@@ -156,9 +156,10 @@ class NoteGroupingTranscriber(object):
         else:
             doShowOctave = basic.showOctaveWithNote(self.previousNote, currentNote)
         
+        descendingChords = self.brailleElementGrouping.descendingChords
         brailleChord = basic.chordToBraille(currentChord,
-                                      descending=self.brailleElementGrouping.descendingChords, 
-                                      showOctave=doShowOctave)
+                                          descending=descendingChords, 
+                                          showOctave=doShowOctave)
         self.previousNote = currentNote
         return brailleChord
     
@@ -179,12 +180,13 @@ class NoteGroupingTranscriber(object):
         
     def translateClef(self, currentClef):
         '''
-        translate Clefs to braille
+        translate Clefs to braille IF self.showClefSigns is True
         '''
         if self.showClefSigns:
-            self.trans.append(basic.clefToBraille(currentClef))
+            brailleClef = basic.clefToBraille(currentClef)
             self.previousNote = None
             self.showLeadingOctave = True
+            return brailleClef
 
 
     translateDict = OrderedDict([
@@ -199,7 +201,8 @@ class NoteGroupingTranscriber(object):
 
     def transcribeOneElement(self, el):
         '''
-        Transcribe a single element...
+        Transcribe a single element and add it to self.trans, setting self.previousElement
+        along the way.
         '''
         elClasses = el.classes
         for className, classMethod in self.translateDict.items():

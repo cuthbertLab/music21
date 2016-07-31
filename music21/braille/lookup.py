@@ -145,15 +145,19 @@ pitchNameToNotes = {'C': c,
                     'A': a,
                     'B': b}
 
-octaves = {0: _B[4] + _B[4],
-           1: _B[4],
+_lowOctave = _B[4]
+_highOctave = _B[6]
+
+octaves = {0: _lowOctave + _lowOctave,
+           1: _lowOctave,
            2: _B[45],
            3: _B[456],
            4: _B[5],
            5: _B[46],
            6: _B[56],
-           7: _B[6],
-           8: _B[6] + _B[6]}
+           7: _highOctave,
+           8: _highOctave + _highOctave,
+           }
 
 _sharp = _B[146]
 _flat = _B[126]
@@ -162,14 +166,14 @@ accidentals = {'sharp':                _sharp,
                'double-sharp':         _sharp + _sharp,
                'triple-sharp':         _sharp + _sharp + _sharp, # extrapolated -- non-attested
                'quadruple-sharp':      _sharp + _sharp + _sharp + _sharp,
-               'half-sharp':           _sharp + _B[4],    # half sharps/flats from
-               'one-and-a-half-sharp': _sharp + _B[456],  # Bettye Krolick (NIM of BMN)
+               'half-sharp':           _B[4] + _sharp,    # half sharps/flats from
+               'one-and-a-half-sharp': _B[456] + _sharp,  # Bettye Krolick (NIM of BMN)
                'flat':                 _flat,
                'double-flat':          _flat + _flat,
                'triple-flat':          _flat + _flat + _flat,
                'quadruple-flat':       _flat + _flat + _flat + _flat,
-               'half-flat':            _flat + _B[4],
-               'one-and-a-half-flat':  _flat + _B[456],
+               'half-flat':            _B[4] + _flat,
+               'one-and-a-half-flat':  _B[456] + _flat,
                'natural':              _B[16],
                }
 

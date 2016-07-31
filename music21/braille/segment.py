@@ -108,13 +108,24 @@ excludeFromBrailleElements = [spanner.Slur,
                               layout.PageLayout, 
                               layout.StaffLayout]
 
-GROUPING_GLOBALS = {'keySignature': 0,
-                    'timeSignature': '4/4'}
+GROUPING_GLOBALS = {'keySignature': None, # will be key.KeySignature(0) on first call
+                    'timeSignature': None, # will be meter.TimeSignature('4/4') on first call
+                    }
 GROUPING_DESC_CHORDS = True
 GROUPING_SHOW_CLEFS = False
 GROUPING_UPPERFIRST_NOTEFINGERING = True
 GROUPING_WITHHYPHEN = False
 GROUPING_NUMREPEATS = 0
+
+def setGroupingGlobals():
+    '''
+    sets defaults for grouping globals.  Called first time anything
+    in Braille is run, but saves creating two expensive objects if never run
+    '''
+    if GROUPING_GLOBALS['keySignature'] == None:
+        GROUPING_GLOBALS['keySignature'] = key.KeySignature(0)
+    if GROUPING_GLOBALS['timeSignature'] == None:
+        GROUPING_GLOBALS['timeSignature'] = meter.TimeSignature('4/4')
 
 # defaults for BrailleSegments
 
@@ -171,15 +182,12 @@ class BrailleElementGrouping(list):
         <music21.note.Rest rest>
         <music21.note.Note F>
 
-        This seems like a mistake that it is not a KeySignature Object by Default...
-        
+        These are the defaults and they are shared across all objects...
+
         >>> bg.keySignature
-        0
-        
-        This seems like a mistake that it is not a TimeSignature Object by Default...
-        
+        <music21.key.KeySignature of no sharps or flats>        
         >>> bg.timeSignature
-        '4/4'
+        <music21.meter.TimeSignature 4/4>
         
         >>> bg.descendingChords
         True
@@ -197,13 +205,9 @@ class BrailleElementGrouping(list):
         0
         """
         list.__init__(self)
-
-        if GROUPING_GLOBALS['keySignature'] == None:
-            GROUPING_GLOBALS['keySignature'] = key.KeySignature(0)
-        if GROUPING_GLOBALS['timeSignature'] == None:
-            GROUPING_GLOBALS['timeSignature'] = meter.TimeSignature('4/4')
         
-
+        setGroupingGlobals()
+        
         self.keySignature = GROUPING_GLOBALS['keySignature']
         self.timeSignature = GROUPING_GLOBALS['timeSignature']
         self.descendingChords = GROUPING_DESC_CHORDS
@@ -338,10 +342,12 @@ class BrailleSegment(collections.defaultdict):
         ---end segment---
         """
         super(BrailleSegment, self).__init__(BrailleElementGrouping)
-        self._allGroupingKeys = None
-        self._currentGroupingKey = None
+
+        self.groupingKeysToProcess = None
+        self.currentGroupingKey = None
         self._lastNote = None
-        self._previousGroupingKey = None
+        self.previousGroupingKey = None
+        
         self.cancelOutgoingKeySig = SEGMENT_CANCEL_OUTGOINGKEYSIG
         self.dummyRestLength = SEGMENT_DUMMYRESTLENGTH
         self.maxLineLength = SEGMENT_MAXLINELENGTH
@@ -352,13 +358,16 @@ class BrailleSegment(collections.defaultdict):
         self.endHyphen = SEGMENT_ENDHYPHEN
         self.beginsMidMeasure = False
         
+        self.brailleText = text.BrailleText(self.maxLineLength) # will be overwritten...
         
     def __unicode__(self):
         name = u"<music21.braille.segment BrailleSegment>"
+        
         allItems = sorted(self.items())
         allKeys = []
         allGroupings = []
         prevKey = SegmentKey()
+        
         for (itemKey, grouping) in allItems:
             try:
                 if (prevKey.affinity) == AFFINITY_SPLIT1_NOTEGROUP:
@@ -397,50 +406,300 @@ class BrailleSegment(collections.defaultdict):
         Measure Number
         Rest of Note Groupings
         """
-        bt = text.BrailleText(self.maxLineLength, self.showHand)
-        self._allGroupingKeys = sorted(self.keys())
+        self.brailleText = text.BrailleText(self.maxLineLength, self.showHand)
+        
+        self.groupingKeysToProcess = sorted(self.keys())
         
         if self.showHeading:
-            self.extractHeading(bt) # Heading
+            self.extractHeading() # Heading
+        
         if self.showFirstMeasureNumber:
-            self.addMeasureNumber(bt) # Measure Number
+            self.addMeasureNumber() # Measure Number
+
         if self.dummyRestLength is not None:
-            self.addDummyRests(bt) # Dummy Rests
+            self.addDummyRests() # Dummy Rests
 
-        while self._allGroupingKeys:
-            self._previousGroupingKey = self._currentGroupingKey
-            self._currentGroupingKey = self._allGroupingKeys.pop(0)
 
-            cgkAffinityGroup = self._currentGroupingKey.affinity
+        self.previousGroupingKey = None
+        while self.groupingKeysToProcess:
+            self.currentGroupingKey = self.groupingKeysToProcess.pop(0)
+
+            cgkAffinityGroup = self.currentGroupingKey.affinity
             
             if cgkAffinityGroup == AFFINITY_NOTEGROUP:
-                self.extractNoteGrouping(bt) # Note Grouping
+                self.extractNoteGrouping() # Note Grouping
             elif cgkAffinityGroup == AFFINITY_SIGNATURE:
-                self.extractSignatureGrouping(bt) # Signature(s) Grouping
+                self.extractSignatureGrouping() # Signature(s) Grouping
             elif cgkAffinityGroup == AFFINITY_LONG_TEXTEXPR:
-                self.extractLongExpressionGrouping(bt) # Long Expression(s) Grouping
+                self.extractLongExpressionGrouping() # Long Expression(s) Grouping
 #             elif cgkAffinityGroup == AFFINITY_INACCORD:
-#                 self.extractInaccordGrouping(bt) # In Accord Grouping
+#                 self.extractInaccordGrouping() # In Accord Grouping
             elif cgkAffinityGroup == AFFINITY_TTEXT:
-                self.extractTempoTextGrouping(bt) # Tempo Text Grouping
+                self.extractTempoTextGrouping() # Tempo Text Grouping
+            self.previousGroupingKey = self.currentGroupingKey
 
-        return bt
+        return self.brailleText
 
-    def addDummyRests(self, brailleText):
+    def addDummyRests(self):
+        u'''
+        Adds as many dummy rests as self.dummyRestLength to the signatures of
+        brailleText
+        
+        >>> seg = braille.segment.BrailleSegment()
+        >>> seg.dummyRestLength = 4
+    
+        >>> print(braille.lookup.rests['dummy'])
+        ⠄
+        >>> seg.addDummyRests()
+        >>> print(seg.brailleText)
+        ⠄⠄⠄⠄
+        '''
         dummyRests = [self.dummyRestLength * lookup.rests['dummy']]
-        brailleText.addSignatures(u"".join(dummyRests))
+        bt = self.brailleText
+        bt.addSignatures(u"".join(dummyRests))
 
-    def addMeasureNumber(self, brailleText):
-        """
+    def addMeasureNumber(self):
+        u"""
         Takes in a braille text instance and adds a measure number 
         
+        >>> segKey = braille.segment.SegmentKey(measure=4, ordinal=1, affinity=9)
+        >>> seg = braille.segment.BrailleSegment()
+
+        Initialize a new Key
+
+        >>> type(seg[segKey])
+        <class 'music21.braille.segment.BrailleElementGrouping'>
+        >>> seg.addMeasureNumber()
+        >>> print(seg.brailleText)
+        ⠼⠙
+        
+        Add a dot to the measure number if the segment begins mid-measure
+        
+        >>> seg = braille.segment.BrailleSegment()
+        >>> seg[segKey]
+        >>> seg.beginsMidMeasure = True
+        >>> seg.addMeasureNumber()
+        >>> print(seg.brailleText)
+        ⠼⠙⠄
         """
-        initMeasureNumber = self._allGroupingKeys[0].measure
+        gkp = self.groupingKeysToProcess or sorted(self.keys())
+        firstSegmentKey = gkp[0]
+        initMeasureNumber = firstSegmentKey.measure
         brailleNumber = basic.numberToBraille(initMeasureNumber)
         if self.beginsMidMeasure:
             brailleNumber += symbols['dot'] 
 
-        brailleText.addMeasureNumber(brailleNumber)
+        bt = self.brailleText
+        bt.addMeasureNumber(brailleNumber)
+
+
+    def extractHeading(self):
+        """
+        Extract a :class:`~music21.key.KeySignature`, :class:`~music21.meter.TimeSignature,
+        :class:`~music21.tempo.TempoText` and :class:`~music21.tempo.MetronomeMark` and
+        add an appropriate braille heading to the brailleText object inputted.    
+        """
+        keySignature = None
+        timeSignature = None
+        tempoText = None
+        metronomeMark = None
+        # find the first keySignature and timeSignature...
+        
+        groupingKeysToProcess = self.groupingKeysToProcess or sorted(self.keys())
+        
+        while groupingKeysToProcess:
+            if groupingKeysToProcess[0].affinity > AFFINITY_MMARK:
+                break
+            cgk = groupingKeysToProcess.pop(0) # cgk = currentGroupingKey 
+
+            cgkAffinityGroup = cgk.affinity
+            currentBrailleGrouping = self.get(cgk) # currentGrouping...
+            
+            if cgkAffinityGroup == AFFINITY_SIGNATURE:
+                if len(currentBrailleGrouping) >= 2:
+                    keySignature, timeSignature = (currentBrailleGrouping[0], 
+                                                   currentBrailleGrouping[1])
+                elif len(currentBrailleGrouping) == 1:
+                    keyOrTimeSig = currentBrailleGrouping[0]
+                    if isinstance(keyOrTimeSig, key.KeySignature):
+                        keySignature = keyOrTimeSig
+                    else:
+                        timeSignature = keyOrTimeSig
+            elif cgkAffinityGroup == AFFINITY_TTEXT:
+                tempoText = currentBrailleGrouping[0]
+            elif cgkAffinityGroup == AFFINITY_MMARK:
+                metronomeMark = currentBrailleGrouping[0]
+
+        if any([keySignature, timeSignature, tempoText, metronomeMark]):
+            brailleHeading = basic.transcribeHeading(keySignature, 
+                                                     timeSignature,
+                                                     tempoText, 
+                                                     metronomeMark, 
+                                                     self.maxLineLength)
+            self.brailleText.addHeading(brailleHeading)
+
+            
+#     def extractInaccordGrouping(self):
+#         inaccords = self.get(self.currentGroupingKey)
+#         voice_trans = []
+#         for music21Voice in inaccords:
+#             noteGrouping = extractBrailleElements(music21Voice)
+#             noteGrouping.descendingChords = inaccords.descendingChords
+#             noteGrouping.showClefSigns = inaccords.showClefSigns
+#             noteGrouping.upperFirstInNoteFingering = inaccords.upperFirstInNoteFingering
+#             voice_trans.append(ngMod.transcribeNoteGrouping(noteGrouping))
+#         brailleInaccord = symbols['full_inaccord'].join(voice_trans)
+#         self.brailleText.addInaccord(brailleInaccord)
+
+    def extractLongExpressionGrouping(self):
+        '''
+        Extract the Long Expression that is in the ElementGrouping in cgk
+        and add it to brailleText.        
+        '''
+        cgk = self.currentGroupingKey
+        currentElementGrouping = self.get(cgk)
+        longTextExpression = currentElementGrouping[0]
+        longExprInBraille = basic.textExpressionToBraille(longTextExpression)
+        self.brailleText.addLongExpression(longExprInBraille)        
+        
+
+    def extractNoteGrouping(self):
+        transcriber = ngMod.NoteGroupingTranscriber()
+        
+        noteGrouping = self.get(self.currentGroupingKey)
+            
+        allNotes = [n for n in noteGrouping if isinstance(n, note.Note)]
+        currentKey = self.currentGroupingKey
+        previousKey = self.previousGroupingKey
+        if previousKey is not None:            
+            if ((currentKey.measure == previousKey.measure 
+                        and currentKey.ordinal == previousKey.ordinal + 1
+                        and currentKey.affinity == previousKey.affinity
+                        and currentKey.splitGroup == previousKey.splitGroup)
+                    or previousKey.affinity != AFFINITY_NOTEGROUP):                 
+                self._lastNote = None
+        showLeadingOctave = True
+        if allNotes:
+            if not self.suppressOctaveMarks:
+                if self._lastNote is not None:
+                    firstNote = allNotes[0]
+                    showLeadingOctave = basic.showOctaveWithNote(self._lastNote, firstNote)
+            else:
+                showLeadingOctave = False
+            self._lastNote = allNotes[-1]
+        else:
+            if self.suppressOctaveMarks:
+                showLeadingOctave = False
+
+        transcriber.showLeadingOctave = showLeadingOctave    
+        brailleNoteGrouping = transcriber.transcribeGroup(noteGrouping)
+        try:
+            self.brailleText.addNoteGrouping(brailleNoteGrouping,
+                                        showLeadingOctave=showLeadingOctave, 
+                                        withHyphen=noteGrouping.withHyphen)
+        except text.BrailleTextException as bte:
+            if bte.args[0] == "Recalculate Note Grouping With Leading Octave":
+                showLeadingOctave = True
+                if self.suppressOctaveMarks:
+                    showLeadingOctave = False
+                    
+                transcriber.showLeadingOctave = showLeadingOctave
+                brailleNoteGrouping = transcriber.transcribeGroup(noteGrouping)
+                
+                self.brailleText.addNoteGrouping(brailleNoteGrouping,
+                                            showLeadingOctave=True, 
+                                            withHyphen=noteGrouping.withHyphen)
+            elif bte.args[0] == "Split Note Grouping":
+                isSolved = False
+                beatDivisionOffset = 0
+                while not isSolved:
+                    (splitNoteGroupA, splitNoteGroupB) = splitNoteGrouping(noteGrouping, 
+                                                            beatDivisionOffset=beatDivisionOffset)
+                    transcriber.showLeadingOctave = showLeadingOctave
+                    brailleNoteGroupingA = transcriber.transcribeGroup(splitNoteGroupA)
+                    try:
+                        self.brailleText.addNoteGrouping(brailleNoteGroupingA,
+                                                    showLeadingOctave=showLeadingOctave, 
+                                                    withHyphen=True)
+                    except text.BrailleTextException:
+                        beatDivisionOffset += 1
+                        continue
+                    showLeadingOctave = True
+                    if self.suppressOctaveMarks:
+                        showLeadingOctave = False
+                    transcriber.showLeadingOctave = showLeadingOctave
+                    
+                    brailleNoteGroupingB = transcriber.transcribeGroup(splitNoteGroupB)
+                    try:
+                        self.brailleText.addNoteGrouping(brailleNoteGroupingB,
+                                               showLeadingOctave=True, 
+                                               withHyphen=noteGrouping.withHyphen, 
+                                               forceHyphen=True)
+                    except text.BrailleTextException as bte:
+                        self.brailleText.addNoteGrouping(brailleNoteGroupingB,
+                                                    showLeadingOctave=True, 
+                                                    withHyphen=noteGrouping.withHyphen, 
+                                                    forceHyphen=True,
+                                                    forceNewline=True)
+                    isSolved = True
+                    
+                    aKey = currentKey._replace(affinity=currentKey.affinity - 0.5)
+                    bKey = currentKey._replace(affinity=currentKey.affinity + 0.5)
+                    
+                    self[aKey] = splitNoteGroupA
+                    self[bKey] = splitNoteGroupB
+                    
+                    
+        repeatTimes = noteGrouping.numRepeats
+        if repeatTimes > 0 and repeatTimes < 3:
+            for unused_repeatCounter in range(repeatTimes):
+                self.brailleText.addSignatures(symbols['repeat'])
+        elif repeatTimes >= 3:  # 17.3 -- repeat plus number.
+            self.brailleText.addSignatures(symbols['repeat'] + basic.numberToBraille(repeatTimes))
+            self._lastNote = None # this is set up to force an octave symbol.
+            
+
+    def extractSignatureGrouping(self):
+        '''
+        Extracts a key signature, time signature, and possibly an outgoing key signature
+        and adds it to the BrailleText object.
+        '''
+        keySignature = None
+        timeSignature = None
+        
+        cgk = self.currentGroupingKey
+        noteGrouping = self.get(cgk)
+        
+        if len(noteGrouping) >= 2:            
+            keySignature, timeSignature = noteGrouping[0], noteGrouping[1]
+        elif len(noteGrouping) == 1:
+            keyOrTimeSig = self.get(self.currentGroupingKey)[0]
+            if isinstance(keyOrTimeSig, key.KeySignature):
+                keySignature = keyOrTimeSig
+            else:
+                timeSignature = keyOrTimeSig
+        
+        outgoingKeySig = None
+        if self.cancelOutgoingKeySig and keySignature is not None:
+            try:
+                outgoingKeySig = keySignature.outgoingKeySig
+            except AttributeError:
+                pass
+        
+        brailleSig = basic.transcribeSignatures(keySignature, timeSignature, outgoingKeySig)
+        if brailleSig != u"":
+            self.brailleText.addSignatures(brailleSig)
+
+    def extractTempoTextGrouping(self):
+        '''
+        extracts a tempo text and process it... 
+        '''
+        self.groupingKeysToProcess.insert(0, self.currentGroupingKey)
+        if self.previousGroupingKey.affinity == AFFINITY_SIGNATURE:
+            self.groupingKeysToProcess.insert(0, self.previousGroupingKey)
+        self.extractHeading()
+        self.addMeasureNumber()
+
 
     def consolidate(self):
         """
@@ -479,200 +738,6 @@ class BrailleSegment(collections.defaultdict):
                 for item in groupingList:
                     newSegment[pngKey].append(item)
         return newSegment
-
-    def extractHeading(self, brailleText):
-        """
-        Extract a :class:`~music21.key.KeySignature`, :class:`~music21.meter.TimeSignature,
-        :class:`~music21.tempo.TempoText` and :class:`~music21.tempo.MetronomeMark` and
-        add an appropriate braille heading to the brailleText object inputted.    
-        """
-        keySignature = None
-        timeSignature = None
-        tempoText = None
-        metronomeMark = None
-        
-        while True:
-            if self._allGroupingKeys is None:
-                self._allGroupingKeys = sorted(self.keys())
-            if self._allGroupingKeys[0].affinity > AFFINITY_MMARK:
-                break
-
-            self._currentGroupingKey = self._allGroupingKeys.pop(0)
-            cgkAffinityGroup = self._currentGroupingKey.affinity
-            
-            if cgkAffinityGroup == AFFINITY_SIGNATURE:
-                try:
-                    keySignature, timeSignature = (self.get(self._currentGroupingKey)[0], 
-                                                   self.get(self._currentGroupingKey)[1])
-                except IndexError:
-                    keyOrTimeSig = self.get(self._currentGroupingKey)[0]
-                    if isinstance(keyOrTimeSig, key.KeySignature):
-                        keySignature = keyOrTimeSig
-                    else:
-                        timeSignature = keyOrTimeSig
-            elif cgkAffinityGroup == AFFINITY_TTEXT:
-                tempoText = self.get(self._currentGroupingKey)[0]
-            elif cgkAffinityGroup == AFFINITY_MMARK:
-                metronomeMark = self.get(self._currentGroupingKey)[0]
-
-        try:
-            brailleHeading = basic.transcribeHeading(keySignature, 
-                                                     timeSignature,
-                                                     tempoText, 
-                                                     metronomeMark, 
-                                                     self.maxLineLength)
-            brailleText.addHeading(brailleHeading)
-        except basic.BrailleBasicException as bbe:
-            if bbe.args[0] != "No heading can be made.":
-                raise bbe
-            
-#     def extractInaccordGrouping(self, brailleText):
-#         inaccords = self.get(self._currentGroupingKey)
-#         voice_trans = []
-#         for music21Voice in inaccords:
-#             noteGrouping = extractBrailleElements(music21Voice)
-#             noteGrouping.descendingChords = inaccords.descendingChords
-#             noteGrouping.showClefSigns = inaccords.showClefSigns
-#             noteGrouping.upperFirstInNoteFingering = inaccords.upperFirstInNoteFingering
-#             voice_trans.append(ngMod.transcribeNoteGrouping(noteGrouping))
-#         brailleInaccord = symbols['full_inaccord'].join(voice_trans)
-#         brailleText.addInaccord(brailleInaccord)
-
-    def extractLongExpressionGrouping(self, brailleText):
-        longExpr = basic.textExpressionToBraille(self.get(self._currentGroupingKey)[0])
-        brailleText.addLongExpression(longExpr)        
-        
-
-    def extractNoteGrouping(self, brailleText):
-        transcriber = ngMod.NoteGroupingTranscriber()
-        
-        noteGrouping = self.get(self._currentGroupingKey)
-        allNotes = [n for n in noteGrouping if isinstance(n, note.Note)]
-        currentKey = self._currentGroupingKey
-        previousKey = self._previousGroupingKey
-        if previousKey is not None:            
-            if ((currentKey.measure == previousKey.measure 
-                        and currentKey.ordinal == previousKey.ordinal + 1
-                        and currentKey.affinity == previousKey.affinity
-                        and currentKey.splitGroup == previousKey.splitGroup)
-                    or previousKey.affinity != AFFINITY_NOTEGROUP):                 
-                self._lastNote = None
-        showLeadingOctave = True
-        if allNotes:
-            if not self.suppressOctaveMarks:
-                if self._lastNote is not None:
-                    firstNote = allNotes[0]
-                    showLeadingOctave = basic.showOctaveWithNote(self._lastNote, firstNote)
-            else:
-                showLeadingOctave = False
-            self._lastNote = allNotes[-1]
-        else:
-            if self.suppressOctaveMarks:
-                showLeadingOctave = False
-
-        transcriber.showLeadingOctave = showLeadingOctave    
-        brailleNoteGrouping = transcriber.transcribeGroup(noteGrouping)
-        try:
-            brailleText.addNoteGrouping(brailleNoteGrouping,
-                                        showLeadingOctave=showLeadingOctave, 
-                                        withHyphen=noteGrouping.withHyphen)
-        except text.BrailleTextException as bte:
-            if bte.args[0] == "Recalculate Note Grouping With Leading Octave":
-                showLeadingOctave = True
-                if self.suppressOctaveMarks:
-                    showLeadingOctave = False
-                    
-                transcriber.showLeadingOctave = showLeadingOctave
-                brailleNoteGrouping = transcriber.transcribeGroup(noteGrouping)
-                
-                brailleText.addNoteGrouping(brailleNoteGrouping,
-                                            showLeadingOctave=True, 
-                                            withHyphen=noteGrouping.withHyphen)
-            elif bte.args[0] == "Split Note Grouping":
-                isSolved = False
-                beatDivisionOffset = 0
-                while not isSolved:
-                    (splitNoteGroupA, splitNoteGroupB) = splitNoteGrouping(noteGrouping, 
-                                                            beatDivisionOffset=beatDivisionOffset)
-                    transcriber.showLeadingOctave = showLeadingOctave
-                    brailleNoteGroupingA = transcriber.transcribeGroup(splitNoteGroupA)
-                    try:
-                        brailleText.addNoteGrouping(brailleNoteGroupingA,
-                                                    showLeadingOctave=showLeadingOctave, 
-                                                    withHyphen=True)
-                    except text.BrailleTextException:
-                        beatDivisionOffset += 1
-                        continue
-                    showLeadingOctave = True
-                    if self.suppressOctaveMarks:
-                        showLeadingOctave = False
-                    transcriber.showLeadingOctave = showLeadingOctave
-                    
-                    brailleNoteGroupingB = transcriber.transcribeGroup(splitNoteGroupB)
-                    try:
-                        brailleText.addNoteGrouping(brailleNoteGroupingB,
-                                               showLeadingOctave=True, 
-                                               withHyphen=noteGrouping.withHyphen, 
-                                               forceHyphen=True)
-                    except text.BrailleTextException as bte:
-                        brailleText.addNoteGrouping(brailleNoteGroupingB,
-                                                    showLeadingOctave=True, 
-                                                    withHyphen=noteGrouping.withHyphen, 
-                                                    forceHyphen=True,
-                                                    forceNewline=True)
-                    isSolved = True
-                    
-                    aKey = currentKey._replace(affinity=currentKey.affinity - 0.5)
-                    bKey = currentKey._replace(affinity=currentKey.affinity + 0.5)
-                    
-                    self[aKey] = splitNoteGroupA
-                    self[bKey] = splitNoteGroupB
-                    
-                    
-        repeatTimes = noteGrouping.numRepeats
-        if repeatTimes > 0 and repeatTimes < 3:
-            for unused_repeatCounter in range(repeatTimes):
-                brailleText.addSignatures(symbols['repeat'])
-        elif repeatTimes >= 3:  # 17.3 -- repeat plus number.
-            brailleText.addSignatures(symbols['repeat'] + basic.numberToBraille(repeatTimes))
-            self._lastNote = None # this is set up to force an octave symbol.
-            
-
-    def extractSignatureGrouping(self, brailleText):
-        keySignature = None
-        timeSignature = None
-        try:
-            keySignature, timeSignature = (self.get(self._currentGroupingKey)[0],
-                                           self.get(self._currentGroupingKey)[1])
-        except IndexError:
-            keyOrTimeSig = self.get(self._currentGroupingKey)[0]
-            if isinstance(keyOrTimeSig, key.KeySignature):
-                keySignature = keyOrTimeSig
-            else:
-                timeSignature = keyOrTimeSig
-        
-        outgoingKeySig = None
-        if self.cancelOutgoingKeySig and keySignature is not None:
-            try:
-                outgoingKeySig = keySignature.outgoingKeySig
-            except AttributeError:
-                pass
-
-        try:
-            brailleSig = basic.transcribeSignatures(keySignature, timeSignature, outgoingKeySig)
-            brailleText.addSignatures(brailleSig)
-        except basic.BrailleBasicException as bbe:
-            if bbe.args[0] != "No key or time signature to transcribe!":
-                raise bbe
-
-    def extractTempoTextGrouping(self, brailleText):
-        self._allGroupingKeys.insert(0, self._currentGroupingKey)
-        if self._previousGroupingKey.affinity == AFFINITY_SIGNATURE:
-            self._allGroupingKeys.insert(0, self._previousGroupingKey)
-        self.extractHeading(brailleText)
-        self.addMeasureNumber(brailleText)
-
-
 
     def addGroupingAttributes(self, **partKeywords):
         """
@@ -908,12 +973,12 @@ class BrailleGrandSegment(object):
 
             if rightKey.affinity >= AFFINITY_INACCORD or leftKey.affinity >= AFFINITY_INACCORD:
                 self.extractNoteGrouping(bk) # Note or Inaccord Grouping
-            elif rightKey.affinity == AFFINITY_SIGNATURE or leftKey.affinity == AFFINITY_SIGNATURE:
-                self.extractSignatureGrouping(bk) # Signature Grouping
-            elif rightKey.affinity == AFFINITY_LONG_TEXTEXPR or leftKey.affinity == AFFINITY_LONG_TEXTEXPR:
-                self.extractLongExpressionGrouping(bk) # Long Expression Grouping
-            elif rightKey.affinity == AFFINITY_TTEXT or leftKey.affinity == AFFINITY_TTEXT:
-                self.extractTempoTextGrouping(bk) # Tempo Text Grouping
+#             elif rightKey.affinity == AFFINITY_SIGNATURE or leftKey.affinity == AFFINITY_SIGNATURE:
+#                 self.extractSignatureGrouping(bk) # Signature Grouping
+#             elif rightKey.affinity == AFFINITY_LONG_TEXTEXPR or leftKey.affinity == AFFINITY_LONG_TEXTEXPR:
+#                 self.extractLongExpressionGrouping(bk) # Long Expression Grouping
+#             elif rightKey.affinity == AFFINITY_TTEXT or leftKey.affinity == AFFINITY_TTEXT:
+#                 self.extractTempoTextGrouping(bk) # Tempo Text Grouping
                 
         return bk
     
@@ -989,17 +1054,17 @@ class BrailleGrandSegment(object):
         brailleKeyboard.addNoteGroupings(currentMeasureNumber, rh_braille, lh_braille)
         return None
 
-    #noinspection PyUnusedLocal
-    def extractSignatureGrouping(self, brailleKeyboard):
-        pass
+#     #noinspection PyUnusedLocal
+#     def extractSignatureGrouping(self, brailleKeyboard):
+#         pass
 
-    #noinspection PyUnusedLocal
-    def extractLongExpressionGrouping(self, brailleKeyboard):
-        pass
+#     #noinspection PyUnusedLocal
+#     def extractLongExpressionGrouping(self, brailleKeyboard):
+#         pass
 
-    #noinspection PyUnusedLocal
-    def extractTempoTextGrouping(self, brailleKeyboard):
-        pass
+#     #noinspection PyUnusedLocal
+#     def extractTempoTextGrouping(self, brailleKeyboard):
+#         pass
             
 def splitNoteGrouping(noteGrouping, beatDivisionOffset=0):
     u"""
@@ -1761,6 +1826,22 @@ def areGroupingsIdentical(noteGroupingA, noteGroupingB):
     """
     Takes in two note groupings, noteGroupingA and noteGroupingB. Returns True
     if both groupings have identical contents. False otherwise.
+
+    Helper for numRepeats...
+    
+    Needs two identical length groupings.
+    
+    >>> a = [note.Note('C4'), note.Note('D4')]
+    >>> b = [note.Note('C4'), note.Note('D4')]
+    >>> braille.segment.areGroupingsIdentical(a, b)
+    True
+    
+    >>> d = b.pop()
+    >>> braille.segment.areGroupingsIdentical(a, b)
+    False
+    >>> c = [note.Rest(), note.Note('D4')]
+    >>> braille.segment.areGroupingsIdentical(a, c)
+    False
     """
     if len(noteGroupingA) == len(noteGroupingB):
         for (elementA, elementB) in zip(noteGroupingA, noteGroupingB):

@@ -36,7 +36,6 @@ intervals = lookup.intervals
 keySignatures = lookup.keySignatures
 naturals = lookup.naturals
 numbers = lookup.numbers
-octaves = lookup.octaves
 rests = lookup.rests
 symbols = lookup.symbols
 textExpressions = lookup.textExpressions
@@ -157,21 +156,72 @@ def chordToBraille(music21Chord, descending=True, showOctave=True):
         if intervalDistance > 8:
             intervalDistance = intervalDistance % 8 + 1
             if currentPitchIndex == 1:
-                chordTrans.append(octaves[currentPitch.octave])
+                brailleOctave = pitchToOctave(currentPitch)
+                chordTrans.append(brailleOctave)
                 music21Chord._brailleEnglish.append(
-                    u"Octave {0} {1}".format(currentPitch.octave, octaves[currentPitch.octave]))
+                    u"Octave {0} {1}".format(currentPitch.octave, brailleOctave))
             else:
                 previousPitch = allPitches[currentPitchIndex - 1]
                 relativeIntervalDist = interval.notesToInterval(previousPitch, 
                                                             currentPitch).generic.undirected
                 if relativeIntervalDist >= 8:
-                    chordTrans.append(octaves[currentPitch.octave])
+                    brailleOctave = pitchToOctave(currentPitch)
+                    chordTrans.append(brailleOctave)
                     music21Chord._brailleEnglish.append(
-                        u"Octave {0} {1}".format(currentPitch.octave, octaves[currentPitch.octave]))
+                        u"Octave {0} {1}".format(currentPitch.octave, brailleOctave))
         chordTrans.append(intervals[intervalDistance])
         music21Chord._brailleEnglish.append(u"Interval {0} {1}".format(intervalDistance, 
                                                                        intervals[intervalDistance]))
     return u"".join(chordTrans)
+
+def pitchToOctave(music21PitchOrInt):
+    u'''
+    takes a pitch object and returns the brailling for the octave.
+    
+    Can also be given an int specifying the octave.
+    
+    Expands the definition given in Degarmo Ch 7 to allow even less commonly used octaves such
+    as -1, and > 8 by tripling, etc. the number of octave marks.
+    
+    >>> print(braille.basic.pitchToOctave(pitch.Pitch("C4")))
+    ⠐
+    >>> print(braille.basic.pitchToOctave(pitch.Pitch("B-4")))
+    ⠐
+    >>> print(braille.basic.pitchToOctave(4))
+    ⠐
+    >>> print(braille.basic.pitchToOctave(3))
+    ⠸
+    >>> print(braille.basic.pitchToOctave(2))
+    ⠘
+    >>> print(braille.basic.pitchToOctave(1))
+    ⠈
+    >>> print(braille.basic.pitchToOctave(0))
+    ⠈⠈
+    >>> print(braille.basic.pitchToOctave(-1))
+    ⠈⠈⠈
+    >>> print(braille.basic.pitchToOctave(5))
+    ⠨
+    >>> print(braille.basic.pitchToOctave(6))
+    ⠰
+    >>> print(braille.basic.pitchToOctave(7))
+    ⠠
+    >>> print(braille.basic.pitchToOctave(8))
+    ⠠⠠
+    >>> print(braille.basic.pitchToOctave(9))
+    ⠠⠠⠠
+    '''
+    if hasattr(music21PitchOrInt, 'octave'):
+        octave = music21PitchOrInt.octave
+    else:
+        octave = music21PitchOrInt
+        
+    if octave in lookup.octaves:
+        return lookup.octaves[octave]
+    elif octave < 1:
+        return lookup.octaves[1] * (2 - octave)
+    elif octave > 7:
+        return lookup.octaves[7] * (octave - 6)
+    
 
 def clefToBraille(music21Clef, keyboardHandSwitched=False):
     u"""
@@ -396,7 +446,7 @@ def metronomeMarkToBraille(music21MetronomeMark):
     try:
         metroTrans = []
         metroNote = note.Note('C4', quarterLength=music21MetronomeMark.referent.quarterLength)
-        brailleNote = noteToBraille(metroNote, showOctave = False)
+        brailleNote = noteToBraille(metroNote, showOctave=False)
         metroTrans.append(brailleNote)
         music21MetronomeMark._brailleEnglish.append(u"Metronome Note {0}".format(u" ".join(
                                                     metroNote._brailleEnglish)))
@@ -561,13 +611,10 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
     # octave mark
     # -----------
     if showOctave:
-        try:
-            noteTrans.append(octaves[music21Note.octave])
-            music21Note._brailleEnglish.append(u"Octave {0} {1}".format(
-                            music21Note.octave, octaves[music21Note.octave]))
-        except KeyError:  # pragma: no cover
-            environRules.warn("Octave {0} of note {1} cannot be transcribed to braille.".format(
-                                music21Note.octave, music21Note))
+        brailleOctave = pitchToOctave(music21Note.pitch)
+        noteTrans.append(brailleOctave)
+        music21Note._brailleEnglish.append(u"Octave {0} {1}".format(
+                        music21Note.octave, brailleOctave))
 
     # note name
     # ---------
@@ -723,26 +770,19 @@ def tempoTextToBraille(music21TempoText, maxLineLength=40):
                                                                         music21TempoText.text))
                 return symbols['basic_exception']
             
-            if len(phraseTrans) + len(brailleWord) + 1 <= (maxLineLength - 6):
-                phraseTrans.append(brailleWord)
-                phraseTrans.append(symbols['space'])
-            else:
+            if len(phraseTrans) + len(brailleWord) + 1 > (maxLineLength - 6):
                 phraseTrans.append(u"\n")
-                phraseTrans.append(brailleWord)
-                phraseTrans.append(symbols['space'])
+
+            phraseTrans.append(brailleWord)
+            phraseTrans.append(symbols['space'])
         braillePhrases.append(u"".join(phraseTrans[0:-1]))
     
-    brailleText = []
-    for braillePhrase in braillePhrases:
-        brailleText.append(braillePhrase)
-        brailleText.append(alphabet[","])
-        brailleText.append(u"\n")
-        
-    brailleText = brailleText[0:-2]
-    brailleText.append(alphabet["."]) # literary period
+    joiner = alphabet[","] + u"\n"
+    brailleUnicodeText = joiner.join(braillePhrases) + alphabet["."]
+
     music21TempoText._brailleEnglish.append(
-            u"Tempo Text {0} {1}".format(music21TempoText.text, u"".join(brailleText)))
-    return u"".join(brailleText)
+            u"Tempo Text {0} {1}".format(music21TempoText.text, brailleUnicodeText))
+    return brailleUnicodeText
 
 def textExpressionToBraille(music21TextExpression, precedeByWordSign=True):    
     u"""
@@ -1146,7 +1186,7 @@ def transcribeSignatures(music21KeySignature, music21TimeSignature, outgoingKeyS
     if (music21TimeSignature is None 
             and (music21KeySignature is None 
                  or (music21KeySignature.sharps == 0 and outgoingKeySig is None))):
-        raise BrailleBasicException("No key or time signature to transcribe!")
+        return u""
     
     trans = []
     if music21KeySignature is not None:
@@ -1236,7 +1276,7 @@ def brailleAsciiToBrailleUnicode(brailleAscii):
 
 def brailleUnicodeToSymbols(brailleUnicode, filledSymbol=u'o', emptySymbol=u'\u00B7'):
     u"""
-    translates a braille unicode string into symbols (unicode).
+    translates a braille unicode string into symbols (unicode) -- for debugging.
     
     >>> print(braille.basic.brailleUnicodeToSymbols(u'⠜'))
     ·o
