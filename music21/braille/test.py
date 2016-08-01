@@ -83,7 +83,8 @@ def example2_1():
     ===
     ---end segment---    
     """
-    bm = converter.parse("tinynotation: 3/8         g8 r8 e8    f8 r8 a8    g8 r8 f8    e8 r8 r8" + 
+    bm = converter.parse("tinynotation: 3/8         " +
+                         "g8 r8 e8     f8 r8 a8     g8 r8 f8    e8 r8 r8 " + 
                          "e8 r8 c8     d8 r8 f8     e8 r8 d8    c8 r8 r8 " + 
                          "d8 r8 f8     e8 r8 g8     f8 g8 a8    g8 r8 r8 " + 
                          "a8 r8 f8     g8 r8 e8     f8 e8 d8    c8 r8 r8", 
