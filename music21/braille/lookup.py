@@ -340,7 +340,7 @@ symbols = {'space': _B[0],
            'metronome': _B[2356],
            'common': _B[46] + _B[14],
            'cut': _B[456] + _B[14],
-           'music_hyphen': _B[5],
+           'music_hyphen': _B[5], # or transcriber-added sign
            'music_asterisk': _B[345] + _B[26] + _B[35],
            'rh_keyboard': _B[46] + _B[345],
            'lh_keyboard': _B[456] + _B[345],
@@ -356,7 +356,9 @@ symbols = {'space': _B[0],
            'closing_bracket_slur': _B[45] + _B[23],
            'basic_exception': _B[345] + _B[236],
            'full_inaccord': _B[126] + _B[345],
-           'repeat': _B[2356]}
+           'repeat': _B[2356],
+           'print-pagination': _B[5] + _B[25], # used to indicate page turnover for sighted
+           }
 
 ascii_chars = {_B[0]: ' ',
                _B[1]: 'A',

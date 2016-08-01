@@ -663,6 +663,64 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
         return showLeadingOctave
 
 
+    def needsSplitToFit(self, brailleNoteGrouping):
+        '''
+        Returns boolean on whether a note grouping needs to be split in order to fit.
+        
+        Generally a noteGrouping will need to be split if the amount of space left
+        is more than 1/4 of the line length and the brailleNoteGrouping cannot fit.
+        '''
+        quarterLineLength = self.lineLength // 4
+        spaceLeft = self.lineLength - self.currentLine.textLocation
+        if (spaceLeft > quarterLineLength 
+                and len(brailleNoteGrouping) > quarterLineLength):
+            return True
+        else:
+            return False
+        
+
+    def splitNoteGroupingAndTranscribe(self, 
+                                       noteGrouping, 
+                                       showLeadingOctaveOnFirst=False, 
+                                       addSpaceToFirst=False):
+        '''
+        
+        '''
+        transcriber = ngMod.NoteGroupingTranscriber()
+
+        beatDivisionOffset = 0
+        REASONABLE_LIMIT = 10
+        (splitNoteGroupA, splitNoteGroupB) = (None, None)
+
+        while beatDivisionOffset < REASONABLE_LIMIT:
+            (splitNoteGroupA, splitNoteGroupB) = splitNoteGrouping(
+                                                    noteGrouping, 
+                                                    beatDivisionOffset=beatDivisionOffset)
+            transcriber.showLeadingOctave = showLeadingOctaveOnFirst
+            splitNoteGroupA.withHyphen = True
+            brailleNoteGroupingA = transcriber.transcribeGroup(splitNoteGroupA)
+            if self.currentLine.canAppend(brailleNoteGroupingA, addSpace=addSpaceToFirst):
+                break
+            
+            beatDivisionOffset += 1
+            continue
+            
+            
+        showLeadingOctave = False if self.suppressOctaveMarks else True
+        transcriber.showLeadingOctave = showLeadingOctave
+        brailleNoteGroupingB = transcriber.transcribeGroup(splitNoteGroupB)
+
+        currentKey = self.currentGroupingKey
+        
+        aKey = currentKey._replace(affinity=currentKey.affinity - 0.5)
+        bKey = currentKey._replace(affinity=currentKey.affinity + 0.5)
+        
+        self[aKey] = splitNoteGroupA
+        self[bKey] = splitNoteGroupB
+        
+        return (brailleNoteGroupingA, brailleNoteGroupingB)
+
+
     def extractNoteGrouping(self):
         transcriber = ngMod.NoteGroupingTranscriber()
         
@@ -677,46 +735,16 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
         if self.currentLine.canAppend(brailleNoteGrouping, addSpace=addSpace):
             self.currentLine.append(brailleNoteGrouping, addSpace=addSpace)
         else:
-            quarterLineLength = self.lineLength // 4
-            spaceLeft = self.lineLength - self.currentLine.textLocation
-            if (spaceLeft > quarterLineLength 
-                    and len(brailleNoteGrouping) > quarterLineLength):
+            if self.needsSplitToFit(brailleNoteGrouping):
                 # there is too much space left in the current line to leave it blank
                 # but not enough space left to insert the current brailleNoteGrouping
                 # hence -- let us split this noteGrouping into two noteGroupings.
-                
-                # splitNoteGroupings
-                beatDivisionOffset = 0
-                REASONABLE_LIMIT = 10
-                (splitNoteGroupA, splitNoteGroupB) = (None, None)
+                bngA, bngB = self.splitNoteGroupingAndTranscribe(noteGrouping, 
+                                                                 showLeadingOctave,
+                                                                 addSpace)
+                self.currentLine.append(bngA, addSpace=addSpace)
+                self.addToNewLine(bngB)
 
-                while beatDivisionOffset < REASONABLE_LIMIT:
-                    (splitNoteGroupA, splitNoteGroupB) = splitNoteGrouping(
-                                                            noteGrouping, 
-                                                            beatDivisionOffset=beatDivisionOffset)
-                    transcriber.showLeadingOctave = showLeadingOctave
-                    splitNoteGroupA.withHyphen = True
-                    brailleNoteGroupingA = transcriber.transcribeGroup(splitNoteGroupA)
-                    if self.currentLine.canAppend(brailleNoteGroupingA, addSpace=addSpace):
-                        break
-                    
-                    beatDivisionOffset += 1
-                    continue
-                    
-                self.currentLine.append(brailleNoteGroupingA, addSpace=addSpace)
-                    
-                showLeadingOctave = False if self.suppressOctaveMarks else True
-                transcriber.showLeadingOctave = showLeadingOctave
-                brailleNoteGroupingB = transcriber.transcribeGroup(splitNoteGroupB)
-                self.addToNewLine(brailleNoteGroupingB)
-
-                currentKey = self.currentGroupingKey
-                
-                aKey = currentKey._replace(affinity=currentKey.affinity - 0.5)
-                bKey = currentKey._replace(affinity=currentKey.affinity + 0.5)
-                
-                self[aKey] = splitNoteGroupA
-                self[bKey] = splitNoteGroupB
                 
             elif showLeadingOctave is False:
                 # "Recalculate Note Grouping With Leading Octave":
@@ -1177,31 +1205,6 @@ class BrailleGrandSegment(object):
 #     def extractTempoTextGrouping(self, brailleKeyboard):
 #         pass
             
-def splitNoteGrouping(noteGrouping, beatDivisionOffset=0):
-    u"""
-    Almost identical to :meth:`~music21.braille.segment.splitMeasure`, but
-    functions on a :class:`~music21.braille.segment.BrailleElementGrouping`
-    instead.
-    """
-    # pylint: disable=attribute-defined-outside-init
-    music21Measure = stream.Measure()
-    for brailleElement in noteGrouping:
-        music21Measure.insert(brailleElement.offset, brailleElement)
-    (leftMeasure, rightMeasure) = splitMeasure(music21Measure, 
-                                               beatDivisionOffset, 
-                                               noteGrouping.timeSignature)
-    
-    leftBrailleElements = BrailleElementGrouping()
-    for brailleElement in leftMeasure:
-        leftBrailleElements.append(brailleElement)
-    leftBrailleElements.__dict__ = noteGrouping.__dict__.copy() 
-
-    rightBrailleElements = BrailleElementGrouping()
-    for brailleElement in rightMeasure:
-        rightBrailleElements.append(brailleElement)
-    rightBrailleElements.__dict__ = noteGrouping.__dict__.copy() 
-
-    return leftBrailleElements, rightBrailleElements
 
 #-------------------------------------------------------------------------------
 # Grouping + Segment creation from music21.stream Part
@@ -1964,6 +1967,33 @@ def areGroupingsIdentical(noteGroupingA, noteGroupingB):
 
 #-------------------------------------------------------------------------------
 # Helper Methods
+
+def splitNoteGrouping(noteGrouping, beatDivisionOffset=0):
+    u"""
+    Almost identical to :meth:`~music21.braille.segment.splitMeasure`, but
+    functions on a :class:`~music21.braille.segment.BrailleElementGrouping`
+    instead.
+    """
+    # pylint: disable=attribute-defined-outside-init
+    music21Measure = stream.Measure()
+    for brailleElement in noteGrouping:
+        music21Measure.insert(brailleElement.offset, brailleElement)
+    (leftMeasure, rightMeasure) = splitMeasure(music21Measure, 
+                                               beatDivisionOffset, 
+                                               noteGrouping.timeSignature)
+    
+    leftBrailleElements = BrailleElementGrouping()
+    for brailleElement in leftMeasure:
+        leftBrailleElements.append(brailleElement)
+    leftBrailleElements.__dict__ = noteGrouping.__dict__.copy() 
+
+    rightBrailleElements = BrailleElementGrouping()
+    for brailleElement in rightMeasure:
+        rightBrailleElements.append(brailleElement)
+    rightBrailleElements.__dict__ = noteGrouping.__dict__.copy() 
+
+    return leftBrailleElements, rightBrailleElements
+
 
 def splitMeasure(music21Measure, beatDivisionOffset=0, useTimeSignature=None):
     """
