@@ -719,8 +719,13 @@ def restToBraille(music21Rest):
     """
     music21Rest._brailleEnglish = []
     restTrans = []
+    restType = music21Rest.duration.type
+    restDots = music21Rest.duration.dots
+    if music21Rest.fullMeasure is True:
+        restType = 'whole'
+        restDots = 0
     try:
-        simpleRest = rests[music21Rest.duration.type]
+        simpleRest = rests[restType]
     except KeyError:  # pragma: no cover
         environRules.warn(
             "Rest of duration {0} cannot be transcribed to braille.".format(music21Rest.duration)) 
@@ -728,9 +733,8 @@ def restToBraille(music21Rest):
         return symbols['basic_exception']
 
     restTrans.append(simpleRest)
-    music21Rest._brailleEnglish.append(
-        u"Rest {0} {1}".format(music21Rest.duration.type, simpleRest))
-    for unused_counter_dot in range(music21Rest.duration.dots):
+    music21Rest._brailleEnglish.append(u"Rest {0} {1}".format(restType, simpleRest))
+    for unused_counter_dot in range(restDots):
         restTrans.append(symbols['dot'])
         music21Rest._brailleEnglish.append(u"Dot {0}".format(symbols['dot']))
     return u"".join(restTrans)

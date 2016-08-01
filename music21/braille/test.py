@@ -975,6 +975,75 @@ def example7_6():
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> inPart = test.example7_6()
+    >>> print(translate.partToBraille(inPart, inPlace=True, debug=True))
+    ---begin segment---
+    <music21.braille.segment BrailleSegment>
+    Measure 1, Signature Grouping 1:
+    Time Signature 4/8 ⠼⠙⠦
+    ===
+    Measure 1, Note Grouping 1:
+    <music21.clef.TrebleClef>
+    Accidental flat ⠣
+    Octave 5 ⠨
+    E eighth ⠋
+    E eighth ⠋
+    E eighth ⠋
+    E eighth ⠋
+    ===
+    Measure 2, Note Grouping 1:
+    D eighth ⠑
+    D eighth ⠑
+    Accidental flat ⠣
+    B quarter ⠺
+    ===
+    Measure 3, Note Grouping 1:
+    C eighth ⠙
+    C eighth ⠙
+    C eighth ⠙
+    C eighth ⠙
+    ===
+    Measure 4, Note Grouping 1:
+    Accidental flat ⠣
+    Octave 4 ⠐
+    E eighth ⠋
+    Octave 5 ⠨
+    C eighth ⠙
+    Accidental flat ⠣
+    B quarter ⠺
+    ===
+    Measure 5, Note Grouping 1:
+    F eighth ⠛
+    F eighth ⠛
+    Octave 5 ⠨
+    C quarter ⠹
+    ===
+    Measure 6, Note Grouping 1:
+    Accidental flat ⠣
+    B eighth ⠚
+    B eighth ⠚
+    Octave 5 ⠨
+    F quarter ⠻
+    ===
+    Measure 7, Note Grouping 1:
+    Accidental flat ⠣
+    Octave 5 ⠨
+    E eighth ⠋
+    D eighth ⠑
+    C eighth ⠙
+    Accidental flat ⠣
+    B eighth ⠚
+    ===
+    Measure 8, Note Grouping 1:
+    Accidental flat ⠣
+    Octave 5 ⠨
+    E quarter ⠫
+    Accidental flat ⠣
+    Octave 4 ⠐
+    E quarter ⠫
+    Barline final ⠣⠅
+    ===
+    ---end segment---
+    
     >>> print(translate.partToBraille(inPart, inPlace=True))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠣⠨⠋⠋⠋⠋⠀⠑⠑⠣⠺⠀⠙⠙⠙⠙⠀⠣⠐⠋⠨⠙⠣⠺⠀⠛⠛⠨⠹⠀⠣⠚⠚⠨⠻

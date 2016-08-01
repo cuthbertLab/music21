@@ -684,7 +684,8 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
                                        showLeadingOctaveOnFirst=False, 
                                        addSpaceToFirst=False):
         '''
-        
+        Take a noteGrouping and split it at a logical place,
+        returning braille transcriptions of each section.
         '''
         transcriber = ngMod.NoteGroupingTranscriber()
 
@@ -722,8 +723,10 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
 
 
     def extractNoteGrouping(self):
-        transcriber = ngMod.NoteGroupingTranscriber()
-        
+        '''
+        Fundamentally important method that adds a noteGrouping to the braille line.
+        '''
+        transcriber = ngMod.NoteGroupingTranscriber()        
         noteGrouping = self.get(self.currentGroupingKey)
             
         showLeadingOctave = self.showLeadingOctaveFromNoteGrouping(noteGrouping)
@@ -745,24 +748,17 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
                 self.currentLine.append(bngA, addSpace=addSpace)
                 self.addToNewLine(bngB)
 
-                
-            elif showLeadingOctave is False:
-                # "Recalculate Note Grouping With Leading Octave":
-                # move to a new line and append there with the octave shown.
-                showLeadingOctave = True
-                if self.suppressOctaveMarks:
-                    showLeadingOctave = False
-                    
-                transcriber.showLeadingOctave = showLeadingOctave
-                brailleNoteGrouping = transcriber.transcribeGroup(noteGrouping)
-                self.addToNewLine(brailleNoteGrouping)
             else:
+                # not enough space left on this line to use, so
+                # move the whole group to another line
+                if showLeadingOctave is False and self.suppressOctaveMarks is False:
+                    # if we didn't show the octave before, retranscribe with the octave
+                    # displayed
+                    transcriber.showLeadingOctave = True   
+                    brailleNoteGrouping = transcriber.transcribeGroup(noteGrouping)
                 # if not forceHyphen:
                 self.currentLine.lastHyphenToSpace()
                 self.addToNewLine(brailleNoteGrouping)
-
-                if noteGrouping.withHyphen:
-                    self.currentLine.append(symbols['music_hyphen'], addSpace=False)                
                     
         self.addRepeatSymbols(noteGrouping.numRepeats)            
         
@@ -831,7 +827,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
 
     def extractTempoTextGrouping(self):
         '''
-        extracts a tempo text and process it... 
+        extracts a tempo text and processes it... 
         '''
         self.groupingKeysToProcess.insert(0, self.currentGroupingKey)
         if self.previousGroupingKey.affinity == AFFINITY_SIGNATURE:
@@ -930,9 +926,11 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
                         descendingChords = True
                     elif isinstance(groupingList[0], (clef.BassClef, clef.TenorClef)):
                         descendingChords = False
+                
+                # make a whole rest no matter the length of the rest if only one note.
                 allGeneralNotes = [n for n in groupingList if isinstance(n, note.GeneralNote)]
                 if len(allGeneralNotes) == 1 and isinstance(allGeneralNotes[0], note.Rest):
-                    allGeneralNotes[0].quarterLength = 4.0
+                    allGeneralNotes[0].fullMeasure = True
             groupingList.keySignature = currentKeySig
             groupingList.timeSignature = currentTimeSig
             groupingList.descendingChords = descendingChords
