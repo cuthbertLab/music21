@@ -681,6 +681,10 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
             spaceLeft = self.lineLength - self.currentLine.textLocation
             if (spaceLeft > quarterLineLength 
                     and len(brailleNoteGrouping) > quarterLineLength):
+                # there is too much space left in the current line to leave it blank
+                # but not enough space left to insert the current brailleNoteGrouping
+                # hence -- let us split this noteGrouping into two noteGroupings.
+                
                 # splitNoteGroupings
                 beatDivisionOffset = 0
                 REASONABLE_LIMIT = 10
@@ -704,12 +708,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
                 showLeadingOctave = False if self.suppressOctaveMarks else True
                 transcriber.showLeadingOctave = showLeadingOctave
                 brailleNoteGroupingB = transcriber.transcribeGroup(splitNoteGroupB)
-                self.makeNewLine()
-                if self.rightHandSymbol or self.leftHandSymbol:
-                    self.optionalAddKeyboardSymbolsAndDots(brailleNoteGroupingB)
-                    self.currentLine.append(brailleNoteGroupingB, addSpace=False)
-                else:
-                    self.currentLine.insert(2, brailleNoteGroupingB)
+                self.addToNewLine(brailleNoteGroupingB)
 
                 currentKey = self.currentGroupingKey
                 
@@ -721,27 +720,18 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
                 
             elif showLeadingOctave is False:
                 # "Recalculate Note Grouping With Leading Octave":
+                # move to a new line and append there with the octave shown.
                 showLeadingOctave = True
                 if self.suppressOctaveMarks:
                     showLeadingOctave = False
                     
                 transcriber.showLeadingOctave = showLeadingOctave
                 brailleNoteGrouping = transcriber.transcribeGroup(noteGrouping)
-                self.makeNewLine()
-                if self.rightHandSymbol or self.leftHandSymbol:
-                    self.optionalAddKeyboardSymbolsAndDots(brailleNoteGrouping)
-                    self.currentLine.append(brailleNoteGrouping, addSpace=False)
-                else:
-                    self.currentLine.insert(2, brailleNoteGrouping)
+                self.addToNewLine(brailleNoteGrouping)
             else:
                 # if not forceHyphen:
                 self.currentLine.lastHyphenToSpace()
-                self.makeNewLine()
-                if self.rightHandSymbol or self.leftHandSymbol:
-                    self.optionalAddKeyboardSymbolsAndDots(brailleNoteGrouping)
-                    self.currentLine.append(brailleNoteGrouping, addSpace=False)
-                else:
-                    self.currentLine.insert(2, brailleNoteGrouping)
+                self.addToNewLine(brailleNoteGrouping)
 
                 if noteGrouping.withHyphen:
                     self.currentLine.append(symbols['music_hyphen'], addSpace=False)                

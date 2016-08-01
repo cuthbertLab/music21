@@ -124,6 +124,41 @@ class BrailleText(object):
             self.appendOrInsertCurrent(brailleExpr)
         
     
+    def addToNewLine(self, brailleNoteGrouping):
+        u'''
+        Adds a NoteGrouping to a new line, prefacing that new line
+        with the appropriate spaces or keyboard symbols and dots.
+        
+        >>> if ext.six.PY2: str = unicode #_DOCS_HIDE
+        >>> bt = braille.text.BrailleText(10)
+        >>> bt.currentLine.append('hi', addSpace=False)
+        >>> print(str(bt))
+        hi
+        >>> c = braille.lookup.c['quarter']  # dots 1456
+        >>> bt.addToNewLine(c + c + c)
+        >>> print(str(bt))
+        hi
+        ⠀⠀⠹⠹⠹
+
+        It is done differently if there are hand symbols involved:
+        
+        >>> bt = braille.text.BrailleText(10)
+        >>> bt.showHand = 'right'
+        >>> bt.currentLine.append('hi', addSpace=False)
+        >>> bt.addToNewLine(c + c + c)
+        >>> print(str(bt))
+        hi
+        ⠨⠜⠄⠹⠹⠹
+        
+        '''
+        self.makeNewLine()
+        if self.rightHandSymbol or self.leftHandSymbol:
+            self.optionalAddKeyboardSymbolsAndDots(brailleNoteGrouping)
+            self.currentLine.append(brailleNoteGrouping, addSpace=False)
+        else:
+            self.currentLine.insert(2, brailleNoteGrouping)        
+        
+    
     def appendOrInsertCurrent(self, brailleExpr, addSpace=True):
         u'''
         append expression to the current line if it is possible,
@@ -209,18 +244,18 @@ class BrailleText(object):
         before the next symbol is needed. 
         '''
         addSpace = True
-        if not self.currentLine.containsNoteGrouping:
-            if self.rightHandSymbol or self.leftHandSymbol:
-                if self.currentLine.textLocation == 0:
-                    addSpace = False
-                if self.rightHandSymbol:
-                    self.currentLine.append(symbols['rh_keyboard'], addSpace=addSpace)
-                elif self.leftHandSymbol:
-                    self.currentLine.append(symbols['lh_keyboard'], addSpace=addSpace)
-                if noteGrouping:
-                    for dot in yieldDots(noteGrouping[0]):
-                        self.currentLine.append(dot, addSpace=False)
+        if (not self.currentLine.containsNoteGrouping
+                and (self.rightHandSymbol or self.leftHandSymbol)):
+            if self.currentLine.textLocation == 0:
                 addSpace = False
+            if self.rightHandSymbol:
+                self.currentLine.append(symbols['rh_keyboard'], addSpace=addSpace)
+            elif self.leftHandSymbol:
+                self.currentLine.append(symbols['lh_keyboard'], addSpace=addSpace)
+            if noteGrouping:
+                for dot in yieldDots(noteGrouping[0]):
+                    self.currentLine.append(dot, addSpace=False)
+            addSpace = False
 
         if self.currentLine.textLocation == 0:
             addSpace = False
@@ -531,6 +566,7 @@ class BrailleTextLine(object):
         if not self.canAppend(text, addSpace):
             raise BrailleTextException("Text does not fit at end of braille text line.")
         if addSpace:
+            self.allChars[self.textLocation] = symbols['space']
             self.textLocation += 1
         for char in list(text):
             self.allChars[self.textLocation] = char
@@ -661,14 +697,15 @@ class BrailleTextLine(object):
         >>> bt = braille.text.BrailleTextLine(10)
         >>> bt.append('hi', addSpace=False)
         >>> bt.append(braille.lookup.symbols['music_hyphen'], addSpace=False)
-        >>> print(bt)
+        >>> if ext.six.PY2: str = unicode # _DOCS_HIDE
+        >>> print(str(bt))
         hi⠐
         >>> bt.textLocation
         3
         >>> print(bt.allChars[2])
         ⠐
         >>> bt.lastHyphenToSpace()
-        >>> print(bt)
+        >>> print(str(bt))
         hi
         >>> bt.allChars[2] == braille.lookup.symbols['space']
         True
