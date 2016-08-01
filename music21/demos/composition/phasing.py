@@ -83,7 +83,9 @@ def partPari(show = True):
     s = stream.Score()
     cminor = key.Key('c')
     #real Paert
-    main = converter.parse("tinynotation: 4/4 E-1 C D E- F G F E- D C D E- G A- F G E- F G F E- D F G c B- c G A- B- c B- A- B- G c e- d c d c B- A- G F E- F G c E- F G E- D E- F E- D C E- G F E- C F E- D C E- D C D C~ C")
+    main = converter.parse('tinynotation: 4/4 E-1 C D E- F G F E- D C D E- G A- F G E- F G F E- ' + 
+                            'D F G c B- c G A- B- c B- A- B- G c e- d c d c B- A- G F E- F G c ' + 
+                            'E- F G E- D E- F E- D C E- G F E- C F E- D C E- D C D C~ C')
     
     # fake Paert
     #main = converter.parse("E-1 F G A- G F c d e- G A- F E- D d e- c B- A- c d A- G F G F A- B- A- c d A- B- c B- A- G F G F E-~ E-", '4/4')
@@ -97,7 +99,7 @@ def partPari(show = True):
             n.accidental = pitch.Accidental('natural')
         else:
             n.accidental = cminor.accidentalByStep(n.step)
-        if n.offset == (2-1) * 4 or n.offset == (74-1) * 4:
+        if n.offset == (2 - 1) * 4 or n.offset == (74 - 1) * 4:
             n.pitch = pitch.Pitch("C3") # exceptions to rule
         elif n.offset == (73 - 1) * 4:
             n.tie = None
@@ -107,7 +109,7 @@ def partPari(show = True):
     middle = copy.deepcopy(main.flat)
     
     
-    cMinorArpeg = scale.ConcreteScale(pitches = ["C2","E-2","G2"])
+    cMinorArpeg = scale.ConcreteScale(pitches = ["C2", "E-2", "G2"])
     # dummy test on other data
     #myA = pitch.Pitch("A2")
     #myA.microtone = -15
@@ -118,7 +120,7 @@ def partPari(show = True):
     for n in top:
         if 'Note' in n.classes:
             n.pitch = cMinorArpeg.next(n.pitch, stepSize=2)
-            if n.offset != (73-1)*4.0:  # m. 73 is different
+            if n.offset != (73 - 1) * 4.0:  # m. 73 is different
                 n.duration.quarterLength = 3.0
                 top.insert(n.offset + 3, note.Rest())
             else:

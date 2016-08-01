@@ -1385,7 +1385,7 @@ class IntervalNetwork(object):
         # if this network is octaveDuplicating, than we can shift 
         # reference up octaves to just below minPitch
         if self.octaveDuplicating and minPitch is not None:
-            pitchReference.transposeBelowTarget(minPitch, minimize=True)
+            pitchReference.transposeBelowTarget(minPitch, minimize=True, inPlace=True)
 
         # first, go upward from this pitch to the high terminus
         n = nodeObj
@@ -1574,7 +1574,7 @@ class IntervalNetwork(object):
         # if this network is octaveDuplicating, than we can shift 
         # reference down octaves to just above minPitch
         if self.octaveDuplicating and maxPitch is not None:
-            pitchReference.transposeAboveTarget(maxPitch, minimize=True)
+            pitchReference.transposeAboveTarget(maxPitch, minimize=True, inPlace=True)
 
         n = nodeObj
         p = pitchReference
@@ -1656,8 +1656,14 @@ class IntervalNetwork(object):
 
 
 
-    def realize(self, pitchReference, nodeId=None, minPitch=None, maxPitch=None, 
-        direction=DIRECTION_ASCENDING, alteredDegrees=None, reverse=False):
+    def realize(self, 
+                pitchReference, 
+                nodeId=None, 
+                minPitch=None, 
+                maxPitch=None, 
+                direction=DIRECTION_ASCENDING, 
+                alteredDegrees=None, 
+                reverse=False):
         '''
         Realize the nodes of this network based on a pitch assigned to a 
         valid `nodeId`, where `nodeId` can be specified by integer 
@@ -1728,7 +1734,7 @@ class IntervalNetwork(object):
             if direction == DIRECTION_ASCENDING:
                 # move pitch reference to below minimum
                 if self.octaveDuplicating and minPitch is not None:
-                    pitchReference.transposeBelowTarget(minPitch)
+                    pitchReference.transposeBelowTarget(minPitch, inPlace=True)
 
                 mergedPitches, mergedNodes = self._realizeAscending(pitchReference=pitchReference, 
                                                                     nodeId=nodeId, 
@@ -1740,7 +1746,7 @@ class IntervalNetwork(object):
             elif direction == DIRECTION_DESCENDING:
                 # move pitch reference to above minimum
                 if self.octaveDuplicating and maxPitch is not None:
-                    pitchReference.transposeAboveTarget(maxPitch)
+                    pitchReference.transposeAboveTarget(maxPitch, inPlace=True)
 
                 # fillMinMaxIfNone will result in a complete scale
                 # being returned if no min and max are given (otherwise
@@ -1760,9 +1766,9 @@ class IntervalNetwork(object):
                 pitchReferenceB = copy.deepcopy(pitchReference)
 
                 if self.octaveDuplicating and minPitch is not None:
-                    pitchReferenceA.transposeBelowTarget(minPitch)
+                    pitchReferenceA.transposeBelowTarget(minPitch, inPlace=True)
 
-                #pitchReferenceA.transposeBelowTarget(minPitch)
+                #pitchReferenceA.transposeBelowTarget(minPitch, inPlace=True)
 
                 post, postNodeId = self._realizeAscending(pitchReference=pitchReferenceA, 
                                                           nodeId=nodeId, 
@@ -1771,9 +1777,9 @@ class IntervalNetwork(object):
                                                           alteredDegrees=alteredDegrees)
 
                 if self.octaveDuplicating and maxPitch is not None:
-                    pitchReferenceB.transposeAboveTarget(maxPitch)
+                    pitchReferenceB.transposeAboveTarget(maxPitch, inPlace=True)
 
-                #pitchReferenceB.transposeAboveTarget(maxPitch)
+                #pitchReferenceB.transposeAboveTarget(maxPitch, inPlace=True)
 
                 pre, preNodeId = self._realizeDescending(pitchReference=pitchReferenceB, 
                                                          nodeId=nodeId,

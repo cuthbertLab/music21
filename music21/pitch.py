@@ -2253,6 +2253,10 @@ class Pitch(object):
         >>> a = pitch.Pitch('G#')
         >>> a.name
         'G#'
+        
+        >>> a = pitch.Pitch('B--')
+        >>> a.name
+        'B--'
         '''
         if self.accidental is not None:
             return self.step + self.accidental.modifier
@@ -2389,7 +2393,7 @@ class Pitch(object):
         'C#'
         >>> dFlatFive.octave
         6
-
+        
 
         N.B. -- it's generally better to set the name and octave separately, especially
         since you may at some point encounter very low pitches such as "A octave -1", which
@@ -2410,17 +2414,15 @@ class Pitch(object):
 
     @property
     def unicodeNameWithOctave(self):
-        '''
+        u'''
         Return the pitch name with octave with unicode accidental symbols,
         if available.
 
         Read-only property.
 
         >>> p = pitch.Pitch("C#4")
-        
-        This only displays properly in Py3
-        
-        `p.unicodeNameWithOctave` -> 'C♯4'
+        >>> print(p.unicodeNameWithOctave)
+        C♯4
         '''
         if self.octave is None:
             return self.unicodeName
@@ -3611,7 +3613,7 @@ class Pitch(object):
         algorithm that might take your piece far into the realm of
         double or triple flats or sharps.
 
-        If mostCommon is set to true, then the most commonly used
+        If mostCommon is set to True, then the most commonly used
         enharmonic spelling is chosen (that is, the one that appears
         first in key signatures as you move away from C on the circle
         of fifths).  Thus G-flat becomes F#, A# becomes B-flat,
@@ -3979,10 +3981,24 @@ class Pitch(object):
         <music21.pitch.Pitch C-5>
 
 
+        An interval object can also be a certain number of semitones,
+        in which case, the spelling of the resulting note (sharp or flat, etc.)
+        is up to the system to choose.
+
         >>> aInterval = interval.Interval(-6)
         >>> bPitch = aPitch.transpose(aInterval)
         >>> bPitch
         <music21.pitch.Pitch C#4>
+
+
+        Transpose fFlat down 5 semitones -- sort of like a Perfect 4th, but 
+        should be respelled:
+        
+        >>> fFlat = pitch.Pitch('F-4')
+        >>> newPitch = fFlat.transpose(-5)
+        >>> newPitch
+        <music21.pitch.Pitch B3>
+
 
         >>> aPitch
         <music21.pitch.Pitch G4>
@@ -3990,6 +4006,30 @@ class Pitch(object):
         >>> aPitch.transpose(aInterval, inPlace=True)
         >>> aPitch
         <music21.pitch.Pitch C#4>
+
+
+        Implicit octaves remain implicit:
+
+        >>> anyGsharp = pitch.Pitch("G#")
+        >>> print(anyGsharp.transpose("P8"))
+        G#
+        >>> print(anyGsharp.transpose("P5"))
+        D#
+
+
+        If the accidental of a pitch is chosen by music21, not
+        given by the user, then after transposing, music21 will
+        simplify the spelling again:
+        
+        >>> pc6 = pitch.Pitch(6)
+        >>> pc6
+        <music21.pitch.Pitch F#>
+        >>> pc6.implicitAccidental
+        True
+        >>> pc6.transpose('-m2')
+        <music21.pitch.Pitch F>
+        
+
 
         OMIT_FROM_DOCS
 
@@ -4000,17 +4040,9 @@ class Pitch(object):
         >>> lowC
         <music21.pitch.Pitch C#-1>
 
-        Implicit octaves should remain implicit:
-
-        >>> anyGsharp = pitch.Pitch("G#")
-        >>> print(anyGsharp.transpose("P8"))
-        G#
-
-        >>> print(anyGsharp.transpose("P5"))
-        D#
 
         >>> otherPitch = pitch.Pitch('D2')
-        >>> otherPitch.transpose('m-23', inPlace = True)
+        >>> otherPitch.transpose('m-23', inPlace=True)
         >>> print(otherPitch)
         C#-1
 
@@ -4025,8 +4057,10 @@ class Pitch(object):
 
         p = intervalObj.transposePitch(self)
         # TODO: if p.implicitAccidental, then change enharmonics. 
-        #     (should implicitAccidental be inferredSpelling or soemthing?)
+        #     (should implicitAccidental be inferredSpelling or something?)
         p.implicitAccidental = self.implicitAccidental
+        if p.implicitAccidental is True:
+            p.simplifyEnharmonic(inPlace=True, mostCommon=True)
         
         if not inPlace:
             return p
@@ -4046,30 +4080,29 @@ class Pitch(object):
     #---------------------------------------------------------------------------
     # utilities for pitch object manipulation
 
-    def transposeBelowTarget(self, target, minimize=False, inPlace=True):
+    def transposeBelowTarget(self, target, minimize=False, inPlace=False):
         '''
-        Given a source Pitch, shift it down octaves until it is below the
-        target. Note: this manipulates src inPlace.
+        Given a source Pitch, shift it down some number of octaves until it is below the
+        target. 
 
         If `minimize` is True, a pitch below the target will move up to the
         nearest octave.
 
+        >>> higherG = pitch.Pitch('g5')
+        >>> lowerG = higherG.transposeBelowTarget(pitch.Pitch('c#4'))
+        >>> lowerG
+        <music21.pitch.Pitch G3>
+        >>> higherG
+        <music21.pitch.Pitch G5>
+
+
+        Prior to Music21 3.0 (August 1, 2016), the default for inPlace was True, now it is False.
+        To change the pitch itself, set inPlace to True
+
         >>> p = pitch.Pitch('g5')
         >>> p.transposeBelowTarget(pitch.Pitch('c#4'), inPlace=True)
-        <music21.pitch.Pitch G3>
         >>> p
         <music21.pitch.Pitch G3>
-
-
-        Music21 2.0 transition period: inPlace is allowed now. Right now
-        the default is True, but it will become False later.
-
-        >>> p = pitch.Pitch('g5')
-        >>> c = p.transposeBelowTarget(pitch.Pitch('c#4'), inPlace=False)
-        >>> c
-        <music21.pitch.Pitch G3>
-        >>> p
-        <music21.pitch.Pitch G5>
         
 
         If already below the target, make no change:
@@ -4077,7 +4110,7 @@ class Pitch(object):
         >>> pitch.Pitch('g#3').transposeBelowTarget(pitch.Pitch('c#6'))
         <music21.pitch.Pitch G#3>
 
-        Accept the same pitch:
+        Below target includes being the same as the target
 
         >>> pitch.Pitch('g#8').transposeBelowTarget(pitch.Pitch('g#1'))
         <music21.pitch.Pitch G#1>
@@ -4088,17 +4121,18 @@ class Pitch(object):
         >>> pitch.Pitch('g#2').transposeBelowTarget(pitch.Pitch('f#8'))
         <music21.pitch.Pitch G#2>
 
-        But with minimize=True, it makes a difference...
+        But with minimize=True, it will actually RAISE the pitch so it is the closest
+        pitch to the target
 
-        >>> pitch.Pitch('g#2').transposeBelowTarget(pitch.Pitch('f#8'), minimize=True)
+        >>> target = pitch.Pitch('f#8')
+        >>> pitch.Pitch('g#2').transposeBelowTarget(target, minimize=True)
         <music21.pitch.Pitch G#7>
 
-        >>> pitch.Pitch('f#2').transposeBelowTarget(pitch.Pitch('f#8'), minimize=True)
+        >>> pitch.Pitch('f#2').transposeBelowTarget(target, minimize=True)
         <music21.pitch.Pitch F#8>
 
         :rtype: music21.pitch.Pitch
         '''
-        # TODO: switch inPlace: default is True now, will become False.
         if inPlace:
             src = self
         else:
@@ -4117,18 +4151,30 @@ class Pitch(object):
                     break
                 else:
                     src.octave += 1
-        return src
+                    
+        if not inPlace:
+            return src
 
-    def transposeAboveTarget(self, target, minimize=False, inPlace=True):
+    def transposeAboveTarget(self, target, minimize=False, inPlace=False):
         '''
         Given a source Pitch, shift it up octaves until it is above the target.
-        Note: this manipulates src inPlace.
 
         If `minimize` is True, a pitch above the target will move down to the
         nearest octave.
 
         >>> pitch.Pitch('d2').transposeAboveTarget(pitch.Pitch('e4'))
         <music21.pitch.Pitch D5>
+
+
+        Prior to Music21 3.0 (August 1, 2016), the default for inPlace was True, now it is False.
+        To change the pitch itself, set inPlace to True
+
+
+        >>> p = pitch.Pitch('d2')
+        >>> p.transposeAboveTarget(pitch.Pitch('e4'), inPlace=True)
+        >>> p
+        <music21.pitch.Pitch D5>
+
 
         If already above the target, make no change:
 
@@ -4153,7 +4199,6 @@ class Pitch(object):
 
         :rtype: music21.pitch.Pitch
         '''
-        # TODO: switch inPlace: default is True now, will become False.
         if inPlace:
             src = self
         else:
@@ -4173,7 +4218,9 @@ class Pitch(object):
                     break
                 else:
                     src.octave -= 1
-        return src
+        
+        if not inPlace:
+            return src
 
     #---------------------------------------------------------------------------
 
