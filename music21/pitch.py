@@ -1298,14 +1298,14 @@ class Pitch(object):
     <music21.pitch.Pitch E->
 
     Since `pitch.Pitch(3)` could be either a D# or an E-flat,
-    this `Pitch` object has an attribute, `.implicitAccidental` that
+    this `Pitch` object has an attribute, `.spellingIsInferred` that
     is set to `True`.  That means that when it is transposed or
     displayed, other programs should feel free to substitute an
     enharmonically equivalent pitch in its place:
 
-    >>> p2.implicitAccidental
+    >>> p2.spellingIsInferred
     True
-    >>> p1.implicitAccidental
+    >>> p1.spellingIsInferred
     False
 
     Instead of using a single string or integer for creating the object, a succession
@@ -1429,7 +1429,7 @@ class Pitch(object):
 
         # if True, accidental is not known; is determined algorithmically
         # likely due to pitch data from midi or pitch space/class numbers
-        self.implicitAccidental = False
+        self.spellingIsInferred = False
         # the fundamental attribute stores an optional pitch
         # that defines the fundamental used to create this Pitch
         self.fundamental = None
@@ -1531,7 +1531,7 @@ class Pitch(object):
             for k in self.__dict__:
                 v = getattr(self, k, None)
                 if k in ('_step', '_overridden_freq440', 'defaultOctave', 
-                         '_octave', 'implicitAccidental'):
+                         '_octave', 'spellingIsInferred'):
                     setattr(new, k, v)
                 else:                   
                     setattr(new, k, copy.deepcopy(v, memo))
@@ -1543,7 +1543,7 @@ class Pitch(object):
         hashValues = (
             self.accidental,
             self.fundamental,
-            self.implicitAccidental,
+            self.spellingIsInferred,
             self.microtone,
             self.octave,
             self.step,
@@ -2026,7 +2026,7 @@ class Pitch(object):
         >>> p.ps = 61
         >>> p.ps
         61.0
-        >>> p.implicitAccidental
+        >>> p.spellingIsInferred
         True
         >>> p.ps = 61.5 # get a quarter tone
         >>> p
@@ -2049,7 +2049,7 @@ class Pitch(object):
 
         # all ps settings must set implicit to True, as we do not know
         # what accidental this is
-        self.implicitAccidental = True
+        self.spellingIsInferred = True
 
 
     ps = property(_getPs, _setPs,
@@ -2082,7 +2082,7 @@ class Pitch(object):
 
 
         Notice that ps 61 represents both
-        C# and D-flat.  Thus "implicitAccidental"
+        C# and D-flat.  Thus "spellingIsInferred"
         will be true after setting our pitch to 61:
 
         >>> a.ps = 61
@@ -2090,7 +2090,7 @@ class Pitch(object):
         <music21.pitch.Pitch C#4>
         >>> a.ps
         61.0
-        >>> a.implicitAccidental
+        >>> a.spellingIsInferred
         True
 
         Microtonal accidentals and pure Microtones are allowed, as are extreme ranges:
@@ -2166,7 +2166,7 @@ class Pitch(object):
 
         # all midi settings must set implicit to True, as we do not know
         # what accidental this is
-        self.implicitAccidental = True
+        self.spellingIsInferred = True
 
 
     midi = property(_getMidi, _setMidi,
@@ -2227,7 +2227,7 @@ class Pitch(object):
         2
         >>> a.ps
         2.0
-        >>> a.implicitAccidental
+        >>> a.spellingIsInferred
         True
         
 
@@ -2294,7 +2294,7 @@ class Pitch(object):
             self.octave = octave
 
         # when setting by name, we assume that the accidental intended
-        self.implicitAccidental = False
+        self.spellingIsInferred = False
 
     name = property(_getName, _setName, doc='''
         Gets or sets the name (pitch name with accidental but
@@ -2310,12 +2310,12 @@ class Pitch(object):
 
         OMIT_FROM_DOCS
 
-        move to implicitAccidental section...
+        move to spellingIsInferred section...
 
-        >>> p.implicitAccidental
+        >>> p.spellingIsInferred
         False
         >>> p.ps = 61
-        >>> p.implicitAccidental
+        >>> p.spellingIsInferred
         True
         >>> p.name
         'C#'
@@ -2324,7 +2324,7 @@ class Pitch(object):
         'B-'
 
         >>> p.name = 'C#'
-        >>> p.implicitAccidental
+        >>> p.spellingIsInferred
         False
     ''')
 
@@ -2541,7 +2541,7 @@ class Pitch(object):
         >>> a.pitchClass = 3
         >>> a
         <music21.pitch.Pitch E-3>
-        >>> a.implicitAccidental
+        >>> a.spellingIsInferred
         True
         >>> a.pitchClass = 'A'
         >>> a
@@ -2553,7 +2553,7 @@ class Pitch(object):
         (self._step, self._accidental, self._microtone, unused_octShift) = _convertPsToStep(value)
 
         # do not know what accidental is
-        self.implicitAccidental = True
+        self.spellingIsInferred = True
 
     pitchClass = property(_getPitchClass, _setPitchClass,
         doc='''
@@ -4024,7 +4024,7 @@ class Pitch(object):
         >>> pc6 = pitch.Pitch(6)
         >>> pc6
         <music21.pitch.Pitch F#>
-        >>> pc6.implicitAccidental
+        >>> pc6.spellingIsInferred
         True
         >>> pc6.transpose('-m2')
         <music21.pitch.Pitch F>
@@ -4056,10 +4056,10 @@ class Pitch(object):
 
 
         p = intervalObj.transposePitch(self)
-        # TODO: if p.implicitAccidental, then change enharmonics. 
-        #     (should implicitAccidental be inferredSpelling or something?)
-        p.implicitAccidental = self.implicitAccidental
-        if p.implicitAccidental is True:
+        # TODO: if p.spellingIsInferred, then change enharmonics. 
+        #     (should spellingIsInferred be inferredSpelling or something?)
+        p.spellingIsInferred = self.spellingIsInferred
+        if p.spellingIsInferred is True:
             p.simplifyEnharmonic(inPlace=True, mostCommon=True)
         
         if not inPlace:
