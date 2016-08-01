@@ -4364,7 +4364,7 @@ class MeasureExporter(XMLExporterBase):
         <transpose>
           <diatonic>19</diatonic>
           <chromatic>10</chromatic>
-          <octave-shift>1</octave-shift>
+          <octave-change>1</octave-change>
         </transpose>        
 
         >>> i = interval.Interval('-M6')
@@ -4405,7 +4405,7 @@ class MeasureExporter(XMLExporterBase):
         mxChromatic.text = str(semitones)
     
         if octShift != 0:
-            mxOctaveChange = SubElement(mxTranspose, 'octave-shift')
+            mxOctaveChange = SubElement(mxTranspose, 'octave-change')
             mxOctaveChange.text = str(octShift)
         
         return mxTranspose

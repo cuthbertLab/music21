@@ -3998,8 +3998,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ''')
 
 
-    def _transposeByInstrument(self, reverse=False, inPlace=True,
-        transposeKeySignature=True):
+    def _transposeByInstrument(self, 
+                               reverse=False, 
+                               inPlace=True,
+                               transposeKeySignature=True):
         '''
         Transpose the Stream according to each instrument's transpostion.
         
@@ -4086,13 +4088,34 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             pass
         return returnObj # the Stream or None
 
-    def toWrittenPitch(self, inPlace=True):
+    def toWrittenPitch(self, inPlace=False):
         '''
         If not at written pitch, transpose all Pitch elements to
         written pitch. The atSoundingPitch property is used to
         determine if transposition is necessary.
-
-        TODO: by default inPlace should be False
+        
+        music21 v.3 changes -- inPlace=False
+        
+        >>> sc = stream.Score()
+        >>> p = stream.Part(id='barisax')
+        >>> p.append(instrument.BaritoneSaxophone())
+        >>> m = stream.Measure(number=1)
+        >>> m.append(note.Note('C3'))
+        >>> p.append(m)
+        >>> sc.append(p)
+        >>> sc.atSoundingPitch = True
+        >>> scWritten = sc.toWrittenPitch()
+        >>> scWritten.show('text')
+        {0.0} <music21.stream.Part barisax>
+            {0.0} <music21.instrument.Instrument Baritone Saxophone>
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.note.Note A>        
+        >>> scWritten.atSoundingPitch
+        False
+        >>> scWritten.parts[0].atSoundingPitch
+        False
+        >>> scWritten.recurse().notes[0].nameWithOctave
+        'A4'
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
@@ -4100,21 +4123,32 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnObj = self
 
         if returnObj.hasPartLikeStreams():
-            for p in returnObj.getElementsByClass('Stream'):
+            for partLike in returnObj.getElementsByClass('Stream'):
                 # call on each part
-                p.toWrittenPitch(inPlace=True)
+                partLike.toWrittenPitch(inPlace=True)
+            returnObj.atSoundingPitch = False
             return returnObj
         
         # else...
-        if self.atSoundingPitch == 'unknown':
-            raise StreamException('atSoundingPitch is unknown: cannot transpose')
-        elif self.atSoundingPitch == False:
+        atSoundingPitch = self.atSoundingPitch
+        if atSoundingPitch == 'unknown':
+            for site in self.sites:
+                if hasattr(site, 'atSoundingPitch') and site.atSoundingPitch != 'unknown':
+                    atSoundingPitch = site.atSoundingPitch
+                    break
+            else:
+                raise StreamException('atSoundingPitch is unknown: cannot transpose')
+        
+        if atSoundingPitch == False:
             pass
-        elif self.atSoundingPitch == True:
+        elif atSoundingPitch == True:
             # transposition defined on instrument goes from written to sounding
             # need to reverse to go to written
             returnObj._transposeByInstrument(reverse=True, inPlace=True)
-        return returnObj
+            returnObj.atSoundingPitch = False
+        
+        if not inPlace:
+            return returnObj
 
     #---------------------------------------------------------------------------
     def getTimeSignatures(self, 

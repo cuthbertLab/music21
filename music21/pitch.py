@@ -4056,8 +4056,6 @@ class Pitch(object):
 
 
         p = intervalObj.transposePitch(self)
-        # TODO: if p.spellingIsInferred, then change enharmonics. 
-        #     (should spellingIsInferred be inferredSpelling or something?)
         p.spellingIsInferred = self.spellingIsInferred
         if p.spellingIsInferred is True:
             p.simplifyEnharmonic(inPlace=True, mostCommon=True)

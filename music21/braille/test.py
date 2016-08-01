@@ -50,10 +50,43 @@ def example2_1():
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠓⠭⠋⠀⠛⠭⠊⠀⠓⠭⠛⠀⠋⠭⠭⠀⠋⠭⠙⠀⠑⠭⠛⠀⠋⠭⠑⠀⠙⠭⠭⠀⠑⠭⠛
     ⠀⠀⠋⠭⠓⠀⠛⠓⠊⠀⠓⠭⠭⠀⠊⠭⠛⠀⠓⠭⠋⠀⠛⠋⠑⠀⠙⠭⠭⠣⠅
+    >>> print(translate.partToBraille(test.example2_1(), inPlace=True, 
+    ...                               debug=True, suppressOctaveMarks=True))
+    ---begin segment---
+    <music21.braille.segment BrailleSegment>
+    Measure 1, Signature Grouping 1:
+    Time Signature 3/8 ⠼⠉⠦
+    ===
+    Measure 1, Note Grouping 1:
+    <music21.clef.TrebleClef>
+    G eighth ⠓
+    Rest eighth ⠭
+    E eighth ⠋
+    ===
+    Measure 2, Note Grouping 1:
+    F eighth ⠛
+    Rest eighth ⠭
+    A eighth ⠊
+    ===
+    Measure 3, Note Grouping 1:
+    G eighth ⠓
+    Rest eighth ⠭
+    F eighth ⠛
+    ===
+    ...
+    ===
+    Measure 16, Note Grouping 1:
+    C eighth ⠙
+    Rest eighth ⠭
+    Rest eighth ⠭
+    Barline final ⠣⠅
+    ===
+    ---end segment---    
     """
-    bm = converter.parse("tinynotation: 3/8 g8 r8 e8 f8 r8 a8 g8 r8 f8 e8 r8 " + 
-                         "r8 e8 r8 c8 d8 r8 f8 e8 r8 d8 c8 r8 r8 " + 
-                         "d8 r8 f8 e8 r8 g8 f8 g8 a8 g8 r8 r8 a8 r8 f8 g8 r8 e8 f8 e8 d8 c8 r8 r8", 
+    bm = converter.parse("tinynotation: 3/8         g8 r8 e8    f8 r8 a8    g8 r8 f8    e8 r8 r8" + 
+                         "e8 r8 c8     d8 r8 f8     e8 r8 d8    c8 r8 r8 " + 
+                         "d8 r8 f8     e8 r8 g8     f8 g8 a8    g8 r8 r8 " + 
+                         "a8 r8 f8     g8 r8 e8     f8 e8 d8    c8 r8 r8", 
                          makeNotation=False)
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     return bm

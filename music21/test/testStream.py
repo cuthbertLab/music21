@@ -6668,6 +6668,7 @@ class Test(unittest.TestCase):
         # declare that at written pitch 
         p1.atSoundingPitch = False
         test = p1.toWrittenPitch(inPlace=False)
+        
         # no change; already at written
         self.assertEqual([str(p) for p in test.pitches], ['C4', 'C4', 'C4', 'C4'])
         
@@ -6682,6 +6683,7 @@ class Test(unittest.TestCase):
         # reverse intervals; app pitches should be upward
         test = p1.toWrittenPitch(inPlace=False)
         self.assertEqual([str(p) for p in test.pitches], ['G4', 'G4', 'D4', 'D4'])
+        self.assertFalse(test.atSoundingPitch)
 
         
         # test on a complete score
@@ -7607,7 +7609,7 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, 'verbose') #, runTest='testContextNestedD')
+    music21.mainTest(Test, 'verbose') #, runTest='testTransposeByPitchA')
 
 #------------------------------------------------------------------------------
 # eof
