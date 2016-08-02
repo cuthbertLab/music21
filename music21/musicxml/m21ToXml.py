@@ -4178,8 +4178,8 @@ class MeasureExporter(XMLExporterBase):
         and beat-type elements
     
         
-        >>> a = meter.TimeSignature('3/4')
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> a = meter.TimeSignature('3/4')
         >>> b = MEX.timeSignatureToXml(a)
         >>> MEX.dump(b)
         <time>
@@ -4204,6 +4204,27 @@ class MeasureExporter(XMLExporterBase):
           <beats>5</beats>
           <beat-type>4</beat-type>
         </time>
+        
+        
+        >>> a = meter.TimeSignature('4/4')
+        >>> a.symbol = 'common'
+        >>> b = MEX.timeSignatureToXml(a)
+        >>> MEX.dump(b)
+        <time symbol="common">
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        
+
+        >>> a.symbol = ""
+        >>> a.symbolizeDenominator = True
+        >>> b = MEX.timeSignatureToXml(a)
+        >>> MEX.dump(b)
+        <time symbol="note">
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        
         '''
         #mxTimeList = []
         mxTime = Element('time')
@@ -4224,7 +4245,14 @@ class MeasureExporter(XMLExporterBase):
         # TODO: choice -- senza-misura
     
         # TODO: attr: interchangeable
-        # TODO: attr: symbol
+        
+        # attr: symbol
+        if ts.symbolizeDenominator:
+            mxTime.set('symbol', 'note')
+        elif ts.symbol != "":
+            mxTime.set('symbol', ts.symbol)
+            # dotted-note not supported
+
         # TODO: attr: separator
         # TODO: attr: print-style-align
         # TODO: attr: print-object

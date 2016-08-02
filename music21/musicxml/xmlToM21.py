@@ -9,6 +9,8 @@
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
+from __future__ import division, print_function
+
 import copy
 import math
 #import pprint
@@ -3332,7 +3334,9 @@ class MeasureParser(XMLParserBase):
 
 
     def xmlTransposeToInterval(self, mxTranspose):
-        '''Convert a MusicXML Transpose object to a music21 Interval object.
+        '''
+        Convert a MusicXML Transpose object to a music21 Interval object.
+        
         >>> import xml.etree.ElementTree as ET        
         >>> MP = musicxml.xmlToM21.MeasureParser()
         
@@ -3346,14 +3350,15 @@ class MeasureParser(XMLParserBase):
         >>> MP.xmlTransposeToInterval(t)
         <music21.interval.Interval M-6>
         
-        It should be like this:
+        It should be like this -- where the diatonic includes the complete octave information:
         
         >>> t = ET.fromstring('<transpose><diatonic>-8</diatonic><chromatic>-2</chromatic>' + 
         ...         '<octave-change>-1</octave-change></transpose>')
         >>> MP.xmlTransposeToInterval(t)
         <music21.interval.Interval M-9>
         
-        but it is sometimes encoded this way (Finale; MuseScore), so we will deal...
+        but it is sometimes encoded this way (Finale; MuseScore) where octave-change
+        refers to both diatonic and chromatic, so we will deal...
 
         >>> t = ET.fromstring('<transpose><diatonic>-1</diatonic><chromatic>-2</chromatic>' + 
         ...         '<octave-change>-1</octave-change></transpose>')
@@ -3361,79 +3366,99 @@ class MeasureParser(XMLParserBase):
         <music21.interval.Interval M-9>
         
         '''
-        ds = None
+        diatonicStep = None
         
         mxDiatonic = mxTranspose.find('diatonic')
         if mxDiatonic is not None:
-            ds = int(mxDiatonic.text)
+            diatonicStep = int(mxDiatonic.text)
             
-        cs = None
+        chromaticStep = None
         mxChromatic = mxTranspose.find('chromatic')
         if mxChromatic is not None:
-            cs = int(mxChromatic.text)
+            chromaticStep = int(mxChromatic.text)
     
-        oc = 0
+        octaveChange = 0
         mxOctaveChange = mxTranspose.find('octave-change')
         if mxOctaveChange is not None:
-            oc = int(mxOctaveChange.text) * 12
+            octaveChange = int(mxOctaveChange.text) * 12
     
         # TODO: presently not dealing with <double>
         # doubled one octave down from what is currently written 
         # (as is the case for mixed cello / bass parts in orchestral literature)
-        #environLocal.printDebug(['ds', ds, 'cs', cs, 'oc', oc])
-        if ds is not None and ds != 0 and cs is not None and cs != 0:
+        #environLocal.printDebug(['ds', diatonicStep, 'cs', chromaticStep, 'oc', oc])
+        if diatonicStep and chromaticStep:
             # diatonic step can be used as a generic specifier here if 
             # shifted 1 away from zero
-            if ds < 0:
-                diatonicActual = ds - 1
+            if diatonicStep < 0:
+                diatonicActual = diatonicStep - 1
             else:
-                diatonicActual = ds + 1
+                diatonicActual = diatonicStep + 1
             
             try:          
-                post = interval.intervalFromGenericAndChromatic(diatonicActual, cs + oc)
+                post = interval.intervalFromGenericAndChromatic(diatonicActual, 
+                                                                chromaticStep + octaveChange)
             except interval.IntervalException:
                 # some people don't use -8 for diatonic for down a 9th, assuming
                 # that octave-change will take care of it.  So try again.
-                if ds < 0:
-                    diatonicActual = (ds + int(oc*7/12)) - 1
+                if diatonicStep < 0:
+                    diatonicActual = (diatonicStep + int(octaveChange * 7 / 12)) - 1
                 else:
-                    diatonicActual = (ds + int(oc*7/12)) + 1
+                    diatonicActual = (diatonicStep + int(octaveChange * 7 / 12)) + 1
 
-                post = interval.intervalFromGenericAndChromatic(diatonicActual, cs + oc)
+                post = interval.intervalFromGenericAndChromatic(diatonicActual, 
+                                                                chromaticStep + octaveChange)
                 
                 
-        else: # assume we have chromatic; may not be correct spelling
-            post = interval.Interval(cs + oc)
+        elif chromaticStep is not None:
+            post = interval.Interval(chromaticStep + octaveChange)
+        elif diatonicStep is not None: 
+            post = interval.GenericInterval(diatonicStep)
+        else:
+            post = interval.Interval('P1') # guaranteed to return an interval object.
+            
         return post
 
     def handleTimeSignature(self, mxTime):
-        # TODO: interchangeable
-        # TODO: senza-misura
-        # TODO: attr: separator
-        # TODO: attr: symbol
-        # TODO: attr: number (done?)
-        # TODO: print-style-align
-        # TODO: print-object
         ts = self.xmlToTimeSignature(mxTime)
-        self.insertCoreAndRef(0, mxTime, ts)
+        if ts is not None:
+            self.insertCoreAndRef(0, mxTime, ts)
         
     def xmlToTimeSignature(self, mxTime):
         '''
+        Returns a TimeSignature or None (for senza-misura) from a TimeSignature object.
+
         >>> import xml.etree.ElementTree as ET
-        >>> mxTime = ET.fromstring('<time><beats>3</beats><beat-type>8</beat-type></time>')
-        
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
+        >>> mxTime = ET.fromstring('<time><beats>3</beats><beat-type>8</beat-type></time>')        
         >>> MP.xmlToTimeSignature(mxTime)
         <music21.meter.TimeSignature 3/8>      
-        '''
+
+        >>> mxTime = ET.fromstring('<time symbol="common"><beats>4</beats>' + 
+        ...                                              '<beat-type>4</beat-type></time>')        
+        >>> MP.xmlToTimeSignature(mxTime).symbol
+        'common'
+        
+        >>> mxTime = ET.fromstring('<time><beats>3</beats><beat-type>8</beat-type>' + 
+        ...                              '<beats>4</beats><beat-type>4</beat-type></time>')        
+        >>> MP.xmlToTimeSignature(mxTime)
+        <music21.meter.TimeSignature 3/8+4/4>    
+        ''' 
+        isSenzaMisura = mxTime.find('senza-misura') 
+        if isSenzaMisura:
+            # TODO: return the content as a senza-misura object.
+            return None
+        
         n = []
         d = []
-        # just get first one for now;
         for beatOrType in mxTime:
             if beatOrType.tag == 'beats':
                 n.append(beatOrType.text) # may be 3+2
             elif beatOrType.tag == 'beat-type':
                 d.append(beatOrType.text)
+            elif beatOrType.tag == 'interchangeable':
+                break # interchangeable comes after all beat/beat-type sequences
+
         # convert into a string
         msg = []
         for i in range(len(n)):
@@ -3445,6 +3470,24 @@ class MeasureParser(XMLParserBase):
         else:
             ts = meter.TimeSignature()
             ts.load('+'.join(msg))
+        # TODO: interchangeable
+
+        # TODO: attrGroup: print-style-align
+        # TODO: attr: print-object
+
+
+        # TODO: attr: separator        
+        # attr: symbol
+        symbol = mxTime.get('symbol')
+        if symbol:
+            if symbol in ('common', 'cut', 'single-number', 'normal'):
+                ts.symbol = symbol
+            elif symbol == 'note':
+                ts.symbolizeDeonimator = True
+            elif symbol == 'dotted-note':
+                pass # TODO: support, but not as musicxml style -- reduces by 1/3 the numerator...
+                # this should be done by changing the displaySequence directly. 
+        # TODO: attr: number (which staff... is this done?)
         
         return ts
         

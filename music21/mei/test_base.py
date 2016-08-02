@@ -3809,13 +3809,14 @@ class TestMeasureFromElement(unittest.TestCase):
         expectedNs = ['1', '2', '3', '4']
         slurBundle = mock.MagicMock(name='slurBundle')
         activeMeter = mock.MagicMock(name='activeMeter')
-        activeMeter.totalLength = 4.0  # this must match Measure.duration.quarterLength
+        activeMeter.barDuration = duration.Duration(4.0) 
+        # this must match Measure.duration.quarterLength
         # prepare the mock Measure objects returned by mockMeasure
         mockMeasRets = [mock.MagicMock(name='Measure {}'.format(i + 1)) for i in range(4)]
         expected = mockMeasRets  # finish preparing "expected" below...
         for meas in mockMeasRets:
             meas.duration = mock.MagicMock(spec_set=duration.Duration)
-            meas.duration.quarterLength = 4.0  # must match activeMeter.totalLength
+            meas.duration.quarterLength = 4.0  # must match activeMeter.barDuration.quarterLength
         mockMeasure.side_effect = lambda *x, **y: mockMeasRets.pop(0)
         # prepare mock of _makeBarlines() which returns "staves"
         mockMakeBarlines.side_effect = lambda elem, staves: staves
@@ -3901,7 +3902,8 @@ class TestMeasureFromElement(unittest.TestCase):
         self.assertIsInstance(actual['4'][0], stream.Voice)
         self.assertEqual(1, len(actual['4'][0]))
         self.assertIsInstance(actual['4'][0][0], note.Rest)
-        self.assertEqual(activeMeter.totalLength, actual['4'][0][0].duration.quarterLength)
+        self.assertEqual(activeMeter.barDuration.quarterLength, 
+                         actual['4'][0][0].duration.quarterLength)
         self.assertIsInstance(actual[eachN].rightBarline, bar.Barline)
         self.assertEqual('double', actual[eachN].rightBarline.style)
 
@@ -3931,7 +3933,9 @@ class TestMeasureFromElement(unittest.TestCase):
         expectedNs = ['1', '2', '3', '4']
         slurBundle = mock.MagicMock(name='slurBundle')
         activeMeter = mock.MagicMock(name='activeMeter')
-        activeMeter.totalLength = 12.0  # this must be longer than Measure.duration.quarterLength
+        # this must be longer than Measure.duration.quarterLength
+        activeMeter.barDuration = duration.Duration(12.0) 
+        
         # prepare the mock Measure objects returned by mockMeasure
         mockMeasRets = [mock.MagicMock(name='Measure {}'.format(i + 1)) for i in range(4)]
         expected = mockMeasRets  # finish preparing "expected" below...
@@ -4015,7 +4019,8 @@ class TestMeasureFromElement(unittest.TestCase):
             self.assertIsInstance(actual[eachN][0], stream.Voice)
             self.assertEqual(1, len(actual[eachN][0]))
             self.assertIsInstance(actual[eachN][0][0], note.Rest)
-            self.assertEqual(activeMeter.totalLength, actual['4'][0][0].duration.quarterLength)
+            self.assertEqual(activeMeter.barDuration.quarterLength, 
+                             actual['4'][0][0].duration.quarterLength)
             self.assertIsInstance(actual[eachN].rightBarline, bar.Repeat)
             self.assertEqual('final', actual[eachN].rightBarline.style)
 
@@ -4045,7 +4050,8 @@ class TestMeasureFromElement(unittest.TestCase):
         expectedNs = ['1']
         slurBundle = mock.MagicMock(name='slurBundle')
         activeMeter = mock.MagicMock(name='activeMeter')
-        activeMeter.totalLength = 4.0  # this must match Measure.duration.quarterLength
+        # this must match Measure.duration.quarterLength
+        activeMeter.barDuration = duration.Duration(4.0) 
         # prepare the mock Measure object returned by mockMeasure
         mockMeasure.return_value = mock.MagicMock(name='Measure 1')
         # prepare mock of _makeBarlines() which returns "staves"
@@ -4097,7 +4103,8 @@ class TestMeasureFromElement(unittest.TestCase):
         expectedNs = ['1']
         slurBundle = mock.MagicMock(name='slurBundle')
         activeMeter = mock.MagicMock(name='activeMeter')
-        activeMeter.totalLength = 4.0  # this must match Measure.duration.quarterLength
+        # this must match Measure.duration.quarterLength
+        activeMeter.barDuration = duration.Duration(4.0)  
         # prepare the mock Measure object returned by mockMeasure
         mockMeasure.return_value = mock.MagicMock(name='Measure 1')
         # prepare mock of _makeBarlines() which returns "staves"
