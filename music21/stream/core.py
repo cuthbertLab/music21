@@ -46,7 +46,7 @@ class StreamCoreMixin(object):
 
 
     def _insertCore(self, offset, element, ignoreSort=False,
-        setActiveSite=True):
+                    setActiveSite=True):
         '''
         A faster way of inserting elements that does no checks,
         just insertion.
@@ -118,7 +118,7 @@ class StreamCoreMixin(object):
         # does not change sorted state
         if element.duration is not None:
             self._setHighestTime(self.highestTime +
-                element.duration.quarterLength)
+                                 element.duration.quarterLength)
     #---------------------------------------------------------------------------
     # adding and editing Elements and Streams -- all need to call elementsChanged
     # most will set isSorted to False
@@ -287,7 +287,7 @@ class StreamCoreMixin(object):
                         raise StreamException(
                             'the object ' +
                             '(%s, id()=%s) is already found in this Stream (%s, id()=%s)' %
-                                                    (element, id(element), self, id(self)))
+                            (element, id(element), self, id(self)))
                 # something was old... delete from _offsetDict
                 # environLocal.warn('stale object')
                 del self._offsetDict[idElement]
@@ -358,8 +358,8 @@ class StreamCoreMixin(object):
         cacheKey = "timespanTree" + str(hashedAttributes)
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             hashedTimespanTree = tree.fromStream.asTimespans(self,
-                                                     flatten=flatten,
-                                                     classList=classList)
+                                                             flatten=flatten,
+                                                             classList=classList)
             self._cache[cacheKey] = hashedTimespanTree
         return self._cache[cacheKey]
 
@@ -381,10 +381,10 @@ class StreamCoreMixin(object):
         cacheKey = "elementTree" + str(hashedAttributes)
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             hashedElementTree = tree.fromStream.asTree(self,
-                                                     flatten=flatten,
-                                                     classList=classList,
-                                                     useTimespans=useTimespans,
-                                                     groupOffsets=groupOffsets)
+                                                       flatten=flatten,
+                                                       classList=classList,
+                                                       useTimespans=useTimespans,
+                                                       groupOffsets=groupOffsets)
             self._cache[cacheKey] = hashedElementTree
         return self._cache[cacheKey]
 
