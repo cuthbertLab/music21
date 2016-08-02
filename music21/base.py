@@ -124,7 +124,7 @@ for modName in ('matplotlib', 'numpy', 'scipy'):
 if _missingImport:
     if environLocal['warnings'] in (1, '1', True):
         environLocal.warn(common.getMissingImportStr(_missingImport),
-        header='music21:')
+                          header='music21:')
 
 class Music21ObjectException(exceptions21.Music21Exception):
     pass
@@ -323,17 +323,17 @@ class Music21Object(object):
     _DOC_ORDER = [
         'classes',
         'classSet',
-        ]
+    ]
 
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
         'id': '''A unique identification string; not to be confused with the
             default `.id()` method. However, if not set, will return the `id()` number''',
-        'groups': '''An instance of a :class:`~music21.base.Group` object which describes
+                                                                                         'groups': '''An instance of a :class:`~music21.base.Group` object which describes
             arbitrary `Groups` that this object belongs to.''',
-        'isStream': '''Boolean value for quickly identifying
+                                                              'isStream': '''Boolean value for quickly identifying
             :class:`~music21.stream.Stream` objects (False by default). Deprecated''',
-        'classSortOrder' : '''Property which returns an number (int or otherwise)
+                                                                                     'classSortOrder' : '''Property which returns an number (int or otherwise)
             depending on the class of the Music21Object that
             represents a priority for an object based on its class alone --
             used as a tie for stream sorting in case two objects have the
@@ -366,12 +366,12 @@ class Music21Object(object):
             >>> ec1.classSortOrder
             5
             ''',
-        'hideObjectOnPrint': '''if set to `True` will not print upon output
+               'hideObjectOnPrint': '''if set to `True` will not print upon output
             (only used in MusicXML output at this point and
             Lilypond for notes, chords, and rests).''',
-        'xPosition': '''if set, defines the display x-position from
+                                                      'xPosition': '''if set, defines the display x-position from
             the start of the container (in musicxml "tenths" by default)''',
-        }
+    }
 
     def __init__(self, *arguments, **keywords):
         # None is stored as the internal location of an obj w/o any sites
@@ -530,11 +530,11 @@ class Music21Object(object):
                     except TypeError:
                         # just link...
                         environLocal.printDebug('__deepcopy__: Could not copy (deep or shallow) ' +
-                            '%s in %s, not a music21Object so just making a link' % (name, self))
+                                                '%s in %s, not a music21Object so just making a link' % (name, self))
                         setattr(new, name, attrValue)
                 else: # raise error for our own problem.
                     raise Music21Exception('__deepcopy__: Cannot deepcopy Music21Object ' +
-                        '%s probably because it requires a default value in instantiation.' % name)
+                                           '%s probably because it requires a default value in instantiation.' % name)
 
         return new
 
@@ -1111,9 +1111,9 @@ class Music21Object(object):
     #---------------------------------------------------------------------------------
     # contexts...
     def getContextByClass(self,
-                             className,
-                             getElementMethod='getElementAtOrBefore',
-                             sortByCreationTime=False):
+                          className,
+                          getElementMethod='getElementAtOrBefore',
+                          sortByCreationTime=False):
         '''
         A very powerful method in music21 of fundamental importance: Returns
         the element matching the className that is closest to this element in
@@ -1219,14 +1219,14 @@ class Music21Object(object):
             if 'Offset' in getElementMethod:
                 # these methods match only by offset.  Used in .getBeat among other places
                 if (('At' in getElementMethod and 'Before' in getElementMethod)
-                        or ('At' not in getElementMethod and 'After' in getElementMethod)):
+                    or ('At' not in getElementMethod and 'After' in getElementMethod)):
                     positionStart = ZeroSortTupleHigh.modify(offset=positionStart.offset)
                 elif (('At' in getElementMethod and 'After' in getElementMethod)
-                        or ('At' not in getElementMethod and 'Before' in getElementMethod)):
+                      or ('At' not in getElementMethod and 'Before' in getElementMethod)):
                     positionStart = ZeroSortTupleLow.modify(offset=positionStart.offset)
                 else:
                     raise Music21Exception(
-                            "Incorrect getElementMethod: {}".format(getElementMethod))
+                        "Incorrect getElementMethod: {}".format(getElementMethod))
 
             if 'Before' in getElementMethod:
                 contextNode = siteTree.getNodeBefore(positionStart)
@@ -1344,8 +1344,8 @@ class Music21Object(object):
             return self
 
         for site, positionStart, searchType in self.contextSites(
-                                            returnSortTuples=True,
-                                            sortByCreationTime=sortByCreationTime):
+            returnSortTuples=True,
+            sortByCreationTime=sortByCreationTime):
             if searchType == 'elementsOnly' or searchType == 'elementsFirst':
                 contextEl = payloadExtractor(site, flatten=False, positionStart=positionStart)
 
@@ -1359,8 +1359,8 @@ class Music21Object(object):
 
             if searchType != 'elementsOnly': # flatten or elementsFirst
                 if ('After' in getElementMethod
-                        and (not className
-                             or site.isClassOrSubclass(className))):
+                    and (not className
+                         or site.isClassOrSubclass(className))):
                     if 'NotSelf' in getElementMethod and self is site:
                         pass
                     elif 'NotSelf' not in getElementMethod: # for 'After' we can't do the
@@ -1376,8 +1376,8 @@ class Music21Object(object):
                     return contextEl
 
                 if ('Before' in getElementMethod
-                        and (not className
-                             or site.isClassOrSubclass(className))):
+                    and (not className
+                         or site.isClassOrSubclass(className))):
                     if 'NotSelf' in getElementMethod and self is site:
                         pass
                     else:
@@ -1555,7 +1555,7 @@ class Music21Object(object):
             if self.isStream and self not in memo:
                 recursionType = self.recursionType
                 environLocal.printDebug("Caller first is {} with offsetAppend {}".format(
-                                                                callerFirst, offsetAppend))
+                    callerFirst, offsetAppend))
                 if returnSortTuples:
                     selfSortTuple = self.sortTuple().modify(offset=0.0, priority=float('-inf'))
                     yield ContextTuple(self, selfSortTuple, recursionType)
@@ -1599,12 +1599,12 @@ class Music21Object(object):
 
             memo.append(siteObj)
             environLocal.printDebug("looking in contextSites for {} with position {}".format(
-                                                        siteObj, positionInStream.shortRepr()))
+                siteObj, positionInStream.shortRepr()))
             for topLevel, inStreamPos, recurType in siteObj.contextSites(callerFirst=callerFirst,
-                                              memo=memo,
-                                              offsetAppend=positionInStream.offset,
-                                              returnSortTuples=True, # ALWAYS
-                                              sortByCreationTime=sortByCreationTime):
+                                                                         memo=memo,
+                                                                         offsetAppend=positionInStream.offset,
+                                                                         returnSortTuples=True, # ALWAYS
+                                                                         sortByCreationTime=sortByCreationTime):
                                 # get activeSite unless sortByCreationTime
                 inStreamOffset = inStreamPos.offset
                 # now take that offset and use it to modify the positionInStream
@@ -1625,23 +1625,23 @@ class Music21Object(object):
         if followDerivation:
             for derivedObject in topLevel.derivation.chain():
                 environLocal.printDebug(
-                        "looking now in derivedObject, {} with offsetAppend {}".format(
-                                                            derivedObject, offsetAppend))
+                    "looking now in derivedObject, {} with offsetAppend {}".format(
+                        derivedObject, offsetAppend))
                 for derivedCsTuple in derivedObject.contextSites(
-                                              callerFirst=None,
-                                              memo=memo,
-                                              offsetAppend=0.0,
-                                              returnSortTuples=True,
-                                              sortByCreationTime=sortByCreationTime):
+                    callerFirst=None,
+                    memo=memo,
+                    offsetAppend=0.0,
+                    returnSortTuples=True,
+                    sortByCreationTime=sortByCreationTime):
                                             # get activeSite unless sortByCreationTime
                     if derivedCsTuple.site not in memo:
                         environLocal.printDebug(
-                                "Yielding {} from derivedObject contextSites".format(derivedCsTuple)
-                                )
+                            "Yielding {} from derivedObject contextSites".format(derivedCsTuple)
+                        )
                         offsetAdjustedCsTuple = ContextTuple(
                             derivedCsTuple.site,
                             derivedCsTuple.offset.modify(offset=derivedCsTuple[1].offset +
-                                                                offsetAppend),
+                                                         offsetAppend),
                             derivedCsTuple.recurseType)
                         if returnSortTuples:
                             yield offsetAdjustedCsTuple
@@ -2057,7 +2057,7 @@ class Music21Object(object):
             self._activeSite = site
 
     activeSite = property(_getActiveSite, _setActiveSite,
-        doc='''
+                          doc='''
         A reference to the most-recent object used to
         contain this object. In most cases, this will be a
         Stream or Stream sub-class. In most cases, an object's
@@ -2150,7 +2150,7 @@ class Music21Object(object):
             self._naiveOffset = offset
 
     offset = property(_getOffset, _setOffset,
-        doc = '''
+                      doc = '''
         The offset property sets or returns the position of this object
         as a float or fractions.Fraction value
         (generally in `quarterLengths`), depending on what is representable.
@@ -2377,7 +2377,7 @@ class Music21Object(object):
             isNotGrace = 1
 
         if (useSite is not False
-                and self.sites.hasSiteId(id(useSite))):
+            and self.sites.hasSiteId(id(useSite))):
             insertIndex = self.sites.siteDict[id(useSite)].globalSiteIndex
         elif self.activeSite is not None:
             insertIndex = self.sites.siteDict[id(self.activeSite)].globalSiteIndex
@@ -2385,7 +2385,7 @@ class Music21Object(object):
             insertIndex = 0
 
         return SortTuple(atEnd, offset, self.priority,
-                          self.classSortOrder, isNotGrace, insertIndex)
+                         self.classSortOrder, isNotGrace, insertIndex)
 
     #------------------------------------------------------------------
     def _getDuration(self):
@@ -2415,7 +2415,7 @@ class Music21Object(object):
             raise Exception('this must be a Duration object, not %s' % durationObj)
 
     duration = property(_getDuration, _setDuration,
-        doc = '''
+                        doc = '''
         Get and set the duration of this object as a Duration object.
         ''')
 
@@ -2449,7 +2449,7 @@ class Music21Object(object):
             self.informSites({'changedElement': 'priority', 'priority': value})
 
     priority = property(_getPriority, _setPriority,
-        doc = '''
+                        doc = '''
         Get and set the priority integer value.
 
         Priority specifies the order of processing from left (lowest number)
@@ -2787,8 +2787,8 @@ class Music21Object(object):
 
         if quarterLength > self.duration.quarterLength:
             raise duration.DurationException(
-            "cannot split a duration (%s) at this quarterLength (%s)" % (
-            self.duration.quarterLength, quarterLength))
+                "cannot split a duration (%s) at this quarterLength (%s)" % (
+                    self.duration.quarterLength, quarterLength))
 
         if retainOrigin is True:
             e = self
@@ -2957,8 +2957,8 @@ class Music21Object(object):
         for qlIndex in range(len(quarterLengthList) - 1):
             qlSplit = quarterLengthList[qlIndex]
             st = eRemain.splitAtQuarterLength(qlSplit,
-                                           addTies=addTies,
-                                           displayTiedAccidentals=displayTiedAccidentals)
+                                              addTies=addTies,
+                                              displayTiedAccidentals=displayTiedAccidentals)
             newEl, eRemain = st
             eList.append(newEl)
             spannerList.extend(st.spannerList)
@@ -3459,7 +3459,7 @@ class Music21Object(object):
         ts = self._getTimeSignatureForBeat()
         return ts.getAccentWeight(
             self._getMeasureOffsetOrMeterModulusOffset(ts),
-                forcePositionMatch=True, permitMeterModulus=False)
+            forcePositionMatch=True, permitMeterModulus=False)
 
     def _setSeconds(self, value):
         ti = self.getContextByClass('TempoIndication')
@@ -3570,7 +3570,7 @@ class ElementWrapper(Music21Object):
     _DOC_ORDER = ['obj']
     _DOC_ATTR = {
         'obj': 'The object this wrapper wraps. It should not be a Music21Object.',
-        }
+    }
 
     def __init__(self, obj=None):
         Music21Object.__init__(self)
@@ -3588,10 +3588,10 @@ class ElementWrapper(Music21Object):
 
         if self.id is not None:
             return '<%s id=%s offset=%s obj="%s">' % \
-                (self.__class__.__name__, self.id, self.offset, shortObj)
+                   (self.__class__.__name__, self.id, self.offset, shortObj)
         else:
             return '<%s offset=%s obj="%s">' % \
-                (self.__class__.__name__, self.offset, shortObj)
+                   (self.__class__.__name__, self.offset, shortObj)
 
     def __eq__(self, other):
         '''Test ElementWrapper equality
@@ -3644,7 +3644,7 @@ class ElementWrapper(Music21Object):
         # if not, change the attribute in the stored object
         storedobj = object.__getattribute__(self, "obj")
         if name not in ['offset', '_offset', '_activeSite'] and \
-            storedobj is not None and hasattr(storedobj, name):
+           storedobj is not None and hasattr(storedobj, name):
             setattr(storedobj, name, value)
         # unless neither has the attribute, in which case add it to the ElementWrapper
         else:
@@ -4313,12 +4313,12 @@ class Test(unittest.TestCase):
         # if done with default args, we get the same object, as we are using
         # getElementAtOrBefore
         self.assertEqual(str(mm2.getContextByClass('MetronomeMark')),
-            '<music21.tempo.MetronomeMark Eighth=150>')
+                         '<music21.tempo.MetronomeMark Eighth=150>')
         # if we provide the getElementMethod parameter, we can use
         # getElementBeforeOffset
         self.assertEqual(str(mm2.getContextByClass('MetronomeMark',
-            getElementMethod='getElementBeforeOffset')),
-            '<music21.tempo.MetronomeMark lento 16th=50>')
+                                                   getElementMethod='getElementBeforeOffset')),
+                         '<music21.tempo.MetronomeMark lento 16th=50>')
 
     def testElementWrapperOffsetAccess(self):
         from music21 import stream, meter
@@ -4572,7 +4572,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(nLast.previous('TimeSignature')),
                          '<music21.meter.TimeSignature 4/4>')
         self.assertEqual(str(nLast.previous('KeySignature')),
-            'f# minor')
+                         'f# minor')
 
         # iterating at the Measure level, showing usage of flattenLocalSites
         measures = p1.getElementsByClass('Measure').stream()
