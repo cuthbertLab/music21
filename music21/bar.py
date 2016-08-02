@@ -107,6 +107,8 @@ class Barline(base.Music21Object):
     >>> bl4 = bar.Barline(style='final', location='right')
     >>> bl4
     <music21.bar.Barline style=final>
+    >>> bl4.style
+    'final'
     
     Note that the barline style 'ticked' only is displayed correctly in Finale and Finale Notepad.
     '''

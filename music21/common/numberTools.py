@@ -9,6 +9,7 @@
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
+from __future__ import division, print_function
 
 import math
 import random
@@ -655,10 +656,10 @@ def decimalToTuplet(decNum):
         raise ZeroDivisionError("number must be greater than zero")
     if decNum < 1:
         flipNumerator = True
-        decNum = 1.0/decNum
+        decNum = 1 / decNum
 
     unused_remainder, multiplier = math.modf(decNum)
-    working = decNum/multiplier
+    working = decNum / multiplier
 
     (jy, iy) = findSimpleFraction(working)
 

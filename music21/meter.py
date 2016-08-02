@@ -3054,7 +3054,7 @@ class TimeSignature(base.Music21Object):
             maxInt = max(weightInts)
             weightValues = {} # reference dictionary
             # minimum value, something like 1/16., to be multiplied by powers of 2
-            weightValueMin = 1.0 / pow(2, maxInt-1)
+            weightValueMin = 1 / pow(2, maxInt-1)
             for x in range(maxInt):
                 # multiply base value (.125) by 1, 2, 4
                 # there is never a 0 integer weight, so add 1 to dictionary
@@ -3290,13 +3290,13 @@ class TimeSignature(base.Music21Object):
     @property
     def beatLengthToQuarterLengthRatio(self):
         '''
-        Returns 4.0/denominator... seems a bit silly...
+        Returns 4.0 / denominator... seems a bit silly...
         
         >>> a = meter.TimeSignature('3/2')
         >>> a.beatLengthToQuarterLengthRatio
         2.0
         '''
-        return 4.0 / self.denominator
+        return 4 / self.denominator
 
     @property
     def quarterLengthToBeatLengthRatio(self):

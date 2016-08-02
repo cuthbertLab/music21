@@ -13,6 +13,7 @@
 This module defines the Chord object, a sub-class of :class:`~music21.note.GeneralNote`
 as well as other methods, functions, and objects related to chords.
 '''
+from __future__ import division, print_function
 __all__ = ['tables', 'Chord']
 
 import copy
@@ -940,7 +941,7 @@ class Chord(note.NotRest):
             score = 0
             for i, val in enumerate(rootThirdList):
                 if val is True:
-                    score += 1.0/(i+6)
+                    score += 1 / (i + 6)
             return score
 
         stepsFound = []

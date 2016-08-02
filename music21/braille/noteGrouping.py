@@ -205,9 +205,17 @@ class NoteGroupingTranscriber(object):
     ])
 
     def transcribeOneElement(self, el):
-        '''
+        u'''
         Transcribe a single element and add it to self.trans, setting self.previousElement
         along the way.
+        
+        >>> ngt = braille.noteGrouping.NoteGroupingTranscriber()
+        >>> n = note.Note('C4')
+        >>> ngt.transcribeOneElement(n)
+        >>> print(u''.join(ngt.trans))
+        ⠐⠹
+        >>> ngt.previousElement
+        <music21.note.Note C>
         '''
         elClasses = el.classes
         for className, classMethod in self.translateDict.items():

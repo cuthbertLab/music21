@@ -11,6 +11,7 @@
 '''
 This module defines the ContourFinder and AggregateContour objects.
 '''
+from __future__ import division, print_function
 
 import random
 import unittest
@@ -375,7 +376,7 @@ class ContourFinder(object):
                         n += dur
                         
         if n != 0:
-            return score*1.0/n
+            return score / n
         else:
             return None
             

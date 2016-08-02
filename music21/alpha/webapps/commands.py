@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import division, print_function
+
 import unittest
 import copy
 
@@ -324,7 +326,7 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
                     'numUserIdentified': user, 
                     'numMusic21Identified': music21VS, 
                     'numBothIdentified': both, 
-                    'accuracy': both * 100.0 / music21VS if music21VS != 0 else 100, 
+                    'accuracy': both * 100 / music21VS if music21VS != 0 else 100, 
                     'romans': romanFigureList, 
                     'key': pieceKey}
     return analysisData
@@ -420,7 +422,7 @@ def correctChordSymbols(worksheet, studentResponse):
         if isCorrect == False:
             chord2.lyric = "PITCHES"
 
-    percentCorrect =  numCorrect*1.0/totalNumChords * 100
+    percentCorrect =  numCorrect / totalNumChords * 100
     return (studentResponse, percentCorrect) #student's corrected score
 
 def checkLeadSheetPitches(worksheet, returnType=''):

@@ -9,6 +9,7 @@
 # Copyright:    Copyright © 2009-2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
+from __future__ import division, print_function
 
 import random
 import unittest
@@ -2300,8 +2301,8 @@ class Test(unittest.TestCase):
 
         p = stream.Part()
         p.insert(0, meter.TimeSignature('2/4'))
-        tuplet1 = note.Note("E-4", quarterLength=1.0/3.0)
-        tuplet2 = note.Note("F#4", quarterLength=2.0/3.0)
+        tuplet1 = note.Note("E-4", quarterLength=1/3)
+        tuplet2 = note.Note("F#4", quarterLength=2/3)
         p.repeatAppend(tuplet1, 10)
         p.repeatAppend(tuplet2, 7)
         ex = p.makeNotation()

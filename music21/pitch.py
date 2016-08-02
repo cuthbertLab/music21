@@ -16,6 +16,8 @@ Each :class:`~music21.note.Note` object has a `Pitch` object embedded in it.
 Some of the methods below, such as `Pitch.name`, `Pitch.step`, etc. are
 made available directly in the `Note` object, so they will seem familiar.
 '''
+from __future__ import division, print_function
+
 import copy, math, itertools
 import unittest
 
@@ -47,9 +49,9 @@ STEPREF = {
            'A' : 9,
            'B' : 11,
                }
-STEPNAMES = ['C','D','E','F','G','A','B']
+STEPNAMES = set(['C', 'D', 'E', 'F', 'G', 'A', 'B'])
 
-TWELFTH_ROOT_OF_TWO = 2.0 ** (1.0/12)
+TWELFTH_ROOT_OF_TWO = 2.0 ** (1/12)
 
 # how many significant digits to keep in pitch space resolution
 # where 1 is a half step. this means that 4 significant digits of cents will be kept
@@ -85,10 +87,6 @@ def _sortModifiers():
                 ams.append(sym)
         return ams
 accidentalModifiersSorted = _sortModifiers()
-
-
-
-
 
 
 #-------------------------------------------------------------------------------
@@ -376,8 +374,8 @@ def _convertHarmonicToCents(value):
     583
     '''
     if value < 0: #subharmonics
-        value = 1.0/(abs(value))
-    return int(round(1200*math.log(value, 2), 0))
+        value = 1 / (abs(value))
+    return int(round(1200 * math.log(value, 2), 0))
 
 #------------------------------------------------------------------------------
 

@@ -40,7 +40,7 @@ environLocal = environment.Environment(_MOD)
 #-------------------------------------------------------------------------------
 # constants
 
-STEPNAMES = ['C','D','E','F','G','A','B']
+STEPNAMES = ('C', 'D', 'E', 'F', 'G', 'A', 'B')
 
 DESCENDING = -1
 OBLIQUE    = 0

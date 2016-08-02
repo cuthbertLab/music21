@@ -9,11 +9,11 @@
 # Copyright:    Copyright © 2010-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 '''
 Module to translate MIDI data to music21 Streams and voice versa.  Note that quantization of
 notes takes place in the :meth:`~music21.stream.Stream.quantize` method not here.
 '''
+from __future__ import division, print_function
 
 
 import unittest
@@ -925,7 +925,7 @@ def midiEventsToTempo(eventList):
         event = eventList[1]
     # get microseconds per quarter
     mspq = midiModule.getNumber(event.data, 3)[0] # first data is number
-    bpm = round(60000000.0 / mspq, 2)
+    bpm = round(60000000 / mspq, 2)
     #post = midiModule.getNumbersAsList(event.data)
     #environLocal.printDebug(['midiEventsToTempo, got bpm', bpm])
     mm = tempo.MetronomeMark(number=bpm)
@@ -976,7 +976,7 @@ def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
     # from any tempo indication, get the sounding metronome mark
     mm = tempoIndication.getSoundingMetronomeMark()
     bpm = mm.getQuarterBPM()
-    mspq = int(round(60000000.0 / bpm)) # microseconds per quarter note
+    mspq = int(round(60000000 / bpm)) # microseconds per quarter note
 
     me.data = midiModule.putNumber(mspq, 3)
     eventList.append(me)

@@ -28,6 +28,7 @@ from music21 import stream
 from music21 import tempo
 
 from music21.articulations import Fingering
+from music21.braille.objects import BrailleSegmentDivision
 
 
 # Examples follow the order in:
@@ -2200,8 +2201,7 @@ def example11_1():
     u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.example11_1(), inPlace=True, 
-    ...                               forcedSegmentBreaks=[(9, 0.0)]))
+    >>> print(translate.partToBraille(test.example11_1(), inPlace=True))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠸⠱⠋⠛⠓⠊⠀⠺⠪⠓⠛⠀⠋⠑⠙⠑⠋⠛⠀⠳⠪⠧⠀⠺⠙⠑⠋⠛⠀⠫⠱⠙⠚
     ⠀⠀⠐⠙⠋⠑⠙⠚⠩⠊⠀⠞⠧
@@ -2214,14 +2214,14 @@ def example11_1():
         A4 G8 F#8 E8 D8 C#4 D4 E8 F#8 G8 A8 B8 A8 G8 F#8 E4 D4 r4""").flat
     bm.insert(0, key.KeySignature(2))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    bm.measure(9).insert(0, BrailleSegmentDivision())
     return bm
 
 def example11_2():
     u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.example11_2(), inPlace=True, 
-    ...                               forcedSegmentBreaks=[(8, 3.0)]))
+    >>> print(translate.partToBraille(test.example11_2(), inPlace=True))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠚⠀⠐⠺⠀⠳⠫⠱⠫⠀⠗⠻⠫⠀⠪⠳⠨⠹⠄⠙⠀⠞⠄⠺⠀⠨⠫⠐⠺⠪⠄⠓⠀⠗⠻⠨⠹
     ⠀⠀⠨⠹⠐⠻⠪⠄⠑⠀⠏⠄⠐
@@ -2239,6 +2239,7 @@ def example11_2():
         sm.number -= 1
     m[0].pop(3)
     m[0].padAsAnacrusis()
+    bm.measure(8).insert(3.0, BrailleSegmentDivision())
     return bm
 
 #-------------------------------------------------------------------------------

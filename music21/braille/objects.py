@@ -14,7 +14,18 @@ import unittest
 
 from music21.base import Music21Object
 
-class BrailleSegmentDivision(Music21Object):
+class BrailleTranscriptionHelper(Music21Object):
+    '''
+    represents an object that should not be transcribed into braille
+    but can help with transcription.
+
+    >>> bth = braille.objects.BrailleTranscriptionHelper()
+    >>> bth
+    <music21.braille.objects.BrailleTranscriptionHelper object at 0x10afc1a58>
+    '''
+    classSortOrder = -100
+
+class BrailleSegmentDivision(BrailleTranscriptionHelper):
     '''
     Represents that a segment must divide at this point.
     
@@ -32,7 +43,7 @@ class BrailleOptionalSegmentDivision(BrailleSegmentDivision):
     <music21.braille.objects.BrailleOptionalSegmentDivision object at 0x10afc1b38>
     '''
 
-class BrailleOptionalNoteDivision(Music21Object):
+class BrailleOptionalNoteDivision(BrailleTranscriptionHelper):
     '''
     Represents the best place in a measure to divide notes
     if the measure needs to be divided.

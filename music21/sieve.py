@@ -52,6 +52,7 @@ The :class:`music21.sieve.PitchSieve` class provides a quick generation of
  F7, C8, E-8, F#8, C#9, E9, G9'
 
 '''
+from __future__ import division, print_function
 
 
 import copy, string, random
@@ -331,7 +332,7 @@ def unitNormEqual(parts):
         return [0,1]
     else:
         unit = []
-        step = 1.0 / (parts - 1)
+        step = 1 / (parts - 1)
         for y in range(0, parts-1): # one less value tn needed
             unit.append(y*step)
         unit.append(1) # make last an integer, add manually

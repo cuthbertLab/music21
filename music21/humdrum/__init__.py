@@ -46,7 +46,7 @@ iv_           :meth:`~music21.chord.Chord.intervalVector`
 kern_         None                                               Output to Humdrum is not supported
 key_          :meth:`~music21.stream.Stream.analyze` ('key')
 melac_        see Notes                                          :meth:`~music21.analysis.metrical.thomassenMelodicAccent`.  incorporates humdrum additions for giving accent of the first and last notes.
-metpos_       `1.0/obj.beatStrength()`                           the beatStrength of an object is essentially something similar but inverted.  beatStrength handles irregular meters.
+metpos_       `1 / obj.beatStrength()`                           the beatStrength of an object is essentially something similar but inverted.  beatStrength handles irregular meters.
 midi_         `.show('midi')`
 midireset_    None                                               Not needed for now because we do not write directly to MIDI.  A midi.allOff() will be needed for direct midi access...
 mint_         `interval.Interval(note1, note2)`                  Or :meth:`~music21.stream.Stream.melodicIntervals`

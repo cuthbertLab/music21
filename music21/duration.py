@@ -275,7 +275,7 @@ def quarterLengthToClosestType(qLen):
     if (isinstance(qLen, fractions.Fraction)):
         noteLengthType = 4 / qLen  # divides right...
     else:
-        noteLengthType = opFrac(4.0/qLen)
+        noteLengthType = opFrac(4 / qLen)
 
     if noteLengthType in typeFromNumDict:
         return (typeFromNumDict[noteLengthType], True)
@@ -2942,7 +2942,7 @@ class TupletFixer(object):
             return
         else:
             excessRatio = opFrac(currentTupletDuration / totalTupletDuration)
-            inverseExcessRatio = opFrac(1.0/excessRatio)
+            inverseExcessRatio = opFrac(1 / excessRatio)
 
             if excessRatio == int(excessRatio): # divide tuplets into smaller
                 largestTupletType = ordinalTypeFromNum[largestTupletTypeOrdinal]
