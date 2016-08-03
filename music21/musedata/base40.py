@@ -106,6 +106,18 @@ base40Representation = {'C--': 1,
                         'B##': 40,
                         }
 
+base40FromMidi =   {0: 3,
+                    1: 4,
+                    2: 9,
+                    3: 14,
+                    4: 15,
+                    5: 20,
+                    6: 21,
+                    7: 26,
+                    8: 31,
+                    9: 32,
+                    10: 37,
+                    11: 38}
 
 #Key => Base40 delta (difference between two Base40 pitch numbers)
 #Value => Corresponding music21 Interval
@@ -459,6 +471,115 @@ def quickEnharmonicString(nameStr, allowDoubleAccidentals=True):
     l = quickLowerEnharmonicString(nameStr, allowDoubleAccidentals)
     l.extend(quickHigherEnharmonicString(nameStr, allowDoubleAccidentals))
     return l
+
+def getBase40EquivalentWithOctave(base40Num):
+    base40Str = base40Equivalent.get((base40Num-1)%40 + 1, None)
+    if base40Str:
+        octave = (base40Num-1)//40 + 1
+        # cannot be below zero because you cannot distinguish C- in octave 1 and C in octave -1
+        if octave < 0:
+            return None
+        else:
+            return base40Str + str(octave)
+    else:
+        return base40Str
+
+def getBase40RepresentationWithOctave(base40Str):
+    octave = int(base40Str[-1])
+    tableNum = base40Representation.get(base40Str[:-1], None)
+    if tableNum:
+        return (octave-1)*40 + tableNum
+    else:
+        return tableNum
+
+def getBase40FromMidi(midiNum, withOctave=True):
+    num = base40FromMidi.get(midiNum%12, None)
+    if num:
+        if withOctave:
+            num += (midiNum//12 - 2)*40
+        return num
+    else:
+        return num
+
+def getAlterationsNum(base40Num):
+    base40Str = base40Equivalent.get(base40Num%40, None)
+    if base40Str:
+        alter = len(base40Str)-1
+        if alter != 0 and base40Str[1] == '-':
+            alter *= -1
+        return alter
+    else:
+        return 0
+
+def getStepNum(base40Num):
+    base40Str = base40Equivalent.get(base40Num%40, None)
+    if base40Str:
+        return base40Str[:1]
+    else:
+        return 0
+
+def _quickEnharmonicNum(base40num, direction='up', allowDoubleAccidentals=True, withOctave=False):
+    if direction == 'up':
+        addNum = 4
+    elif direction == 'down':
+        addNum = -4
+    else:
+        raise Base40Exception("Not a valid direction, {}".format(direction))
+        
+    enharmonicsNum = []
+    enharmonicsStr = []
+    base40numOrig = base40num
+    base40num = base40num % 40
+    nameStr = base40Equivalent.get(base40num, None)
+
+    if nameStr is None:
+        base40num = None
+    
+    while base40num is not None:
+        base40num = (base40num + addNum) % 40
+        base40str = base40Equivalent.get(base40num, None)
+
+        if base40num == 0:
+            base40num = 40
+        if withOctave:
+            base40num += int(round((base40numOrig-base40num)/40))*40
+        
+        if allowDoubleAccidentals is False and base40str is not None and len(base40str) > 2:
+            base40str = None
+        
+        if base40str is None:
+            base40num = None
+        else:
+            if base40str[0] == nameStr[0]:
+                base40num = None
+                base40str = None
+            for e in enharmonicsStr:
+                if base40str[0] == e[0]:
+                    base40num = None
+                    base40str = None
+            if base40str is not None:           
+                enharmonicsNum.append(base40num)
+                enharmonicsStr.append(base40str)
+        
+    return enharmonicsNum
+
+def quickHigherEnharmonicNum(base40num, allowDoubleAccidentals=True, withOctave=False):
+    return _quickEnharmonicNum(base40num, 
+                                  direction='up', 
+                                  allowDoubleAccidentals=allowDoubleAccidentals,
+                                  withOctave=withOctave)
+
+def quickLowerEnharmonicNum(base40num, allowDoubleAccidentals=True, withOctave=False):
+    return _quickEnharmonicNum(base40num, 
+                                  direction='down', 
+                                  allowDoubleAccidentals=allowDoubleAccidentals,
+                                  withOctave=withOctave)
+
+def quickEnharmonicNum(base40num, allowDoubleAccidentals=True, withOctave=False):
+    l = quickLowerEnharmonicNum(base40num, allowDoubleAccidentals, withOctave)
+    l.extend(quickHigherEnharmonicNum(base40num, allowDoubleAccidentals, withOctave))
+    return l
+
 
 class Base40Exception(exceptions21.Music21Exception):
     pass

@@ -390,6 +390,7 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
     score_accidentals = 0.0
     score_ratio = 0.0
     score_traid = 0.0
+    triad_bases = []
 
     if len(pitches) == 0:
         return 0.0
@@ -399,37 +400,38 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
         accidentals = [abs(p.alter) for p in pitches]
         score_accidentals = sum(a if a>1 else 0 for a in accidentals) / len(pitches)
 
-    if smallPythagoreanRatio:
-        # score_ratio = Pythagorean ratio complexity per pitch
-        for p1, p2 in itertools.combinations(pitches, 2):
-            # does not accept weird intervals, e.g. with semitones
-            try:
-                this_interval = interval.Interval(noteStart=p1,  noteEnd=p2)
-                ratio = interval.intervalToPythagoreanRatio(this_interval)
-                penalty = math.log(ratio.numerator * ratio.denominator /
-                    ratio)  / 26.366694928034633 # d2 is 1.0
-                score_ratio += penalty
-            except interval.IntervalException:
-                return float('inf')
+    for p1, p2 in itertools.combinations(pitches, 2):
 
-        score_ratio /= len(pitches)
-
-    if triadAward:
-        # score_traid = number of thirds per pitch (avoid double-base-thirds)
-        triad_bases = []
-        for p1, p2 in itertools.combinations(pitches, 2):
+        try:
             this_interval = interval.Interval(noteStart=p1,  noteEnd=p2)
+        except interval.IntervalException:
+            # does not accept weird intervals, e.g. with semitones
+            return float('inf')
+
+        if smallPythagoreanRatio:
+            # score_ratio = Pythagorean ratio complexity per pitch     
+            ratio = interval.intervalToPythagoreanRatio(this_interval)
+            penalty = math.log(ratio.numerator * ratio.denominator /
+                ratio)  / 26.366694928034633 # d2 is 1.0
+            score_ratio += penalty
+
+        if triadAward:
+            # score_traid = number of thirds per pitch (avoid double-base-thirds)
             generic_interval_value = abs(this_interval.generic.value) % 8
             interval_semitones = this_interval.chromatic.semitones % 12
             if generic_interval_value == 3 and interval_semitones in [3, 4]:
                 triad_steps = (p1.step, p2.step)
                 if triad_steps not in triad_bases:
                     score_traid -= 1.0
+                    triad_bases.append(triad_steps)
             elif generic_interval_value == 6 and interval_semitones in [8, 9]:
                 triad_steps = (p2.step, p1.step)
                 if triad_steps not in triad_bases:
                     score_traid -= 1.0
-        score_traid /= len(pitches)
+                    triad_bases.append(triad_steps)
+
+    score_ratio /= len(pitches)
+    score_traid /= len(pitches)
 
     return (score_accidentals + score_ratio + score_traid) / int(smallPythagoreanRatio
             + accidentalPenalty + triadAward)
@@ -496,6 +498,124 @@ def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=
 
     if remove_first:
         simplifiedPitches = simplifiedPitches[1:]
+
+    return simplifiedPitches
+
+#------------------------------------------------------------------------------
+
+def _dissonanceScore_b40(pitches, smallPythagoreanRatio=True, accidentalPenalty=True, triadAward=True):
+    from music21.musedata import base40
+
+    score_accidentals = 0.0
+    score_ratio = 0.0
+    score_traid = 0.0
+    triad_bases = []
+
+    if len(pitches) == 0:
+        return 0.0
+
+    if accidentalPenalty:
+        # score_accidentals = accidentals per pitch
+        accidentals = [abs(base40.getAlterationsNum(p)) for p in pitches]
+        score_accidentals = sum(a if a>1 else 0 for a in accidentals) / len(pitches)
+
+    
+    for p1, p2 in itertools.combinations(pitches, 2):
+
+        try:
+            this_interval = base40.base40Interval(p1, p2)
+        except (base40.Base40Exception, interval.IntervalException):
+            # does not accept weird intervals, e.g. with semitones
+            # base40.base40ActualInterval(p1, p2) could offer some more intervals...
+            return float('inf')
+
+        if smallPythagoreanRatio:
+            # score_ratio = Pythagorean ratio complexity per pitch
+            ratio = interval.intervalToPythagoreanRatio(this_interval)
+            penalty = math.log(ratio.numerator * ratio.denominator /
+                ratio)  / 26.366694928034633 # d2 is 1.0
+            score_ratio += penalty
+
+        if triadAward:
+            # score_traid = number of thirds per pitch (avoid double-base-thirds)
+            generic_interval_value = abs(this_interval.generic.value) % 8
+            interval_semitones = this_interval.chromatic.semitones % 12
+            if generic_interval_value == 3 and interval_semitones in [3, 4]:
+                triad_steps = (base40.getStepNum(p1), base40.getStepNum(p2))
+                if triad_steps not in triad_bases:
+                    score_traid -= 1.0
+                    triad_bases.append(triad_steps)
+            elif generic_interval_value == 6 and interval_semitones in [8, 9]:
+                triad_steps = (base40.getStepNum(p2), base40.getStepNum(p1))
+                if triad_steps not in triad_bases:
+                    score_traid -= 1.0
+                    triad_bases.append(triad_steps)
+
+    score_ratio /= len(pitches)
+    score_traid /= len(pitches)
+
+    return (score_accidentals + score_ratio + score_traid) / int(smallPythagoreanRatio
+            + accidentalPenalty + triadAward)
+
+def _bruteForceEnharmonicsSearch_b40(oldPitches, scoreFunc=_dissonanceScore_b40, with_octave=False):
+    from music21.musedata import base40
+
+    all_possible_pitches = [[p] + base40.quickEnharmonicNum(p, withOctave=with_octave) for p in oldPitches[1:]]
+    all_pitch_combinations = itertools.product(*all_possible_pitches)
+    newPitches = min(all_pitch_combinations, key=lambda x:  scoreFunc(oldPitches[:1] + list(x)))
+    return oldPitches[:1] + list(newPitches)
+
+def _greedyEnharmonicsSearch_b40(oldPitches, scoreFunc=_dissonanceScore_b40, with_octave=False):
+    from music21.musedata import base40
+
+    newPitches = oldPitches[:1]
+    for oldPitch in oldPitches[1:]:
+        candidates = [oldPitch] + base40.quickEnharmonicNum(oldPitch, withOctave=with_octave)
+        newPitch = min(candidates, key=lambda x:  scoreFunc(newPitches + [x]))
+        newPitches.append(newPitch)
+    return newPitches
+
+def simplifyMultipleEnharmonics_b40(pitches, criterion=_dissonanceScore_b40, keyContext=None):
+    from music21.musedata import base40
+
+    if len(pitches) == 0:
+        return pitches
+
+    firstp = pitches[0]
+    with_octave = ((isinstance(firstp, Pitch) and firstp.octave)
+                    or (isinstance(firstp, str) and firstp[-1].isdigit())
+                    or (isinstance(firstp, int) and all(n > 11 for n in pitches)))
+
+    if isinstance(firstp, Pitch) and with_octave:
+        pitchConverter = lambda p: base40.getBase40RepresentationWithOctave(p.nameWithOctave)
+    elif isinstance(firstp, Pitch):
+        pitchConverter = lambda p: base40.base40Representation.get(p.name)
+    elif isinstance(firstp, str) and with_octave:
+        pitchConverter = base40.getBase40RepresentationWithOctave
+    elif isinstance(firstp, str):
+        pitchConverter = base40.base40Representation.get
+    elif isinstance(firstp, int) and with_octave:
+        pitchConverter = lambda p: base40.getBase40FromMidi(p, True)
+    else:
+        pitchConverter = lambda p: base40.getBase40FromMidi(p, False)
+
+    oldPitches = [pitchConverter(p) for p in pitches]
+
+    if keyContext:
+        oldPitches = [base40.pitchToBase40(keyContext.pitchAndMode[0].name)] + oldPitches
+        remove_first = True
+    else:
+        remove_first = False
+
+    if len(oldPitches) < 5:
+        simplifiedPitches = _bruteForceEnharmonicsSearch_b40(oldPitches, criterion, with_octave)
+    else:
+        simplifiedPitches = _greedyEnharmonicsSearch_b40(oldPitches, criterion, with_octave)
+
+    if remove_first:
+        simplifiedPitches = simplifiedPitches[1:]
+
+    simplifiedPitches = [Pitch(base40.getBase40EquivalentWithOctave(p)) for p in simplifiedPitches]
 
     return simplifiedPitches
 

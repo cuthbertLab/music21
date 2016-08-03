@@ -4322,7 +4322,7 @@ def fromForteClass(notation):
     <music21.chord.Chord C E- G>
 
     >>> chord.fromForteClass((11,1))
-    <music21.chord.Chord C D- D E- E F G- G A- A B->
+    <music21.chord.Chord C D- D E- F- F G- G A- A B->
 
     '''
     card = None
