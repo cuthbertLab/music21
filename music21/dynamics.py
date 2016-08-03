@@ -266,6 +266,22 @@ class Dynamic(base.Music21Object):
         doc='''
         Get or set the value of this dynamic, which sets the long and 
         English names of this Dynamic. The value is a string specification. 
+        
+        >>> p = dynamics.Dynamic('p')
+        >>> p.value
+        'p'
+        >>> p.englishName
+        'soft'
+        >>> p.longName
+        'piano'
+        
+        >>> p.value = 'f'
+        >>> p.value
+        'f'
+        >>> p.englishName
+        'loud'
+        >>> p.longName
+        'forte'
         ''')
 
 

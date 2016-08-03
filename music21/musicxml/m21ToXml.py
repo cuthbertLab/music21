@@ -4251,7 +4251,7 @@ class MeasureExporter(XMLExporterBase):
             mxTime.set('symbol', 'note')
         elif ts.symbol != "":
             mxTime.set('symbol', ts.symbol)
-            # dotted-note not supported
+            # symbol: dotted-note not supported
 
         # TODO: attr: separator
         # TODO: attr: print-style-align

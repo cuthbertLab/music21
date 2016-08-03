@@ -4185,6 +4185,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if obj is not None:
                 post.append(obj)
 
+        #if there is no timeSignature, we will look at any stream at offset 0:
+        if not(post):
+            streamsAtStart = self.getElementsByOffset(0.0).getElementsByClass('Stream')
+            for s in streamsAtStart:
+                tss = s.getElementsByOffset(0.0).getElementsByClass('TimeSignature')
+                for ts in tss:
+                    post.append(ts)
+        
         # get a default and/or place default at zero if nothing at zero
         if returnDefault:
             if len(post) == 0 or post[0].offset > 0:
@@ -7750,8 +7758,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     #---------------------------------------------------------------------------
     # transformations
 
-    def transpose(self, value, inPlace=False, recurse=True,
-        classFilterList=('Note', 'Chord')):
+    def transpose(self, 
+                  value, 
+                  inPlace=False, 
+                  recurse=True,
+                  classFilterList=('Note', 'Chord')):
         '''
         Transpose all specified classes in the
         Stream by the
@@ -7765,7 +7776,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         it modifies pitches in place.
         
         TODO: for generic interval set accidental by key signature.
-        TODO: set recurse = False? 
         
 
         >>> aInterval = interval.Interval('d5')
@@ -7795,6 +7805,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # only change the copy
         if not inPlace:
             post = copy.deepcopy(self)
+            post.derivation.method = 'transpose'
         else:
             post = self
 #         for p in post.pitches: # includes chords
@@ -8909,6 +8920,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> m.findConsecutiveNotes(skipUnisons=False,
         ...                        skipRests=True, noNone=True)
         [<music21.note.Note F>, <music21.note.Note D>, 
+         <music21.note.Note D>, <music21.note.Note D>, <music21.note.Note D>, 
          <music21.note.Note B->, <music21.note.Note A->]
 
         OMIT_FROM_DOCS
