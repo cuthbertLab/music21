@@ -293,8 +293,9 @@ def keyboardPartsToBraille(staffUpper, staffLower, **keywords):
         for lhGroupingKey in lhSegment:
             bg[lhGroupingKey] = lhSegment[lhGroupingKey]
         
+        bg.transcribe()
         if not debug:
-            allBrailleText.append(bg.transcribe())
+            allBrailleText.append(bg.brailleText)
         else:
             if six.PY2:
                 bsStr = str(bg)

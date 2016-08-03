@@ -1049,23 +1049,9 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
             return text.BrailleKeyboard.__unicode__(self)
         else:
             return text.BrailleKeyboard.__str__(self)
-    
-    def __str__(self):
         name = u"<music21.braille.segment BrailleGrandSegment>\n==="
         allPairs = []
         for (rightKey, leftKey) in self.yieldCombinedGroupingKeys():
-            rightHeading = u"Measure {0} Right, {1} {2}:\n".format(
-                rightKey.measure, affinityNames[rightKey.affinity], rightKey.ordinal + 1)
-            rightContents = str(self.get(rightKey))
-            if six.PY2:
-                rightContents = rightContents.decode(encoding='utf_8', errors='ignore')
-            leftHeading = u"\nMeasure {0} Left, {1} {2}:\n".format(
-                leftKey.measure, affinityNames[leftKey.affinity], leftKey.ordinal + 1)
-            leftContents = str(self.get(leftKey))
-            if six.PY2:
-                leftContents = leftContents.decode(encoding='utf_8', errors='ignore')
-            rightFull = u"".join([rightContents, rightHeading]) 
-            leftFull = u"".join([leftHeading, leftContents])
             allPairs.append(u"\n".join([rightFull, leftFull, "====\n"]))
         out = u"\n".join([u"---begin grand segment---", name, u"".join(allPairs), 
                            u"---end grand segment---"])
@@ -1094,14 +1080,11 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
         (, '3l')
         ('4r', '4l')
         ('5r', )        
-        '''
-        def sortKey(segmentKey):
             if segmentKey.hand == 'right':
                 skH = -1
             else:
                 skH = 1
             return (segmentKey.measure, segmentKey.ordinal, segmentKey.affinity, skH)
-        
         def matchOther(thisKey, otherKey):
             if (thisKey.measure == otherKey.measure
                     and thisKey.ordinal == otherKey.ordinal
@@ -1112,7 +1095,6 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
         
         storedRight = None
         storedLeft = None
-        for thisKey in sorted(self.keys(), key=sortKey):
             if thisKey.hand == 'left':
                 if storedRight is not None:
                     if matchOther(thisKey, storedRight):                        
@@ -1197,7 +1179,6 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
             self.currentGroupingPair = self.allKeyPairs.pop(0)
             (rightKey, leftKey) = self.currentGroupingPair
 
-            if rightKey.affinity >= Affinity.INACCORD or leftKey.affinity >= Affinity.INACCORD:
                 self.extractNoteGrouping() # Note or Inaccord Grouping
 #             elif rightKey.affinity == Affinity.SIGNATURE or leftKey.affinity == Affinity.SIGNATURE:
 #                 self.extractSignatureGrouping() # Signature Grouping
@@ -1251,8 +1232,6 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
     
     def extractNoteGrouping(self):
         (rightKey, leftKey) = self.currentGroupingPair
-        currentMeasureNumber = basic.numberToBraille(rightKey.measure, withNumberSign=False)
-        if rightKey.affinity == Affinity.INACCORD:
             inaccords = self.get(rightKey)
             voice_trans = []
             for music21Voice in inaccords:
@@ -1262,9 +1241,7 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                 noteGrouping.upperFirstInNoteFingering = inaccords.upperFirstInNoteFingering
                 voice_trans.append(ngMod.transcribeNoteGrouping(noteGrouping))
             rh_braille = symbols['full_inaccord'].join(voice_trans)
-        else:
             rh_braille = ngMod.transcribeNoteGrouping(self.get(rightKey))
-        if leftKey.affinity == Affinity.INACCORD:
             inaccords = self.get(leftKey)
             voice_trans = []
             for music21Voice in inaccords:
@@ -1274,7 +1251,6 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                 noteGrouping.upperFirstInNoteFingering = inaccords.upperFirstInNoteFingering
                 voice_trans.append(ngMod.transcribeNoteGrouping(noteGrouping))
             lh_braille = symbols['full_inaccord'].join(voice_trans)
-        else:
             lh_braille = ngMod.transcribeNoteGrouping(self.get(leftKey))
         self.addNoteGroupings(currentMeasureNumber, rh_braille, lh_braille)
         return None
