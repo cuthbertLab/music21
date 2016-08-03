@@ -355,7 +355,9 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
         """
         collections.defaultdict.__init__(self, BrailleElementGrouping)
         text.BrailleText.__init__(self, lineLength=SEGMENT_LINELENGTH)
-
+        self.init_defaults()
+        
+    def init_defaults(self):
         self.groupingKeysToProcess = None
         self.currentGroupingKey = None
         self.lastNote = None
@@ -426,6 +428,8 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
         then the Measure Number
         then adds appropriate numbers of dummyRests
         then adds the Rest of the Note Groupings
+        
+        returns brailleText
         """
         self.groupingKeysToProcess = sorted(self.keys())
         
@@ -660,7 +664,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
                      or currentKey.affinity != Affinity.NOTEGROUP
                      or (currentKey.measure == previousKey.measure 
                         and currentKey.ordinal == previousKey.ordinal + 1
-                        and currentKey.splitGroup == previousKey.splitGroup))):
+                        and currentKey.hand == previousKey.hand))):
             self.lastNote = None
 
         if self.suppressOctaveMarks:
@@ -866,13 +870,13 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
         >>> BS2 = BS1.consolidate()
         >>> for (groupingKey, groupingList) in sorted(BS2.items()):
         ...     print(groupingKey, groupingList)
-        SegmentKey(measure=0, ordinal=0, affinity=2, splitGroup=False) ['hi', 'hello', 'there']
-        SegmentKey(measure=0, ordinal=1, affinity=9, splitGroup=False) these
+        SegmentKey(measure=0, ordinal=0, affinity=2, hand=None) ['hi', 'hello', 'there']
+        SegmentKey(measure=0, ordinal=1, affinity=9, hand=None) these
         get
         put
         together
-        SegmentKey(measure=0, ordinal=3, affinity=4, splitGroup=False) ['in', 'new', 'group']
-        SegmentKey(measure=0, ordinal=4, affinity=9, splitGroup=False) with
+        SegmentKey(measure=0, ordinal=3, affinity=4, hand=None) ['in', 'new', 'group']
+        SegmentKey(measure=0, ordinal=4, affinity=9, hand=None) with
         the
         previous
         """
@@ -1029,104 +1033,181 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
                                     music21NoteContinue.articulations.remove(artOther)
            
 
-class BrailleGrandSegment(BrailleSegment):
+class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
     '''
     A BrailleGrandSegment represents a pair of segments (rightSegment, leftSegment)
     representing the right and left hands of a piano staff (or other two-staff object)
     '''
+    def __init__(self):
+        collections.defaultdict.__init__(self, BrailleElementGrouping)
+        text.BrailleKeyboard.__init__(self, lineLength=SEGMENT_LINELENGTH)
+        self.init_defaults()
+    
+    @property
+    def brailleText(self):
+        if six.PY2:
+            return text.BrailleKeyboard.__unicode__(self)
+        else:
+            return text.BrailleKeyboard.__str__(self)
+    
     def __str__(self):
         name = u"<music21.braille.segment BrailleGrandSegment>\n==="
         allPairs = []
-        allKeyPairs = self.combineGroupingKeys(self.rightSegment, self.leftSegment)
-        for (rightKey, leftKey) in allKeyPairs:
-            a = u"Measure {0} Right, {1} {2}:\n".format(
+        for (rightKey, leftKey) in self.yieldCombinedGroupingKeys():
+            rightHeading = u"Measure {0} Right, {1} {2}:\n".format(
                 rightKey.measure, affinityNames[rightKey.affinity], rightKey.ordinal + 1)
-            b = str(self.rightSegment[rightKey])
+            rightContents = str(self.get(rightKey))
             if six.PY2:
-                b = b.decode(encoding='utf_8', errors='ignore')
-            c = u"\nMeasure {0} Left, {1} {2}:\n".format(
+                rightContents = rightContents.decode(encoding='utf_8', errors='ignore')
+            leftHeading = u"\nMeasure {0} Left, {1} {2}:\n".format(
                 leftKey.measure, affinityNames[leftKey.affinity], leftKey.ordinal + 1)
-            d = str(self.leftSegment[leftKey])
+            leftContents = str(self.get(leftKey))
             if six.PY2:
-                d = d.decode(encoding='utf_8', errors='ignore')
-            ab = u"".join([a,b]) 
-            cd = u"".join([c,d])
-            allPairs.append(u"\n".join([ab, cd, "====\n"]))
+                leftContents = leftContents.decode(encoding='utf_8', errors='ignore')
+            rightFull = u"".join([rightContents, rightHeading]) 
+            leftFull = u"".join([leftHeading, leftContents])
+            allPairs.append(u"\n".join([rightFull, leftFull, "====\n"]))
         out = u"\n".join([u"---begin grand segment---", name, u"".join(allPairs), 
                            u"---end grand segment---"])
         if six.PY2:
             out = out.encode(encoding='utf_8', errors='ignore')
         return out
 
-    def combineGroupingKeys(self, rightSegment, leftSegment):
-        groupingKeysRight = sorted(rightSegment.keys())
-        groupingKeysLeft = sorted(leftSegment.keys())
-        combinedGroupingKeys = []
+    def yieldCombinedGroupingKeys(self):
+        '''
+        yields all the keys in order as a tuple of (rightKey, leftKey) where 
+        two keys are grouped if they have the same segmentKey except for the hand.
         
-        while groupingKeysRight:
-            gkRight = groupingKeysRight.pop(0)
-            try:
-                groupingKeysLeft.remove(gkRight)
-                combinedGroupingKeys.append((gkRight, gkRight))
-            except ValueError:
-                if gkRight.affinity < Affinity.INACCORD:
-                    combinedGroupingKeys.append((gkRight, None))
-                else:
-                    if gkRight.affinity == Affinity.INACCORD:
-                        gkLeft = gkRight._replace(affinity=gkRight.affinity + 1)
+        >>> bgs = braille.segment.BrailleGrandSegment()
+        >>> SegmentKey = braille.segment.SegmentKey # namedtuple
+        >>> bgs[SegmentKey(1, 1, 1, 'right')] = "1r"
+        >>> bgs[SegmentKey(1, 1, 1, 'left')]  = "1l"
+        >>> bgs[SegmentKey(1, 2, 3, 'right')] = "2r"
+        >>> bgs[SegmentKey(1, 2, 4, 'left')] = "3l"
+        >>> bgs[SegmentKey(2, 1, 9, 'left')] = "4l"
+        >>> bgs[SegmentKey(2, 1, 9, 'right')] = "4r"
+        >>> bgs[SegmentKey(3, 1, 9, 'right')] = "5r"
+        >>> for l, r in bgs.yieldCombinedGroupingKeys():
+        ...     (bgs[l], bgs[r])
+        ('1r', '1l')
+        ('2r', )
+        (, '3l')
+        ('4r', '4l')
+        ('5r', )        
+        '''
+        def sortKey(segmentKey):
+            if segmentKey.hand == 'right':
+                skH = -1
+            else:
+                skH = 1
+            return (segmentKey.measure, segmentKey.ordinal, segmentKey.affinity, skH)
+        
+        def matchOther(thisKey, otherKey):
+            if (thisKey.measure == otherKey.measure
+                    and thisKey.ordinal == otherKey.ordinal
+                    and thisKey.affinity == otherKey.affinity):
+                return True
+            else:
+                return False
+        
+        storedRight = None
+        storedLeft = None
+        for thisKey in sorted(self.keys(), key=sortKey):
+            if thisKey.hand == 'left':
+                if storedRight is not None:
+                    if matchOther(thisKey, storedRight):                        
+                        yield(storedRight, thisKey)
                     else:
-                        gkLeft = gkRight._replace(affinity=gkRight.affinity - 1)
-                    try:
-                        groupingKeysLeft.remove(gkLeft)
-                    except ValueError:
-                        raise BrailleSegmentException(
-                            "Misaligned braille groupings: " + 
-                            "groupingKeyLeft was %s" % gkLeft + 
-                            "groupingKeyRight was %s" % gkRight + 
-                            "rightSegment was %s, leftSegment was %s" % (rightSegment, leftSegment))
+                        yield(storedRight, None)
+                        storedLeft = thisKey
+                    storedRight = None
+                else:
+                    storedLeft = thisKey
+            elif thisKey.hand == 'right':
+                if storedLeft is not None:
+                    if matchOther(thisKey, storedLeft):                        
+                        yield(thisKey, storedLeft)
+                    else:
+                        yield(None, storedLeft)
+                        storedRight = thisKey
+                    storedLeft = None
+                else:
+                    storedRight = thisKey
+        if storedRight:
+            yield (storedRight, None)
+        if storedLeft:
+            yield (None, storedLeft)
+          
 
-                    try:
-                        combinedGroupingTuple = (gkRight, gkLeft)
-                        combinedGroupingKeys.append(combinedGroupingTuple)
-                    except ValueError:
-                        raise BrailleSegmentException(
-                            "Misaligned braille groupings could not append combinedGroupingKeys")
-
-        
-        while groupingKeysLeft:
-            gkLeft = groupingKeysLeft.pop(0)
-            combinedGroupingTuple = (None, gkLeft)
-            combinedGroupingKeys.append(combinedGroupingTuple)
-        
-        return combinedGroupingKeys
+#     def combineGroupingKeys(self, rightSegment, leftSegment):
+#         #return list(self.yieldCombinedGroupingKeys())
+#     
+#         groupingKeysRight = sorted(rightSegment.keys())
+#         groupingKeysLeft = sorted(leftSegment.keys())
+#         combinedGroupingKeys = []
+#         
+#         while groupingKeysRight:
+#             gkRight = groupingKeysRight.pop(0)
+#             try:
+#                 groupingKeysLeft.remove(gkRight)
+#                 combinedGroupingKeys.append((gkRight, gkRight))
+#             except ValueError:
+#                 if gkRight.affinity < Affinity.INACCORD:
+#                     combinedGroupingKeys.append((gkRight, None))
+#                 else:
+#                     if gkRight.affinity == Affinity.INACCORD:
+#                         gkLeft = gkRight._replace(affinity=gkRight.affinity + 1)
+#                     else:
+#                         gkLeft = gkRight._replace(affinity=gkRight.affinity - 1)
+#                     try:
+#                         groupingKeysLeft.remove(gkLeft)
+#                     except ValueError:
+#                         raise BrailleSegmentException(
+#                             "Misaligned braille groupings: " + 
+#                             "groupingKeyLeft was %s" % gkLeft + 
+#                             "groupingKeyRight was %s" % gkRight + 
+#                             "rightSegment was %s, leftSegment was %s" % (rightSegment, leftSegment))
+# 
+#                     try:
+#                         combinedGroupingTuple = (gkRight, gkLeft)
+#                         combinedGroupingKeys.append(combinedGroupingTuple)
+#                     except ValueError:
+#                         raise BrailleSegmentException(
+#                             "Misaligned braille groupings could not append combinedGroupingKeys")
+# 
+#         
+#         while groupingKeysLeft:
+#             gkLeft = groupingKeysLeft.pop(0)
+#             combinedGroupingTuple = (None, gkLeft)
+#             combinedGroupingKeys.append(combinedGroupingTuple)
+#         
+#         return combinedGroupingKeys
     
     def transcribe(self):
         """
         TODO: define this method
         """
-        bk = text.BrailleKeyboard(self.lineLength)
-        self.allKeyPairs = self.combineGroupingKeys(self.rightSegment, self.leftSegment)   
-        bk.highestMeasureNumberLength = len(str(self.allKeyPairs[-1][0].measure))
+        self.allKeyPairs = list(self.yieldCombinedGroupingKeys())   
+        self.highestMeasureNumberLength = len(str(self.allKeyPairs[-1][0].measure))
 
-        self.extractHeading(bk) # Heading
-    
+        self.extractHeading() # Heading
+        self.currentGroupingPair = None
         while self.allKeyPairs:
             self.previousGroupingPair = self.currentGroupingPair
             self.currentGroupingPair = self.allKeyPairs.pop(0)
             (rightKey, leftKey) = self.currentGroupingPair
 
             if rightKey.affinity >= Affinity.INACCORD or leftKey.affinity >= Affinity.INACCORD:
-                self.extractNoteGrouping(bk) # Note or Inaccord Grouping
+                self.extractNoteGrouping() # Note or Inaccord Grouping
 #             elif rightKey.affinity == Affinity.SIGNATURE or leftKey.affinity == Affinity.SIGNATURE:
-#                 self.extractSignatureGrouping(bk) # Signature Grouping
+#                 self.extractSignatureGrouping() # Signature Grouping
 #             elif rightKey.affinity == Affinity.LONG_TEXTEXPR or leftKey.affinity == Affinity.LONG_TEXTEXPR:
-#                 self.extractLongExpressionGrouping(bk) # Long Expression Grouping
+#                 self.extractLongExpressionGrouping() # Long Expression Grouping
 #             elif rightKey.affinity == Affinity.TTEXT or leftKey.affinity == Affinity.TTEXT:
-#                 self.extractTempoTextGrouping(bk) # Tempo Text Grouping
-                
-        return bk
-    
-    def extractHeading(self, brailleKeyboard):
+#                 self.extractTempoTextGrouping() # Tempo Text Grouping
+        return self.brailleText
+                    
+    def extractHeading(self):
         keySignature = None
         timeSignature = None
         tempoText = None
@@ -1136,10 +1217,10 @@ class BrailleGrandSegment(BrailleSegment):
             (rightKey, leftKey) = self.allKeyPairs[0]
             useKey = rightKey
             try:
-                useElement = self.rightSegment[rightKey]
+                useElement = self.get(rightKey)
             except KeyError as ke:
                 if ke.args[0] == "None":
-                    useElement = self.leftSegment[leftKey]
+                    useElement = self.get(leftKey)
                     useKey = leftKey
                 else:
                     raise ke
@@ -1162,17 +1243,17 @@ class BrailleGrandSegment(BrailleSegment):
         try:
             brailleHeading = basic.transcribeHeading(keySignature, timeSignature,
                 tempoText, metronomeMark, self.lineLength)
-            brailleKeyboard.addHeading(brailleHeading)
+            self.addHeading(brailleHeading)
         except basic.BrailleBasicException as bbe:
             if bbe.args[0] != "No heading can be made.":
                 raise bbe
         return None
     
-    def extractNoteGrouping(self, brailleKeyboard):
+    def extractNoteGrouping(self):
         (rightKey, leftKey) = self.currentGroupingPair
         currentMeasureNumber = basic.numberToBraille(rightKey.measure, withNumberSign=False)
         if rightKey.affinity == Affinity.INACCORD:
-            inaccords = self.rightSegment[rightKey]
+            inaccords = self.get(rightKey)
             voice_trans = []
             for music21Voice in inaccords:
                 noteGrouping = extractBrailleElements(music21Voice)
@@ -1182,9 +1263,9 @@ class BrailleGrandSegment(BrailleSegment):
                 voice_trans.append(ngMod.transcribeNoteGrouping(noteGrouping))
             rh_braille = symbols['full_inaccord'].join(voice_trans)
         else:
-            rh_braille = ngMod.transcribeNoteGrouping(self.rightSegment[rightKey])
+            rh_braille = ngMod.transcribeNoteGrouping(self.get(rightKey))
         if leftKey.affinity == Affinity.INACCORD:
-            inaccords = self.leftSegment[leftKey]
+            inaccords = self.get(leftKey)
             voice_trans = []
             for music21Voice in inaccords:
                 noteGrouping = extractBrailleElements(music21Voice)
@@ -1194,8 +1275,8 @@ class BrailleGrandSegment(BrailleSegment):
                 voice_trans.append(ngMod.transcribeNoteGrouping(noteGrouping))
             lh_braille = symbols['full_inaccord'].join(voice_trans)
         else:
-            lh_braille = ngMod.transcribeNoteGrouping(self.leftSegment[leftKey])
-        brailleKeyboard.addNoteGroupings(currentMeasureNumber, rh_braille, lh_braille)
+            lh_braille = ngMod.transcribeNoteGrouping(self.get(leftKey))
+        self.addNoteGroupings(currentMeasureNumber, rh_braille, lh_braille)
         return None
 
 #     #noinspection PyUnusedLocal
@@ -1221,7 +1302,6 @@ def findSegments(music21Part, **partKeywords):
     
     Returns a list of :class:`~music21.segment.BrailleSegment` instances.
     
-    
     Five methods get called in the generation of segments:
     
     * :meth:`~music21.braille.segment.prepareSlurredNotes`
@@ -1229,7 +1309,6 @@ def findSegments(music21Part, **partKeywords):
     * :meth:`~music21.braille.segment.BrailleSegment.addGroupingAttributes`
     * :meth:`~music21.braille.segment.BrailleSegment.addSegmentAttributes`
     * :meth:`~music21.braille.segment.BrailleSegment.fixArticulations`
-
     
     >>> from music21.braille import test
     >>> example = test.example11_2()
@@ -1353,7 +1432,8 @@ def findSegments(music21Part, **partKeywords):
 
     # Raw Segments
     # ------------
-    allSegments = getRawSegments(music21Part)
+    setHand = partKeywords['setHand'] if 'setHand' in partKeywords else None
+    allSegments = getRawSegments(music21Part, setHand=setHand)
     # Grouping Attributes
     # -------------------
     for seg in allSegments:
@@ -1543,7 +1623,7 @@ def prepareSlurredNotes(music21Part, **keywords):
                 allNotes[beginIndex + 1].beginLongDoubleSlur = True
                 allNotes[endIndex - 1].endLongDoubleSlur = True
 
-def getRawSegments(music21Part):
+def getRawSegments(music21Part, setHand=None):
     u"""
     Takes in a :class:`~music21.stream.Part` divided it up into segments (i.e. instances of
     :class:`~music21.braille.segment.BrailleSegment`). This method assumes 
@@ -1719,7 +1799,9 @@ def getRawSegments(music21Part):
             
             segmentKey = SegmentKey(music21Measure.number, 
                                     offsetFactor, 
-                                    affinityCode)
+                                    affinityCode,
+                                    setHand
+                                    )
             brailleElementGrouping = currentSegment[segmentKey]
             brailleElementGrouping.append(brailleElement)
             elementsInCurrentSegment += 1

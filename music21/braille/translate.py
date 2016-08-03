@@ -281,13 +281,20 @@ def keyboardPartsToBraille(staffUpper, staffLower, **keywords):
     lowerPartToTranscribe = staffLower
     if not inPlace:
         lowerPartToTranscribe = staffLower.makeNotation(cautionaryNotImmediateRepeat=False)
-    rhSegments = segment.findSegments(upperPartToTranscribe, **keywords)
-    lhSegments = segment.findSegments(lowerPartToTranscribe, **keywords)
+    rhSegments = segment.findSegments(upperPartToTranscribe, setHand='right', **keywords)
+    lhSegments = segment.findSegments(lowerPartToTranscribe, setHand='left', **keywords)
+    
     allBrailleText = []
     for (rhSegment, lhSegment) in zip(rhSegments, lhSegments):
-        bg = segment.BrailleGrandSegment(rhSegment, lhSegment)
+        bg = segment.BrailleGrandSegment()
+        for rhGroupingKey in rhSegment:
+            bg[rhGroupingKey] = rhSegment[rhGroupingKey]
+
+        for lhGroupingKey in lhSegment:
+            bg[lhGroupingKey] = lhSegment[lhGroupingKey]
+        
         if not debug:
-            allBrailleText.append(bg.transcription)
+            allBrailleText.append(bg.transcribe())
         else:
             if six.PY2:
                 bsStr = str(bg)

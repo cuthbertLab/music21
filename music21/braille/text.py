@@ -371,12 +371,9 @@ class BrailleKeyboard(BrailleText):
     A subclass of BrailleText that handles both hands at once.
     '''
     def __init__(self, lineLength=40):
-        self.lineLength = lineLength
-        self.allLines = []
-        self.makeNewLine()
-        self.allHeadings = []
-        self.rightHand = None
-        self.leftHand = None
+        super(BrailleKeyboard, self).__init__(lineLength=lineLength)
+        self.rightHandLine = None
+        self.leftHandLine = None
 
 #     def addElement(self, **elementKeywords):
 #         if 'pair' in elementKeywords:
@@ -388,57 +385,57 @@ class BrailleKeyboard(BrailleText):
 
     def makeNewLines(self):
         if self.currentLine.textLocation == 0:
-            self.rightHand = self.currentLine
+            self.rightHandLine = self.currentLine
         else:
-            self.rightHand = BrailleTextLine(self.lineLength)
-            self.allLines.append(self.rightHand)
+            self.rightHandLine = BrailleTextLine(self.lineLength)
+            self.allLines.append(self.rightHandLine)
 
-        self.leftHand = BrailleTextLine(self.lineLength)
-        self.allLines.append(self.leftHand)
+        self.leftHandLine = BrailleTextLine(self.lineLength)
+        self.allLines.append(self.leftHandLine)
 
     def addNoteGroupings(self, measureNumber, noteGroupingR, noteGroupingL):
-        if self.rightHand is None and self.leftHand is None:
+        if self.rightHandLine is None and self.leftHandLine is None:
             self.makeNewLines()
-        if self.rightHand.textLocation == 0:
-            self.rightHand.insert(self.highestMeasureNumberLength - len(measureNumber), 
+        if self.rightHandLine.textLocation == 0:
+            self.rightHandLine.insert(self.highestMeasureNumberLength - len(measureNumber), 
                                   measureNumber)
-            self.leftHand.textLocation = self.rightHand.textLocation
+            self.leftHandLine.textLocation = self.rightHandLine.textLocation
         addSpace = True
-        if self.rightHand.containsNoteGrouping is False:
+        if self.rightHandLine.containsNoteGrouping is False:
             addSpace = False
-            self.rightHand.append(symbols['rh_keyboard'], addSpace=True)
-            self.leftHand.append(symbols['lh_keyboard'], addSpace=True)
+            self.rightHandLine.append(symbols['rh_keyboard'], addSpace=True)
+            self.leftHandLine.append(symbols['lh_keyboard'], addSpace=True)
             for dot in yieldDots(noteGroupingR[0]):
-                self.rightHand.append(dot, addSpace=False)
+                self.rightHandLine.append(dot, addSpace=False)
             for dot in yieldDots(noteGroupingL[0]):
-                self.leftHand.append(dot, addSpace=False)
-        if (self.rightHand.canAppend(noteGroupingR, addSpace=addSpace) 
-                and self.leftHand.canAppend(noteGroupingL, addSpace=addSpace)):
-            self.leftHand.append(noteGroupingL, addSpace=addSpace)
-            self.rightHand.append(noteGroupingR, addSpace=addSpace)
-            if self.rightHand.textLocation > self.leftHand.textLocation:
-                self.leftHand.textLocation = self.rightHand.textLocation
+                self.leftHandLine.append(dot, addSpace=False)
+        if (self.rightHandLine.canAppend(noteGroupingR, addSpace=addSpace) 
+                and self.leftHandLine.canAppend(noteGroupingL, addSpace=addSpace)):
+            self.leftHandLine.append(noteGroupingL, addSpace=addSpace)
+            self.rightHandLine.append(noteGroupingR, addSpace=addSpace)
+            if self.rightHandLine.textLocation > self.leftHandLine.textLocation:
+                self.leftHandLine.textLocation = self.rightHandLine.textLocation
             else:
-                self.rightHand.textLocation = self.leftHand.textLocation
+                self.rightHandLine.textLocation = self.leftHandLine.textLocation
         else:   
             self.makeNewLines()
-            self.rightHand.insert(self.highestMeasureNumberLength - len(measureNumber), 
+            self.rightHandLine.insert(self.highestMeasureNumberLength - len(measureNumber), 
                                   measureNumber)
-            self.leftHand.textLocation = self.rightHand.textLocation
-            self.rightHand.append(symbols['rh_keyboard'], addSpace=True)
-            self.leftHand.append(symbols['lh_keyboard'], addSpace=True)
+            self.leftHandLine.textLocation = self.rightHandLine.textLocation
+            self.rightHandLine.append(symbols['rh_keyboard'], addSpace=True)
+            self.leftHandLine.append(symbols['lh_keyboard'], addSpace=True)
             for dot in yieldDots(noteGroupingR[0]):
-                self.rightHand.append(dot, addSpace=False)
+                self.rightHandLine.append(dot, addSpace=False)
             for dot in yieldDots(noteGroupingL[0]):
-                self.leftHand.append(dot, addSpace=False)
-            self.leftHand.append(noteGroupingL, addSpace=False)
-            self.rightHand.append(noteGroupingR, addSpace=False)
-            if self.rightHand.textLocation > self.leftHand.textLocation:
-                self.leftHand.textLocation = self.rightHand.textLocation
+                self.leftHandLine.append(dot, addSpace=False)
+            self.leftHandLine.append(noteGroupingL, addSpace=False)
+            self.rightHandLine.append(noteGroupingR, addSpace=False)
+            if self.rightHandLine.textLocation > self.leftHandLine.textLocation:
+                self.leftHandLine.textLocation = self.rightHandLine.textLocation
             else:
-                self.rightHand.textLocation = self.leftHand.textLocation
-        self.rightHand.containsNoteGrouping = True
-        self.leftHand.containsNoteGrouping = True
+                self.rightHandLine.textLocation = self.leftHandLine.textLocation
+        self.rightHandLine.containsNoteGrouping = True
+        self.leftHandLine.containsNoteGrouping = True
 
             
     
