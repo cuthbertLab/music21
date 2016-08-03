@@ -3871,7 +3871,7 @@ class MeasureExporter(XMLExporterBase):
         to a <lyric> tag.
         '''
         mxLyric = Element('lyric')
-        _setTagTextFromAttribute(l, mxLyric, 'syllabic')
+        _setTagTextFromAttribute(l, mxLyric, 'syllabic')        
         _setTagTextFromAttribute(l, mxLyric, 'text', forceEmpty=True)
         # TODO: elision
         # TODO: more syllabic
