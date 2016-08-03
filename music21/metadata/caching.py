@@ -326,8 +326,7 @@ class JobProcessor(object):
         '''
         Report on the current job status.
         '''
-        message = 'updated {0} of {1} files; ' \
-            'total errors: {2} ... last file: {3}'.format(
+        message = 'updated {0} of {1} files; total errors: {2} ... last file: {3}'.format(
                 totalJobs - remainingJobs,
                 totalJobs,
                 filePathErrorCount,

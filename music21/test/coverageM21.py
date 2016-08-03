@@ -24,13 +24,14 @@ omit_modules = [
                 'music21/figuredBass/examples.py',
                 'music21/alpha/*', #trecento/tonality.py'
                 ]
+
+# THESE ARE NOT RELEVANT FOR coveralls.io -- edit .coveragerc
 exclude_lines = [
                 r'\s*import music21\s*',
                 r'\s*music21.mainTest\(\)\s*',
+                r'.*#\s*pragma:\s*no cover.*',
+                r'class TestExternal.*',
                 ]
-partial_exclude = [
-                   r'.*no cover.*',
-                   ]
 
 def getCoverage():    
     if six.PY2:
@@ -39,8 +40,6 @@ def getCoverage():
             cov = coverage.coverage(omit=omit_modules)
             for e in exclude_lines:
                 cov.exclude(e, which='exclude')
-            for e in partial_exclude: # branches
-                cov.exclude(e, which='partial')
             cov.start()
         except ImportError:
             cov = None

@@ -14,6 +14,8 @@ Released under either the BSD (3-clause) or GNU LGPL license according to your c
 
 Music21 runs on Python 2.7 or preferably Python 3.4+
 
+[![Build Status](https://travis-ci.org/cuthbertLab/music21.svg?branch=master)](https://travis-ci.org/cuthbertLab/music21)
+[![Coverage Status](https://coveralls.io/repos/github/cuthbertLab/music21/badge.svg?branch=master)](https://coveralls.io/github/cuthbertLab/music21?branch=master)
 
 ## Mailing list ##
 

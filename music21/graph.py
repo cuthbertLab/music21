@@ -70,7 +70,7 @@ def _getExtendedModules():
     #matplotlib.use('WXAgg')
     try:
         from mpl_toolkits.mplot3d import Axes3D # @UnresolvedImport
-    except ImportError:
+    except ImportError: # pragma: no cover
         Axes3D = None
         environLocal.warn(
             "mpl_toolkits.mplot3d.Axes3D could not be imported -- likely cause is an " + 
@@ -84,7 +84,7 @@ def _getExtendedModules():
     
     try:
         import networkx
-    except ImportError:
+    except ImportError: # pragma: no cover
         networkx = None # use for testing
     
     return ExtendedModules(matplotlib, Axes3D, collections, patches, plt, networkx)
@@ -180,6 +180,8 @@ def getColor(color):
     '#808080'
     >>> graph.getColor(.8)
     '#cccccc'
+    >>> graph.getColor([.8])
+    '#cccccc'
     >>> graph.getColor([255, 255, 255])
     '#ffffff'
     
@@ -232,11 +234,10 @@ def getColor(color):
                 break
         if percent:
             if len(color) == 1:
-                color = [color, color, color]
+                color = [color[0], color[0], color[0]]
             # convert to 0 100% values as strings with % symbol
-            color = ['%s' % str(x*100) for x in color]
-            color = [x + '%' for x in color]
-            return webcolors.rgb_percent_to_hex(color)
+            colorStrList = [str(x * 100) + "%" for x in color]
+            return webcolors.rgb_percent_to_hex(colorStrList)
         else: # assume integers
             return webcolors.rgb_to_hex(tuple(color))
     raise GraphException('invalid color specification: %s' % color)
@@ -413,7 +414,7 @@ class Graph(object):
         '''
         if action in ['show', 'write', None]:
             self.doneAction = action
-        else:
+        else: # pragma: no cover
             raise GraphException('not such done action: %s' % action)
 
     def setTicks(self, axisKey, pairs):
@@ -470,8 +471,7 @@ class Graph(object):
         in either direction.  Set paddingFraction = 0 to
         eliminate this shift
         '''
-        
-        if axisKey not in self.axisKeys:
+        if axisKey not in self.axisKeys: # pragma: no cover
             raise GraphException('No such axis exists: %s' % axisKey)
         # find a shift
         if paddingFraction != 0:
@@ -486,7 +486,7 @@ class Graph(object):
         self._axisRangesAlreadySet[axisKey] = True
 
     def setAxisLabel(self, axisKey, label):
-        if axisKey not in self.axisKeys:
+        if axisKey not in self.axisKeys: # pragma: no cover
             raise GraphException('No such axis exists: %s' % axisKey)
         self.axis[axisKey]['label'] = label
 
@@ -501,7 +501,7 @@ class Graph(object):
                 #spine.set_position(('outward',10)) # outward by 10 points
             elif loc in ['right','top']:
                 spine.set_color('none') # don't draw spine
-            else:
+            else: # pragma: no cover
                 raise ValueError('unknown spine location: %s'%loc)
 
         # remove top and right ticks
@@ -639,14 +639,14 @@ class Graph(object):
         '''
         Implement the desired doneAction, after data processing
         '''
-        if self.doneAction == 'show':
+        if self.doneAction == 'show': # pragma: no cover
             self.show()
-        elif self.doneAction == 'write':
+        elif self.doneAction == 'write': # pragma: no cover
             self.write(fp)
         elif self.doneAction == None:
             pass
 
-    def show(self):
+    def show(self): # pragma: no cover
         '''
         Calls the show() method of the matplotlib plot. 
         For most matplotlib back ends, this will open 
@@ -655,7 +655,7 @@ class Graph(object):
         extm = _getExtendedModules() #@UnusedVariable
         extm.plt.show()
 
-    def write(self, fp=None):
+    def write(self, fp=None): # pragma: no cover
         '''
         Writes the graph to a file. If no file path is given, a temporary file is used. 
         '''
@@ -704,11 +704,11 @@ class GraphNetworxGraph(Graph):
             self.setTitle('Network Plot')
 
         self.networkxGraph = None
-        if 'networkxGraph' in keywords:
+        if 'networkxGraph' in keywords: # pragma: no cover
             self.networkxGraph = keywords['networkxGraph']            
         elif extm.networkx is not None: # if we have this module
             # testing default; temporary
-            try:
+            try: # pragma: no cover
                 g = extm.networkx.Graph()
 #             g.add_edge('a','b',weight=1.0)
 #             g.add_edge('b','c',weight=0.6)
@@ -718,7 +718,7 @@ class GraphNetworxGraph(Graph):
             except NameError: 
                 pass # keep as None
 
-    def process(self):
+    def process(self): # pragma: no cover
         extm = _getExtendedModules()
         plt = extm.plt
         networkx = extm.networkx
@@ -1392,7 +1392,7 @@ class GraphScatter(Graph):
         yValues = []
         i = 0
         for row in self.data:
-            if len(row) < 2:
+            if len(row) < 2: # pragma: no cover
                 raise GraphException("Need at least two points for a graph data object!")
             x = row[0]
             y = row[1]
@@ -1815,11 +1815,11 @@ class PlotStream(object):
 
     def __init__(self, streamObj, flatten=True, *args, **keywords):
         '''
-        Provide a Stream as an arguement. If `flatten` is True, 
+        Provide a Stream as an argument. If `flatten` is True, 
         the Stream will automatically be flattened.
         '''
         #if not isinstance(streamObj, music21.stream.Stream):
-        if not hasattr(streamObj, 'elements'):
+        if not hasattr(streamObj, 'elements'): # pragma: no cover
             raise PlotStreamException('non-stream provided as argument: %s' % streamObj)
         self.streamObj = streamObj
         self.flatten = flatten
@@ -1851,7 +1851,7 @@ class PlotStream(object):
                 value = None
                 try:
                     value = fx(n)
-                except AttributeError:
+                except AttributeError: # pragma: no cover
                     break # do not try others
                 if value is not None:
                     values.append(value)
@@ -1901,7 +1901,7 @@ class PlotStream(object):
                 f, target, dst = b
                 try:
                     target = f(n)
-                except AttributeError:
+                except AttributeError: # pragma: no cover
                     pass # must try others
                 if target is not None:
                     dst.append(target)
@@ -1939,13 +1939,13 @@ class PlotStream(object):
         '''
         self.graph.process()
 
-    def show(self):
+    def show(self): # pragma: no cover
         '''
         Call internal Graphs show() method independently of doneAction set and run with process()
         '''
         self.graph.show()
 
-    def write(self, fp=None):
+    def write(self, fp=None): # pragma: no cover
         '''
         Call internal Graphs write() method independently of doneAction set and run with process()
         '''
@@ -1968,7 +1968,7 @@ class PlotStream(object):
         Return an axis label for measure or offset, depending on if measures are available.
         '''
         # look for this attribute; only want to do ticksOffset procedure once
-        if self._axisLabelUsesMeasures is None:
+        if self._axisLabelUsesMeasures is None: # pragma: no cover
             raise GraphException('call ticksOffset() first')
         # this parameter is set in 
         if self._axisLabelUsesMeasures:
@@ -2397,7 +2397,7 @@ class PlotStream(object):
             return 0
         try:
             return math.log(x, 2)
-        except ValueError:
+        except ValueError: # pragma: no cover
             raise GraphException('cannot take log of x value: %s' %  x)
         #return pow(x, .5)
 
@@ -2541,13 +2541,13 @@ class PlotMultiStream(object):
         '''
         self.graph.process()
 
-    def show(self):
+    def show(self): # pragma: no cover
         '''
         Call internal Graphs show() method independently of doneAction set and run with process()
         '''
         self.graph.show()
 
-    def write(self, fp=None):
+    def write(self, fp=None): # pragma: no cover
         '''
         Call internal Graphs write() method independently of doneAction set and run with process()
         '''
@@ -2668,7 +2668,7 @@ class PlotWindowedAnalysis(PlotStream):
         self.graphLegend = self._getLegend()
         self.graphLegend.process()
 
-    def write(self, fp=None):
+    def write(self, fp=None): # pragma: no cover
         '''Process method here overridden to provide legend.
         '''
         if fp == None:
@@ -4827,7 +4827,7 @@ class Test(unittest.TestCase):
 
         
     def testPlotWindowed(self, doneAction=None):
-        if doneAction != None:
+        if doneAction != None: # pragma: no cover
             fp = random.choice(corpus.getBachChorales('.xml'))
             unused_directory, fn = os.path.split(fp)
             a = corpus.parse(fp)
@@ -4880,7 +4880,7 @@ class Test(unittest.TestCase):
     def testGraphNetworxGraph(self):
         extm = _getExtendedModules() #@UnusedVariable
 
-        if extm.networkx is not None:
+        if extm.networkx is not None: # pragma: no cover
             b = GraphNetworxGraph(doneAction=None)
             #b = GraphNetworxGraph()
             b.process()
@@ -5263,7 +5263,7 @@ class Test(unittest.TestCase):
         #b.show()
 
 
-    def xtestGraphVerticalBar(self):
+    def xtestGraphVerticalBar(self): # pragma: no cover
 
         #streamList = corpus.parse('essenFolksong/han1')
         streamList = corpus.getBachChorales()[100:108]
