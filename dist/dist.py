@@ -19,13 +19,15 @@ To do a release,
 2. for a major change, run 
     `corpus.cacheMetadata(['core', 'virtual'], verbose=True)`.
     every once in a while run corpus.corpora.CoreCorpus().metadataBundle.rebuild() 
-    (40 min on MacPro)
+    (40 min on MacPro) -- either of these MAY change a lot of tests in corpus, metadata, etc.
+    so don't skip the next step!
 3. run test/multiprocessTest.py  for Python2 AND Python3
 4. commit and then check test/testSingleCoreAll.py results on Travis-CI
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest, 
      but should be done before making a release).  Done automatically by Travis-CI on GitHub commit
 5. then python3 test/testDocumentation.py # only designed for Python 3...
-6. # no 6 no longer applies
+6. load the user's guide into Jupyter and make sure that everything works there too! (along
+     with about/what.ipynb and developerReference/installJupyter and tutorials/examples)
 7. run documentation/make.py clean
 8. run documentation/make.py   [*] 
 

@@ -145,10 +145,6 @@ class Test(unittest.TestCase):
         searchResults = corpus.search(str(ks), field='keySignature')
         self.assertEqual(len(searchResults) >= 32, True, len(searchResults))
 
-    def testSearch11(self):
-        searchResults = corpus.search('mode phry(.*)', field='keySignature')
-        self.assertEqual(len(searchResults) >= 9, True)
-
     def testSearch12(self):
         # searching virtual entries
         searchResults = corpus.search('coltrane', field='composer')

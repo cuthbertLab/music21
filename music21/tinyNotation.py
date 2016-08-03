@@ -369,11 +369,12 @@ class NoteOrRestToken(Token):
                 callFunc = getattr(self, method)
                 t = callFunc(n, searchSuccess, pm, t, parent)
         
-        if self.durationFound is False:
+        if self.durationFound is False and hasattr(parent, 'stateDict'):
             n.duration.quarterLength = parent.stateDict['lastDuration']
 
         # do this by quarterLength here, so that applied tuplets do not persist.        
-        parent.stateDict['lastDuration'] = n.duration.quarterLength
+        if hasattr(parent, 'stateDict'):
+            parent.stateDict['lastDuration'] = n.duration.quarterLength
         
         return t
 
@@ -415,6 +416,25 @@ class RestToken(NoteOrRestToken):
 class NoteToken(NoteOrRestToken):
     '''
     A NoteToken represents a single Note with pitch
+    
+    >>> c3 = tinyNotation.NoteToken('C')
+    >>> c3
+    <music21.tinyNotation.NoteToken object at 0x10b07bf98>
+    >>> n = c3.parse()
+    >>> n
+    <music21.note.Note C>
+    >>> n.nameWithOctave
+    'C3'
+    
+    >>> bFlat6 = tinyNotation.NoteToken("b''-")
+    >>> bFlat6
+    <music21.tinyNotation.NoteToken object at 0x10b07bf98>
+    >>> n = bFlat6.parse()
+    >>> n
+    <music21.note.Note B->
+    >>> n.nameWithOctave
+    'B-6'
+    
     '''    
     pitchMap = [
         (r'([A-G]+)', 'lowOctave'),
@@ -428,7 +448,7 @@ class NoteToken(NoteOrRestToken):
         super(NoteToken, self).__init__(token)
         self.isEditorial = False
     
-    def parse(self, parent):
+    def parse(self, parent=None):
         '''
         Extract the pitch from the note.
         '''
@@ -436,7 +456,8 @@ class NoteToken(NoteOrRestToken):
         
         n = note.Note()
         t = self.getPitch(n, t)
-        self.applyDuration(n, t, parent)
+        if parent:
+            self.applyDuration(n, t, parent)
         return n
 
     def getPitch(self, n, t):

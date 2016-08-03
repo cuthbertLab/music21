@@ -938,7 +938,7 @@ class Iterator(object):
     numberList = [list, of, numbers]
 
     >>> from music21 import corpus
-    >>> for chorale in corpus.chorales.Iterator(1,4, returnType = 'filename'):
+    >>> for chorale in corpus.chorales.Iterator(1,4, returnType='filename'):
     ...    print(chorale)
     bach/bwv269
     bach/bwv347
@@ -1040,8 +1040,11 @@ class Iterator(object):
     _DOC_ORDER = ['numberingSystem', 'currentNumber', 'highestNumber', 
                   'titleList', 'numberList', 'returnType', 'iterationType']
 
-    def __init__(self, currentNumber=None, highestNumber=None, 
-                 numberingSystem='riemenschneider', **kwargs):
+    def __init__(self, 
+                 currentNumber=None, 
+                 highestNumber=None, 
+                 numberingSystem='riemenschneider', 
+                 **kwargs):
         '''
         By default: numberingSystem = 'riemenschneider', currentNumber = 1, 
         highestNumber = 371, iterationType = 'number',

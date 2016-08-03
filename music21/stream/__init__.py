@@ -8869,9 +8869,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     #---------------------------------------------------------------------------
     # interval routines
 
-    def findConsecutiveNotes(self, skipRests=False, skipChords=False,
-        skipUnisons=False, skipOctaves=False,
-        skipGaps=False, getOverlaps=False, noNone=False, **keywords):
+    def findConsecutiveNotes(self, 
+                             skipRests=False, 
+                             skipChords=False,
+                             skipUnisons=False, 
+                             skipOctaves=False,
+                             skipGaps=False, 
+                             getOverlaps=False, 
+                             noNone=False, **keywords):
         r'''
         Returns a list of consecutive *pitched* Notes in a Stream.
 
@@ -8890,8 +8895,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             will give you the number of P1s in the piece, because there could be
             d2's in there as well.
 
-        See Test.testFindConsecutiveNotes() for usage details.
+        See test.TestStream.testFindConsecutiveNotes() for usage details.
 
+        This example is adapted from the tutorials/Examples page.
+
+        >>> s = converter.parse("tinynotation: 4/4 f8 d'8~ d'8 d'8~ d'4 b'-8 a'-8 a-8")
+        >>> m = s.measure(1)
+        >>> m.findConsecutiveNotes(skipUnisons=True, skipOctaves=True,
+        ...                        skipRests=True, noNone=True)
+        [<music21.note.Note F>, <music21.note.Note D>, 
+         <music21.note.Note B->, <music21.note.Note A->]
+         
+        >>> m.findConsecutiveNotes(skipUnisons=False,
+        ...                        skipRests=True, noNone=True)
+        [<music21.note.Note F>, <music21.note.Note D>, 
+         <music21.note.Note B->, <music21.note.Note A->]
 
         OMIT_FROM_DOCS
 
@@ -8902,11 +8920,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         findConsecutiveNotes don't have to remove
         their own args; this method is used in melodicIntervals.)
         '''
-        if self.isSorted is False:
-            sortedSelf = self.sorted
-        else:
-            sortedSelf = self
-            
         returnList = []
         lastStart = 0.0
         lastEnd = 0.0
@@ -8920,9 +8933,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             vGroups = []
             for v in self.voices:
                 vGroups.append(v.flat)
-            vGroups.append(sortedSelf)
+            vGroups.append(self)
         else:
-            vGroups = (sortedSelf.flat,)
+            vGroups = (self.flat,)
 
         for v in vGroups:
             for e in v.elements:
@@ -8934,10 +8947,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         lastWasNone = True
                 if hasattr(e, "pitch"):
                     #if (skipUnisons is False or isinstance(lastPitch, list)
-                    if (skipUnisons is False or isinstance(lastPitch, tuple)
+                    if (skipUnisons is False 
+                            or isinstance(lastPitch, tuple)
                             or lastPitch is None
-                            or e.pitch.pitchClass != lastPitch.pitchClass
-                            or (skipOctaves is False and e.pitch.ps != lastPitch.ps)):
+                            or (hasattr(lastPitch, 'pitchClass') 
+                                and e.pitch.pitchClass != lastPitch.pitchClass)
+                            or (skipOctaves is False 
+                                and hasattr(lastPitch, 'pitchClass')
+                                and e.pitch.ps != lastPitch.ps)):
                         if getOverlaps is True or e.offset >= lastEnd:
                             if e.offset >= lastEnd:  # is not an overlap...
                                 lastStart = e.offset
@@ -8951,7 +8968,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                 pass
                             returnList.append(e)
                 # if we have a chord
-                elif hasattr(e, "pitches"):
+                elif hasattr(e, "pitches") and len(e.pitches) > 1:
                     if skipChords is True:
                         if lastWasNone is False:
                             if not noNone:
@@ -8964,7 +8981,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         #environLocal.printDebug(['lastPitch', lastPitch])
 
                         if (skipUnisons is True 
-                                and isinstance(lastPitch, list) 
+                                and isinstance(lastPitch, (list, tuple)) 
                                 and e.pitches[0].ps == lastPitch[0].ps):
                             pass
                         else:
