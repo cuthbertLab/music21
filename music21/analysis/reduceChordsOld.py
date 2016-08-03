@@ -49,8 +49,11 @@ class ChordReducer(object):
         self.positionInMeasure = None
         self.numberOfElementsInMeasure = None
 
-    def reduceMeasureToNChords(self, measureObj, numChords = 1, 
-                               weightAlgorithm=None, trimBelow=0.25):
+    def reduceMeasureToNChords(self, 
+                               measureObj, 
+                               numChords=1, 
+                               weightAlgorithm=None, 
+                               trimBelow=0.25):
         '''
         
         >>> s = analysis.reduceChords.testMeasureStream1()     

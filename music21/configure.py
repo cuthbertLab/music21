@@ -917,6 +917,8 @@ class AskSendInstallationReport(YesOrNo):
         userData.update(self._additionalEntries)
         for key in sorted(userData.keys()):
             body.append('%s // %s' % (key, userData[key]))
+        body.append('python version:')
+        body.append(sys.version)
 
         body.append('')
         body.append('Below, please provide a few words about what sorts of tasks ' + 
@@ -926,7 +928,7 @@ class AskSendInstallationReport(YesOrNo):
         body.append('')
 
         platform = common.getPlatform()
-        if platform == 'win': # need to add proper return carriage fro win
+        if platform == 'win': # need to add proper return carriage for win
             body = '%0D%0A'.join(body)
         else:
             body = '\n'.join(body)

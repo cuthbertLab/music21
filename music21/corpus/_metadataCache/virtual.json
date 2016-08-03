@@ -30,7 +30,7 @@
               "_workIds": {
                 "movementName": {
                   "__attr__": {
-                    "_data": "m21-3.0.3-112d8da260908b23717e5c763f8c38c3.xml"
+                    "_data": "m21-3.0.6-112d8da260908b23717e5c763f8c38c3.xml"
                   },
                   "__class__": "music21.metadata.primitives.Text"
                 },
@@ -48,9 +48,9 @@
                 },
                 "__class__": "music21.interval.Interval"
               },
-              "keySignatureFirst": "<music21.key.KeySignature of no sharps or flats, mode major>",
+              "keySignatureFirst": "<music21.key.Key of C major>",
               "keySignatures": [
-                "<music21.key.KeySignature of no sharps or flats, mode major>"
+                "<music21.key.Key of C major>"
               ],
               "noteCount": 1850,
               "pitchHighest": "E-6",
@@ -83,7 +83,7 @@
               "_workIds": {
                 "movementName": {
                   "__attr__": {
-                    "_data": "m21-3.0.3-73c69954b59e5b98278400657b88503a.xml"
+                    "_data": "m21-3.0.6-73c69954b59e5b98278400657b88503a.xml"
                   },
                   "__class__": "music21.metadata.primitives.Text"
                 }
@@ -124,7 +124,7 @@
               "_workIds": {
                 "movementName": {
                   "__attr__": {
-                    "_data": "m21-3.0.3-caa4768738c4d8813ce3f78b682572b8.xml"
+                    "_data": "m21-3.0.6-caa4768738c4d8813ce3f78b682572b8.xml"
                   },
                   "__class__": "music21.metadata.primitives.Text"
                 }
@@ -136,9 +136,9 @@
                 },
                 "__class__": "music21.interval.Interval"
               },
-              "keySignatureFirst": "<music21.key.KeySignature of 2 sharps, mode major>",
+              "keySignatureFirst": "<music21.key.Key of D major>",
               "keySignatures": [
-                "<music21.key.KeySignature of 2 sharps, mode major>"
+                "<music21.key.Key of D major>"
               ],
               "noteCount": 2331,
               "pitchHighest": "D6",
@@ -165,7 +165,7 @@
               "_workIds": {
                 "movementName": {
                   "__attr__": {
-                    "_data": "m21-3.0.3-43f075dbbe4328402234e85dc71d6332.xml"
+                    "_data": "m21-3.0.6-43f075dbbe4328402234e85dc71d6332.xml"
                   },
                   "__class__": "music21.metadata.primitives.Text"
                 }
@@ -177,9 +177,9 @@
                 },
                 "__class__": "music21.interval.Interval"
               },
-              "keySignatureFirst": "<music21.key.KeySignature of 3 sharps, mode minor>",
+              "keySignatureFirst": "<music21.key.Key of f# minor>",
               "keySignatures": [
-                "<music21.key.KeySignature of 3 sharps, mode minor>"
+                "<music21.key.Key of f# minor>"
               ],
               "noteCount": 148,
               "pitchHighest": "A5",
@@ -206,7 +206,7 @@
               "_workIds": {
                 "movementName": {
                   "__attr__": {
-                    "_data": "m21-3.0.3-355cf399875d46b3ea75a6086d9e1caf.xml"
+                    "_data": "m21-3.0.6-355cf399875d46b3ea75a6086d9e1caf.xml"
                   },
                   "__class__": "music21.metadata.primitives.Text"
                 }
@@ -218,9 +218,9 @@
                 },
                 "__class__": "music21.interval.Interval"
               },
-              "keySignatureFirst": "<music21.key.KeySignature of no sharps or flats, mode major>",
+              "keySignatureFirst": "<music21.key.Key of C major>",
               "keySignatures": [
-                "<music21.key.KeySignature of no sharps or flats, mode major>"
+                "<music21.key.Key of C major>"
               ],
               "noteCount": 484,
               "pitchHighest": "C6",
@@ -253,7 +253,7 @@
               "_workIds": {
                 "movementName": {
                   "__attr__": {
-                    "_data": "m21-3.0.3-75a4d45be4c266a1f7d9d6491e33ca5a.xml"
+                    "_data": "m21-3.0.6-75a4d45be4c266a1f7d9d6491e33ca5a.xml"
                   },
                   "__class__": "music21.metadata.primitives.Text"
                 }
@@ -265,9 +265,9 @@
                 },
                 "__class__": "music21.interval.Interval"
               },
-              "keySignatureFirst": "<music21.key.KeySignature of 3 flats, mode minor>",
+              "keySignatureFirst": "<music21.key.Key of c minor>",
               "keySignatures": [
-                "<music21.key.KeySignature of 3 flats, mode minor>"
+                "<music21.key.Key of c minor>"
               ],
               "noteCount": 670,
               "pitchHighest": "C6",
@@ -294,7 +294,7 @@
               "_workIds": {
                 "movementName": {
                   "__attr__": {
-                    "_data": "m21-3.0.3-7a4081e06d963e526a925e5671704e90.xml"
+                    "_data": "m21-3.0.6-7a4081e06d963e526a925e5671704e90.xml"
                   },
                   "__class__": "music21.metadata.primitives.Text"
                 }
@@ -335,7 +335,7 @@
               "_workIds": {
                 "movementName": {
                   "__attr__": {
-                    "_data": "m21-3.0.3-a5574e2fdd8974f6eac9998f724bccfe.xml"
+                    "_data": "m21-3.0.6-a5574e2fdd8974f6eac9998f724bccfe.xml"
                   },
                   "__class__": "music21.metadata.primitives.Text"
                 }
@@ -376,7 +376,7 @@
               "_workIds": {
                 "movementName": {
                   "__attr__": {
-                    "_data": "m21-3.0.3-09037b882cbace8c89188abc2de880b1.xml"
+                    "_data": "m21-3.0.6-09037b882cbace8c89188abc2de880b1.xml"
                   },
                   "__class__": "music21.metadata.primitives.Text"
                 }
@@ -415,6 +415,6 @@
   "__version__": [
     3,
     0,
-    3
+    6
   ]
 }

@@ -9,11 +9,9 @@
 # Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
-
 '''
 Automatically reduce a MeasureStack to a single chord or group of chords.
 '''
-
 import collections
 import itertools
 import unittest
@@ -27,17 +25,13 @@ from music21 import stream
 from music21 import tree
 
 #from music21 import tie
-
 environLocal = environment.Environment('reduceChords')
 
-
 #------------------------------------------------------------------------------
-
 
 def testMeasureStream1():
     '''
     returns a simple measure stream for testing:
-
 
     >>> s = analysis.reduceChords.testMeasureStream1()
     >>> s.show('text')

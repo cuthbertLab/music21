@@ -196,7 +196,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         #environLocal.printDebug(['abcToStreamPart: calling makeBeams'])
         try:
             p.makeBeams(inPlace=True)
-        except meter.MeterException as e:
+        except (meter.MeterException, stream.StreamException) as e:
             environLocal.warn("Error in beaming...ignoring: %s" % str(e))
 
     # copy spanners into topmost container; here, a part

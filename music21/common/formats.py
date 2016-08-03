@@ -14,7 +14,7 @@ Utilities for working with file formats.
 
 almost everything here is deprecated.
 '''
-__all__ = ['subConverterList', 'findSubConverterForFormat', 'findFormat',
+__all__ = ['findSubConverterForFormat', 'findFormat',
            'findInputExtension', 'findFormatFile', 'findFormatExtFile',
            'findFormatExtURL',
            'VALID_SHOW_FORMATS', 'VALID_WRITE_FORMATS', 'VALID_AUTO_DOWNLOAD']
@@ -35,20 +35,7 @@ VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi',
                        'musicxml.png']
 VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 
-from music21.common.decorators import deprecated 
-
 #-------------------------------------------------------------------------------
-@deprecated('May 2015', '[soonest possible]', 'Moved to converter')
-def subConverterList():
-    '''
-    returns a list of subconverter classes available to music21
-    in converter/subConverters, including the stub SubConverter class
-    
-    DEPRECATED May 2015: moved to converter. #TODO: Remove
-    '''
-    from music21 import converter
-    return converter.Converter().subconvertersList()
-
 def findSubConverterForFormat(fmt):
     '''
     return a converter.subConverter.SubConverter subclass
