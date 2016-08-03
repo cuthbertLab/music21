@@ -242,8 +242,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             return base.Music21Object.__repr__(self)
 
-    # def show(self...    --- see base.py calls .write(
+    def write(self, *args, **kwargs):
+        #...    --- see base.py calls .write(
+        if self.isSorted is False and self.autoSort:
+            self.sort()
+        return super(Stream, self).write(*args, **kwargs)
 
+    
+    def show(self, *args, **kwargs):
+        #...    --- see base.py calls .write(
+        if self.isSorted is False and self.autoSort:
+            self.sort()
+        return super(Stream, self).show(*args, **kwargs)
 
     #---------------------------------------------------------------------------
     # sequence like operations
@@ -362,7 +372,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> a['green'] is b
         True
         '''
-
         # need to sort if not sorted, as this call may rely on index positions
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
@@ -8932,6 +8941,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         findConsecutiveNotes don't have to remove
         their own args; this method is used in melodicIntervals.)
         '''
+        if self.isSorted is False and self.autoSort:
+            self.sort()  
         returnList = []
         lastStart = 0.0
         lastEnd = 0.0
@@ -9313,10 +9324,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if 'GapStream' in self._cache and self._cache["GapStream"] is not None:
             return self._cache["GapStream"]
 
-        if self.isSorted is False:
-            sortedElements = self.sorted.elements
-        else:
-            sortedElements = self.elements
+        if self.isSorted is False and self.autoSort:
+            self.sort()
+
+        sortedElements = self.elements
             
         gapStream = self.cloneEmpty(derivationMethod='findGaps')
         

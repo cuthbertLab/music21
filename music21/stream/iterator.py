@@ -67,7 +67,8 @@ class StreamIterator(object):
                  filterList=None, 
                  restoreActiveSites=True,
                  activeInformation=None):
-
+        if srcStream.isSorted is False and srcStream.autoSort:
+            srcStream.sort()
         self.srcStream = srcStream
         self.index = 0
         

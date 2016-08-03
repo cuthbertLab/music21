@@ -209,7 +209,7 @@ def _setTagTextFromAttribute(m21El, xmlEl, tag, attributeName=None,
     
     subElement = SubElement(xmlEl, tag)
     
-    if value not in (None, ""):
+    if value is not None:
         subElement.text = str(value)
 
     return subElement
@@ -3872,7 +3872,7 @@ class MeasureExporter(XMLExporterBase):
         '''
         mxLyric = Element('lyric')
         _setTagTextFromAttribute(l, mxLyric, 'syllabic')
-        _setTagTextFromAttribute(l, mxLyric, 'text')
+        _setTagTextFromAttribute(l, mxLyric, 'text', forceEmpty=True)
         # TODO: elision
         # TODO: more syllabic
         # TODO: more text
