@@ -1671,7 +1671,7 @@ def partitionByInstrument(streamObj):
             {3.0} <music21.bar.Barline style=final>
 
 
-    TODO: parts should be in Score Order. Coindicence that this almost works.
+    TODO: parts should be in Score Order. Coincidence that this almost works.
     TODO: note redundant Alto Saxophone... instrument -- 
     '''
     from music21 import stream
