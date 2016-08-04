@@ -47,12 +47,14 @@ To do a release,
     
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-13. then update PyPI by going to pypi.python.org and logging in and selecting music21 and clicking 
+13. Unless this is a pre-release, update PyPI by going to pypi.python.org and logging in and 
+    selecting music21 and clicking 
     edit at the top and augment the version number and the download URL. 
     The URL will be printed when
     running dist.py -- (the md5 hash is no longer needed)
 
-14. Upload the .tar.gz file to PyPi by clicking "files" at the time.  Click Choose File.
+14. Unless this is a pre-release, 
+    Upload the .tar.gz file to PyPi by clicking "files" at the time.  Click Choose File.
     File Type is Source.  Leave everything else blank, then click "upload new file"
 
 15. Delete the files in dist...
