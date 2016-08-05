@@ -95,6 +95,7 @@ class Metadata(base.Music21Object):
     >>> md.title
     'Rhapsody in Blue'
 
+    >>> md.composer = 'Gershwin, George'
 
     These are used by .search() methods to determine what attributes are
     made available by default.
@@ -102,6 +103,11 @@ class Metadata(base.Music21Object):
     >>> md.searchAttributes
     ('alternativeTitle', 'composer', 'date', 'localeOfComposition', 
      'movementName', 'movementNumber', 'number', 'opusNumber', 'title')
+    
+    All contributors are stored in a .contributors list:
+     
+    >>> md.contributors
+    [<music21.metadata.primitives.Contributor composer:Gershwin, George>]
     '''
 
     ### CLASS VARIABLES ###
@@ -176,7 +182,7 @@ class Metadata(base.Music21Object):
 
         # a list of Contributor objects
         # there can be more than one composer, or any other combination
-        self._contributors = [] # use addContributor to add.
+        self.contributors = [] # use addContributor to add.
         self._date = None
 
         # store one or more URLs from which this work came; this could
@@ -224,7 +230,7 @@ class Metadata(base.Music21Object):
                 continue
             t = (str(wid), str(val))
             allOut.append(t)
-        for contri in self._contributors:
+        for contri in self.contributors:
             for n in contri._names:
                 t = (str(contri.role), str(n))
                 allOut.append(t)
@@ -284,23 +290,25 @@ class Metadata(base.Music21Object):
         Assign a :class:`~music21.metadata.Contributor` object to this
         Metadata.
 
-        >>> md = metadata.Metadata(title='Third Symphony')
+        >>> md = metadata.Metadata(title='Gaelic Symphony')
         >>> c = metadata.Contributor()
-        >>> c.name = 'Beethoven, Ludwig van'
+        >>> c.name = 'Beach, Amy'
         >>> c.role = 'composer'
         >>> md.addContributor(c)
         >>> md.composer
-        'Beethoven, Ludwig van'
+        'Beach, Amy'
 
-        >>> md.composer = 'frank'
+        Add maiden name as an alternative composer name:
+
+        >>> md.composer = 'Cheney, Amy Marcy'
         >>> md.composers
-        ['Beethoven, Ludwig van', 'frank']
+        ['Beach, Amy', 'Cheney, Amy Marcy']
 
         '''
         if not isinstance(c, Contributor):
             raise exceptions21.MetadataException(
                 'supplied object is not a Contributor: %s' % c)
-        self._contributors.append(c)
+        self.contributors.append(c)
 
     def getContributorsByRole(self, value):
         r'''
@@ -334,7 +342,7 @@ class Metadata(base.Music21Object):
         'Beth Hadley'
         '''
         result = []  # there may be more than one per role
-        for c in self._contributors:
+        for c in self.contributors:
             if c.role == value:
                 result.append(c)
         if result:
@@ -348,11 +356,11 @@ class Metadata(base.Music21Object):
         regular expression match.
 
         >>> md = metadata.Metadata()
-        >>> md.composer = 'Beethoven, Ludwig van'
-        >>> md.title = 'Third Symphony'
+        >>> md.composer = 'Joplin, Scott'
+        >>> md.title = 'Maple Leaf Rag'
 
         >>> md.search(
-        ...     'beethoven',
+        ...     'joplin',
         ...     field='composer',
         ...     )
         (True, 'composer')
@@ -361,41 +369,42 @@ class Metadata(base.Music21Object):
         matched:
 
         >>> md.search(
-        ...     'beethoven',
-        ...     field='compose',
+        ...     'joplin',
+        ...     field='compos',
         ...     )
         (True, 'composer')
 
+        These don't work (Richard W. didn't have the rhythm...)
+
         >>> md.search(
-        ...     'frank',
+        ...     'Wagner',
         ...     field='composer',
         ...     )
         (False, None)
 
-        >>> md.search('frank')
+        >>> md.search('Wagner')
         (False, None)
 
-        >>> md.search('third')
+        >>> md.search('leaf')
         (True, 'title')
 
         >>> md.search(
-        ...     'third',
+        ...     'leaf',
         ...     field='composer',
         ...     )
         (False, None)
 
         >>> md.search(
-        ...     'third',
+        ...     'leaf',
         ...     field='title',
         ...     )
         (True, 'title')
 
-        >>> md.search('third|fourth')
+        >>> md.search('leaf|entertainer')
         (True, 'title')
 
-        >>> md.search('thove(.*)')
+        >>> md.search('opl(.*)cott')
         (True, 'composer')
-
         '''
         valueFieldPairs = []
         if field is not None:
@@ -519,8 +528,7 @@ class Metadata(base.Music21Object):
 
         # slow approach
         for workId in Metadata.workIdAbbreviationDict.keys():
-            if value.lower() == \
-                Metadata.workIdAbbreviationDict[workId].lower():
+            if value.lower() == Metadata.workIdAbbreviationDict[workId].lower():
                 return workId
         raise exceptions21.MetadataException(
             'no such work id: %s' % value)
@@ -552,7 +560,7 @@ class Metadata(base.Music21Object):
         specified.
 
         The composer attribute does not live in Metadata, but creates a
-        :class:`~music21.metadata.Contributor` object in the Metadata
+        :class:`~music21.metadata.Contributor` object in the .contributors
         object.
 
         >>> md = metadata.Metadata(
@@ -573,7 +581,7 @@ class Metadata(base.Music21Object):
         c = Contributor()
         c.name = value
         c.role = 'composer'
-        self._contributors.append(c)
+        self.contributors.append(c)
 
     @property
     def composers(self):
@@ -819,7 +827,7 @@ class RichMetadata(Metadata):
         # specifically name attributes to copy, as do not want to get all
         # Metadata is a m21 object
         localNames = [
-            '_contributors', '_date', '_urls', '_imprint', '_copyright',
+            'contributors', '_date', '_urls', '_imprint', '_copyright',
             '_workIds',
             ]
         environLocal.printDebug(['RichMetadata: calling merge()'])

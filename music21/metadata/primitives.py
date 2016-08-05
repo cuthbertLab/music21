@@ -755,6 +755,9 @@ class Contributor(object):
 
     >>> td.relevance
     'contributor'
+    
+    >>> td
+    <music21.metadata.primitives.Contributor composer:Chopin, Fryderyk>
     '''
 
     ### CLASS VARIABLES ###
@@ -817,6 +820,10 @@ class Contributor(object):
             self._dateRange[0] = DateSingle(keywords['birth'])
         if 'death' in keywords:
             self._dateRange[1] = DateSingle(keywords['death'])
+
+    def __repr__(self):
+        return '<music21.metadata.primitives.{} {}:{}>'.format(                                                           
+                                self.__class__.__name__, self.role, self.name)
 
     ### PUBLIC METHODS ###
 

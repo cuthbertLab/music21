@@ -193,7 +193,6 @@ class Test(unittest.TestCase):
             test.dedent('''
                 {
                     "__attr__": {
-                        "_contributors": [],
                         "_urls": [],
                         "_workIds": {
                             "movementName": {
@@ -210,6 +209,7 @@ class Test(unittest.TestCase):
                             },
                             "__class__": "music21.interval.Interval"
                         },
+                        "contributors": [],
                         "keySignatureFirst": "<music21.key.Key of f# minor>",
                         "keySignatures": [
                             "<music21.key.Key of f# minor>"

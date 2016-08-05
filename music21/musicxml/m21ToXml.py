@@ -1574,7 +1574,7 @@ class ScoreExporter(XMLExporterBase):
         # creators
         foundOne = False
         if self.scoreMetadata is not None:
-            for c in self.scoreMetadata._contributors:
+            for c in self.scoreMetadata.contributors:
                 mxCreator = self.contributorToXmlCreator(c)
                 mxId.append(mxCreator)
                 foundOne = True
@@ -1704,15 +1704,15 @@ class ScoreExporter(XMLExporterBase):
         Return a <creator> tag from a :class:`~music21.metadata.Contributor` object.
     
         >>> md = metadata.Metadata()
-        >>> md.composer = 'frank'
-        >>> contrib = md._contributors[0]
+        >>> md.composer = 'Oliveros, Pauline'
+        >>> contrib = md.contributors[0]
         >>> contrib
-        <music21.metadata.primitives.Contributor object at 0x...>
+        <music21.metadata.primitives.Contributor composer:Oliveros, Pauline>
         
         >>> SX = musicxml.m21ToXml.ScoreExporter()
         >>> mxCreator = SX.contributorToXmlCreator(contrib)
         >>> SX.dump(mxCreator) 
-        <creator type="composer">frank</creator>
+        <creator type="composer">Oliveros, Pauline</creator>
         '''
         mxCreator = Element('creator')
         if c.role is not None:

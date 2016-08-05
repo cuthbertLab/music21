@@ -1039,7 +1039,7 @@ class JSONFreezeThawBase(object):
             ],
         'music21.metadata.Metadata': [
             '_date', '_imprint', '_copyright', '_workIds', '_urls',
-            '_contributors',
+            'contributors',
             ],
         'music21.metadata.bundles.MetadataBundle': [
             '_metadataEntries', 'name',
