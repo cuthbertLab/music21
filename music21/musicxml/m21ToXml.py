@@ -1578,18 +1578,64 @@ class ScoreExporter(XMLExporterBase):
                 mxCreator = self.contributorToXmlCreator(c)
                 mxId.append(mxCreator)
                 foundOne = True
+                
         if foundOne is False:
             mxCreator = SubElement(mxId, 'creator')
             mxCreator.set('type', 'composer')
             mxCreator.text = defaults.author
         
         # TODO: rights.
+        
+        # Encoding does its own append...
         self.setEncoding()
         # TODO: source
         # TODO: relation
         # TODO: miscellaneous
+        self.metadataToMiscellaneous()
+        
         return mxId
         
+        
+    def metadataToMiscellaneous(self, md=None):
+        '''
+        Returns an mxMiscellaneous of information from metadata object md or
+        from self.scoreMetadata if md is None.  If the mxMiscellaneous object
+        has any miscellaneous-fields, then it is appended to self.mxIdentification
+        if it exists.
+        
+        >>> SX = musicxml.m21ToXml.ScoreExporter()
+        >>> md = metadata.Metadata()
+        >>> md.date = metadata.primitives.DateRelative('1689', 'onOrBefore')
+        >>> md.localeOfComposition = 'Rome'
+        
+        >>> mxMisc = SX.metadataToMiscellaneous(md)
+        >>> SX.dump(mxMisc)
+        <miscellaneous>
+          <miscellaneous-field name="date">1689/--/-- or earlier</miscellaneous-field>
+          <miscellaneous-field name="localeOfComposition">Rome</miscellaneous-field>
+        </miscellaneous>               
+        '''
+        if md is None and self.scoreMetadata is None:
+            return None
+        elif md is None:
+            md = self.scoreMetadata
+                        
+        mxMiscellaneous = Element('miscellaneous')
+
+        foundOne = False                    
+        for name, value in md.all(skipContributors=True):
+            if name in ('movementName', 'movementNumber', 'title'):
+                continue
+            mxMiscField = SubElement(mxMiscellaneous, 'miscellaneous-field')
+            mxMiscField.set('name', name)
+            mxMiscField.text = value
+            foundOne = True
+
+        if self.mxIdentification is not None and foundOne:
+            self.mxIdentification.append(mxMiscellaneous)
+        
+        # for testing:
+        return mxMiscellaneous
         
     def setEncoding(self):
         '''

@@ -753,9 +753,7 @@ class MusicXMLImporter(XMLParserBase):
         Converts part of the root element into a metadata object
         
         Supported: work-title, work-number, opus, movement-number,
-        movement-title, identification (creator)
-        
-        Not supported: rights, encoding, source, relation, miscellaneous
+        movement-title, identification        
         '''
         if el is None:
             el = self.root
@@ -778,24 +776,60 @@ class MusicXMLImporter(XMLParserBase):
         
         identification = el.find('identification')
         if identification is not None:
-            for creator in identification.findall('creator'):
-                c = self.creatorToContributor(creator)
-                md.addContributor(c)
-            encoding = identification.find('encoding')
-            if encoding is not None:
-                for supports in encoding.findall('supports'):
-                    attr = supports.get('attribute')
-                    value = supports.get('value')
-                    if (attr, value) == ('new-system', 'yes'):
-                        self.definesExplicitSystemBreaks = True
-                    elif (attr, value) == ('new-page', 'yes'):
-                        self.definesExplicitPageBreaks = True
+            self.identificationToMetadata(identification, md)
+
+        if inputM21 is None:
+            return md
+        
+    def identificationToMetadata(self, identification, inputM21=None):
+        '''
+        Converters an <identification> tag, containing <creator> tags and
+        <miscellaneous> tag.
+        
+        Not supported: rights, source, relation
+        
+        Encoding only parses "supports" and that only has 
+        new-system (definesExplicitSystemBreaks) and
+        new-page (definesExplicitPageBreaks)
+        '''
+        if inputM21 is not None:
+            md = inputM21
+        else:
+            md = metadata.Metadata()
+            
+        for creator in identification.findall('creator'):
+            c = self.creatorToContributor(creator)
+            md.addContributor(c)
+        encoding = identification.find('encoding')
+        if encoding is not None:
+            for supports in encoding.findall('supports'):
+                attr = supports.get('attribute')
+                value = supports.get('value')
+                if (attr, value) == ('new-system', 'yes'):
+                    self.definesExplicitSystemBreaks = True
+                elif (attr, value) == ('new-page', 'yes'):
+                    self.definesExplicitPageBreaks = True
         
         # TODO: rights
         # TODO: encoding (incl. supports)
         # TODO: source
         # TODO: relation
-        # TODO: miscellaneous
+        miscellaneous = identification.find('miscellaneous')
+        if miscellaneous is not None:
+            for mxMiscField in miscellaneous.findall('miscellaneous-field'):
+                miscFieldName = mxMiscField.get('name')
+                if miscFieldName is None:
+                    continue # it is required, so technically can raise an exception
+                miscFieldValue = mxMiscField.text
+                if miscFieldValue is None:
+                    continue # it is required, so technically can raise an exception
+                try:
+                    setattr(md, miscFieldName, miscFieldValue)
+                except Exception as e: # pylint: disable=broad-except
+                    environLocal.warn("Could not set metadata: {} to {}: {}".format(
+                                        miscFieldName, miscFieldValue, e
+                                    ))
+        
         if inputM21 is None:
             return md
         

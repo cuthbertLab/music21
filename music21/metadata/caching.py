@@ -21,21 +21,16 @@ import unittest
 from music21 import common
 from music21 import exceptions21
 
-
 #------------------------------------------------------------------------------
 
 
 from music21 import environment
 environLocal = environment.Environment(os.path.basename(__file__))
-
-
 #------------------------------------------------------------------------------
 
 
 class MetadataCacheException(exceptions21.Music21Exception):
     pass
-
-
 #------------------------------------------------------------------------------
 
 

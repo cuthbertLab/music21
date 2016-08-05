@@ -69,9 +69,9 @@ class Date(object):
 
     ### CLASS VARIABLES ###
 
-    approximateSymbols = ['~', 'x']
-
-    uncertainSymbols = ['?', 'z']
+    approximateSymbols = ('~', 'x')
+    uncertainSymbols = ('?', 'z')
+    priorTimeSymbols = ('<', '{', '>', '}')
 
     ### INITIALIZER ###
 
@@ -82,6 +82,7 @@ class Date(object):
         self.hour = None
         self.minute = None
         self.second = None
+        
         # error: can be 'approximate', 'uncertain'
         # None is assumed to be certain
         self.yearError = None
@@ -162,7 +163,7 @@ class Date(object):
             return value, None
         else:
             dateStr = value
-        sym = self.approximateSymbols + self.uncertainSymbols
+        sym = self.approximateSymbols + self.uncertainSymbols + self.priorTimeSymbols
         found = None
         for char in dateStr:
             if char in sym:
@@ -176,6 +177,10 @@ class Date(object):
         elif found in self.uncertainSymbols:
             dateStr = dateStr.replace(found, '')
             return dateStr, 'uncertain'
+        elif found in self.priorTimeSymbols:
+            dateStr = dateStr.replace(found, '')
+            return dateStr, 'priority'
+
 
     ### PUBLIC METHODS ###
 
@@ -480,11 +485,15 @@ class DateSingle(object):
 
 class DateRelative(DateSingle):
     r'''
-    Store a relative date, sometime prior or sometime after.
+    Store a relative date, sometime `prior` or sometime `after`, `onorbefore`, or onorafter`.
 
     >>> dd = metadata.DateRelative('2009/12/31', 'prior')
     >>> str(dd)
-    '2009/12/31'
+    'prior to 2009/12/31'
+    >>> dd.relevance = 'after'
+    >>> str(dd)
+    'after 2009/12/31'
+
 
     >>> dd = metadata.DateRelative('2009/12/31', 'certain')
     Traceback (most recent call last):
@@ -502,17 +511,32 @@ class DateRelative(DateSingle):
 
     ### PUBLIC PROPERTIES ###
 
+    def __str__(self):
+        r = self.relevance
+        ds = super(DateRelative, self).__str__()
+        if r == 'prior':
+            return 'prior to ' + ds
+        elif r == 'onorbefore':
+            return ds + ' or earlier'
+        elif r == 'onorafter':
+            return ds + ' or later'
+        else:
+            return 'after ' + ds
+
     @property
     def relevance(self):
         return self._relevance
 
     @relevance.setter
     def relevance(self, value):
-        if value not in ['prior', 'after']:
+        if value == 'before':
+            value = 'prior'
+        
+        if value.lower() not in ['prior', 'after', 'onorbefore', 'onorafter']:
             raise exceptions21.MetadataException(
                 'Relevance value is not supported by this object: '
                 '{0!r}'.format(value))
-        self._relevance = value
+        self._relevance = value.lower()
 
 
 
@@ -1176,7 +1200,7 @@ class Test(unittest.TestCase):
         from music21 import metadata
 
         dateRelative = metadata.primitives.DateRelative('2001/12/31', 'prior')
-        self.assertEqual(str(dateRelative), '2001/12/31')
+        self.assertEqual(str(dateRelative), 'prior to 2001/12/31')
         self.assertEqual(dateRelative.relevance, 'prior')
         self.assertEqual(len(dateRelative._data), 1)
 

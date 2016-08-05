@@ -41,7 +41,7 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
     :width: 600
 
 '''
-
+from collections import OrderedDict
 import os
 import re
 import unittest
@@ -195,7 +195,7 @@ class Metadata(base.Music21Object):
 
         # a dictionary of Text elements, where keys are work id strings
         # all are loaded with None by default
-        self._workIds = {}
+        self._workIds = OrderedDict()
         for abbreviation, workId in self.workIdAbbreviationDict.items():
             #abbreviation = workIdToAbbreviation(id)
             if workId in keywords:
@@ -213,7 +213,7 @@ class Metadata(base.Music21Object):
                 setattr(self, attr, keywords[attr])
 
     ### SPECIAL METHODS ###
-    def all(self):
+    def all(self, skipContributors=False):
         '''
         Returns all values (as strings) stored in this metadata as a sorted list of tuples.
         
@@ -221,6 +221,16 @@ class Metadata(base.Music21Object):
         >>> c.metadata.all()
         [('arranger', 'Michael Scott Cuthbert'), 
          ('composer', 'Arcangelo Corelli'), 
+         ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
+
+        Skip contributors is there to help with musicxml parsing -- there's no reason for it
+        except that we haven't exposed enough functionality yet:
+        
+        >>> c.metadata.date = metadata.primitives.DateRelative('1689', 'onOrBefore')
+        >>> c.metadata.localeOfComposition = 'Rome'
+        >>> c.metadata.all(skipContributors=True)
+        [('date', '1689/--/-- or earlier'), 
+         ('localeOfComposition', 'Rome'), 
          ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
         '''
         allOut = []
@@ -230,10 +240,11 @@ class Metadata(base.Music21Object):
                 continue
             t = (str(wid), str(val))
             allOut.append(t)
-        for contri in self.contributors:
-            for n in contri._names:
-                t = (str(contri.role), str(n))
-                allOut.append(t)
+        if not skipContributors:
+            for contri in self.contributors:
+                for n in contri._names:
+                    t = (str(contri.role), str(n))
+                    allOut.append(t)
         if self._date is not None:
             t = ('date', str(self._date))
             allOut.append(t)
