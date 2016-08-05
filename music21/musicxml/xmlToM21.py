@@ -809,7 +809,7 @@ class MusicXMLImporter(XMLParserBase):
         >>> MI = musicxml.xmlToM21.MusicXMLImporter()
         >>> c = MI.creatorToContributor(creator)
         >>> c
-        <music21.metadata.primitives.Contributor object at 0x...>
+        <music21.metadata.primitives.Contributor composer:Beethoven, Ludwig van>
         >>> c.role
         'composer'
         >>> c.name
