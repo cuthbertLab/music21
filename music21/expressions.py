@@ -25,6 +25,7 @@ import copy
 import unittest
 
 from music21 import base
+from music21 import common
 from music21 import exceptions21
 from music21 import interval
 from music21 import spanner
@@ -96,15 +97,34 @@ class ExpressionException(exceptions21.Music21Exception):
 
 
 class Expression(base.Music21Object):
-    '''This base class is inherited by many diverse expressions. 
+    '''
+    This base class is inherited by many diverse expressions. 
     '''
     def __init__(self):
         base.Music21Object.__init__(self)
-
+    
     def __repr__(self):
         return '<music21.expressions.%s>' % (self.__class__.__name__)
 
-
+    @property
+    def name(self):
+        '''
+        returns the name of the expression, which is generally the
+        class name lowercased and spaces where a new capital occurs.
+        
+        Subclasses can override this as necessary.
+        
+        >>> sc = expressions.Schleifer()
+        >>> sc.name
+        'schleifer'
+        
+        >>> iturn = expressions.InvertedTurn()
+        >>> iturn.name
+        'inverted turn'
+        '''
+        className = self.__class__.__name__
+        return common.camelCaseToHyphen(className, replacement=' ')
+    
 
 #-------------------------------------------------------------------------------
 class TextExpressionException(ExpressionException):

@@ -166,6 +166,12 @@ def camelCaseToHyphen(usrStr, replacement='-'):
 
     >>> common.camelCaseToHyphen('movementName')
     'movement-name'
+
+    First letter can be uppercase as well:
+    
+    >>> common.camelCaseToHyphen('MovementName')
+    'movement-name'
+
     >>> common.camelCaseToHyphen('movementNameName')
     'movement-name-name'
     

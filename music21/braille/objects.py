@@ -53,6 +53,22 @@ class BrailleOptionalNoteDivision(BrailleTranscriptionHelper):
     <music21.braille.objects.BrailleOptionalNoteDivision object at 0x10afc19b0>
     '''
 
+class BrailleMusicComma(BrailleTranscriptionHelper):
+    pass
+
+class BrailleExplicitNoteLength(BrailleTranscriptionHelper):
+    pass
+
+class BrailleExplicitNoteLarger(BrailleExplicitNoteLength):
+    pass
+
+class BrailleExplicitNoteSmaller(BrailleExplicitNoteLength):
+    pass
+
+class BrailleExplicitNoteExtraSmaller(BrailleExplicitNoteLength):
+    pass
+
+
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 

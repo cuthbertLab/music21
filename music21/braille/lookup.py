@@ -9,6 +9,21 @@
 # Copyright:    Copyright © 2011, 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-----------------------------------------------------------------------------------
+'''
+This file contains some basic lookups for symbols (used where there is not much more
+logical code to deduce).
+
+
+Music21 standards generally follow Mary Turner De Garmo, 
+Introduction to Braille Music Transcription (2005) (called "degarmo" or "IMBT2005" below).
+
+Signs from other books will be accepted if
+and only if there is no conflict between them and BRL signs listed in IBMT2005.
+
+A place where other signs are found generally is 
+New International Manual of Braille Music Notation (by Bettye Krolick), which we will cite as
+"Krolick" or "krolick".
+'''
 
 import itertools
 
@@ -74,7 +89,7 @@ d = {'128th':   _B[15],
      'half':    _B[135],
      'whole':   _B[1356],
      'breve':   _B[1356] + _B[45] + _B[14] + _B[1356],
-     'longa':   _B[1356] + _B[45] + _B[14] + _B[45] + _B[14] + _B[1356],     
+     'longa':   _B[1356] + _B[45] + _B[14] + _B[45] + _B[14] + _B[1356],
      }
 
 e = {'128th':   _B[124],
@@ -86,7 +101,7 @@ e = {'128th':   _B[124],
      'half':    _B[1234],
      'whole':   _B[12346],
      'breve':   _B[12346] + _B[45] + _B[14] + _B[12346],
-     'longa':   _B[12346] + _B[45] + _B[14] + _B[45] + _B[14] + _B[12346],     
+     'longa':   _B[12346] + _B[45] + _B[14] + _B[45] + _B[14] + _B[12346],
      }
 
 f = {'128th':   _B[1245],
@@ -98,7 +113,7 @@ f = {'128th':   _B[1245],
      'half':    _B[12345],
      'whole':   _B[123456],
      'breve':   _B[123456] + _B[45] + _B[14] + _B[123456],
-     'longa':   _B[123456] + _B[45] + _B[14] + _B[45] + _B[14] + _B[123456],     
+     'longa':   _B[123456] + _B[45] + _B[14] + _B[45] + _B[14] + _B[123456],
      }
 
 g = {'128th':   _B[125],
@@ -122,7 +137,7 @@ a = {'128th':   _B[24],
      'half':    _B[234],
      'whole':   _B[2346],
      'breve':   _B[2346] + _B[45] + _B[14] + _B[2346],
-     'longa':   _B[2346] + _B[45] + _B[14] + _B[45] + _B[14] + _B[2346],     
+     'longa':   _B[2346] + _B[45] + _B[14] + _B[45] + _B[14] + _B[2346],
      }
 
 b = {'128th':   _B[245],
@@ -247,6 +262,13 @@ rests = {'dummy':   _B[3],
          'breve':   _B[134] + _B[45] + _B[14] + _B[134],
          'longa':   _B[134] + _B[45] + _B[14] + _B[45] + _B[14] + _B[134],         
          }
+
+lengthPrefixes = {
+        'larger': _B[45] + _B[126] + _B[2], # whole to eighth inclusive + longer (degarmo 15)
+        'smaller': _B[6] + _B[126] + _B[2], # 16th to 128th inclusive
+        'xsmall': _B[56] + _B[126] + _B[2], # 256th notes + presumably shorter?
+                  
+        }
 
 barlines = {'final': _B[126] + _B[13],
             'double':_B[126] + _B[13] + _B[3],
