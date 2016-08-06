@@ -238,18 +238,33 @@ class Metadata(base.Music21Object):
             val = self._workIds[wid]
             if val is None:
                 continue
-            t = (str(wid), str(val))
+            if six.PY3:
+                t = (str(wid), str(val))
+            else:
+                try:
+                    t = (str(wid), unicode(val)) # @UndefinedVariable
+                except UnicodeDecodeError as ude:
+                    print(val, repr(val), ude)
             allOut.append(t)
         if not skipContributors:
             for contri in self.contributors:
                 for n in contri._names:
-                    t = (str(contri.role), str(n))
+                    if six.PY3:
+                        t = (str(contri.role), str(n))
+                    else:
+                        t = (str(contri.role), unicode(n)) # @UndefinedVariable
                     allOut.append(t)
         if self._date is not None:
-            t = ('date', str(self._date))
+            if six.PY3:
+                t = ('date', str(self._date))
+            else:
+                t = ('date', unicode(self._date)) # @UndefinedVariable
             allOut.append(t)
         if self._copyright is not None:
-            t = ('copyright', str(self._copyright))
+            if six.PY3:
+                t = ('copyright', str(self._copyright))
+            else:
+                t = ('copyright', unicode(self._copyright)) # @UndefinedVariable
             allOut.append(t)
             
         

@@ -25,14 +25,14 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 
 # http://abcnotation.com/tunePage?a=www.folkwiki.se/pub/cache/_Fyrareprisarn_0bf5b5/0001
-fyrareprisarn = """
+fyrareprisarn = u"""
 %%abc-charset utf-8
 
 X: 1
 T: Fyrareprisarn
-O: JÃ¤t, SmÃ¥land
-S: efter August StrÃƒÂ¶mberg
-D: Svensson, Gustafsson mfl - BÃƒÂ¥lgetingen
+O: Jät, Småland
+S: efter August Strömberg
+D: Svensson, Gustafsson mfl - Bålgetingen
 Z: Till abc av Jon Magnusson 100517 
 R: Hambo
 M: 3/4
@@ -548,14 +548,19 @@ class Test(unittest.TestCase):
 
         GEX = m21ToXml.GeneralObjectExporter()
         
-        for tf in ALL:
+        for i, tf in enumerate(ALL):
             ah = af.readstr(tf)
             environLocal.printDebug([ah.getTitle()])
             s = translate.abcToStreamScore(ah)
             # run musicxml processing to look for internal errors
-            unused_out = GEX.parse(s)
-
-
+            #print(repr(s.metadata._workIds['localeOfComposition']._data))
+            #print(s.metadata.all())
+            try:
+                unused_out = GEX.parse(s)
+            except UnicodeDecodeError as ude:
+                environLocal.warn("About to fail on ABC file #{}".format(i))
+                raise ude
+                
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test)

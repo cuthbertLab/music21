@@ -124,7 +124,7 @@ class ABCToken(object):
     The source ABC string itself is stored in self.src
 
     '''
-    def __init__(self, src=''):
+    def __init__(self, src=u''):
         self.src = src # store source character sequence
 
     def __repr__(self):
@@ -170,7 +170,7 @@ class ABCMetadata(ABCToken):
 
     # given a logical unit, create an object
     # may be a chord, notes, metadata, bars
-    def __init__(self, src = ''):
+    def __init__(self, src=u''):
         ABCToken.__init__(self, src)
         self.tag = None
         self.data = None
@@ -184,13 +184,12 @@ class ABCMetadata(ABCToken):
         to have access to data.  Divides a token into
         .tag (a single capital letter or w) and .data representations.
         
-        
-        >>> x = abcFormat.ABCMetadata('T:tagData')
+        >>> x = abcFormat.ABCMetadata(u'T:tagData')
         >>> x.preParse()
         >>> x.tag
-        'T'
+        u'T'
         >>> x.data
-        'tagData'
+        u'tagData'
         '''
         div = reMetadataTag.match(self.src).end()
         strSrc = self.stripComment(self.src) # remove any comments
@@ -223,28 +222,32 @@ class ABCMetadata(ABCToken):
         return False
 
     def isMeter(self):
-        '''Returns True if the tag is "M" for meter, False otherwise.
+        '''
+        Returns True if the tag is "M" for meter, False otherwise.
         '''
         if self.tag == 'M': 
             return True
         return False
 
     def isTitle(self):
-        '''Returns True if the tag is "T" for title, False otherwise.
+        '''
+        Returns True if the tag is "T" for title, False otherwise.
         '''
         if self.tag == 'T': 
             return True
         return False
 
     def isComposer(self):
-        '''Returns True if the tag is "C" for composer, False otherwise.
+        '''
+        Returns True if the tag is "C" for composer, False otherwise.
         '''
         if self.tag == 'C': 
             return True
         return False
 
     def isOrigin(self):
-        '''Returns True if the tag is "O" for origin, False otherwise. 
+        '''
+        Returns True if the tag is "O" for origin, False otherwise. 
         This value is set in the Metadata `localOfComposition` of field. 
         '''
         if self.tag == 'O': 
@@ -252,7 +255,8 @@ class ABCMetadata(ABCToken):
         return False
 
     def isVoice(self):
-        '''Returns True if the tag is "V", False otherwise.
+        '''
+        Returns True if the tag is "V", False otherwise.
         '''
         if self.tag == 'V': 
             return True
@@ -1678,7 +1682,7 @@ class ABCHandler(object):
         lastIndex = len(strSrc) - 1
         skipAhead = 0
 
-        activeChordSymbol = '' # accumulate, then prepend
+        activeChordSymbol = u'' # accumulate, then prepend
         
         while currentIndex < lastIndex: 
             currentIndex += 1

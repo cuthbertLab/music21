@@ -195,9 +195,9 @@ class Date(object):
         >>> metadata.Date.errorToSymbol('uncertain')
         '?'
         '''
-        if value.lower() in Date.approximateSymbols + ['approximate']:
+        if value.lower() in Date.approximateSymbols + ('approximate',):
             return Date.approximateSymbols[0]
-        if value.lower() in Date.uncertainSymbols + ['uncertain']:
+        if value.lower() in Date.uncertainSymbols + ('uncertain',):
             return Date.uncertainSymbols[0]
 
     def load(self, value):
@@ -468,7 +468,7 @@ class DateSingle(object):
 
     @relevance.setter
     def relevance(self, value):
-        if value in ['certain', 'approximate', 'uncertain']:
+        if value in ('certain', 'approximate', 'uncertain'):
             self._relevance = value
             self._dataError = []
             # only here is dataError the same as relevance
@@ -532,7 +532,7 @@ class DateRelative(DateSingle):
         if value == 'before':
             value = 'prior'
         
-        if value.lower() not in ['prior', 'after', 'onorbefore', 'onorafter']:
+        if value.lower() not in ('prior', 'after', 'onorbefore', 'onorafter'):
             raise exceptions21.MetadataException(
                 'Relevance value is not supported by this object: '
                 '{0!r}'.format(value))
@@ -598,7 +598,7 @@ class DateBetween(DateSingle):
 
     @relevance.setter
     def relevance(self, value):
-        if value not in ['between']:
+        if value != 'between':
             raise exceptions21.MetadataException(
                 'Relevance value is not supported by this object: '
                 '{0!r}'.format(value))
@@ -669,7 +669,7 @@ class DateSelection(DateSingle):
 
     @relevance.setter
     def relevance(self, value):
-        if value not in ['or']:
+        if value != 'or':
             raise exceptions21.MetadataException(
                 'Relevance value is not supported by this object: '
                 '{0!r}'.format(value))
@@ -721,6 +721,9 @@ class Text(object):
                 return str(self._data)
             else:
                 return self._data
+
+    def __unicode__(self):
+        return self.__str__().decode('utf-8')
 
     ### PUBLIC PROPERTIES ###
 
