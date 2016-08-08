@@ -2980,157 +2980,132 @@ Barline final ⠣⠅
 
 # Triplets
 # --------
-def test_example16_1():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example16_1(), inPlace=True, 
-    ...                showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀
-    ⠆⠨⠦⠐⠙⠋⠊⠳⠀⠆⠨⠦⠸⠚⠑⠊⠳
-    """
-    bm = converter.parse("tinynotation: 2/4 trip{c8 e a} g4 trip{B8 d a} g4").flat
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    bm.getElementsByClass('Measure')[-1].rightBarline = None
-    bm.getElementsByClass('Measure')[0].notes[0].articulations.append(articulations.Accent())
-    bm.getElementsByClass('Measure')[1].notes[0].articulations.append(articulations.Accent())
-    return bm
-
-def test_example16_2():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example16_2(), inPlace=True, 
-    ...                showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠐⠺⠈⠉⠆⠚⠙⠐⠛⠆⠚⠑⠐⠛⠀⠺⠈⠉⠆⠚⠙⠑⠆⠑⠙⠚
-    """
-    bm = converter.parse("tinynotation: 3/4 b-4~ trip{b-8 c' f} trip{b- d' f} " + 
-                         "b-4~ trip{b-8 c' d'} trip{d' c' b-}").flat
-    bm.insert(0, key.KeySignature(-2))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    bm.getElementsByClass('Measure')[-1].rightBarline = None
-    return bm
-
-def test_example16_4():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example16_4(), inPlace=True, 
-    ...                    showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠜⠇⠑⠛⠁⠞⠕⠜⠏⠰⠃⠆⠨⠙⠚⠊⠆⠊⠚⠙⠆⠚⠙⠚⠫⠘⠆
-    """
-    bm = converter.parse("tinynotation: 4/4 trip{c'8 b- a-} trip{a- b- c'} " + 
-                         "trip{b- c' b-} e-4").flat
-    bm.insert(0, key.KeySignature(-4))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m0 = bm.getElementsByClass('Measure')[0]
-    m0.insert(0.0, dynamics.Dynamic('p'))
-    m0.insert(0.0, expressions.TextExpression("legato"))
-    m0.append(spanner.Slur(m0.notes[0], m0.notes[-1]))
-    bm.getElementsByClass('Measure')[-1].rightBarline = None
-    return bm
-
-def test_example16_6():
-    bm = converter.parse("tinynotation: 2/4 trip{b'-8 f' d'} trip{b- d' e'-} " + 
-                         "trip{f' d' b-} trip{f b- d'}").flat
-    bm.insert(0, key.KeySignature(-2))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    bm.getElementsByClass('Measure')[-1].rightBarline = None
-    return bm
-
-#-------------------------------------------------------------------------------
-# Chapter 17: Measure Repeats, Full-Measure In-Accords
-
-def test_example17_1():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example17_1(), inPlace=True, 
-    ...                    showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀
-    ⠐⠹⠫⠪⠳⠀⠶⠀⠸⠺⠱⠪⠳⠀⠷
-    """
-    bm = converter.parse("tinynotation: 4/4 c4 e a g c e a g B d a g g1").flat
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    bm.getElementsByClass('Measure')[-1].rightBarline = None
-    return bm
-
-def test_example17_2():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example17_2(), inPlace=True, 
-    ...                    showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀
-    ⠦⠐⠳⠦⠩⠻⠨⠦⠡⠟⠀⠶⠀⠏⠗⠀⠯
-    """
-    bm = converter.parse("tinynotation: 4/4 g4 f# fn2 g4 f# fn2 e2 g2 e1").flat
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    bm.getElementsByClass('Measure')[-1].rightBarline = None
-    m0 = bm.getElementsByClass('Measure')[0]
-    m0.notes[0].articulations.append(articulations.Staccato())
-    m0.notes[1].articulations.append(articulations.Staccato())
-    m0.notes[2].articulations.append(articulations.Accent())
-    m1 = bm.getElementsByClass('Measure')[1]    
-    m1.notes[0].articulations.append(articulations.Staccato())
-    m1.notes[1].articulations.append(articulations.Staccato())
-    m1.notes[2].articulations.append(articulations.Accent())
-    return bm
-
-def test_example17_3():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example17_3(), inPlace=True, 
-    ...                    showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀
-    ⠐⠹⠫⠳⠀⠶⠀⠶⠀⠨⠝⠄
-    """
-    bm = converter.parse("tinynotation: 3/4 c4 e g c e g c e g c'2.").flat
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    bm.getElementsByClass('Measure')[-1].rightBarline = None
-    return bm
-
-def test_example17_4():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example17_4(), inPlace=True, 
-    ...                    showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀
-    ⠐⠹⠫⠳⠀⠶⠀⠶⠀⠎⠄
-    """
-    bm = converter.parse("tinynotation: 3/4 c4 e g c e g c e g a2.").flat
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    bm.getElementsByClass('Measure')[-1].rightBarline = None
-    return bm
-
-def test_example17_5():
-    u"""
-    Measure repeated six times followed by one measure repeated twice
+    def test_example16_1(self):
+        bm = converter.parse("tinynotation: 2/4 trip{c8 e a} g4 trip{B8 d a} g4").flat
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        bm.getElementsByClass('Measure')[-1].rightBarline = None
+        bm.getElementsByClass('Measure')[0].notes[0].articulations.append(articulations.Accent())
+        bm.getElementsByClass('Measure')[1].notes[0].articulations.append(articulations.Accent())
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀
+        ⠆⠨⠦⠐⠙⠋⠊⠳⠀⠆⠨⠦⠸⠚⠑⠊⠳
+        '''
     
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example17_5(), inPlace=True, 
-    ...                    showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠐⠳⠓⠓⠳⠀⠶⠼⠑⠀⠐⠙⠋⠓⠨⠙⠫⠀⠶
+    def test_example16_2(self):
+        bm = converter.parse("tinynotation: 3/4 b-4~ trip{b-8 c' f} trip{b- d' f} " + 
+                             "b-4~ trip{b-8 c' d'} trip{d' c' b-}").flat
+        bm.insert(0, key.KeySignature(-2))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        bm.getElementsByClass('Measure')[-1].rightBarline = None
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠐⠺⠈⠉⠆⠚⠙⠐⠛⠆⠚⠑⠐⠛⠀⠺⠈⠉⠆⠚⠙⠑⠆⠑⠙⠚
+        '''
     
-    """
-    bm = converter.parse('tinynotation: 3/4 g4 g8 g g4 ' + 
-                         'g4 g8 g g4 ' +
-                         'g4 g8 g g4 ' +
-                         'g4 g8 g g4 ' +
-                         'g4 g8 g g4 ' +
-                         'g4 g8 g g4 ' +
-                         "c8 e g c' e'4 " +
-                         "c8 e g c' e'4 "
-                         )
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    bm.getElementsByClass('Measure')[-1].rightBarline = None
-    return bm
+    def test_example16_4(self):
+        bm = converter.parse("tinynotation: 4/4 trip{c'8 b- a-} trip{a- b- c'} " + 
+                             "trip{b- c' b-} e-4").flat
+        bm.insert(0, key.KeySignature(-4))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m0 = bm.getElementsByClass('Measure')[0]
+        m0.insert(0.0, dynamics.Dynamic('p'))
+        m0.insert(0.0, expressions.TextExpression("legato"))
+        m0.append(spanner.Slur(m0.notes[0], m0.notes[-1]))
+        bm.getElementsByClass('Measure')[-1].rightBarline = None
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠜⠇⠑⠛⠁⠞⠕⠜⠏⠰⠃⠆⠨⠙⠚⠊⠆⠊⠚⠙⠆⠚⠙⠚⠫⠘⠆
+        '''
+    
+    def xtest_example16_6(self):
+        bm = converter.parse("tinynotation: 2/4 trip{b'-8 f' d'} trip{b- d' e'-} " + 
+                             "trip{f' d' b-} trip{f b- d'}").flat
+        bm.insert(0, key.KeySignature(-2))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        bm.getElementsByClass('Measure')[-1].rightBarline = None
+        self.s = bm
+#         self.b = '''
+#         '''
+    
+    #-------------------------------------------------------------------------------
+    # Chapter 17: Measure Repeats, Full-Measure In-Accords
+    
+    def test_example17_1(self):
+        bm = converter.parse("tinynotation: 4/4 c4 e a g c e a g B d a g g1").flat
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        bm.getElementsByClass('Measure')[-1].rightBarline = None
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀
+        ⠐⠹⠫⠪⠳⠀⠶⠀⠸⠺⠱⠪⠳⠀⠷
+        '''
+    
+    def test_example17_2(self):
+        bm = converter.parse("tinynotation: 4/4 g4 f# fn2 g4 f# fn2 e2 g2 e1").flat
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        bm.getElementsByClass('Measure')[-1].rightBarline = None
+        m0 = bm.getElementsByClass('Measure')[0]
+        m0.notes[0].articulations.append(articulations.Staccato())
+        m0.notes[1].articulations.append(articulations.Staccato())
+        m0.notes[2].articulations.append(articulations.Accent())
+        m1 = bm.getElementsByClass('Measure')[1]    
+        m1.notes[0].articulations.append(articulations.Staccato())
+        m1.notes[1].articulations.append(articulations.Staccato())
+        m1.notes[2].articulations.append(articulations.Accent())
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀
+        ⠦⠐⠳⠦⠩⠻⠨⠦⠡⠟⠀⠶⠀⠏⠗⠀⠯
+        '''
+    
+    def test_example17_3(self):
+        bm = converter.parse("tinynotation: 3/4 c4 e g c e g c e g c'2.").flat
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        bm.getElementsByClass('Measure')[-1].rightBarline = None
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀
+        ⠐⠹⠫⠳⠀⠶⠀⠶⠀⠨⠝⠄
+        '''
+    
+    def test_example17_4(self):
+        bm = converter.parse("tinynotation: 3/4 c4 e g c e g c e g a2.").flat
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        bm.getElementsByClass('Measure')[-1].rightBarline = None
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀
+        ⠐⠹⠫⠳⠀⠶⠀⠶⠀⠎⠄
+        '''
+    
+    def test_example17_5(self):
+        bm = converter.parse('tinynotation: 3/4 g4 g8 g g4 ' + 
+                             'g4 g8 g g4 ' +
+                             'g4 g8 g g4 ' +
+                             'g4 g8 g g4 ' +
+                             'g4 g8 g g4 ' +
+                             'g4 g8 g g4 ' +
+                             "c8 e g c' e'4 " +
+                             "c8 e g c' e'4 "
+                             )
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        bm.getElementsByClass('Measure')[-1].rightBarline = None
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠐⠳⠓⠓⠳⠀⠶⠼⠑⠀⠐⠙⠋⠓⠨⠙⠫⠀⠶
+        '''
 
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
