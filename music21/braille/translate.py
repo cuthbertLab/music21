@@ -159,7 +159,7 @@ def streamToBraille(music21Stream, **keywords):
         return measureToBraille(music21Stream, **keywords)
     keyboardParts = music21Stream.getElementsByClass(stream.PartStaff)
     if len(keyboardParts) == 2:
-        return keyboardPartsToBraille(keyboardParts[0], keyboardParts[1], **keywords)
+        return keyboardPartsToBraille(music21Stream, **keywords)
     elif isinstance(music21Stream, stream.Score):
         return scoreToBraille(music21Stream, **keywords)
     elif isinstance(music21Stream, stream.Opus):
@@ -275,12 +275,18 @@ def partToBraille(music21Part, **keywords):
 
 
 
-def keyboardPartsToBraille(staffUpper, staffLower, **keywords):
+def keyboardPartsToBraille(keyboardScore, **keywords):
     """
-    Translates two :class:`~music21.stream.Part` instances to braille, an upper part and a lower
+    Translates a Score object containing two :class:`~music21.stream.Part` instances to braille, 
+    an upper part and a lower
     part. Assumes that the two parts are aligned and well constructed. Bar over bar format is used.
     """
+    parts = keyboardScore.getElementsByClass(['Part', 'PartStaff'])
+    if len(parts) != 2:
+        raise BrailleTranslateException("Can only translate two keyboard parts at a time")
     (inPlace, debug) = _translateArgs(**keywords)
+    staffUpper = parts[0]
+    staffLower = parts[1]
     upperPartToTranscribe = staffUpper
     if not inPlace:
         upperPartToTranscribe = staffUpper.makeNotation(cautionaryNotImmediateRepeat=False)
