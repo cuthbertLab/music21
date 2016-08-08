@@ -1241,8 +1241,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if shiftOffsets is True and matchedEndElement is False: 
                 matchDuration = match.duration.quarterLength
                 shiftedRegionStart = matchOffset + matchDuration
-                if i+1 < len(targetList):
-                    shiftedRegionEnd = self.elementOffset(targetList[i+1])
+                if (i + 1) < len(targetList):
+                    shiftedRegionEnd = self.elementOffset(targetList[i + 1])
                 else:
                     shiftedRegionEnd = self.duration.quarterLength
 
@@ -1259,6 +1259,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         self.setElementOffset(e, elementOffset-shiftDur)
             #if renumberMeasures is True and matchedEndElement is False:
             #   pass  # This should maybe just call a function renumberMeasures
+        self.elementsChanged(clearIsSorted=False)
 
     def pop(self, index):
         '''
@@ -11654,7 +11655,7 @@ class Measure(Stream):
             barDuration = self.barDuration
         return opFrac(self.highestTime / barDuration.quarterLength)
 
-    def padAsAnacrusis(self):
+    def padAsAnacrusis(self, useGaps=True, useInitialRests=False):
         '''
         Given an incompletely filled Measure, adjust the `paddingLeft` value to to
         represent contained events as shifted to fill the right-most duration of the bar.
@@ -11662,20 +11663,84 @@ class Measure(Stream):
         Calling this method will overwrite any previously set `paddingLeft` value,
         based on the current TimeSignature-derived `barDuration` attribute.
 
-        >>> import copy
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> n = note.Note()
         >>> n.quarterLength = 1.0
-        >>> m.append(copy.deepcopy(n))
+        >>> m.append(n)
         >>> m.padAsAnacrusis()
         >>> m.paddingLeft
         2.0
+
         >>> m.timeSignature = meter.TimeSignature('5/4')
         >>> m.padAsAnacrusis()
         >>> m.paddingLeft
         4.0
+        
+
+        Empty space at the beginning of the measure will not be taken in account:
+        
+        >>> m = stream.Measure()
+        >>> m.timeSignature = meter.TimeSignature('3/4')
+        >>> n = note.Note(type='quarter')
+        >>> m.insert(2.0, n)
+        >>> m.padAsAnacrusis()
+        >>> m.paddingLeft
+        0
+        
+        If useInitialRests is True, then rests at the beginning of the measure
+        are removed.  This is especially useful for formats that don't give a
+        way to specify a pickup measure (such as tinynotation) or software
+        that generates incorrect opening measures.  So, to fix the problem before,
+        put a rest at the beginning and call useInitialRests:
+        
+        >>> r = note.Rest(type='half')
+        >>> m.insert(0, r)
+        >>> m.padAsAnacrusis(useInitialRests=True)
+        >>> m.paddingLeft
+        2.0
+        
+        And the rest is gone!
+        
+        >>> m.show('text')
+        {0.0} <music21.meter.TimeSignature 3/4>
+        {0.0} <music21.note.Note C>        
+
+
+        Only initial rests count for useInitialRests:
+        
+        >>> m = stream.Measure()
+        >>> m.timeSignature = meter.TimeSignature('3/4')
+        >>> m.append(note.Rest(type='eighth'))
+        >>> m.append(note.Rest(type='eighth'))
+        >>> m.append(note.Note('C4', type='quarter'))
+        >>> m.append(note.Rest(type='eighth'))
+        >>> m.append(note.Note('D4', type='eighth'))
+        >>> m.show('text')
+        {0.0} <music21.meter.TimeSignature 3/4>
+        {0.0} <music21.note.Rest rest>
+        {0.5} <music21.note.Rest rest>
+        {1.0} <music21.note.Note C>
+        {2.0} <music21.note.Rest rest>
+        {2.5} <music21.note.Note D>        
+        >>> m.padAsAnacrusis(useInitialRests=True)
+        >>> m.paddingLeft
+        1.0
+        >>> m.show('text')
+        {0.0} <music21.meter.TimeSignature 3/4>
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Rest rest>
+        {1.5} <music21.note.Note D>        
         '''
+        if useInitialRests:
+            removeList = []
+            for gn in self.getElementsByClass('GeneralNote'):
+                if 'Rest' not in gn.classes:
+                    break
+                removeList.append(gn)
+            if removeList:
+                self.remove(removeList, shiftOffsets=True)
+        
         # note: may need to set paddingLeft to 0 before examining
 
         # bar duration is that suggested by time signature; it may

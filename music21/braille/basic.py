@@ -597,16 +597,25 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
         noteTrans.append(brailleArticulation)
         # accidental
     # ----------
-    if (music21Note.pitch.accidental is not None
-            and music21Note.pitch.accidental.displayStatus is not False):
+    acc = music21Note.pitch.accidental
+    if (acc is not None and acc.displayStatus is not False):
         try:
-            noteTrans.append(accidentals[music21Note.pitch.accidental.name])
+            if acc.displayStyle == 'parentheses':
+                ps = symbols['braille-music-parenthesis']
+                noteTrans.append(ps)
+                music21Note._brailleEnglish.append(u"Parenthesis {0}".format(ps))              
+                
+            noteTrans.append(accidentals[acc.name])
             music21Note._brailleEnglish.append(u"Accidental {0} {1}".format(
-                                                            music21Note.pitch.accidental.name, 
-                                                accidentals[music21Note.pitch.accidental.name]))              
+                                                            acc.name, accidentals[acc.name]))              
+            if acc.displayStyle == 'parentheses':
+                ps = symbols['braille-music-parenthesis']
+                noteTrans.append(ps)
+                music21Note._brailleEnglish.append(u"Parenthesis {0}".format(ps))              
+
         except KeyError:  # pragma: no cover
             environRules.warn("Accidental {0} of note {1} cannot be transcribed to braille.".format(
-                                music21Note.pitch.accidental, music21Note))
+                                acc, music21Note))
                             
     # octave mark
     # -----------

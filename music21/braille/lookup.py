@@ -380,6 +380,7 @@ symbols = {'space': _B[0],
            'full_inaccord': _B[126] + _B[345],
            'repeat': _B[2356],
            'print-pagination': _B[5] + _B[25], # used to indicate page turnover for sighted
+           'braille-music-parenthesis': _B[6] + _B[3] # [T17, 17.6, degarmo chp. 10]
            }
 
 ascii_chars = {_B[0]: ' ',

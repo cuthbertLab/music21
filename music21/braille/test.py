@@ -45,8 +45,7 @@ def example11_2():
     m = bm.getElementsByClass('Measure')
     for sm in m:
         sm.number -= 1
-    m[0].pop(3)
-    m[0].padAsAnacrusis()
+    m[0].padAsAnacrusis(useInitialRests=True)
     bm.measure(8).insert(3.0, BrailleSegmentDivision())
     return bm
 
@@ -169,9 +168,7 @@ class DeGarmoTest(unittest.TestCase):
             "E8 E8 G8 E8 D8 E8 G8 B8 d8 c8 B8 A8 G8 G8 G8 r8")
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
-        for unused_numRest in range(3):
-            m[0].pop(2)
-        m[0].padAsAnacrusis()
+        m[0].padAsAnacrusis(useInitialRests=True)
         for measure in m:
             measure.number -= 1
         self.methodArgs = {'suppressOctaveMarks': True}
@@ -216,9 +213,7 @@ class DeGarmoTest(unittest.TestCase):
                              "d8 e8 f8 d8 c8 d8 e8 f8 g8 e8 c8 e8 f8 r8")
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
-        for unused_numRest in range(2):
-            m[0].pop(2)
-        m[0].padAsAnacrusis()
+        m[0].padAsAnacrusis(useInitialRests=True)
         for measure in m:
             measure.number -= 1
         self.s = bm
@@ -1088,9 +1083,7 @@ class DeGarmoTest(unittest.TestCase):
                 "G8 E-8 A-8 G8 C8 F8 E-8 GG8 D8 C8 GG8 EE-8 FF8 D8 C8 BBn8 GG8 GG8 CC4. r4")
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
-        for unused_numRest in range(2):
-            m[0].pop(2)
-        m[0].padAsAnacrusis()
+        m[0].padAsAnacrusis(useInitialRests=True)
         for measure in m:
             measure.number -= 1
         bm.measure(7).notes[3].pitch.accidental = pitch.Accidental()
@@ -1280,8 +1273,7 @@ class DeGarmoTest(unittest.TestCase):
         bm.insert(0, tempo.TempoText("Con delicatezza"))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
-        m[0].pop(4)
-        m[0].padAsAnacrusis()
+        m[0].padAsAnacrusis(useInitialRests=True)
         for measure in m:
             measure.number -= 1
         self.s = bm
@@ -1318,8 +1310,7 @@ class DeGarmoTest(unittest.TestCase):
         bm.insert(0, tempo.MetronomeMark(number=112, referent=note.Note(type='half')))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
-        m[0].pop(5)
-        m[0].padAsAnacrusis()
+        m[0].padAsAnacrusis(useInitialRests=True)
         for measure in m:
             measure.number -= 1
         self.s = bm
@@ -1521,8 +1512,7 @@ class DeGarmoTest(unittest.TestCase):
         bmsave = bm
         bm = bmsave.getElementsByClass('Measure')
         
-        bm[0].pop(4)
-        bm[0].padAsAnacrusis()
+        bm[0].padAsAnacrusis(useInitialRests=True)
         for m in bm:
             m.number -= 1
         bm[0].notes[0].articulations.append(Fingering('2'))
@@ -1781,245 +1771,356 @@ class DeGarmoTest(unittest.TestCase):
 # Chapter 10: Changes of Signature; the Braille Music Hyphen, Asterisk, and 
 # Parenthesis; Clef Signs
 
-def test_example10_1():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example10_1(), inPlace=True))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠣⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠼⠁⠀⠐⠻⠨⠙⠑⠙⠚⠀⠼⠃⠲⠀⠐⠪⠳⠣⠅⠄⠀⠡⠣⠣⠣⠼⠋⠦⠀⠐⠋⠨⠋⠑⠫⠐⠓
-    ⠀⠀⠼⠉⠲⠀⠐⠪⠳⠻⠣⠅⠄⠀⠡⠡⠡⠀⠐⠓⠛⠋⠑⠙⠚⠀⠝⠄⠣⠅
-    """
-    bm = stream.Part()
+    def test_example10_1(self):
+        bm = stream.Part()
+        
+        m1 = stream.Measure(number=1)
+        m1.append(clef.TrebleClef())
+        m1.append(key.KeySignature(-4))
+        m1.append(meter.TimeSignature('6/8'))
+        m1.append(note.Note('F4'))
+        m1.append(note.Note('C5', quarterLength=0.5))
+        m1.append(note.Note('D-5', quarterLength=0.5))
+        m1.append(note.Note('C5', quarterLength=0.5))
+        m1.append(note.Note('B-4', quarterLength=0.5))
+        bm.append(m1)
+        
+        m2 = stream.Measure(number=2)
+        m2.append(meter.TimeSignature('2/4'))
+        m2.append(note.Note('A-4'))
+        m2.append(note.Note('G4'))
+        m2.rightBarline = bar.Barline('double')
+        bm.append(m2)
+        
+        m3 = stream.Measure(number=3)
+        m3.append(key.KeySignature(-3))
+        m3.append(meter.TimeSignature('6/8'))
+        m3.append(note.Note('E-4', quarterLength=0.5))
+        m3.append(note.Note('E-5', quarterLength=0.5))
+        m3.append(note.Note('D5', quarterLength=0.5))
+        m3.append(note.Note('E-5'))
+        m3.append(note.Note('G4', quarterLength=0.5))
+        bm.append(m3)
+        
+        m4 = stream.Measure(number=4)
+        m4.append(meter.TimeSignature('3/4'))
+        m4.append(note.Note('A-4'))
+        m4.append(note.Note('G4'))
+        m4.append(note.Note('F4'))
+        m4.rightBarline = bar.Barline('double')
+        bm.append(m4)
+        
+        m5 = stream.Measure(number=5)
+        m5.append(key.KeySignature(0))
+        m5.append(note.Note('G4', quarterLength=0.5))
+        m5.append(note.Note('F4', quarterLength=0.5))
+        m5.append(note.Note('E4', quarterLength=0.5))
+        m5.append(note.Note('D4', quarterLength=0.5))
+        m5.append(note.Note('C4', quarterLength=0.5))
+        m5.append(note.Note('B3', quarterLength=0.5))
+        bm.append(m5)
+        
+        m6 = stream.Measure(number=6)
+        m6.append(note.Note('C4', quarterLength=3.0))
+        m6.rightBarline = bar.Barline('final')
+        bm.append(m6)
     
-    m1 = stream.Measure(number=1)
-    m1.append(clef.TrebleClef())
-    m1.append(key.KeySignature(-4))
-    m1.append(meter.TimeSignature('6/8'))
-    m1.append(note.Note('F4'))
-    m1.append(note.Note('C5', quarterLength=0.5))
-    m1.append(note.Note('D-5', quarterLength=0.5))
-    m1.append(note.Note('C5', quarterLength=0.5))
-    m1.append(note.Note('B-4', quarterLength=0.5))
-    bm.append(m1)
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)    
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠣⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠐⠻⠨⠙⠑⠙⠚⠀⠼⠃⠲⠀⠐⠪⠳⠣⠅⠄⠀⠡⠣⠣⠣⠼⠋⠦⠀⠐⠋⠨⠋⠑⠫⠐⠓
+        ⠀⠀⠼⠉⠲⠀⠐⠪⠳⠻⠣⠅⠄⠀⠡⠡⠡⠀⠐⠓⠛⠋⠑⠙⠚⠀⠝⠄⠣⠅
+        '''
     
-    m2 = stream.Measure(number=2)
-    m2.append(meter.TimeSignature('2/4'))
-    m2.append(note.Note('A-4'))
-    m2.append(note.Note('G4'))
-    m2.rightBarline = bar.Barline('double')
-    bm.append(m2)
+    def test_example10_2(self):
+        self.methodArgs = {'dummyRestLength': 5, 'lineLength': 20}
+        bm = converter.parse("tinynotation: 4/4 e8 f# g# a b- gn e c f a g c a2").flat
+        bm.insert(0, key.KeySignature(-1))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m = bm.getElementsByClass('Measure')
+        m[1].notesAndRests[0].pitch.accidental.displayStatus = False
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠄⠄⠄⠄⠄⠀⠐⠋⠩⠛⠩⠓⠊⠐
+        ⠀⠀⠐⠚⠡⠓⠋⠙⠀⠛⠊⠓⠙⠐⠎⠣⠅        
+        '''
     
-    m3 = stream.Measure(number=3)
-    m3.append(key.KeySignature(-3))
-    m3.append(meter.TimeSignature('6/8'))
-    m3.append(note.Note('E-4', quarterLength=0.5))
-    m3.append(note.Note('E-5', quarterLength=0.5))
-    m3.append(note.Note('D5', quarterLength=0.5))
-    m3.append(note.Note('E-5'))
-    m3.append(note.Note('G4', quarterLength=0.5))
-    bm.append(m3)
+    def test_example10_3(self):
+        self.methodArgs = {'dummyRestLength': 10, 'lineLength': 21}
+        bm = converter.parse("tinynotation: 6/8 e8 f# g# a b- g e c f a g c a2.").flat
+        bm.insert(0, key.KeySignature(-1))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m = bm.getElementsByClass('Measure')
+        m[1].notesAndRests[2].pitch.accidental.displayStatus = False
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠀⠐⠋⠩⠛⠩⠓⠐
+        ⠀⠀⠐⠊⠚⠡⠓⠀⠋⠙⠛⠊⠓⠙⠀⠐⠎⠄⠣⠅
+        '''
     
-    m4 = stream.Measure(number=4)
-    m4.append(meter.TimeSignature('3/4'))
-    m4.append(note.Note('A-4'))
-    m4.append(note.Note('G4'))
-    m4.append(note.Note('F4'))
-    m4.rightBarline = bar.Barline('double')
-    bm.append(m4)
+    def test_example10_4(self):
+        self.methodArgs = {'dummyRestLength': 10}
+        bm = converter.parse(
+            "tinynotation: 12/8 e2.~ e8 f# g# a b- gn c d e f4.~ f8 e f g f e f2.").flat
+        bm.insert(0, key.KeySignature(-1))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m = bm.getElementsByClass('Measure')
+        m[1].notesAndRests[3].pitch.accidental.displayStatus = False
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠁⠃⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠀⠐⠏⠄⠈⠉⠋⠩⠛⠩⠓⠊⠚⠡⠓⠀⠙⠑⠋⠻⠄⠈⠉⠛⠐
+        ⠀⠀⠐⠋⠛⠓⠛⠋⠀⠟⠄⠣⠅
+        '''
+        
+    def test_example10_5(self):
+        bm = converter.parse("tinynotation: 3/4 g4. f8 e-4 B-4 b-4 g4 f2 g4 e'-4. d'8 c'4 d'4 g4 bn4 " +
+                             "d'4 c'4 c'4 a-4. g8 f4 c4 c'4 en4 f2.").flat
+        bm.insert(0, key.KeySignature(-3))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m = bm.getElementsByClass('Measure')
+        m[2].insert(1, bar.Barline('double'))
+        m[5].insert(2, key.KeySignature(-4))
+        m[5].insert(2, bar.Barline('double'))
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠐⠳⠄⠛⠫⠀⠸⠺⠐⠺⠳⠀⠟⠣⠅⠄⠐⠀⠐⠳⠀⠨⠫⠄⠑⠹⠀⠱⠐⠳⠡⠺
+        ⠀⠀⠨⠱⠹⠣⠅⠄⠐⠀⠼⠙⠣⠀⠨⠹⠀⠪⠄⠓⠻⠀⠹⠨⠹⠡⠐⠫⠀⠟⠄⠣⠅
+        '''
     
-    m5 = stream.Measure(number=5)
-    m5.append(key.KeySignature(0))
-    m5.append(note.Note('G4', quarterLength=0.5))
-    m5.append(note.Note('F4', quarterLength=0.5))
-    m5.append(note.Note('E4', quarterLength=0.5))
-    m5.append(note.Note('D4', quarterLength=0.5))
-    m5.append(note.Note('C4', quarterLength=0.5))
-    m5.append(note.Note('B3', quarterLength=0.5))
-    bm.append(m5)
+    def test_example10_6(self):
+        bm = converter.parse("tinynotation: 4/4 a4 a'~ a'8 g'# f'# e' f'#4 " + 
+                             "e'~ e'8 d' c'# b d'4 c'#~ c'#8 b a b " +
+                             "c'#2 r8 a'8 g'# f'# e' d' c'# b a b c'# b a2. r4", makeNotation=False)
+        bm.insert(0, key.KeySignature(3))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m = bm.getElementsByClass('Measure')
+        m[3].insert(2.0, bar.Barline('double'))
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠐⠪⠨⠪⠈⠉⠊⠓⠛⠋⠀⠻⠫⠈⠉⠋⠑⠙⠚⠀⠱⠹⠈⠉⠙⠚⠊⠚⠀⠝⠣⠅⠄
+        ⠀⠀⠭⠨⠊⠓⠛⠀⠋⠑⠙⠚⠊⠚⠙⠚⠀⠎⠄⠧⠣⠅
+        '''
     
-    m6 = stream.Measure(number=6)
-    m6.append(note.Note('C4', quarterLength=3.0))
-    m6.rightBarline = bar.Barline('final')
-    bm.append(m6)
-
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)    
-    return bm
-
-def test_example10_2():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example10_2(), inPlace=True, 
-    ...            dummyRestLength=5, lineLength=20))
-    ⠀⠀⠀⠀⠀⠀⠀⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀
-    ⠼⠁⠀⠄⠄⠄⠄⠄⠀⠐⠋⠩⠛⠩⠓⠊⠐
-    ⠀⠀⠐⠚⠡⠓⠋⠙⠀⠛⠊⠓⠙⠐⠎⠣⠅
-    """
-    bm = converter.parse("tinynotation: 4/4 e8 f# g# a b- gn e c f a g c a2").flat
-    bm.insert(0, key.KeySignature(-1))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    m[1].notesAndRests[0].pitch.accidental.displayStatus = False
-    return bm
-
-def test_example10_3():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example10_3(), inPlace=True, 
-    ...                dummyRestLength=10, lineLength=21))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠼⠁⠀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠀⠐⠋⠩⠛⠩⠓⠐
-    ⠀⠀⠐⠊⠚⠡⠓⠀⠋⠙⠛⠊⠓⠙⠀⠐⠎⠄⠣⠅
-    """
-    bm = converter.parse("tinynotation: 6/8 e8 f# g# a b- g e c f a g c a2.").flat
-    bm.insert(0, key.KeySignature(-1))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    m[1].notesAndRests[2].pitch.accidental.displayStatus = False
-    return bm
-
-def test_example10_4():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example10_4(), inPlace=True, dummyRestLength=10))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠁⠃⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠼⠁⠀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠀⠐⠏⠄⠈⠉⠋⠩⠛⠩⠓⠊⠚⠡⠓⠀⠙⠑⠋⠻⠄⠈⠉⠛⠐
-    ⠀⠀⠐⠋⠛⠓⠛⠋⠀⠟⠄⠣⠅
-    """
-    bm = converter.parse(
-        "tinynotation: 12/8 e2.~ e8 f# g# a b- gn c d e f4.~ f8 e f g f e f2.").flat
-    bm.insert(0, key.KeySignature(-1))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    m[1].notesAndRests[3].pitch.accidental.displayStatus = False
-    return bm
+    def test_example10_9(self):
+        self.methodArgs = {'showClefSigns': False}
+        bm = converter.parse("tinynotation: 4/4 BB-4 F B- f b- d' c' a b-1", makeNotation=False)
+        bm.insert(0, key.KeySignature(-2))
+        bm.insert(0, clef.BassClef())
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m = bm.getElementsByClass('Measure')
+        m[0].insert(3.0, clef.TrebleClef())
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠘⠺⠸⠻⠺⠐⠻⠀⠺⠱⠹⠪⠀⠾⠣⠅
+        '''
+        self.methodArgs = {'showClefSigns': True}
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠜⠼⠇⠘⠺⠸⠻⠺⠜⠌⠇⠐⠻⠀⠺⠱⠹⠪⠀⠾⠣⠅
+        '''
     
-def test_example10_5():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example10_5(), inPlace=True))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠼⠁⠀⠐⠳⠄⠛⠫⠀⠸⠺⠐⠺⠳⠀⠟⠣⠅⠄⠐⠀⠐⠳⠀⠨⠫⠄⠑⠹⠀⠱⠐⠳⠡⠺
-    ⠀⠀⠨⠱⠹⠣⠅⠄⠐⠀⠼⠙⠣⠀⠨⠹⠀⠪⠄⠓⠻⠀⠹⠨⠹⠡⠐⠫⠀⠟⠄⠣⠅
-    """
-    bm = converter.parse("tinynotation: 3/4 g4. f8 e-4 B-4 b-4 g4 f2 g4 e'-4. d'8 c'4 d'4 g4 bn4 " +
-                         "d'4 c'4 c'4 a-4. g8 f4 c4 c'4 en4 f2.").flat
-    bm.insert(0, key.KeySignature(-3))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    m[2].insert(1, bar.Barline('double'))
-    m[5].insert(2, key.KeySignature(-4))
-    m[5].insert(2, bar.Barline('double'))
-    return bm
-
-def test_example10_6():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example10_6(), inPlace=True))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠼⠁⠀⠐⠪⠨⠪⠈⠉⠊⠓⠛⠋⠀⠻⠫⠈⠉⠋⠑⠙⠚⠀⠱⠹⠈⠉⠙⠚⠊⠚⠀⠝⠣⠅⠄
-    ⠀⠀⠭⠨⠊⠓⠛⠀⠋⠑⠙⠚⠊⠚⠙⠚⠀⠎⠄⠧⠣⠅
-    """
-    bm = converter.parse("tinynotation: 4/4 a4 a'~ a'8 g'# f'# e' f'#4 " + 
-                         "e'~ e'8 d' c'# b d'4 c'#~ c'#8 b a b " +
-                         "c'#2 r8 a'8 g'# f'# e' d' c'# b a b c'# b a2. r4", makeNotation=False)
-    bm.insert(0, key.KeySignature(3))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    m[3].insert(2.0, bar.Barline('double'))
-    return bm
-
-def test_example10_9():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example10_9(), inPlace=True, showClefSigns=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀
-    ⠼⠁⠀⠘⠺⠸⠻⠺⠐⠻⠀⠺⠱⠹⠪⠀⠾⠣⠅
-    >>> print(translate.partToBraille(test.test_example10_9(), inPlace=True, showClefSigns=True))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠼⠁⠀⠜⠼⠇⠘⠺⠸⠻⠺⠜⠌⠇⠐⠻⠀⠺⠱⠹⠪⠀⠾⠣⠅
-    """
-    bm = converter.parse("tinynotation: 4/4 BB-4 F B- f b- d' c' a b-1", makeNotation=False)
-    bm.insert(0, key.KeySignature(-2))
-    bm.insert(0, clef.BassClef())
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    m[0].insert(3.0, clef.TrebleClef())
-    return bm
-
-def test_example10_10():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example10_10(), inPlace=True, showClefSigns=False))
-    ⠀⠀⠀⠀⠀⠀⠩⠩⠩⠼⠋⠦⠀⠀⠀⠀⠀⠀
-    ⠼⠁⠀⠐⠊⠋⠊⠚⠙⠑⠀⠋⠛⠓⠪⠄⠣⠅
-    >>> print(translate.partToBraille(test.test_example10_10(), inPlace=True, showClefSigns=True))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠩⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠼⠁⠀⠜⠬⠇⠐⠊⠋⠊⠚⠙⠑⠀⠜⠌⠇⠨⠋⠛⠓⠪⠄⠣⠅
-    """
-    bm = converter.parse("tinynotation: 6/8 a8 e a b c'# d' e' f'# g'# a'4.", makeNotation=False)
-    bm.insert(0, key.KeySignature(3))
-    bm.insert(0, clef.AltoClef())
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    m[1].insert(0.0, clef.TrebleClef())
-    return bm
-
-def test_drill10_2():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_drill10_2(), inPlace=True, cancelOutgoingKeySig=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠼⠁⠀⠐⠱⠻⠪⠻⠀⠑⠋⠛⠓⠎⠣⠅⠄⠀⠣⠣⠣⠀⠐⠫⠳⠺⠳⠀⠋⠛⠓⠊⠞⠣⠅⠄⠀⠼⠙⠩
-    ⠀⠀⠐⠫⠳⠺⠳⠀⠋⠛⠓⠊⠞⠣⠅⠄⠀⠣⠀⠐⠻⠪⠹⠪⠀⠛⠓⠊⠚⠝⠣⠅⠄⠀⠼⠋⠣
-    ⠀⠀⠐⠳⠺⠱⠺⠀⠓⠊⠚⠙⠕⠣⠅⠄⠀⠨⠱⠺⠳⠺⠀⠑⠙⠚⠊⠗⠣⠅⠄
-    """
-    bm = converter.parse("""tinynotation: 4/4 d4 f# a f# d8 e f# g a2 e-4 g b- g e-8 f g a- b-2
-        e4 g# b g# e8 f# g# a b2 f4 a c' a f8 g a b- c'2
-        g-4 b- d'- b- g-8 a- b- c'- d'-2 d'4 b g b d'8 c' b a g2""", makeNotation=False)
-    bm.insert(0.0, key.KeySignature(2))
-    bm.insert(8.0, key.KeySignature(-3))
-    bm.insert(16.0, key.KeySignature(4))
-    bm.insert(24.0, key.KeySignature(-1))
-    bm.insert(32.0, key.KeySignature(-6))
-    bm.insert(40.0, key.KeySignature(0))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    m[1].rightBarline = bar.Barline('double')
-    m[3].rightBarline = bar.Barline('double')
-    m[5].rightBarline = bar.Barline('double')
-    m[7].rightBarline = bar.Barline('double')
-    m[9].rightBarline = bar.Barline('double')
-    m[11].rightBarline = bar.Barline('double')
-    return bm
-
-def test_drill10_4():
-    # TODO: 4/4 as c symbol.
-    bm = converter.parse("""tinynotation: 4/4 r2. AA4 DD r d2~ d8 f e d c#4 
-        A B-2~ B-8 d cn B- A4 F D E 
-        F G8 A B-4 c#8 Bn c# d d e f a a4 g8 e c# g f d Bn f e c# A e d cn B- d 
-        c4 B-8 A G4 F8 E D4 AA DD""")
-    bm.insert(0, key.KeySignature(-1))
-    bm.insert(0, clef.BassClef())
-    bm.insert(0, tempo.TempoText("Con brio"))
-    bm.insert(25.0, clef.TrebleClef())
-    bm.insert(32.0, clef.BassClef())
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    m[0].pop(4)
-    m[0].padAsAnacrusis()
-    for sm in m:
-        sm.number -= 1
-    return bm
-
+    def test_example10_10(self):
+        self.methodArgs = {'showClefSigns': False}
+        bm = converter.parse("tinynotation: 6/8 a8 e a b c'# d' e' f'# g'# a'4.", makeNotation=False)
+        bm.insert(0, key.KeySignature(3))
+        bm.insert(0, clef.AltoClef())
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m = bm.getElementsByClass('Measure')
+        m[1].insert(0.0, clef.TrebleClef())
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠩⠩⠩⠼⠋⠦⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠐⠊⠋⠊⠚⠙⠑⠀⠋⠛⠓⠪⠄⠣⠅        
+        '''
+        self.methodArgs = {'showClefSigns': True}
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠩⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠜⠬⠇⠐⠊⠋⠊⠚⠙⠑⠀⠜⠌⠇⠨⠋⠛⠓⠪⠄⠣⠅
+        '''
+    
+    def test_drill10_2(self):
+        self.methodArgs = {'cancelOutgoingKeySig': False}
+        bm = converter.parse("""tinynotation: 4/4 d4 f# a f# d8 e f# g a2 e-4 g b- g e-8 f g a- b-2
+            e4 g# b g# e8 f# g# a b2 f4 a c' a f8 g a b- c'2
+            g-4 b- d'- b- g-8 a- b- c'- d'-2 d'4 b g b d'8 c' b a g2""", makeNotation=False)
+        bm.insert(0.0, key.KeySignature(2))
+        bm.insert(8.0, key.KeySignature(-3))
+        bm.insert(16.0, key.KeySignature(4))
+        bm.insert(24.0, key.KeySignature(-1))
+        bm.insert(32.0, key.KeySignature(-6))
+        bm.insert(40.0, key.KeySignature(0))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m = bm.getElementsByClass('Measure')
+        m[1].rightBarline = bar.Barline('double')
+        m[3].rightBarline = bar.Barline('double')
+        m[5].rightBarline = bar.Barline('double')
+        m[7].rightBarline = bar.Barline('double')
+        m[9].rightBarline = bar.Barline('double')
+        m[11].rightBarline = bar.Barline('double')
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠐⠱⠻⠪⠻⠀⠑⠋⠛⠓⠎⠣⠅⠄⠀⠣⠣⠣⠀⠐⠫⠳⠺⠳⠀⠋⠛⠓⠊⠞⠣⠅⠄⠀⠼⠙⠩
+        ⠀⠀⠐⠫⠳⠺⠳⠀⠋⠛⠓⠊⠞⠣⠅⠄⠀⠣⠀⠐⠻⠪⠹⠪⠀⠛⠓⠊⠚⠝⠣⠅⠄⠀⠼⠋⠣
+        ⠀⠀⠐⠳⠺⠱⠺⠀⠓⠊⠚⠙⠕⠣⠅⠄⠀⠨⠱⠺⠳⠺⠀⠑⠙⠚⠊⠗⠣⠅⠄        
+        '''
+    # test_drill10_3 -- requires alternate time signature symbols
+    
+    def test_drill10_4(self):
+        # TODO: 4/4 as c symbol.
+        bm = converter.parse("""tinynotation: 4/4 r2. AA4 DD r d2~ d8 f e d c#4 
+            A B-2~ B-8 d cn B- A4 F D E 
+            F G8 A B-4 c#8 Bn c# d d e f a a4 g8 e c# g f d Bn f e c# A e d cn B- d 
+            c4 B-8 A G4 F8 E D4 AA DD""").flat
+        bm.insert(0, key.KeySignature(-1))
+        bm.insert(0, tempo.TempoText("Con brio"))
+        bm.insert(25.0, clef.TrebleClef())
+        bm.insert(32.0, clef.BassClef())
+        bm.recurse().getElementsByClass('TimeSignature')[0].symbol = 'common'
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m = bm.getElementsByClass('Measure')
+        m[0].padAsAnacrusis(useInitialRests=True)
+        m[3].notes[3].pitch.accidental.displayStyle = 'parentheses'
+        m[8].notes[6].pitch.accidental.displayStatus = False
+        for sm in m:
+            sm.number -= 1
+        self.setUp()
+        self.methodArgs = {'showClefSigns': True}
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠉⠕⠝⠀⠃⠗⠊⠕⠲⠀⠣⠨⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠚⠀⠜⠼⠇⠘⠪⠀⠱⠧⠐⠕⠈⠉⠀⠑⠛⠋⠑⠩⠹⠪⠀⠞⠈⠉⠚⠑⠠⠄⠡⠠⠄⠙⠚
+        ⠀⠀⠸⠪⠻⠱⠫⠀⠻⠓⠊⠺⠩⠙⠡⠚⠀⠩⠙⠑⠜⠌⠇⠐⠑⠋⠛⠊⠪⠀⠓⠋⠩⠙⠓⠐
+        ⠀⠀⠐⠛⠑⠡⠚⠐⠛⠀⠜⠼⠇⠐⠋⠩⠙⠊⠐⠋⠑⠡⠙⠚⠑⠀⠹⠚⠊⠳⠛⠋⠀⠱⠘⠪⠱⠣⠅
+        '''
+        self.e = '''
+---begin segment---
+<music21.braille.segment BrailleSegment>
+Measure 0, Signature Grouping 1:
+Key Signature 1 flat(s) ⠣
+Time Signature common ⠨⠉
+===
+Measure 0, Tempo Text Grouping 1:
+Tempo Text Con brio ⠠⠉⠕⠝⠀⠃⠗⠊⠕⠲
+===
+Measure 0, Note Grouping 1:
+Bass Clef ⠜⠼
+Octave 2 ⠘
+A quarter ⠪
+===
+Measure 1, Note Grouping 1:
+D quarter ⠱
+Rest quarter ⠧
+Octave 4 ⠐
+D half ⠕
+Tie ⠈⠉
+===
+Measure 2, Note Grouping 1:
+D eighth ⠑
+F eighth ⠛
+E eighth ⠋
+D eighth ⠑
+Accidental sharp ⠩
+C quarter ⠹
+A quarter ⠪
+===
+Measure 3, Note Grouping 1:
+B half ⠞
+Tie ⠈⠉
+B eighth ⠚
+D eighth ⠑
+Parenthesis ⠠⠄
+Accidental natural ⠡
+Parenthesis ⠠⠄
+C eighth ⠙
+B eighth ⠚
+===
+Measure 4, Note Grouping 1:
+Octave 3 ⠸
+A quarter ⠪
+F quarter ⠻
+D quarter ⠱
+E quarter ⠫
+===
+Measure 5, Note Grouping 1:
+F quarter ⠻
+G eighth ⠓
+A eighth ⠊
+B quarter ⠺
+Accidental sharp ⠩
+C eighth ⠙
+Accidental natural ⠡
+B eighth ⠚
+===
+Measure 6, Note Grouping 1:
+Accidental sharp ⠩
+C eighth ⠙
+D eighth ⠑
+Treble Clef ⠜⠌
+Octave 4 ⠐
+D eighth ⠑
+E eighth ⠋
+F eighth ⠛
+A eighth ⠊
+A quarter ⠪
+===
+Measure 7, Split Note Grouping A 1:
+G eighth ⠓
+E eighth ⠋
+Accidental sharp ⠩
+C eighth ⠙
+G eighth ⠓
+music hyphen ⠐
+===
+Measure 7, Split Note Grouping B 1:
+Octave 4 ⠐
+F eighth ⠛
+D eighth ⠑
+Accidental natural ⠡
+B eighth ⠚
+Octave 4 ⠐
+F eighth ⠛
+===
+Measure 8, Note Grouping 1:
+Bass Clef ⠜⠼
+Octave 4 ⠐
+E eighth ⠋
+Accidental sharp ⠩
+C eighth ⠙
+A eighth ⠊
+Octave 4 ⠐
+E eighth ⠋
+D eighth ⠑
+Accidental natural ⠡
+C eighth ⠙
+B eighth ⠚
+D eighth ⠑
+===
+Measure 9, Note Grouping 1:
+C quarter ⠹
+B eighth ⠚
+A eighth ⠊
+G quarter ⠳
+F eighth ⠛
+E eighth ⠋
+===
+Measure 10, Note Grouping 1:
+D quarter ⠱
+Octave 2 ⠘
+A quarter ⠪
+D quarter ⠱
+Barline final ⠣⠅
+===
+---end segment---        
+        '''
+    
 #-------------------------------------------------------------------------------
 # Chapter 11: Segments for Single-Line Instrumental Music, Format for the 
 # Beginning of a Composition or Movement
@@ -2781,8 +2882,7 @@ def test_example15_1():
                          makeNotation=False)
     bm.insert(0, key.KeySignature(1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    bm.getElementsByClass('Measure')[0].pop(3)
-    bm.getElementsByClass('Measure')[0].padAsAnacrusis()
+    bm.getElementsByClass('Measure')[0].padAsAnacrusis(useInitialRests=True)
     for m in bm.getElementsByClass('Measure'):
         m.number -= 1
     bm.getElementsByClass('Measure')[-1].rightBarline = None
@@ -2849,8 +2949,7 @@ def test_example15_5():
                          "b8. c'#8 e'8. d'16 c'#16 b16 a4").flat
     bm.insert(0, key.KeySignature(3))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    bm.getElementsByClass('Measure')[0].pop(3)
-    bm.getElementsByClass('Measure')[0].padAsAnacrusis()
+    bm.getElementsByClass('Measure')[0].padAsAnacrusis(useInitialRests=True)
     bm.getElementsByClass('Measure')[3][1].pitch.accidental.displayStatus = False 
         # remove cautionary accidental display
     for m in bm:
@@ -3211,12 +3310,10 @@ def test_example24_3():
     rhm[0].notes[0].articulations.append(Fingering('3'))
     lastRH.notes[0].articulations.append(Fingering('1'))
     lastRH.notes[1].articulations.append(Fingering('3'))
-    rhm[0].pop(3)
-    rhm[0].padAsAnacrusis()
+    rhm[0].padAsAnacrusis(useInitialRests=True)
     
     lhm = leftHand.getElementsByClass('Measure')
-    lhm[0].pop(3)
-    lhm[0].padAsAnacrusis()
+    lhm[0].padAsAnacrusis(useInitialRests=True)
     for m in rhm:
         m.number -= 1
     for m in lhm:
@@ -3443,7 +3540,7 @@ def test_example26_5():
  
 if __name__ == "__main__":
     import music21
-    music21.mainTest(DeGarmoTest, verbose=True) #, runTest='test13_18')
+    music21.mainTest(DeGarmoTest, verbose=True) #, runTest='test_drill10_4')
 
 #------------------------------------------------------------------------------
 # eof
