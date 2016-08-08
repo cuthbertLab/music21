@@ -134,7 +134,7 @@ class BrailleText(object):
         >>> bt.currentLine.append('hi', addSpace=False)
         >>> print(str(bt))
         hi
-        >>> c = braille.lookup.c['quarter']  # dots 1456
+        >>> c = braille.lookup.pitchNameToNotes['C']['quarter']  # dots 1456
         >>> bt.addToNewLine(c + c + c)
         >>> print(str(bt))
         hi
