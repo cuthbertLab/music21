@@ -34,6 +34,23 @@ from music21.articulations import Fingering
 from music21.braille.objects import BrailleSegmentDivision
 from music21.braille.translate import partToBraille, measureToBraille #, keyboardPartsToBraille
 
+# called elsewhere:
+def example11_2():
+    bm = converter.parse("""tinynotation: 4/4 r2. b-4 g e- d e- g2 f4 
+        e- a- g c'4. c'8 b-2. b-4 e'-4 b- a-4. g8 
+        g2 f4 c' c' f a-4. d8 e-2. g4 g4. f8 f4 f a-2 g4 b- b- an an c' 
+        b-2. b-4 e'- b- a- g g2 f4 c' c' r f r a-2. d4 e-2.""").flat
+    bm.insert(0, key.KeySignature(-3))
+    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+    m = bm.getElementsByClass('Measure')
+    for sm in m:
+        sm.number -= 1
+    m[0].pop(3)
+    m[0].padAsAnacrusis()
+    bm.measure(8).insert(3.0, BrailleSegmentDivision())
+    return bm
+
+
 # Examples follow the order in:
 #   Introduction to Braille Music Transcription, Second Edition (2005)
 # Mary Turner De Garmo
@@ -2038,20 +2055,9 @@ def test_example11_2():
     ⠼⠓⠄⠀⠐⠳⠀⠳⠄⠛⠻⠻⠀⠎⠳⠺⠀⠺⠡⠪⠪⠹⠀⠞⠄⠺⠀⠨⠫⠐⠺⠪⠳⠀⠗⠻⠨⠹
     ⠀⠀⠨⠹⠧⠐⠻⠧⠀⠎⠄⠱⠀⠏⠄⠣⠅
     """
-    bm = converter.parse("""tinynotation: 4/4 r2. b-4 g e- d e- g2 f4 
-        e- a- g c'4. c'8 b-2. b-4 e'-4 b- a-4. g8 
-        g2 f4 c' c' f a-4. d8 e-2. g4 g4. f8 f4 f a-2 g4 b- b- an an c' 
-        b-2. b-4 e'- b- a- g g2 f4 c' c' r f r a-2. d4 e-2.""").flat
-    bm.insert(0, key.KeySignature(-3))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    for sm in m:
-        sm.number -= 1
-    m[0].pop(3)
-    m[0].padAsAnacrusis()
-    bm.measure(8).insert(3.0, BrailleSegmentDivision())
+    # this example was used elsewhere, so needed to be retained.
+    bm = example11_2() 
     return bm
-
 #-------------------------------------------------------------------------------
 # Chapter 12: Slurs (Phrasing)
 
