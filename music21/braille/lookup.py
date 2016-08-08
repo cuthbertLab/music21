@@ -70,7 +70,7 @@ def makeBrailleDictionary():
 _B = makeBrailleDictionary()
 
 def dotsAdd(dotIter):
-    '''
+    u'''
     takes in an iterable of dots and returns them added together.
     
     >>> print(braille.lookup.dotsAdd([12, 3, 4]))
