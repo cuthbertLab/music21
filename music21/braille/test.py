@@ -2125,551 +2125,512 @@ Barline final ⠣⠅
 # Chapter 11: Segments for Single-Line Instrumental Music, Format for the 
 # Beginning of a Composition or Movement
 
-def test_example11_1():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example11_1(), inPlace=True))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠼⠁⠀⠸⠱⠋⠛⠓⠊⠀⠺⠪⠓⠛⠀⠋⠑⠙⠑⠋⠛⠀⠳⠪⠧⠀⠺⠙⠑⠋⠛⠀⠫⠱⠙⠚
-    ⠀⠀⠐⠙⠋⠑⠙⠚⠩⠊⠀⠞⠧
-    ⠼⠊⠀⠐⠻⠑⠙⠺⠀⠐⠫⠙⠚⠩⠪⠀⠐⠱⠚⠡⠊⠩⠳⠀⠎⠧⠀⠪⠓⠛⠋⠑⠀⠹⠱⠋⠛
-    ⠀⠀⠸⠓⠊⠚⠊⠓⠛⠀⠫⠱⠧⠣⠅
-    """
-    bm = converter.parse("""tinynotation: 3/4 D4 E8 F#8 G8 A8 B4 A4 G8 F#8 
-        E8 D8 C#8 D8 E8 F#8 G4 A4 r4 B4 c#8 d8 e8 f#8 e4 d4 c#8 B8 
-        c#8 e8 d8 c#8 B8 A#8 B2 r4 f#4 d8 c#8 B4 e4 c#8 B8 A#4 d4 B8 An8 G#4 A2 r4 
-        A4 G8 F#8 E8 D8 C#4 D4 E8 F#8 G8 A8 B8 A8 G8 F#8 E4 D4 r4""").flat
-    bm.insert(0, key.KeySignature(2))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    bm.measure(9).insert(0, BrailleSegmentDivision())
-    return bm
-
-def test_example11_2():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example11_2(), inPlace=True))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠼⠚⠀⠐⠺⠀⠳⠫⠱⠫⠀⠗⠻⠫⠀⠪⠳⠨⠹⠄⠙⠀⠞⠄⠺⠀⠨⠫⠐⠺⠪⠄⠓⠀⠗⠻⠨⠹
-    ⠀⠀⠨⠹⠐⠻⠪⠄⠑⠀⠏⠄⠐
-    ⠼⠓⠄⠀⠐⠳⠀⠳⠄⠛⠻⠻⠀⠎⠳⠺⠀⠺⠡⠪⠪⠹⠀⠞⠄⠺⠀⠨⠫⠐⠺⠪⠳⠀⠗⠻⠨⠹
-    ⠀⠀⠨⠹⠧⠐⠻⠧⠀⠎⠄⠱⠀⠏⠄⠣⠅
-    """
-    # this example was used elsewhere, so needed to be retained.
-    bm = example11_2() 
-    return bm
+    def test_example11_1(self):
+        bm = converter.parse("""tinynotation: 3/4 D4 E8 F#8 G8 A8 B4 A4 G8 F#8 
+            E8 D8 C#8 D8 E8 F#8 G4 A4 r4 B4 c#8 d8 e8 f#8 e4 d4 c#8 B8 
+            c#8 e8 d8 c#8 B8 A#8 B2 r4 f#4 d8 c#8 B4 e4 c#8 B8 A#4 d4 B8 An8 G#4 A2 r4 
+            A4 G8 F#8 E8 D8 C#4 D4 E8 F#8 G8 A8 B8 A8 G8 F#8 E4 D4 r4""").flat
+        bm.insert(0, key.KeySignature(2))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        bm.measure(9).insert(0, BrailleSegmentDivision())
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠸⠱⠋⠛⠓⠊⠀⠺⠪⠓⠛⠀⠋⠑⠙⠑⠋⠛⠀⠳⠪⠧⠀⠺⠙⠑⠋⠛⠀⠫⠱⠙⠚
+        ⠀⠀⠐⠙⠋⠑⠙⠚⠩⠊⠀⠞⠧
+        ⠼⠊⠀⠐⠻⠑⠙⠺⠀⠐⠫⠙⠚⠩⠪⠀⠐⠱⠚⠡⠊⠩⠳⠀⠎⠧⠀⠪⠓⠛⠋⠑⠀⠹⠱⠋⠛
+        ⠀⠀⠸⠓⠊⠚⠊⠓⠛⠀⠫⠱⠧⠣⠅        
+        '''
+    
+    def test_example11_2(self):
+        # this example was used elsewhere, so needed to be retained.
+        bm = example11_2() 
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠚⠀⠐⠺⠀⠳⠫⠱⠫⠀⠗⠻⠫⠀⠪⠳⠨⠹⠄⠙⠀⠞⠄⠺⠀⠨⠫⠐⠺⠪⠄⠓⠀⠗⠻⠨⠹
+        ⠀⠀⠨⠹⠐⠻⠪⠄⠑⠀⠏⠄⠐
+        ⠼⠓⠄⠀⠐⠳⠀⠳⠄⠛⠻⠻⠀⠎⠳⠺⠀⠺⠡⠪⠪⠹⠀⠞⠄⠺⠀⠨⠫⠐⠺⠪⠳⠀⠗⠻⠨⠹
+        ⠀⠀⠨⠹⠧⠐⠻⠧⠀⠎⠄⠱⠀⠏⠄⠣⠅
+        '''
 #-------------------------------------------------------------------------------
 # Chapter 12: Slurs (Phrasing)
 
-def test_example12_1():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example12_1(), inPlace=True, 
-    ...                                showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠐⠳⠄⠅⠉⠛⠫⠉⠱⠀⠳⠉⠻⠉⠫⠧⠀⠻⠃⠉⠳⠁⠉⠪⠉⠺⠀⠹⠉⠱⠉⠹⠧
-    """
-    bm = converter.parse(
-            "tinynotation: 4/4 g4. f8 e4 d4 g4 f4 e4 r4 f4 g4 a4 b4 c'4 d'4 c'4 r4").flat
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    m[0].notes[0].articulations.append(Fingering('5'))
-    m[2].notes[0].articulations.append(Fingering('2'))
-    m[2].notes[1].articulations.append(Fingering('1'))
-    m[0].append(spanner.Slur(m[0].notes[0], m[0].notes[1]))
-    m[0].append(spanner.Slur(m[0].notes[2], m[0].notes[3]))
-    m[1].append(spanner.Slur(m[1].notes[0], m[1].notes[2]))
-    m[2].append(spanner.Slur(m[2].notes[0], m[2].notes[3]))
-    m[3].append(spanner.Slur(m[3].notes[0], m[3].notes[2]))
-    m[3].rightBarline = None
-    return bm
+    def test_example12_1(self):
+        bm = converter.parse(
+                "tinynotation: 4/4 g4. f8 e4 d4 g4 f4 e4 r4 f4 g4 a4 b4 c'4 d'4 c'4 r4").flat
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m = bm.getElementsByClass('Measure')
+        m[0].notes[0].articulations.append(Fingering('5'))
+        m[2].notes[0].articulations.append(Fingering('2'))
+        m[2].notes[1].articulations.append(Fingering('1'))
+        m[0].append(spanner.Slur(m[0].notes[0], m[0].notes[1]))
+        m[0].append(spanner.Slur(m[0].notes[2], m[0].notes[3]))
+        m[1].append(spanner.Slur(m[1].notes[0], m[1].notes[2]))
+        m[2].append(spanner.Slur(m[2].notes[0], m[2].notes[3]))
+        m[3].append(spanner.Slur(m[3].notes[0], m[3].notes[2]))
+        m[3].rightBarline = None
+        self.s = bm
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠐⠳⠄⠅⠉⠛⠫⠉⠱⠀⠳⠉⠻⠉⠫⠧⠀⠻⠃⠉⠳⠁⠉⠪⠉⠺⠀⠹⠉⠱⠉⠹⠧
+        '''
+    
+    def test_example12_2(self):
+        bm = converter.parse("tinynotation: 4/4 g4. f8 e4 d g f e r f g a b c' d' c' r").flat
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m = bm.getElementsByClass('Measure')
+        m[1].append(spanner.Slur(m[0].notes[0], m[1].notes[2]))
+        m[3].append(spanner.Slur(m[2].notes[0], m[3].notes[2]))
+        m[0].notes[0].articulations.append(Fingering('5'))
+        m[2].notes[0].articulations.append(Fingering('1'))
+        m[3].notes[0].articulations.append(Fingering('1'))
+        m[3].rightBarline = None
+        self.s = bm
+        self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠐⠳⠄⠅⠉⠉⠛⠫⠱⠀⠳⠻⠉⠫⠧⠀⠻⠁⠉⠉⠳⠪⠺⠀⠹⠁⠱⠉⠹⠧
+        '''
+      
+    def test_example12_3(self):
+        bm = converter.parse("tinynotation: 4/4 e-4. f8 g4 e- f g a- r g g e'- d' c'2. r4").flat
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m = bm.getElementsByClass('Measure')
+        m[1].append(spanner.Slur(m[0].notes[0], m[1].notes[2]))
+        m[3].append(spanner.Slur(m[2].notes[0], m[3].notes[0]))
+        m[0].notes[0].articulations.append(Fingering('1'))
+        m[2].notes[0].articulations.append(Fingering('1'))
+        m[2].notes[2].articulations.append(Fingering('4'))
+        m[3].rightBarline = None
+        self.s = bm
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠰⠃⠣⠐⠫⠄⠁⠛⠳⠫⠀⠻⠳⠣⠪⠘⠆⠧⠀⠰⠃⠳⠁⠳⠣⠨⠫⠂⠱⠀⠝⠄⠘⠆⠧
+        '''
+    
+    def test_example12_4(self):
+        bm = converter.parse("tinynotation: 12/8 e'4. c'4 g'8 g'4. f'4 e'8").flat
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m = bm.getElementsByClass('Measure')
+        m[0].append(spanner.Slur(m[0].notes[0], m[0].notes[2]))
+        m[0].append(spanner.Slur(m[0].notes[3], m[0].notes[5]))
+        m[0].append(spanner.Slur(m[0].notes[0], m[0].notes[5]))
+        m[0].rightBarline = None
+        self.s = bm
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠼⠁⠃⠦⠀⠀⠀⠀⠀⠀
+        ⠰⠃⠨⠫⠄⠉⠹⠉⠓⠳⠄⠉⠻⠉⠋⠘⠆
+        '''
+    
+    def test_example12_5(self):
+        bm = converter.parse("tinynotation: 3/4 a2 b4 a8 f'# e' d' c'# b a4 b8 c'# d' e' f'#2."
+                             ).flat
+        bm.insert(0, key.KeySignature(2))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m = bm.getElementsByClass('Measure')
+        m[2].append(spanner.Slur(m[0].notes[0], m[2].notes[0]))
+        m[3].append(spanner.Slur(m[2].notes[0], m[3].notes[0])) 
+        m[3].rightBarline = None
+        self.setUp()
+        import copy
+        bmm = copy.deepcopy(bm)
+        self.s = bm
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠰⠃⠐⠎⠺⠀⠊⠨⠛⠋⠑⠙⠚⠀⠰⠃⠘⠆⠪⠚⠙⠑⠋⠀⠟⠄⠘⠆
+        '''
+        self.s = bmm
+        self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠐⠎⠉⠉⠺⠀⠊⠨⠛⠋⠑⠙⠚⠉⠀⠪⠉⠉⠚⠙⠑⠋⠉⠀⠟⠄
+        '''
 
-def test_example12_2():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example12_2(), inPlace=True, 
-    ...                    showFirstMeasureNumber=False, slurLongPhraseWithBrackets=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠐⠳⠄⠅⠉⠉⠛⠫⠱⠀⠳⠻⠉⠫⠧⠀⠻⠁⠉⠉⠳⠪⠺⠀⠹⠁⠱⠉⠹⠧
-    """
-    bm = converter.parse("tinynotation: 4/4 g4. f8 e4 d g f e r f g a b c' d' c' r").flat
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    m[1].append(spanner.Slur(m[0].notes[0], m[1].notes[2]))
-    m[3].append(spanner.Slur(m[2].notes[0], m[3].notes[2]))
-    m[0].notes[0].articulations.append(Fingering('5'))
-    m[2].notes[0].articulations.append(Fingering('1'))
-    m[3].notes[0].articulations.append(Fingering('1'))
-    m[3].rightBarline = None
-    return bm
-  
-def test_example12_3():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example12_3(), inPlace=True, 
-    ...                    showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠰⠃⠣⠐⠫⠄⠁⠛⠳⠫⠀⠻⠳⠣⠪⠘⠆⠧⠀⠰⠃⠳⠁⠳⠣⠨⠫⠂⠱⠀⠝⠄⠘⠆⠧
-    """
-    bm = converter.parse("tinynotation: 4/4 e-4. f8 g4 e- f g a- r g g e'- d' c'2. r4").flat
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    m[1].append(spanner.Slur(m[0].notes[0], m[1].notes[2]))
-    m[3].append(spanner.Slur(m[2].notes[0], m[3].notes[0]))
-    m[0].notes[0].articulations.append(Fingering('1'))
-    m[2].notes[0].articulations.append(Fingering('1'))
-    m[2].notes[2].articulations.append(Fingering('4'))
-    m[3].rightBarline = None
-    return bm
-
-def test_example12_4():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example12_4(), inPlace=True, 
-    ...                    showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠼⠁⠃⠦⠀⠀⠀⠀⠀⠀
-    ⠰⠃⠨⠫⠄⠉⠹⠉⠓⠳⠄⠉⠻⠉⠋⠘⠆
-    """
-    bm = converter.parse("tinynotation: 12/8 e'4. c'4 g'8 g'4. f'4 e'8").flat
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    m[0].append(spanner.Slur(m[0].notes[0], m[0].notes[2]))
-    m[0].append(spanner.Slur(m[0].notes[3], m[0].notes[5]))
-    m[0].append(spanner.Slur(m[0].notes[0], m[0].notes[5]))
-    m[0].rightBarline = None
-    return bm
-
-def test_example12_5():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example12_5(), inPlace=True, 
-    ...                            showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠰⠃⠐⠎⠺⠀⠊⠨⠛⠋⠑⠙⠚⠀⠰⠃⠘⠆⠪⠚⠙⠑⠋⠀⠟⠄⠘⠆
-    >>> print(translate.partToBraille(test.test_example12_5(), inPlace=True, 
-    ...                    showFirstMeasureNumber=False, slurLongPhraseWithBrackets=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠐⠎⠉⠉⠺⠀⠊⠨⠛⠋⠑⠙⠚⠉⠀⠪⠉⠉⠚⠙⠑⠋⠉⠀⠟⠄
-    """
-    bm = converter.parse("tinynotation: 3/4 a2 b4 a8 f'# e' d' c'# b a4 b8 c'# d' e' f'#2.").flat
-    bm.insert(0, key.KeySignature(2))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    m[2].append(spanner.Slur(m[0].notes[0], m[2].notes[0]))
-    m[3].append(spanner.Slur(m[2].notes[0], m[3].notes[0])) 
-    m[3].rightBarline = None
-    return bm
-
-def test_example12_6():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example12_6(), inPlace=True, 
-    ...                showFirstMeasureNumber=False, showShortSlursAndTiesTogether=False))
-    ⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀
-    ⠨⠝⠈⠉⠙⠉⠑⠀⠕⠈⠉⠑⠉⠋
-    >>> print(translate.partToBraille(test.test_example12_6(), inPlace=True, 
-    ...                showFirstMeasureNumber=False, showShortSlursAndTiesTogether=True))
-    ⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
-    ⠨⠝⠉⠈⠉⠙⠉⠑⠀⠕⠉⠈⠉⠑⠉⠋
-    """
-    bm = converter.parse("tinynotation: 3/4 c'2~ c'8 d' d'2~ d'8 e'").flat
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    m[0].append(spanner.Slur(m[0].notes[0], m[0].notes[2]))
-    m[1].append(spanner.Slur(m[1].notes[0], m[1].notes[2])) 
-    m[1].rightBarline = None
-    return bm
-  
-def test_example12_7():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example12_7(), inPlace=True, 
-    ...                            showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀
-    ⠰⠃⠨⠟⠄⠈⠉⠀⠛⠙⠑⠙⠚⠊⠘⠆
-    >>> print(translate.partToBraille(test.test_example12_7(), inPlace=True, 
-    ...                        showFirstMeasureNumber=False, slurLongPhraseWithBrackets=False))
-    ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀
-    ⠨⠟⠄⠈⠉⠀⠛⠉⠉⠙⠑⠙⠚⠉⠊
-    """
-    bm = converter.parse("tinynotation: 3/4 f'2.~ f'8 c' d' c' b- a").flat
-    bm.insert(0, key.KeySignature(-1))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    m[-1].append(spanner.Slur(m[0].notes[0], m[-1].notes[-1]))
-    m[-1].rightBarline = None
-    return bm
-
-def test_example12_8():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example12_8(), inPlace=True, 
-    ...                        showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀
-    ⠨⠟⠄⠈⠉⠀⠰⠃⠛⠙⠑⠙⠚⠊⠘⠆
-    >>> print(translate.partToBraille(test.test_example12_8(), inPlace=True, 
-    ...                        showFirstMeasureNumber=False, slurLongPhraseWithBrackets=False))
-    ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀
-    ⠨⠟⠄⠈⠉⠀⠛⠉⠉⠙⠑⠙⠚⠉⠊
-    """
-    bm = converter.parse("tinynotation: 3/4 f'2.~ f'8 c' d' c' b- a").flat
-    bm.insert(0, key.KeySignature(-1))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    ml = bm.getElementsByClass('Measure')[-1]
-    ml.append(spanner.Slur(ml.notes[0], ml.notes[-1]))
-    ml.rightBarline = None
-    return bm
-
-def test_example12_9():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example12_9(), inPlace=True, 
-    ...                        showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠰⠃⠨⠋⠛⠓⠛⠋⠑⠀⠝⠄⠈⠉⠀⠹⠘⠆⠧⠧
-    >>> print(translate.partToBraille(test.test_example12_9(), inPlace=True, 
-    ...                        showFirstMeasureNumber=False, slurLongPhraseWithBrackets=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠨⠋⠉⠉⠛⠓⠛⠋⠑⠉⠀⠝⠄⠈⠉⠀⠹⠧⠧
-    """
-    bm = converter.parse("tinynotation: 3/4 e'8 f' g' f' e' d' c'2.~ c'4 r r").flat
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    m[-1].append(spanner.Slur(m[0].notes[0], m[-1].notes[-1]))
-    m[-1].rightBarline = None
-    return bm
-
-def test_example12_10():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example12_10(), inPlace=True, 
-    ...                        showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠰⠃⠨⠋⠛⠓⠛⠋⠑⠀⠝⠄⠘⠆⠈⠉⠀⠹⠧⠧
-    >>> print(translate.partToBraille(test.test_example12_10(), inPlace=True, 
-    ...                        showFirstMeasureNumber=False, slurLongPhraseWithBrackets=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠨⠋⠉⠉⠛⠓⠛⠋⠑⠉⠀⠝⠄⠈⠉⠀⠹⠧⠧
-    """
-    bm = converter.parse("tinynotation: 3/4 e'8 f' g' f' e' d' c'2.~ c'4 r r").flat
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    m[1].append(spanner.Slur(m[0].notes[0], m[1].notes[0]))
-    m[-1].rightBarline = None
-    return bm
-
-def test_example12_11():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example12_11(), inPlace=True, 
-    ...                                showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀
-    ⠐⠹⠇⠉⠹⠃⠉⠹⠁⠉⠹⠇
-    """
-    bm = converter.parse("tinynotation: 4/4 c4 c c c").flat
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    m[0].append(spanner.Slur(m[0].notes[0], m[0].notes[1]))
-    m[0].append(spanner.Slur(m[0].notes[1], m[0].notes[2]))
-    m[0].append(spanner.Slur(m[0].notes[2], m[0].notes[3]))
-    m[0].notes[0].articulations.append(Fingering('3'))
-    m[0].notes[1].articulations.append(Fingering('2'))
-    m[0].notes[2].articulations.append(Fingering('1'))
-    m[0].notes[3].articulations.append(Fingering('3'))
-    m[-1].rightBarline = None
-    return bm
+    def test_example12_6(self):
+        bm = converter.parse("tinynotation: 3/4 c'2~ c'8 d' d'2~ d'8 e'").flat
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m = bm.getElementsByClass('Measure')
+        m[0].append(spanner.Slur(m[0].notes[0], m[0].notes[2]))
+        m[1].append(spanner.Slur(m[1].notes[0], m[1].notes[2])) 
+        m[1].rightBarline = None
+        self.s = bm
+        self.methodArgs = {'showFirstMeasureNumber': False, 'showShortSlursAndTiesTogether': False}
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀
+        ⠨⠝⠈⠉⠙⠉⠑⠀⠕⠈⠉⠑⠉⠋
+        '''
+        self.methodArgs = {'showFirstMeasureNumber': False, 'showShortSlursAndTiesTogether': True}
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
+        ⠨⠝⠉⠈⠉⠙⠉⠑⠀⠕⠉⠈⠉⠑⠉⠋
+        '''
+      
+    def test_example12_7(self):
+        bm = converter.parse("tinynotation: 3/4 f'2.~ f'8 c' d' c' b- a").flat
+        bm.insert(0, key.KeySignature(-1))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m = bm.getElementsByClass('Measure')
+        m[-1].append(spanner.Slur(m[0].notes[0], m[-1].notes[-1]))
+        m[-1].rightBarline = None
+        import copy
+        bmm = copy.deepcopy(bm)
+        self.s = bm
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀
+        ⠰⠃⠨⠟⠄⠈⠉⠀⠛⠙⠑⠙⠚⠊⠘⠆
+        '''
+        self.s = bmm
+        self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀
+        ⠨⠟⠄⠈⠉⠀⠛⠉⠉⠙⠑⠙⠚⠉⠊
+        '''
+    
+    def test_example12_8(self):
+        bm = converter.parse("tinynotation: 3/4 f'2.~ f'8 c' d' c' b- a").flat
+        bm.insert(0, key.KeySignature(-1))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        ml = bm.getElementsByClass('Measure')[-1]
+        ml.append(spanner.Slur(ml.notes[0], ml.notes[-1]))
+        ml.rightBarline = None
+        import copy
+        bmm = copy.deepcopy(bm)
+        self.s = bm
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀
+        ⠨⠟⠄⠈⠉⠀⠰⠃⠛⠙⠑⠙⠚⠊⠘⠆
+        '''
+        self.s = bmm
+        self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀
+        ⠨⠟⠄⠈⠉⠀⠛⠉⠉⠙⠑⠙⠚⠉⠊
+        '''
+    
+    def test_example12_9(self):
+        bm = converter.parse("tinynotation: 3/4 e'8 f' g' f' e' d' c'2.~ c'4 r r").flat
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m = bm.getElementsByClass('Measure')
+        m[-1].append(spanner.Slur(m[0].notes[0], m[-1].notes[-1]))
+        m[-1].rightBarline = None
+        import copy
+        bmm = copy.deepcopy(bm)
+        self.s = bm
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠰⠃⠨⠋⠛⠓⠛⠋⠑⠀⠝⠄⠈⠉⠀⠹⠘⠆⠧⠧
+        '''
+        self.s = bmm
+        self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠨⠋⠉⠉⠛⠓⠛⠋⠑⠉⠀⠝⠄⠈⠉⠀⠹⠧⠧
+        '''
+    
+    def test_example12_10(self):
+        bm = converter.parse("tinynotation: 3/4 e'8 f' g' f' e' d' c'2.~ c'4 r r").flat
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m = bm.getElementsByClass('Measure')
+        m[1].append(spanner.Slur(m[0].notes[0], m[1].notes[0]))
+        m[-1].rightBarline = None
+        import copy
+        bmm = copy.deepcopy(bm)
+        self.s = bm
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠰⠃⠨⠋⠛⠓⠛⠋⠑⠀⠝⠄⠘⠆⠈⠉⠀⠹⠧⠧
+        '''
+        self.s = bmm
+        self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠨⠋⠉⠉⠛⠓⠛⠋⠑⠉⠀⠝⠄⠈⠉⠀⠹⠧⠧
+        '''
+    
+    def test_example12_11(self):
+        bm = converter.parse("tinynotation: 4/4 c4 c c c").flat
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m = bm.getElementsByClass('Measure')
+        m[0].append(spanner.Slur(m[0].notes[0], m[0].notes[1]))
+        m[0].append(spanner.Slur(m[0].notes[1], m[0].notes[2]))
+        m[0].append(spanner.Slur(m[0].notes[2], m[0].notes[3]))
+        m[0].notes[0].articulations.append(Fingering('3'))
+        m[0].notes[1].articulations.append(Fingering('2'))
+        m[0].notes[2].articulations.append(Fingering('1'))
+        m[0].notes[3].articulations.append(Fingering('3'))
+        m[-1].rightBarline = None
+        self.s = bm
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.b = '''
+        ⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀
+        ⠐⠹⠇⠉⠹⠃⠉⠹⠁⠉⠹⠇
+        '''
 
 #-------------------------------------------------------------------------------
 # Chapter 13: Words, Abbreviations, Letters, and Phrases of Expression
 
-def test_example13_1():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example13_1(), inPlace=True))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠼⠁⠀⠜⠙⠕⠇⠉⠑⠐⠟⠫⠀⠫⠱⠜⠏⠐⠹⠀⠐⠪⠄⠚⠪⠀⠳⠜⠍⠋⠐⠙⠑⠋⠛
-    ⠀⠀⠐⠳⠜⠗⠊⠞⠄⠐⠻⠫⠀⠟⠄⠣⠅
-    """
-    bm = converter.parse(
-            "tinynotation: 3/4 f2 e4 e4 d4 c4 a4. b-8 a4 g4 c8 d8 e8 f8 g4 f4 e4 f2.").flat
-    bm.insert(0, key.KeySignature(-1))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    m = bm.getElementsByClass('Measure')
-    m[0].insert(0.0, expressions.TextExpression("dolce"))
-    m[1].insert(2.0, dynamics.Dynamic('p'))
-    m[3].insert(1.0, dynamics.Dynamic('mf'))
-    m[4].insert(1.0, expressions.TextExpression("rit."))
-    return bm
-
-def test_example13_2():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example13_2(), inPlace=True))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠼⠁⠀⠜⠋⠄⠩⠨⠱⠉⠋⠭⠜⠏⠰⠃⠐⠺⠳⠀⠪⠻⠳⠘⠆⠜⠗⠊⠞⠄⠡⠐⠛⠉⠋
-    ⠀⠀⠐⠑⠉⠋⠉⠡⠛⠉⠋⠜⠍⠕⠗⠑⠝⠙⠕⠄⠩⠐⠛⠉⠓⠛⠉⠩⠓⠀⠩⠮⠜⠏⠏⠏⠄⠣⠅
-    """
-    bm = converter.parse(
-            "tinynotation: 4/4 d'#4 e'8 r b4 g a f# g fn8 e d e fn e f# g f# g# a#1").flat
-    bm.insert(0, key.KeySignature(1))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    ml = bm.getElementsByClass('Measure')
-    ml[0].append(spanner.Slur(bm[0].notes[0], bm[0].notes[1]))
-    ml[1].append(spanner.Slur(bm[0].notes[2], bm[1].notes[2]))
-    ml[1].append(spanner.Slur(bm[1].notes[3], bm[1].notes[4]))
-    ml[2].append(spanner.Slur(bm[2].notes[0], bm[2].notes[3]))
-    ml[2].append(spanner.Slur(bm[2].notes[4], bm[2].notes[5]))
-    ml[2].append(spanner.Slur(bm[2].notes[6], bm[2].notes[7]))
-    ml[0].insert(0.0, dynamics.Dynamic('f'))
-    ml[0].insert(2.0, dynamics.Dynamic('p'))
-    ml[1].insert(3.0, expressions.TextExpression("rit."))
-    ml[2].insert(2.0, expressions.TextExpression("morendo"))
-    ml[3].insert(4.0, dynamics.Dynamic('ppp'))
-    return bm
+    def test_example13_1(self):
+        bm = converter.parse(
+                "tinynotation: 3/4 f2 e4 e4 d4 c4 a4. b-8 a4 g4 c8 d8 e8 f8 g4 f4 e4 f2.").flat
+        bm.insert(0, key.KeySignature(-1))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        m = bm.getElementsByClass('Measure')
+        m[0].insert(0.0, expressions.TextExpression("dolce"))
+        m[1].insert(2.0, dynamics.Dynamic('p'))
+        m[3].insert(1.0, dynamics.Dynamic('mf'))
+        m[4].insert(1.0, expressions.TextExpression("rit."))
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠜⠙⠕⠇⠉⠑⠐⠟⠫⠀⠫⠱⠜⠏⠐⠹⠀⠐⠪⠄⠚⠪⠀⠳⠜⠍⠋⠐⠙⠑⠋⠛
+        ⠀⠀⠐⠳⠜⠗⠊⠞⠄⠐⠻⠫⠀⠟⠄⠣⠅
+        '''
     
-def test_example13_3():
-    # Problem: How to plug in wedges into music21?
-    bm = converter.parse("tinynotation: a1 a1 a1 a1", "c").flat
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    ml = bm.getElementsByClass('Measure')
-    ml[-1].rightBarline = None
-    e0 = expressions.TextExpression('cresc.')
-    e1 = expressions.TextExpression('decresc.')
-    ml[0].insert(0.0, e0)
-    ml[1].insert(0.0, e1)
-    #w1 = dynamics.Wedge(type = 'crescendo')
-    return bm
+    def test_example13_2(self):
+        bm = converter.parse(
+                "tinynotation: 4/4 d'#4 e'8 r b4 g a f# g fn8 e d e fn e f# g f# g# a#1").flat
+        bm.insert(0, key.KeySignature(1))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        ml = bm.getElementsByClass('Measure')
+        ml[0].append(spanner.Slur(bm[0].notes[0], bm[0].notes[1]))
+        ml[1].append(spanner.Slur(bm[0].notes[2], bm[1].notes[2]))
+        ml[1].append(spanner.Slur(bm[1].notes[3], bm[1].notes[4]))
+        ml[2].append(spanner.Slur(bm[2].notes[0], bm[2].notes[3]))
+        ml[2].append(spanner.Slur(bm[2].notes[4], bm[2].notes[5]))
+        ml[2].append(spanner.Slur(bm[2].notes[6], bm[2].notes[7]))
+        ml[0].insert(0.0, dynamics.Dynamic('f'))
+        ml[0].insert(2.0, dynamics.Dynamic('p'))
+        ml[1].insert(3.0, expressions.TextExpression("rit."))
+        ml[2].insert(2.0, expressions.TextExpression("morendo"))
+        ml[3].insert(4.0, dynamics.Dynamic('ppp'))
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠜⠋⠄⠩⠨⠱⠉⠋⠭⠜⠏⠰⠃⠐⠺⠳⠀⠪⠻⠳⠘⠆⠜⠗⠊⠞⠄⠡⠐⠛⠉⠋
+        ⠀⠀⠐⠑⠉⠋⠉⠡⠛⠉⠋⠜⠍⠕⠗⠑⠝⠙⠕⠄⠩⠐⠛⠉⠓⠛⠉⠩⠓⠀⠩⠮⠜⠏⠏⠏⠄⠣⠅
+        '''
+        
+    def xtest_example13_3(self):
+        # Problem: How to plug in wedges into music21?
+        bm = converter.parse("tinynotation: a1 a1 a1 a1", "c").flat
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        ml = bm.getElementsByClass('Measure')
+        ml[-1].rightBarline = None
+        e0 = expressions.TextExpression('cresc.')
+        e1 = expressions.TextExpression('decresc.')
+        ml[0].insert(0.0, e0)
+        ml[1].insert(0.0, e1)
+        #w1 = dynamics.Wedge(type = 'crescendo')
+        self.s = bm
+        #self.b = '''
+        #'''
+    
+    def test_example13_9(self):
+        bm = converter.parse("tinynotation: 4/4 g8 a b c' d' e' f' g'").flat
+        bm.insert(0.0, dynamics.Dynamic('f'))
+        bm.insert(0.0, expressions.TextExpression('rush!'))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        ml = bm.getElementsByClass('Measure')
+        ml[-1].rightBarline = None
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀
+        ⠜⠗⠥⠎⠓⠖⠜⠋⠐⠓⠊⠚⠙⠑⠋⠛⠓
+        '''
+    
+    def test_example13_10(self):
+        bm = converter.parse("tinynotation: 4/4 c4 c e c").flat
+        bm.insert(0.0, dynamics.Dynamic('f'))
+        bm.insert(0.0, expressions.TextExpression('(marc.)'))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        ml = bm.getElementsByClass('Measure')
+        ml[-1].rightBarline = None
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀
+        ⠜⠶⠍⠁⠗⠉⠄⠶⠜⠋⠐⠹⠹⠫⠹
+        '''
+    
+    def xtest_example13_11(self):
+        # Problem: How to braille the pp properly?
+        bm = converter.parse("tinynotation: 4/4 b-2 r f e- d1 r B-").flat
+        bm.insert(0.0, key.KeySignature(-2))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        ml = bm.getElementsByClass('Measure')    
+        ml[0].insert(0.0, dynamics.Dynamic('f'))
+        ml[0].insert(2.0, dynamics.Dynamic('pp'))
+        ml[1].append(spanner.Slur(ml[1].notes[0], ml[1].notes[1]))
+        ml[3].insert(0.0, expressions.TextExpression('rit.'))
+        self.s = bm
+#         self.b = '''
+#         '''
 
-def test_example13_9():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example13_9(), inPlace=True, 
-    ...                showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀
-    ⠜⠗⠥⠎⠓⠖⠜⠋⠐⠓⠊⠚⠙⠑⠋⠛⠓
-    """
-    bm = converter.parse("tinynotation: 4/4 g8 a b c' d' e' f' g'").flat
-    bm.insert(0.0, dynamics.Dynamic('f'))
-    bm.insert(0.0, expressions.TextExpression('rush!'))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    ml = bm.getElementsByClass('Measure')
-    ml[-1].rightBarline = None
-    return bm
-
-def test_example13_10():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example13_10(), inPlace=True, 
-    ...                showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀
-    ⠜⠶⠍⠁⠗⠉⠄⠶⠜⠋⠐⠹⠹⠫⠹
-    """
-    bm = converter.parse("tinynotation: 4/4 c4 c e c").flat
-    bm.insert(0.0, dynamics.Dynamic('f'))
-    bm.insert(0.0, expressions.TextExpression('(marc.)'))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    ml = bm.getElementsByClass('Measure')
-    ml[-1].rightBarline = None
-    return bm
-
-def test_example13_11():
-    # Problem: How to braille the pp properly?
-    bm = converter.parse("tinynotation: 4/4 b-2 r f e- d1 r B-").flat
-    bm.insert(0.0, key.KeySignature(-2))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    ml = bm.getElementsByClass('Measure')    
-    ml[0].insert(0.0, dynamics.Dynamic('f'))
-    ml[0].insert(2.0, dynamics.Dynamic('pp'))
-    ml[1].append(spanner.Slur(ml[1].notes[0], ml[1].notes[1]))
-    ml[3].insert(0.0, expressions.TextExpression('rit.'))
-    return bm
-
-def test_example13_14():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example13_14(), inPlace=True, 
-    ...                    showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠨⠫⠫⠻⠀⠗⠄⠀⠜⠙⠊⠍⠄⠀⠑⠀⠗⠁⠇⠇⠄⠜⠀⠨⠛⠑⠐⠊⠨⠑⠋⠙⠀⠕⠄
-    """
-    bm = converter.parse("tinynotation: 3/4 e'4 e' f'# g'2. f'#8 d' a d' e' c'# d'2.").flat
-    bm.insert(0.0, key.KeySignature(2))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    ml = bm.getElementsByClass('Measure')
-    ml[2].insert(0.0, expressions.TextExpression('dim. e rall.'))
-    ml[-1].rightBarline = None
-    return bm
-
-def test_example13_15():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example13_15(), inPlace=True, 
-    ...                showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠨⠑⠙⠚⠊⠀⠗⠀⠜⠉⠁⠇⠍⠂⠀⠎⠑⠗⠑⠝⠑⠜⠀⠐⠺⠄⠊⠀⠳⠄⠚⠀⠪⠄⠓⠀⠟
-    """
-    bm = converter.parse("tinynotation: 2/4 d'8 c' b- a g2 b-4. a8 g4. b-8 a4. g8 f2").flat
-    bm.insert(0.0, key.KeySignature(-2))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    ml = bm.getElementsByClass('Measure')
-    ml[2].insert(0.0, expressions.TextExpression('calm, serene'))
-    ml[-1].rightBarline = None
-    return bm
-
-def test_example13_16():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example13_16(), inPlace=True, 
-    ...                    showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠨⠑⠙⠚⠊⠀⠗⠀⠜⠎⠑⠓⠗⠀⠗⠥⠓⠊⠛⠜⠀⠐⠺⠄⠊⠀⠳⠄⠚⠀⠪⠄⠓⠀⠟
-    """
-    bm = converter.parse("tinynotation: 2/4 d'8 c' b- a g2 b-4. a8 g4. b-8 a4. g8 f2").flat
-    bm.insert(0.0, key.KeySignature(-2))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    ml = bm.getElementsByClass('Measure')
-    ml[2].insert(0.0, expressions.TextExpression('Sehr ruhig'))
-    ml[-1].rightBarline = None
-    return bm
-
-def test_example13_17():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example13_17(), inPlace=True, 
-    ...                    showFirstMeasureNumber=False))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠐⠳⠧⠐⠀⠜⠗⠊⠞⠄⠀⠑⠀⠙⠊⠍⠄⠜⠀⠰⠃⠨⠳⠀⠳⠫⠹⠀⠻⠱⠺⠀⠝⠄⠘⠆
-    """
-    bm = converter.parse("tinynotation: 3/4 g4 r g' g' e' c' f' d' b c'2.").flat
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    ml = bm.getElementsByClass('Measure')
-    ml[0].insert(2.0, expressions.TextExpression('rit. e dim.'))
-    ml[-1].append(spanner.Slur(bm[0].notes[1], bm[-1].notes[0]))
-    ml[-1].rightBarline = None
-    return bm
-
-def test_example13_18():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example13_18(), inPlace=True, debug=True))
-    ---begin segment---
-    <music21.braille.segment BrailleSegment>
-    Measure 1, Signature Grouping 1:
-    Key Signature 1 flat(s) ⠣
-    Time Signature 3/4 ⠼⠉⠲
-    ===
-    Measure 1, Note Grouping 1:
-    <music21.clef.BassClef>
-    Octave 2 ⠘
-    F quarter ⠻
-    music hyphen ⠐
-    ===
-    Measure 1, Long Text Expression Grouping 2:
-    Word ⠜
-    Text Expression speeding up ⠎⠏⠑⠑⠙⠊⠝⠛⠀⠥⠏
-    Word ⠜
-    music hyphen ⠐
-    ===
-    Measure 1, Note Grouping 2:
-    Octave 2 ⠘
-    G eighth ⠓
-    A eighth ⠊
-    B eighth ⠚
-    C eighth ⠙
-    ===
-    Measure 2, Split Note Grouping A 1:
-    D quarter ⠱
-    B eighth ⠚
-    C eighth ⠙
-    music hyphen ⠐
-    ===
-    Measure 2, Split Note Grouping B 1:
-    Word ⠜
-    Text Expression slowing ⠎⠇⠕⠺⠊⠝⠛
-    Octave 3 ⠸
-    D eighth ⠑
-    E eighth ⠋
-    ===
-    Measure 3, Note Grouping 1:
-    F quarter ⠻
-    E eighth ⠋
-    D eighth ⠑
-    C quarter ⠹
-    ===
-    ---end segment---
-
-    >>> print(translate.partToBraille(test.test_example13_18(), inPlace=True))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠼⠁⠀⠘⠻⠐⠀⠜⠎⠏⠑⠑⠙⠊⠝⠛⠀⠥⠏⠜⠀⠘⠓⠊⠚⠙⠀⠱⠚⠙⠐
-    ⠀⠀⠜⠎⠇⠕⠺⠊⠝⠛⠸⠑⠋⠀⠻⠋⠑⠹
-    """
-    bm = converter.parse("tinynotation: 3/4 FF4 GG8 AA BB- C    D4 BB-8 C D E    F4 E8 D C4").flat
-    bm.insert(0.0, key.KeySignature(-1))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    ml = bm.getElementsByClass('Measure')
-    ml[0].insert(1.0, expressions.TextExpression("speeding up"))
-    ml[1].insert(2.0, expressions.TextExpression("slowing"))
-    ml[-1].rightBarline = None
-    return bm
-
-def test_example13_19():
-    bm = converter.parse("tinynotation: 3/4 c'8 d' c' b- a g a2.").flat
-    bm.insert(0.0, key.KeySignature(-1))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    ml = bm.getElementsByClass('Measure')
-    ml[0].insert(0.0, dynamics.Dynamic("pp"))
-    ml[0].insert(0.0, expressions.TextExpression("very sweetly"))
-    ml[-1].rightBarline = None
-    return bm
-
-def test_example13_26():
-    u"""
-    >>> from music21.braille import test
-    >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.test_example13_26(), inPlace=True))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠼⠙⠑⠀⠰⠃⠐⠏⠻⠳⠀⠎⠜⠗⠁⠇⠇⠄⠐⠺⠪⠀⠗⠻⠫⠀⠕⠄⠘⠆⠧⠣⠅⠄⠀⠡⠡⠣⠣
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠏⠗⠑⠎⠞⠕⠲⠀⠣⠣⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠼⠙⠊⠀⠜⠋⠋⠐⠺⠑⠛⠺⠛⠑⠀⠺⠨⠋⠓⠺⠓⠋⠀⠐⠺⠨⠋⠛⠪⠛⠋⠀⠐⠺⠑⠛⠺⠧
-    """
-    bm = converter.parse("tinynotation: 4/4 e2 f#4 g a2 b4 a g2 f#4 e d2. r4 " +
-                         "b-4 d'8 f' b'-4 f'8 d'8 " +
-                         "b-4 e'-8 g' b'-4 g'8 e'-8 b-4 e'-8 f' a'4 f'8 e'- b-4 d'8 f' b'-4 r", 
-                         makeNotation=False)
-    bm.insert(0.0, key.KeySignature(2))
-    bm.insert(16.0, key.KeySignature(-2))
-    bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    ml = bm.getElementsByClass('Measure')
-    for m in ml:
-        m.number += 44
-    ml[4].append(spanner.Slur(ml[0].notes[0], ml[3].notes[0]))
-    ml[1].insert(2.0, expressions.TextExpression("rall."))
-    ml[3].rightBarline = bar.Barline("double")
-    ml[4].insert(0.0, expressions.TextExpression("ff"))
-    ml[4].insert(0.0, tempo.TempoText("Presto"))
-    ml[-1].rightBarline = None
-    return bm
+    def test_example13_14(self):
+        bm = converter.parse("tinynotation: 3/4 e'4 e' f'# g'2. f'#8 d' a d' e' c'# d'2.").flat
+        bm.insert(0.0, key.KeySignature(2))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        ml = bm.getElementsByClass('Measure')
+        ml[2].insert(0.0, expressions.TextExpression('dim. e rall.'))
+        ml[-1].rightBarline = None
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠨⠫⠫⠻⠀⠗⠄⠀⠜⠙⠊⠍⠄⠀⠑⠀⠗⠁⠇⠇⠄⠜⠀⠨⠛⠑⠐⠊⠨⠑⠋⠙⠀⠕⠄
+        '''
+    
+    def test_example13_15(self):
+        bm = converter.parse("tinynotation: 2/4 d'8 c' b- a g2 b-4. a8 g4. b-8 a4. g8 f2").flat
+        bm.insert(0.0, key.KeySignature(-2))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        ml = bm.getElementsByClass('Measure')
+        ml[2].insert(0.0, expressions.TextExpression('calm, serene'))
+        ml[-1].rightBarline = None
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠨⠑⠙⠚⠊⠀⠗⠀⠜⠉⠁⠇⠍⠂⠀⠎⠑⠗⠑⠝⠑⠜⠀⠐⠺⠄⠊⠀⠳⠄⠚⠀⠪⠄⠓⠀⠟
+        '''
+    
+    def test_example13_16(self):
+        bm = converter.parse("tinynotation: 2/4 d'8 c' b- a g2 b-4. a8 g4. b-8 a4. g8 f2").flat
+        bm.insert(0.0, key.KeySignature(-2))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        ml = bm.getElementsByClass('Measure')
+        ml[2].insert(0.0, expressions.TextExpression('Sehr ruhig'))
+        ml[-1].rightBarline = None
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠨⠑⠙⠚⠊⠀⠗⠀⠜⠎⠑⠓⠗⠀⠗⠥⠓⠊⠛⠜⠀⠐⠺⠄⠊⠀⠳⠄⠚⠀⠪⠄⠓⠀⠟
+        '''
+    
+    def test_example13_17(self):
+        bm = converter.parse("tinynotation: 3/4 g4 r g' g' e' c' f' d' b c'2.").flat
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        ml = bm.getElementsByClass('Measure')
+        ml[0].insert(2.0, expressions.TextExpression('rit. e dim.'))
+        ml[-1].append(spanner.Slur(bm[0].notes[1], bm[-1].notes[0]))
+        ml[-1].rightBarline = None
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠐⠳⠧⠐⠀⠜⠗⠊⠞⠄⠀⠑⠀⠙⠊⠍⠄⠜⠀⠰⠃⠨⠳⠀⠳⠫⠹⠀⠻⠱⠺⠀⠝⠄⠘⠆
+        '''
+    
+    def test_example13_18(self):
+        bm = converter.parse("tinynotation: 3/4 FF4 GG8 AA BB- C    " + 
+                             "D4 BB-8 C D E    F4 E8 D C4").flat
+        bm.insert(0.0, key.KeySignature(-1))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        ml = bm.getElementsByClass('Measure')
+        ml[0].insert(1.0, expressions.TextExpression("speeding up"))
+        ml[1].insert(2.0, expressions.TextExpression("slowing"))
+        ml[-1].rightBarline = None
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠁⠀⠘⠻⠐⠀⠜⠎⠏⠑⠑⠙⠊⠝⠛⠀⠥⠏⠜⠀⠘⠓⠊⠚⠙⠀⠱⠚⠙⠐
+        ⠀⠀⠜⠎⠇⠕⠺⠊⠝⠛⠸⠑⠋⠀⠻⠋⠑⠹
+        '''
+        self.e = '''
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
+        Measure 1, Signature Grouping 1:
+        Key Signature 1 flat(s) ⠣
+        Time Signature 3/4 ⠼⠉⠲
+        ===
+        Measure 1, Note Grouping 1:
+        <music21.clef.BassClef>
+        Octave 2 ⠘
+        F quarter ⠻
+        music hyphen ⠐
+        ===
+        Measure 1, Long Text Expression Grouping 2:
+        Word ⠜
+        Text Expression speeding up ⠎⠏⠑⠑⠙⠊⠝⠛⠀⠥⠏
+        Word ⠜
+        music hyphen ⠐
+        ===
+        Measure 1, Note Grouping 2:
+        Octave 2 ⠘
+        G eighth ⠓
+        A eighth ⠊
+        B eighth ⠚
+        C eighth ⠙
+        ===
+        Measure 2, Split Note Grouping A 1:
+        D quarter ⠱
+        B eighth ⠚
+        C eighth ⠙
+        music hyphen ⠐
+        ===
+        Measure 2, Split Note Grouping B 1:
+        Word ⠜
+        Text Expression slowing ⠎⠇⠕⠺⠊⠝⠛
+        Octave 3 ⠸
+        D eighth ⠑
+        E eighth ⠋
+        ===
+        Measure 3, Note Grouping 1:
+        F quarter ⠻
+        E eighth ⠋
+        D eighth ⠑
+        C quarter ⠹
+        ===
+        ---end segment---
+        '''
+    
+    def xtest_example13_19(self):
+        bm = converter.parse("tinynotation: 3/4 c'8 d' c' b- a g a2.").flat
+        bm.insert(0.0, key.KeySignature(-1))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        ml = bm.getElementsByClass('Measure')
+        ml[0].insert(0.0, dynamics.Dynamic("pp"))
+        ml[0].insert(0.0, expressions.TextExpression("very sweetly"))
+        ml[-1].rightBarline = None
+        self.s = bm
+#         self.b = '''
+#         '''
+    
+    def test_example13_26(self):
+        bm = converter.parse("tinynotation: 4/4 e2 f#4 g a2 b4 a g2 f#4 e d2. r4 " +
+                             "b-4 d'8 f' b'-4 f'8 d'8 " +
+                             "b-4 e'-8 g' b'-4 g'8 e'-8 b-4 e'-8 f' a'4 f'8 e'- b-4 d'8 f' b'-4 r", 
+                             makeNotation=False)
+        bm.insert(0.0, key.KeySignature(2))
+        bm.insert(16.0, key.KeySignature(-2))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        ml = bm.getElementsByClass('Measure')
+        for m in ml:
+            m.number += 44
+        ml[4].append(spanner.Slur(ml[0].notes[0], ml[3].notes[0]))
+        ml[1].insert(2.0, expressions.TextExpression("rall."))
+        ml[3].rightBarline = bar.Barline("double")
+        ml[4].insert(0.0, expressions.TextExpression("ff"))
+        ml[4].insert(0.0, tempo.TempoText("Presto"))
+        ml[-1].rightBarline = None
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠙⠑⠀⠰⠃⠐⠏⠻⠳⠀⠎⠜⠗⠁⠇⠇⠄⠐⠺⠪⠀⠗⠻⠫⠀⠕⠄⠘⠆⠧⠣⠅⠄⠀⠡⠡⠣⠣
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠏⠗⠑⠎⠞⠕⠲⠀⠣⠣⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠼⠙⠊⠀⠜⠋⠋⠐⠺⠑⠛⠺⠛⠑⠀⠺⠨⠋⠓⠺⠓⠋⠀⠐⠺⠨⠋⠛⠪⠛⠋⠀⠐⠺⠑⠛⠺⠧
+        '''
 
 #-------------------------------------------------------------------------------
 # Chapter 14: Symbols of Expression and Execution
@@ -3540,7 +3501,7 @@ def test_example26_5():
  
 if __name__ == "__main__":
     import music21
-    music21.mainTest(DeGarmoTest, verbose=True) #, runTest='test_drill10_4')
+    music21.mainTest(DeGarmoTest, verbose=True) #, runTest='test_example12_5')
 
 #------------------------------------------------------------------------------
 # eof

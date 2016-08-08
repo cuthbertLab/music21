@@ -1611,6 +1611,7 @@ def prepareSlurredNotes(music21Part, **keywords):
     if not music21Part.spannerBundle:
         return 
 
+
     slurLongPhraseWithBrackets = keywords.get('slurLongPhraseWithBrackets', 
                                                   SEGMENT_SLURLONGPHRASEWITHBRACKETS)
     showShortSlursAndTiesTogether = keywords.get('showShortSlursAndTiesTogether',
@@ -1621,6 +1622,9 @@ def prepareSlurredNotes(music21Part, **keywords):
         showLongSlursAndTiesTogether = True
     else:
         showLongSlursAndTiesTogether = SEGMENT_SHOWLONGSLURSANDTIESTOGETHER
+
+    if slurLongPhraseWithBrackets is False:
+        pass
     
     allNotes = music21Part.flat.notes.stream()
     for slur in music21Part.spannerBundle.getByClass(spanner.Slur):

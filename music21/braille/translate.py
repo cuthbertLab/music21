@@ -264,10 +264,16 @@ def partToBraille(music21Part, **keywords):
             else:
                 allBrailleText.append(str(brailleSegment))
 
+    from music21.braille.basic import beamStatus
+    for x in list(beamStatus.keys()):
+        del beamStatus[x]
+
     if six.PY2 and debug:
         return u"\n".join(allBrailleText)
     else:
         return u"\n".join([unicode(bt) for bt in allBrailleText])
+
+
 
 def keyboardPartsToBraille(staffUpper, staffLower, **keywords):
     """
