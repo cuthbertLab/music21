@@ -684,32 +684,8 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
             music21Note._brailleEnglish.append("Duration {0} None".format(music21Note.duration))
             return symbols['basic_exception']
 
-    # finger mark
-    # -----------
-    try:
-        for art in music21Note.articulations:
-            if 'Fingering' in art.classes:
-                transcribedFingering = transcribeNoteFingering(art.fingerNumber, 
-                                                        upperFirstInFingering=upperFirstInFingering)
-                noteTrans.append(transcribedFingering)
-    except BrailleBasicException:  # pragma: no cover
-        environRules.warn("Fingering {0} of note {1} cannot be transcribed to braille.".format(
-                                        music21Note.fingering, music21Note))
-
-    # expressions (so far, just fermata)
-    # ----------------------------------
-    for expr in music21Note.expressions:
-        if 'Fermata' in expr.classes:
-            try:
-                fermataBraille = lookup.fermatas['shape'][expr.shape]
-                noteTrans.append(fermataBraille)
-                music21Note._brailleEnglish.append(
-                    u'Note-fermata: Shape {0}: {1}'.format(expr.shape, fermataBraille))
-            except KeyError: # shape is unusual.
-                environRules.warn("Fermata {0} of note {1} cannot be transcribed.".format(
-                                        expr, music21Note))
-                
-
+    handleArticulations(music21Note, noteTrans, upperFirstInFingering)
+    handleExpressions(music21Note, noteTrans)
 
     # single slur
     # closing double slur (after second to last note, before last note)
@@ -738,6 +714,39 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
         music21Note._brailleEnglish.append(u"Tie {0}".format(symbols['tie']))
 
     return u"".join(noteTrans)
+
+def handleArticulations(music21Note, noteTrans, upperFirstInFingering=True):
+    # finger mark
+    # -----------
+    try:
+        for art in music21Note.articulations:
+            if 'Fingering' in art.classes:
+                transcribedFingering = transcribeNoteFingering(art.fingerNumber, 
+                                                        upperFirstInFingering=upperFirstInFingering)
+                noteTrans.append(transcribedFingering)
+    except BrailleBasicException:  # pragma: no cover
+        environRules.warn("Fingering {0} of note {1} cannot be transcribed to braille.".format(
+                                        music21Note.fingering, music21Note))
+
+
+def handleExpressions(music21Note, noteTrans):
+    u'''
+    Transcribe the expressions for a Note or Rest (or anything with a .expressions list.
+    '''
+    # expressions (so far, just fermata)
+    # ----------------------------------
+    for expr in music21Note.expressions:
+        if 'Fermata' in expr.classes:
+            try:
+                fermataBraille = lookup.fermatas['shape'][expr.shape]
+                noteTrans.append(fermataBraille)
+                music21Note._brailleEnglish.append(
+                    u'Note-fermata: Shape {0}: {1}'.format(expr.shape, fermataBraille))
+            except KeyError: # shape is unusual.
+                environRules.warn("Fermata {0} of note {1} cannot be transcribed.".format(
+                                        expr, music21Note))
+                
+
 
 def restToBraille(music21Rest):
     u"""
@@ -782,6 +791,9 @@ def restToBraille(music21Rest):
     for unused_counter_dot in range(restDots):
         restTrans.append(symbols['dot'])
         music21Rest._brailleEnglish.append(u"Dot {0}".format(symbols['dot']))
+        
+    handleExpressions(music21Rest, restTrans)
+        
     return u"".join(restTrans)
 
 def tempoTextToBraille(music21TempoText, maxLineLength=40):

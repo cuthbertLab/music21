@@ -341,6 +341,7 @@ def mainTest(*testClasses, **kwargs):
                         break
                 if hasattr(tObj, runThisTest):
                     print('Running Named Test Method: %s' % runThisTest)
+                    tObj.setUp()
                     getattr(tObj, runThisTest)()
                     runAllTests = False
                     break

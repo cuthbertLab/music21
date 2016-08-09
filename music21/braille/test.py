@@ -666,7 +666,6 @@ class DeGarmoTest(unittest.TestCase):
         bm.makeNotation(inPlace=True)
         m = bm.getElementsByClass('Measure')
         m[0].pop(0)
-        self.setUp() # necessary if calling directly...
         self.methodArgs = {'showHeading': False, 'showFirstMeasureNumber': False}
         self.s = bm
         #self.b = ''
@@ -1996,7 +1995,6 @@ class DeGarmoTest(unittest.TestCase):
         m[8].notes[6].pitch.accidental.displayStatus = False
         for sm in m:
             sm.number -= 1
-        self.setUp()
         self.methodArgs = {'showClefSigns': True}
         self.s = bm
         self.b = '''
@@ -2240,7 +2238,8 @@ Barline final ⠣⠅
         m[2].append(spanner.Slur(m[0].notes[0], m[2].notes[0]))
         m[3].append(spanner.Slur(m[2].notes[0], m[3].notes[0])) 
         m[3].rightBarline = None
-        self.setUp()
+
+        # need two copies because of a bug...
         import copy
         bmm = copy.deepcopy(bm)
         self.s = bm
@@ -2810,6 +2809,39 @@ Barline final ⠣⠅
         ⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀
         ⠨⠦⠸⠦⠸⠳⠨⠦⠸⠦⠺⠨⠦⠸⠦⠹
         '''
+        
+    def test_example_14_14(self):
+        bm = converter.parse('tinynotation: 3/4 G4~ G8 F D BB C2.').flat
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        bm.measure(1).notes[0].articulations.append(articulations.Fingering(2))
+        bm.measure(1).notes[2].articulations.append(articulations.Fingering(1))
+        bm.measure(1).notes[0].expressions.append(expressions.Fermata())
+        bm.measure(2).rightBarline = None
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀
+        ⠸⠳⠃⠣⠇⠈⠉⠓⠛⠁⠑⠚⠀⠝⠄        
+        '''
+    
+    def test_example_14_15(self):
+        bm = converter.parse("tinynotation: 4/4 d'8 f' f'4 e'8 c' r4 " + 
+                             "d'2 r4 d'8 f'     e' c' d'2 r4").flat
+        bm.insert(0, key.KeySignature(-1))
+        sl = spanner.Slur(bm.notes[-5], bm.notes[-1])
+        bm.insert(0, sl)
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        bm.measure(1).notesAndRests[-1].expressions.append(expressions.Fermata())
+        bm.measure(2).notesAndRests[1].expressions.append(expressions.Fermata())
+        bm.measure(3).notesAndRests[-1].expressions.append(expressions.Fermata())        
+        bm.measure(3).rightBarline = None
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠨⠑⠛⠻⠋⠙⠧⠣⠇⠀⠕⠧⠣⠇⠰⠃⠑⠛⠀⠋⠙⠕⠘⠆⠧⠣⠇
+        '''
+    
     
     #-------------------------------------------------------------------------------
     # Chapter 15: Smaller Values and Regular Note-Grouping, the Music Comma
