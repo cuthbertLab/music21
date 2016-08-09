@@ -2247,6 +2247,22 @@ class MeasureParser(XMLParserBase):
         return post
     
     def xmlNotations(self, mxNotations, n):
+        u'''
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        
+        >>> mxNotations = EL('<notations>' +
+        ...     '<fermata type="upright">angled</fermata>' + 
+        ...     '</notations>')
+        >>> n = note.Note()
+        >>> MP.xmlNotations(mxNotations, n)
+        >>> n.expressions
+        [<music21.expressions.Fermata>]
+        >>> n.expressions[0].type
+        'upright'
+        >>> n.expressions[0].shape
+        'angled'
+        '''
         # TODO: editorial
         # TODO: attr: print-object
         
