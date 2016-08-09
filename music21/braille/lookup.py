@@ -346,6 +346,14 @@ symbols = {'space': _B[0],
            'braille-music-parenthesis': _B[6] + _B[3] # [T17, 17.6, degarmo chp. 10]
            }
 
+fermatas = {'shape': {'normal': _B[126] + _B[123],
+                      'angled': _B[45] + _B[126] + _B[123],
+                      'square': _B[56] + _B[126] + _B[123],
+                      },
+            'on barline': _B[456],
+            'between notes': _B[5],
+            }
+
 ascii_chars = {_B[0]: ' ',
                _B[1]: 'A',
                _B[2]: '1',

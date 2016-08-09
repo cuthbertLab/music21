@@ -990,6 +990,7 @@ class Fermata(Expression):
     '''
     Fermatas by default get appended to the last
     note if a note is split because of measures.
+    
     To override this (for Fermatas or for any
     expression) set .tieAttach to 'all' or 'first'
     instead of 'last'. 
@@ -1005,7 +1006,7 @@ class Fermata(Expression):
     .. image:: images/expressionsFermata.*
          :width: 193
     '''
-    shape = "normal"
+    shape = "normal" # angled, square.
     # for musicmxml, can be upright or inverted, but Finale's idea of an 
     # inverted fermata is ass backwards.
     type  = "inverted" 

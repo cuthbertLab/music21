@@ -3205,6 +3205,10 @@ class MeasureExporter(XMLExporterBase):
         >>> mxExpression = MEX.expressionToXml(f)
         >>> MEX.dump(mxExpression)
         <fermata type="inverted" />
+        >>> f.shape = 'angled'
+        >>> mxExpression = MEX.expressionToXml(f)
+        >>> MEX.dump(mxExpression)
+        <fermata type="inverted">angled</fermata>
         
         >>> t = expressions.Tremolo()
         >>> t.numberOfMarks = 4
@@ -3248,7 +3252,8 @@ class MeasureExporter(XMLExporterBase):
             mx.set('placement', expression.placement)
         if 'Fermata' in classes:
             mx.set('type', str(expression.type))
-        
+            if expression.shape in ('angled', 'square'): # only valid shapes
+                mx.text = expression.shape
         
         if 'Tremolo' in classes:
             mx.set('type', 'single')

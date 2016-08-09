@@ -546,6 +546,27 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
     >>> A2.quarterLength = 3.0
     >>> print(basic.noteToBraille(A2))
     ⠘⠎⠄
+    
+    
+    >>> B = note.Note('B4')
+    >>> f = expressions.Fermata()
+    >>> B.expressions.append(f)
+    >>> print(basic.noteToBraille(B))
+    ⠐⠺⠣⠇
+    >>> for x in B._brailleEnglish:
+    ...     print(x)
+    Octave 4 ⠐
+    B quarter ⠺
+    Note-fermata: Shape normal: ⠣⠇
+    
+    >>> f.shape = 'square'
+    >>> print(basic.noteToBraille(B))
+    ⠐⠺⠰⠣⠇
+    >>> for x in B._brailleEnglish:
+    ...     print(x)
+    Octave 4 ⠐
+    B quarter ⠺
+    Note-fermata: Shape square: ⠰⠣⠇
     """
     music21Note._brailleEnglish = []
     falseKeywords = ['beginLongBracketSlur', 
@@ -674,6 +695,21 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
     except BrailleBasicException:  # pragma: no cover
         environRules.warn("Fingering {0} of note {1} cannot be transcribed to braille.".format(
                                         music21Note.fingering, music21Note))
+
+    # expressions (so far, just fermata)
+    # ----------------------------------
+    for expr in music21Note.expressions:
+        if 'Fermata' in expr.classes:
+            try:
+                fermataBraille = lookup.fermatas['shape'][expr.shape]
+                noteTrans.append(fermataBraille)
+                music21Note._brailleEnglish.append(
+                    u'Note-fermata: Shape {0}: {1}'.format(expr.shape, fermataBraille))
+            except KeyError: # shape is unusual.
+                environRules.warn("Fermata {0} of note {1} cannot be transcribed.".format(
+                                        expr, music21Note))
+                
+
 
     # single slur
     # closing double slur (after second to last note, before last note)

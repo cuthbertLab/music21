@@ -2280,6 +2280,8 @@ class MeasureParser(XMLParserBase):
             ftype = mxObj.get('type')
             if ftype is not None:
                 fermata.type = ftype
+            if mxObj.text is not None:
+                fermata.shape = mxObj.text
             n.expressions.append(fermata)
 
         for mxObj in flatten(mxNotations, 'ornaments'):
