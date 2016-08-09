@@ -568,6 +568,9 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
     B quarter ⠺
     Note-fermata: Shape square: ⠰⠣⠇
     """
+    
+    # Note: both beamStatus, and _brailleEnglish are crutches that I hope to remove
+    # when moving all the translation features to a separate class.
     music21Note._brailleEnglish = []
     falseKeywords = ['beginLongBracketSlur', 
                      'endLongBracketSlur', 
@@ -616,27 +619,10 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
     # -------------
     for brailleArticulation in yieldBrailleArticulations(music21Note):
         noteTrans.append(brailleArticulation)
-        # accidental
+    
+    # accidental
     # ----------
-    acc = music21Note.pitch.accidental
-    if (acc is not None and acc.displayStatus is not False):
-        try:
-            if acc.displayStyle == 'parentheses':
-                ps = symbols['braille-music-parenthesis']
-                noteTrans.append(ps)
-                music21Note._brailleEnglish.append(u"Parenthesis {0}".format(ps))              
-                
-            noteTrans.append(accidentals[acc.name])
-            music21Note._brailleEnglish.append(u"Accidental {0} {1}".format(
-                                                            acc.name, accidentals[acc.name]))              
-            if acc.displayStyle == 'parentheses':
-                ps = symbols['braille-music-parenthesis']
-                noteTrans.append(ps)
-                music21Note._brailleEnglish.append(u"Parenthesis {0}".format(ps))              
-
-        except KeyError:  # pragma: no cover
-            environRules.warn("Accidental {0} of note {1} cannot be transcribed to braille.".format(
-                                acc, music21Note))
+    handleNoteWithAccidental(music21Note, noteTrans)
                             
     # octave mark
     # -----------
@@ -649,11 +635,11 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
     # note name
     # ---------
     try:
-        notesInStep = pitchNameToNotes[music21Note.step]
+        notesInStep = pitchNameToNotes[music21Note.pitch.step]
     except KeyError:  # pragma: no cover
         environRules.warn("Name '{0}' of note {1} cannot be transcribed to braille.".format(
-                        music21Note.step, music21Note)) 
-        music21Note._brailleEnglish.append("Name {0} None".format(music21Note.step))
+                        music21Note.pitch.step, music21Note)) 
+        music21Note._brailleEnglish.append("Name {0} None".format(music21Note.pitch.step))
         return symbols['basic_exception']
     
     # note duration
@@ -714,6 +700,27 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
         music21Note._brailleEnglish.append(u"Tie {0}".format(symbols['tie']))
 
     return u"".join(noteTrans)
+
+def handleNoteWithAccidental(music21Note, noteTrans):
+    acc = music21Note.pitch.accidental
+    if (acc is not None and acc.displayStatus is not False):
+        try:
+            if acc.displayStyle == 'parentheses':
+                ps = symbols['braille-music-parenthesis']
+                noteTrans.append(ps)
+                music21Note._brailleEnglish.append(u"Parenthesis {0}".format(ps))              
+                
+            noteTrans.append(accidentals[acc.name])
+            music21Note._brailleEnglish.append(u"Accidental {0} {1}".format(
+                                                            acc.name, accidentals[acc.name]))              
+            if acc.displayStyle == 'parentheses':
+                ps = symbols['braille-music-parenthesis']
+                noteTrans.append(ps)
+                music21Note._brailleEnglish.append(u"Parenthesis {0}".format(ps))              
+
+        except KeyError:  # pragma: no cover
+            environRules.warn("Accidental {0} of note {1} cannot be transcribed to braille.".format(
+                                acc, music21Note))
 
 def handleArticulations(music21Note, noteTrans, upperFirstInFingering=True):
     # finger mark
