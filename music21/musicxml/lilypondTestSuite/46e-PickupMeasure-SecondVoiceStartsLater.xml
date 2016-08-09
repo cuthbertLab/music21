@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+          "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="2.0">
+    <identification>
+      <miscellaneous>
+        <miscellaneous-field name="description">Voice 2 should start at 2nd 
+            beat of first full measure.</miscellaneous-field>
+      </miscellaneous>
+    </identification>
+    <part-list>
+        <score-part id="P1">
+            <part-name></part-name>
+        </score-part>
+    </part-list>
+    <!--=========================================================-->
+    <part id="P1">
+        <measure implicit="yes" number="0">
+            <attributes>
+                <divisions>1</divisions>
+            </attributes>
+            <note>
+                <pitch>
+                    <step>C</step>
+                    <octave>5</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+            </note>
+        </measure>
+        <!--=======================================================-->
+        <measure number="1">
+            <attributes>
+                <divisions>1</divisions>
+            </attributes>
+            <note>
+                <pitch>
+                    <step>C</step>
+                    <octave>5</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+            </note>
+            <note>
+                <pitch>
+                    <step>A</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+            </note>
+            <note>
+                <pitch>
+                    <step>F</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+            </note>
+            <note>
+                <pitch>
+                    <step>C</step>
+                    <octave>5</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+            </note>
+            <backup>
+                <duration>3</duration>
+            </backup>
+            <note>
+                <pitch>
+                    <step>C</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>2</voice>
+                <type>quarter</type>
+            </note>
+        </measure>
+        <!--=======================================================-->
+    </part>
+    <!--=========================================================-->
+</score-partwise>

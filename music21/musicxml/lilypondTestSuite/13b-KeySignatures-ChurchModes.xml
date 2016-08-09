@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise>
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">All different modes: major, 
+        minor, ionian, dorian, phrygian, lydian, mixolydian, aeolian, and 
+        locrian; All modes are given with 2 sharps.</miscellaneous-field>
+    </miscellaneous>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name>MusicXML Part</part-name>
+    </score-part>
+  </part-list>
+  <!--=========================================================-->
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key>
+          <fifths>2</fifths>
+          <mode>major</mode>
+        </key>
+        <time symbol="common">
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1"><text>major</text></lyric>
+      </note>
+      <attributes>
+        <key>
+          <fifths>2</fifths>
+          <mode>minor</mode>
+        </key>
+      </attributes>
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1"><text>minor</text></lyric>
+      </note>
+      <attributes>
+        <key>
+          <fifths>2</fifths>
+          <mode>ionian</mode>
+        </key>
+      </attributes>
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1"><text>ionian</text></lyric>
+      </note>
+      <attributes>
+        <key>
+          <fifths>2</fifths>
+          <mode>dorian</mode>
+        </key>
+      </attributes>
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1"><text>dorian</text></lyric>
+      </note>
+    </measure>
+    <measure number="2">
+      <attributes>
+        <key>
+          <fifths>2</fifths>
+          <mode>phrygian</mode>
+        </key>
+      </attributes>
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1"><text>phrygian</text></lyric>
+      </note>
+      <attributes>
+        <key>
+          <fifths>2</fifths>
+          <mode>lydian</mode>
+        </key>
+      </attributes>
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1"><text>lydian</text></lyric>
+      </note>
+      <attributes>
+        <key>
+          <fifths>2</fifths>
+          <mode>mixolydian</mode>
+        </key>
+      </attributes>
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1"><text>mixolydian</text></lyric>
+      </note>
+      <attributes>
+        <key>
+          <fifths>2</fifths>
+          <mode>aeolian</mode>
+        </key>
+      </attributes>
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1"><text>aeolian</text></lyric>
+      </note>
+    </measure>
+    <measure number="3">
+      <attributes>
+        <key>
+          <fifths>2</fifths>
+          <mode>locrian</mode>
+        </key>
+      </attributes>
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1"><text>locrian</text></lyric>
+      </note>
+    </measure>
+  </part>
+</score-partwise>

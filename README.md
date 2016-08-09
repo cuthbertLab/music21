@@ -10,9 +10,12 @@ http://web.mit.edu/music21 or http://music21.readthedocs.org/en/latest/index.htm
 And to install, see:
 http://web.mit.edu/music21/doc/usersGuide/usersGuide_01_installing.html
 
-Released under either the BSD (3-clause) or GNU LGPL license according to your choice. See LICENSE.
-
 Music21 runs on Python 2.7 or preferably Python 3.4+
+
+Released under either the BSD (3-clause) or GNU LGPL license according to your choice. See LICENSE.
+Externally provided software (including the MIT licensed Lilypond/MusicXML test Suite) and 
+music encoding in the corpus may have different licenses. A no-corpus version of music21
+is available also on GitHub
 
 [![Build Status](https://travis-ci.org/cuthbertLab/music21.svg?branch=master)](https://travis-ci.org/cuthbertLab/music21)
 [![Coverage Status](https://coveralls.io/repos/github/cuthbertLab/music21/badge.svg?branch=master)](https://coveralls.io/github/cuthbertLab/music21?branch=master)

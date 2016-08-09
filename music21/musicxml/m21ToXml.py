@@ -2238,7 +2238,8 @@ class MeasureExporter(XMLExporterBase):
                             if pmtrs[attrName] is not None:
                                 mxElement.set(attrName, str(pmtrs[attrName]))
                     mxDirection = Element('direction')
-                    if su.placement is not None:
+                    # Not all spanners have placements
+                    if hasattr(su, 'placement') and su.placement is not None:
                         mxDirection.set('placement', str(su.placement))
                     mxDirectionType = SubElement(mxDirection, 'direction-type')
                     mxDirectionType.append(mxElement)
@@ -4189,6 +4190,10 @@ class MeasureExporter(XMLExporterBase):
                 mxAttributes.append(self.keySignatureToXml(m.keySignature))
             if m.timeSignature is not None:
                 mxAttributes.append(self.timeSignatureToXml(m.timeSignature))
+            smts = list(m.getElementsByClass('SenzaMisuraTimeSignature'))
+            if smts:
+                mxAttributes.append(self.timeSignatureToXml(smts[0]))
+                
             # TODO: staves (piano staff...)
             # TODO: part-symbol
             # TODO: instruments
@@ -4276,9 +4281,22 @@ class MeasureExporter(XMLExporterBase):
           <beat-type>4</beat-type>
         </time>
         
+        
+        >>> sm = meter.SenzaMisuraTimeSignature('free')
+        >>> b = MEX.timeSignatureToXml(sm)
+        >>> MEX.dump(b)
+        <time>
+          <senza-misura>free</senza-misura>
+        </time>
         '''
         #mxTimeList = []
         mxTime = Element('time')
+        if 'SenzaMisuraTimeSignature' in ts.classes:
+            mxSenzaMisura = SubElement(mxTime, 'senza-misura')
+            if ts.text is not None:
+                mxSenzaMisura.text = ts.text
+            return mxTime
+        
         # always get a flat version to display any subivisions created
         fList = [(mt.numerator, mt.denominator) for mt in ts.displaySequence.flat._partition]
         if ts.summedNumerator:

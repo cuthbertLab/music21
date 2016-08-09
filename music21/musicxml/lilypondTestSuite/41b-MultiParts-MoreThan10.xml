@@ -1,0 +1,494 @@
+<?xml version="1.0"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 0.6 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise>
+	<identification> 
+		<miscellaneous>
+			<miscellaneous-field name="description">A piece with 
+                            20 parts to check whether an application supports
+			    that many parts and whether they are 
+                            correctly sorted.</miscellaneous-field>
+		</miscellaneous>
+	</identification> 
+	<part-list>
+		<score-part id="P0">
+			<part-name>P0</part-name>
+		</score-part>
+		<score-part id="P1">
+			<part-name>P1</part-name>
+		</score-part>
+		<score-part id="P2">
+			<part-name>P2</part-name>
+		</score-part>
+		<score-part id="P3">
+			<part-name>P3</part-name>
+		</score-part>
+		<score-part id="P4">
+			<part-name>P4</part-name>
+		</score-part>
+		<score-part id="P5">
+			<part-name>P5</part-name>
+		</score-part>
+		<score-part id="P6">
+			<part-name>P6</part-name>
+		</score-part>
+		<score-part id="P7">
+			<part-name>P7</part-name>
+		</score-part>
+		<score-part id="P8">
+			<part-name>P8</part-name>
+		</score-part>
+		<score-part id="P9">
+			<part-name>P9</part-name>
+		</score-part>
+		<score-part id="P10">
+			<part-name>P10</part-name>
+		</score-part>
+		<score-part id="P11">
+			<part-name>P11</part-name>
+		</score-part>
+		<score-part id="P12">
+			<part-name>P12</part-name>
+		</score-part>
+		<score-part id="P13">
+			<part-name>P13</part-name>
+		</score-part>
+		<score-part id="P14">
+			<part-name>P14</part-name>
+		</score-part>
+		<score-part id="P15">
+			<part-name>P15</part-name>
+		</score-part>
+		<score-part id="P16">
+			<part-name>P16</part-name>
+		</score-part>
+		<score-part id="P17">
+			<part-name>P17</part-name>
+		</score-part>
+		<score-part id="P18">
+			<part-name>P18</part-name>
+		</score-part>
+		<score-part id="P19">
+			<part-name>P19</part-name>
+		</score-part>
+	</part-list>
+	<part id="P0">
+		<measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+				<beats>4</beats>
+				<beat-type>4</beat-type>
+				</time>
+				<clef>
+				<sign>G</sign>
+				<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<rest/>
+				<duration>3840</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+	</part>
+	<part id="P1">
+		<measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+				<beats>4</beats>
+				<beat-type>4</beat-type>
+				</time>
+				<clef>
+				<sign>G</sign>
+				<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<rest/>
+				<duration>3840</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+	</part>
+	<part id="P2">
+		<measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+				<beats>4</beats>
+				<beat-type>4</beat-type>
+				</time>
+				<clef>
+				<sign>G</sign>
+				<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<rest/>
+				<duration>3840</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+	</part>
+	<part id="P3">
+		<measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+				<beats>4</beats>
+				<beat-type>4</beat-type>
+				</time>
+				<clef>
+				<sign>G</sign>
+				<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<rest/>
+				<duration>3840</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+	</part>
+	<part id="P4">
+		<measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+				<beats>4</beats>
+				<beat-type>4</beat-type>
+				</time>
+				<clef>
+				<sign>G</sign>
+				<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<rest/>
+				<duration>3840</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+	</part>
+	<part id="P5">
+		<measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+				<beats>4</beats>
+				<beat-type>4</beat-type>
+				</time>
+				<clef>
+				<sign>G</sign>
+				<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<rest/>
+				<duration>3840</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+	</part>
+	<part id="P6">
+		<measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+				<beats>4</beats>
+				<beat-type>4</beat-type>
+				</time>
+				<clef>
+				<sign>G</sign>
+				<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<rest/>
+				<duration>3840</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+	</part>
+	<part id="P7">
+		<measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+				<beats>4</beats>
+				<beat-type>4</beat-type>
+				</time>
+				<clef>
+				<sign>G</sign>
+				<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<rest/>
+				<duration>3840</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+	</part>
+	<part id="P8">
+		<measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+				<beats>4</beats>
+				<beat-type>4</beat-type>
+				</time>
+				<clef>
+				<sign>G</sign>
+				<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<rest/>
+				<duration>3840</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+	</part>
+	<part id="P9">
+		<measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+				<beats>4</beats>
+				<beat-type>4</beat-type>
+				</time>
+				<clef>
+				<sign>G</sign>
+				<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<rest/>
+				<duration>3840</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+	</part>
+	<part id="P10">
+		<measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+				<beats>4</beats>
+				<beat-type>4</beat-type>
+				</time>
+				<clef>
+				<sign>G</sign>
+				<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<rest/>
+				<duration>3840</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+	</part>
+	<part id="P11">
+		<measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+				<beats>4</beats>
+				<beat-type>4</beat-type>
+				</time>
+				<clef>
+				<sign>G</sign>
+				<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<rest/>
+				<duration>3840</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+	</part>
+	<part id="P12">
+		<measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+				<beats>4</beats>
+				<beat-type>4</beat-type>
+				</time>
+				<clef>
+				<sign>G</sign>
+				<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<rest/>
+				<duration>3840</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+	</part>
+	<part id="P13">
+		<measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+				<beats>4</beats>
+				<beat-type>4</beat-type>
+				</time>
+				<clef>
+				<sign>G</sign>
+				<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<rest/>
+				<duration>3840</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+	</part>
+	<part id="P14">
+		<measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+				<beats>4</beats>
+				<beat-type>4</beat-type>
+				</time>
+				<clef>
+				<sign>G</sign>
+				<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<rest/>
+				<duration>3840</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+	</part>
+	<part id="P15">
+		<measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+				<beats>4</beats>
+				<beat-type>4</beat-type>
+				</time>
+				<clef>
+				<sign>G</sign>
+				<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<rest/>
+				<duration>3840</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+	</part>
+	<part id="P16">
+		<measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+				<beats>4</beats>
+				<beat-type>4</beat-type>
+				</time>
+				<clef>
+				<sign>G</sign>
+				<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<rest/>
+				<duration>3840</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+	</part>
+	<part id="P17">
+		<measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+				<beats>4</beats>
+				<beat-type>4</beat-type>
+				</time>
+				<clef>
+				<sign>G</sign>
+				<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<rest/>
+				<duration>3840</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+	</part>
+	<part id="P18">
+		<measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+				<beats>4</beats>
+				<beat-type>4</beat-type>
+				</time>
+				<clef>
+				<sign>G</sign>
+				<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<rest/>
+				<duration>3840</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+	</part>
+	<part id="P19">
+		<measure number="1">
+			<attributes>
+				<divisions>960</divisions>
+				<time>
+				<beats>4</beats>
+				<beat-type>4</beat-type>
+				</time>
+				<clef>
+				<sign>G</sign>
+				<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<rest/>
+				<duration>3840</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+	</part>
+</score-partwise>

@@ -187,7 +187,7 @@ class Groups(list): # no need to inherit from slotted object
 
     >>> g.append(5)
     Traceback (most recent call last):
-    GroupException: Only strings can be used as group names
+    GroupException: Only strings can be used as group names, not 5
     '''
     # could be made into a set instance, but actually
     # timing: a subclassed list and a set are almost the same speed 
@@ -198,7 +198,8 @@ class Groups(list): # no need to inherit from slotted object
     
     def _validName(self, value):
         if not isinstance(value, six.string_types):
-            raise exceptions21.GroupException("Only strings can be used as group names")
+            raise exceptions21.GroupException("Only strings can be used as group names, " + 
+                                              "not {}".format(repr(value)))
         #if ' ' in value:
         #    raise exceptions21.GroupException("Spaces are not allowed as group names")
     

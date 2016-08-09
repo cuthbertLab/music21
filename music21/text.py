@@ -297,11 +297,12 @@ class TextFormatMixin(object):
             try:
                 value = float(value)
             except ValueError:
-                raise TextFormatException('Not a supported size: %s' % value)
+                pass # MusicXML font sizes can be CSS strings...
+                #raise TextFormatException('Not a supported size: %s' % value)
         self._size = value
 
     size = property(_getSize, _setSize, 
-        doc = '''Get or set the size.
+        doc = '''Get or set the size.  Best, a float, but also a css font size
 
         >>> tf = text.TextFormatMixin()
         >>> tf.size = 20

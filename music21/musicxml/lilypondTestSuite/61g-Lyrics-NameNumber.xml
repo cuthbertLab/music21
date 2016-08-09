@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise>
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">A lyrics syllable can have both 
+          a number and a name attribute. The question is: What should be used 
+          to put syllables of the same voice together. This example uses 
+          different number/name combinations to check how different 
+          applications handle this unspecified case (The advice on the 
+          MusicXML mailing list was "there is no correct way, each 
+          application can do what it thinks is best").</miscellaneous-field>
+    </miscellaneous>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name>MusicXML Part</part-name>
+    </score-part>
+  </part-list>
+  <!--=========================================================-->
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key><fifths>0</fifths><mode>major</mode></key>
+        <time><beats>6</beats><beat-type>4</beat-type></time>
+        <clef><sign>G</sign><line>2</line></clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="Verse">
+          <syllabic>begin</syllabic>
+          <text>Verse1A</text>
+        </lyric>
+        <lyric number="1" name="Chorus">
+          <syllabic>begin</syllabic>
+          <text>Chorus1A</text>
+        </lyric>
+        <lyric number="1" name="Chorus">
+          <syllabic>begin</syllabic>
+          <text>AnotherChorus1A</text>
+        </lyric>
+        <lyric number="2" name="Chorus">
+          <syllabic>begin</syllabic>
+          <text>Chorus1A</text>
+        </lyric>
+      </note>
+      <note>
+        <pitch><step>G</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1">
+          <syllabic>begin</syllabic>
+          <text>1B</text>
+        </lyric>
+        <lyric number="2">
+          <syllabic>begin</syllabic>
+          <text>2B</text>
+        </lyric>
+      </note>
+      <note>
+        <pitch><step>G</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="Verse">
+          <syllabic>begin</syllabic>
+          <text>Verse1C</text>
+        </lyric>
+        <lyric number="2" name="Chorus">
+          <syllabic>begin</syllabic>
+          <text>Chorus2C</text>
+        </lyric>
+      </note>
+      <note>
+        <pitch><step>G</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="Chorus">
+          <syllabic>begin</syllabic>
+          <text>Chorus1D</text>
+        </lyric>
+      </note>
+      <note>
+        <pitch><step>G</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric name="Verse">
+          <syllabic>begin</syllabic>
+          <text>VerseE</text>
+        </lyric>
+      </note>
+      <note>
+        <pitch><step>G</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric>
+          <syllabic>begin</syllabic>
+          <text>NoneF</text>
+        </lyric>
+      </note>
+      <barline location="right">
+        <bar-style>light-heavy</bar-style>
+      </barline>
+    </measure>
+  </part>
+  <!--=========================================================-->
+</score-partwise>

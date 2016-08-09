@@ -1085,6 +1085,7 @@ class TremoloSpanner(spanner.Spanner):
     # musicxml defines a start, stop, and a continue; will try to avoid continue
     def __init__(self, *arguments, **keywords):
         spanner.Spanner.__init__(self, *arguments, **keywords)
+        self.placement = None
         self.measured = True
         self._numberOfMarks = 3
         

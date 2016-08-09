@@ -540,7 +540,19 @@ class MusicXMLImporter(XMLParserBase):
         self.parsePartList(mxScore)
         for p in mxScore.findall('part'):
             partId = p.get('id')
-            part = self.xmlPartToPart(p, self.partIdDict[partId])
+            if partId is None: # pragma: no cover
+                partId = list(self.partIdDict.keys())[0]
+                # Lilypond Test Suite allows for parsing w/o a part ID for one part...
+            try:
+                partInfo = self.partIdDict[partId]
+            except KeyError: # pragma: no cover
+                environLocal.warn("Cannot find info for part with name {}".format(partId) 
+                                  + ", skipping the part")
+                continue
+            
+            part = self.xmlPartToPart(p, partInfo)
+            
+            
             if part is not None: # for instance, in partStreams
                 s._insertCore(0.0, part)
                 self.m21PartObjectsById[partId] = part
@@ -886,6 +898,8 @@ class PartParser(XMLParserBase):
         self.mxPartInfo = mxPartInfo
         if mxPart is not None:
             self.partId = mxPart.get('id')
+            if self.partId is None and parent is not None:
+                self.partId = list(parent.partIdDict.keys())[0]
         else:
             self.partId = ""
         self._parent = common.wrapWeakref(parent)
@@ -1630,7 +1644,6 @@ class MeasureParser(XMLParserBase):
         # note either does not exist or is not a chord, we 
         # have a complete chord
         if len(self.mxNoteList) > 0 and nextNoteIsChord is False:
-            # TODO: move spanners from first note to Chord.  See slur in m2 of schoenberg/op19 #2
             c = self.xmlToChord(self.mxNoteList)
             # add any accumulated lyrics
             self.updateLyricsFromList(c, self.mxLyricList)
@@ -1678,6 +1691,7 @@ class MeasureParser(XMLParserBase):
         for mxNote in mxNoteList:
             notes.append(self.xmlToSimpleNote(mxNote, freeSpanners=False))
         c = chord.Chord(notes)
+        # move spanners from first note to Chord.  See slur in m2 of schoenberg/op19 #2
         for n in notes:
             ss = n.getSpannerSites()
             # transfer all spanners from the notes to the chord.
@@ -1930,7 +1944,8 @@ class MeasureParser(XMLParserBase):
         mxAlter = mxPitch.find('alter')
         accAlter = None
         if mxAlter is not None:
-            accAlter = int(mxAlter.text.strip()) 
+            accAlter = float(mxAlter.text.strip()) 
+            
                 
         mxAccidental = mxNote.find('accidental')
         mxAccidentalName = None
@@ -3477,7 +3492,8 @@ class MeasureParser(XMLParserBase):
         
     def xmlToTimeSignature(self, mxTime):
         '''
-        Returns a TimeSignature or None (for senza-misura) from a TimeSignature object.
+        Returns a TimeSignature or SenzaMisuraTimeSignature (for senza-misura) 
+        from a <time> block.
 
         >>> import xml.etree.ElementTree as ET
         >>> MP = musicxml.xmlToM21.MeasureParser()
@@ -3495,11 +3511,14 @@ class MeasureParser(XMLParserBase):
         ...                              '<beats>4</beats><beat-type>4</beat-type></time>')        
         >>> MP.xmlToTimeSignature(mxTime)
         <music21.meter.TimeSignature 3/8+4/4>    
+
+        >>> mxSenza = ET.fromstring('<time><senza-misura>0</senza-misura></time>')        
+        >>> MP.xmlToTimeSignature(mxSenza)
+        <music21.meter.SenzaMisuraTimeSignature 0 >
         ''' 
         isSenzaMisura = mxTime.find('senza-misura') 
-        if isSenzaMisura:
-            # TODO: return the content as a senza-misura object.
-            return None
+        if isSenzaMisura is not None:        
+            return meter.SenzaMisuraTimeSignature(isSenzaMisura.text)
         
         n = []
         d = []

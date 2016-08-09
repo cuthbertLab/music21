@@ -4334,6 +4334,31 @@ class TimeSignature(base.Music21Object):
 
 #------------------------------------------------------------------------------
 
+class SenzaMisuraTimeSignature(base.Music21Object):
+    '''
+    A SenzaMisuraTimeSignature represents the absence of a TimeSignature
+    
+    It is NOT a TimeSignature subclass, only because it has none of the attributes
+    of a TimeSignature.
+    
+    >>> smts = meter.SenzaMisuraTimeSignature('0')
+    >>> smts.text
+    '0'
+    >>> smts
+    <music21.meter.SenzaMisuraTimeSignature 0 >
+    '''
+    def __init__(self, text=None):
+        super(SenzaMisuraTimeSignature, self).__init__()
+        self.text = text
+
+    def __repr__(self):
+        head = "<music21.meter.SenzaMisuraTimeSignature"
+        if self.text is None:
+            return head + ">" 
+        else:
+            return head + " " + self.text + " >"
+
+
 # TODO: Implement or delete...
 
 # class CompoundTimeSignature(TimeSignature):

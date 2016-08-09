@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="2.0">
+  <work>
+    <work-number></work-number>
+    <work-title></work-title>
+  </work>
+  <movement-number></movement-number>
+  <movement-title>Empty work-title, non-empty movement-title</movement-title>
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">A piece with an empty (but
+            existing) work-title, but a non-empty movement-title. In this case
+            the movement-title should be chosen, even though the work-title
+            exists.</miscellaneous-field>
+    </miscellaneous>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name print-object="no">MusicXML Part</part-name>
+    </score-part>
+  </part-list>
+  <!--=========================================================-->
+  <part id="P1">
+    <measure number="1">
+      <note>
+        <rest/>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>whole</type>
+      </note>
+    </measure>
+  </part>
+  <!--=========================================================-->
+</score-partwise>
