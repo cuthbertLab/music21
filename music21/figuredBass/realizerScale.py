@@ -8,8 +8,6 @@
 # Copyright:    Copyright © 2010-2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-from builtins import map
-
 import copy
 import itertools
 import unittest
@@ -21,6 +19,10 @@ from music21 import key
 from music21 import scale
 from music21.figuredBass import notation
 from music21.ext import six
+
+if six.PY2:
+    from future_builtins import map
+    
 
 scaleModes = {'major' : scale.MajorScale,
               'minor' : scale.MinorScale,
