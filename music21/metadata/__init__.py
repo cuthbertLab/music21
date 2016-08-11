@@ -515,7 +515,7 @@ class Metadata(base.Music21Object):
 
         >>> md.setWorkId('sdf', None)
         Traceback (most recent call last):
-        MetadataException: no work id available with id: sdf
+        music21.exceptions21.MetadataException: no work id available with id: sdf
         '''
         idStr = idStr.lower()
         match = False

@@ -2360,7 +2360,7 @@ class Pitch(object):
         >>> a.nameWithOctave = 'C#9'
         >>> a.nameWithOctave = 'C#'
         Traceback (most recent call last):
-        PitchException: Cannot set a nameWithOctave with 'C#'
+        music21.pitch.PitchException: Cannot set a nameWithOctave with 'C#'
         '''
         try:
             lenVal = len(value)
@@ -2511,7 +2511,7 @@ class Pitch(object):
         >>> b = pitch.Pitch('E4')
         >>> b.step = "B-"
         Traceback (most recent call last):
-        PitchException: Cannot make a step out of 'B-'
+        music21.pitch.PitchException: Cannot make a step out of 'B-'
 
         This is okay though:
 
@@ -2745,7 +2745,7 @@ class Pitch(object):
         >>> p1.accidental = pitch.Accidental('half-sharp')
         >>> p1.german
         Traceback (most recent call last):
-        PitchException: Es geht nicht "german" zu benutzen mit Microt...nen.  Schade!
+        music21.pitch.PitchException: Es geht nicht "german" zu benutzen mit Microt...nen.  Schade!
 
         Note these rarely used pitches:
 
@@ -2808,7 +2808,7 @@ class Pitch(object):
         >>> p1.accidental = pitch.Accidental('half-sharp')
         >>> p1.italian
         Traceback (most recent call last):
-        PitchException: Non si puo usare `italian` con microtoni
+        music21.pitch.PitchException: Non si puo usare `italian` con microtoni
 
         Note these rarely used pitches:
 
@@ -2894,7 +2894,7 @@ class Pitch(object):
         >>> p1.accidental = pitch.Accidental('half-sharp')
         >>> p1.spanish
         Traceback (most recent call last):
-        PitchException: Unsupported accidental type.
+        music21.pitch.PitchException: Unsupported accidental type.
 
         Note these rarely used pitches:
 
@@ -2943,7 +2943,8 @@ class Pitch(object):
         >>> p1.accidental = pitch.Accidental('half-sharp')
         >>> p1.french
         Traceback (most recent call last):
-        PitchException: On ne peut pas utiliser les microtones avec "french." Quelle Dommage!        
+        music21.pitch.PitchException: On ne peut pas utiliser les microtones avec "french." 
+            Quelle Dommage!        
         '''
         if self.accidental is not None:
             tempAlter = self.accidental.alter

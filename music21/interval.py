@@ -273,12 +273,16 @@ def convertGeneric(value):
     -12
     >>> interval.convertGeneric(1)
     1
+    
     >>> interval.convertGeneric(None)
     Traceback (most recent call last):
-    IntervalException: Cannot get a direction from None
+    music21.interval.IntervalException: Cannot get a direction from None
+    
+    Strings are not the same as numbers...
+    
     >>> interval.convertGeneric("1")
     Traceback (most recent call last):
-    IntervalException: Cannot get a direction from 1
+    music21.interval.IntervalException: Cannot get a direction from 1
     '''
     post = None
     if common.isNum(value):
@@ -461,12 +465,15 @@ def intervalToPythagoreanRatio(intervalObj):
 
     >>> p1, p2 = pitch.Pitch('C1'), pitch.Pitch('C1')
     >>> p2.accidental = 'half-sharp'
+    
     >>> fiftyCent = interval.Interval(p1, p2)
     >>> fiftyCent
     <music21.interval.Interval A1 (-50c)>
+    
     >>> interval.intervalToPythagoreanRatio(fiftyCent)
     Traceback (most recent call last):
-    IntervalException: Could not find a pythagorean ratio for <music21.interval.Interval A1 (-50c)>.
+    music21.interval.IntervalException: Could not find a pythagorean ratio for 
+        <music21.interval.Interval A1 (-50c)>.
     '''
     from music21.pitch import Pitch
 
@@ -603,7 +610,7 @@ class GenericInterval(IntervalBase):
 
         >>> aInterval = interval.GenericInterval(0)
         Traceback (most recent call last):
-        IntervalException: The Zeroth is not an interval
+        music21.interval.IntervalException: The Zeroth is not an interval
 
         >>> aInterval = interval.GenericInterval(24)
         >>> aInterval.niceName
@@ -1521,7 +1528,8 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
     >>> dInterval = interval.ChromaticInterval(10)  # 8x augmented second
     >>> interval._getSpecifierFromGenericChromatic(cInterval, dInterval)
     Traceback (most recent call last):
-    IntervalException: cannot get a specifier for a note with this many semitones off of Major: 8
+    music21.interval.IntervalException: cannot get a specifier for a note with 
+        this many semitones off of Major: 8
     '''        
     noteVals = [None, 0, 2, 4, 5, 7, 9, 11]
     normalSemis = noteVals[gInt.simpleUndirected] + 12 * gInt.undirectedOctaves
@@ -1713,7 +1721,7 @@ class Interval(IntervalBase):
     
     >>> aInterval = interval.Interval(noteStart=n1, noteEnd=None)
     Traceback (most recent call last):
-    IntervalException: either both the starting and the ending note.Note must 
+    music21.interval.IntervalException: either both the starting and the ending note must 
         be given or neither can be given.  You cannot have one without the other.
 
     An Interval can be constructed from a Diatonic and Chromatic Interval object (or just one)

@@ -1536,7 +1536,7 @@ class LilypondConverter(object):
         >>> d = duration.Duration(5.0)
         >>> str(lpc.lyMultipliedDurationFromDuration(d))
         Traceback (most recent call last):
-        LilyTranslateException: DurationException for durationObject 
+        music21.lily.translate.LilyTranslateException: DurationException for durationObject 
             <music21.duration.Duration 5.0>: Could not determine durationNumber from None
 
         Instead split by components:

@@ -365,7 +365,7 @@ class StreamFreezer(StreamFreezeThawBase):
         2
         >>> n.getOffsetBySite(s)
         Traceback (most recent call last):
-        SitesException: an entry for this object <music21.note.Note D#> 
+        music21.sites.SitesException: an entry for this object <music21.note.Note D#> 
                is not stored in stream <music21.stream.Stream stream s>
         >>> n.getOffsetBySite(t)
         20.0
@@ -434,7 +434,7 @@ class StreamFreezer(StreamFreezeThawBase):
          (<music21.bar.Barline style=regular>, 'end')]
         >>> n1.getOffsetBySite(s)
         Traceback (most recent call last):
-        SitesException: an entry for this object <music21.note.Note C#> is 
+        music21.sites.SitesException: an entry for this object <music21.note.Note C#> is 
              not stored in stream <music21.stream.Measure 0 offset=0.0>
 
         Trying it again, but now with substreams:
@@ -1140,7 +1140,7 @@ class JSONFreezeThawBase(object):
 
         >>> jss.music21ObjectFromString('blah.NotAClass')
         Traceback (most recent call last):
-        JSONFreezerException: Cannot generate a new object from blah.NotAClass
+        music21.freezeThaw.JSONFreezerException: Cannot generate a new object from blah.NotAClass
         '''
         import music21 # pylint: disable=redefined-outer-name
         idStrOrig = idStr

@@ -996,7 +996,7 @@ def fromRoman(num):
 
     >>> common.fromRoman('vx')
     Traceback (most recent call last):
-    Music21CommonException: input contains an invalid subtraction element: vx
+    music21.exceptions21.Music21CommonException: input contains an invalid subtraction element: vx
 
     :rtype: int
     '''

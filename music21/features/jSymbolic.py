@@ -3939,12 +3939,13 @@ def getExtractorByTypeAndNumber(extractorType, number):
     
     >>> features.jSymbolic.getExtractorByTypeAndNumber('L', 900)
     Traceback (most recent call last):
-    ...
-    JSymbolicFeatureException: Could not find any jSymbolic features of type L
+    music21.features.jSymbolic.JSymbolicFeatureException: Could not find 
+        any jSymbolic features of type L
+
     >>> features.jSymbolic.getExtractorByTypeAndNumber('C', 200)
     Traceback (most recent call last):
-    ...
-    JSymbolicFeatureException: jSymbolic features of type C do not have number 200
+    music21.features.jSymbolic.JSymbolicFeatureException: jSymbolic 
+        features of type C do not have number 200
     
     
     You could also find all the feature extractors this way:

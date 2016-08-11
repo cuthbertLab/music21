@@ -2430,7 +2430,7 @@ class DiatonicScale(ConcreteScale):
         >>> sc = scale.DiatonicScale()
         >>> sc.getTonic()
         Traceback (most recent call last):
-        IntervalNetworkException: pitchReference cannot be None
+        music21.scale.intervalNetwork.IntervalNetworkException: pitchReference cannot be None
         '''
         # NOTE: override method on ConcreteScale that simply returns _tonic
         return self.pitchFromDegree(self._abstract.tonicDegree)
@@ -3019,7 +3019,7 @@ class ScalaScale(ConcreteScale):
 
     >>> sc = scale.ScalaScale('badFileName.scl')
     Traceback (most recent call last):
-    ScaleException: Could not find a file named badFileName.scl in the scala database
+    music21.scale.ScaleException: Could not find a file named badFileName.scl in the scala database
     '''
     def __init__(self, tonic=None, scalaString=None):
         if (tonic is not None 

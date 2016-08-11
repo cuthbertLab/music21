@@ -961,7 +961,8 @@ class MetricModulation(TempoIndication):
 
         >>> mmod1.oldMetronome = 'junk'
         Traceback (most recent call last):
-        MetricModulationException: oldMetronome property must be set with a MetronomeMark instance
+        music21.tempo.MetricModulationException: oldMetronome property 
+            must be set with a MetronomeMark instance
 
         ''')
 
@@ -1034,7 +1035,8 @@ class MetricModulation(TempoIndication):
         >>> mmod1.newMetronome = mm1
         >>> mmod1.newMetronome = 'junk'
         Traceback (most recent call last):
-        MetricModulationException: newMetronome property must be set with a MetronomeMark instance
+        music21.tempo.MetricModulationException: newMetronome property must be 
+            set with a MetronomeMark instance
 
         ''')
 
@@ -1270,10 +1272,9 @@ def interpolateElements(element1, element2, sourceStream,
     >>> destStream3.insert(100, element1)
     >>> destStream3.insert(500, element2)
     >>> eA.id = "blah"
-    >>> tempo.interpolateElements(element1, element2, sourceStream, destStream3, autoAdd = False)
+    >>> tempo.interpolateElements(element1, element2, sourceStream, destStream3, autoAdd=False)
     Traceback (most recent call last):
-    ...
-    TempoException: Could not find element <music21.note.Note D> with id ...
+    music21.tempo.TempoException: Could not find element <music21.note.Note D> with id ...
 
     '''
     try:

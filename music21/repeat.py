@@ -1960,12 +1960,13 @@ class RepeatFinder(object):
         >>> tooShort = noPickup.parts[0].measures(1, 2)
         >>> repeat.RepeatFinder(tooShort).getQuarterLengthOfPickupMeasure()
         Traceback (most recent call last):
-        InsufficientLengthException: Cannot determine length of pickup given fewer than 3 measures
+        music21.repeat.InsufficientLengthException: Cannot determine length 
+            of pickup given fewer than 3 measures
         
         _OMIT_FROM_DOCS_
         >>> repeat.RepeatFinder().getQuarterLengthOfPickupMeasure()
         Traceback (most recent call last):
-        NoInternalStreamException: RepeatFinder must be initialized with a stream
+        music21.repeat.NoInternalStreamException: RepeatFinder must be initialized with a stream
         
         '''            
         if self.s is None:
@@ -2012,10 +2013,11 @@ class RepeatFinder(object):
         _OMIT_FROM_DOCS_
         >>> repeat.RepeatFinder(noPickup.parts[0].measures(1, 2)).hasPickup()
         Traceback (most recent call last):
-        InsufficientLengthException: Cannot determine length of pickup given fewer than 3 measures
+        music21.repeat.InsufficientLengthException: Cannot determine length of pickup 
+            given fewer than 3 measures
         >>> repeat.RepeatFinder().hasPickup()
         Traceback (most recent call last):
-        NoInternalStreamException: RepeatFinder must be initialized with a stream
+        music21.repeat.NoInternalStreamException: RepeatFinder must be initialized with a stream
         '''
         if self.s is None:
             raise NoInternalStreamException("RepeatFinder must be initialized with a stream")
@@ -2054,7 +2056,7 @@ class RepeatFinder(object):
         _OMIT_FROM_DOCS_
         >>> repeat.RepeatFinder().getMeasureSimilarityList()
         Traceback (most recent call last):
-        NoInternalStreamException: RepeatFinder must be initialized with a stream
+        music21.repeat.NoInternalStreamException: RepeatFinder must be initialized with a stream
         '''
         
         if self.s is None:

@@ -94,7 +94,7 @@ def fromCacheName(name):
 
     >>> corpus.manager.fromCacheName('testDummy')
     Traceback (most recent call last):
-    CorpusException: Cannot parse a cacheName of 'testDummy'
+    music21.exceptions21.CorpusException: Cannot parse a cacheName of 'testDummy'
     '''
     if name == 'core':
         return corpora.CoreCorpus()

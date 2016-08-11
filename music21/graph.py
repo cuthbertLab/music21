@@ -189,15 +189,15 @@ def getColor(color):
     
     >>> graph.getColor('l')
     Traceback (most recent call last):
-    GraphException: invalid color abbreviation: l
+    music21.graph.GraphException: invalid color abbreviation: l
 
     >>> graph.getColor('chalkywhitebutsortofgreenish')
     Traceback (most recent call last):
-    GraphException: invalid color name: chalkywhitebutsortofgreenish
+    music21.graph.GraphException: invalid color name: chalkywhitebutsortofgreenish
 
     >>> graph.getColor(True)
     Traceback (most recent call last):
-    GraphException: invalid color specification: True
+    music21.graph.GraphException: invalid color specification: True
     '''
     # expand a single value to three
     if common.isNum(color):

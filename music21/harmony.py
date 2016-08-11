@@ -429,7 +429,7 @@ class Harmony(chord.Chord):
         >>> h.addChordStepModification(hd)
         >>> h.addChordStepModification('juicy')
         Traceback (most recent call last):
-        HarmonyException: cannot add this object as a degree: juicy
+        music21.harmony.HarmonyException: cannot add this object as a degree: juicy
         '''
         if not isinstance(degree, ChordStepModification):
             # TODO: possibly create ChordStepModification objects from other 
@@ -547,7 +547,7 @@ class ChordStepModification(object):
 
         >>> hd.degree = 'juicy'
         Traceback (most recent call last):
-        ChordStepModificationException: not a valid degree: juicy
+        music21.harmony.ChordStepModificationException: not a valid degree: juicy
         '''
         return self._degree
 
@@ -609,7 +609,7 @@ class ChordStepModification(object):
 
         >>> hd.modType = 'juicy'
         Traceback (most recent call last):
-        ChordStepModificationException: not a valid degree modification type: juicy
+        music21.harmony.ChordStepModificationException: not a valid degree modification type: juicy
         '''
         return self._modType
 

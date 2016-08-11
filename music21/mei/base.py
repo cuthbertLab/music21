@@ -524,7 +524,7 @@ def _attrTranslator(attr, name, mapping):
     '#'
     >>> _attrTranslator('9', 'dur', _DUR_ATTR_DICT)
     Traceback (most recent call last):
-    MeiValueError: Unexpected value for "dur" attribute: 9
+    music21.mei.base.MeiValueError: Unexpected value for "dur" attribute: 9
     '''
     try:
         return mapping[attr]

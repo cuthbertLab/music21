@@ -187,7 +187,7 @@ class Groups(list): # no need to inherit from slotted object
 
     >>> g.append(5)
     Traceback (most recent call last):
-    GroupException: Only strings can be used as group names, not 5
+    music21.exceptions21.GroupException: Only strings can be used as group names, not 5
     '''
     # could be made into a set instance, but actually
     # timing: a subclassed list and a set are almost the same speed 
@@ -801,7 +801,7 @@ class Music21Object(object):
         >>> s2.id = 'notContainingStream'
         >>> n.getOffsetBySite(s2)
         Traceback (most recent call last):
-        SitesException: an entry for this object <music21.note.Note A-> is not 
+        music21.sites.SitesException: an entry for this object <music21.note.Note A-> is not 
               stored in stream <music21.stream.Stream notContainingStream>
 
         Consider this use of derivations:
@@ -818,7 +818,7 @@ class Music21Object(object):
         
         >>> s1.elementOffset(nCopy)
         Traceback (most recent call last):
-        SitesException: an entry for this object ... is not 
+        music21.sites.SitesException: an entry for this object ... is not 
             stored in stream <music21.stream.Stream containingStream>
         
 
@@ -934,7 +934,7 @@ class Music21Object(object):
         >>> s2 = stream.Score(id="otherScore")
         >>> n.getOffsetInHierarchy(s2)
         Traceback (most recent call last):
-        SitesException: Element <music21.note.Note C> 
+        music21.sites.SitesException: Element <music21.note.Note C> 
             is not in hierarchy of <music21.stream.Score otherScore>
         
         But if the element is derived from an element in a hierarchy then it can get the offset:
@@ -2346,7 +2346,7 @@ class Music21Object(object):
         
         >>> aloneNote.sortTuple(aloneStream, raiseExceptionOnMiss=True)
         Traceback (most recent call last):
-        SitesException: an entry for this object 0x... is not stored in 
+        music21.sites.SitesException: an entry for this object 0x... is not stored in 
             stream <music21.stream.Stream aloneStream>
         '''
         if useSite is False: # False or a Site; since None is a valid site, default is False
@@ -2477,7 +2477,7 @@ class Music21Object(object):
         >>> a.priority = 3
         >>> a.priority = 'high'
         Traceback (most recent call last):
-        ElementException: priority values must be integers.
+        music21.base.ElementException: priority values must be integers.
         ''')
 
 
@@ -2776,7 +2776,8 @@ class Music21Object(object):
         >>> n.quarterLength = 0.5
         >>> a, b = n.splitAtQuarterLength(0.7)
         Traceback (most recent call last):
-        DurationException: cannot split a duration (0.5) at this quarterLength (7/10)
+        music21.duration.DurationException: cannot split a duration (0.5) 
+            at this quarterLength (7/10)
         '''
         # needed for temporal manipulations; not music21 objects
         from music21 import tie

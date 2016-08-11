@@ -139,7 +139,7 @@ def rhythmicSearch(thisStream, searchStream):
     >>> s = stream.Stream()
     >>> search.rhythmicSearch(pf, s)
     Traceback (most recent call last):
-    SearchException: the search Stream cannot be empty
+    music21.search.base.SearchException: the search Stream cannot be empty
     
     why doesn't this work?  thisStream[found].expressions.append(expressions.TextExpression("*"))
     

@@ -319,7 +319,6 @@ class Date(object):
 
         >>> a.datetime
         Traceback (most recent call last):
-        ...
         TypeError: Required argument 'day' (pos 3) not found
 
         '''
@@ -497,7 +496,8 @@ class DateRelative(DateSingle):
 
     >>> dd = metadata.DateRelative('2009/12/31', 'certain')
     Traceback (most recent call last):
-    MetadataException: Relevance value is not supported by this object: 'certain'
+    music21.exceptions21.MetadataException: Relevance value is not 
+        supported by this object: 'certain'
     '''
 
     ### CLASS VARIABLES ###
@@ -553,7 +553,8 @@ class DateBetween(DateSingle):
 
     >>> dd = metadata.DateBetween(['2009/12/31', '2010/1/28'], 'certain')
     Traceback (most recent call last):
-    MetadataException: Relevance value is not supported by this object: 'certain'
+    music21.exceptions21.MetadataException: Relevance value is not 
+        supported by this object: 'certain'
     '''
 
     ### CLASS VARIABLES ###
@@ -626,7 +627,8 @@ class DateSelection(DateSingle):
     ...     'certain',
     ...     )
     Traceback (most recent call last):
-    MetadataException: Relevance value is not supported by this object: 'certain'
+    music21.exceptions21.MetadataException: Relevance value is not 
+        supported by this object: 'certain'
     '''
 
     ### CLASS VARIABLES ###

@@ -275,7 +275,7 @@ class Beams(SlottedObjectMixin):
 
         >>> a.fill(7)
         Traceback (most recent call last):
-        BeamException: cannot fill beams for level 7
+        music21.beam.BeamException: cannot fill beams for level 7
         '''
         #TODO -- why not to 2048th?
         self.beamsList = []
@@ -385,7 +385,7 @@ class Beams(SlottedObjectMixin):
 
         >>> a.setAll('sexy')
         Traceback (most recent call last):
-        BeamException: beam type cannot be sexy
+        music21.beam.BeamException: beam type cannot be sexy
 
         '''
         if type not in ('start', 'stop', 'continue', 'partial'):
@@ -422,7 +422,7 @@ class Beams(SlottedObjectMixin):
 
         >>> a.setByNumber(2, 'crazy')
         Traceback (most recent call last):
-        BeamException: beam type cannot be crazy
+        music21.beam.BeamException: beam type cannot be crazy
 
         '''
         # permit providing one argument hyphenated

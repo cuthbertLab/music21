@@ -350,7 +350,8 @@ class GeneralMordent(Ornament):
         >>> m2 = expressions.GeneralMordent()
         >>> m2.realize(n2)
         Traceback (most recent call last):
-        ExpressionException: Cannot realize a mordent if I do not know its direction
+        music21.expressions.ExpressionException: Cannot realize a mordent if I do not 
+            know its direction
 
         :type srcObj: base.Music21Object
         '''
@@ -553,8 +554,7 @@ class Trill(Ornament):
         >>> t2 = expressions.Trill()
         >>> t2.realize(n2)
         Traceback (most recent call last):
-            ...
-        ExpressionException: The note is not long enough to realize a trill
+        music21.expressions.ExpressionException: The note is not long enough to realize a trill
         
         :type srcObj: base.Music21Object
         '''
@@ -718,8 +718,7 @@ class Turn(Ornament):
         >>> t2 = expressions.Turn()
         >>> t2.realize(n2)
         Traceback (most recent call last):
-            ...
-        ExpressionException: The note is not long enough to realize a turn
+        music21.expressions.ExpressionException: The note is not long enough to realize a turn
 
         :type srcObj: base.Music21Object
         '''
@@ -892,11 +891,11 @@ class Tremolo(Ornament):
     
     >>> t.numberOfMarks = 'Hi'
     Traceback (most recent call last):
-    TremoloException: Number of marks must be a number from 0 to 8
+    music21.expressions.TremoloException: Number of marks must be a number from 0 to 8
 
     >>> t.numberOfMarks = -1
     Traceback (most recent call last):
-    TremoloException: Number of marks must be a number from 0 to 8
+    music21.expressions.TremoloException: Number of marks must be a number from 0 to 8
     
     
     TODO: (someday) realize triplet Tremolos, etc. differently from other tremolos.
@@ -1080,7 +1079,7 @@ class TremoloSpanner(spanner.Spanner):
 
     >>> ts.numberOfMarks = -1
     Traceback (most recent call last):
-    TremoloException: Number of marks must be a number from 0 to 8
+    music21.expressions.TremoloException: Number of marks must be a number from 0 to 8
     '''
     # musicxml defines a start, stop, and a continue; will try to avoid continue
     def __init__(self, *arguments, **keywords):

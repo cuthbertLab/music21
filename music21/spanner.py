@@ -1715,9 +1715,9 @@ class Line(Spanner):
         
         >>> b = spanner.Line()
         >>> b.lineType = 'dotted'
-        >>> b.lineType = 'junk'
+        >>> b.lineType = 'navyblue'
         Traceback (most recent call last):
-        SpannerException: not a valid value: junk
+        music21.spanner.SpannerException: not a valid value: navyblue
 
         >>> b.validLineTypes
         ('solid', 'dashed', 'dotted', 'wavy')

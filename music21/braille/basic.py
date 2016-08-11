@@ -1178,7 +1178,7 @@ def transcribeNoteFingering(sampleNoteFingering='1', upperFirstInFingering=True)
     
     >>> basic.transcribeNoteFingering('6')
     Traceback (most recent call last):
-    BrailleBasicException: Cannot translate note fingering: 6
+    music21.braille.basic.BrailleBasicException: Cannot translate note fingering: 6
     """
     fingerMarks = lookup.fingerMarks
     if isinstance(sampleNoteFingering, int):

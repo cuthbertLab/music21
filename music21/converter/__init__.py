@@ -363,7 +363,7 @@ def unregisterSubconverter(removeSubconverter):
     ...    registerInputExtensions = ('mus',)
     >>> converter.unregisterSubconverter(ConverterSonix)
     Traceback (most recent call last):
-    ConverterException: Could not remove <class 'music21.ConverterSonix'> from 
+    music21.converter.ConverterException: Could not remove <class 'music21.ConverterSonix'> from 
                 registered subconverters
     
     The special command "all" removes everything including the default converters:

@@ -634,7 +634,7 @@ class GeneralNote(base.Music21Object):
         >>> n = note.Note('g#')
         >>> n.augmentOrDiminish(-1)
         Traceback (most recent call last):
-        NoteException: scalar must be greater than zero
+        music21.note.NoteException: scalar must be greater than zero
         '''
         if not scalar > 0:
             raise NoteException('scalar must be greater than zero')
@@ -798,7 +798,7 @@ class NotRest(GeneralNote):
         'noStem'
         >>> n.stemDirection = 'junk'
         Traceback (most recent call last):
-        NotRestException: not a valid stem direction name: junk
+        music21.note.NotRestException: not a valid stem direction name: junk
         ''')
 
 
@@ -830,7 +830,7 @@ class NotRest(GeneralNote):
 
         >>> n.notehead = 'junk'
         Traceback (most recent call last):
-        NotRestException: not a valid notehead type name: 'junk'
+        music21.note.NotRestException: not a valid notehead type name: 'junk'
         ''')
 
 
@@ -862,9 +862,9 @@ class NotRest(GeneralNote):
         >>> n.noteheadFill
         True
 
-        >>> n.noteheadFill = 'junk'
+        >>> n.noteheadFill = 'jelly'
         Traceback (most recent call last):
-        NotRestException: not a valid notehead fill value: junk
+        music21.note.NotRestException: not a valid notehead fill value: jelly
         ''')
 
 
@@ -901,7 +901,7 @@ class NotRest(GeneralNote):
         
         >>> n.noteheadParenthesis = 'blah'
         Traceback (most recent call last):
-        NotRestException: notehead parentheses must be True or False, not 'blah'
+        music21.note.NotRestException: notehead parentheses must be True or False, not 'blah'
         ''')
 
     #---------------------------------------------------------------------------

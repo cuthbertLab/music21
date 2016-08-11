@@ -756,11 +756,13 @@ class Environment(object):
 
         >>> a['autoDownload'] = 'adsf'
         Traceback (most recent call last):
-        EnvironmentException: adsf is not an acceptable value for preference: autoDownload
+        music21.environment.EnvironmentException: adsf is not an acceptable 
+            value for preference: autoDownload
 
         >>> a['showFormat'] = 'adsf'
         Traceback (most recent call last):
-        EnvironmentException: adsf is not an acceptable value for preference: showFormat
+        music21.environment.EnvironmentException: adsf is not an acceptable 
+            value for preference: showFormat
 
         >>> a['showFormat'] = 'musicxml'
         >>> a['localCorpusPath'] = '/path/to/local'
@@ -1139,13 +1141,13 @@ class UserSettings(object):
         >>> us = environment.UserSettings()
         >>> us['musicxmlPath'] = 'asdfwerasdffasdfwer'
         Traceback (most recent call last):
-        UserSettingsException: attempting to set a value to a path that does not exist: 
-            asdfwerasdffasdfwer
+        music21.environment.UserSettingsException: attempting to set a value 
+            to a path that does not exist: asdfwerasdffasdfwer
 
         >>> us['localCorpusPath'] = '/path/to/local'
         Traceback (most recent call last):
-        UserSettingsException: attempting to set a value to a path that does not exist: 
-            /path/to/local
+        music21.environment.UserSettingsException: attempting to set a value 
+            to a path that does not exist: /path/to/local
         '''
         # NOTE: testing setting of any UserSettings key will result
         # in a change in your local preferences files
@@ -1236,7 +1238,7 @@ def set(key, value):  # okay to override set here: @ReservedAssignment
 
     >>> environment.set('wer', 'asdf')
     Traceback (most recent call last):
-    EnvironmentException: no preference: wer
+    music21.environment.EnvironmentException: no preference: wer
 
     >>> #_DOCS_SHOW environment.set('musicxmlPath', '/Applications/Finale Reader.app')
     '''

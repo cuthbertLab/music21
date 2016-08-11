@@ -569,7 +569,8 @@ class NoteworthyTranslator(object):
     
         >>> nwt.createClef({"Type" : "OBonobo"})
         Traceback (most recent call last):
-        NoteworthyTranslateException: Did not find a proper clef in type, OBonobo
+        music21.noteworthy.translate.NoteworthyTranslateException: Did 
+            not find a proper clef in type, OBonobo
     
         '''  
         currentClef = None

@@ -809,7 +809,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
     >>> possibB2 = (A4, E4, Cs4, A2)
     >>> possibility.couldBeItalianA6Resolution(possibA2, possibB2)
     Traceback (most recent call last):
-    PossibilityException: possibA does not spell out an It+6 chord.
+    music21.figuredBass.possibility.PossibilityException: possibA does not spell out an It+6 chord.
     
     
     The method is called "couldBeItalianA6Resolution" as opposed

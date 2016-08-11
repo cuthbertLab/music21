@@ -484,7 +484,7 @@ def clefFromString(clefString, octaveShift = 0):
     
     >>> invalidClef = clef.clefFromString("F6") 
     Traceback (most recent call last):
-    ClefException: line number (second character) must be 1-5; 
+    music21.clef.ClefException: line number (second character) must be 1-5; 
                 do not use this function for clefs on special staves such as 'F6'
     '''
     xnStr = clefString.strip()

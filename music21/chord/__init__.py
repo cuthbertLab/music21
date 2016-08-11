@@ -150,7 +150,8 @@ class Chord(note.NotRest):
     
     >>> chord.Chord([base])
     Traceback (most recent call last):
-    ChordException: Could not process input argument <module 'music21.base' from '...base...'>
+    music21.chord.ChordException: Could not process input 
+                                    argument <module 'music21.base' from '...base...'>
 
     '''
     ### CLASS VARIABLES ###
@@ -921,7 +922,7 @@ class Chord(note.NotRest):
 
         >>> chord.Chord().findRoot()
         Traceback (most recent call last):
-        ChordException: no notes in chord <music21.chord.Chord >
+        music21.chord.ChordException: no notes in chord <music21.chord.Chord >
         '''
         def rootnessFunction(rootThirdList):
             '''
@@ -1278,7 +1279,7 @@ class Chord(note.NotRest):
 
         >>> c.getVolume('G4')
         Traceback (most recent call last):
-        ChordException: the given pitch is not in the Chord: G4
+        music21.chord.ChordException: the given pitch is not in the Chord: G4
         '''
         # NOTE: pitch matching is potentially problematic if we have more than
         # one of the same pitch
@@ -1508,7 +1509,7 @@ class Chord(note.NotRest):
 
         >>> GMajRepeats.inversion(3)
         Traceback (most recent call last):
-        ChordException: Could not invert chord...inversion may not exist
+        music21.chord.ChordException: Could not invert chord...inversion may not exist
 
 
         If testRoot is True then that temporary root is used instead of self.root(). 
@@ -1522,7 +1523,7 @@ class Chord(note.NotRest):
         6
         >>> dim7.inversion("six-four")
         Traceback (most recent call last):
-        ChordException: Inversion must be an integer      
+        music21.chord.ChordException: Inversion must be an integer      
 
         if you are trying to crash the system...
         
@@ -2901,7 +2902,7 @@ class Chord(note.NotRest):
         'blue'
         >>> c.setColor('red', 'C9')
         Traceback (most recent call last):
-        ChordException: the given pitch is not in the Chord: C9
+        music21.chord.ChordException: the given pitch is not in the Chord: C9
         '''
         # assign to base
         if pitchTarget is None and len(self._notes) > 0:
@@ -3000,7 +3001,7 @@ class Chord(note.NotRest):
 
         >>> c3.setNotehead('so', 'G4')
         Traceback (most recent call last):
-        ChordException: the given pitch is not in the Chord: G4
+        music21.chord.ChordException: the given pitch is not in the Chord: G4
 
         '''
         # assign to first pitch by default
@@ -3066,7 +3067,7 @@ class Chord(note.NotRest):
         Error:
         >>> c3.setNoteheadFill(True, 'G4')
         Traceback (most recent call last):
-        ChordException: the given pitch is not in the Chord: G4
+        music21.chord.ChordException: the given pitch is not in the Chord: G4
 
         '''
         # assign to first pitch by default
@@ -3144,7 +3145,7 @@ class Chord(note.NotRest):
         Error:
         >>> c3.setStemDirection('up', 'G4')
         Traceback (most recent call last):
-        ChordException: the given pitch is not in the Chord: G4
+        music21.chord.ChordException: the given pitch is not in the Chord: G4
 
         '''
         if pitchTarget is None and len(self._notes) > 0:
@@ -3202,7 +3203,7 @@ class Chord(note.NotRest):
         
         >>> c3.setTie('stop', 'G4')
         Traceback (most recent call last):
-        ChordException: the given pitch is not in the Chord: G4
+        music21.chord.ChordException: the given pitch is not in the Chord: G4
 
         '''
         if pitchTarget is None and len(self._notes) > 0: # if no pitch

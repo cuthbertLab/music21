@@ -91,7 +91,7 @@ def musicXMLTypeToType(value):
     'quarter'
     >>> musicxml.xmlToM21.musicXMLTypeToType(None)
     Traceback (most recent call last):
-    MusicXMLImportException...
+    music21.musicxml.xmlToM21.MusicXMLImportException...
     '''
     # MusicXML uses long instead of longa
     if value not in duration.typeToDuration:

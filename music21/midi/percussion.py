@@ -115,7 +115,7 @@ class PercussionMapper(object):
         >>> bassDrum1Pitch = pitch.Pitch('B-1')
         >>> pm.midiPitchToInstrument(bassDrum1Pitch)
         Traceback (most recent call last):
-        MIDIPercussionException: 34 doesn't map to a valid instrument!
+        music21.midi.percussion.MIDIPercussionException: 34 doesn't map to a valid instrument!
         
         Also, certain GM instruments do not have corresponding music21 instruments, 
         so at present they also raise an exception.
@@ -123,7 +123,7 @@ class PercussionMapper(object):
         >>> cabasaPitch = 69
         >>> pm.midiPitchToInstrument(cabasaPitch)
         Traceback (most recent call last):
-        MIDIPercussionException: 69 doesn't map to a valid instrument!
+        music21.midi.percussion.MIDIPercussionException: 69 doesn't map to a valid instrument!
 
 
         Some music21 Instruments have more than one MidiPitch.  In this case you'll
@@ -186,7 +186,7 @@ class PercussionMapper(object):
         >>> myBagpipes = instrument.Bagpipes()
         >>> pipePitch = pm.midiInstrumentToPitch(myBagpipes)
         Traceback (most recent call last):
-        MIDIPercussionException: <music21.instrument.Instrument Bagpipes> 
+        music21.midi.percussion.MIDIPercussionException: <music21.instrument.Instrument Bagpipes> 
             is not in the GM Percussion Map!
         '''
         if not hasattr(midiInstrument, 'inGMPercMap') or midiInstrument.inGMPercMap is False:
@@ -217,7 +217,7 @@ class Test(unittest.TestCase):
                 continue
             name = getattr(sys.modules[self.__module__], part)
             if callable(name) and not isinstance(name, types.FunctionType):
-                try: # see if obj can be made w/ args
+                try: # see if obj can be made w/o any args
                     obj = name()
                 except TypeError:
                     continue

@@ -496,7 +496,7 @@ class StreamIterator(object):
         >>> pi.srcStream = note.Note()
         >>> pi._newBaseStream()
         Traceback (most recent call last):
-        StreamIteratorException: ...
+        music21.stream.iterator.StreamIteratorException: ...
         '''
         StreamBase = None
         for x in self.srcStream.__class__.mro():

@@ -73,8 +73,7 @@ def mergeVariants(streamX, streamY, variantName='variant', inPlace=False):
     >>> streamZ = converter.parse("tinynotation: 4/4 a4 b c d e f g a", makeNotation=False)
     >>> variant.mergeVariants(streamX, streamZ, variantName='docvariant', inPlace=False)
     Traceback (most recent call last):
-    ...
-    VariantException: Could not determine what merging method to use. 
+    music21.variant.VariantException: Could not determine what merging method to use. 
             Try using a more specific merging function.
     
     
@@ -85,13 +84,13 @@ def mergeVariants(streamX, streamY, variantName='variant', inPlace=False):
     >>> aScore = stream.Score()
     >>> vScore = stream.Score()
 
-    >>> #                                                             *
-    >>> ap1 = stream.Part(converter.parse("tinynotation: 4/4   a4 b c d    e2 f   g2 f4 g ").makeMeasures())
-    >>> vp1 = stream.Part(converter.parse("tinynotation: 4/4   a4 b c e    e2 f   g2 f4 a ").makeMeasures())
+    >>> #                                                 *
+    >>> ap1 = converter.parse("tinynotation: 4/4   a4 b c d    e2 f   g2 f4 g ")
+    >>> vp1 = converter.parse("tinynotation: 4/4   a4 b c e    e2 f   g2 f4 a ")
         
-    >>> #                                                                     *    *    *
-    >>> ap2 = stream.Part(converter.parse("tinynotation: 4/4   a4 g f e    f2 e   d2 g4 f ").makeMeasures())
-    >>> vp2 = stream.Part(converter.parse("tinynotation: 4/4   a4 g f e    f2 g   f2 g4 d ").makeMeasures())
+    >>> #                                                         *    *    *
+    >>> ap2 = converter.parse("tinynotation: 4/4   a4 g f e    f2 e   d2 g4 f ")
+    >>> vp2 = converter.parse("tinynotation: 4/4   a4 g f e    f2 g   f2 g4 d ")
     
     >>> ap1.id = 'aPart1'
     >>> ap2.id = 'aPart2'
@@ -644,8 +643,8 @@ def mergeVariantsEqualDuration(streams, variantNames, inPlace=False):
     >>> mergedStreams = variant.mergeVariantsEqualDuration(
     ...                 [stream1, streamDifferentMeasures], ['paris'])
     Traceback (most recent call last):
-    ...
-    VariantException: _mergeVariants cannot merge streams which are of different lengths
+    music21.variant.VariantException: _mergeVariants cannot merge streams 
+        which are of different lengths
     '''
     
     if inPlace is True:
@@ -1443,8 +1442,8 @@ def _mergeVariants(streamA, streamB, containsVariants = False, variantName=None,
     >>> stream1.append(note.Note('e'))
     >>> mergedStreams = variant._mergeVariants(stream1, stream2, variantName=['paris'])
     Traceback (most recent call last):
-    ...
-    VariantException: _mergeVariants cannot merge streams which are of different lengths
+    music21.variant.VariantException: _mergeVariants cannot merge streams 
+        which are of different lengths
     '''
     # TODO: Add the feature for merging a stream to a stream with existing variants 
     # (it has to compare against both the stream and the contained variant)

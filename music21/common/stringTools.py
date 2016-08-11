@@ -183,16 +183,16 @@ def camelCaseToHyphen(usrStr, replacement='-'):
 
     >>> common.camelCaseToHyphen('fileName', replacement='NotFound')
     Traceback (most recent call last):
-    Exception: Replacement must be a single character.
+    ValueError: Replacement must be a single character.
     
     >>> common.camelCaseToHyphen('fileName', replacement='A')
     Traceback (most recent call last):
-    Exception: Replacement cannot be an uppercase character.
+    ValueError: Replacement cannot be an uppercase character.
     '''
     if len(replacement) != 1:
-        raise Exception('Replacement must be a single character.')
+        raise ValueError('Replacement must be a single character.')
     elif replacement.lower() != replacement:
-        raise Exception('Replacement cannot be an uppercase character.')
+        raise ValueError('Replacement cannot be an uppercase character.')
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1' + replacement + r'\2', usrStr)
     return re.sub('([a-z0-9])([A-Z])', r'\1' + replacement + r'\2', s1).lower()
 

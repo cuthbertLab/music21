@@ -270,7 +270,7 @@ def putVariableLengthNumber(x):
 
     >>> midi.putVariableLengthNumber(-1)
     Traceback (most recent call last):
-    MidiException: cannot putVariableLengthNumber() when number is negative: -1
+    music21.midi.MidiException: cannot putVariableLengthNumber() when number is negative: -1
     '''
     #environLocal.printDebug(['calling putVariableLengthNumber(x) with', x])
     # note: negative numbers will cause an infinite loop here
@@ -316,7 +316,7 @@ def putNumbersAsList(numList):
 
     >>> midi.putNumbersAsList([256])
     Traceback (most recent call last):
-    MidiException: Cannot place a number > 255 in a list: 256
+    music21.midi.MidiException: Cannot place a number > 255 in a list: 256
     '''
     post = bytearray()
     for n in numList:

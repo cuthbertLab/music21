@@ -738,7 +738,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> thisTrebleClef.getOffsetBySite(m)
         Traceback (most recent call last):
-        SitesException: an entry for this object <music21.clef.TrebleClef> is not 
+        music21.sites.SitesException: an entry for this object <music21.clef.TrebleClef> is not 
               stored in stream <music21.stream.Measure 10 offset=0.0>
 
 
@@ -1539,7 +1539,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         20.0
         >>> p.elementOffset(mCopy) 
         Traceback (most recent call last):
-        SitesException: an entry for this object 0x... is not stored in 
+        music21.sites.SitesException: an entry for this object 0x... is not stored in 
             stream <music21.stream.Part sPart>
         
         
@@ -1622,10 +1622,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         2
 
         OMIT_FROM_DOCS
+        
         Raise an error if offset is not a number
+        
         >>> stream.Stream().insert("l","g")
         Traceback (most recent call last):
-        StreamException: ...
+        music21.exceptions21.StreamException: ...
 
         '''
         #environLocal.printDebug(['self', self, 'offsetOrItemOrList',
@@ -4004,7 +4006,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         'unknown'
         >>> s.atSoundingPitch = 'junk'
         Traceback (most recent call last):
-        StreamException: not a valid at sounding pitch value: junk
+        music21.exceptions21.StreamException: not a valid at sounding pitch value: junk
         ''')
 
 

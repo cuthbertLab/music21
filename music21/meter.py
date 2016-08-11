@@ -145,7 +145,7 @@ def slashMixedToFraction(valueSrc):
 
     >>> meter.slashMixedToFraction('3+2+5/8+3/4+2+1+4')
     Traceback (most recent call last):
-    MeterException: cannot match denominator to numerator in: 3+2+5/8+3/4+2+1+4
+    music21.meter.MeterException: cannot match denominator to numerator in: 3+2+5/8+3/4+2+1+4
     '''
     pre = []
     post = []
@@ -1035,7 +1035,7 @@ class MeterSequence(MeterTerminal):
         >>> a[3] = a[0][0].subdivide(2)
         Traceback (most recent call last):
         ...
-        MeterException: cannot insert {1/16+1/16} into space of 1/4
+        music21.meter.MeterException: cannot insert {1/16+1/16} into space of 1/4
         '''
         # comparison of numerator and denominator
         if not isinstance(value, MeterTerminal):
@@ -1512,7 +1512,7 @@ class MeterSequence(MeterTerminal):
 
         >>> a.partitionByCount(11, loadDefault = False)
         Traceback (most recent call last):
-        MeterException: Cannot set partition by 11 (5/8)
+        music21.meter.MeterException: Cannot set partition by 11 (5/8)
 
         '''
         opts = self._getOptions()
@@ -1577,7 +1577,7 @@ class MeterSequence(MeterTerminal):
 
         >>> a.partitionByList(['3/4', '1/8', '5/8'])
         Traceback (most recent call last):
-        MeterException: Cannot set partition by ['3/4', '1/8', '5/8']
+        music21.meter.MeterException: Cannot set partition by ['3/4', '1/8', '5/8']
         '''
         # assume a list of terminal definitions
         if isinstance(numeratorList[0], six.string_types):
@@ -2415,14 +2415,14 @@ class MeterSequence(MeterTerminal):
         >>> a = meter.MeterSequence('4/4')
         >>> a.offsetToIndex(5.0)
         Traceback (most recent call last):
-        MeterException: cannot access from qLenPos 5.0 where total duration is 4.0
+        music21.meter.MeterException: cannot access from qLenPos 5.0 where total duration is 4.0
 
 
         Negative numbers also raise an exception:
 
         >>> a.offsetToIndex(-0.5)
         Traceback (most recent call last):
-        MeterException: cannot access from qLenPos -0.5 where total duration is 4.0
+        music21.meter.MeterException: cannot access from qLenPos -0.5 where total duration is 4.0
         '''
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             raise MeterException(
@@ -2603,7 +2603,7 @@ class MeterSequence(MeterTerminal):
 
         >>> b.offsetToDepth(-1)
         Traceback (most recent call last):
-        MeterException: cannot access from qLenPos -1.0
+        music21.meter.MeterException: cannot access from qLenPos -1.0
         '''
         qLenPos = opFrac(qLenPos)
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
@@ -4010,7 +4010,7 @@ class TimeSignature(base.Music21Object):
         
         >>> [ts1.getAccentWeight(x) for x in range(6)]
         Traceback (most recent call last):
-        MeterException: cannot access from qLenPos 3.0 where total duration is 3.0
+        music21.meter.MeterException: cannot access from qLenPos 3.0 where total duration is 3.0
 
         ...unless permitMeterModulus is employed
 

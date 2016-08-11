@@ -963,12 +963,14 @@ class Iterator(object):
     >>> BCI.currentNumber = 25
     Traceback (most recent call last):
     ...
-    BachException: 25 does not correspond to a chorale in the riemenschneider numbering system
+    music21.corpus.chorales.BachException: 25 does not correspond to a 
+        chorale in the riemenschneider numbering system
 
     >>> BCI.numberingSystem = 'not a numbering system'
     Traceback (most recent call last):
     ...
-    BachException: not a numbering system is not a valid numbering system for Bach Chorales.
+    music21.corpus.chorales.BachException: not a numbering system is not a valid 
+        numbering system for Bach Chorales.
 
     If the numberingSystem 'title' is selected, the iterator must be 
     initialized with a list of titles.
@@ -1199,7 +1201,7 @@ class Iterator(object):
         >>> BCI._returnChorale()
         Traceback (most recent call last):
         ...
-        BachException: Cannot parse Chorales because no titles to parse.
+        music21.corpus.chorales.BachException: Cannot parse Chorales because no titles to parse.
 
         >>> BCI.titleList = ['Christ lag in Todesbanden', 'Aus meines Herzens Grunde']
         >>> christlag = BCI._returnChorale()

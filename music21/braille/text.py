@@ -507,7 +507,7 @@ class BrailleTextLine(object):
         
         >>> btl.append(braille.lookup.symbols['tie'])
         Traceback (most recent call last):
-        BrailleTextException: Text does not fit at end of braille text line.
+        music21.braille.text.BrailleTextException: Text does not fit at end of braille text line.
         
         Text is appended at `textLocation`, overwriting other text that might be there.
         
@@ -567,7 +567,7 @@ class BrailleTextLine(object):
 
         >>> btl.insert(5, braille.lookup.symbols['tie'])
         Traceback (most recent call last):
-        BrailleTextException: Text cannot be inserted at specified location.
+        music21.braille.text.BrailleTextException: Text cannot be inserted at specified location.
         
         Unlike list inserts, this insert overwrites the previous text:
         

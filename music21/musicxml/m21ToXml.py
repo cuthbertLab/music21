@@ -56,9 +56,9 @@ _MOD = "musicxml.m21ToXml"
 environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------
-class ToMxObjectsException(exceptions21.Music21Exception):
+class MusicXMLExportException(exceptions21.Music21Exception):
     pass
-class NoteheadException(ToMxObjectsException):
+class NoteheadException(MusicXMLExportException):
     pass
 
     
@@ -76,7 +76,7 @@ def typeToMusicXMLType(value):
     if value == 'longa': 
         return 'long'
     elif value == '2048th':
-        raise ToMxObjectsException('Cannot convert "2048th" duration to MusicXML (too short).')
+        raise MusicXMLExportException('Cannot convert "2048th" duration to MusicXML (too short).')
     else:
         return value
 
@@ -385,7 +385,7 @@ class GeneralObjectExporter():
                 outObj = meth(obj)
                 break
         if outObj is None:
-            raise ToMxObjectsException("Cannot translate the object " + 
+            raise MusicXMLExportException("Cannot translate the object " + 
                 "%s to a complete musicXML document; put it in a Stream first!" % self.generalObj)
         return outObj
 
@@ -1141,7 +1141,7 @@ class ScoreExporter(XMLExporterBase):
         for innerStream in sp:
             count += 1
             if count > len(sp):
-                raise ToMxObjectsException('infinite stream encountered')
+                raise MusicXMLExportException('infinite stream encountered')
 
             pp = PartExporter(innerStream, parent=self)
             pp.parse()
@@ -2695,7 +2695,7 @@ class MeasureExporter(XMLExporterBase):
         mxNote = self.noteToXml(r)
         mxRestTag = mxNote.find('rest')
         if mxRestTag is None:
-            raise ToMxObjectsException("Something went wrong -- converted rest w/o rest tag")
+            raise MusicXMLExportException("Something went wrong -- converted rest w/o rest tag")
 
         isFullMeasure = False
         if r.fullMeasure in (True, "always"):
@@ -2897,7 +2897,6 @@ class MeasureExporter(XMLExporterBase):
         '''
         foundANotehead = False
         if (hasattr(n, 'notehead') 
-                # TODO: restore... needed for complete compatibility with toMxObjects...
             and (n.notehead != 'normal'
                  or n.noteheadParenthesis
                  or n.noteheadFill is not None
@@ -2908,7 +2907,6 @@ class MeasureExporter(XMLExporterBase):
             mxNote.append(mxNotehead)
         if foundANotehead is False and chordParent is not None:
             if (hasattr(chordParent, 'notehead')
-                    # TODO: restore... needed for complete compatibility with toMxObjects...
                 and (chordParent.notehead != 'normal'
                      or chordParent.noteheadParenthesis
                      or chordParent.noteheadFill is not None
@@ -3156,7 +3154,7 @@ class MeasureExporter(XMLExporterBase):
             return []
         
         if tuplet.type not in ('start', 'stop', 'startStop'):
-            raise ToMxObjectsException(
+            raise MusicXMLExportException(
                 "Cannot create music XML from a tuplet of type " + tuplet.type)
 
         if tuplet.type == 'startStop': # need two musicxml
@@ -3300,7 +3298,7 @@ class MeasureExporter(XMLExporterBase):
                 break
         if musicXMLArticulationName is None:
             musicXMLArticulationName = 'other-articulation'
-            #raise ToMxObjectsException("Cannot translate %s to musicxml" % articulationMark)
+            #raise MusicXMLExportException("Cannot translate %s to musicxml" % articulationMark)
         mxArticulationMark = Element(musicXMLArticulationName)
         mxArticulationMark.set('placement', articulationMark.placement)
         self.setPosition(articulationMark, mxArticulationMark)
@@ -3346,7 +3344,7 @@ class MeasureExporter(XMLExporterBase):
                 musicXMLTechnicalName = xmlObjects.TECHNICAL_MARKS_REV[c]
                 break
         if musicXMLTechnicalName is None:
-            raise ToMxObjectsException(
+            raise MusicXMLExportException(
                 "Cannot translate technical indication %s to musicxml" % articulationMark)
         mxTechnicalMark = Element(musicXMLTechnicalName)
         mxTechnicalMark.set('placement', articulationMark.placement)
@@ -4008,12 +4006,13 @@ class MeasureExporter(XMLExporterBase):
         >>> a.direction = None
         >>> b = MEX.beamToXml(a)
         Traceback (most recent call last):
-        ToMxObjectsException: partial beam defined without a proper direction set (set to None)
+        music21.musicxml.m21ToXml.MusicXMLExportException: partial beam defined 
+            without a proper direction set (set to None)
     
         >>> a.type = 'crazy'
         >>> b = MEX.beamToXml(a)
         Traceback (most recent call last):
-        ToMxObjectsException: unexpected beam type encountered (crazy)
+        music21.musicxml.m21ToXml.MusicXMLExportException: unexpected beam type encountered (crazy)
         '''
         mxBeam = Element('beam')
         if beamObject.type == 'start':
@@ -4028,11 +4027,11 @@ class MeasureExporter(XMLExporterBase):
             elif beamObject.direction == 'right':
                 mxBeam.text = 'forward hook'
             else:
-                raise ToMxObjectsException(
+                raise MusicXMLExportException(
                     'partial beam defined without a proper direction set (set to %s)' % 
                     beamObject.direction)
         else:
-            raise ToMxObjectsException('unexpected beam type encountered (%s)' % beamObject.type)
+            raise MusicXMLExportException('unexpected beam type encountered (%s)' % beamObject.type)
     
         mxBeam.set('number', str(beamObject.number))
         # not todo: repeater (deprecated)

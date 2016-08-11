@@ -211,8 +211,7 @@ def pitchToSharps(value, mode=None):
     
     >>> key.pitchToSharps('C~')
     Traceback (most recent call last):
-    KeyException: Cannot determine sharps for quarter-tone keys! silly!
-    
+    music21.key.KeyException: Cannot determine sharps for quarter-tone keys! silly!
     '''
     if isinstance(value, six.string_types): 
         value = pitch.Pitch(value)
@@ -335,8 +334,8 @@ class KeySignature(base.Music21Object):
 
     >>> illegal = key.KeySignature('c#')
     Traceback (most recent call last):
-    KeySignatureException: Cannot get a KeySignature from this "number" of sharps: "c#"; 
-        did you mean to use a key.Key() object instead?
+    music21.key.KeySignatureException: Cannot get a KeySignature from this 
+        "number" of sharps: "c#"; did you mean to use a key.Key() object instead?
     
     >>> legal = key.Key('c#')
     >>> legal.sharps
@@ -1006,7 +1005,9 @@ class Key(KeySignature, scale.DiatonicScale):
         >>> k2 = key.Key('b-')
         >>> k2.tonalCertainty()
         Traceback (most recent call last):
-        KeySignatureException: cannot process ambiguity without a list of .alternateInterpretations
+        music21.key.KeySignatureException: cannot process ambiguity without a 
+            list of .alternateInterpretations
+
         >>> k2.alternateInterpretations is None
         True
         '''
