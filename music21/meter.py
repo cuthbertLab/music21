@@ -4919,6 +4919,26 @@ class Test(unittest.TestCase):
         ts6 = bestTimeSignature(m6)
         self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 15/16>')
 
+    def testBestTimeSignatureDoubleDottedC(self):
+        '''
+        These add up the same as testBestTimeSignatureDoubleDotted, but
+        use multiple notes which are dotted divisions of the original
+        '''
+        from music21 import converter, stream
+        s6 = converter.parse('C4.. D4..', format='tinyNotation').flat.notes
+        m6 = stream.Measure()
+        for el in s6:
+            m6.insert(el.offset, el)
+        ts6 = bestTimeSignature(m6)
+        self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 7/8>')
+
+        s6 = converter.parse('C4... D4...', format='tinyNotation').flat.notes
+        m6 = stream.Measure()
+        for el in s6:
+            m6.insert(el.offset, el)
+        ts6 = bestTimeSignature(m6)
+        self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 15/16>')
+
 
 #------------------------------------------------------------------------------
 # define presented order in documentation
