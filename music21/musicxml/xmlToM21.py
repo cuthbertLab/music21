@@ -923,6 +923,9 @@ class PartParser(XMLParserBase):
         self.lastMeasureNumber = 0
         self.lastNumberSuffix = None
         
+        self.multiMeasureRestsToCapture = 0
+        self.activeMultiMeasureRestSpanner = None
+        
         self.activeInstrument = None
         self.firstMeasureParsed = False # has the first measure been parsed yet?
         self.activeAttributes = None # divisions, clef, etc.        
@@ -1277,7 +1280,7 @@ class PartParser(XMLParserBase):
         if mHighestTime >= lastTimeSignatureQuarterLength:
             mOffsetShift = mHighestTime
 
-        elif mHighestTime == 0.0 and len(m.flat.notesAndRests) == 0:
+        elif mHighestTime == 0.0 and len(m.recurse().notesAndRests) == 0:
             ## this routine fixes a bug in PDFtoMusic and other MusicXML writers
             ## that omit empty rests in a Measure.  It is a very quick test if
             ## the measure has any notes.  Slower if it does not.
@@ -1412,6 +1415,50 @@ class PartParser(XMLParserBase):
 
         # TODO: reclassify 
         return i
+
+    def applyMultiMeasureRest(self, r):
+        '''
+        If there is an active MultiMeasureRestSpanner, add the Rest, r, to it:
+        
+        >>> PP = musicxml.xmlToM21.PartParser()
+        >>> mmrSpanner = spanner.MultiMeasureRest()
+        >>> PP.activeMultiMeasureRestSpanner = mmrSpanner
+        >>> PP.multiMeasureRestsToCapture = 2
+        >>> r1 = note.Rest(type='whole', id='r1')
+        >>> PP.applyMultiMeasureRest(r1)
+        >>> PP.multiMeasureRestsToCapture
+        1
+        >>> PP.activeMultiMeasureRestSpanner is mmrSpanner
+        True
+        >>> PP.stream.show('text')  # Nothing...
+        
+        >>> r2 = note.Rest(type='whole', id='r2')
+        >>> PP.applyMultiMeasureRest(r2)
+        >>> PP.multiMeasureRestsToCapture
+        0
+        >>> PP.activeMultiMeasureRestSpanner is None
+        True
+        
+        # spanner added to stream
+        
+        >>> PP.stream.show('text')
+        {0.0} <music21.spanner.MultiMeasureRest <music21.note.Rest rest><music21.note.Rest rest>>
+
+        >>> r3 = note.Rest(type='whole', id='r3')
+        >>> PP.applyMultiMeasureRest(r3)
+        >>> PP.stream.show('text')
+        {0.0} <music21.spanner.MultiMeasureRest <music21.note.Rest rest><music21.note.Rest rest>>
+
+        '''
+        if self.activeMultiMeasureRestSpanner is None:
+            return
+        self.activeMultiMeasureRestSpanner.addSpannedElements(r)
+        self.multiMeasureRestsToCapture -= 1
+        if self.multiMeasureRestsToCapture == 0:    
+            self.stream.insert(0, self.activeMultiMeasureRestSpanner)
+            self.activeMultiMeasureRestSpanner = None
+    
+    
 #------------------------------------------------------------------------------
 class MeasureParser(XMLParserBase):
     '''
@@ -2176,10 +2223,15 @@ class MeasureParser(XMLParserBase):
         r = note.Rest()
         mxRestTag = mxRest.find('rest')
         if mxRestTag is None:
-            raise MusicXMLImportException("do not call xmlToRest unless it is a rest")
+            raise MusicXMLImportException("do not call xmlToRest or a <note> unless it " + 
+                                          "contains a rest tag.")
         isFullMeasure = mxRestTag.get('measure')
         if isFullMeasure == "yes":
             self.fullMeasureRest = True # force full measure rest...
+            # this attribute is not 100% necessary to get a multimeasure rest spanner
+        
+        if self.parent: # will apply if active
+            self.parent.applyMultiMeasureRest(r)
             
         ds = mxRestTag.find('display-step')
         if ds is not None:
