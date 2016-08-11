@@ -1839,7 +1839,7 @@ class Interval(IntervalBase):
         # catch case where only one Note is provided
         if ((self._noteStart is not None and self._noteEnd is None) or 
                 (self._noteEnd is not None and self._noteStart is None)):
-            raise IntervalException('either both the starting and the ending note.Note must be ' +
+            raise IntervalException('either both the starting and the ending note must be ' +
                 'given or neither can be given.  You cannot have one without the other.')
 
         if self._noteStart is not None and self._noteEnd is not None:

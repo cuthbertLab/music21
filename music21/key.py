@@ -228,7 +228,7 @@ def pitchToSharps(value, mode=None):
         if value.accidental.isTwelveTone() is False:
             raise KeyException('Cannot determine sharps for quarter-tone keys! silly!')
         vaa = int(value.accidental.alter) 
-        sharps = sharps + 7*vaa
+        sharps = sharps + 7 * vaa
     
     if mode is not None and mode in modeSharpsAlter:
         sharps += modeSharpsAlter[mode]
@@ -316,11 +316,10 @@ class KeyException(exceptions21.Music21Exception):
 class KeySignature(base.Music21Object):
     '''
     A KeySignature object specifies the signature to be used for a piece; it takes
-    in zero, one, or two arguments.  The only argument is an int giving the number of sharps,
+    in zero or one arguments.  The only argument is an int giving the number of sharps,
     or if negative the number of flats.  
     
     If you are starting with the name of a key, see the :class:`~music21.key.Key` object.
-
 
     >>> A = key.KeySignature(3)
     >>> A
@@ -698,17 +697,6 @@ class KeySignature(base.Music21Object):
         >>> ks1
         <music21.key.KeySignature of 4 flats>
         ''')
-
-
-
-# 
-# key1 = Key("E", "major")
-# key1
-# <music21.key.Key E major>
-# key1.parallel
-# <music21.key.Key E minor>
-# key1.relative
-# <music21.key.Key c# minor>
 
 
 class Key(KeySignature, scale.DiatonicScale):

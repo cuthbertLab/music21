@@ -7776,7 +7776,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                   value, 
                   inPlace=False, 
                   recurse=True,
-                  classFilterList=('Note', 'Chord')):
+                  classFilterList=None):
         '''
         Transpose all specified classes in the
         Stream by the
@@ -7790,6 +7790,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         it modifies pitches in place.
         
         TODO: for generic interval set accidental by key signature.
+
         
 
         >>> aInterval = interval.Interval('d5')
@@ -7835,8 +7836,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             siterator = post.__iter__()
         
-        for e in siterator.getElementsByClass(classFilterList):
-            e.transpose(value, inPlace=True)
+        if classFilterList:
+            siterator.addFilter(filters.ClassFilter(classFilterList))
+        
+        for e in siterator:
+            if e.isStream:
+                continue
+            if hasattr(e, 'transpose'):
+                e.transpose(value, inPlace=True)
         if not inPlace:
             return post
         else:
