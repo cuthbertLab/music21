@@ -190,7 +190,7 @@ naturals = {0: u'',
             6: _B[3456] + _B[124] + _B[16],
             7: _B[3456] + _B[1245] + _B[16]}
 
-numbers = {0: _B[245],
+numbersUpper = {0: _B[245],
            1: _B[1],
            2: _B[12],
            3: _B[14],
@@ -200,17 +200,16 @@ numbers = {0: _B[245],
            7: _B[1245],
            8: _B[125],
            9: _B[24]}
-
-# these are NOT the same as the numbers above. -- digits are dropped one cell:
-beatUnits = {1: _B[2],
-             2: _B[23],
-             4: _B[256],
-             8: _B[236],
-             16: _B[2] + _B[235],
-             32: _B[25] + _B[23],
-             64: _B[235] + _B[256],
-             128: _B[2] + _B[23] + _B[236],  
-             }
+numbersLower = {0: _B[356],
+           1: _B[2],
+           2: _B[23],
+           3: _B[25],
+           4: _B[256],
+           5: _B[26],
+           6: _B[235],
+           7: _B[2356],
+           8: _B[236],
+           9: _B[35]}
 
 rests = {'dummy':   _B[3],
          '128th':   _B[1346],
@@ -331,6 +330,7 @@ symbols = {'space': _B[0],
            'lh_keyboard': _B[456] + _B[345],
            'word': _B[345],
            'triplet': _B[23],
+           'tuplet_prefix': _B[456], # irregular-grouping prefix
            'finger_change': _B[14], # [14.2; Degarmo Example 9-4]
            'first_set_missing_fingermark': _B[6], # [Degarmo 9-6]
            'second_set_missing_fingermark': _B[3], # [Degarmo 9-6]

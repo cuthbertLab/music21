@@ -376,7 +376,7 @@ def bestTimeSignature(meas):
     minDurQL = 4 # smallest denominator; start with a whole note
     # find sum of all durations in quarter length
     # find if there are any dotted durations
-    minDurDotted = False
+    minDurDots = 0
     sumDurQL = opFrac(meas.duration.quarterLength)
     #beatStrAvg = 0
     #beatStrAvg += e.beatStrength
@@ -388,15 +388,13 @@ def bestTimeSignature(meas):
                 and not isinstance(opFrac(e.quarterLength), fractions.Fraction)): 
             # no non-power2 sigs
             minDurQL = e.quarterLength
-            if e.duration.dots > 0:
-                minDurDotted = True
-            else:
-                minDurDotted = False
+            minDurDots = e.duration.dots
             
 
     # first, we need to evenly divide min dur into total
     minDurTest = minDurQL
     if isinstance(sumDurQL, fractions.Fraction):
+        # not a power of two -- some tuplets, etc.
         numerator = sumDurQL.numerator
         denominator = sumDurQL.denominator
     else:
@@ -410,19 +408,17 @@ def bestTimeSignature(meas):
                 break
             # need to break down minDur until we can get a match
             else:
-                if minDurDotted:
-                    minDurTest = minDurTest / 3.
-                else:
-                    minDurTest = minDurTest / 2.
+                minDurTest = minDurTest / (2 * common.dotMultiplier(minDurDots))
             i -= 1
     
         # see if we can get a type for the denominator
         # if we do not have a match; we need to break down this value
         match = False
+        durationMinLimit = duration.typeToDuration[MIN_DENOMINATOR_TYPE]
         i = 10
         while i > 0:
-            if minDurTest < duration.typeToDuration[MIN_DENOMINATOR_TYPE]:
-                minDurTest = duration.typeToDuration[MIN_DENOMINATOR_TYPE]
+            if minDurTest < durationMinLimit:
+                minDurTest = durationMinLimit
                 break
             try:
                 dType, match = duration.quarterLengthToClosestType(minDurTest)
@@ -431,10 +427,7 @@ def bestTimeSignature(meas):
     
             if match or dType == MIN_DENOMINATOR_TYPE:
                 break
-            if minDurDotted:
-                minDurTest = minDurTest / 3.
-            else:
-                minDurTest = minDurTest / 2.
+            minDurTest = minDurTest / (2 * common.dotMultiplier(minDurDots))
             i -= 1
     
         minDurQL = minDurTest
@@ -449,9 +442,18 @@ def bestTimeSignature(meas):
                 if num >= 1:
                     num = int(num)
                 denominator = num
+                break
         # numerator is the count of min parts in the sum
-        numerator = int(sumDurQL / minDurQL)
+        multiplier = 1
+        while i > 0:
+            numerator = multiplier * sumDurQL / minDurQL
+            if numerator == int(numerator):
+                break
+            multiplier *= 2
+            i -= 1
     
+        numerator = int(numerator)
+        denominator *= multiplier
         #simplifies to "simplest terms," with 4 in denominator, before testing beat strengths
         denom = common.euclidGCD(numerator, denominator)
         numerator = numerator // denom
@@ -4874,6 +4876,30 @@ class Test(unittest.TestCase):
                                   '<music21.meter.TimeSignature 12/4>', 
                                   '<music21.meter.TimeSignature 13/4>'])
 
+    def testBestTimeSignatureDoubleDotted(self):
+        from music21 import converter, stream
+        s6 = converter.parse('C4.', format='tinyNotation').flat.notes
+        m6 = stream.Measure()
+        for el in s6:
+            m6.insert(el.offset, el)
+        ts6 = bestTimeSignature(m6)
+        self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 3/8>')
+
+        s6 = converter.parse('C2..', format='tinyNotation').flat.notes
+        m6 = stream.Measure()
+        for el in s6:
+            m6.insert(el.offset, el)
+        ts6 = bestTimeSignature(m6)
+        self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 7/8>')
+
+        s6 = converter.parse('C2...', format='tinyNotation').flat.notes
+        m6 = stream.Measure()
+        for el in s6:
+            m6.insert(el.offset, el)
+        ts6 = bestTimeSignature(m6)
+        self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 15/16>')
+
+
 #------------------------------------------------------------------------------
 # define presented order in documentation
 
@@ -4883,7 +4909,7 @@ _DOC_ORDER = [TimeSignature]
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test, runTest='testBestTimeSignatureDoubleDotted')
 
 
 

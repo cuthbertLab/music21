@@ -34,6 +34,9 @@ def allFiles():
     return allOut
 
 class Test(unittest.TestCase):
+    '''
+    Test Suite for the Test Suite (meta!)
+    '''
     
     def testAll(self):
         for f in allFiles():

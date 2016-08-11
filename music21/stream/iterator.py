@@ -959,9 +959,12 @@ class StreamIterator(object):
 
         :rtype: StreamIterator
         '''        
-        self.addFilter(filters.OffsetFilter(offsetStart, offsetEnd, includeEndBoundary,
-                                           mustFinishInSpan, mustBeginInSpan,
-                                           includeElementsThatEndAtStart))
+        self.addFilter(filters.OffsetFilter(offsetStart, 
+                                            offsetEnd, 
+                                            includeEndBoundary,
+                                            mustFinishInSpan, 
+                                            mustBeginInSpan,
+                                            includeElementsThatEndAtStart))
         return self
     
     #-------------------------------------------------------------

@@ -1964,34 +1964,36 @@ def prepareBeamedNotes(music21Measure):
     allNotesAndRests = music21Measure.notesAndRests.stream()
 
     # TODO: change these into filters on iterators
-    allNotesWithBeams = allNotes.splitByClass(
-        None, lambda sampleNote: (sampleNote.beams is not None) and len(sampleNote.beams) > 0)[0]
-    allStart = allNotesWithBeams.splitByClass(
-        None, lambda sampleNote: sampleNote.beams.getByNumber(1).type == 'start')[0]
-    allStop  = allNotesWithBeams.splitByClass(
-        None, lambda sampleNote: sampleNote.beams.getByNumber(1).type == 'stop')[0]
-    if len(allStart) != len(allStop):
+    withBeamFilter  = lambda el, unused: (el.beams is not None) and len(el.beams) > 0
+    beamStartFilter = lambda el, unused: (el.beams.getByNumber(1).type == 'start')
+    beamStopFilter  = lambda el, unused: (el.beams.getByNumber(1).type == 'stop')
+    
+    allStartIter = allNotes.iter.addFilter(withBeamFilter).addFilter(beamStartFilter)
+    allStopIter  = allNotes.iter.addFilter(withBeamFilter).addFilter(beamStopFilter)
+    
+    if len(allStartIter) != len(allStopIter):
         environRules.warn("Incorrect beaming: number of start notes != to number of stop notes.")
         return
     
-    for beamIndex in range(len(allStart)):
-        startNote = allStart[beamIndex]
-        stopNote = allStop[beamIndex]
-        startIndex = allNotesAndRests.index(startNote)
-        stopIndex = allNotesAndRests.index(stopNote)
-        delta = stopIndex - startIndex + 1
-        if delta < 3: # 2. The group must be composed of at least three notes.
-            continue
+    for beamIndex, startNote in enumerate(allStartIter):
         # Eighth notes cannot be beamed in braille (redundant, because beamed 
         # notes look like eighth notes, but nevertheless useful).
         if startNote.quarterLength == 0.5:
+            continue
+
+        stopNote = allStopIter[beamIndex]
+        startIndex = allNotesAndRests.index(startNote)
+        stopIndex = allNotesAndRests.index(stopNote)
+        
+        delta = stopIndex - startIndex + 1
+        if delta < 3: # 2. The group must be composed of at least three notes.
             continue
         # 1. All notes in the group must have precisely the same value.
         # 3. A rest of the same value may take the place of the first note in a group, 
         # but if the rest is located anywhere else, grouping may not be used.
         allNotesOfSameValue = True
         for noteIndex in range(startIndex + 1, stopIndex + 1):
-            if (allNotesAndRests[noteIndex].duration.type != startNote.duration.type
+            if (allNotesAndRests[noteIndex].quarterLength != startNote.quarterLength
                     or isinstance(allNotesAndRests[noteIndex], note.Rest)):
                 allNotesOfSameValue = False
                 break
@@ -2018,7 +2020,7 @@ def prepareBeamedNotes(music21Measure):
             beforeStartNote = allNotesAndRests[startIndex - 1]
             if (isinstance(beforeStartNote, note.Rest) 
                     and int(beforeStartNote.beat) == int(startNote.beat)
-                    and beforeStartNote.duration.type == startNote.duration.type):
+                    and beforeStartNote.quarterLength == startNote.quarterLength):
                 startNote.beamContinue = True
         except IndexError: # startNote is first note of measure.
             pass
