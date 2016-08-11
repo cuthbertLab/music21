@@ -1422,12 +1422,18 @@ class PartParser(XMLParserBase):
         
         >>> PP = musicxml.xmlToM21.PartParser()
         >>> mmrSpanner = spanner.MultiMeasureRest()
+        >>> mmrSpanner
+        <music21.spanner.MultiMeasureRest 0 measures>
+        
         >>> PP.activeMultiMeasureRestSpanner = mmrSpanner
         >>> PP.multiMeasureRestsToCapture = 2
         >>> r1 = note.Rest(type='whole', id='r1')
         >>> PP.applyMultiMeasureRest(r1)
         >>> PP.multiMeasureRestsToCapture
         1
+        >>> PP.activeMultiMeasureRestSpanner
+        <music21.spanner.MultiMeasureRest 1 measure>
+        
         >>> PP.activeMultiMeasureRestSpanner is mmrSpanner
         True
         >>> PP.stream.show('text')  # Nothing...
@@ -1442,12 +1448,12 @@ class PartParser(XMLParserBase):
         # spanner added to stream
         
         >>> PP.stream.show('text')
-        {0.0} <music21.spanner.MultiMeasureRest <music21.note.Rest rest><music21.note.Rest rest>>
+        {0.0} <music21.spanner.MultiMeasureRest 2 measures>
 
         >>> r3 = note.Rest(type='whole', id='r3')
         >>> PP.applyMultiMeasureRest(r3)
         >>> PP.stream.show('text')
-        {0.0} <music21.spanner.MultiMeasureRest <music21.note.Rest rest><music21.note.Rest rest>>
+        {0.0} <music21.spanner.MultiMeasureRest 2 measures>
 
         '''
         if self.activeMultiMeasureRestSpanner is None:
@@ -1485,6 +1491,7 @@ class MeasureParser(XMLParserBase):
                      'clef': 'handleClef',
                      'key': 'handleKeySignature',
                      'staff-details': 'handleStaffDetails',
+                     'measure-style': 'handleMeasureStyle',
                      }
     musicDataMethods = {'note': 'xmlToNote',
                         'backup': 'xmlBackup',
@@ -1504,8 +1511,6 @@ class MeasureParser(XMLParserBase):
     # TODO: staves (num staves)
     # TODO: part-symbol
     # not TODO: directive DEPRECATED since MusicXML 2.0
-    # TODO: measure-style
-    
     def __init__(self, mxMeasure=None, parent=None):
         XMLParserBase.__init__(self)
         
@@ -3566,15 +3571,16 @@ class MeasureParser(XMLParserBase):
                 meth(mxSub)
             elif mxSub.tag == 'staves':
                 self.staves = int(mxSub.text)
+
+        divisionsTag = mxAttributes.find('divisions')
+        if divisionsTag is not None:
+            self.divisions = common.opFrac(float(divisionsTag.text))
+            self.parent.lastDivisions = self.divisions
         
         transposeTag = mxAttributes.find('transpose')
         if transposeTag is not None:
             self.transposition = self.xmlTransposeToInterval(transposeTag)
             #environLocal.warn("Got a transposition of ", str(self.transposition) )
-        divisionsTag = mxAttributes.find('divisions')
-        if divisionsTag is not None:
-            self.divisions = common.opFrac(float(divisionsTag.text))
-            self.parent.lastDivisions = self.divisions
 
 
     def xmlTransposeToInterval(self, mxTranspose):
@@ -3930,6 +3936,28 @@ class MeasureParser(XMLParserBase):
             stl.hidden = False
         return stl
                
+    def handleMeasureStyle(self, mxMeasureStyle):
+        '''
+        measure + multimeasure repeats, slashed repeats, etc.
+        
+        But currently only multiMeasure rests are supported.
+        '''
+        # TODO: attr: number (staff number)
+        # TODO: attr-group font
+        # TODO: attr-group color
+        # TODO: beat-repeat
+        # TODO: measure-repeat
+        mxMultiRest = mxMeasureStyle.find('multiple-rest')
+        if mxMultiRest is not None and self.parent is not None:
+            self.parent.multiMeasureRestsToCapture = int(mxMultiRest.text)
+            mmrSpanner = spanner.MultiMeasureRest()
+            useSymbols = mxMultiRest.get('use-symbols')
+            if useSymbols == 'yes':
+                mmrSpanner.useSymbols = True
+            else: # musicxml default is False
+                mmrSpanner.useSymbols = False
+            self.parent.activeMultiMeasureRestSpanner = mmrSpanner
+        # TODO: slash
 
     
     def parseMeasureNumbers(self, mNumRaw=None):

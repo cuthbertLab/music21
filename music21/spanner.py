@@ -1241,6 +1241,10 @@ class MultiMeasureRest(Spanner):
         self.useSymbols = keywords.get('useSymbols', defaults.multiMeasureRestUseSymbols)
         self.maxSymbols = keywords.get('maxSymbols', defaults.multiMeasureRestMaxSymbols)
         
+    def __repr__(self):
+        return "<music21.spanner.MultiMeasureRest {} measure{}>".format(self.numRests, 
+                                        "s" if self.numRests != 1 else "")
+        
     @property
     def numRests(self):
         '''
