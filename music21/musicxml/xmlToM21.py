@@ -913,7 +913,6 @@ class PartParser(XMLParserBase):
         self.staffReferenceList = []
         
         self.lastTimeSignature = None
-        self.lastTransposition = None  # may change at measure boundaries
         self.lastMeasureWasShort = False
         self.lastMeasureOffset = 0.0
         
@@ -1057,7 +1056,7 @@ class PartParser(XMLParserBase):
         post.sort()
         return post
            
-    def measureParsingError(self, mxMeasure, e):
+    def measureParsingError(self, mxMeasure, e): # pragma: no cover
         measureNumber = "unknown"
         try:
             measureNumber = mxMeasure.get('number')
@@ -1102,54 +1101,26 @@ class PartParser(XMLParserBase):
         >>> m.notesAndRests[0].duration.quarterLength
         3.0
         '''
-        parser = MeasureParser(mxMeasure, parent=self)
+        measureParser = MeasureParser(mxMeasure, parent=self)
         try:
-            parser.parse()
+            measureParser.parse()
         except Exception as e: # pylint: disable=broad-except
             self.measureParsingError(mxMeasure, e)
         
-        if parser.staves > self.maxStaves:
-            self.maxStaves = parser.staves
-            
-        if parser.transposition is not None:
-            #environLocal.warn(["Got a transposition,", parser.transposition])
-            if (self.lastTransposition is None 
-                and self.firstMeasureParsed is False
-                and self.activeInstrument is not None):
-                self.activeInstrument.transposition = parser.transposition
-                #environLocal.warn("Put trans on active instrument")
-            elif self.activeInstrument is not None:
-                # will this catch something like Bb clarinet to Bb Soprano Sax to Eb clarinet? 
-                newInst = copy.deepcopy(self.activeInstrument)
-                newInst.transposition = parser.transposition 
-                #environLocal.warn("Put trans on new instrument")
-                self.activeInstrument = newInst
-                self.stream._insertCore(self.lastMeasureOffset, newInst)
-            else:
-                environLocal.warn("Received a transposition tag, but nowhere to put it!")
-                
-            self.lastTransposition = parser.transposition
-            self.atSoundingPitch = False
+        if measureParser.staves > self.maxStaves:
+            self.maxStaves = measureParser.staves
+
+        if measureParser.transposition is not None:
+            self.updateTransposition(measureParser.transposition)
+                   
         self.firstMeasureParsed = True
-        self.staffReferenceList.append(parser.staffReference)
-        if parser.measureNumber != self.lastMeasureNumber:
-            # we do this check so that we do not compound suffixes, i.e.:
-            # 23, 23.X1, 23.X1X2, 23.X1X2X3
-            # and instead just do:
-            # 23, 23.X1, 23.X2, etc.
-            self.lastMeasureNumber = parser.measureNumber
-            self.lastNumberSuffix = parser.numberSuffix      
-        m = parser.stream
-        if m.timeSignature is not None:
-            self.lastTimeSignature = m.timeSignature
-        elif self.lastTimeSignature is None and m.timeSignature is None:
-            # if no time signature is defined, need to get a default
-            ts = meter.TimeSignature('4/4')
-            self.lastTimeSignature = ts
+        self.staffReferenceList.append(measureParser.staffReference)
         
+        m = measureParser.stream
+        self.setLastMeasureInfo(m)        
         # TODO: move this into the measure parsing, because it should happen on a voice
         # level.
-        if parser.fullMeasureRest is True:
+        if measureParser.fullMeasureRest is True:
             # recurse is necessary because it could be in voices...
             r1 = m.recurse().getElementsByClass('Rest')[0]
             if (r1.duration.quarterLength == 4.0
@@ -1162,6 +1133,134 @@ class PartParser(XMLParserBase):
         self.adjustTimeAttributesFromMeasure(m)
         
         return m
+
+    def updateTransposition(self, newTransposition):
+        '''
+        As you might expect, a measureParser that reveals a change
+        in transposition is going to have an effect on the
+        Part's instrument list.  This (totally undocumented) method
+        deals with it.
+        
+        If measureParser.transposition is None, does nothing.
+        If measureParser.transposition is not None, but 
+
+        NOTE: Need to test a change of instrument w/o a change of
+        transposition such as: Bb clarinet to Bb Soprano Sax to Eb clarinet? 
+        '''
+        # STEP 1: determine whether this  new transposition
+        # requires creating a new instrument.
+        
+        if self.activeInstrument is not None:
+            if (self.activeInstrument.transposition is None 
+                    and self.firstMeasureParsed is False):
+                # We already created an instrument (activeInstrument) from the
+                # PartInfo. We haven't done anything with it yet, so
+                # no need for a change of instrument
+                pass
+                #environLocal.warn("Put trans on active instrument")
+            else: 
+                # We have an activeInstrument, so this change of transposition
+                # requires us to create a new one (think of physical instruments
+                # such as Bb clarinet to A clarinet.
+                newInst = copy.deepcopy(self.activeInstrument)
+                #environLocal.warn("Put trans on new instrument")
+                self.activeInstrument = newInst
+                self.stream._insertCore(self.lastMeasureOffset, newInst)
+        else:
+            # There is no activeInstrument and we're not at the beginning
+            # of the piece... this shouldn't happen, but let's send a warning
+            # and create a Generic Instrument object rather than dying.
+            environLocal.warn("Received a transposition tag, but instrument to put it on!")
+            fakeInst = instrument.Instrument()
+            self.activeInstrument = fakeInst
+            self.stream._insertCore(self.lastMeasureOffset, fakeInst)
+
+        # STEP 2:
+        # Actually change the trnasposition of the instrument
+        # and note that the score is definitely NOT all at sounding pitch
+        self.activeInstrument.transposition = newTransposition
+        self.atSoundingPitch = False
+        
+    def setLastMeasureInfo(self, m):
+        '''
+        Sets self.lastMeasureNumber and self.lastMeasureSuffix from the measure,
+        which is used in fixing Finale unnumbered measure issues.
+        
+        Also sets self.lastTimeSignature from the timeSignature found in
+        the measure, if any.
+        
+        >>> PP = musicxml.xmlToM21.PartParser()
+        
+        Here are the defaults:
+        
+        >>> PP.lastMeasureNumber
+        0
+        >>> PP.lastNumberSuffix is None
+        True
+        >>> PP.lastTimeSignature is None
+        True
+        
+        After setLastMeasureInfo:
+        
+        >>> m = stream.Measure(number=4)
+        >>> m.numberSuffix = 'b'
+        >>> ts38 = meter.TimeSignature('3/8')
+        >>> m.timeSignature = ts38
+        >>> PP.setLastMeasureInfo(m)
+        
+        >>> PP.lastMeasureNumber
+        4
+        >>> PP.lastNumberSuffix
+        'b'
+        >>> PP.lastTimeSignature
+        <music21.meter.TimeSignature 3/8>
+        >>> PP.lastTimeSignature is ts38
+        True
+        
+        Note that if there was no timeSignature defined in m,
+        and no lastTimeSignature exists, 
+        the PartParser gets a default of 4/4, because
+        after the first measure there's going to be routines
+        that need some sort of time signature:
+        
+        >>> PP2 = musicxml.xmlToM21.PartParser()
+        >>> m2 = stream.Measure(number=2)
+        >>> PP2.setLastMeasureInfo(m2)
+        >>> PP2.lastTimeSignature
+        <music21.meter.TimeSignature 4/4>
+        
+        
+        For obscure reasons relating to how Finale gives suffixes
+        to unnumbered measures, if a measure has the same number
+        as lastMeasureNumber, the lastNumberSuffix is not updated:
+        
+        >>> PP3 = musicxml.xmlToM21.PartParser()
+        >>> PP3.lastMeasureNumber = 10
+        >>> PP3.lastNumberSuffix = 'X1'
+        
+        >>> m10 = stream.Measure(number=10)
+        >>> m10.numberSuffix = 'X2'
+        >>> PP3.setLastMeasureInfo(m10)
+        >>> PP3.lastNumberSuffix
+        'X1'
+        '''
+        if m.number == self.lastMeasureNumber:
+            pass
+            # we do this check so that we do not compound suffixes, i.e.:
+            # 23, 23.X1, 23.X1X2, 23.X1X2X3
+            # and instead just do:
+            # 23, 23.X1, 23.X2, etc.
+        else:
+            self.lastMeasureNumber = m.number
+            self.lastNumberSuffix = m.numberSuffix
+                  
+        if m.timeSignature is not None:
+            self.lastTimeSignature = m.timeSignature
+        elif self.lastTimeSignature is None and m.timeSignature is None:
+            # if no time signature is defined, need to get a default
+            ts = meter.TimeSignature('4/4')
+            self.lastTimeSignature = ts
+        
         
     def adjustTimeAttributesFromMeasure(self, m):
         # note: we cannot assume that the time signature properly
@@ -1250,7 +1349,6 @@ class PartParser(XMLParserBase):
         'Bass'
         >>> i.partAbbreviation
         'B.'
-        
         '''
         if mxPartInfo is None:
             mxInfo = self.mxPartInfo
@@ -1360,6 +1458,7 @@ class MeasureParser(XMLParserBase):
     # TODO: part-symbol
     # not TODO: directive DEPRECATED since MusicXML 2.0
     # TODO: measure-style
+    
     def __init__(self, mxMeasure=None, parent=None):
         XMLParserBase.__init__(self)
         
@@ -1405,7 +1504,8 @@ class MeasureParser(XMLParserBase):
         self.parseIndex = 0
         self.offsetMeasureNote = 0.0
     
-    def getStaffNumberStr(self, mxObjectOrNumber):
+    @staticmethod
+    def getStaffNumberStr(mxObjectOrNumber):
         '''
         gets a string representing a staff number, or None
         from an mxObject or a number...
@@ -1418,10 +1518,19 @@ class MeasureParser(XMLParserBase):
         '1'
         >>> gsn('2')
         '2'
+
+        <note> tags store their staff numbers in a <staff> tag's text...
+
         >>> gsn(EL('<note><staff>2</staff></note>'))
         '2'
+        
+        ...or not at all.
+        
         >>> gsn(EL('<note><pitch><step>C</step><octave>4</octave></pitch></note>')) is None
         True
+        
+        Clefs, however, store theirs in a `number` attribute.
+        
         >>> gsn(EL('<clef number="2"/>'))
         '2'
         >>> print(gsn(None))
@@ -1449,9 +1558,14 @@ class MeasureParser(XMLParserBase):
             except AttributeError:
                 pass
             return None
-        elif mxObject.tag in ('staff-layout', 'staff-details', 'measure-style',
-                              'clef', 'key', 'time', 'transpose'):
-            # these objects store staff assignment simply as number as an attribute
+        elif mxObject.tag in ('staff-layout', 
+                              'staff-details', 
+                              'measure-style',
+                              'clef', 
+                              'key', 
+                              'time', 
+                              'transpose'):
+            # these objects store staff assignment simply as an attribute called number.
             try:
                 k = mxObject.get('number')
                 # this must be a positive integer as string
@@ -1477,6 +1591,9 @@ class MeasureParser(XMLParserBase):
         staffReference[staffKey].append(m21Object)
     
     def insertCoreAndRef(self, offset, mxObjectOrNumber, m21Object):
+        '''
+        runs addToStaffReference and then insertCore.
+        '''
         self.addToStaffReference(mxObjectOrNumber, m21Object)
         self.stream._insertCore(offset, m21Object)
         
@@ -1485,8 +1602,14 @@ class MeasureParser(XMLParserBase):
         # attributes!
         for mxPrint in self.mxMeasure.findall('print'):
             self.xmlPrint(mxPrint)
-        
+
+        # these are the attributes of the <measure> tag, not the <attributes> tag        
         self.parseMeasureAttributes()
+        if self.parent:
+            self.divisions = self.parent.lastDivisions
+        else:
+            self.divisions = defaults.divisionsPerQuarter 
+
         self.updateVoiceInformation()
         self.mxMeasureElements = list(self.mxMeasure) # for grabbing next note
         for i, mxObj in enumerate(self.mxMeasureElements):
@@ -1501,7 +1624,7 @@ class MeasureParser(XMLParserBase):
             for v in self.stream.iter.voices:
                 if v: # do not bother with empty voices
                     v.makeRests(inPlace=True)
-                v.elementsChanged()
+                    v.elementsChanged()
         self.stream.elementsChanged()
         
         if (self.restAndNoteCount['rest'] == 1
@@ -3362,19 +3485,22 @@ class MeasureParser(XMLParserBase):
             return 0.0
         return offset / self.divisions
     
-    def parseMeasureAttributes(self):        
-        self.parseMeasureNumbers()        
+    def parseMeasureAttributes(self):
+        '''
+        parses the attributes of the <measure> tag.  Not the
+        <attributes> tag inside the measure tag.
+        
+        calls parseMeasureNumbers(), and gets the width from the width tag.
+
         # TODO: implicit
         # TODO: non-controlling 
-        # may need to do a format/unit conversion?        
+        # may need to do a format/unit conversion?
+        '''
+        self.parseMeasureNumbers()
         width = self.mxMeasure.get('width')
         if width is not None:
             width = _floatOrIntStr(width)
             self.stream.layoutWidth = width
-        if self.parent:
-            self.divisions = self.parent.lastDivisions
-        else:
-            self.divisions = defaults.divisionsPerQuarter 
 
     def parseAttributesTag(self, mxAttributes):
         self.attributesAreInternal = False
@@ -3755,16 +3881,51 @@ class MeasureParser(XMLParserBase):
                
 
     
-    def parseMeasureNumbers(self):
+    def parseMeasureNumbers(self, mNumRaw=None):
+        '''
+        Gets the measure number from the 'number' attribute of the
+        <measure> tag.  (Or, for testing, from the mNumRaw
+        argument).  Sets MeasureParser.stream.number and possibly
+        MeasureParser.stream.numberSuffix
+        
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> MP.parseMeasureNumbers('5')
+        >>> MP.stream.number
+        5
+        
+        Sets not only stream.number, but also MeasureParser.measureNumber and
+        MeasureParser.numberSuffix
+        
+        >>> MP.parseMeasureNumbers('44b')
+        >>> MP.stream.number
+        44
+        >>> MP.stream.numberSuffix
+        'b'
+        >>> MP.measureNumber
+        44
+        >>> MP.numberSuffix
+        'b'
+
+        >>> MP.parseMeasureNumbers('X1')
+        >>> MP.stream.number
+        1
+        >>> MP.stream.numberSuffix
+        'X'
+
+        
+        '''
+        if mNumRaw is None and self.mxMeasure is not None:
+            # this is the default situation 
+            mNumRaw = self.mxMeasure.get('number')
+
         m = self.stream
         if self.parent:
             lastMNum = self.parent.lastMeasureNumber
             lastMSuffix = self.parent.lastNumberSuffix
         else:
-            lastMNum = 0
+            lastMNum = None
             lastMSuffix = ""
             
-        mNumRaw = self.mxMeasure.get('number')
         if mNumRaw is None:
             mNum = None
             mSuffix = None
@@ -4582,20 +4743,20 @@ class Test(unittest.TestCase):
         self.assertIs(trillExtension[0], fSharpTrill)
         self.assertIs(trillExtension[-1], fSharpTrill)
         
-    def xtestLucaGloriaSpanners(self):
+    def testLucaGloriaSpanners(self):
         '''
-        lots of lines, including overlapping here
+        lots of lines, including overlapping here; testing that
+        a line attached to a rest is still there.  Formerly was a problem.
+
+        Many more tests could be done on this piece...
+        '''
+        from music21 import corpus
+        c = corpus.parse('luca/gloria')
+        r = c.parts[1].measure(99).getElementsByClass('Rest')[0]
+        bracketAttachedToRest = r.getSpannerSites()[0]
+        self.assertIn('Line', bracketAttachedToRest.classes)
+        self.assertEqual(bracketAttachedToRest.idLocal, '1')
         
-        problem in m. 99 of part 2 -- spanner seems to be in the score
-        but not being output to musicxml -- REASON: toMxObjects cannot handle
-        spanners on rests! fix...
-        '''
-        from music21 import  corpus, converter
-        c = converter.parse(corpus.corpora.CoreCorpus().getWorkList('luca/gloria.xml')[0], 
-                            format='musicxml', 
-                            #forceSource=True
-                            )
-        print(c.parts[1].measure(99).notesAndRests[0].getSpannerSites()[0].idLocal)
         #c.show()
         #c.parts[1].show('t')
         

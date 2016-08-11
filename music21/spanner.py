@@ -27,6 +27,7 @@ import copy
 from music21 import exceptions21
 from music21 import base
 from music21 import common
+from music21 import defaults
 from music21 import duration
 
 from music21.ext import six
@@ -1209,6 +1210,63 @@ class Slur(Spanner):
         msg = Spanner.__repr__(self)
         msg = msg.replace(self._reprHead, '<music21.spanner.Slur ')
         return msg
+    
+#-------------------------------------------------------------------------------
+class MultiMeasureRest(Spanner):
+    '''
+    A grouping symbol that indicates that a collection of rests lasts
+    multiple measures.
+    '''    
+    _DOC_ATTR = {'useSymbols': '''boolean to indicate whether rest symbols 
+                                    (breve, longa, etc.) should be used when
+                                    displaying the rest. Your music21 inventor
+                                    is a medievalist, so this defaults to True.
+
+                                    Change defaults.multiMeasureRestUseSymbols to
+                                    change globally.
+                                    ''',
+                 'maxSymbols': '''int, specifying the maximum number of rests
+                                     to display as symbols.  Default is 11.
+                                     If useSymbols is False then this setting
+                                     does nothing.
+                                     
+                                     Change defaults.multiMeasureRestMaxSymbols to
+                                     change globally.                                   
+                                     '''
+                 }
+    
+    def __init__(self, *arguments, **keywords):
+        Spanner.__init__(self, *arguments, **keywords)
+        self._overriddenNumber = None
+        self.useSymbols = keywords.get('useSymbols', defaults.multiMeasureRestUseSymbols)
+        self.maxSymbols = keywords.get('maxSymbols', defaults.multiMeasureRestMaxSymbols)
+        
+    @property
+    def numRests(self):
+        '''
+        Returns the number of measures involved in the
+        multi-measure rest.
+        
+        Calculated automatically from the number of rests in
+        the spanner.  Or can be set manually to override the number.
+        
+        >>> mmr = spanner.MultiMeasureRest()
+        >>> for i in range(6):
+        ...     mmr.addSpannedElements([note.Rest(type='whole')])
+        >>> mmr.numRests
+        6
+        >>> mmr.numRests = 10
+        >>> mmr.numRests
+        10
+        '''
+        if self._overriddenNumber is not None:
+            return self._overriddenNumber
+        else:
+            return len(self)
+
+    @numRests.setter
+    def numRests(self, overridden):
+        self._overriddenNumber = overridden
     
 #-------------------------------------------------------------------------------
 # first/second repeat bracket

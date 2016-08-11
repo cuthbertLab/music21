@@ -1391,8 +1391,7 @@ class Test(unittest.TestCase):
         p.transferOffsetToElements()
 
         junk = p.getTimeSignatures(searchContext=True, sortByCreationTime=True)
-        p.makeRests(refStreamOrTimeRange=[0, 100], 
-            inPlace=True)
+        p.makeRests(refStreamOrTimeRange=[0, 100], inPlace=True)
 
         self.assertEqual(p.lowestOffset, 0)
         self.assertEqual(p.highestTime, 100.0)

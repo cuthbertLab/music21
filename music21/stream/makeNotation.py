@@ -616,8 +616,11 @@ def makeMeasures(
             s.insert(post.elementOffset(e), e)
 
 
-def makeRests(s, refStreamOrTimeRange=None, fillGaps=False,
-    timeRangeFromBarDuration=False, inPlace=True):
+def makeRests(s, 
+              refStreamOrTimeRange=None, 
+              fillGaps=False,
+              timeRangeFromBarDuration=False, 
+              inPlace=True):
     '''
     Given a Stream with an offset not equal to zero,
     fill with one Rest preceding this offset.
