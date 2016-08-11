@@ -245,7 +245,7 @@ class Instrument(base.Music21Object):
         >>> i = instrument.Instrument()
         >>> i.autoAssignMidiChannel(used2)
         Traceback (most recent call last):
-        music21.instrument.InstrumentException: we are out of midi channels! help!
+        music21.exceptions21.InstrumentException: we are out of midi channels! help!
         '''
         # NOTE: this is used in musicxml output, not in midi output
         maxMidi = 16
@@ -1528,7 +1528,7 @@ def instrumentFromMidiProgram(number):
     <music21.instrument.Instrument Accordion>
     >>> instrument.instrumentFromMidiProgram(500)
     Traceback (most recent call last):
-    music21.instrument.InstrumentException: No instrument found with given midi program    
+    music21.exceptions21.InstrumentException: No instrument found with given midi program    
     '''    
     foundInstrument = False
     for myThing in sys.modules[__name__].__dict__.values():
