@@ -17,11 +17,11 @@ import time
 import types
 import inspect
 
-from jsonpickle import tags
-from jsonpickle.compat import set, unicode, long, bytes, PY3
+from music21.ext.jsonpickle import tags
+from music21.ext.jsonpickle.compat import set, unicode, long, bytes, PY3
 
 if not PY3:
-    import __builtin__
+    import __builtin__ # @UnresolvedImport
 
 SEQUENCES = (list, set, tuple)
 SEQUENCES_SET = set(SEQUENCES)
@@ -45,7 +45,7 @@ def is_type(obj):
     if PY3:
         return isinstance(obj, type)
     else:
-        return isinstance(obj, (type, types.ClassType))
+        return isinstance(obj, (type, types.ClassType)) # @UndefinedVariable
 
 
 def has_method(obj, name):

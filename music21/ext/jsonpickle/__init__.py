@@ -54,17 +54,14 @@ added to JSON::
 
 """
 import sys, os
-from music21 import common
-sys.path.append(common.getSourceFilePath() + os.path.sep + 'ext')
 
-
-from jsonpickle import pickler
-from jsonpickle import unpickler
-from jsonpickle.backend import JSONBackend
-from jsonpickle.version import VERSION
+from music21.ext.jsonpickle import pickler # @UnresolvedImport
+from music21.ext.jsonpickle import unpickler # @UnresolvedImport
+from music21.ext.jsonpickle.backend import JSONBackend # @UnresolvedImport
+from music21.ext.jsonpickle.version import VERSION # @UnresolvedImport
 
 # ensure built-in handlers are loaded
-__import__('jsonpickle.handlers')
+__import__('music21.ext.jsonpickle.handlers')
 
 __all__ = ('encode', 'decode')
 __version__ = VERSION

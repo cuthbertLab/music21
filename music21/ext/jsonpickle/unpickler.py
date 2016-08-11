@@ -10,12 +10,12 @@
 import sys
 import quopri
 
-import jsonpickle.util as util
-import jsonpickle.tags as tags
-import jsonpickle.handlers as handlers
+from music21.ext.jsonpickle import util
+from music21.ext.jsonpickle import tags
+from music21.ext.jsonpickle import handlers
 
-from jsonpickle.compat import set
-from jsonpickle.backend import JSONBackend
+from music21.ext.jsonpickle.compat import set
+from music21.ext.jsonpickle.backend import JSONBackend
 
 
 def decode(string, backend=None, context=None, keys=False, reset=True,

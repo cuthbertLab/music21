@@ -4208,25 +4208,61 @@ class MeasureExporter(XMLExporterBase):
         if self.transpositionInterval is not None:
             mxAttributes.append(self.intervalToXmlTranspose(self.transpositionInterval))
         
-        # directive is deprecated, do not support        
+        # directive is deprecated, do not support  
+        # measureStyle      
+        mxMeasureStyle = self.measureStyle()
+        if mxMeasureStyle is not None:
+            mxAttributes.append(mxMeasureStyle)
+            
+        self.xmlRoot.append(mxAttributes)
+        return mxAttributes
+
+    def measureStyle(self):
+        '''
+        return a <measure-style> Element or None according to the contents of the Stream.
+        
+        Currently, only multiple-rest is supported.
+        '''
+        m = self.stream            
+        
+        mxMeasureStyle = None
+        mxMultipleRest = None
+        
         rests = m.getElementsByClass('Rest')
         if rests:
             hasMMR = rests[0].getSpannerSites('MultiMeasureRest')
             if hasMMR:
                 firstRestMMR = hasMMR[0]
                 if firstRestMMR.isFirst(rests[0]):
-                    mxMeasureStyle = SubElement(mxAttributes, 'measure-style')
                     mxMultipleRest = SubElement(mxMeasureStyle, 'multiple-rest')
                     if firstRestMMR.useSymbols:
                         mxMultipleRest.set('use-symbols', 'yes')
                     else:
                         mxMultipleRest.set('use-symbols', 'no')
                     mxMultipleRest.text = str(firstRestMMR.numRests)
-
-        self.xmlRoot.append(mxAttributes)
-        return mxAttributes
-    
+        if mxMultipleRest:
+            mxMeasureStyle = Element('measure-style')
+            mxMeasureStyle.append(mxMultipleRest)
+        
+        return mxMeasureStyle
+        
     def staffLayoutToXmlStaffDetails(self, staffLayout):
+        '''
+        Convert a :class:`~music21.layout.StaffLayout` object to a 
+        <staff-details> element.
+        
+        <staff-type> is not yet supported.
+        
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> sl = layout.StaffLayout()
+        >>> sl.staffLines = 3  # tenor drums?
+        >>> sl.hidden = True
+        >>> mxDetails = MEX.staffLayoutToXmlStaffDetails(sl)
+        >>> MEX.dump(mxDetails)
+        <staff-details print-object="no">
+              <staff-lines>3</staff-lines>
+        </staff-details>
+        '''
         mxStaffDetails = Element('staff-details')
         # TODO: staff-type
         if staffLayout.staffLines is not None:
@@ -4594,42 +4630,48 @@ class MeasureExporter(XMLExporterBase):
                                 self.stream).getByClass('RepeatBracket')
         
     def setTranspose(self):
+        '''
+        Set the transposition interval based on whether the active
+        instrument for this period has a transposition object.
+        
+        Stores in self.transpositionInterval.  Returns None
+        '''
         if self.parent is None:
-            return
+            return None
         if self.parent.stream is None:
-            return
+            return None
         if self.parent.stream.atSoundingPitch is True:
-            return
+            return None
 
         m = self.stream
         self.measureOffsetStart = m.getOffsetBySite(self.parent.stream)
 
         instSubStream = self.parent.instrumentStream.getElementsByOffset(
-                    self.measureOffsetStart,
-                    self.measureOffsetStart + m.duration.quarterLength,
-                    includeEndBoundary=False)        
+                            self.measureOffsetStart,
+                            self.measureOffsetStart + m.duration.quarterLength,
+                            includeEndBoundary=False)        
         if len(instSubStream) == 0:
-            return
+            return None
         
         instSubObj = instSubStream[0]
         if instSubObj.transposition is None:
-            return
+            return None
         self.transpositionInterval = instSubObj.transposition
         # do here???
         #self.mxTranspose = self.intervalToMXTranspose()
-
+        return None
 
 
 #-------------------------------------------------------------------------------
 def indent(elem, level=0):
-    i = "\n" + level*"  "
+    i = "\n" + level * "  "
     if len(elem):
         if not elem.text or not elem.text.strip():
             elem.text = i + "  "
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
-        for elem in elem:
-            indent(elem, level+1)
+        for subEl in elem:
+            indent(subEl, level + 1)
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
     else:
@@ -4638,7 +4680,6 @@ def indent(elem, level=0):
             
 
 class Test(unittest.TestCase):
-
     def runTest(self):
         pass
 
@@ -4646,36 +4687,34 @@ class Test(unittest.TestCase):
         pass
 
 class TestExternal(unittest.TestCase):
-
     def runTest(self):
         pass
 
     def testBasic(self):
         pass
 
-
-    def testFindOneError(self):
-        from music21 import corpus
-
-        b = corpus.parse('schoenberg')
-
-        SX = ScoreExporter(b)
-        mxScore = SX.parse()
-        for x in mxScore.findall('part'):
-            print(x)
-            for y in x:
-                print(y)
-                for z in y:
-                    print(z)
-                    for w in z:
-                        print(w)
-                        for v in w:
-                            print(v)
-                            SX.dump(v)
-                            for u in v:
-                                print(u)
-                                SX.dump(u)
-        
+#     def testFindOneError(self):
+#         from music21 import corpus
+# 
+#         b = corpus.parse('schoenberg')
+# 
+#         SX = ScoreExporter(b)
+#         mxScore = SX.parse()
+#         for x in mxScore.findall('part'):
+#             print(x)
+#             for y in x:
+#                 print(y)
+#                 for z in y:
+#                     print(z)
+#                     for w in z:
+#                         print(w)
+#                         for v in w:
+#                             print(v)
+#                             SX.dump(v)
+#                             for u in v:
+#                                 print(u)
+#                                 SX.dump(u)
+#         
 
     def testSimple(self):
         from xml.etree.ElementTree import ElementTree as ETObj

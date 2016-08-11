@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from jsonpickle.compat import PY32
-from jsonpickle.compat import unicode
+from music21.ext.jsonpickle.compat import PY32
+from music21.ext.jsonpickle.compat import unicode
 
 
 class JSONBackend(object):

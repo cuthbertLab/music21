@@ -5,8 +5,8 @@ from __future__ import absolute_import
 import numpy as np
 
 import ast
-import jsonpickle
-from jsonpickle.compat import unicode
+from music21.ext import jsonpickle
+from music21.ext.jsonpickle.compat import unicode
 
 __all__ = ['register_handlers', 'unregister_handlers']
 
