@@ -2559,7 +2559,7 @@ class Test(unittest.TestCase):
         p1 = s.parts[0]
         p2 = copy.deepcopy(p1)
         t = interval.Interval(0.5) # a sharp p4
-        p2.transpose(t, inPlace=True)
+        p2.transpose(t, inPlace=True, classFilterList=('Note', 'Chord'))
         post = stream.Score()
         post.insert(0, p1)
         post.insert(0, p2)
@@ -2584,8 +2584,8 @@ class Test(unittest.TestCase):
 
         t1 = interval.Interval(12.5) # octave + half sharp
         t2 = interval.Interval(-12.25) # octave down minus 1/8th tone
-        p2.transpose(t1, inPlace=True)
-        p3.transpose(t2, inPlace=True)
+        p2.transpose(t1, inPlace=True, classFilterList=('Note', 'Chord'))
+        p3.transpose(t2, inPlace=True, classFilterList=('Note', 'Chord'))
         post = stream.Score()
         post.insert(0, p1)
         post.insert(0, p2)
@@ -2614,8 +2614,8 @@ class Test(unittest.TestCase):
         
         t1 = interval.Interval(12.5) # a sharp p4
         t2 = interval.Interval(-7.25) # a sharp p4
-        p2.transpose(t1, inPlace=True)
-        p3.transpose(t2, inPlace=True)
+        p2.transpose(t1, inPlace=True, classFilterList=('Note', 'Chord'))
+        p3.transpose(t2, inPlace=True, classFilterList=('Note', 'Chord'))
         post = stream.Score()
         p1.insert(0, instrument.Dulcimer())
         post.insert(0, p1)

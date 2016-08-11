@@ -1493,8 +1493,8 @@ class ConcreteScale(Scale):
 
 
     def romanNumeral(self, degree):
-        '''Return a RomanNumeral object built on the specified scale degree.
-
+        '''
+        Return a RomanNumeral object built on the specified scale degree.
         
         >>> sc1 = scale.MajorScale('a-4')
         >>> h1 = sc1.romanNumeral(1)
@@ -1915,9 +1915,9 @@ class ConcreteScale(Scale):
         >>> eflatMaj = key.Key('E-')
         >>> eflatMaj.solfeg(pitch.Pitch('G'))
         'mi'
-        >>> eflatMaj.solfeg(pitch.Pitch('A'))
+        >>> eflatMaj.solfeg('A')
         'fi'
-        >>> eflatMaj.solfeg(pitch.Pitch('A'), chromatic=False)
+        >>> eflatMaj.solfeg('A', chromatic=False)
         'fa'        
         >>> eflatMaj.solfeg(pitch.Pitch('G#'), variant='music21') #default
         'mis'

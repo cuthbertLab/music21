@@ -958,8 +958,10 @@ class Key(KeySignature, scale.DiatonicScale):
         # estimate range as 2, normalize between zero and 1
         return (absMagnitude * 1) + (leaderSpan * 2)
 
-    def tonalCertainty(self, method='correlationCoefficient', *args, 
-        **keywords):
+    def tonalCertainty(self, 
+                       method='correlationCoefficient', 
+                       *args, 
+                       **keywords):
         '''Provide a measure of tonal ambiguity for Key determined with one of many methods. 
 
         The `correlationCoefficient` assumes that the alternateInterpretations list has 
