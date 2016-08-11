@@ -83,8 +83,8 @@ class Corpus(object):
         matched = []
         if six.PY2:
             rootDirectoryPath = unicode(rootDirectoryPath)
-        for rootDirectory, directoryNames, filenames in os.walk(
-            rootDirectoryPath):
+            
+        for rootDirectory, directoryNames, filenames in os.walk(rootDirectoryPath):
             if '.svn' in directoryNames:
                 directoryNames.remove('.svn')
             for filename in filenames:
@@ -93,8 +93,7 @@ class Corpus(object):
                         continue
                 except UnicodeDecodeError as error:
                     raise corpus.CorpusException(
-                        'Incorrect filename in corpus path: {0}: {1!r}'.format(
-                            filename, error))
+                        'Incorrect filename in corpus path: {0}: {1!r}'.format(filename, error))
                 for extension in fileExtensions:
                     if filename.endswith(extension):
                         matched.append(os.path.join(rootDirectory, filename))

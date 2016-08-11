@@ -532,7 +532,7 @@ class Converter(object):
             useFormat, dataStr = self.formatFromHeader(dataStr)
 
             if six.PY3 and isinstance(dataStr, bytes):
-                dataStrMakeStr = dataStr.decode('utf-8','ignore')
+                dataStrMakeStr = dataStr.decode('utf-8', 'ignore')
             else:
                 dataStrMakeStr = dataStr
 
@@ -856,7 +856,7 @@ class Converter(object):
         '''
         dataStrStartLower = dataStr[:20].lower()
         if six.PY3 and isinstance(dataStrStartLower, bytes):
-            dataStrStartLower = dataStrStartLower.decode('utf-8','ignore')
+            dataStrStartLower = dataStrStartLower.decode('utf-8', 'ignore')
 
         foundFormat = None
         sclist = self.subconvertersList()
@@ -1833,7 +1833,6 @@ class Test(unittest.TestCase):
         '''
         Checks quantization when parsing a stream. Here everything snaps to the 8th note.
         '''
-        import os
         from music21 import omr
         from music21.common import numberTools
         midifp = omr.correctors.pathName + os.sep + 'k525short.mid'

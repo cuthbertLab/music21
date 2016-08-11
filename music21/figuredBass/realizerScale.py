@@ -8,6 +8,7 @@
 # Copyright:    Copyright © 2010-2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
+from builtins import map
 
 import copy
 import itertools
@@ -184,16 +185,14 @@ class FiguredBassScale(object):
         maxPitch = convertToPitch(maxPitch)
         pitchNames = self.getPitchNames(bassPitch, notationString)
         iter1 = itertools.product(pitchNames, range(maxPitch.octave + 1))
+        iter2 = map( # pylint: disable=bad-builtin
+                    lambda x: pitch.Pitch(x[0] + str(x[1])), iter1) 
         if six.PY3:
-            iter2 = map( # pylint: disable=bad-builtin
-                        lambda x: pitch.Pitch(x[0] + str(x[1])), iter1) 
             iter3 = itertools.filterfalse( # @UndefinedVariable
                                           lambda samplePitch: bassPitch > samplePitch, iter2) 
             iter4 = itertools.filterfalse( # @UndefinedVariable
                                           lambda samplePitch: samplePitch > maxPitch, iter3) 
         else:
-            iter2 = itertools.imap( # @UndefinedVariable
-                            lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)  
             iter3 = itertools.ifilterfalse(  # @UndefinedVariable
                             lambda samplePitch: bassPitch > samplePitch, iter2) 
             iter4 = itertools.ifilterfalse(  # @UndefinedVariable

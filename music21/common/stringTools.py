@@ -73,6 +73,7 @@ def toUnicode(usrStr):
     Note: this method is NOT USED and could disappear
     without notice.
     
+    # TODO: Remove
     
     :rtype: str
     '''
@@ -302,7 +303,8 @@ def getMd5(value=None):
 
 
 def formatStr(msg, *arguments, **keywords):
-    '''Format one or more data elements into string suitable for printing
+    '''
+    Format one or more data elements into string suitable for printing
     straight to stderr or other outputs
 
     >>> a = common.formatStr('test', '1', 2, 3)

@@ -2724,7 +2724,7 @@ class Pitch(object):
     @property
     def german(self):
         u'''
-        Read-only property. Returns the name
+        Read-only property. Returns a unicode string of the name
         of a Pitch in the German system
         (where B-flat = B, B = H, etc.)
         (Microtones and Quartertones raise an error).  Note that
