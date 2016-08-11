@@ -16,7 +16,7 @@
 This module defines numerous subclasses of 
 :class:`~music21.clef.Clef`, providing object representations for all 
 commonly used clefs. Clef objects are often found 
-within :class:`~music21.stream.Measure` objects.  
+within :class:`~music21.stream.Measure` objects.
 '''
  
 import unittest
@@ -26,7 +26,7 @@ from music21 import common
 from music21 import exceptions21
 from music21 import environment
 _MOD = "clef.py"
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment(_MOD) 
 
 
 class ClefException(exceptions21.Music21Exception):
@@ -36,9 +36,8 @@ class ClefException(exceptions21.Music21Exception):
 #-------------------------------------------------------------------------------
 class Clef(base.Music21Object):
     '''
-    A Clef is a basic music21 object for representing musical clefs
-    (Treble, Bass, etc.)
-    
+    A Clef is a basic `music21` object for representing musical clefs
+    (Treble, Bass, etc.) 
     
     Some clefs only represent the graphical element of the clef, 
     such as G clef, which is subclassed by TrebleClef() and FrenchViolinClef().

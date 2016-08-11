@@ -16,12 +16,12 @@ contains all the most low-level objects that also appear in the music21 module
 (i.e., music21.base.Music21Object is the same as music21.Music21Object).
 
 Music21 base classes for :class:`~music21.stream.Stream` objects and all
-elements contained within them including Notes, etc.. Additional objects for
+elements contained within them including Notes, etc. Additional objects for
 defining and manipulating elements are included.
 
 The namespace of this file, as all base.py files, is loaded into the package
 that contains this file via __init__.py. Everything in this file is thus
-available after importing music21.
+available after importing `music21`.
 
 >>> import music21
 >>> music21.Music21Object

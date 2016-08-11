@@ -33,12 +33,9 @@ to get a pitches across any range, get a pitch for scale step, get a
 scale step for pitch, and, for any given pitch ascend or descend to the 
 next pitch. In all cases :class:`~music21.pitch.Pitch` objects are returned.
 
-
-
 >>> sc1 = scale.MajorScale('a')
 >>> [str(p) for p in sc1.getPitches('g2', 'g4')]
 ['G#2', 'A2', 'B2', 'C#3', 'D3', 'E3', 'F#3', 'G#3', 'A3', 'B3', 'C#4', 'D4', 'E4', 'F#4']
-
 
 >>> sc2 = scale.MelodicMinorScale('a')
 >>> [str(p) for p in sc2.getPitches('g2', 'g4', direction='descending')]
@@ -1924,6 +1921,8 @@ class ConcreteScale(Scale):
         >>> eflatMaj.solfeg(pitch.Pitch('G#'), variant='humdrum')
         'my'
         '''
+        if isinstance(pitchTarget, six.string_types):
+            pitchTarget = pitch.Pitch(pitchTarget)
         (scaleDeg, accidental) = self.getScaleDegreeAndAccidentalFromPitch(pitchTarget, direction)
         if variant == 'music21':
             syllableDict = self._solfegSyllables

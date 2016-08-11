@@ -20,12 +20,12 @@ The Beams object is stored in :class:`~music21.note.Note` and
 :class:`~music21.chord.Chord` objects as their :attr:`~music21.note.Note.beams`
 attributes.   Beams objects can largely be treated as a list.
 
-See `meter.TimeSignature`.:meth:`~music21.meter.TimeSignature.getBeams` for a
+See `meter.TimeSignature`. :meth:`~music21.meter.TimeSignature.getBeams` for a
 way of getting beam information for a measure given the meter.  The
-`meter.TimeSignature`.:attr:`~music21.meter.TimeSignature.beamSequence`
+`meter.TimeSignature`. :attr:`~music21.meter.TimeSignature.beamSequence`
 attribute holds information about how to beam given the TimeSignature
 
-Run `stream.Stream`.:meth:`~music21.stream.Stream.makeBeams` to set beaming
+Run `Stream`. :meth:`~music21.stream.Stream.makeBeams` to set beaming
 information automatically given the current meter.
 
 Suppose you had a measure of two eighths and a quarter and wanted to explicitly
