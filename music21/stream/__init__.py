@@ -5599,6 +5599,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         fillGaps=False,
         timeRangeFromBarDuration=False,
         inPlace=True,
+        hideRests=False,
         ):
         '''
         Calls :py:func:`~music21.stream.makeNotation.makeRests`.
@@ -5609,6 +5610,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             fillGaps=fillGaps,
             timeRangeFromBarDuration=timeRangeFromBarDuration,
             inPlace=inPlace,
+            hideRests=hideRests,
             )
 
     def makeTies(self,

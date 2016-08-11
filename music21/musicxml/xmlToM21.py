@@ -1623,13 +1623,12 @@ class MeasureParser(XMLParserBase):
         if self.useVoices is True:
             for v in self.stream.iter.voices:
                 if v: # do not bother with empty voices
-                    v.makeRests(inPlace=True)
+                    v.makeRests(inPlace=True, hideRests=True)
                     v.elementsChanged()
         self.stream.elementsChanged()
         
         if (self.restAndNoteCount['rest'] == 1
-            and self.restAndNoteCount['note'] == 0
-                ):
+                and self.restAndNoteCount['note'] == 0):
             # TODO: do this on a per voice basis.
             self.fullMeasureRest = True 
             # it might already be True because a rest had a "measure='yes'" attribute

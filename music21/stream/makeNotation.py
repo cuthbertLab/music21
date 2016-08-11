@@ -620,7 +620,9 @@ def makeRests(s,
               refStreamOrTimeRange=None, 
               fillGaps=False,
               timeRangeFromBarDuration=False, 
-              inPlace=True):
+              inPlace=True,
+              hideRests=False,
+              ):
     '''
     Given a Stream with an offset not equal to zero,
     fill with one Rest preceding this offset.
@@ -641,7 +643,7 @@ def makeRests(s,
     based on the .barDuration property.
 
     If `inPlace` is True, this is done in-place; if `inPlace` is False,
-    this returns a modified deepcopy.
+    this returns a modified deepcopy. # TODO: Make inPlace default to False.
 
     >>> a = stream.Stream()
     >>> a.insert(20, note.Note())
@@ -666,7 +668,7 @@ def makeRests(s,
     >>> b[0].duration.quarterLength
     20.0
         
-    Same thing, but this time, with gaps...
+    Same thing, but this time, with gaps, and hidden rests...
     
     >>> a = stream.Stream()
     >>> a.insert(20, note.Note('C4'))
@@ -678,7 +680,7 @@ def makeRests(s,
     >>> a.show('text')
     {20.0} <music21.note.Note C>        
     {30.0} <music21.note.Note D>        
-    >>> b = a.makeRests(fillGaps = True, inPlace = False)
+    >>> b = a.makeRests(fillGaps=True, inPlace=False, hideRests=True)
     >>> len(b)
     4
     >>> b.lowestOffset
@@ -688,7 +690,8 @@ def makeRests(s,
     {20.0} <music21.note.Note C>
     {21.0} <music21.note.Rest rest>
     {30.0} <music21.note.Note D>        
-    
+    >>> b[0].hideObjectOnPrint
+    True
 
     Now with measures:
 
@@ -732,6 +735,7 @@ def makeRests(s,
 
     if not inPlace:  # make a copy
         returnObj = copy.deepcopy(s)
+        returnObj.derivation.method = 'makeRests'
     else:
         returnObj = s
 
@@ -772,6 +776,7 @@ def makeRests(s,
         if qLen > 0:
             r = note.Rest()
             r.duration.quarterLength = qLen
+            r.hideObjectOnPrint = hideRests            
             #environLocal.printDebug(['makeRests(): add rests', r, r.duration])
             # place at oLowTarget to reach to oLow
             v._insertCore(oLowTarget, r)
@@ -782,6 +787,7 @@ def makeRests(s,
         if qLen > 0:
             r = note.Rest()
             r.duration.quarterLength = qLen
+            r.hideObjectOnPrint = hideRests            
             # place at oHigh to reach to oHighTarget
             v._insertCore(oHigh, r)
         v.elementsChanged()  # must update otherwise might add double r
@@ -792,12 +798,15 @@ def makeRests(s,
                 for e in gapStream:
                     r = note.Rest()
                     r.duration.quarterLength = e.duration.quarterLength
+                    r.hideObjectOnPrint = hideRests            
                     v._insertCore(e.offset, r)
         v.elementsChanged()
         #environLocal.printDebug(['post makeRests show()', v])
+
         # NOTE: this sorting has been found to be necessary, as otherwise
         # the resulting Stream is not sorted and does not get sorted in
         # preparing musicxml output
+        # TODO: a lot has changed since 2009 -- check if this is still true...
         if v.autoSort:
             v.sort()
 
@@ -921,6 +930,7 @@ def makeTies(
 
     if not inPlace:  # make a copy
         returnObj = copy.deepcopy(s)
+        returnObj.derivation.method = 'makeTies'
     else:
         returnObj = s
     if len(returnObj) == 0:
@@ -1116,6 +1126,7 @@ def makeTupletBrackets(s, inPlace=False):
         # Stream, as it should be...
         if not inPlace:  # make a copy
             returnObj = copy.deepcopy(s)
+            returnObj.derivation.method = 'makeTupletBrackets'
         else:
             returnObj = s
     
