@@ -4,7 +4,7 @@
 Authors, Acknowledgments, Contributing, and Licensing
 =====================================================
 
-Music21 is an open-source toolkit for Computer-aided musicology.  It is licensed under 
+`Music21` is an open-source toolkit for Computer-aided musicology.  It is licensed under 
 the LGPL or BSD license (see below).
 
 About the Authors
@@ -148,8 +148,6 @@ to this project.  Their contributions and generosity are greatly appreciated.
 .. _Project Gutenberg: http://www.gutenberg.org/browse/categories/4
 
 
-
-
 How to Contribute
 -----------------
 
@@ -168,22 +166,18 @@ or new features to music21, please contact the lead author on GitHub or through 
 list. 
 
 
-
-
-
 Licensing and Copyright
 ---------------------------------
 
-
-The music21 Toolkit
+The `music21` Toolkit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Music21 is Copyright (c) 2006-15, Michael Scott Cuthbert and cuthbertLab.  
+Music21 is Copyright (c) 2006-2016, Michael Scott Cuthbert and cuthbertLab.  
 Music21 code (excluding content encoded in the corpus) is 
 free and open-source software, licensed under the Lesser GNU Public License (LGPL) or the
 BSD License.
 
-The music21 Corpus
+The `music21` Corpus
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The LGPL/BSD music21 software is distributed with a corpus of encoded 

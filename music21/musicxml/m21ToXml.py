@@ -4207,8 +4207,8 @@ class MeasureExporter(XMLExporterBase):
         if self.transpositionInterval is not None:
             mxAttributes.append(self.intervalToXmlTranspose(self.transpositionInterval))
         
-        # directive is deprecated, do not support  
-        # measureStyle      
+        # directive goes here, but is deprecated, do not support  
+        # measureStyle
         mxMeasureStyle = self.measureStyle()
         if mxMeasureStyle is not None:
             mxAttributes.append(mxMeasureStyle)
@@ -4233,13 +4233,13 @@ class MeasureExporter(XMLExporterBase):
             if hasMMR:
                 firstRestMMR = hasMMR[0]
                 if firstRestMMR.isFirst(rests[0]):
-                    mxMultipleRest = SubElement(mxMeasureStyle, 'multiple-rest')
+                    mxMultipleRest = Element('multiple-rest')
                     if firstRestMMR.useSymbols:
                         mxMultipleRest.set('use-symbols', 'yes')
                     else:
                         mxMultipleRest.set('use-symbols', 'no')
                     mxMultipleRest.text = str(firstRestMMR.numRests)
-        if mxMultipleRest:
+        if mxMultipleRest is not None:
             mxMeasureStyle = Element('measure-style')
             mxMeasureStyle.append(mxMultipleRest)
         

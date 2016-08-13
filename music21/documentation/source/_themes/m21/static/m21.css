@@ -258,7 +258,7 @@ a.headerlink:hover {
 cite, code, tt {
     font-family: 'Source Code Pro', monospace;
 	font-size: 0.9em;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.05em;
     font-style: normal;
     }
 

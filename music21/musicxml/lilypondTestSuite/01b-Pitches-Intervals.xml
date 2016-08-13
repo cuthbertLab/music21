@@ -24,7 +24,7 @@
           <mode>major</mode>
         </key>
         <time symbol="common">
-          <beats>2</beats>
+          <beats>4</beats>
           <beat-type>4</beat-type>
         </time>
         <clef>
@@ -70,6 +70,9 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="2">
       <note>
         <pitch>
           <step>D</step>
@@ -108,6 +111,9 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="3">
       <note>
         <pitch>
           <step>D</step>
@@ -148,6 +154,9 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="4">
       <note>
         <pitch>
           <step>E</step>
@@ -186,6 +195,9 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="5">
       <note>
         <pitch>
           <step>F</step>
@@ -224,6 +236,9 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="6">
       <note>
         <pitch>
           <step>F</step>
@@ -264,6 +279,9 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="7">
       <note>
         <pitch>
           <step>G</step>
@@ -302,6 +320,9 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="8">
       <note>
         <pitch>
           <step>A</step>
@@ -340,6 +361,9 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="9">
       <note>
         <pitch>
           <step>A</step>
@@ -380,6 +404,9 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="10">
       <note>
         <pitch>
           <step>B</step>
@@ -418,6 +445,9 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="11">
       <note>
         <pitch>
           <step>C</step>
@@ -456,6 +486,9 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="12">
       <note>
         <pitch>
           <step>C</step>
@@ -496,6 +529,19 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="13">
+      <note>
+        <pitch>
+          <step>B</step>
+          <alter>1</alter>
+          <octave>3</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
       <note>
         <pitch>
           <step>D</step>
@@ -524,6 +570,9 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="14">
       <note>
         <pitch>
           <step>B</step>
@@ -563,6 +612,9 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="15">
       <note>
         <pitch>
           <step>A</step>
@@ -602,6 +654,9 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="16">
       <note>
         <pitch>
           <step>G</step>
@@ -640,6 +695,9 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="17">
       <note>
         <pitch>
           <step>G</step>
@@ -679,6 +737,9 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="18">
       <note>
         <pitch>
           <step>F</step>
@@ -718,6 +779,9 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="19">
       <note>
         <pitch>
           <step>E</step>
@@ -756,6 +820,9 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="20">
       <note>
         <pitch>
           <step>E</step>
@@ -786,6 +853,9 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="21">
       <note>
         <pitch>
           <step>B</step>

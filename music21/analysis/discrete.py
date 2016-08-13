@@ -183,7 +183,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
     # these are specialized in subclass
     name = 'KeyWeightKeyAnalysis Base Class'
-    identifiers = ['key', 'keyscape']
+    identifiers = ['key.baseClass', 'keyscape.baseClass']
 
     # in general go to Gb, F#: favor F# majorKeyColors
     # favor eb minor
@@ -687,8 +687,11 @@ class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
     '''
     _DOC_ALL_INHERITED = False
     name = 'Krumhansl Schmuckler Key Analysis'
-    identifiers = ['krumhansl', 'schmuckler',  'krumhansl-schmuckler', 
-                   'krumhanslschmuckler']
+    identifiers = ['key.krumhansl', 'key.schmuckler',  'key.krumhansl-schmuckler', 
+                   'key.krumhanslschmuckler', 
+                   'krumhansl', 'schmuckler',  'krumhansl-schmuckler', 
+                   'krumhanslschmuckler', 
+                   ]
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -725,7 +728,9 @@ class KrumhanslKessler(KeyWeightKeyAnalysis):
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Krumhansl Kessler Key Analysis'
-    identifiers = ['krumhansl', 'kessler', 'krumhansl-kessler', 'krumhanslkessler']
+    identifiers = ['key.kessler', 'key.krumhansl-kessler', 'key.krumhanslkessler',
+                   'kessler', 'krumhansl-kessler', 'krumhanslkessler',
+                   ]
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -764,7 +769,9 @@ class AardenEssen(KeyWeightKeyAnalysis):
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Aarden Essen Key Analysis'
-    identifiers = ['aarden', 'essen', 'aarden-essen', 'aardenessen']
+    identifiers = ['key.aarden', 'key.essen', 'key.aarden-essen', 'key.aardenessen'
+                   'aarden', 'essen', 'aarden-essen', 'aardenessen',
+                   ]
     # adding these identifiers make this the default
     identifiers.append('key')
     identifiers.append('keyscape')
@@ -807,7 +814,9 @@ class SimpleWeights(KeyWeightKeyAnalysis):
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Simple Weight Key Analysis'
-    identifiers = ['simple', 'weight', 'simple-weight', 'simpleweight']
+    identifiers = ['key.simple', 'key.weight', 'key.simple-weight', 'key.simpleweight',
+                   'simple', 'weight', 'simple-weight', 'simpleweight',
+                   ]
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -842,7 +851,9 @@ class BellmanBudge(KeyWeightKeyAnalysis):
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Bellman Budge Key Analysis'
-    identifiers = ['bellman', 'budge', 'bellman-budge', 'bellmanbudge']
+    identifiers = ['key.bellman', 'key.budge', 'key.bellman-budge', 'key.bellmanbudge',
+                   'bellman', 'budge', 'bellman-budge', 'bellmanbudge',
+                   ]
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -883,8 +894,11 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Temperley Kostka Payne Key Analysis'
-    identifiers = ['temperley', 'kostka', 'payne', 
-                   'temperley-kostka-payne', 'temperleykostkapayne']
+    identifiers = ['key.temperley', 'key.kostka', 'key.payne', 
+                   'key.temperley-kostka-payne', 'key.temperleykostkapayne',                   
+                   'temperley', 'kostka', 'payne', 
+                   'temperley-kostka-payne', 'temperleykostkapayne'
+                   ]
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -1215,7 +1229,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
 
     name = 'Interval Diversity'
     # provide possible string matches for this processor
-    identifiers = ['ambitus', 'range', 'span']
+    identifiers = ['interval.diversity', 'intervals']
 
     def __init__(self, referenceStream=None):
         '''
@@ -1356,12 +1370,21 @@ def analyzeStream(streamObj, *args, **keywords):
             break
         else:
             for idStr in analysisClassName.identifiers:
+                if method == idStr:
+                    match = analysisClassName
+                    #environLocal.printDebug(['matched idStr', idStr])
+                    break
+            if match != None:
+                break
+            for idStr in analysisClassName.identifiers:
                 if method in idStr:
                     match = analysisClassName
                     #environLocal.printDebug(['matched idStr', idStr])
                     break
             if match != None:
                 break
+
+    
     if match != None:
         obj = match() # NOTE: Cuthbert, this was previously analysisClassName()? - out of scope
         #environLocal.printDebug(['analysis method used:', obj])
