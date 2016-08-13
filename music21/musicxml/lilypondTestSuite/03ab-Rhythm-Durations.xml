@@ -47,9 +47,18 @@
       <attributes>
         <time>
           <beats>2</beats>
-          <beat-type>128</beat-type>
+          <beat-type>64</beat-type>
         </time>
       </attributes>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>64th</type>
+      </note>
       <note>
         <pitch>
           <step>C</step>
@@ -93,9 +102,29 @@
       <attributes>
         <time>
           <beats>3</beats>
-          <beat-type>128</beat-type>
+          <beat-type>32</beat-type>
         </time>
       </attributes>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>32nd</type>
+        <dot/>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>6</duration>
+        <voice>1</voice>
+        <type>64th</type>
+        <dot/>
+      </note>
       <note>
         <pitch>
           <step>C</step>
@@ -142,9 +171,31 @@
       <attributes>
         <time>
           <beats>7</beats>
-          <beat-type>128</beat-type>
+          <beat-type>32</beat-type>
         </time>
       </attributes>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>28</duration>
+        <voice>1</voice>
+        <type>16th</type>
+        <dot/>
+        <dot/>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>14</duration>
+        <voice>1</voice>
+        <type>32nd</type>
+        <dot/>
+        <dot/>
+      </note>
       <note>
         <pitch>
           <step>C</step>

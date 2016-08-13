@@ -1338,6 +1338,9 @@ class MeterSequence(MeterTerminal):
          ['144/32'], 
          ['288/64'], 
          ['576/128']]
+
+        >>> a._divisionOptionsAlgo(3, 128)
+        [['1/128', '1/128', '1/128'], ['3/128']]
         '''
         opts = []
 
@@ -1396,7 +1399,7 @@ class MeterSequence(MeterTerminal):
         Provide fixed set of meter divisions that will not be easily
         obtained algorithmically.
 
-        Currently does nothing except to allow partitioning 5/8 as 2/8,2/8,1/8 as a possibility
+        Currently does nothing except to allow partitioning 5/8 as 2/8, 2/8, 1/8 as a possibility
         (sim for 5/16, etc.)
 
 
@@ -1451,6 +1454,32 @@ class MeterSequence(MeterTerminal):
         self._levelListCache = {}
 
     def _getOptions(self):
+        '''
+        Return either a cached or a new set of division/partition options.
+        
+        Calls _divisionOptionsAlgo and _divisionOptionsPreset (which will be empty
+        except if the numerator is 5.
+        
+        Works on anything that has a .numerator and .denominator.
+        
+        >>> meter.MeterSequence('3/4')._getOptions()
+        [['1/4', '1/4', '1/4'], 
+         ['1/8', '1/8', '1/8', '1/8', '1/8', '1/8'], 
+         ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', 
+          '1/16', '1/16', '1/16', '1/16', '1/16'], 
+         ['3/4'], ['6/8'], ['12/16'], ['24/32'], ['48/64'], ['96/128']]
+
+        The additional 2 + 2 + 1 and 2 + 1 + 2 options for numerator 5 are at the end.
+
+        >>> meter.MeterSequence('5/32')._getOptions()
+        [['2/32', '3/32'], 
+         ['3/32', '2/32'], 
+         ['1/32', '1/32', '1/32', '1/32', '1/32'], 
+         ['1/64', '1/64', '1/64', '1/64', '1/64', 
+          '1/64', '1/64', '1/64', '1/64', '1/64'], 
+         ['5/32'], ['10/64'], ['20/128'], 
+         ['2/32', '2/32', '1/32'], ['2/32', '1/32', '2/32']]
+        '''
         # all-string python dictionaries are optimized; use string key
         n = int(self.numerator)
         d = int(self.denominator)
@@ -1501,7 +1530,7 @@ class MeterSequence(MeterTerminal):
         '{2/8+2/8+1/8}'
 
 
-        Here we use loadDefault = True to get the default:
+        Here we use loadDefault=True to get the default:
 
         >>> a = meter.MeterSequence('5/8')
         >>> a.partitionByCount(11)
@@ -1510,7 +1539,7 @@ class MeterSequence(MeterTerminal):
 
         If loadDefault is False then an error is raised:
 
-        >>> a.partitionByCount(11, loadDefault = False)
+        >>> a.partitionByCount(11, loadDefault=False)
         Traceback (most recent call last):
         music21.meter.MeterException: Cannot set partition by 11 (5/8)
 
@@ -1654,7 +1683,7 @@ class MeterSequence(MeterTerminal):
         # clear cache
         self._levelListCache = {}
 
-    def partition(self, value):
+    def partition(self, value, loadDefault=False):
         '''
         Partitioning creates and sets a number of MeterTerminals
         that make up this MeterSequence.
@@ -1687,13 +1716,26 @@ class MeterSequence(MeterTerminal):
         >>> str(a)
         '{1/8+1/8+1/8+...+1/8}'
 
+        Demo of loadDefault: if impossible, then do it another way...
+
+        >>> c = meter.MeterSequence('3/128')
+        >>> c.partition(2)
+        Traceback (most recent call last):
+        music21.meter.MeterException: Cannot set partition by 2 (3/128)
+
+        >>> c = meter.MeterSequence('3/128')
+        >>> c.partition(2, loadDefault=True)
+        >>> len(c)
+        3
+        >>> str(c)
+        '{1/128+1/128+1/128}'
         '''
         if common.isListLike(value):
             self.partitionByList(value)
         elif isinstance(value, MeterSequence):
             self.partitionByOtherMeterSequence(value)
         elif common.isNum(value):
-            self.partitionByCount(value, loadDefault=False)
+            self.partitionByCount(value, loadDefault=loadDefault)
         else:
             raise MeterException('cannot process partition argument %s' % value)
 
@@ -1927,8 +1969,11 @@ class MeterSequence(MeterTerminal):
     #---------------------------------------------------------------------------
     # loading is always destructive
 
-    def load(self, value, partitionRequest=None, autoWeight=False,
-            targetWeight=None):
+    def load(self, 
+             value, 
+             partitionRequest=None, 
+             autoWeight=False,
+             targetWeight=None):
         '''
         This method is called when a MeterSequence is created, or if a MeterSequence is re-set.
 
@@ -1971,8 +2016,8 @@ class MeterSequence(MeterTerminal):
 
         if isinstance(value, six.string_types):
             ratioList, self.summedNumerator = slashMixedToFraction(value)
-            for n,d in ratioList:
-                slashNotation = '%s/%s' % (n,d)
+            for n, d in ratioList:
+                slashNotation = '%s/%s' % (n, d)
                 self._addTerminal(MeterTerminal(slashNotation))
             self._updateRatio()
             self.weight = targetWeight # may be None
@@ -2956,7 +3001,11 @@ class TimeSignature(base.Music21Object):
 
         # create subdivisions, and thus define compound/simple distinction
         if len(self.beatSequence) > 1: # if partitioned
-            self.beatSequence.subdividePartitionsEqual()
+            try:
+                self.beatSequence.subdividePartitionsEqual()
+            except MeterException:
+                if self.denominator >= 128:
+                    pass # do not raise an exception for unable to subdivide smaller than 128
 
     def _setDefaultBeamPartitions(self):
         '''

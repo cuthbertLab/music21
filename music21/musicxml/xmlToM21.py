@@ -3698,6 +3698,20 @@ class MeasureParser(XMLParserBase):
         >>> mxSenza = ET.fromstring('<time><senza-misura>0</senza-misura></time>')        
         >>> MP.xmlToTimeSignature(mxSenza)
         <music21.meter.SenzaMisuraTimeSignature 0 >
+
+        Small Time Signatures
+
+        >>> mxTime = ET.fromstring('<time><beats>3</beats><beat-type>32</beat-type></time>')        
+        >>> MP.xmlToTimeSignature(mxTime)
+        <music21.meter.TimeSignature 3/32>
+
+        >>> mxTime = ET.fromstring('<time><beats>3</beats><beat-type>64</beat-type></time>')        
+        >>> MP.xmlToTimeSignature(mxTime)
+        <music21.meter.TimeSignature 3/64>
+
+        >>> mxTime = ET.fromstring('<time><beats>3</beats><beat-type>128</beat-type></time>')        
+        >>> MP.xmlToTimeSignature(mxTime)
+        <music21.meter.TimeSignature 3/128>
         ''' 
         isSenzaMisura = mxTime.find('senza-misura') 
         if isSenzaMisura is not None:        
@@ -3720,7 +3734,11 @@ class MeasureParser(XMLParserBase):
     
         #environLocal.warn(['loading meter string:', '+'.join(msg)])
         if len(msg) == 1: # normal
-            ts = meter.TimeSignature(msg[0])
+            try:
+                ts = meter.TimeSignature(msg[0])
+            except meter.MeterException:
+                ts = meter.TimeSignature(msg[0])
+                raise MusicXMLImportException("Cannot process time signature {}".format(msg[0]))
         else:
             ts = meter.TimeSignature()
             ts.load('+'.join(msg))
