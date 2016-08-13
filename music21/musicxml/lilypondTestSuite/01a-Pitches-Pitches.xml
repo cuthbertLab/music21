@@ -7,7 +7,8 @@
     <miscellaneous>
       <miscellaneous-field name="description">All pitches from G to c'''' in 
           ascending steps; First without accidentals, then with a sharp and then 
-          with a flat accidental. Double alterations and cautionary accidentals 
+          with a flat accidental, then with explicit natural accidentals. 
+          Double alterations and cautionary accidentals 
           are tested at the end.</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -1097,7 +1098,93 @@
       </note>
     </measure>
     <!--=======================================================-->
-    <measure number="31">
+    <measure number="25">
+      <note>
+        <pitch>
+          <step>E</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <accidental>natural</accidental>
+      </note>
+      <note>
+        <pitch>
+          <step>F</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <accidental>natural</accidental>
+      </note>
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <accidental>natural</accidental>
+      </note>
+      <note>
+        <pitch>
+          <step>A</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <accidental>natural</accidental>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="26">
+      <note>
+        <pitch>
+          <step>B</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <accidental>natural</accidental>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <accidental>natural</accidental>
+      </note>
+      <note>
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <accidental>natural</accidental>
+      </note>
+      <note>
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <accidental>natural</accidental>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="27">
       <note>
         <pitch>
           <step>C</step>
@@ -1144,7 +1231,7 @@
       </note>
     </measure>
     <!--=======================================================-->
-    <measure number="32">
+    <measure number="28">
       <note>
         <pitch>
           <step>C</step>
