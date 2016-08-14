@@ -1346,6 +1346,42 @@ def analyzeStream(streamObj, *args, **keywords):
     <music21.interval.Interval m21>
 
     '''
+    if 'method' in keywords:
+        method = keywords['method']
+    if args:
+        method = args[0]
+        
+    match = analysisClassFromMethodName(method)
+    
+    if match != None:
+        obj = match() # NOTE: Cuthbert, this was previously analysisClassName()? - out of scope
+        #environLocal.printDebug(['analysis method used:', obj])
+        return obj.getSolution(streamObj)
+
+    # if no match raise error
+    raise DiscreteAnalysisException('no such analysis method: %s' % method)
+
+def analysisClassFromMethodName(method):
+    '''
+    Returns an analysis class given a method name, or None if none can be found
+
+    Searches first the class name, then the .identifiers array for each class,
+    then a subset of any identifier.
+    
+    >>> acfmn = analysis.discrete.analysisClassFromMethodName
+    >>> acfmn('aarden')
+    <class 'music21.analysis.discrete.AardenEssen'>
+    >>> acfmn('range')
+    <class 'music21.analysis.discrete.Ambitus'>
+    
+    This one is fundamentally important...
+    
+    >>> acfmn('key')
+    <class 'music21.analysis.discrete.AardenEssen'>
+    
+    >>> print(repr(acfmn('asdfadsfasdf')))
+    None
+    '''
     analysisClasses = [
         Ambitus,
         KrumhanslSchmuckler,
@@ -1355,43 +1391,36 @@ def analyzeStream(streamObj, *args, **keywords):
         BellmanBudge,
         TemperleyKostkaPayne,
     ]
-
-    if 'method' in keywords:
-        method = keywords['method']
-    if args:
-        method = args[0]
     match = None
-    for analysisClassName in analysisClasses:    
+    for analysisClass in analysisClasses:    
         # this is a very loose matching, as there are few classes now
-        if (method.lower() in analysisClassName.__name__.lower() or
-            method.lower() in analysisClassName.name):
-            match = analysisClassName
+        if (method.lower() in analysisClass.__name__.lower() or
+            method.lower() in analysisClass.name):
+            match = analysisClass
             #environLocal.printDebug(['matched analysis class name'])
             break
-        else:
-            for idStr in analysisClassName.identifiers:
+        
+    if match is None:
+        # no match for exact class name, so check to see if .identifiers matches
+        for analysisClass in analysisClasses:    
+            for idStr in analysisClass.identifiers:
                 if method == idStr:
-                    match = analysisClassName
+                    match = analysisClass
                     #environLocal.printDebug(['matched idStr', idStr])
                     break
-            if match != None:
-                break
-            for idStr in analysisClassName.identifiers:
+
+    if match is None:
+        # no match for identifiers, so see if the id is a subset of identifiers.
+        for analysisClass in analysisClasses:    
+            for idStr in analysisClass.identifiers:
                 if method in idStr:
-                    match = analysisClassName
+                    match = analysisClass
                     #environLocal.printDebug(['matched idStr', idStr])
                     break
             if match != None:
                 break
 
-    
-    if match != None:
-        obj = match() # NOTE: Cuthbert, this was previously analysisClassName()? - out of scope
-        #environLocal.printDebug(['analysis method used:', obj])
-        return obj.getSolution(streamObj)
-
-    # if no match raise error
-    raise DiscreteAnalysisException('no such analysis method: %s' % method)
+    return match
 
 #------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):

@@ -1159,11 +1159,10 @@ def allFeaturesAsList(streamInput):
     file to this data set.
     
     
-    >>> #_DOCS_SHOW s = corpus.parse('bwv66.6')
-    >>> s = converter.parse('tinynotation: 4/4 c4 d e2') #_DOCS_HIDE
+    >>> s = converter.parse('tinynotation: 4/4 c4 d e2')
     >>> f = features.allFeaturesAsList(s)
     >>> f[1][0:3]
-    [[1], [0.6899992497638124], [2]]
+    [[1], [0.689999...], [2]]
     >>> len(f[0]) > 65
     True
     >>> len(f[1]) > 20
@@ -1175,7 +1174,7 @@ def allFeaturesAsList(streamInput):
     ds.addFeatureExtractors(f)
     ds.addData(streamInput)
     ds.process()
-    jsymb = ds.getFeaturesAsList( includeClassLabel=False, includeId=False, concatenateLists=False)
+    jsymb = ds.getFeaturesAsList(includeClassLabel=False, includeId=False, concatenateLists=False)
     ds._featureExtractors = []
     ds._features = []
     n = [f for f in native.featureExtractors]
