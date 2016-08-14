@@ -740,12 +740,12 @@ class MeasureHash(object):
         for n in mo:
             if n.duration.quarterLength == 0.0:
                 hashString += self.hashGrace(n)
-            elif n.isNote == True:
+            elif n.isNote:
                 hashString += self.hashNote(n)
-            elif n.isNote == False:
-                if n.isRest == True:
+            elif not n.isNote:
+                if n.isRest:
                     hashString += self.hashRest(n)
-                elif n.isChord ==True:
+                elif n.isChord:
                     hashString += self.hashNote(n)
         self.hashString = hashString
         return hashString

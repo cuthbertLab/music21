@@ -26,6 +26,16 @@ Speed notes:
 '''
 from __future__ import print_function, division
 
+import copy
+import difflib
+import json
+import math
+import os
+import random
+
+from collections import OrderedDict
+from functools import partial
+
 from music21 import common
 from music21 import converter
 from music21 import corpus
@@ -33,14 +43,7 @@ from music21 import environment
 
 _MOD = 'search.segment.py'
 environLocal = environment.Environment(_MOD)
-import copy
-import os
-import math
-import json
-import difflib
-from collections import OrderedDict
-from functools import partial
-import random
+
 
 def translateMonophonicPartToSegments(
     inputStream,
@@ -282,7 +285,6 @@ def scoreSimilarity(
     (...'bwv197.5.mxl', 0, 1, (5, 11), ...'bwv197.10.mxl', 3, 2, (9, 14), 0.0)
     (...'bwv197.5.mxl', 0, 2, (9, 14), ...'bwv190.7.mxl', 0, 0, (0, 9), 0.07547...)
     (...'bwv197.5.mxl', 0, 2, (9, 14), ...'bwv190.7.mxl', 0, 1, (6, 15), 0.07547...)
-        
     '''
     similarityScores = []
     scoreIndex = 0
@@ -354,5 +356,3 @@ if __name__ == "__main__":
 
 #------------------------------------------------------------------------------
 # eof
-
-

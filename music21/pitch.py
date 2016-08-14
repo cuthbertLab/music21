@@ -2760,6 +2760,7 @@ class Pitch(object):
             tempAlter = 0
         tempStep = self.step
         if six.PY2:
+            # pylint: disable=undefined-variable
             tempStep = unicode(tempStep) # @UndefinedVariable
 
         if tempAlter != int(tempAlter):
@@ -2953,6 +2954,7 @@ class Pitch(object):
         tempStep = self.step
 
         if six.PY2:
+            # pylint: disable=undefined-variable
             tempStep = unicode(tempStep) # @UndefinedVariable
         
         if tempAlter != int(tempAlter):

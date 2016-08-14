@@ -8,9 +8,9 @@
 # Copyright:    Copyright © 2011-2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
-
-
+'''
+base classes for searching scores.
+'''
 import copy
 import difflib
 import math
@@ -161,7 +161,7 @@ def rhythmicSearch(thisStream, searchStream):
                                                                       j].duration.quarterLength:
                 foundException = True
                 break
-        if foundException == False:
+        if foundException is False:
             foundEls.append(start)
     return foundEls
 
@@ -754,7 +754,7 @@ def mostCommonMeasureRythms(streamIn, transposeDiatonic = False):
                 entry['number'] += 1
                 entry['measures'].append(thisMeasure)
                 break
-        if rhythmFound == False:
+        if rhythmFound is False:
             newDict = {}
             newDict['number'] = 1
             newDict['rhythmString'] = rhythmString
@@ -765,7 +765,7 @@ def mostCommonMeasureRythms(streamIn, transposeDiatonic = False):
                     distanceToTranspose = 72 - measureNotes[0].pitch.ps
                     foundNote = True
                     break
-            if foundNote == True:
+            if foundNote:
                 thisMeasureCopy = copy.deepcopy(thisMeasure)
                 for n in thisMeasureCopy.notes:
                     # TODO: Transpose Diatonic

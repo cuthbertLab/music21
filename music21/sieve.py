@@ -595,7 +595,7 @@ class Residual(object):
         # get a default range, can be changed later
         # is an actual range and not start/end points b/c when producing a not (-)
         # it is easy to remove the mod,n from the range
-        if z == None: # supply default if necessary
+        if z is None: # supply default if necessary
             z = list(range(0, 100))
         self._z = z
         #print 'residual init self._z', self._z
@@ -734,7 +734,7 @@ class Residual(object):
 
     def __eq__(self, other):
         "==, compare residual classes in terms of m and shift"
-        if other == None: 
+        if other is None: 
             return 0
         if (self._m == other._m and self._shift == other._shift and 
              self._neg == other._neg):
@@ -744,7 +744,7 @@ class Residual(object):
 
     def __ne__(self, other):
         "m and shift not equal"
-        if other == None: 
+        if other is None: 
             return 1
         if (self._m != other._m 
                 or self._shift != other._shift
@@ -1161,7 +1161,7 @@ class Sieve(object):
         '''
         data = {}
         data['logStr'] = self.represent('exp') # store expanded representation
-        if self._z == None: # get from residual classes, always one at 
+        if self._z is None: # get from residual classes, always one at 
             data['z'] = self._resLib[self._resKeyStr(0)].z
         else:
             data['z'] = self._z
@@ -1397,7 +1397,7 @@ class Sieve(object):
         return a string id representation
         this uses self._z at initialization"""
         resDict = self._parseResidual(''.join(resStr))
-        if resDict == None:
+        if resDict is None:
             msg = 'cannot parse %s' % ''.join(resStr)
             raise SieveException('bad residual class notation: (%r)' % msg)
         resObj = Residual(resDict['m'],resDict['shift'],
@@ -1414,7 +1414,7 @@ class Sieve(object):
         """this is where residuals are converted to set evaluating strings
         z should not be stored; should be a temporary value
         """
-        if z == None: # if none given, give internal
+        if z is None: # if none given, give internal
             z = self._z 
         # z is valid, gets default from residual class
         if not common.isListLike(z) and z != None:
@@ -1441,7 +1441,7 @@ class Sieve(object):
         self._resId = len(self._resLib.keys())
 
     def _resClear(self, state=None):
-        if state == None: # clear all
+        if state is None: # clear all
             self._resLib = {} # store id and object
             self._resId = 0
         elif state == 'cmp':
@@ -1463,7 +1463,7 @@ class Sieve(object):
         self._expTree = [] # string that stores representation
         # use dynamically generated z
         segObj = CompressionSegment(usrData, self._z) #  a list of values
-        if self._z == None: # non given at init, get from segObj
+        if self._z is None: # non given at init, get from segObj
             self._z = segObj._z
         union = segObj() # convert to residual classes
         for resObj in union:
@@ -1505,7 +1505,7 @@ class Sieve(object):
                 i = i + 1
 
             # if NEG is last char this is always an error
-            elif char == NEG and charNext == None:
+            elif char == NEG and charNext is None:
                 msg = 'negation cannot be used without operands'
                 raise SieveException('badly formed logical string (a): (%s)' % msg)
             # attempting to use negationg as a binary operators
@@ -1628,11 +1628,11 @@ class Sieve(object):
         [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]
         """
 
-        if state == None:
+        if state is None:
             state = self._state
-        if z == None:
+        if z is None:
             z = self._z
-        if segmentFormat == None:
+        if segmentFormat is None:
             segmentFormat = self._segmentFormat
 
         if state == 'exp':
@@ -1771,7 +1771,7 @@ class Sieve(object):
         style of None is use for users; adds | to singel residuals
         style abs (absolute) does not add | tos single residual class
         """
-        if state == None:
+        if state is None:
             state = self._state
         if state == 'exp':
             msg = copy.copy(self._expTree)

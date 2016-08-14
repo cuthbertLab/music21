@@ -18,8 +18,9 @@ The :class:`~music21.key.Key` object is a fuller representation not just of
 a key signature but also of the key of a region. 
 '''
 
-import unittest
 import copy
+import re
+import unittest
 
 from music21 import base
 from music21 import common
@@ -35,7 +36,6 @@ from music21 import environment
 _MOD = "key.py"
 environLocal = environment.Environment(_MOD)
 
-import re
 
 
 #-------------------------------------------------------------------------------

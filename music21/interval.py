@@ -229,7 +229,7 @@ def convertSpecifier(specifier):
         # between m and M, but was taken care of in the line above
         elif specifier.lower() in [x.lower() for x in prefixSpecs[1:]]:    
             for i in range(len(prefixSpecs)):
-                if prefixSpecs[i] == None: 
+                if prefixSpecs[i] is None: 
                     continue
                 if specifier.lower() == prefixSpecs[i].lower():
                     post = i
@@ -237,7 +237,7 @@ def convertSpecifier(specifier):
 
         elif specifier.lower() in [x.lower() for x in niceSpecNames[1:]]:    
             for i in range(len(niceSpecNames)):
-                if niceSpecNames[i] == None: 
+                if niceSpecNames[i] is None: 
                     continue
                 if specifier.lower() == niceSpecNames[i].lower():
                     post = i
@@ -754,7 +754,7 @@ class GenericInterval(IntervalBase):
         
         >>> a == ""
         False
-        >>> a == None
+        >>> a is None
         False
         '''
         if other is None:
@@ -1059,7 +1059,7 @@ class DiatonicInterval(IntervalBase):
         elif not hasattr(other, "specifier"):
             return False
 
-        if other == None:
+        if other is None:
             return False
         
         ## untested...
@@ -1291,7 +1291,7 @@ class ChromaticInterval(IntervalBase):
         >>> b == e
         False
         '''
-        if other == None:
+        if other is None:
             return False
         elif not hasattr(other, "semitones"):
             return False
@@ -1952,7 +1952,7 @@ class Interval(IntervalBase):
         >>> a == 'a4'
         False
         '''
-        if other == None:
+        if other is None:
             return False
         elif not hasattr(other, 'diatonic') or not hasattr(other, 'chromatic'):
             return False

@@ -1522,7 +1522,8 @@ class Ottava(Spanner):
                 stub.append('a')        
             self._type = ''.join(stub)    
         else:
-            if not isinstance(newType, six.string_types) or newType.lower() not in self.validOttavaTypes:
+            if (not isinstance(newType, six.string_types) 
+                    or newType.lower() not in self.validOttavaTypes):
                 raise SpannerException(
                     'cannot create Ottava of type: %s' % newType)
             self._type = newType.lower()
@@ -2717,8 +2718,3 @@ if __name__ == "__main__":
 
 #------------------------------------------------------------------------------
 # eof
-
-
-
-
-

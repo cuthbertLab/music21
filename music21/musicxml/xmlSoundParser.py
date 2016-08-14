@@ -22,7 +22,8 @@ class SoundTagMixin(object):
         Returns a list of objects that represent the sound tag.
         '''
         soundObjs = []
-        tempoNum = mxSound.get('tempo')
-        dynamicsNum = mxSound.get('dynamics')
+        # pylint: disable=unused-variable
+        tempoNum = mxSound.get('tempo') # @UnusedVariable
+        dynamicsNum = mxSound.get('dynamics') # @UnusedVariable
         
         return soundObjs

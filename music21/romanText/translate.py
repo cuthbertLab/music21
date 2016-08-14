@@ -312,7 +312,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     from music21 import roman
     from music21 import tie
 
-    if inputM21 == None:
+    if inputM21 is None:
         s = stream.Score()
     else:
         s = inputM21
@@ -458,7 +458,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                     
                     for i, a in enumerate(t.atoms):
                         if (isinstance(a, rtObjects.RTKey)
-                            or (foundAKeySignatureSoFar == False
+                            or (foundAKeySignatureSoFar is False
                                 and isinstance(a, rtObjects.RTAnalyticKey))): 
                             # found a change of Key+KeySignature or
                             # just found a change of analysis but no keysignature so far
@@ -520,7 +520,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                 firstChord = copy.deepcopy(previousRn)
                                 firstChord.quarterLength = o
                                 firstChord.lyric = ""
-                                if previousRn.tie == None:
+                                if previousRn.tie is None:
                                     previousRn.tie = tie.Tie('start')
                                 else:
                                     previousRn.tie.type = 'continue'    
@@ -534,7 +534,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                             # use source to evaluation roman 
                             tsAtTimeOfLastChord = tsCurrent
                             rn = note.Rest()
-                            if pivotChordPossible == False:
+                            if pivotChordPossible is False:
                                 # probably best to find duration
                                 if previousChordInMeasure is None:
                                     pass # use default duration
@@ -602,7 +602,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                 #environLocal.printDebug('cannot create RN from: %s' % a.src)
                                 rn = note.Note() # create placeholder 
 
-                            if pivotChordPossible == False:
+                            if pivotChordPossible is False:
                                 # probably best to find duration
                                 if previousChordInMeasure is None:
                                     pass # use default duration
@@ -870,7 +870,7 @@ def romanTextToStreamOpus(rtHandler, inputM21=None):
         rtHandler = rtf.readstr(rtHandler) # return handler, processes tokens
 
     if rtHandler.definesMovements(): # create an opus
-        if inputM21 == None:
+        if inputM21 is None:
             s = stream.Opus()
         else:
             s = inputM21
@@ -1161,7 +1161,7 @@ m6-7 = m4-5
                              "['A4', 'C5', 'F5']")
 
             x = rnStream[elementNumber + 4].pitches[2].accidental
-            if x == None: 
+            if x is None: 
                 x = pitch.Accidental('natural')
             self.assertEqual(x.alter, 0)
 

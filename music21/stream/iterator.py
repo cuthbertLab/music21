@@ -9,7 +9,6 @@
 # Copyright:    Copyright © 2008-2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
-from music21.sites import SitesException
 '''
 this class contains iterators and filters for walking through streams
 
@@ -18,10 +17,11 @@ StreamIterators are explicitly allowed to access private methods on streams.
 import unittest
 import warnings
 from music21 import common
-from music21.stream import filters
 from music21.exceptions21 import StreamException
-
 from music21.ext import six
+from music21.stream import filters
+
+from music21.sites import SitesException
 
 #------------------------------------------------------------------------------
 class StreamIteratorException(StreamException):

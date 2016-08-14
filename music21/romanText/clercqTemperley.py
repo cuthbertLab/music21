@@ -950,7 +950,7 @@ class CTRule(object):
             sectionName = 'Tag' + self.LHS[2:]
         elif self.LHS == 'S':
             sectionName = 'Song' + self.LHS[1:]
-        elif 'Fadeout' == self.LHS:
+        elif self.LHS == 'Fadeout':
             sectionName = 'Fadeout'
         else:
             sectionName = self.LHS

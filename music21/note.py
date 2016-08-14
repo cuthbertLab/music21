@@ -1761,7 +1761,7 @@ class Test(unittest.TestCase):
         a5 = Note()
         a5.name = "A"
         a5.octave = 5
-        self.assertAlmostEquals(a5.pitch.frequency, 880.0)
+        self.assertAlmostEqual(a5.pitch.frequency, 880.0)
         self.assertEqual(a5.pitch.pitchClass, 9)
 
 
@@ -1827,13 +1827,13 @@ class Test(unittest.TestCase):
             # test matching beat proportion value
             post = [m.notesAndRests[i].beat for i in range(nCount)]
             for i in range(len(matchBeat)):
-                self.assertAlmostEquals(post[i], matchBeat[i], 4)
+                self.assertAlmostEqual(post[i], matchBeat[i], 4)
 
             # test getting beat duration
             post = [m.notesAndRests[i].beatDuration.quarterLength for i in range(nCount)]
 
             for i in range(len(matchBeat)):
-                self.assertAlmostEquals(post[i], matchBeatDur[i], 4)
+                self.assertAlmostEqual(post[i], matchBeatDur[i], 4)
 
         # two measure case
         for tsStr, nQL, nCount, matchBeat, matchBeatDur in data:
@@ -1857,11 +1857,11 @@ class Test(unittest.TestCase):
             # test matching beat proportion value
             post = [m2.notesAndRests[i].beat for i in range(nCount)]
             for i in range(len(matchBeat)):
-                self.assertAlmostEquals(post[i], matchBeat[i], 4)
+                self.assertAlmostEqual(post[i], matchBeat[i], 4)
             # test getting beat duration
             post = [m2.notesAndRests[i].beatDuration.quarterLength for i in range(nCount)]
             for i in range(len(matchBeat)):
-                self.assertAlmostEquals(post[i], matchBeatDur[i], 4)
+                self.assertAlmostEqual(post[i], matchBeatDur[i], 4)
 
 
 
@@ -1880,7 +1880,7 @@ class Test(unittest.TestCase):
                 found.append(n.beat)
 
             for i in range(len(match)):
-                self.assertEquals(match[i], found[i])
+                self.assertEqual(match[i], found[i])
 
             #s.show()
 

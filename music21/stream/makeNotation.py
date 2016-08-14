@@ -148,7 +148,8 @@ def makeBeams(s, inPlace=False):
                 offset = (lastTimeSignature.barDuration.quarterLength -
                     noteStream.highestTime)
             beamsList = lastTimeSignature.getBeams(noteStream, measureStartOffset=offset)
-
+            
+            # pylint: disable=consider-using-enumerate
             for i in range(len(noteStream)):
                 # this may try to assign a beam to a Rest
                 noteStream[i].beams = beamsList[i]
@@ -1270,6 +1271,23 @@ def realizeOrnaments(s):
     newStream = s.cloneEmpty()
     newStream.offset = s.offset
 
+    def realizeElementExpressions(element):
+        elementHasBeenRealized = False
+        for exp in element.expressions:
+            if not hasattr(exp, "realize"):
+                continue
+            # else:
+            before, during, after = exp.realize(element)
+            elementHasBeenRealized = True
+            for n in before:
+                newStream.append(n)
+            if during is not None:
+                newStream.append(during)
+            for n in after:
+                newStream.append(n)
+        if elementHasBeenRealized is False:
+            newStream.append(element)
+
     # If this streamObj contains more streams (i.e., a Part that contains
     # multiple measures):
     for element in s:
@@ -1277,27 +1295,13 @@ def realizeOrnaments(s):
             newStream.append(realizeOrnaments(element))
         else:
             if hasattr(element, "expressions"):
-                elementHasBeenRealized = False
-                for exp in element.expressions:
-                    if hasattr(exp, "realize"):
-                        before, during, after = exp.realize(element)
-                        elementHasBeenRealized = True
-                        for n in before:
-                            newStream.append(n)
-                        if during is not None:
-                            newStream.append(during)
-                        for n in after:
-                            newStream.append(n)
-                if elementHasBeenRealized is False:
-                    newStream.append(element)
+                realizeElementExpressions(element)
             else:
                 newStream.append(element)
 
     return newStream
 
-
 #------------------------------------------------------------------------------
-
 
 class Test(unittest.TestCase):
     '''
@@ -1307,11 +1311,8 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-
 #------------------------------------------------------------------------------
-
 
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test)
-

@@ -11,8 +11,8 @@
 '''
 Instrument translations from http://www.music-cog.ohio-state.edu/Humdrum/guide.append2.html
 '''
-from music21 import exceptions21
 import unittest
+from music21 import exceptions21
 
 humdrumInstrumentClassToInstrument = {
                                   'vox': 'Vocalist',

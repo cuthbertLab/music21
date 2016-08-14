@@ -297,7 +297,7 @@ class HumdrumDataCollection(object):
         if len(dataCollections) > 1:
             return (True, dataCollections)
         else:
-            raise HumdrumDataCollection("Malformed humdrum data: " + 
+            raise HumdrumException("Malformed humdrum data: " + 
                 "possibly multiple **tags without closing information. Or a *tandem tag " +
                 "accidentally encoded as a **spine tag.")
 

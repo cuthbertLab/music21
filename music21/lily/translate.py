@@ -18,13 +18,16 @@ this replaces (July 2012) the old LilyString() conversion methods.
 from __future__ import unicode_literals
 
 import os
+import re
 import subprocess
 import sys
-import re
-from collections import OrderedDict
-# import threading
 import unittest
+
+from collections import OrderedDict
+
+
 from music21 import common
+from music21 import corpus
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
@@ -50,8 +53,6 @@ except ImportError: # pragma: no cover
     except ImportError:
         noPIL = True
 
-from music21 import corpus
-
 ### speed up tests! move to music21 base...
 class _sharedCorpusTestObject(object):
     sharedCache = {}
@@ -63,7 +64,6 @@ def _getCachedCorpusFile(keyName):
     if keyName not in sharedCacheObject.sharedCache:
         sharedCacheObject.sharedCache[keyName] = corpus.parse(keyName)
     return sharedCacheObject.sharedCache[keyName]
-
 
 #b.parts[0].measure(4)[2].color = 'blue'#.rightBarline = 'double'
 

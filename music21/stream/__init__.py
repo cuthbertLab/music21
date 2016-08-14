@@ -2295,7 +2295,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         # pylint: disable=attribute-defined-outside-init
         quarterLength = opFrac(quarterLength)
-        if retainOrigin == True:
+        if retainOrigin :
             sLeft = self
         else:
             sLeft = copy.deepcopy(self)
@@ -4093,10 +4093,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # else...
         if returnObj.atSoundingPitch == 'unknown':
             raise StreamException('atSoundingPitch is unknown: cannot transpose')
-        elif returnObj.atSoundingPitch == False:
+        elif not returnObj.atSoundingPitch:
             # transposition defined on instrument goes from written to sounding
             returnObj._transposeByInstrument(reverse=False, inPlace=True)
-        elif returnObj.atSoundingPitch == True:
+        elif returnObj.atSoundingPitch:
             pass
         return returnObj # the Stream or None
 
@@ -4151,9 +4151,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             else:
                 raise StreamException('atSoundingPitch is unknown: cannot transpose')
         
-        if atSoundingPitch == False:
-            pass
-        elif atSoundingPitch == True:
+        if atSoundingPitch is True:
             # transposition defined on instrument goes from written to sounding
             # need to reverse to go to written
             returnObj._transposeByInstrument(reverse=True, inPlace=True)
@@ -4498,7 +4496,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             {1.0} <music21.note.Note B>
             {1.5} <music21.note.Note A#>
         '''
-        if inPlace == True:
+        if inPlace :
             returnStream = self
         else:
             returnStream = copy.deepcopy(self)
@@ -5321,7 +5319,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         if toSoundingPitch:
             #environLocal.printDebug(['at sounding pitch',     allParts[0].atSoundingPitch])
-            if allParts[0].atSoundingPitch == False: # if false
+            if allParts[0].atSoundingPitch is False: # if false
                 returnObj.toSoundingPitch(inPlace=True)
 
         mStream = allParts[0].getElementsByClass('Measure').stream()
@@ -6199,7 +6197,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             if nLast.pitches[pitchIndex] != n.pitches[pitchIndex]:
                                 allPitchesMatched = False
                                 break
-                        if allPitchesMatched == True:
+                        if allPitchesMatched :
                             endMatch = True
 
             # process end condition
@@ -7921,7 +7919,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
             returnObj.setElementOffset(e, o)
             # need to look for embedded Streams, and call this method
-            # on them, with inPlace == True, as already copied if
+            # on them, with inPlace , as already copied if
             # inPlace is != True
             #if hasattr(e, "elements"): # recurse time:
             if e.isStream:
