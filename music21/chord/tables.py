@@ -2590,7 +2590,7 @@ def _validateAddress(address):
         if inversion not in inversionsAvailable:
             raise ChordTablesException('inversion %s not valid' % inversion)
 
-    if inversion == None: # get a default inversion
+    if inversion is None: # get a default inversion
         #environLocal.printDebug(['getting inversion for:', card, index])
         if 0 in inversionsAvailable: 
             inversion = 0 
@@ -2834,7 +2834,7 @@ def seekChordTablesAddress(c):
     
     for indexCandidate in range(len(FORTE[card])):
         dataLine = FORTE[card][indexCandidate]
-        if dataLine == None: 
+        if dataLine is None: 
             continue # spacer lines
         inversionsAvailable = forteIndexToInversionsAvailable(card, indexCandidate)
 

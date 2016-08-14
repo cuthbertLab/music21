@@ -104,6 +104,10 @@ try:
 except ImportError:
     from urllib import parse as urlparse
 
+try:
+    from html import escape as cgiescape # PY3
+except ImportError:
+    from cgi import escape as cgiescape # PY2
 
 # music21 imports
 from music21 import common
@@ -374,7 +378,7 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
     return agenda
 
 
-def setupApplication(agenda, appName = None):
+def setupApplication(agenda, appName=None):
     '''
     Given an agenda, determines which application is desired either from the appName parameter
     or if the appName parameter is none, from the value associated with the "appName" key 
@@ -384,7 +388,7 @@ def setupApplication(agenda, appName = None):
     appropriate application initializer
     from music21.webapps.apps.py on the agenda.
     '''
-    if appName == None:
+    if appName is None:
         if 'appName' in agenda:
             appName = agenda['appName']
         else:
@@ -1221,7 +1225,7 @@ class CommandProcessor(object):
                         returnVal = [self.parseInputToPrimitive(element) for 
                                         element in listElements]
                     else: 
-                        returnVal = cgi.escape(str(strVal))
+                        returnVal = cgiescape(str(strVal))
         return returnVal
     
     def getOutput(self):

@@ -135,7 +135,8 @@ class Segment(object):
         self.bassNote = bassNote
         self.numParts = numParts
         self._maxPitch = maxPitch
-        if notationString == None and listOfPitches != None: #must be a chord symbol or roman num.
+        if notationString is None and listOfPitches is not None: 
+            # must be a chord symbol or roman num.
             self.pitchNamesInChord = listOfPitches
         #!------ Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects ------!
         else:

@@ -83,22 +83,25 @@ memorization" (BMTM, 71). Some of these keywords are changed automatically in co
     there is a choice fingering (i.e. 5|4), the upper 
     number is transcribed before the lower number. If False, the reverse is the case.
 """
-
-from music21 import metadata, stream, exceptions21
-from music21.braille import segment
-from music21.ext import six
-
 import re
 import unittest
-
-# pylint: disable=redefined-builtin    
-if six.PY3:
-    unicode = str # @ReservedAssignment
 
 try: # gives Py2 the zip of Py3
     from future_builtins import zip
 except ImportError:
     pass
+
+
+from music21 import exceptions21
+from music21 import metadata
+from music21 import stream
+
+from music21.braille import segment
+from music21.ext import six
+
+# pylint: disable=redefined-builtin    
+if six.PY3:
+    unicode = str # @ReservedAssignment
 
 
 #------------------------------------------------------------------------------
@@ -265,8 +268,8 @@ def partToBraille(music21Part, **keywords):
                 allBrailleText.append(str(brailleSegment))
 
     from music21.braille.basic import beamStatus
-    for x in list(beamStatus.keys()):
-        del beamStatus[x]
+    for x in list(beamStatus): # coerce to list first so that dictionary does not change size
+        del beamStatus[x]      # while iterating.
 
     if six.PY2 and debug:
         return u"\n".join(allBrailleText)

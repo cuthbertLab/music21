@@ -39,6 +39,7 @@ under the module "base":
 from __future__ import (print_function, division)
 
 import copy
+import imp
 import sys
 import types
 import unittest
@@ -95,7 +96,6 @@ environLocal = environment.Environment(_MOD)
 
 # check external dependencies and display
 _missingImport = []
-import imp
 for modName in ('matplotlib', 'numpy', 'scipy'):    
     try:
         imp.find_module(modName)
@@ -1700,6 +1700,7 @@ class Music21Object(object):
 
         The `classFilterList` may specify one or more classes as targets.
         '''
+        positionStart = None
         def adjacentObject(site):
             '''
             Core method for finding adjacent objects given a single site.

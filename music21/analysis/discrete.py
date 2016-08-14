@@ -1529,7 +1529,7 @@ class Test(unittest.TestCase):
 
         midDict = mid.countMelodicIntervals(s)
         self.assertEqual(len(midDict), 10)
-        self.assertEqual(str(sorted(list(midDict.keys()))), 
+        self.assertEqual(str(sorted(list(midDict))), 
                          "['M2', 'M3', 'M6', 'P15', 'P4', 'P5', 'P8', 'd5', 'm2', 'm3']")
         self.assertEqual(str(midDict['P15']), "[<music21.interval.Interval P15>, 1]")
         self.assertEqual(str(midDict['P5']), "[<music21.interval.Interval P5>, 16]")

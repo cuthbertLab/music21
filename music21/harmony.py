@@ -1601,7 +1601,7 @@ class ChordSymbol(Harmony):
                             #if hD.degree not in string, 
                             #should we throw an exception???? for now yes, but maybe later we
                             #will be more lenient....
-                    if pitchFound == False:
+                    if not pitchFound:
                         raise ChordStepModificationException(
                             'Degree not in specified chord: %s' % hD.degree)
             elif hD.modType == 'alter':
@@ -1625,7 +1625,7 @@ class ChordSymbol(Harmony):
 #                                 break
 #                         #if hD.degree not in string:
 #                         #should we throw an exception???? for now yes, but maybe later we should.
-                if pitchFound == False:
+                if not pitchFound:
                     raise ChordStepModificationException(
                             'Degree not in specified chord: %s' % hD.degree)
         return tuple(pitches)
@@ -1747,30 +1747,30 @@ class ChordSymbol(Harmony):
         indexes = []
         altCopy = []
         for itemString in alterations:
-            if itemString != '':
-                justints = itemString.replace('b', '')
-                justints = justints.replace('#', '')
-                if int(justints) > 20:
-                    skipNext = False
-                    i = 0
-                    charString = ''
-                    for char in itemString:
-                        if not skipNext:
-                            if char == '1':
-                                indexes.append(itemString[i] + itemString[i + 1])
-                                skipNext = True
-                            else:
-                                if char == 'b' or char == '#':
-                                    charString = charString + char
-                                else:
-                                    charString = charString + char
-                                    indexes.append(charString)
-                                    charString = ''
+            if itemString == '':
+                continue
+            justints = itemString.replace('b', '')
+            justints = justints.replace('#', '')
+            if int(justints) > 20: # MSC: what is this doing?
+                skipNext = False
+                i = 0
+                charString = ''
+                for char in itemString:
+                    if not skipNext:
+                        if char == '1':
+                            indexes.append(itemString[i] + itemString[i + 1])
+                            skipNext = True
+                        elif char == 'b' or char == '#':
+                            charString = charString + char
                         else:
-                            skipNext = False
-                        i = i + 1
-                else:
-                    altCopy.append(itemString)
+                            charString = charString + char
+                            indexes.append(charString)
+                            charString = ''
+                    else:
+                        skipNext = False
+                    i = i + 1
+            else:
+                altCopy.append(itemString)
         for item in indexes:
             altCopy.append(item)
         alterations = altCopy

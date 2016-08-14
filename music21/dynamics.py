@@ -531,19 +531,19 @@ class Test(unittest.TestCase):
         assert nodyn.longName is None
         
         pp = Dynamic('pp')
-        self.assertEquals(pp.value, 'pp')
-        self.assertEquals(pp.longName, 'pianissimo')
-        self.assertEquals(pp.englishName, 'very soft')
+        self.assertEqual(pp.value, 'pp')
+        self.assertEqual(pp.longName, 'pianissimo')
+        self.assertEqual(pp.englishName, 'very soft')
 
 
     def testCorpusDynamicsWedge(self):
         from music21 import corpus
         a = corpus.parse('opus41no1/movement2') # has dynamics!
         b = a.parts[0].flat.getElementsByClass("Dynamic")
-        self.assertEquals(len(b), 35)
+        self.assertEqual(len(b), 35)
 
         b = a.parts[0].flat.getElementsByClass("DynamicWedge")
-        self.assertEquals(len(b), 2)
+        self.assertEqual(len(b), 2)
 
 
     def testMusicxmlOutput(self):

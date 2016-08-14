@@ -9,8 +9,8 @@
 # Copyright:    Copyright © 2010 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
-'''This module describes classes for performing windowed and overlapping windowed analysis. 
+'''
+This module describes classes for performing windowed and overlapping windowed analysis. 
 The :class:`music21.analysis.windowed.WindowedAnalysis` provides a reusable framework for 
 systematic overlapping window analysis at the starting at the level of the quarter note 
 and moving to the size of an entire :class:`music21.stream.Stream`.
@@ -19,8 +19,6 @@ Modular analysis procedures inherit from :class:`music21.analysis.discrete.Discr
 The :class:`music21.analysis.discrete.KrumhanslSchmuckler` (for algorithmic key detection) 
 and :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) classes provide examples.
 '''
-
-
 import unittest
 
 from music21 import exceptions21
@@ -230,17 +228,17 @@ class WindowedAnalysis(object):
         >>> y[0][0].startswith('#') # a color is returned for each matching data position
         True
         '''
-        if maxWindow == None:
+        if maxWindow is None:
             maxLength = len(self._windowedStream)
         else:
             maxLength = maxWindow
 
-        if minWindow == None:
+        if minWindow is None:
             minLength = len(self._windowedStream)
         else:
             minLength = minWindow
         
-        if windowType == None:
+        if windowType is None:
             windowType = 'overlap'
         elif windowType.lower() in ['overlap']:
             windowType = 'overlap'

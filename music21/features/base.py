@@ -652,11 +652,10 @@ class OutputFormat(object):
         if fp is None:
             fp = environLocal.getTempFile(suffix=self._ext)
         if not fp.endswith(self._ext):
-            raise
-        f = open(fp, 'w')
-        f.write(self.getString(includeClassLabel=includeClassLabel, 
-                               includeId=includeId))
-        f.close()
+            raise OutputFormatException("Could not get a temp file with the right extension")
+        with open(fp, 'w') as f:
+            f.write(self.getString(includeClassLabel=includeClassLabel, 
+                                   includeId=includeId))
         return fp
 
 
@@ -1299,19 +1298,19 @@ def getIndex(featureString, extractorType=None):
     '''
     from music21.features import jSymbolic, native
 
-    if extractorType == None or extractorType == 'jsymbolic':
-        indexcnt=0
+    if extractorType is None or extractorType == 'jsymbolic':
+        indexcnt = 0
         for feature in jSymbolic.featureExtractors:
     
             if feature().name  == featureString:
-                return indexcnt, 'jsymbolic'
-            indexcnt+=1
-    if extractorType == None or extractorType == 'native':
-        indexcnt=0  
+                return (indexcnt, 'jsymbolic')
+            indexcnt += 1
+    if extractorType is None or extractorType == 'native':
+        indexcnt = 0  
         for feature in native.featureExtractors:
             if feature().name == featureString:
-                return indexcnt, 'native'
-            indexcnt+=1
+                return (indexcnt, 'native')
+            indexcnt += 1
         
         return None
     

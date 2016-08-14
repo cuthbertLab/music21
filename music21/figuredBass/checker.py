@@ -709,7 +709,7 @@ def generalNoteToPitch(music21GeneralNote):
     >>> checker.generalNoteToPitch(c1)
     'RT'
     '''
-    if music21GeneralNote.isNote == True:
+    if music21GeneralNote.isNote:
         return music21GeneralNote.pitch
     else:
         return "RT"

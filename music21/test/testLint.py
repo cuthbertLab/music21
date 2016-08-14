@@ -94,6 +94,9 @@ def main(fnAccept=None):
                     # can be fine...
                     
                 'misplaced-comparison-constant', # sometimes 2 < x is what we want
+                'unsubscriptable-object', # unfortunately, thinks that Streams are unsubscriptable.
+                'consider-iterating-dictionary', # sometimes .keys() is a good test against
+                    # changing the dictionary size while iterating.
                 
                 'invalid-name',      # these are good music21 names; fix the regexp instead...
                 'no-self-use',       # maybe later

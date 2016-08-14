@@ -561,7 +561,7 @@ class Trill(Ornament):
         from music21 import key
         if self.size == "":
             raise ExpressionException("Cannot realize a trill if there is no size given")
-        if srcObj.duration == None or srcObj.duration.quarterLength == 0:
+        if srcObj.duration is None or srcObj.duration.quarterLength == 0:
             raise ExpressionException("Cannot steal time from an object with no duration")
         if srcObj.duration.quarterLength < 2*self.quarterLength:
             raise ExpressionException("The note is not long enough to realize a trill")
@@ -726,7 +726,7 @@ class Turn(Ornament):
 
         if self.size is None:
             raise ExpressionException("Cannot realize a turn if there is no size given")
-        if srcObject.duration == None or srcObject.duration.quarterLength == 0:
+        if srcObject.duration is None or srcObject.duration.quarterLength == 0:
             raise ExpressionException("Cannot steal time from an object with no duration")
         if srcObject.duration.quarterLength < 4 * self.quarterLength:
             raise ExpressionException("The note is not long enough to realize a turn")
@@ -821,7 +821,7 @@ class GeneralAppoggiatura(Ornament):
         if self.size == "":
             raise ExpressionException(
                     "Cannot realize an Appoggiatura if there is no size given")
-        if srcObj.duration == None or srcObj.duration.quarterLength == 0:
+        if srcObj.duration is None or srcObj.duration.quarterLength == 0:
             raise ExpressionException("Cannot steal time from an object with no duration")
 
         newDuration = srcObj.duration.quarterLength / 2

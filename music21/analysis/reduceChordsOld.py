@@ -253,13 +253,12 @@ class ChordReducer(object):
                 cLastEnd = 0.0
                 for cEl in newPart:
                     cElCopy = copy.deepcopy(cEl)
-                    if 'Chord' in cEl.classes:
-                        if closedPosition is not False:
-                            if forceOctave is not False:
-                                cElCopy.closedPosition(forceOctave=forceOctave, inPlace=True)
-                            else:
-                                cElCopy.closedPosition(inPlace=True)
-                            cElCopy.removeRedundantPitches(inPlace=True)
+                    if 'Chord' in cEl.classes and closedPosition is not False:
+                        if forceOctave is not False:
+                            cElCopy.closedPosition(forceOctave=forceOctave, inPlace=True)
+                        else:
+                            cElCopy.closedPosition(inPlace=True)
+                        cElCopy.removeRedundantPitches(inPlace=True)
                     newOffset = cEl.getOffsetBySite(newPart)
                     
                     # extend over gaps
@@ -301,7 +300,7 @@ class ChordReducer(object):
                     lastTs = sourceMeasureTs
 
                 p._appendCore(m)
-            if self.printDebug == True:
+            if self.printDebug:
                 print(i, " ", end="")
                 if i % 20 == 0 and i != 0:
                     print("")

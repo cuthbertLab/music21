@@ -427,7 +427,7 @@ class Graph(object):
         N.B. -- both 'x' and 'y' ticks have to be set in
         order to get matplotlib to display either...
         '''
-        if pairs != None:
+        if pairs is not None:
             positions = []
             labels = []
             # ticks are value, label pairs
@@ -525,7 +525,7 @@ class Graph(object):
         # rect.set_edgecolor(getColor('red'))
 
         for axis in self.axisKeys:
-            if self.axis[axis]['range'] != None:
+            if self.axis[axis]['range'] is not None:
                 # for 2d graphs
                 if axis == 'x' and len(self.axisKeys) == 2:
                     ax.set_xlim(*self.axis[axis]['range'])
@@ -542,7 +542,7 @@ class Graph(object):
                     ax.set_zlim3d(*self.axis[axis]['range'])
 
             if 'label' in self.axis[axis]:
-                if self.axis[axis]['label'] != None:
+                if self.axis[axis]['label'] is not None:
                     if axis == 'x':
                         ax.set_xlabel(self.axis[axis]['label'],
                         fontsize=self.labelFontSize, family=self.fontFamily)
@@ -555,7 +555,7 @@ class Graph(object):
                         fontsize=self.labelFontSize, family=self.fontFamily)
 
             if 'scale' in self.axis[axis]:
-                if self.axis[axis]['scale'] != None:
+                if self.axis[axis]['scale'] is not None:
                     if axis == 'x':
                         ax.set_xscale(self.axis[axis]['scale'])
                     elif axis == 'y':
@@ -643,7 +643,7 @@ class Graph(object):
             self.show()
         elif self.doneAction == 'write': # pragma: no cover
             self.write(fp)
-        elif self.doneAction == None:
+        elif self.doneAction is None:
             pass
 
     def show(self): # pragma: no cover
@@ -659,10 +659,10 @@ class Graph(object):
         '''
         Writes the graph to a file. If no file path is given, a temporary file is used. 
         '''
-        if fp == None:
+        if fp is None:
             fp = environLocal.getTempFile('.png')
 
-        if self.dpi != None:
+        if self.dpi is not None:
             self.fig.savefig(fp, 
                              facecolor=getColor(self.colorBackgroundFigure),      
                              edgecolor=getColor(self.colorBackgroundFigure),
@@ -1636,12 +1636,12 @@ class _Graph3DBars(Graph):
         #environLocal.printDebug(['yVals', yVals])
         #environLocal.printDebug(['xVals', xVals])
 
-        if self.axis['x']['range'] == None:
+        if self.axis['x']['range'] is None:
             self.axis['x']['range'] =  min(xVals), max(xVals)
         # swap y for z
-        if self.axis['z']['range'] == None:
+        if self.axis['z']['range'] is None:
             self.axis['z']['range'] =  min(yVals), max(yVals)
-        if self.axis['y']['range'] == None:
+        if self.axis['y']['range'] is None:
             self.axis['y']['range'] =  min(zVals), max(zVals)+1
 
         for z in range(*self.axis['y']['range']):
@@ -2310,9 +2310,9 @@ class PlotStream(object):
         else:
             sSrc = self.streamObj
 
-        if offsetMin == None:
+        if offsetMin is None:
             offsetMin = sSrc.lowestOffset
-        if offsetMax == None:
+        if offsetMax is None:
             offsetMax = sSrc.highestTime
    
         # see if this stream has any Measures, or has any references to
@@ -2376,7 +2376,7 @@ class PlotStream(object):
                     ticks.append([offset, '%s' % mNumber])
                     i += mNoStepSize
         else: # generate numeric ticks
-            if offsetStepSize == None:
+            if offsetStepSize is None:
                 offsetStepSize = 10
             #environLocal.printDebug(['using offsets for offset ticks'])
             # get integers for range calculation
@@ -2466,9 +2466,9 @@ class PlotStream(object):
         [[3, '$ppp$'], [4, '$pp$'], [5, '$p$'], [6, '$mp$']]
 
         '''
-        if minNameIndex == None:
+        if minNameIndex is None:
             minNameIndex = 0
-        if maxNameIndex == None:
+        if maxNameIndex is None:
             # will add one in range()
             maxNameIndex = len(dynamics.shortNames)-1
 
@@ -2671,7 +2671,7 @@ class PlotWindowedAnalysis(PlotStream):
     def write(self, fp=None): # pragma: no cover
         '''Process method here overridden to provide legend.
         '''
-        if fp == None:
+        if fp is None:
             fp = environLocal.getTempFile('.png')
 
         directory, fn = os.path.split(fp)
@@ -2725,7 +2725,7 @@ class PlotWindowedAardenEssen(PlotWindowedAnalysis):
     '''
     values = discrete.AardenEssen.identifiers
     def __init__(self, streamObj, *args, **keywords):
-        super(PlotWindowedAnalysis, self).__init__(streamObj, 
+        super(PlotWindowedAardenEssen, self).__init__(streamObj, 
             discrete.AardenEssen(streamObj), *args, **keywords)
 
 class PlotWindowedSimpleWeights(PlotWindowedAnalysis):
@@ -4212,23 +4212,24 @@ def _getPlotsToMake(*args, **keywords):
             # try direct match of format and values
             plotClassNameValues = [x.lower() for x in plotClassName.values]
             plotClassNameFormat = plotClassName.format.lower()
-            if plotClassNameFormat == showFormat.lower():
-                #environLocal.printDebug(['matching format', showFormat])
-                # see if a matching set of values is specified
-                # normally plots need to match all values 
-                match = []
-                for requestedValue in values:
-                    if requestedValue is None: 
-                        continue
-                    if (requestedValue.lower() in plotClassNameValues):
-                        # do not allow the same value to be requested
-                        if requestedValue not in match:
-                            match.append(requestedValue)
-                if len(match) == len(values):
-                    plotMake.append(plotClassName)
-                else:
-                    sortTuple = (len(match), plotClassName)
-                    plotMakeCandidates.append(sortTuple)
+            if plotClassNameFormat != showFormat.lower():
+                continue
+            #environLocal.printDebug(['matching format', showFormat])
+            # see if a matching set of values is specified
+            # normally plots need to match all values 
+            match = []
+            for requestedValue in values:
+                if requestedValue is None: 
+                    continue
+                if (requestedValue.lower() in plotClassNameValues):
+                    # do not allow the same value to be requested
+                    if requestedValue not in match:
+                        match.append(requestedValue)
+            if len(match) == len(values):
+                plotMake.append(plotClassName)
+            else:
+                sortTuple = (len(match), plotClassName)
+                plotMakeCandidates.append(sortTuple)
 
         # if no matches, try something more drastic:
         if len(plotMake) == 0:
@@ -4357,8 +4358,9 @@ class TestExternal(unittest.TestCase):
                                title='50 x with random values increase by 10 per x', 
                                alpha=.8, colors=['b', 'g'])
         data = {1:[], 2:[], 3:[], 4:[], 5:[]}
-        for i in range(len(data.keys())):
-            q = [(x, random.choice(range(10*i, 10*(i+1)))) for x in range(50)]
+        
+        for i in range(len(data)):
+            q = [(x, random.choice(range(10 * i, 10 * (i + 1)))) for x in range(50)]
             dk = list(data.keys())
             data[dk[i]] = q
         a.setData(data)
@@ -4649,13 +4651,13 @@ class TestExternal(unittest.TestCase):
         sDefault = corpus.parse('bach/bwv57.8')
 
         for plotClassName, work, titleStr in plotClasses:
-            if work == None:
+            if work is None:
                 s = sDefault
 
             else: # expecting data
                 s = converter.parse(work)
 
-            if titleStr != None:
+            if titleStr is not None:
                 obj = plotClassName(s, doneAction=None, title=titleStr)
             else:
                 obj = plotClassName(s, doneAction=None)
@@ -4827,7 +4829,7 @@ class Test(unittest.TestCase):
 
         
     def testPlotWindowed(self, doneAction=None):
-        if doneAction != None: # pragma: no cover
+        if doneAction is not None: # pragma: no cover
             fp = random.choice(corpus.getBachChorales('.xml'))
             unused_directory, fn = os.path.split(fp)
             a = corpus.parse(fp)

@@ -43,6 +43,10 @@ of music21's ability to manipulate diatonic Streams.
 '''
 from __future__ import print_function
 
+import copy
+import unittest
+
+
 from music21 import clef
 #from music21 import common
 from music21 import corpus
@@ -56,13 +60,10 @@ from music21 import meter
 from music21 import note
 from music21 import stream
 
-import copy
-import unittest
-
-def reverse(self, inPlace = False, 
-                classesToMove = (key.KeySignature, meter.TimeSignature, clef.Clef, 
+def reverse(self, inPlace=False, 
+                classesToMove=(key.KeySignature, meter.TimeSignature, clef.Clef, 
                                  metadata.Metadata, instrument.Instrument, layout.SystemLayout), 
-                makeNotation = False,
+                makeNotation=False,
                 ):
     '''
     synonym: retrograde()
@@ -146,7 +147,7 @@ def prependBlankMeasures(myStream, measuresToAppend=1, inPlace=True):
     measureDuration = myStream.flat.getElementsByClass(meter.TimeSignature
                                         )[0].barDuration.quarterLength
     
-    if inPlace == True:
+    if inPlace:
         ms = myStream
     else:
         ms = copy.deepcopy(myStream)
@@ -160,7 +161,7 @@ def prependBlankMeasures(myStream, measuresToAppend=1, inPlace=True):
     return ms
 
 
-def transposeStreamDiatonic(myStream, diatonicInterval = 1):
+def transposeStreamDiatonic(myStream, diatonicInterval=1):
     if diatonicInterval == 1:
         return myStream
 #    genericInterval = interval.GenericInterval(diatonicNumber)
@@ -257,10 +258,10 @@ def findRetrogradeVoices(show = True):
             qj2.flat.notesAndRests[0].addLyric('Invert: ' + str(invert))
             qj1.flat.notesAndRests[0].addLyric('Score: ' + str(finalScore))
             
-            if show == True:
+            if show:
                 qj.show()
             else:
-                if invert == True:
+                if invert:
                     invStr = "Invert"
                 else:
                     invStr = "      "
@@ -370,6 +371,8 @@ def possibleSolution():
     #qjChords.show('musicxml')
  
 def multipleSolve():
+    # this is ridiculous...
+    # pylint: disable=too-many-nested-blocks
     import csv
     csvFile = csv.writer(open('d:/desktop/quodJ3.csv', 'wb'))
 
@@ -420,15 +423,15 @@ def multipleSolve():
                                                         continue # no continuous parallel motion            
                                                     if (transLowest == transMiddle and 
                                                             delayLowest == delayMiddle and 
-                                                            lowestRetro == False and 
-                                                            middleRetro == True):
+                                                            lowestRetro is False and 
+                                                            middleRetro is True):
                                                         continue 
                                                         # same as lowestRetro == True and 
                                                         #    middleRetro == False
                                                     if (transLowest == transMiddle and 
                                                             delayLowest == delayMiddle and 
-                                                            lowestInvert == False and 
-                                                            middleInvert == True):
+                                                            lowestInvert is False and 
+                                                            middleInvert is True):
                                                         continue 
                                                         # same as lowestInvert == True and 
                                                         #    middleInvert == False

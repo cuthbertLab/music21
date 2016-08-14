@@ -162,7 +162,7 @@ class Corpus(object):
 
     ### PUBLIC METHODS ###
     @abc.abstractmethod
-    def getPaths(self):
+    def getPaths(self, fileExtensions=None, expandExtensions=True):
         r'''
         The paths of the files in a given corpus.
         '''
@@ -939,22 +939,22 @@ class LocalCorpus(Corpus):
             )
         cacheKey = (self.cacheName, tuple(fileExtensions))
         # not cached, fetch and reset
-        if True:
         #if cacheKey not in Corpus._pathsCache:
             # check paths before trying to search
-            validPaths = []
-            for directoryPath in self.directoryPaths:
-                if not os.path.isdir(directoryPath):
-                    environLocal.warn(
-                        'invalid path set as localCorpusSetting: {0}'.format(
-                            directoryPath))
-                else:
-                    validPaths.append(directoryPath)
-            # append successive matches into one list
-            matches = []
-            for directoryPath in validPaths:
-                matches += self._findPaths(directoryPath, fileExtensions)
-            Corpus._pathsCache[cacheKey] = matches
+        validPaths = []
+        for directoryPath in self.directoryPaths:
+            if not os.path.isdir(directoryPath):
+                environLocal.warn(
+                    'invalid path set as localCorpusSetting: {0}'.format(
+                        directoryPath))
+            else:
+                validPaths.append(directoryPath)
+        # append successive matches into one list
+        matches = []
+        for directoryPath in validPaths:
+            matches += self._findPaths(directoryPath, fileExtensions)
+        Corpus._pathsCache[cacheKey] = matches
+
         return Corpus._pathsCache[cacheKey]
 
     def removePath(self, directoryPath):

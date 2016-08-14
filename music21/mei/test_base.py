@@ -11,7 +11,6 @@
 '''
 Tests for :mod:`music21.mei.base`.
 '''
-
 # part of the whole point is to test protect things too
 # pylint: disable=protected-access
 
@@ -26,6 +25,12 @@ Tests for :mod:`music21.mei.base`.
 
 # pylint is bad at guessing types in these tests---reasonably so
 # pylint: disable=maybe-no-member
+
+# pylint doesn't realize that we need music21.ext.six before we know where mock is.
+# pylint: disable=ungrouped-imports 
+# pylint: disable=redefined-builtin
+# pylint: disable=import-error
+# pylint: disable=unused-import
 import unittest
 
 # To have working MagicMock objects, we can't use cElementTree even though it would be faster.
@@ -37,13 +42,13 @@ from collections import defaultdict
 from fractions import Fraction
 
 from music21.ext import six
-from six.moves import xrange  # pylint: disable=redefined-builtin,import-error,unused-import
-from six.moves import range  # pylint: disable=redefined-builtin,import-error,unused-import
+from six.moves import xrange   # @UnusedImport @UnresolvedImport
+from six.moves import range  # @UnresolvedImport @NoMove
 
 if six.PY3:
-    from unittest import mock  # pylint: disable=no-name-in-module
+    from unittest import mock  # pylint: disable=no-name-in-module @UnusedImport @NoMove
 else:
-    from music21.ext import mock
+    from music21.ext import mock  # @Reimport
 
 
 from music21 import articulations

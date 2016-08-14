@@ -113,7 +113,7 @@ class StreamFreezeThawBase(object):
         self.stream = None
 
     def getPickleFp(self, directory):
-        if directory == None:
+        if directory is None:
             raise ValueError
         # cannot get data from stream, as offsets are broken
         streamStr = str(time.time())
@@ -1713,8 +1713,7 @@ class JSONThawer(JSONFreezeThawBase):
             elif attr == '__attr__':
                 for key in d[attr]:
                     attrValue = d[attr][key]
-                    if attrValue == None or isinstance(attrValue,
-                        (int, float)):
+                    if attrValue is None or isinstance(attrValue, (int, float)):
                         try:
                             setattr(obj, key, attrValue)
                         except AttributeError:
@@ -1726,8 +1725,7 @@ class JSONThawer(JSONFreezeThawBase):
                         subList = []
                         for attrValueSub in attrValue:
                             if self._isComponent(attrValueSub):
-                                subList.append(
-                                    self._buildComponent(attrValueSub))
+                                subList.append(self._buildComponent(attrValueSub))
                             else:
                                 subList.append(attrValueSub)
                         setattr(obj, key, subList)

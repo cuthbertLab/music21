@@ -805,7 +805,7 @@ class Chord(note.NotRest):
         # if not inPlace, creates a second new chord object!
         returnObj.sortAscending(inPlace=True)
 
-        if inPlace == False:
+        if not inPlace:
             return returnObj
 
     def containsSeventh(self):
@@ -1338,7 +1338,7 @@ class Chord(note.NotRest):
 
         '''
         for i in range(1, 8): ## == 1 - 7 inclusive
-            if self.hasRepeatedChordStep(i, testRoot) == True:
+            if self.hasRepeatedChordStep(i, testRoot):
                 return True
         return False
 

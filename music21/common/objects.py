@@ -230,18 +230,18 @@ class Timer(object):
         Reports current time or, if stopped, stopped time.
         '''
         # if stopped, gets _tDif; if not stopped, gets current time
-        if self._tStop == None: # if not stoped yet
+        if self._tStop is None: # if not stoped yet
             t = time.time() - self._tStart
         else:
             t = self._tDif
         return t
 
     def __str__(self):
-        if self._tStop == None: # if not stoped yet
+        if self._tStop is None: # if not stoped yet
             t = time.time() - self._tStart
         else:
             t = self._tDif
-        return str(round(t,3))
+        return str(round(t, 3))
 
 
 if __name__ == '__main__':

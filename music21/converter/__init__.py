@@ -143,77 +143,80 @@ class ArchiveManager(object):
         return post
 
 
-    def getData(self, name=None, dataFormat='musicxml' ):
-        '''Return data from the archive by name. If no name is given, 
+    def getData(self, name=None, dataFormat='musicxml'):
+        '''
+        Return data from the archive by name. If no name is given, 
         a default may be available.
 
         For 'musedata' format this will be a list of strings. 
         For 'musicxml' this will be a single string.
         '''
-        if self.archiveType == 'zip':
-            f = zipfile.ZipFile(self.fp, 'r')
-            if name == None and dataFormat == 'musicxml': # try to auto-harvest
-                # will return data as a string
-                # note that we need to read the META-INF/container.xml file
-                # and get the rootfile full-path
-                # a common presentation will be like this:
-                # ['musicXML.xml', 'META-INF/', 'META-INF/container.xml']
-                for subFp in f.namelist():
-                    # the name musicXML.xml is often used, or get top level
-                    # xml file
-                    if 'META-INF' in subFp:
-                        continue
-                    if subFp.endswith('.xml'):
-                        post = f.read(subFp)
-                        if six.PY3 and isinstance(post, bytes):
-                            foundEncoding = re.match(br"encoding=[\'\"](\S*?)[\'\"]", post[:1000])
-                            if foundEncoding:
-                                defaultEncoding = foundEncoding.group(1).decode('ascii')
-                                #print("FOUND ENCODING: ", defaultEncoding)
-                            else:
-                                defaultEncoding = 'UTF-8'
-                            try:
-                                post = post.decode(encoding=defaultEncoding)
-                            except UnicodeDecodeError: # sometimes windows written...
-                                post = post.decode(encoding='utf-16-le')
-                                post = re.sub(r"encoding=([\'\"]\S*?[\'\"])", 
-                                              "encoding='UTF-8'", post)
-
-                        break
-
-            elif name == None and dataFormat == 'musedata':
-                # this might concatenate all parts into a single string
-                # or, return a list of strings
-                # alternative, a different method might return one at a time
-                mdd = musedataModule.MuseDataDirectory(f.namelist())
-                #environLocal.printDebug(['mdd object, namelist', mdd, f.namelist])
-
-                post = []
-                for subFp in mdd.getPaths():
-                    component = f.open(subFp, 'rU')
-                    lines = component.readlines()
-                    #environLocal.printDebug(['subFp', subFp, len(lines)])
-                    if six.PY2:
-                        post.append(''.join(lines))
-                    else:
-                        try:
-                            post.append(''.join([l.decode(encoding='UTF-8') for l in lines]))
-                        except UnicodeDecodeError:
-                            # python3 UTF-8 fails to read corpus/haydn/opus103/movement1.zip
-                            post.append(''.join([l.decode(encoding='ISO-8859-1') for l in lines]))
-
-                    # note: the following methods do not properly employ
-                    # universal new lines; this is a python problem:
-                    # http://bugs.python.org/issue6759
-                    #post.append(component.read())
-                    #post.append(f.read(subFp, 'U'))
-                    #msg.append('\n/END\n')
-
-
-            f.close()
-        else:
+        if self.archiveType != 'zip':
             raise ArchiveManagerException('no support for extension: %s' % self.archiveType)
 
+        f = zipfile.ZipFile(self.fp, 'r')
+        if name is None and dataFormat == 'musicxml': # try to auto-harvest
+            # will return data as a string
+            # note that we need to read the META-INF/container.xml file
+            # and get the rootfile full-path
+            # a common presentation will be like this:
+            # ['musicXML.xml', 'META-INF/', 'META-INF/container.xml']
+            for subFp in f.namelist():
+                # the name musicXML.xml is often used, or get top level
+                # xml file
+                if 'META-INF' in subFp:
+                    continue
+                if not subFp.endswith('.xml'):
+                    continue
+
+                post = f.read(subFp)
+                if six.PY3 and isinstance(post, bytes):
+                    foundEncoding = re.match(br"encoding=[\'\"](\S*?)[\'\"]", post[:1000])
+                    if foundEncoding:
+                        defaultEncoding = foundEncoding.group(1).decode('ascii')
+                        #print("FOUND ENCODING: ", defaultEncoding)
+                    else:
+                        defaultEncoding = 'UTF-8'
+                    try:
+                        post = post.decode(encoding=defaultEncoding)
+                    except UnicodeDecodeError: # sometimes windows written...
+                        post = post.decode(encoding='utf-16-le')
+                        post = re.sub(r"encoding=([\'\"]\S*?[\'\"])", 
+                                      "encoding='UTF-8'", post)
+
+                break
+
+        elif name is None and dataFormat == 'musedata':
+            # this might concatenate all parts into a single string
+            # or, return a list of strings
+            # alternative, a different method might return one at a time
+            mdd = musedataModule.MuseDataDirectory(f.namelist())
+            #environLocal.printDebug(['mdd object, namelist', mdd, f.namelist])
+
+            post = []
+            for subFp in mdd.getPaths():
+                component = f.open(subFp, 'rU')
+                lines = component.readlines()
+                #environLocal.printDebug(['subFp', subFp, len(lines)])
+                if six.PY2:
+                    post.append(''.join(lines))
+                else:
+                    try:
+                        post.append(''.join([l.decode(encoding='UTF-8') for l in lines]))
+                    except UnicodeDecodeError:
+                        # python3 UTF-8 failed to read corpus/haydn/opus103/movement1.zip
+                        post.append(''.join([l.decode(encoding='ISO-8859-1') for l in lines]))
+
+                # note: the following methods do not properly employ
+                # universal new lines; this is a python problem:
+                # http://bugs.python.org/issue6759
+                #post.append(component.read())
+                #post.append(f.read(subFp, 'U'))
+                #msg.append('\n/END\n')
+
+
+        f.close()
+        
 
         return post
 
@@ -240,7 +243,7 @@ class PickleFilter(object):
 
     def _getPickleFp(self, directory, zipType=None):
         import sys
-        if directory == None:
+        if directory is None:
             raise ValueError
         if zipType is None:
             extension = '.p'
@@ -283,7 +286,7 @@ class PickleFilter(object):
             writePickle = False # cannot write pickle if no scratch dir
             fpLoad = self.fp
             fpPickle = None
-        elif fpScratch == None or self.forceSource:
+        elif fpScratch is None or self.forceSource:
             writePickle = False # cannot write pickle if no scratch dir
             fpLoad = self.fp
             fpPickle = None
@@ -327,7 +330,7 @@ def registerSubconverter(newSubConverter):
     ...    registerInputExtensions = ('mus',)
     >>> converter.registerSubconverter(ConverterSonix)
     >>> scf = converter.Converter().getSubConverterFormats()
-    >>> for x in sorted(list(scf.keys())):
+    >>> for x in sorted(scf):
     ...     x, scf[x] 
     ('abc', <class 'music21.converter.subConverters.ConverterABC'>)
     ...
@@ -413,7 +416,7 @@ class Converter(object):
 
 
     def _getDownloadFp(self, directory, ext, url):
-        if directory == None:
+        if directory is None:
             raise ValueError
         return os.path.join(directory, 'm21-' + _version.__version__ + '-' + 
                                             common.getMd5(url) + ext)
@@ -755,7 +758,7 @@ class Converter(object):
         <class 'music21.converter.subConverters.SubConverter'>
         '''
         defaultSubconverters = []
-        for i in sorted(list(subConverters.__dict__.keys())):
+        for i in sorted(subConverters.__dict__):
             name = getattr(subConverters, i)
             if (callable(name)
                     and not isinstance(name, types.FunctionType)
@@ -770,7 +773,7 @@ class Converter(object):
         >>> scf = converter.Converter().getSubConverterFormats()
         >>> scf['abc']
         <class 'music21.converter.subConverters.ConverterABC'>
-        >>> for x in sorted(list(scf.keys())):
+        >>> for x in sorted(scf):
         ...     x, scf[x]
         ('abc', <class 'music21.converter.subConverters.ConverterABC'>)
         ('braille', <class 'music21.converter.subConverters.ConverterBraille'>)

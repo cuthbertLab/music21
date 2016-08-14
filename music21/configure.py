@@ -915,7 +915,7 @@ class AskSendInstallationReport(YesOrNo):
         userData = getUserData()
         # add any additional entries; this is used for adding the original egg info
         userData.update(self._additionalEntries)
-        for key in sorted(userData.keys()):
+        for key in sorted(userData):
             body.append('%s // %s' % (key, userData[key]))
         body.append('python version:')
         body.append(sys.version)

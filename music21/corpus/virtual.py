@@ -39,7 +39,7 @@ class VirtualWork(object):
 #         a file path based on the md5 of the works title. This means that all
 #         works must have unique titles in the virtual corpus. 
 #         '''
-#         if dir == None:
+#         if dir is None:
 #             raise ValueError
 #         return os.path.join(dir, 'm21-' + common.getMd5(self.title) + '.p')
 
@@ -49,7 +49,7 @@ class VirtualWork(object):
         '''
         if not common.isListLike(extList):
             extList = [extList]
-        if extList == None or extList == [None]:
+        if extList is None or extList == [None]:
             return [self.urlList[0]] # return a list of all 
 
         post = []
@@ -199,8 +199,8 @@ class Test(unittest.TestCase):
         '''Test copying all objects defined in the virtual corpus module
         '''
         a = BachBWV1007Prelude()
-        self.assertNotEquals(a.getUrlByExt(['.xml']), [])
-        self.assertNotEquals(a.getUrlByExt(['.krn']), [])
+        self.assertNotEqual(a.getUrlByExt(['.xml']), [])
+        self.assertNotEqual(a.getUrlByExt(['.krn']), [])
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

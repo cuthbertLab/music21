@@ -21,6 +21,8 @@ from music21.figuredBass import notation
 from music21.ext import six
 
 if six.PY2:
+    # the point is to redefine this builtin
+    # pylint: disable=redefined-builtin,import-error
     from future_builtins import map
     
 
@@ -88,7 +90,7 @@ class FiguredBassScale(object):
         bassSD = self.realizerScale.getScaleDegreeFromPitch(bassPitch)
         nt = notation.Notation(notationString)
         
-        if bassSD == None:
+        if bassSD is None:
             bassPitchCopy = copy.deepcopy(bassPitch)
             bassNote = note.Note(bassPitchCopy)
             if (self.keySig.accidentalByStep(bassNote.pitch.step)
@@ -187,8 +189,7 @@ class FiguredBassScale(object):
         maxPitch = convertToPitch(maxPitch)
         pitchNames = self.getPitchNames(bassPitch, notationString)
         iter1 = itertools.product(pitchNames, range(maxPitch.octave + 1))
-        iter2 = map( # pylint: disable=bad-builtin
-                    lambda x: pitch.Pitch(x[0] + str(x[1])), iter1) 
+        iter2 = map(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1) 
         if six.PY3:
             iter3 = itertools.filterfalse( # @UndefinedVariable
                                           lambda samplePitch: bassPitch > samplePitch, iter2) 
@@ -243,6 +244,7 @@ class Test(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
+    # pylint: disable=ungrouped-imports
     import music21
     music21.mainTest(Test)
 

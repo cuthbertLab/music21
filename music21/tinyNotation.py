@@ -408,7 +408,7 @@ class RestToken(NoteOrRestToken):
     '''
     A token starting with 'r', representing a rest.
     '''
-    def parse(self, parent):    
+    def parse(self, parent=None):    
         r = note.Rest()
         self.applyDuration(r, self.token, parent)        
         return r

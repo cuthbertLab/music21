@@ -52,6 +52,8 @@ def runParallel(iterable, parallelFunction,
     
     resultsList = []
     
+    # multiprocessing has trouble with introspection
+    # pylint: disable=not-callable
     if multiprocessing.current_process().daemon: # @UndefinedVariable
         return runNonParallel(iterable, parallelFunction, updateFunction,
                               updateMultiply, unpackIterable)

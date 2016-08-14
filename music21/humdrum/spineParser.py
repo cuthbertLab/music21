@@ -539,8 +539,6 @@ class HumdrumDataCollection(object):
             *x    exchange the position of two spines
             *     do nothing
         '''
-
-
         if protoSpines is None or eventCollections is None:
             protoSpines = self.protoSpines
             eventCollections = self.eventCollections
@@ -1183,7 +1181,7 @@ class HumdrumSpine(object):
         measureElements = streamOut.getElementsByClass('Measure')
         if measureElements:
             m1 = measureElements[0]
-            if hasMeasureOne == False: # pickup measure is not measure1
+            if not hasMeasureOne: # pickup measure is not measure1
                 m1.number = 1
             beginningStuff = streamOut.getElementsByOffset(0)
             for el in beginningStuff:
@@ -1225,9 +1223,10 @@ class HumdrumSpine(object):
             elif eventC.startswith('!'):
                 thisObject = SpineComment(eventC)
             else:
+                # pylint: disable=attribute-defined-outside-init
                 thisObject = base.ElementWrapper(event)
-                thisObject.humdrumPosition = event.position # pylint: disable=attribute-defined-outside-init
-
+                thisObject.humdrumPosition = event.position 
+                
             if thisObject is not None:
                 self.stream._appendCore(thisObject)
         self.stream.elementsChanged()
@@ -1238,11 +1237,22 @@ class KernSpine(HumdrumSpine):
     attribute set and thus events are processed as if they
     are kern notes
     '''
+    def __init__(self, id=0, eventList=None, streamClass=stream.Stream): #@ReservedAssignment
+        super(KernSpine, self).__init__(id, eventList, streamClass)
+        self.lastContainer = None
+        self.inTuplet = None
+        self.lastNote = None
+        self.currentBeamNumbers = 0
+        self.currentTupletDuration = 0.0
+        self.desiredTupletDuration = 0.0    
+    
     def parse(self):
-        lastContainer = hdStringToMeasure('=0')
-        inTuplet = False
-        lastNote = None
-        currentBeamNumbers = 0
+        self.lastContainer = hdStringToMeasure('=0')
+        self.inTuplet = False
+        self.lastNote = None
+        self.currentBeamNumbers = 0
+        self.currentTupletDuration = 0.0
+        self.desiredTupletDuration = 0.0    
 
         for event in self.eventList:
             # event is a SpineEvent object
@@ -1257,97 +1267,20 @@ class KernSpine(HumdrumSpine):
                     if tempObject is not None:
                         thisObject = tempObject
                 elif eventC.startswith('='):
-                    lastContainer  = hdStringToMeasure(eventC, lastContainer)
-                    thisObject = lastContainer
+                    self.lastContainer  = hdStringToMeasure(eventC, self.lastContainer)
+                    thisObject = self.lastContainer
                 elif eventC.startswith('!'):
                     thisObject = SpineComment(eventC)
                     if thisObject.comment == "":
                         thisObject = None
                 elif eventC.count(' '):
-                    ### multipleNotes
-                    notesToProcess = eventC.split()
-                    chordNotes = []
-                    for noteToProcess in notesToProcess:
-                        thisNote = hdStringToNote(noteToProcess)
-                        chordNotes.append(thisNote)
-                    thisObject = chord.Chord(chordNotes, beams=chordNotes[-1].beams)
-                    thisObject.duration = chordNotes[0].duration
-
-                    if currentBeamNumbers != 0 and len(thisObject.beams.beamsList) == 0:
-                        for i in range(currentBeamNumbers):
-                            thisObject.beams.append('continue')
-                    elif thisObject.beams.beamsList:
-                        if thisObject.beams.beamsList[0].type == 'stop':
-                            currentBeamNumbers = 0
-                        else:
-                            for i in range(len(thisObject.beams.beamsList)):
-                                if thisObject.beams.beamsList[i].type != 'stop':
-                                    currentBeamNumbers += 1
-
-                    # nested tuplets not supported by humdrum...
-                    if inTuplet is False and thisObject.duration.tuplets:
-                        inTuplet = True
-                        desiredTupletDuration = thisObject.duration.tuplets[0].totalTupletLength()
-                        currentTupletDuration = thisObject.duration.quarterLength
-                        thisObject.duration.tuplets[0].type = 'start'
-                    elif inTuplet is True and len(thisObject.duration.tuplets) == 0:
-                        inTuplet = False
-                        desiredTupletDuration = 0.0
-                        currentTupletDuration = 0.0
-                        lastNote.duration.tuplets[0].type = 'stop'
-                    elif inTuplet is True:
-                        currentTupletDuration += thisObject.duration.quarterLength
-                        if (currentTupletDuration == desiredTupletDuration or
-                            # check for things like 6 6 3 6 6; 
-                            # redundant with previous, but written out for clarity
-                                currentTupletDuration/desiredTupletDuration == int(
-                                                    currentTupletDuration/desiredTupletDuration)):
-                            thisObject.duration.tuplets[0].type = 'stop'
-                            inTuplet = False
-                            currentTupletDuration = 0.0
-                            desiredTupletDuration = 0.0
-                    lastNote = thisObject
-
+                    thisObject = self.processChordEvent(eventC)
                 else: # Note or Rest
-                    thisObject = hdStringToNote(eventC)
-                    if hasattr(thisObject, 'beams'):
-                        if currentBeamNumbers != 0 and len(thisObject.beams.beamsList) == 0:
-                            for i in range(currentBeamNumbers):
-                                thisObject.beams.append('continue')
-                        elif thisObject.beams.beamsList:
-                            if thisObject.beams.beamsList[0].type == 'stop':
-                                currentBeamNumbers = 0
-                            else:
-                                for i in range(len(thisObject.beams.beamsList)):
-                                    if thisObject.beams.beamsList[i].type != 'stop':
-                                        currentBeamNumbers += 1
-                    # nested tuplets not supported by humdrum...
-                    if inTuplet is False and thisObject.duration.tuplets:
-                        inTuplet = True
-                        desiredTupletDuration = thisObject.duration.tuplets[0].totalTupletLength()
-                        currentTupletDuration = thisObject.duration.quarterLength
-                        thisObject.duration.tuplets[0].type = 'start'
-                    elif inTuplet is True and not thisObject.duration.tuplets:
-                        inTuplet = False
-                        desiredTupletDuration = 0.0
-                        currentTupletDuration = 0.0
-                        lastNote.duration.tuplets[0].type = 'stop'
-                    elif inTuplet is True:
-                        currentTupletDuration += thisObject.duration.quarterLength
-                        if (currentTupletDuration == desiredTupletDuration or
-                            # check for things like 6 6 3 6 6; 
-                            # redundant with previous, but written out for clarity
-                                currentTupletDuration/desiredTupletDuration == int(
-                                        currentTupletDuration/desiredTupletDuration)):
-                            thisObject.duration.tuplets[0].type = 'stop'
-                            inTuplet = False
-                            currentTupletDuration = 0.0
-                            desiredTupletDuration = 0.0
-
-                    lastNote = thisObject
-
+                    thisObject = self.processNoteEvent(eventC)
+                
                 if thisObject is not None:
-                    thisObject.humdrumPosition = event.position # pylint: disable=attribute-defined-outside-init
+                    # pylint: disable=attribute-defined-outside-init
+                    thisObject.humdrumPosition = event.position 
                     thisObject.priority = event.position
                     self.stream._appendCore(thisObject)
             except Exception as e: # pylint: disable=broad-except
@@ -1361,6 +1294,89 @@ class KernSpine(HumdrumSpine):
 
         self.stream.elementsChanged()
         ## still to be done later... move things before first measure to first measure!
+
+    def processNoteEvent(self, eventC):
+        '''
+        similar to hdStringToNote, this method processes a string representing a single
+        note, but stores information about current beam and tuplet state.
+        '''
+        eventNote = hdStringToNote(eventC)
+
+        self.setBeamsForNote(eventNote)
+        self.setTupletTypeForNote(eventNote)
+
+        self.lastNote = eventNote
+        return eventNote
+
+
+    def processChordEvent(self, eventC):
+        '''
+        Process a single chord event
+
+        Like processNoteEvent, stores information about current beam and tuplet state.
+        '''
+        ### multipleNotes
+        notesToProcess = eventC.split()
+        chordNotes = []
+        for noteToProcess in notesToProcess:
+            thisNote = hdStringToNote(noteToProcess)
+            chordNotes.append(thisNote)
+        eventChord = chord.Chord(chordNotes, beams=chordNotes[-1].beams)
+        eventChord.duration = chordNotes[0].duration
+
+        self.setBeamsForNote(eventChord)
+        self.setTupletTypeForNote(eventChord)
+        self.lastNote = eventChord
+        
+        return eventChord
+    
+    def setBeamsForNote(self, n):
+        '''
+        sets the beams for a Note (or Chord) given self.currentBeamNumbers
+        and updates self.currentBeamNumbers based on stop beams.
+        
+        Safe enough to use on elements such as rests that don't have beam info.
+        '''
+        if not hasattr(n, 'beams'):
+            return None
+
+        if self.currentBeamNumbers != 0 and len(n.beams.beamsList) == 0:
+            for unused_counter in range(self.currentBeamNumbers):
+                n.beams.append('continue')
+        elif n.beams.beamsList:
+            if n.beams.beamsList[0].type == 'stop':
+                self.currentBeamNumbers = 0
+            else:
+                for thisBeam in n.beams.beamsList:
+                    if thisBeam.type != 'stop':
+                        self.currentBeamNumbers += 1
+
+    def setTupletTypeForNote(self, n):
+        # nested tuplets not supported by humdrum...
+        nDur = n.duration
+        nTuplets = n.duration.tuplets
+        
+        if self.inTuplet is False and nTuplets:
+            self.inTuplet = True
+            self.desiredTupletDuration = nTuplets[0].totalTupletLength()
+            self.currentTupletDuration = nDur.quarterLength
+            n.duration.tuplets[0].type = 'start'
+        elif self.inTuplet is True and not nTuplets:
+            self.inTuplet = False
+            self.desiredTupletDuration = 0.0
+            self.currentTupletDuration = 0.0
+            self.lastNote.duration.tuplets[0].type = 'stop'
+        elif self.inTuplet is True:
+            self.currentTupletDuration += nDur.quarterLength
+            if (self.currentTupletDuration == self.desiredTupletDuration or
+                # check for things like 6 6 3 6 6; 
+                # redundant with previous, but written out for clarity
+                    (self.currentTupletDuration / self.desiredTupletDuration) == int(
+                            self.currentTupletDuration / self.desiredTupletDuration)):
+                nTuplets[0].type = 'stop'
+                self.inTuplet = False
+                self.currentTupletDuration = 0.0
+                self.desiredTupletDuration = 0.0    
 
 class DynamSpine(HumdrumSpine):
     r'''
@@ -1787,49 +1803,57 @@ class SpineCollection(object):
         '''
         kernStreams = {}
         for thisSpine in self.spines:
-            if thisSpine.parentSpine is None:
-                if thisSpine.spineType == 'kern':
-                    for tandem in thisSpine.stream.getElementsByClass('MiscTandem'):
-                        if tandem.tandem.startswith('*staff'):
-                            staffInfo = int(tandem.tandem[6:]) # single staff
-                            kernStreams[staffInfo] = thisSpine.stream
-                            break
+            if thisSpine.parentSpine is not None:
+                continue
+            if thisSpine.spineType != 'kern':
+                continue
+            for tandem in thisSpine.stream.getElementsByClass('MiscTandem'):
+                if not tandem.tandem.startswith('*staff'):
+                    continue
+                staffInfo = int(tandem.tandem[6:]) # single staff
+                kernStreams[staffInfo] = thisSpine.stream
+                break
+
         for thisSpine in self.spines:
-            if thisSpine.parentSpine is None:
-                if thisSpine.spineType != 'kern':
-                    stavesAppliedTo = []
-                    prioritiesToSearch = {}
-                    for tandem in thisSpine.stream.flat.getElementsByClass('MiscTandem'):
-                        if tandem.tandem.startswith('*staff'):
-                            staffInfo = tandem.tandem[6:] # could be multiple staves
-                            stavesAppliedTo = [int(x) for x in staffInfo.split('/')]
-                            break
-                    if thisSpine.spineType == 'dynam':
-                        for dynamic in thisSpine.stream.flat:
-                            if 'Dynamic' in dynamic.classes:
-                                prioritiesToSearch[dynamic.humdrumPosition] = dynamic
-                        for applyStaff in stavesAppliedTo:
-                            applyStream = kernStreams[applyStaff]
-                            for el in applyStream.recurse():
-                                if el.priority in prioritiesToSearch:
-                                    try:
-                                        el.activeSite.insert(el.offset, 
-                                                             prioritiesToSearch[el.priority])
-                                    except exceptions21.StreamException: 
-                                        # may appear twice because of voices...
-                                        pass
-                                        #el.activeSite.insert(el.offset, 
-                                        #    copy.deepcopy(prioritiesToSearch[el.priority]))
-                    elif thisSpine.spineType == 'lyrics' or thisSpine.spineType == 'text':
-                        for text in thisSpine.stream.flat:
-                            if 'ElementWrapper' in text.classes:
-                                prioritiesToSearch[text.humdrumPosition] = text.obj
-                        for applyStaff in stavesAppliedTo:
-                            applyStream = kernStreams[applyStaff]
-                            for el in applyStream.recurse():
-                                if el.priority in prioritiesToSearch:
-                                    lyric = prioritiesToSearch[el.priority].contents
-                                    el.lyric = lyric
+            if thisSpine.parentSpine is not None:
+                continue
+            if thisSpine.spineType == 'kern':
+                continue
+            
+            stavesAppliedTo = []
+            prioritiesToSearch = {}
+            for tandem in thisSpine.stream.recurse().getElementsByClass('MiscTandem'):
+                if tandem.tandem.startswith('*staff'):
+                    staffInfo = tandem.tandem[6:] # could be multiple staves
+                    stavesAppliedTo = [int(x) for x in staffInfo.split('/')]
+                    break
+            if thisSpine.spineType == 'dynam':
+                for dynamic in thisSpine.stream.flat:
+                    if 'Dynamic' in dynamic.classes:
+                        prioritiesToSearch[dynamic.humdrumPosition] = dynamic
+                for applyStaff in stavesAppliedTo:
+                    applyStream = kernStreams[applyStaff]
+                    for el in applyStream.recurse():
+                        if el.priority not in prioritiesToSearch:
+                            continue
+                        try:
+                            el.activeSite.insert(el.offset, 
+                                                 prioritiesToSearch[el.priority])
+                        except exceptions21.StreamException: 
+                            # may appear twice because of voices...
+                            pass
+                            #el.activeSite.insert(el.offset, 
+                            #    copy.deepcopy(prioritiesToSearch[el.priority]))
+            elif thisSpine.spineType in ('lyrics', 'text'):
+                for text in thisSpine.stream.recurse():
+                    if 'ElementWrapper' in text.classes:
+                        prioritiesToSearch[text.humdrumPosition] = text.obj
+                for applyStaff in stavesAppliedTo:
+                    applyStream = kernStreams[applyStaff]
+                    for el in applyStream.recurse():
+                        if el.priority in prioritiesToSearch:
+                            lyric = prioritiesToSearch[el.priority].contents
+                            el.lyric = lyric
 
 
     def makeVoices(self):
@@ -1841,42 +1865,46 @@ class SpineCollection(object):
         Should be done after measures have been made.
         '''
         for thisSpine in self.spines:
-            if thisSpine.spineType == 'kern' and thisSpine.parentSpine is None:
-                thisStream = thisSpine.stream
-                for el in thisStream:
-                    if 'Measure' in el.classes:
-                        hasVoices = False
-                        lowestVoiceOffset = 0
-                        for mEl in el:
-                            if 'voice1' in mEl.groups:
-                                hasVoices = True
-                                lowestVoiceOffset = mEl.offset
-                                break
-                        if hasVoices is True:
-                            voices = [None for i in range(10)]
-                            measureElements = el.elements
-                            for mEl in measureElements:
-                                mElGroups = mEl.groups
-                                #print mEl, mElGroups
-                                if len(mElGroups) > 0 and mElGroups[0].startswith('voice'):
-                                    voiceName = mElGroups[0]
-                                    voiceNumber = int(voiceName[5])
-                                    voicePart = voices[voiceNumber]
-                                    if voicePart is None:
-                                        voices[voiceNumber] = stream.Voice()
-                                        voicePart = voices[voiceNumber]
-                                        voicePart.groups.append(voiceName)
-                                    mElOffset = mEl.offset
-                                    el.remove(mEl)
-                                    voicePart._insertCore(mElOffset - lowestVoiceOffset, mEl)
-                            #print voices
-                            for voicePart in voices:
-                                if voicePart is not None:
-                                    #voicePart.show('text')
-                                    voicePart.elementsChanged()
-                                    el._insertCore(lowestVoiceOffset, voicePart)
-                            el.elementsChanged()
-                            #print el.number, "has voices at", lowestVoiceOffset
+            if thisSpine.spineType != 'kern' or thisSpine.parentSpine is not None:
+                continue
+            thisStream = thisSpine.stream
+            for el in thisStream.getElementsByClass('Measure'):
+                hasVoices = False
+                lowestVoiceOffset = 0
+                for mEl in el:
+                    if 'voice1' in mEl.groups:
+                        hasVoices = True
+                        lowestVoiceOffset = mEl.offset
+                        break
+                if not hasVoices:
+                    continue
+                
+                voices = [None for i in range(10)]
+                measureElements = el.elements
+                for mEl in measureElements:
+                    mElGroups = mEl.groups
+                    #print mEl, mElGroups
+                    if len(mElGroups) == 0 or not mElGroups[0].startswith('voice'):
+                        continue
+
+                    voiceName = mElGroups[0]
+                    voiceNumber = int(voiceName[5])
+                    voicePart = voices[voiceNumber]
+                    if voicePart is None:
+                        voices[voiceNumber] = stream.Voice()
+                        voicePart = voices[voiceNumber]
+                        voicePart.groups.append(voiceName)
+                    mElOffset = mEl.offset
+                    el.remove(mEl)
+                    voicePart._insertCore(mElOffset - lowestVoiceOffset, mEl)
+                #print voices
+                for voicePart in voices:
+                    if voicePart is not None:
+                        #voicePart.show('text')
+                        voicePart.elementsChanged()
+                        el._insertCore(lowestVoiceOffset, voicePart)
+                el.elementsChanged()
+                #print el.number, "has voices at", lowestVoiceOffset
 
 
     def parseMusic21(self):
@@ -2728,7 +2756,7 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, runTest='testSplitSpines2') #, TestExternal)
+    music21.mainTest(Test) #, runTest='testSplitSpines2') #, TestExternal)
 
 #------------------------------------------------------------------------------
 # eof

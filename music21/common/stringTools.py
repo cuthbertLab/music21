@@ -291,7 +291,7 @@ def getMd5(value=None):
 
     :rtype: str
     '''
-    if value == None:
+    if value is None:
         value = str(time.time()) + str(random.random())
     m = hashlib.md5()
     try:
@@ -408,6 +408,7 @@ def removePunctuation(s):
     u'This is my face'
     '''
     if six.PY2:
+        # pylint: disable=undefined-variable
         wasUnicode = False
         if isinstance(s, unicode): # @UndefinedVariable
             s = s.encode('utf-8')

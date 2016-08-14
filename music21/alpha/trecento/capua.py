@@ -35,8 +35,8 @@ from music21 import environment
 _MOD = 'trecento.capua.py'
 environLocal = environment.Environment(_MOD)
 
-RULE_ONE   = 1
-RULE_TWO   = 2
+RULE_ONE = 1
+RULE_TWO = 2
 RULE_THREE = 4
 RULE_FOUR_A = 8
 RULE_FOUR_B = 16
@@ -854,7 +854,7 @@ def findCorrections(correctionType="Maj3", startPiece=2, endPiece=459):
     for i in range(startPiece, endPiece):  # all ballate   
 #    for i in range(2, 29):  # small number of ballate 
 #    for i in range(232, 373):  # all of Landini ballate
-        pieceObj   = ballataObj.makeWork(i)  ## N.B. -- we now use Excel column numbers
+        pieceObj = ballataObj.makeWork(i)  ## N.B. -- we now use Excel column numbers
         if pieceObj.incipit is None:
             continue
         environLocal.warn("Working on piece number %d, %s " % (i, pieceObj.title))
@@ -867,8 +867,8 @@ def findCorrections(correctionType="Maj3", startPiece=2, endPiece=459):
             thisSnippetParts = thisSnippet.parts
             if len(thisSnippetParts) < 2:
                 continue
-            srcStream1    = thisSnippetParts['C'].flat.notesAndRests
-            srcStream2    = thisSnippetParts['T'].flat.notesAndRests  
+            srcStream1 = thisSnippetParts['C'].flat.notesAndRests
+            srcStream2 = thisSnippetParts['T'].flat.notesAndRests  
             ## ignore 3rd voice for now...
             srcStream1.attachIntervalsBetweenStreams(srcStream2)
             srcStream2.attachIntervalsBetweenStreams(srcStream1)
@@ -883,8 +883,8 @@ def findCorrections(correctionType="Maj3", startPiece=2, endPiece=459):
                 srcStreamNotes = ss.notes # get rid of rests
                 srcStreamLen = len(srcStreamNotes)
                 for (i, note1) in enumerate(srcStreamNotes):
-                    if note1.editorial.harmonicInterval is None or \
-                       note1.editorial.harmonicInterval.simpleName != simpleNameToCheck:
+                    if (note1.editorial.harmonicInterval is None
+                            or note1.editorial.harmonicInterval.simpleName != simpleNameToCheck):
                         continue
                     if i >= srcStreamLen - notesToCheck:
                         if i == srcStreamLen - 1:
@@ -902,12 +902,12 @@ def findCorrections(correctionType="Maj3", startPiece=2, endPiece=459):
                                 "This was only supposed to return non-None, what is up???")
                         if thisNote.editorial.harmonicInterval is None:
                             continue  ## probably a rest; should not happen
-                        if correctionType == 'Maj3':
-                            if thisNote.editorial.harmonicInterval.simpleName == "P1":
-                                foundP8 = True                    
-                        elif correctionType == 'min6':
-                            if thisNote.editorial.harmonicInterval.semiSimpleName == "P8":
-                                foundP8 = True
+                        if (correctionType == 'Maj3'
+                                and thisNote.editorial.harmonicInterval.simpleName == "P1"):
+                            foundP8 = True
+                        elif (correctionType == 'min6'
+                                and thisNote.editorial.harmonicInterval.semiSimpleName == "P8"):
+                            foundP8 = True
                     if foundP8 is False:
                         continue
                     newResults = compareNoteCapuaToEditor(note1)
@@ -915,10 +915,11 @@ def findCorrections(correctionType="Maj3", startPiece=2, endPiece=459):
                     for thisKey in newResults:
                         if thisKey == 'alterAll':
                             continue
-                        if thisKey == 'capuaNotPmfc' and newResults[thisKey] == 1:
-                            if thisSnippetAppended is False:
-                                foundPieceOpus.insert(0, thisSnippet)
-                                thisSnippetAppended = True
+                        if (thisKey == 'capuaNotPmfc' 
+                                and newResults[thisKey] == 1
+                                and thisSnippetAppended is False):
+                            foundPieceOpus.insert(0, thisSnippet)
+                            thisSnippetAppended = True
                         totalDict[thisKey] += newResults[thisKey]
                 
     return (totalDict, foundPieceOpus)
@@ -951,7 +952,7 @@ def improvedHarmony(startPiece = 2, endPiece = 459):
 #    for i in range(2, 29):  # small number of ballate 
 #    for i in range(232, 373):  # all of Landini ballate
         # environLocal.printDebug("Working on piece number %d " % i)
-        pieceObj   = ballataObj.makeWork(i)  ## N.B. -- we now use Excel column numbers
+        pieceObj = ballataObj.makeWork(i)  ## N.B. -- we now use Excel column numbers
         if pieceObj.incipit is None:
             continue
         for thisSnippet in pieceObj.snippets:
@@ -963,8 +964,8 @@ def improvedHarmony(startPiece = 2, endPiece = 459):
             thisSnippetParts = thisSnippet.parts
             if len(thisSnippetParts) < 2:
                 continue
-            srcStream1    = thisSnippetParts['C'].flat.notesAndRests
-            srcStream2    = thisSnippetParts['T'].flat.notesAndRests  ## ignore 3rd voice for now...
+            srcStream1 = thisSnippetParts['C'].flat.notesAndRests
+            srcStream2 = thisSnippetParts['T'].flat.notesAndRests  ## ignore 3rd voice for now...
             srcStream1.attachIntervalsBetweenStreams(srcStream2)
             #srcStream2.attachIntervalsBetweenStreams(srcStream1)
             applyCapuaToStream(srcStream1)
@@ -995,14 +996,14 @@ def improvedHarmony(startPiece = 2, endPiece = 459):
 
     return checkDict
 
-def runPiece(pieceNum = 331, snipNum = 0):  # random default piece...
+def runPiece(pieceNum=331, snipNum=0):  # random default piece...
     ballataObj = cadencebook.BallataSheet()
-    pieceObj   = ballataObj.makeWork(pieceNum)
+    pieceObj = ballataObj.makeWork(pieceNum)
 #    pieceObj.snippets[0].lily.showPNG()
     applyCapuaToScore(pieceObj)
 #    pieceObj.snippets[snipNum].show('lily.png')
-    srcStream    = pieceObj.snippets[snipNum].parts[0].flat.notesAndRests
-    cmpStream    = pieceObj.snippets[snipNum].parts[1].flat.notesAndRests  
+    srcStream = pieceObj.snippets[snipNum].parts[0].flat.notesAndRests
+    cmpStream = pieceObj.snippets[snipNum].parts[1].flat.notesAndRests  
     ## ignore 3rd voice for now...
     srcStream.attachIntervalsBetweenStreams(cmpStream)
 
@@ -1045,11 +1046,11 @@ class Test(unittest.TestCase):
     def testRunNonCrederDonna(self):
         pieceNum = 331 # Francesco, PMFC 4 6-7: Non creder, donna
         ballataObj = cadencebook.BallataSheet()
-        pieceObj   = ballataObj.makeWork(pieceNum)
+        pieceObj = ballataObj.makeWork(pieceNum)
         
         applyCapuaToCadencebookWork(pieceObj)
-        srcStream    = pieceObj.snippets[0].parts[0].flat.notesAndRests.stream()
-        cmpStream    = pieceObj.snippets[0].parts[1].flat.notesAndRests.stream()
+        srcStream = pieceObj.snippets[0].parts[0].flat.notesAndRests.stream()
+        cmpStream = pieceObj.snippets[0].parts[1].flat.notesAndRests.stream()
         ## ignore 3rd voice for now...
         srcStream.attachIntervalsBetweenStreams(cmpStream)
         cmpStream.attachIntervalsBetweenStreams(srcStream)
@@ -1084,10 +1085,10 @@ class Test(unittest.TestCase):
 
     def testRun1(self):
         ballataSht = cadencebook.BallataSheet()
-        pieceObj   = ballataSht.makeWork(20)  ## N.B. -- we now use Excel column numbers
+        pieceObj = ballataSht.makeWork(20)  ## N.B. -- we now use Excel column numbers
         if pieceObj.incipit is None:
             return None
-        cadenceA   = pieceObj.cadenceA
+        cadenceA = pieceObj.cadenceA
         if len(cadenceA.parts) >= 2:
             srcStream1 = cadenceA.parts[0].flat.notes.stream()
             srcStream2 = cadenceA.parts[1].flat.notes.stream()  ## ignore 3rd voice for now...
@@ -1202,14 +1203,14 @@ class TestSlow(unittest.TestCase):
             }
     
         for i in range(232, 349):  # 232-349 is most of Landini PMFC
-            pieceObj   = ballataObj.makeWork(i)  ## N.B. -- we now use Excel column numbers
+            pieceObj = ballataObj.makeWork(i)  ## N.B. -- we now use Excel column numbers
             if pieceObj.incipit is None:
                 continue
             environLocal.printDebug(pieceObj.title)
             cadenceA = pieceObj.cadenceA
             if cadenceA is not None and len(cadenceA.parts) >= 2:
-                srcStream1    = cadenceA.parts[0] #.flat.notesAndRests
-                #srcStream2    = cadenceA.parts[1].flat.notesAndRests  
+                srcStream1 = cadenceA.parts[0] #.flat.notesAndRests
+                #srcStream2 = cadenceA.parts[1].flat.notesAndRests  
                 ## ignore 3rd voice for now...
                 #twoStreams1 = twoStreams.TwoStreamComparer(srcStream1, srcStream2)
                 #twoStreams1.intervalToOtherStreamWhenAttacked()

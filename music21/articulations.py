@@ -501,6 +501,7 @@ class StringThumbPosition(Bowing):
 
 class StringFingering(StringIndication, Fingering):
     '''
+    Indicates a fingering on a specific string.  Nothing special for now.
     '''
     pass
 

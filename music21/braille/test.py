@@ -1152,21 +1152,14 @@ class DeGarmoTest(unittest.TestCase):
         pass
     
     def test_example08_5(self):
+        '''
+        Common/cut time signatures
+        '''
         from music21.braille.basic import timeSigToBraille
         for ts, r in [('common', '⠨⠉'),
                       ('cut', '⠸⠉'),
                       ]:
             self.assertEqual(timeSigToBraille(meter.TimeSignature(ts)), r)
-        u"""
-        Common/cut time signatures.
-    
-        >>> from music21.braille import basic
-        >>> print(basic.timeSigToBraille(meter.TimeSignature('common')))
-        ⠨⠉
-        >>> print(basic.timeSigToBraille(meter.TimeSignature('cut')))
-        ⠸⠉
-        """
-        pass
 
     def test_example08_6(self):
         from music21.braille.basic import transcribeSignatures

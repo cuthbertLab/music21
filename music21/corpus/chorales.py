@@ -39,7 +39,7 @@ class ChoraleList(object):
     >>> from music21 import corpus
     >>> bcl = corpus.chorales.ChoraleList()
     >>> info358 = bcl.byBudapest[358]
-    >>> for key in sorted(list(info358.keys())):
+    >>> for key in sorted(list(info358)):
     ...   print("%s %s" % (key, info358[key]))
     baerenreiter 68
     budapest 358
@@ -499,7 +499,7 @@ class ChoraleListRKBWV(object):
     >>> from music21 import corpus
     >>> bcl = corpus.chorales.ChoraleListRKBWV()
     >>> info155 = bcl.byRiemenschneider[155]
-    >>> for key in sorted(list(info155.keys())):
+    >>> for key in sorted(list(info155)):
     ...   print("%s %s" % (key, info155[key]))
     bwv 344
     kalmus 173
@@ -1282,7 +1282,7 @@ class Iterator(object):
 
         if self._returnType is 'stream':
             chorale = corpus.parse(filename)
-            if self.numberingSystem is 'riemenschneider' and self.analysis == True:
+            if self.numberingSystem is 'riemenschneider' and self.analysis:
                 try:
                     riemenschneiderName = 'bach/choraleAnalyses/riemenschneider%03d.rntxt' % (
                                                                 self._currentIndex + 1)
@@ -1352,13 +1352,13 @@ class Iterator(object):
         else:
             if self._numberingSystem is 'riemenschneider':
                 self._numberList = []
-                for n in sorted(self._choraleList2.byRiemenschneider.keys()):
+                for n in sorted(self._choraleList2.byRiemenschneider):
                     self._numberList.append(n) 
                     # addList = [26, 91, 259, 261, 263] 
                     # These are the numbers that appear twice and thus stored only once.
             elif self._numberingSystem is 'kalmus':
                 self._numberList = []
-                for n in sorted(self._choraleList2.byKalmus.keys()):
+                for n in sorted(self._choraleList2.byKalmus):
                     # Need to skip K0 because it is not actually in the number system. 
                     # Denotes chorales that do not have a Kalmus number.
                     if n is 0: 
@@ -1367,15 +1367,15 @@ class Iterator(object):
             elif self._numberingSystem is 'bwv':
                 self._numberList = []
                 #This does not sort correctly at this time TODO: Make this sort correctly
-                for n in sorted(self._choraleList2.byBWV.keys()): 
+                for n in sorted(self._choraleList2.byBWV): 
                     self._numberList.append(n)
             elif self._numberingSystem is 'budapest':
                 self._numberList = []
-                for n in sorted(self._choraleList1.byBudapest.keys()):
+                for n in sorted(self._choraleList1.byBudapest):
                     self._numberList.append(n)
             elif self._numberingSystem is 'baerenreiter':
                 self._numberList = []
-                for n in sorted(self._choraleList1.byBaerenreiter.keys()):
+                for n in sorted(self._choraleList1.byBaerenreiter):
                     self._numberList.append(n)
 
             if self.iterationType is 'number':

@@ -275,10 +275,10 @@ def findFormatExtFile(fp):
     ('humdrum', '.krn')
     '''
     fileFormat, unused_extOut = findFormat(fp.split('.')[-1])
-    if fileFormat == None:
-        return None, None
+    if fileFormat is None:
+        return (None, None)
     else:
-        return fileFormat, '.'+fp.split('.')[-1] # may be None if no match
+        return (fileFormat, '.'+fp.split('.')[-1]) # may be None if no match
 
 #@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 def findFormatExtURL(url):

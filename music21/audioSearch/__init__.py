@@ -246,7 +246,7 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
         raise AudioSearchException(
             "Cannot normalize input frequency if thresholds are given and " + 
             "pitches are not, or vice-versa")
-    elif thresholds == None:
+    elif thresholds is None:
         (thresholds, pitches) = prepareThresholds()
 
     inputPitchLog2 = math.log(inputPitchFrequency, 2)
@@ -750,7 +750,7 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None,
         fe = features.native.MostCommonNoteQuarterLength(scNotes)
         mostCommon = fe.extract().vector[0]
         qle = quarterLengthEstimation(durationList, mostCommon)
-    elif scNotes == None: # this is for the transcriber
+    elif scNotes is None: # this is for the transcriber
         qle = quarterLengthEstimation(durationList)
 
     for i in range(len(durationList)):
@@ -767,7 +767,7 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None,
     sc.metadata.title = 'Automatic Music21 Transcription'
     sc.insert(0, p2)
 
-    if scNotes == None:   # Case transcriber
+    if scNotes is None:   # Case transcriber
         return sc, len(p2)
     else: #case follower
         return sc,qle

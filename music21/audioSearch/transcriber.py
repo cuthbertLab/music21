@@ -50,7 +50,7 @@ def runTranscribe(show=True, plot=True, useMic=True,
         useScale = scale.ChromaticScale('C4')
     #beginning - recording or not
     if saveFile != False:
-        if saveFile == True:
+        if saveFile:
             WAVE_FILENAME = environLocal.getRootTempDir() + os.path.sep + 'ex.wav'
         else:
             WAVE_FILENAME = saveFile
@@ -76,10 +76,10 @@ def runTranscribe(show=True, plot=True, useMic=True,
                                                             durationList, 
                                                             removeRestsAtBeginning=True)    
 
-    if show == True:
+    if show:
         myScore.show()        
     
-    if plot == True:
+    if plot:
         try:
             import matplotlib.pyplot # for find
         except ImportError:
