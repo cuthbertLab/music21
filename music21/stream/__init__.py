@@ -10990,10 +10990,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
                 exemptShift = shiftDur
                 shiftDur = shiftDur + durationAmount
-                shiftsDict[startOffset] = (
-                            shiftDur, endOffset, includeEnd, exemptObjects, exemptShift)
+                shiftsDict[startOffset] = (shiftDur, endOffset, includeEnd, 
+                                           exemptObjects, exemptShift)
 
-            for offset in sorted(shiftsDict.keys(), key=lambda offset: -offset):
+            for offset in sorted(shiftsDict, key=lambda offset: -1 * offset):
                 shiftDur, endOffset, includeEnd, exemptObjects, exemptShift = shiftsDict[offset]
                 for e in returnObj.getElementsByOffset(offset,
                     endOffset,
@@ -11119,7 +11119,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if isinstance(numOrNumTuple, tuple):
                 return measureNumberSortRoutine(numOrNumTuple[0])
             elif numOrNumTuple is None:
-                return -999
+                return -9999 
             else:
                 return numOrNumTuple
             
@@ -11161,7 +11161,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # above which measures should be shifted by the value up to the next key. It is easiest
         # to do this in reverse order so there is no overlapping.
         previousBoundary = None
-        for k in sorted(oldCorrections.keys(), key=lambda x: -x):
+        for k in sorted(oldCorrections, key=lambda x: -1 * x):
             shift = oldCorrections[k]
             for m in oldMeasures:
                 if previousBoundary is None or m.number < previousBoundary:
@@ -11170,7 +11170,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             previousBoundary = k
 
         previousBoundary = None
-        for k in sorted(newCorrections.keys(), key=lambda x: -x):
+        for k in sorted(newCorrections, key=lambda x: -1 * x):
             shift = newCorrections[k]
             for m in newMeasures:
                 if previousBoundary is None or m.number < previousBoundary:

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, print_function
 
-import unittest
 import copy
+import random
+import unittest
 
 from music21 import key
 from music21 import metadata
@@ -14,7 +15,6 @@ from music21 import harmony
 from music21 import scale
 from music21.alpha.theoryAnalysis import theoryAnalyzer
 
-import random
 
 
 #---------------
@@ -275,7 +275,7 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
     >>> s.append(p)
     >>> aData = alpha.webapps.commands.determineDissonantIdentificationAccuracy(s, [2.3, 3.2])
     >>> chords = aData['stream'].flat.getElementsByClass('Chord')
-    >>> chords[0].color == None #BLACK (by default)
+    >>> chords[0].color is None #BLACK (by default)
     True
     >>> chords[1].color #RED
     '#cc3300'
@@ -292,7 +292,7 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
     music21VS = 0
     both = 0
     romanFigureList = []
-    if keyStr == None:
+    if keyStr is None:
         pieceKey = scoreIn.analyze('key')
     else:
         pieceKey = key.Key(keyStr)
@@ -401,7 +401,7 @@ def correctChordSymbols(worksheet, studentResponse):
             else:
                 isCorrect = False
                 break
-        if isCorrect == True:
+        if isCorrect:
             newPitches1 = []
             for y in chord1.pitches:
                 newPitches1.append(str(y.name))
@@ -419,7 +419,7 @@ def correctChordSymbols(worksheet, studentResponse):
             else:
                 numCorrect = numCorrect + 1
                 chord2.lyric = ":)"
-        if isCorrect == False:
+        if not isCorrect:
             chord2.lyric = "PITCHES"
 
     percentCorrect =  numCorrect / totalNumChords * 100

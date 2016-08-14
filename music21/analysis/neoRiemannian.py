@@ -13,11 +13,11 @@
 This module defines the L, P, and R objects and their 
 related transformations as called on a chord.Chord, according to Neo-Riemannian theory.
 '''
+import copy
 import unittest
 
 from music21 import exceptions21
 from music21 import chord
-import copy
 
 from music21 import environment
 _MOD = "analysis.neoRiemannian"
@@ -48,10 +48,10 @@ def L(c, raiseException=False):
     ...     pass
     
     '''
-    if c.isMajorTriad() == True:
+    if c.isMajorTriad():
         transposeInterval = "-m2"
         changingPitch = c.root()
-    elif c.isMinorTriad() == True:
+    elif c.isMinorTriad():
         transposeInterval = "m2"
         changingPitch = c.fifth
     else:
@@ -82,10 +82,10 @@ def P(c, raiseException=False):
     ...     pass
 
     '''
-    if c.isMajorTriad() == True:
+    if c.isMajorTriad():
         transposeInterval = "-A1"
         changingPitch = c.third
-    elif c.isMinorTriad() == True:
+    elif c.isMinorTriad() :
         transposeInterval = "A1"
         changingPitch = c.third
     else:
@@ -115,10 +115,10 @@ def R(c, raiseException=False):
     ...     pass
     
     '''
-    if c.isMajorTriad() == True:
+    if c.isMajorTriad():
         transposeInterval = "M2"
         changingPitch = c.fifth
-    elif c.isMinorTriad() == True:
+    elif c.isMinorTriad() :
         transposeInterval = "-M2"
         changingPitch = c.root()
     else:
@@ -186,7 +186,7 @@ def LRP_combinations(c,
 #    >>> c6
 #    <music21.chord.Chord A-4 C4 E-5>
     
-    if c.isMajorTriad() == True or c.isMinorTriad() == True:
+    if c.isMajorTriad()  or c.isMinorTriad():
         if leftOrdered is False: 
             for i in transformationString:
                 if i == 'L':
@@ -201,7 +201,7 @@ def LRP_combinations(c,
                 return c
             else:
                 for i in range(len(c.pitches)):
-                    c.pitches[i].simplifyEnharmonic(inPlace = True, mostCommon=True)
+                    c.pitches[i].simplifyEnharmonic(inPlace=True, mostCommon=True)
                 return c
         elif leftOrdered is True:
             transformationStringReversed = transformationString[::-1]
@@ -218,7 +218,7 @@ def LRP_combinations(c,
                 return c
             else:
                 for i in range(len(c.pitches)):
-                    c.pitches[i].simplifyEnharmonic(inPlace = True, mostCommon=True)
+                    c.pitches[i].simplifyEnharmonic(inPlace=True, mostCommon=True)
                 return c
             
     else:
@@ -264,7 +264,7 @@ def completeHexatonic(c):
      <music21.chord.Chord C-4 F-4 A--4>]
     '''
     #TODO: more documentation
-    if c.isMajorTriad() == True or c.isMinorTriad() == True:
+    if c.isMajorTriad() or c.isMinorTriad():
         hexatonic_1 = P(c)
         hexatonic_2 = L(hexatonic_1)
         hexatonic_3 = P(hexatonic_2)
@@ -316,7 +316,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(c6_T), "<music21.chord.Chord C4 F4 A-4 C5 F5>") 
         
         c7 = chord.Chord('C4 E4 G4 C5 E5')
-        c7_T = LRP_combinations(c7, 'LP', leftOrdered = True)
+        c7_T = LRP_combinations(c7, 'LP', leftOrdered=True)
         self.assertEqual(str(c7_T), "<music21.chord.Chord C4 E-4 A-4 C5 E-5>") 
         
         

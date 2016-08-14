@@ -17891,8 +17891,8 @@ class Test(unittest.TestCase):
         orig_clefs = orig_stream.flat.getElementsByClass('Clef')
 
         xml = musicxml.m21ToXml.GeneralObjectExporter().parse(orig_stream)
-        self.assertEquals(xml.count(b'<clef>'), 2) # clefs got out
-        self.assertEquals(xml.count(b'<measure'), 1) # in one measure
+        self.assertEqual(xml.count(b'<clef>'), 2) # clefs got out
+        self.assertEqual(xml.count(b'<measure'), 1) # in one measure
         
         new_stream = converter.parse(xml)
         new_clefs = new_stream.flat.getElementsByClass('Clef')

@@ -56,9 +56,12 @@ def example11_2():
 # https://www.loc.gov/nls/music/
 #-------------------------------------------------------------------------------
 class DeGarmoTest(unittest.TestCase):
-        
-    def _s(self, stream):
-        self.stream = stream
+    '''
+    A series of tests from the DeGarmo book that run automatically
+    when self.b (expected braille) or self.e (expected english) are altered
+    '''
+    def _s(self, streamIn):
+        self.stream = streamIn
     
     s = property(fset=_s)
     
@@ -307,7 +310,8 @@ class DeGarmoTest(unittest.TestCase):
     
     def test_example03_5(self):
         self.methodArgs = {'suppressOctaveMarks': True}
-        bm = converter.parse("tinynotation: 4/4 f4. c8 d4 e4 f4. g8 a4 f4 a4 c'4 d'4 c'4 a4 f4 g4 r4 " +
+        bm = converter.parse("tinynotation: 4/4 f4. c8 d4 e4 f4. g8 a4 f4 " + 
+                             "a4 c'4 d'4 c'4 a4 f4 g4 r4 " +
                              "g4. e8 c4 e4 f4. c8 f4 a4 g4 g4 f4 e4 f4 a4 f4 r4")
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
@@ -321,7 +325,8 @@ class DeGarmoTest(unittest.TestCase):
     
     def test_example03_6(self):
         self.methodArgs = {'suppressOctaveMarks': True}
-        bm = converter.parse("tinynotation: 3/4 g4 g8 d4 d8 g4 b8 d'8 b8 g8 a4 a8 a8 b8 c'8 b4 b8 " +
+        bm = converter.parse("tinynotation: 3/4 g4 g8 d4 d8 g4 b8 d'8 b8 " + 
+                             "g8 a4 a8 a8 b8 c'8 b4 b8 " +
                              "g4 r8 a4 a8 d4 d8 g4 b8 a4 c'8 b8 c'8 d'8 c'4 a8 g4 g8 g4 r8").flat
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
@@ -1083,7 +1088,8 @@ class DeGarmoTest(unittest.TestCase):
 
     def test_example07_11(self):
         bm = converter.parse(
-                "tinynotation: 6/8 r2 r8 GG8 C4 GG8 C4 E-8 D4 GG8 D4 G8 C4 G8 c4 B-8 A-4 F8 C4 A-8 " +
+                "tinynotation: 6/8 r2 r8 GG8 C4 GG8 C4 E-8 D4 GG8 D4 G8 C4 " + 
+                "G8 c4 B-8 A-4 F8 C4 A-8 " +
                 "G8 E-8 A-8 G8 C8 F8 E-8 GG8 D8 C8 GG8 EE-8 FF8 D8 C8 BBn8 GG8 GG8 CC4. r4")
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
@@ -1881,7 +1887,8 @@ class DeGarmoTest(unittest.TestCase):
         '''
         
     def test_example10_5(self):
-        bm = converter.parse("tinynotation: 3/4 g4. f8 e-4 B-4 b-4 g4 f2 g4 e'-4. d'8 c'4 d'4 g4 bn4 " +
+        bm = converter.parse("tinynotation: 3/4 g4. f8 e-4 B-4 b-4 g4 f2 g4 " + 
+                             "e'-4. d'8 c'4 d'4 g4 bn4 " +
                              "d'4 c'4 c'4 a-4. g8 f4 c4 c'4 en4 f2.").flat
         bm.insert(0, key.KeySignature(-3))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -1932,7 +1939,8 @@ class DeGarmoTest(unittest.TestCase):
     
     def test_example10_10(self):
         self.methodArgs = {'showClefSigns': False}
-        bm = converter.parse("tinynotation: 6/8 a8 e a b c'# d' e' f'# g'# a'4.", makeNotation=False)
+        bm = converter.parse("tinynotation: 6/8 a8 e a b c'# d' e' f'# g'# a'4.", 
+                             makeNotation=False)
         bm.insert(0, key.KeySignature(3))
         bm.insert(0, clef.AltoClef())
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -2865,7 +2873,8 @@ Barline final ⠣⠅
      
     def test_example15_2(self):
         bm = converter.parse(
-            "tinynotation: 2/4 d'8 r16 e'16 d'8 r16 c'#16 d'4 b8 r8 b8 r16 c'16 b8 r16 a#16 b4 g8 r8"
+            "tinynotation: 2/4 d'8 r16 e'16 d'8 r16 c'#16 " + 
+            "d'4 b8 r8 b8 r16 c'16 b8 r16 a#16 b4 g8 r8"
             ).flat
         bm.insert(0, key.KeySignature(1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -2982,8 +2991,10 @@ Barline final ⠣⠅
         '''
     
     def xtest_example15_10(self):
-        # print translate.partToBraille(test.test_example15_10(), inPlace=True, dummyRestLength = 24)
-        # Division of measure at end of line of "4/4" bar occurs in middle of measure, when in reality
+        # print translate.partToBraille(test.test_example15_10(),
+        #    inPlace=True, dummyRestLength = 24)
+        # Division of measure at end of line of "4/4" bar occurs 
+        #  in middle of measure, when in reality
         # it could occur 3/4 into the bar. Hypothetical example that might not be worth attacking.
         bm = converter.parse("tinynotation: 4/4 g16 a g f e8 c d16 e f d e8 c").flat
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -3182,10 +3193,10 @@ Barline final ⠣⠅
     
     def test_example24_2(self):
         self.method = keyboardPartsToBraille
-        rightHand = converter.parse("tinynotation: 2/4 c'8 g8 e8 g8 f8 g8 e8 a8 g8 " + 
-                                    "f8 e8 d8 e8 e8 d8 r8 e8 d8 e8 g8 f8 g8 a8 f8 e8 g8 g8 f8 e2").flat
-        leftHand = converter.parse("tinynotation: 2/4 C8 G8 c8 B8 A8 B8 c8 c8 B8 A8 G8 B8 " + 
-                                   "c8 c8 B8 G8 c8 r8 B-4 A8 r8 c8 r8 c8 r8 B8 G8 c2").flat
+        rightHand = converter.parse("tinynotation: 2/4 c'8 g e g f g e a g " + 
+                                    "f e d e e d r e d e g f g a f e g g f e2").flat
+        leftHand = converter.parse("tinynotation: 2/4 C8 G c B A B c c B A G B " + 
+                                   "c c B G c r B-4 A r c r c r B G c2").flat
         rightHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         leftHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         keyboardPart = stream.Score()
@@ -3203,8 +3214,8 @@ Barline final ⠣⠅
     def test_example24_3(self):
         self.method = keyboardPartsToBraille
         rightHand = converter.parse("tinynotation: 3/4 r2 d'4 d'8 e'-8 d'8 c'8 b-8 a8 g2 b-4").flat
-        leftHand = converter.parse("tinynotation: 3/4 r2 B-8 A8 G8 r8 B-8 r8 d8 " + 
-                                   "r8 G8 A8 B-8 c8 d4").flat
+        leftHand = converter.parse("tinynotation: 3/4 r2 B-8 A G r B- r d " + 
+                                   "r G A B- c d4").flat
         rightHand.insert(0, key.KeySignature(-2))
         leftHand.insert(0, key.KeySignature(-2))
         rightHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)

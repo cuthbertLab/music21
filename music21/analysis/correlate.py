@@ -67,9 +67,9 @@ class ActivityMatch(object):
         {'src': obj, 'dst': [objs]}
 
         '''        
-        if objNameSrc == None:
+        if objNameSrc is None:
             objNameSrc = (note.Note, chord.Chord)
-        if objNameDst == None:
+        if objNameDst is None:
             objNameDst = dynamics.Dynamic
 
         post = []

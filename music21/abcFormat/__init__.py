@@ -44,9 +44,6 @@ __all__ = [
     'testFiles',
     ]
 
-from music21.abcFormat import translate
-
-
 import copy
 import io
 import re
@@ -55,6 +52,8 @@ import unittest
 from music21 import common
 from music21 import environment
 from music21 import exceptions21
+
+from music21.abcFormat import translate
 
 _MOD = 'abc'
 environLocal = environment.Environment(_MOD)
@@ -300,7 +299,7 @@ class ABCMetadata(ABCToken):
 
         >>> am = abcFormat.ABCMetadata('M: none')
         >>> am.preParse()
-        >>> am._getTimeSignatureParameters() == None
+        >>> am._getTimeSignatureParameters() is None
         True
 
         >>> am = abcFormat.ABCMetadata('M: FREI4/4')
@@ -346,7 +345,7 @@ class ABCMetadata(ABCToken):
                     'no time signature associated with this non-metrical meta-data')
         from music21 import meter
         parameters = self._getTimeSignatureParameters()
-        if parameters == None:
+        if parameters is None:
             return None
         else:
             numerator, denominator, unused_symbol = parameters
@@ -643,7 +642,7 @@ class ABCMetadata(ABCToken):
         elif self.isMeter():
             # if meter auto-set a default not length
             parameters = self._getTimeSignatureParameters()
-            if parameters == None:
+            if parameters is None:
                 return .5 # TODO: assume default, need to configure
             n, d, unused_symbol = parameters
             if float(n) / d < .75:
@@ -853,7 +852,7 @@ class ABCTuplet(ABCToken):
         (5, 3)
         '''
 
-        if keySignatureObj == None:
+        if keySignatureObj is None:
             from music21 import meter   
             ts = meter.TimeSignature('4/4') # default
         else:
@@ -895,7 +894,7 @@ class ABCTuplet(ABCToken):
         Update the note count of notes that are 
         affected by this tuplet.
         '''
-        if self.numberNotesActual == None: 
+        if self.numberNotesActual is None: 
             raise ABCTokenException('must set numberNotesActual with updateRatio()')
 
         # nee dto 
@@ -1290,7 +1289,7 @@ class ABCNote(ABCToken):
         if accString != '':
             accidentalDisplayStatus = True
         # if we do not have a key signature, and have accidentals, set to None
-        elif activeKeySignature == None:
+        elif activeKeySignature is None:
             accidentalDisplayStatus = None
         # pitches are key dependent: accidentals are not given
         # if we have a key and find a name, that does not have a n, must be
@@ -1363,7 +1362,7 @@ class ABCNote(ABCToken):
         else: # may be None
             activeDefaultQuarterLength = self.activeDefaultQuarterLength
 
-        if activeDefaultQuarterLength == None:
+        if activeDefaultQuarterLength is None:
             raise ABCTokenException(
                 'cannot calculate quarter length without a default quarter length')
 
@@ -1457,7 +1456,7 @@ class ABCNote(ABCToken):
             
         self.pitchName, self.accidentalDisplayStatus = a, b
 
-        if self.pitchName == None:
+        if self.pitchName is None:
             self.isRest = True
         else:
             self.isRest = False
@@ -1903,12 +1902,11 @@ class ABCHandler(object):
                     # if we have not found pitch alpha
                     # ornaments may precede note names
                     # accidentals (^=_) staccato (.), up/down bow (u, v)
-                    if (foundPitchAlpha == False 
-                            and strSrc[j] in '~=^_vHLTS'):
+                    if (not foundPitchAlpha and strSrc[j] in '~=^_vHLTS'):
                         j += 1
                         continue                    
                     # only allow one pitch alpha to be a continue condition
-                    elif (foundPitchAlpha == False and strSrc[j].isalpha() 
+                    elif (not foundPitchAlpha and strSrc[j].isalpha() 
                         and strSrc[j] not in '~wuvhHLTSN'):
                         foundPitchAlpha = True
                         j += 1
@@ -2098,7 +2096,7 @@ class ABCHandler(object):
             
             # ABCChord inherits ABCNote, thus getting note is enough for both
             if isinstance(t, (ABCNote, ABCChord)):
-                if lastDefaultQL == None:
+                if lastDefaultQL is None:
                     raise ABCHandlerException(
                             'no active default note length provided for note processing. ' + 
                             'tPrev: %s, t: %s, tNext: %s' % (tPrev, t, tNext))
@@ -2129,7 +2127,7 @@ class ABCHandler(object):
                     lastTenutoToken = None
                 if lastGraceToken is not None:
                     t.inGrace = True
-                if lastTupletToken == None:
+                if lastTupletToken is None:
                     pass
                 elif lastTupletToken.noteCount == 0:
                     lastTupletToken = None # clear, no longer needed
@@ -3015,12 +3013,12 @@ class Test(unittest.TestCase):
             #print 'expectiing', i, l, r, ahm[i].tokens
             #print 'have', ahm[i].leftBarToken, ahm[i].rightBarToken
             #print 
-            if l == None:
+            if l is None:
                 self.assertEqual(ahm[i].leftBarToken, None)
             else:
                 self.assertEqual(ahm[i].leftBarToken.src, l)
 
-            if r == None:
+            if r is None:
                 self.assertEqual(ahm[i].rightBarToken, None)
             else:
                 self.assertEqual(ahm[i].rightBarToken.src, r)
@@ -3041,12 +3039,12 @@ class Test(unittest.TestCase):
                         (-1, '||', None), # trailing lyric meta data
                        ]:
             #print i, l, r, ahm[i].tokens
-            if l == None:
+            if l is None:
                 self.assertEqual(ahm[i].leftBarToken, None)
             else:
                 self.assertEqual(ahm[i].leftBarToken.src, l)
 
-            if r == None:
+            if r is None:
                 self.assertEqual(ahm[i].rightBarToken, None)
             else:
                 self.assertEqual(ahm[i].rightBarToken.src, r)
@@ -3060,12 +3058,12 @@ class Test(unittest.TestCase):
                         (-1, None, None), # note data, but no bars
                        ]:
             #print i, l, r, ahm[i].tokens
-            if l == None:
+            if l is None:
                 self.assertEqual(ahm[i].leftBarToken, None)
             else:
                 self.assertEqual(ahm[i].leftBarToken.src, l)
 
-            if r == None:
+            if r is None:
                 self.assertEqual(ahm[i].rightBarToken, None)
             else:
                 self.assertEqual(ahm[i].rightBarToken.src, r)

@@ -210,7 +210,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
     def __init__(self, referenceStream=None):
         DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
         # store sharp/flat count on init if available
-        if referenceStream != None:
+        if referenceStream is not None:
             self.sharpFlatCount = self._getSharpFlatCount(referenceStream)
         else:
             self.sharpFlatCount = None
@@ -281,7 +281,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         flatCount = 0
         sharpCount = 0
         for p in subStream.pitches:
-            if p.accidental != None:
+            if p.accidental is not None:
                 if p.accidental.alter < 0:
                     flatCount += -1
                 elif p.accidental.alter > 0:
@@ -348,7 +348,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             over Sapp's given distribution for finding key, returning the result. 
         '''
         # may get an empty distribution
-        if pcDistribution == None:
+        if pcDistribution is None:
             return None
 
         soln = [0] * 12
@@ -363,7 +363,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             list of keys in letters, sorted from most likely to least likely
         '''
         # case of empty data
-        if keyResults == None:
+        if keyResults is None:
             return None
 
         likelyKeys = [0] * 12
@@ -384,7 +384,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             difference of the top two keys
         '''
         # case of empty analysis
-        if keyResults == None:
+        if keyResults is None:
             return None
  
         soln = [0] * 12
@@ -437,7 +437,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             keySortOrderFiltered = []
             for keyEl in _keySortOrder:
                 for sol in solutionsUsed: # three values
-                    if sol[0] == None: 
+                    if sol[0] is None: 
                         continue
                     if keyEl == sol[0].name: # first is key string
                         keySortOrderFiltered.append(keyEl)
@@ -491,7 +491,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
     def solutionToColor(self, solution):
         solutionKey = solution[0]
         # key may be None
-        if solutionKey == None:
+        if solutionKey is None:
             return '#ffffff'
         modality = solution[1].lower()
         if modality == 'major':
@@ -529,12 +529,12 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         <music21.pitch.Pitch E>
 
         '''
-        if pitchObj == None:
+        if pitchObj is None:
             return None
 
         # this does not yet seem necessary
         # if not done at init with ref stream, do now
-#         if self.sharpFlatCount == None:
+#         if self.sharpFlatCount is None:
 #             sharpFlatCount = self._getSharpFlatCount(sStream)
 #         else:
 #             sharpFlatCount = self.sharpFlatCount
@@ -547,7 +547,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 #             favor = None
 
         flipEnharmonic = False
-#         if pitchObj.accidental != None:
+#         if pitchObj.accidental is not None:
 #             # if we have a sharp key and we need to favor flat, get enharm
 #             if pitchObj.accidental.alter > 0 and favor == 'flat':
 #                 flipEnharmonic = True
@@ -972,8 +972,8 @@ class Ambitus(DiscreteAnalysis):
         '''
         Provide uniformly distributed colors across the entire range.
         '''
-        if numColors == None:
-            if self._referenceStream != None:
+        if numColors is None:
+            if self._referenceStream is not None:
                 # get total range for entire piece
                 minPitch, maxPitch = self.getPitchRanges(self._referenceStream)
             else:
@@ -1176,7 +1176,7 @@ class Ambitus(DiscreteAnalysis):
         True
         '''    
         # a result of None may be possible
-        if result == None:
+        if result is None:
             return self._rgbToHex((255, 255, 255))
 
         return self._pitchSpanColors[result]
@@ -1194,7 +1194,7 @@ class Ambitus(DiscreteAnalysis):
         (<music21.interval.Interval m38>, '#665288')
         '''
         post = self.getPitchSpan(sStream)
-        if post != None:
+        if post is not None:
             solution = interval.Interval(noteStart = post[0], noteEnd = post[1])
         else:
             solution = None
@@ -1253,7 +1253,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         # offer similar approaches, but return Streams and manage offsets and durations, 
         # components not needed here
     
-        if found == None:
+        if found is None:
             found = {}
 
         # if this has parts, need to move through each at a time
@@ -1353,7 +1353,7 @@ def analyzeStream(streamObj, *args, **keywords):
         
     match = analysisClassFromMethodName(method)
     
-    if match != None:
+    if match is not None:
         obj = match() # NOTE: Cuthbert, this was previously analysisClassName()? - out of scope
         #environLocal.printDebug(['analysis method used:', obj])
         return obj.getSolution(streamObj)
@@ -1417,7 +1417,7 @@ def analysisClassFromMethodName(method):
                     match = analysisClass
                     #environLocal.printDebug(['matched idStr', idStr])
                     break
-            if match != None:
+            if match is not None:
                 break
 
     return match
