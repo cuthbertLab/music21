@@ -26,16 +26,7 @@ Tests for :mod:`music21.mei.base`.
 
 # pylint is bad at guessing types in these tests---reasonably so
 # pylint: disable=maybe-no-member
-
-from music21.ext import six
-from six.moves import xrange  # pylint: disable=redefined-builtin,import-error,unused-import
-from six.moves import range  # pylint: disable=redefined-builtin,import-error,unused-import
-
 import unittest
-if six.PY3:
-    from unittest import mock  # pylint: disable=no-name-in-module
-else:
-    from music21.ext import mock
 
 # To have working MagicMock objects, we can't use cElementTree even though it would be faster.
 # The C implementation provides some methods/attributes dynamically (notably "tag"), so MagicMock
@@ -44,6 +35,16 @@ from xml.etree import ElementTree as ETree
 
 from collections import defaultdict
 from fractions import Fraction
+
+from music21.ext import six
+from six.moves import xrange  # pylint: disable=redefined-builtin,import-error,unused-import
+from six.moves import range  # pylint: disable=redefined-builtin,import-error,unused-import
+
+if six.PY3:
+    from unittest import mock  # pylint: disable=no-name-in-module
+else:
+    from music21.ext import mock
+
 
 from music21 import articulations
 from music21 import bar
@@ -118,7 +119,8 @@ class TestMeiToM21Class(unittest.TestCase):
     @mock.patch('music21.mei.base._ppConclude')
     @mock.patch('music21.mei.base.scoreFromElement')
     @mock.patch('music21.mei.base.makeMetadata')
-    def testRun1(self, mockMeta, mockScoreFE, mockConclude, mockTuplet, mockBeams, mockTies, mockSlurs):
+    def testRun1(self, mockMeta, mockScoreFE, mockConclude, 
+                 mockTuplet, mockBeams, mockTies, mockSlurs):
         '''
         MeiToM21Converter.run(): that it works
         '''
@@ -1279,12 +1281,12 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertEqual('D2', actual.nameWithOctave)
         self.assertEqual(0.0, actual.quarterLength)
         self.assertEqual('16th', actual.duration.type)
-        self.assertTrue(1, actual.beams.beamsList[0].number)
-        self.assertTrue('start', actual.beams.beamsList[0].type)
-        self.assertTrue(2, actual.beams.beamsList[1].number)
-        self.assertTrue('start', actual.beams.beamsList[1].type)
-        self.assertTrue(1, len(actual.lyrics))
-        self.assertTrue('words!', actual.lyrics[0].text)
+        self.assertEqual(1, actual.beams.beamsList[0].number)
+        self.assertEqual('start', actual.beams.beamsList[0].type)
+        self.assertEqual(2, actual.beams.beamsList[1].number)
+        self.assertEqual('start', actual.beams.beamsList[1].type)
+        self.assertEqual(1, len(actual.lyrics))
+        self.assertEqual('words!', actual.lyrics[0].text)
 
     @mock.patch('music21.note.Note')
     @mock.patch('music21.mei.base._processEmbeddedElements')
@@ -4450,7 +4452,7 @@ class TestSectionScore(unittest.TestCase):
         self.assertIsInstance(meas[voiceIndex][0], note.Note)
         self.assertEqual('G4', meas[voiceIndex][0].nameWithOctave)
         self.assertIsInstance(meas[clefIndex], clef.TrebleClef)  # check out the Clef
-        self.assertIsInstance(meas[timeSigIndex], meter.TimeSignature)  # check out the TimeSignature
+        self.assertIsInstance(meas[timeSigIndex], meter.TimeSignature) # check out the TimeSignature
         self.assertEqual('8/8', meas[timeSigIndex].ratioString)
 
     @mock.patch('music21.mei.base.measureFromElement')
@@ -4466,7 +4468,8 @@ class TestSectionScore(unittest.TestCase):
             - two of <measure> (one in a <section>)
             - things in a <section> are appended properly (different for <score> and <section>)
 
-        This test is roughly equivalent to testCoreUnit1() but with a <section> instead of a <score>.
+        This test is roughly equivalent to testCoreUnit1() 
+        but with a <section> instead of a <score>.
         Note that, because the <measure> *should* be processed here, this test is indeed more
         complicated.
 
@@ -4518,7 +4521,8 @@ class TestSectionScore(unittest.TestCase):
         # setup staffDefFromElement()
         mockStaffDFE.return_value = {'whatever': 'treble clef'}
         # prepare the "expected" return
-        expected = {'1': [expMeas1, expPart1[0]]}  # must be [0] b/c expPart1 would be list of Measure
+        expected = {'1': [expMeas1, expPart1[0]]}   # must be [0] b/c expPart1 
+                                                    # would be list of Measure
         expected = (expected, expActiveMeter, expNMLeft, expMeasureNum)
 
         actual = base.sectionScoreCore(elem, allPartNs, slurBundle)
@@ -4534,7 +4538,9 @@ class TestSectionScore(unittest.TestCase):
                                               allPartNs,
                                               activeMeter=scoreDefActiveMeter,
                                               nextMeasureLeft=None,
-                                              backupMeasureNum=1,  # incremented automatically on finding a <measure>
+                                              
+                                              # incremented automatically on finding a <measure>
+                                              backupMeasureNum=1,  
                                               slurBundle=slurBundle)
         self.assertEqual('{}section'.format(_MEINS), mockSectionFE.call_args_list[0][0][0].tag)
         # ensure scoreDefFromElement()
@@ -4585,7 +4591,8 @@ class TestSectionScore(unittest.TestCase):
         slurBundle = spanner.SpannerBundle()
         allPartNs = ['1']
 
-        parsed, activeMeter, nextMeasureLeft, backupMeasureNum = base.sectionScoreCore(elem, allPartNs, slurBundle)
+        parsed, activeMeter, nextMeasureLeft, backupMeasureNum = base.sectionScoreCore(
+                                                                    elem, allPartNs, slurBundle)
 
         # ensure simple returns are okay
         self.assertEqual('8/8', activeMeter.ratioString)
@@ -4594,7 +4601,8 @@ class TestSectionScore(unittest.TestCase):
         # ensure "parsed" is the right format
         self.assertEqual(1, len(parsed))
         self.assertTrue('1' in parsed)
-        self.assertEqual(2, len(parsed['1']))  # one <measure> plus one <section> with one <measure> in it
+        self.assertEqual(2, len(parsed['1']))  # one <measure> plus one <section> 
+                            # with one <measure> in it
         # check the first Measure
         meas = parsed['1'][0]
         # the order of these doesn't matter, but it may change, so this is easier to adjust
@@ -4609,7 +4617,7 @@ class TestSectionScore(unittest.TestCase):
         self.assertIsInstance(meas[voiceIndex][0], note.Note)
         self.assertEqual('E7', meas[voiceIndex][0].nameWithOctave)
         self.assertIsInstance(meas[clefIndex], clef.TrebleClef)  # check out the Clef
-        self.assertIsInstance(meas[timeSigIndex], meter.TimeSignature)  # check out the TimeSignature
+        self.assertIsInstance(meas[timeSigIndex], meter.TimeSignature)  # check out the TS
         self.assertEqual('8/8', meas[timeSigIndex].ratioString)
         # check the second Measure
         meas = parsed['1'][1]
@@ -4672,7 +4680,8 @@ class TestSectionScore(unittest.TestCase):
         expected = (expected, expActiveMeter, expNMLeft, expMeasureNum)
 
         actual = base.sectionScoreCore(elem, allPartNs, slurBundle, activeMeter=activeMeter,
-                                       nextMeasureLeft=nextMeasureLeft, backupMeasureNum=backupMeasureNum)
+                                       nextMeasureLeft=nextMeasureLeft, 
+                                       backupMeasureNum=backupMeasureNum)
 
         # ensure expected == actual
         self.assertEqual(expected, actual)
@@ -4718,11 +4727,11 @@ class TestSectionScore(unittest.TestCase):
         backupMeasureNum = 900
 
         parsed, activeMeter, nextMeasureLeft, backupMeasureNum = base.sectionScoreCore(elem,
-                                                                                       allPartNs,
-                                                                                       slurBundle,
-                                                                                       activeMeter=activeMeter,
-                                                                                       nextMeasureLeft=nextMeasureLeft,
-                                                                                       backupMeasureNum=backupMeasureNum)
+                                                   allPartNs,
+                                                   slurBundle,
+                                                   activeMeter=activeMeter,
+                                                   nextMeasureLeft=nextMeasureLeft,
+                                                   backupMeasureNum=backupMeasureNum)
 
         # ensure simple returns are okay
         self.assertEqual('8/8', activeMeter.ratioString)

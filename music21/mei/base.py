@@ -1588,7 +1588,8 @@ def staffGrpFromElement(elem, slurBundle=None, staffDefDict=None):
 
     For now, this function is merely a container-processor  for <staffDef> elements contained
     in this <staffGrp> element given as the "elem" argument. That is, the function does not yet
-    create the brackets/braces and labels expected of a staff group. Note however that all <staffDef>
+    create the brackets/braces and labels expected of a staff group. 
+    Note however that all <staffDef>
     elements will be processed, even if they're contained within several layers of <staffGrp>.
 
     :param elem: The ``<staffGrp>`` element to process.

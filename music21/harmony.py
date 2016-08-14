@@ -193,7 +193,7 @@ class Harmony(chord.Chord):
         # if the bass is not specified, but the root is,
         # assume the bass and root are identical and
         # assign the values accordingly
-        if self._bass == None:
+        if self._bass is None:
             self.bass(self._root)
             
         updatePitches = keywords.get('updatePitches', True)
@@ -284,7 +284,7 @@ class Harmony(chord.Chord):
         >>> h.figure
         'CM'
         '''
-        if self._figure == None:
+        if self._figure is None:
             return self.findFigure()
         else:
             return self._figure
@@ -1755,7 +1755,7 @@ class ChordSymbol(Harmony):
                     i = 0
                     charString = ''
                     for char in itemString:
-                        if skipNext == False:
+                        if not skipNext:
                             if char == '1':
                                 indexes.append(itemString[i] + itemString[i + 1])
                                 skipNext = True
@@ -1837,7 +1837,7 @@ class ChordSymbol(Harmony):
             'minor-ninth',
             )
        
-        if self._root == None or self.chordKind == None:
+        if self._root is None or self.chordKind is None:
             return
 
         # create figured bass scale with root as scale
@@ -2010,7 +2010,7 @@ class ChordSymbol(Harmony):
             #there is no hope to determine the chord from pitches
             # if it's been modified, so we'll just have to try this route....
             
-            if self.root() == None:
+            if self.root() is None:
                 raise HarmonyException('Cannot find figure. No root to the chord found' , self)
             else:
                 figure = self.root().name
@@ -2096,10 +2096,10 @@ class ChordSymbol(Harmony):
             or self.chordKind in thirteenths
             ):
             return True
-        elif (inversion == 2 or inversion == 1) \
-            and not self.chordKind == 'pedal':
+        elif ((inversion == 2 or inversion == 1) 
+                and not self.chordKind == 'pedal'):
             return True
-        elif inversion == None:
+        elif inversion is None:
             return False
         else:
             return False

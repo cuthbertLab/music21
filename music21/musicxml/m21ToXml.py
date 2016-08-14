@@ -1843,7 +1843,7 @@ class PartExporter(XMLExporterBase):
         if firstInstId in instIdList or firstInstId is None: # must have unique ids 
             self.firstInstrumentObject.partIdRandomize() # set new random id
 
-        if (self.firstInstrumentObject.midiChannel == None
+        if (self.firstInstrumentObject.midiChannel is None
             or self.firstInstrumentObject.midiChannel in self.midiChannelList):
             try:
                 self.firstInstrumentObject.autoAssignMidiChannel(usedChannels=self.midiChannelList)
@@ -1998,7 +1998,7 @@ class PartExporter(XMLExporterBase):
     def instrumentToXmlMidiInstrument(self, i):
         mxMidiInstrument = Element('midi-instrument')
         mxMidiInstrument.set('id', str(i.instrumentId))
-        if i.midiChannel == None:
+        if i.midiChannel is None:
             i.autoAssignMidiChannel()
             # TODO: allocate channels from a higher level
         mxMidiChannel = SubElement(mxMidiInstrument, 'midi-channel')

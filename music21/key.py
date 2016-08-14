@@ -388,7 +388,7 @@ class KeySignature(base.Music21Object):
     def _strDescription(self):
         output = ""
         ns = self.sharps
-        if ns == None:
+        if ns is None:
             output = 'None'
         elif ns > 1:
             output = "%s sharps" % str(ns)

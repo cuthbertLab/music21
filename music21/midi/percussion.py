@@ -9,13 +9,12 @@
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
+import unittest
+import copy
 
 from music21 import pitch
 from music21 import exceptions21
 from music21 import instrument
-
-import unittest
-import copy
 
 class MIDIPercussionException(exceptions21.Music21Exception):
     pass

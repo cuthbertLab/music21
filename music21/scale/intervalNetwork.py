@@ -33,6 +33,12 @@ import copy
 import unittest
 
 from collections import OrderedDict
+try:
+    import networkx
+except ImportError:
+    # lacking this does nothing
+    networkx = None
+    #_missingImport.append('networkx')
 
 from music21 import exceptions21
 from music21 import interval
@@ -45,13 +51,6 @@ from music21 import environment
 _MOD = "intervalNetwork.py"
 environLocal = environment.Environment(_MOD)
 
-
-try:
-    import networkx
-except ImportError:
-    # lacking this does nothing
-    networkx = None
-    #_missingImport.append('networkx')
 
 # these are just symbols/place holders; values do not matter as long
 # as they are not positive ints

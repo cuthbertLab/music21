@@ -1814,8 +1814,8 @@ class Interval(IntervalBase):
         elif (len(arguments) == 2 
               and hasattr(arguments[0], 'isNote') 
               and hasattr(arguments[1], 'isNote') 
-              and arguments[0].isNote == True 
-              and arguments[1].isNote == True):
+              and arguments[0].isNote is True 
+              and arguments[1].isNote is True):
             self._noteStart = arguments[0]
             self._noteEnd = arguments[1]
         else:

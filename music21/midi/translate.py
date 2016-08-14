@@ -148,7 +148,7 @@ def midiToDuration(ticks, ticksPerQuarter=None, inputM21DurationObject=None):
     else:
         d = inputM21DurationObject
 
-    if ticksPerQuarter == None:
+    if ticksPerQuarter is None:
         ticksPerQuarter = defaults.ticksPerQuarter
     # given a value in ticks
     d._qtrLength = float(ticks) / ticksPerQuarter
@@ -317,12 +317,12 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     94
 
     '''
-    if inputM21 == None:
+    if inputM21 is None:
         n = note.Note()
     else:
         n = inputM21
 
-    if ticksPerQuarter == None:
+    if ticksPerQuarter is None:
         ticksPerQuarter = defaults.ticksPerQuarter
 
     # pre sorted from a stream
@@ -499,12 +499,12 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     >>> c.duration.quarterLength
     2.0
     '''
-    if inputM21 == None:
+    if inputM21 is None:
         c = chord.Chord()
     else:
         c = inputM21
 
-    if ticksPerQuarter == None:
+    if ticksPerQuarter is None:
         ticksPerQuarter = defaults.ticksPerQuarter
 
     from music21 import pitch
@@ -1291,7 +1291,7 @@ def _processPackets(packets, channelForInstrument=None, channelsDynamic=None,
 
     # after processing, collect all channels used
     foundChannels = []
-    for start, stop, usedChannel in uniqueChannelEvents.keys(): # a list
+    for start, stop, usedChannel in list(uniqueChannelEvents): # a list
         if usedChannel not in foundChannels:
             foundChannels.append(usedChannel)
 #         for ch in chList:
@@ -1424,11 +1424,11 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     #environLocal.printDebug(['midiTrackToStream(): got midi track: events', 
     # len(mt.events), 'ticksPerQuarter', ticksPerQuarter])
 
-    if inputM21 == None:
+    if inputM21 is None:
         s = stream.Stream()
     else:
         s = inputM21
-    if ticksPerQuarter == None:
+    if ticksPerQuarter is None:
         ticksPerQuarter = defaults.ticksPerQuarter
 
     # need to build chords and notes
@@ -1623,7 +1623,10 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
             quarterLengthDivisors = keywords["quarterLengthDivisors"]
         else: 
             quarterLengthDivisors = None   
-        s.quantize(quarterLengthDivisors = quarterLengthDivisors, processOffsets=True, processDurations=True, inPlace=True)
+        s.quantize(quarterLengthDivisors=quarterLengthDivisors, 
+                   processOffsets=True, 
+                   processDurations=True, 
+                   inPlace=True)
 
     if voicesRequired:
         pass
@@ -1829,7 +1832,7 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
     '''
     Given a list of midiTracks, populate this Stream with a Part for each track. 
     '''
-    if inputM21 == None:
+    if inputM21 is None:
         s = stream.Score()
     else:
         s = inputM21
@@ -2010,7 +2013,7 @@ def midiAsciiStringToBinaryString(midiFormat=1, ticksPerQuarterNote=960, tracksE
                 else:
                     environLocal.warn("Unsupported meta event: 0x%s" % (chunk_event_param[1])) 
                                         
-                if valid == True:
+                if valid:
                     trk.events.append(dt)
                     trk.events.append(me)
                                 
@@ -2068,7 +2071,7 @@ def midiFileToStream(mf, inputM21=None, quantizePost=True, **keywords):
     11
     '''
     #environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
-    if inputM21 == None:
+    if inputM21 is None:
         s = stream.Score()
     else:
         s = inputM21
@@ -2079,7 +2082,10 @@ def midiFileToStream(mf, inputM21=None, quantizePost=True, **keywords):
         # create a stream for each tracks   
         # may need to check if tracks actually have event data
         midiTracksToStreams(mf.tracks, 
-            ticksPerQuarter=mf.ticksPerQuarterNote, quantizePost=quantizePost, inputM21=s, **keywords)
+                            ticksPerQuarter=mf.ticksPerQuarterNote, 
+                            quantizePost=quantizePost, 
+                            inputM21=s, 
+                            **keywords)
         #s._setMidiTracks(mf.tracks, mf.ticksPerQuarterNote)
 
     return s

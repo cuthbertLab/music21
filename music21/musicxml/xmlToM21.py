@@ -492,6 +492,7 @@ class MusicXMLImporter(XMLParserBase):
         self.xmlRootToScore(self.xmlRoot, self.stream)
     
     def parseXMLText(self):
+        # pylint: disable=undefined-variable
         if six.PY3 and isinstance(self.xmlText, bytes):
             self.xmlText = self.xmlText.decode('utf-8')
         elif six.PY2 and isinstance(self.xmlText, unicode): # @UndefinedVariable
@@ -2101,7 +2102,7 @@ class MeasureParser(XMLParserBase):
         E#3
         '''
         seta = _setAttributeFromTagText
-        if inputM21 == None:
+        if inputM21 is None:
             p = pitch.Pitch()
         else:
             p = inputM21
@@ -2342,7 +2343,7 @@ class MeasureParser(XMLParserBase):
         >>> c.dots
         1
         '''
-        if inputM21 == None:
+        if inputM21 is None:
             d = None
         else:
             d = inputM21

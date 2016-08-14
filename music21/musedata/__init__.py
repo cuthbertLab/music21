@@ -9,7 +9,6 @@
 # Copyright:    Copyright © 2010, 2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 '''
 **N.B. in Dec. 2014 MuseData access was removed from music21 because the rights conflicted with
 access computationally from music21.  This module is retained for anyone who has such access,
@@ -194,7 +193,7 @@ class MuseDataRecord(object):
         >>> mdr._getAccidentalObject().displayStatus == True
         True
         >>> mdr = musedata.MuseDataRecord('F#4    1        s ')
-        >>> mdr._getAccidentalObject() == None
+        >>> mdr._getAccidentalObject() is None
         True
         '''
         # this is not called by stage 1 
@@ -386,7 +385,7 @@ class MuseDataRecord(object):
         >>> mdr.getBeams()
         ']\'
         >>> mdr = musedata.MuseDataRecord('E2     4        q     u')
-        >>> mdr.getBeams() == None
+        >>> mdr.getBeams() is None
         True
 
         '''
@@ -776,7 +775,7 @@ class MuseDataPart(object):
         self._divisionsPerQuarterNote = None
 
         self.stage = stage
-        if self.stage == None and len(self.src) > 0:
+        if self.stage is None and len(self.src) > 0:
             self.stage = self._determineStage()
         if self.stage == 1:
             self.src = self._scrubStage1(self.src)
@@ -1059,7 +1058,7 @@ class MuseDataPart(object):
                     raw = self._getDigitsFollowingTag(line, 'of')
                     break
                 i += 1
-            if raw == None:
+            if raw is None:
                 return None
             else:
                 return int(raw)
@@ -1086,7 +1085,7 @@ class MuseDataPart(object):
                     raw = self._getDigitsFollowingTag(line, 'part')
                     break
                 i += 1
-            if raw == None:
+            if raw is None:
                 return None
             else:
                 return int(raw)
@@ -1316,7 +1315,7 @@ class MuseDataPart(object):
         >>> mdw.addFile(fp2)
         >>> mdw.getParts()[0]._getTranspositionParameters()
         -11
-        >>> mdw.getParts()[1]._getTranspositionParameters() == None
+        >>> mdw.getParts()[1]._getTranspositionParameters() is None
         True
         '''
         line = self._getAttributesRecord()
@@ -1360,7 +1359,7 @@ class MuseDataPart(object):
         >>> mdw.getParts()[0].getDivisionsPerQuarterNote()
         6
         '''
-        if self._divisionsPerQuarterNote == None:
+        if self._divisionsPerQuarterNote is None:
             # set once the first time this is called
             line = self._getAttributesRecord()
 
@@ -1387,7 +1386,7 @@ class MuseDataPart(object):
         '''
         
         >>> mdp = musedata.MuseDataPart()
-        >>> mdp.stage == None
+        >>> mdp.stage is None
         True
         >>> mdp._getMeasureBoundaryIndices(['$', 'A', 'B', 'm', 'C', 'm', 'D'])
         [(1, 2), (3, 4), (5, 6)]
@@ -1396,7 +1395,7 @@ class MuseDataPart(object):
         >>> mdp._getMeasureBoundaryIndices(['$', 'B', 'C', 'm', 'D', 'E'])
         [(1, 2), (3, 5)]
         '''
-        if src == None:
+        if src is None:
             src = self.src
         boundaries = []
         mIndices = []
@@ -1418,7 +1417,7 @@ class MuseDataPart(object):
                 if line.startswith('$'):
                     mAttributeRecordCount += 1
                     continue
-                if mAttributeRecordCount > 0 and firstPostAttributesIndex == None:
+                if mAttributeRecordCount > 0 and firstPostAttributesIndex is None:
                     firstPostAttributesIndex = i    
                     # do not continue, as this may also be a measure start
                 if line.startswith('m'):

@@ -320,7 +320,6 @@ class Date(object):
         >>> a.datetime
         Traceback (most recent call last):
         TypeError: Required argument 'day' (pos 3) not found
-
         '''
         post = []
         # order here is order for datetime

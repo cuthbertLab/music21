@@ -13,11 +13,8 @@ music21.humdrum.spineParser is a collection of utilities for changing
 native humdrum code into music21 streams.  Most music21 users will
 simply want to call:
 
-
-
 >>> #_DOCS_SHOW myFile = converter.parse('myfile.krn')
 >>> #_DOCS_SHOW myFile.show()
-
 
 The methods in here are documented for developers wishing to expand
 music21's ability to parse humdrum.
@@ -45,7 +42,6 @@ SpineParsing consists of several steps.
 * Lyrics and Dynamics are placed into their corresponding HumdrumSpine.stream objects
 * Stream elements are moved into their measures within a Stream
 * Measures are searched for elements with voice groups and Voice objects are created
-
 '''
 # pylint: disable=redefined-builtin
 #python3
@@ -54,9 +50,10 @@ try:
 except NameError:
     basestring = str # @ReservedAssignment
 
-import unittest
 import math
+import os
 import re
+import unittest
 
 from music21.ext import six
 
@@ -84,8 +81,6 @@ _MOD = "humdrum.spineParser"
 environLocal = environment.Environment(_MOD)
 
 flavors = {'JRP': False}
-
-import os
 
 spinePathIndicators = ["*+", "*-", "*^", "*v", "*x", "*"]
 
@@ -546,7 +541,7 @@ class HumdrumDataCollection(object):
         '''
 
 
-        if protoSpines == None or eventCollections == None:
+        if protoSpines is None or eventCollections is None:
             protoSpines = self.protoSpines
             eventCollections = self.eventCollections
         maxSpines = len(protoSpines)
@@ -1748,7 +1743,7 @@ class SpineCollection(object):
         '''
         positionDict = {}
         for thisSpine in self.spines:
-            if thisSpine.parentSpine == None:
+            if thisSpine.parentSpine is None:
                 sf = thisSpine.stream.flat
                 for el in sf:
                     if hasattr(el, 'humdrumPosition'):
@@ -1772,7 +1767,7 @@ class SpineCollection(object):
         tf = duration.TupletFixer()
 
         for thisSpine in self.spines:
-            if thisSpine.parentSpine == None:
+            if thisSpine.parentSpine is None:
                 thisSpine.stream = thisSpine.moveElementsIntoMeasures(thisSpine.stream)
 
                 # fix tuplet groups
@@ -1792,7 +1787,7 @@ class SpineCollection(object):
         '''
         kernStreams = {}
         for thisSpine in self.spines:
-            if thisSpine.parentSpine == None:
+            if thisSpine.parentSpine is None:
                 if thisSpine.spineType == 'kern':
                     for tandem in thisSpine.stream.getElementsByClass('MiscTandem'):
                         if tandem.tandem.startswith('*staff'):
@@ -1800,7 +1795,7 @@ class SpineCollection(object):
                             kernStreams[staffInfo] = thisSpine.stream
                             break
         for thisSpine in self.spines:
-            if thisSpine.parentSpine == None:
+            if thisSpine.parentSpine is None:
                 if thisSpine.spineType != 'kern':
                     stavesAppliedTo = []
                     prioritiesToSearch = {}
@@ -1846,7 +1841,7 @@ class SpineCollection(object):
         Should be done after measures have been made.
         '''
         for thisSpine in self.spines:
-            if thisSpine.spineType == 'kern' and thisSpine.parentSpine == None:
+            if thisSpine.spineType == 'kern' and thisSpine.parentSpine is None:
                 thisStream = thisSpine.stream
                 for el in thisStream:
                     if 'Measure' in el.classes:

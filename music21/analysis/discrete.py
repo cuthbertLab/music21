@@ -1195,7 +1195,7 @@ class Ambitus(DiscreteAnalysis):
         '''
         post = self.getPitchSpan(sStream)
         if post is not None:
-            solution = interval.Interval(noteStart = post[0], noteEnd = post[1])
+            solution = interval.Interval(noteStart=post[0], noteEnd=post[1])
         else:
             solution = None
         color = self.solutionToColor(post[1].ps - post[0].ps)
@@ -1241,8 +1241,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         # TODO: map diversity to color span
         return '#ffffff'
 
-    def countMelodicIntervals(self, sStream, found=None, ignoreDirection=True, 
-        ignoreUnison=True):
+    def countMelodicIntervals(self, sStream, found=None, ignoreDirection=True, ignoreUnison=True):
         '''
         Find all unique melodic intervals in this Stream. 
 

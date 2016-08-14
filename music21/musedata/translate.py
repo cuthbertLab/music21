@@ -165,7 +165,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
     from music21 import note
     from music21 import tempo
 
-    if inputM21 == None:
+    if inputM21 is None:
         s = stream.Score()
     else:
         s = inputM21
@@ -339,7 +339,7 @@ def museDataWorkToStreamScore(museDataWork, inputM21=None):
     from music21 import stream
     from music21 import metadata
 
-    if inputM21 == None:
+    if inputM21 is None:
         s = stream.Score()
     else:
         s = inputM21

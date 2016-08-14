@@ -91,9 +91,19 @@ Below is an example of a complete JSON request::
     }
     
 '''
+import cgi
 import collections
+import json
+import re #@UnusedImport
+import traceback
 import sys
 import unittest
+import zipfile #@UnusedImport
+try:
+    import urlparse
+except ImportError:
+    from urllib import parse as urlparse
+
 
 # music21 imports
 from music21 import common
@@ -112,17 +122,6 @@ from music21.ext import six
 from music21.alpha.webapps import templates
 from music21.alpha.webapps import apps     
 from music21.alpha.webapps import commands  
-
-# python library imports
-import json
-import zipfile #@UnusedImport
-import cgi
-try:
-    import urlparse
-except ImportError:
-    from urllib import parse as urlparse
-import re #@UnusedImport
-import traceback
 
 from music21.ext.six import StringIO
 

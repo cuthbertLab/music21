@@ -22,10 +22,10 @@ how-can-i-produce-real-time-audio-output-from-music-made-with-music21
 
 Requires pygame: http://www.pygame.org/download.shtml
 '''
+import unittest
+
 from music21.exceptions21 import Music21Exception
 from music21.midi import translate as midiTranslate
-
-import unittest
 
 from music21.ext import six
 
