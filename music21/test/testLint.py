@@ -75,6 +75,7 @@ def main(fnAccept=None):
 
                 'arguments-differ', # someday...
                 'abstract-class-instantiated', # this trips on the fractions.Fraction() class.
+                'multiple-imports', # import os, sys -- fine...
                 'fixme', # known...
                 'superfluous-parens', # nope -- if they make things clearer...
                 'too-many-statements', # someday
@@ -100,6 +101,14 @@ def main(fnAccept=None):
                            # x = copy.deepcopy(self); x._volume = ... which is not a problem...
                 'unused-argument',
                 'import-self', # fix is either to get rid of it or move away many tests...
+                
+                'redefined-variable-type', # this would be great! but too much.
+
+                'simplifiable-if-statement', # NO! NO! NO!
+                #  if (x or y and z and q): return True, else: return False,
+                #      is a GREAT paradigm -- over "return (x or y and z and q)" and
+                #      assuming that it returns a bool...  it's no slower than
+                #      the simplification and it's so much clearer.
                ]
 
     goodnameRx = {'argument-rgx': r'[a-z_][A-Za-z0-9_]{2,30}$',

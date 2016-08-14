@@ -6,7 +6,7 @@
 # Authors:      Josiah Wolf Oberholtzer
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
@@ -74,8 +74,7 @@ def listOfTreesByClass(inputStream,
         currentParentage = (inputStream,)
         ## fix non-tuple classLists -- first call only...
         if classLists:
-            for i in range(len(classLists)):
-                cl = classLists[i]
+            for i, cl in enumerate(classLists):
                 if not common.isIterable(cl):
                     classLists[i] = (cl,)
 
@@ -271,7 +270,8 @@ def asTimespans(inputStream, flatten, classList):
     since that caches the TimespanTree.
 
     >>> score = corpus.parse('bwv66.6')
-    >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True, classList=(note.Note, chord.Chord))
+    >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True, 
+    ...                                         classList=(note.Note, chord.Chord))
     >>> scoreTree
     <TimespanTree {165} (0.0 to 36.0) <music21.stream.Score ...>>
     >>> for x in scoreTree[:5]:

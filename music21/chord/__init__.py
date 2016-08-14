@@ -1575,7 +1575,7 @@ class Chord(note.NotRest):
 
         elif (self._inversion is None and find is True) or testRoot is not None:
             try:
-                if rootPitch == None or self.bass() == None:
+                if rootPitch is None or self.bass() is None:
                     return None
             except ChordException:
                 raise ChordException("Not a normal inversion") # can this be run?
@@ -4782,19 +4782,19 @@ class Test(unittest.TestCase):
         Cq.duration.type = "quarter"
 
         chord35 = Chord([Cq])
-        self.assertEquals(chord35.duration.type, "quarter")
+        self.assertEqual(chord35.duration.type, "quarter")
 
         Dh = note.Note('D4')
         Dh.duration.type = "half"
 
         chord36 = Chord([Cq, Dh])
-        self.assertEquals(chord36.duration.type, "quarter")
+        self.assertEqual(chord36.duration.type, "quarter")
 
         chord37 = Chord([Dh, Cq])
-        self.assertEquals(chord37.duration.type, "half")
+        self.assertEqual(chord37.duration.type, "half")
 
         chord38 = Chord([Cq, Dh], type="whole")
-        self.assertEquals(chord38.duration.type, "whole")
+        self.assertEqual(chord38.duration.type, "whole")
 
     def testShortCuts(self):
         chord1 = Chord(["C#4", "E4", "G4"])

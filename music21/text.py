@@ -144,7 +144,7 @@ def prependArticle(src, language=None):
     if ',' not in src: # must have a comma
         return src
 
-    if language == None: # get all languages?
+    if language is None: # get all languages?
         ref = []
         for key in articleReference:
             ref += articleReference[key]
@@ -182,7 +182,7 @@ def postpendArticle(src, language=None):
     if ' ' not in src: # must have at least one space
         return src
 
-    if language == None: # get all languages?
+    if language is None: # get all languages?
         ref = []
         for key in articleReference:
             ref += articleReference[key]
@@ -849,8 +849,3 @@ if __name__ == "__main__":
 
 #------------------------------------------------------------------------------
 # eof
-
-
-
-
-

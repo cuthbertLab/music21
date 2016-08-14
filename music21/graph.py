@@ -142,7 +142,7 @@ VALUES = ['pitch', 'pitchspace', 'ps', 'pitchclass', 'pc', 'duration',
           'quarterlength', 'offset', 'time', 'dynamic', 'dynamics', 'instrument']
 
 def userValuesToValues(valueList):
-    '''Given a value list, replace string with synonymes. Let unmatched values pass.
+    '''Given a value list, replace string with synonyms. Let unmatched values pass.
     '''  
     post = []
     for value in valueList:
@@ -5324,7 +5324,7 @@ _DOC_ORDER = [
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='testGetPlotsToMakeA')
 
 #------------------------------------------------------------------------------
 # eof

@@ -668,15 +668,13 @@ def mergeVariantsEqualDuration(streams, variantNames, inPlace=False):
         returnObjParts = returnObj.getElementsByClass('Part')
         if len(returnObjParts) != 0: # If parts exist, iterate through them.
             sParts = s.getElementsByClass('Part')
-            for i in range(len(returnObjParts)):
-                returnObjPart = returnObjParts[i]
+            for i, returnObjPart in enumerate(returnObjParts):
                 sPart = sParts[i]
                 
                 returnObjMeasures = returnObjPart.getElementsByClass('Measure')
                 if len(returnObjMeasures) != 0: 
                     # If measures exist and parts exist, iterate through them both.
-                    for j in range(len(returnObjMeasures)):
-                        returnObjMeasure = returnObjMeasures[j]
+                    for j, returnObjMeasure in enumerate(returnObjMeasures):
                         sMeasure = sPart.getElementsByClass('Measure')[j]
                         _mergeVariants(
                             returnObjMeasure, sMeasure, variantName=variantName, inPlace=True)
@@ -686,7 +684,7 @@ def mergeVariantsEqualDuration(streams, variantNames, inPlace=False):
         else:
             returnObjMeasures = returnObj.getElementsByClass('Measure')
             if len(returnObjMeasures) != 0: #If no parts, but still measures, iterate through them.
-                for j in range(len(returnObjMeasures)):
+                for j, returnObjMeasure in enumerate(returnObjMeasures):
                     returnObjMeasure = returnObjMeasures[j]
                     sMeasure = s.getElementsByClass('Measure')[j]
                     _mergeVariants(returnObjMeasure, sMeasure, 
@@ -1705,7 +1703,7 @@ def _doVariantFixingOnStream(s, variantNames=None):
     
     for v in s.variants:
         if isinstance(variantNames, list): #If variantNames are controlled
-            if set(v.groups) & set(variantNames) is []: 
+            if set(v.groups) and set(variantNames) is []: 
                 # and if this variant is not in the controlled list
                 continue # then skip it
         else: # otherwise, skip it unless it is a strict insertion of deletion

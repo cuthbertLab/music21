@@ -1190,7 +1190,8 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
 #                             "Misaligned braille groupings: " + 
 #                             "groupingKeyLeft was %s" % gkLeft + 
 #                             "groupingKeyRight was %s" % gkRight + 
-#                             "rightSegment was %s, leftSegment was %s" % (rightSegment, leftSegment))
+#                             "rightSegment was %s, leftSegment was %s" % 
+#                                        (rightSegment, leftSegment))
 # 
 #                     try:
 #                         combinedGroupingTuple = (gkRight, gkLeft)
@@ -1226,9 +1227,11 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
             if ((rightKey is not None and rightKey.affinity >= Affinity.INACCORD)
                     or (leftKey is not None and leftKey.affinity >= Affinity.INACCORD)):
                 self.extractNoteGrouping() # Note or Inaccord Grouping
-#             elif rightKey.affinity == Affinity.SIGNATURE or leftKey.affinity == Affinity.SIGNATURE:
+#             elif (rightKey.affinity == Affinity.SIGNATURE 
+#                    or leftKey.affinity == Affinity.SIGNATURE):
 #                 self.extractSignatureGrouping() # Signature Grouping
-#             elif rightKey.affinity == Affinity.LONG_TEXTEXPR or leftKey.affinity == Affinity.LONG_TEXTEXPR:
+#             elif (rightKey.affinity == Affinity.LONG_TEXTEXPR 
+#                    or leftKey.affinity == Affinity.LONG_TEXTEXPR):
 #                 self.extractLongExpressionGrouping() # Long Expression Grouping
 #             elif rightKey.affinity == Affinity.TTEXT or leftKey.affinity == Affinity.TTEXT:
 #                 self.extractTempoTextGrouping() # Tempo Text Grouping

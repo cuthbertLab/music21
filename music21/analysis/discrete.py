@@ -723,7 +723,7 @@ class KrumhanslKessler(KeyWeightKeyAnalysis):
     key determination algorithm.
 
     Values from from http://extra.humdrum.org/man/keycor/, which describes these 
-    weightings as "Strong tendancy to identify the dominant key as the tonic."
+    weightings as "Strong tendency to identify the dominant key as the tonic."
     '''
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
@@ -769,7 +769,7 @@ class AardenEssen(KeyWeightKeyAnalysis):
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Aarden Essen Key Analysis'
-    identifiers = ['key.aarden', 'key.essen', 'key.aarden-essen', 'key.aardenessen'
+    identifiers = ['key.aarden', 'key.essen', 'key.aarden-essen', 'key.aardenessen',
                    'aarden', 'essen', 'aarden-essen', 'aardenessen',
                    ]
     # adding these identifiers make this the default
@@ -809,7 +809,7 @@ class SimpleWeights(KeyWeightKeyAnalysis):
 
     Values from from http://extra.humdrum.org/man/keycor/, which describes 
     these weightings as "Performs most consistently with large regions of music, 
-    becomes noiser with smaller regions of music."
+    becomes noisier with smaller regions of music."
     '''
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
@@ -846,7 +846,7 @@ class BellmanBudge(KeyWeightKeyAnalysis):
     Implementation of Bellman-Budge weightings for Krumhansl-Schmuckler key determination algorithm.
 
     Values from from http://extra.humdrum.org/man/keycor/, which describes these 
-    weightings as "No particular tendancies for confusions with neighboring keys."
+    weightings as "No particular tendencies for confusions with neighboring keys."
     '''
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
@@ -888,7 +888,7 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
     key determination algorithm.
 
     Values from from http://extra.humdrum.org/man/keycor/, which describes 
-    these weightings as "Strong tendancy to identify the relative major as the tonic 
+    these weightings as "Strong tendency to identify the relative major as the tonic 
     in minor keys. Well-balanced for major keys."
     '''
     # from http://extra.humdrum.org/man/keycor/
@@ -1394,8 +1394,8 @@ def analysisClassFromMethodName(method):
     match = None
     for analysisClass in analysisClasses:    
         # this is a very loose matching, as there are few classes now
-        if (method.lower() in analysisClass.__name__.lower() or
-            method.lower() in analysisClass.name):
+        if (method.lower() in analysisClass.__name__.lower()
+                or method.lower() in analysisClass.name):
             match = analysisClass
             #environLocal.printDebug(['matched analysis class name'])
             break
