@@ -98,6 +98,13 @@ class ContiguousSegmentOfNotes(base.Music21Object):
         self.containerStream = containerStream
         self.partNumber = partNumber
         
+    def __repr__(self):
+        chordList = []
+        for ch in self.segment:
+            chordPitches = ' '.join(str(p) for p in ch.pitches)
+            chordList.append(chordPitches)
+        return '<music21.alpha.search.serial.ContiguousSegmentOfNotes {}>'.format(chordList)
+        
     @property
     def startMeasureNumber(self):
         '''The measure number on which the contiguous segment begins.'''
@@ -277,7 +284,9 @@ class ContiguousSegmentSearcher(object):
 
     >>> skipConsecutiveList = searcher.byLength(3)
     >>> print(skipConsecutiveList)
-    [<music21.alpha.search.serial.ContiguousSegmentOfNotes object ...]
+    [<music21.alpha.search.serial.ContiguousSegmentOfNotes ['G4', 'A4', 'B4']>, 
+     <music21.alpha.search.serial.ContiguousSegmentOfNotes ['A4', 'B4', 'C5']>]
+     
     >>> [instance.segment for instance in skipConsecutiveList]
     [[<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 
      [<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>]]
@@ -430,6 +439,10 @@ class ContiguousSegmentSearcher(object):
     
     >>> searcher.reps = 'rowsOnly'
     >>> rowsOnlyChords = searcher.byLength(4)
+    >>> rowsOnlyChords
+    [<music21.alpha.search.serial.ContiguousSegmentOfNotes ['D4', 'F4 G4', 'B4 D#5 F#5']>,
+     <music21.alpha.search.serial.ContiguousSegmentOfNotes ['F4 G4', 'B4 D#5 F#5']>]
+    
     >>> [seg.segment for seg in rowsOnlyChords]
     [[<music21.note.Note D>, <music21.chord.Chord F4 G4>, <music21.chord.Chord B4 D#5 F#5>], 
      [<music21.chord.Chord F4 G4>, <music21.chord.Chord B4 D#5 F#5>]]
@@ -796,12 +809,19 @@ class ContiguousSegmentSearcher(object):
                 self.activeChordList = activeChordList
                 csn = self.addActiveChords(partNumber)
                 rowSuperset = csn.readPitchClassesFromBottom()
-                lowerBound = max([0, len(rowSuperset) - self.searchLength - len(self.activeChordList[-1].pitches) + 1])
-                upperBound = min([len(self.activeChordList[0].pitches), len(rowSuperset) - self.searchLength + 1])
+                lowerBound = max([0, 
+                                  len(rowSuperset) 
+                                    - self.searchLength 
+                                    - len(self.activeChordList[-1].pitches) 
+                                    + 1])
+                upperBound = min([len(self.activeChordList[0].pitches), 
+                                  len(rowSuperset) - self.searchLength + 1])
                 for j in range(lowerBound, upperBound):
                     if len(set(rowSuperset[j:j + self.searchLength])) == self.searchLength:
                         break
-                else: # was not a match, should not have been added remove from listOfContiguousSegments
+                else: 
+                    # was not a match, should not have been added, 
+                    # thus remove from listOfContiguousSegments
                     self.listOfContiguousSegments.pop()                    
 
             elif (lengthOfActive >= self.searchLength):
@@ -813,13 +833,12 @@ class ContiguousSegmentSearcher(object):
             removedChord = chordList.pop(0)
             self.totalLength -= len(removedChord.pitches)
 
-
-
-def findSegments(inputStream, searchList, reps='skipConsecutive', includeChords=True):
+class SegmentMatcher(object):
     '''
-    Finds all instances of given contiguous segments of pitch classes 
-    within a :class:`~music21.stream.Stream`.
-    
+    Matches all the ContiguousSegmentsOfNotes (found by ContiguousSegmentSearcher)
+    within a :class:`~music21.stream.Stream`
+    to one or more segments of pitch classes.
+
     The inputStream is a :class:`~music21.stream.Stream`; as 
     in :class:`~music21.alpha.search.serial.ContiguousSegmentSearcher`, 
     the inputStream can contain at most one :class:`~music21.stream.Score` and
@@ -870,14 +889,12 @@ def findSegments(inputStream, searchList, reps='skipConsecutive', includeChords=
         :width: 500
     
     >>> sc.insert(0, newpart)
-    
-    ### >>> searcher = alpha.search.serial.ContiguousSegmentSearcher(sc, includeChords=False)
-    
-    >>> GABandABC = alpha.search.serial.findSegments(sc, [[7, 9, 11], [9, 11, 0]], 
-    ...     includeChords=False)
+
+    >>> matcher = alpha.search.serial.SegmentMatcher(sc, includeChords=False)
+    >>> GABandABC = matcher.find([[7, 9, 11], [9, 11, 0]])
     >>> print(GABandABC)
-    [<music21.alpha.search.serial.ContiguousSegmentOfNotes object at 0x104a2cf98>, 
-     <music21.alpha.search.serial.ContiguousSegmentOfNotes object at 0x104a2cfd0>]
+    [<music21.alpha.search.serial.ContiguousSegmentOfNotes ['G4', 'A4', 'B4']>, 
+     <music21.alpha.search.serial.ContiguousSegmentOfNotes ['A4', 'B4', 'C5']>]
 
     >>> GABandABC[0].segment, GABandABC[1].segment
     ([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 
@@ -900,15 +917,18 @@ def findSegments(inputStream, searchList, reps='skipConsecutive', includeChords=
     Below, 'B' refers to the
     pitch class 11, which only coincidentally is the same as that of the note B.
     
-    >>> len(alpha.search.serial.findSegments(sc, [[7, 9, 11], ['B', 0]], includeChords=False))
-    2
+    >>> x = (matcher.find([[7, 9, 11], ['B', 0]]))
+    >>> x
+    [<music21.alpha.search.serial.ContiguousSegmentOfNotes ['G4', 'A4', 'B4']>, 
+     <music21.alpha.search.serial.ContiguousSegmentOfNotes ['B4', 'C5']>]
     
-    Below, we can see what happens when we include the chords.
+    Below, we can see what happens when we include the chords and use ignoreAll
     
-    >>> [seg.segment for seg in alpha.search.serial.findSegments(newpart, [[5, 7, 'B']], 
-    ...     'ignoreAll')]
+    >>> matcher = alpha.search.serial.SegmentMatcher(sc, reps='ignoreAll', includeChords=True)
+    >>> [seg.segment for seg in matcher.find([[5, 7, 'B']])]
     [[<music21.note.Note F>, <music21.chord.Chord G4 B4>]]
     
+        
     As expected, the pitch classes found segment are read 
     in the order 5, 7, 11 ('B'), as the pitches
     in the chord are read from bottom to top.
@@ -923,12 +943,25 @@ def findSegments(inputStream, searchList, reps='skipConsecutive', includeChords=
     >>> p0.append(c2)
     >>> p0 = p0.makeMeasures()
     >>> sc0.insert(0, p0)
-    >>> [(seg.segment, seg.activeSegment) for seg in alpha.search.serial.findSegments(sc0, 
-    ...     [[0, 2, 4]])]
-    [([<music21.chord.Chord C4 D4>, <music21.chord.Chord E4 F4>], [0, 2, 4])]
-    >>> [(seg.segment, seg.activeSegment) for seg in alpha.search.serial.findSegments(sc0, 
-    ...     [[2, 4, 5]])]
-    [([<music21.chord.Chord C4 D4>, <music21.chord.Chord E4 F4>], [2, 4, 5])]
+
+    >>> matcher = alpha.search.serial.SegmentMatcher(sc0)
+    >>> foundSegments = matcher.find([[0, 2, 4]])
+    >>> len(foundSegments)
+    1
+    >>> seg = foundSegments[0]
+    >>> seg.segment
+    [<music21.chord.Chord C4 D4>, <music21.chord.Chord E4 F4>]
+    >>> seg.activeSegment
+    [0, 2, 4]
+
+    >>> foundSegments = matcher.find([[2, 4, 5]])
+    >>> len(foundSegments)
+    1
+    >>> seg = foundSegments[0]
+    >>> seg.segment
+    [<music21.chord.Chord C4 D4>, <music21.chord.Chord E4 F4>]
+    >>> seg.activeSegment
+    [2, 4, 5]
     
     In the two function calls, despite the fact that two different segments 
     of pitch classes were searched for, the same
@@ -940,8 +973,9 @@ def findSegments(inputStream, searchList, reps='skipConsecutive', includeChords=
     note of the first chord and the two notes of the second
     chord in order. Both times, the chords are read from bottom to top.
     
-    >>> foundSegments = alpha.search.serial.findSegments(sc, [[7, -3, 11], [9, 11, 0]], 
-    ...    includeChords=False)
+    >>> matcher = alpha.search.serial.SegmentMatcher(sc, includeChords=False)
+    >>> foundSegments = matcher.find([[7, -3, 11], [9, 11, 0]])
+
     >>> for a in foundSegments:
     ...    print(a.matchedSegment)
     [7, -3, 11]
@@ -960,11 +994,139 @@ def findSegments(inputStream, searchList, reps='skipConsecutive', includeChords=
     >>> s.append(n3)
     >>> s.append(c)
     >>> s = s.makeMeasures()
-    >>> [seg.segment for seg in alpha.search.serial.findSegments(s, [[4, -7, 7]], 'ignoreAll')]
+
+    >>> matcher = alpha.search.serial.SegmentMatcher(s, 'ignoreAll')
+    >>> foundSegs = matcher.find([[4, -7, 7]])
+
+    >>> [seg.segment for seg in foundSegs]
     [[<music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>]]
-    >>> [seg.segment for seg in alpha.search.serial.findSegments(s, [[7, 'B', 9]], 'ignoreAll')]
+    
+    >>> foundSegs = matcher.find([[7, 'B', 9]])
+    >>> [seg.segment for seg in foundSegs]
     [[<music21.note.Note G>, <music21.chord.Chord B4 G5 A5>]]
     '''
+    def __init__(self, inputStream, reps='skipConsecutive', includeChords=True):
+        self.stream = inputStream
+        self.reps = reps
+        self.includeChords = includeChords
+        self.searchedAlready = []
+        self.matchedSegments = []
+        self.currentSearchSegmentLength = 0
+        
+    def find(self, searchList):
+        self.matchedSegments = []
+        self.searchedAlready = []
+        self.contiguousSegmentsByLength = {}
+        
+        for unNormalizedCurrentSearchSegment in searchList:
+            currentSearchSegment = self.normalize(unNormalizedCurrentSearchSegment)
+            if self.isAlreadySearched(currentSearchSegment):
+                continue
+            self.searchedAlready.append(currentSearchSegment)
+            searchSegmentLength = len(currentSearchSegment)
+            if searchSegmentLength in self.contiguousSegmentsByLength:
+                theseSegments = self.contiguousSegmentsByLength[searchSegmentLength]
+            else:
+                searcher = ContiguousSegmentSearcher(self.stream, self.reps, self.includeChords)
+                theseSegments = searcher.byLength(searchSegmentLength)
+                self.contiguousSegmentsByLength[searchSegmentLength] = theseSegments
+                
+            self.currentSearchSegmentLength = searchSegmentLength
+            for thisSegment in theseSegments:
+                if self.reps == 'ignoreAll':
+                    self.findOneIgnoreAll(thisSegment, 
+                                          currentSearchSegment, 
+                                          unNormalizedCurrentSearchSegment)
+                else:
+                    self.findOneOtherReps(thisSegment, 
+                                          currentSearchSegment,
+                                          unNormalizedCurrentSearchSegment)                    
+                
+        return self.matchedSegments
+
+    def findOneIgnoreAll(self, thisSegment, searchSegment, unNormalizedCurrentSearchSegment=None):
+        '''
+        Checks whether thisSegment is a match for the searchSegment if 'ignoreAll' is the search
+        term.
+        
+        If so adds it to self.matchedSegments.  Only matches once per segment
+        '''
+        if unNormalizedCurrentSearchSegment is None:
+            unNormalizedCurrentSearchSegment = searchSegment
+        length = self.currentSearchSegmentLength
+        thisChordList = thisSegment.segment
+        pitchClassList = thisSegment.getDistinctPitchClasses()
+        lastStartPosition = len(pitchClassList) - len(searchSegment) + 1
+        for i in range(lastStartPosition):
+            subsetToCheck = pitchClassList[i:i + length]
+            if searchSegment != subsetToCheck:
+                continue
+            if subsetToCheck[0] not in [p.pitchClass for p in thisChordList[0].pitches]:
+                continue
+            startSeg = thisChordList[:-1]
+            startSegPitchClasses = ContiguousSegmentOfNotes(startSeg).readPitchClassesFromBottom()
+            if subsetToCheck[-1] not in startSegPitchClasses:
+                thisSegment.activeSegment = subsetToCheck
+                thisSegment.matchedSegment = list(unNormalizedCurrentSearchSegment)
+                self.matchedSegments.append(thisSegment)
+                break
+            
+
+    def findOneOtherReps(self, thisSegment, searchSegment, unNormalizedCurrentSearchSegment):
+        '''
+        Checks whether thisSegment is a match for the searchSegment if 'ignoreAll' is NOT the search
+        term.
+        
+        If so adds it to self.matchedSegments.  Only matches once per segment
+        '''
+        if unNormalizedCurrentSearchSegment is None:
+            unNormalizedCurrentSearchSegment = searchSegment
+        length = self.currentSearchSegmentLength
+        thisChordList = thisSegment.segment
+        pitchClassList = thisSegment.getDistinctPitchClasses()
+        lowerBound = max([0,
+                          len(pitchClassList) - length - len(thisChordList[-1].pitches) + 1])
+        upperBound = min([len(thisChordList[0].pitches),
+                          len(pitchClassList) + 1 - length])
+        for i in range(lowerBound, upperBound):
+            subsetToCheck = pitchClassList[i:i + length]
+            if subsetToCheck != searchSegment:
+                continue
+            thisSegment.activeSegment = subsetToCheck
+            thisSegment.matchedSegment = list(unNormalizedCurrentSearchSegment)
+            self.matchedSegments.append(thisSegment)
+            break
+                
+                
+    def isAlreadySearched(self, currentSearchSegment):
+        '''
+        Returns bool on wheterh this segment has already been found.
+        '''
+        searchRow = pcToToneRow(currentSearchSegment)
+        for alreadySearchedSegment in self.searchedAlready:
+            alreadySearchedRow = pcToToneRow(alreadySearchedSegment)
+            if searchRow.isSameRow(alreadySearchedRow):
+                return True
+        return False
+    
+    @staticmethod
+    def normalize(segment):
+        '''
+        Normalize an input segment for searching.  By default just changes
+        letters to numbers, etc.
+        
+        Staticmethod:
+        
+        >>> alpha.search.serial.SegmentMatcher.normalize([3, 4, 5])
+        [3, 4, 5]
+        >>> alpha.search.serial.SegmentMatcher(None).normalize(['B', -24, '1'])
+        [11, 0, 1]
+        '''
+        return pcToToneRow(segment).pitchClasses()
+        
+    
+def findSegments(inputStream, searchList, reps='skipConsecutive', includeChords=True):
+    # deprecated; to be removed
     # pylint: disable=line-too-long,duplicate-code
     
     numsegs = len(searchList)
@@ -972,7 +1134,7 @@ def findSegments(inputStream, searchList, reps='skipConsecutive', includeChords=
     doneAlready = []
     contigdict = {}
     
-    for k in range(0,numsegs):
+    for k in range(numsegs):
         currentSearchSegment = searchList[k]
         currentSearchSegmentCopy = list(currentSearchSegment)
         used = False
@@ -1185,8 +1347,8 @@ def findTransposedSegments(inputStream, searchList, reps='skipConsecutive', incl
                                         contiguousseg.matchedSegment = currentSearchSegment
                                         segs.append(contiguousseg)
                 else:
-                    segment = contiguousseg.segment
                     pitchList = contiguousseg.readPitchClassesFromBottom()
+                    segment = contiguousseg.segment
                     matched = False
                     lowerBound = max([0, len(pitchList) - length - len(segment[-1].pitches) + 1])
                     upperBound = min([len(segment[0].pitches) - 1, len(pitchList) - length])
@@ -1256,7 +1418,7 @@ def findTransformedSegments(inputStream, searchList,
     2
     >>> firstInstance = rowInstances[0]
     >>> firstInstance
-    <music21.alpha.search.serial.ContiguousSegmentOfNotes object at 0x1047c9550>
+    <music21.alpha.search.serial.ContiguousSegmentOfNotes ['C#4', 'E4', 'D#4']>
     
     >>> firstInstance.activeSegment, firstInstance.startMeasureNumber
     ([1, 4, 3], 1)
@@ -1594,8 +1756,8 @@ def findMultisets(inputStream, searchList, reps='skipConsecutive', includeChords
                                                 contiguousseg.matchedSegment = multiset
                                                 multisets.append(contiguousseg)
                 else:
-                    segment = contiguousseg.segment
                     pitchList = contiguousseg.readPitchClassesFromBottom()
+                    segment = contiguousseg.segment
                     matched = False
                     lowerBound = max([0, len(pitchList) - length - len(segment[-1].pitches) + 1])
                     upperBound = min([len(segment[0].pitches) - 1, len(pitchList) - length])
