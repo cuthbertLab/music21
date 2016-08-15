@@ -13,11 +13,16 @@ import copy
 import unittest
 from operator import attrgetter
 
-from music21 import base, note, spanner, stream
+from music21 import base
+from music21 import common
 from music21 import environment
+from music21 import note
+from music21 import spanner
+from music21 import stream
+
 environLocal = environment.Environment()
 
-from music21.serial import pcToToneRow, SerialException
+from music21.serial import pcToToneRow, SerialException, ToneRow
 # ------- parsing functions for atonal music -------
 
 def _checkMultisetEquivalence(multiset1, multiset2):
@@ -123,6 +128,22 @@ class ContiguousSegmentOfNotes(base.Music21Object):
             return self.segment[0].offset
         else:
             return None
+
+    def getActiveMatchedRows(self):
+        '''
+        Returns two ToneRow objects, the activeSegment as ToneRow
+        and the matchedSegment as ToneRow
+        '''
+        if isinstance(self.activeSegment, ToneRow):
+            activeRow = self.activeSegment
+        else:
+            activeRow = pcToToneRow(self.activeSegment)
+
+        if isinstance(self.matchedSegment, ToneRow):
+            matchedRow = self.matchedSegment
+        else:
+            matchedRow = pcToToneRow(self.matchedSegment)
+        return(activeRow, matchedRow)
     
     @property
     def zeroCenteredTransformationsFromMatched(self):
@@ -133,8 +154,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
         For an explanation of the zero-centered convention for serial transformations, 
         see :meth:`music21.alpha.search.serial.ToneRow.zeroCenteredTransformation`.
         '''
-        activeRow = pcToToneRow(self.activeSegment)
-        matchedRow = pcToToneRow(self.matchedSegment)
+        (activeRow, matchedRow) = self.getActiveMatchedRows()
         return matchedRow.findZeroCenteredTransformations(activeRow)
     
     @property
@@ -144,9 +164,9 @@ class ContiguousSegmentOfNotes(base.Music21Object):
         :func:`~music21.alpha.search.serial.findTransformedSegments`. 
         For an explanation of the 
         zero-centered convention for serial transformations, see 
-        :meth:`music21.alpha.search.serial.ToneRow.originalCenteredTransformation`.'''        
-        activeRow = pcToToneRow(self.activeSegment)
-        matchedRow = pcToToneRow(self.matchedSegment)
+        :meth:`music21.alpha.search.serial.ToneRow.originalCenteredTransformation`.
+        '''
+        (activeRow, matchedRow) = self.getActiveMatchedRows()
         return matchedRow.findOriginalCenteredTransformations(activeRow)
 
     def readPitchClassesFromBottom(self):        
@@ -954,8 +974,11 @@ class SegmentMatcher(object):
     [<music21.chord.Chord C4 D4>, <music21.chord.Chord E4 F4>]
     >>> seg.activeSegment
     [0, 2, 4]
+    
+    If we are just searching for a single term, the list-of-lists can be
+    given just as a list:
 
-    >>> foundSegments = matcher.find([[2, 4, 5]])
+    >>> foundSegments = matcher.find([2, 4, 5])
     >>> len(foundSegments)
     1
     >>> seg = foundSegments[0]
@@ -997,43 +1020,86 @@ class SegmentMatcher(object):
     >>> s = s.makeMeasures()
 
     >>> matcher = alpha.search.serial.SegmentMatcher(s, 'ignoreAll')
-    >>> foundSegs = matcher.find([[4, -7, 7]])
+    >>> foundSegs = matcher.find([4, -7, 7])
 
     >>> [seg.segment for seg in foundSegs]
     [[<music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>]]
     
-    >>> foundSegs = matcher.find([[7, 'B', 9]])
+    >>> foundSegs = matcher.find([7, 'B', 9])
     >>> [seg.segment for seg in foundSegs]
     [[<music21.note.Note G>, <music21.chord.Chord B4 G5 A5>]]
     '''
     def __init__(self, inputStream, reps='skipConsecutive', includeChords=True):
         self.stream = inputStream
-        self.reps = reps
-        self.includeChords = includeChords
+        self._reps = reps
+        self._includeChords = includeChords
         self.searchedAlready = []
         self.matchedSegments = []
         self.currentSearchSegmentLength = 0
+        self._contiguousSegmentsByLength = {}
+        
+    @property
+    def reps(self):
+        return self._reps
+
+    @reps.setter
+    def reps(self, newReps):
+        self._reps = newReps
+        self._contiguousSegmentsByLength = {}
+
+    @property
+    def includeChords(self):
+        return self._includeChords
+
+    @includeChords.setter
+    def includeChords(self, newChords):
+        self._includeChords = newChords
+        self._contiguousSegmentsByLength = {}
+        
+        
+    def getContiguousSegmentsByLength(self, searchSegmentLength):
+        '''
+        Creates a ContiguousSegmentSearcher and finds all segments in
+        self.stream based on the .reps and .includeChords settings and
+        the searchSegmentLength
+        
+        If we are searching on lots of segments to match, then we could
+        end up running this expensive routine multiple times, so we'll
+        cache the answer for each length.
+        
+        If .reps or .includeChords is changed, then this will be obsolete, 
+        so cleared.
+        '''
+        if searchSegmentLength in self._contiguousSegmentsByLength:
+            theseSegments = self._contiguousSegmentsByLength[searchSegmentLength]
+        else:
+            searcher = ContiguousSegmentSearcher(self.stream, self.reps, self.includeChords)
+            theseSegments = searcher.byLength(searchSegmentLength)
+            self._contiguousSegmentsByLength[searchSegmentLength] = theseSegments
+
+        return theseSegments
         
     def find(self, searchList):
+        if not searchList:
+            return []
+        elif not (common.isIterable(searchList[0])):
+            # a single list instead of a list of lists:
+            searchList = [searchList]
+            
+        
+        
         self.matchedSegments = []
         self.searchedAlready = []
-        self.contiguousSegmentsByLength = {}
+        self._contiguousSegmentsByLength = {}
         
         for unNormalizedCurrentSearchSegment in searchList:
             # normalize and check.
-            currentSearchSegment = self.normalize(unNormalizedCurrentSearchSegment)
-            if currentSearchSegment in self.searchedAlready:
+            if self.checkSearchedAlready(unNormalizedCurrentSearchSegment):
                 continue
-            self.searchedAlready.append(currentSearchSegment)
-            
+            currentSearchSegment = self.normalize(unNormalizedCurrentSearchSegment)
             
             searchSegmentLength = len(unNormalizedCurrentSearchSegment)
-            if searchSegmentLength in self.contiguousSegmentsByLength:
-                theseSegments = self.contiguousSegmentsByLength[searchSegmentLength]
-            else:
-                searcher = ContiguousSegmentSearcher(self.stream, self.reps, self.includeChords)
-                theseSegments = searcher.byLength(searchSegmentLength)
-                self.contiguousSegmentsByLength[searchSegmentLength] = theseSegments
+            theseSegments = self.getContiguousSegmentsByLength(searchSegmentLength)
                 
             self.currentSearchSegmentLength = searchSegmentLength
             for thisSegment in theseSegments:
@@ -1065,7 +1131,7 @@ class SegmentMatcher(object):
         for i in range(lastStartPosition):
             pitchClassSubset = pitchClassList[i:i + length]
             subsetToCheck = self.normalize(pitchClassSubset)
-            if searchSegment != subsetToCheck:
+            if not self.equalSubset(searchSegment, subsetToCheck):
                 continue
             if pitchClassSubset[0] not in [p.pitchClass for p in thisChordList[0].pitches]:
                 continue
@@ -1077,7 +1143,6 @@ class SegmentMatcher(object):
                 self.matchedSegments.append(thisSegment)
                 break
             
-
     def findOneOtherReps(self, thisSegment, searchSegment, unNormalizedCurrentSearchSegment):
         '''
         Checks whether thisSegment is a match for the searchSegment if 'ignoreAll' is NOT the search
@@ -1089,20 +1154,44 @@ class SegmentMatcher(object):
             unNormalizedCurrentSearchSegment = searchSegment
         length = self.currentSearchSegmentLength
         thisChordList = thisSegment.segment
-        pitchClassList = thisSegment.getDistinctPitchClasses()
+        pitchClassList = thisSegment.readPitchClassesFromBottom()
         lowerBound = max([0,
                           len(pitchClassList) - length - len(thisChordList[-1].pitches) + 1])
         upperBound = min([len(thisChordList[0].pitches),
                           len(pitchClassList) + 1 - length])
         for i in range(lowerBound, upperBound):
             subsetToCheck = self.normalize(pitchClassList[i:i + length])
-            if subsetToCheck != searchSegment:
+            if not self.equalSubset(searchSegment, subsetToCheck):
                 continue
             thisSegment.activeSegment = subsetToCheck
             thisSegment.matchedSegment = list(unNormalizedCurrentSearchSegment)
             self.matchedSegments.append(thisSegment)
             break
                 
+    
+    def checkSearchedAlready(self, unNormalizedSearchSegment):
+        '''
+        Check to see if we have searched this segment already.
+        
+        Called out to be subclassible by Transformed searchers.
+        
+        If yes, return True.
+        
+        If not, add to searchedAlready and return False
+        
+        >>> matcher = alpha.search.serial.SegmentMatcher(None)
+        >>> matcher.checkSearchedAlready([4, 5, 6])
+        False
+        >>> matcher.checkSearchedAlready([1, 2, 3])
+        False
+        >>> matcher.checkSearchedAlready([4, 5, 6])
+        True
+        '''
+        currentSearchSegment = self.normalize(unNormalizedSearchSegment)
+        if currentSearchSegment in self.searchedAlready:
+            return True
+        self.searchedAlready.append(currentSearchSegment)
+        return False
     
     @staticmethod
     def normalize(segment):
@@ -1119,6 +1208,14 @@ class SegmentMatcher(object):
         '''
         return pcToToneRow(segment).pitchClasses()
         
+    def equalSubset(self, searchSegment, subsetToCheck):
+        '''
+        Returns True if these are equal in some way.
+        
+        Here's it's simple -- are they equal, but will be harder for other classes.
+        '''
+        return bool(searchSegment == subsetToCheck)
+
     
 class TransposedSegmentMatcher(SegmentMatcher):
     '''
@@ -1176,14 +1273,14 @@ class TransposedSegmentMatcher(SegmentMatcher):
     with repeated pitch classes.
     
     >>> matcher = alpha.search.serial.TransposedSegmentMatcher(newpart, 'ignoreAll')
-    >>> matcher.find([[0, 0]])
+    >>> matcher.find([0, 0])
     []
     
     A somewhat more interesting example is below.
     
     >>> matcher = alpha.search.serial.TransposedSegmentMatcher(newpart, 'rowsOnly', 
     ...                                                            includeChords=False)
-    >>> halfStepList = matcher.find([[0, 1]])
+    >>> halfStepList = matcher.find([0, 1])
     >>> L = [step.segment for step in halfStepList]
     >>> print(L)
     [[<music21.note.Note E>, <music21.note.Note F>], 
@@ -1202,7 +1299,7 @@ class TransposedSegmentMatcher(SegmentMatcher):
     >>> s.repeatAppend(newpart, 2) #s has two parts, each of which is a copy of newpart.
 
     >>> sMatcher = alpha.search.serial.TransposedSegmentMatcher(s, includeChords=False)
-    >>> wholeStepList = sMatcher.find([[12, 2]])
+    >>> wholeStepList = sMatcher.find([12, 2])
     >>> [(step.segment, step.startMeasureNumber, step.partNumber) for step in wholeStepList]
     [([<music21.note.Note G>, <music21.note.Note A>], 3, 0), 
     ([<music21.note.Note A>, <music21.note.Note B>], 3, 0), 
@@ -1212,7 +1309,7 @@ class TransposedSegmentMatcher(SegmentMatcher):
     Including chords works similarly as in :class:`~music21.alpha.search.serial.findSegments`.
     
     >>> sMatcher = alpha.search.serial.TransposedSegmentMatcher(newpart, includeChords=True)
-    >>> foundSegments = sMatcher.find([[4, 6, 'A']])
+    >>> foundSegments = sMatcher.find([4, 6, 'A'])
     >>> [seg.segment for seg in foundSegments]
     [[<music21.note.Note F>, <music21.chord.Chord G4 B4>]]
     
@@ -1220,14 +1317,14 @@ class TransposedSegmentMatcher(SegmentMatcher):
     
     >>> sMatcher = alpha.search.serial.TransposedSegmentMatcher(newpart, 'skipConsecutive', 
     ...                         includeChords=False)
-    >>> testSameSeg = sMatcher.find([[12, 13], [0, 1]]) # duplicates
+    >>> testSameSeg = sMatcher.find([(12, 13), (0, 1)]) # duplicates
     >>> len(testSameSeg)
     2
     >>> testSameSeg[0].matchedSegment
     [12, 13]
     >>> sMatcher = alpha.search.serial.TransposedSegmentMatcher(newpart, 'rowsOnly', 
     ...                         includeChords=False)
-    >>> sMatcher.find([[9, 'A', 'B']])
+    >>> sMatcher.find([9, 'A', 'B'])
     []
     
     >>> s = stream.Stream()
@@ -1241,9 +1338,9 @@ class TransposedSegmentMatcher(SegmentMatcher):
     >>> s.append(c)
     >>> s = s.makeMeasures()
     >>> sMatcher = alpha.search.serial.TransposedSegmentMatcher(s, 'ignoreAll', includeChords=True)
-    >>> sMatcher.find([[3, 4, 6]])
+    >>> sMatcher.find([3, 4, 6])
     [<music21.alpha.search.serial.ContiguousSegmentOfNotes ['E4', 'F4', 'G4']>]
-    >>> sMatcher.find([[4, 8, 6]])
+    >>> sMatcher.find([4, 8, 6])
     [<music21.alpha.search.serial.ContiguousSegmentOfNotes ['G4', 'B4 G5 A5']>]
     '''
 
@@ -1261,7 +1358,219 @@ class TransposedSegmentMatcher(SegmentMatcher):
         '''
         return pcToToneRow(segment).getIntervalsAsString()
         
+        
+
+
+class TransformedSegmentMatcher(SegmentMatcher):
+    '''
+    Finds all instances of given contiguous segments of pitch classes, 
+    with serial transformations,
+    within a :class:`~music21.stream.Stream`.
     
+    The inputStream is :class:`~music21.stream.Stream`; as 
+    in :class:`~music21.alpha.search.serial.ContiguousSegmentSearcher`,
+    the inputStream can 
+    contain at most one :class:`~music21.stream.Score` 
+    and its notes must be contained in measures. The searchList is a list of contiguous segments to
+    be searched for, each segment being given as a list of pitch classes. 
+    The reps and includeChords settings specify how
+    repeated pitches and chords, respectively, are handled; the possible settings 
+    are the same as those in
+    :class:`~music21.alpha.search.serial.ContiguousSegmentSearcher`. 
+    
+    The convention for serial 
+    transformations must be specified to either
+    'zero' or 'original', as described in 
+    :meth:`~music21.alpha.search.serial.zeroCenteredTransformation` and
+    :func:`~music21.alpha.search.serial.originalCenteredTransformation` - the default setting 
+    is 'original', as to relate found segments
+    directly to the given segments, without first transposing the given segment to 
+    begin on the pitch class 0.
+    
+    Returns a list of :class:`~music21.alpha.search.serial.ContiguousSegmentOfNotes` objects 
+    for which some transformation of the
+    :attr:`~music21.alpha.search.serial.ContiguousSegmentOfNotes.activeSegment` matches at 
+    least one of the elements of the searchList,
+    subject to the settings specified in reps and includeChords.
+    
+    
+    >>> n1 = note.Note('c#4')
+    >>> n2 = note.Note('e4')
+    >>> n3 = note.Note('d#4')
+    >>> n4 = note.Note('f4')
+    >>> n5 = note.Note('e4')
+    >>> n6 = note.Note('g4')
+    >>> noteList = [n1, n2, n3, n4, n5, n6]
+    >>> part = stream.Part()
+    >>> part.append(noteList)
+    >>> part = part.makeMeasures()
+    >>> #_DOCS_SHOW part.show()
+    
+    .. image:: images/serial-findTransformedSegments.png
+        :width: 150
+    
+    
+    >>> tsMatcher = alpha.search.serial.TransformedSegmentMatcher(part, 'rowsOnly', 
+    ...                 includeChords=False)
+    >>> rowInstances = tsMatcher.find([2, 5, 4])
+    
+    >>> row = [2, 5, 4]
+    >>> zrowInstances = alpha.search.serial.findTransformedSegments(part, [row], 
+    ...    'rowsOnly', includeChords=False)
+    >>> len(rowInstances)
+    2
+    >>> firstInstance = rowInstances[0]
+    >>> firstInstance
+    <music21.alpha.search.serial.ContiguousSegmentOfNotes ['C#4', 'E4', 'D#4']>
+    
+    >>> firstInstance.activeSegment, firstInstance.startMeasureNumber
+    (<music21.serial.ToneRow 0x10b145470>, 1)
+    >>> firstInstance.activeSegment.pitchClasses()
+    [1, 4, 3]
+    >>> firstInstance.originalCenteredTransformationsFromMatched
+    [('T', 11)]
+    
+    We have thus found that the first instance of the row [2, 5, 4] within our 
+    stream appears as a transposition
+    down a semitone, beginning in measure 1. We can do a similar analysis on 
+    the other instance of the row.
+    
+    >>> secondInstance = rowInstances[1]
+    >>> secondInstance.activeSegment.pitchClasses(), secondInstance.startMeasureNumber
+    ([5, 4, 7], 1)
+    >>> secondInstance.zeroCenteredTransformationsFromMatched
+    [('RI', 7)]
+    
+    Let us give an example of this function used with chords included and reps set to 'ignoreAll'.
+    
+    >>> s = stream.Stream()
+    >>> n1 = note.Note('e4')
+    >>> n2 = note.Note('f4')
+    >>> n3 = note.Note('g4')
+    >>> c = chord.Chord(['b4', 'g5', 'a5'])
+    >>> s.append(n1)
+    >>> s.append(n2)
+    >>> s.append(n3)
+    >>> s.append(c)
+    >>> s = s.makeMeasures()
+    
+    >>> tsMatcher = alpha.search.serial.TransformedSegmentMatcher(s, 'ignoreAll', 
+    ...                 includeChords=True)
+    >>> found643 = tsMatcher.find([6, 4, 3])
+    >>> [seg.segment for seg in found643]
+    [[<music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>]]
+    
+    >>> found684 = tsMatcher.find([6, 8, 4])
+    >>> for seg in found684:
+    ...    print(seg.segment)
+    [<music21.note.Note G>, <music21.chord.Chord B4 G5 A5>]
+    [<music21.chord.Chord B4 G5 A5>]
+    
+    >>> [seg.activeSegment.pitchClasses() for seg in found684]
+    [[7, 11, 9], 
+     [11, 7, 9]]
+     
+    >>> [seg.originalCenteredTransformationsFromMatched for seg in found684]
+    [[('R', 3)], 
+     [('RI', 3)]]
+    
+    Pitch classes are extracted from segments in order of appearance, with 
+    pitches in chords being read from bottom to top.
+    However, only the first instance of each pitch class is considered, as seen in the
+    :attr:`~music21.alpha.search.serial.ContiguousSegmentOfNotes.activeSegment` calls. 
+    As long as the first and last pitch classes in the
+    active segment first appear in the first and last elements of 
+    the found segment, respectively, the segment will be matched to the
+    segment being searched for. To make this more clear, consider the 
+    following example in the same stream s:
+    
+    >>> tsMatcher = alpha.search.serial.TransformedSegmentMatcher(s, 'includeAll')
+    >>> found = tsMatcher.find([4, 0, 4])
+    >>> [(seg.segment, seg.activeSegment.pitchClasses()) for seg in found]
+    [([<music21.note.Note G>, <music21.chord.Chord B4 G5 A5>], [7, 11, 7])]
+    
+    Above, the pitch classes of the found segment are read in the order 7, 11, 7, 9. 
+    Because a subsequence of this, [7, 11, 7],
+    is an inversion of the search segment, [4, 0, 4], and furthermore, 
+    the first 7 is part of the first note of the segment (G), and
+    the last 7 is part of the last chord of the segment, the found segment is 
+    matched to the segment being searched for.
+    
+    OMIT_FROM_DOCS
+    
+    >>> s = stream.Stream()
+    >>> s.repeatAppend(part, 2)
+    >>> tsMatcher = alpha.search.serial.TransformedSegmentMatcher(s, includeChords=False)
+    >>> testNegativePitchClass = tsMatcher.find([2, -7, 4])
+    >>> len(testNegativePitchClass)
+    4
+    >>> testNegativePitchClass[0].matchedSegment
+    [2, -7, 4]
+    '''
+    def checkSearchedAlready(self, unNormalizedSearchSegment):
+        '''
+        Here a segment is returned as searchedAlready if it is a transformation
+        of a previous search segment.
+        
+        >>> transMatcher = alpha.search.serial.TransformedSegmentMatcher(None)
+        >>> transMatcher.checkSearchedAlready([0, 1, 2])
+        False
+        >>> transMatcher.checkSearchedAlready([0, 1, 2])
+        True
+        >>> transMatcher.checkSearchedAlready([0, 1, 3])
+        False
+        >>> transMatcher.checkSearchedAlready([3, 5, 6]) # RI of 0, 1, 3
+        True
+        '''
+        segmentRow = self.normalize(unNormalizedSearchSegment)
+        for usedRow in self.searchedAlready:
+            if self.getTransformations(segmentRow, usedRow):
+                return True
+        self.searchedAlready.append(segmentRow)
+        return False
+    
+    @staticmethod
+    def normalize(segment):
+        '''
+        Normalize an input segment for searching. For this class changes to intervals
+        
+        Staticmethod:
+        
+        >>> alpha.search.serial.TransformedSegmentMatcher.normalize([3, 4, 5])
+        <music21.serial.ToneRow 0x10b136400>
+        >>> alpha.search.serial.TransformedSegmentMatcher.normalize(['12', 'B', 7])
+        <music21.serial.ToneRow 0x10b13641b>
+        '''
+        return pcToToneRow(segment)
+
+    @staticmethod
+    def getTransformations(row1, row2):
+        '''
+        Staticmethod:
+        
+        >>> TSM = alpha.search.serial.TransformedSegmentMatcher
+        >>> TSM.getTransformations(TSM.normalize([3, 4, 5]), TSM.normalize([4, 5, 6]))
+        [('P', 3), ('RI', 5)]
+        >>> TSM.getTransformations(TSM.normalize(['12', 'B', 7]), TSM.normalize([0, 1, 5]))
+        [('I', 0)]
+        '''
+        return row2.findZeroCenteredTransformations(row1)
+    
+    def equalSubset(self, searchSegment, subsetToCheck):
+        '''
+        Returns True if these are equal in some way.
+        
+        If is case two rows are equal if they have a zeroCenteredTransformation of the other.
+
+        >>> TSM = alpha.search.serial.TransformedSegmentMatcher(None)
+        >>> TSM.equalSubset(TSM.normalize([3, 4, 5]), TSM.normalize([4, 5, 6]))
+        True
+        >>> TSM.equalSubset(TSM.normalize([0, 1, 2]), TSM.normalize([0, 1, 3]))
+        False
+        '''
+        return bool(self.getTransformations(searchSegment, subsetToCheck))
+
+
     
 def findSegments(inputStream, searchList, reps='skipConsecutive', includeChords=True):
     # deprecated; to be removed
@@ -1381,140 +1690,7 @@ def findTransposedSegments(inputStream, searchList, reps='skipConsecutive', incl
 
 def findTransformedSegments(inputStream, searchList, 
                             reps='skipConsecutive', includeChords=True):
-    '''
-    Finds all instances of given contiguous segments of pitch classes, 
-    with serial transformations,
-    within a :class:`~music21.stream.Stream`.
-    
-    The inputStream is :class:`~music21.stream.Stream`; as 
-    in :class:`~music21.alpha.search.serial.ContiguousSegmentSearcher`,
-    the inputStream can 
-    contain at most one :class:`~music21.stream.Score` 
-    and its notes must be contained in measures. The searchList is a list of contiguous segments to
-    be searched for, each segment being given as a list of pitch classes. 
-    The reps and includeChords settings specify how
-    repeated pitches and chords, respectively, are handled; the possible settings 
-    are the same as those in
-    :class:`~music21.alpha.search.serial.ContiguousSegmentSearcher`. 
-    
-    The convention for serial 
-    transformations must be specified to either
-    'zero' or 'original', as described in 
-    :meth:`~music21.alpha.search.serial.zeroCenteredTransformation` and
-    :func:`~music21.alpha.search.serial.originalCenteredTransformation` - the default setting 
-    is 'original', as to relate found segments
-    directly to the given segments, without first transposing the given segment to 
-    begin on the pitch class 0.
-    
-    Returns a list of :class:`~music21.alpha.search.serial.ContiguousSegmentOfNotes` objects 
-    for which some transformation of the
-    :attr:`~music21.alpha.search.serial.ContiguousSegmentOfNotes.activeSegment` matches at 
-    least one of the elements of the searchList,
-    subject to the settings specified in reps and includeChords.
-    
-    
-    >>> n1 = note.Note('c#4')
-    >>> n2 = note.Note('e4')
-    >>> n3 = note.Note('d#4')
-    >>> n4 = note.Note('f4')
-    >>> n5 = note.Note('e4')
-    >>> n6 = note.Note('g4')
-    >>> noteList = [n1, n2, n3, n4, n5, n6]
-    >>> part = stream.Part()
-    >>> part.append(noteList)
-    >>> part = part.makeMeasures()
-    >>> #_DOCS_SHOW part.show()
-    
-    .. image:: images/serial-findTransformedSegments.png
-        :width: 150
-    
-    >>> row = [2, 5, 4]    
-    >>> rowInstances = alpha.search.serial.findTransformedSegments(part, [row], 
-    ...    'rowsOnly', includeChords=False)
-    >>> len(rowInstances)
-    2
-    >>> firstInstance = rowInstances[0]
-    >>> firstInstance
-    <music21.alpha.search.serial.ContiguousSegmentOfNotes ['C#4', 'E4', 'D#4']>
-    
-    >>> firstInstance.activeSegment, firstInstance.startMeasureNumber
-    ([1, 4, 3], 1)
-    >>> firstInstance.originalCenteredTransformationsFromMatched
-    [('T', 11)]
-    
-    We have thus found that the first instance of the row [2, 5, 4] within our 
-    stream appears as a transposition
-    down a semitone, beginning in measure 1. We can do a similar analysis on 
-    the other instance of the row.
-    
-    >>> secondInstance = rowInstances[1]
-    >>> secondInstance.activeSegment, secondInstance.startMeasureNumber
-    ([5, 4, 7], 1)
-    >>> secondInstance.zeroCenteredTransformationsFromMatched
-    [('RI', 7)]
-    
-    Let us give an example of this function used with chords included and reps set to 'ignoreAll'.
-    
-    >>> s = stream.Stream()
-    >>> n1 = note.Note('e4')
-    >>> n2 = note.Note('f4')
-    >>> n3 = note.Note('g4')
-    >>> c = chord.Chord(['b4', 'g5', 'a5'])
-    >>> s.append(n1)
-    >>> s.append(n2)
-    >>> s.append(n3)
-    >>> s.append(c)
-    >>> s = s.makeMeasures()
-    
-    >>> found643 = alpha.search.serial.findTransformedSegments(s, [[6, 4, 3]], 'ignoreAll')
-    >>> [seg.segment for seg in found643]
-    [[<music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>]]
-    
-    >>> found = alpha.search.serial.findTransformedSegments(s, [[6, 8, 4]], 'ignoreAll')
-    >>> for seg in found:
-    ...    print(seg.segment)
-    [<music21.note.Note G>, <music21.chord.Chord B4 G5 A5>]
-    [<music21.chord.Chord B4 G5 A5>]
-    
-    >>> [seg.activeSegment for seg in found]
-    [[7, 11, 9], 
-     [11, 7, 9]]
-    >>> [seg.originalCenteredTransformationsFromMatched for seg in found]
-    [[('R', 3)], 
-     [('RI', 3)]]
-    
-    Pitch classes are extracted from segments in order of appearance, with 
-    pitches in chords being read from bottom to top.
-    However, only the first instance of each pitch class is considered, as seen in the
-    :attr:`~music21.alpha.search.serial.ContiguousSegmentOfNotes.activeSegment` calls. 
-    As long as the first and last pitch classes in the
-    active segment first appear in the first and last elements of 
-    the found segment, respectively, the segment will be matched to the
-    segment being searched for. To make this more clear, consider the 
-    following example in the same stream s:
-    
-    >>> found = alpha.search.serial.findTransformedSegments(s, [[4, 0, 4]], 'includeAll')
-    >>> [(seg.segment, seg.activeSegment) for seg in found]
-    [([<music21.note.Note G>, <music21.chord.Chord B4 G5 A5>], [7, 11, 7])]
-    
-    Above, the pitch classes of the found segment are read in the order 7, 11, 7, 9. 
-    Because a subsequence of this, [7, 11, 7],
-    is an inversion of the search segment, [4, 0, 4], and furthermore, 
-    the first 7 is part of the first note of the segment (G), and
-    the last 7 is part of the last chord of the segment, the found segment is 
-    matched to the segment being searched for.
-    
-    OMIT_FROM_DOCS
-    
-    >>> s = stream.Stream()
-    >>> s.repeatAppend(part, 2)
-    >>> testNegativePitchClass = alpha.search.serial.findTransformedSegments(s, [[2, -7, 4]], 
-    ...                                    includeChords=False)
-    >>> len(testNegativePitchClass)
-    4
-    >>> testNegativePitchClass[0].matchedSegment
-    [2, -7, 4]
-    '''
+    # Deprecated!
     numsegs = len(searchList)
     segs = []
     doneAlready = []
