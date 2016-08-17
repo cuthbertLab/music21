@@ -56,7 +56,7 @@ def etIndent(elem, level=0, spaces=2):
     else:
         if level and (not elem.tail or not elem.tail.strip()):
             elem.tail = i
- 
+
 #------------------------------------------------------------------------------
 
 
@@ -130,7 +130,7 @@ class _EnvironmentCore(object):
         value = self._ref[key]
         if six.PY3 and isinstance(value, bytes):
             value = value.decode(encoding='utf-8', errors='replace')
-        
+
         valueStr = str(value).lower()
 
         if key == 'debug':  # debug expects a number
@@ -166,7 +166,7 @@ class _EnvironmentCore(object):
         #    value = value.decode(errors='replace')
         if 'path' in key.lower() and value is not None:
             value = common.cleanpath(value)
-        
+
         if key not in self._ref:
             if key != 'localCorpusPath':
                 raise EnvironmentException('no preference: %s' % key)
@@ -240,7 +240,7 @@ class _EnvironmentCore(object):
                     # do not set, ignore for now
                 else:  # load up stored values, overwriting defaults
                     ref[name] = value
-                
+
     def _loadDefaults(self, forcePlatform=None):
         '''
         Load defaults.
@@ -304,7 +304,7 @@ class _EnvironmentCore(object):
         if platform == 'win':
             for name, value in [
                 ('lilypondPath', 'lilypond'),
-                ('musescoreDirectPNGPath', 
+                ('musescoreDirectPNGPath',
                     common.cleanpath(r'%PROGRAMFILES(x86)%\MuseScore 2\MuseScore.exe')),
                 ]:
                 self.__setitem__(name, value)  # use for key checking
@@ -330,10 +330,10 @@ class _EnvironmentCore(object):
         '''
         if ref is None:
             ref = self._ref
-        
+
         settingsDict = {'encoding': 'utf-8'}
         settings = ET.Element('settings', settingsDict)
-        
+
         settingsTree = ET.ElementTree(settings)
         for key, value in sorted(ref.items()):
             if key == 'localCorpusSettings':
@@ -363,15 +363,15 @@ class _EnvironmentCore(object):
                 slot = ET.Element('preference', attribs)
                 settings.append(slot)
         return settingsTree
-                
+
     ### PUBLIC METHODS ###
 
     def getDefaultRootTempDir(self):
         '''
         returns whatever tempfile.gettempdir() returns plus 'music21'.
-        
+
         Creates the subdirectory if it doesn't exist:
-        
+
         >>> import tempfile
         >>> t = tempfile.gettempdir()
         >>> #_DOCS_SHOW t
@@ -398,7 +398,7 @@ class _EnvironmentCore(object):
     def getKeysToPaths(self):
         '''
         Find all keys that refer to paths
-        
+
         >>> e = environment.Environment()
         >>> for i in e.getKeysToPaths():
         ...     #_DOCS_SHOW print(i)
@@ -414,7 +414,7 @@ class _EnvironmentCore(object):
     def getRefKeys(self):
         '''
         Find all keys (in any order)...
-        
+
         >>> e = environment.Environment()
         >>> for i in e.getRefKeys():
         ...     #_DOCS_SHOW print(i)
@@ -432,7 +432,7 @@ class _EnvironmentCore(object):
     def getRootTempDir(self):
         '''
         gets either the directory in key 'directoryScratch' or self.getDefaultRootTempDir
-        
+
         Returns an exception if directoryScratch is defined but does not exist.
         '''
         if self._ref['directoryScratch'] is None:
@@ -492,7 +492,7 @@ class _EnvironmentCore(object):
                 # on MacOS, fd returns an int, like 3, when this is called
                 # in some context (specifically, programmatically in a
                 # TestExternal class. the filePath is still valid and works
-                pass
+                os.close(fileDescriptor)
             else:
                 fileDescriptor.close()
         else:  # win
@@ -508,7 +508,7 @@ class _EnvironmentCore(object):
     def formatToKey(self, m21Format):
         '''
         Finds the appropriate key to the file/app that can launch the given format:
-        
+
         >>> e = environment.Environment()
         >>> e.formatToKey('lilypond')
         'lilypondPath'
@@ -563,13 +563,13 @@ class _EnvironmentCore(object):
         return None
 
 
-    #@common.deprecated("May 24, 2014", "May 2016", "call SubConverter().launch() instead")    
+    #@common.deprecated("May 24, 2014", "May 2016", "call SubConverter().launch() instead")
     def launch(self, fmt, filePath, options='', app=None):
         '''
         DEPRECATED May 24, 2014 -- call Launch on SubConverter
 
         Needed still just for graphics, graph.launch('png'), lily.translate(), scale
-        
+
         Create a png, svg, etc. converter (or just a graphics converter) and call launch on it
         '''
         # see common.fileExtensions for format names
@@ -613,7 +613,7 @@ class _EnvironmentCore(object):
                         for line in f:
                             print(line, end="")
                         print("")
-                    return                    
+                    return
                 else:
                     raise EnvironmentException(
                         "Cannot find a valid application path for format {}. "
@@ -756,12 +756,12 @@ class Environment(object):
 
         >>> a['autoDownload'] = 'adsf'
         Traceback (most recent call last):
-        music21.environment.EnvironmentException: adsf is not an acceptable 
+        music21.environment.EnvironmentException: adsf is not an acceptable
             value for preference: autoDownload
 
         >>> a['showFormat'] = 'adsf'
         Traceback (most recent call last):
-        music21.environment.EnvironmentException: adsf is not an acceptable 
+        music21.environment.EnvironmentException: adsf is not an acceptable
             value for preference: showFormat
 
         >>> a['showFormat'] = 'musicxml'
@@ -977,7 +977,7 @@ class Environment(object):
             msg = [str(msg)]
         elif isinstance(msg, Exception):
             msg = [str(msg)]
-            
+
         if header is None:
             if msg[0] != self.modNameParent and self.modNameParent is not None:
                 msg = [self.modNameParent + ': WARNING:'] + msg
@@ -997,7 +997,7 @@ class Environment(object):
     def xmlReaderType(self):
         r'''
         Returns an xmlReaderType depending on the 'musicxmlPath'
-        
+
         >>> a = environment.Environment()
         >>> a['musicxmlPath'] = '/Applications/Musescore.app'
         >>> a.xmlReaderType()
@@ -1034,7 +1034,7 @@ class Environment(object):
             return 'Musescore'
         else:
             return 'unknown'
-        
+
 #------------------------------------------------------------------------------
 
 
@@ -1141,12 +1141,12 @@ class UserSettings(object):
         >>> us = environment.UserSettings()
         >>> us['musicxmlPath'] = 'asdfwerasdffasdfwer'
         Traceback (most recent call last):
-        music21.environment.UserSettingsException: attempting to set a value 
+        music21.environment.UserSettingsException: attempting to set a value
             to a path that does not exist: asdfwerasdffasdfwer
 
         >>> us['localCorpusPath'] = '/path/to/local'
         Traceback (most recent call last):
-        music21.environment.UserSettingsException: attempting to set a value 
+        music21.environment.UserSettingsException: attempting to set a value
             to a path that does not exist: /path/to/local
         '''
         # NOTE: testing setting of any UserSettings key will result
@@ -1230,7 +1230,7 @@ def keys():
     return us.keys()
 
 
-# pylint: disable=redefined-builtin    
+# pylint: disable=redefined-builtin
 def set(key, value):  # okay to override set here: @ReservedAssignment
     '''
     Directly set a single UserSettings key, by providing a key and the
@@ -1294,14 +1294,14 @@ class Test(unittest.TestCase):
   <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
-  <preference name="lilypondPath" 
+  <preference name="lilypondPath"
       value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond" />
   <preference name="lilypondVersion" />
   <localCorporaSettings />
   <localCorpusSettings />
   <preference name="manualCoreCorpusPath" />
   <preference name="midiPath" value="/Applications/QuickTime Player.app" />
-  <preference name="musescoreDirectPNGPath" 
+  <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
   <preference name="musicxmlPath" value="/Applications/Finale Notepad 2014.app" />
   <preference name="pdfPath" value="/Applications/Preview.app" />
@@ -1332,7 +1332,7 @@ class Test(unittest.TestCase):
   <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
-  <preference name="lilypondPath" 
+  <preference name="lilypondPath"
       value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond" />
   <preference name="lilypondVersion" />
   <localCorporaSettings>
@@ -1349,7 +1349,7 @@ class Test(unittest.TestCase):
   </localCorpusSettings>
   <preference name="manualCoreCorpusPath" />
   <preference name="midiPath" value="/Applications/QuickTime Player.app" />
-  <preference name="musescoreDirectPNGPath" 
+  <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
   <preference name="musicxmlPath" value="/Applications/Finale Notepad 2014.app" />
   <preference name="pdfPath" value="/Applications/Preview.app" />
@@ -1390,7 +1390,7 @@ class Test(unittest.TestCase):
   <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
-  <preference name="lilypondPath" 
+  <preference name="lilypondPath"
       value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond" />
   <preference name="lilypondVersion" />
   <localCorporaSettings />
@@ -1401,7 +1401,7 @@ class Test(unittest.TestCase):
   </localCorpusSettings>
   <preference name="manualCoreCorpusPath" />
   <preference name="midiPath" value="w" />
-  <preference name="musescoreDirectPNGPath" 
+  <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
   <preference name="musicxmlPath" value="/Applications/Finale Notepad 2014.app" />
   <preference name="pdfPath" value="/Applications/Preview.app" />
