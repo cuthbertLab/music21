@@ -822,12 +822,10 @@ def makeRests(s,
         return returnObj
 
 
-def makeTies(
-    s,
-    meterStream=None,
-    inPlace=True,
-    displayTiedAccidentals=False,
-    ):
+def makeTies(s,
+             meterStream=None,
+             inPlace=True,
+             displayTiedAccidentals=False):
     '''
     Given a stream containing measures, examine each element in the
     Stream. If the elements duration extends beyond the measure's boundary,
@@ -1029,59 +1027,60 @@ def makeTies(
                 #    'Stream.makeTies() iterating over elements in measure',
                 #    m, e])
                 #if hasattr(e, 'duration') and e.duration is not None:
-                if e.duration is not None:
-                    # check to see if duration is within Measure
-                    eOffset = v.elementOffset(e)
-                    eEnd = opFrac(eOffset + e.duration.quarterLength)
-                    # assume end can be at boundary of end of measure
-                    overshot = eEnd - mEnd
+                if e.duration is None:
+                    continue
+                # check to see if duration is within Measure
+                eOffset = v.elementOffset(e)
+                eEnd = opFrac(eOffset + e.duration.quarterLength)
+                # assume end can be at boundary of end of measure
+                overshot = eEnd - mEnd
 
-                    if overshot > 0:
-                        if eOffset >= mEnd:
-                            continue # skip elements that extend past measure boundary.
+                if overshot > 0:
+                    if eOffset >= mEnd:
+                        continue # skip elements that extend past measure boundary.
 #                             raise stream.StreamException(
 #                                 'element (%s) has offset %s within a measure '
 #                                 'that ends at offset %s' % (e, eOffset, mEnd))
 
-                        qLenBegin = mEnd - eOffset
-                        e, eRemain = e.splitAtQuarterLength(qLenBegin,
-                            retainOrigin=True,
-                            displayTiedAccidentals=displayTiedAccidentals)
+                    qLenBegin = mEnd - eOffset
+                    e, eRemain = e.splitAtQuarterLength(qLenBegin,
+                        retainOrigin=True,
+                        displayTiedAccidentals=displayTiedAccidentals)
 
-                        # manage bridging voices
-                        if mNextHasVoices:
-                            if mHasVoices:  # try to match voice id
-                                dst = mNext.voices[v.id]
-                            # src does not have voice, but dst does
-                            else:  # place in top-most voice
-                                dst = mNext.voices[0]
-                        else:
-                            # mNext has no voices but this one does
-                            if mHasVoices:
-                                # internalize all components in a voice
-                                mNext.internalize(container=stream.Voice)
-                                # place in first voice
-                                dst = mNext.voices[0]
-                            else:  # no voices in either
-                                dst = mNext
+                    # manage bridging voices
+                    if mNextHasVoices:
+                        if mHasVoices:  # try to match voice id
+                            dst = mNext.voices[v.id]
+                        # src does not have voice, but dst does
+                        else:  # place in top-most voice
+                            dst = mNext.voices[0]
+                    else:
+                        # mNext has no voices but this one does
+                        if mHasVoices:
+                            # internalize all components in a voice
+                            mNext.internalize(container=stream.Voice)
+                            # place in first voice
+                            dst = mNext.voices[0]
+                        else:  # no voices in either
+                            dst = mNext
 
-                        #eRemain.activeSite = mNext
-                        # manually set activeSite
-                        # cannot use _insertCore here
-                        dst.insert(0, eRemain)
+                    #eRemain.activeSite = mNext
+                    # manually set activeSite
+                    # cannot use _insertCore here
+                    dst.insert(0, eRemain)
 
-                        # we are not sure that this element fits
-                        # completely in the next measure, thus, need to
-                        # continue processing each measure
-                        if mNextAdd:
-                            #environLocal.printDebug([
-                            #    'makeTies() inserting mNext into returnObj',
-                            #    mNext])
-                            returnObj.insert(mNext.offset, mNext)
-                    elif overshot > 0:
-                        environLocal.printDebug([
-                            'makeTies() found and skipping extremely small '
-                            'overshot into next measure', overshot])
+                    # we are not sure that this element fits
+                    # completely in the next measure, thus, need to
+                    # continue processing each measure
+                    if mNextAdd:
+                        #environLocal.printDebug([
+                        #    'makeTies() inserting mNext into returnObj',
+                        #    mNext])
+                        returnObj.insert(mNext.offset, mNext)
+                elif overshot > 0:
+                    environLocal.printDebug([
+                        'makeTies() found and skipping extremely small '
+                        'overshot into next measure', overshot])
         mCount += 1
     del measureStream  # clean up unused streams
 

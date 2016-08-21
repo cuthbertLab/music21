@@ -4221,10 +4221,10 @@ def _getPlotsToMake(*args, **keywords):
             for requestedValue in values:
                 if requestedValue is None: 
                     continue
-                if (requestedValue.lower() in plotClassNameValues):
+                if (requestedValue.lower() in plotClassNameValues
+                        and requestedValue not in match):
                     # do not allow the same value to be requested
-                    if requestedValue not in match:
-                        match.append(requestedValue)
+                    match.append(requestedValue)
             if len(match) == len(values):
                 plotMake.append(plotClassName)
             else:
@@ -4232,30 +4232,29 @@ def _getPlotsToMake(*args, **keywords):
                 plotMakeCandidates.append(sortTuple)
 
         # if no matches, try something more drastic:
-        if len(plotMake) == 0:
-            if len(plotMakeCandidates) > 0:
-                plotMakeCandidates.sort(key=lambda x: (x[0], x[1].__name__.lower()) )
-                # last in list has highest score; second item is class
-                plotMake.append(plotMakeCandidates[-1][1])
-            else:
-                for plotClassName in plotClasses:
-                    # create a list of all possible identifiers
-                    plotClassIdentifiers = [plotClassName.format.lower()]
-                    plotClassIdentifiers += [x.lower() for x in 
-                                            plotClassName.values]
-                    # combine format and values args
-                    for requestedValue in [showFormat] + values:
-                        if requestedValue.lower() in plotClassIdentifiers:
-                            plotMake.append(plotClassName)
-                            break
-                    if len(plotMake) > 0: # found a match
+        if len(plotMake) == 0 and len(plotMakeCandidates) > 0:
+            plotMakeCandidates.sort(key=lambda x: (x[0], x[1].__name__.lower()) )
+            # last in list has highest score; second item is class
+            plotMake.append(plotMakeCandidates[-1][1])
+
+        elif len(plotMake) == 0: # none to make and no candidates
+            for plotClassName in plotClasses:
+                # create a list of all possible identifiers
+                plotClassIdentifiers = [plotClassName.format.lower()]
+                plotClassIdentifiers += [x.lower() for x in plotClassName.values]
+                # combine format and values args
+                for requestedValue in [showFormat] + values:
+                    if requestedValue.lower() in plotClassIdentifiers:
+                        plotMake.append(plotClassName)
                         break
+                if len(plotMake) > 0: # found a match
+                    break
     #environLocal.printDebug(['plotMake', plotMake])
     return plotMake
 
 def plotStream(streamObj, *args, **keywords):
-    '''G
-    iven a stream and any keyword configuration arguments, create and display a plot.
+    '''
+    Given a stream and any keyword configuration arguments, create and display a plot.
 
     Note: plots require matplotib to be installed.
 

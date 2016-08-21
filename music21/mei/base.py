@@ -3181,6 +3181,9 @@ def sectionScoreCore(elem, allPartNs, slurBundle, **kwargs):
     - ``'backupMeasureNum'`` is equal to the ``backupMeasureNum`` argument plus the number of
         <measure> elements found in this <score> or <section>.
     '''
+    # pylint: disable=too-many-nested-blocks
+    # ^^^ -- was not required at time of contribution
+    
     # TODO: replace the returned 4-tuple with a namedtuple
 
     # set the optional kwargs

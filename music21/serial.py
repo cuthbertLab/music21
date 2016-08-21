@@ -51,10 +51,29 @@ class TwelveToneMatrix(stream.Stream):
     :meth:`~music21.stream.TwelveToneRow.matrix` method of 
     :meth:`~music21.stream.TwelveToneRow` (or a subclass).
 
-    OMIT_FROM_DOCS
-
+    >>> ttr = serial.TwelveToneRow([0, 2, 11, 7, 8, 3, 9, 1, 4, 10, 6, 5])
+    >>> aMatrix = ttr.matrix()
+    >>> print(aMatrix)
+      0  2  B  7  8  3  9  1  4  A  6  5
+      A  0  9  5  6  1  7  B  2  8  4  3
+      1  3  0  8  9  4  A  2  5  B  7  6
+      5  7  4  0  1  8  2  6  9  3  B  A
+      4  6  3  B  0  7  1  5  8  2  A  9
+      9  B  8  4  5  0  6  A  1  7  3  2
+      3  5  2  A  B  6  0  4  7  1  9  8
+      B  1  A  6  7  2  8  0  3  9  5  4
+      8  A  7  3  4  B  5  9  0  6  2  1
+      2  4  1  9  A  5  B  3  6  0  8  7
+      6  8  5  1  2  9  3  7  A  4  0  B
+      7  9  6  2  3  A  4  8  B  5  1  0
     
-    >>> aMatrix = serial.rowToMatrix([0,2,11,7,8,3,9,1,4,10,6,5])
+    >>> repr(aMatrix)
+    '<music21.serial.TwelveToneMatrix for [<music21.serial.TwelveToneRow row-1>]>'
+    
+    >>> fourthQuartetMatrix = serial.getHistoricalRowByName('RowSchoenbergOp37').matrix()
+    >>> repr(fourthQuartetMatrix)
+    '<music21.serial.TwelveToneMatrix for 
+         [<music21.serial.HistoricalTwelveToneRow Schoenberg Op. 37 Fourth String Quartet>]>'
     '''
     
     def __init__(self, *arguments, **keywords):
@@ -64,13 +83,13 @@ class TwelveToneMatrix(stream.Stream):
         '''
         Return a string representation of the matrix.
         '''
-        ret = ""
-        for rowForm in self.elements:
+        ret = []
+        for rowForm in self:
             msg = []
             for n in rowForm:
                 msg.append(str(n.pitch.pitchClassString).rjust(3))
-            ret += ''.join(msg) + "\n"
-        return ret
+            ret.append(''.join(msg))
+        return '\n'.join(ret)
 
     def __repr__(self):
         if self:
@@ -238,10 +257,8 @@ class ToneRow(stream.Stream):
     can most importantly be used to deal with
     serial transformations. 
     '''
-    row = None
-
     _DOC_ATTR = {
-    'row': 'A list representing the pitch class values of the row.',
+        'row': 'A list representing the pitch class values of the row.',
     }
     
     _DOC_ORDER = ['pitchClasses', 'noteNames', 'isTwelveToneRow', 'isSameRow', 
@@ -249,16 +266,19 @@ class ToneRow(stream.Stream):
                   'zeroCenteredTransformation', 'originalCenteredTransformation',
                   'findZeroCenteredTransformations', 'findOriginalCenteredTransformations']
     
-    def __init__(self):
-        stream.Stream.__init__(self)
-        
-        if self.row is not None:
-            for pc in self.row:
-                n = note.Note()
-                n.pitch = pitch.Pitch(pc)
-                n.pitch.octave = None
-                self.append(n)
-    
+    def __init__(self, row=None, *arguments, **keywords):
+        stream.Stream.__init__(self, *arguments, **keywords)
+        if row is not None:
+            self.row = row
+        else:
+            self.row = []
+
+        for pc in self.row:
+            n = note.Note()
+            n.pitch = pitch.Pitch(pc)
+            n.pitch.octave = None
+            self.append(n)
+                
         
     def pitchClasses(self):
         '''
@@ -621,8 +641,8 @@ class TwelveToneRow(ToneRow):
     _DOC_ORDER = ['matrix', 'isAllInterval', 
                   'getLinkClassification', 'isLinkChord', 'areCombinatorial']
 
-    def __init__(self):
-        ToneRow.__init__(self)
+    def __init__(self, *arguments, **keywords):
+        ToneRow.__init__(self, *arguments, **keywords)
         #environLocal.printDebug(['TwelveToneRow.__init__: length of elements', len(self)])
 
         #if self.row != None:
@@ -1031,34 +1051,34 @@ class TwelveToneRow(ToneRow):
 
 
 class HistoricalTwelveToneRow(TwelveToneRow):
-    
     '''
     Subclass of :class:`~music21.serial.TwelveToneRow` storing additional attributes of a 
     twelve-tone row used in the historical literature.
-    
     '''
-    
     _DOC_ATTR = {
-    'composer': 'The name of the composer.',
-    'opus': 'The opus of the work, or None.',
-    'title': 'The title of the work.',
+        'composer': 'The name of the composer.',
+        'opus': 'The opus of the work, or None.',
+        'title': 'The title of the work.',
     }
     
     composer = None
     opus = None
     title = None
     
-    def __init__(self, composer = None, opus = None, title = None, row = None):
+    def __init__(self, composer=None, opus=None, title=None, row=None):
+        TwelveToneRow.__init__(self, row)
         self.composer = composer
         self.opus = opus
         self.title = title
-        self.row = row
-        TwelveToneRow.__init__(self)
+
+    def __repr__(self):
+        return '<music21.serial.HistoricalTwelveToneRow {} {} {}>'.format(self.composer,
+                                                                          self.opus,
+                                                                          self.title)
 
 
 
 def getHistoricalRowByName(rowName):
-    
     '''
     Given the name referring to a twelve-tone row used in the historical literature,
     returns a :class:`~music21.serial.HistoricalTwelveToneRow` object with attributes 
@@ -1141,7 +1161,6 @@ def getHistoricalRowByName(rowName):
     RowWebernOp31
     RowWebernOpNo17No1
     
-    
     >>> a = serial.getHistoricalRowByName('RowWebernOp29')
     >>> a.row
     [3, 11, 2, 1, 5, 4, 7, 6, 10, 9, 0, 8]
@@ -1153,9 +1172,7 @@ def getHistoricalRowByName(rowName):
     'Cantata I'
     >>> a.isLinkChord()
     False
-    
     '''
-    
     if rowName in historicalDict:
         attr = historicalDict[rowName]
         rowObj = HistoricalTwelveToneRow(attr[0], attr[1], attr[2], attr[3])
@@ -1219,19 +1236,34 @@ def pcToToneRow(pcSet):
 def rowToMatrix(p):
     '''
     takes a row of numbers of converts it to a 12-tone matrix.
+
+    >>> aMatrix = serial.rowToMatrix([0, 2, 11, 7, 8, 3, 9, 1, 4, 10, 6, 5])
+    >>> print(aMatrix)
+      0  2 11  7  8  3  9  1  4 10  6  5
+     10  0  9  5  6  1  7 11  2  8  4  3
+      1  3  0  8  9  4 10  2  5 11  7  6
+      5  7  4  0  1  8  2  6  9  3 11 10
+      4  6  3 11  0  7  1  5  8  2 10  9
+      9 11  8  4  5  0  6 10  1  7  3  2
+      3  5  2 10 11  6  0  4  7  1  9  8
+     11  1 10  6  7  2  8  0  3  9  5  4
+      8 10  7  3  4 11  5  9  0  6  2  1
+      2  4  1  9 10  5 11  3  6  0  8  7
+      6  8  5  1  2  9  3  7 10  4  0 11
+      7  9  6  2  3 10  4  8 11  5  1  0
     '''
     
-    i = [(12-x) % 12 for x in p]
-    matrix = [[(x+t) % 12 for x in p] for t in i]
+    i = [(12 - x) % 12 for x in p]
+    matrix = [[(x + t) % 12 for x in p] for t in i]
 
-    ret = ""
+    ret = []
     for row in matrix:
         msg = []
         for p in row:
             msg.append(str(p).rjust(3))
-        ret += ''.join(msg) + "\n"
+        ret.append(''.join(msg))
 
-    return ret
+    return '\n'.join(ret)
 
 
 #-------------------------------------------------------------------------------
@@ -1267,7 +1299,6 @@ class Test(unittest.TestCase):
 
 
     def testMatrix(self):
-
         src = getHistoricalRowByName('RowSchoenbergOp37')
         self.assertEqual([p.name for p in src], 
             ['D', 'C#', 'A', 'B-', 'F', 'E-', 'E', 'C', 'G#', 'G', 'F#', 'B'])

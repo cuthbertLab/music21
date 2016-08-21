@@ -22,6 +22,7 @@ this module.
 '''
 import collections
 import copy
+import itertools
 import unittest
 import warnings
 import sys
@@ -3548,16 +3549,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if startOffset is None:
                 # is m 2X before 2 or after? can't be sure,
                 # so we get the min...
-                for mWithSameId in matches:
-                    for m in mWithSameId:
-                        thisOffset = m.getOffsetBySite(srcObj)
-                        if startOffset is None:
-                            startOffset = thisOffset # most common
+                
+                # m is in a list of lists...
+                for m in itertools.chain.from_iterable(matches):
+                    thisOffset = m.getOffsetBySite(srcObj)
+                    if startOffset is None:
+                        startOffset = thisOffset # most common
+                        startMeasure = m
+                    else: # suffixes -- should check priority!
+                        if thisOffset < startOffset:
+                            startOffset = thisOffset
                             startMeasure = m
-                        else: # suffixes -- should check priority!
-                            if thisOffset < startOffset:
-                                startOffset = thisOffset
-                                startMeasure = m
                 #environLocal.printDebug(['startOffset', startOffset, 
                 #    'startMeasure', startMeasure, 'm', m])
 
@@ -4922,6 +4924,55 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         additional objects by placing class names in the `collect` list.
         By default, TimeSignature and KeySignature objects are collected.     
         '''
+        def dealWithSubNotes(chordLength, subNotes, returnObj):
+            #environLocal.printDebug(['creating chord from subNotes', 
+            #   subNotes, 'inPlace', inPlace])
+            c = chord.Chord()
+            c.duration.quarterLength = chordLength
+            # these are references, not copies, for now
+            tempComponents = []
+            for n in subNotes:
+                if n.isChord:
+                    cSub = [subN for subN in n]
+                else:
+                    cSub = [n]
+
+                if transferGroupsToPitches and n.groups:
+                    for comp in cSub:
+                        for g in n.groups:
+                            comp.pitch.groups.append(g)
+
+                for comp in cSub:
+                    tempComponents.append(comp)
+
+            c.pitches = [comp.pitch for comp in tempComponents]
+            for comp in tempComponents:
+                if comp.tie is not None:
+                    c.setTie(comp.tie.type, comp.pitch)
+
+            if gatherArticulations:
+                for n in subNotes:
+                    c.articulations += n.articulations
+            if gatherExpressions:
+                for n in subNotes:
+                    c.expressions += n.expressions
+            # always remove all the previous elements
+            for n in subNotes:
+                returnObj.remove(n)
+            # remove all rests found in source
+            for r in list(returnObj.getElementsByClass('Rest')):
+                returnObj.remove(r)
+                
+            if removeRedundantPitches:
+                removedPitches = c.removeRedundantPitches(inPlace=True)
+                
+                if transferGroupsToPitches:
+                    for rem_p, cn in itertools.product(removedPitches, c):
+                        if cn.pitch.nameWithOctave == rem_p.nameWithOctave:
+                            #print(cn.pitch, rem_p)
+                            #print(cn.pitch.groups, rem_p.groups)
+                            cn.pitch.groups.extend(rem_p.groups)
+            return c
         #environLocal.printDebug(['makeChords():', 
         #              'transferGroupsToPitches', transferGroupsToPitches])
 
@@ -4974,14 +5025,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         matchClasses = ['Note', 'Chord']
         o = 0.0 # start at zero
         oTerminate = returnObj.highestOffset
-        removedPitches = []
 
         # get temporary boundaries for making rests
         preHighestTime = returnObj.highestTime
         preLowestOffset = returnObj.lowestOffset
         #environLocal.printDebug(['got preLowest, preHighest', preLowestOffset, preHighestTime])
         if useExactOffsets is False:
-            while True:
+            while True: # TODO: Remove while True always...
                 # get all notes within the start and the minwindow size
                 oStart = o
                 oEnd = oStart + minimumWindowSize
@@ -5020,45 +5070,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
                 # make subNotes into a chord
                 if subNotes:
-                    #environLocal.printDebug(['creating chord from subNotes', 
-                    #   subNotes, 'inPlace', inPlace])
-                    c = chord.Chord()
-                    c.duration.quarterLength = qlMax
-                    # these are references, not copies, for now
-                    tempPitches = []
-                    for n in subNotes:
-                        if n.isChord:
-                            pSub = n.pitches
-                        else:
-                            pSub = [n.pitch]
-                        for p in pSub:
-                            if transferGroupsToPitches:
-                                for g in n.groups:
-                                    p.groups.append(g)
-                            tempPitches.append(p)
-                    c.pitches = tempPitches
-                    if gatherArticulations:
-                        for n in subNotes:
-                            c.articulations += n.articulations
-                    if gatherExpressions:
-                        for n in subNotes:
-                            c.expressions += n.expressions
-                    # always remove all the previous elements
-                    for n in subNotes:
-                        returnObj.remove(n)
-                    # remove all rests found in source
-                    for r in list(returnObj.getElementsByClass('Rest')):
-                        returnObj.remove(r)
-                    if removeRedundantPitches:
-                        removedPitches = c.removeRedundantPitches(inPlace=True)
-                        
-                        if transferGroupsToPitches:
-                            for rem_p in removedPitches:
-                                for cn in c:
-                                    if cn.pitch.nameWithOctave == rem_p.nameWithOctave:
-                                        #print(cn.pitch, rem_p)
-                                        #print(cn.pitch.groups, rem_p.groups)
-                                        cn.pitch.groups.extend(rem_p.groups)
+                    c = dealWithSubNotes(qlMax, subNotes, returnObj)
                     # insert chord at start location
                     returnObj._insertCore(o, c)
                 #environLocal.printDebug(['len of returnObj', len(returnObj)])
@@ -5094,54 +5106,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
                 # make subNotes into a chord
                 if subNotes:
-                    #environLocal.printDebug(['creating chord from subNotes', subNotes, 
-                    #    'inPlace', inPlace])
-                    c = chord.Chord()
-                    c.duration.quarterLength = oEnd - oStart
-                    # these are references, not copies, for now
-                    tempComponents = []
-                    for n in subNotes:
-                        if n.isChord:  # TODO: this code should be the same as before: combine.
-                            cSub = n._notes
-                        else:
-                            cSub = [n]
-
-                        if transferGroupsToPitches:
-                            if n.groups:
-                                for comp in cSub:
-                                    for g in n.groups:
-                                        comp.pitch.groups.append(g)
-#                            for g in comp.groups:
-#                                comp.pitch.groups.append(g)
-                        for comp in cSub:
-                            tempComponents.append(comp)
-                    c.pitches = [comp.pitch for comp in tempComponents]
-                    for comp in tempComponents:
-                        if comp.tie is not None:
-                            c.setTie(comp.tie.type, comp.pitch)
-
-                    if gatherArticulations:
-                        for n in subNotes:
-                            c.articulations += n.articulations
-                    if gatherExpressions:
-                        for n in subNotes:
-                            c.expressions += n.expressions
-                    # always remove all the previous elements
-                    for n in subNotes:
-                        returnObj.remove(n)
-                    # remove all rests found in source
-                    for r in list(returnObj.getElementsByClass('Rest')):
-                        returnObj.remove(r)
-
-                    if removeRedundantPitches:
-                        removedPitches = c.removeRedundantPitches(inPlace=True)
-                        if transferGroupsToPitches:
-                            for rem_p in removedPitches:
-                                for cn in c:
-                                    if cn.pitch.nameWithOctave == rem_p.nameWithOctave:
-                                        cn.pitch.groups.extend(rem_p.groups)
-
-                    
+                    c = dealWithSubNotes(oEnd - oStart, subNotes, returnObj)                    
                     # insert chord at start location
                     returnObj._insertCore(oStart, c)
 
@@ -6067,8 +6032,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return boundaries
 
 
-    def stripTies(self, inPlace=False, matchByPitch=False,
-         retainContainers=False):
+    def stripTies(self, 
+                  inPlace=False, 
+                  matchByPitch=False,
+                  retainContainers=False):
         '''
         Find all notes that are tied; remove all tied notes,
         then make the first of the tied notes have a duration
@@ -6137,11 +6104,54 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         posConnected = [] # temporary storage for index of tied notes
         posDelete = [] # store deletions to be processed later
 
+        def updateEndMatch(n):
+            '''
+            updateEndMatch based on nList, iLast, matchByPitch, etc.
+            '''
+            # ties tell us when the are ended
+            if (hasattr(n, 'tie') 
+                    and n.tie is not None
+                    and n.tie.type == 'stop'):
+                return True
+            # if we cannot find a stop tie, see if last note was connected
+            # and this and the last note are the same pitch; this assumes
+            # that connected and same pitch value is tied; this is not
+            # frequently the case
+            elif not matchByPitch:
+                return False
+
+            # else...
+            # find out if the last index is in position connected
+            # if the pitches are the same for each note
+            endMatch = False
+            if (nLast is not None 
+                    and iLast in posConnected
+                    and hasattr(nLast, "pitch") 
+                    and hasattr(n, "pitch")
+                    and nLast.pitch == n.pitch):
+                endMatch = True
+            # looking for two chords of equal size
+            elif (nLast is not None 
+                    and not n.isClassOrSubclass('Note') 
+                    and iLast in posConnected
+                    and hasattr(nLast, "pitches") 
+                    and hasattr(n, "pitches")
+                    and len(nLast.pitches) == len(n.pitches)):
+                allPitchesMatched = True
+                for pitchIndex in range(len(nLast.pitches)):
+                    if nLast.pitches[pitchIndex] != n.pitches[pitchIndex]:
+                        allPitchesMatched = False
+                        break
+                if allPitchesMatched:
+                    endMatch = True
+
+            return endMatch
+
         for i in range(len(notes)):
             endMatch = None # can be True, False, or None
             n = notes[i]
             if i > 0: # get i and n for the previous value
-                iLast = i-1
+                iLast = i - 1
                 nLast = notes[iLast]
             else:
                 iLast = None
@@ -6171,34 +6181,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
             # establish end condition
             if endMatch is None: # not yet set, not a start or continue
-                # ties tell us when the are ended
-                if (hasattr(n, 'tie') 
-                        and n.tie is not None
-                        and n.tie.type == 'stop'):
-                    endMatch = True
-                # if we cannot find a stop tie, see if last note was connected
-                # and this and the last note are the same pitch; this assumes
-                # that connected and same pitch value is tied; this is not
-                # frequently the case
-                elif matchByPitch:
-                    # find out if the last index is in position connected
-                    # if the pitches are the same for each note
-                    if (nLast is not None and iLast in posConnected
-                        and hasattr(nLast, "pitch") and hasattr(n, "pitch")
-                        and nLast.pitch == n.pitch):
-                        endMatch = True
-                    # looking for two chords of equal size
-                    elif (nLast is not None and not
-                        self.isClassOrSubclass('Note') and iLast in posConnected
-                        and hasattr(nLast, "pitches") and hasattr(n, "pitches")
-                        and len(nLast.pitches) == len(n.pitches)):
-                        allPitchesMatched = True
-                        for pitchIndex in range(len(nLast.pitches)):
-                            if nLast.pitches[pitchIndex] != n.pitches[pitchIndex]:
-                                allPitchesMatched = False
-                                break
-                        if allPitchesMatched :
-                            endMatch = True
+                endMatch = updateEndMatch(n)
 
             # process end condition
             if endMatch:
@@ -6318,27 +6301,25 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 e.getOffsetBySite(srcFlat) + e.duration.quarterLength)
             #environLocal.printDebug(['possible conections', connections])
 
-            for p in pSrc:
+            for p, m in itertools.product(pSrc, connections):
                 # for each p, see if there is match in the next position
-                for m in connections:
-                    # for each element, look for a pitch to match
-                    mSrc = []
-                    if 'Note' in m.classes:
-                        mSrc = [m]
-                    elif 'Chord' in m.classes:
-                        mSrc = [n for n in m] # get components
-                    # final note comparison
-                    for q in mSrc:
-                        if getattr(q.pitch, pitchAttr) == getattr(p.pitch,
-                            pitchAttr):
-                            # create a tie from p to q
-                            if p.tie is None:
-                                p.tie = tie.Tie('start')
-                            elif p.tie.type is 'stop':
-                                p.tie.type = 'continue'
-                            # if dst tie exists, assume it connects
-                            q.tie = tie.Tie('stop')
-                            break # can only have one match from p to q
+                # for each element, look for a pitch to match
+                mSrc = []
+                if 'Note' in m.classes:
+                    mSrc = [m]
+                elif 'Chord' in m.classes:
+                    mSrc = [n for n in m] # get components
+                # final note comparison
+                for q in mSrc:
+                    if getattr(q.pitch, pitchAttr) == getattr(p.pitch, pitchAttr):
+                        # create a tie from p to q
+                        if p.tie is None:
+                            p.tie = tie.Tie('start')
+                        elif p.tie.type is 'stop':
+                            p.tie.type = 'continue'
+                        # if dst tie exists, assume it connects
+                        q.tie = tie.Tie('stop')
+                        break # can only have one match from p to q
 
     #---------------------------------------------------------------------------
 
@@ -6842,12 +6823,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # not a Stream; may or may not have a activeSite;
                 # its possible that it may have activeSite not identified elsewhere
                 #if not hasattr(e, 'elements'):
-                if not e.isStream:
-                    if not streamsOnly:
-                        if id(e) not in memo:
-                            yield e
-                            if skipDuplicates:
-                                memo.append(id(e))
+                if not e.isStream and not streamsOnly and id(e) not in memo:
+                    yield e
+                    if skipDuplicates:
+                        memo.append(id(e))
                 # for each element in the activeSite that is a Stream,
                 # look at the activeSites
                 # if the activeSites are a Stream, recurse
@@ -6868,11 +6847,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     # here, we have found a container at the same level of
                     # the caller; since it is a Stream, we yield
                     # caller is contained in the activeSite; if e is self, skip
-                    if id(e) != id(self):
-                        if id(e) not in memo:
-                            yield e
-                            if skipDuplicates:
-                                memo.append(id(e))
+                    if id(e) != id(self) and id(e) not in memo:
+                        yield e
+                        if skipDuplicates:
+                            memo.append(id(e))
 
     def recurse(self, streamsOnly=False,
         restoreActiveSites=True, classFilter=(), skipSelf=False):
@@ -8980,7 +8958,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         lastWasNone = True
                 if hasattr(e, "pitch"):
                     #if (skipUnisons is False or isinstance(lastPitch, list)
-                    if (skipUnisons is False 
+                    if not(skipUnisons is False 
                             or isinstance(lastPitch, tuple)
                             or lastPitch is None
                             or (hasattr(lastPitch, 'pitchClass') 
@@ -8988,50 +8966,48 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             or (skipOctaves is False 
                                 and hasattr(lastPitch, 'pitchClass')
                                 and e.pitch.ps != lastPitch.ps)):
-                        if getOverlaps is True or e.offset >= lastEnd:
-                            if e.offset >= lastEnd:  # is not an overlap...
-                                lastStart = e.offset
-                                if hasattr(e, "duration"):
-                                    lastEnd = opFrac(lastStart + e.duration.quarterLength)
-                                else:
-                                    lastEnd = lastStart
-                                lastWasNone = False
-                                lastPitch = e.pitch
-                            else:  # do not update anything for overlaps
-                                pass
-                            returnList.append(e)
+                        continue
+                    if getOverlaps is False and e.offset < lastEnd:
+                        continue
+
+                    returnList.append(e)
+                    if e.offset < lastEnd:  # is an overlap...
+                        continue
+
+                    lastStart = e.offset
+                    if hasattr(e, "duration"):
+                        lastEnd = opFrac(lastStart + e.duration.quarterLength)
+                    else:
+                        lastEnd = lastStart
+                    lastWasNone = False
+                    lastPitch = e.pitch
+                    
                 # if we have a chord
                 elif hasattr(e, "pitches") and len(e.pitches) > 1:
                     if skipChords is True:
-                        if lastWasNone is False:
-                            if not noNone:
-                                returnList.append(None)
-                                lastWasNone = True
-                                lastPitch = None
+                        if lastWasNone is False and not noNone:
+                            returnList.append(None)
+                            lastWasNone = True
+                            lastPitch = None
                     # if we have a chord
-                    else:
-                        #environLocal.printDebug(['e.pitches', e, e.pitches])
-                        #environLocal.printDebug(['lastPitch', lastPitch])
-
-                        if (skipUnisons is True 
+                    elif (not (skipUnisons is True 
                                 and isinstance(lastPitch, (list, tuple)) 
-                                and e.pitches[0].ps == lastPitch[0].ps):
-                            pass
+                                and e.pitches[0].ps == lastPitch[0].ps
+                                ) and (getOverlaps is True or e.offset >= lastEnd)):
+                        returnList.append(e)
+                        if e.offset < lastEnd:  # is an overlap...
+                            continue
+                        
+                        lastStart = e.offset
+                        if hasattr(e, "duration"):
+                            lastEnd = opFrac(lastStart + e.duration.quarterLength)
                         else:
-                            if getOverlaps is True or e.offset >= lastEnd:
-                                if e.offset >= lastEnd:  # is not an overlap...
-                                    lastStart = e.offset
-                                    if hasattr(e, "duration"):
-                                        lastEnd = opFrac(lastStart + e.duration.quarterLength)
-                                    else:
-                                        lastEnd = lastStart
-                                    # this is the case where the last pitch is a
-                                    # a list
-                                    lastPitch = e.pitches
-                                    lastWasNone = False
-                                else:  # do not update anything for overlaps
-                                    pass
-                                returnList.append(e)
+                            lastEnd = lastStart
+                        # this is the case where the last pitch is a
+                        # a list
+                        lastPitch = e.pitches
+                        lastWasNone = False
+
 
                 elif (skipRests is False 
                       and isinstance(e, note.Rest) 
@@ -12623,12 +12599,8 @@ class Score(Stream):
                     v.id = pIndex
                     # for now, just take notes, including rests
                     for e in m.notesAndRests: #m.getElementsByClass():
-                        if setStems:
-                            if hasattr(e, 'stemDirection'):
-                                if pIndex % 2 == 0:
-                                    e.stemDirection = 'up'
-                                else:
-                                    e.stemDirection = 'down'
+                        if setStems and hasattr(e, 'stemDirection'):
+                            e.stemDirection = 'up' if pIndex % 2 == 0 else 'down'
                         v.insert(e.getOffsetBySite(m), e)
                     # insert voice in new  measure
                     #environLocal.printDebug(['inserting voice', v, v.id, 'into measure', mActive])

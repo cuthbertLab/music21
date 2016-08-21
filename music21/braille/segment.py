@@ -18,6 +18,11 @@ available from the Library of Congress `here <http://www.loc.gov/nls/music/>`_,
 and will henceforth be referred to as BMTM.
 """
 
+# eventually this needs to be removed but for now, we are monkey patching
+# _brailleEnglish
+
+# pylint: disable=attribute-defined-outside-init
+
 # pylint: disable=redefined-builtin
 try:  # gives Py2 the zip of Py3
     from future_builtins import zip
@@ -1042,6 +1047,9 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
     A BrailleGrandSegment represents a pair of segments (rightSegment, leftSegment)
     representing the right and left hands of a piano staff (or other two-staff object)
     '''
+    # this is very bad practice and 
+    # TODO: find a way around this.
+    # pylint: disable=non-parent-init-called,super-init-not-called
     def __init__(self):
         collections.defaultdict.__init__(self, BrailleElementGrouping)
         text.BrailleKeyboard.__init__(self, lineLength=SEGMENT_LINELENGTH)

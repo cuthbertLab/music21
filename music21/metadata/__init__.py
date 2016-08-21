@@ -55,7 +55,10 @@ from music21.ext import six
 
 from music21.metadata import bundles
 from music21.metadata import caching
-from music21.metadata.primitives import * # pylint: disable=wildcard-import
+from music21.metadata import primitives
+from music21.metadata.primitives import (Date, DateSingle, DateRelative, DateBetween,
+                                         DateSelection, Text, Contributor, Creator,
+                                         Imprint, Copyright)
 
 from music21.metadata import testMetadata 
 #------------------------------------------------------------------------------
@@ -226,7 +229,7 @@ class Metadata(base.Music21Object):
         Skip contributors is there to help with musicxml parsing -- there's no reason for it
         except that we haven't exposed enough functionality yet:
         
-        >>> c.metadata.date = metadata.primitives.DateRelative('1689', 'onOrBefore')
+        >>> c.metadata.date = metadata.DateRelative('1689', 'onOrBefore')
         >>> c.metadata.localeOfComposition = 'Rome'
         >>> c.metadata.all(skipContributors=True)
         [('date', '1689/--/-- or earlier'), 
@@ -242,6 +245,7 @@ class Metadata(base.Music21Object):
                 t = (str(wid), str(val))
             else:
                 try:
+                    # pylint: disable=undefined-variable
                     t = (str(wid), unicode(val)) # @UndefinedVariable
                 except UnicodeDecodeError as ude:
                     print(val, repr(val), ude)
@@ -252,18 +256,21 @@ class Metadata(base.Music21Object):
                     if six.PY3:
                         t = (str(contri.role), str(n))
                     else:
+                        # pylint: disable=undefined-variable
                         t = (str(contri.role), unicode(n)) # @UndefinedVariable
                     allOut.append(t)
         if self._date is not None:
             if six.PY3:
                 t = ('date', str(self._date))
             else:
+                # pylint: disable=undefined-variable
                 t = ('date', unicode(self._date)) # @UndefinedVariable
             allOut.append(t)
         if self._copyright is not None:
             if six.PY3:
                 t = ('copyright', str(self._copyright))
             else:
+                # pylint: disable=undefined-variable
                 t = ('copyright', unicode(self._copyright)) # @UndefinedVariable
             allOut.append(t)
             

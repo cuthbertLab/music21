@@ -104,6 +104,8 @@ try:
 except ImportError:
     from urllib import parse as urlparse
 
+# some reason, pylint looks at method name not whether actually deprecated
+# pylint: disable=deprecated-method,ungrouped-imports
 try:
     from html import escape as cgiescape # PY3
 except ImportError:

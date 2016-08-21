@@ -584,6 +584,21 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
     >>> 'Part' in secondStaff.classes
     True
     '''
+    def getRichSystemLayout(allSystemLayouts):
+        '''
+        If there are multiple systemLayous in an iterable (list or StreamIterator),
+        make a copy of the first one and get information from each successive one into
+        a rich system layout.
+        '''
+        richestSystemLayout = copy.deepcopy(allSystemLayouts[0])
+        for sl in allSystemLayouts[1:]:
+            for attribute in ('distance', 'topDistance', 'leftMargin', 'rightMargin'):
+                if (getattr(richestSystemLayout, attribute) is None
+                        and getattr(sl, attribute) is not None):
+                    setattr(richestSystemLayout, attribute, getattr(sl, attribute))
+        return richestSystemLayout
+    
+    
     pageMeasureTuples = getPageRegionMeasureNumbers(scoreIn)
     systemMeasureTuples = getSystemRegionMeasureNumbers(scoreIn)
     firstMeasureNumber = pageMeasureTuples[0][0]
@@ -663,21 +678,17 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
                 staffObject.elements = p
                 thisSystem.replace(p, staffObject)
                 allStaffLayouts = p.recurse().getElementsByClass('StaffLayout')
-                if len(allStaffLayouts) > 0:
-                    #if len(allStaffLayouts) > 1:
-                    #    print("Got many staffLayouts")
-                    staffObject.staffLayout = allStaffLayouts[0]
+                if len(allStaffLayouts) == 0:
+                    continue
+                # else:
+                staffObject.staffLayout = allStaffLayouts[0]
+                #if len(allStaffLayouts) > 1:
+                #    print("Got many staffLayouts")
+
 
             allSystemLayouts = thisSystem.recurse().getElementsByClass('SystemLayout')
-            if allSystemLayouts:
-                richestSystemLayout = copy.deepcopy(allSystemLayouts[0])
-                for sl in allSystemLayouts[1:]:
-                    for attribute in ('distance', 'topDistance', 'leftMargin', 'rightMargin'):
-                        if (getattr(richestSystemLayout, attribute) is None
-                                and getattr(sl, attribute) is not None):
-                            setattr(richestSystemLayout, attribute, getattr(sl, attribute))
-                    #print(sl, sl.measureNumber)
-                thisSystem.systemLayout = richestSystemLayout
+            if len(allSystemLayouts) >= 2:
+                thisSystem.systemLayout = getRichSystemLayout(allSystemLayouts)
             elif len(allSystemLayouts) == 1:
                 thisSystem.systemLayout = allSystemLayouts[0]
             else:

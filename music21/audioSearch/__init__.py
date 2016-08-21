@@ -514,7 +514,7 @@ def smoothFrequencies(detectedPitchesFreq, smoothLevels=7, inPlace=True):
      440, 440, 440, 441, 441, 441, 441, 441, 441, 441]
     '''
     dpf = detectedPitchesFreq
-    if inPlace == True:
+    if inPlace:
         detectedPitchesFreq = dpf
     else:
         detectedPitchesFreq = copy.copy(dpf)
@@ -613,7 +613,7 @@ def joinConsecutiveIdenticalPitches(detectedPitchObjects):
                     notesList.append(note.Rest())
                 bad = 0
             j = j + 1
-        if valid_note == True:
+        if valid_note:
             durationList.append(good)
             total_notes = total_notes + 1
             ### doesn't this unnecessarily create a note that it doesn't need?
@@ -756,9 +756,7 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None,
     for i in range(len(durationList)):
         actualDuration = quantizeDuration(durationList[i] / qle)
         notesList[i].quarterLength = actualDuration
-        if (removeRestsAtBeginning == True) and (notesList[i].name == "rest"):
-            pass
-        else:
+        if not (removeRestsAtBeginning and (notesList[i].name == "rest")):
             p2.append(notesList[i])
             removeRestsAtBeginning = False
 

@@ -87,7 +87,7 @@ import re
 import unittest
 
 try: # gives Py2 the zip of Py3
-    from future_builtins import zip
+    from future_builtins import zip # pylint: disable=redefined-builtin
 except ImportError:
     pass
 

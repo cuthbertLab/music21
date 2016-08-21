@@ -46,7 +46,7 @@ from six.moves import xrange   # @UnusedImport @UnresolvedImport
 from six.moves import range  # @UnresolvedImport @NoMove
 
 if six.PY3:
-    from unittest import mock  # pylint: disable=no-name-in-module @UnusedImport @NoMove
+    from unittest import mock  # @UnusedImport @NoMove # pylint: disable=no-name-in-module 
 else:
     from music21.ext import mock  # @Reimport
 

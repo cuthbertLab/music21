@@ -807,7 +807,7 @@ class Key(KeySignature, scale.DiatonicScale):
         self.correlationCoefficient = None
 
         # store an ordered list of alternative Key objects
-        self.alternateInterpretations = None
+        self.alternateInterpretations = []
 
     def __hash__(self):
         hashTuple = (self.tonic, self.mode)
@@ -920,7 +920,7 @@ class Key(KeySignature, scale.DiatonicScale):
     
     def _tonalCertainityCorrelationCoefficient(self, *args, **keywords):
         # possible measures:
-        if self.alternateInterpretations is None or len(self.alternateInterpretations) == 0:
+        if len(self.alternateInterpretations) == 0:
             raise KeySignatureException(
                     'cannot process ambiguity without a list of .alternateInterpretations')
         focus = []

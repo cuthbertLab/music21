@@ -977,7 +977,7 @@ class PartParser(XMLParserBase):
         '''
         # get staves will return a number, between 1 and count
         #for staffCount in range(mxPart.getStavesCount()):
-        for staffNumber in self._getUniqueStaffKeys():
+        def separateOneStaffNumber(staffNumber):
             partStaffId = '%s-Staff%s' % (self.partId, staffNumber)
             #environLocal.printDebug(['partIdStaff', partIdStaff, 'copying streamPart'])
             # this deepcopy is necessary, as we will remove components
@@ -995,22 +995,24 @@ class PartParser(XMLParserBase):
             mStream = streamPartStaff.getElementsByClass('Measure')
             for i, staffReference in enumerate(self.staffReferenceList):
                 staffExclude = self._getStaffExclude(staffReference, staffNumber)
-                if len(staffExclude) > 0:
-                    m = mStream[i]
-                    for eRemove in staffExclude:
-                        for eMeasure in m:
-                            if (eMeasure.derivation.origin is eRemove
-                                and eMeasure.derivation.method == '__deepcopy__'):
-                                #print("removing element", eMeasure, " from ", m)
-                                m.remove(eMeasure)
-                                break
-                        for v in m.voices:
-                            v.remove(eRemove)
-                            for eVoice in v.elements:
-                                if (eVoice.derivation.origin is eRemove 
-                                    and eVoice.derivation.method == '__deepcopy__'):
-                                    #print("removing element", eRemove, " from ", m, ' voice', v)
-                                    v.remove(eVoice)
+                if len(staffExclude) == 0:
+                    continue
+
+                m = mStream[i]
+                for eRemove in staffExclude:
+                    for eMeasure in m:
+                        if (eMeasure.derivation.origin is eRemove
+                            and eMeasure.derivation.method == '__deepcopy__'):
+                            #print("removing element", eMeasure, " from ", m)
+                            m.remove(eMeasure)
+                            break
+                    for v in m.voices:
+                        v.remove(eRemove)
+                        for eVoice in v.elements:
+                            if (eVoice.derivation.origin is eRemove 
+                                and eVoice.derivation.method == '__deepcopy__'):
+                                #print("removing element", eRemove, " from ", m, ' voice', v)
+                                v.remove(eVoice)
                 # after adjusting voices see if voices can be reduced or
                 # removed
                 #environLocal.printDebug(['calling flattenUnnecessaryVoices: voices before:',
@@ -1027,6 +1029,9 @@ class PartParser(XMLParserBase):
             self.parent.stream._insertCore(0, streamPartStaff)
             self.parent.m21PartObjectsById[partStaffId] = streamPartStaff
         
+        for staffNumber in self._getUniqueStaffKeys():
+            separateOneStaffNumber(staffNumber)
+
         self.appendToScoreAfterParse = False
         self.parent.stream.elementsChanged()
     

@@ -2095,6 +2095,7 @@ class Test(unittest.TestCase):
 
 ##-------Main-------------##
 if __name__ == '__main__':
+    # pylint: disable=ungrouped-imports
     import music21
     music21.mainTest(Test)
 

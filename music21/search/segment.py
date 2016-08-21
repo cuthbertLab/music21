@@ -290,6 +290,50 @@ def scoreSimilarity(
     scoreIndex = 0
     totalScores = len(scoreDict)
     scoreDictKeys = list(scoreDict.keys())
+    pNum = None
+    segmentNumber = None
+    
+    def doOneSegment(thisSegment):
+        dl = getDifflibOrPyLev(thisSegment, forceDifflib=forceDifflib)
+        #dl = difflib.SequenceMatcher(None, '', thisSegment)
+        for thatScoreNumber in range(scoreIndex, totalScores):
+            thatScoreKey = scoreDictKeys[thatScoreNumber]
+            thatScore = scoreDict[thatScoreKey]
+            for pNum2 in range(len(thatScore)):
+                for thatSegmentNumber, thatSegment in enumerate(
+                                                    thatScore[pNum2]['segmentList']):
+                    if len(thatSegment) < minimumLength:
+                        continue
+                    dl.set_seq1(thatSegment)
+                    ratio = dl.ratio()
+                    thatMeasureNumber = thatScore[pNum2]['measureList'][thatSegmentNumber]
+                    similarityTuple = (
+                        thisScoreKey, 
+                        pNum, 
+                        segmentNumber, 
+                        thisMeasureNumber, 
+                        thatScoreKey, 
+                        pNum2, 
+                        thatSegmentNumber, 
+                        thatMeasureNumber, 
+                        ratio,
+                        )
+                    similarityScores.append(similarityTuple)
+                    if not includeReverse:
+                        continue
+                    similarityTupleReversed = (
+                        thatScoreKey, 
+                        pNum2, 
+                        thatSegmentNumber, 
+                        thatMeasureNumber, 
+                        thisScoreKey, 
+                        pNum, 
+                        segmentNumber, 
+                        thisMeasureNumber, 
+                        ratio,
+                        )
+                    similarityScores.append(similarityTupleReversed)
+    
     for thisScoreNumber in range(totalScores):
         thisScoreKey = scoreDictKeys[thisScoreNumber]
         thisScore = scoreDict[thisScoreKey]
@@ -302,44 +346,7 @@ def scoreSimilarity(
                 if len(thisSegment) < minimumLength:
                     continue
                 thisMeasureNumber = thisScore[pNum]['measureList'][segmentNumber]
-                dl = getDifflibOrPyLev(thisSegment, forceDifflib = forceDifflib)
-                #dl = difflib.SequenceMatcher(None, '', thisSegment)
-                for thatScoreNumber in range(scoreIndex, totalScores):
-                    thatScoreKey = scoreDictKeys[thatScoreNumber]
-                    thatScore = scoreDict[thatScoreKey]
-                    for pNum2 in range(len(thatScore)):
-                        for thatSegmentNumber, thatSegment in enumerate(
-                                                            thatScore[pNum2]['segmentList']):
-                            if len(thatSegment) < minimumLength:
-                                continue
-                            dl.set_seq1(thatSegment)
-                            ratio = dl.ratio()
-                            thatMeasureNumber = thatScore[pNum2]['measureList'][thatSegmentNumber]
-                            similarityTuple = (
-                                thisScoreKey, 
-                                pNum, 
-                                segmentNumber, 
-                                thisMeasureNumber, 
-                                thatScoreKey, 
-                                pNum2, 
-                                thatSegmentNumber, 
-                                thatMeasureNumber, 
-                                ratio,
-                                )
-                            similarityScores.append(similarityTuple)
-                            if includeReverse is True:
-                                similarityTupleReversed = (
-                                    thatScoreKey, 
-                                    pNum2, 
-                                    thatSegmentNumber, 
-                                    thatMeasureNumber, 
-                                    thisScoreKey, 
-                                    pNum, 
-                                    segmentNumber, 
-                                    thisMeasureNumber, 
-                                    ratio,
-                                    )
-                                similarityScores.append(similarityTupleReversed)
+                doOneSegment(thisSegment)
 
     #import pprint
     #pprint.pprint(similarityScores)

@@ -1706,62 +1706,64 @@ def _doVariantFixingOnStream(s, variantNames=None):
             if set(v.groups) and set(variantNames) is []: 
                 # and if this variant is not in the controlled list
                 continue # then skip it
-        else: # otherwise, skip it unless it is a strict insertion of deletion
-            lengthType = v.lengthType
-            replacementDuration = v.replacementDuration
-            highestTime = v.containedHighestTime
-            
-            if lengthType is 'elongation' and replacementDuration == 0.0:
-                variantType = 'insertion'
-            elif lengthType is 'deletion' and highestTime == 0.0:
-                variantType = 'deletion'
             else:
-                continue
+                continue # huh???? 
+        #else: # otherwise, skip it unless it is a strict insertion of deletion
+        lengthType = v.lengthType
+        replacementDuration = v.replacementDuration
+        highestTime = v.containedHighestTime
+        
+        if lengthType is 'elongation' and replacementDuration == 0.0:
+            variantType = 'insertion'
+        elif lengthType is 'deletion' and highestTime == 0.0:
+            variantType = 'deletion'
+        else:
+            continue
+        
+        if v.getOffsetBySite(s) == 0.0:
+            isInitial = True
+            isFinal = False
+        elif v.getOffsetBySite(s)+v.replacementDuration == s.duration.quarterLength:
+            isInitial = False
+            isFinal = True
+        else:
+            isInitial = False
+            isFinal = False
+        
+        # If a non-final deletion or an INITIAL insertion, 
+        #  add the next element after the variant.
+        if ((variantType is 'insertion' and (isInitial is True)) or
+                (variantType is 'deletion' and (isFinal is False))):
+            targetElement = _getNextElements(s, v)
             
-            if v.getOffsetBySite(s) == 0.0:
-                isInitial = True
-                isFinal = False
-            elif v.getOffsetBySite(s)+v.replacementDuration == s.duration.quarterLength:
-                isInitial = False
-                isFinal = True
-            else:
-                isInitial = False
-                isFinal = False
+            #Delete initial clefs, etc. from initial insertion targetElement if it exists
+            if "Stream" in targetElement.classes:
+                # Must use .elements, because of removal of elements
+                for e in targetElement.elements: 
+                    if "Clef" in e.classes or "TimeSignature" in e.classes:
+                        targetElement.remove(e)
             
-            # If a non-final deletion or an INITIAL insertion, 
-            #  add the next element after the variant.
-            if ((variantType is 'insertion' and (isInitial is True)) or
-                    (variantType is 'deletion' and (isFinal is False))):
-                targetElement = _getNextElements(s, v)
+            v.append(copy.deepcopy(targetElement)) #Appends a copy!!!
                 
-                #Delete initial clefs, etc. from initial insertion targetElement if it exists
-                if "Stream" in targetElement.classes:
-                    # Must use .elements, because of removal of elements
-                    for e in targetElement.elements: 
-                        if "Clef" in e.classes or "TimeSignature" in e.classes:
-                            targetElement.remove(e)
-                
-                v.append(copy.deepcopy(targetElement)) #Appends a copy!!!
-                    
-            # If a non-initial insertion or a FINAL deletion, 
-            #     add the previous element after the variant.
-            # #elif ((variantType is 'deletion' and (isFinal is True)) or 
-            #         (type is 'insertion' and (isInitial is False))):
-            else: 
-                targetElement = _getPreviousElements(s, v)
-                newVariantOffset = targetElement.getOffsetBySite(s)
-                # Need to shift elements to make way for new element at front
-                offsetShift = targetElement.duration.quarterLength
-                for e in v.containedSite:
-                    oldOffset = e.getOffsetBySite(v.containedSite)
-                    e.setOffsetBySite(v.containedSite, oldOffset+offsetShift)
-                v.insert(0.0, copy.deepcopy(targetElement))
-                s.remove(v)
-                s.insert(newVariantOffset, v)
-                
-                # Give it a new replacementDuration including the added element
-            oldReplacementDuration = v.replacementDuration
-            v.replacementDuration = oldReplacementDuration + targetElement.duration.quarterLength
+        # If a non-initial insertion or a FINAL deletion, 
+        #     add the previous element after the variant.
+        # #elif ((variantType is 'deletion' and (isFinal is True)) or 
+        #         (type is 'insertion' and (isInitial is False))):
+        else: 
+            targetElement = _getPreviousElements(s, v)
+            newVariantOffset = targetElement.getOffsetBySite(s)
+            # Need to shift elements to make way for new element at front
+            offsetShift = targetElement.duration.quarterLength
+            for e in v.containedSite:
+                oldOffset = e.getOffsetBySite(v.containedSite)
+                e.setOffsetBySite(v.containedSite, oldOffset + offsetShift)
+            v.insert(0.0, copy.deepcopy(targetElement))
+            s.remove(v)
+            s.insert(newVariantOffset, v)
+            
+            # Give it a new replacementDuration including the added element
+        oldReplacementDuration = v.replacementDuration
+        v.replacementDuration = oldReplacementDuration + targetElement.duration.quarterLength
 
 
 def _getNextElements(s, v, numberOfElements=1):

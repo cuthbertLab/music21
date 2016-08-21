@@ -266,34 +266,47 @@ class ScoreReduction(object):
         # iterate overall notes, check all lyrics
         for p in score.parts:
             for i, m in enumerate(p.getElementsByClass('Measure')):
-                for n in m.flat.notes:
-                    if not n.hasLyrics():
-                        continue
+                for n in m.recurse().notes:
+                    infoDict = {'part': p,
+                                'measure': m,
+                                'measureIndex': i}
+                    self._extractNoteReductiveEvent(n, infoDict, removeAfterParsing)
 
+    def _extractNoteReductiveEvent(self, n, infoDict=None, removeAfterParsing=True):
+        if infoDict is None:
+            infoDict = {'part': None,
+                        'measure': None,
+                        'measureIndex': 0
+                        }
+        m = infoDict['measure']
+        
+        if not n.hasLyrics():
+            return
 
-                    removalIndices = []
-                    if m.hasElement(n):
-                        offset = n.getOffsetBySite(m)
-                    else: # its in a Voice
-                        for v in m.voices:
-                            if v.hasElement(n):
-                                offset = n.getOffsetBySite(v)
+        removalIndices = []
+        if m.hasElement(n):
+            offset = n.getOffsetBySite(m)
+        else: # its in a Voice
+            for v in m.voices:
+                if v.hasElement(n):
+                    offset = n.getOffsetBySite(v)
 
-                    
-                    # a list of Lyric objects
-                    for k, l in enumerate(n.lyrics): 
-                        # store measure index
-                        rn = ReductiveNote(l.text, n, i, offset)
-                        if rn.isParsed():
-                            #environLocal.printDebug(['parsing reductive note', rn])
-                            # use id, lyric text as hash
-                            key = str(id(n)) + l.text
-                            self._reductiveNotes[key] = rn
-                            removalIndices.append(k)
-                    if removeAfterParsing:
-                        for q in removalIndices:
-                            # replace position in list with empty lyric
-                            n.lyrics[q] = note.Lyric('') 
+        
+        # a list of Lyric objects
+        for k, l in enumerate(n.lyrics): 
+            # store measure index
+            rn = ReductiveNote(l.text, n, infoDict['measureIndex'], offset)
+            if rn.isParsed():
+                #environLocal.printDebug(['parsing reductive note', rn])
+                # use id, lyric text as hash
+                key = str(id(n)) + l.text
+                self._reductiveNotes[key] = rn
+                removalIndices.append(k)
+        if removeAfterParsing:
+            for q in removalIndices:
+                # replace position in list with empty lyric
+                n.lyrics[q] = note.Lyric('') 
+
 
     def _parseReductiveNotes(self):
         self._reductiveNotes = {}

@@ -924,7 +924,7 @@ def findCorrections(correctionType="Maj3", startPiece=2, endPiece=459):
                 
     return (totalDict, foundPieceOpus)
 
-def improvedHarmony(startPiece = 2, endPiece = 459):
+def improvedHarmony(startPiece=2, endPiece=459):
     '''
     Find how often an augmented or diminished interval was corrected to a perfect 
     interval and vice-versa

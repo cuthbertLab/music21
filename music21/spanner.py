@@ -1563,7 +1563,10 @@ class Ottava(Spanner):
 
     def getStartParameters(self):
         '''
-        Return the parameters for the start of this spanners required by MusicXML output. 
+        Return a dictionary of the parameters for the start of this spanners 
+        (required by MusicXML output). 
+        
+        TODO: Move to m21ToXml
         
         >>> ottava = spanner.Ottava(type='15mb')
         >>> st = ottava.getStartParameters()
@@ -1583,7 +1586,8 @@ class Ottava(Spanner):
         return post
 
     def getEndParameters(self):
-        '''Return the parameters for the start of this spanner required by MusicXML output. 
+        '''
+        Return a dict of the parameters for the start of this spanner required by MusicXML output. 
 
         >>> ottava = spanner.Ottava(type=8)
         >>> st = ottava.getStartParameters()
@@ -1751,7 +1755,8 @@ class Line(Spanner):
 
 
     def getStartParameters(self):
-        '''Return the parameters for the start of this spanners required by MusicXML output. 
+        '''
+        Return a dict of the parameters for the start of this spanners required by MusicXML output. 
         ''' 
         post = {}
         post['type'] = 'start'
@@ -1760,7 +1765,8 @@ class Line(Spanner):
         return post
 
     def getEndParameters(self):
-        '''Return the parameters for the start of this spanner required by MusicXML output. 
+        '''
+        Return a dict of the parameters for the start of this spanner required by MusicXML output. 
         ''' 
         post = {}
         post['type'] = 'stop'  # always stop

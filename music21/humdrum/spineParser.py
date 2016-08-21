@@ -463,52 +463,56 @@ class HumdrumDataCollection(object):
         ##    one of Events(horizontal slices)
         returnProtoSpines = []
         returnEventCollections = []
+        protoSpineEventList = []
 
-        for j in range(0, self.maxSpines):
-            protoSpineEventList = []
+        def doOneCell(i, j):
+            # get the currentEventCollection
+            thisEventCollection = returnEventCollections[i]
+            
+            # parse this cell
+            if self.eventList[i].isSpineLine is True:
+                # not a global event
+                if len(self.eventList[i].spineData) > j:
+                    ## are there actually this many spines at this point?
+                    ## thus, is there an event here? True
+                    thisEvent = SpineEvent(self.eventList[i].spineData[j])
+                    thisEvent.position = i
+                    thisEvent.protoSpineId = j
+                    if thisEvent.contents in spinePathIndicators:
+                        thisEventCollection.spinePathData = True
 
-            for i in range(0, self.fileLength):
-                # get the currentEventCollection
-                if j == 0:
-                    thisEventCollection = EventCollection(self.maxSpines)
-                    returnEventCollections.append(thisEventCollection)
-                else:
-                    thisEventCollection = returnEventCollections[i]
-
-                # parse this cell
-                if self.eventList[i].isSpineLine is True:
-                    # not a global event
-                    if len(self.eventList[i].spineData) > j:
-                        ## are there actually this many spines at this point?
-                        ## thus, is there an event here? True
-                        thisEvent = SpineEvent(self.eventList[i].spineData[j])
-                        thisEvent.position = i
-                        thisEvent.protoSpineId = j
-                        if thisEvent.contents in spinePathIndicators:
-                            thisEventCollection.spinePathData = True
-
-                        protoSpineEventList.append(thisEvent)
-                        thisEventCollection.addSpineEvent(j, thisEvent)
-                        if thisEvent.contents == '.' and i > 0:
-                            lastEvent = returnEventCollections[i-1].events[j]
-                            if lastEvent is not None:
-                                thisEventCollection.addLastSpineEvent(j, 
-                                    returnEventCollections[i-1].getSpineOccurring(j))
-                    else:  ## no data here
-                        thisEvent = SpineEvent(None)
-                        thisEvent.position = i
-                        thisEvent.protoSpineId = j
-                        thisEventCollection.addSpineEvent(j, thisEvent)
-
-                        protoSpineEventList.append(None)
-                else:  ## Global event -- either GlobalCommentLine or GlobalReferenceLine
-                    if j == 0: ## adds to all spines but just runs the first time.
-                        thisEventCollection.addGlobalEvent(self.eventList[i])
+                    protoSpineEventList.append(thisEvent)
+                    thisEventCollection.addSpineEvent(j, thisEvent)
+                    if thisEvent.contents == '.' and i > 0:
+                        lastEvent = returnEventCollections[i-1].events[j]
+                        if lastEvent is not None:
+                            thisEventCollection.addLastSpineEvent(j, 
+                                returnEventCollections[i-1].getSpineOccurring(j))
+                else:  ## no data here
                     thisEvent = SpineEvent(None)
                     thisEvent.position = i
                     thisEvent.protoSpineId = j
                     thisEventCollection.addSpineEvent(j, thisEvent)
+
                     protoSpineEventList.append(None)
+            else:  ## Global event -- either GlobalCommentLine or GlobalReferenceLine
+                if j == 0: ## adds to all spines but just runs the first time.
+                    thisEventCollection.addGlobalEvent(self.eventList[i])
+                thisEvent = SpineEvent(None)
+                thisEvent.position = i
+                thisEvent.protoSpineId = j
+                thisEventCollection.addSpineEvent(j, thisEvent)
+                protoSpineEventList.append(None)
+
+        # end doOneCell
+        for j in range(0, self.maxSpines):
+            protoSpineEventList = []
+
+            for i in range(0, self.fileLength):
+                if j == 0:
+                    returnEventCollections.append(EventCollection(self.maxSpines))
+                
+                doOneCell(i, j)
 
             returnProtoSpines.append(ProtoSpine(protoSpineEventList))
 
@@ -517,7 +521,7 @@ class HumdrumDataCollection(object):
 
         return (returnProtoSpines, returnEventCollections)
 
-    def createHumdrumSpines(self, protoSpines = None, eventCollections = None):
+    def createHumdrumSpines(self, protoSpines=None, eventCollections=None):
         '''
         Takes the data from the object's protoSpines and eventCollections
         and returns a :class:`~music21.humdrum.spineParser.SpineCollection`
@@ -555,98 +559,103 @@ class HumdrumDataCollection(object):
             for j in range(0, maxSpines):
                 thisEvent = protoSpines[j].eventList[i]
 
-                if thisEvent is not None:  # something there                
-                    currentSpine = currentSpineList[j]
-                    if currentSpine is None:
-                        ## first event after a None = new spine because
-                        ## Humdrum does not require *+ at the beginning
-                        currentSpine = spineCollection.addSpine()
-                        currentSpine.insertPoint = i
-                        currentSpineList[j] = currentSpine
+                if thisEvent is None:  # nothing there
+                    continue
 
-                    currentSpine.append(thisEvent)
-                    # currentSpine.id is always unique in a spineCollection
-                    thisEvent.protoSpineId = currentSpine.id
+                currentSpine = currentSpineList[j]
+                if currentSpine is None:
+                    ## first event after a None = new spine because
+                    ## Humdrum does not require *+ at the beginning
+                    currentSpine = spineCollection.addSpine()
+                    currentSpine.insertPoint = i
+                    currentSpineList[j] = currentSpine
+
+                currentSpine.append(thisEvent)
+                # currentSpine.id is always unique in a spineCollection
+                thisEvent.protoSpineId = currentSpine.id
 
             # check for spinePathData
+            if thisEventCollection.spinePathData is False:
+                continue
+
             # note that nothing else can happen in an eventCollection
             # except spine path data if any spine has spine path data.
             # thus, this is illegal.  The C#4 will be ignored:
             # *x     *x     C#4
-            if thisEventCollection.spinePathData is True:
-                newSpineList = common.defaultlist(lambda:None)
-                mergerActive = False
-                exchangeActive = False
-                for j in range(0, maxSpines):
-                    thisEvent = protoSpines[j].eventList[i]
-                    currentSpine = currentSpineList[j]
-                    
-                    if thisEvent is None and currentSpine is not None:
-                        ## should this happen?
-                        newSpineList.append(currentSpine)
-                    elif thisEvent is None:
-                        continue
-                    elif thisEvent.contents == "*-":  ## terminate spine
+
+            newSpineList = common.defaultlist(lambda:None)
+            mergerActive = False
+            exchangeActive = False
+            for j in range(0, maxSpines):
+                thisEvent = protoSpines[j].eventList[i]
+                currentSpine = currentSpineList[j]
+                
+                if thisEvent is None and currentSpine is not None:
+                    ## should this happen?
+                    newSpineList.append(currentSpine)
+                elif thisEvent is None:
+                    continue
+                elif thisEvent.contents == "*-":  ## terminate spine
+                    currentSpine.endingPosition = i
+                elif thisEvent.contents == "*^":  ## split spine assume they are voices
+                    newSpine1 = spineCollection.addSpine(streamClass=stream.Voice)
+                    newSpine1.insertPoint = i+1
+                    newSpine1.parentSpine = currentSpine
+                    newSpine1.isFirstVoice = True
+                    newSpine2 = spineCollection.addSpine(streamClass=stream.Voice)
+                    newSpine2.insertPoint = i+1
+                    newSpine2.parentSpine = currentSpine
+                    currentSpine.endingPosition = i # will be overridden if merged
+                    currentSpine.childSpines.append(newSpine1)
+                    currentSpine.childSpines.append(newSpine2)
+
+                    currentSpine.childSpineInsertPoints[i] = (newSpine1, newSpine2)
+                    newSpineList.append(newSpine1)
+                    newSpineList.append(newSpine2)
+                elif thisEvent.contents == "*v":  #merge spine -- n.b. we allow non-adjacent 
+                                                    #    lines to be merged. this is incorrect
+                    if mergerActive is False:       #    per humdrum syntax, but is easily done.
+                        # assume that previous spine continues
+                        if currentSpine.parentSpine is not None:
+                            mergerActive = currentSpine.parentSpine
+                        else:
+                            mergerActive = True
                         currentSpine.endingPosition = i
-                    elif thisEvent.contents == "*^":  ## split spine assume they are voices
-                        newSpine1 = spineCollection.addSpine(streamClass = stream.Voice)
-                        newSpine1.insertPoint = i+1
-                        newSpine1.parentSpine = currentSpine
-                        newSpine1.isFirstVoice = True
-                        newSpine2 = spineCollection.addSpine(streamClass = stream.Voice)
-                        newSpine2.insertPoint = i+1
-                        newSpine2.parentSpine = currentSpine
-                        currentSpine.endingPosition = i # will be overridden if merged
-                        currentSpine.childSpines.append(newSpine1)
-                        currentSpine.childSpines.append(newSpine2)
+                    else:   ## if second merger code is not found then 
+                            ## a one-to-one spine "merge" occurs
+                        currentSpine.endingPosition = i
+                        # merge back to parent if possible:
+                        if currentSpine.parentSpine is not None:
+                            newSpineList.append(currentSpine.parentSpine)
+                        # or merge back to other spine's parent:
+                        elif mergerActive is not True: # other spine parent set
+                            newSpineList.append(mergerActive)
+                        # or make a new spine...
+                        else:
+                            s = spineCollection.addSpine(streamClass = stream.Part)
+                            s.insertPoint = i
+                            newSpineList.append(s)
 
-                        currentSpine.childSpineInsertPoints[i] = (newSpine1, newSpine2)
-                        newSpineList.append(newSpine1)
-                        newSpineList.append(newSpine2)
-                    elif thisEvent.contents == "*v":  #merge spine -- n.b. we allow non-adjacent 
-                                                        #    lines to be merged. this is incorrect
-                        if mergerActive is False:       #    per humdrum syntax, but is easily done.
-                            # assume that previous spine continues
-                            if currentSpine.parentSpine is not None:
-                                mergerActive = currentSpine.parentSpine
-                            else:
-                                mergerActive = True
-                            currentSpine.endingPosition = i
-                        else:   ## if second merger code is not found then 
-                                ## a one-to-one spine "merge" occurs
-                            currentSpine.endingPosition = i
-                            # merge back to parent if possible:
-                            if currentSpine.parentSpine is not None:
-                                newSpineList.append(currentSpine.parentSpine)
-                            # or merge back to other spine's parent:
-                            elif mergerActive is not True: # other spine parent set
-                                newSpineList.append(mergerActive)
-                            # or make a new spine...
-                            else:
-                                s = spineCollection.addSpine(streamClass = stream.Part)
-                                s.insertPoint = i
-                                newSpineList.append(s)
+                        mergerActive = False
 
-                            mergerActive = False
-
-                    elif thisEvent.contents == "*x":  # exchange spine
-                        if exchangeActive is False:
-                            exchangeActive = currentSpine
-                        else:   ## if second exchange is not found, then both 
-                                ## lines disappear and exception is raised
-                                ## n.b. we allow more than one PAIR of exchanges 
-                                ## in a line so long as the first
-                                ## is totally finished by the time the second happens
-                            newSpineList.append(currentSpine)
-                            newSpineList.append(exchangeActive)
-                            exchangeActive = False
-                    else:  ## null processing code "*"
+                elif thisEvent.contents == "*x":  # exchange spine
+                    if exchangeActive is False:
+                        exchangeActive = currentSpine
+                    else:   ## if second exchange is not found, then both 
+                            ## lines disappear and exception is raised
+                            ## n.b. we allow more than one PAIR of exchanges 
+                            ## in a line so long as the first
+                            ## is totally finished by the time the second happens
                         newSpineList.append(currentSpine)
+                        newSpineList.append(exchangeActive)
+                        exchangeActive = False
+                else:  ## null processing code "*"
+                    newSpineList.append(currentSpine)
 
-                if exchangeActive is not False:
-                    raise HumdrumException("ProtoSpine found with unpaired exchange instruction " + 
-                                           "at line %d [%s]" % (i, thisEventCollection.events))
-                currentSpineList = newSpineList
+            if exchangeActive is not False:
+                raise HumdrumException("ProtoSpine found with unpaired exchange instruction " + 
+                                       "at line %d [%s]" % (i, thisEventCollection.events))
+            currentSpineList = newSpineList
 
         return spineCollection
 

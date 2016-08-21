@@ -2217,30 +2217,32 @@ class MeasureExporter(XMLExporterBase):
 
         for m21spannerClass, infoTuple in paramsSet.items():
             mxtag, parameterSet = infoTuple
-            for su in spannerBundle.getByClass(m21spannerClass):
-                for posSub in getProc(su, target):
+            for thisSpanner in spannerBundle.getByClass(m21spannerClass):
+                for posSub in getProc(thisSpanner, target):
                     # create new tag
                     mxElement = Element(mxtag)
-                    mxElement.set('number', str(su.idLocal))
+                    mxElement.set('number', str(thisSpanner.idLocal))
                     if m21spannerClass == 'Line':
-                        mxElement.set('line-type', str(su.lineType))
+                        mxElement.set('line-type', str(thisSpanner.lineType))
                     
-                    if posSub == 'first':
-                        pmtrs = su.getStartParameters()
-                    elif posSub == 'last':
-                        pmtrs = su.getEndParameters()
+                    if posSub == 'first': # TODO: getStartParameters and getEndParamters
+                        pmtrs = thisSpanner.getStartParameters()
+                    elif posSub == 'last': # should be defined here, not in spanner.py
+                        pmtrs = thisSpanner.getEndParameters()
                     else:
-                        pmtrs = None
+                        pmtrs = {}
                         
-                    if pmtrs is not None:
+                    if 'type' in pmtrs:
                         mxElement.set('type', str(pmtrs['type']))
-                        for attrName in parameterSet:
-                            if pmtrs[attrName] is not None:
-                                mxElement.set(attrName, str(pmtrs[attrName]))
+                        
+                    for attrName in parameterSet:
+                        if attrName in pmtrs and pmtrs[attrName] is not None:
+                            mxElement.set(attrName, str(pmtrs[attrName]))
+                    
                     mxDirection = Element('direction')
                     # Not all spanners have placements
-                    if hasattr(su, 'placement') and su.placement is not None:
-                        mxDirection.set('placement', str(su.placement))
+                    if hasattr(thisSpanner, 'placement') and thisSpanner.placement is not None:
+                        mxDirection.set('placement', str(thisSpanner.placement))
                     mxDirectionType = SubElement(mxDirection, 'direction-type')
                     mxDirectionType.append(mxElement)
                     
