@@ -3277,7 +3277,7 @@ class MeasureParser(XMLParserBase):
             mxRootAlter =  mxRoot.find('root-alter')
             if mxRootAlter is not None:
                 # can provide integer to create accidental on pitch
-                r.accidental = pitch.Accidental(int(mxRootAlter.text))
+                r.accidental = pitch.Accidental(int(float(mxRootAlter.text)))
             # set Pitch object on Harmony
             cs.root(r)
         else:
@@ -3312,7 +3312,7 @@ class MeasureParser(XMLParserBase):
             mxBassAlter = mxBass.find('bass-alter')
             if mxBassAlter is not None:
                 # can provide integer to create accidental on pitch
-                b.accidental = pitch.Accidental(int(mxBassAlter.text))
+                b.accidental = pitch.Accidental(int(float(mxBassAlter.text)))
             # set Pitch object on Harmony
             cs.bass(b)
         else:
