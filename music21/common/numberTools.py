@@ -97,8 +97,13 @@ def cleanupFloat(floatNum, maxDenominator=defaults.limitOffsetDenominator):
 
 def numToIntOrFloat(value):
     '''
-    Given a number, return an integer if it is very close to an integer, otherwise, return a float.
+    Given a number, return an integer if it is very close to an integer, 
+    otherwise, return a float.
 
+    This routine is very important for conversion of
+    :class:`~music21.pitch.Accidential` objects' `.alter`  attribute
+    in musicXML must be 1 (not 1.0) for sharp and -1 (not -1.0) for flat,
+    but allows for 0.5 for half-sharp.
 
     >>> common.numToIntOrFloat(1.0)
     1
@@ -108,6 +113,14 @@ def numToIntOrFloat(value):
     1.5
     >>> common.numToIntOrFloat(1.0000000005)
     1
+
+    >>> sharp = pitch.Accidental('sharp')
+    >>> common.numToIntOrFloat(sharp.alter)
+    1
+    >>> halfFlat = pitch.Accidental('half-flat')
+    >>> common.numToIntOrFloat(halfFlat.alter)
+    -0.5
+    
     
     :rtype: float
     '''

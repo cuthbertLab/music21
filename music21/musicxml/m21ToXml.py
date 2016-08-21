@@ -3511,7 +3511,7 @@ class MeasureExporter(XMLExporterBase):
                     
             if csRoot.accidental is not None:
                 mxAlter = SubElement(mxRoot, 'root-alter')
-                mxAlter.text = str(int(csRoot.accidental.alter))
+                mxAlter.text = str(common.numToIntOrFloat(csRoot.accidental.alter))
                 # TODO: attrGroup: print-object (why here)??
                 # TODO: attrGroup: print-style
                 # TODO: attr: location (left, right)
@@ -3550,7 +3550,7 @@ class MeasureExporter(XMLExporterBase):
                     
             if csBass.accidental is not None:
                 mxAlter = SubElement(mxBass, 'bass-alter')
-                mxAlter.text = str(int(csBass.accidental.alter))
+                mxAlter.text = str(common.numToIntOrFloat(csBass.accidental.alter))
                 # TODO: attrGroup: print-object (why here)??
                 # TODO: attrGroup: print-style
                 # TODO: attr: location (left, right)       

@@ -3276,8 +3276,8 @@ class MeasureParser(XMLParserBase):
             r = pitch.Pitch(rootText)
             mxRootAlter =  mxRoot.find('root-alter')
             if mxRootAlter is not None:
-                # can provide integer to create accidental on pitch
-                r.accidental = pitch.Accidental(int(float(mxRootAlter.text)))
+                # can provide integer or float to create accidental on pitch
+                r.accidental = pitch.Accidental(float(mxRootAlter.text))
             # set Pitch object on Harmony
             cs.root(r)
         else:
@@ -3311,8 +3311,8 @@ class MeasureParser(XMLParserBase):
             # optional
             mxBassAlter = mxBass.find('bass-alter')
             if mxBassAlter is not None:
-                # can provide integer to create accidental on pitch
-                b.accidental = pitch.Accidental(int(float(mxBassAlter.text)))
+                # can provide integer or float to create accidental on pitch
+                b.accidental = pitch.Accidental(float(mxBassAlter.text))
             # set Pitch object on Harmony
             cs.bass(b)
         else:
@@ -3323,7 +3323,8 @@ class MeasureParser(XMLParserBase):
         for mxDegree in mxDegrees: # a list of components
             hd = harmony.ChordStepModification()
             seta(hd, mxDegree, 'degree-value', 'degree', int)
-            seta(hd, mxDegree, 'degree-alter', 'interval', int)
+            # TODO: - should allow float, but meaningless to allow microtones in this context.
+            seta(hd, mxDegree, 'degree-alter', 'interval', int) 
             seta(hd, mxDegree, 'degree-type', 'modType')
             cs.addChordStepModification(hd)
 
