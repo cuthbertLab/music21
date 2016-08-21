@@ -3380,13 +3380,13 @@ class MeasureExporter(XMLExporterBase):
         <harmony>
           <root>
             <root-step>E</root-step>
-            <root-alter>-1.0</root-alter>
+            <root-alter>-1</root-alter>
           </root>
           <kind text="M">major</kind>
           <inversion>2</inversion>
           <bass>
             <bass-step>B</bass-step>
-            <bass-alter>-1.0</bass-alter>
+            <bass-alter>-1</bass-alter>
           </bass>
         </harmony>        
         
@@ -3402,7 +3402,7 @@ class MeasureExporter(XMLExporterBase):
           <inversion>2</inversion>
           <bass>
             <bass-step>B</bass-step>
-            <bass-alter>-1.0</bass-alter>
+            <bass-alter>-1</bass-alter>
           </bass>
         </harmony>
      
@@ -3420,7 +3420,7 @@ class MeasureExporter(XMLExporterBase):
           <inversion>2</inversion>
           <bass>
             <bass-step>B</bass-step>
-            <bass-alter>-1.0</bass-alter>
+            <bass-alter>-1</bass-alter>
           </bass>
           <degree>
             <degree-value>3</degree-value>
@@ -3511,7 +3511,7 @@ class MeasureExporter(XMLExporterBase):
                     
             if csRoot.accidental is not None:
                 mxAlter = SubElement(mxRoot, 'root-alter')
-                mxAlter.text = str(csRoot.accidental.alter)
+                mxAlter.text = str(int(csRoot.accidental.alter))
                 # TODO: attrGroup: print-object (why here)??
                 # TODO: attrGroup: print-style
                 # TODO: attr: location (left, right)
@@ -3550,7 +3550,7 @@ class MeasureExporter(XMLExporterBase):
                     
             if csBass.accidental is not None:
                 mxAlter = SubElement(mxBass, 'bass-alter')
-                mxAlter.text = str(csBass.accidental.alter)
+                mxAlter.text = str(int(csBass.accidental.alter))
                 # TODO: attrGroup: print-object (why here)??
                 # TODO: attrGroup: print-style
                 # TODO: attr: location (left, right)       
