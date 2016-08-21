@@ -236,6 +236,7 @@ class Metadata(base.Music21Object):
          ('localeOfComposition', 'Rome'), 
          ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
         '''
+        # pylint: disable=undefined-variable
         allOut = []
         for wid in self._workIds.keys():
             val = self._workIds[wid]
@@ -245,7 +246,6 @@ class Metadata(base.Music21Object):
                 t = (str(wid), str(val))
             else:
                 try:
-                    # pylint: disable=undefined-variable
                     t = (str(wid), unicode(val)) # @UndefinedVariable
                 except UnicodeDecodeError as ude:
                     print(val, repr(val), ude)
@@ -256,21 +256,18 @@ class Metadata(base.Music21Object):
                     if six.PY3:
                         t = (str(contri.role), str(n))
                     else:
-                        # pylint: disable=undefined-variable
                         t = (str(contri.role), unicode(n)) # @UndefinedVariable
                     allOut.append(t)
         if self._date is not None:
             if six.PY3:
                 t = ('date', str(self._date))
             else:
-                # pylint: disable=undefined-variable
                 t = ('date', unicode(self._date)) # @UndefinedVariable
             allOut.append(t)
         if self._copyright is not None:
             if six.PY3:
                 t = ('copyright', str(self._copyright))
             else:
-                # pylint: disable=undefined-variable
                 t = ('copyright', unicode(self._copyright)) # @UndefinedVariable
             allOut.append(t)
             

@@ -998,8 +998,8 @@ class Key(KeySignature, scale.DiatonicScale):
         music21.key.KeySignatureException: cannot process ambiguity without a 
             list of .alternateInterpretations
 
-        >>> k2.alternateInterpretations is None
-        True
+        >>> k2.alternateInterpretations
+        []
         '''
         if method == 'correlationCoefficient':
             return self._tonalCertainityCorrelationCoefficient(

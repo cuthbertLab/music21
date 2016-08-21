@@ -11,6 +11,9 @@
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
+import copy
+import unittest
+
 import music21
 
 from music21 import converter
@@ -19,8 +22,6 @@ from music21 import instrument
 from music21 import note
 from music21.alpha.theoryAnalysis import theoryAnalyzer
 
-import unittest
-import copy
 
 class wwnortonExercise(object):
     '''

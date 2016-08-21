@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         alpha.trecento.capua.py
+# Name:         demos.trecento.capua.py
 # Purpose:      The regola of Nicolaus de Capua for Musica Ficta
 #
 # Authors:      Michael Scott Cuthbert
@@ -63,10 +63,10 @@ def applyCapuaToCadencebookWork(thisWork):
     
     >>> b = alpha.trecento.cadencebook.BallataSheet().makeWork(331) # Francesco, Non Creder Donna
     >>> bOrig = copy.deepcopy(b)
-    >>> alpha.trecento.capua.applyCapuaToCadencebookWork(b)
+    >>> demos.trecento.capua.applyCapuaToCadencebookWork(b)
     >>> bFN = b.asScore().flat.notes
     >>> for n in bFN:
-    ...    alpha.trecento.capua.capuaFictaToAccidental(n)
+    ...    demos.trecento.capua.capuaFictaToAccidental(n)
     >>> bOrigFN = bOrig.asScore().flat.notes
     >>> for i in range(len(bFN)):
     ...    if bFN[i].pitch != bOrigFN[i].pitch: 
@@ -119,16 +119,14 @@ def capuaRuleOne(srcStream):
         n2 = ssn[i+1]
         n3 = ssn[i+2]
 
-        if n1.isRest or \
-           n2.isRest or \
-           n3.isRest:
+        if (n1.isRest or n2.isRest or n3.isRest):
             continue
         
         i1 = interval.notesToInterval(n1,n2)
         i2 = interval.notesToInterval(n2,n3)
 
-        if n1.pitch.accidental is not None or \
-           n3.pitch.accidental is not None:
+        if (n1.pitch.accidental is not None
+                or n3.pitch.accidental is not None):
             continue
 
         ### never seems to improve things...
@@ -570,8 +568,8 @@ def compareThreeFictas(srcStream1, srcStream2):
     >>> #_DOCS_SHOW b.show()
     >>> b0n = b.parts[0].flat.notesAndRests.stream()
     >>> b1n = b.parts[1].flat.notesAndRests.stream()
-    >>> alpha.trecento.capua.applyCapuaToStream(b0n)
-    >>> alpha.trecento.capua.compareThreeFictas(b0n, b1n) 
+    >>> demos.trecento.capua.applyCapuaToStream(b0n)
+    >>> demos.trecento.capua.compareThreeFictas(b0n, b1n) 
     >>> for n in b0n:
     ...    pass 
     
@@ -820,7 +818,7 @@ def findCorrections(correctionType="Maj3", startPiece=2, endPiece=459):
 #        'pmfcAlt': 4, 'pmfcNotCapua': 1, 'totalNotes': 82}
 #    >>> foundPieceOpus.show('lily.pdf')
 
-#    >>> #_DOCS_SHOW (totalDict, foundPieceOpus) = alpha.trecento.capua.correctedMin6()
+#    >>> #_DOCS_SHOW (totalDict, foundPieceOpus) = demos.trecento.capua.correctedMin6()
 #    >>> totalDict = {'potentialChange': 82, 'capuaAlt': 30, 'pmfcAndCapua': 3, #_DOCS_HIDE
 #    ...    'capuaNotPmfc': 27, 'pmfcAlt': 4, 'pmfcNotCapua': 1, 'totalNotes': 82} #_DOCS_HIDE
 #    >>> pp(totalDict)
@@ -933,7 +931,7 @@ def improvedHarmony(startPiece=2, endPiece=459):
     Returns a dict showing the results
     
     
-    >>> #_DOCS_SHOW alpha.trecento.capua.improvedHarmony()
+    >>> #_DOCS_SHOW demos.trecento.capua.improvedHarmony()
     >>> print("{'imperfCapua': 22, 'imperfIgnored': 155, " + #_DOCS_HIDE
     ...    "'perfCapua': 194, 'perfIgnored': 4057}") #_DOCS_HIDE
     {'imperfCapua': 22, 'imperfIgnored': 155, 'perfCapua': 194, 'perfIgnored': 4057}

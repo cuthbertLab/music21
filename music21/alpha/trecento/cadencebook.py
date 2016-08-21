@@ -312,15 +312,15 @@ class TrecentoCadenceWork(object):
     beginSnippetPositions = [8]
     endSnippetPositions = []
     
-    def __init__(self, rowvalues = None, rowDescriptions = None):
-        if rowvalues == None:
+    def __init__(self, rowvalues=None, rowDescriptions=None):
+        if rowvalues is None:
             rowvalues = ["", "", "", "", "", "", "", "", "", "", "", "", ""]
-        if rowDescriptions == None:
+        if rowDescriptions is None:
             rowDescriptions = ["Catalog Number", "Title", "Composer", "EncodedVoices", 
                                "PMFC/CMM Vol.", "PMFC Page Start", "PMFC Page End", 
                                "Time Signature Beginning", "Incipit C", "Incipit T", 
                                "Incipit Ct", "Incipit Type", "Notes"]
-        self.rowvalues     = rowvalues
+        self.rowvalues = rowvalues
         self.rowDescriptions = rowDescriptions
         self.fischerNum    = rowvalues[0]
         self.title         = rowvalues[1]
@@ -373,7 +373,6 @@ class TrecentoCadenceWork(object):
         '''
         returns all snippets as a :class:`~music21.stream.Opus` object
 
-        
         >>> deduto = alpha.trecento.cadencebook.BallataSheet().workByTitle('deduto')
         >>> deduto.title
         'Deduto sey a quel'
@@ -381,7 +380,6 @@ class TrecentoCadenceWork(object):
         >>> dedutoScore
         <music21.stream.Opus ...>
         >>> #_DOCS_SHOW dedutoScore.show('lily.png')
-
         '''
         o = stream.Opus()
         md = metadata.Metadata()
@@ -393,9 +391,9 @@ class TrecentoCadenceWork(object):
         for thisSnippet in bs:
             if thisSnippet is None:
                 continue
-            if (thisSnippet.tenor is None and 
-                    thisSnippet.cantus is None and 
-                    thisSnippet.contratenor is None):
+            if (thisSnippet.tenor is None  
+                    and thisSnippet.cantus is None 
+                    and thisSnippet.contratenor is None):
                 continue
             s = stream.Score()
             for dummy in range(self.totalVoices):
