@@ -24,20 +24,23 @@ see http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e
 '''
 __all__ = ['translate', 'realtime', 'percussion']
 
-import sys
-from music21.midi import realtime
-from music21.midi import percussion
-from music21.ext import six
 
-import unittest
-import unicodedata # @UnresolvedImport
-import os, string
+import os
+import string
 import struct
+import sys
+import unicodedata # @UnresolvedImport
+import unittest
 
 from music21 import common
-from music21 import exceptions21
-
 from music21 import environment
+from music21 import exceptions21
+from music21.ext import six
+
+from music21.midi import realtime
+from music21.midi import percussion
+
+
 _MOD = "midi.base.py"  
 environLocal = environment.Environment(_MOD)
 
@@ -270,7 +273,7 @@ def putVariableLengthNumber(x):
 
     >>> midi.putVariableLengthNumber(-1)
     Traceback (most recent call last):
-    MidiException: cannot putVariableLengthNumber() when number is negative: -1
+    music21.midi.MidiException: cannot putVariableLengthNumber() when number is negative: -1
     '''
     #environLocal.printDebug(['calling putVariableLengthNumber(x) with', x])
     # note: negative numbers will cause an infinite loop here
@@ -316,7 +319,7 @@ def putNumbersAsList(numList):
 
     >>> midi.putNumbersAsList([256])
     Traceback (most recent call last):
-    MidiException: Cannot place a number > 255 in a list: 256
+    music21.midi.MidiException: Cannot place a number > 255 in a list: 256
     '''
     post = bytearray()
     for n in numList:
@@ -516,7 +519,7 @@ class MidiEvent(object):
             self.sortOrder = -20
     
     def __repr__(self): 
-        if self.track == None:
+        if self.track is None:
             trackIndex = None
         else:
             trackIndex = self.track.index
@@ -1246,12 +1249,12 @@ class MidiFile(object):
         # we step through the str src, chopping off characters as we go
         # and reassigning to str
         length, midiStr = getNumber(midiStr[4:], 4) 
-        if not length == 6:
+        if length != 6:
             raise MidiException('badly formated midi string')
 
         midiFormatType, midiStr = getNumber(midiStr, 2) 
         self.format = midiFormatType
-        if not midiFormatType in [0, 1]:
+        if midiFormatType not in (0, 1):
             raise MidiException('cannot handle midi file format: %s' % format)
 
         numTracks, midiStr = getNumber(midiStr, 2) 
@@ -1261,7 +1264,7 @@ class MidiFile(object):
         if division & 0x8000: 
             framesPerSecond = -((division >> 8) | -128) 
             ticksPerFrame = division & 0xFF 
-            if not ticksPerFrame in [24, 25, 29, 30]:
+            if ticksPerFrame not in [24, 25, 29, 30]:
                 raise MidiException('cannot handle ticks per frame: %s' % ticksPerFrame)
             if ticksPerFrame == 29: 
                 ticksPerFrame = 30  # drop frame 

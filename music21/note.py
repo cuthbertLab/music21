@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2006-2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -634,7 +634,7 @@ class GeneralNote(base.Music21Object):
         >>> n = note.Note('g#')
         >>> n.augmentOrDiminish(-1)
         Traceback (most recent call last):
-        NoteException: scalar must be greater than zero
+        music21.note.NoteException: scalar must be greater than zero
         '''
         if not scalar > 0:
             raise NoteException('scalar must be greater than zero')
@@ -798,7 +798,7 @@ class NotRest(GeneralNote):
         'noStem'
         >>> n.stemDirection = 'junk'
         Traceback (most recent call last):
-        NotRestException: not a valid stem direction name: junk
+        music21.note.NotRestException: not a valid stem direction name: junk
         ''')
 
 
@@ -830,7 +830,7 @@ class NotRest(GeneralNote):
 
         >>> n.notehead = 'junk'
         Traceback (most recent call last):
-        NotRestException: not a valid notehead type name: 'junk'
+        music21.note.NotRestException: not a valid notehead type name: 'junk'
         ''')
 
 
@@ -862,9 +862,9 @@ class NotRest(GeneralNote):
         >>> n.noteheadFill
         True
 
-        >>> n.noteheadFill = 'junk'
+        >>> n.noteheadFill = 'jelly'
         Traceback (most recent call last):
-        NotRestException: not a valid notehead fill value: junk
+        music21.note.NotRestException: not a valid notehead fill value: jelly
         ''')
 
 
@@ -901,7 +901,7 @@ class NotRest(GeneralNote):
         
         >>> n.noteheadParenthesis = 'blah'
         Traceback (most recent call last):
-        NotRestException: notehead parentheses must be True or False, not 'blah'
+        music21.note.NotRestException: notehead parentheses must be True or False, not 'blah'
         ''')
 
     #---------------------------------------------------------------------------
@@ -1761,7 +1761,7 @@ class Test(unittest.TestCase):
         a5 = Note()
         a5.name = "A"
         a5.octave = 5
-        self.assertAlmostEquals(a5.pitch.frequency, 880.0)
+        self.assertAlmostEqual(a5.pitch.frequency, 880.0)
         self.assertEqual(a5.pitch.pitchClass, 9)
 
 
@@ -1827,13 +1827,13 @@ class Test(unittest.TestCase):
             # test matching beat proportion value
             post = [m.notesAndRests[i].beat for i in range(nCount)]
             for i in range(len(matchBeat)):
-                self.assertAlmostEquals(post[i], matchBeat[i], 4)
+                self.assertAlmostEqual(post[i], matchBeat[i], 4)
 
             # test getting beat duration
             post = [m.notesAndRests[i].beatDuration.quarterLength for i in range(nCount)]
 
             for i in range(len(matchBeat)):
-                self.assertAlmostEquals(post[i], matchBeatDur[i], 4)
+                self.assertAlmostEqual(post[i], matchBeatDur[i], 4)
 
         # two measure case
         for tsStr, nQL, nCount, matchBeat, matchBeatDur in data:
@@ -1857,11 +1857,11 @@ class Test(unittest.TestCase):
             # test matching beat proportion value
             post = [m2.notesAndRests[i].beat for i in range(nCount)]
             for i in range(len(matchBeat)):
-                self.assertAlmostEquals(post[i], matchBeat[i], 4)
+                self.assertAlmostEqual(post[i], matchBeat[i], 4)
             # test getting beat duration
             post = [m2.notesAndRests[i].beatDuration.quarterLength for i in range(nCount)]
             for i in range(len(matchBeat)):
-                self.assertAlmostEquals(post[i], matchBeatDur[i], 4)
+                self.assertAlmostEqual(post[i], matchBeatDur[i], 4)
 
 
 
@@ -1880,7 +1880,7 @@ class Test(unittest.TestCase):
                 found.append(n.beat)
 
             for i in range(len(match)):
-                self.assertEquals(match[i], found[i])
+                self.assertEqual(match[i], found[i])
 
             #s.show()
 

@@ -588,7 +588,7 @@ def getVerticalityNTuplets(score, ntupletNum):
         verticalities = getVerticalities(score)
     else:
         verticalities = score.analysisData['Verticalities']
-        if verticalities == None:
+        if verticalities is None:
             verticalities = getVerticalities(score)
     for i in range(0, len(verticalities)-(ntupletNum-1)):
         verticalityList = []
@@ -772,7 +772,7 @@ def _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFu
         editorialMarkList = []
     addAnalysisData(score)
 
-    if partNum1 == None or partNum2 == None:
+    if partNum1 is None or partNum2 is None:
         for (partNum1,partNum2) in getAllPartNumPairs(score):
             _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, 
                                 textFunction, color,
@@ -781,7 +781,7 @@ def _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFu
     else:
       
         vlqList = getVLQs(score, partNum1, partNum2)
-        if endIndex == None and startIndex >=0:
+        if endIndex is None and startIndex >=0:
             endIndex = len(vlqList)
    
         for vlq in vlqList[startIndex:endIndex]:
@@ -789,7 +789,7 @@ def _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFu
             if testFunction(vlq) is not False: # True or value
                 tr = theoryResult.VLQTheoryResult(vlq)
                 tr.value = testFunction(vlq)
-                if textFunction == None:
+                if textFunction is None:
                     tr.text = tr.value
                 else:    
                     tr.text = textFunction(vlq, partNum1, partNum2)
@@ -802,10 +802,10 @@ def _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFu
 def _identifyBasedOnHarmonicInterval(score, partNum1, partNum2, color, dictKey, 
                                      testFunction, textFunction, valueFunction=None):
     addAnalysisData(score)
-    if valueFunction == None:
+    if valueFunction is None:
         valueFunction = testFunction
     
-    if partNum1 == None or partNum2 == None:
+    if partNum1 is None or partNum2 is None:
         for (partNum1,partNum2) in getAllPartNumPairs(score):
             _identifyBasedOnHarmonicInterval(score, partNum1, partNum2, color, dictKey, 
                                              testFunction, textFunction, 
@@ -826,7 +826,7 @@ def _identifyBasedOnHarmonicInterval(score, partNum1, partNum2, color, dictKey,
                                
 def _identifyBasedOnMelodicInterval(score, partNum, color, dictKey, testFunction, textFunction):
     addAnalysisData(score)    
-    if partNum == None:
+    if partNum is None:
         for partNum in range(0, len(score.parts)):
             _identifyBasedOnMelodicInterval(score, partNum, color, dictKey, 
                                             testFunction, textFunction)
@@ -845,7 +845,7 @@ def _identifyBasedOnMelodicInterval(score, partNum, color, dictKey, testFunction
 def _identifyBasedOnNote(score, partNum, color, dictKey, testFunction, textFunction): 
     addAnalysisData(score)
 
-    if partNum == None: 
+    if partNum is None: 
         for partNum in range(0, len(score.parts)):
             _identifyBasedOnNote(score, partNum, color, dictKey, testFunction, textFunction)
     else:
@@ -891,7 +891,7 @@ def _identifyBasedOnVerticalityNTuplet(score, partNumToIdentify, dictKey,
         editorialMarkDict = {} 
 
     addAnalysisData(score)
-    if partNumToIdentify == None:
+    if partNumToIdentify is None:
         for partNum in range(0,len(score.parts)):
             _identifyBasedOnVerticalityNTuplet(score, partNum, dictKey, testFunction, 
                                                textFunction, color,
@@ -915,7 +915,7 @@ def _identifyBasedOnThreeNoteLinearSegment(score, partNum, color, dictKey,
                                            testFunction, textFunction):            
 
     addAnalysisData(score)
-    if partNum == None:
+    if partNum is None:
         for partNum in range(0,len(score.parts)):
             _identifyBasedOnThreeNoteLinearSegment(score, partNum, color, dictKey, 
                                                    testFunction, textFunction)
@@ -1426,9 +1426,9 @@ def identifyPassingTones(score, partNumToIdentify=None, color=None, dictKey=None
     'G identified as a passing tone in part 1'
     
     '''
-    if dictKey == None and unaccentedOnly:
+    if dictKey is None and unaccentedOnly:
         dictKey = 'unaccentedPassingTones'
-    elif dictKey == None:
+    elif dictKey is None:
         dictKey = 'accentedPassingTones'
     testFunction = lambda vst, pn: vst.hasPassingTone(pn, unaccentedOnly)
     textFunction = lambda vsnt, pn: (vsnt.tnlsDict[pn].n2.name + 
@@ -1462,9 +1462,9 @@ def getPassingTones(score, dictKey=None, partNumToIdentify=None, unaccentedOnly=
     >>> alpha.theoryAnalysis.theoryAnalyzer.getPassingTones(sc)
     [<music21.note.Note G>]
     '''
-    if dictKey == None and unaccentedOnly:
+    if dictKey is None and unaccentedOnly:
         dictKey = 'unaccentedPassingTones'
-    elif dictKey == None:
+    elif dictKey is None:
         dictKey = 'accentedPassingTones'
     testFunction = lambda vst, pn: vst.hasPassingTone(pn, unaccentedOnly)
     _identifyBasedOnVerticalityNTuplet(score, partNumToIdentify, dictKey=dictKey, 
@@ -1500,9 +1500,9 @@ def getNeighborTones(score, dictKey=None, partNumToIdentify=None, unaccentedOnly
     >>> alpha.theoryAnalysis.theoryAnalyzer.getNeighborTones(sc)
     [<music21.note.Note B>]
     '''
-    if dictKey == None and unaccentedOnly:
+    if dictKey is None and unaccentedOnly:
         dictKey = 'unaccentedNeighborTones'
-    elif dictKey == None:
+    elif dictKey is None:
         dictKey = 'accentedNeighborTones'
     testFunction = lambda vst, pn: vst.hasNeighborTone(pn, unaccentedOnly)
     _identifyBasedOnVerticalityNTuplet(score, partNumToIdentify, dictKey=dictKey, 
@@ -1632,9 +1632,9 @@ def identifyNeighborTones(score, partNumToIdentify=None, color=None, dictKey=Non
     >>> sc.analysisData['ResultDict']['unaccentedNeighborTones'][0].text
     'B identified as a neighbor tone in part 2'
     '''
-    if dictKey == None and unaccentedOnly:
+    if dictKey is None and unaccentedOnly:
         dictKey = 'unaccentedNeighborTones'
-    elif dictKey == None:
+    elif dictKey is None:
         dictKey = 'accentedNeighborTones'
         
     testFunction = lambda vst, pn: vst.hasNeighborTone(pn, unaccentedOnly)
@@ -1724,7 +1724,7 @@ def identifyImproperDissonantIntervals(score, partNum1=None, partNum2=None, colo
 
     '''
    
-    if partNum1 == None or partNum2 == None:
+    if partNum1 is None or partNum2 is None:
         for (partNum1,partNum2) in getAllPartNumPairs(score):
             identifyImproperDissonantIntervals(score, partNum1, partNum2, color, dictKey, 
                                                unaccentedOnly)

@@ -403,7 +403,7 @@ def generateBoogieVamp(blRealization = None, numRepeats = 5):
         :width: 700   
     '''
     from music21 import converter, stream, interval
-    if blRealization == None:
+    if blRealization is None:
         bluesLine = twelveBarBlues()
         fbRules = rules.Rules()
         fbRules.partMovementLimits = [(1,4),(2,12),(3,12)]
@@ -448,7 +448,7 @@ def generateTripletBlues(blRealization = None, numRepeats = 5): #12/8
         :width: 700   
     '''
     from music21 import converter, stream, interval, meter
-    if blRealization == None:
+    if blRealization is None:
         bluesLine = twelveBarBlues()
         fbRules = rules.Rules()
         fbRules.partMovementLimits = [(1,4),(2,12),(3,12)]

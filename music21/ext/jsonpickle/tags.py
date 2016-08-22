@@ -8,7 +8,7 @@ created by the Pickler class.  The Unpickler uses
 these custom key names to identify dictionaries
 that need to be specially handled.
 """
-from jsonpickle.compat import set
+from music21.ext.jsonpickle.compat import set
 
 
 BYTES = 'py/bytes'

@@ -18,15 +18,19 @@ omit_modules = [
                 'installer.py',
                 'music21/documentation/upload.py',
                 'music21/documentation/make.py',
-    #            '*/test/*',
-    #            'music21/demos/*',  # maybe remove someday...
+                'music21/test/*',
+                'music21/demos/*',  # maybe remove someday...
                 'music21/configure.py',
                 'music21/figuredBass/examples.py',
-                'music21/alpha/trecento/tonality.py'
+                'music21/alpha/*', #trecento/tonality.py'
                 ]
+
+# THESE ARE NOT RELEVANT FOR coveralls.io -- edit .coveragerc
 exclude_lines = [
                 r'\s*import music21\s*',
                 r'\s*music21.mainTest\(\)\s*',
+                r'.*#\s*pragma:\s*no cover.*',
+                r'class TestExternal.*',
                 ]
 
 def getCoverage():    

@@ -21,54 +21,63 @@ DYNAMIC_MARKS = ['p', 'pp', 'ppp', 'pppp', 'ppppp', 'pppppp',
         'other-dynamics' # non-empty...
         ] 
 
-ARTICULATION_MARKS = {'accent'       : articulations.Accent,
-                   'strong-accent'   : articulations.StrongAccent,
-                   'staccato'        : articulations.Staccato,
-                   'staccatissimo'   : articulations.Staccatissimo,
-                   'spiccato'        : articulations.Spiccato,
-                   'tenuto'          : articulations.Tenuto,
-                   'detached-legato' : articulations.DetachedLegato,
-                   'scoop'           : articulations.Scoop,
-                   'plop'            : articulations.Plop,
-                   'doit'            : articulations.Doit,
-                   'falloff'         : articulations.Falloff,
-                   'breath-mark'     : articulations.BreathMark,
-                   'caesura'         : articulations.Caesura,
-                   'stress'          : articulations.Stress,
-                   'unstress'        : articulations.Unstress,
-                   'other-articulation': articulations.Articulation,
+ARTICULATION_MARKS = { 'accent'       : articulations.Accent,
+                       'strong-accent'   : articulations.StrongAccent,
+                       'staccato'        : articulations.Staccato,
+                       'staccatissimo'   : articulations.Staccatissimo,
+                       'spiccato'        : articulations.Spiccato,
+                       'tenuto'          : articulations.Tenuto,
+                       'detached-legato' : articulations.DetachedLegato,
+                       'scoop'           : articulations.Scoop,
+                       'plop'            : articulations.Plop,
+                       'doit'            : articulations.Doit,
+                       'falloff'         : articulations.Falloff,
+                       'breath-mark'     : articulations.BreathMark,
+                       'caesura'         : articulations.Caesura,
+                       'stress'          : articulations.Stress,
+                       'unstress'        : articulations.Unstress,
+                       'other-articulation': articulations.Articulation,
                    }
+
+# A reversed dictionary mapping classes to names, excepting Articulation
+# which does not get mapped, and Staccato which must come after Staccatissimo,
+# and Accent which must come after StrongAccent
 ARTICULATION_MARKS_REV = OrderedDict([(v, k) for k, v in ARTICULATION_MARKS.items()])
 del ARTICULATION_MARKS_REV[articulations.Articulation]
 del ARTICULATION_MARKS_REV[articulations.Staccato]
+del ARTICULATION_MARKS_REV[articulations.Accent]
 ARTICULATION_MARKS_REV[articulations.Staccato] = 'staccato' # py3: move_to_end
+ARTICULATION_MARKS_REV[articulations.Accent] = 'accent' # py3: move_to_end
 
-TECHNICAL_MARKS = {'up-bow'          : articulations.UpBow,
-                   'down-bow'        : articulations.DownBow,
-                   'harmonic'        : articulations.Harmonic,
-                   'open-string'     : articulations.OpenString,
-                   'thumb-position'  : articulations.StringThumbPosition,
-                   'fingering'       : articulations.StringFingering,
-                   'pluck'           : articulations.FrettedPluck,
-                   'double-tongue'   : articulations.DoubleTongue,
-                   'triple-tongue'   : articulations.TripleTongue,
-                   'stopped'         : articulations.Stopped,
-                   'snap-pizzicato'  : articulations.SnapPizzicato,
-                   'fret'            : articulations.FretIndication,
-                   'string'          : articulations.StringIndication,
-                   'hammer-on'       : articulations.HammerOn,
-                   'pull-off'        : articulations.PullOff,
-                   #bend not implemented because it needs many sub components
-                   #bend'            : articulations.FretBend,
-                   'tap'             : articulations.FretTap,
-                   'heel'            : articulations.OrganHeel,
-                   'toe'             : articulations.OrganToe,
-                   'fingernails'     : articulations.HarpFingerNails,
-                   'other-technical' : articulations.TechnicalIndication,
-                   }
+TECHNICAL_MARKS = OrderedDict([('up-bow',           articulations.UpBow),
+                               ('down-bow',         articulations.DownBow),
+                               ('harmonic',         articulations.Harmonic),
+                               ('open-string',      articulations.OpenString),
+                               ('thumb-position',   articulations.StringThumbPosition),
+                               ('fingering',        articulations.Fingering),
+                               ('pluck',            articulations.FrettedPluck),
+                               ('double-tongue',    articulations.DoubleTongue),
+                               ('triple-tongue',    articulations.TripleTongue),
+                               ('stopped',          articulations.Stopped),
+                               ('snap-pizzicato',   articulations.SnapPizzicato),
+                               ('fret',             articulations.FretIndication),
+                               ('string',           articulations.StringIndication),
+                               ('hammer-on',        articulations.HammerOn),
+                               ('pull-off',         articulations.PullOff),
+                                #bend not implemented because it needs many sub components
+                                #('bend',            articulations.FretBend),
+                               ('tap',              articulations.FretTap),
+                               ('heel',             articulations.OrganHeel),
+                               ('toe',              articulations.OrganToe),
+                               ('fingernails',      articulations.HarpFingerNails),
+                               ('other-technical',  articulations.TechnicalIndication),
+                               ])
 TECHNICAL_MARKS_REV = OrderedDict([(v, k) for k, v in TECHNICAL_MARKS.items()])
-# too generic until we have an ordered dict.
+# too generic until we have an ordered dict. -- we have that now.  Should we not do it?
 del TECHNICAL_MARKS_REV[articulations.TechnicalIndication]
+
+
+
 # NON-spanner ornaments that go into Expressions
 ORNAMENT_MARKS = {'trill-mark'       : expressions.Trill,
                   'turn'             : expressions.Turn,

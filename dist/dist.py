@@ -16,16 +16,19 @@ To do a release,
 
 1. update the VERSION in _version.py and the single test cases in base.py and 
      in case of major version changes freezeThaw.JSONFreezer.jsonPrint if this wasn't done already.
-2. for a major change, run 
+2. for a major change, run in Py3
     `corpus.cacheMetadata(['core', 'virtual'], verbose=True)`.
     every once in a while run corpus.corpora.CoreCorpus().metadataBundle.rebuild() 
-    (40 min on MacPro)
+    (40 min on MacPro) -- either of these MAY change a lot of tests in corpus, metadata, etc.
+    so don't skip the next step!
 3. run test/multiprocessTest.py  for Python2 AND Python3
-4. run test/testSingleCoreAll.py 
+3.5 run test/testLint.py and fix any lint errors
+4. commit and then check test/testSingleCoreAll.py results on Travis-CI
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest, 
      but should be done before making a release).  Done automatically by Travis-CI on GitHub commit
 5. then python3 test/testDocumentation.py # only designed for Python 3...
-6. # no 6 no longer applies
+6. load the user's guide into Jupyter and make sure that everything works there too! (along
+     with about/what.ipynb and developerReference/installJupyter and tutorials/examples)
 7. run documentation/make.py clean
 8. run documentation/make.py   [*] 
 
@@ -45,12 +48,14 @@ To do a release,
     
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-13. then update PyPI by going to pypi.python.org and logging in and selecting music21 and clicking 
+13. Unless this is a pre-release, update PyPI by going to pypi.python.org and logging in and 
+    selecting music21 and clicking 
     edit at the top and augment the version number and the download URL. 
     The URL will be printed when
     running dist.py -- (the md5 hash is no longer needed)
 
-14. Upload the .tar.gz file to PyPi by clicking "files" at the time.  Click Choose File.
+14. Unless this is a pre-release, 
+    Upload the .tar.gz file to PyPi by clicking "files" at the time.  Click Choose File.
     File Type is Source.  Leave everything else blank, then click "upload new file"
 
 15. Delete the files in dist...

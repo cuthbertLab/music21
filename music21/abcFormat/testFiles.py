@@ -25,14 +25,14 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 
 # http://abcnotation.com/tunePage?a=www.folkwiki.se/pub/cache/_Fyrareprisarn_0bf5b5/0001
-fyrareprisarn = """
+fyrareprisarn = u"""
 %%abc-charset utf-8
 
 X: 1
 T: Fyrareprisarn
-O: JÃ¤t, SmÃ¥land
-S: efter August StrÃƒÂ¶mberg
-D: Svensson, Gustafsson mfl - BÃƒÂ¥lgetingen
+O: Jät, Småland
+S: efter August Strömberg
+D: Svensson, Gustafsson mfl - Bålgetingen
 Z: Till abc av Jon Magnusson 100517 
 R: Hambo
 M: 3/4
@@ -511,6 +511,35 @@ T:Test Tuplet Primitve
 """
 # (9Bc^C ^c=cc =Cc=f
 
+
+# abc-2.1 code + allowing shared header information.
+
+reelsABC21 = '''%abc-2.1
+M:4/4
+O:Irish
+R:Reel
+
+X:1
+T:Untitled Reel
+C:Trad.
+K:D
+eg|a2ab ageg|agbg agef|g2g2 fgag|f2d2 d2:|\
+ed|cecA B2ed|cAcA E2ed|cecA B2ed|c2A2 A2:|
+K:G
+AB|cdec BcdB|ABAF GFE2|cdec BcdB|c2A2 A2:|
+
+X:2
+T:Kitchen Girl
+C:Trad.
+K:D
+[c4a4] [B4g4]|efed c2cd|e2f2 gaba|g2e2 e2fg|
+a4 g4|efed cdef|g2d2 efed|c2A2 A4:|
+K:G
+ABcA BAGB|ABAG EDEG|A2AB c2d2|e3f edcB|ABcA BAGB|
+ABAG EGAB|cBAc BAG2|A4 A4:|
+'''
+
+
 #-------------------------------------------------------------------------------
 
 ALL  = [fyrareprisarn, mysteryReel, fullRiggedShip, aleIsDear, kitchGirl, 
@@ -548,16 +577,22 @@ class Test(unittest.TestCase):
 
         GEX = m21ToXml.GeneralObjectExporter()
         
-        for tf in ALL:
+        for i, tf in enumerate(ALL):
             ah = af.readstr(tf)
             environLocal.printDebug([ah.getTitle()])
             s = translate.abcToStreamScore(ah)
             # run musicxml processing to look for internal errors
-            unused_out = GEX.parse(s)
-
-
+            #print(repr(s.metadata._workIds['localeOfComposition']._data))
+            #print(s.metadata.all())
+            try:
+                unused_out = GEX.parse(s)
+            except UnicodeDecodeError as ude:
+                environLocal.warn("About to fail on ABC file #{}".format(i))
+                raise ude
+                
 if __name__ == "__main__":
     import music21
+    #music21.converter.parse(reelsABC21, format='abc').scores[1].show()
     music21.mainTest(Test)
 
 

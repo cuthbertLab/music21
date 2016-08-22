@@ -9,7 +9,6 @@
 # Copyright:    Copyright © 2008-2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
-from music21.sites import SitesException
 '''
 this class contains iterators and filters for walking through streams
 
@@ -18,10 +17,11 @@ StreamIterators are explicitly allowed to access private methods on streams.
 import unittest
 import warnings
 from music21 import common
-from music21.stream import filters
 from music21.exceptions21 import StreamException
-
 from music21.ext import six
+from music21.stream import filters
+
+from music21.sites import SitesException
 
 #------------------------------------------------------------------------------
 class StreamIteratorException(StreamException):
@@ -67,7 +67,8 @@ class StreamIterator(object):
                  filterList=None, 
                  restoreActiveSites=True,
                  activeInformation=None):
-
+        if srcStream.isSorted is False and srcStream.autoSort:
+            srcStream.sort()
         self.srcStream = srcStream
         self.index = 0
         
@@ -495,7 +496,7 @@ class StreamIterator(object):
         >>> pi.srcStream = note.Note()
         >>> pi._newBaseStream()
         Traceback (most recent call last):
-        StreamIteratorException: ...
+        music21.stream.iterator.StreamIteratorException: ...
         '''
         StreamBase = None
         for x in self.srcStream.__class__.mro():
@@ -958,9 +959,12 @@ class StreamIterator(object):
 
         :rtype: StreamIterator
         '''        
-        self.addFilter(filters.OffsetFilter(offsetStart, offsetEnd, includeEndBoundary,
-                                           mustFinishInSpan, mustBeginInSpan,
-                                           includeElementsThatEndAtStart))
+        self.addFilter(filters.OffsetFilter(offsetStart, 
+                                            offsetEnd, 
+                                            includeEndBoundary,
+                                            mustFinishInSpan, 
+                                            mustBeginInSpan,
+                                            includeElementsThatEndAtStart))
         return self
     
     #-------------------------------------------------------------

@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2012, 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -119,13 +119,21 @@ OMIT_FROM_DOCS
 ...  converter.parse('romantext: m1 a: vio').flat.getElementsByClass('RomanNumeral')[0].pitches]
 ['F#5', 'A5', 'C6']
 '''
-import unittest
 import copy
+import traceback
+import unittest
 
-from music21 import base
-from music21 import exceptions21
-from music21 import common
 from music21 import bar
+from music21 import base
+from music21 import common
+from music21 import exceptions21
+from music21 import key
+from music21 import metadata
+from music21 import meter
+from music21 import note
+from music21 import roman
+from music21 import stream
+from music21 import tie
 
 from music21.ext import six
 from music21.romanText import rtObjects
@@ -184,7 +192,6 @@ def _copySingleMeasure(t, p, kCurrent):
                 else:
                     rnPast.key = kCurrent
                 if rnPast.secondaryRomanNumeral is not None:
-                    from music21 import roman
                     newRN = roman.RomanNumeral(rnPast.figure, kCurrent)
                     newRN.duration = copy.deepcopy(rnPast.duration)
                     newRN.lyrics = copy.deepcopy(rnPast.lyrics)
@@ -250,7 +257,6 @@ def _copyMultipleMeasures(t, p, kCurrent):
                 else:
                     rnPast.key = kCurrent                
                 if rnPast.secondaryRomanNumeral is not None:
-                    from music21 import roman
                     newRN = roman.RomanNumeral(rnPast.figure, kCurrent)
                     newRN.duration = copy.deepcopy(rnPast.duration)
                     newRN.lyrics = copy.deepcopy(rnPast.lyrics)
@@ -278,7 +284,6 @@ def _getKeyAndPrefix(rtKeyOrString):
     >>> romanText.translate._getKeyAndPrefix('b#')
     (<music21.key.Key of b# minor>, 'b#: ')
     '''
-    from music21 import key
     if isinstance(rtKeyOrString, six.string_types):
         rtKeyOrString = key.convertKeyStringToMusic21KeyString(rtKeyOrString)
         k = key.Key(rtKeyOrString)
@@ -291,8 +296,402 @@ def _getKeyAndPrefix(rtKeyOrString):
     return k, prefix
 
 
+rnKeyCache = {}
+
+class PartTranslator(object):
+    '''
+    A refactoring of the previously massive romanTextToStreamScore function
+    to allow for more fine-grained testing (eventually), and to
+    get past the absurdly high number of nested blocks (the previous translator
+    was written under severe time constraints).
+    '''
+    def __init__(self, md=None):
+        if md is None:
+            md = metadata.Metadata()
+        self.md = md # global metadata object
+        self.p = stream.Part()
+        # ts indication are found in header, and also found elsewhere
+        self.tsCurrent = meter.TimeSignature('4/4') # create default 4/4
+        self.tsAtTimeOfLastChord = self.tsCurrent
+        self.tsSet = False # store if set to a measure
+        self.lastMeasureToken = None
+        self.lastMeasureNumber = 0
+        self.previousRn = None
+        self.keySigCurrent = None
+        self.keySigSet = True  # set a keySignature
+        self.foundAKeySignatureSoFar = False
+        self.kCurrent, unused_prefixLyric = _getKeyAndPrefix('C') # default if none defined
+        self.prefixLyric = ''
+    
+        self.repeatEndings = {}
+        
+        # reset for each measure
+        self.currentMeasureToken = None
+        self.previousChordInMeasure = None
+        self.pivotChordPossible = False
+        self.numberOfAtomsInCurrentMeasure = 0
+        self.setKeyChangeToken = False
+        self.currentOffsetInMeasure = 0.0
+
+    def translateTokens(self, tokens):
+        for t in tokens:
+            try:
+                self.translateOneToken(t)
+            except Exception: # pylint: disable=broad-except
+                tracebackMessage = traceback.format_exc()
+                raise RomanTextTranslateException(
+                    "At line %d for token %r, an exception was raised: \n%s" % (t.lineNumber, 
+                                                                                t, 
+                                                                                tracebackMessage))
+        
+        p = self.p
+        p.elementsChanged()
+        fixPickupMeasure(p)
+        p.makeBeams(inPlace=True)
+        p.makeAccidentals(inPlace=True)
+        _addRepeatsFromRepeatEndings(p, self.repeatEndings) # 1st and second endings...
+        return p
+
+
+    def translateOneToken(self, t):
+        md = self.md
+        p = self.p    
+        # environLocal.printDebug(['token', t])
+        if t.isTitle():
+            md.title = t.data            
+
+        elif t.isWork():
+            md.alternativeTitle = t.data
+
+        elif t.isPiece():
+            md.alternativeTitle = t.data
+
+        elif t.isComposer():
+            md.composer = t.data
+
+        elif t.isMovement():
+            md.movementNumber = t.data
+
+        elif t.isTimeSignature():
+            self.tsCurrent = meter.TimeSignature(t.data)
+            self.tsSet = False
+            # environLocal.printDebug(['tsCurrent:', tsCurrent])
+
+        elif t.isKeySignature():
+            if t.data == "":
+                self.keySigCurrent = key.KeySignature(0)
+            elif t.data == "Bb":
+                self.keySigCurrent = key.KeySignature(-1)
+            else:
+                pass 
+                # better to print a message
+                # environLocal.printDebug(['still need to write a generic RomanText
+                #     KeySignature routine.  this is just temporary'])
+                # raise RomanTextTranslateException("still need to write a generic
+                #     RomanText KeySignature routine.  this is just temporary")
+            self.keySigSet = False
+            # environLocal.printDebug(['keySigCurrent:', keySigCurrent])
+            self.foundAKeySignatureSoFar = True
+
+        elif t.isMeasure():
+            # environLocal.printDebug(['handling measure token:', t])
+            #if t.number[0] % 10 == 0:
+            #    print "at number " + str(t.number[0])
+            if t.variantNumber is not None:
+                # environLocal.printDebug(['skipping variant: %s' % t])
+                return
+            if t.variantLetter is not None:
+                # environLocal.printDebug(['skipping variant: %s' % t])
+                return
+
+            # if this measure number is more than 1 greater than the last
+            # defined measure number, and the previous chord is not None, 
+            # then fill with copies of the last-defined measure
+            if ((t.number[0] > self.lastMeasureNumber + 1)
+                    and (self.previousRn is not None)):
+                for i in range(self.lastMeasureNumber + 1, t.number[0]):
+                    mFill = stream.Measure()
+                    mFill.number = i
+                    newRn = copy.deepcopy(self.previousRn)
+                    newRn.lyric = ""
+                    # set to entire bar duration and tie 
+                    newRn.duration = copy.deepcopy(self.tsAtTimeOfLastChord.barDuration)
+                    if self.previousRn.tie is None:
+                        self.previousRn.tie = tie.Tie('start')
+                    else:
+                        self.previousRn.tie.type = 'continue'
+                    # set to stop for now; may extend on next iteration
+                    newRn.tie = tie.Tie('stop')
+                    self.previousRn = newRn
+                    mFill.append(newRn)
+                    appendMeasureToRepeatEndingsDict(self.lastMeasureToken,
+                                                     mFill, 
+                                                     self.repeatEndings, i)
+                    p._appendCore(mFill)
+                self.lastMeasureNumber = t.number[0] - 1
+                self.lastMeasureToken = t
+
+            # create a new measure or copy a past measure
+            if len(t.number) == 1 and t.isCopyDefinition: # if not a range
+                p.elementsChanged()
+                m, self.kCurrent = _copySingleMeasure(t, p, self.kCurrent)
+                p._appendCore(m)
+                self.lastMeasureNumber = m.number
+                self.lastMeasureToken = t
+                romans = m.getElementsByClass(roman.RomanNumeral)
+                if romans:
+                    self.previousRn = romans[-1] 
+
+            elif len(t.number) > 1:
+                p.elementsChanged()
+                measures, self.kCurrent = _copyMultipleMeasures(t, p, self.kCurrent)
+                p.append(measures) # appendCore does not work with list
+                self.lastMeasureNumber = measures[-1].number
+                self.lastMeasureToken = t
+                romans = measures[-1].getElementsByClass(roman.RomanNumeral)
+                if romans:
+                    self.previousRn = romans[-1]
+
+            else:       
+                m = self.translateSingleMeasure(t)
+                p._appendCore(m)
+
+    def translateSingleMeasure(self, measureToken):
+        self.currentMeasureToken = measureToken
+        m = stream.Measure()
+        m.number = measureToken.number[0]
+        appendMeasureToRepeatEndingsDict(measureToken, m, self.repeatEndings)                            
+        self.lastMeasureNumber = measureToken.number[0]
+        self.lastMeasureToken = measureToken
+        
+        if not self.tsSet:
+            m.timeSignature = self.tsCurrent
+            self.tsSet = True # only set when changed
+        if not self.keySigSet and self.keySigCurrent is not None:
+            m.insert(0, self.keySigCurrent)
+            self.keySigSet = True # only set when changed
+
+        self.currentOffsetInMeasure = 0.0 # start offsets at zero
+        self.previousChordInMeasure = None
+        self.pivotChordPossible = False
+        self.numberOfAtomsInCurrentMeasure = len(measureToken.atoms)
+        # first RomanNumeral object after a key change should have this set to True
+        self.setKeyChangeToken = False 
+        
+        for i, a in enumerate(measureToken.atoms):
+            self.translateSingleMeasureAtom(i, a, m)
+        
+        # may need to adjust duration of last chord added
+        if self.tsCurrent is not None:
+            self.previousRn.quarterLength = (self.tsCurrent.barDuration.quarterLength 
+                                                - self.currentOffsetInMeasure)
+        m.elementsChanged()
+        return m
+
+    def translateSingleMeasureAtom(self, i, a, m):
+        o = self.currentOffsetInMeasure
+        
+        if (isinstance(a, rtObjects.RTKey)
+            or (self.foundAKeySignatureSoFar is False
+                and isinstance(a, rtObjects.RTAnalyticKey))): 
+            # found a change of Key+KeySignature or
+            # just found a change of analysis but no keysignature so far
+    
+            # environLocal.printDebug(['handling key token:', a])
+            try: # this sets the key and the keysignature
+                self.kCurrent, pl = _getKeyAndPrefix(a)
+                self.prefixLyric += pl
+            except:
+                raise RomanTextTranslateException(
+                            'cannot get key from %s in line %s' % (a.src, 
+                                                                   self.currentMeasureToken.src))
+            # insert at beginning of measure if at beginning 
+            #    -- for things like pickups.
+            if m.number < 2:
+                m._insertCore(0, self.kCurrent)
+            else:
+                m._insertCore(o, self.kCurrent)
+            self.foundAKeySignatureSoFar = True
+            self.setKeyChangeToken = True
+
+        elif isinstance(a, rtObjects.RTKeySignature):
+            try: # this sets the keysignature but not the prefix text
+                thisSig = a.getKeySignature()
+            except:
+                raise RomanTextTranslateException(
+                            'cannot get key from %s in line %s' % (a.src, 
+                                                                   self.currentMeasureToken.src))
+            #insert at beginning of measure if at beginning
+            #     -- for things like pickups.
+            if m.number < 2:
+                m._insertCore(0, thisSig)
+            else:
+                m._insertCore(o, thisSig)
+            self.foundAKeySignatureSoFar = True
+
+        elif isinstance(a, rtObjects.RTAnalyticKey):
+            # just a change in analyzed key, not a change in anything else
+            #try: # this sets the key, not the keysignature
+            self.kCurrent, pl = _getKeyAndPrefix(a)
+            self.prefixLyric += pl
+            self.setKeyChangeToken = True
+
+            #except:
+            #    raise RomanTextTranslateException(
+            #         'cannot get key from %s in line %s' % (a.src, t.src))
+
+        elif isinstance(a, rtObjects.RTBeat):
+            # set new offset based on beat
+            try:
+                o = a.getOffset(self.tsCurrent)
+            except ValueError:
+                raise RomanTextTranslateException(
+                    "cannot properly get an offset from " + 
+                    "beat data {0}".format(a.src) + 
+                    "under timeSignature {0} in line {1}".format(self.tsCurrent, 
+                                                                 self.currentMeasureToken.src))
+            if (self.previousChordInMeasure is None
+                    and self.previousRn is not None 
+                    and o > 0):
+                # setting a new beat before giving any chords
+                firstChord = copy.deepcopy(self.previousRn)
+                firstChord.quarterLength = o
+                firstChord.lyric = ""
+                if self.previousRn.tie is None:
+                    self.previousRn.tie = tie.Tie('start')
+                else:
+                    self.previousRn.tie.type = 'continue'    
+                firstChord.tie = tie.Tie('stop')
+                self.previousRn = firstChord
+                self.previousChordInMeasure = firstChord
+                m._insertCore(0, firstChord)
+            self.pivotChordPossible = False
+
+        elif isinstance(a, rtObjects.RTNoChord):
+            # use source to evaluation roman 
+            self.tsAtTimeOfLastChord = self.tsCurrent
+            rn = note.Rest()
+            if self.pivotChordPossible is False:
+                # probably best to find duration
+                if self.previousChordInMeasure is None:
+                    pass # use default duration
+                else: # update duration of previous chord in Measure
+                    oPrevious = self.previousChordInMeasure.getOffsetBySite(m)
+                    newQL = o - oPrevious
+                    if newQL <= 0:
+                        raise RomanTextTranslateException(
+                            'too many notes in this measure: %s' % self.currentMeasureToken.src)
+                    self.previousChordInMeasure.quarterLength = newQL                                                          
+                self.prefixLyric = ""
+                m._insertCore(o, rn)
+                self.previousChordInMeasure = rn
+                self.previousRn = rn
+                self.pivotChordPossible = False
+
+        elif isinstance(a, rtObjects.RTChord):
+            # use source to evaluation roman 
+            self.tsAtTimeOfLastChord = self.tsCurrent
+            try:
+                asrc = a.src
+#                            if kCurrent.mode == 'minor':
+#                                if asrc.lower().startswith('vi'): #vi or vii w/ or w/o o
+#                                    if asrc.upper() == a.src: # VI or VII to bVI or bVII
+#                                        asrc = 'b' + asrc
+                cacheTuple = (asrc, self.kCurrent.tonicPitchNameWithCase)
+                if USE_RN_CACHE and cacheTuple in rnKeyCache:                                    
+                    #print "Got a match: " + str(cacheTuple)
+                    # Problems with Caches not picking up pivot chords...
+                    #    Not faster, see below.
+                    rn = copy.deepcopy(rnKeyCache[cacheTuple])
+                else:
+                    #print "No match for: " + str(cacheTuple)
+                    rn = roman.RomanNumeral(asrc, copy.deepcopy(self.kCurrent))
+                    rnKeyCache[cacheTuple] = rn
+                # surprisingly, not faster... and more dangerous
+                #rn = roman.RomanNumeral(asrc, kCurrent)
+                ## SLOWEST!!!
+                #rn = roman.RomanNumeral(asrc, kCurrent.tonicPitchNameWithCase)                                
+                
+                #>>> from timeit import timeit as t
+                #>>> t('roman.RomanNumeral("IV", "c#")', 
+                #...     'from music21 import roman', number=1000)
+                #45.75
+                #>>> t('roman.RomanNumeral("IV", k)', 
+                #...     'from music21 import roman, key; k = key.Key("c#")', 
+                #...     number=1000)
+                #16.09
+                #>>> t('roman.RomanNumeral("IV", copy.deepcopy(k))', 
+                #...    'from music21 import roman, key; import copy; 
+                #...     k = key.Key("c#")', number=1000)
+                #22.49
+                ## key cache, does not help much...
+                #>>> t('copy.deepcopy(r)', 'from music21 import roman; import copy; 
+                #...        r = roman.RomanNumeral("IV", "c#")', number=1000)
+                #19.01
+                                              
+                if self.setKeyChangeToken is True:
+                    rn.followsKeyChange = True
+                    self.setKeyChangeToken = False
+                else:
+                    rn.followsKeyChange = False
+            except (roman.RomanNumeralException, 
+                exceptions21.Music21CommonException): 
+                #environLocal.printDebug('cannot create RN from: %s' % a.src)
+                rn = note.Note() # create placeholder 
+
+            if self.pivotChordPossible is False:
+                # probably best to find duration
+                if self.previousChordInMeasure is None:
+                    pass # use default duration
+                else: # update duration of previous chord in Measure
+                    oPrevious = self.previousChordInMeasure.getOffsetBySite(m)
+                    newQL = o - oPrevious
+                    if newQL <= 0:
+                        raise RomanTextTranslateException(
+                            'too many notes in this measure: %s' % self.currentMeasureToken.src)
+                    self.previousChordInMeasure.quarterLength = newQL                          
+                
+                rn.addLyric(self.prefixLyric + a.src)
+                self.prefixLyric = ""
+                m._insertCore(o, rn)
+                self.previousChordInMeasure = rn
+                self.previousRn = rn
+                self.pivotChordPossible = True
+            else:
+                self.previousChordInMeasure.lyric += "//" + self.prefixLyric + a.src
+                self.previousChordInMeasure.pivotChord = rn
+                self.prefixLyric = ""
+                self.pivotChordPossible = False
+
+        elif isinstance(a, rtObjects.RTRepeat):
+            if o == 0:
+                if isinstance(a, rtObjects.RTRepeatStart):
+                    m.leftBarline = bar.Repeat(direction='start')
+                else:
+                    rtt = RomanTextUnprocessedToken(a)
+                    m._insertCore(o, rtt)
+            elif (self.tsCurrent is not None 
+                    and (self.tsCurrent.barDuration.quarterLength == o 
+                         or i == self.numberOfAtomsInCurrentMeasure - 1)):
+                if isinstance(a, rtObjects.RTRepeatStop):
+                    m.rightBarline = bar.Repeat(direction='end')
+                else:
+                    rtt = RomanTextUnprocessedToken(a)
+                    m._insertCore(o, rtt)
+            else: # mid measure repeat signs
+                rtt = RomanTextUnprocessedToken(a)
+                m._insertCore(o, rtt)
+
+        else:
+            rtt = RomanTextUnprocessedToken(a)
+            m._insertCore(o, rtt)
+            #environLocal.warn("Got an unknown token: %r" % a)
+        
+        self.currentOffsetInMeasure = o
+
 def romanTextToStreamScore(rtHandler, inputM21=None):
-    '''The main processing module for single-movement RomanText works.
+    '''
+    The main processing module for single-movement RomanText works.
 
     Given a romanText handler or string, return or fill a Score Stream.
     '''
@@ -303,16 +702,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
 
     # this could be just a Stream, but b/c we are creating metadata, 
     # perhaps better to match presentation of other scores. 
-
-    from music21 import metadata
-    from music21 import stream
-    from music21 import note
-    from music21 import meter
-    from music21 import key
-    from music21 import roman
-    from music21 import tie
-
-    if inputM21 == None:
+    if inputM21 is None:
         s = stream.Score()
     else:
         s = inputM21
@@ -320,355 +710,9 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     # metadata can be first
     md = metadata.Metadata()
     s.insert(0, md)
-
-    p = stream.Part()
-    # ts indication are found in header, and also found elsewhere
-    tsCurrent = meter.TimeSignature('4/4') # create default 4/4
-    tsAtTimeOfLastChord = tsCurrent
-    tsSet = False # store if set to a measure
-    lastMeasureToken = None
-    lastMeasureNumber = 0
-    previousRn = None
-    keySigCurrent = None
-    keySigSet = True  # set a keySignature
-    foundAKeySignatureSoFar = False
-    kCurrent, unused_prefixLyric = _getKeyAndPrefix('C') # default if none defined
-    prefixLyric = ''
-
-    repeatEndings = {}
-    rnKeyCache = {}
-
-    for t in rtHandler.tokens:
-        try:
-
-            # environLocal.printDebug(['token', t])
-            if t.isTitle():
-                md.title = t.data            
-
-            elif t.isWork():
-                md.alternativeTitle = t.data
-
-            elif t.isPiece():
-                md.alternativeTitle = t.data
-
-            elif t.isComposer():
-                md.composer = t.data
-
-            elif t.isMovement():
-                md.movementNumber = t.data
     
-            elif t.isTimeSignature():
-                tsCurrent = meter.TimeSignature(t.data)
-                tsSet = False
-                # environLocal.printDebug(['tsCurrent:', tsCurrent])
-
-            elif t.isKeySignature():
-                if t.data == "":
-                    keySigCurrent = key.KeySignature(0)
-                elif t.data == "Bb":
-                    keySigCurrent = key.KeySignature(-1)
-                else:
-                    pass 
-                    # better to print a message
-                    # environLocal.printDebug(['still need to write a generic RomanText
-                    #     KeySignature routine.  this is just temporary'])
-                    # raise RomanTextTranslateException("still need to write a generic
-                    #     RomanText KeySignature routine.  this is just temporary")
-                keySigSet = False
-                # environLocal.printDebug(['keySigCurrent:', keySigCurrent])
-                foundAKeySignatureSoFar = True
-
-            elif t.isMeasure():
-                # environLocal.printDebug(['handling measure token:', t])
-                #if t.number[0] % 10 == 0:
-                #    print "at number " + str(t.number[0])
-                if t.variantNumber is not None:
-                    # environLocal.printDebug(['skipping variant: %s' % t])
-                    continue
-                if t.variantLetter is not None:
-                    # environLocal.printDebug(['skipping variant: %s' % t])
-                    continue
-    
-                # if this measure number is more than 1 greater than the last
-                # defined measure number, and the previous chord is not None, 
-                # then fill with copies of the last-defined measure
-                if ((t.number[0] > lastMeasureNumber + 1)
-                        and (previousRn is not None)):
-                    for i in range(lastMeasureNumber + 1, t.number[0]):
-                        mFill = stream.Measure()
-                        mFill.number = i
-                        newRn = copy.deepcopy(previousRn)
-                        newRn.lyric = ""
-                        # set to entire bar duration and tie 
-                        newRn.duration = copy.deepcopy(tsAtTimeOfLastChord.barDuration)
-                        if previousRn.tie is None:
-                            previousRn.tie = tie.Tie('start')
-                        else:
-                            previousRn.tie.type = 'continue'
-                        # set to stop for now; may extend on next iteration
-                        newRn.tie = tie.Tie('stop')
-                        previousRn = newRn
-                        mFill.append(newRn)
-                        appendMeasureToRepeatEndingsDict(lastMeasureToken, mFill, repeatEndings, i)
-                        p._appendCore(mFill)
-                    lastMeasureNumber = t.number[0] - 1
-                    lastMeasureToken = t
-
-                # create a new measure or copy a past measure
-                if len(t.number) == 1 and t.isCopyDefinition: # if not a range
-                    p.elementsChanged()
-                    m, kCurrent = _copySingleMeasure(t, p, kCurrent)
-                    p._appendCore(m)
-                    lastMeasureNumber = m.number
-                    lastMeasureToken = t
-                    romans = m.iter.getElementsByClass(roman.RomanNumeral)
-                    if romans:
-                        previousRn = romans[-1] 
-
-                elif len(t.number) > 1:
-                    p.elementsChanged()
-                    measures, kCurrent = _copyMultipleMeasures(t, p, kCurrent)
-                    p.append(measures) # appendCore does not work with list
-                    lastMeasureNumber = measures[-1].number
-                    lastMeasureToken = t
-                    romans = measures[-1].iter.getElementsByClass(roman.RomanNumeral)
-                    if romans:
-                        previousRn = romans[-1]
-
-                else:       
-                    m = stream.Measure()
-                    m.number = t.number[0]
-                    appendMeasureToRepeatEndingsDict(t, m, repeatEndings)                            
-                    lastMeasureNumber = t.number[0]
-                    lastMeasureToken = t
-                    
-                    if not tsSet:
-                        m.timeSignature = tsCurrent
-                        tsSet = True # only set when changed
-                    if not keySigSet and keySigCurrent is not None:
-                        m.insert(0, keySigCurrent)
-                        keySigSet = True # only set when changed
-        
-                    o = 0.0 # start offsets at zero
-                    previousChordInMeasure = None
-                    pivotChordPossible = False
-                    numberOfAtoms = len(t.atoms)
-                    # first RomanNumeral object after a key change should have this set to True
-                    setKeyChangeToken = False 
-                    
-                    for i, a in enumerate(t.atoms):
-                        if (isinstance(a, rtObjects.RTKey)
-                            or (foundAKeySignatureSoFar == False
-                                and isinstance(a, rtObjects.RTAnalyticKey))): 
-                            # found a change of Key+KeySignature or
-                            # just found a change of analysis but no keysignature so far
-                    
-                            # environLocal.printDebug(['handling key token:', a])
-                            try: # this sets the key and the keysignature
-                                kCurrent, pl = _getKeyAndPrefix(a)
-                                prefixLyric += pl
-                            except:
-                                raise RomanTextTranslateException(
-                                            'cannot get key from %s in line %s' % (a.src, t.src))
-                            # insert at beginning of measure if at beginning 
-                            #    -- for things like pickups.
-                            if m.number < 2:
-                                m._insertCore(0, kCurrent)
-                            else:
-                                m._insertCore(o, kCurrent)
-                            foundAKeySignatureSoFar = True
-                            setKeyChangeToken = True
-    
-                        elif isinstance(a, rtObjects.RTKeySignature):
-                            try: # this sets the keysignature but not the prefix text
-                                thisSig = a.getKeySignature()
-                            except:
-                                raise RomanTextTranslateException(
-                                            'cannot get key from %s in line %s' % (a.src, t.src))
-                            #insert at beginning of measure if at beginning
-                            #     -- for things like pickups.
-                            if m.number < 2:
-                                m._insertCore(0, thisSig)
-                            else:
-                                m._insertCore(o, thisSig)
-                            foundAKeySignatureSoFar = True
-    
-                        elif isinstance(a, rtObjects.RTAnalyticKey):
-                            # just a change in analyzed key, not a change in anything else
-                            #try: # this sets the key, not the keysignature
-                            kCurrent, pl = _getKeyAndPrefix(a)
-                            prefixLyric += pl
-                            setKeyChangeToken = True
-
-                            #except:
-                            #    raise RomanTextTranslateException(
-                            #         'cannot get key from %s in line %s' % (a.src, t.src))
-    
-                        elif isinstance(a, rtObjects.RTBeat):
-                            # set new offset based on beat
-                            try:
-                                o = a.getOffset(tsCurrent)
-                            except ValueError:
-                                raise RomanTextTranslateException(
-                                    "cannot properly get an offset from " + 
-                                    "beat data {0}".format(a.src) + 
-                                    "under timeSignature {0} in line {1}".format(tsCurrent, t.src))
-                            if (previousChordInMeasure is None
-                                    and previousRn is not None 
-                                    and o > 0):
-                                # setting a new beat before giving any chords
-                                firstChord = copy.deepcopy(previousRn)
-                                firstChord.quarterLength = o
-                                firstChord.lyric = ""
-                                if previousRn.tie == None:
-                                    previousRn.tie = tie.Tie('start')
-                                else:
-                                    previousRn.tie.type = 'continue'    
-                                firstChord.tie = tie.Tie('stop')
-                                previousRn = firstChord
-                                previousChordInMeasure = firstChord
-                                m._insertCore(0, firstChord)
-                            pivotChordPossible = False
-
-                        elif isinstance(a, rtObjects.RTNoChord):
-                            # use source to evaluation roman 
-                            tsAtTimeOfLastChord = tsCurrent
-                            rn = note.Rest()
-                            if pivotChordPossible == False:
-                                # probably best to find duration
-                                if previousChordInMeasure is None:
-                                    pass # use default duration
-                                else: # update duration of previous chord in Measure
-                                    oPrevious = previousChordInMeasure.getOffsetBySite(m)
-                                    newQL = o - oPrevious
-                                    if newQL <= 0:
-                                        raise RomanTextTranslateException(
-                                            'too many notes in this measure: %s' % t.src)
-                                    previousChordInMeasure.quarterLength = newQL                                                          
-                                prefixLyric = ""
-                                m._insertCore(o, rn)
-                                previousChordInMeasure = rn
-                                previousRn = rn
-                                pivotChordPossible = False
-
-                        elif isinstance(a, rtObjects.RTChord):
-                            # use source to evaluation roman 
-                            tsAtTimeOfLastChord = tsCurrent
-                            try:
-                                asrc = a.src
-    #                            if kCurrent.mode == 'minor':
-    #                                if asrc.lower().startswith('vi'): #vi or vii w/ or w/o o
-    #                                    if asrc.upper() == a.src: # VI or VII to bVI or bVII
-    #                                        asrc = 'b' + asrc
-                                cacheTuple = (asrc, kCurrent.tonicPitchNameWithCase)
-                                if USE_RN_CACHE and cacheTuple in rnKeyCache:                                    
-                                    #print "Got a match: " + str(cacheTuple)
-                                    # Problems with Caches not picking up pivot chords...
-                                    #    Not faster, see below.
-                                    rn = copy.deepcopy(rnKeyCache[cacheTuple])
-                                else:
-                                    #print "No match for: " + str(cacheTuple)
-                                    rn = roman.RomanNumeral(asrc, copy.deepcopy(kCurrent))
-                                    rnKeyCache[cacheTuple] = rn
-                                # surprisingly, not faster... and more dangerous
-                                #rn = roman.RomanNumeral(asrc, kCurrent)
-                                ## SLOWEST!!!
-                                #rn = roman.RomanNumeral(asrc, kCurrent.tonicPitchNameWithCase)                                
-                                
-                                #>>> from timeit import timeit as t
-                                #>>> t('roman.RomanNumeral("IV", "c#")', 
-                                #...     'from music21 import roman', number=1000)
-                                #45.75
-                                #>>> t('roman.RomanNumeral("IV", k)', 
-                                #...     'from music21 import roman, key; k = key.Key("c#")', 
-                                #...     number=1000)
-                                #16.09
-                                #>>> t('roman.RomanNumeral("IV", copy.deepcopy(k))', 
-                                #...    'from music21 import roman, key; import copy; 
-                                #...     k = key.Key("c#")', number=1000)
-                                #22.49
-                                ## key cache, does not help much...
-                                #>>> t('copy.deepcopy(r)', 'from music21 import roman; import copy; 
-                                #...        r = roman.RomanNumeral("IV", "c#")', number=1000)
-                                #19.01
-                                                              
-                                if setKeyChangeToken is True:
-                                    rn.followsKeyChange = True
-                                    setKeyChangeToken = False
-                                else:
-                                    rn.followsKeyChange = False
-                            except (roman.RomanNumeralException, 
-                                exceptions21.Music21CommonException): 
-                                #environLocal.printDebug('cannot create RN from: %s' % a.src)
-                                rn = note.Note() # create placeholder 
-
-                            if pivotChordPossible == False:
-                                # probably best to find duration
-                                if previousChordInMeasure is None:
-                                    pass # use default duration
-                                else: # update duration of previous chord in Measure
-                                    oPrevious = previousChordInMeasure.getOffsetBySite(m)
-                                    newQL = o - oPrevious
-                                    if newQL <= 0:
-                                        raise RomanTextTranslateException(
-                                            'too many notes in this measure: %s' % t.src)
-                                    previousChordInMeasure.quarterLength = newQL                          
-                                
-                                rn.addLyric(prefixLyric + a.src)
-                                prefixLyric = ""
-                                m._insertCore(o, rn)
-                                previousChordInMeasure = rn
-                                previousRn = rn
-                                pivotChordPossible = True
-                            else:
-                                previousChordInMeasure.lyric += "//" + prefixLyric + a.src
-                                previousChordInMeasure.pivotChord = rn
-                                prefixLyric = ""
-                                pivotChordPossible = False
-
-                        elif isinstance(a, rtObjects.RTRepeat):
-                            if o == 0:
-                                if isinstance(a, rtObjects.RTRepeatStart):
-                                    m.leftBarline = bar.Repeat(direction='start')
-                                else:
-                                    rtt = RomanTextUnprocessedToken(a)
-                                    m._insertCore(o, rtt)
-                            elif (tsCurrent is not None 
-                                    and (tsCurrent.barDuration.quarterLength == o 
-                                         or i == numberOfAtoms - 1)):
-                                if isinstance(a, rtObjects.RTRepeatStop):
-                                    m.rightBarline = bar.Repeat(direction='end')
-                                else:
-                                    rtt = RomanTextUnprocessedToken(a)
-                                    m._insertCore(o, rtt)
-                            else: # mid measure repeat signs
-                                rtt = RomanTextUnprocessedToken(a)
-                                m._insertCore(o, rtt)
-
-                        else:
-                            rtt = RomanTextUnprocessedToken(a)
-                            m._insertCore(o, rtt)
-                            #environLocal.warn("Got an unknown token: %r" % a)
-                    
-                    # may need to adjust duration of last chord added
-                    if tsCurrent is not None:
-                        previousRn.quarterLength = tsCurrent.barDuration.quarterLength - o
-                    m.elementsChanged()
-                    p._appendCore(m)
-
-        except Exception:
-            import traceback
-            tracebackMessage = traceback.format_exc()
-            raise RomanTextTranslateException(
-                "At line %d for token %r, an exception was raised: \n%s" % (t.lineNumber, 
-                                                                            t, 
-                                                                            tracebackMessage))
-
-    p.elementsChanged()
-    fixPickupMeasure(p)
-    p.makeBeams(inPlace=True)
-    p.makeAccidentals(inPlace=True)
-    _addRepeatsFromRepeatEndings(p, repeatEndings) # 1st and second endings...
+    partTrans = PartTranslator(md)
+    p = partTrans.translateTokens(rtHandler.tokens)
     s.insert(0, p)
 
     return s
@@ -864,13 +908,12 @@ def romanTextToStreamOpus(rtHandler, inputM21=None):
     Return either a Score object, or, if a multi-movement work is defined, an
     Opus object.
     '''
-    from music21 import stream
     if isinstance(rtHandler, six.string_types):
         rtf = rtObjects.RTFile()
         rtHandler = rtf.readstr(rtHandler) # return handler, processes tokens
 
     if rtHandler.definesMovements(): # create an opus
-        if inputM21 == None:
+        if inputM21 is None:
             s = stream.Opus()
         else:
             s = inputM21
@@ -1161,7 +1204,7 @@ m6-7 = m4-5
                              "['A4', 'C5', 'F5']")
 
             x = rnStream[elementNumber + 4].pitches[2].accidental
-            if x == None: 
+            if x is None: 
                 x = pitch.Accidental('natural')
             self.assertEqual(x.alter, 0)
 

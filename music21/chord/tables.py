@@ -2560,13 +2560,15 @@ def _validateAddress(address):
 
     >>> chord.tables._validateAddress((20,1,0))
     Traceback (most recent call last):
-    ChordTablesException: cardinality 20 not valid
+    music21.chord.tables.ChordTablesException: cardinality 20 not valid
+    
     >>> chord.tables._validateAddress((8,3000,0))
     Traceback (most recent call last):
-    ChordTablesException: index 3000 not valid
+    music21.chord.tables.ChordTablesException: index 3000 not valid
+    
     >>> chord.tables._validateAddress((8,3,-30))
     Traceback (most recent call last):
-    ChordTablesException: inversion -30 not valid
+    music21.chord.tables.ChordTablesException: inversion -30 not valid
     '''
     address = list(address)
     card = address[0]
@@ -2588,7 +2590,7 @@ def _validateAddress(address):
         if inversion not in inversionsAvailable:
             raise ChordTablesException('inversion %s not valid' % inversion)
 
-    if inversion == None: # get a default inversion
+    if inversion is None: # get a default inversion
         #environLocal.printDebug(['getting inversion for:', card, index])
         if 0 in inversionsAvailable: 
             inversion = 0 
@@ -2793,7 +2795,8 @@ def seekChordTablesAddress(c):
     >>> c2 = chord.Chord()
     >>> chord.tables.seekChordTablesAddress(c2)
     Traceback (most recent call last):
-    ChordTablesException: cannot access chord tables address for Chord with 0 pitches
+    music21.chord.tables.ChordTablesException: cannot access chord tables address 
+        for Chord with 0 pitches
     '''
     pcSet = c.orderedPitchClasses
     if len(pcSet) == 0:
@@ -2831,7 +2834,7 @@ def seekChordTablesAddress(c):
     
     for indexCandidate in range(len(FORTE[card])):
         dataLine = FORTE[card][indexCandidate]
-        if dataLine == None: 
+        if dataLine is None: 
             continue # spacer lines
         inversionsAvailable = forteIndexToInversionsAvailable(card, indexCandidate)
 

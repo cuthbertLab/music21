@@ -9,7 +9,6 @@
 # Copyright:    Copyright © 2010, 2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 '''
 **N.B. in Dec. 2014 MuseData access was removed from music21 because the rights conflicted with
 access computationally from music21.  This module is retained for anyone who has such access,
@@ -194,7 +193,7 @@ class MuseDataRecord(object):
         >>> mdr._getAccidentalObject().displayStatus == True
         True
         >>> mdr = musedata.MuseDataRecord('F#4    1        s ')
-        >>> mdr._getAccidentalObject() == None
+        >>> mdr._getAccidentalObject() is None
         True
         '''
         # this is not called by stage 1 
@@ -386,7 +385,7 @@ class MuseDataRecord(object):
         >>> mdr.getBeams()
         ']\'
         >>> mdr = musedata.MuseDataRecord('E2     4        q     u')
-        >>> mdr.getBeams() == None
+        >>> mdr.getBeams() is None
         True
 
         '''
@@ -776,7 +775,7 @@ class MuseDataPart(object):
         self._divisionsPerQuarterNote = None
 
         self.stage = stage
-        if self.stage == None and len(self.src) > 0:
+        if self.stage is None and len(self.src) > 0:
             self.stage = self._determineStage()
         if self.stage == 1:
             self.src = self._scrubStage1(self.src)
@@ -1059,7 +1058,7 @@ class MuseDataPart(object):
                     raw = self._getDigitsFollowingTag(line, 'of')
                     break
                 i += 1
-            if raw == None:
+            if raw is None:
                 return None
             else:
                 return int(raw)
@@ -1086,7 +1085,7 @@ class MuseDataPart(object):
                     raw = self._getDigitsFollowingTag(line, 'part')
                     break
                 i += 1
-            if raw == None:
+            if raw is None:
                 return None
             else:
                 return int(raw)
@@ -1316,7 +1315,7 @@ class MuseDataPart(object):
         >>> mdw.addFile(fp2)
         >>> mdw.getParts()[0]._getTranspositionParameters()
         -11
-        >>> mdw.getParts()[1]._getTranspositionParameters() == None
+        >>> mdw.getParts()[1]._getTranspositionParameters() is None
         True
         '''
         line = self._getAttributesRecord()
@@ -1360,7 +1359,7 @@ class MuseDataPart(object):
         >>> mdw.getParts()[0].getDivisionsPerQuarterNote()
         6
         '''
-        if self._divisionsPerQuarterNote == None:
+        if self._divisionsPerQuarterNote is None:
             # set once the first time this is called
             line = self._getAttributesRecord()
 
@@ -1387,7 +1386,7 @@ class MuseDataPart(object):
         '''
         
         >>> mdp = musedata.MuseDataPart()
-        >>> mdp.stage == None
+        >>> mdp.stage is None
         True
         >>> mdp._getMeasureBoundaryIndices(['$', 'A', 'B', 'm', 'C', 'm', 'D'])
         [(1, 2), (3, 4), (5, 6)]
@@ -1396,7 +1395,7 @@ class MuseDataPart(object):
         >>> mdp._getMeasureBoundaryIndices(['$', 'B', 'C', 'm', 'D', 'E'])
         [(1, 2), (3, 5)]
         '''
-        if src == None:
+        if src is None:
             src = self.src
         boundaries = []
         mIndices = []
@@ -1418,7 +1417,7 @@ class MuseDataPart(object):
                 if line.startswith('$'):
                     mAttributeRecordCount += 1
                     continue
-                if mAttributeRecordCount > 0 and firstPostAttributesIndex == None:
+                if mAttributeRecordCount > 0 and firstPostAttributesIndex is None:
                     firstPostAttributesIndex = i    
                     # do not continue, as this may also be a measure start
                 if line.startswith('m'):
@@ -1771,7 +1770,7 @@ class Test(unittest.TestCase):
 #         mdw.addString(testFiles.bach_cantata5_mvmt3)
 # 
 #         mdpObjs = mdw.getParts()
-#         self.assertEquals(len(mdpObjs), 3)
+#         self.assertEqual(len(mdpObjs), 3)
 #         # first line of src strings
 #         self.assertEqual(mdpObjs[0].src[1], 
 #                'ID: {bach/bg/cant/0005/stage2/03/01} [KHM:1658122244]')
@@ -1783,16 +1782,16 @@ class Test(unittest.TestCase):
 #                'ID: {bach/bg/cant/0005/stage2/03/03} [KHM:1658122244]')
 # 
 #         for i in range(3):
-#             self.assertEquals(mdpObjs[i].getWorkNumber(), '5')
-#             self.assertEquals(mdpObjs[i].getMovementNumber(), '3')
-#             self.assertEquals(mdpObjs[i].getSource(), 'Bach Gesellschaft i')
-#             self.assertEquals(mdpObjs[i].getWorkTitle(), 'Wo soll ich fliehen hin')
-#             self.assertEquals(mdpObjs[i].getMovementTitle(), 'Aria')
+#             self.assertEqual(mdpObjs[i].getWorkNumber(), '5')
+#             self.assertEqual(mdpObjs[i].getMovementNumber(), '3')
+#             self.assertEqual(mdpObjs[i].getSource(), 'Bach Gesellschaft i')
+#             self.assertEqual(mdpObjs[i].getWorkTitle(), 'Wo soll ich fliehen hin')
+#             self.assertEqual(mdpObjs[i].getMovementTitle(), 'Aria')
 # 
 # 
-#         self.assertEquals(mdpObjs[0]._getKeyParameters(), -3)
-#         self.assertEquals(mdpObjs[0]._getTimeSignatureParameters(), '3/4')
-#         self.assertEquals(mdpObjs[0].getDivisionsPerQuarterNote(), 4)
+#         self.assertEqual(mdpObjs[0]._getKeyParameters(), -3)
+#         self.assertEqual(mdpObjs[0]._getTimeSignatureParameters(), '3/4')
+#         self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 4)
 
 
 
@@ -1812,53 +1811,53 @@ class Test(unittest.TestCase):
             mdw.addFile(fp)
 
         mdpObjs = mdw.getParts()
-        self.assertEquals(len(mdpObjs), 5)
+        self.assertEqual(len(mdpObjs), 5)
         # first line of src strings
-        self.assertEquals(mdpObjs[0].src[4], 'WK#:581       MV#:3c')
-        self.assertEquals(mdpObjs[0].src[12], 'score: part 1 of 5')
+        self.assertEqual(mdpObjs[0].src[4], 'WK#:581       MV#:3c')
+        self.assertEqual(mdpObjs[0].src[12], 'score: part 1 of 5')
 
-        self.assertEquals(mdpObjs[1].src[4], 'WK#:581       MV#:3c')
-        self.assertEquals(mdpObjs[1].src[12], 'score: part 2 of 5')
+        self.assertEqual(mdpObjs[1].src[4], 'WK#:581       MV#:3c')
+        self.assertEqual(mdpObjs[1].src[12], 'score: part 2 of 5')
 
-        self.assertEquals(mdpObjs[2].src[4], 'WK#:581       MV#:3c')
-        self.assertEquals(mdpObjs[2].src[12], 'score: part 3 of 5')
+        self.assertEqual(mdpObjs[2].src[4], 'WK#:581       MV#:3c')
+        self.assertEqual(mdpObjs[2].src[12], 'score: part 3 of 5')
 
-        self.assertEquals(mdpObjs[3].src[4], 'WK#:581       MV#:3c')
-        self.assertEquals(mdpObjs[3].src[12], 'score: part 4 of 5')
+        self.assertEqual(mdpObjs[3].src[4], 'WK#:581       MV#:3c')
+        self.assertEqual(mdpObjs[3].src[12], 'score: part 4 of 5')
 
-        self.assertEquals(mdpObjs[4].src[4], 'WK#:581       MV#:3c')
-        self.assertEquals(mdpObjs[4].src[12], 'score: part 5 of 5')
+        self.assertEqual(mdpObjs[4].src[4], 'WK#:581       MV#:3c')
+        self.assertEqual(mdpObjs[4].src[12], 'score: part 5 of 5')
 
 
         # all files have the same metadata
         for i in range(4):
-            self.assertEquals(mdpObjs[i].getWorkNumber(), '581')
-            self.assertEquals(mdpObjs[i].getMovementNumber(), '3')
-            self.assertEquals(mdpObjs[i].getSource().startswith('Breitkopf'), True)
-            self.assertEquals(mdpObjs[i].getWorkTitle(), 'Clarinet Quintet')
-            self.assertEquals(mdpObjs[i].getMovementTitle(), 'Trio II')
+            self.assertEqual(mdpObjs[i].getWorkNumber(), '581')
+            self.assertEqual(mdpObjs[i].getMovementNumber(), '3')
+            self.assertEqual(mdpObjs[i].getSource().startswith('Breitkopf'), True)
+            self.assertEqual(mdpObjs[i].getWorkTitle(), 'Clarinet Quintet')
+            self.assertEqual(mdpObjs[i].getMovementTitle(), 'Trio II')
 
-            self.assertEquals(mdpObjs[i].getGroupMemberships(), ['sound', 'score'])
+            self.assertEqual(mdpObjs[i].getGroupMemberships(), ['sound', 'score'])
 
-            self.assertEquals(mdpObjs[i].getGroupMembershipsTotal('score'), 5)
-            self.assertEquals(mdpObjs[i].getGroupMembershipsTotal('sound'), 5)
+            self.assertEqual(mdpObjs[i].getGroupMembershipsTotal('score'), 5)
+            self.assertEqual(mdpObjs[i].getGroupMembershipsTotal('sound'), 5)
 
-        self.assertEquals(mdpObjs[0].getGroupMembershipNumber('score'), 1)
-        self.assertEquals(mdpObjs[0].getGroupMembershipNumber('sound'), 1)
-        self.assertEquals(mdpObjs[1].getGroupMembershipNumber('score'), 2)
-        self.assertEquals(mdpObjs[1].getGroupMembershipNumber('sound'), 2)
-        self.assertEquals(mdpObjs[2].getGroupMembershipNumber('score'), 3)
-        self.assertEquals(mdpObjs[2].getGroupMembershipNumber('sound'), 3)
+        self.assertEqual(mdpObjs[0].getGroupMembershipNumber('score'), 1)
+        self.assertEqual(mdpObjs[0].getGroupMembershipNumber('sound'), 1)
+        self.assertEqual(mdpObjs[1].getGroupMembershipNumber('score'), 2)
+        self.assertEqual(mdpObjs[1].getGroupMembershipNumber('sound'), 2)
+        self.assertEqual(mdpObjs[2].getGroupMembershipNumber('score'), 3)
+        self.assertEqual(mdpObjs[2].getGroupMembershipNumber('sound'), 3)
 
-        self.assertEquals(mdpObjs[3].getGroupMembershipNumber('score'), 4)
-        self.assertEquals(mdpObjs[3].getGroupMembershipNumber('sound'), 4)
-        self.assertEquals(mdpObjs[4].getGroupMembershipNumber('score'), 5)
-        self.assertEquals(mdpObjs[4].getGroupMembershipNumber('sound'), 5)
+        self.assertEqual(mdpObjs[3].getGroupMembershipNumber('score'), 4)
+        self.assertEqual(mdpObjs[3].getGroupMembershipNumber('sound'), 4)
+        self.assertEqual(mdpObjs[4].getGroupMembershipNumber('score'), 5)
+        self.assertEqual(mdpObjs[4].getGroupMembershipNumber('sound'), 5)
 
 
-        self.assertEquals(mdpObjs[0]._getKeyParameters(), 0)
-        self.assertEquals(mdpObjs[0]._getTimeSignatureParameters(), '3/4')
-        self.assertEquals(mdpObjs[0].getDivisionsPerQuarterNote(), 6)
+        self.assertEqual(mdpObjs[0]._getKeyParameters(), 0)
+        self.assertEqual(mdpObjs[0]._getTimeSignatureParameters(), '3/4')
+        self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 6)
 
 
 #     def testIterateMeasuresFromString(self):
@@ -1870,23 +1869,23 @@ class Test(unittest.TestCase):
 #         mdpObjs = mdw.getParts()
 #         # can iterate over measures, creating them as iterating
 #         for m in mdpObjs[0]:
-#             self.assertEquals(isinstance(m, MuseDataMeasure), True)
+#             self.assertEqual(isinstance(m, MuseDataMeasure), True)
 # 
 #             # iterate over measures to get notes
 #             for n in m:
-#                 self.assertEquals(isinstance(n, MuseDataRecord), True)
+#                 self.assertEqual(isinstance(n, MuseDataRecord), True)
 # 
 #         # cannot access them as in a list, however
-#         #self.assertEquals(mdpObjs[0][0], True)
+#         #self.assertEqual(mdpObjs[0][0], True)
 # 
 #         # try using stored objects
 #         measures = mdpObjs[0].getMeasures()
-#         self.assertEquals(isinstance(measures[0], MuseDataMeasure), True)
-#         self.assertEquals(len(measures), 106)
+#         self.assertEqual(isinstance(measures[0], MuseDataMeasure), True)
+#         self.assertEqual(len(measures), 106)
 # 
 #         records = measures[4].getRecords()
-#         self.assertEquals(isinstance(records[0], MuseDataRecord), True)
-#         self.assertEquals(len(records), 13)
+#         self.assertEqual(isinstance(records[0], MuseDataRecord), True)
+#         self.assertEqual(len(records), 13)
 
        
 
@@ -1917,30 +1916,30 @@ class Test(unittest.TestCase):
 # 
 #         # all files have the same metadata
 #         for i in range(2):
-#             self.assertEquals(mdpObjs[i].getWorkNumber(), '1080')
-#             self.assertEquals(mdpObjs[i].getMovementNumber(), '1')
-#             self.assertEquals(mdpObjs[i].getSource(), 'Bach Gesellschaft xxv,1')
-#             self.assertEquals(mdpObjs[i].getGroupMembershipsTotal(), 4)
+#             self.assertEqual(mdpObjs[i].getWorkNumber(), '1080')
+#             self.assertEqual(mdpObjs[i].getMovementNumber(), '1')
+#             self.assertEqual(mdpObjs[i].getSource(), 'Bach Gesellschaft xxv,1')
+#             self.assertEqual(mdpObjs[i].getGroupMembershipsTotal(), 4)
 # 
-#         self.assertEquals(mdpObjs[0]._getKeyParameters(), -1)
-#         self.assertEquals(mdpObjs[0]._getTimeSignatureParameters(), '2/2')
-#         self.assertEquals(mdpObjs[0].getDivisionsPerQuarterNote(), 4.0)
+#         self.assertEqual(mdpObjs[0]._getKeyParameters(), -1)
+#         self.assertEqual(mdpObjs[0]._getTimeSignatureParameters(), '2/2')
+#         self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 4.0)
 
 
 
     def testGetLyrics(self):
         mdr = MuseDataRecord('D4     2        e     u                    con-')
         mdr.stage = 2
-        self.assertEquals(mdr.getLyrics(), ['con-'])
+        self.assertEqual(mdr.getLyrics(), ['con-'])
 
         mdr = MuseDataRecord('F#4    2        e     u                    a')
         mdr.stage = 2
-        self.assertEquals(mdr.getLyrics(), ['a'])
+        self.assertEqual(mdr.getLyrics(), ['a'])
 
 
         mdr = MuseDataRecord('F#4    2        e     u                    a | b')
         mdr.stage = 2
-        self.assertEquals(mdr.getLyrics(), ['a', 'b'])
+        self.assertEqual(mdr.getLyrics(), ['a', 'b'])
 
 
 

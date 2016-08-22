@@ -20,12 +20,12 @@ The Beams object is stored in :class:`~music21.note.Note` and
 :class:`~music21.chord.Chord` objects as their :attr:`~music21.note.Note.beams`
 attributes.   Beams objects can largely be treated as a list.
 
-See `meter.TimeSignature`.:meth:`~music21.meter.TimeSignature.getBeams` for a
+See `meter.TimeSignature`. :meth:`~music21.meter.TimeSignature.getBeams` for a
 way of getting beam information for a measure given the meter.  The
-`meter.TimeSignature`.:attr:`~music21.meter.TimeSignature.beamSequence`
+`meter.TimeSignature`. :attr:`~music21.meter.TimeSignature.beamSequence`
 attribute holds information about how to beam given the TimeSignature
 
-Run `stream.Stream`.:meth:`~music21.stream.Stream.makeBeams` to set beaming
+Run `Stream`. :meth:`~music21.stream.Stream.makeBeams` to set beaming
 information automatically given the current meter.
 
 Suppose you had a measure of two eighths and a quarter and wanted to explicitly
@@ -275,7 +275,7 @@ class Beams(SlottedObjectMixin):
 
         >>> a.fill(7)
         Traceback (most recent call last):
-        BeamException: cannot fill beams for level 7
+        music21.beam.BeamException: cannot fill beams for level 7
         '''
         #TODO -- why not to 2048th?
         self.beamsList = []
@@ -385,7 +385,7 @@ class Beams(SlottedObjectMixin):
 
         >>> a.setAll('sexy')
         Traceback (most recent call last):
-        BeamException: beam type cannot be sexy
+        music21.beam.BeamException: beam type cannot be sexy
 
         '''
         if type not in ('start', 'stop', 'continue', 'partial'):
@@ -422,7 +422,7 @@ class Beams(SlottedObjectMixin):
 
         >>> a.setByNumber(2, 'crazy')
         Traceback (most recent call last):
-        BeamException: beam type cannot be crazy
+        music21.beam.BeamException: beam type cannot be crazy
 
         '''
         # permit providing one argument hyphenated

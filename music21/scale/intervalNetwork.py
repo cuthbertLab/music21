@@ -29,10 +29,17 @@ A scale or harmony may be composed of one or more IntervalNetwork objects.
 Both nodes and edges can be weighted to suggest tonics, dominants, 
 finals, or other attributes of the network. 
 '''
-from collections import OrderedDict
-
-import unittest
 import copy
+import unittest
+
+from collections import OrderedDict
+try:
+    import networkx
+except ImportError:
+    # lacking this does nothing
+    networkx = None
+    #_missingImport.append('networkx')
+
 from music21 import exceptions21
 from music21 import interval
 from music21 import common
@@ -44,13 +51,6 @@ from music21 import environment
 _MOD = "intervalNetwork.py"
 environLocal = environment.Environment(_MOD)
 
-
-try:
-    import networkx
-except ImportError:
-    # lacking this does nothing
-    networkx = None
-    #_missingImport.append('networkx')
 
 # these are just symbols/place holders; values do not matter as long
 # as they are not positive ints
@@ -269,7 +269,7 @@ class Edge(object):
         [(1, 'terminusLow')]
 
         '''
-        if direction == None:
+        if direction is None:
             direction = self._direction # assign native direction
 
         # do not need to supply direction, because direction is defined
@@ -809,7 +809,7 @@ class IntervalNetwork(object):
         '''
         x = None
         for n in self._nodes.values():
-            if x == None:
+            if x is None:
                 x = n.degree
             if n.degree > x:
                 x = n.degree
@@ -832,7 +832,7 @@ class IntervalNetwork(object):
             # reject terminus high, as this duplicates terminus low
             if nId == TERMINUS_HIGH:
                 continue
-            if x == None:
+            if x is None:
                 x = n.degree
             if n.degree > x:
                 x = n.degree
@@ -1384,7 +1384,7 @@ class IntervalNetwork(object):
         # if this network is octaveDuplicating, than we can shift 
         # reference up octaves to just below minPitch
         if self.octaveDuplicating and minPitch is not None:
-            pitchReference.transposeBelowTarget(minPitch, minimize=True)
+            pitchReference.transposeBelowTarget(minPitch, minimize=True, inPlace=True)
 
         # first, go upward from this pitch to the high terminus
         n = nodeObj
@@ -1573,7 +1573,7 @@ class IntervalNetwork(object):
         # if this network is octaveDuplicating, than we can shift 
         # reference down octaves to just above minPitch
         if self.octaveDuplicating and maxPitch is not None:
-            pitchReference.transposeAboveTarget(maxPitch, minimize=True)
+            pitchReference.transposeAboveTarget(maxPitch, minimize=True, inPlace=True)
 
         n = nodeObj
         p = pitchReference
@@ -1655,8 +1655,14 @@ class IntervalNetwork(object):
 
 
 
-    def realize(self, pitchReference, nodeId=None, minPitch=None, maxPitch=None, 
-        direction=DIRECTION_ASCENDING, alteredDegrees=None, reverse=False):
+    def realize(self, 
+                pitchReference, 
+                nodeId=None, 
+                minPitch=None, 
+                maxPitch=None, 
+                direction=DIRECTION_ASCENDING, 
+                alteredDegrees=None, 
+                reverse=False):
         '''
         Realize the nodes of this network based on a pitch assigned to a 
         valid `nodeId`, where `nodeId` can be specified by integer 
@@ -1727,7 +1733,7 @@ class IntervalNetwork(object):
             if direction == DIRECTION_ASCENDING:
                 # move pitch reference to below minimum
                 if self.octaveDuplicating and minPitch is not None:
-                    pitchReference.transposeBelowTarget(minPitch)
+                    pitchReference.transposeBelowTarget(minPitch, inPlace=True)
 
                 mergedPitches, mergedNodes = self._realizeAscending(pitchReference=pitchReference, 
                                                                     nodeId=nodeId, 
@@ -1739,7 +1745,7 @@ class IntervalNetwork(object):
             elif direction == DIRECTION_DESCENDING:
                 # move pitch reference to above minimum
                 if self.octaveDuplicating and maxPitch is not None:
-                    pitchReference.transposeAboveTarget(maxPitch)
+                    pitchReference.transposeAboveTarget(maxPitch, inPlace=True)
 
                 # fillMinMaxIfNone will result in a complete scale
                 # being returned if no min and max are given (otherwise
@@ -1759,9 +1765,9 @@ class IntervalNetwork(object):
                 pitchReferenceB = copy.deepcopy(pitchReference)
 
                 if self.octaveDuplicating and minPitch is not None:
-                    pitchReferenceA.transposeBelowTarget(minPitch)
+                    pitchReferenceA.transposeBelowTarget(minPitch, inPlace=True)
 
-                #pitchReferenceA.transposeBelowTarget(minPitch)
+                #pitchReferenceA.transposeBelowTarget(minPitch, inPlace=True)
 
                 post, postNodeId = self._realizeAscending(pitchReference=pitchReferenceA, 
                                                           nodeId=nodeId, 
@@ -1770,9 +1776,9 @@ class IntervalNetwork(object):
                                                           alteredDegrees=alteredDegrees)
 
                 if self.octaveDuplicating and maxPitch is not None:
-                    pitchReferenceB.transposeAboveTarget(maxPitch)
+                    pitchReferenceB.transposeAboveTarget(maxPitch, inPlace=True)
 
-                #pitchReferenceB.transposeAboveTarget(maxPitch)
+                #pitchReferenceB.transposeAboveTarget(maxPitch, inPlace=True)
 
                 pre, preNodeId = self._realizeDescending(pitchReference=pitchReferenceB, 
                                                          nodeId=nodeId,
@@ -2034,10 +2040,10 @@ class IntervalNetwork(object):
             if i == 0 and nId in [TERMINUS_LOW, TERMINUS_HIGH]:
                 continue
             # turn off collection after finding next terminus
-            elif nId in [TERMINUS_LOW, TERMINUS_HIGH] and collect == True:
+            elif nId in [TERMINUS_LOW, TERMINUS_HIGH] and collect is True:
                 postPairs.append((p, nId))
                 break
-            elif nId in [TERMINUS_LOW, TERMINUS_HIGH] and collect == False:
+            elif nId in [TERMINUS_LOW, TERMINUS_HIGH] and collect is False:
                 collect = True
             if collect:
                 postPairs.append((p, nId))
@@ -2051,10 +2057,10 @@ class IntervalNetwork(object):
             if i == 0 and nId in [TERMINUS_LOW, TERMINUS_HIGH]:
                 continue
             # turn off collection after finding next terminus
-            elif nId in [TERMINUS_LOW, TERMINUS_HIGH] and collect == True:
+            elif nId in [TERMINUS_LOW, TERMINUS_HIGH] and collect is True:
                 prePairs.append((p, nId))
                 break
-            elif nId in [TERMINUS_LOW, TERMINUS_HIGH] and collect == False:
+            elif nId in [TERMINUS_LOW, TERMINUS_HIGH] and collect is False:
                 collect = True
             if collect:
                 prePairs.append((p, nId))
@@ -2154,6 +2160,20 @@ class IntervalNetwork(object):
         of this IntervalNetwork if networkx is installed
 
         '''
+        def sortTerminusLowThenIntThenTerminusHigh(a):
+            '''
+            return a two-tuple where the first element is -1 if 'TERMINUS_LOW',
+            0 if an int, and 1 if 'TERMINUS_HIGH' or another string, and
+            the second element is the value itself.
+            '''
+            sortFirst = 0
+            if isinstance(a, six.string_types):
+                if a.upper() == 'TERMINUS_LOW':
+                    sortFirst = -1
+                else:
+                    sortFirst = 1
+            return (sortFirst, a)
+            
         #g = networkx.DiGraph()
         g = networkx.MultiDiGraph()
 
@@ -2175,7 +2195,7 @@ class IntervalNetwork(object):
         degreeCount = OrderedDict() # degree, count pairs
         # sorting nodes will help, but not insure, proper positioning
         nKeys = list(self._nodes.keys())
-        nKeys.sort()
+        nKeys.sort(key=sortTerminusLowThenIntThenTerminusHigh)
         for nId in nKeys:
             n = self._nodes[nId]
             if n.degree not in degreeCount:
@@ -2250,13 +2270,13 @@ class IntervalNetwork(object):
         1
         >>> net.getRelativeNodeId('a', 1, 'c', comparisonAttribute = 'step')
         1
-        >>> net.getRelativeNodeId('a', 1, 'b-4') == None
+        >>> net.getRelativeNodeId('a', 1, 'b-4') is None
         True
         '''
         if alteredDegrees is None:
             alteredDegrees = {}
         # TODO: this always takes the first: need to add weighted selection
-        if nodeName == None: # assume first
+        if nodeName is None: # assume first
             nodeId = self._getTerminusLowNodes()[0]
         else:
             nodeId = self._nodeNameToNodes(nodeName)[0]
@@ -2335,7 +2355,7 @@ class IntervalNetwork(object):
         if alteredDegrees is None:
             alteredDegrees = {}
         # TODO: this takes the first, need to add probabilistic selection
-        if nodeName == None: # assume first
+        if nodeName is None: # assume first
             nodeId = self._getTerminusLowNodes()[0]
         else:
             nodeId = self._nodeNameToNodes(nodeName)[0]
@@ -2405,7 +2425,7 @@ class IntervalNetwork(object):
         >>> net.getRelativeNodeDegree('e-2', 1, 'd') # if e- is tonic, what is d3
         7
 
-        >>> net.getRelativeNodeDegree('e3', 1, 'd5') == None
+        >>> net.getRelativeNodeDegree('e3', 1, 'd5') is None
         True
         >>> net.getRelativeNodeDegree('e3', 1, 'd5', comparisonAttribute='step')
         7
@@ -2419,7 +2439,7 @@ class IntervalNetwork(object):
         1
         >>> net.getRelativeNodeDegree('e-2', 1, 'f3')
         2
-        >>> net.getRelativeNodeDegree('e-3', 1, 'b6') == None
+        >>> net.getRelativeNodeDegree('e-3', 1, 'b6') is None
         True
 
         >>> net.getRelativeNodeDegree('e-3', 1, 'e-2')
@@ -2470,7 +2490,7 @@ class IntervalNetwork(object):
             comparisonAttribute=comparisonAttribute, 
             alteredDegrees=alteredDegrees, 
             direction=direction)
-        if nId == None:
+        if nId is None:
             return None
         else:
             return self._nodeIdToDegree(nId)
@@ -2675,7 +2695,7 @@ class IntervalNetwork(object):
             alteredDegrees = {}
         # these return a Node, not a nodeId
         # TODO: just getting first
-        if nodeId == None: # assume first
+        if nodeId is None: # assume first
             nodeId = self._getTerminusLowNodes()[0]
         else:
             nodeId = self._nodeNameToNodes(nodeId)[0]
@@ -2727,7 +2747,7 @@ class IntervalNetwork(object):
             alteredDegrees = {}
             
         # these return a Node, not a nodeId
-        if nodeId == None: # assume first
+        if nodeId is None: # assume first
             nodeId = self._getTerminusLowNodes()[0]
         else:
             nodeId = self._nodeNameToNodes(nodeId)[0]
@@ -3452,7 +3472,6 @@ _DOC_ORDER = [IntervalNetwork, Node, Edge]
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test)
-
 
 #------------------------------------------------------------------------------
 # eof

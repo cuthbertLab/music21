@@ -188,7 +188,7 @@ def upperPartsWithinLimit(possibA, maxSemitoneSeparation=12):
     False
     '''
     upperPartsWithinLimit = True # pylint: disable=redefined-outer-name
-    if maxSemitoneSeparation == None:
+    if maxSemitoneSeparation is None:
         return upperPartsWithinLimit
     
     upperParts = possibA[0:len(possibA)-1]
@@ -752,14 +752,14 @@ def partsSame(possibA, possibB, partsToCheck = None):
     >>> possibility.partsSame(possibA1, possibB1, [2,3,4])
     True
     '''
-    if partsToCheck == None:
+    if partsToCheck is None:
         return True
     
     pairsList = partPairs(possibA, possibB)
     
     for partIndex in partsToCheck:
         (pitchA, pitchB) = pairsList[partIndex - 1]
-        if not (pitchA == pitchB):
+        if pitchA != pitchB:
             return False
     
     return True
@@ -809,7 +809,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
     >>> possibB2 = (A4, E4, Cs4, A2)
     >>> possibility.couldBeItalianA6Resolution(possibA2, possibB2)
     Traceback (most recent call last):
-    PossibilityException: possibA does not spell out an It+6 chord.
+    music21.figuredBass.possibility.PossibilityException: possibA does not spell out an It+6 chord.
     
     
     The method is called "couldBeItalianA6Resolution" as opposed
@@ -836,7 +836,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
     >>> possibility.couldBeItalianA6Resolution(possibA3, possibB6, restrictDoublings=False)
     True
     '''
-    if threePartChordInfo == None:
+    if threePartChordInfo is None:
         augSixthChord = chord.Chord(possibA)
         if not augSixthChord.isItalianAugmentedSixth():
             raise PossibilityException("possibA does not spell out an It+6 chord.")
@@ -846,7 +846,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
         fifth = augSixthChord.getChordStep(5)
         threePartChordInfo = [bass, root, third, fifth]
             
-    allowedIntervalNames = ['M3','m3','M2','m-2']
+    allowedIntervalNames = ['M3', 'm3', 'M2', 'm-2']
     rootResolved = False
     [bass, root, third, fifth] = threePartChordInfo
     for pitchIndex in range(len(possibA)):
@@ -867,7 +867,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
             if not i.directedName == 'm-2':
                 return False
         elif pitchA.name == root.name:
-            if rootResolved == True and restrictDoublings:
+            if rootResolved and restrictDoublings:
                 # there can't be more than one root
                 return False
             if not (pitchB.ps - pitchA.ps) == 1.0:

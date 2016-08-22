@@ -15,10 +15,11 @@ Parses the de Clercq-Temperley popular music flavor of RomanText.
 The Clercq-Temperley file format and additional rock corpus analysis
 information may be located at http://theory.esm.rochester.edu/rock_corpus/
 '''
+import copy
 import io
 import re
-import copy
 import unittest
+
 from collections import OrderedDict
 
 from music21 import exceptions21
@@ -592,12 +593,11 @@ class CTRule(object):
                 for i in range(numReps):
                     returnedMeasures = rule.expand(ts, ks)
                     self.insertKsTs(returnedMeasures[0], ts, ks)
-                    for m in returnedMeasures:
-                        tsEs = m.iter.getElementsByClass('TimeSignature')
-                        for returnedTs in tsEs:
-                            if returnedTs is not ts:
-                                # the TS changed mid-rule; create a new one for return.
-                                ts = copy.deepcopy(ts) 
+                    for returnedTs in [m.getElementsByClass('TimeSignature') 
+                                        for m in returnedMeasures]:
+                        if returnedTs is not ts:
+                            # the TS changed mid-rule; create a new one for return.
+                            ts = copy.deepcopy(ts) 
                                 
                     measures.extend(returnedMeasures)
             elif sep == "|":
@@ -950,7 +950,7 @@ class CTRule(object):
             sectionName = 'Tag' + self.LHS[2:]
         elif self.LHS == 'S':
             sectionName = 'Song' + self.LHS[1:]
-        elif 'Fadeout' == self.LHS:
+        elif self.LHS == 'Fadeout':
             sectionName = 'Fadeout'
         else:
             sectionName = self.LHS

@@ -14,6 +14,7 @@ trecento directory which works particularly on 14th-century Italian
 music. Objects representing the punctus and the divisione can be found there.
 '''
 import copy
+import unittest
 
 from music21 import bar
 from music21 import base
@@ -31,8 +32,6 @@ from music21.alpha import trecento
 
 from music21 import environment
 environLocal = environment.Environment('medren')
-
-import unittest
 
 allowableStrettoIntervals = { 
         -8: [(3, True), 
@@ -520,61 +519,61 @@ class GeneralMensuralNote(base.Music21Object):
         mOrD = mensurationOrDivisione
         if mOrD is None:
             mOrD = self._determineMensurationOrDivisione()
-
-        mList = []
-        currentIndex, index = -1, -1
-        indOffset = 0 
         
         if activeSite is None:
             site = self.activeSite
         else:
             site = activeSite
         
-        if (site is not None):
-            if self.mensuralType in ['brevis', 'longa', 'maxima']:
-                mList = [self]
-                currentIndex = 0
+        if site is None:
+            return [], -1
+        if self.mensuralType in ['brevis', 'longa', 'maxima']:
+            return [self], 0
+
+        tempList = list(site.recurse())[1:]
+        if site.isMeasure:
+            return tempList, -1
+
+        # else...
+        mList = []
+        currentIndex, index = -1, -1
+        indOffset = 0 
+        
+        for ind, item in enumerate(tempList):
+            if self is item:
+                currentIndex = ind
+                           
+        for i in range(currentIndex-1, -1, -1):
+            # Punctus and ligature marks indicate a new measure
+            if (('Punctus' in tempList[i].classes) or 
+                    ('Ligature' in tempList[i].classes)):
+                indOffset = i+1
+                break
+            elif 'GeneralMensuralNote' in tempList[i].classes:
+                # In Italian notation, brevis, longa, and maxima indicate a new measure
+                if (('Divisione' in mOrD.classes) and
+                        (tempList[i].mensuralType in ['brevis', 'longa', 'maxima'])):
+                    indOffset = i+1
+                    break
+                else:
+                    mList.insert(i, tempList[i])
             else:
-                tempList = list(site.recurse())[1:]
-                if site.isMeasure:
-                    mList += tempList
-                else:                    
-                    for ind, item in enumerate(tempList):
-                        if self is item:
-                            currentIndex = ind
-                                       
-                    for i in range(currentIndex-1, -1, -1):
-                        # Punctus and ligature marks indicate a new measure
-                        if (('Punctus' in tempList[i].classes) or 
-                                ('Ligature' in tempList[i].classes)):
-                            indOffset = i+1
-                            break
-                        elif 'GeneralMensuralNote' in tempList[i].classes:
-                            # In Italian notation, brevis, longa, and maxima indicate a new measure
-                            if (('Divisione' in mOrD.classes) and
-                                    (tempList[i].mensuralType in ['brevis', 'longa', 'maxima'])):
-                                indOffset = i+1
-                                break
-                            else:
-                                mList.insert(i, tempList[i])
-                        else:
-                            indOffset += 1
-                    
-                    mList.reverse()
-                    mList.insert(currentIndex, self)
-                    for j in range(currentIndex+1,len(tempList), 1):
-                        if (('Punctus' in tempList[j].classes) or 
-                                ('Ligature' in tempList[j].classes)):
-                            break
-                        if 'GeneralMensuralNote' in tempList[j].classes:
-                            if (('Divisione' in mOrD.classes) and 
-                                    (tempList[j].mensuralType in ['brevis', 'longa', 'maxima'])):
-                                break
-                            else:
-                                mList.insert(j, tempList[j])
+                indOffset += 1
         
-        index = currentIndex - indOffset
+        mList.reverse()
+        mList.insert(currentIndex, self)
+        for j in range(currentIndex+1,len(tempList), 1):
+            if (('Punctus' in tempList[j].classes) or 
+                    ('Ligature' in tempList[j].classes)):
+                break
+            if 'GeneralMensuralNote' in tempList[j].classes:
+                if (('Divisione' in mOrD.classes) and 
+                        (tempList[j].mensuralType in ['brevis', 'longa', 'maxima'])):
+                    break
+                else:
+                    mList.insert(j, tempList[j])
         
+        index = currentIndex - indOffset        
         return mList, index
             
 class MensuralRest(GeneralMensuralNote, note.Rest):
@@ -867,8 +866,6 @@ class MensuralNote(GeneralMensuralNote, note.Note):
         return self.stems
     
     def setStem(self, direction):
-        #NOTE: This method makes it possible to have a semibrevis with a sidestem and a 
-        # downstem. This doesn't mean anything so far as I can tell.
         '''
         Takes one argument: direction.
         
@@ -903,36 +900,40 @@ class MensuralNote(GeneralMensuralNote, note.Note):
         >>> r_3.getStems()
         ['up']
         '''
+        #NOTE: This method makes it possible to have a semibrevis with a sidestem and a 
+        # downstem. This doesn't mean anything so far as I can tell.
         
         if direction in [None, 'none', 'None']:
             if self.mensuralType in ['minima', 'semiminima']:
                 self.stems = ['up']
             else:
                 self.stems = []
-        else:
-            if self.mensuralType in ['brevis','longa', 'maxima']:
-                raise MedRenException('A note of type %s cannot be equipped with a stem' % 
-                                      self.mensuralType)
+            return    
+            
+        if self.mensuralType in ['brevis','longa', 'maxima']:
+            raise MedRenException('A note of type %s cannot be equipped with a stem' % 
+                                  self.mensuralType)
+
+        
+        if direction in ['down', 'Down']:
+            direction = 'down'
+            if len(self.stems) > 1:
+                raise MedRenException('This note already has the maximum number of stems')
             else:
-                if direction in ['down', 'Down']:
-                    direction = 'down'
-                    if len(self.stems) > 1:
-                        raise MedRenException('This note already has the maximum number of stems')
-                    else:
-                        self.stems.append(direction)
-                            
-                elif direction in ['side', 'Side']:
-                    direction = 'side'
-                    if ((self.mensuralType not in ['semibrevis', 'minima']) or 
-                        self.getNumDots() > 0):
-                        raise MedRenException('This note may not have a stem of direction %s' % 
-                                              direction)
-                    elif len(self.stems) > 1:
-                        raise MedRenException('This note already has the maximum number of stems')
-                    else:
-                        self.stems.append(direction)
-                else:
-                    raise MedRenException('%s not recognized as a valid stem direction' % direction)
+                self.stems.append(direction)
+                    
+        elif direction in ['side', 'Side']:
+            direction = 'side'
+            if ((self.mensuralType not in ['semibrevis', 'minima']) or 
+                self.getNumDots() > 0):
+                raise MedRenException('This note may not have a stem of direction %s' % 
+                                      direction)
+            elif len(self.stems) > 1:
+                raise MedRenException('This note already has the maximum number of stems')
+            else:
+                self.stems.append(direction)
+        else:
+            raise MedRenException('%s not recognized as a valid stem direction' % direction)
                 
     def getFlags(self):
         '''
@@ -1439,14 +1440,15 @@ class Ligature(base.Music21Object):
         False
         '''
         if index < self._ligatureLength():
-            if value == True or value == 'True' or value == 'true':
+            # TODO: fix so there's only one right way...
+            if value in (True, 'True', 'true'):
                 if ((self.getNoteheadShape(index) == 'oblique') or 
                         (self.getStem(index) != (None, None)) or 
                         (index > 0 and self.getStem(index-1)[0] == 'up')):
                     raise MedRenException('cannot make note at index %d a maxima' % index)
                 else:
                     self.maximaNotes[index] = value
-            elif value == False or value == 'False' or value == 'false':
+            elif value in (False, 'False', 'false'):
                 self.maximaNotes[index] = value
             else:
                 raise MedRenException('%s is not a valid value' % value)
@@ -1510,55 +1512,56 @@ class Ligature(base.Music21Object):
             direction = None
         if orientation == 'None' or direction == 'none':
             index = None
-        if index < self._ligatureLength():
-            if self.isMaxima(index):
-                raise MedRenException('cannot place stem at index %d' % index)
+        if index >= self._ligatureLength():
+            raise MedRenException('no note exists at index %d' % index)
+
+        if self.isMaxima(index):
+            raise MedRenException('cannot place stem at index %d' % index)
+
+        if orientation is None and direction is None:
+            self.stems[index] = (direction, orientation)
+        elif orientation in ['left', 'right']:
+            if index == 0:
+                prevStem = (None,None)
+                nextStem = self.getStem(1)
+            elif index == self._ligatureLength() - 1:
+                prevStem = self.getStem(self._ligatureLength() - 2)
+                nextStem = (None,None)
             else:
-                if orientation == None and direction == None:
-                    self.stems[index] = (direction, orientation)
-                elif orientation in ['left', 'right']:
-                    if index == 0:
-                        prevStem = (None,None)
-                        nextStem = self.getStem(1)
-                    elif index == self._ligatureLength() - 1:
-                        prevStem = self.getStem(self._ligatureLength()-2)
-                        nextStem = (None,None)
-                    else:
-                        prevStem = self.getStem(index-1)
-                        nextStem = self.getStem(index+1)
-                    if ((orientation == 'left' and prevStem[1] != 'right') or 
-                            (orientation == 'right' and nextStem[1] != 'left')):
-                        if direction == 'down':
-                            if prevStem[0] != 'up':
-                                self.stems[index] = (direction, orientation)
-                            else:
-                                raise MedRenException(
-                                    'a stem with direction "%s" not permitted at index %d' % 
-                                    (direction, index))
-                        elif direction == 'up':
-                            if ((index < self._ligatureLength()-1) 
-                                    and (prevStem[0] != 'up') 
-                                    and (nextStem[0] == None) 
-                                    and not self.isMaxima(index+1)):
-                                self.stems[index] = (direction, orientation)
-                            else:
-                                raise MedRenException(
-                                    'a stem with direction "%s" not permitted at index %d' % 
-                                    (direction, index))
-                        else:
-                            raise MedRenException(
-                                'direction "%s" and orientation "%s" not supported for ligatures' %
-                                (direction, orientation))
+                prevStem = self.getStem(index - 1)
+                nextStem = self.getStem(index + 1)
+                
+            if ((orientation == 'left' and prevStem[1] != 'right') 
+                    or (orientation == 'right' and nextStem[1] != 'left')):
+                if direction == 'down':
+                    if prevStem[0] != 'up':
+                        self.stems[index] = (direction, orientation)
                     else:
                         raise MedRenException(
-                            'a stem with orientation "%s" not permitted at index %d' % 
-                            (orientation,index))
+                            'a stem with direction "%s" not permitted at index %d' % 
+                            (direction, index))
+                elif direction == 'up':
+                    if ((index < self._ligatureLength() - 1) 
+                            and (prevStem[0] != 'up') 
+                            and (nextStem[0] is None) 
+                            and not self.isMaxima(index + 1)):
+                        self.stems[index] = (direction, orientation)
+                    else:
+                        raise MedRenException(
+                            'a stem with direction "%s" not permitted at index %d' % 
+                            (direction, index))
                 else:
                     raise MedRenException(
-                        'direction "%s" and orientation "%s" not supported for ligatures' % 
-                        (direction,orientation))
+                        'direction "%s" and orientation "%s" not supported for ligatures' %
+                        (direction, orientation))
+            else:
+                raise MedRenException(
+                    'a stem with orientation "%s" not permitted at index %d' % 
+                    (orientation,index))
         else:
-            raise MedRenException('no note exists at index %d' % index)
+            raise MedRenException(
+                'direction "%s" and orientation "%s" not supported for ligatures' % 
+                (direction,orientation))
         self._notes = []     
        
     def isReversed(self, index):
@@ -2091,8 +2094,8 @@ def cummingSchubertStrettoFuga(score):
         print(score.title)
     
     print("intv.\tcount\tpercent")
-    for l in sorted(strettoKeys.keys()):
-        print("%2d\t%3d\t%2d%%" % (l, strettoKeys[l], strettoKeys[l]*100/len(sn)-1))
+    for l in sorted(strettoKeys):
+        print("%2d\t%3d\t%2d%%" % (l, strettoKeys[l], strettoKeys[l] * 100/len(sn) - 1))
     print("\n")
         
 class MedRenException(exceptions21.Music21Exception):

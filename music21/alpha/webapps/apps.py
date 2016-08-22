@@ -52,9 +52,9 @@ def setupURLCorpusParseApp(agenda):
     
     if agenda.getData('measureStart') != None or agenda.getData('measureEnd') != None:
         # Get only certian measures
-        if agenda.getData('measureStart') == None:
-            agenda.addData('measureStart',0)
-        if agenda.getData('measureEnd') == None:
+        if agenda.getData('measureStart') is None:
+            agenda.addData('measureStart', 0)
+        if agenda.getData('measureEnd') is None:
             agenda.addData('measureEnd', 'None')
         agenda.addCommand('method', 'outputStream', 'outputStream', 'measures', 
                           ['measureStart', 'measureEnd'])

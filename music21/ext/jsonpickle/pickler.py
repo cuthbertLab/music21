@@ -12,12 +12,12 @@ import sys
 import quopri
 from itertools import chain, islice
 
-import jsonpickle.util as util
-import jsonpickle.tags as tags
-import jsonpickle.handlers as handlers
+from music21.ext.jsonpickle import util
+from music21.ext.jsonpickle import tags
+from music21.ext.jsonpickle import handlers
 
-from jsonpickle.backend import JSONBackend
-from jsonpickle.compat import unicode, PY3, PY2
+from music21.ext.jsonpickle.backend import JSONBackend
+from music21.ext.jsonpickle.compat import unicode, PY3, PY2
 
 
 def encode(value,
@@ -177,7 +177,7 @@ class Pickler(object):
 
     def _get_flattener(self, obj):
 
-        if PY2 and isinstance(obj, file):
+        if PY2 and isinstance(obj, file): # @UndefinedVariable
             return self._flatten_file
 
         if util.is_primitive(obj):
@@ -238,7 +238,7 @@ class Pickler(object):
         """
         Special case file objects
         """
-        assert not PY3 and isinstance(obj, file)
+        assert not PY3 and isinstance(obj, file) # @UndefinedVariable
         return None
 
     def _flatten_bytestring(self, obj):

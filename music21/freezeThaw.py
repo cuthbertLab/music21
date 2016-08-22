@@ -113,7 +113,7 @@ class StreamFreezeThawBase(object):
         self.stream = None
 
     def getPickleFp(self, directory):
-        if directory == None:
+        if directory is None:
             raise ValueError
         # cannot get data from stream, as offsets are broken
         streamStr = str(time.time())
@@ -365,7 +365,7 @@ class StreamFreezer(StreamFreezeThawBase):
         2
         >>> n.getOffsetBySite(s)
         Traceback (most recent call last):
-        SitesException: an entry for this object <music21.note.Note D#> 
+        music21.sites.SitesException: an entry for this object <music21.note.Note D#> 
                is not stored in stream <music21.stream.Stream stream s>
         >>> n.getOffsetBySite(t)
         20.0
@@ -434,7 +434,7 @@ class StreamFreezer(StreamFreezeThawBase):
          (<music21.bar.Barline style=regular>, 'end')]
         >>> n1.getOffsetBySite(s)
         Traceback (most recent call last):
-        SitesException: an entry for this object <music21.note.Note C#> is 
+        music21.sites.SitesException: an entry for this object <music21.note.Note C#> is 
              not stored in stream <music21.stream.Measure 0 offset=0.0>
 
         Trying it again, but now with substreams:
@@ -1039,7 +1039,7 @@ class JSONFreezeThawBase(object):
             ],
         'music21.metadata.Metadata': [
             '_date', '_imprint', '_copyright', '_workIds', '_urls',
-            '_contributors',
+            'contributors',
             ],
         'music21.metadata.bundles.MetadataBundle': [
             '_metadataEntries', 'name',
@@ -1140,7 +1140,7 @@ class JSONFreezeThawBase(object):
 
         >>> jss.music21ObjectFromString('blah.NotAClass')
         Traceback (most recent call last):
-        JSONFreezerException: Cannot generate a new object from blah.NotAClass
+        music21.freezeThaw.JSONFreezerException: Cannot generate a new object from blah.NotAClass
         '''
         import music21 # pylint: disable=redefined-outer-name
         idStrOrig = idStr
@@ -1641,7 +1641,7 @@ class JSONThawer(JSONFreezeThawBase):
 
         return obj
 
-    def _setJSON(self, jsonStr, inputObject = None):
+    def _setJSON(self, jsonStr, inputObject=None):
         '''
         Set this object based on a JSON string
         or instantiated dictionary representation.
@@ -1704,6 +1704,64 @@ class JSONThawer(JSONFreezeThawBase):
                     "Cannot find an object class definition in the jsonStr; " + 
                     "you must provide an input object")
 
+        def doOneAttr(key, attrValue):
+            if attrValue is None or isinstance(attrValue, (int, float)):
+                try:
+                    setattr(obj, key, attrValue)
+                except AttributeError:
+                    raise JSONThawerException(
+                        "Cannot set attribute '%s' to %s for obj %r" % (
+                                                        key, attrValue, obj))
+            # handle a list or tuple, looking for dicts that define objs
+            elif isinstance(attrValue, (list, tuple)):
+                subList = []
+                for attrValueSub in attrValue:
+                    if self._isComponent(attrValueSub):
+                        subList.append(self._buildComponent(attrValueSub))
+                    else:
+                        subList.append(attrValueSub)
+                setattr(obj, key, subList)
+            # handle a dictionary, looking for dicts that define objs
+            elif isinstance(attrValue, dict):
+                # could be a data dict or a dict of objects;
+                # if an object, will have a __class__ key
+                if self._isComponent(attrValue):
+                    setattr(obj, key, self._buildComponent(attrValue))
+                # its a data dictionary; could contain objects as
+                # dictionaries, or flat data
+                else:
+                    subDict = {}
+                    for subKey in attrValue:
+                        # this could be flat data or a obj definition
+                        # in a dictionary
+                        attrValueSub = attrValue[subKey]
+                        # if a dictionary, and defines a __class__,
+                        # create an object
+                        if self._isComponent(attrValueSub):
+                            subDict[subKey] = self._buildComponent(
+                                attrValueSub)
+                        else:
+                            subDict[subKey] = attrValueSub
+                    #setattr(self, key, subDict)
+                    try:
+                        dst = getattr(obj, key)
+                    except AttributeError as ae:
+                        if key == "_storage": # changed name; help older .json files...
+                            dst = getattr(obj, "storage")
+                        else:
+                            raise JSONFreezerException(
+                                "Problem with key: %s for object %s: %s" % (key, obj, ae))
+
+                    # updating the dictionary preserves default
+                    # values created at init
+                    dst.update(subDict)
+            else: # assume a string
+                try:
+                    setattr(obj, key, attrValue)
+                except AttributeError:
+                    pass
+
+
         for attr in d:
             #environLocal.printDebug(['_setJSON: attr', attr, d[attr]])
             if attr == '__class__':
@@ -1713,63 +1771,7 @@ class JSONThawer(JSONFreezeThawBase):
             elif attr == '__attr__':
                 for key in d[attr]:
                     attrValue = d[attr][key]
-                    if attrValue == None or isinstance(attrValue,
-                        (int, float)):
-                        try:
-                            setattr(obj, key, attrValue)
-                        except AttributeError:
-                            raise JSONThawerException(
-                                "Cannot set attribute '%s' to %s for obj %r" % (
-                                                                key, attrValue, obj))
-                    # handle a list or tuple, looking for dicts that define objs
-                    elif isinstance(attrValue, (list, tuple)):
-                        subList = []
-                        for attrValueSub in attrValue:
-                            if self._isComponent(attrValueSub):
-                                subList.append(
-                                    self._buildComponent(attrValueSub))
-                            else:
-                                subList.append(attrValueSub)
-                        setattr(obj, key, subList)
-                    # handle a dictionary, looking for dicts that define objs
-                    elif isinstance(attrValue, dict):
-                        # could be a data dict or a dict of objects;
-                        # if an object, will have a __class__ key
-                        if self._isComponent(attrValue):
-                            setattr(obj, key, self._buildComponent(attrValue))
-                        # its a data dictionary; could contain objects as
-                        # dictionaries, or flat data
-                        else:
-                            subDict = {}
-                            for subKey in attrValue:
-                                # this could be flat data or a obj definition
-                                # in a dictionary
-                                attrValueSub = attrValue[subKey]
-                                # if a dictionary, and defines a __class__,
-                                # create an object
-                                if self._isComponent(attrValueSub):
-                                    subDict[subKey] = self._buildComponent(
-                                        attrValueSub)
-                                else:
-                                    subDict[subKey] = attrValueSub
-                            #setattr(self, key, subDict)
-                            try:
-                                dst = getattr(obj, key)
-                            except AttributeError as ae:
-                                if key == "_storage": # changed name; help older .json files...
-                                    dst = getattr(obj, "storage")
-                                else:
-                                    raise JSONFreezerException(
-                                        "Problem with key: %s for object %s: %s" % (key, obj, ae))
-
-                            # updating the dictionary preserves default
-                            # values created at init
-                            dst.update(subDict)
-                    else: # assume a string
-                        try:
-                            setattr(obj, key, attrValue)
-                        except AttributeError:
-                            pass
+                    doOneAttr(key, attrValue)
             else:
                 raise JSONFreezerException('cannot handle json attr: %s'% attr)
 

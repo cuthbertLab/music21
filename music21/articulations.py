@@ -99,6 +99,7 @@ A longer test showing the utility of the module:
 import unittest
 
 from music21 import base
+from music21 import common
 from music21 import exceptions21
 from music21 import environment
 _MOD = "articulations.py"
@@ -121,7 +122,6 @@ class Articulation(base.Music21Object):
     '''
     def __init__(self):
         base.Music21Object.__init__(self)
-        self.name = None # specified in subclasses
         self.placement = 'above'
         # declare a unit interval shift for the performance of this articulation
         self._volumeShift = 0.0 
@@ -129,6 +129,25 @@ class Articulation(base.Music21Object):
 
     def __repr__(self):
         return '<music21.articulations.%s>' % (self.__class__.__name__)
+
+    @property
+    def name(self):
+        '''
+        returns the name of the articulation, which is generally the
+        class name without the leading letter lowercase.
+        
+        Subclasses can override this as necessary.
+        
+        >>> st = articulations.Staccato()
+        >>> st.name
+        'staccato'
+        
+        >>> sp = articulations.SnapPizzicato()
+        >>> sp.name
+        'snap pizzicato'
+        '''
+        className = self.__class__.__name__
+        return common.camelCaseToHyphen(className, replacement=' ')
     
 #     def __eq__(self, other):
 #         '''
@@ -252,7 +271,6 @@ class Accent(DynamicArticulation):
         >>> a = articulations.Accent()
         '''
         DynamicArticulation.__init__(self)
-        self.name = 'accent'
         self._volumeShift = 0.1
 
 
@@ -263,7 +281,6 @@ class StrongAccent(Accent):
         >>> a = articulations.StrongAccent()
         '''
         Accent.__init__(self)
-        self.name = 'strong accent'
         self._volumeShift = 0.15
 
 class Staccato(LengthArticulation):
@@ -273,7 +290,6 @@ class Staccato(LengthArticulation):
         >>> a = articulations.Staccato()
         '''
         LengthArticulation.__init__(self)
-        self.name = 'staccato'
         self._volumeShift = 0.05
 
 class Staccatissimo(Staccato):
@@ -286,7 +302,6 @@ class Staccatissimo(Staccato):
         >>> a = articulations.Staccatissimo()
         '''
         Staccato.__init__(self)
-        self.name = 'staccatissimo'
         self._volumeShift = 0.05
 
 class Spiccato(Staccato):
@@ -298,7 +313,6 @@ class Spiccato(Staccato):
         >>> a = articulations.Spiccato()
         '''
         Staccato.__init__(self)
-        self.name = 'spiccato'
         self._volumeShift = 0.05
 
 class Tenuto(LengthArticulation):
@@ -308,7 +322,6 @@ class Tenuto(LengthArticulation):
         >>> a = articulations.Tenuto()
         '''
         LengthArticulation.__init__(self)
-        self.name = 'tenuto'
         self._volumeShift = -0.05
 
 class DetachedLegato(LengthArticulation):
@@ -318,7 +331,6 @@ class DetachedLegato(LengthArticulation):
         >>> a = articulations.DetachedLegato()
         '''
         LengthArticulation.__init__(self)
-        self.name = 'detached legato'
         self._volumeShift = 0
 
 
@@ -399,8 +411,11 @@ class TechnicalIndication(Articulation):
     TechnicalIndications (MusicXML: technical) give performance 
     indications specific to different instrument types, such
     as harmonics or bowing.
+    
+    TechnicalIndications can include an optional content.
     '''
-    pass
+    def __init__(self):
+        super(TechnicalIndication, self).__init__()
 
 class Harmonic(TechnicalIndication):
     def __init__(self):
@@ -417,6 +432,38 @@ class Bowing(TechnicalIndication):
         >>> a = articulations.Bowing()
         '''
         TechnicalIndication.__init__(self)
+
+class Fingering(TechnicalIndication):
+    def __init__(self, fingerNumber=None):
+        '''
+        Fingering is a technical indication that covers the fingering of
+        a note (in a guitar/fret context, this covers the fret finger, 
+        see FrettedPluck for that).
+        
+        Converts the MusicXML -- <fingering> object
+        
+        >>> f = articulations.Fingering(5)
+        >>> f
+        <music21.articulations.Fingering 5>
+        >>> f.fingerNumber
+        5
+
+        `.substitution` indicates that this fingering indicates a substitute fingering:
+
+        >>> f.substitution = True
+        
+        MusicXML distinguishes between a substitution and an alternate
+        fingering:
+        
+        >>> f.alternate = True
+        '''
+        TechnicalIndication.__init__(self)
+        self.fingerNumber = fingerNumber
+        self.substitution = False
+        self.alternate = False
+
+    def __repr__(self):
+        return '<music21.articulations.%s %s>' % (self.__class__.__name__, self.fingerNumber)
 
 
 #-------------------------------------------------------------------------------
@@ -452,9 +499,9 @@ class StringThumbPosition(Bowing):
     '''
     pass
 
-class StringFingering(Bowing):
+class StringFingering(StringIndication, Fingering):
     '''
-    MusicXML -- fingering
+    Indicates a fingering on a specific string.  Nothing special for now.
     '''
     pass
 
@@ -477,7 +524,7 @@ class NailPizzicato(Pizzicato):
 class FretIndication(TechnicalIndication):
     pass
 
-class FrettedPluck(FretIndication):
+class FrettedPluck(FretIndication, Fingering):
     '''
     specifies plucking fingering for fretted instruments
     

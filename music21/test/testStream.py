@@ -9,6 +9,7 @@
 # Copyright:    Copyright © 2009-2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
+from __future__ import division, print_function
 
 import random
 import unittest
@@ -1390,8 +1391,7 @@ class Test(unittest.TestCase):
         p.transferOffsetToElements()
 
         junk = p.getTimeSignatures(searchContext=True, sortByCreationTime=True)
-        p.makeRests(refStreamOrTimeRange=[0, 100], 
-            inPlace=True)
+        p.makeRests(refStreamOrTimeRange=[0, 100], inPlace=True)
 
         self.assertEqual(p.lowestOffset, 0)
         self.assertEqual(p.highestTime, 100.0)
@@ -2300,8 +2300,8 @@ class Test(unittest.TestCase):
 
         p = stream.Part()
         p.insert(0, meter.TimeSignature('2/4'))
-        tuplet1 = note.Note("E-4", quarterLength=1.0/3.0)
-        tuplet2 = note.Note("F#4", quarterLength=2.0/3.0)
+        tuplet1 = note.Note("E-4", quarterLength=1/3)
+        tuplet2 = note.Note("F#4", quarterLength=2/3)
         p.repeatAppend(tuplet1, 10)
         p.repeatAppend(tuplet2, 7)
         ex = p.makeNotation()
@@ -4642,7 +4642,7 @@ class Test(unittest.TestCase):
         n = note.Note()
         n.quarterLength = 4
         s.append(n)
-        unused_post = s.sliceAtOffsets([1, 2, 3], inPlace=True)
+        s.sliceAtOffsets([1, 2, 3], inPlace=True)
         a = [(e.offset, e.quarterLength) for e in s]
         b = [(0.0, 1.0), (1.0, 1.0), (2.0, 1.0), (3.0, 1.0)]
         self.assertEqual(a, b)
@@ -6668,6 +6668,7 @@ class Test(unittest.TestCase):
         # declare that at written pitch 
         p1.atSoundingPitch = False
         test = p1.toWrittenPitch(inPlace=False)
+        
         # no change; already at written
         self.assertEqual([str(p) for p in test.pitches], ['C4', 'C4', 'C4', 'C4'])
         
@@ -6682,6 +6683,7 @@ class Test(unittest.TestCase):
         # reverse intervals; app pitches should be upward
         test = p1.toWrittenPitch(inPlace=False)
         self.assertEqual([str(p) for p in test.pitches], ['G4', 'G4', 'D4', 'D4'])
+        self.assertFalse(test.atSoundingPitch)
 
         
         # test on a complete score
@@ -7607,7 +7609,7 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, 'verbose') #, runTest='testContextNestedD')
+    music21.mainTest(Test, 'verbose') #, runTest='testExtendTiesA')
 
 #------------------------------------------------------------------------------
 # eof

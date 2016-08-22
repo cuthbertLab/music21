@@ -72,7 +72,7 @@ class PolyphonicSnippet(stream.Score):
 
     def __init__(self, fiveExcelCells = None, parentPiece = None):
         stream.Score.__init__(self)
-        if fiveExcelCells == None:
+        if fiveExcelCells is None:
             fiveExcelCells = []
         if fiveExcelCells != []:        
             if len(fiveExcelCells) != 5:
@@ -116,7 +116,7 @@ class PolyphonicSnippet(stream.Score):
             # thisVoice is a type of stream.Stream()
             
             if thisVoice is not None:
-                if foundTs == False and any(thisVoice.getElementsByClass(meter.TimeSignature)):
+                if not foundTs and any(thisVoice.getElementsByClass(meter.TimeSignature)):
                     foundTs = True
                 thisVoice.makeNotation(inPlace = True)
                 self.insert(0, thisVoice)

@@ -351,6 +351,10 @@ class ClassDocumenter(ObjectDocumenter):
     - :class:`~music21.articulations.Articulation`
     - :class:`~music21.base.Music21Object`
     .. rubric:: :class:`~music21.articulations.Caesura` read-only properties
+    Read-only properties inherited from :class:`~music21.articulations.Articulation`:
+    .. hlist::
+       :columns: 3
+       - :attr:`~music21.articulations.Articulation.name`
     Read-only properties inherited from :class:`~music21.base.Music21Object`:
     .. hlist::
        :columns: 3
@@ -378,9 +382,6 @@ class ClassDocumenter(ObjectDocumenter):
        - :meth:`~music21.base.Music21Object.contextSites`
        - :meth:`~music21.base.Music21Object.getAllContextsByClass`
                 ...
-       - :meth:`~music21.base.Music21Object.show`
-       - :meth:`~music21.base.Music21Object.sortTuple`
-       - :meth:`~music21.base.Music21Object.splitAtDurations`
        - :meth:`~music21.base.Music21Object.splitAtQuarterLength`
        - :meth:`~music21.base.Music21Object.splitByQuarterLengths`
        - :meth:`~music21.base.Music21Object.write`

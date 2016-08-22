@@ -69,8 +69,8 @@ class GregorianStream(stream.Stream):
         startedSyllable = False
         for e in self:
             if hasattr(e, 'isNote') and e.isNote is True:
-                if self.lyrics and e.lyrics[0] != "":
-                    if startedSyllable == True:
+                if e.lyrics and e.lyrics[0] != "":
+                    if startedSyllable:
                         outLine += ")"
                         startedSyllable = False
                     if e.lyrics[0].syllabic in ['begin', 'single']:
@@ -81,14 +81,15 @@ class GregorianStream(stream.Stream):
  
                 outLine += e.toGABC(useClef = currentClef)
             elif 'Clef' in e.classes:
-                if startedSyllable == True:
+                if startedSyllable:
                     outLine += ") "
                     startedSyllable = False
                 currentClef = e
                 outLine += self.clefToGABC(e) + ' '
-        if startedSyllable == True:
+        if startedSyllable:
             outLine += ")\n"
         return outLine
+    
     def clefToGABC(self, clefIn):
         '''
         >>> s = alpha.chant.GregorianStream()
@@ -154,9 +155,9 @@ class GregorianNote(note.Note):
        
     def toGABC(self, useClef = None, nextNote = None):
         letter = self.toBasicGABC(useClef)
-        if self.debilis == True:
+        if self.debilis:
             letter = "-" + letter
-        if self.inclinatum == True:
+        if self.inclinatum:
             letter = letter.upper()
        
         if self.fill != 'solid':
@@ -165,11 +166,11 @@ class GregorianNote(note.Note):
             else:
                 raise ChantException('cannot use filltype %s' % self.fill)
            
-        if self.oriscus == True:
+        if self.oriscus:
             letter += 'o'
-        elif self.quilisma == True:
+        elif self.quilisma:
             letter += 'w'
-        elif self.stropha == True:
+        elif self.stropha:
             letter += 's'
         if self.liquescent != False:
             #if nextNote is not None:
@@ -184,7 +185,7 @@ class GregorianNote(note.Note):
             else:
                 letter += '~'
         if self.punctumMora != False:
-            if self.punctumMora == True or self.punctumMora == 1:
+            if self.punctumMora == 1:
                 letter += '.'
             elif self.punctumMora == 2:
                 letter += '..'
@@ -203,7 +204,7 @@ class GregorianNote(note.Note):
         if self.choralSign != False:
             letter += "[cs:" + self.choralSign + "]"
                
-        if self.polyphonic == True:
+        if self.polyphonic:
             letter = "{" + letter + "}"
         return letter
  
@@ -351,7 +352,7 @@ class BaseScoreConverter(object):
         
         '''
         
-        if text == None or text == "":
+        if text is None or text == "":
             raise ChantException('Cannot write file if there is no data')
         fp = self.environLocal.getTempFile('.gabc')
         f = open(fp, 'w')

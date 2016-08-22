@@ -1013,8 +1013,7 @@ class ModalCounterpoint(object):
         thirdsGood = False
         sixthsGood = False
     
-        while (goodHarmony == False or goodMelody == False or thirdsGood == False or 
-               sixthsGood == False):
+        while (not goodHarmony or not goodMelody or not thirdsGood or not sixthsGood): 
             environLocal.printDebug([''])
             environLocal.printDebug(['-------------------------------------'])
             environLocal.printDebug(['STARTING OVER NOW'])

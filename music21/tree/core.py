@@ -454,7 +454,7 @@ class AVLNode(common.SlottedObjectMixin):
         '''
         node = self
         if node.balance > 1:
-            if 0 <= node.rightChild.balance:
+            if node.rightChild.balance >= 0:
                 node = node.rotateRightRight()
             else:
                 node = node.rotateRightLeft()
@@ -897,4 +897,3 @@ class AVLTree(object):
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-

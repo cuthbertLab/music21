@@ -101,7 +101,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
             if mh.leftBarToken is not None:
                 # this may be Repeat Bar subclass
                 bLeft = mh.leftBarToken.getBarObject()
-                if bLeft != None:
+                if bLeft is not None:
                     dst.leftBarline = bLeft
                 if mh.leftBarToken.isRepeatBracket():
                     # get any open spanners of RepeatBracket type
@@ -129,7 +129,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
 
             if mh.rightBarToken is not None:
                 bRight = mh.rightBarToken.getBarObject()
-                if bRight != None:
+                if bRight is not None:
                     dst.rightBarline = bRight
                 # above returns bars and repeats; we need to look if we just
                 # have repeats
@@ -162,7 +162,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
             # must have a time signature in this bar, or defined recently
             # could use getTimeSignatures() on Stream
 
-            if barCount == 1 and dst.timeSignature != None: # easy case
+            if barCount == 1 and dst.timeSignature is not None: # easy case
                 # can only do this b/c ts is defined
                 if dst.barDurationProportion() < 1.0:
                     dst.padAsAnacrusis()
@@ -196,7 +196,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         #environLocal.printDebug(['abcToStreamPart: calling makeBeams'])
         try:
             p.makeBeams(inPlace=True)
-        except meter.MeterException as e:
+        except (meter.MeterException, stream.StreamException) as e:
             environLocal.warn("Error in beaming...ignoring: %s" % str(e))
 
     # copy spanners into topmost container; here, a part
@@ -223,7 +223,7 @@ def parseTokens(mh, dst, p, useMeasures):
         if isinstance(t, abcFormat.ABCMetadata):
             if t.isMeter():
                 ts = t.getTimeSignatureObject()
-                if ts != None: # can be None
+                if ts is not None: # can be None
                 # should append at the right position
                     if useMeasures: # assume at start of measures
                         dst.timeSignature = ts
@@ -237,7 +237,7 @@ def parseTokens(mh, dst, p, useMeasures):
                     dst._appendCore(ks)
                 # check for clef information sometimes stored in key
                 clefObj, transposition = t.getClefObject()
-                if clefObj != None:
+                if clefObj is not None:
                     clefSet = False
                     #environLocal.printDebug(['found clef in key token:', t, 
                     #     clefObj, transposition])
@@ -264,7 +264,7 @@ def parseTokens(mh, dst, p, useMeasures):
             c.quarterLength = t.quarterLength
             # adjust accidental display for each contained pitch
             for pIndex in range(len(c.pitches)):
-                if c.pitches[pIndex].accidental == None:
+                if c.pitches[pIndex].accidental is None:
                     continue
                 c.pitches[pIndex].accidental.displayStatus = accStatusList[pIndex]
             dst._appendCore(c)
@@ -276,7 +276,7 @@ def parseTokens(mh, dst, p, useMeasures):
                 n = note.Rest()
             else:
                 n = note.Note(t.pitchName)
-                if n.pitch.accidental != None:
+                if n.pitch.accidental is not None:
                     n.pitch.accidental.displayStatus = t.accidentalDisplayStatus
 
             n.quarterLength = t.quarterLength
@@ -337,7 +337,7 @@ def abcToStreamScore(abcHandler, inputM21=None):
     from music21 import abcFormat
     from music21 import metadata
 
-    if inputM21 == None:
+    if inputM21 is None:
         s = stream.Score()
     else:
         s = inputM21
@@ -409,7 +409,7 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
     If a `number` argument is given, and a work is defined by
     that number, that work is returned.
     '''
-    if inputM21 == None:
+    if inputM21 is None:
         opus = stream.Opus()
     else:
         opus = inputM21
@@ -419,7 +419,7 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
     # returns a dictionary of numerical key
     if abcHandler.definesReferenceNumbers():
         abcDict = abcHandler.splitByReferenceNumber()
-        if number != None and number in abcDict:
+        if number is not None and number in abcDict:
             # get number from dictionary; set to new score
             opus = abcToStreamScore(abcDict[number]) # return a score, not an opus
         else: # build entire opus into an opus stream

@@ -9,12 +9,9 @@
 # Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 '''
 Module to translate Noteworthy Composer's NWCTXT format to music21.
-
 '''
-
 # to do:
 # |SongInfo|Title:"<FileTitle>"|Author:"<Author>"|Lyricist:"<Lyricist>"|
 #                Copyright1:"<Copyright1>"|Copyright2:"<Copyright2>"|Comments:"<Comments>"
@@ -61,7 +58,7 @@ Module to translate Noteworthy Composer's NWCTXT format to music21.
 # Pos2? Dur2?
 # |Chord|Dur:8th|Pos:-4,n-3,b-2,#-1,x0,v1,2x|Opts:Stem=Down,Crescendo|Dur2:8th,DblDotted|Pos2:3x
 
-from music21.exceptions21 import Music21Exception
+import unittest
 from music21 import bar
 from music21 import chord
 from music21 import clef
@@ -81,8 +78,7 @@ from music21 import environment
 _MOD = 'music21.noteworthy.translate'
 environLocal = environment.Environment(_MOD)
 
-import unittest
-
+from music21.exceptions21 import Music21Exception
 
 # initializations
 
@@ -275,7 +271,7 @@ class NoteworthyTranslator(object):
 
 
         # if Tied          
-        if thisNoteBeginsATie == True:
+        if thisNoteBeginsATie:
             noteOrChord.tie = tie.Tie("start")
         if self.withinTie is True and thisNoteIsTied is False:
             noteOrChord.tie = tie.Tie("stop") 
@@ -569,7 +565,8 @@ class NoteworthyTranslator(object):
     
         >>> nwt.createClef({"Type" : "OBonobo"})
         Traceback (most recent call last):
-        NoteworthyTranslateException: Did not find a proper clef in type, OBonobo
+        music21.noteworthy.translate.NoteworthyTranslateException: Did 
+            not find a proper clef in type, OBonobo
     
         '''  
         currentClef = None

@@ -416,7 +416,7 @@ class TimespanTree(trees.OffsetTree):
         for verticality in iterator:
             verticalityBuffer.append(verticality)
             if verticality.isConsonant:
-                if 2 < len(verticalityBuffer):
+                if len(verticalityBuffer) > 2:
                     yield tuple(verticalityBuffer)
                 verticalityBuffer = [verticality]
 
@@ -777,10 +777,8 @@ class Test(unittest.TestCase):
                 currentTimespansInList = list(sorted(tss[:i + 1],
                     key=lambda x: (x.offset, x.endTime)))
                 currentTimespansInTree = [x for x in tsTree]
-                currentPosition = min(
-                    x.offset for x in currentTimespansInList)
-                currentEndTime = max(
-                    x.endTime for x in currentTimespansInList)
+                currentPosition = min(x.offset for x in currentTimespansInList)
+                currentEndTime = max(x.endTime for x in currentTimespansInList)
                 
                 self.assertEqual(currentTimespansInTree, 
                                  currentTimespansInList, 
@@ -791,7 +789,8 @@ class Test(unittest.TestCase):
                                  max(x.endTime for x in currentTimespansInList))
                 self.assertEqual(tsTree.lowestPosition(), currentPosition)
                 self.assertEqual(tsTree.endTime, currentEndTime)
-                for i in range(len(currentTimespansInTree)):
+                # pylint: disable=consider-using-enumerate
+                for i in range(len(currentTimespansInTree)): 
                     self.assertEqual(currentTimespansInList[i], currentTimespansInTree[i])
 
             random.shuffle(tss)
@@ -805,17 +804,15 @@ class Test(unittest.TestCase):
                                  currentTimespansInList, 
                                  (attempt, currentTimespansInTree, currentTimespansInList))
                 if tsTree.rootNode is not None:
-                    currentPosition = min(
-                        x.offset for x in currentTimespansInList)
-                    currentEndTime = max(
-                        x.endTime for x in currentTimespansInList)
+                    currentPosition = min(x.offset for x in currentTimespansInList)
+                    currentEndTime = max(x.endTime for x in currentTimespansInList)
                     self.assertEqual(tsTree.rootNode.endTimeLow, 
                                      min(x.endTime for x in currentTimespansInList))
                     self.assertEqual(tsTree.rootNode.endTimeHigh,
                                      max(x.endTime for x in currentTimespansInList))
                     self.assertEqual(tsTree.lowestPosition(), currentPosition)
                     self.assertEqual(tsTree.endTime, currentEndTime)
-
+                    # pylint: disable=consider-using-enumerate
                     for i in range(len(currentTimespansInTree)):
                         self.assertEqual(currentTimespansInList[i], currentTimespansInTree[i])
 #------------------------------------------------------------------------------
@@ -824,4 +821,3 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test) #, runTest='testGetVerticalityAtWithKey')
-

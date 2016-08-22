@@ -9,11 +9,10 @@
 # Copyright:    Copyright © 2009-11, '15 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
-'''This module defines objects for describing tempo and changes in tempo.
 '''
-
-from __future__ import unicode_literals
+This module defines objects for describing tempo and changes in tempo.
+'''
+from __future__ import unicode_literals, division, print_function
 
 import unittest
 import copy
@@ -106,14 +105,14 @@ def convertTempoByReferent(numberSrc, quarterLengthBeatSrc,
     
     '''
     # find duration in seconds of of quarter length
-    srcDurPerBeat = 60.0 / numberSrc
+    srcDurPerBeat = 60 / numberSrc
     # convert to dur for one quarter length
-    dur = srcDurPerBeat * (1.0 / quarterLengthBeatSrc)
+    dur = srcDurPerBeat / quarterLengthBeatSrc
     # multiply dur by dst quarter
     dstDurPerBeat = dur * float(quarterLengthBeatDst)
     #environLocal.printDebug(['dur', dur, 'dstDurPerBeat', dstDurPerBeat])
     # find tempo
-    return 60.0 / dstDurPerBeat
+    return float(60 / dstDurPerBeat)
 
 
 
@@ -962,7 +961,8 @@ class MetricModulation(TempoIndication):
 
         >>> mmod1.oldMetronome = 'junk'
         Traceback (most recent call last):
-        MetricModulationException: oldMetronome property must be set with a MetronomeMark instance
+        music21.tempo.MetricModulationException: oldMetronome property 
+            must be set with a MetronomeMark instance
 
         ''')
 
@@ -1035,7 +1035,8 @@ class MetricModulation(TempoIndication):
         >>> mmod1.newMetronome = mm1
         >>> mmod1.newMetronome = 'junk'
         Traceback (most recent call last):
-        MetricModulationException: newMetronome property must be set with a MetronomeMark instance
+        music21.tempo.MetricModulationException: newMetronome property must be 
+            set with a MetronomeMark instance
 
         ''')
 
@@ -1271,10 +1272,9 @@ def interpolateElements(element1, element2, sourceStream,
     >>> destStream3.insert(100, element1)
     >>> destStream3.insert(500, element2)
     >>> eA.id = "blah"
-    >>> tempo.interpolateElements(element1, element2, sourceStream, destStream3, autoAdd = False)
+    >>> tempo.interpolateElements(element1, element2, sourceStream, destStream3, autoAdd=False)
     Traceback (most recent call last):
-    ...
-    TempoException: Could not find element <music21.note.Note D> with id ...
+    music21.tempo.TempoException: Could not find element <music21.note.Note D> with id ...
 
     '''
     try:
@@ -1702,5 +1702,3 @@ if __name__ == "__main__":
 
 #------------------------------------------------------------------------------
 # eof
-
-

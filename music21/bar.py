@@ -107,6 +107,8 @@ class Barline(base.Music21Object):
     >>> bl4 = bar.Barline(style='final', location='right')
     >>> bl4
     <music21.bar.Barline style=final>
+    >>> bl4.style
+    'final'
     
     Note that the barline style 'ticked' only is displayed correctly in Finale and Finale Notepad.
     '''
@@ -302,12 +304,12 @@ class Repeat(RepeatMark, Barline):
         
         >>> lb.times = 3
         Traceback (most recent call last):
-        BarException: cannot set repeat times on a start Repeat
+        music21.bar.BarException: cannot set repeat times on a start Repeat
         
         >>> rb.times = 3
         >>> rb.times = -3
         Traceback (most recent call last):
-        BarException: cannot set repeat times to a value less than zero: -3
+        music21.bar.BarException: cannot set repeat times to a value less than zero: -3
         ''')
 
 

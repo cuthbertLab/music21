@@ -73,6 +73,7 @@ def toUnicode(usrStr):
     Note: this method is NOT USED and could disappear
     without notice.
     
+    # TODO: Remove
     
     :rtype: str
     '''
@@ -166,6 +167,12 @@ def camelCaseToHyphen(usrStr, replacement='-'):
 
     >>> common.camelCaseToHyphen('movementName')
     'movement-name'
+
+    First letter can be uppercase as well:
+    
+    >>> common.camelCaseToHyphen('MovementName')
+    'movement-name'
+
     >>> common.camelCaseToHyphen('movementNameName')
     'movement-name-name'
     
@@ -176,16 +183,16 @@ def camelCaseToHyphen(usrStr, replacement='-'):
 
     >>> common.camelCaseToHyphen('fileName', replacement='NotFound')
     Traceback (most recent call last):
-    Exception: Replacement must be a single character.
+    ValueError: Replacement must be a single character.
     
     >>> common.camelCaseToHyphen('fileName', replacement='A')
     Traceback (most recent call last):
-    Exception: Replacement cannot be an uppercase character.
+    ValueError: Replacement cannot be an uppercase character.
     '''
     if len(replacement) != 1:
-        raise Exception('Replacement must be a single character.')
+        raise ValueError('Replacement must be a single character.')
     elif replacement.lower() != replacement:
-        raise Exception('Replacement cannot be an uppercase character.')
+        raise ValueError('Replacement cannot be an uppercase character.')
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1' + replacement + r'\2', usrStr)
     return re.sub('([a-z0-9])([A-Z])', r'\1' + replacement + r'\2', s1).lower()
 
@@ -284,7 +291,7 @@ def getMd5(value=None):
 
     :rtype: str
     '''
-    if value == None:
+    if value is None:
         value = str(time.time()) + str(random.random())
     m = hashlib.md5()
     try:
@@ -296,7 +303,8 @@ def getMd5(value=None):
 
 
 def formatStr(msg, *arguments, **keywords):
-    '''Format one or more data elements into string suitable for printing
+    '''
+    Format one or more data elements into string suitable for printing
     straight to stderr or other outputs
 
     >>> a = common.formatStr('test', '1', 2, 3)
@@ -400,6 +408,7 @@ def removePunctuation(s):
     u'This is my face'
     '''
     if six.PY2:
+        # pylint: disable=undefined-variable
         wasUnicode = False
         if isinstance(s, unicode): # @UndefinedVariable
             s = s.encode('utf-8')

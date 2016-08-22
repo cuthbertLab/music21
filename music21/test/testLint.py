@@ -75,6 +75,7 @@ def main(fnAccept=None):
 
                 'arguments-differ', # someday...
                 'abstract-class-instantiated', # this trips on the fractions.Fraction() class.
+                'multiple-imports', # import os, sys -- fine...
                 'fixme', # known...
                 'superfluous-parens', # nope -- if they make things clearer...
                 'too-many-statements', # someday
@@ -89,17 +90,37 @@ def main(fnAccept=None):
                 'too-many-return-statements', # we'll see
                 'unpacking-non-sequence', # gets it wrong too often.
                 'too-many-instance-attributes', # maybe later
+                'too-many-boolean-expressions', #AbstractDiatonicScale.__eq__ shows how this
+                    # can be fine...
+                    
+                'misplaced-comparison-constant', # sometimes 2 < x is what we want
+                'unsubscriptable-object', # unfortunately, thinks that Streams are unsubscriptable.
+                'consider-iterating-dictionary', # sometimes .keys() is a good test against
+                    # changing the dictionary size while iterating.
                 
                 'invalid-name',      # these are good music21 names; fix the regexp instead...
                 'no-self-use',       # maybe later
                 'too-few-public-methods', # never remove or set to 1
+                
                 'trailing-whitespace',  # should ignore blank lines with tabs
+                'trailing-newlines', # just because something is easy to detect doesn't make it bad.
+                
                 'missing-docstring',    # gets too many well-documented properties
                 'star-args', # no problem with them...
                 'protected-access', # this is an important one, but for now we do a lot of
                            # x = copy.deepcopy(self); x._volume = ... which is not a problem...
                 'unused-argument',
                 'import-self', # fix is either to get rid of it or move away many tests...
+                
+                'redefined-variable-type', # this would be great! but too much.
+
+                'simplifiable-if-statement', # NO! NO! NO!
+                #  if (x or y and z and q): return True, else: return False,
+                #      is a GREAT paradigm -- over "return (x or y and z and q)" and
+                #      assuming that it returns a bool...  it's no slower than
+                #      the simplification and it's so much clearer.
+                'consider-using-enumerate', # good when i used only once, but
+                    # x[i] = y[i] is a nice paradigm, even if one can be simplified out.
                ]
 
     goodnameRx = {'argument-rgx': r'[a-z_][A-Za-z0-9_]{2,30}$',
@@ -159,9 +180,6 @@ def main(fnAccept=None):
 
 if __name__ == '__main__':
     main(sys.argv[1:])
-
-
-
 #     if len(sys.argv) >= 2:
 #         test.main(sys.argv[1:], restoreEnvironmentDefaults=True)
 #     else:

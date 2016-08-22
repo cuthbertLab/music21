@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2015 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2006-2016 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
@@ -23,12 +23,12 @@ import doctest
 import inspect
 import re
 import sys
+import types
 import unittest
 from music21.ext import six
 
 
 defaultImports = ['music21']
-
 
 ###### monkey patch doctest...
 
@@ -149,13 +149,36 @@ def addDocAttrTestsToSuite(suite,
 
 
 def fixTestsForPy2and3(doctestSuite):
-    '''
+    r'''
     Fix doctests so that they work in both python2 and python3, namely
     unicode/byte characters and added module names to exceptions.
     
     >>> import doctest
-    >>> s1 = doctest.DocTestSuite(chord)
-    >>> test.testRunner.fixTestsForPy2and3(s1)
+    >>> suite1 = doctest.DocTestSuite(chord)
+    >>> doctestCase = list(iter(suite1))[0]
+    >>> dt = doctestCase._dt_test
+    >>> testWithTraceback = None
+    >>> for testExample in dt.examples:
+    ...     if testExample.exc_msg is not None:
+    ...         testWithTraceback = testExample
+    ...         break
+    
+    Py3 example:
+    
+    <<< testWithTraceback.exc_msg
+    "ChordException: Could not process input argument\n"
+    <<< test.testRunner.fixTestsForPy2and3(suite1)
+    <<< testWithTraceback.exc_msg
+    "...ChordException: Could not process input argument\n"
+
+    Py2 example:
+
+    <<< testWithTraceback.exc_msg
+    "music21.chord.ChordException: Could not process input argument\n"
+    <<< test.testRunner.fixTestsForPy2and3(suite1)
+    <<< testWithTraceback.exc_msg
+    "ChordException: Could not process input argument\n"
+
     '''
     for dtc in doctestSuite: # Suite to DocTestCase -- undocumented.
         if not hasattr(dtc, '_dt_test'):
@@ -172,6 +195,8 @@ def fixTestsForPy2and3(doctestSuite):
                     # won't be caught, but saves a lot of anguish
                     example.want = example.want[1:]
             elif six.PY2:
+                if example.exc_msg is not None and len(example.exc_msg) > 0:
+                    example.exc_msg = re.sub(r'^(\w|\.)*\.(\w+\:)', r'\2', example.exc_msg)
                 if (example.want is not None 
                         and example.want.startswith('b\'')):
                     # probably a unicode example:
@@ -213,8 +238,6 @@ def stripAddresses(textString, replacement = "ADDRESS"):
 
 
 #-------------------------------------------------------------------------------
-
-
 
 def mainTest(*testClasses, **kwargs):
     '''
@@ -341,6 +364,7 @@ def mainTest(*testClasses, **kwargs):
                         break
                 if hasattr(tObj, runThisTest):
                     print('Running Named Test Method: %s' % runThisTest)
+                    tObj.setUp()
                     getattr(tObj, runThisTest)()
                     runAllTests = False
                     break

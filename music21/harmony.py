@@ -193,7 +193,7 @@ class Harmony(chord.Chord):
         # if the bass is not specified, but the root is,
         # assume the bass and root are identical and
         # assign the values accordingly
-        if self._bass == None:
+        if self._bass is None:
             self.bass(self._root)
             
         updatePitches = keywords.get('updatePitches', True)
@@ -284,7 +284,7 @@ class Harmony(chord.Chord):
         >>> h.figure
         'CM'
         '''
-        if self._figure == None:
+        if self._figure is None:
             return self.findFigure()
         else:
             return self._figure
@@ -429,7 +429,7 @@ class Harmony(chord.Chord):
         >>> h.addChordStepModification(hd)
         >>> h.addChordStepModification('juicy')
         Traceback (most recent call last):
-        HarmonyException: cannot add this object as a degree: juicy
+        music21.harmony.HarmonyException: cannot add this object as a degree: juicy
         '''
         if not isinstance(degree, ChordStepModification):
             # TODO: possibly create ChordStepModification objects from other 
@@ -547,7 +547,7 @@ class ChordStepModification(object):
 
         >>> hd.degree = 'juicy'
         Traceback (most recent call last):
-        ChordStepModificationException: not a valid degree: juicy
+        music21.harmony.ChordStepModificationException: not a valid degree: juicy
         '''
         return self._degree
 
@@ -609,7 +609,7 @@ class ChordStepModification(object):
 
         >>> hd.modType = 'juicy'
         Traceback (most recent call last):
-        ChordStepModificationException: not a valid degree modification type: juicy
+        music21.harmony.ChordStepModificationException: not a valid degree modification type: juicy
         '''
         return self._modType
 
@@ -1540,25 +1540,30 @@ class ChordSymbol(Harmony):
         chordStepModifications = self.chordStepModifications
         if chordStepModifications is None:
             return pitches
+        
         rootPitch = self.root()
         sc = scale.MajorScale(rootPitch)
-        for hD in chordStepModifications:
-            if hD.modType == 'add':
-                pitchToAppend = sc.pitchFromDegree(hD.degree, rootPitch)
-                if hD.interval and hD.interval.semitones != 0:
-                    pitchToAppend = pitchToAppend.transpose(hD.interval)
-                if hD.degree >= 7:
-                    pitchToAppend.octave = pitchToAppend.octave + 1
-                
-                degrees = self._degreesList
-                
-                if str(hD.degree) in degrees:
-                    for p in pitches:
-                        if sc.getScaleDegreeFromPitch(p) == hD.degree:
-                            pitches.remove(p)
-                            pitches.append(pitchToAppend)
-                else:
-                    pitches.append(pitchToAppend)
+        
+        def typeAdd(hD):
+            '''
+            change the pitches list based on this chordStepModification, adding
+            a pitch
+            '''
+            pitchToAppend = sc.pitchFromDegree(hD.degree, rootPitch)
+            if hD.interval and hD.interval.semitones != 0:
+                pitchToAppend = pitchToAppend.transpose(hD.interval)
+            if hD.degree >= 7:
+                pitchToAppend.octave = pitchToAppend.octave + 1
+            
+            degrees = self._degreesList
+            
+            if str(hD.degree) in degrees:
+                for p in pitches:
+                    if sc.getScaleDegreeFromPitch(p) == hD.degree:
+                        pitches.remove(p)
+                        pitches.append(pitchToAppend)
+            else:
+                pitches.append(pitchToAppend)
 #                 # for now I won't worry about the octave of the added note
 #                 #if self.bass() != None:
 #                 #    p = sc.pitchFromDegree(hD.degree, self.bass())
@@ -1582,41 +1587,51 @@ class ChordSymbol(Harmony):
 #                     if hD.degree >= 7:
 #                         p.octave = p.octave + 1
 #                 pitches.append(p)
-            elif hD.modType == 'subtract':
-                pitchFound = False
-                degrees = self._degreesList
-                if degrees != None:
-                    for p, degree in zip(pitches, degrees):
-                        degree = degree.replace('-', '')
-                        degree = degree.replace('#', '')
-                        degree = degree.replace('A', '') # A is for 'Altered'
-                        if hD.degree == int(degree):
-                            pitches.remove(p)
-                            pitchFound = True
-                            
-                            for degreeString in self._degreesList:
-                                if str(hD.degree) in degreeString:
-                                    self._degreesList.remove(degreeString)
-                                    break
-                            #if hD.degree not in string, 
-                            #should we throw an exception???? for now yes, but maybe later we
-                            #will be more lenient....
-                    if pitchFound == False:
-                        raise ChordStepModificationException(
-                            'Degree not in specified chord: %s' % hD.degree)
-            elif hD.modType == 'alter':
-                pitchFound = False
-                degrees = self._degreesList
 
-                for p, degree in zip(pitches, degrees):
-                    degree = degree.replace('-', '')
-                    degree = degree.replace('#', '')
-                    degree = degree.replace('A', '') #A is for 'Altered'
-                    if hD.degree == int(degree):
-                        # transpose by semitones (positive for up, negative for down)
-                        p = p.transpose(hD.interval) 
-                        pitchFound = True
-                        
+        def typeSubtract(hD):
+            '''
+            change the pitches list based on this chordStepModification, removing a pitch            
+            '''
+            degrees = self._degreesList
+            if not degrees:
+                return
+
+            pitchFound = False
+            for p, degree in zip(pitches, degrees):
+                degree = degree.replace('-', '')
+                degree = degree.replace('#', '')
+                degree = degree.replace('A', '') # A is for 'Altered'
+                if hD.degree == int(degree):
+                    pitches.remove(p)
+                    pitchFound = True
+                    
+                    for degreeString in self._degreesList:
+                        if str(hD.degree) in degreeString:
+                            self._degreesList.remove(degreeString)
+                            break
+                    #if hD.degree not in string, 
+                    #should we throw an exception???? for now yes, but maybe later we
+                    #will be more lenient....
+            if not pitchFound:
+                raise ChordStepModificationException(
+                    'Degree not in specified chord: %s' % hD.degree)
+
+        def typeAlter(hD):
+            '''
+            alter
+            '''
+            pitchFound = False
+            degrees = self._degreesList
+
+            for p, degree in zip(pitches, degrees):
+                degree = degree.replace('-', '')
+                degree = degree.replace('#', '')
+                degree = degree.replace('A', '') #A is for 'Altered'
+                if hD.degree == int(degree):
+                    # transpose by semitones (positive for up, negative for down)
+                    p = p.transpose(hD.interval) 
+                    pitchFound = True
+                    
 #                         for degreeString in self._degreesList:
 #                             if str(hD.degree) in degreeString:
 #                                 self._degreesList = self._degreesList.replace(
@@ -1625,9 +1640,20 @@ class ChordSymbol(Harmony):
 #                                 break
 #                         #if hD.degree not in string:
 #                         #should we throw an exception???? for now yes, but maybe later we should.
-                if pitchFound == False:
-                    raise ChordStepModificationException(
-                            'Degree not in specified chord: %s' % hD.degree)
+            if not pitchFound:
+                raise ChordStepModificationException(
+                        'Degree not in specified chord: %s' % hD.degree)
+        
+        
+        # main routines...
+        for hD in chordStepModifications:
+            if hD.modType == 'add':
+                typeAdd(hD)
+            elif hD.modType == 'subtract':
+                typeSubtract(hD)
+            elif hD.modType == 'alter':
+                typeAlter(hD)
+
         return tuple(pitches)
 
     def _getKindFromShortHand(self, sH):
@@ -1747,30 +1773,30 @@ class ChordSymbol(Harmony):
         indexes = []
         altCopy = []
         for itemString in alterations:
-            if itemString != '':
-                justints = itemString.replace('b', '')
-                justints = justints.replace('#', '')
-                if int(justints) > 20:
-                    skipNext = False
-                    i = 0
-                    charString = ''
-                    for char in itemString:
-                        if skipNext == False:
-                            if char == '1':
-                                indexes.append(itemString[i] + itemString[i + 1])
-                                skipNext = True
-                            else:
-                                if char == 'b' or char == '#':
-                                    charString = charString + char
-                                else:
-                                    charString = charString + char
-                                    indexes.append(charString)
-                                    charString = ''
+            if itemString == '':
+                continue
+            justints = itemString.replace('b', '')
+            justints = justints.replace('#', '')
+            if int(justints) > 20: # MSC: what is this doing?
+                skipNext = False
+                i = 0
+                charString = ''
+                for char in itemString:
+                    if not skipNext:
+                        if char == '1':
+                            indexes.append(itemString[i] + itemString[i + 1])
+                            skipNext = True
+                        elif char == 'b' or char == '#':
+                            charString = charString + char
                         else:
-                            skipNext = False
-                        i = i + 1
-                else:
-                    altCopy.append(itemString)
+                            charString = charString + char
+                            indexes.append(charString)
+                            charString = ''
+                    else:
+                        skipNext = False
+                    i = i + 1
+            else:
+                altCopy.append(itemString)
         for item in indexes:
             altCopy.append(item)
         alterations = altCopy
@@ -1837,7 +1863,7 @@ class ChordSymbol(Harmony):
             'minor-ninth',
             )
        
-        if self._root == None or self.chordKind == None:
+        if self._root is None or self.chordKind is None:
             return
 
         # create figured bass scale with root as scale
@@ -2010,7 +2036,7 @@ class ChordSymbol(Harmony):
             #there is no hope to determine the chord from pitches
             # if it's been modified, so we'll just have to try this route....
             
-            if self.root() == None:
+            if self.root() is None:
                 raise HarmonyException('Cannot find figure. No root to the chord found' , self)
             else:
                 figure = self.root().name
@@ -2096,10 +2122,10 @@ class ChordSymbol(Harmony):
             or self.chordKind in thirteenths
             ):
             return True
-        elif (inversion == 2 or inversion == 1) \
-            and not self.chordKind == 'pedal':
+        elif ((inversion == 2 or inversion == 1) 
+                and not self.chordKind == 'pedal'):
             return True
-        elif inversion == None:
+        elif inversion is None:
             return False
         else:
             return False

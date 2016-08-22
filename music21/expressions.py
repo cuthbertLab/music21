@@ -25,6 +25,7 @@ import copy
 import unittest
 
 from music21 import base
+from music21 import common
 from music21 import exceptions21
 from music21 import interval
 from music21 import spanner
@@ -96,15 +97,34 @@ class ExpressionException(exceptions21.Music21Exception):
 
 
 class Expression(base.Music21Object):
-    '''This base class is inherited by many diverse expressions. 
+    '''
+    This base class is inherited by many diverse expressions. 
     '''
     def __init__(self):
         base.Music21Object.__init__(self)
-
+    
     def __repr__(self):
         return '<music21.expressions.%s>' % (self.__class__.__name__)
 
-
+    @property
+    def name(self):
+        '''
+        returns the name of the expression, which is generally the
+        class name lowercased and spaces where a new capital occurs.
+        
+        Subclasses can override this as necessary.
+        
+        >>> sc = expressions.Schleifer()
+        >>> sc.name
+        'schleifer'
+        
+        >>> iturn = expressions.InvertedTurn()
+        >>> iturn.name
+        'inverted turn'
+        '''
+        className = self.__class__.__name__
+        return common.camelCaseToHyphen(className, replacement=' ')
+    
 
 #-------------------------------------------------------------------------------
 class TextExpressionException(ExpressionException):
@@ -330,7 +350,8 @@ class GeneralMordent(Ornament):
         >>> m2 = expressions.GeneralMordent()
         >>> m2.realize(n2)
         Traceback (most recent call last):
-        ExpressionException: Cannot realize a mordent if I do not know its direction
+        music21.expressions.ExpressionException: Cannot realize a mordent if I do not 
+            know its direction
 
         :type srcObj: base.Music21Object
         '''
@@ -533,15 +554,14 @@ class Trill(Ornament):
         >>> t2 = expressions.Trill()
         >>> t2.realize(n2)
         Traceback (most recent call last):
-            ...
-        ExpressionException: The note is not long enough to realize a trill
+        music21.expressions.ExpressionException: The note is not long enough to realize a trill
         
         :type srcObj: base.Music21Object
         '''
         from music21 import key
         if self.size == "":
             raise ExpressionException("Cannot realize a trill if there is no size given")
-        if srcObj.duration == None or srcObj.duration.quarterLength == 0:
+        if srcObj.duration is None or srcObj.duration.quarterLength == 0:
             raise ExpressionException("Cannot steal time from an object with no duration")
         if srcObj.duration.quarterLength < 2*self.quarterLength:
             raise ExpressionException("The note is not long enough to realize a trill")
@@ -698,8 +718,7 @@ class Turn(Ornament):
         >>> t2 = expressions.Turn()
         >>> t2.realize(n2)
         Traceback (most recent call last):
-            ...
-        ExpressionException: The note is not long enough to realize a turn
+        music21.expressions.ExpressionException: The note is not long enough to realize a turn
 
         :type srcObj: base.Music21Object
         '''
@@ -707,7 +726,7 @@ class Turn(Ornament):
 
         if self.size is None:
             raise ExpressionException("Cannot realize a turn if there is no size given")
-        if srcObject.duration == None or srcObject.duration.quarterLength == 0:
+        if srcObject.duration is None or srcObject.duration.quarterLength == 0:
             raise ExpressionException("Cannot steal time from an object with no duration")
         if srcObject.duration.quarterLength < 4 * self.quarterLength:
             raise ExpressionException("The note is not long enough to realize a turn")
@@ -802,7 +821,7 @@ class GeneralAppoggiatura(Ornament):
         if self.size == "":
             raise ExpressionException(
                     "Cannot realize an Appoggiatura if there is no size given")
-        if srcObj.duration == None or srcObj.duration.quarterLength == 0:
+        if srcObj.duration is None or srcObj.duration.quarterLength == 0:
             raise ExpressionException("Cannot steal time from an object with no duration")
 
         newDuration = srcObj.duration.quarterLength / 2
@@ -872,11 +891,11 @@ class Tremolo(Ornament):
     
     >>> t.numberOfMarks = 'Hi'
     Traceback (most recent call last):
-    TremoloException: Number of marks must be a number from 0 to 8
+    music21.expressions.TremoloException: Number of marks must be a number from 0 to 8
 
     >>> t.numberOfMarks = -1
     Traceback (most recent call last):
-    TremoloException: Number of marks must be a number from 0 to 8
+    music21.expressions.TremoloException: Number of marks must be a number from 0 to 8
     
     
     TODO: (someday) realize triplet Tremolos, etc. differently from other tremolos.
@@ -970,6 +989,7 @@ class Fermata(Expression):
     '''
     Fermatas by default get appended to the last
     note if a note is split because of measures.
+    
     To override this (for Fermatas or for any
     expression) set .tieAttach to 'all' or 'first'
     instead of 'last'. 
@@ -985,7 +1005,7 @@ class Fermata(Expression):
     .. image:: images/expressionsFermata.*
          :width: 193
     '''
-    shape = "normal"
+    shape = "normal" # angled, square.
     # for musicmxml, can be upright or inverted, but Finale's idea of an 
     # inverted fermata is ass backwards.
     type  = "inverted" 
@@ -1059,11 +1079,12 @@ class TremoloSpanner(spanner.Spanner):
 
     >>> ts.numberOfMarks = -1
     Traceback (most recent call last):
-    TremoloException: Number of marks must be a number from 0 to 8
+    music21.expressions.TremoloException: Number of marks must be a number from 0 to 8
     '''
     # musicxml defines a start, stop, and a continue; will try to avoid continue
     def __init__(self, *arguments, **keywords):
         spanner.Spanner.__init__(self, *arguments, **keywords)
+        self.placement = None
         self.measured = True
         self._numberOfMarks = 3
         

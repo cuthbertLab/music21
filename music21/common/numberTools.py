@@ -9,6 +9,7 @@
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
+from __future__ import division, print_function
 
 import math
 import random
@@ -96,8 +97,13 @@ def cleanupFloat(floatNum, maxDenominator=defaults.limitOffsetDenominator):
 
 def numToIntOrFloat(value):
     '''
-    Given a number, return an integer if it is very close to an integer, otherwise, return a float.
+    Given a number, return an integer if it is very close to an integer, 
+    otherwise, return a float.
 
+    This routine is very important for conversion of
+    :class:`~music21.pitch.Accidential` objects' `.alter`  attribute
+    in musicXML must be 1 (not 1.0) for sharp and -1 (not -1.0) for flat,
+    but allows for 0.5 for half-sharp.
 
     >>> common.numToIntOrFloat(1.0)
     1
@@ -107,6 +113,14 @@ def numToIntOrFloat(value):
     1.5
     >>> common.numToIntOrFloat(1.0000000005)
     1
+
+    >>> sharp = pitch.Accidental('sharp')
+    >>> common.numToIntOrFloat(sharp.alter)
+    1
+    >>> halfFlat = pitch.Accidental('half-flat')
+    >>> common.numToIntOrFloat(halfFlat.alter)
+    -0.5
+    
     
     :rtype: float
     '''
@@ -597,16 +611,23 @@ def dotMultiplier(dots):
     dotMultiplier(dots) returns how long to multiply the note 
     length of a note in order to get the note length with n dots
 
+    NOTE: the return of a Fraction is deprecated -- in v.4, a float will be returned. 
+    Since dotMultiplier always returns a power of two in the denominator,
+    the float will be exact.
+
     >>> common.dotMultiplier(1)
     Fraction(3, 2)
     >>> common.dotMultiplier(2)
     Fraction(7, 4)
     >>> common.dotMultiplier(3)
     Fraction(15, 8)
+
+    >>> common.dotMultiplier(0)
+    Fraction(1, 1)
     
     :rtype: Fraction
     '''
-    x = (((2**(dots+1.0))-1.0)/(2**dots))
+    x = (((2 ** (dots + 1.0)) - 1.0) / (2 ** dots))
     return Fraction(x)
 
 
@@ -655,10 +676,10 @@ def decimalToTuplet(decNum):
         raise ZeroDivisionError("number must be greater than zero")
     if decNum < 1:
         flipNumerator = True
-        decNum = 1.0/decNum
+        decNum = 1 / decNum
 
     unused_remainder, multiplier = math.modf(decNum)
-    working = decNum/multiplier
+    working = decNum / multiplier
 
     (jy, iy) = findSimpleFraction(working)
 
@@ -988,7 +1009,7 @@ def fromRoman(num):
 
     >>> common.fromRoman('vx')
     Traceback (most recent call last):
-    Music21CommonException: input contains an invalid subtraction element: vx
+    music21.exceptions21.Music21CommonException: input contains an invalid subtraction element: vx
 
     :rtype: int
     '''

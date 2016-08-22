@@ -8,17 +8,17 @@
 
 body {
     font-family: 'Open Sans', sans-serif;
-    font-size: 12px;
+    font-size: 15px;
     line-height: 150%;
     text-align: center;
-    color: #002b36;
+    color: #2b3600;
     padding: 0;
     margin: 0px 80px 0px 80px;
-    min-width: 740px;	
+    min-width: 740px;
     -moz-box-shadow: 0px 0px 10px #93a1a1;
     -webkit-box-shadow: 0px 0px 10px #93a1a1;
     box-shadow: 0px 0px 10px #93a1a1;
-    background: url("dots.png") repeat;
+    background: radial-gradient(ellipse at center, #d5e899 0%,#7f9152 100%);
     }
 
 img {
@@ -26,7 +26,7 @@ img {
     }
 
 div.document {
-    background-color: #fcfcfc;
+    background-color: #fdfdfb;
     text-align: left;
     background-repeat: repeat-x;
     }
@@ -45,7 +45,7 @@ div.body {
 div.related {
     font-size: 1em;
     /*background: #002b36;*/
-    background-color: #605C7F;
+    background-color: #2e3436;
     color: #839496;
     padding: 5px 0px;
     }
@@ -152,7 +152,7 @@ p {
     }
 
 div.body a, div.sphinxsidebarwrapper a {
-    color: #CA7900;
+    color: #dc322f;
     /* color: #268bd2; */
     text-decoration: none;
     }
@@ -170,8 +170,7 @@ h1 {
     margin: 0;
     padding: 0.7em 0 0.3em 0;
     line-height: 1.2em;
-    color: #002b36;
-    text-shadow: #eee 0.1em 0.1em 0.1em;
+    color: #362b00;
     }
 
 h2 {
@@ -259,8 +258,7 @@ a.headerlink:hover {
 cite, code, tt {
     font-family: 'Source Code Pro', monospace;
 	font-size: 0.9em;
-    letter-spacing: 0.01em;
-    background-color: #eeeff2;
+    letter-spacing: 0.05em;
     font-style: normal;
     }
 
@@ -274,12 +272,13 @@ hr {
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
     border-radius: 2px;
-    background-color: #f8f8f8;
+    background-color: #e8f5cc;
     }
 
-div.highlight {
-    background-color: #f8f8f8;
-    }
+div.ipython-result div.highlight {
+	background-color: #e8e8db;
+	margin-top: -12px; /* close the gap!  */
+}
 
 pre {
     font-family: 'Source Code Pro', monospace;
@@ -289,11 +288,11 @@ pre {
     line-height: 120%;
     padding: 0.7em;
 	white-space: pre-wrap;       /* css-3 */
-	white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-	white-space: -pre-wrap;      /* Opera 4-6 */
-	white-space: -o-pre-wrap;    /* Opera 7 */
-	word-wrap: break-word;       /* Internet Explorer 5.5+ */
     }
+
+div.ipython-result div.highlight pre {
+    padding-left: 0px;
+}
 
 pre a {
     color: inherit;

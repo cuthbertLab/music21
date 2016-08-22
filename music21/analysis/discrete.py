@@ -183,7 +183,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
     # these are specialized in subclass
     name = 'KeyWeightKeyAnalysis Base Class'
-    identifiers = ['key', 'keyscape']
+    identifiers = ['key.baseClass', 'keyscape.baseClass']
 
     # in general go to Gb, F#: favor F# majorKeyColors
     # favor eb minor
@@ -210,7 +210,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
     def __init__(self, referenceStream=None):
         DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
         # store sharp/flat count on init if available
-        if referenceStream != None:
+        if referenceStream is not None:
             self.sharpFlatCount = self._getSharpFlatCount(referenceStream)
         else:
             self.sharpFlatCount = None
@@ -281,7 +281,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         flatCount = 0
         sharpCount = 0
         for p in subStream.pitches:
-            if p.accidental != None:
+            if p.accidental is not None:
                 if p.accidental.alter < 0:
                     flatCount += -1
                 elif p.accidental.alter > 0:
@@ -348,7 +348,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             over Sapp's given distribution for finding key, returning the result. 
         '''
         # may get an empty distribution
-        if pcDistribution == None:
+        if pcDistribution is None:
             return None
 
         soln = [0] * 12
@@ -363,7 +363,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             list of keys in letters, sorted from most likely to least likely
         '''
         # case of empty data
-        if keyResults == None:
+        if keyResults is None:
             return None
 
         likelyKeys = [0] * 12
@@ -384,7 +384,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             difference of the top two keys
         '''
         # case of empty analysis
-        if keyResults == None:
+        if keyResults is None:
             return None
  
         soln = [0] * 12
@@ -437,7 +437,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             keySortOrderFiltered = []
             for keyEl in _keySortOrder:
                 for sol in solutionsUsed: # three values
-                    if sol[0] == None: 
+                    if sol[0] is None: 
                         continue
                     if keyEl == sol[0].name: # first is key string
                         keySortOrderFiltered.append(keyEl)
@@ -491,7 +491,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
     def solutionToColor(self, solution):
         solutionKey = solution[0]
         # key may be None
-        if solutionKey == None:
+        if solutionKey is None:
             return '#ffffff'
         modality = solution[1].lower()
         if modality == 'major':
@@ -529,12 +529,12 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         <music21.pitch.Pitch E>
 
         '''
-        if pitchObj == None:
+        if pitchObj is None:
             return None
 
         # this does not yet seem necessary
         # if not done at init with ref stream, do now
-#         if self.sharpFlatCount == None:
+#         if self.sharpFlatCount is None:
 #             sharpFlatCount = self._getSharpFlatCount(sStream)
 #         else:
 #             sharpFlatCount = self.sharpFlatCount
@@ -547,7 +547,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 #             favor = None
 
         flipEnharmonic = False
-#         if pitchObj.accidental != None:
+#         if pitchObj.accidental is not None:
 #             # if we have a sharp key and we need to favor flat, get enharm
 #             if pitchObj.accidental.alter > 0 and favor == 'flat':
 #                 flipEnharmonic = True
@@ -687,8 +687,11 @@ class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
     '''
     _DOC_ALL_INHERITED = False
     name = 'Krumhansl Schmuckler Key Analysis'
-    identifiers = ['krumhansl', 'schmuckler',  'krumhansl-schmuckler', 
-                   'krumhanslschmuckler']
+    identifiers = ['key.krumhansl', 'key.schmuckler',  'key.krumhansl-schmuckler', 
+                   'key.krumhanslschmuckler', 
+                   'krumhansl', 'schmuckler',  'krumhansl-schmuckler', 
+                   'krumhanslschmuckler', 
+                   ]
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -720,12 +723,14 @@ class KrumhanslKessler(KeyWeightKeyAnalysis):
     key determination algorithm.
 
     Values from from http://extra.humdrum.org/man/keycor/, which describes these 
-    weightings as "Strong tendancy to identify the dominant key as the tonic."
+    weightings as "Strong tendency to identify the dominant key as the tonic."
     '''
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Krumhansl Kessler Key Analysis'
-    identifiers = ['krumhansl', 'kessler', 'krumhansl-kessler', 'krumhanslkessler']
+    identifiers = ['key.kessler', 'key.krumhansl-kessler', 'key.krumhanslkessler',
+                   'kessler', 'krumhansl-kessler', 'krumhanslkessler',
+                   ]
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -764,7 +769,9 @@ class AardenEssen(KeyWeightKeyAnalysis):
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Aarden Essen Key Analysis'
-    identifiers = ['aarden', 'essen', 'aarden-essen', 'aardenessen']
+    identifiers = ['key.aarden', 'key.essen', 'key.aarden-essen', 'key.aardenessen',
+                   'aarden', 'essen', 'aarden-essen', 'aardenessen',
+                   ]
     # adding these identifiers make this the default
     identifiers.append('key')
     identifiers.append('keyscape')
@@ -802,12 +809,14 @@ class SimpleWeights(KeyWeightKeyAnalysis):
 
     Values from from http://extra.humdrum.org/man/keycor/, which describes 
     these weightings as "Performs most consistently with large regions of music, 
-    becomes noiser with smaller regions of music."
+    becomes noisier with smaller regions of music."
     '''
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Simple Weight Key Analysis'
-    identifiers = ['simple', 'weight', 'simple-weight', 'simpleweight']
+    identifiers = ['key.simple', 'key.weight', 'key.simple-weight', 'key.simpleweight',
+                   'simple', 'weight', 'simple-weight', 'simpleweight',
+                   ]
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -837,12 +846,14 @@ class BellmanBudge(KeyWeightKeyAnalysis):
     Implementation of Bellman-Budge weightings for Krumhansl-Schmuckler key determination algorithm.
 
     Values from from http://extra.humdrum.org/man/keycor/, which describes these 
-    weightings as "No particular tendancies for confusions with neighboring keys."
+    weightings as "No particular tendencies for confusions with neighboring keys."
     '''
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Bellman Budge Key Analysis'
-    identifiers = ['bellman', 'budge', 'bellman-budge', 'bellmanbudge']
+    identifiers = ['key.bellman', 'key.budge', 'key.bellman-budge', 'key.bellmanbudge',
+                   'bellman', 'budge', 'bellman-budge', 'bellmanbudge',
+                   ]
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -877,14 +888,17 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
     key determination algorithm.
 
     Values from from http://extra.humdrum.org/man/keycor/, which describes 
-    these weightings as "Strong tendancy to identify the relative major as the tonic 
+    these weightings as "Strong tendency to identify the relative major as the tonic 
     in minor keys. Well-balanced for major keys."
     '''
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Temperley Kostka Payne Key Analysis'
-    identifiers = ['temperley', 'kostka', 'payne', 
-                   'temperley-kostka-payne', 'temperleykostkapayne']
+    identifiers = ['key.temperley', 'key.kostka', 'key.payne', 
+                   'key.temperley-kostka-payne', 'key.temperleykostkapayne',                   
+                   'temperley', 'kostka', 'payne', 
+                   'temperley-kostka-payne', 'temperleykostkapayne'
+                   ]
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -958,8 +972,8 @@ class Ambitus(DiscreteAnalysis):
         '''
         Provide uniformly distributed colors across the entire range.
         '''
-        if numColors == None:
-            if self._referenceStream != None:
+        if numColors is None:
+            if self._referenceStream is not None:
                 # get total range for entire piece
                 minPitch, maxPitch = self.getPitchRanges(self._referenceStream)
             else:
@@ -1162,7 +1176,7 @@ class Ambitus(DiscreteAnalysis):
         True
         '''    
         # a result of None may be possible
-        if result == None:
+        if result is None:
             return self._rgbToHex((255, 255, 255))
 
         return self._pitchSpanColors[result]
@@ -1180,8 +1194,8 @@ class Ambitus(DiscreteAnalysis):
         (<music21.interval.Interval m38>, '#665288')
         '''
         post = self.getPitchSpan(sStream)
-        if post != None:
-            solution = interval.Interval(noteStart = post[0], noteEnd = post[1])
+        if post is not None:
+            solution = interval.Interval(noteStart=post[0], noteEnd=post[1])
         else:
             solution = None
         color = self.solutionToColor(post[1].ps - post[0].ps)
@@ -1215,7 +1229,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
 
     name = 'Interval Diversity'
     # provide possible string matches for this processor
-    identifiers = ['ambitus', 'range', 'span']
+    identifiers = ['interval.diversity', 'intervals']
 
     def __init__(self, referenceStream=None):
         '''
@@ -1227,8 +1241,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         # TODO: map diversity to color span
         return '#ffffff'
 
-    def countMelodicIntervals(self, sStream, found=None, ignoreDirection=True, 
-        ignoreUnison=True):
+    def countMelodicIntervals(self, sStream, found=None, ignoreDirection=True, ignoreUnison=True):
         '''
         Find all unique melodic intervals in this Stream. 
 
@@ -1239,7 +1252,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         # offer similar approaches, but return Streams and manage offsets and durations, 
         # components not needed here
     
-        if found == None:
+        if found is None:
             found = {}
 
         # if this has parts, need to move through each at a time
@@ -1332,6 +1345,42 @@ def analyzeStream(streamObj, *args, **keywords):
     <music21.interval.Interval m21>
 
     '''
+    if 'method' in keywords:
+        method = keywords['method']
+    if args:
+        method = args[0]
+        
+    match = analysisClassFromMethodName(method)
+    
+    if match is not None:
+        obj = match() # NOTE: Cuthbert, this was previously analysisClassName()? - out of scope
+        #environLocal.printDebug(['analysis method used:', obj])
+        return obj.getSolution(streamObj)
+
+    # if no match raise error
+    raise DiscreteAnalysisException('no such analysis method: %s' % method)
+
+def analysisClassFromMethodName(method):
+    '''
+    Returns an analysis class given a method name, or None if none can be found
+
+    Searches first the class name, then the .identifiers array for each class,
+    then a subset of any identifier.
+    
+    >>> acfmn = analysis.discrete.analysisClassFromMethodName
+    >>> acfmn('aarden')
+    <class 'music21.analysis.discrete.AardenEssen'>
+    >>> acfmn('range')
+    <class 'music21.analysis.discrete.Ambitus'>
+    
+    This one is fundamentally important...
+    
+    >>> acfmn('key')
+    <class 'music21.analysis.discrete.AardenEssen'>
+    
+    >>> print(repr(acfmn('asdfadsfasdf')))
+    None
+    '''
     analysisClasses = [
         Ambitus,
         KrumhanslSchmuckler,
@@ -1341,34 +1390,36 @@ def analyzeStream(streamObj, *args, **keywords):
         BellmanBudge,
         TemperleyKostkaPayne,
     ]
-
-    if 'method' in keywords:
-        method = keywords['method']
-    if args:
-        method = args[0]
     match = None
-    for analysisClassName in analysisClasses:    
+    for analysisClass in analysisClasses:    
         # this is a very loose matching, as there are few classes now
-        if (method.lower() in analysisClassName.__name__.lower() or
-            method.lower() in analysisClassName.name):
-            match = analysisClassName
+        if (method.lower() in analysisClass.__name__.lower()
+                or method.lower() in analysisClass.name):
+            match = analysisClass
             #environLocal.printDebug(['matched analysis class name'])
             break
-        else:
-            for idStr in analysisClassName.identifiers:
-                if method in idStr:
-                    match = analysisClassName
+        
+    if match is None:
+        # no match for exact class name, so check to see if .identifiers matches
+        for analysisClass in analysisClasses:    
+            for idStr in analysisClass.identifiers:
+                if method == idStr:
+                    match = analysisClass
                     #environLocal.printDebug(['matched idStr', idStr])
                     break
-            if match != None:
-                break
-    if match != None:
-        obj = match() # NOTE: Cuthbert, this was previously analysisClassName()? - out of scope
-        #environLocal.printDebug(['analysis method used:', obj])
-        return obj.getSolution(streamObj)
 
-    # if no match raise error
-    raise DiscreteAnalysisException('no such analysis method: %s' % method)
+    if match is None:
+        # no match for identifiers, so see if the id is a subset of identifiers.
+        for analysisClass in analysisClasses:    
+            for idStr in analysisClass.identifiers:
+                if method in idStr:
+                    match = analysisClass
+                    #environLocal.printDebug(['matched idStr', idStr])
+                    break
+            if match is not None:
+                break
+
+    return match
 
 #------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
@@ -1478,7 +1529,7 @@ class Test(unittest.TestCase):
 
         midDict = mid.countMelodicIntervals(s)
         self.assertEqual(len(midDict), 10)
-        self.assertEqual(str(sorted(list(midDict.keys()))), 
+        self.assertEqual(str(sorted(list(midDict))), 
                          "['M2', 'M3', 'M6', 'P15', 'P4', 'P5', 'P8', 'd5', 'm2', 'm3']")
         self.assertEqual(str(midDict['P15']), "[<music21.interval.Interval P15>, 1]")
         self.assertEqual(str(midDict['P5']), "[<music21.interval.Interval P5>, 16]")

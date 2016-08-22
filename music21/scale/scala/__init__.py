@@ -19,6 +19,8 @@ http://www.huygens-fokker.org/scala/scl_format.html
 We thank Manuel Op de Coul for allowing us to include 
 the repository (as of May 11, 2011) with music21
 
+Scala files are encoded as latin-1 (ISO-8859) text
+
 Utility functions are also provided to search and find 
 scales in the Scala scale archive. File names can be found 
 with the :func:`~music21.scala.search` function.
@@ -114,8 +116,8 @@ def getPaths():
 
 
 class ScalaPitch(object):
-    '''Representation of a scala pitch notation
-
+    '''
+    Representation of a scala pitch notation
     
     >>> sp = scale.scala.ScalaPitch(' 1066.667 cents')
     >>> print(sp.parse())
@@ -128,15 +130,13 @@ class ScalaPitch(object):
     100.0
     >>> [sp.parse(x) for x in ['89/84', '55/49', '44/37', '63/50', '4/3', '99/70', '442/295', 
     ...     '27/17', '37/22', '98/55', '15/8', '2/1']]
-    [100.09920982..., 199.9798432913..., 299.973903610..., 400.108480470..., 498.044999134..., 
-     600.08832376157..., 699.9976981706..., 800.90959309..., 900.02609638..., 
-     1000.020156708..., 1088.268714730..., 1200.0]
+    [100.0992..., 199.9798..., 299.9739..., 400.10848..., 498.04499..., 
+     600.0883..., 699.9976..., 800.9095..., 900.0260..., 
+     1000.0201..., 1088.2687..., 1200.0]
     '''
-
     # pitch values; if has a period, is cents, otherwise a ratio
     # above the implied base ratio
     # integer values w/ no period or slash: 2 is 2/1
-
     def __init__(self, sourceString=None):
 
         self.src = None
@@ -153,7 +153,8 @@ class ScalaPitch(object):
         self.src = raw.strip()
 
     def parse(self, sourceString=None):
-        '''Parse the source string and set self.cents.
+        '''
+        Parse the source string and set self.cents.
         '''
         if sourceString is not None:
             self._setSrc(sourceString)
@@ -175,12 +176,70 @@ class ScalaPitch(object):
 
 
 class ScalaData(object):
-    '''Object representation of data stored in a Scale scale file. This object is used to 
+    u'''
+    Object representation of data stored in a Scale scale file. This object is used to 
     access Scala information stored in a file. To create a music21 scale with a Scala file, 
     use :class:`~music21.scale.ScalaScale`.
 
     This is not called ScalaScale, as this name clashes with the 
     :class:`~music21.scale.ScalaScale` that uses this object.
+
+    >>> import os
+    >>> sf = scale.scala.ScalaFile()
+    >>> fp = os.sep.join([common.getSourceFilePath(), 
+    ...                   'scale', 'scala', 'scl', 'tanaka.scl'])
+    >>> sf.open(fp)
+    >>> sd = sf.read()
+    >>> print(sd.description) # converted to unicode...
+    26-note choice system of Shohé Tanaka, Studien i.G.d. reinen Stimmung (1890)
+    >>> sd.pitchCount
+    26
+    
+    Distances from the tonic:
+    
+    >>> cat = sd.getCentsAboveTonic()
+    >>> len(cat)
+    26
+    >>> list(int(round(x)) for x in cat[0:4])
+    [71, 92, 112, 182]
+    >>> sd.pitchValues[0]
+    <music21.scale.scala.ScalaPitch object at 0x10b16fac8>
+    >>> sd.pitchValues[0].cents
+    70.6724...
+    
+    This will not add up with centsAboveTonic above, due to rounding
+    
+    >>> adj = sd.getAdjacentCents()
+    >>> list(int(round(x)) for x in adj[0:4])
+    [71, 22, 20, 71]
+    
+    Interval Sequences
+    
+    >>> intSeq = sd.getIntervalSequence()
+    >>> intSeq[0:4]
+    [<music21.interval.Interval m2 (-29c)>, 
+     <music21.interval.Interval P1 (+22c)>, 
+     <music21.interval.Interval P1 (+20c)>, 
+     <music21.interval.Interval m2 (-29c)>]
+     
+    Tweak the file and be ready to write it back out:
+     
+    >>> sd.pitchValues[0].cents = 73.25
+    >>> sd.fileName = 'tanaka2.scl'
+    >>> sd.description = 'Tweaked version of tanaka.scl'
+    >>> fs = sd.getFileString()
+    >>> print(fs)
+    ! tanaka2.scl
+    !
+    Tweaked version of tanaka.scl
+    26
+    !
+    73.25
+    92.17...
+    111.73...
+    182.40...
+        
+    Be sure to reencode `fs` as `latin-1` before writing to disk.
     '''
     def __init__(self, sourceString=None, fileName=None):
         self.src = sourceString
@@ -195,7 +254,8 @@ class ScalaData(object):
         self.pitchValues = []
 
     def parse(self):
-        '''Parse a scala file delivered as a long string with line breaks
+        '''
+        Parse a scala file delivered as a long string with line breaks
         '''
         lines = self.src.split('\n')
         count = 0 # count non-comment lines
@@ -222,13 +282,15 @@ class ScalaData(object):
                     self.pitchValues.append(sp)
   
     def getCentsAboveTonic(self):
-        '''Return a list of cent values above the implied tonic.
+        '''
+        Return a list of cent values above the implied tonic.
         '''
         return [sp.cents for sp in self.pitchValues]    
     
 
     def getAdjacentCents(self):
-        '''Get cents values between adjacent intervals.
+        '''
+        Get cents values between adjacent intervals.
         '''
         post = []
         location = 0
@@ -253,7 +315,6 @@ class ScalaData(object):
             self.pitchValues.append(sp)
         self.pitchCount = len(self.pitchValues)
 
-
     def getIntervalSequence(self):
         '''
         Get the scale as a list of Interval objects.
@@ -265,7 +326,8 @@ class ScalaData(object):
         return post
 
     def setIntervalSequence(self, iList):
-        '''Set the scale from a list of Interval objects.
+        '''
+        Set the scale from a list of Interval objects.
         '''
         self.pitchValues = []
         location = 0
@@ -278,32 +340,36 @@ class ScalaData(object):
         self.pitchCount = len(self.pitchValues)
 
     def getFileString(self):
-        '''Return a string suitable for writing a Scale file
+        '''
+        Return a unicode-string suitable for writing a Scala file
+        
+        The unicode string should be encoded in Latin-1 for maximum
+        Scala compatibility.
         '''
         msg = []
         if self.fileName is not None:
-            msg.append('! %s' % self.fileName)
+            msg.append(u'! %s' % self.fileName)
         # conventional to add a comment space
-        msg.append('!')
+        msg.append(u'!')
 
         if self.description is not None:
             msg.append(self.description)
         else: # must supply empty line
-            msg.append('')
+            msg.append(u'')
 
         if self.pitchCount is not None:
             msg.append(str(self.pitchCount))
         else: # must supply empty line
-            msg.append('')
+            msg.append(u'')
     
         # conventional to add a comment space
-        msg.append('!')
+        msg.append(u'!')
         for sp in self.pitchValues:
             msg.append(str(sp.cents))
         # add space
-        msg.append('') 
+        msg.append(u'') 
 
-        return '\n'.join(msg)
+        return u'\n'.join(msg)
 
 
 #-------------------------------------------------------------------------------
@@ -312,8 +378,20 @@ class ScalaFile(object):
     Interface for reading and writing scala files. 
     On reading, returns a :class:`~music21.scala.ScalaData` object.
 
-    
-    >>> sf = scale.scala.ScalaFile() 
+    >>> import os
+    >>> sf = scale.scala.ScalaFile()
+    >>> fp = os.sep.join([common.getSourceFilePath(), 
+    ...                   'scale', 'scala', 'scl', 'tanaka.scl'])
+    >>> sf.open(fp)
+    >>> sd = sf.read()
+    >>> sd
+    <music21.scale.scala.ScalaData object at 0x10b170e10>
+    >>> sd is sf.data
+    True
+    >>> sf.fileName.endswith('tanaka.scl')
+    True
+    >>> sd.pitchCount
+    26
     '''
     
     def __init__(self, data=None): 
@@ -323,9 +401,10 @@ class ScalaFile(object):
         self.data = data
 
     def open(self, fp, mode='r'): 
-        '''Open a file for reading
         '''
-        self.file = io.open(fp, mode, encoding='utf-8')
+        Open a file for reading
+        '''
+        self.file = io.open(fp, mode, encoding='latin-1')
         self.fileName = os.path.basename(fp)
 
     def openFileLike(self, fileLike):

@@ -201,7 +201,7 @@ def nextLargerType(durType):
     'breve'
     >>> duration.nextLargerType("duplex-maxima")
     Traceback (most recent call last):
-    DurationException: cannot get the next larger of duplex-maxima
+    music21.duration.DurationException: cannot get the next larger of duplex-maxima
     '''
     if durType not in ordinalTypeFromNum:
         raise DurationException("cannot get the next larger of %s" % durType)
@@ -225,7 +225,7 @@ def nextSmallerType(durType):
     '2048th'
     >>> duration.nextSmallerType("2048th")
     Traceback (most recent call last):
-    DurationException: cannot get the next smaller of 2048th
+    music21.duration.DurationException: cannot get the next smaller of 2048th
     '''
     if durType not in ordinalTypeFromNum:
         raise DurationException("cannot get the next smaller of %s" % durType)
@@ -267,15 +267,17 @@ def quarterLengthToClosestType(qLen):
     >>> qL = duration.typeToDuration['2048th']
     >>> qL
     0.001953125
+    
     >>> qL = qL * .75
     >>> duration.quarterLengthToClosestType(qL)
     Traceback (most recent call last):
-    DurationException: Cannot return types smaller than 2048th; qLen was: 0.00146484375
+    music21.duration.DurationException: Cannot return types smaller than 2048th; 
+        qLen was: 0.00146484375
     '''
     if (isinstance(qLen, fractions.Fraction)):
         noteLengthType = 4 / qLen  # divides right...
     else:
-        noteLengthType = opFrac(4.0/qLen)
+        noteLengthType = opFrac(4 / qLen)
 
     if noteLengthType in typeFromNumDict:
         return (typeFromNumDict[noteLengthType], True)
@@ -309,7 +311,7 @@ def convertQuarterLengthToType(qLen):
     '32nd'
     >>> duration.convertQuarterLengthToType(0.33333)
     Traceback (most recent call last):
-    DurationException: cannot convert quarterLength 0.33333 exactly to type
+    music21.duration.DurationException: cannot convert quarterLength 0.33333 exactly to type
     '''
     dtype, match = quarterLengthToClosestType(qLen)
     if match is False:
@@ -923,13 +925,13 @@ class Tuplet(object):
     >>> myTup.frozen = True
     >>> myTup.tupletActual = [3, 2]
     Traceback (most recent call last):
-    TupletException: A frozen tuplet (or one attached to a duration) is immutable
+    music21.duration.TupletException: A frozen tuplet (or one attached to a duration) is immutable
 
     >>> myHalf = duration.Duration("half")
     >>> myHalf.appendTuplet(myTup2)
     >>> myTup2.tupletActual = [5, 4]
     Traceback (most recent call last):
-    TupletException: A frozen tuplet (or one attached to a duration) is immutable
+    music21.duration.TupletException: A frozen tuplet (or one attached to a duration) is immutable
 
     Note that if you want to create a note with a simple Tuplet attached to it,
     you can just change the quarterLength of the note:
@@ -1551,7 +1553,7 @@ class Duration(SlottedObjectMixin):
                 self.components = list(qlc.components)
                 if qlc.tuplet is not None:
                     self.tuplets = (qlc.tuplet,)
-            except DurationException:                
+            except music21.duration.DurationException:                
                 environLocal.printDebug([
                     "problem updating components of note with quarterLength ", self.quarterLength, 
                     "chokes quarterLengthToDurations"
@@ -2942,7 +2944,7 @@ class TupletFixer(object):
             return
         else:
             excessRatio = opFrac(currentTupletDuration / totalTupletDuration)
-            inverseExcessRatio = opFrac(1.0/excessRatio)
+            inverseExcessRatio = opFrac(1 / excessRatio)
 
             if excessRatio == int(excessRatio): # divide tuplets into smaller
                 largestTupletType = ordinalTypeFromNum[largestTupletTypeOrdinal]

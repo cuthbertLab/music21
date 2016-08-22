@@ -69,9 +69,9 @@ class Date(object):
 
     ### CLASS VARIABLES ###
 
-    approximateSymbols = ['~', 'x']
-
-    uncertainSymbols = ['?', 'z']
+    approximateSymbols = ('~', 'x')
+    uncertainSymbols = ('?', 'z')
+    priorTimeSymbols = ('<', '{', '>', '}')
 
     ### INITIALIZER ###
 
@@ -82,6 +82,7 @@ class Date(object):
         self.hour = None
         self.minute = None
         self.second = None
+        
         # error: can be 'approximate', 'uncertain'
         # None is assumed to be certain
         self.yearError = None
@@ -162,7 +163,7 @@ class Date(object):
             return value, None
         else:
             dateStr = value
-        sym = self.approximateSymbols + self.uncertainSymbols
+        sym = self.approximateSymbols + self.uncertainSymbols + self.priorTimeSymbols
         found = None
         for char in dateStr:
             if char in sym:
@@ -176,6 +177,10 @@ class Date(object):
         elif found in self.uncertainSymbols:
             dateStr = dateStr.replace(found, '')
             return dateStr, 'uncertain'
+        elif found in self.priorTimeSymbols:
+            dateStr = dateStr.replace(found, '')
+            return dateStr, 'priority'
+
 
     ### PUBLIC METHODS ###
 
@@ -190,9 +195,9 @@ class Date(object):
         >>> metadata.Date.errorToSymbol('uncertain')
         '?'
         '''
-        if value.lower() in Date.approximateSymbols + ['approximate']:
+        if value.lower() in Date.approximateSymbols + ('approximate',):
             return Date.approximateSymbols[0]
-        if value.lower() in Date.uncertainSymbols + ['uncertain']:
+        if value.lower() in Date.uncertainSymbols + ('uncertain',):
             return Date.uncertainSymbols[0]
 
     def load(self, value):
@@ -314,10 +319,9 @@ class Date(object):
 
         >>> a.datetime
         Traceback (most recent call last):
-        ...
         TypeError: Required argument 'day' (pos 3) not found
-
         '''
+        # pylint: disable=no-value-for-parameter
         post = []
         # order here is order for datetime
         # TODO: need defaults for incomplete times.
@@ -463,7 +467,7 @@ class DateSingle(object):
 
     @relevance.setter
     def relevance(self, value):
-        if value in ['certain', 'approximate', 'uncertain']:
+        if value in ('certain', 'approximate', 'uncertain'):
             self._relevance = value
             self._dataError = []
             # only here is dataError the same as relevance
@@ -480,15 +484,20 @@ class DateSingle(object):
 
 class DateRelative(DateSingle):
     r'''
-    Store a relative date, sometime prior or sometime after.
+    Store a relative date, sometime `prior` or sometime `after`, `onorbefore`, or onorafter`.
 
     >>> dd = metadata.DateRelative('2009/12/31', 'prior')
     >>> str(dd)
-    '2009/12/31'
+    'prior to 2009/12/31'
+    >>> dd.relevance = 'after'
+    >>> str(dd)
+    'after 2009/12/31'
+
 
     >>> dd = metadata.DateRelative('2009/12/31', 'certain')
     Traceback (most recent call last):
-    MetadataException: Relevance value is not supported by this object: 'certain'
+    music21.exceptions21.MetadataException: Relevance value is not 
+        supported by this object: 'certain'
     '''
 
     ### CLASS VARIABLES ###
@@ -502,17 +511,32 @@ class DateRelative(DateSingle):
 
     ### PUBLIC PROPERTIES ###
 
+    def __str__(self):
+        r = self.relevance
+        ds = super(DateRelative, self).__str__()
+        if r == 'prior':
+            return 'prior to ' + ds
+        elif r == 'onorbefore':
+            return ds + ' or earlier'
+        elif r == 'onorafter':
+            return ds + ' or later'
+        else:
+            return 'after ' + ds
+
     @property
     def relevance(self):
         return self._relevance
 
     @relevance.setter
     def relevance(self, value):
-        if value not in ['prior', 'after']:
+        if value == 'before':
+            value = 'prior'
+        
+        if value.lower() not in ('prior', 'after', 'onorbefore', 'onorafter'):
             raise exceptions21.MetadataException(
                 'Relevance value is not supported by this object: '
                 '{0!r}'.format(value))
-        self._relevance = value
+        self._relevance = value.lower()
 
 
 
@@ -529,7 +553,8 @@ class DateBetween(DateSingle):
 
     >>> dd = metadata.DateBetween(['2009/12/31', '2010/1/28'], 'certain')
     Traceback (most recent call last):
-    MetadataException: Relevance value is not supported by this object: 'certain'
+    music21.exceptions21.MetadataException: Relevance value is not 
+        supported by this object: 'certain'
     '''
 
     ### CLASS VARIABLES ###
@@ -574,7 +599,7 @@ class DateBetween(DateSingle):
 
     @relevance.setter
     def relevance(self, value):
-        if value not in ['between']:
+        if value != 'between':
             raise exceptions21.MetadataException(
                 'Relevance value is not supported by this object: '
                 '{0!r}'.format(value))
@@ -602,7 +627,8 @@ class DateSelection(DateSingle):
     ...     'certain',
     ...     )
     Traceback (most recent call last):
-    MetadataException: Relevance value is not supported by this object: 'certain'
+    music21.exceptions21.MetadataException: Relevance value is not 
+        supported by this object: 'certain'
     '''
 
     ### CLASS VARIABLES ###
@@ -645,7 +671,7 @@ class DateSelection(DateSingle):
 
     @relevance.setter
     def relevance(self, value):
-        if value not in ['or']:
+        if value != 'or':
             raise exceptions21.MetadataException(
                 'Relevance value is not supported by this object: '
                 '{0!r}'.format(value))
@@ -697,6 +723,9 @@ class Text(object):
                 return str(self._data)
             else:
                 return self._data
+
+    def __unicode__(self):
+        return self.__str__().decode('utf-8')
 
     ### PUBLIC PROPERTIES ###
 
@@ -755,6 +784,9 @@ class Contributor(object):
 
     >>> td.relevance
     'contributor'
+    
+    >>> td
+    <music21.metadata.primitives.Contributor composer:Chopin, Fryderyk>
     '''
 
     ### CLASS VARIABLES ###
@@ -817,6 +849,10 @@ class Contributor(object):
             self._dateRange[0] = DateSingle(keywords['birth'])
         if 'death' in keywords:
             self._dateRange[1] = DateSingle(keywords['death'])
+
+    def __repr__(self):
+        return '<music21.metadata.primitives.{} {}:{}>'.format(                                                           
+                                self.__class__.__name__, self.role, self.name)
 
     ### PUBLIC METHODS ###
 
@@ -1169,7 +1205,7 @@ class Test(unittest.TestCase):
         from music21 import metadata
 
         dateRelative = metadata.primitives.DateRelative('2001/12/31', 'prior')
-        self.assertEqual(str(dateRelative), '2001/12/31')
+        self.assertEqual(str(dateRelative), 'prior to 2001/12/31')
         self.assertEqual(dateRelative.relevance, 'prior')
         self.assertEqual(len(dateRelative._data), 1)
 

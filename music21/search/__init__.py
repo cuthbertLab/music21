@@ -13,17 +13,14 @@ Methods and Classes useful in searching within scores.
 
 For searching a group of scores see the search functions within
 :ref:`moduleCorpus` .
-
 '''
-
-
 ### __init__.py ######
-__all__ = ['base', 'lyrics', 'segment']
+__all__ = ['base', 'lyrics', 'segment', 'serial']
 
 from music21.search import base
 from music21.search import lyrics
 from music21.search import segment
+from music21.search import serial
 
 # __init__ can wildcard import base; it's how it is designed.
 from music21.search.base import * # pylint: disable=wildcard-import
-

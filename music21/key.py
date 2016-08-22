@@ -18,8 +18,9 @@ The :class:`~music21.key.Key` object is a fuller representation not just of
 a key signature but also of the key of a region. 
 '''
 
-import unittest
 import copy
+import re
+import unittest
 
 from music21 import base
 from music21 import common
@@ -35,7 +36,6 @@ from music21 import environment
 _MOD = "key.py"
 environLocal = environment.Environment(_MOD)
 
-import re
 
 
 #-------------------------------------------------------------------------------
@@ -211,8 +211,7 @@ def pitchToSharps(value, mode=None):
     
     >>> key.pitchToSharps('C~')
     Traceback (most recent call last):
-    KeyException: Cannot determine sharps for quarter-tone keys! silly!
-    
+    music21.key.KeyException: Cannot determine sharps for quarter-tone keys! silly!
     '''
     if isinstance(value, six.string_types): 
         value = pitch.Pitch(value)
@@ -229,7 +228,7 @@ def pitchToSharps(value, mode=None):
         if value.accidental.isTwelveTone() is False:
             raise KeyException('Cannot determine sharps for quarter-tone keys! silly!')
         vaa = int(value.accidental.alter) 
-        sharps = sharps + 7*vaa
+        sharps = sharps + 7 * vaa
     
     if mode is not None and mode in modeSharpsAlter:
         sharps += modeSharpsAlter[mode]
@@ -317,11 +316,10 @@ class KeyException(exceptions21.Music21Exception):
 class KeySignature(base.Music21Object):
     '''
     A KeySignature object specifies the signature to be used for a piece; it takes
-    in zero, one, or two arguments.  The only argument is an int giving the number of sharps,
+    in zero or one arguments.  The only argument is an int giving the number of sharps,
     or if negative the number of flats.  
     
     If you are starting with the name of a key, see the :class:`~music21.key.Key` object.
-
 
     >>> A = key.KeySignature(3)
     >>> A
@@ -335,8 +333,8 @@ class KeySignature(base.Music21Object):
 
     >>> illegal = key.KeySignature('c#')
     Traceback (most recent call last):
-    KeySignatureException: Cannot get a KeySignature from this "number" of sharps: "c#"; 
-        did you mean to use a key.Key() object instead?
+    music21.key.KeySignatureException: Cannot get a KeySignature from this 
+        "number" of sharps: "c#"; did you mean to use a key.Key() object instead?
     
     >>> legal = key.Key('c#')
     >>> legal.sharps
@@ -390,7 +388,7 @@ class KeySignature(base.Music21Object):
     def _strDescription(self):
         output = ""
         ns = self.sharps
-        if ns == None:
+        if ns is None:
             output = 'None'
         elif ns > 1:
             output = "%s sharps" % str(ns)
@@ -701,17 +699,6 @@ class KeySignature(base.Music21Object):
         ''')
 
 
-
-# 
-# key1 = Key("E", "major")
-# key1
-# <music21.key.Key E major>
-# key1.parallel
-# <music21.key.Key E minor>
-# key1.relative
-# <music21.key.Key c# minor>
-
-
 class Key(KeySignature, scale.DiatonicScale):
     '''
     Note that a key is a sort of hypothetical/conceptual object.
@@ -820,7 +807,7 @@ class Key(KeySignature, scale.DiatonicScale):
         self.correlationCoefficient = None
 
         # store an ordered list of alternative Key objects
-        self.alternateInterpretations = None
+        self.alternateInterpretations = []
 
     def __hash__(self):
         hashTuple = (self.tonic, self.mode)
@@ -933,7 +920,7 @@ class Key(KeySignature, scale.DiatonicScale):
     
     def _tonalCertainityCorrelationCoefficient(self, *args, **keywords):
         # possible measures:
-        if self.alternateInterpretations is None or len(self.alternateInterpretations) == 0:
+        if len(self.alternateInterpretations) == 0:
             raise KeySignatureException(
                     'cannot process ambiguity without a list of .alternateInterpretations')
         focus = []
@@ -971,8 +958,10 @@ class Key(KeySignature, scale.DiatonicScale):
         # estimate range as 2, normalize between zero and 1
         return (absMagnitude * 1) + (leaderSpan * 2)
 
-    def tonalCertainty(self, method='correlationCoefficient', *args, 
-        **keywords):
+    def tonalCertainty(self, 
+                       method='correlationCoefficient', 
+                       *args, 
+                       **keywords):
         '''Provide a measure of tonal ambiguity for Key determined with one of many methods. 
 
         The `correlationCoefficient` assumes that the alternateInterpretations list has 
@@ -1006,9 +995,11 @@ class Key(KeySignature, scale.DiatonicScale):
         >>> k2 = key.Key('b-')
         >>> k2.tonalCertainty()
         Traceback (most recent call last):
-        KeySignatureException: cannot process ambiguity without a list of .alternateInterpretations
-        >>> k2.alternateInterpretations is None
-        True
+        music21.key.KeySignatureException: cannot process ambiguity without a 
+            list of .alternateInterpretations
+
+        >>> k2.alternateInterpretations
+        []
         '''
         if method == 'correlationCoefficient':
             return self._tonalCertainityCorrelationCoefficient(

@@ -94,7 +94,7 @@ def fromCacheName(name):
 
     >>> corpus.manager.fromCacheName('testDummy')
     Traceback (most recent call last):
-    CorpusException: Cannot parse a cacheName of 'testDummy'
+    music21.exceptions21.CorpusException: Cannot parse a cacheName of 'testDummy'
     '''
     if name == 'core':
         return corpora.CoreCorpus()
@@ -259,7 +259,7 @@ def search(
     ...     'bach',
     ...     corpusNames=('core', 'virtual'),
     ...     )
-    <music21.metadata.bundles.MetadataBundle {150 entries}>
+    <music21.metadata.bundles.MetadataBundle {151 entries}>
 
     If ``names`` is None, all corpora known to music21 will be searched.
 

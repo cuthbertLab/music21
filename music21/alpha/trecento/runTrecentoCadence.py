@@ -29,7 +29,7 @@ def countTimeSig():
             else:
                 timeSigCounter[thisTime] = 1
                 
-    for thisKey in sorted(timeSigCounter.keys()):
+    for thisKey in sorted(timeSigCounter):
         print(thisKey, ":", timeSigCounter[thisKey], 
               str(int(timeSigCounter[thisKey]*100/totalPieces)) + "%")
 

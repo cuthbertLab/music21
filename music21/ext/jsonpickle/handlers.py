@@ -30,9 +30,9 @@ import re
 import sys
 import time
 
-from jsonpickle import util
-from jsonpickle.compat import unicode
-from jsonpickle.compat import queue
+from music21.ext.jsonpickle import util
+from music21.ext.jsonpickle.compat import unicode
+from music21.ext.jsonpickle.compat import queue
 
 
 class Registry(object):

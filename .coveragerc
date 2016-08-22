@@ -2,3 +2,4 @@
 exclude_lines =
     if __name__ == .__main__.:
     class TestExternal(unittest.TestCase):
+    pragma: no cover

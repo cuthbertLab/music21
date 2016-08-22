@@ -12,7 +12,7 @@ __all__ = [
     ]
 
 from music21.demos import gatherAccidentals
-
+from music21.demos import trecento
 
 #------------------------------------------------------------------------------
 # eof

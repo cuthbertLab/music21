@@ -9,11 +9,11 @@
 # Copyright:    Copyright © 2010-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 '''
 Module to translate MIDI data to music21 Streams and voice versa.  Note that quantization of
 notes takes place in the :meth:`~music21.stream.Stream.quantize` method not here.
 '''
+from __future__ import division, print_function
 
 
 import unittest
@@ -148,7 +148,7 @@ def midiToDuration(ticks, ticksPerQuarter=None, inputM21DurationObject=None):
     else:
         d = inputM21DurationObject
 
-    if ticksPerQuarter == None:
+    if ticksPerQuarter is None:
         ticksPerQuarter = defaults.ticksPerQuarter
     # given a value in ticks
     d._qtrLength = float(ticks) / ticksPerQuarter
@@ -235,12 +235,19 @@ def getEndEvents(mt=None, channel=1):
 # Multiobject conversion
 
 def music21ObjectToMidiFile(music21Object):
+    '''
+    Either calls streamToMidiFile on the music21Object or
+    puts a copy of that object into a Stream (so as
+    not to change activeSites, etc.) and calls streamToMidiFile on
+    that object.
+    '''
     classes = music21Object.classes
     if 'Stream' in classes:
         return streamToMidiFile(music21Object)
     else:
+        m21ObjectCopy = copy.deepcopy(music21Object)
         s = stream.Stream()
-        s.insert(0, music21Object)
+        s.insert(0, m21ObjectCopy)
         return streamToMidiFile(s)
    
 
@@ -310,12 +317,12 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     94
 
     '''
-    if inputM21 == None:
+    if inputM21 is None:
         n = note.Note()
     else:
         n = inputM21
 
-    if ticksPerQuarter == None:
+    if ticksPerQuarter is None:
         ticksPerQuarter = defaults.ticksPerQuarter
 
     # pre sorted from a stream
@@ -492,12 +499,12 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     >>> c.duration.quarterLength
     2.0
     '''
-    if inputM21 == None:
+    if inputM21 is None:
         c = chord.Chord()
     else:
         c = inputM21
 
-    if ticksPerQuarter == None:
+    if ticksPerQuarter is None:
         ticksPerQuarter = defaults.ticksPerQuarter
 
     from music21 import pitch
@@ -918,7 +925,7 @@ def midiEventsToTempo(eventList):
         event = eventList[1]
     # get microseconds per quarter
     mspq = midiModule.getNumber(event.data, 3)[0] # first data is number
-    bpm = round(60000000.0 / mspq, 2)
+    bpm = round(60000000 / mspq, 2)
     #post = midiModule.getNumbersAsList(event.data)
     #environLocal.printDebug(['midiEventsToTempo, got bpm', bpm])
     mm = tempo.MetronomeMark(number=bpm)
@@ -969,7 +976,7 @@ def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
     # from any tempo indication, get the sounding metronome mark
     mm = tempoIndication.getSoundingMetronomeMark()
     bpm = mm.getQuarterBPM()
-    mspq = int(round(60000000.0 / bpm)) # microseconds per quarter note
+    mspq = int(round(60000000 / bpm)) # microseconds per quarter note
 
     me.data = midiModule.putNumber(mspq, 3)
     eventList.append(me)
@@ -1284,7 +1291,7 @@ def _processPackets(packets, channelForInstrument=None, channelsDynamic=None,
 
     # after processing, collect all channels used
     foundChannels = []
-    for start, stop, usedChannel in uniqueChannelEvents.keys(): # a list
+    for start, stop, usedChannel in list(uniqueChannelEvents): # a list
         if usedChannel not in foundChannels:
             foundChannels.append(usedChannel)
 #         for ch in chList:
@@ -1417,11 +1424,11 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     #environLocal.printDebug(['midiTrackToStream(): got midi track: events', 
     # len(mt.events), 'ticksPerQuarter', ticksPerQuarter])
 
-    if inputM21 == None:
+    if inputM21 is None:
         s = stream.Stream()
     else:
         s = inputM21
-    if ticksPerQuarter == None:
+    if ticksPerQuarter is None:
         ticksPerQuarter = defaults.ticksPerQuarter
 
     # need to build chords and notes
@@ -1616,7 +1623,10 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
             quarterLengthDivisors = keywords["quarterLengthDivisors"]
         else: 
             quarterLengthDivisors = None   
-        s.quantize(quarterLengthDivisors = quarterLengthDivisors, processOffsets=True, processDurations=True, inPlace=True)
+        s.quantize(quarterLengthDivisors=quarterLengthDivisors, 
+                   processOffsets=True, 
+                   processDurations=True, 
+                   inPlace=True)
 
     if voicesRequired:
         pass
@@ -1667,7 +1677,7 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
     Given a Stream, Score, Part, etc., that may have substreams (i.e.,
     a hierarchy), return a list of :class:`~music21.midi.base.MidiTrack` objects. 
 
-    acceptableChannelList is a list of MIDI Channel numbers that can be used.
+    acceptableChannelList is a list of MIDI Channel numbers that can be used or None.
     If None, then 1-9, 11-16 are used (10 being reserved for percussion).
 
     Called by streamToMidiFile()
@@ -1678,7 +1688,6 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
        be done with a shallow copy?)
        
     2. we make a list of all instruments that are being used in the piece.
-
     '''
     from music21 import midi as midiModule
 
@@ -1823,7 +1832,7 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
     '''
     Given a list of midiTracks, populate this Stream with a Part for each track. 
     '''
-    if inputM21 == None:
+    if inputM21 is None:
         s = stream.Score()
     else:
         s = inputM21
@@ -2004,7 +2013,7 @@ def midiAsciiStringToBinaryString(midiFormat=1, ticksPerQuarterNote=960, tracksE
                 else:
                     environLocal.warn("Unsupported meta event: 0x%s" % (chunk_event_param[1])) 
                                         
-                if valid == True:
+                if valid:
                     trk.events.append(dt)
                     trk.events.append(me)
                                 
@@ -2062,7 +2071,7 @@ def midiFileToStream(mf, inputM21=None, quantizePost=True, **keywords):
     11
     '''
     #environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
-    if inputM21 == None:
+    if inputM21 is None:
         s = stream.Score()
     else:
         s = inputM21
@@ -2073,7 +2082,10 @@ def midiFileToStream(mf, inputM21=None, quantizePost=True, **keywords):
         # create a stream for each tracks   
         # may need to check if tracks actually have event data
         midiTracksToStreams(mf.tracks, 
-            ticksPerQuarter=mf.ticksPerQuarterNote, quantizePost=quantizePost, inputM21=s, **keywords)
+                            ticksPerQuarter=mf.ticksPerQuarterNote, 
+                            quantizePost=quantizePost, 
+                            inputM21=s, 
+                            **keywords)
         #s._setMidiTracks(mf.tracks, mf.ticksPerQuarterNote)
 
     return s
@@ -2553,7 +2565,7 @@ class Test(unittest.TestCase):
         p1 = s.parts[0]
         p2 = copy.deepcopy(p1)
         t = interval.Interval(0.5) # a sharp p4
-        p2.transpose(t, inPlace=True)
+        p2.transpose(t, inPlace=True, classFilterList=('Note', 'Chord'))
         post = stream.Score()
         post.insert(0, p1)
         post.insert(0, p2)
@@ -2578,8 +2590,8 @@ class Test(unittest.TestCase):
 
         t1 = interval.Interval(12.5) # octave + half sharp
         t2 = interval.Interval(-12.25) # octave down minus 1/8th tone
-        p2.transpose(t1, inPlace=True)
-        p3.transpose(t2, inPlace=True)
+        p2.transpose(t1, inPlace=True, classFilterList=('Note', 'Chord'))
+        p3.transpose(t2, inPlace=True, classFilterList=('Note', 'Chord'))
         post = stream.Score()
         post.insert(0, p1)
         post.insert(0, p2)
@@ -2608,8 +2620,8 @@ class Test(unittest.TestCase):
         
         t1 = interval.Interval(12.5) # a sharp p4
         t2 = interval.Interval(-7.25) # a sharp p4
-        p2.transpose(t1, inPlace=True)
-        p3.transpose(t2, inPlace=True)
+        p2.transpose(t1, inPlace=True, classFilterList=('Note', 'Chord'))
+        p3.transpose(t2, inPlace=True, classFilterList=('Note', 'Chord'))
         post = stream.Score()
         p1.insert(0, instrument.Dulcimer())
         post.insert(0, p1)

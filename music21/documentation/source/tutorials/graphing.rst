@@ -206,7 +206,7 @@ This example provides basic customization to a scatter graph::
     >>> for midiNumber in range(36,120):
     ...	    n = note.Note()
     ...	    n.midi = midiNumber
-    ...	    frequency = n.frequency
+    ...	    frequency = n.pitch.frequency
     ...	    if n.pitch.pitchClass in [0, 2, 4, 5, 7, 9, 11]:
     ...	        alpha = 1
     ...	        marker = 'o'
@@ -217,7 +217,9 @@ This example provides basic customization to a scatter graph::
     ...	        marker = 'd'
     ...	        color = 'black'
     ...	        markerSize = 8
-    ...	    data.append( (midiNumber, int(frequency), {'color':color, 'alpha': alpha, 'marker': marker, 'markerSize':markerSize} ) )
+    ...	    data.append( (midiNumber, int(frequency), 
+    ...                   {'color':color, 'alpha': alpha, 
+    ...                     'marker': marker, 'markerSize':markerSize} ) )
     >>> a.setData(data)
     >>> a.setAxisLabel('x', 'midi number')
     >>> a.setAxisLabel('y', 'frequency')
@@ -241,7 +243,10 @@ The example follows::
     >>> from music21 import *
     >>> sopranoDict, altoDict, tenorDict, bassDict, data, noteTotal = {}, {}, {}, {}, [], 0.0
     >>> for chorale in corpus.chorales.Iterator():
-    ...     soprano, alto, tenor, bass = chorale.getElementById('Soprano'), chorale.getElementById('Alto'), chorale.getElementById('Tenor'), chorale.getElementById('Bass')
+    ...     (soprano, alto, tenor, bass) = (chorale.getElementById('Soprano'), 
+    ...                                     chorale.getElementById('Alto'), 
+    ...                                     chorale.getElementById('Tenor'), 
+    ...                                     chorale.getElementById('Bass'))
     ...     for (part, partDict) in [(soprano, sopranoDict), (alto, altoDict), (tenor, tenorDict), (bass, bassDict)]:
     ...         if part is not None:
     ...             part = part.flat.notes

@@ -9,7 +9,6 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
-import music21
 import unittest
 
 class TheoryResult(object):
@@ -296,7 +295,7 @@ class TestExternal(unittest.TestCase):
 
     
 if __name__ == "__main__":
-
+    import music21
     music21.mainTest(Test)
     
     #te = TestExternal()

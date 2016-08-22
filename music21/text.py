@@ -144,7 +144,7 @@ def prependArticle(src, language=None):
     if ',' not in src: # must have a comma
         return src
 
-    if language == None: # get all languages?
+    if language is None: # get all languages?
         ref = []
         for key in articleReference:
             ref += articleReference[key]
@@ -182,7 +182,7 @@ def postpendArticle(src, language=None):
     if ' ' not in src: # must have at least one space
         return src
 
-    if language == None: # get all languages?
+    if language is None: # get all languages?
         ref = []
         for key in articleReference:
             ref += articleReference[key]
@@ -297,11 +297,12 @@ class TextFormatMixin(object):
             try:
                 value = float(value)
             except ValueError:
-                raise TextFormatException('Not a supported size: %s' % value)
+                pass # MusicXML font sizes can be CSS strings...
+                #raise TextFormatException('Not a supported size: %s' % value)
         self._size = value
 
     size = property(_getSize, _setSize, 
-        doc = '''Get or set the size.
+        doc = '''Get or set the size.  Best, a float, but also a css font size
 
         >>> tf = text.TextFormatMixin()
         >>> tf.size = 20
@@ -848,8 +849,3 @@ if __name__ == "__main__":
 
 #------------------------------------------------------------------------------
 # eof
-
-
-
-
-

@@ -10,11 +10,12 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
-_all_ = ['xmlObjects', 'xmlToM21', 'm21ToXml']
+_all_ = ['lilypondTestSuite', 'm21ToXml', 'xmlObjects', 'xmlToM21']
 
+from music21.musicxml import lilypondTestSuite
+from music21.musicxml import m21ToXml
 from music21.musicxml import xmlObjects
 from music21.musicxml import xmlToM21
-from music21.musicxml import m21ToXml
 
 #------------------------------------------------------------------------------
 # eof

@@ -652,11 +652,10 @@ class OutputFormat(object):
         if fp is None:
             fp = environLocal.getTempFile(suffix=self._ext)
         if not fp.endswith(self._ext):
-            raise
-        f = open(fp, 'w')
-        f.write(self.getString(includeClassLabel=includeClassLabel, 
-                               includeId=includeId))
-        f.close()
+            raise OutputFormatException("Could not get a temp file with the right extension")
+        with open(fp, 'w') as f:
+            f.write(self.getString(includeClassLabel=includeClassLabel, 
+                                   includeId=includeId))
         return fp
 
 
@@ -1159,11 +1158,10 @@ def allFeaturesAsList(streamInput):
     file to this data set.
     
     
-    >>> #_DOCS_SHOW s = corpus.parse('bwv66.6')
-    >>> s = converter.parse('tinynotation: 4/4 c4 d e2') #_DOCS_HIDE
+    >>> s = converter.parse('tinynotation: 4/4 c4 d e2')
     >>> f = features.allFeaturesAsList(s)
     >>> f[1][0:3]
-    [[1], [0.6899992497638124], [2]]
+    [[1], [0.689999...], [2]]
     >>> len(f[0]) > 65
     True
     >>> len(f[1]) > 20
@@ -1175,7 +1173,7 @@ def allFeaturesAsList(streamInput):
     ds.addFeatureExtractors(f)
     ds.addData(streamInput)
     ds.process()
-    jsymb = ds.getFeaturesAsList( includeClassLabel=False, includeId=False, concatenateLists=False)
+    jsymb = ds.getFeaturesAsList(includeClassLabel=False, includeId=False, concatenateLists=False)
     ds._featureExtractors = []
     ds._features = []
     n = [f for f in native.featureExtractors]
@@ -1300,19 +1298,19 @@ def getIndex(featureString, extractorType=None):
     '''
     from music21.features import jSymbolic, native
 
-    if extractorType == None or extractorType == 'jsymbolic':
-        indexcnt=0
+    if extractorType is None or extractorType == 'jsymbolic':
+        indexcnt = 0
         for feature in jSymbolic.featureExtractors:
     
             if feature().name  == featureString:
-                return indexcnt, 'jsymbolic'
-            indexcnt+=1
-    if extractorType == None or extractorType == 'native':
-        indexcnt=0  
+                return (indexcnt, 'jsymbolic')
+            indexcnt += 1
+    if extractorType is None or extractorType == 'native':
+        indexcnt = 0  
         for feature in native.featureExtractors:
             if feature().name == featureString:
-                return indexcnt, 'native'
-            indexcnt+=1
+                return (indexcnt, 'native')
+            indexcnt += 1
         
         return None
     

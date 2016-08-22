@@ -148,7 +148,9 @@ class SFApp():
         self.newSize = [self.x, self.y]
         for i in range(self.totalPagesScore):
             numberLength = len(str(self.totalPagesScore))
-            namePage = '%s%s.%s' % (str(self.scoreNameSong), str(i + 1).zfill(numberLength), self.format)
+            namePage = '%s%s.%s' % (str(self.scoreNameSong), 
+                                    str(i + 1).zfill(numberLength), 
+                                    self.format)
             self.listNamePages.append(namePage)
             pilPage = PILImage.open(namePage) # @UndefinedVariable
             if pilPage.mode != "RGB":
@@ -172,13 +174,17 @@ class SFApp():
 
         #Find top
         for i in range(0, len(data), numberPixels + int(resX / 10)):
-            if data[i][0] not in colorRange and data[i][1] not in colorRange and data[i][2] not in colorRange:
+            if (data[i][0] not in colorRange 
+                    and data[i][1] not in colorRange 
+                    and data[i][2] not in colorRange):
                 topCut = int(i / resX)
                 break  
         
         #Find bottom
-        for i in range(len(data) - 1, 0, -numberPixels - int(resX / 10)):
-            if data[i][0] not in colorRange and data[i][1] not in colorRange and data[i][2] not in colorRange:
+        for i in range(len(data) - 1, 0, -1 * numberPixels - int(resX / 10)):
+            if (data[i][0] not in colorRange 
+                    and data[i][1] not in colorRange 
+                    and data[i][2] not in colorRange):
                 bottomCut = int((len(data) - i) / resX)
                 break    
                   
@@ -187,9 +193,9 @@ class SFApp():
         for xPos in range(0, resX, numberPixels):  # check every 4th pixel
             for yPos in range(xPos, resY, int(resY / 15)): 
                 pixelPosition = yPos * resX + xPos
-                if data[pixelPosition][0] not in colorRange and \
-                   data[pixelPosition][1] not in colorRange and \
-                   data[pixelPosition][2] not in colorRange:
+                if (data[pixelPosition][0] not in colorRange
+                        and data[pixelPosition][1] not in colorRange
+                        and data[pixelPosition][2] not in colorRange):
                     leftCut = xPos                                     
                     stop = True
                     break   
@@ -203,9 +209,9 @@ class SFApp():
                 pixelPosition = yPos * resX + leftCut - numberPixels
                 if pixelPosition >= len(data):
                     bad = False
-                elif data[pixelPosition][0] not in colorRange or \
-                       data[pixelPosition][1] not in colorRange or \
-                       data[pixelPosition][2] not in colorRange:
+                elif (data[pixelPosition][0] not in colorRange
+                        or data[pixelPosition][1] not in colorRange
+                        or data[pixelPosition][2] not in colorRange):
                     bad = True
             if bad == False:
                 comprovation = True
@@ -285,7 +291,10 @@ class SFApp():
             if pageCounter <= self.totalPagesScore and imn >= self.pageMeasureNumbers[pageCounter]:
                 self.beginningPages.append(noteCounter)
                 pageCounter += 1
-            if middlePagesCounter < self.totalPagesScore and imn == math.floor((self.pageMeasureNumbers[middlePagesCounter + 1] + self.pageMeasureNumbers[middlePagesCounter]) / 2):
+            if middlePagesCounter < self.totalPagesScore and imn == math.floor(
+                            (self.pageMeasureNumbers[middlePagesCounter + 1] + 
+                                    self.pageMeasureNumbers[middlePagesCounter]) 
+                                                                    / 2):
                 self.middlePages.append(noteCounter)
                 middlePagesCounter += 1
             noteCounter += 1
@@ -307,11 +316,14 @@ class SFApp():
         self.sizeCanvasx = 2 * self.x + self.separation
         self.sizeCanvasy = self.y    
         
-        self.canvas1 = tkinter.Canvas(master, borderwidth=1, width=self.sizeCanvasx, height=self.sizeCanvasy, bg="black")
-        self.canvas1.create_image(self.positionxLeft, self.positionyLeft, image=self.phimage[0], tag='leftImage')
+        self.canvas1 = tkinter.Canvas(master, borderwidth=1, width=self.sizeCanvasx, 
+                                      height=self.sizeCanvasy, bg="black")
+        self.canvas1.create_image(self.positionxLeft, self.positionyLeft, 
+                                  image=self.phimage[0], tag='leftImage')
         
         if self.totalPagesScore >= 2:
-            self.canvas1.create_image(self.positionxRight, self.positionyRight, image=self.phimage[1], tag='rightImage')
+            self.canvas1.create_image(self.positionxRight, self.positionyRight, 
+                                      image=self.phimage[1], tag='rightImage')
         self.canvas1.grid(row=1, column=0, columnspan=3, rowspan=7)
 
         self.textVarTitle = tkinter.StringVar()
@@ -332,25 +344,38 @@ class SFApp():
         self.textVar3.set('That is a good song! :)')
         
         if self.firstTime == True:
-            self.button2 = tkinter.Button(master, text="START SF", width=self.sizeButton, command=self.startScoreFollower, bg='green')
+            self.button2 = tkinter.Button(master, 
+                                          text="START SF", 
+                                          width=self.sizeButton, 
+                                          command=self.startScoreFollower, 
+                                          bg='green')
             self.button2.grid(row=5, column=3)
             
-            self.button3 = tkinter.Button(master, text="1st page", width=self.sizeButton, command=self.goTo1stPage)
+            self.button3 = tkinter.Button(master, 
+                                          text="1st page", 
+                                          width=self.sizeButton, 
+                                          command=self.goTo1stPage)
             self.button3.grid(row=4, column=3)
             
-            self.button3 = tkinter.Button(master, text="Last page", width=self.sizeButton, command=self.goToLastPage)
+            self.button3 = tkinter.Button(master, text="Last page", 
+                                          width=self.sizeButton, command=self.goToLastPage)
             self.button3.grid(row=4, column=4)
             
-            self.button4 = tkinter.Button(master, text="Forward", width=self.sizeButton, command=self.pageForward)
+            self.button4 = tkinter.Button(master, text="Forward", 
+                                          width=self.sizeButton, command=self.pageForward)
             self.button4.grid(row=3, column=4)
             
-            self.button7 = tkinter.Button(master, text="Backward", width=self.sizeButton, command=self.pageBackward)
+            self.button7 = tkinter.Button(master, text="Backward", 
+                                          width=self.sizeButton, command=self.pageBackward)
             self.button7.grid(row=3, column=3)
             
-            self.button5 = tkinter.Button(master, text="MOVE", width=self.sizeButton, command=self.moving, bg='beige')
+            self.button5 = tkinter.Button(master, text="MOVE", 
+                                          width=self.sizeButton, command=self.moving, bg='beige')
             self.button5.grid(row=2, column=3)
             
-            self.button6 = tkinter.Button(master, text="STOP SF", width=self.sizeButton, command=self.stopScoreFollower, bg='red')
+            self.button6 = tkinter.Button(master, text="STOP SF", 
+                                          width=self.sizeButton, command=self.stopScoreFollower, 
+                                          bg='red')
             self.button6.grid(row=5, column=4)
                                 
             self.textVarComments = tkinter.StringVar()
@@ -366,19 +391,28 @@ class SFApp():
         if self.currentLeftPage + 1 < self.totalPagesScore:
             self.ntimes = 0
             self.newcoords = self.positionxRight, self.positionyLeft
-            self.canvas1.create_image(self.positionx3rd, self.positiony3rd, image=self.phimage[self.currentLeftPage + 1], tag='3rdImage')
+            self.canvas1.create_image(self.positionx3rd, self.positiony3rd, 
+                                      image=self.phimage[self.currentLeftPage + 1], tag='3rdImage')
 
             self.refreshTime = 40
             if self.ScF != None:                
-                if self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber < (self.pageMeasureNumbers[self.currentLeftPage + 1] + self.pageMeasureNumbers[self.currentLeftPage]) / 2.0:
+                if self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber < (
+                        self.pageMeasureNumbers[self.currentLeftPage + 1] 
+                            + self.pageMeasureNumbers[self.currentLeftPage]) / 2.0:
                     self.speed = self.speed = int(3.0 * (self.screenResolution[0] / 1024.0))
-                    environLocal.printDebug("moving when last measure was at the first 50%% of the right page")
-                elif self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber < 3 * (self.pageMeasureNumbers[self.currentLeftPage + 1] + self.pageMeasureNumbers[self.currentLeftPage]) / 4.0:
+                    environLocal.printDebug(
+                            "moving when last measure was at the first 50% of the right page")
+                elif self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber < 3 * (
+                                self.pageMeasureNumbers[self.currentLeftPage + 1] 
+                                    + self.pageMeasureNumbers[self.currentLeftPage]) / 4.0:
                     self.speed = self.speed = int(4.0 * (self.screenResolution[0] / 1024.0))
-                    environLocal.printDebug("moving when last measure was between the first 50%% and the 75%% of the right page")
+                    environLocal.printDebug(
+                            "moving when last measure was between the first 50% " + 
+                            "and the 75% of the right page")
                 else:
                     self.speed = self.speed = int(5.0 * (self.screenResolution[0] / 1024.0))
-                    environLocal.printDebug("moving when last measure was after the 75%% of the right page")
+                    environLocal.printDebug("moving when last measure was after " + 
+                                            "the 75% of the right page")
           
             else:
                 environLocal.printDebug("moving at default speed")
@@ -411,27 +445,35 @@ class SFApp():
         if self.currentLeftPage + 1 <= self.totalPagesScore:
             self.canvas1.delete('leftImage')
             self.canvas1.delete('rightImage')  
-            self.canvas1.create_image(self.positionxLeft, self.positionyLeft, image=self.phimage[self.currentLeftPage], tag='leftImage')
+            self.canvas1.create_image(self.positionxLeft, self.positionyLeft, 
+                                      image=self.phimage[self.currentLeftPage], tag='leftImage')
             self.textVar1.set('Left page: %d/%d' % (self.currentLeftPage + 1, self.totalPagesScore))
             
             if self.currentLeftPage + 1 < self.totalPagesScore:
-                self.canvas1.create_image(self.positionxRight, self.positionyRight, image=self.phimage[self.currentLeftPage + 1], tag='rightImage')
-                self.textVar2.set('Right page: %d/%d' % (self.currentLeftPage + 2, self.totalPagesScore))               
+                self.canvas1.create_image(self.positionxRight, self.positionyRight, 
+                                          image=self.phimage[self.currentLeftPage + 1], 
+                                          tag='rightImage')
+                self.textVar2.set('Right page: %d/%d' % (self.currentLeftPage + 2, 
+                                                         self.totalPagesScore))               
             else:
                 self.textVar2.set('Right page: --')   
                             
             self.canvas1.grid(row=1, column=0, columnspan=3, rowspan=7)        
             self.currentLeftPage += 1        
-        environLocal.printDebug("page Forward %d, %d" % (self.currentLeftPage, self.totalPagesScore))
+        environLocal.printDebug("page Forward %d, %d" % (self.currentLeftPage, 
+                                                         self.totalPagesScore))
         
     def pageBackward(self):           
         if self.currentLeftPage > 1:
             self.canvas1.delete('leftImage')
             self.canvas1.delete('rightImage')  
-            self.canvas1.create_image(self.positionxLeft, self.positionyLeft, image=self.phimage[self.currentLeftPage - 2], tag='leftImage')
+            self.canvas1.create_image(self.positionxLeft, self.positionyLeft, 
+                                      image=self.phimage[self.currentLeftPage - 2], tag='leftImage')
 
             self.textVar1.set('Left page: %d/%d' % (self.currentLeftPage - 1, self.totalPagesScore))            
-            self.canvas1.create_image(self.positionxRight, self.positionyRight, image=self.phimage[self.currentLeftPage - 1], tag='rightImage')
+            self.canvas1.create_image(self.positionxRight, self.positionyRight, 
+                                      image=self.phimage[self.currentLeftPage - 1], 
+                                      tag='rightImage')
             self.textVar2.set('Right page: %d/%d' % (self.currentLeftPage, self.totalPagesScore))               
 
             self.canvas1.grid(row=1, column=0, columnspan=3, rowspan=7)         
@@ -441,12 +483,14 @@ class SFApp():
     def goTo1stPage(self):
         self.currentLeftPage = 1
         self.canvas1.delete('leftImage')
-        self.canvas1.create_image(self.positionxLeft, self.positionyLeft, image=self.phimage[0], tag='leftImage')
+        self.canvas1.create_image(self.positionxLeft, self.positionyLeft, 
+                                  image=self.phimage[0], tag='leftImage')
         self.textVar1.set('Left page: %d/%d' % (1, self.totalPagesScore))
              
         if self.totalPagesScore > 1: #there is more than 1 page
             self.canvas1.delete('rightImage')             
-            self.canvas1.create_image(self.positionxRight, self.positionyRight, image=self.phimage[1], tag='rightImage')
+            self.canvas1.create_image(self.positionxRight, self.positionyRight, 
+                                      image=self.phimage[1], tag='rightImage')
             self.textVar2.set('Right page: %d/%d' % (2, self.totalPagesScore)) 
                           
         self.canvas1.grid(row=1, column=0, columnspan=3, rowspan=7)      
@@ -454,7 +498,8 @@ class SFApp():
     def goToLastPage(self):
         self.currentLeftPage = self.totalPagesScore
         self.canvas1.delete('leftImage')
-        self.canvas1.create_image(self.positionxLeft, self.positionyLeft, image=self.phimage[self.totalPagesScore - 1], tag='leftImage')
+        self.canvas1.create_image(self.positionxLeft, self.positionyLeft, 
+                                  image=self.phimage[self.totalPagesScore - 1], tag='leftImage')
         self.textVar1.set('Left page: %d/%d' % (self.totalPagesScore, self.totalPagesScore))
              
         if self.totalPagesScore > 1: #there is more than 1 page
@@ -467,7 +512,8 @@ class SFApp():
        
     def startScoreFollower(self):
         environLocal.printDebug("startScoreFollower starting")
-        self.button2 = tkinter.Button(self.master, text="START SF", width=self.sizeButton, command=self.startScoreFollower, state='disable', bg='green')
+        self.button2 = tkinter.Button(self.master, text="START SF", width=self.sizeButton, 
+                                      command=self.startScoreFollower, state='disable', bg='green')
         self.button2.grid(row=5, column=3)        
         scNotes = self.scorePart.flat.notesAndRests
         ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
@@ -504,21 +550,30 @@ class SFApp():
         if self.stop == False and (self.firstTimeSF == True or self.rt.resultInThread == False):
             environLocal.printDebug("firstTimeSF == True or resultInThread")
             
-            self.lastNoteString = 'Note: %d, Measure: %d, Countdown:%d, Page:%d' % (self.ScF.lastNotePosition, self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber , self.ScF.countdown, self.currentLeftPage) 
+            self.lastNoteString = 'Note: %d, Measure: %d, Countdown:%d, Page:%d' % (
+                                    self.ScF.lastNotePosition, 
+                                    self.ScF.scoreStream[self.ScF.lastNotePosition].measureNumber, 
+                                    self.ScF.countdown, 
+                                    self.currentLeftPage) 
             if self.firstTimeSF == False:
-                self.textVarComments.set("1st meas: %d, last meas: %d" % (self.ScF.scoreStream[self.ScF.firstNotePage].measureNumber, self.ScF.scoreStream[self.ScF.lastNotePage].measureNumber))
+                self.textVarComments.set("1st meas: %d, last meas: %d" % (
+                                    self.ScF.scoreStream[self.ScF.firstNotePage].measureNumber, 
+                                    self.ScF.scoreStream[self.ScF.lastNotePage].measureNumber))
             self.firstTimeSF = False
             # first and last note shown in the screeen
             self.ScF.firstNotePage = self.beginningPages[self.currentLeftPage - 1] - 1
             if self.currentLeftPage + 1 < self.totalPagesScore:
                 self.ScF.lastNotePage = self.middlePages[self.currentLeftPage + 1] - 1
-                environLocal.printDebug("3 or more pages remaining %d %d" % (self.firstTimeSF, self.ScF.lastNotePage))
+                environLocal.printDebug("3 or more pages remaining %d %d" % (self.firstTimeSF, 
+                                                                             self.ScF.lastNotePage))
             elif self.currentLeftPage < self.totalPagesScore:
                 self.ScF.lastNotePage = self.beginningPages[self.currentLeftPage + 1] - 1
-                environLocal.printDebug("2 pages on the screen %d %d" % (self.firstTimeSF, self.ScF.lastNotePage))
+                environLocal.printDebug("2 pages on the screen %d %d" % (self.firstTimeSF, 
+                                                                         self.ScF.lastNotePage))
             else:
                 self.ScF.lastNotePage = self.beginningPages[self.currentLeftPage] - 1
-                environLocal.printDebug("only one page on the screen %d %d" % (self.firstTimeSF, self.ScF.lastNotePage))
+                environLocal.printDebug("only one page on the screen %d %d" % (self.firstTimeSF, 
+                                                                    self.ScF.lastNotePage))
             
             self.rt = RecordThread(self.dummyQueue, self.sampleQueue, self.ScF)            
             self.rt.daemon = True
@@ -531,7 +586,8 @@ class SFApp():
             environLocal.printDebug("stopped...")
 
             self.button2.destroy() 
-            self.button2 = tkinter.Button(self.master, text="START SF", width=self.sizeButton, command=self.startScoreFollower, bg='green')
+            self.button2 = tkinter.Button(self.master, text="START SF", width=self.sizeButton, 
+                                          command=self.startScoreFollower, bg='green')
             self.button2.grid(row=5, column=3)
             self.textVarComments.set('END!! %s' % (self.rt.resultInThread))
 
@@ -540,13 +596,21 @@ class SFApp():
         self.rt.outQueue.get()  
         self.textVar3.set(self.lastNoteString)  
         self.ScF.firstSlot = self.beginningPages[self.currentLeftPage - 1]       
-        environLocal.printDebug("**** %d %d %d %d" % (self.ScF.lastNotePosition, self.beginningPages[self.currentLeftPage - 1], self.currentLeftPage, self.ScF.lastNotePosition < self.beginningPages[self.currentLeftPage - 1]))
+        environLocal.printDebug("**** %d %d %d %d" % (self.ScF.lastNotePosition, 
+                                                      self.beginningPages[self.currentLeftPage - 1], 
+                                                      self.currentLeftPage, 
+                                                      (self.ScF.lastNotePosition < 
+                                                        self.beginningPages[
+                                                                self.currentLeftPage - 1])))
         if self.currentLeftPage <= self.totalPagesScore:            
-            if self.ScF.lastNotePosition < self.beginningPages[self.currentLeftPage - 1] or self.ScF.lastNotePosition >= self.beginningPages[self.currentLeftPage + 1]: # case in which the musician plays a note of a not displayed page
+            if (self.ScF.lastNotePosition < self.beginningPages[self.currentLeftPage - 1] 
+                    or self.ScF.lastNotePosition >= self.beginningPages[self.currentLeftPage + 1]): 
+                # case in which the musician plays a note of a not displayed page
                 pageNumber = 0
                 final = False
                 while final == False:              
-                    if pageNumber < self.totalPagesScore and self.ScF.lastNotePosition >= self.beginningPages[pageNumber]: 
+                    if (pageNumber < self.totalPagesScore 
+                            and self.ScF.lastNotePosition >= self.beginningPages[pageNumber]): 
                         pageNumber += 1
                     else:
                         final = True
@@ -566,16 +630,20 @@ class SFApp():
     #                   print "has played a note not shown in the score (backward)"
 
             
-            elif self.ScF.lastNotePosition >= self.middlePages[self.currentLeftPage] and self.isMoving == False:  #50% case
+            elif (self.ScF.lastNotePosition >= self.middlePages[self.currentLeftPage] 
+                    and self.isMoving == False):  #50% case
                 self.isMoving = True
                 environLocal.printDebug('moving right page to left')
                 self.moving()
                 #self.isMoving = False
                 environLocal.printDebug("playing a note of the second half part of the right page")
                 
-            elif self.ScF.lastNotePosition >= self.beginningPages[self.currentLeftPage] and self.ScF.lastNotePosition < self.middlePages[self.currentLeftPage] + self.beginningPages[self.currentLeftPage]: 
+            elif (self.ScF.lastNotePosition >= self.beginningPages[self.currentLeftPage] 
+                    and self.ScF.lastNotePosition < (self.middlePages[self.currentLeftPage] 
+                                                     + self.beginningPages[self.currentLeftPage])): 
                 self.hits += 1
-                environLocal.printDebug("playing a note of the first half part of the right page: hits=%d" % self.hits)
+                environLocal.printDebug("playing a note of the first half part of the right " + 
+                                        "page: hits=%d" % self.hits)
                 if self.hits == 2:
                     self.hits = 0
                     if self.isMoving == False:
@@ -601,7 +669,9 @@ class SFApp():
 #        
 #class External():        
 #    
-#    def __init__(self,newcoords,positionxLeft,positionxRight,speed,positionyRight,canvas,currentLeftPage,totalPagesScore,newcoords3rd,positionx3rd,positiony3rd,refreshTime):
+#    def __init__(self, newcoords, positionxLeft, positionxRight, speed, positionyRight,
+#                    canvas,currentLeftPage,totalPagesScore,newcoords3rd,
+#                    positionx3rd,positiony3rd,refreshTime):
 #        self.ntimes = 0
 #        self.newcoords = newcoords
 #        self.positionxLeft = positionxLeft

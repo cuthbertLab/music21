@@ -7,7 +7,7 @@ Developer Reference
     documenting
     buildingDocumentation
     usingGit
-    installIPython
+    installJupyter
 
 
 

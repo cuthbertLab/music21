@@ -400,20 +400,22 @@ class TrecentoTinyConverter(tinyNotation.Converter):
 
 
 class TrecentoRestToken(tinyNotation.RestToken):
-    def parse(self, parent):
+    def parse(self, parent=None):
         from music21.alpha import medren
         r = medren.MensuralRest()  # to-do -- affect..
-        r.mensuralType = parent.stateDict['previousMensuralType']
+        if parent:
+            r.mensuralType = parent.stateDict['previousMensuralType']
 
 class TrecentoNoteToken(tinyNotation.NoteToken):
     '''
     For documentation please see :class:`music21.alpha.trecento.notation.TrecentoTinyConverter`.
     '''
-    def parse(self, parent):
+    def parse(self, parent=None):
         from music21.alpha import medren
         n = medren.MensuralNote()
         self.getPitch(n, self.token)
-        n.mensuralType = parent.stateDict['previousMensuralType']
+        if parent:
+            n.mensuralType = parent.stateDict['previousMensuralType']
         return n
 
 #-------------------------------------------------------------------
@@ -471,7 +473,7 @@ class Divisione(meter.TimeSignature):
                 self.standardSymbol = d[1]
                 self._minimaPerBrevis = _validDivisiones[d]
 
-        if self.standardSymbol == None:
+        if self.standardSymbol is None:
             self.timeString = None
         elif self.standardSymbol == '.q.':
             self.timeString = '2/4'
@@ -1009,30 +1011,31 @@ class BrevisLengthTranslator(object):
                 minimaLength = float(self.div.minimaPerBrevis)
             else:
                 objC = obj.classes
-                if 'GeneralMensuralNote' in objC:
-                    #Dep on div
-                    if obj.mensuralType == 'semibrevis':
-                        if 'MensuralRest' in obj.classes:
-                            if self.div.standardSymbol in ['.q.', '.i.']:
-                                minimaLength = self.div.minimaPerBrevis/float(2)
-                            elif self.div.standardSymbol in ['.p.', '.n.']:
-                                minimaLength = self.div.minimaPerBrevis/float(3)
-                            else: # we don't know it...
-                                pass
-                        else:
-                            if 'side' in obj.getStems(): # oblique-stemmed semibreve
-                                minimaLength = 3.0
-                            else: # WHO THe heck knows a semibreve's length!!! :-)
-                                pass
-                    elif obj.mensuralType == 'minima':
-                        if 'MensuralNote' in obj.classes and 'down' in obj.stems:
-                            raise TrecentoNotationException('Dragmas currently not supported')
-                        elif 'MensuralNote' in obj.classes and 'side' in obj.stems:
-                            minimaLength = 1.5
-                        else:
-                            minimaLength = 1.0
-                    elif obj.mensuralType == 'semiminima':
-                        pass
+                if 'GeneralMensuralNote' not in objC:
+                    continue
+                #Dep on div
+                if obj.mensuralType == 'semibrevis':
+                    if 'MensuralRest' in obj.classes:
+                        if self.div.standardSymbol in ['.q.', '.i.']:
+                            minimaLength = self.div.minimaPerBrevis/float(2)
+                        elif self.div.standardSymbol in ['.p.', '.n.']:
+                            minimaLength = self.div.minimaPerBrevis/float(3)
+                        else: # we don't know it...
+                            pass
+                    else:
+                        if 'side' in obj.getStems(): # oblique-stemmed semibreve
+                            minimaLength = 3.0
+                        else: # WHO THe heck knows a semibreve's length!!! :-)
+                            pass
+                elif obj.mensuralType == 'minima':
+                    if 'MensuralNote' in obj.classes and 'down' in obj.stems:
+                        raise TrecentoNotationException('Dragmas currently not supported')
+                    elif 'MensuralNote' in obj.classes and 'side' in obj.stems:
+                        minimaLength = 1.5
+                    else:
+                        minimaLength = 1.0
+                elif obj.mensuralType == 'semiminima':
+                    pass
             unchangeableNoteLengthsList.append(minimaLength)
         return unchangeableNoteLengthsList
 
@@ -1844,26 +1847,25 @@ class BrevisLengthTranslator(object):
                             knownLengthsList_changeable[ind] = dSLengthList[i]
                         #Don't need shrink_tup. There is no room to extend anything.
 
-                else: #No downstems
-                    if self.numberOfSemibreves > 0:
-                        if self.hasLastSB:
-                            maxVal = max(minRem_changeable, 2.0)
-                            knownLengthsList_changeable[semibrevis_list[-1]] = maxVal
-                            extend_num_1 = min(float(len(extend_list_1)), 
-                                               int(0.5 * minRem_changeable - 1.0))
-                            minRem_changeable -= knownLengthsList_changeable[semibrevis_list[-1]]
+                elif self.numberOfSemibreves > 0: # no downstems
+                    if self.hasLastSB:
+                        maxVal = max(minRem_changeable, 2.0)
+                        knownLengthsList_changeable[semibrevis_list[-1]] = maxVal
+                        extend_num_1 = min(float(len(extend_list_1)), 
+                                           int(0.5 * minRem_changeable - 1.0))
+                        minRem_changeable -= knownLengthsList_changeable[semibrevis_list[-1]]
 
+                        shrink_tup += -1,
+                        if extend_list_2:
                             shrink_tup += -1,
-                            if extend_list_2:
-                                shrink_tup += -1,
 
-                        else:
-                            knownLengthsList[semibrevis_list[-1]] = 2.0
-                            extend_list_1.append(semibrevis_list[-1])
-                            extend_list_1 = _removeRepeatedElements(extend_list_1)
-                            extend_num_1 = float(len(extend_list_1))
-                            extend_num_2 = float(len(extend_list_2))
-                            minRem_changeable -= 2.0
+                    else:
+                        knownLengthsList[semibrevis_list[-1]] = 2.0
+                        extend_list_1.append(semibrevis_list[-1])
+                        extend_list_1 = _removeRepeatedElements(extend_list_1)
+                        extend_num_1 = float(len(extend_list_1))
+                        extend_num_2 = float(len(extend_list_2))
+                        minRem_changeable -= 2.0
 
                 change_tup += extend_list_1, extend_list_2
                 num_tup += extend_num_1, extend_num_2

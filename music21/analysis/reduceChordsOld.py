@@ -48,9 +48,16 @@ class ChordReducer(object):
         self.maxChords = 3
         self.positionInMeasure = None
         self.numberOfElementsInMeasure = None
+        
+        # for working...
+        self._lastPitchedObject = None
+        self._lastTs = None
 
-    def reduceMeasureToNChords(self, measureObj, numChords = 1, 
-                               weightAlgorithm=None, trimBelow=0.25):
+    def reduceMeasureToNChords(self, 
+                               measureObj, 
+                               numChords=1, 
+                               weightAlgorithm=None, 
+                               trimBelow=0.25):
         '''
         
         >>> s = analysis.reduceChords.testMeasureStream1()     
@@ -226,11 +233,10 @@ class ChordReducer(object):
         '''
         i = 0
         p = stream.Part()
-        lastPitchedObject = None
-        gobcM = inStream.parts[0].getElementsByClass('Measure')
-        lenMeasures = len(gobcM)
-        lastTs = None
-        while i <= lenMeasures:
+        self._lastPitchedObject = None
+        lenMeasures = len(inStream.parts[0].getElementsByClass('Measure'))
+        self._lastTs = None
+        for i in range(lenMeasures):
             mI = inStream.measure(i, ignoreNumbers=True)
             if len(mI.flat.notesAndRests) == 0:
                 if i == 0:
@@ -238,76 +244,79 @@ class ChordReducer(object):
                 else:
                     break
             else:
-                m = stream.Measure()
-                m.number = i
-
-                mIchord = mI.chordify()
-                newPart = self.reduceMeasureToNChords(mIchord, maxChords, 
-                                                      weightAlgorithm=self.qlbsmpConsonance, 
-                                                      trimBelow=0.3)
-                #newPart.show('text')
-                cLast = None
-                cLastEnd = 0.0
-                for cEl in newPart:
-                    cElCopy = copy.deepcopy(cEl)
-                    if 'Chord' in cEl.classes:
-                        if closedPosition is not False:
-                            if forceOctave is not False:
-                                cElCopy.closedPosition(forceOctave=forceOctave, inPlace=True)
-                            else:
-                                cElCopy.closedPosition(inPlace=True)
-                            cElCopy.removeRedundantPitches(inPlace=True)
-                    newOffset = cEl.getOffsetBySite(newPart)
-                    
-                    # extend over gaps
-                    if cLast is not None:
-                        if round(newOffset - cLastEnd, 6) != 0.0:
-                            cLast.quarterLength += newOffset - cLastEnd
-                    cLast = cElCopy
-                    cLastEnd = newOffset + cElCopy.quarterLength
-                    m._insertCore(newOffset, cElCopy)
-                
-                tsContext = mI.parts[0].getContextByClass('TimeSignature')
-                if tsContext is not None:
-                    if round(tsContext.barDuration.quarterLength - cLastEnd, 6) != 0.0:
-                        cLast.quarterLength += tsContext.barDuration.quarterLength - cLastEnd
-                
-                
-                m.elementsChanged()
-
-                # add ties
-                if lastPitchedObject is not None:
-                    firstPitched = m[0]
-                    if lastPitchedObject.isNote and firstPitched.isNote:
-                        if lastPitchedObject.pitch == firstPitched.pitch:
-                            lastPitchedObject.tie = tie.Tie("start")
-                    elif lastPitchedObject.isChord and firstPitched.isChord:
-                        if len(lastPitchedObject) == len(firstPitched):
-                            allSame = True
-                            for pitchI in range(len(lastPitchedObject)):
-                                if (lastPitchedObject.pitches[pitchI] != 
-                                        firstPitched.pitches[pitchI]):
-                                    allSame = False
-                            if allSame is True:
-                                lastPitchedObject.tie = tie.Tie('start')
-                lastPitchedObject = m[-1]
-
-                sourceMeasureTs = mI.parts[0].getElementsByClass('Measure')[0].timeSignature
-                if sourceMeasureTs != lastTs:
-                    m.timeSignature = copy.deepcopy(sourceMeasureTs)
-                    lastTs = sourceMeasureTs
-
+                m = self.reduceThisMeasure(mI, i, maxChords, closedPosition, forceOctave)
                 p._appendCore(m)
-            if self.printDebug == True:
+                
+            if self.printDebug:
                 print(i, " ", end="")
                 if i % 20 == 0 and i != 0:
                     print("")
-            i += 1
         p.elementsChanged()
         p.getElementsByClass('Measure')[0].insert(0, p.bestClef(allowTreble8vb=True))
         p.makeNotation(inPlace=True)
         return p
 
+
+    def reduceThisMeasure(self, mI, measureIndex, maxChords, closedPosition, forceOctave):
+        m = stream.Measure()
+        m.number = measureIndex
+
+        mIchord = mI.chordify()
+        newPart = self.reduceMeasureToNChords(mIchord, maxChords, 
+                                              weightAlgorithm=self.qlbsmpConsonance, 
+                                              trimBelow=0.3)
+        #newPart.show('text')
+        cLast = None
+        cLastEnd = 0.0
+        for cEl in newPart:
+            cElCopy = copy.deepcopy(cEl)
+            if 'Chord' in cEl.classes and closedPosition is not False:
+                if forceOctave is not False:
+                    cElCopy.closedPosition(forceOctave=forceOctave, inPlace=True)
+                else:
+                    cElCopy.closedPosition(inPlace=True)
+                cElCopy.removeRedundantPitches(inPlace=True)
+            newOffset = cEl.getOffsetBySite(newPart)
+            
+            # extend over gaps
+            if cLast is not None:
+                if round(newOffset - cLastEnd, 6) != 0.0:
+                    cLast.quarterLength += newOffset - cLastEnd
+            cLast = cElCopy
+            cLastEnd = newOffset + cElCopy.quarterLength
+            m._insertCore(newOffset, cElCopy)
+        
+        tsContext = mI.parts[0].getContextByClass('TimeSignature')
+        if tsContext is not None:
+            if round(tsContext.barDuration.quarterLength - cLastEnd, 6) != 0.0:
+                cLast.quarterLength += tsContext.barDuration.quarterLength - cLastEnd
+        
+        
+        m.elementsChanged()
+
+        # add ties
+        if self._lastPitchedObject is not None:
+            firstPitched = m[0]
+            if self._lastPitchedObject.isNote and firstPitched.isNote:
+                if self._lastPitchedObject.pitch == firstPitched.pitch:
+                    self._lastPitchedObject.tie = tie.Tie("start")
+            elif self._lastPitchedObject.isChord and firstPitched.isChord:
+                if len(self._lastPitchedObject) == len(firstPitched):
+                    allSame = True
+                    for pitchI in range(len(self._lastPitchedObject)):
+                        if (self._lastPitchedObject.pitches[pitchI] != 
+                                firstPitched.pitches[pitchI]):
+                            allSame = False
+                    if allSame is True:
+                        self._lastPitchedObject.tie = tie.Tie('start')
+        self._lastPitchedObject = m[-1]
+
+        sourceMeasureTs = mI.parts[0].getElementsByClass('Measure')[0].timeSignature
+        if sourceMeasureTs != self._lastTs:
+            m.timeSignature = copy.deepcopy(sourceMeasureTs)
+            self._lastTs = sourceMeasureTs
+
+        return m
 #-------------------------------------------------------------------------------    
 class Test(unittest.TestCase):
 

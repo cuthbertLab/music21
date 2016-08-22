@@ -124,7 +124,7 @@ def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
 
     If `packageOnly` is true, only directories with __init__.py files are collected.
     '''
-    if fpMusic21 == None:
+    if fpMusic21 is None:
         fpMusic21 = getSourceFilePath()
 
     #fpCorpus = os.path.join(fpMusic21, 'corpus')

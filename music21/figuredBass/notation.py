@@ -153,7 +153,7 @@ class Notation(object):
     
     def __init__(self, notationColumn = None):
         #Parse notation string
-        if notationColumn == None:
+        if notationColumn is None:
             notationColumn = ""
         self.notationColumn = notationColumn
         self.figureStrings = None
@@ -263,7 +263,7 @@ class Notation(object):
             oldNumbers = list(oldNumbers)
             temp = []
             for number in oldNumbers:
-                if number == None:
+                if number is None:
                     temp.append(3)
                 else:
                     temp.append(number)
@@ -282,7 +282,7 @@ class Notation(object):
             newNumbers = list(newNumbers)
             temp = []
             for number in newNumbers:
-                if number == None:
+                if number is None:
                     temp.append(3)
                 else:
                     temp.append(number)
@@ -433,10 +433,10 @@ class Modifier(object):
     
     
     >>> m2a = notation.Modifier(None)
-    >>> m2a.accidental == None
+    >>> m2a.accidental is None
     True
     >>> m2b = notation.Modifier("")
-    >>> m2b.accidental == None
+    >>> m2b.accidental is None
     True
     '''
     _DOC_ATTR = {'modifierString': 'A modifier string associated with an ' + 
@@ -471,7 +471,7 @@ class Modifier(object):
         >>> m5.accidental
         <accidental flat>
         '''
-        if self.modifierString == None or len(self.modifierString) == 0:
+        if self.modifierString is None or len(self.modifierString) == 0:
             return None
         
         a = pitch.Accidental()
@@ -537,12 +537,12 @@ class Modifier(object):
         '''
         if not inPlace:
             pitchToAlter = copy.deepcopy(pitchToAlter)
-        if self.accidental == None:
+        if self.accidental is None:
             return pitchToAlter
         if self.accidental.alter == 0.0:
             pitchToAlter.accidental = self.accidental
         else:
-            if pitchToAlter.accidental == None:
+            if pitchToAlter.accidental is None:
                 pitchToAlter.accidental = self.accidental
             else:
                 newAccidental = pitch.Accidental()

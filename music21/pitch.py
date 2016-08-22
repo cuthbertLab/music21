@@ -16,6 +16,8 @@ Each :class:`~music21.note.Note` object has a `Pitch` object embedded in it.
 Some of the methods below, such as `Pitch.name`, `Pitch.step`, etc. are
 made available directly in the `Note` object, so they will seem familiar.
 '''
+from __future__ import division, print_function
+
 import copy, math, itertools
 import unittest
 
@@ -47,9 +49,9 @@ STEPREF = {
            'A' : 9,
            'B' : 11,
                }
-STEPNAMES = ['C','D','E','F','G','A','B']
+STEPNAMES = set(['C', 'D', 'E', 'F', 'G', 'A', 'B'])
 
-TWELFTH_ROOT_OF_TWO = 2.0 ** (1.0/12)
+TWELFTH_ROOT_OF_TWO = 2.0 ** (1/12)
 
 # how many significant digits to keep in pitch space resolution
 # where 1 is a half step. this means that 4 significant digits of cents will be kept
@@ -85,10 +87,6 @@ def _sortModifiers():
                 ams.append(sym)
         return ams
 accidentalModifiersSorted = _sortModifiers()
-
-
-
-
 
 
 #-------------------------------------------------------------------------------
@@ -376,8 +374,8 @@ def _convertHarmonicToCents(value):
     583
     '''
     if value < 0: #subharmonics
-        value = 1.0/(abs(value))
-    return int(round(1200*math.log(value, 2), 0))
+        value = 1 / (abs(value))
+    return int(round(1200 * math.log(value, 2), 0))
 
 #------------------------------------------------------------------------------
 
@@ -1298,14 +1296,14 @@ class Pitch(object):
     <music21.pitch.Pitch E->
 
     Since `pitch.Pitch(3)` could be either a D# or an E-flat,
-    this `Pitch` object has an attribute, `.implicitAccidental` that
+    this `Pitch` object has an attribute, `.spellingIsInferred` that
     is set to `True`.  That means that when it is transposed or
     displayed, other programs should feel free to substitute an
     enharmonically equivalent pitch in its place:
 
-    >>> p2.implicitAccidental
+    >>> p2.spellingIsInferred
     True
-    >>> p1.implicitAccidental
+    >>> p1.spellingIsInferred
     False
 
     Instead of using a single string or integer for creating the object, a succession
@@ -1429,7 +1427,7 @@ class Pitch(object):
 
         # if True, accidental is not known; is determined algorithmically
         # likely due to pitch data from midi or pitch space/class numbers
-        self.implicitAccidental = False
+        self.spellingIsInferred = False
         # the fundamental attribute stores an optional pitch
         # that defines the fundamental used to create this Pitch
         self.fundamental = None
@@ -1531,7 +1529,7 @@ class Pitch(object):
             for k in self.__dict__:
                 v = getattr(self, k, None)
                 if k in ('_step', '_overridden_freq440', 'defaultOctave', 
-                         '_octave', 'implicitAccidental'):
+                         '_octave', 'spellingIsInferred'):
                     setattr(new, k, v)
                 else:                   
                     setattr(new, k, copy.deepcopy(v, memo))
@@ -1543,7 +1541,7 @@ class Pitch(object):
         hashValues = (
             self.accidental,
             self.fundamental,
-            self.implicitAccidental,
+            self.spellingIsInferred,
             self.microtone,
             self.octave,
             self.step,
@@ -2026,7 +2024,7 @@ class Pitch(object):
         >>> p.ps = 61
         >>> p.ps
         61.0
-        >>> p.implicitAccidental
+        >>> p.spellingIsInferred
         True
         >>> p.ps = 61.5 # get a quarter tone
         >>> p
@@ -2049,7 +2047,7 @@ class Pitch(object):
 
         # all ps settings must set implicit to True, as we do not know
         # what accidental this is
-        self.implicitAccidental = True
+        self.spellingIsInferred = True
 
 
     ps = property(_getPs, _setPs,
@@ -2082,7 +2080,7 @@ class Pitch(object):
 
 
         Notice that ps 61 represents both
-        C# and D-flat.  Thus "implicitAccidental"
+        C# and D-flat.  Thus "spellingIsInferred"
         will be true after setting our pitch to 61:
 
         >>> a.ps = 61
@@ -2090,7 +2088,7 @@ class Pitch(object):
         <music21.pitch.Pitch C#4>
         >>> a.ps
         61.0
-        >>> a.implicitAccidental
+        >>> a.spellingIsInferred
         True
 
         Microtonal accidentals and pure Microtones are allowed, as are extreme ranges:
@@ -2166,7 +2164,7 @@ class Pitch(object):
 
         # all midi settings must set implicit to True, as we do not know
         # what accidental this is
-        self.implicitAccidental = True
+        self.spellingIsInferred = True
 
 
     midi = property(_getMidi, _setMidi,
@@ -2227,7 +2225,7 @@ class Pitch(object):
         2
         >>> a.ps
         2.0
-        >>> a.implicitAccidental
+        >>> a.spellingIsInferred
         True
         
 
@@ -2253,6 +2251,10 @@ class Pitch(object):
         >>> a = pitch.Pitch('G#')
         >>> a.name
         'G#'
+        
+        >>> a = pitch.Pitch('B--')
+        >>> a.name
+        'B--'
         '''
         if self.accidental is not None:
             return self.step + self.accidental.modifier
@@ -2290,7 +2292,7 @@ class Pitch(object):
             self.octave = octave
 
         # when setting by name, we assume that the accidental intended
-        self.implicitAccidental = False
+        self.spellingIsInferred = False
 
     name = property(_getName, _setName, doc='''
         Gets or sets the name (pitch name with accidental but
@@ -2306,12 +2308,12 @@ class Pitch(object):
 
         OMIT_FROM_DOCS
 
-        move to implicitAccidental section...
+        move to spellingIsInferred section...
 
-        >>> p.implicitAccidental
+        >>> p.spellingIsInferred
         False
         >>> p.ps = 61
-        >>> p.implicitAccidental
+        >>> p.spellingIsInferred
         True
         >>> p.name
         'C#'
@@ -2320,7 +2322,7 @@ class Pitch(object):
         'B-'
 
         >>> p.name = 'C#'
-        >>> p.implicitAccidental
+        >>> p.spellingIsInferred
         False
     ''')
 
@@ -2358,7 +2360,7 @@ class Pitch(object):
         >>> a.nameWithOctave = 'C#9'
         >>> a.nameWithOctave = 'C#'
         Traceback (most recent call last):
-        PitchException: Cannot set a nameWithOctave with 'C#'
+        music21.pitch.PitchException: Cannot set a nameWithOctave with 'C#'
         '''
         try:
             lenVal = len(value)
@@ -2389,7 +2391,7 @@ class Pitch(object):
         'C#'
         >>> dFlatFive.octave
         6
-
+        
 
         N.B. -- it's generally better to set the name and octave separately, especially
         since you may at some point encounter very low pitches such as "A octave -1", which
@@ -2410,17 +2412,15 @@ class Pitch(object):
 
     @property
     def unicodeNameWithOctave(self):
-        '''
+        u'''
         Return the pitch name with octave with unicode accidental symbols,
         if available.
 
         Read-only property.
 
         >>> p = pitch.Pitch("C#4")
-        
-        This only displays properly in Py3
-        
-        `p.unicodeNameWithOctave` -> 'C♯4'
+        >>> print(p.unicodeNameWithOctave)
+        C♯4
         '''
         if self.octave is None:
             return self.unicodeName
@@ -2511,7 +2511,7 @@ class Pitch(object):
         >>> b = pitch.Pitch('E4')
         >>> b.step = "B-"
         Traceback (most recent call last):
-        PitchException: Cannot make a step out of 'B-'
+        music21.pitch.PitchException: Cannot make a step out of 'B-'
 
         This is okay though:
 
@@ -2539,7 +2539,7 @@ class Pitch(object):
         >>> a.pitchClass = 3
         >>> a
         <music21.pitch.Pitch E-3>
-        >>> a.implicitAccidental
+        >>> a.spellingIsInferred
         True
         >>> a.pitchClass = 'A'
         >>> a
@@ -2551,7 +2551,7 @@ class Pitch(object):
         (self._step, self._accidental, self._microtone, unused_octShift) = _convertPsToStep(value)
 
         # do not know what accidental is
-        self.implicitAccidental = True
+        self.spellingIsInferred = True
 
     pitchClass = property(_getPitchClass, _setPitchClass,
         doc='''
@@ -2724,7 +2724,7 @@ class Pitch(object):
     @property
     def german(self):
         u'''
-        Read-only property. Returns the name
+        Read-only property. Returns a unicode string of the name
         of a Pitch in the German system
         (where B-flat = B, B = H, etc.)
         (Microtones and Quartertones raise an error).  Note that
@@ -2745,7 +2745,7 @@ class Pitch(object):
         >>> p1.accidental = pitch.Accidental('half-sharp')
         >>> p1.german
         Traceback (most recent call last):
-        PitchException: Es geht nicht "german" zu benutzen mit Microt...nen.  Schade!
+        music21.pitch.PitchException: Es geht nicht "german" zu benutzen mit Microt...nen.  Schade!
 
         Note these rarely used pitches:
 
@@ -2760,6 +2760,7 @@ class Pitch(object):
             tempAlter = 0
         tempStep = self.step
         if six.PY2:
+            # pylint: disable=undefined-variable
             tempStep = unicode(tempStep) # @UndefinedVariable
 
         if tempAlter != int(tempAlter):
@@ -2808,7 +2809,7 @@ class Pitch(object):
         >>> p1.accidental = pitch.Accidental('half-sharp')
         >>> p1.italian
         Traceback (most recent call last):
-        PitchException: Non si puo usare `italian` con microtoni
+        music21.pitch.PitchException: Non si puo usare `italian` con microtoni
 
         Note these rarely used pitches:
 
@@ -2894,7 +2895,7 @@ class Pitch(object):
         >>> p1.accidental = pitch.Accidental('half-sharp')
         >>> p1.spanish
         Traceback (most recent call last):
-        PitchException: Unsupported accidental type.
+        music21.pitch.PitchException: Unsupported accidental type.
 
         Note these rarely used pitches:
 
@@ -2943,7 +2944,8 @@ class Pitch(object):
         >>> p1.accidental = pitch.Accidental('half-sharp')
         >>> p1.french
         Traceback (most recent call last):
-        PitchException: On ne peut pas utiliser les microtones avec "french." Quelle Dommage!        
+        music21.pitch.PitchException: On ne peut pas utiliser les microtones avec "french." 
+            Quelle Dommage!        
         '''
         if self.accidental is not None:
             tempAlter = self.accidental.alter
@@ -2952,6 +2954,7 @@ class Pitch(object):
         tempStep = self.step
 
         if six.PY2:
+            # pylint: disable=undefined-variable
             tempStep = unicode(tempStep) # @UndefinedVariable
         
         if tempAlter != int(tempAlter):
@@ -3611,7 +3614,7 @@ class Pitch(object):
         algorithm that might take your piece far into the realm of
         double or triple flats or sharps.
 
-        If mostCommon is set to true, then the most commonly used
+        If mostCommon is set to True, then the most commonly used
         enharmonic spelling is chosen (that is, the one that appears
         first in key signatures as you move away from C on the circle
         of fifths).  Thus G-flat becomes F#, A# becomes B-flat,
@@ -3979,10 +3982,24 @@ class Pitch(object):
         <music21.pitch.Pitch C-5>
 
 
+        An interval object can also be a certain number of semitones,
+        in which case, the spelling of the resulting note (sharp or flat, etc.)
+        is up to the system to choose.
+
         >>> aInterval = interval.Interval(-6)
         >>> bPitch = aPitch.transpose(aInterval)
         >>> bPitch
         <music21.pitch.Pitch C#4>
+
+
+        Transpose fFlat down 5 semitones -- sort of like a Perfect 4th, but 
+        should be respelled:
+        
+        >>> fFlat = pitch.Pitch('F-4')
+        >>> newPitch = fFlat.transpose(-5)
+        >>> newPitch
+        <music21.pitch.Pitch B3>
+
 
         >>> aPitch
         <music21.pitch.Pitch G4>
@@ -3990,6 +4007,30 @@ class Pitch(object):
         >>> aPitch.transpose(aInterval, inPlace=True)
         >>> aPitch
         <music21.pitch.Pitch C#4>
+
+
+        Implicit octaves remain implicit:
+
+        >>> anyGsharp = pitch.Pitch("G#")
+        >>> print(anyGsharp.transpose("P8"))
+        G#
+        >>> print(anyGsharp.transpose("P5"))
+        D#
+
+
+        If the accidental of a pitch is chosen by music21, not
+        given by the user, then after transposing, music21 will
+        simplify the spelling again:
+        
+        >>> pc6 = pitch.Pitch(6)
+        >>> pc6
+        <music21.pitch.Pitch F#>
+        >>> pc6.spellingIsInferred
+        True
+        >>> pc6.transpose('-m2')
+        <music21.pitch.Pitch F>
+        
+
 
         OMIT_FROM_DOCS
 
@@ -4000,17 +4041,9 @@ class Pitch(object):
         >>> lowC
         <music21.pitch.Pitch C#-1>
 
-        Implicit octaves should remain implicit:
-
-        >>> anyGsharp = pitch.Pitch("G#")
-        >>> print(anyGsharp.transpose("P8"))
-        G#
-
-        >>> print(anyGsharp.transpose("P5"))
-        D#
 
         >>> otherPitch = pitch.Pitch('D2')
-        >>> otherPitch.transpose('m-23', inPlace = True)
+        >>> otherPitch.transpose('m-23', inPlace=True)
         >>> print(otherPitch)
         C#-1
 
@@ -4024,9 +4057,9 @@ class Pitch(object):
 
 
         p = intervalObj.transposePitch(self)
-        # TODO: if p.implicitAccidental, then change enharmonics. 
-        #     (should implicitAccidental be inferredSpelling or soemthing?)
-        p.implicitAccidental = self.implicitAccidental
+        p.spellingIsInferred = self.spellingIsInferred
+        if p.spellingIsInferred is True:
+            p.simplifyEnharmonic(inPlace=True, mostCommon=True)
         
         if not inPlace:
             return p
@@ -4046,30 +4079,29 @@ class Pitch(object):
     #---------------------------------------------------------------------------
     # utilities for pitch object manipulation
 
-    def transposeBelowTarget(self, target, minimize=False, inPlace=True):
+    def transposeBelowTarget(self, target, minimize=False, inPlace=False):
         '''
-        Given a source Pitch, shift it down octaves until it is below the
-        target. Note: this manipulates src inPlace.
+        Given a source Pitch, shift it down some number of octaves until it is below the
+        target. 
 
         If `minimize` is True, a pitch below the target will move up to the
         nearest octave.
 
+        >>> higherG = pitch.Pitch('g5')
+        >>> lowerG = higherG.transposeBelowTarget(pitch.Pitch('c#4'))
+        >>> lowerG
+        <music21.pitch.Pitch G3>
+        >>> higherG
+        <music21.pitch.Pitch G5>
+
+
+        Prior to Music21 3.0 (August 1, 2016), the default for inPlace was True, now it is False.
+        To change the pitch itself, set inPlace to True
+
         >>> p = pitch.Pitch('g5')
         >>> p.transposeBelowTarget(pitch.Pitch('c#4'), inPlace=True)
-        <music21.pitch.Pitch G3>
         >>> p
         <music21.pitch.Pitch G3>
-
-
-        Music21 2.0 transition period: inPlace is allowed now. Right now
-        the default is True, but it will become False later.
-
-        >>> p = pitch.Pitch('g5')
-        >>> c = p.transposeBelowTarget(pitch.Pitch('c#4'), inPlace=False)
-        >>> c
-        <music21.pitch.Pitch G3>
-        >>> p
-        <music21.pitch.Pitch G5>
         
 
         If already below the target, make no change:
@@ -4077,7 +4109,7 @@ class Pitch(object):
         >>> pitch.Pitch('g#3').transposeBelowTarget(pitch.Pitch('c#6'))
         <music21.pitch.Pitch G#3>
 
-        Accept the same pitch:
+        Below target includes being the same as the target
 
         >>> pitch.Pitch('g#8').transposeBelowTarget(pitch.Pitch('g#1'))
         <music21.pitch.Pitch G#1>
@@ -4088,17 +4120,18 @@ class Pitch(object):
         >>> pitch.Pitch('g#2').transposeBelowTarget(pitch.Pitch('f#8'))
         <music21.pitch.Pitch G#2>
 
-        But with minimize=True, it makes a difference...
+        But with minimize=True, it will actually RAISE the pitch so it is the closest
+        pitch to the target
 
-        >>> pitch.Pitch('g#2').transposeBelowTarget(pitch.Pitch('f#8'), minimize=True)
+        >>> target = pitch.Pitch('f#8')
+        >>> pitch.Pitch('g#2').transposeBelowTarget(target, minimize=True)
         <music21.pitch.Pitch G#7>
 
-        >>> pitch.Pitch('f#2').transposeBelowTarget(pitch.Pitch('f#8'), minimize=True)
+        >>> pitch.Pitch('f#2').transposeBelowTarget(target, minimize=True)
         <music21.pitch.Pitch F#8>
 
         :rtype: music21.pitch.Pitch
         '''
-        # TODO: switch inPlace: default is True now, will become False.
         if inPlace:
             src = self
         else:
@@ -4117,18 +4150,30 @@ class Pitch(object):
                     break
                 else:
                     src.octave += 1
-        return src
+                    
+        if not inPlace:
+            return src
 
-    def transposeAboveTarget(self, target, minimize=False, inPlace=True):
+    def transposeAboveTarget(self, target, minimize=False, inPlace=False):
         '''
         Given a source Pitch, shift it up octaves until it is above the target.
-        Note: this manipulates src inPlace.
 
         If `minimize` is True, a pitch above the target will move down to the
         nearest octave.
 
         >>> pitch.Pitch('d2').transposeAboveTarget(pitch.Pitch('e4'))
         <music21.pitch.Pitch D5>
+
+
+        Prior to Music21 3.0 (August 1, 2016), the default for inPlace was True, now it is False.
+        To change the pitch itself, set inPlace to True
+
+
+        >>> p = pitch.Pitch('d2')
+        >>> p.transposeAboveTarget(pitch.Pitch('e4'), inPlace=True)
+        >>> p
+        <music21.pitch.Pitch D5>
+
 
         If already above the target, make no change:
 
@@ -4153,7 +4198,6 @@ class Pitch(object):
 
         :rtype: music21.pitch.Pitch
         '''
-        # TODO: switch inPlace: default is True now, will become False.
         if inPlace:
             src = self
         else:
@@ -4173,7 +4217,9 @@ class Pitch(object):
                     break
                 else:
                     src.octave -= 1
-        return src
+        
+        if not inPlace:
+            return src
 
     #---------------------------------------------------------------------------
 

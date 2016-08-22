@@ -8,7 +8,6 @@
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      BSD or LGPL, see license.txt
 #-------------------------------------------------------------------------------
-
 '''
 The project was to see how well (or not) Monteverdi's 5-voice madrigals in Books
 3, 4, and 5 follow the principles of common-practice, tonal harmony.  Organized
@@ -17,6 +16,7 @@ by Dmitri T.
 The workshop gave the excuse to add the romanText format, which DT and others
 have encoded lots of analyses in.  Some demos of the format are below
 '''
+from __future__ import division, print_function
 
 from music21 import corpus, clef, interval, pitch, voiceLeading, roman
 
@@ -107,7 +107,7 @@ def iqChordsAndPercentage(analysisStream):
             fig = fig.replace('[no3]','')
             fig = fig.replace('[no1]','')
             longString = fig + " (" + str(int(
-                            element.duration.quarterLength*10000.0/totalDuration)/100.0) + ") "
+                            element.duration.quarterLength * 10000 / totalDuration) / 100) + ") "
             if active == 'major':
                 major += longString
             else:
@@ -132,7 +132,8 @@ def iqSemitonesAndPercentage(analysisStream):
             distanceToTonicInSemis = int((element.root().ps - 
                                           pitch.Pitch(element.scale.tonic).ps) % 12)
             longString = str(distanceToTonicInSemis) + " (" + str(int(
-                                element.duration.quarterLength*10000.0/totalDuration)/100.0) + ") "
+                                element.duration.quarterLength * 10000 / totalDuration) 
+                                                                  / 100) + ") "
             if active == 'major':
                 major += longString
             else:
@@ -171,7 +172,8 @@ def iqRootsAndPercentage(analysisStream):
                 else:
                     pass
             longString = elementLetter + " (" + str(int(
-                                element.duration.quarterLength*10000.0/totalDuration)/100.0) + ") "
+                                element.duration.quarterLength * 10000 / totalDuration)
+                                                    / 100) + ") "
             if active == 'major':
                 major += longString
             else:

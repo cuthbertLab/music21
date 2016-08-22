@@ -73,8 +73,7 @@ def mergeVariants(streamX, streamY, variantName='variant', inPlace=False):
     >>> streamZ = converter.parse("tinynotation: 4/4 a4 b c d e f g a", makeNotation=False)
     >>> variant.mergeVariants(streamX, streamZ, variantName='docvariant', inPlace=False)
     Traceback (most recent call last):
-    ...
-    VariantException: Could not determine what merging method to use. 
+    music21.variant.VariantException: Could not determine what merging method to use. 
             Try using a more specific merging function.
     
     
@@ -85,13 +84,13 @@ def mergeVariants(streamX, streamY, variantName='variant', inPlace=False):
     >>> aScore = stream.Score()
     >>> vScore = stream.Score()
 
-    >>> #                                                             *
-    >>> ap1 = stream.Part(converter.parse("tinynotation: 4/4   a4 b c d    e2 f   g2 f4 g ").makeMeasures())
-    >>> vp1 = stream.Part(converter.parse("tinynotation: 4/4   a4 b c e    e2 f   g2 f4 a ").makeMeasures())
+    >>> #                                                 *
+    >>> ap1 = converter.parse("tinynotation: 4/4   a4 b c d    e2 f   g2 f4 g ")
+    >>> vp1 = converter.parse("tinynotation: 4/4   a4 b c e    e2 f   g2 f4 a ")
         
-    >>> #                                                                     *    *    *
-    >>> ap2 = stream.Part(converter.parse("tinynotation: 4/4   a4 g f e    f2 e   d2 g4 f ").makeMeasures())
-    >>> vp2 = stream.Part(converter.parse("tinynotation: 4/4   a4 g f e    f2 g   f2 g4 d ").makeMeasures())
+    >>> #                                                         *    *    *
+    >>> ap2 = converter.parse("tinynotation: 4/4   a4 g f e    f2 e   d2 g4 f ")
+    >>> vp2 = converter.parse("tinynotation: 4/4   a4 g f e    f2 g   f2 g4 d ")
     
     >>> ap1.id = 'aPart1'
     >>> ap2.id = 'aPart2'
@@ -644,8 +643,8 @@ def mergeVariantsEqualDuration(streams, variantNames, inPlace=False):
     >>> mergedStreams = variant.mergeVariantsEqualDuration(
     ...                 [stream1, streamDifferentMeasures], ['paris'])
     Traceback (most recent call last):
-    ...
-    VariantException: _mergeVariants cannot merge streams which are of different lengths
+    music21.variant.VariantException: _mergeVariants cannot merge streams 
+        which are of different lengths
     '''
     
     if inPlace is True:
@@ -669,15 +668,13 @@ def mergeVariantsEqualDuration(streams, variantNames, inPlace=False):
         returnObjParts = returnObj.getElementsByClass('Part')
         if len(returnObjParts) != 0: # If parts exist, iterate through them.
             sParts = s.getElementsByClass('Part')
-            for i in range(len(returnObjParts)):
-                returnObjPart = returnObjParts[i]
+            for i, returnObjPart in enumerate(returnObjParts):
                 sPart = sParts[i]
                 
                 returnObjMeasures = returnObjPart.getElementsByClass('Measure')
                 if len(returnObjMeasures) != 0: 
                     # If measures exist and parts exist, iterate through them both.
-                    for j in range(len(returnObjMeasures)):
-                        returnObjMeasure = returnObjMeasures[j]
+                    for j, returnObjMeasure in enumerate(returnObjMeasures):
                         sMeasure = sPart.getElementsByClass('Measure')[j]
                         _mergeVariants(
                             returnObjMeasure, sMeasure, variantName=variantName, inPlace=True)
@@ -687,7 +684,7 @@ def mergeVariantsEqualDuration(streams, variantNames, inPlace=False):
         else:
             returnObjMeasures = returnObj.getElementsByClass('Measure')
             if len(returnObjMeasures) != 0: #If no parts, but still measures, iterate through them.
-                for j in range(len(returnObjMeasures)):
+                for j, returnObjMeasure in enumerate(returnObjMeasures):
                     returnObjMeasure = returnObjMeasures[j]
                     sMeasure = s.getElementsByClass('Measure')[j]
                     _mergeVariants(returnObjMeasure, sMeasure, 
@@ -1443,8 +1440,8 @@ def _mergeVariants(streamA, streamB, containsVariants = False, variantName=None,
     >>> stream1.append(note.Note('e'))
     >>> mergedStreams = variant._mergeVariants(stream1, stream2, variantName=['paris'])
     Traceback (most recent call last):
-    ...
-    VariantException: _mergeVariants cannot merge streams which are of different lengths
+    music21.variant.VariantException: _mergeVariants cannot merge streams 
+        which are of different lengths
     '''
     # TODO: Add the feature for merging a stream to a stream with existing variants 
     # (it has to compare against both the stream and the contained variant)
@@ -1706,65 +1703,67 @@ def _doVariantFixingOnStream(s, variantNames=None):
     
     for v in s.variants:
         if isinstance(variantNames, list): #If variantNames are controlled
-            if set(v.groups) & set(variantNames) is []: 
+            if set(v.groups) and set(variantNames) is []: 
                 # and if this variant is not in the controlled list
                 continue # then skip it
-        else: # otherwise, skip it unless it is a strict insertion of deletion
-            lengthType = v.lengthType
-            replacementDuration = v.replacementDuration
-            highestTime = v.containedHighestTime
-            
-            if lengthType is 'elongation' and replacementDuration == 0.0:
-                variantType = 'insertion'
-            elif lengthType is 'deletion' and highestTime == 0.0:
-                variantType = 'deletion'
             else:
-                continue
+                continue # huh???? 
+        #else: # otherwise, skip it unless it is a strict insertion of deletion
+        lengthType = v.lengthType
+        replacementDuration = v.replacementDuration
+        highestTime = v.containedHighestTime
+        
+        if lengthType is 'elongation' and replacementDuration == 0.0:
+            variantType = 'insertion'
+        elif lengthType is 'deletion' and highestTime == 0.0:
+            variantType = 'deletion'
+        else:
+            continue
+        
+        if v.getOffsetBySite(s) == 0.0:
+            isInitial = True
+            isFinal = False
+        elif v.getOffsetBySite(s)+v.replacementDuration == s.duration.quarterLength:
+            isInitial = False
+            isFinal = True
+        else:
+            isInitial = False
+            isFinal = False
+        
+        # If a non-final deletion or an INITIAL insertion, 
+        #  add the next element after the variant.
+        if ((variantType is 'insertion' and (isInitial is True)) or
+                (variantType is 'deletion' and (isFinal is False))):
+            targetElement = _getNextElements(s, v)
             
-            if v.getOffsetBySite(s) == 0.0:
-                isInitial = True
-                isFinal = False
-            elif v.getOffsetBySite(s)+v.replacementDuration == s.duration.quarterLength:
-                isInitial = False
-                isFinal = True
-            else:
-                isInitial = False
-                isFinal = False
+            #Delete initial clefs, etc. from initial insertion targetElement if it exists
+            if "Stream" in targetElement.classes:
+                # Must use .elements, because of removal of elements
+                for e in targetElement.elements: 
+                    if "Clef" in e.classes or "TimeSignature" in e.classes:
+                        targetElement.remove(e)
             
-            # If a non-final deletion or an INITIAL insertion, 
-            #  add the next element after the variant.
-            if ((variantType is 'insertion' and (isInitial is True)) or
-                    (variantType is 'deletion' and (isFinal is False))):
-                targetElement = _getNextElements(s, v)
+            v.append(copy.deepcopy(targetElement)) #Appends a copy!!!
                 
-                #Delete initial clefs, etc. from initial insertion targetElement if it exists
-                if "Stream" in targetElement.classes:
-                    # Must use .elements, because of removal of elements
-                    for e in targetElement.elements: 
-                        if "Clef" in e.classes or "TimeSignature" in e.classes:
-                            targetElement.remove(e)
-                
-                v.append(copy.deepcopy(targetElement)) #Appends a copy!!!
-                    
-            # If a non-initial insertion or a FINAL deletion, 
-            #     add the previous element after the variant.
-            # #elif ((variantType is 'deletion' and (isFinal is True)) or 
-            #         (type is 'insertion' and (isInitial is False))):
-            else: 
-                targetElement = _getPreviousElements(s, v)
-                newVariantOffset = targetElement.getOffsetBySite(s)
-                # Need to shift elements to make way for new element at front
-                offsetShift = targetElement.duration.quarterLength
-                for e in v.containedSite:
-                    oldOffset = e.getOffsetBySite(v.containedSite)
-                    e.setOffsetBySite(v.containedSite, oldOffset+offsetShift)
-                v.insert(0.0, copy.deepcopy(targetElement))
-                s.remove(v)
-                s.insert(newVariantOffset, v)
-                
-                # Give it a new replacementDuration including the added element
-            oldReplacementDuration = v.replacementDuration
-            v.replacementDuration = oldReplacementDuration + targetElement.duration.quarterLength
+        # If a non-initial insertion or a FINAL deletion, 
+        #     add the previous element after the variant.
+        # #elif ((variantType is 'deletion' and (isFinal is True)) or 
+        #         (type is 'insertion' and (isInitial is False))):
+        else: 
+            targetElement = _getPreviousElements(s, v)
+            newVariantOffset = targetElement.getOffsetBySite(s)
+            # Need to shift elements to make way for new element at front
+            offsetShift = targetElement.duration.quarterLength
+            for e in v.containedSite:
+                oldOffset = e.getOffsetBySite(v.containedSite)
+                e.setOffsetBySite(v.containedSite, oldOffset + offsetShift)
+            v.insert(0.0, copy.deepcopy(targetElement))
+            s.remove(v)
+            s.insert(newVariantOffset, v)
+            
+            # Give it a new replacementDuration including the added element
+        oldReplacementDuration = v.replacementDuration
+        v.replacementDuration = oldReplacementDuration + targetElement.duration.quarterLength
 
 
 def _getNextElements(s, v, numberOfElements=1):

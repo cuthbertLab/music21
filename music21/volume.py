@@ -250,7 +250,6 @@ class Volume(SlottedObjectMixin):
             # userArticulations can be a list of 1 or more articulation objects
             # as well as True/False
             if useArticulations is not False:
-                am = None
                 if common.isIterable(useArticulations):
                     am = useArticulations
                 elif (hasattr(useArticulations, 'classes')
@@ -258,6 +257,8 @@ class Volume(SlottedObjectMixin):
                     am = [useArticulations] # place in a list
                 elif self.client is not None:
                     am = self.client.articulations
+                else:
+                    am = None
                 if am is not None:
                     for a in am:
                         # add in volume shift for all articulations
@@ -570,8 +571,6 @@ class Test(unittest.TestCase):
 
 
     def testGetRealizedB(self):
-
-
         from music21 import articulations
 
         v1 = Volume(velocity=64)
@@ -580,8 +579,8 @@ class Test(unittest.TestCase):
         a1 = articulations.StrongAccent()
         self.assertEqual(v1.getRealizedStr(useArticulations=a1), '0.65')
 
-        a1 = articulations.Accent()
-        self.assertEqual(v1.getRealizedStr(useArticulations=a1), '0.6')
+        a2 = articulations.Accent()
+        self.assertEqual(v1.getRealizedStr(useArticulations=a2), '0.6')
 
 #         d1 = dynamics.Dynamic('ppp')
 #         self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.1')
@@ -732,7 +731,3 @@ if __name__ == "__main__":
 
 #------------------------------------------------------------------------------
 # eof
-
-
-
-

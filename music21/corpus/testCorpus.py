@@ -8,9 +8,10 @@
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-from music21 import corpus
-import unittest
 import re
+import unittest
+
+from music21 import corpus
 
 class Test(unittest.TestCase):
 
@@ -144,10 +145,6 @@ class Test(unittest.TestCase):
         ks = key.KeySignature(3)
         searchResults = corpus.search(str(ks), field='keySignature')
         self.assertEqual(len(searchResults) >= 32, True, len(searchResults))
-
-    def testSearch11(self):
-        searchResults = corpus.search('mode phry(.*)', field='keySignature')
-        self.assertEqual(len(searchResults) >= 9, True)
 
     def testSearch12(self):
         # searching virtual entries

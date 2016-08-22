@@ -23,9 +23,9 @@ crash -- the numbers are not checked because the underlying data is changing
 too often.
 '''
 import unittest
+from collections import defaultdict
 
 from music21.alpha.trecento import cadencebook
-from collections import defaultdict
 
 class TonalityCounter(object):
     '''
@@ -137,9 +137,9 @@ class TonalityCounter(object):
 
         bigTotalSame = 0
         bigTotalDiff = 0
-        for outKey in sorted(myDict.keys()):
+        for outKey in sorted(myDict):
             outKeyDiffTotal = 0
-            for inKey in sorted(myDict[outKey].keys()):
+            for inKey in sorted(myDict[outKey]):
                 if outKey == inKey:
                     output += "**** "
                     bigTotalSame += myDict[outKey][inKey]
@@ -271,7 +271,7 @@ def nonLandiniTonality(show = True):
     ballataObj  = cadencebook.BallataSheet()
     worksList = []
     for thisWork in ballataObj:
-        if show == True:
+        if show:
             print(thisWork.title)
         if thisWork.composer != "Landini" and thisWork.composer != ".":
             worksList.append(thisWork)

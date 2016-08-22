@@ -245,7 +245,7 @@ class Instrument(base.Music21Object):
         >>> i = instrument.Instrument()
         >>> i.autoAssignMidiChannel(used2)
         Traceback (most recent call last):
-        InstrumentException: we are out of midi channels! help!
+        music21.exceptions21.InstrumentException: we are out of midi channels! help!
         '''
         # NOTE: this is used in musicxml output, not in midi output
         maxMidi = 16
@@ -1528,8 +1528,7 @@ def instrumentFromMidiProgram(number):
     <music21.instrument.Instrument Accordion>
     >>> instrument.instrumentFromMidiProgram(500)
     Traceback (most recent call last):
-        ...
-    InstrumentException: No instrument found with given midi program    
+    music21.exceptions21.InstrumentException: No instrument found with given midi program    
     '''    
     foundInstrument = False
     for myThing in sys.modules[__name__].__dict__.values():
@@ -1618,8 +1617,8 @@ def partitionByInstrument(streamObj):
     # TODO: this step SHOULD not be necessary (measureTemplate)...
     
     >>> for p in s2.parts:
-    ...     p.makeMeasures(inPlace = True)
-    ...     p.makeTies(inPlace = True)
+    ...     p.makeMeasures(inPlace=True)
+    ...     p.makeTies(inPlace=True)
     
     >>> s2.show('text')
     {0.0} <music21.stream.Part Piccolo>
@@ -1660,6 +1659,7 @@ def partitionByInstrument(streamObj):
             {0.0} <music21.instrument.Instrument Alto Saxophone>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Rest rest>
             {2.0} <music21.note.Note E>
             {3.0} <music21.note.Note F>
         {4.0} <music21.stream.Measure 2 offset=4.0>
@@ -1670,10 +1670,8 @@ def partitionByInstrument(streamObj):
             {3.0} <music21.bar.Barline style=final>
 
 
-    Bug in makeRests -- notice the missing rest at the beginning of the alto sax part...
-
-    TODO: parts should be in Score Order. Cooindicence that this works.
-    TODO: note redundant Alto Saxophone...
+    TODO: parts should be in Score Order. Coincidence that this almost works.
+    TODO: note redundant Alto Saxophone... instrument -- 
     '''
     from music21 import stream
 

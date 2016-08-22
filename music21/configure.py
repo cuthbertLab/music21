@@ -57,7 +57,7 @@ reFinaleExe = re.compile(r'Finale (?:Notepad )?20[0-2][0-9][a-z\.0-9]*.exe', re.
 reSibeliusExe = re.compile(r'Sibelius.exe', re.IGNORECASE)
 reFinaleReaderApp = re.compile(r'Finale Reader.app', re.IGNORECASE)
 reMuseScoreApp = re.compile(r'MuseScore\s?[0-9]*.app', re.IGNORECASE)
-
+reMuseScoreExe = re.compile(r'Musescore [0-9]\\bin\\MuseScore.exe', re.IGNORECASE)
 
 urlMusic21 = 'http://web.mit.edu/music21'
 urlFinaleNotepad = 'http://www.finalemusic.com/products/finale-notepad/resources/'
@@ -280,7 +280,6 @@ class KeyInterruptError(DialogError):
     '''
     Subclass of DialogError that deals with Keyboard Interruptions. 
     '''
-    
     def __init__(self, src=None):
         DialogError.__init__(self, src=src)
 
@@ -309,11 +308,8 @@ class BadConditions(DialogError):
         DialogError.__init__(self, src=src)
 
 
-
-
-
 #-------------------------------------------------------------------------------
-class DialogException(exceptions21.Music21Exception):
+class DialogException(exceptions21.Music21Exception, DialogError):
     pass
 
 #-------------------------------------------------------------------------------
@@ -623,11 +619,11 @@ class Dialog(object):
         else:
             try:
                 self._performAction(simulate=simulate)
-            except DialogError: # pylint: disable=catching-non-exception
+            except DialogException: # pylint: disable=catching-non-exception
                 # in some cases, the action selected requires exciting the 
                 # configuration assistant
                 # pylint: disable=raising-non-exception
-                raise DialogError('perform action raised a dialog exception') 
+                raise DialogException('perform action raised a dialog exception') 
 
 
 #-------------------------------------------------------------------------------
@@ -919,8 +915,10 @@ class AskSendInstallationReport(YesOrNo):
         userData = getUserData()
         # add any additional entries; this is used for adding the original egg info
         userData.update(self._additionalEntries)
-        for key in sorted(userData.keys()):
+        for key in sorted(userData):
             body.append('%s // %s' % (key, userData[key]))
+        body.append('python version:')
+        body.append(sys.version)
 
         body.append('')
         body.append('Below, please provide a few words about what sorts of tasks ' + 
@@ -930,7 +928,7 @@ class AskSendInstallationReport(YesOrNo):
         body.append('')
 
         platform = common.getPlatform()
-        if platform == 'win': # need to add proper return carriage fro win
+        if platform == 'win': # need to add proper return carriage for win
             body = '%0D%0A'.join(body)
         else:
             body = '\n'.join(body)
@@ -1011,8 +1009,9 @@ class SelectFromList(Dialog):
         False
         '''
         # this does not do anything: customize in subclass
-        d = YesOrNo(default=default, tryAgain=False, 
-            promptHeader='The selection list is empty. Try Again?')
+        d = YesOrNo(default=default, 
+                    tryAgain=False, 
+                    promptHeader='The selection list is empty. Try Again?')
         d.askUser(force=force)
         post = d.getResult()
         # if any errors are found, return False
@@ -1020,7 +1019,9 @@ class SelectFromList(Dialog):
             return False
         else: # must be True or False
             if post not in [True, False]:
-                raise DialogError('_askFillEmptyList(): sub-command returned non True/False value') # pylint: disable=raising-non-exception
+                # this should never happen...
+                raise DialogException(
+                    '_askFillEmptyList(): sub-command returned non True/False value') 
             return post
 
     def _preAskUser(self, force=None):
@@ -1034,7 +1035,7 @@ class SelectFromList(Dialog):
         True
         >>> d._preAskUser('') # no default, returns False
         False
-        >>> d._preAskUser('x') # bad input returns false
+        >>> d._preAskUser('x') # bad input returns False
         False
         '''
         options = self._getValidResults()
@@ -1202,34 +1203,38 @@ class AskAutoDownload(SelectFromList):
                 raise DialogException('user selected an option that terminates installer.')
 
         if result in [1, 2]: 
-            self._writeToUser(['Auto Download set to: %s' % 
-                environment.get('autoDownload'), ' '])
+            self._writeToUser(['Auto Download set to: %s' % environment.get('autoDownload'), ' '])
 
 
 
 class SelectFilePath(SelectFromList):
-    '''General class to select values from a list.
-
-    
+    '''
+    General class to select values from a list.
     '''
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         SelectFromList.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
 
-    def _getDarwinApp(self, comparisonFunction):
-        '''Provide a comparison function that returns True or False based on the file name. 
-        This looks at everything in Applications, as well as every directory in Applications
+
+    def _getAppOSIndependent(self, comparisonFunction, path0, post):
         '''
-        post = []
-        path0 = '/Applications'
+        Uses comparisonFunction to see if a file in path0 matches
+        the RE embedded in comparisonFunction and if so manipulate the list
+        in post
+        
+        comparisonFunction = function (lambda function on path returning True/False)
+        path0 = os-specific string
+        post = list of matching results.
+        '''
         for sub1 in os.listdir(path0):
             path1 = os.path.join(path0, sub1)
             if os.path.isdir(path1):
-                # on macos, .apps are (always?) directories; thus, look
+                # on macos, .app files are actually directories; thus, look
                 # at these names directly
                 if comparisonFunction(sub1):
                     post.append(path1)
                     continue
-                #environLocal.printDebug(['_getDarwinApp: dir', path1])
+                # only go two levels deep in /Applications: all things there, 
+                # and all things in directories stored there.
                 try:
                     for sub2 in os.listdir(path1):
                         path2 = os.path.join(path1, sub2)
@@ -1240,6 +1245,15 @@ class SelectFilePath(SelectFromList):
             else:        
                 if comparisonFunction(sub1):
                     post.append(path1)
+        
+
+    def _getDarwinApp(self, comparisonFunction):
+        '''Provide a comparison function that returns True or False based on the file name. 
+        This looks at everything in Applications, as well as every directory in Applications
+        '''
+        post = []
+        for path0 in ('/Applications', common.cleanpath('~/Applications')):
+            self._getAppOSIndependent(comparisonFunction, path0, post)
         return post
 
 
@@ -1247,7 +1261,17 @@ class SelectFilePath(SelectFromList):
         '''Provide a comparison function that returns True or False based on the file name. 
         '''
         # provide a similar method to _getDarwinApp
-        return []
+        post = []
+        environKeys = ('ProgramFiles', 'ProgramFiles(x86)', 'ProgramW6432')
+        for possibleEnvironKey in environKeys:
+            if possibleEnvironKey not in os.environ:
+                continue
+            environPath = os.environ[possibleEnvironKey]
+            if environPath == '':
+                continue
+            self._getAppOSIndependent(comparisonFunction, environPath, post)
+        
+        return post
 
 
     def _evaluateUserInput(self, raw):
@@ -1305,53 +1329,35 @@ class SelectMusicXMLReader(SelectFilePath):
         '''
         Get all possible Finale or MuseScore paths on Darwin
         '''
+        comparisonFinale = lambda x : reFinaleApp.match(x) is not None
+        comparisonMuseScore = lambda x : reMuseScoreApp.match(x) is not None
+        comparisonFinaleReader = lambda x : reFinaleReaderApp.match(x) is not None
+        comparisonSibelius = lambda x : reSibeliusApp.match(x) is not None
+
         # order here results in ranks
-        def comparisonFinale(name):
-            m = reFinaleApp.match(name)
-            if m is not None: 
-                return True
-            else: 
-                return False
         results = self._getDarwinApp(comparisonFinale)
-
-        def comparisonMuseScore(name):
-            m = reMuseScoreApp.match(name)
-            if m is not None: 
-                return True
-            else: 
-                return False
-            
         results += self._getDarwinApp(comparisonMuseScore)
-
-        def comparisonFinaleReader(name):
-            m = reFinaleReaderApp.match(name)
-            if m is not None: 
-                return True
-            else: 
-                return False
-
         results += self._getDarwinApp(comparisonFinaleReader)
-
-        def comparisonSibelius(name):
-            m = reSibeliusApp.match(name)
-            if m is not None: 
-                return True
-            else: 
-                return False
-            
         results += self._getDarwinApp(comparisonSibelius)
 
         return results
         
-        # only go two levels deep in /Applications: all things there, 
-        # and all things in directories stored there.
-
 
     def _getMusicXMLReaderWin(self):
         '''
         Get all possible Finale, MuseScore paths on Windows
         '''
-        return []
+        comparisonFinale = lambda x : reFinaleExe.match(x) is not None
+        comparisonMuseScore = lambda x : reMuseScoreExe.match(x) is not None
+        comparisonSibelius = lambda x : reSibeliusExe.match(x) is not None
+
+        # order here results in ranks
+        results = self._getWinApp(comparisonFinale)
+        results += self._getWinApp(comparisonMuseScore)
+        results += self._getWinApp(comparisonSibelius)
+
+        return results
+        
 
     def _getMusicXMLReaderNix(self):
         '''

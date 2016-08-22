@@ -21,21 +21,16 @@ import unittest
 from music21 import common
 from music21 import exceptions21
 
-
 #------------------------------------------------------------------------------
 
 
 from music21 import environment
 environLocal = environment.Environment(os.path.basename(__file__))
-
-
 #------------------------------------------------------------------------------
 
 
 class MetadataCacheException(exceptions21.Music21Exception):
     pass
-
-
 #------------------------------------------------------------------------------
 
 
@@ -326,8 +321,7 @@ class JobProcessor(object):
         '''
         Report on the current job status.
         '''
-        message = 'updated {0} of {1} files; ' \
-            'total errors: {2} ... last file: {3}'.format(
+        message = 'updated {0} of {1} files; total errors: {2} ... last file: {3}'.format(
                 totalJobs - remainingJobs,
                 totalJobs,
                 filePathErrorCount,

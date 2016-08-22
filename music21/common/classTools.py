@@ -12,9 +12,8 @@
 
 #from music21 import exceptions21
 from music21.ext import six
-from music21.common.decorators import deprecated
 
-__all__ = ['isNum', 'isStr', 'isListLike', 'isIterable', 'classToClassStr']
+__all__ = ['isNum', 'isListLike', 'isIterable', 'classToClassStr']
 
 def isNum(usrData):
     '''
@@ -59,24 +58,6 @@ def isNum(usrData):
             return False
     except Exception: # pylint: disable=broad-except
         return False
-
-
-@deprecated("April 2016", "June 2016", 
-                "use isinstance(usrData, music21.ext.six.string_types)")
-def isStr(usrData):
-    """
-    Check of usrData is some form of string, including unicode.
-
-    <<< common.isStr(3)
-    False
-    <<< common.isStr('sharp')
-    True
-    <<< common.isStr(u'flat')
-    True
-    
-    :rtype: bool
-    """
-    return isinstance(usrData, six.string_types)
 
 
 def isListLike(usrData):
