@@ -38,12 +38,12 @@ tuple assigned to __version_info__, and the __version__ string will be
 updated along with it.
 
 When changing, update the single test case in base.py, and in freezeThaw.JSONFreezer.jsonPrint
-(on a major version change). If you dare edit a 28MB file, chang it 
+(on a major version change). If you dare edit a 28MB file, change it 
 at the end of the two corpus/metadataCache .jsons, but only a problem there sometimes.
 
 Changing this number invalidates old pickles -- do it if the old pickles create a problem.
 '''
 
-__version_info__ = (3, 1, 0)
+__version_info__ = (4, 0, 1)
 __version__ = '.'.join(str(x) for x in __version_info__)
 

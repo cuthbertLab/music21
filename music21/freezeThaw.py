@@ -1573,17 +1573,15 @@ class JSONFreezer(JSONFreezeThawBase):
           }, 
           "__class__": "music21.note.Note", 
           "__version__": [
-            3, 
+            4, 
             ..., 
             ...
           ]
         }
         '''
-        print(json.dumps(
-            self.getJSONDict(includeVersion=True),
-            sort_keys=True,
-            indent=2,
-            ))
+        print(json.dumps(self.getJSONDict(includeVersion=True),
+                         sort_keys=True,
+                         indent=2,))
 
     def jsonWrite(self, fp, formatOutput=True):
         '''
