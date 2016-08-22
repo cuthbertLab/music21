@@ -154,6 +154,36 @@ def normalizeColor(color):
     else:
         return color.upper()
 
+def getMetadataFromContext(s):
+    '''
+    Get metadata from site or context.
+    
+    >>> s = stream.Stream()
+    >>> s2 = s.transpose(4)
+    >>> md = metadata.Metadata()
+    >>> md.title = 'emptiness'
+    >>> s.metadata = md
+    >>> s2.metadata is None
+    True
+    >>> musicxml.m21ToXml.getMetadataFromContext(s2).title
+    'emptiness'
+    >>> musicxml.m21ToXml.getMetadataFromContext(s).title
+    'emptiness'
+    >>> p = stream.Part()
+    >>> s2.insert(0, p)
+    >>> musicxml.m21ToXml.getMetadataFromContext(p).title
+    'emptiness'
+    '''
+    # get metadata from context.
+    md = s.metadata
+    if md is not None:
+        return md
+    
+    for contextSite in s.contextSites():
+        if contextSite.site.metadata is not None:
+            md = contextSite.site.metadata
+            break
+    return md
 
 def _setTagTextFromAttribute(m21El, xmlEl, tag, attributeName=None, 
                              transform=None, forceEmpty=False):
@@ -407,6 +437,7 @@ class GeneralObjectExporter():
         # p.makeImmutable()  # impossible, we haven't made notation yet.
         s = stream.Score()
         s.insert(0, p)
+        s.metadata = copy.deepcopy(getMetadataFromContext(p))
 #         if p.metadata is not None:
 #             s.insert(0.0, copy.deepcopy(p.metadata))
         
@@ -425,6 +456,7 @@ class GeneralObjectExporter():
         mCopy.clef = mCopy.bestClef()  
         p = stream.Part()
         p.append(mCopy)
+        p.metadata = copy.deepcopy(getMetadataFromContext(m))
         return self.fromPart(p)
     
     def fromVoice(self, v):
@@ -439,19 +471,25 @@ class GeneralObjectExporter():
             st2.elements = copy.deepcopy(st)
             st2.clef = st2.bestClef()
             st2.makeNotation(inPlace=True)
+            st2.metadata = copy.deepcopy(getMetadataFromContext(st))
             return self.fromPart(st2)
+
         elif st.hasPartLikeStreams():
             st2 = stream.Score()
             st2.mergeAttributes(st)
             st2.elements = copy.deepcopy(st)
             st2.makeNotation(inPlace=True)
+            st2.metadata = copy.deepcopy(getMetadataFromContext(st))
             return self.fromScore(st2)
+
         elif st.getElementsByClass('Stream')[0].isFlat: # like a part w/ measures...
             st2 = stream.Part()
             st2.mergeAttributes(st)
             st2.elements = copy.deepcopy(st)
             st2.makeNotation(inPlace=True, bestClef=True)
+            st2.metadata = copy.deepcopy(getMetadataFromContext(st))
             return self.fromPart(st2)
+
         else:
             # probably a problem? or a voice...
             st2 = st.makeNotation(inPlace=False, bestClef=True)
@@ -1197,8 +1235,7 @@ class ScoreExporter(XMLExporterBase):
         s = self.stream
         # create score and part list
         # set some score header information from metadata
-        if s.metadata != None:
-            self.scoreMetadata = s.metadata
+        self.scoreMetadata = getMetadataFromContext(s)
     
         self.setTitles()
         self.setIdentification()
