@@ -554,6 +554,33 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
     Octave 4 ⠐
     B quarter ⠺
     Note-fermata: Shape square: ⠰⠣⠇
+
+
+    >>> C4 = note.Note('C4')
+    >>> print(basic.noteToBraille(C4))
+    ⠐⠹
+    >>> C4.duration.appendTuplet(duration.Tuplet(3, 2)) # triplet
+    >>> print(basic.noteToBraille(C4))
+    ⠐⠹
+    >>> C4.beamStart = True
+    >>> print(basic.noteToBraille(C4))
+    ⠆⠐⠹
+    >>> for x in C4._brailleEnglish:
+    ...     print(x)
+    Triplet ⠆
+    Octave 4 ⠐
+    C quarter ⠹    
+
+    >>> C4 = note.Note('C4')
+    >>> C4.duration.appendTuplet(duration.Tuplet(7, 4)) # septuplet
+    >>> C4.beamStart = True
+    >>> print(basic.noteToBraille(C4))
+    ⠸⠶⠄⠐⠹
+    >>> for x in C4._brailleEnglish:
+    ...     print(x)
+    Tuplet of 7/4ths ⠸⠶⠄
+    Octave 4 ⠐
+    C quarter ⠹    
     """
     
     # Note: both beamStatus, and _brailleEnglish are crutches that I hope to remove
@@ -599,13 +626,14 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
             if allTuplets[0].fullName == 'Triplet':
                 noteTrans.append(symbols['triplet']) # dot 2-3
             else:
-                noteTrans.append(symbols['tuplet_prefix']) # dots 4,5,6
-                noteTrans.append(numberToBraille(allTuplets[0].numberNotesActual, 
+                tupletTrans = symbols['tuplet_prefix'] # dots 4,5,6
+                tupletTrans += numberToBraille(allTuplets[0].numberNotesActual, 
                                                  withNumberSign=False, 
-                                                 lower=True))
-                noteTrans.append(symbols['dot'])
+                                                 lower=True)
+                tupletTrans += symbols['dot']
+                noteTrans.append(tupletTrans)
             music21Note._brailleEnglish.append(u"{0} {1}".format(allTuplets[0].fullName, 
-                                                                 symbols['triplet']))
+                                                                 noteTrans[-1]))
         elif beamStatus['beamContinue']: 
             beamStatus['beamContinue'] = False
     
