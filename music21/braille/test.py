@@ -55,7 +55,7 @@ def example11_2():
 # Mary Turner De Garmo
 # https://www.loc.gov/nls/music/
 #-------------------------------------------------------------------------------
-class DeGarmoTest(unittest.TestCase):
+class Test(unittest.TestCase):
     '''
     A series of tests from the DeGarmo book that run automatically
     when self.b (expected braille) or self.e (expected english) are altered
@@ -3189,7 +3189,7 @@ Barline final ⠣⠅
         rightHand = converter.parse("tinynotation: 2/4 c'8 g e g f g e a g " + 
                                     "f e d e e d r e d e g f g a f e g g f e2").flat
         leftHand = converter.parse("tinynotation: 2/4 C8 G c B A B c c B A G B " + 
-                                   "c c B G c r B-4 A r c r c r B G c2").flat
+                                   "c c B G c r B-4 A8 r c r c r B G c2").flat
         rightHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         leftHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         keyboardPart = stream.Score()
@@ -3432,7 +3432,7 @@ Barline final ⠣⠅
  
 if __name__ == "__main__":
     import music21
-    music21.mainTest(DeGarmoTest, verbose=True) #, runTest='test_example05_7c')
+    music21.mainTest(Test) #, verbose=True) #, runTest='test_example24_2')
 
 #------------------------------------------------------------------------------
 # eof
