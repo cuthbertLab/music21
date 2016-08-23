@@ -1198,7 +1198,8 @@ class Test(unittest.TestCase):
             self.assertEqual(transcribeHeading(ks, ts, tt), r)
     
     def test_example08_8(self):
-        self.assertEqual(music21.braille.basic.metronomeMarkToBraille(
+        from music21.braille import basic
+        self.assertEqual(basic.metronomeMarkToBraille(
                             tempo.MetronomeMark(number=80,
                                                 referent=note.Note(type='half'))), '⠝⠶⠼⠓⠚')
 
