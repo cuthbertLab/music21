@@ -141,6 +141,7 @@ class SubConverter(object):
                 launchKey = self.launchKey
                 app = environLocal[launchKey]
             else:
+                launchKey = environLocal.formatToKey(fmt)
                 app = environLocal.formatToApp(fmt)
 
         platform = common.getPlatform()
