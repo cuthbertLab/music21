@@ -422,44 +422,70 @@ class Graph(object):
         Set the tick-labels for a given graph or plot's axisKey
         (generally 'x', and 'y') with a set of pairs
         
-        Pairs are tuples of positions and labels.
+        Pairs are iterables of positions and labels.
 
         N.B. -- both 'x' and 'y' ticks have to be set in
-        order to get matplotlib to display either...
+        order to get matplotlib to display either... (and presumably 'z' for 3D graphs)
+        
+        >>> g = graph.GraphHorizontalBar()
+        >>> g.axis['x']['ticks']
+        Traceback (most recent call last):
+        KeyError: 'ticks'
+        >>> g.axis['x']
+        {'range': None}
+        
+        >>> g.setTicks('x', [(0, 'a'), (1, 'b')])
+        >>> g.axis['x']['ticks']
+        ([0, 1], ['a', 'b'])
+
+        >>> g.setTicks('m', [('a', 'b')])
+        Traceback (most recent call last):
+        music21.graph.GraphException: Cannot find key 'm' in self.axis
+
+        >>> g.setTicks('x', [])
+        >>> g.axis['x']['ticks']
+        ([], [])
         '''
-        if pairs is not None:
-            positions = []
-            labels = []
-            # ticks are value, label pairs
-            for value, label in pairs:
-                positions.append(value)
-                labels.append(label)
-            #environLocal.printDebug(['got labels', labels])
-            self.axis[axisKey]['ticks'] = positions, labels
+        if pairs is None: # is okay to send an empty list to clear everything...
+            return
+        if axisKey not in self.axis:
+            raise GraphException("Cannot find key '{}' in self.axis".format(axisKey))
+        
+
+        positions = []
+        labels = []
+        # ticks are value, label pairs
+        for value, label in pairs:
+            positions.append(value)
+            labels.append(label)
+        #environLocal.printDebug(['got labels', labels])
+        self.axis[axisKey]['ticks'] = positions, labels
 
     def setIntegerTicksFromData(self, unsortedData, axisKey='y', dataSteps=8):
         '''
-        Set the ticks for an axis (usually 'y') given the data
+        Set the ticks for an axis (usually 'y') given unsorted data.
+        
+        Data steps shows how many ticks to make from the data.
+
+        >>> g = graph.GraphHorizontalBar()
+        >>> g.setIntegerTicksFromData([10, 5, 3, 8, 20, 11], dataSteps=4)
+        >>> g.axis['y']['ticks']
+        ([0, 5, 10, 15, 20], ['0', '5', '10', '15', '20'])
+
+        TODO: should this not also use min? instead of always starting from zero?
         '''
         maxData = max(unsortedData)
-        yTicks = []
-        yTickStep = int(round(maxData / (dataSteps+0.0)))
-        if yTickStep <= 1:
-            yTickStep = 2
-        for y in range(0, maxData + 1, yTickStep):
-            yTicks.append([y, '%s' % y])
-        yTicks.sort()
-        positions = []
-        labels = []
+        tickStep = int(round(maxData / dataSteps))
 
-        for value, label in yTicks:
-            positions.append(value)
-            labels.append(label)
+        tickList = []
+        if tickStep <= 1:
+            tickStep = 2
+        for y in range(0, maxData + 1, tickStep):
+            tickList.append([y, '%s' % y])
+        tickList.sort()
+        return self.setTicks(axisKey, tickList)        
 
-        self.axis[axisKey]['ticks'] = positions, labels
-        
-
-    def setAxisRange(self, axisKey, valueRange, paddingFraction=.1):
+    def setAxisRange(self, axisKey, valueRange, paddingFraction=0.1):
         '''
         Set the range for the axis for a given axis key
         (generally, 'x', or 'y')
@@ -480,8 +506,8 @@ class Graph(object):
         else:
             shift = 0
         # set range with shift
-        self.axis[axisKey]['range'] = (valueRange[0]-shift,
-                                       valueRange[1]+shift)
+        self.axis[axisKey]['range'] = (valueRange[0] - shift,
+                                       valueRange[1] + shift)
         
         self._axisRangesAlreadySet[axisKey] = True
 
@@ -490,16 +516,25 @@ class Graph(object):
             raise GraphException('No such axis exists: %s' % axisKey)
         self.axis[axisKey]['label'] = label
 
-    def _adjustAxisSpines(self, ax, leftBottom=False):
-        '''Remove the right and left spines from the diagram
+    @staticmethod
+    def hideAxisSpines(ax, leftBottom=False):
+        '''
+        Remove the right and top spines from the diagram.
+        
+        If leftBottom is True, remove the left and bottom spines as well.
+        
+        Spines are removed by setting their colors to 'none' and every other
+        tickline set_visible to False.
+
+        >>> 
         '''
         for loc, spine in ax.spines.items():
-            if loc in ['left','bottom']:
+            if loc in ('left', 'bottom'):
                 if leftBottom:
                     spine.set_color('none') # don't draw spine
                 # this pushes them outward in an interesting way
                 #spine.set_position(('outward',10)) # outward by 10 points
-            elif loc in ['right','top']:
+            elif loc in ('right', 'top'):
                 spine.set_color('none') # don't draw spine
             else: # pragma: no cover
                 raise ValueError('unknown spine location: %s'%loc)
@@ -525,85 +560,7 @@ class Graph(object):
         # rect.set_edgecolor(getColor('red'))
 
         for axis in self.axisKeys:
-            if self.axis[axis]['range'] is not None:
-                # for 2d graphs
-                if axis == 'x' and len(self.axisKeys) == 2:
-                    ax.set_xlim(*self.axis[axis]['range'])
-                elif axis == 'y' and len(self.axisKeys) == 2:
-                    ax.set_ylim(*self.axis[axis]['range'])
-                elif axis == 'z' and len(self.axisKeys) == 2:
-                    ax.set_zlim(*self.axis[axis]['range'])
-                # for 3d graphs
-                elif axis == 'x' and len(self.axisKeys) == 3:
-                    ax.set_xlim3d(*self.axis[axis]['range'])
-                elif axis == 'y' and len(self.axisKeys) == 3:
-                    ax.set_ylim3d(*self.axis[axis]['range'])
-                elif axis == 'z' and len(self.axisKeys) == 3:
-                    ax.set_zlim3d(*self.axis[axis]['range'])
-
-            if 'label' in self.axis[axis]:
-                if self.axis[axis]['label'] is not None:
-                    if axis == 'x':
-                        ax.set_xlabel(self.axis[axis]['label'],
-                        fontsize=self.labelFontSize, family=self.fontFamily)
-                    elif axis == 'y':
-                        ax.set_ylabel(self.axis[axis]['label'],
-                        fontsize=self.labelFontSize, family=self.fontFamily,
-                        rotation='horizontal')
-                    elif axis == 'z':
-                        ax.set_zlabel(self.axis[axis]['label'],
-                        fontsize=self.labelFontSize, family=self.fontFamily)
-
-            if 'scale' in self.axis[axis]:
-                if self.axis[axis]['scale'] is not None:
-                    if axis == 'x':
-                        ax.set_xscale(self.axis[axis]['scale'])
-                    elif axis == 'y':
-                        ax.set_yscale(self.axis[axis]['scale'])
-                    elif axis == 'z':
-                        ax.set_zscale(self.axis[axis]['scale'])
-
-            if 'ticks' in self.axis[axis]:
-                if axis == 'x':
-                    # note: this problem needs to be update to use the
-                    # same format as y, below
-                    #plt.xticks(*self.axis[axis]['ticks'], fontsize=7)
-
-                    if 'ticks' in self.axis[axis]:
-                        values, labels = self.axis[axis]['ticks']
-                        #environLocal.printDebug(['x tick labels, x tick values', labels, values])
-                        ax.set_xticks(values)
-                        # using center alignment to account for odd spacing in 
-                        # accidentals
-                        #environLocal.printDebug(['setting labels', labels])
-                        ax.set_xticklabels(
-                            labels, 
-                            fontsize=self.tickFontSize,
-                            family=self.fontFamily, 
-                            horizontalalignment=self.xTickLabelHorizontalAlignment, 
-                            verticalalignment=self.xTickLabelVerticalAlignment, 
-                            rotation=self.xTickLabelRotation,
-                            y=-.01)
-
-                elif axis == 'y':
-                    # this is the old way ticks were set:
-                    #plt.yticks(*self.axis[axis]['ticks'])
-                    # new way:
-                    if 'ticks' in self.axis[axis]:
-                        values, labels = self.axis[axis]['ticks']
-                        #environLocal.printDebug(['y tick labels, y tick values', labels, values])
-                        ax.set_yticks(values)
-                        ax.set_yticklabels(labels, fontsize=self.tickFontSize,
-                            family=self.fontFamily,
-                            horizontalalignment='right', verticalalignment='center')
-            else: # apply some default formatting to default ticks
-                if axis == 'x':
-                    ax.set_xticklabels(ax.get_xticks(),
-                        fontsize=self.tickFontSize, family=self.fontFamily) 
-                elif axis == 'y':
-                    ax.set_yticklabels(ax.get_yticks(),
-                        fontsize=self.tickFontSize, family=self.fontFamily) 
-
+            self.applyFormattingToOneAxis(ax, axis)
 
         if self.title:
             ax.set_title(self.title, fontsize=self.titleFontSize, family=self.fontFamily)
@@ -630,6 +587,79 @@ class Graph(object):
 #         ax.set_yscale('linear')
 #         ax.set_aspect('normal')
 
+    def applyFormattingToOneAxis(self, ax, axis):
+        '''
+        Given a matplotlib.Axes object (from figure or subplot) and a string of
+        'x', 'y', or 'z', set the Axes object's xlim (or ylim or zlim or xlim3d, etc.) from
+        self.axis[axis]['range'], Set the label from self.axis[axis]['label'],
+        the scale, the ticks, and the ticklabels.
+        '''
+        thisAxis = self.axis[axis]
+        if axis not in ('x', 'y', 'z'):
+            return
+        
+        if 'range' in thisAxis and thisAxis['range'] is not None:
+            rangeFuncs = {('x', 2): 'set_xlim',
+                          ('y', 2): 'set_ylim',
+                          ('z', 2): 'set_zlim',
+                          ('x', 3): 'set_xlim3d',
+                          ('y', 3): 'set_ylim3d',
+                          ('z', 3): 'set_zlim3d',
+                          }
+            thisRangeFunc = getattr(ax, rangeFuncs[(axis, len(self.axisKeys))])
+            thisRangeFunc(*thisAxis['range'])
+            
+        if 'label' in thisAxis and thisAxis['label'] is not None:
+            # ax.set_xlabel, set_ylabel, set_zlabel <-- for searching do not delete.
+            setLabelFunction = getattr(ax, 'set_' + axis + 'label')
+            setLabelFunction(thisAxis['label'],
+                    fontsize=self.labelFontSize, family=self.fontFamily)
+            
+        if 'scale' in thisAxis and thisAxis['scale'] is not None:
+            # ax.set_xscale, set_yscale, set_zscale <-- for searching do not delete.
+            setLabelFunction = getattr(ax, 'set_' + axis + 'scale')
+            setLabelFunction(thisAxis['scale'])
+        
+        
+        try:
+            getTickFunction = getattr(ax, 'get_' + axis + 'ticks')
+            setTickFunction = getattr(ax, 'set_' + axis + 'ticks')
+            setTickLabelFunction = getattr(ax, 'set_' + axis + 'ticklabels')
+        except AttributeError:
+            # for z ?? or maybe it will work now?
+            getTickFunction = None
+            setTickFunction = None
+            setTickLabelFunction = None
+        
+        if 'ticks' not in thisAxis:
+            # apply some default formatting to default ticks
+            setTickLabelFunction(getTickFunction(), 
+                                 fontsize=self.tickFontSize, 
+                                 family=self.fontFamily)                                      
+        else:
+            values, labels = thisAxis['ticks']
+            setTickFunction(values)
+            if axis == 'x':
+                ax.set_xticklabels(labels, 
+                                   fontsize=self.tickFontSize,
+                                   family=self.fontFamily, 
+                                   horizontalalignment=self.xTickLabelHorizontalAlignment, 
+                                   verticalalignment=self.xTickLabelVerticalAlignment, 
+                                   rotation=self.xTickLabelRotation,
+                                   y=-.01)
+        
+            elif axis == 'y':
+                ax.set_yticklabels(labels, 
+                                   fontsize=self.tickFontSize,
+                                   family=self.fontFamily,
+                                   horizontalalignment='right', 
+                                   verticalalignment='center')
+            else:
+                setTickLabelFunction(labels,
+                                     fontsize=self.tickFontSize,
+                                     family=self.fontFamily)
+
+
     def process(self):
         '''process data and prepare plot'''
         pass
@@ -644,7 +674,8 @@ class Graph(object):
         elif self.doneAction == 'write': # pragma: no cover
             self.write(fp)
         elif self.doneAction is None:
-            pass
+            extm = _getExtendedModules() #@UnusedVariable
+            extm.plt.close()
 
     def show(self): # pragma: no cover
         '''
@@ -765,7 +796,7 @@ class GraphNetworxGraph(Graph):
         # turn off grid
         self.grid = False
         # standard procedures
-        self._adjustAxisSpines(ax, leftBottom=True)
+        self.hideAxisSpines(ax, leftBottom=True)
         self._applyFormatting(ax)
         self.done()
 
@@ -821,19 +852,21 @@ class GraphColorGrid(Graph):
         rowCount = len(self.data)
 
         for i in range(rowCount):
+            thisRowData = self.data[i]
+            
             positions = []
             heights = []
             subColors = []
             
-            for j in range(len(self.data[i])):
-                positions.append((1/2)+j)
+            for j, thisColor in enumerate(thisRowData):
+                positions.append(j) # + 1/2)
                 # collect colors in a list to set all at once
-                subColors.append(self.data[i][j])
+                subColors.append(thisColor)
                 #correlations.append(float(self.data[i][j][2]))
                 heights.append(1)
             
             # add a new subplot for each row    
-            ax = self.fig.add_subplot(rowCount, 1, len(self.data)-i)
+            ax = self.fig.add_subplot(rowCount, 1, rowCount - i)
 
             # linewidth: .1 is the thinnest possible
             # antialiased = false, for small diagrams, provides tighter images
@@ -872,11 +905,13 @@ class GraphColorGrid(Graph):
         else:
             self.fig.subplots_adjust(hspace=.1)
 
-        self.setAxisRange('x', range(rowCount), 0)
+
+        axisRangeNumbers = (0, rowCount)
+        self.setAxisRange('x', axisRangeNumbers, 0)
         # turn off grid
         self.grid = False
         # standard procedures
-        self._adjustAxisSpines(axTop, leftBottom=True)
+        self.hideAxisSpines(axTop, leftBottom=True)
         self._applyFormatting(axTop)
         self.done()
 
@@ -901,11 +936,6 @@ class GraphColorGridLegend(Graph):
         :width: 600
 
     '''
-
-#     >>> data = [('a', [('q', '#525252'), ('r', '#5f5f5f'), ('s', '#797979')]),
-#                 ('b', [('t', '#858585'), ('u', '#00ff00'), ('v', '#6c6c6c')]), 
-#                 ('c', [('w', '#8c8c8c'), ('x', '#8c8c8c'), ('y', '#6c6c6c')])
-
     def __init__(self, *args, **keywords):
         super(GraphColorGridLegend, self).__init__(*args, **keywords)
         self.axisKeys = ['x', 'y']
@@ -915,7 +945,7 @@ class GraphColorGridLegend(Graph):
             self.setFigureSize([5, 1.5])
         if 'title' not in keywords:
             self.setTitle('Legend')
-                
+                                
     def process(self):
         extm = _getExtendedModules()
         plt = extm.plt
@@ -925,65 +955,23 @@ class GraphColorGridLegend(Graph):
 
         axTop = self.fig.add_subplot(1, 1, 1)
         
-        for i in range(len(self.data)):
-            rowLabel = self.data[i][0]
-            rowData = self.data[i][1]
-            #environLocal.printDebug(['rowLabel', rowLabel, i])
-
-            positions = []
-            heights = []
-            subColors = []
+        for i, rowLabelAndData in enumerate(self.data):
+            rowLabel = rowLabelAndData[0]
+            rowData = rowLabelAndData[1]
+            self.makeOneRowOfGraph(self.fig, i, rowLabel, rowData)
             
-            for j in range(len(rowData)):
-                positions.append(.5+j)
-                subColors.append(rowData[j][1]) # second value is colors
-                heights.append(1)
-            
-            # add a new subplot for each row    
-            posTriple = (len(self.data), 1, i+1)
-            #environLocal.printDebug(['posTriple', posTriple])
-            ax = self.fig.add_subplot(*posTriple)
-            # 1 here is width
-            ax.bar(positions, heights, 1, color=subColors, linewidth=.3, edgecolor='#000000')
-            
-            # remove spines from each bar plot; cause excessive thickness
-            for unused_loc, spine in ax.spines.items():
-                #spine.set_color('none') # don't draw spine
-                spine.set_linewidth(.3) 
-                spine.set_color('#000000') 
-
-            # remove all ticks for subplots
-            for j, line in enumerate(ax.get_xticklines() + ax.get_yticklines()):
-                line.set_visible(False)
-
-            # need one label for each left side; .5 is in the middle
-            ax.set_yticks([.5])
-            ax.set_yticklabels([rowLabel], fontsize=self.tickFontSize, 
-                family=self.fontFamily, horizontalalignment='right', 
-                verticalalignment='center') # one label for one tick
-
-            # need a label for each bars
-            ax.set_xticks([x + 1 for x in range(len(rowData))])
-            # get labels from row data; first of pair
-            # need to push y down as need bottom alignment for lower case
-            ax.set_xticklabels(
-                [_substituteAccidentalSymbols(x) for x, unused_y in rowData], 
-                fontsize=self.tickFontSize, family=self.fontFamily, 
-                horizontalalignment='center', verticalalignment='center', 
-                y=-.4)
-            # this is the scaling to see all bars; not necessary
-            ax.set_xlim([.5, len(rowData)+.5])
             
         self.setAxisRange('x', range(len(self.data)), 0)
 
-        for j, line in enumerate(axTop.get_xticklines() + axTop.get_yticklines()):
+        allTickLines = axTop.get_xticklines() + axTop.get_yticklines()
+        for j, line in enumerate(allTickLines):
             line.set_visible(False)
 
         # sets the space between subplots
         # top and bottom here push diagram more toward center of frame
         # may be useful in other graphs
         # , 
-        self.fig.subplots_adjust(hspace=1.5, top=.75, bottom=.2)
+        self.fig.subplots_adjust(hspace=1.5, top=0.75, bottom=0.2)
 
         self.setAxisLabel('y', '')
         self.setAxisLabel('x', '')
@@ -991,11 +979,84 @@ class GraphColorGridLegend(Graph):
         self.setTicks('x', [])
 
         # standard procedures
-        self._adjustAxisSpines(axTop, leftBottom=True)
+        self.hideAxisSpines(axTop, leftBottom=True)
         self._applyFormatting(axTop)
         self.done()
 
+    def makeOneRowOfGraph(self, figure, rowIndex, rowLabel, rowData):
+        '''
+        Makes a subplot for one row of data (such as for the Major label) 
+        and returns a matplotlib.axes._subplots.AxesSubplot instance representing the subplot.
+        
+        Here we create an axis with a part of Scriabin's mapping of colors
+        to keys in Prometheus: The Poem of Fire.
+        
+        >>> import matplotlib.pyplot
+        >>> gcgl = graph.GraphColorGridLegend()
+        >>> fig = matplotlib.pyplot.figure()
+        >>> rowData = [('C', '#ff0000'), ('G', '#ff8800'), ('D', '#ffff00'),
+        ...            ('A', '#00ff00'), ('E', '#4444ff')]
+        >>> gcgl.data = [['Scriabin Mapping', rowData]]
+        >>> ax = gcgl.makeOneRowOfGraph(fig, 0, 'Scriabin Mapping', rowData)
+        >>> ax
+        <matplotlib.axes._subplots.AxesSubplot object at 0x111e13828>
+        '''
+        #environLocal.printDebug(['rowLabel', rowLabel, i])
 
+        positions = []
+        heights = []
+        subColors = []
+        
+        for j, oneColorMapping in enumerate(rowData):
+            positions.append(.5 + j)
+            subColors.append(oneColorMapping[1]) # second value is colors
+            heights.append(1)
+        
+        # add a new subplot for each row    
+        posTriple = (len(self.data), 1, rowIndex + 1)
+        #environLocal.printDebug(['posTriple', posTriple])
+        ax = figure.add_subplot(*posTriple)
+        
+        # ax is an Axes object
+        # 1 here is width
+        ax.bar(positions, heights, 1, color=subColors, linewidth=0.3, edgecolor='#000000')
+        
+        # lower thickness of spines 
+        for spineArtist in ax.spines.values():
+            #spineArtist.set_color('none') # don't draw spine
+            spineArtist.set_linewidth(0.3) 
+            spineArtist.set_color('#000000') 
+
+        # remove all ticks for subplots
+        allTickLines = ax.get_xticklines() + ax.get_yticklines()
+        for j, line in enumerate(allTickLines):
+            line.set_visible(False)
+
+        # need one label for each left side; 0.5 is in the middle
+        ax.set_yticks([0.5])
+        ax.set_yticklabels([rowLabel], 
+                           fontsize=self.tickFontSize, 
+                           family=self.fontFamily, 
+                           horizontalalignment='right', 
+                           verticalalignment='center') # one label for one tick
+
+        # need a label for each bars
+        ax.set_xticks([x + 1 for x in range(len(rowData))])
+        # get labels from row data; first of pair
+        # need to push y down as need bottom alignment for lower case
+        substitutedAccidentalLabels = [_substituteAccidentalSymbols(x) 
+                                            for x, unused_y in rowData]
+        ax.set_xticklabels(
+            substitutedAccidentalLabels, 
+            fontsize=self.tickFontSize, 
+            family=self.fontFamily, 
+            horizontalalignment='center', 
+            verticalalignment='center', 
+            y=-0.4)
+        # this is the scaling to see all bars; not necessary
+        ax.set_xlim([0.5, len(rowData) + 0.5])
+
+        return ax
 
 class GraphHorizontalBar(Graph):
     def __init__(self, *args, **keywords):
@@ -1095,7 +1156,7 @@ class GraphHorizontalBar(Graph):
             self.setTicks('x', xTicks)  
 
         #environLocal.printDebug([yTicks])
-        self._adjustAxisSpines(ax)
+        self.hideAxisSpines(ax)
         self._applyFormatting(ax)
         self.done()
 
@@ -1231,7 +1292,7 @@ class GraphHorizontalBarWeighted(Graph):
 #                 self.setTicks('x', xTicks)  
 #         environLocal.printDebug(['xTicks', xTicks])
 
-        self._adjustAxisSpines(ax)
+        self.hideAxisSpines(ax)
         self._applyFormatting(ax)
         self.done()
 
@@ -1353,7 +1414,7 @@ class GraphScatterWeighted(Graph):
         self.setAxisRange('y', (yMin, yMax),)
         self.setAxisRange('x', (xMin, xMax),)
 
-        self._adjustAxisSpines(ax)
+        self.hideAxisSpines(ax)
         self._applyFormatting(ax)
         self.done()
 
@@ -1427,7 +1488,7 @@ class GraphScatter(Graph):
         if not self._axisRangesAlreadySet['x']:
             self.setAxisRange('x', (xValues[0], xValues[-1]))
 
-        self._adjustAxisSpines(ax)
+        self.hideAxisSpines(ax)
         self._applyFormatting(ax)
         self.done()
 
@@ -1484,7 +1545,7 @@ class GraphHistogram(Graph):
             y.append(b)
         ax.bar(x, y, width = binWidth, alpha=alpha, color=color)
 
-        self._adjustAxisSpines(ax)
+        self.hideAxisSpines(ax)
         self._applyFormatting(ax)
         self.done()
 
@@ -1589,13 +1650,14 @@ class GraphGroupedVerticalBar(Graph):
                          family=self.fontFamily) 
         ax.legend(colors, subLabels, prop=font)
 
-        self._adjustAxisSpines(ax)
+        self.hideAxisSpines(ax)
         self._applyFormatting(ax)
         self.done()
 
 
 class _Graph3DBars(Graph):
-    '''Not functioning in all matplotlib versions
+    '''
+    Not functioning in all matplotlib versions
     '''
     def __init__(self, *args, **keywords):
         '''
@@ -1828,7 +1890,7 @@ class PlotStream(object):
 
         # store axis label type for time-based plots
         # either measure or offset
-        self._axisLabelUsesMeasures = None
+        self.useMeasuresForAxisLabel = None
 
     #---------------------------------------------------------------------------
     def _extractChordDataOneAxis(self, fx, c):
@@ -1968,10 +2030,10 @@ class PlotStream(object):
         Return an axis label for measure or offset, depending on if measures are available.
         '''
         # look for this attribute; only want to do ticksOffset procedure once
-        if self._axisLabelUsesMeasures is None: # pragma: no cover
-            raise GraphException('call ticksOffset() first')
+        if self.useMeasuresForAxisLabel is None: # pragma: no cover
+            raise GraphException('Axis label does not use measures, so call ticksOffset() first')
         # this parameter is set in 
-        if self._axisLabelUsesMeasures:
+        if self.useMeasuresForAxisLabel:
             return 'Measure Number'
         else:
             return 'Offset'
@@ -1993,11 +2055,10 @@ class PlotStream(object):
     def _filterPitchLabel(self, ticks):
         '''
         Given a list of ticks, replace all labels with alternative/unicode symbols where necessary.
-
         '''
         #environLocal.printDebug(['calling filterPitchLabel', ticks])
-        # this uses tex mathtext, which happens to define harp and flat
-        # http://matplotlib.sourceforge.net/users/mathtext.html
+        # this uses tex mathtext, which happens to define sharp and flat
+        #http://matplotlib.org/users/mathtext.html
         post = []
         for value, label in ticks:
             label = _substituteAccidentalSymbols(label)
@@ -2331,11 +2392,11 @@ class PlotStream(object):
         else:
             offsetMap = self.streamObj.measureOffsetMap([note.Note])
         if len(offsetMap) > 0:
-            self._axisLabelUsesMeasures = True
+            self.useMeasuresForAxisLabel = True
         else:
-            self._axisLabelUsesMeasures = False
+            self.useMeasuresForAxisLabel = False
         #environLocal.printDebug(['ticksOffset: got offset map keys', offsetMap.keys(), 
-        #    self._axisLabelUsesMeasures])
+        #    self.useMeasuresForAxisLabel])
 
         ticks = [] # a list of graphed value, string label pairs
         if len(offsetMap) > 0:
@@ -2603,16 +2664,24 @@ class PlotWindowedAnalysis(PlotStream):
         else:
             self.compressLegend = True
 
+        self.createGraph(*args, **keywords)
+        
+    def createGraph(self, *args, **keywords):
+        '''
+        actually create the graph...
+        '''
         # create a color grid
         self.graph = GraphColorGrid(*args, **keywords)
         # uses self.processor
+        
+        # data is a list of lists where the outer list represents one row
+        # of the graph and the inner list represents the color of each cell
         data, yTicks = self._extractData()
         xTicks = self.ticksOffset(minMaxOnly=True)
         
         self.graph.setData(data)
         self.graph.setAxisLabel('y', 'Window Size\n(Quarter Lengths)')
-        self.graph.setAxisLabel('x', 'Windows (%s Span)' %
-                                 self._axisLabelMeasureOrOffset())
+        self.graph.setAxisLabel('x', 'Windows (%s Span)' % self._axisLabelMeasureOrOffset())
         self.graph.setTicks('y', yTicks)
 
         # replace offset values with 0 and 1, as proportional here
@@ -2621,46 +2690,61 @@ class PlotWindowedAnalysis(PlotStream):
         else:
             environLocal.printDebug(['raw xTicks', xTicks])
             xTicks = []
+        environLocal.printDebug(['xTicks', xTicks])
         self.graph.setTicks('x', xTicks)
 
         
     def _extractData(self):
-        '''Extract data actually calls the processing routine. 
+        '''
+        Extract data actually calls the processing routine. 
+        
+        Returns two element tuple of the data (colorMatrix) and the yTicks list
         '''
         wa = windowed.WindowedAnalysis(self.streamObj, self.processor)
         unused_solutionMatrix, colorMatrix, metaMatrix = wa.process(self.minWindow, 
-            self.maxWindow, self.windowStep, windowType=self.windowType)
+                                                                    self.maxWindow, 
+                                                                    self.windowStep, 
+                                                                    windowType=self.windowType)
                 
+        # if more than 12 bars, reduce the number of ticks
+        if len(metaMatrix) > 12:
+            tickRange = range(0, len(metaMatrix), len(metaMatrix) // 12)
+        else:
+            tickRange = range(len(metaMatrix))
+
+        environLocal.printDebug(['tickRange', tickRange])
+        #environLocal.printDebug(['last start color', colorMatrix[-1][0]])
+        
+
         # get dictionaries of meta data for each row
         pos = 0
         yTicks = []
-
-        # if more than 12 bars, reduce the number of ticks
-        if len(metaMatrix) > 12:
-            tickRange = range(0, len(metaMatrix), int(len(metaMatrix) / 12))
-        else:
-            tickRange = range(len(metaMatrix))
-        environLocal.printDebug(['tickRange', tickRange])
-        for y in tickRange:        
+        
+        for y in tickRange: 
+            thisWindowSize = metaMatrix[y]['windowSize']
             # pad three ticks for each needed
             yTicks.append([pos, '']) # pad first
-            yTicks.append([pos+1, '%s' % metaMatrix[y]['windowSize']])
-            yTicks.append([pos+2, '']) # pad last
+            yTicks.append([pos + 1, str(thisWindowSize)])
+            yTicks.append([pos + 2, '']) # pad last
             pos += 3
 
         return colorMatrix, yTicks
     
     def _getLegend(self):
+        '''
+        Returns a solution legend for a WindowedAnalysis
+        '''
         title = (self.processor.name + 
                 ' (%s)' % self.processor.solutionUnitString())
         graphLegend = GraphColorGridLegend(doneAction=self.graph.doneAction, 
-                           title=title)
-        graphLegend.setData(self.processor.solutionLegend(
-                           compress=self.compressLegend))
+                                           title=title)
+        graphData = self.processor.solutionLegend(compress=self.compressLegend)
+        graphLegend.setData(graphData)
         return graphLegend
 
     def process(self):
-        '''Process method here overridden to provide legend.
+        '''
+        Process method here overridden to provide legend.
         '''
         # call the process routine in the base graph
         self.graph.process()
@@ -2669,7 +2753,8 @@ class PlotWindowedAnalysis(PlotStream):
         self.graphLegend.process()
 
     def write(self, fp=None): # pragma: no cover
-        '''Process method here overridden to provide legend.
+        '''
+        Process method here overridden to provide legend.
         '''
         if fp is None:
             fp = environLocal.getTempFile('.png')
@@ -4104,9 +4189,17 @@ class PlotFeatures(PlotMultiStream):
 
 #-------------------------------------------------------------------------------
 # public function
-def _getPlotsToMake(*args, **keywords):
+def getPlotsToMake(*args, **keywords):
     '''
-    Given `format` and `values` arguments, return a list of plot classes.
+    Given `format` and `values` provided as arguments or keywords, return a list of plot classes.
+    
+    no arguments = horizontalbar
+
+    >>> graph.getPlotsToMake()
+    [<class 'music21.graph.PlotHorizontalBarPitchSpaceOffset'>]
+    
+    >>> graph.getPlotsToMake('windowed')
+    [<class 'music21.graph.PlotWindowedTemperleyKostkaPayne'>]
     '''
     plotClasses = [
         # histograms
@@ -4322,7 +4415,7 @@ def plotStream(streamObj, *args, **keywords):
         :width: 600
 
     '''
-    plotMake = _getPlotsToMake(*args, **keywords)
+    plotMake = getPlotsToMake(*args, **keywords)
     #environLocal.printDebug(['plotClassName found', plotMake])
     for plotClassName in plotMake:
         obj = plotClassName(streamObj, *args, **keywords)
@@ -4371,11 +4464,11 @@ class TestExternal(unittest.TestCase):
     def test3DGraph(self):
         a = Graph3DPolygonBars(doneAction='write', 
                                title='50 x with random values increase by 10 per x', 
-                               alpha=.8, colors=['b', 'g'])
+                               alpha=0.8, colors=['b', 'g'])
         data = {1:[], 2:[], 3:[], 4:[], 5:[]}
         for i in range(len(data.keys())):
-            q = [(x, random.choice(range(10*i, 10*(i+1)))) for x in range(50)]
-            data[data.keys()[i]] = q
+            q = [(x, random.choice(range(10 * i, 10 * (i + 1)))) for x in range(50)]
+            data[list(data.keys())[i]] = q
         a.setData(data)
 
 
@@ -5080,7 +5173,7 @@ class Test(unittest.TestCase):
         b.process()
         
         self.assertEqual(b.data[0:8], [[0.5, 0, 0], [1.0, 0, 1], [1.5, 0, 1], 
-                                       [3, 0, 3], [0.5, 1, 0], [1.0, 1, 0], 
+                                       [3, 0, 3],   [0.5, 1, 0], [1.0, 1, 0], 
                                        [1.5, 1, 0], [3, 1, 0]])
         #b.write()
 
@@ -5176,53 +5269,53 @@ class Test(unittest.TestCase):
         
 
     def testGetPlotsToMakeA(self):
-        post = _getPlotsToMake(format='grid', values='krumhansl-schmuckler')
+        post = getPlotsToMake(format='grid', values='krumhansl-schmuckler')
         self.assertEqual(post, [PlotWindowedKrumhanslSchmuckler])
-        post = _getPlotsToMake(format='grid', values='aarden')
+        post = getPlotsToMake(format='grid', values='aarden')
         self.assertEqual(post, [PlotWindowedAardenEssen])
-        post = _getPlotsToMake(format='grid', values='simple')
+        post = getPlotsToMake(format='grid', values='simple')
         self.assertEqual(post, [PlotWindowedSimpleWeights])
-        post = _getPlotsToMake(format='grid', values='bellman')
+        post = getPlotsToMake(format='grid', values='bellman')
         self.assertEqual(post, [PlotWindowedBellmanBudge])
-        post = _getPlotsToMake(format='grid', values='kostka')
+        post = getPlotsToMake(format='grid', values='kostka')
         self.assertEqual(post, [PlotWindowedTemperleyKostkaPayne])
-        post = _getPlotsToMake(format='grid', values='KrumhanslKessler')
+        post = getPlotsToMake(format='grid', values='KrumhanslKessler')
         self.assertEqual(post, [PlotWindowedKrumhanslKessler])
 
 
         # no args get pitch space piano roll
-        post = _getPlotsToMake()
+        post = getPlotsToMake()
         self.assertEqual(post, [PlotHorizontalBarPitchSpaceOffset])
 
         # one arg gives a histogram of that parameters
-        post = _getPlotsToMake('duration')
+        post = getPlotsToMake('duration')
         self.assertEqual(post, [PlotHistogramQuarterLength])
-        post = _getPlotsToMake('quarterLength')
+        post = getPlotsToMake('quarterLength')
         self.assertEqual(post, [PlotHistogramQuarterLength])
-        post = _getPlotsToMake('ps')
+        post = getPlotsToMake('ps')
         self.assertEqual(post, [PlotHistogramPitchSpace])
-        post = _getPlotsToMake('pitch')
+        post = getPlotsToMake('pitch')
         self.assertEqual(post, [PlotHistogramPitchSpace])
-        post = _getPlotsToMake('pitchspace')
+        post = getPlotsToMake('pitchspace')
         self.assertEqual(post, [PlotHistogramPitchSpace])
-        post = _getPlotsToMake('pc')
+        post = getPlotsToMake('pc')
         self.assertEqual(post, [PlotHistogramPitchClass])
 
-        post = _getPlotsToMake('scatter', 'ps')
+        post = getPlotsToMake('scatter', 'ps')
         self.assertEqual(post, [PlotScatterPitchSpaceQuarterLength])
-        post = _getPlotsToMake('scatter', 'ps', 'duration')
+        post = getPlotsToMake('scatter', 'ps', 'duration')
         self.assertEqual(post, [PlotScatterPitchSpaceQuarterLength])
 
-        post = _getPlotsToMake('scatter', 'pc', 'offset')
+        post = getPlotsToMake('scatter', 'pc', 'offset')
         self.assertEqual(post, [PlotScatterPitchClassOffset])
 
 
     def testGetPlotsToMakeB(self):
-        post = _getPlotsToMake('dolan')
+        post = getPlotsToMake('dolan')
         self.assertEqual(post, [PlotDolan])
-        post = _getPlotsToMake(values='instrument')
+        post = getPlotsToMake(values='instrument')
         self.assertEqual(post, [PlotDolan])
-        post = _getPlotsToMake(format='horizontalbarweighted')
+        post = getPlotsToMake(format='horizontalbarweighted')
         self.assertEqual(post, [PlotDolan])
 
 
@@ -5325,7 +5418,7 @@ _DOC_ORDER = [
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
-    music21.mainTest(Test) #, runTest='testGetPlotsToMakeA')
+    music21.mainTest(Test) #TestExternal, 'noDocTest') #, runTest='testGetPlotsToMakeA')
 
 #------------------------------------------------------------------------------
 # eof

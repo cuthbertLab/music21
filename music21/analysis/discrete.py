@@ -27,6 +27,7 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 
 import unittest
 
+from collections import OrderedDict
 from music21 import exceptions21
 
 from music21 import pitch
@@ -65,32 +66,46 @@ class DiscreteAnalysis(object):
         # to configure the generation of a legend based only on the values 
         # that have been produced.
         # store pairs of sol, color
-        self._solutionsFound = []
+        self.solutionsFound = []
 
         # store alternative solutions, which may be sorted or not
-        self._alternativeSolutions = []
+        self.alternativeSolutions = []
 
     def _rgbToHex(self, rgb):
-        '''Utility conversion method
+        '''
+        Utility conversion method
+        
+        >>> da = analysis.discrete.DiscreteAnalysis()
+        >>> ffffff = (255, 255, 255)
+        >>> da._rgbToHex(ffffff)
+        '#ffffff'
         '''
         rgb = int(round(rgb[0])), int(round(rgb[1])), int(round(rgb[2]))
         return '#%02x%02x%02x' % rgb    
 
     def _hexToRgb(self, value):
-        '''Utility conversion method    
+        '''
+        Utility conversion method for six-digit hex values to RGB lists.
+        
         >>> da = analysis.discrete.DiscreteAnalysis()
         >>> da._hexToRgb('#ffffff')
         [255, 255, 255]
+        >>> da._hexToRgb('#ff8000')
+        [255, 128, 0]
         >>> da._hexToRgb('#000000')
         [0, 0, 0]
         '''
         value = value.lstrip('#')
         lv = len(value)
-        return list(int(value[i:i+lv//3], 16) for i in range(0, lv, lv//3))
+        return list(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
 
     def _rgbLimit(self, value):
-        '''Utility conversion method    
+        '''
+        Utility conversion method -- limits all numbers to between 0 and 255.
+        
         >>> da = analysis.discrete.DiscreteAnalysis()
+        >>> da._rgbLimit(70)
+        70
         >>> da._rgbLimit(300)
         255
         >>> da._rgbLimit(-30)
@@ -104,9 +119,10 @@ class DiscreteAnalysis(object):
 
 
     def clearSolutionsFound(self):
-        '''Clear all stored solutions 
         '''
-        self._solutionsFound = []
+        Clear all stored solutions 
+        '''
+        self.solutionsFound = []
 
     def getColorsUsed(self):
         '''
@@ -114,7 +130,7 @@ class DiscreteAnalysis(object):
         return the colors that have been used.
         '''
         post = []
-        for unused_solution, color in self._solutionsFound:
+        for unused_solution, color in self.solutionsFound:
             if color not in post:
                 post.append(color)
         return post    
@@ -125,7 +141,7 @@ class DiscreteAnalysis(object):
         return the solutions that have been used.
         '''
         post = []
-        for solution, unused_color in self._solutionsFound:
+        for solution, unused_color in self.solutionsFound:
             if solution not in post:
                 post.append(solution)
         return post   
@@ -189,23 +205,23 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
     # favor eb minor
     # C- major cannot be determined if no enharmonics are present
     # C# major can be determined w/o enharmonics
-    keysValidMajor = ['C', 'C#', 'C-',
+    keysValidMajor = ('C', 'C#', 'C-',
                       'D-', 'D',
                       'E-', 'E',
                       'F', 'F#',
                       'G-', 'G',
                       'A-', 'A',
                       'B-', 'B',
-                    ]
+                    )
 
-    keysValidMinor = ['C', 'C#',
+    keysValidMinor = ('C', 'C#',
                       'D', 'D#',
                       'E-', 'E',
                       'F', 'F#',
                       'G', 'G#',
                       'A-', 'A', 'A#',
                       'B-', 'B',
-                    ]
+                    )
 
     def __init__(self, referenceStream=None):
         DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
@@ -214,16 +230,19 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             self.sharpFlatCount = self._getSharpFlatCount(referenceStream)
         else:
             self.sharpFlatCount = None
-        self._majorKeyColors = {}
-        self._minorKeyColors = {}
+        self.majorKeyColors = {}
+        self.minorKeyColors = {}
         self._fillColorDictionaries()
     
     def _fillColorDictionaries(self):
         '''
         >>> p = analysis.discrete.KrumhanslSchmuckler()
-        >>> len(p._majorKeyColors)
+        
+        This automatically calls _fillColorDictionaries
+        
+        >>> len(p.majorKeyColors)
         15
-        >>> p._majorKeyColors['C']
+        >>> p.majorKeyColors['C']
         '#ff816b'
         '''
         # for each step, assign a color
@@ -231,16 +250,16 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         # idea is basically:
         # red, orange, yellow, green, cyan, blue, purple, pink
         stepLib = {'C': '#CD4F39', # tomato3
-                'D': '#DAA520', # goldenrod
-                'E': '#BCEE68', # DarkOliveGreen2
-                'F': '#96CDCD', # PaleTurquoise3
-                'G': '#6495ED', # cornflower blue
-                'A': '#8968CD', # MediumPurple3
-                'B': '#FF83FA', # orchid1
-                } 
+                   'D': '#DAA520', # goldenrod
+                   'E': '#BCEE68', # DarkOliveGreen2
+                   'F': '#96CDCD', # PaleTurquoise3
+                   'G': '#6495ED', # cornflower blue
+                   'A': '#8968CD', # MediumPurple3
+                   'B': '#FF83FA', # orchid1
+                   } 
 
-        for dst, valid in [(self._majorKeyColors, self.keysValidMajor), 
-                           (self._minorKeyColors, self.keysValidMinor)]:
+        for dst, valid in [(self.majorKeyColors, self.keysValidMajor), 
+                           (self.minorKeyColors, self.keysValidMinor)]:
             for validKey in valid:
                 # convert to pitch object
                 validKey = pitch.Pitch(validKey)
@@ -255,13 +274,15 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                     for i in range(len(rgbStep)):
                         rgbStep[i] = self._rgbLimit(rgbStep[i] - 100)
         
+                # alter colors for chromatic keys
                 if len(validKey.name) > 1:
                     magnitude = 15
                     if validKey.name[1] == '-':
                         # index and value shift for each of rgb values
-                        shiftLib = {0: magnitude, 1: magnitude, 2: -magnitude}                   
+                        shiftLib = {0: magnitude, 1: magnitude, 2: -1 * magnitude}                   
                     elif validKey.name[1] == '#':                   
-                        shiftLib = {0: -magnitude, 1: -magnitude, 2: magnitude}                   
+                        shiftLib = {0: -1 * magnitude, 1: -1 * magnitude, 2: magnitude}                   
+
                     for i in shiftLib:
                         rgbStep[i] = self._rgbLimit(rgbStep[i] + shiftLib[i])
                 # add to dictionary
@@ -414,20 +435,20 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         return soln    
 
     def solutionLegend(self, compress=False):
-        ''' Returns a list of lists of possible results for the creation of a legend.
-
+        '''
+        Returns a list of lists of possible results for the creation of a legend.
         
         >>> p = analysis.discrete.KrumhanslSchmuckler()
         >>> post = p.solutionLegend()
         '''
         # need a presentation order for legend; not alphabetical
         _keySortOrder = ['C-', 'C', 'C#',
-                          'D-', 'D', 'D#',
-                          'E-', 'E',
-                          'F', 'F#',
-                          'G-', 'G', 'G#',
-                          'A-', 'A', 'A#',
-                          'B-', 'B',
+                         'D-', 'D', 'D#',
+                         'E-', 'E',
+                         'F', 'F#',
+                         'G-', 'G', 'G#',
+                         'A-', 'A', 'A#',
+                         'B-', 'B',
                         ]
         if compress:
             colorsUsed = self.getColorsUsed()
@@ -489,15 +510,23 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
     
     def solutionToColor(self, solution):
+        '''
+        Given a two-element tuple of (tonicPitch, modality) return the proper color
+        
+        >>> p = analysis.discrete.KrumhanslSchmuckler()
+        >>> solution = (pitch.Pitch('C'), 'major')
+        >>> p.solutionToColor(solution)
+        '#ff816b'
+        '''
         solutionKey = solution[0]
         # key may be None
         if solutionKey is None:
             return '#ffffff'
         modality = solution[1].lower()
         if modality == 'major':
-            return self._majorKeyColors[solutionKey.name]
+            return self.majorKeyColors[solutionKey.name]
         else:
-            return self._minorKeyColors[solutionKey.name]
+            return self.minorKeyColors[solutionKey.name]
 
     
     def _likelyKeys(self, sStream):
@@ -626,19 +655,20 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
         # store all aleternatives in solution format
         if storeAlternatives:
-            self._alternativeSolutions = []
+            self.alternativeSolutions = []
             # get all but first
             for coefficient, p, mode in sortList[1:]:
                 # adjust enharmonic spelling
                 p = self._bestKeyEnharmonic(p, mode, sStream)
-                self._alternativeSolutions.append((p, mode, coefficient))
+                self.alternativeSolutions.append((p, mode, coefficient))
 
         # store solutions for compressed legend generation
-        self._solutionsFound.append((solution, color))
+        self.solutionsFound.append((solution, color))
         return solution, color        
     
     def _solutionToObject(self, solution):
-        '''Convert a solution into an appropriate object representation, returning a Key object.
+        '''
+        Convert a solution into an appropriate object representation, returning a Key object.
         '''
         k = key.Key(tonic=solution[0], mode=solution[1])
         k.correlationCoefficient = solution[2]
@@ -670,7 +700,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         if k.alternateInterpretations is None:
             k.alternateInterpretations = []
             
-        for sol in self._alternativeSolutions:
+        for sol in self.alternativeSolutions:
             # append each additional interpretation
             k.alternateInterpretations.append(self._solutionToObject(sol))
         return k
@@ -964,7 +994,7 @@ class Ambitus(DiscreteAnalysis):
         'ambitus'
         '''
         DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
-        self._pitchSpanColors = {}
+        self._pitchSpanColors = OrderedDict()
         self._generateColors()
 
 
@@ -1102,7 +1132,16 @@ class Ambitus(DiscreteAnalysis):
         Return legend data. 
 
         >>> s = corpus.parse('bach/bwv66.6')
-        >>> p = analysis.discrete.Ambitus(s.parts[0]) #provide ref stream
+        >>> soprano = s.parts[0]
+        >>> p = analysis.discrete.Ambitus(soprano) #provide ref stream
+        >>> p.solutionLegend()
+        [['', 
+          [(0, '#130f19'), (1, '#211a2c'), (2, '#2f263f'), 
+           (3, '#3e3253'), (4, '#4c3d66'), (5, '#5b4979')]], 
+         ['', 
+          [(6, '#69548c'), (7, '#775f9f'), (8, '#866bb2'), (9, '#9476c5'), 
+           (10, '#a382d9'), (11, '#b18eec'), (12, '#bf99ff')]]]
+
         >>> len(p.solutionLegend())
         2
         >>> [len(x) for x in p.solutionLegend()]
@@ -1201,7 +1240,7 @@ class Ambitus(DiscreteAnalysis):
         color = self.solutionToColor(post[1].ps - post[0].ps)
         
         # store solutions for compressed legend generation
-        self._solutionsFound.append((solution, color))
+        self.solutionsFound.append((solution, color))
         return solution, color
 
 

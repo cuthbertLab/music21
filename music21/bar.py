@@ -25,7 +25,6 @@ from music21 import environment
 _MOD = 'bar.py'
 environLocal = environment.Environment(_MOD)
 
-
 #-------------------------------------------------------------------------------
 
 class BarException(exceptions21.Music21Exception):
