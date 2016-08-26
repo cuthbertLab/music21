@@ -3536,7 +3536,7 @@ class MeasureExporter(XMLExporterBase):
         mxHarmony = Element('harmony')
 
         csRoot = cs.root()
-        csBass = cs.bass(find=False)
+        csBass = cs.bass()
         # TODO: do not look at ._attributes...
         if cs._roman is not None:
             mxFunction = SubElement(mxHarmony, 'function')
