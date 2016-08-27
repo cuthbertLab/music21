@@ -65,7 +65,8 @@ def main(fnAccept=None):
                     #'repeat.py', # used to hang pylint...
                     #'spanner.py', # used to hang pylint...
                     ]
-    disable = [
+    disable = [  # These also need to be changed in MUSIC21BASE/.pylintrc
+               
                 'cyclic-import', # we use these inside functions when there's a deep problem.
                 'unnecessary-pass', # nice, but not really a problem...
                 'locally-disabled', # test for this later, but hopefully will know what 
