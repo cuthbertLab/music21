@@ -12,7 +12,7 @@
 #-------------------------------------------------------------------------------
 
 import os
-from setuptools import setup, find_packages
+import setuptools
 
 # Do not import music21 directly.
 # Instead, read the _version.py file and exec its contents. 
@@ -54,7 +54,7 @@ classifiers = [
 ]
 
 if __name__ == '__main__':
-    setup(
+    setuptools.setup(
         name='music21',
         version=m21version,
         description=DESCRIPTION,
@@ -65,7 +65,7 @@ if __name__ == '__main__':
         url='https://github.com/cuthbertLab/music21',
         classifiers=classifiers,
         download_url='https://github.com/cuthbertLab/music21/releases/download/v%s/music21-%s.tar.gz' % (m21version, m21version),
-        packages=find_packages(exclude=['ez_setup']),
+        packages=setuptools.find_packages(exclude=['ez_setup']),
         include_package_data=True,
     )
 

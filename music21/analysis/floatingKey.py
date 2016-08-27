@@ -13,8 +13,8 @@ The floatingKey analyzer will give an approximation of the key at any point in
 a score down to the measure level using a fixed window.  It helps smooth out
 measures emphasizing non-chord tones, etc.
 '''
+from __future__ import division, print_function, absolute_import
 
-from __future__ import print_function
 import copy
 from music21 import key
 from music21.exceptions21 import AnalysisException

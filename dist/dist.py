@@ -284,8 +284,7 @@ class Distributor(object):
             #setup.runDisutils(type)
             savePath = os.getcwd()
             os.chdir(self.fpPackageDir)
-            os.system('%s setup.py %s' % 
-                        (PY, buildType))
+            os.system('%s setup.py %s' % (PY, buildType))
             os.chdir(savePath)
 
 #        os.system('cd %s; %s setup.py bdist_egg' % (self.fpPackageDir, PY))
@@ -331,7 +330,7 @@ class Distributor(object):
 
     def getMD5Path(self):
         '''
-        for PyPi
+        for PyPi -- no longer used.
         '''
         gitHubPath = "https://github.com"
         user = "cuthbertLab"
@@ -356,5 +355,5 @@ if __name__ == '__main__':
     d.buildNoCorpus = True
     d.build()
     d.updatePaths()
-    d.getMD5Path()
+    #d.getMD5Path()
     #d.uploadPyPi()

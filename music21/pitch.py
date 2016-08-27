@@ -28,6 +28,8 @@ from music21 import exceptions21
 from music21 import interval
 from music21.common import SlottedObjectMixin
 from music21.ext import six
+if six.PY2:
+    from music21.common import py3round as round
 
 from music21 import environment
 _MOD = "pitch.py"
@@ -375,7 +377,7 @@ def _convertHarmonicToCents(value):
     '''
     if value < 0: #subharmonics
         value = 1 / (abs(value))
-    return int(round(1200 * math.log(value, 2), 0))
+    return round(1200 * math.log(value, 2), 0)
 
 #------------------------------------------------------------------------------
 
@@ -637,9 +639,9 @@ class Microtone(SlottedObjectMixin):
         # cent values may be of any resolution, but round to nearest int
 
         if self._centShift >= 0:
-            sub = '+%sc' % int(round(self._centShift))
+            sub = '+%sc' % round(self._centShift)
         elif self._centShift < 0:
-            sub = '%sc' % int(round(self._centShift))
+            sub = '%sc' % round(self._centShift)
             if sub == '0c':
                 sub = '-0c'
         # only show a harmonic if present
@@ -1857,7 +1859,7 @@ class Pitch(object):
         while midiDistance > 11.0:
             midiDistance -= 12.0
         
-        return int(round(midiDistance * 100))
+        return round(midiDistance * 100)
 
 
     @property
@@ -2153,7 +2155,7 @@ class Pitch(object):
         midi values are constrained within the range of 0 to 127
         floating point values,
         '''
-        value = int(round(value))
+        value = round(value)
         if value > 127:
             value = (12 * 9) + (value % 12) # highest oct plus modulus
             if value < (127-12):
@@ -2526,7 +2528,7 @@ class Pitch(object):
             return self.step + str(self.octave)
 
     def _getPitchClass(self):
-        pc = int(round(self.ps) % 12)
+        pc = round(self.ps) % 12
         if pc == 12:
             pc = 0
         return pc

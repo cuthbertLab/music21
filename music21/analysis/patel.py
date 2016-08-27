@@ -8,7 +8,7 @@
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-from __future__ import division, print_function
+from __future__ import division, print_function, absolute_import
 
 import unittest
 import math

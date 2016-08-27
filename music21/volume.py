@@ -20,6 +20,10 @@ from music21 import exceptions21
 from music21 import common
 from music21.common import SlottedObjectMixin
 
+from music21.ext import six
+if six.PY2:
+    from music21.common import py3round as round
+    
 from music21 import environment
 _MOD = "volume.py"
 environLocal = environment.Environment(_MOD)
@@ -392,7 +396,7 @@ class Volume(SlottedObjectMixin):
             scalar = 1
         else:
             scalar = value
-        self._velocity = int(round(scalar * 127))
+        self._velocity = round(scalar * 127)
 
 
 #-------------------------------------------------------------------------------

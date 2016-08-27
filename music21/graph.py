@@ -18,7 +18,7 @@ graphing archetypes using the matplotlib library. The :class:`~music21.graph.Plo
 object subclasses provide reusable approaches to graphing data and structures in 
 :class:`~music21.stream.Stream` objects.
 '''
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 
 from collections import namedtuple
 
@@ -45,6 +45,8 @@ from music21.analysis import windowed
 from music21 import features
 from music21.ext import six
 from music21.ext import webcolors
+if six.PY2:
+    from music21.common import py3round as round
 
 
 from music21 import environment
@@ -475,7 +477,7 @@ class Graph(object):
         TODO: should this not also use min? instead of always starting from zero?
         '''
         maxData = max(unsortedData)
-        tickStep = int(round(maxData / dataSteps))
+        tickStep = round(maxData / dataSteps)
 
         tickList = []
         if tickStep <= 1:
@@ -1146,11 +1148,11 @@ class GraphHorizontalBar(Graph):
 
         # first, see if ticks have been set externally
         if 'ticks' in self.axis['x'] and len(self.axis['x']['ticks']) == 0:
-            rangeStep = int(xMin + int(round(xRange / 10)))
+            rangeStep = int(xMin + round(xRange / 10))
             if rangeStep == 0:
                 rangeStep = 1
             for x in range(int(math.floor(xMin)), 
-                           int(round(math.ceil(xMax))), 
+                           round(math.ceil(xMax)), 
                            rangeStep):
                 xTicks.append([x, '%s' % x])
             self.setTicks('x', xTicks)  
@@ -1282,11 +1284,11 @@ class GraphHorizontalBarWeighted(Graph):
 
         # first, see if ticks have been set externally
 #         if 'ticks' in self.axis['x'] and len(self.axis['x']['ticks']) == 0:
-#             rangeStep = int(xMin+int(round(xRange/10)))
+#             rangeStep = int(xMin round(xRange/10))
 #             if rangeStep == 0:
 #                 rangeStep = 1
 #             for x in range(int(math.floor(xMin)), 
-#                            int(round(math.ceil(xMax))), 
+#                            round(math.ceil(xMax)), 
 #                            rangeStep):
 #                 xTicks.append([x, '%s' % x])
 #                 self.setTicks('x', xTicks)  
@@ -2937,7 +2939,7 @@ class PlotHistogram(PlotStream):
         xTicks = dataTick
         # alway have min and max
         yTicks = []
-        yTickStep = int(round(countMax / 8.))
+        yTickStep = round(countMax / 8)
         if yTickStep <= 1:
             yTickStep = 2
         for y in range(0, countMax+1, yTickStep):

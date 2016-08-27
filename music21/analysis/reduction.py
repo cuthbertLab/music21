@@ -16,6 +16,7 @@ and one or more reductive representation lines.
 
 Used by graph.PlotHorizontalBarWeighted()
 '''
+from __future__ import division, print_function, absolute_import
 
 
 import unittest

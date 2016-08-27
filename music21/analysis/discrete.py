@@ -9,7 +9,6 @@
 # Copyright:    Copyright © 2010-2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 '''
 Modular analysis procedures for use alone or 
 applied with :class:`music21.analysis.windowed.WindowedAnalysis` class. 
@@ -22,6 +21,7 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 (for algorithmic key detection) and 
 :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) provide examples.
 '''
+from __future__ import division, print_function, absolute_import
 #TODO: make an analysis.base for the Discrete and analyzeStream aspects, then create
 # range and key modules in analysis
 
@@ -33,6 +33,10 @@ from music21 import exceptions21
 from music21 import pitch
 from music21 import interval
 from music21 import key
+
+from music21.ext import six
+if six.PY2:
+    from music21.common import py3round as round
 
 
 
@@ -80,7 +84,7 @@ class DiscreteAnalysis(object):
         >>> da._rgbToHex(ffffff)
         '#ffffff'
         '''
-        rgb = int(round(rgb[0])), int(round(rgb[1])), int(round(rgb[2]))
+        rgb = round(rgb[0]), round(rgb[1]), round(rgb[2])
         return '#%02x%02x%02x' % rgb    
 
     def _hexToRgb(self, value):
@@ -958,23 +962,6 @@ keyWeightKeyAnalysisClasses = [KrumhanslSchmuckler, KrumhanslKessler,
                                AardenEssen, SimpleWeights, BellmanBudge, TemperleyKostkaPayne]
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #------------------------------------------------------------------------------
 class Ambitus(DiscreteAnalysis):
     '''
@@ -1001,6 +988,16 @@ class Ambitus(DiscreteAnalysis):
     def _generateColors(self, numColors=None):
         '''
         Provide uniformly distributed colors across the entire range.
+        
+        >>> ambitusAnalysis = analysis.discrete.Ambitus()
+        >>> ambitusAnalysis._generateColors()
+        >>> for i, j in ambitusAnalysis._pitchSpanColors.items():
+        ...     if i > 3: break
+        ...     print(i, j)
+        0 #130f19
+        1 #14101b
+        2 #16111d
+        3 #16121e
         '''
         if numColors is None:
             if self._referenceStream is not None:
@@ -1016,9 +1013,9 @@ class Ambitus(DiscreteAnalysis):
             valueRange = 1 # avoid float division by zero
         step = 0
         antiBlack = 25
-        for i in range(minPitch, maxPitch+1):
+        for i in range(minPitch, maxPitch + 1):
             # do not use all 255 to avoid going to black
-            val = int(round(((255.0 - antiBlack)/ valueRange) * step)) + antiBlack
+            val = round(((255.0 - antiBlack)/ valueRange) * step) + antiBlack
             # store in dictionary the accepted values, not the step
             self._pitchSpanColors[i] = self._rgbToHex(((val*.75), (val*.6), val))
             step += 1
