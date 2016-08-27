@@ -448,7 +448,7 @@ def py3round(number, ndigits=None):
     intIt = True if ndigits is None else False
     ndigits = ndigits if ndigits is not None else 0
     
-    if abs(round(f) - f) == 0.5:
+    if abs(round(float(f)) - float(f)) == 0.5:
         retAmount = 2.0 * round(f / 2.0, ndigits);
     else:
         retAmount = round(f, ndigits)

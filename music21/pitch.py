@@ -377,7 +377,7 @@ def _convertHarmonicToCents(value):
     '''
     if value < 0: #subharmonics
         value = 1 / (abs(value))
-    return round(1200 * math.log(value, 2), 0)
+    return round(1200 * math.log(value, 2))
 
 #------------------------------------------------------------------------------
 
