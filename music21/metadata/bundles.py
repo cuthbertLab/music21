@@ -1135,9 +1135,8 @@ class MetadataBundle(object):
                         if metadataEntry.sourcePath.endswith(fileExtension):
                             include = True
                             break
-                        elif fileExtension.endswith('xml') \
-                            and metadataEntry.sourcePath.endswith(
-                                ('mxl', 'mx')):
+                        elif (fileExtension.endswith('xml')
+                                and metadataEntry.sourcePath.endswith(('mxl', 'mx'))):
                             include = True
                             break
                 else:

@@ -1244,9 +1244,9 @@ class JSONFreezer(JSONFreezeThawBase):
 
         for attr in inspect.classify_class_attrs(type(self.storedObject)):
             if attr.kind == 'data' and inspect.ismemberdescriptor(attr.object):
-                if attr.name not in excludedNames and \
-                    attr.name.startswith('_') and \
-                    not attr.name.startswith('__'):
+                if (attr.name not in excludedNames 
+                        and attr.name.startswith('_') 
+                        and not attr.name.startswith('__')):
                     result.add(attr.name)
             else:
                 excludedNames.append(attr.name)
@@ -1256,9 +1256,9 @@ class JSONFreezer(JSONFreezeThawBase):
             elif name in excludedNames:
                 continue
             attr = getattr(self.storedObject, name)
-            if inspect.ismethod(attr) or \
-                inspect.isfunction(attr) or  \
-                inspect.isroutine(attr):
+            if (inspect.ismethod(attr) 
+                    or inspect.isfunction(attr) 
+                    or  inspect.isroutine(attr)):
                 continue
             result.add(name)
 

@@ -11477,8 +11477,9 @@ class Measure(Stream):
             return str(self.number)
 
     def __repr__(self):
-        return "<music21.stream.%s %s offset=%s>" % \
-            (self.__class__.__name__, self.measureNumberWithSuffix(), self.offset)
+        return "<music21.stream.%s %s offset=%s>" % (self.__class__.__name__, 
+                                                     self.measureNumberWithSuffix(), 
+                                                     self.offset)
 
     #--------------------------------------------------------------------------
     def mergeAttributes(self, other):

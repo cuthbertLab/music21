@@ -390,13 +390,13 @@ def compressXML(filename, deleteOriginal=False):
     filenameList.append(archivedName[0:len(archivedName) - 4] + ".mxl")
     newFilename = os.path.sep.join(filenameList)  # new filename
     # contents of container.xml file in META-INF folder
-    container = '<?xml version="1.0" encoding="UTF-8"?>\n\
-<container>\n\
-  <rootfiles>\n\
-    <rootfile full-path="{0}"/>\n\
-  </rootfiles>\n\
-</container>\n\
-    '.format(archivedName)
+    container = '''<?xml version="1.0" encoding="UTF-8"?>
+<container>
+  <rootfiles>
+    <rootfile full-path="{0}"/>
+  </rootfiles>
+</container>
+    '''.format(archivedName)
     # Export container and original xml file to system as a compressed XML.
     with zipfile.ZipFile(
         newFilename,

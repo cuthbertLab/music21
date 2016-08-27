@@ -182,7 +182,8 @@ def userValuesToValues(valueList):
 
 
 def getColor(color):
-    '''Convert any specification of a color to a hexadecimal color used by matplotlib. 
+    '''
+    Convert any specification of a color to a hexadecimal color used by matplotlib. 
     
     >>> graph.getColor('red')
     '#ff0000'
@@ -685,7 +686,7 @@ class Graph(object):
         pass
 
     #---------------------------------------------------------------------------
-    def done(self, fp=None):
+    def callDoneAction(self, fp=None):
         '''
         Implement the desired doneAction, after data processing
         '''
@@ -781,13 +782,13 @@ class GraphNetworxGraph(Graph):
         for nId, nData in self.networkxGraph.nodes(data=True):
             posNodes[nId] = nData['pos']
             # shift labels off center of nodes
-            posNodeLabels[nId] = (nData['pos'][0]+.125, nData['pos'][1])
+            posNodeLabels[nId] = (nData['pos'][0] + 0.125, nData['pos'][1])
 
         #environLocal.printDebug(['get position', posNodes])
         #posNodes = networkx.spring_layout(self.networkxGraph, weighted=True) 
         # draw nodes
         networkx.draw_networkx_nodes(self.networkxGraph, posNodes, 
-            node_size=300, ax=ax, node_color='#605C7F', alpha=.5)
+            node_size=300, ax=ax, node_color='#605C7F', alpha=0.5)
 
         for (u,v,d) in self.networkxGraph.edges(data=True):
             environLocal.printDebug(['GraphNetworxGraph', (u,v,d)])
@@ -814,7 +815,7 @@ class GraphNetworxGraph(Graph):
         # standard procedures
         self.hideAxisSpines(ax, leftBottom=True)
         self.applyFormatting(ax)
-        self.done()
+        self.callDoneAction()
 
 
 
@@ -857,7 +858,7 @@ class GraphColorGrid(Graph):
         # this sets the color of the main data presentation window
         #axTop.axesPatch.set_facecolor('#000000')
 
-        # axTop.bar([0.5], [1], 1, color=['#000000'], linewidth=.5, edgecolor='#111111')
+        # axTop.bar([0.5], [1], 1, color=['#000000'], linewidth=0.5, edgecolor='#111111')
         
         rowCount = len(self.data)
 
@@ -913,7 +914,7 @@ class GraphColorGrid(Graph):
         if rowCount > 12:
             self.fig.subplots_adjust(hspace=0)
         else:
-            self.fig.subplots_adjust(hspace=.1)
+            self.fig.subplots_adjust(hspace=0.1)
 
 
         axisRangeNumbers = (0, 1)
@@ -923,7 +924,7 @@ class GraphColorGrid(Graph):
         # standard procedures
         self.hideAxisSpines(axTop, leftBottom=True)
         self.applyFormatting(axTop)
-        self.done()
+        self.callDoneAction()
 
 
 class GraphColorGridLegend(Graph):
@@ -989,7 +990,7 @@ class GraphColorGridLegend(Graph):
         # standard procedures
         self.hideAxisSpines(axTop, leftBottom=True)
         self.applyFormatting(axTop)
-        self.done()
+        self.callDoneAction()
 
     def makeOneRowOfGraph(self, figure, rowIndex, rowLabel, rowData):
         '''
@@ -1163,7 +1164,7 @@ class GraphHorizontalBar(Graph):
         #environLocal.printDebug([yTicks])
         self.hideAxisSpines(ax)
         self.applyFormatting(ax)
-        self.done()
+        self.callDoneAction()
 
 
 
@@ -1224,18 +1225,17 @@ class GraphHorizontalBarWeighted(Graph):
             alphas = []
             colors = []
             for i, data in enumerate(points):
+                
+                color = self.colors[i % len(self.colors)]
+                alpha = self.alpha
+                yShift = 0 # between -1 and 1
+
                 if len(data) == 3:
                     x, span, heightScalar = data
-                    color = self.colors[i%len(self.colors)]
-                    alpha = self.alpha
-                    yShift = 0 # between -1 and 1
                 elif len(data) == 4:
                     x, span, heightScalar, color = data
-                    alpha = self.alpha
-                    yShift = 0 # between -1 and 1
                 elif len(data) == 5:
                     x, span, heightScalar, color, alpha = data
-                    yShift = 0 # between -1 and 1
                 elif len(data) == 6:
                     x, span, heightScalar, color, alpha, yShift = data
                 # filter color value
@@ -1253,18 +1253,20 @@ class GraphHorizontalBarWeighted(Graph):
                 # TODO: add high/low shift to position w/n range
                 # provide a list of start, end points;
                 # then start y position, bar height
-                h = self._barHeight*heightScalar
-                yAdjust = (self._barHeight-h) * 0.5
-                yShiftUnit = self._barHeight * (1-heightScalar) * 0.5
-                yRanges.append((yPos + 
-                    self._margin + yAdjust + (yShiftUnit*yShift), h))
+                h = self._barHeight * heightScalar
+                yAdjust = (self._barHeight - h) * 0.5
+                yShiftUnit = self._barHeight * (1 - heightScalar) * 0.5
+                adjustedY = yPos + self._margin + yAdjust + (yShiftUnit * yShift)
+                yRanges.append((adjustedY, h))
 
             for i, xRange in enumerate(xRanges):
                 # note: can get ride of bounding lines by providing
                 # linewidth=0, however, this may leave gaps in adjacent regions
-                ax.broken_barh([xRange], yRanges[i],
-                        facecolors=colors[i], alpha=alphas[i], 
-                        edgecolor=colors[i])
+                ax.broken_barh([xRange], 
+                               yRanges[i],
+                               facecolors=colors[i], 
+                               alpha=alphas[i], 
+                               edgecolor=colors[i])
 
             # ticks are value, label
             yTicks.append([yPos + self._barSpace * 0.5, key])
@@ -1279,8 +1281,8 @@ class GraphHorizontalBarWeighted(Graph):
 
         # NOTE: these pad values determine extra space inside the graph that
         # is not filled with data, a sort of inner margin
-        self.setAxisRange('y', (0, len(keys) * self._barSpace), paddingFraction=.05)
-        self.setAxisRange('x', (xMin, xMax), paddingFraction=.01)
+        self.setAxisRange('y', (0, len(keys) * self._barSpace), paddingFraction=0.05)
+        self.setAxisRange('x', (xMin, xMax), paddingFraction=0.01)
         self.setTicks('y', yTicks)  
 
         # first, see if ticks have been set externally
@@ -1297,7 +1299,7 @@ class GraphHorizontalBarWeighted(Graph):
 
         self.hideAxisSpines(ax)
         self.applyFormatting(ax)
-        self.done()
+        self.callDoneAction()
 
 
 
@@ -1374,7 +1376,7 @@ class GraphScatterWeighted(Graph):
             else:
                 # this will make the minimum scalar 0 when z is zero
                 if zRange != 0:
-                    scalar = (z-zMin) / zRange # shifted part / range
+                    scalar = (z - zMin) / zRange # shifted part / range
                 else:
                     scalar = 0.5 # if all the same size, use 0.5
                 scaled = self._minDiameter + (self._rangeDiameter * scalar)
@@ -1386,8 +1388,8 @@ class GraphScatterWeighted(Graph):
             y = yList[i]
             z, unused_zScalar = zNorm[i] # normalized values
 
-            width=z*xDistort
-            height=z*yDistort
+            width = z * xDistort
+            height = z * yDistort
             e = patches.Ellipse(xy=(x, y), width=width, height=height)
             #e = patches.Circle(xy=(x, y), radius=z)
             ax.add_artist(e)
@@ -1395,7 +1397,7 @@ class GraphScatterWeighted(Graph):
             e.set_clip_box(ax.bbox)
             #e.set_alpha(self.alpha*zScalar)
             e.set_alpha(self.alpha)
-            e.set_facecolor(getColor(self.colors[i%len(self.colors)])) 
+            e.set_facecolor(getColor(self.colors[i % len(self.colors)])) 
             # can do this here
             #environLocal.printDebug([e])
 
@@ -1405,17 +1407,23 @@ class GraphScatterWeighted(Graph):
                 # width shift can be between 0.1 and 0.25
                 # width is already shifted by distort
                 # use half of width == radius
-                ax.text(x+((width*.5)+(0.05*xDistort)),
-                        y+.10,
-                        "%s" % zList[i], size=6,
-                        va="baseline", ha="left", multialignment="left")
+                adjustedX = x + ((width * 0.5) + (0.05 * xDistort))
+                adjustedY = y + 0.10 # why?
+                
+                ax.text(adjustedX,
+                        adjustedY,
+                        str(zList[i]),
+                        size=6,
+                        va="baseline", 
+                        ha="left", 
+                        multialignment="left")
 
         self.setAxisRange('y', (yMin, yMax))
         self.setAxisRange('x', (xMin, xMax))
 
         self.hideAxisSpines(ax)
         self.applyFormatting(ax)
-        self.done()
+        self.callDoneAction()
 
 
 class GraphScatter(Graph):
@@ -1445,6 +1453,7 @@ class GraphScatter(Graph):
         xValues = []
         yValues = []
         i = 0
+        
         for row in self.data:
             if len(row) < 2: # pragma: no cover
                 raise GraphException("Need at least two points for a graph data object!")
@@ -1459,7 +1468,7 @@ class GraphScatter(Graph):
             x = row[0]
             y = row[1]
             marker = self.marker
-            color = getColor(self.colors[i%len(self.colors)])
+            color = getColor(self.colors[i % len(self.colors)])
             alpha = self.alpha
             markerSize = self.markerSize
             if len(row) >= 3:
@@ -1484,7 +1493,7 @@ class GraphScatter(Graph):
 
         self.hideAxisSpines(ax)
         self.applyFormatting(ax)
-        self.done()
+        self.callDoneAction()
 
 class GraphHistogram(Graph):
     '''Graph the count of a single element.
@@ -1533,14 +1542,15 @@ class GraphHistogram(Graph):
         binWidth = self.binWidth
         color = getColor(self.colors[0])
         alpha = self.alpha
-        for a,b in self.data:
+        for a, b in self.data:
             x.append(a)
             y.append(b)
-        ax.bar(x, y, width = binWidth, alpha=alpha, color=color)
+        
+        ax.bar(x, y, width=binWidth, alpha=alpha, color=color)
 
         self.hideAxisSpines(ax)
         self.applyFormatting(ax)
-        self.done()
+        self.callDoneAction()
 
 
 
@@ -1583,10 +1593,11 @@ class GraphGroupedVerticalBar(Graph):
     def labelBars(self, ax, rects):
         # attach some text labels
         for rect in rects:
+            adjustedX = rect.get_x() + (rect.get_width() / 2)
             height = rect.get_height()
-            ax.text(rect.get_x() + rect.get_width() / 2., 
+            ax.text(adjustedX, 
                     height, 
-                    '%s' % str(round(height, self.roundDigits)), 
+                    str(common.py3round(height, self.roundDigits)), 
                     ha='center', 
                     va='bottom', 
                     fontsize=self.tickFontSize, 
@@ -1598,7 +1609,7 @@ class GraphGroupedVerticalBar(Graph):
         matplotlib = extm.matplotlib
 
         self.fig = plt.figure()
-        self.fig.subplots_adjust(bottom=.3)
+        self.fig.subplots_adjust(bottom=0.3)
         ax = self.fig.add_subplot(1, 1, 1)
 
         # b value is a list of values for each bar
@@ -1629,7 +1640,7 @@ class GraphGroupedVerticalBar(Graph):
             for x in xVals:
                 xValsShifted.append(x + (widthShift * i))
 
-            rect = ax.bar(xValsShifted, yVals, width=widthShift, alpha=.8,
+            rect = ax.bar(xValsShifted, yVals, width=widthShift, alpha=0.8,
                     color=getColor(self.colors[i % len(self.colors)]))
             rects.append(rect)
 
@@ -1638,13 +1649,13 @@ class GraphGroupedVerticalBar(Graph):
             self.labelBars(ax, rect)
             colors.append(rect[0])
 
-        font = matplotlib.font_manager.FontProperties(size=self.tickFontSize,
-                         family=self.fontFamily) 
-        ax.legend(colors, subLabels, prop=font)
+        fontProps = matplotlib.font_manager.FontProperties(size=self.tickFontSize,
+                                                           family=self.fontFamily) 
+        ax.legend(colors, subLabels, prop=fontProps)
 
         self.hideAxisSpines(ax)
         self.applyFormatting(ax)
-        self.done()
+        self.callDoneAction()
 
 
 class _Graph3DBars(Graph):
@@ -1690,7 +1701,7 @@ class _Graph3DBars(Graph):
         if self.axis['z']['range'] is None:
             self.axis['z']['range'] =  min(yVals), max(yVals)
         if self.axis['y']['range'] is None:
-            self.axis['y']['range'] =  min(zVals), max(zVals)+1
+            self.axis['y']['range'] =  min(zVals), max(zVals) + 1
 
         for z in range(*self.axis['y']['range']):
             #c = ['b', 'g', 'r', 'c', 'm'][z%5]
@@ -1698,18 +1709,15 @@ class _Graph3DBars(Graph):
             xs = [x for x, y in self.data[z]]
             # list of y values
             ys = [y for x, y in self.data[z]]
-            # width=.1, color=c, alpha=self.alpha
+            # width=0.1, color=c, alpha=self.alpha
             ax.bar(xs, ys, zs=z, zdir='y')
 
         self.setAxisLabel('x', 'x')
         self.setAxisLabel('y', 'y')
         self.setAxisLabel('z', 'z')
 
-        #ax.set_xlabel('X')
-        #ax.set_ylabel('Y')
-        #ax.set_zlabel('Z')
         self.applyFormatting(ax)
-        self.done()
+        self.callDoneAction()
    
 
 class Graph3DPolygonBars(Graph):
@@ -1833,7 +1841,7 @@ class Graph3DPolygonBars(Graph):
 
         ax.add_collection3d(poly, zs=zs, zdir='y')
         self.applyFormatting(ax)
-        self.done()
+        self.callDoneAction()
 
 
 
@@ -1977,8 +1985,8 @@ class PlotStream(object):
         return None
 
     def process(self):
-        '''This will process all data, as well as call the done() method. 
-        What happens when the done() is called is determined by the keyword argument `doneAction`; 
+        '''This will process all data, as well as call the callDoneAction() method. 
+        What happens when the callDoneAction() is called is determined by the keyword argument `doneAction`; 
         options are 'show' (display immediately), 'write' (write the file to a supplied file path), 
         and None (do processing but do not write or show a graph).
 
@@ -2577,7 +2585,7 @@ class PlotMultiStream(object):
     def process(self):
         '''
         This will process all data, as well as call 
-        the done() method. What happens when the done() is 
+        the callDoneAction() method. What happens when the callDoneAction() is 
         called is determined by the attribute `doneAction`; 
         options are 'show' (display immediately), 
         'write' (write the file to a supplied file path), 
@@ -3213,7 +3221,8 @@ class PlotScatterPitchClassQuarterLength(PlotScatter):
         :width: 600
     '''
     # string name used to access this class
-    values = ['pitchClass', 'quarterLength']
+    values = ('pitchClass', 'quarterLength')
+    
     def __init__(self, streamObj, *args, **keywords):
         super(PlotScatterPitchClassQuarterLength, self).__init__(streamObj, *args, **keywords)
 
@@ -3258,7 +3267,8 @@ class PlotScatterPitchClassOffset(PlotScatter):
     .. image:: images/PlotScatterPitchClassOffset.*
         :width: 600
     '''
-    values = ['pitchClass', 'offset']
+    values = ('pitchClass', 'offset')
+    
     def __init__(self, streamObj, *args, **keywords):
         super(PlotScatterPitchClassOffset, self).__init__(streamObj, *args, **keywords)
 
@@ -3289,8 +3299,8 @@ class PlotScatterPitchClassOffset(PlotScatter):
 
 
 class PlotScatterPitchSpaceDynamicSymbol(PlotScatter):
-    '''A graph of dynamics used by pitch space.
-
+    '''
+    A graph of dynamics used by pitch space.
     
     >>> s = converter.parse('tinynotation: 4/4 C4 d E f', makeNotation=False) #_DOCS_HIDE
     >>> s.insert(0.0, dynamics.Dynamic('pp')) #_DOCS_HIDE
@@ -3304,7 +3314,9 @@ class PlotScatterPitchSpaceDynamicSymbol(PlotScatter):
         :width: 600
     '''
     # string name used to access this class
-    values = ['pitchClass', 'dynamics']
+    values = ('pitchClass', 'dynamics')
+    figureSizeDefault = (12, 6)
+    
     def __init__(self, streamObj, *args, **keywords):
         super(PlotScatterPitchSpaceDynamicSymbol, self).__init__(streamObj, *args, **keywords)
 
@@ -3332,7 +3344,7 @@ class PlotScatterPitchSpaceDynamicSymbol(PlotScatter):
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
-            self.graph.figureSize = (12, 6)
+            self.graph.figureSize = self.figureSizeDefault
         if 'title' not in keywords:
             self.graph.title = 'Pitch Class by Quarter Length Scatter'
         if 'alpha' not in keywords:
@@ -3348,9 +3360,11 @@ class PlotScatterPitchSpaceDynamicSymbol(PlotScatter):
 # horizontal bar graphs
 
 class PlotHorizontalBar(PlotStream):
-    '''A graph of events, sorted by pitch, over time
+    '''
+    A graph of events, sorted by pitch, over time
     '''
     format = 'horizontalbar'
+    
     def __init__(self, streamObj, *args, **keywords):
         super(PlotHorizontalBar, self).__init__(streamObj, *args, **keywords)
 
@@ -3391,7 +3405,8 @@ class PlotHorizontalBar(PlotStream):
         # y ticks are auto-generated in lower-level routines
         # this is used just for creating labels
         yTicks = self.fyTicks(min(dataUnique.keys()),
-                                       max(dataUnique.keys()))
+                              max(dataUnique.keys()))
+
         for numericValue, label in yTicks:
             if numericValue in dataUnique:
                 data.append([label, dataUnique[numericValue]])
@@ -3417,7 +3432,8 @@ class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
         :width: 600
 
     '''
-    values = ['pitchClass', 'offset', 'pianoroll']
+    values = ('pitchClass', 'offset', 'pianoroll')
+    
     def __init__(self, streamObj, *args, **keywords):
         super(PlotHorizontalBarPitchClassOffset, self).__init__(streamObj, *args, **keywords)
 
@@ -3461,8 +3477,8 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
     .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
         :width: 600
     '''
-
-    values = ['pitch', 'offset', 'pianoroll']
+    values = ('pitch', 'offset', 'pianoroll')
+    
     def __init__(self, streamObj, *args, **keywords):
         super(PlotHorizontalBarPitchSpaceOffset, self).__init__(streamObj, *args, **keywords)
        
@@ -3526,7 +3542,8 @@ class PlotHorizontalBarWeighted(PlotStream):
 
 
     def _extractData(self):
-        '''Extract the data from the Stream.
+        '''
+        Extract the data from the Stream.
         '''
         if 'Score' not in self.streamObj.classes:
             raise GraphException('provided Stream must be Score')
@@ -3591,7 +3608,8 @@ class PlotDolan(PlotHorizontalBarWeighted):
         :width: 600
 
     '''
-    values = ['instrument']
+    values = ('instrument',)
+    
     def __init__(self, streamObj, *args, **keywords):
         super(PlotDolan, self).__init__(streamObj, *args, **keywords)
 
@@ -3799,8 +3817,8 @@ class PlotScatterWeightedPitchSpaceQuarterLength(PlotScatterWeighted):
     .. image:: images/PlotScatterWeightedPitchSpaceQuarterLength.*
         :width: 600
     '''
-
-    values = ['pitch', 'quarterLength']
+    values = ('pitch', 'quarterLength')
+    
     def __init__(self, streamObj, *args, **keywords):
         super(PlotScatterWeightedPitchSpaceQuarterLength, self).__init__(
                                                 streamObj, *args, **keywords)
@@ -3845,8 +3863,8 @@ class PlotScatterWeightedPitchClassQuarterLength(PlotScatterWeighted):
         :width: 600
 
     '''
-
-    values = ['pitchClass', 'quarterLength']
+    values = ('pitchClass', 'quarterLength')
+    
     def __init__(self, streamObj, *args, **keywords):
         super(PlotScatterWeightedPitchClassQuarterLength, self).__init__(
                                                             streamObj, *args, **keywords)
@@ -3893,7 +3911,8 @@ class PlotScatterWeightedPitchSpaceDynamicSymbol(PlotScatterWeighted):
         :width: 600
         
     '''
-    values = ['pitchClass', 'dynamicSymbol']
+    values = ('pitchClass', 'dynamicSymbol')
+    
     def __init__(self, streamObj, *args, **keywords):
         super(PlotScatterWeightedPitchSpaceDynamicSymbol, self).__init__(
                                                 streamObj, *args, **keywords)
@@ -4040,8 +4059,8 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
     .. image:: images/Plot3DBarsPitchSpaceQuarterLength.*
         :width: 600
     '''
-
-    values = ['pitch', 'quarterLength']
+    values = ('pitch', 'quarterLength')
+    
     def __init__(self, streamObj, *args, **keywords):
         super(Plot3DBarsPitchSpaceQuarterLength, self).__init__(streamObj, *args, **keywords)
 
@@ -4215,7 +4234,7 @@ def getPlotsToMake(*args, **keywords):
     ]
 
     showFormat = ''
-    values = []
+    values = ()
 
     # can match by format
     if 'format' in keywords:
@@ -4224,14 +4243,14 @@ def getPlotsToMake(*args, **keywords):
         showFormat = keywords['showFormat']
 
     if 'values' in keywords:
-        values = keywords['values'] # should be a list
+        values = keywords['values'] # should be a tuple or list
 
     #environLocal.printDebug(['got args pre conversion', args])
     # if no args, use pianoroll
     foundClassName = None
     if (len(args) == 0 
             and showFormat == '' 
-            and values == []):
+            and not values):
         showFormat = 'horizontalbar'
         values = 'pitch'
     elif len(args) == 1:
@@ -4245,7 +4264,7 @@ def getPlotsToMake(*args, **keywords):
         # if one arg, assume it is a histogram value
         if formatCandidate in VALUES:
             showFormat = 'histogram'
-            values = [args[0]]
+            values = (args[0],)
             match = True
         # permit directly matching the class name
         if not match:
@@ -4258,8 +4277,9 @@ def getPlotsToMake(*args, **keywords):
         showFormat = userFormatsToFormat(args[0])
         values = args[1:] # get all remaining
     if not common.isListLike(values):
-        values = [values]
-    # make sure we have a list
+        values = (values,)
+        
+    # make it mutable
     values = list(values)
 
     #environLocal.printDebug(['got args post conversion', 'format', showFormat, 
@@ -4430,7 +4450,7 @@ class TestExternal(unittest.TestCase):
 
         a = Graph3DPolygonBars(doneAction='write', 
                                title='50 x with random values increase by 10 per x', 
-                               alpha=.8, colors=['b', 'g'])
+                               alpha=0.8, colors=['b', 'g'])
         data = {1:[], 2:[], 3:[], 4:[], 5:[]}
         
         for i in range(len(data)):
@@ -4772,8 +4792,11 @@ class TestExternal(unittest.TestCase):
         post.append([a, 'graphing-04'])
 
 
-        b = Graph3DPolygonBars(title='Random Data', alpha=.8,\
-        barWidth=.2, doneAction=None, colors=['b','r','g']) 
+        b = Graph3DPolygonBars(title='Random Data', 
+                               alpha=0.8,
+                               barWidth=0.2, 
+                               doneAction=None, 
+                               colors=['b', 'r', 'g']) 
         b.data = data
         post.append([b, 'graphing-05'])
 
@@ -4834,7 +4857,8 @@ class Test(unittest.TestCase):
 
         a = Graph3DPolygonBars(doneAction=None, 
                                title='50 x with random values increase by 10 per x', 
-                               alpha=.8, colors=['b', 'g'])
+                               alpha=0.8, 
+                               colors=['b', 'g'])
         data = {1:[], 2:[], 3:[], 4:[], 5:[]}
         for i in range(len(data.keys())):
             q = [(x, random.choice(range(10*i, 10*(i+1)))) for x in range(50)]
@@ -4994,7 +5018,7 @@ class Test(unittest.TestCase):
 
         s = stream.Stream()
         s.append(sc.getChord('e3','a3', quarterLength=2))
-        s.append(note.Note('c3', quarterLength=.5))
+        s.append(note.Note('c3', quarterLength=0.5))
         b = PlotHistogramQuarterLength(s, doneAction=None)
         b.process()
         
@@ -5006,11 +5030,11 @@ class Test(unittest.TestCase):
 
 
         b = PlotScatter(stream.Stream(), doneAction=None)
-        c = chord.Chord(['b', 'c', 'd'], quarterLength=.5)
+        c = chord.Chord(['b', 'c', 'd'], quarterLength=0.5)
         fx = lambda n: n.pitch.midi
         fy = lambda n: n.quarterLength
         self.assertEqual(b._extractChordDataTwoAxis(fx, fy, c), ([71, 60, 62], [0.5]))
-        c = chord.Chord(['b', 'c', 'd'], quarterLength=.5)
+        c = chord.Chord(['b', 'c', 'd'], quarterLength=0.5)
         # matching the number of pitches for each data point may be needed
         self.assertEqual(b._extractChordDataTwoAxis(fx, fy, c, matchPitchCount=True), 
                          ([71, 60, 62], [0.5, 0.5, 0.5]) )
@@ -5020,7 +5044,7 @@ class Test(unittest.TestCase):
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
-        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        s.append(sc.getChord('e3','a3', quarterLength=0.5))
         s.append(sc.getChord('b3','c5', quarterLength=1.5))
         s.append(note.Note('c3', quarterLength=2))
         b = PlotScatterPitchSpaceQuarterLength(s, doneAction=None, xLog=False)
@@ -5036,7 +5060,7 @@ class Test(unittest.TestCase):
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
-        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        s.append(sc.getChord('e3','a3', quarterLength=0.5))
         s.append(sc.getChord('b3','c5', quarterLength=1.5))
         s.append(note.Note('c3', quarterLength=2))
         b = PlotScatterPitchClassQuarterLength(s, doneAction=None, xLog=False)
@@ -5052,7 +5076,7 @@ class Test(unittest.TestCase):
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
-        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        s.append(sc.getChord('e3','a3', quarterLength=0.5))
         s.append(note.Note('c3', quarterLength=2))
         s.append(sc.getChord('b3','e4', quarterLength=1.5))
         s.append(note.Note('d3', quarterLength=2))
@@ -5072,7 +5096,7 @@ class Test(unittest.TestCase):
 
         s = stream.Stream()
         s.append(dynamics.Dynamic('f'))
-        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        s.append(sc.getChord('e3','a3', quarterLength=0.5))
         #s.append(note.Note('c3', quarterLength=2))
         s.append(dynamics.Dynamic('p'))
         s.append(sc.getChord('b3','e4', quarterLength=1.5))
@@ -5093,7 +5117,7 @@ class Test(unittest.TestCase):
 
         s = stream.Stream()
         s.append(note.Note('c3'))
-        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        s.append(sc.getChord('e3','a3', quarterLength=0.5))
         #s.append(note.Note('c3', quarterLength=2))
         s.append(sc.getChord('b3','e4', quarterLength=1.5))
 
@@ -5109,7 +5133,7 @@ class Test(unittest.TestCase):
 
         s = stream.Stream()
         s.append(note.Note('c3'))
-        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        s.append(sc.getChord('e3','a3', quarterLength=0.5))
         #s.append(note.Note('c3', quarterLength=2))
         s.append(sc.getChord('b3','e4', quarterLength=1.5))
 
@@ -5126,7 +5150,7 @@ class Test(unittest.TestCase):
 
         s = stream.Stream()
         s.append(note.Note('c3'))
-        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        s.append(sc.getChord('e3','a3', quarterLength=0.5))
         #s.append(note.Note('c3', quarterLength=2))
         s.append(sc.getChord('b3','e4', quarterLength=1.5))
         s.append(sc.getChord('f4','g5', quarterLength=3))
@@ -5144,7 +5168,7 @@ class Test(unittest.TestCase):
 
         s = stream.Stream()
         s.append(note.Note('c3'))
-        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        s.append(sc.getChord('e3','a3', quarterLength=0.5))
         #s.append(note.Note('c3', quarterLength=2))
         s.append(sc.getChord('b3','e4', quarterLength=1.5))
         s.append(sc.getChord('f4','g5', quarterLength=3))
@@ -5166,7 +5190,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.append(dynamics.Dynamic('f'))
         #s.append(note.Note('c3'))
-        c = sc.getChord('e3','a3', quarterLength=.5)
+        c = sc.getChord('e3','a3', quarterLength=0.5)
         self.assertEqual(repr(c), '<music21.chord.Chord E3 F3 G3 A3>')
         self.assertEqual([n.pitch.ps for n in c], [52.0, 53.0, 55.0, 57.0])
         s.append(c)
@@ -5201,7 +5225,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.append(dynamics.Dynamic('f'))
         s.append(note.Note('c3'))
-        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        s.append(sc.getChord('e3','a3', quarterLength=0.5))
         s.append(dynamics.Dynamic('mf'))
         s.append(sc.getChord('b3','e4', quarterLength=1.5))
         s.append(dynamics.Dynamic('pp'))
@@ -5224,7 +5248,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.append(dynamics.Dynamic('f'))
         s.append(note.Note('c4'))
-        s.append(sc.getChord('e3','a3', quarterLength=.5))
+        s.append(sc.getChord('e3','a3', quarterLength=0.5))
         #s.append(note.Note('c3', quarterLength=2))
         s.append(dynamics.Dynamic('mf'))
         s.append(sc.getChord('b3','e4', quarterLength=1.5))

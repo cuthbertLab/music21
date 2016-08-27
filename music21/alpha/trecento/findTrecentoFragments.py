@@ -113,10 +113,10 @@ def colorFound(searcher1, thisCadence, streamOpus, thisWork, i):
             else:
                 notesStr += "r "
         streamOpus.insert(0, thisCadence)
-#                    streamLily += "\\score {" + \
-#                            "<< \\time " + str(thisCadence.timeSig) + \
-#                            "\n \\new Staff {" + str(thisCadence.parts[i].lily) + "} >>" + \
-#                            thisCadence.header() + "\n}\n"
+#                    streamLily += ("\\score {" +
+#                            "<< \\time " + str(thisCadence.timeSig) +
+#                            "\n \\new Staff {" + str(thisCadence.parts[i].lily) + "} >>" +
+#                            thisCadence.header() + "\n}\n")
         print(u"In piece %r found in stream %d: %s" % (thisWork.title, i, notesStr))
 
 def searchForIntervals(notesStr):

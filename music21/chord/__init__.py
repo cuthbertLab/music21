@@ -266,8 +266,7 @@ class Chord(note.NotRest):
 
         if "duration" in keywords:
             self.duration = keywords['duration']
-        elif "type" in keywords or \
-            "quarterLength" in keywords: #dots dont cut it
+        elif "type" in keywords or "quarterLength" in keywords: #dots dont cut it
             self.duration = duration.Duration(**keywords)
 
 #        elif len(notes) > 0:
@@ -1826,9 +1825,8 @@ class Chord(note.NotRest):
             i = interval.notesToInterval(c4.pitches[0], c4.pitches[1])
             return i.isConsonant()
         elif len(c2.pitches) == 3:
-            if (self.isMajorTriad() is True
-                or self.isMinorTriad() is True) \
-                and (self.inversion() != 2):
+            if ((self.isMajorTriad() is True or self.isMinorTriad() is True)
+                    and (self.inversion() != 2)):
                 return True
             else:
                 return False

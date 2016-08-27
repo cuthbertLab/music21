@@ -1306,8 +1306,8 @@ class ModuleDocumenter(ObjectDocumenter):
                 if named.__module__ != self.referent.__name__:
                     continue
                 namesMapping[name] = ClassDocumenter(named)
-            elif isinstance(named, types.FunctionType) \
-                and not named.__name__ == '<lambda>':
+            elif (isinstance(named, types.FunctionType)
+                    and not named.__name__ == '<lambda>'):
                 if named.__module__ != self.referent.__name__:
                     continue
                 namesMapping[name] = FunctionDocumenter(named)

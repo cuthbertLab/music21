@@ -822,19 +822,22 @@ class VoiceLeadingQuartet(base.Music21Object):
         scale = self.key.getScale()
 
         if self.vIntervals[0].simpleName == 'd5':
-            return not (scale.getScaleDegreeFromPitch(self.v2n1) == 7 and \
-            scale.getScaleDegreeFromPitch(self.v2n2) == 1 and \
-            self.inwardContraryMotion() and self.vIntervals[1].generic.simpleUndirected == 3)
+            return not (scale.getScaleDegreeFromPitch(self.v2n1) == 7
+                        and scale.getScaleDegreeFromPitch(self.v2n2) == 1
+                        and self.inwardContraryMotion() 
+                        and self.vIntervals[1].generic.simpleUndirected == 3)
 
         elif self.vIntervals[0].simpleName == 'A4':
-            return not (scale.getScaleDegreeFromPitch(self.v2n1) == 4 and \
-            scale.getScaleDegreeFromPitch(self.v2n2) == 3 and \
-            self.outwardContraryMotion() and self.vIntervals[1].generic.simpleUndirected == 6)
+            return not (scale.getScaleDegreeFromPitch(self.v2n1) == 4
+                        and scale.getScaleDegreeFromPitch(self.v2n2) == 3 
+                        and self.outwardContraryMotion() 
+                        and self.vIntervals[1].generic.simpleUndirected == 6)
 
         elif self.vIntervals[0].simpleName == 'm7':
-            return not (scale.getScaleDegreeFromPitch(self.v2n1) == 5 and \
-            scale.getScaleDegreeFromPitch(self.v2n2) == 1 and \
-            self.inwardContraryMotion() and self.vIntervals[1].generic.simpleUndirected == 3)
+            return not (scale.getScaleDegreeFromPitch(self.v2n1) == 5
+                        and scale.getScaleDegreeFromPitch(self.v2n2) == 1
+                        and self.inwardContraryMotion() 
+                        and self.vIntervals[1].generic.simpleUndirected == 3)
         else:
             return False
 
@@ -1823,15 +1826,20 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         same for the next; and both move in the same direction
         (that is, the two intervals multiplied by each other are 4, not -4).
 
-        >>> voiceLeading.ThreeNoteLinearSegment('B3','C4','C#4').couldBeDiatonicPassingTone()
+        >>> tls = voiceLeading.ThreeNoteLinearSegment('B3', 'C4', 'C#4')
+        >>> tls.couldBeDiatonicPassingTone()
         False
-        >>> voiceLeading.ThreeNoteLinearSegment('C3','D3','E3').couldBeDiatonicPassingTone()
+
+        >>> tls = voiceLeading.ThreeNoteLinearSegment('C3', 'D3', 'E3')
+        >>> tls.couldBeDiatonicPassingTone()
         True
         '''
-        return self._isComplete() and (self.iLeftToRight.generic.isSkip and \
-            self.iLeft.generic.undirected == 2 and self.iRight.generic.undirected == 2 and \
-            self.iLeft.generic.undirected * self.iRight.generic.undirected == 4 and \
-            (self.iLeft.direction * self.iRight.direction == 1))
+        return (self._isComplete() 
+                and self.iLeftToRight.generic.isSkip 
+                and self.iLeft.generic.undirected == 2 
+                and self.iRight.generic.undirected == 2 
+                and self.iLeft.generic.undirected * self.iRight.generic.undirected == 4 
+                and self.iLeft.direction * self.iRight.direction == 1)
 
 
     def couldBeChromaticPassingTone(self):
@@ -1861,12 +1869,14 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         '''
 
         return (self._isComplete() 
-            and ((self.iLeft.generic.undirected == 2 or self.iLeft.generic.undirected == 1)
-                and (self.iRight.generic.undirected == 2 or self.iRight.generic.undirected == 1)
-                and self.iLeft.generic.undirected * self.iRight.generic.undirected == 2
-                and self.iLeft.isChromaticStep 
-                and self.iRight.isChromaticStep
-                and self.iLeft.direction * self.iRight.direction == 1))
+                and ((self.iLeft.generic.undirected == 2 
+                            or self.iLeft.generic.undirected == 1)
+                     and (self.iRight.generic.undirected == 2 
+                            or self.iRight.generic.undirected == 1)
+                     and self.iLeft.generic.undirected * self.iRight.generic.undirected == 2
+                     and self.iLeft.isChromaticStep 
+                     and self.iRight.isChromaticStep
+                     and self.iLeft.direction * self.iRight.direction == 1))
 
     def couldBeNeighborTone(self):
         '''

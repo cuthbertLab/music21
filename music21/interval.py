@@ -696,9 +696,7 @@ class GenericInterval(IntervalBase):
             self.simpleDirected = steps
             self.semiSimpleDirected = self.semiSimpleUndirected
             
-        if (self.simpleUndirected==1) or \
-           (self.simpleUndirected==4) or \
-           (self.simpleUndirected==5):
+        if self.simpleUndirected in (1, 4, 5):
             self.perfectable = True
         else:
             self.perfectable = False

@@ -1199,8 +1199,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(allPlayingWhileSounding), 1)
         self.assertTrue(allPlayingWhileSounding[0] is n24)
 
-    #    trimPlayingWhileSounding = \
-    #         stream2.trimPlayingWhileSounding(n12)
+    #    trimPlayingWhileSounding = stream2.trimPlayingWhileSounding(n12)
     #    assert trimPlayingWhileSounding[0] == n22
     #    assert trimPlayingWhileSounding[1].duration.quarterLength == 3.5
 

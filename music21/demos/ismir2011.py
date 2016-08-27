@@ -11,7 +11,7 @@
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      BSD or LGPL, see license.txt
 #-------------------------------------------------------------------------------
-
+from __future__ import division, print_function
 
 from music21 import corpus, features, converter, graph
 from music21 import figuredBass
@@ -23,7 +23,8 @@ from music21.alpha import trecento
 #     print (fe.extract().vector)
 # 
 #     # no longer works...
-#     soft = converter.parse("https://github.com/cuthbertLab/music21/raw/master/music21/corpus/leadSheet/fosterBrownHair.mxl")
+#     soft = converter.parse("https://github.com/cuthbertLab/music21/raw/master/music21/" + 
+#                            "corpus/leadSheet/fosterBrownHair.mxl")
 #     fe.setData(soft)
 #     print (fe.extract().vector)
 
@@ -40,8 +41,7 @@ class MusicaFictaFeature(features.FeatureExtractor):
                 continue
             elif p.accidental is not None and p.accidental.name != 'natural':
                 fictaPitches += 1
-        self._feature.vector[0] = \
-           fictaPitches / float(len(allPitches))
+        self._feature.vector[0] = fictaPitches / len(allPitches)
             
 def testFictaFeature():
     luca = corpus.parse('luca/gloria.mxl')
@@ -299,8 +299,7 @@ def tinyNotationBass():
     fbLine1.showAllRealizations()
 
 def figuredBassScale():
-    fbScale1 = figuredBass.realizerScale. \
-        FiguredBassScale("D", "major")
+    fbScale1 = figuredBass.realizerScale.FiguredBassScale("D", "major")
     print (fbScale1.getSamplePitches("E3", "6"))
 
 
@@ -312,8 +311,7 @@ def exampleD():
     
 def fbFeatureExtraction():
     exampleFB = converter.parse('ismir2011_fb_example1b.xml')
-    fe1 = features.jSymbolic.\
-         PitchClassDistributionFeature(exampleFB)
+    fe1 = features.jSymbolic.PitchClassDistributionFeature(exampleFB)
     print (fe1.extract().vector)
     # [0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.6666666666666666, 0.0, 0.0, 1.0, 0.0, 0.0]
     n1 = exampleFB.parts[0][1][5]

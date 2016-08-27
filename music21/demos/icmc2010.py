@@ -88,11 +88,9 @@ def showDots(show=True):
     for h in range(len(ts.beatSequence)):
         ts.beatSequence[h] = ts.beatSequence[h].subdivide(2)
         for i in range(len(ts.beatSequence[h])):
-            ts.beatSequence[h][i] = \
-                ts.beatSequence[h][i].subdivide(2)
+            ts.beatSequence[h][i] = ts.beatSequence[h][i].subdivide(2)
             for j in range(len(ts.beatSequence[h][i])):
-                ts.beatSequence[h][i][j] = \
-                    ts.beatSequence[h][i][j].subdivide(2)
+                ts.beatSequence[h][i][j] = ts.beatSequence[h][i][j].subdivide(2)
     
     for m in partBass.getElementsByClass('Measure'):
         for n in m.notes:

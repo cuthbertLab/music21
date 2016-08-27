@@ -276,15 +276,16 @@ def findPhraseBoundaries(book=4, madrigal=12):
             if nextNote.isRest == True:
                 thisScore = thisScore + 10
             else:
-                intervalToNextNote = interval.notesToInterval(thisNote, nextNote)
+                intervalToNextNote = interval.notesToInterval(thisNote.pitches[0], 
+                                                              nextNote.pitches[0])
                 if intervalToNextNote.chromatic.undirected >= 6: # a tritone or bigger
                     thisScore = thisScore + 10
-            if (thisNote.quarterLength > previousNote.quarterLength) and \
-                (thisNote.quarterLength > nextNote.quarterLength):
+            if ((thisNote.quarterLength > previousNote.quarterLength)
+                    and (thisNote.quarterLength > nextNote.quarterLength)):
                 thisScore = thisScore + 10
-            if (thisNote.quarterLength > previousNote.quarterLength) and \
-                (thisNote.quarterLength > twoNotesBack.quarterLength) and \
-                (nextNote.quarterLength > nextAfterThatNote.quarterLength):
+            if ((thisNote.quarterLength > previousNote.quarterLength)
+                    and (thisNote.quarterLength > twoNotesBack.quarterLength)
+                    and (nextNote.quarterLength > nextAfterThatNote.quarterLength)):
                 thisScore = thisScore + 10
 
             previousNoteAnalysis = analysisFlat.getElementAtOrBefore(previousNote.offset)

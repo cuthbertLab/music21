@@ -1845,8 +1845,7 @@ class LyTempoRange(LyObject):
         if self.highestTempoOrNone is None:
             return str(self.lowestOrOnlyTempo) + ' '
         else:
-            return str(self.lowestOrOnlyTempo) + '~' + \
-                str(self.highestTempoOrNone) + ' '
+            return str(self.lowestOrOnlyTempo) + '~' + str(self.highestTempoOrNone) + ' '
 
 class LyNumberExpression(LyObject):
     '''

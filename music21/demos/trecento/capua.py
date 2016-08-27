@@ -134,8 +134,8 @@ def capuaRuleOne(srcStream):
             continue
 
         ## e.g. G, F, G => G, F#, G
-        if i1.directedName == "M-2" and \
-           i2.directedName == "M2":
+        if (i1.directedName == "M-2"
+                and i2.directedName == "M2"):
             numChanged += 1
             if ("capua" in n2.editorial.misc):
                 n2.editorial.misc['capua_rule_number'] += RULE_ONE
@@ -171,25 +171,25 @@ def capuaRuleTwo(srcStream):
     numChanged = 0
 
     ssn = srcStream.flat.notesAndRests
-    for i in range(0, len(ssn)-3):
+    for i in range(0, len(ssn) - 3):
         n1 = ssn[i]
-        n2 = ssn[i+1]
-        n3 = ssn[i+2]
-        n4 = ssn[i+3]
+        n2 = ssn[i + 1]
+        n3 = ssn[i + 2]
+        n4 = ssn[i + 3]
 
-        if n1.isRest or \
-           n2.isRest or \
-           n3.isRest or \
-           n4.isRest:
+        if (n1.isRest
+                or n2.isRest
+                or n3.isRest
+                or n4.isRest):
             continue
 
         i1 = interval.notesToInterval(n1,n2)
         i2 = interval.notesToInterval(n2,n3)
         i3 = interval.notesToInterval(n3,n4)
 
-        if (n1.pitch.accidental is not None or
-                n2.pitch.accidental is not None or
-                n4.pitch.accidental is not None):
+        if (n1.pitch.accidental is not None
+                or n2.pitch.accidental is not None
+                or n4.pitch.accidental is not None):
             continue
 
         ### never seems to improve things...
@@ -198,9 +198,9 @@ def capuaRuleTwo(srcStream):
 
         # e.g., D E F G => D E F# G
         #    or F A Bb C => F A B C
-        if (i1.directedName == "M2" and
-                i2.directedName == "m2" and
-                i3.directedName == "M2"):
+        if (i1.directedName == "M2"
+                and i2.directedName == "m2"
+                and i3.directedName == "M2"):
             numChanged += 1
             if ("capua" in n3.editorial.misc):
                 n3.editorial.misc['capua_rule_number'] += RULE_TWO
@@ -246,17 +246,15 @@ def capuaRuleThree(srcStream):
         n2 = ssn[i+1]
         n3 = ssn[i+2]
 
-        if n1.isRest or \
-           n2.isRest or \
-           n3.isRest:
+        if n1.isRest or n2.isRest or n3.isRest:
             continue
         
         i1 = interval.notesToInterval(n1,n2)
         i2 = interval.notesToInterval(n2,n3)
 
-        if n1.pitch.accidental is not None or \
-           n2.pitch.accidental is not None or \
-           n3.pitch.accidental is not None:
+        if (n1.pitch.accidental is not None
+                or n2.pitch.accidental is not None
+                or n3.pitch.accidental is not None):
             continue
 
         ### never seems to improve things...
@@ -264,8 +262,8 @@ def capuaRuleThree(srcStream):
             continue
 
         # e.g., E C D => E C# D
-        if i1.directedName  == "M-3" and \
-           i2.directedName  == "M2":
+        if (i1.directedName  == "M-3"
+                and i2.directedName  == "M2"):
             numChanged += 1
             if ("capua" in n2.editorial.misc):
                 n2.editorial.misc['capua_rule_number'] += RULE_THREE
@@ -301,17 +299,15 @@ def capuaRuleFourA(srcStream):
         n2 = ssn[i+1]
         n3 = ssn[i+2]
 
-        if n1.isRest or \
-           n2.isRest or \
-           n3.isRest:
+        if n1.isRest or n2.isRest or n3.isRest:
             continue
         
         i1 = interval.notesToInterval(n1,n2)
         i2 = interval.notesToInterval(n2,n3)
 
-        if n1.pitch.accidental is not None or \
-           n2.pitch.accidental is not None or \
-           n3.pitch.accidental is not None:
+        if (n1.pitch.accidental is not None
+                or n2.pitch.accidental is not None
+                or n3.pitch.accidental is not None):
             continue
 
         ### never seems to improve things...
@@ -319,8 +315,7 @@ def capuaRuleFourA(srcStream):
             continue
 
         # e.g., D B A => D Bb A
-        if i1.directedName  == "m-3" and \
-           i2.directedName  == "M-2":
+        if i1.directedName  == "m-3" and i2.directedName  == "M-2":
             numChanged += 1
             if ("capua" in n2.editorial.misc):
                 n2.editorial.misc['capua_rule_number'] += RULE_FOUR_A
@@ -349,21 +344,19 @@ def capuaRuleFourB(srcStream):
     '''
     numChanged = 0
     ssn = srcStream.flat.notesAndRests
-    for i in range(0, len(ssn)-2):
+    for i in range(0, len(ssn) - 2):
         n1 = ssn[i]
-        n2 = ssn[i+1]
-        n3 = ssn[i+2]
+        n2 = ssn[i + 1]
+        n3 = ssn[i + 2]
 
-        if n1.isRest or \
-           n2.isRest or \
-           n3.isRest:
+        if n1.isRest or n2.isRest or n3.isRest:
             continue
 
         i1 = interval.notesToInterval(n1,n2)
         i2 = interval.notesToInterval(n2,n3)
 
-        if n1.pitch.accidental is not None or \
-           n3.pitch.accidental is not None:
+        if (n1.pitch.accidental is not None
+                or n3.pitch.accidental is not None):
             continue
 
         ### never seems to improve things...
@@ -371,8 +364,7 @@ def capuaRuleFourB(srcStream):
             continue
 
         # e.g., D F G => D F# G  or G Bb C => G B C
-        if i1.directedName  == "m3" and \
-           i2.directedName  == "M2":
+        if i1.directedName == "m3" and i2.directedName == "M2":
             numChanged += 1
             if ("capua" in n2.editorial.misc):
                 n2.editorial.misc['capua_rule_number'] += RULE_FOUR_B
@@ -448,8 +440,8 @@ def pmfcFictaToAccidental(note1):
     Moves any ficta in `Note.editorial.misc['pmfc-ficta']` to the `Note.pitch.accidental`
     object and saves the previous accidental by calling `clearAccidental()` first.
     '''
-    if "pmfc-ficta" in note1.editorial.misc and \
-            note1.editorial.misc["pmfc-ficta"] is not None:
+    if ("pmfc-ficta" in note1.editorial.misc
+            and note1.editorial.misc["pmfc-ficta"] is not None):
         clearAccidental(note1)
         note1.pitch.accidental = note1.editorial.misc["pmfc-ficta"]
         
@@ -459,8 +451,8 @@ def capuaFictaToAccidental(note1):
     `Note.pitch.accidental` object.  Saves the previous accidental by calling
     `clearAccidental` first.
     '''
-    if "capua-ficta" in note1.editorial.misc and \
-            note1.editorial.misc["capua-ficta"] is not None:
+    if ("capua-ficta" in note1.editorial.misc
+            and note1.editorial.misc["capua-ficta"] is not None):
         clearAccidental(note1)
         note1.pitch.accidental = note1.editorial.misc["capua-ficta"]
 
@@ -654,8 +646,8 @@ def compareNoteCapuaToEditor(note1):
     if note1.isRest:
         return statsDict
     statsDict['totalNotes'] += 1
-    if "pmfc-ficta" in note1.editorial.misc and \
-           "capua-ficta" in note1.editorial.misc:
+    if ("pmfc-ficta" in note1.editorial.misc
+           and "capua-ficta" in note1.editorial.misc):
         statsDict['pmfcAlt'] += 1
         statsDict['capuaAlt'] += 1
         statsDict['pmfcAndCapua'] += 1
@@ -778,7 +770,7 @@ def colorNote(note1, oneOrBoth = "both"):
     elif oneOrBoth == "both": 
         capuaHarmony = note1.editorial.misc["capua2FictaHarmony"]
     else: 
-        raise CapuaException("Please specify \"one\" or \"both\" for the variable \"oneOrBoth\".")
+        raise CapuaException('Please specify "one" or "both" for the variable "oneOrBoth".')
     nonCapuaHarmony = note1.editorial.misc["noFictaHarmony"]
     #nonCapuaHarmony = getIntervalType(nonCapuaInterval)
     ruleOne(nonCapuaHarmony, capuaHarmony)

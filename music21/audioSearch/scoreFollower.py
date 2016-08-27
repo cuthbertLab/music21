@@ -142,8 +142,8 @@ class ScoreFollower(object):
                 storeWaveFilename=None,
                 )
         else:
-            freqFromAQList, self.waveFile, self.currentSample = \
-                audioSearch.getFrequenciesFromPartialAudioFile(
+            getFreqFunc = audioSearch.getFrequenciesFromPartialAudioFile
+            freqFromAQList, self.waveFile, self.currentSample = getFreqFunc(
                     self.waveFile,
                     length=self.seconds_recording,
                     startSample=self.currentSample,
@@ -189,8 +189,8 @@ class ScoreFollower(object):
 
         if self.useMic is False:  # reading from the disc (only for TESTS)
             # skip ahead the processing time.
-            freqFromAQList, junk, self.currentSample = \
-                audioSearch.getFrequenciesFromPartialAudioFile(
+            getFreqFunc = audioSearch.getFrequenciesFromPartialAudioFile
+            freqFromAQList, junk, self.currentSample = getFreqFunc(
                     self.waveFile,
                     length=self.processing_time,
                     startSample=self.currentSample,
@@ -399,14 +399,12 @@ class ScoreFollower(object):
                     totalLengthPeriod, processing_time)
             elif self.countdown == 1:
                 # do nothing to startSearch or predicted note position
-                totalSeconds = 2 * (time() - time_start) + \
-                    self.seconds_recording
+                totalSeconds = 2 * (time() - time_start) + self.seconds_recording
                 self.predictedNotePosition = self.predictNextNotePosition(
                     totalLengthPeriod, totalSeconds)
             elif self.countdown == 2:
                 # another chance to match notes
-                totalSeconds = 3 * (time() - time_start) + \
-                    self.seconds_recording
+                totalSeconds = 3 * (time() - time_start) + self.seconds_recording
                 self.predictedNotePosition = self.predictNextNotePosition(
                     totalLengthPeriod, totalSeconds)
             elif self.countdown == 3:

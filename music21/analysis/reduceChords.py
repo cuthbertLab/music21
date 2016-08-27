@@ -199,8 +199,8 @@ class ChordReducer(object):
             verticalityOne, verticalityTwo = verticalities
             pitchSetOne = verticalityOne.pitchSet
             pitchSetTwo = verticalityTwo.pitchSet
-            if not verticalityOne.isConsonant or \
-                not verticalityTwo.isConsonant:
+            if (not verticalityOne.isConsonant 
+                or not verticalityTwo.isConsonant):
                 continue
             if verticalityOne.measureNumber != verticalityTwo.measureNumber:
                 continue

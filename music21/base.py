@@ -3589,11 +3589,14 @@ class ElementWrapper(Music21Object):
             shortObj += "..."
 
         if self.id is not None:
-            return '<%s id=%s offset=%s obj="%s">' % \
-                (self.__class__.__name__, self.id, self.offset, shortObj)
+            return '<%s id=%s offset=%s obj="%s">' % (self.__class__.__name__, 
+                                                      self.id, 
+                                                      self.offset, 
+                                                      shortObj)
         else:
-            return '<%s offset=%s obj="%s">' % \
-                (self.__class__.__name__, self.offset, shortObj)
+            return '<%s offset=%s obj="%s">' % (self.__class__.__name__, 
+                                                self.offset, 
+                                                shortObj)
 
     def __eq__(self, other):
         '''Test ElementWrapper equality
@@ -3615,20 +3618,20 @@ class ElementWrapper(Music21Object):
         >>> a == c
         False
         '''
-        if not hasattr(other, "obj") or \
-           not hasattr(other, "offset") or \
-           not hasattr(other, "priority") or \
-           not hasattr(other, "groups") or \
-           not hasattr(other, "activeSite") or \
-           not hasattr(other, "duration"):
+        if (not hasattr(other, "obj")
+                or not hasattr(other, "offset")
+                or not hasattr(other, "priority")
+                or not hasattr(other, "groups")
+                or not hasattr(other, "activeSite")
+                or not hasattr(other, "duration")):
             return False
 
 
-        if (self.obj == other.obj and \
-            self.offset == other.offset and \
-            self.priority == other.priority and \
-            self.groups == other.groups and \
-            self.duration == self.duration):
+        if (self.obj == other.obj
+                and self.offset == other.offset
+                and self.priority == other.priority
+                and self.groups == other.groups
+                and self.duration == self.duration):
             return True
         else:
             return False
@@ -3645,8 +3648,9 @@ class ElementWrapper(Music21Object):
 
         # if not, change the attribute in the stored object
         storedobj = object.__getattribute__(self, "obj")
-        if name not in ['offset', '_offset', '_activeSite'] and \
-            storedobj is not None and hasattr(storedobj, name):
+        if (name not in ('offset', '_offset', '_activeSite')
+                and storedobj is not None 
+                and hasattr(storedobj, name)):
             setattr(storedobj, name, value)
         # unless neither has the attribute, in which case add it to the ElementWrapper
         else:

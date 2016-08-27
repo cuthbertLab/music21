@@ -2010,8 +2010,8 @@ class Variant(base.Music21Object):
         base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
 
     def __repr__(self):
-        return "<music21.variant.%s object of length %s>" % \
-            (self.__class__.__name__, str(self.containedHighestTime))
+        return "<music21.variant.%s object of length %s>" % (self.__class__.__name__, 
+                                                             str(self.containedHighestTime))
     
     def __getattr__(self, attr):
         '''

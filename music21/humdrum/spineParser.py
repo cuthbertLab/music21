@@ -346,11 +346,11 @@ class HumdrumDataCollection(object):
         Returns eventList in addition to setting it as self.eventList.
 
 
-        >>> eventString = "!!! COM: Beethoven, Ludwig van\n" + \
-        ...               "!! Not really a piece by Beethoven\n" + \
-        ...               "**kern\t**dynam\n" + \
-        ...               "C4\tpp\n" + \
-        ...               "D8\t.\n"
+        >>> eventString = ("!!! COM: Beethoven, Ludwig van\n" +
+        ...                "!! Not really a piece by Beethoven\n" +
+        ...                "**kern\t**dynam\n" +
+        ...                "C4\tpp\n" +
+        ...                "D8\t.\n")
         >>> hdc = humdrum.spineParser.HumdrumDataCollection(eventString)
         >>> eList = hdc.parseEventListFromDataStream()
         >>> eList is hdc.eventList
@@ -424,11 +424,11 @@ class HumdrumDataCollection(object):
         setting it in the calling object.
 
 
-        >>> eventString = "!!!COM: Beethoven, Ludwig van\n" + \
-        ...               "!! Not really a piece by Beethoven\n" + \
-        ...               "**kern\t**dynam\n" + \
-        ...               "C4\tpp\n" + \
-        ...               "D8\t.\n"
+        >>> eventString = ("!!!COM: Beethoven, Ludwig van\n" +
+        ...                "!! Not really a piece by Beethoven\n" +
+        ...                "**kern\t**dynam\n" +
+        ...                "C4\tpp\n" +
+        ...                "D8\t.\n")
         >>> hdc = humdrum.spineParser.HumdrumDataCollection(eventString)
         >>> protoSpines, eventCollections = hdc.parseProtoSpinesAndEventCollections()
         >>> protoSpines is hdc.protoSpines
@@ -2350,8 +2350,8 @@ def hdStringToMeasure(contents, previousMeasure = None):
             barline.repeat_dots = "both"
             ## cannot specify single repeat dots without styles
         if contents == "==|":
-            raise HumdrumException \
-                ("Cannot import a double bar visually rendered as a single bar -- " + 
+            raise HumdrumException(
+                 "Cannot import a double bar visually rendered as a single bar -- " + 
                  "not sure exactly what that would mean anyhow.")
 
     if contents.count(';'):
@@ -2599,13 +2599,13 @@ class Test(unittest.TestCase):
     #            print "NONE"
 
     #    for mySpine in hf1.spineCollection:
-    #        print "\n\n***NEW SPINE: No. " + str(mySpine.id) + " parentSpine: " \
-    #            + str(mySpine.parentSpine) + " childSpines: " + str(mySpine.childSpines)
-    #        print mySpine.spineType
+    #        print("\n\n***NEW SPINE: No. " + str(mySpine.id) + " parentSpine: "
+    #            + str(mySpine.parentSpine) + " childSpines: " + str(mySpine.childSpines))
+    #        print(mySpine.spineType)
     #        for childSpinesSpine in mySpine.childSpinesSpines():
-    #            print str(childSpinesSpine.id) + " *** testing spineCollection code ***"
+    #            print(str(childSpinesSpine.id) + " *** testing spineCollection code ***")
     #        for thisEvent in mySpine:
-    #            print thisEvent.contents
+    #            print(thisEvent.contents)
         spine5 = hf1.spineCollection.getSpineById(5)
         self.assertEqual(spine5.id, 5)
         self.assertEqual(spine5.parentSpine.id, 1)

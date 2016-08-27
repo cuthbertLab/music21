@@ -1457,11 +1457,11 @@ class RomanNumeral(harmony.Harmony):
             workingFigure = workingFigure[:-2] + '7'
             impliedQuality = 'dominant-seventh'
             #impliedQualitySymbol = '(dom7)'
-        elif self.caseMatters and \
-            self.romanNumeralAlone.upper() == self.romanNumeralAlone:
+        elif (self.caseMatters 
+              and self.romanNumeralAlone.upper() == self.romanNumeralAlone):
             impliedQuality = 'major'
-        elif self.caseMatters and \
-            self.romanNumeralAlone.lower() == self.romanNumeralAlone:
+        elif (self.caseMatters 
+              and self.romanNumeralAlone.lower() == self.romanNumeralAlone):
             impliedQuality = 'minor'
         self.impliedQuality = impliedQuality
         return workingFigure
@@ -1494,12 +1494,12 @@ class RomanNumeral(harmony.Harmony):
 
         for j in range(numberNotes):
             i = numberNotes - j - 1
-            thisscaleDegree = bassScaleDegree + \
-                self.figuresNotationObj.numbers[i] - 1
+            thisscaleDegree = (bassScaleDegree 
+                                + self.figuresNotationObj.numbers[i] 
+                                - 1)
             newPitch = useScale.pitchFromDegree(thisscaleDegree,
-                direction=scale.DIRECTION_ASCENDING)
-            pitchName = self.figuresNotationObj.modifiers[i].modifyPitchName(
-                newPitch.name)
+                                                direction=scale.DIRECTION_ASCENDING)
+            pitchName = self.figuresNotationObj.modifiers[i].modifyPitchName(newPitch.name)
             newnewPitch = pitch.Pitch(pitchName)
             newnewPitch.octave = newPitch.octave
             #if newnewPitch.midi < lastPitch.midi:
@@ -1512,8 +1512,7 @@ class RomanNumeral(harmony.Harmony):
         if self.frontAlterationTransposeInterval:
             newPitches = []
             for thisPitch in pitches:
-                newPitch = thisPitch.transpose(
-                    self.frontAlterationTransposeInterval)
+                newPitch = thisPitch.transpose(self.frontAlterationTransposeInterval)
                 newPitches.append(newPitch)
             self.pitches = newPitches
         else:
@@ -1530,6 +1529,7 @@ class RomanNumeral(harmony.Harmony):
                 p = self.getChordStep(thisCS)
                 if p not in [False, None]:
                     omittedPitches.append(p.name)
+
             newPitches = []
             for thisPitch in pitches:
                 if thisPitch.name not in omittedPitches:

@@ -66,9 +66,15 @@ class SFApp():
         self.frame = tkinter.Frame(master)
         self.master.wm_title("Score follower - music21")
         
-        self.scoreNameSong = 'scores/d luca gloria_Page_'#'/Users/cuthbert/Desktop/scores/Saint-Saens-Clarinet-Sonata/Saint-Saens-Clarinet-Sonata_Page_'#C:\Users\Jordi\Desktop\m21\Saint-Saens-Clarinet-Sonata\Saint-Saens-Clarinet-Sonata\Saint-Saens-Clarinet-Sonata_Page_'#'scores/d luca gloria_Page_'##'scores/d luca gloria_Page_' #  #       
+        self.scoreNameSong = 'scores/d luca gloria_Page_'
+        #'/Users/cuthbert/Desktop/scores/Saint-Saens-Clarinet-Sonata/Saint-Saens-Clarinet-Sonata_Page_'
+        #C:\Users\Jordi\Desktop\m21\Saint-Saens-Clarinet-Sonata\Saint-Saens-Clarinet-Sonata\Saint-Saens-Clarinet-Sonata_Page_'
+        #'scores/d luca gloria_Page_'
+        #'scores/d luca gloria_Page_'
         self.format = 'tiff'#'jpg'
-        self.nameRecordedSong = 'luca/gloria'#'/Users/cuthbert/Desktop/scores/Saint-Saens-Clarinet-Sonata/saint-saens.xml'#'C:\Users\Jordi\Desktop\m21\Saint-Saens-Clarinet-Sonata\Saint-Saens-Clarinet-Sonata\saint-saens.xml'### # 
+        self.nameRecordedSong = 'luca/gloria'
+        #'/Users/cuthbert/Desktop/scores/Saint-Saens-Clarinet-Sonata/saint-saens.xml'
+        #'C:\Users\Jordi\Desktop\m21\Saint-Saens-Clarinet-Sonata\Saint-Saens-Clarinet-Sonata\saint-saens.xml' 
         self.pageMeasureNumbers = [] # get directly from score - the last one is the last note of the score
         self.totalPagesScore = 1
         self.currentLeftPage = 1
@@ -223,9 +229,9 @@ class SFApp():
         for xPos in range(resX - 1, 0, -numberPixels):  # check every 4th pixel
             for yPos in range(resX - xPos, resY, int(resY / 15)): 
                 pixelPosition = yPos * resX + xPos
-                if data[pixelPosition][0] not in colorRange and \
-                   data[pixelPosition][1] not in colorRange and \
-                   data[pixelPosition][2] not in colorRange:
+                if (data[pixelPosition][0] not in colorRange
+                        and data[pixelPosition][1] not in colorRange
+                        and data[pixelPosition][2] not in colorRange):
                     rightCut = resX - xPos + 1                 
                     stop = True
                     break
@@ -239,9 +245,9 @@ class SFApp():
                 pixelPosition = yPos * resX + resX - (rightCut - numberPixels)
                 if pixelPosition >= len(data):
                     bad = False
-                elif data[pixelPosition][0] not in colorRange or \
-                       data[pixelPosition][1] not in colorRange or \
-                       data[pixelPosition][2] not in colorRange:
+                elif (data[pixelPosition][0] not in colorRange
+                        and data[pixelPosition][1] not in colorRange
+                        and data[pixelPosition][2] not in colorRange):
                     bad = True
             if bad == False:
                 comprovation = True

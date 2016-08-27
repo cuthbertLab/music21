@@ -94,8 +94,10 @@ class Clef(base.Music21Object):
         False
         '''
         try:
-            if self.__class__ == other.__class__ and self.sign == other.sign \
-                    and self.line == other.line and self.octaveChange == other.octaveChange:
+            if (self.__class__ == other.__class__ 
+                    and self.sign == other.sign
+                    and self.line == other.line 
+                    and self.octaveChange == other.octaveChange):
                 return True
             else:
                 return False

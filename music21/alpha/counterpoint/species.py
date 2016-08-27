@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-
 '''
 alpha.counterpoint.species -- set of tools for dealing with Species Counterpoint and 
 later other forms of counterpoint.
@@ -8,6 +6,7 @@ later other forms of counterpoint.
 Mostly coded by Jackie Rogoff -- some routines have been moved to
 by VoiceLeadingQuartet, and that module should be used for future work
 '''
+from __future__ import division, print_function
 
 import copy
 import random
@@ -1065,8 +1064,8 @@ class ModalCounterpoint(object):
         # DOES NOT YET RAISE LEADING TONES, AND DOES NOT CHECK FOR NOODLING.
         stream2 = stream.Part([])
         firstNote = stream1.notes[0]
-#        choices = [interval.transposeNote(firstNote, "P1"),\
-#                   interval.transposeNote(firstNote, "P5"),\
+#        choices = [interval.transposeNote(firstNote, "P1"),
+#                   interval.transposeNote(firstNote, "P5"),
 #                   interval.transposeNote(firstNote, "P8")]
         choices = [copy.deepcopy(firstNote),
                    firstNote.transpose("P5"),
