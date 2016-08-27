@@ -996,7 +996,7 @@ class GraphColorGridLegend(Graph):
     def makeOneRowOfGraph(self, figure, rowIndex, rowLabel, rowData):
         '''
         Makes a subplot for one row of data (such as for the Major label) 
-        and returns a matplotlib.axes._subplots.AxesSubplot instance representing the subplot.
+        and returns a matplotlib.axes.AxesSubplot instance representing the subplot.
         
         Here we create an axis with a part of Scriabin's mapping of colors
         to keys in Prometheus: The Poem of Fire.
@@ -1009,7 +1009,7 @@ class GraphColorGridLegend(Graph):
         >>> gcgl.data = [['Scriabin Mapping', rowData]]
         >>> ax = gcgl.makeOneRowOfGraph(fig, 0, 'Scriabin Mapping', rowData)
         >>> ax
-        <matplotlib.axes._subplots.AxesSubplot object at 0x111e13828>
+        <matplotlib...AxesSubplot object at 0x111e13828>
         '''
         #environLocal.printDebug(['rowLabel', rowLabel, i])
 

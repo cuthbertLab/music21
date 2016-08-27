@@ -89,7 +89,7 @@ It's a little complex, but worth seeing in full:
 ...    xlabels.append((i+.5, deg), )
 ...    values.append(degreeDictionary[deg])
 ...    i += 1 
->>> histo.setData(data)
+>>> histo.data = data
 
 
 These commands give nice labels for the data; optional:
