@@ -272,7 +272,7 @@ class WindowedAnalysis(object):
             x = minLength
             while True:
                 windowSizes.append(x)
-                x = x * round(num)
+                x = x * round(int(num))
                 if x > (maxLength * .75):
                     break
 

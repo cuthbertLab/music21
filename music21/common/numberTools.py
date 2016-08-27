@@ -439,7 +439,10 @@ def py3round(number, ndigits=None):
     -2
     '''
     if six.PY3:
-        return round(number, ndigits)
+        if ndigits is not None:
+            return round(number, ndigits)
+        else:
+            return round(number)
     
     f = number
     intIt = True if ndigits is None else False
