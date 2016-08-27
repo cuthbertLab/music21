@@ -716,7 +716,7 @@ class Test(unittest.TestCase):
         #{1: 307, 2: 3, 3: 11, 4: 31, 5: 34, 6: 5, 7: 2, None: 3}
 
         #g = graph.GraphHistogram()
-        #g.setData([(x, y) for x, y in sorted(results.items())])
+        #g.data = [(x, y) for x, y in sorted(results.items())]
         #g.process()
 
     def xtestEx04(self):

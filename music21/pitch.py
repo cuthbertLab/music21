@@ -399,7 +399,7 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
     if accidentalPenalty:
         # score_accidentals = accidentals per pitch
         accidentals = [abs(p.alter) for p in pitches]
-        score_accidentals = sum(a if a>1 else 0 for a in accidentals) / len(pitches)
+        score_accidentals = sum(a if a > 1 else 0 for a in accidentals) / len(pitches)
 
     if smallPythagoreanRatio:
         # score_ratio = Pythagorean ratio complexity per pitch
@@ -408,13 +408,13 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
             try:
                 this_interval = interval.Interval(noteStart=p1,  noteEnd=p2)
                 ratio = interval.intervalToPythagoreanRatio(this_interval)
-                penalty = math.log(ratio.numerator * ratio.denominator /
-                    ratio)  / 26.366694928034633 # d2 is 1.0
+                penalty = (math.log(ratio.numerator * ratio.denominator / ratio)  
+                                        / 26.366694928034633) # d2 is 1.0
                 score_ratio += penalty
             except interval.IntervalException:
                 return float('inf')
 
-        score_ratio /= len(pitches)
+        score_ratio = score_ratio / len(pitches)
 
     if triadAward:
         # score_traid = number of thirds per pitch (avoid double-base-thirds)

@@ -176,14 +176,14 @@ value will write the output in backend-specific format using a music21-generated
 A basic example follows::
 
     >>> from music21 import *
-    >>> a = graph.GraphScatter(title = 'Chromatic Scale', doneAction='show')
+    >>> a = graph.GraphScatter(title='Chromatic Scale', doneAction='show')
     >>> data = []
     >>> for midiNumber in range(36,120):
     ...     n = note.Note()
     ...     n.midi = midiNumber
     ...     frequency = n.pitch.frequency
     ...	    data.append( (midiNumber, int(frequency) ) )
-    >>> a.setData(data)
+    >>> a.data = data
     >>> a.process()  # doctest: +SKIP
 
 .. image:: images/graphing-01.*
@@ -220,7 +220,7 @@ This example provides basic customization to a scatter graph::
     ...	    data.append( (midiNumber, int(frequency), 
     ...                   {'color':color, 'alpha': alpha, 
     ...                     'marker': marker, 'markerSize':markerSize} ) )
-    >>> a.setData(data)
+    >>> a.data = data
     >>> a.setAxisLabel('x', 'midi number')
     >>> a.setAxisLabel('y', 'frequency')
     >>> a.process()  # doctest: +SKIP
@@ -274,7 +274,7 @@ The example follows::
     ...                                   binWidth = 1,
     ...                                   colors = ['#605C7F', '#5c7f60', '#715c7f', '#3FEE32', '#01FFEE'],
     ...                                   roundDigits = 4)
-    >>> a.setData(sorted(data, key = lambda datum: datum[0]))
+    >>> a.data = sorted(data, key=lambda datum: datum[0])
     >>> a.setAxisLabel('x', 'Note duration in quarter lengths')
     >>> xtickValues = range(len(quarterLengths))
     >>> xtickLabels = sorted(quarterLengths)
@@ -310,7 +310,7 @@ A basic example follows::
     >>> for i in range(len(data.keys())):
     ...    q = [(x, random.choice(range(10*(i+1)))) for x in range(20)]
     ...    data[list(data.keys())[i]] = q
-    >>> a.setData(data) 
+    >>> a.data = data
     >>> a.process()  # doctest: +SKIP
 
 .. image:: images/graphing-04.*
@@ -338,7 +338,7 @@ and which notes are not::
     ...                             useKeyValues = True,
     ...                             zeroFloor = True,
     ...                             colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet']) 
-    >>> a.setData(data)
+    >>> a.data = data
     >>> a.axis['x']['ticks'] = (range(12), ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'])
     >>> a.axis['y']['ticks'] = (range(12), ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'])
     >>> a.setAxisLabel('y', 'Root Notes')
