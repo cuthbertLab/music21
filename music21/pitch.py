@@ -28,7 +28,9 @@ from music21 import exceptions21
 from music21 import interval
 from music21.common import SlottedObjectMixin
 from music21.ext import six
+
 if six.PY2:
+    # pylint: disable=redefined-builtin
     from music21.common import py3round as round
 
 from music21 import environment
@@ -1985,9 +1987,6 @@ class Pitch(object):
             return None
         else:
             return returnObj
-
-
-
 
     #---------------------------------------------------------------------------
 

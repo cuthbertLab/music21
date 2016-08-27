@@ -46,6 +46,7 @@ from music21 import features
 from music21.ext import six
 from music21.ext import webcolors
 if six.PY2:
+    # pylint: disable=redefined-builtin
     from music21.common import py3round as round
 
 
@@ -1980,13 +1981,16 @@ class PlotStream(object):
         return xValues, yValues
 
     def _extractData(self):
-        '''Override in subclass
+        '''
+        Override in subclass
         '''
         return None
 
     def process(self):
-        '''This will process all data, as well as call the callDoneAction() method. 
-        What happens when the callDoneAction() is called is determined by the keyword argument `doneAction`; 
+        '''
+        This will process all data, as well as call the callDoneAction() method. 
+        What happens when the callDoneAction() is called is 
+        determined by the keyword argument `doneAction`; 
         options are 'show' (display immediately), 'write' (write the file to a supplied file path), 
         and None (do processing but do not write or show a graph).
 
