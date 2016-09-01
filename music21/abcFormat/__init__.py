@@ -388,10 +388,25 @@ class ABCMetadata(ABCToken):
         >>> am._getKeySignatureParameters()
         (1, None)
 
+        >>> am = abcFormat.ABCMetadata('K:Gm')
+        >>> am.preParse()
+        >>> am._getKeySignatureParameters()
+        (-2, 'minor')
+
         >>> am = abcFormat.ABCMetadata('K:Hp')
         >>> am.preParse()
         >>> am._getKeySignatureParameters()
         (2, None)
+
+        >>> am = abcFormat.ABCMetadata('K:G ionian')
+        >>> am.preParse()
+        >>> am._getKeySignatureParameters()
+        (1, 'ionian')
+
+        >>> am = abcFormat.ABCMetadata('K:G aeol')
+        >>> am.preParse()
+        >>> am._getKeySignatureParameters()
+        (-2, 'aeolian')
 
         '''
         # placing this import in method for now; key.py may import this module
@@ -426,6 +441,7 @@ class ABCMetadata(ABCToken):
             standardKeyStr = standardKeyStr[0] + '-'
 
         mode = None
+        stringRemain = stringRemain.strip()
         if stringRemain != '':
             # only first three characters are parsed
             modeCandidate = stringRemain.lower()
@@ -434,10 +450,14 @@ class ABCMetadata(ABCToken):
                                    ('phr', 'phrygian'),
                                    ('lyd', 'lydian'),
                                    ('mix', 'mixolydian'),
-                                   ('min', 'minor'),
+                                   ('maj', 'major'),
+                                   ('ion', 'ionian'),
+                                   ('aeo', 'aeolian'),
+                                   ('m', 'minor'),
                                   ]:
-                if match in modeCandidate:
-                    mode = modeStr    
+                if modeCandidate.startswith(match):
+                    mode = modeStr 
+                    break   
         # not yet implemented: checking for additional chromatic alternations
         # e.g.: K:D =c would write the key signature as two sharps 
         # (key of D) but then mark every  c  as  natural
@@ -462,6 +482,16 @@ class ABCMetadata(ABCToken):
         <music21.key.Key of g minor>
         >>> ks.sharps
         -2
+
+        Note that capitalization does not matter 
+        (http://abcnotation.com/wiki/abc:standard:v2.1#kkey)
+        so this should still be minor.
+
+        >>> am = abcFormat.ABCMetadata('K:GM')
+        >>> am.preParse()
+        >>> ks = am.getKeySignatureObject()
+        >>> ks
+        <music21.key.Key of g minor>
         '''
         if not self.isKey():
             raise ABCTokenException('no key signature associated with this meta-data')

@@ -140,7 +140,9 @@ def sharpsToPitch(sharpCount):
 
 fifthsOrder = ['F','C','G','D','A','E','B']
 modeSharpsAlter = {'major': 0,
+                   'ionian': 0,
                    'minor': -3,
+                   'aeolian': -3,
                    'dorian': -2,
                    'phrygian': -4,
                    'lydian': 1,
@@ -206,6 +208,11 @@ def pitchToSharps(value, mode=None):
     -15
     >>> key.pitchToSharps('f--', 'locrian')
     -20
+    >>> key.pitchToSharps('a', 'ionian')
+    3
+    >>> key.pitchToSharps('a', 'aeolian')
+    0
+
     
     But quarter tones don't work:
     
