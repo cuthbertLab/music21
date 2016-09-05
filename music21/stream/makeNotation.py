@@ -47,14 +47,11 @@ def makeBeams(s, inPlace=False):
 
     See :meth:`~music21.meter.TimeSignature.getBeams` for the algorithm used.
 
-    >>> from music21 import meter
-    >>> from music21 import stream
-
     >>> aMeasure = stream.Measure()
     >>> aMeasure.timeSignature = meter.TimeSignature('4/4')
     >>> aNote = note.Note()
     >>> aNote.quarterLength = .25
-    >>> aMeasure.repeatAppend(aNote,16)
+    >>> aMeasure.repeatAppend(aNote, 16)
     >>> bMeasure = aMeasure.makeBeams(inPlace=False)
 
     >>> for i in range(0, 4):
@@ -63,6 +60,25 @@ def makeBeams(s, inPlace=False):
     1 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>
     2 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>
     3 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>
+
+
+    This is currently a bug -- we can't have a partial-left beam at the start of a
+    beam group:
+
+    >>> aMeasure = stream.Measure()
+    >>> aMeasure.timeSignature = meter.TimeSignature('4/4')
+    >>> for i in range(4):
+    ...     aMeasure.append(note.Rest(quarterLength=0.25))
+    ...     aMeasure.repeatAppend(note.Note('C4', quarterLength=0.25), 3)
+    >>> bMeasure = aMeasure.makeBeams(inPlace=False).notes
+    >>> for i in range(0, 6):
+    ...   print("%d %r" % (i, bMeasure[i].beams))
+    0 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/partial/left>>
+    1 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>
+    2 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>
+    3 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/partial/left>>
+    4 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>
+    5 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>
 
     OMIT_FROM_DOCS
     TODO: inPlace=False does not work in many cases
@@ -101,9 +117,9 @@ def makeBeams(s, inPlace=False):
         noteGroups = []
         if m.hasVoices():
             for v in m.voices:
-                noteGroups.append(v.iter.notesAndRests.stream())
+                noteGroups.append(v.notesAndRests.stream())
         else:
-            noteGroups.append(m.iter.notesAndRests.stream())
+            noteGroups.append(m.notesAndRests.stream())
 
         #environLocal.printDebug([
         #    'noteGroups', noteGroups, 'len(noteGroups[0])',
@@ -145,8 +161,7 @@ def makeBeams(s, inPlace=False):
                 offset = opFrac(m.paddingLeft)
             elif (noteStream.highestTime <
                 lastTimeSignature.barDuration.quarterLength):
-                offset = (lastTimeSignature.barDuration.quarterLength -
-                    noteStream.highestTime)
+                offset = (lastTimeSignature.barDuration.quarterLength - noteStream.highestTime)
             beamsList = lastTimeSignature.getBeams(noteStream, measureStartOffset=offset)
             
             # pylint: disable=consider-using-enumerate

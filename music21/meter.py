@@ -3632,15 +3632,17 @@ class TimeSignature(base.Music21Object):
     # access data for other processing
 
     def getBeams(self, srcList, measureStartOffset=0.0):
-        '''Given a qLen position and a list of Duration objects, return a list of Beams object.
-
-        Can alternatively provide a flat stream, from which Durations are extracted.
+        '''
+        Given a qLen position and an iterable of Duration objects
+        or music21Objects, return a list of Beams object.  The iterable can be a list (of
+        durations or elements) or a Stream (preferably flat) from which Durations will be 
+        extracted.
 
         Duration objects are assumed to be adjoining; offsets are not used.
 
         This can be modified to take lists of rests and notes
 
-        Must process a list at  time, because we cannot tell when a beam ends
+        Must process a list at time, because we cannot tell when a beam ends
         unless we see the context of adjoining durations.
 
 
@@ -3674,6 +3676,12 @@ class TimeSignature(base.Music21Object):
          <music21.beam.Beams <music21.beam.Beam 1/continue>>, 
          <music21.beam.Beams <music21.beam.Beam 1/stop>>]
 
+        Make sure this works the same:
+        
+        >>> b = [note.Note(type='eighth')] * 6
+        >>> d = a.getBeams(b)
+        >>> c == d
+        True
 
         >>> fourFour = meter.TimeSignature('4/4')
         >>> d = duration.Duration
@@ -3695,13 +3703,17 @@ class TimeSignature(base.Music21Object):
          <music21.beam.Beams <music21.beam.Beam 1/continue>>, 
          <music21.beam.Beams <music21.beam.Beam 1/stop>>]
         '''
-
         if isinstance(srcList, base.Music21Object):
             durList = []
             for n in srcList:
                 durList.append(n.duration)
             srcStream = srcList
-        else: # a list of durations
+        elif len(srcList) > 0 and isinstance(srcList[0], base.Music21Object):
+            # assume all are objects:
+            durList = [n.duration for n in srcList]
+            srcStream = None
+        else: 
+            # a list of durations
             durList = srcList
             srcStream = None
 

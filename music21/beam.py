@@ -78,14 +78,14 @@ import unittest
 from music21 import common
 from music21 import exceptions21
 from music21 import duration
-from music21.common import SlottedObjectMixin
+from music21.common import EqualSlottedObjectMixin
 
 
 class BeamException(exceptions21.Music21Exception):
     pass
 
 
-class Beam(SlottedObjectMixin):
+class Beam(EqualSlottedObjectMixin):
     '''
     A Beam is an object representation of one single beam, that is, one
     horizontal line connecting two notes together (or less commonly a note to a
@@ -105,14 +105,24 @@ class Beam(SlottedObjectMixin):
 
     Two ways of doing the same thing
 
-    >>> b3 = beam.Beam(type='partial', direction='left')
+    >>> b3 = beam.Beam(number=1, type='partial', direction='left')
+    >>> b3
+    <music21.beam.Beam 1/partial/left>
+    
     >>> b4 = beam.Beam('partial', 'left')
     >>> b4.number = 1
     >>> b4
     <music21.beam.Beam 1/partial/left>
 
+    All attributes must be the same for equality:
+    
+    >>> b3 == b4
+    True
+
     >>> b2
     <music21.beam.Beam None/start>
+    >>> b2 == b3
+    False
     '''
 
     ### CLASS VARIABLES ###
@@ -126,27 +136,25 @@ class Beam(SlottedObjectMixin):
 
     ### INITIALIZER ###
     # pylint: disable=redefined-builtin
-    def __init__(self, type=None, direction=None):  # type is okay @ReservedAssignment
+    def __init__(self, type=None, direction=None, number=None):  # type is okay @ReservedAssignment
         self.type = type  # start, stop, continue, partial
         self.direction = direction  # left or right for partial
         self.independentAngle = None
         # represents which beam line referred to
         # 8th, 16th, etc represented as 1, 2, ...
-        self.number = None
+        self.number = number
 
     ### SPECIAL METHODS ###
-
     def __repr__(self):
         if self.direction is None:
             return '<music21.beam.Beam %s/%s>' % (self.number, self.type)
         else:
             return '<music21.beam.Beam %s/%s/%s>' % (self.number, self.type, self.direction)
 
-
 #------------------------------------------------------------------------------
 
 
-class Beams(SlottedObjectMixin):
+class Beams(EqualSlottedObjectMixin):
     '''
     The Beams object stores in it attribute beamsList (a list) all the Beam
     objects defined above.  Thus len(beam.Beams) tells you how many beams the
