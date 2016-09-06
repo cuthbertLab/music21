@@ -853,15 +853,14 @@ class ABCTuplet(ABCToken):
     '''
     ABCTuplet tokens always precede the notes they describe.
 
-    In ABCHandler.tokenProcess(), rhythms are adjusted. 
-
+    In ABCHandler.tokenProcess(), rhythms are adjusted.
     '''
     def __init__(self, src):
         ABCToken.__init__(self, src)
 
         #self.qlRemain = None # how many ql are left of this tuplets activity
         # how many notes are affected by this; this assumes equal duration
-        self.noteCount = None         
+        self.noteCount = None
 
         # actual is tuplet represented value; 3 in 3:2
         self.numberNotesActual = None
@@ -881,65 +880,111 @@ class ABCTuplet(ABCToken):
         '''
         Cannot be called until local meter context 
         is established.
-
         
         >>> at = abcFormat.ABCTuplet('(3')
         >>> at.updateRatio()
         >>> at.numberNotesActual, at.numberNotesNormal
         (3, 2)
 
+        Generally a 5:n tuplet is 5 in the place of 2.
+
         >>> at = abcFormat.ABCTuplet('(5')
         >>> at.updateRatio()
         >>> at.numberNotesActual, at.numberNotesNormal
         (5, 2)
 
+        Unless it's in a meter.TimeSignature compound (triple) context:
+
         >>> at = abcFormat.ABCTuplet('(5')
         >>> at.updateRatio(meter.TimeSignature('6/8'))
         >>> at.numberNotesActual, at.numberNotesNormal
         (5, 3)
+
+
+        Six is 6:2, not 6:4!
+
+        >>> at = abcFormat.ABCTuplet('(6')
+        >>> at.updateRatio()
+        >>> at.numberNotesActual, at.numberNotesNormal
+        (6, 2)
+
+        >>> at = abcFormat.ABCTuplet('(6:4')
+        >>> at.updateRatio()
+        >>> at.numberNotesActual, at.numberNotesNormal
+        (6, 4)
+
+        >>> at = abcFormat.ABCTuplet('(6::6')
+        >>> at.updateRatio()
+        >>> at.numberNotesActual, at.numberNotesNormal
+        (6, 2)
         '''
-
         if keySignatureObj is None:
-            from music21 import meter   
-            ts = meter.TimeSignature('4/4') # default
-        else:
-            ts = keySignatureObj
-
-        if ts.beatDivisionCount == 3: # if compound
+            normalSwitch = 2 # 4/4 
+        elif keySignatureObj.beatDivisionCount == 3: # if compound
             normalSwitch = 3
         else:
             normalSwitch = 2
 
-        data = self.src.strip()
-        if data == '(1': # not sure if valid, but found
+        splitTuplet = self.src.strip().split(':')        
+        
+        tupletNumber = splitTuplet[0]
+        normalNotes = None
+        
+        if len(splitTuplet) >= 2 and splitTuplet[1] != '':
+            normalNotes = int(splitTuplet[1])
+
+        
+        if tupletNumber == '(1': # not sure if valid, but found
             a, n = 1, 1 
-        elif data == '(2':
+        elif tupletNumber == '(2':
             a, n = 2, 3 # actual, normal
-        elif data == '(3':
+        elif tupletNumber == '(3':
             a, n = 3, 2 # actual, normal
-        elif data == '(4':
+        elif tupletNumber == '(4':
             a, n = 4, 3 # actual, normal
-        elif data == '(5':
+        elif tupletNumber == '(5':
             a, n = 5, normalSwitch # actual, normal
-        elif data == '(6':
+        elif tupletNumber == '(6':
             a, n = 6, 2 # actual, normal
-        elif data == '(7':
+        elif tupletNumber == '(7':
             a, n = 7, normalSwitch # actual, normal
-        elif data == '(8':
+        elif tupletNumber == '(8':
             a, n = 8, 3 # actual, normal
-        elif data == '(9':
+        elif tupletNumber == '(9':
             a, n = 9, normalSwitch # actual, normal
         else:       
-            raise ABCTokenException('cannot handle tuplet of form: %s' % data)
+            raise ABCTokenException('cannot handle tuplet of form: %s' % tupletNumber)
+        
+        if normalNotes is None:
+            normalNotes = n
+        
 
         self.numberNotesActual = a
-        self.numberNotesNormal = n
+        self.numberNotesNormal = normalNotes
 
 
     def updateNoteCount(self, durationActual=None, durationNormal=None):
         '''
         Update the note count of notes that are 
-        affected by this tuplet.
+        affected by this tuplet. Can be set by p:q:r style tuplets.
+
+        >>> at = abcFormat.ABCTuplet('(6')
+        >>> at.updateRatio()
+        >>> at.updateNoteCount()
+        >>> at.noteCount
+        6
+
+        >>> at = abcFormat.ABCTuplet('(6:4:12')
+        >>> at.updateRatio()
+        >>> at.updateNoteCount()
+        >>> at.noteCount
+        12
+
+        >>> at = abcFormat.ABCTuplet('(6::18')
+        >>> at.updateRatio()
+        >>> at.updateNoteCount()
+        >>> at.noteCount
+        18
         '''
         if self.numberNotesActual is None: 
             raise ABCTokenException('must set numberNotesActual with updateRatio()')
@@ -953,7 +998,11 @@ class ABCTuplet(ABCToken):
             durationNormal=durationNormal)
 
         # copy value; this will be dynamically counted down
-        self.noteCount = self.numberNotesActual
+        splitTuplet = self.src.strip().split(':')        
+        if len(splitTuplet) >= 3  and splitTuplet[2] != '':
+            self.noteCount = int(splitTuplet[2])
+        else:
+            self.noteCount = self.numberNotesActual
 
         #self.qlRemain = self._tupletObj.totalTupletLength()
 
@@ -1722,6 +1771,27 @@ class ABCHandler(object):
         >>> abch.tokenize('X: 1')
         >>> abch._tokens
         [<music21.abcFormat.ABCMetadata 'X: 1'>]
+        
+        
+        >>> abch = abcFormat.ABCHandler()
+        >>> abch.tokenize('(6f')
+        >>> abch._tokens
+        [<music21.abcFormat.ABCTuplet '(6'>, <music21.abcFormat.ABCNote 'f'>]
+
+        >>> abch = abcFormat.ABCHandler()
+        >>> abch.tokenize('(6:4f')
+        >>> abch._tokens
+        [<music21.abcFormat.ABCTuplet '(6:4'>, <music21.abcFormat.ABCNote 'f'>]        
+
+        >>> abch = abcFormat.ABCHandler()
+        >>> abch.tokenize('(6:4:2f')
+        >>> abch._tokens
+        [<music21.abcFormat.ABCTuplet '(6:4:2'>, <music21.abcFormat.ABCNote 'f'>]        
+
+        >>> abch = abcFormat.ABCHandler()
+        >>> abch.tokenize('(6::2f')
+        >>> abch._tokens
+        [<music21.abcFormat.ABCTuplet '(6::2'>, <music21.abcFormat.ABCNote 'f'>]        
         '''
         currentIndex = -1
         collect = []
@@ -1807,11 +1877,25 @@ class ABCHandler(object):
 #                         self._tokens.append(ABCBar(collect))
                     continue
                     
-            # get tuplet indicators: (2, (3
-            # TODO: extended tuplets look like this: (p:q:r or (3::
+            # get tuplet indicators: (2, (3, (p:q:r or (3::
             if (c == '(' and cNext != None and cNext.isdigit()):
                 skipAhead = 1
                 j = currentIndex + skipAhead + 1 # always two characters
+                unused, possibleColon, qChar, unused = self._getLinearContext(strSrc, j)
+                if possibleColon == ':':
+                    j += 1
+                    skipAhead += 1
+                    if qChar is not None and qChar.isdigit():
+                        j += 1                    
+                        skipAhead += 1
+                    unused, possibleColon, rChar, unused = self._getLinearContext(strSrc, j)
+                    if possibleColon == ':':
+                        j += 1 # include the r characters
+                        skipAhead += 1
+                        if rChar is not None and rChar.isdigit():
+                            j += 1                    
+                            skipAhead += 1
+                                    
                 collect = strSrc[currentIndex:j]
                 #environLocal.printDebug(['got tuplet start:', repr(collect)])
                 self._tokens.append(ABCTuplet(collect))
