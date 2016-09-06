@@ -3075,6 +3075,18 @@ Barline final ⠣⠅
 #         self.b = '''
 #         '''
     
+    def test_example16_15(self):
+        bm = converter.parse("tinynotation: 6/8 f#4 a8 d' c'# b quad{a g f# a} quad{g f# e g} f# g b a f# e d2.").flat
+        bm.insert(0, key.KeySignature(2))
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        bm.getElementsByClass('Measure')[-1].rightBarline = None
+        self.methodArgs = {'showFirstMeasureNumber': False}
+        self.s = bm
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+        ⠐⠻⠊⠨⠑⠙⠚⠀⠸⠲⠄⠊⠓⠛⠊⠸⠲⠄⠓⠛⠋⠓⠀⠛⠓⠚⠊⠛⠋⠀⠕⠄
+        '''
+    
     #-------------------------------------------------------------------------------
     # Chapter 17: Measure Repeats, Full-Measure In-Accords
     

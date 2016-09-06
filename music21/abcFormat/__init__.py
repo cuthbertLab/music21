@@ -625,7 +625,7 @@ class ABCMetadata(ABCToken):
 
 
     def getDefaultQuarterLength(self):
-        '''
+        r'''
         If there is a quarter length representation available, return it as a floating point value
 
         
@@ -644,16 +644,33 @@ class ABCMetadata(ABCToken):
         >>> am.getDefaultQuarterLength()
         0.5
 
+
+        If taking from meter, find the "fraction" and if < .75 use sixteenth notes.
+        If >= .75 use eighth notes.
+
         >>> am = abcFormat.ABCMetadata('M:2/4')
         >>> am.preParse()
         >>> am.getDefaultQuarterLength()
         0.25
 
-        >>> am = abcFormat.ABCMetadata('M:6/8')
+        >>> am = abcFormat.ABCMetadata('M:3/4')
         >>> am.preParse()
         >>> am.getDefaultQuarterLength()
         0.5
 
+
+        >>> am = abcFormat.ABCMetadata('M:6/8')
+        >>> am.preParse()
+        >>> am.getDefaultQuarterLength()
+        0.5
+        
+        
+        Meter is only used for default length if there is no L:
+        
+        >>> x = 'L:1/4\nM:3/4\n\nf'
+        >>> sc = converter.parse(x, format='abc')
+        >>> sc.flat.notes[0].duration.type
+        'quarter'       
         '''
         #environLocal.printDebug(['getDefaultQuarterLength', self.data])
         if self.isDefaultNoteLength() and '/' in self.data:
@@ -2034,7 +2051,7 @@ class ABCHandler(object):
                 if t.isMeter():
                     lastTimeSignatureObj = t.getTimeSignatureObject()
                 # restart matching conditions; match meter twice ok
-                if t.isMeter() or t.isDefaultNoteLength():
+                if t.isDefaultNoteLength() or (t.isMeter() and lastDefaultQL is None):
                     lastDefaultQL = t.getDefaultQuarterLength()
                 elif t.isKey():
                     sharpCount, mode = t._getKeySignatureParameters()
