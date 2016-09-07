@@ -1303,7 +1303,8 @@ def brailleUnicodeToBrailleAscii(brailleUnicode):
         The table which corresponds said values can be found
         `here <http://en.wikipedia.org/wiki/Braille_ASCII#Braille_ASCII_values>`_.
         Because of the way in which the braille symbols translate2, the resulting
-        ASCII string will look like gibberish. Also, the eighth-note notes in braille
+        ASCII string will look to a non-reader as gibberish. Also, the eighth-note notes 
+        in braille
         music are one-off their corresponding letters in both ASCII and written braille.
         The written D is really a C eighth-note, the written E is really a
         D eighth note, etc.
@@ -1320,6 +1321,9 @@ def brailleUnicodeToBrailleAscii(brailleUnicode):
     >>> Eb8_braille = basic.noteToBraille(Eb8)
     >>> basic.brailleUnicodeToBrailleAscii(Eb8_braille)
     '<"F'
+
+    >>> basic.brailleUnicodeToBrailleAscii('hello')
+    'hello'
     """
     brailleLines = brailleUnicode.splitlines()
     asciiLines = []
@@ -1437,6 +1441,12 @@ def wordToBraille(sampleWord, isTextExpression=False):
     ⠠⠁⠝⠙⠁⠝⠞⠑
     >>> print(basic.wordToBraille('Fagott'))
     ⠠⠋⠁⠛⠕⠞⠞
+    
+    Tests number symbol at beginning, punctuation in number
+    and switch back to letters.
+    
+    >>> print(basic.wordToBraille('25.4cm'))
+    ⠼⠃⠑⠲⠙⠰⠉⠍
     """
     wordTrans = []
     
@@ -1455,12 +1465,26 @@ def wordToBraille(sampleWord, isTextExpression=False):
                         "cannot be transcribed to braille.")
         return u"".join(wordTrans)
     
+    
+    lastCharWasNumber = False
+    
     for letter in sampleWord:
         try:
+            if letter.isdigit() and not lastCharWasNumber:
+                wordTrans.append(symbols['number'])
+                lastCharWasNumber = True
+            elif letter.isalpha() and lastCharWasNumber:
+                wordTrans.append(symbols['letter_sign'])
+                lastCharWasNumber = False
+                    
             if letter.isupper():
                 wordTrans.append(symbols['uppercase'] + alphabet[letter.lower()])
+            elif letter.isdigit():
+                wordTrans.append(lookup.numbersUpper[int(letter)])
             else:
                 wordTrans.append(alphabet[letter])
+                
+                
         except KeyError:  # pragma: no cover
             raise BrailleBasicException(
                 "Character '{0}' in word '{1}' cannot be transcribed to braille.".format(

@@ -96,6 +96,8 @@ from music21 import exceptions21
 from music21 import metadata
 from music21 import stream
 
+from music21.braille.basic import wordToBraille
+from music21.braille.lookup import alphabet
 from music21.braille import segment
 from music21.ext import six
 
@@ -175,28 +177,39 @@ def scoreToBraille(music21Score, **keywords):
     """
     allBrailleLines = []
     for music21Metadata in music21Score.getElementsByClass(metadata.Metadata):
-        allBrailleLines.append(metadataToString(music21Metadata))
+        allBrailleLines.append(metadataToString(music21Metadata, returnBrailleUnicode=True))
     for p in music21Score.getElementsByClass(stream.Part):
         braillePart = partToBraille(p, **keywords)
         allBrailleLines.append(braillePart)
     return u"\n".join(allBrailleLines)
 
-def metadataToString(music21Metadata):
+def metadataToString(music21Metadata, returnBrailleUnicode=False):
     u"""
     >>> from music21.braille import translate
     >>> corelli = corpus.parse("monteverdi/madrigal.3.1.rntxt")
-    >>> corelli.getElementsByClass('Metadata')[0].__class__
+    >>> mdObject = corelli.getElementsByClass('Metadata')[0] 
+    >>> mdObject.__class__
     <class 'music21.metadata.Metadata'>
-    >>> print(translate.metadataToString(corelli.getElementsByClass('Metadata')[0]))
+    >>> print(translate.metadataToString(mdObject))
     Alternative Title: 3.1
     Title: La Giovinetta Pianta
+    
+    >>> print(translate.metadataToString(mdObject, returnBrailleUnicode=True))
+    ⠠⠁⠇⠞⠑⠗⠝⠁⠞⠊⠧⠑⠀⠠⠞⠊⠞⠇⠑⠒⠀⠼⠉⠲⠁
+    ⠠⠞⠊⠞⠇⠑⠒⠀⠠⠇⠁⠀⠠⠛⠊⠕⠧⠊⠝⠑⠞⠞⠁⠀⠠⠏⠊⠁⠝⠞⠁
     """
     allBrailleLines = []
     for key in music21Metadata._workIds:
         value = music21Metadata._workIds[key]
         if value is not None:
             n = u" ".join(re.findall(r"([A-Z]*[a-z]+)", key))
-            allBrailleLines.append("{0}: {1}".format(n.title(), value))
+            outString = u"{0}: {1}".format(n.title(), value)
+            if returnBrailleUnicode:
+                outTemp = []
+                for word in outString.split():
+                    outTemp.append(wordToBraille(word))
+                outString = alphabet[' '].join(outTemp)
+            allBrailleLines.append(outString)
     return u'\n'.join(sorted(allBrailleLines))
 
 def opusToBraille(music21Opus, **keywords):

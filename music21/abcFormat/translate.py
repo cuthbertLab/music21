@@ -261,7 +261,9 @@ def parseTokens(mh, dst, p, useMeasures):
                     pitchNameList.append(tSub.pitchName)
                     accStatusList.append(tSub.accidentalDisplayStatus)
             c = chord.Chord(pitchNameList)
-            c.quarterLength = t.quarterLength
+            c.duration.quarterLength = t.quarterLength
+            if t.activeTuplet:
+                c.duration.appendTuplet(copy.deepcopy(t.activeTuplet))
             # adjust accidental display for each contained pitch
             for pIndex in range(len(c.pitches)):
                 if c.pitches[pIndex].accidental is None:
@@ -279,7 +281,9 @@ def parseTokens(mh, dst, p, useMeasures):
                 if n.pitch.accidental is not None:
                     n.pitch.accidental.displayStatus = t.accidentalDisplayStatus
 
-            n.quarterLength = t.quarterLength
+            n.duration.quarterLength = t.quarterLength
+            if t.activeTuplet:
+                n.duration.appendTuplet(copy.deepcopy(t.activeTuplet))
 
             # start or end a tie at note n
             if t.tie is not None:

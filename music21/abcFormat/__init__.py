@@ -957,7 +957,6 @@ class ABCTuplet(ABCToken):
         
         if normalNotes is None:
             normalNotes = n
-        
 
         self.numberNotesActual = a
         self.numberNotesNormal = normalNotes
@@ -967,18 +966,23 @@ class ABCTuplet(ABCToken):
         '''
         Update the note count of notes that are 
         affected by this tuplet. Can be set by p:q:r style tuplets.
+        Also creates a tuplet object.
 
         >>> at = abcFormat.ABCTuplet('(6')
         >>> at.updateRatio()
         >>> at.updateNoteCount()
         >>> at.noteCount
         6
+        >>> at.tupletObj
+        <music21.duration.Tuplet 6/2/eighth>
 
         >>> at = abcFormat.ABCTuplet('(6:4:12')
         >>> at.updateRatio()
         >>> at.updateNoteCount()
         >>> at.noteCount
         12
+        >>> at.tupletObj
+        <music21.duration.Tuplet 6/4/eighth>
 
         >>> at = abcFormat.ABCTuplet('(6::18')
         >>> at.updateRatio()
@@ -1250,8 +1254,6 @@ class ABCNote(ABCToken):
         # store articulations if active
         self.artic = []
         
-        
-
         # set to True if a modification of key signature
         # set to False if an altered tone part of a Key
         self.accidentalDisplayStatus = None
@@ -1524,13 +1526,15 @@ class ABCNote(ABCToken):
             elif direction == 'right':
                 ql *= modPair[1]
 
-        # need to look at tuplets lastly
+        
+        # this is set here for historical reasons, from when we
+        # used to include the tuplets in the quarter length calculations
+        # which did not preserve tuplet names (6:4, instead of 3:2).
         if self.activeTuplet != None: # this is an m21 tuplet object
             # set the underlying duration type; probably this duration?
             # or the activeDefaultQuarterLength
             self.activeTuplet.setDurationType(activeDefaultQuarterLength)
-            # scale duration by active tuplet multipler
-            ql = common.opFrac(ql * self.activeTuplet.tupletMultiplier())
+
         return ql
 
 
@@ -1557,8 +1561,9 @@ class ABCNote(ABCToken):
         else:
             self.isRest = False
 
-        self.quarterLength = self._getQuarterLength(nonChordSymStr, 
-                            forceDefaultQuarterLength=forceDefaultQuarterLength)
+        self.quarterLength = self._getQuarterLength(
+                                nonChordSymStr, 
+                                forceDefaultQuarterLength=forceDefaultQuarterLength)
 
         # environLocal.printDebug(['ABCNote:', 'pitch name:', self.pitchName, 
         #                            'ql:', self.quarterLength])
