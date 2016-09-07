@@ -1321,9 +1321,6 @@ def brailleUnicodeToBrailleAscii(brailleUnicode):
     >>> Eb8_braille = basic.noteToBraille(Eb8)
     >>> basic.brailleUnicodeToBrailleAscii(Eb8_braille)
     '<"F'
-
-    >>> basic.brailleUnicodeToBrailleAscii('hello')
-    'hello'
     """
     brailleLines = brailleUnicode.splitlines()
     asciiLines = []

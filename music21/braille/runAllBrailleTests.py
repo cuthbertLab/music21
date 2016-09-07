@@ -9,7 +9,9 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
-A Python 3 only module that runs all the braille tests and no other tests.
+A Python 3 only module that runs all the braille Tests and no other tests.
+
+Does not run the doctests, unfortunately.  TODO: use mainTest somehow...
 
 This module produces a minimum of output which is most helpful
 to people who are programming music21 on a screen reader.
