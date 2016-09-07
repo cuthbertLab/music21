@@ -26,13 +26,13 @@ VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi',
                       'lily.pdf', 'lily.png', 'lily.svg', 'braille', 
                       'vexflow', 'vexflow.html', 'vexflow.js', 
                       'ipython', 'ipython.png', 'ipython.midi',
-                      'musicxml.png']
+                      'musicxml.png', 'musicxml.pdf']
 VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 
                        'png', 'pdf', 'svg', 
                        'lily.pdf', 'lily.png', 'lily.svg', 'braille', 
                        'vexflow', 'vexflow.html', 'vexflow.js', 
                        'ipython', 'ipython.png', 'ipython.midi', 
-                       'musicxml.png']
+                       'musicxml.png', 'musicxml.pdf']
 VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 
 #-------------------------------------------------------------------------------
@@ -111,8 +111,8 @@ def findFormat(fmt):
     ('musicxml', '.xml')
 
     
-    #>>> common.findFormat('png')
-    #('musicxml.png', '.png')
+    >>> common.findFormat('png')
+    ('musicxml.png', '.png')
     
     #>>> common.findFormat('ipython')
     #('ipython', '.png')

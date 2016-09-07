@@ -892,8 +892,7 @@ class Converter(object):
         >>> c.regularizeFormat('lily.png')
         'lilypond'
         >>> c.regularizeFormat('blah') is None
-        True              
-        
+        True
         '''
         # make lower case, as some lilypond processing used upper case
         fmt = fmt.lower().strip()
@@ -937,8 +936,8 @@ class Converter(object):
                 if foundSc is not None:
                     break
 
-        if sc.registerFormats:
-            return sc.registerFormats[0]
+        if foundSc and foundSc.registerFormats:
+            return foundSc.registerFormats[0]
         else:
             return None
 
