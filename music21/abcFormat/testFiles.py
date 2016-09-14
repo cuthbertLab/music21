@@ -539,6 +539,15 @@ ABcA BAGB|ABAG EDEG|A2AB c2d2|e3f edcB|ABcA BAGB|
 ABAG EGAB|cBAc BAG2|A4 A4:|
 '''
 
+sponge1613 = '''
+X:1
+T:Example 16-13
+L:1/4
+M:3/4
+K:F
+V:1
+fz((6:4F,//A,//C//F//A//c// e/d/)dz
+'''
 
 #-------------------------------------------------------------------------------
 

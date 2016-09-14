@@ -3062,7 +3062,7 @@ class Music21Object(object):
 
         >>> n = note.Note()
         >>> n.duration.quarterLength = 0.5 + 0.0625 # eighth + 64th
-        >>> t = duration.Tuplet(3, 2)
+        >>> t = duration.Tuplet(3, 2, 'eighth')
         >>> n.duration.appendTuplet(t)
         >>> (n.duration.type, n.duration.dots, n.duration.tuplets)
         ('complex', 0, (<music21.duration.Tuplet 3/2/eighth>,))

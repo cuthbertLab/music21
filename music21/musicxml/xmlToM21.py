@@ -2862,6 +2862,17 @@ class MeasureParser(XMLParserBase):
         >>> t = MP.xmlToTuplet(mxNote)
         >>> t
         <music21.duration.Tuplet 5/4/16th>
+
+        >>> mxNote = ET.fromstring('<note><type>eighth</type>' + 
+        ...    '<time-modification><actual-notes>5</actual-notes>' + 
+        ...    '<normal-notes>3</normal-notes>' + 
+        ...    '<normal-type>16th</normal-type><normal-dot /><normal-dot />' + 
+        ...    '</time-modification></note>')
+        >>> t = MP.xmlToTuplet(mxNote)
+        >>> t
+        <music21.duration.Tuplet 5/3/16th>
+        >>> t.durationNormal
+        DurationTuple(type='16th', dots=2, quarterLength=0.4375)
         ''' 
         if inputM21 is None:
             t = duration.Tuplet()
@@ -2876,16 +2887,17 @@ class MeasureParser(XMLParserBase):
         seta(t, mxTimeModification, 'actual-notes', 'numberNotesActual', transform=int)
         seta(t, mxTimeModification, 'normal-notes', 'numberNotesNormal', transform=int)
         
-        mxNormalType = mxTimeModification.get('normal-type')
+        mxNormalType = mxTimeModification.find('normal-type')
         if mxNormalType is not None:
             musicXMLNormalType = mxNormalType.text.strip()
         else:
             musicXMLNormalType = mxNote.find('type').text.strip()
 
-        t.setDurationType(musicXMLTypeToType(musicXMLNormalType))
+        durationNormalType = musicXMLTypeToType(musicXMLNormalType)
+        numDots = len(mxTimeModification.findall('normal-dot'))
+
+        t.setDurationType(durationNormalType, numDots)
         
-        # TODO: implement dot
-        # mxNormalDot = mxTimeModification.get('normal-dot')
     
         mxNotations = mxNote.find('notations')
         #environLocal.printDebug(['got mxNotations', mxNotations])

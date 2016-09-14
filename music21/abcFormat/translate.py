@@ -263,7 +263,10 @@ def parseTokens(mh, dst, p, useMeasures):
             c = chord.Chord(pitchNameList)
             c.duration.quarterLength = t.quarterLength
             if t.activeTuplet:
-                c.duration.appendTuplet(copy.deepcopy(t.activeTuplet))
+                thisTuplet = copy.deepcopy(t.activeTuplet)
+                if thisTuplet.durationNormal is None:
+                    thisTuplet.setDurationType(c.duration.type, c.duration.dots)
+                c.duration.appendTuplet(thisTuplet)
             # adjust accidental display for each contained pitch
             for pIndex in range(len(c.pitches)):
                 if c.pitches[pIndex].accidental is None:
@@ -283,7 +286,10 @@ def parseTokens(mh, dst, p, useMeasures):
 
             n.duration.quarterLength = t.quarterLength
             if t.activeTuplet:
-                n.duration.appendTuplet(copy.deepcopy(t.activeTuplet))
+                thisTuplet = copy.deepcopy(t.activeTuplet)
+                if thisTuplet.durationNormal is None:
+                    thisTuplet.setDurationType(n.duration.type, n.duration.dots)
+                n.duration.appendTuplet(thisTuplet)
 
             # start or end a tie at note n
             if t.tie is not None:

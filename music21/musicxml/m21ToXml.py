@@ -2908,17 +2908,29 @@ class MeasureExporter(XMLExporterBase):
         <time-modification>
           <actual-notes>11</actual-notes>
           <normal-notes>8</normal-notes>
-          <normal-type>eighth</normal-type>
         </time-modification>
+
+        >>> t.setDurationType('eighth', dots=2)
+        >>> mxTimeMod = MEX.tupletToTimeModification(t)
+        >>> MEX.dump(mxTimeMod)
+        <time-modification>
+          <actual-notes>11</actual-notes>
+          <normal-notes>8</normal-notes>
+          <normal-type>eighth</normal-type>
+          <normal-dot />
+          <normal-dot />
+        </time-modification>
+        
         '''
         mxTimeModification = Element('time-modification')
         _setTagTextFromAttribute(tup, mxTimeModification, 'actual-notes', 'numberNotesActual')
         _setTagTextFromAttribute(tup, mxTimeModification, 'normal-notes', 'numberNotesNormal')
-        mxNormalType = SubElement(mxTimeModification, 'normal-type')
-        mxNormalType.text = typeToMusicXMLType(tup.durationNormal.type)
-        if tup.durationNormal.dots > 0:
-            for i in range(tup.durationNormal.dots):
-                SubElement(mxTimeModification, 'normal-dot')
+        if tup.durationNormal is not None:
+            mxNormalType = SubElement(mxTimeModification, 'normal-type')
+            mxNormalType.text = typeToMusicXMLType(tup.durationNormal.type)
+            if tup.durationNormal.dots > 0:
+                for i in range(tup.durationNormal.dots):
+                    SubElement(mxTimeModification, 'normal-dot')
                 
         return mxTimeModification
     

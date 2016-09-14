@@ -759,7 +759,6 @@ def partitionQuarterLength(qLen, qLenDiv=4):
     >>> pql(1.5, 4)
     DurationTuple(type='quarter', dots=1, quarterLength=1.5)
     [None]
-
     '''
     qLen = opFrac(qLen)
     qLenDiv = opFrac(qLenDiv)
@@ -880,16 +879,22 @@ class Tuplet(object):
 
     The first pair of note numbers and durations describes the representation
     within the tuplet, or the value presented by the context. This is called
-    "actual." In a standard 8th note triplet this would be 3, eighth.
-    Attributes are `numberNotesActual`, `durationActual`.
+    "actual." In a standard 8th note triplet this would be 3, eighth, meaning
+    that a complete collection of this tuplet will be visually represented as
+    three eighth notes.  These 
+    attributes are `numberNotesActual`, `durationActual`.
 
     The second pair of note numbers and durations describes the space that
     would have been occupied in a normal context. This is called "normal." In a
-    standard 8th note triplet this would be 2, eighth. Attributes are
+    standard 8th note triplet this would be 2, eighth, meaning that a complete
+    collection of notes under this tuplet will occupy the space of two eighth notes. 
+    These attributes are
     `numberNotesNormal`, `durationNormal`.
 
-    If duration values are not provided, the `durationActual` and
-    `durationNormal` are assumed to be eighths.
+    If duration values are not provided then `durationActual` and `durationNormal` are
+    left as None -- meaning that it is unspecified what the duration that completes the
+    tuplet is.  And this tuplet just represents a Ratio.
+    PRIOR TO v.4 `durationActual` and `durationNormal` were assumed to be eighths.
 
     If only one duration, either `durationActual` or `durationNormal`, is
     provided, both are set to the same value.
@@ -897,10 +902,25 @@ class Tuplet(object):
     Note that this is a duration modifier, or a generator of ratios to scale
     quarterLength values in Duration objects.
 
-    >>> myTup = duration.Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
+    >>> myTup = duration.Tuplet(numberNotesActual=5, numberNotesNormal=4)
     >>> print(myTup.tupletMultiplier())
     4/5
 
+    We know that it is 5 in the place of 4, but 5 what in the place of 4 what?
+
+    >>> myTup.durationActual is None
+    True
+    >>> myTup
+    <music21.duration.Tuplet 5/4>
+    
+    But we can change that:
+    
+    >>> myTup.setDurationType('eighth')
+    >>> myTup.durationActual
+    DurationTuple(type='eighth', dots=0, quarterLength=0.5)
+    >>> myTup
+    <music21.duration.Tuplet 5/4/eighth>
+    
 
     In this case, the tupletMultiplier is a float because it can be expressed
     as a binary number:
@@ -910,10 +930,14 @@ class Tuplet(object):
     >>> tm
     0.625
 
+    Here, six sixteenth notes occupy the space of four sixteenth notes.
+
     >>> myTup2 = duration.Tuplet(6, 4, "16th")
     >>> print(myTup2.durationActual.type)
     16th
-
+    >>> print(myTup2.durationNormal.type)
+    16th
+    
     >>> print(myTup2.tupletMultiplier())
     2/3
 
@@ -1001,7 +1025,7 @@ class Tuplet(object):
             else:
                 self.durationActual = keywords['durationActual']
         else:
-            self.durationActual = durationTupleFromTypeDots("eighth", 0)
+            self.durationActual = None
 
         # normal is the space that would normally be occupied by the tuplet span
         if 'numberNotesNormal' in keywords:
@@ -1019,7 +1043,7 @@ class Tuplet(object):
             else:
                 self.durationNormal = keywords['durationNormal']
         else:
-            self.durationNormal = durationTupleFromTypeDots("eighth", 0)
+            self.durationNormal = None
 
         # Type is start, stop, or startStop: determines whether to start or stop
         # the bracket/group drawing
@@ -1037,10 +1061,14 @@ class Tuplet(object):
     ### SPECIAL METHODS ###
 
     def __repr__(self):
-        return ("<music21.duration.Tuplet %d/%d/%s>" % (self.numberNotesActual, 
-                                                        self.numberNotesNormal, 
-                                                        self.durationNormal.type))
-
+        if self.durationNormal is not None:
+            return ("<music21.duration.Tuplet %d/%d/%s>" % (self.numberNotesActual, 
+                                                            self.numberNotesNormal, 
+                                                            self.durationNormal.type))
+        else:
+            return ("<music21.duration.Tuplet %d/%d>" % (self.numberNotesActual, 
+                                                            self.numberNotesNormal))
+            
     ### PUBLIC METHODS ###
 
     def augmentOrDiminish(self, amountToScale):
@@ -1058,9 +1086,10 @@ class Tuplet(object):
         usage.
 
         >>> a = duration.Tuplet()
-        >>> a.setRatio(6,2)
+        >>> a.setRatio(6, 2)
         >>> a.tupletMultiplier()
         Fraction(1, 3)
+        >>> a.setDurationType('eighth')
         >>> a.durationActual
         DurationTuple(type='eighth', dots=0, quarterLength=0.5)
 
@@ -1079,19 +1108,21 @@ class Tuplet(object):
         post.frozen = False
 
         # duration units scale
-        post.durationActual = post.durationActual.augmentOrDiminish(amountToScale)
-        post.durationNormal = post.durationNormal.augmentOrDiminish(amountToScale)
+        if post.durationActual is not None:
+            post.durationActual = post.durationActual.augmentOrDiminish(amountToScale)
+        if post.durationNormal is not None:
+            post.durationNormal = post.durationNormal.augmentOrDiminish(amountToScale)
 
         # ratios stay the same
         #self.numberNotesActual = actual
         #self.numberNotesNormal = normal
         return post
 
-    def setDurationType(self, durType):
-        '''Set the Duration for both actual and normal.
-
-        A type string or quarter length can be given.
-
+    def setDurationType(self, durType, dots=0):
+        '''
+        Set both durationActual and durationNormal from either a string type or
+        a quarterLength.  optional dots can add dots to a string Type (or I suppose
+        a quarterLength...but why?)
 
         >>> a = duration.Tuplet()
         >>> a.tupletMultiplier()
@@ -1099,25 +1130,33 @@ class Tuplet(object):
         >>> a.totalTupletLength()
         1.0
         >>> a.setDurationType('half')
+        >>> a.durationNormal
+        DurationTuple(type='half', dots=0, quarterLength=2.0)
         >>> a.tupletMultiplier()
         Fraction(2, 3)
         >>> a.totalTupletLength()
         4.0
+        >>> a.setDurationType('half', dots=1)
+        >>> a.durationNormal
+        DurationTuple(type='half', dots=1, quarterLength=3.0)
+        >>> a.totalTupletLength()
+        6.0
 
-        >>> a.setDurationType(2)
+        >>> a.setDurationType(2.0)
         >>> a.totalTupletLength()
         4.0
-        >>> a.setDurationType(4)
+        >>> a.setDurationType(4.0)
         >>> a.totalTupletLength()
         8.0
+
         '''
         if self.frozen is True:
             raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
         if common.isNum(durType):
             durType = convertQuarterLengthToType(durType)
 
-        self.durationActual = durationTupleFromTypeDots(durType, self.durationActual.dots)
-        self.durationNormal = durationTupleFromTypeDots(durType, self.durationActual.dots)
+        self.durationActual = durationTupleFromTypeDots(durType, dots)
+        self.durationNormal = durationTupleFromTypeDots(durType, dots)
 
     def setRatio(self, actual, normal):
         '''Set the ratio of actual divisions to represented in normal divisions.
@@ -1126,13 +1165,18 @@ class Tuplet(object):
         >>> a = duration.Tuplet()
         >>> a.tupletMultiplier()
         Fraction(2, 3)
-        >>> a.setRatio(6,2)
+        >>> a.setRatio(6, 2)
+        >>> a.numberNotesActual
+        6
+        >>> a.numberNotesNormal
+        2
         >>> a.tupletMultiplier()
         Fraction(1, 3)
 
         One way of expressing 6/4-ish triplets without numbers:
+
         >>> a = duration.Tuplet()
-        >>> a.setRatio(3,1)
+        >>> a.setRatio(3, 1)
         >>> a.durationActual = duration.durationTupleFromTypeDots('quarter', 0)
         >>> a.durationNormal = duration.durationTupleFromTypeDots('half', 0)
         >>> a.tupletMultiplier()
@@ -1148,35 +1192,52 @@ class Tuplet(object):
 
     def totalTupletLength(self):
         '''
-        The total duration in quarter length of the tuplet as defined, assuming that
-        enough notes existed to fill all entire tuplet as defined.
+        The total duration in quarter length of the tuplet as defined, 
+        assuming that enough notes existed to fill all entire tuplet as defined.
 
         For instance, 3 quarters in the place of 2 quarters = 2.0
         5 half notes in the place of a 2 dotted half notes = 6.0
         (In the end it's only the denominator that matters)
 
-
+        If durationActual or durationNormal are None, then they will be
+        assumed to be eighth notes (for the basic 3:2 eighth-note triplet)
+        
         >>> a = duration.Tuplet()
         >>> a.totalTupletLength()
         1.0
+        
         >>> a.numberNotesActual = 3
-        >>> a.durationActual = duration.durationTupleFromTypeDots('half', 0)
         >>> a.numberNotesNormal = 2
-        >>> a.durationNormal = duration.durationTupleFromTypeDots('half', 0)
+        >>> a.setDurationType('half')
         >>> a.totalTupletLength()
         4.0
-        >>> a.setRatio(5,4)
+        
+        Let's make it five halfs in the place of four:
+        
+        >>> a.setRatio(5, 4)
+        >>> a.setDurationType('half')
         >>> a.totalTupletLength()
         8.0
-        >>> a.setRatio(5,2)
+
+        Now five halfs in the place of two whole notes (same thing):
+
+        >>> a.setRatio(5, 2)
         >>> a.totalTupletLength()
         4.0
+        >>> a.durationNormal = duration.durationTupleFromTypeDots('whole', 0)
+        >>> a.totalTupletLength()
+        8.0
         '''
         n = self.numberNotesNormal
-        return opFrac(n * self.durationNormal.quarterLength)
+        if self.durationNormal is not None:
+            dnql = self.durationNormal.quarterLength
+        else:
+            dnql = 0.5 # eighth notes
+        return opFrac(n * dnql)
 
     def tupletMultiplier(self):
-        '''Get a Fraction() by which to scale the duration that
+        '''
+        Get a Fraction() by which to scale the duration that
         this Tuplet is associated with.
 
         >>> myTuplet = duration.Tuplet()
@@ -1192,11 +1253,13 @@ class Tuplet(object):
         >>> myTuplet.numberNotesNormal = 4
         >>> print(myTuplet.tupletMultiplier())
         4/5
-        
         '''
-        lengthActual = self.durationActual.quarterLength
-        return opFrac(self.totalTupletLength() / (
-                lengthActual * self.numberNotesActual))
+        if self.durationActual is not None:
+            lengthActual = self.durationActual.quarterLength
+        else:
+            lengthActual = 0.5 # default
+        ttl = self.totalTupletLength()
+        return opFrac(ttl / (lengthActual * self.numberNotesActual))
 
     ### PUBLIC PROPERTIES ###
 
@@ -2076,7 +2139,7 @@ class Duration(SlottedObjectMixin):
 
         >>> n2 = note.Note()
         >>> n2.duration.type = 'quarter'
-        >>> n2.duration.dotGroups = (1,1)
+        >>> n2.duration.dotGroups = (1, 1)
         >>> n2.quarterLength
         2.25
         >>> #_DOCS_SHOW n2.show() # generates a dotted-quarter tied to dotted-eighth
@@ -2084,8 +2147,8 @@ class Duration(SlottedObjectMixin):
         Does NOT handle tuplets etc.
         '''
         d = Duration()
-        d.addDurationTuple(durationTupleFromTypeDots(self.type,1))
-        d.addDurationTuple(durationTupleFromTypeDots(nextSmallerType(self.type),1))
+        d.addDurationTuple(durationTupleFromTypeDots(self.type, 1))
+        d.addDurationTuple(durationTupleFromTypeDots(nextSmallerType(self.type), 1))
         
         return d
 #         dG = self.dotGroups
@@ -2955,21 +3018,33 @@ class TupletFixer(object):
 
                 #print largestTupletTypeOrdinal, largestTupletType
                 for n in tupletGroup:
+                    normalDots = 0
+                    if n.duration.tuplets[0].durationNormal is not None:
+                        normalDots = n.duration.tuplets[0].durationNormal.dots
                     n.duration.tuplets[0].durationNormal = durationTupleFromTypeDots(
-                                    largestTupletType, n.duration.tuplets[0].durationNormal.dots)
+                                    largestTupletType, normalDots)
+                    actualDots = 0
+                    if n.duration.tuplets[0].durationActual is not None:
+                        actualDots = n.duration.tuplets[0].durationActual.dots
                     n.duration.tuplets[0].durationActual = durationTupleFromTypeDots(
-                                    largestTupletType, n.duration.tuplets[0].durationActual.dots)
+                                    largestTupletType, actualDots)
                  
 
             elif inverseExcessRatio == int(inverseExcessRatio): # redefine tuplets by GCD
                 smallestTupletType = ordinalTypeFromNum[smallestTupletTypeOrdinal]
                 for n in tupletGroup:
+                    normalDots = 0
+                    if n.duration.tuplets[0].durationNormal is not None:
+                        normalDots = n.duration.tuplets[0].durationNormal.dots
                     # TODO: this should be frozen!
-                    durt = durationTupleFromTypeDots(smallestTupletType, 
-                                                     n.duration.tuplets[0].durationNormal.dots)
+                    durt = durationTupleFromTypeDots(smallestTupletType, normalDots)
                     n.duration.tuplets[0].durationNormal = durt
+
+                    actualDots = 0
+                    if n.duration.tuplets[0].durationActual is not None:
+                        actualDots = n.duration.tuplets[0].durationActual.dots
                     durt = durationTupleFromTypeDots(smallestTupletType, 
-                                                     n.duration.tuplets[0].durationActual.dots)
+                                                     actualDots)
                     n.duration.tuplets[0].durationActual = durt
             else:
                 pass
@@ -3176,8 +3251,8 @@ class Test(unittest.TestCase):
 
         # test halfs and doubles
 
-        for ql, half, double in [(2,1,4), (.5,.25,1), (1.5, .75, 3),
-                                 (2/3., 1/3., 4/3.)]:
+        for ql, half, double in [(2, 1, 4), (0.5, 0.25, 1), (1.5, 0.75, 3),
+                                 (2/3, 1/3, 4/3)]:
 
             d = Duration()
             d.quarterLength = ql
@@ -3191,36 +3266,39 @@ class Test(unittest.TestCase):
         # testing tuplets in duration units
 
         a = Duration()
-        a.quarterLength = 1/3.0
-        self.assertEqual(a.aggregateTupletMultiplier(), opFrac(2/3.))
+        a.type = 'eighth'
+        tup1 = Tuplet(3, 2, 'eighth')
+        a.appendTuplet(tup1)
+        self.assertEqual(a.quarterLength, opFrac(1/3))
+        self.assertEqual(a.aggregateTupletMultiplier(), opFrac(2/3))
         self.assertEqual(repr(a.tuplets[0].durationNormal), 
                          "DurationTuple(type='eighth', dots=0, quarterLength=0.5)")
 
         b = a.augmentOrDiminish(2)
-        self.assertEqual(b.aggregateTupletMultiplier(), opFrac(2/3.), 5)
+        self.assertEqual(b.aggregateTupletMultiplier(), opFrac(2/3), 5)
         self.assertEqual(repr(b.tuplets[0].durationNormal), 
                          "DurationTuple(type='quarter', dots=0, quarterLength=1.0)")
 
-        c = b.augmentOrDiminish(.25)
-        self.assertEqual(c.aggregateTupletMultiplier(), opFrac(2/3.), 5)
+        c = b.augmentOrDiminish(0.25)
+        self.assertEqual(c.aggregateTupletMultiplier(), opFrac(2/3), 5)
         self.assertEqual(repr(c.tuplets[0].durationNormal), 
                          "DurationTuple(type='16th', dots=0, quarterLength=0.25)")
 
 
         # testing tuplets on Durations
         a = Duration()
-        a.quarterLength = 1/3.0
-        self.assertEqual(a.aggregateTupletMultiplier(), opFrac(2/3.), 5)
+        a.quarterLength = 1/3
+        self.assertEqual(a.aggregateTupletMultiplier(), opFrac(2/3), 5)
         self.assertEqual(repr(a.tuplets[0].durationNormal), 
                          "DurationTuple(type='eighth', dots=0, quarterLength=0.5)")
 
         b = a.augmentOrDiminish(2)
-        self.assertEqual(b.aggregateTupletMultiplier(), opFrac(2/3.), 5)
+        self.assertEqual(b.aggregateTupletMultiplier(), opFrac(2/3), 5)
         self.assertEqual(repr(b.tuplets[0].durationNormal), 
                          "DurationTuple(type='quarter', dots=0, quarterLength=1.0)")
 
         c = b.augmentOrDiminish(.25)
-        self.assertEqual(c.aggregateTupletMultiplier(), opFrac(2/3.), 5)
+        self.assertEqual(c.aggregateTupletMultiplier(), opFrac(2/3), 5)
         self.assertEqual(repr(c.tuplets[0].durationNormal), 
                          "DurationTuple(type='16th', dots=0, quarterLength=0.25)")
 

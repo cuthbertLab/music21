@@ -962,7 +962,7 @@ class ABCTuplet(ABCToken):
         self.numberNotesNormal = normalNotes
 
 
-    def updateNoteCount(self, durationActual=None, durationNormal=None):
+    def updateNoteCount(self):
         '''
         Update the note count of notes that are 
         affected by this tuplet. Can be set by p:q:r style tuplets.
@@ -974,7 +974,7 @@ class ABCTuplet(ABCToken):
         >>> at.noteCount
         6
         >>> at.tupletObj
-        <music21.duration.Tuplet 6/2/eighth>
+        <music21.duration.Tuplet 6/2>
 
         >>> at = abcFormat.ABCTuplet('(6:4:12')
         >>> at.updateRatio()
@@ -982,7 +982,7 @@ class ABCTuplet(ABCToken):
         >>> at.noteCount
         12
         >>> at.tupletObj
-        <music21.duration.Tuplet 6/4/eighth>
+        <music21.duration.Tuplet 6/4>
 
         >>> at = abcFormat.ABCTuplet('(6::18')
         >>> at.updateRatio()
@@ -997,9 +997,7 @@ class ABCTuplet(ABCToken):
         from music21 import duration
         self.tupletObj = duration.Tuplet(
             numberNotesActual=self.numberNotesActual, 
-            numberNotesNormal=self.numberNotesNormal, 
-            durationActual=durationActual,
-            durationNormal=durationNormal)
+            numberNotesNormal=self.numberNotesNormal)
 
         # copy value; this will be dynamically counted down
         splitTuplet = self.src.strip().split(':')        
@@ -1297,8 +1295,9 @@ class ABCNote(ABCToken):
             return [], strSrc        
 
 
-    def _getPitchName(self, strSrc, forceKeySignature=None):
-        '''Given a note or rest string without a chord symbol, 
+    def getPitchName(self, strSrc, forceKeySignature=None):
+        '''
+        Given a note or rest string without a chord symbol, 
         return a music21 pitch string or None (if a rest), 
         and the accidental display status. This value is paired 
         with an accidental display status. Pitch alterations, and 
@@ -1306,40 +1305,43 @@ class ABCNote(ABCToken):
         declared in the Note. 
 
         >>> an = abcFormat.ABCNote()
-        >>> an._getPitchName('e2')
+        >>> an.getPitchName('e2')
         ('E5', None)
-        >>> an._getPitchName('C')
+        >>> an.getPitchName('C')
         ('C4', None)
-        >>> an._getPitchName('B,,')
+        >>> an.getPitchName('B,,')
         ('B2', None)
-        >>> an._getPitchName('C,')
+        >>> an.getPitchName('C,')
         ('C3', None)
-        >>> an._getPitchName('c')
+        >>> an.getPitchName('c')
         ('C5', None)
-        >>> an._getPitchName("c'")
+        >>> an.getPitchName("c'")
         ('C6', None)
-        >>> an._getPitchName("c''")
+        >>> an.getPitchName("c''")
         ('C7', None)
-        >>> an._getPitchName("^g")
+        >>> an.getPitchName("^g")
         ('G#5', True)
-        >>> an._getPitchName("_g''")
+        >>> an.getPitchName("_g''")
         ('G-7', True)
-        >>> an._getPitchName("=c")
+        >>> an.getPitchName("=c")
         ('Cn5', True)
-        >>> an._getPitchName("z4") 
+        >>> an.getPitchName("z4") 
         (None, None)
         
         Grace note
-        >>> an._getPitchName("{c}")
+        
+        >>> an.getPitchName("{c}")
         ('C5', None)
 
 
-        >>> an.activeKeySignature = key.KeySignature(3)
-        >>> an._getPitchName("c") # w/ key, change and set to false
-        ('C#5', False)
+        Given an active KeySignature object, the pitch name might
+        change:
 
+        >>> an.activeKeySignature = key.KeySignature(3)
+        >>> an.getPitchName("c")
+        ('C#5', False)
         '''
-        #environLocal.printDebug(['_getPitchName:', strSrc])
+        #environLocal.printDebug(['getPitchName:', strSrc])
 
         # skip some articulations parsed with the pitch
         # some characters are errors in parsing or encoding not yet handled
@@ -1394,7 +1396,7 @@ class ABCNote(ABCToken):
         # altered
         else:
             alteredPitches = activeKeySignature.alteredPitches
-            # just the steps, no accientals
+            # just the steps, no accidentals
             alteredPitchSteps = [p.step.lower() for p in alteredPitches]
             # includes #, -
             alteredPitchNames = [p.name.lower() for p in alteredPitches]
@@ -1414,45 +1416,45 @@ class ABCNote(ABCToken):
         return pStr, accidentalDisplayStatus
 
 
-    def _getQuarterLength(self, strSrc, forceDefaultQuarterLength=None):
+    def getQuarterLength(self, strSrc, forceDefaultQuarterLength=None):
         '''
         Called with parse(), after context processing, to calculate duration
         
         >>> an = abcFormat.ABCNote()
         >>> an.activeDefaultQuarterLength = .5
-        >>> an._getQuarterLength('e2')
+        >>> an.getQuarterLength('e2')
         1.0
-        >>> an._getQuarterLength('G')
+        >>> an.getQuarterLength('G')
         0.5
-        >>> an._getQuarterLength('=c/2')
+        >>> an.getQuarterLength('=c/2')
         0.25
-        >>> an._getQuarterLength('A3/2')
+        >>> an.getQuarterLength('A3/2')
         0.75
-        >>> an._getQuarterLength('A/')
+        >>> an.getQuarterLength('A/')
         0.25
 
-        >>> an._getQuarterLength('A//')
+        >>> an.getQuarterLength('A//')
         0.125
-        >>> an._getQuarterLength('A///')
+        >>> an.getQuarterLength('A///')
         0.0625
 
         >>> an = abcFormat.ABCNote()
         >>> an.activeDefaultQuarterLength = .5
         >>> an.brokenRhythmMarker = ('>', 'left')
-        >>> an._getQuarterLength('A')
+        >>> an.getQuarterLength('A')
         0.75
         >>> an.brokenRhythmMarker = ('>', 'right')
-        >>> an._getQuarterLength('A')
+        >>> an.getQuarterLength('A')
         0.25
 
         >>> an.brokenRhythmMarker = ('<<<', 'left')
-        >>> an._getQuarterLength('A')
+        >>> an.getQuarterLength('A')
         0.0625
         >>> an.brokenRhythmMarker = ('<<<', 'right')
-        >>> an._getQuarterLength('A')
+        >>> an.getQuarterLength('A')
         0.9375
 
-        >>> an._getQuarterLength('A', forceDefaultQuarterLength=1)
+        >>> an.getQuarterLength('A', forceDefaultQuarterLength=1)
         1.875
         '''
         if forceDefaultQuarterLength != None:
@@ -1527,14 +1529,6 @@ class ABCNote(ABCToken):
                 ql *= modPair[1]
 
         
-        # this is set here for historical reasons, from when we
-        # used to include the tuplets in the quarter length calculations
-        # which did not preserve tuplet names (6:4, instead of 3:2).
-        if self.activeTuplet != None: # this is an m21 tuplet object
-            # set the underlying duration type; probably this duration?
-            # or the activeDefaultQuarterLength
-            self.activeTuplet.setDurationType(activeDefaultQuarterLength)
-
         return ql
 
 
@@ -1546,22 +1540,22 @@ class ABCNote(ABCToken):
         # rests will have a pitch name of None
         
         try:
-            a, b = self._getPitchName(nonChordSymStr,
-                   forceKeySignature=forceKeySignature)
+            pn, accDisp = self.getPitchName(nonChordSymStr,
+                                      forceKeySignature=forceKeySignature)
         except ABCHandlerException:
             environLocal.warn(["Could not get pitch information from note: " , 
                                "{0}, assuming C".format(nonChordSymStr)])
-            a = "C"
-            b = False
+            pn = "C"
+            accDisp = False
             
-        self.pitchName, self.accidentalDisplayStatus = a, b
+        self.pitchName, self.accidentalDisplayStatus = pn, accDisp
 
         if self.pitchName is None:
             self.isRest = True
         else:
             self.isRest = False
 
-        self.quarterLength = self._getQuarterLength(
+        self.quarterLength = self.getQuarterLength(
                                 nonChordSymStr, 
                                 forceDefaultQuarterLength=forceDefaultQuarterLength)
 
@@ -1594,8 +1588,10 @@ class ABCChord(ABCNote):
         tokenStr = nonChordSymStr[1:-1] # remove outer brackets
         #environLocal.printDebug(['ABCChord:', nonChordSymStr, 'tokenStr', tokenStr])
 
-        self.quarterLength = self._getQuarterLength(nonChordSymStr, 
-            forceDefaultQuarterLength=forceDefaultQuarterLength)
+        self.quarterLength = self.getQuarterLength(
+                                        nonChordSymStr, 
+                                        forceDefaultQuarterLength=forceDefaultQuarterLength
+                                )
 
         if forceKeySignature != None:
             activeKeySignature = forceKeySignature
@@ -3152,19 +3148,19 @@ class Test(unittest.TestCase):
 
         # with a key signature, matching steps are assumed altered
         an.activeKeySignature = key.KeySignature(3)
-        self.assertEqual(an._getPitchName("c"), ('C#5', False))
+        self.assertEqual(an.getPitchName("c"), ('C#5', False))
 
         an.activeKeySignature = None
-        self.assertEqual(an._getPitchName("c"), ('C5', None))
-        self.assertEqual(an._getPitchName("^c"), ('C#5', True))
+        self.assertEqual(an.getPitchName("c"), ('C5', None))
+        self.assertEqual(an.getPitchName("^c"), ('C#5', True))
 
 
         an.activeKeySignature = key.KeySignature(-3)
-        self.assertEqual(an._getPitchName("B"), ('B-4', False))
+        self.assertEqual(an.getPitchName("B"), ('B-4', False))
 
         an.activeKeySignature = None
-        self.assertEqual(an._getPitchName("B"), ('B4', None))
-        self.assertEqual(an._getPitchName("_B"), ('B-4', True))
+        self.assertEqual(an.getPitchName("B"), ('B4', None))
+        self.assertEqual(an.getPitchName("_B"), ('B-4', True))
 
 
     def testSplitByMeasure(self):
