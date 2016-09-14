@@ -261,35 +261,34 @@ class ConverterIPython(SubConverter):
     registerFormats = ('ipython',)
     registerOutputExtensions = ()
     registerOutputSubformatExtensions = {'lilypond': 'ly'}
-#     def vfshow(self, s):
-#         '''
-#         pickle this object and send it to Vexflow
-#         
-#         Alpha -- does not work too well.
-#         '''
-#         import random
-#         from music21.vexflow import toMusic21j
-#         from IPython.display import HTML # @UnresolvedImport
-#         vfp = toMusic21j.VexflowPickler()
-#         vfp.mode = 'jsonSplit'
-#         outputCode = vfp.fromObject(s)
-#         idName = 'canvasDiv' + str(random.randint(0, 10000))
-#         htmlBlock = '<div id="' + idName + '"><canvas/></div>'
-#         js = '''
-#         <script>
-#              data = ''' + outputCode + ''';       
-#              var jpc = new music21.jsonPickle.Converter();
-#              var streamObj = jpc.run(data);
-#              streamObj.replaceCanvas("#''' + idName + '''");
-#         </script>
-#         '''
-#         return HTML(htmlBlock + js)
+    def vfshow(self, s):
+        '''
+        pickle this object and send it to Vexflow.
+        '''
+        import random
+        from music21.vexflow import toMusic21j
+        from IPython.core.display import HTML
+        vfp = toMusic21j.VexflowPickler()
+        vfp.mode = 'json'
+        data = vfp.fromObject(s)
+        divId = 'm21j' + str(random.randint(0, 10000))
+        return HTML("""
+        <script>
+        require(['music21'], function (music21) {
+            data = '""" + data + """';
+            var jpc = new music21.fromPython.Converter();
+            var s = jpc.run(data);
+            s.renderScrollableCanvas($('#""" + divId + """'));
+        });
+        </script>
+        <div id='""" + divId + """'></div>
+        """)
     
     def show(self, obj, fmt, app=None, subformats=None, **keywords):
         '''
         show using the appropriate subformat.
         '''
-        if subformats is None:
+        if not subformats:
             subformats = ['vexflow']
         
         if subformats and subformats[0] == 'vexflow':
@@ -1285,7 +1284,11 @@ class Test(unittest.TestCase):
         tempfp += "-0001.png"
         xmlconverter = ConverterMusicXML()
         self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, xmlfp)
-        
+
+    def testVexFlowShow(self):
+        from music21 import corpus
+        b = corpus.parse('bwv66.6')
+        b.show('ipython.vexflow') # musicxml
         
 class TestExternal(unittest.TestCase):
     def runTest(self):
@@ -1328,7 +1331,6 @@ class TestExternal(unittest.TestCase):
 #         biggerStream.show('musicxml.png')
 #         biggerStream.show()
 #         print(biggerStream.write('musicxml.png'))
-
 
 if __name__ == '__main__':
     import music21
