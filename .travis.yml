@@ -24,7 +24,11 @@ before_install:
     - export PATH=/home/travis/bin:$PATH
 
 install:
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib setuptools coverage
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy 
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION scipy 
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION matplotlib 
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION setuptools 
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION coverage
     - cd ..
     - mv music21 music21base
     - cd music21base
