@@ -17,6 +17,7 @@ before_install:
     - export PYTHONPATH=/home/travis/cuthbertLab/music21base
     - export DISPLAY=:99.0
     - sh -e /etc/init.d/xvfb start
+    - echo next line commented out temporarily because of problems with conda and numpy/enum34...
     - echo conda update --yes conda
     - wget -q http://download.linuxaudio.org/lilypond/binaries/linux-64/lilypond-2.19.15-1.linux-64.sh
     - pip install coveralls
@@ -24,6 +25,7 @@ before_install:
     - export PATH=/home/travis/bin:$PATH
 
 install:
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION pyqt
     - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy 
     - conda install --yes python=$TRAVIS_PYTHON_VERSION scipy 
     - conda install --yes python=$TRAVIS_PYTHON_VERSION matplotlib 
