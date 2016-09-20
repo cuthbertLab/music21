@@ -10,7 +10,6 @@
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
-
 '''
 Editorial objects store comments and other meta-data associated with specific
 :class:`~music21.note.Note` objects or other music21 objects.
@@ -60,11 +59,11 @@ def getObjectsWithEditorial(
     >>> s.repeatAppend(n2, 3)
     >>> listofNotes = s.getElementsByClass(note.Note)
     >>> listOfValues = ['consider revising', 'remove']
-    >>> listofNotesWithEditorialisPassingTone = editorial.getObjectsWithEditorial(
+    >>> listofNotesWithEditorialIsPassingTone = editorial.getObjectsWithEditorial(
     ...     listofNotes, "isPassingTone")
     >>> listofNotesWithEditorialComment = editorial.getObjectsWithEditorial(
     ...     listofNotes, "comment", listOfValues)
-    >>> print(len(listofNotesWithEditorialisPassingTone))
+    >>> print(len(listofNotesWithEditorialIsPassingTone))
     5
 
     >>> print(len(listofNotesWithEditorialComment))
@@ -192,7 +191,8 @@ class NoteEditorial(SlottedObjectMixin):
             result += r"\hideNotes "
         return result
 
-    def fictaLilyStart(self):
+    @staticmethod
+    def fictaLilyStart():
         r'''
         Returns \ficta -- called out so it is more easily subclassed
         '''
@@ -222,13 +222,12 @@ class NoteEditorial(SlottedObjectMixin):
     def lilyEnd(self):
         r'''
         Returns a string of editorial lily instructions to come after the note.
-        Currently it is just info to turn off hidding of notes.
+        Currently it is just info to turn off hiding of notes.
         '''
         result = u""
         if self.hidden is True:
             result += u"\\unHideNotes "
         return result
-
 
 class Comment(SlottedObjectMixin):
     '''
@@ -303,8 +302,10 @@ class Test(unittest.TestCase):
                     obj = name()
                 except TypeError:
                     continue
-                unused_a = copy.copy(obj)
-                unused_b = copy.deepcopy(obj)
+                a = copy.copy(obj)
+                b = copy.deepcopy(obj)
+                self.assertIsNot(a, None)
+                self.assertIsNot(b, None)
 
     def testBasic(self):
         a = Comment()

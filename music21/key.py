@@ -17,7 +17,6 @@ areas. The :class:`~music21.key.KeySignature` is used in
 The :class:`~music21.key.Key` object is a fuller representation not just of
 a key signature but also of the key of a region. 
 '''
-
 import copy
 import re
 import unittest

@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #
-# Changes:      04th March 2014 by Michael Bodenbach
+# Changes:      04 March 2014 by Michael Bodenbach
 #               - TabClef added
 #-------------------------------------------------------------------------------
 '''
@@ -134,7 +134,7 @@ class PercussionClef(Clef):
     def __init__(self):
         Clef.__init__(self)
         self.sign = 'percussion'
-        self.lowestLine = (7*4) + 3  # 4 octaves + 3 notes = e4
+        self.lowestLine = (7 * 4) + 3  # 4 octaves + 3 notes = e4
         
 class NoClef(Clef):
     '''
@@ -562,7 +562,8 @@ class Test(unittest.TestCase):
         pass
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
+        '''
+        Test copying all objects defined in this module
         '''
         import sys, types, copy
         for part in sys.modules[self.__module__].__dict__:

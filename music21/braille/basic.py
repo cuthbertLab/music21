@@ -139,7 +139,7 @@ def chordToBraille(music21Chord, descending=True, showOctave=True):
         currentPitch = allPitches[currentPitchIndex]
         intervalDistance = interval.notesToInterval(basePitch, currentPitch).generic.undirected
         if intervalDistance > 8:
-            intervalDistance = intervalDistance % 8 + 1
+            intervalDistance = (intervalDistance - 1) % 7 + 1
             if currentPitchIndex == 1:
                 brailleOctave = pitchToOctave(currentPitch)
                 chordTrans.append(brailleOctave)
@@ -154,6 +154,13 @@ def chordToBraille(music21Chord, descending=True, showOctave=True):
                     chordTrans.append(brailleOctave)
                     music21Chord._brailleEnglish.append(
                         u"Octave {0} {1}".format(currentPitch.octave, brailleOctave))
+        elif intervalDistance == 1:
+            brailleOctave = pitchToOctave(currentPitch)
+            chordTrans.append(brailleOctave)
+            music21Chord._brailleEnglish.append(
+                u"Octave {0} {1}".format(currentPitch.octave, brailleOctave))
+        if intervalDistance == 1:
+            intervalDistance = 8
         chordTrans.append(lookup.intervals[intervalDistance])
         music21Chord._brailleEnglish.append(u"Interval {0} {1}".format(intervalDistance, 
                                                             lookup.intervals[intervalDistance]))

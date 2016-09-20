@@ -1295,6 +1295,8 @@ class Iterator(object):
             if chorale.metadata is None:
                 chorale.metadata = metadata.Metadata()
             chorale.metadata.title = title
+            chorale.metadata.number = self._currentIndex + 1
+            
             return chorale
         elif self._returnType is 'filename':
             return filename
