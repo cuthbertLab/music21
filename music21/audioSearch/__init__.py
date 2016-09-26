@@ -211,10 +211,8 @@ def interpolation(correlation, peak):
     >>> audioSearch.interpolation(f, peak)
     3.21428571...
     '''
-    if peak == 0:
-        return correlation[peak]
-    elif peak == len(correlation) - 1:
-        return correlation[peak]
+    if peak == 0 or peak == len(correlation) - 1:
+        return peak
     
     vertex = (correlation[peak - 1] - correlation[peak + 1]) / (
                 correlation[peak - 1] - 2.0 * correlation[peak] + correlation[peak + 1])
