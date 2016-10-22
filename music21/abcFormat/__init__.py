@@ -917,6 +917,13 @@ class ABCTuplet(ABCToken):
         >>> at.updateRatio()
         >>> at.numberNotesActual, at.numberNotesNormal
         (6, 2)
+
+        2 is 2 in 3...
+
+        >>> at = abcFormat.ABCTuplet('(2')
+        >>> at.updateRatio()
+        >>> at.numberNotesActual, at.numberNotesNormal
+        (2, 3)
         '''
         if keySignatureObj is None:
             normalSwitch = 2 # 4/4 

@@ -85,9 +85,9 @@ class ChordReducer(object):
         '''
         from music21 import note
         if measureObj.isFlat is False:
-            mObj = measureObj.flat.notes
+            mObj = measureObj.flat.notes.stream()
         else:
-            mObj = measureObj.notes
+            mObj = measureObj.notes.stream()
         
         chordWeights = self.computeMeasureChordWeights(mObj, weightAlgorithm)
 
@@ -369,7 +369,7 @@ class TestExternal(unittest.TestCase):
 
         cr = ChordReducer()
         #cr.printDebug = True
-        p = cr.multiPartReduction(c, maxChords = 3)
+        p = cr.multiPartReduction(c, maxChords=3)
         #p = cr.multiPartReduction(c, closedPosition=True)
         c.insert(0, p)
         c.show()

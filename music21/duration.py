@@ -1061,12 +1061,14 @@ class Tuplet(object):
     ### SPECIAL METHODS ###
 
     def __repr__(self):
+        # use %r because floats are acceptable for numberNotesNormal, and perhaps
+        # even Fractions...
         if self.durationNormal is not None:
-            return ("<music21.duration.Tuplet %d/%d/%s>" % (self.numberNotesActual, 
+            return ("<music21.duration.Tuplet %r/%r/%s>" % (self.numberNotesActual, 
                                                             self.numberNotesNormal, 
                                                             self.durationNormal.type))
         else:
-            return ("<music21.duration.Tuplet %d/%d>" % (self.numberNotesActual, 
+            return ("<music21.duration.Tuplet %r/%r>" % (self.numberNotesActual, 
                                                             self.numberNotesNormal))
             
     ### PUBLIC METHODS ###
