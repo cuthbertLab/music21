@@ -1604,6 +1604,9 @@ class JSONFreezer(JSONFreezeThawBase):
                     sort_keys=True,
                     indent=2,
                     )
+            if six.PY2:
+                jsonString = unicode(jsonString) # @UndefinedVariable
+                
             f.write(jsonString)
 
 class JSONThawer(JSONFreezeThawBase):

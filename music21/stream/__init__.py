@@ -6494,7 +6494,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             sOldId = sNew.id
             if common.isNum(sOldId) and sOldId > defaults.minIdNumberToConsiderMemoryLocation:
                 sOldId = hex(sOldId)
-            sNew.id = str(sOldId) + "_" + method
+            try:
+                newId = str(sOldId) + "_" + method
+                sNew.id = newId
+            except UnicodeEncodeError:
+                sNew.id = "_" + method
         
         sNew._derivation = derivation.Derivation(sNew)
         sNew._derivation.origin = self
