@@ -61,7 +61,8 @@ class StreamPlayer(object):
     
     >>> #_DOCS_SHOW b = corpus.parse('bwv66.6')
     >>> #_DOCS_SHOW for n in b.flat.notes:
-    >>> class Mock(): midi = 20 #_DOCS_HIDE -- should not playback in doctests, see TestExternal
+    >>> class PitchMock(): midi = 20 #_DOCS_HIDE
+    >>> class Mock(): pitch = PitchMock() #_DOCS_HIDE -- should not playback in doctests, see TestExternal
     >>> n = Mock() #_DOCS_HIDE
     >>> for i in [1]: #_DOCS_HIDE
     ...    n.pitch.microtone = keyDetune[n.pitch.midi]
@@ -161,7 +162,7 @@ class Test(unittest.TestCase):
 
 class TestExternal(unittest.TestCase):
     
-    def xtestBachDetune(self):
+    def testBachDetune(self):
         from music21 import corpus
         import random
         b = corpus.parse('bwv66.6')
@@ -201,7 +202,7 @@ class TestExternal(unittest.TestCase):
         sp = StreamPlayer(b)
         sp.play(busyFunction=busyCounter, busyArgs=[timeCounter], busyWaitMilliseconds=500)
             
-    def testPlayOneMeasureAtATime(self):
+    def xtestPlayOneMeasureAtATime(self):
         from music21 import corpus
         defaults.ticksAtStart = 0
         b = corpus.parse('bwv66.6')
