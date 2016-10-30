@@ -114,6 +114,16 @@ def chordToBraille(music21Chord, descending=True, showOctave=True):
     >>> cMajorSeventhLeftHand = chord.Chord(['G2', 'E3', 'E4'], quarterLength=4.0)
     >>> print(basic.chordToBraille(cMajorSeventhLeftHand, descending=False))
     ⠘⠷⠴⠐⠴
+    
+    
+    >>> chordWithoutAccidentals = chord.Chord(['C4', 'E4', 'F4'], quarterLength=4.0)
+    >>> print(basic.chordToBraille(chordWithoutAccidentals, descending=True))
+    ⠐⠿⠌⠼
+    
+    >>> chordWithAccidentals = chord.Chord(['C4', 'E-4', 'F#4'], quarterLength=4.0)
+    >>> chordWithAccidentals.pitches[0].accidental = 'natural'
+    >>> print(basic.chordToBraille(chordWithAccidentals, descending=True))
+    ⠩⠐⠿⠣⠌⠡⠼
     """
     music21Chord._brailleEnglish = []
     allPitches = sorted(music21Chord.pitches)
@@ -137,6 +147,11 @@ def chordToBraille(music21Chord, descending=True, showOctave=True):
 
     for currentPitchIndex in range(1, len(allPitches)):
         currentPitch = allPitches[currentPitchIndex]
+        try:
+            handlePitchWithAccidental(currentPitch, chordTrans, music21Chord._brailleEnglish)
+        except KeyError:
+            environRules.warn("Accidental {0} of chord {1} cannot be transcribed to braille.".format(
+                                currentPitch.accidental, music21Chord))
         intervalDistance = interval.notesToInterval(basePitch, currentPitch).generic.undirected
         if intervalDistance > 8:
             intervalDistance = (intervalDistance - 1) % 7 + 1
@@ -630,9 +645,13 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
     allTuplets = music21Note.duration.tuplets
     if allTuplets:
         if beamStatus['beamStart']: 
-            if allTuplets[0].fullName == 'Triplet':
+            if allTuplets[0].fullName == 'Triplet' and allTuplets[0].tupletActualShow != 'none':
                 noteTrans.append(symbols['triplet']) # dot 2-3
             else:
+                if allTuplets[0].tupletActualShow == 'none':
+                    noteTrans.append(symbols['transcriber-added_sign'])
+                    music21Note._brailleEnglish.append(u"transcriber-added {0}".format(
+                        symbols['transcriber-added_sign']))
                 tupletTrans = symbols['tuplet_prefix'] # dots 4,5,6
                 tupletTrans += numberToBraille(allTuplets[0].numberNotesActual, 
                                                  withNumberSign=False, 
@@ -652,7 +671,11 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
     
     # accidental
     # ----------
-    handleNoteWithAccidental(music21Note, noteTrans)
+    try:
+        handlePitchWithAccidental(music21Note.pitch, noteTrans, music21Note._brailleEnglish)
+    except KeyError:
+        environRules.warn("Accidental {0} of note {1} cannot be transcribed to braille.".format(
+                            music21Note.pitch.accidental, music21Note))
                             
     # octave mark
     # -----------
@@ -731,26 +754,21 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
 
     return u"".join(noteTrans)
 
-def handleNoteWithAccidental(music21Note, noteTrans):
-    acc = music21Note.pitch.accidental
+def handlePitchWithAccidental(music21Pitch, pitchTrans, _brailleEnglish):
+    acc = music21Pitch.accidental
     if (acc is not None and acc.displayStatus is not False):
-        try:
-            if acc.displayStyle == 'parentheses':
-                ps = symbols['braille-music-parenthesis']
-                noteTrans.append(ps)
-                music21Note._brailleEnglish.append(u"Parenthesis {0}".format(ps))              
-                
-            noteTrans.append(lookup.accidentals[acc.name])
-            music21Note._brailleEnglish.append(u"Accidental {0} {1}".format(
-                                                    acc.name, lookup.accidentals[acc.name]))              
-            if acc.displayStyle == 'parentheses':
-                ps = symbols['braille-music-parenthesis']
-                noteTrans.append(ps)
-                music21Note._brailleEnglish.append(u"Parenthesis {0}".format(ps))              
+        if acc.displayStyle == 'parentheses':
+            ps = symbols['braille-music-parenthesis']
+            pitchTrans.append(ps)
+            _brailleEnglish.append(u"Parenthesis {0}".format(ps))              
 
-        except KeyError:  # pragma: no cover
-            environRules.warn("Accidental {0} of note {1} cannot be transcribed to braille.".format(
-                                acc, music21Note))
+        pitchTrans.append(lookup.accidentals[acc.name])
+        _brailleEnglish.append(u"Accidental {0} {1}".format(
+                                        acc.name, lookup.accidentals[acc.name]))              
+        if acc.displayStyle == 'parentheses':
+            ps = symbols['braille-music-parenthesis']
+            pitchTrans.append(ps)
+            _brailleEnglish.append(u"Parenthesis {0}".format(ps))              
 
 def handleArticulations(music21Note, noteTrans, upperFirstInFingering=True):
     # finger mark
