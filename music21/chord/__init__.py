@@ -3745,6 +3745,21 @@ class Chord(note.NotRest):
         pcOriginal = cta.pcOriginal
         transposedNormalForm = chordTables.addressToTransposedNormalForm(cta)
         return [(pc + pcOriginal) % 12 for pc in transposedNormalForm]
+    
+    @property
+    def normalOrderString(self):
+        '''
+        Return the normal order/normal form of the Chord as a string representation.
+
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
+        >>> c1.normalOrder
+        [0, 3, 7]
+        
+        >>> c1.normalOrderString
+        '<037>'
+
+        '''
+        return Chord.formatVectorString(self.normalOrder)
 
 
     @property
