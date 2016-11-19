@@ -826,6 +826,9 @@ class Converter(object):
     }
     _modifierEqualsRe = re.compile(r'\=([A-Za-z0-9]*)')
     _modifierStarRe = re.compile(r'\*(.*?)\*')
+    _modifierAngleRe = re.compile(r'\<(.*?)\>')
+    _modifierParensRe = re.compile(r'\((.*?)\)')
+    _modifierSquareRe = re.compile(r'\[(.*?)\]')
     _modifierUnderscoreRe = re.compile(r'_(.*)')                          
     
     def __init__(self, stringRep="", **keywords):
@@ -837,9 +840,11 @@ class Converter(object):
                     (r'r(\S*)', RestToken),
                     (r'([a-gA-G]\S*)', NoteToken), # last
         ]
-        
         self.modifierEquals = IdModifier
         self.modifierStar = None
+        self.modifierAngle = None
+        self.modifierParens = None
+        self.modifierSquare = None
         self.modifierUnderscore = LyricModifier
 
         self.keywords = keywords
@@ -1043,33 +1048,18 @@ class Converter(object):
         multiple tokens, use a State object
         '''
         activeModifiers = []
-        # note that since these are constants, they don't need to be compiled
-        equalSuccess = self._modifierEqualsRe.search(t)
-        if equalSuccess is not None: # is not None is necessary
-            equalsData = equalSuccess.group(1)
-            t = self._modifierEqualsRe.sub('', t)
-            if self.modifierEquals is not None:
-                equalObject = self.modifierEquals(equalsData, t, self)
-                activeModifiers.append(equalObject)
-
-        # purposely writing this out three times, to try to remove the temptation
-        # to add more modifiers...
-        starSuccess = self._modifierStarRe.search(t)
-        if starSuccess is not None: # is not None is necessary
-            starData = starSuccess.group(1)
-            t = self._modifierStarRe.sub('', t)
-            if self.modifierStar is not None:
-                starObject = self.modifierStar(starData, t, self)
-                activeModifiers.append(starObject)
         
-        # underscore last, since it's the largest capture group
-        underscoreSuccess = self._modifierUnderscoreRe.search(t)
-        if underscoreSuccess is not None: # is not None is necessary
-            underscoreData = underscoreSuccess.group(1)
-            t = self._modifierUnderscoreRe.sub('', t)
-            if self.modifierUnderscore is not None:
-                underscoreObject = self.modifierUnderscore(underscoreData, t, self)
-                activeModifiers.append(underscoreObject)
+        for modifierName in ('Equals', 'Star', 'Angle', 'Parens', 'Square', 'Underscore'):
+            modifierClass = getattr(self, 'modifier' + modifierName, None)
+            if modifierClass is None:
+                continue
+            modifierRe = getattr(self, '_modifier' + modifierName + 'Re', None)
+            foundIt = modifierRe.search(t)
+            if foundIt is not None: # is not None is necessary
+                modifierData = foundIt.group(1)
+                t = modifierRe.sub('', t)
+                modifierObject = modifierClass(modifierData, t, self)
+                activeModifiers.append(modifierObject)
                 
         for modObj in activeModifiers:
             modObj.preParse(t)

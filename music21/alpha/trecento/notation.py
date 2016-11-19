@@ -118,16 +118,6 @@ class MensuralTypeModifier(tinyNotation.Modifier):
         parent.stateDict['previousMensuralType'] = mensuralType
         return n
 
-class StemsModifier(tinyNotation.Modifier):
-    def postParse(self, m21Obj):
-        direction = {'': None, 'S': 'side', 'D': 'down', 'U':'up'}
-        for stem in self.modifierData.split('/'):
-            if stem in direction:
-                m21Obj.setStem(direction[stem])
-            else:
-                raise TrecentoNotationException('could not determine stem direction from %s' % stem)
-
-        return m21Obj
 
 class FlagsModifier(tinyNotation.Modifier):
     def postParse(self, m21Obj):
@@ -140,18 +130,27 @@ class FlagsModifier(tinyNotation.Modifier):
                 raise TrecentoNotationException('cannot determine flag from %s' % flag)
         return m21Obj
 
-class LigatureStemsModifier(tinyNotation.Modifier):
+class StemsModifier(tinyNotation.Modifier):
     def postParse(self, m21Obj):
-        direction = {'D': 'down', 'U':'up'}
+        direction = {'': None, 'S': 'side', 'D': 'down', 'U':'up'}
         orientation = {'L': 'left', 'R': 'right'}
-        try:
-            d = direction[self.modifierData[0]]
-            o = orientation[self.modifierData[1]]
-            tup = (m21Obj.numberInLigature, d, o)
-            m21Obj.activeLigature.state.ligatureStems.append(tup)
-        except (IndexError, KeyError):
-            raise TrecentoNotationException('cannot determine ligature stem from %s' % 
-                                            self.modifierData)
+        if '/' in self.modifierData or len(self.modifierData) == 1:            
+            for stem in self.modifierData.split('/'):
+                if stem in direction:
+                    m21Obj.setStem(direction[stem])
+                else:
+                    raise TrecentoNotationException('could not determine stem direction from %s' % 
+                                                    stem)
+        else:
+            try:
+                d = direction[self.modifierData[0]]
+                o = orientation[self.modifierData[1]]
+                tup = (m21Obj.numberInLigature, d, o)
+                m21Obj.activeLigature.state.ligatureStems.append(tup)
+            except (IndexError, KeyError):
+                raise TrecentoNotationException('cannot determine ligature stem from %s' % 
+                                                self.modifierData)
+
         return m21Obj
 
 
@@ -173,6 +172,7 @@ class LigatureNoteheadModifier(tinyNotation.Modifier):
 class LigatureReverseModifier(tinyNotation.Modifier):
     def postParse(self, n):
         n.activeLigature.state.reverseNums.append(n.numberInLigature)
+        return n
 # #------------------------------------------------------------------------------
 # def breakString(string, startBreakChar, endBreakChar,
 #     func=lambda s: s.split()):
@@ -325,15 +325,15 @@ class TrecentoTinyConverter(tinyNotation.Converter):
     Valid notehead shapes are s for square and o for oblique. Valid stem
     directions are U for up and D for down, and valid orientations are L for
     left and R for right. To set a note of a ligature as a maxima, append (Mx)
-    to the note string. To set a note of a ligature as reversed, append a
-    forward slash followed by an R ("/R") to the note string.
+    to the note string. To set a note of a ligature as reversed, append an equal sign
+    forward slash followed by an R ("=R") to the note string.
 
     Note, ligatures must follow the rules outlined by
     :class:`music21.medren.Ligature`.
 
     Examples:
 
-    >>> ts = alpha.trecento.notation.TrecentoTinyConverter(r'lig{f a[DL]/R}').parse().stream
+    >>> ts = alpha.trecento.notation.TrecentoTinyConverter(r'lig{f a[DL]=R}').parse().stream
     >>> tTNN = ts.flat.getElementsByClass('Ligature')[0]
     >>> tTNN.getStem(1)
     ('down', 'left')
@@ -373,7 +373,11 @@ class TrecentoTinyConverter(tinyNotation.Converter):
     {0.0} <music21...medren.MensuralNote brevis D>
     {0.0} <music21...medren.Ligature...>
     '''
-
+    bracketStateMapping = {
+        'trip': tinyNotation.TripletState,
+        'quad': tinyNotation.QuadrupletState,
+        'lig': LigatureState
+    }    
     def __init__(self, stringRep=""):
         super(TrecentoTinyConverter, self).__init__(stringRep)
         self.tokenMap = [
@@ -383,18 +387,16 @@ class TrecentoTinyConverter(tinyNotation.Converter):
                          (r'r(\S*)', TrecentoRestToken),
                          (r'(\S*)', TrecentoNoteToken)
                          ]
-        self.stateMap = [
-                        (r'trip\{', tinyNotation.TripletState),
-                        (r'lig\{', LigatureState)                          
-                         ]
-        self.modifierMap = [
-                        (r'\(([A-Z][A-Za-z]?)\)', MensuralTypeModifier),
-                        (r'\[([A-Z]?(\/[A-Z])*)\]', StemsModifier),
-                        (r'\_(([A-Z][A-Z])?(\/[A-Z][A-Z])*)', FlagsModifier),
-                        (r'\[([A-Z][A-Z])\]', LigatureStemsModifier),
-                        (r'\<([a-z])\>', LigatureNoteheadModifier),
-                        (r'(\/R)', LigatureReverseModifier),    
-                        ]
+        self.modifierEquals = LigatureReverseModifier
+        self.modifierUnderscore = FlagsModifier
+        self.modifierAngle = LigatureNoteheadModifier
+        self.modifierParens = MensuralTypeModifier
+        self.modifierSquare = StemsModifier # or LigatureStemsModifier
+#         self.modifierMap = [
+#                         (r'\[([A-Z]?(\/[A-Z])*)\]', StemsModifier),
+#                         (r'\[([A-Z][A-Z])\]', LigatureStemsModifier),
+#                         (r'(\/R)', LigatureReverseModifier),    
+#                         ]
         self.stateDict['lastDuration'] = 0.0
         self.stateDict['previousMensuralType'] = None
 
@@ -413,7 +415,7 @@ class TrecentoNoteToken(tinyNotation.NoteToken):
     def parse(self, parent=None):
         from music21.alpha import medren
         n = medren.MensuralNote()
-        self.getPitch(n, self.token)
+        self.processPitchMap(n, self.token)
         if parent:
             n.mensuralType = parent.stateDict['previousMensuralType']
         return n
