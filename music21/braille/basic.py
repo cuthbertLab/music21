@@ -150,7 +150,8 @@ def chordToBraille(music21Chord, descending=True, showOctave=True):
         try:
             handlePitchWithAccidental(currentPitch, chordTrans, music21Chord._brailleEnglish)
         except KeyError:
-            environRules.warn("Accidental {0} of chord {1} cannot be transcribed to braille.".format(
+            environRules.warn(
+                "Accidental {0} of chord {1} cannot be transcribed to braille.".format(
                                 currentPitch.accidental, music21Chord))
         intervalDistance = interval.notesToInterval(basePitch, currentPitch).generic.undirected
         if intervalDistance > 8:

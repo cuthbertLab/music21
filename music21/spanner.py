@@ -320,9 +320,9 @@ class Spanner(base.Music21Object):
     # Music21Object to get at these objects 
     # this is the same as with Variants
 
-    def purgeOrphans(self):
-        self.spannerStorage.purgeOrphans()
-        base.Music21Object.purgeOrphans(self)
+    def purgeOrphans(self, excludeStorageStreams=True):
+        self.spannerStorage.purgeOrphans(excludeStorageStreams)
+        base.Music21Object.purgeOrphans(self, excludeStorageStreams)
 
     def purgeLocations(self, rescanIsDead=False):
         # must override Music21Object to purge locations from the contained

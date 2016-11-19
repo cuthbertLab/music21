@@ -18,11 +18,8 @@ made it a generally supported music21 format.
 
 N.B.: TinyNotation is not meant to expand to cover every single case.  Instead
 it is meant to be subclassable to extend to the cases *your* project needs.
-See for instance the harmony examples in HarmonyStream and HarmonyNote
-or the Trecento specific examples in trecento/cadencebook.py
 
-
-Here are the most important rules:
+Here are the most important rules by default:
 
 1. Note names are: a,b,c,d,e,f,g and r for rest
 2. Flats, sharps, and naturals are notated as #,- (not b), and (if needed) n.  
@@ -54,84 +51,136 @@ Here are the most important rules:
    use `quad{c16 d e8}`.  No other tuplets are supported.
 
 
-Again, see the :class:`~music21.tinyNotation.HarmonyStream` (below) and 
-trecento.cadencebook examples
-to see how to make TinyNotation useful for your own needs.
+>>> stream1 = converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
+>>> stream1.show('text')
+{0.0} <music21.stream.Measure 1 offset=0.0>
+    {0.0} <music21.clef.TrebleClef>
+    {0.0} <music21.meter.TimeSignature 3/4>
+    {0.0} <music21.note.Note E>
+    {1.0} <music21.note.Rest rest>
+    {2.0} <music21.note.Note F#>
+{3.0} <music21.stream.Measure 2 offset=3.0>
+    {0.0} <music21.note.Note G>
+    {1.0} <music21.note.Note B->
+    {1.3333} <music21.note.Note A>
+    {1.6667} <music21.note.Note G>
+    {2.0} <music21.note.Note C>
+{6.0} <music21.stream.Measure 3 offset=6.0>
+    {0.0} <music21.note.Note C>
+    {1.0} <music21.bar.Barline style=final>
 
-(Currently, final notes with fermatas (or any very long final note), 
-take 0 for the note length.  But expect this to disappear from the
-TinyNotation specification soon, as it's too Trecento specific.)
+>>> stream1.flat.getElementById("lastG").step
+'G'
+>>> stream1.flat.notesAndRests[1].isRest
+True
+>>> stream1.flat.notesAndRests[0].octave
+3    
+>>> stream1.flat.notes[-2].tie.type
+'start'
+>>> stream1.flat.notes[-1].tie.type
+'stop'
+
+Changing time signatures are supported:
+
+>>> s1 = converter.parse('tinynotation: 3/4 C4 D E 2/4 F G A B 1/4 c')
+>>> s1.show('t')
+{0.0} <music21.stream.Measure 1 offset=0.0>
+    {0.0} <music21.clef.BassClef>
+    {0.0} <music21.meter.TimeSignature 3/4>
+    {0.0} <music21.note.Note C>
+    {1.0} <music21.note.Note D>
+    {2.0} <music21.note.Note E>
+{3.0} <music21.stream.Measure 2 offset=3.0>
+    {0.0} <music21.meter.TimeSignature 2/4>
+    {0.0} <music21.note.Note F>
+    {1.0} <music21.note.Note G>
+{5.0} <music21.stream.Measure 3 offset=5.0>
+    {0.0} <music21.note.Note A>
+    {1.0} <music21.note.Note B>
+{7.0} <music21.stream.Measure 4 offset=7.0>
+    {0.0} <music21.meter.TimeSignature 1/4>
+    {0.0} <music21.note.Note C>
+    {1.0} <music21.bar.Barline style=final>
 
 
 
-an alpha complete rewrite of tinyNotation.
+Here is an equivalent way of doing the example above, but lower level:
 
-tinyNotation was one of the first modules of music21 and one of my first attempts to
-program in Python.  and it shows.
+>>> tnc = tinyNotation.Converter("3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
+>>> stream2 = tnc.parse().stream
+>>> len(stream1.recurse()) == len(stream2.recurse())
+True
 
-this is what the module should have been... from mistakes
-learned and insights from ABC etc. parsing.
+This lower level is needed in case you want to add additional features.
 
-keeping both until this becomes stable.
+>>> class ColorModifier(tinyNotation.Modifier):
+...     def postParse(self, m21Obj):
+...         m21Obj.color = self.modifierData
+...         return m21Obj
 
+>>> tnc = tinyNotation.Converter("3/4 C4*pink* D4*green* E4*blue*")
+>>> tnc.modifierStar = ColorModifier
+>>> s = tnc.parse().stream
+>>> for n in s.recurse().getElementsByClass('Note'):
+...     print(n.step, n.color)
+C pink
+D green
+E blue
 
-    >>> tnc = tinyNotation.Converter("3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
-    >>> stream1 = tnc.parse().stream
-    >>> stream1.show('text')
-    {0.0} <music21.stream.Measure 1 offset=0.0>
-        {0.0} <music21.clef.TrebleClef>
-        {0.0} <music21.meter.TimeSignature 3/4>
-        {0.0} <music21.note.Note E>
-        {1.0} <music21.note.Rest rest>
-        {2.0} <music21.note.Note F#>
-    {3.0} <music21.stream.Measure 2 offset=3.0>
-        {0.0} <music21.note.Note G>
-        {1.0} <music21.note.Note B->
-        {1.3333} <music21.note.Note A>
-        {1.6667} <music21.note.Note G>
-        {2.0} <music21.note.Note C>
-    {6.0} <music21.stream.Measure 3 offset=6.0>
-        {0.0} <music21.note.Note C>
-        {1.0} <music21.bar.Barline style=final>
+Or more usefully, and often desired:
 
-    >>> stream1.flat.getElementById("lastG").step
-    'G'
-    >>> stream1.flat.notesAndRests[1].isRest
-    True
-    >>> stream1.flat.notesAndRests[0].octave
-    3    
-    >>> stream1.flat.notes[-2].tie.type
-    'start'
-    >>> stream1.flat.notes[-1].tie.type
-    'stop'
-    
-    
-    Changing time signatures are supported:
-    
-    >>> s1 = converter.parse('tinynotation: 3/4 C4 D E 2/4 F G A B 1/4 c')
-    >>> s1.show('t')
-    {0.0} <music21.stream.Measure 1 offset=0.0>
-        {0.0} <music21.clef.BassClef>
-        {0.0} <music21.meter.TimeSignature 3/4>
-        {0.0} <music21.note.Note C>
-        {1.0} <music21.note.Note D>
-        {2.0} <music21.note.Note E>
-    {3.0} <music21.stream.Measure 2 offset=3.0>
-        {0.0} <music21.meter.TimeSignature 2/4>
-        {0.0} <music21.note.Note F>
-        {1.0} <music21.note.Note G>
-    {5.0} <music21.stream.Measure 3 offset=5.0>
-        {0.0} <music21.note.Note A>
-        {1.0} <music21.note.Note B>
-    {7.0} <music21.stream.Measure 4 offset=7.0>
-        {0.0} <music21.meter.TimeSignature 1/4>
-        {0.0} <music21.note.Note C>
-        {1.0} <music21.bar.Barline style=final>
+>>> class HarmonyModifier(tinyNotation.Modifier):
+...     def postParse(self, n):
+...         cs = harmony.ChordSymbol(n.pitch.name + self.modifierData)
+...         cs.duration = n.duration
+...         return cs
+>>> tnc = tinyNotation.Converter("4/4 C2_maj7 D4_m E-_sus4")
+>>> tnc.modifierUnderscore = HarmonyModifier
+>>> s = tnc.parse().stream
+>>> s.show('text')
+{0.0} <music21.stream.Measure 1 offset=0.0>
+    {0.0} <music21.clef.BassClef>
+    {0.0} <music21.meter.TimeSignature 4/4>
+    {0.0} <music21.harmony.ChordSymbol Cmaj7>
+    {2.0} <music21.harmony.ChordSymbol Dm>
+    {3.0} <music21.harmony.ChordSymbol E-sus4>
+    {4.0} <music21.bar.Barline style=final>
+>>> for cs in s.recurse().getElementsByClass('ChordSymbol'):
+...     print([p.name for p in cs.pitches])
+['C', 'E', 'G', 'B']
+['D', 'F', 'A']
+['E-', 'A-', 'B-']
+
+Another example: TinyNotation does not support key signatures -- well, no problem! Let's
+create a new Token type and add it to the tokenMap
+
+>>> class KeyToken(tinyNotation.Token):
+...     def parse(self, parent):
+...         keyName = self.token
+...         return key.Key(keyName)
+>>> keyMapping = (r'k(.*)', KeyToken)
+>>> tnc = tinyNotation.Converter("4/4 kE- G1 kf# A1")
+>>> tnc.tokenMap.append(keyMapping)
+>>> s = tnc.parse().stream
+>>> s.show('text')
+{0.0} <music21.stream.Measure 1 offset=0.0>
+    {0.0} <music21.clef.BassClef>
+    {0.0} <music21.key.Key of E- major>
+    {0.0} <music21.meter.TimeSignature 4/4>
+    {0.0} <music21.note.Note G>
+{4.0} <music21.stream.Measure 2 offset=4.0>
+    {0.0} <music21.key.Key of f# minor>
+    {0.0} <music21.note.Note A>
+    {4.0} <music21.bar.Barline style=final>
+
+If you want to create a very different dialect, you can subclass tinyNotation.Converter
+and set it up once to use the mappings above. 
 '''
-import unittest
+import collections
 import copy
 import re
 import sre_parse
+import unittest
 
 from music21 import note
 from music21 import duration
@@ -154,10 +203,20 @@ class State(object):
     '''
     State tokens apply something to 
     every note found within it.
+    
+    State objects can have "autoExpires" set, which is False if it does not expire
+    or an integer if it expires after a certain number of tokens have been processed.
+    
+    >>> tnc = tinyNotation.Converter()
+    >>> ts = tinyNotation.TieState(tnc, '~')
+    >>> isinstance(ts, tinyNotation.State)
+    True
+    >>> ts.autoExpires
+    2
     '''
     autoExpires = False # expires after N tokens or never.
     
-    def __init__(self, parent, stateInfo):
+    def __init__(self, parent=None, stateInfo=None):
         self.affectedTokens = []
         self.parent = common.wrapWeakref(parent)
         self.stateInfo = stateInfo
@@ -290,32 +349,31 @@ class Modifier(object):
     def postParse(self, m21Obj):
         '''
         called after the tokenString has been
-        truend into an m21Obj.  m21Obj may be None
+        turned into an m21Obj.  m21Obj may be None
+        
+        Important: must return the m21Obj, or a different object!
         '''
-        pass
+        return m21Obj
 
 
 class IdModifier(Modifier):
     '''
-    sets the .id of the m21Obj, called with =
+    sets the .id of the m21Obj, called with = by default
     '''
     def postParse(self, m21Obj):
         if hasattr(m21Obj, 'id'):
             m21Obj.id = self.modifierData
+        return m21Obj
 
 class LyricModifier(Modifier):
     '''
-    sets the .lyric of the m21Obj, called with _
+    sets the .lyric of the m21Obj, called with _ by default
     '''
     def postParse(self, m21Obj):
         if hasattr(m21Obj, 'lyric'):
             m21Obj.lyric = self.modifierData
+        return m21Obj
 
-class StarModifier(Modifier):
-    '''
-    does nothing, but easily subclassed.  Uses *...* to make it happen
-    '''
-    pass
 
 
 class Token(object):
@@ -332,7 +390,7 @@ class Token(object):
         do NOT store parent -- probably
         too slow
         '''
-        pass
+        return None
         
 
 class TimeSignatureToken(Token):
@@ -378,7 +436,7 @@ class NoteOrRestToken(Token):
         
         return t
 
-    def durationType(self, n, search, pm, t, parent):
+    def durationType(self, element, search, pm, t, parent):
         '''
         The result of a successful search for a duration type: puts a Duration in the right place.
         '''
@@ -386,20 +444,21 @@ class NoteOrRestToken(Token):
         typeNum = int(search.group(1))
         if typeNum == 0:
             if parent.stateDict['currentTimeSignature'] is not None:
-                n.duration = copy.deepcopy(parent.stateDict['currentTimeSignature'].barDuration)
-                n.expressions.append(expressions.Fermata())
+                element.duration = copy.deepcopy(
+                        parent.stateDict['currentTimeSignature'].barDuration)
+                element.expressions.append(expressions.Fermata())
         else:
-            n.duration.type = duration.typeFromNumDict[typeNum]
+            element.duration.type = duration.typeFromNumDict[typeNum]
         t = re.sub(pm, '', t)
         return t
     
-    def dots(self, n, search, pm, t, parent):
+    def dots(self, element, search, pm, t, parent):
         '''
         adds the appropriate number of dots to the right place.
         
         Subclassed in TrecentoNotation where two dots has a different meaning.
         '''
-        n.duration.dots = len(search.group(1))
+        element.duration.dots = len(search.group(1))
         t = re.sub(pm, '', t)
         return t
     
@@ -436,32 +495,35 @@ class NoteToken(NoteOrRestToken):
     'B-6'
     
     '''    
-    pitchMap = [
-        (r'([A-G]+)', 'lowOctave'),
-        (r'([a-g])(\'*)', 'highOctave'),
-        (r'\(([\#\-n]+)\)(.*)', 'editorialAccidental'),
-        (r'(\#+)', 'sharps'),
-        (r'(\-+)', 'flats'),
-        (r'(n)', 'natural'),
-    ]
+    pitchMap = collections.OrderedDict([
+        ('lowOctave', r'([A-G]+)'),
+        ('highOctave', r'([a-g])(\'*)'),
+        ('editorialAccidental', r'\(([\#\-n]+)\)(.*)'),
+        ('sharps', r'(\#+)'),
+        ('flats', r'(\-+)'),
+        ('natural', r'(n)'),
+    ])
     def __init__(self, token=""):
         super(NoteToken, self).__init__(token)
         self.isEditorial = False
     
     def parse(self, parent=None):
         '''
-        Extract the pitch from the note.
+        Extract the pitch from the note and then returns the Note.
         '''
         t = self.token
         
         n = note.Note()
-        t = self.getPitch(n, t)
+        t = self.processPitchMap(n, t)
         if parent:
             self.applyDuration(n, t, parent)
         return n
 
-    def getPitch(self, n, t):
-        for pm, method in self.pitchMap:
+    def processPitchMap(self, n, t):
+        '''
+        processes the pitchMap on the object.
+        '''
+        for method, pm in self.pitchMap.items():
             searchSuccess = re.search(pm, t)
             if searchSuccess:
                 callFunc = getattr(self, method)
@@ -477,8 +539,27 @@ class NoteToken(NoteOrRestToken):
         return t
 
     def _addAccidental(self, n, alter, pm, t):
-        '''
+        r'''
         helper function for all accidental types.
+        
+        >>> nToken = tinyNotation.NoteToken('BB--')
+        >>> n = note.Note('B')
+        >>> n.octave = 2
+        >>> tPost = nToken._addAccidental(n, -2, r'(\-+)', 'BB--')
+        >>> tPost
+        'BB'
+        >>> n.pitch.accidental
+        <accidental double-flat>
+        
+        >>> nToken = tinyNotation.NoteToken('BB(--)')
+        >>> nToken.isEditorial = True
+        >>> n = note.Note('B')
+        >>> n.octave = 2
+        >>> tPost = nToken._addAccidental(n, -2, r'(\-+)', 'BB--')
+        >>> tPost
+        'BB'
+        >>> n.editorial.ficta
+        <accidental double-flat>
         '''
         acc = pitch.Accidental(alter)
         if self.isEditorial:
@@ -489,15 +570,40 @@ class NoteToken(NoteOrRestToken):
         return t
 
     def sharps(self, n, search, pm, t):
-        '''
-        called when one or more sharps have been found.
+        r'''
+        called when one or more sharps have been found and adds the appropriate accidental to it.
+
+        >>> import re
+        >>> tStr = 'C##'
+        >>> nToken = tinyNotation.NoteToken(tStr)
+        >>> n = note.Note('C')
+        >>> n.octave = 3
+        >>> search = re.search(nToken.pitchMap['sharps'], tStr)
+        >>> tPost = nToken.sharps(n, search, nToken.pitchMap['sharps'], tStr)
+        >>> tPost
+        'C'
+        >>> n.pitch.accidental
+        <accidental double-sharp>
         '''
         alter = len(search.group(1))
         return self._addAccidental(n, alter, pm, t)
 
     def flats(self, n, search, pm, t):
         '''
-        called when one or more flats have been found.
+        called when one or more flats have been found and calls adds 
+        the appropriate accidental to it.
+
+        >>> import re
+        >>> tStr = 'BB--'
+        >>> nToken = tinyNotation.NoteToken(tStr)
+        >>> n = note.Note('B')
+        >>> n.octave = 2
+        >>> search = re.search(nToken.pitchMap['flats'], tStr)
+        >>> tPost = nToken.flats(n, search, nToken.pitchMap['flats'], tStr)
+        >>> tPost
+        'BB'
+        >>> n.pitch.accidental
+        <accidental double-flat>
         '''
         alter = -1 * len(search.group(1))
         return self._addAccidental(n, alter, pm, t)
@@ -505,13 +611,36 @@ class NoteToken(NoteOrRestToken):
     def natural(self, n, search, pm, t):
         '''
         called when an explicit natural has been found.  All pitches are natural without
-        being specified, so not needed.
+        being specified, so not needed. Adds a natural accidental to it.
+
+        >>> import re
+        >>> tStr = 'En'
+        >>> nToken = tinyNotation.NoteToken(tStr)
+        >>> n = note.Note('E')
+        >>> n.octave = 3
+        >>> search = re.search(nToken.pitchMap['natural'], tStr)
+        >>> tPost = nToken.natural(n, search, nToken.pitchMap['natural'], tStr)
+        >>> tPost
+        'E'
+        >>> n.pitch.accidental
+        <accidental natural>
         '''
         return self._addAccidental(n, 0, pm, t)
 
     def lowOctave(self, n, search, pm, t):
         '''
         Called when a note of octave 3 or below is encountered.
+
+        >>> import re
+        >>> tStr = 'BBB'
+        >>> nToken = tinyNotation.NoteToken(tStr)
+        >>> n = note.Note('B')
+        >>> search = re.search(nToken.pitchMap['lowOctave'], tStr)
+        >>> tPost = nToken.lowOctave(n, search, nToken.pitchMap['lowOctave'], tStr)
+        >>> tPost
+        ''
+        >>> n.octave
+        1
         '''
         stepName = search.group(1)[0].upper()
         octaveNum = 4 - len(search.group(1))
@@ -523,6 +652,17 @@ class NoteToken(NoteOrRestToken):
     def highOctave(self, n, search, pm, t):
         '''
         Called when a note of octave 4 or higher is encountered.
+
+        >>> import re
+        >>> tStr = "e''"
+        >>> nToken = tinyNotation.NoteToken(tStr)
+        >>> n = note.Note('E')
+        >>> search = re.search(nToken.pitchMap['highOctave'], tStr)
+        >>> tPost = nToken.highOctave(n, search, nToken.pitchMap['highOctave'], tStr)
+        >>> tPost
+        ''
+        >>> n.octave
+        6
         '''
         stepName = search.group(1)[0].upper()
         octaveNum = 4 + len(search.group(2))
@@ -538,27 +678,169 @@ class Converter(object):
     
     Accepts one keyword: makeNotation=False to get "classic" TinyNotation formats.
     
-    '''
-    def __init__(self, stringRep = "", **keywords):
-        self.stateMap = [ 
-            (r'trip\{', TripletState),
-            (r'quad\{', QuadrupletState),
-            (r'\~', TieState)
-            ]
+    >>> tnc = tinyNotation.Converter('4/4 C##4 D e-8 f~ f f# g4 trip{f8 e d} C2=hello')
+    >>> tnc.parse()
+    <music21.tinyNotation.Converter object at 0x10aeefbe0>
+    >>> tnc.stream.show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.note.Note C##>
+        {1.0} <music21.note.Note D>
+        {2.0} <music21.note.Note E->
+        {2.5} <music21.note.Note F>
+        {3.0} <music21.note.Note F>
+        {3.5} <music21.note.Note F#>
+    {4.0} <music21.stream.Measure 2 offset=4.0>
+        {0.0} <music21.note.Note G>
+        {1.0} <music21.note.Note F>
+        {1.3333} <music21.note.Note E>
+        {1.6667} <music21.note.Note D>
+        {2.0} <music21.note.Note C>
+        {4.0} <music21.bar.Barline style=final>
     
-        self.endState = re.compile(r'\}$')
-        
+
+    Or, breaking down what Parse does bit by bit...
+
+    >>> tnc = tinyNotation.Converter('4/4 C##4 D e-8 f~ f f# g4 trip{f8 e d} C2=hello')
+    >>> tnc.stream
+    <music21.stream.Part 0x10acee860>
+    >>> tnc.makeNotation
+    True
+    >>> tnc.stringRep
+    '4/4 C##4 D e-8 f~ f f# g4 trip{f8 e d} C2=hello'    
+    >>> tnc.activeStates
+    []
+    >>> tnc.preTokens
+    []
+    >>> tnc.splitPreTokens()
+    >>> tnc.preTokens
+    ['4/4', 'C##4', 'D', 'e-8', 'f~', 'f', 'f#', 'g4', 'trip{f8', 'e', 'd}', 'C2=hello']
+    >>> tnc.setupRegularExpressions()
+
+    Then we parse the time signature:
+    
+    >>> tnc.parseOne(0, tnc.preTokens[0])
+    >>> tnc.stream.elementsChanged()
+    >>> tnc.stream.show('text')
+    {0.0} <music21.meter.TimeSignature 4/4>
+    
+    Then the first note:
+    
+    >>> tnc.parseOne(1, tnc.preTokens[1])
+    >>> tnc.stream.elementsChanged()
+    >>> tnc.stream.show('text')
+    {0.0} <music21.meter.TimeSignature 4/4>
+    {0.0} <music21.note.Note C##>
+
+    The next notes to 'g4' are pretty similar...
+
+    >>> for i in range(2, 8):
+    ...     tnc.parseOne(i, tnc.preTokens[i])
+    >>> tnc.stream.elementsChanged()
+    >>> tnc.stream.show('text')
+    {0.0} <music21.meter.TimeSignature 4/4>
+    {0.0} <music21.note.Note C##>
+    {1.0} <music21.note.Note D>
+    {2.0} <music21.note.Note E->
+    {2.5} <music21.note.Note F>
+    {3.0} <music21.note.Note F>
+    {3.5} <music21.note.Note F#>    
+    {4.0} <music21.note.Note G> 
+
+    The next note starts a "State" since it has a triplet:
+    
+    >>> tnc.preTokens[8]
+    'trip{f8'
+    >>> tnc.parseOne(8, tnc.preTokens[8])
+    >>> tnc.activeStates
+    [<music21.tinyNotation.TripletState object at 0x10ae9dba8>]
+    >>> tnc.activeStates[0].affectedTokens
+    [<music21.note.Note F>]
+    
+    The state is still active for the next token:
+    
+    >>> tnc.preTokens[9]
+    'e'
+    >>> tnc.parseOne(9, tnc.preTokens[9])
+    >>> tnc.activeStates
+    [<music21.tinyNotation.TripletState object at 0x10ae9dba8>]
+    >>> tnc.activeStates[0].affectedTokens
+    [<music21.note.Note F>, <music21.note.Note E>]
+
+    But the next token closes the state:
+
+    >>> tnc.preTokens[10]
+    'd}'
+    >>> tnc.parseOne(10, tnc.preTokens[10])
+    >>> tnc.activeStates
+    []
+    >>> tnc.stream.elementsChanged()
+    >>> tnc.stream.show('text')
+    {0.0} <music21.meter.TimeSignature 4/4>
+    ...
+    {4.0} <music21.note.Note G>
+    {5.0} <music21.note.Note F>
+    {5.3333} <music21.note.Note E>
+    {5.6667} <music21.note.Note D>   
+    
+    The last token has a modifier, which is an IdModifier:
+    
+    >>> tnc.preTokens[11]
+    'C2=hello'
+    >>> tnc.parseOne(11, tnc.preTokens[11])
+    >>> tnc.stream.elementsChanged()
+    >>> tnc.stream.show('text')
+    {0.0} <music21.meter.TimeSignature 4/4>
+    ...
+    {5.6667} <music21.note.Note D>   
+    {6.0} <music21.note.Note C>
+    >>> tnc.stream[-1].id
+    'hello'
+    
+    Then calling tnc.postParse() runs the makeNotation:
+    
+    >>> tnc.postParse()
+    >>> tnc.stream.show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.note.Note C##>
+        {1.0} <music21.note.Note D>
+        {2.0} <music21.note.Note E->
+        {2.5} <music21.note.Note F>
+        {3.0} <music21.note.Note F>
+        {3.5} <music21.note.Note F#>
+    {4.0} <music21.stream.Measure 2 offset=4.0>
+        {0.0} <music21.note.Note G>
+        {1.0} <music21.note.Note F>
+        {1.3333} <music21.note.Note E>
+        {1.6667} <music21.note.Note D>
+        {2.0} <music21.note.Note C>
+        {4.0} <music21.bar.Barline style=final>    
+    
+    '''
+    bracketStateMapping = {
+        'trip': TripletState,
+        'quad': QuadrupletState,
+    }
+    _modifierEqualsRe = re.compile(r'\=([A-Za-z0-9]*)')
+    _modifierStarRe = re.compile(r'\*(.*?)\*')
+    _modifierUnderscoreRe = re.compile(r'_(.*)')                          
+    
+    def __init__(self, stringRep="", **keywords):
+        self.generalBracketStateRe = re.compile(r'(\w+)\{')
+        self.tieStateRe = re.compile(r'\~')
+    
         self.tokenMap = [
                     (r'(\d+\/\d+)', TimeSignatureToken),
                     (r'r(\S*)', RestToken),
-                    (r'(\S*)', NoteToken), # last
+                    (r'([a-gA-G]\S*)', NoteToken), # last
         ]
         
-        self.modifierMap = [
-                    (r'\=([A-Za-z0-9]*)', IdModifier),
-                    (r'_(.*)', LyricModifier),
-                    (r'\*(.*)\*', StarModifier),
-        ]
+        self.modifierEquals = IdModifier
+        self.modifierStar = None
+        self.modifierUnderscore = LyricModifier
 
         self.keywords = keywords
         if 'makeNotation' in keywords:
@@ -571,14 +853,12 @@ class Converter(object):
                           'lastDuration': 1.0
                           }
         self.stringRep = stringRep
-        #self.regexps = {}
         self.activeStates = []
         self.preTokens = [] # space-separated strings
     
-        self._stateMapRe = None
+        # will be filled by self.setupRegularExpressions()
         self._tokenMapRe = None
-        self._modifierMapRe = None
-            
+  
     def splitPreTokens(self):
         '''
         splits the string into textual tokens.
@@ -591,16 +871,11 @@ class Converter(object):
     def setupRegularExpressions(self):
         '''
         Regular expressions get compiled for faster
-        usage.
+        usage.  This is called automatically by .parse(), but can be
+        called separately for testing.  It is also important that it
+        is not called in __init__ since subclasses should override the
+        tokenMap, etc. for a class.
         '''
-        self._stateMapRe = []
-        for rePre, classCall in self.stateMap:
-            try:
-                self._stateMapRe.append( (re.compile(rePre), classCall) )
-            except sre_parse.error as e:
-                raise TinyNotationException("Error in compiling state, %s: %s" % (rePre, str(e)))
-
-
         self._tokenMapRe = []
         for rePre, classCall in self.tokenMap:
             try:
@@ -608,16 +883,11 @@ class Converter(object):
             except sre_parse.error as e:
                 raise TinyNotationException("Error in compiling token, %s: %s" % (rePre, str(e)))
         
-        self._modifierMapRe = []
-        for rePre, classCall in self.modifierMap:
-            try:
-                self._modifierMapRe.append( (re.compile(rePre), classCall) )
-            except sre_parse.error as e:
-                raise TinyNotationException("Error in compiling modifier, %s: %s" % (rePre, str(e)))
         
     def parse(self):
         '''
-        splitPreTokens, setupRegularExpressions, then run through each preToken, and run postParse.
+        splitPreTokens, setupRegularExpressions, then runs
+        through each preToken, and runs postParse.
         '''
         if self.preTokens == [] and self.stringRep != "":
             self.splitPreTokens()
@@ -629,67 +899,48 @@ class Converter(object):
         self.postParse()
         return self
 
+
     def parseOne(self, i, t):
         '''
         parse a single token at position i, with
-        text t.
+        text t, possibly adding it to the stream.
         
         Checks for state changes, modifiers, tokens, and end-state brackets.
-        '''        
-        endBrackets = 0
-        
-        for s, c in self._stateMapRe:
-            matchSuccess = s.search(t)
-            if matchSuccess is not None:
-                stateData = matchSuccess.group(0)
-                t = s.sub('', t)
-                stateObj = c(self, stateData)
-                stateObj.start()
-                self.activeStates.append(stateObj)
+        '''    
+        t = self.parseStartStates(t)
+        t, numberOfStatesToEnd = self.parseEndStates(t)
+        t, activeModifiers = self.parseModifiers(t)
 
-        while self.endState.search(t):
-            t = self.endState.sub('', t)
-            endBrackets += 1
-
-        
-        modifiers = []
-        for m, c in self._modifierMapRe:
-            matchSuccess = m.search(t)
-            if matchSuccess is not None:
-                modifierData = matchSuccess.group(1)
-                t = m.sub('', t)
-                modObj = c(modifierData, t, self)
-                modifiers.append(modObj)
-                
-        for mObj in modifiers:
-            mObj.preParse(t)
-        
-        for s in self.activeStates[:]:
-            t = s.affectTokenBeforeParse(t)
+        # this copy is done so that an activeState can
+        # remove itself from this list...
+        for stateObj in self.activeStates[:]:
+            t = stateObj.affectTokenBeforeParse(t)
         
         m21Obj = None
         tokenObj = None   
         # parse token...with state...
-        for tokenRe, c in self._tokenMapRe:
-            matchSuccess = tokenRe.search(t)
-            if matchSuccess is not None:
-                tokenData = matchSuccess.group(1)
-                tokenObj = c(tokenData)
-                m21Obj = tokenObj.parse(self)
-                if m21Obj is not None:
-                    break
+        for tokenRe, tokenClass in self._tokenMapRe:
+            matchSuccess = tokenRe.match(t)
+            if matchSuccess is None:
+                continue
 
-        for s in self.activeStates[:]: # iterate over copy so we can remove....
-            m21Obj = s.affectTokenAfterParseBeforeModifiers(m21Obj)
+            tokenData = matchSuccess.group(1)
+            tokenObj = tokenClass(tokenData)
+            m21Obj = tokenObj.parse(self)
+            if m21Obj is not None: # can only match one.
+                break
+
+        for stateObj in self.activeStates[:]: # iterate over copy so we can remove....
+            m21Obj = stateObj.affectTokenAfterParseBeforeModifiers(m21Obj)
 
 
-        for m in modifiers:
-            m.postParse(m21Obj)
+        for modObj in activeModifiers:
+            m21Obj = modObj.postParse(m21Obj)
         
-        for s in self.activeStates[:]: # iterate over copy so we can remove....
-            m21Obj = s.affectTokenAfterParse(m21Obj)
+        for stateObj in self.activeStates[:]: # iterate over copy so we can remove....
+            m21Obj = stateObj.affectTokenAfterParse(m21Obj)
         
-        for i in range(endBrackets):
+        for i in range(numberOfStatesToEnd):
             stateToRemove = self.activeStates.pop()
             tempObj = stateToRemove.end()
             if tempObj is not None:
@@ -697,6 +948,133 @@ class Converter(object):
 
         if m21Obj is not None:
             self.stream._appendCore(m21Obj)
+            
+    def parseStartStates(self, t):
+        '''
+        Changes the states in self.activeStates, and starts the state given the current data.
+        Returns a newly processed token.
+        
+        A contrived example:
+        
+        >>> tnc = tinyNotation.Converter()
+        >>> tnc.setupRegularExpressions()
+        >>> len(tnc.activeStates)
+        0
+        >>> tIn = 'trip{quad{f8~'
+        >>> tOut = tnc.parseStartStates(tIn)
+        >>> tOut
+        'f8'
+        >>> len(tnc.activeStates)
+        3
+        >>> tripState = tnc.activeStates[0]
+        >>> tripState
+        <music21.tinyNotation.TripletState object at 0x10afaa630>
+
+        >>> quadState = tnc.activeStates[1]
+        >>> quadState
+        <music21.tinyNotation.QuadrupletState object at 0x10adcb0b8>        
+
+        >>> tieState = tnc.activeStates[2]
+        >>> tieState
+        <music21.tinyNotation.TieState object at 0x10afab048>
+        
+        >>> tieState.parent
+        <weakref at 0x10adb31d8; to 'Converter' at 0x10adb42e8>
+        >>> tieState.parent() is tnc
+        True
+        >>> tieState.stateInfo
+        '~'
+        >>> quadState.stateInfo
+        'quad{'
+
+
+        Note that the affected tokens haven't yet been added:
+        
+        >>> tripState.affectedTokens
+        []
+        '''        
+        bracketMatchSuccess = self.generalBracketStateRe.search(t)
+        while bracketMatchSuccess:
+            stateData = bracketMatchSuccess.group(0)
+            bracketType = bracketMatchSuccess.group(1)
+            t = self.generalBracketStateRe.sub('', t, count=1)
+            bracketMatchSuccess = self.generalBracketStateRe.search(t)
+            if bracketType not in self.bracketStateMapping:
+                environLocal.warn("Incorrect bracket state: {0}".format(bracketType))
+                continue
+            stateObj = self.bracketStateMapping[bracketType](self, stateData)
+            stateObj.start()
+            self.activeStates.append(stateObj)
+                
+        
+        tieMatchSuccess = self.tieStateRe.search(t)
+        if tieMatchSuccess:
+            stateData = tieMatchSuccess.group(0)
+            t = self.tieStateRe.sub('', t)
+            tieState = TieState(self, stateData)
+            tieState.start()
+            self.activeStates.append(tieState)
+
+        return t
+    
+    def parseEndStates(self, t):
+        '''
+        Trims the endState token ('}') from the t string
+        and then returns a two-tuple of the new token and number
+        of states to remove:
+        
+        >>> tnc = tinyNotation.Converter()
+        >>> tnc.parseEndStates('C4')
+        ('C4', 0)
+        >>> tnc.parseEndStates('C4}}')
+        ('C4', 2)
+        '''
+        endBrackets = t.count('}')
+        t = t.replace('}', '')
+        return t, endBrackets
+    
+    def parseModifiers(self, t):
+        '''
+        Parses modifierEquals, modifierUnderscore, and modifierStar
+        for a given token and returns the modified token and a
+        (possibly empty) list of activeModifiers.
+        
+        Modifiers affect only the current token.  To affect
+        multiple tokens, use a State object
+        '''
+        activeModifiers = []
+        # note that since these are constants, they don't need to be compiled
+        equalSuccess = self._modifierEqualsRe.search(t)
+        if equalSuccess is not None: # is not None is necessary
+            equalsData = equalSuccess.group(1)
+            t = self._modifierEqualsRe.sub('', t)
+            if self.modifierEquals is not None:
+                equalObject = self.modifierEquals(equalsData, t, self)
+                activeModifiers.append(equalObject)
+
+        # purposely writing this out three times, to try to remove the temptation
+        # to add more modifiers...
+        starSuccess = self._modifierStarRe.search(t)
+        if starSuccess is not None: # is not None is necessary
+            starData = starSuccess.group(1)
+            t = self._modifierStarRe.sub('', t)
+            if self.modifierStar is not None:
+                starObject = self.modifierStar(starData, t, self)
+                activeModifiers.append(starObject)
+        
+        # underscore last, since it's the largest capture group
+        underscoreSuccess = self._modifierUnderscoreRe.search(t)
+        if underscoreSuccess is not None: # is not None is necessary
+            underscoreData = underscoreSuccess.group(1)
+            t = self._modifierUnderscoreRe.sub('', t)
+            if self.modifierUnderscore is not None:
+                underscoreObject = self.modifierUnderscore(underscoreData, t, self)
+                activeModifiers.append(underscoreObject)
+                
+        for modObj in activeModifiers:
+            modObj.preParse(t)
+
+        return t, activeModifiers
     
     def postParse(self):
         '''
@@ -704,6 +1082,14 @@ class Converter(object):
         '''
         if self.makeNotation is not False:
             self.stream.makeMeasures(inPlace=True)
+
+
+####
+class ChordConverter(Converter):
+    pass
+
+class ChordModifier(Modifier):
+    pass
         
 class Test(unittest.TestCase):
     parseTest = "1/4 trip{C8~ C~_hello C=mine} F~ F~ 2/8 F F# quad{g--16 a## FF(n) g#} g16 F0"
@@ -740,6 +1126,9 @@ class TestExternal(unittest.TestCase):
 
 
 ### TODO: Chords
+#-------------------------------------------------------------------------------
+# define presented order in documentation
+_DOC_ORDER = [Converter, ChordConverter, Token, State, Modifier, ChordModifier]
         
 if __name__ == '__main__':
     import music21

@@ -263,11 +263,10 @@ class Volume(SlottedObjectMixin):
                 elif self.client is not None:
                     am = self.client.articulations
                 else:
-                    am = None
-                if am is not None:
-                    for a in am:
-                        # add in volume shift for all articulations
-                        val += a.volumeShift
+                    am = []
+                for a in am:
+                    # add in volume shift for all articulations
+                    val += a.volumeShift
         if clip: # limit between 0 and 1
             if val > 1:
                 val = 1.0

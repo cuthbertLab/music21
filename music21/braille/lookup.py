@@ -322,6 +322,18 @@ alphabet = {'a': _B[1],
             }
 alphabet.update(numbersUpper)
 
+chordSymbols = {
+        'plus': _B[346],
+        'minus': _B[46],
+        'diminished_circle': _B[256],
+        'half_diminished_circle': _B[256] + _B[3],
+        'triangle': _B[356],
+        'triangle_line': _B[356] + _B[3],
+        'italics_seven': _B[46] + _B[3456] + _B[1246], # italics + number symbol + 7?
+        'slash': _B[34],
+        'parentheses': _B[2356],
+    }
+
 symbols = {'space': _B[0],
            'double_space': _B[0] + _B[0],
            'number': _B[3456],

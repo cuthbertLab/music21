@@ -11,7 +11,7 @@
 #-------------------------------------------------------------------------------
 
 # this requires pylint to be installed and available from the command line
-import sys
+import argparse
 
 from music21 import common
 from music21.test import commonTest
@@ -44,7 +44,7 @@ except ImportError:
 #                  too many return statement, making it hard to follow.
 
 
-def main(fnAccept=None):
+def main(fnAccept=None, strict=False):
     '''
     `fnAccept` is a list of one or more files to test.  Otherwise runs all.
     '''
@@ -65,7 +65,25 @@ def main(fnAccept=None):
                     #'repeat.py', # used to hang pylint...
                     #'spanner.py', # used to hang pylint...
                     ]
+
+    disable_unless_strict = [
+                'too-many-statements', # someday
+                'too-many-arguments', # definitely! but takes too long to get a fix now...
+                'too-many-public-methods', # maybe, look 
+                'too-many-branches', # yes, someday
+                'too-many-lines',    # yes, someday.
+                'too-many-return-statements', # we'll see
+                'too-many-instance-attributes', # maybe later
+                'protected-access', # this is an important one, but for now we do a lot of
+                           # x = copy.deepcopy(self); x._volume = ... which is not a problem...
+    ]    
     disable = [  # These also need to be changed in MUSIC21BASE/.pylintrc
+                'arguments-differ', # -- no -- should be able to add additional arguments so long
+                    # as initial ones are the same.
+                'multiple-imports', # import os, sys -- fine...
+                'redefined-variable-type', # would be good, but currently
+                # lines like: if x: y = note.Note() ; else: y = note.Rest()
+                # triggers this, even though y doesn't change. 
                
                 'cyclic-import', # we use these inside functions when there's a deep problem.
                 'unnecessary-pass', # nice, but not really a problem...
@@ -74,23 +92,14 @@ def main(fnAccept=None):
 
                 'duplicate-code', # needs to ignore strings -- keeps getting doctests...
 
-                'arguments-differ', # someday...
                 'abstract-class-instantiated', # this trips on the fractions.Fraction() class.
-                'multiple-imports', # import os, sys -- fine...
                 'fixme', # known...
                 'superfluous-parens', # nope -- if they make things clearer...
-                'too-many-statements', # someday
                 'no-member', # important, but too many false positives
-                'too-many-arguments', # definitely! but takes too long to get a fix now...
-                'too-many-public-methods', # maybe, look 
-                'too-many-branches', # yes, someday
                 'too-many-locals',   # no
-                'too-many-lines',    # yes, someday.
                 'bad-whitespace', # maybe later, but "bad" isn't something I necessarily agree with
                 'bad-continuation',  # never remove -- this is a good thing many times.
-                'too-many-return-statements', # we'll see
                 'unpacking-non-sequence', # gets it wrong too often.
-                'too-many-instance-attributes', # maybe later
                 'too-many-boolean-expressions', #AbstractDiatonicScale.__eq__ shows how this
                     # can be fine...
                     
@@ -108,13 +117,9 @@ def main(fnAccept=None):
                 
                 'missing-docstring',    # gets too many well-documented properties
                 'star-args', # no problem with them...
-                'protected-access', # this is an important one, but for now we do a lot of
-                           # x = copy.deepcopy(self); x._volume = ... which is not a problem...
                 'unused-argument',
                 'import-self', # fix is either to get rid of it or move away many tests...
                 
-                'redefined-variable-type', # this would be great! but too much.
-
                 'simplifiable-if-statement', # NO! NO! NO!
                 #  if (x or y and z and q): return True, else: return False,
                 #      is a GREAT paradigm -- over "return (x or y and z and q)" and
@@ -123,6 +128,8 @@ def main(fnAccept=None):
                 'consider-using-enumerate', # good when i used only once, but
                     # x[i] = y[i] is a nice paradigm, even if one can be simplified out.
                ]
+    if not strict:
+        disable = disable + disable_unless_strict
 
     goodnameRx = {'argument-rgx': r'[a-z_][A-Za-z0-9_]{2,30}$',
                   'attr-rgx': r'[a-z_][A-Za-z0-9_]{2,30}$',
@@ -133,13 +140,16 @@ def main(fnAccept=None):
                   'variable-rgx': r'[a-z_][A-Za-z0-9_]{2,30}$',
                   }
 
+    maxArgs = 7 if not strict else 5
+    maxBranches = 20 if not strict else 10
+
     cmd = ['--output-format=parseable',
            r'--dummy-variables-rgx="_$|dummy|unused|i$|j$|junk|counter"', 
            '--docstring-min-length=3',
-           '--max-args=7',  # should be 5 later, but baby steps
+           '--max-args=' + str(maxArgs),  # should be 5 later, but baby steps
            '--bad-names="foo,shit,fuck,stuff"', # definitely allow "bar" for barlines
            '--reports=n',
-           '--max-branches=20',
+           '--max-branches=' + str(maxBranches),
            '-j ' + str(poolSize), # multiprocessing!
            r'--ignore-long-lines="converter\.parse"', # some tiny notation...
            '--max-line-length=100', # tada
@@ -147,8 +157,6 @@ def main(fnAccept=None):
     for gn, gnv in goodnameRx.items():
         cmd.append('--' + gn + '="' + gnv + '"')
 
-    #print(cmd)
-    
     for pyLintId in disable:
         cmd.append('--disable=%s' % pyLintId)
 
@@ -178,9 +186,24 @@ def main(fnAccept=None):
     #print(fp)
     pylintRun(cmdFile, exit=False)
 
+def argRun():
+    parser = argparse.ArgumentParser(description='Run pylint on music21 according to style guide.')
+    parser.add_argument('files', metavar='filename', type=str, nargs='*',
+                        help='Files to parse (default nearly all)')
+    parser.add_argument('--strict', action='store_true',
+                        help='Run the file in strict mode')
+    args = parser.parse_args()
+    #print(args.files)
+    #print(args.strict)    
+    files = args.files if args.files else None
+    if files:
+        sfp = common.getSourceFilePath()
+        files = [common.relativepath(f, sfp) for f in files]
+    main(files, args.strict)
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    argRun()
+    #main(sys.argv[1:])
 #     if len(sys.argv) >= 2:
 #         test.main(sys.argv[1:], restoreEnvironmentDefaults=True)
 #     else:

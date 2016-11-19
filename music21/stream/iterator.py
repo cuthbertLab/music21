@@ -654,8 +654,27 @@ class StreamIterator(object):
         self.resetCaches()
         return self
     
-    
-    
+    def getElementById(self, elementId):
+        '''
+        Returns a single element (or None) that matches elementId.
+        
+        If chaining filters, this should be the last one, as it returns an element
+        
+        >>> s = stream.Stream(id="s1")
+        >>> s.append(note.Note('C'))
+        >>> r = note.Rest()
+        >>> r.id = 'restId'
+        >>> s.append(r)
+        >>> r2 = s.recurse().getElementById('restId')
+        >>> r2 is r
+        True
+        >>> r2.id
+        'restId'
+        '''
+        self.addFilter(filters.IdFilter(elementId))
+        for e in self:
+            return e
+        return None
     
     def getElementsByClass(self, classFilterList):
         '''
@@ -1090,7 +1109,7 @@ class RecursiveIterator(StreamIterator):
     6
     >>> expressive[-1].measureNumber
     9
-    
+        
     '''
     def __init__(self, 
                  srcStream, 
@@ -1244,6 +1263,14 @@ class RecursiveIterator(StreamIterator):
 class Test(unittest.TestCase):
     pass
 
+    def testRecursiveActiveSites(self):
+        from music21 import converter
+        s = converter.parse('tinyNotation: 4/4 c1 c4 d=id2 e f')
+        rec = s.recurse()
+        n = rec.getElementById('id2')
+        self.assertEqual(n.activeSite.number, 2)
+
+        
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='testRecursiveActiveSites')

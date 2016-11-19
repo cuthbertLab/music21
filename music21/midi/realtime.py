@@ -62,7 +62,8 @@ class StreamPlayer(object):
     >>> #_DOCS_SHOW b = corpus.parse('bwv66.6')
     >>> #_DOCS_SHOW for n in b.flat.notes:
     >>> class PitchMock(): midi = 20 #_DOCS_HIDE
-    >>> class Mock(): pitch = PitchMock() #_DOCS_HIDE -- should not playback in doctests, see TestExternal
+    >>> class Mock(): pitch = PitchMock() #_DOCS_HIDE 
+    >>> #_DOCS_HIDE -- should not playback in doctests, see TestExternal
     >>> n = Mock() #_DOCS_HIDE
     >>> for i in [1]: #_DOCS_HIDE
     ...    n.pitch.microtone = keyDetune[n.pitch.midi]

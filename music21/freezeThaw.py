@@ -11,7 +11,6 @@
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
-
 r'''
 This module contains objects for storing complete `Music21Objects`, especially
 `Stream` and `Score` objects on disk.  Freezing (or "pickling") refers to
@@ -1605,6 +1604,7 @@ class JSONFreezer(JSONFreezeThawBase):
                     indent=2,
                     )
             if six.PY2:
+                # pylint: disable=undefined-variable
                 jsonString = unicode(jsonString) # @UndefinedVariable
                 
             f.write(jsonString)
