@@ -2487,11 +2487,6 @@ _DOC_ORDER = [Harmony, chordSymbolFigureFromChord, ChordSymbol, ChordStepModific
 
 if __name__ == "__main__":
     import music21
-    cs = music21.harmony.ChordSymbol('E-sus4')
-    s = music21.stream.Stream()
-    s.append(cs)
-    s.write('musicxml')
-    
     music21.mainTest(Test)
 
 

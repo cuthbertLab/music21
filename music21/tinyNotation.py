@@ -909,6 +909,7 @@ class Converter(object):
         self.stateDictDefault = {'currentTimeSignature': None,
                                  'lastDuration': 1.0
                                  }
+        self.preTokens = None # otherwise attribute-defined-outside-init errors appear.
         self.load(stringRep)    
         # will be filled by self.setupRegularExpressions()
         self._tokenMapRe = None
