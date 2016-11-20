@@ -3481,8 +3481,6 @@ class MeasureExporter(XMLExporterBase):
         </harmony>
     
         Test altered chords:
-        
-        Is this correct?
     
         >>> f = harmony.ChordSymbol('F sus add 9')
         >>> f
@@ -3491,10 +3489,9 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxHarmony)
         <harmony>
           <root>
-            <root-step>G</root-step>
+            <root-step>F</root-step>
           </root>
           <kind>suspended-fourth</kind>
-          <inversion>3</inversion>
           <degree>
             <degree-value>9</degree-value>
             <degree-alter />
