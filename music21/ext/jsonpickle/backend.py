@@ -33,6 +33,9 @@ class JSONBackend(object):
             'django.util.simplejson': json_opts,
         }
 
+        # Options to pass to specific encoders
+        self._decoder_options = {}
+
         # The exception class that is thrown when a decoding error occurs
         self._decoder_exceptions = {}
 
@@ -120,8 +123,9 @@ class JSONBackend(object):
             # simplejson uses ValueError
             self._decoder_exceptions[name] = loads_exc
 
-        # Setup the default args and kwargs for this encoder
+        # Setup the default args and kwargs for this encoder/decoder
         self._encoder_options[name] = ([], {})
+        self._decoder_options[name] = ([], {})
 
         # Add this backend to the list of candidate backends
         self._backend_names.append(name)
@@ -135,6 +139,7 @@ class JSONBackend(object):
         self._encoders.pop(name, None)
         self._decoders.pop(name, None)
         self._decoder_exceptions.pop(name, None)
+        self._decoder_options.pop(name, None)
         self._encoder_options.pop(name, None)
         if name in self._backend_names:
             self._backend_names.remove(name)
@@ -156,10 +161,7 @@ class JSONBackend(object):
 
         for idx, name in enumerate(self._backend_names):
             try:
-                optargs, optkwargs = self._encoder_options[name]
-                encoder_kwargs = optkwargs.copy()
-                encoder_args = (obj,) + tuple(optargs)
-                return self._encoders[name](*encoder_args, **encoder_kwargs)
+                return self.backend_encode(name, obj)
             except Exception as e:
                 if idx == len(self._backend_names) - 1:
                     raise e
@@ -198,7 +200,9 @@ class JSONBackend(object):
     loads = decode
 
     def backend_decode(self, name, string):
-        return self._decoders[name](string)
+        optargs, optkwargs = self._decoder_options.get(name, ((), {}))
+        decoder_kwargs = optkwargs.copy()
+        return self._decoders[name](string, *optargs, **decoder_kwargs)
 
     def set_preferred_backend(self, name):
         """
@@ -243,6 +247,25 @@ class JSONBackend(object):
 
         """
         self._encoder_options[name] = (args, kwargs)
+
+    def set_decoder_options(self, name, *args, **kwargs):
+        """
+        Associate decoder-specific options with a decoder.
+
+        After calling set_decoder_options, any calls to jsonpickle's
+        decode method will pass the supplied args and kwargs along to
+        the appropriate backend's decode method.
+
+        For example::
+
+            set_decoder_options('simplejson', encoding='utf8', cls=JSONDecoder)
+            set_decoder_options('demjson', strict=True)
+
+        See the appropriate decoder's documentation for details about
+        the supported arguments and keyword arguments.
+
+        """
+        self._decoder_options[name] = (args, kwargs)
 
     def _store(self, dct, backend, obj, name):
         try:

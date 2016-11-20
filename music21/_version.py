@@ -44,6 +44,6 @@ at the end of the two corpus/metadataCache .jsons, but only a problem there some
 Changing this number invalidates old pickles -- do it if the old pickles create a problem.
 '''
 
-__version_info__ = (4, 0, 1)
+__version_info__ = (4, 0, 2)
 __version__ = '.'.join(str(x) for x in __version_info__)
 

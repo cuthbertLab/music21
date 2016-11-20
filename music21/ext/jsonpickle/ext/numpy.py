@@ -12,16 +12,29 @@ __all__ = ['register_handlers', 'unregister_handlers']
 
 
 class NumpyBaseHandler(jsonpickle.handlers.BaseHandler):
+
     def restore_dtype(self, data):
         dtype = data['dtype']
         if dtype.startswith(('{', '[')):
             return ast.literal_eval(dtype)
         return np.dtype(dtype)
 
+    def flatten_dtype(self, dtype, data):
+
+        if hasattr(dtype, 'tostring'):
+            data['dtype'] = dtype.tostring()
+        else:
+            dtype = unicode(dtype)
+            prefix = '(numpy.record, '
+            if dtype.startswith(prefix):
+                dtype = dtype[len(prefix):-1]
+            data['dtype'] = dtype
+
 
 class NumpyDTypeHandler(NumpyBaseHandler):
+
     def flatten(self, obj, data):
-        data['dtype'] = unicode(obj)
+        self.flatten_dtype(obj, data)
         return data
 
     def restore(self, data):
@@ -29,8 +42,9 @@ class NumpyDTypeHandler(NumpyBaseHandler):
 
 
 class NumpyGenericHandler(NumpyBaseHandler):
+
     def flatten(self, obj, data):
-        data['dtype'] = unicode(obj.dtype)
+        self.flatten_dtype(obj.dtype, data)
         data['value'] = self.context.flatten(obj.tolist(), reset=False)
         return data
 
@@ -40,8 +54,9 @@ class NumpyGenericHandler(NumpyBaseHandler):
 
 
 class NumpyNDArrayHandler(NumpyBaseHandler):
+
     def flatten(self, obj, data):
-        data['dtype'] = unicode(obj.dtype)
+        self.flatten_dtype(obj.dtype, data)
         data['values'] = self.context.flatten(obj.tolist(), reset=False)
         return data
 

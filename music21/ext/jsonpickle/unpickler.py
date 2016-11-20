@@ -14,7 +14,7 @@ from music21.ext.jsonpickle import util
 from music21.ext.jsonpickle import tags
 from music21.ext.jsonpickle import handlers
 
-from music21.ext.jsonpickle.compat import set
+from music21.ext.jsonpickle.compat import numeric_types, set, unicode
 from music21.ext.jsonpickle.backend import JSONBackend
 
 
@@ -204,6 +204,7 @@ class Unpickler(object):
             for k, v in dictitems:
                 stage1.__setitem__(k, v)
 
+        self._mkref(stage1)
         return stage1
 
     def _restore_id(self, obj):
@@ -315,7 +316,11 @@ class Unpickler(object):
             # ignore the reserved attribute
             if ignorereserved and k in tags.RESERVED:
                 continue
-            self._namestack.append(k)
+            if isinstance(k, numeric_types):
+                str_k = unicode(k)
+            else:
+                str_k = k
+            self._namestack.append(str_k)
             k = restore_key(k)
             # step into the namespace
             value = self._restore(v)
@@ -398,7 +403,11 @@ class Unpickler(object):
         data = {}
         restore_key = self._restore_key_fn()
         for k, v in sorted(obj.items(), key=util.itemgetter):
-            self._namestack.append(k)
+            if isinstance(k, numeric_types):
+                str_k = unicode(k)
+            else:
+                str_k = k
+            self._namestack.append(str_k)
             k = restore_key(k)
             data[k] = self._restore(v)
             self._namestack.pop()
