@@ -50,6 +50,7 @@ Here are the most important rules by default:
    two notes both have "3s" over them.  For 4 in the place of 3, 
    use `quad{c16 d e8}`.  No other tuplets are supported.
 
+Here is an example of TinyNotation in action.
 
 >>> stream1 = converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
 >>> stream1.show('text')
@@ -68,7 +69,6 @@ Here are the most important rules by default:
 {6.0} <music21.stream.Measure 3 offset=6.0>
     {0.0} <music21.note.Note C>
     {1.0} <music21.bar.Barline style=final>
-
 >>> stream1.flat.getElementById("lastG").step
 'G'
 >>> stream1.flat.notesAndRests[1].isRest
@@ -104,14 +104,16 @@ Changing time signatures are supported:
 
 
 
-Here is an equivalent way of doing the example above, but lower level:
+Here is an equivalent way of doing the example above, but using the lower level
+:class:`music21.tinyNotation.Converter` object:
 
 >>> tnc = tinyNotation.Converter("3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
 >>> stream2 = tnc.parse().stream
 >>> len(stream1.recurse()) == len(stream2.recurse())
 True
 
-This lower level is needed in case you want to add additional features.
+This lower level is needed in case you want to add additional features.  For instance,
+here we will set the "modifierStar" to change the color of notes:
 
 >>> class ColorModifier(tinyNotation.Modifier):
 ...     def postParse(self, m21Obj):
@@ -151,6 +153,15 @@ Or more usefully, and often desired:
 ['D', 'F', 'A']
 ['E-', 'A-', 'B-']
 
+The supported modifiers are:
+    * `=data` (`modifierEquals`, default action is to set `.id`)
+    * `_data` (`modifierUnderscore`, default action is to set `.lyric`)
+    * `[data]` (`modifierSquare`, no default action)
+    * `<data>` (`modifierAngle`, no default action)
+    * `(data)` (`modifierParens`, no default action)
+    * `*data*` (`modifierStar`, no default action)
+
+
 Another example: TinyNotation does not support key signatures -- well, no problem! Let's
 create a new Token type and add it to the tokenMap
 
@@ -173,8 +184,47 @@ create a new Token type and add it to the tokenMap
     {0.0} <music21.note.Note A>
     {4.0} <music21.bar.Barline style=final>
 
+
+TokenMap should be passed a string, representing a regular expression with exactly one
+group (which can be the entire expression), and a subclass of :class:`~music21.tinyNotation.Token`
+which will handle the parsing of the string.
+
+Tokens can take advantage of the `parent` variable, which is a reference to the `Converter`
+object, to use the `.stateDict` dictionary to store information about state.  For instance,
+the `NoteOrRestToken` uses `parent.stateDict['lastDuration']` to get access to the last
+duration.
+
+There is also the concept of "State" which affects multiple tokens.  The best way to create
+a new State is to define a subclass of the :class:`~music21.tinyNotation.State`  and add it
+to `bracketStateMapping` of the converter.  Here's one that a lot of people have asked for
+over the years:
+
+>>> class ChordState(tinyNotation.State):
+...    def affectTokenAfterParse(self, n):
+...        super(ChordState, self).affectTokenAfterParse(n)
+...        return None # do not append Note object
+...    def end(self):
+...        ch = chord.Chord(self.affectedTokens)
+...        ch.duration = self.affectedTokens[0].duration
+...        return ch
+>>> tnc = tinyNotation.Converter("2/4 C4 chord{C4 e g'} F.4 chord{D8 F# A}")
+>>> tnc.bracketStateMapping['chord'] = ChordState
+>>> s = tnc.parse().stream
+>>> s.show('text')
+{0.0} <music21.stream.Measure 1 offset=0.0>
+    {0.0} <music21.clef.BassClef>
+    {0.0} <music21.meter.TimeSignature 2/4>
+    {0.0} <music21.note.Note C>
+    {1.0} <music21.chord.Chord C3 E4 G5>
+{2.0} <music21.stream.Measure 2 offset=2.0>
+    {0.0} <music21.note.Note F>
+    {1.5} <music21.chord.Chord D3 F#3 A3>
+    {2.0} <music21.bar.Barline style=final>
+
 If you want to create a very different dialect, you can subclass tinyNotation.Converter
-and set it up once to use the mappings above. 
+and set it up once to use the mappings above.   See 
+:class:`~music21.alpha.trecento.notation.TrecentoTinyConverter` (especially the code)
+for details on how to do that.
 '''
 import collections
 import copy
@@ -232,7 +282,7 @@ class State(object):
         '''
         called just after removing state
         '''
-        pass
+        return None
     
     def affectTokenBeforeParse(self, tokenStr):
         '''
@@ -257,6 +307,7 @@ class State(object):
         if self.autoExpires is not False:
             if len(self.affectedTokens) == self.autoExpires:
                 self.end()
+                # this is a hack that should be done away with...
                 p = common.unwrapWeakref(self.parent)
                 for i in range(len(p.activeStates)):
                     backCount = -1 * (i+1)
@@ -282,8 +333,9 @@ class TieState(State):
             self.affectedTokens[0].tie.type = 'continue'
         if len(self.affectedTokens) > 1: # could be end...            
             self.affectedTokens[1].tie = tie.Tie('stop')
-
-
+        return None
+        
+        
 class TupletState(State):
     '''
     a tuplet state applies tuplets to notes while parsing and sets 'start' and 'stop'
@@ -297,10 +349,10 @@ class TupletState(State):
         end a tuplet by putting start on the first note and stop on the last.
         '''
         if len(self.affectedTokens) == 0:
-            return 
+            return None 
         self.affectedTokens[0].duration.tuplets[0].type = 'start'
         self.affectedTokens[-1].duration.tuplets[0].type = 'stop'
-            
+        return None
     
     def affectTokenAfterParse(self, n):
         '''
@@ -676,7 +728,8 @@ class Converter(object):
     '''
     Main conversion object for TinyNotation.
     
-    Accepts one keyword: makeNotation=False to get "classic" TinyNotation formats.
+    Accepts one keyword: `makeNotation=False` to get "classic" TinyNotation formats without
+    measures, Clefs, etc.
     
     >>> tnc = tinyNotation.Converter('4/4 C##4 D e-8 f~ f f# g4 trip{f8 e d} C2=hello')
     >>> tnc.parse()
@@ -853,16 +906,37 @@ class Converter(object):
         else:
             self.makeNotation = True
         
-        self.stream = stream.Part()
-        self.stateDict = {'currentTimeSignature': None,
-                          'lastDuration': 1.0
-                          }
-        self.stringRep = stringRep
-        self.activeStates = []
-        self.preTokens = [] # space-separated strings
-    
+        self.stateDictDefault = {'currentTimeSignature': None,
+                                 'lastDuration': 1.0
+                                 }
+        self.load(stringRep)    
         # will be filled by self.setupRegularExpressions()
         self._tokenMapRe = None
+  
+    def load(self, stringRep):
+        '''
+        Loads a stringRepresentation into `.stringRep`
+        and resets the parsing state.
+        
+        >>> tnc = tinyNotation.Converter()
+        >>> tnc.load('4/4 c2 d e f')
+        >>> s = tnc.parse().stream
+        >>> tnc.load('4/4 f e d c')
+        >>> s2 = tnc.parse().stream
+        >>> ns2 = s2.flat.notes
+        
+        Check that the duration of 2.0 from the first load did not carry over.
+        
+        >>> ns2[0].duration.quarterLength
+        1.0
+        >>> len(ns2)
+        4
+        '''
+        self.stream = stream.Part()
+        self.stateDict = copy.copy(self.stateDictDefault)
+        self.stringRep = stringRep
+        self.activeStates = []
+        self.preTokens = []
   
     def splitPreTokens(self):
         '''
@@ -945,14 +1019,15 @@ class Converter(object):
         for stateObj in self.activeStates[:]: # iterate over copy so we can remove....
             m21Obj = stateObj.affectTokenAfterParse(m21Obj)
         
-        for i in range(numberOfStatesToEnd):
-            stateToRemove = self.activeStates.pop()
-            tempObj = stateToRemove.end()
-            if tempObj is not None:
-                m21Obj = tempObj
-
         if m21Obj is not None:
             self.stream._appendCore(m21Obj)
+
+        for i in range(numberOfStatesToEnd):
+            stateToRemove = self.activeStates.pop()
+            possibleObj = stateToRemove.end()
+            if possibleObj is not None:
+                self.stream._appendCore(possibleObj)
+
             
     def parseStartStates(self, t):
         '''
@@ -1040,12 +1115,12 @@ class Converter(object):
     
     def parseModifiers(self, t):
         '''
-        Parses modifierEquals, modifierUnderscore, and modifierStar
+        Parses `modifierEquals`, `modifierUnderscore`, `modifierStar`, etc.
         for a given token and returns the modified token and a
         (possibly empty) list of activeModifiers.
         
         Modifiers affect only the current token.  To affect
-        multiple tokens, use a State object
+        multiple tokens, use a :class:`~music21.tinyNotation.State` object.
         '''
         activeModifiers = []
         
@@ -1068,18 +1143,13 @@ class Converter(object):
     
     def postParse(self):
         '''
-        Call postParse calls on .stream, currently just .makeMeasures.
+        Called after all the tokens have been run.
+        
+        Currently runs `.makeMeasures` on `.stream` unless `.makeNotation` is `False`.
         '''
         if self.makeNotation is not False:
             self.stream.makeMeasures(inPlace=True)
 
-
-####
-class ChordConverter(Converter):
-    pass
-
-class ChordModifier(Modifier):
-    pass
         
 class Test(unittest.TestCase):
     parseTest = "1/4 trip{C8~ C~_hello C=mine} F~ F~ 2/8 F F# quad{g--16 a## FF(n) g#} g16 F0"
@@ -1118,7 +1188,7 @@ class TestExternal(unittest.TestCase):
 ### TODO: Chords
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Converter, ChordConverter, Token, State, Modifier, ChordModifier]
+_DOC_ORDER = [Converter, Token, State, Modifier]
         
 if __name__ == '__main__':
     import music21

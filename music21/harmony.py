@@ -200,6 +200,10 @@ class Harmony(chord.Chord):
         if updatePitches and self._figure is not None or self._root or self._bass:            
             self._updatePitches()
         self._updateBasedOnXMLInput(keywords)
+        
+        # fix Root in sus4... There might be a better place for this, but damn if I know...
+        if self._figure is not None and 'sus' in self._figure and 'sus2' not in self._figure:
+            self.root(self.bass())
 
     ### SPECIAL METHODS ###
 
@@ -252,6 +256,7 @@ class Harmony(chord.Chord):
                 self.duration = duration.Duration(keywords[kw])
             else:
                 pass
+            
 
     ### PUBLIC PROPERTIES ###
 
@@ -952,12 +957,17 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
     ('Csus2', 'suspended-second')
     >>> c.root()
     <music21.pitch.Pitch C3>
+    >>> c.bass()
+    <music21.pitch.Pitch C3>
+    
     
     >>> c = chord.Chord(['C3', 'F3', 'G3'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
     ('Csus', 'suspended-fourth')
     >>> c.root()
     <music21.pitch.Pitch C3>
+    >>> c.inversion()
+    0
 
     >>> c = chord.Chord(['C3', 'D-3', 'E3', 'G-3'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
@@ -1215,7 +1225,6 @@ def chordSymbolFromChord(inChord):
     
     >>> harmony.chordSymbolFromChord(chord.Chord(['D3','F3','A3','B-3']))
     <music21.harmony.ChordSymbol B-maj7/D>
-
     '''
     return ChordSymbol(chordSymbolFigureFromChord(inChord))
 
@@ -1717,7 +1726,6 @@ class ChordSymbol(Harmony):
         Harmony object by identifying the root, bass, inversion, kind, and 
         kindStr.
         '''
-
         #remove spaces from prelim Figure...
         prelimFigure = self.figure
         prelimFigure = re.sub(r'\s', '', prelimFigure)
@@ -1814,7 +1822,7 @@ class ChordSymbol(Harmony):
         for degree, alterBy in degrees:
             self.addChordStepModification(
                 ChordStepModification('add', degree, alterBy))
-
+            
     def _updatePitches(self):
         '''
         TODO: EXTREMELY SLOW!
@@ -2479,6 +2487,11 @@ _DOC_ORDER = [Harmony, chordSymbolFigureFromChord, ChordSymbol, ChordStepModific
 
 if __name__ == "__main__":
     import music21
+    cs = music21.harmony.ChordSymbol('E-sus4')
+    s = music21.stream.Stream()
+    s.append(cs)
+    s.write('musicxml')
+    
     music21.mainTest(Test)
 
 
