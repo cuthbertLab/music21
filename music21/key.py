@@ -631,6 +631,8 @@ class KeySignature(base.Music21Object):
         '''
         if hasattr(value, 'diatonic'): # its an Interval class
             intervalObj = value
+        elif hasattr(value, 'classes') and 'GenericInterval' in value.classes:
+            intervalObj = value
         else: # try to process
             intervalObj = interval.Interval(value)
 

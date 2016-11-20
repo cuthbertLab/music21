@@ -806,7 +806,7 @@ class GenericInterval(IntervalBase):
         else:
             return GenericInterval(self.undirected * (-1 * self.direction))
 
-    def transposePitch(self, p):
+    def transposePitch(self, p, inPlace=False):
         '''
         transpose a pitch, retaining the accidental if any.
         
@@ -815,6 +815,13 @@ class GenericInterval(IntervalBase):
         >>> bPitch = genericFifth.transposePitch(aPitch)
         >>> bPitch
         <music21.pitch.Pitch D5>
+
+        >>> gPitch = pitch.Pitch('g4')
+        >>> genericFifth = interval.GenericInterval(5)
+        >>> genericFifth.transposePitch(gPitch, inPlace=True)
+        >>> gPitch
+        <music21.pitch.Pitch D5>
+
 
         >>> a2 = pitch.Pitch('B-')
         >>> cPitch = genericFifth.transposePitch(a2)
@@ -828,12 +835,111 @@ class GenericInterval(IntervalBase):
         else:
             useImplicitOctave = False
         pdnn = p.diatonicNoteNum
-        newPitch = copy.deepcopy(p)
+        if inPlace:
+            newPitch = p
+        else:
+            newPitch = copy.deepcopy(p)
         newPitch.diatonicNoteNum = pdnn + self.staffDistance
         if useImplicitOctave is True:
             newPitch.octave = None
-        return newPitch
+        if not inPlace:
+            return newPitch
+    
+    def transposePitchKeyAware(self, p, k=None, inPlace=False):
+        '''
+        Transposes a pitch while remaining aware of its key context,
+        for modal transposition:
         
+        If k is None, works the same as `.transposePitch`:
+
+        >>> aPitch = pitch.Pitch('g4')
+        >>> genericFifth = interval.GenericInterval(5)
+        >>> bPitch = genericFifth.transposePitchKeyAware(aPitch, None)
+        >>> bPitch
+        <music21.pitch.Pitch D5>
+        
+        But if a key or keySignature (such as one from .getContextByClass('KeySignature')
+        is given, then the fun begins...
+        
+        >>> fis = pitch.Pitch('F#4')
+        >>> e = pitch.Pitch('E')
+        >>> gMaj = key.Key('G')
+        >>> genericStep = interval.GenericInterval('second')
+        >>> genericStep.transposePitchKeyAware(fis, gMaj)
+        <music21.pitch.Pitch G4>
+        >>> genericStep.transposePitchKeyAware(e, gMaj)
+        <music21.pitch.Pitch F#>
+        
+        If a pitch already has an accidental that contradicts the current
+        key, the difference between that pitch and the new key is applied
+        to the new pitch:
+        
+        >>> fNat = pitch.Pitch('F4')
+        >>> genericStep.transposePitchKeyAware(fNat, gMaj)
+        <music21.pitch.Pitch G-4>
+        
+        inPlace should work:
+        
+        >>> genericStep.transposePitchKeyAware(fis, gMaj, inPlace=True)
+        >>> fis
+        <music21.pitch.Pitch G4>
+        
+        This is used for Stream.transpose when a GenericInterval is given:
+        
+        >>> s = converter.parse('tinyNotation: 4/4 d4 e f f# g1 a-4 g b- a c1')
+        >>> s.measure(1).insert(0, key.Key('G'))
+        >>> s.measure(3).insert(0, key.Key('c'))
+        >>> s2 = s.transpose(interval.GenericInterval(2))
+        >>> s2.show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.key.Key of G major>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note E>
+            {1.0} <music21.note.Note F#>
+            {2.0} <music21.note.Note G->
+            {3.0} <music21.note.Note G>
+        {4.0} <music21.stream.Measure 2 offset=4.0>
+            {0.0} <music21.note.Note A>
+        {8.0} <music21.stream.Measure 3 offset=8.0>
+            {0.0} <music21.key.Key of c minor>
+            {0.0} <music21.note.Note B->
+            {1.0} <music21.note.Note A->
+            {2.0} <music21.note.Note C>
+            {3.0} <music21.note.Note B>
+        {12.0} <music21.stream.Measure 4 offset=12.0>
+            {0.0} <music21.note.Note D>
+            {4.0} <music21.bar.Barline style=final> 
+        
+        Does not take into account harmonic or melodic minor.
+        '''
+        from music21 import pitch
+
+        if k is None:
+            return self.transposePitch(p, inPlace)
+        
+        
+        accidentalByStep = k.accidentalByStep(p.step)
+        stepAlter = accidentalByStep.alter if accidentalByStep is not None else 0
+        pAlter = p.accidental.alter if p.accidental is not None else 0
+        offsetFromKey = pAlter - stepAlter
+
+        newPitch = self.transposePitch(p, inPlace)
+        if inPlace is True:
+            newPitch = p
+
+        newAccidentalByStep = k.accidentalByStep(newPitch.step)
+        newStepAlter = newAccidentalByStep.alter if newAccidentalByStep is not None else 0
+
+        newPitchAlter = newStepAlter + offsetFromKey
+        if newPitchAlter != 0:
+            newPitch.accidental = pitch.Accidental(newPitchAlter)
+        elif  newPitch.accidental is not None:
+            newPitch.accidental = None
+        
+        if inPlace is False:
+            return newPitch
+
 
     def getDiatonic(self, specifier):
         '''

@@ -7823,7 +7823,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if e.isStream:
                 continue
             if hasattr(e, 'transpose'):
-                e.transpose(value, inPlace=True)
+                if (hasattr(value, 'classes') 
+                    and 'GenericInterval' in value.classes):
+                    # do not transpose KeySignatures w/ Generic Intervals
+                    if 'KeySignature' not in e.classes and hasattr(e, 'pitches'):
+                        k = e.getContextByClass('KeySignature')
+                        for p in e.pitches:
+                            value.transposePitchKeyAware(p, k, inPlace=True)                         
+                else:
+                    e.transpose(value, inPlace=True)
         if not inPlace:
             return post
         else:

@@ -468,7 +468,6 @@ class StreamFreezer(StreamFreezeThawBase):
             # transferred.  Thus, we should NOT do this again!
             return
 
-        from music21 import duration
         storedElementOffsetTuples = []
         for e in streamObj._elements:
             elementTuple = (e, streamObj.elementOffset(e))
