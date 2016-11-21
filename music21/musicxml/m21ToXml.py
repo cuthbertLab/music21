@@ -16,8 +16,10 @@ from __future__ import print_function, division
 
 from collections import OrderedDict
 import copy
-import unittest
+import fractions
 import datetime
+import unittest
+
 from music21.ext import webcolors, six
 
 if six.PY3:
@@ -42,6 +44,7 @@ from music21 import exceptions21
 
 from music21 import bar
 from music21 import clef
+from music21 import duration
 from music21 import metadata
 from music21 import note
 from music21 import meter
@@ -2442,7 +2445,16 @@ class MeasureExporter(XMLExporterBase):
             <normal-type>eighth</normal-type>
           </time-modification>
           <notations>
-            <tuplet bracket="yes" number="1" placement="above" type="start" />
+            <tuplet bracket="yes" number="1" placement="above" type="start">
+              <tuplet-actual>
+                <tuplet-number>3</tuplet-number>
+                <tuplet-type>eighth</tuplet-type>
+              </tuplet-actual>
+              <tuplet-normal>
+                <tuplet-number>2</tuplet-number>
+                <tuplet-type>eighth</tuplet-type>
+              </tuplet-normal>
+            </tuplet>
           </notations>
         </note>
         >>> len(MEX.xmlRoot)
@@ -2579,10 +2591,20 @@ class MeasureExporter(XMLExporterBase):
             mxAccidental = accidentalToMx(n.pitch.accidental)
             mxNote.append(mxAccidental)
             
-        if len(d.tuplets) > 0:
-            for tup in d.tuplets:
-                mxTimeModification = self.tupletToTimeModification(tup)
-                mxNote.append(mxTimeModification)
+        if len(d.tuplets) == 1:
+            mxTimeModification = self.tupletToTimeModification(d.tuplets[0])
+            mxNote.append(mxTimeModification)
+        elif len(d.tuplets) > 1:
+            # create a composite tuplet to use as a timeModification guide
+            tupletFraction = fractions.Fraction(d.aggregateTupletMultiplier()
+                                                ).limit_denominator(1000)
+            tempTuplet = duration.Tuplet(tupletFraction.denominator,
+                                         tupletFraction.numerator)
+            # don't set durationType until this can be done properly.
+#             tempTuplet.setDurationType(d.tuplets[0].durationNormal.type,
+#                                        d.tuplets[0].durationNormal.dots)
+            mxTimeModification = self.tupletToTimeModification(tempTuplet)
+            mxNote.append(mxTimeModification)
         
         # stem...        
         stemDirection = None
@@ -3200,14 +3222,21 @@ class MeasureExporter(XMLExporterBase):
         >>> len(mxTup)
         1
         >>> MEX.dump(mxTup[0])
-        <tuplet bracket="yes" number="1" placement="above" type="start" />
-        
+        <tuplet bracket="yes" number="1" placement="above" type="start">
+          <tuplet-actual>
+            <tuplet-number>11</tuplet-number>
+          </tuplet-actual>
+          <tuplet-normal>
+            <tuplet-number>8</tuplet-number>
+          </tuplet-normal>
+        </tuplet>
+  
         >>> t.tupletActualShow = 'both'
         >>> t.tupletNormalShow = 'type'
         >>> mxTup = MEX.tupletToXmlTuplet(t)
         >>> MEX.dump(mxTup[0])
         <tuplet bracket="yes" number="1" placement="above" 
-            show-number="actual" show-type="both" type="start" />
+            show-number="actual" show-type="both" type="start">...</tuplet>
         '''
         if tuplet.type in (None, False, ''):
             return []
@@ -3255,10 +3284,29 @@ class MeasureExporter(XMLExporterBase):
                     
                 if tuplet.bracket == 'slur':
                     mxTuplet.set('line-shape', 'curved')
-                # TODO: attr: show-type
                 # TODO: attrGroup: position
-                # TODO: tuplet-actual different from time-modification
-                # TODO: tuplet-normal different from time-modification
+                    
+                mxTupletActual = SubElement(mxTuplet, 'tuplet-actual')
+                mxTupletNumber = SubElement(mxTupletActual, 'tuplet-number')
+                mxTupletNumber.text = str(tuplet.numberNotesActual)
+                if tuplet.durationActual is not None:
+                    actualType = typeToMusicXMLType(tuplet.durationActual.type)
+                    if actualType:
+                        mxTupletType = SubElement(mxTupletActual, 'tuplet-type')
+                        mxTupletType.text = actualType
+                    for unused_counter in range(tuplet.durationActual.dots):
+                        SubElement(mxTupletActual, 'tuplet-dot')
+                
+                mxTupletNormal = SubElement(mxTuplet, 'tuplet-normal')
+                mxTupletNumber = SubElement(mxTupletNormal, 'tuplet-number')
+                mxTupletNumber.text = str(tuplet.numberNotesNormal)
+                if tuplet.durationNormal is not None:
+                    normalType = typeToMusicXMLType(tuplet.durationNormal.type)
+                    if normalType:
+                        mxTupletType = SubElement(mxTupletNormal, 'tuplet-type')
+                        mxTupletType.text = normalType
+                    for unused_counter in range(tuplet.durationNormal.dots):
+                        SubElement(mxTupletNormal, 'tuplet-dot')
             
             retList.append(mxTuplet)
         return retList

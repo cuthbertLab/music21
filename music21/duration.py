@@ -1592,7 +1592,7 @@ class Duration(SlottedObjectMixin):
                 self.components = list(qlc.components)
                 if qlc.tuplet is not None:
                     self.tuplets = (qlc.tuplet,)
-            except music21.duration.DurationException:                
+            except DurationException:                
                 environLocal.printDebug([
                     "problem updating components of note with quarterLength ", self.quarterLength, 
                     "chokes quarterLengthToDurations"
