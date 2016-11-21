@@ -1798,7 +1798,7 @@ class SpineCollection(object):
                 # fix tuplet groups
                 for m in thisSpine.stream.getElementsByClass('Measure'):
                     tf.setStream(m)
-                    tupletGroups = tf.findTupletGroups(incorporateGroupings = True)
+                    tupletGroups = tf.findTupletGroups(incorporateGroupings=True)
                     for tg in tupletGroups:
                         tf.fixBrokenTupletDuration(tg)
 

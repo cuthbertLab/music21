@@ -82,7 +82,8 @@ def typeToMusicXMLType(value):
 
 def accidentalToMx(a):
     '''
-
+    Convert a pitch.Accidental object to a Element of tag accidental
+    
     >>> a = pitch.Accidental()
     >>> a.set('half-sharp')
     >>> a.alter == .5
@@ -2441,7 +2442,7 @@ class MeasureExporter(XMLExporterBase):
             <normal-type>eighth</normal-type>
           </time-modification>
           <notations>
-            <tuplet bracket="yes" placement="above" type="start" />
+            <tuplet bracket="yes" number="1" placement="above" type="start" />
           </notations>
         </note>
         >>> len(MEX.xmlRoot)
@@ -2624,8 +2625,8 @@ class MeasureExporter(XMLExporterBase):
             
         # add tuplets if it's a note or the first <note> of a chord.
         if addChordTag is False:
-            for tup in d.tuplets:
-                tupTagList = self.tupletToXmlTuplet(tup)
+            for i, tup in enumerate(d.tuplets):
+                tupTagList = self.tupletToXmlTuplet(tup, i+1)
                 mxNotationsList.extend(tupTagList)
     
             
@@ -3178,7 +3179,7 @@ class MeasureExporter(XMLExporterBase):
         
         return mxTiedList
 
-    def tupletToXmlTuplet(self, tuplet):
+    def tupletToXmlTuplet(self, tuplet, tupletIndex=1):
         '''
         In musicxml, a tuplet is represented by
         a timeModification and visually by the
@@ -3199,9 +3200,16 @@ class MeasureExporter(XMLExporterBase):
         >>> len(mxTup)
         1
         >>> MEX.dump(mxTup[0])
-        <tuplet bracket="yes" placement="above" type="start" />
+        <tuplet bracket="yes" number="1" placement="above" type="start" />
+        
+        >>> t.tupletActualShow = 'both'
+        >>> t.tupletNormalShow = 'type'
+        >>> mxTup = MEX.tupletToXmlTuplet(t)
+        >>> MEX.dump(mxTup[0])
+        <tuplet bracket="yes" number="1" placement="above" 
+            show-number="actual" show-type="both" type="start" />
         '''
-        if tuplet.type in (None, ''):
+        if tuplet.type in (None, False, ''):
             return []
         
         if tuplet.type not in ('start', 'stop', 'startStop'):
@@ -3215,22 +3223,43 @@ class MeasureExporter(XMLExporterBase):
 
         retList = []
         
-        # TODO: tuplet-actual different from time-modification
-        # TODO: tuplet-normal
-        # TODO: attr: show-type
-        # TODO: attrGroup: position
         
         for tupletType in localType:
+            # might be multiple in case of startStop
             mxTuplet = Element('tuplet')
             mxTuplet.set('type', tupletType)
+            mxTuplet.set('number', str(tupletIndex))            
             # only provide other parameters if this tuplet is a start
             if tupletType == 'start':
+                tbracket = tuplet.bracket
+                if tbracket == 'slur':
+                    tbracket = True
                 mxTuplet.set('bracket', 
-                             xmlObjects.booleanToYesNo(tuplet.bracket))
+                             xmlObjects.booleanToYesNo(tbracket))
                 if tuplet.placement is not None:
                     mxTuplet.set('placement', tuplet.placement)
-                if tuplet.tupletActualShow == 'none':
+                tas = tuplet.tupletActualShow
+                tns = tuplet.tupletNormalShow
+                if tas == None:
                     mxTuplet.set('show-number', 'none')
+                    # cannot show normal without actual
+                elif tas in ('both', 'number') and tns in ('both', 'number'):
+                    mxTuplet.set('show-number', 'both')
+                elif tas in ('both', 'actual'):
+                    mxTuplet.set('show-number', 'actual')
+                
+                if tas in ('both', 'type') and tns in ('both', 'type'):
+                    mxTuplet.set('show-type', 'both')
+                elif tas in ('both', 'type'):
+                    mxTuplet.set('show-type', 'actual')
+                    
+                if tuplet.bracket == 'slur':
+                    mxTuplet.set('line-shape', 'curved')
+                # TODO: attr: show-type
+                # TODO: attrGroup: position
+                # TODO: tuplet-actual different from time-modification
+                # TODO: tuplet-normal different from time-modification
+            
             retList.append(mxTuplet)
         return retList
 

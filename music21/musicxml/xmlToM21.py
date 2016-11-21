@@ -12,6 +12,7 @@
 from __future__ import division, print_function
 
 import copy
+import fractions
 import math
 #import pprint
 import re
@@ -1756,6 +1757,8 @@ class MeasureParser(XMLParserBase):
     def xmlToNote(self, mxNote):
         '''
         handles everything for creating a Note or Rest or Chord
+        
+        Does not actually return the note, but sets self.nLast to the note.
         '''
         try:
             mxObjNext = self.mxMeasureElements[self.parseIndex + 1]
@@ -2374,11 +2377,11 @@ class MeasureParser(XMLParserBase):
             mxTimeModification = mxNote.find('time-modification')
     
             if mxTimeModification is not None:
-                tup = self.xmlToTuplet(mxNote)
+                tups = self.xmlToTuplets(mxNote)
                 # TODO: nested tuplets...
                 # get all necessary config from mxNote
             else:
-                tup = None
+                tups = ()
 
         else: # some rests do not define type, and only define duration
             durationType = None # no type to get, must use raw
@@ -2415,7 +2418,7 @@ class MeasureParser(XMLParserBase):
             else:
                 d = duration.Duration(durationTuple=dt)
 
-            if tup is not None:
+            for tup in tups:
                 d.appendTuplet(tup)
     
         if inputM21 is None:
@@ -2847,7 +2850,7 @@ class MeasureParser(XMLParserBase):
         return t
 
     
-    def xmlToTuplet(self, mxNote, inputM21=None):
+    def xmlToTuplets(self, mxNote):
         '''
         Given an mxNote, based on mxTimeModification 
         and mxTuplet objects, return a Tuplet object
@@ -2859,30 +2862,27 @@ class MeasureParser(XMLParserBase):
         >>> mxNote = ET.fromstring('<note><type>16th</type>' + 
         ...    '<time-modification><actual-notes>5</actual-notes>' + 
         ...    '<normal-notes>4</normal-notes></time-modification></note>')
-        >>> t = MP.xmlToTuplet(mxNote)
+        >>> t = MP.xmlToTuplets(mxNote)
         >>> t
-        <music21.duration.Tuplet 5/4/16th>
+        [<music21.duration.Tuplet 5/4/16th>]
 
         >>> mxNote = ET.fromstring('<note><type>eighth</type>' + 
         ...    '<time-modification><actual-notes>5</actual-notes>' + 
         ...    '<normal-notes>3</normal-notes>' + 
         ...    '<normal-type>16th</normal-type><normal-dot /><normal-dot />' + 
         ...    '</time-modification></note>')
-        >>> t = MP.xmlToTuplet(mxNote)
+        >>> t = MP.xmlToTuplets(mxNote)
         >>> t
-        <music21.duration.Tuplet 5/3/16th>
-        >>> t.durationNormal
-        DurationTuple(type='16th', dots=2, quarterLength=0.4375)
+        [<music21.duration.Tuplet 5/3/16th>]
+        >>> t[0].durationNormal
+        DurationTuple(type='16th', dots=2, quarterLength=0.4375)        
         ''' 
-        if inputM21 is None:
-            t = duration.Tuplet()
-        else:
-            t = inputM21
-        if t.frozen is True:
-            raise duration.TupletException("A frozen tuplet (or one attached to a duration) " +
-                                           "is immutable")
+        t = duration.Tuplet()
         mxTimeModification = mxNote.find('time-modification')
-        #environLocal.printDebug(['got mxTimeModification', mxTimeModification])
+        #environLocal.printDebug(['got mxTimeModification', mxTimeModification])        
+        
+        # This should only be a backup in case there are no tuplet definitions
+        # in the tuplet tag.
         seta = _setAttributeFromTagText
         seta(t, mxTimeModification, 'actual-notes', 'numberNotesActual', transform=int)
         seta(t, mxTimeModification, 'normal-notes', 'numberNotesNormal', transform=int)
@@ -2900,29 +2900,80 @@ class MeasureParser(XMLParserBase):
         
     
         mxNotations = mxNote.find('notations')
+        if mxNotations is None:
+            return [t]
         #environLocal.printDebug(['got mxNotations', mxNotations])
     
-        if mxNotations is not None:
-            # TODO: findall -- these are unbounded...
-            mxTuplet = mxNotations.find('tuplet')
-            if mxTuplet is not None:
-                # TODO: tuplet-actual
-                # TODO: tuplet-normal               
-                t.type = mxTuplet.get('type') # required
-                 
-                t.bracket = xmlObjects.yesNoToBoolean(mxTuplet.get('bracket'))
-                #environLocal.printDebug(['got bracket', self.bracket])
-                showNumber = mxTuplet.get('show-number')
-                if showNumber is not None and showNumber == 'none':
-                    # do something for 'both'; 'actual' is the default
-                    t.tupletActualShow = 'none'
-                # TODO: show-type
-                # TODO: line-shape
-                # TODO: position
-                t.placement = mxTuplet.get('placement') 
+        remainingTupletAmountToAccountFor = t.tupletMultiplier()
+        timeModTup = t
+        
+        returnTuplets = []
+        # returnTupletDict = {} # use this to map number back to itself so 
+        # that startStop can be found
+        
+        mxTuplets = mxNotations.findall('tuplet')
+        for mxTuplet in mxTuplets:
+            mxTupletActual = mxTuplet.find('tuplet-actual')
+            mxTupletNormal = mxTuplet.find('tuplet-normal')
+            if mxTupletActual is None or mxTupletNormal is None:
+                t = timeModTup # in theory either can be absent, but so far I have only seen both.
+            else:
+                t = duration.Tuplet()
+                seta(t, mxTupletActual, 'tuplet-number', 'numberNotesActual', transform=int)
+                seta(t, mxTupletNormal, 'tuplet-number', 'numberNotesNormal', transform=int)
+                
+                mxActualType = mxTupletActual.find('tuplet-type')
+                if mxActualType is not None:
+                    xmlActualType = mxActualType.text.strip()
+                    durType = musicXMLTypeToType(xmlActualType)
+                    dots = len(mxActualType.findall('tuplet-dot'))              
+                    t.durationActual = duration.durationTupleFromTypeDots(durType, dots)           
+
+                mxNormalType = mxTupletNormal.find('tuplet-type')
+                if mxNormalType is not None:
+                    xmlNormalType = mxNormalType.text.strip()
+                    durType = musicXMLTypeToType(xmlNormalType)
+                    dots = len(mxNormalType.findall('tuplet-dot'))              
+                    t.durationNormal = duration.durationTupleFromTypeDots(durType, dots)           
+
+            # TODO: combine start + stop into startStop.
+            t.type = mxTuplet.get('type') # required
+            
+            # number is not needed, since each tuplet will create a new number.
+             
+            t.bracket = xmlObjects.yesNoToBoolean(mxTuplet.get('bracket'))
+            #environLocal.printDebug(['got bracket', self.bracket])
+            showNumber = mxTuplet.get('show-number')
+            if showNumber is not None and showNumber == 'none':
+                t.tupletActualShow = None
+            elif showNumber is not None and showNumber == 'both':
+                t.tupletNormalShow = 'number'
+
+            showType = mxTuplet.get('show-type')
+            if showType is not None and showType == 'actual':
+                t.tupletActualShow = 'both' if t.tupletActualShow is not None else 'type'
+            elif showNumber is not None and showNumber == 'both':
+                t.tupletActualShow = 'both' if t.tupletActualShow is not None else 'type'
+                t.tupletNormalShow = 'both' if t.tupletNormalShow is not None else 'type'
+            
+            lineShape = mxTuplet.get('line-shape')
+            if lineShape is not None and lineShape == 'curved':
+                t.bracket = 'slur'
+            # TODO: default-x, default-y, relative-x, relative-y
+            t.placement = mxTuplet.get('placement')
+            returnTuplets.append(t)
+            remainingTupletAmountToAccountFor /= t.tupletMultiplier()
     
-        if inputM21 is None:
-            return t
+        if remainingTupletAmountToAccountFor != 1:
+            remainderFraction = fractions.Fraction(remainingTupletAmountToAccountFor)
+            remainderTuplet = duration.Tuplet(remainderFraction.denominator,
+                                              remainderFraction.numerator)
+            returnTuplets.append(remainderTuplet)
+    
+        if len(returnTuplets) == 0:
+            return [timeModTup]
+        else:
+            return returnTuplets
 
 
     def updateLyricsFromList(self, n, lyricList):
@@ -4887,9 +4938,65 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(firstChord), '<music21.chord.Chord G4 B4>')
         self.assertEqual(firstChord.offset, 1.0)
 
+    def testComplexTupletNote(self):
+        '''
+        test that a note with nested tuplets gets converted properly.
+        '''
+        mxN = '''
+        <note default-x="347">
+        <pitch>
+          <step>D</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>eighth</type>
+        <time-modification>
+          <actual-notes>9</actual-notes>
+          <normal-notes>4</normal-notes>
+        </time-modification>
+        <stem default-y="-55">down</stem>
+        <beam number="1">begin</beam>
+        <notations>
+          <tuplet bracket="yes" number="1" placement="below" type="start">
+            <tuplet-actual>
+              <tuplet-number>3</tuplet-number>
+              <tuplet-type>eighth</tuplet-type>
+            </tuplet-actual>
+            <tuplet-normal>
+              <tuplet-number>2</tuplet-number>
+              <tuplet-type>eighth</tuplet-type>
+            </tuplet-normal>
+          </tuplet>
+          <tuplet number="2" placement="below" type="start">
+            <tuplet-actual>
+              <tuplet-number>3</tuplet-number>
+              <tuplet-type>eighth</tuplet-type>
+            </tuplet-actual>
+            <tuplet-normal>
+              <tuplet-number>2</tuplet-number>
+              <tuplet-type>eighth</tuplet-type>
+            </tuplet-normal>
+          </tuplet>
+        </notations>
+      </note>        
+        '''
+        MP = MeasureParser()
+        mxNote = ET.fromstring(mxN)
+        #mxNotations = mxNote.find('notations')
+        #mxTuplets = mxNotations.findall('tuplet')
+        tups = MP.xmlToTuplets(mxNote)
+        self.assertEqual(len(tups), 2)
+        MP.xmlToNote(mxNote)
+        n = MP.nLast
+        self.assertEqual(len(n.duration.tuplets), 2)
+        self.assertEqual(repr(n.duration.tuplets), 
+            '(<music21.duration.Tuplet 3/2/eighth>, <music21.duration.Tuplet 3/2/eighth>)')
+        self.assertEqual(n.duration.quarterLength, fractions.Fraction(2, 9))
+            
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='testTwoVoicesWithChords')
+    music21.mainTest(Test) #, runTest='testComplexTupletNote')
     
     
     
