@@ -2730,7 +2730,7 @@ class Music21Object(object):
         
         
 
-        Make sure that ties remain as they should be:
+        Make sure that ties and accidentals remain as they should be:
 
         >>> d = note.Note('D#4')
         >>> d.duration.quarterLength = 3.0
@@ -2738,18 +2738,25 @@ class Music21Object(object):
         >>> e, f = d.splitAtQuarterLength(2.0)
         >>> e.tie, f.tie
         (<music21.tie.Tie start>, <music21.tie.Tie continue>)
+        >>> e.pitch.accidental.displayStatus is None
+        True
+        >>> f.pitch.accidental.displayStatus
+        False
 
         Should be the same for chords...
 
-        >>> g = chord.Chord(['C4', 'E4', 'G4'])
+        >>> g = chord.Chord(['C4', 'E4', 'G#4'])
         >>> g.duration.quarterLength = 3.0
-        >>> g._notes[1].tie = tie.Tie('start')
+        >>> g[1].tie = tie.Tie('start')
         >>> h, i = g.splitAtQuarterLength(2.0)
-        >>> for j in range(0,3):
-        ...   h._notes[j].tie, i._notes[j].tie
+        >>> for j in range(3):
+        ...   (h[j].tie, i[j].tie)
         (<music21.tie.Tie start>, <music21.tie.Tie stop>)
         (<music21.tie.Tie start>, <music21.tie.Tie continue>)
         (<music21.tie.Tie start>, <music21.tie.Tie stop>)
+        
+        >>> h[2].pitch.accidental.displayStatus, i[2].pitch.accidental.displayStatus
+        (None, False)
         
         
         If quarterLength == self.quarterLength then the second element will be None.
@@ -2897,16 +2904,16 @@ class Music21Object(object):
 
         # hide accidentals on tied notes where previous note
         # had an accidental that was shown
-        # this is not general enough, for things like chords
-        if hasattr(e, 'pitch'):
-            if hasattr(e.pitch, 'accidental') and e.pitch.accidental is not None:
-                if not displayTiedAccidentals: # if False
-                    if (e.pitch.accidental.displayType not in
-                        ['even-tied']):
-                        eRemain.pitch.accidental.displayStatus = False
-                else: # display tied accidentals
-                    eRemain.pitch.accidental.displayType = 'even-tied'
-                    eRemain.pitch.accidental.displayStatus = True
+        if addTies and hasattr(e, 'pitches'):
+            for i, p in enumerate(e.pitches):
+                remainP = eRemain.pitches[i]
+                if hasattr(p, 'accidental') and p.accidental is not None:
+                    if not displayTiedAccidentals: # if False
+                        if (p.accidental.displayType != 'even-tied'):
+                            remainP.accidental.displayStatus = False
+                    else: # display tied accidentals
+                        remainP.accidental.displayType = 'even-tied'
+                        remainP.accidental.displayStatus = True
 
         if eRemain.duration.quarterLength > 0.0:
             st = _SplitTuple([e, eRemain])

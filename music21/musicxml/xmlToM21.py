@@ -2830,6 +2830,32 @@ class MeasureParser(XMLParserBase):
         '''
         Translate a MusicXML <note> with <tie> subelements
         :class:`~music21.tie.Tie` object
+
+        >>> import xml.etree.ElementTree as ET        
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+
+        Create the incomplete part of a Note.
+        
+        >>> mxNote = ET.fromstring('<note><tie type="start" />'
+        ...            + '<notations><tied line-type="dotted" placement="below" type="start" />'
+        ...            + '</notations></note>')
+        >>> t = MP.xmlToTie(mxNote)
+        >>> t.type
+        'start'
+        >>> t.style
+        'dotted'
+        >>> t.placement
+        'below'
+        
+        Same thing but with orientation instead of placement, which both get mapped to
+        placement in Tie objects
+        
+        >>> mxNote = ET.fromstring('<note><tie type="start" />'
+        ...            + '<notations><tied line-type="dotted" orientation="over" type="start" />'
+        ...            + '</notations></note>')        
+        >>> t = MP.xmlToTie(mxNote)
+        >>> t.placement
+        'above'
         '''
         t = tie.Tie()
         allTies = mxNote.findall('tie')
@@ -2847,10 +2873,24 @@ class MeasureParser(XMLParserBase):
         else:
             environLocal.printDebug(['found unexpected arrangement of multiple tie types when ' +
                          'importing from musicxml:', typesFound])
-        # TODO: look at notations for printed, non-sounding ties
-#         mxNotations = mxNote.get('notations')
-#         if mxNotations != None:
-#             mxTiedList = mxNotations.getTieds()
+
+        # TODO: get everything else from <tied> besides line-style, placement, and orientation.
+        mxNotations = mxNote.find('notations')
+        if mxNotations != None:
+            mxTiedList = mxNotations.findall('tied')
+            if mxTiedList is not None and len(mxTiedList) > 0:
+                tieStyle = mxTiedList[0].get('line-type')
+                if tieStyle is not None and tieStyle != 'wavy': # do not support wavy...
+                    t.style = tieStyle
+                placement = mxTiedList[0].get('placement')
+                if placement is not None:
+                    t.placement = placement
+                else:
+                    orientation = mxTiedList[0].get('orientation')
+                    if orientation == 'over':
+                        t.placement = 'above'
+                    elif orientation == 'under':
+                        t.placement = 'below'
         return t
 
     

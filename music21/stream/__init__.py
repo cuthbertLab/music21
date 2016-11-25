@@ -2133,6 +2133,38 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     #---------------------------------------------------------------------------
     # searching and replacing routines
 
+    def setDerivationMethod(self, derivationMethod, recurse=False):
+        '''
+        Sets the .derivation.method for each element in the Stream
+        if it has a .derivation object.
+        
+        >>> import copy
+        >>> s = converter.parse('tinyNotation: 2/4 c2 d e f')
+        >>> s2 = copy.deepcopy(s)
+        >>> s2.recurse().notes[-1].derivation
+        <Derivation of <music21.note.Note F> from <music21.note.Note F> via "__deepcopy__">
+        >>> s2.setDerivationMethod('exampleCopy', recurse=True)
+        >>> s2.recurse().notes[-1].derivation
+        <Derivation of <music21.note.Note F> from <music21.note.Note F> via "exampleCopy">
+
+        Without recurse:
+        
+        >>> s = converter.parse('tinyNotation: 2/4 c2 d e f')
+        >>> s2 = copy.deepcopy(s)
+        >>> s2.setDerivationMethod('exampleCopy')
+        >>> s2.recurse().notes[-1].derivation
+        <Derivation of <music21.note.Note F> from <music21.note.Note F> via "__deepcopy__">
+        '''
+        if recurse:
+            sIter = self.recurse()
+        else:
+            sIter = self.iter
+            
+        for el in sIter:
+            if el.derivation is not None:
+                el.derivation.method = derivationMethod
+
+
     def replace(self, 
                 target, 
                 replacement, 
@@ -6081,6 +6113,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #environLocal.printDebug(['calling stripTies'])
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
+            returnObj.derivation.method = 'stripTies'
+            returnObj.setDerivationMethod('stripTies', recurse=True)
         else:
             returnObj = self
 
@@ -6095,7 +6129,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             retainContainers=True)
             return returnObj # exit
 
-        # assume this is sorted
         # need to just get .notesAndRests, as there may be other objects in the Measure
         # that come before the first Note, such as a SystemLayout object
         f = returnObj.flat
@@ -6213,7 +6246,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
                 # set tie to None on first note
                 notes[posConnected[0]].tie = None
-                posConnected = [] # resset to empty
+                posConnected = [] # reset to empty
 
         # all results have been processed
         # presently removing from notes, not resultObj, as index positions
@@ -7801,6 +7834,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if not inPlace:
             post = copy.deepcopy(self)
             post.derivation.method = 'transpose'
+            post.setDerivationMethod('transpose', recurse=True)
         else:
             post = self
 #         for p in post.pitches: # includes chords
@@ -7884,6 +7918,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
+            returnObj.derivation.method = 'scaleOffsets'
+            returnObj.setDerivationMethod('scaleOffsets', recurse=True)
         else:
             returnObj = self
 
@@ -7937,6 +7973,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
+            returnObj.derivation.method = 'scaleDurations'
+            returnObj.setDerivationMethod('scaleDurations', recurse=True)
         else:
             returnObj = self
 
@@ -7989,6 +8027,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             raise StreamException('amountToScale must be greater than zero')
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
+            returnObj.derivation.method = 'augmentOrDiminish'
+            returnObj.setDerivationMethod('augmentOrDiminish', recurse=True)
         else:
             returnObj = self
 
@@ -8107,6 +8147,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # TODO: Use new filters...
         if inPlace is False:
             returnStream = copy.deepcopy(self)
+            returnStream.derivation.method = 'quantize'
+            returnStream.setDerivationMethod('quantize', recurse=True)
+
         else:
             returnStream = self
 
@@ -8400,8 +8443,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return returnObj
 
 
-    def sliceByBeat(self, target=None,
-        addTies=True, inPlace=False, displayTiedAccidentals=False):
+    def sliceByBeat(self, 
+                    target=None,
+                    addTies=True, 
+                    inPlace=False, 
+                    displayTiedAccidentals=False):
         '''
         Slice all elements in the Stream that have a Duration at
         the offsets determined to be the beat from the local TimeSignature.

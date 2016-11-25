@@ -75,6 +75,8 @@ environLocal = environment.Environment(_MOD)
 
 DENOM_LIMIT = defaults.limitOffsetDenominator
 
+_inf = float('inf')
+
 #-------------------------------------------------------------------------------
 # duration constants and reference
 
@@ -1782,14 +1784,16 @@ class Duration(SlottedObjectMixin):
         (It is not clear yet if this is needed: YES! for zero duration!)
 
         >>> a = duration.Duration()
-        >>> a.quarterLength = 4
+        >>> a.quarterLength = 6
         >>> a.type
         'whole'
         >>> a.components
-        (DurationTuple(type='whole', dots=0, quarterLength=4.0),)
+        (DurationTuple(type='whole', dots=1, quarterLength=6.0),)
 
         >>> a.clear()
 
+        >>> a.dots
+        0
         >>> a.components
         ()
         >>> a.type
@@ -1797,6 +1801,7 @@ class Duration(SlottedObjectMixin):
         >>> a.quarterLength
         0.0
         '''
+        self._dotGroups = (0,)
         self._components = []
         self._componentsNeedUpdating = False
         self._quarterLengthNeedsUpdating = True
@@ -1942,10 +1947,7 @@ class Duration(SlottedObjectMixin):
         >>> a.type
         'whole'
 
-
-
         If the type cannot be expressed then the type is inexpressible
-
 
         >>> a = duration.Duration()
         >>> a.fill(['quarter', 'half', 'half'])
@@ -1963,13 +1965,26 @@ class Duration(SlottedObjectMixin):
         5.0
         >>> len(a.components)
         1
-        >>> a.components[0]
-        DurationTuple(type='inexpressible', dots=0, quarterLength=5.0)
+        >>> a.components
+        (DurationTuple(type='inexpressible', dots=0, quarterLength=5.0),)
 
         It gains a type!
 
         >>> a.type
         'inexpressible'
+        
+        For an 'inexpressible' duration, the opposite of consolidate is
+        to set the duration's quarterLength to itself.  It won't necessarily
+        return to the original components, but it will (usually? always?)
+        create something that can be notated.
+        
+        >>> a.quarterLength = a.quarterLength
+        >>> a.type
+        'complex'
+        >>> a.components
+        (DurationTuple(type='whole', dots=0, quarterLength=4.0),
+         DurationTuple(type='quarter', dots=0, quarterLength=1.0))
+        
         '''
         if len(self.components) == 1:
             pass # nothing to be done
@@ -2127,7 +2142,7 @@ class Duration(SlottedObjectMixin):
         '''
         return self._components
 
-    def splitDotGroups(self):
+    def splitDotGroups(self, inPlace=False):
         '''
         splits a dotGroup-duration (of 1 component) into a new duration of two
         components.  Returns a new duration
@@ -2143,7 +2158,6 @@ class Duration(SlottedObjectMixin):
         >>> d2.components
         (DurationTuple(type='half', dots=1, quarterLength=3.0), 
          DurationTuple(type='quarter', dots=1, quarterLength=1.5))
-        
         >>> d2.quarterLength
         4.5
 
@@ -2170,14 +2184,50 @@ class Duration(SlottedObjectMixin):
         >>> n2.quarterLength
         2.25
         >>> #_DOCS_SHOW n2.show() # generates a dotted-quarter tied to dotted-eighth
+        >>> n2.duration.splitDotGroups(inPlace=True)
+        >>> n2.duration.dotGroups
+        (1,)
+        >>> n2.duration.components
+        (DurationTuple(type='quarter', dots=1, quarterLength=1.5), 
+         DurationTuple(type='eighth', dots=1, quarterLength=0.75))
+
+        >>> n2 = note.Note()
+        >>> n2.duration.type = 'quarter'
+        >>> n2.duration.dotGroups = (1, 1, 1)
+        >>> n2.quarterLength
+        3.375
+        >>> dSplit = n2.duration.splitDotGroups()
+        >>> dSplit.quarterLength
+        3.375
+        >>> dSplit.components
+        (DurationTuple(type='quarter', dots=1, quarterLength=1.5), 
+         DurationTuple(type='eighth', dots=1, quarterLength=0.75), 
+         DurationTuple(type='eighth', dots=1, quarterLength=0.75), 
+         DurationTuple(type='16th', dots=1, quarterLength=0.375))
+
+
 
         Does NOT handle tuplets etc.
         '''
-        d = Duration()
-        d.addDurationTuple(durationTupleFromTypeDots(self.type, 1))
-        d.addDurationTuple(durationTupleFromTypeDots(nextSmallerType(self.type), 1))
+        t = self.type
+        dg = self.dotGroups
+        if not inPlace:
+            d = copy.deepcopy(self)
+        else:
+            d = self
+            
+        d.clear()
+
+        d.addDurationTuple(durationTupleFromTypeDots(t, dg[0]))
+        for i in range(1, len(dg)):
+            for existingComponent in list(d.components):
+                d.addDurationTuple(
+                    durationTupleFromTypeDots(nextSmallerType(existingComponent.type),
+                                              existingComponent.dots)
+                    )
         
-        return d
+        if not inPlace:
+            return d
 #         dG = self.dotGroups
 #         if len(dG) < 2:
 #             return copy.deepcopy(self)
@@ -2272,11 +2322,71 @@ class Duration(SlottedObjectMixin):
     @property
     def dots(self):
         '''
-        Returns the number of dots in the Duration
-        if it is a simple Duration.  Otherwise returns the number of dots on the first component
-
-        Previously it could return None if it was not a simple duration which led to some
-        terribly difficult to find errors.
+        Returns or sets the number of dots in the Duration
+        if it is a simple Duration.  
+        
+        For returning only the number of dots on the first component is returned for
+        complex durations. (Previously it could return None 
+        if it was not a simple duration which led to some
+        terribly difficult to find errors.)
+        
+        >>> a = duration.Duration()
+        >>> a.type = 'quarter'
+        >>> a.dots = 1
+        >>> a.quarterLength
+        1.5
+        >>> a.dots = 2
+        >>> a.quarterLength
+        1.75
+        
+        If a duration is complex then setting dots has the effect of 
+        setting the number of dots to `value` on every component.
+        
+        >>> DT = duration.durationTupleFromTypeDots
+        >>> complex = duration.Duration()
+        >>> complex.addDurationTuple(DT('half', 0))
+        >>> complex.addDurationTuple(DT('eighth', 2))
+        >>> complex.type
+        'complex'
+        >>> complex.quarterLength
+        2.875
+        
+        This number comes from the first component:
+        
+        >>> complex.dots
+        0
+        
+        
+        >>> complex.dots = 1
+        >>> complex.components
+        (DurationTuple(type='half', dots=1, quarterLength=3.0),
+         DurationTuple(type='eighth', dots=1, quarterLength=0.75))
+        >>> complex.quarterLength
+        3.75
+        
+        
+        Here's a little easter egg:
+        
+        >>> d = duration.Duration('half')
+        >>> d.quarterLength
+        2.0
+        >>> d.dots = 5
+        >>> d.quarterLength 
+        3.9375
+        >>> d.dots = 10
+        >>> d.quarterLength 
+        3.998046875
+        
+        Infinite dots...
+        
+        >>> d.dots = float('inf')
+        >>> d.quarterLength
+        4.0
+        >>> d.dots
+        0
+        >>> d.type
+        'whole'
+        
         '''
         if self._componentsNeedUpdating:
             self._updateComponents()
@@ -2291,30 +2401,23 @@ class Duration(SlottedObjectMixin):
     def dots(self, value):
         '''
         Set dots if a number, as first element
-
-        >>> a = duration.Duration()
-        >>> a.type = 'quarter'
-        >>> a.dots = 1
-        >>> a.quarterLength
-        1.5
-        >>> a.dots = 2
-        >>> a.quarterLength
-        1.75
         '''
         if self._componentsNeedUpdating:
             self._updateComponents()
         if not common.isNum(value):
             raise DurationException('only numeric dot values can be used with this method.')
-        if len(self._components) == 1:
-            self._components[0] = durationTupleFromTypeDots(self.components[0].type, value)
-            self._quarterLengthNeedsUpdating = True
-            self.informClient()
-        elif len(self._components) > 1:
-            raise DurationException(
-                "setting type on Complex note: Myke and Chris need to decide what that means")
-        else:  # there must be 1 or more components
-            raise DurationException(
-                "Cannot set dots on an object with zero DurationTuples in its duration.components")
+
+        # easter egg...
+        if value == _inf:
+            self.type = nextLargerType(self.type)
+            self.dots = 0
+            return
+
+
+        for i, dt in enumerate(self._components):
+            self._components[i] = durationTupleFromTypeDots(dt.type, value)
+        self._quarterLengthNeedsUpdating = True
+        self.informClient()
 
     @property
     def fullName(self):

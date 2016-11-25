@@ -2191,6 +2191,15 @@ class MeasureExporter(XMLExporterBase):
         if 'GeneralNote' in classes:
             self.offsetInMeasure += obj.duration.quarterLength
 
+        # turn inexpressible durations into complex durations (unless unlinked)
+        if obj.duration.type == 'inexpressible':
+            obj.duration.quarterLength = obj.duration.quarterLength
+
+        # make dotGroups into normal notes
+        if len(obj.duration.dotGroups) > 1:
+            obj.duration.splitDotGroups(inPlace=True)
+
+
         # split at durations...
         if 'GeneralNote' in classes and obj.duration.type == 'complex':
             objList = obj.splitAtDurations()
@@ -3191,11 +3200,25 @@ class MeasureExporter(XMLExporterBase):
             mxTiedList.append(mxTied)
         
         # TODO: attr: number (distinguishing ties on enharmonics)
-        # TODO: attrGroup: line-type
+        if t.style != 'normal' and t.type != 'stop':
+            mxTied.set('line-type', t.style)
+            # wavy is not supported as a tie type.
+        
         # TODO: attrGroup: dashed-formatting
         # TODO: attrGroup: position
-        # TODO: attrGroup: placement
-        # TODO: attrGroup: orientation
+
+        if t.placement is not None:
+            mxTied.set('placement', t.placement)
+            orientation = None
+            if t.placement == 'above':
+                orientation = 'over'
+            elif t.placement == 'below':
+                orientation = 'under'
+            # MuseScore requires 'orientation' not placement
+            # should be no need for separate orientation
+            # http://forums.makemusic.com/viewtopic.php?f=12&t=2179&start=0
+            mxTied.set('orientation', orientation)
+        
         # TODO: attrGroup: bezier
         # TODO: attrGroup: color
         

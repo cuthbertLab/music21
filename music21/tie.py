@@ -38,12 +38,30 @@ class Tie(SlottedObjectMixin):
     >>> note1.tie
     <music21.tie.Tie start>
 
+    Generally Ties have a placement of None, but if they are defined
+    as 'above' or 'below' this will be retained.  (see:
+    http://forums.makemusic.com/viewtopic.php?f=12&t=2179&start=0
+    for how orientation and placement in musicxml are essentially the same
+    content).
+
+    >>> note1.tie.placement is None
+    True
+
     Differences from MusicXML:
-       notes do not need to know if they are tied from a
+    
+    *  notes do not need to know if they are tied from a
        previous note.  i.e., you can tie n1 to n2 just with
        a tie start on n1.  However, if you want proper musicXML output
-       you need a tie stop on n2
-       one tie with "continue" implies tied from and tied to
+       you need a tie stop on n2.
+    
+    *  one tie with "continue" implies tied from and tied to.
+
+    The tie.style only applies to ties of type 'start' or 'continue' (and then
+    only to the next part of the tie).  For instance, if there are two
+    tied notes, and the first note has a 'dotted'-start tie, and the
+    second note has a 'dashed'-stop tie, the graphical tie itself will be dotted.
+
+
 
     OMIT_FROM_DOCS
        optional (to know what notes are next:)
@@ -58,7 +76,8 @@ class Tie(SlottedObjectMixin):
     ### CLASS VARIABLES ###
 
     __slots__ = (
-        'style',
+        'placement',
+        'style',        
         'type',
         )
 
@@ -70,9 +89,9 @@ class Tie(SlottedObjectMixin):
             raise TieException("Type must be one of 'start', 'stop', or 'continue', not %s" % type)
         # naming this "type" was a mistake, because cannot create a property of this name.
         
-        
         self.type = type
         self.style = "normal"
+        self.placement = None # = unknown, can be 'above' or 'below'
 
     ### SPECIAL METHODS ###
 

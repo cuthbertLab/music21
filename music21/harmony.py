@@ -407,7 +407,7 @@ class Harmony(chord.Chord):
     def writeAsChord(self):
         '''
         Boolean attribute of all harmony objects that specifies how this 
-        object will be written to the musicxml of a stream. If true 
+        object will be written to the musicxml of a stream. If `True` 
         (default for romanNumerals), the chord with pitches is written. If 
         False (default for ChordSymbols) the harmony symbol is written.
         '''
@@ -545,6 +545,9 @@ class ChordStepModification(object):
     @property
     def degree(self):
         '''
+        Returns or sets an integer specifying the scale degree
+        that this ChordStepModification alters.
+        
         >>> hd = harmony.ChordStepModification()
         >>> hd.degree = 3
         >>> hd.degree
@@ -568,7 +571,8 @@ class ChordStepModification(object):
     def interval(self):
         '''
         Get or set the alteration of this degree as a 
-        :class:`~music21.interval.Interval` object.
+        :class:`~music21.interval.Interval` object, generally
+        as a type of ascending or descending augmented unison.
         
         >>> hd = harmony.ChordStepModification()
         >>> hd.interval = 1
@@ -577,7 +581,22 @@ class ChordStepModification(object):
 
         >>> hd.interval = -2
         >>> hd.interval
-        <music21.interval.Interval AA-1>        
+        <music21.interval.Interval AA-1>
+
+        >>> hd.interval = 0
+        >>> hd.interval
+        <music21.interval.Interval P1>
+
+        >>> hd.interval = interval.Interval('m3')
+        >>> hd.interval
+        <music21.interval.Interval m3> 
+
+        More than 3 half step alteration gets
+        an interval that isn't a prime.
+
+        >>> hd.interval = -4
+        >>> hd.interval
+        <music21.interval.Interval M-3> 
         '''
         return self._interval
 
@@ -590,16 +609,19 @@ class ChordStepModification(object):
             self._interval = value
         else:
             # accept numbers to permit loading from mxl alter specs
-            if value in [1]:
-                self._interval = interval.Interval('a1')
-            elif value in [2]: # double augmented
-                self._interval = interval.Interval('aa1')
-            elif value in [-1]:
-                self._interval = interval.Interval('-a1')
-            elif value in [-2]:
-                self._interval = interval.Interval('-aa1')
+            numAs = abs(value)
+            if numAs <= 3:
+                if numAs == 0:
+                    aStr = 'P'
+                else:
+                    aStr = 'a' * numAs
+                aStr += '1'
+                if value < 0:
+                    aStr += '-'
+                self._interval = interval.Interval(aStr)
             else: # try to create interval object
                 self._interval = interval.Interval(value)
+                
 
     @property
     def modType(self):
