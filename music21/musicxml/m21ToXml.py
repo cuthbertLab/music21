@@ -1976,8 +1976,6 @@ class PartExporter(XMLExporterBase):
         if measureStream.streamStatus.haveTupletBracketsBeenMade() is False:
             measureStream.makeTupletBrackets(inPlace=True)
             
-        # TODO: make tuplet brackets once haveTupletBracketsBeenMade is done...
-            
         if len(self.spannerBundle) == 0:
             self.spannerBundle = spanner.SpannerBundle(measureStream.flat)
     
