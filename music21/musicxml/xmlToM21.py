@@ -1274,6 +1274,19 @@ class PartParser(XMLParserBase):
         
         
     def adjustTimeAttributesFromMeasure(self, m):
+        '''
+        Adds padAsAnacrusis to pickup measures and other measures that
+        do not fill the whole tile, if the first measure of the piece, or
+        immediately follows an incomplete measure (such as a repeat sign mid-measure
+        in a piece where each phrase begins with a pickup and ends with an
+        incomplete measure).
+        
+        Fills an empty measure with a measure of rest (bug in PDFtoMusic and
+        other MusicXML writers).
+        
+        sets self.lastMeasureWasShort to True or False if it is an incomplete measure
+        that is not a pickup.
+        '''
         # note: we cannot assume that the time signature properly
         # describes the offsets w/n this bar. need to look at 
         # offsets within measure; if the .highestTime value is greater
@@ -1309,9 +1322,6 @@ class PartParser(XMLParserBase):
                     #    import; interpreting as a anacrusis:', 'padingLeft:', m.paddingLeft])
                 mOffsetShift = mHighestTime
                 
-            # assume that, even if measure is incomplete, the next bar should
-            # start at the duration given by the time signature, not highestTime
-            ### no...let's not do this...
             else:
                 mOffsetShift = mHighestTime #lastTimeSignatureQuarterLength
                 if self.lastMeasureWasShort is True:
@@ -1329,6 +1339,12 @@ class PartParser(XMLParserBase):
         
         
     def parsePartInfo(self):
+        '''
+        Sets the stream.partName, stream.partAbbreivation, self.activeInstrument,
+        and inserts an instrument at the beginning of the stream.
+        
+        The instrumentObj being configured comes from self.getDefaultInstrument.
+        '''
         instrumentObj = self.getDefaultInstrument()
         #self.firstInstrumentObject = instrumentObj # not used.
         if instrumentObj.bestName() is not None:
@@ -1550,6 +1566,7 @@ class MeasureParser(XMLParserBase):
         
         self.divisions = defaults.divisionsPerQuarter
         
+        
         self.staffLayoutObjects = []
         self.stream = stream.Measure()
         
@@ -1673,7 +1690,7 @@ class MeasureParser(XMLParserBase):
         if self.parent:
             self.divisions = self.parent.lastDivisions
         else:
-            self.divisions = defaults.divisionsPerQuarter 
+            self.divisions = defaults.divisionsPerQuarter
 
         self.updateVoiceInformation()
         self.mxMeasureElements = list(self.mxMeasure) # for grabbing next note
@@ -2173,6 +2190,21 @@ class MeasureParser(XMLParserBase):
         'half-flat'
         >>> b.alter
         -0.5
+
+        >>> a = EL('<accidental parentheses="yes">sharp</accidental>')
+        >>> b = MP.xmlToAccidental(a)
+        >>> b.displayStyle
+        'parentheses'
+        
+        >>> a = EL('<accidental bracket="yes">sharp</accidental>')
+        >>> b = MP.xmlToAccidental(a)
+        >>> b.displayStyle
+        'bracket'
+        
+        >>> a = EL('<accidental bracket="yes" parentheses="yes">sharp</accidental>')
+        >>> b = MP.xmlToAccidental(a)
+        >>> b.displayStyle
+        'both'
         '''    
         if inputM21 is None:
             acc = pitch.Accidental()
@@ -2186,6 +2218,33 @@ class MeasureParser(XMLParserBase):
             name = mxName
         # need to use set here to get all attributes up to date
         acc.set(name)
+        # TODO: natural-sharp, natural-flat, sharp-down, sharp-up,
+        #       natural-down, natural-up, flat-down, flat-up,
+        #       slash-quarter-sharp, slash-sharp, slash-flat, double-slash-flat
+        #       sharp-1, 2, 3, 5, flat-1, 2, 3, 4, sori, koron
+
+
+        parentheses = mxAccidental.get('parentheses')
+        bracket = mxAccidental.get('bracket')
+        if parentheses == 'yes' and bracket == 'yes':
+            acc.displayStyle = 'both'
+        elif parentheses == 'yes':
+            acc.displayStyle = 'parentheses'
+        elif bracket == 'yes':
+            acc.displayStyle = 'bracket'
+
+        # TODO: attr: cautionary
+        # TODO: attr: editorial
+        # TODO: attr: size
+        # TODO: attr: default-x
+        # TODO: attr: default-y
+        # TODO: attr: relative-x
+        # TODO: attr: relative-y
+        # TODO: attr: font-family
+        # TODO: attr: font-style
+        # TODO: attr: font-size
+        # TODO: attr: font-weight
+        # TODO: attr: color
     
         if inputM21 is None:
             return acc
@@ -2307,14 +2366,16 @@ class MeasureParser(XMLParserBase):
             n.tie = self.xmlToTie(mxNote)
             # provide all because of tied...
             # TODO: find tied if tie is not found... (cue notes)
-            
-        mxNotations = mxNote.find('notations')
-        if mxNotations is not None:
-            self.xmlNotations(mxNotations, n)
 
         # translate if necessary, otherwise leaves unchanged
         if isGrace is True:
             n = self.xmlGraceToGrace(mxGrace, n)
+        # this must be before notations, to get the slurs, etc.
+        # attached to the grace notes...
+            
+        mxNotations = mxNote.findall('notations')
+        for mxN in mxNotations:
+            self.xmlNotations(mxN, n)
         
         return n
             
@@ -2953,13 +3014,17 @@ class MeasureParser(XMLParserBase):
         returnTuplets = [None] * 8
         removeFromActiveTuplets = set()
         
+        # a set of tuplets to set to stop...
+        tupletsToStop = set()
+        
         if mxNotations is not None:
             mxTuplets = mxNotations.findall('tuplet')
             for mxTuplet in mxTuplets:
                 # TODO: combine start + stop into startStop.
                 t.type = mxTuplet.get('type') # required            
                 tupletNumberStr = mxTuplet.get('number') # str "1" to "6" or None
-                tupletIndex = int(tupletNumberStr) if tupletNumberStr is not None else 0
+                # no tuplet number is equal to 1
+                tupletIndex = int(tupletNumberStr) if tupletNumberStr is not None else 1
                 
                 if t.type == 'stop':
                     if self.activeTuplets[tupletIndex] is not None:
@@ -2967,6 +3032,8 @@ class MeasureParser(XMLParserBase):
                         if activeT in returnTuplets:
                             activeT.type = 'startStop'
                         removeFromActiveTuplets.add(tupletIndex)
+                        tupletsToStop.add(tupletIndex)
+
                     continue
                 
                 mxTupletActual = mxTuplet.find('tuplet-actual')
@@ -2974,7 +3041,7 @@ class MeasureParser(XMLParserBase):
                 if mxTupletActual is None or mxTupletNormal is None:
                     # in theory either can be absent, but so far I have only seen both present
                     # or both absent
-                    t = copy.deepcopy(timeModTup) 
+                    t = copy.deepcopy(timeModTup)
                 else:
                     t = duration.Tuplet()
                     seta(t, mxTupletActual, 'tuplet-number', 'numberNotesActual', transform=int)
@@ -2994,7 +3061,9 @@ class MeasureParser(XMLParserBase):
                         dots = len(mxNormalType.findall('tuplet-dot'))              
                         t.durationNormal = duration.durationTupleFromTypeDots(durType, dots)           
                  
-                t.bracket = xmlObjects.yesNoToBoolean(mxTuplet.get('bracket'))
+                bracketMaybe = mxTuplet.get('bracket')
+                if bracketMaybe is not None:
+                    t.bracket = xmlObjects.yesNoToBoolean(bracketMaybe)
                 #environLocal.printDebug(['got bracket', self.bracket])
                 showNumber = mxTuplet.get('show-number')
                 if showNumber is not None and showNumber == 'none':
@@ -3026,6 +3095,10 @@ class MeasureParser(XMLParserBase):
             if thisActive in returnTuplets:
                 continue
             thisActiveCopy = copy.deepcopy(thisActive)
+            if i in tupletsToStop:
+                thisActiveCopy.type = 'stop'
+            else:
+                thisActiveCopy.type = None
             remainingTupletAmountToAccountFor /= thisActiveCopy.tupletMultiplier()
             returnTuplets[i] = thisActiveCopy
     
@@ -3040,6 +3113,7 @@ class MeasureParser(XMLParserBase):
 
         # now we can remove stops for future notes.
         for tupletIndexToRemove in removeFromActiveTuplets:
+            # set to stop before removing
             self.activeTuplets[tupletIndexToRemove] = None
     
         returnTuplets = [t for t in returnTuplets if t is not None]
@@ -3700,14 +3774,28 @@ class MeasureParser(XMLParserBase):
             self.stream.layoutWidth = width
 
     def parseAttributesTag(self, mxAttributes):
+        '''
+        Parses a single attributes tag (mxAttributes) and sets
+        
+        self.attributesAreInternal to False,
+        self.activeAttributes to mxAttributes,
+        self.parent.activeAttributes to mxAttributes
+        and then runs the appropriate attributeTagsToMethods for
+        the attribute.
+        
+        Also sets self.divisions for the current divisions
+        (along with self.parent.lastDivisions) 
+        and self.transposition and
+        to the current transpose.
+        '''
         self.attributesAreInternal = False
         self.activeAttributes = mxAttributes
-        self.parent.activeAttributes = self.activeAttributes
         for mxSub in mxAttributes:
             meth = None
             # key, clef, time, details
             if mxSub.tag in self.attributeTagsToMethods:
                 meth = getattr(self, self.attributeTagsToMethods[mxSub.tag])
+                
             if meth is not None:
                 meth(mxSub)
             elif mxSub.tag == 'staves':
@@ -3716,13 +3804,15 @@ class MeasureParser(XMLParserBase):
         divisionsTag = mxAttributes.find('divisions')
         if divisionsTag is not None:
             self.divisions = common.opFrac(float(divisionsTag.text))
-            self.parent.lastDivisions = self.divisions
         
         transposeTag = mxAttributes.find('transpose')
         if transposeTag is not None:
             self.transposition = self.xmlTransposeToInterval(transposeTag)
             #environLocal.warn("Got a transposition of ", str(self.transposition) )
 
+        if self.parent is not None:
+            self.parent.lastDivisions = self.divisions
+            self.parent.activeAttributes = self.activeAttributes
 
     def xmlTransposeToInterval(self, mxTranspose):
         '''
@@ -3812,7 +3902,7 @@ class MeasureParser(XMLParserBase):
     def handleTimeSignature(self, mxTime):
         ts = self.xmlToTimeSignature(mxTime)
         if ts is not None:
-            self.insertCoreAndRef(0, mxTime, ts)
+            self.insertCoreAndRef(self.offsetMeasureNote, mxTime, ts)
         
     def xmlToTimeSignature(self, mxTime):
         '''
@@ -3831,16 +3921,26 @@ class MeasureParser(XMLParserBase):
         >>> MP.xmlToTimeSignature(mxTime).symbol
         'common'
         
+        Multiple times:
+        
         >>> mxTime = ET.fromstring('<time><beats>3</beats><beat-type>8</beat-type>' + 
         ...                              '<beats>4</beats><beat-type>4</beat-type></time>')        
         >>> MP.xmlToTimeSignature(mxTime)
         <music21.meter.TimeSignature 3/8+4/4>    
 
+        >>> mxTime = ET.fromstring('<time><beats>3+2</beats><beat-type>8</beat-type></time>')        
+        >>> ts32 = MP.xmlToTimeSignature(mxTime)
+        >>> ts32
+        <music21.meter.TimeSignature 3/8+2/8>
+
+        Senza Misura
+
         >>> mxSenza = ET.fromstring('<time><senza-misura>0</senza-misura></time>')        
         >>> MP.xmlToTimeSignature(mxSenza)
         <music21.meter.SenzaMisuraTimeSignature 0 >
 
-        Small Time Signatures
+
+        Small Duration Time Signatures
 
         >>> mxTime = ET.fromstring('<time><beats>3</beats><beat-type>32</beat-type></time>')        
         >>> MP.xmlToTimeSignature(mxTime)
@@ -3878,7 +3978,6 @@ class MeasureParser(XMLParserBase):
             try:
                 ts = meter.TimeSignature(msg[0])
             except meter.MeterException:
-                ts = meter.TimeSignature(msg[0])
                 raise MusicXMLImportException("Cannot process time signature {}".format(msg[0]))
         else:
             ts = meter.TimeSignature()
@@ -3969,11 +4068,12 @@ class MeasureParser(XMLParserBase):
         convert mxKey to a Key or KeySignature and run insertCoreAndRef on it
         '''
         keySig = self.xmlToKeySignature(mxKey)
-        self.insertCoreAndRef(0, mxKey, keySig)
+        self.insertCoreAndRef(self.offsetMeasureNote, mxKey, keySig)
 
     def xmlToKeySignature(self, mxKey):
         '''
-        Returns either a KeySignature or a Key object based on whether mode is present.
+        Returns either a KeySignature (traditional or non-traditional) 
+        or a Key object based on whether fifths and mode is present.
         
         >>> import xml.etree.ElementTree as ET
         >>> mxKey = ET.fromstring('<key><fifths>-4</fifths></key>')
@@ -3998,9 +4098,12 @@ class MeasureParser(XMLParserBase):
         >>> MP.xmlToKeySignature(mxKey)
         <music21.key.KeySignature of 4 flats>
         '''
+        if mxKey.find('fifths') is None:
+            return self.nonTraditionalKeySignature(mxKey)
+        
         ks = key.KeySignature()
         seta = _setAttributeFromTagText
-        seta(ks, mxKey, 'fifths', 'sharps', transform=int)
+        seta(ks, mxKey, 'fifths', 'sharps', transform=int)        
         
         mxKeyMode = mxKey.find('mode')
         if mxKeyMode is None:
@@ -4014,6 +4117,70 @@ class MeasureParser(XMLParserBase):
             return k
         except exceptions21.Music21Exception:
             return ks # mxKeyMode might not be a valid mode -- in which case ignore...
+    
+    def nonTraditionalKeySignature(self, mxKey):
+        '''
+        Returns a KeySignature object that represents a nonTraditional Key Signature
+        
+        called by xmlToKeySignature if <fifths> is not present.
+
+        >>> import xml.etree.ElementTree as ET
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+
+        >>> mxKey = ET.fromstring('<key><key-step>E</key-step><key-alter>-1</key-alter></key>')        
+        >>> MP.nonTraditionalKeySignature(mxKey)
+        <music21.key.KeySignature of pitches: [E-]>
+        
+        Should be the same:
+        
+        >>> MP.xmlToKeySignature(mxKey)
+        <music21.key.KeySignature of pitches: [E-]>
+        '''
+        allChildren = list(mxKey.getchildren())
+        
+        lastTag = None
+        allSteps = []
+        allAlters = []
+        allAccidentals = []
+        
+        for c in allChildren:
+            tag = c.tag
+            if lastTag == 'key-alter' and tag == 'key-step':
+                allAccidentals.append(None)
+
+            if tag == 'key-step':
+                allSteps.append(c.text)
+            elif tag == 'key-alter':
+                allAlters.append(float(c.text))
+            elif tag == 'key-accidental':
+                allAccidentals.append(c.text)
+            lastTag = tag    
+                
+        if len(allAccidentals) < len(allAlters):
+            allAccidentals.append(None)
+        if len(allSteps) != len(allAlters):
+            raise MusicXMLImportException(
+                'For non traditional signatures each step must have an alter')
+
+        ks = key.KeySignature()
+        
+        alteredPitches = []
+        for i in range(len(allSteps)):
+            thisStep = allSteps[i]
+            thisAlter = allAlters[i]
+            thisAccidental = allAccidentals[i]
+            p = pitch.Pitch(thisStep)
+            if thisAccidental is not None:
+                p.accidental = pitch.Accidental(self.mxAccidentalNameToM21[thisAccidental])
+                p.accidental.alter = thisAlter
+            else:
+                p.accidental = pitch.Accidental(thisAlter)
+            
+            alteredPitches.append(p)
+            
+        ks.alteredPitches = alteredPitches
+        return ks
+    
     
     def handleStaffDetails(self, mxDetails):
         '''
@@ -4072,8 +4239,7 @@ class MeasureParser(XMLParserBase):
         if foundMatch is False:
             stl = self.xmlStaffLayoutFromStaffDetails(mxDetails)
             
-            # should this be 0.0 or current offset?
-            self.insertCoreAndRef(0.0, mxDetails, stl)
+            self.insertCoreAndRef(self.offsetMeasureNote, mxDetails, stl)
             self.staffLayoutObjects.append(stl)
 
     def xmlStaffLayoutFromStaffDetails(self, mxDetails):
@@ -4100,6 +4266,9 @@ class MeasureParser(XMLParserBase):
         measure + multimeasure repeats, slashed repeats, etc.
         
         But currently only multiMeasure rests are supported.
+        
+        Each of these applies to the entire measure, so there's
+        no need to insert into the stream.
         '''
         # TODO: attr: number (staff number)
         # TODO: attr-group font
@@ -4594,15 +4763,15 @@ class Test(unittest.TestCase):
         # all playing A4 in concert pitch.
         
         
-        iStream1 = s.parts[0].flat.getElementsByClass('Instrument')
+        iStream1 = s.parts[0].flat.getElementsByClass('Instrument').stream()
         # three instruments; one initial, and then one for each transposition
         self.assertEqual(len(iStream1), 3)
         # should be 3
-        iStream2 = s.parts[1].flat.getElementsByClass('Instrument')
+        iStream2 = s.parts[1].flat.getElementsByClass('Instrument').stream()
         self.assertEqual(len(iStream2), 3)
         #i2 = iStream2[0]
 
-        iStream3 = s.parts[2].flat.getElementsByClass('Instrument')
+        iStream3 = s.parts[2].flat.getElementsByClass('Instrument').stream()
         self.assertEqual(len(iStream3), 1)
         i3 = iStream3[0]
 
@@ -5009,6 +5178,71 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(firstChord), '<music21.chord.Chord G4 B4>')
         self.assertEqual(firstChord.offset, 1.0)
 
+    def testParseTupletStartStop(self):
+        '''
+        test that three notes with tuplets start, none, stop
+        have these types
+        '''
+        
+        def getNoteByTupletTypeNumber(tupletType=None, number=None):
+            mxNBase = '''
+            <note>
+            <pitch>
+              <step>C</step>
+              <octave>4</octave>
+            </pitch>
+            <duration>56</duration>
+            <voice>1</voice>
+            <type>quarter</type>
+            <time-modification>
+              <actual-notes>3</actual-notes>
+              <normal-notes>2</normal-notes>
+            </time-modification>
+            '''
+            mxNEnd = '</note>'
+            if tupletType is None:
+                return mxNBase + mxNEnd
+            
+            if number is None:
+                mxNMiddle = '<notations><tuplet type="%s" /></notations>' % tupletType
+            else:
+                mxNMiddle = '<notations><tuplet number="%d" type="%s" /></notations>' % (
+                            number, tupletType)
+            return mxNBase + mxNMiddle + mxNEnd    
+            
+            
+        n0 = getNoteByTupletTypeNumber('start', 1)
+        n1 = getNoteByTupletTypeNumber()
+        n2 = getNoteByTupletTypeNumber('stop', 1)
+                
+        MP = MeasureParser()
+        tupTypes = ('start', None, 'stop')
+        for i, n in enumerate([n0, n1, n2]):            
+            mxNote = ET.fromstring(n)
+            #mxNotations = mxNote.find('notations')
+            #mxTuplets = mxNotations.findall('tuplet')
+            tups = MP.xmlToTuplets(mxNote)
+            self.assertEqual(len(tups), 1)
+            self.assertEqual(tups[0].type, tupTypes[i])
+
+        # without number....        
+        n0 = getNoteByTupletTypeNumber('start')
+        n1 = getNoteByTupletTypeNumber()
+        n2 = getNoteByTupletTypeNumber('stop')
+        
+        MP = MeasureParser()
+        tupTypes = ('start', None, 'stop')
+        for i, n in enumerate([n0, n1, n2]):            
+            mxNote = ET.fromstring(n)
+            #mxNotations = mxNote.find('notations')
+            #mxTuplets = mxNotations.findall('tuplet')
+            tups = MP.xmlToTuplets(mxNote)
+            self.assertEqual(len(tups), 1)
+            self.assertEqual(tups[0].type, tupTypes[i])
+
+
+        
+
     def testComplexTupletNote(self):
         '''
         test that a note with nested tuplets gets converted properly.
@@ -5084,7 +5318,7 @@ class Test(unittest.TestCase):
             
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='testParseTupletStartStop')
     
     
     

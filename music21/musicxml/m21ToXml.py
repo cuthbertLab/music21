@@ -118,6 +118,19 @@ def accidentalToMx(a):
     >>> XB.dump(mxAccidental)
     <accidental>three-quarters-flat</accidental>
 
+    >>> a.set('sharp')
+    >>> a2m = musicxml.m21ToXml.accidentalToMx
+    >>> a.displayStyle = 'parentheses'
+    >>> XB.dump(a2m(a))
+    <accidental parentheses="yes">sharp</accidental>
+    
+    >>> a.displayStyle = 'bracket'
+    >>> XB.dump(a2m(a))
+    <accidental bracket="yes">sharp</accidental>
+    
+    >>> a.displayStyle = 'both'
+    >>> XB.dump(a2m(a))
+    <accidental bracket="yes" parentheses="yes">sharp</accidental>
     '''
     if a.name == "half-sharp": 
         mxName = "quarter-sharp"
@@ -137,6 +150,11 @@ def accidentalToMx(a):
     #         if self.displayStatus == False:
     #             pass
     mxAccidental.text = mxName
+    if a.displayStyle in ('parentheses', 'both'):
+        mxAccidental.set('parentheses', 'yes')
+    if a.displayStyle in ('bracket', 'both'):
+        mxAccidental.set('bracket', 'yes')        
+    
     return mxAccidental
     
 
@@ -1835,6 +1853,10 @@ class PartExporter(XMLExporterBase):
 
         self.instrumentStream = None
         self.firstInstrumentObject = None
+        
+        # keep track of this so that we only put out new attributes when something
+        # has changed
+        self.lastDivisions = None
 
         self.spannerBundle = partObj.spannerBundle
 
@@ -2069,9 +2091,14 @@ class MeasureExporter(XMLExporterBase):
                 ('MetricModulation', 'tempoIndicationToXml'),
                 ('TextExpression', 'textExpressionToXml'),
                 ('RepeatExpression', 'textExpressionToXml'),
-                ('Clef', 'midmeasureClefToXml'),
                ])
-    ignoreOnParseClasses = set(['KeySignature', 'LayoutBase', 'TimeSignature', 'Barline'])
+    wrapAttributeMethodClasses = OrderedDict(
+        [('Clef', 'clefToXml'),
+         ('KeySignature', 'keySignatureToXml'),
+         ('TimeSignature', 'timeSignatureToXml'),
+        ])
+    
+    ignoreOnParseClasses = set(['LayoutBase', 'Barline'])
     
     
     def __init__(self, measureObj=None, parent=None):
@@ -2091,7 +2118,7 @@ class MeasureExporter(XMLExporterBase):
         self.measureOffsetStart = 0.0
         self.offsetInMeasure = 0.0
         self.currentVoiceId = None
-        
+                
         self.rbSpanners = [] # repeatBracket spanners
         
         if parent is None:
@@ -2114,7 +2141,7 @@ class MeasureExporter(XMLExporterBase):
         self.setRbSpanners()
         self.setMxAttributes()
         self.setMxPrint()
-        self.setMxAttributesObject()
+        self.setMxAttributesObjectForStartOfMeasure()
         self.setLeftBarline()
         self.mainElementsParse()
         self.setRightBarline()
@@ -2205,20 +2232,31 @@ class MeasureExporter(XMLExporterBase):
             objList = [obj]
         
         
-        ignore = False
+        parsedObject = False
         for className, methName in self.classesToMethods.items():
             if className in classes:
                 meth = getattr(self, methName)
                 for o in objList:
                     meth(o)
-                ignore = True
+                parsedObject = True
                 break
-        if ignore is False:
+            
+        # these are classes that need to be wrapped in an attribute tag if
+        # not at the beginning of a measure
+        for className, methName in self.wrapAttributeMethodClasses.items():
+            if className in classes:
+                meth = getattr(self, methName)
+                for o in objList:
+                    self.wrapObjectInAttributes(o, meth)
+                parsedObject = True
+                break
+            
+        if parsedObject is False:
             for className in classes:
                 if className in self.ignoreOnParseClasses:
-                    ignore = True
+                    parsedObject = True
                     break
-            if ignore is False:
+            if parsedObject is False:
                 environLocal.printDebug(['did not convert object', obj])
 
         for sp in postList: # directions that follow the element
@@ -4046,18 +4084,27 @@ class MeasureExporter(XMLExporterBase):
         self.xmlRoot.append(mxDirection)
         return mxDirection
             
-    def midmeasureClefToXml(self, clefObj):
+    def wrapObjectInAttributes(self, objectToWrap, methodToMx):
         '''
-        given a clefObj which is in .elements insert it in self.xmlRoot as
-        an attribute if it is not at offset 0.0.
+        given a clefObj which is in .elements and not m.clef insert it in self.xmlRoot as
+        part of the current mxAttributes
+        
+        (or insert into a new mxAttributes if Clef is not at the beginning
+        of the measure and not at the same point as an existing mxAttributes)
         '''
-        if self.offsetInMeasure == 0 and clefObj.offset == 0:
+        if self.offsetInMeasure == 0.0:
             return
+        
         mxAttributes = Element('attributes')
-        mxClef = self.clefToXml(clefObj)
-        mxAttributes.append(mxClef)
+
+        mxObj = methodToMx(objectToWrap)
+        mxAttributes.append(mxObj)
+        
         self.xmlRoot.append(mxAttributes)
+        
         return mxAttributes
+    
+    
     
     #------------------------------
     # note helpers...
@@ -4319,17 +4366,27 @@ class MeasureExporter(XMLExporterBase):
         # TODO: attr: winged
         return mxRepeat
 
-    def setMxAttributesObject(self):
+    def setMxAttributesObjectForStartOfMeasure(self):
         '''
-        creates an <attributes> tag (always? or if needed...)
+        creates an <attributes> tag at the start of the measure.
+        
+        We create one for each measure unless it is identical to self.parent.mxAttributes
         '''
         m = self.stream
-        self.currentDivisions = defaults.divisionsPerQuarter
         mxAttributes = Element('attributes')
         # TODO: footnote
         # TODO: level
-        mxDivisions = SubElement(mxAttributes, 'divisions')
-        mxDivisions.text = str(self.currentDivisions)
+        
+        
+        # TODO: Do something more intelligent with this...
+        self.currentDivisions = defaults.divisionsPerQuarter
+        
+        if self.parent is None or self.currentDivisions != self.parent.lastDivisions:
+            mxDivisions = SubElement(mxAttributes, 'divisions')
+            mxDivisions.text = str(self.currentDivisions)
+            self.parent.lastDivisions = self.currentDivisions
+        
+        
         if 'Measure' in m.classes:
             if m.keySignature is not None:
                 mxAttributes.append(self.keySignatureToXml(m.keySignature))
@@ -4544,6 +4601,20 @@ class MeasureExporter(XMLExporterBase):
           <fifths>-3</fifths>
           <mode>major</mode>
         </key>
+
+        >>> ksNonTrad = key.KeySignature()
+        >>> ksNonTrad.alteredPitches = ['C#', 'E-']
+        >>> ksNonTrad
+        <music21.key.KeySignature of pitches: [C#, E-]>
+        
+        >>> mxKeyNonTrad = MEX.keySignatureToXml(ksNonTrad)
+        >>> MEX.dump(mxKeyNonTrad)
+        <key>
+          <key-step>C</key-step>
+          <key-alter>1</key-alter>
+          <key-step>E</key-step>
+          <key-alter>-1</key-alter>
+        </key>
         '''
         seta = _setTagTextFromAttribute
         mxKey = Element('key')
@@ -4551,24 +4622,30 @@ class MeasureExporter(XMLExporterBase):
         # TODO: attr: print-style
         # TODO: attr: print-object
         
-        # choice... non-traditional-key...
-        # TODO: key-step
-        # TODO: key-alter
-        # TODO: key-accidental
+        if not keyOrKeySignature.isNonTraditional:
+            # Choice traditional-key
+            # TODO: cancel
+            seta(keyOrKeySignature, mxKey, 'fifths', 'sharps')
+            if hasattr(keyOrKeySignature, 'mode') and keyOrKeySignature.mode is not None:
+                if (environLocal.xmlReaderType() == 'Musescore' 
+                        and keyOrKeySignature.mode not in ('major', 'minor')):
+                    # Musescore up to v. 2 has major problems with modes other than major or minor
+                    # Fixed in latest Nightlys
+                    pass            
+                else:
+                    seta(keyOrKeySignature, mxKey, 'mode')
+                                        
+        else:
+            # choice... non-traditional-key...
+            for p in keyOrKeySignature.alteredPitches:
+                seta(p, mxKey, 'key-step', 'step')
+                a = p.accidental
+                if a is None: # ???
+                    a = pitch.Accidental(0)
+                mxAlter = SubElement(mxKey, 'key-alter')
+                mxAlter.text = str(common.numToIntOrFloat(a.alter))
+                # TODO: key-accidental
         
-        # Choice traditional-key
-        
-        # TODO: cancel
-        seta(keyOrKeySignature, mxKey, 'fifths', 'sharps')
-        if hasattr(keyOrKeySignature, 'mode') and keyOrKeySignature.mode is not None:
-            if (environLocal.xmlReaderType() == 'Musescore' 
-                    and keyOrKeySignature.mode not in ('major', 'minor')):
-                # Musescore up to v. 2 has major problems with modes other than major or minor
-                # Fixed in latest Nightlys
-                pass            
-            else:
-                seta(keyOrKeySignature, mxKey, 'mode')
-                
         # TODO: key-octave
         return mxKey
         

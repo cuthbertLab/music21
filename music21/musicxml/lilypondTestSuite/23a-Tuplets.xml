@@ -25,7 +25,7 @@
           <mode>major</mode>
         </key>
         <time>
-          <beats>14</beats>
+          <beats>4</beats>
           <beat-type>4</beat-type>
         </time>
         <clef>
@@ -123,6 +123,8 @@
           <tuplet type="stop"/>
         </notations>
       </note>
+   </measure>
+   <measure number="2">
       <note>
         <pitch>
           <step>B</step>
@@ -226,6 +228,8 @@
           <tuplet number="1" type="stop"/>
         </notations>
       </note>
+    </measure>
+    <measure number="3">
       <note>
         <pitch>
           <step>B</step>
@@ -381,6 +385,8 @@
           <tuplet number="1" type="stop"/>
         </notations>
       </note>
+    </measure>
+    <measure number="4">
       <note>
         <pitch>
           <step>A</step>
@@ -464,6 +470,15 @@
         <notations>
           <tuplet number="1" type="stop"/>
         </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>168</duration>
+        <voice>1</voice>
+        <type>half</type>
       </note>
       <barline location="right">
         <bar-style>light-heavy</bar-style>

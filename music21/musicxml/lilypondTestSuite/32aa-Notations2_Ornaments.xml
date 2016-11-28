@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="2.0">
+  <movement-title>MusicXML ornaments (attached to note)</movement-title>
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">All &lt;ornament&gt; elements 
+          defined in MusicXML. The lyrics show the ornament assigned to each 
+          note.</miscellaneous-field>
+    </miscellaneous>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name></part-name>
+    </score-part>
+  </part-list>
+  <!--=========================================================-->
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key>
+          <fifths>0</fifths>
+          <mode>major</mode>
+        </key>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+    <!-- Ornaments:
+         trill-mark | turn | delayed-turn | inverted-turn |
+         shake | wavy-line | mordent | inverted-mordent | 
+         schleifer | tremolo | other-ornament), 
+         accidental-mark 
+         
+         Test cases for various tremolo options are in a separate 
+         unit test file
+         -->
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <ornaments><trill-mark/></ornaments>
+        </notations>
+        <lyric number="1"><text>tr.</text></lyric>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <ornaments><turn/></ornaments>
+        </notations>
+        <lyric number="1"><text>turn</text></lyric>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <ornaments><delayed-turn/></ornaments>
+        </notations>
+        <lyric number="1"><text>del.turn</text></lyric>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <ornaments><inverted-turn/></ornaments>
+        </notations>
+        <lyric number="1"><text>inv.turn</text></lyric>
+      </note>
+    </measure>
+    <measure number="2">
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <ornaments><shake/></ornaments>
+        </notations>
+        <lyric number="1"><text>shake</text></lyric>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <ornaments>
+            <wavy-line number="1" placement="below" type="start"/>
+          </ornaments>
+        </notations>
+        <lyric number="1"><syllabic>begin</syllabic><text>wavy</text></lyric>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <ornaments>
+            <wavy-line number="1" placement="below" type="stop"/>
+            <wavy-line number="2" placement="below" type="start"/>
+          </ornaments>
+        </notations>
+        <lyric number="1"><syllabic>middle</syllabic><text>wavy</text></lyric>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <ornaments>
+            <wavy-line number="2" placement="below" type="stop"/>
+          </ornaments>
+        </notations>
+        <lyric number="1"><syllabic>end</syllabic><text>line</text></lyric>
+      </note>
+    </measure>
+    <measure number="3">
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <ornaments><mordent/></ornaments>
+        </notations>
+        <lyric number="1"><text>mord.</text></lyric>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <ornaments><inverted-mordent/></ornaments>
+        </notations>
+        <lyric number="1"><text>inv.mord.</text></lyric>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <ornaments><schleifer/></ornaments>
+        </notations>
+        <lyric number="1"><text>schl.</text></lyric>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <ornaments><tremolo>3</tremolo></ornaments>
+        </notations>
+        <lyric number="1"><text>trem.</text></lyric>
+      </note>
+    </measure>
+    <measure number="4">
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <ornaments>
+            <turn/>
+            <accidental-mark>natural</accidental-mark>
+          </ornaments>
+        </notations>
+        <lyric number="1"><text>turn+acc.</text></lyric>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <ornaments>
+            <turn/>
+            <accidental-mark placement="above">sharp</accidental-mark>
+            <accidental-mark placement="above">three-quarters-flat</accidental-mark>
+          </ornaments>
+        </notations>
+        <lyric number="1"><text>turn+acc.(ab.+bel./rel to turn)</text></lyric>
+      </note>
+      <note>
+        <rest/>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+      </note>
+      <barline location="right">
+        <bar-style>light-light</bar-style>
+      </barline>
+    </measure>
+  </part>
+</score-partwise>

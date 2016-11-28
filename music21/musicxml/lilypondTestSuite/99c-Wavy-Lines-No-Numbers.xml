@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="2.0">
+  <movement-title>Wavy Line with no number but stop before start</movement-title>
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">A wavy line starts on the first note, ends on the second,
+          starts again on the second and ends on the third.  No numbers given.
+
+          This is very bad, but technically not incorrect MusicXML.
+     </miscellaneous-field>
+    </miscellaneous>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name></part-name>
+    </score-part>
+  </part-list>
+  <!--=========================================================-->
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key>
+          <fifths>0</fifths>
+          <mode>major</mode>
+        </key>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+    <!-- Ornaments:
+         trill-mark | turn | delayed-turn | inverted-turn |
+         shake | wavy-line | mordent | inverted-mordent | 
+         schleifer | tremolo | other-ornament), 
+         accidental-mark 
+         
+         Test cases for various tremolo options are in a separate 
+         unit test file
+         -->
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <ornaments>
+            <wavy-line placement="below" type="start"/>
+          </ornaments>
+        </notations>
+        <lyric number="1"><syllabic>begin</syllabic><text>wavy</text></lyric>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <ornaments>
+            <wavy-line placement="below" type="stop"/>
+            <wavy-line placement="below" type="start" number="1"/>
+          </ornaments>
+        </notations>
+        <lyric number="1"><syllabic>middle</syllabic><text>wavy</text></lyric>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <ornaments>
+            <wavy-line placement="below" type="stop" number="1"/>
+          </ornaments>
+        </notations>
+        <lyric number="1"><syllabic>end</syllabic><text>line</text></lyric>
+      </note>
+    </measure>
+  </part>
+</score-partwise>

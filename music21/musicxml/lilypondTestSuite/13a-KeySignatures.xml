@@ -5,8 +5,8 @@
   <movement-title>Different Key signatures</movement-title>
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Various key signature: from 11
-            flats to 11 sharps (each one first one measure in major, then one
+      <miscellaneous-field name="description">Various standard key signatures: from 7
+            flats to 7 sharps (each one first one measure in major, then one
             measure in minor)</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -21,10 +21,10 @@
       <attributes>
         <divisions>1</divisions>
         <key>
-          <fifths>-11</fifths>
+          <fifths>-7</fifths>
           <mode>major</mode>
         </key>
-        <time symbol="common">
+        <time>
           <beats>2</beats>
           <beat-type>4</beat-type>
         </time>
@@ -46,7 +46,7 @@
     <measure number="2">
       <attributes>
         <key>
-          <fifths>-11</fifths>
+          <fifths>-7</fifths>
           <mode>minor</mode>
         </key>
       </attributes>
@@ -63,7 +63,7 @@
     <measure number="3">
       <attributes>
         <key>
-          <fifths>-10</fifths>
+          <fifths>-6</fifths>
           <mode>major</mode>
         </key>
       </attributes>
@@ -80,7 +80,7 @@
     <measure number="4">
       <attributes>
         <key>
-          <fifths>-10</fifths>
+          <fifths>-6</fifths>
           <mode>minor</mode>
         </key>
       </attributes>
@@ -97,7 +97,7 @@
     <measure number="5">
       <attributes>
         <key>
-          <fifths>-9</fifths>
+          <fifths>-5</fifths>
           <mode>major</mode>
         </key>
       </attributes>
@@ -114,7 +114,7 @@
     <measure number="6">
       <attributes>
         <key>
-          <fifths>-9</fifths>
+          <fifths>-5</fifths>
           <mode>minor</mode>
         </key>
       </attributes>
@@ -131,7 +131,7 @@
     <measure number="7">
       <attributes>
         <key>
-          <fifths>-8</fifths>
+          <fifths>-4</fifths>
           <mode>major</mode>
         </key>
       </attributes>
@@ -148,7 +148,7 @@
     <measure number="8">
       <attributes>
         <key>
-          <fifths>-8</fifths>
+          <fifths>-4</fifths>
           <mode>minor</mode>
         </key>
       </attributes>
@@ -165,7 +165,7 @@
     <measure number="9">
       <attributes>
         <key>
-          <fifths>-7</fifths>
+          <fifths>-3</fifths>
           <mode>major</mode>
         </key>
       </attributes>
@@ -182,7 +182,7 @@
     <measure number="10">
       <attributes>
         <key>
-          <fifths>-7</fifths>
+          <fifths>-3</fifths>
           <mode>minor</mode>
         </key>
       </attributes>
@@ -199,7 +199,7 @@
     <measure number="11">
       <attributes>
         <key>
-          <fifths>-6</fifths>
+          <fifths>-2</fifths>
           <mode>major</mode>
         </key>
       </attributes>
@@ -216,7 +216,7 @@
     <measure number="12">
       <attributes>
         <key>
-          <fifths>-6</fifths>
+          <fifths>-2</fifths>
           <mode>minor</mode>
         </key>
       </attributes>
@@ -233,7 +233,7 @@
     <measure number="13">
       <attributes>
         <key>
-          <fifths>-5</fifths>
+          <fifths>-1</fifths>
           <mode>major</mode>
         </key>
       </attributes>
@@ -250,7 +250,7 @@
     <measure number="14">
       <attributes>
         <key>
-          <fifths>-5</fifths>
+          <fifths>-1</fifths>
           <mode>minor</mode>
         </key>
       </attributes>
@@ -267,7 +267,7 @@
     <measure number="15">
       <attributes>
         <key>
-          <fifths>-4</fifths>
+          <fifths>0</fifths>
           <mode>major</mode>
         </key>
       </attributes>
@@ -284,7 +284,7 @@
     <measure number="16">
       <attributes>
         <key>
-          <fifths>-4</fifths>
+          <fifths>0</fifths>
           <mode>minor</mode>
         </key>
       </attributes>
@@ -301,7 +301,7 @@
     <measure number="17">
       <attributes>
         <key>
-          <fifths>-3</fifths>
+          <fifths>1</fifths>
           <mode>major</mode>
         </key>
       </attributes>
@@ -318,7 +318,7 @@
     <measure number="18">
       <attributes>
         <key>
-          <fifths>-3</fifths>
+          <fifths>1</fifths>
           <mode>minor</mode>
         </key>
       </attributes>
@@ -335,7 +335,7 @@
     <measure number="19">
       <attributes>
         <key>
-          <fifths>-2</fifths>
+          <fifths>2</fifths>
           <mode>major</mode>
         </key>
       </attributes>
@@ -352,7 +352,7 @@
     <measure number="20">
       <attributes>
         <key>
-          <fifths>-2</fifths>
+          <fifths>2</fifths>
           <mode>minor</mode>
         </key>
       </attributes>
@@ -369,7 +369,7 @@
     <measure number="21">
       <attributes>
         <key>
-          <fifths>-1</fifths>
+          <fifths>3</fifths>
           <mode>major</mode>
         </key>
       </attributes>
@@ -386,7 +386,7 @@
     <measure number="22">
       <attributes>
         <key>
-          <fifths>-1</fifths>
+          <fifths>3</fifths>
           <mode>minor</mode>
         </key>
       </attributes>
@@ -403,7 +403,7 @@
     <measure number="23">
       <attributes>
         <key>
-          <fifths>0</fifths>
+          <fifths>4</fifths>
           <mode>major</mode>
         </key>
       </attributes>
@@ -420,7 +420,7 @@
     <measure number="24">
       <attributes>
         <key>
-          <fifths>0</fifths>
+          <fifths>4</fifths>
           <mode>minor</mode>
         </key>
       </attributes>
@@ -437,7 +437,7 @@
     <measure number="25">
       <attributes>
         <key>
-          <fifths>1</fifths>
+          <fifths>5</fifths>
           <mode>major</mode>
         </key>
       </attributes>
@@ -454,7 +454,7 @@
     <measure number="26">
       <attributes>
         <key>
-          <fifths>1</fifths>
+          <fifths>5</fifths>
           <mode>minor</mode>
         </key>
       </attributes>
@@ -471,7 +471,7 @@
     <measure number="27">
       <attributes>
         <key>
-          <fifths>2</fifths>
+          <fifths>6</fifths>
           <mode>major</mode>
         </key>
       </attributes>
@@ -488,7 +488,7 @@
     <measure number="28">
       <attributes>
         <key>
-          <fifths>2</fifths>
+          <fifths>6</fifths>
           <mode>minor</mode>
         </key>
       </attributes>
@@ -505,7 +505,7 @@
     <measure number="29">
       <attributes>
         <key>
-          <fifths>3</fifths>
+          <fifths>7</fifths>
           <mode>major</mode>
         </key>
       </attributes>
@@ -522,279 +522,7 @@
     <measure number="30">
       <attributes>
         <key>
-          <fifths>3</fifths>
-          <mode>minor</mode>
-        </key>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>half</type>
-      </note>
-    </measure>
-    <measure number="31">
-      <attributes>
-        <key>
-          <fifths>4</fifths>
-          <mode>major</mode>
-        </key>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>half</type>
-      </note>
-    </measure>
-    <measure number="32">
-      <attributes>
-        <key>
-          <fifths>4</fifths>
-          <mode>minor</mode>
-        </key>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>half</type>
-      </note>
-    </measure>
-    <measure number="33">
-      <attributes>
-        <key>
-          <fifths>5</fifths>
-          <mode>major</mode>
-        </key>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>half</type>
-      </note>
-    </measure>
-    <measure number="34">
-      <attributes>
-        <key>
-          <fifths>5</fifths>
-          <mode>minor</mode>
-        </key>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>half</type>
-      </note>
-    </measure>
-    <measure number="35">
-      <attributes>
-        <key>
-          <fifths>6</fifths>
-          <mode>major</mode>
-        </key>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>half</type>
-      </note>
-    </measure>
-    <measure number="36">
-      <attributes>
-        <key>
-          <fifths>6</fifths>
-          <mode>minor</mode>
-        </key>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>half</type>
-      </note>
-    </measure>
-    <measure number="37">
-      <attributes>
-        <key>
           <fifths>7</fifths>
-          <mode>major</mode>
-        </key>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>half</type>
-      </note>
-    </measure>
-    <measure number="38">
-      <attributes>
-        <key>
-          <fifths>7</fifths>
-          <mode>minor</mode>
-        </key>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>half</type>
-      </note>
-    </measure>
-    <measure number="39">
-      <attributes>
-        <key>
-          <fifths>8</fifths>
-          <mode>major</mode>
-        </key>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>half</type>
-      </note>
-    </measure>
-    <measure number="40">
-      <attributes>
-        <key>
-          <fifths>8</fifths>
-          <mode>minor</mode>
-        </key>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>half</type>
-      </note>
-    </measure>
-    <measure number="41">
-      <attributes>
-        <key>
-          <fifths>9</fifths>
-          <mode>major</mode>
-        </key>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>half</type>
-      </note>
-    </measure>
-    <measure number="42">
-      <attributes>
-        <key>
-          <fifths>9</fifths>
-          <mode>minor</mode>
-        </key>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>half</type>
-      </note>
-    </measure>
-    <measure number="43">
-      <attributes>
-        <key>
-          <fifths>10</fifths>
-          <mode>major</mode>
-        </key>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>half</type>
-      </note>
-    </measure>
-    <measure number="44">
-      <attributes>
-        <key>
-          <fifths>10</fifths>
-          <mode>minor</mode>
-        </key>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>half</type>
-      </note>
-    </measure>
-    <measure number="45">
-      <attributes>
-        <key>
-          <fifths>11</fifths>
-          <mode>major</mode>
-        </key>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>2</duration>
-        <voice>1</voice>
-        <type>half</type>
-      </note>
-    </measure>
-    <measure number="46">
-      <attributes>
-        <key>
-          <fifths>11</fifths>
           <mode>minor</mode>
         </key>
       </attributes>

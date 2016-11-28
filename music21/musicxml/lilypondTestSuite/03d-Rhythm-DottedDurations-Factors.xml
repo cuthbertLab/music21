@@ -6,7 +6,7 @@
     <miscellaneous>
       <miscellaneous-field name="description">Several durations can be written
       with dots. For multimeasure rests, we can also have durations that
-      cannot be expressed with dotted notes (like 5/8).</miscellaneous-field>
+      cannot be expressed with dotted notes (5/16 and 9/8).</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -266,9 +266,13 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>1</duration>
+        <duration>62</duration>
         <voice>1</voice>
-        <type>16th</type>
+        <type>breve</type>
+        <dot/>
+        <dot/>
+        <dot/>
+        <dot/>
       </note>
     </measure>
     <!--=======================================================-->

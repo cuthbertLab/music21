@@ -2,11 +2,11 @@
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
+  <movement-title>Extreme Key signatures</movement-title>
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">All different modes: major, 
-        minor, ionian, dorian, phrygian, lydian, mixolydian, aeolian, and 
-        locrian; All modes are given with 2 sharps.</miscellaneous-field>
+      <miscellaneous-field name="description">Various extreme key signatures: from 11 flats to 7
+            flats and 7 sharps to 11 sharps (all marked as major)</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -20,11 +20,11 @@
       <attributes>
         <divisions>1</divisions>
         <key>
-          <fifths>2</fifths>
+          <fifths>-11</fifths>
           <mode>major</mode>
         </key>
         <time>
-          <beats>1</beats>
+          <beats>2</beats>
           <beat-type>4</beat-type>
         </time>
         <clef>
@@ -34,158 +34,169 @@
       </attributes>
       <note>
         <pitch>
-          <step>G</step>
+          <step>C</step>
           <octave>4</octave>
         </pitch>
-        <duration>1</duration>
+        <duration>2</duration>
         <voice>1</voice>
-        <type>quarter</type>
-        <lyric number="1"><text>major</text></lyric>
+        <type>half</type>
       </note>
     </measure>
     <measure number="2">
       <attributes>
         <key>
-          <fifths>2</fifths>
-          <mode>minor</mode>
+          <fifths>-10</fifths>
+          <mode>major</mode>
         </key>
       </attributes>
       <note>
         <pitch>
-          <step>G</step>
+          <step>C</step>
           <octave>4</octave>
         </pitch>
-        <duration>1</duration>
+        <duration>2</duration>
         <voice>1</voice>
-        <type>quarter</type>
-        <lyric number="1"><text>minor</text></lyric>
+        <type>half</type>
       </note>
     </measure>
     <measure number="3">
       <attributes>
         <key>
-          <fifths>2</fifths>
-          <mode>ionian</mode>
+          <fifths>-9</fifths>
+          <mode>major</mode>
         </key>
       </attributes>
       <note>
         <pitch>
-          <step>G</step>
+          <step>C</step>
           <octave>4</octave>
         </pitch>
-        <duration>1</duration>
+        <duration>2</duration>
         <voice>1</voice>
-        <type>quarter</type>
-        <lyric number="1"><text>ionian</text></lyric>
+        <type>half</type>
       </note>
     </measure>
     <measure number="4">
       <attributes>
         <key>
-          <fifths>2</fifths>
-          <mode>dorian</mode>
+          <fifths>-8</fifths>
+          <mode>major</mode>
         </key>
       </attributes>
       <note>
         <pitch>
-          <step>G</step>
+          <step>C</step>
           <octave>4</octave>
         </pitch>
-        <duration>1</duration>
+        <duration>2</duration>
         <voice>1</voice>
-        <type>quarter</type>
-        <lyric number="1"><text>dorian</text></lyric>
+        <type>half</type>
       </note>
     </measure>
     <measure number="5">
       <attributes>
         <key>
-          <fifths>2</fifths>
-          <mode>phrygian</mode>
+          <fifths>-7</fifths>
+          <mode>major</mode>
         </key>
       </attributes>
       <note>
         <pitch>
-          <step>G</step>
+          <step>C</step>
           <octave>4</octave>
         </pitch>
-        <duration>1</duration>
+        <duration>2</duration>
         <voice>1</voice>
-        <type>quarter</type>
-        <lyric number="1"><text>phrygian</text></lyric>
+        <type>half</type>
       </note>
     </measure>
     <measure number="6">
       <attributes>
         <key>
-          <fifths>2</fifths>
-          <mode>lydian</mode>
+          <fifths>7</fifths>
+          <mode>major</mode>
         </key>
       </attributes>
       <note>
         <pitch>
-          <step>G</step>
+          <step>C</step>
           <octave>4</octave>
         </pitch>
-        <duration>1</duration>
+        <duration>2</duration>
         <voice>1</voice>
-        <type>quarter</type>
-        <lyric number="1"><text>lydian</text></lyric>
+        <type>half</type>
       </note>
     </measure>
     <measure number="7">
       <attributes>
         <key>
-          <fifths>2</fifths>
-          <mode>mixolydian</mode>
+          <fifths>8</fifths>
+          <mode>major</mode>
         </key>
       </attributes>
       <note>
         <pitch>
-          <step>G</step>
+          <step>C</step>
           <octave>4</octave>
         </pitch>
-        <duration>1</duration>
+        <duration>2</duration>
         <voice>1</voice>
-        <type>quarter</type>
-        <lyric number="1"><text>mixolydian</text></lyric>
+        <type>half</type>
       </note>
     </measure>
     <measure number="8">
       <attributes>
         <key>
-          <fifths>2</fifths>
-          <mode>aeolian</mode>
+          <fifths>9</fifths>
+          <mode>major</mode>
         </key>
       </attributes>
       <note>
         <pitch>
-          <step>G</step>
+          <step>C</step>
           <octave>4</octave>
         </pitch>
-        <duration>1</duration>
+        <duration>2</duration>
         <voice>1</voice>
-        <type>quarter</type>
-        <lyric number="1"><text>aeolian</text></lyric>
+        <type>half</type>
       </note>
     </measure>
     <measure number="9">
       <attributes>
         <key>
-          <fifths>2</fifths>
-          <mode>locrian</mode>
+          <fifths>10</fifths>
+          <mode>major</mode>
         </key>
       </attributes>
       <note>
         <pitch>
-          <step>G</step>
+          <step>C</step>
           <octave>4</octave>
         </pitch>
-        <duration>1</duration>
+        <duration>2</duration>
         <voice>1</voice>
-        <type>quarter</type>
-        <lyric number="1"><text>locrian</text></lyric>
+        <type>half</type>
       </note>
+    </measure>
+    <measure number="10">
+      <attributes>
+        <key>
+          <fifths>11</fifths>
+          <mode>major</mode>
+        </key>
+      </attributes>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+      </note>
+      <barline location="right">
+        <bar-style>light-heavy</bar-style>
+      </barline>
     </measure>
   </part>
 </score-partwise>

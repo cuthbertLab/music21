@@ -4,12 +4,12 @@
 <score-partwise>
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Various clefs: G, C, F, percussion, 
-          TAB and none; some are also possible with transposition and on other
-          staff lines than their default (e.g. soprano/alto/tenor/baritone C
-          clefs); Each measure shows a different clef (measure 17 has the "none" 
-          clef), only measure 18 has the same treble clef as measure 
-          1.</miscellaneous-field>
+      <miscellaneous-field name="description">Clefs with octave shifts,
+          clefs on staff lines other than default, and percussion.
+
+          Order: Percussion, treble 8vb, bass 8vb, F3, G1, C5, C2, C1,
+          treble 8va, bass 8va, 
+      </miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -31,8 +31,7 @@
           <beat-type>4</beat-type>
         </time>
         <clef>
-          <sign>G</sign>
-          <line>2</line>
+          <sign>percussion</sign>
         </clef>
       </attributes>
       <note>
@@ -49,8 +48,9 @@
     <measure number="2">
       <attributes>
         <clef>
-          <sign>C</sign>
-          <line>3</line>
+          <sign>G</sign>
+          <line>2</line>
+          <clef-octave-change>-1</clef-octave-change>
         </clef>
       </attributes>
       <note>
@@ -67,8 +67,9 @@
     <measure number="3">
       <attributes>
         <clef>
-          <sign>C</sign>
+          <sign>F</sign>
           <line>4</line>
+          <clef-octave-change>-1</clef-octave-change>
         </clef>
       </attributes>
       <note>
@@ -86,7 +87,7 @@
       <attributes>
         <clef>
           <sign>F</sign>
-          <line>4</line>
+          <line>3</line>
         </clef>
       </attributes>
       <note>
@@ -103,7 +104,8 @@
     <measure number="5">
       <attributes>
         <clef>
-          <sign>percussion</sign>
+          <sign>G</sign>
+          <line>1</line>
         </clef>
       </attributes>
       <note>
@@ -120,9 +122,8 @@
     <measure number="6">
       <attributes>
         <clef>
-          <sign>G</sign>
-          <line>2</line>
-          <clef-octave-change>-1</clef-octave-change>
+          <sign>C</sign>
+          <line>5</line>
         </clef>
       </attributes>
       <note>
@@ -139,9 +140,8 @@
     <measure number="7">
       <attributes>
         <clef>
-          <sign>F</sign>
-          <line>4</line>
-          <clef-octave-change>-1</clef-octave-change>
+          <sign>C</sign>
+          <line>2</line>
         </clef>
       </attributes>
       <note>
@@ -158,8 +158,8 @@
     <measure number="8">
       <attributes>
         <clef>
-          <sign>F</sign>
-          <line>3</line>
+          <sign>C</sign>
+          <line>1</line>
         </clef>
       </attributes>
       <note>
@@ -177,7 +177,8 @@
       <attributes>
         <clef>
           <sign>G</sign>
-          <line>1</line>
+          <line>2</line>
+          <clef-octave-change>1</clef-octave-change>
         </clef>
       </attributes>
       <note>
@@ -194,152 +195,9 @@
     <measure number="10">
       <attributes>
         <clef>
-          <sign>C</sign>
-          <line>5</line>
-        </clef>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>4</duration>
-        <voice>1</voice>
-        <type>whole</type>
-      </note>
-    </measure>
-    <!--=======================================================-->
-    <measure number="11">
-      <attributes>
-        <clef>
-          <sign>C</sign>
-          <line>2</line>
-        </clef>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>4</duration>
-        <voice>1</voice>
-        <type>whole</type>
-      </note>
-    </measure>
-    <!--=======================================================-->
-    <measure number="12">
-      <attributes>
-        <clef>
-          <sign>C</sign>
-          <line>1</line>
-        </clef>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>4</duration>
-        <voice>1</voice>
-        <type>whole</type>
-      </note>
-    </measure>
-    <!--=======================================================-->
-    <measure number="13">
-      <attributes>
-        <clef>
-          <sign>percussion</sign>
-        </clef>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>4</duration>
-        <voice>1</voice>
-        <type>whole</type>
-      </note>
-    </measure>
-    <!--=======================================================-->
-    <measure number="14">
-      <attributes>
-        <clef>
-          <sign>G</sign>
-          <line>2</line>
-          <clef-octave-change>1</clef-octave-change>
-        </clef>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>4</duration>
-        <voice>1</voice>
-        <type>whole</type>
-      </note>
-    </measure>
-    <!--=======================================================-->
-    <measure number="15">
-      <attributes>
-        <clef>
           <sign>F</sign>
           <line>4</line>
           <clef-octave-change>1</clef-octave-change>
-        </clef>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>4</duration>
-        <voice>1</voice>
-        <type>whole</type>
-      </note>
-    </measure>
-    <!--=======================================================-->
-    <measure number="16">
-      <attributes>
-        <clef>
-          <sign>TAB</sign>
-          <line>5</line>
-        </clef>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>4</duration>
-        <voice>1</voice>
-        <type>whole</type>
-      </note>
-    </measure>
-    <!--=======================================================-->
-    <measure number="17">
-      <attributes>
-        <clef>
-          <sign>none</sign>
-        </clef>
-      </attributes>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>4</duration>
-        <voice>1</voice>
-        <type>whole</type>
-      </note>
-    </measure>
-    <!--=======================================================-->
-    <measure number="18">
-      <attributes>
-        <clef>
-          <sign>G</sign>
-          <line>2</line>
         </clef>
       </attributes>
       <note>
