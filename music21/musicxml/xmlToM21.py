@@ -4098,25 +4098,68 @@ class MeasureParser(XMLParserBase):
         >>> MP.xmlToKeySignature(mxKey)
         <music21.key.KeySignature of 4 flats>
         '''
+        # TODO: cancel
         if mxKey.find('fifths') is None:
-            return self.nonTraditionalKeySignature(mxKey)
+            ks = self.nonTraditionalKeySignature(mxKey)
+        else:
+            ks = key.KeySignature()
+            seta = _setAttributeFromTagText
+            seta(ks, mxKey, 'fifths', 'sharps', transform=int)        
+            
+            mxKeyMode = mxKey.find('mode')
+            if mxKeyMode is not None:
+                modeValue = mxKeyMode.text
+                if modeValue not in (None, ""):
+                    try:
+                        ks = ks.asKey(modeValue)
+                    except exceptions21.Music21Exception:
+                        pass # mxKeyMode might not be a valid mode -- in which case ignore...
+        self.mxKeyOctaves(mxKey, ks)
+        return ks
+    
+    def mxKeyOctaves(self, mxKey, ks):
+        '''
+        process the <key-octave> tags to potentially change a key signature
+        to a non-standard key signature.
         
-        ks = key.KeySignature()
-        seta = _setAttributeFromTagText
-        seta(ks, mxKey, 'fifths', 'sharps', transform=int)        
-        
-        mxKeyMode = mxKey.find('mode')
-        if mxKeyMode is None:
-            return ks
+        >>> import xml.etree.ElementTree as ET
+        >>> mxKey = ET.fromstring('<key><fifths>-4</fifths>' 
+        ...   + '<key-octave number="1">3</key-octave>' 
+        ...   + '<key-octave number="2">4</key-octave>' 
+        ...   + '<key-octave number="4">3</key-octave>' 
+        ...   + '</key>')
 
-        modeValue = mxKeyMode.text
-        if modeValue in (None, ""):
-            return ks
-        try:
-            k = ks.asKey(modeValue)
-            return k
-        except exceptions21.Music21Exception:
-            return ks # mxKeyMode might not be a valid mode -- in which case ignore...
+        >>> ks = key.KeySignature(-4)
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> MP.mxKeyOctaves(mxKey, ks)
+        >>> ks.alteredPitches
+        [<music21.pitch.Pitch B-3>, 
+         <music21.pitch.Pitch E-4>, 
+         <music21.pitch.Pitch A->, 
+         <music21.pitch.Pitch D-3>]
+        '''
+        # key-octave
+        keyOctaves = mxKey.findall('key-octave')
+        if len(keyOctaves) == 0:
+            return
+
+        alteredPitches = copy.deepcopy(ks.alteredPitches)
+        
+        for mxKeyOctave in keyOctaves:
+            cancel = mxKeyOctave.get('cancel')
+            # TODO: cancel
+            if cancel == 'yes':
+                continue
+            pitchIndex = mxKeyOctave.get('number')
+            try:
+                alteredPitch = alteredPitches[int(pitchIndex) - 1]
+            except (IndexError, ValueError):
+                continue
+            octaveToSet = int(mxKeyOctave.text)
+            alteredPitch.octave = octaveToSet
+
+        ks.alteredPitches = alteredPitches
+
     
     def nonTraditionalKeySignature(self, mxKey):
         '''

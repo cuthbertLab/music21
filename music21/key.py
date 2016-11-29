@@ -347,6 +347,33 @@ class KeySignature(base.Music21Object):
     4
     >>> legal
     <music21.key.Key of c# minor>
+    
+    To set a non-traditional Key Signature, create a KeySignature object and then
+    set the alteredPitches list:
+    
+    >>> unusual = key.KeySignature()
+    >>> unusual.alteredPitches = ['E-', 'G#']
+    >>> unusual
+    <music21.key.KeySignature of pitches: [E-, G#]>
+    >>> unusual.isNonTraditional
+    True
+    
+    To set a pitch as displayed in a particular octave, create a non-traditional
+    KeySignature and then set pitches with octaves:
+    
+    >>> unusual = key.KeySignature()
+    >>> unusual.alteredPitches = ['F#4']
+    >>> unusual
+    <music21.key.KeySignature of pitches: [F#4]>
+    
+    If the accidental applies to all octaves but is being displayed differently
+    then you are done, but if you want them to apply only to the octave displayed
+    in then set `.accidentalsApplyOnlyToOctave` to `True`:
+    
+    >>> unusual.accidentalsApplyOnlyToOctave
+    False
+    >>> unusual.accidentalsApplyOnlyToOctave = True
+    
     '''
 
 
@@ -380,9 +407,10 @@ class KeySignature(base.Music21Object):
 
         # cache altered pitches
         self._alteredPitchesCached = []
+        self.accidentalsApplyOnlyToOctave = False
 
     def __hash__(self):
-        hashTuple = (self._sharps, tuple(self._alteredPitches))
+        hashTuple = (self._sharps, tuple(self._alteredPitches), self.accidentalsApplyOnlyToOctave)
         return hash(hashTuple)
     
     #---------------------------------------------------------------------------
@@ -538,7 +566,10 @@ class KeySignature(base.Music21Object):
         True
         
         >>> g
-        <music21.key.KeySignature of pitches: [E`]>        
+        <music21.key.KeySignature of pitches: [E`]>
+        
+        >>> g.accidentalByStep('E')
+        <accidental half-flat>
         '''
         if self.sharps is None and self.alteredPitches:
             return True

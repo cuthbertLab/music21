@@ -4603,9 +4603,9 @@ class MeasureExporter(XMLExporterBase):
         </key>
 
         >>> ksNonTrad = key.KeySignature()
-        >>> ksNonTrad.alteredPitches = ['C#', 'E-']
+        >>> ksNonTrad.alteredPitches = ['C#', 'E-4']
         >>> ksNonTrad
-        <music21.key.KeySignature of pitches: [C#, E-]>
+        <music21.key.KeySignature of pitches: [C#, E-4]>
         
         >>> mxKeyNonTrad = MEX.keySignatureToXml(ksNonTrad)
         >>> MEX.dump(mxKeyNonTrad)
@@ -4614,6 +4614,7 @@ class MeasureExporter(XMLExporterBase):
           <key-alter>1</key-alter>
           <key-step>E</key-step>
           <key-alter>-1</key-alter>
+          <key-octave number="2">4</key-octave>
         </key>
         '''
         seta = _setTagTextFromAttribute
@@ -4640,13 +4641,18 @@ class MeasureExporter(XMLExporterBase):
             for p in keyOrKeySignature.alteredPitches:
                 seta(p, mxKey, 'key-step', 'step')
                 a = p.accidental
-                if a is None: # ???
+                if a is None: # can't imagine why it would be...
                     a = pitch.Accidental(0)
                 mxAlter = SubElement(mxKey, 'key-alter')
                 mxAlter.text = str(common.numToIntOrFloat(a.alter))
                 # TODO: key-accidental
         
-        # TODO: key-octave
+        for i, p in enumerate(keyOrKeySignature.alteredPitches):
+            if p.octave is not None:
+                mxKeyOctave = SubElement(mxKey, 'key-octave')
+                mxKeyOctave.text = str(p.octave)
+                mxKeyOctave.set('number', str(i + 1))
+
         return mxKey
         
     def clefToXml(self, clefObj):

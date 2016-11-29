@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="2.0">
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">Invalid accordion 
+          registrations.
+
+          Moved out of 75a..
+
+            No accordion-(high|middle|low) given, empty middle, 
+           middle with invalid value, middle with 0
+      </miscellaneous-field>
+    </miscellaneous>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name></part-name>
+    </score-part>
+  </part-list>
+  <!--=========================================================-->
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key>
+          <fifths>0</fifths>
+          <mode>major</mode>
+        </key>
+        <time symbol="common">
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <direction>
+        <direction-type>
+          <accordion-registration>
+              <accordion-high/>
+              <accordion-middle/>
+              <accordion-low/>
+          </accordion-registration>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1"><text>empty M</text></lyric>
+      </note>
+      <direction>
+        <direction-type>
+          <accordion-registration>
+              <accordion-high/>
+              <accordion-middle>test</accordion-middle>
+              <accordion-low/>
+          </accordion-registration>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1"><text>inval.M</text></lyric>
+      </note>
+      <direction>
+        <direction-type>
+          <accordion-registration>
+              <accordion-high/>
+              <accordion-middle>0</accordion-middle>
+              <accordion-low/>
+          </accordion-registration>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1"><text>M=0</text></lyric>
+      </note>
+      <direction>
+        <direction-type>
+          <accordion-registration>
+              <accordion-high/>
+              <accordion-middle>5</accordion-middle>
+              <accordion-low/>
+          </accordion-registration>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1"><text>M=5</text></lyric>
+      </note>
+      
+      <barline location="right">
+        <bar-style>light-heavy</bar-style>
+      </barline>
+    </measure>
+    <!--=======================================================-->
+  </part>
+  <!--=========================================================-->
+</score-partwise>
