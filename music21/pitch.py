@@ -946,7 +946,7 @@ class Accidental(SlottedObjectMixin):
         >>> acc = pitch.Accidental('flat')
         >>> st = acc.style
         >>> st
-        <music21.style.Style object at 0x10ba96208>
+        <music21.style.TextStyle object at 0x10ba96208>
         >>> st.absoluteX = 20.0
         >>> st.absoluteX
         20.0
