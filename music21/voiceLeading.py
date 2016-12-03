@@ -1074,8 +1074,7 @@ class Verticality(base.Music21Object):
                 contentDict[partNum] = [element]
 
         self.contentDict = contentDict
-        self._color = ''
-
+        
     def isConsonant(self):
         '''
         evaluates whether this vertical slice moment is consonant or dissonant 
@@ -1122,7 +1121,9 @@ class Verticality(base.Music21Object):
                     pitches.append(x.nameWithOctave)
             elif 'Note' in el.classes:
                 pitches.append(el)
-        return chord.Chord(pitches)
+        ch = chord.Chord(pitches)
+        ch.style = self.style
+        return ch
 
     def makeAllSmallestDuration(self):
         '''
@@ -1405,20 +1406,20 @@ class Verticality(base.Music21Object):
                                 self.__class__.__name__, self.contentDict)
 
     def _setColor(self, color):
-
+        self.style.color = color
         for obj in self.objects:
-            obj.color = color
+            obj.style.color = color
 
     def _getColor(self):
-        return self._color
+        return self.style.color
 
     color = property(_getColor, _setColor, doc='''
         sets the color of each element in the vertical slice
 
-        >>> vs1 = voiceLeading.Verticality({1:note.Note('C'), 2:harmony.ChordSymbol('C')})
+        >>> vs1 = voiceLeading.Verticality({1:note.Note('C'), 2:harmony.ChordSymbol('D')})
         >>> vs1.color = 'blue'
-        >>> [x.color for x in vs1.objects]
-        ['blue', 'blue']
+        >>> [(x, x.style.color) for x in vs1.objects]
+        [(<music21.note.Note C>, 'blue'), (<music21.harmony.ChordSymbol D>, 'blue')]
     ''')
 
 

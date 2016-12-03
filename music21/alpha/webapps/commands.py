@@ -78,8 +78,8 @@ def generateChords(numChords,kind=''):
     only diatonic triads will be generated
         
     
-    >>> sc = alpha.webapps.commands.generateChords(4,'diatonicTriads')
-    >>> a = alpha.webapps.commands.runPerceivedDissonanceAnalysis(sc,[1.2,3.2,5.2])
+    >>> sc = alpha.webapps.commands.generateChords(4, 'diatonicTriads')
+    >>> a = alpha.webapps.commands.runPerceivedDissonanceAnalysis(sc, [1.2, 3.2, 5.2])
     >>> chords = a['fullScore']['stream'].flat.getElementsByClass('Chord')
     >>> chords[0].style.color != None
     True
@@ -90,7 +90,7 @@ def generateChords(numChords,kind=''):
     >>> chords[3].style.color in [None, '#cc3300']
     True
     >>> sc2 = alpha.webapps.commands.generateChords(4)
-    >>> a = alpha.webapps.commands.runPerceivedDissonanceAnalysis(sc2,[1.2,3.2])
+    >>> a = alpha.webapps.commands.runPerceivedDissonanceAnalysis(sc2, [1.2, 3.2])
     >>> chords = a['fullScore']['stream'].flat.getElementsByClass('Chord')
     >>> chords[0].style.color != None
     True
@@ -304,19 +304,19 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
         else:
             nextVSOffset = vsList[vsNum + 1].offset(leftAlign=False)
         if not vs.isConsonant(): #music21 recognizes this as a dissonant vertical slice
-            music21VS+=1
+            music21VS += 1
             if _withinRange(offsetList, currentVSOffset, nextVSOffset):
-                vs.style.color = '#00cc33' 
+                vs.color = '#00cc33' 
                 # the user also recognizes this as a dissonant vertical slice GREEN
                 both += 1
                 c = vs.getChord()
                 romanFigureList.append(roman.romanNumeralFromChord(c, pieceKey).figure)
             else:
-                vs.style.color = '#cc3300'  
+                vs.color = '#cc3300'  
                 #the user did not recognize as a dissonant vertical slice RED
         else: #music21 did not recognize this as a dissonant vertical slice
             if _withinRange(offsetList, currentVSOffset, nextVSOffset):
-                vs.style.color = '#0033cc' 
+                vs.color = '#0033cc' 
                 #the user recognized it as a dissonant vertical slice BLUE
     
     score.insert(metadata.Metadata())
@@ -477,7 +477,7 @@ def colorAllNotes(sc, color):
     used for testing color rendering in noteflight
     '''
     for n in sc.flat.getElementsByClass('Note'):
-        n.style.olor = color 
+        n.style.color = color 
     return sc
 
 def colorAllChords(sc, color):

@@ -4472,7 +4472,7 @@ class MeasureParser(XMLParserBase):
                 mmrSpanner.useSymbols = False
             self.parent.activeMultiMeasureRestSpanner = mmrSpanner
 
-        self.setFont(mxMultiRest, mmrSpanner)
+            self.setFont(mxMultiRest, mmrSpanner)
         
         # TODO: slash
 
