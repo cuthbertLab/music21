@@ -403,7 +403,7 @@ class TrecentoCadenceWork(object):
                         thisSnippet.getElementsByClass('TrecentoCadenceStream')):
                 if thisSnippet.snippetName != "" and partNumber == self.totalVoices - 1:
                     textEx = expressions.TextExpression(thisSnippet.snippetName)
-                    textEx.positionVertical = 'below'
+                    textEx.style.absoluteY = 'below'
                     if 'FrontPaddedSnippet' in thisSnippet.classes:
                         if snippetPart.hasMeasures():
                             snippetPart.getElementsByClass('Measure')[-1].insert(0, textEx)
@@ -468,7 +468,7 @@ class TrecentoCadenceWork(object):
             for partNumber, snippetPart in enumerate(thisSnippet.getElementsByClass('Stream')):
                 if thisSnippet.snippetName != "" and partNumber == self.totalVoices - 1:
                     textEx = expressions.TextExpression(thisSnippet.snippetName)
-                    textEx.positionVertical = 'below'
+                    textEx.style.absoluteY = 'below'
                     if 'FrontPaddedSnippet' in thisSnippet.classes:
                         if snippetPart.hasMeasures():
                             snippetPart.getElementsByClass('Measure')[-1].insert(0, textEx)

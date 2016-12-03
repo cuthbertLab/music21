@@ -1236,6 +1236,7 @@ class JSONFreezer(JSONFreezeThawBase):
         '_noteheadParenthesis'
         '_priority'
         '_stemDirection'
+        '_style'
         '_volume'
         '''
         result = set()

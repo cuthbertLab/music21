@@ -29,7 +29,7 @@ from music21 import common
 from music21 import exceptions21
 from music21 import interval
 from music21 import spanner
-from music21 import text
+from music21 import style
 
 from music21.ext import six
 
@@ -131,30 +131,30 @@ class TextExpressionException(ExpressionException):
     pass
 
 
-class TextExpression(Expression, text.TextFormatMixin):
+class TextExpression(Expression):
     '''
     A TextExpression is a word, phrase, or similar 
     bit of text that is positioned in a Stream or Measure. 
     Conventional expressive indications are text 
     like "agitato" or "con fuoco."
 
-    
-    >>> te = expressions.TextExpression('testing')
-    >>> te.size = 24
-    >>> te.size
-    24.0
-    >>> te.style = 'bolditalic'
-    >>> te.letterSpacing = 0.5
+    >>> te = expressions.TextExpression('Con fuoco')
+    >>> te.content
+    'Con fuoco'
+    >>> te.style.fontSize = 24.0
+    >>> te.style.fontSize
+    24
+    >>> te.style.fontStyle = 'bolditalic'
+    >>> te.style.letterSpacing = 0.5
     '''
 
     # always need to be first, before even clefs
     classSortOrder = -30
+    _styleClass = style.TextStyle
 
     def __init__(self, content=None):
         Expression.__init__(self)
         # numerous properties are inherited from TextFormat
-        text.TextFormatMixin.__init__(self)
-
         # the text string to be displayed; not that line breaks
         # are given in the xml with this non-printing character: (#)
         if not isinstance(content, six.string_types):
@@ -164,12 +164,8 @@ class TextExpression(Expression, text.TextFormatMixin):
 
         self._enclosure = None
 
-        # numerous parameters are inherited from text.TextFormat
-        self._positionDefaultX = None
-        self._positionDefaultY = 20 # two staff lines above
-        # these values provided for musicxml compatibility
-        self._positionRelativeX = None
-        self._positionRelativeY = None
+        self.style.absoluteY = 20
+
         # this does not do anything if default y is defined
         self._positionPlacement = None
 
@@ -191,73 +187,10 @@ class TextExpression(Expression, text.TextFormatMixin):
     
     content = property(_getContent, _setContent, 
         doc = '''Get or set the content.
-
         
-        >>> te = expressions.TextExpression('testing')
+        >>> te = expressions.TextExpression('dolce')
         >>> te.content
-        'testing'
-        ''')
-
-    def _getEnclosure(self):
-        return self._enclosure
-    
-    def _setEnclosure(self, value):
-        if value is None:
-            self._enclosure = value
-        elif value.lower() in ['oval', 'rectangle']:
-            self._enclosure = value.lower()
-        else:
-            raise TextExpressionException('Not a supported justification: %s' % value)
-    
-    enclosure = property(_getEnclosure, _setEnclosure, 
-        doc = '''Get or set the enclosure.
-
-        
-        >>> te = expressions.TextExpression()
-        >>> te.justify = 'center'
-        >>> te.enclosure = None
-        >>> te.enclosure = 'rectangle'
-        ''')
-
-
-    def _getPositionVertical(self):
-        return self._positionDefaultY
-    
-    def _setPositionVertical(self, value):
-        if value is None:
-            self._positionDefaultY = None
-        else:
-            if value == 'above':
-                value = 10.0
-            elif value == 'below':
-                value = -70.0
-            try:
-                value = float(value)
-            except (ValueError):
-                raise TextExpressionException('Not a supported size: %s' % value)
-            self._positionDefaultY = value
-    
-    positionVertical = property(_getPositionVertical, _setPositionVertical, 
-        doc = '''
-        Get or set the vertical position, where 0 
-        is the top line of the staff and units 
-        are in 10ths of a staff space.
-
-        Other legal positions are 'above' and 'below' which
-        are synonyms for 10 and -70 respectively (for 5-line
-        staves; other staves are not yet implemented)
-
-
-        
-        >>> te = expressions.TextExpression()
-        >>> te.positionVertical = 10
-        >>> te.positionVertical
-        10.0
-        
-        
-        >>> te.positionVertical = 'below'
-        >>> te.positionVertical
-        -70.0
+        'dolce'
         ''')
 
 
@@ -267,10 +200,10 @@ class TextExpression(Expression, text.TextFormatMixin):
     # return the appropriate object
 
     def getRepeatExpression(self):
-        '''If this TextExpression can be a RepeatExpression,
+        '''
+        If this TextExpression can be a RepeatExpression,
         return a new :class:`~music21.repeat.RepeatExpression`. 
         object, otherwise, return None.
-        
         '''
         # use objects stored in
         # repeat.repeatExpressionReferences for comparison to stored

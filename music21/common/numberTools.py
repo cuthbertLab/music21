@@ -121,11 +121,30 @@ def numToIntOrFloat(value):
     >>> halfFlat = pitch.Accidental('half-flat')
     >>> common.numToIntOrFloat(halfFlat.alter)
     -0.5
+
+    Also can take in a string representing an int or float
     
+    >>> common.numToIntOrFloat("1.0")
+    1
+    >>> common.numToIntOrFloat("1")
+    1
+    >>> common.numToIntOrFloat("1.25")
+    1.25
     
     :rtype: float
     '''
-    intVal = py3round(value)
+    try:
+        intVal = int(value)
+    except ValueError:
+        value = float(value)
+        intVal = int(value)
+    
+    try:
+        value + 0.0
+    except TypeError: # string
+        value = float(value)
+
+    
     if almostEquals(intVal, value, 1e-6):
         return intVal
     else: # source

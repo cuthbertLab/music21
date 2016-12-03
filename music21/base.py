@@ -78,16 +78,17 @@ from music21 import exceptions21
 
 Music21Exception = exceptions21.Music21Exception
 
-from music21.sites import SitesException
-from music21 import sites
 from music21 import common
 from music21 import defaults
 from music21 import derivation
 from music21 import duration
 from music21 import environment
+from music21 import sites
+from music21 import style
 
 from music21.common import opFrac
 from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
+from music21.sites import SitesException
 
 
 _MOD = 'music21.base.py'
@@ -318,6 +319,10 @@ class Music21Object(object):
     # same with fully qualified names
     _classListFullyQualifiedCacheDict = {}
 
+    # what class should we call for Style?
+    
+    _styleClass = style.Style
+
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = [
@@ -369,8 +374,6 @@ class Music21Object(object):
         'hideObjectOnPrint': '''if set to `True` will not print upon output 
             (only used in MusicXML output at this point and 
             Lilypond for notes, chords, and rests).''',
-        'xPosition': '''if set, defines the display x-position from 
-            the start of the container (in musicxml "tenths" by default)''',
         }
 
     def __init__(self, *arguments, **keywords):
@@ -390,9 +393,11 @@ class Music21Object(object):
         # private duration storage; managed by property
         self._duration = None
         self._priority = 0 # default is zero
+        
+        # Style objects are created only when necessary.
+        self._style = None
 
         self.hideObjectOnPrint = False
-        self.xPosition = None
 
         if "id" in keywords:
             self.id = keywords["id"]
@@ -715,6 +720,61 @@ class Music21Object(object):
             self._classSetCacheDict[self.__class__] = classSet
             return classSet
 
+
+    @property
+    def hasStyleInformation(self):
+        '''
+        Returns True if there is a :class:`~music21.style.Style` object
+        already associated with this object, False otherwise.
+        
+        Calling .style on an object will always create a new 
+        Style object, so even though a new Style object isn't too expensive
+        to create, this property helps to prevent creating new Styles more than
+        necessary.
+        
+        >>> mObj = base.Music21Object()
+        >>> mObj.hasStyleInformation
+        False
+        >>> mObj.style
+        <music21.style.Style object at 0x10b0a2080>
+        >>> mObj.hasStyleInformation
+        True
+        '''
+        return False if self._style is None else True
+    
+    
+    @property
+    def style(self):
+        '''
+        Returns (or Creates and then Returns) the Style object
+        associated with this object, or sets a new
+        style object.  Different classes might use
+        different Style objects because they might have different 
+        style needs (such as text formatting or bezier positioning)
+        
+        Eventually will also query the groups to see if they have
+        any styles associated with them.
+        
+        >>> n = note.Note()
+        >>> st = n.style
+        >>> st
+        <music21.style.Style object at 0x10ba96208>
+        >>> st.absoluteX = 20.0
+        >>> st.absoluteX
+        20.0
+        >>> n.style = style.Style()
+        >>> n.style.absoluteX is None
+        True
+        '''
+        if self._style is None:
+            styleClass = self._styleClass
+            self._style = styleClass()
+        return self._style
+    
+    @style.setter
+    def style(self, newStyle):
+        self._style = newStyle
+    
     #---------------------------
     # convenience.  used to be in note.Note, but belongs everywhere:
     def _getQuarterLength(self):

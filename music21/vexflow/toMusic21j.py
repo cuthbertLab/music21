@@ -46,7 +46,7 @@ def fromObject(thisObject, mode='html', local=False):
         <script>
             require(['music21'], function() {
                 var pickleIn = '{"m21Version": {"py/tuple": [1, 9, 2]}, "stream": 
-    {"_mutable": true, "_activeSite": null, "xPosition": null, "' + 
+    {"_mutable": true, "_activeSite": null, "' + 
     '_priority": 0, "_elements": [], "_cache": {}, "definesExplicitPageBreaks": 
     false, "_unlinkedDuration": null, "' + 
     'id": ..., "_duration": null, "py/object": "music21.stream.Stream", 

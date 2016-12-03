@@ -738,13 +738,30 @@ class XMLExporterBase(object):
                 b''''http://www.musicxml.org/dtds/partwise.dtd'>\n''')
     
     def setPosition(self, m21Object, mxObject):
-        if hasattr(m21Object, 'xPosition') and m21Object.xPosition is not None:
-            mxObject.set('default-x', m21Object.xPosition)
-        if hasattr(m21Object, 'positionVertical') and m21Object.positionVertical is not None:
-            mxObject.set('default-y', m21Object.positionVertical)
+        '''
+        set positioning information for an mxObject from
+        default-x, default-y, relative-x, relative-y from
+        the .style attribute's absoluteX, relativeX, etc. attributes.
         
-        # TODO: attr: relative-x, relative-y
-        # TODO: standardize "positionVertical, etc.
+        '''
+        if m21Object.hasStyleInformation is False:
+            return
+        
+        musicXMLNames = ('default-x', 'default-y', 'relative-x', 'relative-y')
+        m21Names = ('absoluteX', 'absoluteY', 'relativeX', 'relativeY')
+        
+        stObj = m21Object.style
+
+        for xmlName, m21Name in zip(musicXMLNames, m21Names):
+            m21Value = getattr(stObj, m21Name)
+            if m21Value is None:
+                continue
+            try:
+                m21Value = str(m21Value)
+            except ValueError:
+                continue
+            
+            mxObject.set(xmlName, m21Value)
 
     def pageLayoutToXmlPrint(self, pageLayout, mxPrintIn=None):
         '''
@@ -1274,14 +1291,14 @@ class ScoreExporter(XMLExporterBase):
         Convert a music21 TextBox to a MusicXML Credit.
         
         >>> tb = text.TextBox('testing')
-        >>> tb.positionVertical = 500
-        >>> tb.positionHorizontal = 300
+        >>> tb.style.absoluteY = 400
+        >>> tb.style.absoluteX = 300
         >>> tb.page = 3
         >>> SX = musicxml.m21ToXml.ScoreExporter()
         >>> mxCredit = SX.textBoxToXmlCredit(tb)
         >>> SX.dump(mxCredit)
         <credit page="3">
-          <credit-words default-x="300" default-y="500" 
+          <credit-words default-x="300" default-y="400" 
                halign="center" valign="top">testing</credit-words>
         </credit>
             
@@ -1314,26 +1331,26 @@ class ScoreExporter(XMLExporterBase):
             cw.text = l
             # TODO: link/bookmark in credit-words
             if count == 0: # on first, configure properties         
-                if textBox.positionHorizontal is not None:
-                    cw.set('default-x', str(textBox.positionHorizontal))
-                if textBox.positionVertical is not None:
-                    cw.set('default-y', str(textBox.positionVertical))
-                if textBox.fontFamily is not None:
-                    cw.set('font-family', str(textBox.fontFamily))
-                if textBox.justify is not None:
-                    cw.set('justify', str(textBox.justify))
-                if textBox.style is not None:
-                    cw.set('font-style', str(textBox.style))
-                if textBox.weight is not None:
-                    cw.set('font-weight', str(textBox.weight))
-                if textBox.size is not None:
-                    cw.set('font-size', str(textBox.size))
+                if textBox.style.absoluteX is not None:
+                    cw.set('default-x', str(textBox.style.absoluteX))
+                if textBox.style.absoluteY is not None:
+                    cw.set('default-y', str(textBox.style.absoluteY))
+                if textBox.style.fontFamily:
+                    cw.set('font-family', ','.join(textBox.style.fontFamily))
+                if textBox.style.justify is not None:
+                    cw.set('justify', str(textBox.style.justify))
+                if textBox.style.fontStyle is not None:
+                    cw.set('font-style', str(textBox.style.fontStyle))
+                if textBox.style.fontWeight is not None:
+                    cw.set('font-weight', str(textBox.style.fontWeight))
+                if textBox.style.fontSize is not None:
+                    cw.set('font-size', str(textBox.style.fontSize))
 #                else:
 #                    cw.set('font-size', '12')
-                if textBox.alignVertical is not None:
-                    cw.set('valign', str(textBox.alignVertical))
-                if textBox.alignHorizontal is not None:
-                    cw.set('halign', str(textBox.alignHorizontal))
+                if textBox.style.alignVertical is not None:
+                    cw.set('valign', str(textBox.style.alignVertical))
+                if textBox.style.alignHorizontal is not None:
+                    cw.set('halign', str(textBox.style.alignHorizontal))
             mxCredit.append(cw)
             count += 1
         return mxCredit
@@ -3761,11 +3778,15 @@ class MeasureExporter(XMLExporterBase):
         return mxHarmony
 
     def setPrintStyleAlign(self, m21Obj, mxObj):
+        if not m21Obj.hasStyleInformation:
+            return
+        
+        st = m21Obj.style
         # print-style-align...
-        for src, dst in [(m21Obj._positionDefaultX, 'default-x'),
-                     (m21Obj._positionDefaultY, 'default-y'),
-                     (m21Obj._positionRelativeX, 'relative-x'),
-                     (m21Obj._positionRelativeY, 'relative-y')]:
+        for src, dst in [(st.absoluteX, 'default-x'),
+                         (st.absoluteY, 'default-y'),
+                         (st.relativeX, 'relative-x'),
+                         (st.relativeY, 'relative-y')]:
             if src is not None:
                 mxObj.set(dst, str(src))
 
@@ -3792,7 +3813,7 @@ class MeasureExporter(XMLExporterBase):
         >>> ppp = dynamics.Dynamic('ppp')
         >>> print('%.2f' % ppp.volumeScalar)
         0.15
-        >>> ppp._positionRelativeY = -10
+        >>> ppp.style.relativeY = -10
 
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> mxDirection = MEX.dynamicToXml(ppp)
@@ -3897,7 +3918,8 @@ class MeasureExporter(XMLExporterBase):
             self.xmlRoot.append(mxDirection)
             return mxDirection
         else:
-            return self.textExpressionToXml(coda.getTextExpression())
+            codaTe = coda.getTextExpression()
+            return self.textExpressionToXml(codaTe)
     
     def tempoIndicationToXml(self, ti):
         '''
@@ -3907,6 +3929,7 @@ class MeasureExporter(XMLExporterBase):
         as a textExpression.... but only the first will be returned.
 
         >>> mm = tempo.MetronomeMark("slow", 40, note.Note(type='half'))
+        >>> mm.style.justify = 'left'
         
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> mxDirection = MEX.tempoIndicationToXml(mm)
@@ -3926,7 +3949,7 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(MEX.xmlRoot.findall('direction')[1])
         <direction>
           <direction-type>
-            <words default-y="45.0" font-weight="bold" justify="left">slow</words>
+            <words default-y="45" font-weight="bold" justify="left">slow</words>
           </direction-type>
           <offset>0</offset>
         </direction>
@@ -4039,8 +4062,8 @@ class MeasureExporter(XMLExporterBase):
         
         if 'MetronomeMark' in ti.classes:
             if ti.getTextExpression(returnImplicit=False) is not None:
-                unused_mxDirectionText = self.textExpressionToXml(
-                              ti.getTextExpression(returnImplicit=False))
+                te = ti.getTextExpression(returnImplicit=False)
+                unused_mxDirectionText = self.textExpressionToXml(te)
                 
         return mxDirection
     
@@ -4057,23 +4080,23 @@ class MeasureExporter(XMLExporterBase):
             te = teOrRe.getTextExpression()
             mxWords.text = str(te.content)
             
-        for src, dst in [#(te._positionDefaultX, 'default-x'), 
-                         (te.positionVertical, 'default-y'),
-    #                      (te._positionRelativeX, 'relative-x'),
-    #                      (te._positionRelativeY, 'relative-y')]:
-                          (te.enclosure, 'enclosure'),
-                          (te.justify, 'justify'),
-                          (te.size, 'font-size'),
-                          (te.letterSpacing, 'letter-spacing'),
-                        ]:
+        for src, dst in [(te.style.absoluteX, 'default-x'), 
+                         (te.style.absoluteY, 'default-y'),
+                         (te.style.relativeX, 'relative-x'),
+                         (te.style.relativeY, 'relative-y'),
+                         (te.style.enclosure, 'enclosure'),
+                         (te.style.justify, 'justify'),
+                         (te.style.fontSize, 'font-size'),
+                         (te.style.letterSpacing, 'letter-spacing'),
+                     ]:
             if src is not None:
                 mxWords.set(dst, str(src))
-        if te.style is not None and te.style.lower() == 'bolditalic':
+        if te.style.fontStyle is not None and te.style.fontStyle.lower() == 'bolditalic':
             mxWords.set('font-style', 'italic')
             mxWords.set('font-weight', 'bold')
-        elif te.style == 'italic':
+        elif te.style.fontStyle == 'italic':
             mxWords.set('font-style', 'italic')
-        elif te.style == 'bold':
+        elif te.style.fontStyle == 'bold':
             mxWords.set('font-weight', 'bold')
             
         mxDirection = self.placeInDirection(mxWords, te)
@@ -4086,11 +4109,34 @@ class MeasureExporter(XMLExporterBase):
             
     def wrapObjectInAttributes(self, objectToWrap, methodToMx):
         '''
-        given a clefObj which is in .elements and not m.clef insert it in self.xmlRoot as
-        part of the current mxAttributes
+        given a Clef, KeySignature, or TimeSignature which is in .elements and not m.clef,
+        etc. insert it in self.xmlRoot as
+        part of the current mxAttributes using methodToMx as a wrapper function.
         
-        (or insert into a new mxAttributes if Clef is not at the beginning
+        (or insert into a new mxAttributes if Clef/KeySignature/etc. is not at the beginning
         of the measure and not at the same point as an existing mxAttributes)
+        
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> MEX.offsetInMeasure = 3.0
+        >>> cl = clef.BassClef()
+        >>> methodToMx = MEX.clefToXml
+        >>> mxAttributes = MEX.wrapObjectInAttributes(cl, methodToMx)
+        >>> MEX.dump(mxAttributes)
+        <attributes>
+          <clef>
+            <sign>F</sign>
+            <line>4</line>
+          </clef>
+        </attributes>
+        
+        Also puts it in MEX.xmlRoot.
+        
+        If offsetInMeasure is 0.0 then nothing is done or returned:
+        
+        >>> MEX.offsetInMeasure = 0.0
+        >>> nothing = MEX.wrapObjectInAttributes(cl, methodToMx)
+        >>> nothing is None
+        True
         '''
         if self.offsetInMeasure == 0.0:
             return

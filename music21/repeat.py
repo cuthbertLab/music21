@@ -23,7 +23,7 @@ import unittest
 from music21 import exceptions21
 from music21 import expressions
 from music21 import spanner
-
+from music21 import style
 
 from music21 import environment
 _MOD = 'repeat.py'
@@ -81,6 +81,8 @@ class RepeatExpression(RepeatMark, expressions.Expression):
     properly configured TextExpression object can also be 
     used to create an instance of a RepeatExpressions.
     '''
+    _styleClass = style.TextStyle
+    
     def __init__(self):
         expressions.Expression.__init__(self)
         RepeatMark.__init__(self)
@@ -89,18 +91,12 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         # store a lost of alternative text representations
         self._textAlternatives = []
         # store a default text justification
-        self._textJustification = 'center'
+        self.style.justify = 'center'
         # for those that have symbols, declare if the symbol is to be used
         self.useSymbol = False
 
         # for musicxml compatibility
-        self._positionDefaultX = None
-        self._positionDefaultY = 20 # two staff lines above
-        # these values provided for musicxml compatibility
-        self._positionRelativeX = None
-        self._positionRelativeY = None
-        # this does not do anything if default y is defined
-        self._positionPlacement = None
+        self.style.absoluteY = 20 # two staff lines above
 
     def __repr__(self):
         content = self.getText()
@@ -123,6 +119,7 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         '''
         if self._textExpression is None:
             self._textExpression = expressions.TextExpression(value)
+            self._textExpression.style = self.style # link style
             self.applyTextFormatting()
         else:
             self._textExpression.content = value
@@ -195,6 +192,8 @@ class Coda(RepeatExpressionMarker):
     def __init__(self, text=None):
         RepeatExpressionMarker.__init__(self)
         # default text expression is coda
+        self.style.justify = 'center'
+        
         self._textAlternatives = ['Coda', 'to Coda', 'al Coda']
         if text is not None and self.isValidText(text):
             self.setText(text)

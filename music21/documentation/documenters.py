@@ -373,7 +373,7 @@ class ClassDocumenter(ObjectDocumenter):
        - :attr:`~music21.base.Music21Object.activeSite`
        - :attr:`~music21.base.Music21Object.derivation`
                 ...
-       - :attr:`~music21.base.Music21Object.seconds`
+       - :attr:`~music21.base.Music21Object.style`
     .. rubric:: :class:`~music21.articulations.Caesura` methods
     Methods inherited from :class:`~music21.base.Music21Object`:
     .. hlist::
@@ -394,7 +394,6 @@ class ClassDocumenter(ObjectDocumenter):
        - :attr:`~music21.base.Music21Object.hideObjectOnPrint`
        - :attr:`~music21.base.Music21Object.id`
        - :attr:`~music21.base.Music21Object.isStream`
-       - :attr:`~music21.base.Music21Object.xPosition`    
     '''
 
     ### CLASS VARIABLES ###
@@ -676,6 +675,7 @@ class ClassDocumenter(ObjectDocumenter):
         music21.base.Music21Object:
         - music21.base.Music21Object.classSet
         - music21.base.Music21Object.classes
+        - music21.base.Music21Object.hasStyleInformation
         - music21.base.Music21Object.measureNumber
         music21.stream.Stream:
         - music21.stream.Stream.beat
@@ -761,6 +761,7 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.base.Music21Object.offset
         - music21.base.Music21Object.priority
         - music21.base.Music21Object.quarterLength
+        - music21.base.Music21Object.style
         music21.stream.Stream:
         - music21.stream.Stream.atSoundingPitch
         - music21.stream.Stream.clef
@@ -1010,6 +1011,7 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.beatStrength`'
         '   - :attr:`~music21.base.Music21Object.classSet`'
         '   - :attr:`~music21.base.Music21Object.classes`'
+        '   - :attr:`~music21.base.Music21Object.hasStyleInformation`'
         '   - :attr:`~music21.base.Music21Object.measureNumber`'
         ''
 
@@ -1059,6 +1061,7 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.priority`'
         '   - :attr:`~music21.base.Music21Object.quarterLength`'
         '   - :attr:`~music21.base.Music21Object.seconds`'
+        '   - :attr:`~music21.base.Music21Object.style`'
         ''
         '''
         mapping = self.inheritedReadwritePropertiesMapping
@@ -1152,6 +1155,7 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.beatStrength`'
         '   - :attr:`~music21.base.Music21Object.classSet`'
         '   - :attr:`~music21.base.Music21Object.classes`'
+        '   - :attr:`~music21.base.Music21Object.hasStyleInformation`'
         '   - :attr:`~music21.base.Music21Object.measureNumber`'
         ''
 
@@ -1192,6 +1196,7 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.priority`'
         '   - :attr:`~music21.base.Music21Object.quarterLength`'
         '   - :attr:`~music21.base.Music21Object.seconds`'
+        '   - :attr:`~music21.base.Music21Object.style`'
         ''
         '''
         result = []

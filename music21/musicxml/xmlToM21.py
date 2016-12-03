@@ -249,17 +249,23 @@ class XMLParserBase(object):
     def setPosition(self, mxObject, m21Object):
         '''
         get positioning information for an object from
-        default-x, default-y 
+        default-x, default-y, relative-x, relative-y into
+        the .style attribute's absoluteX, relativeX, etc. attributes'
         '''
-        defaultX = mxObject.get('default-x')
-        if defaultX is not None:
-            m21Object.xPosition = defaultX
-        defaultY = mxObject.get('default-y')
-        if defaultY is not None:
-            m21Object.positionVertical = defaultY
-            
-        # TODO: attr: relative-x, relative-y
-        # TODO: standardize "positionVertical, etc.
+        musicXMLNames = ('default-x', 'default-y', 'relative-x', 'relative-y')
+        m21Names = ('absoluteX', 'absoluteY', 'relativeX', 'relativeY')
+        
+        stObj = m21Object.style
+
+        for xmlName, m21Name in zip(musicXMLNames, m21Names):
+            mxValue = mxObject.get(xmlName)
+            if mxValue is None:
+                continue
+            try:
+                mxValue = float(mxValue)
+            except ValueError:
+                continue
+            setattr(stObj, m21Name, mxValue)
 
     def xmlPrintToPageLayout(self, mxPrint, inputM21=None):
         '''
@@ -668,15 +674,19 @@ class MusicXMLImporter(XMLParserBase):
     
         cw1 = mxCredit.find('credit-words')
         # take formatting from the first, no matter if multiple are defined
-        tb.positionVertical = cw1.get('default-y')
-        tb.positionHorizontal = cw1.get('default-x')
-        tb.justify = cw1.get('justify')
-        tb.fontFamily = cw1.get('font-family')
-        tb.style = cw1.get('font-style')
-        tb.weight = cw1.get('font-weight')
-        tb.size = cw1.get('font-size')
-        tb.alignVertical = cw1.get('valign')
-        tb.alignHorizontal = cw1.get('halign')        
+        st = tb.style
+        
+        st.aboluteY = cw1.get('default-y')
+        st.absoluteX = cw1.get('default-x')
+        st.justify = cw1.get('justify')
+        ff = cw1.get('font-family')
+        if ff is not None:
+            st.fontFamily = ff.split(',')
+        st.fontStyle = cw1.get('font-style')
+        st.fontWeight = cw1.get('font-weight')
+        st.fontSize = cw1.get('font-size')
+        st.alignVertical = cw1.get('valign')
+        st.alignHorizontal = cw1.get('halign')        
         # TODO: credit type
         # TODO: link
         # TODO: bookmark
@@ -3594,15 +3604,17 @@ class MeasureParser(XMLParserBase):
                 elif tag in ('wedge', 'bracket', 'dashes'):
                     self.xmlDirectionTypeToSpanners(mxDir)
     
-                elif tag == 'segno':
-                    rm = repeat.Segno()
-                    rm._positionDefaultX = mxDir.get('default-x')
-                    rm._positionDefaultY = mxDir.get('default-y')
-                    self.insertCoreAndRef(totalOffset, staffKey, rm)
-                elif tag == 'coda':
-                    rm = repeat.Coda()
-                    rm._positionDefaultX = mxDir.get('default-x')
-                    rm._positionDefaultY = mxDir.get('default-y')
+                elif tag in ('coda', 'segno'):
+                    if tag == 'segno':
+                        rm = repeat.Segno()
+                    else:
+                        rm = repeat.Coda()
+                    dX = mxDir.get('default-x')
+                    if dX is not None:
+                        rm.style.absoluteX = common.numToIntOrFloat(dX)
+                    dY = mxDir.get('default-y')
+                    if dY is not None:
+                        rm.style.absoluteY = common.numToIntOrFloat(dY)
                     self.insertCoreAndRef(totalOffset, staffKey, rm)
     
                 elif tag == 'metronome':
@@ -3633,12 +3645,13 @@ class MeasureParser(XMLParserBase):
         te = expressions.TextExpression(mxWords.text.strip())
 
         setb = _setAttributeFromAttribute
-        setb(te, mxWords, 'justify')
-        setb(te, mxWords, 'font-family')
-        setb(te, mxWords, 'font-size', 'size', transform=_floatOrIntStr)
-        setb(te, mxWords, 'letter-spacing', transform=_floatOrIntStr)
-        setb(te, mxWords, 'enclosure')
-        setb(te, mxWords, 'default-y', 'positionVertical', transform=_floatOrIntStr)
+        st = te.style
+        setb(st, mxWords, 'justify')
+        setb(st, mxWords, 'font-family')
+        setb(st, mxWords, 'font-size',  transform=_floatOrIntStr)
+        setb(st, mxWords, 'letter-spacing', transform=_floatOrIntStr)
+        setb(st, mxWords, 'enclosure')
+        setb(st, mxWords, 'default-y', 'absoluteY', transform=_floatOrIntStr)
 
         # two parameters that are combined
         style = mxWords.get('font-style')
@@ -3650,12 +3663,12 @@ class MeasureParser(XMLParserBase):
             weight = None
         if style is not None and weight is not None:
             if style == 'italic' and weight == 'bold':
-                te.style = 'bolditalic'
+                st.fontStyle = 'bolditalic'
         # one is None
         elif style == 'italic':
-            te.style = 'italic'
+            st.fontStyle = 'italic'
         elif weight == 'bold':
-            te.style = 'bold'
+            st.fontStyle = 'bold'
 
         return te
 
@@ -4587,11 +4600,11 @@ class Test(unittest.TestCase):
                 if n.pitch.name in ['B']:
                     msg = '%s\n%s' % (n.pitch.nameWithOctave, n.duration.quarterLength)
                     te = expressions.TextExpression(msg)
-                    te.size = 14
-                    te.style = 'bold'
-                    te.justify = 'center'
-                    te.enclosure = 'rectangle'
-                    te.positionVertical = -80
+                    te.style.fontSize = 14
+                    te.style.fontStyle = 'bold'
+                    te.style.justify = 'center'
+                    te.style.enclosure = 'rectangle'
+                    te.style.absoluteY = -80
                     m.insert(n.offset, te)
         #p.show()        
 
@@ -4604,9 +4617,9 @@ class Test(unittest.TestCase):
         for m in p.getElementsByClass('Measure')[1:]:
             for pos in [1.5, 2.5]:
                 te = expressions.TextExpression(pos)
-                te.style = 'bold'
-                te.justify = 'center'
-                te.enclosure = 'rectangle'
+                te.style.fontStyle = 'bold'
+                te.style.justify = 'center'
+                te.style.enclosure = 'rectangle'
                 m.insert(pos, te)
         #p.show()
 
@@ -4624,9 +4637,9 @@ class Test(unittest.TestCase):
             offsets = offsets[:4]
             for o in offsets:
                 te = expressions.TextExpression(o)
-                te.style = 'bold'
-                te.justify = 'center'
-                te.enclosure = 'rectangle'
+                te.style.fontStyle = 'bold'
+                te.style.justify = 'center'
+                te.style.enclosure = 'rectangle'
                 m.insert(o, te)
         #s.show()      
 
