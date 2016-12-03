@@ -241,31 +241,140 @@ class XMLParserBase(object):
                              'flat-flat': 'double-flat',
                              'sharp-sharp': 'double-sharp',                                 
                              }
-
     
-    def __init__(self):
-        pass
+    def setTextFormatting(self, mxObject, m21Object):
+        '''
+        sets the justification, print-style-align group, and
+        text-decoration, text-rotation,
+        letter-spacing, line-height, lang, text-direction, and
+        enclosure, on an
+        m21Object, which must have style.TextStyle as its Style class,
+        and then calls setPrintStyleAlign
+        
+        conforms to attr-group %text-formatting in the MusicXML DTD
+        '''
+        musicXMLNames = ('justify', 'text-decoration', 'text-rotation', 'letter-spacing',
+                         'line-height', 'lang', 'text-direction', 'enclosure')
+        m21Names = ('justify', 'textDecoration', 'textRotation', 'letterSpacing',
+                    'lineHeight', 'language', 'textDirection', 'enclosure')
+        self.setStyleAttributes(mxObject, m21Object, musicXMLNames, m21Names)
+        self.setPrintStyleAlign(mxObject, m21Object)
+    
+    def setPrintStyleAlign(self, mxObject, m21Object):
+        '''
+        runs setPrintStyle and then sets horizontalAlign and verticalAlign, on an
+        m21Object, which must have style.TextStyle as its Style class.
+    
+        conforms to attr-group %print-style-align in the MusicXML DTD
+        '''
+        self.setPrintStyle(mxObject, m21Object)
+        self.setStyleAttributes(mxObject, 
+                                m21Object, 
+                                ('valign', 'halign'),
+                                ('alignVertical', 'alignHorizontal'))
+    
+    def setPrintStyle(self, mxObject, m21Object):
+        '''
+        get position, font, and color information from the mxObject
+        into the m21Object, which must have style.TextStyle as its Style class.
+        
+        conforms to attr-group %print-style in the MusicXML DTD
+        '''
+        self.setPosition(mxObject, m21Object)
+        self.setFont(mxObject, m21Object)
+        self.setColor(mxObject, m21Object)
+        
+    def setColor(self, mxObject, m21Object):
+        '''
+        Sets m21Object.style.color to be the same as color...
+        '''
+        mxColor = mxObject.get('color')
+        if mxColor is not None:
+            m21Object.style.color = mxColor
+    
+    def setFont(self, mxObject, m21Object):
+        '''
+        sets font-family, font-style, font-size, and font-weight as
+        fontFamily (list), fontStyle, fontSize and fontWeight from
+        an object into a TextStyle object
+        
+        conforms to attr-group %font in the MusicXML DTD
+        
+        >>> from xml.etree.ElementTree import fromstring as El
+        >>> XP = musicxml.xmlToM21.XMLParserBase()
+        >>> mxObj = El('<text font-family="Courier,monospaced" font-style="italic" ' 
+        ...            + 'font-size="24" font-weight="bold" />')
+        >>> te = expressions.TextExpression('hi!')
+        >>> XP.setFont(mxObj, te)
+        >>> te.style.fontFamily
+        ['Courier', 'monospaced']
+        >>> te.style.fontStyle
+        'italic'
+        >>> te.style.fontSize
+        24
+        >>> te.style.fontWeight
+        'bold'
+        '''
+        musicXMLNames = ('font-family', 'font-style', 'font-size', 'font-weight')
+        m21Names = ('fontFamily', 'fontStyle', 'fontSize', 'fontWeight')
+        self.setStyleAttributes(mxObject, m21Object, musicXMLNames, m21Names)
+    
     
     def setPosition(self, mxObject, m21Object):
         '''
         get positioning information for an object from
         default-x, default-y, relative-x, relative-y into
         the .style attribute's absoluteX, relativeX, etc. attributes'
+        
+        conforms to attr-group %position in the MusicXML DTD
         '''
         musicXMLNames = ('default-x', 'default-y', 'relative-x', 'relative-y')
         m21Names = ('absoluteX', 'absoluteY', 'relativeX', 'relativeY')
-        
-        stObj = m21Object.style
+        self.setStyleAttributes(mxObject, m21Object, musicXMLNames, m21Names)
 
+    def setStyleAttributes(self, mxObject, m21Object, musicXMLNames, m21Names):
+        '''
+        Takes an mxObject, a music21Object, and a list/tuple of musicXMLnames and
+        a list/tuple of m21Names, and assigns each of the mxObject's attributes
+        that fits this style name to the corresponding style object's m21Name attribute.
+        
+        >>> from xml.etree.ElementTree import fromstring as El
+        >>> XP = musicxml.xmlToM21.XMLParserBase()
+        >>> mxObj = El('<a x="20.1" y="10.0" z="yes" />')
+        >>> m21Obj = base.Music21Object()
+        >>> musicXMLNames = ('w', 'x', 'y', 'z')
+        >>> m21Names = ('justify', 'absoluteX', 'absoluteY', 'hideObjectOnPrint')
+        
+        >>> XP.setStyleAttributes(mxObj, m21Obj, musicXMLNames, m21Names)
+
+        `.justify` requires a TextStyle object.
+
+        >>> m21Obj.style.justify
+        Traceback (most recent call last):
+        AttributeError: 'Style' object has no attribute 'justify'
+
+        >>> m21Obj.style.absoluteX
+        20.1
+        >>> m21Obj.style.absoluteY
+        10
+        >>> m21Obj.style.hideObjectOnPrint
+        'yes'
+        '''
+        stObj = None
         for xmlName, m21Name in zip(musicXMLNames, m21Names):
             mxValue = mxObject.get(xmlName)
             if mxValue is None:
                 continue
             try:
-                mxValue = float(mxValue)
-            except ValueError:
-                continue
+                mxValue = common.numToIntOrFloat(mxValue)
+            except (ValueError, TypeError):
+                pass
+            
+            # only create a style object if we get this far...
+            if stObj is None:
+                stObj = m21Object.style
             setattr(stObj, m21Name, mxValue)
+
 
     def xmlPrintToPageLayout(self, mxPrint, inputM21=None):
         '''
@@ -674,19 +783,9 @@ class MusicXMLImporter(XMLParserBase):
     
         cw1 = mxCredit.find('credit-words')
         # take formatting from the first, no matter if multiple are defined
-        st = tb.style
-        
-        st.aboluteY = cw1.get('default-y')
-        st.absoluteX = cw1.get('default-x')
-        st.justify = cw1.get('justify')
-        ff = cw1.get('font-family')
-        if ff is not None:
-            st.fontFamily = ff.split(',')
-        st.fontStyle = cw1.get('font-style')
-        st.fontWeight = cw1.get('font-weight')
-        st.fontSize = cw1.get('font-size')
-        st.alignVertical = cw1.get('valign')
-        st.alignHorizontal = cw1.get('halign')        
+        self.setPrintStyleAlign(cw1, tb)  
+              
+        tb.style.justify = cw1.get('justify')
         # TODO: credit type
         # TODO: link
         # TODO: bookmark
@@ -2232,8 +2331,9 @@ class MeasureParser(XMLParserBase):
         #       natural-down, natural-up, flat-down, flat-up,
         #       slash-quarter-sharp, slash-sharp, slash-flat, double-slash-flat
         #       sharp-1, 2, 3, 5, flat-1, 2, 3, 4, sori, koron
+        self.setPrintStyle(mxAccidental, acc)
 
-
+        # level display...
         parentheses = mxAccidental.get('parentheses')
         bracket = mxAccidental.get('bracket')
         if parentheses == 'yes' and bracket == 'yes':
@@ -2242,19 +2342,10 @@ class MeasureParser(XMLParserBase):
             acc.displayStyle = 'parentheses'
         elif bracket == 'yes':
             acc.displayStyle = 'bracket'
+        # TODO: attr: size
 
         # TODO: attr: cautionary
         # TODO: attr: editorial
-        # TODO: attr: size
-        # TODO: attr: default-x
-        # TODO: attr: default-y
-        # TODO: attr: relative-x
-        # TODO: attr: relative-y
-        # TODO: attr: font-family
-        # TODO: attr: font-style
-        # TODO: attr: font-size
-        # TODO: attr: font-weight
-        # TODO: attr: color
     
         if inputM21 is None:
             return acc
@@ -2344,15 +2435,28 @@ class MeasureParser(XMLParserBase):
         return self.xmlNoteToGeneralNoteHelper(r, mxRest)
 
     def xmlNoteToGeneralNoteHelper(self, n, mxNote, freeSpanners=True):
+        '''
+        Combined function to work on all <note> tags, where n can be
+        a Note or Rest
+        '''
         spannerBundle = self.spannerBundle
         if freeSpanners is True:
             spannerBundle.freePendingSpannedElementAssignment(n)
 
+        # attributes
+        self.setPrintStyle(mxNote, n)        
         # print object == 'no' and grace notes may have a type but not
         # a duration. they may be filtered out at the level of Stream 
         # processing
         if mxNote.get('print-object') == 'no':
             n.hideObjectOnPrint = True
+        # TODO: attr dynamics -- MIDI Note On velocity
+        # TODO: attr end-dynamics -- MIDI Note Off velocity
+        # TODO: attr attack -- alter starting time of the note
+        # TODO: attr release -- alter the release time of the note
+        # TODO: attr-group time-only
+        # TODO: attr pizzicato 
+
 
         mxGrace = mxNote.find('grace')
         isGrace = False
@@ -2448,6 +2552,8 @@ class MeasureParser(XMLParserBase):
             typeStr = mxType.text.strip()
             durationType = musicXMLTypeToType(typeStr)
             forceRaw = False
+            
+            # TODO: dot as print object with print-style and placement.
             numDots = len(mxNote.findall('dot'))
             # divide mxNote duration count by divisions to get qL
             # mxNotations = mxNote.get('notationsObj')
@@ -2683,8 +2789,8 @@ class MeasureParser(XMLParserBase):
         tag = mxObj.tag
         if tag in xmlObjects.ARTICULATION_MARKS:
             artic = xmlObjects.ARTICULATION_MARKS[tag]()
-            # print-style (beyond default-x, default-y
-            self.setPosition(mxObj, artic)
+
+            self.setPrintStyle(mxObj, artic)
             placement = mxObj.get('placement')
             if placement is not None:
                 artic.placement = placement
@@ -2707,12 +2813,14 @@ class MeasureParser(XMLParserBase):
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
 
-        >>> mxOrn = EL('<inverted-turn placement="above"/>')
+        >>> mxOrn = EL('<inverted-turn placement="above" font-size="24"/>')
         >>> a = MP.xmlOrnamentToExpression(mxOrn)
         >>> a
         <music21.expressions.InvertedTurn>
         >>> a.placement
         'above'
+        >>> a.style.fontSize
+        24
 
         If it can't be converted, return None
 
@@ -2729,7 +2837,7 @@ class MeasureParser(XMLParserBase):
             orn = xmlObjects.ORNAMENT_MARKS[tag]()
         except KeyError: # should already be checked...
             return None
-        # print-style
+        self.setPrintStyle(mxObj, orn)
         # trill-sound?
         placement = mxObj.get('placement')
         if placement is not None:
@@ -2840,9 +2948,23 @@ class MeasureParser(XMLParserBase):
         
     def xmlNotationsToSpanners(self, mxNotations, n):
         for mxObj in mxNotations.findall('slur'):
-            self.xmlOneSpanner(mxObj, n, spanner.Slur)
+            slur = self.xmlOneSpanner(mxObj, n, spanner.Slur)
+            # TODO: attr line-type
+            # TODO: attr dashed-formatting
+            self.setPosition(mxObj, slur)
+            # TODO: attr placement
+            # TODO: attr orientation
+            # TODO: attr bezier
+            self.setColor(mxObj, slur)
+            
+        
         for mxObj in mxNotations.findall('glissando'):
-            self.xmlOneSpanner(mxObj, n, spanner.Glissando)
+            gliss = self.xmlOneSpanner(mxObj, n, spanner.Glissando)            
+            # TODO: attr line-type
+            # TODO: attr dashed-formatting
+            self.setPrintStyle(mxObj, gliss)
+            
+        # TODO: slide?  
         
     def xmlToTremolo(self, mxTremolo, n):
         # tremolo is tricky -- can be either an
@@ -2869,6 +2991,8 @@ class MeasureParser(XMLParserBase):
         '''
         Some spanner types do not have an id necessarily, we allow duplicates of them
         if allowDuplicateIds is True. Wedges are one.
+        
+        Returns the new spanner created.
         '''
         idFound = mxObj.get('number')
 
@@ -3479,13 +3603,14 @@ class MeasureParser(XMLParserBase):
         # TODO: offset
         # TODO: editorial
         # TODO: staff
-        # TODO: attrGroup: print-object
-        # TODO: attr: print-frame
-        # TODO: attrGroup: print-style
-        # TODO: attrGroup: placement
         
         #environLocal.printDebug(['mxToChordSymbol():', mxHarmony])
         cs = harmony.ChordSymbol()
+        self.setPrintStyle(mxHarmony, cs)
+        # TODO: attrGroup: print-object
+        # TODO: attr: print-frame
+        # TODO: attrGroup: placement
+        
         seta = _setAttributeFromTagText
 
         # TODO: root vs. function;  see group "harmony-chord")
@@ -3997,11 +4122,11 @@ class MeasureParser(XMLParserBase):
             ts.load('+'.join(msg))
         # TODO: interchangeable
 
-        # TODO: attrGroup: print-style-align
+        self.setPrintStyleAlign(mxTime, ts)
         # TODO: attr: print-object
 
-
-        # TODO: attr: separator        
+        # TODO: attr: separator
+             
         # attr: symbol
         symbol = mxTime.get('symbol')
         if symbol:
@@ -4068,10 +4193,10 @@ class MeasureParser(XMLParserBase):
             clefObj = clef.clefFromString(sign + line, octaveChange)
     
         # TODO: number
-        # TODO: additional
+        # TODO: additional -- is this clef an additional clef to ignore...
         # TODO: size
-        # TODO: after-barline
-        # TODO: print-style
+        # TODO: after-barline -- particular style to clef.
+        self.setPrintStyle(mxClef, clefObj)
         # TODO: print-object
     
         return clefObj
@@ -4111,6 +4236,7 @@ class MeasureParser(XMLParserBase):
         >>> MP.xmlToKeySignature(mxKey)
         <music21.key.KeySignature of 4 flats>
         '''
+        
         # TODO: cancel
         if mxKey.find('fifths') is None:
             ks = self.nonTraditionalKeySignature(mxKey)
@@ -4128,6 +4254,11 @@ class MeasureParser(XMLParserBase):
                     except exceptions21.Music21Exception:
                         pass # mxKeyMode might not be a valid mode -- in which case ignore...
         self.mxKeyOctaves(mxKey, ks)
+        # TODO: attr: number
+        self.setPrintStyle(mxKey, ks)
+        # TODO: attr: print-object
+        
+        
         return ks
     
     def mxKeyOctaves(self, mxKey, ks):
@@ -4327,7 +4458,6 @@ class MeasureParser(XMLParserBase):
         no need to insert into the stream.
         '''
         # TODO: attr: number (staff number)
-        # TODO: attr-group font
         # TODO: attr-group color
         # TODO: beat-repeat
         # TODO: measure-repeat
@@ -4341,6 +4471,9 @@ class MeasureParser(XMLParserBase):
             else: # musicxml default is False
                 mmrSpanner.useSymbols = False
             self.parent.activeMultiMeasureRestSpanner = mmrSpanner
+
+        self.setFont(mxMultiRest, mmrSpanner)
+        
         # TODO: slash
 
     

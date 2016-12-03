@@ -1255,7 +1255,7 @@ class LilypondConverter(object):
         >>> n0 = note.Note("D#5")
         >>> n0.pitch.accidental.displayType = 'always'
         >>> n0.pitch.accidental.displayStyle = 'parentheses'
-        >>> n0.editorial.color = 'blue'
+        >>> n0.style.color = 'blue'
         >>> sm = conv.lySimpleMusicFromNoteOrRest(n0)
         >>> print(sm)
         \color "blue" dis'' ! ? 4
@@ -1270,9 +1270,10 @@ class LilypondConverter(object):
         c = noteOrRest.classes
 
         simpleElementParts = []
-        if noteOrRest._editorial is not None:
-            if noteOrRest.editorial.color and noteOrRest.hideObjectOnPrint is not True:
-                simpleElementParts.append(noteOrRest.editorial.colorLilyStart())
+        if noteOrRest.hasStyleInformation is not None:
+            if noteOrRest.style.color and noteOrRest.hideObjectOnPrint is not True:
+                colorLily = r'\color "' + noteOrRest.style.color + '" '
+                simpleElementParts.append(colorLily)
 
         if 'Note' in c:
             if noteOrRest.hideObjectOnPrint is not True:
@@ -1992,7 +1993,7 @@ class LilypondConverter(object):
 
             if coloredVariants is True:
                 for n in v._stream.recurse().notesAndRests:
-                    n.editorial.color = color# make thing (with or without fraction)
+                    n.style.color = color# make thing (with or without fraction)
 
             # Strip off spacer
             endOffset = v.containedHighestTime
@@ -2116,7 +2117,7 @@ class LilypondConverter(object):
         if coloredVariants is True:
             color = self.variantColors[self.addedVariants.index(variantName) % 6]
             for n in variantObject._stream.recurse().notesAndRests:
-                n.editorial.color = color
+                n.style.color = color
 
 
 

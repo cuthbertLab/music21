@@ -29,6 +29,7 @@ from music21 import defaults
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
+from music21 import style
 
 from music21.common import SlottedObjectMixin, opFrac
 from music21.ext import six
@@ -2859,7 +2860,7 @@ class TimeSignature(base.Music21Object):
     TimeSignature to contradict what the notes imply.  All this can be done
     with .displaySequence.      
     '''
-
+    _styleClass = style.TextStyle
     classSortOrder = 4
 
     _DOC_ATTR = {

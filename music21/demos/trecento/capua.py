@@ -103,7 +103,7 @@ def capuaRuleOne(srcStream):
     Applies Nicolaus de Capua's first rule to the given srcStream, i.e. if a line descends
     a major second then ascends back to the original note, the major second is
     made into a minor second. Also copies the relevant accidentals into
-    `Note.editorial.misc["saved-accidental"]` and changes `Note.editorial.color`
+    `Note.editorial.misc["saved-accidental"]` and changes `Note.style.color`
     for rule 1 (blue green blue).
     
     The relevant Rule number is also stored in `Note.editorial.misc['capua_rule_number']` which
@@ -146,15 +146,15 @@ def capuaRuleOne(srcStream):
                 n2.pitch.accidental = None
                 n2.editorial.ficta = pitch.Accidental("natural")
                 n2.editorial.misc["capua-ficta"] = pitch.Accidental("natural")
-                n1.editorial.color = "blue"
-                n2.editorial.color = "forestGreen"
-                n3.editorial.color = "blue"
+                n1.style.color = "blue"
+                n2.style.color = "forestGreen"
+                n3.style.color = "blue"
             else:
                 n2.editorial.ficta = pitch.Accidental("sharp")
                 n2.editorial.misc["capua-ficta"] = pitch.Accidental("sharp")
-                n1.editorial.color = "blue"
-                n2.editorial.color = "ForestGreen"
-                n3.editorial.color = "blue"
+                n1.style.color = "blue"
+                n2.style.color = "ForestGreen"
+                n3.style.color = "blue"
 
     return numChanged
 
@@ -164,7 +164,7 @@ def capuaRuleTwo(srcStream):
     
     Applies Capua's second rule to the given srcStream, i.e. if four notes are
     ascending with the pattern M2 m2 M2, the intervals shall be made M2 M2 m2.
-    Also changes note.editorial.color for rule 2 (purple purple green purple).
+    Also changes note.style.color for rule 2 (purple purple green purple).
     
     returns the number of times any note was changed
     '''
@@ -212,17 +212,17 @@ def capuaRuleTwo(srcStream):
                 n3.pitch.accidental = None
                 n3.editorial.ficta = pitch.Accidental("natural")
                 n3.editorial.misc["capua-ficta"] = pitch.Accidental("natural")
-                n1.editorial.color = "purple"
-                n2.editorial.color = "purple"
-                n3.editorial.color = "ForestGreen"
-                n4.editorial.color = "purple"
+                n1.style.color = "purple"
+                n2.style.color = "purple"
+                n3.style.color = "ForestGreen"
+                n4.style.color = "purple"
             else:
                 n3.editorial.ficta = pitch.Accidental("sharp")
                 n3.editorial.misc["capua-ficta"] = pitch.Accidental("sharp")
-                n1.editorial.color = "purple"
-                n2.editorial.color = "purple"
-                n3.editorial.color = "ForestGreen"
-                n4.editorial.color = "purple"
+                n1.style.color = "purple"
+                n2.style.color = "purple"
+                n3.style.color = "ForestGreen"
+                n4.style.color = "purple"
 
     return numChanged
 
@@ -234,7 +234,7 @@ def capuaRuleThree(srcStream):
     descending major third followed by an ascending major second, the second
     note will be made a half-step higher so that there is a descending minor
     third followed by an ascending minor second. Also changes
-    note.editorial.color for rule 3 (pink green pink).
+    note.style.color for rule 3 (pink green pink).
     
     returns the number of times a note was changed
     '''
@@ -271,9 +271,9 @@ def capuaRuleThree(srcStream):
                 n2.editorial.misc['capua_rule_number'] = RULE_THREE
             n2.editorial.ficta = pitch.Accidental("sharp")
             n2.editorial.misc["capua-ficta"] = pitch.Accidental("sharp")
-            n1.editorial.color = "DeepPink"
-            n2.editorial.color = "ForestGreen"
-            n3.editorial.color = "DeepPink"
+            n1.style.color = "DeepPink"
+            n2.style.color = "ForestGreen"
+            n3.style.color = "DeepPink"
 
     return numChanged
 
@@ -284,7 +284,7 @@ def capuaRuleFourA(srcStream):
     Applies one interpretation of Capua's fourth rule to the given srcStream,
     i.e. if a descending minor third is followed by a descending major second,
     the intervals will be changed to a major third followed by a minor second.
-    Also changes note.editorial.color for rule 4 (orange green orange).
+    Also changes note.style.color for rule 4 (orange green orange).
     
     returns the number of notes that were changed
 
@@ -323,9 +323,9 @@ def capuaRuleFourA(srcStream):
                 n2.editorial.misc['capua_rule_number'] = RULE_FOUR_A
             n2.editorial.ficta = pitch.Accidental("flat")
             n2.editorial.misc["capua-ficta"] = pitch.Accidental("flat")
-            n1.editorial.color = "orange"
-            n2.editorial.color = "ForestGreen"
-            n3.editorial.color = "orange"
+            n1.style.color = "orange"
+            n2.style.color = "ForestGreen"
+            n3.style.color = "orange"
 
     return numChanged
 
@@ -337,7 +337,7 @@ def capuaRuleFourB(srcStream):
     srcStream, i.e. if a descending minor third is followed by a descending major
     second, the intervals will be changed to a major third followed by a minor
     second. Also copies any relevant accidental to note.editorial.misc under
-    "saved-accidental" and changes note.editorial.color for rule 4 (orange
+    "saved-accidental" and changes note.style.color for rule 4 (orange
     green orange).
     
     returns the number of times a note was changed.
@@ -375,15 +375,15 @@ def capuaRuleFourB(srcStream):
                 n2.pitch.accidental = None
                 n2.editorial.ficta = pitch.Accidental("natural")
                 n2.editorial.misc["capua-ficta"] = pitch.Accidental("natural")
-                n1.editorial.color = "orange"
-                n2.editorial.color = "green"
-                n3.editorial.color = "orange"
+                n1.style.color = "orange"
+                n2.style.color = "green"
+                n3.style.color = "orange"
             else:
                 n2.editorial.ficta = pitch.Accidental("sharp")
                 n2.editorial.misc["capua-ficta"] = pitch.Accidental("sharp")
-                n1.editorial.color = "orange"
-                n2.editorial.color = "green"
-                n3.editorial.color = "orange"
+                n1.style.color = "orange"
+                n2.style.color = "green"
+                n3.style.color = "orange"
 
     return numChanged
 
@@ -1131,10 +1131,10 @@ class Test(unittest.TestCase):
         colorCapuaFicta(stream1, stream2, "both")
         assert n13.editorial.harmonicInterval.name == "P5", n13.editorial.harmonicInterval.name
 #    
-#        assert n11.editorial.color == "yellow"
-#        assert n12.editorial.color == "yellow"
-#        assert n13.editorial.color == "green"
-#        assert n14.editorial.color == "yellow"
+#        assert n11.style.color == "yellow"
+#        assert n12.style.color == "yellow"
+#        assert n13.style.color == "green"
+#        assert n14.style.color == "yellow"
 #    
 #        assert n11.editorial.harmonicInterval.name == "M2"
 #        assert n21.editorial.harmonicInterval.name == "M2"
@@ -1143,7 +1143,7 @@ class Test(unittest.TestCase):
 #        assert n13.editorial.misc["noFictaHarmony"] == "perfect cons"
 #        assert n13.editorial.misc["capua2FictaHarmony"] == "perfect cons"
 #        assert n13.editorial.misc["capua2FictaInterval"].name == "P5"
-#        assert n13.editorial.color == "green"
+#        assert n13.style.color == "green"
 #        assert stream1.lily.strip() == (r'''\clef "treble" \color "yellow" d'4 ''' +
 #                r'''\color "yellow" e'4 \ficta \color "green" fis'!4 \color "yellow" g'4''')
 

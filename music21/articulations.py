@@ -102,6 +102,8 @@ from music21 import base
 from music21 import common
 from music21 import exceptions21
 from music21 import environment
+from music21 import style
+
 _MOD = "articulations.py"
 environLocal = environment.Environment(_MOD)
 
@@ -118,8 +120,11 @@ class Articulation(base.Music21Object):
     
     >>> x = articulations.Articulation()
     >>> x.placement = 'below'
+    >>> x.style.absoluteY = 20
     
     '''
+    _styleClass = style.TextStyle
+    
     def __init__(self):
         base.Music21Object.__init__(self)
         self.placement = 'above'

@@ -28,6 +28,7 @@ from music21 import interval
 from music21 import note
 from music21 import pitch
 from music21 import scale
+from music21 import style
 
 from music21.ext import six
 
@@ -373,9 +374,8 @@ class KeySignature(base.Music21Object):
     >>> unusual.accidentalsApplyOnlyToOctave
     False
     >>> unusual.accidentalsApplyOnlyToOctave = True
-    
     '''
-
+    _styleClass = style.TextStyle
 
     # note that musicxml permits non-tradtional keys by specifying
     # one or more altered tones; these are given as pairs of 

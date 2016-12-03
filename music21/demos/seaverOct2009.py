@@ -70,7 +70,7 @@ def simple3():
         #notes[0].lyric = str(thisMeasure.number)
         if len(rhythmicHash[offsetString]) == 0: # if it is our first encounter with the rhythm, add the rhythm alone in blue
             for thisNote in rhythmicStream:
-                thisNote.color = "blue"
+                thisNote.style.color = "blue"
             rhythmicHash[offsetString].append(rhythmicStream)
         thisMeasure.flat.notesAndRests[0].editorial.comment.text = str(thisMeasure.number)
         rhythmicHash[offsetString].append(thisMeasure)
@@ -120,7 +120,7 @@ def displayChopinRhythms():
         notes[0].lyric = str(thisMeasure.number)
         if len(rhythmicHash[offsetString]) == 0: # if it is our first encounter with the rhythm, add the rhythm alone in blue
             for thisNote in rhythmicStream:
-                thisNote.color = "blue"
+                thisNote.style.color = "blue"
             rhythmicHash[offsetString].append(rhythmicStream)
         #thisMeasure.flat.notesAndRests[0].editorial.comment.text = str(thisMeasure.number)
         rhythmicHash[offsetString].append(thisMeasure)

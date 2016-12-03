@@ -54,7 +54,7 @@ class Style(object):
         self.fontRepresentation = None
         
         # TODO: migrate from elsewhere
-        # self.color = None
+        self.color = None
         
         self.units = 'tenths'
 
@@ -137,6 +137,10 @@ class TextStyle(Style):
         self._fontWeight = None
         self._letterSpacing = None
 
+        self.lineHeight = None
+        self.textDirection = None
+        self.textRotation = None
+        self.language = None
         # this might be a complex device -- underline, overline, line-through etc.
         self.textDecoration = None
 
@@ -310,9 +314,9 @@ class TextStyle(Style):
         >>> ts.fontFamily.append('Garamond')
         >>> ts.fontFamily
         ['Times', 'Garamond']
-        >>> ts.fontFamily = 'Helvetica'
+        >>> ts.fontFamily = 'Helvetica, sans-serif'
         >>> ts.fontFamily
-        ['Helvetica']
+        ['Helvetica', 'sans-serif']
         '''
         if self._fontFamily is None:
             self._fontFamily = []
@@ -323,7 +327,8 @@ class TextStyle(Style):
         if common.isIterable(newFamily):
             self._fontFamily = newFamily
         else:
-            self._fontFamily = [newFamily]
+            self._fontFamily = [f.strip() for f in newFamily.split(',')]
+            
         
 
 class BezierStyle(Style):

@@ -81,24 +81,24 @@ def generateChords(numChords,kind=''):
     >>> sc = alpha.webapps.commands.generateChords(4,'diatonicTriads')
     >>> a = alpha.webapps.commands.runPerceivedDissonanceAnalysis(sc,[1.2,3.2,5.2])
     >>> chords = a['fullScore']['stream'].flat.getElementsByClass('Chord')
-    >>> chords[0].color != None
+    >>> chords[0].style.color != None
     True
-    >>> chords[1].color != None
+    >>> chords[1].style.color != None
     True
-    >>> chords[2].color != None
+    >>> chords[2].style.color != None
     True
-    >>> chords[3].color in [None, '#cc3300']
+    >>> chords[3].style.color in [None, '#cc3300']
     True
     >>> sc2 = alpha.webapps.commands.generateChords(4)
     >>> a = alpha.webapps.commands.runPerceivedDissonanceAnalysis(sc2,[1.2,3.2])
     >>> chords = a['fullScore']['stream'].flat.getElementsByClass('Chord')
-    >>> chords[0].color != None
+    >>> chords[0].style.color != None
     True
-    >>> chords[1].color != None
+    >>> chords[1].style.color != None
     True
-    >>> chords[2].color in [None, '#cc3300']
+    >>> chords[2].style.color in [None, '#cc3300']
     True
-    >>> chords[3].color in [None, '#cc3300']
+    >>> chords[3].style.color in [None, '#cc3300']
     True
     '''
     sc = stream.Score()
@@ -275,13 +275,13 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
     >>> s.append(p)
     >>> aData = alpha.webapps.commands.determineDissonantIdentificationAccuracy(s, [2.3, 3.2])
     >>> chords = aData['stream'].flat.getElementsByClass('Chord')
-    >>> chords[0].color is None #BLACK (by default)
+    >>> chords[0].style.color is None #BLACK (by default)
     True
-    >>> chords[1].color #RED
+    >>> chords[1].style.color #RED
     '#cc3300'
-    >>> chords[2].color #BLUE
+    >>> chords[2].style.color #BLUE
     '#0033cc'
-    >>> chords[3].color #GREEN
+    >>> chords[3].style.color #GREEN
     '#00cc33'
     '''
     from music21 import roman
@@ -306,17 +306,17 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
         if not vs.isConsonant(): #music21 recognizes this as a dissonant vertical slice
             music21VS+=1
             if _withinRange(offsetList, currentVSOffset, nextVSOffset):
-                vs.color = '#00cc33' 
+                vs.style.color = '#00cc33' 
                 # the user also recognizes this as a dissonant vertical slice GREEN
                 both += 1
                 c = vs.getChord()
                 romanFigureList.append(roman.romanNumeralFromChord(c, pieceKey).figure)
             else:
-                vs.color = '#cc3300'  
+                vs.style.color = '#cc3300'  
                 #the user did not recognize as a dissonant vertical slice RED
         else: #music21 did not recognize this as a dissonant vertical slice
             if _withinRange(offsetList, currentVSOffset, nextVSOffset):
-                vs.color = '#0033cc' 
+                vs.style.color = '#0033cc' 
                 #the user recognized it as a dissonant vertical slice BLUE
     
     score.insert(metadata.Metadata())
@@ -477,7 +477,7 @@ def colorAllNotes(sc, color):
     used for testing color rendering in noteflight
     '''
     for n in sc.flat.getElementsByClass('Note'):
-        n.color = color 
+        n.style.olor = color 
     return sc
 
 def colorAllChords(sc, color):
@@ -486,7 +486,7 @@ def colorAllChords(sc, color):
     used for testing color rendering in noteflight
     '''
     for c in sc.flat.getElementsByClass('Chord'):
-        c.color = color 
+        c.style.color = color 
     return sc
 
 def writeMIDIFileToServer(sc):

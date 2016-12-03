@@ -843,8 +843,9 @@ class MensuralNote(GeneralMensuralNote, note.Note):
                      >>> from music21.alpha import medren
                      
                      >>> n = medren.MensuralNote('A', 'brevis')
-                     >>> n.color
-                     >>> 
+                     >>> n.color is None
+                     True
+
                      >>> n.color = 'red'
                      >>> n.color
                      'red'
@@ -1124,7 +1125,7 @@ class Ligature(base.Music21Object):
                 self._pitches.append(pitch.Pitch(p))
         
         self.noteheadShape = dict([(ind, 'square') for ind in range(self._ligatureLength())])
-        self.stems = dict([(ind, (None,None)) for ind in range(self._ligatureLength())])
+        self.stems = dict([(ind, (None, None)) for ind in range(self._ligatureLength())])
         self.maximaNotes = dict([(ind, False) for ind in range(self._ligatureLength())])
         self.reversedNotes = dict([(ind, False) for ind in range(self._ligatureLength())])
         
@@ -1214,7 +1215,7 @@ class Ligature(base.Music21Object):
             index = None
         if index != None:
             if index < self._ligatureLength():
-                return self.notes[index]._getColor()
+                return self.notes[index].color
             else:
                 raise MedRenException('no note exists at index %d' % index)
         else: 
@@ -1244,14 +1245,14 @@ class Ligature(base.Music21Object):
             if index < self._ligatureLength():
                 if value != tempColor:
                     self.color = 'mixed'
-                    self.notes[index]._setColor(value)
+                    self.notes[index].color = value
             else:
                 raise MedRenException('no note exists at index %d' % index)
         else:
             if value in ['black', 'red']:
                 self.color = value
                 for n in self.notes:
-                    n._setColor(value)
+                    n.color = value
             else:
                 raise MedRenException('color %s not supported for ligatures' % value)
     

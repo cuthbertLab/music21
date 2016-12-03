@@ -26,6 +26,8 @@ from music21 import common
 from music21 import defaults
 from music21 import exceptions21
 from music21 import interval
+from music21 import style
+
 from music21.common import SlottedObjectMixin
 from music21.ext import six
 
@@ -724,7 +726,7 @@ class Accidental(SlottedObjectMixin):
     ('sharp', 1.0, '#')
 
     '''
-
+    _styleClass = style.TextStyle
     ### CLASS VARIABLES ###
 
     __slots__ = (
@@ -736,6 +738,7 @@ class Accidental(SlottedObjectMixin):
         'displayLocation',
         'displaySize',
         'displayStyle',
+        '_style',
         )
 
     # define order to present names in documentation; use strings
@@ -752,7 +755,8 @@ class Accidental(SlottedObjectMixin):
         'displayStyle': 'Style of display: "parentheses", "bracket", "both".',
         'displayStatus': '''Determines if this Accidental is to be displayed; 
             can be None (for not set), True, or False.''',
-        'displayLocation': 'Location of accidental: "normal", "above", "below".'
+        'displayLocation': 'Location of accidental: "normal", "above", "below".',
+        'style': 'General print style attributes, see `style.Style`',
         }
 
     ### INITIALIZER ###
@@ -772,6 +776,7 @@ class Accidental(SlottedObjectMixin):
         self._modifier = ''
         self._alter = 0.0     # semitones to alter step
         # potentially can be a fraction... but not exponent...
+        self._style = None
         self.set(specifier)
 
     ### SPECIAL METHODS ###
@@ -924,6 +929,39 @@ class Accidental(SlottedObjectMixin):
           'sharp', 'triple-flat', 'triple-sharp']              
         '''
         return sorted(accidentalNameToModifier.keys(), key=str.lower)
+
+    ### PUBLIC PROPERTIES ###
+    @property
+    def style(self):
+        '''
+        Returns (or Creates and then Returns) the Style object
+        associated with this object, or sets a new
+        style object.  Different classes might use
+        different Style objects because they might have different 
+        style needs (such as text formatting or bezier positioning)
+        
+        Eventually will also query the groups to see if they have
+        any styles associated with them.
+        
+        >>> acc = pitch.Accidental('flat')
+        >>> st = acc.style
+        >>> st
+        <music21.style.Style object at 0x10ba96208>
+        >>> st.absoluteX = 20.0
+        >>> st.absoluteX
+        20.0
+        >>> acc.style = style.Style()
+        >>> acc.style.absoluteX is None
+        True
+        '''
+        if self._style is None:
+            styleClass = self._styleClass
+            self._style = styleClass()
+        return self._style
+    
+    @style.setter
+    def style(self, newStyle):
+        self._style = newStyle
 
     ### PUBLIC METHODS ###
 

@@ -97,6 +97,8 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
       # -*- coding: utf-8 -*-
     world
     
+    Restore stderr at the end.
+    
     >>> sys.stderr = saveStdErr
     
     '''

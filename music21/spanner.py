@@ -29,6 +29,7 @@ from music21 import base
 from music21 import common
 from music21 import defaults
 from music21 import duration
+from music21 import style
 
 from music21.ext import six
 
@@ -1217,6 +1218,8 @@ class MultiMeasureRest(Spanner):
     A grouping symbol that indicates that a collection of rests lasts
     multiple measures.
     '''    
+    _styleClass = style.TextStyle
+    
     _DOC_ATTR = {'useSymbols': '''boolean to indicate whether rest symbols 
                                     (breve, longa, etc.) should be used when
                                     displaying the rest. Your music21 inventor

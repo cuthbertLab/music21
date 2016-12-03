@@ -25,6 +25,8 @@ from music21 import base
 from music21 import common
 from music21 import exceptions21
 from music21 import environment
+from music21 import style
+
 _MOD = "clef.py"
 environLocal = environment.Environment(_MOD) 
 
@@ -58,7 +60,7 @@ class Clef(base.Music21Object):
     >>> tc.lowestLine
     31
     '''
-    
+    _styleClass = style.TextStyle
     classSortOrder = 0
 
     def __init__(self):

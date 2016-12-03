@@ -406,7 +406,10 @@ class GeneralNote(base.Music21Object):
 
     #---------------------------------------------------------------------------
     def _getColor(self):
-        '''Return the Note color.
+        '''
+        DEPRECATED: use `.style.color`
+        
+        Return the Note color.
 
         >>> a = note.GeneralNote()
         >>> a.duration.type = 'whole'
@@ -415,14 +418,11 @@ class GeneralNote(base.Music21Object):
         >>> a.color = '#235409'
         >>> a.color
         '#235409'
-        >>> a.editorial.color
+        >>> a.style.color
         '#235409'
-
-
         '''
-        #return self.editorial.color
-        if self._editorial is not None:
-            return self.editorial.color
+        if self._style is not None:
+            return self.style.color
         else:
             return None
 
@@ -432,7 +432,7 @@ class GeneralNote(base.Music21Object):
         uses this re: #[\dA-F]{6}([\dA-F][\dA-F])?
         No: because Lilypond supports "blue", "red" etc., as does CSS; musicxml also supports alpha
         '''
-        self.editorial.color = value
+        self.style.color = value
 
     color = property(_getColor, _setColor)
 

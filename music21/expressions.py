@@ -100,6 +100,8 @@ class Expression(base.Music21Object):
     '''
     This base class is inherited by many diverse expressions. 
     '''
+    _styleClass = style.TextStyle
+    
     def __init__(self):
         base.Music21Object.__init__(self)
     

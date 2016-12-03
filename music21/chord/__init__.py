@@ -1098,7 +1098,7 @@ class Chord(note.NotRest):
         
         >>> p = pitch.Pitch('C4')
         >>> n = note.Note(p)
-        >>> n.color = 'red'
+        >>> n.style.color = 'red'
         >>> c = chord.Chord([n, 'E4'])
         >>> c.getColor(p)
         'red'
@@ -1120,13 +1120,16 @@ class Chord(note.NotRest):
             pitchTarget = pitch.Pitch(pitchTarget)
         for n in self._notes:
             if n.pitch is pitchTarget:
-                if n.color is not None:
-                    return n.color
+                if n.hasStyleInformation and n.style.color is not None:
+                    return n.style.color
         for n in self._notes:
             if n.pitch == pitchTarget:
-                if n.color is not None:
-                    return n.color
-        return self.color # may be None
+                if n.hasStyleInformation and n.style.color is not None:
+                    return n.style.color
+        if self.hasStyleInformation:
+            return self.style.color # may be None
+        else:
+            return None
 
     def getNotehead(self, p):
         '''Given a pitch in this Chord, return an associated notehead
@@ -2904,7 +2907,7 @@ class Chord(note.NotRest):
         '''
         # assign to base
         if pitchTarget is None and len(self._notes) > 0:
-            self.color = value
+            self.style.color = value
             return
         elif isinstance(pitchTarget, six.string_types):
             pitchTarget = pitch.Pitch(pitchTarget)
@@ -2912,13 +2915,13 @@ class Chord(note.NotRest):
         match = False
         for d in self._notes:
             if d.pitch is pitchTarget:
-                d.color = value
+                d.style.color = value
                 match = True
                 break
         if not match: # look at equality of value
             for d in self._notes:
                 if d.pitch == pitchTarget:
-                    d.color = value
+                    d.style.color = value
                     match = True
                     break
         if not match:
@@ -3414,7 +3417,7 @@ class Chord(note.NotRest):
         >>> a.color
         '#235409'
 
-        >>> a.editorial.color
+        >>> a.style.color
         '#235409'
 
         >>> a.setColor('#ff0000', 'e4')
@@ -3428,14 +3431,14 @@ class Chord(note.NotRest):
         #235409
 
         '''
-        if self._editorial is not None:
-            return self.editorial.color
+        if self.hasStyleInformation:
+            return self.style.color
         else:
             return None
 
     @color.setter
     def color(self, expr):
-        self.editorial.color = expr
+        self.style.color = expr
 
     @property
     def commonName(self):

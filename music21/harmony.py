@@ -25,6 +25,7 @@ from music21 import exceptions21
 from music21 import interval
 from music21 import key
 from music21 import pitch
+from music21 import style
 
 from music21.ext import six
 from music21.figuredBass import realizerScale
@@ -164,6 +165,7 @@ class Harmony(chord.Chord):
     Accepts a keyword 'updatePitches'. By default it
     is True, but can be set to False to initialize faster if pitches are not needed.
     '''
+    _styleClass = style.TextStyle
     
     ### INITIALIZER ###
 

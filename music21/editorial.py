@@ -17,7 +17,6 @@ Editorial objects store comments and other meta-data associated with specific
 import unittest
 from music21 import exceptions21
 from music21.common import SlottedObjectMixin
-from music21.ext import six
 
 #------------------------------------------------------------------------------
 
@@ -95,7 +94,7 @@ class NoteEditorial(SlottedObjectMixin):
     stored in the dict called "misc":
 
     >>> a = editorial.NoteEditorial()
-    >>> a.color = "blue"  # a standard editorial effect
+    >>> a.comment = "blue note"  # a standard editorial 
     >>> a.misc['backgroundHighlight'] = 'yellow'  # non-standard.
 
     Every GeneralNote object already has a NoteEditorial object attached to it
@@ -118,7 +117,6 @@ class NoteEditorial(SlottedObjectMixin):
     '''
 
     _DOC_ATTR = {
-        'color': 'the color of the note (RGP, x11 colors, and extended x11colors are allowed)',
         'comment': 'a reference to a :class:`~music21.editorial.Comment` object',
         'ficta': '''a :class:`~music21.pitch.Accidental` object that specifies musica 
             ficta for the note.  Will only be displayed in LilyPond and then only if 
@@ -138,7 +136,6 @@ class NoteEditorial(SlottedObjectMixin):
 
     __slots__ = (
         'ficta',
-        'color',
         'misc',
         'harmonicInterval',
         'harmonicIntervals',
@@ -154,7 +151,6 @@ class NoteEditorial(SlottedObjectMixin):
     def __init__(self):
         # Accidental object -- N.B. for PRINTING only not for determining intervals
         self.ficta = None
-        self.color = None
         self.misc = {}
         self.harmonicInterval = None
         self.harmonicIntervals = []
@@ -163,71 +159,6 @@ class NoteEditorial(SlottedObjectMixin):
         self.melodicIntervals = []
         self.melodicIntervalsOverRests = []
         self.comment = Comment()
-
-    ### PUBLIC METHODS ###
-
-    def lilyStart(self):
-        r'''
-        A method that returns a string containing the lilypond output that
-        comes before the note.
-
-        >>> n = note.Note()
-        >>> n.editorial.lilyStart()
-        ''
-
-        >>> n.editorial.ficta = pitch.Accidental("Sharp")
-        >>> n.editorial.color = "blue"
-        >>> n.editorial.hidden = True
-        >>> print(n.editorial.lilyStart())
-        \ficta \color "blue" \hideNotes
-
-        '''
-        result = ""
-        if self.ficta is not None:
-            result += self.fictaLilyStart()
-        if self.color:
-            result += self.colorLilyStart()
-        if self.hidden is True:
-            result += r"\hideNotes "
-        return result
-
-    @staticmethod
-    def fictaLilyStart():
-        r'''
-        Returns \ficta -- called out so it is more easily subclassed
-        '''
-        return r"\ficta "
-
-    def colorLilyStart(self):
-        r'''
-        Returns \color "theColorName" -- called out so it is more easily
-        subclassed.
-        '''
-        return r'\color "' + self.color + '" '
-
-    def lilyAttached(self):
-        r'''
-        Returns any information that should be attached under the note,
-        currently just returns self.comment.lily or "".
-        '''
-        # pylint: disable=undefined-variable
-        if self.comment and self.comment.text:
-            if six.PY2:
-                return unicode(self.comment.lily) # @UndefinedVariable
-            else:
-                return str(self.comment.lily)
-        else:
-            return ''
-
-    def lilyEnd(self):
-        r'''
-        Returns a string of editorial lily instructions to come after the note.
-        Currently it is just info to turn off hiding of notes.
-        '''
-        result = u""
-        if self.hidden is True:
-            result += u"\\unHideNotes "
-        return result
 
 class Comment(SlottedObjectMixin):
     '''
