@@ -16,7 +16,7 @@ Editorial objects store comments and other meta-data associated with specific
 '''
 import unittest
 from music21 import exceptions21
-from music21.common import SlottedObjectMixin
+from music21 import style
 
 #------------------------------------------------------------------------------
 
@@ -29,13 +29,16 @@ class CommentException(exceptions21.Music21Exception):
 
 
 #------------------------------------------------------------------------------
-class NoteEditorial(SlottedObjectMixin):
+class Editorial(dict):
     '''
-    Editorial comments and special effects that can be applied to notes
-    stored in the dict called "misc":
+    Editorial comments and special effects that can be applied to music21 objects.
 
-    >>> a = editorial.NoteEditorial()
-    >>> a.misc['backgroundHighlight'] = 'yellow'  # non-standard.
+    >>> a = editorial.Editorial()
+    >>> a.backgroundHighlight = 'yellow'  # non-standard.
+    >>> a.backgroundHighlight
+    'yellow'
+    >>> list(a.keys())
+    ['backgroundHighlight']
 
     Every GeneralNote object already has a NoteEditorial object attached to it
     at object.editorial.  Normally you will just change that object instead.
@@ -57,42 +60,88 @@ class NoteEditorial(SlottedObjectMixin):
     '''
 
     _DOC_ATTR = {
+        'comments': '''
+            a list of :class:`~music21.editorial.Comment` objects that represent any comments
+            about the object.
+            ''',
+        'footnotes': '''
+            a list of :class:`~music21.editorial.Comment` objects that represent annotations
+            for the object.
+        ''',
         'ficta': '''a :class:`~music21.pitch.Accidental` object that specifies musica 
             ficta for the note.  Will only be displayed in LilyPond and then only if 
             there is no Accidental object on the note itself''',
         'harmonicInterval': '''an :class:`~music21.interval.Interval` object that specifies 
-            the harmonic interval between this note and a single other note 
+            the harmonic interval between this note and a single other note, or None 
             (useful for storing information post analysis)''',
         'melodicInterval': '''an :class:`~music21.interval.Interval` object that specifies 
             the melodic interval to the next note in this part/voice/stream, etc.''',
         'misc': 'A dict to hold anything you might like to store.',
         }
 
-    __slots__ = (
-        'ficta',
-        '_misc',
-        'harmonicInterval',
-        'melodicInterval',
-        )
+    predefinedDicts = ('misc',)
+    predefinedLists = ('footnotes', 'comments')
+    predefinedNones = ('ficta', 'harmonicInterval', 'melodicInterval')
+
+    def __repr__(self):
+        return '<music21.editorial.Editorial ' + super(Editorial, self).__repr__() + ' >'
 
     ### INITIALIZER ###
+    def __getattr__(self, name):
+        if name in self:
+            return self[name]
+        elif name in self.predefinedDicts:
+            self[name] = {}
+            return self[name]
+        elif name in self.predefinedLists:
+            self[name] = []
+            return self[name]
+        elif name in self.predefinedNones:
+            self[name] = None
+            return self[name]
+        else:
+            raise AttributeError('Editorial does not have an attribute %s' % name)
 
-    def __init__(self):
-        # Accidental object -- N.B. for PRINTING only not for determining intervals
-        self.ficta = None
-        self._misc = None
-        self.harmonicInterval = None
-        self.melodicInterval = None
+    def __setattr__(self, name, value):
+        self[name] = value
 
-    @property
-    def misc(self):
-        if self._misc is None:
-            self._misc = {}
-        return self._misc
+    def __delattr__(self, name):
+        if name in self:
+            del self[name]
+        else:
+            raise AttributeError("No such attribute: " + name)
+
+#------------------------------------------------------------------------------
+class Comment(style.StyleMixin):
+    '''
+    A comment or footnote or something else attached to a note.
     
-    @misc.setter
-    def misc(self, value):
-        self._misc = value
+    >>> c = editorial.Comment('presented as C natural in the 1660 print.')
+    >>> c.isFootnote = True
+    >>> c.levelInformation = 'musicological'
+    
+    >>> n = note.Note('C#4')
+    >>> n.editorial.footnotes.append(c)
+    >>> n.editorial.footnotes[0]
+    <music21.editorial.Comment 'presented as C na...' >
+    '''
+    def __init__(self, text=None):
+        super(Comment, self).__init__()
+        self.text = text
+        self.isFootnote = False
+        self.isReference = False
+        self.levelInformation = None
+        self.voiceInformation = None
+       
+    def __repr__(self):
+        head = '<music21.editorial.Comment '
+        end = '>'
+        if self.text is None:
+            return head + end 
+        elif len(self.text) < 20:
+            return head + "'" + self.text + "' " + end
+        else:
+            return head + "'" + self.text[:17] + "...' " + end
 
 #------------------------------------------------------------------------------
 
@@ -102,12 +151,9 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-    def testSlots(self):
-        editorial = NoteEditorial()
-        assert not hasattr(editorial, '__dict__')
-
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
+        '''
+        Test copying all objects defined in this module
         '''
         import copy
         import sys
@@ -135,7 +181,7 @@ class Test(unittest.TestCase):
 
 
 _DOC_ORDER = (
-    NoteEditorial,
+    Editorial,
     )
 
 if __name__ == "__main__":

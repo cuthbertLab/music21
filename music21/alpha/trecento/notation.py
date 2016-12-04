@@ -226,7 +226,7 @@ class TrecentoTinyConverter(tinyNotation.Converter):
     In 14th c. music, C to B and c to b will be most common
 
     3.  Flats, sharps, and naturals are notated as #,- (not b), and (if needed)
-        n. If the accidental is above the staff (i.e., editorial), enclose it
+        n. If the accidental is above the staff (i.e., editorial.ficta), enclose it
         in parentheses: (#), etc.  Make sure that flats in the key signatures
         are explicitly specified.
 

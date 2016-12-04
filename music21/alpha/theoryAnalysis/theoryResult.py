@@ -85,16 +85,16 @@ class VLQTheoryResult(TheoryResult):
     def hasEditorial(self, miscKey, editorialValue=True):
         '''
         return True if any of the four VLQTheoryResult notes have the editorial key 
-        .editorial.misc[miscKey] present and equal to a certain editorialValue (True by default)
+        .editorial[miscKey] present and equal to a certain editorialValue (True by default)
         '''
-        return ((miscKey in self.vlq.v1n1.editorial.misc and 
-                    self.vlq.v1n1.editorial.misc[miscKey] == editorialValue) or 
-                (miscKey in self.vlq.v1n2.editorial.misc and 
-                    self.vlq.v1n2.editorial.misc[miscKey] == editorialValue) or 
-                (miscKey in self.vlq.v2n1.editorial.misc and 
-                    self.vlq.v2n1.editorial.misc[miscKey] == editorialValue) or 
-                (miscKey in self.vlq.v2n2.editorial.misc and 
-                    self.vlq.v2n2.editorial.misc[miscKey] == editorialValue))
+        return ((miscKey in self.vlq.v1n1.editorial and 
+                    self.vlq.v1n1.editorial[miscKey] == editorialValue) or 
+                (miscKey in self.vlq.v1n2.editorial and 
+                    self.vlq.v1n2.editorial[miscKey] == editorialValue) or 
+                (miscKey in self.vlq.v2n1.editorial and 
+                    self.vlq.v2n1.editorial[miscKey] == editorialValue) or 
+                (miscKey in self.vlq.v2n2.editorial and 
+                    self.vlq.v2n2.editorial[miscKey] == editorialValue))
 
     def markNoteEditorial(self, 
         editorialDictKey, 
@@ -102,7 +102,7 @@ class VLQTheoryResult(TheoryResult):
         editorialMarkList=(1, 2, 3, 4)):
         '''
         Mark each note as specified in editorialMarkList with the 
-        editorialValue in `Editorial.misc[editorialDictKey]`.
+        editorialValue in `Editorial[editorialDictKey]`.
         
         `editorialMarkList` is a list with the notenumber in the 
         voiceleadingquartet to mark.
@@ -116,13 +116,13 @@ class VLQTheoryResult(TheoryResult):
         '''
 
         if 1 in editorialMarkList:
-            self.vlq.v1n1.editorial.misc[editorialDictKey] = editorialValue
+            self.vlq.v1n1.editorial[editorialDictKey] = editorialValue
         if 2 in editorialMarkList:
-            self.vlq.v1n2.editorial.misc[editorialDictKey] = editorialValue
+            self.vlq.v1n2.editorial[editorialDictKey] = editorialValue
         if 3 in editorialMarkList:
-            self.vlq.v2n1.editorial.misc[editorialDictKey] = editorialValue
+            self.vlq.v2n1.editorial[editorialDictKey] = editorialValue
         if 4 in editorialMarkList:
-            self.vlq.v2n2.editorial.misc[editorialDictKey] = editorialValue
+            self.vlq.v2n2.editorial[editorialDictKey] = editorialValue
                   
 class IntervalTheoryResult(TheoryResult):
     
@@ -170,13 +170,13 @@ class IntervalTheoryResult(TheoryResult):
     def hasEditorial(self, miscKey, editorialValue=True):
         '''
         return True if either the noteStart or the noteEnd has the editorial key 
-        .editorial.misc[miscKey] 
+        .editorial[miscKey] 
         present and equal to a certain editorialValue (True by default)
         '''
-        return ((miscKey in self.intv.noteStart.editorial.misc and 
-                    self.intv.noteStart.editorial.misc[miscKey] == editorialValue) or                 
-                (miscKey in self.intv.noteEnd.editorial.misc and 
-                 self.intv.noteEnd.editorial.misc[miscKey] == editorialValue))
+        return ((miscKey in self.intv.noteStart.editorial and 
+                    self.intv.noteStart.editorial[miscKey] == editorialValue) or                 
+                (miscKey in self.intv.noteEnd.editorial and 
+                 self.intv.noteEnd.editorial[miscKey] == editorialValue))
     
 # Note Theory Result Object
                   
@@ -277,7 +277,7 @@ class VerticalityNTupletTheoryResult(TheoryResult):
         for vsNum, partNumList in editorialMarkDict.items():
             for unused_counter_partNum in partNumList:
                 self.vsnt.verticalities[vsNum].getObjectsByPart(0, 
-                    classFilterList=['Note']).editorial.misc[editorialDictKey] = editorialValue
+                    classFilterList=['Note']).editorial[editorialDictKey] = editorialValue
 
 
 class Test(unittest.TestCase):

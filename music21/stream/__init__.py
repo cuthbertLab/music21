@@ -8044,7 +8044,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
     def quantize(self, quarterLengthDivisors=None,
-            processOffsets=True, processDurations=True, inPlace=False, recurse=True):
+                 processOffsets=True, processDurations=True, 
+                 inPlace=False, recurse=True):
         '''
         Quantize time values in this Stream by snapping offsets
         and/or durations to the nearest multiple of a quarter length value
@@ -8079,14 +8080,24 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> nshort = note.Note()
         >>> nshort.quarterLength = .26
         >>> s.repeatInsert(nshort, [1.49, 1.76])
+        
         >>> s.quantize([4], processOffsets=True, processDurations=True, inPlace=True)
         >>> [e.offset for e in s]
         [0.0, 0.5, 1.0, 1.5, 1.75]
         >>> [e.duration.quarterLength for e in s]
         [0.5, 0.5, 0.5, 0.25, 0.25]
+        
+        
+        The error in quantization is set in the editorial attribute for the note in
+        two places `.offsetQuantizationError` and `.quarterLengthQuantizationError`
+        
+        >>> [e.editorial.offsetQuantizationError for e in s.notes]
+        [0.1, -0.01, -0.1, -0.01, 0.01]
+        >>> [e.editorial.quarterLengthQuantizationError for e in s.notes]
+        [-0.01, -0.01, -0.01, 0.01, 0.01]
 
 
-        # test with default quarterLengthDivisors...
+        with default quarterLengthDivisors...
 
         >>> s = stream.Stream()
         >>> s.repeatInsert(n, [0.1, .49, .9])
@@ -8124,7 +8135,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         TODO: test recurse and inPlace etc.
         TODO: recurse should be off by default -- standard
-
         '''
         if quarterLengthDivisors is None:
             quarterLengthDivisors = defaults.quantizationQuarterLengthDivisors
@@ -8171,9 +8181,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     unused_error, oNew, signedError = bestMatch(float(o), quarterLengthDivisors)
                     useStream.setElementOffset(e, oNew * sign)
                     if (hasattr(e, 'editorial') 
-                            and hasattr(e.editorial, 'misc') 
                             and signedError != 0):
-                        e.editorial.misc['offsetQuantizationError'] = signedError * sign
+                        e.editorial.offsetQuantizationError = signedError * sign
                 if processDurations:
                     if e.duration is not None:
                         ql = e.duration.quarterLength
@@ -8183,9 +8192,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                                             float(ql), quarterLengthDivisors)
                         e.duration.quarterLength = qlNew
                         if (hasattr(e, 'editorial')
-                                and hasattr(e.editorial, 'misc') 
                                 and signedError != 0):
-                            e.editorial.misc['quarterLengthQuantizationError'] = signedError
+                            e.editorial.quarterLengthQuantizationError = signedError
 
         if inPlace is False:
             return returnStream
@@ -9618,8 +9626,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s1 = converter.parse('tinyNotation: 7/4 C4 d8 e f# g A2 d2', makeNotation=False)
         >>> s1.attachMelodicIntervals()
         >>> for n in s1.notes:
-        ...     if n.editorial.melodicInterval is None: print("None")
-        ...     else: print(n.editorial.melodicInterval.directedName)
+        ...     if n.editorial.melodicInterval is None: 
+        ...         print("None")
+        ...     else: 
+        ...         print(n.editorial.melodicInterval.directedName)
         None
         M9
         M2

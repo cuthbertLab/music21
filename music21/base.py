@@ -28,7 +28,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'4.0.3'
+'4.0.4'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -82,6 +82,7 @@ from music21 import common
 from music21 import defaults
 from music21 import derivation
 from music21 import duration
+from music21 import editorial
 from music21 import environment
 from music21 import sites
 from music21 import style
@@ -299,6 +300,12 @@ class Music21Object(object):
         object is in.
     8.  derivation: a :class:`~music21.derivation.Derivation` object, or None, that shows
         where the object came from.
+    9.  style: a :class:`~music21.style.Style` object, that contains Style information
+        automatically created if it doesn't exist, so check `.hasStyleInformation` first
+        if that is not desired.
+    10. editorial: a :class:`~music21.editorial.Editorial` object
+    
+
 
     Each of these may be passed in as a named keyword to any music21 object.
 
@@ -379,15 +386,15 @@ class Music21Object(object):
         # offset when no activeSite is available
         self._naiveOffset = 0.0
         # offset when activeSite is already garbage collected/dead, as in short-lived sites
-        # like .getElementsByClass
+        # like .getElementsByClass().stream()
         self._activeSiteStoredOffset = None
 
-        
         # store a derivation object to track derivations from other Streams
         # pass a reference to this object
         self._derivation = None
         
         self._style = None
+        self._editorial = None
         
         # private duration storage; managed by property
         self._duration = None
@@ -400,21 +407,26 @@ class Music21Object(object):
         else:
             self.id = id(self)
 
-        # a duration object is not created until the .duration property is
-        # accessed with _getDuration(); this is a performance optimization
-        if "duration" in keywords:
-            self.duration = keywords["duration"]
         if "groups" in keywords and keywords["groups"] is not None:
             self.groups = keywords["groups"]
         else:
             self.groups = Groups()
+
         if "sites" in keywords:
             self.sites = keywords["sites"]
         else:
             self.sites = sites.Sites()
 
+        # a duration object is not created until the .duration property is
+        # accessed with _getDuration(); this is a performance optimization
+        if "duration" in keywords:
+            self.duration = keywords["duration"]
         if "activeSite" in keywords:
             self.activeSite = keywords["activeSite"]
+        if 'style' in keywords:
+            self.style = keywords['style']
+        if 'editorial' in keywords:
+            self.editorial = keywords['editorial']
 
 
     def mergeAttributes(self, other):
@@ -721,6 +733,63 @@ class Music21Object(object):
             classSet = frozenset(classList)
             self._classSetCacheDict[self.__class__] = classSet
             return classSet
+
+
+    #---------------------------------------------------------------------------
+    @property
+    def hasEditorialInformation(self):
+        '''
+        Returns True if there is a :class:`~music21.editorial.Editorial` object
+        already associated with this object, False otherwise.
+        
+        Calling .style on an object will always create a new 
+        Style object, so even though a new Style object isn't too expensive
+        to create, this property helps to prevent creating new Styles more than
+        necessary.
+        
+        >>> mObj = base.Music21Object()
+        >>> mObj.hasEditorialInformation
+        False
+        >>> mObj.editorial
+        <music21.editorial.Editorial {} >
+        >>> mObj.hasEditorialInformation
+        True
+        '''
+        return False if self._editorial is None else True
+
+    @property
+    def editorial(self):
+        '''
+        a :class:`~music21.editorial.Editorial` object that stores editorial information
+        (comments, footnotes, harmonic information, ficta).
+
+        Created automatically as needed:
+
+        >>> n = note.Note("C4")
+        >>> n.editorial
+        <music21.editorial.Editorial {} >
+        >>> n.editorial.ficta = pitch.Accidental('sharp')
+        >>> n.editorial.ficta
+        <accidental sharp>
+        >>> n.editorial
+        <music21.editorial.Editorial {'ficta': <accidental sharp>} >
+
+        OMIT_FROM_DOCS
+        >>> b2 = base.Music21Object()
+        >>> b2._editorial is None
+        True
+        >>> b2.editorial
+        <music21.editorial.Editorial {} >
+        >>> b2._editorial is None
+        False      
+        '''
+        if self._editorial is None:
+            self._editorial = editorial.Editorial()
+        return self._editorial
+
+    @editorial.setter
+    def editorial(self, ed):
+        self._editorial = ed
 
     @property
     def hasStyleInformation(self):
@@ -4901,8 +4970,6 @@ class Test(unittest.TestCase):
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Music21Object, ElementWrapper]
-
-
 
 
 #------------------------------------------------------------------------------

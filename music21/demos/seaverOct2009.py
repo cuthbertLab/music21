@@ -76,7 +76,7 @@ def simple3():
             for thisNote in rhythmicStream:
                 thisNote.style.color = "blue"
             rhythmicHash[offsetString].append(rhythmicStream)
-        # thisMeasure.flat.notesAndRests[0].editorial.comment.text = str(thisMeasure.number)
+        # thisMeasure.flat.notesAndRests[0].editorial.measureNumber = str(thisMeasure.number)
         rhythmicHash[offsetString].append(thisMeasure)
 
     s = stream.Part()
@@ -128,7 +128,7 @@ def displayChopinRhythms():
             for thisNote in rhythmicStream:
                 thisNote.style.color = "blue"
             rhythmicHash[offsetString].append(rhythmicStream)
-        # thisMeasure.flat.notesAndRests[0].editorial.comment.text = str(thisMeasure.number)
+        # thisMeasure.flat.notesAndRests[0].editorial.measureNumber = str(thisMeasure.number)
         rhythmicHash[offsetString].append(thisMeasure)
 
     s = stream.Part()
