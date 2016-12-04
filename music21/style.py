@@ -346,6 +346,84 @@ class BezierStyle(Style):
         self.bezierX2 = None
         self.bezierY2 = None
 
+
+class StyleMixin(common.SlottedObjectMixin):
+    '''
+    Mixin for any class that wants to support style, since several 
+    non-music21 objects, such as Lyrics and Accidentals will support Style.
+    
+    Not used by Music21Objects because of the added trouble in copying etc. so
+    there is code duplication with base.Music21Object
+    '''
+    _styleClass = Style
+    
+    __slots__ = ('_style',)
+    
+    def __init__(self):
+        super(StyleMixin, self).__init__()
+        self._style = None
+        
+    @property
+    def hasStyleInformation(self):
+        '''
+        Returns True if there is a :class:`~music21.style.Style` object
+        already associated with this object, False otherwise.
+        
+        Calling .style on an object will always create a new 
+        Style object, so even though a new Style object isn't too expensive
+        to create, this property helps to prevent creating new Styles more than
+        necessary.
+        
+        >>> lObj = note.Lyric('hello')
+        >>> lObj.hasStyleInformation
+        False
+        >>> lObj.style
+        <music21.style.TextStyle object at 0x10b0a2080>
+        >>> lObj.hasStyleInformation
+        True
+        '''
+        try:
+            self._style
+        except AttributeError:
+            pass
+            
+        return False if self._style is None else True
+    
+    
+    @property
+    def style(self):
+        '''
+        Returns (or Creates and then Returns) the Style object
+        associated with this object, or sets a new
+        style object.  Different classes might use
+        different Style objects because they might have different 
+        style needs (such as text formatting or bezier positioning)
+        
+        Eventually will also query the groups to see if they have
+        any styles associated with them.
+        
+        >>> acc = pitch.Accidental()
+        >>> st = acc.style
+        >>> st
+        <music21.style.TextStyle object at 0x10ba96208>
+        >>> st.absoluteX = 20.0
+        >>> st.absoluteX
+        20.0
+        >>> acc.style = style.TextStyle()
+        >>> acc.style.absoluteX is None
+        True
+        '''
+        if self._style is None:
+            styleClass = self._styleClass
+            self._style = styleClass()
+        return self._style
+    
+    @style.setter
+    def style(self, newStyle):
+        self._style = newStyle
+    
+
+
 class Test(unittest.TestCase):
     pass
 

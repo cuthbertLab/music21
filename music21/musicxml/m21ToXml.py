@@ -83,79 +83,6 @@ def typeToMusicXMLType(value):
     else:
         return value
 
-def accidentalToMx(a):
-    '''
-    Convert a pitch.Accidental object to a Element of tag accidental
-    
-    >>> a = pitch.Accidental()
-    >>> a.set('half-sharp')
-    >>> a.alter == .5
-    True
-    >>> mxAccidental = musicxml.m21ToXml.accidentalToMx(a)
-
-    >>> XB = musicxml.m21ToXml.XMLExporterBase()
-    >>> XB.dump(mxAccidental)
-    <accidental>quarter-sharp</accidental>
-
-    >>> a.set('double-flat')
-    >>> mxAccidental = musicxml.m21ToXml.accidentalToMx(a)
-    >>> XB.dump(mxAccidental)
-    <accidental>flat-flat</accidental>
-
-
-    >>> a.set('one-and-a-half-sharp')
-    >>> mxAccidental = musicxml.m21ToXml.accidentalToMx(a)
-    >>> XB.dump(mxAccidental)
-    <accidental>three-quarters-sharp</accidental>
-
-    >>> a.set('half-flat')
-    >>> mxAccidental = musicxml.m21ToXml.accidentalToMx(a)
-    >>> XB.dump(mxAccidental)
-    <accidental>quarter-flat</accidental>
-
-    >>> a.set('one-and-a-half-flat')
-    >>> mxAccidental = musicxml.m21ToXml.accidentalToMx(a)
-    >>> XB.dump(mxAccidental)
-    <accidental>three-quarters-flat</accidental>
-
-    >>> a.set('sharp')
-    >>> a2m = musicxml.m21ToXml.accidentalToMx
-    >>> a.displayStyle = 'parentheses'
-    >>> XB.dump(a2m(a))
-    <accidental parentheses="yes">sharp</accidental>
-    
-    >>> a.displayStyle = 'bracket'
-    >>> XB.dump(a2m(a))
-    <accidental bracket="yes">sharp</accidental>
-    
-    >>> a.displayStyle = 'both'
-    >>> XB.dump(a2m(a))
-    <accidental bracket="yes" parentheses="yes">sharp</accidental>
-    '''
-    if a.name == "half-sharp": 
-        mxName = "quarter-sharp"
-    elif a.name == "one-and-a-half-sharp": 
-        mxName = "three-quarters-sharp"
-    elif a.name == "half-flat": 
-        mxName = "quarter-flat"
-    elif a.name == "one-and-a-half-flat": 
-        mxName = "three-quarters-flat"
-    elif a.name == "double-flat": 
-        mxName = "flat-flat"
-    else: # all others are the same
-        mxName = a.name
-
-    mxAccidental = Element('accidental')
-    # need to remove display in this case and return None
-    #         if self.displayStatus == False:
-    #             pass
-    mxAccidental.text = mxName
-    if a.displayStyle in ('parentheses', 'both'):
-        mxAccidental.set('parentheses', 'yes')
-    if a.displayStyle in ('bracket', 'both'):
-        mxAccidental.set('bracket', 'yes')        
-    
-    return mxAccidental
     
 
 def normalizeColor(color):
@@ -662,7 +589,6 @@ class XMLExporterBase(object):
     contains functions that could be called
     at multiple levels of exporting (Score, Part, Measure).
     '''
-    
     def __init__(self):
         self.xmlRoot = None
 
@@ -737,23 +663,112 @@ class XMLExporterBase(object):
                 b'''PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'\n  ''' + 
                 b''''http://www.musicxml.org/dtds/partwise.dtd'>\n''')
     
-    def setPosition(self, m21Object, mxObject):
+    
+    #### style attributes
+    def setTextFormatting(self, mxObject, m21Object):
+        '''
+        sets the justification, print-style-align group, and
+        text-decoration, text-rotation,
+        letter-spacing, line-height, lang, text-direction, and
+        enclosure, on an
+        m21Object, which must have style.TextStyle as its Style class,
+        and then calls setPrintStyleAlign
+        
+        conforms to attr-group %text-formatting in the MusicXML DTD
+        '''
+        musicXMLNames = ('justify', 'text-decoration', 'text-rotation', 'letter-spacing',
+                         'line-height', 'lang', 'text-direction', 'enclosure')
+        m21Names = ('justify', 'textDecoration', 'textRotation', 'letterSpacing',
+                    'lineHeight', 'language', 'textDirection', 'enclosure')
+        self.setStyleAttributes(mxObject, m21Object, musicXMLNames, m21Names)
+        self.setPrintStyleAlign(mxObject, m21Object)
+    
+    def setPrintStyleAlign(self, mxObject, m21Object):
+        '''
+        runs setPrintStyle and then sets horizontalAlign and verticalAlign, on an
+        m21Object, which must have style.TextStyle as its Style class.
+    
+        conforms to attr-group %print-style-align in the MusicXML DTD
+        '''
+        self.setPrintStyle(mxObject, m21Object)
+        self.setStyleAttributes(mxObject, 
+                                m21Object, 
+                                ('valign', 'halign'),
+                                ('alignVertical', 'alignHorizontal'))
+    
+    def setPrintStyle(self, mxObject, m21Object):
+        '''
+        get position, font, and color information from the mxObject
+        into the m21Object, which must have style.TextStyle as its Style class.
+        
+        conforms to attr-group %print-style in the MusicXML DTD
+        '''
+        self.setPosition(mxObject, m21Object)
+        self.setFont(mxObject, m21Object)
+        self.setColor(mxObject, m21Object)
+        
+    def setColor(self, mxObject, m21Object):
+        '''
+        Sets m21Object.style.color to be the same as color...
+        '''
+        self.setStyleAttributes(mxObject, m21Object, ('color',), ('color',))
+
+
+    def setFont(self, mxObject, m21Object):
+        '''
+        sets font-family, font-style, font-size, and font-weight as
+        fontFamily (list), fontStyle, fontSize and fontWeight from
+        an object into a TextStyle object
+        
+        conforms to attr-group %font in the MusicXML DTD
+        
+        >>> from xml.etree.ElementTree import fromstring as El
+        >>> XP = musicxml.xmlToM21.XMLParserBase()
+        >>> mxObj = El('<text font-family="Courier,monospaced" font-style="italic" ' 
+        ...            + 'font-size="24" font-weight="bold" />')
+        >>> te = expressions.TextExpression('hi!')
+        >>> XP.setFont(mxObj, te)
+        >>> te.style.fontFamily
+        ['Courier', 'monospaced']
+        >>> te.style.fontStyle
+        'italic'
+        >>> te.style.fontSize
+        24
+        >>> te.style.fontWeight
+        'bold'
+        '''
+        musicXMLNames = ['font-style', 'font-size', 'font-weight']
+        m21Names = ['fontStyle', 'fontSize', 'fontWeight']
+        if (m21Object.hasStyleInformation and hasattr(m21Object.style, 'fontFamily') 
+                and m21Object.style.fontFamily):
+            musicXMLNames = ['font-family'] + musicXMLNames
+            m21Names = ['font-family'] + m21Names
+                    
+        self.setStyleAttributes(mxObject, m21Object, musicXMLNames, m21Names)
+    
+    
+    def setPosition(self, mxObject, m21Object):
         '''
         set positioning information for an mxObject from
         default-x, default-y, relative-x, relative-y from
         the .style attribute's absoluteX, relativeX, etc. attributes.
         
-        '''
-        if m21Object.hasStyleInformation is False:
-            return
-        
+        '''        
         musicXMLNames = ('default-x', 'default-y', 'relative-x', 'relative-y')
         m21Names = ('absoluteX', 'absoluteY', 'relativeX', 'relativeY')
-        
+        self.setStyleAttributes(mxObject, m21Object, musicXMLNames, m21Names)
+            
+    def setStyleAttributes(self, mxObject, m21Object, musicXMLNames, m21Names):
+        if m21Object.hasStyleInformation is False:
+            return
         stObj = m21Object.style
 
         for xmlName, m21Name in zip(musicXMLNames, m21Names):
-            m21Value = getattr(stObj, m21Name)
+            try:
+                m21Value = getattr(stObj, m21Name)
+            except AttributeError:
+                continue
+            
             if m21Value is None:
                 continue
             try:
@@ -762,6 +777,12 @@ class XMLExporterBase(object):
                 continue
             
             mxObject.set(xmlName, m21Value)
+
+
+
+            
+    ###################
+            
 
     def pageLayoutToXmlPrint(self, pageLayout, mxPrintIn=None):
         '''
@@ -981,6 +1002,82 @@ class XMLExporterBase(object):
         if mxStaffLayoutIn is None:
             return mxStaffLayout        
         
+
+    def accidentalToMx(self, a):
+        '''
+        Convert a pitch.Accidental object to a Element of tag accidental
+        
+        >>> a = pitch.Accidental()
+        >>> a.set('half-sharp')
+        >>> a.alter == .5
+        True
+    
+        >>> XB = musicxml.m21ToXml.XMLExporterBase()
+        >>> a2m = XB.accidentalToMx
+        >>> XB.dump(a2m(a))
+        <accidental>quarter-sharp</accidental>
+    
+        >>> a.set('double-flat')
+        >>> XB.dump(a2m(a))
+        <accidental>flat-flat</accidental>
+    
+    
+        >>> a.set('one-and-a-half-sharp')
+        >>> XB.dump(a2m(a))
+        <accidental>three-quarters-sharp</accidental>
+    
+        >>> a.set('half-flat')
+        >>> XB.dump(a2m(a))
+        <accidental>quarter-flat</accidental>
+    
+        >>> a.set('one-and-a-half-flat')
+        >>> XB.dump(a2m(a))
+        <accidental>three-quarters-flat</accidental>
+    
+        >>> a.set('sharp')
+        >>> a.displayStyle = 'parentheses'
+        >>> XB.dump(a2m(a))
+        <accidental parentheses="yes">sharp</accidental>
+        
+        >>> a.displayStyle = 'bracket'
+        >>> XB.dump(a2m(a))
+        <accidental bracket="yes">sharp</accidental>
+        
+        >>> a.displayStyle = 'both'
+        >>> XB.dump(a2m(a))
+        <accidental bracket="yes" parentheses="yes">sharp</accidental>
+        
+        >>> a = pitch.Accidental('flat')
+        >>> a.style.relativeX = -2
+        >>> XB.dump(a2m(a))
+        <accidental relative-x="-2">flat</accidental>
+        '''
+        if a.name == "half-sharp": 
+            mxName = "quarter-sharp"
+        elif a.name == "one-and-a-half-sharp": 
+            mxName = "three-quarters-sharp"
+        elif a.name == "half-flat": 
+            mxName = "quarter-flat"
+        elif a.name == "one-and-a-half-flat": 
+            mxName = "three-quarters-flat"
+        elif a.name == "double-flat": 
+            mxName = "flat-flat"
+        else: # all others are the same
+            mxName = a.name
+    
+        mxAccidental = Element('accidental')
+        # need to remove display in this case and return None
+        #         if self.displayStatus == False:
+        #             pass
+        mxAccidental.text = mxName
+        if a.displayStyle in ('parentheses', 'both'):
+            mxAccidental.set('parentheses', 'yes')
+        if a.displayStyle in ('bracket', 'both'):
+            mxAccidental.set('bracket', 'yes')        
+        
+        self.setPrintStyle(mxAccidental, a)      
+        return mxAccidental
+
 
 #----------
 
@@ -1330,27 +1427,8 @@ class ScoreExporter(XMLExporterBase):
             cw = Element('credit-words')
             cw.text = l
             # TODO: link/bookmark in credit-words
-            if count == 0: # on first, configure properties         
-                if textBox.style.absoluteX is not None:
-                    cw.set('default-x', str(textBox.style.absoluteX))
-                if textBox.style.absoluteY is not None:
-                    cw.set('default-y', str(textBox.style.absoluteY))
-                if textBox.style.fontFamily:
-                    cw.set('font-family', ','.join(textBox.style.fontFamily))
-                if textBox.style.justify is not None:
-                    cw.set('justify', str(textBox.style.justify))
-                if textBox.style.fontStyle is not None:
-                    cw.set('font-style', str(textBox.style.fontStyle))
-                if textBox.style.fontWeight is not None:
-                    cw.set('font-weight', str(textBox.style.fontWeight))
-                if textBox.style.fontSize is not None:
-                    cw.set('font-size', str(textBox.style.fontSize))
-#                else:
-#                    cw.set('font-size', '12')
-                if textBox.style.alignVertical is not None:
-                    cw.set('valign', str(textBox.style.alignVertical))
-                if textBox.style.alignHorizontal is not None:
-                    cw.set('halign', str(textBox.style.alignHorizontal))
+            if count == 0: # on first, configure properties
+                self.setPrintStyleAlign(cw, textBox) 
             mxCredit.append(cw)
             count += 1
         return mxCredit
@@ -1911,37 +1989,62 @@ class PartExporter(XMLExporterBase):
         
         Note that there's a deficiency currently that only the first instrument is fully
         converted.
-        '''
         
-        # only things that can be treated as parts are in finalStream
+        >>> p = converter.parse('tinyNotation: 4/4 c1 d1 e1')
+        >>> p.getElementsByClass('Measure')[0].insert(0, instrument.Clarinet())
+        >>> p.getElementsByClass('Measure')[1].insert(0, instrument.BassClarinet())
+        >>> PEX = musicxml.m21ToXml.PartExporter(p)
+        >>> PEX.instrumentStream is None
+        True
+        >>> PEX.firstInstrumentObject is None
+        True
+        >>> PEX.instrumentSetup()
+        >>> PEX.instrumentStream
+        <music21.stream.Part 0x10ae02780>
+        
+        The "P" signifies that it is the instrument associated with a Part.
+        
+        
+        >>> PEX.instrumentStream.show('text')
+        {0.0} <music21.instrument.Instrument P...: Clarinet>
+        {4.0} <music21.instrument.Instrument Bass clarinet>
+        '''
         # get a default instrument if not assigned
-        self.instrumentStream = self.stream.getInstruments(returnDefault=True)
+        self.instrumentStream = self.stream.getInstruments(returnDefault=True, recurse=True)
         self.firstInstrumentObject = self.instrumentStream[0] # store first, as handled differently
-        instIdList = [x.partId for x in self.parent.instrumentList]
 
+        if self.parent is not None:
+            instIdList = [x.partId for x in self.parent.instrumentList]
+        else:
+            instIdList = [self.stream.id]
+        
         firstInstId = self.firstInstrumentObject.partId
         if firstInstId in instIdList or firstInstId is None: # must have unique ids 
             self.firstInstrumentObject.partIdRandomize() # set new random id
 
-        if (self.firstInstrumentObject.midiChannel is None
-            or self.firstInstrumentObject.midiChannel in self.midiChannelList):
-            try:
-                self.firstInstrumentObject.autoAssignMidiChannel(usedChannels=self.midiChannelList)
-            except exceptions21.InstrumentException as e:
-                environLocal.warn(str(e))
 
-        # this is shared among all 
-        self.midiChannelList.append(self.firstInstrumentObject.midiChannel)
-        #environLocal.printDebug(['midiChannel list', self.midiChannelList])
-
-        # add to list for checking on next part
-        self.parent.instrumentList.append(self.firstInstrumentObject)
-        # force this instrument into this part
-        # meterStream is only used here if there are no measures
-        # defined in this part
-
-        if self.firstInstrumentObject.instrumentId is None:
-            self.firstInstrumentObject.instrumentIdRandomize()
+        for thisInstrument in self.instrumentStream:
+            if (thisInstrument.midiChannel is None
+                    or thisInstrument.midiChannel in self.midiChannelList):
+                try:
+                    thisInstrument.autoAssignMidiChannel(usedChannels=self.midiChannelList)
+                except exceptions21.InstrumentException as e:
+                    environLocal.warn(str(e))
+    
+            # this is shared among all PartExporters, so long as they are created by a 
+            # ScoreExporter
+            self.midiChannelList.append(thisInstrument.midiChannel)
+            #environLocal.printDebug(['midiChannel list', self.midiChannelList])
+    
+            # add to list for checking on next part
+            if self.parent is not None:
+                self.parent.instrumentList.append(thisInstrument)
+            # force this instrument into this part
+            # meterStream is only used here if there are no measures
+            # defined in this part
+    
+            if thisInstrument.instrumentId is None:
+                thisInstrument.instrumentIdRandomize()
 
 
         
@@ -2060,6 +2163,30 @@ class PartExporter(XMLExporterBase):
         return mxScorePart
     
     def instrumentToXmlScoreInstrument(self, i):
+        '''
+        Convert an :class:`~music21.instrument.Instrument` object to a
+        <score-instrument> element and return it.
+        
+        >>> i = instrument.Clarinet()
+        >>> i.instrumentId = 'clarinet1'
+        >>> i.midiChannel = 4
+        >>> PEX = musicxml.m21ToXml.PartExporter()
+        >>> mxScoreInstrument = PEX.instrumentToXmlScoreInstrument(i)
+        >>> PEX.dump(mxScoreInstrument)
+        <score-instrument id="clarinet1">
+          <instrument-name>Clarinet</instrument-name>
+          <instrument-abbreviation>Cl</instrument-abbreviation>
+        </score-instrument>        
+        
+        >>> i.instrumentName = "Klarinette 1."
+        >>> i.instrumentAbbreviation = 'Kl.1'
+        >>> mxScoreInstrument = PEX.instrumentToXmlScoreInstrument(i)
+        >>> PEX.dump(mxScoreInstrument)
+        <score-instrument id="clarinet1">
+          <instrument-name>Klarinette 1.</instrument-name>
+          <instrument-abbreviation>Kl.1</instrument-abbreviation>
+        </score-instrument>        
+        '''
         mxScoreInstrument = Element('score-instrument')
         mxScoreInstrument.set('id', str(i.instrumentId))
         mxInstrumentName = SubElement(mxScoreInstrument, 'instrument-name')
@@ -2074,6 +2201,20 @@ class PartExporter(XMLExporterBase):
         return mxScoreInstrument
 
     def instrumentToXmlMidiInstrument(self, i):
+        '''
+        Convert an instrument object to a <midi-instrument> tag and return the element
+        
+        >>> i = instrument.Clarinet()
+        >>> i.instrumentId = 'clarinet1'
+        >>> i.midiChannel = 4
+        >>> PEX = musicxml.m21ToXml.PartExporter()
+        >>> mxMidiInstrument = PEX.instrumentToXmlMidiInstrument(i)
+        >>> PEX.dump(mxMidiInstrument)
+        <midi-instrument id="clarinet1">
+          <midi-channel>5</midi-channel>
+          <midi-program>72</midi-program>
+        </midi-instrument>
+        '''
         mxMidiInstrument = Element('midi-instrument')
         mxMidiInstrument.set('id', str(i.instrumentId))
         if i.midiChannel is None:
@@ -2452,10 +2593,10 @@ class MeasureExporter(XMLExporterBase):
                 ornaments.append(mxWavyLine)
 
         if len(ornaments) > 0:
-            mxOrn = Element('ornaments')
-            for orn in ornaments:
-                mxOrn.append(orn)
-            notations.append(mxOrn)
+            mxOrnGroup = Element('ornaments')
+            for mxOrn in ornaments:
+                mxOrnGroup.append(mxOrn)
+            notations.append(mxOrnGroup)
 
         return notations
 
@@ -2551,19 +2692,21 @@ class MeasureExporter(XMLExporterBase):
         '''
         setb = _setAttributeFromAttribute
         
-        # TODO: attrGroup x-position
-        # TODO: attrGroup font
-        # TODO: attr: dynamics
-        # TODO: attr: end-dynamics
-        # TODO: attr: attack
-        # TODO: attr: release
-        # TODO: attr: time-only
         if chordParent is None:
             chordOrN = n
         else:
             chordOrN = chordParent
         
         mxNote = Element('note')
+        # TODO: attrGroup x-position
+        self.setFont(mxNote, chordOrN)
+        # TODO: attrGroup font
+        # TODO: attr: dynamics
+        # TODO: attr: end-dynamics
+        # TODO: attr: attack
+        # TODO: attr: release
+        # TODO: attr: time-only
+
         d = chordOrN.duration
         
         if d.isGrace is True:
@@ -2650,7 +2793,7 @@ class MeasureExporter(XMLExporterBase):
         if (hasattr(n, 'pitch') and 
                 n.pitch.accidental is not None and 
                 n.pitch.accidental.displayStatus in (True, None)):
-            mxAccidental = accidentalToMx(n.pitch.accidental)
+            mxAccidental = self.accidentalToMx(n.pitch.accidental)
             mxNote.append(mxAccidental)
             
         if len(d.tuplets) == 1:
@@ -3448,8 +3591,8 @@ class MeasureExporter(XMLExporterBase):
         if mx is None:
             environLocal.printDebug(['no musicxml conversion for:', expression])
             return 
-        
-        # TODO: print-style
+
+        self.setPrintStyle(mx, expression)        
         # TODO: trill-sound
         if hasattr(expression, 'placement') and expression.placement is not None:
             mx.set('placement', expression.placement)
@@ -3505,7 +3648,7 @@ class MeasureExporter(XMLExporterBase):
             #raise MusicXMLExportException("Cannot translate %s to musicxml" % articulationMark)
         mxArticulationMark = Element(musicXMLArticulationName)
         mxArticulationMark.set('placement', articulationMark.placement)
-        self.setPosition(articulationMark, mxArticulationMark)
+        self.setPosition(mxArticulationMark, articulationMark)
         #mxArticulations.append(mxArticulationMark)
         return mxArticulationMark
     
@@ -3558,7 +3701,7 @@ class MeasureExporter(XMLExporterBase):
                                 xmlObjects.booleanToYesNo(articulationMark.alternate))
             mxTechnicalMark.set('substitution', 
                                 xmlObjects.booleanToYesNo(articulationMark.substitution))
-        
+        self.setPrintStyle(mxTechnicalMark, articulationMark)
         #mxArticulations.append(mxArticulationMark)
         return mxTechnicalMark
     
@@ -3688,7 +3831,6 @@ class MeasureExporter(XMLExporterBase):
         # TODO: staff
         # TODO: attrGroup: print-object
         # TODO: attr: print-frame
-        # TODO: attrGroup: print-style
         # TODO: attrGroup: placement
                 
         if cs.writeAsChord is True:
@@ -3696,6 +3838,8 @@ class MeasureExporter(XMLExporterBase):
 
         from music21 import harmony
         mxHarmony = Element('harmony')
+        self.setPrintStyle(mxHarmony, cs)
+
 
         csRoot = cs.root()
         csBass = cs.bass(find=False)
@@ -3777,19 +3921,6 @@ class MeasureExporter(XMLExporterBase):
         self.xmlRoot.append(mxHarmony)
         return mxHarmony
 
-    def setPrintStyleAlign(self, m21Obj, mxObj):
-        if not m21Obj.hasStyleInformation:
-            return
-        
-        st = m21Obj.style
-        # print-style-align...
-        for src, dst in [(st.absoluteX, 'default-x'),
-                         (st.absoluteY, 'default-y'),
-                         (st.relativeX, 'relative-x'),
-                         (st.relativeY, 'relative-y')]:
-            if src is not None:
-                mxObj.set(dst, str(src))
-
     def placeInDirection(self, mxObj, m21Obj=None):
         '''
         places the mxObj <element> inside <direction><direction-type>
@@ -3820,7 +3951,7 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxDirection)
         <direction>
           <direction-type>
-            <dynamics default-x="-36" default-y="-80" relative-y="-10">
+            <dynamics default-x="-36" default-y="-80" halign="left" relative-y="-10" valign="top">
               <ppp />
             </dynamics>
           </direction-type>
@@ -3837,7 +3968,7 @@ class MeasureExporter(XMLExporterBase):
             mxThisDynamic = SubElement(mxDynamics, 'other-dynamics')
             mxThisDynamic.text = str(d.value)
         
-        self.setPrintStyleAlign(d, mxDynamics)
+        self.setPrintStyleAlign(mxDynamics, d)
         # TODO: attrGroup: placement (but done for direction, so okay...
         # TODO: attrGroup: text-decoration
         # TODO: attrGroup: enclosure
@@ -3870,12 +4001,12 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxSegnoDir)
         <direction>
           <direction-type>
-            <segno default-y="20" />
+            <segno default-y="20" halign="left" valign="top" />
           </direction-type>
         </direction>
         '''
         mxSegno = Element('segno')
-        self.setPrintStyleAlign(segno, mxSegno)
+        self.setPrintStyleAlign(mxSegno, segno)
         mxDirection = self.placeInDirection(mxSegno, segno)
         self.xmlRoot.append(mxDirection)
         return mxDirection
@@ -3894,7 +4025,7 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxCodaDir)
         <direction>
           <direction-type>
-            <coda default-y="20" />
+            <coda default-y="20" halign="left" valign="top" />
           </direction-type>
         </direction>
         
@@ -3913,7 +4044,7 @@ class MeasureExporter(XMLExporterBase):
         '''
         if coda.useSymbol:
             mxCoda = Element('coda')
-            self.setPrintStyleAlign(coda, mxCoda)
+            self.setPrintStyleAlign(mxCoda, coda)
             mxDirection = self.placeInDirection(mxCoda, coda)
             self.xmlRoot.append(mxDirection)
             return mxDirection
@@ -4620,7 +4751,7 @@ class MeasureExporter(XMLExporterBase):
             # symbol: dotted-note not supported
 
         # TODO: attr: separator
-        # TODO: attr: print-style-align
+        self.setPrintStyleAlign(mxTime, ts)
         # TODO: attr: print-object
         return mxTime
 
@@ -4666,7 +4797,7 @@ class MeasureExporter(XMLExporterBase):
         seta = _setTagTextFromAttribute
         mxKey = Element('key')
         # TODO: attr: number
-        # TODO: attr: print-style
+        self.setPrintStyle(mxKey, keyOrKeySignature)
         # TODO: attr: print-object
         
         if not keyOrKeySignature.isNonTraditional:
@@ -4744,14 +4875,14 @@ class MeasureExporter(XMLExporterBase):
           <sign>G</sign>
         </clef>
         '''
+        mxClef = Element('clef')
         # TODO: attr: number
-        # TODO: attr: print-style
+        self.setPrintStyle(mxClef, clefObj)
         # TODO: attr: print-object
         # TODO: attr: number (staff number)
         # TODO: attr: additional
         # TODO: attr: size
         # TODO: attr: after-barline
-        mxClef = Element('clef')
         sign = clefObj.sign
         if sign is None:
             print("Clef with no .sign exported; setting as a G clef")

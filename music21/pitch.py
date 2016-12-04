@@ -705,7 +705,7 @@ class Microtone(SlottedObjectMixin):
         self._harmonicShift = value
 
 
-class Accidental(SlottedObjectMixin):
+class Accidental(style.StyleMixin):
     '''
     Accidental class, representing the symbolic and numerical representation of
     pitch deviation from a pitch name (e.g., G, B).
@@ -724,6 +724,12 @@ class Accidental(SlottedObjectMixin):
     >>> a = pitch.Accidental('sharp')
     >>> a.name, a.alter, a.modifier
     ('sharp', 1.0, '#')
+    >>> a.style.color = 'red'
+
+    >>> import copy
+    >>> b = copy.deepcopy(a)
+    >>> b.style.color
+    'red'
 
     '''
     _styleClass = style.TextStyle
@@ -738,7 +744,6 @@ class Accidental(SlottedObjectMixin):
         'displayLocation',
         'displaySize',
         'displayStyle',
-        '_style',
         )
 
     # define order to present names in documentation; use strings
@@ -756,12 +761,12 @@ class Accidental(SlottedObjectMixin):
         'displayStatus': '''Determines if this Accidental is to be displayed; 
             can be None (for not set), True, or False.''',
         'displayLocation': 'Location of accidental: "normal", "above", "below".',
-        'style': 'General print style attributes, see `style.Style`',
         }
 
     ### INITIALIZER ###
 
     def __init__(self, specifier='natural'):
+        super(Accidental, self).__init__()
         # managed by properties
         self._displayType = "normal" # always, never, unless-repeated, even-tied
         self._displayStatus = None # None, True, False
@@ -776,7 +781,6 @@ class Accidental(SlottedObjectMixin):
         self._modifier = ''
         self._alter = 0.0     # semitones to alter step
         # potentially can be a fraction... but not exponent...
-        self._style = None
         self.set(specifier)
 
     ### SPECIAL METHODS ###
@@ -798,7 +802,7 @@ class Accidental(SlottedObjectMixin):
     def __deepcopy__(self, memo):
         if type(self) is Accidental: # pylint: disable=unidiomatic-typecheck
             new = Accidental.__new__(Accidental)
-            for s in self.__slots__:
+            for s in self._getSlotsRecursive():
                 setattr(new, s, getattr(self, s))
             return new
         else:

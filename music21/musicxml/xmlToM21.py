@@ -36,6 +36,7 @@ from music21.musicxml import xmlObjects
 
 # modules that import this include converter.py.
 # thus, cannot import these here
+from music21 import articulations
 from music21 import bar
 from music21 import beam
 from music21 import chord
@@ -241,6 +242,8 @@ class XMLParserBase(object):
                              'flat-flat': 'double-flat',
                              'sharp-sharp': 'double-sharp',                                 
                              }
+
+    #### style attributes
     
     def setTextFormatting(self, mxObject, m21Object):
         '''
@@ -288,9 +291,7 @@ class XMLParserBase(object):
         '''
         Sets m21Object.style.color to be the same as color...
         '''
-        mxColor = mxObject.get('color')
-        if mxColor is not None:
-            m21Object.style.color = mxColor
+        self.setStyleAttributes(mxObject, m21Object, ('color',), ('color',))
     
     def setFont(self, mxObject, m21Object):
         '''
@@ -2035,7 +2036,7 @@ class MeasureParser(XMLParserBase):
         
         >>> MP.divisions = 10080
         
-        >>> mxNote = EL('<note><pitch><step>D</step>' +
+        >>> mxNote = EL('<note pizzicato="yes"><pitch><step>D</step>' +
         ...     '<alter>-1</alter><octave>6</octave></pitch>' + 
         ...     '<duration>7560</duration>' +
         ...     '<type>eighth</type><dot/></note>')
@@ -2047,6 +2048,9 @@ class MeasureParser(XMLParserBase):
         6
         >>> n.duration
         <music21.duration.Duration 0.75>
+        >>> n.articulations
+        [<music21.articulations.Pizzicato>]
+        
         
         >>> beams = EL('<beam>begin</beam>')
         >>> mxNote.append(beams)
@@ -2455,7 +2459,8 @@ class MeasureParser(XMLParserBase):
         # TODO: attr attack -- alter starting time of the note
         # TODO: attr release -- alter the release time of the note
         # TODO: attr-group time-only
-        # TODO: attr pizzicato 
+        if mxNote.get('pizzicato') == 'yes':
+            n.articulations.append(articulations.Pizzicato())
 
 
         mxGrace = mxNote.find('grace')

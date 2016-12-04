@@ -1393,7 +1393,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             ignoreAttributes = defaultIgnoreSet
         else:
             ignoreAttributes = ignoreAttributes | defaultIgnoreSet
-
         new = super(Stream, self)._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
 
         if removeFromIgnore is not None:
@@ -4247,7 +4246,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return post
 
 
-    def getInstruments(self, searchActiveSite=True, returnDefault=True):
+    def getInstruments(self, searchActiveSite=True, returnDefault=True, recurse=False):
         '''
         Search this stream or activeSite streams for
         :class:`~music21.instrument.Instrument` objects, otherwise
@@ -4259,7 +4258,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #for cases when there is more than one instrument
 
         instObj = None
-        post = self.getElementsByClass('Instrument').stream()
+        if recurse:
+            iter = self.recurse()
+        else:
+            iter = self.iter
+        
+        post = iter.getElementsByClass('Instrument').stream()
         if post:
             #environLocal.printDebug(['found local instrument:', post[0]])
             instObj = post[0] # get first

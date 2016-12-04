@@ -318,11 +318,7 @@ class Music21Object(object):
     _classSetCacheDict = {}
     # same with fully qualified names
     _classListFullyQualifiedCacheDict = {}
-
-    # what class should we call for Style?
-    
     _styleClass = style.Style
-
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = [
@@ -377,6 +373,7 @@ class Music21Object(object):
         }
 
     def __init__(self, *arguments, **keywords):
+        super(Music21Object, self).__init__()
         # None is stored as the internal location of an obj w/o any sites
         self._activeSite = None
         # offset when no activeSite is available
@@ -390,13 +387,12 @@ class Music21Object(object):
         # pass a reference to this object
         self._derivation = None
         
+        self._style = None
+        
         # private duration storage; managed by property
         self._duration = None
         self._priority = 0 # default is zero
         
-        # Style objects are created only when necessary.
-        self._style = None
-
         self.hideObjectOnPrint = False
 
         if "id" in keywords:
@@ -454,7 +450,7 @@ class Music21Object(object):
         
         TODO: move to class attributes to cache.
         '''
-        defaultIgnoreSet = {'_derivation', '_activeSite', 'id', 'sites', '_duration'}
+        defaultIgnoreSet = {'_derivation', '_activeSite', 'id', 'sites', '_duration', '_style'}
         if ignoreAttributes is None:
             ignoreAttributes = defaultIgnoreSet
         else:
@@ -509,6 +505,10 @@ class Music21Object(object):
             # this calls __deepcopy__ in Sites
             newValue = copy.deepcopy(value, memo)
             setattr(new, 'sites', newValue)
+        if '_style' in ignoreAttributes:
+            value = getattr(self, '_style')
+            newValue = copy.deepcopy(value, memo)
+            setattr(new, '_style', newValue)
 
 
         for name in self.__dict__:
@@ -698,9 +698,11 @@ class Music21Object(object):
         True
         
         >>> sorted([s for s in n.classSet if isinstance(s, str)])
-        ['GeneralNote', 'Music21Object', 'NotRest', 'Note', '....object', 
-         'music21.base.Music21Object', 'music21.note.GeneralNote', 'music21.note.NotRest', 
-         'music21.note.Note', 'object']
+        ['GeneralNote', 'Music21Object', 'NotRest', 'Note',
+         '....object', 
+         'music21.base.Music21Object', 
+         'music21.note.GeneralNote', 'music21.note.NotRest', 'music21.note.Note', 
+         'object']
          
         >>> sorted([s for s in n.classSet if not isinstance(s, str)], key=lambda x: x.__name__)
         [<class 'music21.note.GeneralNote'>, 
@@ -719,7 +721,6 @@ class Music21Object(object):
             classSet = frozenset(classList)
             self._classSetCacheDict[self.__class__] = classSet
             return classSet
-
 
     @property
     def hasStyleInformation(self):
@@ -774,7 +775,9 @@ class Music21Object(object):
     @style.setter
     def style(self, newStyle):
         self._style = newStyle
-    
+
+
+
     #---------------------------
     # convenience.  used to be in note.Note, but belongs everywhere:
     def _getQuarterLength(self):
@@ -3378,7 +3381,7 @@ class Music21Object(object):
         >>> s.insert(0, ts)
         >>> n = note.Note(type='eighth')
         >>> s.repeatAppend(n, 8)
-        >>> s.makeMeasures(inPlace = True)
+        >>> s.makeMeasures(inPlace=True)
         >>> [n.beat for n in s.flat.notes]
         [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5]
         
@@ -4894,8 +4897,6 @@ class Test(unittest.TestCase):
         self.assertEqual(ecopy2.pitch.name, 'F#')
         prev = ecopy2.previous('Note')
         self.assertIs(prev, ecopy1)
-        
-        
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

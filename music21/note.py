@@ -20,17 +20,18 @@ import copy
 import unittest
 
 from music21 import base
+from music21 import beam
 from music21 import common
 from music21 import duration
 from music21 import exceptions21
-from music21 import interval
 from music21 import editorial
 from music21 import expressions
+from music21 import interval
 from music21 import pitch
-from music21 import beam
+from music21 import style
 from music21 import tie
 from music21 import volume
-from music21.common import SlottedObjectMixin
+
 from music21.ext import six
 
 from music21 import environment
@@ -88,7 +89,7 @@ class NotRestException(exceptions21.Music21Exception):
 #-------------------------------------------------------------------------------
 
 
-class Lyric(SlottedObjectMixin):
+class Lyric(style.StyleMixin):
     '''
     An object representing a single Lyric as part of a note's .lyrics property.
 
@@ -130,7 +131,7 @@ class Lyric(SlottedObjectMixin):
     the same as the number, but in cases where a string identifier is present,
     it will be different.
     '''
-
+    _styleClass = style.TextStyle
     ### CLASS VARIABLES ###
 
     __slots__ = (
@@ -142,12 +143,8 @@ class Lyric(SlottedObjectMixin):
 
     ### INITIALIZER ###
 
-    def __init__(
-        self,
-        text=None,
-        number=1,
-        **kwargs
-        ):
+    def __init__(self, text=None, number=1, **kwargs):
+        super(Lyric, self).__init__()
         self._identifier = None
         self._number = None
 
