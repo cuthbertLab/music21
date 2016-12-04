@@ -1454,8 +1454,6 @@ class Analyzer(object):
         :class:`~music21.editorial.NoteEditorial` value of 
         editorialValue at ``note.editorial.misc[editorialDictKey]``
         
-        
-    
         >>> sc = stream.Score()
         >>> sc.insert(0, meter.TimeSignature('2/4'))
         >>> part0 = stream.Part()

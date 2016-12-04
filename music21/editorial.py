@@ -29,64 +29,6 @@ class CommentException(exceptions21.Music21Exception):
 
 
 #------------------------------------------------------------------------------
-
-
-def getObjectsWithEditorial(
-    listToSearch, 
-    editorialStringToFind,
-    listOfValues=None,
-    ):
-    '''
-    Provided a list of objects (typically note objects) to search through, this
-    method returns only those objects that have the editorial attribute defined
-    by the editorialStringToFind.  An optional parameter, listOfValues, is a
-    list of all the possible values the given object's editorialString can
-    have.
-
-    The editorialStringToFind can be any of the pre-defined editorial
-    attributes (such as "ficta" or "harmonicIntervals") but it may also be the
-    dictionary key of editorial notes stored in the miscellaneous (misc)
-    dictionary.  For example, "isPassingTone" or "isNeighborTone"
-
-    >>> n1 = note.Note()
-    >>> n1.editorial.misc['isPassingTone'] = True
-    >>> n2 = note.Note()
-    >>> n2.editorial.comment = 'consider revising'
-    >>> s = stream.Stream()
-    >>> s.repeatAppend(n1, 5)
-    >>> s.repeatAppend(note.Note(), 2)
-    >>> s.repeatAppend(n2, 3)
-    >>> listofNotes = s.getElementsByClass(note.Note)
-    >>> listOfValues = ['consider revising', 'remove']
-    >>> listofNotesWithEditorialIsPassingTone = editorial.getObjectsWithEditorial(
-    ...     listofNotes, "isPassingTone")
-    >>> listofNotesWithEditorialComment = editorial.getObjectsWithEditorial(
-    ...     listofNotes, "comment", listOfValues)
-    >>> print(len(listofNotesWithEditorialIsPassingTone))
-    5
-
-    >>> print(len(listofNotesWithEditorialComment))
-    3
-    '''
-    listofOBJToReturn = []
-    for obj in listToSearch:
-        try:
-            try:
-                editorialContents = getattr(
-                    obj.editorial, editorialStringToFind)
-            except AttributeError:
-                editorialContents = obj.editorial.misc[editorialStringToFind]
-
-            if listOfValues is not None:
-                if editorialContents in listOfValues:
-                    listofOBJToReturn.append(obj)
-            else:
-                listofOBJToReturn.append(obj)
-        except KeyError:
-            pass
-    return listofOBJToReturn
-
-
 class NoteEditorial(SlottedObjectMixin):
     '''
     Editorial comments and special effects that can be applied to notes
@@ -117,33 +59,22 @@ class NoteEditorial(SlottedObjectMixin):
     '''
 
     _DOC_ATTR = {
-        'comment': 'a reference to a :class:`~music21.editorial.Comment` object',
         'ficta': '''a :class:`~music21.pitch.Accidental` object that specifies musica 
             ficta for the note.  Will only be displayed in LilyPond and then only if 
             there is no Accidental object on the note itself''',
-        'hidden': '''boolean value about whether to hide the 
-            note or not (only works in lilypond)''',
         'harmonicInterval': '''an :class:`~music21.interval.Interval` object that specifies 
             the harmonic interval between this note and a single other note 
             (useful for storing information post analysis)''',
-        'harmonicIntervals': 'a list for when you want to store more than one harmonicInterval',
         'melodicInterval': '''an :class:`~music21.interval.Interval` object that specifies 
             the melodic interval to the next note in this part/voice/stream, etc.''',
-        'melodicIntervals': 'a list for storing more than one melodic interval',
-        'melodicIntervalsOverRests': 'same thing but a list',
         'misc': 'A dict to hold anything you might like to store.',
         }
 
     __slots__ = (
         'ficta',
-        'misc',
+        '_misc',
         'harmonicInterval',
-        'harmonicIntervals',
-        'hidden',
         'melodicInterval',
-        'melodicIntervals',
-        'melodicIntervalsOverRests',
-        'comment',
         )
 
     ### INITIALIZER ###
@@ -151,54 +82,19 @@ class NoteEditorial(SlottedObjectMixin):
     def __init__(self):
         # Accidental object -- N.B. for PRINTING only not for determining intervals
         self.ficta = None
-        self.misc = {}
+        self._misc = None
         self.harmonicInterval = None
-        self.harmonicIntervals = []
-        self.hidden = False
         self.melodicInterval = None
-        self.melodicIntervals = []
-        self.melodicIntervalsOverRests = []
-        self.comment = Comment()
-
-class Comment(SlottedObjectMixin):
-    '''
-    An object that adds text above or below a note:
-
-    >>> n = note.Note()
-    >>> n.editorial.comment.text = "hello"
-    >>> n.editorial.comment.position = "above"
-    >>> n.editorial.comment.lily
-    '^"hello"'
-
-    '''
-
-    ### CLASS VARIABLES ###
-
-    __slots__ = (
-        'position',
-        'text',
-        )
-
-    ### INITIALIZER ###
-
-    def __init__(self):
-        self.position = "below"
-        self.text = None
-
-    ### PUBLIC PROPERTIES ###
 
     @property
-    def lily(self):
-        if self.text is None:
-            return ""
-        if self.position == 'below':
-            return '_"' + self.text + '"'
-        elif self.position == 'above':
-            return '^"' + self.text + '"'
-        else:
-            raise CommentException(
-                'Cannot deal with position: ' + self.position)
-
+    def misc(self):
+        if self._misc is None:
+            self._misc = {}
+        return self._misc
+    
+    @misc.setter
+    def misc(self, value):
+        self._misc = value
 
 #------------------------------------------------------------------------------
 
@@ -211,8 +107,6 @@ class Test(unittest.TestCase):
     def testSlots(self):
         editorial = NoteEditorial()
         assert not hasattr(editorial, '__dict__')
-        comment = Comment()
-        assert not hasattr(comment, '__dict__')
 
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
@@ -237,10 +131,6 @@ class Test(unittest.TestCase):
                 b = copy.deepcopy(obj)
                 self.assertIsNot(a, None)
                 self.assertIsNot(b, None)
-
-    def testBasic(self):
-        a = Comment()
-        self.assertEqual(a.position, 'below')
 
 
 #------------------------------------------------------------------------------

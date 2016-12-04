@@ -87,7 +87,7 @@ class TestExternal(unittest.TestCase):
         
         b.elements[0].duration.tuplets[0].type = "start"
         b.elements[-1].duration.tuplets[0].type = "stop"
-        b.elements[2].editorial.comment.text = "a real C"
+        b.elements[2].lyric = "a real C"
          
         bestC = b.bestClef(allowTreble8vb = True)
         a.insert(0, bestC)

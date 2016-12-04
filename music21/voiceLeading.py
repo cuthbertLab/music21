@@ -1599,9 +1599,9 @@ class NNoteLinearSegment(base.Music21Object):
         calculates the melodic intervals and returns them as a list,
         with the interval at 0 being the interval between the first and second note.
 
-        >>> n = voiceLeading.NNoteLinearSegment([note.Note('A'), note.Note('B'), 
+        >>> linSeg = voiceLeading.NNoteLinearSegment([note.Note('A'), note.Note('B'), 
         ...            note.Note('C'), note.Note('D')])
-        >>> n.melodicIntervals
+        >>> linSeg.melodicIntervals
         [<music21.interval.Interval M2>, 
          <music21.interval.Interval M-7>, 
          <music21.interval.Interval M2>]

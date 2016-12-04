@@ -206,9 +206,10 @@ def runPerceivedDissonanceAnalysis(scoreIn, offsetList, keyStr=None):
    
     Returns a dictionary.
     '''
+    ads = theoryAnalyzer.Analyzer()
     withoutNonharmonictonesScore = copy.deepcopy(scoreIn)
-    theoryAnalyzer.removePassingTones(withoutNonharmonictonesScore)
-    theoryAnalyzer.removeNeighborTones(withoutNonharmonictonesScore)
+    ads.removePassingTones(withoutNonharmonictonesScore)
+    ads.removeNeighborTones(withoutNonharmonictonesScore)
     withoutNonharmonictonesScore.sliceByGreatestDivisor(addTies=True, 
                                                         inPlace=True)
     withoutNonharmonictonesScore.stripTies(inPlace=True, 
@@ -285,9 +286,10 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
     '#00cc33'
     '''
     from music21 import roman
+    ads = theoryAnalyzer.Analyzer()
     
     score = scoreIn.sliceByGreatestDivisor(addTies=True)
-    vsList = theoryAnalyzer.getVerticalities(score)
+    vsList = ads.getVerticalities(score)
     user = len(offsetList)
     music21VS = 0
     both = 0
