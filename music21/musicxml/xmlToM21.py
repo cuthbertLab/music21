@@ -4639,8 +4639,11 @@ class MeasureParser(XMLParserBase):
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.mxMeasure = ET.fromstring('<measure><note><voice>1</voice></note></measure>')        
         >>> MP.updateVoiceInformation()
-        >>> MP.voiceIndices
-        {'1'}
+        
+        This is a set, so displays differently in PY2 vs. PY3
+        
+        >>> list(MP.voiceIndices)
+        ['1']
         >>> MP.useVoices
         False
         

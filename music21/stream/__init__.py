@@ -1387,7 +1387,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
         # NOTE: this is a performance critical operation        
         defaultIgnoreSet = {'_offsetDict', 'streamStatus', '_elements', '_endElements', '_cache',
-                            'analysisData' # TODO: REMOVE SOON
                             }
         if ignoreAttributes is None:
             ignoreAttributes = defaultIgnoreSet
@@ -1415,8 +1414,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 newValue.client = new
                 setattr(new, 'streamStatus', newValue)
                 #self.streamStatus.client = storedClient
-        #if name == '_cache' or name == 'analysisData':
-        #    continue # skip for now
         if '_elements' in ignoreAttributes:
             # must manually add elements to new Stream
             for e in self._elements:
@@ -4259,11 +4256,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         instObj = None
         if recurse:
-            iter = self.recurse()
+            sIter = self.recurse()
         else:
-            iter = self.iter
+            sIter = self.iter
         
-        post = iter.getElementsByClass('Instrument').stream()
+        post = sIter.getElementsByClass('Instrument').stream()
         if post:
             #environLocal.printDebug(['found local instrument:', post[0]])
             instObj = post[0] # get first
