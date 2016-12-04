@@ -723,28 +723,22 @@ class XMLExporterBase(object):
         conforms to attr-group %font in the MusicXML DTD
         
         >>> from xml.etree.ElementTree import fromstring as El
-        >>> XP = musicxml.xmlToM21.XMLParserBase()
-        >>> mxObj = El('<text font-family="Courier,monospaced" font-style="italic" ' 
-        ...            + 'font-size="24" font-weight="bold" />')
+        >>> XB = musicxml.m21ToXml.XMLExporterBase()
+        >>> mxObj = El('<text>hi</text>')
         >>> te = expressions.TextExpression('hi!')
-        >>> XP.setFont(mxObj, te)
-        >>> te.style.fontFamily
-        ['Courier', 'monospaced']
-        >>> te.style.fontStyle
-        'italic'
-        >>> te.style.fontSize
-        24
-        >>> te.style.fontWeight
-        'bold'
+        >>> te.style.fontFamily = ['Courier', 'monospaced']
+        >>> te.style.fontStyle = 'italic'
+        >>> te.style.fontSize = 24.0
+        >>> XB.setFont(mxObj, te)
+        >>> XB.dump(mxObj)
+        <text font-family="Courier,monospaced" font-size="24" font-style="italic">hi</text>
         '''
         musicXMLNames = ['font-style', 'font-size', 'font-weight']
-        m21Names = ['fontStyle', 'fontSize', 'fontWeight']
+        m21Names = ['fontStyle', 'fontSize', 'fontWeight']                    
+        self.setStyleAttributes(mxObject, m21Object, musicXMLNames, m21Names)
         if (m21Object.hasStyleInformation and hasattr(m21Object.style, 'fontFamily') 
                 and m21Object.style.fontFamily):
-            musicXMLNames = ['font-family'] + musicXMLNames
-            m21Names = ['font-family'] + m21Names
-                    
-        self.setStyleAttributes(mxObject, m21Object, musicXMLNames, m21Names)
+            mxObject.set('font-family', ','.join(m21Object.style.fontFamily))
     
     
     def setPosition(self, mxObject, m21Object):
@@ -759,6 +753,9 @@ class XMLExporterBase(object):
         self.setStyleAttributes(mxObject, m21Object, musicXMLNames, m21Names)
             
     def setStyleAttributes(self, mxObject, m21Object, musicXMLNames, m21Names):
+        '''
+        Sets any attribute from .style
+        '''
         if m21Object.hasStyleInformation is False:
             return
         stObj = m21Object.style
@@ -778,7 +775,74 @@ class XMLExporterBase(object):
             
             mxObject.set(xmlName, m21Value)
 
+    def setEditorial(self, mxObject, m21Object):
+        '''
+        >>> from xml.etree.ElementTree import fromstring as El
+        >>> XB = musicxml.m21ToXml.XMLExporterBase()
+        >>> mxObj = El('<note />')
+        >>> n = note.Note('C-5')
+        
+        Most common case: does nothing
 
+        >>> XB.setEditorial(mxObj, n)
+        >>> XB.dump(mxObj)
+        <note />
+        
+        >>> fn = editorial.Comment('flat is obvious error for sharp')
+        >>> fn.levelInformation = 2
+        >>> fn.isFootnote = True
+        >>> n.editorial.footnotes.append(fn)
+        >>> XB.setEditorial(mxObj, n)
+        >>> XB.dump(mxObj)
+        <note>
+          <footnote>flat is obvious error for sharp</footnote>
+          <level reference="no">2</level>
+        </note>        
+
+        Placing information in `.editorial.comments` only puts out the level:
+
+        >>> mxObj = El('<note />')
+        >>> n = note.Note('C-5')
+        >>> com = editorial.Comment('flat is obvious error for sharp')
+        >>> com.levelInformation = 'hello'
+        >>> com.isReference = True
+        >>> n.editorial.comments.append(com)
+        >>> XB.setEditorial(mxObj, n)
+        >>> XB.dump(mxObj)
+        <note>
+          <level reference="yes">hello</level>
+        </note>
+        '''
+        if m21Object.hasEditorialInformation is False:
+            return
+        # MusicXML allows only one footnote or level, so we take the first...
+
+        e = m21Object.editorial
+        if 'footnotes' not in e and 'comments' not in e:
+            return
+        
+        makeFootnote = False
+        if len(e.footnotes) > 0:
+            c = e.footnotes[0]
+            makeFootnote = True
+        elif len(e.comments) > 0:
+            c = e.comments[0]
+        else:
+            return
+        
+        if makeFootnote:
+            mxFn = SubElement(mxObject, 'footnote')
+            self.setTextFormatting(mxFn, c)
+            if c.text is not None:
+                mxFn.text = c.text
+        if c.levelInformation is not None:
+            mxLevel = SubElement(mxObject, 'level')
+            mxLevel.text = str(c.levelInformation)
+            mxLevel.set('reference', xmlObjects.booleanToYesNo(c.isReference))
+            # TODO: attr: parentheses
+            # TODO: attr: bracket
+            # TODO: attr: size
+        
 
             
     ###################
@@ -1672,7 +1736,7 @@ class ScoreExporter(XMLExporterBase):
         elif staffGroup.barTogether == 'Mensurstrich':
             mxGroupBarline.text = 'Mensurstrich'
         # TODO: group-time
-        # TODO: editorial
+        self.setEditorial(mxPartGroup, staffGroup)
         
         #environLocal.printDebug(['configureMxPartGroupFromStaffGroup: mxPartGroup', mxPartGroup])
         return mxPartGroup
@@ -2353,7 +2417,7 @@ class MeasureExporter(XMLExporterBase):
             mxBackup = Element('backup')
             mxDuration = SubElement(mxBackup, 'duration')
             mxDuration.text = str(int(round(divisions * self.offsetInMeasure)))
-            # TODO: editorial
+            # TODO: editorial -- nowhere to store?
             root.append(mxBackup)
         self.currentVoiceId = None
 
@@ -2763,10 +2827,8 @@ class MeasureExporter(XMLExporterBase):
             for t in mxTieList:
                 mxNote.append(t)
         
-            
         # TODO: instrument
-        # TODO: footnote
-        # TODO: level
+        self.setEditorial(mxNote, n)
         if self.currentVoiceId is not None:
             mxVoice = SubElement(mxNote, 'voice')
             try:
@@ -3824,10 +3886,6 @@ class MeasureExporter(XMLExporterBase):
           <type>quarter</type>
         </note>
         '''
-        # TODO: frame # fretboard
-        # TODO: offset # IMPORTANT
-        # TODO: editorial
-        # TODO: staff
         # TODO: attrGroup: print-object
         # TODO: attr: print-frame
         # TODO: attrGroup: placement
@@ -3916,9 +3974,33 @@ class MeasureExporter(XMLExporterBase):
                 mxDegreeType.text = str(hd.modType)
                 # TODO: attr: text -- alternate display
                 # TODO: attrGroup: print-style
+
+        # TODO: frame # fretboard
+        self.setOffsetOptional(cs, mxHarmony)
+        self.setEditorial(mxHarmony, cs)
+        # TODO: staff
             
         self.xmlRoot.append(mxHarmony)
         return mxHarmony
+
+    def setOffsetOptional(self, m21Obj, mxObj=None):
+        '''
+        If this object has an offset different from self.offsetInMeasure,
+        then create and return an offset Element.
+        
+        If mxObj is not None then the offset element will be appended to it.
+        '''
+        if m21Obj.offset == self.offsetInMeasure:
+            return None
+        offsetDifferenceInQl = m21Obj.offset - self.offsetInMeasure
+        offsetDifferenceInDivisions = int(offsetDifferenceInQl * self.currentDivisions)
+        if mxObj is not None:
+            mxOffset = SubElement(mxObj, 'offset')
+        else:
+            mxOffset = Element('offset')
+        mxOffset.text = str(offsetDifferenceInDivisions)
+        mxOffset.set('sound', 'yes') # always affects sound at location in measure.
+        return mxOffset
 
     def placeInDirection(self, mxObj, m21Obj=None):
         '''
@@ -3957,8 +4039,24 @@ class MeasureExporter(XMLExporterBase):
           <sound dynamics="19" />
         </direction>        
 
-        appends to score
-
+        appends to score.
+        
+        Now with offset not zero.
+        
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> ppp.offset = 1.0
+        >>> mxDirection = MEX.dynamicToXml(ppp)
+        >>> MEX.dump(mxDirection)
+        <direction>
+          <direction-type>
+            <dynamics default-x="-36" default-y="-80" halign="left" relative-y="-10" valign="top">
+              <ppp />
+            </dynamics>
+          </direction-type>
+          <offset sound="yes">10080</offset>
+          <sound dynamics="19" />
+        </direction>        
+        
         '''
         mxDynamics = Element('dynamics')
         if d.value in xmlObjects.DYNAMIC_MARKS:
@@ -3972,12 +4070,14 @@ class MeasureExporter(XMLExporterBase):
         # TODO: attrGroup: text-decoration
         # TODO: attrGroup: enclosure
         
+        mxDirection = self.placeInDirection(mxDynamics, d)        
         # direction todos
-        # TODO: offset # IMPORTANT
-        # TODO: editorial-voice-direction
+        self.setOffsetOptional(d, mxDirection)
+        self.setEditorial(mxDirection, d)
+        # TODO: voice
         # TODO: staff
 
-        mxDirection = self.placeInDirection(mxDynamics, d)        
+        
         # sound
         vS = d.volumeScalar
         if vS is not None:

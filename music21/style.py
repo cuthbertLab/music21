@@ -16,6 +16,7 @@ etc. such that precise positioning information, layout, size, etc. can be specif
 import unittest
 
 from music21 import common
+from music21 import editorial
 from music21 import exceptions21
 
 class TextFormatException(exceptions21.Music21Exception):
@@ -350,7 +351,7 @@ class BezierStyle(Style):
 
 class StyleMixin(common.SlottedObjectMixin):
     '''
-    Mixin for any class that wants to support style, since several 
+    Mixin for any class that wants to support style and editorial, since several 
     non-music21 objects, such as Lyrics and Accidentals will support Style.
     
     Not used by Music21Objects because of the added trouble in copying etc. so
@@ -358,11 +359,12 @@ class StyleMixin(common.SlottedObjectMixin):
     '''
     _styleClass = Style
     
-    __slots__ = ('_style',)
+    __slots__ = ('_style', '_editorial')
     
     def __init__(self):
         super(StyleMixin, self).__init__()
         self._style = None
+        self._editorial = None
         
     @property
     def hasStyleInformation(self):
@@ -423,6 +425,51 @@ class StyleMixin(common.SlottedObjectMixin):
     def style(self, newStyle):
         self._style = newStyle
     
+    @property
+    def hasEditorialInformation(self):
+        '''
+        Returns True if there is a :class:`~music21.editorial.Editorial` object
+        already associated with this object, False otherwise.
+        
+        Calling .style on an object will always create a new 
+        Style object, so even though a new Style object isn't too expensive
+        to create, this property helps to prevent creating new Styles more than
+        necessary.
+        
+        >>> acc = pitch.Accidental('#')
+        >>> acc.hasEditorialInformation
+        False
+        >>> acc.editorial
+        <music21.editorial.Editorial {} >
+        >>> acc.hasEditorialInformation
+        True
+        '''
+        return False if self._editorial is None else True
+
+    @property
+    def editorial(self):
+        '''
+        a :class:`~music21.editorial.Editorial` object that stores editorial information
+        (comments, footnotes, harmonic information, ficta).
+
+        Created automatically as needed:
+
+        >>> acc = pitch.Accidental()
+        >>> acc.editorial
+        <music21.editorial.Editorial {} >
+        >>> acc.editorial.ficta = pitch.Accidental('sharp')
+        >>> acc.editorial.ficta
+        <accidental sharp>
+        >>> acc.editorial
+        <music21.editorial.Editorial {'ficta': <accidental sharp>} >
+        '''
+        if self._editorial is None:
+            self._editorial = editorial.Editorial()
+        return self._editorial
+
+    @editorial.setter
+    def editorial(self, ed):
+        self._editorial = ed
 
 
 class Test(unittest.TestCase):

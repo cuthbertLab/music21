@@ -75,7 +75,7 @@ class Editorial(dict):
             the harmonic interval between this note and a single other note, or None 
             (useful for storing information post analysis)''',
         'melodicInterval': '''an :class:`~music21.interval.Interval` object that specifies 
-            the melodic interval to the next note in this part/voice/stream, etc.''',
+            the melodic interval to the next note in this Part/Voice/Stream, etc.''',
         'misc': 'A dict to hold anything you might like to store.',
         }
 
@@ -131,8 +131,7 @@ class Comment(style.StyleMixin):
         self.isFootnote = False
         self.isReference = False
         self.levelInformation = None
-        self.voiceInformation = None
-       
+        
     def __repr__(self):
         head = '<music21.editorial.Comment '
         end = '>'
