@@ -2002,8 +2002,7 @@ class PartExporter(XMLExporterBase):
         >>> PEX.instrumentStream
         <music21.stream.Part 0x10ae02780>
         
-        The "P" signifies that it is the instrument associated with a Part.
-        
+        The "P" signifies that it is the main instrument associated with a Part.
         
         >>> PEX.instrumentStream.show('text')
         {0.0} <music21.instrument.Instrument P...: Clarinet>

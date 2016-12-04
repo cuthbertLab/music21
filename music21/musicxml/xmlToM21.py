@@ -1775,9 +1775,37 @@ class MeasureParser(XMLParserBase):
         Utility routine for importing musicXML objects; 
         here, we store a reference to the music21 object in a dictionary, 
         where keys are the staff values. Staff values may be None, 1, 2, etc.
+        
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> MP.addToStaffReference(1, note.Note('C5'))
+        >>> MP.addToStaffReference(2, note.Note('D3'))
+        >>> MP.addToStaffReference(2, note.Note('E3'))
+        >>> len(MP.staffReference)
+        2
+        >>> list(sorted(MP.staffReference.keys()))
+        ['1', '2']
+        >>> MP.staffReference['1']
+        [<music21.note.Note C>]
+        >>> MP.staffReference['2']
+        [<music21.note.Note D>, <music21.note.Note E>]
+        
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> mxNote = EL('<note><staff>1</staff></note>')
+        >>> MP.addToStaffReference(mxNote, note.Note('F5'))
+        >>> MP.staffReference['1']
+        [<music21.note.Note C>, <music21.note.Note F>]
+
+        No staff reference.
+
+        >>> mxNote = EL('<note />')
+        >>> MP.addToStaffReference(mxNote, note.Note('G4'))
+        >>> len(MP.staffReference)
+        3
+        >>> MP.staffReference[None]
+        [<music21.note.Note G>]
         '''
         staffReference = self.staffReference
-        staffKey = self.getStaffNumberStr(mxObjectOrNumber) # a str of a number or None
+        staffKey = self.getStaffNumberStr(mxObjectOrNumber) # an Int, str of a number or None
         if staffKey not in staffReference:
             staffReference[staffKey] = []
         staffReference[staffKey].append(m21Object)
@@ -1785,6 +1813,18 @@ class MeasureParser(XMLParserBase):
     def insertCoreAndRef(self, offset, mxObjectOrNumber, m21Object):
         '''
         runs addToStaffReference and then insertCore.
+        
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> mxNote = EL('<note><staff>1</staff></note>')
+        
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> MP.insertCoreAndRef(1.0, mxNote, note.Note('F5'))
+        
+        Need to run at end: 
+        
+        >>> MP.stream.elementsChanged()
+        >>> MP.stream.show('text')
+        {1.0} <music21.note.Note F>
         '''
         self.addToStaffReference(mxObjectOrNumber, m21Object)
         self.stream._insertCore(offset, m21Object)
@@ -1797,6 +1837,7 @@ class MeasureParser(XMLParserBase):
 
         # these are the attributes of the <measure> tag, not the <attributes> tag        
         self.parseMeasureAttributes()
+        
         if self.parent:
             self.divisions = self.parent.lastDivisions
         else:
@@ -3557,6 +3598,9 @@ class MeasureParser(XMLParserBase):
 
     
     def xmlHarmony(self, mxHarmony):
+        '''
+        Create a ChordSymbol object and insert it to the core and staff reference.
+        '''
         h = self.xmlToChordSymbol(mxHarmony)
         self.insertCoreAndRef(self.offsetMeasureNote, mxHarmony, h)
     
@@ -3607,7 +3651,7 @@ class MeasureParser(XMLParserBase):
         # TODO: frame
         # TODO: offset
         # TODO: editorial
-        # TODO: staff
+        # staff is covered by insertCoreAndReference
         
         #environLocal.printDebug(['mxToChordSymbol():', mxHarmony])
         cs = harmony.ChordSymbol()
@@ -3691,8 +3735,8 @@ class MeasureParser(XMLParserBase):
     
     def xmlDirection(self, mxDirection):
         '''
-        convert a <direction> tag to an expression, metronome mark, etc.
-        and add it to the core and staff direction.
+        convert a <direction> tag to one or more expressions, metronome marks, etc.
+        and them to the core and staffReference.
         '''
         offsetDirection = self.xmlToOffset(mxDirection)
         totalOffset = offsetDirection + self.offsetMeasureNote
@@ -3701,7 +3745,6 @@ class MeasureParser(XMLParserBase):
         # found in mxDir but in mxDirection itself.
         staffKey = self.getStaffNumberStr(mxDirection)
         # TODO: editorial-voice-direction
-        # TODO: staff
         # TODO: sound
         for mxDirType in mxDirection.findall('direction-type'):
             for mxDir in mxDirType:
@@ -3768,6 +3811,8 @@ class MeasureParser(XMLParserBase):
         '''
         Given an mxDirection, create a textExpression
         '''
+        # TODO: switch to using the setPrintAlign, etc.
+        
         #environLocal.printDebug(['mxToTextExpression()', mxWords, mxWords.charData])
         # content can be passed with creation argument
         if mxWords.text is None:
@@ -3891,6 +3936,14 @@ class MeasureParser(XMLParserBase):
         >>> off = EL(r'<direction><offset>100</offset></direction>')
         >>> MP.xmlToOffset(off)
         2.5
+        
+        Returns a float, not fraction.
+        
+        >>> MP.divisions = 30
+        >>> off = EL(r'<direction><offset>10</offset></direction>')
+        >>> MP.xmlToOffset(off)
+        0.33333...
+        
         '''
         
         try:
@@ -4043,6 +4096,10 @@ class MeasureParser(XMLParserBase):
         return post
 
     def handleTimeSignature(self, mxTime):
+        '''
+        Creates a TimeSignature using xmlToTimeSignature and inserts it into
+        the stream if it is appropriate to do so (now always yes.)
+        '''
         ts = self.xmlToTimeSignature(mxTime)
         if ts is not None:
             self.insertCoreAndRef(self.offsetMeasureNote, mxTime, ts)
@@ -4168,12 +4225,15 @@ class MeasureParser(XMLParserBase):
         '''
         clefObj = self.xmlToClef(mxClef)
         self.insertCoreAndRef(self.offsetMeasureNote, mxClef, clefObj)
-        staffNumberStr = self.getStaffNumberStr(mxClef)
-        self.lastClefs[staffNumberStr] = clefObj
-    
+
+        # Update the list of lastClefs -- needed for rest display.
+        staffNumberStrOrNone = self.getStaffNumberStr(mxClef)
+        self.lastClefs[staffNumberStrOrNone] = clefObj
     
     def xmlToClef(self, mxClef):
         '''
+        Returns a music21 Clef object from an mxClef element.
+        
         >>> import xml.etree.ElementTree as ET
         >>> mxClef = ET.fromstring('<clef><sign>G</sign><line>2</line></clef>')
         
@@ -4197,7 +4257,8 @@ class MeasureParser(XMLParserBase):
                 octaveChange = 0
             clefObj = clef.clefFromString(sign + line, octaveChange)
     
-        # TODO: number
+        # number is taken care of by insertCoreAndReference
+        
         # TODO: additional -- is this clef an additional clef to ignore...
         # TODO: size
         # TODO: after-barline -- particular style to clef.
@@ -4437,6 +4498,21 @@ class MeasureParser(XMLParserBase):
     def xmlStaffLayoutFromStaffDetails(self, mxDetails):
         '''
         Returns a new StaffLayout object from staff-details.
+        
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> mxDetails = EL('<details number="2" print-object="no">' 
+        ...                + '<staff-size>21.2</staff-size><staff-lines>4</staff-lines>'
+        ...                + '</details>')
+        >>> stl = MP.xmlStaffLayoutFromStaffDetails(mxDetails)
+        >>> stl.staffSize
+        21.2
+        >>> stl.staffLines
+        4
+        >>> stl.staffNumber
+        2
+        >>> stl.hidden
+        True
         '''
         seta = _setAttributeFromTagText
         
@@ -4461,6 +4537,8 @@ class MeasureParser(XMLParserBase):
         
         Each of these applies to the entire measure, so there's
         no need to insert into the stream.
+        
+        Does not support multiple staves yet.
         '''
         # TODO: attr: number (staff number)
         # TODO: attr-group color
@@ -4511,9 +4589,7 @@ class MeasureParser(XMLParserBase):
         >>> MP.stream.number
         1
         >>> MP.stream.numberSuffix
-        'X'
-
-        
+        'X'        
         '''
         if mNumRaw is None and self.mxMeasure is not None:
             # this is the default situation 
@@ -4553,6 +4629,43 @@ class MeasureParser(XMLParserBase):
         self.numberSuffix = m.numberSuffix
         
     def updateVoiceInformation(self):
+        '''
+        Finds all the "voice" information in <note> tags and updates the set of
+        `.voiceIndices` to be a set of all the voice texts, and if there is
+        more than one voice in the measure, sets `.useVoices` to True
+        and creates a voice for each.
+        
+        >>> import xml.etree.ElementTree as ET
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> MP.mxMeasure = ET.fromstring('<measure><note><voice>1</voice></note></measure>')        
+        >>> MP.updateVoiceInformation()
+        >>> MP.voiceIndices
+        {'1'}
+        >>> MP.useVoices
+        False
+        
+        `.updateVoiceInformation` runs `._insertCore` so we need to call elementsChanged:
+        
+        >>> MP.stream.elementsChanged()
+        >>> len(MP.stream)
+        0
+        
+        Now a better test:
+        
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> MP.mxMeasure = ET.fromstring('<measure><note><voice>1</voice></note>' 
+        ...                                     + '<note><voice>2</voice></note></measure>')        
+        >>> MP.updateVoiceInformation()
+        >>> sorted(list(MP.voiceIndices))
+        ['1', '2']
+        >>> MP.useVoices
+        True
+        >>> MP.stream.elementsChanged()
+        >>> len(MP.stream)
+        2
+        >>> len(MP.stream.getElementsByClass('Voice'))
+        2
+        '''
         mxm = self.mxMeasure
         for mxn in mxm.findall('note'):
             voice = mxn.find('voice')
@@ -4565,7 +4678,7 @@ class MeasureParser(XMLParserBase):
         if len(self.voiceIndices) > 1:
             for vIndex in sorted(self.voiceIndices):
                 v = stream.Voice()
-                v.id = vIndex
+                v.id = vIndex # TODO: should use a separate voiceId or something in Voice.
                 self.stream._insertCore(0.0, v)
             self.useVoices = True
 #------------------------------------------------------------------------------

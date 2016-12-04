@@ -935,37 +935,6 @@ class Accidental(style.StyleMixin):
         return sorted(accidentalNameToModifier.keys(), key=str.lower)
 
     ### PUBLIC PROPERTIES ###
-    @property
-    def style(self):
-        '''
-        Returns (or Creates and then Returns) the Style object
-        associated with this object, or sets a new
-        style object.  Different classes might use
-        different Style objects because they might have different 
-        style needs (such as text formatting or bezier positioning)
-        
-        Eventually will also query the groups to see if they have
-        any styles associated with them.
-        
-        >>> acc = pitch.Accidental('flat')
-        >>> st = acc.style
-        >>> st
-        <music21.style.TextStyle object at 0x10ba96208>
-        >>> st.absoluteX = 20.0
-        >>> st.absoluteX
-        20.0
-        >>> acc.style = style.Style()
-        >>> acc.style.absoluteX is None
-        True
-        '''
-        if self._style is None:
-            styleClass = self._styleClass
-            self._style = styleClass()
-        return self._style
-    
-    @style.setter
-    def style(self, newStyle):
-        self._style = newStyle
 
     ### PUBLIC METHODS ###
 

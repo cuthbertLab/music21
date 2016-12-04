@@ -73,7 +73,8 @@ class Style(object):
             raise TextFormatException('Not a supported enclosure: %s' % value)
     
     enclosure = property(_getEnclosure, _setEnclosure, 
-        doc = '''Get or set the enclosure.  Valid names are
+        doc = '''
+        Get or set the enclosure.  Valid names are
         rectangle, square, oval, circle, bracket, triangle, diamond, or None.
 
         
