@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function, division
 
 from music21 import stream, converter, corpus, instrument, graph, note, meter, humdrum
 import music21.pitch
@@ -518,8 +519,8 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    js_q1()
-    #music21.mainTest(Test)
+    #js_q1()
+    music21.mainTest(Test)
     #music21.mainTest(TestExternal)
 
 
