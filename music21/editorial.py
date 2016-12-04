@@ -32,11 +32,9 @@ class CommentException(exceptions21.Music21Exception):
 class NoteEditorial(SlottedObjectMixin):
     '''
     Editorial comments and special effects that can be applied to notes
-    Standard ones are stored as attributes.  Non-standard/one-off effects are
     stored in the dict called "misc":
 
     >>> a = editorial.NoteEditorial()
-    >>> a.comment = "blue note"  # a standard editorial 
     >>> a.misc['backgroundHighlight'] = 'yellow'  # non-standard.
 
     Every GeneralNote object already has a NoteEditorial object attached to it
