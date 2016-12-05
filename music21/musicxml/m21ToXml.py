@@ -202,7 +202,8 @@ def _setAttributeFromAttribute(m21El, xmlEl, xmlAttributeName, attributeName=Non
     
     Pass a function or lambda function as transform to transform the value before setting it
     
-    >>> from xml.etree.ElementTree import fromstring as El
+    >>> El = musicxml.m21ToXml.ET.fromstring #_DOCS_HIDE -- py2 cElementTree needed
+    >>> #_DOCS_SHOW from xml.etree.ElementTree import fromstring as El
 
     >>> e = El('<page-layout/>')
 
@@ -723,7 +724,8 @@ class XMLExporterBase(object):
         
         conforms to attr-group %font in the MusicXML DTD
         
-        >>> from xml.etree.ElementTree import fromstring as El
+        >>> El = musicxml.m21ToXml.ET.fromstring #_DOCS_HIDE -- py2 cElementTree needed
+        >>> #_DOCS_SHOW from xml.etree.ElementTree import fromstring as El
         >>> XB = musicxml.m21ToXml.XMLExporterBase()
         >>> mxObj = El('<text>hi</text>')
         >>> te = expressions.TextExpression('hi!')
@@ -778,7 +780,8 @@ class XMLExporterBase(object):
 
     def setEditorial(self, mxObject, m21Object):
         '''
-        >>> from xml.etree.ElementTree import fromstring as El
+        >>> El = musicxml.m21ToXml.ET.fromstring #_DOCS_HIDE -- py2 cElementTree needed
+        >>> #_DOCS_SHOW from xml.etree.ElementTree import fromstring as El
         >>> XB = musicxml.m21ToXml.XMLExporterBase()
         >>> mxObj = El('<note />')
         >>> n = note.Note('C-5')
