@@ -16,7 +16,6 @@ etc. such that precise positioning information, layout, size, etc. can be specif
 import unittest
 
 from music21 import common
-from music21 import editorial
 from music21 import exceptions21
 
 class TextFormatException(exceptions21.Music21Exception):
@@ -463,6 +462,7 @@ class StyleMixin(common.SlottedObjectMixin):
         >>> acc.editorial
         <music21.editorial.Editorial {'ficta': <accidental sharp>} >
         '''
+        from music21 import editorial
         if self._editorial is None:
             self._editorial = editorial.Editorial()
         return self._editorial
