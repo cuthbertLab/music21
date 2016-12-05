@@ -393,7 +393,7 @@ class XMLParserBase(object):
         False
         
         >>> mxObj = El('<note><footnote>Sharp is conjectural</footnote>' 
-        ...            + '<level reference="yes">2</level>')
+        ...            + '<level reference="yes">2</level></note>')
         >>> XP.setEditorial(mxObj, n)
         >>> n.hasEditorialInformation
         True
@@ -412,8 +412,7 @@ class XMLParserBase(object):
         If no <footnote> tag exists, the editorial information will be found in
         comments:
         
-        >>> mxObj = El('<note>' 
-        ...            + '<level reference="no">ed</level>')
+        >>> mxObj = El('<note><level reference="no">ed</level></note>')
         >>> n = note.Note('C#4')
         >>> XP.setEditorial(mxObj, n)
         >>> len(n.editorial.footnotes)
@@ -426,8 +425,7 @@ class XMLParserBase(object):
         >>> com.text is None
         True
         >>> com.levelInformation
-        'ed'
-        
+        'ed' 
         '''
         mxFootnote = mxObj.find('footnote')
         mxLevel = mxObj.find('level')

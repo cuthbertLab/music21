@@ -1555,7 +1555,8 @@ class Ottava(Spanner):
             raise SpannerException("Cannot get shift magnitude from %s" % self._type)
 
     def _getShiftDirection(self):
-        '''Get basic parameters of shift.
+        '''
+        Get basic parameters of shift.
         '''
         # an 8va means that the notes must be shifted down with the mark
         if self._type.endswith('a'): 

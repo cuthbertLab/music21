@@ -51,6 +51,7 @@ from music21 import meter
 from music21 import pitch
 from music21 import spanner
 from music21 import stream
+from music21.stream.iterator import OffsetIterator
 
 from music21.musicxml import xmlObjects
 
@@ -2356,7 +2357,6 @@ class MeasureExporter(XMLExporterBase):
         deals with transposing, repeat brackets, setting measureNumber and width, 
         the first mxPrint, the first <attributes> tag, the left barline, parsing all internal
         elements, setting the right barline, then returns the root <measure> tag.
-        
         '''
         self.setTranspose()
         self.setRbSpanners()
@@ -2409,8 +2409,22 @@ class MeasureExporter(XMLExporterBase):
             voiceId = None
         
         self.currentVoiceId = voiceId
-        for obj in m:
-            self.parseOneElement(obj)
+        
+        # group all objects by offsets and then do a different order than normal sort.
+        # that way chord symbols and other 0-width objects appear before notes as much as
+        # possible.
+        for objGroup in OffsetIterator(m):
+            notesForLater = []
+            for obj in objGroup:
+                # we do all non-note elements (including ChordSymbols)
+                # first before note elements, in musicxml
+                if 'GeneralNote' in obj.classes and 'Harmony' not in obj.classes:
+                    notesForLater.append(obj)
+                else:
+                    self.parseOneElement(obj)
+
+            for n in notesForLater:
+                self.parseOneElement(n)
         
         if voiceId is not None:
             # return to the beginning of the measure.
@@ -2532,9 +2546,9 @@ class MeasureExporter(XMLExporterBase):
                     if m21spannerClass == 'Line':
                         mxElement.set('line-type', str(thisSpanner.lineType))
                     
-                    if posSub == 'first': # TODO: getStartParameters and getEndParamters
+                    if posSub == 'first': # TODO: getStartParameters and getEndParamters...
                         pmtrs = thisSpanner.getStartParameters()
-                    elif posSub == 'last': # should be defined here, not in spanner.py
+                    elif posSub == 'last': # ...should be defined here, not in spanner.py
                         pmtrs = thisSpanner.getEndParameters()
                     else:
                         pmtrs = {}
@@ -4503,7 +4517,7 @@ class MeasureExporter(XMLExporterBase):
             raise MusicXMLExportException('unexpected beam type encountered (%s)' % beamObject.type)
     
         mxBeam.set('number', str(beamObject.number))
-        # not todo: repeater (deprecated)
+        # not to be done: repeater (deprecated)
         # TODO: attr: fan
         # TODO: attr: color group
         return mxBeam
@@ -4511,7 +4525,7 @@ class MeasureExporter(XMLExporterBase):
     
     def setRightBarline(self):
         '''
-        Calls self.setBarline for 
+        Calls self.setBarline for the right side if the measure has a .rightBarline set.
         ''' 
         m = self.stream
         if not hasattr(m, 'rightBarline'):
@@ -4527,6 +4541,9 @@ class MeasureExporter(XMLExporterBase):
             self.setBarline(rightBarline, 'right')
         
     def setLeftBarline(self):
+        '''
+        Calls self.setBarline for the left side if the measure has a .leftBarline set.
+        ''' 
         m = self.stream
         if not hasattr(m, 'leftBarline'):
             return
