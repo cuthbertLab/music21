@@ -3907,7 +3907,7 @@ class Test(unittest.TestCase):
         b.offset = 2.0 # duration.Duration("half")
 
         self.assertFalse(n is b)
-        n.accidental = "-"
+        n.pitch.accidental = '-'
         self.assertEqual(b.name, "A")
         self.assertEqual(n.offset, 1.0)
         self.assertEqual(b.offset, 2.0)

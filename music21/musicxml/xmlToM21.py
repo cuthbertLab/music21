@@ -2327,7 +2327,7 @@ class MeasureParser(XMLParserBase):
         False
         >>> n.noteheadParenthesis
         True
-        >>> n.color
+        >>> n.style.color
         '#FF0000'
         '''
         if mxNotehead.text not in ('', None):

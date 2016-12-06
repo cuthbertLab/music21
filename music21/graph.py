@@ -2099,7 +2099,7 @@ class PlotStream(object):
         >>> s = stream.Stream()
         >>> for i in range(60, 84):
         ...    n = note.Note()
-        ...    n.ps = i
+        ...    n.pitch.ps = i
         ...    s.append(n)
         >>> a = graph.PlotStream(s)
         >>> [x for x, y in a.ticksPitchClassUsage(showEnharmonic=True)]
