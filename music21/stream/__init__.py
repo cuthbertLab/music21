@@ -11633,7 +11633,7 @@ class Measure(Stream):
                 pass
                 #environLocal.printDebug(['skipping makeBeams exception', StreamException])
         if m.streamStatus.haveTupletBracketsBeenMade() is False:
-            m.makeTupletBrackets(inPlace=True)
+            makeNotation.makeTupletBrackets(m, inPlace=True)
 
         if not inPlace:
             return m
