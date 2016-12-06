@@ -1258,7 +1258,6 @@ def realizeOrnaments(s):
     >>> s1.append(m2)
     >>> for x in s1.recurse():
     ...     x
-    ...
     <music21.stream.Stream ...>
     <music21.stream.Measure 1 offset=0.0>
     <music21.meter.TimeSignature 4/4>
@@ -1269,7 +1268,6 @@ def realizeOrnaments(s):
     >>> s2 = stream.makeNotation.realizeOrnaments(s1)
     >>> for x in s2.recurse():
     ...     x
-    ...
     <music21.stream.Stream ...>
     <music21.stream.Measure 1 offset=0.0>
     <music21.meter.TimeSignature 4/4>

@@ -425,7 +425,7 @@ class Graph(object):
         '''
         pass
 
-    @common.deprecated('August 2016', 'December 2016', 'use self.data = data instead')
+    @common.deprecated('August 2016', 'August 2017', 'use self.data = data instead')
     def setData(self, data):
         self.data = data
 

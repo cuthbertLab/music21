@@ -3698,9 +3698,6 @@ class Chord(note.NotRest):
         return len(self.pitchClasses)
 
 
-    # @deprecated("September 2016", 
-    #    "Deprecated because it gives the wrong answer -- use normalOrder")
-    
     @property
     def normalOrder(self):
         '''
@@ -3766,7 +3763,7 @@ class Chord(note.NotRest):
 
 
     @property
-    @deprecated("July 2016", "September 2016", 
+    @deprecated("July 2016", "July 2017", 
                 "Deprecated because it gives the wrong answer -- use normalOrder")
     def normalForm(self):
         '''
@@ -3783,7 +3780,7 @@ class Chord(note.NotRest):
         return [(pc - firstPC) % 12 for pc in normalOrderList]
 
     @property
-    @deprecated("July 2016", "September 2016", 
+    @deprecated("July 2016", "July 2017", 
                 "Deprecated because it gives the wrong answer -- use normalOrderString")
     def normalFormString(self):
         '''

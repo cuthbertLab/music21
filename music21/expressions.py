@@ -325,7 +325,7 @@ class GeneralMordent(Ornament):
             currentKeySig = key.KeySignature(0)
 
         for n in mordNotes:            
-            n.accidental = currentKeySig.accidentalByStep(n.step)
+            n.pitch.accidental = currentKeySig.accidentalByStep(n.step)
         remainderNote = copy.deepcopy(srcObj)
         remainderNote.duration.quarterLength = remainderDuration
         #TODO clear just mordent here...
@@ -530,13 +530,13 @@ class Trill(Ornament):
             currentKeySig = key.KeySignature(0)
 
         for n in trillNotes:
-            n.accidental = currentKeySig.accidentalByStep(n.step)
+            n.pitch.accidental = currentKeySig.accidentalByStep(n.step)
         
         if self.nachschlag:
             firstNoteNachschlag = copy.deepcopy(srcObj)
             #TODO: remove expressions
             firstNoteNachschlag.duration.quarterLength = self.quarterLength
-            firstNoteNachschlag.accidental = currentKeySig.accidentalByStep(
+            firstNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
                                                         firstNoteNachschlag.step)
             
             secondNoteNachschlag = copy.deepcopy(srcObj)
@@ -544,7 +544,7 @@ class Trill(Ornament):
             secondNoteNachschlag.duration.quarterLength = self.quarterLength
             secondNoteNachschlag.transpose(transposeIntervalReverse, 
                 inPlace = True)
-            secondNoteNachschlag.accidental = currentKeySig.accidentalByStep(
+            secondNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
                                                         secondNoteNachschlag.step)
             
             nachschlag = [firstNoteNachschlag, secondNoteNachschlag]
@@ -701,7 +701,7 @@ class Turn(Ornament):
             currentKeySig = key.KeySignature(0)
        
         for n in turnNotes:
-            n.accidental = currentKeySig.accidentalByStep(n.step)
+            n.pitch.accidental = currentKeySig.accidentalByStep(n.step)
             
         remainderNote = copy.deepcopy(srcObject)
         remainderNote.duration.quarterLength = remainderDuration

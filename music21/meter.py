@@ -3220,23 +3220,6 @@ class TimeSignature(base.Music21Object):
     #---------------------------------------------------------------------------
     # properties
 
-    # temp for backward compat  # TODO: Formally Deprecate and remove.
-    @property
-    @common.deprecated('2012', '2016 November', 'use .barDuration.quarterLength instead.')
-    def totalLength(self):
-        '''
-        Total length of the TimeSignature, in Quarter Lengths.
-
-        DEPRECATED.  Use .barDuration.quarterLength
-
-        >>> ts = meter.TimeSignature('6/8')
-        >>> ts.barDuration.quarterLength
-        3.0
-        '''
-        return self.beamSequence.duration.quarterLength
-
-
-
     def _getNumerator(self):
         return self.beamSequence.numerator
 

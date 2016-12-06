@@ -367,6 +367,7 @@ class GeneralNote(base.Music21Object):
         self.tie = None # store a Tie object
 
     #---------------------------------------------------------------------------
+    @common.deprecated('December 2016', 'December 2017', 'use .style.color instead')
     def _getColor(self):
         '''
         DEPRECATED: use `.style.color`
@@ -375,10 +376,10 @@ class GeneralNote(base.Music21Object):
 
         >>> a = note.GeneralNote()
         >>> a.duration.type = 'whole'
-        >>> a.color is None
+        >>> a.style.color is None
         True
-        >>> a.color = '#235409'
-        >>> a.color
+        >>> a.style.color = '#235409'
+        >>> a.style.color
         '#235409'
         >>> a.style.color
         '#235409'
@@ -1125,10 +1126,11 @@ class Note(NotRest):
         ''')
 
 
-    @common.deprecated("May 2014", "May 2016", "use pitch.accidental instead")
+    @common.deprecated("May 2014", "May 2017", "use pitch.accidental instead")
     def _getAccidental(self):
         return self.pitch.accidental
 
+    @common.deprecated("May 2014", "May 2017", "use pitch.accidental instead")
     def _setAccidental(self, value):
         '''
         Adds an accidental to the Note, given as an Accidental object.
@@ -1140,7 +1142,7 @@ class Note(NotRest):
         >>> a.name
         'D'
         >>> b = pitch.Accidental("sharp")
-        >>> a.accidental = (b)
+        >>> a.pitch.accidental = (b)
         >>> a.name
         'D#'
         '''
@@ -1171,10 +1173,11 @@ class Note(NotRest):
         See :attr:`~music21.pitch.Pitch.step`.
         ''')
 
-    @common.deprecated("May 2014", "May 2016", "use pitch.frequency instead")
+    @common.deprecated("May 2014", "May 2017", "use pitch.frequency instead")
     def _getFrequency(self):
         return self.pitch.frequency
 
+    @common.deprecated("May 2014", "May 2017", "use pitch.frequency instead")
     def _setFrequency(self, value):
         self.pitch.frequency = value
 
@@ -1198,10 +1201,12 @@ class Note(NotRest):
         doc = '''Return or set the octave value from the :class:`~music21.pitch.Pitch` object. 
         See :attr:`~music21.pitch.Pitch.octave`.''')
 
-    @common.deprecated("May 2014", "May 2016", "use pitch.midi instead")
+
+    @common.deprecated("May 2014", "May 2017", "use pitch.midi instead")
     def _getMidi(self):
         return self.pitch.midi
 
+    @common.deprecated("May 2014", "May 2017", "use pitch.midi instead")
     def _setMidi(self, value):
         self.pitch.midi = value
 
@@ -1216,10 +1221,11 @@ class Note(NotRest):
         DEPRECATED May 2014: use n.pitch.midi instead
         ''')
 
-    @common.deprecated("May 2014", "May 2016", "use pitch.ps instead")
+    @common.deprecated("May 2014", "May 2017", "use pitch.ps instead")
     def _getPs(self):
         return self.pitch.ps
 
+    @common.deprecated("May 2014", "May 2017", "use pitch.ps instead")
     def _setPs(self, value):
         self.pitch.ps = value
 
@@ -1234,10 +1240,11 @@ class Note(NotRest):
         DEPRECATED May 2014: use n.pitch.ps instead
         ''')
 
-    @common.deprecated("May 2014", "May 2016", "use pitch.microtone instead")
+    @common.deprecated("May 2014", "May 2017", "use pitch.microtone instead")
     def _getMicrotone(self):
         return self.pitch.microtone
 
+    @common.deprecated("May 2014", "May 2017", "use pitch.microtone instead")
     def _setMicrotone(self, value):
         self.pitch.microtone = value
 
@@ -1251,10 +1258,11 @@ class Note(NotRest):
         ''')
 
 
-    @common.deprecated("May 2014", "May 2016", "use pitch.pitchClass instead")
+    @common.deprecated("May 2014", "May 2017", "use pitch.pitchClass instead")
     def _getPitchClass(self):
         return self.pitch.pitchClass
 
+    @common.deprecated("May 2014", "May 2017", "use pitch.pitchClass instead")
     def _setPitchClass(self, value):
         self.pitch.pitchClass = value
 
@@ -1266,10 +1274,11 @@ class Note(NotRest):
         ''')
 
 
-    @common.deprecated("May 2014", "May 2016", "use pitch.pitchClassString instead")
+    @common.deprecated("May 2014", "May 2017", "use pitch.pitchClassString instead")
     def _getPitchClassString(self):
         return self.pitch.pitchClassString
 
+    @common.deprecated("May 2014", "May 2017", "use pitch.pitchClassString instead")
     def _setPitchClassString(self, value):
         self.pitch.pitchClassString = value
 
@@ -1284,14 +1293,14 @@ class Note(NotRest):
         DEPRECATED May 2014: use n.pitch.pitchClassString instead
         ''')
 
-
     @property
+    @common.deprecated('December 2016', 'December 2017', 'use `.pitch.diatonicNoteNum instead')
     def diatonicNoteNum(self):
         '''
-        Return the diatonic note number from the :class:`~music21.pitch.Pitch` object. 
-        See :attr:`~music21.pitch.Pitch.diatonicNoteNum`.
+        DEPRECATED: use .pitch.diatonicNoteNum instead.
         
-        Probably will be deprecated soon...
+        Return the diatonic note number from the :class:`~music21.pitch.Pitch` object. 
+        See :attr:`~music21.pitch.Pitch.diatonicNoteNum`.        
         '''
         return self.pitch.diatonicNoteNum
 
@@ -1421,7 +1430,7 @@ class Note(NotRest):
         'E-half-sharp in octave 3 Half Note'
 
         >>> n = note.Note('D', quarterLength=.25)
-        >>> n.microtone = 25
+        >>> n.pitch.microtone = 25
         >>> n.fullName
         'D (+25c) 16th Note'
         '''

@@ -385,9 +385,6 @@ class KeySignature(base.Music21Object):
     
     def __init__(self, sharps=None):
         base.Music21Object.__init__(self)
-        #if mode is not None:
-        #    self._mode_is_deprecated()
-        
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
 
         try:

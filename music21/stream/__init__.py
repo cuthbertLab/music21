@@ -836,6 +836,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     #-------------------------------
     # Temporary -- Remove in  2016
+    @common.deprecated('2016 December', '2017 December', 'No need to call `.stream()` on a stream. '
+                                                        + 'just use the object itself')
     def stream(self, returnStreamSubclass=None):
         '''
         During the transition period to the new iteration system,
@@ -3360,22 +3362,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     #-----------------------------------------------------
     # end .getElement filters
-    
-    
-    @common.deprecated("September 2015", "May 2016", 
-                       "use s.elementOffset() instead w/ a try/except")
-    def getOffsetByElement(self, obj):
-        '''
-        DEPRECATED Sep 2015: use s.elementOffset(obj) and if it is possible that
-        obj is not in s, then do a try: except base.SitesException
-        
-        Remove in 2016 May.
-        '''
-        try:
-            return self.elementOffset(obj)
-        except base.SitesException:
-            return None
-
 
     def groupElementsByOffset(self, returnDict=False):
         '''
@@ -4322,44 +4308,54 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return None
 
 
-    def bestClef(self, allowTreble8vb=False):
+    def bestClef(self, allowTreble8vb=False, recurse=False):
         '''
         TODO: Move to Clef
         
         Returns the clef that is the best fit for notes and chords found in this Stream.
-
-        This does not automatically get a flat representation of the Stream.
 
 
         >>> import random
         >>> a = stream.Stream()
         >>> for x in range(30):
         ...    n = note.Note()
-        ...    n.midi = random.choice(range(60,72))
+        ...    n.pitch.midi = random.randint(70, 81)
         ...    a.insert(n)
         >>> b = a.bestClef()
+        >>> b
+        <music21.clef.TrebleClef>
         >>> b.line
         2
         >>> b.sign
         'G'
 
         >>> c = stream.Stream()
-        >>> for x in range(30):
+        >>> for x in range(10):
         ...    n = note.Note()
-        ...    n.midi = random.choice(range(35,55))
+        ...    n.pitch.midi = random.randint(45, 54)
         ...    c.insert(n)
         >>> d = c.bestClef()
+        >>> d
+        <music21.clef.BassClef>
         >>> d.line
         4
         >>> d.sign
         'F'
+        
+        This does not automatically get a flat representation of the Stream.
+        
+        There are a lot more high notes in `a` (30) than low notes in `c` (10),
+        but it will not matter here, because the pitches in `a` will not be found:
+        
+        >>> c.insert(0, a)
+        >>> c.bestClef()
+        <music21.clef.BassClef>
+        
+        But with recursion, it will matter:
+        
+        >>> c.bestClef(recurse=True)
+        <music21.clef.TrebleClef>
         '''
-        #environLocal.printDebug(['calling bestClef()'])
-
-        totalNotes = 0
-        totalHeight = 0
-
-        notes = self.getElementsByClass('GeneralNote')
         def findHeight(p):
             height = p.diatonicNoteNum
             if p.diatonicNoteNum > 33: # a4
@@ -4367,6 +4363,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             elif p.diatonicNoteNum < 24: # Bass F or lower
                 height += -3 # bonus
             return height
+        #environLocal.printDebug(['calling bestClef()'])
+
+        totalNotes = 0
+        totalHeight = 0
+
+        sIter = self.recurse() if recurse else self.iter
+
+        notes = sIter.getElementsByClass('GeneralNote')
 
         for n in notes:
             if n.isRest:
@@ -4546,7 +4550,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             quickSearch = False
 
-        inversionDNN = inversionNote.diatonicNoteNum
+        inversionDNN = inversionNote.pitch.diatonicNoteNum
         for n in returnStream.recurse(classFilter=('NotRest')):
             n.pitch.diatonicNoteNum = (2*inversionDNN) - n.pitch.diatonicNoteNum
             if quickSearch: # use previously found
@@ -5638,35 +5642,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             inPlace=inPlace,
             )
 
-    @common.deprecated("September 2015", "May 2016", 
-                       "use stream.streamStatus.StreamStatus.haveBeamsBeenMade instead")
-    def haveBeamsBeenMade(self):
-        # could be called: hasAccidentalDisplayStatusSet
-        '''
-        If any Note in this Stream has .beams defined, it as
-        assumed that Beams have not been set and/or makeBeams
-        has not been run. If any Beams exist, this method
-        returns True, regardless of if makeBeams has actually been run.
-        
-        DEPRECATED: Use :meth:`~music21.stream.streamStatus.StreamStatus.haveBeamsBeenMade`
-        instead.
-        
-        Remove in May 2016
-        '''
-        return self.streamStatus.haveBeamsBeenMade()
-
-    # @common.deprecated
-    def makeTupletBrackets(self, inPlace=False):
-        '''
-        Calls :py:func:`~music21.stream.makeNotation.makeTupletBrackets`.
-        
-        Deprecated sep 2015; rem July 2016; call makeNotation.makeTupletBrackets directly.
-        '''
-        return makeNotation.makeTupletBrackets(
-            self,
-            inPlace=inPlace,
-            )
-
     def makeAccidentals(self, 
                         pitchPast=None, 
                         pitchPastMeasure=None,
@@ -5936,16 +5911,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #environLocal.printDebug(['Stream.makeNotation(): created measures:', len(measureStream)])
         
         return returnStream
-
-    def realizeOrnaments(self):
-        '''
-        Calls :py:func:`~music21.stream.makeNotation.realizeOrnaments`.
-        
-        DEPRECATED Sep 2015; will be removed by July 2016
-        '''
-        warnings.warn("realizeOrnaments; use stream.makeNotation.realizeOrnaments() instead", 
-                      StreamDeprecationWarning)
-        return makeNotation.realizeOrnaments(self)
 
     def extendDuration(self, objName, inPlace=True):
         '''
@@ -9865,6 +9830,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return returnObj
         return None
 
+    
     def internalize(self, container=None,
                     classFilterList=('GeneralNote',)):
         '''

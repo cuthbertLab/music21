@@ -774,10 +774,9 @@ class SpannerBundle(object):
         return '<music21.spanner.SpannerBundle of size %s>' % self.__len__()
 
     @property
+    @common.deprecated('January 2016; w/ decorator Dec 2016', 'May 2017', 'use list(sb) instead')
     def list(self):
         '''
-        DEPRECATED: use list(sb) instead!
-
         Return the bundle as a list.
         
         >>> su1 = spanner.Slur()
@@ -872,11 +871,11 @@ class SpannerBundle(object):
         >>> sb = spanner.SpannerBundle()
         >>> sb.append(su1)
         >>> sb.append(su2)
-        >>> sb.getBySpannedElement(n1).list == [su1]
+        >>> list(sb.getBySpannedElement(n1)) == [su1]
         True
-        >>> sb.getBySpannedElement(n2).list == [su1, su2]
+        >>> list(sb.getBySpannedElement(n2)) == [su1, su2]
         True
-        >>> sb.getBySpannedElement(n3).list == [su2]
+        >>> list(sb.getBySpannedElement(n3)) == [su2]
         True
         '''
         # NOTE: this is a performance critical operation
@@ -975,11 +974,11 @@ class SpannerBundle(object):
         
         Classes can be strings (short class) or classes.
         
-        >>> sb.getByClass(spanner.Slur).list == [su1]
+        >>> list(sb.getByClass(spanner.Slur)) == [su1]
         True
-        >>> sb.getByClass('Slur').list == [su1]
+        >>> list(sb.getByClass('Slur')) == [su1]
         True
-        >>> sb.getByClass('StaffGroup').list == [su2, su3]
+        >>> list(sb.getByClass('StaffGroup')) == [su2, su3]
         True
         '''
         # NOTE: this is called very frequently: optimize
@@ -1098,10 +1097,10 @@ class SpannerBundle(object):
         >>> sb = spanner.SpannerBundle()
         >>> sb.append(su1)
         >>> sb.append(su2)
-        >>> sb.getByClassIdLocalComplete('StaffGroup', 3, False).list == [su2]
+        >>> list(sb.getByClassIdLocalComplete('StaffGroup', 3, False)) == [su2]
         True
         >>> su2.completeStatus = True
-        >>> sb.getByClassIdLocalComplete('StaffGroup', 3, False).list == []
+        >>> list(sb.getByClassIdLocalComplete('StaffGroup', 3, False)) == []
         True
         '''
         return self.getByClass(className).getByIdLocal(
@@ -2060,13 +2059,13 @@ class Test(unittest.TestCase):
 
         sb1 = spanner.SpannerBundle(su1, su2, su3)
         self.assertEqual(len(sb1), 3)
-        self.assertEqual(sb1.list, [su1, su2, su3])
+        self.assertEqual(list(sb1), [su1, su2, su3])
 
         # n3 is found in su1 and su2
 
         sb1.replaceSpannedElement(n3, n3a)
         self.assertEqual(len(sb1), 3)
-        self.assertEqual(sb1.list, [su1, su2, su3])
+        self.assertEqual(list(sb1), [su1, su2, su3])
 
         self.assertEqual(sb1[0].getSpannedElements(), [n1, n3a])
         # check su2

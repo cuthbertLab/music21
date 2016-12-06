@@ -2812,8 +2812,8 @@ class MeasureExporter(XMLExporterBase):
                 environLocal.warn("Duration set as Grace while not being a GraceDuration %s" % d)
 
         # TODO: cue...
-        if chordOrN.color is not None:
-            mxNote.set('color', normalizeColor(chordOrN.color))
+        if chordOrN.style.color is not None:
+            mxNote.set('color', normalizeColor(chordOrN.style.color))
         
         if n.hideObjectOnPrint is True:
             mxNote.set('print-object', 'no')
@@ -3257,7 +3257,7 @@ class MeasureExporter(XMLExporterBase):
             and (n.notehead != 'normal'
                  or n.noteheadParenthesis
                  or n.noteheadFill is not None
-                 or n.color not in (None, ''))
+                 or (n.hasStyleInformation and n.style.color not in (None, '')))
             ):
             foundANotehead = True
             mxNotehead = self.noteheadToXml(n)
@@ -3267,7 +3267,8 @@ class MeasureExporter(XMLExporterBase):
                 and (chordParent.notehead != 'normal'
                      or chordParent.noteheadParenthesis
                      or chordParent.noteheadFill is not None
-                     or chordParent.color not in (None, ''))
+                     or (chordParent.hasStyleInformation 
+                         and chordParent.style.color not in (None, '')))
                 ):
                 mxNotehead = self.noteheadToXml(chordParent)
                 mxNote.append(mxNotehead)
@@ -3313,8 +3314,8 @@ class MeasureExporter(XMLExporterBase):
         setb(n, mxNotehead, 'parentheses', 'noteheadParenthesis', 
              transform=xmlObjects.booleanToYesNo)
         # TODO: font
-        if n.color not in (None, ''):
-            color = normalizeColor(n.color)
+        if n.hasStyleInformation and n.style.color not in (None, ''):
+            color = normalizeColor(n.style.color)
             mxNotehead.set('color', color)
         return mxNotehead
     

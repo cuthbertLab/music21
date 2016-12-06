@@ -2105,11 +2105,11 @@ def hdStringToNote(contents):
     matchedFlat  = re.search(r"(\-+)", contents)
 
     if matchedSharp:
-        thisObject.accidental = matchedSharp.group(0)
+        thisObject.pitch.accidental = matchedSharp.group(0)
     elif matchedFlat:
-        thisObject.accidental = matchedFlat.group(0)
+        thisObject.pitch.accidental = matchedFlat.group(0)
     elif contents.count("n"):
-        thisObject.accidental = "n"
+        thisObject.pitch.accidental = "n"
 
     # 3.2.2 -- Slurs, Ties, Phrases
     # TODO: add music21 phrase information

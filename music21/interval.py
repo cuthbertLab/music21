@@ -109,7 +109,23 @@ class IntervalException(exceptions21.Music21Exception):
 #-------------------------------------------------------------------------------
 # some utility functions
 
-
+def _extractPitch(nOrP):
+    '''
+    utility function to return either the object itself
+    or the `.pitch` if it's a Note.
+    
+    >>> p = pitch.Pitch('D#4')
+    >>> interval._extractPitch(p) is p
+    True
+    >>> n = note.Note('E-4')
+    >>> interval._extractPitch(n) is n.pitch
+    True
+    
+    '''
+    if 'Pitch' in nOrP.classes:
+        return nOrP
+    else:
+        return nOrP.pitch
 
 def convertStaffDistanceToInterval(staffDist):
     '''
@@ -1579,7 +1595,9 @@ def notesToGeneric(n1, n2):
     <music21.interval.GenericInterval 11>
 
     '''
-    staffDist = n2.diatonicNoteNum - n1.diatonicNoteNum
+    (p1, p2) = (_extractPitch(n1), _extractPitch(n2))
+    
+    staffDist = p2.diatonicNoteNum - p1.diatonicNoteNum
     genDist = convertStaffDistanceToInterval(staffDist)
     return GenericInterval(genDist)
 
@@ -2447,9 +2465,10 @@ def getWrittenHigherNote(note1, note2):
     >>> interval.getWrittenHigherNote(aNote, bNote)
     <music21.note.Note D-->
     '''
-    
-    num1 = note1.diatonicNoteNum
-    num2 = note2.diatonicNoteNum
+    (p1, p2) = (_extractPitch(note1), _extractPitch(note2))
+
+    num1 = p1.diatonicNoteNum
+    num2 = p2.diatonicNoteNum
     if num1 > num2: 
         return note1
     elif num1 < num2: 
@@ -2496,8 +2515,10 @@ def getWrittenLowerNote(note1, note2):
     >>> interval.getWrittenLowerNote(aNote, bNote)
     <music21.note.Note C#>
     '''
-    num1 = note1.diatonicNoteNum
-    num2 = note2.diatonicNoteNum
+    (p1, p2) = (_extractPitch(note1), _extractPitch(note2))
+
+    num1 = p1.diatonicNoteNum
+    num2 = p2.diatonicNoteNum
     if num1 < num2: 
         return note1
     elif num1 > num2: 
@@ -2760,7 +2781,7 @@ class Test(unittest.TestCase):
         
         n2.step = "B"
         n2.octave = 5
-        n2.accidental = Accidental("-")
+        n2.pitch.accidental = Accidental("-")
         
         int1  = Interval(noteStart=n1, noteEnd=n2)
         dInt1 = int1.diatonic # returns same as gInt1 -- just a different way of thinking of things
@@ -2769,10 +2790,10 @@ class Test(unittest.TestCase):
         self.assertEqual(gInt1.isDiatonicStep, False)
         self.assertEqual(gInt1.isSkip, True)
         
-        n1.accidental = Accidental("#")
+        n1.pitch.accidental = Accidental("#")
         int1.reinit()
         
-        cInt1 = notesToChromatic(n1,n2) # returns music21.interval.ChromaticInterval object
+        cInt1 = notesToChromatic(n1, n2) # returns music21.interval.ChromaticInterval object
         cInt2 = int1.chromatic # returns same as cInt1 -- a different way of thinking of things
         self.assertEqual(cInt1.semitones, cInt2.semitones)
         
@@ -2795,15 +2816,15 @@ class Test(unittest.TestCase):
         n4 = Note()
         n4.step = "D"
         n4.octave = 3
-        n4.accidental = "-"
+        n4.pitch.accidental = "-"
         
         ##n3 = interval.transposePitch(n4, "AA8")
-        ##if n3.accidental is not None:
-        ##    print n3.step, n3.accidental.name, n3.octave
+        ##if n3.pitch.accidental is not None:
+        ##    print(n3.step, n3.pitch.accidental.name, n3.octave)
         ##else:
-        ##    print n3.step, n3.octave
-        ##print n3.name
-        ##print
+        ##    print(n3.step, n3.octave)
+        ##print(n3.name)
+        ##print()
      
         cI = ChromaticInterval (-14)
         self.assertEqual(cI.semitones, -14)

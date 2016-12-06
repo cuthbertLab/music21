@@ -117,14 +117,14 @@ here we will set the "modifierStar" to change the color of notes:
 
 >>> class ColorModifier(tinyNotation.Modifier):
 ...     def postParse(self, m21Obj):
-...         m21Obj.color = self.modifierData
+...         m21Obj.style.color = self.modifierData
 ...         return m21Obj
 
 >>> tnc = tinyNotation.Converter("3/4 C4*pink* D4*green* E4*blue*")
 >>> tnc.modifierStar = ColorModifier
 >>> s = tnc.parse().stream
 >>> for n in s.recurse().getElementsByClass('Note'):
-...     print(n.step, n.color)
+...     print(n.step, n.style.color)
 C pink
 D green
 E blue

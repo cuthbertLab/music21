@@ -3015,7 +3015,7 @@ class TupletFixer(object):
         >>> s = stream.Stream()
         >>> for i in range(9):
         ...    n = note.Note()
-        ...    n.ps = 60 + i
+        ...    n.pitch.ps = 60 + i
         ...    n.duration.quarterLength = 1.0/3
         ...    if i % 3 == 2:
         ...        n.duration.tuplets[0].type = 'stop'
