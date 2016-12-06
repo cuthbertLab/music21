@@ -329,6 +329,8 @@ class Chord(note.NotRest):
             # get by name of attribute on Note
             if last == 'volume': # special handling to avoid setting client
                 return component._getVolume(forceClient=self)
+            elif last == 'color':
+                return component.style.color
             else:
                 return getattr(component, last)
         else:

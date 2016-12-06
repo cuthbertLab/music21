@@ -583,7 +583,7 @@ class Music21Object(object):
         False
         >>> b.id != n.id
         True        
-        >>> n.accidental = "-"
+        >>> n.pitch.accidental = '-'
         >>> b.name
         'A'
         >>> n.offset
