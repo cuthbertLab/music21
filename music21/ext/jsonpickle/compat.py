@@ -26,8 +26,10 @@ except NameError:
 
 try:
     long = long
+    numeric_types = (int, long)
 except NameError:
     long = int
+    numeric_types = (int,)
 
 try:
     unichr = unichr

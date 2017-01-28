@@ -3076,7 +3076,8 @@ Barline final ⠣⠅
 #         '''
     
     def test_example16_15(self):
-        bm = converter.parse("tinynotation: 6/8 f#4 a8 d' c'# b quad{a g f# a} quad{g f# e g} f# g b a f# e d2.").flat
+        bm = converter.parse("tinynotation: 6/8 f#4 a8 d' c'# b quad{a g f# a} quad{g f# e g} " 
+                             + "f# g b a f# e d2.").flat
         bm.insert(0, key.KeySignature(2))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass('Measure')[-1].rightBarline = None
@@ -3440,6 +3441,32 @@ Barline final ⠣⠅
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠁⠀⠨⠜⠐⠚⠬⠙⠑⠬⠐⠓⠨⠋⠬⠛⠓⠴⠐⠓⠀⠀
         ⠀⠀⠸⠜⠘⠓⠔⠸⠋⠘⠓⠔⠸⠚⠸⠙⠔⠊⠓⠔⠸⠚
+        '''
+
+    def test_example26_6(self):
+        self.method = keyboardPartsToBraille
+        part_right = stream.Part()
+        part_right.append(meter.TimeSignature('2/4'))
+        part_right.append(chord.Chord(['C5', 'E5'], quarterLength=1.0))
+        part_right.append(chord.Chord(['B4', 'D5'], quarterLength=1.0))
+        part_right.append(chord.Chord(['C5', 'C5'], quarterLength=2.0))
+        part_left = stream.Part()
+        part_left.append(meter.TimeSignature('2/4'))
+        part_left.append(chord.Chord(['E3', 'G3'], quarterLength=1.0))
+        part_left.append(chord.Chord(['G3', 'G3'], quarterLength=1.0))
+        part_left.append(chord.Chord(['C3', 'C4'], quarterLength=2.0))
+        part_right.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        part_left.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        part_right.getElementsByClass('Measure')[-1].rightBarline = None
+        part_left.getElementsByClass('Measure')[-1].rightBarline = None
+        keyboardPart = stream.Part()
+        keyboardPart.append(part_right)
+        keyboardPart.append(part_left)
+        self.s = keyboardPart
+        self.b = '''
+        ⠀⠀⠀⠀⠀⠀⠼⠃⠲⠀⠀⠀⠀⠀⠀
+        ⠁⠀⠨⠜⠨⠫⠬⠱⠬⠀⠀⠨⠝⠨⠤
+        ⠀⠀⠸⠜⠸⠫⠬⠳⠸⠤⠀⠸⠝⠤⠀
         '''
 #-------------------------------------------------------------------------------
  

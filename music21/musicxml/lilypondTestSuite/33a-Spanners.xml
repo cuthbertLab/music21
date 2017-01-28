@@ -9,7 +9,8 @@
            tr + wavy-line, single-note trill spanner, octave-shift (8va,15mb),
            bracket (solid down/down, dashed down/down, solid none/down,
            dashed none/up, solid none/none), dashes, glissando (wavy),
-           bend-alter, slide (solid), grouping, two-note tremolo, hammer-on,
+           bend-alter, slide (solid), grouping, two-note tremolo (B to D#), 
+           hammer-on,
            pull-off, pedal (down, change, up).</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -780,12 +781,14 @@
       </note>
       <note>
         <pitch>
-          <step>B</step>
-          <octave>4</octave>
+          <step>D</step>
+          <alter>1</alter>
+          <octave>5</octave>
         </pitch>
         <duration>3</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <accidental>sharp</accidental>
         <notations>
           <ornaments><tremolo type="stop">2</tremolo></ornaments>
         </notations>

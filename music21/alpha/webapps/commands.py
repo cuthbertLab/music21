@@ -78,27 +78,27 @@ def generateChords(numChords,kind=''):
     only diatonic triads will be generated
         
     
-    >>> sc = alpha.webapps.commands.generateChords(4,'diatonicTriads')
-    >>> a = alpha.webapps.commands.runPerceivedDissonanceAnalysis(sc,[1.2,3.2,5.2])
+    >>> sc = alpha.webapps.commands.generateChords(4, 'diatonicTriads')
+    >>> a = alpha.webapps.commands.runPerceivedDissonanceAnalysis(sc, [1.2, 3.2, 5.2])
     >>> chords = a['fullScore']['stream'].flat.getElementsByClass('Chord')
-    >>> chords[0].color != None
+    >>> chords[0].style.color != None
     True
-    >>> chords[1].color != None
+    >>> chords[1].style.color != None
     True
-    >>> chords[2].color != None
+    >>> chords[2].style.color != None
     True
-    >>> chords[3].color in [None, '#cc3300']
+    >>> chords[3].style.color in [None, '#cc3300']
     True
     >>> sc2 = alpha.webapps.commands.generateChords(4)
-    >>> a = alpha.webapps.commands.runPerceivedDissonanceAnalysis(sc2,[1.2,3.2])
+    >>> a = alpha.webapps.commands.runPerceivedDissonanceAnalysis(sc2, [1.2, 3.2])
     >>> chords = a['fullScore']['stream'].flat.getElementsByClass('Chord')
-    >>> chords[0].color != None
+    >>> chords[0].style.color != None
     True
-    >>> chords[1].color != None
+    >>> chords[1].style.color != None
     True
-    >>> chords[2].color in [None, '#cc3300']
+    >>> chords[2].style.color in [None, '#cc3300']
     True
-    >>> chords[3].color in [None, '#cc3300']
+    >>> chords[3].style.color in [None, '#cc3300']
     True
     '''
     sc = stream.Score()
@@ -206,9 +206,10 @@ def runPerceivedDissonanceAnalysis(scoreIn, offsetList, keyStr=None):
    
     Returns a dictionary.
     '''
+    ads = theoryAnalyzer.Analyzer()
     withoutNonharmonictonesScore = copy.deepcopy(scoreIn)
-    theoryAnalyzer.removePassingTones(withoutNonharmonictonesScore)
-    theoryAnalyzer.removeNeighborTones(withoutNonharmonictonesScore)
+    ads.removePassingTones(withoutNonharmonictonesScore)
+    ads.removeNeighborTones(withoutNonharmonictonesScore)
     withoutNonharmonictonesScore.sliceByGreatestDivisor(addTies=True, 
                                                         inPlace=True)
     withoutNonharmonictonesScore.stripTies(inPlace=True, 
@@ -275,19 +276,20 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
     >>> s.append(p)
     >>> aData = alpha.webapps.commands.determineDissonantIdentificationAccuracy(s, [2.3, 3.2])
     >>> chords = aData['stream'].flat.getElementsByClass('Chord')
-    >>> chords[0].color is None #BLACK (by default)
+    >>> chords[0].style.color is None #BLACK (by default)
     True
-    >>> chords[1].color #RED
+    >>> chords[1].style.color #RED
     '#cc3300'
-    >>> chords[2].color #BLUE
+    >>> chords[2].style.color #BLUE
     '#0033cc'
-    >>> chords[3].color #GREEN
+    >>> chords[3].style.color #GREEN
     '#00cc33'
     '''
     from music21 import roman
+    ads = theoryAnalyzer.Analyzer()
     
     score = scoreIn.sliceByGreatestDivisor(addTies=True)
-    vsList = theoryAnalyzer.getVerticalities(score)
+    vsList = ads.getVerticalities(score)
     user = len(offsetList)
     music21VS = 0
     both = 0
@@ -304,7 +306,7 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
         else:
             nextVSOffset = vsList[vsNum + 1].offset(leftAlign=False)
         if not vs.isConsonant(): #music21 recognizes this as a dissonant vertical slice
-            music21VS+=1
+            music21VS += 1
             if _withinRange(offsetList, currentVSOffset, nextVSOffset):
                 vs.color = '#00cc33' 
                 # the user also recognizes this as a dissonant vertical slice GREEN
@@ -477,7 +479,7 @@ def colorAllNotes(sc, color):
     used for testing color rendering in noteflight
     '''
     for n in sc.flat.getElementsByClass('Note'):
-        n.color = color 
+        n.style.color = color 
     return sc
 
 def colorAllChords(sc, color):
@@ -486,7 +488,7 @@ def colorAllChords(sc, color):
     used for testing color rendering in noteflight
     '''
     for c in sc.flat.getElementsByClass('Chord'):
-        c.color = color 
+        c.style.color = color 
     return sc
 
 def writeMIDIFileToServer(sc):

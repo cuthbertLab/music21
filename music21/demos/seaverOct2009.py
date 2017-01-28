@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function, division
 
 from music21 import stream, converter, corpus, instrument, graph, note, meter, humdrum
 import music21.pitch
@@ -9,7 +10,8 @@ import unittest
 
 def simple1():
     '''
-    show correlations (if any) between notelength and pitch in several pieces coded in musicxml or humdrum and also including the trecento cadences.
+    show correlations (if any) between notelength and pitch in several pieces 
+    coded in musicxml or humdrum and also including the trecento cadences.
     '''
     
     for work in ['opus18no1', 'opus59no3']:
@@ -33,7 +35,8 @@ def simple2():
 
 def simple3():
     '''
-    reduce all measures of Chopin mazurkas to their rhythmic components and give the measure numbers (harder: render in notation) of all measures sorted by pattern.
+    reduce all measures of Chopin mazurkas to their rhythmic components and give the 
+    measure numbers (harder: render in notation) of all measures sorted by pattern.
     '''
     def lsort(keyname):
         return len(rhythmicHash[keyname])
@@ -41,7 +44,8 @@ def simple3():
     defaultPitch = music21.pitch.Pitch("C3")      
     
     #  semiFlat lets me get all Measures no matter where they reside in the tree structure
-    measureStream = converter.parse(humdrum.testFiles.mazurka6).semiFlat.getElementsByClass('Measure')
+    measureStream = converter.parse(humdrum.testFiles.mazurka6
+                                    ).semiFlat.getElementsByClass('Measure')
     rhythmicHash = defaultdict(list) 
     
     for thisMeasure in measureStream:
@@ -68,11 +72,12 @@ def simple3():
             rhythmicStream.append(rhythmNote)
             
         #notes[0].lyric = str(thisMeasure.number)
-        if len(rhythmicHash[offsetString]) == 0: # if it is our first encounter with the rhythm, add the rhythm alone in blue
+        if len(rhythmicHash[offsetString]) == 0: 
+            # if it is our first encounter with the rhythm, add the rhythm alone in blue
             for thisNote in rhythmicStream:
-                thisNote.color = "blue"
+                thisNote.style.color = "blue"
             rhythmicHash[offsetString].append(rhythmicStream)
-        thisMeasure.flat.notesAndRests[0].editorial.comment.text = str(thisMeasure.number)
+        # thisMeasure.flat.notesAndRests[0].editorial.measureNumber = str(thisMeasure.number)
         rhythmicHash[offsetString].append(thisMeasure)
 
     s = stream.Part()
@@ -88,7 +93,8 @@ def displayChopinRhythms():
     defaultPitch = music21.pitch.Pitch("C3")      
     
     #  semiFlat lets me get all Measures no matter where they reside in the tree structure
-    measureStream = converter.parse(humdrum.testFiles.mazurka6).semiFlat.getElementsByClass('Measure')
+    measureStream = converter.parse(humdrum.testFiles.mazurka6
+                                    ).semiFlat.getElementsByClass('Measure')
     rhythmicHash = {} 
 
     def lsort(keyname):
@@ -118,11 +124,12 @@ def displayChopinRhythms():
             rhythmicStream.append(rhythmNote)
             
         notes[0].lyric = str(thisMeasure.number)
-        if len(rhythmicHash[offsetString]) == 0: # if it is our first encounter with the rhythm, add the rhythm alone in blue
+        if len(rhythmicHash[offsetString]) == 0: 
+            # if it is our first encounter with the rhythm, add the rhythm alone in blue
             for thisNote in rhythmicStream:
-                thisNote.color = "blue"
+                thisNote.style.color = "blue"
             rhythmicHash[offsetString].append(rhythmicStream)
-        #thisMeasure.flat.notesAndRests[0].editorial.comment.text = str(thisMeasure.number)
+        # thisMeasure.flat.notesAndRests[0].editorial.measureNumber = str(thisMeasure.number)
         rhythmicHash[offsetString].append(thisMeasure)
 
     s = stream.Part()
@@ -137,14 +144,14 @@ def displayChopinRhythms():
 
 def simple4a(show=True):
     '''
-    find at least 5 questions that are difficult to solve in Humdrum which are simple in music21; (one which just uses Python)
+    find at least 5 questions that are difficult to solve in Humdrum 
+    which are simple in music21; (one which just uses Python)
+    
+    4a: in addition to the graphs as they are can we have a graph showing average
+    dynamic for a given pitch, and a single number for the Correlation Coefficient
+    between dynamic level and pitch -- the sort of super scientific. I imagine
+    it'd be something like 0.55, so no, not a connection between pitch and dynamic.
     '''
-
-# 4a: in addition to the graphs as they are can we have a graph showing average
-# dynamic for a given pitch, and a single number for the Correlation Coefficient
-# between dynamic level and pitch -- the sort of super scientific. I imagine
-# it'd be something like 0.55, so no, not a connection between pitch and dynamic.
-
     # question 1: Above G4 do higher pitches tend to be louder?
     work = 'opus18no1'
     movementNumber = 3
@@ -172,11 +179,14 @@ def simple4a(show=True):
 
 
 def simple4b(show=True):
+    '''
+    question 8: Are dynamic swells (crescendo-diminuendos) 
+    more common than dips (diminuendos-crescendos)?
+    so we need to compute the average distance between < and > and see if 
+    it's higher or lower than > to <. And any dynamic marking in between resets the count.
+    '''
     from music21 import dynamics
-
-    # question 8: Are dynamic swells (crescendo-diminuendos) more common than dips (diminuendos-crescendos)?
-    # so we need to compute the average distance between < and > and see if it's higheror lower than > to <. And any dynamic marking in between resets the count.
-
+    
     work = 'opus41no1'
     movementNumber = 2
     s = corpus.parse(work, movementNumber) #, extList='xml')
@@ -290,30 +300,11 @@ def simple4g():
                      movementNumber, count))
 
 
-def simple4h():
-    # question 40: Count how many measures contain at least one trill. 
-    pass
-
-    # question 60: Determine how frequently ascending melodic leaps are followed by descending steps
-    # question 184: Identify all D major triads in a work
-    # 251.    Identify the longest run of ascending intervals in some melody.
-    # 252.    Identify the lowest note in a score
-
 
 def threeDimChopin():
     from music21.humdrum import testFiles  
 
     streamObject = converter.parse(testFiles.mazurka6)
-#    n1 = music21.note.Note("C7")
-#    n1.duration.quarterLength = 3
-#    n1.tie = music21.note.Tie("start")
-#    streamObject.append(n1)
-#    
-#    n2 = music21.note.Note("C7")
-#    n2.duration.quarterLength = 3
-#    n2.tie = music21.note.Tie("stop")
-#    streamObject.append(n2)
-    
     stream2 = streamObject.stripTies()
     g = graph.Plot3DBarsPitchSpaceQuarterLength(stream2)
     g.process()
@@ -357,7 +348,6 @@ def januaryThankYou():
             notes = thisPart.flat.findConsecutiveNotes(skipUnisons = True, skipChords = True,
                        skipOctaves = True, skipRests = True, noNone = True )
             for i in range(len(notes) - 4):
-#                if (notes[i].name == 'E-' or notes[i].name == "D#") and notes[i+1].name == 'E' and notes[i+2].name == 'A':
                 if notes[i].name == 'E-' and notes[i+1].name == 'E' and notes[i+2].name == 'A':
                     measureNumber = 0
                     for site in notes[i].sites.get():
@@ -415,28 +405,38 @@ def js_q1():
     from music21 import expressions
 
     allChorales = corpus.chorales.Iterator()
-    returnStream = stream.Stream()
+    returnStream = stream.Part()
     
     prevChord = None
     saveChord = None
-    for chorale in allChorales:
-        reducedChorale = chorale.simplify()
-        for thisChord in reducedChorale.chords:
+    for i, chorale in enumerate(allChorales[230:]):
+        print("")
+        print(i, chorale.metadata.title, end="--")
+        reducedChorale = chorale.chordify()
+        for thisChord in reducedChorale.recurse().getElementsByClass('Chord'):
             # move this into ReducedChorale...
             prev2Chord = prevChord
             prevChord = saveChord
             saveChord = thisChord
             
             isCadence = False
-            for thisEditorial in thisChord.editorial:
-                if isinstance(thisEditorial, expressions.Fermata):
+            for thisExpression in thisChord.expressions:
+                if isinstance(thisExpression, expressions.Fermata):
                     isCadence = True
-            
-            if isCadence is True and thisChord.inversion == 1:
-                thisChord.lyric.append(str.chorale.name + ": " + str(thisChord.context.number) + "/" + str(thisChord.context.beat))
-                returnStream.append(prev2Chord)
-                returnStream.append(prevChord)
-                returnStream.append(thisChord)
+            if isCadence is True:
+                print(thisChord.inversion(), end=" ")
+            if isCadence is True and thisChord.inversion() == 1:
+                thisChord.lyric = (chorale.metadata.title + ". " 
+                                       + " m:" + str(thisChord.measureNumber) 
+                                       + " b:" + str(thisChord.beatStr))
+                retMeasure = stream.Measure()
+                if prev2Chord is not None:
+                    retMeasure.append(prev2Chord)
+                if prevChord is not None:
+                    retMeasure.append(prevChord)
+                retMeasure.append(thisChord)
+                returnStream.append(retMeasure)
+                print('gotOne')
 
     returnStream.show()
 
@@ -519,8 +519,8 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    simple3()
-    #music21.mainTest(Test)
+    #js_q1()
+    music21.mainTest(Test)
     #music21.mainTest(TestExternal)
 
 

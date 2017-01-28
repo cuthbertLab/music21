@@ -17,7 +17,7 @@ from music21.ext.jsonpickle import tags
 from music21.ext.jsonpickle import handlers
 
 from music21.ext.jsonpickle.backend import JSONBackend
-from music21.ext.jsonpickle.compat import unicode, PY3, PY2
+from music21.ext.jsonpickle.compat import numeric_types, unicode, PY3, PY2
 
 
 def encode(value,
@@ -29,7 +29,8 @@ def encode(value,
            backend=None,
            warn=False,
            context=None,
-           max_iter=None):
+           max_iter=None,
+           numeric_keys=False):
     backend = _make_backend(backend)
     if context is None:
         context = Pickler(unpicklable=unpicklable,
@@ -38,7 +39,8 @@ def encode(value,
                           backend=backend,
                           max_depth=max_depth,
                           warn=warn,
-                          max_iter=max_iter)
+                          max_iter=max_iter,
+                          numeric_keys=numeric_keys)
     return backend.encode(context.flatten(value, reset=reset))
 
 
@@ -58,12 +60,14 @@ class Pickler(object):
                  backend=None,
                  keys=False,
                  warn=False,
-                 max_iter=None):
+                 max_iter=None,
+                 numeric_keys=False):
         self.unpicklable = unpicklable
         self.make_refs = make_refs
         self.backend = _make_backend(backend)
         self.keys = keys
         self.warn = warn
+        self.numeric_keys = numeric_keys
         # The current recursion depth
         self._depth = -1
         # The maximal recursion depth
@@ -177,7 +181,7 @@ class Pickler(object):
 
     def _get_flattener(self, obj):
 
-        if PY2 and isinstance(obj, file): # @UndefinedVariable
+        if PY2 and isinstance(obj, file):  # @UndefinedVariable
             return self._flatten_file
 
         if util.is_primitive(obj):
@@ -482,7 +486,10 @@ class Pickler(object):
         else:
             if k is None:
                 k = 'null'  # for compatibility with common json encoders
-            if not isinstance(k, (str, unicode)):
+
+            if self.numeric_keys and isinstance(k, numeric_types):
+                pass
+            elif not isinstance(k, (str, unicode)):
                 try:
                     k = repr(k)
                 except:

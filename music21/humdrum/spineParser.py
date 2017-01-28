@@ -1798,7 +1798,7 @@ class SpineCollection(object):
                 # fix tuplet groups
                 for m in thisSpine.stream.getElementsByClass('Measure'):
                     tf.setStream(m)
-                    tupletGroups = tf.findTupletGroups(incorporateGroupings = True)
+                    tupletGroups = tf.findTupletGroups(incorporateGroupings=True)
                     for tg in tupletGroups:
                         tf.fixBrokenTupletDuration(tg)
 
@@ -2105,11 +2105,11 @@ def hdStringToNote(contents):
     matchedFlat  = re.search(r"(\-+)", contents)
 
     if matchedSharp:
-        thisObject.accidental = matchedSharp.group(0)
+        thisObject.pitch.accidental = matchedSharp.group(0)
     elif matchedFlat:
-        thisObject.accidental = matchedFlat.group(0)
+        thisObject.pitch.accidental = matchedFlat.group(0)
     elif contents.count("n"):
-        thisObject.accidental = "n"
+        thisObject.pitch.accidental = "n"
 
     # 3.2.2 -- Slurs, Ties, Phrases
     # TODO: add music21 phrase information
@@ -2232,15 +2232,15 @@ def hdStringToNote(contents):
         else:
             dT = int(durationType) + 0.0
             (unused_remainder, exponents) = math.modf(math.log(dT, 2))
-            basevalue = 2**exponents
+            basevalue = 2 ** exponents
             thisObject.duration.type = duration.typeFromNumDict[int(basevalue)]
             newTup = duration.Tuplet()
             newTup.durationActual = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
             newTup.durationNormal = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
 
             gcd = common.euclidGCD(int(dT), basevalue)
-            newTup.numberNotesActual = int(dT/gcd)
-            newTup.numberNotesNormal = int(float(basevalue)/gcd)
+            newTup.numberNotesActual = int(dT / gcd)
+            newTup.numberNotesNormal = int(float(basevalue) / gcd)
 
             # The Josquin Research Project uses an incorrect definition of
             # humdrum tuplets that breaks normal usage.  TODO: Refactor adding a Flavor = "JRP"

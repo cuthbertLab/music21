@@ -76,7 +76,7 @@ class StreamIterator(object):
         self.srcStreamElements = srcStream.elements
         self.streamLength = len(self.srcStreamElements)
         
-        # this information can help a 
+        # this information can help in speed later
         self.elementsLength = len(self.srcStream._elements)
         self.sectionIndex = -1
         self.iterSection = '_elements'
@@ -654,8 +654,27 @@ class StreamIterator(object):
         self.resetCaches()
         return self
     
-    
-    
+    def getElementById(self, elementId):
+        '''
+        Returns a single element (or None) that matches elementId.
+        
+        If chaining filters, this should be the last one, as it returns an element
+        
+        >>> s = stream.Stream(id="s1")
+        >>> s.append(note.Note('C'))
+        >>> r = note.Rest()
+        >>> r.id = 'restId'
+        >>> s.append(r)
+        >>> r2 = s.recurse().getElementById('restId')
+        >>> r2 is r
+        True
+        >>> r2.id
+        'restId'
+        '''
+        self.addFilter(filters.IdFilter(elementId))
+        for e in self:
+            return e
+        return None
     
     def getElementsByClass(self, classFilterList):
         '''
@@ -1033,6 +1052,108 @@ class StreamIterator(object):
         return self
 
 #------------------------------------------------------------------------------
+class OffsetIterator(StreamIterator):
+    '''
+    An iterator that with each iteration returns a list of elements
+    that are at the same offset (or all at end)
+    
+    >>> s = stream.Stream()
+    >>> s.insert(0, note.Note('C'))
+    >>> s.insert(0, note.Note('D'))
+    >>> s.insert(1, note.Note('E'))
+    >>> s.insert(2, note.Note('F'))
+    >>> s.insert(2, note.Note('G'))
+    >>> s.storeAtEnd(bar.Repeat('end'))
+    >>> s.storeAtEnd(clef.TrebleClef())
+    
+    >>> oiter = stream.iterator.OffsetIterator(s)
+    >>> for groupedElements in oiter:
+    ...     print(groupedElements)
+    [<music21.note.Note C>, <music21.note.Note D>]
+    [<music21.note.Note E>]
+    [<music21.note.Note F>, <music21.note.Note G>]
+    [<music21.bar.Repeat direction=end>, <music21.clef.TrebleClef>]    
+    
+    Does it work again?
+    
+    >>> for groupedElements2 in oiter:
+    ...     print(groupedElements2)
+    [<music21.note.Note C>, <music21.note.Note D>]
+    [<music21.note.Note E>]
+    [<music21.note.Note F>, <music21.note.Note G>]
+    [<music21.bar.Repeat direction=end>, <music21.clef.TrebleClef>]    
+    
+    
+    >>> for groupedElements in oiter.notes:
+    ...     print(groupedElements)
+    [<music21.note.Note C>, <music21.note.Note D>]
+    [<music21.note.Note E>]
+    [<music21.note.Note F>, <music21.note.Note G>]
+    
+    >>> for groupedElements in stream.iterator.OffsetIterator(s).getElementsByClass('Clef'):
+    ...     print(groupedElements)
+    [<music21.clef.TrebleClef>]
+    '''
+    def __init__(self, 
+                 srcStream, 
+                 filterList=None, 
+                 restoreActiveSites=True,
+                 activeInformation=None):
+        super(OffsetIterator, self).__init__(srcStream, 
+                                             filterList=None, 
+                                             restoreActiveSites=True,
+                                             activeInformation=None)
+        self.raiseStopIterationNext = False
+        self.nextToYield = []
+        self.nextOffsetToYield = None
+    
+    def __next__(self):
+        if self.raiseStopIterationNext:
+            raise StopIteration
+        
+        retElementList = None
+        # make sure that cleanup is not called during the loop...
+        try:
+            if self.nextToYield:
+                retElementList = self.nextToYield
+                retElOffset = self.nextOffsetToYield
+            else:
+                retEl = super(OffsetIterator, self).__next__()
+                retElOffset = self.srcStream.elementOffset(retEl)
+                retElementList = [retEl]
+
+            while self.index <= self.streamLength:
+                nextEl = super(OffsetIterator, self).__next__()
+                nextElOffset = self.srcStream.elementOffset(nextEl)
+                if nextElOffset == retElOffset:
+                    retElementList.append(nextEl)
+                else:
+                    self.nextToYield = [nextEl]
+                    self.nextOffsetToYield = nextElOffset
+                    return retElementList
+            
+                    
+        except StopIteration:
+            if retElementList:
+                self.raiseStopIterationNext = True
+                return retElementList
+            else:
+                raise StopIteration
+        
+    if six.PY2:
+        next = __next__
+
+    def reset(self):
+        '''
+        runs before iteration
+        '''
+        super(OffsetIterator, self).reset()
+        self.nextToYield = []
+        self.nextOffsetToYield = None
+        self.raiseStopIterationNext = False
+
+            
+#------------------------------------------------------------------------------
 class RecursiveIterator(StreamIterator):
     '''
     >>> b = corpus.parse('bwv66.6')
@@ -1090,7 +1211,7 @@ class RecursiveIterator(StreamIterator):
     6
     >>> expressive[-1].measureNumber
     9
-    
+        
     '''
     def __init__(self, 
                  srcStream, 
@@ -1244,6 +1365,14 @@ class RecursiveIterator(StreamIterator):
 class Test(unittest.TestCase):
     pass
 
+    def testRecursiveActiveSites(self):
+        from music21 import converter
+        s = converter.parse('tinyNotation: 4/4 c1 c4 d=id2 e f')
+        rec = s.recurse()
+        n = rec.getElementById('id2')
+        self.assertEqual(n.activeSite.number, 2)
+
+        
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='testRecursiveActiveSites')

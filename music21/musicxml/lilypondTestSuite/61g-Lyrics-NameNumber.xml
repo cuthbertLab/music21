@@ -10,7 +10,16 @@
           different number/name combinations to check how different 
           applications handle this unspecified case (The advice on the 
           MusicXML mailing list was "there is no correct way, each 
-          application can do what it thinks is best").</miscellaneous-field>
+          application can do what it thinks is best").
+	
+	  The complete text should be (by note number):
+          1: Verse1A, Chorus1A, AnotherChorus1A
+          2: 1B, 2B
+          3: Verse1C, Chorus2C
+          4: Chorus1D
+          5: VerseE
+          6: NoneF (indicating no number or name was given) 
+      </miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>

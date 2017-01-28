@@ -87,7 +87,7 @@ class TestExternal(unittest.TestCase):
         
         b.elements[0].duration.tuplets[0].type = "start"
         b.elements[-1].duration.tuplets[0].type = "stop"
-        b.elements[2].editorial.comment.text = "a real C"
+        b.elements[2].lyric = "a real C"
          
         bestC = b.bestClef(allowTreble8vb = True)
         a.insert(0, bestC)
@@ -5944,7 +5944,8 @@ class Test(unittest.TestCase):
         
         GEX = m21ToXml.GeneralObjectExporter()
         raw = GEX.parse(m).decode('utf-8')
-        self.assertTrue(raw.find('<tuplet bracket="yes" placement="above"') > 0, raw)
+        self.assertTrue(raw.find(
+            '<tuplet bracket="yes" number="1" placement="above" type="start">') > 0, raw)
         self.assertTrue(raw.find('<beam number="1">begin</beam>') > 0, raw)
 
     def testMakeNotationByMeasuresB(self):
@@ -5955,7 +5956,8 @@ class Test(unittest.TestCase):
         GEX = m21ToXml.GeneralObjectExporter()
         raw = GEX.parse(m).decode('utf-8')
         self.assertTrue(raw.find('<beam number="1">begin</beam>') > 0, raw)
-        self.assertTrue(raw.find('<tuplet bracket="yes" placement="above"') > 0, raw)
+        self.assertTrue(raw.find(
+            '<tuplet bracket="yes" number="1" placement="above" type="start"') > 0, raw)
 
     def testHaveAccidentalsBeenMadeA(self):
         from music21 import stream
@@ -7043,7 +7045,7 @@ class Test(unittest.TestCase):
         GEX = m21ToXml.GeneralObjectExporter()
         raw = GEX.parse(m1).decode('utf-8')
         # there should only be 2 tuplet indications in the produced chords: start and stop...
-        self.assertEqual(raw.count('<tuplet'), 2, raw)
+        self.assertEqual(raw.count('<tuplet '), 2, raw)
         # pitch grouping in measure index 1 was not allocated properly
         #for c in chords.getElementsByClass('Chord'):
         #    self.assertEqual(len(c), 2)
@@ -7608,7 +7610,7 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, 'verbose') #, runTest='testExtendTiesA')
+    music21.mainTest(Test, 'verbose') #, runTest='testMakeNotationByMeasuresB')
 
 #------------------------------------------------------------------------------
 # eof

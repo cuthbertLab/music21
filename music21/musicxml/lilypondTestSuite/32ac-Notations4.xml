@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="2.0">
+  <movement-title>MusicXML misc notations (attached to note)</movement-title>
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">Some miscellanious &lt;notation&gt; elements 
+          defined in MusicXML including dynamics in notations. The lyrics show the notation assigned to each 
+          note.</miscellaneous-field>
+    </miscellaneous>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name></part-name>
+    </score-part>
+  </part-list>
+  <!--=========================================================-->
+  <part id="P1">
+    <!-- General Notation elements (no spanners, which are tested separately):
+         fermata | arpeggiate | non-arpeggiate | accidental-mark -->
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key>
+          <fifths>0</fifths>
+          <mode>major</mode>
+        </key>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+    <!-- Dynamics, attached to notes by putting them inside <notations> tags -->
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <dynamics><f/></dynamics>
+        </notations>
+        <lyric number="1"><text>f</text></lyric>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <dynamics><ppp/></dynamics>
+        </notations>
+        <lyric number="1"><text>ppp</text></lyric>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <dynamics><sfp/></dynamics>
+        </notations>
+        <lyric number="1"><text>sfp</text></lyric>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <dynamics><other-dynamics>sfffz</other-dynamics></dynamics>
+        </notations>
+        <lyric number="1"><text>Oth.dyn.sfffz</text></lyric>
+      </note>
+    </measure>
+    
+    <!-- General tests: multiple notations, directions, etc. -->
+    <measure number="2">
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <notations>
+          <articulations>
+            <strong-accent placement="above" type="up"/>
+            <staccato placement="above"/>
+          </articulations>
+        </notations>
+        <lyric number="1"><text>both above</text></lyric>
+      </note>
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <notations>
+          <articulations>
+            <accent placement="below"/>
+            <tenuto placement="below"/>
+            <staccato placement="above"/>
+          </articulations>
+        </notations>
+        <lyric number="1"><text>acc below</text></lyric>
+        <lyric number="2"><text>ten below</text></lyric>
+        <lyric number="3"><text>stacc above</text></lyric>
+      </note>
+      <barline location="right">
+        <bar-style>light-heavy</bar-style>
+      </barline>
+    </measure>
+  </part>
+</score-partwise>

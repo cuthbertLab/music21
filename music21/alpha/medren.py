@@ -766,7 +766,7 @@ class MensuralNote(GeneralMensuralNote, note.Note):
         >>> mn.setStem(None)
         >>> mn.fontString
         '0x4d'
-        >>> mn.color = 'red'
+        >>> mn.style.color = 'red'
         >>> mn.fontString
         '0x6d'        
         '''
@@ -807,7 +807,7 @@ class MensuralNote(GeneralMensuralNote, note.Note):
                 else:
                     self._fontString = '0x59'
         
-        if self.color ==  'red':
+        if self.style.color ==  'red':
             if self._fontString in ['41', '61']:
                 self._fontString = ''
             else:
@@ -831,27 +831,6 @@ class MensuralNote(GeneralMensuralNote, note.Note):
     mensuralType = property(GeneralMensuralNote._getMensuralType, _setMensuralType,
                           doc = ''' See documentation in `music21.medren.GeneralMensuralType`''')
     
-    def _setColor(self, value):
-        if value in ['black', 'red']:
-            note.Note._setColor(self, value)
-        else:
-            raise MedRenException('color %s not supported for mensural notes' % value)
-    
-    color = property(note.GeneralNote._getColor, _setColor,
-                     doc = '''The only valid colors for mensural notes are red and black
-                     
-                     >>> from music21.alpha import medren
-                     
-                     >>> n = medren.MensuralNote('A', 'brevis')
-                     >>> n.color
-                     >>> 
-                     >>> n.color = 'red'
-                     >>> n.color
-                     'red'
-                     >>> n.color = 'green'
-                     Traceback (most recent call last):
-                     MedRenException: color green not supported for mensural notes
-                     ''')
     
     def getNumDots(self):
         ''' 
@@ -1026,8 +1005,8 @@ class Ligature(base.Music21Object):
     An object that represents a ligature commonly found in medieval and Renaissance music. 
     Initialization takes a list of the pitches in the ligature as a required argument.
     Color of the ligature is an optional argument (default is 'black'). Color can also be set 
-    with the :meth:`music21.medren.Ligature.setColor` method. 
-    Color of a ligature can be determined with the :meth:`music21.medren.Ligature.getColor` method.
+    with .style.color. 
+    Color of a ligature can be determined with .style.color.
     Whether the noteheads of the ligature are filled is an optional argument (default is 'yes'). 
     Noteheads can be also filled with the :meth:`music21.medren.Ligature.setFillStatus` method. 
     Fill status of a ligature can be determined with the 
@@ -1108,7 +1087,7 @@ class Ligature(base.Music21Object):
             self.pitches = pitches
         
         self._notes = []
-        self.color = color
+        self.style.color = color
         self.filled = filled
         
     
@@ -1124,7 +1103,7 @@ class Ligature(base.Music21Object):
                 self._pitches.append(pitch.Pitch(p))
         
         self.noteheadShape = dict([(ind, 'square') for ind in range(self._ligatureLength())])
-        self.stems = dict([(ind, (None,None)) for ind in range(self._ligatureLength())])
+        self.stems = dict([(ind, (None, None)) for ind in range(self._ligatureLength())])
         self.maximaNotes = dict([(ind, False) for ind in range(self._ligatureLength())])
         self.reversedNotes = dict([(ind, False) for ind in range(self._ligatureLength())])
         
@@ -1214,11 +1193,11 @@ class Ligature(base.Music21Object):
             index = None
         if index != None:
             if index < self._ligatureLength():
-                return self.notes[index]._getColor()
+                return self.notes[index].style.color
             else:
                 raise MedRenException('no note exists at index %d' % index)
         else: 
-            return self.color
+            return self.style.color
         
     def setColor(self, value, index=None):
         '''
@@ -1243,19 +1222,19 @@ class Ligature(base.Music21Object):
         if index != None:
             if index < self._ligatureLength():
                 if value != tempColor:
-                    self.color = 'mixed'
-                    self.notes[index]._setColor(value)
+                    self.style.color = 'mixed'
+                    self.notes[index].style.color = value
             else:
                 raise MedRenException('no note exists at index %d' % index)
         else:
             if value in ['black', 'red']:
-                self.color = value
+                self.style.color = value
                 for n in self.notes:
-                    n._setColor(value)
+                    n.style.color = value
             else:
                 raise MedRenException('color %s not supported for ligatures' % value)
     
-    def getFillStatus(self, index = None):
+    def getFillStatus(self, index=None):
         '''
         Take one argument: index (optional, default is None).
         

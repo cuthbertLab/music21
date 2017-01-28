@@ -11,7 +11,6 @@
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
-
 r'''
 This module contains objects for storing complete `Music21Objects`, especially
 `Stream` and `Score` objects on disk.  Freezing (or "pickling") refers to
@@ -870,7 +869,14 @@ class StreamThawer(StreamFreezeThawBase):
             #streamObj._elementTree = ElementTree(source=streamObj)
             for e, offset in streamObj._storedElementOffsetTuples:
                 if offset != 'end':
-                    streamObj._insertCore(offset, e)
+                    try:
+                        streamObj._insertCore(offset, e)
+                    except AttributeError:
+                        print("Problem in decoding... some debug info...")
+                        print(offset, e)
+                        print(streamObj)
+                        print(streamObj.activeSite)
+                        raise
                 else:
                     streamObj._storeAtEndCore(e)
             del(streamObj._storedElementOffsetTuples)
@@ -1017,8 +1023,8 @@ class JSONFreezeThawBase(object):
             '_unlinkedType',
             '_dotGroups',
             ],
-        'music21.editorial.NoteEditorial': [
-            'color', 'misc', 'comment',
+        'music21.editorial.Editorial': [
+            '__AUTO_GATHER__',
             ],
         'music21.editorial.Comment': [
             '__AUTO_GATHER__',
@@ -1230,6 +1236,7 @@ class JSONFreezer(JSONFreezeThawBase):
         '_noteheadParenthesis'
         '_priority'
         '_stemDirection'
+        '_style'
         '_volume'
         '''
         result = set()
@@ -1297,10 +1304,10 @@ class JSONFreezer(JSONFreezeThawBase):
 
         For an object which does not define this, just returns all the _underscore attributes:
 
-        >>> ed = editorial.NoteEditorial()
+        >>> ed = editorial.Editorial()
         >>> jsf = freezeThaw.JSONFreezer(ed)
         >>> jsf.jsonAttributes()
-        ['color', 'misc', 'comment']
+        []
 
         >>> l = note.Lyric()
         >>> jsf = freezeThaw.JSONFreezer(l)
@@ -1604,6 +1611,10 @@ class JSONFreezer(JSONFreezeThawBase):
                     sort_keys=True,
                     indent=2,
                     )
+            if six.PY2:
+                # pylint: disable=undefined-variable
+                jsonString = unicode(jsonString) # @UndefinedVariable
+                
             f.write(jsonString)
 
 class JSONThawer(JSONFreezeThawBase):
@@ -1845,6 +1856,19 @@ class Test(unittest.TestCase):
         self.assertEqual(len(outStream), 2)
         self.assertEqual(outStream.notes[0].offset, 2.0)
         self.assertIs(outStream.spanners[0].getFirst(), outStream.notes[0])
+
+    def testFreezeThawJsonPickleEnum(self):
+        '''
+        Versions of jsonpickle prior to  0.9.3 were having problems serializing Enums.
+        
+        Works now
+        '''
+        from music21 import corpus
+        c = corpus.parse('luca/gloria').parts[2].measures(1,2)
+        sf2 = StreamFreezer(c)
+        data2 = sf2.writeStr(fmt='jsonpickle')
+        st2 = StreamThawer()
+        st2.openStr(data2)
 
     def testFreezeThawCorpusFileWithSpanners(self):
         from music21 import corpus

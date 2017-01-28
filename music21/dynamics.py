@@ -21,6 +21,7 @@ from music21 import base
 from music21 import exceptions21
 from music21 import common
 from music21 import spanner
+from music21 import style
 
 from music21.ext import six
 
@@ -193,6 +194,7 @@ class Dynamic(base.Music21Object):
     
     '''
     classSortOrder = 10
+    _styleClass = style.TextStyle
     
     _DOC_ORDER = ['longName', 'englishName']
     _DOC_ATTR = {
@@ -235,13 +237,9 @@ class Dynamic(base.Music21Object):
 
         # for position, as musicxml, all units are in tenths of interline space
         # position is needed as default positions are often incorrect
-        self._positionDefaultX = -36
-        self._positionDefaultY = -80 # below top line
+        self.style.absoluteX = -36
+        self.style.absoluteY = -80 # below top line
         # this value provides good 16th note alignment
-        self._positionRelativeX = None
-        self._positionRelativeY = None
-        # this does not do anything if default y is defined
-        self._positionPlacement = None
 
     def __repr__(self):
         return "<music21.dynamics.Dynamic %s >" % self.value
@@ -338,38 +336,12 @@ class Dynamic(base.Music21Object):
         <?xml...
         <direction>
             <direction-type>
-              <dynamics default-x="-36" default-y="-80">
+              <dynamics default-x="-36" default-y="-80" halign="left" valign="top">
                 <mf />
               </dynamics>
             </direction-type>
             <sound dynamics="12" />
         </direction>...
-        ''')
-
-
-    def _getPositionVertical(self):
-        return self._positionDefaultY
-    
-    def _setPositionVertical(self, value):
-        if value is None:
-            self._positionDefaultY = None
-        else:
-            try:
-                value = float(value)
-            except ValueError:
-                raise DynamicException('Not a supported size: %s' % value)
-            self._positionDefaultY = value
-    
-    positionVertical = property(_getPositionVertical, _setPositionVertical,
-        doc='''
-        Get or set the vertical position, where 0 is the top line 
-        of the staff and units are in 10ths of a staff space.
-
-        
-        >>> te = expressions.TextExpression()
-        >>> te.positionVertical = 10
-        >>> te.positionVertical
-        10.0
         ''')
 
 
@@ -562,7 +534,6 @@ class Test(unittest.TestCase):
         #positions = [-20, 0, 20]
         for i in range(10):
             d = Dynamic(selections[i % len(selections)])
-            #d.positionVertical = positions[i%len(positions)]
             s.append(d)
             s.append(note.Note('c1'))
         #s.show()
@@ -582,7 +553,7 @@ class Test(unittest.TestCase):
             offsets = offsets[:4]
             for o in offsets:
                 d = Dynamic('mf')
-                d.positionVertical = 20
+                d.style.absoluteY = 20
                 m.insert(o, d)
 
         #s.show()

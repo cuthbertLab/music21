@@ -185,6 +185,7 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
     def __ne__(self, other):
         return not (self == other)
 
+
 #-------------------------------------------------------------------------------
 class Iterator(object):
     '''A simple Iterator object used to handle iteration of Streams and other

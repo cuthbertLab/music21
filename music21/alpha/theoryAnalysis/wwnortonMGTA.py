@@ -42,6 +42,7 @@ class wwnortonExercise(object):
         self.studentExercise = stream.Stream()
         self.textResultString = ""
         self.pn = {}
+        self.ads = theoryAnalyzer.Analyzer()
         
     def checkExercise(self):
         pass
@@ -159,8 +160,7 @@ class wwnortonExercise(object):
     
     def compareMarkerLyricAnswer(self, score, taKey, markerPartName, offsetFunc, lyricFunc):
         markerPart = self.studentExercise.parts[self.pn[markerPartName]]
-        #addAnalysisData(score)   ## BUG: addAnalysisData does not exist!
-        for resultObj in score.analysisData['ResultDict'][taKey]:
+        for resultObj in self.ads.store[score.id]['ResultDict'][taKey]:
             offset = offsetFunc(resultObj)
             correctLyric = lyricFunc(resultObj)
             markerNote = markerPart.flat.getElementAtOrBefore(offset, classList=['Note'])
@@ -208,12 +208,12 @@ class ex11_1_I(wwnortonExercise):
                                        direction="below")
         
     def checkExercise(self):
-        theoryAnalyzer.setKeyMeasureMap(self.studentExercise,{0:'F'})
-        theoryAnalyzer.identifyMotionType(self.studentExercise, self.pn['part1'], 
+        self.ads.setKeyMeasureMap(self.studentExercise,{0:'F'})
+        self.ads.identifyMotionType(self.studentExercise, self.pn['part1'], 
                                           self.pn['part2'],dictKey='motionType')
-        theoryAnalyzer.identifyScaleDegrees(self.studentExercise, self.pn['part1'], 
+        self.ads.identifyScaleDegrees(self.studentExercise, self.pn['part1'], 
                                             dictKey='p1ScaleDegrees')
-        theoryAnalyzer.identifyHarmonicIntervals(self.studentExercise, self.pn['part1'], 
+        self.ads.identifyHarmonicIntervals(self.studentExercise, self.pn['part1'], 
                                                  self.pn['part2'],dictKey='harmIntervals')
         
         scaleDegreeOffsetFunc = lambda resultObj: resultObj.n.offset
@@ -262,13 +262,13 @@ class ex11_3_A(wwnortonExercise):
                                        direction = "below")
         
     def checkExercise(self):
-        theoryAnalyzer.setKeyMeasureMap(self.studentExercise, {0:'G', 5:'D', 8:'F'})
-        theoryAnalyzer.identifyHarmonicIntervals(self.studentExercise, self.pn['part1'], 
+        self.ads.setKeyMeasureMap(self.studentExercise, {0:'G', 5:'D', 8:'F'})
+        self.ads.identifyHarmonicIntervals(self.studentExercise, self.pn['part1'], 
                                                  self.pn['part2'], dictKey='harmIntervals')
-        theoryAnalyzer.identifyCommonPracticeErrors(self.studentExercise, self.pn['part1'], 
+        self.ads.identifyCommonPracticeErrors(self.studentExercise, self.pn['part1'], 
                                                     self.pn['part2'], dictKey='counterpointErrors')
                 
-        self.textResultString = theoryAnalyzer.getResultsString(self.studentExercise, 
+        self.textResultString = self.ads.getResultsString(self.studentExercise, 
                                                                 ['counterpointErrors'])
         
         harmonicIntervalOffsetFunc = lambda resultObj: resultObj.offset()

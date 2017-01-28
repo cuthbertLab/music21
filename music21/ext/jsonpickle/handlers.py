@@ -29,6 +29,7 @@ import decimal
 import re
 import sys
 import time
+import uuid
 
 from music21.ext.jsonpickle import util
 from music21.ext.jsonpickle.compat import unicode
@@ -278,3 +279,16 @@ class CloneFactory(object):
 
     def __repr__(self):
         return ('<CloneFactory object at 0x%x (%s)>' % (id(self), self.exemplar))
+
+
+class UUIDHandler(BaseHandler):
+    """Serialize uuid.UUID objects"""
+
+    def flatten(self, obj, data):
+        data['hex'] = obj.hex
+        return data
+
+    def restore(self, data):
+        return uuid.UUID(data['hex'])
+
+UUIDHandler.handles(uuid.UUID)

@@ -23,8 +23,8 @@
           <fifths>2</fifths>
           <mode>major</mode>
         </key>
-        <time symbol="common">
-          <beats>4</beats>
+        <time>
+          <beats>1</beats>
           <beat-type>4</beat-type>
         </time>
         <clef>
@@ -42,6 +42,8 @@
         <type>quarter</type>
         <lyric number="1"><text>major</text></lyric>
       </note>
+    </measure>
+    <measure number="2">
       <attributes>
         <key>
           <fifths>2</fifths>
@@ -58,6 +60,8 @@
         <type>quarter</type>
         <lyric number="1"><text>minor</text></lyric>
       </note>
+    </measure>
+    <measure number="3">
       <attributes>
         <key>
           <fifths>2</fifths>
@@ -74,6 +78,8 @@
         <type>quarter</type>
         <lyric number="1"><text>ionian</text></lyric>
       </note>
+    </measure>
+    <measure number="4">
       <attributes>
         <key>
           <fifths>2</fifths>
@@ -91,7 +97,7 @@
         <lyric number="1"><text>dorian</text></lyric>
       </note>
     </measure>
-    <measure number="2">
+    <measure number="5">
       <attributes>
         <key>
           <fifths>2</fifths>
@@ -108,6 +114,8 @@
         <type>quarter</type>
         <lyric number="1"><text>phrygian</text></lyric>
       </note>
+    </measure>
+    <measure number="6">
       <attributes>
         <key>
           <fifths>2</fifths>
@@ -124,6 +132,8 @@
         <type>quarter</type>
         <lyric number="1"><text>lydian</text></lyric>
       </note>
+    </measure>
+    <measure number="7">
       <attributes>
         <key>
           <fifths>2</fifths>
@@ -140,6 +150,8 @@
         <type>quarter</type>
         <lyric number="1"><text>mixolydian</text></lyric>
       </note>
+    </measure>
+    <measure number="8">
       <attributes>
         <key>
           <fifths>2</fifths>
@@ -157,7 +169,7 @@
         <lyric number="1"><text>aeolian</text></lyric>
       </note>
     </measure>
-    <measure number="3">
+    <measure number="9">
       <attributes>
         <key>
           <fifths>2</fifths>

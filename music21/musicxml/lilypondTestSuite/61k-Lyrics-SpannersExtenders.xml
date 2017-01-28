@@ -7,7 +7,10 @@
       <miscellaneous-field name="description">Lyrics spanners: continued 
             syllables and extenders, possibly spanning multiple notes. The 
             intermediate notes do not have any &lt;lyric&gt; 
-            element.</miscellaneous-field>
+            element.
+
+	    Text should read: "A long-er text"
+       </miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -66,7 +69,7 @@
         <type>quarter</type>
         <lyric number="1">
           <syllabic>begin</syllabic>
-          <text>b</text>
+          <text>long</text>
         </lyric>
       </note>
       <note>
@@ -100,7 +103,7 @@
         <type>quarter</type>
         <lyric justify="left" number="1">
           <syllabic>end</syllabic>
-          <text>CC</text>
+          <text>er</text>
           <extend/>
         </lyric>
       </note>
@@ -135,7 +138,7 @@
         <type>quarter</type>
         <lyric justify="left" number="1">
           <syllabic>single</syllabic>
-          <text>e</text>
+          <text>Text</text>
           <extend/>
         </lyric>
       </note>

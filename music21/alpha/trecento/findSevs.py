@@ -29,12 +29,12 @@ def find(startRow=2, endRow=469, searchInterval=7):
     if any(opus):
         opus.show('lily.pdf')
 
-def findInWork(work, searchInterval = 7):
+def findInWork(work, searchInterval=7):
     ballata = work
     streams = ballata.getAllStreams()
     containsInterval = False
     for astream in streams:
-        intervals = astream.flat.melodicIntervals(skipRests = True)
+        intervals = astream.flat.melodicIntervals(skipRests=True)
         #genints = []
         for thisInterval in intervals:
             if thisInterval is not None:
@@ -42,18 +42,18 @@ def findInWork(work, searchInterval = 7):
                 if thisInterval.generic.undirected == searchInterval:
                     containsInterval = True
 #                    try:
-                    thisInterval.noteStart.editorial.color = 'blue'
-                    thisInterval.noteEnd.editorial.color = 'blue'
+                    thisInterval.noteStart.style.color = 'blue'
+                    thisInterval.noteEnd.style.color = 'blue'
 #                    except:
 #                        pass # not worth dying if the startNote can't be found
                     #print(thisInterval.note1.nameWithOctave + ' -- ' + 
                     #    thisInterval.note2.nameWithOctave)
-                    #interval.note1.editorial.color = "blue" #this doesn't actually work yet....
-                    #interval.note2.editorial.color = "blue"
+                    #interval.note1.style.color = "blue" #this doesn't actually work yet....
+                    #interval.note2.style.color = "blue"
     return containsInterval
 
 if __name__ == "__main__":
-    find(2,459,7)
+    find(2, 459, )
 
 #------------------------------------------------------------------------------
 # eof

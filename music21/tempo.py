@@ -18,11 +18,13 @@ import unittest
 import copy
 
 from music21 import base
-from music21 import exceptions21
-from music21 import note
 from music21 import common
 from music21 import duration
+from music21 import exceptions21
 from music21 import expressions
+from music21 import note
+from music21 import style
+
 from music21.ext import six
 
 from music21 import environment
@@ -136,9 +138,11 @@ class TempoIndication(base.Music21Object):
     Can be used to filter out all types of tempo indications. 
     '''
     classSortOrder = 1
+    _styleClass = style.TextStyle
 
     def __init__(self):
         base.Music21Object.__init__(self)
+        # self.style.justify = 'left' # creates a style object to share.
 
     def getSoundingMetronomeMark(self, found=None):
         '''Get the appropriate MetronomeMark from any sort of TempoIndication, regardless of class.
@@ -194,7 +198,6 @@ class TempoText(TempoIndication):
 
         # store text in a TextExpression instance        
         self._textExpression = None # a stored object
-        self._textJustification = 'left'
 
         if text is not None:
             self.text = text
@@ -208,7 +211,8 @@ class TempoText(TempoIndication):
         return "<%s %s>" % (self.__class__.__name__, self.text)
 
     def _getText(self):
-        '''Get the text used for this expression.
+        '''
+        Get the text used for this expression.
         '''
         return self._textExpression.content
 
@@ -219,6 +223,10 @@ class TempoText(TempoIndication):
         '''
         if self._textExpression is None:
             self._textExpression = expressions.TextExpression(value)
+            if self.hasStyleInformation:
+                self._textExpression.style = self.style # link styles
+            else:
+                self.style = self._textExpression.style
             self.applyTextFormatting()
         else:
             self._textExpression.content = value
@@ -240,18 +248,26 @@ class TempoText(TempoIndication):
         ''')
 
     def getMetronomeMark(self):
-        '''Return a MetronomeMark object that is configured from this objects Text.
-
+        '''
+        Return a MetronomeMark object that is configured from this objects Text.
         
         >>> tt = tempo.TempoText("slow")
         >>> mm = tt.getMetronomeMark()
         >>> mm.number
         56
         '''
-        return MetronomeMark(text=self.text)
+        mm = MetronomeMark(text=self.text)
+        if self.hasStyleInformation:
+            mm.style = self.style
+        else:
+            self.style = mm.style
+        return mm
 
     def getTextExpression(self, numberImplicit=False):
-        '''Return a TextExpression object for this text.
+        '''
+        Return a TextExpression object for this text.
+        
+        What is this a deepcopy and not the actual one?
         '''
         if self._textExpression is None:
             return None
@@ -260,22 +276,23 @@ class TempoText(TempoIndication):
             return copy.deepcopy(self._textExpression)
 
     def setTextExpression(self, value):
-        '''Given a TextExpression, set it in this object.
+        '''
+        Given a TextExpression, set it in this object.
         '''
         self._textExpression = value
         self.applyTextFormatting()
         
     def applyTextFormatting(self, te=None, numberImplicit=False):
-        '''Apply the default text formatting to the text expression version of of this repeat
+        '''
+        Apply the default text formatting to the text expression version of of this tempo mark
         '''
         if te is None: # use the stored version if possible
             te = self._textExpression
-        te.justify = self._textJustification
-        te.style = 'bold'
+        te.style.fontStyle = 'bold'
         if numberImplicit:
-            te.positionVertical = 20 # if not showing number
+            te.style.absoluteY = 20 # if not showing number
         else:
-            te.positionVertical = 45 # 4.5 staff lines above
+            te.style.absoluteY = 45 # 4.5 staff lines above
         return te
 
     def isCommonTempoText(self, value=None):
@@ -391,8 +408,7 @@ class MetronomeMark(TempoIndication):
 #     >>> tm3.number
 #     90
 
-    def __init__(self, text=None, number=None, referent=None, 
-        parentheses=False):
+    def __init__(self, text=None, number=None, referent=None, parentheses=False):
         TempoIndication.__init__(self)
 
         self._number = number # may be None
@@ -405,6 +421,7 @@ class MetronomeMark(TempoIndication):
         if text is not None: # use property to create object if necessary
             self.text = text
 
+        # TODO: style??
         self.parentheses = parentheses 
 
         self._referent = None # set with property
@@ -489,6 +506,10 @@ class MetronomeMark(TempoIndication):
             self.textImplicit = False # must set here
         else:
             self._tempoText = TempoText(value)
+            if self.hasStyleInformation:
+                self._tempoText.style = self.style # link style information
+            else:
+                self.style = self._tempoText.style
             self.textImplicit = False # must set here
 
         if updateNumberFromText:
@@ -755,7 +776,8 @@ class MetronomeMark(TempoIndication):
 #         pass
 
     def getMaintainedNumberWithReferent(self, referent):
-        '''Return a new MetronomeMark object that has an equivalent number but a new referent.
+        '''
+        Return a new MetronomeMark object that has an equivalent number but a new referent.
         '''
         return MetronomeMark(text=self.text, number=self.number, 
                              referent=referent)
@@ -1690,6 +1712,12 @@ class Test(unittest.TestCase):
         self.assertEqual(mm.durationToSeconds(180), 60.0)
         self.assertEqual(mm.secondsToDuration(60.0).quarterLength, 180.0)
 
+    def testStylesAreShared(self):
+        halfNote = note.Note(type='half')
+        mm = MetronomeMark("slow", 40, halfNote)
+        mm.style.justify = 'left'
+        self.assertIs(mm._tempoText.style, mm.style)
+        self.assertIs(mm._tempoText._textExpression.style, mm.style)
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -1698,7 +1726,7 @@ _DOC_ORDER = [MetronomeMark, TempoText, MetricModulation, interpolateElements]
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='testStylesAreShared')
 
 #------------------------------------------------------------------------------
 # eof

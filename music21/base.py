@@ -28,7 +28,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'4.0.1'
+'4.0.4'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -78,16 +78,18 @@ from music21 import exceptions21
 
 Music21Exception = exceptions21.Music21Exception
 
-from music21.sites import SitesException
-from music21 import sites
 from music21 import common
 from music21 import defaults
 from music21 import derivation
 from music21 import duration
+from music21 import editorial
 from music21 import environment
+from music21 import sites
+from music21 import style
 
 from music21.common import opFrac
 from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
+from music21.sites import SitesException
 
 
 _MOD = 'music21.base.py'
@@ -298,6 +300,12 @@ class Music21Object(object):
         object is in.
     8.  derivation: a :class:`~music21.derivation.Derivation` object, or None, that shows
         where the object came from.
+    9.  style: a :class:`~music21.style.Style` object, that contains Style information
+        automatically created if it doesn't exist, so check `.hasStyleInformation` first
+        if that is not desired.
+    10. editorial: a :class:`~music21.editorial.Editorial` object
+    
+
 
     Each of these may be passed in as a named keyword to any music21 object.
 
@@ -317,7 +325,7 @@ class Music21Object(object):
     _classSetCacheDict = {}
     # same with fully qualified names
     _classListFullyQualifiedCacheDict = {}
-
+    _styleClass = style.Style
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = [
@@ -369,51 +377,56 @@ class Music21Object(object):
         'hideObjectOnPrint': '''if set to `True` will not print upon output 
             (only used in MusicXML output at this point and 
             Lilypond for notes, chords, and rests).''',
-        'xPosition': '''if set, defines the display x-position from 
-            the start of the container (in musicxml "tenths" by default)''',
         }
 
     def __init__(self, *arguments, **keywords):
+        super(Music21Object, self).__init__()
         # None is stored as the internal location of an obj w/o any sites
         self._activeSite = None
         # offset when no activeSite is available
         self._naiveOffset = 0.0
         # offset when activeSite is already garbage collected/dead, as in short-lived sites
-        # like .getElementsByClass
+        # like .getElementsByClass().stream()
         self._activeSiteStoredOffset = None
 
-        
         # store a derivation object to track derivations from other Streams
         # pass a reference to this object
         self._derivation = None
         
+        self._style = None
+        self._editorial = None
+        
         # private duration storage; managed by property
         self._duration = None
         self._priority = 0 # default is zero
-
+        
         self.hideObjectOnPrint = False
-        self.xPosition = None
 
         if "id" in keywords:
             self.id = keywords["id"]
         else:
             self.id = id(self)
 
-        # a duration object is not created until the .duration property is
-        # accessed with _getDuration(); this is a performance optimization
-        if "duration" in keywords:
-            self.duration = keywords["duration"]
         if "groups" in keywords and keywords["groups"] is not None:
             self.groups = keywords["groups"]
         else:
             self.groups = Groups()
+
         if "sites" in keywords:
             self.sites = keywords["sites"]
         else:
             self.sites = sites.Sites()
 
+        # a duration object is not created until the .duration property is
+        # accessed with _getDuration(); this is a performance optimization
+        if "duration" in keywords:
+            self.duration = keywords["duration"]
         if "activeSite" in keywords:
             self.activeSite = keywords["activeSite"]
+        if 'style' in keywords:
+            self.style = keywords['style']
+        if 'editorial' in keywords:
+            self.editorial = keywords['editorial']
 
 
     def mergeAttributes(self, other):
@@ -449,7 +462,7 @@ class Music21Object(object):
         
         TODO: move to class attributes to cache.
         '''
-        defaultIgnoreSet = {'_derivation', '_activeSite', 'id', 'sites', '_duration'}
+        defaultIgnoreSet = {'_derivation', '_activeSite', 'id', 'sites', '_duration', '_style'}
         if ignoreAttributes is None:
             ignoreAttributes = defaultIgnoreSet
         else:
@@ -504,6 +517,10 @@ class Music21Object(object):
             # this calls __deepcopy__ in Sites
             newValue = copy.deepcopy(value, memo)
             setattr(new, 'sites', newValue)
+        if '_style' in ignoreAttributes:
+            value = getattr(self, '_style')
+            newValue = copy.deepcopy(value, memo)
+            setattr(new, '_style', newValue)
 
 
         for name in self.__dict__:
@@ -566,7 +583,7 @@ class Music21Object(object):
         False
         >>> b.id != n.id
         True        
-        >>> n.accidental = "-"
+        >>> n.pitch.accidental = '-'
         >>> b.name
         'A'
         >>> n.offset
@@ -693,9 +710,11 @@ class Music21Object(object):
         True
         
         >>> sorted([s for s in n.classSet if isinstance(s, str)])
-        ['GeneralNote', 'Music21Object', 'NotRest', 'Note', '....object', 
-         'music21.base.Music21Object', 'music21.note.GeneralNote', 'music21.note.NotRest', 
-         'music21.note.Note', 'object']
+        ['GeneralNote', 'Music21Object', 'NotRest', 'Note',
+         '....object', 
+         'music21.base.Music21Object', 
+         'music21.note.GeneralNote', 'music21.note.NotRest', 'music21.note.Note', 
+         'object']
          
         >>> sorted([s for s in n.classSet if not isinstance(s, str)], key=lambda x: x.__name__)
         [<class 'music21.note.GeneralNote'>, 
@@ -714,6 +733,119 @@ class Music21Object(object):
             classSet = frozenset(classList)
             self._classSetCacheDict[self.__class__] = classSet
             return classSet
+
+
+    #---------------------------------------------------------------------------
+    @property
+    def hasEditorialInformation(self):
+        '''
+        Returns True if there is a :class:`~music21.editorial.Editorial` object
+        already associated with this object, False otherwise.
+        
+        Calling .style on an object will always create a new 
+        Style object, so even though a new Style object isn't too expensive
+        to create, this property helps to prevent creating new Styles more than
+        necessary.
+        
+        >>> mObj = base.Music21Object()
+        >>> mObj.hasEditorialInformation
+        False
+        >>> mObj.editorial
+        <music21.editorial.Editorial {} >
+        >>> mObj.hasEditorialInformation
+        True
+        '''
+        return False if self._editorial is None else True
+
+    @property
+    def editorial(self):
+        '''
+        a :class:`~music21.editorial.Editorial` object that stores editorial information
+        (comments, footnotes, harmonic information, ficta).
+
+        Created automatically as needed:
+
+        >>> n = note.Note("C4")
+        >>> n.editorial
+        <music21.editorial.Editorial {} >
+        >>> n.editorial.ficta = pitch.Accidental('sharp')
+        >>> n.editorial.ficta
+        <accidental sharp>
+        >>> n.editorial
+        <music21.editorial.Editorial {'ficta': <accidental sharp>} >
+
+        OMIT_FROM_DOCS
+        >>> b2 = base.Music21Object()
+        >>> b2._editorial is None
+        True
+        >>> b2.editorial
+        <music21.editorial.Editorial {} >
+        >>> b2._editorial is None
+        False      
+        '''
+        if self._editorial is None:
+            self._editorial = editorial.Editorial()
+        return self._editorial
+
+    @editorial.setter
+    def editorial(self, ed):
+        self._editorial = ed
+
+    @property
+    def hasStyleInformation(self):
+        '''
+        Returns True if there is a :class:`~music21.style.Style` object
+        already associated with this object, False otherwise.
+        
+        Calling .style on an object will always create a new 
+        Style object, so even though a new Style object isn't too expensive
+        to create, this property helps to prevent creating new Styles more than
+        necessary.
+        
+        >>> mObj = base.Music21Object()
+        >>> mObj.hasStyleInformation
+        False
+        >>> mObj.style
+        <music21.style.Style object at 0x10b0a2080>
+        >>> mObj.hasStyleInformation
+        True
+        '''
+        return False if self._style is None else True
+    
+    
+    @property
+    def style(self):
+        '''
+        Returns (or Creates and then Returns) the Style object
+        associated with this object, or sets a new
+        style object.  Different classes might use
+        different Style objects because they might have different 
+        style needs (such as text formatting or bezier positioning)
+        
+        Eventually will also query the groups to see if they have
+        any styles associated with them.
+        
+        >>> n = note.Note()
+        >>> st = n.style
+        >>> st
+        <music21.style.Style object at 0x10ba96208>
+        >>> st.absoluteX = 20.0
+        >>> st.absoluteX
+        20.0
+        >>> n.style = style.Style()
+        >>> n.style.absoluteX is None
+        True
+        '''
+        if self._style is None:
+            styleClass = self._styleClass
+            self._style = styleClass()
+        return self._style
+    
+    @style.setter
+    def style(self, newStyle):
+        self._style = newStyle
+
+
 
     #---------------------------
     # convenience.  used to be in note.Note, but belongs everywhere:
@@ -2730,7 +2862,7 @@ class Music21Object(object):
         
         
 
-        Make sure that ties remain as they should be:
+        Make sure that ties and accidentals remain as they should be:
 
         >>> d = note.Note('D#4')
         >>> d.duration.quarterLength = 3.0
@@ -2738,18 +2870,25 @@ class Music21Object(object):
         >>> e, f = d.splitAtQuarterLength(2.0)
         >>> e.tie, f.tie
         (<music21.tie.Tie start>, <music21.tie.Tie continue>)
+        >>> e.pitch.accidental.displayStatus is None
+        True
+        >>> f.pitch.accidental.displayStatus
+        False
 
         Should be the same for chords...
 
-        >>> g = chord.Chord(['C4', 'E4', 'G4'])
+        >>> g = chord.Chord(['C4', 'E4', 'G#4'])
         >>> g.duration.quarterLength = 3.0
-        >>> g._notes[1].tie = tie.Tie('start')
+        >>> g[1].tie = tie.Tie('start')
         >>> h, i = g.splitAtQuarterLength(2.0)
-        >>> for j in range(0,3):
-        ...   h._notes[j].tie, i._notes[j].tie
+        >>> for j in range(3):
+        ...   (h[j].tie, i[j].tie)
         (<music21.tie.Tie start>, <music21.tie.Tie stop>)
         (<music21.tie.Tie start>, <music21.tie.Tie continue>)
         (<music21.tie.Tie start>, <music21.tie.Tie stop>)
+        
+        >>> h[2].pitch.accidental.displayStatus, i[2].pitch.accidental.displayStatus
+        (None, False)
         
         
         If quarterLength == self.quarterLength then the second element will be None.
@@ -2897,16 +3036,16 @@ class Music21Object(object):
 
         # hide accidentals on tied notes where previous note
         # had an accidental that was shown
-        # this is not general enough, for things like chords
-        if hasattr(e, 'pitch'):
-            if hasattr(e.pitch, 'accidental') and e.pitch.accidental is not None:
-                if not displayTiedAccidentals: # if False
-                    if (e.pitch.accidental.displayType not in
-                        ['even-tied']):
-                        eRemain.pitch.accidental.displayStatus = False
-                else: # display tied accidentals
-                    eRemain.pitch.accidental.displayType = 'even-tied'
-                    eRemain.pitch.accidental.displayStatus = True
+        if addTies and hasattr(e, 'pitches'):
+            for i, p in enumerate(e.pitches):
+                remainP = eRemain.pitches[i]
+                if hasattr(p, 'accidental') and p.accidental is not None:
+                    if not displayTiedAccidentals: # if False
+                        if (p.accidental.displayType != 'even-tied'):
+                            remainP.accidental.displayStatus = False
+                    else: # display tied accidentals
+                        remainP.accidental.displayType = 'even-tied'
+                        remainP.accidental.displayStatus = True
 
         if eRemain.duration.quarterLength > 0.0:
             st = _SplitTuple([e, eRemain])
@@ -3062,7 +3201,7 @@ class Music21Object(object):
 
         >>> n = note.Note()
         >>> n.duration.quarterLength = 0.5 + 0.0625 # eighth + 64th
-        >>> t = duration.Tuplet(3, 2)
+        >>> t = duration.Tuplet(3, 2, 'eighth')
         >>> n.duration.appendTuplet(t)
         >>> (n.duration.type, n.duration.dots, n.duration.tuplets)
         ('complex', 0, (<music21.duration.Tuplet 3/2/eighth>,))
@@ -3311,7 +3450,7 @@ class Music21Object(object):
         >>> s.insert(0, ts)
         >>> n = note.Note(type='eighth')
         >>> s.repeatAppend(n, 8)
-        >>> s.makeMeasures(inPlace = True)
+        >>> s.makeMeasures(inPlace=True)
         >>> [n.beat for n in s.flat.notes]
         [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5]
         
@@ -3768,7 +3907,7 @@ class Test(unittest.TestCase):
         b.offset = 2.0 # duration.Duration("half")
 
         self.assertFalse(n is b)
-        n.accidental = "-"
+        n.pitch.accidental = '-'
         self.assertEqual(b.name, "A")
         self.assertEqual(n.offset, 1.0)
         self.assertEqual(b.offset, 2.0)
@@ -4827,14 +4966,10 @@ class Test(unittest.TestCase):
         self.assertEqual(ecopy2.pitch.name, 'F#')
         prev = ecopy2.previous('Note')
         self.assertIs(prev, ecopy1)
-        
-        
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Music21Object, ElementWrapper]
-
-
 
 
 #------------------------------------------------------------------------------

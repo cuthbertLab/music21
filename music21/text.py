@@ -24,6 +24,8 @@ from music21 import base
 from music21 import common
 from music21 import exceptions21
 from music21 import environment
+from music21 import style
+
 from music21.ext import six
 
 _MOD = "text.py"  
@@ -207,143 +209,17 @@ class TextException(exceptions21.Music21Exception):
     pass
 
 
-#-------------------------------------------------------------------------------
-class TextFormatException(exceptions21.Music21Exception):
-    pass
-
-class TextFormatMixin(object):
-    '''
-    An mixin object for defining text formatting. 
-    This object can be multiple-inherited by objects that need storage and i/o of text settings. 
-
-    See :class:`music21.expressions.TextExpression` for an example. 
-    '''
-    def __init__(self):
-        # these could all be in a text s
-        self._justify = None
-        self._style = None
-        self._weight = None
-        self._size = None
-        self._letterSpacing = None
-
-        # TODO: a comma separated list; can also be generic font styles
-        self.fontFamily = None 
-
-    def _getJustify(self):
-        return self._justify    
-    
-    def _setJustify(self, value):
-        if value is None:
-            self._justify = None
-        else:
-            if value.lower() not in ['left', 'center', 'right']:
-                raise TextFormatException('Not a supported justification: %s' % value)
-            self._justify = value.lower()
-
-    justify = property(_getJustify, _setJustify, 
-        doc = '''Get or set the justification.
-
-        >>> tf = text.TextFormatMixin()
-        >>> tf.justify = 'center'
-        >>> tf.justify
-        'center'
-        ''')
-
-    def _getStyle(self):
-        return self._style    
-    
-    def _setStyle(self, value):
-        if value is None:
-            self._style = None
-        else:
-            if value.lower() not in ['italic', 'normal', 'bold', 'bolditalic']:
-                raise TextFormatException('Not a supported justification: %s' % value)
-            self._style = value.lower()
-
-    style = property(_getStyle, _setStyle, 
-        doc = '''Get or set the style, as normal, italic, bold, and bolditalic.
-        
-        >>> tf = text.TextFormatMixin()
-        >>> tf.style = 'bold'
-        >>> tf.style
-        'bold'
-        ''')
-
-    def _getWeight(self):
-        return self._weight    
-    
-    def _setWeight(self, value):
-        if value is None:
-            self._weight = None
-        else:
-            if value.lower() not in ['normal', 'bold']:
-                raise TextFormatException('Not a supported justification: %s' % value)
-            self._weight = value.lower()
-
-    weight = property(_getWeight, _setWeight, 
-        doc = '''Get or set the weight, as normal, or bold.
-
-        >>> tf = text.TextFormatMixin()
-        >>> tf.weight = 'bold'
-        >>> tf.weight
-        'bold'
-        ''')
-
-    def _getSize(self):
-        return self._size    
-    
-    def _setSize(self, value):
-        if value is not None:
-            try:
-                value = float(value)
-            except ValueError:
-                pass # MusicXML font sizes can be CSS strings...
-                #raise TextFormatException('Not a supported size: %s' % value)
-        self._size = value
-
-    size = property(_getSize, _setSize, 
-        doc = '''Get or set the size.  Best, a float, but also a css font size
-
-        >>> tf = text.TextFormatMixin()
-        >>> tf.size = 20
-        >>> tf.size
-        20.0
-        ''')
-
-    def _getLetterSpacing(self):
-        return self._letterSpacing    
-    
-    def _setLetterSpacing(self, value):
-        
-        if value != 'normal' and value is not None:            
-            # convert to number
-            try:
-                value = float(value)
-            except ValueError:
-                raise TextFormatException('Not a supported size: %s' % value)
-
-        self._letterSpacing = value
-
-    letterSpacing = property(_getLetterSpacing, _setLetterSpacing, 
-        doc = '''Get or set the letter spacing.
-
-        >>> tf = text.TextFormatMixin()
-        >>> tf.letterSpacing = 20
-        >>> tf.letterSpacing
-        20.0
-        >>> tf.letterSpacing = 'normal'
-        ''')
 
 #-------------------------------------------------------------------------------
 class TextBoxException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
-class TextBox(base.Music21Object, TextFormatMixin):
+class TextBox(base.Music21Object):
     '''
     A TextBox is arbitrary text that might be positioned anywhere on a page, 
     independent of notes or staffs. A page attribute specifies what page this text is found on; 
-    positionVertical and positionHorizontal position the text from the bottom left corner in 
+    style.absoluteY and style.absoluteX position the text from the bottom left corner in 
     units of tenths.
 
     This object is similar to the TextExpression object, but does not have as many position 
@@ -353,53 +229,59 @@ class TextBox(base.Music21Object, TextFormatMixin):
     >>> from music21 import text, stream
     >>> y = 1000 # set a fixed vertical distance
     >>> s = stream.Stream()
-    >>> # specify character, x position, y position
+    
+    Specify character, x position, y position
+    
     >>> tb = text.TextBox('m', 250, y)
-    >>> tb.size = 40
-    >>> tb.alignVertical = 'bottom'
+    >>> tb.style.fontSize = 40
+    >>> tb.style.alignVertical = 'bottom'
     >>> s.append(tb)
+
     >>> tb = text.TextBox('u', 300, y)
-    >>> tb.size = 60
-    >>> tb.alignVertical = 'bottom'
+    >>> tb.style.fontSize = 60
+    >>> tb.style.alignVertical = 'bottom'
     >>> s.append(tb)
+    
     >>> tb = text.TextBox('s', 550, y)
-    >>> tb.size = 120
-    >>> tb.alignVertical = 'bottom'
-    >>> s.append(tb)        
+    >>> tb.style.fontSize = 120
+    >>> tb.style.alignVertical = 'bottom'
+    >>> s.append(tb)
+            
     >>> tb = text.TextBox('ic', 700, y)
-    >>> tb.alignVertical = 'bottom'
-    >>> tb.size = 20
-    >>> tb.style = 'italic'
+    >>> tb.style.alignVertical = 'bottom'
+    >>> tb.style.fontSize = 20
+    >>> tb.style.fontStyle = 'italic'
     >>> s.append(tb)
+
     >>> tb = text.TextBox('21', 850, y)
-    >>> tb.alignVertical = 'bottom'
-    >>> tb.size = 80
-    >>> tb.weight = 'bold'
-    >>> tb.style = 'italic'
+    >>> tb.style.alignVertical = 'bottom'
+    >>> tb.style.fontSize = 80
+    >>> tb.style.fontWeight = 'bold'
+    >>> tb.style.fontStyle = 'italic'
     >>> s.append(tb)
+    
     >>> #_DOCS_SHOW s.show()
 
     .. image:: images/textBoxes-01.*
         :width: 600
 
     '''
+    _styleClass = style.TextStyle
     classSortOrder = -31 # text expressions are -30
 
     def __init__(self, content=None, x=500, y=500):
         base.Music21Object.__init__(self)
         # numerous properties are inherited from TextFormat
-        TextFormatMixin.__init__(self)
-
         # the text string to be displayed; not that line breaks
         # are given in the xml with this non-printing character: (#)
         self._content = None
         self.content = content   # use property
 
         self._page = 1 # page one is deafault
-        self._positionDefaultX = x    
-        self._positionDefaultY = y
-        self._alignVertical = 'top'
-        self._alignHorizontal = 'center'
+        self.style.absoluteX = x    
+        self.style.absoluteY = y
+        self.style.alignVertical = 'top'
+        self.style.alignHorizontal = 'center'
 
 
     def __repr__(self):
@@ -424,11 +306,11 @@ class TextBox(base.Music21Object, TextFormatMixin):
         doc = '''Get or set the content.
 
         
-        >>> te = text.TextBox('testing')
+        >>> te = text.TextBox('Con fuoco')
         >>> te.content
-        'testing'
-        >>> te.justify = 'center'
-        >>> te.justify
+        'Con fuoco'
+        >>> te.style.justify = 'center'
+        >>> te.style.justify
         'center'
 
         ''')
@@ -445,94 +327,14 @@ class TextBox(base.Music21Object, TextFormatMixin):
         doc = '''Get or set the page number. The first page (page 1) is the default. 
 
         
-        >>> te = text.TextBox('testing')
+        >>> te = text.TextBox('Great Score')
         >>> te.content
-        'testing'
+        'Great Score'
         >>> te.page
         1
-        ''')
-
-    def _getPositionVertical(self):
-        return self._positionDefaultY
-    
-    def _setPositionVertical(self, value):
-        if value is not None:
-            self._positionDefaultY = value
-    
-    positionVertical = property(_getPositionVertical, _setPositionVertical, 
-        doc = '''
-        Get or set the vertical position.
-
-        
-        >>> te = text.TextBox('testing')
-        >>> te.positionVertical = 1000
-        >>> te.positionVertical
-        1000
-        ''')
-
-    def _getPositionHorizontal(self):
-        return self._positionDefaultX
-    
-    def _setPositionHorizontal(self, value):
-        if value is not None:
-            self._positionDefaultX = value
-    
-    positionHorizontal = property(_getPositionHorizontal,     
-        _setPositionHorizontal, 
-        doc = '''
-        Get or set the vertical position.
-
-        
-        >>> te = text.TextBox('testing')
-        >>> te.positionHorizontal = 200
-        >>> te.positionHorizontal
-        200
-
-        ''')
-
-
-    # note: this properties might be moved into the TextFormat object?
-
-    def _getAlignVertical(self):
-        return self._alignVertical
-    
-    def _setAlignVertical(self, value):
-        if value in [None, 'top', 'middle', 'bottom', 'baseline']:
-            self._alignVertical = value 
-        else:
-            raise TextBoxException('invalid vertical align: %s' % value)
-    
-    alignVertical = property(_getAlignVertical, _setAlignVertical, 
-        doc = '''
-        Get or set the vertical align. Valid values are top, middle, bottom, and baseline
-
-        
-        >>> te = text.TextBox('testing')
-        >>> te.alignVertical = 'top'
-        >>> te.alignVertical
-        'top'
-        ''')
-
-    def _getAlignHorizontal(self):
-        return self._alignHorizontal
-    
-    def _setAlignHorizontal(self, value):
-        if value in [None, 'left', 'right', 'center']:
-            self._alignHorizontal = value
-        else:
-            raise TextBoxException('invalid horizontal align: %s' % value)
-    
-    alignHorizontal = property(_getAlignHorizontal,     
-        _setAlignHorizontal, 
-        doc = '''
-        Get or set the horicontal align.
-
-        
-        >>> te = text.TextBox('testing')
-        >>> te.alignHorizontal = 'right'
-        >>> te.alignHorizontal
-        'right'
-
+        >>> te.page = 2
+        >>> te.page
+        2
         ''')
 
 
@@ -839,7 +641,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [TextBox, TextFormatMixin]
+_DOC_ORDER = [TextBox]
 
 
 if __name__ == "__main__":

@@ -425,7 +425,7 @@ class Graph(object):
         '''
         pass
 
-    @common.deprecated('August 2016', 'December 2016', 'use self.data = data instead')
+    @common.deprecated('August 2016', 'August 2017', 'use self.data = data instead')
     def setData(self, data):
         self.data = data
 
@@ -2099,7 +2099,7 @@ class PlotStream(object):
         >>> s = stream.Stream()
         >>> for i in range(60, 84):
         ...    n = note.Note()
-        ...    n.ps = i
+        ...    n.pitch.ps = i
         ...    s.append(n)
         >>> a = graph.PlotStream(s)
         >>> [x for x, y in a.ticksPitchClassUsage(showEnharmonic=True)]

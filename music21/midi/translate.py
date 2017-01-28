@@ -1190,7 +1190,7 @@ def _processPackets(packets, channelForInstrument=None, channelsDynamic=None,
         # if necessary, add pitch change at start of Note, 
         # cancel pitch change at end
         o = p['offset']
-        oEnd = p['offset']+p['duration']
+        oEnd = p['offset'] + p['duration']
 
         channelExclude = [] # channels that cannot be used
         centShift = p['centShift'] # may be None
@@ -1205,11 +1205,11 @@ def _processPackets(packets, channelForInstrument=None, channelsDynamic=None,
             # or if any start or stop is within this span
             #if o >= start and o < stop: # found an offset that is used
 
-            if ( (start >= o and start < oEnd) or
-                 (stop > o and stop < oEnd) or
-                 (start <= o and stop > o) or
-                 (start < oEnd and stop > oEnd)
-                ) : 
+            if ((start >= o and start < oEnd)
+                 or (stop > o and stop < oEnd)
+                 or (start <= o and stop > o)
+                 or (start < oEnd and stop > oEnd)
+                ): 
                 # if there is a cent shift active in the already used channel
                 #environLocal.printDebug(['matchedOffset overlap'])
                 centShiftList = uniqueChannelEvents[key]
@@ -1268,14 +1268,16 @@ def _processPackets(packets, channelForInstrument=None, channelsDynamic=None,
                                     type="PITCH_BEND", channel=ch)
             me.setPitchBend(centShift)
             pBendStart = _getPacket(trackId=p['trackId'], 
-                offset=o, midiEvent=me, # keep offset here
-                obj=None, lastInstrument=None)
+                                    offset=o, 
+                                    midiEvent=me, # keep offset here
+                                    obj=None, 
+                                    lastInstrument=None)
             post.append(pBendStart)
             #environLocal.printDebug(['adding pitch bend', me])
             # removal of pitch bend will happen above with note off
 
         # key includes channel, so that durations can span once in each channel
-        key = (p['offset'], p['offset']+p['duration'], ch)
+        key = (p['offset'], p['offset'] + p['duration'], ch)
         if key not in uniqueChannelEvents:
             # need to count multiple instances of events on the same
             # span and in the same channel (fine if all have the same pitchbend
@@ -1736,11 +1738,11 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
             for i in instrumentStream:
                 if i.midiProgram not in allUniqueInstruments:
                     allUniqueInstruments.append(i.midiProgram)
-        else: # get None as a placeholder for detaul
+        else: # get None as a placeholder for default
             if None not in allUniqueInstruments:
                 allUniqueInstruments.append(None)
 
-        # store packets in dictionary; keys are trackids
+        # store packets in dictionary; keys are trackIds
         packetStorage[trackCount] = {}
         packetStorage[trackCount]['rawPackets'] = _streamToPackets(s, 
                                                trackId=trackCount)

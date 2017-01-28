@@ -45,7 +45,7 @@ class ModalCounterpoint(object):
     # pylint: disable=duplicate-code
     def findParallelFifths(self, srcStream, cmpStream):
         '''Given two streams, returns the number of parallel fifths and also
-        assigns a flag under note.editorial.misc["Parallel Fifth"] for
+        assigns a flag under note.editorial["parallelFifth"] for
         any note that has harmonic interval of a fifth and is preceded by a
         harmonic interval of a fifth.
         
@@ -70,26 +70,26 @@ class ModalCounterpoint(object):
         >>> m4.octave = 5 #checking for 12ths as well
         >>> cp.findParallelFifths(cp.stream1, cp.stream2)
         3
-        
         '''
-        
         srcStream.attachIntervalsBetweenStreams(cmpStream)
         numParallelFifths = 0
         srcNotes = srcStream.notes
         
         for note1 in srcNotes:
             note2 = srcStream.getElementAfterElement(note1, [Note])
-            if note2 is not None:
-                if (note1.editorial.harmonicInterval.semiSimpleName == "P5" and
-                        note2.editorial.harmonicInterval.semiSimpleName == "P5"):
-                    numParallelFifths += 1
-                    note2.editorial.misc["Parallel Fifth"] = True
+            if (note2 is not None 
+                    and note1.editorial.harmonicInterval is not None
+                    and note2.editorial.harmonicInterval is not None
+                    and note1.editorial.harmonicInterval.semiSimpleName == "P5"
+                    and note2.editorial.harmonicInterval.semiSimpleName == "P5"):
+                numParallelFifths += 1
+                note2.editorial["parallelFifth"] = True
         return numParallelFifths
 
     def findHiddenFifths(self, stream1, stream2):
         '''
         Given two streams, returns the number of hidden fifths and also
-        assigns a flag under note.editorial.misc under "Hidden Fifth" for
+        assigns a flag under note.editorial under "hiddenFifth" for
         any note that has harmonic interval of a fifth where it creates a
         hidden parallel fifth. Note: a hidden fifth here is defined as anything
         where the two streams reach a fifth through parallel motion, but is
@@ -110,11 +110,10 @@ class ModalCounterpoint(object):
         >>> cp = alpha.counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
         >>> cp.findHiddenFifths(cp.stream1, cp.stream2)
         2
-        >>> n2.editorial.misc['Hidden Fifth']
+        >>> n2.editorial['hiddenFifth']
         True
         >>> cp.findHiddenFifths(cp.stream2, cp.stream1)
         2
-
         '''
         numHiddenFifths = 0
         for i in range(len(stream1.notes)-1):
@@ -126,7 +125,7 @@ class ModalCounterpoint(object):
                 hidden = self.isHiddenFifth(note1, note2, note3, note4)
                 if hidden:
                     numHiddenFifths += 1
-                    note2.editorial.misc["Hidden Fifth"] = True
+                    note2.editorial["hiddenFifth"] = True
         return numHiddenFifths
 
     def isParallelFifth(self, note11, note12, note21, note22):
@@ -165,8 +164,6 @@ class ModalCounterpoint(object):
         is isHiddenFifth(v1n1, v1n2, v2n1, v2n2)), returns True if
         there is a hidden fifth and false otherwise.
         
-
-        
         >>> n1 = note.Note('G3')
         >>> n2 = note.Note('B-3')
         >>> m1 = note.Note('E4')
@@ -180,7 +177,6 @@ class ModalCounterpoint(object):
         >>> m2.octave = 5 # check for hidden 12ths
         >>> cp.isHiddenFifth(n1, n2, m1, m2)
         True
-
         '''
 
         vlq = voiceLeading.VoiceLeadingQuartet(note11, note12, note21, note22)
@@ -203,12 +199,12 @@ class ModalCounterpoint(object):
 ##        return False
 
     def findParallelOctaves(self, stream1, stream2):
-        '''Given two streams, returns the number of parallel octaves and also
-        assigns a flag under note.editorial.misc["Parallel Octave"] for
+        '''
+        Given two streams, returns the number of parallel octaves and also
+        assigns a flag under note.editorial.parallelOctave for
         any note that has harmonic interval of an octave and is preceded by a
         harmonic interval of an octave.
 
-        
         >>> n1 = note.Note('G3')
         >>> n2 = note.Note('A3')
         >>> n3 = note.Note('B3')
@@ -224,7 +220,7 @@ class ModalCounterpoint(object):
         >>> cp = alpha.counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
         >>> cp.findParallelOctaves(cp.stream1, cp.stream2)
         3
-        >>> n2.editorial.misc['Parallel Octave']
+        >>> n2.editorial.parallelOctave
         True
         >>> cp.findParallelOctaves(cp.stream2, cp.stream1)
         3
@@ -244,18 +240,18 @@ class ModalCounterpoint(object):
                 if note1.editorial.harmonicInterval.semiSimpleName == "P8":
                     if note2.editorial.harmonicInterval.semiSimpleName == "P8":
                         numParallelOctaves += 1
-                        note2.editorial.misc["Parallel Octave"] = True
+                        note2.editorial.parallelOctave = True
         for note1 in stream2:
             note2 = stream2.getElementAfterElement(note1, [Note])
             if note2 is not None:
                 if note1.editorial.harmonicInterval.semiSimpleName == "P8":
                     if note2.editorial.harmonicInterval.semiSimpleName == "P8":
-                        note2.editorial.misc["Parallel Octave"] = True
+                        note2.editorial.parallelOctave = True
         return numParallelOctaves
 
     def findHiddenOctaves(self, stream1, stream2):
         '''Given two streams, returns the number of hidden octaves and also
-        assigns a flag under note.editorial.misc["Hidden Octave"]for
+        assigns a flag under note.editorial["hiddenOctave"]for
         any note that has harmonic interval of an octave where it creates a
         hidden parallel octave. Note: a hidden octave here is defined as
         anything where the two streams reach an octave through parallel motion,
@@ -280,7 +276,7 @@ class ModalCounterpoint(object):
         >>> cp = alpha.counterpoint.species.ModalCounterpoint(stream1=bass, stream2=sop)
         >>> cp.findHiddenOctaves(cp.stream1, cp.stream2)
         2
-        >>> n2.editorial.misc['Hidden Octave']
+        >>> n2.editorial.hiddenOctave
         True
         >>> cp.findHiddenOctaves(cp.stream2, cp.stream1)
         2
@@ -299,7 +295,7 @@ class ModalCounterpoint(object):
                 hidden = self.isHiddenOctave(note1, note2, note3, note4)
                 if hidden:
                     numHiddenOctaves += 1
-                    note2.editorial.misc["Hidden Octave"] = True
+                    note2.editorial.hiddenOctave = True
         return numHiddenOctaves
 
     def isParallelOctave(self, note11, note12, note21, note22):
@@ -378,11 +374,9 @@ class ModalCounterpoint(object):
 
     def findParallelUnisons(self, stream1, stream2):
         '''Given two streams, returns the number of parallel unisons and also
-        assigns a flag under note.editorial.misc["Parallel Unison"] for
+        assigns a flag under note.editorial["parallelUnison"] for
         any note that has harmonic interval of P1 and is preceded by a P1.
-
-
-        
+     
         >>> n1 = note.Note('G4')
         >>> n2 = note.Note('A4')
         >>> n3 = note.Note('B4')
@@ -398,7 +392,7 @@ class ModalCounterpoint(object):
         >>> cp = alpha.counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
         >>> cp.findParallelUnisons(cp.stream1, cp.stream2)
         3
-        >>> n2.editorial.misc['Parallel Unison']
+        >>> n2.editorial.parallelUnison
         True
         >>> cp.findParallelUnisons(cp.stream2, cp.stream1)
         3
@@ -414,13 +408,13 @@ class ModalCounterpoint(object):
                 if note1.editorial.harmonicInterval.name == "P1":
                     if note2.editorial.harmonicInterval.name == "P1":
                         numParallelUnisons += 1
-                        note2.editorial.misc["Parallel Unison"] = True
+                        note2.editorial.parallelUnison = True
         for note1 in stream2:
             note2 = stream2.getElementAfterElement(note1, [Note])
             if note2 is not None:
                 if note1.editorial.harmonicInterval.name == "P1":
                     if note2.editorial.harmonicInterval.name == "P1":
-                        note2.editorial.misc["Parallel Unison"] = True
+                        note2.editorial.parallelUnison = True
         return numParallelUnisons
 
     def isParallelUnison(self, note11, note12, note21, note22):
@@ -428,8 +422,6 @@ class ModalCounterpoint(object):
         the second pair sounds at the same time, (i.e. argument order is
         isParallelFifth(v1n1, v1n2, v2n1, v2n2)) returns True if the two
         harmonic intervals are P1 and False otherwise.
-
-
         
         >>> n1 = note.Note('A3')
         >>> n2 = note.Note('B-3')
@@ -750,10 +742,8 @@ class ModalCounterpoint(object):
 
     def findAllBadFifths(self, stream1, stream2):
         '''Given two streams, returns the total parallel and hidden fifths,
-        and also puts the appropriate tags in note.editorial.misc under
-        "Parallel Fifth" and "Hidden Fifth".
-
-        
+        and also puts the appropriate tags in note.editorial under
+        `.parallelFifth` and `.hiddenFifth`.
         
         >>> n1 = note.Note('C4')
         >>> n2 = note.Note('D4')
@@ -770,7 +760,6 @@ class ModalCounterpoint(object):
         >>> cp = alpha.counterpoint.species.ModalCounterpoint(s1, s2)
         >>> cp.findAllBadFifths(cp.stream1, cp.stream2)
         2
-
         '''
         parallel = self.findParallelFifths(stream1, stream2)
         hidden = self.findHiddenFifths(stream1, stream2)
@@ -778,10 +767,8 @@ class ModalCounterpoint(object):
 
     def findAllBadOctaves(self, stream1, stream2):
         '''Given two streams, returns the total parallel and hidden octaves,
-        and also puts the appropriate tags in note.editorial.misc under
-        "Parallel Octave" and "Hidden Octave".
-
-
+        and also puts the appropriate tags in note.editorial under
+        `.parallelOctave` and `.hiddenOctave`.
         
         >>> n1 = note.Note('C4')
         >>> n2 = note.Note('D4')
@@ -1307,15 +1294,15 @@ class Test(unittest.TestCase):
 #         print(findPar5)
 #         
 #         assert findPar5 == 1
-#         assert n24.editorial.misc["Parallel Fifth"] == True
-#         assert "Parallel Fifth" not in n21.editorial.misc
-#         assert "Parallel Fifth" not in n22.editorial.misc
-#         assert "Parallel Fifth" not in n23.editorial.misc
+#         assert n24.editorial.parallelFifth == True
+#         assert "parallelFifth" not in n21.editorial
+#         assert "parallelFifth" not in n22.editorial
+#         assert "parallelFifth" not in n23.editorial
 # 
-#         assert n14.editorial.misc["Parallel Fifth"] == True
-#         assert "Parallel Fifth" not in n11.editorial.misc
-#         assert "Parallel Fifth" not in n12.editorial.misc
-#         assert "Parallel Fifth" not in n13.editorial.misc
+#         assert n14.editorial["parallelFifth"] == True
+#         assert "parallelFifth" not in n11.editorial
+#         assert "parallelFifth" not in n12.editorial
+#         assert "parallelFifth" not in n13.editorial
 #     
 #         par5 = counterpoint1.isParallelFifth(n11, n12, n21, n22)
 #         assert par5 == False
@@ -1381,10 +1368,10 @@ class Test(unittest.TestCase):
 #         par8 = counterpoint1.findParallelOctaves(stream1, stream6)
 #     
 #         assert par8 == 3
-#         assert "Parallel Octave" not in n31.editorial.misc
-#         assert n32.editorial.misc["Parallel Octave"] == True
-#         assert n33.editorial.misc["Parallel Octave"] == True
-#         assert n34.editorial.misc["Parallel Octave"] == True
+#         assert "parallelOctave" not in n31.editorial
+#         assert n32.editorial["parallelOctave"] == True
+#         assert n33.editorial["parallelOctave"] == True
+#         assert n34.editorial["parallelOctave"] == True
 #     
 #         par82 = counterpoint1.findParallelOctaves(stream1, stream2)
 #         assert par82 == 0
@@ -1521,9 +1508,9 @@ class Test(unittest.TestCase):
 #     
 #         parallel5 = counterpoint1.findParallelFifths(stream10, stream11)
 #         hidden5 = counterpoint1.findHiddenFifths(stream10, stream11)
-#         assert "Hidden Fifth" not in n71.editorial.misc
-#         assert n72.editorial.misc["Hidden Fifth"] == True
-#         assert n75.editorial.misc["Hidden Fifth"] == True
+#         assert "hiddenFifth" not in n71.editorial
+#         assert n72.editorial["hiddenFifth"] == True
+#         assert n75.editorial["hiddenFifth"] == True
 #         total5 = counterpoint1.findAllBadFifths(stream10, stream11)
 #     
 #         assert parallel5 == 2
@@ -1559,14 +1546,14 @@ class Test(unittest.TestCase):
 #         hidden8 = counterpoint1.findHiddenOctaves(stream12, stream13)
 #         total8 = counterpoint1.findAllBadOctaves(stream12, stream13)
 #     
-#         assert "Parallel Octave" not in n91.editorial.misc
-#         assert "Hidden Octave" not in n91.editorial.misc
-#         assert n92.editorial.misc["Hidden Octave"] == True
-#         assert "Parallel Octave" not in n92.editorial.misc
-#         assert n93.editorial.misc["Parallel Octave"] == True
-#         assert "Hidden Octave" not in n93.editorial.misc
-#         assert n94.editorial.misc["Parallel Octave"] == True
-#         assert n96.editorial.misc["Hidden Octave"] == True
+#         assert "parallelOctave" not in n91.editorial
+#         assert "hiddenOctave" not in n91.editorial
+#         assert n92.editorial["hiddenOctave"] == True
+#         assert "parallelOctave" not in n92.editorial
+#         assert n93.editorial["parallelOctave"] == True
+#         assert "hiddenOctave" not in n93.editorial
+#         assert n94.editorial["parallelOctave"] == True
+#         assert n96.editorial["hiddenOctave"] == True
 #     
 #         assert parallel8 == 2
 #         assert hidden8 == 2

@@ -85,9 +85,9 @@ class ChordReducer(object):
         '''
         from music21 import note
         if measureObj.isFlat is False:
-            mObj = measureObj.flat.notes
+            mObj = measureObj.flat.notes.stream()
         else:
-            mObj = measureObj.notes
+            mObj = measureObj.notes.stream()
         
         chordWeights = self.computeMeasureChordWeights(mObj, weightAlgorithm)
 
@@ -270,7 +270,8 @@ class ChordReducer(object):
         m.number = measureIndex
 
         mIchord = mI.chordify()
-        newPart = self.reduceMeasureToNChords(mIchord, maxChords, 
+        newPart = self.reduceMeasureToNChords(mIchord, 
+                                              maxChords, 
                                               weightAlgorithm=self.qlbsmpConsonance, 
                                               trimBelow=0.3)
         #newPart.show('text')
@@ -348,13 +349,15 @@ class TestExternal(unittest.TestCase):
 
     def testTrecentoMadrigal(self):
         from music21 import corpus
-        #c = corpus.parse('beethoven/opus18no1', 2).measures(1, 19)
-        c = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
-        #c = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
-        #c = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
-        #c = corpus.parse('PMFC_06-Jacopo').measures(1, 30)
+        # c = corpus.parse('beethoven/opus18no1', 2).measures(1, 19)
         
-        #c = corpus.parse('PMFC_12_13').measures(1, 40)
+        
+        c = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
+        # c = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
+        # c = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
+        # c = corpus.parse('PMFC_06-Jacopo').measures(1, 30)
+        
+        # c = corpus.parse('PMFC_12_13').measures(1, 40)
 
         # fix clef
         fixClef = True
@@ -369,8 +372,16 @@ class TestExternal(unittest.TestCase):
 
         cr = ChordReducer()
         #cr.printDebug = True
-        p = cr.multiPartReduction(c, maxChords = 3)
+        p = cr.multiPartReduction(c, maxChords=3)
         #p = cr.multiPartReduction(c, closedPosition=True)
+        from music21 import key, roman
+        cm = key.Key('G')
+        for thisChord in p.recurse().getElementsByClass('Chord'):
+            thisChord.lyric = roman.romanNumeralFromChord(thisChord, 
+                                                          cm, 
+                                                          preferSecondaryDominants=True).figure
+        
+        
         c.insert(0, p)
         c.show()
         

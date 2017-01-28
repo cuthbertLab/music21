@@ -6,7 +6,11 @@
     <miscellaneous>
       <miscellaneous-field name="description">Accidentals can be cautionary
           or editorial. Each measure has a normal accidental, an editorial,
-          a cautionary and an editioal and cautionary accidental.</miscellaneous-field>
+          a cautionary and an editorial and cautionary accidental.
+
+          These do not need to be graphically distinguished in later
+          XML Versions.
+      </miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -45,7 +49,7 @@
       </note>
       <note>
         <pitch>
-          <step>D</step>
+          <step>E</step>
           <alter>-1</alter>
           <octave>4</octave>
         </pitch>
@@ -56,7 +60,7 @@
       </note>
       <note>
         <pitch>
-          <step>D</step>
+          <step>F</step>
           <alter>-1</alter>
           <octave>4</octave>
         </pitch>
@@ -67,7 +71,7 @@
       </note>
       <note>
         <pitch>
-          <step>D</step>
+          <step>G</step>
           <alter>-1</alter>
           <octave>4</octave>
         </pitch>
@@ -92,7 +96,7 @@
       </note>
       <note>
         <pitch>
-          <step>C</step>
+          <step>D</step>
           <alter>1</alter>
           <octave>4</octave>
         </pitch>
@@ -103,7 +107,7 @@
       </note>
       <note>
         <pitch>
-          <step>C</step>
+          <step>E</step>
           <alter>1</alter>
           <octave>4</octave>
         </pitch>
@@ -114,7 +118,7 @@
       </note>
       <note>
         <pitch>
-          <step>C</step>
+          <step>F</step>
           <alter>1</alter>
           <octave>4</octave>
         </pitch>
@@ -139,7 +143,7 @@
       </note>
       <note>
         <pitch>
-          <step>D</step>
+          <step>E</step>
           <alter>-2</alter>
           <octave>4</octave>
         </pitch>
@@ -150,7 +154,7 @@
       </note>
       <note>
         <pitch>
-          <step>D</step>
+          <step>F</step>
           <alter>-2</alter>
           <octave>4</octave>
         </pitch>
@@ -161,7 +165,7 @@
       </note>
       <note>
         <pitch>
-          <step>D</step>
+          <step>G</step>
           <alter>-2</alter>
           <octave>4</octave>
         </pitch>
@@ -186,7 +190,7 @@
       </note>
       <note>
         <pitch>
-          <step>C</step>
+          <step>D</step>
           <alter>2</alter>
           <octave>4</octave>
         </pitch>
@@ -197,7 +201,7 @@
       </note>
       <note>
         <pitch>
-          <step>C</step>
+          <step>E</step>
           <alter>2</alter>
           <octave>4</octave>
         </pitch>
@@ -208,7 +212,7 @@
       </note>
       <note>
         <pitch>
-          <step>C</step>
+          <step>F</step>
           <alter>2</alter>
           <octave>4</octave>
         </pitch>

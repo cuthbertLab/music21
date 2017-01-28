@@ -221,7 +221,7 @@ class Derivation(SlottedObjectMixin):
     @property
     def method(self):
         '''
-        Returns the string of the method that was used to generate this
+        Returns or sets the string of the method that was used to generate this
         Stream.
 
         >>> s = stream.Stream()
@@ -231,24 +231,19 @@ class Derivation(SlottedObjectMixin):
         >>> sNotes = s.notes.stream()
         >>> sNotes.derivation.method
         'notes'
-        '''
-        return self._method
-
-    @method.setter
-    def method(self, method):
-        '''
-        Sets a string identifying how the object was derived.
 
         Some examples are 'getElementsByClass' etc.
 
         >>> s = stream.Stream()
+        >>> s.id = 'lonelyStream'
         >>> s.append(clef.TrebleClef())
         >>> s.append(note.Note())
-        >>> sNotes = s.notes
+        >>> sNotes = s.notes.stream()
         >>> sNotes.derivation
-        <music21.derivation.Derivation object at 0x...>
+        <Derivation of <music21.stream.Stream lonelyStream> 
+            from <music21.stream.Stream lonelyStream> via "notes">
 
-        >>> sNotes.derivation.method
+        >>> derived = sNotes.derivation
         >>> derived.method
         'notes'
 
@@ -256,9 +251,15 @@ class Derivation(SlottedObjectMixin):
         >>> derived.method
         'blah'
 
+        >>> derived is sNotes.derivation
+        True        
         >>> sNotes.derivation.method
         'blah'
         '''
+        return self._method
+
+    @method.setter
+    def method(self, method):
         self._method = method
 
     @property

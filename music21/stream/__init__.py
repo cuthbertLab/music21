@@ -836,6 +836,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     #-------------------------------
     # Temporary -- Remove in  2016
+    @common.deprecated('2016 December', '2017 December', 'No need to call `.stream()` on a stream. '
+                                                        + 'just use the object itself')
     def stream(self, returnStreamSubclass=None):
         '''
         During the transition period to the new iteration system,
@@ -1387,13 +1389,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
         # NOTE: this is a performance critical operation        
         defaultIgnoreSet = {'_offsetDict', 'streamStatus', '_elements', '_endElements', '_cache',
-                            'analysisData' # TODO: REMOVE SOON
                             }
         if ignoreAttributes is None:
             ignoreAttributes = defaultIgnoreSet
         else:
             ignoreAttributes = ignoreAttributes | defaultIgnoreSet
-
         new = super(Stream, self)._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
 
         if removeFromIgnore is not None:
@@ -1416,8 +1416,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 newValue.client = new
                 setattr(new, 'streamStatus', newValue)
                 #self.streamStatus.client = storedClient
-        #if name == '_cache' or name == 'analysisData':
-        #    continue # skip for now
         if '_elements' in ignoreAttributes:
             # must manually add elements to new Stream
             for e in self._elements:
@@ -2132,6 +2130,38 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     #---------------------------------------------------------------------------
     # searching and replacing routines
+
+    def setDerivationMethod(self, derivationMethod, recurse=False):
+        '''
+        Sets the .derivation.method for each element in the Stream
+        if it has a .derivation object.
+        
+        >>> import copy
+        >>> s = converter.parse('tinyNotation: 2/4 c2 d e f')
+        >>> s2 = copy.deepcopy(s)
+        >>> s2.recurse().notes[-1].derivation
+        <Derivation of <music21.note.Note F> from <music21.note.Note F> via "__deepcopy__">
+        >>> s2.setDerivationMethod('exampleCopy', recurse=True)
+        >>> s2.recurse().notes[-1].derivation
+        <Derivation of <music21.note.Note F> from <music21.note.Note F> via "exampleCopy">
+
+        Without recurse:
+        
+        >>> s = converter.parse('tinyNotation: 2/4 c2 d e f')
+        >>> s2 = copy.deepcopy(s)
+        >>> s2.setDerivationMethod('exampleCopy')
+        >>> s2.recurse().notes[-1].derivation
+        <Derivation of <music21.note.Note F> from <music21.note.Note F> via "__deepcopy__">
+        '''
+        if recurse:
+            sIter = self.recurse()
+        else:
+            sIter = self.iter
+            
+        for el in sIter:
+            if el.derivation is not None:
+                el.derivation.method = derivationMethod
+
 
     def replace(self, 
                 target, 
@@ -3332,22 +3362,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     #-----------------------------------------------------
     # end .getElement filters
-    
-    
-    @common.deprecated("September 2015", "May 2016", 
-                       "use s.elementOffset() instead w/ a try/except")
-    def getOffsetByElement(self, obj):
-        '''
-        DEPRECATED Sep 2015: use s.elementOffset(obj) and if it is possible that
-        obj is not in s, then do a try: except base.SitesException
-        
-        Remove in 2016 May.
-        '''
-        try:
-            return self.elementOffset(obj)
-        except base.SitesException:
-            return None
-
 
     def groupElementsByOffset(self, returnDict=False):
         '''
@@ -4215,7 +4229,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return post
 
 
-    def getInstruments(self, searchActiveSite=True, returnDefault=True):
+    def getInstruments(self, searchActiveSite=True, returnDefault=True, recurse=False):
         '''
         Search this stream or activeSite streams for
         :class:`~music21.instrument.Instrument` objects, otherwise
@@ -4227,7 +4241,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #for cases when there is more than one instrument
 
         instObj = None
-        post = self.getElementsByClass('Instrument').stream()
+        if recurse:
+            sIter = self.recurse()
+        else:
+            sIter = self.iter
+        
+        post = sIter.getElementsByClass('Instrument').stream()
         if post:
             #environLocal.printDebug(['found local instrument:', post[0]])
             instObj = post[0] # get first
@@ -4289,44 +4308,54 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return None
 
 
-    def bestClef(self, allowTreble8vb=False):
+    def bestClef(self, allowTreble8vb=False, recurse=False):
         '''
         TODO: Move to Clef
         
         Returns the clef that is the best fit for notes and chords found in this Stream.
-
-        This does not automatically get a flat representation of the Stream.
 
 
         >>> import random
         >>> a = stream.Stream()
         >>> for x in range(30):
         ...    n = note.Note()
-        ...    n.midi = random.choice(range(60,72))
+        ...    n.pitch.midi = random.randint(70, 81)
         ...    a.insert(n)
         >>> b = a.bestClef()
+        >>> b
+        <music21.clef.TrebleClef>
         >>> b.line
         2
         >>> b.sign
         'G'
 
         >>> c = stream.Stream()
-        >>> for x in range(30):
+        >>> for x in range(10):
         ...    n = note.Note()
-        ...    n.midi = random.choice(range(35,55))
+        ...    n.pitch.midi = random.randint(45, 54)
         ...    c.insert(n)
         >>> d = c.bestClef()
+        >>> d
+        <music21.clef.BassClef>
         >>> d.line
         4
         >>> d.sign
         'F'
+        
+        This does not automatically get a flat representation of the Stream.
+        
+        There are a lot more high notes in `a` (30) than low notes in `c` (10),
+        but it will not matter here, because the pitches in `a` will not be found:
+        
+        >>> c.insert(0, a)
+        >>> c.bestClef()
+        <music21.clef.BassClef>
+        
+        But with recursion, it will matter:
+        
+        >>> c.bestClef(recurse=True)
+        <music21.clef.TrebleClef>
         '''
-        #environLocal.printDebug(['calling bestClef()'])
-
-        totalNotes = 0
-        totalHeight = 0
-
-        notes = self.getElementsByClass('GeneralNote')
         def findHeight(p):
             height = p.diatonicNoteNum
             if p.diatonicNoteNum > 33: # a4
@@ -4334,6 +4363,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             elif p.diatonicNoteNum < 24: # Bass F or lower
                 height += -3 # bonus
             return height
+        #environLocal.printDebug(['calling bestClef()'])
+
+        totalNotes = 0
+        totalHeight = 0
+
+        sIter = self.recurse() if recurse else self.iter
+
+        notes = sIter.getElementsByClass('GeneralNote')
 
         for n in notes:
             if n.isRest:
@@ -4513,7 +4550,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             quickSearch = False
 
-        inversionDNN = inversionNote.diatonicNoteNum
+        inversionDNN = inversionNote.pitch.diatonicNoteNum
         for n in returnStream.recurse(classFilter=('NotRest')):
             n.pitch.diatonicNoteNum = (2*inversionDNN) - n.pitch.diatonicNoteNum
             if quickSearch: # use previously found
@@ -5605,35 +5642,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             inPlace=inPlace,
             )
 
-    @common.deprecated("September 2015", "May 2016", 
-                       "use stream.streamStatus.StreamStatus.haveBeamsBeenMade instead")
-    def haveBeamsBeenMade(self):
-        # could be called: hasAccidentalDisplayStatusSet
-        '''
-        If any Note in this Stream has .beams defined, it as
-        assumed that Beams have not been set and/or makeBeams
-        has not been run. If any Beams exist, this method
-        returns True, regardless of if makeBeams has actually been run.
-        
-        DEPRECATED: Use :meth:`~music21.stream.streamStatus.StreamStatus.haveBeamsBeenMade`
-        instead.
-        
-        Remove in May 2016
-        '''
-        return self.streamStatus.haveBeamsBeenMade()
-
-    # @common.deprecated
-    def makeTupletBrackets(self, inPlace=False):
-        '''
-        Calls :py:func:`~music21.stream.makeNotation.makeTupletBrackets`.
-        
-        Deprecated sep 2015; rem July 2016; call makeNotation.makeTupletBrackets directly.
-        '''
-        return makeNotation.makeTupletBrackets(
-            self,
-            inPlace=inPlace,
-            )
-
     def makeAccidentals(self, 
                         pitchPast=None, 
                         pitchPastMeasure=None,
@@ -5904,16 +5912,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         
         return returnStream
 
-    def realizeOrnaments(self):
-        '''
-        Calls :py:func:`~music21.stream.makeNotation.realizeOrnaments`.
-        
-        DEPRECATED Sep 2015; will be removed by July 2016
-        '''
-        warnings.warn("realizeOrnaments; use stream.makeNotation.realizeOrnaments() instead", 
-                      StreamDeprecationWarning)
-        return makeNotation.realizeOrnaments(self)
-
     def extendDuration(self, objName, inPlace=True):
         '''
         Given a Stream and an object class name, go through the Stream
@@ -6081,6 +6079,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #environLocal.printDebug(['calling stripTies'])
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
+            returnObj.derivation.method = 'stripTies'
+            returnObj.setDerivationMethod('stripTies', recurse=True)
         else:
             returnObj = self
 
@@ -6095,7 +6095,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             retainContainers=True)
             return returnObj # exit
 
-        # assume this is sorted
         # need to just get .notesAndRests, as there may be other objects in the Measure
         # that come before the first Note, such as a SystemLayout object
         f = returnObj.flat
@@ -6213,7 +6212,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
                 # set tie to None on first note
                 notes[posConnected[0]].tie = None
-                posConnected = [] # resset to empty
+                posConnected = [] # reset to empty
 
         # all results have been processed
         # presently removing from notes, not resultObj, as index positions
@@ -6494,7 +6493,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             sOldId = sNew.id
             if common.isNum(sOldId) and sOldId > defaults.minIdNumberToConsiderMemoryLocation:
                 sOldId = hex(sOldId)
-            sNew.id = str(sOldId) + "_" + method
+            try:
+                newId = str(sOldId) + "_" + method
+                sNew.id = newId
+            except UnicodeEncodeError:
+                sNew.id = "_" + method
         
         sNew._derivation = derivation.Derivation(sNew)
         sNew._derivation.origin = self
@@ -7797,6 +7800,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if not inPlace:
             post = copy.deepcopy(self)
             post.derivation.method = 'transpose'
+            post.setDerivationMethod('transpose', recurse=True)
         else:
             post = self
 #         for p in post.pitches: # includes chords
@@ -7819,7 +7823,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if e.isStream:
                 continue
             if hasattr(e, 'transpose'):
-                e.transpose(value, inPlace=True)
+                if (hasattr(value, 'classes') 
+                    and 'GenericInterval' in value.classes):
+                    # do not transpose KeySignatures w/ Generic Intervals
+                    if 'KeySignature' not in e.classes and hasattr(e, 'pitches'):
+                        k = e.getContextByClass('KeySignature')
+                        for p in e.pitches:
+                            value.transposePitchKeyAware(p, k, inPlace=True)                         
+                else:
+                    e.transpose(value, inPlace=True)
         if not inPlace:
             return post
         else:
@@ -7872,6 +7884,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
+            returnObj.derivation.method = 'scaleOffsets'
+            returnObj.setDerivationMethod('scaleOffsets', recurse=True)
         else:
             returnObj = self
 
@@ -7925,6 +7939,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
+            returnObj.derivation.method = 'scaleDurations'
+            returnObj.setDerivationMethod('scaleDurations', recurse=True)
         else:
             returnObj = self
 
@@ -7977,6 +7993,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             raise StreamException('amountToScale must be greater than zero')
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
+            returnObj.derivation.method = 'augmentOrDiminish'
+            returnObj.setDerivationMethod('augmentOrDiminish', recurse=True)
         else:
             returnObj = self
 
@@ -7991,7 +8009,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
     def quantize(self, quarterLengthDivisors=None,
-            processOffsets=True, processDurations=True, inPlace=False, recurse=True):
+                 processOffsets=True, processDurations=True, 
+                 inPlace=False, recurse=True):
         '''
         Quantize time values in this Stream by snapping offsets
         and/or durations to the nearest multiple of a quarter length value
@@ -8026,14 +8045,24 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> nshort = note.Note()
         >>> nshort.quarterLength = .26
         >>> s.repeatInsert(nshort, [1.49, 1.76])
+        
         >>> s.quantize([4], processOffsets=True, processDurations=True, inPlace=True)
         >>> [e.offset for e in s]
         [0.0, 0.5, 1.0, 1.5, 1.75]
         >>> [e.duration.quarterLength for e in s]
         [0.5, 0.5, 0.5, 0.25, 0.25]
+        
+        
+        The error in quantization is set in the editorial attribute for the note in
+        two places `.offsetQuantizationError` and `.quarterLengthQuantizationError`
+        
+        >>> [e.editorial.offsetQuantizationError for e in s.notes]
+        [0.1, -0.01, -0.1, -0.01, 0.01]
+        >>> [e.editorial.quarterLengthQuantizationError for e in s.notes]
+        [-0.01, -0.01, -0.01, 0.01, 0.01]
 
 
-        # test with default quarterLengthDivisors...
+        with default quarterLengthDivisors...
 
         >>> s = stream.Stream()
         >>> s.repeatInsert(n, [0.1, .49, .9])
@@ -8071,7 +8100,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         TODO: test recurse and inPlace etc.
         TODO: recurse should be off by default -- standard
-
         '''
         if quarterLengthDivisors is None:
             quarterLengthDivisors = defaults.quantizationQuarterLengthDivisors
@@ -8095,6 +8123,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # TODO: Use new filters...
         if inPlace is False:
             returnStream = copy.deepcopy(self)
+            returnStream.derivation.method = 'quantize'
+            returnStream.setDerivationMethod('quantize', recurse=True)
+
         else:
             returnStream = self
 
@@ -8115,9 +8146,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     unused_error, oNew, signedError = bestMatch(float(o), quarterLengthDivisors)
                     useStream.setElementOffset(e, oNew * sign)
                     if (hasattr(e, 'editorial') 
-                            and hasattr(e.editorial, 'misc') 
                             and signedError != 0):
-                        e.editorial.misc['offsetQuantizationError'] = signedError * sign
+                        e.editorial.offsetQuantizationError = signedError * sign
                 if processDurations:
                     if e.duration is not None:
                         ql = e.duration.quarterLength
@@ -8127,9 +8157,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                                             float(ql), quarterLengthDivisors)
                         e.duration.quarterLength = qlNew
                         if (hasattr(e, 'editorial')
-                                and hasattr(e.editorial, 'misc') 
                                 and signedError != 0):
-                            e.editorial.misc['quarterLengthQuantizationError'] = signedError
+                            e.editorial.quarterLengthQuantizationError = signedError
 
         if inPlace is False:
             return returnStream
@@ -8388,8 +8417,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return returnObj
 
 
-    def sliceByBeat(self, target=None,
-        addTies=True, inPlace=False, displayTiedAccidentals=False):
+    def sliceByBeat(self, 
+                    target=None,
+                    addTies=True, 
+                    inPlace=False, 
+                    displayTiedAccidentals=False):
         '''
         Slice all elements in the Stream that have a Duration at
         the offsets determined to be the beat from the local TimeSignature.
@@ -9559,8 +9591,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s1 = converter.parse('tinyNotation: 7/4 C4 d8 e f# g A2 d2', makeNotation=False)
         >>> s1.attachMelodicIntervals()
         >>> for n in s1.notes:
-        ...     if n.editorial.melodicInterval is None: print("None")
-        ...     else: print(n.editorial.melodicInterval.directedName)
+        ...     if n.editorial.melodicInterval is None: 
+        ...         print("None")
+        ...     else: 
+        ...         print(n.editorial.melodicInterval.directedName)
         None
         M9
         M2
@@ -9796,6 +9830,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return returnObj
         return None
 
+    
     def internalize(self, container=None,
                     classFilterList=('GeneralNote',)):
         '''
@@ -11598,7 +11633,7 @@ class Measure(Stream):
                 pass
                 #environLocal.printDebug(['skipping makeBeams exception', StreamException])
         if m.streamStatus.haveTupletBracketsBeenMade() is False:
-            m.makeTupletBrackets(inPlace=True)
+            makeNotation.makeTupletBrackets(m, inPlace=True)
 
         if not inPlace:
             return m

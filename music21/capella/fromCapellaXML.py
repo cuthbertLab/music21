@@ -778,7 +778,7 @@ class CapellaImporter(object):
         >>> d2.type
         'quarter'
         >>> d2.tuplets
-        (<music21.duration.Tuplet 3/2/eighth>,)
+        (<music21.duration.Tuplet 3/2>,)
 
 
         Does not handle noDuration='true', display, churchStyle on rest durations
@@ -813,7 +813,7 @@ class CapellaImporter(object):
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> tupletTag = ci.domElementFromText('<tuplet count="3"/>')
         >>> ci.tupletFromTuplet(tupletTag)    
-        <music21.duration.Tuplet 3/2/eighth>
+        <music21.duration.Tuplet 3/2>
         
         does not handle 'tripartite' = True
         '''

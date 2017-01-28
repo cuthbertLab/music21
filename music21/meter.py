@@ -29,6 +29,7 @@ from music21 import defaults
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
+from music21 import style
 
 from music21.common import SlottedObjectMixin, opFrac
 from music21.ext import six
@@ -2816,7 +2817,7 @@ class TimeSignature(base.Music21Object):
     >>> tsCut.symbol
     'cut'
 
-    For other time signatures, the symbol is "" (not set) or "normal"
+    For other time signatures, the symbol is '' (not set) or 'normal'
     
     >>> sixEight.symbol
     ''
@@ -2857,9 +2858,9 @@ class TimeSignature(base.Music21Object):
     if you have the '11/16' time above, you may want to have it displayed as
     '2/4+3/16' or '11/16 (2/4+3/16)'.  Or you might want the written
     TimeSignature to contradict what the notes imply.  All this can be done
-    with .displaySequence.  
+    with .displaySequence.      
     '''
-
+    _styleClass = style.TextStyle
     classSortOrder = 4
 
     _DOC_ATTR = {
@@ -3012,7 +3013,9 @@ class TimeSignature(base.Music21Object):
         This sets default beam partitions when partitionRequest is None.
         '''
         # beam short measures of 8ths, 16ths, or 32nds all together
-        if self.denominator == 8 and self.numerator in (1, 2, 3):
+        if self.beamSequence.summedNumerator:
+            pass # do not mess with a numerator such as (3+2)/8
+        elif self.denominator == 8 and self.numerator in (1, 2, 3):
             pass # doing nothing will beam all together
         elif self.denominator == 16 and self.numerator in range(1, 5 + 1):
             pass
@@ -3216,23 +3219,6 @@ class TimeSignature(base.Music21Object):
 
     #---------------------------------------------------------------------------
     # properties
-
-    # temp for backward compat  # TODO: Formally Deprecate and remove.
-    @property
-    @common.deprecated('2012', '2016 November', 'use .barDuration.quarterLength instead.')
-    def totalLength(self):
-        '''
-        Total length of the TimeSignature, in Quarter Lengths.
-
-        DEPRECATED.  Use .barDuration.quarterLength
-
-        >>> ts = meter.TimeSignature('6/8')
-        >>> ts.barDuration.quarterLength
-        3.0
-        '''
-        return self.beamSequence.duration.quarterLength
-
-
 
     def _getNumerator(self):
         return self.beamSequence.numerator
@@ -5001,6 +4987,11 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 15/16>')
 
 
+    def testCompoundSameDenominator(self):
+        ts328 = TimeSignature('3+2/8')
+        beatSeq = ts328.beamSequence
+        self.assertEqual(str(beatSeq), '{3/8+2/8}')
+
 #------------------------------------------------------------------------------
 # define presented order in documentation
 
@@ -5010,7 +5001,7 @@ _DOC_ORDER = [TimeSignature]
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test) #, runTest='testBestTimeSignatureDoubleDottedB')
+    music21.mainTest(Test) #, runTest='testCompoundSameDenominator')
 
 
 

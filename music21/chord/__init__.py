@@ -329,6 +329,8 @@ class Chord(note.NotRest):
             # get by name of attribute on Note
             if last == 'volume': # special handling to avoid setting client
                 return component._getVolume(forceClient=self)
+            elif last == 'color':
+                return component.style.color
             else:
                 return getattr(component, last)
         else:
@@ -1098,7 +1100,7 @@ class Chord(note.NotRest):
         
         >>> p = pitch.Pitch('C4')
         >>> n = note.Note(p)
-        >>> n.color = 'red'
+        >>> n.style.color = 'red'
         >>> c = chord.Chord([n, 'E4'])
         >>> c.getColor(p)
         'red'
@@ -1120,13 +1122,16 @@ class Chord(note.NotRest):
             pitchTarget = pitch.Pitch(pitchTarget)
         for n in self._notes:
             if n.pitch is pitchTarget:
-                if n.color is not None:
-                    return n.color
+                if n.hasStyleInformation and n.style.color is not None:
+                    return n.style.color
         for n in self._notes:
             if n.pitch == pitchTarget:
-                if n.color is not None:
-                    return n.color
-        return self.color # may be None
+                if n.hasStyleInformation and n.style.color is not None:
+                    return n.style.color
+        if self.hasStyleInformation:
+            return self.style.color # may be None
+        else:
+            return None
 
     def getNotehead(self, p):
         '''Given a pitch in this Chord, return an associated notehead
@@ -2904,7 +2909,7 @@ class Chord(note.NotRest):
         '''
         # assign to base
         if pitchTarget is None and len(self._notes) > 0:
-            self.color = value
+            self.style.color = value
             return
         elif isinstance(pitchTarget, six.string_types):
             pitchTarget = pitch.Pitch(pitchTarget)
@@ -2912,13 +2917,13 @@ class Chord(note.NotRest):
         match = False
         for d in self._notes:
             if d.pitch is pitchTarget:
-                d.color = value
+                d.style.color = value
                 match = True
                 break
         if not match: # look at equality of value
             for d in self._notes:
                 if d.pitch == pitchTarget:
-                    d.color = value
+                    d.style.color = value
                     match = True
                     break
         if not match:
@@ -3414,7 +3419,7 @@ class Chord(note.NotRest):
         >>> a.color
         '#235409'
 
-        >>> a.editorial.color
+        >>> a.style.color
         '#235409'
 
         >>> a.setColor('#ff0000', 'e4')
@@ -3428,14 +3433,14 @@ class Chord(note.NotRest):
         #235409
 
         '''
-        if self._editorial is not None:
-            return self.editorial.color
+        if self.hasStyleInformation:
+            return self.style.color
         else:
             return None
 
     @color.setter
     def color(self, expr):
-        self.editorial.color = expr
+        self.style.color = expr
 
     @property
     def commonName(self):
@@ -3695,9 +3700,6 @@ class Chord(note.NotRest):
         return len(self.pitchClasses)
 
 
-    # @deprecated("September 2016", 
-    #    "Deprecated because it gives the wrong answer -- use normalOrder")
-    
     @property
     def normalOrder(self):
         '''
@@ -3745,10 +3747,25 @@ class Chord(note.NotRest):
         pcOriginal = cta.pcOriginal
         transposedNormalForm = chordTables.addressToTransposedNormalForm(cta)
         return [(pc + pcOriginal) % 12 for pc in transposedNormalForm]
+    
+    @property
+    def normalOrderString(self):
+        '''
+        Return the normal order/normal form of the Chord as a string representation.
+
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
+        >>> c1.normalOrder
+        [0, 3, 7]
+        
+        >>> c1.normalOrderString
+        '<037>'
+
+        '''
+        return Chord.formatVectorString(self.normalOrder)
 
 
     @property
-    @deprecated("July 2016", "September 2016", 
+    @deprecated("July 2016", "July 2017", 
                 "Deprecated because it gives the wrong answer -- use normalOrder")
     def normalForm(self):
         '''
@@ -3765,7 +3782,7 @@ class Chord(note.NotRest):
         return [(pc - firstPC) % 12 for pc in normalOrderList]
 
     @property
-    @deprecated("July 2016", "September 2016", 
+    @deprecated("July 2016", "July 2017", 
                 "Deprecated because it gives the wrong answer -- use normalOrderString")
     def normalFormString(self):
         '''

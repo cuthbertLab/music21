@@ -20,17 +20,17 @@ import copy
 import unittest
 
 from music21 import base
+from music21 import beam
 from music21 import common
 from music21 import duration
 from music21 import exceptions21
-from music21 import interval
-from music21 import editorial
 from music21 import expressions
+from music21 import interval
 from music21 import pitch
-from music21 import beam
+from music21 import style
 from music21 import tie
 from music21 import volume
-from music21.common import SlottedObjectMixin
+
 from music21.ext import six
 
 from music21 import environment
@@ -88,7 +88,7 @@ class NotRestException(exceptions21.Music21Exception):
 #-------------------------------------------------------------------------------
 
 
-class Lyric(SlottedObjectMixin):
+class Lyric(style.StyleMixin):
     '''
     An object representing a single Lyric as part of a note's .lyrics property.
 
@@ -130,7 +130,7 @@ class Lyric(SlottedObjectMixin):
     the same as the number, but in cases where a string identifier is present,
     it will be different.
     '''
-
+    _styleClass = style.TextStyle
     ### CLASS VARIABLES ###
 
     __slots__ = (
@@ -142,12 +142,8 @@ class Lyric(SlottedObjectMixin):
 
     ### INITIALIZER ###
 
-    def __init__(
-        self,
-        text=None,
-        number=1,
-        **kwargs
-        ):
+    def __init__(self, text=None, number=1, **kwargs):
+        super(Lyric, self).__init__()
         self._identifier = None
         self._number = None
 
@@ -289,7 +285,6 @@ class Lyric(SlottedObjectMixin):
         number; lyric order is always stored in this form. Descriptive
         identifiers like 'part2verse1' which can be found in the musicXML
         lyric number attribute should be stored in self.identifier.
-
         '''
         return self._number
 
@@ -364,7 +359,6 @@ class GeneralNote(base.Music21Object):
         self.lyrics = [] # a list of lyric objects
         self.expressions = []
         self.articulations = []
-        self._editorial = None
 
         if "lyric" in keywords:
             self.addLyric(keywords['lyric'])
@@ -373,57 +367,25 @@ class GeneralNote(base.Music21Object):
         self.tie = None # store a Tie object
 
     #---------------------------------------------------------------------------
-    def _getEditorial(self):
-        if self._editorial is None:
-            self._editorial = editorial.NoteEditorial()
-        return self._editorial
-
-    def _setEditorial(self, ed):
-        self._editorial = ed
-
-    editorial = property(_getEditorial, _setEditorial, doc = '''
-        a :class:`~music21.editorial.NoteEditorial` object that stores editorial information
-        (comments, harmonic information, ficta) and 
-        certain display information (color, hidden-state).
-
-        Created automatically as needed:
-
-        >>> n = note.Note("C4")
-        >>> n.editorial
-        <music21.editorial.NoteEditorial object at 0x...>
-        >>> n.editorial.ficta = pitch.Accidental('sharp')
-        >>> n.editorial.ficta
-        <accidental sharp>
-
-        OMIT_FROM_DOCS
-        >>> n2 = note.Note("D4")
-        >>> n2._editorial is None
-        True
-        >>> n2.editorial
-        <music21.editorial.NoteEditorial object at 0x...>
-        >>> n2._editorial is None
-        False
-        ''')
-
-    #---------------------------------------------------------------------------
+    @common.deprecated('December 2016', 'December 2017', 'use .style.color instead')
     def _getColor(self):
-        '''Return the Note color.
+        '''
+        DEPRECATED: use `.style.color`
+        
+        Return the Note color.
 
         >>> a = note.GeneralNote()
         >>> a.duration.type = 'whole'
-        >>> a.color is None
+        >>> a.style.color is None
         True
-        >>> a.color = '#235409'
-        >>> a.color
+        >>> a.style.color = '#235409'
+        >>> a.style.color
         '#235409'
-        >>> a.editorial.color
+        >>> a.style.color
         '#235409'
-
-
         '''
-        #return self.editorial.color
-        if self._editorial is not None:
-            return self.editorial.color
+        if self._style is not None:
+            return self.style.color
         else:
             return None
 
@@ -433,7 +395,7 @@ class GeneralNote(base.Music21Object):
         uses this re: #[\dA-F]{6}([\dA-F][\dA-F])?
         No: because Lilypond supports "blue", "red" etc., as does CSS; musicxml also supports alpha
         '''
-        self.editorial.color = value
+        self.style.color = value
 
     color = property(_getColor, _setColor)
 
@@ -1164,10 +1126,11 @@ class Note(NotRest):
         ''')
 
 
-    @common.deprecated("May 2014", "May 2016", "use pitch.accidental instead")
+    @common.deprecated("May 2014", "May 2017", "use pitch.accidental instead")
     def _getAccidental(self):
         return self.pitch.accidental
 
+    @common.deprecated("May 2014", "May 2017", "use pitch.accidental instead")
     def _setAccidental(self, value):
         '''
         Adds an accidental to the Note, given as an Accidental object.
@@ -1179,7 +1142,7 @@ class Note(NotRest):
         >>> a.name
         'D'
         >>> b = pitch.Accidental("sharp")
-        >>> a.accidental = (b)
+        >>> a.pitch.accidental = (b)
         >>> a.name
         'D#'
         '''
@@ -1210,10 +1173,11 @@ class Note(NotRest):
         See :attr:`~music21.pitch.Pitch.step`.
         ''')
 
-    @common.deprecated("May 2014", "May 2016", "use pitch.frequency instead")
+    @common.deprecated("May 2014", "May 2017", "use pitch.frequency instead")
     def _getFrequency(self):
         return self.pitch.frequency
 
+    @common.deprecated("May 2014", "May 2017", "use pitch.frequency instead")
     def _setFrequency(self, value):
         self.pitch.frequency = value
 
@@ -1237,10 +1201,12 @@ class Note(NotRest):
         doc = '''Return or set the octave value from the :class:`~music21.pitch.Pitch` object. 
         See :attr:`~music21.pitch.Pitch.octave`.''')
 
-    @common.deprecated("May 2014", "May 2016", "use pitch.midi instead")
+
+    @common.deprecated("May 2014", "May 2017", "use pitch.midi instead")
     def _getMidi(self):
         return self.pitch.midi
 
+    @common.deprecated("May 2014", "May 2017", "use pitch.midi instead")
     def _setMidi(self, value):
         self.pitch.midi = value
 
@@ -1255,10 +1221,11 @@ class Note(NotRest):
         DEPRECATED May 2014: use n.pitch.midi instead
         ''')
 
-    @common.deprecated("May 2014", "May 2016", "use pitch.ps instead")
+    @common.deprecated("May 2014", "May 2017", "use pitch.ps instead")
     def _getPs(self):
         return self.pitch.ps
 
+    @common.deprecated("May 2014", "May 2017", "use pitch.ps instead")
     def _setPs(self, value):
         self.pitch.ps = value
 
@@ -1273,10 +1240,11 @@ class Note(NotRest):
         DEPRECATED May 2014: use n.pitch.ps instead
         ''')
 
-    @common.deprecated("May 2014", "May 2016", "use pitch.microtone instead")
+    @common.deprecated("May 2014", "May 2017", "use pitch.microtone instead")
     def _getMicrotone(self):
         return self.pitch.microtone
 
+    @common.deprecated("May 2014", "May 2017", "use pitch.microtone instead")
     def _setMicrotone(self, value):
         self.pitch.microtone = value
 
@@ -1290,10 +1258,11 @@ class Note(NotRest):
         ''')
 
 
-    @common.deprecated("May 2014", "May 2016", "use pitch.pitchClass instead")
+    @common.deprecated("May 2014", "May 2017", "use pitch.pitchClass instead")
     def _getPitchClass(self):
         return self.pitch.pitchClass
 
+    @common.deprecated("May 2014", "May 2017", "use pitch.pitchClass instead")
     def _setPitchClass(self, value):
         self.pitch.pitchClass = value
 
@@ -1305,10 +1274,11 @@ class Note(NotRest):
         ''')
 
 
-    @common.deprecated("May 2014", "May 2016", "use pitch.pitchClassString instead")
+    @common.deprecated("May 2014", "May 2017", "use pitch.pitchClassString instead")
     def _getPitchClassString(self):
         return self.pitch.pitchClassString
 
+    @common.deprecated("May 2014", "May 2017", "use pitch.pitchClassString instead")
     def _setPitchClassString(self, value):
         self.pitch.pitchClassString = value
 
@@ -1323,14 +1293,14 @@ class Note(NotRest):
         DEPRECATED May 2014: use n.pitch.pitchClassString instead
         ''')
 
-
     @property
+    @common.deprecated('December 2016', 'December 2017', 'use `.pitch.diatonicNoteNum instead')
     def diatonicNoteNum(self):
         '''
-        Return the diatonic note number from the :class:`~music21.pitch.Pitch` object. 
-        See :attr:`~music21.pitch.Pitch.diatonicNoteNum`.
+        DEPRECATED: use .pitch.diatonicNoteNum instead.
         
-        Probably will be deprecated soon...
+        Return the diatonic note number from the :class:`~music21.pitch.Pitch` object. 
+        See :attr:`~music21.pitch.Pitch.diatonicNoteNum`.        
         '''
         return self.pitch.diatonicNoteNum
 
@@ -1460,7 +1430,7 @@ class Note(NotRest):
         'E-half-sharp in octave 3 Half Note'
 
         >>> n = note.Note('D', quarterLength=.25)
-        >>> n.microtone = 25
+        >>> n.pitch.microtone = 25
         >>> n.fullName
         'D (+25c) 16th Note'
         '''
@@ -1688,9 +1658,11 @@ class Test(unittest.TestCase):
         pass
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
         '''
-        import sys, types
+        Test copying all objects defined in this module
+        '''
+        import sys
+        import types
         for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:

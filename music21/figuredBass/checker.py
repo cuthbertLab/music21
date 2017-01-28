@@ -248,7 +248,7 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
                                                             initOffset, 
                                                             initOffset, 
                                                             mustBeginInSpan=False)[0]
-                    noteA.color = color
+                    noteA.style.color = color
             if debug is True:
                 debugInfo.append("{0!s:25}{1!s}".format(offsets, partNumberTuple))
 
@@ -318,8 +318,8 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
                                 initOffsetA, initOffsetA, mustBeginInSpan=False)[0]
                     noteB = allParts[partNumber - 1].iter.getElementsByOffset(
                                 initOffsetB, initOffsetB, mustBeginInSpan=False)[0]
-                    noteA.color = color
-                    noteB.color = color
+                    noteA.style.color = color
+                    noteB.style.color = color
             if debug is True:
                 debugInfo.append("{0!s:25}{1!s:25}{2!s}".format(previousOffsets, 
                                                                 offsets, 

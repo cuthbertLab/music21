@@ -175,6 +175,7 @@ class StreamStatus(SlottedObjectMixin):
     @property
     def client(self):
         return common.unwrapWeakref(self._client)
+    
     @client.setter
     def client(self, client):
         # client is the Stream that this status lives on

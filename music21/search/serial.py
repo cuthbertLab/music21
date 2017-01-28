@@ -1023,6 +1023,11 @@ class SegmentMatcher(object):
 
     @property
     def includeChords(self):
+        '''
+        Returns or sets bool on whether chords should be included.
+        
+        Clears the segment cache when it is changed.
+        '''
         return self._includeChords
 
     @includeChords.setter

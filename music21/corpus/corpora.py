@@ -624,12 +624,9 @@ class CoreCorpus(Corpus):
                 results.append(candidate)
         return results
 
-    def getComposerDirectoryPath(
-        self,
-        composerName,
-        ):
+    def getComposerDirectoryPath(self, composerName):
         '''
-        DEPRECATED 
+        To be DEPRECATED 
         
         Given the name of a composer, get the path to the top-level directory
         of that composer:

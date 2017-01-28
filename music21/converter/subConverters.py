@@ -261,6 +261,7 @@ class ConverterIPython(SubConverter):
     registerFormats = ('ipython',)
     registerOutputExtensions = ()
     registerOutputSubformatExtensions = {'lilypond': 'ly'}
+    
 #     def vfshow(self, s):
 #         '''
 #         pickle this object and send it to Vexflow
@@ -295,8 +296,15 @@ class ConverterIPython(SubConverter):
         if subformats and subformats[0] == 'vexflow':
             return self.vfshow(obj)
             #subformats = ['lilypond','png']
-        helperFormat = subformats[0]
-        helperSubformats = subformats[1:]
+        if subformats:
+            helperFormat = subformats[0]
+            helperSubformats = subformats[1:]
+        else:
+            helperFormat = "musicxml"
+            helperSubformats = []
+            
+        if not helperSubformats:
+            helperSubformats = ['png']
         
         from music21 import converter
         
@@ -304,7 +312,7 @@ class ConverterIPython(SubConverter):
         helperConverter.setSubconverterFromFormat(helperFormat)
         helperSubConverter = helperConverter.subConverter
 
-        if helperFormat == 'musicxml':        
+        if helperFormat in ('musicxml', 'xml', 'lilypond', 'lily'):        
             ### hack to make musescore excerpts -- fix with a converter class in MusicXML
             savedDefaultTitle = defaults.title
             savedDefaultAuthor = defaults.author

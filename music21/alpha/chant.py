@@ -241,7 +241,7 @@ class GregorianNote(note.Note):
             raise ChantException(
                 "useClef has to define the diatonicNoteNum representing the lowest line")
        
-        stepsAboveLowestLine = inNote.diatonicNoteNum - useClef.lowestLine
+        stepsAboveLowestLine = inNote.pitch.diatonicNoteNum - useClef.lowestLine
         asciiNote = stepsAboveLowestLine + asciiD
        
         if asciiNote < asciiA:
@@ -585,7 +585,7 @@ _DOC_ORDER = []
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(TestExternal)
+    music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof

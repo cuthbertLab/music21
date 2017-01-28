@@ -879,9 +879,8 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
 
 
 class LandiniCadence(featuresModule.FeatureExtractor):
-    '''Return a bolean if one or more Parts end with a Landini-like cadential figure.
-
-    
+    '''
+    Return a boolean if one or more Parts end with a Landini-like cadential figure. 
     '''
     id = 'MC1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):

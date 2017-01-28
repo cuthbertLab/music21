@@ -1,20 +1,13 @@
 # -*- coding: utf-8 -*-
 '''
 The Lilypond MusicXML Test Suite comes from 
+https://github.com/cuthbertLab/musicxmlTestSuite
+and is a fork of
 http://lilypond.org/doc/v2.18/input/regression/musicxml/collated-files
 
 The test suite is licensed under the MIT license 
 (https://opensource.org/licenses/mit-license.php)
 and copyrighted by the Lilypond project.
-
-Currently this tests only if everything parses without error.  
-It does not check to make sure that it actually works.
-
-One change has been made, to 33g-Slur-ChordedNotes.xml
-which is contains a common incorrect notation but also a very difficult one 
-that music21 can parse if the slur number is changed 
-to "2" for the second incorrect slur
-since music21 parses all notes of a chord before moving to the next.
 '''
 import os
 import unittest

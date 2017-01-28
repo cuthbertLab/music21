@@ -17,7 +17,6 @@ areas. The :class:`~music21.key.KeySignature` is used in
 The :class:`~music21.key.Key` object is a fuller representation not just of
 a key signature but also of the key of a region. 
 '''
-
 import copy
 import re
 import unittest
@@ -29,6 +28,7 @@ from music21 import interval
 from music21 import note
 from music21 import pitch
 from music21 import scale
+from music21 import style
 
 from music21.ext import six
 
@@ -348,8 +348,34 @@ class KeySignature(base.Music21Object):
     4
     >>> legal
     <music21.key.Key of c# minor>
+    
+    To set a non-traditional Key Signature, create a KeySignature object and then
+    set the alteredPitches list:
+    
+    >>> unusual = key.KeySignature()
+    >>> unusual.alteredPitches = ['E-', 'G#']
+    >>> unusual
+    <music21.key.KeySignature of pitches: [E-, G#]>
+    >>> unusual.isNonTraditional
+    True
+    
+    To set a pitch as displayed in a particular octave, create a non-traditional
+    KeySignature and then set pitches with octaves:
+    
+    >>> unusual = key.KeySignature()
+    >>> unusual.alteredPitches = ['F#4']
+    >>> unusual
+    <music21.key.KeySignature of pitches: [F#4]>
+    
+    If the accidental applies to all octaves but is being displayed differently
+    then you are done, but if you want them to apply only to the octave displayed
+    in then set `.accidentalsApplyOnlyToOctave` to `True`:
+    
+    >>> unusual.accidentalsApplyOnlyToOctave
+    False
+    >>> unusual.accidentalsApplyOnlyToOctave = True
     '''
-
+    _styleClass = style.TextStyle
 
     # note that musicxml permits non-tradtional keys by specifying
     # one or more altered tones; these are given as pairs of 
@@ -359,9 +385,6 @@ class KeySignature(base.Music21Object):
     
     def __init__(self, sharps=None):
         base.Music21Object.__init__(self)
-        #if mode is not None:
-        #    self._mode_is_deprecated()
-        
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
 
         try:
@@ -381,9 +404,10 @@ class KeySignature(base.Music21Object):
 
         # cache altered pitches
         self._alteredPitchesCached = []
+        self.accidentalsApplyOnlyToOctave = False
 
     def __hash__(self):
-        hashTuple = (self._sharps, tuple(self._alteredPitches))
+        hashTuple = (self._sharps, tuple(self._alteredPitches), self.accidentalsApplyOnlyToOctave)
         return hash(hashTuple)
     
     #---------------------------------------------------------------------------
@@ -396,7 +420,7 @@ class KeySignature(base.Music21Object):
         output = ""
         ns = self.sharps
         if ns is None:
-            output = 'None'
+            output = 'pitches: [' + ', '.join([str(p) for p in self.alteredPitches]) + ']'
         elif ns > 1:
             output = "%s sharps" % str(ns)
         elif ns == 1:
@@ -439,38 +463,10 @@ class KeySignature(base.Music21Object):
         pitchObj = sharpsToPitch(self.sharps - sharpAlterationFromMajor)
         return Key(pitchObj.name, mode)
 
-
-    def _getAlteredPitches(self):
-        if self._alteredPitchesCached: # if list not empty
-            #environLocal.printDebug(['using cached altered pitches'])
-            return self._alteredPitchesCached
-
-        post = []
-        if self.sharps > 0:
-            pKeep = pitch.Pitch('B')
-            if self.sharps > 8:
-                pass
-            for i in range(self.sharps):
-                pKeep.transpose('P5', inPlace=True)
-                p = copy.deepcopy(pKeep)
-                p.octave = None
-                post.append(p)
-
-        elif self.sharps < 0:
-            pKeep = pitch.Pitch('F')
-            for i in range(abs(self.sharps)):
-                pKeep.transpose('P4', inPlace=True)
-                p = copy.deepcopy(pKeep)
-                p.octave = None
-                post.append(p)
-
-        # assign list to altered pitches; list will be empty if not set
-        self._alteredPitchesCached = post
-        return post
-
-    alteredPitches = property(_getAlteredPitches, 
-        doc='''
-        Return a list of music21.pitch.Pitch objects that are altered by this 
+    @property
+    def alteredPitches(self):
+        '''
+        Return or set a list of music21.pitch.Pitch objects that are altered by this 
         KeySignature. That is, all Pitch objects that will receive an accidental.  
 
         >>> a = key.KeySignature(3)
@@ -499,7 +495,83 @@ class KeySignature(base.Music21Object):
         >>> g = key.KeySignature(-8)
         >>> [str(p) for p in g.alteredPitches]
         ['B-', 'E-', 'A-', 'D-', 'G-', 'C-', 'F-', 'B--']
-        ''')
+        
+        
+        >>> nonTrad = key.KeySignature()
+        >>> nonTrad.alteredPitches = ['B-', 'F#', 'E-', 'G#']
+        >>> nonTrad.alteredPitches
+        [<music21.pitch.Pitch B->, 
+         <music21.pitch.Pitch F#>, 
+         <music21.pitch.Pitch E->, 
+         <music21.pitch.Pitch G#>]
+        '''
+        if self._alteredPitches is not None:
+            return self._alteredPitches
+
+        if self._alteredPitchesCached: # if list not empty
+            #environLocal.printDebug(['using cached altered pitches'])
+            return self._alteredPitchesCached
+
+        post = []
+        if self.sharps > 0:
+            pKeep = pitch.Pitch('B')
+            if self.sharps > 8:
+                pass
+            for i in range(self.sharps):
+                pKeep.transpose('P5', inPlace=True)
+                p = copy.deepcopy(pKeep)
+                p.octave = None
+                post.append(p)
+
+        elif self.sharps < 0:
+            pKeep = pitch.Pitch('F')
+            for i in range(abs(self.sharps)):
+                pKeep.transpose('P4', inPlace=True)
+                p = copy.deepcopy(pKeep)
+                p.octave = None
+                post.append(p)
+
+        # assign list to altered pitches; list will be empty if not set
+        self._alteredPitchesCached = post
+        return post
+
+    @alteredPitches.setter
+    def alteredPitches(self, newAlteredPitches):
+        newList = []
+        for p in newAlteredPitches:
+            if not hasattr(p, 'classes'):
+                newList.append(pitch.Pitch(p))
+            elif 'Pitch' in p.classes:
+                newList.append(p)
+            elif 'Note' in p.classes:
+                newList.append(copy.deepcopy(p.pitch))
+        self._alteredPitches = newList
+
+
+    @property
+    def isNonTraditional(self):
+        '''
+        Returns bool if this is a non-traditional KeySignature:
+        
+        >>> g = key.KeySignature(3)
+        >>> g.isNonTraditional
+        False
+        
+        >>> g = key.KeySignature()
+        >>> g.alteredPitches = [pitch.Pitch('E`')]
+        >>> g.isNonTraditional
+        True
+        
+        >>> g
+        <music21.key.KeySignature of pitches: [E`]>
+        
+        >>> g.accidentalByStep('E')
+        <accidental half-flat>
+        '''
+        if self.sharps is None and self.alteredPitches:
+            return True
+        else:
+            return False
 
     def accidentalByStep(self, step):
         '''
@@ -631,6 +703,8 @@ class KeySignature(base.Music21Object):
         <music21.key.KeySignature of 3 flats>
         '''
         if hasattr(value, 'diatonic'): # its an Interval class
+            intervalObj = value
+        elif hasattr(value, 'classes') and 'GenericInterval' in value.classes:
             intervalObj = value
         else: # try to process
             intervalObj = interval.Interval(value)

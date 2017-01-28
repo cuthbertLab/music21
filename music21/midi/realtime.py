@@ -26,6 +26,7 @@ import unittest
 
 from music21.exceptions21 import Music21Exception
 from music21.midi import translate as midiTranslate
+from music21 import defaults
 
 from music21.ext import six
 
@@ -60,10 +61,12 @@ class StreamPlayer(object):
     
     >>> #_DOCS_SHOW b = corpus.parse('bwv66.6')
     >>> #_DOCS_SHOW for n in b.flat.notes:
-    >>> class Mock(): midi = 20 #_DOCS_HIDE -- should not playback in doctests, see TestExternal
+    >>> class PitchMock(): midi = 20 #_DOCS_HIDE
+    >>> class Mock(): pitch = PitchMock() #_DOCS_HIDE 
+    >>> #_DOCS_HIDE -- should not playback in doctests, see TestExternal
     >>> n = Mock() #_DOCS_HIDE
     >>> for i in [1]: #_DOCS_HIDE
-    ...    n.microtone = keyDetune[n.midi]
+    ...    n.pitch.microtone = keyDetune[n.pitch.midi]
     >>> #_DOCS_SHOW sp = midi.realtime.StreamPlayer(b)
     >>> #_DOCS_SHOW sp.play()
      
@@ -114,6 +117,12 @@ class StreamPlayer(object):
     
     def play(self, busyFunction=None, busyArgs=None, 
              endFunction=None, endArgs=None, busyWaitMilliseconds=50):
+        '''
+        busyFunction is a function that is called with busyArgs when the music is busy every
+        busyWaitMilliseconds.
+        
+        endFunction is a function that is called with endArgs when the music finishes playing.    
+        '''
         streamStringIOFile = self.getStringOrBytesIOFile()
         self.playStringIOFile(streamStringIOFile, busyFunction, busyArgs, 
                               endFunction, endArgs, busyWaitMilliseconds)
@@ -125,6 +134,12 @@ class StreamPlayer(object):
     
     def playStringIOFile(self, stringIOFile, busyFunction=None, busyArgs=None, 
                          endFunction=None, endArgs=None, busyWaitMilliseconds=50):
+        '''
+        busyFunction is a function that is called with busyArgs when the music is busy every
+        busyWaitMilliseconds.
+        
+        endFunction is a function that is called with endArgs when the music finishes playing.    
+        '''
         pygameClock = self.pygame.time.Clock()
         try:
             self.pygame.mixer.music.load(stringIOFile)
@@ -156,7 +171,7 @@ class TestExternal(unittest.TestCase):
         for i in range(0, 127):
             keyDetune.append(random.randint(-30, 30))
         for n in b.flat.notes:
-            n.microtone = keyDetune[n.midi]
+            n.pitch.microtone = keyDetune[n.pitch.midi]
         sp = StreamPlayer(b)
         sp.play()
 
@@ -184,12 +199,13 @@ class TestExternal(unittest.TestCase):
         for i in range(0, 127):
             keyDetune.append(random.randint(-30, 30))
         for n in b.flat.notes:
-            n.microtone = keyDetune[n.midi]
+            n.pitch.microtone = keyDetune[n.pitch.midi]
         sp = StreamPlayer(b)
         sp.play(busyFunction=busyCounter, busyArgs=[timeCounter], busyWaitMilliseconds=500)
             
     def xtestPlayOneMeasureAtATime(self):
         from music21 import corpus
+        defaults.ticksAtStart = 0
         b = corpus.parse('bwv66.6')
         measures = [] # store for later
         maxMeasure = len(b.parts[0].getElementsByClass('Measure'))

@@ -58,6 +58,10 @@ class OmrGroundTruthPair(object):
     
     @property
     def debug(self):
+        '''
+        Returns either the debug value set for this
+        evaluator, or globalDebug
+        '''
         if self._overriddenDebug is None:
             return globalDebug
         else:

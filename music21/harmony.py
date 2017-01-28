@@ -25,6 +25,7 @@ from music21 import exceptions21
 from music21 import interval
 from music21 import key
 from music21 import pitch
+from music21 import style
 
 from music21.ext import six
 from music21.figuredBass import realizerScale
@@ -164,6 +165,7 @@ class Harmony(chord.Chord):
     Accepts a keyword 'updatePitches'. By default it
     is True, but can be set to False to initialize faster if pitches are not needed.
     '''
+    _styleClass = style.TextStyle
     
     ### INITIALIZER ###
 
@@ -200,6 +202,10 @@ class Harmony(chord.Chord):
         if updatePitches and self._figure is not None or self._root or self._bass:            
             self._updatePitches()
         self._updateBasedOnXMLInput(keywords)
+        
+        # fix Root in sus4... There might be a better place for this, but damn if I know...
+        if self._figure is not None and 'sus' in self._figure and 'sus2' not in self._figure:
+            self.root(self.bass())
 
     ### SPECIAL METHODS ###
 
@@ -252,6 +258,7 @@ class Harmony(chord.Chord):
                 self.duration = duration.Duration(keywords[kw])
             else:
                 pass
+            
 
     ### PUBLIC PROPERTIES ###
 
@@ -402,7 +409,7 @@ class Harmony(chord.Chord):
     def writeAsChord(self):
         '''
         Boolean attribute of all harmony objects that specifies how this 
-        object will be written to the musicxml of a stream. If true 
+        object will be written to the musicxml of a stream. If `True` 
         (default for romanNumerals), the chord with pitches is written. If 
         False (default for ChordSymbols) the harmony symbol is written.
         '''
@@ -540,6 +547,9 @@ class ChordStepModification(object):
     @property
     def degree(self):
         '''
+        Returns or sets an integer specifying the scale degree
+        that this ChordStepModification alters.
+        
         >>> hd = harmony.ChordStepModification()
         >>> hd.degree = 3
         >>> hd.degree
@@ -563,7 +573,8 @@ class ChordStepModification(object):
     def interval(self):
         '''
         Get or set the alteration of this degree as a 
-        :class:`~music21.interval.Interval` object.
+        :class:`~music21.interval.Interval` object, generally
+        as a type of ascending or descending augmented unison.
         
         >>> hd = harmony.ChordStepModification()
         >>> hd.interval = 1
@@ -572,7 +583,22 @@ class ChordStepModification(object):
 
         >>> hd.interval = -2
         >>> hd.interval
-        <music21.interval.Interval AA-1>        
+        <music21.interval.Interval AA-1>
+
+        >>> hd.interval = 0
+        >>> hd.interval
+        <music21.interval.Interval P1>
+
+        >>> hd.interval = interval.Interval('m3')
+        >>> hd.interval
+        <music21.interval.Interval m3> 
+
+        More than 3 half step alteration gets
+        an interval that isn't a prime.
+
+        >>> hd.interval = -4
+        >>> hd.interval
+        <music21.interval.Interval M-3> 
         '''
         return self._interval
 
@@ -585,16 +611,19 @@ class ChordStepModification(object):
             self._interval = value
         else:
             # accept numbers to permit loading from mxl alter specs
-            if value in [1]:
-                self._interval = interval.Interval('a1')
-            elif value in [2]: # double augmented
-                self._interval = interval.Interval('aa1')
-            elif value in [-1]:
-                self._interval = interval.Interval('-a1')
-            elif value in [-2]:
-                self._interval = interval.Interval('-aa1')
+            numAs = abs(value)
+            if numAs <= 3:
+                if numAs == 0:
+                    aStr = 'P'
+                else:
+                    aStr = 'a' * numAs
+                aStr += '1'
+                if value < 0:
+                    aStr += '-'
+                self._interval = interval.Interval(aStr)
             else: # try to create interval object
                 self._interval = interval.Interval(value)
+                
 
     @property
     def modType(self):
@@ -952,12 +981,17 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
     ('Csus2', 'suspended-second')
     >>> c.root()
     <music21.pitch.Pitch C3>
+    >>> c.bass()
+    <music21.pitch.Pitch C3>
+    
     
     >>> c = chord.Chord(['C3', 'F3', 'G3'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
     ('Csus', 'suspended-fourth')
     >>> c.root()
     <music21.pitch.Pitch C3>
+    >>> c.inversion()
+    0
 
     >>> c = chord.Chord(['C3', 'D-3', 'E3', 'G-3'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
@@ -1215,7 +1249,6 @@ def chordSymbolFromChord(inChord):
     
     >>> harmony.chordSymbolFromChord(chord.Chord(['D3','F3','A3','B-3']))
     <music21.harmony.ChordSymbol B-maj7/D>
-
     '''
     return ChordSymbol(chordSymbolFigureFromChord(inChord))
 
@@ -1717,7 +1750,6 @@ class ChordSymbol(Harmony):
         Harmony object by identifying the root, bass, inversion, kind, and 
         kindStr.
         '''
-
         #remove spaces from prelim Figure...
         prelimFigure = self.figure
         prelimFigure = re.sub(r'\s', '', prelimFigure)
@@ -1814,7 +1846,7 @@ class ChordSymbol(Harmony):
         for degree, alterBy in degrees:
             self.addChordStepModification(
                 ChordStepModification('add', degree, alterBy))
-
+            
     def _updatePitches(self):
         '''
         TODO: EXTREMELY SLOW!

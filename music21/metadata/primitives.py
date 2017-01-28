@@ -463,6 +463,11 @@ class DateSingle(object):
 
     @property
     def relevance(self):
+        '''
+        The relevance attribute takes one of three
+        values, `'certain'`, `'approximate'`, or
+        `'uncertain'`.
+        '''
         return self._relevance
 
     @relevance.setter
@@ -525,6 +530,11 @@ class DateRelative(DateSingle):
 
     @property
     def relevance(self):
+        '''
+        The relevance attribute takes one of four
+        values, `'prior'`, `'after'`, or
+        `'onorbefore'` or `'onorafter'`.
+        '''
         return self._relevance
 
     @relevance.setter
@@ -595,6 +605,10 @@ class DateBetween(DateSingle):
 
     @property
     def relevance(self):
+        '''
+        The relevance attribute takes only one value:
+        `'between'`.
+        '''
         return self._relevance
 
     @relevance.setter
@@ -667,6 +681,10 @@ class DateSelection(DateSingle):
 
     @property
     def relevance(self):
+        '''
+        The relevance attribute takes only one value:
+        `'or'`.
+        '''
         return self._relevance
 
     @relevance.setter

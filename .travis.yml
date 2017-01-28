@@ -17,14 +17,20 @@ before_install:
     - export PYTHONPATH=/home/travis/cuthbertLab/music21base
     - export DISPLAY=:99.0
     - sh -e /etc/init.d/xvfb start
-    - conda update --yes conda
+    - echo next line commented out temporarily because of problems with conda and numpy/enum34...
+    - echo conda update --yes conda
     - wget -q http://download.linuxaudio.org/lilypond/binaries/linux-64/lilypond-2.19.15-1.linux-64.sh
     - pip install coveralls
     - sh lilypond-2.19.15-1.linux-64.sh --batch
     - export PATH=/home/travis/bin:$PATH
 
 install:
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib setuptools coverage
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION pyqt
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy 
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION scipy 
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION matplotlib 
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION setuptools 
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION coverage
     - cd ..
     - mv music21 music21base
     - cd music21base
