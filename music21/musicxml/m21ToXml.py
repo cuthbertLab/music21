@@ -3753,7 +3753,7 @@ class MeasureExporter(XMLExporterBase):
             return mxDirection
         else:
             return self.textExpressionToXml(coda.getTextExpression())
-    
+
     def tempoIndicationToXml(self, ti):
         '''
         returns a <direction> tag for a single tempo indication.
@@ -3831,8 +3831,6 @@ class MeasureExporter(XMLExporterBase):
           </direction-type>
         </direction>
         '''
-        # if writing just a sound tag, place an empty words tag in a 
-        # direction type and then follow with sound declaration
         # storing lists to accommodate metric modulations
         durs = [] # duration objects
         numbers = [] # tempi
@@ -3884,7 +3882,14 @@ class MeasureExporter(XMLExporterBase):
         else:
             mxMetro.set('parentheses', 'no') # only attribute        
 
-        mxDirection = self.placeInDirection(mxMetro, ti)
+        # if writing just a sound tag, place an empty words tag in a
+        # direction type and then follow with sound declaration
+        if len(durs) > 0:
+            mxDirection = self.placeInDirection(mxMetro, ti)
+        else:
+            mxWords = Element('words')
+            mxDirection = self.placeInDirection(mxWords, ti)
+
         if soundingQuarterBPM is not None:
             mxSound = SubElement(mxDirection, 'sound')
             mxSound.set('tempo', str(common.numToIntOrFloat(soundingQuarterBPM)))
