@@ -4246,6 +4246,21 @@ class MeasureExporter(XMLExporterBase):
             </metronome>
           </direction-type>
         </direction>
+
+        This is the case where only a sound tag is added and no metronomemark
+
+        >>> mm = tempo.MetronomeMark()
+        >>> mm.numberSounding = 60
+
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> mxDirection = MEX.tempoIndicationToXml(mm)
+        >>> MEX.dump(mxDirection)
+        <direction>
+          <direction-type>
+            <words />
+          </direction-type>
+          <sound tempo="60" />
+        </direction>
         '''
         # storing lists to accommodate metric modulations
         durs = [] # duration objects
