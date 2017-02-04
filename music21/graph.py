@@ -2482,7 +2482,7 @@ class PlotStream(object):
         >>> a.ticksQuarterLength()
         [[-3.0, '0.1...'], [-2.0, '0.25'], [-1.0, '0.5'], [0.0, '1.0'], [1.0, '2.0']]
 
-        >>> a.ticksQuarterLength(remap = False)
+        >>> a.ticksQuarterLength(remap=False)
         [[0.125, '0.1...'], [0.25, '0.25'], [0.5, '0.5'], [1.0, '1.0'], [2.0, '2.0']]
 
         The second entry is 0.125 but gets rounded differently in python 2 (1.3) and python 3
@@ -2496,7 +2496,7 @@ class PlotStream(object):
         mapping = sSrc.attributeCount([note.Note, chord.Chord], 'quarterLength')
 
         ticks = []
-        for ql in sorted(mapping.keys()):
+        for ql in sorted(mapping):
             if remap:
                 x = self.remapQuarterLength(ql)
             else:

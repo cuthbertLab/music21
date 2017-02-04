@@ -377,7 +377,7 @@ class LanguageDetector(object):
     def mostLikelyLanguage(self, excerpt):
         '''
         returns the code of the most likely language for a passage, works on 
-        unicode or ascii. current languages: en, fr, de, it, cn
+        unicode or ascii. current languages: en, fr, de, it, cn, or None
         
         >>> ld = text.LanguageDetector()
         >>> ld.mostLikelyLanguage("Hello there, how are you doing today? " + 
@@ -387,7 +387,13 @@ class LanguageDetector(object):
         'it'
         >>> ld.mostLikelyLanguage("Credo in unum deum. Patrem omnipotentem. Factorum celi")
         'la'
+
+        >>> ld = text.LanguageDetector()
+        >>> ld.mostLikelyLanguage("") is None
+        True
         '''
+        if not excerpt:
+            return None
         excTrigram = Trigram(excerpt)
         maxLang = ""
         maxDifference = 1.0
