@@ -295,7 +295,7 @@ class ConverterIPython(SubConverter):
         
         if subformats and subformats[0] == 'vexflow':
             return self.vfshow(obj)
-            #subformats = ['lilypond','png']
+            #subformats = ['lilypond', 'png']
         if subformats:
             helperFormat = subformats[0]
             helperSubformats = subformats[1:]
@@ -462,7 +462,7 @@ class ConverterText(SubConverter):
     Two keyword options are allowed: addEndTimes=Boolean and useMixedNumerals=Boolean
     '''
     
-    registerFormats = ('text','txt','t')
+    registerFormats = ('text', 'txt', 't')
     registerOutputExtensions = ('txt',)
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):
@@ -689,7 +689,7 @@ class ConverterNoteworthyBinary(SubConverter):
 class ConverterMusicXML(SubConverter):
     '''Converter for MusicXML using the 2015 ElementTree system
     '''
-    registerFormats = ('musicxml','xml')
+    registerFormats = ('musicxml', 'xml')
     registerInputExtensions = ('xml', 'mxl', 'mx', 'musicxml')
     registerOutputExtensions = ('xml', 'mxl')
     registerOutputSubformatExtensions = {'png': 'png',

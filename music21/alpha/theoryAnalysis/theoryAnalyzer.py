@@ -177,9 +177,9 @@ environLocal = environment.Environment(_MOD)
 
 class Analyzer(object):
     _DOC_ORDER = ['getVerticalities', 'getVLQs', 'getThreeNoteLinearSegments', 
-              'getLinearSegments', 'getVerticalityNTuplets','getHarmonicIntervals', 
+              'getLinearSegments', 'getVerticalityNTuplets', 'getHarmonicIntervals', 
               'getMelodicIntervals', 'getParallelFifths', 'getPassingTones', 
-              'getNeighborTones','getParallelOctaves', 'identifyParallelFifths',  
+              'getNeighborTones', 'getParallelOctaves', 'identifyParallelFifths',  
               'identifyParallelOctaves', 'identifyParallelUnisons',
               'identifyHiddenFifths', 'identifyHiddenOctaves', 'identifyImproperResolutions',
               'identifyLeapNotSetWithStep', 'identifyOpensIncorrectly', 
@@ -196,7 +196,7 @@ class Analyzer(object):
               'identifyScaleDegrees', 'identifyMotionType', 
               'identifyCommonPracticeErrors',
               'addAnalysisData', 'removeFromAnalysisData', 'setKeyMeasureMap', 
-              'getKeyMeasureMap','getKeyAtMeasure',
+              'getKeyMeasureMap', 'getKeyAtMeasure',
               'getResultsString', 'colorResults', 'getHTMLResultsString', 
               'getAllPartNumPairs', 'getNotes'
             ]
@@ -271,9 +271,9 @@ class Analyzer(object):
     
         >>> sc4 = stream.Score()
         >>> part4 = stream.Part()
-        >>> part4.append(chord.Chord(['A','B','C']))
-        >>> part4.append(chord.Chord(['A','B','C']))
-        >>> part4.append(chord.Chord(['A','B','C']))
+        >>> part4.append(chord.Chord(['A', 'B', 'C']))
+        >>> part4.append(chord.Chord(['A', 'B', 'C']))
+        >>> part4.append(chord.Chord(['A', 'B', 'C']))
         >>> sc4.insert(part4)
         
         >>> ads.getVerticalities(sc4)
@@ -322,7 +322,7 @@ class Analyzer(object):
                                                                   mustBeginInSpan=False, 
                                                                   classList=classFilterList)
                     #el = part.flat.getElementAtOrBefore(c.offset,classList=[
-                    #            'Note','Rest', 'Chord', 'Harmony'])
+                    #            'Note', 'Rest', 'Chord', 'Harmony'])
                     for el in elementStream.elements:
                         contentDict[partNum].append(el)    
                     partNum +=1
@@ -331,7 +331,7 @@ class Analyzer(object):
                                                                mustBeginInSpan=False, 
                                                                classList=classFilterList)
                 #el = part.flat.getElementAtOrBefore(c.offset,
-                #            classList=['Note','Rest', 'Chord', 'Harmony'])
+                #            classList=['Note', 'Rest', 'Chord', 'Harmony'])
                 for el in elementStream.elements:
                     contentDict[partNum].append(el)    
                 partNum += 1
@@ -464,10 +464,10 @@ class Analyzer(object):
     
         >>> sc2 = stream.Score()
         >>> part1 = stream.Part()
-        >>> part1.append(chord.Chord(['C','E','G']))
-        >>> part1.append(chord.Chord(['G','B','D']))
-        >>> part1.append(chord.Chord(['E','G','C']))
-        >>> part1.append(chord.Chord(['F','A','C']))
+        >>> part1.append(chord.Chord(['C', 'E', 'G']))
+        >>> part1.append(chord.Chord(['G', 'B', 'D']))
+        >>> part1.append(chord.Chord(['E', 'G', 'C']))
+        >>> part1.append(chord.Chord(['F', 'A', 'C']))
         >>> sc2.insert(part1)
         >>> ads.getLinearSegments(sc2, 0, 2, ['Chord'])
         [<music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.chord.Chord C E G>, 
@@ -656,7 +656,7 @@ class Analyzer(object):
         'P4'
         '''
         mInvList = []
-        noteList = score.parts[partNum].flat.getElementsByClass(['Note','Rest'])
+        noteList = score.parts[partNum].flat.getElementsByClass(['Note', 'Rest'])
         for (i,n1) in enumerate(noteList[:-1]):
             n2 = noteList[i + 1]
             
@@ -686,7 +686,7 @@ class Analyzer(object):
     
         '''
         noteList = []
-        noteOrRestList = score.parts[partNum].flat.getElementsByClass(['Note','Rest'])
+        noteOrRestList = score.parts[partNum].flat.getElementsByClass(['Note', 'Rest'])
         for nr in noteOrRestList:
             if nr.isClassOrSubclass(['Note']):
                 n = nr
@@ -2030,7 +2030,7 @@ class Analyzer(object):
         def textFunction(vs, rn):
             notes = ''
             for n in vs.getObjectsByClass('Note'):
-                notes+= n.name + ','
+                notes += n.name + ','
             notes = notes[:-1]
             return "Roman Numeral of " + notes + ' is ' + rn
         
@@ -2125,7 +2125,7 @@ class Analyzer(object):
                             + ' and ' + hIntv.noteEnd.name + ' between parts ' + str(pn1 + 1)
                             + ' and ' + str(pn2 + 1) + ' is a ' + str(hIntv.niceName))
         def valueFunction(hIntv):
-            augordimIntervals = ['A4','d5']
+            augordimIntervals = ['A4', 'd5']
             if hIntv.simpleName in augordimIntervals:
                 return hIntv.simpleName
             else:

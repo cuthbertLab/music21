@@ -917,7 +917,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
 #         return False
 #     if not (bassB.ps - bassA.ps == -1.0 and rootB.ps - rootA.ps == 1.0):
 #         return False
-#     allowedIntervalNames = ['M3','m3','M2','m-2']
+#     allowedIntervalNames = ['M3', 'm3', 'M2', 'm-2']
 #     for pitchIndex in range(len(pairsList) - 1):
 #         if pitchIndex == rootIndex:
 #             continue

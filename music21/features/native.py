@@ -862,7 +862,7 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
         
         m = googleResultsRE.search(the_page)
         if m is not None and m.group(0):
-            totalRes = int(m.group(1).replace(',',""))
+            totalRes = int(m.group(1).replace(',', ""))
             if totalRes > 0:
                 resultsLog = math.log(totalRes, 10)
             else: 

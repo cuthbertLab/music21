@@ -103,9 +103,9 @@ def iqChordsAndPercentage(analysisStream):
     for element in romMerged:
         if "RomanNumeral" in element.classes:       
             fig = element.figure
-            fig = fig.replace('[no5]','')
-            fig = fig.replace('[no3]','')
-            fig = fig.replace('[no1]','')
+            fig = fig.replace('[no5]', '')
+            fig = fig.replace('[no3]', '')
+            fig = fig.replace('[no1]', '')
             longString = fig + " (" + str(int(
                             element.duration.quarterLength * 10000 / totalDuration) / 100) + ") "
             if active == 'major':

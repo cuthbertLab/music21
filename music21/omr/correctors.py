@@ -1058,29 +1058,29 @@ class MeasureHash(object):
         
         Replacement of eighth note (F) for quarter note (P) = shift of one value:
         
-        >>> mh.getProbabilityOnSubstitute('F','P')
+        >>> mh.getProbabilityOnSubstitute('F', 'P')
         0.0165
         
         Replacement of eighth note (F) for eighth rest (G) = shift of one type:
         
-        >>> mh.getProbabilityOnSubstitute('F','G')
+        >>> mh.getProbabilityOnSubstitute('F', 'G')
         0.003
         
         Omission of any symbol, less common so costs more
         The proposed correction assumes that the incorrect measure omitted a symbol
         
-        >>> mh.getProbabilityOnSubstitute('','P')
+        >>> mh.getProbabilityOnSubstitute('', 'P')
         0.009
         
         Addition of any symbol, less common so costs more
         The proposed correction assumes that the incorrect measure added a symbol
         
-        >>> mh.getProbabilityOnSubstitute('P','')
+        >>> mh.getProbabilityOnSubstitute('P', '')
         0.004
         
         Combination of value shift and an addition:
         
-        >>> mh.getProbabilityOnSubstitute('F','PP')
+        >>> mh.getProbabilityOnSubstitute('F', 'PP')
         0.0001485
         
         
@@ -1116,31 +1116,31 @@ class MeasureHash(object):
         
         Eighth note to eighth rest:
         
-        >>> mh.getProbabilityFromOneCharSub('F','G')
+        >>> mh.getProbabilityFromOneCharSub('F', 'G')
         0.003
         
         Eighth note to quarter note:
         
-        >>> mh.getProbabilityFromOneCharSub('F','P')
+        >>> mh.getProbabilityFromOneCharSub('F', 'P')
         0.0165
         
         Eighth note to half note:
         
-        >>> mh.getProbabilityFromOneCharSub('F','Z')
+        >>> mh.getProbabilityFromOneCharSub('F', 'Z')
         0.0002722...
         
         Quarter note to dotted quarter note:
         
-        >>> mh.getProbabilityFromOneCharSub('P','V')
+        >>> mh.getProbabilityFromOneCharSub('P', 'V')
         0.009
         
         
         Dotted quarter note to quarter note:
         
-        >>> mh.getProbabilityFromOneCharSub('V','P')
+        >>> mh.getProbabilityFromOneCharSub('V', 'P')
         0.004
         
-        >>> mh.getProbabilityFromOneCharSub('A','Y')
+        >>> mh.getProbabilityFromOneCharSub('A', 'Y')
         3.6e-05
         '''
         charDiff = ord(source)-ord(destination)

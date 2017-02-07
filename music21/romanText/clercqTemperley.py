@@ -542,7 +542,7 @@ class CTRule(object):
     has a :meth:`~music21.romanText.clercqTemperley.CTRUle.streamFromCTSong` attribute, 
     which is the stream from the entire score that the rule corresponds to.
     '''
-    _DOC_ORDER = ['LHS', 'sectionName','musicText', 'homeTimeSig', 'homeKeySig', 'comments']
+    _DOC_ORDER = ['LHS', 'sectionName', 'musicText', 'homeTimeSig', 'homeKeySig', 'comments']
     _DOC_ATTR = {'text': 'the full text of the CTRule, including the LHS, chords, and comments'}
     
     SPLITMEASURES = re.compile(r'(\|\*?\d*)')

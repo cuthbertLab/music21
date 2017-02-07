@@ -43,7 +43,9 @@ def nipsBuild(useOurExtractors = True, buildSet = 1, evaluationMethod = 'coarse'
     
     
     ourExtractors = ['cs12', 'p22', 'k1', 'ql1', 'ql2', 'ql3', 'ql4', 'md1', ]
-    jSymbolicExtrators = ['m1','m2','m3','m4','m5','m6','m7','m9','m10','m11','m12','m13','m14','m15','m17','m18','m19','r23','r32','r33','r35','p3','p4','p5','p6','p7','p10','p12','p15']
+    jSymbolicExtrators = ['m1', 'm2', 'm3', 'm4', 'm5', 'm6', 'm7', 'm9', 'm10', 'm11', 'm12', 
+                          'm13', 'm14', 'm15', 'm17', 'm18', 'm19', 'r23', 'r32', 'r33', 'r35', 
+                          'p3', 'p4', 'p5', 'p6', 'p7', 'p10', 'p12', 'p15']
 
     if useOurExtractors is True:
         FEs = features.extractorsById(ourExtractors)

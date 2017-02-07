@@ -184,7 +184,7 @@ def transposeStreamDiatonic(myStream, diatonicInterval=1):
 
 
 PERFCONS = ['P1', 'P5', 'P8']
-IMPERFCONS = ['m3','M3','m6','M6']
+IMPERFCONS = ['m3', 'M3', 'm6', 'M6']
 
 cachedParts = {}
 

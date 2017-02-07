@@ -109,7 +109,7 @@ class Scale(base.Music21Object):
         or single Pitch), 
         extract all unique Pitches using comparisonAttribute to test for them.
         
-        >>> pStrList = ['A4','D4','E4','F-4','D4','D5', 'A', 'D#4']
+        >>> pStrList = ['A4', 'D4', 'E4', 'F-4', 'D4', 'D5', 'A', 'D#4']
         >>> pList = [pitch.Pitch(p) for p in pStrList]
         >>> nList = [note.Note(p) for p in pStrList]
         >>> s = stream.Stream()
@@ -2213,7 +2213,7 @@ class ConcreteScale(Scale):
         Create a scale like a Harmonic minor but with flat 2 and sharp 4
         
         >>> e = scale.ConcreteScale(pitches=['A4', 'B-4', 'C5', 'D#5', 'E5', 'F5', 'G#5', 'A5'])
-        >>> f = e.deriveRanked(['C','E','G'])
+        >>> f = e.deriveRanked(['C', 'E', 'G'])
         >>> f
         [(3, <music21.scale.ConcreteScale E Concrete>), 
          (3, <music21.scale.ConcreteScale D- Concrete>), 
@@ -2908,8 +2908,8 @@ class ChromaticScale(ConcreteScale):
     '''
     def __init__(self, tonic=None):
         super(ChromaticScale, self).__init__(tonic=tonic)
-        self._abstract = AbstractCyclicalScale(mode=['m2','m2','m2',
-            'm2','m2','m2', 'm2','m2','m2','m2','m2','m2'])
+        self._abstract = AbstractCyclicalScale(mode=['m2', 'm2', 'm2',
+            'm2', 'm2', 'm2', 'm2', 'm2', 'm2', 'm2', 'm2', 'm2'])
         self._abstract._net.pitchSimplification = 'mostCommon'
         self.type = 'Chromatic'
 

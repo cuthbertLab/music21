@@ -463,7 +463,7 @@ class Chord(note.NotRest):
         
         By default we show only the generic interval:
 
-        >>> c1 = chord.Chord(['C2','E2','G2','C3'])
+        >>> c1 = chord.Chord(['C2', 'E2', 'G2', 'C3'])
         >>> c2 = c1.annotateIntervals(inPlace=False)
         >>> c2.lyrics
         [<music21.note.Lyric number=1 syllabic=single text="8">, 
@@ -611,7 +611,7 @@ class Chord(note.NotRest):
         not intended, set find to False when calling this method, and 'None'
         will be returned if no bass is specified
 
-        >>> c = chord.Chord(['E3','G3','B4'])
+        >>> c = chord.Chord(['E3', 'G3', 'B4'])
         >>> c.bass(find=False) == None
         True
 
@@ -746,7 +746,7 @@ class Chord(note.NotRest):
 
         complex chord for semiclosed-position testing...
 
-        >>> c8 = chord.Chord(['C3','E5','C#6','E-7', 'G8','C9','E#9'])
+        >>> c8 = chord.Chord(['C3', 'E5', 'C#6', 'E-7', 'G8', 'C9', 'E#9'])
         >>> c8.closedPosition(inPlace=True)
         >>> c8
         <music21.chord.Chord C3 C#3 E-3 E3 E#3 G3>
@@ -912,7 +912,7 @@ class Chord(note.NotRest):
         >>> chord.Chord("F3 A3 C4 E-4 G-4 B4 D5").findRoot()
         <music21.pitch.Pitch F3>
 
-        >>> lotsOfNotes = chord.Chord(['E3','C4','G4','B-4','E5','G5'])
+        >>> lotsOfNotes = chord.Chord(['E3', 'C4', 'G4', 'B-4', 'E5', 'G5'])
         >>> r = lotsOfNotes.findRoot()
         >>> r
         <music21.pitch.Pitch C4>
@@ -1500,13 +1500,13 @@ class Chord(note.NotRest):
         >>> GNinth4thInversion.inversion()
         4
 
-        >>> BbEleventh5thInversion = chord.Chord(['B-','D','F','A','C','E-'])
+        >>> BbEleventh5thInversion = chord.Chord(['B-', 'D', 'F', 'A', 'C', 'E-'])
         >>> BbEleventh5thInversion.bass(pitch.Pitch('E-4'))
         >>> BbEleventh5thInversion.inversion()
         5
 
 
-        >>> GMajRepeats = chord.Chord(['G4','B5','G6','B6','D7'])
+        >>> GMajRepeats = chord.Chord(['G4', 'B5', 'G6', 'B6', 'D7'])
         >>> GMajRepeats.inversion(2)
         >>> GMajRepeats
         <music21.chord.Chord D7 G7 B7 G8 B8>
@@ -1654,7 +1654,7 @@ class Chord(note.NotRest):
         (N.B. a French/Swiss sixth technically needs to be in second inversion)
 
 
-        >>> c = chord.Chord(['A-3','C4','E-4','F#4'])
+        >>> c = chord.Chord(['A-3', 'C4', 'E-4', 'F#4'])
         >>> c.isAugmentedSixth()
         True
 
@@ -1669,7 +1669,7 @@ class Chord(note.NotRest):
 
         Italian...
 
-        >>> c = chord.Chord(['A-3','C4', 'F#4'])
+        >>> c = chord.Chord(['A-3', 'C4', 'F#4'])
         >>> c.isAugmentedSixth()
         True
         '''
@@ -1758,15 +1758,15 @@ class Chord(note.NotRest):
         >>> c2.isConsonant()
         False
 
-        >>> c3 = chord.Chord(['F2','A2','C3','E-3'])
+        >>> c3 = chord.Chord(['F2', 'A2', 'C3', 'E-3'])
         >>> c3.isConsonant()
         False
 
-        >>> c4 = chord.Chord(['C1','G1','C2','G2','C3','G3'])
+        >>> c4 = chord.Chord(['C1', 'G1', 'C2', 'G2', 'C3', 'G3'])
         >>> c4.isConsonant()
         True
 
-        >>> c5 = chord.Chord(['G1','C2','G2','C3','G3'])
+        >>> c5 = chord.Chord(['G1', 'C2', 'G2', 'C3', 'G3'])
         >>> c5.isConsonant()
         False
 
@@ -1774,29 +1774,29 @@ class Chord(note.NotRest):
         >>> c6.isConsonant()
         True
 
-        >>> c7 = chord.Chord(['C1','C#1','D-1'])
+        >>> c7 = chord.Chord(['C1', 'C#1', 'D-1'])
         >>> c7.isConsonant()
         False
 
         Spelling does matter:
 
-        >>> c8 = chord.Chord(['D-4','G#4'])
+        >>> c8 = chord.Chord(['D-4', 'G#4'])
         >>> c8.isConsonant()
         False
 
-        >>> c9 = chord.Chord(['D3','A2','D2','D2','A4'])
+        >>> c9 = chord.Chord(['D3', 'A2', 'D2', 'D2', 'A4'])
         >>> c9.isConsonant()
         True
 
-        >>> c10 = chord.Chord(['D3','A2','D2','D2','A1'])
+        >>> c10 = chord.Chord(['D3', 'A2', 'D2', 'D2', 'A1'])
         >>> c10.isConsonant()
         False
 
-        >>> c11 = chord.Chord(['F3','D4','A4'])
+        >>> c11 = chord.Chord(['F3', 'D4', 'A4'])
         >>> c11.isConsonant()
         True
 
-        >>> c12 = chord.Chord(['F3','D4','A4','E#4'])
+        >>> c12 = chord.Chord(['F3', 'D4', 'A4', 'E#4'])
         >>> c12.isConsonant()
         False
 
@@ -1804,7 +1804,7 @@ class Chord(note.NotRest):
 
         Weird things used to happen when some notes have octaves and some don't:
 
-        >>> c13 = chord.Chord(['A4','B4','A'])
+        >>> c13 = chord.Chord(['A4', 'B4', 'A'])
         >>> c14 = c13.removeRedundantPitchNames(inPlace=False)
         >>> c14
         <music21.chord.Chord A4 B4>
@@ -1997,17 +1997,17 @@ class Chord(note.NotRest):
         in second inversion to begin with, otherwise its not
         a Fr+6 chord. This is to avoid ChordException errors.
 
-        >>> fr6a = chord.Chord(['A-3','C4','D4','F#4'])
+        >>> fr6a = chord.Chord(['A-3', 'C4', 'D4', 'F#4'])
         >>> fr6a.isFrenchAugmentedSixth()
         True
 
-        >>> fr6b = chord.Chord(['A-3','C4','E--4','F#4'])
+        >>> fr6b = chord.Chord(['A-3', 'C4', 'E--4', 'F#4'])
         >>> fr6b.isFrenchAugmentedSixth()
         False
 
         Inversion matters...
     
-        >>> fr6c = chord.Chord(['C4','D4','F#4', 'A-4'])
+        >>> fr6c = chord.Chord(['C4', 'D4', 'F#4', 'A-4'])
         >>> fr6c.isFrenchAugmentedSixth()
         False
 
@@ -2016,7 +2016,7 @@ class Chord(note.NotRest):
         >>> chord.Chord().isFrenchAugmentedSixth()
         False        
 
-        >>> fr6d = chord.Chord(['A-3','C-4','D4','F#4'])
+        >>> fr6d = chord.Chord(['A-3', 'C-4', 'D4', 'F#4'])
         >>> fr6d.isFrenchAugmentedSixth()
         False
         '''
@@ -2127,17 +2127,17 @@ class Chord(note.NotRest):
         Chord must be spelled correctly. Otherwise returns false.
 
 
-        >>> c1 = chord.Chord(['C4','E-4','G-4','B-4'])
+        >>> c1 = chord.Chord(['C4', 'E-4', 'G-4', 'B-4'])
         >>> c1.isHalfDiminishedSeventh()
         True
 
         Incorrectly spelled chords are not considered half-diminished sevenths
-        >>> c2 = chord.Chord(['C4','E-4','G-4','A#4'])
+        >>> c2 = chord.Chord(['C4', 'E-4', 'G-4', 'A#4'])
         >>> c2.isHalfDiminishedSeventh()
         False
 
         Nor are incomplete chords
-        >>> c3 = chord.Chord(['C4', 'G-4','B-4'])
+        >>> c3 = chord.Chord(['C4', 'G-4', 'B-4'])
         >>> c3.isHalfDiminishedSeventh()
         False
         
@@ -2166,7 +2166,7 @@ class Chord(note.NotRest):
         a dyad of root and major third
 
 
-        >>> c1 = chord.Chord(['C4','E3'])
+        >>> c1 = chord.Chord(['C4', 'E3'])
         >>> c1.isMajorTriad()
         False
         >>> c1.isIncompleteMajorTriad()
@@ -2176,13 +2176,13 @@ class Chord(note.NotRest):
         Note that complete major triads return False:
 
 
-        >>> c2 = chord.Chord(['C4','E3', 'G5'])
+        >>> c2 = chord.Chord(['C4', 'E3', 'G5'])
         >>> c2.isIncompleteMajorTriad()
         False
 
         Remember, MAJOR Triad...
         
-        >>> c3 = chord.Chord(['C4','E-3'])
+        >>> c3 = chord.Chord(['C4', 'E-3'])
         >>> c3.isIncompleteMajorTriad()
         False
         
@@ -2210,17 +2210,17 @@ class Chord(note.NotRest):
         a dyad of root and minor third
 
 
-        >>> c1 = chord.Chord(['C4','E-3'])
+        >>> c1 = chord.Chord(['C4', 'E-3'])
         >>> c1.isMinorTriad()
         False
         >>> c1.isIncompleteMinorTriad()
         True
-        >>> c2 = chord.Chord(['C4','E-3', 'G5'])
+        >>> c2 = chord.Chord(['C4', 'E-3', 'G5'])
         >>> c2.isIncompleteMinorTriad()
         False
 
         OMIT_FROM_DOCS
-        >>> c3 = chord.Chord(['C4','E3'])
+        >>> c3 = chord.Chord(['C4', 'E3'])
         >>> c3.isIncompleteMinorTriad()
         False
 
@@ -2249,23 +2249,23 @@ class Chord(note.NotRest):
 
         If restrictDoublings is set to True then only the tonic may be doubled.
 
-        >>> c1 = chord.Chord(['A-4','C5','F#6'])
+        >>> c1 = chord.Chord(['A-4', 'C5', 'F#6'])
         >>> c1.isItalianAugmentedSixth()
         True
 
 
         Spelling matters:
 
-        >>> c2 = chord.Chord(['A-4','C5','G-6'])
+        >>> c2 = chord.Chord(['A-4', 'C5', 'G-6'])
         >>> c2.isItalianAugmentedSixth()
         False
         
         So does inversion:
         
-        >>> c3 = chord.Chord(['F#4','C5','A-6'])
+        >>> c3 = chord.Chord(['F#4', 'C5', 'A-6'])
         >>> c3.isItalianAugmentedSixth()
         False
-        >>> c4 = chord.Chord(['C5','A-5','F#6'])
+        >>> c4 = chord.Chord(['C5', 'A-5', 'F#6'])
         >>> c4.isItalianAugmentedSixth()
         False
 
@@ -2283,10 +2283,10 @@ class Chord(note.NotRest):
         If doubling rules are turned on then only the tonic can be doubled:
 
 
-        >>> c4 = chord.Chord(['A-4','C5','F#6', 'C6', 'C7'])
+        >>> c4 = chord.Chord(['A-4', 'C5', 'F#6', 'C6', 'C7'])
         >>> c4.isItalianAugmentedSixth(restrictDoublings = True)
         True
-        >>> c5 = chord.Chord(['A-4','C5','F#6', 'C5', 'F#7'])
+        >>> c5 = chord.Chord(['A-4', 'C5', 'F#6', 'C5', 'F#7'])
         >>> c5.isItalianAugmentedSixth(restrictDoublings = True)
         False
         >>> c5.isItalianAugmentedSixth(restrictDoublings = False)
@@ -2356,15 +2356,15 @@ class Chord(note.NotRest):
 
         Notice that the proper spelling of notes is crucial
         
-        >>> chord.Chord(['B-','D','F']).isMajorTriad()
+        >>> chord.Chord(['B-', 'D', 'F']).isMajorTriad()
         True
-        >>> chord.Chord(['A#','D','F']).isMajorTriad()
+        >>> chord.Chord(['A#', 'D', 'F']).isMajorTriad()
         False
         
         (See: :meth:`~music21.chord.Chord.forteClassTn` to catch this case; major triads 
         in the forte system are 3-11B no matter how they are spelled.)
         
-        >>> chord.Chord(['A#','D','F']).forteClassTn == '3-11B'
+        >>> chord.Chord(['A#', 'D', 'F']).forteClassTn == '3-11B'
         True
         
         
@@ -2374,9 +2374,9 @@ class Chord(note.NotRest):
         and G--- = E, so the chord is found to be a major triad, even though it should
         not be.  This bug is now fixed.
         
-        >>> chord.Chord(['C','E###','G---']).isMajorTriad()
+        >>> chord.Chord(['C', 'E###', 'G---']).isMajorTriad()
         False
-        >>> chord.Chord(['C','E','G','E###','G---']).isMajorTriad()
+        >>> chord.Chord(['C', 'E', 'G', 'E###', 'G---']).isMajorTriad()
         False
         
 
@@ -2572,7 +2572,7 @@ class Chord(note.NotRest):
         >>> other.isTriad()
         False
 
-        >>> incorrectlySpelled = chord.Chord(['C','D#','G'])
+        >>> incorrectlySpelled = chord.Chord(['C', 'D#', 'G'])
         >>> incorrectlySpelled.isTriad()
         False
 
@@ -2728,7 +2728,7 @@ class Chord(note.NotRest):
         not intended, set find to False when calling this method, and 'None'
         will be returned if no root is specified
 
-        >>> c = chord.Chord(['E3','G3','B4'])
+        >>> c = chord.Chord(['E3', 'G3', 'B4'])
         >>> c.root(find=False) == None
         True
 
@@ -2760,7 +2760,7 @@ class Chord(note.NotRest):
         a pitch at that step, then it puts it up an octave.  It's a
         very useful display standard for dense post-tonal chords.
 
-        >>> c1 = chord.Chord(['C3','E5','C#6','E-7', 'G8','C9','E#9'])
+        >>> c1 = chord.Chord(['C3', 'E5', 'C#6', 'E-7', 'G8', 'C9', 'E#9'])
         >>> c2 = c1.semiClosedPosition(inPlace=False)
         >>> c2
         <music21.chord.Chord C3 E-3 G3 C#4 E4 E#5>
@@ -2858,7 +2858,7 @@ class Chord(note.NotRest):
 
         Test whether this strange chord gets the B# as 0 semitones:
         
-        >>> c = chord.Chord(['C4','E4','G4','B#4'])
+        >>> c = chord.Chord(['C4', 'E4', 'G4', 'B#4'])
         >>> c.semitonesFromChordStep(7)
         0
 
@@ -2867,7 +2867,7 @@ class Chord(note.NotRest):
         
         A-minor: 1st inversion.
         
-        >>> aMin = chord.Chord(['C4','E4','A4'])
+        >>> aMin = chord.Chord(['C4', 'E4', 'A4'])
         >>> aMin.semitonesFromChordStep(3)
         3
         >>> aMin.semitonesFromChordStep(5)
@@ -2978,7 +2978,7 @@ class Chord(note.NotRest):
         If a chord has two of the same pitch, but each associated with a different notehead, then
         object equality must be used to distinguish between the two.
 
-        >>> c2 = chord.Chord(['D4','D4'])
+        >>> c2 = chord.Chord(['D4', 'D4'])
         >>> secondD4 = c2.pitches[1]
         >>> c2.setNotehead('diamond', secondD4)
         >>> for i in [0,1]:
@@ -3045,7 +3045,7 @@ class Chord(note.NotRest):
         If a chord has two of the same pitch, but each associated with a different notehead, then
         object equality must be used to distinguish between the two.
 
-        >>> c2 = chord.Chord(['D4','D4'])
+        >>> c2 = chord.Chord(['D4', 'D4'])
         >>> secondD4 = c2.pitches[1]
         >>> c2.setNoteheadFill(False, secondD4)
         >>> for i in [0,1]:
@@ -3123,7 +3123,7 @@ class Chord(note.NotRest):
         different stem, then object equality must be used to distinguish
         between the two.
 
-        >>> c2 = chord.Chord(['D4','D4'])
+        >>> c2 = chord.Chord(['D4', 'D4'])
         >>> secondD4 = c2.pitches[1]
         >>> c2.setStemDirection('double', secondD4)
         >>> for i in [0,1]:
@@ -3184,7 +3184,7 @@ class Chord(note.NotRest):
         Setting a tie with a chord with the same pitch twice requires
         getting the exact pitch object out to be sure which one...
 
-        >>> c2 = chord.Chord(['D4','D4'])
+        >>> c2 = chord.Chord(['D4', 'D4'])
         >>> secondD4 = c2.pitches[1]
         >>> c2.setTie('start', secondD4)
         >>> for i in [0,1]:
@@ -3513,7 +3513,7 @@ class Chord(note.NotRest):
     def fifth(self):
         '''Shortcut for getChordStep(5):
 
-        >>> cMaj1stInv = chord.Chord(['E3','C4','G5'])
+        >>> cMaj1stInv = chord.Chord(['E3', 'C4', 'G5'])
         >>> cMaj1stInv.fifth
         <music21.pitch.Pitch G5>
 
@@ -4025,17 +4025,17 @@ class Chord(note.NotRest):
         >>> a.quality
         'augmented'
 
-        >>> a = chord.Chord(['c','c#','d'])
+        >>> a = chord.Chord(['c', 'c#', 'd'])
         >>> a.quality
         'other'
 
         Incomplete triads are returned as major or minor:
 
-        >>> a = chord.Chord(['c','e-'])
+        >>> a = chord.Chord(['c', 'e-'])
         >>> a.quality
         'minor'
 
-        >>> a = chord.Chord(['e-','g'])
+        >>> a = chord.Chord(['e-', 'g'])
         >>> a.quality
         'major'
 
@@ -4172,13 +4172,13 @@ class Chord(note.NotRest):
     def seventh(self):
         '''shortcut for getChordStep(7)
 
-        >>> bDim7_2ndInv = chord.Chord(['F2','A-3','B4','D5'])
+        >>> bDim7_2ndInv = chord.Chord(['F2', 'A-3', 'B4', 'D5'])
         >>> bDim7_2ndInv.seventh
         <music21.pitch.Pitch A-3>
 
         Test whether this strange chord gets the B# not the C or something else:
         
-        >>> c = chord.Chord(['C4','E4','G4','B#4'])
+        >>> c = chord.Chord(['C4', 'E4', 'G4', 'B#4'])
         >>> c.seventh
         <music21.pitch.Pitch B#4>
 
@@ -4189,7 +4189,7 @@ class Chord(note.NotRest):
     def third(self):
         '''Shortcut for getChordStep(3):
 
-        >>> cMaj1stInv = chord.Chord(['E3','C4','G5'])
+        >>> cMaj1stInv = chord.Chord(['E3', 'C4', 'G5'])
         >>> cMaj1stInv.third
         <music21.pitch.Pitch E3>
 
@@ -4209,7 +4209,7 @@ class Chord(note.NotRest):
 
         If setting a tie, tie is applied to all pitches.
 
-        >>> c1 = chord.Chord(['c4','g4'])
+        >>> c1 = chord.Chord(['c4', 'g4'])
         >>> tie1 = tie.Tie('start')
         >>> c1.tie = tie1
         >>> c1.tie

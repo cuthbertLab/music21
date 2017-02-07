@@ -20,7 +20,7 @@ from music21 import common
 #    utility for generating a text file containing all corpus file names
 #    '''
 #    def skip(path):
-#        for skipString in ['.svn','.py','theoryExercises','demos','license.txt']:
+#        for skipString in ['.svn', '.py', 'theoryExercises', 'demos', 'license.txt']:
 #            if skipString in path:
 #                return True
 #        return False
@@ -29,11 +29,12 @@ from music21 import common
 #    i=0
 #    for path in corpus.getCorePaths():
 #        if not skip(path):
-#            pathList.append( path.replace('/home/bhadley/music21Workspace/music21baseubuntu/trunk/music21/corpus/',''))
+#            pathList.append(path.replace(
+#                '/home/bhadley/music21Workspace/music21baseubuntu/trunk/music21/corpus/', ''))
 #            i+=1
 #    print 'Total number of files: ' + str(i)
 #    #Total number of files: 2203
-#    outFile = open('corpusPaths.txt','w')
+#    outFile = open('corpusPaths.txt', 'w')
 #    
 #    for x in pathList:
 #        outFile.write("%s\n" % x)
@@ -60,7 +61,7 @@ def md5OfCorpusFile(fileDir, scoreNumber=None):
     >>> a == b
     True
     
-    >>> md5OfCorpusFile('airdsAirs/book3.abc','413')
+    >>> md5OfCorpusFile('airdsAirs/book3.abc', '413')
     'c1666c19d63fc0940f111008e2269f75.413'
     '''
     

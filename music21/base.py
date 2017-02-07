@@ -631,9 +631,9 @@ class Music21Object(object):
         True
         >>> n.isClassOrSubclass((note.Rest,))
         False
-        >>> n.isClassOrSubclass((note.Note,note.Rest))
+        >>> n.isClassOrSubclass((note.Note, note.Rest))
         True
-        >>> n.isClassOrSubclass(('Rest','Note'))
+        >>> n.isClassOrSubclass(('Rest', 'Note'))
         True
         '''
         return not self.classSet.isdisjoint(classFilterList)
@@ -1151,11 +1151,11 @@ class Music21Object(object):
 
         >>> set(n2.getSpannerSites('DynamicWedge')) == set([sp2, sp3])
         True
-        >>> set(n2.getSpannerSites(['Slur','Diminuendo'])) == set([sp1, sp3])
+        >>> set(n2.getSpannerSites(['Slur', 'Diminuendo'])) == set([sp1, sp3])
         True
 
 
-        >>> set(n2.getSpannerSites(['Slur','Diminuendo'])) == set([sp3, sp1])
+        >>> set(n2.getSpannerSites(['Slur', 'Diminuendo'])) == set([sp3, sp1])
         True
 
 
@@ -4793,7 +4793,7 @@ class Test(unittest.TestCase):
         #The order spanners are returned is generally the order that they were
         #added, but that is not guaranteed, so for safety sake, use set comparisons:
 
-        self.assertEqual(set(n2.getSpannerSites(['Slur','Diminuendo'])), set([sp3, sp1]))
+        self.assertEqual(set(n2.getSpannerSites(['Slur', 'Diminuendo'])), set([sp3, sp1]))
 
 
     def testContextSitesA(self):

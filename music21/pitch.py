@@ -638,7 +638,18 @@ class Microtone(SlottedObjectMixin):
         return not self.__eq__(other)
 
     def __repr__(self):
-        '''Return a string representation
+        '''
+        Return a string representation.
+        
+        >>> m1 = pitch.Microtone(20)
+        >>> repr(m1)
+        '(+20c)'
+        
+        Basically the same as just doing, except with quotes
+        
+        >>> m1
+        (+20c)
+        
         '''
         # cent values may be of any resolution, but round to nearest int
 
@@ -657,7 +668,8 @@ class Microtone(SlottedObjectMixin):
     ### PRIVATE METHODS ###
 
     def _parseString(self, value):
-        '''Parse a string representation.
+        '''
+        Parse a string representation.
         '''
         # strip any delimiters
         value = value.replace(MICROTONE_OPEN, '')
@@ -681,6 +693,9 @@ class Microtone(SlottedObjectMixin):
     def alter(self):
         '''
         Return the microtone value in accidental alter values.
+        
+        >>> pitch.Microtone(20).alter
+        0.2
         '''
         return self.cents * .01
 
@@ -690,6 +705,9 @@ class Microtone(SlottedObjectMixin):
         Return the microtone value in cents.  This is not a settable property.
         To set the value in cents, simply use that value as a creation
         argument.
+
+        >>> pitch.Microtone(20).cents
+        20
         '''
         return _convertHarmonicToCents(self._harmonicShift) + self._centShift
 
@@ -768,13 +786,13 @@ class Accidental(style.StyleMixin):
     def __init__(self, specifier='natural'):
         super(Accidental, self).__init__()
         # managed by properties
-        self._displayType = "normal" # always, never, unless-repeated, even-tied
+        self._displayType = 'normal' # always, never, unless-repeated, even-tied
         self._displayStatus = None # None, True, False
 
         # not yet managed by properties: TODO
-        self.displayStyle = "normal" # "parentheses", "bracket", "both"
-        self.displaySize  = "full"   # "cue", "large", or a percentage
-        self.displayLocation = "normal" # "normal", "above" = ficta, "below"
+        self.displayStyle = 'normal' # 'parentheses', 'bracket', 'both'
+        self.displaySize  = 'full'   # 'cue', 'large', or a percentage
+        self.displayLocation = 'normal' # 'normal', 'above' = ficta, 'below'
         # above and below could also be useful for gruppetti, etc.
 
         self._name = None
@@ -966,21 +984,21 @@ class Accidental(style.StyleMixin):
         '''
         if isinstance(name, six.string_types):
             name = name.lower() # sometimes args get capitalized
-        if name in ['natural', "n", 0]:
+        if name in ['natural', 'n', 0]:
             self._name = 'natural'
             self._alter = 0.0
-        elif name in ['sharp', accidentalNameToModifier['sharp'], "is", 1, 1.0]:
+        elif name in ['sharp', accidentalNameToModifier['sharp'], 'is', 1, 1.0]:
             self._name = 'sharp'
             self._alter = 1.0
         elif name in ['double-sharp', accidentalNameToModifier['double-sharp'],
-            "isis", 2]:
+            'isis', 2]:
             self._name = 'double-sharp'
             self._alter = 2.0
-        elif name in ['flat', accidentalNameToModifier['flat'], "es", -1]:
+        elif name in ['flat', accidentalNameToModifier['flat'], 'es', -1]:
             self._name = 'flat'
             self._alter = -1.0
         elif name in ['double-flat', accidentalNameToModifier['double-flat'],
-            "eses", -2]:
+            'eses', -2]:
             self._name = 'double-flat'
             self._alter = -2.0
 
@@ -1159,7 +1177,7 @@ class Accidental(style.StyleMixin):
             return u'\uD834\uDD2A'
         elif self.name == 'half-sharp':
             # 1D132
-            return u"\uD834\uDD32"
+            return u'\uD834\uDD32'
 
         elif self.name == 'flat':
             # 266D
@@ -1170,7 +1188,7 @@ class Accidental(style.StyleMixin):
         elif self.name == 'half-flat':
             # 1D133
             # raised flat: 1D12C
-            return u"\uD834\uDD33"
+            return u'\uD834\uDD33'
 
         else: # get our best ascii representation
             return self.modifier
@@ -1262,12 +1280,12 @@ class Pitch(object):
         `Pitch` or `Note` has a `.accidental` that you can call `.alter`
         or something like that on:
 
-        >>> c = pitch.Pitch("C4")
+        >>> c = pitch.Pitch('C4')
         >>> c.accidental is None
         True
 
         >>> alters = []
-        >>> for pName in ['G#5','B-5','C6']:
+        >>> for pName in ['G#5', 'B-5', 'C6']:
         ...     p = pitch.Pitch(pName)
         ...     alters.append(p.accidental.alter)
         Traceback (most recent call last):
@@ -1281,10 +1299,10 @@ class Pitch(object):
     any G#, regardless of octave.  Transposing this note up
     an octave doesn't change anything.
 
-    >>> anyGsharp = pitch.Pitch("G#")
+    >>> anyGsharp = pitch.Pitch('G#')
     >>> anyGsharp.octave is None
     True
-    >>> print(anyGsharp.transpose("P8"))
+    >>> print(anyGsharp.transpose('P8'))
     G#
 
     Sometimes we need an octave for a `Pitch` even if it's not
@@ -1340,13 +1358,13 @@ class Pitch(object):
     in octave 3, not B-flat in octave -3.  The second object creates that low `Pitch`
     properly:
 
-    >>> p4 = pitch.Pitch("B--3")
+    >>> p4 = pitch.Pitch('B--3')
     >>> p4.accidental
     <accidental double-flat>
     >>> p4.octave
     3
 
-    >>> p5 = pitch.Pitch(step = "B", accidental = "-", octave = -3)
+    >>> p5 = pitch.Pitch(step='B', accidental='-', octave=-3)
     >>> p5.accidental
     <accidental flat>
     >>> p5.octave
@@ -3784,13 +3802,13 @@ class Pitch(object):
             elif post.accidental.alter < 0:
                 post.getLowerEnharmonic(inPlace=True)
             else: # assume some direction, perhaps using a dictionary
-                if self.step in ['C','D','G']:
+                if self.step in ('C', 'D', 'G'):
                     post.getLowerEnharmonic(inPlace=True)
                 else:
                     post.getHigherEnharmonic(inPlace=True)
 
         else:
-            if self.step in ['C','D','G']:
+            if self.step in ('C', 'D', 'G'):
                 post.getLowerEnharmonic(inPlace=True)
             else:
                 post.getHigherEnharmonic(inPlace=True)
@@ -3959,8 +3977,8 @@ class Pitch(object):
         
         :rtype: int
         '''
-        if ['C','D','E','F','G','A','B'].count(self.step.upper()):
-            noteNumber = ['C','D','E','F','G','A','B'].index(self.step.upper())
+        if ['C', 'D', 'E', 'F', 'G', 'A', 'B'].count(self.step.upper()):
+            noteNumber = ['C', 'D', 'E', 'F', 'G', 'A', 'B'].index(self.step.upper())
             return (noteNumber + 1 + (7 * self.implicitOctave))
         else:
             raise PitchException("Could not find " + self.step + " in the index of notes")
@@ -3968,7 +3986,7 @@ class Pitch(object):
     def _setDiatonicNoteNum(self, newNum):
         octave = int((newNum-1)/7)
         noteNameNum = newNum - 1 - (7*octave)
-        pitchList = ['C','D','E','F','G','A','B']
+        pitchList = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
         noteName = pitchList[noteNameNum]
         self.octave = octave
         self.step = noteName

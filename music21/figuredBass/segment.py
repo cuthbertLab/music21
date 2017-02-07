@@ -887,7 +887,7 @@ class OverlayedSegment(Segment):
     
 # HELPER METHODS
 # --------------
-def getPitches(pitchNames=('C','E','G'), bassPitch = 'C3', maxPitch = 'C8'):
+def getPitches(pitchNames=('C', 'E', 'G'), bassPitch='C3', maxPitch='C8'):
     '''
     Given a list of pitchNames, a bassPitch, and a maxPitch, returns a sorted list of
     pitches between the two limits (inclusive) which correspond to items in pitchNames.
@@ -899,11 +899,11 @@ def getPitches(pitchNames=('C','E','G'), bassPitch = 'C3', maxPitch = 'C8'):
     >>> print(', '.join([p.nameWithOctave for p in pitches]))
     C3, E3, G3, C4, E4, G4, C5, E5, G5, C6, E6, G6, C7, E7, G7, C8
     
-    >>> pitches = segment.getPitches(['G', 'B', 'D', 'F'], bassPitch = pitch.Pitch('B2'))
+    >>> pitches = segment.getPitches(['G', 'B', 'D', 'F'], bassPitch=pitch.Pitch('B2'))
     >>> print(', '.join([p.nameWithOctave for p in pitches]))
     B2, D3, F3, G3, B3, D4, F4, G4, B4, D5, F5, G5, B5, D6, F6, G6, B6, D7, F7, G7, B7
     
-    >>> pitches = segment.getPitches(['F##','A#','C#'], bassPitch = pitch.Pitch('A#3'))
+    >>> pitches = segment.getPitches(['F##', 'A#', 'C#'], bassPitch=pitch.Pitch('A#3'))
     >>> print(', '.join([p.nameWithOctave for p in pitches]))
     A#3, C#4, F##4, A#4, C#5, F##5, A#5, C#6, F##6, A#6, C#7, F##7, A#7
     '''

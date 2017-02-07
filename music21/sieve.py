@@ -1350,7 +1350,7 @@ class Sieve(object):
         if usrStr.find(')') >= 0:
             usrStr = usrStr.replace(')', RGROUP)
         # remove space
-        usrStr = usrStr.replace(' ','')
+        usrStr = usrStr.replace(' ', '')
         return usrStr
 
     #---------------------------------------------------------------------------

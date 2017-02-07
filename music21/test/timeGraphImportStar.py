@@ -94,17 +94,17 @@ class CallGraph:
     def __init__(self):
         self.includeList = ['music21.*']
         self.excludeList = ['pycallgraph.*']
-        self.excludeList += ['re.*','sre_*']
+        self.excludeList += ['re.*', 'sre_*']
         
         # only test our own code for now
         self.excludeList += ['*xlrd*', 'matplotlib*', 'scipy*', 'numpy*']
 
         self.excludeList += ['pdb*', 'repr*', 'cmd*', 'bdb*', 'threading.*', '_weakrefset*']
-        self.excludeList += ['unittest*','doctest*']
+        self.excludeList += ['unittest*', 'doctest*']
         self.excludeList += ['encodings*', 'pkg_resources*', 'ntpath*', 'shutil.*', 'pkgutil.*']
-        self.excludeList += ['difflib*','urlparse*', 'dateutil.*', 'calendar.*',]
-        self.excludeList += ['zipfile*','io.*', 'collections.*', 'tempfile.*', 'urllib.*', 'StringIO*']
-        self.excludeList += ['csv.*', 'json.*', 'os.*', 'distutils.*','ctypes*']
+        self.excludeList += ['difflib*', 'urlparse*', 'dateutil.*', 'calendar.*',]
+        self.excludeList += ['zipfile*', 'io.*', 'collections.*', 'tempfile.*', 'urllib.*', 'StringIO*']
+        self.excludeList += ['csv.*', 'json.*', 'os.*', 'distutils.*', 'ctypes*']
         self.excludeList += ['FileDialog.*', 'Tk*', 'PIL*', 'tk*', 'pillow*']
         
         # these have been shown to be very fast

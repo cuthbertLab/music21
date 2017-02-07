@@ -515,9 +515,9 @@ class CallGraph(object):
 
     def __init__(self):
         self.includeList = ['*xmlToM21*', '*meter*']
-        #self.excludeList = ['pycallgraph.*','re.*','sre_*', 'copy*', '*xlrd*']
+        #self.excludeList = ['pycallgraph.*', 're.*', 'sre_*', 'copy*', '*xlrd*']
         self.excludeList = ['pycallgraph.*']
-        self.excludeList += ['re.*','sre_*']
+        self.excludeList += ['re.*', 'sre_*']
         self.excludeList += ['*xlrd*']
         # these have been shown to be very fast
         self.excludeList += ['xml.dom.*', 'codecs.*', 'io.*']

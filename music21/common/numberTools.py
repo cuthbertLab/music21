@@ -48,17 +48,17 @@ __all__ = ['ordinals', 'musicOrdinals',
            'ordinalAbbreviation',
            ]
 
-ordinals = ["Zeroth","First","Second","Third","Fourth","Fifth",
-            "Sixth","Seventh","Eighth","Ninth","Tenth","Eleventh",
-            "Twelfth","Thirteenth","Fourteenth","Fifteenth",
-            "Sixteenth","Seventeenth","Eighteenth","Nineteenth",
-            "Twentieth","Twenty-first","Twenty-second"]
+ordinals = ['Zeroth', 'First', 'Second', 'Third', 'Fourth', 'Fifth',
+            'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth', 'Eleventh',
+            'Twelfth', 'Thirteenth', 'Fourteenth', 'Fifteenth',
+            'Sixteenth', 'Seventeenth', 'Eighteenth', 'Nineteenth',
+            'Twentieth', 'Twenty-first', 'Twenty-second']
 
 musicOrdinals = ordinals[:]
-musicOrdinals[1] = "Unison"
-musicOrdinals[8] = "Octave"
-musicOrdinals[15] = "Double-octave"
-musicOrdinals[22] = "Triple-octave"
+musicOrdinals[1] = 'Unison'
+musicOrdinals[8] = 'Octave'
+musicOrdinals[15] = 'Double-octave'
+musicOrdinals[22] = 'Triple-octave'
 
 
 
@@ -1125,7 +1125,7 @@ def toRoman(num):
     if not 0 < num < 4000:
         raise ValueError("Argument must be between 1 and 3999")
     ints = (1000, 900,  500, 400, 100,  90, 50,  40, 10,  9,   5,  4,   1)
-    nums = ('M',  'CM', 'D', 'CD','C', 'XC','L','XL','X','IX','V','IV','I')
+    nums = ('M',  'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I')
     result = ""
     for i in range(len(ints)):
         count = int(num/ ints[i])

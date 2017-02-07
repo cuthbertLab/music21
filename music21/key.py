@@ -138,7 +138,7 @@ def sharpsToPitch(sharpCount):
 # store a cache of already-found values
 #_pitchToSharpsCache = {}
 
-fifthsOrder = ['F','C','G','D','A','E','B']
+fifthsOrder = ['F', 'C', 'G', 'D', 'A', 'E', 'B']
 modeSharpsAlter = {'major': 0,
                    'ionian': 0,
                    'minor': -3,

@@ -898,7 +898,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         base.Music21Object.mergeAttributes(self, other)
 
-        for attr in ('autoSort','isSorted'):
+        for attr in ('autoSort', 'isSorted'):
             if hasattr(other, attr):
                 setattr(self, attr, getattr(other, attr))
 
@@ -1699,7 +1699,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> n1.duration.quarterLength = 2.0
         >>> r1 = note.Rest()
         >>> r1.duration.quarterLength = 2.0
-        >>> c1 = chord.Chord(['C4','E4'])
+        >>> c1 = chord.Chord(['C4', 'E4'])
         >>> s = stream.Stream()
         >>> s.append(n1)
         >>> s.append(r1)
@@ -3735,7 +3735,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         
         >>> tenor = b.parts[2]
         >>> tenorNoClefsSignatures = tenor.measureTemplate(fillWithRests=False, 
-        ...       customRemove=['Clef','KeySignature','TimeSignature'])
+        ...       customRemove=['Clef', 'KeySignature', 'TimeSignature'])
         >>> tenorNoClefsSignatures.show('text')
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.note.Note A>
@@ -6949,7 +6949,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         We'll also test using multiple classes here... the Stream given is the same as the
         s.flat.notes stream.
         
-        >>> for el in s.recurse(classFilter=('Note','Rest'), restoreActiveSites=False):
+        >>> for el in s.recurse(classFilter=('Note', 'Rest'), restoreActiveSites=False):
         ...     tup = (el, el.offset, el.activeSite)
         ...     print(tup)
         (<music21.note.Note C>, 0.0, <music21.stream.Score mainScore_flat>)
@@ -8796,7 +8796,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Chords get their pitches found as well:
 
-        >>> c = chord.Chord(['C4','E4','G4'])
+        >>> c = chord.Chord(['C4', 'E4', 'G4'])
         >>> n = note.Note('F#4')
         >>> m = stream.Measure()
         >>> m.append(n)

@@ -659,7 +659,7 @@ def addNewChordSymbol(chordTypeName, fbNotationString, AbbreviationList):
     '''
     Add a new chord symbol:
     
-    >>> harmony.addNewChordSymbol('BethChord', '1,3,-6,#9', ['MH','beth'])
+    >>> harmony.addNewChordSymbol('BethChord', '1,3,-6,#9', ['MH', 'beth'])
     >>> [str(p) for p in harmony.ChordSymbol('BMH').pitches]
     ['B2', 'C##3', 'D#3', 'G3']
     
@@ -713,7 +713,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
     first element being the figure and the second element the identified chord 
     type.
     
-    >>> harmony.chordSymbolFigureFromChord(chord.Chord(['C3','E3','G3'])) #standard example
+    >>> harmony.chordSymbolFigureFromChord(chord.Chord(['C3', 'E3', 'G3'])) #standard example
     'C'
 
     THIRDS
@@ -932,11 +932,11 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
 
     Inversions are supported, and indicated with a '/' between the root, typestring, and bass
 
-    >>> c = chord.Chord([ 'G#3', 'B-3','C4', 'E4',])
+    >>> c = chord.Chord([ 'G#3', 'B-3', 'C4', 'E4',])
     >>> harmony.chordSymbolFigureFromChord(c, True)
     ('C7+/G#', 'augmented-seventh')
 
-    >>> c = chord.Chord(['G#2', 'B2','F#3', 'A3', 'C#4', 'E4'])
+    >>> c = chord.Chord(['G#2', 'B2', 'F#3', 'A3', 'C#4', 'E4'])
     >>> harmony.chordSymbolFigureFromChord(c, True) 
     ('F#m11/G#', 'minor-11th')
 
@@ -1056,11 +1056,11 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
     Users who wish to change these defaults can simply change that 
     entry in the CHORD_TYPES dictionary.
 
-    >>> harmony.chordSymbolFigureFromChord(chord.Chord(['C2','E2','G2']))
+    >>> harmony.chordSymbolFigureFromChord(chord.Chord(['C2', 'E2', 'G2']))
     'C'
 
     >>> harmony.changeAbbreviationFor('major', 'maj')
-    >>> harmony.chordSymbolFigureFromChord(chord.Chord(['C2','E2','G2'])) 
+    >>> harmony.chordSymbolFigureFromChord(chord.Chord(['C2', 'E2', 'G2'])) 
     'Cmaj'
     
     OMIT_FROM_DOCS
@@ -1078,9 +1078,9 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
     
     if len(inChord.pitches) == 1: 
         if includeChordType:
-            return (inChord.root().name.replace('-','b')+'pedal', 'pedal')
+            return (inChord.root().name.replace('-', 'b')+'pedal', 'pedal')
         else:
-            return inChord.root().name.replace('-','b')+'pedal'
+            return inChord.root().name.replace('-', 'b')+'pedal'
     
     d3 = inChord.semitonesFromChordStep(3) #4  #triad
     d5 = inChord.semitonesFromChordStep(5) #7  #triad
@@ -1146,7 +1146,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
                     alt = char.count('-') * -1
                 else:
                     alt = char.count('#')
-                degree = int(char.replace('-','').replace('#',''))
+                degree = int(char.replace('-', '').replace('#', ''))
                 chordDegrees.append( types[degree] + alt)
         return chordDegrees
 
@@ -1189,7 +1189,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
                 chordKindStr = [chordKindStr]
     
             if common.isListLike(chordDegrees):
-                s = fbNotationString.replace('-','').replace('#','')
+                s = fbNotationString.replace('-', '').replace('#', '')
                 degrees = s.split(',')
                 degrees = [int(x) for x in degrees]
                 degrees.sort()
@@ -1226,14 +1226,14 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
             additions = inPitches.difference(perfect)
             subtractions = perfect.difference(inPitches)
             if additions:
-                cs+='add'
+                cs += 'add'
                 for a in additions:
-                    cs+= (a+',')
+                    cs += (a + ',')
             if subtractions:
-                cs+='omit'
+                cs += 'omit'
                 for s in subtractions:
-                    cs+= (s + ',')
-            cs=cs[:-1]
+                    cs += (s + ',')
+            cs = cs[:-1]
     else:
         cs = 'Chord Symbol Cannot Be Identified'
     if includeChordType:
@@ -1247,7 +1247,7 @@ def chordSymbolFromChord(inChord):
     Get the :class:`~music21.harmony.chordSymbol` object from the chord, using 
     :meth:`music21.harmony.chordSymbolFigureFromChord`
     
-    >>> harmony.chordSymbolFromChord(chord.Chord(['D3','F3','A3','B-3']))
+    >>> harmony.chordSymbolFromChord(chord.Chord(['D3', 'F3', 'A3', 'B-3']))
     <music21.harmony.ChordSymbol B-maj7/D>
     '''
     return ChordSymbol(chordSymbolFigureFromChord(inChord))
@@ -1995,7 +1995,7 @@ class ChordSymbol(Harmony):
         ...   c = m.getElementsByClass(harmony.ChordSymbol)
         ...   if(len(c)):
         ...     chord = c[0].figure
-        ...     print(chord.replace('-','b'))
+        ...     print(chord.replace('-', 'b'))
         ...   else:
         ...     print('n.c.')
         F
@@ -2342,7 +2342,7 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(cs), '<music21.harmony.ChordSymbol E-/B->')
 
     def testDoubleSharpsEtc(self):
-        cisisdim = chord.Chord(('c##5','e#5','g#5'))
+        cisisdim = chord.Chord(('c##5', 'e#5', 'g#5'))
         fig = chordSymbolFigureFromChord(cisisdim)
         self.assertEqual(fig, "C##dim")
 
@@ -2469,8 +2469,8 @@ class TestExternal(unittest.TestCase):
         for vs in slices:
             x = harmony.chordSymbolFigureFromChord(vs.getChord())
             if x  != 'Chord Symbol Cannot Be Identified':
-                vs.lyric = x.replace('-','b')
-            print(x.replace('-','b'))
+                vs.lyric = x.replace('-', 'b')
+            print(x.replace('-', 'b'))
 #         Full, unmodified piece:
 #         Bb7
 #         Ebmaj7/Bb

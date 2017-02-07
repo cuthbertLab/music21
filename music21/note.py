@@ -587,7 +587,7 @@ class GeneralNote(base.Music21Object):
         >>> n.quarterLength
         6.0
 
-        >>> c = chord.Chord(['g#','A#','d'])
+        >>> c = chord.Chord(['g#', 'a#', 'd'])
         >>> n.quarterLength = 2
         >>> n.augmentOrDiminish(.25)
         >>> n.quarterLength

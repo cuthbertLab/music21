@@ -5270,7 +5270,7 @@ class Test(unittest.TestCase):
 
         match = set([str(h.figure) for h in s.flat.getElementsByClass('ChordSymbol')])
         
-        self.assertEqual(match, set(['F','F7','B-','C7','G7','C']))
+        self.assertEqual(match, set(['F', 'F7', 'B-', 'C7', 'G7', 'C']))
 
 
         s = corpus.parse('monteverdi/madrigal.3.12.xml')

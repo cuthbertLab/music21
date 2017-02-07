@@ -278,7 +278,7 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
     a dictionary-like environ from the server containing at a minimum a value for the 
     keys QUERY_STRING,
     and a requestType specifying the content-type of the POST data 
-    ('application/json','multipart/form-data', etc.)
+    ('application/json', 'multipart/form-data', etc.)
         
     Note that variables specified via query string will be returned as a list if
     they are specified more than once (e.g. ``?b=3&b=4`` will yeld ``['3', '4']`` 
@@ -362,7 +362,7 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
             # These values can only be specified via JSON, JSON already loaded
             pass
             
-        elif key in ['appName','outputTemplate','outputArgList']:
+        elif key in ['appName', 'outputTemplate', 'outputArgList']:
             agenda[key] = value
             
         elif isinstance(value, file):
@@ -430,11 +430,11 @@ class Agenda(dict):
                               "resultVar":    "<CMD_1_RESULT_VARIABLE>",
                               "caller":       "<CMD_1_CALLER>",
                               "command":      "<CMD_1_COMMAND_NAME>",
-                              "argList":      ['<CMD_1_ARG_1>','<CMD_1_ARG_2>'...]},                   
+                              "argList":      ['<CMD_1_ARG_1>', '<CMD_1_ARG_2>'...]},                   
                               "<CMD_2_TYPE>": "<CMD_2_COMMAND_NAME>",
                               "resultVar":    "<CMD_2_RESULT_VARIABLE>",
                               "caller":       "<CMD_2_CALLER>",
-                              "argList":      ['<CMD_2_ARG_1>','<CMD_2_ARG_2>'...]},
+                              "argList":      ['<CMD_2_ARG_1>', '<CMD_2_ARG_2>'...]},
                               etc.
                               ]
                               
@@ -488,7 +488,7 @@ class Agenda(dict):
         >>> pp(agenda)
         {'commandList': [], 'dataDict': {'a': {'data': 2}}, 'returnDict': {}}
         '''
-        if key in ['dataDict','returnDict'] and not isinstance(value, dict):
+        if key in ['dataDict', 'returnDict'] and not isinstance(value, dict):
             raise Exception('value for key: '+ str(key) + ' must be dict')
         
         elif key in ['commandList'] and not isinstance(value, list):
@@ -560,7 +560,7 @@ class Agenda(dict):
         >>> agenda = alpha.webapps.Agenda()
         >>> pp(agenda)
         {'commandList': [], 'dataDict': {}, 'returnDict': {}}
-        >>> agenda.addCommand('method','sc','sc','transpose',['p5'])
+        >>> agenda.addCommand('method', 'sc', 'sc', 'transpose',['p5'])
         >>> pp(agenda)
         {'commandList': [{'argList': ['p5'],
                           'caller': 'sc',
@@ -568,7 +568,7 @@ class Agenda(dict):
                           'resultVar': 'sc'}],
          'dataDict': {},
          'returnDict': {}}
-        >>> agenda.addCommand('attribute','scFlat','sc','flat')
+        >>> agenda.addCommand('attribute', 'scFlat', 'sc', 'flat')
         >>> pp(agenda)
         {'commandList': [{'argList': ['p5'],
                           'caller': 'sc',
@@ -698,7 +698,7 @@ class CommandProcessor(object):
         if exceptionObj is not None:
             errorTraceback += traceback.format_exc()
             
-        errorString = errorString.encode('ascii','ignore')
+        errorString = errorString.encode('ascii', 'ignore')
         
         sys.stderr.write(errorString)
         sys.stderr.write(errorTraceback)
@@ -744,10 +744,10 @@ class CommandProcessor(object):
                     except ValueError:
                         self.recordError("invalid integer for data element " + str(dataDictElement))
                         continue
-                elif fmt in ['bool','boolean']:
-                    if dataStr in ['true','True']:
+                elif fmt in ['bool', 'boolean']:
+                    if dataStr in ['true', 'True']:
                         data = True
-                    elif dataStr in ['false','False']:
+                    elif dataStr in ['false', 'False']:
                         data = False
                     else:
                         self.recordError("invalid boolean for data element " + str(dataDictElement))
@@ -768,7 +768,7 @@ class CommandProcessor(object):
                 elif fmt == 'file':
                     data = dataStr
                 else:
-                    if fmt in ['xml','musicxml']:                
+                    if fmt in ['xml', 'musicxml']:                
                         if dataStr.find("<!DOCTYPE") == -1:
                             dataStr = (
                                 '<!DOCTYPE score-partwise PUBLIC ' + 
@@ -803,12 +803,12 @@ class CommandProcessor(object):
                                   "resultVar":    "<CMD_1_RESULT_VARIABLE>",
                                   "caller":       "<CMD_1_CALLER>",
                                   "command":      "<CMD_1_COMMAND_NAME>",
-                                  "argList":      ['<CMD_1_ARG_1>','<CMD_1_ARG_2>'...]},
+                                  "argList":      ['<CMD_1_ARG_1>', '<CMD_1_ARG_2>'...]},
                                   
                                   "<CMD_2_TYPE>": "<CMD_2_COMMAND_NAME>",
                                   "resultVar":    "<CMD_2_RESULT_VARIABLE>",
                                   "caller":       "<CMD_2_CALLER>",
-                                  "argList":      ['<CMD_2_ARG_1>','<CMD_2_ARG_2>'...]},
+                                  "argList":      ['<CMD_2_ARG_1>', '<CMD_2_ARG_2>'...]},
                                   etc.
                                   ]
                                   

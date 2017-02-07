@@ -124,8 +124,8 @@ def noteflightEmbed(outputStream):
     from music21.musicxml import m21ToXml
     musicxmlBytes = m21ToXml.GeneralObjectExporter().parse(outputStream)   
     musicxmlString = musicxmlBytes.decode('utf-8') 
-    musicxmlString = musicxmlString.replace('\n','')
-    musicxmlString = musicxmlString.replace('\'','\\\'')
+    musicxmlString = musicxmlString.replace('\n', '')
+    musicxmlString = musicxmlString.replace('\'', '\\\'')
     htmlStr = """
 <html>
 <head>

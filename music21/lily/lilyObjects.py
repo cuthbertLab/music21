@@ -1619,9 +1619,8 @@ class LyPostEvent(LyObject):
 
 class LyDirectionLessEvent(LyObject):
     r'''
-    represents ['[',']','~','(',')','\!','\(','\)','\>','\<']
-    or an EVENT_IDENTIFIER or a tremolo_type
-    
+    represents ['[', ']', '~', '(', ')', '\!', '\(', '\)', '\>', '\<']
+    or an EVENT_IDENTIFIER or a tremolo_type    
     '''
     
     def __init__(self, event=None):

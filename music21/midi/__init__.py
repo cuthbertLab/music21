@@ -876,7 +876,7 @@ class MidiEvent(object):
             except (UnicodeDecodeError, TypeError):
                 #environLocal.printDebug(['cannot decode data', self.data])
                 return s + unicodedata.normalize('NFKD', 
-                           self.data).encode('ascii','ignore')
+                           self.data).encode('ascii', 'ignore')
         else: 
             raise MidiException("unknown midi event type: %s" % self.type)
 

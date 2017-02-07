@@ -509,7 +509,7 @@ class GeneralMensuralNote(base.Music21Object):
         >>> s_2.append(medren.MensuralNote('B', 'semibrevis'))
         >>> gmn_2 = medren.GeneralMensuralNote('semibrevis')
         >>> s_2.append(gmn_2)
-        >>> s_2.append(medren.Ligature(['A','B']))
+        >>> s_2.append(medren.Ligature(['A', 'B']))
         >>> gmn_2._getSurroundingMeasure(activeSite = s_2)
         ([<music21.medren.MensuralNote semibrevis A>, 
           <music21.medren.MensuralNote semibrevis B>, 
@@ -889,7 +889,7 @@ class MensuralNote(GeneralMensuralNote, note.Note):
                 self.stems = []
             return    
             
-        if self.mensuralType in ['brevis','longa', 'maxima']:
+        if self.mensuralType in ['brevis', 'longa', 'maxima']:
             raise MedRenException('A note of type %s cannot be equipped with a stem' % 
                                   self.mensuralType)
 
@@ -956,9 +956,9 @@ class MensuralNote(GeneralMensuralNote, note.Note):
         >>> r_2.setFlag('up', 'left')
         >>> r_2.getFlags()
         {'up': 'left'}
-        >>> r_3 = medren.MensuralNote('A','semibrevis')
+        >>> r_3 = medren.MensuralNote('A', 'semibrevis')
         >>> r_3.setStem('side')
-        >>> r_3.setFlag('side','left')
+        >>> r_3.setFlag('side', 'left')
         Traceback (most recent call last):
         MedRenException: a flag cannot be added to a stem with direction side
         '''
@@ -1059,14 +1059,14 @@ class Ligature(base.Music21Object):
     
     >>> from music21.alpha import medren
     
-    >>> l1 = medren.Ligature(['A4','F4','G4','A4','B-4'])
+    >>> l1 = medren.Ligature(['A4', 'F4', 'G4', 'A4', 'B-4'])
     >>> l1.makeOblique(0)
     >>> l1.setStem(0, 'down', 'left')
     >>> print([n.fullName for n in l1.notes])
     ['brevis A in octave 4 ', 'brevis F in octave 4 ', 
      'brevis G in octave 4 ', 'brevis A in octave 4 ', 'brevis B-flat in octave 4 ']
     >>>
-    >>> l2 = medren.Ligature(['F4','G4','A4','B-4','D5'])
+    >>> l2 = medren.Ligature(['F4', 'G4', 'A4', 'B-4', 'D5'])
     >>> l2.setStem(4, 'down', 'left')
     >>> l2.setReverse(4, True)
     >>> print([(n.mensuralType, n.pitch.nameWithOctave) for n in l2.notes])
@@ -1117,30 +1117,30 @@ class Ligature(base.Music21Object):
         
         >>> from music21.alpha import medren
         
-        >>> l = medren.Ligature(['A4','B4'])
+        >>> l = medren.Ligature(['A4', 'B4'])
         >>> print([n.mensuralType for n in l.notes])
         ['brevis', 'brevis']
         >>> l.makeOblique(0)
         >>> print([n.mensuralType for n in l.notes])
         ['longa', 'brevis']
-        >>> l = medren.Ligature(['B4','A4'])
+        >>> l = medren.Ligature(['B4', 'A4'])
         >>> print([n.mensuralType for n in l.notes])
         ['longa', 'longa']
         >>> l.makeOblique(0)
         >>> print([n.mensuralType for n in l.notes])
         ['longa', 'brevis']
-        >>> l.setStem(0, 'down','left')
+        >>> l.setStem(0, 'down', 'left')
         >>> print([n.mensuralType for n in l.notes])
         ['brevis', 'brevis']
-        >>> l = medren.Ligature(['G4','A4','B4','A4'])
-        >>> l.setStem(2, 'up','left')
+        >>> l = medren.Ligature(['G4', 'A4', 'B4', 'A4'])
+        >>> l.setStem(2, 'up', 'left')
         >>> print([n.mensuralType for n in l.notes])
         ['brevis', 'brevis', 'semibrevis', 'semibrevis']
-        >>> l = medren.Ligature(['B4','A4','G4','A4','G4','A4','F4'])
+        >>> l = medren.Ligature(['B4', 'A4', 'G4', 'A4', 'G4', 'A4', 'F4'])
         >>> l.makeOblique(0)
         >>> l.makeOblique(4)
         >>> l.setStem(2, 'down', 'left')
-        >>> l.setStem(4, 'up','left')
+        >>> l.setStem(4, 'up', 'left')
         >>> l.setMaxima(6, True)
         >>> print([n.mensuralType for n in l.notes])
         ['longa', 'brevis', 'longa', 'brevis', 'semibrevis', 'semibrevis', 'maxima']
@@ -1208,7 +1208,7 @@ class Ligature(base.Music21Object):
         
         >>> from music21.alpha import medren
         
-        >>> l = medren.Ligature(['A4','C5','B4'])
+        >>> l = medren.Ligature(['A4', 'C5', 'B4'])
         >>> l.setColor('red')
         >>> l.getColor()
         'red'
@@ -1263,7 +1263,7 @@ class Ligature(base.Music21Object):
         
         >>> from music21.alpha import medren
         
-        >>> l = medren.Ligature(['A4','C5','B4'])
+        >>> l = medren.Ligature(['A4', 'C5', 'B4'])
         >>> l.setFillStatus('filled')
         >>> l.getFillStatus()
         'yes'
@@ -1282,7 +1282,7 @@ class Ligature(base.Music21Object):
             else:
                 raise MedRenException('no note exists at index %d' % index)
         else:
-            if value in ['yes','fill','filled']:
+            if value in ['yes', 'fill', 'filled']:
                 value = 'yes'
                 self.filled = value
                 for n in self.notes:
@@ -1317,7 +1317,7 @@ class Ligature(base.Music21Object):
         
         >>> from music21.alpha import medren
         
-        >>> l = medren.Ligature(['A4','C5','B4','A4'])
+        >>> l = medren.Ligature(['A4', 'C5', 'B4', 'A4'])
         >>> l.makeOblique(1)
         >>> l.getNoteheadShape(1)
         'oblique'
@@ -1336,7 +1336,7 @@ class Ligature(base.Music21Object):
         if startIndex < self._ligatureLength() - 1:
             currentShape = self.noteheadShape[startIndex]
             nextShape = self.noteheadShape[startIndex+1]
-            if  ((currentShape == ('oblique','end') or nextShape == ('oblique', 'start')) or
+            if  ((currentShape == ('oblique', 'end') or nextShape == ('oblique', 'start')) or
                  (self.isMaxima(startIndex) or self.isMaxima(startIndex+1))): 
                 raise MedRenException('cannot start oblique notehead at index %d' % startIndex)
             
@@ -1358,7 +1358,7 @@ class Ligature(base.Music21Object):
         >>> from music21.alpha import medren
         
         
-        >>> l = medren.Ligature(['A4','C5','B4','A4'])
+        >>> l = medren.Ligature(['A4', 'C5', 'B4', 'A4'])
         >>> l.makeOblique(1)
         >>> l.makeSquare(2)
         >>> l.getNoteheadShape(2)
@@ -1403,7 +1403,7 @@ class Ligature(base.Music21Object):
         
         >>> from music21.alpha import medren
         
-        >>> l = medren.Ligature(['A4','C5','B4'])
+        >>> l = medren.Ligature(['A4', 'C5', 'B4'])
         >>> l.setStem(0, 'up', 'left')
         >>> l.setMaxima(2, True)
         >>> l.isMaxima(2)
@@ -1452,7 +1452,7 @@ class Ligature(base.Music21Object):
         
         Index determines which note in the ligature the stem will be placed on.
         Direction determines which way the stem faces. Permitted directions 
-        are 'up','down', and 'none'.
+        are 'up', 'down', and 'none'.
         Orientation determines on which side of the note the stem sits. 
         Permitted orientations are 'left', 'right', and 'none'. 
         Setting the direction and orientation of a stem to 'none' removes the stem from the note.
@@ -1469,8 +1469,8 @@ class Ligature(base.Music21Object):
         
         >>> from music21.alpha import medren
         
-        >>> l = medren.Ligature(['A4','C5','B4','A4','B4'])
-        >>> l.setStem(0, 'none','left')
+        >>> l = medren.Ligature(['A4', 'C5', 'B4', 'A4', 'B4'])
+        >>> l.setStem(0, 'none', 'left')
         Traceback (most recent call last):
         MedRenException: direction "None" and orientation "left" not supported for ligatures
         >>> l.setStem(1,'up', 'left')
@@ -1483,7 +1483,7 @@ class Ligature(base.Music21Object):
         >>> l.setStem(4, 'up', 'left')
         Traceback (most recent call last):
         MedRenException: cannot place stem at index 4
-        >>> l.setStem(3, 'up','left')
+        >>> l.setStem(3, 'up', 'left')
         Traceback (most recent call last):
         MedRenException: a stem with direction "up" not permitted at index 3
         '''
@@ -1571,7 +1571,7 @@ class Ligature(base.Music21Object):
         
         >>> from music21.alpha import medren
         
-        >>> l = medren.Ligature(['A4','C5','F5','F#5'])
+        >>> l = medren.Ligature(['A4', 'C5', 'F5', 'F#5'])
         >>> l.setStem(1, 'down', 'left')
         >>> l.setStem(2, 'down', 'left')
         >>> l.setStem(3, 'down', 'left')
@@ -1603,7 +1603,7 @@ class Ligature(base.Music21Object):
                         tempPitchPrev._setAccidental(None)
                         if ((not self.isReversed(endIndex-1)) 
                                 and (self.getStem(endIndex-1)[0] != 'up') 
-                                and (self.getStem(endIndex) == ('down','left')) 
+                                and (self.getStem(endIndex) == ('down', 'left')) 
                                 and (tempPitchCurrent > tempPitchPrev)):
                             self.reversedNotes[endIndex] = True
                         else:                           
@@ -1741,13 +1741,13 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD=None, printUpdates=F
 
     >>> from music21.alpha import trecento
     >>> p = stream.Part()
-    >>> m.append(medren.MensuralNote('G','B'))
+    >>> m.append(medren.MensuralNote('G', 'B'))
     >>> p.append(trecento.notation.Divisione('.q.'))
-    >>> p.repeatAppend(medren.MensuralNote('A','SB'),2)
+    >>> p.repeatAppend(medren.MensuralNote('A', 'SB'),2)
     >>> p.append(trecento.notation.Punctus())
-    >>> p.repeatAppend(medren.MensuralNote('B','M'),4)
+    >>> p.repeatAppend(medren.MensuralNote('B', 'M'),4)
     >>> p.append(trecento.notation.Punctus())
-    >>> p.append(medren.MensuralNote('C','B'))
+    >>> p.append(medren.MensuralNote('C', 'B'))
     >>> s.append(trecento.notation.Divisione('.p.'))
     >>> s.append(p)
     >>> s.append(m)

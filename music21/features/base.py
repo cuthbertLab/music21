@@ -1291,9 +1291,9 @@ def getIndex(featureString, extractorType=None):
     >>> features.getIndex('Ends With Landini Melodic Contour')
     (19, 'native')
     >>> features.getIndex('abrandnewfeature!')
-    >>> features.getIndex('Fifths Pitch Histogram','jsymbolic')
+    >>> features.getIndex('Fifths Pitch Histogram', 'jsymbolic')
     (68, 'jsymbolic')
-    >>> features.getIndex('Tonal Certainty','native')
+    >>> features.getIndex('Tonal Certainty', 'native')
     (1, 'native')
     '''
     from music21.features import jSymbolic, native

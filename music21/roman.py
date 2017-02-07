@@ -162,13 +162,13 @@ def expandShortHand(shorthand):
 
     Note that this is not where abbreviations get expanded
 
-    >>> roman.expandShortHand("7") # not 7,5,3
+    >>> roman.expandShortHand("7") # not 7, 5, 3
     ['7']
 
-    >>> roman.expandShortHand("4/3") # not 6,4,3
+    >>> roman.expandShortHand("4/3") # not 6, 4, 3
     ['4', '3']
 
-    Note that this is '6' not '6','3':
+    Note that this is ['6'] not ['6', '3']:
     
     >>> roman.expandShortHand("6")
     ['6']
@@ -222,7 +222,7 @@ def figureFromChordAndKey(chordObj, keyObj=None):
     '65'
 
     >>> roman.figureFromChordAndKey(
-    ...     chord.Chord(['E3','C4','G4','B-5']),
+    ...     chord.Chord(['E3', 'C4', 'G4', 'B-5']),
     ...     key.Key('C'),
     ...     )
     '6b5'
@@ -301,7 +301,7 @@ def figureTuplets(chordObject, keyObject):
 
     >>> from music21 import roman
     >>> roman.figureTuplets(
-    ...     chord.Chord(['F#2','D3','A-3','C#4']),
+    ...     chord.Chord(['F#2', 'D3', 'A-3', 'C#4']),
     ...     key.Key('C'),
     ...     )
     [(1, 1.0, '#', <music21.pitch.Pitch F#2>),
@@ -310,7 +310,7 @@ def figureTuplets(chordObject, keyObject):
      (5, 1.0, '#', <music21.pitch.Pitch C#4>)]
 
     >>> roman.figureTuplets(
-    ...     chord.Chord(['E3','C4','G4','B-5']),
+    ...     chord.Chord(['E3', 'C4', 'G4', 'B-5']),
     ...     key.Key('C'),
     ...     )
     [(1, 0.0, '', <music21.pitch.Pitch E3>),
@@ -383,10 +383,10 @@ def identifyAsTonicOrDominant(inChord, inKey):
     nor dominant is possibly correct, False is returned
 
     >>> from music21 import roman
-    >>> roman.identifyAsTonicOrDominant(['B2','F5'], key.Key('C'))
+    >>> roman.identifyAsTonicOrDominant(['B2', 'F5'], key.Key('C'))
     'V65'
 
-    >>> roman.identifyAsTonicOrDominant(['B3','G4'], key.Key('g'))
+    >>> roman.identifyAsTonicOrDominant(['B3', 'G4'], key.Key('g'))
     'i6'
 
     >>> roman.identifyAsTonicOrDominant(['C3', 'B4'], key.Key('f'))
@@ -487,7 +487,7 @@ def romanNumeralFromChord(chordObj,
     do anything.
 
     >>> rn = roman.romanNumeralFromChord(
-    ...     chord.Chord(['E-3','C4','G-6']),
+    ...     chord.Chord(['E-3', 'C4', 'G-6']),
     ...     key.Key('g#'),
     ...     )
     >>> rn
@@ -561,7 +561,7 @@ def romanNumeralFromChord(chordObj,
     <music21.roman.RomanNumeral bbVI in c minor>
 
     >>> romanNumeral8 = roman.romanNumeralFromChord(
-    ...     chord.Chord(['A#4','C#5','E#5']),
+    ...     chord.Chord(['A#4', 'C#5', 'E#5']),
     ...     key.Key('c'),
     ...     )
     >>> romanNumeral8
@@ -1108,7 +1108,7 @@ class RomanNumeral(harmony.Harmony):
         if self.bracketedAlterations is None:
             return
         for (alterNotation, chordStep) in self.bracketedAlterations:
-            alterNotation = re.sub('b','-', alterNotation)
+            alterNotation = re.sub('b', '-', alterNotation)
             alterPitch = self.getChordStep(chordStep)
             if alterPitch is not None:
                 newAccidental = pitch.Accidental(alterNotation)
@@ -1403,7 +1403,7 @@ class RomanNumeral(harmony.Harmony):
             if romanNumeralAlone != 'Fr':
                 fixTuple = ('#', 1)
                 self.bracketedAlterations.append(fixTuple)
-            if romanNumeralAlone in ('Fr','Sw'):
+            if romanNumeralAlone in ('Fr', 'Sw'):
                 fixTuple = ('#', 3)
                 self.bracketedAlterations.append(fixTuple)
                 

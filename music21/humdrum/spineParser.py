@@ -868,9 +868,9 @@ class GlobalReferenceLine(HumdrumLine):
     isSpineLine = False
     numSpines = 0
 
-    def __init__(self, position = 0, contents = "!!! NUL: None"):
+    def __init__(self, position=0, contents="!!! NUL: None"):
         self.position = position
-        noExclaim = re.sub(r'^\!\!\!+','',contents)
+        noExclaim = re.sub(r'^\!\!\!+', '', contents)
         try:
             (code, value) = noExclaim.split(":", 1)
             value = value.strip()
@@ -918,11 +918,11 @@ class GlobalCommentLine(HumdrumLine):
     isSpineLine = False
     numSpines = 0
 
-    def __init__(self, position = 0, contents = ""):
+    def __init__(self, position=0, contents=""):
         self.position = position
-        value = re.sub(r'^\!\!+\s?','',contents)
+        value = re.sub(r'^\!\!+\s?', '', contents)
         self.contents = contents
-        self.value    = value
+        self.value = value
 
 class ProtoSpine(object):
     '''
@@ -936,7 +936,7 @@ class ProtoSpine(object):
     See :meth:`~music21.humdrum.spineParser.parseProtoSpinesAndEventCollections`
     for more details on how ProtoSpine objects are created.
     '''
-    def __init__(self, eventList = None):
+    def __init__(self, eventList=None):
         if eventList is None:
             eventList = []
         self.eventList = eventList
@@ -956,13 +956,13 @@ class HumdrumSpine(object):
 
 
     >>> SE = humdrum.spineParser.SpineEvent
-    >>> spineEvents = [SE('**kern'),SE('c,4'), SE('d#8')]
+    >>> spineEvents = [SE('**kern'), SE('c,4'), SE('d#8')]
     >>> spine1Id = 5
     >>> spine1 = humdrum.spineParser.HumdrumSpine(spine1Id, spineEvents)
     >>> spine1.insertPoint = 5
     >>> spine1.endingPosition = 6
     >>> spine1.parentSpine = 3  # spine 3 is the previous spine leading to this one
-    >>> spine1.childSpines = [7,8] # the spine ends by being split into spines 7 and 8
+    >>> spine1.childSpines = [7, 8] # the spine ends by being split into spines 7 and 8
 
     we keep weak references to the spineCollection so that we
     don't have circular references
@@ -988,8 +988,7 @@ class HumdrumSpine(object):
     other than :class:`~music21.stream.Stream`, pass its classname in
     as the streamClass argument:
 
-    >>> spine2 = humdrum.spineParser.HumdrumSpine(
-    ...              streamClass = stream.Part)
+    >>> spine2 = humdrum.spineParser.HumdrumSpine(streamClass=stream.Part)
     >>> spine2.stream
     <music21.stream.Part ...>
     '''
@@ -2420,8 +2419,8 @@ def kernTandemToObject(tandem):
             return MM
         except ValueError:
             # assuming that metronomeMark here is text now
-            metronomeMark = re.sub(r'^\[','', metronomeMark)
-            metronomeMark = re.sub(r']\s*$','', metronomeMark)
+            metronomeMark = re.sub(r'^\[', '', metronomeMark)
+            metronomeMark = re.sub(r']\s*$', '', metronomeMark)
             MS = tempo.MetronomeMark(text=metronomeMark)
             return MS
     elif tandem.startswith("*M"):
@@ -2514,7 +2513,7 @@ class SpineComment(base.Music21Object):
 
     def __init__(self, comment = ""):
         base.Music21Object.__init__(self)
-        commentPart = re.sub(r'^\!+\s?','', comment)
+        commentPart = re.sub(r'^\!+\s?', '', comment)
         self.comment = commentPart
 
     def __repr__(self):
@@ -2534,7 +2533,7 @@ class GlobalComment(base.Music21Object):
 
     def __init__(self, comment = ""):
         base.Music21Object.__init__(self)
-        commentPart = re.sub(r'^\!\!+\s?','', comment)
+        commentPart = re.sub(r'^\!\!+\s?', '', comment)
         commentPart = commentPart.strip()
         self.comment = commentPart
 
@@ -2568,10 +2567,10 @@ class GlobalReference(base.Music21Object):
 
     def __init__(self, codeOrAll = "", valueOrNone = None):
         base.Music21Object.__init__(self)
-        codeOrAll = re.sub(r'^\!\!\!+','', codeOrAll)
+        codeOrAll = re.sub(r'^\!\!\!+', '', codeOrAll)
         codeOrAll = codeOrAll.strip()
         if valueOrNone is None and ':' in codeOrAll:
-            valueOrNone = re.sub(r'^.*?\:','', codeOrAll)
+            valueOrNone = re.sub(r'^.*?\:', '', codeOrAll)
             codeOrAll = re.sub(r'\:.*$', '', codeOrAll)
         self.code = codeOrAll
         self.value = valueOrNone

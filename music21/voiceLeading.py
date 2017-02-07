@@ -147,7 +147,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         set the key of this voiceleading quartet, for use in theory analysis routines
         such as closesIncorrectly. The default key is C major
 
-        >>> vlq = voiceLeading.VoiceLeadingQuartet('D','G','B','G')
+        >>> vlq = voiceLeading.VoiceLeadingQuartet('D', 'G', 'B', 'G')
         >>> vlq.key
         <music21.key.Key of C major>
         >>> vlq.key = 'G'
@@ -896,11 +896,11 @@ class VoiceLeadingQuartet(base.Music21Object):
         also checks to see if opening establishes tonic or dominant harmony (uses
         :meth:`~music21.roman.identifyAsTonicOrDominant`
 
-        >>> vl = voiceLeading.VoiceLeadingQuartet('D','D','D','F#')
+        >>> vl = voiceLeading.VoiceLeadingQuartet('D', 'D', 'D', 'F#')
         >>> vl.key = 'D'
         >>> vl.opensIncorrectly()
         False
-        >>> vl = voiceLeading.VoiceLeadingQuartet('B','A','G#','A')
+        >>> vl = voiceLeading.VoiceLeadingQuartet('B', 'A', 'G#', 'A')
         >>> vl.key = 'A'
         >>> vl.opensIncorrectly()
         False
@@ -924,7 +924,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         c2 = chord.Chord([self.vIntervals[1].noteStart, self.vIntervals[1].noteEnd])
         r1 = roman.identifyAsTonicOrDominant(c1, self.key)
         r2 = roman.identifyAsTonicOrDominant(c2, self.key)
-        openings = ['P1','P5', 'I', 'V']
+        openings = ['P1', 'P5', 'I', 'V']
         return not ( (self.vIntervals[0].simpleName in openings
                         or self.vIntervals[1].simpleName in openings)
                       and (r1[0].upper() in openings if r1 is not False else False
@@ -1088,7 +1088,7 @@ class Verticality(base.Music21Object):
         False
         >>> V({0:N('A4'), 1:N('B4'), 2:N('C#4')}).isConsonant()
         False
-        >>> V({0:N('C3'), 1:N('G5'), 2:chord.Chord(['C3','E4','G5'])}).isConsonant()
+        >>> V({0:N('C3'), 1:N('G5'), 2:chord.Chord(['C3', 'E4', 'G5'])}).isConsonant()
         True
         >>> V({0:N('A3'), 1:N('B3'), 2:N('C4')}).isConsonant()
         False
@@ -1106,11 +1106,11 @@ class Verticality(base.Music21Object):
         as a chord. Pretty much returns the vertical slice to a chordified output.
 
         >>> N = note.Note
-        >>> vs1 = voiceLeading.Verticality({0:N('A4'), 1:chord.Chord(['B','C','A']), 2:N('A')})
+        >>> vs1 = voiceLeading.Verticality({0:N('A4'), 1:chord.Chord(['B', 'C', 'A']), 2:N('A')})
         >>> vs1.getChord()
         <music21.chord.Chord A4 B C A A>
         >>> voiceLeading.Verticality({0:N('A3'), 
-        ...                           1:chord.Chord(['F3','D4','A4']), 
+        ...                           1:chord.Chord(['F3', 'D4', 'A4']), 
         ...                           2:harmony.ChordSymbol('Am')}).getChord()
         <music21.chord.Chord A3 F3 D4 A4 A2 C3 E3>
         '''
@@ -1626,7 +1626,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
 
     Accepts a sequence of strings, pitches, or notes.
 
-    >>> ex = voiceLeading.ThreeNoteLinearSegment('C#4','D4','E-4')
+    >>> ex = voiceLeading.ThreeNoteLinearSegment('C#4', 'D4', 'E-4')
     >>> ex.n1
     <music21.note.Note C#>
     >>> ex.n2
@@ -1651,7 +1651,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
 
     if no octave specified, default octave of 4 is assumed
 
-    >>> ex2 = voiceLeading.ThreeNoteLinearSegment('a','b','c')
+    >>> ex2 = voiceLeading.ThreeNoteLinearSegment('a', 'b', 'c')
     >>> ex2.n1
     <music21.note.Note A>
     >>> ex2.n1.pitch.defaultOctave
@@ -1725,7 +1725,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         get the interval between the left-most note and the right-most note
         (read-only property)
 
-        >>> tnls = voiceLeading.ThreeNoteLinearSegment('C', 'E','G')
+        >>> tnls = voiceLeading.ThreeNoteLinearSegment('C', 'E', 'G')
         >>> tnls.iLeftToRight
         <music21.interval.Interval P5>
         ''')
@@ -1734,7 +1734,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         get the interval between the left-most note and the middle note
         (read-only property)
 
-        >>> tnls = voiceLeading.ThreeNoteLinearSegment('A','B','G')
+        >>> tnls = voiceLeading.ThreeNoteLinearSegment('A', 'B', 'G')
         >>> tnls.iLeft
         <music21.interval.Interval M2>
         ''')
@@ -1742,7 +1742,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         get the interval between the middle note and the right-most note
         (read-only property)
 
-        >>> tnls = voiceLeading.ThreeNoteLinearSegment('A','B','G')
+        >>> tnls = voiceLeading.ThreeNoteLinearSegment('A', 'B', 'G')
         >>> tnls.iRight
         <music21.interval.Interval M-3>
         ''')
@@ -1778,41 +1778,41 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
 
         Accepts pitch or note objects; method is dependent on octave information
 
-        >>> voiceLeading.ThreeNoteLinearSegment('C#4','D4','E-4').couldBePassingTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('C#4', 'D4', 'E-4').couldBePassingTone()
         True
-        >>> voiceLeading.ThreeNoteLinearSegment('C3','D3','E3').couldBePassingTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('C3', 'D3', 'E3').couldBePassingTone()
         True
-        >>> voiceLeading.ThreeNoteLinearSegment('E-3','F3','G-3').couldBePassingTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('E-3', 'F3', 'G-3').couldBePassingTone()
         True
-        >>> voiceLeading.ThreeNoteLinearSegment('C3','C3','C3').couldBePassingTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('C3', 'C3', 'C3').couldBePassingTone()
         False
-        >>> voiceLeading.ThreeNoteLinearSegment('A3','C3','D3').couldBePassingTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('A3', 'C3', 'D3').couldBePassingTone()
         False
 
         Directionality must be maintained
 
-        >>> voiceLeading.ThreeNoteLinearSegment('B##3','C4','D--4').couldBePassingTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('B##3', 'C4', 'D--4').couldBePassingTone()
         False
 
         If no octave is given then ._defaultOctave is used.  This is generally octave 4
 
-        >>> voiceLeading.ThreeNoteLinearSegment('C','D','E').couldBePassingTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('C', 'D', 'E').couldBePassingTone()
         True
-        >>> voiceLeading.ThreeNoteLinearSegment('C4','D','E').couldBePassingTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('C4', 'D', 'E').couldBePassingTone()
         True
-        >>> voiceLeading.ThreeNoteLinearSegment('C5','D','E').couldBePassingTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('C5', 'D', 'E').couldBePassingTone()
         False
 
         Method returns true if either a chromatic passing tone or a diatonic passing
         tone is identified. Spelling of the pitch does matter!
 
-        >>> voiceLeading.ThreeNoteLinearSegment('B3','C4','B##3').couldBePassingTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('B3', 'C4', 'B##3').couldBePassingTone()
         False
-        >>> voiceLeading.ThreeNoteLinearSegment('A##3','C4','E---4').couldBePassingTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('A##3', 'C4', 'E---4').couldBePassingTone()
         False
-        >>> voiceLeading.ThreeNoteLinearSegment('B3','C4','D-4').couldBePassingTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('B3', 'C4', 'D-4').couldBePassingTone()
         True
-        >>> voiceLeading.ThreeNoteLinearSegment('B3','C4','C#4').couldBePassingTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('B3', 'C4', 'C#4').couldBePassingTone()
         True
         '''
         if not self._isComplete():
@@ -1853,19 +1853,19 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         AND between each of the notes there is a chromatic interval of 1 or -1 and
         multiplied together it is 1. (i.e.: C -> D-- -> D- is not a chromatic passing tone).
 
-        >>> voiceLeading.ThreeNoteLinearSegment('B3','C4','C#4').couldBeChromaticPassingTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('B3', 'C4', 'C#4').couldBeChromaticPassingTone()
         True
-        >>> voiceLeading.ThreeNoteLinearSegment('B3','C4','C#4').couldBeChromaticPassingTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('B3', 'C4', 'C#4').couldBeChromaticPassingTone()
         True
-        >>> voiceLeading.ThreeNoteLinearSegment('B3','B#3','C#4').couldBeChromaticPassingTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('B3', 'B#3', 'C#4').couldBeChromaticPassingTone()
         True
-        >>> voiceLeading.ThreeNoteLinearSegment('B3','D-4','C#4').couldBeChromaticPassingTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('B3', 'D-4', 'C#4').couldBeChromaticPassingTone()
         False
-        >>> voiceLeading.ThreeNoteLinearSegment('B3','C##4','C#4').couldBeChromaticPassingTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('B3', 'C##4', 'C#4').couldBeChromaticPassingTone()
         False
-        >>> voiceLeading.ThreeNoteLinearSegment('C#4','C4','C##4').couldBeChromaticPassingTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('C#4', 'C4', 'C##4').couldBeChromaticPassingTone()
         False
-        >>> voiceLeading.ThreeNoteLinearSegment('D--4','C4','D-4').couldBeChromaticPassingTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('D--4', 'C4', 'D-4').couldBeChromaticPassingTone()
         False
         '''
 
@@ -1884,19 +1884,19 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         checks if noteToAnalyze could be a neighbor tone, either a diatonic neighbor tone
         or a chromatic neighbor tone. Does NOT check if tone is non harmonic
 
-        >>> voiceLeading.ThreeNoteLinearSegment('E3','F3','E3').couldBeNeighborTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('E3', 'F3', 'E3').couldBeNeighborTone()
         True
-        >>> voiceLeading.ThreeNoteLinearSegment('B-4','C5','B-4').couldBeNeighborTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('B-4', 'C5', 'B-4').couldBeNeighborTone()
         True
-        >>> voiceLeading.ThreeNoteLinearSegment('B4','C5','B4').couldBeNeighborTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('B4', 'C5', 'B4').couldBeNeighborTone()
         True
-        >>> voiceLeading.ThreeNoteLinearSegment('G4','F#4','G4').couldBeNeighborTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('G4', 'F#4', 'G4').couldBeNeighborTone()
         True
-        >>> voiceLeading.ThreeNoteLinearSegment('E-3','F3','E-4').couldBeNeighborTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('E-3', 'F3', 'E-4').couldBeNeighborTone()
         False
-        >>> voiceLeading.ThreeNoteLinearSegment('C3','D3','E3').couldBeNeighborTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('C3', 'D3', 'E3').couldBeNeighborTone()
         False
-        >>> voiceLeading.ThreeNoteLinearSegment('A3','C3','D3').couldBeNeighborTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('A3', 'C3', 'D3').couldBeNeighborTone()
         False
         '''
         if not self._isComplete():
@@ -1910,11 +1910,11 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         returns true if and only if noteToAnalyze could be a diatonic neighbor tone, that is,
         the left and right notes are identical while the middle is a diatonic step up or down
 
-        >>> voiceLeading.ThreeNoteLinearSegment('C3','D3','C3').couldBeDiatonicNeighborTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('C3', 'D3', 'C3').couldBeDiatonicNeighborTone()
         True
-        >>> voiceLeading.ThreeNoteLinearSegment('C3','C#3','C3').couldBeDiatonicNeighborTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('C3', 'C#3', 'C3').couldBeDiatonicNeighborTone()
         False
-        >>> voiceLeading.ThreeNoteLinearSegment('C3','D-3','C3').couldBeDiatonicNeighborTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('C3', 'D-3', 'C3').couldBeDiatonicNeighborTone()
         False
         '''
 
@@ -1930,13 +1930,13 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         returns true if and only if noteToAnalyze could be a chromatic neighbor tone, that is,
         the left and right notes are identical while the middle is a chromatic step up or down
 
-        >>> voiceLeading.ThreeNoteLinearSegment('C3','D3','C3').couldBeChromaticNeighborTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('C3', 'D3', 'C3').couldBeChromaticNeighborTone()
         False
-        >>> voiceLeading.ThreeNoteLinearSegment('C3','D-3','C3').couldBeChromaticNeighborTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('C3', 'D-3', 'C3').couldBeChromaticNeighborTone()
         True
-        >>> voiceLeading.ThreeNoteLinearSegment('C#3','D3','C#3').couldBeChromaticNeighborTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('C#3', 'D3', 'C#3').couldBeChromaticNeighborTone()
         True
-        >>> voiceLeading.ThreeNoteLinearSegment('C#3','D3','D-3').couldBeChromaticNeighborTone()
+        >>> voiceLeading.ThreeNoteLinearSegment('C#3', 'D3', 'D-3').couldBeChromaticNeighborTone()
         False
         '''
         return (self._isComplete() 

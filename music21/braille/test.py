@@ -3315,7 +3315,7 @@ Barline final ⠣⠅
     
     def test_example26_1a(self):
         self.method = measureToBraille
-        c1 = chord.Chord(['G4','B4','D5','G5'], quarterLength=4.0)
+        c1 = chord.Chord(['G4', 'B4', 'D5', 'G5'], quarterLength=4.0)
         m1 = stream.Measure()
         m1.append(c1)
         self.methodArgs = {'showHand': 'right', 'descendingChords': True}
@@ -3326,7 +3326,7 @@ Barline final ⠣⠅
     
     def test_example26_1b(self):
         self.method = measureToBraille
-        c1 = chord.Chord(['G2','B2','D3','G3'], quarterLength=4.0)
+        c1 = chord.Chord(['G2', 'B2', 'D3', 'G3'], quarterLength=4.0)
         m1 = stream.Measure()
         m1.append(c1)
         self.methodArgs = {'showHand': 'left', 'descendingChords': False}
@@ -3337,8 +3337,8 @@ Barline final ⠣⠅
     
     def test_example26_2(self):
         self.method = keyboardPartsToBraille
-        chord_right = chord.Chord(['D4','B4','G5'], quarterLength=4.0)
-        chord_left = chord.Chord(['G2','D3','B3'], quarterLength=4.0)
+        chord_right = chord.Chord(['D4', 'B4', 'G5'], quarterLength=4.0)
+        chord_left = chord.Chord(['G2', 'D3', 'B3'], quarterLength=4.0)
         part_right = stream.Part()
         part_right.append(meter.TimeSignature('c'))
         part_right.append(chord_right)
@@ -3361,8 +3361,8 @@ Barline final ⠣⠅
     
     def test_example26_3(self):
         self.method = keyboardPartsToBraille
-        chord_right = chord.Chord(['C4','E5'], quarterLength=4.0)
-        chord_left = chord.Chord(['C2','E3'], quarterLength=4.0)
+        chord_right = chord.Chord(['C4', 'E5'], quarterLength=4.0)
+        chord_left = chord.Chord(['C2', 'E3'], quarterLength=4.0)
         part_right = stream.Part()
         part_right.append(meter.TimeSignature('c'))
         part_right.append(chord_right)
@@ -3385,8 +3385,8 @@ Barline final ⠣⠅
     
     def test_example26_4(self):
         self.method = keyboardPartsToBraille
-        chord_right = chord.Chord(['B4','E5','C6'], quarterLength=4.0)
-        chord_left = chord.Chord(['G2','E3','E4'], quarterLength=4.0)
+        chord_right = chord.Chord(['B4', 'E5', 'C6'], quarterLength=4.0)
+        chord_left = chord.Chord(['G2', 'E3', 'E4'], quarterLength=4.0)
         part_right = stream.Part()
         part_right.append(meter.TimeSignature('c'))
         part_right.append(chord_right)

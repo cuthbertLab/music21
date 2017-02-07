@@ -759,10 +759,10 @@ class GraphNetworxGraph(Graph):
             # testing default; temporary
             try: # pragma: no cover
                 g = extm.networkx.Graph()
-#             g.add_edge('a','b',weight=1.0)
-#             g.add_edge('b','c',weight=0.6)
-#             g.add_edge('c','d',weight=0.2)
-#             g.add_edge('d','e',weight=0.6)
+#             g.add_edge('a', 'b',weight=1.0)
+#             g.add_edge('b', 'c',weight=0.6)
+#             g.add_edge('c', 'd',weight=0.2)
+#             g.add_edge('d', 'e',weight=0.6)
                 self.networkxGraph = g
             except NameError: 
                 pass # keep as None
@@ -5012,7 +5012,7 @@ class Test(unittest.TestCase):
         self.assertEqual(b.data, [(48, 1), (61, 1), (62, 1), (71, 1), (72, 1)])
 
         s = stream.Stream()
-        s.append(sc.getChord('e3','a3'))
+        s.append(sc.getChord('e3', 'a3'))
         s.append(note.Note('c3'))
         b = PlotHistogramPitchClass(s, doneAction=None)
         b.process()
@@ -5021,7 +5021,7 @@ class Test(unittest.TestCase):
         self.assertEqual(b.data, [(0, 1), (4, 1), (5, 1), (7, 1), (9, 1)])
 
         s = stream.Stream()
-        s.append(sc.getChord('e3','a3', quarterLength=2))
+        s.append(sc.getChord('e3', 'a3', quarterLength=2))
         s.append(note.Note('c3', quarterLength=0.5))
         b = PlotHistogramQuarterLength(s, doneAction=None)
         b.process()
@@ -5048,8 +5048,8 @@ class Test(unittest.TestCase):
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
-        s.append(sc.getChord('e3','a3', quarterLength=0.5))
-        s.append(sc.getChord('b3','c5', quarterLength=1.5))
+        s.append(sc.getChord('e3', 'a3', quarterLength=0.5))
+        s.append(sc.getChord('b3', 'c5', quarterLength=1.5))
         s.append(note.Note('c3', quarterLength=2))
         b = PlotScatterPitchSpaceQuarterLength(s, doneAction=None, xLog=False)
         b.process()
@@ -5064,8 +5064,8 @@ class Test(unittest.TestCase):
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
-        s.append(sc.getChord('e3','a3', quarterLength=0.5))
-        s.append(sc.getChord('b3','c5', quarterLength=1.5))
+        s.append(sc.getChord('e3', 'a3', quarterLength=0.5))
+        s.append(sc.getChord('b3', 'c5', quarterLength=1.5))
         s.append(note.Note('c3', quarterLength=2))
         b = PlotScatterPitchClassQuarterLength(s, doneAction=None, xLog=False)
         b.process()
@@ -5080,9 +5080,9 @@ class Test(unittest.TestCase):
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
-        s.append(sc.getChord('e3','a3', quarterLength=0.5))
+        s.append(sc.getChord('e3', 'a3', quarterLength=0.5))
         s.append(note.Note('c3', quarterLength=2))
-        s.append(sc.getChord('b3','e4', quarterLength=1.5))
+        s.append(sc.getChord('b3', 'e4', quarterLength=1.5))
         s.append(note.Note('d3', quarterLength=2))
         self.assertEqual([e.offset for e in s], [0.0, 0.5, 2.5, 4.0])
 
@@ -5100,10 +5100,10 @@ class Test(unittest.TestCase):
 
         s = stream.Stream()
         s.append(dynamics.Dynamic('f'))
-        s.append(sc.getChord('e3','a3', quarterLength=0.5))
+        s.append(sc.getChord('e3', 'a3', quarterLength=0.5))
         #s.append(note.Note('c3', quarterLength=2))
         s.append(dynamics.Dynamic('p'))
-        s.append(sc.getChord('b3','e4', quarterLength=1.5))
+        s.append(sc.getChord('b3', 'e4', quarterLength=1.5))
         #s.append(note.Note('d3', quarterLength=2))
 
         #s.show()
@@ -5121,9 +5121,9 @@ class Test(unittest.TestCase):
 
         s = stream.Stream()
         s.append(note.Note('c3'))
-        s.append(sc.getChord('e3','a3', quarterLength=0.5))
+        s.append(sc.getChord('e3', 'a3', quarterLength=0.5))
         #s.append(note.Note('c3', quarterLength=2))
-        s.append(sc.getChord('b3','e4', quarterLength=1.5))
+        s.append(sc.getChord('b3', 'e4', quarterLength=1.5))
 
         b = PlotHorizontalBarPitchClassOffset(s, doneAction=None)
         b.process()
@@ -5137,9 +5137,9 @@ class Test(unittest.TestCase):
 
         s = stream.Stream()
         s.append(note.Note('c3'))
-        s.append(sc.getChord('e3','a3', quarterLength=0.5))
+        s.append(sc.getChord('e3', 'a3', quarterLength=0.5))
         #s.append(note.Note('c3', quarterLength=2))
-        s.append(sc.getChord('b3','e4', quarterLength=1.5))
+        s.append(sc.getChord('b3', 'e4', quarterLength=1.5))
 
         b = PlotHorizontalBarPitchSpaceOffset(s, doneAction=None)
         b.process()
@@ -5154,11 +5154,11 @@ class Test(unittest.TestCase):
 
         s = stream.Stream()
         s.append(note.Note('c3'))
-        s.append(sc.getChord('e3','a3', quarterLength=0.5))
+        s.append(sc.getChord('e3', 'a3', quarterLength=0.5))
         #s.append(note.Note('c3', quarterLength=2))
-        s.append(sc.getChord('b3','e4', quarterLength=1.5))
-        s.append(sc.getChord('f4','g5', quarterLength=3))
-        s.append(sc.getChord('f4','g5', quarterLength=3))
+        s.append(sc.getChord('b3', 'e4', quarterLength=1.5))
+        s.append(sc.getChord('f4', 'g5', quarterLength=3))
+        s.append(sc.getChord('f4', 'g5', quarterLength=3))
         s.append(note.Note('c5', quarterLength=3))
 
         b = PlotScatterWeightedPitchSpaceQuarterLength(s, doneAction=None, xLog=False)
@@ -5172,11 +5172,11 @@ class Test(unittest.TestCase):
 
         s = stream.Stream()
         s.append(note.Note('c3'))
-        s.append(sc.getChord('e3','a3', quarterLength=0.5))
+        s.append(sc.getChord('e3', 'a3', quarterLength=0.5))
         #s.append(note.Note('c3', quarterLength=2))
-        s.append(sc.getChord('b3','e4', quarterLength=1.5))
-        s.append(sc.getChord('f4','g5', quarterLength=3))
-        s.append(sc.getChord('f4','g5', quarterLength=3))
+        s.append(sc.getChord('b3', 'e4', quarterLength=1.5))
+        s.append(sc.getChord('f4', 'g5', quarterLength=3))
+        s.append(sc.getChord('f4', 'g5', quarterLength=3))
         s.append(note.Note('c5', quarterLength=3))
 
         b = PlotScatterWeightedPitchClassQuarterLength(s, doneAction=None, xLog=False)
@@ -5194,16 +5194,16 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.append(dynamics.Dynamic('f'))
         #s.append(note.Note('c3'))
-        c = sc.getChord('e3','a3', quarterLength=0.5)
+        c = sc.getChord('e3', 'a3', quarterLength=0.5)
         self.assertEqual(repr(c), '<music21.chord.Chord E3 F3 G3 A3>')
         self.assertEqual([n.pitch.ps for n in c], [52.0, 53.0, 55.0, 57.0])
         s.append(c)
         #s.append(note.Note('c3', quarterLength=2))
         s.append(dynamics.Dynamic('mf'))
-        s.append(sc.getChord('b3','e4', quarterLength=1.5))
+        s.append(sc.getChord('b3', 'e4', quarterLength=1.5))
         s.append(dynamics.Dynamic('pp'))
-        s.append(sc.getChord('f4','g5', quarterLength=3))
-        s.append(sc.getChord('f4','g5', quarterLength=3))
+        s.append(sc.getChord('f4', 'g5', quarterLength=3))
+        s.append(sc.getChord('f4', 'g5', quarterLength=3))
         s.append(note.Note('c5', quarterLength=3))
 
         b = PlotScatterWeightedPitchSpaceDynamicSymbol(s, doneAction=None, xLog=False)
@@ -5229,11 +5229,11 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.append(dynamics.Dynamic('f'))
         s.append(note.Note('c3'))
-        s.append(sc.getChord('e3','a3', quarterLength=0.5))
+        s.append(sc.getChord('e3', 'a3', quarterLength=0.5))
         s.append(dynamics.Dynamic('mf'))
-        s.append(sc.getChord('b3','e4', quarterLength=1.5))
+        s.append(sc.getChord('b3', 'e4', quarterLength=1.5))
         s.append(dynamics.Dynamic('pp'))
-        s.append(sc.getChord('f4','g5', quarterLength=3))
+        s.append(sc.getChord('f4', 'g5', quarterLength=3))
         s.append(note.Note('c5', quarterLength=3))
 
         b = Plot3DBarsPitchSpaceQuarterLength(s, doneAction=None, xLog=False)
@@ -5252,13 +5252,13 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.append(dynamics.Dynamic('f'))
         s.append(note.Note('c4'))
-        s.append(sc.getChord('e3','a3', quarterLength=0.5))
+        s.append(sc.getChord('e3', 'a3', quarterLength=0.5))
         #s.append(note.Note('c3', quarterLength=2))
         s.append(dynamics.Dynamic('mf'))
-        s.append(sc.getChord('b3','e4', quarterLength=1.5))
+        s.append(sc.getChord('b3', 'e4', quarterLength=1.5))
         s.append(dynamics.Dynamic('pp'))
-        s.append(sc.getChord('f4','g5', quarterLength=3))
-        s.append(sc.getChord('f4','g5', quarterLength=3))
+        s.append(sc.getChord('f4', 'g5', quarterLength=3))
+        s.append(sc.getChord('f4', 'g5', quarterLength=3))
         s.append(note.Note('c5', quarterLength=3))
         
         for args in [

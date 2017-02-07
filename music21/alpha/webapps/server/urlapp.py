@@ -50,7 +50,7 @@ def music21ModWSGICorpusURLApplication(environ, start_response):
     
     resultStr = ""
     
-    if len(pathParts) > 1 and pathParts[1] in ['corpusParse','corpusReduce']:
+    if len(pathParts) > 1 and pathParts[1] in ['corpusParse', 'corpusReduce']:
         workList = corpus.corpora.CoreCorpus().getWorkList(pathParts[2])
         if len(workList) >1:
             resultStr = "Multiple choices for query "+pathParts[2]+". Please try one of the following\n"
@@ -124,7 +124,7 @@ def music21ModWSGICorpusURLApplication(environ, start_response):
     else:
         if returnType == "xml":
             response_headers = [('Content-type', 'application/vnd.recordare.musicxml+xml'),
-                                ('Content-disposition','attachment; filename='+filename),
+                                ('Content-disposition', 'attachment; filename='+filename),
                                 ('Content-Length', str(len(resultStr))),
                                ]
             start_response(status, response_headers)
@@ -150,8 +150,8 @@ def music21ModWSGICorpusURLApplication(environ, start_response):
 application = music21ModWSGICorpusURLApplication
 
 def noteflightEmbedTemplate(musicxml, title):
-    musicxml = musicxml.replace('\n','')
-    musicxml = musicxml.replace('\'','\\\'')
+    musicxml = musicxml.replace('\n', '')
+    musicxml = musicxml.replace('\'', '\\\'')
     htmlData = """
 <html>
 <head>
@@ -162,7 +162,7 @@ def noteflightEmbedTemplate(musicxml, title):
     function noteflightEventHandler(e)
     {
         if(e.type == 'scoreDataLoaded') {
-            m21.noteflight.sendMusicXMLToNoteflightEmbed('nfscore','"""
+            m21.noteflight.sendMusicXMLToNoteflightEmbed('nfscore', '"""
     htmlData += musicxml
     htmlData +="""')
         }
@@ -172,7 +172,7 @@ def noteflightEmbedTemplate(musicxml, title):
 m21 = new Music21interface();
 
 function setup() {
-    m21.noteflight.createNoteflightEmbed('noteflightembed','nfscore','fc79df30896da6aa03f90ff771015913ca6880be',800,450,1.0);
+    m21.noteflight.createNoteflightEmbed('noteflightembed', 'nfscore', 'fc79df30896da6aa03f90ff771015913ca6880be',800,450,1.0);
 }
 </script>
 

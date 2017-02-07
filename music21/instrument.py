@@ -464,7 +464,7 @@ class Violin(StringInstrument):
         self.midiProgram = 40
 
         self.lowestNote = pitch.Pitch('G3')
-        self._stringPitches = ['G3','D4','A4','E5']
+        self._stringPitches = ['G3', 'D4', 'A4', 'E5']
 
 class Viola(StringInstrument):
     def __init__(self):
@@ -475,7 +475,7 @@ class Viola(StringInstrument):
         self.midiProgram = 41
 
         self.lowestNote = pitch.Pitch('C3')
-        self._stringPitches = ['C3','G3','D4','A4']
+        self._stringPitches = ['C3', 'G3', 'D4', 'A4']
 
 class Violoncello(StringInstrument):
     def __init__(self):
@@ -486,7 +486,7 @@ class Violoncello(StringInstrument):
         self.midiProgram = 42
 
         self.lowestNote = pitch.Pitch('C2')
-        self._stringPitches = ['C2','G2','D3','A3']
+        self._stringPitches = ['C2', 'G2', 'D3', 'A3']
 
 class Contrabass(StringInstrument):
     '''
@@ -503,7 +503,7 @@ class Contrabass(StringInstrument):
         self.midiProgram = 43
 
         self.lowestNote = pitch.Pitch('E2')
-        self._stringPitches = ['E1','A1','D2','G2']
+        self._stringPitches = ['E1', 'A1', 'D2', 'G2']
         self.transposition = interval.Interval('P-8')
 
 class Harp(StringInstrument):
@@ -521,6 +521,8 @@ class Harp(StringInstrument):
 class Guitar(StringInstrument):
     def __init__(self):
         StringInstrument.__init__(self)
+        self.lowestNote = pitch.Pitch('E2')
+        self._stringPitches = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4']
 
 class AcousticGuitar(Guitar):
     def __init__(self):
@@ -530,9 +532,6 @@ class AcousticGuitar(Guitar):
         self.instrumentAbbreviation = 'Ac Gtr'
         self.midiProgram = 24
 
-        self.lowestNote = pitch.Pitch('E2')
-        self._stringPitches = ['E2','A2','D3','G3','B3','E4']
-
 class ElectricGuitar(Guitar):
     def __init__(self):
         Guitar.__init__(self)
@@ -540,9 +539,6 @@ class ElectricGuitar(Guitar):
         self.instrumentName = 'Electric Guitar'
         self.instrumentAbbreviation = 'Elec Gtr'
         self.midiProgram = 26
-
-        self.lowestNote = pitch.Pitch('E2')
-        self._stringPitches = ['E2','A2','D3','G3','B3','E4']
 
 class AcousticBass(Guitar):
     def __init__(self):
@@ -553,7 +549,7 @@ class AcousticBass(Guitar):
         self.midiProgram = 32
 
         self.lowestNote = pitch.Pitch('E1')
-        self._stringPitches = ['E1','A1','D2','G2']
+        self._stringPitches = ['E1', 'A1', 'D2', 'G2']
 
 class ElectricBass(Guitar):
     def __init__(self):
@@ -564,7 +560,7 @@ class ElectricBass(Guitar):
         self.midiProgram = 33
 
         self.lowestNote = pitch.Pitch('E1')
-        self._stringPitches = ['E1','A1','D2','G2']
+        self._stringPitches = ['E1', 'A1', 'D2', 'G2']
         
 class FretlessBass(Guitar):
     def __init__(self):
@@ -575,7 +571,7 @@ class FretlessBass(Guitar):
         self.midiProgram = 35
 
         self.lowestNote = pitch.Pitch('E1')
-        self._stringPitches = ['E1','A1','D2','G2']
+        self._stringPitches = ['E1', 'A1', 'D2', 'G2']
         
         
 class Mandolin(StringInstrument):
@@ -586,7 +582,7 @@ class Mandolin(StringInstrument):
         self.instrumentAbbreviation = 'Mdln'
         
         self.lowestNote = pitch.Pitch('G3')
-        self._stringPitches = ['G3','D4','A4','E5']
+        self._stringPitches = ['G3', 'D4', 'A4', 'E5']
         
 class Ukulele(StringInstrument):
     def __init__(self):
@@ -596,7 +592,7 @@ class Ukulele(StringInstrument):
         self.instrumentAbbreviation = 'Uke'
         
         self.lowestNote = pitch.Pitch('C4')
-        self._stringPitches = ['G4','C4','E4','A4']
+        self._stringPitches = ['G4', 'C4', 'E4', 'A4']
 
 class Banjo(StringInstrument):
     def __init__(self):
@@ -607,7 +603,7 @@ class Banjo(StringInstrument):
         self.midiProgram = 105
         
         self.lowestNote = pitch.Pitch('C3')
-        self._stringPitches = ['C3','G3','D4','A4']
+        self._stringPitches = ['C3', 'G3', 'D4', 'A4']
         self.transposition = interval.Interval('P-8')
 
 class Lute(StringInstrument):

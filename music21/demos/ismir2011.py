@@ -52,7 +52,7 @@ def testFictaFeature():
     print (fe.extract().vector)
 
 def testDataSet():
-    fes = features.extractorsById(['ql1','ql2','ql3'])
+    fes = features.extractorsById(['ql1', 'ql2', 'ql3'])
     ds = features.DataSet(classLabel='Composer')
     ds.addFeatureExtractors(fes)
     
@@ -81,7 +81,9 @@ def testDataSet():
     p.process()
 
 def prepareChinaEurope1():
-    featureExtractors = features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21'])
+    featureExtractors = features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 
+        'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 
+        'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21'])
     #featureExtractors = features.extractorsById('all')
 
     oChina1 = corpus.parse('essenFolksong/han1')

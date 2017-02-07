@@ -4171,7 +4171,7 @@ class TimeSignature(base.Music21Object):
         will determine the length of the beat:
 
 
-        >>> ts3 = meter.TimeSignature(['3/8','2/8']) # will partition as 2 beat
+        >>> ts3 = meter.TimeSignature(['3/8', '2/8']) # will partition as 2 beat
         >>> ts3.getBeatDuration(.5)
         <music21.duration.Duration 1.5>
         >>> ts3.getBeatDuration(1.5)
@@ -4217,7 +4217,7 @@ class TimeSignature(base.Music21Object):
         Works for asymmetrical meters as well:
 
 
-        >>> ts3 = meter.TimeSignature(['3/8','2/8']) # will partition as 2 beat
+        >>> ts3 = meter.TimeSignature(['3/8', '2/8']) # will partition as 2 beat
         >>> ts3.getOffsetFromBeat(1)
         0.0
         >>> ts3.getOffsetFromBeat(2)
@@ -4303,7 +4303,7 @@ class TimeSignature(base.Music21Object):
         >>> ts1.getBeatProportion(1.0)
         2.0
 
-        >>> ts3 = meter.TimeSignature(['3/8','2/8']) # will partition as 2 beat
+        >>> ts3 = meter.TimeSignature(['3/8', '2/8']) # will partition as 2 beat
         >>> ts3.getBeatProportion(.75)
         1.5
         >>> ts3.getBeatProportion(2.0)
@@ -4325,8 +4325,8 @@ class TimeSignature(base.Music21Object):
         '1 1/2'
         >>> ts1.getBeatProportionStr(1.0)
         '2'
-        >>> ts3 = meter.TimeSignature(['3/8','2/8']) # will partition as 2 beat
-        >>> ts3.getBeatProportionStr(.75)
+        >>> ts3 = meter.TimeSignature(['3/8', '2/8']) # will partition as 2 beat
+        >>> ts3.getBeatProportionStr(0.75)
         '1 1/2'
         >>> ts3.getBeatProportionStr(2)
         '2 1/2'

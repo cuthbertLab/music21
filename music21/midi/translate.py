@@ -562,7 +562,7 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
     
     See noteToMidiEvents above for more details.
 
-    >>> c = chord.Chord(['c3','g#4', 'b5'])
+    >>> c = chord.Chord(['c3', 'g#4', 'b5'])
     >>> c.volume = volume.Volume(velocity=90)
     >>> c.volume.velocityIsRelative = False
     >>> eventList = midi.translate.chordToMidiEvents(c)
@@ -2399,7 +2399,7 @@ class Test(unittest.TestCase):
         n.pitch.microtone = 25
         s.insert(0, n)
 
-        c = chord.Chord(['d','f','a'], type='half')
+        c = chord.Chord(['d', 'f', 'a'], type='half')
         c.pitches[1].microtone = -50
         s.append(c)
 

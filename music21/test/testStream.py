@@ -152,7 +152,7 @@ class TestExternal(unittest.TestCase):
         '''
         q = Stream()
         r = Stream()
-        for x in ['c3','a3','g#4','d2'] * 10:
+        for x in ['c3', 'a3', 'g#4', 'd2'] * 10:
             n = note.Note(x)
             n.quarterLength = .25
             q.append(n)
@@ -182,7 +182,7 @@ class TestExternal(unittest.TestCase):
         probably b/c when appending to s Stream activeSite is set to that stream
         '''
         from music21 import corpus, converter
-        a = converter.parse(corpus.getWork(['mozart', 'k155','movement2.xml']))
+        a = converter.parse(corpus.getWork(['mozart', 'k155', 'movement2.xml']))
         b = a[8][4:8]
         c = a[8][8:12]
         d = a[8][12:16]
@@ -248,7 +248,7 @@ class TestExternal(unittest.TestCase):
         q = Stream()
         r = Stream()
         p = Stream()
-        for x in ['c3','a3','c#4','d3'] * 30:
+        for x in ['c3', 'a3', 'c#4', 'd3'] * 30:
             n = note.Note(x)
             #n.quarterLength = random.choice([.25, .125, .5])
             n.quarterLength = random.choice([.25])
@@ -589,7 +589,7 @@ class Test(unittest.TestCase):
         '''
         q = Stream()
         r = Stream()
-        for x in ['c3','a3','g#4','d2'] * 10:
+        for x in ['c3', 'a3', 'g#4', 'd2'] * 10:
             n = note.Note(x)
             n.quarterLength = .25
             q.append(n)
@@ -662,7 +662,7 @@ class Test(unittest.TestCase):
         # a different test derived from a TestExternal
         q = Stream()
         r = Stream()
-        for x in ['c3','a3','c#4','d3'] * 30:
+        for x in ['c3', 'a3', 'c#4', 'd3'] * 30:
             n = note.Note(x)
             n.quarterLength = random.choice([.25])
             q.append(n)
@@ -734,7 +734,7 @@ class Test(unittest.TestCase):
         # a different test derived from a TestExternal
         q = Stream()
         r = Stream()
-        for x in ['c3','a3','c#4','d3'] * 15:
+        for x in ['c3', 'a3', 'c#4', 'd3'] * 15:
             n = note.Note(x)
             n.quarterLength = random.choice([.25])
             q.append(n)
@@ -789,7 +789,7 @@ class Test(unittest.TestCase):
         # a different test derived from a TestExternal
         q = Stream()
         r = Stream()
-        for x in ['c3','a3','c#4','d3'] * 30:
+        for x in ['c3', 'a3', 'c#4', 'd3'] * 30:
             n = note.Note(x)
             n.quarterLength = random.choice([.25])
             q.append(n)
@@ -819,7 +819,7 @@ class Test(unittest.TestCase):
         '''
         q = Stream()
         r = Stream()
-        for x in ['c3','a3','c#4','d3'] * 5:
+        for x in ['c3', 'a3', 'c#4', 'd3'] * 5:
             n = note.Note(x)
             n.quarterLength = random.choice([.25])
             q.append(n)
@@ -902,7 +902,7 @@ class Test(unittest.TestCase):
 
     def testClefs(self):
         s = Stream()
-        for x in ['c3','a3','c#4','d3'] * 5:
+        for x in ['c3', 'a3', 'c#4', 'd3'] * 5:
             n = note.Note(x)
             s.append(n)
         clefObj = s.bestClef()
@@ -1371,7 +1371,7 @@ class Test(unittest.TestCase):
         self.assertEqual(sorted(list(post.keys())), correctMeasureOffsetMap)
 
         #from music21 import graph
-        #graph.plotStream(altoPostTie, 'scatter', values=['pitchclass','offset'])
+        #graph.plotStream(altoPostTie, 'scatter', values=['pitchclass', 'offset'])
 
 
     def testMusicXMLGenerationViaPropertyA(self):
@@ -3635,7 +3635,7 @@ class Test(unittest.TestCase):
             n.quarterLength = ql
             s.append(n)
         makeNotation.makeTupletBrackets(s, inPlace = True)
-        self.assertEqual(collectType(s), [None, 'start', 'stop','start', None, 'stop', None])
+        self.assertEqual(collectType(s), [None, 'start', 'stop', 'start', None, 'stop', None])
         #s.show()
 
 
@@ -5268,7 +5268,7 @@ class Test(unittest.TestCase):
 #         self.assertEqual(len(s2.parts[2].getElementsByClass(
 #             'Measure')[0].voices), 1)
 # 
-#         s2 = s0.partsToVoices((['Violino I','Violino II'], ['Viola','Bassi'], ['Basso']), permitOneVoicePerPart=True)
+#         s2 = s0.partsToVoices((['Violino I', 'Violino II'], ['Viola', 'Bassi'], ['Basso']), permitOneVoicePerPart=True)
 #         self.assertEqual(len(s2.parts), 3)
 #         self.assertEqual(len(s2.parts[0].getElementsByClass(
 #             'Measure')[0].voices), 2)
@@ -5279,7 +5279,7 @@ class Test(unittest.TestCase):
 # 
 # 
 #         # this will keep the voice part unaltered
-#         s2 = s0.partsToVoices((['Violino I','Violino II'], ['Viola','Bassi'], 'Basso'), permitOneVoicePerPart=False)
+#         s2 = s0.partsToVoices((['Violino I', 'Violino II'], ['Viola', 'Bassi'], 'Basso'), permitOneVoicePerPart=False)
 #         self.assertEqual(len(s2.parts), 3)
 #         self.assertEqual(len(s2.parts[0].getElementsByClass(
 #             'Measure')[0].voices), 2)
@@ -5291,7 +5291,7 @@ class Test(unittest.TestCase):
 # 
 #         # mm 16-19 are a good examples
 #         s1 = corpus.parse('hwv56', '1-05').measures(16, 19)
-#         s2 = s1.partsToVoices((['Violino I','Violino II'], ['Viola','Bassi'], 'Basso'))
+#         s2 = s1.partsToVoices((['Violino I', 'Violino II'], ['Viola', 'Bassi'], 'Basso'))
 #         #s2.show()
 # 
 #         self.assertEqual(len(s2.parts), 3)
