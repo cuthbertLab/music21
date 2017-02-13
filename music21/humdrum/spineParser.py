@@ -717,7 +717,6 @@ class HumdrumDataCollection(object):
         # metadata.  We need to make a new metadata object and put the
         # information from insertList into the metadata structure.
         self.stream.insert(0, metadata.Metadata())
-        print('foo')
         for offset, el in insertList:
             self.addGlobalEventToMetadata(el)
         if insertList:
