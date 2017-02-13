@@ -1624,7 +1624,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         
         Raise an error if offset is not a number
         
-        >>> stream.Stream().insert("l","g")
+        >>> stream.Stream().insert("l", "g")
         Traceback (most recent call last):
         music21.exceptions21.StreamException: ...
 
@@ -4918,7 +4918,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> p2 = stream.Part()
         >>> p2.append([note.Note('C#5', type='half'), 
         ...            note.Note('E#5', type='quarter'), 
-        ...            chord.Chord(["E4","G5","C#7"])])
+        ...            chord.Chord(["E4", "G5", "C#7"])])
         >>> sc1 = stream.Score()
         >>> sc1.insert(0, p1)
         >>> sc1.insert(0, p2)

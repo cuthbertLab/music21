@@ -106,7 +106,7 @@ class ScoreFollower(object):
 
         >>> from music21.audioSearch import scoreFollower
         >>> scoreNotes = " ".join(["c4", "d", "e", "f", "g", "a", "b", "c'", "c", "e",
-        ...     "g", "c'", "a", "f", "d", "c#", "d#", "f#","c", "e", "g", "c'",
+        ...     "g", "c'", "a", "f", "d", "c#", "d#", "f#", "c", "e", "g", "c'",
         ...     "a", "f", "d", "c#", "d#", "f#"])
         >>> scNotes = converter.parse("tinynotation: 4/4 " + scoreNotes, makeNotation=False)
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)

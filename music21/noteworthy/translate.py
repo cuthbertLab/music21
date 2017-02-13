@@ -754,7 +754,7 @@ class NoteworthyTranslator(object):
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentMeasure = stream.Measure()
         >>> nwt.createOtherRepetitions({"Style" : "ToCoda", "Pos": "8", 
-        ...                             "Wide":"Y","Placement":"BestFitForward"})
+        ...                             "Wide":"Y", "Placement": "BestFitForward"})
         >>> "Coda" in nwt.currentMeasure[0].classes
         True
         '''
@@ -806,7 +806,7 @@ class NoteworthyTranslator(object):
         
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentMeasure = stream.Measure()
-        >>> nwt.createDynamics({"Style":"fff","Pos":"-8"})
+        >>> nwt.createDynamics({"Style": "fff", "Pos": "-8"})
         >>> nwt.currentMeasure[0]
         <music21.dynamics.Dynamic fff >      
         '''  
@@ -822,7 +822,7 @@ class NoteworthyTranslator(object):
         
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
-        >>> Lyricslist = nwt.createLyrics({'Text':'"Hello world"'})
+        >>> Lyricslist = nwt.createLyrics({'Text': '"Hello world"'})
         >>> Lyricslist[0]
         'Hello'      
         ''' 
@@ -830,9 +830,9 @@ class NoteworthyTranslator(object):
         space = 0
         allText = attributes['Text']
         allText = allText.strip('"')
-        allText = allText.replace("\r\n"," ")
-        allText = allText.replace("\r"," ") 
-        allText = allText.replace("\n"," ")    
+        allText = allText.replace("\r\n", " ")
+        allText = allText.replace("\r", " ") 
+        allText = allText.replace("\n", " ")    
         for word in allText.split(' '):
             nou = 1
             for wordPart in word.split('-'):

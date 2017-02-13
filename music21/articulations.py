@@ -30,8 +30,8 @@ are found in music21.expressions.
 >>> n1.articulations.append(articulations.Tenuto())
 >>> #_DOCS_SHOW n1.show()
 
->>> c1 = chord.Chord(["C3","G4","E-5"])
->>> c1.articulations = [articulations.OrganHeel(), articulations.Accent() ]
+>>> c1 = chord.Chord(["C3", "G4", "E-5"])
+>>> c1.articulations = [articulations.OrganHeel(), articulations.Accent()]
 >>> #_DOCS_SHOW c1.show()
 
 

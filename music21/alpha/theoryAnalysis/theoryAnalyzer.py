@@ -1873,7 +1873,7 @@ class Analyzer(object):
     
         '''
         testFunction = lambda mIntv: mIntv is not None and mIntv.simpleName in [
-                                                                        "A2","A4","d5","m7","M7"]
+                                                    "A2", "A4", "d5", "m7", "M7"]
         textFunction = lambda mIntv, pn: ("Dissonant melodic interval in part " + str(pn + 1) + 
                                           " measure " + str(mIntv.noteStart.measureNumber) +": " +
                                           str(mIntv.simpleNiceName) + " from " + 

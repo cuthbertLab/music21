@@ -447,7 +447,7 @@ class StringInstrument(Instrument):
             (N.B. that string to pitch conversion is happening automatically)
             
             
-            >>> vln1.stringPitches = ["G3","G4","B4","D4"]
+            >>> vln1.stringPitches = ["G3", "G4", "B4", "D4"]
             
             (`[*]In some tuning methods such as reentrant tuning on the ukulele,
             lute, or five-string banjo the order might not strictly be from lowest to

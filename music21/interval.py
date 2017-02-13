@@ -2714,30 +2714,30 @@ def subtract(intervalList):
     Starts with the first interval and subtracts the 
     following intervals from it:
     
-    >>> interval.subtract(["P5","M3"])
+    >>> interval.subtract(["P5", "M3"])
     <music21.interval.Interval m3>
-    >>> interval.subtract(["P4","d3"])
+    >>> interval.subtract(["P4", "d3"])
     <music21.interval.Interval A2>
     
     >>> m2Object = interval.Interval("m2")
-    >>> interval.subtract(["M6","m2",m2Object])
+    >>> interval.subtract(["M6", "m2", m2Object])
     <music21.interval.Interval AA4>
     >>> interval.subtract(["P4", "M-2"])
     <music21.interval.Interval P5>
-    >>> interval.subtract(["A2","A2"])
+    >>> interval.subtract(["A2", "A2"])
     <music21.interval.Interval P1>
-    >>> interval.subtract(["A1","P1"])
+    >>> interval.subtract(["A1", "P1"])
     <music21.interval.Interval A1>
     
-    >>> interval.subtract(["P8","P1"])
+    >>> interval.subtract(["P8", "P1"])
     <music21.interval.Interval P8>
-    >>> interval.subtract(["P8","d2"])
+    >>> interval.subtract(["P8", "d2"])
     <music21.interval.Interval A7>
-    >>> interval.subtract(["P8","A1"])
+    >>> interval.subtract(["P8", "A1"])
     <music21.interval.Interval d8>
 
     
-    >>> a = interval.subtract(["P5","A5"])
+    >>> a = interval.subtract(["P5", "A5"])
     >>> a.niceName
     'Diminished Unison'
     >>> a.directedNiceName

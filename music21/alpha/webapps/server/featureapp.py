@@ -45,12 +45,13 @@ ORANGE_OUTPUT_ID = 'orange'
 ARFF_OUTPUT_ID = 'arff'
 
 extractorTypeNames = [
-["m21","Music21-specific Extractors"],
-["M","Melody-based Extractors"],
-["P","Pitch-based Extractors"],
-["R","Rhythm-based Extractors"],
-["D","Dynamics-based Extractors"],
-["T","Texture-based Extractors"]]
+    ["m21", "Music21-specific Extractors"],
+    ["M", "Melody-based Extractors"],
+    ["P", "Pitch-based Extractors"],
+    ["R", "Rhythm-based Extractors"],
+    ["D", "Dynamics-based Extractors"],
+    ["T", "Texture-based Extractors"],
+]
 #####
 
 def music21ModWSGIFeatureApplication(environ, start_response):
@@ -274,11 +275,11 @@ def getFeatureInfo():
     
     
     jsExtractorTypes = {
-        "M":"Melody-based Extractors",
-        "P":"Pitch-based Extractors",
-        "R":"Rhythm-based Extractors",
-        "D":"Dynamics-based Extractors",
-        "T":"Texture-based Extractors"}
+        "M": "Melody-based Extractors",
+        "P": "Pitch-based Extractors",
+        "R": "Rhythm-based Extractors",
+        "D": "Dynamics-based Extractors",
+        "T": "Texture-based Extractors"}
     # List jSymbolic Extractors
     for typeInfo in jsExtractorTypes:
         typeId = typeInfo[0]
@@ -472,7 +473,7 @@ def getUploadForm():
 
 featureInfo = dict()
 featureInfo['m21']=[
-    ['P22','Quality',
+    ['P22', 'Quality',
         'Set to 0 if the key signature indicates that a recording is major, set ' + 
         'to 1 if it indicates that it is minor and set to 0 if key signature is unknown. ' + 
         'Music21 addition: if no key mode is found in the piece, analyze the piece to ' + 
@@ -556,39 +557,39 @@ featureInfo['M']=[
     ['M1', 'Melodic Interval Histogram', 'A features array with bins corresponding to the values of the melodic interval histogram.', '128'],
     ['M2', 'Average Melodic Interval', 'Average melodic interval (in semi-tones).', '1'],
     ['M3', 'Most Common Melodic Interval', 'Melodic interval with the highest frequency.', '1'],
-    ['M4', 'Distance Between Most Common Melodic Intervals','Absolute value of the difference between the most common melodic interval and the second most common melodic interval.','1'],
-    ['M5','Most Common Melodic Interval Prevalence','Fraction of melodic intervals that belong to the most common interval.','1'],
-    ['M6','Relative Strength of Most Common Intervals','Fraction of melodic intervals that belong to the second most common interval divided by the fraction of melodic intervals belonging to the most common interval.','1'],
-    ['M7','Number of Common Melodic Intervals','Number of melodic intervals that represent at least 9% of all melodic intervals.','1'],
-    ['M8','Amount of Arpeggiation','Fraction of horizontal intervals that are repeated notes, minor thirds, major thirds, perfect fifths, minor sevenths, major sevenths, octaves, minor tenths or major tenths.','1'],
-    ['M9','Repeated Notes','Fraction of notes that are repeated melodically.','1'],
-    ['m10','Chromatic Motion','Fraction of melodic intervals corresponding to a semi-tone.','1'],
-    ['M11','Stepwise Motion','Fraction of melodic intervals that corresponded to a minor or major second.','1'],
-    ['M12','Melodic Thirds','Fraction of melodic intervals that are major or minor thirds.','1'],
-    ['M13','Melodic Fifths','Fraction of melodic intervals that are perfect fifths.','1'],
-    ['M14','Melodic Tritones','Fraction of melodic intervals that are tritones.','1'],
-    ['M15','Melodic Octaves','Fraction of melodic intervals that are octaves.','1'],
-    ['m17','Direction of Motion','Fraction of melodic intervals that are rising rather than falling.','1'],
-    ['M18','Duration of Melodic Arcs','Average number of notes that separate melodic peaks and troughs in any channel.','1'],
-    ['M19','Size of Melodic Arcs','Average melodic interval separating the top note of melodic peaks and the bottom note of melodic troughs.','1']]
+    ['M4', 'Distance Between Most Common Melodic Intervals', 'Absolute value of the difference between the most common melodic interval and the second most common melodic interval.', '1'],
+    ['M5', 'Most Common Melodic Interval Prevalence', 'Fraction of melodic intervals that belong to the most common interval.', '1'],
+    ['M6', 'Relative Strength of Most Common Intervals', 'Fraction of melodic intervals that belong to the second most common interval divided by the fraction of melodic intervals belonging to the most common interval.', '1'],
+    ['M7', 'Number of Common Melodic Intervals', 'Number of melodic intervals that represent at least 9% of all melodic intervals.', '1'],
+    ['M8', 'Amount of Arpeggiation', 'Fraction of horizontal intervals that are repeated notes, minor thirds, major thirds, perfect fifths, minor sevenths, major sevenths, octaves, minor tenths or major tenths.', '1'],
+    ['M9', 'Repeated Notes', 'Fraction of notes that are repeated melodically.', '1'],
+    ['m10', 'Chromatic Motion', 'Fraction of melodic intervals corresponding to a semi-tone.', '1'],
+    ['M11', 'Stepwise Motion', 'Fraction of melodic intervals that corresponded to a minor or major second.', '1'],
+    ['M12', 'Melodic Thirds', 'Fraction of melodic intervals that are major or minor thirds.', '1'],
+    ['M13', 'Melodic Fifths', 'Fraction of melodic intervals that are perfect fifths.', '1'],
+    ['M14', 'Melodic Tritones', 'Fraction of melodic intervals that are tritones.', '1'],
+    ['M15', 'Melodic Octaves', 'Fraction of melodic intervals that are octaves.', '1'],
+    ['m17', 'Direction of Motion', 'Fraction of melodic intervals that are rising rather than falling.', '1'],
+    ['M18', 'Duration of Melodic Arcs', 'Average number of notes that separate melodic peaks and troughs in any channel.', '1'],
+    ['M19', 'Size of Melodic Arcs', 'Average melodic interval separating the top note of melodic peaks and the bottom note of melodic troughs.', '1']]
 featureInfo['D']=[
-    ['D1','Overall Dynamic Range','The maximum loudness minus the minimum loudness value.','1'],
-    ['D2','Variation of Dynamics','Standard deviation of loudness levels of all notes.','1'],
-    ['D3','Variation of Dynamics In Each Voice','The average of the standard deviations of loudness levels within each channel that contains at least one note.','1'],
-    ['D4','Average Note To Note Dynamics Change','Average change of loudness from one note to the next note in the same channel (in MIDI velocity units).','1']]
+    ['D1', 'Overall Dynamic Range', 'The maximum loudness minus the minimum loudness value.', '1'],
+    ['D2', 'Variation of Dynamics', 'Standard deviation of loudness levels of all notes.', '1'],
+    ['D3', 'Variation of Dynamics In Each Voice', 'The average of the standard deviations of loudness levels within each channel that contains at least one note.', '1'],
+    ['D4', 'Average Note To Note Dynamics Change', 'Average change of loudness from one note to the next note in the same channel (in MIDI velocity units).', '1']]
 featureInfo['T']=[
-    ['T1','Maximum Number of Independent Voices','Maximum number of different channels in which notes have sounded simultaneously. Here, Parts are treated as channels.','1'],
-    ['T2','Average Number of Independent Voices','Average number of different channels in which notes have sounded simultaneously. Rests are not included in this calculation. Here, Parts are treated as voices','1'],
-    ['T3','Variability of Number of Independent Voices','Standard deviation of number of different channels in which notes have sounded simultaneously. Rests are not included in this calculation.','1'],
-    ['T4','Voice Equality - Number of Notes','Standard deviation of the total number of Note Ons in each channel that contains at least one note.','1'],
-    ['T5','Voice Equality - Note Duration','Standard deviation of the total duration of notes in seconds in each channel that contains at least one note.','1'],
-    ['T6','Voice Equality - Dynamics','Standard deviation of the average volume of notes in each channel that contains at least one note.','1'],
-    ['T7','Voice Equality - Melodic Leaps','Standard deviation of the average melodic leap in MIDI pitches for each channel that contains at least one note.','1'],
-    ['T8','Voice Equality - Range','Standard deviation of the differences between the highest and lowest pitches in each channel that contains at least one note.','1'],
-    ['T9','Importance of Loudest Voice','Difference between the average loudness of the loudest channel and the average loudness of the other channels that contain at least one note.','1'],
-    ['T10','Relative Range of Loudest Voice','Difference between the highest note and the lowest note played in the channel with the highest average loudness divided by the difference between the highest note and the lowest note overall in the piece.','1'],
-    ['T12','Range of Highest Line','Difference between the highest note and the lowest note played in the channel with the highest average pitch divided by the difference between the highest note and the lowest note in the piece.','1'],
-    ['T13','Relative Note Density of Highest Line','Number of Note Ons in the channel with the highest average pitch divided by the average number of Note Ons in all channels that contain at least one note.','1'],
-    ['T15','Melodic Intervals in Lowest Line','Average melodic interval in semitones of the channel with the lowest average pitch divided by the average melodic interval of all channels that contain at least two notes.','1'],
-    ['T20','Voice Separation','Average separation in semi-tones between the average pitches of consecutive channels (after sorting based/non average pitch) that contain at least one note.','1']]
+    ['T1', 'Maximum Number of Independent Voices', 'Maximum number of different channels in which notes have sounded simultaneously. Here, Parts are treated as channels.', '1'],
+    ['T2', 'Average Number of Independent Voices', 'Average number of different channels in which notes have sounded simultaneously. Rests are not included in this calculation. Here, Parts are treated as voices', '1'],
+    ['T3', 'Variability of Number of Independent Voices', 'Standard deviation of number of different channels in which notes have sounded simultaneously. Rests are not included in this calculation.', '1'],
+    ['T4', 'Voice Equality - Number of Notes', 'Standard deviation of the total number of Note Ons in each channel that contains at least one note.', '1'],
+    ['T5', 'Voice Equality - Note Duration', 'Standard deviation of the total duration of notes in seconds in each channel that contains at least one note.', '1'],
+    ['T6', 'Voice Equality - Dynamics', 'Standard deviation of the average volume of notes in each channel that contains at least one note.', '1'],
+    ['T7', 'Voice Equality - Melodic Leaps', 'Standard deviation of the average melodic leap in MIDI pitches for each channel that contains at least one note.', '1'],
+    ['T8', 'Voice Equality - Range', 'Standard deviation of the differences between the highest and lowest pitches in each channel that contains at least one note.', '1'],
+    ['T9', 'Importance of Loudest Voice', 'Difference between the average loudness of the loudest channel and the average loudness of the other channels that contain at least one note.', '1'],
+    ['T10', 'Relative Range of Loudest Voice', 'Difference between the highest note and the lowest note played in the channel with the highest average loudness divided by the difference between the highest note and the lowest note overall in the piece.', '1'],
+    ['T12', 'Range of Highest Line', 'Difference between the highest note and the lowest note played in the channel with the highest average pitch divided by the difference between the highest note and the lowest note in the piece.', '1'],
+    ['T13', 'Relative Note Density of Highest Line', 'Number of Note Ons in the channel with the highest average pitch divided by the average number of Note Ons in all channels that contain at least one note.', '1'],
+    ['T15', 'Melodic Intervals in Lowest Line', 'Average melodic interval in semitones of the channel with the lowest average pitch divided by the average melodic interval of all channels that contain at least two notes.', '1'],
+    ['T20', 'Voice Separation', 'Average separation in semi-tones between the average pitches of consecutive channels (after sorting based/non average pitch) that contain at least one note.', '1']]
 

@@ -483,7 +483,7 @@ class AbstractScale(Scale):
         Create an abstract pentatonic scale:
 
         
-        >>> pitchList = ["C#4","D#4","F#4","G#4","A#4"]
+        >>> pitchList = ["C#4", "D#4", "F#4", "G#4", "A#4"]
         >>> absc = scale.AbstractScale()
         >>> absc.buildNetworkFromPitches([pitch.Pitch(p) for p in pitchList])
         '''
@@ -1211,7 +1211,7 @@ class ConcreteScale(Scale):
     <music21.pitch.Pitch C4>
     >>> myscale.next("G-2")
     <music21.pitch.Pitch A2>
-    >>> [str(p) for p in myscale.getPitches("E-5","G-7")]
+    >>> [str(p) for p in myscale.getPitches("E-5", "G-7")]
     ['E-5', 'G-5', 'A5', 'C6', 'E-6', 'G-6', 'A6', 'C7', 'E-7', 'G-7']
     
     
@@ -1225,13 +1225,13 @@ class ConcreteScale(Scale):
     >>> complexscale.next("G3", direction=scale.DIRECTION_DESCENDING)
     <music21.pitch.Pitch F3>
 
-    >>> [str(p) for p in complexscale.getPitches("C3","C7")]
+    >>> [str(p) for p in complexscale.getPitches("C3", "C7")]
     ['C#3', 'E-3', 'F3', 'G3', 'B3', 'D~4', 'F#4', 
      'A4', 'C#5', 'E-5', 'F5', 'G5', 'B5', 'D~6', 'F#6', 'A6']
 
     Descending form:
 
-    >>> [str(p) for p in complexscale.getPitches("C7","C5")]
+    >>> [str(p) for p in complexscale.getPitches("C7", "C5")]
     ['A6', 'F#6', 'D~6', 'B5', 'G5', 'F5', 'E-5', 'C#5']    
     '''
     def __init__(self, tonic=None, pitches=None):

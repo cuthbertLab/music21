@@ -57,13 +57,13 @@ class Chord(note.NotRest):
 
     Create chords by passing a string of pitch names
 
-    >>> dmaj = chord.Chord(["D","F#","A"])
+    >>> dmaj = chord.Chord(["D", "F#", "A"])
     >>> dmaj
     <music21.chord.Chord D F# A>
 
     Pitch names can also include octaves:
 
-    >>> dmaj = chord.Chord(["D3","F#4","A5"])
+    >>> dmaj = chord.Chord(["D3", "F#4", "A5"])
     >>> dmaj
     <music21.chord.Chord D3 F#4 A5>
 
@@ -3599,7 +3599,7 @@ class Chord(note.NotRest):
         Return the most complete representation of this Note, providing
         duration and pitch information.
 
-        >>> c = chord.Chord(["D","F#","A"])
+        >>> c = chord.Chord(["D", "F#", "A"])
         >>> c.fullName
         'Chord {D | F-sharp | A} Quarter'
 
@@ -4128,7 +4128,7 @@ class Chord(note.NotRest):
 
         >>> st3 = stream.Stream()
         >>> st3.append(key.Key('C'))    # C major
-        >>> chord2 = chord.Chord(["C4","C#4","D4","E-4","E4","F4"])  # 1st 1/2 of chromatic
+        >>> chord2 = chord.Chord(["C4", "C#4", "D4", "E-4", "E4", "F4"])  # 1st 1/2 of chromatic
         >>> st3.append(chord2)
         >>> chord2.scaleDegrees
         [(1, None), (1, <accidental sharp>), (2, None), 

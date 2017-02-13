@@ -111,12 +111,12 @@ base40Representation = {'C--': 1,
 #Value => Corresponding music21 Interval
 base40IntervalTable =  {0: 'P1',
                         1: 'A1',
-                  
+
                         4: 'd2',
                         5: 'm2',
                         6: 'M2',
                         7: 'A2',
-                  
+
                         10: 'd3',
                         11: 'm3',
                         12: 'M3',
@@ -125,7 +125,7 @@ base40IntervalTable =  {0: 'P1',
                         16: 'd4',
                         17: 'P4',
                         18: 'A4',
-                  
+
                         22: 'd5',
                         23: 'P5',
                         24: 'A5',
@@ -153,14 +153,14 @@ def base40DeltaToInterval(delta):
     Raises a Base40 Exception if the interval is not handled by Base40.
     Base40 can only handle major, minor, perfect, augmented,
     and diminished intervals. Although not for certain, it seems
-    that the engineers that designed this system assumed that
+    that the engineers that designed this system assumed that asdfasdf 
     other intervals (doubly augmented intervals, for instance)
     would be of a very rare occurrence, and extreme intervals
     which would trigger an incorrect answer (C-- to C##, for
     instance, would return a diminished second, even though it's
     a quadruple augmented unison) just would not occur.
 
-    
+
     >>> musedata.base40.base40DeltaToInterval(4)
     <music21.interval.Interval d2>
     >>> musedata.base40.base40DeltaToInterval(11)
@@ -172,18 +172,18 @@ def base40DeltaToInterval(delta):
     >>> musedata.base40.base40DeltaToInterval(52)
     <music21.interval.Interval M10>
     >>> musedata.base40.base40DeltaToInterval(-52)
-    <music21.interval.Interval M-10>    
+    <music21.interval.Interval M-10>
     >>> musedata.base40.base40DeltaToInterval(77)
     Traceback (most recent call last):
     music21.musedata.base40.Base40Exception: Interval not handled by Base40 37
     '''
-    
+
     direction = 1
     if delta < 0:
         direction = -1
-       
+
     simpleDelta = abs(delta) % 40
-    
+
     try:
         simpleIntervalName = base40IntervalTable[simpleDelta]
         simpleInterval = interval.Interval(simpleIntervalName)
@@ -191,16 +191,16 @@ def base40DeltaToInterval(delta):
         raise Base40Exception('Interval not handled by Base40 ' + str(simpleDelta))
 
     numOctaves = abs(delta) // 40
-    
+
     sgi = simpleInterval.generic #Simple generic interval
     #Compound generic interval
-    cgi = interval.GenericInterval(direction * (sgi.value + 7 * numOctaves)) 
+    cgi = interval.GenericInterval(direction * (sgi.value + 7 * numOctaves))
     sdi = simpleInterval.diatonic #Simple diatonic interval
-    
+
     newInterval = interval.convertSpecifier(sdi.specifier)[1] + str(cgi.value)
 
     return interval.Interval(newInterval)
-    
+
 
 def base40ToPitch(base40Num):
     '''
@@ -210,8 +210,8 @@ def base40ToPitch(base40Num):
     Raises a Base40 Exception if the Base40 pitch number given doesn't
     have an associated pitch name. There is one unassigned number
     each time the interval between two letters is a whole step.
-    
-    
+
+
     >>> musedata.base40.base40ToPitch(1)
     <music21.pitch.Pitch C--1>
     >>> musedata.base40.base40ToPitch(40)
@@ -237,12 +237,12 @@ def pitchToBase40(pitchToConvert):
     '''
     Converts a pitch string or a music21 Pitch into a Base40
     pitch number. The Base40 number is octave specific.
-    
+
     Raises a Base40 Exception if the pitch to convert is outside the set
     of pitches that Base40 can handle; for example, half flats
     and half sharps or triple flats and triple sharps.
 
-    
+
     >>> musedata.base40.pitchToBase40(pitch.Pitch('C--5'))
     161
     >>> musedata.base40.pitchToBase40('F##4')
@@ -267,21 +267,21 @@ def base40Interval(base40NumA, base40NumB):
     Returns a music21 Interval between two base40 pitch
     numbers, using their delta (difference) as defined
     in Base40. The interval provided is without direction.
-    
+
     Raises a Base40 Exception if the delta doesn't correspond
     to an interval in Base40, or if either base40 pitch
     number doesn't correspond to a pitch name.
 
-    
+
     >>> musedata.base40.base40Interval(163, 191)
     <music21.interval.Interval m6>
-    
+
     >>> musedata.base40.base40Interval(186, 174)      #Descending M3
-    <music21.interval.Interval M-3> 
-    
-    
+    <music21.interval.Interval M-3>
+
+
     Base40 has limitations for intervals smaller than diminished or bigger than augmented.
-    
+
     >>> musedata.base40.base40Interval(1, 5)
     Traceback (most recent call last):
     music21.musedata.base40.Base40Exception: Base40 cannot compute interval between 1 and 5.
@@ -292,12 +292,12 @@ def base40Interval(base40NumA, base40NumB):
 
     >>> musedata.base40.base40Interval(2, 6)
     Traceback (most recent call last):
-    music21.musedata.base40.Base40Exception: Pitch name not assigned to this Base40 number 6 
+    music21.musedata.base40.Base40Exception: Pitch name not assigned to this Base40 number 6
         Interval does not exist
 
     >>> musedata.base40.base40Interval(12, 6)
     Traceback (most recent call last):
-    music21.musedata.base40.Base40Exception: Pitch name not assigned to these Base40 numbers 
+    music21.musedata.base40.Base40Exception: Pitch name not assigned to these Base40 numbers
         12 and 6 Interval does not exist
     '''
     pitchA = base40Equivalent[(base40NumA-1)%40 + 1]
@@ -317,7 +317,7 @@ def base40Interval(base40NumA, base40NumB):
     elif delta > 3 and pitchA[0] == pitchB[0]:
         raise Base40Exception('Base40 cannot compute interval between ' +
               str(base40NumA) + ' and ' + str(base40NumB) + '.')
- 
+
     return base40DeltaToInterval(delta)
 
 
@@ -331,11 +331,11 @@ def base40ActualInterval(base40NumA, base40NumB):
     an unusual interval is encountered that can't be handled
     by music21.
 
-    
+
     >>> musedata.base40.base40ActualInterval(163,191)
     <music21.interval.Interval m6>
     >>> musedata.base40.base40ActualInterval(186,174) #Descending M3
-    <music21.interval.Interval M-3> 
+    <music21.interval.Interval M-3>
     >>> musedata.base40.base40ActualInterval(1,5)
     <music21.interval.Interval AAAA1>
     >>> musedata.base40.base40ActualInterval(1,3)
@@ -356,7 +356,7 @@ def base40ActualInterval(base40NumA, base40NumB):
     noteA.pitch = pitchA
     noteB = note.Note()
     noteB.pitch = pitchB
-    
+
     try:
         return interval.notesToInterval(noteA,noteB)
     except IndexError:
@@ -372,7 +372,7 @@ def _quickEnharmonicString(nameStr, direction='up', allowDoubleAccidentals=True)
         addNum = -4
     else:
         raise Base40Exception("Not a valid direction, {}".format(direction))
-        
+
     enharmonics = []
     if common.isNum(nameStr):
         base40num = nameStr
@@ -381,16 +381,16 @@ def _quickEnharmonicString(nameStr, direction='up', allowDoubleAccidentals=True)
             base40num = None
     else:
         base40num = base40Representation.get(nameStr, None)
-    
+
     while base40num is not None:
         base40num = (base40num + addNum) % 40
         if base40num == 0:
-            base40num = 40        
+            base40num = 40
 
         base40str = base40Equivalent.get(base40num, None)
         if allowDoubleAccidentals is False and base40str is not None and len(base40str) > 2:
             base40str = None
-        
+
         if base40str is None:
             base40num = None
         else:
@@ -401,9 +401,9 @@ def _quickEnharmonicString(nameStr, direction='up', allowDoubleAccidentals=True)
                 if base40str[0] == e[0]:
                     base40num = None
                     base40str = None
-            if base40str is not None:           
+            if base40str is not None:
                 enharmonics.append(base40str)
-        
+
     return enharmonics
 
 def quickHigherEnharmonicString(nameStr, allowDoubleAccidentals=True):
@@ -411,7 +411,7 @@ def quickHigherEnharmonicString(nameStr, allowDoubleAccidentals=True):
     Takes a name of a string and returns a list of the quick higher enharmonics, limited
     to double sharps and double flats (or to single sharps and single flats if
     allowDoubleAccidentals is False)
-    
+
     >>> musedata.base40.quickHigherEnharmonicString('F#')
     ['G-']
     >>> musedata.base40.quickHigherEnharmonicString('C##')
@@ -421,8 +421,8 @@ def quickHigherEnharmonicString(nameStr, allowDoubleAccidentals=True):
     >>> musedata.base40.quickHigherEnharmonicString('B#')
     ['C', 'D--']
     '''
-    return _quickEnharmonicString(nameStr, 
-                                  direction='up', 
+    return _quickEnharmonicString(nameStr,
+                                  direction='up',
                                   allowDoubleAccidentals=allowDoubleAccidentals)
 
 def quickLowerEnharmonicString(nameStr, allowDoubleAccidentals=True):
@@ -430,7 +430,7 @@ def quickLowerEnharmonicString(nameStr, allowDoubleAccidentals=True):
     Takes a name of a string and returns a list of the quick lower enharmonics, limited
     to double sharps and double flats (or to single sharps and single flats if
     allowDoubleAccidentals is False)
-    
+
     >>> musedata.base40.quickLowerEnharmonicString('B-')
     ['A#']
     >>> musedata.base40.quickLowerEnharmonicString('G-')
@@ -440,8 +440,8 @@ def quickLowerEnharmonicString(nameStr, allowDoubleAccidentals=True):
     >>> musedata.base40.quickLowerEnharmonicString('C-')
     ['B', 'A##']
     '''
-    return _quickEnharmonicString(nameStr, 
-                                  direction='down', 
+    return _quickEnharmonicString(nameStr,
+                                  direction='down',
                                   allowDoubleAccidentals=allowDoubleAccidentals)
 
 def quickEnharmonicString(nameStr, allowDoubleAccidentals=True):
@@ -449,9 +449,9 @@ def quickEnharmonicString(nameStr, allowDoubleAccidentals=True):
     Takes a name of a string and returns a list of the quick lower and higher enharmonics, limited
     to double sharps and double flats (or to single sharps and single flats if
     allowDoubleAccidentals is False)
-    
+
     >>> musedata.base40.quickEnharmonicString('C')
-    ['B#', 'D--']    
+    ['B#', 'D--']
     >>> musedata.base40.quickEnharmonicString('C', allowDoubleAccidentals=False)
     ['B#']
     >>> musedata.base40.quickEnharmonicString('G')
@@ -463,10 +463,10 @@ def quickEnharmonicString(nameStr, allowDoubleAccidentals=True):
 
 class Base40Exception(exceptions21.Music21Exception):
     pass
-    
 
 
-class BaseN(object):        
+
+class BaseN(object):
     def __init__(self, order=2):
         self.order = order
 
@@ -501,4 +501,3 @@ if __name__ == "__main__":
 
 #------------------------------------------------------------------------------
 # eof
-

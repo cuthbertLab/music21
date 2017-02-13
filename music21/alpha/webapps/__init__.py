@@ -421,7 +421,7 @@ class Agenda(dict):
                           etc.
                           }
         
-    where the variable formats are elements of availableDataFormats ("str","int","musicxml", etc.)
+    where the variable formats are elements of availableDataFormats ("str", "int", "musicxml", etc.)
     
     *     **'commandList'**  whose value is a list specifying commands to be executed by the 
           processor of the form::
@@ -731,9 +731,9 @@ class CommandProcessor(object):
                 
                 if fmt == 'string' or fmt == 'str':
                     if dataStr.count("'") == 2: # Single Quoted String
-                        data = dataStr.replace("'","") # remove excess quotes
+                        data = dataStr.replace("'", "") # remove excess quotes
                     elif dataStr.count("\"") == 2: # Double Quoted String
-                        data = dataStr.replace("\"","") # remove excess quotes
+                        data = dataStr.replace("\"", "") # remove excess quotes
                     else:
                         self.recordError("invalid string (not in quotes...) for data element " + 
                                          str(dataDictElement))
@@ -880,7 +880,7 @@ class CommandProcessor(object):
         Function command elements should be dictionaries of the form::
         
             {'function': "<FUNCTION_NAME>",
-             'argList': ["<ARG_1>","<ARG_2>", etc.],
+             'argList': ["<ARG_1>", "<ARG_2>", etc.],
              'resultVar' : "<RESULT_VARIABLE>"}
          
         Executing it yields the equivalent of: 
@@ -1001,7 +1001,7 @@ class CommandProcessor(object):
         
             {'method': "<METHOD_NAME>",
              'caller': "<CALLER_VARIABLE>",
-             'argList': ["<ARG_1>","<ARG_2>", etc.],
+             'argList': ["<ARG_1>", "<ARG_2>", etc.],
              'resultVar' : "<RESULT_VARIABLE>"}
          
         Executing it yields the equivalent of 

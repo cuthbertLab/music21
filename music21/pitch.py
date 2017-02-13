@@ -3620,6 +3620,15 @@ class Pitch(object):
 
         If `inPlace` is set to true, changes the current Pitch and returns None.
 
+        >>> p1 = pitch.Pitch('E-')
+        >>> p2 = p1.getLowerEnharmonic()
+        >>> print(p2)
+        D#
+
+
+        The lower enharmonic can have a different octave than
+        the original.
+
         >>> p1 = pitch.Pitch('C-3')
         >>> p2 = p1.getLowerEnharmonic()
         >>> print(p2)

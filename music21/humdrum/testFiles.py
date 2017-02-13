@@ -1138,7 +1138,7 @@ r'''
 '''
 )                    
 
-sousaStars = re.sub(r"\s\s\s\s","\t",
+sousaStars = re.sub(r"\s\s\s\s", "\t",
 r'''
 !!!COM: Sousa, John Phillip
 !!!CDT: 1854/11/05/-1932/04/08/
@@ -1857,7 +1857,7 @@ r'''
 '''
 )
 
-multipartSanctus = re.sub(r"\s\s\s\s","\t",
+multipartSanctus = re.sub(r"\s\s\s\s", "\t",
 r'''!!!COM: Palestrina, Giovanni Perluigi da
 **kern    **kern    **kern    **kern
 *Ibass    *Itenor    *Icalto    *Icant

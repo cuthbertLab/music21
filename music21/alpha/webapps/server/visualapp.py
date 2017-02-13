@@ -62,8 +62,8 @@ def music21ModWSGIVisualApplication(environ, start_response):
     writePath = documentRoot + "/music21/OutputFiles/"
     
     
-    fin = open(tempPath,'r')
-    fout = open(writePath+"out.jpg","w")
+    fin = open(tempPath, 'r')
+    fout = open(writePath + "out.jpg", "w")
     fout.write(fin.read())
     fout.close()
         
@@ -78,7 +78,8 @@ def music21ModWSGIVisualApplication(environ, start_response):
     
     templateStr = imageEmbedTemplate(tempPath,'/music21/OutputFiles/out.jpg')
     
-    response_headers = [('Content-type', 'text/html'),('Content-Length', str(len(templateStr)))]
+    response_headers = [('Content-type', 'text/html'),
+                        ('Content-Length', str(len(templateStr)))]
 
     start_response(status, response_headers)
 
