@@ -660,9 +660,12 @@ class OutputFormat(object):
 
 
 class OutputTabOrange(OutputFormat):
-    '''Tab delimited file format used with Orange.
+    '''
+    Tab delimited file format used with Orange.
 
-    http://orange.biolab.si/doc/reference/Orange.data.formats/
+    For more information, see:
+    
+    http://docs.orange.biolab.si/3/data-mining-library/tutorial/data.html#saving-the-data
     '''
     def __init__(self, dataSet=None):
         OutputFormat.__init__(self, dataSet=dataSet)
@@ -738,8 +741,8 @@ class OutputTabOrange(OutputFormat):
 
 
 class OutputCSV(OutputFormat):
-    '''Comma-separated value list. 
-
+    '''
+    Comma-separated value list. 
     '''
     def __init__(self, dataSet=None):
         OutputFormat.__init__(self, dataSet=dataSet)
