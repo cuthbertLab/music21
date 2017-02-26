@@ -1,5 +1,13 @@
+"""
+Demo script showing how to work with MidiFile and MidiTrack directly.
+Generates a completely random collection of 8th notes
+First we create a MidiTrack, insert MidiEvent's into it. Then we add
+that track to a MidiFile and write it to disc.
+
+"""
+
 import random
-from music21 import midi
+from music21 import midi, environment
 
 
 def populate_midi_track_from_data(mt, data):
@@ -49,31 +57,36 @@ def populate_midi_track_from_data(mt, data):
 
     return mt
 
-mt = midi.MidiTrack(1)
+def main():
+    mt = midi.MidiTrack(1)
 
-# duration, pitch, velocity
-data = [] # one start note
+    # duration, pitch, velocity
+    data = [] # one start note
 
-beats_per_measure = 4
-measures = 16
-num_beats = measures * beats_per_measure
+    beats_per_measure = 4
+    measures = 16
+    num_beats = measures * beats_per_measure
 
-# note array is ordered [duration, pitch, velocity]
-for i in range(1, num_beats):
+    # note array is ordered [duration, pitch, velocity]
+    for i in range(1, num_beats):
+        # pick random pitch and velocity for 8th note
+        duration = 512
+        pitch = random.randint(0, 128)
+        velocity = random.randint(0, 128)
 
-    # pick random pitch and velocity for 8th note
-    duration = 128
-    pitch = random.randint(0, 128)
-    velocity = random.randint(0, 128)
+        data.append([duration, pitch, velocity])
 
-    data.append([duration, pitch, velocity])
+    populate_midi_track_from_data(mt, data)
 
-print(data)
-populate_midi_track_from_data(mt, data)
+    mf = midi.MidiFile()
+    mf.tracks.append(mt)
 
-mf = midi.MidiFile()
-mf.tracks.append(mt)
+    env = environment.Environment()
+    temp_filename = env.getTempFile('.mid')
+    print("Saving file to: %s" % temp_filename)
+    mf.open(temp_filename, 'wb')
+    mf.write()
+    mf.close()
 
-mf.open('melody.mid', 'wb')
-mf.write()
-mf.close()
+if __name__ == '__main__':
+    main()
