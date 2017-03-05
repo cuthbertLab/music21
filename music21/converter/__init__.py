@@ -45,6 +45,7 @@ import unittest
 import copy
 import os
 import re
+import sys
 import types
 import urllib
 import zipfile
@@ -231,7 +232,8 @@ class PickleFilter(object):
     then a pickle path will not be created.
     '''
     def __init__(self, fp, forceSource=False, number=None):
-        '''Provide a file path to check if there is pickled version.
+        '''
+        Provide a file path to check if there is pickled version.
 
         If forceSource is True, pickled files, if available, will not be
         returned.
@@ -241,10 +243,13 @@ class PickleFilter(object):
         self.number = number
         #environLocal.printDebug(['creating pickle filter'])
 
-    def _getPickleFp(self, directory, zipType=None):
-        import sys
+    def getPickleFp(self, directory=None, zipType=None):
+        '''
+        Returns the file path of the pickle file for this file.
+        '''
         if directory is None:
-            raise ValueError
+            directory = environLocal.getRootTempDir()
+
         if zipType is None:
             extension = '.p'
         else:
@@ -257,6 +262,18 @@ class PickleFilter(object):
         baseName += extension
         
         return os.path.join(directory, baseName)
+
+    def removePickle(self):
+        '''
+        If a compressed pickled file exists, remove it from disk.
+        
+        Generally not necessary to call, since we can just overwrite obsolete pickles,
+        but useful elsewhere.
+        '''
+        pickleFp = self.getPickleFp(zipType='gz')
+        if os.path.exists(pickleFp):
+            os.remove(pickleFp)
+        
 
     def status(self):
         '''
@@ -291,7 +308,7 @@ class PickleFilter(object):
             fpLoad = self.fp
             fpPickle = None
         else: # see which is more up to date
-            fpPickle = self._getPickleFp(fpScratch, zipType='gz')
+            fpPickle = self.getPickleFp(fpScratch, zipType='gz')
             if not os.path.exists(fpPickle):
                 writePickle = True # if pickled file does not exist
                 fpLoad = self.fp
@@ -443,7 +460,11 @@ class Converter(object):
 
         self.setSubconverterFromFormat(useFormat)
         self.subConverter.keywords = keywords
-        self.subConverter.parseFile(fp, number=number, **keywords)
+        try:
+            self.subConverter.parseFile(fp, number=number, **keywords)
+        except NotImplementedError:
+            raise ConverterFileException('File is not in a correct format: %s' % fp)
+        
         self.stream.filePath = fp
         self.stream.fileNumber = number
         self.stream.fileFormat = useFormat
@@ -1289,7 +1310,6 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        import sys
         for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -1844,7 +1864,21 @@ class Test(unittest.TestCase):
             self.assertTrue(numberTools.almostEquals(n.quarterLength % .5, 0.0))
     
         
-
+    def testIncorrectNotCached(self):
+        '''
+        Here is a filename with an incorrect extension (.txt for .rnText).  Make sure that
+        it is not cached the second time...
+        '''
+        fp = os.path.join(common.getSourceFilePath(), 'converter', 'incorrectExtension.txt')
+        pf = PickleFilter(fp)
+        pf.removePickle()
+        
+        with self.assertRaises(ConverterFileException):
+            parse(fp)
+            
+        c = parse(fp, format='romantext')
+        self.assertEqual(len(c.recurse().getElementsByClass('Harmony')), 1)
+        
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [parse, parseFile, parseData, parseURL, freeze, thaw, freezeStr, thawStr, 

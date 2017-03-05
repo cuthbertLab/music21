@@ -1308,7 +1308,7 @@ class Note(NotRest):
 
 
     def _getPitches(self):
-        return [self.pitch]
+        return (self.pitch,)
 
     def _setPitches(self, value):
         if common.isListLike(value):
@@ -1321,20 +1321,24 @@ class Note(NotRest):
 
     pitches = property(_getPitches, _setPitches,
         doc = '''
-        Return the :class:`~music21.pitch.Pitch` object in a list.
+        Return the :class:`~music21.pitch.Pitch` object in a tuple.
         This property is designed to provide an interface analogous to
-        that found on :class:`~music21.chord.Chord`.
+        that found on :class:`~music21.chord.Chord` so that `[c.pitches for c in s.notes]`
+        provides a consistent interface for all objects.
 
         >>> n = note.Note('g#')
         >>> n.nameWithOctave
         'G#'
         >>> n.pitches
-        [<music21.pitch.Pitch G#>]
+        (<music21.pitch.Pitch G#>,)
+        
+        If given a list, only the first one will be used:
+        
         >>> n.pitches = [pitch.Pitch('c2'), pitch.Pitch('g2')]
         >>> n.nameWithOctave
         'C2'
         >>> n.pitches
-        [<music21.pitch.Pitch C2>]
+        (<music21.pitch.Pitch C2>,)
         ''')
 
 

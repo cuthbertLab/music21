@@ -314,15 +314,15 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                     sharpCount += 1
         return sharpCount, flatCount
 
-    def _getWeights(self, weightType='major'): 
+    def getWeights(self, weightType='major'): 
         '''
         Returns the key weights. To provide different key weights, 
         subclass and override this method. The defaults here are KrumhanslSchmuckler.
             
         >>> a = analysis.discrete.KrumhanslSchmuckler()
-        >>> len(a._getWeights('major'))
+        >>> len(a.getWeights('major'))
         12
-        >>> len(a._getWeights('minor'))
+        >>> len(a.getWeights('minor'))
         12            
         '''
         weightType = weightType.lower()
@@ -378,7 +378,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             return None
 
         soln = [0] * 12
-        toneWeights = self._getWeights(weightType)
+        toneWeights = self.getWeights(weightType)
         for i in range(len(soln)):
             for j in range(len(pcDistribution)):
                 soln[i] = soln[i] + (toneWeights[(j - i) % 12] * pcDistribution[j])
@@ -418,7 +418,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         bottomRight = [0] * 12
         bottomLeft = [0] * 12
             
-        toneWeights = self._getWeights(weightType)
+        toneWeights = self.getWeights(weightType)
         profileAverage = float(sum(toneWeights)) / len(toneWeights)
         histogramAverage = float(sum(pcDistribution)) / len(pcDistribution) 
             
@@ -731,16 +731,16 @@ class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
 
-    def _getWeights(self, weightType='major'): 
+    def getWeights(self, weightType='major'): 
         '''
         Returns the key weights. To provide different key weights, 
         subclass and override this method. The defaults here are KrumhanslSchmuckler.
             
         
         >>> a = analysis.discrete.KrumhanslSchmuckler()
-        >>> len(a._getWeights('major'))
+        >>> len(a.getWeights('major'))
         12
-        >>> len(a._getWeights('minor'))
+        >>> len(a.getWeights('minor'))
         12            
         '''
         weightType = weightType.lower()
@@ -770,15 +770,15 @@ class KrumhanslKessler(KeyWeightKeyAnalysis):
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
 
-    def _getWeights(self, weightType='major'): 
+    def getWeights(self, weightType='major'): 
         '''
         Returns the key weights.    
         
         >>> a = analysis.discrete.KrumhanslKessler()
-        >>> len(a._getWeights('major'))
+        >>> len(a.getWeights('major'))
         12
-        >>> len(a._getWeights('minor'))
-        12            
+        >>> len(a.getWeights('minor'))
+        12
         '''
         weightType = weightType.lower()
         # note: only one value is different from KrumhanslSchmuckler
@@ -814,14 +814,14 @@ class AardenEssen(KeyWeightKeyAnalysis):
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
 
-    def _getWeights(self, weightType='major'): 
+    def getWeights(self, weightType='major'): 
         '''
         Returns the key weights.     
         
         >>> a = analysis.discrete.AardenEssen()
-        >>> len(a._getWeights('major'))
+        >>> len(a.getWeights('major'))
         12
-        >>> len(a._getWeights('minor'))
+        >>> len(a.getWeights('minor'))
         12            
         '''
         weightType = weightType.lower()
@@ -856,14 +856,14 @@ class SimpleWeights(KeyWeightKeyAnalysis):
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
 
-    def _getWeights(self, weightType='major'): 
+    def getWeights(self, weightType='major'): 
         '''
         Returns the key weights.     
         
         >>> a = analysis.discrete.SimpleWeights()
-        >>> len(a._getWeights('major'))
+        >>> len(a.getWeights('major'))
         12
-        >>> len(a._getWeights('minor'))
+        >>> len(a.getWeights('minor'))
         12            
         '''
         weightType = weightType.lower()
@@ -893,16 +893,16 @@ class BellmanBudge(KeyWeightKeyAnalysis):
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
 
-    def _getWeights(self, weightType='major'): 
+    def getWeights(self, weightType='major'): 
         '''
         Returns the key weights. 
         
         >>> a = analysis.discrete.BellmanBudge()
-        >>> len(a._getWeights('major'))
+        >>> len(a.getWeights('major'))
         12
-        >>> len(a._getWeights('minor'))
+        >>> len(a.getWeights('minor'))
         12            
-        >>> a._getWeights('major')
+        >>> a.getWeights('major')
         [16.8..., 0.8..., 12.9..., 1.4..., ...]
 
         '''
@@ -938,13 +938,13 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
 
-    def _getWeights(self, weightType='major'): 
+    def getWeights(self, weightType='major'): 
         ''' Returns the key weights. 
         
         >>> a = analysis.discrete.TemperleyKostkaPayne()
-        >>> len(a._getWeights('major'))
+        >>> len(a.getWeights('major'))
         12
-        >>> len(a._getWeights('minor'))
+        >>> len(a.getWeights('minor'))
         12            
         '''
         weightType = weightType.lower()

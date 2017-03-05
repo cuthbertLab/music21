@@ -633,7 +633,13 @@ class _EnvironmentCore(object):
             filePath = self.getSettingsPath()
         if not os.path.exists(filePath):
             return None  # do nothing if no file exists
-        settingsTree = ET.parse(filePath)
+        
+        try:
+            settingsTree = ET.parse(filePath)
+        except ET.ParseError as pe:
+            raise EnvironmentException(
+                    'Cannot parse file %s: %s' %
+                                           (filePath, str(pe)))
         # load from XML into dictionary
         # updates self._ref in place
         self._fromSettings(settingsTree, self._ref)

@@ -18,6 +18,7 @@ parseData method that sets self.stream.
 #-------------------------------------------------------------------------------
 # Converters are associated classes; they are not subclasses, but most define a pareData() method, 
 # a parseFile() method, and a .stream attribute or property.
+import abc
 import io
 import os
 import sys
@@ -62,6 +63,8 @@ class SubConverter(object):
 
 
     '''
+    __metaclass__ = abc.ABCMeta
+
     readBinary = False
     canBePickled = True
     registerFormats = ()
@@ -78,13 +81,17 @@ class SubConverter(object):
         self._stream = stream.Score()
         self.keywords = keywords
 
+    @abc.abstractmethod
     def parseData(self, dataString, number=None):
         '''
         Called when a string (or binary) data is encountered.
         
         This method MUST be implemented to do anything in parsing.
+        
+        Return self.stream in the end
         '''
-        return self.stream
+        raise NotImplementedError
+        # return self.stream
     
     def parseFile(self, filePath, number=None):
         '''
@@ -98,7 +105,12 @@ class SubConverter(object):
         else:
             with open(filePath, 'rb') as f:
                 dataStream = f.read()
-        self.parseData(dataStream, number)
+                
+        try:
+            self.parseData(dataStream, number)
+        except NotImplementedError:  # just for showing that this is possible.
+            raise
+        
         return self.stream
     
     def _getStream(self):
