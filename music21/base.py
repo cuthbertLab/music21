@@ -39,7 +39,6 @@ under the module "base":
 from __future__ import (print_function, division)
 
 import copy
-import imp
 import sys
 import types
 import unittest
@@ -97,12 +96,26 @@ environLocal = environment.Environment(_MOD)
 
 
 # check external dependencies and display
+_useImportLib = True
+
+try:
+    import importlib
+    fs = importlib.util.find_spec
+except (ImportError, AttributeError):
+    import imp
+    _useImportLib = False
+
 _missingImport = []
 for modName in ('matplotlib', 'numpy', 'scipy'):    
-    try:
-        imp.find_module(modName)
-    except ImportError:
-        _missingImport.append(modName)
+    if _useImportLib:
+        loader = importlib.util.find_spec(modName)
+        if loader is None:
+            _missingImport.append(modName)
+    else:
+        try:
+            imp.find_module(modName)
+        except ImportError:
+            _missingImport.append(modName)
 
 # used for better PNG processing in lily -- not very important
 #try:
@@ -126,6 +139,9 @@ if _missingImport:
     if environLocal['warnings'] in (1, '1', True):
         environLocal.warn(common.getMissingImportStr(_missingImport),
         header='music21:')
+del _useImportLib
+
+
 
 class Music21ObjectException(exceptions21.Music21Exception):
     pass
@@ -321,7 +337,7 @@ class Music21Object(object):
     # this dictionary stores as a tuple of strings for each Class so that
     # it only needs to be made once (11 microseconds per call, can be
     # a big part of iteration; from cache just 1 microsecond)
-    _classListCacheDict = {}
+    _classTupleCacheDict = {}
     _classSetCacheDict = {}
     # same with fully qualified names
     _classListFullyQualifiedCacheDict = {}
@@ -671,11 +687,11 @@ class Music21Object(object):
         `Changed 2015 Sep`: returns a tuple, not a list.        
         '''
         try:
-            return self._classListCacheDict[self.__class__]
+            return self._classTupleCacheDict[self.__class__]
         except KeyError:
-            classList = tuple([x.__name__ for x in self.__class__.mro()])
-            self._classListCacheDict[self.__class__] = classList
-            return classList
+            classTuple = tuple([x.__name__ for x in self.__class__.mro()])
+            self._classTupleCacheDict[self.__class__] = classTuple
+            return classTuple
 
     @property
     def classSet(self):
@@ -727,6 +743,7 @@ class Music21Object(object):
             return self._classSetCacheDict[self.__class__]
         except KeyError:
             classNameList = list(self.classes)
+            
             classObjList = self.__class__.mro()
             classListFQ = [x.__module__ + '.' + x.__name__ for x in self.__class__.mro()]
             classList = classNameList + classObjList + classListFQ

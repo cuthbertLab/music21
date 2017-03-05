@@ -37,6 +37,20 @@ class StreamFilter(object):
     #def reset(self):
     #    pass
 
+    #---------------------------------------------------------------
+    # ProtoM21Object things...
+    @property
+    def classSet(self):
+        '''
+        this is not cached -- it should be if we end up using it a lot...
+        '''
+        return common.classTools.getClassSet(self)
+
+    @property
+    def classes(self):
+        return tuple([x.__name__ for x in self.__class__.mro()])
+    
+    
     def _reprHead(self):
         '''
         returns a head that can be used with .format() to add additional
@@ -76,7 +90,7 @@ class IsFilter(StreamFilter):
     <music21.note.Rest rest>
 
     '''
-    def __init__(self, target):
+    def __init__(self, target=()):
         super(IsFilter, self).__init__()
         if not common.isListLike(target):
             target = (target,)
@@ -134,7 +148,7 @@ class IsNotFilter(IsFilter):
     '''
     derivationStr = 'isNot'
 
-    def __init__(self, target):
+    def __init__(self, target=()):
         super(IsNotFilter, self).__init__(target)
         self.numToFind = float('inf') # there can always be more to find
 
@@ -152,7 +166,7 @@ class IdFilter(StreamFilter):
     '''
     derivationStr = 'getElementById'
 
-    def __init__(self, searchId):
+    def __init__(self, searchId=None):
         super(IdFilter, self).__init__()
         try:
             searchIdLower = searchId.lower()
@@ -275,7 +289,7 @@ class GroupFilter(StreamFilter):
     '''
     derivationStr = 'getElementsByGroup'
     
-    def __init__(self, groupFilterList):
+    def __init__(self, groupFilterList=()):
         super(GroupFilter, self).__init__()
 
         if not common.isListLike(groupFilterList):
@@ -295,7 +309,7 @@ class OffsetFilter(StreamFilter):
     '''
     derivationStr = 'getElementsByOffset'
     
-    def __init__(self, offsetStart, offsetEnd=None,
+    def __init__(self, offsetStart=0.0, offsetEnd=None,
                     includeEndBoundary=True, mustFinishInSpan=False,
                     mustBeginInSpan=True, includeElementsThatEndAtStart=True):
         super(OffsetFilter, self).__init__()

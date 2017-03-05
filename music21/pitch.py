@@ -1428,7 +1428,7 @@ class Pitch(object):
     _twelfth_root_of_two = TWELFTH_ROOT_OF_TWO
 
     # TODO: steal from Music21Object
-    classes = ('Pitch', 'object') 
+    classes = ('Pitch', 'object')
     # makes subclassing harder; 
     # it was [x.__name__ for x in self.__class__.mro()] but that was 5% of creation time 
 
@@ -1671,6 +1671,13 @@ class Pitch(object):
         return self.__gt__(other) or self.__eq__(other)
 
     #---------------------------------------------------------------------------
+    @property
+    def classSet(self):
+        '''
+        this is not cached -- it should be if we end up using it a lot...
+        '''
+        return common.classTools.getClassSet(self)
+    
     def _getGroups(self):
         if self._groups is None:
             self._groups = base.Groups()
