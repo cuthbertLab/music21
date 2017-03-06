@@ -131,7 +131,7 @@ def getClassSet(instance, classNameTuple=None):
     >>> p = pitch.Pitch()
     >>> cs = common.classTools.getClassSet(p)
     >>> cs
-     frozenset({...})
+     frozenset(...)
     >>> pitch.Pitch in cs
     True
     >>> 'music21.pitch.Pitch' in cs
@@ -141,8 +141,6 @@ def getClassSet(instance, classNameTuple=None):
     >>> object in cs
     True
     >>> 'object' in cs
-    True
-    >>> 'builtins.object' in cs
     True
     
     To save time (this IS a performance-critical operation), classNameTuple
