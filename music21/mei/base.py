@@ -700,9 +700,10 @@ def _ppSlurs(theConverter):
     True
     >>> theConverter.slurBundle
     <music21.spanner.SpannerBundle of size 1>
+    >>> firstSpanner = list(theConverter.slurBundle)[0]
     >>> (theConverter.m21Attr['1234']['m21SlurStart'] ==
     ...  theConverter.m21Attr['2345']['m21SlurEnd'] ==
-    ...  theConverter.slurBundle.list[0].idLocal)
+    ...  firstSpanner.idLocal)
     True
 
     This example is a little artificial because of the limitations of a doctest, where we need to
@@ -1507,9 +1508,9 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     >>> len(result)
     5
     >>> result['1']
-    {'instrument': <music21.instrument.Instrument 1: Clarinet: Clarinet>}
+    {'instrument': <music21.instrument.Clarinet 1: Clarinet: Clarinet>}
     >>> result['3']
-    {'instrument': <music21.instrument.Instrument 3: Violin: Violin>}
+    {'instrument': <music21.instrument.Violin 3: Violin: Violin>}
     >>> result['all-part objects']
     [<music21.meter.TimeSignature 3/4>]
     >>> result['whole-score objects']
@@ -1673,7 +1674,7 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     >>> len(result)
     1
     >>> result
-    {'instrument': <music21.instrument.Instrument 1: Clarinet: Clarinet>}
+    {'instrument': <music21.instrument.Clarinet 1: Clarinet: Clarinet>}
     >>> result['instrument'].partId
     '1'
     >>> result['instrument'].partName
@@ -1694,7 +1695,7 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     >>> len(result)
     3
     >>> result['instrument']
-    <music21.instrument.Instrument 2: Tuba: Tuba>
+    <music21.instrument.Tuba 2: Tuba: Tuba>
     >>> result['clef']
     <music21.clef.BassClef>
     >>> result['key']
@@ -3428,7 +3429,7 @@ def scoreFromElement(elem, slurBundle):
     theScore = stream.Score(theScore)
 
     # put slurs in the Score
-    theScore.append(slurBundle.list)
+    theScore.append(list(slurBundle))
     # TODO: when all the Slur objects are at the end, they'll only be outputted properly if the
     #       whole Score is outputted. show()-ing one Part or Measure won't display the slurs.
 

@@ -4237,8 +4237,7 @@ class TestSectionScore(unittest.TestCase):
         mockPartReturns = [mockPart1, mockPart2]
         mockPart.side_effect = lambda: mockPartReturns.pop(0)
         slurBundle = mock.MagicMock(spec_set=spanner.SpannerBundle)
-        slurBundle.list = 'slurBundle list'
-        expected = [mockPart1, mockPart2, slurBundle.list]
+        expected = [mockPart1, mockPart2, []]
 
         actual = base.scoreFromElement(elem, slurBundle)
 

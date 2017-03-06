@@ -8,7 +8,7 @@
 #               Josiah Wolf Oberholtzer
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 '''
@@ -4135,7 +4135,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> scWritten = sc.toWrittenPitch()
         >>> scWritten.show('text')
         {0.0} <music21.stream.Part barisax>
-            {0.0} <music21.instrument.Instrument Baritone Saxophone>
+            {0.0} <music21.instrument.BaritoneSaxophone Baritone Saxophone>
             {0.0} <music21.stream.Measure 1 offset=0.0>
                 {0.0} <music21.note.Note A>        
         >>> scWritten.atSoundingPitch

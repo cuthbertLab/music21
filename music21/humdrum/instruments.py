@@ -224,7 +224,7 @@ def fromHumdrumClass(hdclass):
     '''
     
     >>> humdrum.instruments.fromHumdrumClass('vox')
-    <music21.instrument.Instrument Voice>
+    <music21.instrument.Vocalist Voice>
     '''
     from music21 import instrument
     try:
@@ -239,7 +239,7 @@ def fromHumdrumInstrument(hdinst):
     '''
     
     >>> humdrum.instruments.fromHumdrumInstrument('calto')
-    <music21.instrument.Instrument Alto>
+    <music21.instrument.Alto Alto>
     '''
     from music21 import instrument
     try:
@@ -277,7 +277,8 @@ class Test(unittest.TestCase):
                 foundInstruments.append(str(x))
         self.assertEqual(foundInstruments, 
                          ['Alto', 'Alto', 'Alto', 'Tenor', 'Alto', 'Bass', 'Tenor'])
-        print(c.parts[1].flat.getInstrument())
+        alto = c.parts[1].flat.getInstrument()
+        self.assertIn('Alto', alto.classes)
 
 if __name__ == '__main__':
     import music21
