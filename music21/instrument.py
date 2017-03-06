@@ -521,6 +521,11 @@ class Harp(StringInstrument):
 class Guitar(StringInstrument):
     def __init__(self):
         StringInstrument.__init__(self)
+
+        self.instrumentName = 'Guitar'
+        self.instrumentAbbreviation = 'Gtr'
+        self.midiProgram = 24  # default -- Acoustic
+        
         self.lowestNote = pitch.Pitch('E2')
         self._stringPitches = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4']
 
