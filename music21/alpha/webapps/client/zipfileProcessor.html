@@ -20,13 +20,13 @@ function sendForm() {
 <body>
 
 <div id='uploadcontainer'>
+<form id="form1" action="/music21/zipfileinterface" method="post" enctype="multipart/form-data">
 <h1><span style="font-family:'Courier New', Courier, monospace">music21</span> Zip File Processor</h1>
-<p class="smaller"><a href="index.html">Back to All music21 Web Apps</a>
+<p class="smaller"><a href="index.html">Back to All music21 Web Apps</a></p>
 
 <p>Upload a zip file containing scores (musicxml format .xml for now) and select the command you would like performed on each score.
 Clicking Process will return a new zip file with the same file structure as the original zipfile, but with the command performed on each score</p>
 
-<form id="form1" action="/music21/zipfileinterface" method="POST" enctype="multipart/form-data">
 
 <hr />
 <p class="smaller">Command: 

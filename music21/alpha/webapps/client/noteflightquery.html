@@ -24,9 +24,9 @@ m21interface = new Music21interface();
 <form name='form1' id='form1' >
 <b>Command:</b>
 <input id='command' size="50"/>
-<input type='button' onClick="m21interface.sendRequest()" value='Query Music 21' />
-<input type='button' onClick="m21interface.sendRawRequest(document.getElementById('requestxmltextarea').value)" Value='Query Music 21 XML with Requst field ' />
-<input type='button' onClick="m21interface.noteflight.sendMusicXMLToNoteflightEmbed('score1',document.getElementById('resultxmltextarea').value)" Value='Response to Noteflight' />
+<input type='button' onclick="m21interface.sendRequest()" value='Query Music 21' />
+<input type='button' onclick="m21interface.sendRawRequest(document.getElementById('requestxmltextarea').value)" value='Query Music 21 XML with Requst field ' />
+<input type='button' onclick="m21interface.noteflight.sendMusicXMLToNoteflightEmbed('score1',document.getElementById('resultxmltextarea').value)" value='Response to Noteflight' />
 <br />
 
 
@@ -36,15 +36,15 @@ m21interface = new Music21interface();
 <table width='100%'>
 <tr>
 	<td width='33%'>
-	Request:</br>
+	Request:<br />
 	<textarea name='resultxmltext' id='requestxmltextarea' rows='100' cols='75' style="width:100%"></textarea><br />
 	</td>
 	<td width='33%'>
-	Response:</br>
+	Response:<br />
 	<textarea name='' id='realresponse' rows='100' cols='75' style="width:100%"></textarea><br />
 	</td>
     <td width='33%'>
-	XML of Response:</br>
+	XML of Response:<br />
 	<textarea name='resultxmltext' id='resultxmltextarea' rows='100' cols='75' style="width:100%"></textarea><br />
 	</td>
 	</tr>

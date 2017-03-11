@@ -258,7 +258,7 @@ class _EnvironmentCore(object):
         self._ref['lilypondFormat'] = 'pdf'
         self._ref['lilypondBackend'] = 'ps'
 
-        # path to a MusicXML reader: default, will find "Finale Notepad"
+        # path to a MusicXML reader: default, will find "MuseScore"
         self._ref['musicxmlPath'] = None
 
         # path to a midi reader
@@ -313,13 +313,13 @@ class _EnvironmentCore(object):
                 self.__setitem__(name, value)  # use for key checking
         elif platform == 'darwin':
             for name, value in [
-                ('lilypondPath', '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
-                ('musicxmlPath', '/Applications/Finale Notepad 2014.app'),
-                ('graphicsPath', '/Applications/Preview.app'),
-                ('vectorPath', '/Applications/Preview.app'),
-                ('pdfPath', '/Applications/Preview.app'),
-                ('midiPath', '/Applications/QuickTime Player.app'),
-                ('musescoreDirectPNGPath', '/Applications/MuseScore 2.app/Contents/MacOS/mscore'),
+                    ('lilypondPath', '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
+                    ('musicxmlPath', '/Applications/MuseScore 2.app/Contents/MacOS/mscore'),
+                    ('graphicsPath', '/Applications/Preview.app'),
+                    ('vectorPath', '/Applications/Preview.app'),
+                    ('pdfPath', '/Applications/Preview.app'),
+                    ('midiPath', '/Applications/Utilities/QuickTime Player 7.app'),
+                    ('musescoreDirectPNGPath', '/Applications/MuseScore 2.app/Contents/MacOS/mscore'),
                 ]:
                 self.__setitem__(name, value)  # use for key checking
 
@@ -1306,10 +1306,10 @@ class Test(unittest.TestCase):
   <localCorporaSettings />
   <localCorpusSettings />
   <preference name="manualCoreCorpusPath" />
-  <preference name="midiPath" value="/Applications/QuickTime Player.app" />
+  <preference name="midiPath" value="/Applications/Utilities/QuickTime Player 7.app" />
   <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
-  <preference name="musicxmlPath" value="/Applications/Finale Notepad 2014.app" />
+  <preference name="musicxmlPath" value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
   <preference name="pdfPath" value="/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
   <preference name="vectorPath" value="/Applications/Preview.app" />
@@ -1354,10 +1354,10 @@ class Test(unittest.TestCase):
     <localCorpusPath>c</localCorpusPath>
   </localCorpusSettings>
   <preference name="manualCoreCorpusPath" />
-  <preference name="midiPath" value="/Applications/QuickTime Player.app" />
+  <preference name="midiPath" value="/Applications/Utilities/QuickTime Player 7.app" />
   <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
-  <preference name="musicxmlPath" value="/Applications/Finale Notepad 2014.app" />
+  <preference name="musicxmlPath" value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
   <preference name="pdfPath" value="/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
   <preference name="vectorPath" value="/Applications/Preview.app" />
@@ -1409,7 +1409,7 @@ class Test(unittest.TestCase):
   <preference name="midiPath" value="w" />
   <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
-  <preference name="musicxmlPath" value="/Applications/Finale Notepad 2014.app" />
+  <preference name="musicxmlPath" value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
   <preference name="pdfPath" value="/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
   <preference name="vectorPath" value="/Applications/Preview.app" />
