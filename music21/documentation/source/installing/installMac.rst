@@ -9,10 +9,10 @@ is probably the hardest part of the experience.
 Once you have that set, the rest should be much less painful.
 Trust us that it should work.
 
-Simple install on OS X El Capitan
---------------------------------------------
+Simple install on macOS Sierra or OS X El Capitan
+--------------------------------------------------
 
-If you're on the newest version of OS X, El Capitan (October 2015), then
+If you're on the newest versions of OS X, Sierra or El Capitan, then
 installation is very easy.  Open up "Terminal" in "Applications -> Utilities",
 then type at the prompt:
 
@@ -24,10 +24,19 @@ If you're not on El Cap, or if you want Python 3 (much better!) or something els
 comes up, just follow the instructions below *carefully* and you shouldn't
 have any problems.
 
-
 To upgrade later, just do
 
     sudo pip install --upgrade music21
+
+
+Downloading Python 3 from python.org
+---------------------------------------
+
+The `music21` team strongly recommends using the version of
+Python 3 from the python.org website and not the Conda version
+(or Enthought Canopy) because it is fully compatiable with 
+matplotlib.  If you have no plans on plotting functions, 
+feel free to use any version of Python 3.
 
 
 Starting Python and Checking the Version
@@ -39,7 +48,7 @@ use music21.
 
 Mac OS X comes with Python, but if you have an older version of OS X
 (Leopard or earlier) it might not be a new enough version 
-to run music21. Music21 requires Python 2.7 (2.7.3 or later) or Python 3.3 or 3.4. 
+to run music21. Music21 requires Python 2.7 (2.7.3 or later) or Python 3.4 to 3.6. 
 
 To determine the Python version you have installed, open a 
 terminal (by going to Applications, then Utilities, and then 
@@ -53,7 +62,7 @@ it should display in Terminal something like the following:
     :width: 650
 
 If it says 2.7.3 (possibly with a following number like
-2.7.10) or 3.3 or higher, you're okay.  If it says 2.4 or 2.5 or 2.6, 
+2.7.10) or 3.4 or higher, you're okay.  If it says 2.4 or 2.5 or 2.6, 
 go to http://www.python.org/download
 and download a newer version.  Multiple versions of Python can exist 
 on a single computer without any problems.

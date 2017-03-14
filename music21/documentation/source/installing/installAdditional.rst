@@ -22,25 +22,28 @@ the external modules.
 
 Note that on the Mac if you're using Python 2.7 (installed with recent operating
 systems), it comes with Matplotlib and its dependencies, so unless you need
-pyaudio or pillow/PIL, you're all set!
-
-For installing the majority of dependencies at once or for Python 3.4, 
-there are two good solutions: either use the Anaconda python installation or 
-on Mac follow Dave Hofmann's instructions for using homebrew.
-
-Anaconda: http://continuum.io/downloads#py34
-Homebrew: http://www.davehofmann.de/?p=244
-
+pyaudio or pillow/PIL, you're all set.  It's a little bit harder on 
 
 
 Matplotlib
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Graphing and visual displays in Music21 are provided by Matplotlib. 
-Matplotlib itself has additional dependencies (such as NumPy and SciPy). 
-Please read the detailed instructions in the link below.
+Matplotlib itself has additional dependencies (such as NumPy). 
 
-http://matplotlib.sourceforge.net
+On Mac if you are using the version of python 3 from python.org, run:
+
+`pip3 install matplotlib`
+
+and you should be set.  If you are using a version from anaconda
+(conda, miniconda, etc.), you should run these lines:
+
+`conda install matplotlib`
+`conda install python.app`
+
+and then use `pythonw` instead of `python`.  For more details, see
+http://matplotlib.org/2.0.0b4/faq/osx_framework.html
+
 
 Users of 64-bit windows or Python 2.7 will need to download
 numpy and scipy from:
@@ -48,17 +51,44 @@ numpy and scipy from:
 http://www.lfd.uci.edu/~gohlke/pythonlibs/
 
 
-Mac Users can get Matplotlib, Numpy, Scipy, and a few other systems
-compiled for Mac OS X 10.8 (Mountain Lion) or whatever the most recent
-OS is from this site:
+numpy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-http://fonnesbeck.github.com/ScipySuperpack/
+Numeric extensions to Python.  Included with Matplotlib.
+
+On Mac if you are using the version of python 3 from python.org, run:
+
+`pip3 install numpy`
+
+and you should be set.  If using python 2, substitute `pip` for `pip3`
+
+
+
+
+scipy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Scientific extensions to Python.
+
+On Mac if you are using the version of python 3 from python.org, run:
+
+`pip3 install scipy`
+
+and you should be set.  If using python 2, substitute `pip` for `pip3`
+
+
 
 
 pyaudio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Allows for recording within python.  We use it for the audioSearch module, and nowhere else.
-Not essential.
+Not essential. Requires `portaudio` and, on the Mac, the XCode command-line development tools.
+
+On the Mac, run:
+
+`xcode-select --install`
+`brew install portaudio`
+`pip3 install pyaudio`
 
 
 pygame
@@ -66,7 +96,12 @@ pygame
 Allows for realtime MIDI performance.  We use it in the midi.realtime module, and nowhere else
 Not essential.
 
-Python Imaging Library (pillow or PIL)
+On the Mac, run:
+
+`pip3 install pygame`
+
+
+Python Imaging Library (`pillow` or PIL)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The Python Imaging Library (pillow; formerly PIL) 
@@ -74,25 +109,8 @@ provides resources for transforming
 and editing graphics files.  Without this library, the output from
 Lilypond is less good. Not essential.
 
-On the command line type `pip install image` and you should get the latest version
+On the command line type `pip3 install pillow` and you should get the latest version
 of pillow.
-
-
-PIL (which is only used in audiosearch and to make slightly better PNGs from
-Lilypond) has been a particular problem on the Mac over the past few years.
-If it's really important to you
-Mac Users may to download MacPorts from
-http://www.macports.org/install.php .  After installing, 
-open up a terminal and type:
-"sudo port -v selfupdate"  then when that is done install with
-"sudo port install py27-pil" (replace with py26-pil if you are
-on python2.6.)  This method takes a while but at least it is safe.
-However, it does install a whole nother copy of python on your
-computer which might have its own problems...  Then type:
-"sudo port select python python27" to use the new version of python
-(if you hate it, type "sudo port select python python27-apple" to get
-back)
-
 
 
 
@@ -103,7 +121,6 @@ Installing Additional Software Components
 Additional functionality of Music21 is available with the 
 installation of numerous helper applications. While not essential 
 for all applications, these tools will aid in working with Music21.
-
 
 
 
