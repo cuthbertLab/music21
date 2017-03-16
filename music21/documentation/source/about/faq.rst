@@ -131,14 +131,30 @@ you help?
     enable us to increase the number of student programming assistants we
     employ.  (Or side-step us and offer a cash bounty on the music21list
     itself).
-    
+
+Consulting
+----------    
 No, you don't understand, I **really** need this feature!
 
     If you really need something done in `music21`, we offer paid support
-    by the hour at standard consulting rates. Discounts are available for
-    academic researchers/composers who consider the feature so essential as to add
-    authorship credit to the development team. Contact `cuthbert@mit.edu`
+    by the hour at standard consulting rates. Contact `cuthbert@mit.edu`
     for details and rates.
+    
+Is this also what I should do if I need help using `music21` for my own project?
+
+    Yes, if you're having trouble getting `music21` to do what you want and you've
+    tried the mailing list/StackOverflow, etc. consulting is available to help.
+    
+Why not put the rate here?
+
+    The rate varies according to the difficulty of the feature--whether it
+    requires a principal investigator to run or whether it could be incorporated
+    into the education of a student; whether licensing agreements need to be signed, etc.
+    
+    Discounts are available for
+    academic researchers/composers who consider the consultation sufficiently 
+    essential as to add
+    authorship credit to the development team on a publication. 
 
 
 3rd-Party Utilities
@@ -147,12 +163,12 @@ No, you don't understand, I **really** need this feature!
 What is MusicXML?
 
     MusicXML is a file format for exchanging musical scores among different 
-    programs, such as, oh...`music21` and Finale (or `music21` and Sibelius,
+    programs, such as, oh... `music21` and Finale (or `music21` and Sibelius,
     or Dorico, or MuseScore).  
-    It was created and owned by Recordare (Michael Good, CEO). More 
+    It was created by Recordare (Michael Good, CEO). More 
     information about the project can be found at:
 
-    * http://www.recordare.com/
+    * http://www.musicxml.com/
 
 And this Humdrum about which you speak?
 
