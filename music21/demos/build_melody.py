@@ -34,7 +34,7 @@ def populate_midi_track_from_data(mt, data):
         mt.events.append(dt)
 
         me = midi.MidiEvent(mt)
-        me.type = "NOTE_ON"
+        me.type = "NOTE_OFF"
         me.channel = 1
         me.time = None  # d
         me.pitch = p
