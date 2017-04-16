@@ -2023,13 +2023,16 @@ class Interval(IntervalBase):
         self.isStep = self.isChromaticStep or self.isDiatonicStep
 
     def __repr__(self):
+        return "<music21.interval.Interval {}>".format(self.__str__())
+
+    def __str__(self):
         from music21 import pitch
         shift = self._diatonicIntervalCentShift()
         if shift != 0:
             micro = pitch.Microtone(shift)
-            return "<music21.interval.Interval %s %s>" % (self.directedName, micro)
+            return "%s %s" % (self.directedName, micro)
         else:
-            return "<music21.interval.Interval %s>" % self.directedName
+            return "%s" % self.directedName
 
     def isConsonant(self):
         '''
