@@ -3069,7 +3069,7 @@ class MeasureParser(XMLParserBase):
                     # get first
                 except IndexError:
                     environLocal.warn("Line <" + mxObj.tag + "> stop without start")
-                    return
+                    return []
                 sp.completeStatus = True
                 
                 if mxObj.tag == 'dashes':

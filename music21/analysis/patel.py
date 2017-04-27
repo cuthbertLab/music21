@@ -39,9 +39,11 @@ def nPVI(streamForAnalysis):
     >>> s2 = converter.parse('tinynotation: 4/4 C4 D E F G').flat.notesAndRests.stream()
     >>> analysis.patel.nPVI(s2)
     0.0
+    
     >>> s3 = converter.parse('tinynotation: 4/4 C4 D8 C4 D8 C4').flat.notesAndRests.stream()
     >>> analysis.patel.nPVI(s3)
     66.6666...
+    
     >>> s4 = corpus.parse('bwv66.6').parts[0].flat.notesAndRests.stream()
     >>> analysis.patel.nPVI(s4)
     12.96296...
