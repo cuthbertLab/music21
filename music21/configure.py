@@ -27,11 +27,7 @@ except NameError:
 #except ImportError:
 #    pass
 
-try:
-    import StringIO # python 2 
-except ImportError:
-    from io import StringIO # python3 (also in python 2.6+)
-
+import io
 # pylint: disable=redefined-builtin
 try:
     input = raw_input # @ReservedAssignment @UndefinedVariable # pylint: disable=undefined-variable 
@@ -51,13 +47,13 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 #-------------------------------------------------------------------------------
 # match finale name, which may be directory or something else
-reFinaleApp = re.compile(r'Finale (?:Notepad )?20[0-2][0-9][a-z\.0-9]*.app', re.IGNORECASE)
-reSibeliusApp = re.compile(r'Sibelius.app', re.IGNORECASE)
-reFinaleExe = re.compile(r'Finale (?:Notepad )?20[0-2][0-9][a-z\.0-9]*.exe', re.IGNORECASE)
-reSibeliusExe = re.compile(r'Sibelius.exe', re.IGNORECASE)
-reFinaleReaderApp = re.compile(r'Finale Reader.app', re.IGNORECASE)
-reMuseScoreApp = re.compile(r'MuseScore\s?[0-9]*.app', re.IGNORECASE)
-reMuseScoreExe = re.compile(r'Musescore [0-9]\\bin\\MuseScore.exe', re.IGNORECASE)
+reFinaleApp = re.compile(r'Finale (?:Notepad )?20[0-2][0-9][a-z\.0-9]*.app', re.IGNORECASE) # @UndefinedVariable
+reSibeliusApp = re.compile(r'Sibelius.app', re.IGNORECASE) # @UndefinedVariable
+reFinaleExe = re.compile(r'Finale (?:Notepad )?20[0-2][0-9][a-z\.0-9]*.exe', re.IGNORECASE) # @UndefinedVariable
+reSibeliusExe = re.compile(r'Sibelius.exe', re.IGNORECASE) # @UndefinedVariable
+reFinaleReaderApp = re.compile(r'Finale Reader.app', re.IGNORECASE) # @UndefinedVariable
+reMuseScoreApp = re.compile(r'MuseScore\s?[0-9]*.app', re.IGNORECASE) # @UndefinedVariable
+reMuseScoreExe = re.compile(r'Musescore [0-9]\\bin\\MuseScore.exe', re.IGNORECASE) # @UndefinedVariable
 
 urlMusic21 = 'http://web.mit.edu/music21'
 urlFinaleNotepad = 'http://www.finalemusic.com/products/finale-notepad/resources/'
@@ -856,7 +852,7 @@ class AskInstall(YesOrNo):
             stdoutSrc = sys.stdout
             #stderrSrc = sys.stderr
 
-            fileLikeOpen = StringIO.StringIO()
+            fileLikeOpen = io.StringIO()
             sys.stdout = fileLikeOpen
 
             directory, unused_fn = os.path.split(fp)
