@@ -10,6 +10,7 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
+import sys
 from music21.ext import six
 
 omit_modules = [
@@ -34,7 +35,7 @@ exclude_lines = [
                 ]
 
 def getCoverage():    
-    if six.PY2:
+    if six.PY3 and sys.version_info.minor == 6:
         try:
             import coverage
             cov = coverage.coverage(omit=omit_modules)
