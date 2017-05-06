@@ -4,37 +4,75 @@
 Documenting music21
 =============================================
 
-Music21's documentation system uses a combination of handwritten documentation pages (like this one),
-IPython notebooks, 
-and documentation automatically generated from the documentation found in modules.  
+Music21's documentation system uses a combination of a few handwritten documentation pages (like this one),
+a lot of Jupyter notebooks (mainly in the User's Guide sections), 
+and documentation automatically generated from the documentation found in modules (in moduleReference).  
 
-For handwritten pages, the files can be found in the top-level /buildDoc/rst/ directories, outside
-the music21 directory.  The files are written using the reStructuredText_ format (file extension: .rst),
+The handwritten pages and Jupyter notebooks are found in the `/documentation/source/` directories.  The
+automatically generated documentation is found in each `.py` module.
+
+To build `music21` documentation, go to the `/documentation/` folder and run::
+
+   python3 make.py
+   
+(At present, only MIT affiliates can run the `upload.py` script.)
+
+
+.rst format files
+----------------------------------------------
+The handwritten .rst files are written using the reStructuredText_ format,
 which is a pretty simple way of defining structure of documents with things such as hyperlinks, emphasis,
-etc.  We then use the excellent module Sphinx_ along with our custom-made build.py to translate the code 
-to .html (what you're reading here) and store that code in /music21/doc/html -- letting you read it 
-offline.  (And of course we put a copy of that code online.)
+etc.  It is somewhat similar to Markdown format.   These files should *not* contain code examples, since
+they will not be tested. (You may find some older files that do contain code; we should be translating these
+in the future).
 
 .. _reStructuredText: http://docutils.sourceforge.net/rst.html 
+
+These files get converted to .html when you run `/documentation/make.py` so long as the excellent module 
+Sphinx_ has been installed.
+
 .. _Sphinx: http://sphinx.pocoo.org/
 
-But most of the music21 documentation is automatically generated from the documentation strings
+You can also edit these .rst files directly in Jupyter notebook, which will make them show the
+layout as well.
+
+
+Jupyter Notebook (.ipynb) files
+-------------------------------------------
+Since 2013, the majority of new documentation should be written in Jupyter Notebook (formerly
+IPython Notebook) format.  These files should never be edited directly, but instead should be
+edited using Jupyter Notebook running Python 3.4 or higher.  
+
+
+A lot of the music21 documentation is automatically generated from the documentation strings
 found in music21 modules.  We strongly encourage other module writers to create documentation that works
 the same way.  In fact, we won't add your module to the music21 repository without documentation
-in this form -- we're sort of bastards in how we look out for the users who will come after you -- but
+in this form -- there's a test that ensures that code coverage increases with each build -- but
 we'll help you learn the ropes.  This doc explains some of the main features (and potential Gotchas!) 
 of our automatic documentation system.
 
+Install Jupyter with::
+
+    pip3 install jupyter
+
+And then run it by changing directory to the direction you want to edit and run::
+
+    jupyter notebook
+
+When editing examples with code be sure, at least the first time, to run each code excerpt individually
+and pay attention to changes in output and unexpected errors.
+
+
 
 Documenting modules and classes
----------------------------------------------------
+=================================
 
 music21 documentation for modules is found inside the module itself, at the very top and before the import statements.
 This module-level documentation, usually in triple-quoted strings, might look like this::
 
-  '''
-  I am documentation for this module!
-  '''
+    '''
+    I am documentation for this module!
+    '''
 
 The buildDoc/build.py script creates RST files for modules, which are processed 
 by Sphinx.   Place all documentation for public modules, module-level 
@@ -43,44 +81,44 @@ as close to the relevant code as possible.
 
 If you're going to edit docs you'll need the latest version of Sphinx.  Go to the command line and Type::
 
-  sudo pip install sphinx
- 
+    pip3 install sphinx
+
 Sphinx uses special characters to identify formatting of documentation. For example, to write a heading you can write:
 Helpful tips on Sphinx formatting may be found here:  `Sphinx Documentation Formatting <http://sphinx.pocoo.org/rest.html>`_ 
 
 The code would look like this::
 
-	**This is bold**
+    **This is bold**
 
 The documentation looks like this:
 **This is bold**
 
 The code would look like this::
 
-	*This is italics*
+    *This is italics*
 
 The documentation looks like this:
 *This is italics*
 
 This is a one-line code sample::
-	
-	``print variableName``
-	
-The documentation looks like this:	
+    
+    ``print variableName``
+    
+The documentation looks like this:
 ``print variableName``
 
 You may also use links in your documentation. For example, if in one method you'd like to link to
 another method's documentation, write::
 
-	:meth:`~music21.note.GeneralNote.addLyric`
+    :meth:`~music21.note.GeneralNote.addLyric`
 
 The documentation looks like this:
 :meth:`~music21.note.GeneralNote.addLyric`
 
 Or you would like to link to another class, write::
 
-	:class:`~music21.note.Note`
-	
+    :class:`~music21.note.Note`
+
 The documentation looks like this:
 :class:`~music21.note.Note`
 
@@ -103,28 +141,28 @@ space. Text written after this space will be formatted. For example, in your
 code write:
 
 ::
-	
+    
     ...blah blah blah this text is formatted. now I'm ready for not-formatted
     text, so I put two colons::
-	
+    
         this text is NOT formatted it must be indented
-		
+        
         line breaks and spacing is preserved **bold** sphinx formatting is not
         observed
-		
+        
     Now I'm back to sphinx formatting...**now this is bold!*
 
 The documentation looks like this:
 
 ...blah blah blah this text is formatted. now I'm ready for not-formatted text,
 so I put two colons:
-	
-	this text is NOT formatted
-	it must be indented
-	
-	line breaks and spacing is preserved
-	**bold** sphinx formatting is not observed
-		
+    
+    this text is NOT formatted
+    it must be indented
+
+    line breaks and spacing is preserved
+    **bold** sphinx formatting is not observed
+
 Now I'm back to sphinx formatting. **now this is bold!**
 
 
@@ -156,6 +194,8 @@ could write documentation/test-code like this (but with all caps)
    'C'
    
    OMIT_FROM_Docs
+   
+   (N.B. That should be capital DOCS above...)
    
    >>> c2 = note.Note('C-')
    >>> c2.step
@@ -323,17 +363,18 @@ Documenting Class-Level Methods
 This is the most common type of documentation, and it ensures both excellent 
 documentation and doctests. A typical example of source code might look like this::
 
-	class className():
-		[instance variables, __init__, etc.]
-		def myNewMethod(self,parameters):
-		    '''
-		    This is documentation for this method
-		    
-		    >>> myInstance = className()
-		    >>> myInstance.myNewMethod(someParameters)
-		    >>> myUnicorn.someInstanceVariable
-		    'value'
-		    '''
-			[method code]
+    class className():
+        
+        [instance variables, __init__, etc.]
+        
+        def myNewMethod(self,parameters):
+            '''
+            This is documentation for this method
+    
+            >>> myInstance = className()
+            >>> myInstance.myNewMethod(someParameters)
+            >>> myUnicorn.someInstanceVariable
+            'value'
+            '''
+            [method code]
 
-			
