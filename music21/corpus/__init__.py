@@ -399,15 +399,14 @@ def compressXML(filename, deleteOriginal=False):
     '''.format(archivedName)
     # Export container and original xml file to system as a compressed XML.
     with zipfile.ZipFile(
-        newFilename,
-        'w',
-        compression=zipfile.ZIP_DEFLATED,
-        ) as myZip:
-        myZip.write(filename=filename, archivedName=archivedName)
+            newFilename,
+            'w',
+            compression=zipfile.ZIP_DEFLATED,
+            ) as myZip:
+        myZip.write(filename, archivedName)
         myZip.writestr(
-            zinfo_or_archivedName='META-INF{0}container.xml'.format(
-                os.path.sep),
-            bytes=container,
+            'META-INF' + os.path.sep + 'container.xml',
+            container,
             )
     # Delete uncompressed xml file from system
     if deleteOriginal:

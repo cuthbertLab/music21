@@ -1068,7 +1068,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
     >>> harmony.changeAbbreviationFor('major', '')
 
     '''
-    if len(inChord.pitches) == 0:
+    if not inChord.pitches:
         return ''
 
     try:

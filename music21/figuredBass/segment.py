@@ -983,7 +983,7 @@ def printRules(rulesList, maxLength = 4):
         args = []
         if len(rulesList[ruleIndex]) == maxLength:
             args = rulesList[ruleIndex][-1]
-        if len(args) == 0:
+        if not args:
             argsString = "None"
         else:        
             argsString = ""

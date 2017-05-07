@@ -406,10 +406,10 @@ class BrailleKeyboard(BrailleText):
             addSpace = False
             self.rightHandLine.append(symbols['rh_keyboard'], addSpace=True)
             self.leftHandLine.append(symbols['lh_keyboard'], addSpace=True)
-            if len(noteGroupingR) > 0:
+            if noteGroupingR:
                 for dot in yieldDots(noteGroupingR[0]):
                     self.rightHandLine.append(dot, addSpace=False)
-            if len(noteGroupingL) > 0:
+            if noteGroupingL:
                 for dot in yieldDots(noteGroupingL[0]):
                     self.leftHandLine.append(dot, addSpace=False)
         if (self.rightHandLine.canAppend(noteGroupingR, addSpace=addSpace) 
@@ -429,12 +429,12 @@ class BrailleKeyboard(BrailleText):
             self.leftHandLine.textLocation = self.rightHandLine.textLocation
             self.rightHandLine.append(symbols['rh_keyboard'], addSpace=True)
             self.leftHandLine.append(symbols['lh_keyboard'], addSpace=True)
-            if len(noteGroupingR) > 0:
+            if noteGroupingR:
                 for dot in yieldDots(noteGroupingR[0]):
                     self.rightHandLine.append(dot, addSpace=False)
                 self.rightHandLine.append(noteGroupingR, addSpace=False)
             
-            if len(noteGroupingL) > 0:
+            if noteGroupingL:
                 for dot in yieldDots(noteGroupingL[0]):
                     self.leftHandLine.append(dot, addSpace=False)
                 self.leftHandLine.append(noteGroupingL, addSpace=False)

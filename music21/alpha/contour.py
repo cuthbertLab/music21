@@ -643,7 +643,7 @@ def _getOutliers():
         
         if chorale == 'bach/bwv277':
             continue
-        elif len(s.parts) is not 4:
+        elif len(s.parts) != 4:
             continue
         
         rf = repeat.RepeatFinder(s)

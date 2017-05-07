@@ -135,7 +135,7 @@ class ActivityMatch(object):
 
         for objName in [objNameSrc, objNameDst]:
             dstCheck = self.streamObj.flat.getElementsByClass(objName)
-            if len(dstCheck) == 0:
+            if not dstCheck:
                 raise CorrelateException('cannot create correlation an object ' +
                                          'that is not found in the Stream: %s' % objName)
 

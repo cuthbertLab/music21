@@ -247,7 +247,7 @@ class CapellaImporter(object):
             scoreObj = stream.Score()
 
         systemsList = scoreElement.findall('systems')
-        if len(systemsList) == 0:
+        if not systemsList:
             raise CapellaImportException(
                 "Cannot find a <systems> tag in the <score> object")
         elif len(systemsList) > 1:
@@ -256,7 +256,7 @@ class CapellaImporter(object):
         systemsElement = systemsList[0]
         
         systemList = systemsElement.findall('system')
-        if len(systemList) == 0:
+        if not systemList:
             raise CapellaImportException(
                 'Cannot find any <system> tags in the <systems> tag in the <score> object')
         
@@ -280,14 +280,14 @@ class CapellaImporter(object):
             systemObj = stream.System()
             
         stavesList = systemElement.findall('staves')
-        if len(stavesList) == 0:
+        if not stavesList:
             raise CapellaImportException("No <staves> tag found in this <system> element")
         elif len(stavesList) > 1:
             raise CapellaImportException(
                 "More than one <staves> tag found in this <system> element")
         stavesElement = stavesList[0]
         staffList = stavesElement.findall('staff')
-        if len(stavesList) == 0:
+        if not stavesList:
             raise CapellaImportException(
                 "No <staff> tag found in the <staves> element for this <system> element")
         for thisStaffElement in staffList:
@@ -299,20 +299,20 @@ class CapellaImporter(object):
             partObj.id = partId
             
             voicesList = thisStaffElement.findall('voices')
-            if len(voicesList) == 0:
+            if not voicesList:
                 raise CapellaImportException(
                     "No <voices> tag found in the <staff> tag for the <staves> element " + 
                     "for this <system> element")
             voicesElement = voicesList[0]
             voiceList = voicesElement.findall('voice')
-            if len(voiceList) == 0:
+            if not voiceList:
                 raise CapellaImportException(
                     "No <voice> tag found in the <voices> tag for the <staff> tag for the " + 
                     "<staves> element for this <system> element")
             if len(voiceList) == 1: # single voice staff... perfect!
                 thisVoiceElement = voiceList[0]
                 noteObjectsList = thisVoiceElement.findall('noteObjects')
-                if len(noteObjectsList) == 0:
+                if not noteObjectsList:
                     raise CapellaImportException(
                             "No <noteObjects> tag found in the <voice> tag found in the " + 
                             "<voices> tag for the <staff> tag for the <staves> element for " + 
@@ -465,7 +465,7 @@ class CapellaImporter(object):
         notesList = self.notesFromHeads(headsList[0])
         
         noteOrChord = None
-        if len(notesList) == 0:
+        if not notesList:
             raise CapellaImportException("Malformed chord!")
         elif len(notesList) == 1:
             noteOrChord = notesList[0] # a Note object
@@ -475,7 +475,7 @@ class CapellaImporter(object):
         noteOrChord.duration = self.durationFromDuration(durationList[0])
 
         lyricsList = chordElement.findall('lyric')
-        if len(lyricsList) > 0:
+        if lyricsList:
             lyricsList = self.lyricListFromLyric(lyricsList[0])
             noteOrChord.lyrics = lyricsList
             

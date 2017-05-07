@@ -97,21 +97,17 @@ def figuredBassFromStream(streamPart):
     
     keyList = sf.getElementsByClass(key.Key)
     myKey = None
-    if len(keyList) == 0:
+    if not keyList:
         keyList = sf.getElementsByClass(key.KeySignature)
-        if len(keyList) == 0:
+        if not keyList:
             myKey = key.Key('C')
         else:
-            if keyList[0].pitchAndMode[1] is None:
-                mode = 'major'
-            else:
-                mode = keyList[0].pitchAndMode[1]
-            myKey = key.Key(keyList[0].pitchAndMode[0], mode)
+            myKey = keyList[0].asKey('major')
     else:
         myKey = keyList[0]
 
     tsList = sf.getElementsByClass(meter.TimeSignature)
-    if len(tsList) == 0:
+    if not tsList:
         ts = meter.TimeSignature('4/4')
     else:
         ts = tsList[0]
@@ -153,7 +149,7 @@ def addLyricsToBassNote(bassNote, notationString = None):
     '''
     bassNote.lyrics = []
     n = notation.Notation(notationString)
-    if len(n.figureStrings) == 0:
+    if not n.figureStrings:
         return
     maxLength = 0
     for fs in n.figureStrings:
@@ -477,7 +473,7 @@ class FiguredBassLine(object):
         elif len(segmentList) == 1:
             segmentA = segmentList[0]
             segmentA.correctA = list(segmentA.allCorrectSinglePossibilities())
-        elif len(segmentList) == 0:
+        elif not segmentList:
             raise FiguredBassLineException("No (bassNote, notationString) pairs to realize.")
 
         return Realization(realizedSegmentList = segmentList, inKey = self.inKey, 
@@ -506,14 +502,14 @@ class FiguredBassLine(object):
                 movementsBC = segmentList[segmentIndex].movements
                 #eliminated = []
                 for (possibB, possibCList) in list(movementsBC.items()):
-                    if len(possibCList) == 0:
+                    if not possibCList:
                         del movementsBC[possibB]
                 for (possibA, possibBList) in list(movementsAB.items()):
                     movementsAB[possibA] = list(
                                 ifilter(lambda possibB: possibB in movementsBC, possibBList))
 
             for (possibA, possibBList) in list(movementsAB.items()):
-                if len(possibBList) == 0:
+                if not possibBList:
                     del movementsAB[possibA]
                     
             segmentList.reverse()
@@ -580,7 +576,7 @@ class Realization(object):
         for segmentIndex in range(1, len(self._segmentList)):
             segmentA = self._segmentList[segmentIndex]
             newPathList = {}
-            if len(pathList.keys()) == 0:
+            if not pathList:
                 for possibA in segmentA.movements:
                     newPathList[possibA] = len(segmentA.movements[possibA])
             else:
@@ -735,7 +731,7 @@ class Realization(object):
         '''
         allSols = stream.Score()
         possibilityProgressions = self.getAllPossibilityProgressions()
-        if len(possibilityProgressions) == 0:
+        if not possibilityProgressions:
             raise FiguredBassLineException("Zero solutions")
         sol0 = self.generateRealizationFromPossibilityProgression(possibilityProgressions[0])
         for music21Part in sol0:

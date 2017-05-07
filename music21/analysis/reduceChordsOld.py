@@ -95,7 +95,7 @@ class ChordReducer(object):
             numChords = len(chordWeights)
 
         maxNChords = sorted(chordWeights, key=chordWeights.get, reverse=True)[:numChords]
-        if len(maxNChords) == 0:
+        if not maxNChords:
             r = note.Rest()
             r.quarterLength = mObj.duration.quarterLength
             for c in mObj:
@@ -246,7 +246,7 @@ class ChordReducer(object):
         self._lastTs = None
         for i in range(lenMeasures):
             mI = inStream.measure(i, ignoreNumbers=True)
-            if len(mI.flat.notesAndRests) == 0:
+            if not mI.recurse().notesAndRests:
                 if i == 0:
                     pass
                 else:
@@ -364,7 +364,7 @@ class TestExternal(unittest.TestCase):
         if fixClef:
             from music21 import clef
             startClefs = c.parts[1].getElementsByClass('Measure')[0].getElementsByClass('Clef')
-            if len(startClefs):
+            if startClefs:
                 clef1 = startClefs[0]
                 c.parts[1].getElementsByClass('Measure')[0].remove(clef1)
             c.parts[1].getElementsByClass('Measure')[0].insert(0, clef.Treble8vbClef())

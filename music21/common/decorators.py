@@ -32,7 +32,7 @@ def optional_arg_decorator(fn):
             args = args[1:]
 
         # If no arguments were passed...
-        if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
+        if len(args) == 1 and not kwargs and callable(args[0]):
             if is_bound_method:
                 return fn(klass, args[0])
             else:

@@ -924,7 +924,7 @@ def approximateGCD(values, grain=1e-4):
         # store any division that is found in all values
         if count == len(divisions):
             commonUniqueDivisions.append(v)
-    if len(commonUniqueDivisions) == 0:
+    if not commonUniqueDivisions:
         raise Exception('cannot find a common divisor')
     return max(commonUniqueDivisions)
 

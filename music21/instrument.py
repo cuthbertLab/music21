@@ -254,7 +254,7 @@ class Instrument(base.Music21Object):
             if e != None:
                 channelFilter.append(e)
 
-        if len(channelFilter) == 0:
+        if not channelFilter:
             self.midiChannel = 0
             return 0
         elif len(channelFilter) >= maxMidi:
@@ -419,7 +419,7 @@ class StringInstrument(Instrument):
             return self._cachedPitches
     
     def _setStringPitches(self, newPitches):
-        if len(newPitches) > 0 and (hasattr(newPitches[0], "step") or newPitches[0] is None):
+        if newPitches and (hasattr(newPitches[0], "step") or newPitches[0] is None):
             # newPitches is pitchObjects or something 
             self._stringPitches = newPitches
             self._cachedPitches = newPitches
@@ -1694,7 +1694,7 @@ def partitionByInstrument(streamObj):
 
     # first, find all unique instruments
     found = s.recurse().getElementsByClass('Instrument')
-    if len(found) == 0:
+    if not found:
         return None # no partition is available
     
     names = OrderedDict() # store unique names

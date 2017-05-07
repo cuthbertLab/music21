@@ -44,13 +44,13 @@ def etIndent(elem, level=0, spaces=2):
     indent an elementTree element for printing
     '''
     i = "\n" + level * spaces * " "
-    if len(elem):
+    if len(elem): # pylint: disable=len-as-condition
         if not elem.text or not elem.text.strip():
             elem.text = i + spaces * " "
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
-        for elem in elem:
-            etIndent(elem, level+1)
+        for subEl in elem:
+            etIndent(subEl, level + 1)
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
     else:
@@ -319,7 +319,8 @@ class _EnvironmentCore(object):
                     ('vectorPath', '/Applications/Preview.app'),
                     ('pdfPath', '/Applications/Preview.app'),
                     ('midiPath', '/Applications/Utilities/QuickTime Player 7.app'),
-                    ('musescoreDirectPNGPath', '/Applications/MuseScore 2.app/Contents/MacOS/mscore'),
+                    ('musescoreDirectPNGPath', 
+                        '/Applications/MuseScore 2.app/Contents/MacOS/mscore'),
                 ]:
                 self.__setitem__(name, value)  # use for key checking
 
@@ -481,7 +482,7 @@ class _EnvironmentCore(object):
         '''
         # get the root dir, which may be the user-specified dir
         rootDir = self.getRootTempDir()
-        if len(suffix) > 0 and not suffix.startswith('.'):
+        if suffix and not suffix.startswith('.'):
             suffix = '.' + suffix
 
 

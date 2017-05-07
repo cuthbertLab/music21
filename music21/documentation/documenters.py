@@ -56,7 +56,7 @@ class Documenter(object):
 
     @staticmethod
     def makeHeading(text, heading_level):
-        if not isinstance(text, six.string_types) or len(text) == 0:
+        if not text or not isinstance(text, six.string_types):
             raise Music21Exception("make heading requires text")
         heading_characters = ['=', '-', '^', '"']
         result = [text]

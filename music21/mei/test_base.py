@@ -1816,7 +1816,7 @@ class TestClefFromElement(unittest.TestCase):
         expectedGetOrder.extend([mock.ANY for _ in range(1)])  
         # additional calls to elem.get(), not part of this test
         elemGetReturns = ['theClefShape', 'theClefShape', 'theClefShape', '2', '8', 'above']
-        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
+        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if elemGetReturns else None
         mockClefFromString.return_value = mock.MagicMock(name='clefFromString()')
         expected = mockClefFromString.return_value
 
@@ -1841,7 +1841,7 @@ class TestClefFromElement(unittest.TestCase):
         expectedGetOrder.extend([mock.ANY for _ in range(1)])  
         # additional calls to elem.get(), not part of this test
         elemGetReturns = ['perc']
-        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
+        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if elemGetReturns else None
         mockPercClef.return_value = mock.MagicMock(name='PercussionClef()')
         expected = mockPercClef.return_value
 
@@ -1865,7 +1865,7 @@ class TestClefFromElement(unittest.TestCase):
         expectedGetOrder.extend([mock.ANY for _ in range(1)])  
         # additional calls to elem.get(), not part of this test
         elemGetReturns = ['TAB', 'TAB']
-        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
+        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if elemGetReturns else None
         mockPercClef.return_value = mock.MagicMock(name='PercussionClef()')
         expected = mockTabClef.return_value
 
@@ -1937,7 +1937,7 @@ class TestClefFromElement(unittest.TestCase):
         expectedGetOrder.extend([mock.ANY for _ in range(0)])  
         # additional calls to elem.get(), not part of this test
         elemGetReturns = ['perc', 'theXMLID', 'theXMLID']
-        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
+        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if elemGetReturns else None
         mockPercClef.return_value = mock.MagicMock(name='PercussionClef()')
         expected = mockPercClef.return_value
 
@@ -1969,7 +1969,7 @@ class TestLayerFromElement(unittest.TestCase):
         theNAttribute = '@n value'
         elem = mock.MagicMock()
         elemGetReturns = [theNAttribute, theNAttribute]
-        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) else None
+        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if elemGetReturns else None
         expectedGetOrder = [mock.call('n'), mock.call('n')]
         iterfindReturn = [mock.MagicMock(name='note1'),
                           mock.MagicMock(name='imaginary'),

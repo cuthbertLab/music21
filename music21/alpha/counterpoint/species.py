@@ -1072,7 +1072,7 @@ class ModalCounterpoint(object):
             prevNote = stream2.notes[i-1]
             choices = self.generateValidNotes(prevFirmus, currFirmus, prevNote, 
                                               afterLeap, minorScale)
-            if len(choices) == 0:
+            if not choices:
                 raise ModalCounterpointException("Sorry, please try again")
             if choice == 'random':
                 newNote = random.choice(choices)

@@ -518,7 +518,7 @@ class ChordReducer(object):
             reverse=True,
             )
         maxNChords = sortedChordWeights[:maximumNumberOfChords]
-        if len(maxNChords) == 0:
+        if not maxNChords:
             r = note.Rest()
             r.quarterLength = measureObject.duration.quarterLength
             for c in measureObject:

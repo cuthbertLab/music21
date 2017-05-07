@@ -84,7 +84,8 @@ from music21 import duration
 from music21 import editorial
 from music21 import environment
 from music21 import sites
-from music21 import style
+# ?? pylint does not think that this was used...
+from music21 import style # pylint: disable=unused-import
 
 from music21.common import opFrac
 from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
@@ -1053,8 +1054,8 @@ class Music21Object(object):
         >>> b = note.Note('D')
         >>> b.setOffsetBySite(aSite, 40)
         Traceback (most recent call last):
-        music21.exceptions21.StreamException: Cannot set the offset for element <music21.note.Note D>, 
-            not in Stream <music21.stream.Stream aSite>.
+        music21.exceptions21.StreamException: Cannot set the offset for element 
+            <music21.note.Note D>, not in Stream <music21.stream.Stream aSite>.
 
         >>> b.offset
         0.0
@@ -1925,7 +1926,7 @@ class Music21Object(object):
         # these do not need to be flattened b/c we know the self is in these
         # streams
         memo = {}
-        while len(selfSites) > 0:
+        while selfSites:
             #environLocal.printDebug(['looking at siteSites:', s])
             # check for duplicated sites; may be possible
             s = selfSites.pop(0) # take the first off of sites

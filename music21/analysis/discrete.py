@@ -355,8 +355,8 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         [3.0, 0, 1.5, 0, 1.5, 0, 2.0, 0, 0, 0, 1.5, 0]
         '''
         # storage for 12 pitch classes
-        pcDist = [0]*12
-        if len(streamObj.notes) == 0:
+        pcDist = [0] * 12
+        if not streamObj.notes:
             return None
 
         for n in streamObj.notes:        
@@ -645,7 +645,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         if likelyKeysMinor is not None:
             sortList += [(coefficient, p, 'minor') for 
                          (p, coefficient) in likelyKeysMinor]
-        if len(sortList) == 0:
+        if not sortList:
             raise DiscreteAnalysisException('failed to get likely keys for Stream component')
 
         sortList.sort()
@@ -1046,15 +1046,15 @@ class Ambitus(DiscreteAnalysis):
         >>> p.getPitchSpan(s)
         (<music21.pitch.Pitch A2>, <music21.pitch.Pitch C8>)
         '''
-        ssfn = subStream.flat.notes
-        if len(ssfn) == 0:
+        justNotes = subStream.recurse().notes
+        if not justNotes:
             # need to handle case of no pitches
             return None
 
         # find the min and max pitch space value for all pitches
         psFound = []
         pitchesFound = []
-        for n in ssfn:
+        for n in justNotes:
             #environLocal.printDebug([n])
             pitches = []
             if 'Chord' in n.classes and 'ChordSymbol' not in n.classes:
@@ -1119,10 +1119,10 @@ class Ambitus(DiscreteAnalysis):
                 # p2 should always be equal or greater than p1
                 psRange.append(p2-p1)
         
-        if len(psRange) == 0:
-            return 0, 0
+        if not psRange:
+            return (0, 0)
         else:
-            return int(min(psRange)), int(max(psRange))
+            return (int(min(psRange)), int(max(psRange)))
 
 
     def solutionLegend(self, compress=False):

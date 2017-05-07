@@ -1000,6 +1000,38 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
           staccato or tenuto, they are treated as slurred instead of tied." (BMTM, 112)
         """
         from music21 import articulations
+        def fixOneArticulation(artc, music21NoteStart):
+            artcName = artc.name
+            if artcName == 'fingering': # fingerings are not considered articulations...
+                return
+            if (isinstance(artc, (articulations.Staccato, articulations.Tenuto))
+                    and music21NoteStart.tie is not None):
+                if music21NoteStart.tie.type == 'stop':
+                    allNotes[noteIndexStart - 1].tie = None
+                    allNotes[noteIndexStart - 1].shortSlur = True
+                else:
+                    allNotes[noteIndexStart + 1].tie = None
+                    music21NoteStart.shortSlur = True
+                music21NoteStart.tie = None
+            numSequential = 0
+            for noteIndexContinue in range(noteIndexStart + 1, len(allNotes)):
+                music21NoteContinue = allNotes[noteIndexContinue]
+                if artcName in [a.name for a in music21NoteContinue.articulations]:
+                    numSequential += 1
+                    continue
+                break
+            if numSequential < 3:
+                return            
+            # else:
+            # double the articulation on the first note and remove from the next...
+            music21NoteStart.articulations.append(artc)
+            for noteIndexContinue in range(noteIndexStart + 1, 
+                                           noteIndexStart + numSequential):
+                music21NoteContinue = allNotes[noteIndexContinue]
+                for artOther in music21NoteContinue.articulations:
+                    if artOther.name == artcName:
+                        music21NoteContinue.articulations.remove(artOther)
+        
         newSegment = self.consolidate()
         noteGroupings = [newSegment[gpKey] 
                              for gpKey in newSegment.keys() 
@@ -1009,37 +1041,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
             for noteIndexStart in range(len(allNotes)):
                 music21NoteStart = allNotes[noteIndexStart]
                 for artc in music21NoteStart.articulations:
-                    artcName = artc.name
-                    if artcName == 'fingering': # fingerings are not considered articulations...
-                        continue
-                    if (isinstance(artc, (articulations.Staccato, articulations.Tenuto))
-                            and music21NoteStart.tie is not None):
-                        if music21NoteStart.tie.type == 'stop':
-                            allNotes[noteIndexStart - 1].tie = None
-                            allNotes[noteIndexStart - 1].shortSlur = True
-                        else:
-                            allNotes[noteIndexStart + 1].tie = None
-                            music21NoteStart.shortSlur = True
-                        music21NoteStart.tie = None
-                    numSequential = 0
-                    for noteIndexContinue in range(noteIndexStart + 1, len(allNotes)):
-                        music21NoteContinue = allNotes[noteIndexContinue]
-                        if artcName in [a.name for a in music21NoteContinue.articulations]:
-                            numSequential += 1
-                            continue
-                        break
-                    if numSequential < 3:
-                        continue
-                    
-                    # else:
-                    # double the articulation on the first note and remove from the next...
-                    music21NoteStart.articulations.append(artc)
-                    for noteIndexContinue in range(noteIndexStart+1, 
-                                                   noteIndexStart+numSequential):
-                        music21NoteContinue = allNotes[noteIndexContinue]
-                        for artOther in music21NoteContinue.articulations:
-                            if artOther.name == artcName:
-                                music21NoteContinue.articulations.remove(artOther)
+                    fixOneArticulation(artc, music21NoteStart)
            
 
 class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):

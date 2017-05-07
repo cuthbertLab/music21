@@ -196,9 +196,9 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
             #environLocal.printDebug(['processing match', 'adding collElements', 
             #    'collPitches', collPitches])
 
-            for e in collElements:
+            for innerEl in collElements:
                 # use source offset positions
-                post.insert(source.elementOffset(e), e)
+                post.insert(source.elementOffset(innerEl), innerEl)
             dictionary = {}
             dictionary['stream'] = post
             dictionary['direction'] = directionLast
