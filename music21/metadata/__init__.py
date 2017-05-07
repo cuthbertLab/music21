@@ -458,9 +458,9 @@ class Metadata(base.Music21Object):
             if not match:
                 return False, None
         else:  # get all fields
-            for field in self.searchAttributes:
-                value = getattr(self, field)
-                valueFieldPairs.append((value, field))
+            for innerField in self.searchAttributes:
+                value = getattr(self, innerField)
+                valueFieldPairs.append((value, innerField))
         # for now, make all queries strings
         # ultimately, can look for regular expressions by checking for
         # .search
@@ -474,24 +474,24 @@ class Metadata(base.Music21Object):
             useRegex = True
             reQuery = re.compile(query, flags=re.I)
         if useRegex:
-            for value, field in valueFieldPairs:
+            for value, innerField in valueFieldPairs:
                 # re.I makes case insensitive
                 if isinstance(value, six.string_types):
                     match = reQuery.search(value)
                     if match is not None:
-                        return True, field
+                        return True, innerField
         elif callable(query):
-            for value, field in valueFieldPairs:
+            for value, innerField in valueFieldPairs:
                 if query(value):
-                    return True, field
+                    return True, innerField
         else:
-            for value, field in valueFieldPairs:
+            for value, innerField in valueFieldPairs:
                 if isinstance(value, six.string_types):
                     query = str(query)
                     if query.lower() in value.lower():
-                        return True, field
+                        return True, innerField
                 elif query == value:
-                    return True, field
+                    return True, innerField
         return False, None
 
     def setWorkId(self, idStr, value):
@@ -911,11 +911,11 @@ class RichMetadata(Metadata):
                 if tempoIndicationString not in self.tempos:
                     self.tempos.append(tempoIndicationString)
 
-        if len(self.timeSignatures):
+        if self.timeSignatures:
             self.timeSignatureFirst = self.timeSignatures[0]
-        if len(self.keySignatures):
+        if self.keySignatures:
             self.keySignatureFirst = self.keySignatures[0]
-        if len(self.tempos):
+        if self.tempos:
             self.tempoFirst = self.tempos[0]
 
 #        for element in flat:

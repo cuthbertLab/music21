@@ -594,7 +594,7 @@ class LyBookBody(LyObject):
     def stringOutput(self):
         if self.bookIdentifier is not None:
             return self.bookIdentifier
-        elif len(self.contents) == 0:
+        elif not self.contents:
             return None
         else:
             return self.newlineSeparateStringOutputIfNotNone(self.contents)
@@ -636,7 +636,7 @@ class LyBookpartBody(LyObject):
     def stringOutput(self):
         if self.bookIdentifier is not None:
             return self.bookIdentifier
-        elif len(self.contents) == 0:
+        elif not self.contents:
             return None
         else:
             return self.newlineSeparateStringOutputIfNotNone(self.contents)
@@ -1442,7 +1442,7 @@ class LyEventChord(LyObject):
         self.postEvents = postEvents 
         self.chordRepetition = chordRepetition 
         self.multiMeasureRest = multiMeasureRest 
-        self.duration = duration, 
+        self.duration = duration 
         self.commandElement = commandElement 
         self.noteChordElement = noteChordElement 
     

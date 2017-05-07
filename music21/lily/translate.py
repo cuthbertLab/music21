@@ -992,14 +992,14 @@ class LilypondConverter(object):
                         el.activeSite = streamObject
                         otherList.append(el)
 
-                if len(variantList) > 0:
+                if variantList:
                     for v in variantList:
                         v.activeSite = streamObject
                     self.appendContextFromVariant(variantList, 
                                                   activeSite=streamObject, 
                                                   coloredVariants=self.coloredVariants)
 
-                if len(voiceList) > 0:
+                if voiceList:
                     musicList2 = []
                     lp2GroupedMusicList = lyo.LyGroupedMusicList()
                     lp2SimultaneousMusic = lyo.LySimultaneousMusic()
@@ -1019,7 +1019,7 @@ class LilypondConverter(object):
                     currentMusicList.append(lp2GroupedMusicList)
                     lp2GroupedMusicList.setParent(self.context)
 
-                if len(otherList) > 0:
+                if otherList:
                     for el in otherList:
                         self.appendM21ObjectToContext(el)
 
@@ -1298,7 +1298,7 @@ class LilypondConverter(object):
         lpMultipliedDuration = self.lyMultipliedDurationFromDuration(noteOrRest.duration)
         simpleElementParts.append(lpMultipliedDuration)
 
-        if 'NotRest' in c and noteOrRest.beams is not None and len(noteOrRest.beams) > 0:
+        if 'NotRest' in c and noteOrRest.beams is not None and noteOrRest.beams:
             if noteOrRest.beams.beamsList[0].type == 'start':
                 simpleElementParts.append("[ ")
             elif noteOrRest.beams.beamsList[0].type == 'stop':
@@ -1683,7 +1683,7 @@ class LilypondConverter(object):
         easy extension, but there's too much
         else missing to do it now...
         '''
-        if inObj.duration.tuplets is None or len(inObj.duration.tuplets) == 0:
+        if not inObj.duration.tuplets:
             return None
         elif inObj.duration.tuplets[0].type == 'start':
             numerator = str(int(inObj.duration.tuplets[0].tupletNormal[0]))
@@ -1755,7 +1755,7 @@ class LilypondConverter(object):
         '''
         Reverse of setContextForTupletStart
         '''
-        if len(inObj.duration.tuplets) == 0:
+        if not inObj.duration.tuplets:
             return
         elif inObj.duration.tuplets[0].type == 'stop':
             self.restoreContext()
@@ -2363,7 +2363,7 @@ class LilypondConverter(object):
         if pL == 0:
             return None
         tses = measureObject.getTimeSignatures()
-        if len(tses) == 0:
+        if not tses:
             barLength = 4.0
         else:
             ts = tses[0]

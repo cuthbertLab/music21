@@ -922,7 +922,7 @@ class Contributor(object):
         ['Chopin, Fryderyk', 'Chopin, Frederick']
         '''
         # return first name
-        if len(self._names) > 0:
+        if self._names:
             return str(self._names[0])
         else:
             return None

@@ -1885,28 +1885,29 @@ class MeterSequence(MeterTerminal):
             post = self._subdivideNested(post, divisions=None)
             depthCount += 1
             # need to detect cases of inequal denominators
-            if normalizeDenominators:
-                while True:
-                    d = []
-                    for ref in post:
-                        if ref.denominator not in d:
-                            d.append(ref.denominator)
-                    # if we have more than one denominator; we need to normalize
-                    #environLocal.printDebug(['subdivideNestedHierarchy():', 'd',  d,
-                    #   'post', post, 'depthCount', depthCount])
-                    if len(d) > 1:
-                        postNew = []
-                        for i in range(len(post)):
-                            # if this is a lower denominator (1/4 not 1/8),
-                            # process again
-                            if post[i].denominator == min(d):
-                                postNew += self._subdivideNested([post[i]],
-                                           divisions=None)
-                            else: # keep original if no problem
-                                postNew.append(post[i])
-                        post = postNew # reassing to original
-                    else:
-                        break
+            if not normalizeDenominators:
+                continue
+            while True:
+                d = []
+                for ref in post:
+                    if ref.denominator not in d:
+                        d.append(ref.denominator)
+                # if we have more than one denominator; we need to normalize
+                #environLocal.printDebug(['subdivideNestedHierarchy():', 'd',  d,
+                #   'post', post, 'depthCount', depthCount])
+                if len(d) > 1:
+                    postNew = []
+                    for i in range(len(post)):
+                        # if this is a lower denominator (1/4 not 1/8),
+                        # process again
+                        if post[i].denominator == min(d):
+                            postNew += self._subdivideNested([post[i]],
+                                       divisions=None)
+                        else: # keep original if no problem
+                            postNew.append(post[i])
+                    post = postNew # reassing to original
+                else:
+                    break
 
         # clear cache; done in self._subdivideNested and possibly not
         # needed here
@@ -3692,7 +3693,7 @@ class TimeSignature(base.Music21Object):
             for n in srcList:
                 durList.append(n.duration)
             srcStream = srcList
-        elif len(srcList) > 0 and isinstance(srcList[0], base.Music21Object):
+        elif srcList and isinstance(srcList[0], base.Music21Object):
             # assume all are objects:
             durList = [n.duration for n in srcList]
             srcStream = None
