@@ -45,12 +45,10 @@ class Horizontality(collections.Sequence):
 
     ### INITIALIZER ###
 
-    def __init__(self,
-        timespans=None,
-        ):
+    def __init__(self, timespans=None):
         if not isinstance(timespans, collections.Sequence):
             raise HorizontalityException("timespans must be a sequence, not %r" % timespans)
-        if len(timespans) == 0:
+        if not timespans:
             raise HorizontalityException(
                 "there must be at least one timespan in the timespans list")
         if not all(hasattr(x, 'offset') and hasattr(x, 'endTime') for x in timespans):

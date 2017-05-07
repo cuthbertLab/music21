@@ -947,8 +947,8 @@ class IntervalNetwork(object):
                 elif y == nId: # this node is a destination
                     collection.append(eObj.direction)
                     break
-        if len(collection) == 0:
-            raise IntervalNetworkException('failed to match an edges', nObj)
+        if not collection:
+            raise IntervalNetworkException('failed to match any edges', nObj)
         return collection
 
 
@@ -1097,7 +1097,7 @@ class IntervalNetwork(object):
                     postNodeId.append(dst)
 
         #this should actually never happen    
-        if len(postEdge) == 0:
+        if not postEdge:
             environLocal.printDebug(['nodeStart', nodeStart, 'direction', direction, 
                                      'postEdge', postEdge])
             #return None
@@ -2002,7 +2002,7 @@ class IntervalNetwork(object):
         if alteredDegrees is None:
             alteredDegrees = {}
         # only cache if altered degrees is None
-        if len(alteredDegrees) == 0:
+        if not alteredDegrees:
             # if pitch reference is a string, take it as it is
             if isinstance(pitchReference, six.string_types):
                 cacheKey = (pitchReference, nodeId)
@@ -2010,6 +2010,7 @@ class IntervalNetwork(object):
                 cacheKey = (pitchReference.nameWithOctave, nodeId)
         else:
             cacheKey = None
+            
         if cacheKey in self._minMaxCache:
             return self._minMaxCache[cacheKey]
 
@@ -2325,7 +2326,7 @@ class IntervalNetwork(object):
         if saveOctave is None:
             pitchTarget.octave = None
 
-        if len(post) == 0:
+        if not post:
             return None
         elif len(post) == 1:
             return post[0]

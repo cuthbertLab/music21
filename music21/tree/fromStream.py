@@ -86,7 +86,7 @@ def listOfTreesByClass(inputStream,
     else:
         treeClass = trees.OffsetTree
     
-    if classLists is None or len(classLists) == 0:
+    if classLists is None or not classLists:
         outputTrees = [treeClass(source=lastParentage)]
         classLists = []
     else:

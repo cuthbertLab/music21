@@ -659,7 +659,7 @@ class CTRule(object):
                 environLocal.warn("Rule found without | or $, ignoring: '{0}','{1}': in {2}".format(
                                                                         content, sep, self.text))
                 #pass
-        if len(measures) > 0:
+        if measures:
             for m in measures:
                 noteIter = m.recurse().notes
                 if (noteIter
@@ -735,7 +735,7 @@ class CTRule(object):
             
             for atom in contentList:
                 if atom.startswith('$'): # $BP or $Vr*3, etc.
-                    if len(contentOut) > 0: # clear existing content
+                    if contentOut: # clear existing content
                         measureGroups2.append((" ".join(contentOut), "?", 1))
                         contentOut = []
                         
@@ -757,7 +757,7 @@ class CTRule(object):
             else:
                 numReps = 1
             
-            if (len(contentOut) > 0 or sep == '|'):
+            if (contentOut or sep == '|'):
                 measureGroups2.append((" ".join(contentOut), sep, numReps))
 
         # third pass, make empty content duplicate previous content.
@@ -765,7 +765,7 @@ class CTRule(object):
             contentSplit = content.split()
             if sep == "|" and all([y.startswith('[') or y == "" for y in contentSplit]):
                 content = " ".join(contentSplit)
-                if len(content) > 0:
+                if content:
                     content += " "
                 content += "."
             elif sep == "?": # implied contnuation

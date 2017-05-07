@@ -26,7 +26,7 @@ omit_modules = [
                 'music21/alpha/*', #trecento/tonality.py'
                 ]
 
-# THESE ARE NOT RELEVANT FOR coveralls.io -- edit .coveragerc
+# THESE ARE NOT RELEVANT FOR coveralls.io -- edit .coveragerc to change that
 exclude_lines = [
                 r'\s*import music21\s*',
                 r'\s*music21.mainTest\(\)\s*',

@@ -574,8 +574,8 @@ class Trigram(object):
             return ' '
         # if you were using this a lot, caching would a good idea.
         letters = []
-        for k, v in self.lut[k].items():
-            letters.append(k * v)
+        for letK, v in self.lut[k].items():
+            letters.append(letK * v)
         letters = ''.join(letters)
         return random.choice(letters)
 

@@ -140,9 +140,9 @@ class LyricSearcher(object):
         iText = ""
         lastSyllabic = None
         
-        for n in s.recurse(classFilter='NotRest'):
+        for n in s.recurse().getElementsByClass('NotRest'):
             ls = n.lyrics
-            if len(ls) == 0:
+            if not ls:
                 continue
             l = ls[0]
             if l is not None and l.text != "" and l.text is not None:
@@ -222,7 +222,7 @@ class LyricSearcher(object):
         for i in self._indexTuples:
             if i.end >= posStart and i.start <= posEnd:
                 indices.append(i)
-        if len(indices) == 0:
+        if not indices:
             raise LyricSearcherException("Could not find position {0} in text".format(posStart))
         return indices
 

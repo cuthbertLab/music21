@@ -1536,7 +1536,7 @@ class RomanNumeral(harmony.Harmony):
                     newPitches.append(thisPitch)
             self.pitches = newPitches
 
-        if len(self.pitches) == 0:
+        if not self.pitches:
             raise RomanNumeralException(
                 '_updatePitches() was unable to derive pitches from the '
                 'figure: {0!r}'.format(self.figure))

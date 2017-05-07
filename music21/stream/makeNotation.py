@@ -97,7 +97,7 @@ def makeBeams(s, inPlace=False):
         mColl = [returnObj]  # store a list of measures for processing
     else: 
         mColl = list(returnObj.iter.getElementsByClass('Measure'))  # a list of measures
-        if len(mColl) == 0:
+        if not mColl:
             raise stream.StreamException(
                 'cannot process a stream that is neither a Measure nor has no Measures')
 
@@ -424,7 +424,7 @@ def makeMeasures(
     if clefObj is None:
         clefList = list(srcObj.iter.getElementsByClass('Clef').getElementsByOffset(0))
         # only return clefs that have offset = 0.0
-        if len(clefList) == 0:
+        if not clefList:
             clefObj = srcObj.bestClef()
         else:
             clefObj = clefList[0]
@@ -439,7 +439,7 @@ def makeMeasures(
     offsetMapList = srcObj.offsetMap()
     #environLocal.printDebug(['makeMeasures(): offset map', offsetMap])
     #offsetMapList.sort() not necessary; just get min and max
-    if len(offsetMapList) > 0:
+    if offsetMapList:
         oMax = max([x.endTime for x in offsetMapList])
     else:
         oMax = 0
@@ -1004,12 +1004,12 @@ def makeTies(s,
         returnObj.derivation.method = 'makeTies'
     else:
         returnObj = s
-    if len(returnObj) == 0:
+    if not returnObj:
         raise stream.StreamException('cannot process an empty stream')
 
     # get measures from this stream
     measureStream = returnObj.getElementsByClass('Measure')
-    if len(measureStream) == 0:
+    if not measureStream:
         raise stream.StreamException(
             'cannot process a stream without measures')
 
@@ -1050,7 +1050,7 @@ def makeTies(s,
                                 lastTimeSignature.barDuration.quarterLength)
             else:
                 mNext.offset = moffset
-            if len(meterStream) == 0:  # in case no meters are defined
+            if not meterStream:  # in case no meters are defined
                 ts = meter.TimeSignature()
                 ts.load('%s/%s' % (defaults.meterNumerator,
                     defaults.meterDenominatorBeatType))
@@ -1108,58 +1108,55 @@ def makeTies(s,
                 # assume end can be at boundary of end of measure
                 overshot = eEnd - mEnd
 
-                if overshot > 0:
-                    if eOffset >= mEnd:
-                        continue # skip elements that extend past measure boundary.
+                if overshot <= 0:
+                    continue
+                if eOffset >= mEnd:
+                    continue # skip elements that extend past measure boundary.
 #                             raise stream.StreamException(
 #                                 'element (%s) has offset %s within a measure '
 #                                 'that ends at offset %s' % (e, eOffset, mEnd))
 
-                    qLenBegin = mEnd - eOffset
-                    e, eRemain = e.splitAtQuarterLength(qLenBegin,
-                        retainOrigin=True,
-                        displayTiedAccidentals=displayTiedAccidentals)
+                qLenBegin = mEnd - eOffset
+                e, eRemain = e.splitAtQuarterLength(qLenBegin,
+                    retainOrigin=True,
+                    displayTiedAccidentals=displayTiedAccidentals)
 
-                    # manage bridging voices
-                    if mNextHasVoices:
-                        if mHasVoices:  # try to match voice id
-                            if not isinstance(vId, int):
-                                dst = mNext.voices[vId]
-                            else:
-                                dst = mNext.getElementById(vId)
-                        # src does not have voice, but dst does
-                        else:  # place in top-most voice
-                            dst = mNext.voices[0]
-                    else:
-                        # mNext has no voices but this one does
-                        if mHasVoices:
-                            # internalize all components in a voice
-                            mNext.internalize(container=stream.Voice)
-                            # place in first voice
-                            dst = mNext.voices[0]
-                        else:  # no voices in either
-                            dst = None
+                # manage bridging voices
+                if mNextHasVoices:
+                    if mHasVoices:  # try to match voice id
+                        if not isinstance(vId, int):
+                            dst = mNext.voices[vId]
+                        else:
+                            dst = mNext.getElementById(vId)
+                    # src does not have voice, but dst does
+                    else:  # place in top-most voice
+                        dst = mNext.voices[0]
+                else:
+                    # mNext has no voices but this one does
+                    if mHasVoices:
+                        # internalize all components in a voice
+                        mNext.internalize(container=stream.Voice)
+                        # place in first voice
+                        dst = mNext.voices[0]
+                    else:  # no voices in either
+                        dst = None
 
-                    if dst is None:
-                        dst = mNext
+                if dst is None:
+                    dst = mNext
 
-                    #eRemain.activeSite = mNext
-                    # manually set activeSite
-                    # cannot use _insertCore here
-                    dst.insert(0, eRemain)
+                #eRemain.activeSite = mNext
+                # manually set activeSite
+                # cannot use _insertCore here
+                dst.insert(0, eRemain)
 
-                    # we are not sure that this element fits
-                    # completely in the next measure, thus, need to
-                    # continue processing each measure
-                    if mNextAdd:
-                        #environLocal.printDebug([
-                        #    'makeTies() inserting mNext into returnObj',
-                        #    mNext])
-                        returnObj.insert(mNext.offset, mNext)
-                elif overshot > 0:
-                    environLocal.printDebug([
-                        'makeTies() found and skipping extremely small '
-                        'overshot into next measure', overshot])
+                # we are not sure that this element fits
+                # completely in the next measure, thus, need to
+                # continue processing each measure
+                if mNextAdd:
+                    #environLocal.printDebug([
+                    #    'makeTies() inserting mNext into returnObj',
+                    #    mNext])
+                    returnObj.insert(mNext.offset, mNext)
         mCount += 1
     del measureStream  # clean up unused streams
 
@@ -1199,7 +1196,7 @@ def makeTupletBrackets(s, inPlace=False):
     durationList = []
     
     # legacy -- works on lists not just streams...
-    if isinstance(s, list) or isinstance(s, tuple):
+    if isinstance(s, (list, tuple)):
         durationList = s
     else:
         # Stream, as it should be...
