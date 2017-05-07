@@ -1552,7 +1552,7 @@ class Duration(SlottedObjectMixin):
                 and len(self._components) == 1
                 and self._dotGroups == (0,) 
                 and self._linked is True 
-                and len(self._tuplets) == 0): ## 99% of notes...
+                and not self._tuplets): ## 99% of notes...
             # ignore all but components
             return self.__class__(durationTuple=self._components[0])
         elif (self._componentsNeedUpdating is False

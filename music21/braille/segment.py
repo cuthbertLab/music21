@@ -1000,7 +1000,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
           staccato or tenuto, they are treated as slurred instead of tied." (BMTM, 112)
         """
         from music21 import articulations
-        def fixOneArticulation(artc, music21NoteStart):
+        def fixOneArticulation(artc, music21NoteStart, allNotes, noteIndexStart):
             artcName = artc.name
             if artcName == 'fingering': # fingerings are not considered articulations...
                 return
@@ -1041,7 +1041,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
             for noteIndexStart in range(len(allNotes)):
                 music21NoteStart = allNotes[noteIndexStart]
                 for artc in music21NoteStart.articulations:
-                    fixOneArticulation(artc, music21NoteStart)
+                    fixOneArticulation(artc, music21NoteStart, allNotes, noteIndexStart)
            
 
 class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
