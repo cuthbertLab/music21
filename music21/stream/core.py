@@ -34,19 +34,24 @@ class StreamCoreMixin(object):
         self._cache = {}
         
         # hugely important -- keeps track of where the _elements are
+        # the _offsetDict is a dictionary where id(element) is the 
+        # index and the index and the offset is the value.
         self._offsetDict = {}
         # self._elements stores Music21Object objects.
         self._elements = []
+        
         # self._endElements stores Music21Objects found at
         # the highestTime of this Stream.
         self._endElements = []
+        
         self.isSorted = True
         ### v4!
         #self._elementTree = tree.trees.ElementTree(source=self)
 
         
-    def _insertCore(self, offset, element, ignoreSort=False,
-        setActiveSite=True):
+    def _insertCore(self, offset, element, 
+                    ignoreSort=False,
+                    setActiveSite=True):
         '''
         A faster way of inserting elements that does no checks,
         just insertion.
@@ -87,7 +92,7 @@ class StreamCoreMixin(object):
                         if highestSortTuple < thisSortTuple:
                             storeSorted = True
                     
-        self.setElementOffset(element, float(offset))
+        self.setElementOffset(element, float(offset), addElement=True)
         element.sites.add(self)
         # need to explicitly set the activeSite of the element
         if setActiveSite:
@@ -107,7 +112,7 @@ class StreamCoreMixin(object):
         '''
         # NOTE: this is not called by append, as that is optimized
         # for looping multiple elements
-        self.setElementOffset(element, self.highestTime)
+        self.setElementOffset(element, self.highestTime, addElement=True)
         element.sites.add(self)
         # need to explicitly set the activeSite of the element
         element.activeSite = self
@@ -303,7 +308,7 @@ class StreamCoreMixin(object):
         To be called by other methods.
         '''
         self._addElementPreProcess(element)
-        self.setElementOffset(element, 'highestTime')
+        self.setElementOffset(element, 'highestTime', addElement=True)
         element.sites.add(self)
         # need to explicitly set the activeSite of the element
         element.activeSite = self

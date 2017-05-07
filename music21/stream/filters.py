@@ -6,9 +6,16 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
+'''
+The filter module contains :class:`~music21.stream.filters.StreamFilter` objects
+which are used by :class:`~music21.stream.iterator.StreamIterator` objects to
+decide whether or not a given element matches the list of elements that are being
+filtered.  Filters are used by methods on streams such as
+:meth:`~music21.stream.Stream.getElementsByClass` to filter elements by classes.
+'''
 
 #import inspect 
 import unittest
@@ -27,6 +34,26 @@ class StreamFilter(object):
     
     Filters can also raise StopIteration if no other elements in this Stream
     can possibly fit.
+    
+    The `StreamFilter` object does nothing in itself but subclasses are crucial
+    in filtering out elements according to different properties.
+    
+    Each subclass of `StreamFilter` should set its `.derivationStr` which is
+    a string that determines which a derived Stream based on this filter should be called
+    
+    >>> sf = stream.filters.StreamFilter()
+    >>> sf
+    <music21.stream.filters.StreamFilter object at 0x1051de828>
+    >>> sf.derivationStr
+    'streamFilter'
+    
+    StreamFilters also have these two properties which help in certain debug operations
+    
+    >>> 'StreamFilter' in sf.classSet    
+    True
+    >>> sf.classes
+    ('StreamFilter', 'object')
+    
     '''
     derivationStr = 'streamFilter'
     
@@ -61,9 +88,10 @@ class StreamFilter(object):
         '''
         return '<{0}.{1} '.format(self.__module__, self.__class__.__name__) + '{0}>'
 
+    def __call__(self, item, iterator):
+        return True
     
 class IsFilter(StreamFilter):
-    derivationStr = 'is'
     '''
     filter on items where x IS y
     
@@ -72,11 +100,22 @@ class IsFilter(StreamFilter):
     >>> n = note.Note('C#')
     >>> s.append(n)
     >>> s.append(note.Rest())
-    >>> for el in s.iter.addFilter(stream.filters.IsFilter(n)):
+    >>> isFilter = stream.filters.IsFilter(n)
+    >>> isFilter.derivationStr
+    'is'
+    >>> isFilter.target
+    (<music21.note.Note C#>,)
+    >>> isFilter.numToFind
+    1
+    
+    `.numToFind` is used so that once all elements are found, the iterator can short circuit.
+    
+    
+    >>> for el in s.iter.addFilter(isFilter):
     ...     print(el is n)
     True    
 
-    multiple...
+    Multiple elements can also be passed into the isFilter:
 
     >>> s = stream.Stream()
     >>> s.insert(0, key.KeySignature(-3))
@@ -84,12 +123,18 @@ class IsFilter(StreamFilter):
     >>> s.append(n)
     >>> r = note.Rest()
     >>> s.append(r)
-    >>> for el in s.iter.addFilter(stream.filters.IsFilter([n, r])):
+    >>> isFilter2 = stream.filters.IsFilter([n, r])
+    >>> isFilter2.numToFind
+    2
+    
+    >>> for el in s.iter.addFilter(isFilter2):
     ...     print(el)
     <music21.note.Note C#>
     <music21.note.Rest rest>
 
     '''
+    derivationStr = 'is'
+    
     def __init__(self, target=()):
         super(IsFilter, self).__init__()
         if not common.isListLike(target):
@@ -163,6 +208,9 @@ class IdFilter(StreamFilter):
     '''
     filters on ids. used by stream.getElementById.
     No corresponding iterator call.
+    
+    Only a single Id can be passed in.  Always returns a single item.
+    
     '''
     derivationStr = 'getElementById'
 
@@ -186,6 +234,9 @@ class IdFilter(StreamFilter):
 
 class ClassFilter(StreamFilter):
     '''
+    ClassFilter is used by .getElementsByClass() to 
+    find elements belonging to a class or a list of classes.
+    
     >>> s = stream.Stream()
     >>> s.append(note.Note('C'))
     >>> s.append(note.Rest())
@@ -306,6 +357,8 @@ class GroupFilter(StreamFilter):
 class OffsetFilter(StreamFilter):
     '''
     see iterator.getElementsByOffset()
+    
+    Finds elements that match a given offset range.
     '''
     derivationStr = 'getElementsByOffset'
     
@@ -397,8 +450,6 @@ class OffsetFilter(StreamFilter):
             return False
 
         return True
-    
-    
 
 
 class Test(unittest.TestCase):
