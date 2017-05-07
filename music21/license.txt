@@ -6,7 +6,7 @@
 #               distributed with this package, particularly the corpus files
 #               which have their own copyrights and licenses. 
 #
-# Copyright:    music21 is "Copyright © 2006-16 Michael Scott Cuthbert and  
+# Copyright:    music21 is "Copyright © 2006-17 Michael Scott Cuthbert and  
 #               cuthbertLab" and is freely licensed under the GNU Lesser 
 #               General Public License v3 or subsequent versions, reprinted below or
 #               (beginning with music21 2.0) the BSD 3-Clause License.
@@ -19,7 +19,7 @@ BSD license or the GNU Lesser General Public License, described below:
 ---
 BSD License
 
-Copyright (c) 2006-16, Michael Scott Cuthbert and cuthbertLab
+Copyright (c) 2006-17, Michael Scott Cuthbert and cuthbertLab
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
