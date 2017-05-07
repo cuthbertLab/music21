@@ -146,6 +146,7 @@ def main(fnAccept=None, strict=False):
     cmd = ['--output-format=parseable',
            r'--dummy-variables-rgx="_$|dummy|unused|i$|j$|junk|counter"', 
            '--docstring-min-length=3',
+           '--ignore-docstrings=yes',
            '--max-args=' + str(maxArgs),  # should be 5 later, but baby steps
            '--bad-names="foo,shit,fuck,stuff"', # definitely allow "bar" for barlines
            '--reports=n',

@@ -196,7 +196,7 @@ class NoteworthyTranslator(object):
                 self.createDynamics(attributes)
                     
         # Add the last Stuff 
-        if len(self.currentMeasure) != 0:
+        if self.currentMeasure:
             self.currentPart.append(self.currentMeasure)
         
         self.score.insert(0, self.currentPart)

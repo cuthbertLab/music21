@@ -1138,7 +1138,7 @@ class Expander(object):
 #                     break
             #if not shiftedIndex:
             i += 1
-        if len(groupIndices) > 0:
+        if groupIndices:
             groups.append(groupIndices)
         return groups
 
@@ -1159,7 +1159,7 @@ class Expander(object):
             #    "group['repeatBrackets']",  group['repeatBrackets']])
 
             # the numbers must be consecutive
-            if len(rBrackets) == 0:
+            if not rBrackets:
                 return True
             # accept if any single repeat bracket        
             if len(rBrackets) == 1:
@@ -1271,7 +1271,7 @@ class Expander(object):
                 # meaning that we only want up until the previous
                 elif lb.direction == 'end':
                     #environLocal.printDebug(['found an end in left barline: %s' % lb])
-                    if len(startIndices) == 0:
+                    if not startIndices:
                         # get from first to this one
                         barRepeatIndices = range(0, i)
                         break
@@ -1283,7 +1283,7 @@ class Expander(object):
                     and rb.direction == 'end'):
                 # if this is the first end found and no starts found, 
                 # assume we are counting from zero
-                if len(startIndices) == 0: # get from first to this one
+                if not startIndices: # get from first to this one
                     barRepeatIndices = range(0, i + 1)
                     break
                 else: # otherwise get the last start index
@@ -1540,7 +1540,7 @@ class Expander(object):
         # if we do not groups when expected it is probably b/c spanners have
         # been orphaned
         #environLocal.printDebug(['got groups:', groups])   
-        if len(groups) == 0: # none found:
+        if not groups: # none found:
             return self.processInnermostRepeatBars(streamObj)
 
         # need to find innermost repeat, and then see it it has any

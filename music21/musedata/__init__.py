@@ -81,7 +81,7 @@ class MuseDataRecord(object):
         False
 
         '''
-        if len(self.src) > 0 and self.src[0] == 'r':
+        if self.src and self.src[0] == 'r':
             return True
         return False
 
@@ -103,13 +103,13 @@ class MuseDataRecord(object):
                 return True
             return False
         else:
-            if len(self.src) > 0 and self.src[8] == '-':
+            if len(self.src) > 8 and self.src[8] == '-':
                 return True
             return False
 
 
     def isNote(self):
-        if len(self.src) > 0 and self.src[0] in 'ABCDEFG':
+        if self.src and self.src[0] in 'ABCDEFG':
             return True
         return False
 
@@ -119,24 +119,23 @@ class MuseDataRecord(object):
         The blank space defines this as chord tone. 
         '''
         # second character must be a pitch definition
-        if len(self.src) > 0 and self.src[0] == ' ' and self.src[1] in 'ABCDEFG':
+        if len(self.src) > 1 and self.src[0] == ' ' and self.src[1] in 'ABCDEFG':
             return True
         return False
 
     def isCueOrGrace(self):
-        if len(self.src) > 0 and self.src[0] in 'cg':
+        if self.src and self.src[0] in 'cg':
             return True
         return False
 
 
     def isBack(self):
-        '''
-        
+        '''        
         >>> mdr = musedata.MuseDataRecord('back   4')
         >>> mdr.isBack()
         True
         '''
-        if len(self.src) > 0 and self.src[0:4] == 'back':
+        if len(self.src) >= 4 and self.src[0:4] == 'back':
             return True
         return False
 
@@ -334,7 +333,7 @@ class MuseDataRecord(object):
         if self.stage == 1:
             return None
         else:
-            if len(self.src) > 0:
+            if len(self.src) > 17:
                 if self.src[17] == '.':
                     return 1
                 if self.src[17] == ':':
@@ -703,10 +702,11 @@ class MuseDataMeasure(object):
         return m
 
     def hasNotes(self):
-        '''Return True of if this Measure return Notes
+        '''
+        Return True of if this Measure has Notes
         '''
         for line in self.src:
-            if len(line) > 0 and line[0] in 'ABCDEFGrgc':
+            if line and line[0] in 'ABCDEFGrgc':
                 return True
         return False
 
@@ -716,7 +716,7 @@ class MuseDataMeasure(object):
         Note: this does not instantiate MuseDataRecord instances.
         '''
         for line in self.src:
-            if len(line) > 0 and line.startswith('back'):
+            if line and line.startswith('back'):
                 return True
         return False
 
@@ -775,7 +775,7 @@ class MuseDataPart(object):
         self._divisionsPerQuarterNote = None
 
         self.stage = stage
-        if self.stage is None and len(self.src) > 0:
+        if self.stage is None and self.src:
             self.stage = self._determineStage()
         if self.stage == 1:
             self.src = self._scrubStage1(self.src)
@@ -1543,7 +1543,7 @@ class MuseDataFile(object):
 
             if commentToggle:
                 continue # skip block comment lines 
-            elif len(line) > 0 and line[0] == '@':
+            elif line and line[0] == '@':
                 continue
             # stage 1 files use END, stage 2 uses /END
             elif line.startswith('/END') or line.startswith('END'):
@@ -1583,10 +1583,10 @@ class MuseDataWork(object):
         else:
             fpList = fp
 
-        for fp in fpList:
+        for fpInner in fpList:
             mdf = MuseDataFile()
             #environLocal.printDebug('processing MuseData file: %s' % fp)
-            mdf.open(fp)
+            mdf.open(fpInner)
             mdf.read()  # process string and break into parts
             mdf.close()
             self.files.append(mdf)

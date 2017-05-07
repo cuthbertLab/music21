@@ -397,7 +397,7 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
     score_ratio = 0.0
     score_traid = 0.0
 
-    if len(pitches) == 0:
+    if not pitches:
         return 0.0
 
     if accidentalPenalty:
@@ -1479,7 +1479,7 @@ class Pitch(object):
 
         # override just about everything with keywords
         # necessary for ImmutablePitch objects
-        if len(keywords) > 0:
+        if keywords:
             if 'name' in keywords:
                 self._setName(keywords['name']) # set based on string
             if 'octave' in keywords:
@@ -4417,7 +4417,7 @@ class Pitch(object):
                 return # exit: nothing more to do
 
         ### no pitches in past...
-        if len(pitchPastAll) == 0:
+        if not pitchPastAll:
             # if we have no past, we always need to show the accidental,
             # unless this accidental is in the alteredPitches list
             if (self.accidental is not None

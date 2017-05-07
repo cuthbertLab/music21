@@ -852,8 +852,8 @@ class RTOpenParens(RTAtom):
     >>> romanText.rtObjects.RTOpenParens('(')
     <RTOpenParens '('>
     '''
-    def __init__(self, src=u'(', container=None):
-        super(RTOpenParens, self).__init__(src, container) # pylint: disable=useless-super-delegation
+    def __init__(self, src=u'(', container=None): # pylint: disable=useless-super-delegation
+        super(RTOpenParens, self).__init__(src, container) 
 
     def __repr__(self):
         return '<RTOpenParens %r>' % self.src
@@ -866,8 +866,8 @@ class RTCloseParens(RTAtom):
     >>> romanText.rtObjects.RTCloseParens(')')
     <RTCloseParens ')'>
     '''
-    def __init__(self, src=u')', container=None):
-        super(RTCloseParens, self).__init__(src, container) # pylint: disable=useless-super-delegation
+    def __init__(self, src=u')', container=None): # pylint: disable=useless-super-delegation
+        super(RTCloseParens, self).__init__(src, container) 
 
     def __repr__(self):
         return '<RTCloseParens %r>' % self.src
@@ -949,8 +949,8 @@ class RTPhraseBoundary(RTPhraseMarker):
     >>> phrase
     <RTPhraseBoundary '||'>
     '''
-    def __init__(self, src=u'||', container=None):
-        super(RTPhraseBoundary, self).__init__(src, container) # pylint: disable=useless-super-delegation
+    def __init__(self, src=u'||', container=None): # pylint: disable=useless-super-delegation
+        super(RTPhraseBoundary, self).__init__(src, container) 
 
     def __repr__(self):
         return '<RTPhraseBoundary %r>' % self.src
@@ -962,8 +962,8 @@ class RTEllisonStart(RTPhraseMarker):
     >>> phrase
     <RTEllisonStart '|*'>
     '''
-    def __init__(self, src=u'|*', container=None):
-        super(RTEllisonStart, self).__init__(src, container) # pylint: disable=useless-super-delegation
+    def __init__(self, src=u'|*', container=None): # pylint: disable=useless-super-delegation
+        super(RTEllisonStart, self).__init__(src, container) 
 
     def __repr__(self):
         return '<RTEllisonStart %r>' % self.src
@@ -975,8 +975,8 @@ class RTEllisonStop(RTPhraseMarker):
     >>> phrase
     <RTEllisonStop '*|'>
     '''
-    def __init__(self, src=u'*|', container=None):
-        super(RTEllisonStop, self).__init__(src, container) # pylint: disable=useless-super-delegation
+    def __init__(self, src=u'*|', container=None): # pylint: disable=useless-super-delegation
+        super(RTEllisonStop, self).__init__(src, container) 
 
     def __repr__(self):
         return '<RTEllisonStop %r>' % self.src
@@ -997,8 +997,8 @@ class RTRepeatStart(RTRepeat):
     >>> repeat
     <RTRepeatStart ...'||:'>
     '''
-    def __init__(self, src=u'||:', container=None):
-        super(RTRepeatStart, self).__init__(src, container) # pylint: disable=useless-super-delegation
+    def __init__(self, src=u'||:', container=None): # pylint: disable=useless-super-delegation
+        super(RTRepeatStart, self).__init__(src, container) 
 
     def __repr__(self):
         return '<RTRepeatStart %r>' % self.src
@@ -1010,8 +1010,8 @@ class RTRepeatStop(RTRepeat):
     >>> repeat
     <RTRepeatStop ...':||'>
     '''
-    def __init__(self, src=u':||', container=None):
-        super(RTRepeatStop, self).__init__(src, container) # pylint: disable=useless-super-delegation
+    def __init__(self, src=u':||', container=None): # pylint: disable=useless-super-delegation
+        super(RTRepeatStop, self).__init__(src, container) 
 
     def __repr__(self):
         return '<RTRepeatStop %r>' % self.src
