@@ -145,11 +145,6 @@ class TimespanTree(trees.OffsetTree):
     TODO: Doc examples for all functions, including privates.
     '''
     __slots__ = ()
-    ### PUBLIC METHODS ###
-    def __init__(self, elements=None, source=None):
-        super(TimespanTree, self).__init__(elements, source)
-    
-
     @staticmethod
     def _insertCorePayloadSortKey(x):
         return x.endTime
@@ -161,6 +156,8 @@ class TimespanTree(trees.OffsetTree):
 #             else:
 #                 return x.endTime  # PitchedTimespan with no Element!
         
+    ### PUBLIC METHODS ###
+
     @staticmethod
     def elementEndTime(el, unused_node):
         '''

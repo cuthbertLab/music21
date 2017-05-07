@@ -86,7 +86,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     def __init__(self, v1n1=None, v1n2=None, v2n1=None, v2n2=None, analyticKey=key.Key('C')):
         base.Music21Object.__init__(self)
-        if len(intervalCache) == 0:
+        if not intervalCache:
             # populate interval cache if not done yet
             # more efficient than doing it as Class level variables
             # if VLQ is never called (likely)

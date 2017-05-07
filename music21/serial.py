@@ -1259,8 +1259,8 @@ def rowToMatrix(p):
     ret = []
     for row in matrix:
         msg = []
-        for p in row:
-            msg.append(str(p).rjust(3))
+        for thisPC in row:
+            msg.append(str(thisPC).rjust(3))
         ret.append(''.join(msg))
 
     return '\n'.join(ret)

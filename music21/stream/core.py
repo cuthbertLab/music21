@@ -81,7 +81,7 @@ class StreamCoreMixin(object):
                 if ht < offset:
                     storeSorted = True
                 elif ht == offset:
-                    if len(self._elements) == 0:
+                    if not self._elements:
                         storeSorted = True
                     else:
                         highestSortTuple = self._elements[-1].sortTuple()

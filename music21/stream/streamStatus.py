@@ -133,7 +133,7 @@ class StreamStatus(SlottedObjectMixin):
         actually been run.
         '''
         for n in self.client.recurse(classFilter=('NotRest'), restoreActiveSites=False):
-            if n.beams is not None and len(n.beams.beamsList):
+            if n.beams is not None and n.beams.beamsList:
                 return True
         return False
     

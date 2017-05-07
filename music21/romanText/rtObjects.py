@@ -88,8 +88,6 @@ class RTToken(object):
     False
     >>> rtt.isMovement() or rtt.isAtom()
     False
-
-
     '''
     def __init__(self, src=u''):
         self.src = src # store source character sequence
@@ -166,8 +164,8 @@ class RTTagged(RTToken):
     >>> rttag.isComposer()
     False
     '''
-    def __init__(self, src =u''):
-        RTToken.__init__(self, src)
+    def __init__(self, src=u''):
+        super(RTTagged, self).__init__(src)
         # try to split off tag from data
         self.tag = ''
         self.data = ''
@@ -418,8 +416,8 @@ class RTMeasure(RTToken):
     
 
     '''
-    def __init__(self, src =u''):
-        RTToken.__init__(self, src)
+    def __init__(self, src=u''):
+        super(RTMeasure, self).__init__(src)
         # try to split off tag from data
         self.tag = '' # the measure number or range
         self.data = '' # only chord, phrase, and similar definitions
@@ -433,7 +431,7 @@ class RTMeasure(RTToken):
         # store processed tokens associated with this measure
         self.atoms = []
 
-        if len(src) > 0:
+        if src:
             self._parseAttributes(src)
 
     def _getMeasureNumberData(self, src):
@@ -544,9 +542,9 @@ class RTAtom(RTToken):
     However, see RTChord, RTBeat, etc. which are subclasses of RTAtom
     specifically for storing chords, beats, etc.
     '''
-    def __init__(self, src =u'', container=None):
+    def __init__(self, src=u'', container=None):
         # this stores the source
-        RTToken.__init__(self, src)
+        super(RTAtom, self).__init__(src)
         self.container = container
 
     def __repr__(self):
@@ -567,8 +565,8 @@ class RTChord(RTAtom):
     <RTChord 'IV'>
     '''
     
-    def __init__(self, src =u'', container=None):
-        RTAtom.__init__(self, src, container)
+    def __init__(self, src=u'', container=None):
+        super(RTChord, self).__init__(src, container)
 
         # store offset within measure
         self.offset = None
@@ -588,8 +586,8 @@ class RTNoChord(RTAtom):
     <RTNoChord 'NC'>
     '''
     
-    def __init__(self, src =u'', container=None):
-        RTAtom.__init__(self, src, container)
+    def __init__(self, src=u'', container=None):
+        super(RTNoChord, self).__init__(src, container)
 
         # store offset within measure
         self.offset = None
@@ -608,9 +606,6 @@ class RTBeat(RTAtom):
     >>> beatFour
     <RTBeat 'b4'>
     '''
-    def __init__(self, src =u'', container=None):
-        RTAtom.__init__(self, src, container)
-
     def __repr__(self):
         return '<RTBeat %r>' % self.src
 
@@ -770,87 +765,78 @@ class RTKeyTypeAtom(RTAtom):
 
 
 class RTKey(RTKeyTypeAtom):
+    '''An RTKey(RTAtom) defines both a change in KeySignature and a change
+    in the analyzed Key.
+    
+    They are defined by ";:" after the Key.
+    
+    >>> gminor = romanText.rtObjects.RTKey('g;:')
+    >>> gminor
+    <RTKey 'g;:'>
+    >>> gminor.getKey()
+    <music21.key.Key of g minor>
+
+    >>> bminor = romanText.rtObjects.RTKey('bb;:')
+    >>> bminor
+    <RTKey 'bb;:'>
+    >>> bminor.getKey()
+    <music21.key.Key of b- minor>
+    >>> bminor.getKeySignature()
+    <music21.key.KeySignature of 5 flats>
+
+    >>> eflatmajor = romanText.rtObjects.RTKey('Eb;:')
+    >>> eflatmajor
+    <RTKey 'Eb;:'>
+    >>> eflatmajor.getKey()
+    <music21.key.Key of E- major>
+    '''
     footerStrip = ';:'
-
-    def __init(self, src=u'', container=None):
-        '''An RTKey(RTAtom) defines both a change in KeySignature and a change
-        in the analyzed Key.
-        
-        They are defined by ";:" after the Key.
-        
-        >>> gminor = romanText.rtObjects.RTKey('g;:')
-        >>> gminor
-        <RTKey 'g;:'>
-        >>> gminor.getKey()
-        <music21.key.Key of g minor>
-
-        >>> bminor = romanText.rtObjects.RTKey('bb;:')
-        >>> bminor
-        <RTKey 'bb;:'>
-        >>> bminor.getKey()
-        <music21.key.Key of b- minor>
-        >>> bminor.getKeySignature()
-        <music21.key.KeySignature of 5 flats>
-
-        >>> eflatmajor = romanText.rtObjects.RTKey('Eb;:')
-        >>> eflatmajor
-        <RTKey 'Eb;:'>
-        >>> eflatmajor.getKey()
-        <music21.key.Key of E- major>
-        '''
-        super(RTKey, self).__init__(src, container)
 
     def __repr__(self):
         return '<RTKey %r>' % self.src
 
 
 class RTAnalyticKey(RTKeyTypeAtom):
+    '''An RTAnalyticKey(RTKeyTypeAtom) only defines a change in the key
+    being analyzed.  It does not in itself create a :class:~'music21.key.Key'
+    object.
+    
+    >>> gminor = romanText.rtObjects.RTAnalyticKey('g:')
+    >>> gminor
+    <RTAnalyticKey 'g:'>
+    >>> gminor.getKey()
+    <music21.key.Key of g minor>
+
+    >>> bminor = romanText.rtObjects.RTAnalyticKey('bb:')
+    >>> bminor
+    <RTAnalyticKey 'bb:'>
+    >>> bminor.getKey()
+    <music21.key.Key of b- minor>
+
+    '''
     footerStrip = ':'
 
-    def __init__(self, src =u'', container=None):
-        '''An RTAnalyticKey(RTKeyTypeAtom) only defines a change in the key
-        being analyzed.  It does not in itself create a :class:~'music21.key.Key'
-        object.
-        
-        >>> gminor = romanText.rtObjects.RTAnalyticKey('g:')
-        >>> gminor
-        <RTAnalyticKey 'g:'>
-        >>> gminor.getKey()
-        <music21.key.Key of g minor>
-
-        >>> bminor = romanText.rtObjects.RTAnalyticKey('bb:')
-        >>> bminor
-        <RTAnalyticKey 'bb:'>
-        >>> bminor.getKey()
-        <music21.key.Key of b- minor>
-
-        '''
-        super(RTAnalyticKey, self).__init__(src, container)
-    
     def __repr__(self):
         return '<RTAnalyticKey %r>' % self.src
 
 
 class RTKeySignature(RTAtom):
-    def __init__(self, src =u'', container=None):
-        '''An RTKeySignature(RTAtom) only defines a change in the KeySignature.
-        It does not in itself create a :class:~'music21.key.Key' object, nor
-        does it change the analysis taking place.
-        
-        The number after KS defines the number of sharps (negative for flats).
-        
-        >>> gminor = romanText.rtObjects.RTKeySignature('KS-2')
-        >>> gminor
-        <RTKeySignature 'KS-2'>
-        >>> gminor.getKeySignature()
-        <music21.key.KeySignature of 2 flats>
-        
-        >>> Amajor = romanText.rtObjects.RTKeySignature('KS3')
-        >>> Amajor.getKeySignature()
-        <music21.key.KeySignature of 3 sharps>
-        '''
-        super(RTKeySignature, self).__init__(src, container)
-
+    '''An RTKeySignature(RTAtom) only defines a change in the KeySignature.
+    It does not in itself create a :class:~'music21.key.Key' object, nor
+    does it change the analysis taking place.
+    
+    The number after KS defines the number of sharps (negative for flats).
+    
+    >>> gminor = romanText.rtObjects.RTKeySignature('KS-2')
+    >>> gminor
+    <RTKeySignature 'KS-2'>
+    >>> gminor.getKeySignature()
+    <music21.key.KeySignature of 2 flats>
+    
+    >>> Amajor = romanText.rtObjects.RTKeySignature('KS3')
+    >>> Amajor.getKeySignature()
+    <music21.key.KeySignature of 3 sharps>
+    '''
     def __repr__(self):
         return '<RTKeySignature %r>' % self.src
 
@@ -866,8 +852,8 @@ class RTOpenParens(RTAtom):
     >>> romanText.rtObjects.RTOpenParens('(')
     <RTOpenParens '('>
     '''
-    def __init__(self, src =u'(', container=None):
-        RTAtom.__init__(self, src, container)
+    def __init__(self, src=u'(', container=None):
+        super(RTOpenParens, self).__init__(src, container) # pylint: disable=useless-super-delegation
 
     def __repr__(self):
         return '<RTOpenParens %r>' % self.src
@@ -880,28 +866,25 @@ class RTCloseParens(RTAtom):
     >>> romanText.rtObjects.RTCloseParens(')')
     <RTCloseParens ')'>
     '''
-    def __init__(self, src =u')', container=None):
-        RTAtom.__init__(self, src, container)
+    def __init__(self, src=u')', container=None):
+        super(RTCloseParens, self).__init__(src, container) # pylint: disable=useless-super-delegation
 
     def __repr__(self):
         return '<RTCloseParens %r>' % self.src
 
 
 class RTOptionalKeyOpen(RTAtom):
-    def __init__(self, src=u'', container=None):
-        '''
-        Marks the beginning of an optional Key area which does not
-        affect the roman numeral analysis.  (For instance, it is
-        possible to analyze in Bb major, while remaining in g minor)
-        
-        >>> possibleKey = romanText.rtObjects.RTOptionalKeyOpen('?(Bb:')
-        >>> possibleKey
-        <RTOptionalKeyOpen '?(Bb:'>
-        >>> possibleKey.getKey()
-        <music21.key.Key of B- major>
-        '''
-        RTAtom.__init__(self, src, container)
-
+    '''
+    Marks the beginning of an optional Key area which does not
+    affect the roman numeral analysis.  (For instance, it is
+    possible to analyze in Bb major, while remaining in g minor)
+    
+    >>> possibleKey = romanText.rtObjects.RTOptionalKeyOpen('?(Bb:')
+    >>> possibleKey
+    <RTOptionalKeyOpen '?(Bb:'>
+    >>> possibleKey.getKey()
+    <music21.key.Key of B- major>
+    '''
     def __repr__(self):
         return '<RTOptionalKeyOpen %r>' % self.src
     
@@ -918,20 +901,19 @@ class RTOptionalKeyOpen(RTAtom):
             return key.Key(keyStr)
         
 class RTOptionalKeyClose(RTAtom):
-    def __init__(self, src=u'', container=None):
-        '''Marks the end of an optional Key area which does not affect the roman
-        numeral analysis.
+    '''
+    Marks the end of an optional Key area which does not affect the roman
+    numeral analysis.
 
-        For example, it is ossible to analyze in Bb major, while remaining in g
-        minor.
-        
-        >>> possibleKey = romanText.rtObjects.RTOptionalKeyClose('?)Bb:')
-        >>> possibleKey
-        <RTOptionalKeyClose '?)Bb:'>
-        >>> possibleKey.getKey()
-        <music21.key.Key of B- major>
-        '''
-        RTAtom.__init__(self, src, container)
+    For example, it is ossible to analyze in Bb major, while remaining in g
+    minor.
+    
+    >>> possibleKey = romanText.rtObjects.RTOptionalKeyClose('?)Bb:')
+    >>> possibleKey
+    <RTOptionalKeyClose '?)Bb:'>
+    >>> possibleKey.getKey()
+    <music21.key.Key of B- major>
+    '''
 
     def __repr__(self):
         return '<RTOptionalKeyClose %r>' % self.src
@@ -957,89 +939,79 @@ class RTPhraseMarker(RTAtom):
     >>> rtpm
     <RTPhraseMarker ''>
     '''
-    def __init__(self, src=u'', container=None):
-        RTAtom.__init__(self, src, container)
-
     def __repr__(self):
         return '<RTPhraseMarker %r>' % self.src
         
 
 class RTPhraseBoundary(RTPhraseMarker):
-    def __init__(self, src =u'||', container=None):
-        '''
-        >>> phrase = romanText.rtObjects.RTPhraseBoundary('||')
-        >>> phrase
-        <RTPhraseBoundary '||'>
-        '''
-        RTPhraseMarker.__init__(self, src, container)
+    '''
+    >>> phrase = romanText.rtObjects.RTPhraseBoundary('||')
+    >>> phrase
+    <RTPhraseBoundary '||'>
+    '''
+    def __init__(self, src=u'||', container=None):
+        super(RTPhraseBoundary, self).__init__(src, container) # pylint: disable=useless-super-delegation
 
     def __repr__(self):
         return '<RTPhraseBoundary %r>' % self.src
 
 
 class RTEllisonStart(RTPhraseMarker):
-    def __init__(self, src =u'|*', container=None):
-        '''
-        >>> phrase = romanText.rtObjects.RTEllisonStart('|*')
-        >>> phrase
-        <RTEllisonStart '|*'>
-        '''
-        RTPhraseMarker.__init__(self, src, container)
+    '''
+    >>> phrase = romanText.rtObjects.RTEllisonStart('|*')
+    >>> phrase
+    <RTEllisonStart '|*'>
+    '''
+    def __init__(self, src=u'|*', container=None):
+        super(RTEllisonStart, self).__init__(src, container) # pylint: disable=useless-super-delegation
 
     def __repr__(self):
         return '<RTEllisonStart %r>' % self.src
 
 
 class RTEllisonStop(RTPhraseMarker):
-    def __init__(self, src =u'|*', container=None):
-        '''
-        >>> phrase = romanText.rtObjects.RTEllisonStop('*|')
-        >>> phrase
-        <RTEllisonStop '*|'>
-        '''
-        RTPhraseMarker.__init__(self, src, container)
+    '''
+    >>> phrase = romanText.rtObjects.RTEllisonStop('*|')
+    >>> phrase
+    <RTEllisonStop '*|'>
+    '''
+    def __init__(self, src=u'*|', container=None):
+        super(RTEllisonStop, self).__init__(src, container) # pylint: disable=useless-super-delegation
 
     def __repr__(self):
         return '<RTEllisonStop %r>' % self.src
 
 
 class RTRepeat(RTAtom):
-
-    def __init__(self, src =u'', container=None):
-        '''
-        >>> repeat = romanText.rtObjects.RTRepeat('||:')
-        >>> repeat
-        <RTRepeat '||:'>
-        '''
-        RTAtom.__init__(self, src, container)
-
+    '''
+    >>> repeat = romanText.rtObjects.RTRepeat('||:')
+    >>> repeat
+    <RTRepeat '||:'>
+    '''
     def __repr__(self):
         return '<RTRepeat %r>' % self.src
 
-
 class RTRepeatStart(RTRepeat):
-
-    def __init__(self, src =u'||:', container=None):
-        '''
-        >>> repeat = romanText.rtObjects.RTRepeatStart()
-        >>> repeat
-        <RTRepeatStart ...'||:'>
-        '''
-        RTRepeat.__init__(self, src, container)
+    '''
+    >>> repeat = romanText.rtObjects.RTRepeatStart()
+    >>> repeat
+    <RTRepeatStart ...'||:'>
+    '''
+    def __init__(self, src=u'||:', container=None):
+        super(RTRepeatStart, self).__init__(src, container) # pylint: disable=useless-super-delegation
 
     def __repr__(self):
         return '<RTRepeatStart %r>' % self.src
 
 
 class RTRepeatStop(RTRepeat):
-
-    def __init__(self, src =u':||', container=None):
-        '''
-        >>> repeat = romanText.rtObjects.RTRepeatStop()
-        >>> repeat
-        <RTRepeatStop ...':||'>
-        '''
-        RTRepeat.__init__(self, src, container)
+    '''
+    >>> repeat = romanText.rtObjects.RTRepeatStop()
+    >>> repeat
+    <RTRepeatStop ...':||'>
+    '''
+    def __init__(self, src=u':||', container=None):
+        super(RTRepeatStop, self).__init__(src, container) # pylint: disable=useless-super-delegation
 
     def __repr__(self):
         return '<RTRepeatStop %r>' % self.src
@@ -1226,7 +1198,7 @@ class RTHandler(object):
         >>> rth.definesMovements()
         False
         '''
-        if len(self._tokens) == 0:
+        if not self._tokens:
             raise RTHandlerException('must create tokens first')
         count = 0
         for t in self._tokens:
@@ -1284,7 +1256,8 @@ class RTHandler(object):
                 post.append(rth) 
                 sub = []
             sub.append(t)
-        if len(sub) > 0:
+
+        if sub:
             rth = RTHandler()
             rth.tokens = sub
             post.append(rth)
@@ -1341,7 +1314,6 @@ class RTFile(object):
     '''
     Roman Text File access.
     '''
-    
     def __init__(self): 
         self.file = None
         self.filename = None

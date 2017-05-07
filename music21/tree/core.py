@@ -568,7 +568,7 @@ class AVLTree(object):
             '''
             Divide and conquer.
             '''
-            if len(l) == 0:
+            if not l:
                 return None
             midpoint = len(l)//2
             midtuple = l[midpoint]

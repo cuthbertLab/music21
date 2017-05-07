@@ -414,18 +414,18 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName='variant', inPlace=
         yRegion = None
         replacementDuration = 0.0
 
-        if regionType is 'equal':
+        if regionType == 'equal':
             #yRegion = streamY.measures(yRegionStartMeasure + 1, yRegionEndMeasure)
             continue #Do nothing
-        elif regionType is 'replace':
+        elif regionType == 'replace':
             xRegion = returnObj.measures(xRegionStartMeasure + 1, xRegionEndMeasure)
             replacementDuration = xRegion.duration.quarterLength
             yRegion = streamY.measures(yRegionStartMeasure + 1, yRegionEndMeasure)                      
-        elif regionType is 'delete':
+        elif regionType == 'delete':
             xRegion = returnObj.measures(xRegionStartMeasure + 1, xRegionEndMeasure)
             replacementDuration = xRegion.duration.quarterLength
             yRegion = None
-        elif regionType is 'insert':
+        elif regionType == 'insert':
             yRegion = streamY.measures(yRegionStartMeasure + 1, yRegionEndMeasure)
             replacementDuration = 0.0
         else:
@@ -666,13 +666,13 @@ def mergeVariantsEqualDuration(streams, variantNames, inPlace=False):
             raise VariantException('cannot merge streams of different lengths')
 
         returnObjParts = returnObj.getElementsByClass('Part')
-        if len(returnObjParts) != 0: # If parts exist, iterate through them.
+        if returnObjParts: # If parts exist, iterate through them.
             sParts = s.getElementsByClass('Part')
             for i, returnObjPart in enumerate(returnObjParts):
                 sPart = sParts[i]
                 
                 returnObjMeasures = returnObjPart.getElementsByClass('Measure')
-                if len(returnObjMeasures) != 0: 
+                if returnObjMeasures: 
                     # If measures exist and parts exist, iterate through them both.
                     for j, returnObjMeasure in enumerate(returnObjMeasures):
                         sMeasure = sPart.getElementsByClass('Measure')[j]
@@ -683,7 +683,7 @@ def mergeVariantsEqualDuration(streams, variantNames, inPlace=False):
                     _mergeVariants(returnObjPart, sPart, variantName=variantName, inPlace=True)
         else:
             returnObjMeasures = returnObj.getElementsByClass('Measure')
-            if len(returnObjMeasures) != 0: #If no parts, but still measures, iterate through them.
+            if returnObjMeasures: #If no parts, but still measures, iterate through them.
                 for j, returnObjMeasure in enumerate(returnObjMeasures):
                     returnObjMeasure = returnObjMeasures[j]
                     sMeasure = s.getElementsByClass('Measure')[j]
@@ -805,7 +805,7 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName,
     
     if compareByMeasureNumber is True:
         for ossiaMeasure in ossiapart.getElementsByClass("Measure"):
-            if len(ossiaMeasure.notes) > 0: #If the measure is not just rests
+            if ossiaMeasure.notes: #If the measure is not just rests
                 ossiaNumber = ossiaMeasure.number
                 returnMeasure = returnObj.measure(ossiaNumber)
                 if recurseInMeasures is True: 
@@ -817,7 +817,7 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName,
                                variantName=ossiaName, variantGroups=None, replacementDuration=None)
     else:
         for ossiaMeasure in ossiapart.getElementsByClass("Measure"):
-            if len(ossiaMeasure.notes) > 0: #If the measure is not just rests
+            if ossiaMeasure.notes: #If the measure is not just rests
                 ossiaOffset = ossiaMeasure.getOffsetBySite(ossiapart)
                 if recurseInMeasures is True:
                     returnMeasure = returnObj.iter.getElementsByOffset(
@@ -1065,21 +1065,21 @@ def refineVariant(s, sVariant, inPlace=False):
         #endOffset = (returnRegion[returnEnd-1].getOffsetBySite(returnRegion) + 
         #             returnRegion[returnEnd-1].duration.quarterLength)   
         variantSubRegion = None
-        if regionType is 'equal':
+        if regionType == 'equal':
             returnSubRegion = returnRegion.measures(returnStart + 1, returnEnd)
             variantSubRegion = variantRegion.measures(variantStart + 1, variantEnd)
             mergeVariantsEqualDuration(
                     [returnSubRegion, variantSubRegion], variantGroups, inPlace=True)
             continue        
-        elif regionType is 'replace':
+        elif regionType == 'replace':
             returnSubRegion = returnRegion.measures(returnStart + 1, returnEnd)
             replacementDuration = returnSubRegion.duration.quarterLength
             variantSubRegion = variantRegion.measures(variantStart + 1, variantEnd)                      
-        elif regionType is 'delete':
+        elif regionType == 'delete':
             returnSubRegion = returnRegion.measures(returnStart + 1, returnEnd)
             replacementDuration = returnSubRegion.duration.quarterLength
             variantSubRegion = None
-        elif regionType is 'insert':
+        elif regionType == 'insert':
             variantSubRegion = variantRegion.measures(variantStart + 1, variantEnd)
             replacementDuration = 0.0
         else:
@@ -1136,21 +1136,21 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, inPlace=
     # each region is processed for variants.
     for regionType, returnStart, returnEnd, variantStart, variantEnd in regions:
         startOffset = returnObject.measure(returnStart + 1).getOffsetBySite(returnObject)
-        if regionType is 'equal':
+        if regionType == 'equal':
             returnSubRegion = returnObject.measures(returnStart + 1, returnEnd)
             variantSubRegion = variantObject.measures(variantStart + 1, variantEnd)
             mergeVariantMeasureStreams(returnSubRegion, variantSubRegion, 
                                        [variantName], inPlace=True)
             continue
-        elif regionType is 'replace':
+        elif regionType == 'replace':
             returnSubRegion = returnObject.measures(returnStart + 1, returnEnd)
             replacementDuration = returnSubRegion.duration.quarterLength
             variantSubRegion = variantObject.measures(variantStart + 1, variantEnd)                      
-        elif regionType is 'delete':
+        elif regionType == 'delete':
             returnSubRegion = returnObject.measures(returnStart + 1, returnEnd)
             replacementDuration = returnSubRegion.duration.quarterLength
             variantSubRegion = None
-        elif regionType is 'insert':
+        elif regionType == 'insert':
             variantSubRegion = variantObject.measures(variantStart + 1, variantEnd)
             replacementDuration = 0.0
         addVariant(returnObject, startOffset, variantSubRegion, 
@@ -1703,7 +1703,7 @@ def _doVariantFixingOnStream(s, variantNames=None):
     
     for v in s.variants:
         if isinstance(variantNames, list): #If variantNames are controlled
-            if set(v.groups) and set(variantNames) is []: 
+            if set(v.groups) and not set(variantNames): 
                 # and if this variant is not in the controlled list
                 continue # then skip it
             else:
@@ -1713,9 +1713,9 @@ def _doVariantFixingOnStream(s, variantNames=None):
         replacementDuration = v.replacementDuration
         highestTime = v.containedHighestTime
         
-        if lengthType is 'elongation' and replacementDuration == 0.0:
+        if lengthType == 'elongation' and replacementDuration == 0.0:
             variantType = 'insertion'
-        elif lengthType is 'deletion' and highestTime == 0.0:
+        elif lengthType == 'deletion' and highestTime == 0.0:
             variantType = 'deletion'
         else:
             continue
@@ -1732,8 +1732,8 @@ def _doVariantFixingOnStream(s, variantNames=None):
         
         # If a non-final deletion or an INITIAL insertion, 
         #  add the next element after the variant.
-        if ((variantType is 'insertion' and (isInitial is True)) or
-                (variantType is 'deletion' and (isFinal is False))):
+        if ((variantType == 'insertion' and (isInitial is True)) or
+                (variantType == 'deletion' and (isFinal is False))):
             targetElement = _getNextElements(s, v)
             
             #Delete initial clefs, etc. from initial insertion targetElement if it exists
@@ -1747,8 +1747,8 @@ def _doVariantFixingOnStream(s, variantNames=None):
                 
         # If a non-initial insertion or a FINAL deletion, 
         #     add the previous element after the variant.
-        # #elif ((variantType is 'deletion' and (isFinal is True)) or 
-        #         (type is 'insertion' and (isInitial is False))):
+        # #elif ((variantType == 'deletion' and (isFinal is True)) or 
+        #         (type == 'insertion' and (isInitial is False))):
         else: 
             targetElement = _getPreviousElements(s, v)
             newVariantOffset = targetElement.getOffsetBySite(s)
@@ -1808,7 +1808,7 @@ def _getNextElements(s, v, numberOfElements=1):
     replacedElements = v.replacedElements(s)
     lengthType = v.lengthType
     # Get class of elements in variant or replaced Region
-    if lengthType is 'elongation':
+    if lengthType == 'elongation':
         vClass = type(v.getElementsByClass(['Measure', 'Note', 'Rest'])[0])
         if isinstance(vClass, note.GeneralNote):
             vClass = note.GeneralNote
@@ -1818,7 +1818,7 @@ def _getNextElements(s, v, numberOfElements=1):
             vClass = note.GeneralNote
     
     # Get next element in s after v which is of type vClass
-    if lengthType is 'elongation':
+    if lengthType == 'elongation':
         variantOffset = v.getOffsetBySite(s)
         potentialTargets = s.getElementsByOffset(variantOffset,
                                           offsetEnd = s.highestTime,
@@ -1888,7 +1888,7 @@ def _getPreviousElements(s, v, numberOfElements=1):
     lengthType = v.lengthType
     # Get class of elements in variant or replaced Region
     foundStream = None
-    if lengthType is 'elongation':
+    if lengthType == 'elongation':
         foundStream = v.iter.getElementsByClass(['Measure', 'Note', 'Rest'])
     else:
         foundStream = replacedElements.iter.getElementsByClass(['Measure', 'Note', 'Rest'])

@@ -86,7 +86,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
     @property
     def startMeasureNumber(self):
         '''The measure number on which the contiguous segment begins.'''
-        if (len(self.segment)):
+        if self.segment:
             return self.segment[0].measureNumber
         else:
             return None
@@ -97,7 +97,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
         The offset of the beginning of the contiguous segment, 
         with respect to the measure containing the first note.        
         '''
-        if (len(self.segment)):
+        if self.segment:
             return self.segment[0].offset
         else:
             return None
@@ -596,7 +596,7 @@ class ContiguousSegmentSearcher(object):
         self.listOfContiguousSegments = []
         hasParts = True
         partList = self.stream.recurse().getElementsByClass('Part')
-        if len(partList) == 0:
+        if not partList:
             partList = [self.stream]
             hasParts = False
           
@@ -1944,11 +1944,11 @@ def _labelGeneral(segmentsToLabel, inputStream, segmentDict, reps, includeChords
     Private because this should only be called
     in conjunction with one of the find(type of set of pitch classes) functions.
     '''    
-    if len(inputStream.getElementsByClass(stream.Score)) == 0:
+    if not inputStream.getElementsByClass(stream.Score):
         bigContainer = inputStream
     else:
         bigContainer = inputStream.getElementsByClass(stream.Score)
-    if len(bigContainer.getElementsByClass(stream.Part)) == 0:
+    if not bigContainer.getElementsByClass(stream.Part):
         hasParts = False
     else:
         parts = bigContainer.getElementsByClass(stream.Part)

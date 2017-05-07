@@ -348,7 +348,7 @@ class TupletState(State):
         '''
         end a tuplet by putting start on the first note and stop on the last.
         '''
-        if len(self.affectedTokens) == 0:
+        if not self.affectedTokens:
             return None 
         self.affectedTokens[0].duration.tuplets[0].type = 'start'
         self.affectedTokens[-1].duration.tuplets[0].type = 'stop'

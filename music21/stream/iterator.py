@@ -90,7 +90,7 @@ class StreamIterator(object):
             filterList = []
         elif not common.isIterable(filterList):
             filterList = [filterList]
-        elif isinstance(filterList, tuple) or isinstance(filterList, set):
+        elif isinstance(filterList, (set, tuple)):
             filterList = list(filterList) # mutable....
         # self.filters is a list of expressions that
         # return True or False for an element for

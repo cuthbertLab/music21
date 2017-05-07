@@ -1776,7 +1776,7 @@ class ConcreteScale(Scale):
                     "%s, direction %s, comparisonAttribute='step'" % (pitchTarget, direction))
             pitchesFound = self.pitchesFromScaleDegrees([scaleStepNormal])
             
-            if len(pitchesFound) == 0:
+            if not pitchesFound:
                 return (None, None)
             else:
                 foundPitch = pitchesFound[0]

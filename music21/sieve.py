@@ -984,7 +984,10 @@ class CompressionSegment(object):
         # process residuals
         self._residuals = [] # list of objects
         match = copy.copy(self._match) # scratch to work on
-        while 1: # loop over whatever is left in the match copy
+        
+        maxToRun = 10000
+        while maxToRun: # loop over whatever is left in the match copy
+            maxToRun -= 1
             n = match[0] # always get first item 
             obj, seg = self._find(n, match, self._match)
             if obj is None: # no residual found; should never happen
@@ -994,7 +997,7 @@ class CompressionSegment(object):
                 for x in seg: # clean found values from match
                     if x in match:
                         match.remove(x)
-            if len(match) == 0:
+            if not match:
                 break
         self._residuals.sort()
 
@@ -1273,11 +1276,11 @@ class Sieve(object):
             return {'m':int(usrStr), 'n':0, 'neg':0}
     
         usrStr = usrStr.strip()
-        if len(usrStr) == 0: 
+        if not usrStr: 
             return None
-        if usrStr.find('sub') >= 0:
+        if usrStr.find('sub'):
             usrStr = usrStr.replace('sub', ',')
-        if usrStr.find('@') >= 0:
+        if usrStr.find('@'):
             usrStr = usrStr.replace('@', ',')
         # remove any braces remain, remove
         # all parenthesis and brackets are converted to braces
@@ -1291,7 +1294,7 @@ class Sieve(object):
             usrStr = usrStr[1:].strip() 
         else:
             neg = 0
-        if len(usrStr) == 0: 
+        if usrStr == '': 
             return None
     
         try: # assume we have either an int (M), or a tuple (M,N)
@@ -1557,7 +1560,7 @@ class Sieve(object):
             else: # some other char is in here
                 i = i + 1
         # do some checks 
-        if len(self._resLib) == 0:
+        if not self._resLib:
             raise SieveException('no residual classes defined')
         self._expTree = ''.join(self._expTree)
 
@@ -1962,7 +1965,7 @@ class PitchSieve(object):
             intervalObj = interval.Interval(width*self.eld)
             post.append(intervalObj)
 
-        if len(post) == 0:
+        if not post:
             raise PitchSieveException('interval segment has no values')
         return post
 

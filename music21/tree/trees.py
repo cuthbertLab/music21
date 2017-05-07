@@ -899,10 +899,6 @@ class OffsetTree(ElementTree):
     nodeClass = nodeModule.OffsetNode
 
     ### SPECIAL METHODS ###
-    def __init__(self, elements=None, source=None):
-        super(OffsetTree, self).__init__(elements, source)
-
-
     def __contains__(self, element):
         r'''
         Is true when the ElementTree contains the object within it; 
@@ -1398,7 +1394,7 @@ class OffsetTree(ElementTree):
         overlaps = []
         for cp in checkPoints:
             overlappingElements = self.elementsOverlappingOffset(cp)
-            if len(overlappingElements) == 0:
+            if not overlappingElements:
                 continue
             if returnVerticality is False:
                 overlaps.append(cp)

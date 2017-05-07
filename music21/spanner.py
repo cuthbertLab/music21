@@ -1170,7 +1170,7 @@ class SpannerBundle(object):
         It is set up via a first-in, first-out priority.
         '''
         
-        if len(self._pendingSpannedElementAssignment) == 0:
+        if not self._pendingSpannedElementAssignment:
             return
 
         remove = None
