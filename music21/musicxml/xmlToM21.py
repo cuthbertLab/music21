@@ -855,7 +855,7 @@ class MusicXMLImporter(XMLParserBase):
         for cw in mxCredit.findall('credit-words'):
             if cw.text not in (None, ""):
                 content.append(cw.text)
-        if len(content) == 0: # no text defined
+        if not content: # no text defined
             tb.content = ""
             return tb # capella generates empty credit-words
             #raise MusicXMLImportException('no credit words defined for a credit tag')
@@ -1186,7 +1186,7 @@ class PartParser(XMLParserBase):
             mStream = streamPartStaff.getElementsByClass('Measure')
             for i, staffReference in enumerate(self.staffReferenceList):
                 staffExclude = self._getStaffExclude(staffReference, staffNumber)
-                if len(staffExclude) == 0:
+                if not staffExclude:
                     continue
 
                 m = mStream[i]
@@ -1490,7 +1490,7 @@ class PartParser(XMLParserBase):
         if mHighestTime >= lastTimeSignatureQuarterLength:
             mOffsetShift = mHighestTime
 
-        elif mHighestTime == 0.0 and len(m.recurse().notesAndRests) == 0:
+        elif mHighestTime == 0.0 and not m.recurse().notesAndRests:
             ## this routine fixes a bug in PDFtoMusic and other MusicXML writers
             ## that omit empty rests in a Measure.  It is a very quick test if
             ## the measure has any notes.  Slower if it does not.
@@ -2079,7 +2079,7 @@ class MeasureParser(XMLParserBase):
         # if we we have notes in the note list and the next
         # note either does not exist or is not a chord, we 
         # have a complete chord
-        if len(self.mxNoteList) > 0 and nextNoteIsChord is False:
+        if self.mxNoteList and nextNoteIsChord is False:
             c = self.xmlToChord(self.mxNoteList)
             # add any accumulated lyrics
             self.updateLyricsFromList(c, self.mxLyricList)
@@ -3147,7 +3147,7 @@ class MeasureParser(XMLParserBase):
 
         # returns a new spanner bundle with just the result of the search
         sb = self.spannerBundle.getByClassIdLocalComplete(spannerClass, idFound, False)
-        if len(sb) > 0 and allowDuplicateIds is False: 
+        if sb and allowDuplicateIds is False: 
             # if we already have a spanner matching
             #environLocal.printDebug(['found a match in SpannerBundle'])
             su = sb[0] # get the first
@@ -3203,7 +3203,7 @@ class MeasureParser(XMLParserBase):
         '''
         t = tie.Tie()
         allTies = mxNote.findall('tie')
-        if len(allTies) == 0:
+        if not allTies:
             return None
         
         typesFound = []
@@ -3222,7 +3222,7 @@ class MeasureParser(XMLParserBase):
         mxNotations = mxNote.find('notations')
         if mxNotations != None:
             mxTiedList = mxNotations.findall('tied')
-            if mxTiedList is not None and len(mxTiedList) > 0:
+            if mxTiedList:
                 tieStyle = mxTiedList[0].get('line-type')
                 if tieStyle is not None and tieStyle != 'wavy': # do not support wavy...
                     t.style = tieStyle
@@ -3556,7 +3556,7 @@ class MeasureParser(XMLParserBase):
             # TODO: this should also filter by number... (in theory...)
             rbSpanners = self.spannerBundle.getByClass('RepeatBracket').getByCompleteStatus(False)
             # if we have no complete bracket objects, must start a new one
-            if len(rbSpanners) == 0:
+            if not rbSpanners:
                 # create with this measure as the object
                 rb = spanner.RepeatBracket(m)
                 self.spannerBundle.append(rb)
@@ -4461,7 +4461,7 @@ class MeasureParser(XMLParserBase):
         '''
         # key-octave
         keyOctaves = mxKey.findall('key-octave')
-        if len(keyOctaves) == 0:
+        if not keyOctaves:
             return
 
         alteredPitches = copy.deepcopy(ks.alteredPitches)

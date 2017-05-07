@@ -36,19 +36,19 @@ def generateLanguageDictionary(languageString):
         for accidental in SUPPORTED_ACCIDENTALS:
             pitchStrings.append(microtone + accidental)
 
-    if languageString is "de":
+    if languageString == "de":
         for pitchString in pitchStrings:
             p = pitch.Pitch(pitchString)
             dictionary[p.german] = pitchString
-    elif languageString is "fr":
+    elif languageString == "fr":
         for pitchString in pitchStrings:
             p = pitch.Pitch(pitchString)
             dictionary[p.french] = pitchString
-    elif languageString is "it":
+    elif languageString == "it":
         for pitchString in pitchStrings:
             p = pitch.Pitch(pitchString)
             dictionary[p.italian] = pitchString
-    elif languageString is "es":
+    elif languageString == "es":
         for pitchString in pitchStrings:
             p = pitch.Pitch(pitchString)
             dictionary[p.spanish] = pitchString

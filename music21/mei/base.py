@@ -451,7 +451,7 @@ def allPartsPresent(scoreElem):
     for staffDef in scoreElem.findall(xpathQuery):
         if staffDef.get('n') not in partNs:
             partNs.append(staffDef.get('n'))
-    if 0 == len(partNs):
+    if not partNs:
         raise MeiValidityError(_SEEMINGLY_NO_PARTS)
     return tuple(partNs)
 
@@ -812,9 +812,9 @@ def _ppBeams(theConverter):
         # iterate things in the @plist attribute
         for eachXmlid in eachBeam.get('plist', '').split(' '):
             eachXmlid = removeOctothorpe(eachXmlid)
-            if 0 == len(eachXmlid):
-                # this is either @plist not set or extra spaces around the contained xml:id values
-                pass
+#             if not eachXmlid:
+#                 # this is either @plist not set or extra spaces around the contained xml:id values
+#                 pass
             if 'm21Beam' not in c.m21Attr[eachXmlid]:
                 # only set to 'continue' if it wasn't previously set to 'start' or 'stop'
                 c.m21Attr[eachXmlid]['m21Beam'] = 'continue'
@@ -866,7 +866,7 @@ def _ppTuplets(theConverter):
             # @plist to add our custom @m21TupletNum and @m21TupletNumbase attributes.
             for eachXmlid in eachTuplet.get('plist', '').split(' '):
                 eachXmlid = removeOctothorpe(eachXmlid)
-                if 0 < len(eachXmlid):
+                if eachXmlid:
                     # protect against extra spaces around the contained xml:id values
                     c.m21Attr[eachXmlid]['m21TupletNum'] = eachTuplet.get('num')
                     c.m21Attr[eachXmlid]['m21TupletNumbase'] = eachTuplet.get('numbase')
@@ -1182,14 +1182,14 @@ def beamTogether(someThings):
 
     for i, thing in enumerate(someThings):
         if hasattr(thing, 'beams'):
-            if -1 == iLastBeamedNote:
+            if iLastBeamedNote == -1:
                 beamType = 'start'
             else:
                 beamType = 'continue'
 
             # checking for len(thing.beams) avoids clobbering beams that were set with a nested
             # <beam> element, like a grace note
-            if duration.convertTypeToNumber(thing.duration.type) > 4 and 0 == len(thing.beams):
+            if duration.convertTypeToNumber(thing.duration.type) > 4 and not thing.beams:
                 thing.beams.fill(thing.duration.type, beamType)
                 iLastBeamedNote = i
 
@@ -1284,9 +1284,9 @@ def metaSetComposer(work, meta):
             persName = composer.find('./{}persName'.format(_MEINS))
             if persName.text:
                 composers.append(persName.text)
-    if 1 == len(composers):
+    if len(composers) == 1:
         meta.composer = composers[0]
-    elif 1 < len(composers):
+    elif len(composers) > 1:
         meta.composer = composers
 
     return meta
@@ -1332,7 +1332,7 @@ def getVoiceId(fromThese):
     :raises: :exc:`RuntimeError` if zero or many :class:`Voice` objects are found.
     '''
     fromThese = [item for item in fromThese if isinstance(item, stream.Voice)]
-    if 1 == len(fromThese):
+    if len(fromThese) == 1:
         return fromThese[0].id
     else:
         raise RuntimeError('getVoiceId: found too few or too many Voice objects')
@@ -3272,7 +3272,7 @@ def sectionScoreCore(elem, allPartNs, slurBundle, **kwargs):
                 #        put those into the first Measure object we encounter in this Part
                 # TODO: this is where the Instruments get added
                 # TODO: I think "eachList" really means "each list that will become a Part"
-                if len(inNextThing[eachN]) > 0:
+                if inNextThing[eachN]:
                     # we have to put Instrument objects just before the Measure to which they apply
                     theInstr = None
                     theInstrI = None

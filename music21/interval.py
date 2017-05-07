@@ -2574,7 +2574,7 @@ def transposePitch(pitch1, interval1):
 
     # check if interval1 is a string,
     # then convert it to interval object if necessary
-    if isinstance(interval1, six.string_types) or isinstance(interval1, int):
+    if isinstance(interval1, (six.string_types, int)):
         interval1 = Interval(interval1) 
     else:
         if not hasattr(interval1, 'transposePitch'):
@@ -2699,7 +2699,7 @@ def add(intervalList):
     <music21.interval.Interval M2>
     '''
     from music21 import pitch
-    if len(intervalList) == 0:
+    if not intervalList:
         raise IntervalException("Cannot add an empty set of intervals")
     
     n1 = pitch.Pitch("C4") # need octave to not be implicit...
@@ -2747,7 +2747,7 @@ def subtract(intervalList):
     
     '''
     from music21 import pitch
-    if len(intervalList) == 0:
+    if not intervalList:
         raise IntervalException("Cannot add an empty set of intervals")
     
     n1 = pitch.Pitch("C4")

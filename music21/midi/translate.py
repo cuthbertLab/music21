@@ -2078,7 +2078,7 @@ def midiFileToStream(mf, inputM21=None, quantizePost=True, **keywords):
     else:
         s = inputM21
 
-    if len(mf.tracks) == 0:
+    if not mf.tracks:
         raise exceptions21.StreamException('no tracks are defined in this MIDI file.')
     else:
         # create a stream for each tracks   

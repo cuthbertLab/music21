@@ -1001,7 +1001,7 @@ class Key(KeySignature, scale.DiatonicScale):
     
     def _tonalCertainityCorrelationCoefficient(self, *args, **keywords):
         # possible measures:
-        if len(self.alternateInterpretations) == 0:
+        if not self.alternateInterpretations:
             raise KeySignatureException(
                     'cannot process ambiguity without a list of .alternateInterpretations')
         focus = []

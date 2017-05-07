@@ -678,7 +678,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
                 staffObject.elements = p
                 thisSystem.replace(p, staffObject)
                 allStaffLayouts = p.recurse().getElementsByClass('StaffLayout')
-                if len(allStaffLayouts) == 0:
+                if not allStaffLayouts:
                     continue
                 # else:
                 staffObject.staffLayout = allStaffLayouts[0]
@@ -1144,7 +1144,7 @@ class LayoutScore(stream.Opus):
 
         if self.scoreLayout is not None:
             scl = self.scoreLayout
-            if len(scl.staffLayoutList) > 0:
+            if scl.staffLayoutList:
                 for sltemp in scl.staffLayoutList:
                     distanceTemp = sltemp.distance
                     if distanceTemp is not None:
@@ -1162,7 +1162,7 @@ class LayoutScore(stream.Opus):
                                                                         pageId, systemId, staffId))
 
         allStaffLayouts = firstMeasureOfStaff.iter.getElementsByClass('StaffLayout')
-        if len(allStaffLayouts) > 0:
+        if allStaffLayouts:
             #print("Got staffLayouts: ")
             for sltemp in allStaffLayouts:
                 distanceTemp = sltemp.distance
@@ -1217,7 +1217,7 @@ class LayoutScore(stream.Opus):
         staffSizeDefinedLocally = False
 
         allStaffLayouts = list(firstMeasureOfStaff.iter.getElementsByClass('StaffLayout'))
-        if len(allStaffLayouts) > 0:
+        if allStaffLayouts:
             #print("Got staffLayouts: ")
             staffLayoutObj = allStaffLayouts[0]
             if staffLayoutObj.staffSize is not None:
@@ -1268,7 +1268,7 @@ class LayoutScore(stream.Opus):
 
         staffLayoutObject = None
         allStaffLayoutObjects = list(thisStaff.flat.iter.getElementsByClass('StaffLayout'))
-        if len(allStaffLayoutObjects) > 0:
+        if allStaffLayoutObjects:
             staffLayoutObject = allStaffLayoutObjects[0]
         if staffLayoutObject is None or staffLayoutObject.hidden is None:
             previousPageId, previousSystemId = self.getSystemBeforeThis(pageId, systemId)
