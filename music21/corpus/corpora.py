@@ -79,7 +79,7 @@ class Corpus(object):
         from music21 import corpus
         matched = []
         if six.PY2:
-            rootDirectoryPath = unicode(rootDirectoryPath) # @UndefinedVariable
+            rootDirectoryPath = six.u(rootDirectoryPath)
             
         for rootDirectory, directoryNames, filenames in os.walk(rootDirectoryPath):
             if '.svn' in directoryNames:
