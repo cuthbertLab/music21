@@ -483,12 +483,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self._offsetDict = {}
             self._elements = list(value._elements) # copy list.
             for e in self._elements:
-                self.setElementOffset(e, value.elementOffset(e))
+                self.setElementOffset(e, value.elementOffset(e), addElement=True)
                 e.sites.add(self)
                 e.activeSite = self
             self._endElements = list(value._endElements)
             for e in self._endElements:
-                self.setElementOffset(e, value.elementOffset(e, stringReturn=True))
+                self.setElementOffset(e, value.elementOffset(e, stringReturn=True), addElement=True)
                 e.sites.add(self)
                 e.activeSite = self
         else:
@@ -497,7 +497,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self._endElements = []
             self._offsetDict = {}
             for e in self._elements:
-                self.setElementOffset(e, e.offset)
+                self.setElementOffset(e, e.offset, addElement=True)
                 e.sites.add(self)
                 e.activeSite = self
         self.elementsChanged()
@@ -569,12 +569,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         # remove old value at this position
         oldValue = self._elements[k]
+        del self._offsetDict[id(oldValue)]
         oldValue.sites.remove(self)
         oldValue.activeSite = None
 
         # assign in new position
         self._elements[k] = value
-        self.setElementOffset(value, value.offset)
+        self.setElementOffset(value, value.offset, addElement=True)
         value.activeSite = self
         # must get native offset
 
@@ -1483,18 +1484,47 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
 
-    def setElementOffset(self, element, offset):
+    def setElementOffset(self, element, offset, addElement=False):
         '''
         Sets the Offset for an element, very quickly.
         
-        Too quickly.  TODO: check if the offset is actually in the stream!
+        >>> s = stream.Stream()
+        >>> s.id = 'Stream1'
+        >>> n = note.Note("B-4")
+        >>> s.insert(10, n)
+        >>> n.offset
+        10.0
+        >>> s.setElementOffset(n, 20.0)
+        >>> n.offset
+        20.0
+        >>> n.getOffsetBySite(s)
+        20.0
+        
+        If the element is not in the Stream, raises a StreamException:
+        
+        >>> n2 = note.Note('D')
+        >>> s.setElementOffset(n2, 30.0)
+        Traceback (most recent call last):
+        music21.exceptions21.StreamException: Cannot set the offset for element <music21.note.Note D>, 
+            not in Stream <music21.stream.Stream Stream1>.
+        
+        ...unless addElement is explicitly set to True (this is a core function that should NOT be 
+        used in normal situations.
+        it is used by .insert() and .append() and other core functions; other things must also be done to
+        properly add an element.)
+        
+        >>> n2 = note.Note('D')
+        >>> s.setElementOffset(n2, 30.0, addElement=True)
         '''
         try:
             offset = opFrac(offset)
         except TypeError:
             pass
         
-        self._offsetDict[id(element)] = (offset, element) # fast
+        idEl = id(element)
+        if not addElement and idEl not in self._offsetDict:
+            raise StreamException("Cannot set the offset for element {}, not in Stream {}.".format(element, self))
+        self._offsetDict[idEl] = (offset, element) # fast
     
     def elementOffset(self, element, stringReturns=False):
         '''
@@ -1887,7 +1917,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self._addElementPreProcess(e)
             # add this Stream as a location for the new elements, with the
             # the offset set to the current highestTime
-            self.setElementOffset(e, highestTime)
+            self.setElementOffset(e, highestTime, addElement=True)
             e.sites.add(self)
             # need to explicitly set the activeSite of the element
             e.activeSite = self
@@ -2246,13 +2276,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             target = self._elements[i] # target may have been obj id; reclassing
             self._elements[i] = replacement
             # place the replacement at the old objects offset for this site
-            self.setElementOffset(replacement, self.elementOffset(target))
+            self.setElementOffset(replacement, self.elementOffset(target), addElement=True)
             replacement.sites.add(self)
         else:
             # target may have been obj id; reassign
             target = self._endElements[i - eLen]
             self._endElements[i - eLen] = replacement
-            self.setElementOffset(replacement, 'highestTime')
+            
+            self.setElementOffset(replacement, 'highestTime', addElement=True)
             replacement.sites.add(self)
  
         target.sites.remove(self)
@@ -6370,7 +6401,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         For instance, here is an unsorted Stream
 
-
         >>> s = stream.Stream()
         >>> s.autoSort = False # if true, sorting is automatic
         >>> s.insert(1, note.Note("D"))
@@ -6382,14 +6412,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         But a sorted version of the Stream puts the C first:
 
-
         >>> s.sorted.show('text')
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Note D>
 
-
         While the original stream remains unsorted:
-
 
         >>> s.show('text')
         {1.0} <music21.note.Note D>
@@ -6397,6 +6424,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
         OMIT_FROM_DOCS
+
         >>> s = stream.Stream()
         >>> s.autoSort = False
         >>> s.repeatInsert(note.Note("C#"), [0, 2, 4])
@@ -6444,7 +6472,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             s._endElements = shallowEndElements
 
             for e in shallowElements + shallowEndElements:
-                s.setElementOffset(e, self.elementOffset(e))
+                s.setElementOffset(e, self.elementOffset(e), addElement=True)
                 e.sites.add(s)
                 # need to explicitly set activeSite
                 e.activeSite = s

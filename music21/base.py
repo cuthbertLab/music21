@@ -1040,20 +1040,24 @@ class Music21Object(object):
         
         >>> import music21
         >>> aSite = stream.Stream()
+        >>> aSite.id = 'aSite'
         >>> a = music21.Music21Object()
-        >>> a.sites.add(aSite)
+        >>> aSite.insert(0, a)
         >>> aSite.setElementOffset(a, 20)
         >>> a.setOffsetBySite(aSite, 30)
         >>> a.getOffsetBySite(aSite)
         30.0
         
-        And if it isn't there? Nothing changes.
+        And if it isn't in a Stream? Raises an exception and the offset does not change.
         
-        >>> b = note.Note()
+        >>> b = note.Note('D')
         >>> b.setOffsetBySite(aSite, 40)
+        Traceback (most recent call last):
+        music21.exceptions21.StreamException: Cannot set the offset for element <music21.note.Note D>, 
+            not in Stream <music21.stream.Stream aSite>.
+
         >>> b.offset
         0.0
-
         '''
         if site is not None:
             site.setElementOffset(self, value)
@@ -4394,7 +4398,7 @@ class Test(unittest.TestCase):
         b1 = bar.Barline()
         s.append(n1)
         self.assertEqual(s.highestTime, 30.0)
-        s.setElementOffset(b1, 'highestTime')
+        s.setElementOffset(b1, 'highestTime', addElement=True)
         
         self.assertEqual(b1.getOffsetBySite(s), 30.0)
 
