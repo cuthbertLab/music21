@@ -646,14 +646,14 @@ class XMLExporterBase(object):
         '''
         helper method, indent an element in place:
         '''
-        i = "\n" + level*"  "
-        if len(elem):
+        i = "\n" + level * "  "
+        if len(elem): # pylint: disable=len-as-condition
             if not elem.text or not elem.text.strip():
                 elem.text = i + "  "
             if not elem.tail or not elem.tail.strip():
                 elem.tail = i
-            for elem in elem:
-                self.indent(elem, level+1)
+            for subelem in elem:
+                self.indent(subelem, level+1)
             if not elem.tail or not elem.tail.strip():
                 elem.tail = i
         else:
@@ -826,10 +826,10 @@ class XMLExporterBase(object):
             return
         
         makeFootnote = False
-        if len(e.footnotes) > 0:
+        if e.footnotes:
             c = e.footnotes[0]
             makeFootnote = True
-        elif len(e.comments) > 0:
+        elif e.comments:
             c = e.comments[0]
         else:
             return
@@ -900,7 +900,7 @@ class XMLExporterBase(object):
         setb(pageLayout, mxPrint, 'page-number')
     
         mxPageLayout = self.pageLayoutToXmlPageLayout(pageLayout)
-        if len(mxPageLayout) > 0:
+        if mxPageLayout:
             mxPrint.append(mxPageLayout)
     
         if mxPrintIn is None:
@@ -927,7 +927,7 @@ class XMLExporterBase(object):
         mxPageMargins = Element('page-margins')
         for direction in ('left', 'right', 'top', 'bottom'):
             seta(pageLayout, mxPageMargins, direction + '-margin')
-        if len(mxPageMargins) > 0:
+        if mxPageMargins:
             mxPageLayout.append(mxPageMargins)
 
         if mxPageLayoutIn is None:
@@ -981,7 +981,7 @@ class XMLExporterBase(object):
 
         mxSystemLayout = Element('system-layout')
         self.systemLayoutToXmlSystemLayout(systemLayout, mxSystemLayout)
-        if len(mxSystemLayout) > 0:
+        if mxSystemLayout:
             mxPrint.append(mxSystemLayout)
     
         if mxPrintIn is None:
@@ -1027,7 +1027,8 @@ class XMLExporterBase(object):
         mxSystemMargins = Element('system-margins')
         for direction in ('top', 'bottom', 'left', 'right'):
             seta(systemLayout, mxSystemMargins, direction + '-margin')
-        if len(mxSystemMargins) > 0:
+
+        if mxSystemMargins:
             mxSystemLayout.append(mxSystemMargins)
                 
         seta(systemLayout, mxSystemLayout, 'system-distance', 'distance')
@@ -1201,7 +1202,7 @@ class ScoreExporter(XMLExporterBase):
         <score-partwise>...</score-partwise>
         '''
         s = self.stream
-        if len(s) == 0:
+        if not s:
             return self.emptyObject()
 
         self.scorePreliminaries()    
@@ -1335,7 +1336,7 @@ class ScoreExporter(XMLExporterBase):
                         sortByCreationTime=False, returnDefault=False)
         #environLocal.printDebug(['setMeterStream: post meterStream search', 
         #                meterStream, meterStream[0]])
-        if len(meterStream) == 0:
+        if not meterStream:
             # note: this will return a default if no meters are found
             meterStream = s.flat.getTimeSignatures(searchContext=False,
                         sortByCreationTime=True, returnDefault=True)
@@ -1358,7 +1359,7 @@ class ScoreExporter(XMLExporterBase):
         '''
         s = self.stream
         scoreLayouts = s.getElementsByClass('ScoreLayout').stream()
-        if len(scoreLayouts) > 0:
+        if scoreLayouts:
             scoreLayout = scoreLayouts[0]
         else:
             scoreLayout = None
@@ -1949,7 +1950,7 @@ class ScoreExporter(XMLExporterBase):
             mxWorkTitle = SubElement(mxWork, 'work-title')
             mxWorkTitle.text = str(mdObj.title)
 
-        if len(mxWork) > 0:            
+        if mxWork:            
             mxScoreHeader.append(mxWork)
             
         if mdObj.movementNumber not in (None, ''):
@@ -2037,7 +2038,7 @@ class PartExporter(XMLExporterBase):
         self.xmlRoot.set('id', str(self.firstInstrumentObject.partId))
         measureStream = self.stream.getElementsByClass('Stream').stream() # suppose that everything 
             # below this is a measure
-        if len(measureStream) == 0:
+        if not measureStream:
             self.fixupNotationFlat() 
         else:
             self.fixupNotationMeasured(measureStream)
@@ -2161,17 +2162,19 @@ class PartExporter(XMLExporterBase):
         if hasattr(measureStream[0], 'clef') and measureStream[0].clef is None:
             measureStream[0].makeMutable() # must mutate
             outerClefs = part.getElementsByClass('Clef')
-            if len(outerClefs) > 0:
+            if outerClefs:
                 measureStream[0].clef = outerClefs[0]
+        
         if hasattr(measureStream[0], 'keySignature') and measureStream[0].keySignature is None:
             measureStream[0].makeMutable() # must mutate
             outerKeySignatures = part.getElementsByClass('KeySignature')
-            if len(outerKeySignatures) > 0:
+            if outerKeySignatures:
                 measureStream[0].keySignature = outerKeySignatures[0]
+        
         if hasattr(measureStream[0], 'timeSignature') and measureStream[0].timeSignature is None:
             measureStream[0].makeMutable() # must mutate
             outerTimeSignatures = part.getElementsByClass('TimeSignature')
-            if len(outerTimeSignatures) > 0:
+            if outerTimeSignatures:
                 measureStream[0].timeSignature = outerTimeSignatures[0]
         # see if accidentals/beams can be processed
         if not measureStream.streamStatus.haveAccidentalsBeenMade():
@@ -2185,7 +2188,7 @@ class PartExporter(XMLExporterBase):
         if measureStream.streamStatus.haveTupletBracketsBeenMade() is False:
             measureStream.makeTupletBrackets(inPlace=True)
             
-        if len(self.spannerBundle) == 0:
+        if not self.spannerBundle:
             self.spannerBundle = spanner.SpannerBundle(measureStream.flat)
     
         
@@ -2522,7 +2525,7 @@ class MeasureExporter(XMLExporterBase):
             return proc
         
         spannerBundle = self.objectSpannerBundle
-        if len(spannerBundle) == 0:
+        if not spannerBundle:
             return (), ()
 
         preList = []
@@ -2587,7 +2590,7 @@ class MeasureExporter(XMLExporterBase):
             sb = objectSpannerBundle
         else:        
             sb = self.objectSpannerBundle
-        if len(sb) == 0:
+        if not sb:
             return notations
 
         ornaments = []
@@ -2672,7 +2675,7 @@ class MeasureExporter(XMLExporterBase):
                 mxWavyLine.set('type', 'stop')
                 ornaments.append(mxWavyLine)
 
-        if len(ornaments) > 0:
+        if ornaments:
             mxOrnGroup = Element('ornaments')
             for mxOrn in ornaments:
                 mxOrnGroup.append(mxOrn)
@@ -2861,7 +2864,7 @@ class MeasureExporter(XMLExporterBase):
                 SubElement(mxNote, 'dot')
                 # TODO: dot placement...
 
-        elif len(d.components) > 0:
+        elif d.components:
             mxType = Element('type')
             mxType.text = typeToMusicXMLType(d.components[0].type)
             mxNote.append(mxType)
@@ -2935,7 +2938,7 @@ class MeasureExporter(XMLExporterBase):
                 mxNotationsList.extend(tupTagList)
     
             
-        if len(mxNotationsList) > 0: 
+        if mxNotationsList: 
             mxNotations = SubElement(mxNote, 'notations')
             for mxN in mxNotationsList:
                 mxNotations.append(mxN)
@@ -3388,7 +3391,7 @@ class MeasureExporter(XMLExporterBase):
         for x in (mxArticulations, 
                   mxTechnicalMark, 
                   mxOrnaments):
-            if x is not None and len(x) > 0:
+            if x:
                 notations.append(x)    
 
         # TODO: dynamics in notations
@@ -3567,7 +3570,7 @@ class MeasureExporter(XMLExporterBase):
                     mxTuplet.set('placement', tuplet.placement)
                 tas = tuplet.tupletActualShow
                 tns = tuplet.tupletNormalShow
-                if tas == None:
+                if tas is None:
                     mxTuplet.set('show-number', 'none')
                     # cannot show normal without actual
                 elif tas in ('both', 'number') and tns in ('both', 'number'):
@@ -3974,24 +3977,24 @@ class MeasureExporter(XMLExporterBase):
                 # TODO: attrGroup: print-object (why here)??
                 # TODO: attrGroup: print-style
                 # TODO: attr: location (left, right)       
-
-        if len(cs.getChordStepModifications()) > 0:
-            for hd in cs.getChordStepModifications():
-                mxDegree = SubElement(mxHarmony, 'degree')
-                # types should be compatible
-                # TODO: print-object
-                mxDegreeValue = SubElement(mxDegree, 'degree-value')
-                mxDegreeValue.text = str(hd.degree)
-                mxDegreeAlter = SubElement(mxDegree, 'degree-alter')
-                if hd.interval is not None:
-                    # will return -1 for '-a1'
-                    mxDegreeAlter.text = str(hd.interval.chromatic.directed)
-                    # TODO: attrGroup: print-style
-                    # TODO: attr: plus-minus (yes, no)
-                mxDegreeType = SubElement(mxDegree, 'degree-type')
-                mxDegreeType.text = str(hd.modType)
-                # TODO: attr: text -- alternate display
+        
+        csm = cs.getChordStepModifications()
+        for hd in csm:
+            mxDegree = SubElement(mxHarmony, 'degree')
+            # types should be compatible
+            # TODO: print-object
+            mxDegreeValue = SubElement(mxDegree, 'degree-value')
+            mxDegreeValue.text = str(hd.degree)
+            mxDegreeAlter = SubElement(mxDegree, 'degree-alter')
+            if hd.interval is not None:
+                # will return -1 for '-a1'
+                mxDegreeAlter.text = str(hd.interval.chromatic.directed)
                 # TODO: attrGroup: print-style
+                # TODO: attr: plus-minus (yes, no)
+            mxDegreeType = SubElement(mxDegree, 'degree-type')
+            mxDegreeType.text = str(hd.modType)
+            # TODO: attr: text -- alternate display
+            # TODO: attrGroup: print-style
 
         # TODO: frame # fretboard
         self.setOffsetOptional(cs, mxHarmony)
@@ -4290,10 +4293,9 @@ class MeasureExporter(XMLExporterBase):
             mxMetro.append(mxSub)
             for unused_dotcounter in range(d.dots):
                 mxMetro.append(Element('beat-unit-dot'))
-            if len(numbers) > 0:
-                if not hideNumber[i]:
-                    mxPerMinute = SubElement(mxMetro, 'per-minute') # TODO: font.
-                    mxPerMinute.text = str(common.numToIntOrFloat(numbers[0]))
+            if numbers and not hideNumber[i]:
+                mxPerMinute = SubElement(mxMetro, 'per-minute') # TODO: font.
+                mxPerMinute.text = str(common.numToIntOrFloat(numbers[0]))
 
         if ti.parentheses:
             mxMetro.set('parentheses', 'yes') # only attribute
@@ -4538,7 +4540,7 @@ class MeasureExporter(XMLExporterBase):
         rbSpanners = self.rbSpanners
         rightBarline = self.stream.rightBarline
         if (rightBarline is None 
-                and (len(rbSpanners) == 0 or not rbSpanners[0].isLast(m))):
+                and (not rbSpanners or not rbSpanners[0].isLast(m))):
             return
         else:
             # rightBarline may be None
@@ -4555,7 +4557,7 @@ class MeasureExporter(XMLExporterBase):
         rbSpanners = self.rbSpanners
         leftBarline = m.leftBarline
         if (leftBarline is None 
-                and (len(rbSpanners) == 0 or not rbSpanners[0].isFirst(m))):
+                and (not rbSpanners or not rbSpanners[0].isFirst(m))):
             return
         else:
             # leftBarline may be None. that's okay
@@ -4583,7 +4585,7 @@ class MeasureExporter(XMLExporterBase):
         # TODO: coda
         # TODO: fermata
         
-        if len(self.rbSpanners) > 0: # and self.rbSpanners[0].isFirst(m)???
+        if self.rbSpanners: # and self.rbSpanners[0].isFirst(m)???
             mxEnding = Element('ending')
             if position == 'left':
                 endingType = 'start'
@@ -5083,6 +5085,9 @@ class MeasureExporter(XMLExporterBase):
 
 
     def setMxPrint(self):
+        '''
+        Creates a <print> element and appends it to root, if one is needed.
+        '''
         m = self.stream
         # print objects come before attributes
         # note: this class match is a problem in cases where the object 
@@ -5090,23 +5095,23 @@ class MeasureExporter(XMLExporterBase):
     
         # do a quick search for any layout objects before searching individually...
         foundAny = m.getElementsByClass('LayoutBase')
-        if len(foundAny) == 0:
+        if not foundAny:
             return
 
         mxPrint = None        
         found = m.getElementsByClass('PageLayout')
-        if len(found) > 0:
+        if found:
             pl = found[0] # assume only one per measure
             mxPrint = self.pageLayoutToXmlPrint(pl)
         found = m.getElementsByClass('SystemLayout')
-        if len(found) > 0:
+        if found:
             sl = found[0] # assume only one per measure
             if mxPrint is None:
                 mxPrint = self.systemLayoutToXmlPrint(sl)
             else:
                 self.systemLayoutToXmlPrint(sl, mxPrint)
         found = m.getElementsByClass('StaffLayout')
-        if len(found) > 0:
+        if found:
             sl = found[0] # assume only one per measure
             if mxPrint is None:
                 mxPrint = self.staffLayoutToXmlPrint(sl)
@@ -5175,7 +5180,7 @@ class MeasureExporter(XMLExporterBase):
                             self.measureOffsetStart,
                             self.measureOffsetStart + m.duration.quarterLength,
                             includeEndBoundary=False)        
-        if len(instSubStream) == 0:
+        if not instSubStream:
             return None
         
         instSubObj = instSubStream[0]
@@ -5190,7 +5195,7 @@ class MeasureExporter(XMLExporterBase):
 #-------------------------------------------------------------------------------
 def indent(elem, level=0):
     i = "\n" + level * "  "
-    if len(elem):
+    if len(elem): # pylint: disable=len-as-condition
         if not elem.text or not elem.text.strip():
             elem.text = i + "  "
         if not elem.tail or not elem.tail.strip():

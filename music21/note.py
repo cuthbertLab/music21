@@ -341,7 +341,7 @@ class GeneralNote(base.Music21Object):
     def __init__(self, *arguments, **keywords):
         if 'duration' not in keywords:
             # music21base does not automatically create a duration.
-            if len(keywords) == 0:
+            if not keywords:
                 tempDuration = duration.Duration(1.0)
             else:
                 tempDuration = duration.Duration(**keywords)
@@ -349,7 +349,7 @@ class GeneralNote(base.Music21Object):
                 # looking at currentComponents so as not to trigger
                 # _updateComponents
                 if (tempDuration.quarterLength == 0
-                        and len(tempDuration.currentComponents()) == 0):
+                        and not tempDuration.currentComponents()):
                     tempDuration.quarterLength = 1.0                
         else:
             tempDuration = keywords['duration']
@@ -949,7 +949,23 @@ class Note(NotRest):
     are not compared. This test presently does not look at lyrics in
     establishing equality.  It may in the future.
 
-
+    >>> n = note.Note()
+    >>> n
+    <music21.note.Note C>
+    >>> n.pitch
+    <music21.pitch.Pitch C4>
+    
+    >>> n = note.Note('B-')
+    >>> n.name
+    'B-'
+    >>> n.octave is None
+    True
+    >>> n.pitch.implicitOctave
+    4
+    
+    >>> n = note.Note(name='D#')
+    >>> n.name
+    'D#'
     '''
     isNote = True
     isRest = False
@@ -968,15 +984,20 @@ class Note(NotRest):
     # Accepts an argument for pitch
     def __init__(self, *arguments, **keywords):
         super(Note, self).__init__(**keywords)
-        if len(arguments) > 0:
+        if arguments:
             if isinstance(arguments[0], pitch.Pitch):
                 self.pitch = arguments[0]
             else: # assume first argument is pitch
                 self.pitch = pitch.Pitch(arguments[0], **keywords)
         else: # supply a default pitch
+            name = 'C4'
             if 'name' in keywords:
+                name = keywords['name']
                 del keywords['name']
-            self.pitch = pitch.Pitch('C4', **keywords)
+            elif 'nameWithOctave' in keywords:
+                name = keywords['nameWithOctave']
+                del keywords['nameWithOctave']
+            self.pitch = pitch.Pitch(name, **keywords)
 
     #---------------------------------------------------------------------------
     # operators, representations, and transformations
