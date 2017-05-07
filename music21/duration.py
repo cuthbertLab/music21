@@ -185,7 +185,7 @@ def unitSpec(durationObjectOrObjects):
         return ret
     else:
         dO = durationObjectOrObjects
-        if not(hasattr(dO, 'tuplets')) or dO.tuplets is None or len(dO.tuplets) == 0:
+        if not(hasattr(dO, 'tuplets')) or dO.tuplets is None or not dO.tuplets:
             return (dO.quarterLength, dO.type, dO.dots, None, None, None)
         else:
             return (dO.quarterLength, dO.type, dO.dots, 
@@ -717,9 +717,9 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
 
     # weird medieval notational device; rarely used.
     if dotGroups is not None and len(dotGroups) > 1:
-        for dots in dotGroups:
-            if dots > 0:
-                qtrLength *= common.dotMultiplier(dots)
+        for innerDots in dotGroups:
+            if innerDots > 0:
+                qtrLength *= common.dotMultiplier(innerDots)
     else:
         qtrLength *= common.dotMultiplier(dots)
 
@@ -1501,16 +1501,24 @@ class Duration(SlottedObjectMixin):
         if other is None or not isinstance(other, Duration):
             return False
 
-        if self.isComplex == other.isComplex:
-            if len(self.components) == len(other.components):
-                if len(self.components) == 0:
-                    return True
-                elif self.type == other.type:
-                    if self.dots == other.dots:
-                        if self.tuplets == other.tuplets:
-                            if self.quarterLength == other.quarterLength:
-                                return True
-        return False
+        if self.isComplex != other.isComplex:
+            return False
+        if len(self.components) != len(other.components):
+            return False
+
+        if not self.components:
+            return True
+        
+        if self.type != other.type:
+            return False
+        if self.dots != other.dots:
+            return False
+        if self.tuplets != other.tuplets:
+            return False
+        if self.quarterLength != other.quarterLength:
+            return False
+
+        return True
 
     def __ne__(self, other):
         '''Test not equality.
@@ -1548,9 +1556,9 @@ class Duration(SlottedObjectMixin):
             # ignore all but components
             return self.__class__(durationTuple=self._components[0])
         elif (self._componentsNeedUpdating is False
-                and len(self._components) == 0
+                and not self._components
                 and self._dotGroups == (0,) 
-                and len(self._tuplets) == 0
+                and not self._tuplets
                 and self._linked is True):
             # ignore all
             return self.__class__()
@@ -2503,7 +2511,7 @@ class Duration(SlottedObjectMixin):
                 msg.append('(%s QL)' % (qlStr))
             totalMsg.append("".join(msg).strip())
         
-        if len(self.components) == 0:
+        if not self.components:
             totalMsg.append('Zero Duration ')
         
         outMsg = ""
@@ -3039,7 +3047,7 @@ class TupletFixer(object):
         currentTupletGroup = []
         tupletActive = False
         for n in self.streamIn.notesAndRests:
-            if len(n.duration.tuplets) == 0: # most common case first
+            if not n.duration.tuplets: # most common case first
                 if tupletActive is True:
                     self.allTupletGroups.append(currentTupletGroup)
                     currentTupletGroup = []
@@ -3112,7 +3120,7 @@ class TupletFixer(object):
         >>> m1[-1].duration.quarterLength
         Fraction(4, 3)
         '''
-        if len(tupletGroup) == 0:
+        if not tupletGroup:
             return
         firstTup = tupletGroup[0].duration.tuplets[0]
         totalTupletDuration = opFrac(firstTup.totalTupletLength())

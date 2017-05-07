@@ -297,7 +297,7 @@ def clefToBraille(music21Clef, keyboardHandSwitched=False):
                                             u" Clef {0}".format(brailleClef)])
         except KeyError:  # pragma: no cover
             music21Clef._brailleEnglish = [u"Unnamed Clef {0}".format(str(music21Clef))]
-        if isinstance(music21Clef, clef.TrebleClef) or isinstance(music21Clef, clef.BassClef):
+        if isinstance(music21Clef, (clef.TrebleClef, clef.BassClef)):
             brailleClef += clefs['suffix'][keyboardHandSwitched]
             if keyboardHandSwitched:
                 music21Clef._brailleEnglish.append(' Keyboard hand switched')

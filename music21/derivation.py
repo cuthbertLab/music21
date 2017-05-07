@@ -293,7 +293,7 @@ class Derivation(SlottedObjectMixin):
         True
         '''
         derivationChain = list(self.chain())
-        if len(derivationChain):
+        if derivationChain:
             return derivationChain[-1]
         else:
             return None

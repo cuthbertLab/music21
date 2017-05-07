@@ -248,7 +248,7 @@ class Chord(note.NotRest):
                     self.duration = n.duration
                     del keywords['duration']
                     quickDuration = False
-            elif isinstance(n, six.string_types) or isinstance(n, int):
+            elif isinstance(n, (six.string_types, int)):
                 if 'duration' in keywords:
                     self._notes.append(note.Note(n, duration=keywords['duration']))
                 else:
@@ -443,7 +443,7 @@ class Chord(note.NotRest):
             alteredId.pop(nIndex)
 
         returnObj._notes = altered
-        if len(deleteComponents) > 0:
+        if deleteComponents:
             returnObj._chordTablesAddressNeedsUpdating = True
             returnObj._bass = None
             returnObj._root = None
@@ -959,12 +959,12 @@ class Chord(note.NotRest):
         lenPitches = len(closedChord.pitches)
         rootThirdsList = []
         rootnessFunctionScores = []
-        if len(closedChord.pitches) == 0:
+        if not closedChord.pitches:
             raise ChordException("no notes in chord %r" % self)
         elif len(closedChord.pitches) == 1:
             return self.pitches[0]
         indexOfPitchesWithPerfectlyStackedThirds = []
-        for i,p in enumerate(closedChord.pitches):
+        for i, p in enumerate(closedChord.pitches):
             currentListOfThirds = []
             for chordStepTest in (3, 5, 7, 2, 4, 6):
                 if closedChord.getChordStep(chordStepTest, p):
@@ -2793,7 +2793,7 @@ class Chord(note.NotRest):
         #startOctave = c2.bass().octave
         remainingPitches = copy.copy(c2.pitches) # no deepcopy needed
 
-        while len(remainingPitches) > 0:
+        while remainingPitches:
             usedSteps = []
             newRemainingPitches = []
             for i, p in enumerate(remainingPitches):
@@ -2908,7 +2908,7 @@ class Chord(note.NotRest):
         music21.chord.ChordException: the given pitch is not in the Chord: C9
         '''
         # assign to base
-        if pitchTarget is None and len(self._notes) > 0:
+        if pitchTarget is None and self._notes:
             self.style.color = value
             return
         elif isinstance(pitchTarget, six.string_types):
@@ -3008,7 +3008,7 @@ class Chord(note.NotRest):
 
         '''
         # assign to first pitch by default
-        if pitchTarget is None and len(self._notes) > 0:
+        if pitchTarget is None and self._notes:
             pitchTarget = self._notes[0].pitch
         elif isinstance(pitchTarget, six.string_types):
             pitchTarget = pitch.Pitch(pitchTarget)
@@ -3074,7 +3074,7 @@ class Chord(note.NotRest):
 
         '''
         # assign to first pitch by default
-        if pitchTarget is None and len(self._notes) > 0:
+        if pitchTarget is None and self._notes:
             pitchTarget = self._notes[0].pitch
         elif isinstance(pitchTarget, six.string_types):
             pitchTarget = pitch.Pitch(pitchTarget)
@@ -3151,7 +3151,7 @@ class Chord(note.NotRest):
         music21.chord.ChordException: the given pitch is not in the Chord: G4
 
         '''
-        if pitchTarget is None and len(self._notes) > 0:
+        if pitchTarget is None and self._notes:
             pitchTarget = self._notes[0].pitch # first is default
         elif isinstance(pitchTarget, six.string_types):
             pitchTarget = pitch.Pitch(pitchTarget)
@@ -3209,7 +3209,7 @@ class Chord(note.NotRest):
         music21.chord.ChordException: the given pitch is not in the Chord: G4
 
         '''
-        if pitchTarget is None and len(self._notes) > 0: # if no pitch
+        if pitchTarget is None and self._notes: # if no pitch
             pitchTarget = self._notes[0].pitch
         elif isinstance(pitchTarget, six.string_types):
             pitchTarget = pitch.Pitch(pitchTarget)
@@ -3239,7 +3239,7 @@ class Chord(note.NotRest):
         target. If no pitch target is given, the first pitch is used.
         '''
         # assign to first pitch by default
-        if pitchTarget is None and len(self._notes) > 0: # if no pitches
+        if pitchTarget is None and self._notes: # if no pitches
             pitchTarget = self._notes[0].pitch
         elif isinstance(pitchTarget, six.string_types):
             pitchTarget = pitch.Pitch(pitchTarget)
@@ -3465,7 +3465,7 @@ class Chord(note.NotRest):
         ''
         '''
         ctn = chordTables.addressToCommonNames(self.chordTablesAddress)
-        if ctn is None or len(ctn) == 0:
+        if not ctn:
             return ''
         else:
             return ctn[0]
@@ -3493,7 +3493,7 @@ class Chord(note.NotRest):
         True
 
         '''
-        if self._duration is None and len(self._notes) > 0:
+        if self._duration is None and self._notes:
             #pitchZeroDuration = self._notes[0]['pitch'].duration
             pitchZeroDuration = self._notes[0].duration
             self._duration = pitchZeroDuration
@@ -4359,7 +4359,7 @@ def fromForteClass(notation):
                         'cannot extract set-class representation from string: %s' % notation)
     elif common.isListLike(notation):
         if len(notation) <= 3: # assume its a set-class representation
-            if len(notation) > 0:
+            if notation:
                 card = notation[0]
             if len(notation) > 1:
                 num = notation[1]

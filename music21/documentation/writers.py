@@ -260,7 +260,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
         '''
         tocFile = 'usersGuide_99_Table_of_Contents'
         ipfp = [x for x in self.ipythonNotebookFilePaths if 'usersGuide' in x]
-        if len(ipfp) == 0:
+        if not ipfp:
             raise DocumentationWritersException("No iPythonNotebook files were converted; " +
                     "you probably have a problem with pandoc or nbconvert not being installed.") 
         usersGuideDir = os.path.split(
@@ -440,10 +440,10 @@ class IPythonNotebookReSTWriter(ReSTWriter):
         '''
         lines = [oldLines[0]] # start with first line...
         for first, second in self.iterateSequencePairwise(oldLines):
-            if (len(first.strip()) 
-                and first[0].isspace() 
-                and len(second.strip()) 
-                and not second[0].isspace()):
+            if (first.strip() 
+                    and first[0].isspace() 
+                    and second.strip() 
+                    and not second[0].isspace()):
                 lines.append('')
             lines.append(second)
             if '.. parsed-literal::' in second:

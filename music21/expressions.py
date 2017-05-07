@@ -57,7 +57,7 @@ def realizeOrnaments(srcObject):
     '''
     if not hasattr(srcObject, "expressions"):
         return [srcObject]
-    elif len(srcObject.expressions) == 0:
+    elif not srcObject.expressions:
         return [srcObject]
     else:
         preExpandList = []
@@ -75,11 +75,11 @@ def realizeOrnaments(srcObject):
                     break
                 newSrcObject.expressions = srcObject.expressions[1:]            
                 srcObject = newSrcObject
-                if len(srcObject.expressions) == 0:
+                if not srcObject.expressions:
                     break
             else: # cannot realize this object
                 srcObject.expressions = srcObject.expressions[1:]
-                if len(srcObject.expressions) == 0:
+                if not srcObject.expressions:
                     break
                         
         retList = []
@@ -455,7 +455,7 @@ class Trill(Ornament):
         [<music21.expressions.TrillExtension <music21.note.Note C><music21.note.Note C>>]
         '''
         returnSpanners = []
-        if len(noteList) > 0:
+        if noteList:
             noteList[0].expressions.append(self)
         if len(noteList) > 1 and not noteList[0].getSpannerSites('TrillExtension'):
             te = TrillExtension(noteList)

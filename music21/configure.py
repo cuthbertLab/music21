@@ -47,13 +47,16 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 #-------------------------------------------------------------------------------
 # match finale name, which may be directory or something else
-reFinaleApp = re.compile(r'Finale (?:Notepad )?20[0-2][0-9][a-z\.0-9]*.app', re.IGNORECASE) # @UndefinedVariable
+reFinaleApp = re.compile(r'Finale (?:Notepad )?20[0-2][0-9][a-z\.0-9]*.app', 
+                         re.IGNORECASE) # @UndefinedVariable
 reSibeliusApp = re.compile(r'Sibelius.app', re.IGNORECASE) # @UndefinedVariable
-reFinaleExe = re.compile(r'Finale (?:Notepad )?20[0-2][0-9][a-z\.0-9]*.exe', re.IGNORECASE) # @UndefinedVariable
+reFinaleExe = re.compile(r'Finale (?:Notepad )?20[0-2][0-9][a-z\.0-9]*.exe', 
+                         re.IGNORECASE) # @UndefinedVariable
 reSibeliusExe = re.compile(r'Sibelius.exe', re.IGNORECASE) # @UndefinedVariable
 reFinaleReaderApp = re.compile(r'Finale Reader.app', re.IGNORECASE) # @UndefinedVariable
 reMuseScoreApp = re.compile(r'MuseScore\s?[0-9]*.app', re.IGNORECASE) # @UndefinedVariable
-reMuseScoreExe = re.compile(r'Musescore [0-9]\\bin\\MuseScore.exe', re.IGNORECASE) # @UndefinedVariable
+reMuseScoreExe = re.compile(r'Musescore [0-9]\\bin\\MuseScore.exe', 
+                            re.IGNORECASE) # @UndefinedVariable
 
 urlMusic21 = 'http://web.mit.edu/music21'
 urlFinaleNotepad = 'http://www.finalemusic.com/products/finale-notepad/resources/'
@@ -564,8 +567,7 @@ class Dialog(object):
 
             # if no default and no input, we get here (default supplied in 
             # evaluate
-            if (isinstance(cookedInput, NoInput) or 
-                isinstance(cookedInput, IncompleteInput)):
+            if isinstance(cookedInput, (NoInput, IncompleteInput)):
                 # set result to these objects whether or not try again
                 self._result = cookedInput
                 if self._tryAgain:
@@ -725,7 +727,7 @@ class YesOrNo(Dialog):
         raw = str(raw)
         raw = raw.strip()
         raw = raw.lower()
-        if raw is '':
+        if raw == '':
             return NoInput()
 
         if raw in ['yes', 'y', '1', 'true']:
@@ -1035,7 +1037,7 @@ class SelectFromList(Dialog):
         False
         '''
         options = self._getValidResults()
-        if len(options) == 0:
+        if not options:
             # must return True/False, 
             post = self._askFillEmptyList(force=force)
             return post 
@@ -1061,7 +1063,7 @@ class SelectFromList(Dialog):
         i = 1
         options = self._getValidResults(force=force)
         # if no options, cannot form query: return bad conditions
-        if len(options) == 0:
+        if not options:
             return BadConditions('no options available')
 
         for entry in options:
@@ -1084,7 +1086,7 @@ class SelectFromList(Dialog):
         #environLocal.printDebug(['SelectFromList', '_parseUserInput', 'raw', raw])
         if raw is None:
             return NoInput()
-        if raw is '':
+        if raw == '':
             return NoInput()
         # accept yes as 1
         

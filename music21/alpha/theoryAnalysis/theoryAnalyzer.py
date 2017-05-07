@@ -773,8 +773,8 @@ class Analyzer(object):
         self.addAnalysisData(score)
     
         if partNum1 is None or partNum2 is None:
-            for (partNum1,partNum2) in self.getAllPartNumPairs(score):
-                self._identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, 
+            for (pN1, pN2) in self.getAllPartNumPairs(score):
+                self._identifyBasedOnVLQ(score, pN1, pN2, dictKey, testFunction, 
                                     textFunction, color,
                                     startIndex, endIndex, editorialDictKey, 
                                     editorialValue, editorialMarkList)
@@ -806,8 +806,8 @@ class Analyzer(object):
             valueFunction = testFunction
         
         if partNum1 is None or partNum2 is None:
-            for (partNum1,partNum2) in self.getAllPartNumPairs(score):
-                self._identifyBasedOnHarmonicInterval(score, partNum1, partNum2, color, dictKey, 
+            for (pN1, pN2) in self.getAllPartNumPairs(score):
+                self._identifyBasedOnHarmonicInterval(score, pN1, pN2, color, dictKey, 
                                                  testFunction, textFunction, 
                                                  valueFunction=valueFunction)
         else:
@@ -828,8 +828,8 @@ class Analyzer(object):
                                         color, dictKey, testFunction, textFunction):
         self.addAnalysisData(score)    
         if partNum is None:
-            for partNum in range(0, len(score.parts)):
-                self._identifyBasedOnMelodicInterval(score, partNum, color, dictKey, 
+            for partNumInner in range(0, len(score.parts)):
+                self._identifyBasedOnMelodicInterval(score, partNumInner, color, dictKey, 
                                                 testFunction, textFunction)
         else:
             mIntvList = self.getMelodicIntervals(score, partNum)
@@ -847,8 +847,8 @@ class Analyzer(object):
         self.addAnalysisData(score)
     
         if partNum is None: 
-            for partNum in range(0, len(score.parts)):
-                self._identifyBasedOnNote(score, partNum,
+            for partNumInner in range(0, len(score.parts)):
+                self._identifyBasedOnNote(score, partNumInner,
                                           color, dictKey, testFunction, textFunction)
         else:
             
@@ -920,8 +920,8 @@ class Analyzer(object):
 
         self.addAnalysisData(score)
         if partNum is None:
-            for partNum in range(0,len(score.parts)):
-                self._identifyBasedOnThreeNoteLinearSegment(score, partNum, color, dictKey, 
+            for partNumInner in range(0, len(score.parts)):
+                self._identifyBasedOnThreeNoteLinearSegment(score, partNumInner, color, dictKey, 
                                                        testFunction, textFunction)
         else:
             tnlsList = self.getThreeNoteLinearSegments(score, partNum)
@@ -1171,7 +1171,8 @@ class Analyzer(object):
                                               + " while part " + str(pn2 + 1) 
                                               + " moves from " + vlq.v2n1.name
                                               + " to " + vlq.v2n2.name)
-        self._identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color)
+        self._identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, 
+                                 testFunction, textFunction, color)
         
     def identifyHiddenFifths(self, score, partNum1=None, partNum2=None, 
                              color=None, dictKey='hiddenFifths'):
@@ -1179,8 +1180,10 @@ class Analyzer(object):
         Identifies hidden fifths (calls 
         :meth:`~music21.voiceLeading.VoiceLeadingQuartet.hiddenFifth`) between 
         two parts (if specified) or between all possible pairs of parts (if not specified) 
-        and stores the resulting list of VLQTheoryResult objects in ``self.resultDict['hiddenFifths']``. 
-        Optionally, a color attribute may be specified to color all corresponding notes in the score.
+        and stores the resulting list of VLQTheoryResult objects in 
+        ``self.resultDict['hiddenFifths']``. 
+        Optionally, a color attribute may be specified to color all 
+        corresponding notes in the score.
         
         
     
@@ -1273,7 +1276,8 @@ class Analyzer(object):
         between two parts (if specified) or between all possible pairs of parts (if not specified) 
         and stores the resulting list of VLQTheoryResult objects in 
         ``self.resultDict['improperResolution']``. 
-        Optionally, a color attribute may be specified to color all corresponding notes in the score.
+        Optionally, a color attribute may be specified to 
+        color all corresponding notes in the score.
         
         
     
@@ -1800,8 +1804,8 @@ class Analyzer(object):
         '''
         sid = score.id
         if partNum1 is None or partNum2 is None:
-            for (partNum1,partNum2) in self.getAllPartNumPairs(score):
-                self.identifyImproperDissonantIntervals(score, partNum1, partNum2, color, dictKey, 
+            for (pn1, pn2) in self.getAllPartNumPairs(score):
+                self.identifyImproperDissonantIntervals(score, pn1, pn2, color, dictKey, 
                                                    unaccentedOnly)
         else:
             self.identifyDissonantHarmonicIntervals(score, partNum1, partNum2, dictKey='h1')

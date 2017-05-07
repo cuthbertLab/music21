@@ -19,8 +19,8 @@ Also contains functions for converting Trecento notation to modern notation.
 
 Also a good example of subclassing TinyNotation
 '''
+from __future__ import division
 import unittest
-
 
 from music21 import base
 from music21 import clef
@@ -839,9 +839,9 @@ class BrevisLengthTranslator(object):
                 if common.almostEquals(curBeat % 3, 0):
                     beatStrength = 1.0
                 elif curBeat % 3 - 1 or i % 3 == 2:
-                    beatStrength = float(1.0) / 3
+                    beatStrength = 1/3
                 else:
-                    beatStrength = float(1.0) / 9
+                    beatStrength = 1/9
             elif div.standardSymbol in ['.q.', '.o.', '.d.']:
                 if curBeat % 4 == 0:
                     beatStrength = 1.0
@@ -1006,9 +1006,9 @@ class BrevisLengthTranslator(object):
 
             #Gets rid of everything known
             if obj.mensuralType == 'maxima':
-                minimaLength = float(4)*self.div.minimaPerBrevis
+                minimaLength = 4.0 * self.div.minimaPerBrevis
             elif obj.mensuralType == 'longa':
-                minimaLength = float(2)*self.div.minimaPerBrevis
+                minimaLength = 2.0 * self.div.minimaPerBrevis
             elif obj.mensuralType == 'brevis':
                 minimaLength = float(self.div.minimaPerBrevis)
             else:
@@ -1019,9 +1019,9 @@ class BrevisLengthTranslator(object):
                 if obj.mensuralType == 'semibrevis':
                     if 'MensuralRest' in obj.classes:
                         if self.div.standardSymbol in ['.q.', '.i.']:
-                            minimaLength = self.div.minimaPerBrevis/float(2)
+                            minimaLength = self.div.minimaPerBrevis / 2.0
                         elif self.div.standardSymbol in ['.p.', '.n.']:
-                            minimaLength = self.div.minimaPerBrevis/float(3)
+                            minimaLength = self.div.minimaPerBrevis / 3.0
                         else: # we don't know it...
                             pass
                     else:
@@ -1329,7 +1329,7 @@ class BrevisLengthTranslator(object):
                 minRem -= knownLengthsList[semibrevis_downstem_index]
 
                 extend_num = min(knownLengthsList[semibrevis_downstem_index] - 3, len(extend_list))
-                shrink_tup += semibrevis_downstem_index,
+                shrink_tup += (semibrevis_downstem_index,)
 
             else: #no downstems
 
@@ -1491,7 +1491,7 @@ class BrevisLengthTranslator(object):
             diff_tup = ()
             shrink_tup = ()
 
-            lengths = [(0.5, 0.5), (float(2)/3, 0.5), (0.5, float(2)/3), (float(2)/3, float(2)/3)]
+            lengths = [(0.5, 0.5), (2/3, 0.5), (0.5, 2/3), (2/3, 2/3)]
 
             for (left_length, right_length) in lengths:
                 for ind in semiminima_left_flag_list:
@@ -1582,7 +1582,7 @@ class BrevisLengthTranslator(object):
                         extend_num = min(6*minRem_changeable - 15.0, len(extend_list))
                         minRem_changeable -= knownLengthsList_changeable[semibrevis_downstem_index]
 
-                        shrink_tup += semibrevis_downstem_index,
+                        shrink_tup += (semibrevis_downstem_index,)
 
                     else: #No downstems
                         if self.hasLastSB:
@@ -1599,9 +1599,9 @@ class BrevisLengthTranslator(object):
                             minRem_changeable -= 2.0
                             extend_num = len(extend_list)
 
-                    change_tup += extend_list,
-                    num_tup += extend_num,
-                    diff_tup += float(1)/6,
+                    change_tup += (extend_list,)
+                    num_tup += (extend_num,)
+                    diff_tup += (1/6,)
 
                     if minRem_changeable > -0.0001:
                         knownLengthsList_changeable, minRem_changeable = (
@@ -1756,7 +1756,7 @@ class BrevisLengthTranslator(object):
 
         else:
 
-            lengths = [(0.5, 0.5), (float(2)/3, 0.5), (0.5, float(2)/3), (float(2)/3, float(2)/3)]
+            lengths = [(0.5, 0.5), (2/3, 0.5), (0.5, 2/3), (2/3, 2/3)]
             strength = 0
 
             for (left_length, right_length) in lengths:
@@ -1818,8 +1818,8 @@ class BrevisLengthTranslator(object):
                         extend_list_1.append(semibrevis_list[-1])
                         minRem_changeable -= 2.0
                     extend_list_1 = _removeRepeatedElements(extend_list_1)
-                    extend_num_1 = float(min(len(extend_list_1), 0.5*minRem_changeable - 2.0))
-                    extend_num_2 = float(min(len(extend_list_2), 6*minRem_changeable - 24.0))
+                    extend_num_1 = float(min(len(extend_list_1), 0.5 * minRem_changeable - 2.0))
+                    extend_num_2 = float(min(len(extend_list_2), 6.0 * minRem_changeable - 24.0))
                     
 
                     if self.numberOfDownstems < 2:
@@ -1829,9 +1829,9 @@ class BrevisLengthTranslator(object):
                                                                         minRem_changeable, 4.0)
                         minRem_changeable -= knownLengthsList_changeable[semibrevis_downstem_index]
 
-                        shrink_tup += semibrevis_downstem_index,
+                        shrink_tup += (semibrevis_downstem_index,)
                         if extend_list_2:
-                            shrink_tup += semibrevis_downstem_index,
+                            shrink_tup += (semibrevis_downstem_index,)
 
                     else: #downstems >= 2
                         from music21.alpha import medren
@@ -1871,7 +1871,7 @@ class BrevisLengthTranslator(object):
 
                 change_tup += extend_list_1, extend_list_2
                 num_tup += extend_num_1, extend_num_2
-                diff_tup += 2.0, float(1)/6
+                diff_tup += (2.0, 1/6)
 
                 if minRem_changeable > -0.0001:
                     knownLengthsList_changeable, minRem_changeable = (

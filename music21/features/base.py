@@ -374,12 +374,12 @@ class StreamForms(object):
                     'isHalfDiminishedSeventh']
 
             for c in self.__getitem__('chordify.getElementsByClass.Chord'):
-                for key in keys:
-                    if key not in histo:
-                        histo[key] = 0
+                for thisKey in keys:
+                    if thisKey not in histo:
+                        histo[thisKey] = 0
                     # get the function attr, call it, check bool
-                    if getattr(c, key)():
-                        histo[key] += 1
+                    if getattr(c, thisKey)():
+                        histo[thisKey] += 1
                         # not breaking here means that we may get multiple 
                         # hits for the same chord
             self._forms['chordifyTypesHistogram'] = histo
@@ -1239,7 +1239,7 @@ def extractorsById(idOrList, library=('jSymbolic', 'native')):
         flatIds.append(featureId)
 
     post = []
-    if len(flatIds) == 0:
+    if not flatIds:
         return post
     
     for fe in featureExtractors:

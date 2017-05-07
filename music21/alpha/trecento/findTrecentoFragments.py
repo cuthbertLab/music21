@@ -177,9 +177,9 @@ def searchForVat1969():
     for thisWork in ballataObj:
         cadB1 = thisWork.cadenceB1Class()
         cadB2 = thisWork.cadenceB2Class()
-        if (cadB2 is None or len(cadB2.parts) == 0): 
+        if (cadB2 is None or not cadB2.parts): 
             continue
-        if (cadB1 is None or len(cadB1.parts) == 0): 
+        if (cadB1 is None or not cadB1.parts): 
             continue
         
     for i in range(0, len(cadB2.parts)): 

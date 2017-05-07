@@ -104,7 +104,7 @@ def isIterable(usrData):
     """
     if hasattr(usrData, "__iter__"): 
         if six.PY3: # no __iter__ on strings in py2
-            if isinstance(usrData, str) or isinstance(usrData, bytes):
+            if isinstance(usrData, (str, bytes)):
                 return False
         return True
     else:

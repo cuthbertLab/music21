@@ -87,7 +87,7 @@ class KeyAnalyzer(object):
         keyByMeasure = []
         for i in range(0, self.numMeasures):
             m = self.stream.measure(i)
-            if m is None or len(m.flat.notes) == 0:
+            if m is None or not m.recurse().notes:
                 k = None
             else:
                 k = m.analyze('key')

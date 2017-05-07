@@ -250,164 +250,139 @@ class DynamicArticulation(Articulation):
     '''
     Superclass for all articulations that change the dynamic of a note.
     '''
-    def __init__(self):
-        super(DynamicArticulation, self).__init__()
 
 class PitchArticulation(Articulation):
     '''
     Superclass for all articulations that change the pitch of a note.
     '''
-    def __init__(self):
-        super(PitchArticulation, self).__init__()
 
 class TimbreArticulation(Articulation):
     '''
     Superclass for all articulations that change the timbre of a note.
     '''
-    def __init__(self):
-        super(TimbreArticulation, self).__init__()
 
 
 #-------------------------------------------------------------------------------
 class Accent(DynamicArticulation):
+    '''
+    
+    >>> a = articulations.Accent()
+    '''
     def __init__(self):
-        '''
-        
-        >>> a = articulations.Accent()
-        '''
-        DynamicArticulation.__init__(self)
+        super(Accent, self).__init__()
         self._volumeShift = 0.1
 
 
 class StrongAccent(Accent):
+    '''
+    
+    >>> a = articulations.StrongAccent()
+    '''
     def __init__(self):
-        '''
-        
-        >>> a = articulations.StrongAccent()
-        '''
-        Accent.__init__(self)
+        super(StrongAccent, self).__init__()
         self._volumeShift = 0.15
 
 class Staccato(LengthArticulation):
+    '''
+    
+    >>> a = articulations.Staccato()
+    '''
     def __init__(self):
-        '''
-        
-        >>> a = articulations.Staccato()
-        '''
-        LengthArticulation.__init__(self)
+        super(Staccato, self).__init__()
         self._volumeShift = 0.05
 
 class Staccatissimo(Staccato):
+    '''
+    A very short note (derived from staccato), usually
+    represented as a wedge.
+        
+    >>> a = articulations.Staccatissimo()
+    '''
     def __init__(self):
-        '''
-        A very short note (derived from staccato), usually
-        represented as a wedge.
-        
-        
-        >>> a = articulations.Staccatissimo()
-        '''
-        Staccato.__init__(self)
+        super(Staccatissimo, self).__init__()
         self._volumeShift = 0.05
 
 class Spiccato(Staccato):
+    '''
+    A staccato note + accent in one
+            
+    >>> a = articulations.Spiccato()
+    '''
     def __init__(self):
-        '''
-        A staccato note + accent in one
-        
-        
-        >>> a = articulations.Spiccato()
-        '''
-        Staccato.__init__(self)
+        super(Spiccato, self).__init__()
         self._volumeShift = 0.05
 
 class Tenuto(LengthArticulation):
+    '''
+    >>> a = articulations.Tenuto()
+    '''
     def __init__(self):
-        '''
-        
-        >>> a = articulations.Tenuto()
-        '''
-        LengthArticulation.__init__(self)
-        self._volumeShift = -0.05
+        super(Tenuto, self).__init__()
+        self._volumeShift = -0.05 # is this the right thing to do?
 
 class DetachedLegato(LengthArticulation):
+    '''
+    >>> a = articulations.DetachedLegato()
+    '''
     def __init__(self):
-        '''
-        
-        >>> a = articulations.DetachedLegato()
-        '''
-        LengthArticulation.__init__(self)
+        super(DetachedLegato, self).__init__()
         self._volumeShift = 0
 
 
-class IndeterminantSlide(PitchArticulation):    
-    def __init__(self):
-        PitchArticulation.__init__(self)
+class IndeterminantSlide(PitchArticulation):
+    '''
+    Represents a whole class of slides that are
+    of indeterminent pitch amount (scoops, plops, etc.)
+    '''
+    
 
 class Scoop(IndeterminantSlide):
-    def __init__(self):
-        '''
-        
-        >>> a = articulations.Scoop()
-        '''
-        IndeterminantSlide.__init__(self)
+    '''
+    
+    >>> a = articulations.Scoop()
+    '''
 
 
 class Plop(IndeterminantSlide):
-    def __init__(self):
-        '''
-        
-        >>> a = articulations.Plop()
-        '''
-        IndeterminantSlide.__init__(self)
+    '''
+    
+    >>> a = articulations.Plop()
+    '''
 
 class Doit(IndeterminantSlide):
-    def __init__(self):
-        '''
-        
-        >>> a = articulations.Doit()
-        '''
-        IndeterminantSlide.__init__(self)
+    '''
+    
+    >>> a = articulations.Doit()
+    '''
 
 class Falloff(IndeterminantSlide):
-    def __init__(self):
-        '''
-        
-        >>> a = articulations.Falloff()
-        '''
-        IndeterminantSlide.__init__(self)
+    '''
+    
+    >>> a = articulations.Falloff()
+    '''
 
 class BreathMark(LengthArticulation):
-    def __init__(self):
-        '''
-        
-        >>> a = articulations.BreathMark()
-        '''
-        LengthArticulation.__init__(self)
-
+    '''
+     
+    >>> a = articulations.BreathMark()
+    '''
+       
 class Caesura(Articulation):
-    def __init__(self):
-        '''
-        
-        >>> a = articulations.Caesura()
-        '''
-        Articulation.__init__(self)
+    '''    
+    >>> a = articulations.Caesura()
+    '''
 
 class Stress(DynamicArticulation):
-    def __init__(self):
-        '''
-        
-        >>> a = articulations.Stress()
-        '''
-        DynamicArticulation.__init__(self)
+    '''
+    
+    >>> a = articulations.Stress()
+    '''
 
 class Unstress(DynamicArticulation):
-    def __init__(self):
-        '''
-        
-        >>> a = articulations.Unstress()
-        '''
-        DynamicArticulation.__init__(self)
-
+    '''
+    
+    >>> a = articulations.Unstress()
+    '''
 
 
 #-------------------------------------------------------------------------------
@@ -419,24 +394,17 @@ class TechnicalIndication(Articulation):
     
     TechnicalIndications can include an optional content.
     '''
-    def __init__(self):
-        super(TechnicalIndication, self).__init__()
 
 class Harmonic(TechnicalIndication):
-    def __init__(self):
-        '''
-        
-        >>> a = articulations.Harmonic()
-        '''
-        TechnicalIndication.__init__(self)
+    '''
+    
+    >>> a = articulations.Harmonic()
+    '''
 
 class Bowing(TechnicalIndication):  
-    def __init__(self):
-        '''
-        
-        >>> a = articulations.Bowing()
-        '''
-        TechnicalIndication.__init__(self)
+    '''        
+    >>> a = articulations.Bowing()
+    '''
 
 class Fingering(TechnicalIndication):
     def __init__(self, fingerNumber=None):
@@ -462,7 +430,7 @@ class Fingering(TechnicalIndication):
         
         >>> f.alternate = True
         '''
-        TechnicalIndication.__init__(self)
+        super(Fingering, self).__init__()
         self.fingerNumber = fingerNumber
         self.substitution = False
         self.alternate = False
@@ -473,20 +441,14 @@ class Fingering(TechnicalIndication):
 
 #-------------------------------------------------------------------------------
 class UpBow(Bowing):
-    def __init__(self):
-        '''
-        
-        >>> a = articulations.UpBow()
-        '''
-        Bowing.__init__(self)
+    '''
+    >>> a = articulations.UpBow()
+    '''
 
 class DownBow(Bowing):
-    def __init__(self):
-        '''
-        
-        >>> a = articulations.DownBow()
-        '''
-        Bowing.__init__(self)
+    '''
+    >>> a = articulations.DownBow()
+    '''
 
 class StringHarmonic(Bowing, Harmonic):
     pass

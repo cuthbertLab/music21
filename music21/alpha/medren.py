@@ -1369,11 +1369,11 @@ class Ligature(base.Music21Object):
         if index < self._ligatureLength():
             currentShape = self.noteheadShape[index]
             if currentShape[0] == 'oblique':
-                self.noteheadShape[index] = 'square',
+                self.noteheadShape[index] = ('square',)
                 if currentShape[1] == 'start':
-                    self.noteheadShape[index+1] = 'square',
+                    self.noteheadShape[index + 1] = ('square',)
                 else:
-                    self.noteheadShape[index-1] = 'square',
+                    self.noteheadShape[index - 1] = ('square',)
             else:
                 pass #Already square
         else:
@@ -1958,34 +1958,34 @@ def transferTies(score, inPlace=True):
     for el in score.recurse():
         if not isinstance(el, note.Note):
             continue
-        if el.tie is not None:
-            if el.tie.type == 'start':
-                tieBeneficiary = el
-            elif el.tie.type == 'continue':
-                tiedNotes.append(el)
-            elif el.tie.type == 'stop':
-                tiedNotes.append(el)
-                tiedQL = tieBeneficiary.duration.quarterLength
-                for tiedEl in tiedNotes:
-                    tiedQL += tiedEl.duration.quarterLength
-                tempDuration = duration.Duration(tiedQL)
-                if (tempDuration.type != 'complex' and 
-                    len(tempDuration.tuplets) == 0):
-                    # successfully can combine these notes into one unit
-                    ratioDecimal = tiedQL/float(tieBeneficiary.duration.quarterLength)
-                    (tupAct, tupNorm) = common.decimalToTuplet(ratioDecimal)
-                    if (tupAct != 0): # error...
-                        tempTuplet = duration.Tuplet(tupAct, tupNorm, 
-                                                     copy.deepcopy(tempDuration.components[0]))
-                        tempTuplet.tupletActualShow = "none"
-                        tempTuplet.bracket = False
-                        tieBeneficiary.duration = tempDuration
-                        tieBeneficiary.duration.tuplets = (tempTuplet,)
-                        tieBeneficiary.tie = None #.style = 'hidden'
-                        for tiedEl in tiedNotes:
-                            tiedEl.tie = None #.style = 'hidden'
-                            tiedEl.hideObjectOnPrint = True
-                tiedNotes = []
+        if el.tie is None:
+            continue
+        if el.tie.type == 'start':
+            tieBeneficiary = el
+        elif el.tie.type == 'continue':
+            tiedNotes.append(el)
+        elif el.tie.type == 'stop':
+            tiedNotes.append(el)
+            tiedQL = tieBeneficiary.duration.quarterLength
+            for tiedEl in tiedNotes:
+                tiedQL += tiedEl.duration.quarterLength
+            tempDuration = duration.Duration(tiedQL)
+            if (tempDuration.type != 'complex' and not tempDuration.tuplets):
+                # successfully can combine these notes into one unit
+                ratioDecimal = tiedQL / float(tieBeneficiary.duration.quarterLength)
+                (tupAct, tupNorm) = common.decimalToTuplet(ratioDecimal)
+                if (tupAct != 0): # error...
+                    tempTuplet = duration.Tuplet(tupAct, tupNorm, 
+                                                 copy.deepcopy(tempDuration.components[0]))
+                    tempTuplet.tupletActualShow = "none"
+                    tempTuplet.bracket = False
+                    tieBeneficiary.duration = tempDuration
+                    tieBeneficiary.duration.tuplets = (tempTuplet,)
+                    tieBeneficiary.tie = None #.style = 'hidden'
+                    for tiedEl in tiedNotes:
+                        tiedEl.tie = None #.style = 'hidden'
+                        tiedEl.hideObjectOnPrint = True
+            tiedNotes = []
 
     return score
 

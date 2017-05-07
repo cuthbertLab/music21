@@ -45,11 +45,6 @@ SpineParsing consists of several steps.
 '''
 # pylint: disable=redefined-builtin
 #python3
-try:
-    basestring # @UndefinedVariable
-except NameError:
-    basestring = str # @ReservedAssignment
-
 import math
 import os
 import re
@@ -145,9 +140,9 @@ class HumdrumDataCollection(object):
         
         
         self.globalEventsInserted = None
-        if dataStream is []:
+        if not dataStream:
             raise HumdrumException("dataStream is not optional, specify some lines")
-        elif isinstance(dataStream, basestring):
+        elif isinstance(dataStream, six.string_types):
             dataStream = dataStream.splitlines()
         self.dataStream = dataStream
         self._storedStream = None
@@ -1348,7 +1343,7 @@ class KernSpine(HumdrumSpine):
         if not hasattr(n, 'beams'):
             return None
 
-        if self.currentBeamNumbers != 0 and len(n.beams.beamsList) == 0:
+        if self.currentBeamNumbers != 0 and not n.beams.beamsList:
             for unused_counter in range(self.currentBeamNumbers):
                 n.beams.append('continue')
         elif n.beams.beamsList:
@@ -1658,10 +1653,11 @@ class SpineCollection(object):
         for thisSpine in self.spines:
             spineStream = thisSpine.stream
             instrumentsStream = spineStream.getElementsByClass('Instrument')
-            if len(instrumentsStream) == 0:
+            if not instrumentsStream:
                 spineInstrument = None
             else:
                 spineInstrument = instrumentsStream[0].instrumentName
+                
             if spineInstrument not in usedIds:
                 firstStreamForEachInstrument[spineInstrument] = spineStream
                 usedIds[spineInstrument] = 1
@@ -1685,7 +1681,7 @@ class SpineCollection(object):
             #removeSpines = []
             if thisSpine.parentSpine is not None:
                 continue
-            if len(thisSpine.childSpines) == 0:
+            if not thisSpine.childSpines:
                 continue
 
             # only spines with children spines and parent spines continue
@@ -1892,7 +1888,7 @@ class SpineCollection(object):
                 for mEl in measureElements:
                     mElGroups = mEl.groups
                     #print mEl, mElGroups
-                    if len(mElGroups) == 0 or not mElGroups[0].startswith('voice'):
+                    if not mElGroups or not mElGroups[0].startswith('voice'):
                         continue
 
                     voiceName = mElGroups[0]

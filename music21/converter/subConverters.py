@@ -33,6 +33,8 @@ from music21 import environment
 _MOD = 'converter/subConverters.py'
 environLocal = environment.Environment(_MOD)
 
+# pylint complains when abstract methods are not overwritten, but that's okay.
+# pylint: disable=abstract-method
 
 class SubConverterException(exceptions21.Music21Exception):
     pass
@@ -187,7 +189,7 @@ class SubConverter(object):
         This is currently basically completely unused!!!!
         '''
         exts = self.registerOutputExtensions
-        if len(exts) == 0:
+        if not exts:
             raise SubConverterException(
                 "This subconverter cannot show or write: " + 
                 "no output extensions are registered for it")
@@ -421,7 +423,7 @@ class ConverterLilypond(SubConverter):
         then launch the appropriate viewer for .png/.pdf (graphicsPath) or .svg
         (vectorPath)
         '''
-        if subformats is None or len(subformats) == 0:
+        if not subformats:
             subformats = ['png']
         returnedFilePath = self.write(obj, fmt, subformats=subformats, **keywords)
         if subformats is not None and subformats:
@@ -1054,8 +1056,8 @@ class ConverterMuseData(SubConverter):
 
         mdw = musedataModule.MuseDataWork()
 
-        for strData in strDataList:
-            mdw.addString(strData)
+        for strDataInner in strDataList:
+            mdw.addString(strDataInner)
 
         musedataTranslate.museDataWorkToStreamScore(mdw, self.stream)
 
@@ -1088,8 +1090,8 @@ class ConverterMuseData(SubConverter):
             else:
                 fpList = fp
 
-            for fp in fpList:
-                mdw.addFile(fp)
+            for fpInner in fpList:
+                mdw.addFile(fpInner)
 
         #environLocal.printDebug(['ConverterMuseData: mdw file count', len(mdw.files)])
 

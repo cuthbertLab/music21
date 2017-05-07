@@ -110,7 +110,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                     # this indication is most likely an opening, as ABC does
                     # not encode second ending ending boundaries
                     # we can still check thought:
-                    if len(rbSpanners) == 0:
+                    if not rbSpanners:
                         # add this measure as a componnt
                         rb = spanner.RepeatBracket(dst)
                         # set number, returned here
@@ -181,7 +181,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         pass
     # clefs are not typically defined, but if so, are set to the first measure
     # following the meta data, or in the open stream
-    if not clefSet and len(p.recurse().getElementsByClass('Clef')) == 0:
+    if not clefSet and not p.recurse().getElementsByClass('Clef'):
         if useMeasures:  # assume at start of measures
             p.getElementsByClass('Measure')[0].clef = p.flat.bestClef()
         else:
@@ -190,8 +190,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     if postTransposition != 0:
         p.transpose(postTransposition, inPlace=True)
 
-    if useMeasures and len(p.flat.getTimeSignatures(searchContext=False,
-            returnDefault=False)) > 0:
+    if useMeasures and p.recurse().getElementsByClass('TimeSignature'):
         # call make beams for now; later, import beams
         #environLocal.printDebug(['abcToStreamPart: calling makeBeams'])
         try:

@@ -24,9 +24,6 @@ environLocal = environment.Environment(__file__)
 
 from music21.exceptions21 import CorpusException
 
-if six.PY3:
-    unicode = str # @ReservedAssignment
-
 #------------------------------------------------------------------------------
 
 class Corpus(object):
@@ -82,7 +79,7 @@ class Corpus(object):
         from music21 import corpus
         matched = []
         if six.PY2:
-            rootDirectoryPath = unicode(rootDirectoryPath)
+            rootDirectoryPath = unicode(rootDirectoryPath) # @UndefinedVariable
             
         for rootDirectory, directoryNames, filenames in os.walk(rootDirectoryPath):
             if '.svn' in directoryNames:
@@ -219,7 +216,7 @@ class Corpus(object):
                 results.append(path)
             elif workSlashes.lower() in path.lower():
                 results.append(path)
-        if len(results):
+        if results:
             # more than one matched...use more stringent criterion:
             # must have a slash before the name
             previousResults = results
@@ -228,10 +225,10 @@ class Corpus(object):
             for path in previousResults:
                 if longName in path.lower():
                     results.append(path)
-            if not len(results):
+            if not results:
                 results = previousResults
         movementResults = []
-        if movementNumber is not None and len(results):
+        if movementNumber is not None and results:
             # store one ore more possible mappings of movement number
             movementStrList = []
             # see if this is a pair
@@ -267,13 +264,13 @@ class Corpus(object):
                 # if we have one direct match, all other matches must
                 # be direct. this will match multiple files with different
                 # file extensions
-                if len(movementResults):
+                if movementResults:
                     continue
                 if searchPartialMatch:
                     for movementStr in movementStrList:
                         if filename.startswith(movementStr.lower()):
                             movementResults.append(filePath)
-            if not len(movementResults):
+            if not movementResults:
                 pass
         else:
             movementResults = results
@@ -837,9 +834,9 @@ class LocalCorpus(Corpus):
     ### INITIALIZER ###
 
     def __init__(self, name=None):
-        if not isinstance(name, (str, unicode, type(None))):
+        if not isinstance(name, (six.string_types, type(None))):
             raise CorpusException("Name must be a string or None")
-        if name is not None and len(name) == 0:
+        if name is not None and not name:
             raise CorpusException("Name cannot be blank")
         if name == 'local':
             self._name = None
@@ -864,7 +861,7 @@ class LocalCorpus(Corpus):
 
     def _getSettings(self):
         userSettings = environment.UserSettings()
-        if self.name is 'local':
+        if self.name == 'local':
             return userSettings['localCorpusSettings']
         return userSettings['localCorporaSettings'].get(self.name, None)
 
@@ -890,7 +887,7 @@ class LocalCorpus(Corpus):
         unless explicitly saved by a call to ``LocalCorpus.save()``.
         '''
         from music21 import corpus
-        if not isinstance(directoryPath, (str, unicode)):
+        if not isinstance(directoryPath, six.string_types):
             raise corpus.CorpusException(
                 'an invalid file path has been provided: {0!r}'.format(
                     directoryPath))
@@ -979,7 +976,7 @@ class LocalCorpus(Corpus):
         the user settings.
         '''
         userSettings = environment.UserSettings()
-        if self.name is 'local':
+        if self.name == 'local':
             userSettings['localCorpusSettings'] = self.directoryPaths
         else:
             userSettings['localCorporaSettings'][self.name] = self.directoryPaths

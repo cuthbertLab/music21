@@ -46,7 +46,7 @@ def getMissingImportStr(modNameList):
     if you run into errors, install them by following the instructions at
     http://mit.edu/music21/doc/installing/installAdditional.html    
     '''
-    if len(modNameList) == 0:
+    if not modNameList:
         return None
     elif len(modNameList) == 1:
         return textwrap.dedent('''Certain music21 functions might need the optional package %s;

@@ -146,7 +146,7 @@ def hyphenToCamelCase(usrStr, replacement='-'):
     (?<!\A) # not at the start of the string
     ''' + replacement + r'''
     (?=[a-zA-Z]) # followed by a letter
-    ''', re.X)
+    ''', re.X) # @UndefinedVariable
     
     tokens = PATTERN.split(usrStr)
     response = tokens.pop(0).lower()
@@ -259,7 +259,7 @@ def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
         else:
             firstChar = False
 
-        if len(post) > 0:
+        if post:
             if char.isupper() or firstNum or firstChar:
                 post.append(' ')
             post.append(char)

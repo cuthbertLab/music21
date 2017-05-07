@@ -1124,7 +1124,7 @@ class GraphHorizontalBar(Graph):
             # then start y position, bar height
             faceColor = getColor(self.colors[i % len(self.colors)])            
             
-            if len(points) > 0:
+            if points:
                 yrange = (yPos + self._margin, 
                           self._barHeight)
                 ax.broken_barh(points, 
@@ -1152,7 +1152,7 @@ class GraphHorizontalBar(Graph):
         self.setTicks('y', yTicks)  
 
         # first, see if ticks have been set externally
-        if 'ticks' in self.axis['x'] and len(self.axis['x']['ticks']) == 0:
+        if 'ticks' in self.axis['x'] and not self.axis['x']['ticks']:
             rangeStep = int(xMin + round(xRange / 10))
             if rangeStep == 0:
                 rangeStep = 1
@@ -2124,7 +2124,7 @@ class PlotStream(object):
                     weights.append((nameCount[key], key))
             weights.sort()
             label = []
-            if len(weights) == 0: # get a default
+            if not weights: # get a default
                 if hideUnused:
                     continue
                 if not blankLabelUnused:
@@ -2258,7 +2258,7 @@ class PlotStream(object):
                     weights.append((nameWithOctaveCount[key], key))
             weights.sort()
             label = []
-            if len(weights) == 0: # get a default
+            if not weights: # get a default
                 if hideUnused:
                     continue
                 if not blankLabelUnused:
@@ -2304,7 +2304,7 @@ class PlotStream(object):
                     weights.append((nameWithOctaveCount[key], key))
             weights.sort()
             label = []
-            if len(weights) == 0: # get a default
+            if not weights: # get a default
                 if hideUnused:
                     continue
                 if not blankLabelUnused:
@@ -2388,7 +2388,7 @@ class PlotStream(object):
             offsetMap = self.streamObj.measureOffsetMap([stream.Measure])
         else:
             offsetMap = self.streamObj.measureOffsetMap([note.Note])
-        if len(offsetMap) > 0:
+        if offsetMap:
             self.useMeasuresForAxisLabel = True
         else:
             self.useMeasuresForAxisLabel = False
@@ -2396,7 +2396,7 @@ class PlotStream(object):
         #    self.useMeasuresForAxisLabel])
 
         ticks = [] # a list of graphed value, string label pairs
-        if len(offsetMap) > 0:
+        if offsetMap:
             #environLocal.printDebug(['using measures for offset ticks'])
             # store indices in offsetMap
             mNoToUse = []
@@ -2577,7 +2577,7 @@ class PlotMultiStream(object):
             self.streamList.append(s)
 
         # use found paths if no labels are provided
-        if len(labelList) == 0 and len(foundPaths) == len(streamList):
+        if not labelList and len(foundPaths) == len(streamList):
             self.labelList = foundPaths
         else:
             self.labelList = labelList
@@ -2876,8 +2876,6 @@ class PlotHistogram(PlotStream):
 
     '''
     format = 'histogram'
-    def __init__(self, streamObj, *args, **keywords):
-        super(PlotHistogram, self).__init__(streamObj, *args, **keywords)
 
     def _extractData(self, dataValueLegit=True):
         data = {}
@@ -3657,7 +3655,7 @@ class PlotDolan(PlotHorizontalBarWeighted):
             return # keep what the user set
 
         instStream = self.streamObj.flat.getElementsByClass('Instrument')
-        if len(instStream) == 0:
+        if not instStream:
             return # do not set anything
         
         if len(instStream) == 4 and self.streamObj.getElementById('Soprano') is not None:
@@ -3964,8 +3962,6 @@ class Plot3DBars(PlotStream):
     Base class for Stream plotting classes.
     '''
     format = '3dBars'
-    def __init__(self, streamObj, *args, **keywords):
-        super(Plot3DBars, self).__init__(streamObj, *args, **keywords)
 
     def _extractData(self):
         # TODO: add support for chords
@@ -4252,7 +4248,7 @@ def getPlotsToMake(*args, **keywords):
     #environLocal.printDebug(['got args pre conversion', args])
     # if no args, use pianoroll
     foundClassName = None
-    if (len(args) == 0 
+    if (not args 
             and showFormat == '' 
             and not values):
         showFormat = 'horizontalbar'
@@ -4331,12 +4327,12 @@ def getPlotsToMake(*args, **keywords):
                 plotMakeCandidates.append(sortTuple)
 
         # if no matches, try something more drastic:
-        if len(plotMake) == 0 and len(plotMakeCandidates) > 0:
+        if not plotMake and plotMakeCandidates:
             plotMakeCandidates.sort(key=lambda x: (x[0], x[1].__name__.lower()) )
             # last in list has highest score; second item is class
             plotMake.append(plotMakeCandidates[-1][1])
 
-        elif len(plotMake) == 0: # none to make and no candidates
+        elif not plotMake: # none to make and no candidates
             for plotClassName in plotClasses:
                 # create a list of all possible identifiers
                 plotClassIdentifiers = [plotClassName.format.lower()]
@@ -4346,7 +4342,7 @@ def getPlotsToMake(*args, **keywords):
                     if requestedValue.lower() in plotClassIdentifiers:
                         plotMake.append(plotClassName)
                         break
-                if len(plotMake) > 0: # found a match
+                if plotMake: # found a match
                     break
     #environLocal.printDebug(['plotMake', plotMake])
     return plotMake

@@ -368,7 +368,7 @@ class ScoreReduction(object):
                     #environLocal.printDebug([
                     #  '_createReduction(): found reductive note, rn', rn, 'group', gName])
                     gMeasure = gMeasures[rn.measureIndex]
-                    if len(gMeasure.voices) == 0: # common setup routines
+                    if not gMeasure.voices: # common setup routines
                         # if no voices, start by removing rests
                         gMeasure.removeByClass('Rest')
                         for vId in self._reductiveVoices:
@@ -692,10 +692,13 @@ class PartReduction(object):
                     # for each event span, find the targeted object
                     offsetStart = ds['eStart']
                     offsetEnd = offsetStart + ds['span']
-                    match = flatRef.getElementsByOffset(offsetStart, offsetEnd,
-                        includeEndBoundary=False, mustFinishInSpan=False, 
-                        mustBeginInSpan=True).getElementsByClass(target).stream()
-                    if len(match) == 0:
+                    match = flatRef.getElementsByOffset(
+                                offsetStart, 
+                                offsetEnd,
+                                includeEndBoundary=False, 
+                                mustFinishInSpan=False, 
+                                mustBeginInSpan=True).getElementsByClass(target).stream()
+                    if not match:
                         w = None
                     else:
                         w = targetToWeight(match)
@@ -719,7 +722,7 @@ class PartReduction(object):
                     match.extendDuration(target, inPlace=True)
                     #match.show('t')
                     dsFirst = copy.deepcopy(ds)
-                    if len(match) == 0:
+                    if not match:
                         # weight is not known
                         finalBundle.append(dsFirst)
                         continue

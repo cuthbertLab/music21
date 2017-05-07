@@ -739,9 +739,9 @@ class Converter(object):
         
         filteredSubConvertersList = []
         for sc in subConverterList:
-            if converterType == 'input' and len(sc.registerInputExtensions) == 0:
+            if converterType == 'input' and not sc.registerInputExtensions:
                 continue
-            if converterType == 'output' and len(sc.registerOutputExtensions) == 0:
+            if converterType == 'output' and not sc.registerOutputExtensions:
                 continue
             filteredSubConvertersList.append(sc)
                      

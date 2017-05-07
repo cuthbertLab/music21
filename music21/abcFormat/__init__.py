@@ -600,7 +600,7 @@ class ABCMetadata(ABCToken):
         # get a symbolic and numerical value if available
         number = None
         referent = None
-        if len(nonText) > 0:
+        if nonText:
             if '=' in nonText:
                 durs, number = nonText.split('=')
                 number = float(number)
@@ -2459,7 +2459,7 @@ class ABCHandler(object):
         if currentABCHandler is not None:
             currentABCHandler.tokens = activeTokens
 
-        if len(ahDict) == 0:
+        if not ahDict:
             ahDict[None] = ABCHandler()
         
         for thisABCHandler in ahDict.values():
@@ -2761,7 +2761,7 @@ class ABCHandler(object):
             # boundaries are inclusive; need to add one here
             ah.tokens = self._tokens[xClip:yClip + 1]
             # after bar assign, if no bars known, reject
-            if len(ah) == 0:
+            if not ah:
                 continue 
             post.append(ah)
 

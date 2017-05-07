@@ -1087,12 +1087,12 @@ class CommandProcessor(object):
         return_obj['dataDict'] = {}
         return_obj['errorList'] = []
         
-        if len(self.errorList) > 0:
+        if self.errorList:
             return_obj['status'] = "error"
             return_obj['errorList'] = self.errorList
             return return_obj
         
-        if len(self.returnDict) == 0:
+        if not self.returnDict:
             iterItems = [(k, 'str') for k in sorted(list(self.parsedDataDict.items()))]
         else:
             iterItems = sorted(list(self.returnDict.items()))
@@ -1119,7 +1119,7 @@ class CommandProcessor(object):
             return_obj['dataDict'][dataName] = {"fmt":fmt, "data":dataStr}
             
         
-        if len(self.errorList) > 0:
+        if self.errorList:
             return_obj['status'] = "error"
             return_obj['errorList'] = self.errorList
             return return_obj
@@ -1243,7 +1243,7 @@ class CommandProcessor(object):
         to the server:
         "text/plain", "application/json", "text/html", etc.
         '''
-        if len(self.errorList) > 0:
+        if self.errorList:
             output = "<br />".join([":".join(e) for e in self.errorList])
             outputType = 'text/html'
         

@@ -216,9 +216,9 @@ class Notation(object):
             
             number = None
             modifierString = None
-            if not len(m1) == 0:
+            if m1:
                 number = int(m1[0].strip())
-            if not len(m2) == 0:
+            if m2:
                 modifierString = m2[0].strip()
                 
             numbers.append(number)
@@ -471,7 +471,7 @@ class Modifier(object):
         >>> m5.accidental
         <accidental flat>
         '''
-        if self.modifierString is None or len(self.modifierString) == 0:
+        if not self.modifierString:
             return None
         
         a = pitch.Accidental()
