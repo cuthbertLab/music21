@@ -137,7 +137,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
     correlation = correlation[lengthCorrelation:]
     difference = numpy.diff(correlation) #  Calculates the difference between slots
     positiveDifferences = matplotlib.mlab.find(difference > 0)
-    if not positiveDifferences:
+    if len(positiveDifferences) == 0: # pylint: disable=len-as-condition
         finalResult = 10 # Rest
     else:
         beginning = positiveDifferences[0]

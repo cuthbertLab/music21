@@ -90,7 +90,7 @@ def main(fnAccept=None, strict=False):
                 'locally-disabled', # test for this later, but hopefully will know what 
                             # they're doing
 
-                'duplicate-code', # needs to ignore strings -- keeps getting doctests...
+                #'duplicate-code', # needs to ignore strings -- keeps getting doctests...
 
                 'abstract-class-instantiated', # this trips on the fractions.Fraction() class.
                 'fixme', # known...
@@ -147,6 +147,7 @@ def main(fnAccept=None, strict=False):
            r'--dummy-variables-rgx="_$|dummy|unused|i$|j$|junk|counter"', 
            '--docstring-min-length=3',
            '--ignore-docstrings=yes',
+           '--min-similarity-lines=8',
            '--max-args=' + str(maxArgs),  # should be 5 later, but baby steps
            '--bad-names="foo,shit,fuck,stuff"', # definitely allow "bar" for barlines
            '--reports=n',
