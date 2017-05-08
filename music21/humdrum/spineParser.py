@@ -140,7 +140,7 @@ class HumdrumDataCollection(object):
         
         
         self.globalEventsInserted = None
-        if not dataStream:
+        if dataStream is not None and not dataStream:
             raise HumdrumException("dataStream is not optional, specify some lines")
         elif isinstance(dataStream, six.string_types):
             dataStream = dataStream.splitlines()
@@ -152,7 +152,7 @@ class HumdrumDataCollection(object):
             except IOError:
                 raise
 
-    def parseLines(self, dataStream = None):
+    def parseLines(self, dataStream=None):
         '''
         Parse a list (dataStream) of lines into a HumdrumSpineCollection
         (which contains HumdrumSpines)
@@ -320,7 +320,7 @@ class HumdrumDataCollection(object):
         self._storedStream = opus
         return opus
 
-    def parseEventListFromDataStream(self, dataStream = None):
+    def parseEventListFromDataStream(self, dataStream=None):
         r'''
         Sets self.eventList from a dataStream (that is, a
         list of lines).  It sets self.maxSpines to the
@@ -742,7 +742,7 @@ class HumdrumFile(HumdrumDataCollection):
     A HumdrumFile is a HumdrumDataCollection which takes
     as a mandatory argument a filename to be opened and read.
     '''
-    def __init__(self, filename = None):
+    def __init__(self, filename=None):
         super(HumdrumFile, self).__init__()
         self.dataStream = None
         self._storedStream = None
@@ -1055,7 +1055,7 @@ class HumdrumSpine(object):
     def _getSpineCollection(self):
         return common.unwrapWeakref(self._spineCollection)
 
-    def _setSpineCollection(self, sc = None):
+    def _setSpineCollection(self, sc=None):
         self._spineCollection = common.wrapWeakref(sc)
 
     spineCollection = property(_getSpineCollection, _setSpineCollection)
@@ -1101,7 +1101,7 @@ class HumdrumSpine(object):
                     raise HumdrumException("Could not determine spineType " +
                                            "for spine with id " + str(self.id))
 
-    def _setSpineType(self, newSpineType = None):
+    def _setSpineType(self, newSpineType=None):
         self._spineType = newSpineType
 
     spineType = property(_getSpineType, _setSpineType)
@@ -1463,7 +1463,7 @@ class SpineEvent(object):
     protoSpineId = 0
     spineId = None
 
-    def __init__(self, contents = None, position = 0):
+    def __init__(self, contents=None, position=0):
         self.contents = contents
         self.position = position
 
@@ -1473,7 +1473,7 @@ class SpineEvent(object):
     def __str__(self):
         return self.contents
 
-    def toNote(self, convertString = None):
+    def toNote(self, convertString=None):
         r'''
         parse the object as a \*\*kern note and return the a
         :class:`~music21.note.Note` object (or Rest, or Chord)
@@ -1527,7 +1527,7 @@ class SpineCollection(object):
 
     next = __next__ # py2
 
-    def addSpine(self, streamClass = stream.Part):
+    def addSpine(self, streamClass=stream.Part):
         '''
         creates a new spine in the collection and returns it.
 
@@ -1552,7 +1552,7 @@ class SpineCollection(object):
         >>> newSpine2.stream
         <music21.stream.Stream ...>
         '''
-        self.newSpine = HumdrumSpine(self.nextFreeId, streamClass = streamClass)
+        self.newSpine = HumdrumSpine(self.nextFreeId, streamClass=streamClass)
         self.newSpine.spineCollection = self
         self.spines.append(self.newSpine)
         self.nextFreeId += 1
@@ -2276,7 +2276,7 @@ def hdStringToNote(contents):
 
     return thisObject
 
-def hdStringToMeasure(contents, previousMeasure = None):
+def hdStringToMeasure(contents, previousMeasure=None):
     '''
     kern uses an equals sign followed by processing instructions to
     create new measures.  Here is how...
@@ -2489,9 +2489,10 @@ def kernTandemToObject(tandem):
 
 
 class MiscTandem(base.Music21Object):
-    def __init__(self, tandem = ""):
-        base.Music21Object.__init__(self)
+    def __init__(self, tandem=""):
+        super(MiscTandem, self).__init__()        
         self.tandem = tandem
+
     def __repr__(self):
         return "<music21.humdrum.spineParser.MiscTandem %s humdrum control>" % self.tandem
 
@@ -2507,8 +2508,8 @@ class SpineComment(base.Music21Object):
     'this is a spine comment'
     '''
 
-    def __init__(self, comment = ""):
-        base.Music21Object.__init__(self)
+    def __init__(self, comment=""):
+        super(SpineComment, self).__init__()        
         commentPart = re.sub(r'^\!+\s?', '', comment)
         self.comment = commentPart
 
@@ -2527,8 +2528,8 @@ class GlobalComment(base.Music21Object):
     'this is a global comment'
     '''
 
-    def __init__(self, comment = ""):
-        base.Music21Object.__init__(self)
+    def __init__(self, comment=""):
+        super(GlobalComment, self).__init__()
         commentPart = re.sub(r'^\!\!+\s?', '', comment)
         commentPart = commentPart.strip()
         self.comment = commentPart
@@ -2561,8 +2562,8 @@ class GlobalReference(base.Music21Object):
 
     '''
 
-    def __init__(self, codeOrAll = "", valueOrNone = None):
-        base.Music21Object.__init__(self)
+    def __init__(self, codeOrAll="", valueOrNone=None):
+        super(GlobalReference, self).__init__()
         codeOrAll = re.sub(r'^\!\!\!+', '', codeOrAll)
         codeOrAll = codeOrAll.strip()
         if valueOrNone is None and ':' in codeOrAll:
@@ -2576,7 +2577,6 @@ class GlobalReference(base.Music21Object):
 
 
 class Test(unittest.TestCase):
-
     def runTest(self):
         pass
 

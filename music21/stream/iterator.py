@@ -337,6 +337,16 @@ class StreamIterator(object):
         1
         >>> bool(iterator.notes)
         True
+        >>> bool(iterator.notes)
+        True
+        
+        >>> iterator = s.recurse()
+        >>> bool(iterator)
+        True
+        >>> bool(iterator)
+        True
+        >>> bool(iterator)
+        True
 
         >>> bool(iterator.getElementsByClass('Chord'))
         False
@@ -1225,7 +1235,8 @@ class RecursiveIterator(StreamIterator):
     6
     >>> expressive[-1].measureNumber
     9
-        
+    >>> bool(expressive)
+    True
     '''
     def __init__(self, 
                  srcStream, 
@@ -1252,6 +1263,7 @@ class RecursiveIterator(StreamIterator):
         reset prior to iteration
         '''
         self.returnSelf = self.includeSelf
+        self.recursiveIterator = None
         super(RecursiveIterator, self).reset()
     
     def __next__(self):
