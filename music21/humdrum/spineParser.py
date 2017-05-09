@@ -128,8 +128,6 @@ class HumdrumDataCollection(object):
     parsedLines = False
 
     def __init__(self, dataStream=None, parseLines=True):
-        if dataStream is None:
-            dataStream = []
         # attributes
         self.eventList = None
         self.maxSpines = None
@@ -141,9 +139,13 @@ class HumdrumDataCollection(object):
         
         self.globalEventsInserted = None
         if dataStream is not None and not dataStream:
-            raise HumdrumException("dataStream is not optional, specify some lines")
+            raise HumdrumException("dataStream is not optional, specify some lines: \n" +
+                                   "DataStream was: " + repr(dataStream))
+        elif dataStream is None:
+            dataStream = []
         elif isinstance(dataStream, six.string_types):
             dataStream = dataStream.splitlines()
+
         self.dataStream = dataStream
         self._storedStream = None
         if parseLines is True:
