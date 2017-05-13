@@ -272,7 +272,7 @@ def search(query, field=None, corpusNames=None, fileExtensions=None):
     ...     'bach',
     ...     corpusNames=('core', 'virtual'),
     ...     )
-    <music21.metadata.bundles.MetadataBundle {151 entries}>
+    <music21.metadata.bundles.MetadataBundle {557 entries}>
 
     If ``corpusNames`` is None, all corpora known to music21 will be searched.
 

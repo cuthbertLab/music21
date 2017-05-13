@@ -217,7 +217,7 @@ class MetadataBundle(object):
     <music21.metadata.bundles.MetadataBundle {22 entries}>
     >>> tripleMeterBundle = coreBundle.search('3/4')
     >>> tripleMeterBundle
-    <music21.metadata.bundles.MetadataBundle {1867 entries}>
+    <music21.metadata.bundles.MetadataBundle {1870 entries}>
     >>> bachBundle.intersection(tripleMeterBundle)
     <music21.metadata.bundles.MetadataBundle {5 entries}>
 
@@ -262,7 +262,7 @@ class MetadataBundle(object):
         <music21.metadata.bundles.MetadataBundle {22 entries}>
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1867 entries}>
+        <music21.metadata.bundles.MetadataBundle {1870 entries}>
         >>> bachBundle & tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {5 entries}>
 
@@ -521,7 +521,7 @@ class MetadataBundle(object):
         <music21.metadata.bundles.MetadataBundle {22 entries}>
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1867 entries}>
+        <music21.metadata.bundles.MetadataBundle {1870 entries}>
         >>> bachBundle - tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {17 entries}>
 
@@ -550,9 +550,9 @@ class MetadataBundle(object):
 
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1867 entries}>
+        <music21.metadata.bundles.MetadataBundle {1870 entries}>
         >>> bachBundle ^ tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1879 entries}>
+        <music21.metadata.bundles.MetadataBundle {1882 entries}>
 
         Returns a new metadata bundle.
         '''
@@ -842,7 +842,7 @@ class MetadataBundle(object):
 
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1867 entries}>
+        <music21.metadata.bundles.MetadataBundle {1870 entries}>
 
         >>> bachBundle.difference(tripleMeterBundle)
         <music21.metadata.bundles.MetadataBundle {17 entries}>
@@ -870,7 +870,7 @@ class MetadataBundle(object):
 
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1867 entries}>
+        <music21.metadata.bundles.MetadataBundle {1870 entries}>
 
         >>> bachBundle.intersection(tripleMeterBundle)
         <music21.metadata.bundles.MetadataBundle {5 entries}>
@@ -909,7 +909,7 @@ class MetadataBundle(object):
 
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1867 entries}>
+        <music21.metadata.bundles.MetadataBundle {1870 entries}>
 
         >>> bachBundle.isdisjoint(tripleMeterBundle)
         False
@@ -987,6 +987,7 @@ class MetadataBundle(object):
         'alternativeTitle'
         'ambitus'
         'composer'
+        'copyright'
         'date'
         'keySignatureFirst'
         'keySignatures'
@@ -1164,9 +1165,9 @@ class MetadataBundle(object):
         <music21.metadata.bundles.MetadataBundle {22 entries}>
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1867 entries}>
+        <music21.metadata.bundles.MetadataBundle {1870 entries}>
         >>> bachBundle.symmetric_difference(tripleMeterBundle)
-        <music21.metadata.bundles.MetadataBundle {1879 entries}>
+        <music21.metadata.bundles.MetadataBundle {1882 entries}>
 
         Returns a new MetadataBundle.
         '''
