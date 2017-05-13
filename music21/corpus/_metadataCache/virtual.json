@@ -56,6 +56,7 @@
               "pitchHighest": "E-6",
               "pitchLowest": "B-3",
               "quarterLength": 858.0,
+              "sourcePath": "",
               "tempos": [],
               "timeSignatureFirst": "4/4",
               "timeSignatures": [
@@ -103,6 +104,7 @@
               "pitchHighest": "G4",
               "pitchLowest": "C2",
               "quarterLength": 168.0,
+              "sourcePath": "",
               "tempos": [],
               "timeSignatureFirst": "4/4",
               "timeSignatures": [
@@ -144,6 +146,7 @@
               "pitchHighest": "D6",
               "pitchLowest": "D2",
               "quarterLength": 228.0,
+              "sourcePath": "",
               "tempos": [],
               "timeSignatureFirst": "4/4",
               "timeSignatures": [
@@ -185,6 +188,7 @@
               "pitchHighest": "A5",
               "pitchLowest": "C#2",
               "quarterLength": 34.0,
+              "sourcePath": "",
               "tempos": [],
               "timeSignatureFirst": "2/4",
               "timeSignatures": [
@@ -226,6 +230,7 @@
               "pitchHighest": "C6",
               "pitchLowest": "C2",
               "quarterLength": 88.0,
+              "sourcePath": "",
               "tempos": [],
               "timeSignatureFirst": "4/4",
               "timeSignatures": [
@@ -273,6 +278,7 @@
               "pitchHighest": "C6",
               "pitchLowest": "C2",
               "quarterLength": 108.0,
+              "sourcePath": "",
               "tempos": [],
               "timeSignatureFirst": "4/4",
               "timeSignatures": [
@@ -314,6 +320,7 @@
               "pitchHighest": "C7",
               "pitchLowest": "A2",
               "quarterLength": 32.0,
+              "sourcePath": "",
               "tempos": [],
               "timeSignatureFirst": "2/4",
               "timeSignatures": [
@@ -355,6 +362,7 @@
               "pitchHighest": "F#6",
               "pitchLowest": "A1",
               "quarterLength": 32.0,
+              "sourcePath": "",
               "tempos": [],
               "timeSignatureFirst": "2/4",
               "timeSignatures": [
@@ -396,6 +404,7 @@
               "pitchHighest": "A6",
               "pitchLowest": "A1",
               "quarterLength": 34.0,
+              "sourcePath": "",
               "tempos": [],
               "timeSignatureFirst": "2/4",
               "timeSignatures": [
