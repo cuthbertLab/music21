@@ -885,6 +885,8 @@ class RichMetadata(Metadata):
         >>> rmd.getCorpusPath(b)
         'bach/bwv66.6.mxl'
         '''
+        if not hasattr(streamObj, 'filePath'):
+            return '' # for some abc files...
         if not streamObj.filePath:
             return ''
         corpusParts = streamObj.filePath.split(os.sep)
