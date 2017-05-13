@@ -987,6 +987,7 @@ class MetadataBundle(object):
         'alternativeTitle'
         'ambitus'
         'composer'
+        'corpusPath'
         'date'
         'keySignatureFirst'
         'keySignatures'

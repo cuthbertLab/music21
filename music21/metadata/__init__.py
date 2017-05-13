@@ -172,6 +172,7 @@ class Metadata(base.Music21Object):
         'ovm': 'volume',
         'txl': 'textLanguage',
         'txo': 'textOriginalLanguage',
+        'crp': 'corpusPath',
         }
 
     workIdLookupDict = {}
