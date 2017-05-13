@@ -472,7 +472,7 @@ class Metadata(base.Music21Object):
         elif (isinstance(query, six.string_types)
               and any(character in query for character in '*.|+?{}')):
             useRegex = True
-            reQuery = re.compile(query, flags=re.I)
+            reQuery = re.compile(query, flags=re.IGNORECASE) #  @UndefinedVariable
         if useRegex:
             for value, innerField in valueFieldPairs:
                 # re.I makes case insensitive
@@ -796,19 +796,18 @@ class RichMetadata(Metadata):
     >>> 'keySignatureFirst' in richMetadata.searchAttributes
     True
     >>> richMetadata.searchAttributes
-    ('alternativeTitle', 'ambitus', 'composer', 'date', 
+    ('alternativeTitle', 'ambitus', 'composer', 'corpusPath', 'date', 
      'keySignatureFirst', 'keySignatures', 'localeOfComposition', 
      'movementName', 'movementNumber', 'noteCount', 'number', 
      'opusNumber', 'pitchHighest', 'pitchLowest', 'quarterLength', 
      'tempoFirst', 'tempos', 'timeSignatureFirst', 'timeSignatures', 'title')
-
-
     '''
 
     ### CLASS VARIABLES ###
 
     searchAttributes = tuple(sorted(Metadata.searchAttributes + (
         'ambitus',
+        'corpusPath',
         'keySignatureFirst',
         'keySignatures',
         'noteCount',
@@ -824,7 +823,7 @@ class RichMetadata(Metadata):
     ### INITIALIZER ###
 
     def __init__(self, *args, **keywords):
-        Metadata.__init__(self, *args, **keywords)
+        super(RichMetadata, self).__init__(*args, **keywords)
         self.ambitus = None
         self.keySignatureFirst = None
         self.keySignatures = []
@@ -876,6 +875,28 @@ class RichMetadata(Metadata):
                 except AttributeError:
                     pass
 
+    def getCorpusPath(self, streamObj):
+        '''
+        Get a string of the path after the corpus for the piece...useful for
+        searching on corpus items without proper composer data...
+        
+        >>> rmd = metadata.RichMetadata()
+        >>> b = corpus.parse('bwv66.6')
+        >>> rmd.getCorpusPath(b)
+        'bach/bwv66.6.mxl'
+        '''
+        if not streamObj.filePath:
+            return ''
+        corpusParts = streamObj.filePath.split(os.sep)
+        try:         
+            corpusIndex = corpusParts.index('corpus')
+        except ValueError:
+            return ''
+        if corpusIndex == len(corpusParts) + 1:
+            return ''
+        relevantParts = corpusParts[corpusIndex + 1:]
+        return '/'.join(relevantParts)
+       
     def update(self, streamObj):
         r'''
         Given a Stream object, update attributes with stored objects.
@@ -894,7 +915,10 @@ class RichMetadata(Metadata):
         self.tempos = []
         self.timeSignatureFirst = None
         self.timeSignatures = []
-
+        
+        self.corpusPath = self.getCorpusPath(streamObj)
+        
+        
         # We combine element searching into a single loop to prevent
         # multiple traversals of the flattened stream.
         for element in flat:
