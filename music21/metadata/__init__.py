@@ -194,7 +194,7 @@ class Metadata(base.Music21Object):
 
         # TODO: need a specific object for copyright and imprint
         self._imprint = None
-        self._copyright = None
+        self.copyright = None
 
         # a dictionary of Text elements, where keys are work id strings
         # all are loaded with None by default
@@ -858,7 +858,7 @@ class RichMetadata(Metadata):
         # specifically name attributes to copy, as do not want to get all
         # Metadata is a m21 object
         localNames = [
-            'contributors', '_date', '_urls', '_imprint', '_copyright',
+            'contributors', '_date', '_urls', '_imprint', 'copyright',
             '_workIds',
             ]
         environLocal.printDebug(['RichMetadata: calling merge()'])

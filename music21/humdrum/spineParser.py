@@ -53,21 +53,23 @@ import unittest
 from music21.ext import six
 
 from music21 import articulations
-from music21 import chord
-from music21 import dynamics
-from music21 import base
-from music21 import duration
 from music21 import bar
+from music21 import base
+from music21 import chord
+from music21 import clef
+from music21 import common
+from music21 import dynamics
+from music21 import duration
+from music21 import exceptions21
+from music21 import expressions
 from music21 import key
 from music21 import note
-from music21 import expressions
+from music21 import meter
+from music21 import metadata
+from music21 import stream
 from music21 import tempo
 from music21 import tie
-from music21 import meter
-from music21 import clef
-from music21 import stream
-from music21 import common
-from music21 import exceptions21
+
 from music21.humdrum import testFiles
 from music21.humdrum import instruments
 
@@ -736,7 +738,26 @@ class HumdrumDataCollection(object):
                 if thisSpine.parentSpine is None and thisSpine.spineType == 'kern':
                     masterStream.insert(thisSpine.stream)
             self._storedStream = masterStream
+            self.parseMetadata()
             return masterStream
+
+    def parseMetadata(self):
+        '''
+        Create a metadata object for the file
+        '''
+        s = self._storedStream
+        md = metadata.Metadata()
+        s.metadata = md
+        grToRemove = []
+
+        for gr in s.recurse().getElementsByClass('GlobalReference'):
+            wasParsed = gr.updateMetadata(md)
+            if wasParsed:
+                grToRemove.append(gr)
+
+        if grToRemove:
+            s.remove(grToRemove, recurse=True)
+
 
 
 class HumdrumFile(HumdrumDataCollection):
@@ -2541,7 +2562,8 @@ class GlobalComment(base.Music21Object):
 
 class GlobalReference(base.Music21Object):
     '''
-    A Music21Object that represents a reference in the score
+    A Music21Object that represents a reference in the score, called a "reference record"
+    in Humdrum.  See Humdrum User's Guide Chapter 2.
 
 
     >>> sc = humdrum.spineParser.GlobalReference('!!!REF:this is a global reference')
@@ -2562,6 +2584,24 @@ class GlobalReference(base.Music21Object):
     >>> sc.value
     'this is a global reference'
 
+    Language codes are parsed:
+    
+    >>> sc = humdrum.spineParser.GlobalReference('!!!OPT@@RUS: Vesna svyashchennaya')
+    >>> sc.code
+    'OPT'
+    >>> sc.language
+    'RUS'
+    >>> sc.isPrimary
+    True
+    
+    >>> sc = humdrum.spineParser.GlobalReference('!!!OPT@FRE: Le sacre du printemps')
+    >>> sc.code
+    'OPT'
+    >>> sc.language
+    'FRE'
+    >>> sc.isPrimary
+    False
+    
     '''
 
     def __init__(self, codeOrAll="", valueOrNone=None):
@@ -2573,7 +2613,60 @@ class GlobalReference(base.Music21Object):
             codeOrAll = re.sub(r'\:.*$', '', codeOrAll)
         self.code = codeOrAll
         self.value = valueOrNone
+        self.language = None  # does it have a language code?
+        self.isPrimary = False # is this language marked as primary?
+        if '@@' in self.code:
+            self.isPrimary = True
+            self.code = self.code.replace('@@', '@')
+        if '@' in self.code:
+            self.code, self.language = self.code.split('@')
+            
+    def updateMetadata(self, md):
+        '''
+        update a metadata object according to information in this GlobalReference
+        
+        See humdrum guide Appendix I for information
+        '''
+        c = self.code
+        v = self.value
+        wasParsed = True
+        
+        contributorNames = {
+            'COM': 'composer',
+            'COA': 'attributed composer',
+            'COS': 'suspected composer',
+            'COL': 'composer alias',
+            'COC': 'corporate composer',
+            'LYR': 'lyricist',
+            'LIB': 'librettist',
+            'LAR': 'arranger',
+            'LOR': 'orchestrator',
+            'TRN': 'translator',
+            'YOO': 'original document owner',
+            'YOE': 'original editor',
+            'EED': 'electronic editor',
+            'ENC': 'electronic encoder'
+        }
+        
+        
+        if c in contributorNames:
+            contrib = metadata.Contributor()
+            contrib.role = contributorNames[c]
+            contrib.name = v
+            md.addContributor(contrib)
 
+        elif c.lower() in md.workIdAbbreviationDict:
+            md.setWorkId(c, v)
+        
+        elif c == 'YEC': # electronic edition copyright.
+            md.copyright = v
+        
+        else:
+            wasParsed = False
+        
+        return wasParsed
+        
+        
     def __repr__(self):
         return '<music21.humdrum.spineParser.GlobalReference %s "%s">' % (self.code, self.value)
 
@@ -2760,7 +2853,7 @@ class TestExternal(unittest.TestCase):
         hf1.stream.show()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":        
     import music21
     music21.mainTest(Test) #, runTest='testSplitSpines2') #, TestExternal)
 
