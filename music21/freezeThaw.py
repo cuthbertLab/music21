@@ -1062,6 +1062,7 @@ class JSONFreezeThawBase(object):
             'pitchHighest',
             'pitchLowest',
             'quarterLength',
+            'sourcePath',
             'tempos',
             'tempoFirst',
             'timeSignatureFirst',

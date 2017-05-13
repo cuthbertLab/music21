@@ -297,7 +297,7 @@ class Corpus(object):
         ...     predicate,
         ...     field='noteCount',
         ...     )
-        <music21.metadata.bundles.MetadataBundle {132 entries}>
+        <music21.metadata.bundles.MetadataBundle {134 entries}>
 
         '''
         return self.metadataBundle.search(

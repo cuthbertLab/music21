@@ -19,6 +19,22 @@ visit  :ref:`referenceCorpus`.  Note that music21 does not own
 most of the music in the corpus -- it has been licensed to us (or
 in a free license).  It may not be free in all parts of the world,
 but to the best of our knowledge is true for the US.
+
+Use `corpus.parse` if you know the name of a file in the corpus:
+
+>>> b = corpus.parse('bwv66.6')
+>>> b
+<music21.stream.Score 0x1050ce920>
+
+And use `corpus.search` if you do not:
+
+>>> cb = corpus.search('shandy')
+>>> cb
+<music21.metadata.bundles.MetadataBundle {1 entry}>
+>>> cb[0]
+<music21.metadata.bundles.MetadataEntry: airdsAirs_book1_abc_191>
+>>> cb[0].parse()
+<music21.stream.Score 0x1050ce940>
 '''
 from __future__ import unicode_literals
 
@@ -43,6 +59,8 @@ _MOD = "corpus.base.py"
 environLocal = environment.Environment(_MOD)
 
 from music21.exceptions21 import CorpusException
+
+from music21.corpus.manager import search
 #------------------------------------------------------------------------------
 
 
@@ -179,41 +197,6 @@ def cacheMetadata(corpusNames=('local',), verbose=True):
         # todo -- create cache names for local corpora
         manager._metadataBundles[name] = None
     metadata.caching.cacheMetadata(corpusNames, verbose=verbose)
-
-
-def search(
-    query,
-    field=None,
-    corpusNames=None,
-    fileExtensions=None,
-    ):
-    r'''
-    Search all stored metadata and return a list of file paths; to return a
-    list of parsed Streams, use `searchParse()`.
-
-    The `name` parameter can be used to specify one of three corpora: core
-    (included with music21), virtual (defined in music21 but hosted online),
-    and local (hosted on the user's system (not yet implemented)).
-
-    This method uses stored metadata and thus, on first usage, will incur a
-    performance penalty during metadata loading.
-    
-    >>> corpus.search('china')
-    <music21.metadata.bundles.MetadataBundle {1235 entries}>
-
-    >>> corpus.search('china', fileExtensions='.mid')
-    <music21.metadata.bundles.MetadataBundle {0 entries}>
-
-    >>> corpus.search('bach', field='composer')
-    <music21.metadata.bundles.MetadataBundle {22 entries}>
-   
-    >>> corpus.search('coltrane', corpusNames=('virtual',))
-    <music21.metadata.bundles.MetadataBundle {1 entry}>
-    '''
-    return manager.search(query,
-                        field=field,
-                        corpusNames=corpusNames,
-                        fileExtensions=fileExtensions)
 
 
 #------------------------------------------------------------------------------

@@ -243,16 +243,29 @@ def _addCorpusFilepathToStreamObject(streamObj, filePath):
     else:
         streamObj.corpusFilepath = filePath
 
-def search(
-    query,
-    field=None,
-    corpusNames=None,
-    fileExtensions=None,
-    ):
+def search(query, field=None, corpusNames=None, fileExtensions=None):
     '''
     Search all stored metadata bundles and return a list of file paths.
 
-    The ``names`` parameter can be used to specify which corpora to search,
+    This method uses stored metadata and thus, on first usage, will incur a
+    performance penalty during metadata loading.
+    
+    >>> corpus.search('china')
+    <music21.metadata.bundles.MetadataBundle {1235 entries}>
+
+    >>> corpus.search('china', fileExtensions='.mid')
+    <music21.metadata.bundles.MetadataBundle {0 entries}>
+
+    >>> corpus.search('bach', field='composer')
+    <music21.metadata.bundles.MetadataBundle {22 entries}>
+   
+    >>> corpus.search('coltrane', corpusNames=('virtual',))
+    <music21.metadata.bundles.MetadataBundle {1 entry}>
+    
+    This method is implemented in `corpus.manager` but loaded into corpus for
+    ease of use.
+    
+    The ``corpusNames`` parameter can be used to specify which corpora to search,
     for example:
 
     >>> corpus.manager.search(
@@ -261,10 +274,10 @@ def search(
     ...     )
     <music21.metadata.bundles.MetadataBundle {151 entries}>
 
-    If ``names`` is None, all corpora known to music21 will be searched.
+    If ``corpusNames`` is None, all corpora known to music21 will be searched.
 
-    This method uses stored metadata and thus, on first usage, will incur a
-    performance penalty during metadata loading.
+    See usersGuide (chapter 11) for more information on searching
+
     '''
     readAllMetadataBundlesFromDisk()
     allSearchResults = metadata.bundles.MetadataBundle()
@@ -354,6 +367,7 @@ def listSearchFields():
     'pitchHighest'
     'pitchLowest'
     'quarterLength'
+    'sourcePath'
     'tempoFirst'
     'tempos'
     'timeSignatureFirst'

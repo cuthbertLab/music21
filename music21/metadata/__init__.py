@@ -172,7 +172,6 @@ class Metadata(base.Music21Object):
         'ovm': 'volume',
         'txl': 'textLanguage',
         'txo': 'textOriginalLanguage',
-        'crp': 'corpusPath',
         }
 
     workIdLookupDict = {}
@@ -797,10 +796,11 @@ class RichMetadata(Metadata):
     >>> 'keySignatureFirst' in richMetadata.searchAttributes
     True
     >>> richMetadata.searchAttributes
-    ('alternativeTitle', 'ambitus', 'composer', 'corpusPath', 'date', 
+    ('alternativeTitle', 'ambitus', 'composer', 'date', 
      'keySignatureFirst', 'keySignatures', 'localeOfComposition', 
      'movementName', 'movementNumber', 'noteCount', 'number', 
-     'opusNumber', 'pitchHighest', 'pitchLowest', 'quarterLength', 
+     'opusNumber', 'pitchHighest', 'pitchLowest', 'quarterLength',
+     'sourcePath', 
      'tempoFirst', 'tempos', 'timeSignatureFirst', 'timeSignatures', 'title')
     '''
 
@@ -808,13 +808,13 @@ class RichMetadata(Metadata):
 
     searchAttributes = tuple(sorted(Metadata.searchAttributes + (
         'ambitus',
-        'corpusPath',
         'keySignatureFirst',
         'keySignatures',
         'noteCount',
         'pitchHighest',
         'pitchLowest',
         'quarterLength',
+        'sourcePath',
         'tempoFirst',
         'tempos',
         'timeSignatureFirst',
@@ -832,6 +832,7 @@ class RichMetadata(Metadata):
         self.pitchHighest = None
         self.pitchLowest = None
         self.quarterLength = None
+        self.sourcePath = ''
         self.tempoFirst = None
         self.tempos = []
         self.timeSignatureFirst = None
@@ -876,14 +877,14 @@ class RichMetadata(Metadata):
                 except AttributeError:
                     pass
 
-    def getCorpusPath(self, streamObj):
+    def getSourcePath(self, streamObj):
         '''
         Get a string of the path after the corpus for the piece...useful for
         searching on corpus items without proper composer data...
-        
+         
         >>> rmd = metadata.RichMetadata()
         >>> b = corpus.parse('bwv66.6')
-        >>> rmd.getCorpusPath(b)
+        >>> rmd.getSourcePath(b)
         'bach/bwv66.6.mxl'
         '''
         if not hasattr(streamObj, 'filePath'):
@@ -903,6 +904,20 @@ class RichMetadata(Metadata):
     def update(self, streamObj):
         r'''
         Given a Stream object, update attributes with stored objects.
+
+        >>> rmd = metadata.RichMetadata()
+        >>> rmd.keySignatureFirst is None
+        True
+        >>> rmd.sourcePath
+        ''
+        
+        >>> b = corpus.parse('bwv66.6')
+        >>> rmd.update(b)
+        >>> rmd.keySignatureFirst
+        '<music21.key.Key of f# minor>'
+        >>> rmd.sourcePath
+        'bach/bwv66.6.mxl'
+        
         '''
         from music21 import key
         from music21 import meter
@@ -919,7 +934,7 @@ class RichMetadata(Metadata):
         self.timeSignatureFirst = None
         self.timeSignatures = []
         
-        self.corpusPath = self.getCorpusPath(streamObj)
+        self.sourcePath = self.getSourcePath(streamObj)
         
         
         # We combine element searching into a single loop to prevent
