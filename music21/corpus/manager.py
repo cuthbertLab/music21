@@ -355,6 +355,7 @@ def listSearchFields():
     'alternativeTitle'
     'ambitus'
     'composer'
+    'copyright'
     'date'
     'keySignatureFirst'
     'keySignatures'

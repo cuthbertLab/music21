@@ -530,6 +530,7 @@ class ConverterHumdrum(SubConverter):
         >>> c = converter.subConverters.ConverterHumdrum()
         >>> s = c.parseData(humdata)
         >>> c.stream.show('text')
+        {0.0} <music21.metadata.Metadata object at 0x7f33545027b8>
         {0.0} <music21.stream.Part spine_0>
             {0.0} <music21.humdrum.spineParser.MiscTandem **kern humdrum control>
             {0.0} <music21.stream.Measure 1 offset=0.0>
