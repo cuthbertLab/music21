@@ -1741,7 +1741,9 @@ class Music21Object(object):
                 else:
                     offsetInStream = siteObj.elementOffset(self)
                     
-                positionInStream = st.modify(offset=offsetInStream + offsetAppend)
+                newOffset = opFrac(offsetInStream + offsetAppend)
+                    
+                positionInStream = st.modify(offset=newOffset)
             except SitesException:
                 continue # not a valid site any more.  Could be caught in derivationChain
             
@@ -4995,7 +4997,7 @@ _DOC_ORDER = [Music21Object, ElementWrapper]
 
 
 #------------------------------------------------------------------------------
-if __name__ == "__main__":
+if __name__ == "__main__":    
     mainTest(Test) #, runTest='testPreviousB')
 
 

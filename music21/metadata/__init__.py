@@ -104,7 +104,7 @@ class Metadata(base.Music21Object):
     made available by default.
 
     >>> md.searchAttributes
-    ('alternativeTitle', 'composer', 'date', 'localeOfComposition', 
+    ('alternativeTitle', 'composer', 'copyright', 'date', 'localeOfComposition', 
      'movementName', 'movementNumber', 'number', 'opusNumber', 'title')
     
     All contributors are stored in a .contributors list:
@@ -121,6 +121,7 @@ class Metadata(base.Music21Object):
     searchAttributes = (
         'alternativeTitle',
         'composer',
+        'copyright',
         'date',
         'localeOfComposition',
         'movementName',
@@ -264,11 +265,11 @@ class Metadata(base.Music21Object):
             else:
                 t = ('date', unicode(self._date)) # @UndefinedVariable
             allOut.append(t)
-        if self._copyright is not None:
+        if self.copyright is not None:
             if six.PY3:
-                t = ('copyright', str(self._copyright))
+                t = ('copyright', str(self.copyright))
             else:
-                t = ('copyright', unicode(self._copyright)) # @UndefinedVariable
+                t = ('copyright', unicode(self.copyright)) # @UndefinedVariable
             allOut.append(t)
             
         
@@ -796,7 +797,7 @@ class RichMetadata(Metadata):
     >>> 'keySignatureFirst' in richMetadata.searchAttributes
     True
     >>> richMetadata.searchAttributes
-    ('alternativeTitle', 'ambitus', 'composer', 'date', 
+    ('alternativeTitle', 'ambitus', 'composer', 'copyright', 'date', 
      'keySignatureFirst', 'keySignatures', 'localeOfComposition', 
      'movementName', 'movementNumber', 'noteCount', 'number', 
      'opusNumber', 'pitchHighest', 'pitchLowest', 'quarterLength',

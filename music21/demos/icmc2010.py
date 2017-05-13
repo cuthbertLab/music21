@@ -57,7 +57,7 @@ def bergEx01(show=True):
 *-
 '''
     from music21 import humdrum, meter, stream
-    score = humdrum.parseData(humdata).stream[0]
+    score = humdrum.parseData(humdata).stream.parts[0]
     if show:
         score.show()
    
