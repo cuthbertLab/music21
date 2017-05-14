@@ -409,7 +409,7 @@ class MetronomeMark(TempoIndication):
 #     90
 
     def __init__(self, text=None, number=None, referent=None, parentheses=False):
-        TempoIndication.__init__(self)
+        super(MetronomeMark, self).__init__()
 
         self._number = number # may be None
         self.numberImplicit = None
@@ -636,9 +636,9 @@ class MetronomeMark(TempoIndication):
 
 
     def _getDefaultNumber(self, tempoText):
-        '''Given a tempo text expression or an TempoText, get the default number.
+        '''
+        Given a tempo text expression or an TempoText, get the default number.
 
-        
         >>> mm = tempo.MetronomeMark()
         >>> mm._getDefaultNumber('schnell')
         132

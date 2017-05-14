@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -2115,7 +2115,7 @@ class PlotStream(object):
         # name strings are keys, and enharmonic are thus different
         nameCount = self.streamObj.pitchAttributeCount('name')
         ticks = []
-        for i in range(pcMin, pcMax+1):
+        for i in range(pcMin, pcMax + 1):
             p = pitch.Pitch()
             p.ps = i
             weights = [] # a list of pairs of count/label
@@ -2178,7 +2178,7 @@ class PlotStream(object):
         ticks = []
         cVals = range(pitchMin, pitchMax, 12)
         for i in cVals:
-            p = pitch.Pitch(ps = i)
+            p = pitch.Pitch(ps=i)
             ticks.append([i, '%s' % (p.nameWithOctave)])
         ticks = self._filterPitchLabel(ticks)
         return ticks
@@ -2196,9 +2196,9 @@ class PlotStream(object):
         [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72]
         '''
         ticks = []
-        cVals = range(pitchMin, pitchMax+1)
+        cVals = range(pitchMin, pitchMax + 1)
         for i in cVals:
-            p = pitch.Pitch(ps = i)
+            p = pitch.Pitch(ps=i)
             ticks.append([i, '%s' % (p.nameWithOctave)])
         ticks = self._filterPitchLabel(ticks)
         return ticks
@@ -2209,12 +2209,12 @@ class PlotStream(object):
         '''
         ticks = []
         cVals = []
-        for i in range(pitchMin, pitchMax+1):
+        for i in range(pitchMin, pitchMax + 1):
             cVals.append(i)
             if i != pitchMax: # if not last
-                cVals.append(i+.5)        
+                cVals.append(i + 0.5)        
         for i in cVals:
-            p = pitch.Pitch(ps = i)
+            p = pitch.Pitch(ps=i)
             # should be able to just use nameWithOctave
             ticks.append([i, '%s' % (p.nameWithOctave)])
         ticks = self._filterPitchLabel(ticks)
@@ -2222,7 +2222,7 @@ class PlotStream(object):
         return ticks
 
     def ticksPitchSpaceUsage(self, pcMin=36, pcMax=72,
-            showEnharmonic=False, blankLabelUnused=True, hideUnused=False):
+                             showEnharmonic=False, blankLabelUnused=True, hideUnused=False):
         '''
         Get ticks and labels for pitch space based on usage. That is, 
         show the most commonly used enharmonic first.
@@ -2246,26 +2246,27 @@ class PlotStream(object):
         # keys are integers
         # pcCount = self.streamObj.pitchAttributeCount('pitchClass')
         # name strings are keys, and enharmonic are thus different
-        nameWithOctaveCount = self.streamObj.pitchAttributeCount(
-                             'nameWithOctave')
+        nameWithOctaveCount = self.streamObj.pitchAttributeCount('nameWithOctave')
         ticks = []
-        for i in range(int(math.floor(pcMin)), int(math.ceil(pcMax+1))):
+        for i in range(int(math.floor(pcMin)), int(math.ceil(pcMax + 1))):
             p = pitch.Pitch()
             p.ps = i # set pitch space value
             weights = [] # a list of pairs of count/label
             for key in nameWithOctaveCount:
                 if pitch.Pitch(key).ps == i:
                     weights.append((nameWithOctaveCount[key], key))
-            weights.sort()
+            weights.sort(reverse=True)
             label = []
             if not weights: # get a default
                 if hideUnused:
                     continue
-                if not blankLabelUnused:
+                
+                if blankLabelUnused is False:
                     label.append(p.nameWithOctave)
                 else: # provide an empty label
                     label.append('')
-            elif not showEnharmonic: # get just the first weighted
+                    
+            elif showEnharmonic is False: # get just the first weighted
                 label.append(weights[0][1]) # second value is label
             else:      
                 sub = []
