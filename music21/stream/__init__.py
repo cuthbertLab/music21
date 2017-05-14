@@ -2522,7 +2522,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     # display methods; in the same manner as show() and write()
 
     def plot(self, *args, **keywords):
-        '''Given a method and keyword configuration arguments, create and display a plot.
+        '''
+        Given a method and keyword configuration arguments, create and display a plot.
 
         Note: plot() requires the Python package matplotib to be installed.
 

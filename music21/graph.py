@@ -103,12 +103,15 @@ class PlotStreamException(exceptions21.Music21Exception):
 def _substituteAccidentalSymbols(label):
     if not isinstance(label, six.string_types):
         return label
-    if '-' in label:
-        #label = label.replace('-', '&#x266d;') # ideally...
-        label = label.replace('-', r'$\flat$')
-    if '#' in label:
-#       label = label.replace('-', '&#x266f;') # ideally...
-        label = label.replace('#', r'$\sharp$')
+    if six.PY2 and isinstance(label, str):
+        label = six.u(label)
+    
+    for modifier, unicodeAcc in pitch.unicodeFromModifier.items():
+        if modifier != '' and modifier in label and modifier in ('-', '#'):
+            # ideally eventually matplotlib will do the other accidentals...
+            label = label.replace(modifier, unicodeAcc)
+            break 
+
     return label
 
 # define acceptable format and value strings
@@ -324,100 +327,39 @@ class Graph(object):
         for axisKey in self.axisKeys:
             self.axisRangeHasBeenSet[axisKey] = False
 
-        if 'alpha' in keywords:
-            self.alpha = keywords['alpha']
-        else:
-            self.alpha = 0.2
-
-        if 'dpi' in keywords:
-            self.dpi = keywords['dpi']
-        else:
-            self.dpi = None # do not set
-
-        # set the color of the background data region
-        if 'colorBackgroundData' in keywords:
-            self.colorBackgroundData = keywords['colorBackgroundData']
-        else:
-            self.colorBackgroundData = '#ffffff'
-
-        if 'colorBackgroundFigure' in keywords:
-            self.colorBackgroundFigure = keywords['colorBackgroundFigure']
-        else:
-            # color options: #c7d2d4', '#babecf'
-            self.colorBackgroundFigure = '#ffffff'
-
-        if 'colorGrid' in keywords:
-            self.colorGrid = keywords['colorGrid']
-        else:
-            self.colorGrid = '#666666'
-        
-        if 'title' in keywords:
-            self.title = keywords['title']
-        else:
-            self.title = 'Music21 Graph'
-   
-        if 'doneAction' in keywords:
-            self.setDoneAction(keywords['doneAction'])
-        else: # default is to write a file
-            self.setDoneAction('write')
-
-        if 'figureSize' in keywords and len(keywords['figureSize']) >= 2:
-            self.figureSize = keywords['figureSize']
-        else: # default is to write a file
-            self.figureSize = self.figureSizeDefault # (6, 6)
-
-        if 'marker' in keywords:
-            self.marker = keywords['marker']
-        else:
-            self.marker = 'o'
-        
-        if 'markerSize' in keywords:
-            self.markerSize = keywords['marker']
-        else:
-            self.markerSize = 6
-        
-        # define a list of one or more colors
-        # these will be applied cyclically to data prsented
-        if 'colors' in keywords:
-            self.colors = keywords['colors']
-        else:
-            self.colors = ['#605C7F', '#5c7f60', '#715c7f']
-
-        # font info
-        if 'tickFontSize' in keywords:
-            self.tickFontSize = keywords['tickFontSize']
-        else:
-            self.tickFontSize = 8
-
-        if 'titleFontSize' in keywords:
-            self.titleFontSize = keywords['titleFontSize']
-        else:
-            self.titleFontSize = 12
-
-        if 'labelFontSize' in keywords:
-            self.labelFontSize = keywords['labelFontSize']
-        else:
-            self.labelFontSize = 10
-
-        if 'fontFamily' in keywords:
-            self.fontFamily = keywords['fontFamily']
-        else:
-            self.fontFamily = 'serif'
-
+        self.alpha = 0.2 
+        self.dpi = None # determine on its own
+        self.colorBackgroundData = '#ffffff'  # color of the data region
+        self.colorBackgroundFigure = '#ffffff' # looking good are #c7d2d4, #babecf
+        self.colorGrid = '#666666' # grid color
+        self.title = 'Music21 Graph'
+        self.figureSize = self.figureSizeDefault
+        self.marker = 'o'
+        self.markerSize = 6
+        self.colors = ['#605C7F', '#5c7f60', '#715c7f']
+        self.tickFontSize = 8
+        self.titleFontSize = 12
+        self.labelFontSize = 10
+        self.fontFamily = 'serif'
         self.hideXGrid = False
-        if 'hideXGrid' in keywords:
-            self.hideXGrid = keywords['hideXGrid']
-
         self.hideYGrid = False
-        if 'hideYGrid' in keywords:
-            self.hideYGrid = keywords['hideYGrid']
-
         self.xTickLabelRotation = 0
         self.xTickLabelHorizontalAlignment = 'center'
         self.xTickLabelVerticalAlignment = 'center'
-
-        #self.hideYTick = True
-        #self.hideXTick = True
+        
+        self._doneAction = 'write'
+        
+        for kw in ('alpha', 'dpi', 'colorBackgroundData', 'colorBackgroundFigure',
+                     'colorGrid', 'title', 'figureSize', 'marker', 'markerSize',
+                     'colors', 'tickFontSize', 'titleFontSize', 'labelFontSize',
+                     'fontFamily', 'hideXGrid', 'hideYGrid', 
+                     'xTickLabelRotation', 
+                     'xTickLabelHorizontalAlignment', 'xTickLabelVerticalAlignment',
+                     'doneAction',
+                     ):
+            if kw in keywords:
+                setattr(self, kw, keywords[kw])
+                
 
     def _getFigure(self):
         '''
@@ -429,14 +371,18 @@ class Graph(object):
     def setData(self, data):
         self.data = data
 
-
-    def setDoneAction(self, action):
+    @property
+    def doneAction(self):
         '''
-        sets what should happen when the graph is created (see docs above)
+        returns or sets what should happen when the graph is created (see docs above)
         default is 'write'.
         '''
-        if action in ['show', 'write', None]:
-            self.doneAction = action
+        return self._doneAction
+
+    @doneAction.setter
+    def doneAction(self, action):
+        if action in ('show', 'write', None):
+            self._doneAction = action
         else: # pragma: no cover
             raise GraphException('not such done action: %s' % action)
 
@@ -2066,7 +2012,7 @@ class PlotStream(object):
 
     def ticksPitchClassUsage(self, pcMin=0, pcMax=11, showEnharmonic=True,
                              blankLabelUnused=True, hideUnused=False):
-        r'''
+        u'''
         Get ticks and labels for pitch classes.
         
         If `showEnharmonic` is `True` (default) then 
@@ -2082,9 +2028,9 @@ class PlotStream(object):
         ...            print (str(position) + " " + noteName)
         0 C
         2 D
-        3 D$\sharp$
+        3 D♯
         4 E
-        6 F$\sharp$
+        6 F♯
         7 G
         9 A
         11 B
@@ -2143,7 +2089,7 @@ class PlotStream(object):
         return ticks
 
     def ticksPitchClass(self, pcMin=0, pcMax=11):
-        r'''
+        u'''
         Utility method to get ticks in pitch classes
 
         Uses the default label for each pitch class regardless of what is in the `Stream`
@@ -2152,10 +2098,20 @@ class PlotStream(object):
         
         >>> s = stream.Stream()
         >>> a = graph.PlotStream(s)
-        >>> a.ticksPitchClass()
-        [[0, 'C'], [1, 'C$\\sharp$'], [2, 'D'], [3, 'E$\\flat$'], 
-         [4, 'E'], [5, 'F'], [6, 'F$\\sharp$'], [7, 'G'], [8, 'G$\\sharp$'], 
-         [9, 'A'], [10, 'B$\\flat$'], [11, 'B']]
+        >>> for ps, label in a.ticksPitchClass():
+        ...     print(str(ps) + " " + label)
+        0 C
+        1 C♯
+        2 D
+        3 E♭
+        4 E
+        5 F
+        6 F♯
+        7 G
+        8 G♯
+        9 A
+        10 B♭
+        11 B        
         '''
         ticks = []
         for i in range(pcMin, pcMax+1):
@@ -2185,13 +2141,19 @@ class PlotStream(object):
 
 
     def ticksPitchSpaceChromatic(self, pitchMin=36, pitchMax=100):
-        r'''Utility method to get ticks in pitch space values.
+        u'''Utility method to get ticks in pitch space values.
 
         
         >>> s = stream.Stream()
         >>> a = graph.PlotStream(s)
-        >>> a.ticksPitchSpaceChromatic(20, 24)
-        [[20, 'G$\\sharp$0'], [21, 'A0'], [22, 'B$\\flat$0'], [23, 'B0'], [24, 'C1']]
+        >>> for ps, label in a.ticksPitchSpaceChromatic(20, 24):
+        ...     print(str(ps) + " " + label)
+        20 G♯0
+        21 A0
+        22 B♭0
+        23 B0
+        24 C1
+
         >>> [x for x,y in a.ticksPitchSpaceChromatic(60, 72)]
         [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72]
         '''

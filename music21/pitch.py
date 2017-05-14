@@ -16,10 +16,13 @@ Each :class:`~music21.note.Note` object has a `Pitch` object embedded in it.
 Some of the methods below, such as `Pitch.name`, `Pitch.step`, etc. are
 made available directly in the `Note` object, so they will seem familiar.
 '''
-from __future__ import division, print_function
+from __future__ import division, print_function, absolute_import
 
-import copy, math, itertools
+import copy
+import math
+import itertools
 import unittest
+from collections import OrderedDict
 
 from music21 import base
 from music21 import common
@@ -68,6 +71,7 @@ PITCH_SPACE_SIG_DIGITS = 6
 # are given in the set Accidental.set() method
 MICROTONE_OPEN = '('
 MICROTONE_CLOSE = ')'
+
 accidentalNameToModifier = {
     'natural': '',
     'sharp': '#',
@@ -82,7 +86,25 @@ accidentalNameToModifier = {
     'one-and-a-half-sharp': '#~',
     'half-flat': '`',
     'one-and-a-half-flat': '-`',
-    }
+}
+
+unicodeFromModifier = OrderedDict([
+    ('####', u'\uD834\uDD2A\uD834\uDD2A'),
+    ('###', u'\u266f\uD834\uDD2A'),
+    ('##', u'\uD834\uDD2A'), # 1D12A  # note that this must be expressed as a surrogate pair
+    ('#~', u'\u266f\uD834\uDD32'), # 1D132
+    ('#', u'\u266f'),
+    ('~', u'\uD834\uDD32'), # 1D132
+    ('----', u'\uD834\uDD2B\uD834\uDD2B'),
+    ('---', u'\u266D'),
+    ('--', u'\uD834\uDD2B'),
+    ('-`', u'\u266D\uD834\uDD32'),
+    ('-', u'\u266D'),
+    ('`', u'\uD834\uDD32'), # 1D132 # raised flat: 1D12C
+    ('', u'\u266e'), # natural
+])
+ 
+
 
 # sort modifiers by length, from longest to shortest
 def _sortModifiers():
@@ -1156,42 +1178,28 @@ class Accidental(style.StyleMixin):
 
     @property
     def unicode(self):
-        '''
-        Return a unicode representation of this accidental or the best ascii representation
+        u'''
+        Return a unicode representation of this accidental or the best unicode representation
         if that is not possible.
+        
+        >>> flat = pitch.Accidental('flat')
+        >>> print(flat.unicode)
+        ♭
+        
+        Compare:
+        
+        >>> sharp = pitch.Accidental('sharp')
+        >>> print(sharp.modifier)
+        #
+        >>> print(sharp.unicode)
+        ♯
         '''
         # all unicode musical symbols can be found here:
         # http://www.fileformat.info/info/unicode/block/musical_symbols/images.htm
-
-        if self.name == 'natural':
-            # 266E
-            return u'\u266e'
-
-        elif self.name == 'sharp':
-            # 266F
-            return u'\u266f'
-        # http://www.fileformat.info/info/unicode/char/1d12a/index.htm
-        elif self.name == 'double-sharp':
-            # 1D12A
-            # note that this must be expressed as a surrogate pair
-            return u'\uD834\uDD2A'
-        elif self.name == 'half-sharp':
-            # 1D132
-            return u'\uD834\uDD32'
-
-        elif self.name == 'flat':
-            # 266D
-            return u'\u266D'
-        elif self.name == 'double-flat':
-            # 1D12B
-            return u'\uD834\uDD2B'
-        elif self.name == 'half-flat':
-            # 1D133
-            # raised flat: 1D12C
-            return u'\uD834\uDD33'
-
-        else: # get our best ascii representation
-            return self.modifier
+        if self.modifier in unicodeFromModifier:
+            return unicodeFromModifier[self.modifier]
+        else: # get our best representation
+            return six.u(self.modifier)
 
     @property
     def fullName(self):
