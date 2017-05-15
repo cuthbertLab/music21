@@ -99,8 +99,23 @@ class GraphException(exceptions21.Music21Exception):
 class PlotStreamException(exceptions21.Music21Exception):
     pass
 
-# temporary
-def _substituteAccidentalSymbols(label):
+def accidentalLabelToUnicode(label):
+    u'''
+    Changes a label possibly containing a modifier such as "-" or "#" into
+    a unicode string.
+    
+    >>> print(graph.accidentalLabelToUnicode('B-4'))
+    B♭4
+     
+    Since matplotlib's default fonts do not support double sharps or double flats,
+    etc. these are converted as best we can...
+    
+    >>> print(graph.accidentalLabelToUnicode('B--4'))
+    B♭♭4
+     
+    In Python 2, all strings are converted to unicode strings even if there is
+    no need to.
+    '''
     if not isinstance(label, six.string_types):
         return label
     if six.PY2 and isinstance(label, str):
@@ -163,6 +178,9 @@ VALUES = ['pitch', 'pitchspace', 'ps', 'pitchclass', 'pc', 'duration',
 def userValuesToValues(valueList):
     '''
     Given a value list, replace string with synonyms. Let unmatched values pass.
+    
+    >>> graph.userValuesToValues(['pitchSpace', 'Duration'])
+    ['pitch', 'quarterlength']
     '''  
     post = []
     for value in valueList:
@@ -301,17 +319,13 @@ class Graph(object):
         
         defaults to .figureSizeDefault
         
-
+    >>> a = graph.Graph(title='a graph of some data to be given soon', tickFontSize=9)
+    >>> a.data = ['some', 'arbitrary', 'data', 14, 9.04, None]
     '''
     axisKeys = ('x', 'y')
     figureSizeDefault = (6, 6)
 
     def __init__(self, *args, **keywords):
-        '''
-        >>> a = graph.Graph(title='a graph of some data to be given soon', tickFontSize=9)
-        >>> a.data = ['some', 'arbitrary', 'data', 14, 9.04, None]
-        
-        '''
         _getExtendedModules()
         self.data = None
         self.fig = None
@@ -359,8 +373,7 @@ class Graph(object):
                      ):
             if kw in keywords:
                 setattr(self, kw, keywords[kw])
-                
-
+    
     def _getFigure(self):
         '''
         Configure and return a figure object -- does nothing in the abstract class
@@ -417,10 +430,10 @@ class Graph(object):
         '''
         if pairs is None: # is okay to send an empty list to clear everything...
             return
+        
         if axisKey not in self.axis:
             raise GraphException("Cannot find key '{}' in self.axis".format(axisKey))
         
-
         positions = []
         labels = []
         # ticks are value, label pairs
@@ -678,8 +691,7 @@ class Graph(object):
 class GraphNetworxGraph(Graph):
     ''' 
     Grid a networkx graph -- which is a graph of nodes and edges.
-    Requires the optional networkx module.
-    
+    Requires the optional networkx module.    
     '''
 #     
 #     >>> #_DOCS_SHOW g = graph.GraphNetworxGraph()
@@ -774,8 +786,7 @@ class GraphColorGrid(Graph):
     
     Data is provided as a list of lists of colors, where colors are specified as a hex triplet, 
     or the common HTML color codes, and based on analysis-specific mapping of colors to results.
-    
-    
+        
     
     >>> #_DOCS_SHOW g = graph.GraphColorGrid()
     >>> g = graph.GraphColorGrid(doneAction=None) #_DOCS_HIDE
@@ -1000,7 +1011,7 @@ class GraphColorGridLegend(Graph):
         ax.set_xticks([x + 1 for x in range(len(rowData))])
         # get labels from row data; first of pair
         # need to push y down as need bottom alignment for lower case
-        substitutedAccidentalLabels = [_substituteAccidentalSymbols(x) 
+        substitutedAccidentalLabels = [accidentalLabelToUnicode(x) 
                                             for x, unused_y in rowData]
         ax.set_xticklabels(
             substitutedAccidentalLabels, 
@@ -1116,16 +1127,15 @@ class GraphHorizontalBar(Graph):
 
 
 class GraphHorizontalBarWeighted(Graph):
-    
+    '''
+    Numerous horizontal bars in discrete channels, 
+    where bars can be incomplete and/or overlap, and 
+    can have different heights and colors within their 
+    respective channel.
+    '''    
     figureSizeDefault = (10, 4)
 
     def __init__(self, *args, **keywords):
-        '''
-        Numerous horizontal bars in discrete channels, 
-        where bars can be incomplete and/or overlap, and 
-        can have different heights and colors within their 
-        respective channel.
-        '''
         super(GraphHorizontalBarWeighted, self).__init__(*args, **keywords)
         
         self._barSpace = 8 
@@ -1195,7 +1205,7 @@ class GraphHorizontalBarWeighted(Graph):
                 if x not in xPoints:
                     xPoints.append(x)
                 if x+span not in xPoints:
-                    xPoints.append(x+span)
+                    xPoints.append(x + span)
 
                 # TODO: add high/low shift to position w/n range
                 # provide a list of start, end points;
@@ -1311,9 +1321,9 @@ class GraphScatterWeighted(Graph):
         xDistort = 1
         yDistort = 1
         if xRange > yRange:
-            yDistort = float(yRange)/xRange
+            yDistort = yRange / xRange
         elif yRange > xRange:
-            xDistort = float(xRange)/yRange
+            xDistort = xRange / yRange
         #environLocal.printDebug(['xDistort, yDistort', xDistort, yDistort])
 
         zNorm = []
@@ -1459,9 +1469,7 @@ class GraphHistogram(Graph):
 
     .. image:: images/GraphHistogram.*
         :width: 600
-
     '''
-
     def __init__(self, *args, **keywords):
         super(GraphHistogram, self).__init__(*args, **keywords)
         
@@ -1716,8 +1724,6 @@ class Graph3DPolygonBars(Graph):
         Axes3D = extm.Axes3D
         collections = extm.collections
         
-        cc = lambda arg: matplotlib.colors.colorConverter.to_rgba(getColor(arg),
-                                alpha=self.alpha)
         self.fig = plt.figure()
         ax = Axes3D(self.fig)
 
@@ -1734,6 +1740,9 @@ class Graph3DPolygonBars(Graph):
 
         yVals = []
         xVals = []
+
+        cc = lambda arg: matplotlib.colors.colorConverter.to_rgba(getColor(arg), alpha=self.alpha)
+        
         for key in zVals: 
             verts_i = []
             for i in range(len(self.data[key])):
@@ -1741,12 +1750,12 @@ class Graph3DPolygonBars(Graph):
                 yVals.append(y)
                 xVals.append(x)
                 # this draws the bar manually
-                verts_i.append([x-(self.barWidth*.5),0])
-                verts_i.append([x-(self.barWidth*.5),y])
-                verts_i.append([x+(self.barWidth*.5),y])
-                verts_i.append([x+(self.barWidth*.5),0])
-            verts.append(verts_i)      
-            vertsColor.append(cc(colors[q%len(colors)]))
+                verts_i.append([x - (self.barWidth * 0.5), 0])
+                verts_i.append([x - (self.barWidth * 0.5), y])
+                verts_i.append([x + (self.barWidth * 0.5), y])
+                verts_i.append([x + (self.barWidth * 0.5), 0])
+            verts.append(verts_i)
+            vertsColor.append(cc(colors[q % len(colors)]))
             q += 1
 
         # this actually appears as the w
@@ -1781,19 +1790,14 @@ class Graph3DPolygonBars(Graph):
         if self.useKeyValues is True:
             zs = zVals
         else:
-            zs = range(low, high+1)
+            zs = range(low, high + 1)
 
         poly = collections.PolyCollection(verts, facecolors=vertsColor)
         poly.set_alpha(self.alpha)
-
+        
         ax.add_collection3d(poly, zs=zs, zdir='y')
         self.applyFormatting(ax)
         self.callDoneAction()
-
-
-
-
-
 
 #-------------------------------------------------------------------------------
 # graphing utilities that operate on streams
@@ -1811,7 +1815,7 @@ class PlotStream(object):
     # the following static parameters are used to for matching this
     # plot based on user-requested string aguments
     # a string representation of the type of graph
-    format = ''
+    format = 'genericPlotStream'
     # store a list of parameters that are graphed
     values = [] # this seems not good!
 
@@ -1828,12 +1832,16 @@ class PlotStream(object):
         self.data = None # store native data representation, useful for testing
         self.graph = None  # store instance of graph class here
 
+        self.fx = lambda n : 1 # a function to give the data for the x values
+        self.fy = lambda n : 1 # a function to give the data for the y values
+
         # store axis label type for time-based plots
         # either measure or offset
         self.useMeasuresForAxisLabel = None
 
     #---------------------------------------------------------------------------
-    def _extractChordDataOneAxis(self, fx, c):
+    @staticmethod
+    def _extractChordDataOneAxis(fx, c):
         '''
         Look for Note-like attributes in a Chord. This is done by first 
         looking at the Chord, and then, if attributes are not found, looking at each pitch. 
@@ -1844,10 +1852,11 @@ class PlotStream(object):
             value = fx(c)
         except AttributeError:
             pass # do not try others
+        
         if value is not None:
             values.append(value)
 
-        if values == []: # still not set, get form chord
+        if not values: # still not set, get form chord
             for n in c:
                 # try to get get values from note inside chords
                 value = None
@@ -1855,12 +1864,13 @@ class PlotStream(object):
                     value = fx(n)
                 except AttributeError: # pragma: no cover
                     break # do not try others
+ 
                 if value is not None:
                     values.append(value)
         return values
 
-
-    def _extractChordDataTwoAxis(self, fx, fy, c, matchPitchCount=False):
+    @staticmethod
+    def _extractChordDataTwoAxis(fx, fy, c, matchPitchCount=False):
         xValues = []
         yValues = []
         x = None
@@ -1942,18 +1952,24 @@ class PlotStream(object):
 
         Subclass dependent data extracted is stored in the self.data attribute. 
         '''
+        if self.graph is None: # pragma: no cover
+            raise GraphException('Need graph to be set before processing')
         self.graph.process()
 
     def show(self): # pragma: no cover
         '''
         Call internal Graphs show() method independently of doneAction set and run with process()
         '''
+        if self.graph is None: # pragma: no cover
+            raise GraphException('Need graph to be set before processing')
         self.graph.show()
 
     def write(self, fp=None): # pragma: no cover
         '''
         Call internal Graphs write() method independently of doneAction set and run with process()
         '''
+        if self.graph is None: # pragma: no cover
+            raise GraphException('Need graph to be set before processing')
         self.graph.write(fp)
 
 
@@ -1994,17 +2010,20 @@ class PlotStream(object):
     #---------------------------------------------------------------------------
 
 
-
-    def _filterPitchLabel(self, ticks):
-        '''
+    @staticmethod
+    def makePitchLabelsUnicode(ticks):
+        u'''
         Given a list of ticks, replace all labels with alternative/unicode symbols where necessary.
+        
+        >>> 
+        
         '''
         #environLocal.printDebug(['calling filterPitchLabel', ticks])
         # this uses tex mathtext, which happens to define sharp and flat
         #http://matplotlib.org/users/mathtext.html
         post = []
         for value, label in ticks:
-            label = _substituteAccidentalSymbols(label)
+            label = accidentalLabelToUnicode(label)
             post.append([value, label])
             #post.append([value, unicode(label)])
         return post
@@ -2085,7 +2104,7 @@ class PlotStream(object):
                     sub.append(name)
                 label.append('/'.join(sub))
             ticks.append([i, ''.join(label)])
-        ticks = self._filterPitchLabel(ticks)
+        ticks = self.makePitchLabelsUnicode(ticks)
         return ticks
 
     def ticksPitchClass(self, pcMin=0, pcMax=11):
@@ -2118,14 +2137,13 @@ class PlotStream(object):
             p = pitch.Pitch()
             p.ps = i
             ticks.append([i, '%s' % p.name])
-        ticks = self._filterPitchLabel(ticks)
+        ticks = self.makePitchLabelsUnicode(ticks)
         return ticks
    
     def ticksPitchSpaceOctave(self, pitchMin=36, pitchMax=100):
         '''
         Utility method to get ticks in pitch space only for every octave.
 
-        
         >>> s = stream.Stream()
         >>> a = graph.PlotStream(s)
         >>> a.ticksPitchSpaceOctave()
@@ -2136,13 +2154,13 @@ class PlotStream(object):
         for i in cVals:
             p = pitch.Pitch(ps=i)
             ticks.append([i, '%s' % (p.nameWithOctave)])
-        ticks = self._filterPitchLabel(ticks)
+        ticks = self.makePitchLabelsUnicode(ticks)
         return ticks
 
 
     def ticksPitchSpaceChromatic(self, pitchMin=36, pitchMax=100):
-        u'''Utility method to get ticks in pitch space values.
-
+        u'''
+        Utility method to get ticks in pitch space values.
         
         >>> s = stream.Stream()
         >>> a = graph.PlotStream(s)
@@ -2162,7 +2180,7 @@ class PlotStream(object):
         for i in cVals:
             p = pitch.Pitch(ps=i)
             ticks.append([i, '%s' % (p.nameWithOctave)])
-        ticks = self._filterPitchLabel(ticks)
+        ticks = self.makePitchLabelsUnicode(ticks)
         return ticks
 
     def ticksPitchSpaceQuartertone(self, pitchMin=36, pitchMax=100):
@@ -2179,7 +2197,7 @@ class PlotStream(object):
             p = pitch.Pitch(ps=i)
             # should be able to just use nameWithOctave
             ticks.append([i, '%s' % (p.nameWithOctave)])
-        ticks = self._filterPitchLabel(ticks)
+        ticks = self.makePitchLabelsUnicode(ticks)
         environLocal.printDebug(['ticksPitchSpaceQuartertone', ticks])
         return ticks
 
@@ -2203,7 +2221,6 @@ class PlotStream(object):
         OMIT_FROM_DOCS
         TODO: this needs to look at key signature/key to determine defaults
         for undefined notes.
-
         '''
         # keys are integers
         # pcCount = self.streamObj.pitchAttributeCount('pitchClass')
@@ -2236,7 +2253,7 @@ class PlotStream(object):
                     sub.append(name)
                 label.append('/'.join(sub))
             ticks.append([i, ''.join(label)])
-        ticks = self._filterPitchLabel(ticks)
+        ticks = self.makePitchLabelsUnicode(ticks)
         return ticks
 
 
@@ -2282,11 +2299,8 @@ class PlotStream(object):
                     sub.append(name)
                 label.append('/'.join(sub))
             ticks.append([i, ''.join(label)])
-        ticks = self._filterPitchLabel(ticks)
+        ticks = self.makePitchLabelsUnicode(ticks)
         return ticks
-
-
-
 
     def ticksOffset(self, offsetMin=None, offsetMax=None, offsetStepSize=None,
                     displayMeasureNumberZero=False, minMaxOnly=False, 
@@ -2472,7 +2486,6 @@ class PlotStream(object):
     def ticksDynamics(self, minNameIndex=None, maxNameIndex=None):
         '''
         Utility method to get ticks in dynamic values:
-
         
         >>> s = stream.Stream()
         >>> a = graph.PlotStream(s)
@@ -2857,6 +2870,7 @@ class PlotHistogram(PlotStream):
             value = self.fx(noteObj)
             if value not in dataValues:
                 dataValues.append(value)
+                
         for chordObj in sSrc.getElementsByClass(chord.Chord):
             values = self._extractChordDataOneAxis(self.fx, chordObj)
             for value in values:
@@ -2898,9 +2912,10 @@ class PlotHistogram(PlotStream):
         yTickStep = round(countMax / 8)
         if yTickStep <= 1:
             yTickStep = 2
-        for y in range(0, countMax+1, yTickStep):
+        for y in range(0, countMax + 1, yTickStep):
             yTicks.append([y, '%s' % y])
         yTicks.sort()
+
         return data, xTicks, yTicks
 
 
@@ -2919,7 +2934,8 @@ class PlotHistogramPitchSpace(PlotHistogram):
     .. image:: images/PlotHistogramPitchSpace.*
         :width: 600
     '''
-    values = ['pitch']
+    values = ('pitch',)
+    
     def __init__(self, streamObj, *args, **keywords):
         super(PlotHistogramPitchSpace, self).__init__(streamObj, *args, **keywords)
 
@@ -2931,7 +2947,7 @@ class PlotHistogramPitchSpace(PlotHistogram):
         self.data, xTicks, yTicks = self._extractData()
 
         # filter xTicks to remove - in flat lables
-        xTicks = self._filterPitchLabel(xTicks)
+        xTicks = self.makePitchLabelsUnicode(xTicks)
 
         self.graph = GraphHistogram(*args, **keywords)
         self.graph.data = self.data
@@ -2970,7 +2986,8 @@ class PlotHistogramPitchClass(PlotHistogram):
         :width: 600
 
     '''
-    values = ['pitchClass']
+    values = ('pitchClass',)
+    
     def __init__(self, streamObj, *args, **keywords):
         super(PlotHistogramPitchClass, self).__init__(streamObj, *args, **keywords)
 
@@ -2982,7 +2999,7 @@ class PlotHistogramPitchClass(PlotHistogram):
         self.data, xTicks, yTicks = self._extractData()
 
         # filter xTicks to remove - in flat lables
-        xTicks = self._filterPitchLabel(xTicks)
+        xTicks = self.makePitchLabelsUnicode(xTicks)
 
         self.graph = GraphHistogram(*args, **keywords)
         self.graph.data = self.data
@@ -3015,11 +3032,12 @@ class PlotHistogramQuarterLength(PlotHistogram):
         :width: 600
 
     '''
-    values = ['quarterLength']
+    values = ('quarterLength',)
+    
     def __init__(self, streamObj, *args, **keywords):
         super(PlotHistogramQuarterLength, self).__init__(streamObj, *args, **keywords)
 
-        self.fx = lambda n:n.quarterLength
+        self.fx = lambda n: n.quarterLength
         self.fxTick = lambda n: n.quarterLength
 
         # will use self.fx and self.fxTick to extract data
@@ -3046,6 +3064,7 @@ class PlotScatter(PlotStream):
     '''Base class for 2D Scatter plots.
     '''
     format = 'scatter'
+    
     def __init__(self, streamObj, *args, **keywords):
         super(PlotScatter, self).__init__(streamObj, *args, **keywords)
 
@@ -3140,7 +3159,8 @@ class PlotScatterPitchSpaceQuarterLength(PlotScatter):
     .. image:: images/PlotScatterPitchSpaceQuarterLength.*
         :width: 600
     '''
-    values = ['pitch', 'quarterLength']
+    values = ('pitch', 'quarterLength')
+    
     def __init__(self, streamObj, *args, **keywords):
         super(PlotScatterPitchSpaceQuarterLength, self).__init__(streamObj, *args, **keywords)
 
