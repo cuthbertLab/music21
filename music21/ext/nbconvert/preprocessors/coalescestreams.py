@@ -4,7 +4,8 @@
 # Distributed under the terms of the Modified BSD License.
 
 import re
-from IPython.utils.log import get_logger
+import functools
+from traitlets.log import get_logger
 
 def cell_preprocessor(function):
     """
@@ -20,7 +21,7 @@ def cell_preprocessor(function):
     index : int
         Index of the cell being processed
     """
-    
+    @functools.wraps(function)
     def wrappedfunc(nb, resources):
         get_logger().debug(
                 "Applying preprocessor: %s", function.__name__

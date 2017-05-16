@@ -6,14 +6,17 @@
 
 import re
 from copy import copy
+from functools import partial
 
-from IPython.utils.py3compat import string_types
-from IPython.testing import decorators as dec
+from ipython_genutils.py3compat import string_types
+from ipython_genutils.testing import decorators as dec
 
 from ...tests.base import TestsBase
-from ..markdown import markdown2latex, markdown2html, markdown2rst
+from ..pandoc import convert_pandoc
+from ..markdown import markdown2html
 
 from jinja2 import Environment
+
 
 class TestMarkdown(TestsBase):
 
@@ -45,12 +48,13 @@ class TestMarkdown(TestsBase):
         ('test', 'https://google.com/'),
     ]
 
-
     @dec.onlyif_cmds_exist('pandoc')
     def test_markdown2latex(self):
         """markdown2latex test"""
         for index, test in enumerate(self.tests):
-            self._try_markdown(markdown2latex, test, self.tokens[index])
+            self._try_markdown(partial(convert_pandoc, from_format='markdown',
+                                       to_format='latex'), test,
+                               self.tokens[index])
 
     @dec.onlyif_cmds_exist('pandoc')
     def test_markdown2latex_markup(self):
@@ -58,7 +62,7 @@ class TestMarkdown(TestsBase):
         # This string should be passed through unaltered with pandoc's
         # markdown_strict reader
         s = '1) arabic number with parenthesis'
-        self.assertEqual(markdown2latex(s, markup='markdown_strict'), s)
+        self.assertEqual(convert_pandoc(s, 'markdown_strict', 'latex'), s)
         # This string should be passed through unaltered with pandoc's
         # markdown_strict+tex_math_dollars reader
         s = r'$\alpha$ latex math'
@@ -71,21 +75,25 @@ class TestMarkdown(TestsBase):
             # py2
             assertRegex = self.assertRegexpMatches
         assertRegex(
-            markdown2latex(s, markup='markdown_strict+tex_math_dollars'),
+            convert_pandoc(s, 'markdown_strict+tex_math_dollars', 'latex'),
             expected)
 
     @dec.onlyif_cmds_exist('pandoc')
     def test_pandoc_extra_args(self):
         # pass --no-wrap
         s = '\n'.join([
-            "#latex {{long_line | md2l('markdown', ['--no-wrap'])}}",
+            "#latex {{long_line | md2l(['--no-wrap'])}}",
             "#rst {{long_line | md2r(['--columns', '5'])}}",
         ])
         long_line = ' '.join(['long'] * 30)
         env = Environment()
         env.filters.update({
-            'md2l': markdown2latex,
-            'md2r': markdown2rst,
+            'md2l': lambda code, extra_args: convert_pandoc(
+                code, from_format='markdown', to_format='latex',
+                extra_args=extra_args),
+            'md2r': lambda code, extra_args: convert_pandoc(
+                code, from_format='markdown', to_format='rst',
+                extra_args=extra_args),
         })
         tpl = env.from_string(s)
         rendered = tpl.render(long_line=long_line)
@@ -111,7 +119,8 @@ class TestMarkdown(TestsBase):
             self._try_markdown(markdown2html, md, tokens)
 
     def test_markdown2html_math(self):
-        # Mathematical expressions should be passed through unaltered
+        # Mathematical expressions not containing <, >, & should be passed through unaltered
+        # all the "<", ">", "&" must be escaped correctly
         cases = [("\\begin{equation*}\n"
                   "\\left( \\sum_{k=1}^n a_k b_k \\right)^2 \\leq \\left( \\sum_{k=1}^n a_k^2 \\right) \\left( \\sum_{k=1}^n b_k^2 \\right)\n"
                   "\\end{equation*}"),
@@ -119,10 +128,38 @@ class TestMarkdown(TestsBase):
                   "a = 1 *3* 5\n"
                   "$$"),
                   "$ a = 1 *3* 5 $",
-                ]
+                  "$s_i = s_{i}\n$",
+                  "$a<b&b<lt$",
+                  "$a<b&lt;b>a;a-b<0$",
+                  "$<k'>$",
+                  "$$a<b&b<lt$$",
+                  "$$a<b&lt;b>a;a-b<0$$",
+                  "$$<k'>$$",
+                  """$
+\\begin{tabular}{ l c r }
+  1 & 2 & 3 \\
+  4 & 5 & 6 \\
+  7 & 8 & 9 \\
+\\end{tabular}$"""]
+
         for case in cases:
-            self.assertIn(case, markdown2html(case))
-    
+            result = markdown2html(case)
+            # find the equation in the generated texts
+            search_result = re.search("\$.*\$",result,re.DOTALL)
+            if search_result is None:
+                search_result = re.search("\\\\begin\\{equation.*\\}.*\\\\end\\{equation.*\\}",result,re.DOTALL)
+            math = search_result.group(0)
+            # the resulting math part can not contain "<", ">" or
+            # "&" not followed by "lt;", "gt;", or "amp;".
+            self.assertNotIn("<", math)
+            self.assertNotIn(">", math)
+            # python 2.7 has assertNotRegexpMatches instead of assertNotRegex
+            if not hasattr(self, 'assertNotRegex'):
+                self.assertNotRegex = self.assertNotRegexpMatches
+            self.assertNotRegex(math,"&(?![gt;|lt;|amp;])")
+            # the result should be able to be unescaped correctly
+            self.assertEquals(case,self._unescape(math))
+
     def test_markdown2html_math_mixed(self):
         """ensure markdown between inline and inline-block math"""
         case = """The entries of $C$ are given by the exact formula:
@@ -162,7 +199,8 @@ i.e. the $i^{th}$"""
         ]
 
         for case in cases:
-            self.assertIn(case, markdown2html(case))
+            s = markdown2html(case)
+            self.assertIn(case,self._unescape(s))
 
     @dec.onlyif_cmds_exist('pandoc')
     def test_markdown2rst(self):
@@ -174,13 +212,24 @@ i.e. the $i^{th}$"""
         tokens[1] = r'\*\*test'
 
         for index, test in enumerate(self.tests):
-            self._try_markdown(markdown2rst, test, tokens[index])
-
+            self._try_markdown(partial(convert_pandoc, from_format='markdown',
+                                       to_format='rst'), test, tokens[index])
 
     def _try_markdown(self, method, test, tokens):
         results = method(test)
         if isinstance(tokens, string_types):
-            assert tokens in results
+            self.assertIn(tokens, results)
         else:
             for token in tokens:
-                assert token in results
+                self.assertIn(token, results)
+
+    def _unescape(self,s):
+        # undo cgi.escape() manually
+        # We must be careful here for compatibility
+        # html.unescape() is not availale on python 2.7
+        # For more information, see:
+        # https://wiki.python.org/moin/EscapingHtml
+        s = s.replace("&lt;", "<")
+        s = s.replace("&gt;", ">")
+        s = s.replace("&amp;", "&")
+        return s

@@ -4,7 +4,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 from ..utils.base import NbConvertBase
-from IPython.utils.traitlets import Bool
+from traitlets import Bool
 
 
 class Preprocessor(NbConvertBase):
@@ -24,7 +24,7 @@ class Preprocessor(NbConvertBase):
         'c.YourPreprocessorName.enabled = True'
     """
     
-    enabled = Bool(False, config=True)
+    enabled = Bool(False).tag(config=True)
 
     def __init__(self, **kw):
         """
@@ -34,8 +34,8 @@ class Preprocessor(NbConvertBase):
         ----------
         config : Config
             Configuration file structure
-        **kw : misc
-            Additional arguments
+        `**kw`
+            Additional keyword arguments passed to parent
         """
         
         super(Preprocessor, self).__init__(**kw)

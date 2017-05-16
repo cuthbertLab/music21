@@ -8,6 +8,7 @@ Used from markdown.py
 from __future__ import print_function
 
 import re
+import cgi
 
 import mistune
 
@@ -16,18 +17,15 @@ from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 from pygments.util import ClassNotFound
 
-from IPython.nbconvert.filters.strings import add_anchor
-from IPython.nbconvert.utils.exceptions import ConversionException
-from IPython.utils.decorators import undoc
+from nbconvert.filters.strings import add_anchor
+from nbconvert.utils.exceptions import ConversionException
 
 
-@undoc
 class MathBlockGrammar(mistune.BlockGrammar):
     block_math = re.compile(r"^\$\$(.*?)\$\$", re.DOTALL)
     latex_environment = re.compile(r"^\\begin\{([a-z]*\*?)\}(.*?)\\end\{\1\}",
                                                 re.DOTALL)
 
-@undoc
 class MathBlockLexer(mistune.BlockLexer):
     default_rules = ['block_math', 'latex_environment'] + mistune.BlockLexer.default_rules
 
@@ -50,15 +48,15 @@ class MathBlockLexer(mistune.BlockLexer):
             'text': m.group(2)
         })
 
-@undoc
+
 class MathInlineGrammar(mistune.InlineGrammar):
-    math = re.compile(r"^\$(.+?)\$")
+    math = re.compile(r"^\$(.+?)\$", re.DOTALL)
     block_math = re.compile(r"^\$\$(.+?)\$\$", re.DOTALL)
     text = re.compile(r'^[\s\S]+?(?=[\\<!\[_*`~$]|https?://| {2,}\n|$)')
 
-@undoc
+
 class MathInlineLexer(mistune.InlineLexer):
-    default_rules = ['math', 'block_math'] + mistune.InlineLexer.default_rules
+    default_rules = ['block_math', 'math'] + mistune.InlineLexer.default_rules
 
     def __init__(self, renderer, rules=None, **kwargs):
         if rules is None:
@@ -71,7 +69,7 @@ class MathInlineLexer(mistune.InlineLexer):
     def output_block_math(self, m):
         return self.renderer.block_math(m.group(1))
 
-@undoc
+
 class MarkdownWithMath(mistune.Markdown):
     def __init__(self, renderer, **kwargs):
         if 'inline' not in kwargs:
@@ -86,7 +84,7 @@ class MarkdownWithMath(mistune.Markdown):
     def output_latex_environment(self):
         return self.renderer.latex_environment(self.token['name'], self.token['text'])
 
-@undoc
+
 class IPythonRenderer(mistune.Renderer):
     def block_code(self, code, lang):
         if lang:
@@ -107,16 +105,24 @@ class IPythonRenderer(mistune.Renderer):
         html = super(IPythonRenderer, self).header(text, level, raw=raw)
         return add_anchor(html)
 
-    # Pass math through unaltered - mathjax does the rendering in the browser
+    # We must be careful here for compatibility
+    # html.escape() is not availale on python 2.7
+    # For more details, see:
+    # https://wiki.python.org/moin/EscapingHtml
+    def escape_html(self,text):
+        return cgi.escape(text)
+
     def block_math(self, text):
-        return '$$%s$$' % text
+        return '$$%s$$' % self.escape_html(text)
 
     def latex_environment(self, name, text):
+        name = self.escape_html(name)
+        text = self.escape_html(text)
         return r'\begin{%s}%s\end{%s}' % (name, text, name)
 
     def inline_math(self, text):
-        return '$%s$' % text
+        return '$%s$' % self.escape_html(text)
 
 def markdown2html_mistune(source):
     """Convert a markdown string to HTML using mistune"""
-    return MarkdownWithMath(renderer=IPythonRenderer()).render(source)
+    return MarkdownWithMath(renderer=IPythonRenderer(escape=False)).render(source)

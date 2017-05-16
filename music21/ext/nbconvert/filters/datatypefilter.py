@@ -18,6 +18,7 @@ NbConvertBase.display_data_priority
 #-----------------------------------------------------------------------------
 
 from ..utils.base import NbConvertBase
+from warnings import warn
 
 __all__ = ['DataTypeFilter']
 
@@ -25,9 +26,19 @@ class DataTypeFilter(NbConvertBase):
     """ Returns the preferred display format """
         
     def __call__(self, output):
-        """ Return the first available format in the priority """
+        """ Return the first available format in the priority.
 
+        Produces a UserWarning if no compatible mimetype is found.
+        
+        `output` is dict with structure {mimetype-of-element: value-of-element}
+        
+        """
         for fmt in self.display_data_priority:
             if fmt in output:
                 return [fmt]
+        warn("Your element with mimetype(s) {mimetypes}"
+                      " is not able to be represented.".format(
+                          mimetypes=output.keys())
+                      )
+        
         return []

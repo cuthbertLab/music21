@@ -16,6 +16,10 @@
 
 ((* block input scoped *))
     \begin{Verbatim}[commandchars=\\\{\}]
+((*- if resources.global_content_filter.include_input_prompt *))
 ((( cell.source | highlight_code(strip_verbatim=True) | add_prompts )))
+((* else *))
+((( cell.source | highlight_code(strip_verbatim=True) )))
+((* endif *))
     \end{Verbatim}
 ((* endblock input *))

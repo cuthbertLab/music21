@@ -1,43 +1,48 @@
 """Markdown Exporter class"""
 
-#-----------------------------------------------------------------------------
-# Copyright (c) 2013, the IPython Development Team.
-#
+# Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
-#
-# The full license is in the file COPYING.txt, distributed with this software.
-#-----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
-
-from IPython.config import Config
+from traitlets import default
+from traitlets.config import Config
 
 from .templateexporter import TemplateExporter
 
-#-----------------------------------------------------------------------------
-# Classes
-#-----------------------------------------------------------------------------
 
 class MarkdownExporter(TemplateExporter):
     """
     Exports to a markdown document (.md)
     """
-    
+
+    @default('file_extension')
     def _file_extension_default(self):
         return '.md'
 
+    @default('template_file')
     def _template_file_default(self):
         return 'markdown'
 
     output_mimetype = 'text/markdown'
-    
+
+    @default('raw_mimetypes')
     def _raw_mimetypes_default(self):
         return ['text/markdown', 'text/html', '']
 
     @property
     def default_config(self):
-        c = Config({'ExtractOutputPreprocessor':{'enabled':True}})
-        c.merge(super(MarkdownExporter,self).default_config)
+        c = Config({
+            'ExtractOutputPreprocessor': {'enabled': True},
+            'NbConvertBase': {
+                'display_data_priority': ['text/html',
+                                          'text/markdown',
+                                          'image/svg+xml',
+                                          'text/latex',
+                                          'image/png',
+                                          'image/jpeg',
+                                          'text/plain'
+                                          ]
+            },
+
+        })
+        c.merge(super(MarkdownExporter, self).default_config)
         return c

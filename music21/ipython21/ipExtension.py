@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import music21.ipython21.objects
+# import music21.ipython21.objects
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
@@ -8,12 +8,15 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 def load_ipython_extension(ip):
     '''
     Special method to automatically make PNG objects display inline.
+    
+    MAY 2017: everything happens in converter.subConverters
     '''
-    pngFormatter = ip.display_formatter.formatters['image/png']
-    pngFormatter.for_type(music21.ipython21.objects.IPythonPNGObject, 
-                          music21.ipython21.objects.IPythonPNGObject.getData)
+#     pngFormatter = ip.display_formatter.formatters['image/png']
+#     pngFormatter.for_type(music21.ipython21.objects.IPythonPNGObject, 
+#                           music21.ipython21.objects.IPythonPNGObject.getData)
     # also get matplotlib going inline for free...
     ip.run_line_magic('matplotlib', 'inline')
-
+    # get retina figures in matplotlib
+    ip.run_line_magic('config', "InlineBackend.figure_format = 'retina'")
 
     

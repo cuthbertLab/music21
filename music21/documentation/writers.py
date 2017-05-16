@@ -460,7 +460,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
 
     def runNBConvert(self, ipythonNotebookFilePath):
         try:
-            from nbconvert import nbconvertapp as nb
+            from music21.ext.nbconvert import nbconvertapp as nb
         except ImportError:
             environLocal.warn("Using music21.ext.nbconvert -- this will stop working in " + 
                               "IPython4. use pip3 install nbconvert")        

@@ -9,11 +9,12 @@ import re
 
 from .base import ExportersTestsBase
 from ..latex import LatexExporter
-from IPython.nbformat import write
-from IPython.nbformat import v4
-from IPython.testing.decorators import onlyif_cmds_exist
-from IPython.utils.tempdir import TemporaryDirectory
+from nbformat import write
+from nbformat import v4
+from ipython_genutils.testing.decorators import onlyif_cmds_exist
+from testpath.tempdir import TemporaryDirectory
 
+from jinja2 import DictLoader
 
 class TestLatexExporter(ExportersTestsBase):
     """Contains test functions for latex.py"""
@@ -115,3 +116,16 @@ class TestLatexExporter(ExportersTestsBase):
 
         assert re.findall(in_regex, output) == ins
         assert re.findall(out_regex, output) == outs
+
+    def test_in_memory_template_tplx(self):
+        # Loads in an in memory latex template (.tplx) using jinja2.DictLoader
+        # creates a class that uses this template with the template_file argument
+        # converts an empty notebook using this mechanism
+        my_loader_tplx = DictLoader({'my_template': "{%- extends 'article.tplx' -%}"})
+        
+        class MyExporter(LatexExporter):
+            template_file = 'my_template'
+
+        exporter = MyExporter(extra_loaders=[my_loader_tplx])
+        nb = v4.new_notebook()
+        out, resources = exporter.from_notebook_node(nb)

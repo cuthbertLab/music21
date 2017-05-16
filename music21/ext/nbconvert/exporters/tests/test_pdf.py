@@ -5,8 +5,10 @@
 
 import logging
 import os
+import shutil
 
-from IPython.testing import decorators as dec
+from ipython_genutils.testing import decorators as dec
+from testpath import tempdir
 
 from .base import ExportersTestsBase
 from ..pdf import PDFExporter
@@ -26,11 +28,14 @@ class TestPDF(ExportersTestsBase):
         self.exporter_class()
 
 
-    @dec.onlyif_cmds_exist('pdflatex')
+    @dec.onlyif_cmds_exist('xelatex')
     @dec.onlyif_cmds_exist('pandoc')
     def test_export(self):
         """Smoke test PDFExporter"""
-        (output, resources) = self.exporter_class(latex_count=1).from_filename(self._get_notebook())
-        self.assertIsInstance(output, bytes)
-        assert len(output) > 0
+        with tempdir.TemporaryDirectory() as td:
+            newpath = os.path.join(td, os.path.basename(self._get_notebook()))
+            shutil.copy(self._get_notebook(), newpath)
+            (output, resources) = self.exporter_class(latex_count=1).from_filename(newpath)
+            self.assertIsInstance(output, bytes)
+            assert len(output) > 0
 

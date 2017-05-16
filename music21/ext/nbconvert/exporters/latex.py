@@ -1,30 +1,16 @@
 """LaTeX Exporter class"""
 
-#-----------------------------------------------------------------------------
-# Copyright (c) 2013, the IPython Development Team.
-#
+# Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
-#
-# The full license is in the file COPYING.txt, distributed with this software.
-#-----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
-
-# Stdlib imports
 import os
 
-# IPython imports
-from IPython.utils.traitlets import Unicode
-from IPython.config import Config
+from traitlets import Unicode, default
+from traitlets.config import Config
 
-from IPython.nbconvert.filters.highlight import Highlight2Latex
+from nbconvert.filters.highlight import Highlight2Latex
+from nbconvert.filters.filter_links import resolve_references
 from .templateexporter import TemplateExporter
-
-#-----------------------------------------------------------------------------
-# Classes and functions
-#-----------------------------------------------------------------------------
 
 class LatexExporter(TemplateExporter):
     """
@@ -36,38 +22,38 @@ class LatexExporter(TemplateExporter):
     subfolder of the "../templates" folder.
     """
 
+    @default('file_extension')
     def _file_extension_default(self):
         return '.tex'
 
+    @default('template_file')
     def _template_file_default(self):
         return 'article'
 
-    #Latex constants
+    # Latex constants
+    @default('default_template_path')
     def _default_template_path_default(self):
         return os.path.join("..", "templates", "latex")
 
+    @default('template_skeleton_path')
     def _template_skeleton_path_default(self):
         return os.path.join("..", "templates", "latex", "skeleton")
-
-    #Special Jinja2 syntax that will not conflict when exporting latex.
-    jinja_comment_block_start = Unicode("((=", config=True)
-    jinja_comment_block_end = Unicode("=))", config=True)
-    jinja_variable_block_start = Unicode("(((", config=True)
-    jinja_variable_block_end = Unicode(")))", config=True)
-    jinja_logic_block_start = Unicode("((*", config=True)
-    jinja_logic_block_end = Unicode("*))", config=True)
     
-    #Extension that the template files use.    
-    template_extension = Unicode(".tplx", config=True)
+    #Extension that the template files use.
+    template_extension = Unicode(".tplx").tag(config=True)
 
     output_mimetype = 'text/latex'
 
+    def default_filters(self):
+        for x in super(LatexExporter, self).default_filters():
+            yield x 
+        yield ('resolve_references', resolve_references)
 
     @property
     def default_config(self):
         c = Config({
             'NbConvertBase': {
-                'display_data_priority' : ['text/latex', 'application/pdf', 'image/png', 'image/jpeg', 'image/svg+xml', 'text/plain']
+                'display_data_priority' : ['text/latex', 'application/pdf', 'image/png', 'image/jpeg', 'image/svg+xml', 'text/markdown', 'text/plain']
                 },
              'ExtractOutputPreprocessor': {
                     'enabled':True
@@ -94,3 +80,16 @@ class LatexExporter(TemplateExporter):
         self.register_filter('highlight_code',
                              Highlight2Latex(pygments_lexer=lexer, parent=self))
         return super(LatexExporter, self).from_notebook_node(nb, resources, **kw)
+
+    def _create_environment(self):
+        environment = super(LatexExporter, self)._create_environment()
+
+        # Set special Jinja2 syntax that will not conflict with latex.
+        environment.block_start_string = "((*"
+        environment.block_end_string = "*))"
+        environment.variable_start_string = "((("
+        environment.variable_end_string = ")))"
+        environment.comment_start_string = "((="
+        environment.comment_end_string = "=))"
+
+        return environment

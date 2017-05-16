@@ -7,36 +7,59 @@ import subprocess
 import os
 import sys
 
-from IPython.utils.process import find_cmd
-from IPython.utils.traitlets import Integer, List, Bool, Instance
-from IPython.utils.tempdir import TemporaryWorkingDirectory
+from ipython_genutils.py3compat import which, cast_bytes_py2, getcwd
+from traitlets import Integer, List, Bool, Instance, Unicode
+from testpath.tempdir import TemporaryWorkingDirectory
 from .latex import LatexExporter
+
+class LatexFailed(IOError):
+    """Exception for failed latex run
+    
+    Captured latex output is in error.output.
+    """
+    def __init__(self, output):
+        self.output = output
+    
+    def __unicode__(self):
+        return u"PDF creating failed, captured latex output:\n%s" % self.output
+    
+    def __str__(self):
+        u = self.__unicode__()
+        return cast_bytes_py2(u)
 
 
 class PDFExporter(LatexExporter):
-    """Writer designed to write to PDF files"""
+    """Writer designed to write to PDF files.
 
-    latex_count = Integer(3, config=True,
+    This inherits from :class:`LatexExporter`. It creates a LaTeX file in
+    a temporary directory using the template machinery, and then runs LaTeX
+    to create a pdf.
+    """
+
+    latex_count = Integer(3,
         help="How many times latex will be called."
-    )
+    ).tag(config=True)
 
-    latex_command = List([u"pdflatex", u"{filename}"], config=True, 
+    latex_command = List([u"xelatex", u"{filename}"],
         help="Shell command used to compile latex."
-    )
+    ).tag(config=True)
 
-    bib_command = List([u"bibtex", u"{filename}"], config=True,
+    bib_command = List([u"bibtex", u"{filename}"],
         help="Shell command used to run bibtex."
-    )
+    ).tag(config=True)
 
-    verbose = Bool(False, config=True,
+    verbose = Bool(False,
         help="Whether to display the output of latex commands."
-    )
+    ).tag(config=True)
 
-    temp_file_exts = List(['.aux', '.bbl', '.blg', '.idx', '.log', '.out'], config=True,
+    temp_file_exts = List(['.aux', '.bbl', '.blg', '.idx', '.log', '.out'],
         help="File extensions of temp files to remove after running."
-    )
+    ).tag(config=True)
     
-    writer = Instance("IPython.nbconvert.writers.FilesWriter", args=())
+    texinputs = Unicode(help="texinputs dir. A notebook's directory is added")
+    writer = Instance("nbconvert.writers.FilesWriter", args=())
+    
+    _captured_output = List()
 
     def run_command(self, command_list, filename, count, log_function):
         """Run command_list count times.
@@ -65,18 +88,33 @@ class PDFExporter(LatexExporter):
             #We must use cp1252 encoding for calling subprocess.Popen
             #Note that sys.stdin.encoding and encoding.DEFAULT_ENCODING
             # could be different (cp437 in case of dos console)
-            command = [c.encode('cp1252') for c in command]        
+            command = [c.encode('cp1252') for c in command]
 
         # This will throw a clearer error if the command is not found
-        find_cmd(command_list[0])
+        cmd = which(command_list[0])
+        if cmd is None:
+            link = "https://nbconvert.readthedocs.io/en/latest/install.html#installing-tex"
+            raise OSError("{formatter} not found on PATH, if you have not installed "
+                          "{formatter} you may need to do so. Find further instructions "
+                          "at {link}.".format(formatter=command_list[0], link=link))
         
         times = 'time' if count == 1 else 'times'
         self.log.info("Running %s %i %s: %s", command_list[0], count, times, command)
+        
+        shell = (sys.platform == 'win32')
+        if shell:
+            command = subprocess.list2cmdline(command)
+        env = os.environ.copy()
+        env['TEXINPUTS'] = os.pathsep.join([
+            cast_bytes_py2(self.texinputs),
+            env.get('TEXINPUTS', ''),
+        ])
         with open(os.devnull, 'rb') as null:
             stdout = subprocess.PIPE if not self.verbose else None
             for index in range(count):
-                p = subprocess.Popen(command, stdout=stdout, stdin=null)
-                out, err = p.communicate()
+                p = subprocess.Popen(command, stdout=stdout, stderr=subprocess.STDOUT,
+                        stdin=null, shell=shell, env=env)
+                out, _ = p.communicate()
                 if p.returncode:
                     if self.verbose:
                         # verbose means I didn't capture stdout with PIPE,
@@ -85,16 +123,17 @@ class PDFExporter(LatexExporter):
                     else:
                         out = out.decode('utf-8', 'replace')
                     log_function(command, out)
+                    self._captured_output.append(out)
                     return False # failure
         return True # success
 
     def run_latex(self, filename):
-        """Run pdflatex self.latex_count times."""
+        """Run xelatex self.latex_count times."""
 
         def log_error(command, out):
             self.log.critical(u"%s failed: %s\n%s", command[0], command, out)
 
-        return self.run_command(self.latex_command, filename, 
+        return self.run_command(self.latex_command, filename,
             self.latex_count, log_error)
 
     def run_bib(self, filename):
@@ -109,7 +148,7 @@ class PDFExporter(LatexExporter):
         return self.run_command(self.bib_command, filename, 1, log_error)
 
     def clean_temp_files(self, filename):
-        """Remove temporary files created by pdflatex/bibtex."""
+        """Remove temporary files created by xelatex/bibtex."""
         self.log.info("Removing temporary LaTeX files")
         filename = os.path.splitext(filename)[0]
         for ext in self.temp_file_exts:
@@ -117,24 +156,31 @@ class PDFExporter(LatexExporter):
                 os.remove(filename+ext)
             except OSError:
                 pass
-
+    
     def from_notebook_node(self, nb, resources=None, **kw):
         latex, resources = super(PDFExporter, self).from_notebook_node(
             nb, resources=resources, **kw
         )
-        with TemporaryWorkingDirectory() as td:
-            notebook_name = "notebook"
+        # set texinputs directory, so that local files will be found
+        if resources and resources.get('metadata', {}).get('path'):
+            self.texinputs = resources['metadata']['path']
+        else:
+            self.texinputs = getcwd()
+        
+        self._captured_outputs = []
+        with TemporaryWorkingDirectory():
+            notebook_name = 'notebook'
             tex_file = self.writer.write(latex, resources, notebook_name=notebook_name)
             self.log.info("Building PDF")
             rc = self.run_latex(tex_file)
-            if not rc:
+            if rc:
                 rc = self.run_bib(tex_file)
-            if not rc:
+            if rc:
                 rc = self.run_latex(tex_file)
             
             pdf_file = notebook_name + '.pdf'
             if not os.path.isfile(pdf_file):
-                raise RuntimeError("PDF creating failed")
+                raise LatexFailed('\n'.join(self._captured_output))
             self.log.info('PDF successfully created')
             with open(pdf_file, 'rb') as f:
                 pdf_data = f.read()
@@ -142,6 +188,9 @@ class PDFExporter(LatexExporter):
         # convert output extension to pdf
         # the writer above required it to be tex
         resources['output_extension'] = '.pdf'
+        # clear figure outputs, extracted by latex export,
+        # so we don't claim to be a multi-file export.
+        resources.pop('outputs', None)
         
         return pdf_data, resources
     

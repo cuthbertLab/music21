@@ -3,7 +3,7 @@ This template builds upon the abstract template, adding common latex output
 functions.  Figures, data_text,
 This template does not define a docclass, the inheriting class must define this.=))
 
-((*- extends 'display_priority.tplx' -*))
+((*- extends 'document_contents.tplx' -*))
 
 %===============================================================================
 % Abstract overrides
@@ -13,13 +13,42 @@ This template does not define a docclass, the inheriting class must define this.
     ((* block docclass *))((* endblock docclass *))
     
     ((* block packages *))
-    \usepackage{graphicx} % Used to insert images
+    \usepackage[T1]{fontenc}
+    % Nicer default font (+ math font) than Computer Modern for most use cases
+    \usepackage{mathpazo}
+
+    % Basic figure setup, for now with no caption control since it's done
+    % automatically by Pandoc (which extracts ![](path) syntax from Markdown).
+    \usepackage{graphicx}
+    % We will generate all images so they have a width \maxwidth. This means
+    % that they will get their normal width if they fit onto the page, but
+    % are scaled down if they would overflow the margins.
+    \makeatletter
+    \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth
+    \else\Gin@nat@width\fi}
+    \makeatother
+    \let\Oldincludegraphics\includegraphics
+    % Set max figure width to be 80% of text width, for now hardcoded.
+    \renewcommand{\includegraphics}[1]{\Oldincludegraphics[width=.8\maxwidth]{#1}}
+    % Ensure that by default, figures have no caption (until we provide a
+    % proper Figure object with a Caption API and a way to capture that
+    % in the conversion process - todo).
+    \usepackage{caption}
+    \DeclareCaptionLabelFormat{nolabel}{}
+    \captionsetup{labelformat=nolabel}
+
     \usepackage{adjustbox} % Used to constrain images to a maximum size 
-    \usepackage{color} % Allow colors to be defined
+    \usepackage{xcolor} % Allow colors to be defined
     \usepackage{enumerate} % Needed for markdown enumerations to work
     \usepackage{geometry} % Used to adjust the document margins
     \usepackage{amsmath} % Equations
     \usepackage{amssymb} % Equations
+    \usepackage{textcomp} % defines textquotesingle
+    % Hack from http://tex.stackexchange.com/a/47451/13684:
+    \AtBeginDocument{%
+        \def\PYZsq{\textquotesingle}% Upright quotes in Pygmentized code
+    }
+    \usepackage{upquote} % Upright quotes for verbatim code
     \usepackage{eurosym} % defines \euro
     \usepackage[mathletters]{ucs} % Extended unicode (utf-8) support
     \usepackage[utf8x]{inputenc} % Allow utf-8 characters in the tex document
@@ -32,36 +61,35 @@ This template does not define a docclass, the inheriting class must define this.
     \usepackage{hyperref}
     \usepackage{longtable} % longtable support required by pandoc >1.10
     \usepackage{booktabs}  % table support for pandoc > 1.12.2
+    \usepackage[inline]{enumitem} % IRkernel/repr support (it uses the enumerate* environment)
+    \usepackage[normalem]{ulem} % ulem is needed to support strikethroughs (\sout)
+                                % normalem makes italics be italics, not underlines
     ((* endblock packages *))
 
     ((* block definitions *))
-    \definecolor{orange}{cmyk}{0,0.4,0.8,0.2}
-    \definecolor{darkorange}{rgb}{.71,0.21,0.01}
-    \definecolor{darkgreen}{rgb}{.12,.54,.11}
-    \definecolor{myteal}{rgb}{.26, .44, .56}
-    \definecolor{gray}{gray}{0.45}
-    \definecolor{lightgray}{gray}{.95}
-    \definecolor{mediumgray}{gray}{.8}
-    \definecolor{inputbackground}{rgb}{.95, .95, .85}
-    \definecolor{outputbackground}{rgb}{.95, .95, .95}
-    \definecolor{traceback}{rgb}{1, .95, .95}
-    % ansi colors
-    \definecolor{red}{rgb}{.6,0,0}
-    \definecolor{green}{rgb}{0,.65,0}
-    \definecolor{brown}{rgb}{0.6,0.6,0}
-    \definecolor{blue}{rgb}{0,.145,.698}
-    \definecolor{purple}{rgb}{.698,.145,.698}
-    \definecolor{cyan}{rgb}{0,.698,.698}
-    \definecolor{lightgray}{gray}{0.5}
-    
-    % bright ansi colors
-    \definecolor{darkgray}{gray}{0.25}
-    \definecolor{lightred}{rgb}{1.0,0.39,0.28}
-    \definecolor{lightgreen}{rgb}{0.48,0.99,0.0}
-    \definecolor{lightblue}{rgb}{0.53,0.81,0.92}
-    \definecolor{lightpurple}{rgb}{0.87,0.63,0.87}
-    \definecolor{lightcyan}{rgb}{0.5,1.0,0.83}
-    
+    % Colors for the hyperref package
+    \definecolor{urlcolor}{rgb}{0,.145,.698}
+    \definecolor{linkcolor}{rgb}{.71,0.21,0.01}
+    \definecolor{citecolor}{rgb}{.12,.54,.11}
+
+    % ANSI colors
+    \definecolor{ansi-black}{HTML}{3E424D}
+    \definecolor{ansi-black-intense}{HTML}{282C36}
+    \definecolor{ansi-red}{HTML}{E75C58}
+    \definecolor{ansi-red-intense}{HTML}{B22B31}
+    \definecolor{ansi-green}{HTML}{00A250}
+    \definecolor{ansi-green-intense}{HTML}{007427}
+    \definecolor{ansi-yellow}{HTML}{DDB62B}
+    \definecolor{ansi-yellow-intense}{HTML}{B27D12}
+    \definecolor{ansi-blue}{HTML}{208FFB}
+    \definecolor{ansi-blue-intense}{HTML}{0065CA}
+    \definecolor{ansi-magenta}{HTML}{D160C4}
+    \definecolor{ansi-magenta-intense}{HTML}{A03196}
+    \definecolor{ansi-cyan}{HTML}{60C6C8}
+    \definecolor{ansi-cyan-intense}{HTML}{258F8F}
+    \definecolor{ansi-white}{HTML}{C5C1B4}
+    \definecolor{ansi-white-intense}{HTML}{A1A6B2}
+
     % commands and environments needed by pandoc snippets
     % extracted from the output of `pandoc -s`
     \providecommand{\tightlist}{%
@@ -84,6 +112,26 @@ This template does not define a docclass, the inheriting class must define this.
     \newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
     \newcommand{\NormalTok}[1]{{#1}}
     
+    % Additional commands for more recent versions of Pandoc
+    \newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.53,0.00,0.00}{{#1}}}
+    \newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.73,0.40,0.53}{{#1}}}
+    \newcommand{\ImportTok}[1]{{#1}}
+    \newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.73,0.13,0.13}{\textit{{#1}}}}
+    \newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\VariableTok}[1]{\textcolor[rgb]{0.10,0.09,0.49}{{#1}}}
+    \newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
+    \newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.40,0.40,0.40}{{#1}}}
+    \newcommand{\BuiltInTok}[1]{{#1}}
+    \newcommand{\ExtensionTok}[1]{{#1}}
+    \newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.74,0.48,0.00}{{#1}}}
+    \newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.49,0.56,0.16}{{#1}}}
+    \newcommand{\InformationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    
+    
     % Define a nice break command that doesn't care if a line doesn't already
     % exist.
     \def\br{\hspace*{\fill} \\* }
@@ -103,9 +151,9 @@ This template does not define a docclass, the inheriting class must define this.
     \hypersetup{
       breaklinks=true,  % so long urls are correctly broken across lines
       colorlinks=true,
-      urlcolor=blue,
-      linkcolor=darkorange,
-      citecolor=darkgreen,
+      urlcolor=urlcolor,
+      linkcolor=linkcolor,
+      citecolor=citecolor,
       }
     % Slightly bigger margins than the latex defaults
     ((* block margins *))
@@ -130,76 +178,3 @@ This template does not define a docclass, the inheriting class must define this.
     ((* endblock postdoc *))
     \end{document}
 ((* endblock body *))
-
-%===============================================================================
-% Support blocks
-%===============================================================================
-
-% Displaying simple data text
-((* block data_text *))
-    \begin{verbatim}
-((( output.data['text/plain'] )))
-    \end{verbatim}
-((* endblock data_text *))
-
-% Display python error text as-is
-((* block error *))
-    \begin{Verbatim}[commandchars=\\\{\}]
-((( super() )))
-    \end{Verbatim}
-((* endblock error *))
-((* block traceback_line *))
-    ((( line | indent | strip_ansi | escape_latex )))
-((* endblock traceback_line *))
-
-% Display stream ouput with coloring
-((* block stream *))
-    \begin{Verbatim}[commandchars=\\\{\}]
-((( output.text | escape_latex | ansi2latex )))
-    \end{Verbatim}
-((* endblock stream *))
-
-% Display latex
-((* block data_latex -*))
-    ((*- if output.data['text/latex'].startswith('$'): -*))
-        ((= Replace $ symbols with more explicit, equation block. =))
-        \begin{equation*}\adjustbox{max width=\hsize}{$
-        ((( output.data['text/latex'] | strip_dollars )))
-        $}\end{equation*}
-    ((*- else -*))
-        ((( output.data['text/latex'] )))
-    ((*- endif *))
-((* endblock data_latex *))
-
-% Default mechanism for rendering figures
-((*- block data_png -*))((( draw_figure(output.metadata.filenames['image/png']) )))((*- endblock -*))
-((*- block data_jpg -*))((( draw_figure(output.metadata.filenames['image/jpeg']) )))((*- endblock -*))
-((*- block data_svg -*))((( draw_figure(output.metadata.filenames['image/svg+xml']) )))((*- endblock -*))
-((*- block data_pdf -*))((( draw_figure(output.metadata.filenames['application/pdf']) )))((*- endblock -*))
-
-% Draw a figure using the graphicx package.
-((* macro draw_figure(filename) -*))
-((* set filename = filename | posix_path *))
-((*- block figure scoped -*))
-    \begin{center}
-    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{((( filename )))}
-    \end{center}
-    { \hspace*{\fill} \\}
-((*- endblock figure -*))
-((*- endmacro *))
-
-% Redirect execute_result to display data priority.
-((* block execute_result scoped *))
-    ((* block data_priority scoped *))
-    ((( super() )))
-    ((* endblock *))
-((* endblock execute_result *))
-
-% Render markdown
-((* block markdowncell scoped *))
-    ((( cell.source | citation2latex | strip_files_prefix | markdown2latex )))
-((* endblock markdowncell *))
-
-% Don't display unknown types
-((* block unknowncell scoped *))
-((* endblock unknowncell *))

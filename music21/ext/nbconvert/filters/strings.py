@@ -11,14 +11,15 @@ templates.
 import os
 import re
 import textwrap
+import warnings
+
 try:
     from urllib.parse import quote  # Py 3
 except ImportError:
     from urllib2 import quote  # Py 2
 from xml.etree import ElementTree
 
-from IPython.core.interactiveshell import InteractiveShell
-from IPython.utils import py3compat
+from ipython_genutils import py3compat
 
 
 __all__ = [
@@ -76,8 +77,17 @@ def html2text(element):
     return text
 
 
+def _convert_header_id(header_contents):
+    """Convert header contents to valid id value. Takes string as input, returns string.
+    
+    Note: this may be subject to change in the case of changes to how we wish to generate ids.
+
+    For use on markdown headings.
+    """
+    return header_contents.replace(' ', '-')
+
 def add_anchor(html):
-    """Add an anchor-link to an html header
+    """Add an id and an anchor-link to an html header
     
     For use on markdown headings
     """
@@ -86,7 +96,7 @@ def add_anchor(html):
     except Exception:
         # failed to parse, just return it unmodified
         return html
-    link = html2text(h).replace(' ', '-')
+    link = _convert_header_id(html2text(h))
     h.set('id', link)
     a = ElementTree.Element("a", {"class" : "anchor-link", "href" : "#" + link})
     a.text = u'¶'
@@ -187,8 +197,17 @@ def ipython2python(code):
     code : str
         IPython code, to be transformed to pure Python
     """
-    shell = InteractiveShell.instance()
-    return shell.input_transformer_manager.transform_cell(code)
+    try:
+        from IPython.core.inputsplitter import IPythonInputSplitter
+    except ImportError:
+        warnings.warn(
+            "IPython is needed to transform IPython syntax to pure Python."
+            " Install ipython if you need this functionality."
+        )
+        return code
+    else:
+        isp = IPythonInputSplitter(line_input_checker=False)
+        return isp.transform_cell(code)
 
 def posix_path(path):
     """Turn a path into posix-style path/to/etc

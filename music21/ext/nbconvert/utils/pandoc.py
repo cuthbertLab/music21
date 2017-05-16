@@ -1,37 +1,25 @@
 """Utility for calling pandoc"""
-#-----------------------------------------------------------------------------
-# Copyright (c) 2014 the IPython Development Team.
-#
+# Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
-#
-# The full license is in the file COPYING.txt, distributed with this software.
-#-----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 
-# Stdlib imports
 import subprocess
 import warnings
 import re
 from io import TextIOWrapper, BytesIO
 
-# IPython imports
-from IPython.utils.py3compat import cast_bytes
-from IPython.utils.version import check_version
-from IPython.utils.process import is_cmd_found, FindCmdError
+from nbconvert.utils.version import check_version
+from ipython_genutils.py3compat import cast_bytes, which
 
 from .exceptions import ConversionException
 
-#-----------------------------------------------------------------------------
-# Classes and functions
-#-----------------------------------------------------------------------------
 _minimal_version = "1.12.1"
 
 def pandoc(source, fmt, to, extra_args=None, encoding='utf-8'):
-    """Convert an input string in format `from` to format `to` via pandoc.
+    """Convert an input string using pandoc.
+
+    Pandoc converts an input string `from` a format `to` a target format.
 
     Parameters
     ----------
@@ -84,7 +72,7 @@ def get_pandoc_version():
     global __version
 
     if __version is None:
-        if not is_cmd_found('pandoc'):
+        if not which('pandoc'):
             raise PandocMissing()
 
         out = subprocess.check_output(['pandoc', '-v'],
@@ -99,7 +87,7 @@ def get_pandoc_version():
 
 
 def check_pandoc_version():
-    """Returns True if minimal pandoc version is met.
+    """Returns True if pandoc's version meets at least minimal version.
 
     Raises
     ------
@@ -117,7 +105,7 @@ def check_pandoc_version():
     if not ok:
         warnings.warn( "You are using an old version of pandoc (%s)\n" % v + 
                        "Recommended version is %s.\nTry updating." % _minimal_version + 
-                       "http://johnmacfarlane.net/pandoc/installing.html.\nContinuing with doubts...",
+                       "http://pandoc.org/installing.html.\nContinuing with doubts...",
                        RuntimeWarning, stacklevel=2)
     return ok
 
@@ -125,11 +113,11 @@ def check_pandoc_version():
 # Exception handling
 #-----------------------------------------------------------------------------
 class PandocMissing(ConversionException):
-    """Exception raised when Pandoc is missing. """
+    """Exception raised when Pandoc is missing."""
     def __init__(self, *args, **kwargs):
         super(PandocMissing, self).__init__( "Pandoc wasn't found.\n" +
                                              "Please check that pandoc is installed:\n" +
-                                             "http://johnmacfarlane.net/pandoc/installing.html" )
+                                             "http://pandoc.org/installing.html" )
 
 #-----------------------------------------------------------------------------
 # Internal state management

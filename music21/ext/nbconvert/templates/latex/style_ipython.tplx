@@ -20,7 +20,9 @@
 %===============================================================================
 
 ((* block input scoped *))
+((*- if resources.global_content_filter.include_input_prompt *))
     ((( add_prompt(cell.source | highlight_code(strip_verbatim=True), cell, 'In ', 'incolor') )))
+((* endif *))
 ((* endblock input *))
 
 
@@ -30,10 +32,12 @@
 
 ((* block execute_result scoped *))
     ((*- for type in output.data | filter_data_type -*))
-        ((*- if type in ['text/plain']*))
-            ((( add_prompt(output.data['text/plain'] | escape_latex, cell, 'Out', 'outcolor') )))
-        ((* else -*))
+        ((*- if resources.global_content_filter.include_output_prompt -*))
+            ((*- if type in ['text/plain'] *))
+((( add_prompt(output.data['text/plain'] | escape_latex, cell, 'Out', 'outcolor') )))
+            ((* else -*))
 \texttt{\color{outcolor}Out[{\color{outcolor}((( cell.execution_count )))}]:}((( super() )))
+            ((*- endif -*))
         ((*- endif -*))
     ((*- endfor -*))
 ((* endblock execute_result *))

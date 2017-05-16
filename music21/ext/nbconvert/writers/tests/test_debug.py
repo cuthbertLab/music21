@@ -18,7 +18,7 @@ import sys
 
 from ...tests.base import TestsBase
 from ..debug import DebugWriter
-from IPython.utils.py3compat import PY3
+from ipython_genutils.py3compat import PY3
 
 if PY3:
     from io import StringIO

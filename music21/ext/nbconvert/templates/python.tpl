@@ -5,7 +5,9 @@
 {% endblock header %}
 
 {% block in_prompt %}
-# In[{{ cell.execution_count if cell.execution_count else ' ' }}]:
+{% if resources.global_content_filter.include_input_prompt -%}
+    # In[{{ cell.execution_count if cell.execution_count else ' ' }}]:
+{% endif %}
 {% endblock in_prompt %}
 
 {% block input %}

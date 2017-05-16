@@ -9,7 +9,12 @@
 
 {% block input %}
 {%- if cell.source.strip() -%}
-.. code:: python
+{{".. code:: "-}}
+{%- if 'pygments_lexer' in nb.metadata.get('language_info', {}) -%}
+    {{ nb.metadata.language_info.pygments_lexer }}
+{%- elif 'name' in nb.metadata.get('language_info', {}) -%}
+    {{ nb.metadata.language_info.name }}
+{%- endif %}
 
 {{ cell.source | indent}}
 {% endif -%}
@@ -43,11 +48,18 @@
 
 {% block data_png %}
 .. image:: {{ output.metadata.filenames['image/png'] | urlencode }}
+
+hello THERE!
+
 {% endblock data_png %}
 
 {% block data_jpg %}
 .. image:: {{ output.metadata.filenames['image/jpeg'] | urlencode }}
 {% endblock data_jpg %}
+
+{% block data_markdown %}
+{{ output.data['text/markdown'] | convert_pandoc("markdown", "rst") }}
+{% endblock data_markdown %}
 
 {% block data_latex %}
 .. math::
@@ -68,7 +80,7 @@
 {% endblock data_html %}
 
 {% block markdowncell scoped %}
-{{ cell.source | markdown2rst }}
+{{ cell.source | convert_pandoc("markdown", "rst") }}
 {% endblock markdowncell %}
 
 {%- block rawcell scoped -%}
@@ -78,7 +90,7 @@
 {%- endblock rawcell -%}
 
 {% block headingcell scoped %}
-{{ ("#" * cell.level + cell.source) | replace('\n', ' ') | markdown2rst }}
+{{ ("#" * cell.level + cell.source) | replace('\n', ' ') | convert_pandoc("markdown", "rst") }}
 {% endblock headingcell %}
 
 {% block unknowncell scoped %}

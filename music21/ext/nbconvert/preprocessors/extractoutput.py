@@ -5,15 +5,25 @@ notebook file.  The extracted outputs are returned in the 'resources' dictionary
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-import base64
+from binascii import a2b_base64
 import sys
 import os
 from mimetypes import guess_extension
 
-from IPython.utils.traitlets import Unicode, Set
+from traitlets import Unicode, Set
 from .base import Preprocessor
-from IPython.utils import py3compat
 
+def guess_extension_without_jpe(mimetype):
+    """
+    This function fixes a problem with '.jpe' extensions
+    of jpeg images which are then not recognised by latex.
+    For any other case, the function works in the same way
+    as mimetypes.guess_extension
+    """
+    ext = guess_extension(mimetype)
+    if ext==".jpe":
+        ext=".jpeg"
+    return ext
 
 class ExtractOutputPreprocessor(Preprocessor):
     """
@@ -22,9 +32,12 @@ class ExtractOutputPreprocessor(Preprocessor):
     """
 
     output_filename_template = Unicode(
-        "{unique_key}_{cell_index}_{index}{extension}", config=True)
+        "{unique_key}_{cell_index}_{index}{extension}"
+    ).tag(config=True)
 
-    extract_output_types = Set({'image/png', 'image/jpeg', 'image/svg+xml', 'application/pdf'}, config=True)
+    extract_output_types = Set(
+        {'image/png', 'image/jpeg', 'image/svg+xml', 'application/pdf'}
+    ).tag(config=True)
 
     def preprocess_cell(self, cell, resources, cell_index):
         """
@@ -62,17 +75,15 @@ class ExtractOutputPreprocessor(Preprocessor):
 
                     #Binary files are base64-encoded, SVG is already XML
                     if mime_type in {'image/png', 'image/jpeg', 'application/pdf'}:
-
-                        # data is b64-encoded as text (str, unicode)
-                        # decodestring only accepts bytes
-                        data = py3compat.cast_bytes(data)
-                        data = base64.decodestring(data)
+                        # data is b64-encoded as text (str, unicode),
+                        # we want the original bytes
+                        data = a2b_base64(data)
                     elif sys.platform == 'win32':
                         data = data.replace('\n', '\r\n').encode("UTF-8")
                     else:
                         data = data.encode("UTF-8")
                     
-                    ext = guess_extension(mime_type)
+                    ext = guess_extension_without_jpe(mime_type)
                     if ext is None:
                         ext = '.' + mime_type.rsplit('/')[-1]
                     

@@ -14,7 +14,7 @@ Module with tests for exporter.py
 # Imports
 #-----------------------------------------------------------------------------
 
-from IPython.config import Config
+from traitlets.config import Config
 
 from .base import ExportersTestsBase
 from ...preprocessors.base import Preprocessor

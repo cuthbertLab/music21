@@ -13,5 +13,5 @@
 %===============================================================================
 
 ((* block docclass *))
-\documentclass{article}
+\documentclass[11pt]{article}
 ((* endblock docclass *))

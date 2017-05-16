@@ -1,6 +1,6 @@
 """PostProcessor for serving reveal.js HTML slideshows."""
 
-# Copyright (c) IPython Development Team.
+# Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
 from __future__ import print_function
@@ -8,10 +8,9 @@ from __future__ import print_function
 import os
 import webbrowser
 
-from tornado import web, ioloop, httpserver
+from tornado import web, ioloop, httpserver, log
 from tornado.httpclient import AsyncHTTPClient
-
-from IPython.utils.traitlets import Bool, Unicode, Int
+from traitlets import Bool, Unicode, Int
 
 from .base import PostProcessorBase
 
@@ -43,15 +42,15 @@ class ServePostProcessor(PostProcessorBase):
     """
 
 
-    open_in_browser = Bool(True, config=True,
+    open_in_browser = Bool(True,
         help="""Should the browser be opened automatically?"""
-    )
-    reveal_cdn = Unicode("https://cdn.jsdelivr.net/reveal.js/2.6.2", config=True,
+    ).tag(config=True)
+    reveal_cdn = Unicode("https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.1.0",
         help="""URL for reveal.js CDN."""
-    )
-    reveal_prefix = Unicode("reveal.js", config=True, help="URL prefix for reveal.js")
-    ip = Unicode("127.0.0.1", config=True, help="The IP address to listen on.")
-    port = Int(8000, config=True, help="port for the server to listen on.")
+    ).tag(config=True)
+    reveal_prefix = Unicode("reveal.js", help="URL prefix for reveal.js").tag(config=True)
+    ip = Unicode("127.0.0.1", help="The IP address to listen on.").tag(config=True)
+    port = Int(8000, help="port for the server to listen on.").tag(config=True)
 
     def postprocess(self, input):
         """Serve the build directory with a webserver."""
@@ -75,14 +74,10 @@ class ServePostProcessor(PostProcessorBase):
             cdn=self.reveal_cdn,
             client=AsyncHTTPClient(),
         )
+        
         # hook up tornado logging to our logger
-        try:
-            from tornado import log
-            log.app_log = self.log
-        except ImportError:
-            # old tornado (<= 3), ignore
-            pass
-    
+        log.app_log = self.log
+
         http_server = httpserver.HTTPServer(app)
         http_server.listen(self.port, address=self.ip)
         url = "http://%s:%i/%s" % (self.ip, self.port, filename)

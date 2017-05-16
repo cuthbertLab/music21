@@ -2,34 +2,14 @@
 Module with tests for files
 """
 
-#-----------------------------------------------------------------------------
-# Copyright (c) 2013, the IPython Development Team.
-#
+# Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
-#
-# The full license is in the file COPYING.txt, distributed with this software.
-#-----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
-
-import sys
 import os
 
 from ...tests.base import TestsBase
 from ..files import FilesWriter
-from IPython.utils.py3compat import PY3
 
-if PY3:
-    from io import StringIO
-else:
-    from StringIO import StringIO
-
-
-#-----------------------------------------------------------------------------
-# Class
-#-----------------------------------------------------------------------------
 
 class Testfiles(TestsBase):
     """Contains test functions for files.py"""
@@ -98,7 +78,7 @@ class Testfiles(TestsBase):
                 self.assertEqual(output, 'b')
 
 
-    def test_builddir(self):
+    def test_build_dir(self):
         """Can FilesWriter write to a build dir correctly?"""
 
         # Work in a temporary directory.
@@ -125,6 +105,20 @@ class Testfiles(TestsBase):
             with open(extracted_file_dest, 'r') as f:
                 output = f.read()
                 self.assertEqual(output, 'b')
+
+    def test_build_dir_default(self):
+        """FilesWriter defaults to input path"""
+        with self.create_temp_cwd():
+            os.mkdir('sub')
+            resources = {
+                'metadata': {'path': 'sub'}
+            }
+            writer = FilesWriter()
+            writer.write(u'content', resources, notebook_name="out")
+            dest = os.path.join('sub', 'out')
+            assert os.path.isfile(dest)
+            with open(dest) as f:
+                self.assertEqual(f.read().strip(), 'content')
 
 
     def test_links(self):
@@ -271,7 +265,7 @@ class Testfiles(TestsBase):
                 output = f.read()
                 self.assertEqual(output, 'd')
 
-    def test_relpath_default(self):
+    def test_relpath_precedence(self):
         """Does the FilesWriter relpath option take precedence over the path?"""
 
         # Work in a temporary directory.

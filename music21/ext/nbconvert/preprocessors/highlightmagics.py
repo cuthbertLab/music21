@@ -4,16 +4,15 @@ so that the appropriate highlighter can be used in the `highlight`
 filter.
 """
 
-# Copyright (c) IPython Development Team.
+# Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
 from __future__ import print_function, absolute_import
 
 import re
 
-# Our own imports
 from .base import Preprocessor
-from IPython.utils.traitlets import Dict
+from traitlets import Dict
 
 
 class HighlightMagicsPreprocessor(Preprocessor):
@@ -22,8 +21,7 @@ class HighlightMagicsPreprocessor(Preprocessor):
     """
 
     # list of magic language extensions and their associated pygment lexers
-    default_languages = Dict(
-        default_value={
+    default_languages = Dict({
             '%%R': 'r',
             '%%bash': 'bash',
             '%%cython': 'cython',
@@ -33,14 +31,15 @@ class HighlightMagicsPreprocessor(Preprocessor):
             '%%octave': 'octave',
             '%%perl': 'perl',
             '%%ruby': 'ruby',
-            '%%sh': 'sh'})
+            '%%sh': 'sh',
+    })
 
     # user defined language extensions
     languages = Dict(
-        config=True,
         help=("Syntax highlighting for magic's extension languages. "
          "Each item associates a language magic extension such as %%R, "
-         "with a pygments lexer such as r."))
+         "with a pygments lexer such as r.")
+    ).tag(config=True)
 
     def __init__(self, config=None, **kw):
         """Public constructor"""

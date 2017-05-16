@@ -322,40 +322,42 @@ class ConverterIPython(SubConverter):
         helperConverter.setSubconverterFromFormat(helperFormat)
         helperSubConverter = helperConverter.subConverter
 
+        from IPython.display import Image, display, HTML # @UnresolvedImport
+
         if helperFormat in ('musicxml', 'xml', 'lilypond', 'lily'):        
             ### hack to make musescore excerpts -- fix with a converter class in MusicXML
+            from music21.ipython21 import objects as ipythonObjects
+
             savedDefaultTitle = defaults.title
             savedDefaultAuthor = defaults.author
             defaults.title = ''
             defaults.author = ''
+
             
             if 'Opus' not in obj.classes:
-                fp = helperSubConverter.write(obj, helperFormat, subformats=helperSubformats)
-        
-                defaults.title = savedDefaultTitle
-                defaults.author = savedDefaultAuthor
-                if helperSubformats[0] == 'png':
-                    from music21.ipython21 import objects as ipythonObjects
-                    ipo = ipythonObjects.IPythonPNGObject(fp)
-                    return ipo
+                scores = [obj]                
             else:
-                from IPython.display import Image, display # @UnresolvedImport
-                for s in obj.scores:
-                    fp = helperSubConverter.write(s, helperFormat, subformats=helperSubformats)
-            
-                    if helperSubformats[0] == 'png':
-                        from music21.ipython21 import objects as ipythonObjects # @Reimport
-                        ipo = ipythonObjects.IPythonPNGObject(fp)
-                        display(Image(filename=ipo.fp, retina=True))
-                defaults.title = savedDefaultTitle
-                defaults.author = savedDefaultAuthor
-                return None
+                scores = list(obj.scores)
+
+            for s in scores:
+                fp = helperSubConverter.write(s, helperFormat, 
+                                              subformats=helperSubformats, **keywords)
+        
+                if helperSubformats[0] == 'png':
+                    ipo = ipythonObjects.IPythonPNGObject(fp)
+                    display(Image(data=ipo.getData(), retina=True))
+
+            defaults.title = savedDefaultTitle
+            defaults.author = savedDefaultAuthor
+            return None
+        
         elif helperFormat == 'midi':
             import base64
-            from IPython.display import HTML, display # @UnresolvedImport @Reimport
+
             fp = helperSubConverter.write(obj, helperFormat, subformats=helperSubformats)
             with open(fp, 'rb') as f:
                 binaryMidiData = f.read()
+                
             binaryBase64 = base64.b64encode(binaryMidiData)
             s = common.SingletonCounter()
             outputId = "midiPlayerDiv" + str(s())
@@ -793,6 +795,7 @@ class ConverterMusicXML(SubConverter):
         musescoreRun = '"' + musescorePath + '" ' + fp + " -o " + fpOut + " -T 0 "
         if 'dpi' in keywords:
             musescoreRun += " -r " + str(keywords['dpi'])
+            
         if common.runningUnderIPython():
             musescoreRun += " -r " + str(defaults.ipythonImageDpi)
         

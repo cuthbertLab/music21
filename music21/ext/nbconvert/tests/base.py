@@ -6,19 +6,19 @@
 import io
 import os
 import glob
+import shlex
 import shutil
+import sys
 import unittest
+import nbconvert
+from subprocess import Popen, PIPE
 
-import IPython
-from IPython.nbformat import v4, write
-from IPython.utils.tempdir import TemporaryWorkingDirectory
-from IPython.utils.path import get_ipython_package_dir
-from IPython.utils.process import get_output_error_code
-from IPython.testing.tools import get_ipython_cmd
+import nose.tools as nt
 
-# a trailing space allows for simpler concatenation with the other arguments
-ipy_cmd = get_ipython_cmd(as_string=True) + " "
+from nbformat import v4, write
+from testpath.tempdir import TemporaryWorkingDirectory
 
+from ipython_genutils.py3compat import string_types, bytes_to_str
 
 class TestsBase(unittest.TestCase):
     """Base tests class.  Contains useful fuzzy comparison and nbconvert
@@ -111,7 +111,9 @@ class TestsBase(unittest.TestCase):
             os.makedirs(dest)
         files_path = self._get_files_path()
         for pattern in copy_filenames:
-            for match in glob.glob(os.path.join(files_path, pattern)):
+            files = glob.glob(os.path.join(files_path, pattern))
+            assert files
+            for match in files:
                 shutil.copyfile(match, os.path.join(dest, os.path.basename(match)))
 
 
@@ -121,28 +123,52 @@ class TestsBase(unittest.TestCase):
         names = self.__module__.split('.')[1:-1]
         names.append('files')
         
-        #Build a path using the IPython directory and the relative path we just
+        #Build a path using the nbconvert directory and the relative path we just
         #found.
-        path = get_ipython_package_dir()
-        for name in names:
-            path = os.path.join(path, name)
-        return path
+        path = os.path.dirname(nbconvert.__file__)
+        return os.path.join(path, *names)
 
 
-    def call(self, parameters, ignore_return_code=False):
+    def nbconvert(self, parameters, ignore_return_code=False, stdin=None):
         """
-        Execute a, IPython shell command, listening for both Errors and non-zero
-        return codes.
+        Run nbconvert as a shell command, listening for both Errors and
+        non-zero return codes. Returns the tuple (stdout, stderr) of
+        output produced during the nbconvert run.
 
         Parameters
         ----------
-        parameters : str
+        parameters : str, list(str)
             List of parameters to pass to IPython.
         ignore_return_code : optional bool (default False)
             Throw an OSError if the return code 
         """
+        if isinstance(parameters, string_types):
+            parameters = shlex.split(parameters)
+        cmd = [sys.executable, '-m', 'nbconvert'] + parameters
+        p = Popen(cmd, stdout=PIPE, stderr=PIPE, stdin=PIPE)
+        stdout, stderr = p.communicate(input=stdin)
+        if not (p.returncode == 0 or ignore_return_code):
+            raise OSError(bytes_to_str(stderr))
+        return stdout.decode('utf8', 'replace'), stderr.decode('utf8', 'replace')
 
-        stdout, stderr, retcode = get_output_error_code(ipy_cmd + parameters)
-        if not (retcode == 0 or ignore_return_code):
-            raise OSError(stderr)
-        return stdout, stderr
+
+def assert_big_text_equal(a, b, chunk_size=80):
+    """assert that large strings are equal
+
+    Zooms in on first chunk that differs,
+    to give better info than vanilla assertEqual for large text blobs.
+    """
+    for i in range(0, len(a), chunk_size):
+        chunk_a = a[i:i + chunk_size]
+        chunk_b = b[i:i + chunk_size]
+        nt.assert_equal(chunk_a, chunk_b, "[offset: %i]\n%r != \n%r" % (
+            i, chunk_a, chunk_b))
+
+    if len(a) > len(b):
+        nt.fail("Length doesn't match (%i > %i). Extra text:\n%r" % (
+            len(a), len(b), a[len(b):]
+        ))
+    elif len(a) < len(b):
+        nt.fail("Length doesn't match (%i < %i). Extra text:\n%r" % (
+            len(a), len(b), b[len(a):]
+        ))

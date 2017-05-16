@@ -103,7 +103,7 @@ scalingMillimeters = 7
 scalingTenths = 40
 
 
-ipythonImageDpi = 100
+ipythonImageDpi = 200 # retina...
 
 
 # multmeasure rests

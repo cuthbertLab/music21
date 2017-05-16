@@ -2,6 +2,8 @@
 see templateexporter.py.
 """
 
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 from __future__ import print_function, absolute_import
 
@@ -11,12 +13,12 @@ import copy
 import collections
 import datetime
 
-from IPython.config.configurable import LoggingConfigurable
-from IPython.config import Config
-from IPython import nbformat
-from IPython.utils.traitlets import MetaHasTraits, Unicode, List, TraitError
-from IPython.utils.importstring import import_item
-from IPython.utils import text, py3compat
+from traitlets.config.configurable import LoggingConfigurable
+from traitlets.config import Config
+import nbformat
+from traitlets import HasTraits, Unicode, List, TraitError
+from traitlets.utils.importstring import import_item
+from ipython_genutils import text, py3compat
 
 
 class ResourcesDict(collections.defaultdict):
@@ -49,10 +51,9 @@ class Exporter(LoggingConfigurable):
     accompanying resources dict.
     """
 
-    file_extension = FilenameExtension(
-        '.txt', config=True,
+    file_extension = FilenameExtension('.txt',
         help="Extension of the file that should be written to disk"
-        )
+    ).tag(config=True)
 
     # MIME type of the result file, for HTTP response headers.
     # This is *not* a traitlet, because we want to be able to access it from
@@ -60,26 +61,25 @@ class Exporter(LoggingConfigurable):
     output_mimetype = ''
 
     #Configurability, allows the user to easily add filters and preprocessors.
-    preprocessors = List(config=True,
-        help="""List of preprocessors, by name or namespace, to enable.""")
+    preprocessors = List(
+        help="""List of preprocessors, by name or namespace, to enable."""
+    ).tag(config=True)
 
     _preprocessors = List()
 
     default_preprocessors = List([
-                                  'IPython.nbconvert.preprocessors.ClearOutputPreprocessor',
-                                  'IPython.nbconvert.preprocessors.ExecutePreprocessor',
-                                  'IPython.nbconvert.preprocessors.coalesce_streams',
-                                  'IPython.nbconvert.preprocessors.SVG2PDFPreprocessor',
-                                  'IPython.nbconvert.preprocessors.CSSHTMLHeaderPreprocessor',
-                                  'IPython.nbconvert.preprocessors.RevealHelpPreprocessor',
-                                  'IPython.nbconvert.preprocessors.LatexPreprocessor',
-                                  'IPython.nbconvert.preprocessors.HighlightMagicsPreprocessor',
-                                  'IPython.nbconvert.preprocessors.ExtractOutputPreprocessor',
-                                 ],
-        config=True,
+                                  'nbconvert.preprocessors.ClearOutputPreprocessor',
+                                  'nbconvert.preprocessors.ExecutePreprocessor',
+                                  'nbconvert.preprocessors.coalesce_streams',
+                                  'nbconvert.preprocessors.SVG2PDFPreprocessor',
+                                  'nbconvert.preprocessors.CSSHTMLHeaderPreprocessor',
+                                  'nbconvert.preprocessors.LatexPreprocessor',
+                                  'nbconvert.preprocessors.HighlightMagicsPreprocessor',
+                                  'nbconvert.preprocessors.ExtractOutputPreprocessor',
+                              ],
         help="""List of preprocessors available by default, by name, namespace, 
-        instance, or type.""")
-
+        instance, or type."""
+    ).tag(config=True)
 
     def __init__(self, config=None, **kw):
         """
@@ -87,8 +87,11 @@ class Exporter(LoggingConfigurable):
 
         Parameters
         ----------
-        config : config
+        config : :class:`~traitlets.config.Config`
             User configuration instance.
+        `**kw`
+            Additional keyword arguments passed to parent __init__
+
         """
         with_default_config = self.default_config
         if config:
@@ -109,13 +112,14 @@ class Exporter(LoggingConfigurable):
 
         Parameters
         ----------
-        nb : :class:`~IPython.nbformat.NotebookNode`
+        nb : :class:`~nbformat.NotebookNode`
           Notebook node (dict-like with attr-access)
         resources : dict
           Additional resources that can be accessed read/write by
           preprocessors and filters.
-        **kw
-          Ignored (?)
+        `**kw`
+          Ignored
+
         """
         nb_copy = copy.deepcopy(nb)
         resources = self._init_resources(resources)
@@ -137,8 +141,19 @@ class Exporter(LoggingConfigurable):
         ----------
         filename : str
             Full filename of the notebook file to open and convert.
-        """
+        resources : dict
+          Additional resources that can be accessed read/write by
+          preprocessors and filters.
+        `**kw`
+          Ignored
 
+        """
+        # Convert full filename string to unicode
+        # In python 2.7.x if filename comes as unicode string,
+        # just skip converting it.
+        if isinstance(filename, str):
+           filename = py3compat.str_to_unicode(filename)
+           
         # Pull the metadata from the filesystem.
         if resources is None:
             resources = ResourcesDict()
@@ -153,7 +168,7 @@ class Exporter(LoggingConfigurable):
         resources['metadata']['modified_date'] = modified_date.strftime(text.date_format)
 
         with io.open(filename, encoding='utf-8') as f:
-            return self.from_notebook_node(nbformat.read(f, as_version=4), resources=resources, **kw)
+            return self.from_file(f, resources=resources, **kw)
 
 
     def from_file(self, file_stream, resources=None, **kw):
@@ -164,6 +179,12 @@ class Exporter(LoggingConfigurable):
         ----------
         file_stream : file-like object
             Notebook file-like object to convert.
+        resources : dict
+          Additional resources that can be accessed read/write by
+          preprocessors and filters.
+        `**kw`
+          Ignored
+
         """
         return self.from_notebook_node(nbformat.read(file_stream, as_version=4), resources=resources, **kw)
 
@@ -178,10 +199,14 @@ class Exporter(LoggingConfigurable):
 
         Parameters
         ----------
-        preprocessor : preprocessor
+        preprocessor : :class:`~nbconvert.preprocessors.Preprocessor`
+            A dotted module name, a type, or an instance
+        enabled : bool
+            Mark the preprocessor as enabled
+
         """
         if preprocessor is None:
-            raise TypeError('preprocessor')
+            raise TypeError('preprocessor must not be None')
         isclass = isinstance(preprocessor, type)
         constructed = not isclass
 
@@ -200,7 +225,7 @@ class Exporter(LoggingConfigurable):
             self._preprocessors.append(preprocessor)
             return preprocessor
 
-        elif isclass and isinstance(preprocessor, MetaHasTraits):
+        elif isclass and issubclass(preprocessor, HasTraits):
             # Preprocessor is configurable.  Make sure to pass in new default for 
             # the enabled flag if one was specified.
             self.register_preprocessor(preprocessor(parent=self), enabled)
@@ -212,7 +237,7 @@ class Exporter(LoggingConfigurable):
         else:
             # Preprocessor is an instance of something without a __call__ 
             # attribute.  
-            raise TypeError('preprocessor')
+            raise TypeError('preprocessor must be callable or an importable constructor, got %r' % preprocessor)
 
 
     def _init_preprocessors(self):
@@ -260,7 +285,9 @@ class Exporter(LoggingConfigurable):
     def _preprocess(self, nb, resources):
         """
         Preprocess the notebook before passing it into the Jinja engine.
-        To preprocess the notebook is to apply all of the
+        To preprocess the notebook is to successively apply all the
+        enabled preprocessors. Output from each preprocessor is passed
+        along to the next one.
 
         Parameters
         ----------

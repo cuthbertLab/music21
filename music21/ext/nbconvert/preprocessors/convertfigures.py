@@ -1,32 +1,22 @@
 """Module containing a preprocessor that converts outputs in the notebook from 
 one format to another.
 """
-#-----------------------------------------------------------------------------
-# Copyright (c) 2013, the IPython Development Team.
-#
-# Distributed under the terms of the Modified BSD License.
-#
-# The full license is in the file COPYING.txt, distributed with this software.
-#-----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
 
 from .base import Preprocessor
-from IPython.utils.traitlets import Unicode
+from traitlets import Unicode
 
-#-----------------------------------------------------------------------------
-# Classes
-#-----------------------------------------------------------------------------
 
 class ConvertFiguresPreprocessor(Preprocessor):
     """
     Converts all of the outputs in a notebook from one format to another.
     """
 
-    from_format = Unicode(config=True, help='Format the converter accepts')
-    to_format = Unicode(config=True, help='Format the converter writes')
+    from_format = Unicode(help='Format the converter accepts').tag(config=True)
+    to_format = Unicode(help='Format the converter writes').tag(config=True)
 
     def __init__(self, **kw):
         """

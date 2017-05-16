@@ -14,6 +14,7 @@ Module of useful filters for processing Latex within Jinja latex templates.
 # Imports
 #-----------------------------------------------------------------------------
 import re
+from nbconvert.utils.pandoc import pandoc
 
 #-----------------------------------------------------------------------------
 # Globals and constants
@@ -46,6 +47,7 @@ LATEX_SUBS = {
 
 __all__ = ['escape_latex']
 
+
 def escape_latex(text):
     """
     Escape characters that may conflict with latex.
@@ -60,4 +62,3 @@ def escape_latex(text):
         text = pattern.sub(replacement, text)
 
     return text
-    

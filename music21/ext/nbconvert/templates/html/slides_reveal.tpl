@@ -2,40 +2,35 @@
 {% from 'mathjax.tpl' import mathjax %}
 
 {%- block any_cell scoped -%}
-{%- if cell.metadata.slide_type in ['slide'] -%}
-    <section>
-    <section>
-    {{ super() }}
-{%- elif cell.metadata.slide_type in ['subslide'] -%}
-    <section>
-    {{ super() }}
-{%- elif cell.metadata.slide_type in ['-'] -%}
-    {%- if cell.metadata.frag_helper in ['fragment_end'] -%}
-        <div class="fragment" data-fragment-index="{{ cell.metadata.frag_number }}">
-        {{ super() }}
-        </div>
-    {%- else -%}
-        {{ super() }}
-    {%- endif -%}
-{%- elif cell.metadata.slide_type in ['skip'] -%}
-    <div style=display:none>
-    {{ super() }}
-    </div>
-{%- elif cell.metadata.slide_type in ['notes'] -%}
-    <aside class="notes">
-    {{ super() }}
-    </aside>
-{%- elif cell.metadata.slide_type in ['fragment'] -%}
-    <div class="fragment" data-fragment-index="{{ cell.metadata.frag_number }}">
-    {{ super() }}
-    </div>
+{%- if cell.metadata.get('slide_start', False) -%}
+<section>
 {%- endif -%}
-{%- if cell.metadata.slide_helper in ['subslide_end'] -%}
-    </section>
-{%- elif cell.metadata.slide_helper in ['slide_end'] -%}
-    </section>
-    </section>
+{%- if cell.metadata.get('subslide_start', False) -%}
+<section>
 {%- endif -%}
+{%- if cell.metadata.get('fragment_start', False) -%}
+<div class="fragment">
+{%- endif -%}
+
+{%- if cell.metadata.slide_type == 'notes' -%}
+<aside class="notes">
+{{ super() }}
+</aside>
+{%- elif cell.metadata.slide_type == 'skip' -%}
+{%- else -%}
+{{ super() }}
+{%- endif -%}
+
+{%- if cell.metadata.get('fragment_end', False) -%}
+</div>
+{%- endif -%}
+{%- if cell.metadata.get('subslide_end', False) -%}
+</section>
+{%- endif -%}
+{%- if cell.metadata.get('slide_end', False) -%}
+</section>
+{%- endif -%}
+
 {%- endblock any_cell -%}
 
 {% block header %}
@@ -51,12 +46,12 @@
 
 <title>{{resources['metadata']['name']}} slides</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="{{resources.reveal.require_js_url}}"></script>
+<script src="{{resources.reveal.jquery_url}}"></script>
 
 <!-- General and theme style sheets -->
 <link rel="stylesheet" href="{{resources.reveal.url_prefix}}/css/reveal.css">
-<link rel="stylesheet" href="{{resources.reveal.url_prefix}}/css/theme/simple.css" id="theme">
+<link rel="stylesheet" href="{{resources.reveal.url_prefix}}/css/theme/{{resources.reveal.theme}}.css" id="theme">
 
 <!-- If the query includes 'print-pdf', include the PDF print sheet -->
 <script>
@@ -74,8 +69,11 @@ if( window.location.search.match( /print-pdf/gi ) ) {
 <script src="{{resources.reveal.url_prefix}}/lib/js/html5shiv.js"></script>
 <![endif]-->
 
+<!-- Loading the mathjax macro -->
+{{ mathjax() }}
+
 <!-- Get Font-awesome from cdn -->
-<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css">
+<link rel="stylesheet" href="{{resources.reveal.font_awesome_url}}">
 
 {% for css in resources.inlining.css -%}
     <style type="text/css">
@@ -85,11 +83,9 @@ if( window.location.search.match( /print-pdf/gi ) ) {
 
 <style type="text/css">
 /* Overrides of notebook CSS for static HTML export */
-html {
-  overflow-y: auto;
-}
 .reveal {
   font-size: 160%;
+  overflow-y: scroll;
 }
 .reveal pre {
   width: inherit;
@@ -142,6 +138,14 @@ div.output_prompt {
   /* 5px right shift to account for margin in parent container */
   margin: 5px 5px 0 0;
 }
+div.text_cell.rendered .rendered_html {
+  /* The H1 height seems miscalculated, we are just hidding the scrollbar */
+  overflow-y: hidden;
+}
+a.anchor-link {
+  /* There is still an anchor, we are only hidding it */
+  display: none;
+}
 .rendered_html p {
   text-align: inherit;
 }
@@ -155,47 +159,70 @@ div.output_prompt {
 
 
 {% block body %}
+{% block pre_slides %}
 <body>
+{% endblock pre_slides %}
+
 <div class="reveal">
 <div class="slides">
 {{ super() }}
 </div>
 </div>
-
-<script src="{{resources.reveal.url_prefix}}/lib/js/head.min.js"></script>
-
-<script src="{{resources.reveal.url_prefix}}/js/reveal.js"></script>
-
+{% block post_slides %}
 <script>
 
-// Full list of configuration options available here: https://github.com/hakimel/reveal.js#configuration
-Reveal.initialize({
-controls: true,
-progress: true,
-history: true,
+require(
+    {
+      // it makes sense to wait a little bit when you are loading
+      // reveal from a cdn in a slow connection environment
+      waitSeconds: 15
+    },
+    [
+      "{{resources.reveal.url_prefix}}/lib/js/head.min.js",
+      "{{resources.reveal.url_prefix}}/js/reveal.js"
+    ],
 
-theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
-transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/concave/zoom/linear/none
+    function(head, Reveal){
 
-// Optional libraries used to extend on reveal.js
-dependencies: [
-{ src: "{{resources.reveal.url_prefix}}/lib/js/classList.js", condition: function() { return !document.body.classList; } },
-{ src: "{{resources.reveal.url_prefix}}/plugin/notes/notes.js", async: true, condition: function() { return !!document.body.classList; } }
-]
-});
-</script>
+        // Full list of configuration options available here: https://github.com/hakimel/reveal.js#configuration
+        Reveal.initialize({
+            controls: true,
+            progress: true,
+            history: true,
 
-<!-- Loading mathjax macro -->
-{{ mathjax() }}
+            theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+            transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/concave/zoom/linear/none
 
-<script>
-Reveal.addEventListener( 'slidechanged', function( event ) {
-  window.scrollTo(0,0);
-  MathJax.Hub.Rerender(event.currentSlide);
-});
+            // Optional libraries used to extend on reveal.js
+            dependencies: [
+                { src: "{{resources.reveal.url_prefix}}/lib/js/classList.js",
+                  condition: function() { return !document.body.classList; } },
+                { src: "{{resources.reveal.url_prefix}}/plugin/notes/notes.js",
+                  async: true,
+                  condition: function() { return !!document.body.classList; } }
+            ]
+        });
+
+        var update = function(event){
+          if(MathJax.Hub.getAllJax(Reveal.getCurrentSlide())){
+            MathJax.Hub.Rerender(Reveal.getCurrentSlide());
+          }
+        };
+
+        Reveal.addEventListener('slidechanged', update);
+
+        var update_scroll = function(event){
+          $(".reveal").scrollTop(0);
+        };
+
+        Reveal.addEventListener('slidechanged', update_scroll);
+
+    }
+);
 </script>
 
 </body>
+{% endblock post_slides %}
 {% endblock body %}
 
 {% block footer %}

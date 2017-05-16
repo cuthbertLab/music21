@@ -10,8 +10,10 @@ from within Jinja templates.
 # because errors should be raised at runtime if it's actually needed,
 # not import time, when it may not be needed.
 
-from IPython.nbconvert.utils.base import NbConvertBase
+from nbconvert.utils.base import NbConvertBase
 from warnings import warn
+
+from traitlets import observe
 
 MULTILINE_OUTPUTS = ['text', 'html', 'svg', 'latex', 'javascript', 'json']
 
@@ -24,11 +26,12 @@ class Highlight2HTML(NbConvertBase):
     def __init__(self, pygments_lexer=None, **kwargs):
         self.pygments_lexer = pygments_lexer or 'ipython3'
         super(Highlight2HTML, self).__init__(**kwargs)
-
-    def _default_language_changed(self, name, old, new):
-        warn('Setting default_language in config is deprecated, '
+    
+    @observe('default_language')
+    def _default_language_changed(self, change):
+        warn('Setting default_language in config is deprecated as of 5.0, '
              'please use language_info metadata instead.')
-        self.pygments_lexer = new
+        self.pygments_lexer = change['new']
 
     def __call__(self, source, language=None, metadata=None):
         """
@@ -58,11 +61,12 @@ class Highlight2Latex(NbConvertBase):
     def __init__(self, pygments_lexer=None, **kwargs):
         self.pygments_lexer = pygments_lexer or 'ipython3'
         super(Highlight2Latex, self).__init__(**kwargs)
-
-    def _default_language_changed(self, name, old, new):
-        warn('Setting default_language in config is deprecated, '
+    
+    @observe('default_language')
+    def _default_language_changed(self, change):
+        warn('Setting default_language in config is deprecated as of 5.0, '
              'please use language_info metadata instead.')
-        self.pygments_lexer = new
+        self.pygments_lexer = change['new']
 
     def __call__(self, source, language=None, metadata=None, strip_verbatim=False):
         """
@@ -109,7 +113,6 @@ def _pygments_highlight(source, output_formatter, language='ipython', metadata=N
     from pygments import highlight
     from pygments.lexers import get_lexer_by_name
     from pygments.util import ClassNotFound
-    from IPython.lib.lexers import IPythonLexer, IPython3Lexer
 
     # If the cell uses a magic extension language,
     # use the magic language instead.
@@ -119,11 +122,25 @@ def _pygments_highlight(source, output_formatter, language='ipython', metadata=N
 
         language = metadata['magics_language']
 
+    lexer = None
     if language == 'ipython2':
-        lexer = IPythonLexer()
+        try:
+            from IPython.lib.lexers import IPythonLexer
+        except ImportError:
+            warn("IPython lexer unavailable, falling back on Python")
+            language = 'python'
+        else:
+            lexer = IPythonLexer()
     elif language == 'ipython3':
-        lexer = IPython3Lexer()
-    else:
+        try:
+            from IPython.lib.lexers import IPython3Lexer
+        except ImportError:
+            warn("IPython3 lexer unavailable, falling back on Python 3")
+            language = 'python3'
+        else:
+            lexer = IPython3Lexer()
+
+    if lexer is None:
         try:
             lexer = get_lexer_by_name(language, stripall=True)
         except ClassNotFound:

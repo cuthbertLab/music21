@@ -328,7 +328,7 @@ class Graph(object):
     def __init__(self, *args, **keywords):
         _getExtendedModules()
         self.data = None
-        self.fig = None
+        self.fig = None # a matplotlib.Figure object
         # define a component dictionary for each axis
         self.axis = {}
         for ax in self.axisKeys:
@@ -373,13 +373,19 @@ class Graph(object):
                      ):
             if kw in keywords:
                 setattr(self, kw, keywords[kw])
-    
-    def _getFigure(self):
-        '''
-        Configure and return a figure object -- does nothing in the abstract class
-        '''
-        pass
 
+#     def __del__(self):
+#         '''
+#         Matplotlib Figure objects need to be explicitly closed when no longer used...
+# 
+#         Too slow, and recent matplotlib versions don't have this problem any more.
+#         '''
+#         if hasattr(self, 'fig') and self.fig is not None:
+#             keep_observers = False
+#             if self.doneAction == 'show':
+#                 keep_observers = True
+#             self.fig.clf(keep_observers=keep_observers)
+    
     @common.deprecated('August 2016', 'August 2017', 'use self.data = data instead')
     def setData(self, data):
         self.data = data
@@ -527,33 +533,36 @@ class Graph(object):
                 if leftBottom:
                     line.set_visible(False)
 
-    def applyFormatting(self, ax):
+    def applyFormatting(self, subplot):
         '''
-        Apply formatting to the Axes container and Figure instance.  
+        Apply formatting to the Subplot (Axes) container and Figure instance. 
+        
+        ax should be an AxesSubplot object or
+        an Axes3D object or something similar.
         '''
-        #environLocal.printDebug('calling applyFormatting')
+        environLocal.printDebug('calling applyFormatting on ' + repr(subplot))
 
-        rect = ax.axesPatch
+        rect = subplot.patch
         # this sets the color of the main data presentation window
         rect.set_facecolor(getColor(self.colorBackgroundData))
         # this does not do anything yet
         # rect.set_edgecolor(getColor('red'))
 
         for axis in self.axisKeys:
-            self.applyFormattingToOneAxis(ax, axis)
+            self.applyFormattingToOneAxis(subplot, axis)
 
         if self.title:
-            ax.set_title(self.title, fontsize=self.titleFontSize, family=self.fontFamily)
+            subplot.set_title(self.title, fontsize=self.titleFontSize, family=self.fontFamily)
 
         if self.grid:
             if self.colorGrid is not None: # None is another way to hide grid
-                ax.grid(True, which='major', color=getColor(self.colorGrid))
+                subplot.grid(True, which='major', color=getColor(self.colorGrid))
         # provide control for each grid line
         if self.hideYGrid:
-            ax.yaxis.grid(False)
+            subplot.yaxis.grid(False)
         
         if self.hideXGrid:
-            ax.xaxis.grid(False)
+            subplot.xaxis.grid(False)
 
         # right and top must be larger
         # this does not work right yet
@@ -564,48 +573,46 @@ class Graph(object):
         self.fig.set_figwidth(self.figureSize[0])
         self.fig.set_figheight(self.figureSize[1])
 
-#         ax.set_xscale('linear')
-#         ax.set_yscale('linear')
-#         ax.set_aspect('normal')
+#         subplot.set_xscale('linear')
+#         subplot.set_yscale('linear')
+#         subplot.set_aspect('normal')
 
-    def applyFormattingToOneAxis(self, ax, axis):
+    def applyFormattingToOneAxis(self, subplot, axis):
         '''
-        Given a matplotlib.Axes object (from figure or subplot) and a string of
+        Given a matplotlib.Axes object (a subplot) and a string of
         'x', 'y', or 'z', set the Axes object's xlim (or ylim or zlim or xlim3d, etc.) from
         self.axis[axis]['range'], Set the label from self.axis[axis]['label'],
         the scale, the ticks, and the ticklabels.
+        
+        Returns the matplotlib Axis object that has been modified
         '''
         thisAxis = self.axis[axis]
         if axis not in ('x', 'y', 'z'):
             return
         
         if 'range' in thisAxis and thisAxis['range'] is not None:
-            rangeFuncs = {('x', 2): 'set_xlim',
-                          ('y', 2): 'set_ylim',
-                          ('z', 2): 'set_zlim',
-                          ('x', 3): 'set_xlim3d',
-                          ('y', 3): 'set_ylim3d',
-                          ('z', 3): 'set_zlim3d',
-                          }
-            thisRangeFunc = getattr(ax, rangeFuncs[(axis, len(self.axisKeys))])
+            rangeFuncName = 'set_' + axis + 'lim'
+            if len(self.axisKeys) == 3:
+                rangeFuncName += '3d'
+            thisRangeFunc = getattr(subplot, rangeFuncName)
             thisRangeFunc(*thisAxis['range'])
             
         if 'label' in thisAxis and thisAxis['label'] is not None:
             # ax.set_xlabel, set_ylabel, set_zlabel <-- for searching do not delete.
-            setLabelFunction = getattr(ax, 'set_' + axis + 'label')
+            setLabelFunction = getattr(subplot, 'set_' + axis + 'label')
             setLabelFunction(thisAxis['label'],
                     fontsize=self.labelFontSize, family=self.fontFamily)
             
         if 'scale' in thisAxis and thisAxis['scale'] is not None:
             # ax.set_xscale, set_yscale, set_zscale <-- for searching do not delete.
-            setLabelFunction = getattr(ax, 'set_' + axis + 'scale')
+            setLabelFunction = getattr(subplot, 'set_' + axis + 'scale')
             setLabelFunction(thisAxis['scale'])
         
         
         try:
-            getTickFunction = getattr(ax, 'get_' + axis + 'ticks')
-            setTickFunction = getattr(ax, 'set_' + axis + 'ticks')
-            setTickLabelFunction = getattr(ax, 'set_' + axis + 'ticklabels')
+            getTickFunction = getattr(subplot, 'get_' + axis + 'ticks')
+            setTickFunction = getattr(subplot, 'set_' + axis + 'ticks')
+            setTickLabelFunction = getattr(subplot, 'set_' + axis + 'ticklabels')
         except AttributeError:
             # for z ?? or maybe it will work now?
             getTickFunction = None
@@ -621,16 +628,16 @@ class Graph(object):
             values, labels = thisAxis['ticks']
             setTickFunction(values)
             if axis == 'x':
-                ax.set_xticklabels(labels, 
+                subplot.set_xticklabels(labels, 
                                    fontsize=self.tickFontSize,
                                    family=self.fontFamily, 
                                    horizontalalignment=self.xTickLabelHorizontalAlignment, 
                                    verticalalignment=self.xTickLabelVerticalAlignment, 
                                    rotation=self.xTickLabelRotation,
-                                   y=-.01)
+                                   y=-0.01)
         
             elif axis == 'y':
-                ax.set_yticklabels(labels, 
+                subplot.set_yticklabels(labels, 
                                    fontsize=self.tickFontSize,
                                    family=self.fontFamily,
                                    horizontalalignment='right', 
@@ -640,6 +647,7 @@ class Graph(object):
                                      fontsize=self.tickFontSize,
                                      family=self.fontFamily)
 
+        return thisAxis
 
     def process(self):
         '''process data and prepare plot'''
@@ -664,8 +672,7 @@ class Graph(object):
         For most matplotlib back ends, this will open 
         a GUI window with the desired graph.
         '''
-        extm = _getExtendedModules() #@UnusedVariable
-        extm.plt.show()
+        self.fig.show()
 
     def write(self, fp=None): # pragma: no cover
         '''
@@ -814,7 +821,7 @@ class GraphColorGrid(Graph):
         # these approaches do not work:
         # adjust face color of axTop independently
         # this sets the color of the main data presentation window
-        #axTop.axesPatch.set_facecolor('#000000')
+        # axTop.patch.set_facecolor('#000000')
 
         # axTop.bar([0.5], [1], 1, color=['#000000'], linewidth=0.5, edgecolor='#111111')
         
@@ -1439,7 +1446,7 @@ class GraphScatter(Graph):
                 if 'markerSize' in displayData:
                     markerSize = displayData['markerSize']
                     
-            ax.plot(x, y, marker, color=color, alpha=alpha, ms=markerSize)
+            ax.plot(x, y, marker=marker, color=color, alpha=alpha, markersize=markerSize)
             i += 1
         # values are sorted, so no need to use max/min
         if not self.axisRangeHasBeenSet['y']:
@@ -5372,7 +5379,7 @@ class Test(unittest.TestCase):
             for m in p.getElementsByClass('Measure'):
                 m.insert(0, dynamics.Dynamic(dyn[i % len(dyn)]))
                 i += 1
-        s.plot('dolan', fillByMeasure = True, segmentByTarget=True, doneAction=None)
+        s.plot('dolan', fillByMeasure=True, segmentByTarget=True, doneAction=None)
 
 
 

@@ -8,7 +8,9 @@
 {%- endblock output_prompt %}
 
 {% block input %}
-{{ cell.source | indent(4)}}
+```{% if nb.metadata.language_info %}{{ nb.metadata.language_info.name }}{% endif %}
+{{ cell.source}}
+```
 {% endblock input %}
 
 {% block error %}

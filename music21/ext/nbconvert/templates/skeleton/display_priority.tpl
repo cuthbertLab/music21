@@ -32,6 +32,12 @@
         {%- elif type == 'application/javascript' -%}
             {%- block data_javascript -%}
             {%- endblock -%}
+        {%- elif type == 'application/vnd.jupyter.widget-state+json' -%}
+            {%- block data_widget_state -%}
+            {%- endblock -%}
+        {%- elif type == 'application/vnd.jupyter.widget-view+json' -%}
+            {%- block data_widget_view -%}
+            {%- endblock -%}
         {%- else -%}
             {%- block data_other -%}
             {%- endblock -%}

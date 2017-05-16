@@ -3,10 +3,11 @@
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+import os
 import sys
 
-from IPython.nbformat import v4
-from IPython.utils.py3compat import PY3
+from nbformat import v4
+import nbconvert
 
 from .base import ExportersTestsBase
 from ..script import ScriptExporter
@@ -42,4 +43,17 @@ class TestScriptExporter(ExportersTestsBase):
         (output, resources) = self.exporter_class().from_notebook_node(pynb)
         self.assertIn('# coding: utf-8', output)
 
-        
+def test_script_exporter_entrypoint():
+    nb = v4.new_notebook()
+    nb.metadata.language_info = {
+        'name': 'dummy',
+        'mimetype': 'text/x-dummy',
+    }
+
+    p = os.path.join(os.path.dirname(nbconvert.tests.__file__), 'exporter_entrypoint')
+    sys.path.insert(0, p)
+    try:
+        output, _ = ScriptExporter().from_notebook_node(nb)
+        assert output == 'dummy-script-exported'
+    finally:
+        sys.path.remove(p)

@@ -10,7 +10,7 @@
 # Imports
 #-----------------------------------------------------------------------------
 from ..citation import citation2latex
-from nose.tools import assert_equal
+import pytest
 
 #-----------------------------------------------------------------------------
 # Tests
@@ -144,7 +144,9 @@ $1 < 2$ is true, but $3 > 4$ is false
 1 < 2 it is even worse if it is alone in a line.
 """}
 
-def test_citation2latex():
+
+@pytest.mark.parametrize(["in_arg", "out_arg"], [
+    (in_arg, out_arg) for (in_arg, out_arg) in test_md.items()])
+def test_citation2latex(in_arg, out_arg):
     """Are citations parsed properly?"""
-    for input, output in test_md.items():
-        yield (assert_equal, citation2latex(input), output)
+    assert citation2latex(in_arg)==out_arg

@@ -16,7 +16,7 @@ Module with tests for Highlight
 
 from ...tests.base import TestsBase
 from ..highlight import Highlight2HTML, Highlight2Latex
-from IPython.config import Config
+from traitlets.config import Config
 import xml
 
 #-----------------------------------------------------------------------------

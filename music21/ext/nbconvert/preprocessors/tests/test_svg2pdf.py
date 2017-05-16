@@ -3,8 +3,8 @@
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from IPython.testing import decorators as dec
-from IPython.nbformat import v4 as nbformat
+from ipython_genutils.testing import decorators as dec
+from nbformat import v4 as nbformat
 
 from .base import PreprocessorTestsBase
 from ..svg2pdf import SVG2PDFPreprocessor

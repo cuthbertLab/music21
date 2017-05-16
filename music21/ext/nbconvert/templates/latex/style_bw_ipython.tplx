@@ -7,7 +7,9 @@
 %===============================================================================
 
 ((* block input scoped *))
+((*- if resources.global_content_filter.include_input_prompt *))
 ((( add_prompt(cell.source, cell, 'In ') )))
+((* endif -*))
 ((* endblock input *))
 
 
@@ -17,10 +19,12 @@
 
 ((* block execute_result scoped *))
     ((*- for type in output.data | filter_data_type -*))
-        ((*- if type in ['text/plain']*))
+        ((*- if resources.global_content_filter.include_output_prompt -*))
+            ((*- if type in ['text/plain'] *))
 ((( add_prompt(output.data['text/plain'], cell, 'Out') )))
-        ((*- else -*))
+            ((*- else -*))
 \verb+Out[((( cell.execution_count )))]:+((( super() )))
+            ((*- endif -*))
         ((*- endif -*))
     ((*- endfor -*))
 ((* endblock execute_result *))

@@ -1,166 +1,263 @@
-"""Filters for processing ANSI colors within Jinja templates.
-"""
-#-----------------------------------------------------------------------------
-# Copyright (c) 2013, the IPython Development Team.
-#
-# Distributed under the terms of the Modified BSD License.
-#
-# The full license is in the file COPYING.txt, distributed with this software.
-#-----------------------------------------------------------------------------
+"""Filters for processing ANSI colors within Jinja templates."""
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
+# Copyright (c) IPython Development Team.
+# Distributed under the terms of the Modified BSD License.
 
 import re
-from IPython.utils import coloransi
-from IPython.utils.text import strip_ansi
-
-#-----------------------------------------------------------------------------
-# Classes and functions
-#-----------------------------------------------------------------------------
+import jinja2
 
 __all__ = [
     'strip_ansi',
     'ansi2html',
-    'single_ansi2latex',
     'ansi2latex'
 ]
 
-ansi_colormap = {
-    '30': 'ansiblack',
-    '31': 'ansired',
-    '32': 'ansigreen',
-    '33': 'ansiyellow',
-    '34': 'ansiblue',
-    '35': 'ansipurple',
-    '36': 'ansicyan',
-    '37': 'ansigrey',
-    '01': 'ansibold',
-}
+_ANSI_RE = re.compile('\x1b\\[(.*?)([@-~])')
 
-html_escapes = {
-    '<': '&lt;',
-    '>': '&gt;',
-    "'": '&apos;',
-    '"': '&quot;',
-    '`': '&#96;',
-}
-ansi_re = re.compile('\x1b' + r'\[([\dA-Fa-f;]*?)m')
+_ANSI_COLORS = (
+    'ansi-black',
+    'ansi-red',
+    'ansi-green',
+    'ansi-yellow',
+    'ansi-blue',
+    'ansi-magenta',
+    'ansi-cyan',
+    'ansi-white',
+    'ansi-black-intense',
+    'ansi-red-intense',
+    'ansi-green-intense',
+    'ansi-yellow-intense',
+    'ansi-blue-intense',
+    'ansi-magenta-intense',
+    'ansi-cyan-intense',
+    'ansi-white-intense',
+)
+
+
+def strip_ansi(source):
+    """
+    Remove ANSI escape codes from text.
+
+    Parameters
+    ----------
+    source : str
+        Source to remove the ANSI from
+
+    """
+    return _ANSI_RE.sub('', source)
+
 
 def ansi2html(text):
     """
-    Convert ansi colors to html colors.
-    
+    Convert ANSI colors to HTML colors.
+
     Parameters
     ----------
-    text : str
-        Text containing ansi colors to convert to html
+    text : unicode
+        Text containing ANSI colors to convert to HTML
+
     """
+    text = jinja2.utils.escape(text)
+    return _ansi2anything(text, _htmlconverter)
 
-    # do ampersand first
-    text = text.replace('&', '&amp;')
-    
-    for c, escape in html_escapes.items():
-        text = text.replace(c, escape)
-
-    m = ansi_re.search(text)
-    opened = False
-    cmds = []
-    opener = ''
-    closer = ''
-    while m:
-        cmds = m.groups()[0].split(';')
-        closer = '</span>' if opened else ''
-        
-        # True if there is there more than one element in cmds, *or*
-        # if there is only one but it is not equal to a string of zeroes.
-        opened = len(cmds) > 1 or cmds[0] != '0' * len(cmds[0])
-        classes = []
-        for cmd in cmds:
-            if cmd in ansi_colormap:
-                classes.append(ansi_colormap[cmd])
-
-        if classes:
-            opener = '<span class="%s">' % (' '.join(classes))
-        else:
-            opener = ''
-        text = re.sub(ansi_re, closer + opener, text, 1)
-
-        m = ansi_re.search(text)
-
-    if opened:
-        text += '</span>'
-    return text
-
-
-def single_ansi2latex(code):
-    """Converts single ansi markup to latex format.
-
-    Return latex code and number of open brackets.
-
-    Accepts codes like '\x1b[1;32m' (bold, red) and the short form '\x1b[32m' (red)
-
-    Colors are matched to those defined in coloransi, which defines colors
-    using the 0, 1 (bold) and 5 (blinking) styles. Styles 1 and 5 are
-    interpreted as bold. All other styles are mapped to 0. Note that in
-    coloransi, a style of 1 does not just mean bold; for example, Brown is
-    "0;33", but Yellow is "1;33". An empty string is returned for unrecognised
-    codes and the "reset" code '\x1b[m'.
-    """
-    components = code.split(';')
-    if len(components) > 1:
-        # Style is digits after '['
-        style = int(components[0].split('[')[-1])
-        color = components[1][:-1]
-    else:
-        style = 0
-        color = components[0][-3:-1]
-        
-    # If the style is not normal (0), bold (1) or blinking (5) then treat it as normal
-    if style not in [0, 1, 5]:
-        style = 0
-
-    for name, tcode in coloransi.color_templates:
-        tstyle, tcolor = tcode.split(';')
-        tstyle = int(tstyle)
-        if tstyle == style and tcolor == color:
-            break
-    else:
-        return '', 0
-
-    if style == 5:
-        name = name[5:]                             # BlinkRed -> Red, etc
-    name = name.lower()
-
-    if style in [1, 5]:
-        return r'\textbf{\color{'+name+'}', 1
-    else:
-        return r'{\color{'+name+'}', 1
 
 def ansi2latex(text):
-    """Converts ansi formated text to latex version
-
-    based on https://bitbucket.org/birkenfeld/sphinx-contrib/ansi.py
     """
-    color_pattern = re.compile('\x1b\\[([^m]*)m')
-    last_end = 0
-    openbrack = 0
-    outstring = ''
-    for match in color_pattern.finditer(text):
-        head = text[last_end:match.start()]
-        outstring += head
-        if openbrack:
-            outstring += '}'*openbrack
-            openbrack = 0
-        code = match.group()
-        if not (code == coloransi.TermColors.Normal or openbrack):
-            texform, openbrack = single_ansi2latex(code)
-            outstring += texform
-        last_end = match.end()
-    
-    # Add the remainer of the string and THEN close any remaining color brackets.
-    outstring += text[last_end:]
-    if openbrack: 
-        outstring += '}'*openbrack
-    return outstring.strip()
+    Convert ANSI colors to LaTeX colors.
+
+    Parameters
+    ----------
+    text : unicode
+        Text containing ANSI colors to convert to LaTeX
+
+    """
+    return _ansi2anything(text, _latexconverter)
+
+
+def _htmlconverter(fg, bg, bold):
+    """
+    Return start and end tags for given foreground/background/bold.
+
+    """
+    if (fg, bg, bold) == (None, None, False):
+        return '', ''
+
+    classes = []
+    styles = []
+
+    if isinstance(fg, int):
+        classes.append(_ANSI_COLORS[fg] + '-fg')
+    elif fg:
+        styles.append('color: rgb({},{},{})'.format(*fg))
+
+    if isinstance(bg, int):
+        classes.append(_ANSI_COLORS[bg] + '-bg')
+    elif bg:
+        styles.append('background-color: rgb({},{},{})'.format(*bg))
+
+    if bold:
+        classes.append('ansi-bold')
+
+    starttag = '<span'
+    if classes:
+        starttag += ' class="' + ' '.join(classes) + '"'
+    if styles:
+        starttag += ' style="' + '; '.join(styles) + '"'
+    starttag += '>'
+    return starttag, '</span>'
+
+
+def _latexconverter(fg, bg, bold):
+    """
+    Return start and end markup given foreground/background/bold.
+
+    """
+    if (fg, bg, bold) == (None, None, False):
+        return '', ''
+
+    starttag, endtag = '', ''
+
+    if isinstance(fg, int):
+        starttag += r'\textcolor{' + _ANSI_COLORS[fg] + '}{'
+        endtag = '}' + endtag
+    elif fg:
+        # See http://tex.stackexchange.com/a/291102/13684
+        starttag += r'\def\tcRGB{\textcolor[RGB]}\expandafter'
+        starttag += r'\tcRGB\expandafter{\detokenize{%s,%s,%s}}{' % fg
+        endtag = '}' + endtag
+
+    if isinstance(bg, int):
+        starttag += r'\setlength{\fboxsep}{0pt}\colorbox{'
+        starttag += _ANSI_COLORS[bg] + '}{'
+        endtag = r'\strut}' + endtag
+    elif bg:
+        starttag += r'\setlength{\fboxsep}{0pt}'
+        # See http://tex.stackexchange.com/a/291102/13684
+        starttag += r'\def\cbRGB{\colorbox[RGB]}\expandafter'
+        starttag += r'\cbRGB\expandafter{\detokenize{%s,%s,%s}}{' % bg
+        endtag = r'\strut}' + endtag
+
+    if bold:
+        starttag += r'\textbf{'
+        endtag = '}' + endtag
+    return starttag, endtag
+
+
+def _ansi2anything(text, converter):
+    r"""
+    Convert ANSI colors to HTML or LaTeX.
+
+    See https://en.wikipedia.org/wiki/ANSI_escape_code
+
+    Accepts codes like '\x1b[32m' (red) and '\x1b[1;32m' (bold, red).
+    The codes 1 (bold) and 5 (blinking) are selecting a bold font, code
+    0 and an empty code ('\x1b[m') reset colors and bold-ness.
+    Unlike in most terminals, "bold" doesn't change the color.
+    The codes 21 and 22 deselect "bold", the codes 39 and 49 deselect
+    the foreground and background color, respectively.
+    The codes 38 and 48 select the "extended" set of foreground and
+    background colors, respectively.
+
+    Non-color escape sequences (not ending with 'm') are filtered out.
+
+    Ideally, this should have the same behavior as the function
+    fixConsole() in notebook/notebook/static/base/js/utils.js.
+
+    """
+    fg, bg = None, None
+    bold = False
+    numbers = []
+    out = []
+
+    while text:
+        m = _ANSI_RE.search(text)
+        if m:
+            if m.group(2) == 'm':
+                try:
+                    numbers = [int(n) if n else 0
+                               for n in m.group(1).split(';')]
+                except ValueError:
+                    pass  # Invalid color specification
+            else:
+                pass  # Not a color code
+            chunk, text = text[:m.start()], text[m.end():]
+        else:
+            chunk, text = text, ''
+
+        if chunk:
+            if bold and fg in range(8):
+                fg += 8
+            starttag, endtag = converter(fg, bg, bold)
+            out.append(starttag)
+            out.append(chunk)
+            out.append(endtag)
+
+        while numbers:
+            n = numbers.pop(0)
+            if n == 0:
+                fg = bg = None
+                bold = False
+            elif n in (1, 5):
+                bold = True
+            elif n in (21, 22):
+                bold = False
+            elif 30 <= n <= 37:
+                fg = n - 30
+            elif n == 38:
+                try:
+                    fg = _get_extended_color(numbers)
+                except ValueError:
+                    numbers.clear()
+            elif n == 39:
+                fg = None
+            elif 40 <= n <= 47:
+                bg = n - 40
+            elif n == 48:
+                try:
+                    bg = _get_extended_color(numbers)
+                except ValueError:
+                    numbers.clear()
+            elif n == 49:
+                bg = None
+            elif 90 <= n <= 97:
+                fg = n - 90 + 8
+            elif 100 <= n <= 107:
+                bg = n - 100 + 8
+            else:
+                pass  # Unknown codes are ignored
+    return ''.join(out)
+
+
+def _get_extended_color(numbers):
+    n = numbers.pop(0)
+    if n == 2 and len(numbers) >= 3:
+        # 24-bit RGB
+        r = numbers.pop(0)
+        g = numbers.pop(0)
+        b = numbers.pop(0)
+        if not all(0 <= c <= 255 for c in (r, g, b)):
+            raise ValueError()
+    elif n == 5 and len(numbers) >= 1:
+        # 256 colors
+        idx = numbers.pop(0)
+        if idx < 0:
+            raise ValueError()
+        elif idx < 16:
+            # 16 default terminal colors
+            return idx
+        elif idx < 232:
+            # 6x6x6 color cube, see http://stackoverflow.com/a/27165165/500098
+            r = (idx - 16) // 36
+            r = 55 + r * 40 if r > 0 else 0
+            g = ((idx - 16) % 36) // 6
+            g = 55 + g * 40 if g > 0 else 0
+            b = (idx - 16) % 6
+            b = 55 + b * 40 if b > 0 else 0
+        elif idx < 256:
+            # grayscale, see http://stackoverflow.com/a/27165165/500098
+            r = g = b = (idx - 232) * 10 + 8
+        else:
+            raise ValueError()
+    else:
+        raise ValueError()
+    return r, g, b

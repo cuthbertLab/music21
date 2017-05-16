@@ -11,7 +11,7 @@
 #-----------------------------------------------------------------------------
 # Imports
 #-----------------------------------------------------------------------------
-from IPython.utils.py3compat import PY3
+from ipython_genutils.py3compat import PY3
 if PY3:
     from html.parser import HTMLParser
 else:

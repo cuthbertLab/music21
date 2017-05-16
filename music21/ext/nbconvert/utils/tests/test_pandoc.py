@@ -12,9 +12,9 @@
 import os
 import warnings
 
-from IPython.testing import decorators as dec
+from ipython_genutils.testing import decorators as dec
 
-from IPython.nbconvert.tests.base import TestsBase
+from nbconvert.tests.base import TestsBase
 from .. import pandoc
 
 #-----------------------------------------------------------------------------

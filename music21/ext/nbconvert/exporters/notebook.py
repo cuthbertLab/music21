@@ -4,19 +4,24 @@
 # Distributed under the terms of the Modified BSD License.
 
 from .exporter import Exporter
-from IPython import nbformat
-from IPython.utils.traitlets import Enum
+import nbformat
+from traitlets import Enum, default
 
 class NotebookExporter(Exporter):
-    """Exports to an IPython notebook."""
+    """Exports to an IPython notebook.
+
+    This is useful when you want to use nbconvert's preprocessors to operate on
+    a notebook (e.g. to execute it) and then write it back to a notebook file.
+    """
 
     nbformat_version = Enum(list(nbformat.versions),
         default_value=nbformat.current_nbformat,
-        config=True,
         help="""The nbformat version to write.
         Use this to downgrade notebooks.
         """
-    )
+    ).tag(config=True)
+
+    @default('file_extension')
     def _file_extension_default(self):
         return '.ipynb'
 
@@ -29,4 +34,6 @@ class NotebookExporter(Exporter):
         else:
             resources['output_suffix'] = '.nbconvert'
         output = nbformat.writes(nb_copy, version=self.nbformat_version)
+        if not output.endswith("\n"):
+            output = output + "\n"
         return output, resources

@@ -5,12 +5,12 @@
 
 import io
 
-from IPython import nbformat
-from IPython.nbformat import v4
+import nbformat
+from nbformat import v4
 
 from .base import ExportersTestsBase
 from ..rst import RSTExporter
-from IPython.testing.decorators import onlyif_cmds_exist
+from ipython_genutils.testing.decorators import onlyif_cmds_exist
 
 
 class TestRSTExporter(ExportersTestsBase):
