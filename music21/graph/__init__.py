@@ -20,22 +20,22 @@ object subclasses provide reusable approaches to graphing data and structures in
 '''
 from __future__ import division, print_function, absolute_import
 
-from collections import namedtuple
-
 import unittest
 import random, math, os
-
-# TODO: Move _missingImport to environment or common so this is unnecessary.
-from music21 import base # for _missingImport
 
 from music21 import common
 from music21 import chord
 from music21 import corpus
 from music21 import converter
 from music21 import dynamics
-from music21 import exceptions21
 from music21 import note
 from music21 import pitch
+
+from music21.graph import utilities
+from music21.graph.utilities import (getExtendedModules, 
+                                     GraphException, PlotStreamException,
+                                     getColor, accidentalLabelToUnicode,
+                                     userFormatsToFormat, userValuesToValues)
 
 from music21.analysis import correlate
 from music21.analysis import discrete
@@ -46,7 +46,6 @@ from music21.analysis import windowed
 
 from music21 import features
 from music21.ext import six
-from music21.ext import webcolors
 if six.PY2:
     # pylint: disable=redefined-builtin
     from music21.common import py3round as round
@@ -56,233 +55,6 @@ from music21 import environment
 _MOD = 'graph.py'
 environLocal = environment.Environment(_MOD)    
 
-ExtendedModules = namedtuple('ExtendedModules', 
-                             'matplotlib Axes3D collections patches plt networkx')
-
-def _getExtendedModules():
-    '''
-    this is done inside a function, so that the slow import of matplotlib is not done
-    in ``from music21 import *`` unless it's actually needed.
-
-    Returns a namedtuple: (matplotlib, Axes3D, collections, patches, plt, networkx)
-    '''
-    if 'matplotlib' in base._missingImport:
-        raise GraphException(
-            'could not find matplotlib, graphing is not allowed') # pragma: no cover
-    import matplotlib # @UnresolvedImport
-    # backend can be configured from config file, matplotlibrc,
-    # but an early test broke all processing
-    #matplotlib.use('WXAgg')
-    try:
-        from mpl_toolkits.mplot3d import Axes3D # @UnresolvedImport
-    except ImportError: # pragma: no cover
-        Axes3D = None
-        environLocal.warn(
-            "mpl_toolkits.mplot3d.Axes3D could not be imported -- likely cause is an " + 
-            "old version of six.py (< 1.9.0) on your system somewhere")
-    
-    from matplotlib import collections # @UnresolvedImport
-    from matplotlib import patches # @UnresolvedImport
-
-    #from matplotlib.colors import colorConverter
-    import matplotlib.pyplot as plt # @UnresolvedImport
-    
-    try:
-        import networkx
-    except ImportError: # pragma: no cover
-        networkx = None # use for testing
-    
-    return ExtendedModules(matplotlib, Axes3D, collections, patches, plt, networkx)
-
-#-------------------------------------------------------------------------------
-class GraphException(exceptions21.Music21Exception):
-    pass
-
-class PlotStreamException(exceptions21.Music21Exception):
-    pass
-
-def accidentalLabelToUnicode(label):
-    u'''
-    Changes a label possibly containing a modifier such as "-" or "#" into
-    a unicode string.
-    
-    >>> print(graph.accidentalLabelToUnicode('B-4'))
-    B♭4
-     
-    Since matplotlib's default fonts do not support double sharps or double flats,
-    etc. these are converted as best we can...
-    
-    >>> print(graph.accidentalLabelToUnicode('B--4'))
-    B♭♭4
-     
-    In Python 2, all strings are converted to unicode strings even if there is
-    no need to.
-    '''
-    if not isinstance(label, six.string_types):
-        return label
-    if six.PY2 and isinstance(label, str):
-        label = six.u(label)
-    
-    for modifier, unicodeAcc in pitch.unicodeFromModifier.items():
-        if modifier != '' and modifier in label and modifier in ('-', '#'):
-            # ideally eventually matplotlib will do the other accidentals...
-            label = label.replace(modifier, unicodeAcc)
-            break 
-
-    return label
-
-# define acceptable format and value strings
-FORMATS = ['horizontalbar', 'histogram', 'scatter', 'scatterweighted', 
-            '3dbars', 'colorgrid', 'horizontalbarweighted']
-
-# first for each row needs to match a format.
-FORMAT_SYNONYMS = [('horizontalbar', 'bar', 'horizontal', 'pianoroll', 'piano'),
-                   ('histogram', 'histo', 'count'),
-                   ('scatter', 'point'),
-                   ('scatterweighted', 'weightedscatter', 'weighted'),
-                   ('3dbars', '3d'),
-                   ('colorgrid', 'grid', 'window', 'windowed'),
-                   ('horizontalbarweighted', 'barweighted', 'weightedbar')]
-
-
-def userFormatsToFormat(value):
-    '''
-    Replace possible user format strings with defined format names as used herein. 
-    Returns string unaltered if no match.
-    
-    >>> graph.userFormatsToFormat('horizontal')
-    'horizontalbar'
-    >>> graph.userFormatsToFormat('Weighted Scatter')
-    'scatterweighted'
-    >>> graph.userFormatsToFormat('3D')
-    '3dbars'
-    
-    Unknown:
-    
-    >>> graph.userFormatsToFormat('4D super chart')
-    '4dsuperchart'
-    '''
-    #environLocal.printDebug(['calling user userFormatsToFormat:', value])
-    value = value.lower()
-    value = value.replace(' ', '')
-
-    for opt in FORMAT_SYNONYMS:
-        if value in opt:
-            return opt[0] # first one for each is the preferred
-    
-    # return unaltered if no match
-    #environLocal.printDebug(['userFormatsToFormat(): could not match value', value])
-    return value
-
-VALUES = ['pitch', 'pitchspace', 'ps', 'pitchclass', 'pc', 'duration', 
-          'quarterlength', 'offset', 'time', 'dynamic', 'dynamics', 'instrument']
-
-def userValuesToValues(valueList):
-    '''
-    Given a value list, replace string with synonyms. Let unmatched values pass.
-    
-    >>> graph.userValuesToValues(['pitchSpace', 'Duration'])
-    ['pitch', 'quarterlength']
-    '''  
-    post = []
-    for value in valueList:
-        value = value.lower()
-        value = value.replace(' ', '')
-        if value in ['pitch', 'pitchspace', 'ps']:
-            post.append('pitch')
-        elif value in ['pitchclass', 'pc']:
-            post.append('pitchclass')
-        elif value in ['duration', 'quarterlength']:
-            post.append('quarterlength')
-        elif value in ['offset', 'time']:
-            post.append('offset')
-        elif value in ['dynamic', 'dynamics']:
-            post.append('dynamics')
-        elif value in ['instrument', 'instruments', 'instrumentation']:
-            post.append('instrument')
-        else:
-            post.append(value)
-    return post
-
-
-def getColor(color):
-    '''
-    Convert any specification of a color to a hexadecimal color used by matplotlib. 
-    
-    >>> graph.getColor('red')
-    '#ff0000'
-    >>> graph.getColor('r')
-    '#ff0000'
-    >>> graph.getColor('Steel Blue')
-    '#4682b4'
-    >>> graph.getColor('#f50')
-    '#ff5500'
-    >>> graph.getColor([0.5, 0.5, 0.5])
-    '#808080'
-    >>> graph.getColor(0.8)
-    '#cccccc'
-    >>> graph.getColor([0.8])
-    '#cccccc'
-    >>> graph.getColor([255, 255, 255])
-    '#ffffff'
-    
-    Invalid colors raise GraphExceptions:
-    
-    >>> graph.getColor('l')
-    Traceback (most recent call last):
-    music21.graph.GraphException: invalid color abbreviation: l
-
-    >>> graph.getColor('chalkywhitebutsortofgreenish')
-    Traceback (most recent call last):
-    music21.graph.GraphException: invalid color name: chalkywhitebutsortofgreenish
-
-    >>> graph.getColor(True)
-    Traceback (most recent call last):
-    music21.graph.GraphException: invalid color specification: True
-    '''
-    # expand a single value to three
-    if common.isNum(color):
-        color = [color, color, color]
-    if isinstance(color, six.string_types):
-        if color[0] == '#': # assume is hex
-            # this will expand three-value codes, and check for badly
-            # formed codes
-            return webcolors.normalize_hex(color)
-        color = color.lower().replace(' ', '')
-        # check for one character matplotlib colors
-        if len(color) == 1:
-            colorMap = {'b': 'blue',
-                        'g': 'green',
-                        'r': 'red',
-                        'c': 'cyan',
-                        'm': 'magenta',
-                        'y': 'yellow',
-                        'k': 'black',
-                        'w': 'white'}
-            try:
-                color = colorMap[color]
-            except KeyError:
-                raise GraphException('invalid color abbreviation: %s' % color)
-        try:
-            return webcolors.css3_names_to_hex[color]
-        except KeyError: # no color match
-            raise GraphException('invalid color name: %s' % color)
-        
-    elif common.isListLike(color):
-        percent = False
-        for sub in color:
-            if sub < 1:
-                percent = True  
-                break
-        if percent:
-            if len(color) == 1:
-                color = [color[0], color[0], color[0]]
-            # convert to 0 100% values as strings with % symbol
-            colorStrList = [str(x * 100) + "%" for x in color]
-            return webcolors.rgb_percent_to_hex(colorStrList)
-        else: # assume integers
-            return webcolors.rgb_to_hex(tuple(color))
-    raise GraphException('invalid color specification: %s' % color)
 
 #-------------------------------------------------------------------------------
 class Graph(object):
@@ -328,7 +100,7 @@ class Graph(object):
     figureSizeDefault = (6, 6)
 
     def __init__(self, *args, **keywords):
-        _getExtendedModules()
+        getExtendedModules()
         self.data = None
         self.figure = None # a matplotlib.Figure object
         # define a component dictionary for each axis
@@ -385,7 +157,7 @@ class Graph(object):
 #             if self.doneAction == 'show':
 #                 keep_observers = True
 #             self.figure.clf(keep_observers=keep_observers)
-            etm = _getExtendedModules()
+            etm = getExtendedModules()
             etm.plt.close(self.figure)
     
     @common.deprecated('August 2016', 'August 2017', 'use self.data = data instead')
@@ -430,7 +202,7 @@ class Graph(object):
 
         >>> g.setTicks('m', [('a', 'b')])
         Traceback (most recent call last):
-        music21.graph.GraphException: Cannot find key 'm' in self.axis
+        music21.graph.utilities.GraphException: Cannot find key 'm' in self.axis
 
         >>> g.setTicks('x', [])
         >>> g.axis['x']['ticks']
@@ -713,7 +485,7 @@ class GraphNetworxGraph(Graph):
 
     def __init__(self, *args, **keywords):
         super(GraphNetworxGraph, self).__init__(*args, **keywords)
-        extm = _getExtendedModules() 
+        extm = getExtendedModules() 
         
         if 'title' not in keywords:
             self.title = 'Network Plot'
@@ -734,7 +506,7 @@ class GraphNetworxGraph(Graph):
                 pass # keep as None
 
     def process(self): # pragma: no cover
-        extm = _getExtendedModules()
+        extm = getExtendedModules()
         plt = extm.plt
         networkx = extm.networkx
         # figure size can be set w/ figsize=(5,10)
@@ -810,7 +582,7 @@ class GraphColorGrid(Graph):
     figureSizeDefault = (9, 6)
 
     def process(self):
-        extm = _getExtendedModules() 
+        extm = getExtendedModules() 
         plt = extm.plt
 
         # figure size can be set w/ figsize=(5,10)
@@ -924,7 +696,7 @@ class GraphColorGridLegend(Graph):
             self.title = 'Legend'
                                 
     def process(self):
-        extm = _getExtendedModules()
+        extm = getExtendedModules()
         plt = extm.plt
 
         # figure size can be set w/ figsize=(5,10)
@@ -1069,7 +841,7 @@ class GraphHorizontalBar(Graph):
             self.alpha = 0.6
 
     def process(self):
-        extm  = _getExtendedModules()
+        extm  = getExtendedModules()
         plt = extm.plt
 
         # figure size can be set w/ figsize=(5,10)
@@ -1166,7 +938,7 @@ class GraphHorizontalBarWeighted(Graph):
 #                 ]
 
     def process(self):
-        extm = _getExtendedModules()
+        extm = getExtendedModules()
         plt = extm.plt
 
         # figure size can be set w/ figsize=(5,10)
@@ -1298,7 +1070,7 @@ class GraphScatterWeighted(Graph):
         self._rangeDiameter = self._maxDiameter - self._minDiameter
 
     def process(self):
-        extm = _getExtendedModules()
+        extm = getExtendedModules()
         plt = extm.plt
         patches = extm.patches
 
@@ -1410,7 +1182,7 @@ class GraphScatter(Graph):
         '''
         runs the data through the processor and if doneAction == 'show' (default), show the graph
         '''
-        extm = _getExtendedModules()
+        extm = getExtendedModules()
         plt = extm.plt
 
         # figure size can be set w/ figsize=(5,10)
@@ -1494,7 +1266,7 @@ class GraphHistogram(Graph):
             self.alpha = 0.8
 
     def process(self):
-        extm = _getExtendedModules()
+        extm = getExtendedModules()
         plt = extm.plt
 
         # figure size can be set w/ figsize=(5,10)
@@ -1569,7 +1341,7 @@ class GraphGroupedVerticalBar(Graph):
                     family=self.fontFamily)
 
     def process(self):
-        extm = _getExtendedModules()
+        extm = getExtendedModules()
         plt = extm.plt
         matplotlib = extm.matplotlib
 
@@ -1641,7 +1413,7 @@ class _Graph3DBars(Graph):
     axisKeys = ('x', 'y', 'z')
 
     def process(self):
-        extm = _getExtendedModules()
+        extm = getExtendedModules()
         plt = extm.plt
         
         self.figure = plt.figure()
@@ -1728,7 +1500,7 @@ class Graph3DPolygonBars(Graph):
             self.zeroFloor = False
 
     def process(self):
-        extm = _getExtendedModules()
+        extm = getExtendedModules()
         plt = extm.plt
         matplotlib = extm.matplotlib
         Axes3D = extm.Axes3D
@@ -2528,7 +2300,6 @@ class PlotMultiStream(object):
     '''
     Approaches to plotting and graphing multiple Streams. 
     A base class from which Stream plotting Classes inherit.
-
     '''
     # the following static parameters are used to for matching this
     # plot based on user-requested string aguments
@@ -4248,12 +4019,12 @@ def getPlotsToMake(*args, **keywords):
         formatCandidate = userFormatsToFormat(args[0])
         #environLocal.printDebug(['formatCandidate', formatCandidate])
         match = False
-        if formatCandidate in FORMATS:
+        if formatCandidate in utilities.FORMATS:
             showFormat = formatCandidate
             values = 'pitch'
             match = True
         # if one arg, assume it is a histogram value
-        if formatCandidate in VALUES:
+        if formatCandidate in utilities.VALUES:
             showFormat = 'histogram'
             values = (args[0],)
             match = True
@@ -4969,7 +4740,7 @@ class Test(unittest.TestCase):
 
 
     def testGraphNetworxGraph(self):
-        extm = _getExtendedModules() #@UnusedVariable
+        extm = getExtendedModules() #@UnusedVariable
 
         if extm.networkx is not None: # pragma: no cover
             b = GraphNetworxGraph(doneAction=None)
@@ -5318,9 +5089,7 @@ class Test(unittest.TestCase):
 
 
     def testGraphVerticalBar(self):
-        from music21 import graph
-        
-        g = graph.GraphGroupedVerticalBar(doneAction=None)
+        g = GraphGroupedVerticalBar(doneAction=None)
         data = [('bar%s' % x, {'a':3,'b':2,'c':1}) for x in range(10)]
         g.data = data
         g.process()
@@ -5330,14 +5099,6 @@ class Test(unittest.TestCase):
         p = PlotFeatures(streamList, featureExtractors=feList, doneAction=None)
         p.process()
         
-
-
-    def testColors(self):
-        from music21 import graph
-        self.assertEqual(graph.getColor([0.5, 0.5, 0.5]), '#808080')
-        self.assertEqual(graph.getColor(0.5), '#808080')
-        self.assertEqual(graph.getColor(255), '#ffffff')
-        self.assertEqual(graph.getColor('Steel Blue'), '#4682b4')
 
 #     def testMeasureNumbersA(self):
 #         from music21 import corpus, graph
@@ -5382,10 +5143,6 @@ class Test(unittest.TestCase):
                 i += 1
         s.plot('dolan', fillByMeasure=True, segmentByTarget=True, doneAction=None)
 
-
-
-
-
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [
@@ -5415,7 +5172,7 @@ _DOC_ORDER = [
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
-    music21.mainTest(Test) #TestExternal, 'noDocTest') #, runTest='testGetPlotsToMakeA')
+    music21.mainTest(Test) #, TestExternal) #, runTest='testGetPlotsToMakeA')
 
 #------------------------------------------------------------------------------
 # eof

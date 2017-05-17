@@ -8853,12 +8853,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
     @common.deprecated('May 2017', 'September 2018', 'see analysis.pitchAnalysis instead')
-    def pitchAttributeCount(self, pitchAttr='name'):
+    def pitchAttributeCount(self, pitchAttr='name'): # pragma: no-cover
+        '''
+        see :func:music21.analysis.pitchAnalysis.pitchAttributeCount
+        '''
         from music21.analysis.pitchAnalysis import pitchAttributeCount
         return pitchAttributeCount(self, pitchAttr)
 
     @common.deprecated('May 2017', 'September 2018', 'see analysis.elements instead')
-    def attributeCount(self, classFilterList=None, attrName='quarterLength'):
+    def attributeCount(self, classFilterList=None, attrName='quarterLength'):  # pragma: no-cover
+        '''
+        see :func:music21.analysis.elements.attributeCount
+        '''
         if classFilterList is not None:
             passedObject = self.iter
             passedObject.addFilter(filters.ClassFilter(classFilterList))
