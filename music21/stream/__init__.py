@@ -8852,81 +8852,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return post
 
 
+    @common.deprecated('May 2017', 'September 2018', 'see analysis.pitchAnalysis instead')
     def pitchAttributeCount(self, pitchAttr='name'):
-        '''
-        Return a collections.Counter of pitch class usage (count)
-        by selecting an attribute of the Pitch object.
+        from music21.analysis.pitchAnalysis import pitchAttributeCount
+        return pitchAttributeCount(self, pitchAttr)
 
-        Changed in 4.0: Returns a collections.Counter object.
-
-        >>> a = corpus.parse('bach/bwv324.xml')
-        >>> pcCount = a.pitchAttributeCount('pitchClass')
-        >>> for n in sorted(pcCount):
-        ...     print ("%2d: %2d" % (n, pcCount[n]))
-         0:  3
-         2: 25
-         3:  3
-         4: 14
-         6: 15
-         7: 13
-         9: 17
-        11: 14
-        
-        
-        List in most common order:
-        
-        >>> nameCount = a.pitchAttributeCount('name')
-        >>> for n, count in nameCount.most_common(3):
-        ...     print ("%2s: %2d" % (n, nameCount[n]))
-         D: 25
-         A: 17
-        F#: 15
-
-        >>> nameOctaveCount = a.pitchAttributeCount('nameWithOctave')
-        >>> for n in sorted(nameOctaveCount):
-        ...     print ("%3s: %2d" % (n, nameOctaveCount[n]))
-         A2:  2
-         A3:  5
-         A4: 10
-         B2:  3
-         B3:  4
-         B4:  7
-         C3:  2
-         C5:  1
-        D#3:  1
-        D#4:  2
-        ...
-        '''
-        post = collections.Counter()
-        for p in self.pitches:
-            k = getattr(p, pitchAttr)
-            post[k] += 1
-        return post
-
-
+    @common.deprecated('May 2017', 'September 2018', 'see analysis.elements instead')
     def attributeCount(self, classFilterList=None, attrName='quarterLength'):
-        '''
-        Return a collections.Counter of attribute usage for one or more
-        classes provided in a the `classFilterList` list and having
-        the attribute specified by `attrName`.
-
-        >>> from music21 import corpus
-        >>> a = corpus.parse('bach/bwv324.xml')
-        >>> qlCount = a.parts[0].flat.attributeCount(note.Note, 'quarterLength')
-        >>> qlCount.most_common(3)
-        [(1.0, 12), (2.0, 11), (4.0, 2)]
-        
-        Changed in 4.0: Returns a collections.Counter object.
-        '''
-        post = collections.Counter()
-        siter = self.iter
         if classFilterList is not None:
-            siter.addFilter(filters.ClassFilter(classFilterList))
-        for e in siter:
-            if hasattr(e, attrName):
-                k = getattr(e, attrName)
-                post[k] += 1
-        return post
+            passedObject = self.iter
+            passedObject.addFilter(filters.ClassFilter(classFilterList))
+        else:
+            passedObject = self
+        from music21.analysis.elements import attributeCount
+        return attributeCount(passedObject, attrName)
 
 
     #---------------------------------------------------------------------------

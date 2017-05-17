@@ -3734,6 +3734,19 @@ class MeasureExporter(XMLExporterBase):
         #mxArticulations.append(mxArticulationMark)
         return mxArticulationMark
     
+    
+#     def fretboardToXmlFrame(self, fretboardMark):
+#         '''
+#         >>> MEX = musicxml.m21ToXml.MeasureExporter()
+#         >>> fb = instruments.fretted.FretBoard(1, 2, 3)
+#         >>> # configure it here...
+#         >>> mxFret = MEX.fretboardToXmlTechnical(fb)
+#         >>> MEX.dump(mxFret)
+#         <frame>lots of stuff here</frame>
+#         '''
+#         pass
+    
+        
     def articulationToXmlTechnical(self, articulationMark):
         '''
         Returns a tag that represents the
@@ -3915,9 +3928,9 @@ class MeasureExporter(XMLExporterBase):
             return self.chordToXml(cs)
 
         from music21 import harmony
+        
         mxHarmony = Element('harmony')
         self.setPrintStyle(mxHarmony, cs)
-
 
         csRoot = cs.root()
         csBass = cs.bass(find=False)

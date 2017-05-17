@@ -39,6 +39,8 @@ from music21 import pitch
 
 from music21.analysis import correlate
 from music21.analysis import discrete
+from music21.analysis import elements as elementAnalysis
+from music21.analysis import pitchAnalysis
 from music21.analysis import reduction
 from music21.analysis import windowed
 
@@ -328,7 +330,7 @@ class Graph(object):
     def __init__(self, *args, **keywords):
         _getExtendedModules()
         self.data = None
-        self.fig = None # a matplotlib.Figure object
+        self.figure = None # a matplotlib.Figure object
         # define a component dictionary for each axis
         self.axis = {}
         for ax in self.axisKeys:
@@ -374,17 +376,17 @@ class Graph(object):
             if kw in keywords:
                 setattr(self, kw, keywords[kw])
 
-#     def __del__(self):
-#         '''
-#         Matplotlib Figure objects need to be explicitly closed when no longer used...
-# 
-#         Too slow, and recent matplotlib versions don't have this problem any more.
-#         '''
-#         if hasattr(self, 'fig') and self.fig is not None:
+    def __del__(self):
+        '''
+        Matplotlib Figure objects need to be explicitly closed when no longer used...
+        '''
+        if hasattr(self, 'figure') and self.figure is not None and self.doneAction is None:
 #             keep_observers = False
 #             if self.doneAction == 'show':
 #                 keep_observers = True
-#             self.fig.clf(keep_observers=keep_observers)
+#             self.figure.clf(keep_observers=keep_observers)
+            etm = _getExtendedModules()
+            etm.plt.close(self.figure)
     
     @common.deprecated('August 2016', 'August 2017', 'use self.data = data instead')
     def setData(self, data):
@@ -566,12 +568,12 @@ class Graph(object):
 
         # right and top must be larger
         # this does not work right yet
-        #self.fig.subplots_adjust(left=1, bottom=1, right=2, top=2)
+        #self.figure.subplots_adjust(left=1, bottom=1, right=2, top=2)
 
         # this figure instance is created in the subclased process() method
         # set total size of figure
-        self.fig.set_figwidth(self.figureSize[0])
-        self.fig.set_figheight(self.figureSize[1])
+        self.figure.set_figwidth(self.figureSize[0])
+        self.figure.set_figheight(self.figureSize[1])
 
 #         subplot.set_xscale('linear')
 #         subplot.set_yscale('linear')
@@ -663,8 +665,7 @@ class Graph(object):
         elif self.doneAction == 'write': # pragma: no cover
             self.write(fp)
         elif self.doneAction is None:
-            extm = _getExtendedModules() #@UnusedVariable
-            extm.plt.close()
+            pass
 
     def show(self): # pragma: no cover
         '''
@@ -672,7 +673,7 @@ class Graph(object):
         For most matplotlib back ends, this will open 
         a GUI window with the desired graph.
         '''
-        self.fig.show()
+        self.figure.show()
 
     def write(self, fp=None): # pragma: no cover
         '''
@@ -682,12 +683,12 @@ class Graph(object):
             fp = environLocal.getTempFile('.png')
 
         if self.dpi is not None:
-            self.fig.savefig(fp, 
+            self.figure.savefig(fp, 
                              facecolor=getColor(self.colorBackgroundFigure),      
                              edgecolor=getColor(self.colorBackgroundFigure),
                              dpi=self.dpi)
         else:
-            self.fig.savefig(fp, 
+            self.figure.savefig(fp, 
                              facecolor=getColor(self.colorBackgroundFigure),      
                              edgecolor=getColor(self.colorBackgroundFigure))
 
@@ -737,8 +738,8 @@ class GraphNetworxGraph(Graph):
         plt = extm.plt
         networkx = extm.networkx
         # figure size can be set w/ figsize=(5,10)
-        self.fig = plt.figure()
-        ax = self.fig.add_subplot(1, 1, 1)
+        self.figure = plt.figure()
+        ax = self.figure.add_subplot(1, 1, 1)
 
         # positions for all nodes
         # positions are stored in the networkx graph as a pos attribute
@@ -813,9 +814,8 @@ class GraphColorGrid(Graph):
         plt = extm.plt
 
         # figure size can be set w/ figsize=(5,10)
-        self.fig = plt.figure()
-        self.fig.subplots_adjust(left=0.15)   
-        axTop = self.fig.add_subplot(1, 1, 1)
+        self.figure = plt.figure()
+        axTop = self.figure.add_subplot(1, 1, 1)
         # do not need grid for outer container
 
         # these approaches do not work:
@@ -824,6 +824,8 @@ class GraphColorGrid(Graph):
         # axTop.patch.set_facecolor('#000000')
 
         # axTop.bar([0.5], [1], 1, color=['#000000'], linewidth=0.5, edgecolor='#111111')
+
+        self.figure.subplots_adjust(left=0.15)   
         
         rowCount = len(self.data)
 
@@ -842,7 +844,7 @@ class GraphColorGrid(Graph):
                 heights.append(1)
             
             # add a new subplot for each row    
-            ax = self.fig.add_subplot(rowCount, 1, rowCount - i)
+            ax = self.figure.add_subplot(rowCount, 1, rowCount - i)
 
             # linewidth: 0.1 is the thinnest possible
             # antialiased = false, for small diagrams, provides tighter images
@@ -877,13 +879,14 @@ class GraphColorGrid(Graph):
         # adjust space between the bars
         # 0.1 is about the smallest that gives some space
         if rowCount > 12:
-            self.fig.subplots_adjust(hspace=0)
+            self.figure.subplots_adjust(hspace=0)
         else:
-            self.fig.subplots_adjust(hspace=0.1)
+            self.figure.subplots_adjust(hspace=0.1)
 
 
         axisRangeNumbers = (0, 1)
         self.setAxisRange('x', axisRangeNumbers, 0)
+
         # turn off grid
         self.grid = False
         # standard procedures
@@ -925,14 +928,14 @@ class GraphColorGridLegend(Graph):
         plt = extm.plt
 
         # figure size can be set w/ figsize=(5,10)
-        self.fig = plt.figure()
+        self.figure = plt.figure()
 
-        axTop = self.fig.add_subplot(1, 1, 1)
+        axTop = self.figure.add_subplot(1, 1, 1)
         
         for i, rowLabelAndData in enumerate(self.data):
             rowLabel = rowLabelAndData[0]
             rowData = rowLabelAndData[1]
-            self.makeOneRowOfGraph(self.fig, i, rowLabel, rowData)
+            self.makeOneRowOfGraph(self.figure, i, rowLabel, rowData)
             
             
         self.setAxisRange('x', (0, 1), 0)
@@ -945,7 +948,7 @@ class GraphColorGridLegend(Graph):
         # top and bottom here push diagram more toward center of frame
         # may be useful in other graphs
         # , 
-        self.fig.subplots_adjust(hspace=1.5, top=0.75, bottom=0.2)
+        self.figure.subplots_adjust(hspace=1.5, top=0.75, bottom=0.2)
 
         self.setAxisLabel('y', '')
         self.setAxisLabel('x', '')
@@ -1070,9 +1073,9 @@ class GraphHorizontalBar(Graph):
         plt = extm.plt
 
         # figure size can be set w/ figsize=(5,10)
-        self.fig = plt.figure()
-        self.fig.subplots_adjust(left=0.15)   
-        ax = self.fig.add_subplot(1, 1, 1)
+        self.figure = plt.figure()
+        self.figure.subplots_adjust(left=0.15)   
+        ax = self.figure.add_subplot(1, 1, 1)
 
         yPos = 0
         xPoints = [] # store all to find min/max
@@ -1167,10 +1170,10 @@ class GraphHorizontalBarWeighted(Graph):
         plt = extm.plt
 
         # figure size can be set w/ figsize=(5,10)
-        self.fig = plt.figure()
+        self.figure = plt.figure()
         # might need more space here for larger y-axis labels
-        self.fig.subplots_adjust(left=0.15)   
-        ax = self.fig.add_subplot(1, 1, 1)
+        self.figure.subplots_adjust(left=0.15)   
+        ax = self.figure.add_subplot(1, 1, 1)
 
         yPos = 0
         xPoints = [] # store all to find min/max
@@ -1300,10 +1303,10 @@ class GraphScatterWeighted(Graph):
         patches = extm.patches
 
         # figure size can be set w/ figsize=(5,10)
-        self.fig = plt.figure()
+        self.figure = plt.figure()
         # these need to be equal to maintain circle scatter points
-        self.fig.subplots_adjust(left=0.15, bottom=0.15)
-        ax = self.fig.add_subplot(1, 1, 1)
+        self.figure.subplots_adjust(left=0.15, bottom=0.15)
+        ax = self.figure.add_subplot(1, 1, 1)
 
         # need to filter data to weight z values
         xList = [x for x, unused_y, unused_z in self.data]
@@ -1411,9 +1414,9 @@ class GraphScatter(Graph):
         plt = extm.plt
 
         # figure size can be set w/ figsize=(5,10)
-        self.fig = plt.figure()
-        self.fig.subplots_adjust(left=0.15)
-        ax = self.fig.add_subplot(1, 1, 1)
+        self.figure = plt.figure()
+        self.figure.subplots_adjust(left=0.15)
+        ax = self.figure.add_subplot(1, 1, 1)
         xValues = []
         yValues = []
         i = 0
@@ -1495,9 +1498,9 @@ class GraphHistogram(Graph):
         plt = extm.plt
 
         # figure size can be set w/ figsize=(5,10)
-        self.fig = plt.figure()
-        self.fig.subplots_adjust(left=0.15)
-        ax = self.fig.add_subplot(1, 1, 1)
+        self.figure = plt.figure()
+        self.figure.subplots_adjust(left=0.15)
+        ax = self.figure.add_subplot(1, 1, 1)
 
         x = []
         y = []
@@ -1570,9 +1573,9 @@ class GraphGroupedVerticalBar(Graph):
         plt = extm.plt
         matplotlib = extm.matplotlib
 
-        self.fig = plt.figure()
-        self.fig.subplots_adjust(bottom=0.3)
-        ax = self.fig.add_subplot(1, 1, 1)
+        self.figure = plt.figure()
+        self.figure.subplots_adjust(bottom=0.3)
+        ax = self.figure.add_subplot(1, 1, 1)
 
         # b value is a list of values for each bar
         for unused_a, b in self.data:
@@ -1641,8 +1644,8 @@ class _Graph3DBars(Graph):
         extm = _getExtendedModules()
         plt = extm.plt
         
-        self.fig = plt.figure()
-        ax = extm.Axes3D(self.fig)
+        self.figure = plt.figure()
+        ax = extm.Axes3D(self.figure)
 
         zVals = self.data.keys()
         zVals.sort()
@@ -1731,8 +1734,8 @@ class Graph3DPolygonBars(Graph):
         Axes3D = extm.Axes3D
         collections = extm.collections
         
-        self.fig = plt.figure()
-        ax = Axes3D(self.fig)
+        self.figure = plt.figure()
+        ax = Axes3D(self.figure)
 
         verts = []
         vertsColor = []
@@ -2083,9 +2086,8 @@ class PlotStream(object):
 
         '''
         # keys are integers
-        # pcCount = self.streamObj.pitchAttributeCount('pitchClass')
         # name strings are keys, and enharmonic are thus different
-        nameCount = self.streamObj.pitchAttributeCount('name')
+        nameCount = pitchAnalysis.pitchAttributeCount(self.streamObj, 'name')
         ticks = []
         for i in range(pcMin, pcMax + 1):
             p = pitch.Pitch()
@@ -2230,9 +2232,8 @@ class PlotStream(object):
         for undefined notes.
         '''
         # keys are integers
-        # pcCount = self.streamObj.pitchAttributeCount('pitchClass')
         # name strings are keys, and enharmonic are thus different
-        nameWithOctaveCount = self.streamObj.pitchAttributeCount('nameWithOctave')
+        nameWithOctaveCount = pitchAnalysis.pitchAttributeCount(self.streamObj, 'nameWithOctave')
         ticks = []
         for i in range(int(math.floor(pcMin)), int(math.ceil(pcMax + 1))):
             p = pitch.Pitch()
@@ -2271,10 +2272,8 @@ class PlotStream(object):
         That is, show the most commonly used enharmonic first.
         '''
         # keys are integers
-        # pcCount = self.streamObj.pitchAttributeCount('pitchClass')
         # name strings are keys, and enharmonic are thus different
-        nameWithOctaveCount = self.streamObj.pitchAttributeCount(
-                             'nameWithOctave')
+        nameWithOctaveCount = pitchAnalysis.pitchAttributeCount(self.streamObj, 'nameWithOctave')
         vals = []
         for i in range(int(math.floor(pcMin)), int(math.ceil(pcMax+1))):
             vals.append(i)
@@ -2473,11 +2472,13 @@ class PlotStream(object):
         (1.2)
         '''
         if self.flatten:
-            sSrc = self.streamObj.flat
+            sSrc = self.streamObj.recurse()
         else:
-            sSrc = self.streamObj
+            sSrc = self.streamObj.iter
+        
+        sSrc = sSrc.getElementsByClass([note.Note, chord.Chord])
         # get all quarter lengths
-        mapping = sSrc.attributeCount([note.Note, chord.Chord], 'quarterLength')
+        mapping = elementAnalysis.attributeCount(sSrc, 'quarterLength')
 
         ticks = []
         for ql in sorted(mapping):
