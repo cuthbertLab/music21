@@ -126,7 +126,7 @@ class Graph(object):
         self.figureSize = self.figureSizeDefault
         self.marker = 'o'
         self.markerSize = 6
-        self.colors = ['#605C7F', '#5c7f60', '#715c7f']
+        self.colors = ['#605c7f', '#5c7f60', '#715c7f']
         self.tickFontSize = 8
         self.titleFontSize = 12
         self.labelFontSize = 10
@@ -140,6 +140,7 @@ class Graph(object):
         self.hideLeftBottomSpines = False
 
         self._doneAction = 'write'
+        self._dataColorIndex = 0
         
         for kw in ('alpha', 'dpi', 'colorBackgroundData', 'colorBackgroundFigure',
                      'colorGrid', 'title', 'figureSize', 'marker', 'markerSize',
@@ -182,6 +183,30 @@ class Graph(object):
             self._doneAction = action
         else: # pragma: no cover
             raise GraphException('not such done action: %s' % action)
+
+    def nextColor(self):
+        '''
+        Utility function that cycles through the colors of self.colors...
+        
+        >>> g = graph.Graph()
+        >>> g.colors
+        ['#605c7f', '#5c7f60', '#715c7f']
+
+        >>> g.nextColor()
+        '#605c7f'
+        
+        >>> g.nextColor()
+        '#5c7f60'
+        
+        >>> g.nextColor()
+        '#715c7f'
+        
+        >>> g.nextColor()
+        '#605c7f'
+        '''
+        c = getColor(self.colors[self._dataColorIndex % len(self.colors)])        
+        self._dataColorIndex += 1
+        return c
 
     def setTicks(self, axisKey, pairs):
         '''
@@ -440,6 +465,9 @@ class Graph(object):
         self.figure = plt.figure()
         self.subplot = self.figure.add_subplot(1, 1, 1)
 
+        self._dataColorIndex = 0 # just for consistent rendering if run twice
+
+        # call class specific info
         self.renderSubplot(self.subplot)
 
         # standard procedures
@@ -856,7 +884,7 @@ class GraphHorizontalBar(Graph):
             keys.append(key)
             # provide a list of start, end points;
             # then start y position, bar height
-            faceColor = getColor(self.colors[i % len(self.colors)])            
+            faceColor = self.nextColor()            
             
             if points:
                 yrange = (yPos + self._margin, 
@@ -948,7 +976,7 @@ class GraphHorizontalBarWeighted(Graph):
             colors = []
             for i, data in enumerate(points):
                 
-                color = self.colors[i % len(self.colors)]
+                color = self.nextColor()
                 alpha = self.alpha
                 yShift = 0 # between -1 and 1
 
@@ -1110,7 +1138,7 @@ class GraphScatterWeighted(Graph):
             e.set_clip_box(subplot.bbox)
             # e.set_alpha(self.alpha * zScalar)
             e.set_alpha(self.alpha)
-            e.set_facecolor(getColor(self.colors[i % len(self.colors)])) 
+            e.set_facecolor(self.nextColor()) 
             # # can do this here
             # environLocal.printDebug([e])
 
@@ -1167,7 +1195,7 @@ class GraphScatter(Graph):
             x = row[0]
             y = row[1]
             marker = self.marker
-            color = getColor(self.colors[i % len(self.colors)])
+            color = self.nextColor()
             alpha = self.alpha
             markerSize = self.markerSize
             if len(row) >= 3:
@@ -1322,7 +1350,7 @@ class GraphGroupedVerticalBar(Graph):
                                yVals, 
                                width=widthShift, 
                                alpha=0.8,
-                               color=getColor(self.colors[i % len(self.colors)]))
+                               color=self.nextColor())
             rects.append(rect)
 
         colors = []
