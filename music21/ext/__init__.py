@@ -4,5 +4,5 @@ but which extend music21 functionality
 and whose licenses allow them to be distributed with music21.
 '''
 __ALL__ = ['jsonpickle', 'joblib', 'xlrd', 'enum', 'six', 'webcolors', 
-           'nbconvert', 'chardet', 'more_itertools']
+           'chardet', 'more_itertools']
 

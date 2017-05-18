@@ -9,6 +9,9 @@
 # Copyright:    Copyright © 2009-2012, 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
+'''
+Methods for finding external modules, converting colors to Matplotlib colors, etc.
+'''
 from __future__ import division, print_function, absolute_import
 
 import unittest
@@ -81,13 +84,13 @@ def accidentalLabelToUnicode(label):
     Changes a label possibly containing a modifier such as "-" or "#" into
     a unicode string.
     
-    >>> print(graph.accidentalLabelToUnicode('B-4'))
+    >>> print(graph.utilities.accidentalLabelToUnicode('B-4'))
     B♭4
      
     Since matplotlib's default fonts do not support double sharps or double flats,
     etc. these are converted as best we can...
     
-    >>> print(graph.accidentalLabelToUnicode('B--4'))
+    >>> print(graph.utilities.accidentalLabelToUnicode('B--4'))
     B♭♭4
      
     In Python 2, all strings are converted to unicode strings even if there is
@@ -125,16 +128,16 @@ def userFormatsToFormat(value):
     Replace possible user format strings with defined format names as used herein. 
     Returns string unaltered if no match.
     
-    >>> graph.userFormatsToFormat('horizontal')
+    >>> graph.utilities.userFormatsToFormat('horizontal')
     'horizontalbar'
-    >>> graph.userFormatsToFormat('Weighted Scatter')
+    >>> graph.utilities.userFormatsToFormat('Weighted Scatter')
     'scatterweighted'
-    >>> graph.userFormatsToFormat('3D')
+    >>> graph.utilities.userFormatsToFormat('3D')
     '3dbars'
     
-    Unknown:
+    Unknown formats pass through unaltered.
     
-    >>> graph.userFormatsToFormat('4D super chart')
+    >>> graph.utilities.userFormatsToFormat('4D super chart')
     '4dsuperchart'
     '''
     #environLocal.printDebug(['calling user userFormatsToFormat:', value])
@@ -156,7 +159,7 @@ def userValuesToValues(valueList):
     '''
     Given a value list, replace string with synonyms. Let unmatched values pass.
     
-    >>> graph.userValuesToValues(['pitchSpace', 'Duration'])
+    >>> graph.utilities.userValuesToValues(['pitchSpace', 'Duration'])
     ['pitch', 'quarterlength']
     '''  
     post = []
@@ -184,34 +187,34 @@ def getColor(color):
     '''
     Convert any specification of a color to a hexadecimal color used by matplotlib. 
     
-    >>> graph.getColor('red')
+    >>> graph.utilities.getColor('red')
     '#ff0000'
-    >>> graph.getColor('r')
+    >>> graph.utilities.getColor('r')
     '#ff0000'
-    >>> graph.getColor('Steel Blue')
+    >>> graph.utilities.getColor('Steel Blue')
     '#4682b4'
-    >>> graph.getColor('#f50')
+    >>> graph.utilities.getColor('#f50')
     '#ff5500'
-    >>> graph.getColor([0.5, 0.5, 0.5])
+    >>> graph.utilities.getColor([0.5, 0.5, 0.5])
     '#808080'
-    >>> graph.getColor(0.8)
+    >>> graph.utilities.getColor(0.8)
     '#cccccc'
-    >>> graph.getColor([0.8])
+    >>> graph.utilities.getColor([0.8])
     '#cccccc'
-    >>> graph.getColor([255, 255, 255])
+    >>> graph.utilities.getColor([255, 255, 255])
     '#ffffff'
     
     Invalid colors raise GraphExceptions:
     
-    >>> graph.getColor('l')
+    >>> graph.utilities.getColor('l')
     Traceback (most recent call last):
     music21.graph.utilities.GraphException: invalid color abbreviation: l
 
-    >>> graph.getColor('chalkywhitebutsortofgreenish')
+    >>> graph.utilities.getColor('chalkywhitebutsortofgreenish')
     Traceback (most recent call last):
     music21.graph.utilities.GraphException: invalid color name: chalkywhitebutsortofgreenish
 
-    >>> graph.getColor(True)
+    >>> graph.utilities.getColor(True)
     Traceback (most recent call last):
     music21.graph.utilities.GraphException: invalid color specification: True
     '''

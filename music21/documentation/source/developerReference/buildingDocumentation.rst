@@ -28,14 +28,14 @@ Note that pandoc 1.14-1.15.0 do not work.  1.15.1 and newer are recommended.
 
 Some of the tutorials and users guides for `music21` use the Jupyter/IPython
 notebook. To convert these files to the Python documentation format .rst, you'll 
-need nbconvert (and pandoc).  Run `sudo pip install nbconvert` or 
+need nbconvert (and pandoc).  Run `sudo pip3 install nbconvert` or 
 `sudo pip3 install nbconvert`.  On Windows, omit the `sudo`. You will probably be
 asked for your password to install.
 
 **4) Downloading and Installing Sphinx**
 
-Sphinx is the document builder for Python.  Run on Mac "sudo pip install sphinx" 
-or on Windows "pip install sphinx".  
+Sphinx is the document builder for Python.  Run on Mac "sudo pip3 install sphinx" 
+or on Windows "pip3 install sphinx".  
 
 **5) Run documentation/make.py** 
 
