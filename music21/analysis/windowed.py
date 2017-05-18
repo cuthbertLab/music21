@@ -407,7 +407,7 @@ class Test(unittest.TestCase):
         unused_wa = WindowedAnalysis(s, p)
 
 
-        plot = graph.PlotWindowedKrumhanslSchmuckler(s, doneAction=None,
+        plot = graph.plots.PlotWindowedKrumhanslSchmuckler(s, doneAction=None,
             windowStep=4, windowType='overlap')
         plot.process()
         #plot.write()

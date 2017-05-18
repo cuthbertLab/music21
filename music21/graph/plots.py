@@ -2950,17 +2950,13 @@ class Test(unittest.TestCase):
 
 
     def xtestGraphVerticalBar(self): # pragma: no cover
-
         #streamList = corpus.parse('essenFolksong/han1')
         streamList = corpus.getBachChorales()[100:108]
         feList = ['m17', 'm18', 'm19', 'ql1']
         #labelList = [os.path.basename(fp) for fp in streamList]
         p = PlotFeatures(streamList, feList)
         p.process()
-        
 
-
-    
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
