@@ -78,7 +78,7 @@ Now if we'd like we can get a Histogram of the data.
 It's a little complex, but worth seeing in full:
 
 >>> import operator
->>> histo = graph.primatives.GraphHistogram()
+>>> histo = graph.primitives.GraphHistogram()
 >>> i = 0
 >>> data = []
 >>> xlabels = []

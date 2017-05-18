@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         graph/primatives.py
+# Name:         graph/primitives.py
 # Purpose:      Classes for graphing in matplotlib and/or other graphing tools.
 #
 # Authors:      Christopher Ariza
@@ -13,7 +13,7 @@
 '''
 Object definitions for graphing and plotting :class:`~music21.stream.Stream` objects. 
 
-The :class:`~music21.graph.primatives.Graph` object subclasses primative, abstract fundamental 
+The :class:`~music21.graph.primitives.Graph` object subclasses primitive, abstract fundamental 
 graphing archetypes using the matplotlib library. 
 '''
 from __future__ import division, print_function, absolute_import
@@ -38,14 +38,14 @@ if six.PY2:
 
 
 from music21 import environment
-_MOD = 'graph/primatives.py'
+_MOD = 'graph/primitives.py'
 environLocal = environment.Environment(_MOD)    
 
 
 #-------------------------------------------------------------------------------
 class Graph(object):
     '''
-    A music21.graph.primatives.Graph is an object that represents a visual graph or 
+    A music21.graph.primitives.Graph is an object that represents a visual graph or 
     plot, automating the creation and configuration of this graph in matplotlib.
     It is a low-level object that most music21 users do not need to call directly; 
     yet, as most graphs will take keyword arguments that specify the
@@ -79,7 +79,7 @@ class Graph(object):
         
         defaults to .figureSizeDefault
         
-    >>> a = graph.primatives.Graph(title='a graph of some data to be given soon', tickFontSize=9)
+    >>> a = graph.primitives.Graph(title='a graph of some data to be given soon', tickFontSize=9)
     >>> a.data = ['some', 'arbitrary', 'data', 14, 9.04, None]
     '''
     axisKeys = ('x', 'y')
@@ -174,7 +174,7 @@ class Graph(object):
         '''
         Utility function that cycles through the colors of self.colors...
         
-        >>> g = graph.primatives.Graph()
+        >>> g = graph.primitives.Graph()
         >>> g.colors
         ['#605c7f', '#5c7f60', '#715c7f']
 
@@ -204,7 +204,7 @@ class Graph(object):
         N.B. -- both 'x' and 'y' ticks have to be set in
         order to get matplotlib to display either... (and presumably 'z' for 3D graphs)
         
-        >>> g = graph.primatives.GraphHorizontalBar()
+        >>> g = graph.primitives.GraphHorizontalBar()
         >>> g.axis['x']['ticks']
         Traceback (most recent call last):
         KeyError: 'ticks'
@@ -244,7 +244,7 @@ class Graph(object):
         
         Data steps shows how many ticks to make from the data.
 
-        >>> g = graph.primatives.GraphHorizontalBar()
+        >>> g = graph.primitives.GraphHorizontalBar()
         >>> g.setIntegerTicksFromData([10, 5, 3, 8, 20, 11], dataSteps=4)
         >>> g.axis['y']['ticks']
         ([0, 5, 10, 15, 20], ['0', '5', '10', '15', '20'])
@@ -514,7 +514,7 @@ class GraphNetworxGraph(Graph):
     Requires the optional networkx module.    
     '''
 #     
-#     >>> #_DOCS_SHOW g = graph.primatives.GraphNetworxGraph()
+#     >>> #_DOCS_SHOW g = graph.primitives.GraphNetworxGraph()
 # 
 #     .. image:: images/GraphNetworxGraph.*
 #         :width: 600
@@ -601,8 +601,8 @@ class GraphColorGrid(Graph):
     or the common HTML color codes, and based on analysis-specific mapping of colors to results.
         
     
-    >>> #_DOCS_SHOW g = graph.primatives.GraphColorGrid()
-    >>> g = graph.primatives.GraphColorGrid(doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW g = graph.primitives.GraphColorGrid()
+    >>> g = graph.primitives.GraphColorGrid(doneAction=None) #_DOCS_HIDE
     >>> data = [['#55FF00', '#9b0000', '#009b00'], 
     ...         ['#FFD600', '#FF5600'], 
     ...         ['#201a2b', '#8f73bf', '#a080d5', '#403355', '#999999']]
@@ -702,8 +702,8 @@ class GraphColorGridLegend(Graph):
     or the common HTML color codes, and based on analysis-specific mapping of colors to results.
     
     
-    >>> #_DOCS_SHOW g = graph.primatives.GraphColorGridLegend()
-    >>> g = graph.primatives.GraphColorGridLegend(doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW g = graph.primitives.GraphColorGridLegend()
+    >>> g = graph.primitives.GraphColorGridLegend(doneAction=None) #_DOCS_HIDE
     >>> data = []
     >>> data.append(('Major', [('C#', '#00AA55'), ('D-', '#5600FF'), ('G#', '#2B00FF')]))
     >>> data.append(('Minor', [('C#', '#004600'), ('D-', '#00009b'), ('G#', '#00009B')]))
@@ -756,7 +756,7 @@ class GraphColorGridLegend(Graph):
         to keys in Prometheus: The Poem of Fire.
         
         >>> import matplotlib.pyplot
-        >>> gcgl = graph.primatives.GraphColorGridLegend()
+        >>> gcgl = graph.primitives.GraphColorGridLegend()
         >>> fig = matplotlib.pyplot.figure()
         >>> rowData = [('C', '#ff0000'), ('G', '#ff8800'), ('D', '#ffff00'),
         ...            ('A', '#00ff00'), ('E', '#4444ff')]
@@ -834,8 +834,8 @@ class GraphHorizontalBar(Graph):
         the second value is a list of x-start, x-length values.
 
         
-        >>> #_DOCS_SHOW a = graph.primatives.GraphHorizontalBar(doneAction='show')
-        >>> a = graph.primatives.GraphHorizontalBar(doneAction=None)  #_DOCS_HIDE
+        >>> #_DOCS_SHOW a = graph.primitives.GraphHorizontalBar(doneAction='show')
+        >>> a = graph.primitives.GraphHorizontalBar(doneAction=None)  #_DOCS_HIDE
         >>> data = [('Chopin', [(1810, 1849-1810)]), 
         ...         ('Schumanns', [(1810, 1856-1810), (1819, 1896-1819)]), 
         ...         ('Brahms', [(1833, 1897-1833)])]
@@ -1039,8 +1039,8 @@ class GraphScatterWeighted(Graph):
     A scatter plot where points are scaled in size to 
     represent the number of values stored within.
     
-    >>> #_DOCS_SHOW g = graph.primatives.GraphScatterWeighted()
-    >>> g = graph.primatives.GraphScatterWeighted(doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW g = graph.primitives.GraphScatterWeighted()
+    >>> g = graph.primitives.GraphScatterWeighted(doneAction=None) #_DOCS_HIDE
     >>> data = [(23, 15, 234), (10, 23, 12), (4, 23, 5), (15, 18, 120)]
     >>> g.data = data
     >>> g.process()
@@ -1152,8 +1152,8 @@ class GraphScatter(Graph):
     '''
     Graph two parameters in a scatter plot. Data representation is a list of points of values. 
 
-    >>> #_DOCS_SHOW g = graph.primatives.GraphScatter()
-    >>> g = graph.primatives.GraphScatter(doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW g = graph.primitives.GraphScatter()
+    >>> g = graph.primitives.GraphScatter(doneAction=None) #_DOCS_HIDE
     >>> data = [(x, x * x) for x in range(50)]
     >>> g.data = data
     >>> g.process()
@@ -1214,8 +1214,8 @@ class GraphHistogram(Graph):
 
     
     >>> import random
-    >>> #_DOCS_SHOW g = graph.primatives.GraphHistogram()
-    >>> g = graph.primatives.GraphHistogram(doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW g = graph.primitives.GraphHistogram()
+    >>> g = graph.primitives.GraphHistogram(doneAction=None) #_DOCS_HIDE
     >>> data = [(x, random.choice(range(30))) for x in range(50)]
     >>> g.data = data
     >>> g.process()
@@ -1258,8 +1258,8 @@ class GraphGroupedVerticalBar(Graph):
     is only one of each x value, and y value is a list of values
 
     >>> from collections import OrderedDict
-    >>> #_DOCS_SHOW g = graph.primatives.GraphGroupedVerticalBar()
-    >>> g = graph.primatives.GraphGroupedVerticalBar(doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW g = graph.primitives.GraphGroupedVerticalBar()
+    >>> g = graph.primitives.GraphGroupedVerticalBar(doneAction=None) #_DOCS_HIDE
     >>> lengths = OrderedDict( [('a', 3), ('b', 2), ('c', 1)] )
     >>> data = [('bar' + str(x), lengths) for x in range(3)]
     >>> data
@@ -1360,8 +1360,8 @@ class Graph3DBars(Graph):
     (x, y) coordinates.
    
     >>> import random
-    >>> #_DOCS_SHOW g = graph.primatives.Graph3DBars()
-    >>> g = graph.primatives.Graph3DBars(doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW g = graph.primitives.Graph3DBars()
+    >>> g = graph.primitives.Graph3DBars(doneAction=None) #_DOCS_HIDE
     >>> data = {1:[], 2:[], 3:[]}
     >>> dk = list(data.keys())
     >>> for i in range(len(dk)):

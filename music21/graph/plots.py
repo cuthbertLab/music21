@@ -33,7 +33,7 @@ from music21 import features
 from music21 import note
 from music21 import pitch
 
-from music21.graph import primatives
+from music21.graph import primitives
 from music21.graph.utilities import (GraphException, PlotStreamException,
                                      accidentalLabelToUnicode)
 
@@ -896,7 +896,7 @@ class PlotWindowedAnalysis(PlotStream):
         actually create the graph...
         '''
         # create a color grid
-        self.graph = primatives.GraphColorGrid(*args, **keywords)
+        self.graph = primitives.GraphColorGrid(*args, **keywords)
         # uses self.processor
         
         # data is a list of lists where the outer list represents one row
@@ -961,7 +961,7 @@ class PlotWindowedAnalysis(PlotStream):
         '''
         title = (self.processor.name + 
                 ' (%s)' % self.processor.solutionUnitString())
-        graphLegend = primatives.GraphColorGridLegend(doneAction=self.graph.doneAction, 
+        graphLegend = primitives.GraphColorGridLegend(doneAction=self.graph.doneAction, 
                                            title=title)
         graphData = self.processor.solutionLegend(compress=self.compressLegend)
         graphLegend.data = graphData
@@ -1201,7 +1201,7 @@ class PlotHistogramPitchSpace(PlotHistogram):
         # filter xTicks to remove - in flat lables
         xTicks = self.makePitchLabelsUnicode(xTicks)
 
-        self.graph = primatives.GraphHistogram(*args, **keywords)
+        self.graph = primitives.GraphHistogram(*args, **keywords)
         self.graph.data = self.data
 
         self.graph.setTicks('x', xTicks)
@@ -1253,7 +1253,7 @@ class PlotHistogramPitchClass(PlotHistogram):
         # filter xTicks to remove - in flat lables
         xTicks = self.makePitchLabelsUnicode(xTicks)
 
-        self.graph = primatives.GraphHistogram(*args, **keywords)
+        self.graph = primitives.GraphHistogram(*args, **keywords)
         self.graph.data = self.data
 
         self.graph.setTicks('x', xTicks)
@@ -1295,7 +1295,7 @@ class PlotHistogramQuarterLength(PlotHistogram):
         # will use self.fx and self.fxTick to extract data
         self.data, xTicks, yTicks = self._extractData(dataValueLegit=False)
 
-        self.graph = primatives.GraphHistogram(*args, **keywords)
+        self.graph = primitives.GraphHistogram(*args, **keywords)
         self.graph.data = self.data
 
         self.graph.setTicks('x', xTicks)
@@ -1424,7 +1424,7 @@ class PlotScatterPitchSpaceQuarterLength(PlotScatter):
         # will use self.fx and self.fxTick to extract data
         self.data, xTicks, yTicks = self._extractData(xLog=self.xLog)
 
-        self.graph = primatives.GraphScatter(*args, **keywords)
+        self.graph = primitives.GraphScatter(*args, **keywords)
         self.graph.data = self.data
 
         self.graph.setTicks('y', yTicks)
@@ -1472,7 +1472,7 @@ class PlotScatterPitchClassQuarterLength(PlotScatter):
         # will use self.fx and self.fxTick to extract data
         self.data, xTicks, yTicks = self._extractData(xLog=self.xLog)
 
-        self.graph = primatives.GraphScatter(*args, **keywords)
+        self.graph = primitives.GraphScatter(*args, **keywords)
         self.graph.data = self.data
 
         self.graph.setTicks('y', yTicks)
@@ -1518,7 +1518,7 @@ class PlotScatterPitchClassOffset(PlotScatter):
         # will use self.fx and self.fxTick to extract data
         self.data, xTicks, yTicks = self._extractData()
 
-        self.graph = primatives.GraphScatter(*args, **keywords)
+        self.graph = primitives.GraphScatter(*args, **keywords)
         self.graph.data = self.data
 
         self.graph.setTicks('y', yTicks)
@@ -1571,7 +1571,7 @@ class PlotScatterPitchSpaceDynamicSymbol(PlotScatter):
         # ticks dynamics takes no args
         yTicks = self.fyTicks(min(yVals), max(yVals))
 
-        self.graph = primatives.GraphScatter(*args, **keywords)
+        self.graph = primitives.GraphScatter(*args, **keywords)
         self.graph.data = self.data
 
         self.graph.setTicks('y', yTicks)
@@ -1683,7 +1683,7 @@ class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
         #environLocal.printDebug(['PlotHorizontalBarPitchClassOffset', 
         #    'post processing xTicks', xTicks])
 
-        self.graph = primatives.GraphHorizontalBar(*args, **keywords)
+        self.graph = primitives.GraphHorizontalBar(*args, **keywords)
         self.graph.data = self.data
 
         # only need to add x ticks; y ticks added from data labels
@@ -1729,7 +1729,7 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
 
         self.data, xTicks, unused_yTicks = self._extractData()
 
-        self.graph = primatives.GraphHorizontalBar(*args, **keywords)
+        self.graph = primitives.GraphHorizontalBar(*args, **keywords)
         self.graph.data = self.data
 
         # only need to add x ticks; y ticks added from data labels
@@ -1858,7 +1858,7 @@ class PlotDolan(PlotHorizontalBarWeighted):
         self._getPartGroups()
         self.data, xTicks, unused_yTicks = self._extractData()
 
-        self.graph = primatives.GraphHorizontalBarWeighted(*args, **keywords)
+        self.graph = primitives.GraphHorizontalBarWeighted(*args, **keywords)
         self.graph.data = self.data
 
         # only need to add x ticks; y ticks added from data labels
@@ -2067,7 +2067,7 @@ class PlotScatterWeightedPitchSpaceQuarterLength(PlotScatterWeighted):
 
         self.data, xTicks, yTicks = self._extractData(xLog=self.xLog)
 
-        self.graph = primatives.GraphScatterWeighted(*args, **keywords)
+        self.graph = primitives.GraphScatterWeighted(*args, **keywords)
         self.graph.data = self.data
 
         self.graph.setAxisLabel('x', self._axisLabelQuarterLength(
@@ -2113,7 +2113,7 @@ class PlotScatterWeightedPitchClassQuarterLength(PlotScatterWeighted):
 
         self.data, xTicks, yTicks = self._extractData(xLog = self.xLog)
 
-        self.graph = primatives.GraphScatterWeighted(*args, **keywords)
+        self.graph = primitives.GraphScatterWeighted(*args, **keywords)
         self.graph.data = self.data
 
         self.graph.setAxisLabel('x', self._axisLabelQuarterLength(
@@ -2169,7 +2169,7 @@ class PlotScatterWeightedPitchSpaceDynamicSymbol(PlotScatterWeighted):
         yTicks = self.fyTicks(min(yVals), max(yVals))
 
 
-        self.graph = primatives.GraphScatterWeighted(*args, **keywords)
+        self.graph = primitives.GraphScatterWeighted(*args, **keywords)
         self.graph.data = self.data
 
         self.graph.setAxisLabel('x', 'Pitch')
@@ -2306,7 +2306,7 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
         # will use self.fx and self.fxTick to extract data
         self.data, unused_xTicks, unused_yTicks, unused_zTicks = self._extractData()
 
-        self.graph = primatives.Graph3DBars(*args, **keywords)
+        self.graph = primitives.Graph3DBars(*args, **keywords)
         self.graph.data = self.data
 
         #self.graph.setTicks('y', yTicks)
@@ -2350,7 +2350,7 @@ class PlotFeatures(PlotMultiStream):
         # will use self.fx and self.fxTick to extract data
         self.data, xTicks, yTicks = self._extractData()
 
-        self.graph = primatives.GraphGroupedVerticalBar(*args, **keywords)
+        self.graph = primitives.GraphGroupedVerticalBar(*args, **keywords)
         self.graph.grid = False
         self.graph.data = self.data
 

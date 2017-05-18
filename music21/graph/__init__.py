@@ -13,7 +13,7 @@
 '''
 Object definitions for graphing and plotting :class:`~music21.stream.Stream` objects. 
 
-The :class:`~music21.graph.primatives.Graph` object subclasses abstract fundamental 
+The :class:`~music21.graph.primitives.Graph` object subclasses primitive, abstract fundamental 
 graphing archetypes using the matplotlib library. The :class:`~music21.graph.plots.Plot` 
 object subclasses provide reusable approaches to graphing data and structures in 
 :class:`~music21.stream.Stream` objects.
@@ -22,11 +22,11 @@ The most common way of using plotting functions is to call `.plot()` on a Stream
 '''
 from __future__ import division, print_function, absolute_import
 
-__all__ = ['plots', 'primatives', 'utilities']
+__all__ = ['plots', 'primitives', 'utilities']
 
 from music21 import common
 
-from music21.graph import primatives
+from music21.graph import primitives
 from music21.graph import plots
 from music21.graph import utilities
 
