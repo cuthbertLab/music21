@@ -22,12 +22,13 @@ The most common way of using plotting functions is to call `.plot()` on a Stream
 '''
 from __future__ import division, print_function, absolute_import
 
-__all__ = ['plots', 'primitives', 'utilities']
+__all__ = ['axis', 'plots', 'primitives', 'utilities']
 
 from music21 import common
 
-from music21.graph import primitives
+from music21.graph import axis
 from music21.graph import plots
+from music21.graph import primitives
 from music21.graph import utilities
 
 import unittest
