@@ -14,7 +14,7 @@
 Object definitions for graphing and plotting :class:`~music21.stream.Stream` objects. 
 
 The :class:`~music21.graph.primitives.Graph` object subclasses primitive, abstract fundamental 
-graphing archetypes using the matplotlib library. The :class:`~music21.graph.plots.Plot` 
+graphing archetypes using the matplotlib library. The :class:`~music21.graph.plot.Plot` 
 object subclasses provide reusable approaches to graphing data and structures in 
 :class:`~music21.stream.Stream` objects.
 
@@ -22,12 +22,12 @@ The most common way of using plotting functions is to call `.plot()` on a Stream
 '''
 from __future__ import division, print_function, absolute_import
 
-__all__ = ['axis', 'plots', 'primitives', 'utilities']
+__all__ = ['axis', 'plot', 'primitives', 'utilities']
 
 from music21 import common
 
 from music21.graph import axis
-from music21.graph import plots
+from music21.graph import plot
 from music21.graph import primitives
 from music21.graph import utilities
 
@@ -49,40 +49,40 @@ def getPlotsToMake(*args, **keywords):
     no arguments = horizontalbar
 
     >>> graph.getPlotsToMake()
-    [<class 'music21.graph.plots.PlotHorizontalBarPitchSpaceOffset'>]
+    [<class 'music21.graph.plot.PlotHorizontalBarPitchSpaceOffset'>]
     
     >>> graph.getPlotsToMake('windowed')
-    [<class 'music21.graph.plots.PlotWindowedTemperleyKostkaPayne'>]
+    [<class 'music21.graph.plot.PlotWindowedTemperleyKostkaPayne'>]
     '''
     plotClasses = [
         # histograms
-        plots.PlotHistogramPitchSpace, 
-        plots.PlotHistogramPitchClass, 
-        plots.PlotHistogramQuarterLength,
+        plot.PlotHistogramPitchSpace, 
+        plot.PlotHistogramPitchClass, 
+        plot.PlotHistogramQuarterLength,
         # scatters
-        plots.PlotScatterPitchSpaceQuarterLength, 
-        plots.PlotScatterPitchClassQuarterLength, 
-        plots.PlotScatterPitchClassOffset,
-        plots.PlotScatterPitchSpaceDynamicSymbol,
+        plot.PlotScatterPitchSpaceQuarterLength, 
+        plot.PlotScatterPitchClassQuarterLength, 
+        plot.PlotScatterPitchClassOffset,
+        plot.PlotScatterPitchSpaceDynamicSymbol,
         # offset based horizontal
-        plots.PlotHorizontalBarPitchSpaceOffset, 
-        plots.PlotHorizontalBarPitchClassOffset,
+        plot.PlotHorizontalBarPitchSpaceOffset, 
+        plot.PlotHorizontalBarPitchClassOffset,
         # weighted scatter
-        plots.PlotScatterWeightedPitchSpaceQuarterLength, 
-        plots.PlotScatterWeightedPitchClassQuarterLength,
-        plots.PlotScatterWeightedPitchSpaceDynamicSymbol,
+        plot.PlotScatterWeightedPitchSpaceQuarterLength, 
+        plot.PlotScatterWeightedPitchClassQuarterLength,
+        plot.PlotScatterWeightedPitchSpaceDynamicSymbol,
         # 3d graphs
-        plots.Plot3DBarsPitchSpaceQuarterLength,
+        plot.Plot3DBarsPitchSpaceQuarterLength,
         # windowed plots
-        plots.PlotWindowedKrumhanslSchmuckler,
-        plots.PlotWindowedKrumhanslKessler,
-        plots.PlotWindowedAardenEssen,
-        plots.PlotWindowedSimpleWeights,
-        plots.PlotWindowedBellmanBudge,
-        plots.PlotWindowedTemperleyKostkaPayne,
-        plots.PlotWindowedAmbitus,
+        plot.PlotWindowedKrumhanslSchmuckler,
+        plot.PlotWindowedKrumhanslKessler,
+        plot.PlotWindowedAardenEssen,
+        plot.PlotWindowedSimpleWeights,
+        plot.PlotWindowedBellmanBudge,
+        plot.PlotWindowedTemperleyKostkaPayne,
+        plot.PlotWindowedAmbitus,
         # instrumentation and part graphs
-        plots.PlotDolan,
+        plot.PlotDolan,
     ]
 
     showFormat = ''
@@ -361,53 +361,53 @@ class Test(unittest.TestCase):
 
     def testGetPlotsToMakeA(self):
         post = getPlotsToMake(format='grid', values='krumhansl-schmuckler')
-        self.assertEqual(post, [plots.PlotWindowedKrumhanslSchmuckler])
+        self.assertEqual(post, [plot.PlotWindowedKrumhanslSchmuckler])
         post = getPlotsToMake(format='grid', values='aarden')
-        self.assertEqual(post, [plots.PlotWindowedAardenEssen])
+        self.assertEqual(post, [plot.PlotWindowedAardenEssen])
         post = getPlotsToMake(format='grid', values='simple')
-        self.assertEqual(post, [plots.PlotWindowedSimpleWeights])
+        self.assertEqual(post, [plot.PlotWindowedSimpleWeights])
         post = getPlotsToMake(format='grid', values='bellman')
-        self.assertEqual(post, [plots.PlotWindowedBellmanBudge])
+        self.assertEqual(post, [plot.PlotWindowedBellmanBudge])
         post = getPlotsToMake(format='grid', values='kostka')
-        self.assertEqual(post, [plots.PlotWindowedTemperleyKostkaPayne])
+        self.assertEqual(post, [plot.PlotWindowedTemperleyKostkaPayne])
         post = getPlotsToMake(format='grid', values='KrumhanslKessler')
-        self.assertEqual(post, [plots.PlotWindowedKrumhanslKessler])
+        self.assertEqual(post, [plot.PlotWindowedKrumhanslKessler])
 
 
         # no args get pitch space piano roll
         post = getPlotsToMake()
-        self.assertEqual(post, [plots.PlotHorizontalBarPitchSpaceOffset])
+        self.assertEqual(post, [plot.PlotHorizontalBarPitchSpaceOffset])
 
         # one arg gives a histogram of that parameters
         post = getPlotsToMake('duration')
-        self.assertEqual(post, [plots.PlotHistogramQuarterLength])
+        self.assertEqual(post, [plot.PlotHistogramQuarterLength])
         post = getPlotsToMake('quarterLength')
-        self.assertEqual(post, [plots.PlotHistogramQuarterLength])
+        self.assertEqual(post, [plot.PlotHistogramQuarterLength])
         post = getPlotsToMake('ps')
-        self.assertEqual(post, [plots.PlotHistogramPitchSpace])
+        self.assertEqual(post, [plot.PlotHistogramPitchSpace])
         post = getPlotsToMake('pitch')
-        self.assertEqual(post, [plots.PlotHistogramPitchSpace])
+        self.assertEqual(post, [plot.PlotHistogramPitchSpace])
         post = getPlotsToMake('pitchspace')
-        self.assertEqual(post, [plots.PlotHistogramPitchSpace])
+        self.assertEqual(post, [plot.PlotHistogramPitchSpace])
         post = getPlotsToMake('pc')
-        self.assertEqual(post, [plots.PlotHistogramPitchClass])
+        self.assertEqual(post, [plot.PlotHistogramPitchClass])
 
         post = getPlotsToMake('scatter', 'ps')
-        self.assertEqual(post, [plots.PlotScatterPitchSpaceQuarterLength])
+        self.assertEqual(post, [plot.PlotScatterPitchSpaceQuarterLength])
         post = getPlotsToMake('scatter', 'ps', 'duration')
-        self.assertEqual(post, [plots.PlotScatterPitchSpaceQuarterLength])
+        self.assertEqual(post, [plot.PlotScatterPitchSpaceQuarterLength])
 
         post = getPlotsToMake('scatter', 'pc', 'offset')
-        self.assertEqual(post, [plots.PlotScatterPitchClassOffset])
+        self.assertEqual(post, [plot.PlotScatterPitchClassOffset])
 
 
     def testGetPlotsToMakeB(self):
         post = getPlotsToMake('dolan')
-        self.assertEqual(post, [plots.PlotDolan])
+        self.assertEqual(post, [plot.PlotDolan])
         post = getPlotsToMake(values='instrument')
-        self.assertEqual(post, [plots.PlotDolan])
+        self.assertEqual(post, [plot.PlotDolan])
         post = getPlotsToMake(format='horizontalbarweighted')
-        self.assertEqual(post, [plots.PlotDolan])
+        self.assertEqual(post, [plot.PlotDolan])
 
 #     def testMeasureNumbersA(self):
 #         from music21 import corpus, graph

@@ -52,11 +52,22 @@ class Graph(object):
     look of graphs, they are important to know about.
 
     The keyword arguments can be provided for configuration are: 
-    alpha (which describes how transparent elements of the graph are), 
-    colorBackgroundData, colorBackgroundFigure, colorGrid, title, 
-    doneAction (see below), 
-    figureSize, colors, tickFontSize, titleFontSize, labelFontSize, 
-    fontFamily, marker, markerSize.
+
+    *    doneAction (see below), 
+    *    alpha (which describes how transparent elements of the graph are), 
+    *    colorBackgroundData
+    *    colorBackgroundFigure
+    *    colorGrid, 
+    *    title (a string)
+    *    figureSize (a tuple of two ints)
+    *    colors (a list of colors to cycle through)
+    *    tickFontSize
+    *    tickColors (a dict of 'x': '#color', 'y': '#color') 
+    *    titleFontSize 
+    *    labelFontSize 
+    *    fontFamily
+    *    marker
+    *    markerSize
 
     Graph objects do not manipulate Streams or other music21 data; they only 
     manipulate raw data formatted for each Graph subclass, hence it is
@@ -68,8 +79,6 @@ class Graph(object):
     interactive GUI browser.  The
     third option, None, does the processing but does not write any output.
     
-    TODO: add color for individual points.
-
     figureSize:
     
         A two-element iterable.
@@ -80,10 +89,23 @@ class Graph(object):
         defaults to .figureSizeDefault
         
     >>> a = graph.primitives.Graph(title='a graph of some data to be given soon', tickFontSize=9)
-    >>> a.data = ['some', 'arbitrary', 'data', 14, 9.04, None]
+    >>> a.data = [[0, 2], [1, 3]]
+    >>> a.graphType
+    'genericGraph'
     '''
+    graphType = 'genericGraph'
     axisKeys = ('x', 'y')
     figureSizeDefault = (6, 6)
+    
+    keywordConfigurables = (
+        'alpha', 'dpi', 'colorBackgroundData', 'colorBackgroundFigure',
+        'colorGrid', 'title', 'figureSize', 'marker', 'markerSize',
+        'colors', 'tickFontSize', 'tickColors', 'titleFontSize', 'labelFontSize',
+        'fontFamily', 'hideXGrid', 'hideYGrid', 
+        'xTickLabelRotation', 
+        'xTickLabelHorizontalAlignment', 'xTickLabelVerticalAlignment',
+        'doneAction',
+     )
 
     def __init__(self, *args, **keywords):
         getExtendedModules()
@@ -107,13 +129,16 @@ class Graph(object):
         self.dpi = None # determine on its own
         self.colorBackgroundData = '#ffffff'  # color of the data region
         self.colorBackgroundFigure = '#ffffff' # looking good are #c7d2d4, #babecf
-        self.colorGrid = '#666666' # grid color
+        self.colorGrid = '#dddddd' # grid color
         self.title = 'Music21 Graph'
         self.figureSize = self.figureSizeDefault
         self.marker = 'o'
         self.markerSize = 6
         self.colors = ['#605c7f', '#5c7f60', '#715c7f']
-        self.tickFontSize = 8
+        
+        self.tickFontSize = 7
+        self.tickColors = {'x' : '#000000', 'y' : '#000000'}
+        
         self.titleFontSize = 12
         self.labelFontSize = 10
         self.fontFamily = 'serif'
@@ -128,14 +153,7 @@ class Graph(object):
         self._doneAction = 'write'
         self._dataColorIndex = 0
         
-        for kw in ('alpha', 'dpi', 'colorBackgroundData', 'colorBackgroundFigure',
-                     'colorGrid', 'title', 'figureSize', 'marker', 'markerSize',
-                     'colors', 'tickFontSize', 'titleFontSize', 'labelFontSize',
-                     'fontFamily', 'hideXGrid', 'hideYGrid', 
-                     'xTickLabelRotation', 
-                     'xTickLabelHorizontalAlignment', 'xTickLabelVerticalAlignment',
-                     'doneAction',
-                     ):
+        for kw in self.keywordConfigurables:
             if kw in keywords:
                 setattr(self, kw, keywords[kw])
 
@@ -321,6 +339,7 @@ class Graph(object):
             elif i % 2 == 1:   # top and right are the odd indices
                 line.set_visible(False)
 
+
     def applyFormatting(self, subplot):
         '''
         Apply formatting to the Subplot (Axes) container and Figure instance. 
@@ -342,19 +361,16 @@ class Graph(object):
         if self.title:
             subplot.set_title(self.title, fontsize=self.titleFontSize, family=self.fontFamily)
 
-        if self.grid:
-            if self.colorGrid is not None: # None is another way to hide grid
-                subplot.grid(True, which='major', color=getColor(self.colorGrid))
-        # provide control for each grid line
-        if self.hideYGrid:
-            subplot.yaxis.grid(False)
-        
-        if self.hideXGrid:
-            subplot.xaxis.grid(False)
-
         # right and top must be larger
         # this does not work right yet
         #self.figure.subplots_adjust(left=1, bottom=1, right=2, top=2)
+        
+        for thisAxisName in self.axisKeys:
+            if thisAxisName not in self.tickColors:
+                continue
+            subplot.tick_params(axis=thisAxisName, colors=self.tickColors[thisAxisName])
+            
+        self.applyGrid(self.subplot)
 
         # this figure instance is created in the subclased process() method
         # set total size of figure
@@ -364,6 +380,22 @@ class Graph(object):
 #         subplot.set_xscale('linear')
 #         subplot.set_yscale('linear')
 #         subplot.set_aspect('normal')
+
+    def applyGrid(self, subplot):
+        '''
+        Apply the Grid to the subplot such that it goes below the data.
+        '''
+
+        if self.grid and self.colorGrid is not None: # None is another way to hide grid
+            subplot.set_axisbelow(True)
+            subplot.grid(True, which='major', color=getColor(self.colorGrid))
+        # provide control for each grid line
+        if self.hideYGrid:
+            subplot.yaxis.grid(False)
+        
+        if self.hideXGrid:
+            subplot.xaxis.grid(False)
+
 
     def applyFormattingToOneAxis(self, subplot, axis):
         '''
@@ -452,7 +484,6 @@ class Graph(object):
         self.subplot = self.figure.add_subplot(1, 1, 1)
 
         self._dataColorIndex = 0 # just for consistent rendering if run twice
-
         # call class specific info
         self.renderSubplot(self.subplot)
 
@@ -502,7 +533,8 @@ class Graph(object):
         else:
             self.figure.savefig(fp, 
                              facecolor=getColor(self.colorBackgroundFigure),      
-                             edgecolor=getColor(self.colorBackgroundFigure))
+                             edgecolor=getColor(self.colorBackgroundFigure),
+                             dpi=300)
 
         if common.runningUnderIPython() is not True:
             environLocal.launch('png', fp)
@@ -519,22 +551,26 @@ class GraphNetworxGraph(Graph):
 #     .. image:: images/GraphNetworxGraph.*
 #         :width: 600
     _DOC_ATTR = {
-        'networkxGraph' : '''An instance of a networkx graph object.'''
+        'networkxGraph' : '''An instance of a networkx graph object.''',
+        'hideLeftBottomSpines': 'bool to hide the left and bottom axis spines; default True',    
     }
-
+    
+    graphType = 'networkx'
+    keywordConfigurables = Graph.keywordConfigurables + (
+        'networkxGraph', 'hideLeftBottomSpines',
+    )
 
     def __init__(self, *args, **keywords):
-        super(GraphNetworxGraph, self).__init__(*args, **keywords)
+        self.networkxGraph = None
         self.hideLeftBottomSpines = True
+        
+        super(GraphNetworxGraph, self).__init__(*args, **keywords)
         
         extm = getExtendedModules() 
         
         if 'title' not in keywords:
             self.title = 'Network Plot'
 
-        self.networkxGraph = None
-        if 'networkxGraph' in keywords: # pragma: no cover
-            self.networkxGraph = keywords['networkxGraph']            
         elif extm.networkx is not None: # if we have this module
             # testing default; temporary
             try: # pragma: no cover
@@ -612,11 +648,18 @@ class GraphColorGrid(Graph):
     .. image:: images/GraphColorGrid.*
         :width: 600
     '''
+    _DOC_ATTR = {
+        'hideLeftBottomSpines': 'bool to hide the left and bottom axis spines; default True',    
+    }
+
+    
+    graphType = 'colorGrid'
     figureSizeDefault = (9, 6)
+    keywordConfigurables = Graph.keywordConfigurables + ('hideLeftBottomSpines',)
 
     def __init__(self, *args, **kwargs):
-        super(GraphColorGrid, self).__init__(*args, **kwargs)
         self.hideLeftBottomSpines = True
+        super(GraphColorGrid, self).__init__(*args, **kwargs)
 
 
     def renderSubplot(self, subplot):        # do not need grid for outer container
@@ -714,11 +757,18 @@ class GraphColorGridLegend(Graph):
         :width: 600
 
     '''
-    figureSizeDefault = (5, 1.5)
+    _DOC_ATTR = {
+        'hideLeftBottomSpines': 'bool to hide the left and bottom axis spines; default True',    
+    }
 
+    graphType = 'colorGridLegend'
+    figureSizeDefault = (5, 1.5)
+    keywordConfigurables = Graph.keywordConfigurables + ('hideLeftBottomSpines',)
+    
     def __init__(self, *args, **keywords):
-        super(GraphColorGridLegend, self).__init__(*args, **keywords)
         self.hideLeftBottomSpines = True
+
+        super(GraphColorGridLegend, self).__init__(*args, **keywords)
         
         if 'title' not in keywords:
             self.title = 'Legend'
@@ -823,38 +873,50 @@ class GraphColorGridLegend(Graph):
         return ax
 
 class GraphHorizontalBar(Graph):
+    '''
+    Numerous horizontal bars in discrete channels, where bars 
+    can be incomplete and/or overlap.
+
+    Data provided is a list of pairs, where the first value becomes the key, 
+    the second value is a list of x-start, x-length values.
+
+    
+    >>> #_DOCS_SHOW a = graph.primitives.GraphHorizontalBar(doneAction='show')
+    >>> a = graph.primitives.GraphHorizontalBar(doneAction=None)  #_DOCS_HIDE
+    >>> data = [('Chopin', [(1810, 1849-1810)]), 
+    ...         ('Schumanns', [(1810, 1856-1810), (1819, 1896-1819)]), 
+    ...         ('Brahms', [(1833, 1897-1833)])]
+    >>> a.data = data
+    >>> a.process()
+
+    .. image:: images/GraphHorizontalBar.*
+        :width: 600
+    
+    '''
+    _DOC_ATTR = {
+        'barSpace': 'Amount of vertical space each bar takes; default 8',
+        'margin': 'Space around the bars, default 2',
+    }
+
+    
+    graphType = 'horizontalBar'
     figureSizeDefault = (10, 4)
+    keywordConfigurables = Graph.keywordConfigurables + (
+        'barSpace', 'margin')
     
     def __init__(self, *args, **keywords):
-        '''
-        Numerous horizontal bars in discrete channels, where bars 
-        can be incomplete and/or overlap.
+        self.barSpace = 8
+        self.margin = 2
 
-        Data provided is a list of pairs, where the first value becomes the key, 
-        the second value is a list of x-start, x-length values.
-
-        
-        >>> #_DOCS_SHOW a = graph.primitives.GraphHorizontalBar(doneAction='show')
-        >>> a = graph.primitives.GraphHorizontalBar(doneAction=None)  #_DOCS_HIDE
-        >>> data = [('Chopin', [(1810, 1849-1810)]), 
-        ...         ('Schumanns', [(1810, 1856-1810), (1819, 1896-1819)]), 
-        ...         ('Brahms', [(1833, 1897-1833)])]
-        >>> a.data = data
-        >>> a.process()
-
-        .. image:: images/GraphHorizontalBar.*
-            :width: 600
-
-        '''
         super(GraphHorizontalBar, self).__init__(*args, **keywords)
-        
-        self._barSpace = 8
-        self._margin = 2
-        self._barHeight = self._barSpace - (self._margin * 2)
 
         if 'alpha' not in keywords:
             self.alpha = 0.6
-
+        
+    @property
+    def barHeight(self):
+        return self.barSpace - (self.margin * 2)
+        
     def renderSubplot(self, subplot):
         self.figure.subplots_adjust(left=0.15)   
 
@@ -873,8 +935,8 @@ class GraphHorizontalBar(Graph):
             faceColor = self.nextColor()            
             
             if points:
-                yrange = (yPos + self._margin, 
-                          self._barHeight)
+                yrange = (yPos + self.margin, 
+                          self.barHeight)
                 subplot.broken_barh(points, 
                                     yrange, 
                                     facecolors=faceColor, 
@@ -885,9 +947,9 @@ class GraphHorizontalBar(Graph):
                         if x not in xPoints:
                             xPoints.append(x)
             # ticks are value, label
-            yTicks.append([yPos + self._barSpace * 0.5, key])
-            #yTicks.append([key, yPos + self._barSpace * 0.5])
-            yPos += self._barSpace
+            yTicks.append([yPos + self.barSpace * 0.5, key])
+            #yTicks.append([key, yPos + self.barSpace * 0.5])
+            yPos += self.barSpace
             i += 1
 
         xMin = min(xPoints)
@@ -895,7 +957,7 @@ class GraphHorizontalBar(Graph):
         xRange = xMax - xMin
         #environLocal.printDebug(['got xMin, xMax for points', xMin, xMax, ])
 
-        self.setAxisRange('y', (0, len(keys) * self._barSpace))
+        self.setAxisRange('y', (0, len(keys) * self.barSpace))
         self.setAxisRange('x', (xMin, xMax))
         self.setTicks('y', yTicks)  
 
@@ -917,17 +979,25 @@ class GraphHorizontalBarWeighted(Graph):
     where bars can be incomplete and/or overlap, and 
     can have different heights and colors within their 
     respective channel.
-    '''    
+    '''
+    _DOC_ATTR = {
+        'barSpace': 'Amount of vertical space each bar takes; default 8',
+        'margin': 'Space around the bars, default 2',
+    }
+
+    
+    graphType = 'horizontalBarWeighted'
     figureSizeDefault = (10, 4)
 
+    keywordConfigurables = Graph.keywordConfigurables + (
+        'barSpace', 'margin')
+
     def __init__(self, *args, **keywords):
+        self.barSpace = 8 
+        self.margin = 0.25 # was 8; determines space between channels
+
         super(GraphHorizontalBarWeighted, self).__init__(*args, **keywords)
         
-        self._barSpace = 8 
-        self._margin = 0.25 # was 8; determines space between channels
-        # this is a maximum value
-        self._barHeight = self._barSpace - (self._margin * 2)
-
         # this default alpha is used if not specified per bar
         if 'alpha' not in keywords:
             self.alpha = 1
@@ -939,6 +1009,9 @@ class GraphHorizontalBarWeighted(Graph):
 #         ('Clarinet', [(5, 1, 0.5, '#3ff203')]  ),
 #         ('Flute',    [(5, 1, 0.1, '#00ff00'), (7, 20, 0.3, '#00ff88')]  ),
 #                 ]
+    @property
+    def barHeight(self):
+        return self.barSpace - (self.margin * 2)
 
     def renderSubplot(self, subplot):
         # might need more space here for larger y-axis labels
@@ -989,10 +1062,10 @@ class GraphHorizontalBarWeighted(Graph):
                 # TODO: add high/low shift to position w/n range
                 # provide a list of start, end points;
                 # then start y position, bar height
-                h = self._barHeight * heightScalar
-                yAdjust = (self._barHeight - h) * 0.5
-                yShiftUnit = self._barHeight * (1 - heightScalar) * 0.5
-                adjustedY = yPos + self._margin + yAdjust + (yShiftUnit * yShift)
+                h = self.barHeight * heightScalar
+                yAdjust = (self.barHeight - h) * 0.5
+                yShiftUnit = self.barHeight * (1 - heightScalar) * 0.5
+                adjustedY = yPos + self.margin + yAdjust + (yShiftUnit * yShift)
                 yRanges.append((adjustedY, h))
 
             for i, xRange in enumerate(xRanges):
@@ -1005,9 +1078,9 @@ class GraphHorizontalBarWeighted(Graph):
                                     edgecolor=colors[i])
 
             # ticks are value, label
-            yTicks.append([yPos + self._barSpace * 0.5, key])
-            #yTicks.append([key, yPos + self._barSpace * 0.5])
-            yPos += self._barSpace
+            yTicks.append([yPos + self.barSpace * 0.5, key])
+            #yTicks.append([key, yPos + self.barSpace * 0.5])
+            yPos += self.barSpace
             i += 1
 
         xMin = min(xPoints)
@@ -1017,7 +1090,7 @@ class GraphHorizontalBarWeighted(Graph):
 
         # NOTE: these pad values determine extra space inside the graph that
         # is not filled with data, a sort of inner margin
-        self.setAxisRange('y', (0, len(keys) * self._barSpace), paddingFraction=0.05)
+        self.setAxisRange('y', (0, len(keys) * self.barSpace), paddingFraction=0.05)
         self.setAxisRange('x', (xMin, xMax), paddingFraction=0.01)
         self.setTicks('y', yTicks)  
 
@@ -1049,17 +1122,29 @@ class GraphScatterWeighted(Graph):
         :width: 600
 
     '''
+    _DOC_ATTR = {
+        'maxDiameter': 'the maximum diameter of any ellipse, default 1.25',
+        'minDiameter': 'the minimum diameter of any ellipse, default 0.25',
+    }
+    
+    graphType = 'scatterWeighted'
     figureSizeDefault = (5, 5)
     
+    keywordConfigurables = Graph.keywordConfigurables + ('maxDiameter', 'minDiatmeter')
+    
     def __init__(self, *args, **keywords):
+        self.maxDiameter = 1.25
+        self.minDiameter = 0.25
+
         super(GraphScatterWeighted, self).__init__(*args, **keywords)
         
         if 'alpha' not in keywords:
-            self.alpha = 0.6
+            self.alpha = 0.6            
 
-        self._maxDiameter = 1.25
-        self._minDiameter = 0.25
-        self._rangeDiameter = self._maxDiameter - self._minDiameter
+    
+    @property
+    def rangeDiameter(self):
+        return self.maxDiameter - self.minDiameter
 
     def renderSubplot(self, subplot):
         extm = getExtendedModules()
@@ -1106,7 +1191,7 @@ class GraphScatterWeighted(Graph):
                     scalar = (z - zMin) / zRange # shifted part / range
                 else:
                     scalar = 0.5 # if all the same size, use 0.5
-                scaled = self._minDiameter + (self._rangeDiameter * scalar)
+                scaled = self.minDiameter + (self.rangeDiameter * scalar)
                 zNorm.append([scaled, scalar])
 
         # draw elipses
@@ -1161,6 +1246,8 @@ class GraphScatter(Graph):
     .. image:: images/GraphScatter.*
         :width: 600
     '''
+    graphType = 'scatter'
+
     def renderSubplot(self, subplot):
         self.figure.subplots_adjust(left=0.15)
         xValues = []
@@ -1206,7 +1293,8 @@ class GraphScatter(Graph):
 
 
 class GraphHistogram(Graph):
-    '''Graph the count of a single element.
+    '''
+    Graph the count of a single element.
 
     Data set is simply a list of x and y pairs, where there
     is only one of each x value, and y value is the count or magnitude
@@ -1216,6 +1304,9 @@ class GraphHistogram(Graph):
     >>> import random
     >>> #_DOCS_SHOW g = graph.primitives.GraphHistogram()
     >>> g = graph.primitives.GraphHistogram(doneAction=None) #_DOCS_HIDE
+    >>> g.graphType
+    'histogram'
+    
     >>> data = [(x, random.choice(range(30))) for x in range(50)]
     >>> g.data = data
     >>> g.process()
@@ -1223,17 +1314,22 @@ class GraphHistogram(Graph):
     .. image:: images/GraphHistogram.*
         :width: 600
     '''
+    _DOC_ATTR = {
+        'binWidth': '''
+            Size of each bin; if the bins are equally spaced at intervals of 1,
+            then 0.8 is a good default to allow a little space. 1.0 will give no
+            space.
+            ''',
+    }
+    
+    graphType = 'histogram'
+    keywordConfigurables = Graph.keywordConfigurables + ('binWidth',)
+    
     def __init__(self, *args, **keywords):
+        self.binWidth = 0.8
         super(GraphHistogram, self).__init__(*args, **keywords)
         
-        if 'binWidth' in keywords:
-            self.binWidth = keywords['binWidth']
-        else:
-            self.binWidth = 0.8
-            
-        if 'alpha' in keywords:
-            self.alpha = keywords['alpha']
-        else:
+        if 'alpha' not in keywords:
             self.alpha = 0.8
 
     def renderSubplot(self, subplot):
@@ -1252,7 +1348,8 @@ class GraphHistogram(Graph):
 
 
 class GraphGroupedVerticalBar(Graph):
-    '''Graph the count of on or more elements in vertical bars
+    '''
+    Graph the count of on or more elements in vertical bars
 
     Data set is simply a list of x and y pairs, where there
     is only one of each x value, and y value is a list of values
@@ -1269,23 +1366,17 @@ class GraphGroupedVerticalBar(Graph):
     >>> g.data = data
     >>> g.process()
     '''
+    graphType = 'groupedVerticalBar'
+    keywordConfigurables = Graph.keywordConfigurables + (
+        'binWidth', 'roundDigits', 'groupLabelHeight',)
+    
     def __init__(self, *args, **keywords):
+        self.binWidth = 1
+        self.roundDigits = 1
+        self.groupLabelHeight = 0.0
+        
         super(GraphGroupedVerticalBar, self).__init__(*args, **keywords)
         
-        if 'roundDigits' in keywords:
-            self.roundDigits = keywords['roundDigits']
-        else:
-            self.roundDigits = 1
-        
-        if 'groupLabelHeight' in keywords:
-            self.groupLabelHeight = keywords['groupLabelHeight']
-        else:
-            self.groupLabelHeight = 0.0
-            
-        if 'binWidth' in keywords:
-            self.binWidth = keywords['binWidth']
-        else:
-            self.binWidth = 1
 
     def labelBars(self, subplot, rects):
         # attach some text labels
@@ -1371,6 +1462,7 @@ class Graph3DBars(Graph):
     >>> g.process()
 
     '''
+    graphType = '3DBars'
     axisKeys = ('x', 'y', 'z')
 
     def process(self):

@@ -1148,7 +1148,7 @@ class PlotHistogram(PlotStream):
                 if value not in data:
                     data[value] = 0
                     # this is the offset that is used to shift labels
-                    # into bars; this only is 0.5 if x values are integers
+                    # into bars; this only is 0.4 if x values are integers
                     dataTick[value+.4] = ticks[i]
                 data[value] += 1
                 if data[value] >= countMax:

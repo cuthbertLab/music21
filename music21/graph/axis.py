@@ -12,16 +12,18 @@
 #-------------------------------------------------------------------------------
 '''
 Definitions for extracting data from a Stream to place on one axis of a 
-:class:`~music21.graph.plots.Plot`.
+:class:`~music21.graph.plot.Plot`.
 '''
 from __future__ import division, print_function, absolute_import
 
+import collections
 import math
 import unittest
 
 from music21.graph.utilities import accidentalLabelToUnicode, GraphException
 
 from music21 import common
+from music21 import duration
 from music21 import dynamics
 from music21 import pitch
 from music21 import stream
@@ -40,9 +42,27 @@ class Axis(object):
         'maxValue': '''
             None or number representing the axis maximum.  Default None.
             ''',        
+        'axisDataMap': '''
+            a dict of {'x': 0, 'y': 1, 'z': 2} mapping where an axis's data can
+            be found in self.client.data after extract data is run:
+            
+            >>> b = corpus.parse('bwv66.6')
+            >>> plot = graph.plot.PlotScatterPitchClassOffset(b)
+            >>> pcAxis = plot.axisY
+            >>> pcAxis.axisName
+            'y'
+            >>> pcAxisDataIndex = pcAxis.axisDataMap[pcAxis.axisName]
+            >>> pcAxisDataIndex
+            1
+            >>> plot.extractData()
+            >>> pcValues = [dataTuple[pcAxisDataIndex] for dataTuple in plot.data]
+            >>> pcValues[0:2]
+            [1, 11]
+            ''',
     }
     
     axisLabelDefault = 'an axis'
+    axisDataMap = {'x': 0, 'y': 1, 'z': 2} 
     
     def __init__(self, client=None, axisName='x'):
         self._client = None
@@ -143,6 +163,14 @@ class Axis(object):
             self.minValue = min(values)
         if self.maxValue is None:
             self.maxValue = max(values)
+            
+    def postProcessData(self, dataList=None):
+        '''
+        Routine to be called after data has been extracted to 
+        do any cleanup, etc.  Defaults to doing nothing, but
+        see CountingAxis for an example of how this works.
+        '''
+        pass
 
 #------------------------------------------------------------------------------
 class PitchAxis(Axis):
@@ -158,7 +186,7 @@ class PitchAxis(Axis):
             ''',
         'hideUnused': '''
             bool on whether not to even show a tick when a pitch doesn't exist.
-            default False.
+            default True.
         ''',
     }
     axisLabelDefault = 'Pitch'
@@ -167,7 +195,7 @@ class PitchAxis(Axis):
         super(PitchAxis, self).__init__(client, axisName)    
         self.showEnharmonic = True
         self.blankLabelUnused = True
-        self.hideUnused = False
+        self.hideUnused = True
     
     @staticmethod
     def makePitchLabelsUnicode(ticks):
@@ -280,7 +308,7 @@ class PitchClassAxis(PitchAxis):
         >>> s.analyze('key')
         <music21.key.Key of G major>
 
-        >>> plotS = graph.plots.PlotStream(s)
+        >>> plotS = graph.plot.PlotStream(s)
         >>> ax = graph.axis.PitchClassAxis(plotS)
         >>> ax.hideUnused = True
 
@@ -302,7 +330,7 @@ class PitchClassAxis(PitchAxis):
        
         
         >>> s = corpus.parse('bach/bwv281.xml')
-        >>> plotS = graph.plots.PlotStream(s)
+        >>> plotS = graph.plot.PlotStream(s)
         >>> ax = graph.axis.PitchClassAxis(plotS)
         >>> ax.hideUnused = True
         >>> ax.showEnharmonic = True
@@ -395,8 +423,9 @@ class PitchSpaceAxis(PitchAxis):
         [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72]
                 
         >>> bach = corpus.parse('bwv66.6')
-        >>> plotS = graph.plots.PlotStream(bach.parts[-1])
+        >>> plotS = graph.plot.PlotStream(bach.parts[-1])
         >>> ax = graph.axis.PitchSpaceAxis(plotS)
+        >>> ax.hideUnused = False
         >>> ax.minValue = 36
         >>> ax.maxValue = 100
         >>> ticks = ax.ticks()
@@ -527,15 +556,15 @@ class OffsetAxis(PositionAxis):
         Get offset or measure ticks
         
         >>> s = corpus.parse('bach/bwv281.xml')
-        >>> plotS = graph.plots.PlotStream(s)
+        >>> plotS = graph.plot.PlotStream(s)
         >>> ax = graph.axis.OffsetAxis(plotS)
         >>> ax.setBoundariesFromData()
         >>> ax.ticks() # on whole score, showing anacrusis spacing
         [(0.0, '0'), (1.0, '1'), (5.0, '2'), (9.0, '3'), (13.0, '4'), (17.0, '5'), 
          (21.0, '6'), (25.0, '7'), (29.0, '8')]
 
-        >>> a = graph.plots.PlotStream(s.parts[0].flat) # on a Part
-        >>> plotS = graph.plots.PlotStream(s)
+        >>> a = graph.plot.PlotStream(s.parts[0].flat) # on a Part
+        >>> plotS = graph.plot.PlotStream(s)
         >>> ax = graph.axis.OffsetAxis(plotS)
         >>> ax.setBoundariesFromData()
         >>> ax.ticks() # on whole score, showing anacrusis spacing
@@ -556,7 +585,7 @@ class OffsetAxis(PositionAxis):
         >>> n = note.Note('a') # on a raw collection of notes with no measures
         >>> s = stream.Stream()
         >>> s.repeatAppend(n, 20)
-        >>> plotS = graph.plots.PlotStream(s)
+        >>> plotS = graph.plot.PlotStream(s)
         >>> ax = graph.axis.OffsetAxis(plotS)
         >>> ax.setBoundariesFromData()
         >>> ax.ticks()
@@ -630,7 +659,7 @@ class OffsetAxis(PositionAxis):
         empty-dict if not.
         
         >>> b = corpus.parse('bwv66.6')
-        >>> p = graph.plots.PlotStream(b)
+        >>> p = graph.plot.PlotStream(b)
         >>> ax = graph.axis.OffsetAxis(p, 'x')
         >>> om = ax.getOffsetMap()
         >>> om
@@ -641,7 +670,7 @@ class OffsetAxis(PositionAxis):
 
         Same if called on a single part:        
         
-        >>> p = graph.plots.PlotStream(b.parts[0])
+        >>> p = graph.plot.PlotStream(b.parts[0])
         >>> ax = graph.axis.OffsetAxis(p, 'x')
         >>> om2 = ax.getOffsetMap()
         >>> om2
@@ -652,7 +681,7 @@ class OffsetAxis(PositionAxis):
 
         But empty if called on a single Measure ...
         
-        >>> p = graph.plots.PlotStream(b.parts[0].getElementsByClass('Measure')[2])
+        >>> p = graph.plot.PlotStream(b.parts[0].getElementsByClass('Measure')[2])
         >>> ax = graph.axis.OffsetAxis(p, 'x')
         >>> om3 = ax.getOffsetMap()
         >>> om3
@@ -683,7 +712,7 @@ class OffsetAxis(PositionAxis):
         non-empty.
 
         >>> b = corpus.parse('bwv66.6')
-        >>> p = graph.plots.PlotStream(b)
+        >>> p = graph.plot.PlotStream(b)
         >>> ax = graph.axis.OffsetAxis(p, 'x')
         >>> print(ax.useMeasures)
         None
@@ -711,7 +740,7 @@ class OffsetAxis(PositionAxis):
 
         Returns False if the offsetMap is empty
         
-        >>> p = graph.plots.PlotStream(b.parts[0].getElementsByClass('Measure')[2])
+        >>> p = graph.plot.PlotStream(b.parts[0].getElementsByClass('Measure')[2])
         >>> axMeasure = graph.axis.OffsetAxis(p, 'x')
         >>> axMeasure.setUseMeasuresFromOffsetMap()
         False
@@ -739,6 +768,10 @@ class QuarterLengthAxis(PositionAxis):
             length to substitute a grace note or other Zero-length element for.
             Default is the length of a 64th note (1/16 of a QL)
         ''',
+        'useDurationNames': '''
+            If used then duration names replace numbers for ticks.
+            If set, probably will want to change tickFontSize in the graph object
+        ''',
     }
     
     axisLabelDefault = 'Quarter Length'
@@ -747,9 +780,19 @@ class QuarterLengthAxis(PositionAxis):
         super(QuarterLengthAxis, self).__init__(client, axisName)
         self.useLogScale = True
         self.graceNoteQL = 2**-4
+        self.useDurationNames = False
     
     def extractOneElement(self, n):
-        return float(n.duration.quarterLength)
+        return self.dataFromQL(n.duration.quarterLength)
+
+    def dataFromQL(self, ql):
+        if self.useLogScale:
+            x = self.remapQuarterLength(ql)
+        elif ql > 0:
+            x = float(ql)
+        else:
+            x = self.graceNoteQL
+        return x
     
     def ticks(self):
         '''
@@ -769,7 +812,7 @@ class QuarterLengthAxis(PositionAxis):
         ...     n.duration.type = t
         ...     s.append(n)
         
-        >>> plotS = graph.plots.PlotStream(s)
+        >>> plotS = graph.plot.PlotStream(s)
         >>> ax = graph.axis.QuarterLengthAxis(plotS)
         >>> ax.ticks()
         [(-3.0, '0.1...'), (-2.0, '0.25'), (-1.0, '0.5'), (0.0, '1.0'), (1.0, '2.0')]
@@ -777,6 +820,9 @@ class QuarterLengthAxis(PositionAxis):
         >>> ax.useLogScale = False
         >>> ax.ticks()
         [(0.125, '0.1...'), (0.25, '0.25'), (0.5, '0.5'), (1.0, '1.0'), (2.0, '2.0')]
+        >>> ax.useDurationNames = True
+        >>> ax.ticks()
+        [(0.125, '32nd'), (0.25, '16th'), (0.5, 'Eighth'), (1.0, 'Quarter'), (2.0, 'Half')]        
 
         The second entry is 0.125 but gets rounded differently in python 2 (1.3) and python 3
         (1.2)
@@ -784,7 +830,7 @@ class QuarterLengthAxis(PositionAxis):
         >>> nGrace = note.Note()
         >>> nGrace.getGrace(inPlace=True)
         >>> s.append(nGrace)
-        >>> plotS = graph.plots.PlotStream(s)
+        >>> plotS = graph.plot.PlotStream(s)
         >>> ax = graph.axis.QuarterLengthAxis(plotS)
         >>> ax.ticks()[0]
         (-4.0, '0.0')
@@ -807,13 +853,12 @@ class QuarterLengthAxis(PositionAxis):
 
         ticks = []
         for ql in sorted(mapping):
-            if self.useLogScale:
-                x = self.remapQuarterLength(ql)
-            elif ql > 0:
-                x = float(ql)
+            x = self.dataFromQL(ql)
+            if self.useDurationNames:
+                label = duration.Duration(ql).fullName
             else:
-                x = self.graceNoteQL
-            ticks.append((x, '%s' % round(ql, 2)))
+                label = str(round(ql, 2))
+            ticks.append((x, label))
         return ticks
 
     def axisLabelLogTag(self):
@@ -870,12 +915,13 @@ class DynamicsAxis(Axis):
     Axis subclass for dealing with Dynamics
     '''
     axisLabelDefault = 'Dynamic'
-    
-    def __init__(self, client=None, axisName='x'):
-        super(DynamicsAxis, self).__init__(client, axisName)
-        self.minValue = 0
-        self.maxValue = len(dynamics.shortNames) - 1
-
+        
+    def setBoundariesFromData(self, values=None):
+        if values is None:
+            self.minValue = 0 
+            self.maxValue = len(dynamics.shortNames) - 1
+        else:
+            return super(DynamicsAxis, self).setBoundariesFromData(values)
 
     def ticks(self):
         '''
@@ -883,22 +929,142 @@ class DynamicsAxis(Axis):
         
         >>> ax = graph.axis.DynamicsAxis()
         >>> ax.ticks()
-        [[0, '$pppppp$'], [1, '$ppppp$'], [2, '$pppp$'], [3, '$ppp$'], [4, '$pp$'], 
-         [5, '$p$'], [6, '$mp$'], [7, '$mf$'], [8, '$f$'], [9, '$fp$'], [10, '$sf$'], 
-         [11, '$ff$'], [12, '$fff$'], [13, '$ffff$'], [14, '$fffff$'], [15, '$ffffff$']]
+        [(0, '$pppppp$'), (1, '$ppppp$'), (2, '$pppp$'), (3, '$ppp$'), (4, '$pp$'), 
+         (5, '$p$'), (6, '$mp$'), (7, '$mf$'), (8, '$f$'), (9, '$fp$'), (10, '$sf$'), 
+         (11, '$ff$'), (12, '$fff$'), (13, '$ffff$'), (14, '$fffff$'), (15, '$ffffff$')]
 
         A minimum and maximum dynamic index can be specified as minValue and maxValue
         
         >>> ax.minValue = 3
         >>> ax.maxValue = 6
         >>> ax.ticks()
-        [[3, '$ppp$'], [4, '$pp$'], [5, '$p$'], [6, '$mp$']]
+        [(3, '$ppp$'), (4, '$pp$'), (5, '$p$'), (6, '$mp$')]
 
         '''
         ticks = []
+        if self.minValue is None:
+            self.setBoundariesFromData()
         for i in range(self.minValue, self.maxValue + 1):
             # place string in tex format for italic display
-            ticks.append([i, r'$%s$' % dynamics.shortNames[i]])
+            ticks.append((i, r'$%s$' % dynamics.shortNames[i]))
+        return ticks
+
+#------------------------------------------------------------------------------
+class CountingAxis(Axis):
+    '''
+    Axis subclass for counting data in another Axis.
+    
+    Used for histograms, weighted scatter, etc.
+    
+    >>> bach = corpus.parse('bwv66.6')
+    >>> plotS = graph.plot.PlotStream(bach)
+    >>> plotS.axisX = graph.axis.PitchSpaceAxis(plotS, 'x')
+    >>> plotS.axisY = graph.axis.CountingAxis(plotS)
+    >>> plotS.doneAction = None
+    >>> plotS.run()
+    >>> plotS.data
+    [[42.0, 1], [45.0, 1], [46.0, 1], [47.0, 5], [49.0, 6], ...]
+    '''
+    _DOC_ATTR = {
+        'countAxes': '''
+            a string or tuple of strings representing an axis or axes to use in counting
+            ''',
+    }
+    
+    axisLabelDefault = 'Count'
+
+    def __init__(self, client=None, axisName='y'):
+        super(CountingAxis, self).__init__(client, axisName)
+        self.countAxes = 'x'
+        
+    def postProcessData(self):
+        '''
+        Replace client.data with a list that only includes each key once.
+        '''
+        client = self.client
+        if client is None:
+            return []
+
+        from operator import itemgetter
+        countAxes = self.countAxes
+        if not common.isIterable(countAxes):
+            countAxes = (countAxes,)
+        axesIndices = tuple([self.axisDataMap[axisName] for axisName in countAxes])
+        thisIndex = self.axisDataMap[self.axisName]
+        selector = itemgetter(*axesIndices)
+        relevantData = [selector(innerTuple) for innerTuple in client.data]
+        counter = collections.Counter(relevantData)
+        
+        newClientData = []
+        for counterKey in counter:
+            innerList = [None] * (len(axesIndices) + 1)
+            if len(axesIndices) > 1:
+                for dependentIndex in axesIndices:
+                    innerList[dependentIndex] = counterKey[dependentIndex]
+            else: # single axesIndices means the counterKey will not be a tuple:
+                innerList[axesIndices[0]] = counterKey
+            innerList[thisIndex] = counter[counterKey]
+            newClientData.append(innerList)
+        
+        client.data = sorted(newClientData)
+        return client.data
+        
+        
+    def ticks(self):
+        '''
+        Get a set of ticks for this data
+        
+        >>> cax = graph.axis.CountingAxis()
+        >>> cax.minValue = 1
+        >>> cax.maxValue = 9
+        >>> cax.ticks()
+        [(0, '0'), (1, '1'), (2, '2'), (3, '3'), (4, '4'), 
+         (5, '5'), (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10')]
+        
+        For larger data, the ticks are farther apart.
+        
+        >>> cax.minValue = 7
+        >>> cax.maxValue = 80
+        >>> cax.ticks()
+        [(0, '0'), (10, '10'), (20, '20'), (30, '30'), (40, '40'), 
+         (50, '50'), (60, '60'), (70, '70'), (80, '80'), (90, '90')]
+
+        >>> cax.minValue = 712
+        >>> cax.maxValue = 2213
+        >>> cax.ticks()
+        [(600, '600'), (700, '700'), (800, '800'), (900, '900'), (1000, '1000'), 
+         (1100, '1100'), (1200, '1200'), (1300, '1300'), (1400, '1400'), (1500, '1500'), 
+         (1600, '1600'), (1700, '1700'), (1800, '1800'), (1900, '1900'), (2000, '2000'), 
+         (2100, '2100'), (2200, '2200'), (2300, '2300')]
+        '''
+        minV = self.minValue
+        maxV = self.maxValue
+        if minV is None:
+            minV = 0
+        if maxV is None:
+            maxV = 10
+
+        difference = maxV - minV
+        if difference == 0:
+            log10distance = 0
+        else:
+            log10distance = int(math.log10(maxV - minV))
+
+        closest10 = 10 ** log10distance # closest power of 10 that is smaller than the difference
+        if closest10 > 1 and (difference / closest10) <= 2: # min three steps
+            closest10 = int(closest10 / 10)
+        
+        startValue = (int(minV / closest10) - 1) * closest10
+        if startValue < 0 and minV >= 0:
+            startValue = 0
+        
+        stopValue =  (int(maxV / closest10) + 2) * closest10
+        steps = range(startValue, stopValue, closest10)
+        
+        
+        ticks = []
+        for tickNum in steps:
+            ticks.append((tickNum, str(tickNum)))
         return ticks
 
 
