@@ -293,7 +293,6 @@ class PlotStreamMixin(object):
 
 class PlotStream(primitives.Graph, PlotStreamMixin):
     def __init__(self, streamObj, *args, **keywords):
-        from music21.graph import axis
         primitives.Graph.__init__(self, *args, **keywords)
         PlotStreamMixin.__init__(self, streamObj)
 

@@ -403,7 +403,7 @@ class PitchSpaceAxis(PitchAxis):
             return n.pitch.ps
 
     def ticks(self, dataMin=36, dataMax=100):
-        '''
+        u'''
         >>> ax = graph.axis.PitchSpaceAxis()
         >>> ax.hideUnused = False
         >>> ax.blankLabelUnused = False

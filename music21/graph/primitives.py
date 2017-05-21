@@ -884,8 +884,8 @@ class GraphHorizontalBar(Graph):
     the second value is a list of x-start, x-length values.
 
     
-    >>> #_DOCS_SHOW a = graph.primitives.GraphHorizontalBar(doneAction='show')
-    >>> a = graph.primitives.GraphHorizontalBar(doneAction=None)  #_DOCS_HIDE
+    >>> a = graph.primitives.GraphHorizontalBar()  
+    >>> a.doneAction = None #_DOCS_HIDE
     >>> data = [('Chopin', [(1810, 1849-1810)]), 
     ...         ('Schumanns', [(1810, 1856-1810), (1819, 1896-1819)]), 
     ...         ('Brahms', [(1833, 1897-1833)])]
@@ -1115,8 +1115,8 @@ class GraphScatterWeighted(Graph):
     A scatter plot where points are scaled in size to 
     represent the number of values stored within.
     
-    >>> #_DOCS_SHOW g = graph.primitives.GraphScatterWeighted()
-    >>> g = graph.primitives.GraphScatterWeighted(doneAction=None) #_DOCS_HIDE
+    >>> g = graph.primitives.GraphScatterWeighted() 
+    >>> g.doneAction = None #_DOCS_HIDE
     >>> data = [(23, 15, 234), (10, 23, 12), (4, 23, 5), (15, 18, 120)]
     >>> g.data = data
     >>> g.process()
@@ -1240,8 +1240,8 @@ class GraphScatter(Graph):
     '''
     Graph two parameters in a scatter plot. Data representation is a list of points of values. 
 
-    >>> #_DOCS_SHOW g = graph.primitives.GraphScatter()
-    >>> g = graph.primitives.GraphScatter(doneAction=None) #_DOCS_HIDE
+    >>> g = graph.primitives.GraphScatter() 
+    >>> g.doneAction = None #_DOCS_HIDE
     >>> data = [(x, x * x) for x in range(50)]
     >>> g.data = data
     >>> g.process()
@@ -1305,8 +1305,8 @@ class GraphHistogram(Graph):
 
     
     >>> import random
-    >>> #_DOCS_SHOW g = graph.primitives.GraphHistogram()
-    >>> g = graph.primitives.GraphHistogram(doneAction=None) #_DOCS_HIDE
+    >>> g = graph.primitives.GraphHistogram() 
+    >>> g.doneAction = None #_DOCS_HIDE
     >>> g.graphType
     'histogram'
     
@@ -1358,8 +1358,8 @@ class GraphGroupedVerticalBar(Graph):
     is only one of each x value, and y value is a list of values
 
     >>> from collections import OrderedDict
-    >>> #_DOCS_SHOW g = graph.primitives.GraphGroupedVerticalBar()
-    >>> g = graph.primitives.GraphGroupedVerticalBar(doneAction=None) #_DOCS_HIDE
+    >>> g = graph.primitives.GraphGroupedVerticalBar() 
+    >>> g.doneAction = None #_DOCS_HIDE
     >>> lengths = OrderedDict( [('a', 3), ('b', 2), ('c', 1)] )
     >>> data = [('bar' + str(x), lengths) for x in range(3)]
     >>> data
@@ -1455,7 +1455,7 @@ class Graph3DBars(Graph):
    
     >>> import random
     >>> g = graph.primitives.Graph3DBars()
-    >>> # g.doneAction=None #_DOCS_HIDE
+    >>> g.doneAction = None #_DOCS_HIDE
     >>> data = []
     >>> ri = random.randint
     >>> for i in range(1, 10+1):
