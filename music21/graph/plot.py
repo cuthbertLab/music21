@@ -42,9 +42,6 @@ from music21.analysis import reduction
 from music21.analysis import windowed
 
 from music21.ext import six
-if six.PY2:
-    # pylint: disable=redefined-builtin
-    from music21.common import py3round as round
 
 from music21 import environment
 _MOD = 'graph/plots.py'
