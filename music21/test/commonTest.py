@@ -195,6 +195,10 @@ class ModuleGather(object):
             ]
         # run these first...
         self.slowModules = ['graph', 
+                            'graph/plot',
+                            'graph/axis',
+                            'graph/primitives',
+                            'freezeThaw',
                             'figuredBass/realizer', 
                             'features/jSymbolic', 
                             'features/native', 
