@@ -159,9 +159,9 @@ class Axis(object):
         >>> ax.maxValue
         10        
         '''
-        if self.minValue is None:
+        if self.minValue is None and values:
             self.minValue = min(values)
-        if self.maxValue is None:
+        if self.maxValue is None and values:
             self.maxValue = max(values)
             
     def postProcessData(self, dataList=None):
@@ -476,7 +476,18 @@ class PositionAxis(Axis):
     '''
     Axis subclass for dealing with Positions
     '''
+    _DOC_ATTR = {
+        'graceNoteQL': '''
+            length to substitute a grace note or other Zero-length element for.
+            Default is the length of a 64th note (1/16 of a QL)
+        ''',
+    }
+
     axisLabelDefault = 'Position'
+    
+    def __init__(self, client=None, axisName='x'):
+        super(PositionAxis, self).__init__(client, axisName)
+        self.graceNoteQL = 2**-4
     
 
 class OffsetAxis(PositionAxis):
@@ -597,7 +608,7 @@ class OffsetAxis(PositionAxis):
         offsetMap = self.getOffsetMap()
         self.setUseMeasuresFromOffsetMap(offsetMap)   
            
-        if offsetMap:
+        if self.useMeasures:
             return self._measureTicks(self.minValue, self.maxValue, offsetMap)
         else: # generate numeric ticks
             #environLocal.printDebug(['using offsets for offset ticks'])
@@ -764,10 +775,6 @@ class QuarterLengthAxis(PositionAxis):
             axis label if used.  If True (default) then log2 is assumed.  If an int, then
             log the int (say, 10) is used. instead.
         ''',
-        'graceNoteQL': '''
-            length to substitute a grace note or other Zero-length element for.
-            Default is the length of a 64th note (1/16 of a QL)
-        ''',
         'useDurationNames': '''
             If used then duration names replace numbers for ticks.
             If set, probably will want to change tickFontSize in the graph object
@@ -779,7 +786,6 @@ class QuarterLengthAxis(PositionAxis):
     def __init__(self, client=None, axisName='x'):
         super(QuarterLengthAxis, self).__init__(client, axisName)
         self.useLogScale = True
-        self.graceNoteQL = 2**-4
         self.useDurationNames = False
     
     def extractOneElement(self, n):
@@ -909,6 +915,34 @@ class QuarterLengthAxis(PositionAxis):
             raise GraphException('cannot take log of x value: %s' %  x)
 
 
+class OffsetEndAxis(OffsetAxis):
+    '''
+    An Axis that gives beginning and ending values for each element
+    '''
+    _DOC_ATTR = {
+        'noteSpacing': '''
+            amount in QL to leave blank between untied notes.
+            (default = graceNoteQL)
+            '''
+    }
+    
+    def __init__(self, client=None, axisName='x'):
+        super(OffsetEndAxis, self).__init__(client, axisName)
+        self.noteSpacing = self.graceNoteQL
+    
+    def extractOneElement(self, n):
+        off = float(n.getOffsetInHierarchy(self.stream))
+        useQL = float(n.duration.quarterLength)
+        if useQL < self.graceNoteQL:
+            useQL = self.graceNoteQL
+        elif useQL > self.graceNoteQL * 2:
+            if hasattr(n, 'tie') and n.tie is not None and n.tie.type in ('start', 'continue'):
+                pass
+            else:
+                useQL -= self.graceNoteQL
+        
+        return (off, useQL)
+
 #------------------------------------------------------------------------------
 class DynamicsAxis(Axis):
     '''
@@ -993,7 +1027,7 @@ class CountingAxis(Axis):
         thisIndex = self.axisDataMap[self.axisName]
         selector = itemgetter(*axesIndices)
         relevantData = [selector(innerTuple) for innerTuple in client.data]
-        counter = collections.Counter(relevantData)
+        counter = collections.Counter(tuple(relevantData))
         
         newClientData = []
         for counterKey in counter:

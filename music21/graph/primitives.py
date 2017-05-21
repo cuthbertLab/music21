@@ -683,7 +683,7 @@ class GraphColorGrid(Graph):
             subColors = []
             
             for j, thisColor in enumerate(thisRowData):
-                positions.append(j) # + 1/2)
+                positions.append(j + 1/2)
                 # collect colors in a list to set all at once
                 subColors.append(thisColor)
                 #correlations.append(float(self.data[i][j][2]))
@@ -806,13 +806,15 @@ class GraphColorGridLegend(Graph):
         to keys in Prometheus: The Poem of Fire.
         
         >>> import matplotlib.pyplot
+
         >>> gcgl = graph.primitives.GraphColorGridLegend()
-        >>> fig = matplotlib.pyplot.figure()
         >>> rowData = [('C', '#ff0000'), ('G', '#ff8800'), ('D', '#ffff00'),
         ...            ('A', '#00ff00'), ('E', '#4444ff')]
         >>> gcgl.data = [['Scriabin Mapping', rowData]]
-        >>> ax = gcgl.makeOneRowOfGraph(fig, 0, 'Scriabin Mapping', rowData)
-        >>> ax
+
+        >>> fig = matplotlib.pyplot.figure()
+        >>> subplot = gcgl.makeOneRowOfGraph(fig, 0, 'Scriabin Mapping', rowData)
+        >>> subplot
         <matplotlib...AxesSubplot object at 0x111e13828>
         '''
         #environLocal.printDebug(['rowLabel', rowLabel, i])
@@ -822,7 +824,7 @@ class GraphColorGridLegend(Graph):
         subColors = []
         
         for j, oneColorMapping in enumerate(rowData):
-            positions.append(0.5 + j)
+            positions.append(1.0 + j)
             subColors.append(oneColorMapping[1]) # second value is colors
             heights.append(1)
         
@@ -833,7 +835,8 @@ class GraphColorGridLegend(Graph):
         
         # ax is an Axes object
         # 1 here is width
-        ax.bar(positions, heights, 1, color=subColors, linewidth=0.3, edgecolor='#000000')
+        width = 1
+        ax.bar(positions, heights, width, color=subColors, linewidth=0.3, edgecolor='#000000')
         
         # lower thickness of spines 
         for spineArtist in ax.spines.values():
@@ -1451,26 +1454,33 @@ class Graph3DBars(Graph):
     (x, y) coordinates.
    
     >>> import random
-    >>> #_DOCS_SHOW g = graph.primitives.Graph3DBars()
-    >>> g = graph.primitives.Graph3DBars(doneAction=None) #_DOCS_HIDE
-    >>> data = {1:[], 2:[], 3:[]}
-    >>> dk = list(data.keys())
-    >>> for i in range(len(dk)):
-    ...    q = [(x, random.choice(range(10 * (i+1)))) for x in range(20)]
-    ...    data[dk[i]] = q
+    >>> g = graph.primitives.Graph3DBars()
+    >>> # g.doneAction=None #_DOCS_HIDE
+    >>> data = []
+    >>> ri = random.randint
+    >>> for i in range(1, 10+1):
+    ...    q = [i, i//2, 10-i]
+    ...    data.append(q)
     >>> g.data = data
     >>> g.process()
 
     '''
     graphType = '3DBars'
     axisKeys = ('x', 'y', 'z')
+    def __init__(self, *args, **keywords):
+        super(Graph3DBars, self).__init__(*args, **keywords)
+        if 'alpha' not in keywords:
+            self.alpha = 0.8
+        if 'colors' not in keywords:
+            self.colors = ['#ff0000', '#00ff00', '#6666ff']
+
 
     def process(self):
         extm = getExtendedModules()
         plt = extm.plt
         
         self.figure = plt.figure()
-        self.subplot = extm.Axes3D(self.figure)
+        self.subplot = self.figure.add_subplot(1, 1, 1, projection='3d')
 
         self.renderSubplot(self.subplot)
 
@@ -1478,37 +1488,41 @@ class Graph3DBars(Graph):
         self.callDoneAction()
    
     def renderSubplot(self, subplot):
-        zVals = list(self.data.keys())
-        zVals.sort()
+        yDict = {}
+        for x, y, z in self.data:
+            if y not in yDict:
+                yDict[y] = []
+            yDict[y].append((x, z))
 
-        yVals = []
+        yVals = list(yDict.keys())
+        yVals.sort()
+
+        zVals = []
         xVals = []
-        for key in zVals:
-            for i in range(len(self.data[key])):
-                x, y = self.data[key][i]
-                yVals.append(y)
+        for key in yVals:
+            for i in range(len(yDict[key])):
+                x, z = yDict[key][i]
+                zVals.append(z)
                 xVals.append(x)
         #environLocal.printDebug(['yVals', yVals])
         #environLocal.printDebug(['xVals', xVals])
 
         if self.axis['x']['range'] is None:
-            self.axis['x']['range'] =  min(xVals), max(xVals)
+            self.axis['x']['range'] = min(xVals), max(xVals)
         # swap y for z
         if self.axis['z']['range'] is None:
-            self.axis['z']['range'] =  min(yVals), max(yVals)
+            self.axis['z']['range'] = min(zVals), max(zVals)
         if self.axis['y']['range'] is None:
-            self.axis['y']['range'] =  min(zVals), max(zVals) + 1
+            self.axis['y']['range'] = min(yVals), max(yVals)
 
-        width = 0.1
+        barWidth = (max(xVals) - min(xVals)) / 20
+        barDepth = (max(yVals) - min(yVals)) / 20
         
-        for z in range(*self.axis['y']['range']):
-            #c = ['b', 'g', 'r', 'c', 'm'][z%5]
-            # list of x values
-            xs = [x + width / 2 for x, y in self.data[z]]
-            # list of y values
-            ys = [y for x, y in self.data[z]]
-            # width=0.1, color=c, alpha=self.alpha
-            subplot.bar(xs, ys, zs=z, zdir='y', width=width)
+        for x, y, z in self.data:
+            subplot.bar3d(x - (barWidth / 2), y - (barDepth / 2), 0, 
+                          barWidth, barDepth, z, 
+                          self.nextColor(),
+                          alpha=self.alpha)
 
         self.setAxisLabel('x', 'x')
         self.setAxisLabel('y', 'y')

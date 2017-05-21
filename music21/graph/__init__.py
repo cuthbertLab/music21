@@ -52,7 +52,7 @@ def getPlotsToMake(*args, **keywords):
     [<class 'music21.graph.plot.PlotHorizontalBarPitchSpaceOffset'>]
     
     >>> graph.getPlotsToMake('windowed')
-    [<class 'music21.graph.plot.PlotWindowedTemperleyKostkaPayne'>]
+    [<class 'music21.graph.plot.PlotWindowedTKey'>]
     '''
     plotClasses = [
         # histograms
@@ -74,12 +74,7 @@ def getPlotsToMake(*args, **keywords):
         # 3d graphs
         plot.Plot3DBarsPitchSpaceQuarterLength,
         # windowed plots
-        plot.PlotWindowedKrumhanslSchmuckler,
-        plot.PlotWindowedKrumhanslKessler,
-        plot.PlotWindowedAardenEssen,
-        plot.PlotWindowedSimpleWeights,
-        plot.PlotWindowedBellmanBudge,
-        plot.PlotWindowedTemperleyKostkaPayne,
+        plot.PlotWindowedKey,
         plot.PlotWindowedAmbitus,
         # instrumentation and part graphs
         plot.PlotDolan,
@@ -150,6 +145,8 @@ def getPlotsToMake(*args, **keywords):
         plotMake = [foundClassName] # place in a list
     else:
         plotMakeCandidates = [] # store pairs of score, class
+        from music21 import stream
+        sDummy = stream.Stream()
         for plotClassName in plotClasses:
             # try to match by complete class name
             if plotClassName.__name__.lower() == showFormat.lower():
@@ -157,8 +154,9 @@ def getPlotsToMake(*args, **keywords):
                 plotMake.append(plotClassName)
 
             # try direct match of format and values
-            plotClassNameValues = [x.lower() for x in plotClassName.values]
-            plotClassNameFormat = plotClassName.format.lower()
+            plotClassNameValues = [x.axisLabelDefault.lower() 
+                                        for x in plotClassName(sDummy).allAxes]
+            plotClassNameFormat = plotClassName.graphType.lower()
             if plotClassNameFormat != showFormat.lower():
                 continue
             #environLocal.printDebug(['matching format', showFormat])
@@ -240,15 +238,9 @@ def plotStream(streamObj, *args, **keywords):
     * :class:`~music21.graph.PlotScatterWeightedPitchClassQuarterLength`
     * :class:`~music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol`
     * :class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`
-    * :class:`~music21.graph.PlotWindowedKrumhanslSchmuckler`
-    * :class:`~music21.graph.PlotWindowedKrumhanslKessler`
-    * :class:`~music21.graph.PlotWindowedAardenEssen`
-    * :class:`~music21.graph.PlotWindowedSimpleWeights`
-    * :class:`~music21.graph.PlotWindowedBellmanBudge`
-    * :class:`~music21.graph.PlotWindowedTemperleyKostkaPayne`
+    * :class:`~music21.graph.PlotWindowedKey`
     * :class:`~music21.graph.PlotWindowedAmbitus`
     * :class:`~music21.graph.PlotDolan`
-
 
     
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
@@ -273,7 +265,7 @@ def plotStream(streamObj, *args, **keywords):
     #environLocal.printDebug(['plotClassName found', plotMake])
     for plotClassName in plotMake:
         obj = plotClassName(streamObj, *args, **keywords)
-        obj.process()
+        obj.run()
 
         
 
@@ -360,18 +352,10 @@ class Test(unittest.TestCase):
         
 
     def testGetPlotsToMakeA(self):
-        post = getPlotsToMake(format='grid', values='krumhansl-schmuckler')
-        self.assertEqual(post, [plot.PlotWindowedKrumhanslSchmuckler])
-        post = getPlotsToMake(format='grid', values='aarden')
-        self.assertEqual(post, [plot.PlotWindowedAardenEssen])
-        post = getPlotsToMake(format='grid', values='simple')
-        self.assertEqual(post, [plot.PlotWindowedSimpleWeights])
-        post = getPlotsToMake(format='grid', values='bellman')
-        self.assertEqual(post, [plot.PlotWindowedBellmanBudge])
-        post = getPlotsToMake(format='grid', values='kostka')
-        self.assertEqual(post, [plot.PlotWindowedTemperleyKostkaPayne])
-        post = getPlotsToMake(format='grid', values='KrumhanslKessler')
-        self.assertEqual(post, [plot.PlotWindowedKrumhanslKessler])
+        post = getPlotsToMake(format='grid', values='key')
+        self.assertEqual(post, [plot.PlotWindowedKey])
+        post = getPlotsToMake(format='grid', values='ambitus')
+        self.assertEqual(post, [plot.PlotWindowedAmbitus])
 
 
         # no args get pitch space piano roll
