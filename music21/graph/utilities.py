@@ -120,8 +120,14 @@ FORMAT_SYNONYMS = [('horizontalbar', 'bar', 'horizontal', 'pianoroll', 'piano'),
                    ('scatterweighted', 'weightedscatter', 'weighted'),
                    ('3dbars', '3d'),
                    ('colorgrid', 'grid', 'window', 'windowed'),
-                   ('horizontalbarweighted', 'barweighted', 'weightedbar')]
+                   ('horizontalbarweighted', 'barweighted', 'weightedbar')
+                   ]
 
+PLOTCLASS_SYNONYMS = {
+    'plotwindowedambitus': ('ambitus',),
+    'plotdolan': ('instrument', 'instruments'),
+    
+}
 
 def userFormatsToFormat(value):
     '''

@@ -642,6 +642,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                         (p, coefficient) in likelyKeysMajor]
         else:
             sortList = []
+            
         if likelyKeysMinor is not None:
             sortList += [(coefficient, p, 'minor') for 
                          (p, coefficient) in likelyKeysMinor]
@@ -1233,9 +1234,10 @@ class Ambitus(DiscreteAnalysis):
         post = self.getPitchSpan(sStream)
         if post is not None:
             solution = interval.Interval(noteStart=post[0], noteEnd=post[1])
+            color = self.solutionToColor(post[1].ps - post[0].ps)
         else:
             solution = None
-        color = self.solutionToColor(post[1].ps - post[0].ps)
+            color = '#ffffff'        
         
         # store solutions for compressed legend generation
         self.solutionsFound.append((solution, color))

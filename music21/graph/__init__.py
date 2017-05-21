@@ -52,7 +52,7 @@ def getPlotsToMake(*args, **keywords):
     [<class 'music21.graph.plot.PlotHorizontalBarPitchSpaceOffset'>]
     
     >>> graph.getPlotsToMake('windowed')
-    [<class 'music21.graph.plot.PlotWindowedTKey'>]
+    [<class 'music21.graph.plot.PlotWindowedKey'>]
     '''
     plotClasses = [
         # histograms
@@ -149,15 +149,24 @@ def getPlotsToMake(*args, **keywords):
         sDummy = stream.Stream()
         for plotClassName in plotClasses:
             # try to match by complete class name
-            if plotClassName.__name__.lower() == showFormat.lower():
+            pcnStr = plotClassName.__name__.lower()
+            if pcnStr == showFormat.lower():
                 #environLocal.printDebug(['got plot class:', plotClassName])
                 plotMake.append(plotClassName)
+            elif pcnStr.replace('plot', '') == showFormat.lower():
+                plotMake.append(plotClassName)
+            elif pcnStr in utilities.PLOTCLASS_SYNONYMS:
+                syns = utilities.PLOTCLASS_SYNONYMS[pcnStr]
+                for syn in syns:
+                    if syn == showFormat.lower():
+                        plotMake.append(plotClassName)
+                        
 
             # try direct match of format and values
-            plotClassNameValues = [x.axisLabelDefault.lower() 
-                                        for x in plotClassName(sDummy).allAxes]
+            plotClassNameValues = [x.axisLabelDefault.lower().replace(' ', '')
+                                        for x in plotClassName(sDummy).allAxes if x is not None]
             plotClassNameFormat = plotClassName.graphType.lower()
-            if plotClassNameFormat != showFormat.lower():
+            if showFormat and plotClassNameFormat != showFormat.lower():
                 continue
             #environLocal.printDebug(['matching format', showFormat])
             # see if a matching set of values is specified
@@ -170,7 +179,12 @@ def getPlotsToMake(*args, **keywords):
                         and requestedValue not in match):
                     # do not allow the same value to be requested
                     match.append(requestedValue)
-            if len(match) == len(values):
+                if pcnStr in utilities.PLOTCLASS_SYNONYMS:
+                    syns = utilities.PLOTCLASS_SYNONYMS[pcnStr]
+                    if requestedValue in syns:
+                        match.append(requestedValue)                    
+
+            if len(match) >= len(values):
                 plotMake.append(plotClassName)
             else:
                 sortTuple = (len(match), plotClassName)
@@ -185,8 +199,10 @@ def getPlotsToMake(*args, **keywords):
         elif not plotMake: # none to make and no candidates
             for plotClassName in plotClasses:
                 # create a list of all possible identifiers
-                plotClassIdentifiers = [plotClassName.format.lower()]
-                plotClassIdentifiers += [x.lower() for x in plotClassName.values]
+                plotClassIdentifiers = [plotClassName.graphType.lower()]
+                plotClassIdentifiers += [x.axisLabelDefault.lower().replace(' ', '')
+                                         for x in plotClassName(sDummy).allAxes if x is not None]
+                
                 # combine format and values args
                 for requestedValue in [showFormat] + values:
                     if requestedValue.lower() in plotClassIdentifiers:
@@ -225,22 +241,22 @@ def plotStream(streamObj, *args, **keywords):
 
     Available plots include the following:
 
-    * :class:`~music21.graph.PlotHistogramPitchSpace`
-    * :class:`~music21.graph.PlotHistogramPitchClass`
-    * :class:`~music21.graph.PlotHistogramQuarterLength`
-    * :class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`
-    * :class:`~music21.graph.PlotScatterPitchClassQuarterLength`
-    * :class:`~music21.graph.PlotScatterPitchClassOffset`
-    * :class:`~music21.graph.PlotScatterPitchSpaceDynamicSymbol`
-    * :class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`
-    * :class:`~music21.graph.PlotHorizontalBarPitchClassOffset`
-    * :class:`~music21.graph.PlotScatterWeightedPitchSpaceQuarterLength`
-    * :class:`~music21.graph.PlotScatterWeightedPitchClassQuarterLength`
-    * :class:`~music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol`
-    * :class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`
-    * :class:`~music21.graph.PlotWindowedKey`
-    * :class:`~music21.graph.PlotWindowedAmbitus`
-    * :class:`~music21.graph.PlotDolan`
+    * :class:`~music21.graph.plot.PlotHistogramPitchSpace`
+    * :class:`~music21.graph.plot.PlotHistogramPitchClass`
+    * :class:`~music21.graph.plot.PlotHistogramQuarterLength`
+    * :class:`~music21.graph.plot.PlotScatterPitchSpaceQuarterLength`
+    * :class:`~music21.graph.plot.PlotScatterPitchClassQuarterLength`
+    * :class:`~music21.graph.plot.PlotScatterPitchClassOffset`
+    * :class:`~music21.graph.plot.PlotScatterPitchSpaceDynamicSymbol`
+    * :class:`~music21.graph.plot.PlotHorizontalBarPitchSpaceOffset`
+    * :class:`~music21.graph.plot.PlotHorizontalBarPitchClassOffset`
+    * :class:`~music21.graph.plot.PlotScatterWeightedPitchSpaceQuarterLength`
+    * :class:`~music21.graph.plot.PlotScatterWeightedPitchClassQuarterLength`
+    * :class:`~music21.graph.plot.PlotScatterWeightedPitchSpaceDynamicSymbol`
+    * :class:`~music21.graph.plot.Plot3DBarsPitchSpaceQuarterLength`
+    * :class:`~music21.graph.plot.PlotWindowedKey`
+    * :class:`~music21.graph.plot.PlotWindowedAmbitus`
+    * :class:`~music21.graph.plot.PlotDolan`
 
     
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
@@ -276,12 +292,11 @@ class TestExternal(unittest.TestCase):
         pass
    
     def testAll(self):
-        from music21 import corpus
+        from music21 import corpus, dynamics
         a = corpus.parse('bach/bwv57.8')
-        plotStream(a.flat, 'all')
-
-
-
+        a.parts[0].insert(0, dynamics.Dynamic('mf'))
+        a.parts[0].insert(10, dynamics.Dynamic('f'))
+        plotStream(a, 'all')
 
 
 class Test(unittest.TestCase):
@@ -352,10 +367,10 @@ class Test(unittest.TestCase):
         
 
     def testGetPlotsToMakeA(self):
-        post = getPlotsToMake(format='grid', values='key')
-        self.assertEqual(post, [plot.PlotWindowedKey])
         post = getPlotsToMake(format='grid', values='ambitus')
         self.assertEqual(post, [plot.PlotWindowedAmbitus])
+        post = getPlotsToMake(format='grid', values='key')
+        self.assertEqual(post, [plot.PlotWindowedKey])
 
 
         # no args get pitch space piano roll
@@ -373,12 +388,10 @@ class Test(unittest.TestCase):
         self.assertEqual(post, [plot.PlotHistogramPitchSpace])
         post = getPlotsToMake('pitchspace')
         self.assertEqual(post, [plot.PlotHistogramPitchSpace])
-        post = getPlotsToMake('pc')
+        post = getPlotsToMake('pitchClass')
         self.assertEqual(post, [plot.PlotHistogramPitchClass])
 
-        post = getPlotsToMake('scatter', 'ps')
-        self.assertEqual(post, [plot.PlotScatterPitchSpaceQuarterLength])
-        post = getPlotsToMake('scatter', 'ps', 'duration')
+        post = getPlotsToMake('scatter', 'pitch', 'ql')
         self.assertEqual(post, [plot.PlotScatterPitchSpaceQuarterLength])
 
         post = getPlotsToMake('scatter', 'pc', 'offset')
@@ -426,7 +439,7 @@ _DOC_ORDER = [plotStream, getPlotsToMake]
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test) #, runTest='testPlot3DPitchSpaceQuarterLengthCount')
+    music21.mainTest(TestExternal) #, runTest='testPlot3DPitchSpaceQuarterLengthCount')
 
 #------------------------------------------------------------------------------
 # eof

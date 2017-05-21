@@ -29,6 +29,9 @@ from music21 import common
 from music21 import meter
 from music21 import stream 
 
+from music21.analysis.discrete import DiscreteAnalysisException
+
+
 from music21.ext import six
 if six.PY2:
     # pylint: disable=redefined-builtin
@@ -146,10 +149,16 @@ class WindowedAnalysis(object):
         if windowType == 'overlap':
             for i in windowCountIndices:
                 current = stream.Stream()
-                for j in range(i, i+windowSize):
+                for j in range(i, i + windowSize):
                     #environLocal.printDebug(['self._windowedStream[j]', self._windowedStream[j]])
                     current.append(self._windowedStream[j])
-                data[i], color[i] = self.processor.process(current)
+
+                try:
+                    data[i], color[i] = self.processor.process(current)
+                except DiscreteAnalysisException:
+                    # current might have no notes...all rests?
+                    data[i], color[i] = (None, None, 0), '#ffffff' 
+                    
 
         elif windowType == 'noOverlap':
             start = 0
@@ -162,7 +171,12 @@ class WindowedAnalysis(object):
                 current = stream.Stream()
                 for j in range(start, end):
                     current.append(self._windowedStream[j])
-                data[i], color[i] = self.processor.process(current)
+
+                try:
+                    data[i], color[i] = self.processor.process(current)
+                except DiscreteAnalysisException:
+                    # current might have no notes...all rests?
+                    data[i], color[i] = (None, None, 0), '#ffffff' 
 
                 start = end
                 end = start + windowSize
@@ -190,7 +204,11 @@ class WindowedAnalysis(object):
                     if i in participants:
                         for m in dataStream:
                             current.append(m)
-                data[i], color[i] = self.processor.process(current)
+                try:
+                    data[i], color[i] = self.processor.process(current)
+                except DiscreteAnalysisException:
+                    # current might have no notes...all rests?
+                    data[i], color[i] = (None, None, 0), '#ffffff' 
 
         return data, color
 
@@ -408,9 +426,9 @@ class Test(unittest.TestCase):
         unused_wa = WindowedAnalysis(s, p)
 
 
-        plot = graph.plots.PlotWindowedKrumhanslSchmuckler(s, doneAction=None,
+        plot = graph.plot.PlotWindowedKey(s, doneAction=None,
             windowStep=4, windowType='overlap')
-        plot.process()
+        plot.run()
         #plot.write()
 
 #-------------------------------------------------------------------------------
