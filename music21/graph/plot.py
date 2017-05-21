@@ -277,10 +277,10 @@ class PlotStreamMixin(object):
         '''
         idName = self.graphType
               
-        for axis in self.allAxes:
-            if axis is None:
+        for axisObj in self.allAxes:
+            if axisObj is None:
                 continue
-            axisName = axis.__class__.__name__
+            axisName = axisObj.__class__.__name__
             axisName = axisName.replace('Axis', '')
             axisName = axisName[0].lower() + axisName[1:]
             idName += '-' + axisName
