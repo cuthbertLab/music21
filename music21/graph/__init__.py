@@ -24,15 +24,14 @@ from __future__ import division, print_function, absolute_import
 
 __all__ = ['axis', 'plot', 'primitives', 'utilities']
 
+import unittest
+
 from music21 import common
 
 from music21.graph import axis
 from music21.graph import plot
 from music21.graph import primitives
 from music21.graph import utilities
-
-import unittest
-
 
 from music21 import environment
 _MOD = 'graph.py'

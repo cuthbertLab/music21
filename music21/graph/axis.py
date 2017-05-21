@@ -443,7 +443,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
     axisLabelDefault = 'Octave'
 
     def __init__(self, client=None, axisName='x'):
-        super(PitchAxis, self).__init__(client, axisName)    
+        super(PitchSpaceOctaveAxis, self).__init__(client, axisName)    
         self.startNameWithOctave = 'C2'
     
     def ticks(self):

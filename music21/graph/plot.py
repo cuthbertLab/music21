@@ -722,7 +722,7 @@ class PlotWindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
         if not self.processorClass:
             return None
         if not self._processor:
-            self._processor = self.processorClass(self.streamObj)
+            self._processor = self.processorClass(self.streamObj) # pylint: disable=not-callable
         return self._processor        
 
     def run(self, *args, **keywords):
@@ -1125,7 +1125,7 @@ class PlotDolan(PlotHorizontalBarWeighted):
                 'match':['clarinetto', r'clarinet in \w* \d']}, 
             {'name':'Bassoon', 'color':'purple', 'match':['fagotto', r'bassoon \d']}, 
 
-            {'name':'Horns', 'color':'orange', 'match':['corno', 'horn in \w* \d']},
+            {'name':'Horns', 'color':'orange', 'match':['corno', r'horn in \w* \d']},
             {'name':'Trumpet', 'color':'red', 
                 'match':['tromba', r'trumpet \d', r'trumpet in \w* \d']},
             {'name':'Trombone', 'color':'red', 'match':[r'trombone \d']},
