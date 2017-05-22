@@ -124,8 +124,8 @@ FORMAT_SYNONYMS = [('horizontalbar', 'bar', 'horizontal', 'pianoroll', 'piano'),
                    ]
 
 PLOTCLASS_SYNONYMS = {
-    'plotwindowedambitus': ('ambitus',),
-    'plotdolan': ('instrument', 'instruments'),
+    'windowedambitus': ('ambitus',),
+    'dolan': ('instrument', 'instruments'),
     
 }
 

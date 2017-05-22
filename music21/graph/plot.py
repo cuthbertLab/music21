@@ -13,8 +13,9 @@
 '''
 Object definitions for plotting :class:`~music21.stream.Stream` objects. 
 
-The :class:`~music21.graph.plot.Plot` 
-object subclasses provide reusable approaches to graphing data and structures in 
+The :class:`~music21.graph.plot.PlotStream` 
+object subclasses combine a Graph object with the PlotStreamMixin to give 
+reusable approaches to graphing data and structures in 
 :class:`~music21.stream.Stream` objects.
 '''
 from __future__ import division, print_function, absolute_import
@@ -53,19 +54,10 @@ environLocal = environment.Environment(_MOD)
 
 class PlotStreamMixin(object):
     '''
-    Approaches to plotting and graphing a Stream. A base class from which 
-    Stream plotting Classes inherit.
-
-    This class has a number of public attributes, but these are generally not intended 
-    for direct user application. The `data` attribute, for example, exposes the 
-    internal data format of this plotting routine for testing, but no effort is 
-    made to make this data useful outside of the context of the Plot.
+    This Mixin adds Stream extracting and Axis holding features to any
+    class derived from Graph.
     '''
     def __init__(self, streamObj, flatten=True, *args, **keywords):
-        '''
-        Provide a Stream as an argument. If `flatten` is True, 
-        the Stream will automatically be flattened.
-        '''
         #if not isinstance(streamObj, music21.stream.Stream):
         if not hasattr(streamObj, 'elements'): # pragma: no cover
             raise PlotStreamException('non-stream provided as argument: %s' % streamObj)
@@ -79,22 +71,24 @@ class PlotStreamMixin(object):
         self.axisY = None
         self.matchPitchCountForChords = True
         
+        self.savedKeywords = keywords
+        
 
     @property
     def allAxes(self):
         '''
-        return a list of axisX, axisY, axisSize, axisZ if any are defined in the class.
+        return a list of axisX, axisY, axisZ if any are defined in the class.
         
         Some might be None.
         
         >>> s = stream.Stream()
-        >>> p = graph.plot.PlotScatterPitchClassOffset(s)
+        >>> p = graph.plot.ScatterPitchClassOffset(s)
         >>> p.allAxes
         [<music21.graph.axis.OffsetAxis object at 0x108e534a8>, 
          <music21.graph.axis.PitchClassAxis object at 0x108e530f0>]
         '''
         allAxesList = []
-        for axisName in ('axisX', 'axisY', 'axisSize', 'axisZ'):
+        for axisName in ('axisX', 'axisY', 'axisZ'):
             if hasattr(self, axisName):
                 allAxesList.append(getattr(self, axisName))
         return allAxesList
@@ -104,6 +98,7 @@ class PlotStreamMixin(object):
         main routine to extract data, set axis labels, run process() on the underlying
         Graph object, and if self.doneAction is not None, either write or show the graph.
         '''
+        self.setAxisKeywords()
         self.extractData()
         if self.axisY:
             self.setTicks('y', self.axisY.ticks())
@@ -113,6 +108,42 @@ class PlotStreamMixin(object):
             self.setAxisLabel('x', self.axisX.axisLabel)
         
         self.process()
+
+    #---------------------------------------------------------------------------
+    def setAxisKeywords(self):
+        '''
+        Configure axis parameters based on keywords given when creating the Plot.
+        
+        Looks in self.savedKeywords, in case any post creation maniuplation needs
+        to happen.
+        
+        Finds keywords that begin with x, y, z and sets the remainder of the
+        keyword (lowercasing the first letter) as an attribute.  Does not
+        set any new attributes, only existing ones.
+        
+        >>> b = corpus.parse('bwv66.6')
+        >>> hist = graph.plot.HistogramPitchSpace(b, xHideUnused=False)
+        >>> hist.axisX.hideUnused
+        True
+        >>> hist.setAxisKeywords()
+        >>> hist.axisX.hideUnused
+        False        
+        '''
+        for thisAxis in self.allAxes:
+            if thisAxis is None:
+                continue
+            thisAxisLetter = thisAxis.axisName
+            for kw in self.savedKeywords:
+                if not kw.startswith(thisAxisLetter):
+                    continue
+                if len(kw) < 3:
+                    continue
+                shortKw = kw[1].lower() + kw[2:]
+                
+                if not hasattr(thisAxis, shortKw):
+                    continue
+                setattr(thisAxis, shortKw, self.savedKeywords[kw])
+
 
     #---------------------------------------------------------------------------
     def extractData(self):
@@ -271,7 +302,7 @@ class PlotStreamMixin(object):
         the class names of the axes:
 
         >>> s = stream.Stream()
-        >>> pscatt = graph.plot.PlotScatter(s)
+        >>> pscatt = graph.plot.Scatter(s)
         >>> pscatt.id
         'scatter'
         '''
@@ -294,7 +325,7 @@ class PlotStreamMixin(object):
 class PlotStream(primitives.Graph, PlotStreamMixin):
     def __init__(self, streamObj, *args, **keywords):
         primitives.Graph.__init__(self, *args, **keywords)
-        PlotStreamMixin.__init__(self, streamObj)
+        PlotStreamMixin.__init__(self, streamObj, **keywords)
 
         self.axisX = axis.OffsetAxis(self, 'x')
 
@@ -302,33 +333,33 @@ class PlotStream(primitives.Graph, PlotStreamMixin):
 #-------------------------------------------------------------------------------
 # scatter plots
 
-class PlotScatter(primitives.GraphScatter, PlotStreamMixin):
+class Scatter(primitives.GraphScatter, PlotStreamMixin):
     '''
     Base class for 2D scatter plots.
     '''
     def __init__(self, streamObj, *args, **keywords):
         primitives.GraphScatter.__init__(self, *args, **keywords)
-        PlotStreamMixin.__init__(self, streamObj)
+        PlotStreamMixin.__init__(self, streamObj, **keywords)
 
 
-class PlotScatterPitchSpaceQuarterLength(PlotScatter):
+class ScatterPitchSpaceQuarterLength(Scatter):
     r'''A scatter plot of pitch space and quarter length
 
     
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
-    >>> p = graph.plot.PlotScatterPitchSpaceQuarterLength(s, doneAction=None) #_DOCS_HIDE
+    >>> p = graph.plot.ScatterPitchSpaceQuarterLength(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
-    >>> #_DOCS_SHOW p = graph.plot.PlotScatterPitchSpaceQuarterLength(s)
+    >>> #_DOCS_SHOW p = graph.plot.ScatterPitchSpaceQuarterLength(s)
     >>> p.id
     'scatter-quarterLength-pitchSpace'
     >>> p.run()
 
-    .. image:: images/PlotScatterPitchSpaceQuarterLength.*
+    .. image:: images/ScatterPitchSpaceQuarterLength.*
         :width: 600
     '''
     
     def __init__(self, streamObj, *args, **keywords):
-        super(PlotScatterPitchSpaceQuarterLength, self).__init__(streamObj, *args, **keywords)
+        super(ScatterPitchSpaceQuarterLength, self).__init__(streamObj, *args, **keywords)
         self.axisX = axis.QuarterLengthAxis(self, 'x')
         self.axisX.useLogScale = True
 
@@ -342,43 +373,43 @@ class PlotScatterPitchSpaceQuarterLength(PlotScatter):
 #             self.alpha = 0.7
 
 
-class PlotScatterPitchClassQuarterLength(PlotScatterPitchSpaceQuarterLength):
+class ScatterPitchClassQuarterLength(ScatterPitchSpaceQuarterLength):
     '''A scatter plot of pitch class and quarter length
     
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
-    >>> p = graph.plot.PlotScatterPitchClassQuarterLength(s, doneAction=None) #_DOCS_HIDE
+    >>> p = graph.plot.ScatterPitchClassQuarterLength(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
-    >>> #_DOCS_SHOW p = graph.plot.PlotScatterPitchClassQuarterLength(s)
+    >>> #_DOCS_SHOW p = graph.plot.ScatterPitchClassQuarterLength(s)
     >>> p.id
     'scatter-quarterLength-pitchClass'
     >>> p.run()
 
-    .. image:: images/PlotScatterPitchClassQuarterLength.*
+    .. image:: images/ScatterPitchClassQuarterLength.*
         :width: 600
     '''
     def __init__(self, streamObj, *args, **keywords):
-        super(PlotScatterPitchClassQuarterLength, self).__init__(streamObj, *args, **keywords)
+        super(ScatterPitchClassQuarterLength, self).__init__(streamObj, *args, **keywords)
         self.axisY = axis.PitchClassAxis(self, 'y')
         if 'title' not in keywords:
             self.title = 'Pitch Class by Quarter Length Scatter'
 
 
-class PlotScatterPitchClassOffset(PlotScatter):
+class ScatterPitchClassOffset(Scatter):
     '''A scatter plot of pitch class and offset
     
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
-    >>> p = graph.plot.PlotScatterPitchClassOffset(s, doneAction=None) #_DOCS_HIDE
+    >>> p = graph.plot.ScatterPitchClassOffset(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
-    >>> #_DOCS_SHOW p = graph.plot.PlotScatterPitchClassOffset(s)
+    >>> #_DOCS_SHOW p = graph.plot.ScatterPitchClassOffset(s)
     >>> p.id
     'scatter-offset-pitchClass'
     >>> p.run()
 
-    .. image:: images/PlotScatterPitchClassOffset.*
+    .. image:: images/ScatterPitchClassOffset.*
         :width: 600
     '''
     def __init__(self, streamObj, *args, **keywords):
-        super(PlotScatterPitchClassOffset, self).__init__(streamObj, *args, **keywords)
+        super(ScatterPitchClassOffset, self).__init__(streamObj, *args, **keywords)
         
         self.axisX = axis.OffsetAxis(self, 'x')
         self.axisY = axis.PitchClassAxis(self, 'y')
@@ -391,26 +422,26 @@ class PlotScatterPitchClassOffset(PlotScatter):
             self.alpha = 0.7
 
 
-class PlotScatterPitchSpaceDynamicSymbol(PlotScatter):
+class ScatterPitchSpaceDynamicSymbol(Scatter):
     '''
     A graph of dynamics used by pitch space.
     
     >>> s = converter.parse('tinynotation: 4/4 C4 d E f', makeNotation=False) #_DOCS_HIDE
     >>> s.insert(0.0, dynamics.Dynamic('pp')) #_DOCS_HIDE
     >>> s.insert(2.0, dynamics.Dynamic('ff')) #_DOCS_HIDE
-    >>> p = graph.plot.PlotScatterPitchSpaceDynamicSymbol(s, doneAction=None) #_DOCS_HIDE
+    >>> p = graph.plot.ScatterPitchSpaceDynamicSymbol(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = converter.parse('/Desktop/schumann/opus41no1/movement2.xml')
-    >>> #_DOCS_SHOW p = graph.plot.PlotScatterPitchSpaceDynamicSymbol(s)
+    >>> #_DOCS_SHOW p = graph.plot.ScatterPitchSpaceDynamicSymbol(s)
     >>> p.run()
 
-    .. image:: images/PlotScatterPitchSpaceDynamicSymbol.*
+    .. image:: images/ScatterPitchSpaceDynamicSymbol.*
         :width: 600
     '''
     # string name used to access this class
     figureSizeDefault = (12, 6)
     
     def __init__(self, streamObj, *args, **keywords):
-        super(PlotScatterPitchSpaceDynamicSymbol, self).__init__(streamObj, *args, **keywords)
+        super(ScatterPitchSpaceDynamicSymbol, self).__init__(streamObj, *args, **keywords)
 
         self.axisY = axis.DynamicsAxis(self, 'y')
         self.axisX = axis.PitchSpaceAxis(self, 'x')
@@ -438,13 +469,13 @@ class PlotScatterPitchSpaceDynamicSymbol(PlotScatter):
         
 #-------------------------------------------------------------------------------
 # histograms
-class PlotHistogram(primitives.GraphHistogram, PlotStreamMixin):
+class Histogram(primitives.GraphHistogram, PlotStreamMixin):
     '''
     Base class for histograms that plot one axis against its count
     '''
     def __init__(self, streamObj, *args, **keywords):
         primitives.GraphHistogram.__init__(self, *args, **keywords)
-        PlotStreamMixin.__init__(self, streamObj)
+        PlotStreamMixin.__init__(self, streamObj, **keywords)
 
         self.axisY = axis.CountingAxis(self, 'y')
         if 'alpha' not in keywords:
@@ -454,6 +485,7 @@ class PlotHistogram(primitives.GraphHistogram, PlotStreamMixin):
         '''
         Override run method to remap X data into individual bins.
         '''
+        self.setAxisKeywords()
         self.extractData()
         self.setTicks('y', self.axisY.ticks())
         xTicksNew = self.remapXTicksData() 
@@ -473,33 +505,47 @@ class PlotHistogram(primitives.GraphHistogram, PlotStreamMixin):
         xTickDict = {v[0]: v[1] for v in xTicksOrig}
         xTicksNew = []
         # self.data is already sorted.
-        for i in range(len(self.data)):
-            dataVal = self.data[i]
-            xDataVal = dataVal[0]
-            dataVal[0] = i + 1
-            if xDataVal in xTickDict: # should be there:
-                newTick = (i + 1, xTickDict[xDataVal])
+        if ((hasattr(self.axisX, 'hideUnused') and self.axisX.hideUnused is True) 
+                or self.axisX.minValue is None
+                or self.axisX.maxValue is None):
+            for i in range(len(self.data)):
+                dataVal = self.data[i]
+                xDataVal = dataVal[0]
+                dataVal[0] = i + 1
+                if xDataVal in xTickDict: # should be there:
+                    newTick = (i + 1, xTickDict[xDataVal])
+                    xTicksNew.append(newTick)
+        else:
+            from music21 import pitch
+            for i in range(int(self.axisX.minValue), int(self.axisX.maxValue) + 1):
+                if i in xTickDict:
+                    label = xTickDict[i]
+                elif hasattr(self.axisX, 'blankLabelUnused') and not self.axisX.blankLabelUnused:
+                    label = pitch.Pitch(i).name
+                else:
+                    label = ''
+                newTick = (i, label)
                 xTicksNew.append(newTick)
-        
+                       
         return xTicksNew
 
-class PlotHistogramPitchSpace(PlotHistogram):
+class HistogramPitchSpace(Histogram):
     '''A histogram of pitch space.
 
     
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
-    >>> p = graph.plot.PlotHistogramPitchSpace(s, doneAction=None) #_DOCS_HIDE
+    >>> p = graph.plot.HistogramPitchSpace(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
-    >>> #_DOCS_SHOW p = graph.plot.PlotHistogramPitchSpace(s)
+    >>> #_DOCS_SHOW p = graph.plot.HistogramPitchSpace(s)
     >>> p.id
     'histogram-pitchSpace-counting'
     >>> p.run() # with defaults and proper configuration, will open graph
 
-    .. image:: images/PlotHistogramPitchSpace.*
+    .. image:: images/HistogramPitchSpace.*
         :width: 600
     '''
     def __init__(self, streamObj, *args, **keywords):
-        super(PlotHistogramPitchSpace, self).__init__(streamObj, *args, **keywords)
+        super(HistogramPitchSpace, self).__init__(streamObj, *args, **keywords)
         self.axisX = axis.PitchSpaceAxis(self, 'x')
         self.axisX.showEnharmonic = False
         # need more space for pitch axis labels
@@ -508,24 +554,24 @@ class PlotHistogramPitchSpace(PlotHistogram):
         if 'title' not in keywords:
             self.title = 'Pitch Histogram'
 
-class PlotHistogramPitchClass(PlotHistogram):
+class HistogramPitchClass(Histogram):
     '''
     A histogram of pitch class
     
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
-    >>> p = graph.plot.PlotHistogramPitchClass(s, doneAction=None) #_DOCS_HIDE
+    >>> p = graph.plot.HistogramPitchClass(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
-    >>> #_DOCS_SHOW p = graph.plot.PlotHistogramPitchClass(s)
+    >>> #_DOCS_SHOW p = graph.plot.HistogramPitchClass(s)
     >>> p.id
     'histogram-pitchClass-counting'
     >>> p.run() # with defaults and proper configuration, will open graph
 
-    .. image:: images/PlotHistogramPitchClass.*
+    .. image:: images/HistogramPitchClass.*
         :width: 600
 
     '''
     def __init__(self, streamObj, *args, **keywords):
-        super(PlotHistogramPitchClass, self).__init__(streamObj, *args, **keywords)
+        super(HistogramPitchClass, self).__init__(streamObj, *args, **keywords)
         self.axisX = axis.PitchClassAxis(self, 'x')
         self.axisX.showEnharmonic = False
         if 'title' not in keywords:
@@ -533,24 +579,24 @@ class PlotHistogramPitchClass(PlotHistogram):
 
 
 
-class PlotHistogramQuarterLength(PlotHistogram):
+class HistogramQuarterLength(Histogram):
     '''A histogram of pitch class
 
     
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
-    >>> p = graph.plot.PlotHistogramQuarterLength(s, doneAction=None) #_DOCS_HIDE
+    >>> p = graph.plot.HistogramQuarterLength(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
-    >>> #_DOCS_SHOW p = graph.plot.PlotHistogramQuarterLength(s)
+    >>> #_DOCS_SHOW p = graph.plot.HistogramQuarterLength(s)
     >>> p.id
     'histogram-quarterLength-counting'
     >>> p.run() # with defaults and proper configuration, will open graph
 
-    .. image:: images/PlotHistogramQuarterLength.*
+    .. image:: images/HistogramQuarterLength.*
         :width: 600
 
     '''
     def __init__(self, streamObj, *args, **keywords):
-        super(PlotHistogramQuarterLength, self).__init__(streamObj, *args, **keywords)
+        super(HistogramQuarterLength, self).__init__(streamObj, *args, **keywords)
         self.axisX = axis.QuarterLengthAxis(self, 'x')
         self.axisX.useLogScale = False
         if 'title' not in keywords:
@@ -561,33 +607,35 @@ class PlotHistogramQuarterLength(PlotHistogram):
 #-------------------------------------------------------------------------------
 # weighted scatter
 
-class PlotScatterWeighted(primitives.GraphScatterWeighted, PlotStreamMixin):
+class ScatterWeighted(primitives.GraphScatterWeighted, PlotStreamMixin):
     '''
-    Base class for histograms that plot one axis against its count
+    Base class for histograms that plot one axis against its count. 
+    
+    The count is stored as the Z axis, though it is represented as size.
     '''
     def __init__(self, streamObj, *args, **keywords):
         primitives.GraphScatterWeighted.__init__(self, *args, **keywords)
-        PlotStreamMixin.__init__(self, streamObj)
+        PlotStreamMixin.__init__(self, streamObj, **keywords)
         
-        self.axisSize = axis.CountingAxis(self, 'z')
-        self.axisSize.countAxes = ('x', 'y')
+        self.axisZ = axis.CountingAxis(self, 'z')
+        self.axisZ.countAxes = ('x', 'y')
 
 
-class PlotScatterWeightedPitchSpaceQuarterLength(PlotScatterWeighted):
+class ScatterWeightedPitchSpaceQuarterLength(ScatterWeighted):
     '''A graph of event, sorted by pitch, over time
 
     
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
-    >>> p = graph.plot.PlotScatterWeightedPitchSpaceQuarterLength(s, doneAction=None) #_DOCS_HIDE
+    >>> p = graph.plot.ScatterWeightedPitchSpaceQuarterLength(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
-    >>> #_DOCS_SHOW p = graph.plot.PlotScatterWeightedPitchSpaceQuarterLength(s)
+    >>> #_DOCS_SHOW p = graph.plot.ScatterWeightedPitchSpaceQuarterLength(s)
     >>> p.run() # with defaults and proper configuration, will open graph
 
-    .. image:: images/PlotScatterWeightedPitchSpaceQuarterLength.*
+    .. image:: images/ScatterWeightedPitchSpaceQuarterLength.*
         :width: 600
     '''
     def __init__(self, streamObj, *args, **keywords):
-        super(PlotScatterWeightedPitchSpaceQuarterLength, self).__init__(
+        super(ScatterWeightedPitchSpaceQuarterLength, self).__init__(
                                                 streamObj, *args, **keywords)
         self.axisX = axis.QuarterLengthAxis(self, 'x')
         self.axisY = axis.PitchSpaceAxis(self, 'y')
@@ -601,22 +649,22 @@ class PlotScatterWeightedPitchSpaceQuarterLength(PlotScatterWeighted):
             self.alpha = 0.8
 
 
-class PlotScatterWeightedPitchClassQuarterLength(PlotScatterWeighted):
+class ScatterWeightedPitchClassQuarterLength(ScatterWeighted):
     '''A graph of event, sorted by pitch class, over time.
 
     
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
-    >>> p = graph.plot.PlotScatterWeightedPitchClassQuarterLength(s, doneAction=None) #_DOCS_HIDE
+    >>> p = graph.plot.ScatterWeightedPitchClassQuarterLength(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
-    >>> #_DOCS_SHOW p = graph.plot.PlotScatterWeightedPitchClassQuarterLength(s)
+    >>> #_DOCS_SHOW p = graph.plot.ScatterWeightedPitchClassQuarterLength(s)
     >>> p.run() # with defaults and proper configuration, will open graph
 
-    .. image:: images/PlotScatterWeightedPitchClassQuarterLength.*
+    .. image:: images/ScatterWeightedPitchClassQuarterLength.*
         :width: 600
 
     '''
     def __init__(self, streamObj, *args, **keywords):
-        super(PlotScatterWeightedPitchClassQuarterLength, self).__init__(
+        super(ScatterWeightedPitchClassQuarterLength, self).__init__(
                                                             streamObj, *args, **keywords)
 
         self.axisX = axis.QuarterLengthAxis(self, 'x')
@@ -632,25 +680,25 @@ class PlotScatterWeightedPitchClassQuarterLength(PlotScatterWeighted):
 
 
 
-class PlotScatterWeightedPitchSpaceDynamicSymbol(PlotScatterWeighted):
+class ScatterWeightedPitchSpaceDynamicSymbol(ScatterWeighted):
     '''A graph of dynamics used by pitch space.
 
     >>> #_DOCS_SHOW s = converter.parse('/Desktop/schumann/opus41no1/movement2.xml')
     >>> s = converter.parse('tinynotation: 4/4 C4 d E f', makeNotation=False) #_DOCS_HIDE
     >>> s.insert(0.0, dynamics.Dynamic('pp')) #_DOCS_HIDE
     >>> s.insert(2.0, dynamics.Dynamic('ff')) #_DOCS_HIDE
-    >>> p = graph.plot.PlotScatterWeightedPitchSpaceDynamicSymbol(s, doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW p = graph.plot.PlotScatterWeightedPitchSpaceDynamicSymbol(s)
+    >>> p = graph.plot.ScatterWeightedPitchSpaceDynamicSymbol(s, doneAction=None) #_DOCS_HIDE
+    >>> #_DOCS_SHOW p = graph.plot.ScatterWeightedPitchSpaceDynamicSymbol(s)
     >>> p.run() # with defaults and proper configuration, will open graph
 
-    .. image:: images/PlotScatterWeightedPitchSpaceDynamicSymbol.*
+    .. image:: images/ScatterWeightedPitchSpaceDynamicSymbol.*
         :width: 600
         
     '''
     values = ('pitchClass', 'dynamicSymbol')
     
     def __init__(self, streamObj, *args, **keywords):
-        super(PlotScatterWeightedPitchSpaceDynamicSymbol, self).__init__(
+        super(ScatterWeightedPitchSpaceDynamicSymbol, self).__init__(
                                                 streamObj, *args, **keywords)
 
         self.axisY = axis.DynamicsAxis(self, 'y')
@@ -690,7 +738,7 @@ class PlotScatterWeightedPitchSpaceDynamicSymbol(PlotScatterWeighted):
 
     
 
-class PlotWindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
+class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
     '''
     Base Plot for windowed analysis routines such as Key Analysis or Ambitus.
     ''' 
@@ -712,7 +760,7 @@ class PlotWindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
         self.compressLegend = True
         
         primitives.GraphColorGrid.__init__(self, *args, **keywords)
-        PlotStreamMixin.__init__(self, streamObj)
+        PlotStreamMixin.__init__(self, streamObj, **keywords)
 
         self.axisX = axis.OffsetAxis(self, 'x')
 
@@ -803,7 +851,7 @@ class PlotWindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
         Process method here overridden to provide legend.
         '''
         # call the process routine in the base graph
-        super(PlotWindowedAnalysis, self).write(fp)
+        super(WindowedAnalysis, self).write(fp)
                 
         if fp is None:
             fp = environLocal.getTempFile('.png')
@@ -815,25 +863,25 @@ class PlotWindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
         self.graphLegend.write(fpLegend)
 
     
-class PlotWindowedKey(PlotWindowedAnalysis):
+class WindowedKey(WindowedAnalysis):
     '''
     Stream plotting of windowed version of Krumhansl-Schmuckler analysis routine. 
     See :class:`~music21.analysis.discrete.KrumhanslSchmuckler` for more details.
 
     
     >>> s = corpus.parse('bach/bwv66.6')
-    >>> p = graph.plot.PlotWindowedKey(s.parts[0])
+    >>> p = graph.plot.WindowedKey(s.parts[0])
     >>> p.doneAction = None #_DOCS_HIDE 
     >>> p.run() # with defaults and proper configuration, will open graph
 
-    .. image:: images/PlotWindowedKrumhanslSchmuckler.*
+    .. image:: images/WindowedKrumhanslSchmuckler.*
         :width: 600
 
-    .. image:: images/legend-PlotWindowedKrumhanslSchmuckler.*
+    .. image:: images/legend-WindowedKrumhanslSchmuckler.*
 
     Set the processor class to one of the following for different uses:
     
-    >>> p = graph.plot.PlotWindowedKey(s.parts[0])
+    >>> p = graph.plot.WindowedKey(s.parts[0])
     >>> p.processorClass = analysis.discrete.KrumhanslKessler
     >>> p.processorClass = analysis.discrete.AardenEssen
     >>> p.processorClass = analysis.discrete.SimpleWeights
@@ -845,29 +893,29 @@ class PlotWindowedKey(PlotWindowedAnalysis):
     '''
     values = discrete.KrumhanslSchmuckler.identifiers
     def __init__(self, streamObj, *args, **keywords):
-        super(PlotWindowedKey, self).__init__(streamObj, *args, **keywords)
+        super(WindowedKey, self).__init__(streamObj, *args, **keywords)
         self.processorClass = discrete.KrumhanslSchmuckler
     
 
-class PlotWindowedAmbitus(PlotWindowedAnalysis):
+class WindowedAmbitus(WindowedAnalysis):
     '''
     Stream plotting of basic pitch span. 
     
     >>> s = corpus.parse('bach/bwv66.6')
-    >>> p = graph.plot.PlotWindowedAmbitus(s.parts[0])
+    >>> p = graph.plot.WindowedAmbitus(s.parts[0])
     >>> p.doneAction = None #_DOCS_HIDE 
     >>> p.run() # with defaults and proper configuration, will open graph
 
-    .. image:: images/PlotWindowedAmbitus.*
+    .. image:: images/WindowedAmbitus.*
         :width: 600
 
-    .. image:: images/legend-PlotWindowedAmbitus.*
+    .. image:: images/legend-WindowedAmbitus.*
 
     '''
     values = discrete.Ambitus.identifiers
     def __init__(self, streamObj, *args, **keywords):
         # provide the stream to both the window and processor in this case
-        super(PlotWindowedAmbitus, self).__init__(streamObj, *args, **keywords)
+        super(WindowedAmbitus, self).__init__(streamObj, *args, **keywords)
         self.processorClass = discrete.Ambitus
 
 
@@ -877,15 +925,13 @@ class PlotWindowedAmbitus(PlotWindowedAnalysis):
 #-------------------------------------------------------------------------------
 # horizontal bar graphs
 
-class PlotHorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
+class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
     '''
     A graph of events, sorted by pitch, over time
     '''
     def __init__(self, streamObj, *args, **keywords):
         primitives.GraphHorizontalBar.__init__(self, *args, **keywords)
-        PlotStreamMixin.__init__(self, streamObj)
-
-        super(PlotHorizontalBar, self).__init__(streamObj, *args, **keywords)
+        PlotStreamMixin.__init__(self, streamObj, **keywords)
 
         self.axisX = axis.OffsetEndAxis(self, 'x')
         self.axisY = axis.PitchSpaceAxis(self, 'y')
@@ -895,7 +941,7 @@ class PlotHorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
         '''
         Call any post data processing routines here and on any axes.
         '''
-        super(PlotHorizontalBar, self).postProcessData()
+        super(HorizontalBar, self).postProcessData()
         self.axisY.setBoundariesFromData([d[1] for d in self.data])
         yTicks = self.axisY.ticks()
 
@@ -918,22 +964,22 @@ class PlotHorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
         self.data = newData
 
 
-class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
+class HorizontalBarPitchClassOffset(HorizontalBar):
     '''A graph of events, sorted by pitch class, over time
 
     
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
-    >>> p = graph.plot.PlotHorizontalBarPitchClassOffset(s, doneAction=None) #_DOCS_HIDE
+    >>> p = graph.plot.HorizontalBarPitchClassOffset(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
-    >>> #_DOCS_SHOW p = graph.plot.PlotHorizontalBarPitchClassOffset(s)
+    >>> #_DOCS_SHOW p = graph.plot.HorizontalBarPitchClassOffset(s)
     >>> p.run() # with defaults and proper configuration, will open graph
 
-    .. image:: images/PlotHorizontalBarPitchClassOffset.*
+    .. image:: images/HorizontalBarPitchClassOffset.*
         :width: 600
 
     '''
     def __init__(self, streamObj, *args, **keywords):
-        super(PlotHorizontalBarPitchClassOffset, self).__init__(streamObj, *args, **keywords)
+        super(HorizontalBarPitchClassOffset, self).__init__(streamObj, *args, **keywords)
         self.axisY = axis.PitchClassAxis(self, 'y')
         self.axisY.hideUnused = False
 
@@ -944,23 +990,23 @@ class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
             self.title = 'Note Quarter Length and Offset by Pitch Class'
 
 
-class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
+class HorizontalBarPitchSpaceOffset(HorizontalBar):
     '''A graph of events, sorted by pitch space, over time
 
     
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
-    >>> p = graph.plot.PlotHorizontalBarPitchSpaceOffset(s, doneAction=None) #_DOCS_HIDE
+    >>> p = graph.plot.HorizontalBarPitchSpaceOffset(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
-    >>> #_DOCS_SHOW p = graph.plot.PlotHorizontalBarPitchSpaceOffset(s)
+    >>> #_DOCS_SHOW p = graph.plot.HorizontalBarPitchSpaceOffset(s)
     >>> p.run() # with defaults and proper configuration, will open graph
 
-    .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
+    .. image:: images/HorizontalBarPitchSpaceOffset.*
         :width: 600
     '''
     values = ('pitch', 'offset', 'pianoroll')
     
     def __init__(self, streamObj, *args, **keywords):
-        super(PlotHorizontalBarPitchSpaceOffset, self).__init__(streamObj, *args, **keywords)
+        super(HorizontalBarPitchSpaceOffset, self).__init__(streamObj, *args, **keywords)
 
         if 'figureSize' not in keywords:
             self.figureSize = (10, 6)
@@ -971,7 +1017,7 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
 
 
 #-------------------------------------------------------------------------------
-class PlotHorizontalBarWeighted(primitives.GraphHorizontalBarWeighted, PlotStreamMixin):
+class HorizontalBarWeighted(primitives.GraphHorizontalBarWeighted, PlotStreamMixin):
     '''
     A base class for plots of Scores with weighted (by height) horizontal bars. 
     Many different weighted segments can provide a 
@@ -980,7 +1026,8 @@ class PlotHorizontalBarWeighted(primitives.GraphHorizontalBarWeighted, PlotStrea
     format = 'horizontalbarweighted'
     def __init__(self, streamObj, *args, **keywords):
         primitives.GraphHorizontalBarWeighted.__init__(self, *args, **keywords)
-        PlotStreamMixin.__init__(self, streamObj)
+        PlotStreamMixin.__init__(self, streamObj, **keywords)
+        
         # will get Measure numbers if appropraite
         self.axisX = axis.OffsetAxis(self, 'x')
         self.fillByMeasure = False
@@ -1026,7 +1073,7 @@ class PlotHorizontalBarWeighted(primitives.GraphHorizontalBarWeighted, PlotStrea
         self.data = data
 
 
-class PlotDolan(PlotHorizontalBarWeighted):
+class Dolan(HorizontalBarWeighted):
     '''
     A graph of the activity of a parameter of a part (or a group of parts) over time. 
     The default parameter graphed is Dynamics. Dynamics are assumed to extend activity 
@@ -1059,14 +1106,14 @@ class PlotDolan(PlotHorizontalBarWeighted):
     ...
     >>> #_DOCS_SHOW s.plot('dolan', fillByMeasure=True, segmentByTarget=True)
 
-    .. image:: images/PlotDolan.*
+    .. image:: images/Dolan.*
         :width: 600
 
     '''
     values = ('instrument',)
     
     def __init__(self, streamObj, *args, **keywords):
-        super(PlotDolan, self).__init__(streamObj, *args, **keywords)
+        super(Dolan, self).__init__(streamObj, *args, **keywords)
 
         #self.fy = lambda n: n.pitch.pitchClass
         #self.fyTicks = self.ticksPitchClassUsage
@@ -1153,7 +1200,8 @@ class Plot3DBars(primitives.Graph3DBars, PlotStreamMixin):
     '''
     def __init__(self, streamObj, *args, **keywords):
         primitives.Graph3DBars.__init__(self, *args, **keywords)
-        PlotStreamMixin.__init__(self, streamObj)
+        PlotStreamMixin.__init__(self, streamObj, **keywords)
+        
         self.axisX = axis.QuarterLengthAxis(self, 'x')
         self.axisY = axis.PitchClassAxis(self, 'y')
         self.axisZ = axis.CountingAxis(self, 'z')
@@ -1259,6 +1307,7 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
     '''
     def __init__(self, streamObj, *args, **keywords):
         super(Plot3DBarsPitchSpaceQuarterLength, self).__init__(streamObj, *args, **keywords)
+        
         self.axisX = axis.QuarterLengthAxis(self, 'x')
         self.axisY = axis.PitchSpaceAxis(self, 'y')
         self.axisZ = axis.CountingAxis(self, 'z')
@@ -1278,7 +1327,7 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
 #-------------------------------------------------------------------------------
 # base class for multi-stream displays
 
-class PlotMultiStream(primitives.GraphGroupedVerticalBar):
+class MultiStream(primitives.GraphGroupedVerticalBar):
     '''
     Approaches to plotting and graphing multiple Streams. 
     A base class from which Stream plotting Classes inherit.
@@ -1319,7 +1368,7 @@ class PlotMultiStream(primitives.GraphGroupedVerticalBar):
             self.streamList.append(s)
         return foundPaths
 
-class PlotFeatures(PlotMultiStream):
+class Features(MultiStream):
     '''
     Plots the output of a set of feature extractors.
     
@@ -1331,7 +1380,7 @@ class PlotFeatures(PlotMultiStream):
         if labelList is None:
             labelList = []
         
-        super(PlotFeatures, self).__init__(streamList, labelList, *args, **keywords)
+        super(Features, self).__init__(streamList, labelList, *args, **keywords)
 
         self.featureExtractors = featureExtractors
 
@@ -1350,6 +1399,8 @@ class PlotFeatures(PlotMultiStream):
 
     def run(self):
         # will use self.fx and self.fxTick to extract data
+        self.setAxisKeywords()
+
         self.data, xTicks, yTicks = self.extractData()
 
         self.grid = False
@@ -1408,91 +1459,91 @@ class PlotFeatures(PlotMultiStream):
 class TestExternal(unittest.TestCase):
     
 
-    def testPlotHorizontalBarPitchSpaceOffset(self):
+    def testHorizontalBarPitchSpaceOffset(self):
         a = corpus.parse('bach/bwv57.8')
         # do not need to call flat version
-        b = PlotHorizontalBarPitchSpaceOffset(a.parts[0], title='Bach (soprano voice)')
+        b = HorizontalBarPitchSpaceOffset(a.parts[0], title='Bach (soprano voice)')
         b.run()
         
 
-        b = PlotHorizontalBarPitchSpaceOffset(a, title='Bach (all parts)')
+        b = HorizontalBarPitchSpaceOffset(a, title='Bach (all parts)')
         b.run()
         
 
 
 
-    def testPlotHorizontalBarPitchClassOffset(self):
+    def testHorizontalBarPitchClassOffset(self):
         a = corpus.parse('bach/bwv57.8')
-        b = PlotHorizontalBarPitchClassOffset(a.parts[0], title='Bach (soprano voice)')
+        b = HorizontalBarPitchClassOffset(a.parts[0], title='Bach (soprano voice)')
         b.run()
         
 
         a = corpus.parse('bach/bwv57.8')
-        b = PlotHorizontalBarPitchClassOffset(a.parts[0].measures(3,6), 
+        b = HorizontalBarPitchClassOffset(a.parts[0].measures(3,6), 
                                               title='Bach (soprano voice, mm 3-6)')
         b.run()
         
 
-    def testPlotScatterWeightedPitchSpaceQuarterLength(self):
+    def testScatterWeightedPitchSpaceQuarterLength(self):
         a = corpus.parse('bach/bwv57.8').parts[0].flat
         for xLog in [True, False]:
-            b = PlotScatterWeightedPitchSpaceQuarterLength(a,
+            b = ScatterWeightedPitchSpaceQuarterLength(a,
                             title='Pitch Space Bach (soprano voice)',
                             )
             b.axisX.useLogScale = xLog
             b.run()
     
-            b = PlotScatterWeightedPitchClassQuarterLength(a,
+            b = ScatterWeightedPitchClassQuarterLength(a,
                             title='Pitch Class Bach (soprano voice)',
                             )
             b.axisX.useLogScale = xLog
             b.run()
 
 
-    def testPlotPitchSpace(self):
+    def testPitchSpace(self):
         a = corpus.parse('bach/bwv57.8')
-        b = PlotHistogramPitchSpace(a.parts[0].flat, title='Bach (soprano voice)')
+        b = HistogramPitchSpace(a.parts[0].flat, title='Bach (soprano voice)')
         b.run()
         
 
-    def testPlotPitchClass(self):
+    def testPitchClass(self):
         a = corpus.parse('bach/bwv57.8')
-        b = PlotHistogramPitchClass(a.parts[0].flat, title='Bach (soprano voice)')
+        b = HistogramPitchClass(a.parts[0].flat, title='Bach (soprano voice)')
         b.run()
 
-    def testPlotQuarterLength(self):
+    def testQuarterLength(self):
         a = corpus.parse('bach/bwv57.8')
-        b = PlotHistogramQuarterLength(a.parts[0].flat, title='Bach (soprano voice)')
+        b = HistogramQuarterLength(a.parts[0].flat, title='Bach (soprano voice)')
         b.run()
 
 
-    def testPlotScatterPitchSpaceQuarterLength(self):
+    def testScatterPitchSpaceQuarterLength(self):
         for xLog in [True, False]:
 
             a = corpus.parse('bach/bwv57.8')
-            b = PlotScatterPitchSpaceQuarterLength(a.parts[0].flat, title='Bach (soprano voice)', 
+            b = ScatterPitchSpaceQuarterLength(a.parts[0].flat, title='Bach (soprano voice)', 
                                                    )
             b.axisX.useLogScale = xLog
             b.run()
     
-            b = PlotScatterPitchClassQuarterLength(a.parts[0].flat, title='Bach (soprano voice)', 
+            b = ScatterPitchClassQuarterLength(a.parts[0].flat, title='Bach (soprano voice)', 
                                                    )
             b.axisX.useLogScale = xLog
             b.run()
 
-    def testPlotScatterPitchClassOffset(self):
+    def testScatterPitchClassOffset(self):
         a = corpus.parse('bach/bwv57.8')
-        b = PlotScatterPitchClassOffset(a.parts[0].flat, title='Bach (soprano voice)')
+        b = ScatterPitchClassOffset(a.parts[0].flat, title='Bach (soprano voice)')
         b.run()
 
 
-    def testPlotScatterPitchSpaceDynamicSymbol(self):
+    def testScatterPitchSpaceDynamicSymbol(self):
         a = corpus.parse('schumann/opus41no1', 2)
-        b = PlotScatterPitchSpaceDynamicSymbol(a.parts[0].flat, title='Schumann (soprano voice)')
+        b = ScatterPitchSpaceDynamicSymbol(a.parts[0].flat, title='Schumann (soprano voice)')
         b.run()
         
 
-        b = PlotScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flat, 
+        b = ScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flat, 
                                                        title='Schumann (soprano voice)')
         b.run()
         
@@ -1515,23 +1566,23 @@ class TestExternal(unittest.TestCase):
 
         plotClasses = [
         # histograms
-        (PlotHistogramPitchSpace, None, None), 
-        (PlotHistogramPitchClass, None, None), 
-        (PlotHistogramQuarterLength, None, None),
+        (HistogramPitchSpace, None, None), 
+        (HistogramPitchClass, None, None), 
+        (HistogramQuarterLength, None, None),
         # scatters
-        (PlotScatterPitchSpaceQuarterLength, None, None), 
-        (PlotScatterPitchClassQuarterLength, None, None), 
-        (PlotScatterPitchClassOffset, None, None),
-        (PlotScatterPitchSpaceDynamicSymbol, 
+        (ScatterPitchSpaceQuarterLength, None, None), 
+        (ScatterPitchClassQuarterLength, None, None), 
+        (ScatterPitchClassOffset, None, None),
+        (ScatterPitchSpaceDynamicSymbol, 
             corpus.getWork('schumann/opus41no1', 2), 'Schumann Opus 41 No 1'),
 
         # offset based horizontal
-        (PlotHorizontalBarPitchSpaceOffset, None, None), 
-        (PlotHorizontalBarPitchClassOffset, None, None),
+        (HorizontalBarPitchSpaceOffset, None, None), 
+        (HorizontalBarPitchClassOffset, None, None),
         # weighted scatter
-        (PlotScatterWeightedPitchSpaceQuarterLength, None, None), 
-        (PlotScatterWeightedPitchClassQuarterLength, None, None),
-        (PlotScatterWeightedPitchSpaceDynamicSymbol, 
+        (ScatterWeightedPitchSpaceQuarterLength, None, None), 
+        (ScatterWeightedPitchClassQuarterLength, None, None),
+        (ScatterWeightedPitchSpaceDynamicSymbol, 
             corpus.getWork('schumann/opus41no1', 2), 'Schumann Opus 41 No 1'),
 
 
@@ -1539,8 +1590,8 @@ class TestExternal(unittest.TestCase):
         (Plot3DBarsPitchSpaceQuarterLength, 
             testFiles.mozartTrioK581Excerpt, 'Mozart Trio K581 Excerpt'), # @UndefinedVariable
 
-        (PlotWindowedKey, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
-        (PlotWindowedAmbitus, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
+        (WindowedKey, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
+        (WindowedAmbitus, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
 
         ]
 
@@ -1597,47 +1648,47 @@ class Test(unittest.TestCase):
 
 
 
-    def testPlotPitchSpaceDurationCount(self):
+    def testPitchSpaceDurationCount(self):
         a = corpus.parse('bach/bwv57.8')
-        b = PlotScatterWeightedPitchSpaceQuarterLength(a.parts[0].flat, doneAction=None,
+        b = ScatterWeightedPitchSpaceQuarterLength(a.parts[0].flat, doneAction=None,
                         title='Bach (soprano voice)')
         b.run()
         
 
-    def testPlotPitchSpace(self):
+    def testPitchSpace(self):
         a = corpus.parse('bach')
-        b = PlotHistogramPitchSpace(a.parts[0].flat, doneAction=None, title='Bach (soprano voice)')
+        b = HistogramPitchSpace(a.parts[0].flat, doneAction=None, title='Bach (soprano voice)')
         b.run()
         
 
-    def testPlotPitchClass(self):
+    def testPitchClass(self):
         a = corpus.parse('bach/bwv57.8')
-        b = PlotHistogramPitchClass(a.parts[0].flat, 
+        b = HistogramPitchClass(a.parts[0].flat, 
                                     doneAction=None, title='Bach (soprano voice)')
         b.run()
         
 
-    def testPlotQuarterLength(self):
+    def testQuarterLength(self):
         a = corpus.parse('bach/bwv57.8')
-        b = PlotHistogramQuarterLength(a.parts[0].flat, 
+        b = HistogramQuarterLength(a.parts[0].flat, 
                                        doneAction=None, title='Bach (soprano voice)')
         b.run()
         
 
     def testPitchDuration(self):
         a = corpus.parse('schoenberg/opus19', 2)
-        b = PlotScatterPitchSpaceDynamicSymbol(a.parts[0].flat, 
+        b = ScatterPitchSpaceDynamicSymbol(a.parts[0].flat, 
                                                doneAction=None, title='Schoenberg (piano)')
         b.run()
         
 
-        b = PlotScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flat, 
+        b = ScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flat, 
                                                        doneAction=None, title='Schoenberg (piano)')
         b.run()
         
 
         
-    def testPlotWindowed(self, doneAction=None):
+    def testWindowed(self, doneAction=None):
         if doneAction is not None: # pragma: no cover
             fp = random.choice(corpus.getBachChorales('.xml'))
             unused_directory, fn = os.path.split(fp)
@@ -1650,22 +1701,22 @@ class Test(unittest.TestCase):
             fn = 'bach/bwv66.6'
             windowStep = 20 # set high to be fast
 
-#         b = PlotWindowedAmbitus(a.parts, title='Bach Ambitus',
+#         b = WindowedAmbitus(a.parts, title='Bach Ambitus',
 #             minWindow=1, maxWindow=8, windowStep=3,
 #             doneAction=doneAction)
 #         b.run()
 
-        b = PlotWindowedKey(a, title=fn,
+        b = WindowedKey(a, title=fn,
             minWindow=1, windowStep=windowStep, 
             doneAction=doneAction, dpi=300)
         b.run()
         
 
-    def testPlotFeatures(self):
+    def testFeatures(self):
         streamList = ['bach/bwv66.6', 'schoenberg/opus19/movement2', 'corelli/opus3no1/1grave']
         feList = ['ql1', 'ql2', 'ql3']
 
-        p = PlotFeatures(streamList, featureExtractors=feList, doneAction=None)
+        p = Features(streamList, featureExtractors=feList, doneAction=None)
         p.run()
 
 
@@ -1674,16 +1725,16 @@ class Test(unittest.TestCase):
         o = corpus.parse('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
         s = o.mergeScores()
 
-        b = PlotHorizontalBarPitchClassOffset(s, doneAction=None)
+        b = HorizontalBarPitchClassOffset(s, doneAction=None)
         b.run()
         
 
 
-    def testPlotChordsA(self):
+    def testChordsA(self):
         from music21 import stream, scale
         sc = scale.MajorScale('c4')
 
-        b = PlotHistogram(stream.Stream(), doneAction=None)
+        b = Histogram(stream.Stream(), doneAction=None)
         c = chord.Chord(['b', 'c', 'd'])
         b.axisX = axis.PitchSpaceAxis(b, 'x')
         self.assertEqual(b.extractChordDataOneAxis(b.axisX, c), [71, 60, 62])
@@ -1693,7 +1744,7 @@ class Test(unittest.TestCase):
         s.append(chord.Chord(['b', 'c#', 'd']))
         s.append(note.Note('c3'))
         s.append(note.Note('c5'))
-        b = PlotHistogramPitchSpace(s, doneAction=None)
+        b = HistogramPitchSpace(s, doneAction=None)
         b.run()
         
         #b.write()
@@ -1703,7 +1754,7 @@ class Test(unittest.TestCase):
         s.append(sc.getChord('e3', 'a3'))
         s.append(note.Note('c3'))
         s.append(note.Note('c3'))
-        b = PlotHistogramPitchClass(s, doneAction=None)
+        b = HistogramPitchClass(s, doneAction=None)
         b.run()
         
         #b.write()
@@ -1712,7 +1763,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.append(sc.getChord('e3', 'a3', quarterLength=2))
         s.append(note.Note('c3', quarterLength=0.5))
-        b = PlotHistogramQuarterLength(s, doneAction=None)
+        b = HistogramQuarterLength(s, doneAction=None)
         b.run()
         
         #b.write()
@@ -1722,7 +1773,7 @@ class Test(unittest.TestCase):
         # test scatter plots
 
 
-        b = PlotScatter(stream.Stream(), doneAction=None)
+        b = Scatter(stream.Stream(), doneAction=None)
         b.axisX = axis.PitchSpaceAxis(b, 'x')
         b.axisY = axis.QuarterLengthAxis(b, 'y')
         b.axisY.useLogScale = False
@@ -1735,7 +1786,7 @@ class Test(unittest.TestCase):
         self.assertEqual(b.extractChordDataMultiAxis(c), [[71, 60, 62], [0.5]])
         # matching the number of pitches for each data point may be needed
 
-    def testPlotChordsA2(self):
+    def testChordsA2(self):
         from music21 import stream, scale
         sc = scale.MajorScale('c4')
 
@@ -1743,7 +1794,7 @@ class Test(unittest.TestCase):
         s.append(sc.getChord('e3', 'a3', quarterLength=0.5))
         s.append(sc.getChord('b3', 'c5', quarterLength=1.5))
         s.append(note.Note('c3', quarterLength=2))
-        b = PlotScatterPitchSpaceQuarterLength(s, doneAction=None)
+        b = ScatterPitchSpaceQuarterLength(s, doneAction=None)
         b.axisX.useLogScale = False
         b.run()
 
@@ -1754,7 +1805,7 @@ class Test(unittest.TestCase):
         self.assertEqual(b.data, match)
         #b.write()
 
-    def testPlotChordsA3(self):
+    def testChordsA3(self):
         from music21 import stream, scale
         sc = scale.MajorScale('c4')
 
@@ -1762,7 +1813,7 @@ class Test(unittest.TestCase):
         s.append(sc.getChord('e3', 'a3', quarterLength=0.5))
         s.append(sc.getChord('b3', 'c5', quarterLength=1.5))
         s.append(note.Note('c3', quarterLength=2))
-        b = PlotScatterPitchClassQuarterLength(s, doneAction=None)
+        b = ScatterPitchClassQuarterLength(s, doneAction=None)
         b.axisX.useLogScale = False
         b.run()
 
@@ -1773,7 +1824,7 @@ class Test(unittest.TestCase):
         self.assertEqual(b.data, match)
         #b.write()
 
-    def testPlotChordsA4(self):
+    def testChordsA4(self):
         from music21 import stream, scale
         sc = scale.MajorScale('c4')
 
@@ -1785,7 +1836,7 @@ class Test(unittest.TestCase):
         self.assertEqual([e.offset for e in s], [0.0, 0.5, 2.5, 4.0])
 
         #s.show()
-        b = PlotScatterPitchClassOffset(s, doneAction=None)
+        b = ScatterPitchClassOffset(s, doneAction=None)
         b.run()
 
         match = [(0.0, 4), (0.0, 5), (0.0, 7), (0.0, 9), 
@@ -1795,7 +1846,7 @@ class Test(unittest.TestCase):
         self.assertEqual(b.data, match)
         #b.write()
 
-    def testPlotChordsA5(self):
+    def testChordsA5(self):
         from music21 import stream, scale
         sc = scale.MajorScale('c4')
 
@@ -1808,7 +1859,7 @@ class Test(unittest.TestCase):
         #s.append(note.Note('d3', quarterLength=2))
 
         #s.show()
-        b = PlotScatterPitchSpaceDynamicSymbol(s, doneAction=None)
+        b = ScatterPitchSpaceDynamicSymbol(s, doneAction=None)
         b.run()
         
         self.assertEqual(b.data, [[52, 8], [53, 8], [55, 8], [57, 8], [59, 8], [59, 5], 
@@ -1816,7 +1867,7 @@ class Test(unittest.TestCase):
         #b.write()
 
 
-    def testPlotChordsB(self):
+    def testChordsB(self):
         from music21 import stream, scale
         sc = scale.MajorScale('c4')
 
@@ -1826,7 +1877,7 @@ class Test(unittest.TestCase):
         #s.append(note.Note('c3', quarterLength=2))
         s.append(sc.getChord('b3', 'e4', quarterLength=1.5))
 
-        b = PlotHorizontalBarPitchClassOffset(s, doneAction=None)
+        b = HorizontalBarPitchClassOffset(s, doneAction=None)
         b.run()
 
         match = [['C', [(0.0, 0.9375), (1.5, 1.4375)]], ['', []], 
@@ -1846,7 +1897,7 @@ class Test(unittest.TestCase):
         #s.append(note.Note('c3', quarterLength=2))
         s.append(sc.getChord('b3', 'e4', quarterLength=1.5))
 
-        b = PlotHorizontalBarPitchSpaceOffset(s, doneAction=None)
+        b = HorizontalBarPitchSpaceOffset(s, doneAction=None)
         b.run()
         match = [['C3', [(0.0, 0.9375)]], ['', []], 
                  ['', []], ['', []], 
@@ -1872,7 +1923,7 @@ class Test(unittest.TestCase):
         s.append(sc.getChord('f4', 'g5', quarterLength=3))
         s.append(note.Note('c5', quarterLength=3))
 
-        b = PlotScatterWeightedPitchSpaceQuarterLength(s, doneAction=None)
+        b = ScatterWeightedPitchSpaceQuarterLength(s, doneAction=None)
         b.axisX.useLogScale = False
         b.run()
         
@@ -1892,7 +1943,7 @@ class Test(unittest.TestCase):
         s.append(sc.getChord('f4', 'g5', quarterLength=3))
         s.append(note.Note('c5', quarterLength=3))
 
-        b = PlotScatterWeightedPitchClassQuarterLength(s, doneAction=None)
+        b = ScatterWeightedPitchClassQuarterLength(s, doneAction=None)
         b.axisX.useLogScale = False
         b.run()
         
@@ -1902,7 +1953,7 @@ class Test(unittest.TestCase):
                                        [1.5, 0, 1], [1.5, 2, 1], [1.5, 4, 1]])
         #b.write()
 
-    def testPlotChordsB2(self):
+    def testChordsB2(self):
         from music21 import stream, scale
         sc = scale.MajorScale('c4')
 
@@ -1921,7 +1972,7 @@ class Test(unittest.TestCase):
         s.append(sc.getChord('f4', 'g5', quarterLength=3))
         s.append(note.Note('c5', quarterLength=3))
 
-        b = PlotScatterWeightedPitchSpaceDynamicSymbol(s, doneAction=None)
+        b = ScatterWeightedPitchSpaceDynamicSymbol(s, doneAction=None)
         b.axisX.useLogScale = False
         b.run()
         match = [[52.0, 8, 1], [53.0, 8, 1], [55.0, 8, 1], [57.0, 8, 1], 
@@ -1939,7 +1990,7 @@ class Test(unittest.TestCase):
         self.assertEqual(b.data, match)
         #b.write()
 
-    def testPlotChordsB3(self):
+    def testChordsB3(self):
         from music21 import stream, scale
         sc = scale.MajorScale('c4')
 
@@ -1961,9 +2012,9 @@ class Test(unittest.TestCase):
         self.assertEqual(b.data[0], [0.5, 52.0, 1])
         #b.write()
 
-    def testPlotDolanA(self):
+    def testDolanA(self):
         a = corpus.parse('bach/bwv57.8')
-        b = PlotDolan(a, title='Bach', doneAction=None)
+        b = Dolan(a, title='Bach', doneAction=None)
         b.run()
         
         #b.show()
@@ -1974,32 +2025,32 @@ class Test(unittest.TestCase):
         streamList = corpus.getBachChorales()[100:108]
         feList = ['m17', 'm18', 'm19', 'ql1']
         #labelList = [os.path.basename(fp) for fp in streamList]
-        p = PlotFeatures(streamList, feList)
+        p = Features(streamList, feList)
         p.run()
 
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [
-        PlotHistogramPitchSpace, 
-        PlotHistogramPitchClass, 
-        PlotHistogramQuarterLength,
+        HistogramPitchSpace, 
+        HistogramPitchClass, 
+        HistogramQuarterLength,
         # windowed
-        PlotWindowedKey, 
-        PlotWindowedAmbitus,
+        WindowedKey, 
+        WindowedAmbitus,
         # scatters
-        PlotScatterPitchSpaceQuarterLength, 
-        PlotScatterPitchClassQuarterLength, 
-        PlotScatterPitchClassOffset,
-        PlotScatterPitchSpaceDynamicSymbol,
+        ScatterPitchSpaceQuarterLength, 
+        ScatterPitchClassQuarterLength, 
+        ScatterPitchClassOffset,
+        ScatterPitchSpaceDynamicSymbol,
         # offset based horizontal
-        PlotHorizontalBarPitchSpaceOffset, 
-        PlotHorizontalBarPitchClassOffset,
-        PlotDolan,
+        HorizontalBarPitchSpaceOffset, 
+        HorizontalBarPitchClassOffset,
+        Dolan,
         # weighted scatter
-        PlotScatterWeightedPitchSpaceQuarterLength, 
-        PlotScatterWeightedPitchClassQuarterLength,
-        PlotScatterWeightedPitchSpaceDynamicSymbol,
+        ScatterWeightedPitchSpaceQuarterLength, 
+        ScatterWeightedPitchClassQuarterLength,
+        ScatterWeightedPitchSpaceDynamicSymbol,
         # 3d graphs
         Plot3DBarsPitchSpaceQuarterLength,
 ]
@@ -2007,19 +2058,19 @@ _DOC_ORDER = [
 
 if __name__ == "__main__":
 #     bach = corpus.parse('schoenberg')
-#     p = Plot3DBars(bach)
+#     p = ThreeDBars(bach)
 #     p.run()
 #     schubert = '/Users/cuthbert/Dropbox (MIT)/Vladimir_Myke/schubert unvoll all_fixed.xml'
 #     schubert = converter.parse(schubert)
-#     p = PlotDolan(schubert)
+#     p = Dolan(schubert)
 #     p.run()
 #     streamList = ['bach/bwv66.6', 'schoenberg/opus19/movement2', 'corelli/opus3no1/1grave']
 #     feList = ['ql1', 'ql2', 'ql3']
 # 
-#     p = PlotFeatures(streamList, featureExtractors=feList)
+#     p = Features(streamList, featureExtractors=feList)
 #     p.run()
      
     import music21
-    music21.mainTest(TestExternal) #, runTest='testPlot3DPitchSpaceQuarterLengthCount')
+    music21.mainTest(Test) #, runTest='test3DPitchSpaceQuarterLengthCount')
 
 

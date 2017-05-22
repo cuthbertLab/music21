@@ -37,6 +37,11 @@ class LilyObjectsException(exceptions21.Music21Exception):
     pass
 
 class LyObject(object):
+    '''
+    LyObject is the base class of all other Lily Objects
+    
+    
+    '''
     supportedClasses = []  # ordered list of classes to support
     m21toLy = {}
     defaultAttributes = {}
@@ -400,7 +405,12 @@ class LyLilypondHeaderBody(LyObject):
         return self.newlineSeparateStringOutputIfNotNone(self.assignments)
 
 class LyAssignmentId(LyObject):
+    '''
+    >>> lyai = lily.lilyObjects.LyAssignmentId('title', isLyricString=False)
+    >>> str(lyai)
+    'title'
     
+    '''
     def __init__(self, content=None, isLyricString=False):
         LyObject.__init__(self)        
         self.content = content
@@ -427,8 +437,7 @@ class LyAssignment(LyObject):
     title = "hi" 
     
     Note that you could also pass assignmentId a LyAssignmentId object,
-    but that's overkill for a lot of things.
-    
+    but that's overkill for a lot of things.    
     '''
     def __init__(self, assignmentId=None, identifierInit=None, 
                  propertyPath=None, embeddedScm=None):

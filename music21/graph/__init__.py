@@ -14,7 +14,7 @@
 Object definitions for graphing and plotting :class:`~music21.stream.Stream` objects. 
 
 The :class:`~music21.graph.primitives.Graph` object subclasses primitive, abstract fundamental 
-graphing archetypes using the matplotlib library. The :class:`~music21.graph.plot.Plot` 
+graphing archetypes using the matplotlib library. The :class:`~music21.graph.plot.PlotStream` 
 object subclasses provide reusable approaches to graphing data and structures in 
 :class:`~music21.stream.Stream` objects.
 
@@ -48,35 +48,35 @@ def getPlotsToMake(*args, **keywords):
     no arguments = horizontalbar
 
     >>> graph.getPlotsToMake()
-    [<class 'music21.graph.plot.PlotHorizontalBarPitchSpaceOffset'>]
+    [<class 'music21.graph.plot.HorizontalBarPitchSpaceOffset'>]
     
     >>> graph.getPlotsToMake('windowed')
-    [<class 'music21.graph.plot.PlotWindowedKey'>]
+    [<class 'music21.graph.plot.WindowedKey'>]
     '''
     plotClasses = [
         # histograms
-        plot.PlotHistogramPitchSpace, 
-        plot.PlotHistogramPitchClass, 
-        plot.PlotHistogramQuarterLength,
+        plot.HistogramPitchSpace, 
+        plot.HistogramPitchClass, 
+        plot.HistogramQuarterLength,
         # scatters
-        plot.PlotScatterPitchSpaceQuarterLength, 
-        plot.PlotScatterPitchClassQuarterLength, 
-        plot.PlotScatterPitchClassOffset,
-        plot.PlotScatterPitchSpaceDynamicSymbol,
+        plot.ScatterPitchSpaceQuarterLength, 
+        plot.ScatterPitchClassQuarterLength, 
+        plot.ScatterPitchClassOffset,
+        plot.ScatterPitchSpaceDynamicSymbol,
         # offset based horizontal
-        plot.PlotHorizontalBarPitchSpaceOffset, 
-        plot.PlotHorizontalBarPitchClassOffset,
+        plot.HorizontalBarPitchSpaceOffset, 
+        plot.HorizontalBarPitchClassOffset,
         # weighted scatter
-        plot.PlotScatterWeightedPitchSpaceQuarterLength, 
-        plot.PlotScatterWeightedPitchClassQuarterLength,
-        plot.PlotScatterWeightedPitchSpaceDynamicSymbol,
+        plot.ScatterWeightedPitchSpaceQuarterLength, 
+        plot.ScatterWeightedPitchClassQuarterLength,
+        plot.ScatterWeightedPitchSpaceDynamicSymbol,
         # 3d graphs
         plot.Plot3DBarsPitchSpaceQuarterLength,
         # windowed plots
-        plot.PlotWindowedKey,
-        plot.PlotWindowedAmbitus,
+        plot.WindowedKey,
+        plot.WindowedAmbitus,
         # instrumentation and part graphs
-        plot.PlotDolan,
+        plot.Dolan,
     ]
 
     showFormat = ''
@@ -240,22 +240,22 @@ def plotStream(streamObj, *args, **keywords):
 
     Available plots include the following:
 
-    * :class:`~music21.graph.plot.PlotHistogramPitchSpace`
-    * :class:`~music21.graph.plot.PlotHistogramPitchClass`
-    * :class:`~music21.graph.plot.PlotHistogramQuarterLength`
-    * :class:`~music21.graph.plot.PlotScatterPitchSpaceQuarterLength`
-    * :class:`~music21.graph.plot.PlotScatterPitchClassQuarterLength`
-    * :class:`~music21.graph.plot.PlotScatterPitchClassOffset`
-    * :class:`~music21.graph.plot.PlotScatterPitchSpaceDynamicSymbol`
-    * :class:`~music21.graph.plot.PlotHorizontalBarPitchSpaceOffset`
-    * :class:`~music21.graph.plot.PlotHorizontalBarPitchClassOffset`
-    * :class:`~music21.graph.plot.PlotScatterWeightedPitchSpaceQuarterLength`
-    * :class:`~music21.graph.plot.PlotScatterWeightedPitchClassQuarterLength`
-    * :class:`~music21.graph.plot.PlotScatterWeightedPitchSpaceDynamicSymbol`
+    * :class:`~music21.graph.plot.HistogramPitchSpace`
+    * :class:`~music21.graph.plot.HistogramPitchClass`
+    * :class:`~music21.graph.plot.HistogramQuarterLength`
+    * :class:`~music21.graph.plot.ScatterPitchSpaceQuarterLength`
+    * :class:`~music21.graph.plot.ScatterPitchClassQuarterLength`
+    * :class:`~music21.graph.plot.ScatterPitchClassOffset`
+    * :class:`~music21.graph.plot.ScatterPitchSpaceDynamicSymbol`
+    * :class:`~music21.graph.plot.HorizontalBarPitchSpaceOffset`
+    * :class:`~music21.graph.plot.HorizontalBarPitchClassOffset`
+    * :class:`~music21.graph.plot.ScatterWeightedPitchSpaceQuarterLength`
+    * :class:`~music21.graph.plot.ScatterWeightedPitchClassQuarterLength`
+    * :class:`~music21.graph.plot.ScatterWeightedPitchSpaceDynamicSymbol`
     * :class:`~music21.graph.plot.Plot3DBarsPitchSpaceQuarterLength`
-    * :class:`~music21.graph.plot.PlotWindowedKey`
-    * :class:`~music21.graph.plot.PlotWindowedAmbitus`
-    * :class:`~music21.graph.plot.PlotDolan`
+    * :class:`~music21.graph.plot.WindowedKey`
+    * :class:`~music21.graph.plot.WindowedAmbitus`
+    * :class:`~music21.graph.plot.Dolan`
 
     
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
@@ -263,7 +263,7 @@ def plotStream(streamObj, *args, **keywords):
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
     >>> #_DOCS_SHOW s.plot('histogram', 'pitch')
 
-    .. image:: images/PlotHistogramPitchSpace.*
+    .. image:: images/HistogramPitchSpace.*
         :width: 600
 
 
@@ -272,7 +272,7 @@ def plotStream(streamObj, *args, **keywords):
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
     >>> #_DOCS_SHOW s.plot('pianoroll')
 
-    .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
+    .. image:: images/HorizontalBarPitchSpaceOffset.*
         :width: 600
 
     '''
@@ -324,6 +324,9 @@ class Test(unittest.TestCase):
                 unused_a = copy.copy(obj)
                 unused_b = copy.deepcopy(obj)
 
+
+
+
     def testAll(self):
         from music21 import corpus
         a = corpus.parse('bach/bwv57.8')
@@ -367,43 +370,42 @@ class Test(unittest.TestCase):
 
     def testGetPlotsToMakeA(self):
         post = getPlotsToMake(format='grid', values='ambitus')
-        self.assertEqual(post, [plot.PlotWindowedAmbitus])
+        self.assertEqual(post, [plot.WindowedAmbitus])
         post = getPlotsToMake(format='grid', values='key')
-        self.assertEqual(post, [plot.PlotWindowedKey])
+        self.assertEqual(post, [plot.WindowedKey])
 
 
         # no args get pitch space piano roll
         post = getPlotsToMake()
-        self.assertEqual(post, [plot.PlotHorizontalBarPitchSpaceOffset])
+        self.assertEqual(post, [plot.HorizontalBarPitchSpaceOffset])
 
         # one arg gives a histogram of that parameters
         post = getPlotsToMake('duration')
-        self.assertEqual(post, [plot.PlotHistogramQuarterLength])
+        self.assertEqual(post, [plot.HistogramQuarterLength])
         post = getPlotsToMake('quarterLength')
-        self.assertEqual(post, [plot.PlotHistogramQuarterLength])
+        self.assertEqual(post, [plot.HistogramQuarterLength])
         post = getPlotsToMake('ps')
-        self.assertEqual(post, [plot.PlotHistogramPitchSpace])
+        self.assertEqual(post, [plot.HistogramPitchSpace])
         post = getPlotsToMake('pitch')
-        self.assertEqual(post, [plot.PlotHistogramPitchSpace])
+        self.assertEqual(post, [plot.HistogramPitchSpace])
         post = getPlotsToMake('pitchspace')
-        self.assertEqual(post, [plot.PlotHistogramPitchSpace])
+        self.assertEqual(post, [plot.HistogramPitchSpace])
         post = getPlotsToMake('pitchClass')
-        self.assertEqual(post, [plot.PlotHistogramPitchClass])
+        self.assertEqual(post, [plot.HistogramPitchClass])
 
         post = getPlotsToMake('scatter', 'pitch', 'ql')
-        self.assertEqual(post, [plot.PlotScatterPitchSpaceQuarterLength])
+        self.assertEqual(post, [plot.ScatterPitchSpaceQuarterLength])
 
         post = getPlotsToMake('scatter', 'pc', 'offset')
-        self.assertEqual(post, [plot.PlotScatterPitchClassOffset])
-
+        self.assertEqual(post, [plot.ScatterPitchClassOffset])
 
     def testGetPlotsToMakeB(self):
         post = getPlotsToMake('dolan')
-        self.assertEqual(post, [plot.PlotDolan])
+        self.assertEqual(post, [plot.Dolan])
         post = getPlotsToMake(values='instrument')
-        self.assertEqual(post, [plot.PlotDolan])
+        self.assertEqual(post, [plot.Dolan])
         post = getPlotsToMake(format='horizontalbarweighted')
-        self.assertEqual(post, [plot.PlotDolan])
+        self.assertEqual(post, [plot.Dolan])
 
 #     def testMeasureNumbersA(self):
 #         from music21 import corpus, graph
@@ -436,9 +438,10 @@ _DOC_ORDER = [plotStream, getPlotsToMake]
 #------------------------------------------------------------------------------
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":    
     import music21
-    music21.mainTest(TestExternal) #, runTest='testPlot3DPitchSpaceQuarterLengthCount')
+    music21.corpus.parse('bwv66.6').plot('histogram', 'pitch', xHideUnused=False)
+    music21.mainTest(Test) #, runTest='testPlot3DPitchSpaceQuarterLengthCount')
 
 #------------------------------------------------------------------------------
 # eof

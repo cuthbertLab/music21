@@ -12,7 +12,7 @@
 #-------------------------------------------------------------------------------
 '''
 Definitions for extracting data from a Stream to place on one axis of a 
-:class:`~music21.graph.plot.Plot`.
+:class:`~music21.graph.plot.PlotStream` or similar object.
 '''
 from __future__ import division, print_function, absolute_import
 
@@ -47,7 +47,7 @@ class Axis(object):
             be found in self.client.data after extract data is run:
             
             >>> b = corpus.parse('bwv66.6')
-            >>> plot = graph.plot.PlotScatterPitchClassOffset(b)
+            >>> plot = graph.plot.ScatterPitchClassOffset(b)
             >>> pcAxis = plot.axisY
             >>> pcAxis.axisName
             'y'
@@ -59,10 +59,19 @@ class Axis(object):
             >>> pcValues[0:2]
             [1, 11]
             ''',
+        'quantities': '''
+            a tuple of strings representing the quantities the axis can plot.
+            The first element of the tuple is the authoritative name.
+                        
+            >>> ax = graph.axis.DynamicsAxis()
+            >>> ax.quantities
+            ('dynamic', 'dynamics', 'volume')
+            '''
     }
     
     axisLabelDefault = 'an axis'
     axisDataMap = {'x': 0, 'y': 1, 'z': 2} 
+    quantities = ('one', 'nothing', 'blank')
     
     def __init__(self, client=None, axisName='x'):
         self._client = None
@@ -397,7 +406,8 @@ class PitchSpaceAxis(PitchAxis):
     Axis subclass for dealing with PitchSpace (MIDI numbers...)
     '''
     axisLabelDefault = 'Pitch'
-    
+    quantities = ('pitchSpace', 'pitch', 'pitchspace', 'ps')
+
     def extractOneElement(self, n):
         if hasattr(n, 'pitch'):
             return n.pitch.ps
@@ -441,6 +451,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
     An axis similar to pitch classes, but just shows the octaves    
     '''
     axisLabelDefault = 'Octave'
+    quantities = ('octave', 'octaves')
 
     def __init__(self, client=None, axisName='x'):
         super(PitchSpaceOctaveAxis, self).__init__(client, axisName)    
@@ -484,6 +495,7 @@ class PositionAxis(Axis):
     }
 
     axisLabelDefault = 'Position'
+    quantities = ('position', 'positions')
     
     def __init__(self, client=None, axisName='x'):
         super(PositionAxis, self).__init__(client, axisName)
@@ -512,6 +524,7 @@ class OffsetAxis(PositionAxis):
         
     }
     axisLabelDefault = 'Offset'
+    quantities = ('offset', 'measure', 'offsets', 'measures')
     
     def __init__(self, client=None, axisName='x'):
         super(OffsetAxis, self).__init__(client, axisName)
@@ -782,6 +795,7 @@ class QuarterLengthAxis(PositionAxis):
     }
     
     axisLabelDefault = 'Quarter Length'
+    quantities = ('quarterLength', 'ql', 'quarterlengths', 'durations', 'duration')
     
     def __init__(self, client=None, axisName='x'):
         super(QuarterLengthAxis, self).__init__(client, axisName)
@@ -925,6 +939,7 @@ class OffsetEndAxis(OffsetAxis):
             (default = graceNoteQL)
             '''
     }
+    quantities = ('offsetEnd', 'timespans', 'timespan')
     
     def __init__(self, client=None, axisName='x'):
         super(OffsetEndAxis, self).__init__(client, axisName)
@@ -949,6 +964,7 @@ class DynamicsAxis(Axis):
     Axis subclass for dealing with Dynamics
     '''
     axisLabelDefault = 'Dynamic'
+    quantities = ('dynamic', 'dynamics', 'volume')
         
     def setBoundariesFromData(self, values=None):
         if values is None:
@@ -1006,6 +1022,7 @@ class CountingAxis(Axis):
     }
     
     axisLabelDefault = 'Count'
+    quantities = ('count', 'quantity', 'frequency')
 
     def __init__(self, client=None, axisName='y'):
         super(CountingAxis, self).__init__(client, axisName)
