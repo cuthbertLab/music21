@@ -168,42 +168,62 @@ class PlotStreamMixin(object):
         if self.classFilterList:
             sIter.getElementsByClass(self.classFilterList)
         
-        
-
         self.data = []
 
         for el in sIter:
-            elementValues = [[] for _ in range(len(self.allAxes))]
-            formatDict = {}
-            # should be two for most things...
-
-            if 'Chord' not in el.classes:
-                for i, thisAxis in enumerate(self.allAxes):
-                    axisValue = thisAxis.extractOneElement(el, formatDict)
-                    # use isinstance(List) not isiterable, since
-                    # extractOneElement can distinguish between a tuple which
-                    # represents a single value, or a list of values (or tuples)
-                    # which represent multiple values
-                    if not isinstance(axisValue, list) and axisValue is not None:
-                        axisValue = [axisValue]
-                    elementValues[i] = axisValue
-            else:
-                elementValues = self.extractChordDataMultiAxis(el, formatDict)
-            
-            self.postProcessElement(el, formatDict, *elementValues)
-            if None in elementValues:
-                continue
-
-            elementValueLength = max([len(ev) for ev in elementValues])
-            formatDictList = [formatDict.copy() for _ in range(elementValueLength)]            
-            self.data.extend(zip(*elementValues, formatDictList))
+            dataList = self.processOneElement(el)
+            if dataList is not None:
+                self.data.extend(dataList)
 
         self.postProcessData()
 
         for i, thisAxis in enumerate(self.allAxes):
             thisAxis.setBoundariesFromData([d[i] for d in self.data])
             
-            
+    def processOneElement(self, el):
+        '''
+        Get a list of data from a single element (generally a Note or chord):
+        
+        >>> n = note.Note('C#4')
+        >>> n.offset = 10.25
+        >>> s = stream.Stream([n])
+        >>> pl = graph.plot.ScatterPitchClassOffset(s)
+        >>> pl.processOneElement(n)
+        [(10.25, 1, {})]
+        
+        >>> c = chord.Chord(['D4', 'E5'])
+        >>> s.insert(5.0, c)
+        >>> pl.processOneElement(c)
+        [(5.0, 2, {}), (5.0, 4, {})]
+        
+        '''
+        elementValues = [[] for _ in range(len(self.allAxes))]
+        formatDict = {}
+        # should be two for most things...
+
+        if 'Chord' not in el.classes:
+            for i, thisAxis in enumerate(self.allAxes):
+                axisValue = thisAxis.extractOneElement(el, formatDict)
+                # use isinstance(List) not isiterable, since
+                # extractOneElement can distinguish between a tuple which
+                # represents a single value, or a list of values (or tuples)
+                # which represent multiple values
+                if not isinstance(axisValue, list) and axisValue is not None:
+                    axisValue = [axisValue]
+                elementValues[i] = axisValue
+        else:
+            elementValues = self.extractChordDataMultiAxis(el, formatDict)
+        
+        self.postProcessElement(el, formatDict, *elementValues)
+        if None in elementValues:
+            return None
+
+        elementValueLength = max([len(ev) for ev in elementValues])
+        formatDictList = [formatDict.copy() for _ in range(elementValueLength)]            
+        returnList = list(zip(*elementValues, formatDictList))
+        return returnList
+    
+        
     def postProcessElement(self, el, formatDict, *values):
         pass
 
