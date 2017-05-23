@@ -1662,7 +1662,7 @@ class Test(unittest.TestCase):
 
         b = Histogram(stream.Stream(), doneAction=None)
         c = chord.Chord(['b', 'c', 'd'])
-        b.axisX = axis.PitchSpaceAxis(b, 'x')
+        b.axisX = axis.PitchSpaceAxis(b, 'x') # pylint: disable=attribute-defined-outside-init
         self.assertEqual(b.extractChordDataOneAxis(b.axisX, c), [71, 60, 62])
 
 
@@ -1700,8 +1700,8 @@ class Test(unittest.TestCase):
 
 
         b = Scatter(stream.Stream(), doneAction=None)
-        b.axisX = axis.PitchSpaceAxis(b, 'x')
-        b.axisY = axis.QuarterLengthAxis(b, 'y')
+        b.axisX = axis.PitchSpaceAxis(b, 'x') # pylint: disable=attribute-defined-outside-init
+        b.axisY = axis.QuarterLengthAxis(b, 'y') # pylint: disable=attribute-defined-outside-init
         b.axisY.useLogScale = False
         c = chord.Chord(['b', 'c', 'd'], quarterLength=0.5)
 
