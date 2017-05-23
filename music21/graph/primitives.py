@@ -67,7 +67,7 @@ class Graph(object):
     *    labelFontSize 
     *    fontFamily
     *    marker
-    *    markerSize
+    *    markersize
 
     Graph objects do not manipulate Streams or other music21 data; they only 
     manipulate raw data formatted for each Graph subclass, hence it is
@@ -99,7 +99,7 @@ class Graph(object):
     
     keywordConfigurables = (
         'alpha', 'dpi', 'colorBackgroundData', 'colorBackgroundFigure',
-        'colorGrid', 'title', 'figureSize', 'marker', 'markerSize',
+        'colorGrid', 'title', 'figureSize', 'marker', 'markersize',
         'colors', 'tickFontSize', 'tickColors', 'titleFontSize', 'labelFontSize',
         'fontFamily', 'hideXGrid', 'hideYGrid', 
         'xTickLabelRotation', 
@@ -133,7 +133,7 @@ class Graph(object):
         self.title = 'Music21 Graph'
         self.figureSize = self.figureSizeDefault
         self.marker = 'o'
-        self.markerSize = 6
+        self.markersize = 6 # lowercase as in matplotlib
         self.colors = ['#605c7f', '#5c7f60', '#715c7f']
         
         self.tickFontSize = 7
@@ -931,7 +931,12 @@ class GraphHorizontalBar(Graph):
         keys = []
         i = 0
         # TODO: check data orientation; flips in some cases
-        for key, points in self.data:
+        for info in self.data:
+            if len(info) == 2:
+                key, points = info
+                unused_formatDict = {}
+            else:
+                key, points, unused_formatDict = info
             keys.append(key)
             # provide a list of start, end points;
             # then start y position, bar height
@@ -1157,9 +1162,16 @@ class GraphScatterWeighted(Graph):
         self.figure.subplots_adjust(left=0.15, bottom=0.15)
 
         # need to filter data to weight z values
-        xList = [x for x, unused_y, unused_z in self.data]
-        yList = [y for unused_x, y, unused_z in self.data]
-        zList = [z for unused_x, unused_y, z in self.data]
+        xList = [d[0] for d in self.data]
+        yList = [d[1] for d in self.data]
+        zList = [d[2] for d in self.data]
+        formatDictList = []
+        for d in self.data:
+            if len(d) > 3:
+                formatDict = d[3]
+            else:
+                formatDict = {}
+            formatDictList.append(formatDict)
 
         xMax = max(xList)
         xMin = min(xList)
@@ -1202,10 +1214,11 @@ class GraphScatterWeighted(Graph):
             x = xList[i]
             y = yList[i]
             z, unused_zScalar = zNorm[i] # normalized values
+            formatDict = formatDictList[i]
 
             width = z * xDistort
             height = z * yDistort
-            e = patches.Ellipse(xy=(x, y), width=width, height=height)
+            e = patches.Ellipse(xy=(x, y), width=width, height=height, **formatDict)
             # e = patches.Circle(xy=(x, y), radius=z)
             subplot.add_artist(e)
 
@@ -1273,7 +1286,7 @@ class GraphScatter(Graph):
             marker = self.marker
             color = self.nextColor()
             alpha = self.alpha
-            markerSize = self.markerSize
+            markersize = self.markersize
             if len(row) >= 3:
                 displayData = row[2]
                 if 'color' in displayData:
@@ -1282,10 +1295,10 @@ class GraphScatter(Graph):
                     marker = displayData['marker']
                 if 'alpha' in displayData:
                     alpha = displayData['alpha']
-                if 'markerSize' in displayData:
-                    markerSize = displayData['markerSize']
+                if 'markersize' in displayData:
+                    markersize = displayData['markersize']
                     
-            subplot.plot(x, y, marker=marker, color=color, alpha=alpha, markersize=markerSize)
+            subplot.plot(x, y, marker=marker, color=color, alpha=alpha, markersize=markersize)
             i += 1
         # values are sorted, so no need to use max/min
         if not self.axisRangeHasBeenSet['y']:
@@ -1343,7 +1356,12 @@ class GraphHistogram(Graph):
         binWidth = self.binWidth
         color = getColor(self.colors[0])
         alpha = self.alpha
-        for a, b in self.data:
+        # TODO: use the formatDict!
+        for point in self.data:
+            if len(point) > 2:
+                a, b, unused_formatDict = point
+            else:
+                a, b = point
             x.append(a)
             y.append(b)
         
@@ -1489,7 +1507,12 @@ class Graph3DBars(Graph):
    
     def renderSubplot(self, subplot):
         yDict = {}
-        for x, y, z in self.data:
+        # TODO: use the formatDict!
+        for point in self.data:
+            if len(point) > 3:
+                x, y, z, unused_formatDict = point
+            else:
+                x, y, z = point
             if y not in yDict:
                 yDict[y] = []
             yDict[y].append((x, z))
@@ -1518,7 +1541,14 @@ class Graph3DBars(Graph):
         barWidth = (max(xVals) - min(xVals)) / 20
         barDepth = (max(yVals) - min(yVals)) / 20
         
-        for x, y, z in self.data:
+        for dataPoint in self.data:
+            if len(dataPoint) == 3:
+                x, y, z = dataPoint
+            elif len(dataPoint) > 3:
+                x, y, z, unused_formatDict = dataPoint
+            else:
+                raise GraphException("Cannot plot a point with fewer than 3 values")
+            
             subplot.bar3d(x - (barWidth / 2), y - (barDepth / 2), 0, 
                           barWidth, barDepth, z, 
                           self.nextColor(),

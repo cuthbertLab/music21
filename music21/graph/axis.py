@@ -1075,7 +1075,7 @@ class CountingAxis(Axis):
     >>> plotS.doneAction = None
     >>> plotS.run()
     >>> plotS.data
-    [[42.0, 1], [45.0, 1], [46.0, 1], [47.0, 5], [49.0, 6], ...]
+    [(42.0, 1, {}), (45.0, 1, {}), (46.0, 1, {}), (47.0, 5, {}), (49.0, 6, {}), ...]
     '''
     _DOC_ATTR = {
         'countAxes': '''
@@ -1093,6 +1093,8 @@ class CountingAxis(Axis):
     def postProcessData(self):
         '''
         Replace client.data with a list that only includes each key once.
+        
+        Unfortunately, currently loses all formatting data...
         '''
         client = self.client
         if client is None:
@@ -1102,10 +1104,12 @@ class CountingAxis(Axis):
         countAxes = self.countAxes
         if not common.isIterable(countAxes):
             countAxes = (countAxes,)
+            
         axesIndices = tuple([self.axisDataMap[axisName] for axisName in countAxes])
         thisIndex = self.axisDataMap[self.axisName]
         selector = itemgetter(*axesIndices)
         relevantData = [selector(innerTuple) for innerTuple in client.data]
+
         counter = collections.Counter(tuple(relevantData))
         
         newClientData = []
@@ -1117,7 +1121,7 @@ class CountingAxis(Axis):
             else: # single axesIndices means the counterKey will not be a tuple:
                 innerList[axesIndices[0]] = counterKey
             innerList[thisIndex] = counter[counterKey]
-            newClientData.append(innerList)
+            newClientData.append(tuple(innerList) + ({},))
         
         client.data = sorted(newClientData)
         return client.data

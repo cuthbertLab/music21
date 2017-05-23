@@ -127,7 +127,7 @@ class ActivityMatch(object):
         >>> len(data)
         39
         >>> data[0]
-        [83.0, 7]
+        (83.0, 7)
         '''
         objNameSrc = (note.Note, chord.Chord)
         #objNameSrc = note.Note
@@ -164,7 +164,7 @@ class ActivityMatch(object):
                     if x is None or y is None:
                         pass
                     else:
-                        pairs.append([x, y])
+                        pairs.append((x, y))
 
         # if requesting data points, just return all points
         if dataPoints:
@@ -173,7 +173,6 @@ class ActivityMatch(object):
         # find unique coords and count instances
         dictionary = OrderedDict()
         for coord in pairs: 
-            coord = tuple(coord)
             if coord not in dictionary:
                 dictionary[coord] = 0
             dictionary[coord] += 1

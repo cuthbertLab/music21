@@ -174,6 +174,7 @@ class PlotStreamMixin(object):
 
         for el in sIter:
             elementValues = [[] for _ in range(len(self.allAxes))]
+            formatDict = {}
             # should be two for most things...
 
             if 'Chord' not in el.classes:
@@ -189,11 +190,13 @@ class PlotStreamMixin(object):
             else:
                 elementValues = self.extractChordDataMultiAxis(el)
             
-            self.postProcessElement(el, *elementValues)
+            self.postProcessElement(el, formatDict, *elementValues)
             if None in elementValues:
                 continue
-            
-            self.data.extend(zip(*elementValues))
+
+            elementValueLength = max([len(ev) for ev in elementValues])
+            formatDictList = [formatDict.copy() for _ in range(elementValueLength)]            
+            self.data.extend(zip(*elementValues, formatDictList))
 
         self.postProcessData()
 
@@ -201,7 +204,7 @@ class PlotStreamMixin(object):
             thisAxis.setBoundariesFromData([d[i] for d in self.data])
             
             
-    def postProcessElement(self, el, *values):
+    def postProcessElement(self, el, formatDict, *values):
         pass
 
     def postProcessData(self):
@@ -468,9 +471,13 @@ class ScatterPitchSpaceDynamicSymbol(Scatter):
     def extractData(self):
         # get data from correlate object
         am = correlate.ActivityMatch(self.streamObj)
-        self.data  = am.pitchToDynamic(dataPoints=True)
-        xVals = [x for x, unused_y in self.data]
-        yVals = [y for unused_x, y in self.data]
+        amData  = am.pitchToDynamic(dataPoints=True)
+        self.data = []
+        for x, y in amData:
+            self.data.append((x, y, {}))
+        
+        xVals = [d[0] for d in self.data]
+        yVals = [d[1] for d in self.data]
 
         self.axisX.setBoundariesFromData(xVals)
         self.axisY.setBoundariesFromData(yVals)
@@ -516,13 +523,13 @@ class Histogram(primitives.GraphHistogram, PlotStreamMixin):
         xTickDict = {v[0]: v[1] for v in xTicksOrig}
         xTicksNew = []
         # self.data is already sorted.
-        if ((hasattr(self.axisX, 'hideUnused') and self.axisX.hideUnused is True) 
+        if ((not hasattr(self.axisX, 'hideUnused') or self.axisX.hideUnused is True) 
                 or self.axisX.minValue is None
                 or self.axisX.maxValue is None):
             for i in range(len(self.data)):
                 dataVal = self.data[i]
                 xDataVal = dataVal[0]
-                dataVal[0] = i + 1
+                self.data[i] = (i + 1, *dataVal[1:])
                 if xDataVal in xTickDict: # should be there:
                     newTick = (i + 1, xTickDict[xDataVal])
                     xTicksNew.append(newTick)
@@ -963,7 +970,7 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
         pitchSpanDict = {}
         newData = []
 
-        for positionData, pitchData in self.data:
+        for positionData, pitchData, formatDict in self.data:
             if pitchData not in pitchSpanDict:
                 pitchSpanDict[pitchData] = []
             pitchSpanDict[pitchData].append(positionData)
@@ -973,9 +980,9 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
         
         for numericValue, label in yTicks:
             if numericValue in pitchSpanDict:
-                newData.append([label, pitchSpanDict[numericValue]])
+                newData.append([label, pitchSpanDict[numericValue], formatDict])
             else:
-                newData.append([label, []])
+                newData.append([label, [], formatDict])
         self.data = newData
 
 
@@ -1674,7 +1681,7 @@ class Test(unittest.TestCase):
         b.run()
         
         #b.write()
-        self.assertEqual(b.data, [[1, 1], [2, 1], [3, 1], [4, 1], [5, 1]])
+        self.assertEqual(b.data, [(1, 1, {}), (2, 1, {}), (3, 1, {}), (4, 1, {}), (5, 1, {})])
 
         s = stream.Stream()
         s.append(sc.getChord('e3', 'a3'))
@@ -1684,7 +1691,7 @@ class Test(unittest.TestCase):
         b.run()
         
         #b.write()
-        self.assertEqual(b.data, [[1, 2], [2, 1], [3, 1], [4, 1], [5, 1]])
+        self.assertEqual(b.data, [(1, 2, {}), (2, 1, {}), (3, 1, {}), (4, 1, {}), (5, 1, {})])
 
         s = stream.Stream()
         s.append(sc.getChord('e3', 'a3', quarterLength=2))
@@ -1693,7 +1700,7 @@ class Test(unittest.TestCase):
         b.run()
         
         #b.write()
-        self.assertEqual(b.data, [[0.5, 1], [2.0, 1]])
+        self.assertEqual(b.data, [(0.5, 1, {}), (2.0, 1, {})])
 
 
         # test scatter plots
@@ -1724,10 +1731,12 @@ class Test(unittest.TestCase):
         b.axisX.useLogScale = False
         b.run()
 
-        match = [(0.5, 52.0), (0.5, 53.0), (0.5, 55.0), (0.5, 57.0), 
-                 (1.5, 59.0), (1.5, 60.0), (1.5, 62.0), (1.5, 64.0), (1.5, 65.0), 
-                 (1.5, 67.0), (1.5, 69.0), (1.5, 71.0), (1.5, 72.0), 
-                 (2.0, 48.0)]
+        match = [(0.5, 52.0, {}), (0.5, 53.0, {}), (0.5, 55.0, {}), (0.5, 57.0, {}), 
+                 (1.5, 59.0, {}), (1.5, 60.0, {}), 
+                 (1.5, 62.0, {}), (1.5, 64.0, {}), 
+                 (1.5, 65.0, {}), (1.5, 67.0, {}), 
+                 (1.5, 69.0, {}), (1.5, 71.0, {}), (1.5, 72.0, {}), 
+                 (2.0, 48.0, {})]
         self.assertEqual(b.data, match)
         #b.write()
 
@@ -1743,10 +1752,10 @@ class Test(unittest.TestCase):
         b.axisX.useLogScale = False
         b.run()
 
-        match = [(0.5, 4), (0.5, 5), (0.5, 7), (0.5, 9), 
-                 (1.5, 11), (1.5, 0), (1.5, 2), (1.5, 4), (1.5, 5), 
-                 (1.5, 7), (1.5, 9), (1.5, 11), (1.5, 0), 
-                 (2.0, 0)]        
+        match = [(0.5, 4, {}), (0.5, 5, {}), (0.5, 7, {}), (0.5, 9, {}), 
+                 (1.5, 11, {}), (1.5, 0, {}), (1.5, 2, {}), (1.5, 4, {}), (1.5, 5, {}), 
+                 (1.5, 7, {}), (1.5, 9, {}), (1.5, 11, {}), (1.5, 0, {}), 
+                 (2.0, 0, {})]        
         self.assertEqual(b.data, match)
         #b.write()
 
@@ -1765,10 +1774,10 @@ class Test(unittest.TestCase):
         b = ScatterPitchClassOffset(s, doneAction=None)
         b.run()
 
-        match = [(0.0, 4), (0.0, 5), (0.0, 7), (0.0, 9), 
-                 (0.5, 0), 
-                 (2.5, 11), (2.5, 0), (2.5, 2), (2.5, 4), 
-                 (4.0, 2)]
+        match = [(0.0, 4, {}), (0.0, 5, {}), (0.0, 7, {}), (0.0, 9, {}), 
+                 (0.5, 0, {}), 
+                 (2.5, 11, {}), (2.5, 0, {}), (2.5, 2, {}), (2.5, 4, {}), 
+                 (4.0, 2, {})]
         self.assertEqual(b.data, match)
         #b.write()
 
@@ -1788,8 +1797,10 @@ class Test(unittest.TestCase):
         b = ScatterPitchSpaceDynamicSymbol(s, doneAction=None)
         b.run()
         
-        self.assertEqual(b.data, [[52, 8], [53, 8], [55, 8], [57, 8], [59, 8], [59, 5], 
-                                  [60, 8], [60, 5], [62, 8], [62, 5], [64, 8], [64, 5]])
+        self.assertEqual(b.data, [(52, 8, {}), (53, 8, {}), (55, 8, {}), 
+                                  (57, 8, {}), (59, 8, {}), (59, 5, {}), 
+                                  (60, 8, {}), (60, 5, {}), (62, 8, {}), 
+                                  (62, 5, {}), (64, 8, {}), (64, 5, {})])
         #b.write()
 
 
@@ -1806,13 +1817,18 @@ class Test(unittest.TestCase):
         b = HorizontalBarPitchClassOffset(s, doneAction=None)
         b.run()
 
-        match = [['C', [(0.0, 0.9375), (1.5, 1.4375)]], ['', []], 
-                 ['D', [(1.5, 1.4375)]], ['', []], 
-                 ['E', [(1.0, 0.4375), (1.5, 1.4375)]], 
-                 ['F', [(1.0, 0.4375)]], ['', []], 
-                 ['G', [(1.0, 0.4375)]], ['', []], 
-                 ['A', [(1.0, 0.4375)]], ['', []], 
-                 ['B', [(1.5, 1.4375)]]]
+        match = [['C', [(0.0, 0.9375), (1.5, 1.4375)], {}], 
+                 ['', [], {}], 
+                 ['D', [(1.5, 1.4375)], {}], 
+                 ['', [], {}], 
+                 ['E', [(1.0, 0.4375), (1.5, 1.4375)], {}], 
+                 ['F', [(1.0, 0.4375)], {}], 
+                 ['', [], {}], 
+                 ['G', [(1.0, 0.4375)], {}], 
+                 ['', [], {}], 
+                 ['A', [(1.0, 0.4375)], {}], 
+                 ['', [], {}], 
+                 ['B', [(1.5, 1.4375)], {}]]
         self.assertEqual(b.data, match)
         #b.write()
 
@@ -1825,16 +1841,23 @@ class Test(unittest.TestCase):
 
         b = HorizontalBarPitchSpaceOffset(s, doneAction=None)
         b.run()
-        match = [['C3', [(0.0, 0.9375)]], ['', []], 
-                 ['', []], ['', []], 
-                 ['E', [(1.0, 0.4375)]], 
-                 ['F', [(1.0, 0.4375)]], ['', []], 
-                 ['G', [(1.0, 0.4375)]], ['', []], 
-                 ['A', [(1.0, 0.4375)]], ['', []], 
-                 ['B', [(1.5, 1.4375)]], 
-                 ['C4', [(1.5, 1.4375)]], ['', []], 
-                 ['D', [(1.5, 1.4375)]], ['', []], 
-                 ['E', [(1.5, 1.4375)]]]
+        match = [['C3', [(0.0, 0.9375)], {}], 
+                 ['', [], {}], 
+                 ['', [], {}], 
+                 ['', [], {}], 
+                 ['E', [(1.0, 0.4375)], {}], 
+                 ['F', [(1.0, 0.4375)], {}], 
+                 ['', [], {}], 
+                 ['G', [(1.0, 0.4375)], {}], 
+                 ['', [], {}], 
+                 ['A', [(1.0, 0.4375)], {}], 
+                 ['', [], {}], 
+                 ['B', [(1.5, 1.4375)], {}], 
+                 ['C4', [(1.5, 1.4375)], {}], 
+                 ['', [], {}], 
+                 ['D', [(1.5, 1.4375)], {}], 
+                 ['', [], {}], 
+                 ['E', [(1.5, 1.4375)], {}]]
         
         self.assertEqual(b.data, match)
         #b.write()
@@ -1853,9 +1876,9 @@ class Test(unittest.TestCase):
         b.axisX.useLogScale = False
         b.run()
         
-        self.assertEqual(b.data[0:7], [[0.5, 52.0, 1], [0.5, 53.0, 1], [0.5, 55.0, 1], 
-                                       [0.5, 57.0, 1], [1.0, 48.0, 1], [1.5, 59.0, 1], 
-                                       [1.5, 60.0, 1]])
+        self.assertEqual(b.data[0:7], [(0.5, 52.0, 1, {}), (0.5, 53.0, 1, {}), (0.5, 55.0, 1, {}), 
+                                       (0.5, 57.0, 1, {}), (1.0, 48.0, 1, {}), (1.5, 59.0, 1, {}), 
+                                       (1.5, 60.0, 1, {})])
         #b.write()
 
 
@@ -1873,10 +1896,10 @@ class Test(unittest.TestCase):
         b.axisX.useLogScale = False
         b.run()
         
-        self.assertEqual(b.data[0:8], [[0.5, 4, 1], [0.5, 5, 1], [0.5, 7, 1], 
-                                       [0.5, 9, 1], 
-                                       [1.0, 0, 1], 
-                                       [1.5, 0, 1], [1.5, 2, 1], [1.5, 4, 1]])
+        self.assertEqual(b.data[0:8], [(0.5, 4, 1, {}), (0.5, 5, 1, {}), (0.5, 7, 1, {}), 
+                                       (0.5, 9, 1, {}), 
+                                       (1.0, 0, 1, {}), 
+                                       (1.5, 0, 1, {}), (1.5, 2, 1, {}), (1.5, 4, 1, {})])
         #b.write()
 
     def testChordsB2(self):
@@ -1901,15 +1924,15 @@ class Test(unittest.TestCase):
         b = ScatterWeightedPitchSpaceDynamicSymbol(s, doneAction=None)
         b.axisX.useLogScale = False
         b.run()
-        match = [[52.0, 8, 1], [53.0, 8, 1], [55.0, 8, 1], [57.0, 8, 1], 
-                 [59.0, 7, 1], [59.0, 8, 1], [60.0, 7, 1], [60.0, 8, 1], 
-                 [62.0, 7, 1], [62.0, 8, 1], [64.0, 7, 1], [64.0, 8, 1], 
-                 [65.0, 4, 2], [65.0, 7, 1], 
-                 [67.0, 4, 2], [67.0, 7, 1], 
-                 [69.0, 4, 2], [69.0, 7, 1], [71.0, 4, 2], [71.0, 7, 1], 
-                 [72.0, 4, 3], [72.0, 7, 1], [74.0, 4, 2], [74.0, 7, 1], 
-                 [76.0, 4, 2], [76.0, 7, 1], [77.0, 4, 2], [77.0, 7, 1], 
-                 [79.0, 4, 2], [79.0, 7, 1]]
+        match = [(52.0, 8, 1, {}), (53.0, 8, 1, {}), (55.0, 8, 1, {}), (57.0, 8, 1, {}), 
+                 (59.0, 7, 1, {}), (59.0, 8, 1, {}), (60.0, 7, 1, {}), (60.0, 8, 1, {}), 
+                 (62.0, 7, 1, {}), (62.0, 8, 1, {}), (64.0, 7, 1, {}), (64.0, 8, 1, {}), 
+                 (65.0, 4, 2, {}), (65.0, 7, 1, {}), 
+                 (67.0, 4, 2, {}), (67.0, 7, 1, {}), 
+                 (69.0, 4, 2, {}), (69.0, 7, 1, {}), (71.0, 4, 2, {}), (71.0, 7, 1, {}), 
+                 (72.0, 4, 3, {}), (72.0, 7, 1, {}), (74.0, 4, 2, {}), (74.0, 7, 1, {}), 
+                 (76.0, 4, 2, {}), (76.0, 7, 1, {}), (77.0, 4, 2, {}), (77.0, 7, 1, {}), 
+                 (79.0, 4, 2, {}), (79.0, 7, 1, {})]
 
         self.maxDiff = 2048
         # TODO: Is this right? why are the old dynamics still active?
@@ -1935,7 +1958,7 @@ class Test(unittest.TestCase):
         b.axisX.useLogScale = False
         b.run()
         
-        self.assertEqual(b.data[0], [0.5, 52.0, 1])
+        self.assertEqual(b.data[0], (0.5, 52.0, 1, {}))
         #b.write()
 
     def testDolanA(self):
