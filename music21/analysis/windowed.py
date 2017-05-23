@@ -426,7 +426,7 @@ class Test(unittest.TestCase):
         unused_wa = WindowedAnalysis(s, p)
 
 
-        plot = graph.plot.PlotWindowedKey(s, doneAction=None,
+        plot = graph.plot.WindowedKey(s, doneAction=None,
             windowStep=4, windowType='overlap')
         plot.run()
         #plot.write()

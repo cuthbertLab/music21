@@ -74,7 +74,7 @@ def getCorpusContentDirs():
 
     >>> fp = common.getCorpusContentDirs()
     >>> fp # this test will be fragile, depending on composition of dirs
-    ['airdsAirs', 'bach', 'beethoven', 'ciconia', 'corelli', 'cpebach',
+    ['airdsAirs', 'bach', 'beethoven', 'chopin', 'ciconia', 'corelli', 'cpebach',
     'demos', 'essenFolksong', 'handel', 'haydn', 'josquin', 'leadSheet',
     'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'palestrina',
     'ryansMammoth', 'schoenberg', 'schumann', 'schumann_clara',

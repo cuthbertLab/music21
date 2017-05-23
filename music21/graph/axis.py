@@ -464,10 +464,11 @@ class PitchSpaceAxis(PitchAxis):
         >>> for ps, label in ax.ticks():
         ...     print(str(ps) + " " + label)
         20 G♯0
-        21 A0
-        22 B♭0
-        23 B0
+        21 A
+        22 B♭
+        23 B
         24 C1
+
         >>> ax.showOctaves = False
         >>> for ps, label in ax.ticks():
         ...     print(str(ps) + " " + label)
@@ -476,16 +477,15 @@ class PitchSpaceAxis(PitchAxis):
         22 B♭
         23 B
         24 C
-        >>> ax.showOctaves = 'few'
+
+        >>> ax.showOctaves = True
         >>> for ps, label in ax.ticks():
         ...     print(str(ps) + " " + label)
         20 G♯0
-        21 A
-        22 B♭
-        23 B
-        24 C1
-        
-        
+        21 A0
+        22 B♭0
+        23 B0
+        24 C1        
 
         >>> ax.minValue = 60
         >>> ax.maxValue = 72
@@ -502,7 +502,7 @@ class PitchSpaceAxis(PitchAxis):
         >>> ticks[0] # blank because no note 36 in data
         (36, '')
         >>> ticks[21]
-        (57, 'A3')
+        (57, 'A')
         '''
         return self._pitchTickHelper('nameWithOctave', 'ps')
 

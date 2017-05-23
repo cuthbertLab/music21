@@ -315,13 +315,14 @@ class Corpus(object):
         each directory in self._directoryInformation.
         
         >>> core = corpus.corpora.CoreCorpus()
-        >>> diBrief = core.directoryInformation[0:4]
+        >>> diBrief = core.directoryInformation[0:5]
         >>> diBrief
         (<music21.corpus.work.DirectoryInformation airdsAirs>,
          <music21.corpus.work.DirectoryInformation bach>, 
          <music21.corpus.work.DirectoryInformation beethoven>, 
+         <music21.corpus.work.DirectoryInformation chopin>, 
          <music21.corpus.work.DirectoryInformation ciconia>)
-        >>> diBrief[3].directoryTitle
+        >>> diBrief[4].directoryTitle
         'Johannes Ciconia'
         '''
         dirInfo = []
@@ -438,6 +439,7 @@ class CoreCorpus(Corpus):
         ('airdsAirs', 'Aird\'s Airs', False),
         ('bach', 'Johann Sebastian Bach', True),
         ('beethoven', 'Ludwig van Beethoven', True),
+        ('chopin', 'Frederic Chopin', True),
         ('ciconia', 'Johannes Ciconia', True),
         ('corelli', 'Arcangelo Corelli', True),
         ('cpebach', 'C.P.E. Bach', True),
