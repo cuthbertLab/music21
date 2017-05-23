@@ -22,13 +22,14 @@ The most common way of using plotting functions is to call `.plot()` on a Stream
 '''
 from __future__ import division, print_function, absolute_import
 
-__all__ = ['axis', 'plot', 'primitives', 'utilities']
+__all__ = ['axis', 'findPlot', 'plot', 'primitives', 'utilities']
 
 import unittest
 
 from music21 import common
 
 from music21.graph import axis
+from music21.graph import findPlot
 from music21.graph import plot
 from music21.graph import primitives
 from music21.graph import utilities
@@ -39,180 +40,12 @@ environLocal = environment.Environment(_MOD)
 
 
 
-#-------------------------------------------------------------------------------
-# public function
-def getPlotsToMake(*args, **keywords):
-    '''
-    Given `format` and `values` provided as arguments or keywords, return a list of plot classes.
-    
-    no arguments = horizontalbar
-
-    >>> graph.getPlotsToMake()
-    [<class 'music21.graph.plot.HorizontalBarPitchSpaceOffset'>]
-    
-    >>> graph.getPlotsToMake('windowed')
-    [<class 'music21.graph.plot.WindowedKey'>]
-    '''
-    plotClasses = [
-        # histograms
-        plot.HistogramPitchSpace, 
-        plot.HistogramPitchClass, 
-        plot.HistogramQuarterLength,
-        # scatters
-        plot.ScatterPitchSpaceQuarterLength, 
-        plot.ScatterPitchClassQuarterLength, 
-        plot.ScatterPitchClassOffset,
-        plot.ScatterPitchSpaceDynamicSymbol,
-        # offset based horizontal
-        plot.HorizontalBarPitchSpaceOffset, 
-        plot.HorizontalBarPitchClassOffset,
-        # weighted scatter
-        plot.ScatterWeightedPitchSpaceQuarterLength, 
-        plot.ScatterWeightedPitchClassQuarterLength,
-        plot.ScatterWeightedPitchSpaceDynamicSymbol,
-        # 3d graphs
-        plot.Plot3DBarsPitchSpaceQuarterLength,
-        # windowed plots
-        plot.WindowedKey,
-        plot.WindowedAmbitus,
-        # instrumentation and part graphs
-        plot.Dolan,
-    ]
-
-    showFormat = ''
-    values = ()
-
-    # can match by format
-    if 'format' in keywords:
-        showFormat = keywords['format']
-    elif 'showFormat' in keywords:
-        showFormat = keywords['showFormat']
-
-    if 'values' in keywords:
-        values = keywords['values'] # should be a tuple or list
-
-    #environLocal.printDebug(['got args pre conversion', args])
-    # if no args, use pianoroll
-    foundClassName = None
-    if (not args 
-            and showFormat == '' 
-            and not values):
-        showFormat = 'horizontalbar'
-        values = 'pitch'
-    elif len(args) == 1:
-        formatCandidate = utilities.userFormatsToFormat(args[0])
-        #environLocal.printDebug(['formatCandidate', formatCandidate])
-        match = False
-        if formatCandidate in utilities.FORMATS:
-            showFormat = formatCandidate
-            values = 'pitch'
-            match = True
-        # if one arg, assume it is a histogram value
-        if formatCandidate in utilities.VALUES:
-            showFormat = 'histogram'
-            values = (args[0],)
-            match = True
-        # permit directly matching the class name
-        if not match:
-            for className in plotClasses:
-                if formatCandidate in str(className).lower():
-                    match = True
-                    foundClassName = className
-                    break
-    elif len(args) > 1:
-        showFormat = utilities.userFormatsToFormat(args[0])
-        values = args[1:] # get all remaining
-    if not common.isListLike(values):
-        values = (values,)
-        
-    # make it mutable
-    values = list(values)
-
-    #environLocal.printDebug(['got args post conversion', 'format', showFormat, 
-    #    'values', values, 'foundClassName', foundClassName])
-
-    # clean data and process synonyms
-    # will return unaltered if no change
-    showFormat = utilities.userFormatsToFormat(showFormat) 
-    values = utilities.userValuesToValues(values)
-    #environLocal.printDebug(['plotStream: format, values', showFormat , values])
-
-    plotMake = []
-    if showFormat.lower() == 'all':
-        plotMake = plotClasses
-    elif foundClassName is not None:
-        plotMake = [foundClassName] # place in a list
-    else:
-        plotMakeCandidates = [] # store pairs of score, class
-        from music21 import stream
-        sDummy = stream.Stream()
-        for plotClassName in plotClasses:
-            # try to match by complete class name
-            pcnStr = plotClassName.__name__.lower()
-            if pcnStr == showFormat.lower():
-                #environLocal.printDebug(['got plot class:', plotClassName])
-                plotMake.append(plotClassName)
-            elif pcnStr.replace('plot', '') == showFormat.lower():
-                plotMake.append(plotClassName)
-            elif pcnStr in utilities.PLOTCLASS_SYNONYMS:
-                syns = utilities.PLOTCLASS_SYNONYMS[pcnStr]
-                for syn in syns:
-                    if syn == showFormat.lower():
-                        plotMake.append(plotClassName)
-                        
-
-            # try direct match of format and values
-            plotClassNameValues = [x.axisLabelDefault.lower().replace(' ', '')
-                                        for x in plotClassName(sDummy).allAxes if x is not None]
-            plotClassNameFormat = plotClassName.graphType.lower()
-            if showFormat and plotClassNameFormat != showFormat.lower():
-                continue
-            #environLocal.printDebug(['matching format', showFormat])
-            # see if a matching set of values is specified
-            # normally plots need to match all values 
-            match = []
-            for requestedValue in values:
-                if requestedValue is None: 
-                    continue
-                if (requestedValue.lower() in plotClassNameValues
-                        and requestedValue not in match):
-                    # do not allow the same value to be requested
-                    match.append(requestedValue)
-                if pcnStr in utilities.PLOTCLASS_SYNONYMS:
-                    syns = utilities.PLOTCLASS_SYNONYMS[pcnStr]
-                    if requestedValue in syns:
-                        match.append(requestedValue)                    
-
-            if len(match) >= len(values):
-                plotMake.append(plotClassName)
-            else:
-                sortTuple = (len(match), plotClassName)
-                plotMakeCandidates.append(sortTuple)
-
-        # if no matches, try something more drastic:
-        if not plotMake and plotMakeCandidates:
-            plotMakeCandidates.sort(key=lambda x: (x[0], x[1].__name__.lower()) )
-            # last in list has highest score; second item is class
-            plotMake.append(plotMakeCandidates[-1][1])
-
-        elif not plotMake: # none to make and no candidates
-            for plotClassName in plotClasses:
-                # create a list of all possible identifiers
-                plotClassIdentifiers = [plotClassName.graphType.lower()]
-                plotClassIdentifiers += [x.axisLabelDefault.lower().replace(' ', '')
-                                         for x in plotClassName(sDummy).allAxes if x is not None]
-                
-                # combine format and values args
-                for requestedValue in [showFormat] + values:
-                    if requestedValue.lower() in plotClassIdentifiers:
-                        plotMake.append(plotClassName)
-                        break
-                if plotMake: # found a match
-                    break
-    #environLocal.printDebug(['plotMake', plotMake])
-    return plotMake
-
-def plotStream(streamObj, *args, **keywords):
+def plotStream(streamObj, 
+               graphFormat=None, 
+               xValue=None, 
+               yValue=None, 
+               zValue=None, 
+               **keywords):
     '''
     Given a stream and any keyword configuration arguments, create and display a plot.
 
@@ -276,10 +109,19 @@ def plotStream(streamObj, *args, **keywords):
         :width: 600
 
     '''
-    plotMake = getPlotsToMake(*args, **keywords)
+    plotMake = findPlot.getPlotsToMake(graphFormat, xValue, yValue, zValue)
     #environLocal.printDebug(['plotClassName found', plotMake])
-    for plotClassName in plotMake:
-        obj = plotClassName(streamObj, *args, **keywords)
+    for plotInfo in plotMake:
+        if not common.isIterable(plotInfo):
+            plotClassName = plotInfo
+            plotDict = None
+        else:
+            plotClassName, plotDict = plotInfo
+        obj = plotClassName(streamObj, **keywords)
+        if plotDict:
+            for axisName, axisClass in plotDict.items():
+                attrName = 'axis' + axisName.upper()
+                setattr(obj, attrName, axisClass(obj, axisName))
         obj.run()
 
         
@@ -368,57 +210,6 @@ class Test(unittest.TestCase):
             s.plot(*args, doneAction=None)
         
 
-    def testGetPlotsToMakeA(self):
-        post = getPlotsToMake(format='grid', values='ambitus')
-        self.assertEqual(post, [plot.WindowedAmbitus])
-        post = getPlotsToMake(format='grid', values='key')
-        self.assertEqual(post, [plot.WindowedKey])
-
-
-        # no args get pitch space piano roll
-        post = getPlotsToMake()
-        self.assertEqual(post, [plot.HorizontalBarPitchSpaceOffset])
-
-        # one arg gives a histogram of that parameters
-        post = getPlotsToMake('duration')
-        self.assertEqual(post, [plot.HistogramQuarterLength])
-        post = getPlotsToMake('quarterLength')
-        self.assertEqual(post, [plot.HistogramQuarterLength])
-        post = getPlotsToMake('ps')
-        self.assertEqual(post, [plot.HistogramPitchSpace])
-        post = getPlotsToMake('pitch')
-        self.assertEqual(post, [plot.HistogramPitchSpace])
-        post = getPlotsToMake('pitchspace')
-        self.assertEqual(post, [plot.HistogramPitchSpace])
-        post = getPlotsToMake('pitchClass')
-        self.assertEqual(post, [plot.HistogramPitchClass])
-
-        post = getPlotsToMake('scatter', 'pitch', 'ql')
-        self.assertEqual(post, [plot.ScatterPitchSpaceQuarterLength])
-
-        post = getPlotsToMake('scatter', 'pc', 'offset')
-        self.assertEqual(post, [plot.ScatterPitchClassOffset])
-
-    def testGetPlotsToMakeB(self):
-        post = getPlotsToMake('dolan')
-        self.assertEqual(post, [plot.Dolan])
-        post = getPlotsToMake(values='instrument')
-        self.assertEqual(post, [plot.Dolan])
-        post = getPlotsToMake(format='horizontalbarweighted')
-        self.assertEqual(post, [plot.Dolan])
-
-#     def testMeasureNumbersA(self):
-#         from music21 import corpus, graph
-#         s = corpus.parse('bwv66.6')
-#         p = graph.PlotHorizontalBarPitchClassOffset(s)
-#         #p.process()
-
-#     def testHorizontalInstrumentationA(self):
-#         s = corpus.parse('symphony94/02')
-#         unused_g = PlotDolan(s, fillByMeasure=False, segmentByTarget=True, 
-#             normalizeByPart = False, title='Haydn, Symphony No. 94 in G major, Movement II',
-#             hideYGrid=True, hideXGrid=True, alpha=1, figureSize=[60,4], dpi=300, )
-
     def testHorizontalInstrumentationB(self):
         from music21 import corpus, dynamics
         s = corpus.parse('bwv66.6')
@@ -432,7 +223,7 @@ class Test(unittest.TestCase):
 
 
 #------------------------------------------------------------------------------
-_DOC_ORDER = [plotStream, getPlotsToMake]
+_DOC_ORDER = [plotStream]
 
 
 #------------------------------------------------------------------------------
@@ -440,7 +231,6 @@ _DOC_ORDER = [plotStream, getPlotsToMake]
 
 if __name__ == "__main__":    
     import music21
-    music21.corpus.parse('bwv66.6').plot('histogram', 'pitch', xHideUnused=False)
     music21.mainTest(Test) #, runTest='testPlot3DPitchSpaceQuarterLengthCount')
 
 #------------------------------------------------------------------------------

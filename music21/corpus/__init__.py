@@ -54,6 +54,8 @@ from music21.corpus import manager
 from music21.corpus import virtual
 from music21.corpus import work
 
+from music21.musicxml import archiveTools
+
 from music21 import environment
 _MOD = "corpus.base.py"
 environLocal = environment.Environment(_MOD)
@@ -341,89 +343,18 @@ def parse(workName,
 def compressAllXMLFiles(deleteOriginal=False):
     '''
     Takes all filenames in corpus.paths and runs
-    :meth:`music21.corpus.compressXML` on each.  If the musicXML files are
+    :meth:`music21.musicxml.archiveTools.compressXML` on each.  If the musicXML files are
     compressed, the originals are deleted from the system.
     '''
     environLocal.warn("Compressing musicXML files...")
     for filename in getPaths(fileExtensions=('.xml',)):
-        compressXML(filename, deleteOriginal=deleteOriginal)
+        archiveTools.compressXML(filename, deleteOriginal=deleteOriginal)
     environLocal.warn(
         'Compression complete. '
         'Run the main test suite, fix bugs if necessary,'
         'and then commit modified directories in corpus.'
         )
 
-
-def compressXML(filename, deleteOriginal=False):
-    '''
-    Takes a filename, and if the filename corresponds to a musicXML file with
-    an .xml extension, creates a corresponding compressed .mxl file in the same
-    directory.
-
-    If deleteOriginal is set to True, the original musicXML file is deleted
-    from the system.
-    '''
-    if not filename.endswith('.xml'):
-        return  # not a musicXML file
-    environLocal.warn("Updating file: {0}".format(filename))
-    filenameList = filename.split(os.path.sep)
-    # find the archive name (name w/out filepath)
-    archivedName = filenameList.pop()
-    # new archive name
-    filenameList.append(archivedName[0:len(archivedName) - 4] + ".mxl")
-    newFilename = os.path.sep.join(filenameList)  # new filename
-    # contents of container.xml file in META-INF folder
-    container = '''<?xml version="1.0" encoding="UTF-8"?>
-<container>
-  <rootfiles>
-    <rootfile full-path="{0}"/>
-  </rootfiles>
-</container>
-    '''.format(archivedName)
-    # Export container and original xml file to system as a compressed XML.
-    with zipfile.ZipFile(
-            newFilename,
-            'w',
-            compression=zipfile.ZIP_DEFLATED,
-            ) as myZip:
-        myZip.write(filename, archivedName)
-        myZip.writestr(
-            'META-INF' + os.path.sep + 'container.xml',
-            container,
-            )
-    # Delete uncompressed xml file from system
-    if deleteOriginal:
-        os.remove(filename)
-
-
-def uncompressMXL(filename, deleteOriginal=False):
-    '''
-    Takes a filename, and if the filename corresponds to a compressed musicXML
-    file with an .mxl extension, creates a corresponding uncompressed .xml file
-    in the same directory.
-
-    If deleteOriginal is set to True, the original compressed musicXML file is
-    deleted from the system.
-    '''
-    if not filename.endswith(".mxl"):
-        return  # not a musicXML file
-    environLocal.warn("Updating file: {0}".format(filename))
-    filenames = filename.split(os.path.sep)
-    # find the archive name (name w/out filepath)
-    archivedName = filenames.pop()
-
-    unarchivedName = os.path.splitext(archivedName)[0] + '.xml'
-    extractPath = os.path.sep.join(filenames)
-    # Export container and original xml file to system as a compressed XML.
-    with zipfile.ZipFile(
-        filename,
-        'r',
-        compression=zipfile.ZIP_DEFLATED,
-        ) as myZip:
-        myZip.extract(member=unarchivedName, path=extractPath)
-    # Delete uncompressed xml file from system
-    if deleteOriginal:
-        os.remove(filename)
 
 
 #------------------------------------------------------------------------------

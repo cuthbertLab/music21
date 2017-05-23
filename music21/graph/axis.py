@@ -19,6 +19,7 @@ from __future__ import division, print_function, absolute_import
 import collections
 import math
 import unittest
+import re
 
 from music21.graph.utilities import accidentalLabelToUnicode, GraphException
 
@@ -71,7 +72,7 @@ class Axis(object):
     
     axisLabelDefault = 'an axis'
     axisDataMap = {'x': 0, 'y': 1, 'z': 2} 
-    quantities = ('one', 'nothing', 'blank')
+    quantities = ('generic', 'one', 'nothing', 'blank')
     
     def __init__(self, client=None, axisName='x'):
         self._client = None
@@ -172,7 +173,27 @@ class Axis(object):
             self.minValue = min(values)
         if self.maxValue is None and values:
             self.maxValue = max(values)
+    
+    def ticks(self):
+        '''
+        Returns a list of tuples where the first element is a float/int of where to
+        put the tick and the second element is the value to put there.
+        '''
+        if self.minValue is not None:
+            minV = int(self.minValue)
+        else:
+            minV = 0
+        
+        if self.maxValue is not None:
+            maxV = int(self.maxValue)
+        else:
+            maxV = 10
             
+        ticks = []
+        for i in range(minV, maxV):
+            ticks.append((i, str(i)))
+        return ticks
+    
     def postProcessData(self, dataList=None):
         '''
         Routine to be called after data has been extracted to 
@@ -196,12 +217,18 @@ class PitchAxis(Axis):
         'hideUnused': '''
             bool on whether not to even show a tick when a pitch doesn't exist.
             default True.
-        ''',
+            ''',
+        'showOctaves': '''
+            bool or 'few' about whether to show octave numbers.  If 'few' then
+            only the first pitch in each octave is shown.  Default 'few'
+            ''',
     }
     axisLabelDefault = 'Pitch'
+    quantities = ('pitchGeneric', )
         
     def __init__(self, client=None, axisName='x'):
         super(PitchAxis, self).__init__(client, axisName)    
+        self.showOctaves = 'few'
         self.showEnharmonic = True
         self.blankLabelUnused = True
         self.hideUnused = True
@@ -253,6 +280,7 @@ class PitchAxis(Axis):
         ticks = []
 
         helperDict = {}
+        octavesSeen = set()
         
         for i in range(int(self.minValue), int(self.maxValue) + 1):
             p = pitch.Pitch()
@@ -284,7 +312,18 @@ class PitchAxis(Axis):
                 for unused_weight, name in weights:
                     sub.append(accidentalLabelToUnicode(name))
                 label = '/'.join(sub)
-                
+            
+            if self.showOctaves is False:
+                label = re.sub(r'\d', '', label)
+            elif self.showOctaves == 'few':
+                matchOctave = re.search(r'\d', label)
+                if matchOctave:
+                    octaveMatch = matchOctave.group(0)
+                    if octaveMatch in octavesSeen:
+                        label = re.sub(r'\d', '', label)
+                    else:
+                        octavesSeen.add(octaveMatch)
+                            
             ticks.append((i, label))
         ticks = self.makePitchLabelsUnicode(ticks)
         return ticks
@@ -296,7 +335,10 @@ class PitchClassAxis(PitchAxis):
     By default, axis is not set from data, but set to 0, 11
     '''
     axisLabelDefault = 'Pitch Class'
+    quantities = ('pitchClass', 'pitchclass', 'pc')
+    
     def __init__(self, client=None, axisName='x'):
+        self.showOctaves = False
         super(PitchClassAxis, self).__init__(client, axisName)    
         self.minValue = 0
         self.maxValue = 11
@@ -426,6 +468,24 @@ class PitchSpaceAxis(PitchAxis):
         22 B♭0
         23 B0
         24 C1
+        >>> ax.showOctaves = False
+        >>> for ps, label in ax.ticks():
+        ...     print(str(ps) + " " + label)
+        20 G♯
+        21 A
+        22 B♭
+        23 B
+        24 C
+        >>> ax.showOctaves = 'few'
+        >>> for ps, label in ax.ticks():
+        ...     print(str(ps) + " " + label)
+        20 G♯0
+        21 A
+        22 B♭
+        23 B
+        24 C1
+        
+        
 
         >>> ax.minValue = 60
         >>> ax.maxValue = 72
@@ -524,7 +584,7 @@ class OffsetAxis(PositionAxis):
         
     }
     axisLabelDefault = 'Offset'
-    quantities = ('offset', 'measure', 'offsets', 'measures')
+    quantities = ('offset', 'measure', 'offsets', 'measures', 'time')
     
     def __init__(self, client=None, axisName='x'):
         super(OffsetAxis, self).__init__(client, axisName)
@@ -971,7 +1031,9 @@ class DynamicsAxis(Axis):
             self.minValue = 0 
             self.maxValue = len(dynamics.shortNames) - 1
         else:
-            return super(DynamicsAxis, self).setBoundariesFromData(values)
+            super(DynamicsAxis, self).setBoundariesFromData(values)
+            self.minValue = int(self.minValue)
+            self.maxValue = int(self.maxValue)
 
     def ticks(self):
         '''
@@ -1022,7 +1084,7 @@ class CountingAxis(Axis):
     }
     
     axisLabelDefault = 'Count'
-    quantities = ('count', 'quantity', 'frequency')
+    quantities = ('count', 'quantity', 'frequency', 'counting')
 
     def __init__(self, client=None, axisName='y'):
         super(CountingAxis, self).__init__(client, axisName)
