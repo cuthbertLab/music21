@@ -14,6 +14,7 @@ Methods for finding appropriate plots for plotStream.
 '''
 from __future__ import division, print_function, absolute_import
 
+import collections
 import types
 import unittest
 
@@ -281,31 +282,30 @@ def getPlotsToMake(graphFormat=None,
     
     >>> graph.findPlot.getPlotsToMake('scatter', 'offset', 'dynamics')
     [(<class 'music21.graph.plot.Scatter'>, 
-      {'x': <class 'music21.graph.axis.OffsetAxis'>, 
-       'y': <class 'music21.graph.axis.DynamicsAxis'>})]
+      OrderedDict([('x', <class 'music21.graph.axis.OffsetAxis'>), 
+                   ('y', <class 'music21.graph.axis.DynamicsAxis'>)]))]
        
        
     Just a couple of values:
     
     >>> graph.findPlot.getPlotsToMake('offset', 'dynamics')
     [(<class 'music21.graph.plot.Scatter'>, 
-      {'x': <class 'music21.graph.axis.OffsetAxis'>, 
-       'y': <class 'music21.graph.axis.DynamicsAxis'>})]
-
+      OrderedDict([('x', <class 'music21.graph.axis.OffsetAxis'>), 
+                   ('y', <class 'music21.graph.axis.DynamicsAxis'>)]))]
 
     Just one value:
     
     >>> graph.findPlot.getPlotsToMake('octave')
     [(<class 'music21.graph.plot.Histogram'>, 
-      {'x': <class 'music21.graph.axis.PitchSpaceOctaveAxis'>})]
+      OrderedDict([('x', <class 'music21.graph.axis.PitchSpaceOctaveAxis'>)]))]
 
     Three values:
 
     >>> graph.findPlot.getPlotsToMake('offset', 'dynamics', 'count')
     [(<class 'music21.graph.plot.ScatterWeighted'>, 
-      {'x': <class 'music21.graph.axis.OffsetAxis'>, 
-       'y': <class 'music21.graph.axis.DynamicsAxis'>,
-       'z': <class 'music21.graph.axis.CountingAxis'>})]
+      OrderedDict([('x', <class 'music21.graph.axis.OffsetAxis'>), 
+                   ('y', <class 'music21.graph.axis.DynamicsAxis'>), 
+                   ('z', <class 'music21.graph.axis.CountingAxis'>)]))]
 
     '''
     def _bestPlotType(graphClassesToChooseFrom):
@@ -384,7 +384,7 @@ def getPlotsToMake(graphFormat=None,
 
     # if still not found, return a dict with the proper axes...
     
-    axisDict = {}    
+    axisDict = collections.OrderedDict()    
     for axisLetter, axisValue in (('x', xValue), ('y', yValue), ('z', zValue)):
         if axisValue is None:
             continue
