@@ -179,7 +179,7 @@ class PlotStreamMixin(object):
 
             if 'Chord' not in el.classes:
                 for i, thisAxis in enumerate(self.allAxes):
-                    axisValue = thisAxis.extractOneElement(el)
+                    axisValue = thisAxis.extractOneElement(el, formatDict)
                     # use isinstance(List) not isiterable, since
                     # extractOneElement can distinguish between a tuple which
                     # represents a single value, or a list of values (or tuples)
@@ -188,7 +188,7 @@ class PlotStreamMixin(object):
                         axisValue = [axisValue]
                     elementValues[i] = axisValue
             else:
-                elementValues = self.extractChordDataMultiAxis(el)
+                elementValues = self.extractChordDataMultiAxis(el, formatDict)
             
             self.postProcessElement(el, formatDict, *elementValues)
             if None in elementValues:
@@ -216,7 +216,7 @@ class PlotStreamMixin(object):
                 
     #---------------------------------------------------------------------------
     @staticmethod
-    def extractChordDataOneAxis(ax, c):
+    def extractChordDataOneAxis(ax, c, formatDict):
         '''
         Look for Note-like attributes in a Chord. This is done by first 
         looking at the Chord, and then, if attributes are not found, looking at each pitch. 
@@ -228,7 +228,7 @@ class PlotStreamMixin(object):
         values = []
         value = None
         try:
-            value = ax.extractOneElement(c)
+            value = ax.extractOneElement(c, formatDict)
         except AttributeError:
             pass # do not try others
         
@@ -240,7 +240,7 @@ class PlotStreamMixin(object):
                 # try to get get values from note inside chords
                 value = None
                 try:
-                    value = ax.extractOneElement(n)
+                    value = ax.extractOneElement(n, formatDict)
                 except AttributeError: # pragma: no cover
                     break # do not try others
  
@@ -248,11 +248,11 @@ class PlotStreamMixin(object):
                     values.append(value)
         return values
 
-    def extractChordDataMultiAxis(self, c):
+    def extractChordDataMultiAxis(self, c, formatDict):
         '''
         Returns a list of lists of values for each axis.
         '''
-        elementValues = [self.extractChordDataOneAxis(ax, c) for ax in self.allAxes]
+        elementValues = [self.extractChordDataOneAxis(ax, c, formatDict) for ax in self.allAxes]
 
         lookIntoChordForNotesGroups = []
         for thisAxis, values in zip(self.allAxes, elementValues):
@@ -262,7 +262,7 @@ class PlotStreamMixin(object):
         for thisAxis, destValues in lookIntoChordForNotesGroups:
             for n in c:
                 try:
-                    target = thisAxis.extractOneElement(n)
+                    target = thisAxis.extractOneElement(n, formatDict)
                 except AttributeError: # pragma: no cover
                     pass # must try others
                 if target is not None:
@@ -1670,7 +1670,7 @@ class Test(unittest.TestCase):
         b = Histogram(stream.Stream(), doneAction=None)
         c = chord.Chord(['b', 'c', 'd'])
         b.axisX = axis.PitchSpaceAxis(b, 'x') # pylint: disable=attribute-defined-outside-init
-        self.assertEqual(b.extractChordDataOneAxis(b.axisX, c), [71, 60, 62])
+        self.assertEqual(b.extractChordDataOneAxis(b.axisX, c, {}), [71, 60, 62])
 
 
         s = stream.Stream()
@@ -1700,7 +1700,7 @@ class Test(unittest.TestCase):
         b.run()
         
         #b.write()
-        self.assertEqual(b.data, [(0.5, 1, {}), (2.0, 1, {})])
+        self.assertEqual(b.data, [(1, 1, {}), (2, 1, {})])
 
 
         # test scatter plots
@@ -1712,11 +1712,11 @@ class Test(unittest.TestCase):
         b.axisY.useLogScale = False
         c = chord.Chord(['b', 'c', 'd'], quarterLength=0.5)
 
-        self.assertEqual(b.extractChordDataMultiAxis(c), 
+        self.assertEqual(b.extractChordDataMultiAxis(c, {}), 
                          [[71, 60, 62], [0.5, 0.5, 0.5]] )
 
         b.matchPitchCountForChords = False
-        self.assertEqual(b.extractChordDataMultiAxis(c), [[71, 60, 62], [0.5]])
+        self.assertEqual(b.extractChordDataMultiAxis(c, {}), [[71, 60, 62], [0.5]])
         # matching the number of pitches for each data point may be needed
 
     def testChordsA2(self):

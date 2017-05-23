@@ -135,7 +135,7 @@ class Axis(object):
         else:
             return c.streamObj
 
-    def extractOneElement(self, n):
+    def extractOneElement(self, n, formatDict):
         '''
         Override in subclasses...
         '''
@@ -343,7 +343,7 @@ class PitchClassAxis(PitchAxis):
         self.minValue = 0
         self.maxValue = 11
 
-    def extractOneElement(self, n):
+    def extractOneElement(self, n, formatDict):
         if hasattr(n, 'pitch'):
             return n.pitch.pitchClass
 
@@ -450,7 +450,7 @@ class PitchSpaceAxis(PitchAxis):
     axisLabelDefault = 'Pitch'
     quantities = ('pitchSpace', 'pitch', 'pitchspace', 'ps')
 
-    def extractOneElement(self, n):
+    def extractOneElement(self, n, formatDict):
         if hasattr(n, 'pitch'):
             return n.pitch.ps
 
@@ -593,7 +593,7 @@ class OffsetAxis(PositionAxis):
         self.offsetStepSize = 10
         self.minMaxMeasureOnly = False
 
-    def extractOneElement(self, n):
+    def extractOneElement(self, n, formatDict):
         return n.getOffsetInHierarchy(self.stream)
         
     @property
@@ -862,7 +862,7 @@ class QuarterLengthAxis(PositionAxis):
         self.useLogScale = True
         self.useDurationNames = False
     
-    def extractOneElement(self, n):
+    def extractOneElement(self, n, formatDict):
         return self.dataFromQL(n.duration.quarterLength)
 
     def dataFromQL(self, ql):
@@ -1005,7 +1005,7 @@ class OffsetEndAxis(OffsetAxis):
         super(OffsetEndAxis, self).__init__(client, axisName)
         self.noteSpacing = self.graceNoteQL
     
-    def extractOneElement(self, n):
+    def extractOneElement(self, n, formatDict):
         off = float(n.getOffsetInHierarchy(self.stream))
         useQL = float(n.duration.quarterLength)
         if useQL < self.graceNoteQL:
