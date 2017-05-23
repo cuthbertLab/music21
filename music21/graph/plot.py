@@ -549,7 +549,7 @@ class Histogram(primitives.GraphHistogram, PlotStreamMixin):
             for i in range(len(self.data)):
                 dataVal = self.data[i]
                 xDataVal = dataVal[0]
-                self.data[i] = (i + 1, *dataVal[1:])
+                self.data[i] = (i + 1,) + dataVal[1:]
                 if xDataVal in xTickDict: # should be there:
                     newTick = (i + 1, xTickDict[xDataVal])
                     xTicksNew.append(newTick)

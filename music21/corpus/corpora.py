@@ -284,7 +284,7 @@ class Corpus(object):
         Search this corpus for metadata entries, returning a metadataBundle
 
         >>> corpus.corpora.CoreCorpus().search('3/4')
-        <music21.metadata.bundles.MetadataBundle {1870 entries}>
+        <music21.metadata.bundles.MetadataBundle {1875 entries}>
 
         >>> corpus.corpora.CoreCorpus().search(
         ...      'bach',
