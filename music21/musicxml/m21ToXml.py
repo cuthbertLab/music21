@@ -2186,7 +2186,7 @@ class PartExporter(XMLExporterBase):
             except exceptions21.StreamException: 
                 pass
         if measureStream.streamStatus.haveTupletBracketsBeenMade() is False:
-            measureStream.makeTupletBrackets(inPlace=True)
+            stream.makeNotation.makeTupletBrackets(measureStream, inPlace=True)
             
         if not self.spannerBundle:
             self.spannerBundle = spanner.SpannerBundle(measureStream.flat)
@@ -2434,11 +2434,13 @@ class MeasureExporter(XMLExporterBase):
         
         if voiceId is not None:
             # return to the beginning of the measure.
-            mxBackup = Element('backup')
-            mxDuration = SubElement(mxBackup, 'duration')
-            mxDuration.text = str(int(round(divisions * self.offsetInMeasure)))
-            # TODO: editorial -- nowhere to store?
-            root.append(mxBackup)
+            amountToBackup = int(round(divisions * self.offsetInMeasure))
+            if amountToBackup:
+                mxBackup = Element('backup')
+                mxDuration = SubElement(mxBackup, 'duration')
+                mxDuration.text = str(amountToBackup)
+                # TODO: editorial -- nowhere to store?
+                root.append(mxBackup)
         self.currentVoiceId = None
 
     def parseOneElement(self, obj):
