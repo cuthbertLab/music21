@@ -219,8 +219,9 @@ class PlotStreamMixin(object):
             return None
 
         elementValueLength = max([len(ev) for ev in elementValues])
-        formatDictList = [formatDict.copy() for _ in range(elementValueLength)]            
-        returnList = list(zip(*elementValues, formatDictList))
+        formatDictList = [formatDict.copy() for _ in range(elementValueLength)]
+        elementValues.append(formatDictList)
+        returnList = list(zip(*elementValues))
         return returnList
     
         
