@@ -209,7 +209,7 @@ def fixTestsForPy2and3(doctestSuite):
 
 ADDRESS = re.compile('0x[0-9A-Fa-f]+')
     
-def stripAddresses(textString, replacement = "ADDRESS"):
+def stripAddresses(textString, replacement="ADDRESS"):
     '''
     Function that changes all memory addresses (pointers) in the given
     textString with (replacement).  This is useful for testing

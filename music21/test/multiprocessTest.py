@@ -59,7 +59,8 @@ def runOneModuleWithoutImp(args):
         environLocal.printDebug(success)
         return ModuleResponse('Skipped', fp, success)
     elif moduleObject == 'notInTree':
-        success = '%s is in the music21 directory but not imported in music21. Skipped -- fix!' % modGath._getNamePeriod(fp)
+        success = ('%s is in the music21 directory but not imported in music21. Skipped -- fix!' % 
+                   modGath._getNamePeriod(fp))
         environLocal.printDebug(success)
         return ModuleResponse("NotInTree", fp, success)
 
@@ -118,7 +119,8 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
     timeStart = time.time()
     poolSize = common.cpus()
 
-    print('Creating %d processes for multiprocessing (omitting %d processors)' % (poolSize, leaveOut))
+    print('Creating %d processes for multiprocessing (omitting %d processors)' 
+            % (poolSize, leaveOut))
     
 
     modGather = commonTest.ModuleGather(useExtended=True)
@@ -221,7 +223,9 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
             otherSummary.append("Untrapped Exception for unknown module: %s" % moduleResponse.fp)
         elif moduleResponse.returnCode == 'TrappedException':
             otherSummary.append("Trapped Exception for module %s, at %s: %s" % 
-                                (moduleResponse.moduleName, moduleResponse.fp, moduleResponse.testRunner))
+                                (moduleResponse.moduleName,
+                                  moduleResponse.fp, 
+                                  moduleResponse.testRunner))
         elif moduleResponse.returnCode == 'LargeException':
             otherSummary.append("Large Exception for file %s: %s" % 
                                 (moduleResponse.fp, moduleResponse.testResult))
@@ -238,12 +242,15 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
                                          moduleResponse.testsRun,
                                          moduleResponse.runTime))
             else:
-                errorsList = moduleResponse.errors # not the original errors list! see pickle note above
+                errorsList = moduleResponse.errors 
+                # not the original errors list! see pickle note above
                 failuresList = moduleResponse.failures
-                errorsFoundSummary.append("\n-----------------------------\n" + 
-                                          "%s had %d ERRORS and %d FAILURES in %d tests after %d seconds:\n-----------------------------\n" 
-                                          % (moduleResponse.moduleName, len(errorsList), 
-                                             len(failuresList), moduleResponse.testsRun, moduleResponse.runTime))
+                errorsFoundSummary.append(
+                    "\n-----------------------------\n" + 
+                    "%s had %d ERRORS and %d FAILURES in %d tests after %d seconds:\n" +
+                    "-----------------------------\n" 
+                    % (moduleResponse.moduleName, len(errorsList), 
+                       len(failuresList), moduleResponse.testsRun, moduleResponse.runTime))
 
                 for e in errorsList:
                     outStr += e + "\n"
