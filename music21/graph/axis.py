@@ -36,7 +36,6 @@ from music21.analysis import pitchAnalysis
 class Axis(object):
     _DOC_ATTR = {
         'axisName': 'the name of the axis.  One of "x" or "y" or for 3D Plots, "z"',
-        'recurse': 'recurse into the stream.  By default this is True',
         'minValue': '''
             None or number representing the axis minimum.  Default None.
             ''',
@@ -70,41 +69,72 @@ class Axis(object):
             '''
     }
     
-    axisLabelDefault = 'an axis'
+    labelDefault = 'an axis'
     axisDataMap = {'x': 0, 'y': 1, 'z': 2} 
     quantities = ('generic', 'one', 'nothing', 'blank')
     
     def __init__(self, client=None, axisName='x'):
+        if isinstance(client, str):
+            raise GraphException('Client must be a PlotStream or None')
         self._client = None
-        self._axisLabel = None
+        self._label = None
         
         self.client = client
         self.axisName = axisName
-        self.recurse = True
         
         self.minValue = None
         self.maxValue = None
-                
-    @property
-    def axisLabel(self):
+    
+    def __repr__(self):
         '''
-        Returns self.axisLabel or class.axisLabelDefault if not set:
+        The representation of the Axis shows the client and the axisName
+        in addition to the class name.
+        
+        >>> s = stream.Stream()
+        >>> plot = graph.plot.ScatterPitchClassQuarterLength(s)
+        >>> plot.axisX
+        <music21.graph.axis.QuarterLengthAxis: x axis for ScatterPitchClassQuarterLength>
+        
+        >>> plot.axisY
+        <music21.graph.axis.PitchClassAxis: y axis for ScatterPitchClassQuarterLength>
+        
+        >>> axIsolated = graph.axis.DynamicsAxis(axisName='z')
+        >>> axIsolated
+        <music21.graph.axis.DynamicsAxis: z axis for (no client)>
+        '''
+        c = self.client
+        if c:
+            clientName = c.__class__.__name__
+        else:
+            clientName = '(no client)'
+        
+        return '<{0}.{1}: {2} axis for {3}>'.format(
+            self.__class__.__module__,
+            self.__class__.__name__,
+            self.axisName,
+            clientName
+            )
+    
+    @property
+    def label(self):
+        '''
+        Returns self.label or class.labelDefault if not set:
         
         >>> ax = graph.axis.Axis(axisName='y')
-        >>> ax.axisLabel
+        >>> ax.label
         'an axis'
-        >>> ax.axisLabel = 'velocity'
-        >>> ax.axisLabel
+        >>> ax.label = 'velocity'
+        >>> ax.label
         'velocity'
         '''
-        if self._axisLabel is not None:
-            return self._axisLabel
+        if self._label is not None:
+            return self._label
         else:
-            return self.axisLabelDefault
+            return self.labelDefault
 
-    @axisLabel.setter
-    def axisLabel(self, value):
-        self._axisLabel = value
+    @label.setter
+    def label(self, value):
+        self._label = value
 
     @property
     def client(self):
@@ -118,9 +148,8 @@ class Axis(object):
         return common.unwrapWeakref(self._client)
 
     @client.setter
-    def client(self, referent):        
+    def client(self, referent):
         self._client = common.wrapWeakref(referent)
-
 
     @property
     def stream(self):
@@ -176,22 +205,60 @@ class Axis(object):
     
     def ticks(self):
         '''
-        Returns a list of tuples where the first element is a float/int of where to
-        put the tick and the second element is the value to put there.
-        '''
-        if self.minValue is not None:
-            minV = int(self.minValue)
-        else:
-            minV = 0
+        Get a set of ticks for this data.  Used by several numeric axes
+        to make a reasonable number of ticks.
         
-        if self.maxValue is not None:
-            maxV = int(self.maxValue)
-        else:
+        >>> cax = graph.axis.Axis()
+        >>> cax.minValue = 1
+        >>> cax.maxValue = 9
+        >>> cax.ticks()
+        [(0, '0'), (1, '1'), (2, '2'), (3, '3'), (4, '4'), 
+         (5, '5'), (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10')]
+        
+        For larger data, the ticks are farther apart.
+        
+        >>> cax.minValue = 7
+        >>> cax.maxValue = 80
+        >>> cax.ticks()
+        [(0, '0'), (10, '10'), (20, '20'), (30, '30'), (40, '40'), 
+         (50, '50'), (60, '60'), (70, '70'), (80, '80'), (90, '90')]
+
+        >>> cax.minValue = 712
+        >>> cax.maxValue = 2213
+        >>> cax.ticks()
+        [(600, '600'), (700, '700'), (800, '800'), (900, '900'), (1000, '1000'), 
+         (1100, '1100'), (1200, '1200'), (1300, '1300'), (1400, '1400'), (1500, '1500'), 
+         (1600, '1600'), (1700, '1700'), (1800, '1800'), (1900, '1900'), (2000, '2000'), 
+         (2100, '2100'), (2200, '2200'), (2300, '2300')]
+        '''
+        minV = self.minValue
+        maxV = self.maxValue
+        if minV is None:
+            minV = 0
+        if maxV is None:
             maxV = 10
-            
+
+        difference = maxV - minV
+        if difference == 0:
+            log10distance = 0
+        else:
+            log10distance = int(math.log10(maxV - minV))
+
+        closest10 = 10 ** log10distance # closest power of 10 that is smaller than the difference
+        if closest10 > 1 and (difference / closest10) <= 2: # min three steps
+            closest10 = int(closest10 / 10)
+        
+        startValue = (int(minV / closest10) - 1) * closest10
+        if startValue < 0 and minV >= 0:
+            startValue = 0
+        
+        stopValue =  (int(maxV / closest10) + 2) * closest10
+        steps = range(startValue, stopValue, closest10)
+        
+        
         ticks = []
-        for i in range(minV, maxV):
-            ticks.append((i, str(i)))
+        for tickNum in steps:
+            ticks.append((tickNum, str(tickNum)))
         return ticks
     
     def postProcessData(self, dataList=None):
@@ -223,7 +290,7 @@ class PitchAxis(Axis):
             only the first pitch in each octave is shown.  Default 'few'
             ''',
     }
-    axisLabelDefault = 'Pitch'
+    labelDefault = 'Pitch'
     quantities = ('pitchGeneric', )
         
     def __init__(self, client=None, axisName='x'):
@@ -334,7 +401,7 @@ class PitchClassAxis(PitchAxis):
     
     By default, axis is not set from data, but set to 0, 11
     '''
-    axisLabelDefault = 'Pitch Class'
+    labelDefault = 'Pitch Class'
     quantities = ('pitchClass', 'pitchclass', 'pc')
     
     def __init__(self, client=None, axisName='x'):
@@ -447,7 +514,7 @@ class PitchSpaceAxis(PitchAxis):
     '''
     Axis subclass for dealing with PitchSpace (MIDI numbers...)
     '''
-    axisLabelDefault = 'Pitch'
+    labelDefault = 'Pitch'
     quantities = ('pitchSpace', 'pitch', 'pitchspace', 'ps')
 
     def extractOneElement(self, n, formatDict):
@@ -510,7 +577,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
     '''
     An axis similar to pitch classes, but just shows the octaves    
     '''
-    axisLabelDefault = 'Octave'
+    labelDefault = 'Octave'
     quantities = ('octave', 'octaves')
 
     def __init__(self, client=None, axisName='x'):
@@ -554,7 +621,7 @@ class PositionAxis(Axis):
         ''',
     }
 
-    axisLabelDefault = 'Position'
+    labelDefault = 'Position'
     quantities = ('position', 'positions')
     
     def __init__(self, client=None, axisName='x'):
@@ -583,7 +650,7 @@ class OffsetAxis(PositionAxis):
             ''',
         
     }
-    axisLabelDefault = 'Offset'
+    labelDefault = 'Offset'
     quantities = ('offset', 'measure', 'offsets', 'measures', 'time')
     
     def __init__(self, client=None, axisName='x'):
@@ -597,19 +664,19 @@ class OffsetAxis(PositionAxis):
         return n.getOffsetInHierarchy(self.stream)
         
     @property
-    def axisLabel(self):
+    def label(self):
         '''
         Return an axis label for measure or offset, depending on if measures are available.
         
         >>> a = graph.axis.OffsetAxis()
-        >>> a.axisLabel
+        >>> a.label
         'Offset'
         >>> a.useMeasures = True
-        >>> a.axisLabel
+        >>> a.label
         'Measure Number'
         '''
-        if self._axisLabel is not None:
-            return self._axisLabel
+        if self._label is not None:
+            return self._label
         
         useMeasures = self.useMeasures
         if useMeasures is None:
@@ -620,9 +687,9 @@ class OffsetAxis(PositionAxis):
         else:
             return 'Offset'
 
-    @axisLabel.setter
-    def axisLabel(self, value):
-        self._axisLabel = value
+    @label.setter
+    def label(self, value):
+        self._label = value
 
     def setBoundariesFromData(self, values=None):
         try:
@@ -854,7 +921,7 @@ class QuarterLengthAxis(PositionAxis):
         ''',
     }
     
-    axisLabelDefault = 'Quarter Length'
+    labelDefault = 'Quarter Length'
     quantities = ('quarterLength', 'ql', 'quarterlengths', 'durations', 'duration')
     
     def __init__(self, client=None, axisName='x'):
@@ -922,12 +989,12 @@ class QuarterLengthAxis(PositionAxis):
         s = self.stream
         if not s:
             return []
-        elif self.recurse:
+        elif self.client.recurse:
             sSrc = s.recurse()
         else:
             sSrc = s.iter
         
-        sSrc = sSrc.getElementsByClass(['Note', 'Chord'])
+        sSrc = sSrc.getElementsByClass(self.client.classFilterList)
         # get all quarter lengths
         mapping = elementAnalysis.attributeCount(sSrc, 'quarterLength')
 
@@ -941,7 +1008,7 @@ class QuarterLengthAxis(PositionAxis):
             ticks.append((x, label))
         return ticks
 
-    def axisLabelLogTag(self):
+    def labelLogTag(self):
         '''
         Returns a TeX formatted tag to the axis label depending on whether
         the scale is logrithmic or not.  Checks `.useLogScale`
@@ -949,15 +1016,15 @@ class QuarterLengthAxis(PositionAxis):
         >>> a = graph.axis.QuarterLengthAxis()
         >>> a.useLogScale
         True
-        >>> a.axisLabelLogTag()
+        >>> a.labelLogTag()
         ' ($log_2$)'
         
         >>> a.useLogScale = False
-        >>> a.axisLabelLogTag()
+        >>> a.labelLogTag()
         ''
         
         >>> a.useLogScale = 10
-        >>> a.axisLabelLogTag()
+        >>> a.labelLogTag()
         ' ($log_10$)'
         '''
         if self.useLogScale is False:
@@ -968,12 +1035,12 @@ class QuarterLengthAxis(PositionAxis):
             return ' ($log_{:d}$)'.format(self.useLogScale)
 
     @property
-    def axisLabel(self):
-        return super(QuarterLengthAxis, self).axisLabel + self.axisLabelLogTag()
+    def label(self):
+        return super(QuarterLengthAxis, self).label + self.labelLogTag()
 
-    @axisLabel.setter
-    def axisLabel(self, value):
-        super(QuarterLengthAxis, self).axisLabel = value
+    @label.setter
+    def label(self, value):
+        super(QuarterLengthAxis, self).label = value
 
     def remapQuarterLength(self, x):
         '''
@@ -1023,7 +1090,7 @@ class DynamicsAxis(Axis):
     '''
     Axis subclass for dealing with Dynamics
     '''
-    axisLabelDefault = 'Dynamic'
+    labelDefault = 'Dynamic'
     quantities = ('dynamic', 'dynamics', 'volume')
         
     def setBoundariesFromData(self, values=None):
@@ -1083,7 +1150,7 @@ class CountingAxis(Axis):
             ''',
     }
     
-    axisLabelDefault = 'Count'
+    labelDefault = 'Count'
     quantities = ('count', 'quantity', 'frequency', 'counting')
 
     def __init__(self, client=None, axisName='y'):
@@ -1092,9 +1159,7 @@ class CountingAxis(Axis):
         
     def postProcessData(self):
         '''
-        Replace client.data with a list that only includes each key once.
-        
-        Unfortunately, currently loses all formatting data...
+        Replace client.data with a list that only includes each key once.        
         '''
         client = self.client
         if client is None:
@@ -1109,8 +1174,20 @@ class CountingAxis(Axis):
         thisIndex = self.axisDataMap[self.axisName]
         selector = itemgetter(*axesIndices)
         relevantData = [selector(innerTuple) for innerTuple in client.data]
+        
+        # all the format dicts will soon be smooshed, so get all the data from it:
+        tupleFormatDict = {}
+        for dataPoint in client.data:
+            dataIndex = selector(dataPoint)
+            formatDict = dataPoint[-1]
+            if not isinstance(formatDict, dict):
+                continue
+            if dataIndex in tupleFormatDict: # already saw one:
+                tupleFormatDict[dataIndex].update(formatDict)
+            else:
+                tupleFormatDict[dataIndex] = formatDict
 
-        counter = collections.Counter(tuple(relevantData))
+        counter = collections.Counter(relevantData)
         
         newClientData = []
         for counterKey in counter:
@@ -1121,73 +1198,34 @@ class CountingAxis(Axis):
             else: # single axesIndices means the counterKey will not be a tuple:
                 innerList[axesIndices[0]] = counterKey
             innerList[thisIndex] = counter[counterKey]
-            newClientData.append(tuple(innerList) + ({},))
+            formatDict = tupleFormatDict.get(counterKey, {})
+            newClientData.append(tuple(innerList) + (formatDict,))
         
         client.data = sorted(newClientData)
         return client.data
-        
-        
-    def ticks(self):
-        '''
-        Get a set of ticks for this data
-        
-        >>> cax = graph.axis.CountingAxis()
-        >>> cax.minValue = 1
-        >>> cax.maxValue = 9
-        >>> cax.ticks()
-        [(0, '0'), (1, '1'), (2, '2'), (3, '3'), (4, '4'), 
-         (5, '5'), (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10')]
-        
-        For larger data, the ticks are farther apart.
-        
-        >>> cax.minValue = 7
-        >>> cax.maxValue = 80
-        >>> cax.ticks()
-        [(0, '0'), (10, '10'), (20, '20'), (30, '30'), (40, '40'), 
-         (50, '50'), (60, '60'), (70, '70'), (80, '80'), (90, '90')]
-
-        >>> cax.minValue = 712
-        >>> cax.maxValue = 2213
-        >>> cax.ticks()
-        [(600, '600'), (700, '700'), (800, '800'), (900, '900'), (1000, '1000'), 
-         (1100, '1100'), (1200, '1200'), (1300, '1300'), (1400, '1400'), (1500, '1500'), 
-         (1600, '1600'), (1700, '1700'), (1800, '1800'), (1900, '1900'), (2000, '2000'), 
-         (2100, '2100'), (2200, '2200'), (2300, '2300')]
-        '''
-        minV = self.minValue
-        maxV = self.maxValue
-        if minV is None:
-            minV = 0
-        if maxV is None:
-            maxV = 10
-
-        difference = maxV - minV
-        if difference == 0:
-            log10distance = 0
-        else:
-            log10distance = int(math.log10(maxV - minV))
-
-        closest10 = 10 ** log10distance # closest power of 10 that is smaller than the difference
-        if closest10 > 1 and (difference / closest10) <= 2: # min three steps
-            closest10 = int(closest10 / 10)
-        
-        startValue = (int(minV / closest10) - 1) * closest10
-        if startValue < 0 and minV >= 0:
-            startValue = 0
-        
-        stopValue =  (int(maxV / closest10) + 2) * closest10
-        steps = range(startValue, stopValue, closest10)
-        
-        
-        ticks = []
-        for tickNum in steps:
-            ticks.append((tickNum, str(tickNum)))
-        return ticks
+      
 
 
 #------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-    pass
+    
+    def testCountingAxisFormat(self):
+        def countingAxisFormatter(n, formatDict):
+            if n.pitch.accidental is not None:
+                formatDict['color'] = 'red'
+            return n.pitch.diatonicNoteNum # 
+
+        from music21.graph.plot import Histogram
+        from music21 import converter
+        s = converter.parse('tinynotation: 4/4 C4 D E F C D# E F#')
+        hist = Histogram(s)
+        hist.doneAction = None
+        hist.axisX = Axis(hist, 'x')
+        hist.axisX.extractOneElement = countingAxisFormatter
+        hist.run()
+        self.assertEqual(hist.data, 
+                         [(1, 2, {}), (2, 2, {'color': 'red'}), 
+                          (3, 2, {}), (4, 2, {'color': 'red'})])
 
 class TestExternal(unittest.TestCase):
     pass

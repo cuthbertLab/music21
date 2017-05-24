@@ -53,8 +53,9 @@ class Graph(object):
 
     The keyword arguments can be provided for configuration are: 
 
-    *    doneAction (see below), 
-    *    alpha (which describes how transparent elements of the graph are), 
+    *    doneAction (see below)
+    *    alpha (which describes how transparent elements of the graph are)
+    *    dpi
     *    colorBackgroundData
     *    colorBackgroundFigure
     *    colorGrid, 
@@ -66,6 +67,9 @@ class Graph(object):
     *    titleFontSize 
     *    labelFontSize 
     *    fontFamily
+    *    hideXGrid
+    *    hideYGrid
+    *    xTickLabelRotation
     *    marker
     *    markersize
 
@@ -306,9 +310,12 @@ class Graph(object):
         
         self.axisRangeHasBeenSet[axisKey] = True
 
-    def setAxisLabel(self, axisKey, label):
+    def setAxisLabel(self, axisKey, label, conditional=False):
         if axisKey not in self.axisKeys: # pragma: no cover
             raise GraphException('No such axis exists: %s' % axisKey)
+        if conditional and 'label' in self.axis[axisKey] and self.axis[axisKey]['label']:
+            return
+        
         self.axis[axisKey]['label'] = label
 
     @staticmethod
@@ -353,7 +360,7 @@ class Graph(object):
         # this sets the color of the main data presentation window
         rect.set_facecolor(getColor(self.colorBackgroundData))
         # this does not do anything yet
-        # rect.set_edgecolor(getColor('red'))
+        # rect.set_edgecolor(getColor(self.colorBackgroundFigure))
 
         for axis in self.axisKeys:
             self.applyFormattingToOneAxis(subplot, axis)
@@ -480,7 +487,9 @@ class Graph(object):
         plt = extm.plt
 
         # figure size can be set w/ figsize=(5, 10)
-        self.figure = plt.figure()
+        if self.doneAction is None:
+            extm.matplotlib.interactive(False)
+        self.figure = plt.figure(facecolor=self.colorBackgroundFigure)
         self.subplot = self.figure.add_subplot(1, 1, 1)
 
         self._dataColorIndex = 0 # just for consistent rendering if run twice
@@ -491,6 +500,9 @@ class Graph(object):
         self.hideAxisSpines(self.subplot, leftBottom=self.hideLeftBottomSpines)
         self.applyFormatting(self.subplot)
         self.callDoneAction()
+        if self.doneAction is None:
+            extm.matplotlib.interactive(False)
+
 
     def renderSubplot(self, subplot):
         '''
@@ -525,19 +537,19 @@ class Graph(object):
         if fp is None:
             fp = environLocal.getTempFile('.png')
 
-        if self.dpi is not None:
-            self.figure.savefig(fp, 
-                             facecolor=getColor(self.colorBackgroundFigure),      
-                             edgecolor=getColor(self.colorBackgroundFigure),
-                             dpi=self.dpi)
-        else:
-            self.figure.savefig(fp, 
-                             facecolor=getColor(self.colorBackgroundFigure),      
-                             edgecolor=getColor(self.colorBackgroundFigure),
-                             dpi=300)
+        dpi = self.dpi
+        if dpi is None:
+            dpi = 300
+
+        self.figure.savefig(fp, 
+                         #facecolor=getColor(self.colorBackgroundData),      
+                         #edgecolor=getColor(self.colorBackgroundFigure),
+                         dpi=dpi)
 
         if common.runningUnderIPython() is not True:
             environLocal.launch('png', fp)
+        else:
+            return self.figure
 
 
 class GraphNetworxGraph(Graph):
@@ -1544,19 +1556,25 @@ class Graph3DBars(Graph):
         for dataPoint in self.data:
             if len(dataPoint) == 3:
                 x, y, z = dataPoint
+                formatDict = {}
             elif len(dataPoint) > 3:
-                x, y, z, unused_formatDict = dataPoint
+                x, y, z, formatDict = dataPoint
             else:
                 raise GraphException("Cannot plot a point with fewer than 3 values")
             
+            if 'color' in formatDict:
+                color = formatDict['color']
+            else:
+                color = self.nextColor()
+            
             subplot.bar3d(x - (barWidth / 2), y - (barDepth / 2), 0, 
                           barWidth, barDepth, z, 
-                          self.nextColor(),
+                          color=color,
                           alpha=self.alpha)
 
-        self.setAxisLabel('x', 'x')
-        self.setAxisLabel('y', 'y')
-        self.setAxisLabel('z', 'z')
+        self.setAxisLabel('x', 'x', conditional=True)
+        self.setAxisLabel('y', 'y', conditional=True)
+        self.setAxisLabel('z', 'z', conditional=True)
         
 
 

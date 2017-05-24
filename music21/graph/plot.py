@@ -65,12 +65,12 @@ class PlotStreamMixin(object):
     '''
     axesClasses = {'x': axis.Axis, 'y': axis.Axis}
     
-    def __init__(self, streamObj, flatten=True, *args, **keywords):
+    def __init__(self, streamObj=None, recurse=True, *args, **keywords):
         #if not isinstance(streamObj, music21.stream.Stream):
         if streamObj is not None and not hasattr(streamObj, 'elements'): # pragma: no cover
             raise PlotStreamException('non-stream provided as argument: %s' % streamObj)
         self.streamObj = streamObj
-        self.flatten = flatten
+        self.recurse = recurse
         self.classFilterList = ['Note', 'Chord']
         self.matchPitchCountForChords = True
         
@@ -83,6 +83,42 @@ class PlotStreamMixin(object):
         
         self.savedKeywords = keywords
         
+    def __repr__(self):
+        '''
+        The representation of the Plot shows the stream repr
+        in addition to the class name.
+        
+        >>> s = stream.Stream()
+        >>> s.id = 'empty'
+        >>> plot = graph.plot.ScatterPitchClassQuarterLength(s)
+        >>> plot
+        <music21.graph.plot.ScatterPitchClassQuarterLength for <music21.stream.Stream empty>>
+        
+        >>> plot = graph.plot.ScatterPitchClassQuarterLength(None)
+        >>> plot
+        <music21.graph.plot.ScatterPitchClassQuarterLength for (no stream)>
+
+        >>> plot.axisX
+        <music21.graph.axis.QuarterLengthAxis: x axis for ScatterPitchClassQuarterLength>
+        
+        >>> plot.axisY
+        <music21.graph.axis.PitchClassAxis: y axis for ScatterPitchClassQuarterLength>
+        
+        >>> axIsolated = graph.axis.DynamicsAxis(axisName='z')
+        >>> axIsolated
+        <music21.graph.axis.DynamicsAxis: z axis for (no client)>
+        '''
+        s = self.streamObj
+        if s is not None: # not "if s" because could be empty
+            streamName = repr(s)
+        else:
+            streamName = '(no stream)'
+        
+        return '<{0}.{1} for {2}>'.format(
+            self.__class__.__module__,
+            self.__class__.__name__,
+            streamName
+            )
 
     @property
     def allAxes(self):
@@ -94,8 +130,8 @@ class PlotStreamMixin(object):
         >>> s = stream.Stream()
         >>> p = graph.plot.ScatterPitchClassOffset(s)
         >>> p.allAxes
-        [<music21.graph.axis.OffsetAxis object at 0x108e534a8>, 
-         <music21.graph.axis.PitchClassAxis object at 0x108e530f0>]
+        [<music21.graph.axis.OffsetAxis: x axis for ScatterPitchClassOffset>, 
+         <music21.graph.axis.PitchClassAxis: y axis for ScatterPitchClassOffset>]
         '''
         allAxesList = []
         for axisName in ('axisX', 'axisY', 'axisZ'):
@@ -112,10 +148,10 @@ class PlotStreamMixin(object):
         self.extractData()
         if hasattr(self, 'axisY') and self.axisY:
             self.setTicks('y', self.axisY.ticks())
-            self.setAxisLabel('y', self.axisY.axisLabel)
+            self.setAxisLabel('y', self.axisY.label)
         if hasattr(self, 'axisX') and self.axisX:
             self.setTicks('x', self.axisX.ticks())
-            self.setAxisLabel('x', self.axisX.axisLabel)
+            self.setAxisLabel('x', self.axisX.label)
         
         self.process()
 
@@ -160,7 +196,7 @@ class PlotStreamMixin(object):
         if None in self.allAxes:
             raise PlotStreamException("Set all axes before calling extractData() via run()")
         
-        if self.flatten:
+        if self.recurse:
             sIter = self.streamObj.recurse()
         else:
             sIter = self.streamObj.iter
@@ -355,7 +391,7 @@ class PlotStreamMixin(object):
 #-------------------------------------------------------------------------------
 
 class PlotStream(primitives.Graph, PlotStreamMixin):
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         primitives.Graph.__init__(self, *args, **keywords)
         PlotStreamMixin.__init__(self, streamObj, **keywords)
 
@@ -369,7 +405,7 @@ class Scatter(primitives.GraphScatter, PlotStreamMixin):
     '''
     Base class for 2D scatter plots.
     '''
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         primitives.GraphScatter.__init__(self, *args, **keywords)
         PlotStreamMixin.__init__(self, streamObj, **keywords)
 
@@ -378,10 +414,9 @@ class ScatterPitchSpaceQuarterLength(Scatter):
     r'''A scatter plot of pitch space and quarter length
 
     
-    >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
-    >>> p = graph.plot.ScatterPitchSpaceQuarterLength(s, doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
-    >>> #_DOCS_SHOW p = graph.plot.ScatterPitchSpaceQuarterLength(s)
+    >>> s = corpus.parse('bach/bwv324.xml')
+    >>> p = graph.plot.ScatterPitchSpaceQuarterLength(s) 
+    >>> p.doneAction = None #_DOCS_HIDE
     >>> p.id
     'scatter-quarterLength-pitchSpace'
     >>> p.run()
@@ -392,7 +427,7 @@ class ScatterPitchSpaceQuarterLength(Scatter):
     axesClasses = {'x': axis.QuarterLengthAxis, 
                    'y': axis.PitchSpaceAxis}
     
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         super(ScatterPitchSpaceQuarterLength, self).__init__(streamObj, *args, **keywords)
         self.axisX.useLogScale = True
         # need more space for pitch axis labels
@@ -421,7 +456,7 @@ class ScatterPitchClassQuarterLength(ScatterPitchSpaceQuarterLength):
     axesClasses = {'x': axis.QuarterLengthAxis, 
                    'y': axis.PitchClassAxis}
 
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         super(ScatterPitchClassQuarterLength, self).__init__(streamObj, *args, **keywords)
         if 'title' not in keywords:
             self.title = 'Pitch Class by Quarter Length Scatter'
@@ -444,7 +479,7 @@ class ScatterPitchClassOffset(Scatter):
     axesClasses = {'x': axis.OffsetAxis, 
                    'y': axis.PitchClassAxis}
 
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         super(ScatterPitchClassOffset, self).__init__(streamObj, *args, **keywords)
         
         # need more space for pitch axis labels
@@ -476,7 +511,7 @@ class ScatterPitchSpaceDynamicSymbol(Scatter):
     axesClasses = {'x': axis.PitchSpaceAxis, 
                    'y': axis.DynamicsAxis}
     
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         super(ScatterPitchSpaceDynamicSymbol, self).__init__(streamObj, *args, **keywords)
 
         self.axisX.showEnharmonic = False
@@ -513,7 +548,7 @@ class Histogram(primitives.GraphHistogram, PlotStreamMixin):
     '''
     axesClasses = {'x': axis.Axis, 'y': axis.CountingAxis}
     
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         primitives.GraphHistogram.__init__(self, *args, **keywords)
         PlotStreamMixin.__init__(self, streamObj, **keywords)
 
@@ -529,8 +564,8 @@ class Histogram(primitives.GraphHistogram, PlotStreamMixin):
         self.setTicks('y', self.axisY.ticks())
         xTicksNew = self.remapXTicksData() 
         self.setTicks('x', xTicksNew)
-        self.setAxisLabel('y', self.axisY.axisLabel)
-        self.setAxisLabel('x', self.axisX.axisLabel)
+        self.setAxisLabel('y', self.axisY.label)
+        self.setAxisLabel('x', self.axisX.label)
         
         self.process()
 
@@ -585,7 +620,7 @@ class HistogramPitchSpace(Histogram):
     '''
     axesClasses = _mergeDicts(Histogram.axesClasses, {'x': axis.PitchSpaceAxis})
 
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         super(HistogramPitchSpace, self).__init__(streamObj, *args, **keywords)
         self.axisX.showEnharmonic = False
         # need more space for pitch axis labels
@@ -612,7 +647,7 @@ class HistogramPitchClass(Histogram):
     '''
     axesClasses = _mergeDicts(Histogram.axesClasses, {'x': axis.PitchClassAxis})
 
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         super(HistogramPitchClass, self).__init__(streamObj, *args, **keywords)
         self.axisX.showEnharmonic = False
         if 'title' not in keywords:
@@ -638,7 +673,7 @@ class HistogramQuarterLength(Histogram):
     '''
     axesClasses = _mergeDicts(Histogram.axesClasses, {'x': axis.QuarterLengthAxis})
 
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         super(HistogramQuarterLength, self).__init__(streamObj, *args, **keywords)
         self.axisX = axis.QuarterLengthAxis(self, 'x')
         self.axisX.useLogScale = False
@@ -658,7 +693,7 @@ class ScatterWeighted(primitives.GraphScatterWeighted, PlotStreamMixin):
     '''
     axesClasses = {'x': axis.Axis, 'y': axis.Axis, 'z': axis.CountingAxis}
 
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         primitives.GraphScatterWeighted.__init__(self, *args, **keywords)
         PlotStreamMixin.__init__(self, streamObj, **keywords)
         
@@ -681,7 +716,7 @@ class ScatterWeightedPitchSpaceQuarterLength(ScatterWeighted):
     axesClasses = _mergeDicts(ScatterWeighted.axesClasses, {'x': axis.QuarterLengthAxis,
                                                             'y': axis.PitchSpaceAxis})
 
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         super(ScatterWeightedPitchSpaceQuarterLength, self).__init__(
                                                 streamObj, *args, **keywords)
         # need more space for pitch axis labels
@@ -710,7 +745,7 @@ class ScatterWeightedPitchClassQuarterLength(ScatterWeighted):
     axesClasses = _mergeDicts(ScatterWeighted.axesClasses, {'x': axis.QuarterLengthAxis,
                                                             'y': axis.PitchClassAxis})
 
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         super(ScatterWeightedPitchClassQuarterLength, self).__init__(
                                                             streamObj, *args, **keywords)
 
@@ -743,7 +778,7 @@ class ScatterWeightedPitchSpaceDynamicSymbol(ScatterWeighted):
                                                             'y': axis.DynamicsAxis,
                                                             })
     
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         super(ScatterWeightedPitchSpaceDynamicSymbol, self).__init__(
                                                 streamObj, *args, **keywords)
 
@@ -795,7 +830,7 @@ class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
     axesClasses = {'x': axis.OffsetAxis, 'y': None}
     processorClassDefault = discrete.KrumhanslSchmuckler
     
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         self.processorClass = self.processorClassDefault # a discrete processor class.
         self._processor = None
         
@@ -839,7 +874,7 @@ class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
         environLocal.printDebug(['xTicks', xTicks])
         self.setTicks('x', xTicks)
         self.setAxisLabel('y', 'Window Size\n(Quarter Lengths)')
-        self.setAxisLabel('x', 'Windows (%s Span)' % self.axisX.axisLabel)
+        self.setAxisLabel('x', 'Windows (%s Span)' % self.axisX.label)
         
         self.graphLegend = self._getLegend()
         self.process()
@@ -939,7 +974,7 @@ class WindowedKey(WindowedAnalysis):
     '''
     processorClassDefault = discrete.KrumhanslSchmuckler
     
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         super(WindowedKey, self).__init__(streamObj, *args, **keywords)
     
 
@@ -960,7 +995,7 @@ class WindowedAmbitus(WindowedAnalysis):
     '''
     processorClassDefault = discrete.Ambitus
     
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         # provide the stream to both the window and processor in this case
         super(WindowedAmbitus, self).__init__(streamObj, *args, **keywords)
         
@@ -974,7 +1009,7 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
     '''
     axesClasses = {'x': axis.OffsetEndAxis, 'y': axis.PitchSpaceAxis}
 
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         primitives.GraphHorizontalBar.__init__(self, *args, **keywords)
         PlotStreamMixin.__init__(self, streamObj, **keywords)
 
@@ -1023,7 +1058,7 @@ class HorizontalBarPitchClassOffset(HorizontalBar):
     '''
     axesClasses = _mergeDicts(HorizontalBar.axesClasses, {'y': axis.PitchClassAxis})
     
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         super(HorizontalBarPitchClassOffset, self).__init__(streamObj, *args, **keywords)
         self.axisY = axis.PitchClassAxis(self, 'y')
         self.axisY.hideUnused = False
@@ -1048,7 +1083,7 @@ class HorizontalBarPitchSpaceOffset(HorizontalBar):
     .. image:: images/HorizontalBarPitchSpaceOffset.*
         :width: 600
     '''    
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         super(HorizontalBarPitchSpaceOffset, self).__init__(streamObj, *args, **keywords)
 
         if 'figureSize' not in keywords:
@@ -1071,7 +1106,7 @@ class HorizontalBarWeighted(primitives.GraphHorizontalBarWeighted, PlotStreamMix
         'fillByMeasure', 'segmentByTarget', 'normalizeByPart', 'partGroups')
 
     
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         self.fillByMeasure = False
         self.segmentByTarget = True
         self.normalizeByPart = False
@@ -1146,7 +1181,7 @@ class Dolan(HorizontalBarWeighted):
         :width: 600
 
     '''
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         super(Dolan, self).__init__(streamObj, *args, **keywords)
 
         #self.fy = lambda n: n.pitch.pitchClass
@@ -1159,7 +1194,7 @@ class Dolan(HorizontalBarWeighted):
             
         if 'title' not in keywords:
             self.title = 'Instrumentation'
-            if self.streamObj.metadata is not None:
+            if self.streamObj and self.streamObj.metadata is not None:
                 if self.streamObj.metadata.title is not None:
                     self.title = self.streamObj.metadata.title
         if 'hideYGrid' not in keywords:
@@ -1173,7 +1208,8 @@ class Dolan(HorizontalBarWeighted):
         '''
         if self.partGroups is not None:
             return # keep what the user set
-
+        if self.streamObj is None:
+            return None
         instStream = self.streamObj.flat.getElementsByClass('Instrument')
         if not instStream:
             return # do not set anything
@@ -1236,7 +1272,7 @@ class Plot3DBars(primitives.Graph3DBars, PlotStreamMixin):
                    'y': axis.PitchClassAxis,
                    'z': axis.CountingAxis,}
     
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         primitives.Graph3DBars.__init__(self, *args, **keywords)
         PlotStreamMixin.__init__(self, streamObj, **keywords)
 
@@ -1262,7 +1298,7 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
     '''
     axesClasses = _mergeDicts(Plot3DBars.axesClasses, {'y': axis.PitchSpaceAxis})
 
-    def __init__(self, streamObj, *args, **keywords):
+    def __init__(self, streamObj=None, *args, **keywords):
         super(Plot3DBarsPitchSpaceQuarterLength, self).__init__(streamObj, *args, **keywords)
         
         # need more space for pitch axis labels
@@ -1288,8 +1324,6 @@ class MultiStream(primitives.GraphGroupedVerticalBar, PlotStreamMixin):
         '''
         Provide a list of Streams as an argument. Optionally 
         provide an additional list of labels for each list. 
-        
-        If `flatten` is True, the Streams will automatically be flattened.
         '''
         primitives.GraphGroupedVerticalBar.__init__(self, *args, **keywords)
         PlotStreamMixin.__init__(self, None)
@@ -1581,7 +1615,8 @@ class Test(unittest.TestCase):
    
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
+        '''
+        Test copying all objects defined in this module
         '''
         import sys, types, copy
         for part in sys.modules[self.__module__].__dict__:

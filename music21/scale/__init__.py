@@ -622,7 +622,7 @@ class AbstractScale(Scale):
         # import is here to avoid import of matplotlib problems
         from music21 import graph
         # first ordered arg can be method type
-        g = graph.GraphNetworxGraph(networkxGraph=self.networkxGraph, *args, **keywords)
+        g = graph.primitives.GraphNetworxGraph(networkxGraph=self.networkxGraph, *args, **keywords)
             # for pitched version
             #networkxGraph=self._getNetworkxRealizedGraph(pitchObj=pitchObj, 
             #    nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch))

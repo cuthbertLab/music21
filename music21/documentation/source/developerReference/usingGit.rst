@@ -311,7 +311,7 @@ packages, type ``no`` and press Enter.
 ..  image:: images/usingEclipse/saynotosavingmusic21.png
     :width: 650
 
-See :ref:`environment` for more information on configuring user settings.
+See :ref:`usersGuide_24_environment` for more information on configuring user settings.
 Otherwise, head to: :ref:`What is Music21? <what>` for further demos and
 tutorials on using music21.
 

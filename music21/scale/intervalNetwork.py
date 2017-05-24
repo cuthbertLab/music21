@@ -2227,7 +2227,7 @@ class IntervalNetwork(object):
         # import is here to avoid import of matplotlib problems
         from music21 import graph
         # first ordered arg can be method type
-        g = graph.GraphNetworxGraph( 
+        g = graph.primitives.GraphNetworxGraph( 
             networkxGraph=self.getNetworkxGraph())
 
             #networkxGraph=self._getNetworkxRealizedGraph(pitchObj=pitchObj, 
