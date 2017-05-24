@@ -1163,7 +1163,7 @@ class UserSettings(object):
         # this will accept localCorpusPath
         if key in self._environment.getKeysToPaths():
             # try to expand user if found; otherwise return unaltered
-            if value is not None:
+            if value is not None and value != '/skip':
                 value = os.path.expanduser(value)
                 if not os.path.exists(value):
                     raise UserSettingsException(

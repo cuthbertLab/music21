@@ -487,8 +487,8 @@ class Graph(object):
         plt = extm.plt
 
         # figure size can be set w/ figsize=(5, 10)
-        if self.doneAction is None:
-            extm.matplotlib.interactive(False)
+#         if self.doneAction is None:
+#             extm.matplotlib.interactive(False)
         self.figure = plt.figure(facecolor=self.colorBackgroundFigure)
         self.subplot = self.figure.add_subplot(1, 1, 1)
 
@@ -500,8 +500,8 @@ class Graph(object):
         self.hideAxisSpines(self.subplot, leftBottom=self.hideLeftBottomSpines)
         self.applyFormatting(self.subplot)
         self.callDoneAction()
-        if self.doneAction is None:
-            extm.matplotlib.interactive(False)
+#         if self.doneAction is None:
+#             extm.matplotlib.interactive(False)
 
 
     def renderSubplot(self, subplot):

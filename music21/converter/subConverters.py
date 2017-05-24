@@ -344,6 +344,11 @@ class ConverterIPython(SubConverter):
                                               subformats=helperSubformats, **keywords)
         
                 if helperSubformats[0] == 'png':
+                    if environLocal['musescoreDirectPNGPath'] == '/skip':
+                        fp = (common.getSourceFilePath() + os.sep + 'documentation'
+                              + os.sep + 'source' + os.sep + 'installing'
+                              + os.sep + 'images' + os.sep + 'macScreenShowText.png')
+
                     ipo = ipythonObjects.IPythonPNGObject(fp)
                     display(Image(data=ipo.getData(), retina=True))
 
@@ -847,7 +852,9 @@ class ConverterMusicXML(SubConverter):
             defaults.author = savedDefaultAuthor
 
         
-        if subformats is not None and ('png' in subformats or 'pdf' in subformats):
+        if (subformats is not None 
+                and ('png' in subformats or 'pdf' in subformats)
+                and environLocal['musescoreDirectPNGPath'] != '/skip'):
             fp = self.runThroughMusescore(fp, subformats, **keywords)
             
         return fp
