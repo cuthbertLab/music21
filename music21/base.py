@@ -142,7 +142,17 @@ if _missingImport:
         header='music21:')
 del _useImportLib
 
-
+if six.PY2:
+    from textwrap import dedent
+    if environLocal['warnings'] in (1, '1', True):
+        environLocal.warn(dedent('''
+        Music21 v.4 is the last version that will support Python 2.
+        Please start using Python 3 instead.
+        
+        Set music21.environment.UserSettings()['warnings'] = 0
+        to disable this message.
+        '''), header='')    
+    del dedent
 
 class Music21ObjectException(exceptions21.Music21Exception):
     pass
