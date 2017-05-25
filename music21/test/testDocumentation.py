@@ -28,6 +28,7 @@ from docutils.core import publish_doctree
 
 from music21.exceptions21 import Music21Exception
 from music21.test import testRunner
+from music21.test import nbvalNotebook
 
 
 ModTuple = namedtuple('ModTuple', 'module fullModulePath moduleNoExtension autoGen')
@@ -186,6 +187,8 @@ def getDocumentationFiles(runOne=False):
     return allModules
 
 def main(runOne=False):
+    if runOne is False:
+        nbvalNotebook.runAll()
     totalTests = 0
     totalFailures = 0
     

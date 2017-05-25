@@ -344,13 +344,16 @@ class ConverterIPython(SubConverter):
                                               subformats=helperSubformats, **keywords)
         
                 if helperSubformats[0] == 'png':
-                    if environLocal['musescoreDirectPNGPath'] == '/skip':
-                        fp = (common.getSourceFilePath() + os.sep + 'documentation'
-                              + os.sep + 'source' + os.sep + 'installing'
-                              + os.sep + 'images' + os.sep + 'macScreenShowText.png')
-
-                    ipo = ipythonObjects.IPythonPNGObject(fp)
-                    display(Image(data=ipo.getData(), retina=True))
+                    if environLocal['musescoreDirectPNGPath'] != '/skip':
+                        ipo = ipythonObjects.IPythonPNGObject(fp)
+                        display(Image(data=ipo.getData(), retina=True))
+                    else:
+                        # smallest transparent pixel
+                        import base64
+                        pngData64 = (b'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA' 
+                                     + b'6fptVAAAACklEQVQYV2P4DwABAQEAWk1v8QAAAABJRU5ErkJggg==')
+                        pngData = base64.b64decode(pngData64)
+                        display(Image(data=pngData, retina=True))
 
             defaults.title = savedDefaultTitle
             defaults.author = savedDefaultAuthor
@@ -446,6 +449,14 @@ class ConverterBraille(SubConverter):
     registerFormats = ('braille',)
     registerOutputExtensions = ('txt',)
     codecWrite = True
+
+    def show(self, obj, fmt, app=None, subformats=None, **keywords):
+        if not common.runningUnderIPython():
+            super(ConverterBraille, self).show(obj, fmt, app=None, subformats=None, **keywords)
+        else:
+            from music21 import braille
+            dataStr = braille.translate.objectToBraille(obj)
+            print(dataStr)
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):
         from music21 import braille

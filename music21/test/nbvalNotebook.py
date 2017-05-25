@@ -12,25 +12,43 @@ import nbval # @UnusedImport
 import os
 
 # pytest --nbval usersGuide_15_key.ipynb --sanitize-with ../../nbval-sanitize.cfg -q
-skip = ['usersGuide_90_musicxmlTest.ipynb']
+skip = ['usersGuide_90_musicxmlTest.ipynb', 'installJupyter.ipynb']
 
 def runAll():
-    pass
+    sourcePath = common.getSourceFilePath() + os.sep + 'documentation' + os.sep + 'source' 
+    for innerDir in ('about', 'developerReference', 'installing', 'moduleReference',
+                     'tutorials', 'usersGuide'):
+    
+        fullDir = sourcePath + os.sep + innerDir
+        allFiles = os.listdir(fullDir)
+        for f in allFiles:
+            if not f.endswith('ipynb'):
+                continue
+            if f in skip:
+                continue
+            print(innerDir + os.sep + f)
+            try:
+                retVal = runOne(fullDir + os.sep + f)
+            except KeyboardInterrupt:
+                break
+            
+            if retVal == 512:
+                return None
 
 def runOne(nbFile):
     us = environment.UserSettings()
     museScore = us['musescoreDirectPNGPath']
     us['musescoreDirectPNGPath'] = '/skip'
     try:
-        _ = input('skip: ')
-        os.system('pytest --nbval ' + nbFile + ' --sanitize-with '
+        retVal = os.system('pytest --nbval ' + nbFile + ' --sanitize-with '
                   + common.getSourceFilePath() + os.sep + 'documentation' + os.sep
                   + 'nbval-sanitize.cfg -q')
-    except Exception:
+    except (Exception, KeyboardInterrupt):
         raise
     finally:
         us['musescoreDirectPNGPath'] = museScore
         
+    return retVal        
     '/Applications/MuseScore 2.app/Contents/MacOS/mscore'
         
 

@@ -6,6 +6,7 @@ __all__ = [
     'coverageM21',
     'commonTest',
     'dedent',
+    'nbvalNotebook',
     'testDocumentation', 
     'testExternal', 
     'testPerformance', 
