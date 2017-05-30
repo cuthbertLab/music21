@@ -1505,6 +1505,9 @@ class ChordSymbol(Harmony):
     ### PRIVATE METHODS ###
 
     def _adjustOctaves(self, pitches):
+        if not isinstance(pitches, list):
+            pitches = list(pitches)
+        
         #do this for all ninth, thirteenth, and eleventh chords...
         #this must be done to get octave spacing right
         #possibly rewrite figured bass function with this integrated????....
@@ -1524,10 +1527,11 @@ class ChordSymbol(Harmony):
             pitches[5] = pitch.Pitch(pitches[5].name + str(pitches[5].octave + 1))
         else:
             return pitches
+        
         c = chord.Chord(pitches)
         c = c.sortDiatonicAscending()
 
-        return c.pitches
+        return list(c.pitches)
 
     def _adjustPitchesForChordStepModifications(self, pitches):
         '''
@@ -1971,7 +1975,7 @@ class ChordSymbol(Harmony):
                 temp = str(thisPitch.name) + str((thisPitch.octave + 1))
                 pitches[i] = pitch.Pitch(temp)
 
-        self.pitches = pitches
+        self.pitches = tuple(pitches)
         self.sortDiatonicAscending(inPlace=True)
 
     ### PUBLIC METHODS ###
@@ -2462,10 +2466,11 @@ class TestExternal(unittest.TestCase):
         excerpt = score.measures(2, 3)
         
         # remove passing and/or neighbor tones?
-        theoryAnalyzer.removePassingTones(excerpt)
-        theoryAnalyzer.removeNeighborTones(excerpt)
+        analyzer = theoryAnalyzer.Analyzer()
+        analyzer.removePassingTones(excerpt)
+        analyzer.removeNeighborTones(excerpt)
     
-        slices = theoryAnalyzer.getVerticalities(excerpt)
+        slices = analyzer.getVerticalities(excerpt)
         for vs in slices:
             x = harmony.chordSymbolFigureFromChord(vs.getChord())
             if x  != 'Chord Symbol Cannot Be Identified':
