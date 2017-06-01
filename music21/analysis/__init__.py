@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 __ALL__ = ['correlate',  'discrete', 'elements',
-           'floatingKey', 'metrical', 'neoRiemannian', 
-           'patel', 'pitchAnalysis', 
+           'floatingKey', 'metrical', 'neoRiemannian',
+           'patel', 'pitchAnalysis',
            'reduceChords', 'reduceChordsOld', 'reduction', 'windowed',
            'AnalysisException']
 
-# this is necessary to get these names available with a 
+# this is necessary to get these names available with a
 # from music21 import * import statement
 from music21.analysis import correlate
 from music21.analysis import discrete

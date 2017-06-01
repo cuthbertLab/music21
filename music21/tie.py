@@ -48,12 +48,12 @@ class Tie(SlottedObjectMixin):
     True
 
     Differences from MusicXML:
-    
+
     *  notes do not need to know if they are tied from a
        previous note.  i.e., you can tie n1 to n2 just with
        a tie start on n1.  However, if you want proper musicXML output
        you need a tie stop on n2.
-    
+
     *  one tie with "continue" implies tied from and tied to.
 
     The tie.style only applies to ties of type 'start' or 'continue' (and then
@@ -77,7 +77,7 @@ class Tie(SlottedObjectMixin):
 
     __slots__ = (
         'placement',
-        'style',        
+        'style',
         'type',
         )
 
@@ -88,7 +88,7 @@ class Tie(SlottedObjectMixin):
         if type not in ('start', 'stop', 'continue'):
             raise TieException("Type must be one of 'start', 'stop', or 'continue', not %s" % type)
         # naming this "type" was a mistake, because cannot create a property of this name.
-        
+
         self.type = type
         self.style = "normal"
         self.placement = None # = unknown, can be 'above' or 'below'

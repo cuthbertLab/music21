@@ -25,9 +25,9 @@ environLocal = environment.Environment(__file__)
 class StreamStatus(SlottedObjectMixin):
     '''
     An object that stores the current notation state for the client stream.
-    
+
     Separates out tasks such as whether notation has been made, etc.
-    
+
     >>> s = stream.Stream()
     >>> ss = s.streamStatus
     >>> ss
@@ -41,7 +41,7 @@ class StreamStatus(SlottedObjectMixin):
     >>> ss2 = copy.deepcopy(ss)
     >>> ss2.client is None
     True
-    
+
     >>> s2 = copy.deepcopy(s)
     >>> s2.streamStatus
     <music21.stream.streamStatus.StreamStatus object at 0x...>
@@ -86,7 +86,7 @@ class StreamStatus(SlottedObjectMixin):
     ## SPECIAL METHODS ###
     def __deepcopy__(self, memo=None):
         '''
-        Manage deepcopying by creating a new reference to the same object. 
+        Manage deepcopying by creating a new reference to the same object.
         leaving out the client
         '''
         new = type(self)()
@@ -95,7 +95,7 @@ class StreamStatus(SlottedObjectMixin):
                 new._client = None
             else:
                 setattr(new, x, getattr(self, x))
-            
+
         return new
 
 
@@ -136,14 +136,14 @@ class StreamStatus(SlottedObjectMixin):
             if n.beams is not None and n.beams.beamsList:
                 return True
         return False
-    
+
     def haveTupletBracketsBeenMade(self):
         '''
         If any GeneralNote in this Stream is a tuplet, then check to
         see if any of them have a first Tuplet with type besides None
         return True. Otherwise return False if there is a tuplet. Return None if
         no Tuplets.
-        
+
         >>> s = stream.Stream()
         >>> s.streamStatus.haveTupletBracketsBeenMade() is None
         True
@@ -157,7 +157,7 @@ class StreamStatus(SlottedObjectMixin):
         >>> n.duration.tuplets[0].type = 'start'
         >>> s.streamStatus.haveTupletBracketsBeenMade()
         True
-        
+
         '''
         foundTuplet = False
         for n in self.client.recurse(classFilter='GeneralNote', restoreActiveSites=False):
@@ -175,7 +175,7 @@ class StreamStatus(SlottedObjectMixin):
     @property
     def client(self):
         return common.unwrapWeakref(self._client)
-    
+
     @client.setter
     def client(self, client):
         # client is the Stream that this status lives on

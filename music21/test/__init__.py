@@ -7,11 +7,11 @@ __all__ = [
     'commonTest',
     'dedent',
     'nbvalNotebook',
-    'testDocumentation', 
-    'testExternal', 
-    'testPerformance', 
+    'testDocumentation',
+    'testExternal',
+    'testPerformance',
     'testRunner',
-    'timeGraphs', 
+    'timeGraphs',
     'testStream',
     ]
 

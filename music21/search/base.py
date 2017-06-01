@@ -25,7 +25,7 @@ class WildcardDuration(duration.Duration):
     a wildcard duration (it might define a duration
     in itself, but the methods here will see that it
     is a wildcard of some sort)
-    
+
     TODO: Write
     '''
     pass
@@ -36,12 +36,12 @@ class Wildcard(m21Base.Music21Object):
     matches a single object in a music21 stream.  Equivalent to the
     regular expression "."
 
-    
+
     >>> wc1 = search.Wildcard()
     >>> wc1.pitch = pitch.Pitch("C")
     >>> st1 = stream.Stream()
     >>> st1.append(note.Note("D", type='half'))
-    >>> st1.append(wc1)    
+    >>> st1.append(wc1)
     '''
     def __init__(self):
         m21Base.Music21Object.__init__(self)
@@ -55,11 +55,11 @@ def rhythmicSearch(thisStream, searchStream):
 
     searches are made based on quarterLength.
     thus an dotted sixteenth-note and a quadruplet (4:3) eighth
-    will match each other.    
-    
+    will match each other.
+
     Example 1: First we will set up a simple stream for searching:
-    
-    
+
+
     >>> thisStream = converter.parse("tinynotation: 3/4 c4. d8 e4 g4. a8 f4. c4.").flat
     >>> thisStream.show('text')
     {0.0} <music21.clef.TrebleClef>
@@ -70,11 +70,11 @@ def rhythmicSearch(thisStream, searchStream):
     {3.0} <music21.note.Note G>
     {4.5} <music21.note.Note A>
     {5.0} <music21.note.Note F>
-    {6.5} <music21.note.Note C>    
+    {6.5} <music21.note.Note C>
     {8.0} <music21.bar.Barline style=final>
-        
+
     Now we will search for all dotted-quarter/eighth elements in the Stream:
-    
+
     >>> searchStream1 = stream.Stream()
     >>> searchStream1.append(note.Note(quarterLength = 1.5))
     >>> searchStream1.append(note.Note(quarterLength = .5))
@@ -84,14 +84,14 @@ def rhythmicSearch(thisStream, searchStream):
     >>> stream.Stream(thisStream[5:7]).show('text')
     {3.0} <music21.note.Note G>
     {4.5} <music21.note.Note A>
-    
-    
-    Slightly more advanced search: we will look for any instances of eighth, 
-    followed by a note (or other element) of any length, followed by a dotted quarter 
+
+
+    Slightly more advanced search: we will look for any instances of eighth,
+    followed by a note (or other element) of any length, followed by a dotted quarter
     note.  Again, we will find two instances; this time we will tag them both with
     a TextExpression of "*" and then show the original stream:
-    
-    
+
+
     >>> searchStream2 = stream.Stream()
     >>> searchStream2.append(note.Note(quarterLength = .5))
     >>> searchStream2.append(search.Wildcard())
@@ -102,12 +102,12 @@ def rhythmicSearch(thisStream, searchStream):
     >>> for found in l:
     ...     thisStream[found].lyric = "*"
     >>> #_DOCS_SHOW thisStream.show()
-    
-    
+
+
     .. image:: images/searchRhythmic1.*
         :width: 221
 
-    
+
     Now we can test the search on a real dataset and show the types
     of preparation that are needed to make it most likely a success.
     We will look through the first movement of Corelli Trio Sonata op. 3 no. 1 (F major)
@@ -115,8 +115,8 @@ def rhythmicSearch(thisStream, searchStream):
     is than the second (eighth, anything, dotted-quarter).  In fact, my hypothesis
     was wrong, and the second term is actually more common than the first! (n.b. rests
     are being counted here as well as notes)
-    
-    
+
+
     >>> grave = corpus.parse('corelli/opus3no1/1grave')
     >>> term1results = []
     >>> term2results = []
@@ -132,19 +132,19 @@ def rhythmicSearch(thisStream, searchStream):
     [5, 29, 95]
     >>> float(len(term1results))/len(term2results)
     8.0
-    
-    
+
+
     OMIT_FROM_DOCS
-    
+
     >>> s = stream.Stream()
     >>> search.rhythmicSearch(pf, s)
     Traceback (most recent call last):
     music21.search.base.SearchException: the search Stream cannot be empty
-    
+
     why doesn't this work?  thisStream[found].expressions.append(expressions.TextExpression("*"))
-    
+
     '''
-    
+
     searchLength = len(searchStream)
     if searchLength == 0:
         raise SearchException('the search Stream cannot be empty')
@@ -157,7 +157,7 @@ def rhythmicSearch(thisStream, searchStream):
             #x = searchStream[j].duration
             if "WildcardDuration" in searchStream[j].duration.classes:
                 continue
-            elif searchStream[j].duration.quarterLength != thisStream[start + 
+            elif searchStream[j].duration.quarterLength != thisStream[start +
                                                                       j].duration.quarterLength:
                 foundException = True
                 break
@@ -172,7 +172,7 @@ def approximateNoteSearch(thisStream, otherStreams):
     well it matches)
 
 
-    
+
     >>> s = converter.parse("tinynotation: 4/4 c4 d8 e16 FF a'4 b-")
     >>> o1 = converter.parse("tinynotation: 4/4 c4 d8 e GG a' b-4")
     >>> o1.id = 'o1'
@@ -211,7 +211,7 @@ def approximateNoteSearchNoRhythm(thisStream, otherStreams):
     well it matches)
 
 
-    
+
     >>> s = converter.parse("tinynotation: 4/4 c4 d8 e16 FF a'4 b-")
     >>> o1 = converter.parse("tinynotation: 4/4 c4 d8 e GG a' b-4")
     >>> o1.id = 'o1'
@@ -249,7 +249,7 @@ def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
     well it matches)
 
 
-    
+
     >>> s = converter.parse("tinynotation: 4/4 c4 d8 e16 FF a'4 b-")
     >>> o1 = converter.parse("tinynotation: 4/4 c4 d8 e GG a' b-4")
     >>> o1.id = 'o1'
@@ -286,7 +286,7 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
     well it matches)
 
 
-    
+
     >>> s = converter.parse("tinynotation: 4/4 c4 d8 e16 FF a'4 b-")
     >>> o1 = converter.parse("tinynotation: 4/4 c4 d8 e GG2 a' b-4")
     >>> o1.id = 'o1'
@@ -307,21 +307,21 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
     isJunk = None
     n = thisStream.flat.notesAndRests.stream()
     thisStreamStrPitches = translateStreamToStringNoRhythm(n)
-    thisStreamStrDuration = translateStreamToStringOnlyRhythm(n)   
+    thisStreamStrDuration = translateStreamToStringOnlyRhythm(n)
 #    print "notes",thisStreamStrPitches
-#    print "rhythm",thisStreamStrDuration 
+#    print "rhythm",thisStreamStrDuration
     sorterList = []
     for s in otherStreams:
         sn = s.flat.notesAndRests
         thatStreamStrPitches = translateStreamToStringNoRhythm(sn)
         thatStreamStrDuration = translateStreamToStringOnlyRhythm(sn)
 #        print "notes2",thatStreamStrPitches
-#        print "rhythm2",thatStreamStrDuration 
-        ratioPitches = difflib.SequenceMatcher(isJunk, 
-                                               thisStreamStrPitches, 
+#        print "rhythm2",thatStreamStrDuration
+        ratioPitches = difflib.SequenceMatcher(isJunk,
+                                               thisStreamStrPitches,
                                                thatStreamStrPitches).ratio()
-        ratioDuration = difflib.SequenceMatcher(isJunk, 
-                                                thisStreamStrDuration, 
+        ratioDuration = difflib.SequenceMatcher(isJunk,
+                                                thisStreamStrDuration,
                                                 thatStreamStrDuration).ratio()
         ratio = (3*ratioPitches+ratioDuration)/4.0
         s.matchProbability = ratio
@@ -336,14 +336,14 @@ def translateStreamToString(inputStreamOrIterator, returnMeasures=False):
     '''
     takes a stream (or streamIterator) of notesAndRests only and returns
     a string for searching on.
-    
-    
+
+
     >>> s = converter.parse("tinynotation: 3/4 c4 d8 r16 FF8. a'8 b-2.")
     >>> sn = s.flat.notesAndRests
     >>> streamString = search.translateStreamToString(sn)
     >>> print(streamString)
     <P>F<)KQFF_
-    >>> len(streamString)  
+    >>> len(streamString)
     12
     '''
     b = ''
@@ -363,28 +363,28 @@ def translateDiatonicStreamToString(inputStreamOrIterator, returnMeasures=False)
     encoding only the .step (no accidental or octave) and whether
     the note is slower, faster, or the same speed as the previous
     note.
-    
-    Skips all but the first note of tie. Skips multiple rests in a row 
-    
+
+    Skips all but the first note of tie. Skips multiple rests in a row
+
     Each note gets one byte:
-    
+
     A-G = note of same length as previous
     H-N = note of longer length than previous
     O-U = note of shorter length than previous
     Z = rest
-    
-    
+
+
     >>> s = converter.parse("tinynotation: 3/4 c4 d8~ d16 r16 FF8 F#8 a'8 b-2.")
     >>> streamString = search.translateDiatonicStreamToString(s.recurse().notesAndRests)
     >>> print(streamString)
     CRZFFAI
     >>> len(streamString)
     7
-    
+
     If returnMeasures is True, returns an array of measureNumbers where each entry represents
     the measure number of the measure of the object at that character position :
-    
-    >>> streamString2, measures = search.translateDiatonicStreamToString(s.recurse().notesAndRests, 
+
+    >>> streamString2, measures = search.translateDiatonicStreamToString(s.recurse().notesAndRests,
     ...                                    returnMeasures=True)
     >>> streamString == streamString2
     True
@@ -428,7 +428,7 @@ def translateDiatonicStreamToString(inputStreamOrIterator, returnMeasures=False)
         newName = chr(ord(n.pitches[0].step) + ascShift)
         measures.append(mNum)
         b.append(newName)
-    
+
     joined = ''.join(b)
     if returnMeasures is False:
         return joined
@@ -441,12 +441,12 @@ def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
     encoding only the chromatic distance from the last note and whether
     the note is slower, faster, or the same speed as the previous
     note.
-    
-    Skips all but the first note of tie. Skips multiple rests in a row 
-    
+
+    Skips all but the first note of tie. Skips multiple rests in a row
+
     Each note gets one byte and encodes up from -13 to 13 (all notes > octave are 13 or -13)
-        
-    
+
+
     >>> s = converter.parse("tinynotation: 3/4 c4 d8~ d16 r16 F8 F#8 a'8 b-2.")
     >>> sn = s.flat.notesAndRests.stream()
     >>> streamString = search.translateIntervalsAndSpeed(sn)
@@ -454,13 +454,13 @@ def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
     Ib RH<9
     >>> len(streamString)
     7
-    
+
     If returnLastTuple is True, returns a triplet of whether the last note
     was a rest, whether the last note was tied, what the last quarterLength was, and what the
     last pitches' midi number was
-    
+
     which can be fed back into this algorithm:
-    
+
     >>> streamString2, measures = search.translateIntervalsAndSpeed(sn, returnMeasures=True)
     >>> streamString == streamString2
     True
@@ -469,7 +469,7 @@ def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
     '''
     b = []
     measures = []
-    
+
     previousRest = False
     previousTie = False
     previousQL = None
@@ -478,7 +478,7 @@ def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
         if n.isNote:
             previousMidi = n.pitches[0].midi
             break
-                
+
     for n in inputStream:
         mNum = None
         if returnMeasures:
@@ -516,7 +516,7 @@ def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
         newName = chr(32 + pitchDifference + ascShift)
         measures.append(mNum)
         b.append(newName)
-    
+
     joined = ''.join(b)
     if returnMeasures is False:
         return joined
@@ -528,7 +528,7 @@ def translateStreamToStringNoRhythm(inputStream, returnMeasures=False):
     '''
     takes a stream or streamIterator of notesAndRests only and returns
     a string for searching on, using translateNoteToByte.
-    
+
     >>> s = converter.parse("tinynotation: 4/4 c4 d e FF a' b-")
     >>> sn = s.flat.notesAndRests
     >>> search.translateStreamToStringNoRhythm(sn)
@@ -544,20 +544,20 @@ def translateStreamToStringNoRhythm(inputStream, returnMeasures=False):
         return (b, measures)
     else:
         return b
-  
-  
+
+
 def translateStreamToStringOnlyRhythm(inputStream, returnMeasures=False):
     '''
     takes a stream or streamIterator of notesAndRests only and returns
     a string for searching on.
-    
-    
+
+
     >>> s = converter.parse("tinynotation: 3/4 c4 d8 e16 FF8. a'8 b-2.")
     >>> sn = s.flat.notesAndRests
     >>> streamString = search.translateStreamToStringOnlyRhythm(sn)
     >>> print(streamString)
     PF<KF_
-    >>> len(streamString)  
+    >>> len(streamString)
     6
     '''
     b = ''
@@ -571,19 +571,19 @@ def translateStreamToStringOnlyRhythm(inputStream, returnMeasures=False):
     else:
         return b
 
-  
+
 def translateNoteToByte(n):
     '''
     takes a note.Note object and translates it to a single byte representation.
 
     currently returns the chr() for the note's midi number. or chr(127) for rests
-    
-    
+
+
     >>> n = note.Note("C4")
     >>> b = search.translateNoteToByte(n)
     >>> b
     '<'
-    >>> ord(b) 
+    >>> ord(b)
     60
     >>> ord(b) == n.pitch.midi
     True
@@ -603,12 +603,12 @@ def translateNoteToByte(n):
 def translateNoteWithDurationToBytes(n, includeTieByte=True):
     '''
     takes a note.Note object and translates it to a three-byte representation.
-    
+
     currently returns the chr() for the note's midi number. or chr(127) for rests
     followed by the log of the quarter length (fitted to 1-127, see formula below)
     followed by 's', 'c', or 'e' if includeTieByte is True and there is a tie
 
-    
+
     >>> n = note.Note("C4")
     >>> n.duration.quarterLength = 3  # dotted half
     >>> trans = search.translateNoteWithDurationToBytes(n)
@@ -616,7 +616,7 @@ def translateNoteWithDurationToBytes(n, includeTieByte=True):
     '<_'
     >>> (2**(ord(trans[1])/10.0))/256  # approximately 3
     2.828...
-    
+
     >>> n.tie = tie.Tie('stop')
     >>> trans = search.translateNoteWithDurationToBytes(n)
     >>> trans
@@ -626,7 +626,7 @@ def translateNoteWithDurationToBytes(n, includeTieByte=True):
     >>> trans
     '<_'
 
-    
+
     '''
     firstByte = translateNoteToByte(n)
     duration1to127 = int(math.log(n.duration.quarterLength * 256, 2)*10)
@@ -635,7 +635,7 @@ def translateNoteWithDurationToBytes(n, includeTieByte=True):
     elif duration1to127 == 0:
         duration1to127 = 1
     secondByte = chr(duration1to127)
-    
+
     thirdByte = translateNoteTieToByte(n)
     if includeTieByte is True:
         return firstByte + secondByte + thirdByte
@@ -647,20 +647,20 @@ def translateNoteTieToByte(n):
     takes a note.Note object and returns a one-byte representation
     of its tie status.
     's' if start tie, 'e' if stop tie, 'c' if continue tie, and '' if no tie
-    
-    
+
+
     >>> n = note.Note("E")
     >>> search.translateNoteTieToByte(n)
     ''
-    
+
     >>> n.tie = tie.Tie("start")
     >>> search.translateNoteTieToByte(n)
     's'
-    
+
     >>> n.tie.type = 'continue'
     >>> search.translateNoteTieToByte(n)
     'c'
-    
+
     >>> n.tie.type = 'stop'
     >>> search.translateNoteTieToByte(n)
     'e'
@@ -683,7 +683,7 @@ def translateDurationToBytes(n):
     currently returns the chr() for the note's midi number. or chr(127) for rests
     followed by the log of the quarter length (fitted to 1-127, see formula below)
 
-    
+
     >>> n = note.Note("C4")
     >>> n.duration.quarterLength = 3  # dotted half
     >>> trans = search.translateDurationToBytes(n)
@@ -691,7 +691,7 @@ def translateDurationToBytes(n):
     '_'
     >>> (2**(ord(trans[0])/10.0))/256  # approximately 3
     2.828...
-    
+
     '''
     duration1to127 = int(math.log(n.duration.quarterLength * 256, 2)*10)
     if duration1to127 >= 127:
@@ -700,28 +700,28 @@ def translateDurationToBytes(n):
         duration1to127 = 1
     secondByte = chr(duration1to127)
     return secondByte
-    
+
 
 #--------------------
 
 def mostCommonMeasureRythms(streamIn, transposeDiatonic = False):
     '''
-    returns a sorted list of dictionaries 
+    returns a sorted list of dictionaries
     of the most common rhythms in a stream where
     each dictionary contains:
-    
+
     number: the number of times a rhythm appears
     rhythm: the rhythm found (with the pitches of the first instance of the rhythm transposed to C5)
     measures: a list of measures containing the rhythm
     rhythmString: a string representation of the rhythm (see translateStreamToStringOnlyRhythm)
 
-    
+
     >>> bach = corpus.parse('bwv1.6')
     >>> sortedRhythms = search.mostCommonMeasureRythms(bach)
     >>> for dict in sortedRhythms[0:3]:
     ...     print('no: %d %s %s' % (dict['number'], 'rhythmString:', dict['rhythmString']))
-    ...     print('bars: %r' % ([(m.number, 
-    ...                               str(m.getContextByClass('Part').id)) 
+    ...     print('bars: %r' % ([(m.number,
+    ...                               str(m.getContextByClass('Part').id))
     ...                            for m in dict['measures']]))
     ...     dict['rhythm'].show('text')
     ...     print('-----')
@@ -775,7 +775,7 @@ def mostCommonMeasureRythms(streamIn, transposeDiatonic = False):
                 newDict['rhythm'] = thisMeasure
             newDict['measures'] = [thisMeasure]
             returnDicts.append(newDict)
-    
+
     sortedDicts = sorted(returnDicts, key=lambda k: k['number'], reverse=True)
     return sortedDicts
 
@@ -801,7 +801,7 @@ class Test(unittest.TestCase):
                 i = copy.copy(obj)
                 j = copy.deepcopy(obj)
 
-    
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

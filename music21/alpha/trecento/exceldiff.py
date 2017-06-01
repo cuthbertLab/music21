@@ -25,7 +25,7 @@ else:
 
 if (book2name.count('.xls') == 0):
     book2name += ".xls"
-    
+
 book1 = xlrd.open_workbook(book1name)
 book2 = xlrd.open_workbook(book2name)
 
@@ -72,20 +72,20 @@ for i in range(0, minRows):
                                                six.u(rowvalues2[j]).encode('utf-8')[:34]))
     if (extraCells > 0):
         print("%3d extra cells in row %3d in" % (extraCells, i+1),)
-        if (longrow == 1): 
+        if (longrow == 1):
             print(book1name + ":" + sheetname1)
-        elif (longrow == 2): 
+        elif (longrow == 2):
             print(book2name + ":" + sheetname2)
-        else: 
+        else:
             raise Exception("What?  longrow was not set!")
 
 if (extraRows > 0):
     print("%3d extra rows in" % extraRows,)
-    if (longsheet == 1): 
+    if (longsheet == 1):
         print(book1name + ":" + sheetname1)
-    elif (longsheet == 2): 
+    elif (longsheet == 2):
         print(book2name + ":" + sheetname2)
-    else: 
+    else:
         raise Exception("What?  longsheet was not set!")
 
 

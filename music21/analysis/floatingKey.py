@@ -25,41 +25,41 @@ class FloatingKeyException(AnalysisException):
 class KeyAnalyzer(object):
     '''
     KeyAnalyzer is the main object to use for floating analysis.
-    
+
     The `windowSize` attribute (default 4) determines how many measures to look at in making
     the decision.  Make it larger for pieces (like Mozart sonatas) that you expect fewer key
     changes.  Make it smaller for pieces (like Bach chorales) that you expect more key changes.
     Or set it to an integer based on the number of the measures in the piece.
-    
+
     The `weightAlgorithm` attribute determines how to scale the weight of measures according to
     their distance.  Currently only one algorithm is supported: floatingKey.divide.
-    
+
     TODO: Needs more work to work with second endings, partial measures, etc.
-    
+
     >>> b = corpus.parse('bwv66.6')
     >>> ka = analysis.floatingKey.KeyAnalyzer(b)
     >>> ka.windowSize = 2 # chorale uses quick key changes
     >>> ka.run()  # first measure is the pickup
-    [<music21.key.Key of A major>, <music21.key.Key of A major>, <music21.key.Key of A major>, 
-     <music21.key.Key of f# minor>, <music21.key.Key of f# minor>, <music21.key.Key of f# minor>, 
-     <music21.key.Key of f# minor>, <music21.key.Key of f# minor>, 
+    [<music21.key.Key of A major>, <music21.key.Key of A major>, <music21.key.Key of A major>,
+     <music21.key.Key of f# minor>, <music21.key.Key of f# minor>, <music21.key.Key of f# minor>,
+     <music21.key.Key of f# minor>, <music21.key.Key of f# minor>,
      <music21.key.Key of f# minor>, <music21.key.Key of f# minor>]
 
     Raw analysis (no smoothing):
-    
+
     >>> ka.getRawKeyByMeasure()
-    [<music21.key.Key of A major>, <music21.key.Key of E major>, <music21.key.Key of A major>, 
-     <music21.key.Key of f# minor>, <music21.key.Key of E major>, <music21.key.Key of A major>, 
-     <music21.key.Key of b minor>, <music21.key.Key of C# major>, 
+    [<music21.key.Key of A major>, <music21.key.Key of E major>, <music21.key.Key of A major>,
+     <music21.key.Key of f# minor>, <music21.key.Key of E major>, <music21.key.Key of A major>,
+     <music21.key.Key of b minor>, <music21.key.Key of C# major>,
      <music21.key.Key of F# major>, <music21.key.Key of b minor>]
 
     Major smoothing...
-    
+
     >>> ka.windowSize = ka.numMeasures // 2
     >>> ka.run()  # only the pickup seems to be in A major by this approach
-    [<music21.key.Key of A major>, <music21.key.Key of f# minor>, <music21.key.Key of f# minor>, 
-     <music21.key.Key of f# minor>, <music21.key.Key of f# minor>, <music21.key.Key of f# minor>, 
-     <music21.key.Key of f# minor>, <music21.key.Key of f# minor>, 
+    [<music21.key.Key of A major>, <music21.key.Key of f# minor>, <music21.key.Key of f# minor>,
+     <music21.key.Key of f# minor>, <music21.key.Key of f# minor>, <music21.key.Key of f# minor>,
+     <music21.key.Key of f# minor>, <music21.key.Key of f# minor>,
      <music21.key.Key of f# minor>, <music21.key.Key of f# minor>]
     '''
     def __init__(self, s=None):
@@ -69,7 +69,7 @@ class KeyAnalyzer(object):
         self.windowSize = 4
         self.rawKeyByMeasure = []
         self._interpretationMeasureDict = {}
-        
+
         self.weightAlgorithm = divide
         if s.hasPartLikeStreams():
             p = s.parts[0]
@@ -98,7 +98,7 @@ class KeyAnalyzer(object):
     def getInterpretationByMeasure(self, mNumber):
         '''
         Returns a dictionary of interpretations for the measure.
-        '''        
+        '''
         if mNumber in self._interpretationMeasureDict:
             return self._interpretationMeasureDict[mNumber] # CACHE
         if self.rawKeyByMeasure == []:
@@ -116,7 +116,7 @@ class KeyAnalyzer(object):
     def smoothInterpretationByMeasure(self):
         smoothedKeysByMeasure = []
         algorithm = self.weightAlgorithm
-        
+
         for i in range(self.numMeasures):
             baseInterpretations = self.getInterpretationByMeasure(i)
             if baseInterpretations is None:
@@ -132,13 +132,13 @@ class KeyAnalyzer(object):
                         baseInterpretations[k] += coeff
             bestName = max(baseInterpretations, key=baseInterpretations.get)
             smoothedKeysByMeasure.append(key.Key(bestName))
-        
+
         return smoothedKeysByMeasure
 
 def divide(coefficient, distance):
     '''
     Divide the coefficient by the absolute value of the distance + 1
-    
+
     >>> analysis.floatingKey.divide(4.0, -1)
     2.0
     '''

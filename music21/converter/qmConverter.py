@@ -15,10 +15,10 @@ in this case, the format, .qm, consists of a line of letters separated
 by spaces:
 
     C E G D F
-    
+
 and turns each of them into a quarter note in octave 4 in 4/4.
 
-Consult the code to see how it works.  To use, call 
+Consult the code to see how it works.  To use, call
 `converter.registerSubconverter(converter.qmConverter.QMConverter)`
 then `myStream = converter.parse('quarterMusic: C E G D F')`
 
@@ -36,7 +36,7 @@ class QMConverter(converter.subConverters.SubConverter):
     def parseData(self, strData, number=None):
         '''
         Parse the data.  The number attribute is not used.
-        
+
         >>> from music21.converter.qmConverter import QMConverter
         >>> qmc = QMConverter()
         >>> qmc.parseData('C D E G C')
@@ -51,7 +51,7 @@ class QMConverter(converter.subConverters.SubConverter):
             {3.0} <music21.note.Note G>
         {4.0} <music21.stream.Measure 2 offset=4.0>
             {0.0} <music21.note.Note C>
-            {1.0} <music21.bar.Barline style=final>        
+            {1.0} <music21.bar.Barline style=final>
         '''
         strDataList = strData.split()
         s = stream.Part()
@@ -62,14 +62,14 @@ class QMConverter(converter.subConverters.SubConverter):
             nObj = note.Note(beat)
             nObj.duration.quarterLength = 1
             s.append(nObj)
-            
+
         self.stream = s.makeMeasures()
 
-    def parseFile(self, filePath, number=None): 
+    def parseFile(self, filePath, number=None):
         '''
         parse a file from disk.  If QMConverter is registered, then any
         file ending in .qm will automatically be parsed.
-        
+
         >>> import os
         >>> parserPath = common.getSourceFilePath() + os.path.sep + 'converter'
         >>> testPath = parserPath + os.path.sep + 'quarterMusicTestIn.qm'
@@ -90,7 +90,7 @@ class QMConverter(converter.subConverters.SubConverter):
             {0.0} <music21.note.Note E>
             {1.0} <music21.note.Note D>
             {2.0} <music21.note.Note C>
-            {3.0} <music21.bar.Barline style=final>        
+            {3.0} <music21.bar.Barline style=final>
         '''
         with open(filePath, 'r') as f:
             self.parseData(f.read())
@@ -108,30 +108,30 @@ class QMConverter(converter.subConverters.SubConverter):
             f.write(music)
 
         return fp
-    
-    
+
+
 if __name__ == '__main__':
     import music21
     music21.mainTest()
 #     from music21 import common
 #     import os
-#     
+#
 #     converter.registerSubconverter(QMConverter)
-#     
+#
 #     print('\nFILE')
 #     print('+++++++++++++++++++++++++')
-# 
+#
 #     parserPath = common.getSourceFilePath() + os.path.sep + 'converter'
 #     testPath = parserPath + os.path.sep + 'quarterMusicTestIn.qm'
-#     
+#
 #     a = converter.parse(testPath)
-#     
+#
 #     a.show('text')
-#     
-#     
+#
+#
 #     print('\nIn-Line')
 #     print('+++++++++++++++++++++++++')
-#     
+#
 #     b = converter.parse('quarterMusic: G C G')
 #     b.show('text')
 #     print( b.write('qm') )

@@ -10,7 +10,7 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
-Utility routines for processing text in scores and other musical objects. 
+Utility routines for processing text in scores and other musical objects.
 '''
 
 import unittest
@@ -28,7 +28,7 @@ from music21 import style
 
 from music21.ext import six
 
-_MOD = "text.py"  
+_MOD = "text.py"
 environLocal = environment.Environment(_MOD)
 
 
@@ -53,18 +53,18 @@ articleReference = {
     # french
     'fr' : ['le', 'la', 'les', 'l\'', 'un', 'une', 'des', 'du', 'de la', 'des'],
     # italian
-    'it' : ['il', 'lo', 'la', 'l\'', 'i', 'gli', 'le', 'un\'', 'un', 'uno', 'una', 
+    'it' : ['il', 'lo', 'la', 'l\'', 'i', 'gli', 'le', 'un\'', 'un', 'uno', 'una',
             'del', 'dello', 'della', 'dei', 'degli', 'delle'],
     }
 
 #-------------------------------------------------------------------------------
 def assembleLyrics(streamIn, lineNumber=1):
     '''
-    Concatenate text from a stream. The Stream is automatically flattened. 
+    Concatenate text from a stream. The Stream is automatically flattened.
 
     The `lineNumber` parameter determines which line of text is assembled.
-    
-    
+
+
     >>> s = stream.Stream()
     >>> n1 = note.Note()
     >>> n1.lyric = "Hi"
@@ -84,7 +84,7 @@ def assembleLyrics(streamIn, lineNumber=1):
             lyricObj = n.lyrics[lineNumber-1] # a list of lyric objs
         except IndexError:
             continue
-        #environLocal.printDebug(['lyricObj', 'lyricObj.text', lyricObj.text, 
+        #environLocal.printDebug(['lyricObj', 'lyricObj.text', lyricObj.text,
         #    'lyricObj.syllabic', lyricObj.syllabic, 'word', word])
 
         # need to match case of non-defined syllabic attribute
@@ -101,15 +101,15 @@ def assembleLyrics(streamIn, lineNumber=1):
             else:
                 raise Exception('no known Text syllabic setting: %s' % lyricObj.syllabic)
     return ' '.join(words)
-        
+
 def assembleAllLyrics(streamIn, maxLyrics = 10, lyricSeparation='\n'):
     r'''
-    Concatenate all Lyrics text from a stream. The Stream is automatically flattened. 
+    Concatenate all Lyrics text from a stream. The Stream is automatically flattened.
 
     uses assembleLyrics to do the heavy work.
-    
+
     maxLyrics just determines how many times we should parse through the score, since it is
-    not easy to determine what the maximum number of lyrics exist in the score.  
+    not easy to determine what the maximum number of lyrics exist in the score.
 
     Here is a demo with one note and five lyrics.
 
@@ -130,17 +130,17 @@ def assembleAllLyrics(streamIn, maxLyrics = 10, lyricSeparation='\n'):
 
 def prependArticle(src, language=None):
     '''
-    Given a text string, if an article is found in a trailing position with a comma, 
-    place the article in front and remove the comma. 
+    Given a text string, if an article is found in a trailing position with a comma,
+    place the article in front and remove the comma.
 
-    
+
     >>> text.prependArticle('Ale is Dear, The')
     'The Ale is Dear'
     >>> text.prependArticle('Ale is Dear, The', 'en')
     'The Ale is Dear'
     >>> text.prependArticle('Ale is Dear, The', 'it')
     'Ale is Dear, The'
-    >>> text.prependArticle('Combattimento di Tancredi e Clorinda, Il', 'it') 
+    >>> text.prependArticle('Combattimento di Tancredi e Clorinda, Il', 'it')
     'Il Combattimento di Tancredi e Clorinda'
     '''
     if ',' not in src: # must have a comma
@@ -168,17 +168,17 @@ def prependArticle(src, language=None):
 
 def postpendArticle(src, language=None):
     '''
-    Given a text string, if an article is found in a leading position, 
-    place it at the end with a comma. 
+    Given a text string, if an article is found in a leading position,
+    place it at the end with a comma.
 
-    
+
     >>> text.postpendArticle('The Ale is Dear')
     'Ale is Dear, The'
     >>> text.postpendArticle('The Ale is Dear', 'en')
     'Ale is Dear, The'
-    >>> text.postpendArticle('The Ale is Dear', 'it') 
+    >>> text.postpendArticle('The Ale is Dear', 'it')
     'The Ale is Dear'
-    >>> text.postpendArticle('Il Combattimento di Tancredi e Clorinda', 'it') 
+    >>> text.postpendArticle('Il Combattimento di Tancredi e Clorinda', 'it')
     'Combattimento di Tancredi e Clorinda, Il'
     '''
     if ' ' not in src: # must have at least one space
@@ -190,7 +190,7 @@ def postpendArticle(src, language=None):
             ref += articleReference[key]
     else:
         ref = articleReference[language]
-    
+
     leading = src.split(' ')[0].strip()
     match = None
     for candidate in ref:
@@ -217,21 +217,21 @@ class TextBoxException(exceptions21.Music21Exception):
 #-------------------------------------------------------------------------------
 class TextBox(base.Music21Object):
     '''
-    A TextBox is arbitrary text that might be positioned anywhere on a page, 
-    independent of notes or staffs. A page attribute specifies what page this text is found on; 
-    style.absoluteY and style.absoluteX position the text from the bottom left corner in 
+    A TextBox is arbitrary text that might be positioned anywhere on a page,
+    independent of notes or staffs. A page attribute specifies what page this text is found on;
+    style.absoluteY and style.absoluteX position the text from the bottom left corner in
     units of tenths.
 
-    This object is similar to the TextExpression object, but does not have as many position 
-    parameters, enclosure attributes, and the ability to convert to 
-    RepeatExpressions and TempoTexts. 
+    This object is similar to the TextExpression object, but does not have as many position
+    parameters, enclosure attributes, and the ability to convert to
+    RepeatExpressions and TempoTexts.
 
     >>> from music21 import text, stream
     >>> y = 1000 # set a fixed vertical distance
     >>> s = stream.Stream()
-    
+
     Specify character, x position, y position
-    
+
     >>> tb = text.TextBox('m', 250, y)
     >>> tb.style.fontSize = 40
     >>> tb.style.alignVertical = 'bottom'
@@ -241,12 +241,12 @@ class TextBox(base.Music21Object):
     >>> tb.style.fontSize = 60
     >>> tb.style.alignVertical = 'bottom'
     >>> s.append(tb)
-    
+
     >>> tb = text.TextBox('s', 550, y)
     >>> tb.style.fontSize = 120
     >>> tb.style.alignVertical = 'bottom'
     >>> s.append(tb)
-            
+
     >>> tb = text.TextBox('ic', 700, y)
     >>> tb.style.alignVertical = 'bottom'
     >>> tb.style.fontSize = 20
@@ -259,7 +259,7 @@ class TextBox(base.Music21Object):
     >>> tb.style.fontWeight = 'bold'
     >>> tb.style.fontStyle = 'italic'
     >>> s.append(tb)
-    
+
     >>> #_DOCS_SHOW s.show()
 
     .. image:: images/textBoxes-01.*
@@ -278,7 +278,7 @@ class TextBox(base.Music21Object):
         self.content = content   # use property
 
         self._page = 1 # page one is deafault
-        self.style.absoluteX = x    
+        self.style.absoluteX = x
         self.style.absoluteY = y
         self.style.alignVertical = 'top'
         self.style.alignHorizontal = 'center'
@@ -295,17 +295,17 @@ class TextBox(base.Music21Object):
 
     def _getContent(self):
         return self._content
-    
+
     def _setContent(self, value):
         if not isinstance(value, six.string_types):
             self._content = str(value)
         else:
-            self._content = value    
-    
-    content = property(_getContent, _setContent, 
+            self._content = value
+
+    content = property(_getContent, _setContent,
         doc = '''Get or set the content.
 
-        
+
         >>> te = text.TextBox('Con fuoco')
         >>> te.content
         'Con fuoco'
@@ -317,16 +317,16 @@ class TextBox(base.Music21Object):
 
     def _getPage(self):
         return self._page
-    
+
     def _setPage(self, value):
         if value != None:
             self._page = int(value) # must be an integer
         # do not set otherwise
-    
-    page = property(_getPage, _setPage, 
-        doc = '''Get or set the page number. The first page (page 1) is the default. 
 
-        
+    page = property(_getPage, _setPage,
+        doc = '''Get or set the page number. The first page (page 1) is the default.
+
+
         >>> te = text.TextBox('Great Score')
         >>> te.content
         'Great Score'
@@ -342,11 +342,11 @@ class TextBox(base.Music21Object):
 class LanguageDetector(object):
     '''
     Attempts to detect language on the basis of trigrams
-    
-    uses code from 
+
+    uses code from
     http://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
     unknown author.  No license given.
-    
+
     See Trigram docs below...
     '''
     languageCodes = ['en', 'fr', 'it', 'de', 'cn', 'la', 'nl']
@@ -358,29 +358,29 @@ class LanguageDetector(object):
                     'la': 'Latin',
                     'nl': 'Dutch',
                     }
-    
+
     def __init__(self, text = None):
         self.text = text
         self.trigrams = {}
         self.readExcerpts()
-    
+
     def readExcerpts(self):
         for languageCode in self.languageCodes:
             thisExcerpt = os.path.join(common.getSourceFilePath(),
                                        'languageExcerpts',
                                        languageCode + '.txt')
-            
+
             with codecs.open(thisExcerpt, encoding='utf-8') as f:
                 excerptWords = f.read().split()
                 self.trigrams[languageCode] = Trigram(excerptWords)
-            
+
     def mostLikelyLanguage(self, excerpt):
         '''
-        returns the code of the most likely language for a passage, works on 
+        returns the code of the most likely language for a passage, works on
         unicode or ascii. current languages: en, fr, de, it, cn, or None
-        
+
         >>> ld = text.LanguageDetector()
-        >>> ld.mostLikelyLanguage("Hello there, how are you doing today? " + 
+        >>> ld.mostLikelyLanguage("Hello there, how are you doing today? " +
         ...                        "I haven't seen you in a while.")
         'en'
         >>> ld.mostLikelyLanguage("Ciao come stai? Sono molto lento oggi, ma non so perche.")
@@ -402,19 +402,19 @@ class LanguageDetector(object):
             if langDiff < maxDifference:
                 maxLang = lang
                 maxDifference = langDiff
-        
+
         return maxLang
-        
+
 
     def mostLikelyLanguageNumeric(self, excerpt = None):
         '''
         returns a number representing the most likely language for a passage
         or 0 if there is no text.
-        
+
         Useful for feature extraction.
-        
+
         The codes are the index of the language name in LanguageDetector.languageCodes + 1
-        
+
         >>> ld = text.LanguageDetector()
         >>> for i in range(0, len(ld.languageCodes)):
         ...    print(str(i+1) + " " +  ld.languageCodes[i])
@@ -425,7 +425,7 @@ class LanguageDetector(object):
         5 cn
         6 la
         7 nl
-        >>> numLang = ld.mostLikelyLanguageNumeric("Hello there, how are you doing today? " + 
+        >>> numLang = ld.mostLikelyLanguageNumeric("Hello there, how are you doing today? " +
         ...                "I haven't seen you in a while.")
         >>> numLang
         1
@@ -438,15 +438,15 @@ class LanguageDetector(object):
             langCode = self.mostLikelyLanguage(excerpt)
             for i in range(len(self.languageCodes)):
                 if self.languageCodes[i] == langCode:
-                    return i+1            
+                    return i+1
             raise TextException("got a language that was not in the codes; should not happen")
 
 #-------------------------------------------------------------------------------
 class Trigram(object):
     '''
-    See LanguageDector above.  
+    See LanguageDector above.
     From http://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
-    
+
     The frequency of three character
     sequences is calculated.  When treated as a vector, this information
     can be compared to other trigrams, and the difference between them
@@ -462,7 +462,7 @@ class Trigram(object):
     #_DOCS_SHOW 0.4
     >>> #_DOCS_SHOW unknown.similarity(reference_en)
     #_DOCS_SHOW 0.95
-    
+
     would indicate the unknown text is almost cetrtainly English.  As
     syntax sugar, the minus sign is overloaded to return the difference
     between texts, so the above objects would give you:
@@ -481,11 +481,11 @@ class Trigram(object):
     style of the Trigram's text.
 
     >>> #_DOCS_SHOW reference_en.makeWords(30)
-    My withillonquiver and ald, by now wittlectionsurper, may sequia, 
+    My withillonquiver and ald, by now wittlectionsurper, may sequia,
     tory, I ad my notter. Marriusbabilly She lady for rachalle spen hat knong al elf
 
 
-    '''    
+    '''
 
     def __init__(self, excerptList = None):
         self.lut = {}
@@ -499,7 +499,7 @@ class Trigram(object):
             return self.measure()
         else:
             return self._length
-        
+
     def parseExcerpt(self, excerpt):
         pair = u'  '
         if isinstance(excerpt, list):
@@ -514,7 +514,7 @@ class Trigram(object):
                 d[letter] = d.get(letter, 0) + 1
                 pair = pair[1] + letter
         self.measure()
-    
+
     def measure(self):
         """calculates the scalar length of the trigram vector and
         stores it in self.length."""
@@ -543,7 +543,7 @@ class Trigram(object):
                 for x in a:
                     if x in b:
                         total += a[x] * b[x]
-        
+
         #environLocal.warn([self.length, "self"])
         #environLocal.warn([other.length, "other"])
 
@@ -596,7 +596,7 @@ class Test(unittest.TestCase):
 
         a = converter.parse(corpus.getWork('luca/gloria'))
         post = assembleLyrics(a)
-        self.assertEqual(post.startswith('Et in terra pax hominibus bone voluntatis'), True) 
+        self.assertEqual(post.startswith('Et in terra pax hominibus bone voluntatis'), True)
 
 
     def testAssembleLyricsA(self):
@@ -608,7 +608,7 @@ class Test(unittest.TestCase):
             s.append(n)
         post = assembleLyrics(s)
         self.assertEqual(post, 'hello again')
-        
+
         s = stream.Stream()
         for syl in ['a-', '-ris-', '-to-', '-cats', 'are', 'great']:
             n = note.Note()
@@ -620,21 +620,21 @@ class Test(unittest.TestCase):
 
     def testLanguageDetector(self):
         ld = LanguageDetector()
-        #print ld.trigrams['fr'] - ld.trigrams['it'] 
-        #print ld.trigrams['fr'] - ld.trigrams['de'] 
-        #print ld.trigrams['fr'] - ld.trigrams['cn'] 
-        
+        #print ld.trigrams['fr'] - ld.trigrams['it']
+        #print ld.trigrams['fr'] - ld.trigrams['de']
+        #print ld.trigrams['fr'] - ld.trigrams['cn']
+
         diffFrIt = ld.trigrams['fr'] - ld.trigrams['it']
         self.assertTrue(0.50 < diffFrIt < 0.55)
         self.assertTrue(0.67 < ld.trigrams['fr'] - ld.trigrams['de'] < 0.70)
         self.assertTrue(0.99 < ld.trigrams['fr'] - ld.trigrams['cn'] < 1.0)
-        
-        self.assertEqual('en', 
-                         ld.mostLikelyLanguage(u"hello friends, this is a test of the " + 
-                                               u"ability of language detector to " + 
+
+        self.assertEqual('en',
+                         ld.mostLikelyLanguage(u"hello friends, this is a test of the " +
+                                               u"ability of language detector to " +
                                                u"tell what language I am writing in."))
         self.assertEqual('it', ld.mostLikelyLanguage(
-            u"ciao amici! cosé trovo in quale lingua ho scritto questo passaggio. Spero che " + 
+            u"ciao amici! cosé trovo in quale lingua ho scritto questo passaggio. Spero che " +
             u"troverà che é stata scritta in italiano"))
 
         ## TODO: Replace

@@ -153,7 +153,7 @@ def base40DeltaToInterval(delta):
     Raises a Base40 Exception if the interval is not handled by Base40.
     Base40 can only handle major, minor, perfect, augmented,
     and diminished intervals. Although not for certain, it seems
-    that the engineers that designed this system assumed that asdfasdf 
+    that the engineers that designed this system assumed that asdfasdf
     other intervals (doubly augmented intervals, for instance)
     would be of a very rare occurrence, and extreme intervals
     which would trigger an incorrect answer (C-- to C##, for

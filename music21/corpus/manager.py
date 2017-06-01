@@ -112,17 +112,17 @@ def iterateCorpora(returnObjects=True):
     '''
     a generator that iterates over the corpora (either as objects or as names)
     for use in pan corpus searching.
-    
+
     This test will only show the first three, because it needs to run the same
     on every system:
-    
+
     >>> for i, corpusObject in enumerate(corpus.manager.iterateCorpora()):
     ...     print(corpusObject)
     ...     if i == 2:
     ...        break
     <music21.corpus.corpora.CoreCorpus>
     <music21.corpus.corpora.VirtualCorpus>
-    <music21.corpus.corpora.LocalCorpus: 'local'>    
+    <music21.corpus.corpora.LocalCorpus: 'local'>
 
     We can also get names instead... Note that the name of the main localcorpus is 'local' not
     None
@@ -134,8 +134,8 @@ def iterateCorpora(returnObjects=True):
     core
     virtual
     local
-    
-    New in v.3 
+
+    New in v.3
     '''
     if returnObjects is True:
         yield corpora.CoreCorpus()
@@ -158,13 +158,13 @@ def getWork(workName,
         ):
     '''
     this parse method is called from `corpus.parse()` and does nothing differently from it.
-    
+
     Searches all corpora for a file that matches the name and returns it parsed.
     '''
     addXMLWarning = False
     workNameJoined = workName
     mxlWorkName = workName
-    
+
     if workName in (None, ''):
         raise CorpusException(
             'a work name must be provided as an argument')
@@ -178,8 +178,8 @@ def getWork(workName,
         mxlWorkName = os.path.splitext(workNameJoined)[0] + ".mxl"
         addXMLWarning = True
 
-    filePaths = None    
-    for corpusObject in iterateCorpora():    
+    filePaths = None
+    for corpusObject in iterateCorpora():
         workList = corpusObject.getWorkList(workName, movementNumber, fileExtensions)
         if not workList and addXMLWarning:
             workList = corpusObject.getWorkList(mxlWorkName, movementNumber, fileExtensions)
@@ -249,7 +249,7 @@ def search(query, field=None, corpusNames=None, fileExtensions=None):
 
     This method uses stored metadata and thus, on first usage, will incur a
     performance penalty during metadata loading.
-    
+
     >>> corpus.search('china')
     <music21.metadata.bundles.MetadataBundle {1235 entries}>
 
@@ -258,13 +258,13 @@ def search(query, field=None, corpusNames=None, fileExtensions=None):
 
     >>> corpus.search('bach', field='composer')
     <music21.metadata.bundles.MetadataBundle {22 entries}>
-   
+
     >>> corpus.search('coltrane', corpusNames=('virtual',))
     <music21.metadata.bundles.MetadataBundle {1 entry}>
-    
+
     This method is implemented in `corpus.manager` but loaded into corpus for
     ease of use.
-    
+
     The ``corpusNames`` parameter can be used to specify which corpora to search,
     for example:
 
@@ -281,32 +281,32 @@ def search(query, field=None, corpusNames=None, fileExtensions=None):
     '''
     readAllMetadataBundlesFromDisk()
     allSearchResults = metadata.bundles.MetadataBundle()
-    
+
     if corpusNames is None:
         corpusNames = list(iterateCorpora(returnObjects=False))
-    
+
     for corpusName in corpusNames:
         c = fromName(corpusName)
         searchResults = c.metadataBundle.search(
                 query, field, fileExtensions=fileExtensions)
         allSearchResults = allSearchResults.union(searchResults)
-    
+
     return allSearchResults
 
 
 def getMetadataBundleByCorpus(corpusObject):
     '''
     Return the metadata bundle for a single Corpus object
-    
+
     >>> vc = corpus.corpora.VirtualCorpus()
     >>> mdb1 = corpus.manager.getMetadataBundleByCorpus(vc)
     >>> mdb1
     <music21.metadata.bundles.MetadataBundle 'virtual': {11 entries}>
-    
+
     This is the same as calling `metadataBundle` on the corpus itself,
     but this is the routine that actually does the work. In other words,
     it's the call on the object that is redundant, not this routine.
-    
+
     >>> mdb1 is vc.metadataBundle
     True
     '''

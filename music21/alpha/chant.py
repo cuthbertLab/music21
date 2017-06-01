@@ -37,7 +37,7 @@ from music21 import environment
 _MOD = "chant.py"
 environLocal = environment.Environment(_MOD)
 
- 
+
 def fromStream(inputStream):
     if inputStream.metadata is not None:
         incipit = inputStream.metadata.title
@@ -47,10 +47,10 @@ def fromStream(inputStream):
     out += 'name: ' + incipit + ';\n'
     out += "%%\n"
     return out
- 
+
 class GregorianStream(stream.Stream):
     r'''
-    
+
     >>> s = alpha.chant.GregorianStream()
     >>> s.append(clef.AltoClef())
     >>> n = alpha.chant.GregorianNote("C4")
@@ -61,7 +61,7 @@ class GregorianStream(stream.Stream):
     >>> s.append(n)
     >>> s.toGABCText()
     '(c3) Po(ho)\n'
-    
+
     '''
     def toGABCText(self):
         currentClef = None
@@ -78,7 +78,7 @@ class GregorianStream(stream.Stream):
                     outLine += e.lyrics[0].text
                     outLine += "("
                     startedSyllable = True
- 
+
                 outLine += e.toGABC(useClef = currentClef)
             elif 'Clef' in e.classes:
                 if startedSyllable:
@@ -89,32 +89,32 @@ class GregorianStream(stream.Stream):
         if startedSyllable:
             outLine += ")\n"
         return outLine
-    
+
     def clefToGABC(self, clefIn):
         '''
         >>> s = alpha.chant.GregorianStream()
         >>> c = clef.AltoClef()
         >>> s.clefToGABC(c)
-        '(c3)'  
+        '(c3)'
         '''
         return "(" + clefIn.sign.lower() + str(clefIn.line) + ")"
- 
- 
+
+
 class GregorianNote(note.Note):
     '''
     A GregorianNote is a subclass of :class:`~music21.note.Note` that
     contains extra attributes which represent the interpretation or
     graphical representation of the note.
-    
-    
+
+
     Most of the attributes default to False.  Exceptions are noted below.
-    
-    
+
+
     Example: a very special note.
-    
-    
+
+
     >>> n = alpha.chant.GregorianNote("C4")
-    >>> n.liquescent = True 
+    >>> n.liquescent = True
     >>> n.quilisma = True
     >>> n.basicShape = 'virga'  # default: punctus
     >>> n.breakNeume = True # don't connect to the next note in a neume.
@@ -123,9 +123,9 @@ class GregorianNote(note.Note):
     >>> n.debilis = True  # small note
     >>> n.episema = True
     >>> n.punctumMora = True
-    >>> n.fill = 'cavum' # 
+    >>> n.fill = 'cavum' #
     '''
-    
+
     liquescent = False
     quilisma = False
     oriscus = False
@@ -149,23 +149,23 @@ class GregorianNote(note.Note):
                'reversed-semi-circulus': 'r5'}
     polyphonic = False
     choralSign = False
-   
+
     def __init__(self, *arguments, **keywords):
         note.Note.__init__(self, *arguments, **keywords)
-       
+
     def toGABC(self, useClef = None, nextNote = None):
         letter = self.toBasicGABC(useClef)
         if self.debilis:
             letter = "-" + letter
         if self.inclinatum:
             letter = letter.upper()
-       
+
         if self.fill != 'solid':
             if self.fill in self.fillDic:
                 letter += self.fillDic[self.fill]
             else:
                 raise ChantException('cannot use filltype %s' % self.fill)
-           
+
         if self.oriscus:
             letter += 'o'
         elif self.quilisma:
@@ -200,50 +200,50 @@ class GregorianNote(note.Note):
                 letter += '_'
         if self.breakNeume != False:
             letter += "!"
-               
+
         if self.choralSign != False:
             letter += "[cs:" + self.choralSign + "]"
-               
+
         if self.polyphonic:
             letter = "{" + letter + "}"
         return letter
- 
- 
+
+
     def toBasicGABC(self, useClef = None):
         '''
         returns the character representing inNote in the given clef (default = AltoClef)
-       
+
         see http://home.gna.org/gregorio/gabc/ for more details.  'd' = lowest line
-       
-        
-        
+
+
+
         >>> n = alpha.chant.GregorianNote("C4")
         >>> c = clef.AltoClef()
         >>> n.toBasicGABC(c)
         'h'
-       
+
         >>> c2 = clef.SopranoClef()
         >>> n.toBasicGABC(c2)
         'd'
-       
+
         '''
         inNote = self
         usedDefaultClef = False
         if useClef is None:
             useClef = clef.AltoClef()
             usedDefaultClef = True
-       
+
         asciiD = 100
         asciiA = 97
         asciiM = 109
-       
+
         if not hasattr(useClef, 'lowestLine'):
             raise ChantException(
                 "useClef has to define the diatonicNoteNum representing the lowest line")
-       
+
         stepsAboveLowestLine = inNote.pitch.diatonicNoteNum - useClef.lowestLine
         asciiNote = stepsAboveLowestLine + asciiD
-       
+
         if asciiNote < asciiA:
             if usedDefaultClef is True:
                 raise ChantException(
@@ -264,16 +264,16 @@ class GregorianNote(note.Note):
 
     def _getFill(self):
         return self._fill
-    
+
     def _setFill(self, value):
         if value not in self.fillDic:
             raise ChantException("Cannot set fill to value %s." % value)
         self._fill = value
-    
+
     fill = property(_getFill, _setFill, doc='''Sets the
     fill for the note, for teaching purposes, representing
     polyphony, etc.  Acceptable values are:
-    
+
         * solid (default)
         * cavum (void)
         * linea (lines around it; technically not a fill)
@@ -283,17 +283,17 @@ class GregorianNote(note.Note):
         * circulus
         * semi-circulus
         * reversed-semi-circulus
-        
+
     See the docs for Gregorio for graphical representations of these figures.
-    
-    
+
+
     >>> n = alpha.chant.GregorianNote("D3")
     >>> n.fill
     'solid'
     >>> n.fill = 'cavum'
     >>> n.fill
     'cavum'
-    
+
     ''')
 
 class BaseScoreConverter(object):
@@ -303,25 +303,25 @@ class BaseScoreConverter(object):
 
     samplePiece = r'''
     style: modern;
-    
-    % Then, when gregorio encounters the following line (%%), 
+
+    % Then, when gregorio encounters the following line (%%),
     % it switches to the score, where you input the notes
     %%
-    
-    % The syntax in this part is called gabc. 
+
+    % The syntax in this part is called gabc.
     % Please refer to http://home.gna.org/gregorio/gabc/#basis
-    
-    Pó(c3eh)pu(g)lus(h) Si(hi)on,(hgh.) *(;) ec(hihi)ce(e.) Dó(e.f!gwhhi)mi(h){n}us(h) 
+
+    Pó(c3eh)pu(g)lus(h) Si(hi)on,(hgh.) *(;) ec(hihi)ce(e.) Dó(e.f!gwhhi)mi(h){n}us(h)
     vé(hi)ni(ig//ih)et(h.) (,) ad(iv./hig) sal(fe)ván(ghg)das(fg) gen(e_f_e_)tes(e.) :(:)
-    
-    et(e) au(eh)dí(hhi)tam(i) fá(kjki)ci(i)et(i) Dó(ij)mi(ihi)nus(iv./hiHF) 
-    (,) gló(h!i'j)ri(ji!kvJI)am(ij) vo(j.i!jwk)cis(ji) su(i_j_i_)æ,(i.) (;) 
+
+    et(e) au(eh)dí(hhi)tam(i) fá(kjki)ci(i)et(i) Dó(ij)mi(ihi)nus(iv./hiHF)
+    (,) gló(h!i'j)ri(ji!kvJI)am(ij) vo(j.i!jwk)cis(ji) su(i_j_i_)æ,(i.) (;)
     in(e) læ(e)tí(e!f'h)ti(h)a(hi!jVji)
-    
-    cor(gh!ijI'H<)dis(ihhf!gwh) ve(e_f_e_)stri.(e) Ps.(::) Qui(ehg) 
+
+    cor(gh!ijI'H<)dis(ihhf!gwh) ve(e_f_e_)stri.(e) Ps.(::) Qui(ehg)
     re(hi)gis(i) I(i)sra(i)el,(hj) in(j)tén(ji)de(ij..) :*(:) qui(ig) de(hi)dú(i)cis(i)
-    
-    vel(i)ut(i!jwk) o(i')vem(h) Jo(hhh)seph.(fe..) (::) Gló(ehg)ri(hi)a(i) 
+
+    vel(i)ut(i!jwk) o(i')vem(h) Jo(hhh)seph.(fe..) (::) Gló(ehg)ri(hi)a(i)
     Pa(i)tri.(i) (:) E(i) u(i!jwk) o(i) u(h) a(hhh) e(fe..) (::)
     '''
 
@@ -331,27 +331,27 @@ class BaseScoreConverter(object):
         self.gregorioConverter = '/usr/local/bin/gregorio'
         self.gregorioOptions = ""
         self.gregorioCommand = None
-        
+
         self.latexConverter = '/usr/texbin/lualatex'
         self.latexOptions = '--interaction=nonstopmode'
-        
+
         self.score = ""
         self.incipit = ""
         self.mode = ""
         self.paperType = None
-    
+
     def writeFile(self, text=None):
         '''
-        
+
         >>> bsc = alpha.chant.BaseScoreConverter()
         >>> filePath = bsc.writeFile('hello')
         >>> assert(filePath.endswith('.gabc')) #_DOCS_HIDE
         >>> filePath = '/var/folders/k9/T/music21/tmpekHFCr.gabc' #_DOCS_HIDE
-        >>> filePath 
+        >>> filePath
         '/var/folders/k9/T/music21/tmpekHFCr.gabc'
-        
+
         '''
-        
+
         if text is None or text == "":
             raise ChantException('Cannot write file if there is no data')
         fp = self.environLocal.getTempFile('.gabc')
@@ -359,23 +359,23 @@ class BaseScoreConverter(object):
         f.write(text)
         f.close()
         return fp
-        
-        
+
+
     def launchGregorio(self, fp = None):
         '''
         converts a .gabc file to LaTeX using the
         gregorio converter.  Returns the filename with .tex substituted for .gabc
-        
+
         >>> bsc = alpha.chant.BaseScoreConverter()
         >>> fn = '~cuthbert/Library/Gregorio/examples/Populas.gabc'
         >>> #_DOCS_SHOW newFp = bsc.launchGregorio(fn)
         >>> #_DOCS_SHOW bsc.gregorioCommand
         >>> 'open -a"/usr/local/bin/gregorio" ' + fn #_DOCS_HIDE
         'open -a"/usr/local/bin/gregorio"  ~cuthbert/Library/Gregorio/examples/Populas.gabc'
-        
-        
+
+
         More often, you'll want to write a textfile from writeFile:
-        
+
         '''
         platform = common.getPlatform()
         fpApp = self.gregorioConverter
@@ -386,7 +386,7 @@ class BaseScoreConverter(object):
         elif platform == 'darwin':
             cmd = '%s %s %s' % (fpApp, options, fp)
         elif platform == 'nix':
-            cmd = '%s %s %s' % (fpApp, options, fp)        
+            cmd = '%s %s %s' % (fpApp, options, fp)
         self.gregorioCommand = cmd
         os.system(cmd)
         newfp = re.sub(r'\.gabc', '.tex', fp)
@@ -408,7 +408,7 @@ class BaseScoreConverter(object):
         elif platform == 'darwin':
             cmd = '%s %s %s' % (fpApp, options, fp)
         elif platform == 'nix':
-            cmd = '%s %s %s' % (fpApp, options, fp)        
+            cmd = '%s %s %s' % (fpApp, options, fp)
         self.gregorioCommand = cmd
         os.system(cmd)
         newfp = re.sub(r'\.tex', '.pdf', fp)
@@ -416,7 +416,7 @@ class BaseScoreConverter(object):
 
 
 class DefaultTeXWrapper(object):
-    
+
     def __init__(self):
         self.baseWrapper = '''% !TEX TS-program = lualatex
 % !TEX encoding = UTF-8
@@ -472,13 +472,13 @@ class DefaultTeXWrapper(object):
 
 % and finally we include the score.
 SCOREGOESHERE
-'''        
-        
+'''
+
     def substituteInfo(self, converter):
         r'''
         Puts the correct information into the TeXWrapper for the document
-        
-        
+
+
         >>> wrapper = alpha.chant.DefaultTeXWrapper()
         >>> class Converter():
         ...    score = r'\note{C}' + "\n" + r'\endgregorioscore %' + "\n" + r'\endinput %'
@@ -490,7 +490,7 @@ SCOREGOESHERE
         % !TEX TS-program = lualatex
         % !TEX encoding = UTF-8
         ...
-        \geometry{letterpaper} % a4paper or letterpaper (US) or a5paper or other 
+        \geometry{letterpaper} % a4paper or letterpaper (US) or a5paper or other
         ...
         % The title:
         \begin{center}\begin{huge}\textsc{Gaudeamus Omnes}\end{huge}\end{center}
@@ -510,7 +510,7 @@ SCOREGOESHERE
         paperType = converter.paperType
         if paperType is None:
             paperType = 'letterpaper'
-        
+
         wrapper = self.baseWrapper
         wrapper = wrapper.replace(r'SCOREGOESHERE', score)
         wrapper = re.sub(r'INCIPITGOESHERE', incipit, wrapper)
@@ -518,13 +518,13 @@ SCOREGOESHERE
         wrapper = re.sub(r'PAPERTYPEGOESHERE', paperType, wrapper)
         wrapper = re.sub(r'\\endinput %', r'\end{document}' + "\n" + r'\endinput %', wrapper)
         return wrapper
-   
-        
-    
+
+
+
 class ChantException(exceptions21.Music21Exception):
     pass
- 
- 
+
+
 
 class Test(unittest.TestCase):
     pass
@@ -537,11 +537,11 @@ class TestExternal(unittest.TestCase):
 
     def runTest(self):
         pass
-    
+
     def testSimpleFile(self):
         s = GregorianStream()
         s.append(clef.AltoClef())
-    
+
         n = GregorianNote("C4")
         l = note.Lyric("Po")
         l.syllabic = "start"
@@ -575,7 +575,7 @@ class TestExternal(unittest.TestCase):
         texfh2.close()
         pdffn = bsc.launchLaTeX(texfn)
         os.system('open %s' % pdffn)
-        
+
 
 
 #-------------------------------------------------------------------------------

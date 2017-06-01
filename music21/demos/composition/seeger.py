@@ -16,7 +16,7 @@ def lowerLines():
     restLengths = [0, 16, 12, 11, 10, 7, 6, 7, 6, 5, 4, 3, 8, 10, 12, 14, 16, 17, 18, 19, 20]
     correctTranspositions = [-1, 2, -3, -3, 1, 1, 6, 3, -2] # correct the first note of rotations 13-21
     fixLastNoteLengths = {11: 4.5, 12: 3, 13: 2.5, 14: 2, 15: 1.5, 20: 10.5}
-    
+
     currentNote = 0
     rotationNumber = 1
     myRow = stream.Part()
@@ -53,7 +53,7 @@ def lowerLines():
                         appendNote.transpose(correctTranspositions[rotationNumber-13], inPlace = True)
                         appendNote.pitch.simplifyEnharmonic(inPlace = True)
                         appendNote.lyrics.append(note.Lyric(text="*", number=3))
-                        
+
                 currentNote += 1
             if addNote == 20-phraseNumber: # correct Last Notes
                 #if phraseNumber == 12: # bug in Finale for accidental display?
@@ -76,7 +76,7 @@ def lowerLines():
             if i == 2:
                 elRest.quarterLength=11.5
             myRow.append(elRest)
-    
+
     myRow.insert(0, meter.TimeSignature('2/2'))
 
     myRow.show()

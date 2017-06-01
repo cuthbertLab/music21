@@ -25,7 +25,7 @@ def annotateWithGerman():
 def bachParallels():
     '''
     find all instances of parallel fifths or octaves in Bach chorales.
-    Checking the work of George Fitsioris and Darrell Conklin, 
+    Checking the work of George Fitsioris and Darrell Conklin,
     "Parallel successions of perfect fifths in the Bach chorales"
     Proceedings of the fourth Conference on Interdisciplinary Musicology (CIM08)
     Thessaloniki, Greece, 3-6 July 2008, http://web.auth.gr/cim08/
@@ -48,12 +48,12 @@ def bachParallels():
                 jfn = c.parts[j].flat.notesAndRests.stream()
                 for k in range(len(omi) - 1):
                     n1pi = omi[k]['element']
-                    n2pi = omi[k+1]['element']                    
-                    n1pj = jfn.getElementsByOffset(offsetStart=omi[k]['endTime'] - .001, 
-                                                   offsetEnd=omi[k]['endTime'] - .001, 
+                    n2pi = omi[k+1]['element']
+                    n1pj = jfn.getElementsByOffset(offsetStart=omi[k]['endTime'] - .001,
+                                                   offsetEnd=omi[k]['endTime'] - .001,
                                                    mustBeginInSpan=False)[0]
-                    n2pj = jfn.getElementsByOffset(offsetStart=omi[k+1]['offset'], 
-                                                   offsetEnd=omi[k+1]['offset'], 
+                    n2pj = jfn.getElementsByOffset(offsetStart=omi[k+1]['offset'],
+                                                   offsetEnd=omi[k+1]['offset'],
                                                    mustBeginInSpan=False)[0]
                     if n1pj is n2pj:
                         continue # no oblique motion
@@ -83,19 +83,19 @@ def bachParallels():
 #
 #                    p1.append(m1)
 #                    p2.append(m2)
-                    
+
 #        sc.append(p1)
 #        sc.append(p2)
 #        sc.show()
         if displayMe:
             c.show()
-    
+
 def towersOfHanoi(show=False, numParts=6, transpose=False):
     '''
     generates a score solution to the Tower of Hanoi problem
     similar in spirit to the one that Tom Johnson made, but
     with any number of parts.  iterating over numParts(1...8) and
-    setting transpose to False gives the same solution as 
+    setting transpose to False gives the same solution as
     Tom Johnson found.
     '''
     sc = stream.Score()
@@ -112,7 +112,7 @@ def towersOfHanoi(show=False, numParts=6, transpose=False):
     else:
         oddPitches = ascendingPitches
         evenPitches = descendingPitches
-    
+
     for i in range(1, numParts + 1):
         baseQuarterLength = 2**(i-2) # .5, 1, 2, 4, etc.
         firstNote = note.Note("E5")
@@ -122,19 +122,19 @@ def towersOfHanoi(show=False, numParts=6, transpose=False):
             pitchCycle = copy.deepcopy(evenPitches)
         else:
             pitchCycle = copy.deepcopy(oddPitches)
-        
+
         if transpose == True and i != 1:
             for pe in pitchCycle: # take down P4s
                 pe.transpose(-5 * (i-1), inPlace = True)
             firstNote.transpose(-5 * (i-1), inPlace = True)
 
-                
-        
+
+
         p = stream.Part()
         p.id = "v. " + str(i)
         p.append(firstNote)
         pc = -1
-        
+
         maxNumber = 2**(numParts-i)
         for j in range(maxNumber):
             pc += 1
@@ -146,13 +146,13 @@ def towersOfHanoi(show=False, numParts=6, transpose=False):
             if j == maxNumber - 1: # last note
                 n.duration.quarterLength = (baseQuarterLength) + 3.0
             p.append(n)
-        
+
         finalRest = note.Rest()
         finalRest.duration.quarterLength = 1
         p.append(finalRest)
-        
+
         sc.insert(0, p)
-    
+
     if show == True:
         sc.show()
 
@@ -160,7 +160,7 @@ def pcsFromHumdrum(show=False):
     '''
     show how music21 can read Humdrum code to append the forte name to
     each vertical simultaneity in a score.
-    
+
     Asked by Fabio Kaiser on 12/8/2010
     '''
     from music21.humdrum import testFiles
@@ -171,7 +171,7 @@ def pcsFromHumdrum(show=False):
         output = output + thisChord.forteName + "\n"
     if show == True:
         print (output)
-        
+
 
 
 #-------------------------------------------------------------------------------

@@ -5,7 +5,7 @@ __all__ = [
     'composition',
     'josquin',
     'trecento',
-           
+
     'eschbeg',
     'monteverdi',
     'gatherAccidentals',

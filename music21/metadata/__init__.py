@@ -60,7 +60,7 @@ from music21.metadata.primitives import (Date, DateSingle, DateRelative, DateBet
                                          DateSelection, Text, Contributor, Creator,
                                          Imprint, Copyright)
 
-from music21.metadata import testMetadata 
+from music21.metadata import testMetadata
 #------------------------------------------------------------------------------
 
 
@@ -104,11 +104,11 @@ class Metadata(base.Music21Object):
     made available by default.
 
     >>> md.searchAttributes
-    ('alternativeTitle', 'composer', 'copyright', 'date', 'localeOfComposition', 
+    ('alternativeTitle', 'composer', 'copyright', 'date', 'localeOfComposition',
      'movementName', 'movementNumber', 'number', 'opusNumber', 'title')
-    
+
     All contributors are stored in a .contributors list:
-     
+
     >>> md.contributors
     [<music21.metadata.primitives.Contributor composer:Gershwin, George>]
     '''
@@ -220,21 +220,21 @@ class Metadata(base.Music21Object):
     def all(self, skipContributors=False):
         '''
         Returns all values (as strings) stored in this metadata as a sorted list of tuples.
-        
+
         >>> c = corpus.parse('corelli/opus3no1/1grave')
         >>> c.metadata.all()
-        [('arranger', 'Michael Scott Cuthbert'), 
-         ('composer', 'Arcangelo Corelli'), 
+        [('arranger', 'Michael Scott Cuthbert'),
+         ('composer', 'Arcangelo Corelli'),
          ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
 
         Skip contributors is there to help with musicxml parsing -- there's no reason for it
         except that we haven't exposed enough functionality yet:
-        
+
         >>> c.metadata.date = metadata.DateRelative('1689', 'onOrBefore')
         >>> c.metadata.localeOfComposition = 'Rome'
         >>> c.metadata.all(skipContributors=True)
-        [('date', '1689/--/-- or earlier'), 
-         ('localeOfComposition', 'Rome'), 
+        [('date', '1689/--/-- or earlier'),
+         ('localeOfComposition', 'Rome'),
          ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
         '''
         # pylint: disable=undefined-variable
@@ -271,8 +271,8 @@ class Metadata(base.Music21Object):
             else:
                 t = ('copyright', unicode(self.copyright)) # @UndefinedVariable
             allOut.append(t)
-            
-        
+
+
         return sorted(allOut)
 
     def __getattr__(self, name):
@@ -797,11 +797,11 @@ class RichMetadata(Metadata):
     >>> 'keySignatureFirst' in richMetadata.searchAttributes
     True
     >>> richMetadata.searchAttributes
-    ('alternativeTitle', 'ambitus', 'composer', 'copyright', 'date', 
-     'keySignatureFirst', 'keySignatures', 'localeOfComposition', 
-     'movementName', 'movementNumber', 'noteCount', 'number', 
+    ('alternativeTitle', 'ambitus', 'composer', 'copyright', 'date',
+     'keySignatureFirst', 'keySignatures', 'localeOfComposition',
+     'movementName', 'movementNumber', 'noteCount', 'number',
      'opusNumber', 'pitchHighest', 'pitchLowest', 'quarterLength',
-     'sourcePath', 
+     'sourcePath',
      'tempoFirst', 'tempos', 'timeSignatureFirst', 'timeSignatures', 'title')
     '''
 
@@ -882,7 +882,7 @@ class RichMetadata(Metadata):
         '''
         Get a string of the path after the corpus for the piece...useful for
         searching on corpus items without proper composer data...
-         
+
         >>> rmd = metadata.RichMetadata()
         >>> b = corpus.parse('bwv66.6')
         >>> rmd.getSourcePath(b)
@@ -893,7 +893,7 @@ class RichMetadata(Metadata):
         if not streamObj.filePath:
             return ''
         corpusParts = streamObj.filePath.split(os.sep)
-        try:         
+        try:
             corpusIndex = corpusParts.index('corpus')
         except ValueError:
             return ''
@@ -901,7 +901,7 @@ class RichMetadata(Metadata):
             return ''
         relevantParts = corpusParts[corpusIndex + 1:]
         return '/'.join(relevantParts)
-       
+
     def update(self, streamObj):
         r'''
         Given a Stream object, update attributes with stored objects.
@@ -911,14 +911,14 @@ class RichMetadata(Metadata):
         True
         >>> rmd.sourcePath
         ''
-        
+
         >>> b = corpus.parse('bwv66.6')
         >>> rmd.update(b)
         >>> rmd.keySignatureFirst
         '<music21.key.Key of f# minor>'
         >>> rmd.sourcePath
         'bach/bwv66.6.mxl'
-        
+
         '''
         from music21 import key
         from music21 import meter
@@ -934,10 +934,10 @@ class RichMetadata(Metadata):
         self.tempos = []
         self.timeSignatureFirst = None
         self.timeSignatures = []
-        
+
         self.sourcePath = self.getSourcePath(streamObj)
-        
-        
+
+
         # We combine element searching into a single loop to prevent
         # multiple traversals of the flattened stream.
         for element in flat:
@@ -1003,10 +1003,10 @@ class RichMetadata(Metadata):
 
 #------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-    
+
     def runTest(self):
         pass
-    
+
 
 #------------------------------------------------------------------------------
 

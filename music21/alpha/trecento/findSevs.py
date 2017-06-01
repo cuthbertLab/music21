@@ -23,7 +23,7 @@ def find(startRow=2, endRow=469, searchInterval=7):
     ballatas = cadencebook.BallataSheet()
     for row in range(startRow, endRow):
         ballata = ballatas.makeWork(row)
-        if findInWork(ballata, searchInterval):                
+        if findInWork(ballata, searchInterval):
             print(ballata.title + ' has a generic interval of %d somewhere' % searchInterval)
             opus.insert(0, ballata.asScore())
     if any(opus):
@@ -46,7 +46,7 @@ def findInWork(work, searchInterval=7):
                     thisInterval.noteEnd.style.color = 'blue'
 #                    except:
 #                        pass # not worth dying if the startNote can't be found
-                    #print(thisInterval.note1.nameWithOctave + ' -- ' + 
+                    #print(thisInterval.note1.nameWithOctave + ' -- ' +
                     #    thisInterval.note2.nameWithOctave)
                     #interval.note1.style.color = "blue" #this doesn't actually work yet....
                     #interval.note2.style.color = "blue"

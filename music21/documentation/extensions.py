@@ -29,7 +29,7 @@ def fixLines(lines):
             omitting = False
             continue
         elif '#_RAISES_ERROR' in line:
-            newLines.append(line.replace(' #_RAISES_ERROR', ' '))        
+            newLines.append(line.replace(' #_RAISES_ERROR', ' '))
         elif omitting is True:
             continue
         else:
@@ -46,7 +46,7 @@ def processDocstring(app, what, name, obj, options, lines):
     #    print 'OPTS ', options
     #    print 'LINES', lines
     fixLines(lines)
-    
+
 
 def processSource(app, name, lines):
     linesSep = lines[0].split('\n')
@@ -59,6 +59,6 @@ def setup(app):
     app.connect('source-read', processSource)
     extension_metadata = {'version': '1.0',
                           'parallel_read_safe': True,
-                          'parallel_write_safe': True,                          
+                          'parallel_write_safe': True,
                           }
     return extension_metadata

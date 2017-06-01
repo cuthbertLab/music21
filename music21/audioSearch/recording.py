@@ -23,7 +23,7 @@ users of 64-bit windows but 32-bit python should download the win32 port
 
 
 users of 64-bit windows and 64-bit python should download the amd64 port
- 
+
 
 '''
 import os
@@ -51,31 +51,31 @@ default_recordChunkLength = 1024
 
 def samplesFromRecording(seconds=10.0, storeFile=True,
                 recordFormat=None,
-                recordChannels=default_recordChannels,     
-                recordSampleRate=default_recordSampleRate, 
+                recordChannels=default_recordChannels,
+                recordSampleRate=default_recordSampleRate,
                 recordChunkLength=default_recordChunkLength):
     '''
     records `seconds` length of sound in the given format (default Wave)
     and optionally stores it to disk using the filename of `storeFile`
-    
-    
+
+
     Returns a list of samples.
     '''
-    
+
     try:
         import pyaudio #@UnresolvedImport
         recordFormatDefault = pyaudio.paInt16
     except (ImportError, SystemExit):
         pyaudio = None
         environLocal.warn("No Pyaudio found. Recording will probably not work.")
-        recordFormatDefault = 8 # pyaudio.paInt16    
+        recordFormatDefault = 8 # pyaudio.paInt16
 
     if recordFormat is None:
         recordFormat = recordFormatDefault
 
     if recordFormat == pyaudio.paInt8:
         raise RecordingException("cannot perform freq_from_autocorr on 8-bit samples")
-    
+
     p_audio = pyaudio.PyAudio()
     st = p_audio.open(format=recordFormat,
                     channels=recordChannels,
@@ -84,7 +84,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
                     frames_per_buffer=recordChunkLength)
 
     recordingLength = int(recordSampleRate * float(seconds) / recordChunkLength)
-    
+
     storedWaveSampleList = []
 
     #time_start = time.time()
@@ -93,9 +93,9 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
         storedWaveSampleList.append(data)
     #print 'Time elapsed: %.3f s\n' % (time.time() - time_start)
     st.close()
-    p_audio.terminate()    
+    p_audio.terminate()
 
-    if storeFile != False: 
+    if storeFile != False:
         if isinstance(storeFile, six.string_types):
             waveFilename = storeFile
         else:
@@ -120,15 +120,15 @@ class RecordingException(exceptions21.Music21Exception):
 
 #------------------------------------------
 class Test(unittest.TestCase):
-    
+
     def runTest(self):
         pass
 
 class TestExternal(unittest.TestCase):
-    
+
     def runTest(self):
         pass
-    
+
     def testRecording(self):
         '''
         record one second of data and print 10 records

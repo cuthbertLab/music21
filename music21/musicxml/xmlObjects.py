@@ -11,7 +11,7 @@
 #-------------------------------------------------------------------------------
 
 from collections import OrderedDict
-# these single-entity tags are bundled together. 
+# these single-entity tags are bundled together.
 from music21 import articulations
 from music21 import expressions
 
@@ -19,7 +19,7 @@ DYNAMIC_MARKS = ['p', 'pp', 'ppp', 'pppp', 'ppppp', 'pppppp',
         'f', 'ff', 'fff', 'ffff', 'fffff', 'ffffff',
         'mp', 'mf', 'sf', 'sfp', 'sfpp', 'fp', 'rf', 'rfz', 'sfz', 'sffz', 'fz',
         'other-dynamics' # non-empty...
-        ] 
+        ]
 
 ARTICULATION_MARKS = { 'accent'       : articulations.Accent,
                        'strong-accent'   : articulations.StrongAccent,
@@ -105,17 +105,17 @@ def yesNoToBoolean(value):
 def booleanToYesNo(value):
     '''
     Convert a True, False bool to 'yes' or 'no'
-    
+
     >>> musicxml.xmlObjects.booleanToYesNo(True)
     'yes'
     >>> musicxml.xmlObjects.booleanToYesNo(False)
     'no'
 
     anything that evaluates to True becomes 'yes'
-    
+
     >>> musicxml.xmlObjects.booleanToYesNo(5)
     'yes'
-    
+
     '''
     if value: # purposely not "is True"
         return 'yes'
@@ -125,12 +125,12 @@ def booleanToYesNo(value):
 def fractionToPercent(value):
     '''
     Turns a fraction into a string percent
-    
+
     >>> musicxml.xmlObjects.fractionToPercent(0.25)
     '25'
 
     Only does whole numbers for now...
-    
+
     >>> musicxml.xmlObjects.fractionToPercent(0.251)
     '25'
 
@@ -141,4 +141,4 @@ def fractionToPercent(value):
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-    
+

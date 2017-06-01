@@ -50,13 +50,13 @@ FORMATS = [syn[0] for syn in FORMAT_SYNONYMS]
 def getPlotClasses():
     '''
     return a list of all PlotStreamMixin subclasses...  returns sorted list by name
-    
+
     >>> graph.findPlot.getPlotClasses()
-    [<class 'music21.graph.plot.Dolan'>, 
-     <class 'music21.graph.plot.Features'>, 
-     <class 'music21.graph.plot.Histogram'>, 
-     <class 'music21.graph.plot.HistogramPitchClass'>, 
-     <class 'music21.graph.plot.HistogramPitchSpace'>, 
+    [<class 'music21.graph.plot.Dolan'>,
+     <class 'music21.graph.plot.Features'>,
+     <class 'music21.graph.plot.Histogram'>,
+     <class 'music21.graph.plot.HistogramPitchClass'>,
+     <class 'music21.graph.plot.HistogramPitchSpace'>,
      ...]
     '''
     allPlot = []
@@ -72,11 +72,11 @@ def getPlotClasses():
 def getAxisClasses():
     '''
     return a list of all Axis subclasses...  returns sorted list by name
-    
+
     >>> graph.findPlot.getAxisClasses()
-    [<class 'music21.graph.axis.Axis'>, 
-     <class 'music21.graph.axis.CountingAxis'>, 
-     <class 'music21.graph.axis.DynamicsAxis'>, 
+    [<class 'music21.graph.axis.Axis'>,
+     <class 'music21.graph.axis.CountingAxis'>,
+     <class 'music21.graph.axis.DynamicsAxis'>,
      <class 'music21.graph.axis.OffsetAxis'>,
      ...]
     '''
@@ -92,21 +92,21 @@ def getAxisClasses():
 def getAxisQuantities(synonyms=False, axesToCheck=None):
     '''
     >>> graph.findPlot.getAxisQuantities()
-    ['generic', 'count', 'dynamic', 'offset', 'offsetEnd', 
+    ['generic', 'count', 'dynamic', 'offset', 'offsetEnd',
      'pitchGeneric', 'pitchClass', 'pitchSpace', 'octave', 'position', 'quarterLength']
 
     >>> graph.findPlot.getAxisQuantities(synonyms=True)
     ['generic', 'one', 'nothing', 'blank', 'count', 'quantity', 'frequency', ...]
-    
+
     >>> theseAxes = [graph.axis.CountingAxis, graph.axis.OffsetAxis]
     >>> graph.findPlot.getAxisQuantities(axesToCheck=theseAxes)
     ['count', 'offset']
-    
+
     >>> graph.findPlot.getAxisQuantities(True, axesToCheck=theseAxes)
-    ['count', 'quantity', 'frequency', 'counting', 
+    ['count', 'quantity', 'frequency', 'counting',
      'offset', 'measure', 'offsets', 'measures', 'time']
 
-    
+
     '''
     if axesToCheck is None:
         axesToCheck = getAxisClasses()
@@ -117,22 +117,22 @@ def getAxisQuantities(synonyms=False, axesToCheck=None):
         else:
             allQuantities.append(axClass.quantities[0])
     return allQuantities
-    
-        
+
+
 def userFormatsToFormat(userFormat):
     '''
-    Replace possible user format strings with defined format names as used herein. 
+    Replace possible user format strings with defined format names as used herein.
     Returns string unaltered if no match.
-    
+
     >>> graph.findPlot.userFormatsToFormat('horizontal')
     'horizontalbar'
     >>> graph.findPlot.userFormatsToFormat('Weighted Scatter')
     'scatterweighted'
     >>> graph.findPlot.userFormatsToFormat('3D')
     '3dbars'
-    
+
     Unknown formats pass through unaltered.
-    
+
     >>> graph.findPlot.userFormatsToFormat('4D super chart')
     '4dsuperchart'
     '''
@@ -143,7 +143,7 @@ def userFormatsToFormat(userFormat):
     for opt in FORMAT_SYNONYMS:
         if userFormat in opt:
             return opt[0] # first one for each is the preferred
-    
+
     # return unaltered if no match
     #environLocal.printDebug(['userFormatsToFormat(): could not match value', value])
     return userFormat
@@ -151,22 +151,22 @@ def userFormatsToFormat(userFormat):
 def getPlotClassesFromFormat(graphFormat, checkPlotClasses=None):
     '''
     Given a graphFormat, find a list of plots that match:
-    
+
     >>> graph.findPlot.getPlotClassesFromFormat('scatterweighted')
-    [<class 'music21.graph.plot.ScatterWeighted'>, 
-     <class 'music21.graph.plot.ScatterWeightedPitchClassQuarterLength'>, 
-     <class 'music21.graph.plot.ScatterWeightedPitchSpaceDynamicSymbol'>, 
+    [<class 'music21.graph.plot.ScatterWeighted'>,
+     <class 'music21.graph.plot.ScatterWeightedPitchClassQuarterLength'>,
+     <class 'music21.graph.plot.ScatterWeightedPitchSpaceDynamicSymbol'>,
      <class 'music21.graph.plot.ScatterWeightedPitchSpaceQuarterLength'>]
 
     Or give a list of plot classes to check:
-    
+
     >>> pcs = [graph.plot.ScatterWeighted, graph.plot.Dolan]
     >>> graph.findPlot.getPlotClassesFromFormat('scatterweighted', pcs)
     [<class 'music21.graph.plot.ScatterWeighted'>]
 
     '''
     graphFormat = userFormatsToFormat(graphFormat).lower()
-    
+
     if checkPlotClasses is None:
         checkPlotClasses = getPlotClasses()
     filteredPlots = []
@@ -178,17 +178,17 @@ def getPlotClassesFromFormat(graphFormat, checkPlotClasses=None):
 def getAxisClassFromValue(axisValue):
     '''
     given an axis value return the single best axis for the value, or None
-    
+
     uses Axis.quantities
-    
+
     >>> getAxis = graph.findPlot.getAxisClassFromValue
-    
+
     >>> getAxis('counting')
     <class 'music21.graph.axis.CountingAxis'>
-    
+
     >>> getAxis('pc')
     <class 'music21.graph.axis.PitchClassAxis'>
-    
+
     >>> print(getAxis('boogie'))
     None
     '''
@@ -200,7 +200,7 @@ def getAxisClassFromValue(axisValue):
 def axisMatchesValue(axisClass, axisValue):
     '''
     Returns Bool about whether axisValue.lower() is anywhere in axisClass.quantities
-    
+
     >>> ax = graph.axis.CountingAxis
     >>> graph.findPlot.axisMatchesValue(ax, 'counting')
     True
@@ -208,8 +208,8 @@ def axisMatchesValue(axisClass, axisValue):
     True
     >>> graph.findPlot.axisMatchesValue(ax, 'offset')
     False
-    
-    
+
+
     Works on an instantiated object as well:
 
     >>> ax = graph.axis.CountingAxis()
@@ -219,7 +219,7 @@ def axisMatchesValue(axisClass, axisValue):
     False
 
     if axisClass is None, returns False
-    
+
     >>> graph.findPlot.axisMatchesValue(None, 'counting')
     False
     '''
@@ -231,87 +231,87 @@ def axisMatchesValue(axisClass, axisValue):
             return True
     return False
 
-def getPlotsToMake(graphFormat=None, 
-                   xValue=None, 
-                   yValue=None, 
+def getPlotsToMake(graphFormat=None,
+                   xValue=None,
+                   yValue=None,
                    zValue=None):
     '''
     Returns either a list of plot clases to make if there is a predetermined class
 
     or a list of tuples where the first element of each tuple is the plot class
-    and the second is a dict of {'x': axisXClass, 'y': axisYClass} etc. 
-    
-    
+    and the second is a dict of {'x': axisXClass, 'y': axisYClass} etc.
+
+
     Default is pianoroll
-    
+
 
     >>> graph.findPlot.getPlotsToMake()
     [<class 'music21.graph.plot.HorizontalBarPitchSpaceOffset'>]
 
     >>> graph.findPlot.getPlotsToMake('scatter')
-    [<class 'music21.graph.plot.Scatter'>, 
-     <class 'music21.graph.plot.ScatterPitchClassOffset'>, 
-     <class 'music21.graph.plot.ScatterPitchClassQuarterLength'>, 
-     <class 'music21.graph.plot.ScatterPitchSpaceDynamicSymbol'>, 
+    [<class 'music21.graph.plot.Scatter'>,
+     <class 'music21.graph.plot.ScatterPitchClassOffset'>,
+     <class 'music21.graph.plot.ScatterPitchClassQuarterLength'>,
+     <class 'music21.graph.plot.ScatterPitchSpaceDynamicSymbol'>,
      <class 'music21.graph.plot.ScatterPitchSpaceQuarterLength'>]
 
     >>> graph.findPlot.getPlotsToMake('scatter', 'offset', 'pitchClass')
     [<class 'music21.graph.plot.ScatterPitchClassOffset'>]
-    
+
     Try in wrong order:
-    
+
     >>> graph.findPlot.getPlotsToMake('scatter', 'pitchClass', 'offset')
     [<class 'music21.graph.plot.ScatterPitchClassOffset'>]
-    
+
     Try giving just one value:
-    
+
     >>> graph.findPlot.getPlotsToMake('scatter', 'offset')
-    [<class 'music21.graph.plot.ScatterPitchClassOffset'>]    
+    [<class 'music21.graph.plot.ScatterPitchClassOffset'>]
 
     >>> graph.findPlot.getPlotsToMake('scatter', 'ql')  # abbreviation
-    [<class 'music21.graph.plot.ScatterPitchClassQuarterLength'>, 
+    [<class 'music21.graph.plot.ScatterPitchClassQuarterLength'>,
      <class 'music21.graph.plot.ScatterPitchSpaceQuarterLength'>]
 
     Just one value but it is in the wrong axis...
-    
+
     >>> graph.findPlot.getPlotsToMake('scatter', 'pitchClass')
-    [<class 'music21.graph.plot.ScatterPitchClassOffset'>, 
+    [<class 'music21.graph.plot.ScatterPitchClassOffset'>,
      <class 'music21.graph.plot.ScatterPitchClassQuarterLength'>]
-     
+
     Create a graph that does not exist:
-    
+
     >>> graph.findPlot.getPlotsToMake('scatter', 'offset', 'dynamics')
-    [(<class 'music21.graph.plot.Scatter'>, 
-      OrderedDict([('x', <class 'music21.graph.axis.OffsetAxis'>), 
+    [(<class 'music21.graph.plot.Scatter'>,
+      OrderedDict([('x', <class 'music21.graph.axis.OffsetAxis'>),
                    ('y', <class 'music21.graph.axis.DynamicsAxis'>)]))]
-       
-       
+
+
     Just a couple of values:
-    
+
     >>> graph.findPlot.getPlotsToMake('offset', 'dynamics')
-    [(<class 'music21.graph.plot.Scatter'>, 
-      OrderedDict([('x', <class 'music21.graph.axis.OffsetAxis'>), 
+    [(<class 'music21.graph.plot.Scatter'>,
+      OrderedDict([('x', <class 'music21.graph.axis.OffsetAxis'>),
                    ('y', <class 'music21.graph.axis.DynamicsAxis'>)]))]
 
     Just one value:
-    
+
     >>> graph.findPlot.getPlotsToMake('octave')
-    [(<class 'music21.graph.plot.Histogram'>, 
+    [(<class 'music21.graph.plot.Histogram'>,
       OrderedDict([('x', <class 'music21.graph.axis.PitchSpaceOctaveAxis'>)]))]
 
     Three values:
 
     >>> graph.findPlot.getPlotsToMake('offset', 'dynamics', 'count')
-    [(<class 'music21.graph.plot.ScatterWeighted'>, 
-      OrderedDict([('x', <class 'music21.graph.axis.OffsetAxis'>), 
-                   ('y', <class 'music21.graph.axis.DynamicsAxis'>), 
+    [(<class 'music21.graph.plot.ScatterWeighted'>,
+      OrderedDict([('x', <class 'music21.graph.axis.OffsetAxis'>),
+                   ('y', <class 'music21.graph.axis.DynamicsAxis'>),
                    ('z', <class 'music21.graph.axis.CountingAxis'>)]))]
 
     '''
     def _bestPlotType(graphClassesToChooseFrom):
-        # now get the best graph type from this possibly motley list...        
+        # now get the best graph type from this possibly motley list...
         numAxes = len([1 for val in (xValue, yValue, zValue) if val is not None])
-        
+
         if numAxes == 3:
             bestGraphType = 'scatterweighted'
         elif numAxes == 2:
@@ -323,11 +323,11 @@ def getPlotsToMake(graphFormat=None,
             return filteredClasses
         else:
             return graphClassesToChooseFrom
-        
-    
+
+
     if [graphFormat, xValue, yValue, zValue] == [None] * 4:
-        graphFormat = 'pianoroll'    
-    
+        graphFormat = 'pianoroll'
+
     if graphFormat in PLOTCLASS_SHORTCUTS:
         graphClasses = [PLOTCLASS_SHORTCUTS[graphFormat]]
     else:
@@ -339,7 +339,7 @@ def getPlotsToMake(graphFormat=None,
         graphFormat = None
         graphClasses = getPlotClasses() # assume graphFormat is an axis and shift over...
     # match values to axes...
-            
+
     graphRemove = []
     for axisLetter, axisValue in (('x', xValue), ('y', yValue), ('z', zValue)):
         for gc in graphClasses:
@@ -352,13 +352,13 @@ def getPlotsToMake(graphFormat=None,
             if not axisMatchesValue(axisObjClass, axisValue):
                 graphRemove.append(gc)
 
-    graphClassesFiltered = [x for x in graphClasses if x not in graphRemove]            
-    if graphClassesFiltered: 
+    graphClassesFiltered = [x for x in graphClasses if x not in graphRemove]
+    if graphClassesFiltered:
         if graphFormat or len(graphClassesFiltered) == 1:
             return graphClassesFiltered
         else:
             return _bestPlotType(graphClassesFiltered)
-    
+
     # no matches for values.  Try agnostic about X and Y...
     graphRemove = []
     for axisLetter, axisValue in (('x', xValue), ('y', yValue), ('z', zValue)):
@@ -370,12 +370,12 @@ def getPlotsToMake(graphFormat=None,
                 if axisMatchesValue(axisObjClass, axisValue):
                     found = True
                     break
-            
+
             if not found:
                 graphRemove.append(gc)
 
-    graphClassesFiltered = [x for x in graphClasses if x not in graphRemove]            
-    if graphClassesFiltered: 
+    graphClassesFiltered = [x for x in graphClasses if x not in graphRemove]
+    if graphClassesFiltered:
         if graphFormat or len(graphClassesFiltered) == 1:
             return graphClassesFiltered
         else:
@@ -383,8 +383,8 @@ def getPlotsToMake(graphFormat=None,
 
 
     # if still not found, return a dict with the proper axes...
-    
-    axisDict = collections.OrderedDict()    
+
+    axisDict = collections.OrderedDict()
     for axisLetter, axisValue in (('x', xValue), ('y', yValue), ('z', zValue)):
         if axisValue is None:
             continue
@@ -392,18 +392,18 @@ def getPlotsToMake(graphFormat=None,
         if axisClass is None:
             continue
         axisDict[axisLetter] = axisClass
-        
+
     if len(graphClasses) == 1:
         return [(graphClasses[0], axisDict)]
     else:
         filteredClasses = _bestPlotType(graphClasses)
-        
+
         if filteredClasses:
             return [(filteredClasses[0], axisDict)]
         else: # we have done our best...
             return [(graphClasses[0], axisDict)]
-            
-        
+
+
 
 class Test(unittest.TestCase):
     def testGetPlotsToMakeA(self):

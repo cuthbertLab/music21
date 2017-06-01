@@ -37,7 +37,7 @@ class Iterator(object):
 class IPythonNotebookIterator(Iterator):
     '''
     Iterates over music21's documentation directory, yielding .ipynb files.
-    
+
     >>> sp = common.getSourceFilePath()
     >>> ipnbi = documentation.iterators.IPythonNotebookIterator()
     >>> for i, nb in enumerate(ipnbi):
@@ -169,10 +169,10 @@ class CodebaseIterator(Iterator):
     Iterate over music21's package system, yielding all classes and functions.
 
     This currently yields enums that are defined in the module (because they are
-    an instance of type 'class') -- should it? 
+    an instance of type 'class') -- should it?
 
     Enums have a different repr: <enum 'MotionType'> not <class 'enum'>
-    
+
     >>> cbi = documentation.iterators.CodebaseIterator(verbose=False)
     >>> firstTen = list(cbi)[:10]
     >>> for x in firstTen:
@@ -186,7 +186,7 @@ class CodebaseIterator(Iterator):
     <class 'music21.articulations.Caesura'>
     <class 'music21.articulations.DetachedLegato'>
     <class 'music21.articulations.Doit'>
-    <class 'music21.articulations.DoubleTongue'>    
+    <class 'music21.articulations.DoubleTongue'>
     '''
 
     ### SPECIAL METHODS ###
@@ -198,7 +198,7 @@ class CodebaseIterator(Iterator):
                     continue
                 named = getattr(module, name)
                 validTypes = six.class_types + (types.FunctionType,)
-                if (isinstance(named, validTypes) 
+                if (isinstance(named, validTypes)
                         and named.__module__ == module.__name__):
                     yield named
         pass

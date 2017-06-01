@@ -6,7 +6,7 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 import re
 
-splitLots = re.sub(r"\s\s\s\s+", "\t", 
+splitLots = re.sub(r"\s\s\s\s+", "\t",
 r'''
 **kern        **kern
 *staff2       *staff1
@@ -28,7 +28,7 @@ r'''
 ''')
 
 
-fakeTest = re.sub(r"\s\s\s\s+", "\t", 
+fakeTest = re.sub(r"\s\s\s\s+", "\t",
 r'''
 !! Global Comment
 !!!COM: Fake, Composer
@@ -59,7 +59,7 @@ r'''
 '''
 )
 
-strangeWTCOpening = re.sub(r"\s\s\s\s+", "\t", 
+strangeWTCOpening = re.sub(r"\s\s\s\s+", "\t",
 r'''
 **kern
 *k[]
@@ -181,7 +181,7 @@ r'''
 )
 
 
-  
+
 schubert = re.sub(r"\s\s\s\s", "\t",
 r'''
 !!!COM: Schubert, Franz Peter
@@ -192,7 +192,7 @@ r'''
 !!!SCT: DV 257
 !!!YOR: Franz Schubert: Selected songs
 !!!PPE: Max Friedlaender
-!!!PSR: C.F. Peters 
+!!!PSR: C.F. Peters
 !!!PSP: Frankfurt, London, New York
 !!!PSD: n.d.
 !!!PPG: pp.73-74
@@ -440,15 +440,15 @@ r'''
 *-
 !!!ENC: David Huron
 !!!EMD: Paul von Hippel updated this file in the following ways (1998/9/2,21-22/):
-!!!EMD:  (1) changed the representation of slurs from curly braces to parentheses 
+!!!EMD:  (1) changed the representation of slurs from curly braces to parentheses
 !!!EMD:  (2) changed freeform comments into reference records and tandem interpretations
 !!!EMD:  (3) changed final barline from quadruple (====) to double (==)
 !!!EMD:  (4) added key signatures, key designations, and tempi
 !!!EEV: Version 2.0
 '''
 )
-    
-    
+
+
 mazurka6 = re.sub(r"\s\s\s\s", "\t",
 r'''
 !!!COM: Chopin, Frederic
@@ -1136,7 +1136,7 @@ r'''
 !!!ENC: Craig Stuart Sapp
 !!!END: 2008/07/25/
 '''
-)                    
+)
 
 sousaStars = re.sub(r"\s\s\s\s", "\t",
 r'''

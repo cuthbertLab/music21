@@ -109,7 +109,7 @@ class MetadataEntry(object):
     def show(self, showFormat=None):
         score = self.parse()
         score.show(showFormat)
-        
+
     def search(self, query, field=None):
         return self.metadataPayload.search(query, field)
 
@@ -155,7 +155,7 @@ class MetadataBundle(object):
 
 
     Results are ordered by their source path:
-    
+
     >>> resultsEntries[0]
     <music21.metadata.bundles.MetadataEntry: bach_choraleAnalyses_riemenschneider001_rntxt>
 
@@ -164,7 +164,7 @@ class MetadataBundle(object):
     >>> resultsEntries[0].parse()
     <music21.stream.Score ...>
 
-    A metadata bundle can be instantiated in three ways, (1) from a ``Corpus`` instance, 
+    A metadata bundle can be instantiated in three ways, (1) from a ``Corpus`` instance,
     or (2) a string indicating which corpus cacheName to draw from:
 
     Method 1:
@@ -193,7 +193,7 @@ class MetadataBundle(object):
 
     The third method is to call `.metadataBundle` on the corpus itself. This
     calls `.read()` automatically:
-    
+
     Method 3:
 
     >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
@@ -231,9 +231,9 @@ class MetadataBundle(object):
     >>> failedPaths
     []
     >>> anonymousBundle
-    <music21.metadata.bundles.MetadataBundle {4 entries}>        
+    <music21.metadata.bundles.MetadataBundle {4 entries}>
     '''
-    
+
     ### INITIALIZER ###
 
     def __init__(self, expr=None):
@@ -576,9 +576,9 @@ class MetadataBundle(object):
             else:
                 metadataEntry = metadataBundle._metadataEntries[key]
             resultBundle._metadataEntries[key] = metadataEntry
-            
+
         mdbItems = list(resultBundle._metadataEntries.items())
-        resultBundle._metadataEntries = OrderedDict(sorted(mdbItems, 
+        resultBundle._metadataEntries = OrderedDict(sorted(mdbItems,
                                                            key=lambda mde: mde[1].sourcePath))
         return resultBundle
 
@@ -732,7 +732,7 @@ class MetadataBundle(object):
         else:
             environLocal.printDebug(message)
 
-        
+
         if useMultiprocessing:
             jobProcessor = metadata.caching.JobProcessor.process_parallel
         else:
@@ -748,8 +748,8 @@ class MetadataBundle(object):
                 environLocal.warn(message)
             else:
                 environLocal.printDebug(message)
-            
-            
+
+
             currentIteration += 1
             accumulatedResults.extend(result['metadataEntries'])
             accumulatedErrors.extend(result['errors'])
@@ -1027,7 +1027,7 @@ class MetadataBundle(object):
 
         >>> anonymousBundle = metadata.bundles.MetadataBundle().read()
         Traceback (most recent call last):
-        music21.exceptions21.MetadataException: Unnamed MetadataBundles have 
+        music21.exceptions21.MetadataException: Unnamed MetadataBundles have
             no default file path to read from.
 
         '''
@@ -1146,7 +1146,7 @@ class MetadataBundle(object):
                 if include and key not in newMetadataBundle._metadataEntries:
                     newMetadataBundle._metadataEntries[key] = metadataEntry
         newMetadataBundle._metadataEntries = OrderedDict(
-                                sorted(list(newMetadataBundle._metadataEntries.items()), 
+                                sorted(list(newMetadataBundle._metadataEntries.items()),
                                                         key=lambda mde: mde[1].sourcePath))
 
         return newMetadataBundle
@@ -1211,11 +1211,11 @@ class MetadataBundle(object):
         If the entry represents a non-virtual corpus asset, test that its
         source path is locatable on disk.  If not, remove the metadata entry
         from the metadata bundle.
-        
+
         Currently (Dec 2014) there is one entry in the metadata bundle that
         has been removed, so calling validate (called from addFromPaths) results in
         14083 instead of 14084 entries
-        
+
         '''
         timer = common.Timer()
         timer.start()

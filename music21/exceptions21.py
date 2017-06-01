@@ -22,7 +22,7 @@ class Music21Exception(Exception):
 
 # The rest of these are here because they are imported by more than one module
 # which cannot import the other module because of circular imports.
-# 
+#
 # if Circular imports have not been a problem and/or you don't plan to use
 # an exception in multiple modules (i.e., you're not going to catch a particular
 # exception in a different module, then define that exception in the module itself

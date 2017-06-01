@@ -319,7 +319,7 @@ class _EnvironmentCore(object):
                     ('vectorPath', '/Applications/Preview.app'),
                     ('pdfPath', '/Applications/Preview.app'),
                     ('midiPath', '/Applications/Utilities/QuickTime Player 7.app'),
-                    ('musescoreDirectPNGPath', 
+                    ('musescoreDirectPNGPath',
                         '/Applications/MuseScore 2.app/Contents/MacOS/mscore'),
                 ]:
                 self.__setitem__(name, value)  # use for key checking
@@ -634,7 +634,7 @@ class _EnvironmentCore(object):
             filePath = self.getSettingsPath()
         if not os.path.exists(filePath):
             return None  # do nothing if no file exists
-        
+
         try:
             settingsTree = ET.parse(filePath)
         except ET.ParseError as pe:

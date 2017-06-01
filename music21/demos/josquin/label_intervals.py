@@ -5,7 +5,7 @@ from music21 import converter, interval
 def displayIntervals(file):
     """
     displayIntervals reads a music file and then displays it with an enumeration
-    of the intervals above the lowest notes in the score at each sonority 
+    of the intervals above the lowest notes in the score at each sonority
     (after chordification).
     """
     sJosquinPiece = converter.parse(file)
@@ -20,7 +20,7 @@ def displayIntervals(file):
                 i = interval.Interval(p, c.pitches[len(c.pitches)-1])
                 notation = i.semiSimpleName
                 c.addLyric(notation, j + 3)
-                if c.isConsonant() is False:                
+                if c.isConsonant() is False:
                     c.addLyric('d', 7)
                     if c.beatStrength >= .5:
                         c.addLyric('sbd', 7)
@@ -32,7 +32,7 @@ def displayIntervals(file):
 if __name__ == "__main__":
     import os
     import sys
-    
+
     basedir = "" # "/Users/Victoria/Desktop/"
     filename = "1202a-Missa_Sine_nomine-Kyrie.xml" #argv[1]
     if os.path.isfile(filename):

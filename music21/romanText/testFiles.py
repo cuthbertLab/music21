@@ -9,7 +9,7 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
-Objects for processing roman numeral analysis text files, 
+Objects for processing roman numeral analysis text files,
 as defined and demonstrated by Dmitri Tymoczko.
 '''
 import unittest
@@ -280,7 +280,7 @@ m80 I b2 IV
 m82 b1.5 VII
 m83 III b2 v d: i
 m84 V
-m85 I || g: V 
+m85 I || g: V
 m86 b2 i
 m87 V6 b2 i b2.5 v b2.75 v6
 m88 iv6
@@ -309,7 +309,7 @@ m106 I ||
 m108 I
 m110 IV
 m111 VII
-m112 v6 
+m112 v6
 m113 i b2 iv6 ||
 Time Signature: 3/4
 Note: harmony ambiguous on b2; could read IV6, with D as a suspension
@@ -453,7 +453,7 @@ Time Signature: 3/4
 Form: exposition
 m1 F: I b2 V4/3 b3 I
 m2 V6/5 b2 V7 b3 I
-m3 ii6 b2 I6/4 b3 V7 
+m3 ii6 b2 I6/4 b3 V7
 m4 IV6 b2 V6/5 b3 I
 m5 ii6 b2 I6/4 b3 V7
 m6 I
@@ -502,7 +502,7 @@ m50 V
 Form: second theme
 m51 V4/3
 m52 I6
-m53 V6/5 
+m53 V6/5
 m54 I
 m55 V6/5/V b2 V b3.5 V2
 m56 I6 b1.5 IV b2 I6/4 b3 V7
@@ -659,9 +659,9 @@ m10 = m9
 m11 I6 b2.5 V6/5/IV b3 IV
 m12 I6 b1.5 ii6 b2 I6/4 b2.5 viio6/4 b3 I6 b4.5 V6/5/IV
 m13 IV b3 I6 b3.5 IV b4 I6/4 b4.5 V
-m14a I b1.5 V7 b2 I b2.5 V7 b3 I C: V b4 V9 
+m14a I b1.5 V7 b2 I b2.5 V7 b3 I C: V b4 V9
 m14b I b1.5 V7 b2 I b2.5 V7 b3 I b4 d: iio2
-Note: m14 melodic texture, inferred harmony  
+Note: m14 melodic texture, inferred harmony
 Form: development
 m15 viio7
 m16 b3 i
@@ -687,10 +687,10 @@ ALL  = [monteverdi_3_13, riemenschneider001, swv23, mozartK279]
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-    
+
     def runTest(self):
         pass
-    
+
 
 
 

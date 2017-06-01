@@ -15,11 +15,11 @@
 
 '''
 This module represents instruments through objects that contain general information
-such as Metadata for instrument names, classifications, transpositions and default 
+such as Metadata for instrument names, classifications, transpositions and default
 MIDI program numbers.  It also contains information specific to each instrument
 or instrument family, such as string pitches, etc.  Information about instrumental
 ensembles is also included here though it may later be separated out into its own
-ensemble.py module. 
+ensemble.py module.
 '''
 import copy
 import unittest
@@ -45,8 +45,8 @@ environLocal = environment.Environment(_MOD)
 def unbundleInstruments(streamIn, inPlace=False):
     '''
     takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.Unpitched` objects
-    and moves their `.storedInstrument` attributes to a new Stream (unless inPlace=True)  
-    
+    and moves their `.storedInstrument` attributes to a new Stream (unless inPlace=True)
+
     >>> up1 = note.Unpitched()
     >>> up1.storedInstrument = instrument.BassDrum()
     >>> up2 = note.Unpitched()
@@ -60,19 +60,19 @@ def unbundleInstruments(streamIn, inPlace=False):
     {0.0} <music21.note.Unpitched object at 0x...>
     {1.0} <music21.instrument.Cowbell Cowbell>
     {1.0} <music21.note.Unpitched object at 0x...>
-    '''    
+    '''
     if inPlace is True:
         s = streamIn
     else:
         s = copy.deepcopy(streamIn)
-    
+
     for thisObj in s:
         if 'Unpitched' in thisObj.classes:
             i = thisObj.storedInstrument
             if i is not None:
                 off = thisObj.offset
                 s.insert(off, i)
-    
+
     if inPlace is False:
         return s
 
@@ -81,7 +81,7 @@ def bundleInstruments(streamIn, inPlace=False):
     >>> up1 = note.Unpitched()
     >>> up1.storedInstrument = instrument.BassDrum()
     >>> upUnknownInstrument = note.Unpitched()
-    
+
     >>> up2 = note.Unpitched()
     >>> up2.storedInstrument = instrument.Cowbell()
     >>> s = stream.Stream()
@@ -95,24 +95,24 @@ def bundleInstruments(streamIn, inPlace=False):
     Bass Drum
     Bass Drum
     Cowbell
-    
+
     '''
     if inPlace is True:
         s = streamIn
     else:
         s = copy.deepcopy(streamIn)
-    
+
     for thisObj in s:
         if 'Instrument' in thisObj.classes:
             lastInstrument = thisObj
             s.remove(thisObj)
         elif 'Unpitched' in thisObj.classes:
             thisObj.storedInstrument = lastInstrument
-        
+
     if inPlace is False:
         return s
 
-    
+
 
 class Instrument(base.Music21Object):
     '''
@@ -120,9 +120,9 @@ class Instrument(base.Music21Object):
     for subclassing, though usually a more specific
     instrument class (such as StringInstrument) would
     be better to subclass.
-    
+
     Some defined attributes for instruments include:
-    
+
     * partId
     * partName
     * partAbbreviation
@@ -137,7 +137,7 @@ class Instrument(base.Music21Object):
     * inGMPercMap (bool -- if it uses the GM percussion map)
     * soundfontFn (filepath to a sound font, optional)
     '''
-    
+
     classSortOrder = -25
 
     def __init__(self):
@@ -152,13 +152,13 @@ class Instrument(base.Music21Object):
         self.instrumentAbbreviation = None
         self.midiProgram = None
         self.midiChannel = None
-        
+
         self.lowestNote = None
         self.highestNote = None
 
         # define interval to go from written to sounding
         self.transposition = None
-        
+
         self.inGMPercMap = False
         self.soundfontFn = None # if defined...
 
@@ -174,12 +174,12 @@ class Instrument(base.Music21Object):
 
     def __repr__(self):
         return "<%s.%s %s>" % (self.__class__.__module__,
-                               self.__class__.__name__, 
+                               self.__class__.__name__,
                                self.__str__())
 
     def bestName(self):
         '''
-        Find a viable name, looking first at instrument, then part, then 
+        Find a viable name, looking first at instrument, then part, then
         abbreviations.
         '''
         if self.partName != None:
@@ -199,19 +199,19 @@ class Instrument(base.Music21Object):
         Force a unique id by using an MD5
         '''
         idNew = 'P%s' % common.getMd5()
-        #environLocal.printDebug(['incrementing instrument from', 
+        #environLocal.printDebug(['incrementing instrument from',
         #                         self.partId, 'to', idNew])
         self.partId = idNew
-         
+
     def instrumentIdRandomize(self):
         '''
         Force a unique id by using an MD5
         '''
         idNew = 'I%s' % common.getMd5()
-        #environLocal.printDebug(['incrementing instrument from', 
+        #environLocal.printDebug(['incrementing instrument from',
         #                         self.partId, 'to', idNew])
         self.instrumentId = idNew
-         
+
 
     # the empty list as default is actually CORRECT!
     def autoAssignMidiChannel(self, usedChannels=[]): # pylint: disable=dangerous-default-value
@@ -230,17 +230,17 @@ class Instrument(base.Music21Object):
         Note that the reused "usedChannels=[]" in the
         signature is NOT a mistake, but necessary for
         the case where there needs to be a global list.
-        
+
         >>> used = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11]
         >>> i = instrument.Violin()
         >>> i.autoAssignMidiChannel(used)
         12
         >>> i.midiChannel
         12
-        
-        
+
+
         OMIT_FROM_DOCS
-        
+
         >>> used2 = range(0,16)
         >>> i = instrument.Instrument()
         >>> i.autoAssignMidiChannel(used2)
@@ -269,7 +269,7 @@ class Instrument(base.Music21Object):
                     self.midiChannel = ch
                     return ch
             return 0
-            #raise InstrumentException("we are out of midi channels and this " + 
+            #raise InstrumentException("we are out of midi channels and this " +
             #            "was not already detected PROGRAM BUG!")
 
 
@@ -281,9 +281,9 @@ class KeyboardInstrument(Instrument):
         self.instrumentName = 'Keyboard'
         self.instrumentAbbreviation = 'Kb'
 
-class Piano(KeyboardInstrument):   
+class Piano(KeyboardInstrument):
     '''
-    
+
     >>> p = instrument.Piano()
     >>> p.instrumentName
     'Piano'
@@ -303,7 +303,7 @@ class Piano(KeyboardInstrument):
         self.names = {'de': ['Klavier', 'Pianoforte'],
                       'en': ["Piano", "Pianoforte"]}
 
-class Harpsichord(KeyboardInstrument):   
+class Harpsichord(KeyboardInstrument):
     def __init__(self):
         KeyboardInstrument.__init__(self)
 
@@ -314,18 +314,18 @@ class Harpsichord(KeyboardInstrument):
         self.lowestNote = pitch.Pitch('F1')
         self.highestNote = pitch.Pitch('F6')
 
-class Clavichord(KeyboardInstrument):   
+class Clavichord(KeyboardInstrument):
     def __init__(self):
         KeyboardInstrument.__init__(self)
 
         self.instrumentName = 'Clavichord'
         self.instrumentAbbreviation = 'Clv'
         self.midiProgram = 7
-        
+
         #TODO: self.lowestNote = pitch.Pitch('')
         #TODO: self.highestNote = pitch.Pitch('')
 
-class Celesta(KeyboardInstrument):   
+class Celesta(KeyboardInstrument):
     def __init__(self):
         KeyboardInstrument.__init__(self)
 
@@ -338,61 +338,61 @@ class Celesta(KeyboardInstrument):
 class Organ(Instrument):
     def __init__(self):
         Instrument.__init__(self)
-        
+
         self.midiProgram = 19
-        
+
 class PipeOrgan(Organ):
     def __init__(self):
         Organ.__init__(self)
-        
+
         self.instrumentName = 'Pipe Organ'
         self.instrumentAbbreviation = 'P Org'
         self.midiProgram = 19
-        
+
         self.lowestNote = pitch.Pitch('C2')
         self.highestNote = pitch.Pitch('C6')
-        
+
 class ElectricOrgan(Organ):
     def __init__(self):
         Organ.__init__(self)
-        
+
         self.instrumentName = 'Electric Organ'
         self.instrumentAbbreviation = 'Elec Org'
         self.midiProgram = 16
-        
+
         self.lowestNote = pitch.Pitch('C2')
         self.highestNote = pitch.Pitch('C6')
 
 class ReedOrgan(Organ):
     def __init__(self):
         Organ.__init__(self)
-        
+
         self.instrumentName = 'Reed Organ'
         #TODO self.instrumentAbbreviation = ''
         self.midiProgram = 20
-        
+
         self.lowestNote = pitch.Pitch('C2')
         self.highestNote = pitch.Pitch('C6')
 
 class Accordion(Organ):
     def __init__(self):
         Organ.__init__(self)
-        
+
         self.instrumentName = 'Accordion'
         self.instrumentAbbreviation = 'Acc'
         self.midiProgram = 21
-        
+
         self.lowestNote = pitch.Pitch('F3')
         self.highestNote = pitch.Pitch('A6')
 
 class Harmonica(Organ):
     def __init__(self):
         Organ.__init__(self)
-        
+
         self.instrumentName = 'Harmonica'
         self.instrumentAbbreviation = 'Hmca'
         self.midiProgram = 22
-        
+
         self.lowestNote = pitch.Pitch('C3')
         self.highestNote = pitch.Pitch('C6')
 
@@ -408,8 +408,8 @@ class StringInstrument(Instrument):
         self.instrumentAbbreviation = 'Str'
 
         self.midiProgram = 48
-    
-    def _getStringPitches(self):    
+
+    def _getStringPitches(self):
         if hasattr(self, "_cachedPitches") and self._cachedPitches is not None:
             return self._cachedPitches
         elif not hasattr(self, "_stringPitches"):
@@ -417,45 +417,45 @@ class StringInstrument(Instrument):
         else:
             self._cachedPitches = [pitch.Pitch(x) for x in self._stringPitches]
             return self._cachedPitches
-    
+
     def _setStringPitches(self, newPitches):
         if newPitches and (hasattr(newPitches[0], "step") or newPitches[0] is None):
-            # newPitches is pitchObjects or something 
+            # newPitches is pitchObjects or something
             self._stringPitches = newPitches
             self._cachedPitches = newPitches
         else:
             self._cachedPitches = None
             self._stringPitches = newPitches
-    
+
     stringPitches = property(_getStringPitches, _setStringPitches, doc = '''
-            stringPitches is a property that stores a list of Pitches (or pitch names, 
+            stringPitches is a property that stores a list of Pitches (or pitch names,
             such as "C4") that represent the pitch of the open strings from lowest to
             highest.[*]
 
-            
-            
+
+
             >>> vln1 = instrument.Violin()
             >>> [str(p) for p in vln1.stringPitches]
             ['G3', 'D4', 'A4', 'E5']
-            
+
             instrument.stringPitches are full pitch objects, not just names:
 
             >>> [x.octave for x in vln1.stringPitches]
             [3, 4, 4, 5]
-            
+
             Scordatura for Scelsi's violin concerto *Anahit*.
             (N.B. that string to pitch conversion is happening automatically)
-            
-            
+
+
             >>> vln1.stringPitches = ["G3", "G4", "B4", "D4"]
-            
+
             (`[*]In some tuning methods such as reentrant tuning on the ukulele,
             lute, or five-string banjo the order might not strictly be from lowest to
             highest.  The same would hold true for certain violin scordatura pieces, such
             as some of Biber's *Mystery Sonatas*`)
             ''')
-                       
-class Violin(StringInstrument):   
+
+class Violin(StringInstrument):
     def __init__(self):
         StringInstrument.__init__(self)
 
@@ -491,9 +491,9 @@ class Violoncello(StringInstrument):
 class Contrabass(StringInstrument):
     '''
     For the Contrabass (or double bass), the stringPitches attribute refers to the sounding pitches
-    of each string; whereas the lowestNote attribute refers to the lowest written 
+    of each string; whereas the lowestNote attribute refers to the lowest written
     note
-    
+
     '''
     def __init__(self):
         StringInstrument.__init__(self)
@@ -525,7 +525,7 @@ class Guitar(StringInstrument):
         self.instrumentName = 'Guitar'
         self.instrumentAbbreviation = 'Gtr'
         self.midiProgram = 24  # default -- Acoustic
-        
+
         self.lowestNote = pitch.Pitch('E2')
         self._stringPitches = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4']
 
@@ -566,7 +566,7 @@ class ElectricBass(Guitar):
 
         self.lowestNote = pitch.Pitch('E1')
         self._stringPitches = ['E1', 'A1', 'D2', 'G2']
-        
+
 class FretlessBass(Guitar):
     def __init__(self):
         Guitar.__init__(self)
@@ -577,36 +577,36 @@ class FretlessBass(Guitar):
 
         self.lowestNote = pitch.Pitch('E1')
         self._stringPitches = ['E1', 'A1', 'D2', 'G2']
-        
-        
+
+
 class Mandolin(StringInstrument):
     def __init__(self):
         StringInstrument.__init__(self)
-        
+
         self.instrumentName = 'Mandolin'
         self.instrumentAbbreviation = 'Mdln'
-        
+
         self.lowestNote = pitch.Pitch('G3')
         self._stringPitches = ['G3', 'D4', 'A4', 'E5']
-        
+
 class Ukulele(StringInstrument):
     def __init__(self):
         StringInstrument.__init__(self)
-        
+
         self.instrumentName = 'Ukulele'
         self.instrumentAbbreviation = 'Uke'
-        
+
         self.lowestNote = pitch.Pitch('C4')
         self._stringPitches = ['G4', 'C4', 'E4', 'A4']
 
 class Banjo(StringInstrument):
     def __init__(self):
         StringInstrument.__init__(self)
-        
+
         self.instrumentName = 'Banjo'
         self.instrumentAbbreviation = 'Bjo'
         self.midiProgram = 105
-        
+
         self.lowestNote = pitch.Pitch('C3')
         self._stringPitches = ['C3', 'G3', 'D4', 'A4']
         self.transposition = interval.Interval('P-8')
@@ -614,31 +614,31 @@ class Banjo(StringInstrument):
 class Lute(StringInstrument):
     def __init__(self):
         StringInstrument.__init__(self)
-        
+
         self.instrumentName = 'Lute'
         self.instrumentAbbreviation = 'Lte'
-        self.midiProgram = 24        
+        self.midiProgram = 24
 
 class Sitar(StringInstrument):
     def __init__(self):
         StringInstrument.__init__(self)
-        
+
         self.instrumentName = 'Sitar'
         self.instrumentAbbreviation = 'Sit'
         self.midiProgram = 104
-        
+
 class Shamisen(StringInstrument):
     def __init__(self):
         StringInstrument.__init__(self)
-        
+
         self.instrumentName = 'Shamisen'
         #TODO: self.instrumentAbbreviation = ''
         self.midiProgram = 106
-        
+
 class Koto(StringInstrument):
     def __init__(self):
         StringInstrument.__init__(self)
-        
+
         self.instrumentName = 'Koto'
         #TODO: self.instrumentAbbreviation = ''
         self.midiProgram = 107
@@ -714,7 +714,7 @@ class Ocarina(Flute):
         self.instrumentName = 'Ocarina'
         self.instrumentAbbreviation = 'Oc'
         self.midiProgram = 79
-        
+
 class Oboe(WoodwindInstrument):
     def __init__(self):
         WoodwindInstrument.__init__(self)
@@ -750,7 +750,7 @@ class Clarinet(WoodwindInstrument):
 
 class BassClarinet(Clarinet):
     '''
-    
+
     >>> bcl = instrument.BassClarinet()
     >>> bcl.instrumentName
     'Bass clarinet'
@@ -761,7 +761,7 @@ class BassClarinet(Clarinet):
     '''
     def __init__(self):
         Clarinet.__init__(self)
-        
+
         self.instrumentName = 'Bass clarinet'
         self.instrumentAbbreviation = 'Bs Cl'
 
@@ -786,70 +786,70 @@ class Saxophone(WoodwindInstrument):
         self.instrumentName = 'Saxophone'
         self.instrumentAbbreviation = 'Sax'
         self.midiProgram = 65
-    
+
 class SopranoSaxophone(Saxophone):
     def __init__(self):
         Saxophone.__init__(self)
-        
+
         self.instrumentName = 'Soprano Saxophone'
         self.instrumentAbbreviation = 'S Sax'
         self.midiProgram = 64
-        
+
         self.lowestNote = pitch.Pitch('B-3')
         self.transposition = interval.Interval('M-2')
-        
+
 class AltoSaxophone(Saxophone):
     def __init__(self):
         Saxophone.__init__(self)
-        
+
         self.instrumentName = 'Alto Saxophone'
         self.instrumentAbbreviation = 'A Sax'
         self.midiProgram = 65
-        
+
         self.lowestNote = pitch.Pitch('B-3')
         self.transposition = interval.Interval('M-6')
-        
+
 class TenorSaxophone(Saxophone):
     def __init__(self):
         Saxophone.__init__(self)
-        
+
         self.instrumentName = 'Tenor Saxophone'
         self.instrumentAbbreviation = 'T Sax'
         self.midiProgram = 66
-        
+
         self.lowestNote = pitch.Pitch('B-3')
         self.transposition = interval.Interval('M-9')
-        
+
 class BaritoneSaxophone(Saxophone):
     def __init__(self):
         Saxophone.__init__(self)
-        
+
         self.instrumentName = 'Baritone Saxophone'
         self.instrumentAbbreviation = 'Bar Sax'
         self.midiProgram = 67
-        
+
         self.lowestNote = pitch.Pitch('B-3')
         self.transposition = interval.Interval('M-13')
-        
+
 
 class Bagpipes(WoodwindInstrument):
     def __init__(self):
         WoodwindInstrument.__init__(self)
-        
+
         self.instrumentName = 'Bagpipes'
         self.instrumentAbbreviation = 'Bag'
         self.midiProgram = 109
-        
+
 class Shehnai(WoodwindInstrument):
     def __init__(self):
         WoodwindInstrument.__init__(self)
-        
+
         self.instrumentName = 'Shehnai'
         self.instrumentAbbreviation = 'Shn'
         self.midiProgram = 111
 
-        
-        
+
+
 #-------------------------------------------------------------------------------
 
 class BrassInstrument(Instrument):
@@ -862,7 +862,7 @@ class BrassInstrument(Instrument):
 
 class Horn(BrassInstrument):
     '''
-    
+
     >>> hn = instrument.Horn()
     >>> hn.instrumentName
     'Horn'
@@ -880,7 +880,7 @@ class Horn(BrassInstrument):
 
         self.lowestNote = pitch.Pitch('C2')
         self.transposition = interval.Interval('P-5')
-        
+
 class Trumpet(BrassInstrument):
     def __init__(self):
         BrassInstrument.__init__(self)
@@ -888,7 +888,7 @@ class Trumpet(BrassInstrument):
         self.instrumentName = 'Trumpet'
         self.instrumentAbbreviation = 'Tpt'
         self.midiProgram = 56
-        
+
         self.lowestNote = pitch.Pitch('F#3')
         self.transposition = interval.Interval('M-2')
 
@@ -899,7 +899,7 @@ class Trombone(BrassInstrument):
         self.instrumentName = 'Trombone'
         self.instrumentAbbreviation = 'Trb'
         self.midiProgram = 57
-        
+
         self.lowestNote = pitch.Pitch('C2')
 
 class BassTrombone(Trombone):
@@ -907,7 +907,7 @@ class BassTrombone(Trombone):
         Trombone.__init__(self)
 
         self.instrumentName = 'Bass Trombone'
-        self.instrumentAbbreviation = 'BTrb'        
+        self.instrumentAbbreviation = 'BTrb'
 
 
 class Tuba(BrassInstrument):
@@ -920,7 +920,7 @@ class Tuba(BrassInstrument):
 
         self.lowestNote = pitch.Pitch('E-2')
 
-    
+
 #-------------
 class Percussion(Instrument):
     def __init__(self):
@@ -939,45 +939,45 @@ class UnpitchedPercussion(Percussion):
     def __init__(self):
         Percussion.__init__(self)
         self._modifier = None
-        self._modifierToPercMapPitch = {}        
-        
+        self._modifierToPercMapPitch = {}
+
     def _getModifier(self):
         return self._modifier
-    
+
     def _setModifier(self, modifier):
         modifier = modifier.lower().strip()
         # BEN: to-do, pull out hyphens, spaces, etc.
-        
-        
+
+
         if self.inGMPercMap is True and modifier.lower() in self._modifierToPercMapPitch:
             self.percMapPitch = self._modifierToPercMapPitch[modifier.lower()]
-            
+
             # normalize modifiers...
             if self.percMapPitch in self._percMapPitchToModifier:
                 modifier = self._percMapPitchToModifier[self.percMapPitch]
-        
+
         self._modifier = modifier
-        
+
     modifier = property(_getModifier, _setModifier, doc='''
     Returns or sets the modifier for this instrument.  A modifier could
     be something like "low-floor" for a TomTom or "rimshot" for a SnareDrum.
-    
+
     If the modifier is in the object's ._modifierToPercMapPitch dictionary
     then changing the modifier also changes the .percMapPitch for the object
-    
-    
+
+
     >>> bd = instrument.BongoDrums()
     >>> bd.modifier
     'high'
-    
+
     >>> bd.percMapPitch
     60
     >>> bd.modifier = 'low'
     >>> bd.percMapPitch
     61
-    
+
     Variations on modifiers can also be used and they get normalized:
-    
+
     >>> wb1 = instrument.Woodblock()
     >>> wb1.percMapPitch
     76
@@ -992,7 +992,7 @@ class UnpitchedPercussion(Percussion):
 class Vibraphone(PitchedPercussion):
     def __init__(self):
         PitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Vibraphone'
         self.instrumentAbbreviation = 'Vbp'
         self.midiProgram = 11
@@ -1000,7 +1000,7 @@ class Vibraphone(PitchedPercussion):
 class Marimba(PitchedPercussion):
     def __init__(self):
         PitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Marimba'
         self.instrumentAbbreviation = 'Mar'
         self.midiProgram = 12
@@ -1020,11 +1020,11 @@ class Glockenspiel(PitchedPercussion):
         self.instrumentName = 'Glockenspiel'
         self.instrumentAbbreviation = 'Gsp'
         self.midiProgram = 9
-        
+
 class ChurchBells(PitchedPercussion):
     def __init__(self):
         PitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Church Bells'
         self.instrumentAbbreviation = 'Bells'
         self.midiProgram = 14
@@ -1032,45 +1032,45 @@ class ChurchBells(PitchedPercussion):
 class TubularBells(PitchedPercussion):
     def __init__(self):
         PitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Tubular Bells'
         self.instrumentAbbreviation = 'Tbells'
         self.midiProgram = 14
-                
+
 class Gong(PitchedPercussion):
     def __init__(self):
         PitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Gong'
         self.instrumentAbbreviation = 'Gng'
-        
+
 class Handbells(PitchedPercussion):
     def __init__(self):
         PitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Handbells'
         #TODO: self.instrumentAbbreviation = ''
 
 class Dulcimer(PitchedPercussion):
     def __init__(self):
         PitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Dulcimer'
         #TODO: self.instrumentAbbreviation = ''
         self.midiProgram = 15
-        
+
 class SteelDrum(PitchedPercussion):
     def __init__(self):
         PitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Steel Drum'
         self.instrumentAbbreviation = 'St Dr'
         self.midiProgram = 114
-        
+
 class Timpani(PitchedPercussion):
     def __init__(self):
         PitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Timpani'
         self.instrumentAbbreviation = 'Timp'
         self.midiProgram = 47
@@ -1078,7 +1078,7 @@ class Timpani(PitchedPercussion):
 class Kalimba(PitchedPercussion):
     def __init__(self):
         PitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Kalimba'
         self.instrumentAbbreviation = 'Kal'
         self.midiProgram = 108
@@ -1087,49 +1087,49 @@ class Kalimba(PitchedPercussion):
 class Woodblock(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Woodblock'
         self.instrumentAbbreviation = 'Wd Bl'
         self.inGMPercMap = True
         self.midiProgram = 115
-        
+
         self._modifier = 'high'
         self._modifierToPercMapPitch = { 'high': 76, 'low': 77, 'hi': 76, 'lo': 77 }
         self._percMapPitchToModifier = { 76: 'high', 77: 'low' }
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
-                
+
 class TempleBlock(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Temple Block'
         self.instrumentAbbreviation = 'Temp Bl'
-        
+
 class Castanets(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Castanets'
         self.instrumentAbbreviation = 'Cas'
-        
+
 class Maracas(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Maracas'
         self.inGMPercMap = True
         self.percMapPitch = 70
         #TODO: self.instrumentAbbreviation = ''
-        
+
 class Vibraslap(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Vibraslap'
         self.instrumenAbbreviation = 'Vbslp'
         self.inGMPercMap = True
         self.percMapPitch = 58
-        
+
 # BEN: Standardize Cymbals as plural
 
 class Cymbals(UnpitchedPercussion):
@@ -1137,23 +1137,23 @@ class Cymbals(UnpitchedPercussion):
         UnpitchedPercussion.__init__(self)
         self.instrumentName = 'Cymbals'
         self.instrumentAbbreviation = 'Cym'
-        
+
 class FingerCymbals(Cymbals):
     def __init__(self):
         Cymbals.__init__(self)
-        
+
         self.instrumentName = 'Finger Cymbals'
         self.instrumentAbbreviation = 'Fing Cym'
-        
+
 class CrashCymbals(Cymbals):
     def __init__(self):
         Cymbals.__init__(self)
-        
+
         self.instrumentName = 'Crash Cymbals'
         self.instrumentAbbreviation = 'Cym'
         self.inGMPercMap = True
         self._modifier = "1"
-        
+
         self._modifierToPercMapPitch = {'1': 49,
                                         '2': 57,
                                         }
@@ -1161,45 +1161,45 @@ class CrashCymbals(Cymbals):
                                         57: '2',
                                         }
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
-    
-        
+
+
 class SuspendedCymbal(Cymbals):
     def __init__(self):
         Cymbals.__init__(self)
-        
+
         self.instrumentName = 'Suspended Cymbal'
         #TODO: self.instrumentAbbreviation = ''
-        
+
 class SizzleCymbal(Cymbals):
     def __init__(self):
         Cymbals.__init__(self)
-        
+
         self.instrumentName = 'Sizzle Cymbal'
         #TODO: self.instrumentAbbreviation = ''
 
 class SplashCymbals(Cymbals):
     def __init__(self):
         Cymbals.__init__(self)
-        
+
         self.instrumentName = 'Splash Cymbals'
         #TODO: self.instrumentAbbreviation = ''
 
 class RideCymbals(Cymbals):
     def __init__(self):
         Cymbals.__init__(self)
-        
+
         self.instrumentName = 'Ride Cymbals'
         #TODO: self.instrumentAbbreviation = ''
-        
+
 class HiHatCymbal(Cymbals):
     def __init__(self):
         Cymbals.__init__(self)
-        
+
         self.instrumentName = 'Hi-Hat Cymbal'
         self.inGMPercMap = True
-        
+
         self._modifier = 'pedal'
-        
+
         self._modifierToPercMapPitch = {'pedal': 44,
                                         'open': 46,
                                         'closed': 42,
@@ -1209,18 +1209,18 @@ class HiHatCymbal(Cymbals):
                                         42: 'closed',
                                         }
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
-    
+
         #TODO: self.instrumentAbbreviation = ''
-        
+
 class Triangle(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Triangle'
         self.instrumentAbbreviation = 'Tri'
         self.inGMPercMap = True
         self._modifier = 'open'
-        
+
         self._modifierToPercMapPitch = {'open': 81,
                                         'mute': 80,
                                         }
@@ -1228,45 +1228,45 @@ class Triangle(UnpitchedPercussion):
                                         81: 'open',
                                         }
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
-    
-        
+
+
 class Cowbell(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Cowbell'
         self.instrumentAbbreviation = 'Cwb'
         self.inGMPercMap = True
         self.percMapPitch = 56
-        
+
 class Agogo(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Agogo'
         #TODO: self.instrumentAbbreviation = ''
         self.inGMPercMap = True
-        self.percMapPitch = 67     
+        self.percMapPitch = 67
         self.midiProgram = 113
 
 class TamTam(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Tam-Tam'
         #TODO: self.instrumentAbbreviation = ''
-        
+
 class SleighBells(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Sleigh Bells'
         #TODO: self.instrumentAbbreviation = ''
-        
+
 class SnareDrum(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Snare Drum'
         self.instrumentAbbreviation = 'Sn Dr'
         self.inGMPercMap = True
@@ -1280,47 +1280,47 @@ class SnareDrum(UnpitchedPercussion):
                                         40: 'electric',
                                         }
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
-    
+
 class TenorDrum(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Tenor Drum'
         self.instrumentAbbreviation = 'Ten Dr'
 
 class BongoDrums(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Bongo Drums'
         self.instrumentAbbreviation = 'Bgo Dr'
-        
+
         self.inGMPercMap = True
         self._modifier = 'high'
         self._modifierToPercMapPitch = { 'high': 60, 'low': 61 }
         self._percMapPitchToModifier = { 60: 'high', 61: 'low' }
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
-        
-    
+
+
 class TomTom(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Tom-Tom'
         #TODO: self.instrumentAbbreviation = ''
         self.inGMPercMap = True
         self._modifier = 'low floor'
-        self._modifierToPercMapPitch = { 'low floor': 41, 'high floor': 43, 'low': 45, 
+        self._modifierToPercMapPitch = { 'low floor': 41, 'high floor': 43, 'low': 45,
                                          'low-mid': 47, 'high-mid': 48, 'high': 50 }
-        self._percMapPitchToModifier = { 41: 'low floor', 43: 'high floor', 45: 'low', 
+        self._percMapPitchToModifier = { 41: 'low floor', 43: 'high floor', 45: 'low',
                                         47: 'low-mid', 48: 'high-mid', 50: 'high' }
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
-        
-    
+
+
 class Timbales(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Timbales'
         self.instrumentAbbreviation = 'Tim'
         self.inGMPercMap = True
@@ -1328,12 +1328,12 @@ class Timbales(UnpitchedPercussion):
         self._modifierToPercMapPitch = { 'high': 65, 'low': 66 }
         self._percMapPitchToModifier = { 65: 'high', 66: 'low' }
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
-        
-        
+
+
 class CongaDrum(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Conga Drum'
         self.instrumentAbbreviation = 'Cga Dr'
         self.inGMPercMap = True
@@ -1341,12 +1341,12 @@ class CongaDrum(UnpitchedPercussion):
         self._modifierToPercMapPitch = { 'low': 64, 'mute high': 62, 'open high': 63 }
         self._percMapPitchToModifier = { 64: 'low', 62: 'mute high', 63: 'open high' }
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
-        
-        
+
+
 class BassDrum(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Bass Drum'
         self.instrumentAbbreviation = 'B Dr'
         self.inGMPercMap = True
@@ -1355,56 +1355,56 @@ class BassDrum(UnpitchedPercussion):
         self._percMapPitchToModifier = { 35: 'acoustic', 36: '1' }
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
-        
+
 class Taiko(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Taiko'
         #TODO: self.instrumentAbbreviation = ''
         self.midiProgram = 116
-        
+
 class Tambourine(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Tambourine'
         self.instrumentAbbreviation = 'Tmbn'
         self.inGMPercMap = True
         self.percMapPitch = 54
-        
+
 class Whip(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Whip'
         #TODO: self.instrumentAbbreviation = ''
-        
+
 class Ratchet(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Ratchet'
         #TODO: self.instrumentAbbreviation = ''
-        
+
 class Siren(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Siren'
         #TODO: self.instrumentAbbreviation = ''
-        
+
 class SandpaperBlocks(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Sandpaper Blocks'
         self.instrumentAbbreviation = 'Sand Bl'
-        
+
 class WindMachine(UnpitchedPercussion):
     def __init__(self):
         UnpitchedPercussion.__init__(self)
-        
+
         self.instrumentName = 'Wind Machine'
         #TODO: self.instrumentAbbreviation = ''
 
@@ -1421,89 +1421,89 @@ class Vocalist(Instrument):
         self.instrumentName = 'Voice'
         self.instrumentAbbreviation = 'V'
         self.midiProgram = 52
-        
+
 class Soprano(Vocalist):
     def __init__(self):
         Vocalist.__init__(self)
-        
+
         self.instrumentName = 'Soprano'
         self.instrumentAbbreviation = 'S'
-        
+
 class MezzoSoprano(Soprano):
     def __init__(self):
         Soprano.__init__(self)
-        
+
         self.instrumentName = 'Mezzo-Soprano'
         self.instrumentAbbreviation = 'Mez'
-        
+
 class Alto(Vocalist):
     def __init__(self):
         Vocalist.__init__(self)
-        
+
         self.instrumentName = 'Alto'
         self.instrumentAbbreviation = 'A'
 
 class Tenor(Vocalist):
     def __init__(self):
         Vocalist.__init__(self)
-        
+
         self.instrumentName = 'Tenor'
         self.instrumentAbbreviation = 'T'
-        
+
 class Baritone(Vocalist):
     def __init__(self):
         Vocalist.__init__(self)
-        
+
         self.instrumentName = 'Baritone'
         self.instrumentAbbreviation = 'Bar'
 
 class Bass(Vocalist):
     def __init__(self):
         Vocalist.__init__(self)
-        
+
         self.instrumentName = 'Bass'
         self.instrumentAbbreviation = 'B'
 
- 
+
 #------------------------------------------------------------------------------
 
 
-ensembleNamesBySize = ['no performers', 'solo', 'duet', 'trio', 'quartet', 
-                       'quintet', 'sextet', 'septet', 'octet', 'nonet', 'dectet', 
-                       'undectet', 'duodectet', 'tredectet', 'quattuordectet', 
-                       'quindectet', 'sexdectet', 'septendectet', 'octodectet', 
-                       'novemdectet', 'vigetet', 'unvigetet', 'duovigetet', 
-                       'trevigetet', 'quattuorvigetet', 'quinvigetet', 'sexvigetet', 
-                       'septenvigetet', 'octovigetet', 'novemvigetet', 
-                       'trigetet', 'untrigetet', 'duotrigetet', 'tretrigetet', 
-                       'quottuortrigetet', 'quintrigetet', 'sextrigetet', 
-                       'septentrigetet', 'octotrigetet', 'novemtrigetet', 
-                       'quadragetet', 'unquadragetet', 'duoquadragetet', 
-                       'trequadragetet', 'quattuorquadragetet', 'quinquadragetet', 
-                       'sexquadragetet', 'octoquadragetet', 'octoquadragetet', 
-                       'novemquadragetet', 'quinquagetet', 'unquinquagetet', 
-                       'duoquinquagetet', 'trequinguagetet', 'quattuorquinquagetet', 
-                       'quinquinquagetet', 'sexquinquagetet', 'septenquinquagetet', 
-                       'octoquinquagetet', 'novemquinquagetet', 'sexagetet', 
-                       'undexagetet', 'duosexagetet', 'tresexagetet', 
-                       'quoattuorsexagetet', 'quinsexagetet', 'sexsexagetet', 
-                       'septensexagetet', 'octosexagetet', 'novemsexagetet', 
-                       'septuagetet', 'unseptuagetet', 'duoseptuagetet', 'treseptuagetet', 
-                       'quattuorseptuagetet', 'quinseptuagetet', 'sexseptuagetet', 
-                       'septenseptuagetet', 'octoseptuagetet', 'novemseptuagetet', 
-                       'octogetet', 'unoctogetet', 'duooctogetet', 
-                       'treoctogetet', 'quattuoroctogetet', 'quinoctogetet', 
-                       'sexoctogetet', 'septoctogetet', 'octooctogetet', 
-                       'novemoctogetet', 'nonagetet', 'unnonagetet', 'duononagetet', 
-                       'trenonagetet', 'quattuornonagetet', 'quinnonagetet', 
-                       'sexnonagetet', 'septennonagetet', 'octononagetet', 
-                       'novemnonagetet', 'centet'] 
-        
+ensembleNamesBySize = ['no performers', 'solo', 'duet', 'trio', 'quartet',
+                       'quintet', 'sextet', 'septet', 'octet', 'nonet', 'dectet',
+                       'undectet', 'duodectet', 'tredectet', 'quattuordectet',
+                       'quindectet', 'sexdectet', 'septendectet', 'octodectet',
+                       'novemdectet', 'vigetet', 'unvigetet', 'duovigetet',
+                       'trevigetet', 'quattuorvigetet', 'quinvigetet', 'sexvigetet',
+                       'septenvigetet', 'octovigetet', 'novemvigetet',
+                       'trigetet', 'untrigetet', 'duotrigetet', 'tretrigetet',
+                       'quottuortrigetet', 'quintrigetet', 'sextrigetet',
+                       'septentrigetet', 'octotrigetet', 'novemtrigetet',
+                       'quadragetet', 'unquadragetet', 'duoquadragetet',
+                       'trequadragetet', 'quattuorquadragetet', 'quinquadragetet',
+                       'sexquadragetet', 'octoquadragetet', 'octoquadragetet',
+                       'novemquadragetet', 'quinquagetet', 'unquinquagetet',
+                       'duoquinquagetet', 'trequinguagetet', 'quattuorquinquagetet',
+                       'quinquinquagetet', 'sexquinquagetet', 'septenquinquagetet',
+                       'octoquinquagetet', 'novemquinquagetet', 'sexagetet',
+                       'undexagetet', 'duosexagetet', 'tresexagetet',
+                       'quoattuorsexagetet', 'quinsexagetet', 'sexsexagetet',
+                       'septensexagetet', 'octosexagetet', 'novemsexagetet',
+                       'septuagetet', 'unseptuagetet', 'duoseptuagetet', 'treseptuagetet',
+                       'quattuorseptuagetet', 'quinseptuagetet', 'sexseptuagetet',
+                       'septenseptuagetet', 'octoseptuagetet', 'novemseptuagetet',
+                       'octogetet', 'unoctogetet', 'duooctogetet',
+                       'treoctogetet', 'quattuoroctogetet', 'quinoctogetet',
+                       'sexoctogetet', 'septoctogetet', 'octooctogetet',
+                       'novemoctogetet', 'nonagetet', 'unnonagetet', 'duononagetet',
+                       'trenonagetet', 'quattuornonagetet', 'quinnonagetet',
+                       'sexnonagetet', 'septennonagetet', 'octononagetet',
+                       'novemnonagetet', 'centet']
+
 def ensembleNameBySize(number):
     '''
     return the name of a generic ensemble with "number" players:
-    
-    
+
+
     >>> instrument.ensembleNameBySize(4)
     'quartet'
     >>> instrument.ensembleNameBySize(1)
@@ -1522,18 +1522,18 @@ def ensembleNameBySize(number):
 def instrumentFromMidiProgram(number):
     '''
     return the instrument with "number" as its assigned midi program:
-    
+
     >>> instrument.instrumentFromMidiProgram(0)
     <music21.instrument.Piano Piano>
     >>> instrument.instrumentFromMidiProgram(21)
     <music21.instrument.Accordion Accordion>
     >>> instrument.instrumentFromMidiProgram(500)
     Traceback (most recent call last):
-    music21.exceptions21.InstrumentException: No instrument found with given midi program    
-    '''    
+    music21.exceptions21.InstrumentException: No instrument found with given midi program
+    '''
     foundInstrument = False
     for myThing in sys.modules[__name__].__dict__.values():
-        try: 
+        try:
             i = myThing()
             mp = getattr(i, 'midiProgram')
             if mp == number:
@@ -1544,25 +1544,25 @@ def instrumentFromMidiProgram(number):
     if not foundInstrument:
         raise InstrumentException('No instrument found with given midi program')
 
-    
+
 
 def partitionByInstrument(streamObj):
     '''
-    Given a single Stream, or a Score or similar multi-part structure, 
-    partition into a Part for each unique Instrument, joining events 
+    Given a single Stream, or a Score or similar multi-part structure,
+    partition into a Part for each unique Instrument, joining events
     possibly from different parts.
-    
+
     >>> p1 = converter.parse("tinynotation: 4/4 c4  d  e  f  g  a  b  c'  c1")
     >>> p2 = converter.parse("tinynotation: 4/4 C#4 D# E# F# G# A# B# c#  C#1")
 
     >>> p1.getElementsByClass('Measure')[0].insert(0.0, instrument.Piccolo())
     >>> p1.getElementsByClass('Measure')[0].insert(2.0, instrument.AltoSaxophone())
     >>> p1.getElementsByClass('Measure')[1].insert(3.0, instrument.Piccolo())
-    
+
     >>> p2.getElementsByClass('Measure')[0].insert(0.0, instrument.Trombone())
     >>> p2.getElementsByClass('Measure')[0].insert(3.0, instrument.Piccolo()) # not likely...
     >>> p2.getElementsByClass('Measure')[1].insert(1.0, instrument.Trombone())
-    
+
     >>> s = stream.Score()
     >>> s.insert(0, p1)
     >>> s.insert(0, p2)
@@ -1609,18 +1609,18 @@ def partitionByInstrument(streamObj):
     >>> s2 = instrument.partitionByInstrument(s)
     >>> len(s2.parts)
     3
-    
+
     # TODO: this step might not be necessary...
-    
+
     >>> for p in s2.parts:
     ...     unused = p.makeRests(fillGaps=True, inPlace=True)
-    
+
     # TODO: this step SHOULD not be necessary (measureTemplate)...
-    
+
     >>> for p in s2.parts:
     ...     p.makeMeasures(inPlace=True)
     ...     p.makeTies(inPlace=True)
-    
+
     >>> s2.show('text')
     {0.0} <music21.stream.Part Piccolo>
         {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -1672,9 +1672,9 @@ def partitionByInstrument(streamObj):
 
 
     TODO: parts should be in Score Order. Coincidence that this almost works.
-    TODO: note redundant Alto Saxophone... instrument -- 
-    
-    TODO: use proper recursion to make a copy of the stream. 
+    TODO: note redundant Alto Saxophone... instrument --
+
+    TODO: use proper recursion to make a copy of the stream.
     '''
     from music21 import stream
 
@@ -1696,13 +1696,13 @@ def partitionByInstrument(streamObj):
     found = s.recurse().getElementsByClass('Instrument')
     if not found:
         return None # no partition is available
-    
+
     names = OrderedDict() # store unique names
     for e in found:
         # matching here by instrument name
         if e.instrumentName not in names:
             names[e.instrumentName] = {'Instrument':e} # just store one instance
-        
+
     # create a return object that has a part for each instrument
     post = stream.Score()
     for iName in names:
@@ -1718,14 +1718,14 @@ def partitionByInstrument(streamObj):
     # add to corresponding part
     for sub in s:
         for i in sub.getElementsByClass('Instrument'):
-            start = i.offset 
+            start = i.offset
             # duration will have been set with sub.extendDuration above
             end = i.offset + i.duration.quarterLength
             # get destination Part
             p = names[i.instrumentName]['Part']
-            coll = sub.getElementsByOffset(start, end, 
+            coll = sub.getElementsByOffset(start, end,
                     # do not include elements that start at the end
-                    includeEndBoundary=False, 
+                    includeEndBoundary=False,
                     mustFinishInSpan=False, mustBeginInSpan=True)
             # add to part at original offset
             # do not gather instrument
@@ -1738,7 +1738,7 @@ def partitionByInstrument(streamObj):
 def _combinations(instrumentString):
     '''
     find all combinations of instrumentString.  Remove all punctuation.
-    '''    
+    '''
     sampleList = instrumentString.split()
     allComb = []
     for size in range(1, len(sampleList) + 1):
@@ -1752,35 +1752,35 @@ def fromString(instrumentString):
     Given a string with instrument content (from an orchestral score
     for example), attempts to return an appropriate
     :class:`~music21.instrument.Instrument`.
-    
+
     >>> from music21 import instrument
     >>> t1 = instrument.fromString("Clarinet 2 in A")
     >>> t1
     <music21.instrument.Clarinet Clarinet>
     >>> t1.transposition
     <music21.interval.Interval m-3>
-    
+
     >>> t2 = instrument.fromString("Clarinetto 3")
     >>> t2
     <music21.instrument.Clarinet Clarinet>
-    
+
     >>> t3 = instrument.fromString("Flauto 2")
     >>> t3
     <music21.instrument.Flute Flute>
-    
-    
+
+
     Excess information is ignored, and the useful information can be extracted
     correctly as long as it's sequential.
-    
-    
+
+
     >>> t4 = instrument.fromString("I <3 music saxofono tenor go beavers")
     >>> t4
     <music21.instrument.TenorSaxophone Tenor Saxophone>
-    
-    
+
+
     #_OMIT_FROM_DOCS
-    
-    
+
+
     >>> t5 = instrument.fromString("Bb Clarinet")
     >>> t5
     <music21.instrument.Clarinet Clarinet>
@@ -1794,7 +1794,7 @@ def fromString(instrumentString):
     >>> t7 = instrument.fromString("B-flat Clarinet.")
     >>> t5.bestName() == t7.bestName() and t5.transposition == t7.transposition
     True
-    
+
     >>> t8 = instrument.fromString("Eb Clarinet")
     >>> t5.bestName() == t8.bestName()
     True
@@ -1811,13 +1811,13 @@ def fromString(instrumentString):
     <music21.instrument.Clarinet Clarinet>
     >>> t9.transposition
     <music21.interval.Interval M-2>
-    
+
     Use "H" or "b-natural" to get an instrument in B-major.  Or donate one to me
     and I'll change this back!
     """
     # pylint: disable=undefined-variable
     from music21.languageExcerpts import instrumentLookup
-    
+
     instrumentString = common.removePunctuation(instrumentString)
     allCombinations = _combinations(instrumentString)
     # First task: Find the best instrument.
@@ -1832,7 +1832,7 @@ def fromString(instrumentString):
             else:
                 englishName = instrumentLookup.allToBestName[substring.lower()]
             className = instrumentLookup.bestNameToInstrumentClass[englishName]
-            
+
             # This would be unsafe...
             thisInstClass = globals()[className]
             thisInstClassParentClasses = [parentcls.__name__ for parentcls in thisInstClass.mro()]
@@ -1844,8 +1844,8 @@ def fromString(instrumentString):
 
             thisInstrument = thisInstClass()
             thisBestName = thisInstrument.bestName().lower()
-            if (bestInstClass is None 
-                    or len(thisBestName.split()) >= len(bestName.split()) 
+            if (bestInstClass is None
+                    or len(thisBestName.split()) >= len(bestName.split())
                     and not issubclass(bestInstClass, thisInstClass)):
                 # priority is also given to same length instruments which fall later
                 # on in the string (i.e. Bb Piccolo Trumpet)
@@ -1866,7 +1866,7 @@ def fromString(instrumentString):
         try:
             if six.PY2:
                 uss = unicode(substring.lower()) # @UndefinedVariable
-                bestPitch = instrumentLookup.pitchFullNameToName[uss] 
+                bestPitch = instrumentLookup.pitchFullNameToName[uss]
             else:
                 bestPitch = instrumentLookup.pitchFullNameToName[substring.lower()]
             bestInterval = instrumentLookup.transposition[bestName][bestPitch]
@@ -1883,13 +1883,13 @@ def fromString(instrumentString):
 
 #-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
-    
+
     def runTest(self):
         pass
-    
+
 
 class Test(unittest.TestCase):
-    
+
     def runTest(self):
         pass
 
@@ -1942,10 +1942,10 @@ class Test(unittest.TestCase):
 
         # basic case of instruments in Parts
         s = stream.Score()
-        p1 = stream.Part() 
+        p1 = stream.Part()
         p1.append(instrument.Piano())
-        
-        p2 = stream.Part() 
+
+        p2 = stream.Part()
         p2.append(instrument.Piccolo())
         s.insert(0, p1)
         s.insert(0, p2)
@@ -1961,7 +1961,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.insert(0, instrument.PanFlute())
         s.insert(20, instrument.ReedOrgan())
-        
+
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 2)
         self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 2)
@@ -1973,11 +1973,11 @@ class Test(unittest.TestCase):
 
         # basic case of instruments in Parts
         s = stream.Score()
-        p1 = stream.Part() 
+        p1 = stream.Part()
         p1.append(instrument.Piano())
         p1.repeatAppend(note.Note(), 6)
-        
-        p2 = stream.Part() 
+
+        p2 = stream.Part()
         p2.append(instrument.Piccolo())
         p2.repeatAppend(note.Note(), 12)
         s.insert(0, p1)
@@ -1995,14 +1995,14 @@ class Test(unittest.TestCase):
 
         # basic case of instruments in Parts
         s = stream.Score()
-        p1 = stream.Part() 
+        p1 = stream.Part()
         p1.append(instrument.Piano())
         p1.repeatAppend(note.Note('a'), 6)
         # will go in next available offset
         p1.append(instrument.AcousticGuitar())
         p1.repeatAppend(note.Note('b'), 3)
-        
-        p2 = stream.Part() 
+
+        p2 = stream.Part()
         p2.append(instrument.Piccolo())
         p2.repeatAppend(note.Note('c'), 2)
         p2.append(instrument.Flute())
@@ -2032,7 +2032,7 @@ class Test(unittest.TestCase):
 
         # basic case of instruments in Parts
         s = stream.Score()
-        p1 = stream.Part() 
+        p1 = stream.Part()
         p1.append(instrument.Piano())
         p1.repeatAppend(note.Note('a'), 6)
         # will go in next available offset
@@ -2040,8 +2040,8 @@ class Test(unittest.TestCase):
         p1.repeatAppend(note.Note('b'), 3)
         p1.append(instrument.Piano())
         p1.repeatAppend(note.Note('e'), 5)
-        
-        p2 = stream.Part() 
+
+        p2 = stream.Part()
         p2.append(instrument.Piccolo())
         p2.repeatAppend(note.Note('c'), 2)
         p2.append(instrument.Flute())
@@ -2059,7 +2059,7 @@ class Test(unittest.TestCase):
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
         self.assertEqual(len(post.parts[0].notes), 12)
 
-        self.assertEqual([n.offset for n in post.parts[0].notes], 
+        self.assertEqual([n.offset for n in post.parts[0].notes],
                          [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 9.0, 10.0, 11.0, 12.0, 13.0])
 
         #environLocal.printDebug(['post processing'])
@@ -2071,7 +2071,7 @@ class Test(unittest.TestCase):
 
         # basic case of instruments in Parts
         #s = stream.Score()
-        p1 = stream.Part() 
+        p1 = stream.Part()
         p1.append(instrument.Piano())
         p1.repeatAppend(note.Note('a'), 6)
         # will go in next available offset
@@ -2079,7 +2079,7 @@ class Test(unittest.TestCase):
         p1.repeatAppend(note.Note('b'), 3)
         p1.append(instrument.Piano())
         p1.repeatAppend(note.Note('e'), 5)
-        
+
         p1.append(instrument.Piccolo())
         p1.repeatAppend(note.Note('c'), 2)
         p1.append(instrument.Flute())
@@ -2100,7 +2100,7 @@ class Test(unittest.TestCase):
         for n in ppn:
             offsetList.append(n.offset)
 
-        self.assertEqual(offsetList, 
+        self.assertEqual(offsetList,
                          [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 9.0, 10.0, 11.0, 12.0, 13.0, 20.0])
 
 

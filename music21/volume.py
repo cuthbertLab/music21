@@ -24,7 +24,7 @@ from music21.ext import six
 if six.PY2:
     # pylint: disable=redefined-builtin
     from music21.common import py3round as round
-    
+
 from music21 import environment
 _MOD = "volume.py"
 environLocal = environment.Environment(_MOD)
@@ -48,7 +48,7 @@ class Volume(SlottedObjectMixin):
     >>> v = volume.Volume(velocity=90)
     >>> v.velocity
     90
-    
+
     '''
 
     ### CLASS VARIABLES ###
@@ -108,7 +108,7 @@ class Volume(SlottedObjectMixin):
     ### PUBLIC METHODS ###
     def getDynamicContext(self):
         '''
-        Return the dynamic context of this Volume, based on the position of the 
+        Return the dynamic context of this Volume, based on the position of the
         client of this object.
         '''
         # TODO: find wedges and crescendi too  and demo/test...
@@ -116,7 +116,7 @@ class Volume(SlottedObjectMixin):
 
     def mergeAttributes(self, other):
         '''
-        Given another Volume object, gather all attributes except client. 
+        Given another Volume object, gather all attributes except client.
         Values are always copied, not passed by reference.
 
         >>> n1 = note.Note()
@@ -186,9 +186,9 @@ class Volume(SlottedObjectMixin):
 
         >>> s = stream.Stream()
         >>> s.repeatAppend(note.Note('d3', quarterLength=.5), 8)
-        >>> s.insert([0, dynamics.Dynamic('p'), 
-        ...           1, dynamics.Dynamic('mp'), 
-        ...           2, dynamics.Dynamic('mf'), 
+        >>> s.insert([0, dynamics.Dynamic('p'),
+        ...           1, dynamics.Dynamic('mp'),
+        ...           2, dynamics.Dynamic('mf'),
         ...           3, dynamics.Dynamic('f')])
 
         >>> s.notes[0].volume.getRealized()
@@ -204,13 +204,13 @@ class Volume(SlottedObjectMixin):
         0.99212...
 
         velocity, if set, will be scaled by dynamics
-        
+
         >>> s.notes[7].volume.velocity = 20
         >>> s.notes[7].volume.getRealized()
         0.22047...
 
         unless we set the velocity to not be relative...
-        
+
         >>> s.notes[7].volume.velocityIsRelative = False
         >>> s.notes[7].volume.getRealized()
         0.1574803...
@@ -384,11 +384,11 @@ class Volume(SlottedObjectMixin):
         1.0
         '''
         return self._velocity / 127.0
-    
+
     @velocityScalar.setter
     def velocityScalar(self, value):
         if not common.isNum(value):
-            raise VolumeException('value provided for velocityScalar must be a number, ' + 
+            raise VolumeException('value provided for velocityScalar must be a number, ' +
                                   'not %s' % value)
         if value < 0:
             scalar = 0
@@ -403,25 +403,25 @@ class Volume(SlottedObjectMixin):
 # utility stream processing methods
 
 
-def realizeVolume(srcStream, 
+def realizeVolume(srcStream,
                   setAbsoluteVelocity=False,
-                  useDynamicContext=True, 
-                  useVelocity=True, 
+                  useDynamicContext=True,
+                  useVelocity=True,
                   useArticulations=True):
     '''
-    Given a Stream with one level of dynamics 
-    (e.g., a Part, or two Staffs that share Dynamics), 
-    destructively modify it to set all realized volume levels. 
+    Given a Stream with one level of dynamics
+    (e.g., a Part, or two Staffs that share Dynamics),
+    destructively modify it to set all realized volume levels.
     These values will be stored in the Volume object as `cachedRealized` values.
 
-    This is a top-down routine, as opposed to bottom-up values available with 
+    This is a top-down routine, as opposed to bottom-up values available with
     context searches on Volume. This thus offers a performance benefit.
 
-    This is always done in place; for the option of non-in place processing, 
+    This is always done in place; for the option of non-in place processing,
     see Stream.realizeVolume().
 
-    If setAbsoluteVelocity is True, the realized values will overwrite all 
-    existing velocity values, and the Volume objects velocityIsRelative 
+    If setAbsoluteVelocity is True, the realized values will overwrite all
+    existing velocity values, and the Volume objects velocityIsRelative
     parameters will be set to False.
     '''
     # get dynamic map
@@ -466,7 +466,7 @@ def realizeVolume(srcStream,
                 dm = useDynamicContext
             # this returns a value, but all we need to do is to set the
             # cached values stored internally
-            val = e.volume.getRealized(useDynamicContext=dm, 
+            val = e.volume.getRealized(useDynamicContext=dm,
                                        useVelocity=True,
                                        useArticulations=True)
             if setAbsoluteVelocity:
@@ -602,20 +602,20 @@ class Test(unittest.TestCase):
         # before insertion of dynamics
         match = [n.volume.cachedRealizedStr for n in s.notes]
         self.assertEqual(match, ['0.71'] * 16)
-        
+
         for i, d in enumerate(['pp', 'p', 'mp', 'f', 'mf', 'ff', 'ppp', 'mf']):
             s.insert(i*2, dynamics.Dynamic(d))
 
         # cached will be out of date in regard to new dynamics
         match = [n.volume.cachedRealizedStr for n in s.notes]
         self.assertEqual(match, ['0.71'] * 16)
-        
+
         # calling realize will set all to new cached values
         volume.realizeVolume(s)
         match = [n.volume.cachedRealizedStr for n in s.notes]
-        self.assertEqual(match, ['0.35', '0.35', '0.5', '0.5', 
-                                 '0.64', '0.64', '0.99', '0.99', 
-                                 '0.78', '0.78', '1.0', '1.0', 
+        self.assertEqual(match, ['0.35', '0.35', '0.5', '0.5',
+                                 '0.64', '0.64', '0.99', '0.99',
+                                 '0.78', '0.78', '1.0', '1.0',
                                  '0.21', '0.21', '0.78', '0.78'])
 
         # we can get the same results without using realizeVolume, though
@@ -626,23 +626,23 @@ class Test(unittest.TestCase):
         for i, d in enumerate(['pp', 'p', 'mp', 'f', 'mf', 'ff', 'ppp', 'mf']):
             s.insert(i * 2, dynamics.Dynamic(d))
         match = [n.volume.cachedRealizedStr for n in s.notes]
-        self.assertEqual(match, ['0.35', '0.35', 
-                                 '0.5', '0.5', 
-                                 '0.64', '0.64', 
-                                 '0.99', '0.99', 
-                                 '0.78', '0.78', 
-                                 '1.0', '1.0', 
-                                 '0.21', '0.21', 
+        self.assertEqual(match, ['0.35', '0.35',
+                                 '0.5', '0.5',
+                                 '0.64', '0.64',
+                                 '0.99', '0.99',
+                                 '0.78', '0.78',
+                                 '1.0', '1.0',
+                                 '0.21', '0.21',
                                  '0.78', '0.78'])
 
         # loooking at raw velocity values
         match = [n.volume.velocity for n in s.notes]
         self.assertEqual(match, [None] * 16)
-        
+
         # can set velocity with realized values
         volume.realizeVolume(s, setAbsoluteVelocity=True)
         match = [n.volume.velocity for n in s.notes]
-        self.assertEqual(match, [45, 45, 63, 63, 81, 81, 126, 126, 99, 99, 
+        self.assertEqual(match, [45, 45, 63, 63, 81, 81, 126, 126, 99, 99,
                                  127, 127, 27, 27, 99, 99])
 
         #s.show('midi')
@@ -670,35 +670,35 @@ class Test(unittest.TestCase):
 
         #### TODO: BUG -- one note too loud...
         match = [n.volume.cachedRealizedStr for n in s.parts[0].flat.notes]
-        self.assertEqual(match, ['0.35', '0.35', '0.35', '0.35', '0.35', 
-                                 '0.5', '0.5', '0.5', '0.5', 
-                                 '0.64', '0.64', '0.64', '0.64', '0.64', 
-                                 '0.99', '0.99', '0.99', '0.99', 
-                                 '0.78', '0.78', '0.78', '0.78', 
-                                 '1.0', '1.0', '1.0', '1.0', 
-                                 '0.99', '0.99', '0.99', '0.99', 
+        self.assertEqual(match, ['0.35', '0.35', '0.35', '0.35', '0.35',
+                                 '0.5', '0.5', '0.5', '0.5',
+                                 '0.64', '0.64', '0.64', '0.64', '0.64',
+                                 '0.99', '0.99', '0.99', '0.99',
+                                 '0.78', '0.78', '0.78', '0.78',
+                                 '1.0', '1.0', '1.0', '1.0',
+                                 '0.99', '0.99', '0.99', '0.99',
                                  '0.78', '0.78', '0.78', '0.78', '0.78', '0.78', '0.78'])
 
         match = [n.volume.cachedRealizedStr for n in s.parts[1].flat.notes]
 
-        self.assertEqual(match, ['0.64', '0.64', '0.64', '0.64', 
-                                 '0.99', '0.99', '0.99', '0.99', '0.99', 
-                                 '0.78', '0.78', '0.78', '0.78', '0.78', 
-                                 '1.0', '1.0', '1.0', '1.0', 
-                                 '0.99', '0.99', '0.99', '0.99', '0.99', 
-                                 '0.78', '0.78', '0.78', '0.78', 
-                                 '0.35', '0.35', '0.35', '0.35', '0.35', '0.35', 
+        self.assertEqual(match, ['0.64', '0.64', '0.64', '0.64',
+                                 '0.99', '0.99', '0.99', '0.99', '0.99',
+                                 '0.78', '0.78', '0.78', '0.78', '0.78',
+                                 '1.0', '1.0', '1.0', '1.0',
+                                 '0.99', '0.99', '0.99', '0.99', '0.99',
+                                 '0.78', '0.78', '0.78', '0.78',
+                                 '0.35', '0.35', '0.35', '0.35', '0.35', '0.35',
                                  '0.5', '0.5', '0.5', '0.5', '0.5', '0.5', '0.5', '0.5', '0.5'])
 
         match = [n.volume.cachedRealizedStr for n in s.parts[3].flat.notes]
 
-        self.assertEqual(match, ['0.99', '0.99', '0.99', '0.99', '0.99', 
-                                 '0.78', '0.78', '0.78', '0.78', '0.78', 
-                                 '0.35', '0.35', '0.35', '0.35', '0.35', 
-                                 '0.5', '0.5', '0.5', '0.5', '0.5', '0.5', '0.5', 
-                                 '0.64', '0.64', '0.64', '0.64', 
-                                 '0.99', '0.99', '0.99', '0.99', 
-                                 '0.78', '0.78', '0.78', '0.78', '0.78', 
+        self.assertEqual(match, ['0.99', '0.99', '0.99', '0.99', '0.99',
+                                 '0.78', '0.78', '0.78', '0.78', '0.78',
+                                 '0.35', '0.35', '0.35', '0.35', '0.35',
+                                 '0.5', '0.5', '0.5', '0.5', '0.5', '0.5', '0.5',
+                                 '0.64', '0.64', '0.64', '0.64',
+                                 '0.99', '0.99', '0.99', '0.99',
+                                 '0.78', '0.78', '0.78', '0.78', '0.78',
                                  '1.0', '1.0', '1.0', '1.0', '1.0', '1.0'])
 
 
@@ -714,8 +714,8 @@ class Test(unittest.TestCase):
             s.notes[i].articulations.append(articulations.StrongAccent())
 
         match = [n.volume.cachedRealizedStr for n in s.notes]
-        self.assertEqual(match, ['0.96', '0.71', '0.71', '0.81', '0.86', '0.71', '0.81', 
-                                 '0.71', '0.86', '0.81', '0.71', '0.71', '0.96', '0.71', 
+        self.assertEqual(match, ['0.96', '0.71', '0.71', '0.81', '0.86', '0.71', '0.81',
+                                 '0.71', '0.86', '0.81', '0.71', '0.71', '0.96', '0.71',
                                  '0.71', '0.81'])
         #s.show()
         #s.show('midi')

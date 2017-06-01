@@ -1,4 +1,4 @@
-##!/usr/bin/env python   
+##!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:          setup.py
@@ -15,7 +15,7 @@ import os
 import setuptools
 
 # Do not import music21 directly.
-# Instead, read the _version.py file and exec its contents. 
+# Instead, read the _version.py file and exec its contents.
 path = os.path.join(os.path.dirname(__file__), 'music21', '_version.py')
 with open(path, 'r') as f:
     lines = f.read()
@@ -24,7 +24,7 @@ with open(path, 'r') as f:
 m21version = __version__ # @UndefinedVariable
 
 DESCRIPTION = 'A Toolkit for Computer-Aided Musical Analysis.'
-DESCRIPTION_LONG = """A Toolkit for Computer-Aided Musical Analysis. 
+DESCRIPTION_LONG = """A Toolkit for Computer-Aided Musical Analysis.
                         Developed at MIT by cuthbertLab.
                         Michael Scott Cuthbert, Principal Investigator.
                         The development of music21 is supported by the

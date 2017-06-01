@@ -20,7 +20,7 @@ def countTimeSig():
     for trecentoWork in ballataObj:
         thisTime = trecentoWork.timeSigBegin
         thisTime = thisTime.strip() # remove leading and trailing whitespace
-        if (thisTime == ""): 
+        if (thisTime == ""):
             pass
         else:
             totalPieces += 1
@@ -28,9 +28,9 @@ def countTimeSig():
                 timeSigCounter[thisTime] += 1
             else:
                 timeSigCounter[thisTime] = 1
-                
+
     for thisKey in sorted(timeSigCounter):
-        print(thisKey, ":", timeSigCounter[thisKey], 
+        print(thisKey, ":", timeSigCounter[thisKey],
               str(int(timeSigCounter[thisKey]*100/totalPieces)) + "%")
 
 def sortByPMFC(work):
@@ -38,7 +38,7 @@ def sortByPMFC(work):
     Sort a work according to which one comes first in PMFC:
 
     >>> from music21.alpha.trecento.runTrecentoCadence import sortByPMFC
-    
+
     >>> class Work(object):
     ...    def __init__(self, id):
     ...        self.id = id
@@ -82,9 +82,9 @@ def makePDFfromPieces(start = 1, finish = 2):
         randomOpus = randomPiece.asOpus()
         for s in randomOpus.scores:
             opus.insert(0, s)
-    
+
     opus.show('lily.pdf')
-        
+
 ## skip skipping skip incipits
 #        randomIncipit = randomPiece.incipitClass()
 #        lilyString += randomIncipit.lily()
@@ -117,7 +117,7 @@ def makePDFfromPiecesWithCapua(start = 2, finish = 3):
                 retrievedPieces.append(randomPiece)
         except:
             raise Exception("Ugg " + str(i))
-    
+
 #    lilyString = ""
 #    retrievedPieces.sort(key=sortByPMFC)
 #    for randomPiece in retrievedPieces:
@@ -127,12 +127,12 @@ def makePDFfromPiecesWithCapua(start = 2, finish = 3):
 #        for thisStream in randomIncipit.streams:
 #            capua.runRulesOnStream(thisStream)
 #        lilyString += randomIncipit.lily()
-#        
+#
 #        randomCadA = randomPiece.cadenceAClass()
 ##        randomCadA.header = randomIncipit.header ## use its header however
 #        for thisStream in randomCadA.streams:
 #            capua.runRulesOnStream(thisStream)
-#        
+#
 #        lilyString += randomCadA.lily()
 #        randomCadB1 = randomPiece.cadenceB1Class()
 #        if randomCadB1 is not None:
@@ -177,7 +177,7 @@ class Test(unittest.TestCase):
     def testA(self):
         self.assertEqual(5, 5) ## something really wrong!??
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     #makePDFfromPiecesWithCapua()
     import music21
     music21.mainTest(Test)

@@ -10,20 +10,20 @@ import unittest
 
 def simple1():
     '''
-    show correlations (if any) between notelength and pitch in several pieces 
+    show correlations (if any) between notelength and pitch in several pieces
     coded in musicxml or humdrum and also including the trecento cadences.
     '''
-    
+
     for work in ['opus18no1', 'opus59no3']:
         movementNumber = 3
         score = corpus.parse(work, movementNumber) #, extList=['xml'])
-    
+
         for part in score:
             instrumentName = part.flat.getElementsByClass(
                 instrument.Instrument)[0].bestName()
             title='%s, Movement %s, %s' % (work, movementNumber, instrumentName)
 
-            g = graph.PlotScatterPitchSpaceQuarterLength(part.flat.sorted, 
+            g = graph.PlotScatterPitchSpaceQuarterLength(part.flat.sorted,
                 title=title)
             g.process()
 
@@ -35,19 +35,19 @@ def simple2():
 
 def simple3():
     '''
-    reduce all measures of Chopin mazurkas to their rhythmic components and give the 
+    reduce all measures of Chopin mazurkas to their rhythmic components and give the
     measure numbers (harder: render in notation) of all measures sorted by pattern.
     '''
     def lsort(keyname):
         return len(rhythmicHash[keyname])
-    
-    defaultPitch = music21.pitch.Pitch("C3")      
-    
+
+    defaultPitch = music21.pitch.Pitch("C3")
+
     #  semiFlat lets me get all Measures no matter where they reside in the tree structure
     measureStream = converter.parse(humdrum.testFiles.mazurka6
                                     ).semiFlat.getElementsByClass('Measure')
-    rhythmicHash = defaultdict(list) 
-    
+    rhythmicHash = defaultdict(list)
+
     for thisMeasure in measureStream:
         if thisMeasure.duration.quarterLength != 3.0:
             continue
@@ -55,8 +55,8 @@ def simple3():
         if len(notes) == 0:
             continue
         rhythmicStream = stream.Measure()
-        
-        offsetString = "" ## comma separated string of offsets 
+
+        offsetString = "" ## comma separated string of offsets
         for thisNote in notes:
             rhythmNote = copy.deepcopy(thisNote)
             if rhythmNote.isNote:
@@ -65,14 +65,14 @@ def simple3():
                 rhythmNote          = note.Note()
                 rhythmNote.pitch    = copy.deepcopy(defaultPitch)
                 rhythmNote.duration = copy.deepcopy(thisNote.duration)
-                            
+
             if not rhythmNote.isRest:
                 offsetString += str(rhythmNote.offset) + ", "
-            
+
             rhythmicStream.append(rhythmNote)
-            
+
         #notes[0].lyric = str(thisMeasure.number)
-        if len(rhythmicHash[offsetString]) == 0: 
+        if len(rhythmicHash[offsetString]) == 0:
             # if it is our first encounter with the rhythm, add the rhythm alone in blue
             for thisNote in rhythmicStream:
                 thisNote.style.color = "blue"
@@ -82,7 +82,7 @@ def simple3():
 
     s = stream.Part()
     s.insert(0, meter.TimeSignature('3/4'))
-    
+
     for thisRhythmProfile in sorted(rhythmicHash, key=lsort, reverse=True):
         for thisMeasure in rhythmicHash[thisRhythmProfile]:
             thisMeasure.insert(0, thisMeasure.bestClef())
@@ -90,12 +90,12 @@ def simple3():
     s.show('lily.png')
 
 def displayChopinRhythms():
-    defaultPitch = music21.pitch.Pitch("C3")      
-    
+    defaultPitch = music21.pitch.Pitch("C3")
+
     #  semiFlat lets me get all Measures no matter where they reside in the tree structure
     measureStream = converter.parse(humdrum.testFiles.mazurka6
                                     ).semiFlat.getElementsByClass('Measure')
-    rhythmicHash = {} 
+    rhythmicHash = {}
 
     def lsort(keyname):
         return len(rhythmicHash[keyname])
@@ -107,8 +107,8 @@ def displayChopinRhythms():
         if len(notes) == 0:
             continue  # should not happen...
         rhythmicStream = stream.Measure()
-        
-        offsetString = "" ## comma separated string of offsets 
+
+        offsetString = "" ## comma separated string of offsets
         for thisNote in notes:
             rhythmNote = copy.deepcopy(thisNote)
             if rhythmNote.isNote:
@@ -117,14 +117,14 @@ def displayChopinRhythms():
                 rhythmNote          = note.Note()
                 rhythmNote.pitch    = copy.deepcopy(defaultPitch)
                 rhythmNote.duration = copy.deepcopy(thisNote.duration)
-                            
+
             if not rhythmNote.isRest:
                 offsetString += str(rhythmNote.offset) + ", "
-            
+
             rhythmicStream.append(rhythmNote)
-            
+
         notes[0].lyric = str(thisMeasure.number)
-        if len(rhythmicHash[offsetString]) == 0: 
+        if len(rhythmicHash[offsetString]) == 0:
             # if it is our first encounter with the rhythm, add the rhythm alone in blue
             for thisNote in rhythmicStream:
                 thisNote.style.color = "blue"
@@ -134,7 +134,7 @@ def displayChopinRhythms():
 
     s = stream.Part()
     s.insert(0, meter.TimeSignature('3/4')) # this should be made more flexible.
-    
+
     for thisRhythmProfile in sorted(rhythmicHash, key=lsort, reverse=True):
         for thisMeasure in rhythmicHash[thisRhythmProfile]:
             thisMeasure.insert(0, thisMeasure.bestClef())
@@ -144,9 +144,9 @@ def displayChopinRhythms():
 
 def simple4a(show=True):
     '''
-    find at least 5 questions that are difficult to solve in Humdrum 
+    find at least 5 questions that are difficult to solve in Humdrum
     which are simple in music21; (one which just uses Python)
-    
+
     4a: in addition to the graphs as they are can we have a graph showing average
     dynamic for a given pitch, and a single number for the Correlation Coefficient
     between dynamic level and pitch -- the sort of super scientific. I imagine
@@ -166,7 +166,7 @@ def simple4a(show=True):
         sPart = s.parts[movement]
         iObj = sPart.getElementsByClass(instrument.Instrument)[0]
         titleStr = '%s, Movement %s, %s' % (work, movementNumber, iObj.bestName())
-    
+
         if not show:
             doneAction = None
         else:
@@ -180,13 +180,13 @@ def simple4a(show=True):
 
 def simple4b(show=True):
     '''
-    question 8: Are dynamic swells (crescendo-diminuendos) 
+    question 8: Are dynamic swells (crescendo-diminuendos)
     more common than dips (diminuendos-crescendos)?
-    so we need to compute the average distance between < and > and see if 
+    so we need to compute the average distance between < and > and see if
     it's higher or lower than > to <. And any dynamic marking in between resets the count.
     '''
     from music21 import dynamics
-    
+
     work = 'opus41no1'
     movementNumber = 2
     s = corpus.parse(work, movementNumber) #, extList='xml')
@@ -199,14 +199,14 @@ def simple4b(show=True):
             if wedge.type == 'crescendo':
                 countCrescendo += 1
                 map.append(('>', wedge.offset))
-            elif wedge.type == 'diminuendo': 
+            elif wedge.type == 'diminuendo':
                 countDiminuendo += 1
                 map.append(('<', wedge.offset))
         if show:
             print(map)
 
     if show:
-        print('total crescendi: %s' % countCrescendo) 
+        print('total crescendi: %s' % countCrescendo)
         print('total diminuendi: %s' % countDiminuendo)
 
 
@@ -224,12 +224,12 @@ def simple4c(show=True):
 def simple4d():
     '''
     question 11: Assemble syllables into words for some vocal text.
-    
+
     music21 extension: then Google the lyrics if they contain the word exultavit
     '''
     import webbrowser
     from music21 import text
-        
+
     for part in converter.parse('d:/web/eclipse/music21misc/musicxmlLib/Binchois.xml'):
         lyrics = text.assembleLyrics(part)
         if 'exultavit' in lyrics:
@@ -274,7 +274,7 @@ def simple4f(show=True):
                     if candidateSet not in foundSets:
                         foundSets.append(candidateSet)
                     candidateSet = []
-            elif isinstance(e, note.Note):      
+            elif isinstance(e, note.Note):
                 if e.pitchClass not in candidateSet:
                     candidateSet.append(e.pitchClass)
     foundSets.sort()
@@ -302,7 +302,7 @@ def simple4g():
 
 
 def threeDimChopin():
-    from music21.humdrum import testFiles  
+    from music21.humdrum import testFiles
 
     streamObject = converter.parse(testFiles.mazurka6)
     stream2 = streamObject.stripTies()
@@ -313,7 +313,7 @@ def threeDimChopin():
 def threeDimMozart():
     from music21.musicxml.testFiles import mozartTrioK581Excerpt  # @UnresolvedImport
 
-    streamObject = converter.parse(mozartTrioK581Excerpt) # 
+    streamObject = converter.parse(mozartTrioK581Excerpt) #
 #    stream2 = streamObject.stripTies() # adds one outlier that makes the graph difficult to read
 
     g = graph.Plot3DBarsPitchSpaceQuarterLength(streamObject.flat)
@@ -323,13 +323,13 @@ def threeDimMozart():
 
 def threeDimBoth():
     from music21.musicxml.testFiles import mozartTrioK581Excerpt # @UnresolvedImport
-    from music21.humdrum import testFiles as kernTest  
+    from music21.humdrum import testFiles as kernTest
 
     mozartStream = converter.parse(mozartTrioK581Excerpt)
     g = graph.Plot3DBarsPitchSpaceQuarterLength(mozartStream.flat)
     g.process()
-    
-    chopinStream = converter.parse(kernTest.mazurka6) 
+
+    chopinStream = converter.parse(kernTest.mazurka6)
     g = graph.Plot3DBarsPitchSpaceQuarterLength(chopinStream.flat)
     g.process()
 
@@ -363,9 +363,9 @@ def januaryThankYou():
                     m.insert(0, m.bestClef())
                     display.append(m)
 
-            
+
             display.show()
-    
+
 
 
 
@@ -374,12 +374,12 @@ def januaryThankYou():
 
 
 # jdstewar@fas.harvard.edu wrote on Nov 21 [1999]:
-# > Dear Myke, 
-# > 
-# > In the meantime here are a few 
-# > questions I would pose for the program; some I imagine would be easy 
-# > and straighforward, some perhaps not so easy: 
-# 
+# > Dear Myke,
+# >
+# > In the meantime here are a few
+# > questions I would pose for the program; some I imagine would be easy
+# > and straighforward, some perhaps not so easy:
+#
 # Indeed, you've organized the questions in order from what I believe
 # will be the easiest to answer to what I believe will be the hardest.
 # The program doesn't have a good "Label Harmony" function (just because
@@ -392,7 +392,7 @@ def januaryThankYou():
 # much by the cadence chord and the chords directly preceding but more
 # from a larger sense of tonal listening which is of course harder to
 # teach a computer to have.
-# 
+#
 # warmly,
 # Myke Cuthbert
 
@@ -400,13 +400,13 @@ def januaryThankYou():
 
 def js_q1():
     '''
-    give all cadential arrivals on a first inversion chord, 6 or 65. 
+    give all cadential arrivals on a first inversion chord, 6 or 65.
     '''
     from music21 import expressions
 
     allChorales = corpus.chorales.Iterator()
     returnStream = stream.Part()
-    
+
     prevChord = None
     saveChord = None
     for i, chorale in enumerate(allChorales[230:]):
@@ -418,7 +418,7 @@ def js_q1():
             prev2Chord = prevChord
             prevChord = saveChord
             saveChord = thisChord
-            
+
             isCadence = False
             for thisExpression in thisChord.expressions:
                 if isinstance(thisExpression, expressions.Fermata):
@@ -426,8 +426,8 @@ def js_q1():
             if isCadence is True:
                 print(thisChord.inversion(), end=" ")
             if isCadence is True and thisChord.inversion() == 1:
-                thisChord.lyric = (chorale.metadata.title + ". " 
-                                       + " m:" + str(thisChord.measureNumber) 
+                thisChord.lyric = (chorale.metadata.title + ". "
+                                       + " m:" + str(thisChord.measureNumber)
                                        + " b:" + str(thisChord.beatStr))
                 retMeasure = stream.Measure()
                 if prev2Chord is not None:
@@ -442,44 +442,44 @@ def js_q1():
 
 def js_q2():
     '''
-    give all instances of bass lines with 7-6-7-5-all 8th notes. OR more 
-    precisely four 8th notes starting on the beat: down a whole step, up a 
-    whole step, down a M 3rd. 
+    give all instances of bass lines with 7-6-7-5-all 8th notes. OR more
+    precisely four 8th notes starting on the beat: down a whole step, up a
+    whole step, down a M 3rd.
     '''
     pass
 
 def js_q3():
     '''
-    find all I II42 V65 I progressions 
+    find all I II42 V65 I progressions
     '''
     allChorales = corpus.chorales.Iterator()
     returnStream = stream.Stream()
     for chorale in allChorales:
         unused_reducedChorale = chorale.simplify()
-        
+
     returnStream.show()
 
 def js_q4():
     '''
-    give all instances of half cadences in which the arrival is preceded 
-    by VII6/V. 
+    give all instances of half cadences in which the arrival is preceded
+    by VII6/V.
     '''
     allChorales = corpus.chorales.Iterator()
     returnStream = stream.Stream()
     for chorale in allChorales:
         unused_reducedChorale = chorale.simplify()
-        
+
     returnStream.show()
 
 def js_q5():
     '''
-    give all cadences that represent modulations to the key of bVII. 
+    give all cadences that represent modulations to the key of bVII.
     '''
     allChorales = corpus.chorales.Iterator()
     returnStream = stream.Stream()
     for chorale in allChorales:
         unused_reducedChorale = chorale.simplify()
-        
+
     returnStream.show()
 
 
@@ -510,7 +510,7 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-        
+
     def xtestBasic(self):
         '''seaverOct2009: Test non-showing functions
         '''

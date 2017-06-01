@@ -534,7 +534,7 @@ class ScoreFollower(object):
         number = int(listOfParts[position].id)
 
         if self.silencePeriod is True and self.silencePeriodCounter < 5:
-            # print(lastCountdown, self.countdown, lastNotePosition, 
+            # print(lastCountdown, self.countdown, lastNotePosition,
             #    beginningData[number], lengthData[number])
             environLocal.printDebug("All rest period")
             self.countdown -= 1

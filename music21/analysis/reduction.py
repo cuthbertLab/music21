@@ -11,7 +11,7 @@
 #-------------------------------------------------------------------------------
 
 '''
-Tools for generation reduction displays, showing a score and or a chord reduction, 
+Tools for generation reduction displays, showing a score and or a chord reduction,
 and one or more reductive representation lines.
 
 Used by graph.PlotHorizontalBarWeighted()
@@ -43,13 +43,13 @@ class ReductiveEventException(exceptions21.Music21Exception):
 
 
 # as lyric, or as parameter
-# 
+#
 # ::/p:g#/o:5/nh:f/ns:n/l:1/g:ursatz/v:1
 
- 
+
 class ReductiveNote(object):
     '''
-    The extraction of an event from a score and specification of where 
+    The extraction of an event from a score and specification of where
     and how it should be presented in a reductive score.
 
     A specification string, as well as Note, must be provided for parsing.
@@ -78,10 +78,10 @@ class ReductiveNote(object):
 
     def __init__(self, specification, inputNote, measureIndex, measureOffset):
         '''
-        A specification must be created when access the Measure that the source note 
-        is found in. Storing the measure and index position provides significant 
-        performance optimization, as we do no have to search 
-        every note when generated the reduction. 
+        A specification must be created when access the Measure that the source note
+        is found in. Storing the measure and index position provides significant
+        performance optimization, as we do no have to search
+        every note when generated the reduction.
 
         The `measureIndex` is the index of measure where this is found, not
         the measure number. The `measureOffset` is the position in the measure
@@ -90,9 +90,9 @@ class ReductiveNote(object):
         self._specification = specification
 
         self._note = None # store a reference to the note this is attached to
-        self._parameters = {}  
+        self._parameters = {}
         # do parsing if possible
-        self._isParsed = False 
+        self._isParsed = False
         self._parseSpecification(self._specification)
         self._note = inputNote # keep a reference
         self.measureIndex = measureIndex
@@ -125,7 +125,7 @@ class ReductiveNote(object):
         args = spec.split(self._delimitArg)
         for a in args[1:]: # skip the first arg, as it is just delmiiter
             # if no delimit arg, it cannot be parsed
-            if self._delimitValue not in a: 
+            if self._delimitValue not in a:
                 continue
             candidateKey, value = a.split(self._delimitValue)
             candidateKey = candidateKey.strip()
@@ -140,7 +140,7 @@ class ReductiveNote(object):
 
     def getNoteAndTextExpression(self):
         '''
-        Produce a new note, a deep copy of the supplied note 
+        Produce a new note, a deep copy of the supplied note
         and with the specified modifications.
         '''
         n = None
@@ -160,7 +160,7 @@ class ReductiveNote(object):
         # always clear certain parameters
         if (n is None):
             raise ReductiveEventException(
-                'Could not find pitch, %r in self._note: %r' % (self._parameters['pitch'], 
+                'Could not find pitch, %r in self._note: %r' % (self._parameters['pitch'],
                                                                 self._note))
         n.lyrics = []
         n.tie = None
@@ -222,14 +222,14 @@ class ScoreReduction(object):
             s = stream.Score()
             s.insert(0, copy.deepcopy(value))
             self._score = s
-        
+
     def  _getScore(self):
         return self._score
 
     score = property(_getScore, _setScore, doc='''
-        Get or set the Score. Setting the score set a deepcopy of the score; the score 
+        Get or set the Score. Setting the score set a deepcopy of the score; the score
         set here will not be altered.
-        
+
         >>> s = corpus.parse('bwv66.6')
         >>> sr = analysis.reduction.ScoreReduction()
         >>> sr.score = s
@@ -246,12 +246,12 @@ class ScoreReduction(object):
             s = stream.Score()
             s.insert(0, copy.deepcopy(value))
             self._chordReduction = s
-        
+
     def  _getChordReduction(self):
         return self._chordReduction
 
     chordReduction = property(_getChordReduction, _setChordReduction, doc='''
-        Get or set a Chord reduction as a Stream or Score. Setting the this values 
+        Get or set a Chord reduction as a Stream or Score. Setting the this values
         set a deepcopy of the reduction; the reduction set here will not be altered.
         ''')
 
@@ -259,7 +259,7 @@ class ScoreReduction(object):
 
     def _extractReductionEvents(self, score, removeAfterParsing=True):
         '''
-        Remove and store all reductive events 
+        Remove and store all reductive events
         Store in a dictionary where obj id is obj key
         '''
         if score is None:
@@ -280,7 +280,7 @@ class ScoreReduction(object):
                         'measureIndex': 0
                         }
         m = infoDict['measure']
-        
+
         if not n.hasLyrics():
             return
 
@@ -292,9 +292,9 @@ class ScoreReduction(object):
                 if v.hasElement(n):
                     offset = n.getOffsetBySite(v)
 
-        
+
         # a list of Lyric objects
-        for k, l in enumerate(n.lyrics): 
+        for k, l in enumerate(n.lyrics):
             # store measure index
             rn = ReductiveNote(l.text, n, infoDict['measureIndex'], offset)
             if rn.isParsed():
@@ -306,7 +306,7 @@ class ScoreReduction(object):
         if removeAfterParsing:
             for q in removalIndices:
                 # replace position in list with empty lyric
-                n.lyrics[q] = note.Lyric('') 
+                n.lyrics[q] = note.Lyric('')
 
 
     def _parseReductiveNotes(self):
@@ -314,27 +314,27 @@ class ScoreReduction(object):
         self._extractReductionEvents(self._chordReduction)
         self._extractReductionEvents(self._score)
         for unused_key, rn in self._reductiveNotes.items():
-            if rn['group'] not in self._reductiveGroups: 
+            if rn['group'] not in self._reductiveGroups:
                 self._reductiveGroups.append(rn['group'])
-            if rn['voice'] not in self._reductiveVoices: 
+            if rn['voice'] not in self._reductiveVoices:
                 self._reductiveVoices.append(rn['voice'])
             # if we have None and a group, then we should just use that one
             # group; same with voices
-            if (len(self._reductiveGroups) == 2 and None in 
+            if (len(self._reductiveGroups) == 2 and None in
                 self._reductiveGroups):
                 self._reductiveGroups.remove(None)
-            # for now, sort all 
+            # for now, sort all
             # environLocal.printDebug(['self._reductiveGroups', self._reductiveGroups])
 
-            if (len(self._reductiveVoices) == 2 and None in 
+            if (len(self._reductiveVoices) == 2 and None in
                 self._reductiveVoices):
                 self._reductiveVoices.remove(None)
 
 
     def _createReduction(self):
         self._parseReductiveNotes()
-        s = stream.Score() 
-        # need to scan all tags 
+        s = stream.Score()
+        # need to scan all tags
         oneGroup = False
         if len(self._reductiveGroups) == 1:
             # if 1, can be None or a group name:
@@ -396,7 +396,7 @@ class ScoreReduction(object):
                 # only make rests if there are notes in the measure
                 for v in m.voices:
                     if v.recurse().notes:
-                        v.makeRests(fillGaps=True, inPlace=True) 
+                        v.makeRests(fillGaps=True, inPlace=True)
                 m.flattenUnnecessaryVoices(inPlace=True)
                 # hide all rests in all containers
                 for r in m.recurse().getElementsByClass('Rest'):
@@ -418,10 +418,10 @@ class ScoreReduction(object):
         return s
 
     def reduce(self):
-        '''Given a score, populate this Score reduction 
+        '''Given a score, populate this Score reduction
         '''
         # if not set here or before
-        if self.score is None and self.chordReduction is None: 
+        if self.score is None and self.chordReduction is None:
             raise ScoreReductionException('no score defined to reduce')
 
         return self._createReduction()
@@ -435,31 +435,31 @@ class PartReductionException(exceptions21.Music21Exception):
 #-------------------------------------------------------------------------------
 class PartReduction(object):
     '''
-    A part reduction reduces a Score into one or more parts. 
-    Parts are combined based on a part group dictionary. 
-    Each resulting part is then segmented by an object. 
+    A part reduction reduces a Score into one or more parts.
+    Parts are combined based on a part group dictionary.
+    Each resulting part is then segmented by an object.
     This object is assigned as floating-point value.
 
-    This reduction is designed to work with the GraphHorizontalBarWeighted and related Plot 
+    This reduction is designed to work with the GraphHorizontalBarWeighted and related Plot
     subclasses.
 
-    If the `fillByMeasure` parameter is True, and if measures are available, 
-    each part will segment by Measure divisions, and look for the target activity only 
-    once per Measure. 
-    
-    If more than one target is found in the Measure, values will be averaged. 
-    
-    If `fillByMeasure` is False, the part will be segmented by each Note. 
+    If the `fillByMeasure` parameter is True, and if measures are available,
+    each part will segment by Measure divisions, and look for the target activity only
+    once per Measure.
 
-    The `segmentByTarget` parameter is True, segments, which may be Notes or Measures, 
-    will be divided if necessary to show changes that occur over the duration of the 
-    segment by a target object. 
+    If more than one target is found in the Measure, values will be averaged.
 
-    If the `normalizeByPart` parameter is True, each part will be normalized within 
-    the range only of that part. If False, all parts will be normalized by the max 
-    of all parts. The default is True. 
+    If `fillByMeasure` is False, the part will be segmented by each Note.
 
-    If the `normalize` parameter is False, no normalization will take place. The default is True. 
+    The `segmentByTarget` parameter is True, segments, which may be Notes or Measures,
+    will be divided if necessary to show changes that occur over the duration of the
+    segment by a target object.
+
+    If the `normalizeByPart` parameter is True, each part will be normalized within
+    the range only of that part. If False, all parts will be normalized by the max
+    of all parts. The default is True.
+
+    If the `normalize` parameter is False, no normalization will take place. The default is True.
 
     '''
     def __init__(self, srcScore=None, *args, **keywords):
@@ -468,7 +468,7 @@ class PartReduction(object):
         if 'Score' not in srcScore.classes:
             raise PartReductionException('provided Stream must be Score')
         self._score = srcScore
-        # an ordered list of dictionaries for 
+        # an ordered list of dictionaries for
         # part id, part color, and a list of Part objs
         self._partBundles = []
         # a dictionary of part id to a list of events
@@ -500,14 +500,14 @@ class PartReduction(object):
         # check that there are measures
         for p in self._score.parts:
             if not p.hasMeasures():
-                self._fillByMeasure = False         
+                self._fillByMeasure = False
                 #environLocal.printDebug(['overriding fillByMeasure as no measures are defined'])
                 break
 
     def _createPartBundles(self):
         '''
-        Fill the _partBundles list with dictionaries, 
-        each dictionary defining a name (part id or supplied), a color, and list 
+        Fill the _partBundles list with dictionaries,
+        each dictionary defining a name (part id or supplied), a color, and list
         of Parts that match.
         '''
         self._partBundles = []
@@ -533,7 +533,7 @@ class PartReduction(object):
                     continue
                 data = {'pGroupId':name, 'color':pColor, 'parts':sub}
                 self._partBundles.append(data)
-        else: # manually creates    
+        else: # manually creates
             for p in self._score.parts:
                 # store one or more Parts associated with an id
                 data = {'pGroupId':p.id, 'color':'#666666', 'parts':[p]}
@@ -569,7 +569,7 @@ class PartReduction(object):
 
             # segmenting by measure if that measure contains notes
             # note that measures are not elided of activity is contiguous
-            if self._fillByMeasure:    
+            if self._fillByMeasure:
                 partMeasures = []
                 for p in parts:
                     partMeasures.append(p.getElementsByClass('Measure').stream())
@@ -587,14 +587,14 @@ class PartReduction(object):
                             break
                     #environLocal.printDebug([i, 'active', active])
                     if not active:
-                        continue    
+                        continue
                     # get offset, or start, of this measure
-                    e = partMeasures[0][i]                            
+                    e = partMeasures[0][i]
                     eStart = e.getOffsetBySite(partMeasures[0])
                     # use duration, not barDuration.quarterLength
-                    # as want filled duration?        
+                    # as want filled duration?
                     eEnd = (eStart + e.barDuration.quarterLength)
-                    ds = {'eStart':eStart, 'span':eEnd-eStart, 
+                    ds = {'eStart':eStart, 'span':eEnd-eStart,
                           'weight':None, 'color':pColor}
                     dataEvents.append(ds)
 
@@ -606,19 +606,19 @@ class PartReduction(object):
 #                             continue
 #                         # if this is the last measure and it is active
 #                         if (i >= iLast and active):
-#                             eLast = partMeasures[0][i]                            
+#                             eLast = partMeasures[0][i]
 #                         # use duration, not barDuration.quarterLength
 #                         # as want filled duration?
 #                         eEnd = (eLast.getOffsetBySite(
-#                                 partMeasures[0]) + 
+#                                 partMeasures[0]) +
 #                                 eLast.barDuration.quarterLength)
-#                         ds = {'eStart':eStart, 'span':eEnd-eStart, 
+#                         ds = {'eStart':eStart, 'span':eEnd-eStart,
 #                               'weight':None, 'color':pColor}
 #                         dataEvents.append(ds)
 #                         eStart = None
 #                    eLast = partMeasures[0][i]
 
-            # fill by alternative approach, based on activity of notes  
+            # fill by alternative approach, based on activity of notes
             # creates region for each contiguous span of notes
             # this is useful as it will handle overlaps and similar arrangments
             # TODO: this needs further testing
@@ -629,7 +629,7 @@ class PartReduction(object):
                 # a li=st, not a stream
                 # a None in the resulting list designates a rest
                 noteSrc = eSrc.findConsecutiveNotes()
-                for i, e in enumerate(noteSrc): 
+                for i, e in enumerate(noteSrc):
                     #environLocal.printDebug(['i, e', i, e])
                     # if this event is a rest, e is None
                     if e is None:
@@ -638,7 +638,7 @@ class PartReduction(object):
                         else:
                             eEnd = eLast.getOffsetBySite(eSrc) + eLast.quarterLength
                         # create a temporary weight
-                        ds = {'eStart': eStart, 'span': eEnd - eStart, 
+                        ds = {'eStart': eStart, 'span': eEnd - eStart,
                               'weight': None, 'color': pColor}
                         dataEvents.append(ds)
                         eStart = None
@@ -648,7 +648,7 @@ class PartReduction(object):
                             eStart = e.getOffsetBySite(eSrc)
                         eEnd = e.getOffsetBySite(eSrc) + e.quarterLength
                         # create a temporary weight
-                        ds = {'eStart': eStart, 'span': eEnd-eStart, 
+                        ds = {'eStart': eStart, 'span': eEnd-eStart,
                               'weight': None, 'color': pColor}
                         dataEvents.append(ds)
                         eStart = None
@@ -660,18 +660,18 @@ class PartReduction(object):
             self._eventSpans[pGroupId] = dataEvents
 
 
-    def _getValueForSpan(self, target='Dynamic', splitSpans=True, 
+    def _getValueForSpan(self, target='Dynamic', splitSpans=True,
                          targetToWeight=None):
         '''
-        For each span, determine the measured parameter value. This is translated 
+        For each span, determine the measured parameter value. This is translated
         as the height of the bar graph.
 
-        If `splitSpans` is True, a span will be split of the target changes over the span. 
-        Otherwise, Spans will be averaged. This is the `segmentByTarget` parameter. 
+        If `splitSpans` is True, a span will be split of the target changes over the span.
+        Otherwise, Spans will be averaged. This is the `segmentByTarget` parameter.
 
-        The `targetToWeight` parameter is a function that takes a list or Stream of objects 
+        The `targetToWeight` parameter is a function that takes a list or Stream of objects
         (of the class specified by `target`) and returns a single floating-point value.
-        ''' 
+        '''
         # this temporary function only works with dynamics
         def _dynamicToWeight(targets):
             # permit a stream
@@ -696,10 +696,10 @@ class PartReduction(object):
                     offsetStart = ds['eStart']
                     offsetEnd = offsetStart + ds['span']
                     match = flatRef.getElementsByOffset(
-                                offsetStart, 
+                                offsetStart,
                                 offsetEnd,
-                                includeEndBoundary=False, 
-                                mustFinishInSpan=False, 
+                                includeEndBoundary=False,
+                                mustFinishInSpan=False,
                                 mustBeginInSpan=True).getElementsByClass(target).stream()
                     if not match:
                         w = None
@@ -718,7 +718,7 @@ class PartReduction(object):
                     # get all targets within the contiguous region
                     # e.g., Dynamics objects
                     match = flatRef.getElementsByOffset(offsetStart, offsetEnd,
-                        includeEndBoundary=True, mustFinishInSpan=False, 
+                        includeEndBoundary=True, mustFinishInSpan=False,
                         mustBeginInSpan=True).getElementsByClass(target).stream()
                     #environLocal.printDebug(['matched elements', target, match])
                     # extend duration of all found dynamics
@@ -738,12 +738,12 @@ class PartReduction(object):
                         # end at this span
                         if targetStart + targetSpan > offsetEnd:
                             targetSpan = offsetEnd - targetStart
-                        # if we have the last matched target, it will 
+                        # if we have the last matched target, it will
                         # have zero duration, as there is no following
                         # thus, span needs to be distance to end of regions
-                        if targetSpan <= 0.001: 
+                        if targetSpan <= 0.001:
                             targetSpan = offsetEnd - targetStart
-                        #environLocal.printDebug([t, 'targetSpan', targetSpan, 
+                        #environLocal.printDebug([t, 'targetSpan', targetSpan,
                         #  'offsetEnd', offsetEnd, "ds['span']", ds['span']])
 
                         if i==0 and ds['eStart'] == targetStart:
@@ -753,38 +753,38 @@ class PartReduction(object):
                             dsFirst['span'] = targetSpan
                             dsFirst['weight'] = targetToWeight(t)
                             finalBundle.append(dsFirst)
-                        elif t==0 and ds['eStart'] != targetStart: 
+                        elif t==0 and ds['eStart'] != targetStart:
                             # add two, one for the empty region, one for target
                             # adjust span of first; weight is not knonw
                             # (hangs over from last)
-                            dsFirst['span'] = targetStart - offsetStart                            
+                            dsFirst['span'] = targetStart - offsetStart
                             finalBundle.append(dsFirst)
                             dsNext = copy.deepcopy(ds)
                             dsNext['eStart'] = targetStart
                             dsNext['span'] = targetSpan
                             dsNext['weight'] = targetToWeight(t)
                             finalBundle.append(dsNext)
-                        else: # for all other cases, create segment for each 
+                        else: # for all other cases, create segment for each
                             dsNext = copy.deepcopy(ds)
                             dsNext['eStart'] = targetStart
                             dsNext['span'] = targetSpan
                             dsNext['weight'] = targetToWeight(t)
                             finalBundle.append(dsNext)
-                # after iterating all ds spans, reassign 
+                # after iterating all ds spans, reassign
                 self._eventSpans[partBundle['pGroupId']] = finalBundle
 
     def _extendSpans(self):
         '''
-        Extend a the value of a target parameter to the next boundary. 
-        An undefined boundary will wave as its weight None. 
-        ''' 
-#         environLocal.printDebug(['_extendSpans: pre'])    
+        Extend a the value of a target parameter to the next boundary.
+        An undefined boundary will wave as its weight None.
+        '''
+#         environLocal.printDebug(['_extendSpans: pre'])
 #         for partBundle in self._partBundles:
 #             for i, ds in enumerate(self._eventSpans[partBundle['pGroupId']]):
 #                 print ds
 
         minValue = 0.01 # for error conditions
-        for partBundle in self._partBundles:            
+        for partBundle in self._partBundles:
             lastWeight = None
             for i, ds in enumerate(self._eventSpans[partBundle['pGroupId']]):
                 if i == 0: # cannot extend first
@@ -800,18 +800,18 @@ class PartReduction(object):
                     elif lastWeight is not None: # its None, use last
                         ds['weight'] = lastWeight
                     # do not have a list; mist set to min
-                    elif ds['weight'] is None and lastWeight is None: 
+                    elif ds['weight'] is None and lastWeight is None:
                         ds['weight'] = minValue
                         #environLocal.printDebug([
                         #  'cannnot extend a weight: no previous weight defined'])
-#         environLocal.printDebug(['_extendSpans: post'])    
+#         environLocal.printDebug(['_extendSpans: post'])
 #         for partBundle in self._partBundles:
 #             for i, ds in enumerate(self._eventSpans[partBundle['pGroupId']]):
 #                 print ds
 
     def _normalize(self, byPart=False):
         '''Normalize, either within each Part, or for all parts
-        ''' 
+        '''
         partMaxRef = {}
         for partBundle in self._partBundles:
             partMax = 0
@@ -821,7 +821,7 @@ class PartReduction(object):
             partMaxRef[partBundle['pGroupId']] = partMax
 
         try:
-            maxOfMax = max([e for e in partMaxRef.values()])        
+            maxOfMax = max([e for e in partMaxRef.values()])
         except ValueError: # empty part?
             maxOfMax = 0
 
@@ -851,10 +851,10 @@ class PartReduction(object):
 
     def getGraphHorizontalBarWeightedData(self):
         '''
-        Get all data organized into bar span specifications. 
+        Get all data organized into bar span specifications.
         '''
 #         data =  [
-#         ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, .2, '#3ff203',.1, 1)]  ), 
+#         ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, .2, '#3ff203',.1, 1)]  ),
 #         ('Celli',    [(2, 7, .2, '#0ff302'), (10, 3, .6, '#ff0000', 1)]  ), ]
         data = []
         # iterate over part bundles to get order
@@ -867,7 +867,7 @@ class PartReduction(object):
             data.append((partBundle['pGroupId'], dataList))
         return data
 
-#-------------------------------------------------------------------------------    
+#-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -893,14 +893,14 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.parts[0].flat.notes), 3)
         #post.parts[0].show('t')
 
-        match = [(repr(e), e.offset, e.duration.quarterLength) 
+        match = [(repr(e), e.offset, e.duration.quarterLength)
             for e in post.parts[0].getElementsByClass('Measure').stream()[0:3].flat.notesAndRests]
-        self.assertEqual(match, 
-                         [('<music21.note.Rest rest>', 0.0, 1.0), 
-                          ('<music21.note.Note F#>', 1.0, 1.0), 
-                          ('<music21.note.Rest rest>', 2.0, 1.0), 
-                          ('<music21.note.Note C#>', 3.0, 1.0), 
-                          ('<music21.note.Rest rest>', 5.0, 1.0), 
+        self.assertEqual(match,
+                         [('<music21.note.Rest rest>', 0.0, 1.0),
+                          ('<music21.note.Note F#>', 1.0, 1.0),
+                          ('<music21.note.Rest rest>', 2.0, 1.0),
+                          ('<music21.note.Note C#>', 3.0, 1.0),
+                          ('<music21.note.Rest rest>', 5.0, 1.0),
                           ('<music21.note.Note G#>', 6.0, 1.0)])
 
         # test that lyric is found
@@ -927,41 +927,41 @@ class Test(unittest.TestCase):
         match = [n for n in post.parts[0].flat.notes]
         self.assertEqual(len(match), 3)
 
-        
+
         #post.show()
 
     def testExtractionC(self):
         from music21 import analysis, corpus
         # http://solomonsmusic.net/schenker.htm
         # shows extracting an Ursatz line
-        
+
         # BACH pre;ide !, WTC
 
         src = corpus.parse('bwv846')
-        chords = src.flattenParts().makeChords(minimumWindowSize=4, 
+        chords = src.flattenParts().makeChords(minimumWindowSize=4,
                                     makeRests=False)
         for c in chords.flat.notes:
             c.quarterLength = 4
         for m in chords.getElementsByClass('Measure'):
             m.clef = m.bestClef()
-        
+
         chords.measure(1).notes[0].addLyric('::/p:e/o:5/nf:no/ta:3/g:Ursatz')
         chords.measure(1).notes[0].addLyric('::/p:c/o:4/nf:no/tb:I')
-        
+
         chords.measure(24).notes[0].addLyric('::/p:d/o:5/nf:no/ta:2')
         chords.measure(24).notes[0].addLyric('::/p:g/o:3/nf:no/tb:V')
-        
+
         chords.measure(30).notes[0].addLyric('::/p:f/o:4/tb:7')
-        
+
         chords.measure(34).notes[0].addLyric('::/p:c/o:5/nf:no/v:1/ta:1')
         chords.measure(34).notes[0].addLyric('::/p:g/o:4/nf:no/v:2')
         chords.measure(34).notes[0].addLyric('::/p:c/o:4/nf:no/v:1/tb:I')
-        
+
         sr = analysis.reduction.ScoreReduction()
         sr.chordReduction = chords
         #sr.score = src
         unused_post = sr.reduce()
-        #unused_post.show()        
+        #unused_post.show()
 
 
     def testExtractionD(self):
@@ -980,12 +980,12 @@ class Test(unittest.TestCase):
                     n.addLyric('::/p:f#/o:4')
         #                 if 'C' in [p.name for p in n.pitches]:
         #                     n.addLyric('::/p:c/o:4/g:C')
-                    
+
         sr = analysis.reduction.ScoreReduction()
         sr.score = src
         unused_post = sr.reduce()
-        #post.show()        
-    
+        #post.show()
+
 
     def testExtractionD2(self):
         # this shows a score, extracting a single pitch
@@ -1003,11 +1003,11 @@ class Test(unittest.TestCase):
                     n.addLyric('::/p:f#/o:4/g:F#')
                 if 'C' in [p.name for p in n.pitches]:
                     n.addLyric('::/p:c/o:4/g:C')
-                    
+
         sr = analysis.reduction.ScoreReduction()
         sr.score = src
         unused_post = sr.reduce()
-        #post.show()        
+        #post.show()
 
 
 
@@ -1022,8 +1022,8 @@ class Test(unittest.TestCase):
         #sr.chordReduction = chords
         sr.score = src
         unused_post = sr.reduce()
-        #post.show()        
-        
+        #post.show()
+
 
 
     def testPartReductionA(self):
@@ -1033,9 +1033,9 @@ class Test(unittest.TestCase):
         s = corpus.parse('bwv66.6')
 
         partGroups = [
-            {'name':'High Voices', 'color':'#ff0088', 
-                'match':['soprano', 'alto']}, 
-            {'name':'Low Voices', 'color':'#8800ff', 
+            {'name':'High Voices', 'color':'#ff0088',
+                'match':['soprano', 'alto']},
+            {'name':'Low Voices', 'color':'#8800ff',
                 'match':['tenor', 'bass']}
                     ]
         pr = analysis.reduction.PartReduction(s, partGroups=partGroups)
@@ -1045,7 +1045,7 @@ class Test(unittest.TestCase):
 
 
     def _matchWeightedData(self, match, target):
-        '''Utility function to compare known data but not compare floating point weights. 
+        '''Utility function to compare known data but not compare floating point weights.
         '''
         for partId in range(len(target)):
             a = match[partId]
@@ -1058,7 +1058,7 @@ class Test(unittest.TestCase):
                 # span
                 self.assertAlmostEqual(dataMatch[1], dataTarget[1])
                 # weight
-                self.assertAlmostEqual(dataMatch[2], dataTarget[2], 
+                self.assertAlmostEqual(dataMatch[2], dataTarget[2],
                                 msg="for partId %s, entry %d: should be %s <-> was %s" % (
                                                     partId, i, dataMatch[2], dataTarget[2]))
 
@@ -1089,15 +1089,15 @@ class Test(unittest.TestCase):
         pr = analysis.reduction.PartReduction(s, normalize=False)
         pr.process()
         match = pr.getGraphHorizontalBarWeightedData()
-        target = [(0, [[0.0, 1.0, 0.07857142857142858, '#666666'], 
-                       [1.0, 3.0, 0.09999999999999999, '#666666'], 
-                       [4.0, 2.0, 0.05, '#666666'], 
-                       [6.0, 4.0, 0.12142857142857143, '#666666'], 
-                       [10.0, 2.0, 0.07857142857142858, '#666666']]), 
-                  (1, [[0.0, 1.0, 0.07857142857142858, '#666666'], 
-                       [1.0, 3.0, 0.09999999999999999, '#666666'], 
-                       [4.0, 2.0, 0.05, '#666666'], 
-                       [6.0, 4.0, 0.12142857142857143, '#666666'], 
+        target = [(0, [[0.0, 1.0, 0.07857142857142858, '#666666'],
+                       [1.0, 3.0, 0.09999999999999999, '#666666'],
+                       [4.0, 2.0, 0.05, '#666666'],
+                       [6.0, 4.0, 0.12142857142857143, '#666666'],
+                       [10.0, 2.0, 0.07857142857142858, '#666666']]),
+                  (1, [[0.0, 1.0, 0.07857142857142858, '#666666'],
+                       [1.0, 3.0, 0.09999999999999999, '#666666'],
+                       [4.0, 2.0, 0.05, '#666666'],
+                       [6.0, 4.0, 0.12142857142857143, '#666666'],
                        [10.0, 2.0, 0.07857142857142858, '#666666']])]
 
         self._matchWeightedData(match, target)
@@ -1131,11 +1131,11 @@ class Test(unittest.TestCase):
         pr.process()
         match = pr.getGraphHorizontalBarWeightedData()
 
-        target = [(0, [[0.0, 2.0, 0.05, '#666666'], 
-                       [2.0, 4.0, 0.1285714285714286, '#666666'], 
-                       [6.0, 2.0, 0.0214285714286, '#666666']]), 
-                  (1, [[0.0, 1.0, 0.05, '#666666'], 
-                       [1.0, 1.0, 0.1285714285714286, '#666666'], 
+        target = [(0, [[0.0, 2.0, 0.05, '#666666'],
+                       [2.0, 4.0, 0.1285714285714286, '#666666'],
+                       [6.0, 2.0, 0.0214285714286, '#666666']]),
+                  (1, [[0.0, 1.0, 0.05, '#666666'],
+                       [1.0, 1.0, 0.1285714285714286, '#666666'],
                        [2.0, 6.0, 0.0214285714286, '#666666']])]
 
         self._matchWeightedData(match, target)
@@ -1170,11 +1170,11 @@ class Test(unittest.TestCase):
         pr.process()
         match = pr.getGraphHorizontalBarWeightedData()
         #print match
-        target = [(0, [[2.0, 2.0, 1.0, '#666666'], 
-                       [6.0, 2.0, 0.166666666666666, '#666666'], 
-                       [10.0, 2.0, 0.166666666666, '#666666']]), 
-                  (1, [[2.0, 2.0, 0.7777777777777776, '#666666'], 
-                       [6.0, 2.0, 0.6111111111111112, '#666666'], 
+        target = [(0, [[2.0, 2.0, 1.0, '#666666'],
+                       [6.0, 2.0, 0.166666666666666, '#666666'],
+                       [10.0, 2.0, 0.166666666666, '#666666']]),
+                  (1, [[2.0, 2.0, 0.7777777777777776, '#666666'],
+                       [6.0, 2.0, 0.6111111111111112, '#666666'],
                        [10.0, 2.0, 0.6111111111111112, '#666666']])]
         self._matchWeightedData(match, target)
 
@@ -1213,11 +1213,11 @@ class Test(unittest.TestCase):
                     segmentByTarget=False, normalize=False)
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
-        match = [(0, [[0.0, 4.0, 0.178571428571, '#666666'], 
-                      [4.0, 4.0, 0.0214285714286, '#666666'], 
-                      [8.0, 4.0, 0.0214285714286, '#666666']]), 
-                 (1, [[0.0, 4.0, 0.178571428571, '#666666'], 
-                      [4.0, 4.0, 0.07857142857142858, '#666666'], 
+        match = [(0, [[0.0, 4.0, 0.178571428571, '#666666'],
+                      [4.0, 4.0, 0.0214285714286, '#666666'],
+                      [8.0, 4.0, 0.0214285714286, '#666666']]),
+                 (1, [[0.0, 4.0, 0.178571428571, '#666666'],
+                      [4.0, 4.0, 0.07857142857142858, '#666666'],
                       [8.0, 4.0, 0.07857142857142858, '#666666']])]
 
         self._matchWeightedData(match, target)
@@ -1227,13 +1227,13 @@ class Test(unittest.TestCase):
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
         #print target
-        match = [(0, [[0.0, 2.0, 0.05, '#666666'], 
-                      [2.0, 2.0, 0.1285714285714286, '#666666'], 
-                      [6.0, 2.0, 0.0214285714286, '#666666'], 
-                      [10.0, 2.0, 0.0214285714286, '#666666']]), 
-                 (1, [[0.0, 2.0, 0.07857142857142858, '#666666'], 
-                      [2.0, 2.0, 0.1, '#666666'], 
-                      [6.0, 2.0, 0.07857142857142858, '#666666'], 
+        match = [(0, [[0.0, 2.0, 0.05, '#666666'],
+                      [2.0, 2.0, 0.1285714285714286, '#666666'],
+                      [6.0, 2.0, 0.0214285714286, '#666666'],
+                      [10.0, 2.0, 0.0214285714286, '#666666']]),
+                 (1, [[0.0, 2.0, 0.07857142857142858, '#666666'],
+                      [2.0, 2.0, 0.1, '#666666'],
+                      [6.0, 2.0, 0.07857142857142858, '#666666'],
                       [10.0, 2.0, 0.07857142857142858, '#666666']])]
         self._matchWeightedData(match, target)
 
@@ -1243,11 +1243,11 @@ class Test(unittest.TestCase):
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
         #print target
-        match = [(0, [[0.0, 4.0, 1.0, '#666666'], 
-                      [6.0, 2.0, 0.12, '#666666'], 
-                      [10.0, 2.0, 0.12, '#666666']]), 
-                 (1, [[0.0, 4.0, 1.0, '#666666'], 
-                      [6.0, 2.0, 0.44, '#666666'], 
+        match = [(0, [[0.0, 4.0, 1.0, '#666666'],
+                      [6.0, 2.0, 0.12, '#666666'],
+                      [10.0, 2.0, 0.12, '#666666']]),
+                 (1, [[0.0, 4.0, 1.0, '#666666'],
+                      [6.0, 2.0, 0.44, '#666666'],
                       [10.0, 2.0, 0.44, '#666666']])]
         self._matchWeightedData(match, target)
 
@@ -1256,13 +1256,13 @@ class Test(unittest.TestCase):
                     segmentByTarget=True)
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
-        match = [(0, [[0.0, 2.0, 0.3888888888888, '#666666'], 
-                      [2.0, 2.0, 1.0, '#666666'], 
-                      [6.0, 2.0, 0.166666666667, '#666666'], 
-                      [8.0, 4.0, 0.166666666667, '#666666']]), 
-                 (1, [[0.0, 2.0, 0.6111111111111112, '#666666'], 
-                      [2.0, 2.0, 0.7777777777777776, '#666666'], 
-                      [6.0, 2.0, 0.611111111111111, '#666666'], 
+        match = [(0, [[0.0, 2.0, 0.3888888888888, '#666666'],
+                      [2.0, 2.0, 1.0, '#666666'],
+                      [6.0, 2.0, 0.166666666667, '#666666'],
+                      [8.0, 4.0, 0.166666666667, '#666666']]),
+                 (1, [[0.0, 2.0, 0.6111111111111112, '#666666'],
+                      [2.0, 2.0, 0.7777777777777776, '#666666'],
+                      [6.0, 2.0, 0.611111111111111, '#666666'],
                       [8.0, 4.0, 0.611111111111111, '#666666']])]
         self._matchWeightedData(match, target)
 
@@ -1272,7 +1272,7 @@ class Test(unittest.TestCase):
 #         p.process()
 
 class TestExternal(unittest.TestCase):
-    
+
     def testPartReductionB(self):
         t = Test()
         t.testPartReductionB(show=True)

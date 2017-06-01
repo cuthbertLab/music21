@@ -33,7 +33,7 @@ class HorizontalityException(exceptions21.TreeException):
 class Horizontality(collections.Sequence):
     r'''
     A horizontality of consecutive PitchedTimespan objects.
-    
+
     It must be initiated with a list or tuple of Timespan objects.
     '''
 
@@ -81,7 +81,7 @@ class Horizontality(collections.Sequence):
         r'''
         Is true if the Horizontality contains a passing tone; currently defined as three tones in
         one direction.
-        
+
         (TODO: better check)
         '''
         if len(self) < 3:
@@ -108,7 +108,7 @@ class Horizontality(collections.Sequence):
             return False
         elif not all(len(x.pitches) for x in self):
             return False
-        
+
         pitches = (
             self[0].pitches[0],
             self[1].pitches[0],
@@ -139,9 +139,9 @@ class Horizontality(collections.Sequence):
 
 
 # class VoiceLeadingQuartet(common.SlottedObjectMixin):
-# 
+#
 #     ### CLASS VARIABLES ###
-# 
+#
 #     __slots__ = (
 #         '_key_signature',
 #         '_voiceOneNoteOne',
@@ -149,9 +149,9 @@ class Horizontality(collections.Sequence):
 #         '_voiceTwoNoteOne',
 #         '_voiceTwoNoteTwo',
 #         )
-# 
+#
 #     ### INITIALIZER ###
-# 
+#
 #     def __init__(
 #         self,
 #         voiceOneNoteOne=None,
@@ -168,78 +168,78 @@ class Horizontality(collections.Sequence):
 #         self._voiceOneNoteTwo = voiceOneNoteTwo
 #         self._voiceTwoNoteOne = voiceTwoNoteOne
 #         self._voiceTwoNoteTwo = voiceTwoNoteTwo
-# 
+#
 #     ### PUBLIC METHODS ###
-# 
+#
 #     def hasAntiParallelMotion(self):
 #         pass
-# 
+#
 #     def hasContraryMotion(self):
 #         pass
-# 
+#
 #     def hasHiddenFifth(self):
 #         pass
-# 
+#
 #     def hasHiddenInterval(self, expr):
 #         pass
-# 
+#
 #     def hasHiddenOctave(self):
 #         pass
-# 
+#
 #     def hasImproperResolution(self):
 #         pass
-# 
+#
 #     def hasInwardContraryMotion(self):
 #         pass
-# 
+#
 #     def hasNoMotion(self):
 #         pass
-# 
+#
 #     def hasObliqueMotion(self):
 #         pass
-# 
+#
 #     def hasOutwardContraryMotion(self):
 #         pass
-# 
+#
 #     def hasParallelFifth(self):
 #         pass
-# 
+#
 #     def hasParallelInterval(self, expr):
 #         pass
-# 
+#
 #     def hasParallelMotion(self):
 #         pass
-# 
+#
 #     def hasParallelOctave(self):
 #         pass
-# 
+#
 #     def hasParallelUnison(self):
 #         pass
-# 
+#
 #     def hasParallelUnisonOrOctave(self):
 #         pass
-# 
+#
 #     def hasSimilarMotion(self):
 #         pass
-# 
+#
 #     ### PUBLIC PROPERTIES ###
-# 
+#
 #     @property
 #     def key_signature(self):
 #         return self._key_signature
-# 
+#
 #     @property
 #     def voiceOneNoteOne(self):
 #         return self._voiceOneNoteOne
-# 
+#
 #     @property
 #     def voiceOneNoteTwo(self):
 #         return self._voiceOneNoteTwo
-# 
+#
 #     @property
 #     def voiceTwoNoteOne(self):
 #         return self._voiceTwoNoteOne
-# 
+#
 #     @property
 #     def voiceTwoNoteTwo(self):
 #         return self._voiceTwoNoteTwo

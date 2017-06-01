@@ -32,18 +32,18 @@ from music21.alpha.trecento import polyphonicSnippet
 
 class TrecentoSheet(object):
     '''
-    A TrecentoSheet represents a single worksheet of an excel spreadsheet 
+    A TrecentoSheet represents a single worksheet of an excel spreadsheet
     that contains data about particular pieces of trecento music.
-    
-    
+
+
     Users can iterate over the rows to get TrecentoCadenceWork objects for each row.
-    
-    
-    
+
+
+
     See the specialized subclasses below, esp. BallataSheet for more details.
 
 
-    
+
     >>> kyrieSheet = alpha.trecento.cadencebook.TrecentoSheet(sheetname = 'kyrie')
     >>> for thisKyrie in kyrieSheet:
     ...     print(thisKyrie.title)
@@ -54,27 +54,27 @@ class TrecentoSheet(object):
 
     filename  = "cadences.xls"
     sheetname = "fischer_caccia"
-    
+
     def __init__(self, **keywords):
         self.iterIndex = 2
-        if ("filename" in keywords): 
+        if ("filename" in keywords):
             self.filename = keywords["filename"]
         if self.filename:
             try:
-                xbook = xlrd.open_workbook(self.filename)        
+                xbook = xlrd.open_workbook(self.filename)
             except IOError:
-                xbook = xlrd.open_workbook(os.path.join(common.getSourceFilePath(), 
+                xbook = xlrd.open_workbook(os.path.join(common.getSourceFilePath(),
                                                         'alpha', 'trecento',
                                                         self.filename))
 
-            
-            if ("sheetname" in keywords): 
+
+            if ("sheetname" in keywords):
                 self.sheetname = keywords["sheetname"]
-            
+
             self.sheet = xbook.sheet_by_name(self.sheetname)
             self.totalRows = self.sheet.nrows
             self.rowDescriptions = self.sheet.row_values(0)
-                
+
 
     def __iter__(self):
         self.iterIndex = 2 ## row 1 is a header
@@ -93,7 +93,7 @@ class TrecentoSheet(object):
     def __getitem__(self, key):
         if isinstance(key, int):
             return self.makeWork(key)
-    
+
         elif isinstance(key, slice): # get a slice of index values
             found = []
             start = key.start
@@ -113,13 +113,13 @@ class TrecentoSheet(object):
         '''
         Returns the TrecentoCadenceWork at the given row number
         Same as using getItem above, but without slices...
-        
-        We use Excel Row numbers, NOT Python row numbers: 
+
+        We use Excel Row numbers, NOT Python row numbers:
         in other words, makeWork(1) = Excel row 1 (python row 0)
 
         Row 1 is a header, so makeWork(2) gives the first piece.
-        
-        
+
+
         >>> ballataSheet = alpha.trecento.cadencebook.BallataSheet()
         >>> b = ballataSheet.makeWork(3)
         >>> print(b.title)
@@ -131,8 +131,8 @@ class TrecentoSheet(object):
     def workByTitle(self, title):
         '''
         return the first work with TITLE in the work's title.  Case insensitive
-        
-        
+
+
         >>> ballataSheet = alpha.trecento.cadencebook.BallataSheet()
         >>> farina = ballataSheet.workByTitle('farina')
         >>> print(farina.title)
@@ -168,36 +168,36 @@ class TrecentoSheet(object):
 class CacciaSheet(TrecentoSheet):
     '''
     shortcut to a worksheet containing all the caccia cadences encoded
-    
-    
+
+
     2011-May: none encoded.
-    
-    
-    
+
+
+
     >>> cacciaSheet = alpha.trecento.cadencebook.CacciaSheet()
     '''
-    
+
     sheetname = "fischer_caccia"
 
 class MadrigalSheet(TrecentoSheet):
     '''
     shortcut to a worksheet containing all the madrigal cadences encoded
-    
-    
+
+
     2011-May: none encoded.
-    
-    
+
+
     '''
-    
+
     sheetname = "fischer_madr"
-    
+
 class BallataSheet(TrecentoSheet):
     '''
     shortcut to a worksheet containing all the ballata cadences encoded.
-    
-    
+
+
     2011-May: over 400 of 460 encoded; unencoded pieces are mostly fragmentary.
-    
+
     '''
 
     sheetname = "fischer_ballata"
@@ -213,12 +213,12 @@ class GloriaSheet(TrecentoSheet):
     shortcut to a worksheet containing all the known 14th and early 15th c.
     French, Spanish, and Italian Gloria's openings of the Et in Terra, Dominus Deus,
     Qui Tollis, encoded along with the ends of the Cum Sancto and Amen.
-    
-    
+
+
     2011-August: all encoded except some very fragmentary pieces.
-    
-    
-    
+
+
+
     >>> cadenceSpreadSheet = alpha.trecento.cadencebook.GloriaSheet()
     >>> gloriaNo20 = cadenceSpreadSheet.makeWork(20)
     >>> incipit = gloriaNo20.incipit
@@ -255,7 +255,7 @@ class GloriaSheet(TrecentoSheet):
         {16.0} <music21.stream.Measure 9 offset=16.0>
             {0.0} <music21.note.Note E>
             {2.0} <music21.bar.Barline style=final>
-    
+
     '''
 
     sheetname = "gloria"
@@ -273,52 +273,52 @@ class AgnusDeiSheet(TrecentoSheet):
 
 class TrecentoCadenceWork(object):
     '''
-    A class representing a work that takes one line in the Trecento Cadence excel workbook 
-    
-    
+    A class representing a work that takes one line in the Trecento Cadence excel workbook
+
+
     Takes in two lists: one containing a value for each column in the excel spreadsheet
     and another containing a description for each column (generally, the excel header row)
-    
-    
+
+
     contains the following attributes::
-    
-        fisherNum     -- the work number assigned by Kurt von Fischer 
+
+        fisherNum     -- the work number assigned by Kurt von Fischer
             (only applies to pieces discovered before 1956)
         title         -- may contain unicode characters
         composer      -- "." = anonymous
-        encodedVoices -- a string representing the number of voices, a period, 
+        encodedVoices -- a string representing the number of voices, a period,
             then the number of texted voices
-        pmfcVol       -- the volume of Polyphonic Music of the Fourteenth Century 
+        pmfcVol       -- the volume of Polyphonic Music of the Fourteenth Century
             where the piece might be found (if any)
-        pmfcPageStart -- the initial page number in that PMFC volume 
+        pmfcPageStart -- the initial page number in that PMFC volume
         pmfcPageEnd   -- the final page number
         timeSignBegin -- the starting time signature (as a string) for the piece
         entryNotes    -- comments
 
     attributes shared with all members of the class::
-    
-        beginSnippetPositions -- a list of the excel 
+
+        beginSnippetPositions -- a list of the excel
             spreadsheet columns in which an incipit of some section can be found. (default = [8])
-        endSnippetPositions   -- a list of the excel 
+        endSnippetPositions   -- a list of the excel
             spreadsheet columns in which an cadence of some section can be found. (default = [])
-    
+
     OMIT_FROM_DOCS
-    
+
     test just creating an empty TrecentoCadenceWork:
-    
-    
+
+
     >>> tcw = alpha.trecento.cadencebook.TrecentoCadenceWork()
     '''
     beginSnippetPositions = [8]
     endSnippetPositions = []
-    
+
     def __init__(self, rowvalues=None, rowDescriptions=None):
         if rowvalues is None:
             rowvalues = ["", "", "", "", "", "", "", "", "", "", "", "", ""]
         if rowDescriptions is None:
-            rowDescriptions = ["Catalog Number", "Title", "Composer", "EncodedVoices", 
-                               "PMFC/CMM Vol.", "PMFC Page Start", "PMFC Page End", 
-                               "Time Signature Beginning", "Incipit C", "Incipit T", 
+            rowDescriptions = ["Catalog Number", "Title", "Composer", "EncodedVoices",
+                               "PMFC/CMM Vol.", "PMFC Page Start", "PMFC Page End",
+                               "Time Signature Beginning", "Incipit C", "Incipit T",
                                "Incipit Ct", "Incipit Type", "Notes"]
         self.rowvalues = rowvalues
         self.rowDescriptions = rowDescriptions
@@ -337,10 +337,10 @@ class TrecentoCadenceWork(object):
         try:
             otherS = self.getOtherSnippets()
             if otherS is not None:
-                self.snippets += otherS        
+                self.snippets += otherS
         except IndexError: # no rowvalues, etc. probably from documentation building...
             pass
-                
+
         if isinstance(self.fischerNum, float):
             self.fischerNum = int(self.fischerNum)
         if self.pmfcVol:
@@ -385,14 +385,14 @@ class TrecentoCadenceWork(object):
         md = metadata.Metadata()
         o.insert(0, md)
         o.metadata.composer = self.composer
-        o.metadata.title = self.title   
-        
+        o.metadata.title = self.title
+
         bs = self.snippets
         for thisSnippet in bs:
             if thisSnippet is None:
                 continue
-            if (thisSnippet.tenor is None  
-                    and thisSnippet.cantus is None 
+            if (thisSnippet.tenor is None
+                    and thisSnippet.cantus is None
                     and thisSnippet.contratenor is None):
                 continue
             s = stream.Score()
@@ -424,17 +424,17 @@ class TrecentoCadenceWork(object):
                 for thisElement in snippetPart:
                     if 'TimeSignature' in thisElement.classes:
                         continue
-                    currentScorePart.append(thisElement) 
+                    currentScorePart.append(thisElement)
             o.insert(0, s)
         return o
-        
-        
+
+
 
     def asScore(self):
         '''
         returns all snippets as a score chunk
 
-        
+
         >>> deduto = alpha.trecento.cadencebook.BallataSheet().workByTitle('deduto')
         >>> deduto.title
         'Deduto sey a quel'
@@ -444,7 +444,7 @@ class TrecentoCadenceWork(object):
         >>> #_DOCS_HIDE dedutoScore.show()
 
         Changes made to a snippet are reflected in the asScore() score object:
-        
+
         >>> deduto.snippets[0].parts[0].flat.notes[0].name = "C###"
         >>> deduto.asScore().parts[0].flat.notes[0].name
         'C###'
@@ -453,16 +453,16 @@ class TrecentoCadenceWork(object):
         md = metadata.Metadata()
         s.insert(0, md)
         s.metadata.composer = self.composer
-        s.metadata.title = self.title   
-        
+        s.metadata.title = self.title
+
         for dummy in range(self.totalVoices):
             s.insert(0, stream.Part())
         bs = self.snippets
         for thisSnippet in bs:
             if thisSnippet is None:
                 continue
-            if (thisSnippet.tenor is None and 
-                    thisSnippet.cantus is None and 
+            if (thisSnippet.tenor is None and
+                    thisSnippet.cantus is None and
                     thisSnippet.contratenor is None):
                 continue
             for partNumber, snippetPart in enumerate(thisSnippet.getElementsByClass('Stream')):
@@ -489,7 +489,7 @@ class TrecentoCadenceWork(object):
                 for thisElement in snippetPart:
                     if 'TimeSignature' in thisElement.classes:
                         continue
-                    currentScorePart.append(thisElement) 
+                    currentScorePart.append(thisElement)
 
         return s
 
@@ -497,14 +497,14 @@ class TrecentoCadenceWork(object):
     def incipit(self):
         '''
         Gets the Incipit PolyphonicSnippet of the piece.
-        
+
         The incipit keeps its time signature
         in a different location from all the other snippets.
         hence, it's a little different
-        
-        Returns None if the piece or timeSignature is 
+
+        Returns None if the piece or timeSignature is
         undefined
-        
+
         >>> bs = alpha.trecento.cadencebook.BallataSheet()
         >>> accur = bs.makeWork(2)
         >>> accurIncipit = accur.incipit
@@ -515,17 +515,17 @@ class TrecentoCadenceWork(object):
         rowBlock.append(self.rowvalues[7])
         if (rowBlock[0] == "" or self.timeSigBegin == ""):
             return None
-        else: 
+        else:
             blockOut = self.convertBlockToStreams(rowBlock)
             return polyphonicSnippet.Incipit(blockOut, self)
- 
+
     def getOtherSnippets(self):
         '''
         returns a list of bits of music notation that are not the actual
         incipits of the piece.
 
 
-        
+
         >>> bs = alpha.trecento.cadencebook.BallataSheet()
         >>> accur = bs.makeWork(2)
         >>> accurSnippets = accur.getOtherSnippets()
@@ -533,7 +533,7 @@ class TrecentoCadenceWork(object):
         ...     print(thisSnip)
         <music21.alpha.trecento.polyphonicSnippet.FrontPaddedSnippet ...>
         <music21.alpha.trecento.polyphonicSnippet.FrontPaddedSnippet ...>
-         
+
         '''
         beginSnippetPositions = self.beginSnippetPositions
         endSnippetPositions = self.endSnippetPositions ## overridden in class Ballata
@@ -563,13 +563,13 @@ class TrecentoCadenceWork(object):
         gets a "snippet" which is a collection of up to 3 lines of music, a timeSignature
         and a description of the cadence.
 
-        
+
         >>> bs = alpha.trecento.cadencebook.BallataSheet()
         >>> accur = bs.makeWork(2)
         >>> print(accur.getSnippetAtPosition(12))
         <music21.alpha.trecento.polyphonicSnippet.FrontPaddedSnippet ...>
         '''
-        
+
         if self.rowvalues[snippetPosition].strip() != "":
             thisBlock = self.rowvalues[snippetPosition:snippetPosition+5]
             if thisBlock[4].strip() == "":
@@ -584,12 +584,12 @@ class TrecentoCadenceWork(object):
 
     def convertBlockToStreams(self, thisBlock):
         '''
-        Takes a block of music information (in 
+        Takes a block of music information (in
         :class:`~music21.alpha.trecento.trecentoCadence.TrecentoCadenceStream` notation)
         and returns a list of Streams and other information
-        
-        
-        
+
+
+
         >>> block1 = ['e4 f g a', 'g4 a b cc', '', 'no-cadence', '2/4']
         >>> bs = alpha.trecento.cadencebook.BallataSheet()
         >>> dummyPiece = bs.makeWork(2)
@@ -611,7 +611,7 @@ class TrecentoCadenceWork(object):
             {0.0} <music21.note.Note G>
             {1.0} <music21.note.Note A>
             {2.0} <music21.bar.Barline style=final>
-    
+
 
         '''
         returnBlock = [None, None, None, None, None]
@@ -623,20 +623,20 @@ class TrecentoCadenceWork(object):
             thisVoice = thisVoice.strip()
             if (thisVoice):
                 try:
-                    returnBlock[i] = trecentoCadence.CadenceConverter(currentTimeSig + " " + 
+                    returnBlock[i] = trecentoCadence.CadenceConverter(currentTimeSig + " " +
                                                                       thisVoice).parse().stream
                 except duration.DurationException as value:
-                    raise duration.DurationException("Problems in line %s: specifically %s" % 
+                    raise duration.DurationException("Problems in line %s: specifically %s" %
                                                      (thisVoice,  value))
 #                except Exception, (value):
-#                    raise Exception("Unknown Problems in line %s: specifically %s" % 
+#                    raise Exception("Unknown Problems in line %s: specifically %s" %
 #                    (thisVoice,  value))
 
         return returnBlock
 
     def allCadences(self):
         '''
-        returns a list of all the PolyphonicSnippet 
+        returns a list of all the PolyphonicSnippet
         objects which are actually cadences (and not incipits)
         '''
         x = len(self.snippets)
@@ -671,7 +671,7 @@ class TrecentoCadenceWork(object):
             fc.snippetName = "B section cadence (1st or only ending)"
         return fc
 
-    @property    
+    @property
     def cadenceBClos(self):
         '''
         Returns the second B cadence -- that is, the 2nd or clos ending.
@@ -679,7 +679,7 @@ class TrecentoCadenceWork(object):
         try:
             fc = self.snippets[3]
         except IndexError:
-            return None        
+            return None
         if fc is not None:
             fc.snippetName = "B section cadence (2nd ending)"
         return fc
@@ -688,13 +688,13 @@ class TrecentoCadenceWork(object):
         '''
         Get all streams in the work as a List, losing association with
         the other polyphonic units.
-        
-        
+
+
         >>> b = alpha.trecento.cadencebook.BallataSheet().makeWork(20)
         >>> sList = b.getAllStreams()
         >>> sList
-        [<music21.stream.Part ...>, <music21.stream.Part ...>, ...] 
-        
+        [<music21.stream.Part ...>, <music21.stream.Part ...>, ...]
+
         '''
         snippets = self.snippets
         streams = []
@@ -704,12 +704,12 @@ class TrecentoCadenceWork(object):
                 for thisStream in PSStreams:
                     streams.append(thisStream)
         return streams
-    
+
     def pmfcPageRange(self):
         '''
         returns a nicely formatted string giving the page numbers in PMFC where the piece
         can be found
-        
+
         >>> bs = alpha.trecento.cadencebook.BallataSheet()
         >>> altroCheSospirar = bs.makeWork(4)
         >>> altroCheSospirar.title
@@ -719,7 +719,7 @@ class TrecentoCadenceWork(object):
         >>> altroCheSospirar.pmfcPageRange()
         'pp. 2-4'
         '''
-        
+
         if (self.pmfcPageStart != self.pmfcPageEnd):
             return str("pp. " + str(self.pmfcPageStart) + "-" + str(self.pmfcPageEnd))
         else:
@@ -729,22 +729,22 @@ class TrecentoCadenceWork(object):
 class Ballata(TrecentoCadenceWork):
     '''
     Class representing a fourteenth-century Ballata.
-    
+
     Overrides the locations of the column numbers in which one finds the cadences.
     '''
     beginSnippetPositions = [8]
     endSnippetPositions = [12, 17, 22]
-    
+
 
 class Gloria(TrecentoCadenceWork):
     '''
     Class representing a fourteenth-century Gloria.
-    
+
     Overrides the locations of the column numbers in which one finds the cadences.
     '''
     beginSnippetPositions = [8, 12, 17]
     endSnippetPositions = [22, 27]
-    
+
 
 class Test(unittest.TestCase):
     def runTest(self):
@@ -790,18 +790,18 @@ class Test(unittest.TestCase):
         dummyPiece = bs.makeWork(2)
         block2 = dummyPiece.convertBlockToStreams(block1)
         self.assertTrue(isinstance(block2[0], stream.Stream))
-        
-    
+
+
 
 class TestExternal(unittest.TestCase):
     def runTest(self):
         pass
-    
+
     def testCredo(self):
         '''
         testing a Credo in and Lilypond out
         '''
-        
+
         cs1 = CredoSheet() #filename = r'd:\docs\trecento\fischer\cadences.xls')
     #    cs1 = BallataSheet()
         credo1 = cs1.makeWork(2)
@@ -813,7 +813,7 @@ class TestExternal(unittest.TestCase):
         '''
         testing a Ballata in and Lilypond out
         '''
-        
+
         cs1 = BallataSheet() #filename = r'd:\docs\trecento\fischer\cadences.xls')
         ballata1 = cs1.makeWork(58)
         opusBallata1 = ballata1.asOpus()
@@ -840,7 +840,7 @@ class TestExternal(unittest.TestCase):
         if thisVirelai.title != "":
             print(thisVirelai.title)
             thisVirelai.incipit.show('musicxml')
-    
+
     def xtestRondeaux(self):
         '''
         test showing a rondeaux's incipit to see if it works
@@ -850,7 +850,7 @@ class TestExternal(unittest.TestCase):
         if thisRondeaux.title != "":
             print(thisRondeaux.title)
             thisRondeaux.incipit.show('musicxml')
-    
+
     def xtestGloria(self):
         '''
         test showing a Gloria's incipit to see if it works

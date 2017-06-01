@@ -104,7 +104,7 @@ def cacheMetadata(corpusNames=('local', 'core', 'virtual'),
             environLocal.warn(message)
         else:
             environLocal.printDebug(message)
-            
+
 
 
 #------------------------------------------------------------------------------
@@ -123,9 +123,9 @@ class MetadataCachingJob(object):
     ((<music21.metadata.bundles.MetadataEntry: bach_bwv66_6>,), ())
     >>> results = job.getResults()
     >>> errors = job.getErrors()
-    
+
     TODO: error list, nut just numbers needs to be reported back up.
-    
+
     '''
 
     ### INITIALIZER ###
@@ -338,9 +338,9 @@ class JobProcessor(object):
 
         If `processCount` is none, use 1 fewer process than the number of
         available cores.
-        
+
         jobs is a list of :class:`~music21.metadata.MetadataCachingJob` objects.
-        
+
         '''
         processCount = processCount or common.cpus()  # @UndefinedVariable
         if processCount < 1:
@@ -348,7 +348,7 @@ class JobProcessor(object):
         remainingJobs = len(jobs)
         if processCount > remainingJobs: # do not start more processes than jobs...
             processCount = remainingJobs
-            
+
         environLocal.printDebug(
             'Processing {0} jobs in parallel, with {1} processes.'.format(
                 remainingJobs, processCount))

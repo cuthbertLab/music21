@@ -15,10 +15,10 @@ import os
 skip = ['usersGuide_90_musicxmlTest.ipynb', 'installJupyter.ipynb']
 
 def runAll():
-    sourcePath = common.getSourceFilePath() + os.sep + 'documentation' + os.sep + 'source' 
+    sourcePath = common.getSourceFilePath() + os.sep + 'documentation' + os.sep + 'source'
     for innerDir in ('about', 'developerReference', 'installing', 'moduleReference',
                      'tutorials', 'usersGuide'):
-    
+
         fullDir = sourcePath + os.sep + innerDir
         allFiles = os.listdir(fullDir)
         for f in allFiles:
@@ -31,7 +31,7 @@ def runAll():
                 retVal = runOne(fullDir + os.sep + f)
             except KeyboardInterrupt:
                 break
-            
+
             if retVal == 512:
                 return None
 
@@ -47,10 +47,10 @@ def runOne(nbFile):
         raise
     finally:
         us['musescoreDirectPNGPath'] = museScore
-        
-    return retVal        
+
+    return retVal
     '/Applications/MuseScore 2.app/Contents/MacOS/mscore'
-        
+
 
 
 if __name__ == '__main__':

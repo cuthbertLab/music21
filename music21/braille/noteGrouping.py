@@ -34,7 +34,7 @@ class NoteGroupingTranscriber(object):
         self.previousElement = None
         self.trans = []
         self.transText = None
-        
+
     def reset(self):
         self.previousNote = None
         self.previousElement = None
@@ -47,10 +47,10 @@ class NoteGroupingTranscriber(object):
         Generally, in Braille, clef signs are not used.  However, they
         can be shown for pedagogical purposes or to make a facsimile
         transcription of the sighted text.
-        
+
         If not set but self.brailleElementGrouping.showClefSigns
         is set, uses that instead.
-        
+
         >>> ngt = braille.noteGrouping.NoteGroupingTranscriber()
         >>> ngt.showClefSigns
         False
@@ -76,13 +76,13 @@ class NoteGroupingTranscriber(object):
     def showClefSigns(self, new):
         self._showClefSigns = new
 
-        
+
     @property
     def upperFirstInFingering(self):
         '''
         When there are multiple fingering patterns listed at the same time,
         should the highest be listed first (default True) or last?
-        
+
         If not set but self.brailleElementGrouping.upperFirstInNoteFingering
         is set, uses that instead. (note the slight difference in names... NoteFingering)
 
@@ -106,17 +106,17 @@ class NoteGroupingTranscriber(object):
             return self.brailleElementGrouping.upperFirstInNoteFingering
         else:
             return True
-        
+
     @upperFirstInFingering.setter
     def upperFirstInFingering(self, new):
         self._upperFirstInFingering = new
-        
+
     def transcribeGroup(self, brailleElementGrouping=None):
         '''
         transcribe a group of notes, possibly excluding certain attributes.
-        
+
         Returns a (unicode) string of brailleElementGrouping transcribed.
-        
+
         '''
         self.reset()
         if brailleElementGrouping is not None:
@@ -124,18 +124,18 @@ class NoteGroupingTranscriber(object):
 
         for brailleElement in self.brailleElementGrouping:
             self.transcribeOneElement(brailleElement)
-            
+
         if brailleElementGrouping.withHyphen:
             self.trans.append(symbols['music_hyphen'])
-        
+
         return u"".join(self.trans)
-                
+
     def translateNote(self, currentNote):
         if self.previousNote is None:
             doShowOctave = self.showLeadingOctave
         else:
             doShowOctave = basic.showOctaveWithNote(self.previousNote, currentNote)
-        brailleNote = basic.noteToBraille(currentNote, 
+        brailleNote = basic.noteToBraille(currentNote,
                                           showOctave=doShowOctave,
                                           upperFirstInFingering=self.upperFirstInFingering)
         self.previousNote = currentNote
@@ -143,7 +143,7 @@ class NoteGroupingTranscriber(object):
 
     def translateRest(self, currentRest):
         return basic.restToBraille(currentRest)
-    
+
     def translateChord(self, currentChord):
         try:
             allNotes = sorted(currentChord._notes, key=lambda n: n.pitch)
@@ -160,20 +160,20 @@ class NoteGroupingTranscriber(object):
             doShowOctave = self.showLeadingOctave
         else:
             doShowOctave = basic.showOctaveWithNote(self.previousNote, currentNote)
-        
+
         descendingChords = self.brailleElementGrouping.descendingChords
         brailleChord = basic.chordToBraille(currentChord,
-                                          descending=descendingChords, 
+                                          descending=descendingChords,
                                           showOctave=doShowOctave)
         self.previousNote = currentNote
         return brailleChord
-    
+
     def translateDynamic(self, currentDynamic):
         brailleDynamic = basic.dynamicToBraille(currentDynamic)
         self.previousNote = None
         self.showLeadingOctave = True
         return brailleDynamic
-    
+
     def translateTextExpression(self, currentExpression):
         brailleExpression = basic.textExpressionToBraille(currentExpression)
         self.previousNote = None
@@ -182,7 +182,7 @@ class NoteGroupingTranscriber(object):
 
     def translateBarline(self, currentBarline):
         return basic.barlineToBraille(currentBarline)
-        
+
     def translateClef(self, currentClef):
         '''
         translate Clefs to braille IF self.showClefSigns is True
@@ -208,7 +208,7 @@ class NoteGroupingTranscriber(object):
         u'''
         Transcribe a single element and add it to self.trans, setting self.previousElement
         along the way.
-        
+
         >>> ngt = braille.noteGrouping.NoteGroupingTranscriber()
         >>> n = note.Note('C4')
         >>> ngt.transcribeOneElement(n)
@@ -226,17 +226,17 @@ class NoteGroupingTranscriber(object):
                 break
         else:
             environRules.warn("{0} not transcribed to braille.".format(el))
-        
+
         self.optionallyAddDotToPrevious(el)
         self.previousElement = el
-    
+
 
     def optionallyAddDotToPrevious(self, el=None):
         '''
-        if el is None or not a Dynamic or TextExpression, add a dot-3 Dot 
+        if el is None or not a Dynamic or TextExpression, add a dot-3 Dot
         before the current transcription
         under certain circumstances:
-        
+
         1. self.previousElement exists
         2. the last character in the current transcription (self.trans) fits the criteria for
            basic.yieldDots()
@@ -244,7 +244,7 @@ class NoteGroupingTranscriber(object):
             a. a Dynamic.
             b. a Clef and clef signs are being transcribed
             c. a TextExpression not ending in "."
-            
+
         Returns True if a dot as added, or False otherwise.
         '''
         prev = self.previousElement
@@ -257,9 +257,9 @@ class NoteGroupingTranscriber(object):
             return False
         if el is not None and 'TextExpression' in el.classes:
             return False
-        
+
         if ('Dynamic' in prev.classes
-                or ('Clef' in prev.classes 
+                or ('Clef' in prev.classes
                         and self.showClefSigns)
                 or ('TextExpression' in prev.classes
                     and prev.content[-1] != '.') # TE is an abbreviation, no extra dot 3 necessary
@@ -274,7 +274,7 @@ class NoteGroupingTranscriber(object):
 def transcribeNoteGrouping(brailleElementGrouping, showLeadingOctave=True):
     '''
     transcribe a group of notes, possibly excluding certain attributes.
-    
+
     To be DEPRECATED -- called only be BrailleGrandSegment now.
     '''
     ngt = NoteGroupingTranscriber()

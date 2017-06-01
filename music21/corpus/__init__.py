@@ -78,7 +78,7 @@ def getCorePaths(fileExtensions=None, expandExtensions=True):
     extensions.
 
     >>> corpusFilePaths = corpus.getCorePaths()
-    >>> cpl = len(corpusFilePaths) 
+    >>> cpl = len(corpusFilePaths)
     >>> 2550 < cpl < 2600
     True
 

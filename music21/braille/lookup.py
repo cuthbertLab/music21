@@ -14,13 +14,13 @@ This file contains some basic lookups for symbols (used where there is not much 
 logical code to deduce).
 
 
-Music21 standards generally follow Mary Turner De Garmo, 
+Music21 standards generally follow Mary Turner De Garmo,
 Introduction to Braille Music Transcription (2005) (called "degarmo" or "IMBT2005" below).
 
 Signs from other books will be accepted if
 and only if there is no conflict between them and BRL signs listed in IBMT2005.
 
-A place where other signs are found generally is 
+A place where other signs are found generally is
 New International Manual of Braille Music Notation (by Bettye Krolick), which we will cite as
 "Krolick" or "krolick".
 '''
@@ -37,22 +37,22 @@ except NameError:
 def makeBrailleDictionary():
     u'''
     return a dictionary mapping six-dot braille characters to lists of dot orders.
-    
+
     >>> B = braille.lookup.makeBrailleDictionary()
     >>> print(B[124])
     ⠋
     >>> print(B[126])
     ⠣
-    
+
     A special character (unicode 0x2800)
-    
+
     >>> print(B[0])
     ⠀
     '''
     braille_dict = {}
     _BRAILLE_START = 0x2800
     i = 0
-    
+
     for bTuple in itertools.product((False, True), repeat=6):
         bList = []
         for pos, trueOrFalse in enumerate(bTuple):
@@ -72,14 +72,14 @@ _B = makeBrailleDictionary()
 def dotsAdd(dotIter):
     u'''
     takes in an iterable of dots and returns them added together.
-    
+
     >>> print(braille.lookup.dotsAdd([12, 3, 4]))
     ⠏
 
     Order does not matter:
-    
+
     >>> print(braille.lookup.dotsAdd([4, 31, 2]))
-    ⠏    
+    ⠏
     '''
     dotsOut = []
     for n in dotIter:
@@ -107,19 +107,19 @@ def makePitchNameToNotes():
               'eighth': 0,
               'quarter': 6,
               'half': 3,
-              'whole': 36              
+              'whole': 36
               }
     stepDicts = {}
     for step in stepNames:
         stepDictSingle = {}
         for duration in durationTypes:
             stepDictSingle[duration] = dotsAdd([stepNames[step], durationTypes[duration]])
-        whole = stepDictSingle['whole'] 
+        whole = stepDictSingle['whole']
         stepDictSingle['breve'] = whole + _B[45] + _B[14] + whole
         stepDictSingle['longa'] = whole + _B[45] + _B[14] + _B[45] + _B[14] + whole
         stepDicts[step] = stepDictSingle
     return stepDicts
-        
+
 pitchNameToNotes = makePitchNameToNotes()
 
 _lowOctave = _B[4]
@@ -221,14 +221,14 @@ rests = {'dummy':   _B[3],
          'half':    _B[136],
          'whole':   _B[134],
          'breve':   _B[134] + _B[45] + _B[14] + _B[134],
-         'longa':   _B[134] + _B[45] + _B[14] + _B[45] + _B[14] + _B[134],         
+         'longa':   _B[134] + _B[45] + _B[14] + _B[45] + _B[14] + _B[134],
          }
 
 lengthPrefixes = {
         'larger': _B[45] + _B[126] + _B[2], # whole to eighth inclusive + longer (degarmo 15)
         'smaller': _B[6] + _B[126] + _B[2], # 16th to 128th inclusive
         'xsmall': _B[56] + _B[126] + _B[2], # 256th notes + presumably shorter?
-                  
+
         }
 
 barlines = {'final': _B[126] + _B[13],
@@ -344,7 +344,7 @@ symbols = {'space': _B[0],
            'metronome': _B[2356],
            'common': _B[46] + _B[14],
            'cut': _B[456] + _B[14],
-           'music_hyphen': _B[5], 
+           'music_hyphen': _B[5],
            'transcriber-added_sign': _B[5], # same as music hyphen. degarmo chp 5; GT N. 9, 4.1, 5.2
            'music_asterisk': _B[345] + _B[26] + _B[35],
            'rh_keyboard': _B[46] + _B[345],
@@ -407,7 +407,7 @@ ascii_chars = {_B[0]: ' ',
                _B[1345]: 'N',
                _B[2345]: 'T',
                _B[12345]: 'Q',
-               _B[6]: ',',     
+               _B[6]: ',',
                _B[16]: '*',
                _B[26]: '5',
                _B[126]: '<',
@@ -423,7 +423,7 @@ ascii_chars = {_B[0]: ' ',
                _B[1346]: 'X',
                _B[2346]: '!',
                _B[12346]: '&',
-               _B[56]: ';',     
+               _B[56]: ';',
                _B[156]: ':',
                _B[256]: '4',
                _B[1256]: '\\',
@@ -472,7 +472,7 @@ binary_dots = {_B[0]:     ('00', '00', '00'),
                _B[1345]:  ('11', '01', '10'),
                _B[2345]:  ('01', '11', '10'),
                _B[12345]: ('11', '11', '10'),
-               _B[6]:     ('00', '00', '01'),    
+               _B[6]:     ('00', '00', '01'),
                _B[16]:    ('10', '00', '01'),
                _B[26]:    ('00', '10', '01'),
                _B[126]:   ('10', '10', '01'),
@@ -488,7 +488,7 @@ binary_dots = {_B[0]:     ('00', '00', '00'),
                _B[1346]:  ('11', '00', '11'),
                _B[2346]:  ('01', '10', '11'),
                _B[12346]: ('11', '10', '11'),
-               _B[56]:    ('00', '01', '01'),     
+               _B[56]:    ('00', '01', '01'),
                _B[156]:   ('10', '01', '01'),
                _B[256]:   ('00', '11', '01'),
                _B[1256]:  ('10', '11', '01'),

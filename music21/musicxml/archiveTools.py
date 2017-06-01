@@ -98,4 +98,3 @@ if __name__ == '__main__':
                 compressXML(xmlName)
             elif xmlName.endswith('.mxl'):
                 uncompressMXL(xmlName)
-    

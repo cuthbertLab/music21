@@ -186,7 +186,7 @@ class FunctionDocumenter(ObjectDocumenter):
 
 class MemberDocumenter(ObjectDocumenter):
     '''
-    Abstract base class for documenting class members such as Methods and Attributes and Properties    
+    Abstract base class for documenting class members such as Methods and Attributes and Properties
 
     '''
 
@@ -194,7 +194,7 @@ class MemberDocumenter(ObjectDocumenter):
                  'referent': '''the attribute or method itself, such as (no quotes)
                                 key.KeySignature.mode''',
                  'definingClass': '''the class the referent belongs to, such as (no quotes)
-                                key.KeySignature'''                
+                                key.KeySignature'''
                 }
 
     ### INITIALIZER ###
@@ -409,11 +409,11 @@ class ClassDocumenter(ObjectDocumenter):
 
 
         self._baseClasses = None
-        self._baseClassDocumenters = None        
+        self._baseClassDocumenters = None
         self._docAttr = None
-        self._docOrder = None 
+        self._docOrder = None
         self._inheritedDocAttrMapping = None
-        
+
         self._methods = []
         self._inheritedMethodsMapping = {}
 
@@ -424,7 +424,7 @@ class ClassDocumenter(ObjectDocumenter):
         # Read-only
         self._readonlyProperties = []
         self._inheritedReadonlyPropertiesMapping = {}
-        
+
         self.findAttributes()
 
         if self.referent not in self._identityMap:
@@ -435,13 +435,13 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         find all attributes in self.referent and set classes appropriately.
         '''
-        
+
         attrs = inspect.classify_class_attrs(self.referent)
         for attr in attrs:
             self.findOneAttribute(attr)
 
         self.sortMemberLists()
-        
+
     def sortMemberLists(self):
         '''
         sort all the member lists by their member names.
@@ -559,14 +559,14 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         >>> d = documentation.documenters.ClassDocumenter(articulations.Caesura)
         >>> d.baseClasses
-        (<class 'music21.articulations.Articulation'>, 
+        (<class 'music21.articulations.Articulation'>,
          <class 'music21.base.Music21Object'>)
         '''
         if self._baseClasses is None:
             self._baseClasses = tuple(
                 cls for cls in inspect.getmro(self.referent)[1:]
                 if cls.__module__.startswith('music21'))
-            
+
         return self._baseClasses
 
     @property
@@ -646,7 +646,7 @@ class ClassDocumenter(ObjectDocumenter):
             inheritedDocAttr = {}
             for baseClass in reversed(self.baseClasses):
                 baseClassDocAttr = getattr(baseClass, '_DOC_ATTR', None)
-                if (baseClassDocAttr is not None 
+                if (baseClassDocAttr is not None
                         and baseClassDocAttr not in seenBaseClassDocAttrs):
                     baseClassDocumenter = type(self).fromIdentityMap(baseClass)
                     inheritedDocAttr[baseClassDocumenter] = baseClassDocAttr
@@ -713,7 +713,7 @@ class ClassDocumenter(ObjectDocumenter):
         ...
         music21.base.Music21Object:
         - music21.base.Music21Object.containerHierarchy
-        - music21.base.Music21Object.contextSites      
+        - music21.base.Music21Object.contextSites
         - music21.base.Music21Object.getAllContextsByClass
         - music21.base.Music21Object.getContextByClass
         - music21.base.Music21Object.getOffsetBySite
@@ -737,7 +737,7 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.stream.core.StreamCoreMixin.asTimespans
         - music21.stream.core.StreamCoreMixin.asTree
         - music21.stream.core.StreamCoreMixin.coreGatherMissingSpanners
-        - music21.stream.core.StreamCoreMixin.elementsChanged        
+        - music21.stream.core.StreamCoreMixin.elementsChanged
         '''
         return self._inheritedMethodsMapping
 
@@ -788,25 +788,25 @@ class ClassDocumenter(ObjectDocumenter):
         >>> for method in documenter.methods[:10]:
         ...     method
         ...
-        <music21.documentation.documenters.MethodDocumenter: 
+        <music21.documentation.documenters.MethodDocumenter:
             music21.stream.Stream.activateVariants>
-        <music21.documentation.documenters.MethodDocumenter: 
+        <music21.documentation.documenters.MethodDocumenter:
             music21.stream.Stream.addGroupForElements>
-        <music21.documentation.documenters.MethodDocumenter: 
+        <music21.documentation.documenters.MethodDocumenter:
             music21.stream.Stream.allPlayingWhileSounding>
-        <music21.documentation.documenters.MethodDocumenter: 
+        <music21.documentation.documenters.MethodDocumenter:
             music21.stream.Stream.analyze>
-        <music21.documentation.documenters.MethodDocumenter: 
+        <music21.documentation.documenters.MethodDocumenter:
             music21.stream.Stream.append>
-        <music21.documentation.documenters.MethodDocumenter: 
+        <music21.documentation.documenters.MethodDocumenter:
             music21.stream.Stream.attachIntervalsBetweenStreams>
-        <music21.documentation.documenters.MethodDocumenter: 
+        <music21.documentation.documenters.MethodDocumenter:
             music21.stream.Stream.attachMelodicIntervals>
-        <music21.documentation.documenters.MethodDocumenter: 
+        <music21.documentation.documenters.MethodDocumenter:
             music21.stream.Stream.attributeCount>
-        <music21.documentation.documenters.MethodDocumenter: 
+        <music21.documentation.documenters.MethodDocumenter:
             music21.stream.Stream.augmentOrDiminish>
-        <music21.documentation.documenters.MethodDocumenter: 
+        <music21.documentation.documenters.MethodDocumenter:
             music21.stream.Stream.beatAndMeasureFromOffset>
         '''
         return self._methods
@@ -854,7 +854,7 @@ class ClassDocumenter(ObjectDocumenter):
         >>> for prop in documenter.readwriteProperties:
         ...     prop
         ...
-        <music21.documentation.documenters.AttributeDocumenter: 
+        <music21.documentation.documenters.AttributeDocumenter:
             music21.stream.Stream.atSoundingPitch>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.clef>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.duration>
@@ -1519,7 +1519,7 @@ class CorpusDocumenter(Documenter):
         name = directoryInformation.directoryTitle
         directory = directoryInformation.directoryName
         isComposer = directoryInformation.isComposer
-        
+
         result = []
         result.append('To get all works ')
         if isComposer:

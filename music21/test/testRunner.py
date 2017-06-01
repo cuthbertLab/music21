@@ -39,7 +39,7 @@ def _msc_extract_future_flags(globs):
     '''
     flags = 0
     for fname in __future__.all_feature_names:
-        if fname in ('absolute_import', 
+        if fname in ('absolute_import',
                      'print_function',
                      'division',
                      ):
@@ -48,18 +48,18 @@ def _msc_extract_future_flags(globs):
 
 if six.PY2:
     doctest._extract_future_flags = _msc_extract_future_flags
-    
+
     naive_single_quote_re = re.compile(r"(^|.)'((\\'|[^'])*?)'")
     naive_double_quote_re = re.compile(r'(^|.)"((\\"|[^"])*?)"')
-    
-    # s = single; d = double; u = unicode; b = binary; 
+
+    # s = single; d = double; u = unicode; b = binary;
     # thus suquoteConv = single unicode quote converter
     suquoteConv = lambda m: (m.group(1) if m.group(1) != "u" else "") + "'" + m.group(2) + "'"
     duquoteConv = lambda m: (m.group(1) if m.group(1) != "u" else "") + '"' + m.group(2) + '"'
 
     sbquoteConv = lambda m: (m.group(1) if m.group(1) != "b" else "") + "'" + m.group(2) + "'"
     dbquoteConv = lambda m: (m.group(1) if m.group(1) != "b" else "") + '"' + m.group(2) + '"'
-    
+
 #ALL_OUTPUT = []
 
 class Py3In2OutputChecker(doctest.OutputChecker):
@@ -68,7 +68,7 @@ class Py3In2OutputChecker(doctest.OutputChecker):
     under Python 3.  The differences between it and
     Py2 mean that we need to find certain differences
     and remove them.
-    
+
     First version: removes bytes from the expected output (want) and unicode from received (got)
     '''
     def check_output(self, want, got, optionflags):
@@ -81,13 +81,13 @@ class Py3In2OutputChecker(doctest.OutputChecker):
             #x = [want, got]
             wantOrig = want
             gotOrig = got
-            
+
             want = naive_single_quote_re.sub(sbquoteConv, want) # bytes in WANT disappear
             want = naive_double_quote_re.sub(dbquoteConv, want) # bytes in WANT disappear
 
             got = naive_single_quote_re.sub(suquoteConv, got) # unicode in GOT disappears
             got = naive_double_quote_re.sub(duquoteConv, got) # unicode in GOT disappears
-            
+
             #x.extend([want, got])
             #ALL_OUTPUT.append(x)
             # if either the original output or the replaced output matches, then it's good.
@@ -97,10 +97,10 @@ class Py3In2OutputChecker(doctest.OutputChecker):
 
 ###### test related functions
 
-def addDocAttrTestsToSuite(suite, 
-                           moduleVariableLists, 
-                           outerFilename=None, 
-                           globs=False, 
+def addDocAttrTestsToSuite(suite,
+                           moduleVariableLists,
+                           outerFilename=None,
+                           globs=False,
                            optionflags=(
                                         doctest.ELLIPSIS |
                                         doctest.NORMALIZE_WHITESPACE
@@ -109,7 +109,7 @@ def addDocAttrTestsToSuite(suite,
     takes a suite, such as a doctest.DocTestSuite and the list of variables
     in a module and adds from those classes that have a _DOC_ATTR dictionary
     (which documents the properties in the class) any doctests to the suite.
-    
+
     >>> import doctest
     >>> s1 = doctest.DocTestSuite(chord)
     >>> s1TestsBefore = len(s1._tests)
@@ -121,7 +121,7 @@ def addDocAttrTestsToSuite(suite,
     >>> t = s1._tests[-1]
     >>> t
     isRest ()
-    
+
     >>> 'hi'
     'hi'
     '''
@@ -140,7 +140,7 @@ def addDocAttrTestsToSuite(suite,
             dt = dtp.get_doctest(documentation, globs, dockey, outerFilename, 0)
             if len(dt.examples) == 0:
                 continue
-            dtc = doctest.DocTestCase(dt, 
+            dtc = doctest.DocTestCase(dt,
                                       optionflags=optionflags,
                                       checker=Py3In2OutputChecker()
                                       )
@@ -152,7 +152,7 @@ def fixTestsForPy2and3(doctestSuite):
     r'''
     Fix doctests so that they work in both python2 and python3, namely
     unicode/byte characters and added module names to exceptions.
-    
+
     >>> import doctest
     >>> suite1 = doctest.DocTestSuite(chord)
     >>> doctestCase = list(iter(suite1))[0]
@@ -162,9 +162,9 @@ def fixTestsForPy2and3(doctestSuite):
     ...     if testExample.exc_msg is not None:
     ...         testWithTraceback = testExample
     ...         break
-    
+
     Py3 example:
-    
+
     <<< testWithTraceback.exc_msg
     "ChordException: Could not process input argument\n"
     <<< test.testRunner.fixTestsForPy2and3(suite1)
@@ -188,7 +188,7 @@ def fixTestsForPy2and3(doctestSuite):
             if six.PY3:
                 if example.exc_msg is not None and len(example.exc_msg) > 0:
                     example.exc_msg = "..." + example.exc_msg
-                elif (example.want is not None 
+                elif (example.want is not None
                         and example.want.startswith('u\'')):
                     # probably a unicode example:
                     # simplistic, since (u'hi', u'bye')
@@ -197,7 +197,7 @@ def fixTestsForPy2and3(doctestSuite):
             elif six.PY2:
                 if example.exc_msg is not None and len(example.exc_msg) > 0:
                     example.exc_msg = re.sub(r'^(\w|\.)*\.(\w+\:)', r'\2', example.exc_msg)
-                if (example.want is not None 
+                if (example.want is not None
                         and example.want.startswith('b\'')):
                     # probably a unicode example:
                     # simplistic, since (b'hi', b'bye')
@@ -208,7 +208,7 @@ def fixTestsForPy2and3(doctestSuite):
             example.want = stripAddresses(example.want, '0x...')
 
 ADDRESS = re.compile('0x[0-9A-Fa-f]+')
-    
+
 def stripAddresses(textString, replacement="ADDRESS"):
     '''
     Function that changes all memory addresses (pointers) in the given
@@ -227,7 +227,7 @@ def stripAddresses(textString, replacement="ADDRESS"):
 
 
     For doctests, can strip to '...' to make it work fine with doctest.ELLIPSIS
-    
+
     >>> test.testRunner.stripAddresses(
     ...     "{0.0} <music21.base.Music21Object object at 0x102a0ff10>", '0x...')
     '{0.0} <music21.base.Music21Object object at 0x...>'
@@ -268,7 +268,7 @@ def mainTest(*testClasses, **kwargs):
     This module tries to fix up some differences between python2 and python3 so
     that the same doctests can work.
     '''
-    
+
     runAllTests = True
 
     # default -- is fail fast.
@@ -284,7 +284,7 @@ def mainTest(*testClasses, **kwargs):
             doctest.ELLIPSIS |
             doctest.NORMALIZE_WHITESPACE
             )
-    
+
     globs = None
     if ('noDocTest' in testClasses or 'noDocTest' in sys.argv
         or 'nodoctest' in sys.argv or bool(kwargs.get('noDocTest', False))):
@@ -299,8 +299,8 @@ def mainTest(*testClasses, **kwargs):
     else:
         # create test suite derived from doc tests
         # here we use '__main__' instead of a module
-        if ('moduleRelative' in testClasses or 
-                'moduleRelative' in sys.argv or 
+        if ('moduleRelative' in testClasses or
+                'moduleRelative' in sys.argv or
                 bool(kwargs.get('moduleRelative', False))):
             pass
         else:
@@ -314,21 +314,21 @@ def mainTest(*testClasses, **kwargs):
                 checker=Py3In2OutputChecker()
                 )
         except ValueError as ve: # no docstrings
-            print("Problem in docstrings [usually a missing r value before " + 
+            print("Problem in docstrings [usually a missing r value before " +
                   "the quotes:] {0}".format(str(ve)))
             s1 = unittest.TestSuite()
 
 
     verbosity = 1
-    if ('verbose' in testClasses or 
-            'verbose' in sys.argv or 
+    if ('verbose' in testClasses or
+            'verbose' in sys.argv or
             bool(kwargs.get('verbose', False))):
         verbosity = 2 # this seems to hide most display
 
     displayNames = False
-    if ('list' in sys.argv or 
-            'display' in sys.argv or 
-            bool(kwargs.get('display', False)) or 
+    if ('list' in sys.argv or
+            'display' in sys.argv or
+            bool(kwargs.get('display', False)) or
             bool(kwargs.get('list', False))):
         displayNames = True
         runAllTests = False
@@ -343,8 +343,8 @@ def mainTest(*testClasses, **kwargs):
         runThisTest = kwargs.get('runTest', False)
 
     # -f, --failfast
-    if ('onlyDocTest' in sys.argv or 
-            'onlyDocTest' in testClasses or 
+    if ('onlyDocTest' in sys.argv or
+            'onlyDocTest' in testClasses or
             bool(kwargs.get('onlyDocTest', False))
             ):
         testClasses = [] # remove cases
@@ -389,14 +389,14 @@ def mainTest(*testClasses, **kwargs):
 
     if runAllTests is True:
         fixTestsForPy2and3(s1)
-                                    
+
         runner = unittest.TextTestRunner()
         runner.verbosity = verbosity
         unused_testResult = runner.run(s1)
-        
-        
+
+
 if __name__ == '__main__':
     mainTest()
     #from pprint import pprint
     #pprint(ALL_OUTPUT)
-        
+

@@ -15,7 +15,7 @@ of tonal closure applies in the music of the Italian fourteenth century
 by seeing how often the first note of the tenor (or the given voice stream
 number) and the last note of that same voice are the same note.
 
-The script also demonstrates the PNG generating abilities of the software, 
+The script also demonstrates the PNG generating abilities of the software,
 etc.
 
 Note that when the tests are run they just check that the program does not
@@ -37,26 +37,26 @@ class TonalityCounter(object):
 
     streamName can be "C" (cantus), "T" (tenor, default), or "Ct"
     (contratenor), or very rarely "4" (fourth voice).
-    
-    
+
+
     cadenceName can be "A" or "B" (which by default uses the
     second ending of cadence B if there are two endings) or
     an integer specifying which cadence to consult (-1 being
     the last one coded.  Useful for sacred music where we
     want the Amen no matter how many internal cadences there
     are).
-    
-    
+
+
     This example takes three ballata and how that all three of
     them cadence on a different note than they began on.  All
     three cadence on D despite beginning on C, A, and B (or B
     flat) repsectively.
-    
-    
+
+
     >>> from music21.alpha.trecento import cadencebook
     >>> threeBallata = cadencebook.BallataSheet()[15:18]
     >>> tc1 = alpha.trecento.tonality.TonalityCounter(threeBallata)
-    >>> tc1.run() 
+    >>> tc1.run()
     >>> print(tc1.output)
                         Bench'amar    C    D
                     Bench'I' serva    A    D
@@ -75,7 +75,7 @@ class TonalityCounter(object):
     Total Diff    3 100.0%
     <BLANKLINE>
     '''
-    
+
     def __init__(self, worksList, streamName = "T", cadenceName = "A"):
         self.worksList = worksList
         self.streamName = streamName
@@ -83,20 +83,20 @@ class TonalityCounter(object):
         self.output = ""
         self.displayStream = None
         self.storedDict = None
-    
+
     def run(self):
         from music21 import stream
         output = ""
         streamName = self.streamName
         allScores = stream.Opus()
-        
-        myDict = {'A': defaultdict(lambda:False), 'B': defaultdict(lambda:False), 
-                  'C': defaultdict(lambda:False), 'D': defaultdict(lambda:False), 
-                  'E': defaultdict(lambda:False), 'F': defaultdict(lambda:False), 
+
+        myDict = {'A': defaultdict(lambda:False), 'B': defaultdict(lambda:False),
+                  'C': defaultdict(lambda:False), 'D': defaultdict(lambda:False),
+                  'E': defaultdict(lambda:False), 'F': defaultdict(lambda:False),
                   'G': defaultdict(lambda:False)}
         for thisWork in self.worksList:
             incip = thisWork.incipit
-            
+
             if self.cadenceName == "A":
                 cadence = thisWork.cadenceA
             elif self.cadenceName == "B":
@@ -113,7 +113,7 @@ class TonalityCounter(object):
                     continue
             else:
                 raise Exception("Cannot deal with cadence type %s" % self.cadenceName)
-            
+
             if incip is None or cadence is None:
                 continue
             try:
@@ -121,14 +121,14 @@ class TonalityCounter(object):
                 cadenceSN = cadence.parts[streamName]
             except KeyError:
                 continue
-            
-            try:           
-                firstNote = incipSN.pitches[0]                
+
+            try:
+                firstNote = incipSN.pitches[0]
                 cadenceNote  = cadenceSN.pitches[-1]
             except IndexError:
                 output += thisWork.title + "\n"
                 continue
-    
+
             myDict[firstNote.step][cadenceNote.step] += 1
             if firstNote.step == cadenceNote.step:
                 allScores.insert(0, incip)
@@ -146,12 +146,12 @@ class TonalityCounter(object):
                 else:
                     output += "     "
                     outKeyDiffTotal += myDict[outKey][inKey]
-                    bigTotalDiff    += myDict[outKey][inKey] 
+                    bigTotalDiff    += myDict[outKey][inKey]
                 output += "%4s %4s %4d\n" % (outKey, inKey, myDict[outKey][inKey])
             output += "     %4s diff %4d\n" % (outKey, outKeyDiffTotal)
-        output += "Total Same %4d %3.1f%%\n" % (bigTotalSame, 
+        output += "Total Same %4d %3.1f%%\n" % (bigTotalSame,
             (bigTotalSame * 100.0) / (bigTotalSame + bigTotalDiff))
-        output += "Total Diff %4d %3.1f%%\n" % (bigTotalDiff, 
+        output += "Total Diff %4d %3.1f%%\n" % (bigTotalDiff,
             (bigTotalDiff * 100.0) / (bigTotalSame + bigTotalDiff))
         self.storedDict = myDict
         self.displayStream = allScores
@@ -162,9 +162,9 @@ def landiniTonality(show = True):
     generates information about the tonality of Landini's ballate using
     the tenor (streamName = "T") and the A cadence (which we would believe
     would end the piece)
-    
+
     '''
-    
+
     ballataObj  = cadencebook.BallataSheet()
     worksList = []
     for thisWork in ballataObj:
@@ -177,18 +177,18 @@ def landiniTonality(show = True):
 
 def nonLandiniTonality(show = True):
     '''
-    generates information about the tonality of not anonymous ballate 
+    generates information about the tonality of not anonymous ballate
     that are not by Francesco (Landini) using
     the tenor (streamName = "T") and the A cadence (which we would believe
     would end the piece)
-    
-    
+
+
     >>> #_DOCS_SHOW trecento.tonality.nonLandiniTonality(show = True)
-    
-    
+
+
     Prints something like this::
-    
-    
+
+
                      Deduto sey a quel    C    F
                       A pianger l'ochi    C    D
                   Con dogliosi martire    E    D
@@ -265,7 +265,7 @@ def nonLandiniTonality(show = True):
         Total Same   49 32.0%
         Total Diff  104 68.0%
 
-    
+
     '''
 
     ballataObj  = cadencebook.BallataSheet()
@@ -284,7 +284,7 @@ def anonBallataTonality(show = True):
     '''
     Gives a list of all anonymous ballate with their incipit tenor note and cadence tenor notes
     keeps track of how often they are the same and how often they are different.
-    
+
     And then generates a PNG of the incipit and first cadence of all the ones that are the same.
 
     '''
@@ -297,7 +297,7 @@ def anonBallataTonality(show = True):
     tCounter.run()
     if show is True:
         print(tCounter.output)
-        print("Generating Lilypond PNG of all pieces where the first note of " + 
+        print("Generating Lilypond PNG of all pieces where the first note of " +
               "the tenor is the same pitchclass as the last note of Cadence A")
         print("It might take a while, esp. on the first Lilypond run...")
         tCounter.displayStream.show('lily.png')
@@ -334,7 +334,7 @@ def testAll(show = True, fast = False):
     if fast is False:
         nonLandiniTonality(show)
         anonBallataTonality(show)
-        landiniTonality(show)            
+        landiniTonality(show)
 
 class Test(unittest.TestCase):
     pass
@@ -347,7 +347,7 @@ class TestExternal(unittest.TestCase):
 
     def runTest(self):
         testAll(show = True, fast = False)
- 
+
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test) #External)

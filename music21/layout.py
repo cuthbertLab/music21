@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         layout.py
-# Purpose:      Layout objects 
+# Purpose:      Layout objects
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
@@ -25,13 +25,13 @@ StaffLayout object because multiple staves can be in a Part.  Music21 uses
 the concept of a PartStaff for a Part that is played by the same performer as another.
 e.g., the left hand of the Piano is a PartStaff paired with the right hand).
 
-PageLayout and SystemLayout objects also have a property, 'isNew', 
+PageLayout and SystemLayout objects also have a property, 'isNew',
 which if set to `True` signifies that a new page
 or system should begin here.  In theory, one could define new dimensions for a page
 or system in the middle of the system or page without setting isNew to True, in
 which case these measurements would start applying on the next page.  In practice,
 there's really one good place to use these Layout objects and that's in the first part
-in a score at offset 0 of the first measure on a page or system 
+in a score at offset 0 of the first measure on a page or system
 (or for ScoreLayout, at the beginning
 of a piece outside of any parts).  But it's not an
 error to put them in other places, such as at offset 0 of the first measure of a page
@@ -62,7 +62,7 @@ A Score that was organized: Score->Parts->Measures would then become:
 LayoutScore->Pages->Systems->Parts->Measures.
 
 The new LayoutScore has methods that enable querying what page or system a measure is in, and
-specifically where on a page a measure is (or the dimensions 
+specifically where on a page a measure is (or the dimensions
 of every measure in the piece).  However
 do not call .show() on a LayoutScore -- the normal score it's derived from will work just fine.
 Nor does calling .show() on a Page or System work yet, but once the LayoutStream has been created,
@@ -118,7 +118,7 @@ class ScoreLayout(LayoutBase):
     PageLayout objects may be found on Measure or Part Streams.
 
 
-    >>> pl = layout.PageLayout(pageNumber=4, leftMargin=234, rightMargin=124, 
+    >>> pl = layout.PageLayout(pageNumber=4, leftMargin=234, rightMargin=124,
     ...                        pageHeight=4000, pageWidth=3000, isNew=True)
     >>> pl.pageNumber
     4
@@ -200,7 +200,7 @@ class PageLayout(LayoutBase):
     PageLayout objects may be found on Measure or Part Streams.
 
 
-    >>> pl = layout.PageLayout(pageNumber=4, leftMargin=234, rightMargin=124, 
+    >>> pl = layout.PageLayout(pageNumber=4, leftMargin=234, rightMargin=124,
     ...                        pageHeight=4000, pageWidth=3000, isNew=True)
     >>> pl.pageNumber
     4
@@ -331,7 +331,7 @@ class StaffLayout(LayoutBase):
     1
 
     staffLines specifies the number of lines for a non 5-line staff.
-    
+
     >>> sl.staffLines
     5
 
@@ -345,14 +345,14 @@ class StaffLayout(LayoutBase):
 
 
     There is one other attribute, '.hidden' which has three settings:
-       
-    * None - inherit from previous StaffLayout object, or False if no object exists 
+
+    * None - inherit from previous StaffLayout object, or False if no object exists
     * False - not hidden -- show as a default staff
     * True - hidden -- for playback only staves, or for a hidden/optimized-out staff
-    
-    
+
+
     Note: (TODO: .hidden None is not working; always gives False)
-       
+
 
     '''
     def __init__(self, *args, **keywords):
@@ -380,9 +380,9 @@ class StaffLayout(LayoutBase):
                     self.hidden = True
 
     def __repr__(self):
-        return ("<music21.layout.StaffLayout " + 
+        return ("<music21.layout.StaffLayout " +
                 "distance %r, staffNumber %r, staffSize %r, staffLines %r>" % (
-                self.distance, self.staffNumber, self.staffSize, self.staffLines))    
+                self.distance, self.staffNumber, self.staffSize, self.staffLines))
 
 #-------------------------------------------------------------------------------
 class LayoutException(exceptions21.Music21Exception):
@@ -414,11 +414,11 @@ class StaffGroup(spanner.Spanner):
     >>> s.insert(0, p1)
     >>> s.insert(0, p2)
     >>> s.insert(0, p3)
-    >>> staffGroup1 = layout.StaffGroup([p1, p2], 
+    >>> staffGroup1 = layout.StaffGroup([p1, p2],
     ...      name='Marimba', abbreviation='Mba.', symbol='brace')
     >>> staffGroup1.barTogether = 'Mensurstrich'
     >>> s.insert(0, staffGroup1)
-    >>> staffGroup2 = layout.StaffGroup([p3], 
+    >>> staffGroup2 = layout.StaffGroup([p3],
     ...      name='Xylophone', abbreviation='Xyl.', symbol='bracket')
     >>> s.insert(0, staffGroup2)
     >>> #_DOCS_SHOW s.show()
@@ -597,8 +597,8 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
                         and getattr(sl, attribute) is not None):
                     setattr(richestSystemLayout, attribute, getattr(sl, attribute))
         return richestSystemLayout
-    
-    
+
+
     pageMeasureTuples = getPageRegionMeasureNumbers(scoreIn)
     systemMeasureTuples = getSystemRegionMeasureNumbers(scoreIn)
     firstMeasureNumber = pageMeasureTuples[0][0]
@@ -618,8 +618,8 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
 
     pageNumber = 0
     systemNumber = 0
-    scoreStaffNumber = 0 
-    
+    scoreStaffNumber = 0
+
     for pageStartM, pageEndM in pageMeasureTuples:
         pageNumber += 1
         if printUpdates is True:
@@ -648,8 +648,8 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
             systemNumber += 1 # global, not on this page...
             pageSystemNumber += 1
             if fastMeasures is True:
-                measureStacks = scoreIn.measures(systemStartM, systemEndM, 
-                                                 collect=[], 
+                measureStacks = scoreIn.measures(systemStartM, systemEndM,
+                                                 collect=[],
                                                  gatherSpanners=False)
             else:
                 measureStacks = scoreIn.measures(systemStartM, systemEndM)
@@ -663,18 +663,18 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
             thisSystem.measureEnd = systemEndM
 
             systemStaffNumber = 0
-            
+
             for p in list(thisSystem.parts):
                 scoreStaffNumber += 1
                 systemStaffNumber += 1
-                
+
                 staffObject = Staff()
                 staffObject.mergeAttributes(p)
                 staffObject.scoreStaffNumber = scoreStaffNumber
                 staffObject.staffNumber = systemStaffNumber
                 staffObject.pageNumber = pageNumber
                 staffObject.pageSystemNumber = pageSystemNumber
-                                
+
                 staffObject.elements = p
                 thisSystem.replace(p, staffObject)
                 allStaffLayouts = p.recurse().getElementsByClass('StaffLayout')
@@ -731,7 +731,7 @@ def getRegionMeasureNumbers(scoreIn, region='Page'):
         plMeasureNumber = pl.measureNumber
         if pl.isNew is False:
             continue
-        if plMeasureNumber not in measureStartList: 
+        if plMeasureNumber not in measureStartList:
             # in case of firstMeasureNumber or system and page layout at same time.
             measureStartList.append(plMeasureNumber)
             measureEndList.append(plMeasureNumber - 1)
@@ -747,7 +747,7 @@ class LayoutScore(stream.Opus):
 
     Used for computing location of notes, etc.
 
-    If the score does not change between calls to the various getPosition calls, 
+    If the score does not change between calls to the various getPosition calls,
     it is much faster as it uses a cache.
     '''
     def __init__(self, *args, **keywords):
@@ -812,7 +812,7 @@ class LayoutScore(stream.Opus):
 
     def getMarginsAndSizeForPageId(self, pageId):
         '''
-        return a namedtuple of (top, left, bottom, right, width, height) 
+        return a namedtuple of (top, left, bottom, right, width, height)
         margins for a given pageId in tenths
 
         Default of (100, 100, 100, 100, 850, 1100) if undefined
@@ -876,7 +876,7 @@ class LayoutScore(stream.Opus):
             if pl.bottomMargin is not None:
                 pageMarginBottom = pl.bottomMargin
 
-        dataTuple = PageSize(pageMarginTop, pageMarginLeft, pageMarginBottom, pageMarginRight, 
+        dataTuple = PageSize(pageMarginTop, pageMarginLeft, pageMarginBottom, pageMarginRight,
                              pageWidth, pageHeight)
         dataCache[pageId] = dataTuple
         return dataTuple
@@ -885,10 +885,10 @@ class LayoutScore(stream.Opus):
         '''
         first systems on a page use a different positioning.
 
-        returns a Named tuple of the (top, left, right, and bottom) where each unit is 
+        returns a Named tuple of the (top, left, right, and bottom) where each unit is
         relative to the page margins
 
-        N.B. right is NOT the width -- it is different.  It is the offset to the right margin.  
+        N.B. right is NOT the width -- it is different.  It is the offset to the right margin.
         weird, inconsistent, but most useful...bottom is the hard part to compute...
 
 
@@ -996,7 +996,7 @@ class LayoutScore(stream.Opus):
         >>> ls.getPositionForStaff(1, 0, 0)
         (0.0, 40.0)
 
-        The second staff (staff 1) begins at the end of staff 0 (40.0) + 
+        The second staff (staff 1) begins at the end of staff 0 (40.0) +
         the appropriate staffDistance
         and adds the height of the staff.  Staff 1 here has a size of 80 which means
         80% of the normal staff size.  40 * 0.8 = 32.0:
@@ -1289,7 +1289,7 @@ class LayoutScore(stream.Opus):
 
         return (None, None) if it's the first system on the first page
 
-        This test score has five systems on the first page, 
+        This test score has five systems on the first page,
         three on the second, and two on the third
 
 
@@ -1377,7 +1377,7 @@ class LayoutScore(stream.Opus):
         systemTop = systemPos.top
         systemLeft = systemPos.left
         pageSize = self.getMarginsAndSizeForPageId(pageId)
-        
+
         top = pageSize.top + systemTop + staffTop
         left = pageSize.left + systemLeft + startXMeasure
         bottom = pageSize.top + systemTop + staffBottom
@@ -1468,7 +1468,7 @@ class LayoutScore(stream.Opus):
         returns a list of dictionaries, where each dictionary gives the measure number
         and other information, etc. in the document.
 
-        
+
         # >>> g = corpus.parse('luca/gloria')
         # >>> gl = layout.divideByPages(g)
         # >>> gl.getAllMeasurePositionsInDocument()
@@ -1531,7 +1531,7 @@ class System(stream.Score):
 
     def __repr__(self):
         return "<{0}.{1} {2}: p.{3}, sys.{4}>".format(self.__module__, self.__class__.__name__,
-                                                        self.systemNumber, 
+                                                        self.systemNumber,
                                                         self.pageNumber, self.pageSystemNumber)
 
     @property
@@ -1548,10 +1548,10 @@ class Staff(stream.Part):
         super(Staff, self).__init__(*args, **keywords)
         self.staffNumber = 1 # number in this system NOT GLOBAL
 
-        self.scoreStaffNumber = 0 
+        self.scoreStaffNumber = 0
         self.pageNumber = 0
         self.pageSystemNumber = 0
-        
+
         self.optimized = 0
         self.height = None # None = undefined
         self.inheritedHeight = None
@@ -1559,7 +1559,7 @@ class Staff(stream.Part):
 
     def __repr__(self):
         return "<{0}.{1} {2}: p.{3}, sys.{4}, st.{5}>".format(
-                                                        self.__module__, 
+                                                        self.__module__,
                                                         self.__class__.__name__,
                                                         self.scoreStaffNumber,
                                                         self.pageNumber, self.pageSystemNumber,

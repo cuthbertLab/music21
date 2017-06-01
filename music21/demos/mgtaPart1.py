@@ -30,7 +30,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-# CHAPTER 1 
+# CHAPTER 1
 #-------------------------------------------------------------------------------
 # Basic Elements
 #-------------------------------------------------------------------------------
@@ -47,10 +47,10 @@ def ch1_basic_I_A(show=True, *arguments, **keywords):
     found = []
     for p in pitches:
         unused_n = note.Note(p)
-        
+
         # get direction of enharmonic move?
         # a move upward goes from f to g-, then a---
-        #n.pitch.getEnharmonic(1) 
+        #n.pitch.getEnharmonic(1)
         found.append(None)
     if show:
         for i in range(len(pitches)):
@@ -61,10 +61,10 @@ def ch1_basic_I_A(show=True, *arguments, **keywords):
 def ch1_basic_I_B(show=True, *arguments, **keywords):
     '''
     p2.
-    given 2 pitches, mark on a keyboard their positions and mark 
+    given 2 pitches, mark on a keyboard their positions and mark
     intervals as W for whole step and H for half step, otherwise N
     '''
-    pitches = [('a#', 'b'), ('b-', 'c#'), ('g-', 'a'), ('d-', 'c##'), 
+    pitches = [('a#', 'b'), ('b-', 'c#'), ('g-', 'a'), ('d-', 'c##'),
                ('f', 'e'), ('f#', 'e')]
     for i,j in pitches:
         n1 = note.Note(i)
@@ -85,18 +85,18 @@ def ch1_basic_I_B(show=True, *arguments, **keywords):
 #             k1.show()
 
 
-    
+
 def ch1_basic_I_C_1(show=True, *arguments, **keywords):
     '''
     p3.
-    start at a note on the piano keyboard marked with an "X", 
-    move the performer's finger according to a pattern 
-    of half and whole steps and then mark the key at the end 
+    start at a note on the piano keyboard marked with an "X",
+    move the performer's finger according to a pattern
+    of half and whole steps and then mark the key at the end
     with an asterisk.
     '''
     from music21 import stream
     nStart = note.Note('a4')
-    intervals = [interval.Interval('w'), interval.Interval('-h'), 
+    intervals = [interval.Interval('w'), interval.Interval('-h'),
                  interval.Interval('-w'), interval.Interval('-w'),
                  interval.Interval('h')]
     s = stream.Stream()
@@ -113,12 +113,12 @@ def ch1_basic_I_C_1(show=True, *arguments, **keywords):
 def ch1_basic_I_C_2(show=True, *arguments, **keywords):
     '''
     p3.
-    start at a key marked with an ex, move finger according to pattern of 
+    start at a key marked with an ex, move finger according to pattern of
     half and whole steps; mark key at end with an asterisk
     '''
     from music21 import stream
     nStart = note.Note('e4')
-    intervals = [interval.Interval('w'), interval.Interval('w'), 
+    intervals = [interval.Interval('w'), interval.Interval('w'),
                  interval.Interval('w'), interval.Interval('-h'),
                  interval.Interval('w'), interval.Interval('h')]
     s = stream.Stream()
@@ -140,7 +140,7 @@ def ch1_basic_I_C_2(show=True, *arguments, **keywords):
 def ch1_basic_II_A_1(show=True, *arguments, **keywords):
     '''
     p3.
-    Write letter names and octave designations for the pitches written 
+    Write letter names and octave designations for the pitches written
     in the treble and bass clefs below.
 
     (Data in Finale/musicxml format)
@@ -165,14 +165,14 @@ def ch1_basic_II_A_1(show=True, *arguments, **keywords):
     #exercise = music21.parseData("ch1_basic_II_A_1.xml")
     for n in exercise.flat.notes: # have to use flat here
         n.lyric = n.nameWithOctave
-    if show: 
+    if show:
         exercise.show()
 
 
 def ch1_basic_II_A_2(show=True, *arguments, **keywords):
     '''
     p3.
-    Write letter names and octave designations for the pitches written 
+    Write letter names and octave designations for the pitches written
     in the treble and bass clefs below.
     '''
     humdata = '''
@@ -196,7 +196,7 @@ def ch1_basic_II_A_2(show=True, *arguments, **keywords):
         n.lyric = n.nameWithOctave
     exercise.insert(0, clef.BassClef())
     exercise = exercise.sorted # need sorted to get clef
-    if show: 
+    if show:
         exercise.show()
 
 
@@ -219,7 +219,7 @@ def ch1_basic_II_B_1(show=True, *arguments, **keywords):
     for n in exercise.flat.notes: # have to use flat here
         n.lyric = n.nameWithOctave
     exercise.insert(0, clef.AltoClef())
-    if show: 
+    if show:
         exercise.show()
 
 
@@ -233,7 +233,7 @@ def ch1_basic_II_B_2(show=True, *arguments, **keywords):
     for n in exercise.flat.notes: # have to use flat here
         n.lyric = n.nameWithOctave
     exercise.insert(0, clef.TenorClef())
-    if show: 
+    if show:
         exercise.show()
 
 
@@ -243,7 +243,7 @@ def ch1_basic_II_C(data, intervalShift):
     from music21 import stream, common, chord
     ex = stream.Stream()
     for chunk in data:
-        m = stream.Measure()    
+        m = stream.Measure()
         for e in chunk:
             if isinstance(e, six.string_types):
                 n1 = note.Note(e)
@@ -262,35 +262,35 @@ def ch1_basic_II_C_1(show=True, *arguments, **keywords):
     Practice writing whole and half steps. Watch for changes in clef.
     Write whole steps
     '''
-    data = [[clef.TrebleClef(), 'g#4', 'b-4', 'd-4'], 
-            [clef.BassClef(), 'e3', 'a-2'], 
+    data = [[clef.TrebleClef(), 'g#4', 'b-4', 'd-4'],
+            [clef.BassClef(), 'e3', 'a-2'],
             [clef.TenorClef(), 'c#']]
     ex = ch1_basic_II_C(data, 'w')
-    if show: 
+    if show:
         ex.show()
 
 def ch1_basic_II_C_2(show=True, *arguments, **keywords):
-    data = [[clef.BassClef(), 'c3', 'f#3'], 
-            [clef.AltoClef(), 'f4', 'c-4'], 
+    data = [[clef.BassClef(), 'c3', 'f#3'],
+            [clef.AltoClef(), 'f4', 'c-4'],
             [clef.TrebleClef(), 'a-4', 'b--4']]
     ex = ch1_basic_II_C(data, '-w')
-    if show: 
+    if show:
         ex.show()
 
 def ch1_basic_II_C_3(show=True, *arguments, **keywords):
-    data = [[clef.BassClef(), 'f#2', 'c-3'], 
-            [clef.TrebleClef(), 'e4', 'b-5', 'a#4'], 
+    data = [[clef.BassClef(), 'f#2', 'c-3'],
+            [clef.TrebleClef(), 'e4', 'b-5', 'a#4'],
             [clef.AltoClef(), 'f-3']]
     ex = ch1_basic_II_C(data, 'h')
-    if show: 
+    if show:
         ex.show()
 
 def ch1_basic_II_C_4(show=True, *arguments, **keywords):
-    data = [[clef.TrebleClef(), 'b#4', 'e4', 'd#5'], 
-            [clef.AltoClef(), 'c-4'], 
+    data = [[clef.TrebleClef(), 'b#4', 'e4', 'd#5'],
+            [clef.AltoClef(), 'c-4'],
             [clef.BassClef(), 'f#3', 'c3']]
     ex = ch1_basic_II_C(data, '-h')
-    if show: 
+    if show:
         ex.show()
 
 
@@ -305,11 +305,11 @@ def ch1_basic_II_C_4(show=True, *arguments, **keywords):
 def ch1_writing_I_A_1(show=True, *arguments, **keywords):
     '''
     p. 5
-    Rewrite these melodies from music literature, placing the pitches 
-    one octave higher or lower as specified, by using ledger lines. 
+    Rewrite these melodies from music literature, placing the pitches
+    one octave higher or lower as specified, by using ledger lines.
     Do not change to a new clef.
 
-    Rewrite one active higher 
+    Rewrite one active higher
     '''
 
     # Purcell, "Music for a While"
@@ -342,7 +342,7 @@ def ch1_writing_I_A_1(show=True, *arguments, **keywords):
 
 def ch1_writing_I_A_2(show=True, *arguments, **keywords):
     '''
-    p. 5 
+    p. 5
     Rewrite one octave higher
     '''
     humdata = '''
@@ -365,7 +365,7 @@ def ch1_writing_I_A_2(show=True, *arguments, **keywords):
 
 def ch1_writing_I_B_1(show=True, *arguments, **keywords):
     '''
-    p.6 
+    p.6
     Transcribe these melodies into the clef specified without changing octaves.
     '''
     # camptown races
@@ -383,7 +383,7 @@ def ch1_writing_I_B_2(show=True, *arguments, **keywords):
     # Mozart no. 41, 4th movement
     humdata = '''
 **kern
-*clefC3 
+*clefC3
 4g
 4g
 4G
@@ -408,7 +408,7 @@ def ch1_writing_I_B_3(show=True, *arguments, **keywords):
     # Purcell, "Music for a While"
     humdata = '''
 **kern
-*clefF4 
+*clefF4
 8C
 8D
 8E
@@ -442,7 +442,7 @@ def ch1_writing_I_B_3(show=True, *arguments, **keywords):
 #     purcellScore.insert(0, instrument.Instrument('bassoon'))
 #     assert purcellScore.allInRange() is True
 #     purcellScore.playMidi()   ## will play on bassoon
-#     purcellScore.show() 
+#     purcellScore.show()
 
 
 #-------------------------------------------------------------------------------
@@ -453,8 +453,8 @@ def ch1_writing_II_A(show=True, *arguments, **keywords):
 
     Compose a melody using whole and half steps in any musical style.
 
-    This technique uses a random walk of whole or half steps with direction 
-    choices determined by whether the present note is above or below the 
+    This technique uses a random walk of whole or half steps with direction
+    choices determined by whether the present note is above or below the
     target end.
     '''
     import random
@@ -470,7 +470,7 @@ def ch1_writing_II_A(show=True, *arguments, **keywords):
 #        n.quarterLength = random.choice([.25, .5, 1])
         n.duration.type = random.choice(['16th', 'eighth', 'quarter'])
         s.append(n)
-        # if we have written more than fifteen notes 
+        # if we have written more than fifteen notes
         # and the last notes matches the first pitch class, then end.
         if len(s) > 4 and n.pitch.pitchClass == nStart.pitch.pitchClass:
             n.expressions.append(expressions.Fermata())
@@ -486,7 +486,7 @@ def ch1_writing_II_A(show=True, *arguments, **keywords):
             n = n.transpose(i)
         except pitch.AccidentalException:
             break # end b/c our transposition have exceeded accidental range
-        
+
         iSpread = interval.notesToInterval(nStart, n)
         if iSpread.direction == -1: # we are below our target, favor upward
             dirWeight = [-1, 1, 1]
@@ -527,7 +527,7 @@ def ch1_analysis_A_2(show=True, *arguments, **keywords):
 def ch1_analysis_B_1(show=True, *arguments, **keywords):
     '''p. 9
 
-    Circle each whole step, put a box around each half step. 
+    Circle each whole step, put a box around each half step.
     '''
     pass
 
@@ -539,7 +539,7 @@ def ch1_analysis_B_2(show=True, *arguments, **keywords):
 
 
 #-------------------------------------------------------------------------------
-# CHAPTER 2 
+# CHAPTER 2
 #-------------------------------------------------------------------------------
 # Basic Elements
 #-------------------------------------------------------------------------------
@@ -552,9 +552,9 @@ def ch2_basic_I_A_1(show=True, *arguments, **keywords):
     '''
     from music21 import stream, key
     ex = stream.Stream()
-    ex.insert(key.KeySignature(1))    
+    ex.insert(key.KeySignature(1))
 
-    data = [[('d6',1.5)], 
+    data = [[('d6',1.5)],
             [('d6',1.5)],
             [('d6',.5),('c6',.5),('b5',.5)],
             [('rest',.5),('b5',.25),('c6',.25),('d6',.5)],
@@ -563,14 +563,14 @@ def ch2_basic_I_A_1(show=True, *arguments, **keywords):
     for mData in data:
         m = stream.Measure()
         for p, d in mData:
-            if p == 'rest': 
+            if p == 'rest':
                 n = note.Rest()
             else:
                 n = note.Note(p)
             n.quarterLength = d
             m.append(n)
         ex.append(m)
-    
+
     # get the best time signature; make sure it agrees with the next
     # time signature, just to be sure
     ts1 = ex.getElementsByClass('Measure')[0].bestTimeSignature()
@@ -608,13 +608,13 @@ def ch2_basic_I_A_4(show=True, *arguments, **keywords):
 
 def ch2_basic_I_B(show=True, *arguments, **keywords):
     '''p. 12
-    Using the information given, complete the chart below. 
-    (Given meter type and one of meter, beat unit, 
+    Using the information given, complete the chart below.
+    (Given meter type and one of meter, beat unit,
     beat division, full bar divisions, provide the other data)
     '''
     # a brute force way to do this might have a function in meter.py that returns a number of candidates for a given meter type and some other parameter (bar duration). then, these values can be tested for match.
     pass
-    
+
 
 def ch2_basic_I_C(show=True, *arguments, **keywords):
     '''p. 13
@@ -684,7 +684,7 @@ def ch2_basic_I_C(show=True, *arguments, **keywords):
         ex.append(prepareBeatUnit(copy.deepcopy(ts)))
         ex.append(prepareBeatDivision(copy.deepcopy(ts)))
         ex.append(prepareBeatSubDivision(copy.deepcopy(ts)))
-        
+
     if show:
         ex.show()
     else:
@@ -694,7 +694,7 @@ def ch2_basic_I_C(show=True, *arguments, **keywords):
 def ch2_basic_II(show=True, *arguments, **keywords):
     '''p. 13
 
-    Write the rhythms that use the same counting pattern as those in the same row. 
+    Write the rhythms that use the same counting pattern as those in the same row.
     '''
     pass
 
@@ -705,7 +705,7 @@ def ch2_basic_II(show=True, *arguments, **keywords):
 #-------------------------------------------------------------------------------
 # I Incomplete measures
 
-def ch2_writing_I_A(tsStr, barGroups):    
+def ch2_writing_I_A(tsStr, barGroups):
     from music21 import meter, stream
 
     ts = meter.TimeSignature(tsStr)
@@ -727,7 +727,7 @@ def ch2_writing_I_A(tsStr, barGroups):
             # subtract bar dur from sum of existing notes
             nFill.quarterLength = ts.barDuration.quarterLength - summation
             ex.append(nFill)
-    
+
     return ex
 
 def ch2_writing_I_A_1(show=True, *arguments, **keywords):
@@ -788,7 +788,7 @@ def ch2_writing_I_A_5(show=True, *arguments, **keywords):
 def ch2_writing_I_B_1(show=True, *arguments, **keywords):
     '''p. 14
 
-    Complete the rhythms below by adding rests to complete any measure with too few beats. 
+    Complete the rhythms below by adding rests to complete any measure with too few beats.
     '''
     pass
 
@@ -819,7 +819,7 @@ def ch2_writing_I_B_5(show=True, *arguments, **keywords):
 def ch2_writing_II_A(show=True, *arguments, **keywords):
     '''p. 15
 
-    Each of these pieces begins with an anacrusis. What note value (or note value plus rest) could the composer use to fill the last measure of the compositions correctly. 
+    Each of these pieces begins with an anacrusis. What note value (or note value plus rest) could the composer use to fill the last measure of the compositions correctly.
     '''
     pass
 
@@ -839,7 +839,7 @@ def ch2_writing_II_C(show=True, *arguments, **keywords):
 # III Dots and ties
 
 def ch2_writing_III_A(quarterLengthSrc, meterStr):
-    '''Function for A1, A2, A3: Add ties. 
+    '''Function for A1, A2, A3: Add ties.
     '''
     from music21 import meter, stream
     ex = stream.Stream()
@@ -945,7 +945,7 @@ def ch2_writing_III_B(src):
 def ch2_writing_III_B_1(show=True, *arguments, **keywords):
     '''p. 17
 
-    Renotate the following rhythms without ties. 
+    Renotate the following rhythms without ties.
     '''
     ex = converter.parse("tinynotation: 3/8 c8~ c16 c16 c16 c16 c8~ c8 c c16 c~ c c c8 c4~ c8")
 
@@ -988,7 +988,7 @@ def ch2_writing_III_B_3(show=True, *arguments, **keywords):
 def ch2_writing_IV_A(show=True, *arguments, **keywords):
     '''p. 17
 
-    Rebeam each of the vocal lines to reflect the meter and beat unit instead. 
+    Rebeam each of the vocal lines to reflect the meter and beat unit instead.
     '''
     pass
 
@@ -998,8 +998,8 @@ def ch2_writing_IV_B(show=True, *arguments, **keywords):
     '''p. 18
     '''
     ex = converter.parse("tinynotation: 2/4 c8. c16 e8 g c'4. r8 a8. a16 c'8 a g4. e16 f g8 g8 e16 e g16 g a8 g8 e4 d8 e16 f e d8 d16 c4.")
-    
-    ex = ex.makeMeasures() 
+
+    ex = ex.makeMeasures()
     ex.makeBeams(inPlace=True)
 
     if show:
@@ -1014,17 +1014,17 @@ def ch2_writing_IV_B(show=True, *arguments, **keywords):
 def ch2_writing_V_A(show=True, *arguments, **keywords):
     '''p. 18
 
-    Using the meter signature given, add bar lines to the following melodies. 
+    Using the meter signature given, add bar lines to the following melodies.
     '''
     from music21 import key
 
     # note: tiny is not encoding C#s for c'#4 properly (it seems)
     ex = converter.parse("tinynotation: 3/2 g#1 f#4 g#4 a1 g#2 f#1 g#4. en8 g#2 f#4 r4 f#4 d#8 B8 e2 r4 e4 a4. a8 a2 g#4 g# b4. e8 a2~ a4 a4 d'n4. d'8 d'n2 c'#4 c'# c'# c'#")
-    
+
     ex.insert(0, key.KeySignature(4))
     # presently, this only works if makeAccidentals is called before make measures
     ex.makeAccidentals(inPlace=True)
-    ex = ex.makeMeasures() 
+    ex = ex.makeMeasures()
     ex.makeBeams(inPlace=True)
 
     if show:
@@ -1046,7 +1046,7 @@ def ch2_writing_VI(show=True, *arguments, **keywords):
     '''
     pass
 
- 
+
 #-------------------------------------------------------------------------------
 # Analysis
 
@@ -1100,8 +1100,8 @@ def ch2_analysis_B_3(show=True, *arguments, **keywords):
 def ch3_basic_I_A(show=True, *arguments, **keywords):
     '''p. 23
 
-    Write a chromatic scale beginning and ending with the 
-    given pitches. Use sharps in ascending chromatic and 
+    Write a chromatic scale beginning and ending with the
+    given pitches. Use sharps in ascending chromatic and
     flats in descending.
     '''
     pass
@@ -1122,8 +1122,8 @@ def ch3_basic_I_B(show=True, *arguments, **keywords):
 def ch3_basic_II_A(show=True, *arguments, **keywords):
     '''p. 24
 
-    Writing seven sharps and flats in order; say the name of the 
-    major key that goes with the signature. 
+    Writing seven sharps and flats in order; say the name of the
+    major key that goes with the signature.
     '''
     pass
 
@@ -1140,7 +1140,7 @@ def ch3_basic_II_B(show=True, *arguments, **keywords):
 def ch3_basic_II_C(show=True, *arguments, **keywords):
     '''p. 24
 
-    Identify the name of the major key associated with each of the key signatures below. 
+    Identify the name of the major key associated with each of the key signatures below.
     '''
     pass
 
@@ -1150,9 +1150,9 @@ def ch3_basic_II_C(show=True, *arguments, **keywords):
 def ch3_basic_III_A(show=True, *arguments, **keywords):
     '''p. 25
 
-    Given the scale degree, write the rest of the scale. 
-    Begin by writing whole notes on the lines and spaces 
-    above and below the given pitch, then fill in the necessary accidentals. 
+    Given the scale degree, write the rest of the scale.
+    Begin by writing whole notes on the lines and spaces
+    above and below the given pitch, then fill in the necessary accidentals.
     '''
     pass
 
@@ -1160,7 +1160,7 @@ def ch3_basic_III_A(show=True, *arguments, **keywords):
 def ch3_basic_III_B(show=True, *arguments, **keywords):
     '''p. 25-26
 
-    For each key listed, write the pitch-class name of the scale degree requested. 
+    For each key listed, write the pitch-class name of the scale degree requested.
     '''
     pass
 
@@ -1171,8 +1171,8 @@ def ch3_basic_III_B(show=True, *arguments, **keywords):
 def ch3_basic_IV_A(show=True, *arguments, **keywords):
     '''p. 26
 
-    Play a chromatic scale starting with the lowest pitch of your instrument 
-    and ending with the highest pitch you can play. 
+    Play a chromatic scale starting with the lowest pitch of your instrument
+    and ending with the highest pitch you can play.
     '''
     pass
 
@@ -1193,14 +1193,14 @@ def ch3_basic_IV_B(show=True, *arguments, **keywords):
 def ch3_writing_I_A(show=True, *arguments, **keywords):
     '''p. 26
 
-    Writing melodies from scale degrees. 
+    Writing melodies from scale degrees.
     '''
     pass
 
 def ch3_writing_I_B(show=True, *arguments, **keywords):
     '''p. 26
 
-    Writing melodies from scale degrees. 
+    Writing melodies from scale degrees.
     '''
     pass
 
@@ -1208,25 +1208,25 @@ def ch3_writing_I_B(show=True, *arguments, **keywords):
 def ch3_writing_I_C(show=True, *arguments, **keywords):
     '''p. 26
 
-    Writing melodies from scale degrees. 
+    Writing melodies from scale degrees.
     '''
     pass
 
 def ch3_writing_I_D(show=True, *arguments, **keywords):
     '''p. 26
 
-    Writing melodies from scale degrees. 
+    Writing melodies from scale degrees.
     '''
     pass
 
 #-------------------------------------------------------------------------------
-# I. Composing your own melody in a major key. 
+# I. Composing your own melody in a major key.
 
 
 def ch3_writing_II(show=True, *arguments, **keywords):
     '''p. 27
 
-    Compose a folk-like melody in a major key, using the melodies given above as examples. 
+    Compose a folk-like melody in a major key, using the melodies given above as examples.
     '''
     pass
 
@@ -1299,7 +1299,7 @@ def ch3_analysis_II_B(show=True, *arguments, **keywords):
 def ch4_basic_I_A(show=True, *arguments, **keywords):
     '''p. 33
 
-    For each major key, write out the scale. Circle degree 6. Write out a new scale that begins ont he pitch class you circled. Write the name of this relative-minor scale on the line indicated. 
+    For each major key, write out the scale. Circle degree 6. Write out a new scale that begins ont he pitch class you circled. Write the name of this relative-minor scale on the line indicated.
     '''
     pass
 
@@ -1584,28 +1584,28 @@ def ch5_writing_III_B(show=True, *arguments, **keywords):
 def ch5_writing_IV_A(show=True, *arguments, **keywords):
     '''p. 50
 
-    Note the meter signature, then add bar lines. 
+    Note the meter signature, then add bar lines.
     '''
     from music21 import stream, meter, key
     ex = stream.Stream()
-    
+
     ex.insert(clef.BassClef())
     ex.insert(meter.TimeSignature('6/4'))
     ex.insert(key.KeySignature(3))
-    
+
     for p, d in [(None,1), ('f#3',1),('g#3',1),('a3',4),
                  ('g#3',.5),('a#3',.5),('b3',2),
                  ('a#3',.5),('g#3',.5),('a#3',.5),('b#3',.5),
                  ('c#4',1.5),('b3',.5),('a3',.5),('c#4',.5),('b3',.5),('a3',.5),
                  ('g#3',2),('f#3',3), (None,.5), ('c#4',.5),('c#4',.5),
                  ('b3',.5),('b3',.5),('a#3',.5)]:
-        if p == None: 
+        if p == None:
             n = note.Rest()
         else:
             n = note.Note(p)
         n.quarterLength = d
         ex.append(n)
-    
+
     if show:
         # calling show creates measures and allocates notes for the time sig
         ex.show()
@@ -1654,7 +1654,7 @@ def ch5_analysis_C(show=True, *arguments, **keywords):
 
 
 #-------------------------------------------------------------------------------
-FUNCTIONS = [ch1_basic_I_A, 
+FUNCTIONS = [ch1_basic_I_A,
             ch1_basic_I_B,
             ch1_basic_I_C_1,
             ch1_basic_I_C_2,
@@ -1678,7 +1678,7 @@ FUNCTIONS = [ch1_basic_I_A,
             ch1_writing_II_A,
             ch1_writing_II_B,
 
-            ch1_analysis_A_1, 
+            ch1_analysis_A_1,
             ch1_analysis_A_2,
             ch1_analysis_B_1,
             ch1_analysis_B_2,
@@ -1828,7 +1828,7 @@ class TestExternal(unittest.TestCase):
     def testBasic(self):
         for func in FUNCTIONS:
             func(show=True, play=False)
-    
+
 
 class Test(unittest.TestCase):
     def runTest(self):
@@ -1839,7 +1839,7 @@ class Test(unittest.TestCase):
             func(show=False, play=False)
 
 
-        
+
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
@@ -1877,7 +1877,7 @@ if __name__ == "__main__":
 
         #ch2_writing_IV_B(show=True)
         #ch2_writing_V_A(show=True)
-        
+
         #ch2_writing_III_B_1()
 
 #------------------------------------------------------------------------------

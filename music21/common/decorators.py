@@ -17,7 +17,7 @@ from music21 import exceptions21
 
 __all__ = ['optional_arg_decorator', 'deprecated']
 
-# from Ryne Everett 
+# from Ryne Everett
 # http://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments
 def optional_arg_decorator(fn):
     """
@@ -51,61 +51,61 @@ def optional_arg_decorator(fn):
 def deprecated(method, startDate=None, removeDate=None, message=None):
     '''
     Decorator that marks a function as deprecated and should not be called.
-    
+
     Because we're all developers, it does not use DeprecationWarning, which no
-    one would ever see, but UserWarning. 
-    
+    one would ever see, but UserWarning.
+
     Warns once per session and never again.
-    
+
     Use without arguments for a simple case:
-    
-    
+
+
     For demonstrating I need to screw with stderr...
-    
+
     >>> import sys
     >>> saveStdErr = sys.stderr
     >>> sys.stderr = sys.stdout
-    
+
     >>> @common.deprecated
     ... def hi(msg):
     ...     print(msg)
-    
+
     (I'm printing "/" at the beginning because message begins with the filename and that is
     different on each system, but you can't use ellipses at the beginning of a doctest)
-    
+
     >>> print("/"); hi("myke")
     /...Music21DeprecationWarning: hi was deprecated
             and will disappear soon. Find alternative methods.
       # -*- coding: utf-8 -*-
-     myke    
-    
+     myke
+
     A second call raises no warning:
-    
+
     >>> hi("myke")
     myke
-    
-    
+
+
     Now a new function demonstrating the argument form.
-    
+
     >>> @common.deprecated("February 1972", "September 2099", "You should be okay...")
     ... def bye(msg):
     ...     print(msg)
 
     >>> print("/"); bye("world")
-    /...Music21DeprecationWarning: bye was deprecated on February 1972 
+    /...Music21DeprecationWarning: bye was deprecated on February 1972
             and will disappear at or after September 2099. You should be okay...
       # -*- coding: utf-8 -*-
     world
-    
+
     Restore stderr at the end.
-    
+
     >>> sys.stderr = saveStdErr
-    
+
     '''
     if hasattr(method, '__qualname__'):
         funcName = method.__qualname__
     else:
-        funcName = method.__name__    
+        funcName = method.__name__
 
     if startDate is not None:
         startDate = " on " + startDate
@@ -113,9 +113,9 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
         startDate = ""
 
     if removeDate is not None:
-        removeDate = "at or after " + removeDate 
+        removeDate = "at or after " + removeDate
     else:
-        removeDate = "soon"        
+        removeDate = "soon"
 
     if message is None:
         message = "Find alternative methods."
@@ -130,14 +130,14 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     def func_wrapper(*args, **kwargs):
         # TODO: look at sys.warnstatus.
         if callInfo['calledAlready'] is False:
-            warnings.warn(callInfo['message'], 
-                          exceptions21.Music21DeprecationWarning, 
+            warnings.warn(callInfo['message'],
+                          exceptions21.Music21DeprecationWarning,
                           stacklevel=2)
             callInfo['calledAlready'] = True
         return method(*args, **kwargs)
 
     return func_wrapper
-    
+
 
 
 

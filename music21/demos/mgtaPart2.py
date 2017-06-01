@@ -36,17 +36,17 @@ class Test(unittest.TestCase):
 #-------------------------------------------------------------------------------
 # I. Writing generic intervals (melodic)
 
-    
+
     def xtest_Ch6_basic_I_A(self, *arguments, **keywords):
         '''p55
-        Write a whole note on the specified generic interval. Do not add sharps or flats. 
-        
+        Write a whole note on the specified generic interval. Do not add sharps or flats.
+
         MSC: 2013 Oct -- No longer works now that convertGenericToSemitone() [buggy] has been removed.
         '''
         pass
 
 
-    
+
 
 #-------------------------------------------------------------------------------
 # II. Writing major and perfect pitch intervals
@@ -79,7 +79,7 @@ class Test(unittest.TestCase):
             s.append(c)
 
         if 'show' in keywords.keys() and keywords['show']:
-            s.show()    
+            s.show()
 
         match = []
         for c in s.getElementsByClass('Chord'):

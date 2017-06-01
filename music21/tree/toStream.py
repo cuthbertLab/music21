@@ -67,7 +67,7 @@ def chordified(timespans, templateStream=None):
         mos = templateStream.measureOffsetMap()
         templateOffsets = list(mos)
         templateOffsets.append(templateStream.duration.quarterLength)
-        if (hasattr(templateStream, 'parts') 
+        if (hasattr(templateStream, 'parts')
                 and templateStream.iter.parts):
             outputStream = templateStream.iter.parts[0].measureTemplate(fillWithRests=False)
         else:
@@ -84,8 +84,8 @@ def chordified(timespans, templateStream=None):
             vert = timespans.getVerticalityAt(offset)
             quarterLength = endTime - offset
             if (quarterLength < 0):
-                raise TreeException("Something is wrong with the verticality " + 
-                        "%r its endTime %f is less than its offset %f" % 
+                raise TreeException("Something is wrong with the verticality " +
+                        "%r its endTime %f is less than its offset %f" %
                                          (vert, endTime, offset))
             element = vert.makeElement(quarterLength)
             outputStream[measureIndex].append(element)
@@ -97,7 +97,7 @@ def chordified(timespans, templateStream=None):
             vert = timespans.getVerticalityAt(offset)
             quarterLength = endTime - offset
             if (quarterLength < 0):
-                raise TreeException("Something is wrong with the verticality " + 
+                raise TreeException("Something is wrong with the verticality " +
                     "%r, its endTime %f is less than its offset %f" % (vert, endTime, offset))
             element = vert.makeElement(quarterLength)
             elements.append(element)

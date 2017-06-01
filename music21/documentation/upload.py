@@ -10,7 +10,7 @@
 #-------------------------------------------------------------------------------
 #pylint: disable=line-too-long
 '''
-if you get a 'ssh_askpass' not found error, create this file in 
+if you get a 'ssh_askpass' not found error, create this file in
 /usr/libexec/ssh-askpass and sudo chmod +x it afterwards:
 
 ..raw::
@@ -19,7 +19,7 @@ if you get a 'ssh_askpass' not found error, create this file in
     # Author: Mark Carver
     # Created: 2011-09-14
     # Copyright (c) 2011 Beyond Eden Development, LLC. All rights reserved.
-    
+
     # A ssh-askpass command for Mac OS X
     # Based from author: Joseph Mocker, Sun Microsystems
     # http://blogs.oracle.com/mock/entry/and_now_chicken_of_the
@@ -48,7 +48,7 @@ if you get a 'ssh_askpass' not found error, create this file in
 
 
 Otherwise just contact MSC...
-'''    
+'''
 
 import getpass, os
 
@@ -64,22 +64,22 @@ def getDirBuildHtml():
     return dirBuildHtml
 
 if __name__ == '__main__':
-    
+
     # this needs to be on level higher then the level of the source
     #DST_MIT = 'athena.dialup.mit.edu:/afs/athena.mit.edu/org/m/music21/doc/'
     remoteHost = 'athena.dialup.mit.edu'
     remoteDir = '/afs/athena.mit.edu/org/m/music21/doc/'
     #tar czpf - -C build/html/ . | ssh cuthbert@linux.mit.edu "tar xzpf - -C /afs/athena.mit.edu/org/m/music21/doc/"
-    
+
     user = getpass.getpass('provide user name : ')
-    
-    
+
+
     src = getDirBuildHtml()
     # -r flag makes this recursive
     cmdStr = 'tar czpf - -C %s . | ssh %s@%s "tar xzpf - -C %s"' % (src, user, remoteHost, remoteDir)
     #cmdStr = 'scp -r "%s" %s@%s' % (src + "/*", user, DST_MIT)
     print(cmdStr)
-    
+
     os.system(cmdStr)
-    
-    
+
+

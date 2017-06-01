@@ -11,11 +11,11 @@
 '''
 On September 11, 2012, Camilla Cavicchi reported to me the finding of
 a new fragment in the Ferrara archives.  One unknown piece has an extraordinary
-large range in the top voice: a 15th within a few notes.  The clefs can't 
+large range in the top voice: a 15th within a few notes.  The clefs can't
 be read and the piece is an adaptation into
 Stroke notation, so it's unlikely to have an exact match in the database
 (also the piece is probably from the 1430s [MSC, guess, not CC], so it's
-not likely to be in the Trecento database anyhow).  
+not likely to be in the Trecento database anyhow).
 
 This demo uses the .analyze('ambitus') function of music21 to try
 to find a match for the ambitus (or at least narrow down the search for others)

@@ -18,7 +18,7 @@ import unittest
 from collections import namedtuple
 
 # TODO: Move _missingImport to environment or common so this is unnecessary.
-from music21.base import _missingImport 
+from music21.base import _missingImport
 
 from music21 import common
 from music21 import exceptions21
@@ -30,11 +30,11 @@ from music21.ext import webcolors
 
 from music21 import environment
 _MOD = 'graph/utilities.py'
-environLocal = environment.Environment(_MOD)    
+environLocal = environment.Environment(_MOD)
 
 
 
-ExtendedModules = namedtuple('ExtendedModules', 
+ExtendedModules = namedtuple('ExtendedModules',
                              'matplotlib Axes3D collections patches plt networkx')
 
 def getExtendedModules():
@@ -56,20 +56,20 @@ def getExtendedModules():
     except ImportError: # pragma: no cover
         Axes3D = None
         environLocal.warn(
-            "mpl_toolkits.mplot3d.Axes3D could not be imported -- likely cause is an " + 
+            "mpl_toolkits.mplot3d.Axes3D could not be imported -- likely cause is an " +
             "old version of six.py (< 1.9.0) on your system somewhere")
-    
+
     from matplotlib import collections # @UnresolvedImport
     from matplotlib import patches # @UnresolvedImport
 
     #from matplotlib.colors import colorConverter
     import matplotlib.pyplot as plt # @UnresolvedImport
-    
+
     try:
         import networkx
     except ImportError: # pragma: no cover
         networkx = None # use for testing
-    
+
     return ExtendedModules(matplotlib, Axes3D, collections, patches, plt, networkx)
 
 #-------------------------------------------------------------------------------
@@ -83,16 +83,16 @@ def accidentalLabelToUnicode(label):
     u'''
     Changes a label possibly containing a modifier such as "-" or "#" into
     a unicode string.
-    
+
     >>> print(graph.utilities.accidentalLabelToUnicode('B-4'))
     B♭4
-     
+
     Since matplotlib's default fonts do not support double sharps or double flats,
     etc. these are converted as best we can...
-    
+
     >>> print(graph.utilities.accidentalLabelToUnicode('B--4'))
     B♭♭4
-     
+
     In Python 2, all strings are converted to unicode strings even if there is
     no need to.
     '''
@@ -100,12 +100,12 @@ def accidentalLabelToUnicode(label):
         return label
     if six.PY2 and isinstance(label, str):
         label = six.u(label)
-    
+
     for modifier, unicodeAcc in pitch.unicodeFromModifier.items():
         if modifier != '' and modifier in label and modifier in ('-', '#'):
             # ideally eventually matplotlib will do the other accidentals...
             label = label.replace(modifier, unicodeAcc)
-            break 
+            break
 
     return label
 
@@ -113,8 +113,8 @@ def accidentalLabelToUnicode(label):
 
 def getColor(color):
     '''
-    Convert any specification of a color to a hexadecimal color used by matplotlib. 
-    
+    Convert any specification of a color to a hexadecimal color used by matplotlib.
+
     >>> graph.utilities.getColor('red')
     '#ff0000'
     >>> graph.utilities.getColor('r')
@@ -131,9 +131,9 @@ def getColor(color):
     '#cccccc'
     >>> graph.utilities.getColor([255, 255, 255])
     '#ffffff'
-    
+
     Invalid colors raise GraphExceptions:
-    
+
     >>> graph.utilities.getColor('l')
     Traceback (most recent call last):
     music21.graph.utilities.GraphException: invalid color abbreviation: l
@@ -173,12 +173,12 @@ def getColor(color):
             return webcolors.css3_names_to_hex[color]
         except KeyError: # no color match
             raise GraphException('invalid color name: %s' % color)
-        
+
     elif common.isListLike(color):
         percent = False
         for sub in color:
             if sub < 1:
-                percent = True  
+                percent = True
                 break
         if percent:
             if len(color) == 1:

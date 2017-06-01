@@ -22,14 +22,14 @@ __all__ = ['analysis', 'core', 'fromStream', 'node', 'spans', 'toStream', 'trees
 
 import unittest
 
-from music21.tree import analysis 
+from music21.tree import analysis
 from music21.tree import core
 from music21.tree import fromStream
-from music21.tree import node 
-from music21.tree import spans 
+from music21.tree import node
+from music21.tree import spans
 from music21.tree import toStream
-from music21.tree import trees 
-from music21.tree import verticality 
+from music21.tree import trees
+from music21.tree import verticality
 
 
 #------------------------------------------------------------------------------

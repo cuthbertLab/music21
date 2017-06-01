@@ -68,13 +68,13 @@ class Editorial(dict):
             a list of :class:`~music21.editorial.Comment` objects that represent annotations
             for the object.
         ''',
-        'ficta': '''a :class:`~music21.pitch.Accidental` object that specifies musica 
-            ficta for the note.  Will only be displayed in LilyPond and then only if 
+        'ficta': '''a :class:`~music21.pitch.Accidental` object that specifies musica
+            ficta for the note.  Will only be displayed in LilyPond and then only if
             there is no Accidental object on the note itself''',
-        'harmonicInterval': '''an :class:`~music21.interval.Interval` object that specifies 
-            the harmonic interval between this note and a single other note, or None 
+        'harmonicInterval': '''an :class:`~music21.interval.Interval` object that specifies
+            the harmonic interval between this note and a single other note, or None
             (useful for storing information post analysis)''',
-        'melodicInterval': '''an :class:`~music21.interval.Interval` object that specifies 
+        'melodicInterval': '''an :class:`~music21.interval.Interval` object that specifies
             the melodic interval to the next note in this Part/Voice/Stream, etc.''',
         'misc': 'A dict to hold anything you might like to store.',
         }
@@ -115,11 +115,11 @@ class Editorial(dict):
 class Comment(style.StyleMixin):
     '''
     A comment or footnote or something else attached to a note.
-    
+
     >>> c = editorial.Comment('presented as C natural in the 1660 print.')
     >>> c.isFootnote = True
     >>> c.levelInformation = 'musicological'
-    
+
     >>> n = note.Note('C#4')
     >>> n.editorial.footnotes.append(c)
     >>> n.editorial.footnotes[0]
@@ -131,12 +131,12 @@ class Comment(style.StyleMixin):
         self.isFootnote = False
         self.isReference = False
         self.levelInformation = None
-        
+
     def __repr__(self):
         head = '<music21.editorial.Comment '
         end = '>'
         if self.text is None:
-            return head + end 
+            return head + end
         elif len(self.text) < 20:
             return head + "'" + self.text + "' " + end
         else:

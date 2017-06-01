@@ -45,7 +45,7 @@ class TimespanTree(trees.OffsetTree):
     score at once:
 
     >>> bach = corpus.parse('bwv66.6')
-    >>> scoreTree = tree.fromStream.asTimespans(bach, flatten=True, 
+    >>> scoreTree = tree.fromStream.asTimespans(bach, flatten=True,
     ...            classList=(note.Note, chord.Chord))
     >>> print(scoreTree.getVerticalityAt(17.0))
     <Verticality 17.0 {F#3 C#4 A4}>
@@ -87,18 +87,18 @@ class TimespanTree(trees.OffsetTree):
 
     Remove neighbor tones from the Bach chorale.  (It's actually quite viscous
     in its pruning...)
- 
+
     Here in Alto, measure 7, there's a neighbor tone E#.
- 
+
     >>> bach.parts['Alto'].measure(7).show('text')
     {0.0} <music21.note.Note F#>
     {0.5} <music21.note.Note E#>
     {1.0} <music21.note.Note F#>
     {1.5} <music21.note.Note F#>
     {2.0} <music21.note.Note C#>
- 
+
     We'll get rid of it and a lot of other neighbor tones.
- 
+
     >>> for verticalities in scoreTree.iterateVerticalitiesNwise(n=3):
     ...     horizontalities = scoreTree.unwrapVerticalities(verticalities)
     ...     for unused_part, horizontality in horizontalities.items():
@@ -110,8 +110,8 @@ class TimespanTree(trees.OffsetTree):
     ...             scoreTree.removeTimespan(horizontality[1])
     ...             scoreTree.removeTimespan(horizontality[2])
     ...             scoreTree.insert(merged)
-     
-     
+
+
     >>> newBach = tree.toStream.partwise(
     ...     scoreTree,
     ...     templateStream=bach,
@@ -120,10 +120,10 @@ class TimespanTree(trees.OffsetTree):
     {0.0} <music21.chord.Chord F#4>
     {1.5} <music21.chord.Chord F#3>
     {2.0} <music21.chord.Chord C#4>
- 
+
     The second F# is an octave lower, so it wouldn't get merged even if
     adjacent notes were fused together (which they're not).
-    
+
     ..  note::
 
         TimespanTree is an implementation of an extended AVL tree. AVL
@@ -140,7 +140,7 @@ class TimespanTree(trees.OffsetTree):
         sorted.
 
     OMIT_FROM_DOCS
-    
+
 
     TODO: Doc examples for all functions, including privates.
     '''
@@ -155,7 +155,7 @@ class TimespanTree(trees.OffsetTree):
 #                 return x.source.sortTuple()[2:]
 #             else:
 #                 return x.endTime  # PitchedTimespan with no Element!
-        
+
     ### PUBLIC METHODS ###
 
     @staticmethod
@@ -171,7 +171,7 @@ class TimespanTree(trees.OffsetTree):
     def index(self, span):
         r'''
         Gets index of a TimeSpan in a TimespanTree.
-        
+
         Since Timespans do not have .sites, there is only one offset to deal with...
 
         >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
@@ -207,7 +207,7 @@ class TimespanTree(trees.OffsetTree):
 
     def offset(self):
         '''
-        this is just for mimicking elements as streams. 
+        this is just for mimicking elements as streams.
         '''
         return self.lowestPosition()
 
@@ -223,11 +223,11 @@ class TimespanTree(trees.OffsetTree):
         this will eventually be different from above...
         '''
         self.removeElements(elements, offsets, runUpdate)
-    
+
     def findNextPitchedTimespanInSameStreamByClass(self, pitchedTimespan, classList=None):
         r'''
         Finds next element timespan in the same stream class as `PitchedTimespan`.
-        
+
         Default classList is (stream.Part, )
 
         >>> score = corpus.parse('bwv66.6')
@@ -265,13 +265,13 @@ class TimespanTree(trees.OffsetTree):
             if verticality is None:
                 return None
             for nextPitchedTimespan in verticality.startTimespans:
-                if (nextPitchedTimespan.getParentageByClass(classList) is 
+                if (nextPitchedTimespan.getParentageByClass(classList) is
                         pitchedTimespan.getParentageByClass(classList)):
                     return nextPitchedTimespan
 
     def findPreviousPitchedTimespanInSameStreamByClass(self, pitchedTimespan, classList=None):
         r'''
-        Finds next element timespan in the same Part/Measure, etc. (specify in classList) as 
+        Finds next element timespan in the same Part/Measure, etc. (specify in classList) as
         the `pitchedTimespan`.
 
         >>> score = corpus.parse('bwv66.6')
@@ -310,7 +310,7 @@ class TimespanTree(trees.OffsetTree):
             if verticality is None:
                 return None
             for previousPitchedTimespan in verticality.startTimespans:
-                if (previousPitchedTimespan.getParentageByClass(classList) is 
+                if (previousPitchedTimespan.getParentageByClass(classList) is
                         pitchedTimespan.getParentageByClass(classList)):
                     return previousPitchedTimespan
 
@@ -334,7 +334,7 @@ class TimespanTree(trees.OffsetTree):
         if not verticality.startTimespans:
             verticality = verticality.previousVerticality
         return verticality
-    
+
     def iterateConsonanceBoundedVerticalities(self):
         r'''
         Iterates consonant-bounded verticality subsequences in this
@@ -540,7 +540,7 @@ class TimespanTree(trees.OffsetTree):
             <Verticality 33.5 {D3 B3 C#4 F#4}>
             ]>
         '''
-        from music21.tree.verticality import VerticalitySequence 
+        from music21.tree.verticality import VerticalitySequence
         n = int(n)
         if (n <= 0):
             message = "The number of verticalities in the group must be at "
@@ -617,7 +617,7 @@ class TimespanTree(trees.OffsetTree):
         is indexed by a Part object (TODO: Don't use mutable objects as hash keys!)
         and each key is a TimeSpan tree containing only element timespans belonging
         to that part.
-        
+
         Used by reduceChords.  May disappear.
         '''
         partwiseTimespanTrees = {}
@@ -661,7 +661,7 @@ class TimespanTree(trees.OffsetTree):
             <PitchedTimespan (0.5 to 1.0) <music21.note.Note B>>
             <PitchedTimespan (1.0 to 2.0) <music21.note.Note C#>>
         '''
-        from music21.tree.verticality import VerticalitySequence 
+        from music21.tree.verticality import VerticalitySequence
         sequence = VerticalitySequence(verticalities)
         unwrapped = sequence.unwrap()
         return unwrapped
@@ -701,16 +701,16 @@ class TimespanTree(trees.OffsetTree):
 #         '''
 #         The minimum number of timespans overlapping at any given moment in this
 #         timespan collection.
-# 
+#
 #         In a tree created from a monophonic stream, the minimumOverlap will
 #         probably be either zero or one.
-# 
+#
 #         >>> score = corpus.parse('bwv66.6')
 #         >>> scoreTree = tree.fromStream.asTimespans(
 #         ...     score, flatten=False, classList=(note.Note, chord.Chord))
 #         >>> scoreTree[0].minimumOverlap()
 #         1
-#         
+#
 #         Returns None if there is no verticality here.
 #         '''
 #         overlap = None
@@ -727,11 +727,11 @@ class TimespanTree(trees.OffsetTree):
     def element(self):
         '''
         defined so a TimespanTree can be used like an PitchedTimespan
-        
+
         TODO: Look at subclassing or at least deriving from a common base...
         '''
         return common.unwrapWeakref(self._source)
-        
+
     @element.setter
     def element(self, expr):
         self._source = common.wrapWeakref(expr)
@@ -742,7 +742,7 @@ class Test(unittest.TestCase):
 
     def runTest(self):
         pass
-    
+
 
     def testGetVerticalityAtWithKey(self):
         from music21 import stream, key, note
@@ -753,7 +753,7 @@ class Test(unittest.TestCase):
         v = scoreTree.getVerticalityAt(0.0)
         ps = v.pitchSet
         self.assertEqual(len(ps), 1)
-        
+
 
     def testTimespanTree(self):
         for attempt in range(100):
@@ -776,18 +776,18 @@ class Test(unittest.TestCase):
                 currentTimespansInTree = [x for x in tsTree]
                 currentPosition = min(x.offset for x in currentTimespansInList)
                 currentEndTime = max(x.endTime for x in currentTimespansInList)
-                
-                self.assertEqual(currentTimespansInTree, 
-                                 currentTimespansInList, 
+
+                self.assertEqual(currentTimespansInTree,
+                                 currentTimespansInList,
                                  (attempt, currentTimespansInTree, currentTimespansInList))
-                self.assertEqual(tsTree.rootNode.endTimeLow, 
+                self.assertEqual(tsTree.rootNode.endTimeLow,
                                  min(x.endTime for x in currentTimespansInList))
                 self.assertEqual(tsTree.rootNode.endTimeHigh,
                                  max(x.endTime for x in currentTimespansInList))
                 self.assertEqual(tsTree.lowestPosition(), currentPosition)
                 self.assertEqual(tsTree.endTime, currentEndTime)
                 # pylint: disable=consider-using-enumerate
-                for i in range(len(currentTimespansInTree)): 
+                for i in range(len(currentTimespansInTree)):
                     self.assertEqual(currentTimespansInList[i], currentTimespansInTree[i])
 
             random.shuffle(tss)
@@ -797,13 +797,13 @@ class Test(unittest.TestCase):
                     key=lambda x: (x.offset, x.endTime))
                 tsTree.removeTimespan(timespan)
                 currentTimespansInTree = [x for x in tsTree]
-                self.assertEqual(currentTimespansInTree, 
-                                 currentTimespansInList, 
+                self.assertEqual(currentTimespansInTree,
+                                 currentTimespansInList,
                                  (attempt, currentTimespansInTree, currentTimespansInList))
                 if tsTree.rootNode is not None:
                     currentPosition = min(x.offset for x in currentTimespansInList)
                     currentEndTime = max(x.endTime for x in currentTimespansInList)
-                    self.assertEqual(tsTree.rootNode.endTimeLow, 
+                    self.assertEqual(tsTree.rootNode.endTimeLow,
                                      min(x.endTime for x in currentTimespansInList))
                     self.assertEqual(tsTree.rootNode.endTimeHigh,
                                      max(x.endTime for x in currentTimespansInList))

@@ -33,7 +33,7 @@ def rhythmLine(baseNote = None, minLength = 8.0, maxProbability = 0.5):
 
         y = random.random()
         z = random.random()
-        
+
         if z < 0.5:
             direction = 1
         else:
@@ -44,11 +44,11 @@ def rhythmLine(baseNote = None, minLength = 8.0, maxProbability = 0.5):
             currentProbability *= .75
             y = random.random()
 
-        
+
         newNote.articulations.append(articulations.Staccatissimo())
         newStream.append(newNote)
         #newStream.getNoteTimeInfo()
-        
+
     return newStream
 
 def alterRhythm(baseDuration):
@@ -70,7 +70,7 @@ def addOrSubtractDot(baseDuration):
             newDuration.dots = newDuration.dots + 1
     else:
         newDuration.dots = 1
-        
+
     return newDuration
 
 def nextOrPreviousType(baseDuration):
@@ -81,7 +81,7 @@ def nextOrPreviousType(baseDuration):
         ordinalType = ordinalType - 1
     else:
         ordinalType = ordinalType + 1
-    
+
     newDuration.type = duration.ordinalTypeFromNum[ordinalType]
     return newDuration
 
@@ -100,9 +100,9 @@ def addPart(minLength=80, maxProbability=0.7, instrument=None):
             r = note.Rest()
             r.quarterLength = n.quarterLength
             s1.replace(n, r, allDerived=True)
-    
+
     return s1
-    
+
 
 def test():
     from music21 import instrument as j
@@ -111,7 +111,7 @@ def test():
     instrument = [j.Piccolo(), j.Xylophone(), j.Clarinet(), j.Oboe(), j.Violin(),
                   j.ElectricGuitar(), j.Harp(), j.Piano(), j.Piano(), j.Piano(), j.Piano(), j.ElectricBass()]
     instrumentOctave = [3, 2, 2, 2, 1, 1, 1, 2, 1, 0, -1, -2]
-    
+
     for i in range(12):
         inst = instrument[i]
         if i < 9:
@@ -123,7 +123,7 @@ def test():
             part.transpose(12 * instrumentOctave[i], inPlace = True)
         sc1.insert(0, part)
     sc1.show()
-    
+
 if (__name__ == "__main__"):
     test()
 

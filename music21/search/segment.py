@@ -13,14 +13,14 @@ tools for segmenting -- that is, dividing up a score into small, possibly overla
 sections -- for searching across pieces for similarity.
 
 Speed notes:
-   
+
    this module is definitely a case where running PyPy rather than cPython will
-   give you a 3-5x speedup.  
-   
+   give you a 3-5x speedup.
+
    If you really want to do lots of comparisons, the `scoreSimilarity` method will
    use pyLevenshtein if it is installed from http://code.google.com/p/pylevenshtein/ .
    You will need to compile it by running **sudo python setup.py install** on Mac or
-   Unix (compilation is much more difficult on Windows; sorry). The ratios are very 
+   Unix (compilation is much more difficult on Windows; sorry). The ratios are very
    slightly different, but the speedup is between 10 and 100x! (but then PyPy probably won't work)
 
 '''
@@ -54,11 +54,11 @@ def translateMonophonicPartToSegments(
     ):
     '''
     Translates a monophonic part with measures to a set of segments of length
-    `segmentLengths` (measured in number of notes) with an overlap of `overlap` notes 
-    using a conversion algorithm of `algorithm` (default: search.translateStreamToStringNoRhythm). 
+    `segmentLengths` (measured in number of notes) with an overlap of `overlap` notes
+    using a conversion algorithm of `algorithm` (default: search.translateStreamToStringNoRhythm).
     Returns two lists, a list of segments, and a list of tuples of measure start and end
     numbers that match the segments.
-    
+
     If algorithm is None then a default algorithm of music21.search.translateStreamToStringNoRhythm
     is used
 
@@ -76,7 +76,7 @@ def translateMonophonicPartToSegments(
     [(1, 12), (7, 18)]
 
     >>> segments, measureLists = search.segment.translateMonophonicPartToSegments(
-    ...     lucaCantus, 
+    ...     lucaCantus,
     ...     algorithm=search.translateDiatonicStreamToString)
     >>> segments[0:2]
     ['CRJOMTHCQNALRQPAGFEFDLFDCFEMOO', 'EFDLFDCFEMOOONPJDCBJSNTHLBOGFE']
@@ -88,9 +88,9 @@ def translateMonophonicPartToSegments(
     from music21 import search
     if algorithm is None:
         algorithm = search.translateStreamToStringNoRhythm
-        
+
     nStream = inputStream.recurse().notes.stream()
-    outputStr, measures = algorithm(nStream, returnMeasures=True) 
+    outputStr, measures = algorithm(nStream, returnMeasures=True)
     totalLength = len(outputStr)
 
 
@@ -100,12 +100,12 @@ def translateMonophonicPartToSegments(
 
     segmentList = []
     measureList = []
-    
+
     for segmentStart in segmentStarts:
         segmentStart += random.randint(-1 * jitter, jitter)
         segmentStart = max(0, segmentStart)
         segmentStart = min(segmentStart, totalLength - 1)
-        
+
         segmentEnd = min(segmentStart + segmentLengths, totalLength)
         currentSegment = outputStr[segmentStart:segmentEnd]
         measureTuple = (measures[segmentStart],  measures[segmentEnd - 1])
@@ -118,8 +118,8 @@ def indexScoreParts(scoreFile, *args, **kwds):
     r'''
     Creates segment and measure lists for each part of a score
     Returns list of dictionaries of segment and measure lists
-    
-    
+
+
     >>> bach = corpus.parse('bwv66.6')
     >>> scoreList = search.segment.indexScoreParts(bach)
     >>> scoreList[1]['segmentList'][0]
@@ -133,7 +133,7 @@ def indexScoreParts(scoreFile, *args, **kwds):
         segmentList, measureList = translateMonophonicPartToSegments(
             part, *args, **kwds)
         indexedList.append({
-            'segmentList': segmentList, 
+            'segmentList': segmentList,
             'measureList': measureList,
             })
     return indexedList
@@ -159,7 +159,7 @@ def _giveUpdatesMulticore(numRun, totalRun, latestOutput):
     for o in latestOutput:
         print("Indexed %s (%d/%d)" % (
             o[0], numRun, totalRun))
-    
+
 
 def indexScoreFilePaths(scoreFilePaths,
                         giveUpdates=False,
@@ -168,7 +168,7 @@ def indexScoreFilePaths(scoreFilePaths,
     '''
     Returns a dictionary of the lists from indexScoreParts for each score in
     scoreFilePaths
-    
+
     >>> searchResults = corpus.search('bwv19')
     >>> fpsNamesOnly = sorted([searchResult.sourcePath for searchResult in searchResults])
     >>> len(fpsNamesOnly)
@@ -183,13 +183,13 @@ def indexScoreFilePaths(scoreFilePaths,
 
     >>> scoreDict['bwv190.7.mxl'][0]['segmentList'][0]
     'NNJLNOLLLJJIJLLLLNJJJIJLLJNNJL'
-    
+
     '''
     if giveUpdates is True:
         updateFunction = _giveUpdatesMulticore
     else:
         updateFunction = None
-    
+
     indexFunc = partial(_indexSingleMulticore, *args, **kwds)
 
     rpList = common.runParallel(scoreFilePaths, indexFunc, updateFunction)
@@ -230,21 +230,21 @@ def loadScoreDict(filePath):
 
 
 def getDifflibOrPyLev(
-    seq2=None, 
-    junk=None, 
+    seq2=None,
+    junk=None,
     forceDifflib=False,
     ):
     '''
     Returns either a difflib.SequenceMatcher or pyLevenshtein
     StringMatcher.StringMatcher object depending on what is installed.
-    
+
     If forceDifflib is True then use difflib even if pyLevenshtein is installed:
     '''
     if forceDifflib is True:
         smObject = difflib.SequenceMatcher(junk, '', seq2)
     else:
         try:
-            import StringMatcher as pyLevenshtein 
+            import StringMatcher as pyLevenshtein
             smObject = pyLevenshtein.StringMatcher(junk, '', seq2)
         except ImportError:
             smObject = difflib.SequenceMatcher(junk, '', seq2)
@@ -252,18 +252,18 @@ def getDifflibOrPyLev(
 
 
 def scoreSimilarity(
-    scoreDict, 
-    minimumLength=20, 
-    giveUpdates=False, 
+    scoreDict,
+    minimumLength=20,
+    giveUpdates=False,
     includeReverse=False,
     forceDifflib=False,
     ):
     r'''
     Find the level of similarity between each pair of segments in a scoreDict.
-    
+
     This takes twice as long as it should because it does not cache the
     pairwise similarity.
-    
+
     >>> filePaths = []
     >>> filePaths.append(corpus.search('bwv197.5.mxl')[0].sourcePath)
     >>> filePaths.append(corpus.search('bwv190.7.mxl')[0].sourcePath)
@@ -273,11 +273,11 @@ def scoreSimilarity(
     >>> #_DOCS_SHOW scoreSim = search.segment.scoreSimilarity(scoreDict)
     >>> len(scoreSim)
     671
-    
+
     Returns a list of tuples of first score name, first score voice number, first score
     measure number, second score name, second score voice number, second score
     measure number, and similarity score (0 to 1).
-    
+
     >>> for result in scoreSim[64:68]:
     ...     result
     ...
@@ -292,7 +292,7 @@ def scoreSimilarity(
     scoreDictKeys = list(scoreDict.keys())
     pNum = None
     segmentNumber = None
-    
+
     def doOneSegment(thisSegment):
         dl = getDifflibOrPyLev(thisSegment, forceDifflib=forceDifflib)
         #dl = difflib.SequenceMatcher(None, '', thisSegment)
@@ -308,36 +308,36 @@ def scoreSimilarity(
                     ratio = dl.ratio()
                     thatMeasureNumber = thatScore[pNum2]['measureList'][thatSegmentNumber]
                     similarityTuple = (
-                        thisScoreKey, 
-                        pNum, 
-                        segmentNumber, 
-                        thisMeasureNumber, 
-                        thatScoreKey, 
-                        pNum2, 
-                        thatSegmentNumber, 
-                        thatMeasureNumber, 
+                        thisScoreKey,
+                        pNum,
+                        segmentNumber,
+                        thisMeasureNumber,
+                        thatScoreKey,
+                        pNum2,
+                        thatSegmentNumber,
+                        thatMeasureNumber,
                         ratio,
                         )
                     similarityScores.append(similarityTuple)
                     if not includeReverse:
                         continue
                     similarityTupleReversed = (
-                        thatScoreKey, 
-                        pNum2, 
-                        thatSegmentNumber, 
-                        thatMeasureNumber, 
-                        thisScoreKey, 
-                        pNum, 
-                        segmentNumber, 
-                        thisMeasureNumber, 
+                        thatScoreKey,
+                        pNum2,
+                        thatSegmentNumber,
+                        thatMeasureNumber,
+                        thisScoreKey,
+                        pNum,
+                        segmentNumber,
+                        thisMeasureNumber,
                         ratio,
                         )
                     similarityScores.append(similarityTupleReversed)
-    
+
     for thisScoreNumber in range(totalScores):
         thisScoreKey = scoreDictKeys[thisScoreNumber]
         thisScore = scoreDict[thisScoreKey]
-        scoreIndex += 1 
+        scoreIndex += 1
         if giveUpdates is True:
             print("Comparing {0} ({1}/{2})".format(
                 thisScoreKey, scoreIndex, totalScores))
@@ -351,7 +351,7 @@ def scoreSimilarity(
     #import pprint
     #pprint.pprint(similarityScores)
     return similarityScores
-    
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []

@@ -15,7 +15,7 @@ sort against bare offsets and other SortTuples.
 
 This is a performance-critical object.
 
-It also defines three singleton instance of the SortTupleLow class as ZeroSortTupleDefault, 
+It also defines three singleton instance of the SortTupleLow class as ZeroSortTupleDefault,
 ZeroSortTupleLow and
 ZeroSortTupleHigh which are sortTuple at
 offset 0.0, priority [0, -inf, inf] respectively:
@@ -40,7 +40,7 @@ class SortingException(exceptions21.Music21Exception):
 class SortTuple(namedtuple('SortTuple', _attrList)):
     '''
     Derived class of namedTuple which allows for comparisons with pure ints/fractions...
-    
+
     >>> n = note.Note()
     >>> s = stream.Stream()
     >>> s.insert(4, n)
@@ -53,7 +53,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
     0
     >>> st.offset
     4.0
-    
+
     >>> st < 5.0
     True
     >>> 5.0 > st
@@ -62,10 +62,10 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
     True
     >>> 3.0 < st
     True
-    
+
     >>> st == 4.0
     True
-    
+
     >>> ts = bar.Barline('double')
     >>> t = stream.Stream()
     >>> t.storeAtEnd(ts)
@@ -78,7 +78,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
     True
     >>> ts_st == float('inf')
     True
-    
+
     Construct one w/ keywords:
 
     >>> st = sorting.SortTuple(atEnd=0, offset=1.0, priority=0, classSortOrder=20,
@@ -91,7 +91,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
     >>> st = sorting.SortTuple(0, 1.0, 0, 20, 1, 323)
     >>> st.shortRepr()
     '1.0 <0.20.323>'
-    
+
     '''
     def __new__(cls, *tupEls, **kw):
         return super(SortTuple, cls).__new__(cls, *tupEls, **kw)
@@ -132,25 +132,25 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
                 return (self.offset > other)
         except ValueError:
             return NotImplemented
-        
+
     def __ne__(self, other):
         return not self.__eq__(other)
-    
+
     def __le__(self, other):
         return self.__lt__(other) or self.__eq__(other)
-    
+
     def __ge__(self, other):
         return self.__gt__(other) or self.__eq__(other)
 
     def shortRepr(self):
         '''
         Returns a nice representation of a SortTuple
-        
+
         >>> st = sorting.SortTuple(atEnd=0, offset=1.0, priority=0, classSortOrder=20,
         ...           isNotGrace=1, insertIndex=323)
         >>> st.shortRepr()
         '1.0 <0.20.323>'
-        
+
         >>> st = sorting.SortTuple(atEnd=1, offset=1.0, priority=4, classSortOrder=7,
         ...           isNotGrace=0, insertIndex=200)
         >>> st.shortRepr()
@@ -165,7 +165,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
         reprParts.append(str(self.priority))
         reprParts.append('.')
         reprParts.append(str(self.classSortOrder))
-        
+
         if self.isNotGrace == 0:
             reprParts.append('.[Grace]')
         reprParts.append('.')
@@ -191,10 +191,10 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
         'End <0.20.[Grace].32>'
 
         The original tuple is never modified (hence tuple):
-        
+
         >>> st.offset
         1.0
-        
+
         Changing offset, but nothing else, helps in creating .flat positions.
         '''
         outList = []
@@ -204,10 +204,10 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
 
     def add(self, other):
         '''
-        Add all attributes from one sortTuple to another, 
+        Add all attributes from one sortTuple to another,
         returning a new one.
-        
-        
+
+
         >>> n = note.Note()
         >>> n.offset = 10
         >>> s = stream.Stream()
@@ -218,7 +218,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
         SortTuple(atEnd=0, offset=10.0, priority=0, classSortOrder=-20, isNotGrace=1, insertIndex=0)
         >>> s.sortTuple().add(n.sortTuple())
         SortTuple(atEnd=0, offset=20.0, priority=0, classSortOrder=0, isNotGrace=1, insertIndex=0)
-        
+
         Note that atEnd and isNotGrace are equal to other's value. are upper bounded at 1 and
         take the maxValue of either.
         '''
@@ -233,7 +233,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
                 newValue = max(selfValue, otherValue)
             outList.append(newValue)
         return self.__class__(*tuple(outList))
-        
+
     def sub(self, other):
         '''
         Subtract all attributes from to another.  atEnd and isNotGrace take the min value of either.
@@ -248,7 +248,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
         SortTuple(atEnd=0, offset=10.0, priority=0, classSortOrder=-20, isNotGrace=1, insertIndex=0)
         >>> s.sortTuple().sub(n.sortTuple())
         SortTuple(atEnd=0, offset=0.0, priority=0, classSortOrder=-40, isNotGrace=1, insertIndex=0)
-        
+
         Note that atEnd and isNotGrace are lower bounded at 0.
 
         '''

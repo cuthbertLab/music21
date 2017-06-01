@@ -11,14 +11,14 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
-Object definitions for graphing and plotting :class:`~music21.stream.Stream` objects. 
+Object definitions for graphing and plotting :class:`~music21.stream.Stream` objects.
 
-The :class:`~music21.graph.primitives.Graph` object subclasses primitive, abstract fundamental 
-graphing archetypes using the matplotlib library. The :class:`~music21.graph.plot.PlotStream` 
-object subclasses provide reusable approaches to graphing data and structures in 
+The :class:`~music21.graph.primitives.Graph` object subclasses primitive, abstract fundamental
+graphing archetypes using the matplotlib library. The :class:`~music21.graph.plot.PlotStream`
+object subclasses provide reusable approaches to graphing data and structures in
 :class:`~music21.stream.Stream` objects.
 
-The most common way of using plotting functions is to call `.plot()` on a Stream. 
+The most common way of using plotting functions is to call `.plot()` on a Stream.
 '''
 from __future__ import division, print_function, absolute_import
 
@@ -36,40 +36,40 @@ from music21.graph import utilities
 
 from music21 import environment
 _MOD = 'graph.py'
-environLocal = environment.Environment(_MOD)    
+environLocal = environment.Environment(_MOD)
 
 
 
-def plotStream(streamObj, 
-               graphFormat=None, 
-               xValue=None, 
-               yValue=None, 
-               zValue=None, 
+def plotStream(streamObj,
+               graphFormat=None,
+               xValue=None,
+               yValue=None,
+               zValue=None,
                **keywords):
     '''
     Given a stream and any keyword configuration arguments, create and display a plot.
 
     Note: plots require matplotib to be installed.
 
-    Plot methods can be specified as additional arguments or by keyword. 
-    Two keyword arguments can be given: `format` and `values`. 
-    If positional arguments are given, the first is taken as `format` 
-    and the rest are collected as `values`. If `format` is the class 
-    name, that class is collected. Additionally, every 
-    :class:`~music21.graph.PlotStream` subclass defines one `format` 
-    string and a list of `values` strings. The `format` parameter 
-    defines the type of Graph (e.g. scatter, histogram, colorGrid). The 
-    `values` list defines what values are graphed 
-    (e.g. quarterLength, pitch, pitchClass). 
+    Plot methods can be specified as additional arguments or by keyword.
+    Two keyword arguments can be given: `format` and `values`.
+    If positional arguments are given, the first is taken as `format`
+    and the rest are collected as `values`. If `format` is the class
+    name, that class is collected. Additionally, every
+    :class:`~music21.graph.PlotStream` subclass defines one `format`
+    string and a list of `values` strings. The `format` parameter
+    defines the type of Graph (e.g. scatter, histogram, colorGrid). The
+    `values` list defines what values are graphed
+    (e.g. quarterLength, pitch, pitchClass).
 
-    If a user provides a `format` and one or more `values` strings, a plot with 
-    the corresponding profile, if found, will be generated. If not, the first 
-    Plot to match any of the defined specifiers will be created. 
+    If a user provides a `format` and one or more `values` strings, a plot with
+    the corresponding profile, if found, will be generated. If not, the first
+    Plot to match any of the defined specifiers will be created.
 
-    In the case of :class:`~music21.graph.PlotWindowedAnalysis` subclasses, 
-    the :class:`~music21.analysis.discrete.DiscreteAnalysis` 
-    subclass :attr:`~music21.analysis.discrete.DiscreteAnalysis.indentifiers` list 
-    is added to the Plot's `values` list. 
+    In the case of :class:`~music21.graph.PlotWindowedAnalysis` subclasses,
+    the :class:`~music21.analysis.discrete.DiscreteAnalysis`
+    subclass :attr:`~music21.analysis.discrete.DiscreteAnalysis.indentifiers` list
+    is added to the Plot's `values` list.
 
     Available plots include the following:
 
@@ -90,7 +90,7 @@ def plotStream(streamObj,
     * :class:`~music21.graph.plot.WindowedAmbitus`
     * :class:`~music21.graph.plot.Dolan`
 
-    
+
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> s.plot('histogram', 'pitch', doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
@@ -124,14 +124,14 @@ def plotStream(streamObj,
                 setattr(obj, attrName, axisClass(obj, axisName))
         obj.run()
 
-        
+
 
 #-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
-   
+
     def runTest(self):
         pass
-   
+
     def testAll(self):
         from music21 import corpus, dynamics
         a = corpus.parse('bach/bwv57.8')
@@ -141,10 +141,10 @@ class TestExternal(unittest.TestCase):
 
 
 class Test(unittest.TestCase):
-   
+
     def runTest(self):
         pass
-   
+
 
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
@@ -192,23 +192,23 @@ class Test(unittest.TestCase):
         s.append(sc.getChord('f4', 'g5', quarterLength=3))
         s.append(sc.getChord('f4', 'g5', quarterLength=3))
         s.append(note.Note('c5', quarterLength=3))
-        
+
         for args in [
             ('histogram', 'pitch'),
-            ('histogram', 'pitchclass'), 
-            ('histogram', 'quarterlength'), 
-            ('scatter', 'pitch', 'quarterlength'), 
-            ('scatter', 'pitchspace', 'offset'), 
-            ('scatter', 'pitch', 'offset'), 
-            ('scatter', 'dynamics'), 
-            ('bar', 'pitch'), 
-            ('bar', 'pc'), 
-            ('weighted', 'pc', 'duration'), 
-            ('weighted', 'dynamics'), 
+            ('histogram', 'pitchclass'),
+            ('histogram', 'quarterlength'),
+            ('scatter', 'pitch', 'quarterlength'),
+            ('scatter', 'pitchspace', 'offset'),
+            ('scatter', 'pitch', 'offset'),
+            ('scatter', 'dynamics'),
+            ('bar', 'pitch'),
+            ('bar', 'pc'),
+            ('weighted', 'pc', 'duration'),
+            ('weighted', 'dynamics'),
                     ]:
             #s.plot(*args, doneAction='write')
             s.plot(*args, doneAction=None)
-        
+
 
     def testHorizontalInstrumentationB(self):
         from music21 import corpus, dynamics
@@ -229,7 +229,7 @@ _DOC_ORDER = [plotStream]
 #------------------------------------------------------------------------------
 
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     import music21
     music21.mainTest(Test) #, runTest='testPlot3DPitchSpaceQuarterLengthCount')
 

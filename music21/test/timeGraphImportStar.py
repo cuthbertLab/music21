@@ -13,17 +13,17 @@
 
 # script to create a graph to time how fast some things are happening...
 # generates pretty graphs showing what the bottlenecks in the system are, for helping to
-# improve them.  Requires pycallgraph (not included with music21).  
+# improve them.  Requires pycallgraph (not included with music21).
 
 import pycallgraph  # @UnresolvedImport @UnusedImport
 import pycallgraph.output # @UnresolvedImport
 import time
 
-# this class is duplicated from common.py in order to avoid 
+# this class is duplicated from common.py in order to avoid
 # import the module for clean testing
 class Timer(object):
     """An object for timing."""
-        
+
     def __init__(self):
         # start on init
         self._tStart = time.time()
@@ -35,7 +35,7 @@ class Timer(object):
         self._tStart = time.time()
         self._tStop = None # show that a new run has started so __call__ works
         self._tDif = 0
-    
+
     def stop(self):
         self._tStop = time.time()
         self._tDif = self._tStop - self._tStart
@@ -53,7 +53,7 @@ class Timer(object):
             t = time.time() - self._tStart
         else:
             t = self._tDif
-        return t 
+        return t
 
     def __str__(self):
         if self._tStop == None: # if not stoped yet
@@ -71,7 +71,7 @@ class CallTest(object):
     def __init__(self):
         '''Perform setup routines for tests
         '''
-        pass 
+        pass
 
     def testFocus(self):
         '''Calls to be timed
@@ -95,7 +95,7 @@ class CallGraph:
         self.includeList = ['music21.*']
         self.excludeList = ['pycallgraph.*']
         self.excludeList += ['re.*', 'sre_*']
-        
+
         # only test our own code for now
         self.excludeList += ['*xlrd*', 'matplotlib*', 'scipy*', 'numpy*']
 
@@ -106,7 +106,7 @@ class CallGraph:
         self.excludeList += ['zipfile*', 'io.*', 'collections.*', 'tempfile.*', 'urllib.*', 'StringIO*']
         self.excludeList += ['csv.*', 'json.*', 'os.*', 'distutils.*', 'ctypes*']
         self.excludeList += ['FileDialog.*', 'Tk*', 'PIL*', 'tk*', 'pillow*']
-        
+
         # these have been shown to be very fast
         self.excludeList += ['xml.dom.*', 'xml.sax.*', 'codecs.*', 'io.*']
         #self.excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
@@ -114,7 +114,7 @@ class CallGraph:
         # these cloud up the graph... should be tested, but removed when you want to see
         # what is up
         self.excludeList += ['music21.articulations.*',
-                             'music21.instrument.*', 
+                             'music21.instrument.*',
                              'music21.musicxml.*',
                              'music21.romanText.base.*',
                              'music21.clef.*',
@@ -125,12 +125,12 @@ class CallGraph:
 
         self.callTest = TestImportStar
 
-        # common to all call tests. 
+        # common to all call tests.
         if hasattr(self.callTest, 'includeList'):
             self.includeList = self.callTest.includeList
 
     def run(self, runWithEnviron=False):
-        '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 
+        '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__().
         '''
         suffix = '.png' # '.svg' no reader for now...
         fmt = suffix[1:]
@@ -149,24 +149,24 @@ class CallGraph:
                 platform = 'win'
             else:
                 platform = 'other'
-            
+
             tempdir = os.path.join(tempfile.gettempdir(), 'music21')
             if platform != 'win':
                 fd, fp = tempfile.mkstemp(dir=tempdir, suffix=suffix)
                 if isinstance(fd, int):
                 # on MacOS, fd returns an int, like 3, when this is called
-                # in some context (specifically, programmatically in a 
+                # in some context (specifically, programmatically in a
                 # TestExternal class. the fp is still valid and works
                 # TODO: this did not work on MacOS 10.6.8 w/ py 2.7
                     pass
                 else:
-                    fd.close() 
+                    fd.close()
             else:
                 tf = tempfile.NamedTemporaryFile(dir=tempdir, suffix=suffix)
                 fp = tf.name
                 tf.close()
 
- 
+
         if self.includeList is not None:
             gf = pycallgraph.GlobbingFilter(include=self.includeList, exclude=self.excludeList)
         else:

@@ -17,7 +17,7 @@ filtered.  Filters are used by methods on streams such as
 :meth:`~music21.stream.Stream.getElementsByClass` to filter elements by classes.
 '''
 
-#import inspect 
+#import inspect
 import unittest
 from music21 import common
 from music21.common import opFrac
@@ -28,35 +28,35 @@ class StreamFilter(object):
     '''
     A filter is an object that when called returns True or False
     about whether an element in the stream matches the filter.
-    
+
     A lambda expression: `lambda el, iterator: True if EXP else False` can also be
-    used as a very simple filter. 
-    
+    used as a very simple filter.
+
     Filters can also raise StopIteration if no other elements in this Stream
     can possibly fit.
-    
+
     The `StreamFilter` object does nothing in itself but subclasses are crucial
     in filtering out elements according to different properties.
-    
+
     Each subclass of `StreamFilter` should set its `.derivationStr` which is
     a string that determines which a derived Stream based on this filter should be called
-    
+
     >>> sf = stream.filters.StreamFilter()
     >>> sf
     <music21.stream.filters.StreamFilter object at 0x1051de828>
     >>> sf.derivationStr
     'streamFilter'
-    
+
     StreamFilters also have these two properties which help in certain debug operations
-    
-    >>> 'StreamFilter' in sf.classSet    
+
+    >>> 'StreamFilter' in sf.classSet
     True
     >>> sf.classes
     ('StreamFilter', 'object')
-    
+
     '''
     derivationStr = 'streamFilter'
-    
+
     def __init__(self):
         pass # store streamIterator?
 
@@ -76,13 +76,13 @@ class StreamFilter(object):
     @property
     def classes(self):
         return tuple([x.__name__ for x in self.__class__.mro()])
-    
-    
+
+
     def _reprHead(self):
         '''
         returns a head that can be used with .format() to add additional
         elements.
-        
+
         >>> stream.filters.StreamFilter()._reprHead()
         '<music21.stream.filters.StreamFilter {0}>'
         '''
@@ -90,11 +90,11 @@ class StreamFilter(object):
 
     def __call__(self, item, iterator):
         return True
-    
+
 class IsFilter(StreamFilter):
     '''
     filter on items where x IS y
-    
+
     >>> s = stream.Stream()
     >>> s.insert(0, key.KeySignature(-3))
     >>> n = note.Note('C#')
@@ -107,13 +107,13 @@ class IsFilter(StreamFilter):
     (<music21.note.Note C#>,)
     >>> isFilter.numToFind
     1
-    
+
     `.numToFind` is used so that once all elements are found, the iterator can short circuit.
-    
-    
+
+
     >>> for el in s.iter.addFilter(isFilter):
     ...     print(el is n)
-    True    
+    True
 
     Multiple elements can also be passed into the isFilter:
 
@@ -126,7 +126,7 @@ class IsFilter(StreamFilter):
     >>> isFilter2 = stream.filters.IsFilter([n, r])
     >>> isFilter2.numToFind
     2
-    
+
     >>> for el in s.iter.addFilter(isFilter2):
     ...     print(el)
     <music21.note.Note C#>
@@ -134,7 +134,7 @@ class IsFilter(StreamFilter):
 
     '''
     derivationStr = 'is'
-    
+
     def __init__(self, target=()):
         super(IsFilter, self).__init__()
         if not common.isListLike(target):
@@ -142,14 +142,14 @@ class IsFilter(StreamFilter):
 
         self.target = target
         self.numToFind = len(target)
-    
+
     def reset(self):
         self.numToFind = len(self.target)
-        
+
     def __call__(self, item, iterator):
-        if self.numToFind == 0: # short circuit -- we already have 
+        if self.numToFind == 0: # short circuit -- we already have
             raise StopIteration
-        
+
         if item in self.target:
             # would popping the item be faster? No: then can't use for IsNotFilter
             self.numToFind -= 1
@@ -160,7 +160,7 @@ class IsFilter(StreamFilter):
 class IsNotFilter(IsFilter):
     '''
     Filter out everything but an item or list of items:
-    
+
     >>> s = stream.Stream()
     >>> s.insert(0, key.KeySignature(-3))
     >>> n = note.Note('C#')
@@ -168,14 +168,14 @@ class IsNotFilter(IsFilter):
     >>> s.append(note.Rest())
     >>> for el in s.iter.addFilter(stream.filters.IsNotFilter(n)):
     ...     el
-    <music21.key.KeySignature of 3 flats>    
+    <music21.key.KeySignature of 3 flats>
     <music21.note.Rest rest>
 
     test that resetting works...
 
     >>> for el in s.iter.addFilter(stream.filters.IsNotFilter(n)):
     ...     el
-    <music21.key.KeySignature of 3 flats>    
+    <music21.key.KeySignature of 3 flats>
     <music21.note.Rest rest>
 
 
@@ -208,9 +208,9 @@ class IdFilter(StreamFilter):
     '''
     filters on ids. used by stream.getElementById.
     No corresponding iterator call.
-    
+
     Only a single Id can be passed in.  Always returns a single item.
-    
+
     '''
     derivationStr = 'getElementById'
 
@@ -221,7 +221,7 @@ class IdFilter(StreamFilter):
         except AttributeError: # not a string
             searchIdLower = searchId
         self.searchId = searchIdLower
-    
+
     def __call__(self, item, iterator):
         if item.id == self.searchId:
             return True
@@ -234,9 +234,9 @@ class IdFilter(StreamFilter):
 
 class ClassFilter(StreamFilter):
     '''
-    ClassFilter is used by .getElementsByClass() to 
+    ClassFilter is used by .getElementsByClass() to
     find elements belonging to a class or a list of classes.
-    
+
     >>> s = stream.Stream()
     >>> s.append(note.Note('C'))
     >>> s.append(note.Rest())
@@ -253,13 +253,13 @@ class ClassFilter(StreamFilter):
     >>> sI.filters.append(stream.filters.ClassFilter('Note'))
     >>> sI.filters
     [<music21.stream.filters.ClassFilter Note>]
-    
+
     >>> for x in sI:
     ...     print(x)
     <music21.note.Note C>
     <music21.note.Note D>
-    
-    ''' 
+
+    '''
     derivationStr = 'getElementsByClass'
 
     def __init__(self, classList=()):
@@ -267,9 +267,9 @@ class ClassFilter(StreamFilter):
 
         if not common.isListLike(classList):
             classList = (classList,)
-            
+
         self.classList = classList
-        
+
     def __eq__(self, other):
         if other.__class__ is not self.__class__:
             return False
@@ -300,7 +300,7 @@ class ClassNotFilter(ClassFilter):
     >>> sI.filters.append(stream.filters.ClassNotFilter('Note'))
     >>> sI.filters
     [<music21.stream.filters.ClassNotFilter Note>]
-    
+
     >>> for x in sI:
     ...     print(x)
     <music21.note.Rest rest>
@@ -327,7 +327,7 @@ class GroupFilter(StreamFilter):
     >>> s1.append(n2)
     >>> s1.append(n3)
     >>> GF = stream.filters.GroupFilter
-    
+
     >>> for thisNote in iter(s1).addFilter(GF("trombone")):
     ...     print(thisNote.name)
     C
@@ -339,7 +339,7 @@ class GroupFilter(StreamFilter):
 
     '''
     derivationStr = 'getElementsByGroup'
-    
+
     def __init__(self, groupFilterList=()):
         super(GroupFilter, self).__init__()
 
@@ -348,7 +348,7 @@ class GroupFilter(StreamFilter):
         self.groupFilterList = groupFilterList
 
     def __call__(self, item, iterator):
-        eGroups = item.groups 
+        eGroups = item.groups
         for groupName in self.groupFilterList:
             if groupName in eGroups:
                 return True
@@ -357,11 +357,11 @@ class GroupFilter(StreamFilter):
 class OffsetFilter(StreamFilter):
     '''
     see iterator.getElementsByOffset()
-    
+
     Finds elements that match a given offset range.
     '''
     derivationStr = 'getElementsByOffset'
-    
+
     def __init__(self, offsetStart=0.0, offsetEnd=None,
                     includeEndBoundary=True, mustFinishInSpan=False,
                     mustBeginInSpan=True, includeElementsThatEndAtStart=True):
@@ -390,7 +390,7 @@ class OffsetFilter(StreamFilter):
         if s is e:
             return False
         offset = s.elementOffset(e)
-        
+
         #offset = common.cleanupFloat(offset)
 
         if offset > self.offsetEnd:  # anything that ends after the span is definitely out
@@ -402,7 +402,7 @@ class OffsetFilter(StreamFilter):
                 return False
 
         elementEnd = opFrac(offset + dur.quarterLength)
-        if elementEnd < self.offsetStart:  
+        if elementEnd < self.offsetStart:
             # anything that finishes before the span ends is definitely out
             return False
 
@@ -412,7 +412,7 @@ class OffsetFilter(StreamFilter):
             elementIsZeroLength = False
 
 
-        # all the simple cases done! Now need to filter out those that 
+        # all the simple cases done! Now need to filter out those that
         # are border cases depending on settings
 
         if self.zeroLengthSearch is True and elementIsZeroLength is True:
@@ -425,7 +425,7 @@ class OffsetFilter(StreamFilter):
                 #environLocal.warn([elementEnd, offsetEnd, e])
                 return False
             if self.includeEndBoundary is False:
-                # we include the end boundary if the search is zeroLength -- 
+                # we include the end boundary if the search is zeroLength --
                 # otherwise nothing can be retrieved
                 if elementEnd == self.offsetEnd:
                     return False

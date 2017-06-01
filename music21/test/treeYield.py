@@ -19,7 +19,7 @@ class TreeYielder(object):
         `yieldValue` should be a lambda function that
         returns True/False or a function/method call that
         will be passed the value of a current attribute
-        '''        
+        '''
         self.currentStack = []
         self.memo = None
         self.yieldValue = yieldValue
@@ -95,7 +95,7 @@ class TreeYielder(object):
                         yield z
                 except RuntimeError:
                     raise Exception("Maximum recursion on:\n%s" % self.currentLevel())
-                self.stackVals.pop()                
+                self.stackVals.pop()
 
         self.currentStack.pop()
 
@@ -116,8 +116,8 @@ class TreeYielder(object):
             else:
                 raise Exception("Cannot get attribute of type %s" % stackType)
         return currentStr
-    
-    
+
+
 def testCode():
     class Mock(object):
         def __init__(self, mockThing, embedMock = True):
@@ -127,13 +127,13 @@ def testCode():
             self.embeddedMock = None
             if embedMock is True:
                 self.embeddedMock = Mock(mockThing, embedMock = False)
-    
+
     mockType = lambda x: x.__class__.__name__ == 'Mock'
-    
+
     subList = [100, 60, -2]
     myList = [5, 20, [5, 12, 17], 30, {'hello': 10, 'goodbye': 22, 'mock': Mock(subList)}, -20, Mock(subList)]
     myList.append(myList)
-    
+
     ty = TreeYielder(mockType)
     for val in ty.run(myList):
         print(val, ty.currentLevel())
@@ -170,4 +170,4 @@ if __name__ == "__main__":
     pass
     #testCode()
     testMIDIParse()
-    
+

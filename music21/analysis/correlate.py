@@ -41,17 +41,17 @@ class CorrelateException(exceptions21.Music21Exception):
 class ActivityMatch(object):
     '''Given a Stream, find if one object is active while another is also active.
 
-    Plotting routines to graph the output of dedicated methods in this class are available. 
+    Plotting routines to graph the output of dedicated methods in this class are available.
 
-    :class:`~music21.graph.PlotScatterPitchSpaceDynamicSymbol` and 
-    :class:`~music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol` 
-    employs the :meth:`~music21.analysis.correlate.ActivityMatch.pitchToDynamic` method. 
-    
+    :class:`~music21.graph.PlotScatterPitchSpaceDynamicSymbol` and
+    :class:`~music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol`
+    employs the :meth:`~music21.analysis.correlate.ActivityMatch.pitchToDynamic` method.
+
     Sample output is as follows:
 
     .. image:: images/PlotScatterWeightedPitchSpaceDynamicSymbol.*
         :width: 600
-    
+
     '''
 
     def __init__(self, streamObj):
@@ -67,7 +67,7 @@ class ActivityMatch(object):
         returns an ordered list of dictionaries, in the form
         {'src': obj, 'dst': [objs]}
 
-        '''        
+        '''
         if objNameSrc is None:
             objNameSrc = (note.Note, chord.Chord)
         if objNameDst is None:
@@ -93,11 +93,11 @@ class ActivityMatch(object):
 
             for entry in post:
                 # here, we are only looking if start times match
-                if (entry['src'].offset >= dstStart 
+                if (entry['src'].offset >= dstStart
                         and entry['src'].offset <= dstEnd):
                     # this is match; add a reference to the element
-                    entry['dst'].append(element)            
-                
+                    entry['dst'].append(element)
+
         self.data = post
         #environLocal.printDebug(['_findActive', self.data])
         return self.data
@@ -107,8 +107,8 @@ class ActivityMatch(object):
         '''
         Create an analysis of pitch to dynamic symbol.
 
-        If `dataPoints` is True, all data matches between source and destination are returned. 
-        If False, 3 point weighted coordinates are created for each unique match. 
+        If `dataPoints` is True, all data matches between source and destination are returned.
+        If False, 3 point weighted coordinates are created for each unique match.
 
         No dynamics here.
 
@@ -116,7 +116,7 @@ class ActivityMatch(object):
         >>> am = analysis.correlate.ActivityMatch(s.parts[0].flat)
         >>> am.pitchToDynamic()
         Traceback (most recent call last):
-        CorrelateException: cannot create correlation an object that is not found in the 
+        CorrelateException: cannot create correlation an object that is not found in the
         Stream: <class 'music21.dynamics.Dynamic'>
 
         Many dynamics
@@ -154,7 +154,7 @@ class ActivityMatch(object):
             #if hasattr(entrySrc, 'pitches'): # a chord
             if entrySrc.isChord:
                 sub = [n for n in entrySrc]
-            else:   
+            else:
                 sub = [entrySrc]
 
             for entrySrc in sub:
@@ -172,7 +172,7 @@ class ActivityMatch(object):
 
         # find unique coords and count instances
         dictionary = OrderedDict()
-        for coord in pairs: 
+        for coord in pairs:
             if coord not in dictionary:
                 dictionary[coord] = 0
             dictionary[coord] += 1

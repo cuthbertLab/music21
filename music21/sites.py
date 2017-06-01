@@ -48,13 +48,13 @@ class SiteRef(common.SlottedObjectMixin):
     a single Site (stream, container, parent, reference, etc.) stored inside the Sites object.
 
     A very simple object.
-    
+
     This site would be stored in the .sites.siteDict for, say a note.Note, if it were in
     st at offset 20.0
-    
+
     >>> st = stream.Stream()
     >>> st.id = 'hi'
-    
+
     >>> s = sites.SiteRef()
     >>> s.classString = st.classes[0]
     >>> s.site = st
@@ -68,7 +68,7 @@ class SiteRef(common.SlottedObjectMixin):
     <music21.stream.Stream hi>
     >>> s.siteWeakref
     <weakref at 0x...; to 'Stream' at 0x...>
-    
+
 
     If you turn sites.WEAKREF_ACTIVE to False then .siteWeakref just stores another reference to
     the site.  Bad for memory. Good for debugging pickling.
@@ -90,13 +90,13 @@ class SiteRef(common.SlottedObjectMixin):
         self.globalSiteIndex = None
         self.siteIndex = None
         self.siteWeakref = None
-    
+
     def _getAndUnwrapSite(self):
         if WEAKREF_ACTIVE:
             return common.unwrapWeakref(self.siteWeakref)
         else:
             return self.siteWeakref
-    
+
     def _setAndWrapSite(self, site):
         if WEAKREF_ACTIVE:
             self.siteWeakref = common.wrapWeakref(site)
@@ -149,7 +149,7 @@ class Sites(common.SlottedObjectMixin):
 
     Most of these objects are locations (also called sites), or Streams that
     contain this object.
-    
+
     All defined contexts are stored as dictionaries in a dictionary. The
     outermost dictionary stores objects.
     '''
@@ -161,7 +161,7 @@ class Sites(common.SlottedObjectMixin):
         '_lastID',
         '_siteIndex',
         )
-    
+
     ### INITIALIZER ###
 
     def __init__(self):
@@ -171,7 +171,7 @@ class Sites(common.SlottedObjectMixin):
         # store an index of numbers for tagging the order of creation of defined contexts;
         # this is used to be able to discern the order of context as added
         self._siteIndex = 0
-        
+
         # cache for performance
         self._lastID = -1  # cannot be None
 
@@ -208,7 +208,7 @@ class Sites(common.SlottedObjectMixin):
         #copies; this functionality is used at times in context searches, but
         # may be a performance hog.
         new = self.__class__()
-        #environLocal.printDebug(['Sites.__deepcopy__', 
+        #environLocal.printDebug(['Sites.__deepcopy__',
         #    'self.siteDict.keys()', self.siteDict.keys()])
         for idKey in self.siteDict:
             if idKey is None:
@@ -253,11 +253,11 @@ class Sites(common.SlottedObjectMixin):
 
         '''
         return len(self.siteDict)
-    
+
     def __contains__(self, checkSite):
         '''
         returns True if checkSite in Sites.
-        
+
         >>> m1 = stream.Measure(number=1)
         >>> m2 = stream.Measure(number=2)
         >>> n = note.Note()
@@ -266,9 +266,9 @@ class Sites(common.SlottedObjectMixin):
         True
         >>> m2 in n.sites
         False
-        
+
         None is always in sites
-        
+
         >>> None in n.sites
         True
         '''
@@ -276,11 +276,11 @@ class Sites(common.SlottedObjectMixin):
             if siteRef.site is checkSite:
                 return True
         return False
-            
+
     def __iter__(self):
         '''
         Returns all non-None sites.  Order is oldest first.
-        
+
         >>> n = note.Note()
         >>> m = stream.Measure(number=1)
         >>> s = stream.Stream(id='thisStream')
@@ -333,7 +333,7 @@ class Sites(common.SlottedObjectMixin):
         called on stream.insert(n), etc.
 
         The `timeValue` argument is used to store the time as an int
-        (in milliseconds after Jan 1, 1970) when this object was added to locations. 
+        (in milliseconds after Jan 1, 1970) when this object was added to locations.
         If set to `None`, then the current time is used.
 
         `idKey` stores the id() of the obj.  If `None`, then id(obj) is used.
@@ -375,7 +375,7 @@ class Sites(common.SlottedObjectMixin):
             #if obj is not None and id(obj) != idKey:
             #    print("RED ALERT!")
             siteRef = self.siteDict[idKey]
-            siteRef.isDead = False  # in case it used to be a dead site...            
+            siteRef.isDead = False  # in case it used to be a dead site...
         else:
             siteRef = SiteRef()
             #if id(obj) != idKey and obj is not None:
@@ -400,22 +400,22 @@ class Sites(common.SlottedObjectMixin):
         self.siteDict = collections.OrderedDict([(None, _NoneSiteRef),])
         self._lastID = -1  # cannot be None
 
-    def yieldSites(self, 
-                   sortByCreationTime=False, 
+    def yieldSites(self,
+                   sortByCreationTime=False,
                    priorityTarget=None,
                    excludeNone=False):
         '''
-        Yield references; order, based on dictionary keys, is from most 
+        Yield references; order, based on dictionary keys, is from most
         recently added to least recently added.
-        
+
         The `sortByCreationTime` option will sort objects by creation time,
-        where most-recently assigned objects are returned first. 
+        where most-recently assigned objects are returned first.
         Can be [False, other], [True, 1] or ['reverse', -1]
-        
+
         Note that priorityTarget is searched only on id -- this could be dangerous if the
         target has been garbage collected and the id is reused. Unlikely since you gotta
         pass in the priorityTarget itself so therefore it still exists...
-        
+
         This can be much faster than .get in the case where the sought-for site
         is earlier in the list.
 
@@ -427,35 +427,35 @@ class Sites(common.SlottedObjectMixin):
         >>> bObj = Mock('b')
         >>> cObj = Mock('c')
         >>> aSites = sites.Sites()
-        >>> aSites.add(cObj) 
+        >>> aSites.add(cObj)
         >>> aSites.add(aObj)
         >>> aSites.add(bObj)
-        
-        Returns a generator (The ellipsis in the repr here is 
+
+        Returns a generator (The ellipsis in the repr here is
         because Python 3.5 gives a fully qualified name to a generator object):
 
-        
+
         >>> ys = aSites.yieldSites()
         >>> ys
-        <generator object ...yieldSites at 0x1058085e8>        
-        
+        <generator object ...yieldSites at 0x1058085e8>
+
         That's no help, so iterate over it instead...
-        
+
         >>> for s in aSites.yieldSites(sortByCreationTime=True, excludeNone=True):
         ...     print(s.id)
         b
         a
         c
-        
+
         With priorityTarget
-        
-        >>> for s in aSites.yieldSites(sortByCreationTime=True, priorityTarget=cObj, 
+
+        >>> for s in aSites.yieldSites(sortByCreationTime=True, priorityTarget=cObj,
         ...                            excludeNone=True):
         ...     print(s.id)
         c
         b
         a
-        
+
         *changed drammatically from the unused version in v.3*
         '''
         if sortByCreationTime is True:
@@ -472,7 +472,7 @@ class Sites(common.SlottedObjectMixin):
                 #environLocal.printDebug(['priorityTarget found in post:', priorityTarget])
                 # extract object and make first
                 keyRepository.insert(0, keyRepository.pop(keyRepository.index(priorityId)))
-            
+
 
         # get each dict from all defined contexts
         for key in keyRepository:
@@ -489,16 +489,16 @@ class Sites(common.SlottedObjectMixin):
                     yield obj
 
 
-    def get(self, 
+    def get(self,
             sortByCreationTime=False,
-            priorityTarget=None, 
+            priorityTarget=None,
             excludeNone=False):
         '''
-        Get references; order, based on dictionary keys, is from most 
+        Get references; order, based on dictionary keys, is from most
         recently added to least recently added.
 
         The `sortByCreationTime` option will sort objects by creation time,
-        where most-recently assigned objects are returned first. 
+        where most-recently assigned objects are returned first.
         Can be [False, other], [True, 1] or ['reverse', -1]
 
         If `priorityTarget` is defined, this object will be placed first in the list of objects.
@@ -510,12 +510,12 @@ class Sites(common.SlottedObjectMixin):
         >>> bObj = Mock()
         >>> cObj = Mock()
         >>> aSites = sites.Sites()
-        >>> aSites.add(cObj) 
+        >>> aSites.add(cObj)
         >>> aSites.add(aObj)
         >>> aSites.add(bObj)
-        
+
         Arbitrary order...
-        
+
         >>> set(aSites.get()) == set([None, cObj, aObj, bObj])
         True
 
@@ -526,7 +526,7 @@ class Sites(common.SlottedObjectMixin):
 
         Priority target
 
-        >>> begotten = aSites.get(sortByCreationTime=True, priorityTarget=cObj, excludeNone=True) 
+        >>> begotten = aSites.get(sortByCreationTime=True, priorityTarget=cObj, excludeNone=True)
         >>> begotten == [cObj, bObj, aObj]
         True
 
@@ -547,7 +547,7 @@ class Sites(common.SlottedObjectMixin):
         '''
         Given an attribute name, search all objects and find the first that
         matches this attribute name; then return a reference to this attribute.
-        
+
         Works in reverse order, so most recent site is returned first.
 
         >>> class Mock(base.Music21Object):
@@ -573,7 +573,7 @@ class Sites(common.SlottedObjectMixin):
         True
 
         An incorrect attribute name will just give none:
-        
+
         >>> aSites.getAttrByName('blah') is None
         True
 
@@ -589,14 +589,14 @@ class Sites(common.SlottedObjectMixin):
                 pass
 
     def getObjByClass(self, className, callerFirst=None,
-             sortByCreationTime=False, 
+             sortByCreationTime=False,
              priorityTarget=None, getElementMethod='getElementAtOrBefore',
              memo=None):
         '''
         Return the most recently added reference based on className.  Class
         name can be a string or the class name.
 
-        This will recursively search the sitesDicts of objects in Site objects in 
+        This will recursively search the sitesDicts of objects in Site objects in
         the siteDict.
 
         The `callerFirst` parameters is simply used to pass a reference of the
@@ -621,7 +621,7 @@ class Sites(common.SlottedObjectMixin):
         >>> # we get the most recently added object first
         >>> aSites.getObjByClass('Mock', sortByCreationTime=True) == bObj
         True
-        
+
         >>> aSites.getObjByClass(Mock, sortByCreationTime=True) == bObj
         True
 
@@ -667,7 +667,7 @@ class Sites(common.SlottedObjectMixin):
         for obj in objs:
             #if DEBUG_CONTEXT: print('\tY: getObjByClass: iterating objs:', id(obj), obj)
             if (classNameIsStr and obj.isFlat):
-                #if DEBUG_CONTEXT: 
+                #if DEBUG_CONTEXT:
                 #    print('\tY: skipping flat stream that does not contain object:', id(obj), obj)
                 #environLocal.printDebug(
                 #    ['\tY: skipping flat stream that does not contain object:'])
@@ -696,7 +696,7 @@ class Sites(common.SlottedObjectMixin):
         '''
         Return the object specified by an id.
         Used for testing and debugging.  Should NOT be used in production code.
-        
+
         >>> a = note.Note()
         >>> s = stream.Stream()
         >>> s.append(a)
@@ -710,7 +710,7 @@ class Sites(common.SlottedObjectMixin):
         '''
         Return the number of non-dead sites, excluding the None site.  This does not
         unwrap weakrefs for performance.
-        
+
         >>> a = note.Note()
         >>> a.sites.getSiteCount()
         0
@@ -750,7 +750,7 @@ class Sites(common.SlottedObjectMixin):
 
     def getSitesByClass(self, className):
         '''
-        Return a list of unwrapped site from siteDict.site [SiteRef.site] (generally a Stream) 
+        Return a list of unwrapped site from siteDict.site [SiteRef.site] (generally a Stream)
         that matches the provided class.
 
         Input can be either a Class object or a string
@@ -802,11 +802,11 @@ class Sites(common.SlottedObjectMixin):
         True
         >>> dc.hasSiteId(id(bSite))
         False
-        
+
         Note that we use "None" not id(None) as a key:
-        
+
         >>> dc.hasSiteId(id(None))
-        False        
+        False
         >>> dc.hasSiteId(None)
         True
         '''
@@ -856,10 +856,10 @@ class Sites(common.SlottedObjectMixin):
         >>> mySites.add(aStream)
         >>> mySites.add(bStream)
         >>> del aStream
-        
-        We still have 3 locations -- just because aStream is gone, doesn't 
+
+        We still have 3 locations -- just because aStream is gone, doesn't
         make it disappear from sites
-        
+
         >>> len(mySites)
         3
 
@@ -887,7 +887,7 @@ class Sites(common.SlottedObjectMixin):
             siteRef = self.siteDict[idKey]
             if siteRef.isDead:
                 remove.append(idKey)
-                
+
         for idKey in remove:
             # this call changes the .siteDict, and thus must be
             # outside the loop
@@ -933,7 +933,7 @@ class Sites(common.SlottedObjectMixin):
         >>> aSites.remove(aSite)
         >>> len(aSites)
         3
-        
+
         '''
         # must clear
         self._lastID = -1  # cannot be None
@@ -943,10 +943,10 @@ class Sites(common.SlottedObjectMixin):
             siteId = id(site)
         try:
             del self.siteDict[siteId]
-            #environLocal.printDebug(['removed site w/o exception:', siteId, 
+            #environLocal.printDebug(['removed site w/o exception:', siteId,
             #    'self.siteDict.keys()', self.siteDict.keys()])
         except:
-            raise SitesException('an entry for this object ' + 
+            raise SitesException('an entry for this object ' +
                                  '(%s) is not stored in this Sites object' % site)
 
     def removeById(self, idKey):
@@ -960,7 +960,7 @@ class Sites(common.SlottedObjectMixin):
         if idKey is None:
             raise SitesException('trying to remove None idKey is not allowed')
 
-        #environLocal.printDebug(['removeById', idKey, 
+        #environLocal.printDebug(['removeById', idKey,
         #    'self.siteDict.keys()', self.siteDict.keys()])
         try:
             del self.siteDict[idKey]
@@ -1008,10 +1008,10 @@ class Test(unittest.TestCase):
 
         n2 = note.Note()
         n2.sites.add(m)
-        
+
         c = clef.Clef()
         c.sites.add(n)
-        
+
         self.assertEqual(n2.sites.getAttrByName('number'), 34)
         c.sites.setAttrByName('lyric', n2.sites.getAttrByName('number'))
         # converted to a string now
