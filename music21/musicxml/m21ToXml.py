@@ -420,7 +420,7 @@ class GeneralObjectExporter():
             st2 = stream.Part()
             st2.mergeAttributes(st)
             st2.elements = copy.deepcopy(st)
-            if not st.getElementsByClass('Clef'):
+            if not st.getElementsByClass('Clef').getElementsByOffset(0.0):
                 st2.clef = st2.bestClef()
             st2.makeNotation(inPlace=True)
             st2.metadata = copy.deepcopy(getMetadataFromContext(st))
