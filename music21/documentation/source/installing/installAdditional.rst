@@ -1,7 +1,7 @@
 .. _installAdditional:
 
 
-Extending Music21 with Additional Software
+Extending `music21` with Additional Software
 =======================================================
 
 
@@ -11,18 +11,14 @@ Installing Additional Python Modules
 `Music21` can do more things, such as plotting graphs, if you
 install additional Python libraries. 
 
-The following topics cover additional software used by music21.
+The following topics cover additional software used by `music21`.
 For each library, visit the websites listed below, download the
 additional python libraries, and install them just as you did with
-music21 above.  If you don't feel like installing them now, no worries:
+`music21` above.  If you don't feel like installing them now, no worries:
 you can always install them later.
 
-It's best not to install these until you have music21 working without
+It's best not to install these until you have `music21` working without
 the external modules.
-
-Note that on the Mac if you're using Python 2.7 (installed with recent operating
-systems), it comes with Matplotlib and its dependencies, so unless you need
-pyaudio or pillow/PIL, you're all set.  It's a little bit harder on 
 
 
 Matplotlib
@@ -118,9 +114,9 @@ of pillow.
 Installing Additional Software Components
 -----------------------------------------------
 
-Additional functionality of Music21 is available with the 
+Additional functionality of `music21` is available with the 
 installation of numerous helper applications. While not essential 
-for all applications, these tools will aid in working with Music21.
+for all applications, these tools will aid in working with `music21`.
 
 
 
@@ -130,9 +126,9 @@ MuseScore
 MuseScore offers a free, full-featured, cross-platform (Windows, Mac OS, Ubuntu,
 Debian, and Fedora) application for viewing and editing music notation. 
 MuseScore can import and export MusicXML, and provides an excellent way to view, 
-edit, and export musical data for working in music21. 
-Use of MuseScore (version 2 or higher) 
-is highly recommended for working with music21. 
+edit, and export musical data for working in `music21`. 
+Downloading MuseScore (version 2 or higher) 
+is highly recommended for working with `music21`. 
 
 http://www.musescore.org
 
@@ -142,11 +138,11 @@ Finale or Finale NotePad
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Finale is one of the industry leaders in creating musical scores.  It
-can import MusicXML that music21 generates and let you see, edit, or print
+can import MusicXML that `music21` generates and let you see, edit, or print
 these scores for your own use.  There is also a free version of Finale,
 Finale NotePad that can load MusicXML files but cannot edit all aspects of them.  
 NotePad is available for Windows and Mac OS computers. Use of Finale or Finale NotePad 
-is recommended for working with music21. 
+is recommended for working with `music21`. 
 
 http://www.finalemusic.com/products/finale-notepad/
 
@@ -165,7 +161,7 @@ Lilypond
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Lilypond is a free, open-source music display program that can produce
-beautiful scores.  Music21 can generate PDF or PNG (like JPG) files 
+beautiful scores.  `Music21` can generate PDF or PNG (like JPG) files 
 automatically if Lilypond is installed on your system.  Download it at:
 
 http://lilypond.org/
@@ -177,8 +173,7 @@ Eclipse is a free, open-source integrated development environment (IDE),
 essentially a program that makes writing (and finding bugs in) other 
 programs much easier.  Eclipse is set up primarily for editing in Java,
 but the add-in PyDev makes it extremely powerful for creating Python scripts
-as well.  In addition, the SVN features of Eclipse let you stay updated
-with the latest versions of music21.  Eclipse + PyDev + Git is the
-only supported method for developers to contribute to music21.  
+as well.  Eclipse + PyDev + Git is the
+only supported method for developers to get help in contributing to `music21`.  
 
 Details are at :ref:`usingGit`

@@ -1,5 +1,5 @@
-About Music21
-=============
+About `music21`
+===============
 
 .. toctree::
    :maxdepth: 1

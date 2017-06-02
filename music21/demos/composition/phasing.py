@@ -210,9 +210,8 @@ def pendulumMusic(show = True,
                 parts[active].insert(jQuant, c)
             else:
                 c = establishedChords[0]
-                pitches = c.pitches
-                pitches.append(p)
-                c.pitches = pitches
+                c.append(p)
+                
             j += loopLength/(maxNotesPerLoop - totalParts + i)
             #j += (8+(8-i))/8.0
         p = octo.next(p, stepSize = scaleStepSize)

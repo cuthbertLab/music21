@@ -3098,7 +3098,7 @@ class MeasureExporter(XMLExporterBase):
         >>> b = pitch.Pitch('A-2')
         >>> c = pitch.Pitch('D3')
         >>> d = pitch.Pitch('E4')
-        >>> e = [b,c,d]
+        >>> e = [b, c, d]
         >>> ch.pitches = e
 
         >>> len(ch.pitches)

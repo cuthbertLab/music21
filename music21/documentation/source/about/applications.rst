@@ -1,7 +1,7 @@
 .. _applications:
 
 
-Applications and Extensions of music21
+Applications and Extensions of `music21`
 =============================================
 
 `Music21` has been used in numerous research tasks already, and will continue 

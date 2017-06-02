@@ -1,22 +1,22 @@
 .. _usingGit:
 
-Using music21 with Git for Eclipse
+Using `music21` with Git for Eclipse
 ==================================
 
-Music21 stores its master code base in the Git code format at the GitHub
+`Music21` stores its master code base in the Git code format at the GitHub
 website (`https://github.com/cuthbertLab/music21 <https://github.com/cuthbertLab/music21>`_ ).
-In order to have the latest, unreleased, versions of music21, which often incorporate new
+In order to have the latest, unreleased, versions of `music21`, which often incorporate new
 bug fixes, users will need to be familiar with Git.
 
-Developers of music21 who want access to support or committing to the code base need to
+Developers of `music21` who want access to support or committing to the code base need to
 use the IDE called Eclipse, which allows for easy debugging and enforcing of coding standards
 such as consistent whitespace, no unused variable names, and simple error catching. Thus, while
-Eclipse is not strictly necessary to editing the Python files that make up music21, it is the
+Eclipse is not strictly necessary to editing the Python files that make up `music21`, it is the
 only supported environment for receiving technical assistance. Thus students and others who
-wish to be part of the development team for music21 will need to follow the instructions below
+wish to be part of the development team for `music21` will need to follow the instructions below
 on using Git for Eclipse.
 
-**IMPORTANT: BEFORE BEGINNING, UNINSTALL ALL EXISTING VERSIONS OF MUSIC21.
+**IMPORTANT: BEFORE BEGINNING, UNINSTALL ALL EXISTING VERSIONS OF `music21`.
 ADDITIONAL VERSIONS OF MUSIC21 INSTALLED IN OTHER LOCATIONS CAN CAUSE DIRECTORY
 ROUTING PROBLEMS.**
 
@@ -87,7 +87,7 @@ Installing for GNU/Linux/FreeBSD/Unix
 You've chosen to run Unix -- you should be able to figure this out on your own.
 :-)  
 
-Because there are so many slightly incompatible flavors of UNIX, the music21 
+Because there are so many slightly incompatible flavors of UNIX, the `music21` 
 team provides free support for problems arising with Windows and Mac installations only;
 UNIX users have saved a few hundred dollars by running a free OS and can spend their
 savings on paid support. 
@@ -172,10 +172,10 @@ GitHub account, and click **Fork** in the upper right-hand corner of the page.
 
 ..  image:: images/usingGit/github__forking__01.png
 
-Cloning your music21 fork in Eclipse
+Cloning your `music21` fork in Eclipse
 ------------------------------------
 
-Once you've forked music21 on GitHub, you need to clone your fork locally to
+Once you've forked `music21` on GitHub, you need to clone your fork locally to
 your machine in order to start working.
 
 To start the cloning process, choose **Import...** from Eclipse's **File**
@@ -230,7 +230,7 @@ contextual menu that appears.
 
     ..  image:: images/usingGit/eclipse__clone__5__edited.png
 
-6.  Eclipse is now cloning your music21 fork! Sit tight: this will take a few
+6.  Eclipse is now cloning your `music21` fork! Sit tight: this will take a few
     minutes: 
 
     ..  image:: images/usingGit/eclipse__clone__6.png
@@ -256,11 +256,11 @@ contextual menu that appears.
     ..  image:: images/usingGit/eclipse__clone__8__edited.png
 
 
-Configuring your music21 project with PyDev
--------------------------------------------
+Configuring your `music21` project with PyDev
+---------------------------------------------
 
-You need to teach Eclipse that music21 should be considered a PyDev project. In
-the **Package Explorer** window, right-click on your music21 project and choose
+You need to teach Eclipse that `music21` should be considered a PyDev project. In
+the **Package Explorer** window, right-click on your `music21` project and choose
 **Set as PyDev Project** from the **PyDev** submenu:
 
 ..  image:: images/usingGit/eclipse__configure_pydev__1.png
@@ -268,19 +268,19 @@ the **Package Explorer** window, right-click on your music21 project and choose
 If you don't see this option, see http://stackoverflow.com/questions/19873064/pydev-not-showing-up-in-eclipse
 
 You also need to tell PyDev that your project should be included in your Python
-path. If you don't do this, Python won't be able to find music21 at all.
+path. If you don't do this, Python won't be able to find `music21` at all.
 
 ..  image:: images/usingGit/eclipse__configure_pydev__2.png
 
 
 
-Configuring the music21 Environment
------------------------------------
+Configuring the `music21` Environment
+--------------------------------------
 
-Configuring the music21 Environment is done mostly like a normal install with
+Configuring the `music21` Environment is done mostly like a normal install with
 one big difference noted below.
 
-To create a user environment settings file, open the music21/configure.py file
+To create a user environment settings file, open the `music21/configure.py` file
 and run it by pressing the green circle with a white arrowhead in it at the top
 of the Eclipse interface.
 
@@ -301,7 +301,7 @@ Configuration Assistant."
 ..  image:: images/usingEclipse/welcometoconfigassistant.png
     :width: 650
     
-When asked if you would like to install music21 in the normal place for Python
+When asked if you would like to install `music21` in the normal place for Python
 packages, type ``no`` and press Enter.
 
 ..  warning::
@@ -323,10 +323,10 @@ This used to be really hard...now look at the instructions for the **Github Desk
 
 
 
-Sending pull requests to the official music21 repository
+Sending pull requests to the official `music21` repository
 --------------------------------------------------------
 
-To get your changes into the official music21 repository, you'll have to make a
+To get your changes into the official `music21` repository, you'll have to make a
 **pull request** via the GitHub **web site** or the desktop app.
 
 A **pull request** is just what it sounds like: 
@@ -343,7 +343,7 @@ Making pull requests is easy:
 
     ..  image:: images/usingGit/github__pull_requests__1.png
 
-2.  If your repository differs from the official music21 repository, you'll be
+2.  If your repository differs from the official `music21` repository, you'll be
     shown the diff stats, as well as a large banner with the text ``Click to
     create a pull request for this comparison``. 
 
@@ -352,7 +352,7 @@ Making pull requests is easy:
     ..  image:: images/usingGit/github__pull_requests__2.png
 
 3.  Almost done. Now you can write a description of what your pull request
-    involves. While the music21 team can and will review the diffs for your
+    involves. While the `music21` team can and will review the diffs for your
     request, please provide a useful description. What do your changes
     accomplish?  Do they address one of the issues in the official issue
     tracker? Which issue?  Do they represent an enhancement, or new
@@ -367,13 +367,13 @@ Making pull requests is easy:
 Getting your pull requests accepted
 ------------------------------------
 
-Once you've sent a pull request to the music21 team they'll need to review the
+Once you've sent a pull request to the `music21` team they'll need to review the
 changes you've suggested.  They can opt to accept some, all or none of the
 commits you've included in your pull request. If the work looks good, they'll
 merge your changes into the official repository.
 
 What do we mean by the "if the work looks good"? The first and highest priority
-is that if the code expands music21 in any way that it is well documented 
+is that if the code expands `music21` in any way that it is well documented 
 (see :ref:`documenting`) and includes tests that ensure that future changes to
 the system will not break the code.  You will need to run test/multiprocessTest.py
 which will update the file test/lastResults.txt to show that the tests have passed.

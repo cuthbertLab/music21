@@ -1,10 +1,10 @@
 .. _installMac:
 
-Installing Music21 on Mac
+Installing `music21` on Mac
 ============================================
 
 Because Apple changes their system details so much
-from one version of OS X to another, installing music21 
+from one version of OS X to another, installing `music21` 
 is probably the hardest part of the experience.  
 Once you have that set, the rest should be much less painful.
 Trust us that it should work.
@@ -36,19 +36,19 @@ The `music21` team strongly recommends using the version of
 Python 3 from the python.org website and not the Conda version
 (or Enthought Canopy) because it is fully compatiable with 
 matplotlib.  If you have no plans on plotting functions, 
-feel free to use any version of Python 3.
+feel free to use any flavor of Python 3.
 
 
 Starting Python and Checking the Version
 ----------------------------------------------
 
-Python is a simple but powerful programming language that music21
+Python is a simple but powerful programming language that `music21`
 is written in and in which you will write your own programs that 
-use music21.
+use `music21`.
 
 Mac OS X comes with Python, but if you have an older version of OS X
 (Leopard or earlier) it might not be a new enough version 
-to run music21. Music21 requires Python 2.7 (2.7.3 or later) or Python 3.4 to 3.6. 
+to run `music21`. `Music21` requires Python 2.7 (2.7.3 or later) or Python 3.4 to 3.6. 
 
 To determine the Python version you have installed, open a 
 terminal (by going to Applications, then Utilities, and then 
@@ -71,7 +71,7 @@ on a single computer without any problems.
 Download music21 
 ----------------------------------------------
 
-Download the most-recent music21 package by getting the first .tar.gz file
+Download the most-recent `music21` package by getting the first .tar.gz file
 from the following URL. 
 
     https://github.com/cuthbertLab/music21/releases
@@ -80,8 +80,8 @@ The newest version should be at the top.  ``Do not download`` the `-no-corpus`
 version of the file.
 
 Once it's downloaded, double-click the icon on your desktop named
-something like music21-2.0.0.tar.gz -- this will create a new directory
-on your desktop called something like "music21-2.0.0".  Look inside it.
+something like music21-4.0.0.tar.gz -- this will create a new directory
+on your desktop called something like "music21-4.0.0".  Look inside it.
 
 You will see the following files:
 
@@ -94,8 +94,8 @@ If you're with us so far, you're halfway there.
 Starting the Configuration Assistant
 -----------------------------------------------------
 
-The music21 Configuration Assistant installs music21 in a place where
-Python can find it and lets you configure music21. 
+The `music21` Configuration Assistant installs `music21` in a place where
+Python can find it and lets you configure `music21`. 
 
 Double click on the installer.command file to start. 
 This file should open a Terminal window and begin running the Configuration Assistant. 
@@ -107,7 +107,7 @@ After waiting a few moments to load modules, the Configuration Assistant begins.
 .. image:: images/macScreenConfigAssistantStart.*
     :width: 650
 
-The first option is to install music21 in its standard location 
+The first option is to install `music21` in its standard location 
 (see below, The Installation Destination). Enter "y" or "yes", or 
 press return to accept the default of "yes". 
 
@@ -133,13 +133,13 @@ Sorry about the mess.  Just ignore it!  It means it's working.
     :width: 650
 
 After installation the Configuration Assistant will try to 
-configure your setup. If you have never used music21 before, 
+configure your setup. If you have never used `music21` before, 
 following these prompts is recommended.
 
 Selecting a MusicXML reader is the first step. 
-MusicXML is one of many display formats used by music21, and 
+MusicXML is one of many display formats used by `music21`, and 
 will provide an easy way for you to visualize, print, and 
-transfer the music you edit or develop in music21. 
+transfer the music you edit or develop in `music21`. 
 
 The Configuration Assistant will attempt to find a MusicXML 
 reader on your system. If it can't find any, you will be asked 
@@ -163,7 +163,7 @@ you will download an installer. Launch the installer immediately, and follow the
 After installing a MusicXML reader, or if you already have 
 one or more installed, the Configuration Assistant will present you with a 
 list of MusicXML readers from which to select one to use with music21 by 
-default. This means that music21 will attempt to open MusicXML files 
+default. This means that `music21` will attempt to open MusicXML files 
 with this application. This setting can be easily changed later. 
 Enter the number of the selection as presented in the list:
 
@@ -171,7 +171,7 @@ Enter the number of the selection as presented in the list:
     :width: 650
 
 After selecting a MusicXML reader, you will be asked a number of 
-questions about working with music21. They concern whether music21 can access
+questions about working with `music21`. They concern whether music21 can access
 the Internet, and whether you are willing to comply with the license for
 use of music21 and the included corpus of scores.  You have to accept the
 license to continue (we need to retain some rights you know!), but you 
@@ -187,8 +187,8 @@ it says "[process terminated]".
 After Installation
 -------------------------------
 
-CONGRATS! You're done with installing.  You can delete the `music21-2.0.0.tar.gz` file
-and `music21-2.0.0` folder from your desktop now.  
+CONGRATS! You're done with installing.  You can delete the `music21-4.0.0.tar.gz` file
+and `music21-4.0.0` folder from your desktop now.  
 
 Open up the Mac Terminal (under Applications/Utilities/Terminal). You might want
 to drag it to the dock.  You'll use it often.
@@ -203,7 +203,7 @@ Installation Help
 
 If you have followed all the instructions and still encounter problems, start over from scratch
 and try it again very carefully.  If you still have problems
-contact the music21 group and someone should be able to help:
+contact the `music21` group and someone should be able to help:
 
 http://groups.google.com/group/music21list
 

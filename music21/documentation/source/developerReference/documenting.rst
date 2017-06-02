@@ -1,10 +1,10 @@
 .. _documenting:
 
 
-Documenting music21
+Documenting `music21`
 =============================================
 
-Music21's documentation system uses a combination of a few handwritten documentation pages (like this one),
+`Music21`'s documentation system uses a combination of a few handwritten documentation pages (like this one),
 a lot of Jupyter notebooks (mainly in the User's Guide sections), 
 and documentation automatically generated from the documentation found in modules (in moduleReference).  
 

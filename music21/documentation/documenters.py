@@ -1479,13 +1479,13 @@ class CorpusDocumenter(Documenter):
 
     @property
     def headingText(self):
-        return 'List of Works Found in the music21 Corpus'
+        return 'List of Works Found in the `music21` Corpus'
 
     @property
     def rstCorpusIntroductionFormat(self):
         result = []
         result.append('The following list shows all files available in the ')
-        result.append('music21 corpus and available through the virtual corpus.')
+        result.append('`music21` corpus and available through the virtual corpus.')
         result.append('To load a work from the corpus, provide the file path ')
         result.append('stub provided.')
         result.append('')

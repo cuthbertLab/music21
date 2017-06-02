@@ -1353,7 +1353,7 @@ class Note(NotRest):
         >>> n.pitches
         (<music21.pitch.Pitch G#>,)
 
-        If given a list, only the first one will be used:
+        If given a list or tuple, only the first one will be used:
 
         >>> n.pitches = [pitch.Pitch('c2'), pitch.Pitch('g2')]
         >>> n.nameWithOctave

@@ -1,7 +1,7 @@
 .. _contents:
 
-Music21 Documentation
-=====================
+`music21` Documentation
+===========================
 
 .. toctree::
    :maxdepth: 2
@@ -32,6 +32,3 @@ Music21 Documentation
    :maxdepth: 2
 
    developerReference/index
-
-
-
