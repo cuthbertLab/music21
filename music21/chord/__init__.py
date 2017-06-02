@@ -208,64 +208,18 @@ class Chord(note.NotRest):
         # keep it here in case we have no notes
         #self.duration = None  # inefficient, since note.Note.__init__ set it
         #del self.pitch
-        quickDuration = False
-        if 'duration' not in keywords:
-            keywords['duration'] = self.duration
-            quickDuration = True
-
-        for n in notes:
-            if isinstance(n, pitch.Pitch):
-                # assign pitch to a new Note
-                if 'duration' in keywords:
-                    newNote = note.Note(n, duration=keywords['duration'])
-                else:
-                    newNote = note.Note(n)
-                self._notes.append(newNote)
-                #self._notes.append({'pitch':n})
-            elif isinstance(n, note.Note):
-                self._notes.append(n)
-                if quickDuration is True:
-                    self.duration = n.duration
-                    #print "got it! %s" % n
-                    del keywords['duration']
-                    quickDuration = False
-                # no need for deepcopy...
-                #self._notes.append(copy.deepcopy(n))
-
-                # TODO: need to provide self as argument, but currently
-                # cause problem on copy
-#                 vNew = volume.Volume()
-#                 vNew.mergeAttributes(n.volume)
-#                 self._notes.append({'pitch':n.pitch,
-#                                       'notehead':n.notehead,
-#                                       'stem': n.stemDirection,
-#                                      'volume': vNew, # volume
-#                                     })
-            elif isinstance(n, Chord):
-                for newNote in n._notes:
-                    self._notes.append(copy.deepcopy(newNote))
-                if quickDuration is True:
-                    self.duration = n.duration
-                    del keywords['duration']
-                    quickDuration = False
-            elif isinstance(n, (six.string_types, int)):
-                if 'duration' in keywords:
-                    self._notes.append(note.Note(n, duration=keywords['duration']))
-                else:
-                    self._notes.append(note.Note(n))
-                #self._notes.append({'pitch':music21.pitch.Pitch(n)})
-            else:
-                raise ChordException("Could not process input argument %s" % n)
+        durationKeyword = None
+        if 'duration' in keywords:
+            durationKeyword = keywords['duration']
+        
+        durationKeyword = self._append_core_or_init(notes, useDuration=durationKeyword)
+    
 
         if all(isinstance(n, int) for n in notes):
             self.simplifyEnharmonics(inPlace=True)
 
-        if quickDuration is True:
-            del keywords['duration']
-            quickDuration = False
-
-        if "duration" in keywords:
-            self.duration = keywords['duration']
+        if durationKeyword is not None:
+            self.duration = durationKeyword
         elif "type" in keywords or "quarterLength" in keywords: #dots dont cut it
             self.duration = duration.Duration(**keywords)
 
@@ -454,6 +408,178 @@ class Chord(note.NotRest):
             return [n.pitch for n in deleteComponents]
 
     ### PUBLIC METHODS ###
+    def _append_core_or_init(self, notes, useDuration=None):
+        '''
+        This is the private append method called by .append and called by __init__.
+        
+        It differs from the public method in that a duration object can
+        be passed in which is used for the first note of the chord or as many pitches
+        as can use it -- it's all an optimization step to create as few duration objects
+        as is necessary.
+        
+        Also requires that notes be an iterable.
+        '''
+        # quickDuration specifies whether the duration object for the chord
+        # should be taken from the first note of the list.
+        quickDuration = False
+        if useDuration is None:
+            useDuration = self.duration
+            quickDuration = True
+
+        for n in notes:
+            if isinstance(n, pitch.Pitch):
+                # assign pitch to a new Note
+                if useDuration: # not False or None
+                    newNote = note.Note(n, duration=useDuration)
+                else:
+                    newNote = note.Note(n)
+                self._notes.append(newNote)
+                #self._notes.append({'pitch':n})
+            elif isinstance(n, note.Note):
+                self._notes.append(n)
+                if quickDuration is True:
+                    self.duration = n.duration
+                    #print "got it! %s" % n
+                    useDuration = None
+                    quickDuration = False
+            elif isinstance(n, Chord):
+                for newNote in n._notes:
+                    self._notes.append(copy.deepcopy(newNote))
+                if quickDuration is True:
+                    self.duration = n.duration
+                    useDuration = None
+                    quickDuration = False
+            elif isinstance(n, (six.string_types, int)):
+                if useDuration:
+                    self._notes.append(note.Note(n, duration=useDuration))
+                else:
+                    self._notes.append(note.Note(n))
+                #self._notes.append({'pitch':music21.pitch.Pitch(n)})
+            else:
+                raise ChordException("Could not process input argument %s" % n)
+
+        return useDuration
+
+    def append(self, notes, runSort=True):
+        '''
+        Add a note, pitch, the notes of another chord, or string representing a pitch, 
+        or a list of any of the above to a Chord.  
+        
+        If runSort is True (default=True) then after appending, the
+        chord will be sorted. 
+        
+        >>> c = chord.Chord('C4 E4 G4')
+        >>> c.append('B3')
+        >>> c
+        <music21.chord.Chord B3 C4 E4 G4>
+        >>> c.duration
+        <music21.duration.Duration 1.0>
+        
+        >>> c.append('A2', runSort=False)
+        >>> c
+        <music21.chord.Chord B3 C4 E4 G4 A2>
+        
+        >>> c.append(['B5', 'C6'])
+        >>> c
+        <music21.chord.Chord A2 B3 C4 E4 G4 B5 C6>
+        
+        >>> c.append(pitch.Pitch('D6'))
+        >>> c
+        <music21.chord.Chord A2 B3 C4 E4 G4 B5 C6 D6>
+
+        >>> n = note.Note('E6')
+        >>> n.duration.type = 'half'
+        >>> c.append(n)
+        >>> c
+        <music21.chord.Chord A2 B3 C4 E4 G4 B5 C6 D6 E6>
+        >>> c.duration
+        <music21.duration.Duration 1.0>
+        >>> c[-1]
+        <music21.note.Note E>
+        >>> c[-1].duration
+        <music21.duration.Duration 2.0>
+        '''
+        if not common.isIterable(notes):
+            notes = [notes]
+
+        self._append_core_or_init(notes, useDuration=False)
+        if runSort:
+            self.sortAscending(inPlace=True)
+    
+    def remove(self, removeItem):
+        '''
+        Removes a note or pitch from the chord.  Must be a pitch
+        equal to a pitch in the chord or a string specifying the pitch
+        name with octave or the a note from a chord.  If not found,
+        raises a ValueError
+        
+        >>> c = chord.Chord('C4 E4 G4')
+        >>> c.remove('E4')
+        >>> c
+        <music21.chord.Chord C4 G4>
+        >>> c.remove('D5')
+        Traceback (most recent call last):
+        ValueError: Chord.remove(x), x not in chord
+
+        >>> c = chord.Chord('C4 E4 G4')
+        >>> c.remove(pitch.Pitch('E4'))
+        >>> c
+        <music21.chord.Chord C4 G4>
+        >>> c.remove(pitch.Pitch('F#5'))
+        Traceback (most recent call last):
+        ValueError: Chord.remove(x), x not in chord
+        
+        
+        The Note also does not need to be the exact note of the
+        chord, just matches on equality
+        
+        >>> c = chord.Chord('C4 E4 G4')
+        >>> c.remove(note.Note('E4'))
+        >>> c
+        <music21.chord.Chord C4 G4>        
+        
+        >>> c.remove(c[1])
+        >>> c
+        <music21.chord.Chord C4>
+        
+        >>> c.remove(note.Note('B-2'))
+        Traceback (most recent call last):
+        ValueError: Chord.remove(x), x not in chord
+
+        >>> c.remove(4)
+        Traceback (most recent call last):
+        ValueError: Cannot remove 4 from a chord; try a Pitch or Note object
+        
+        Like Python's list object does not work on lists...
+        
+        >>> c = chord.Chord('C4 E4 G4')
+        >>> c.remove(['C4', 'E4'])
+        Traceback (most recent call last):
+        ValueError: Cannot remove ['C4', 'E4'] from a chord; try a Pitch or Note object
+        '''
+        if isinstance(removeItem, str):
+            for n in self._notes:
+                if n.pitch.nameWithOctave == removeItem:
+                    self._notes.remove(n)
+                    return
+            else:
+                raise ValueError('Chord.remove(x), x not in chord')
+            
+        if not hasattr(removeItem, 'classes'):
+            raise ValueError("Cannot remove {} from a chord; try a Pitch or Note object".format(
+                removeItem))
+        if 'Pitch' in removeItem.classes:
+            for n in self._notes:
+                if n.pitch == removeItem:
+                    self._notes.remove(n)
+                    return
+            else:
+                raise ValueError('Chord.remove(x), x not in chord')
+
+        try:
+            return self._notes.remove(removeItem)
+        except ValueError:
+            raise ValueError('Chord.remove(x), x not in chord')
 
     def annotateIntervals(self, inPlace=True, stripSpecifiers=True,
                           sortPitches=True, returnList=False):
@@ -3274,8 +3400,9 @@ class Chord(note.NotRest):
             returnObj = copy.deepcopy(self)
 
         pitches = pitch.simplifyMultipleEnharmonics(self.pitches)
-        returnObj.pitches = pitches
-
+        for i in range(len(pitches)):
+            returnObj._notes[i].pitch = pitches[i]
+        
         if inPlace is False:
             return returnObj
 
@@ -3288,8 +3415,7 @@ class Chord(note.NotRest):
         '''
         newChord = copy.deepcopy(self)
         #tempChordNotes = newChord.pitches
-        pitches = sorted(newChord.pitches, key=lambda x: x.ps)
-        newChord.pitches = pitches
+        newChord._notes.sort(key=lambda x: x.pitch.ps)
         return newChord
 
     def sortDiatonicAscending(self, inPlace=False):
@@ -3315,9 +3441,7 @@ class Chord(note.NotRest):
             returnObj = self
         else:
             returnObj = copy.deepcopy(self)
-        pitches = sorted(returnObj.pitches, key=lambda x: (x.diatonicNoteNum, x.ps))
-        # must re-assign altered list, as a new list is created
-        returnObj.pitches = pitches
+        returnObj._notes.sort(key=lambda x: (x.pitch.diatonicNoteNum, x.pitch.ps))
         return returnObj
 
     def sortFrequencyAscending(self):
@@ -3327,8 +3451,7 @@ class Chord(note.NotRest):
         but below it in (most) just intonation types.
         '''
         newChord = copy.deepcopy(self)
-        pitches = sorted(newChord.pitches, key=lambda x: x.frequency)
-        newChord.pitches = pitches
+        newChord._notes.sort(key=lambda x: x.pitch.frequency)
         return newChord
 
     def transpose(self, value, inPlace=False):
@@ -3920,7 +4043,7 @@ class Chord(note.NotRest):
     @property
     def pitches(self):
         '''
-        Get or set a list of all Pitch objects in this Chord.
+        Get or set a list or tuple of all Pitch objects in this Chord.
 
         >>> c = chord.Chord(["C4", "E4", "G#4"])
         >>> c.pitches
@@ -3941,7 +4064,15 @@ class Chord(note.NotRest):
         >>> c.root()
         <music21.pitch.Pitch A4>
 
+
+        Note here that the list will be converted to a tuple:
+
         >>> c.pitches = ['C#4', 'A#4', 'E#5']
+        >>> c.pitches
+        (<music21.pitch.Pitch C#4>, <music21.pitch.Pitch A#4>, <music21.pitch.Pitch E#5>)
+        
+        Bass and root information is also changed.
+        
         >>> c.bass()
         <music21.pitch.Pitch C#4>
 
