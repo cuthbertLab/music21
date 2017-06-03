@@ -421,7 +421,8 @@ class Agenda(dict):
                           etc.
                           }
 
-    where the variable formats are elements of availableDataFormats ("str", "int", "musicxml", etc.)
+    where the variable formats are elements of availableDataFormats 
+    ("str", "int", "musicxml", etc.)
 
     *     **'commandList'**  whose value is a list specifying commands to be executed by the
           processor of the form::
@@ -439,9 +440,11 @@ class Agenda(dict):
                               ]
 
     Calling :meth:`~music21.webapps.CommandProcessor.executeCommands` iterates through
-    the commandList sequentially, calling the equivalent of
-    ``<CMD_n_RESULT_VARAIBLE> = <CMD_n_CALLER>.<CMD_n_COMMAND_NAME>(<CMD_n_ARG_1>,
-        <CMD_n_ARG_2>...)``
+    the commandList sequentially, calling the equivalent of::
+    
+        <CMD_n_RESULT_VARAIBLE> = <CMD_n_CALLER>.<CMD_n_COMMAND_NAME>(<CMD_n_ARG_1>,
+            <CMD_n_ARG_2>...)
+            
     where the command TYPE is "function", "method", or "attribute"
 
     *    **'returnDict'** whose value is a list specifying the variables to be

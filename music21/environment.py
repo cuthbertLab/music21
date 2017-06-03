@@ -18,7 +18,7 @@ whether music21 is allowed to download files directly (via the virtual corpus),
 and other settings.
 
 Additional documentation for and examples of using this module are found in
-:ref:`environment`.
+:ref:`User's Guide, Chapter 24, Environment <usersGuide_24_environment>`.
 
 # TODO: Update to user's guide
 '''

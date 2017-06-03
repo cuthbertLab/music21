@@ -1,7 +1,7 @@
 .. _usingGit:
 
 Using `music21` with Git for Eclipse
-==================================
+======================================
 
 `Music21` stores its master code base in the Git code format at the GitHub
 website (`https://github.com/cuthbertLab/music21 <https://github.com/cuthbertLab/music21>`_ ).
@@ -173,7 +173,7 @@ GitHub account, and click **Fork** in the upper right-hand corner of the page.
 ..  image:: images/usingGit/github__forking__01.png
 
 Cloning your `music21` fork in Eclipse
-------------------------------------
+--------------------------------------
 
 Once you've forked `music21` on GitHub, you need to clone your fork locally to
 your machine in order to start working.
@@ -311,7 +311,7 @@ packages, type ``no`` and press Enter.
 ..  image:: images/usingEclipse/saynotosavingmusic21.png
     :width: 650
 
-See :ref:`usersGuide_24_environment` for more information on configuring user settings.
+See :ref:`User's Guide, Chapter 24 <usersGuide_24_environment>` for more information on configuring user settings.
 Otherwise, head to: :ref:`What is Music21? <what>` for further demos and
 tutorials on using music21.
 
@@ -324,7 +324,7 @@ This used to be really hard...now look at the instructions for the **Github Desk
 
 
 Sending pull requests to the official `music21` repository
---------------------------------------------------------
+-------------------------------------------------------------
 
 To get your changes into the official `music21` repository, you'll have to make a
 **pull request** via the GitHub **web site** or the desktop app.

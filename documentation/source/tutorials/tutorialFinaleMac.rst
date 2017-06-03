@@ -41,7 +41,7 @@ Further Details
 ---------------------------------------
 
 For further details on setting up your Environment, see:
-:ref:`usersGuide_24_environment`.
+:ref:`Chapter 24, Environment <usersGuide_24_environment>`.
 
 For complete instructions on installing music21 on the Mac, see:
 :ref:`installMac`.

@@ -414,7 +414,8 @@ class IPythonNotebookReSTWriter(ReSTWriter):
                     newLines.append(currentLine)
                 currentLineNumber += 1
             elif "# ignore this" in currentLine:
-                if '.. code:: python' in newLines[-2]:
+                if '.. code:: ' in newLines[-2]:
+                    # print("STOP HERE!")
                     newLines.pop() # remove blank line
                     newLines.pop() # remove '.. code:: python'
 

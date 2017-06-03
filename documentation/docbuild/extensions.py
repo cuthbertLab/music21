@@ -35,19 +35,6 @@ def fixLines(lines):
         else:
             newLines.append(line)
     lines[:] = newLines
-    
-    lenLines = len(lines)
-    for i, line in enumerate(lines):
-        if i == lenLines - 1:
-            continue
-        nextLine = lines[i + 1]
-        if line.startswith('..code::') and not nextLine.strip():
-            # a code block with nothing in it is an error...
-            lines[i] = ""
-            
-        
-        
-
 
 def processDocstring(app, what, name, obj, options, lines):
     '''Process the ``lines`` of each docstring, in place.'''

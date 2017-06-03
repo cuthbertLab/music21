@@ -98,7 +98,7 @@ On the Mac, run:
 
 
 Python Imaging Library (`pillow` or PIL)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The Python Imaging Library (pillow; formerly PIL) 
 provides resources for transforming 
@@ -176,4 +176,4 @@ but the add-in PyDev makes it extremely powerful for creating Python scripts
 as well.  Eclipse + PyDev + Git is the
 only supported method for developers to get help in contributing to `music21`.  
 
-Details are at :ref:`usingGit`
+Details are at :ref:`Using Git <usingGit>`
