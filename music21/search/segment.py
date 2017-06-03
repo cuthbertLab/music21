@@ -156,9 +156,7 @@ def _indexSingleMulticore(filePath, *args, **kwds):
     return(shortfp, indexOutput)
 
 def _giveUpdatesMulticore(numRun, totalRun, latestOutput):
-    for o in latestOutput:
-        print("Indexed %s (%d/%d)" % (
-            o[0], numRun, totalRun))
+    print("Indexed %s (%d/%d)" % (latestOutput[0], numRun, totalRun))
 
 
 def indexScoreFilePaths(scoreFilePaths,
