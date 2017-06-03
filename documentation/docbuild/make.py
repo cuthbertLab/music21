@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013-17 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ class DocBuilder(object):
 
         writers.ModuleReferenceReSTWriter().run()
         writers.CorpusReferenceReSTWriter().run()
-
+ 
         if runSphinx:
             self.runSphinx()
 

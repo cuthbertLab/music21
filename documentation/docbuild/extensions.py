@@ -44,6 +44,7 @@ def fixLines(lines):
         if line.startswith('..code::') and not nextLine.strip():
             # a code block with nothing in it is an error...
             lines[i] = ""
+            
         
         
 

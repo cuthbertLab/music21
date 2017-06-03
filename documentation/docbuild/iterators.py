@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         documentation/library/iterators.py
-# Purpose:      music21 documentation IPython notebook to ReST converter
+# Name:         docbuild/iterators.py
+# Purpose:      music21 documentation iterators, including IPython notebook to ReST converter
 #
 # Authors:      Josiah Wolf Oberholtzer
+#               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013, 17 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
@@ -38,7 +39,7 @@ class IPythonNotebookIterator(Iterator):
 
     >>> import os
     >>> sp = common.getRootFilePath()
-    >>> ipnbi = documentation.iterators.IPythonNotebookIterator()
+    >>> ipnbi = IPythonNotebookIterator()
     >>> for i, nb in enumerate(ipnbi):
     ...     if i >= 3:
     ...         break
@@ -76,7 +77,7 @@ class ModuleIterator(Iterator):
     '''
     Iterates over music21's package system, yielding module objects:
 
-    >>> iterator = documentation.iterators.ModuleIterator(verbose=False)
+    >>> iterator = ModuleIterator(verbose=False)
     >>> modules = [x for x in iterator]
     >>> for module in sorted(modules, key=lambda x: x.__name__)[:8]:
     ...     module.__name__
@@ -171,7 +172,7 @@ class CodebaseIterator(Iterator):
 
     Enums have a different repr: <enum 'MotionType'> not <class 'enum'>
 
-    >>> cbi = documentation.iterators.CodebaseIterator(verbose=False)
+    >>> cbi = CodebaseIterator(verbose=False)
     >>> firstTen = list(cbi)[:10]
     >>> for x in firstTen:
     ...     print(x)
@@ -207,7 +208,7 @@ class ClassIterator(Iterator):
     '''
     Iterates over music21's package system, yielding all classes discovered:
 
-    >>> citerator = documentation.iterators.ClassIterator(verbose=False)
+    >>> citerator = ClassIterator(verbose=False)
     >>> for x in citerator:
     ...     pass
     >>> allClasses = [x for x in citerator]
@@ -240,8 +241,7 @@ class FunctionIterator(Iterator):
     '''
     Iterates over music21's package system, yielding all functions discovered:
 
-    >>> from music21 import documentation
-    >>> iterator = documentation.iterators.FunctionIterator(verbose=False)
+    >>> iterator = FunctionIterator(verbose=False)
     >>> functions = [x for x in iterator]
     >>> for function in sorted(functions,
     ...     key=lambda x: (x.__module__, x.__name__))[:10]:
@@ -269,5 +269,5 @@ class FunctionIterator(Iterator):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest()
+    music21.mainTest('moduleRelative')
 

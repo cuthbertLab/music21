@@ -4,9 +4,10 @@
 # Purpose:      music21 documentation helper classes for proper formatting
 #
 # Authors:      Josiah Wolf Oberholtzer
+#               Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013-17 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 
@@ -27,13 +28,14 @@ class Documenter(object):
 
     def __repr__(self):
         raise NotImplementedError
-
+    
     ### PRIVATE PROPERTIES ###
 
     @property
     def _packagesystemPath(self):
         return '.'.join((
-            self.__class__.__module__,
+            'docbuild',
+            'documenters',
             self.__class__.__name__,
             ))
 
@@ -100,9 +102,9 @@ class FunctionDocumenter(ObjectDocumenter):
     A documenter for one function:
 
     >>> function = common.opFrac
-    >>> documenter = documentation.documenters.FunctionDocumenter(function)
+    >>> documenter = FunctionDocumenter(function)
     >>> documenter
-    <music21.documentation.documenters.FunctionDocumenter: music21.common.numberTools.opFrac>
+    <docbuild.documenters.FunctionDocumenter: music21.common.numberTools.opFrac>
 
     >>> documenter.rstCrossReferenceString
     ':func:`~music21.common.numberTools.opFrac`'
@@ -145,7 +147,7 @@ class FunctionDocumenter(ObjectDocumenter):
     def referentPackagesystemPath(self):
         '''
         >>> function = common.opFrac
-        >>> documenter = documentation.documenters.FunctionDocumenter(function)
+        >>> documenter = FunctionDocumenter(function)
         >>> documenter.referentPackagesystemPath
         'music21.common.numberTools.opFrac'
         '''
@@ -159,7 +161,7 @@ class FunctionDocumenter(ObjectDocumenter):
     def rstAutodocDirectiveFormat(self):
         '''
         >>> function = common.opFrac
-        >>> documenter = documentation.documenters.FunctionDocumenter(function)
+        >>> documenter = FunctionDocumenter(function)
         >>> documenter.rstAutodocDirectiveFormat
         ['.. autofunction:: music21.common.numberTools.opFrac', '']
         '''
@@ -246,11 +248,12 @@ class MethodDocumenter(MemberDocumenter):
     '''
     A documenter for class methods:
 
+    >>> from music21 import key
     >>> method = key.KeySignature.transpose
-    >>> documenter = documentation.documenters.MethodDocumenter(
+    >>> documenter = MethodDocumenter(
     ...     method, 'transpose', key.KeySignature)
     >>> documenter
-    <music21.documentation.documenters.MethodDocumenter: music21.key.KeySignature.transpose>
+    <docbuild.documenters.MethodDocumenter: music21.key.KeySignature.transpose>
 
     >>> documenter.rstCrossReferenceString
     ':meth:`~music21.key.KeySignature.transpose`'
@@ -282,11 +285,12 @@ class AttributeDocumenter(MemberDocumenter):
     '''
     A documenter for class attributes, both read/write and read-only:
 
+    >>> from music21 import key
     >>> attribute = key.KeySignature.sharps
-    >>> documenter = documentation.documenters.AttributeDocumenter(
+    >>> documenter = AttributeDocumenter(
     ...     attribute, 'sharps', key.KeySignature)
     >>> documenter
-    <music21.documentation.documenters.AttributeDocumenter: music21.key.KeySignature.sharps>
+    <docbuild.documenters.AttributeDocumenter: music21.key.KeySignature.sharps>
 
     >>> documenter.rstCrossReferenceString
     ':attr:`~music21.key.KeySignature.sharps`'
@@ -316,11 +320,12 @@ class AttributeDocumenter(MemberDocumenter):
 class ClassDocumenter(ObjectDocumenter):
     '''
     A documenter for one class:
-
+    
+    >>> from music21 import articulations
     >>> klass = articulations.Caesura
-    >>> documenter = documentation.documenters.ClassDocumenter(klass)
+    >>> documenter = ClassDocumenter(klass)
     >>> documenter
-    <music21.documentation.documenters.ClassDocumenter: music21.articulations.Caesura>
+    <docbuild.documenters.ClassDocumenter: music21.articulations.Caesura>
     >>> documenter.referent
     <class 'music21.articulations.Caesura'>
 
@@ -553,8 +558,10 @@ class ClassDocumenter(ObjectDocumenter):
     @property
     def baseClasses(self):
         '''
-        >>> d = documentation.documenters.ClassDocumenter(articulations.Caesura)
-        >>> d.baseClasses
+        >>> from music21 import articulations
+        >>> klass = articulations.Caesura
+        >>> documenter = ClassDocumenter(klass)
+        >>> documenter.baseClasses
         (<class 'music21.articulations.Articulation'>,
          <class 'music21.base.Music21Object'>)
         '''
@@ -578,8 +585,9 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         The music21 _DOC_ATTR definition for a documented class:
 
+        >>> from music21 import stream
         >>> klass = stream.Stream
-        >>> documenter = documentation.documenters.ClassDocumenter(klass)
+        >>> documenter = ClassDocumenter(klass)
         >>> for key in sorted(list(documenter.docAttr.keys())):
         ...     key
         ...
@@ -605,8 +613,9 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         The music21 _DOC_ORDER definition for a documented class:
 
+        >>> from music21 import dynamics
         >>> klass = dynamics.Dynamic
-        >>> documenter = documentation.documenters.ClassDocumenter(klass)
+        >>> documenter = ClassDocumenter(klass)
         >>> for name in documenter.docOrder:
         ...     name
         'longName'
@@ -622,15 +631,16 @@ class ClassDocumenter(ObjectDocumenter):
         A mapping of parent class documenters and doc-attr attribute dicts
         for a documented class:
 
+        >>> from music21 import stream
         >>> klass = stream.Measure
-        >>> documenter = documentation.documenters.ClassDocumenter(klass)
+        >>> documenter = ClassDocumenter(klass)
         >>> mapping = documenter.inheritedDocAttrMapping
         >>> sortBy = lambda x: x.referentPackagesystemPath
         >>> for classDocumenter in sorted(mapping, key=sortBy):
         ...     classDocumenter
         ...
-        <music21.documentation.documenters.ClassDocumenter: music21.base.Music21Object>
-        <music21.documentation.documenters.ClassDocumenter: music21.stream.Stream>
+        <docbuild.documenters.ClassDocumenter: music21.base.Music21Object>
+        <docbuild.documenters.ClassDocumenter: music21.stream.Stream>
 
         '''
         # if one of the _DOC_ATTRs is exactly the same as the previous base class,
@@ -657,8 +667,9 @@ class ClassDocumenter(ObjectDocumenter):
         A mapping of parent class documenters and inherited read-only
         properties for a documented class:
 
+        >>> from music21 import stream
         >>> klass = stream.Measure
-        >>> documenter = documentation.documenters.ClassDocumenter(klass)
+        >>> documenter = ClassDocumenter(klass)
         >>> mapping = documenter.inheritedReadonlyPropertiesMapping
         >>> sortBy = lambda x: x.referentPackagesystemPath
         >>> for classDocumenter in sorted(mapping, key=sortBy):
@@ -696,8 +707,9 @@ class ClassDocumenter(ObjectDocumenter):
         A mapping of parent class documenters and inherited attributes for a
         documented class:
 
+        >>> from music21 import stream
         >>> klass = stream.Measure
-        >>> documenter = documentation.documenters.ClassDocumenter(klass)
+        >>> documenter = ClassDocumenter(klass)
         >>> mapping = documenter.inheritedMethodsMapping
         >>> sortBy = lambda x: x.referentPackagesystemPath
         >>> for classDocumenter in sorted(mapping, key=sortBy):
@@ -743,8 +755,9 @@ class ClassDocumenter(ObjectDocumenter):
         A mapping of parent class documenters and inherited read/write
         properties for a documented class:
 
+        >>> from music21 import stream
         >>> klass = stream.Measure
-        >>> documenter = documentation.documenters.ClassDocumenter(klass)
+        >>> documenter = ClassDocumenter(klass)
         >>> mapping = documenter.inheritedReadwritePropertiesMapping
         >>> sortBy = lambda x: x.referentPackagesystemPath
         >>> for classDocumenter in sorted(mapping, key=sortBy):
@@ -779,30 +792,31 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         The method documenters for a documented class:
 
+        >>> from music21 import stream
         >>> klass = stream.Stream
-        >>> documenter = documentation.documenters.ClassDocumenter(klass)
+        >>> documenter = ClassDocumenter(klass)
         >>> for method in documenter.methods[:10]:
         ...     method
         ...
-        <music21.documentation.documenters.MethodDocumenter:
+        <docbuild.documenters.MethodDocumenter:
             music21.stream.Stream.activateVariants>
-        <music21.documentation.documenters.MethodDocumenter:
+        <docbuild.documenters.MethodDocumenter:
             music21.stream.Stream.addGroupForElements>
-        <music21.documentation.documenters.MethodDocumenter:
+        <docbuild.documenters.MethodDocumenter:
             music21.stream.Stream.allPlayingWhileSounding>
-        <music21.documentation.documenters.MethodDocumenter:
+        <docbuild.documenters.MethodDocumenter:
             music21.stream.Stream.analyze>
-        <music21.documentation.documenters.MethodDocumenter:
+        <docbuild.documenters.MethodDocumenter:
             music21.stream.Stream.append>
-        <music21.documentation.documenters.MethodDocumenter:
+        <docbuild.documenters.MethodDocumenter:
             music21.stream.Stream.attachIntervalsBetweenStreams>
-        <music21.documentation.documenters.MethodDocumenter:
+        <docbuild.documenters.MethodDocumenter:
             music21.stream.Stream.attachMelodicIntervals>
-        <music21.documentation.documenters.MethodDocumenter:
+        <docbuild.documenters.MethodDocumenter:
             music21.stream.Stream.attributeCount>
-        <music21.documentation.documenters.MethodDocumenter:
+        <docbuild.documenters.MethodDocumenter:
             music21.stream.Stream.augmentOrDiminish>
-        <music21.documentation.documenters.MethodDocumenter:
+        <docbuild.documenters.MethodDocumenter:
             music21.stream.Stream.beatAndMeasureFromOffset>
         '''
         return self._methods
@@ -812,30 +826,31 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         The read-only property documenters for a documented class:
 
+        >>> from music21 import stream
         >>> klass = stream.Stream
-        >>> documenter = documentation.documenters.ClassDocumenter(klass)
+        >>> documenter = ClassDocumenter(klass)
         >>> for attr in documenter.readonlyProperties:
         ...     attr
         ...
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.beat>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.beatDuration>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.beatStr>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.beatStrength>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.flat>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.highestOffset>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.highestTime>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.isGapless>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.iter>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.lowestOffset>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.notes>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.notesAndRests>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.pitches>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.secondsMap>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.semiFlat>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.sorted>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.spanners>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.variants>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.voices>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.beat>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.beatDuration>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.beatStr>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.beatStrength>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.flat>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.highestOffset>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.highestTime>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.isGapless>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.iter>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.lowestOffset>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.notes>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.notesAndRests>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.pitches>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.secondsMap>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.semiFlat>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.sorted>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.spanners>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.variants>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.voices>
 
         '''
         return self._readonlyProperties
@@ -845,21 +860,22 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         The read/write property documenters for a documented class:
 
+        >>> from music21 import stream
         >>> klass = stream.Stream
-        >>> documenter = documentation.documenters.ClassDocumenter(klass)
+        >>> documenter = ClassDocumenter(klass)
         >>> for prop in documenter.readwriteProperties:
         ...     prop
         ...
-        <music21.documentation.documenters.AttributeDocumenter:
+        <docbuild.documenters.AttributeDocumenter:
             music21.stream.Stream.atSoundingPitch>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.clef>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.duration>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.elements>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.finalBarline>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.keySignature>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.metadata>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.seconds>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.timeSignature>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.clef>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.duration>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.elements>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.finalBarline>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.keySignature>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.metadata>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.seconds>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.timeSignature>
 
         '''
         return self._readwriteProperties
@@ -889,15 +905,16 @@ class ClassDocumenter(ObjectDocumenter):
         The ReST format for the bases from which the documented class
         inherits:
 
-        >>> klass = documentation.documenters.ClassDocumenter
-        >>> documenter = documentation.documenters.ClassDocumenter(klass)
+        >>> from music21 import note
+        >>> klass = note.NotRest
+        >>> documenter = ClassDocumenter(klass)
         >>> for line in documenter.rstBasesFormat:
         ...     line
         ...
-        '.. rubric:: :class:`~music21.documentation.documenters.ClassDocumenter` bases'
+        '.. rubric:: :class:`~music21.note.NotRest` bases'
         ''
-        '- :class:`~music21.documentation.documenters.ObjectDocumenter`'
-        '- :class:`~music21.documentation.documenters.Documenter`'
+        '- :class:`~music21.note.GeneralNote`'
+        '- :class:`~music21.base.Music21Object`'
         ''
 
         '''
@@ -962,25 +979,31 @@ class ClassDocumenter(ObjectDocumenter):
         r'''
         The ReST format for inherited methods:
 
-        >>> klass = documentation.documenters.MethodDocumenter
-        >>> documenter = documentation.documenters.ClassDocumenter(klass)
+        >>> from music21 import note
+        >>> klass = note.Note
+        >>> documenter = ClassDocumenter(klass)
         >>> for line in documenter.rstInheritedMethodsFormat:
         ...     line
         ...
-        'Methods inherited from :class:`~music21.documentation.documenters.MemberDocumenter`:'
+        'Methods inherited from :class:`~music21.note.GeneralNote`:'
         ''
         '.. hlist::'
         '   :columns: 3'
         ''
-        '   - :meth:`~music21.documentation.documenters.MemberDocumenter.run`'
+        '   - :meth:`~music21.note.GeneralNote.addLyric`'
+        '   - :meth:`~music21.note.GeneralNote.augmentOrDiminish`'
+        '   - :meth:`~music21.note.GeneralNote.getGrace`'
+        ...
         ''
-        'Methods inherited from :class:`~music21.documentation.documenters.Documenter`:'
+        'Methods inherited from :class:`~music21.base.Music21Object`:'
         ''
         '.. hlist::'
         '   :columns: 3'
         ''
-        '   - :meth:`~music21.documentation.documenters.Documenter.makeHeading`'
-        '   - :meth:`~music21.documentation.documenters.Documenter.makeRubric`'
+        '   - :meth:`~music21.base.Music21Object.containerHierarchy`'
+        '   - :meth:`~music21.base.Music21Object.contextSites`'
+        '   - :meth:`~music21.base.Music21Object.getAllContextsByClass`'
+        ...
         ''
 
         '''
@@ -994,8 +1017,9 @@ class ClassDocumenter(ObjectDocumenter):
         r'''
         The ReST format for inherited methods:
 
+        >>> from music21 import note
         >>> klass = note.Note
-        >>> documenter = documentation.documenters.ClassDocumenter(klass)
+        >>> documenter = ClassDocumenter(klass)
         >>> for line in documenter.rstInheritedReadonlyPropertiesFormat:
         ...     line
         'Read-only properties inherited from :class:`~music21.base.Music21Object`:'
@@ -1024,8 +1048,9 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         The ReST format for inherited methods:
 
+        >>> from music21 import note
         >>> klass = note.Unpitched
-        >>> documenter = documentation.documenters.ClassDocumenter(klass)
+        >>> documenter = ClassDocumenter(klass)
         >>> for line in documenter.rstInheritedReadwritePropertiesFormat:
         ...     line
         'Read/write properties inherited from :class:`~music21.note.NotRest`:'
@@ -1072,8 +1097,9 @@ class ClassDocumenter(ObjectDocumenter):
         r'''
         The ReST format for the documented class's methods:
 
+        >>> from music21 import scale
         >>> klass = scale.MajorScale
-        >>> documenter = documentation.documenters.ClassDocumenter(klass)
+        >>> documenter = ClassDocumenter(klass)
         >>> for line in documenter.rstMethodsFormat:
         ...     line
         '.. rubric:: :class:`~music21.scale.MajorScale` methods'
@@ -1133,8 +1159,9 @@ class ClassDocumenter(ObjectDocumenter):
         r'''
         The ReST format for the documented class's read-only properties:
 
+        >>> from music21 import note
         >>> klass = note.Note
-        >>> documenter = documentation.documenters.ClassDocumenter(klass)
+        >>> documenter = ClassDocumenter(klass)
         >>> for line in documenter.rstReadonlyPropertiesFormat:
         ...     line
         '.. rubric:: :class:`~music21.note.Note` read-only properties'
@@ -1178,8 +1205,9 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         The ReST format for the documented class's read-only properties:
 
+        >>> from music21 import scale
         >>> klass = scale.MajorScale
-        >>> documenter = documentation.documenters.ClassDocumenter(klass)
+        >>> documenter = ClassDocumenter(klass)
         >>> for line in documenter.rstReadwritePropertiesFormat:
         ...     line
         '.. rubric:: :class:`~music21.scale.MajorScale` read/write properties'
@@ -1222,9 +1250,10 @@ class ModuleDocumenter(ObjectDocumenter):
     '''
     A documenter for one module:
 
-    >>> documenter = documentation.documenters.ModuleDocumenter(serial)
+    >>> from music21 import serial
+    >>> documenter = ModuleDocumenter(serial)
     >>> documenter
-    <music21.documentation.documenters.ModuleDocumenter: music21.serial>
+    <docbuild.documenters.ModuleDocumenter: music21.serial>
 
     >>> for reference, referent in sorted(list(
     ...     documenter.namesMapping.items())):
@@ -1328,8 +1357,9 @@ class ModuleDocumenter(ObjectDocumenter):
         module documenter's module object, taking into account any ordering
         via the `_DOC_ORDER` module-level variable:
 
+        >>> from music21 import serial
         >>> module = serial
-        >>> documenter = documentation.documenters.ModuleDocumenter(module)
+        >>> documenter = ModuleDocumenter(module)
         >>> for classDocumenter in documenter.classDocumenters:
         ...     print(classDocumenter.referentPackagesystemPath)
         ...
@@ -1360,8 +1390,9 @@ class ModuleDocumenter(ObjectDocumenter):
         module documenter's module object, taking into account any ordering
         via the `_DOC_ORDER` module-level variable:
 
+        >>> from music21 import serial
         >>> module = serial
-        >>> documenter = documentation.documenters.ModuleDocumenter(module)
+        >>> documenter = ModuleDocumenter(module)
         >>> for functionDocumenter in documenter.functionDocumenters:
         ...     print(functionDocumenter.referentPackagesystemPath)
         ...
@@ -1420,14 +1451,15 @@ class ModuleDocumenter(ObjectDocumenter):
     def referenceName(self):
         '''The short name of the module:
 
+        >>> from music21 import serial
         >>> module = serial
-        >>> documenter = documentation.documenters.ModuleDocumenter(module)
+        >>> documenter = ModuleDocumenter(module)
         >>> documenter.referenceName
         'moduleSerial'
 
         >>> from music21.stream import makeNotation
         >>> module = makeNotation
-        >>> documenter = documentation.documenters.ModuleDocumenter(module)
+        >>> documenter = ModuleDocumenter(module)
         >>> documenter.referenceName
         'moduleStreamMakeNotation'
 
@@ -1449,7 +1481,7 @@ class ModuleDocumenter(ObjectDocumenter):
 class CorpusDocumenter(Documenter):
     '''A documenter for music21's corpus:
 
-    >>> documenter = documentation.documenters.CorpusDocumenter()
+    >>> documenter = CorpusDocumenter()
     >>> restructuredText = documenter.run()
 
     '''
@@ -1584,4 +1616,4 @@ class CorpusDocumenter(Documenter):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest()
+    music21.mainTest('moduleRelative')
