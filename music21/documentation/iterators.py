@@ -46,7 +46,7 @@ class IPythonNotebookIterator(Iterator):
     ...     print(nb.replace(sp, 'SOURCE'))
     SOURCE/documentation/source/about/what.ipynb
     SOURCE/documentation/source/developerReference/installJupyter.ipynb
-    SOURCE/documentation/source/tutorials/examples.ipynb
+    SOURCE/documentation/source/developerReference/musicxmlTest.ipynb
     '''
 
     ### SPECIAL METHODS ###
