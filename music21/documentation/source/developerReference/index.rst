@@ -8,6 +8,6 @@ Developer Reference
     buildingDocumentation
     usingGit
     installJupyter
-
+    musicxmlTest
 
 
