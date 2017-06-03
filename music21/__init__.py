@@ -65,7 +65,6 @@ __all__ = [
     'converter',
     'corpus',
     'demos',
-    'documentation',
     'features',
     'figuredBass',
     'humdrum',

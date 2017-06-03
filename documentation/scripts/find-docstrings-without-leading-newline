@@ -1,0 +1,35 @@
+#! /usr/bin/env python
+
+import inspect
+import types
+from music21.documentation.iterators import CodebaseIterator
+
+
+def main():
+    print 'Inspecting docstrings...'
+    print 
+    count = 0
+    for x in CodebaseIterator():
+        address = '.'.join((x.__module__, x.__name__))
+        docstring = x.__doc__
+        if docstring is not None and not docstring.startswith('\n'):
+            print address
+            count += 1
+        if isinstance(x, type):
+            for attr in inspect.classify_class_attrs(x):
+                if attr.defining_class is not x or attr.name.startswith('_'):
+                    continue
+                attrAddress = ':'.join((address, attr.name)) 
+                docstring = attr.object.__doc__
+                if docstring is not None and not docstring.startswith('\n'):
+                    print attrAddress
+                    count += 1
+    if count:
+        print
+        print 'Found {} docstring(s) without leading newlines.'.format(count)
+    else:
+        print 'Found no docstrings without leading newlines.'
+
+
+if __name__ == '__main__':
+    main()

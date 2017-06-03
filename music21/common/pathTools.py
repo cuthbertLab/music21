@@ -10,6 +10,7 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 __all__ = [
+           'getRootFilePath',
            'getSourceFilePath',
            'getMetadataCacheFilePath',
            'getCorpusFilePath',
@@ -111,6 +112,14 @@ def getCorpusContentDirs():
         result.append(filename)
     return sorted(result)
 
+def getRootFilePath():
+    '''
+    Return the root directory for music21 -- outside of the music21 namespace
+    which has directories such as "dist", "documentation", "music21"
+    '''
+    fpMusic21 = getSourceFilePath()
+    fpParent = os.path.dirname(fpMusic21)
+    return fpParent
 
 def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
                   packageOnly=True):

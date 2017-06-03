@@ -23,7 +23,6 @@ import doctest
 import inspect
 import re
 import sys
-import types
 import unittest
 from music21.ext import six
 
@@ -128,6 +127,8 @@ def addDocAttrTestsToSuite(suite,
     dtp = doctest.DocTestParser()
     if globs is False:
         globs = __import__(defaultImports[0]).__dict__.copy()
+    elif globs is None:
+        globs = {}
     for lvk in moduleVariableLists:
         if not (inspect.isclass(lvk)):
             continue

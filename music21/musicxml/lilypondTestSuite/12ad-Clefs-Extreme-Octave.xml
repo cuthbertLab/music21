@@ -4,7 +4,7 @@
 <score-partwise>
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Clefs with |octave shifts| > 1
+      <miscellaneous-field name="description">Clefs with abs(octave shifts) > 1
           Order: treble 15vb (C2), bass 15vb (C2),
           treble 15va (C6), bass 15va (C6), 
           treble 22va (C7), bass 22vb (C1).  Should all display as middle C

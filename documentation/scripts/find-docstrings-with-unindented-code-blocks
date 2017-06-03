@@ -1,0 +1,44 @@
+#! /usr/bin/env python
+
+import inspect
+import types
+from music21.documentation.iterators import CodebaseIterator
+
+
+def hasUnindentedCodeBlocks(docstring):
+    lines = docstring.splitlines()
+    for line in lines:
+        if line.startswith('>>> '):
+            return True
+    return False
+
+
+def main():
+    print 'Inspecting docstrings...'
+    print 
+    count = 0
+    for x in CodebaseIterator():
+        address = '.'.join((x.__module__, x.__name__))
+        # inspect.getdoc() strips whitespace for us
+        docstring = inspect.getdoc(x)
+        if docstring is not None and hasUnindentedCodeBlocks(docstring):
+            print address
+            count += 1
+        if isinstance(x, type):
+            for attr in inspect.classify_class_attrs(x):
+                if attr.defining_class is not x or attr.name.startswith('_'):
+                    continue
+                attrAddress = ':'.join((address, attr.name)) 
+                docstring = inspect.getdoc(attr.object)
+                if docstring is not None and hasUnindentedCodeBlocks(docstring):
+                    print attrAddress
+                    count += 1
+    if count:
+        print
+        print 'Found {} docstring(s) with unindented code blocks.'.format(count)
+    else:
+        print 'Found no docstrings with unindented code blocks.'
+
+
+if __name__ == '__main__':
+    main()
