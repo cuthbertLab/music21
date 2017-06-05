@@ -22,13 +22,11 @@ To do a release,
     (40 min on MacPro) -- either of these MAY change a lot of tests in corpus, metadata, etc.
     so don't skip the next step!
 3. run test/multiprocessTest.py  for Python2 AND Python3
-3.5 run test/testLint.py and fix any lint errors
-4. commit and then check test/testSingleCoreAll.py results on Travis-CI
+4. run test/testLint.py and fix any lint errors
+5. commit and then check test/testSingleCoreAll.py results on Travis-CI
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
      but should be done before making a release).  Done automatically by Travis-CI on GitHub commit
-5. then python3 test/testDocumentation.py # only designed for Python 3...
-6. load the user's guide into Jupyter and make sure that everything works there too! (along
-     with about/what.ipynb and developerReference/installJupyter and tutorials/examples)
+6. then python3 test/testDocumentation.py # only designed for Python 3...
 7. run documentation/make.py clean
 8. run documentation/make.py   [*]
 
@@ -36,15 +34,15 @@ To do a release,
 
 9. run documentation/upload.py [not via eclipse] or upload via ssh.
 
-10. And finally this file ON PYTHON 2.7
+10. And finally this file.
 
 11. COMMIT to Github at this point w/ commit comment of the new version,
     then don't change anything until the next step is done.
     (.gitignore SHOULD avoid uploading the large files created here...)
 
-12. Create a new release on GitHub and upload the THREE files created here. Use tag v2.0.1 (etc.).
+12. Create a new release on GitHub and upload the TWO files created here. Use tag v2.0.1 (etc.).
     Don't forget the "v" in the release tag.
-    Drag in this order: .tar.gz, .exe, no-corpus.tar.gz
+    Drag in this order: .tar.gz, no-corpus.tar.gz
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
@@ -58,7 +56,7 @@ To do a release,
     Upload the .tar.gz file to PyPi by clicking "files" at the time.  Click Choose File.
     File Type is Source.  Leave everything else blank, then click "upload new file"
 
-15. Delete the files in dist...
+15. Delete the two .tar.gz files in dist...
 
 16. Immediately increment the number in _version.py and run tests on it here
     to prepare for next release.
@@ -91,7 +89,7 @@ environLocal.warn("using python executable at %s" % PY)
 class Distributor(object):
     def __init__(self):
         #self.fpEgg = None
-        self.fpWin = None
+        #self.fpWin = None
         self.fpTar = None
 
         self.buildNoCorpus = True
@@ -133,25 +131,25 @@ class Distributor(object):
             fp = os.path.join(self.fpDistDir, fn)
             #if self.version in fn and fn.endswith('.egg'):
             #    self.fpEgg = fp
-            if self.version in fn and fn.endswith('.exe'):
-                fpNew = fp.replace('.macosx-10.8-intel.exe', '.win32.exe')
-                fpNew = fpNew.replace('.macosx-10.8-x86_64.exe', '.win32.exe')
-                fpNew = fpNew.replace('.macosx-10.9-intel.exe', '.win32.exe')
-                fpNew = fpNew.replace('.macosx-10.9-x86_64.exe', '.win32.exe')
-                fpNew = fpNew.replace('.macosx-10.10-intel.exe', '.win32.exe')
-                fpNew = fpNew.replace('.macosx-10.10-x86_64.exe', '.win32.exe')
-                fpNew = fpNew.replace('.macosx-10.11-intel.exe', '.win32.exe')
-                fpNew = fpNew.replace('.macosx-10.11-x86_64.exe', '.win32.exe')
-                fpNew = fpNew.replace('.macosx-10.12-intel.exe', '.win32.exe')
-                fpNew = fpNew.replace('.macosx-10.12-x86_64.exe', '.win32.exe')
-                if fpNew != fp:
-                    os.rename(fp, fpNew)
-                self.fpWin = fpNew
-            elif self.version in fn and fn.endswith('.tar.gz'):
+#             if self.version in fn and fn.endswith('.exe'):
+#                 fpNew = fp.replace('.macosx-10.8-intel.exe', '.win32.exe')
+#                 fpNew = fpNew.replace('.macosx-10.8-x86_64.exe', '.win32.exe')
+#                 fpNew = fpNew.replace('.macosx-10.9-intel.exe', '.win32.exe')
+#                 fpNew = fpNew.replace('.macosx-10.9-x86_64.exe', '.win32.exe')
+#                 fpNew = fpNew.replace('.macosx-10.10-intel.exe', '.win32.exe')
+#                 fpNew = fpNew.replace('.macosx-10.10-x86_64.exe', '.win32.exe')
+#                 fpNew = fpNew.replace('.macosx-10.11-intel.exe', '.win32.exe')
+#                 fpNew = fpNew.replace('.macosx-10.11-x86_64.exe', '.win32.exe')
+#                 fpNew = fpNew.replace('.macosx-10.12-intel.exe', '.win32.exe')
+#                 fpNew = fpNew.replace('.macosx-10.12-x86_64.exe', '.win32.exe')
+#                 if fpNew != fp:
+#                     os.rename(fp, fpNew)
+#                 self.fpWin = fpNew
+            if self.version in fn and fn.endswith('.tar.gz'):
                 self.fpTar = fp
 
-        environLocal.warn('giving paths for exe, and tar.gz/zip, respectively:')
-        for fn in [self.fpWin, self.fpTar]:
+        environLocal.warn('giving path for tar.gz')
+        for fn in [self.fpTar]:
             if fn == None:
                 environLocal.warn('missing fn path')
             else:
@@ -275,7 +273,7 @@ class Distributor(object):
         # call setup.py
         #import setup # -- for some reason does not work unless called from command line
         for buildType in [#'bdist_egg',
-                          'bdist_wininst',
+                          #'bdist_wininst',
                           'sdist --formats=gztar'
                           ]:
             environLocal.warn('making %s' % buildType)

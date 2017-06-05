@@ -562,8 +562,7 @@ class Chord(note.NotRest):
                 if n.pitch.nameWithOctave == removeItem:
                     self._notes.remove(n)
                     return
-            else:
-                raise ValueError('Chord.remove(x), x not in chord')
+            raise ValueError('Chord.remove(x), x not in chord')
             
         if not hasattr(removeItem, 'classes'):
             raise ValueError("Cannot remove {} from a chord; try a Pitch or Note object".format(
@@ -573,8 +572,7 @@ class Chord(note.NotRest):
                 if n.pitch == removeItem:
                     self._notes.remove(n)
                     return
-            else:
-                raise ValueError('Chord.remove(x), x not in chord')
+            raise ValueError('Chord.remove(x), x not in chord')
 
         try:
             return self._notes.remove(removeItem)

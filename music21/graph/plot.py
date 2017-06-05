@@ -974,9 +974,6 @@ class WindowedKey(WindowedAnalysis):
     '''
     processorClassDefault = discrete.KrumhanslSchmuckler
 
-    def __init__(self, streamObj=None, *args, **keywords):
-        super(WindowedKey, self).__init__(streamObj, *args, **keywords)
-
 
 class WindowedAmbitus(WindowedAnalysis):
     '''
@@ -994,11 +991,6 @@ class WindowedAmbitus(WindowedAnalysis):
 
     '''
     processorClassDefault = discrete.Ambitus
-
-    def __init__(self, streamObj=None, *args, **keywords):
-        # provide the stream to both the window and processor in this case
-        super(WindowedAmbitus, self).__init__(streamObj, *args, **keywords)
-
 
 #-------------------------------------------------------------------------------
 # horizontal bar graphs
@@ -1025,20 +1017,26 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
 
         pitchSpanDict = {}
         newData = []
+        dictOfFormatDicts = {}
 
         for positionData, pitchData, formatDict in self.data:
             if pitchData not in pitchSpanDict:
                 pitchSpanDict[pitchData] = []
+                dictOfFormatDicts[pitchData] = {}
+                
             pitchSpanDict[pitchData].append(positionData)
+            _mergeDicts(dictOfFormatDicts[pitchData], formatDict)
 
         for unused_k, v in pitchSpanDict.items():
             v.sort() # sort these tuples.
 
         for numericValue, label in yTicks:
             if numericValue in pitchSpanDict:
-                newData.append([label, pitchSpanDict[numericValue], formatDict])
+                newData.append([label, 
+                                pitchSpanDict[numericValue], 
+                                dictOfFormatDicts[numericValue]])
             else:
-                newData.append([label, [], formatDict])
+                newData.append([label, [], {}])
         self.data = newData
 
 
