@@ -199,8 +199,10 @@ def nextLargerType(durType):
 
     >>> duration.nextLargerType("16th")
     'eighth'
+    
     >>> duration.nextLargerType("whole")
     'breve'
+    
     >>> duration.nextLargerType("duplex-maxima")
     Traceback (most recent call last):
     music21.duration.DurationException: cannot get the next larger of duplex-maxima
@@ -606,6 +608,13 @@ def quarterConversion(qLen):
     QuarterLengthConversion(components=(DurationTuple(type='zero', dots=0, quarterLength=0.0),),
         tuplet=None)
 
+
+    >>> duration.quarterConversion(99.0)
+    QuarterLengthConversion(components=(DurationTuple(type='inexpressible', 
+                                                      dots=0, 
+                                                      quarterLength=99.0),), 
+                            tuplet=None)
+
     '''
     # this is a performance-critical operation that has been highly optimized for speed
     # rather than legibility or logic.  Most commonly anticipated events appear first
@@ -637,7 +646,15 @@ def quarterConversion(qLen):
     qLen = opFrac(qLen)
     # try match to type, get next lowest for next part...
     closestSmallerType, unused_match = quarterLengthToClosestType(qLen)
-    typeNext = nextLargerType(closestSmallerType)
+    try:
+        typeNext = nextLargerType(closestSmallerType)
+    except DurationException:
+        # too big...
+        return QuarterLengthConversion((DurationTuple(type='inexpressible', 
+                                                      dots=0, 
+                                                      quarterLength=qLen),), None)
+    
+    
     tupleCandidates = quarterLengthToTuplet(qLen, 1)
     if tupleCandidates:
         # assume that the first tuplet candidate, using the smallest type, is best
@@ -2605,7 +2622,9 @@ class Duration(SlottedObjectMixin):
     def _setQuarterLength(self, value):
         if self.linked is False:
             self._qtrLength = value
-        elif self._qtrLength != value or self.type == 'inexpressible':
+        elif (self._qtrLength != value 
+                or self._componentsNeedUpdating  # skip a type update for next type check
+                or self.type == 'inexpressible'):
             value = opFrac(value)
             if value == 0.0 and self.linked is True:
                 self.clear()

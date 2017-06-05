@@ -5974,13 +5974,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnObj = self
 
         qLenTotal = returnObj.duration.quarterLength
-        elements = []
-        for element in returnObj.getElementsByClass(objName):
-#             if not hasattr(element, 'duration'):
-#                 raise StreamException('can only process objects with duration attributes')
-            if element.duration is None:
-                element.duration = duration.Duration()
-            elements.append(element)
+        elements = list(returnObj.getElementsByClass(objName))
 
         #print(elements[-1], qLenTotal, elements[-1].duration)
         # print(_MOD, elements)

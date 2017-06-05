@@ -1693,15 +1693,16 @@ def partitionByInstrument(streamObj):
         sub.extendDuration('Instrument')
 
     # first, find all unique instruments
-    found = s.recurse().getElementsByClass('Instrument')
-    if not found:
+    instrumentIterator = s.recurse().getElementsByClass('Instrument')
+    if not instrumentIterator:
         return None # no partition is available
 
     names = OrderedDict() # store unique names
-    for e in found:
+    for instrumentObj in instrumentIterator:
         # matching here by instrument name
-        if e.instrumentName not in names:
-            names[e.instrumentName] = {'Instrument':e} # just store one instance
+        if instrumentObj.instrumentName not in names:
+            names[instrumentObj.instrumentName] = {'Instrument': instrumentObj} 
+            # just store one instance
 
     # create a return object that has a part for each instrument
     post = stream.Score()
@@ -1716,21 +1717,32 @@ def partitionByInstrument(streamObj):
 
     # iterate over flat sources; get events within each defined instrument
     # add to corresponding part
-    for sub in s:
-        for i in sub.getElementsByClass('Instrument'):
+    for el in s:
+        if not el.isStream:
+            post.insert(el.offset, el)
+        
+        subStream = el
+        for i in subStream.getElementsByClass('Instrument'):
             start = i.offset
             # duration will have been set with sub.extendDuration above
             end = i.offset + i.duration.quarterLength
             # get destination Part
             p = names[i.instrumentName]['Part']
-            coll = sub.getElementsByOffset(start, end,
+            
+            coll = subStream.getElementsByOffset(start, end,
                     # do not include elements that start at the end
                     includeEndBoundary=False,
                     mustFinishInSpan=False, mustBeginInSpan=True)
             # add to part at original offset
             # do not gather instrument
             for e in coll.getElementsNotOfClass('Instrument'):
-                p.insert(sub.elementOffset(e), e)
+                try:
+                    p.insert(subStream.elementOffset(e), e)
+                except stream.StreamException:
+                    pass
+                    # it is possible to enter an element twice because the getElementsByOffset
+                    # might return something twice if it's at the same offset as the
+                    # instrument switch...
     return post
 
 
@@ -2094,6 +2106,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 4)
         # piano spans are joined together
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
+        
         self.assertEqual(len(post.parts[0].notes), 12)
         offsetList = []
         ppn = post.parts[0].notes
