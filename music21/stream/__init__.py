@@ -4097,7 +4097,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         is used to determine if transposition is necessary.
 
         v2.0.10 changes -- inPlace is False
-
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
@@ -4118,6 +4117,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnObj._transposeByInstrument(reverse=False, inPlace=True)
         elif returnObj.atSoundingPitch:
             pass
+        
+        for ottava in returnObj.getElementsByClass('Ottava'):
+            ottava.performTransposition()
+        
         return returnObj # the Stream or None
 
     def toWrittenPitch(self, inPlace=False):
