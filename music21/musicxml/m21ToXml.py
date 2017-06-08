@@ -2555,10 +2555,10 @@ class MeasureExporter(XMLExporterBase):
                     if m21spannerClass == 'Line':
                         mxElement.set('line-type', str(thisSpanner.lineType))
 
-                    if posSub == 'first':  # TODO: getStartParameters and getEndParamters...
-                        pmtrs = thisSpanner.getStartParameters()
-                    elif posSub == 'last':  # ...should be defined here, not in spanner.py
-                        pmtrs = thisSpanner.getEndParameters()
+                    if posSub == 'first':
+                        pmtrs = self._spannerStartParameters(m21spannerClass, thisSpanner)
+                    elif posSub == 'last':  
+                        pmtrs = self._spannerEndParameters(m21spannerClass, thisSpanner)
                     else:
                         pmtrs = {}
 
@@ -2582,6 +2582,81 @@ class MeasureExporter(XMLExporterBase):
                         postList.append(mxDirection)
 
         return preList, postList
+    
+    @staticmethod
+    def _spannerStartParameters(spannerClass, spanner):
+        '''
+        Return a dict of the parameters for the start of this spanner required by MusicXML output.
+
+        >>> ssp = musicxml.m21ToXml.MeasureExporter._spannerStartParameters
+
+        >>> ottava = spanner.Ottava(type='8va')
+        >>> st = ssp('Ottava', ottava)
+        >>> st['type']  # this is the opposite of what you might expect...
+        'down'
+        >>> st['size']
+        8
+
+        >>> cresc = dynamics.Crescendo()
+        >>> st = ssp('DynamicWedge', cresc)
+        >>> st['type']
+        'crescendo'
+        >>> st['spread']
+        0
+        
+        >>> diminuendo = dynamics.Diminuendo()
+        >>> st = ssp('DynamicWedge', diminuendo)
+        >>> st['type']
+        'diminuendo'
+        >>> st['spread']
+        15        
+        '''
+        post = {}
+        post['type'] = 'start'
+        if spannerClass == 'Ottava':
+            post['size'] = spanner.shiftMagnitude()
+            post['type'] = spanner.shiftDirection(reverse=True)  # up or down
+        elif spannerClass == 'Line':
+            post['line-end'] = spanner.startTick
+            post['end-length'] = spanner.startHeight
+        elif spannerClass == 'DynamicWedge':
+            post['type'] = spanner.type
+            if spanner.type == 'crescendo':
+                post['spread'] = 0
+            else:
+                post['spread'] = spanner.spread
+                                
+        return post
+
+    @staticmethod
+    def _spannerEndParameters(spannerClass, spanner):
+        '''
+        Return a dict of the parameters for the end of this spanner required by MusicXML output.
+
+        >>> ottava = spanner.Ottava(type='8va')
+        >>> en = musicxml.m21ToXml.MeasureExporter._spannerEndParameters('Ottava', ottava)
+        >>> en['type']
+        'stop'
+        >>> en['size']
+        8
+        '''
+        post = {}
+        post['type'] = 'stop'
+        if spannerClass == 'Ottava':
+            post['size'] = spanner.shiftMagnitude()
+        elif spannerClass == 'Line':
+            post['line-end'] = spanner.endTick
+            post['end-length'] = spanner.endHeight
+        elif spannerClass == 'DynamicWedge':
+            post['type'] = spanner.type
+            if spanner.type == 'crescendo':
+                post['spread'] = spanner.spread
+            else:
+                post['spread'] = 0
+        
+        return post
+
+    
 
     def objectAttachedSpannersToNotations(self, obj, objectSpannerBundle=None):
         '''

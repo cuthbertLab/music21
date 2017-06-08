@@ -4096,7 +4096,32 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         elements to sounding pitch. The atSoundingPitch property
         is used to determine if transposition is necessary.
 
+        Affected by the presence of Instruments and by Ottava spanners
+
         v2.0.10 changes -- inPlace is False
+
+        >>> sc = stream.Score()
+        >>> p = stream.Part(id='barisax')
+        >>> p.append(instrument.BaritoneSaxophone())
+        >>> m = stream.Measure(number=1)
+        >>> m.append(note.Note('A4'))
+        >>> p.append(m)
+        >>> sc.append(p)
+        >>> sc.atSoundingPitch = False
+        
+        >>> scSounding = sc.toSoundingPitch()
+        >>> scSounding.show('text')
+        {0.0} <music21.stream.Part barisax>
+            {0.0} <music21.instrument.BaritoneSaxophone Baritone Saxophone>
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.note.Note C>
+
+        >>> scSounding.atSoundingPitch
+        True
+        >>> scSounding.parts[0].atSoundingPitch
+        True
+        >>> scSounding.recurse().notes[0].nameWithOctave
+        'C3'
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
@@ -4107,18 +4132,25 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for p in returnObj.getElementsByClass('Stream'):
                 # call on each part
                 p.toSoundingPitch(inPlace=True)
+                returnObj.atSoundingPitch = True
             return returnObj
 
         # else...
-        if returnObj.atSoundingPitch == 'unknown':
-            raise StreamException('atSoundingPitch is unknown: cannot transpose')
-        elif not returnObj.atSoundingPitch:
+        atSoundingPitch = self.atSoundingPitch
+        if atSoundingPitch == 'unknown':
+            for site in self.sites:
+                if hasattr(site, 'atSoundingPitch') and site.atSoundingPitch != 'unknown':
+                    atSoundingPitch = site.atSoundingPitch
+                    break
+            else:
+                raise StreamException('atSoundingPitch is unknown: cannot transpose')
+        
+        if atSoundingPitch is False:
             # transposition defined on instrument goes from written to sounding
             returnObj._transposeByInstrument(reverse=False, inPlace=True)
-        elif returnObj.atSoundingPitch:
-            pass
-        
-        for ottava in returnObj.getElementsByClass('Ottava'):
+            returnObj.atSoundingPitch = True
+                
+        for ottava in returnObj.recurse().getElementsByClass('Ottava'):
             ottava.performTransposition()
         
         return returnObj # the Stream or None
@@ -4179,6 +4211,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # need to reverse to go to written
             returnObj._transposeByInstrument(reverse=True, inPlace=True)
             returnObj.atSoundingPitch = False
+
+        for ottava in returnObj.recurse().getElementsByClass('Ottava'):
+            ottava.undoTransposition()
 
         if not inPlace:
             return returnObj

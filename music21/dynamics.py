@@ -367,16 +367,13 @@ class Crescendo(DynamicWedge):
 
     >>> from music21 import dynamics
     >>> d = dynamics.Crescendo()
-    >>> d.getStartParameters()['spread']
-    0
-    >>> d.getStartParameters()['type']
-    'crescendo'
-
-    >>> d.getEndParameters()['spread']
+    >>> d.spread
     15
-    >>> d.getEndParameters()['type']
-    'stop'
-
+    >>> d.spread = 20
+    >>> d.spread
+    20
+    >>> d.type
+    'crescendo'
     '''
     def __init__(self, *arguments, **keywords):
         DynamicWedge.__init__(self, *arguments, **keywords)
@@ -387,38 +384,15 @@ class Crescendo(DynamicWedge):
         msg = msg.replace(self._reprHead, '<music21.spanner.Crescendo ')
         return msg
 
-    def getStartParameters(self):
-        '''Return the parameters for the start of this spanner
-        '''
-        post = {}
-        post['type'] = self.type # cresc
-        post['spread'] = 0 # start at zero
-        return post
-
-    def getEndParameters(self):
-        '''Return the parameters for the start of this spanner
-        '''
-        post = {}
-        post['type'] = 'stop'  # end is always stop
-        post['spread'] = self.spread # end with spread
-        return post
 
 class Diminuendo(DynamicWedge):
     '''A spanner diminuendo wedge.
 
     >>> from music21 import dynamics
     >>> d = dynamics.Diminuendo()
-    >>> startP = d.getStartParameters()
-    >>> startP['spread']
-    15
-    >>> startP['type']
-    'diminuendo'
-
-    >>> endP = d.getEndParameters()
-    >>> endP['spread']
-    0
-    >>> endP['type']
-    'stop'
+    >>> d.spread = 20
+    >>> d.spread
+    20
     '''
     def __init__(self, *arguments, **keywords):
         DynamicWedge.__init__(self, *arguments, **keywords)
@@ -428,25 +402,6 @@ class Diminuendo(DynamicWedge):
         msg = spanner.Spanner.__repr__(self)
         msg = msg.replace(self._reprHead, '<music21.spanner.Diminuendo ')
         return msg
-
-    def getStartParameters(self):
-        '''Return the parameters for the start of this spanner
-        '''
-        post = {}
-        post['type'] = self.type # dim
-        post['spread'] = self.spread # start with spread
-        return post
-
-    def getEndParameters(self):
-        '''Return the parameters for the start of this spanner
-        '''
-        post = {}
-        post['type'] = 'stop'  # end is always stop
-        post['spread'] = 0
-        return post
-
-
-
 
 #-------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):

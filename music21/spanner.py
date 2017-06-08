@@ -205,7 +205,7 @@ class Spanner(base.Music21Object):
     >>> sp1.completeStatus = True
     '''
     def __init__(self, *arguments, **keywords):
-        base.Music21Object.__init__(self)
+        super(Spanner, self).__init__()
 
         self._cache = {}
 
@@ -1198,7 +1198,7 @@ class Slur(Spanner):
     is used to mark start and end tags of potentially overlapping indicators.
     '''
     def __init__(self, *arguments, **keywords):
-        Spanner.__init__(self, *arguments, **keywords)
+        super(Slur, self).__init__(*arguments, **keywords)
         self.placement = None  # can above or below, after musicxml
         # line type is only needed as a start parameter; suggest that
         # this should also have start/end parameters
@@ -1238,7 +1238,7 @@ class MultiMeasureRest(Spanner):
                  }
 
     def __init__(self, *arguments, **keywords):
-        Spanner.__init__(self, *arguments, **keywords)
+        super(MultiMeasureRest, self).__init__(*arguments, **keywords)
         self._overriddenNumber = None
         self.useSymbols = keywords.get('useSymbols', defaults.multiMeasureRestUseSymbols)
         self.maxSymbols = keywords.get('maxSymbols', defaults.multiMeasureRestMaxSymbols)
@@ -1332,7 +1332,7 @@ class RepeatBracket(Spanner):
 
     '''
     def __init__(self, *arguments, **keywords):
-        Spanner.__init__(self, *arguments, **keywords)
+        super(RepeatBracket, self).__init__(*arguments, **keywords)
 
         self._number = None
         self._numberRange = []  # store a range, inclusive of the single number assignment
@@ -1491,6 +1491,7 @@ class Ottava(Spanner):
     >>> ottava.addSpannedElements([n1, n2])
     >>> s = stream.Stream([ottava, n1, n2])
     >>> s.atSoundingPitch = False
+    
     >>> s2 = s.toSoundingPitch()
     >>> s2.show('text')
     {0.0} <music21.spanner.Ottava 8vb non-transposing<music21.note.Note D><music21.note.Note E>>
@@ -1499,8 +1500,8 @@ class Ottava(Spanner):
     
     >>> for n in s2.notes:
     ...     print(n.nameWithOctave)
-    D5
-    E5
+    D3
+    E3
 
     All valid types
 
@@ -1510,7 +1511,7 @@ class Ottava(Spanner):
     validOttavaTypes = ('8va', '8vb', '15ma', '15mb', '22da', '22db')
 
     def __init__(self, *arguments, **keywords):
-        Spanner.__init__(self, *arguments, **keywords)
+        super(Ottava, self).__init__(*arguments, **keywords)
         self._type = None  # can be 8va, 8vb, 15ma, 15mb
         if 'type' in keywords:
             self.type = keywords['type']  # use property
@@ -1609,51 +1610,6 @@ class Ottava(Spanner):
             else:
                 return 'down'
 
-    def getStartParameters(self):
-        '''
-        Return a dictionary of the parameters for the start of this spanners
-        (required by MusicXML output).
-
-        TODO: Move to m21ToXml
-
-        >>> ottava = spanner.Ottava(type='15mb')
-        >>> st = ottava.getStartParameters()
-        >>> st['type']
-        'up'
-        >>> st['size']
-        15
-        >>> en = ottava.getEndParameters()
-        >>> en['type']
-        'stop'
-        >>> en['size']
-        15
-        '''
-        post = {}
-        post['size'] = self.shiftMagnitude()
-        post['type'] = self.shiftDirection(reverse=True)  # up or down
-        return post
-
-    def getEndParameters(self):
-        '''
-        Return a dict of the parameters for the start of this spanner required by MusicXML output.
-
-        >>> ottava = spanner.Ottava(type=8)
-        >>> st = ottava.getStartParameters()
-        >>> st['type']
-        'down'
-        >>> st['size']
-        8
-        >>> en = ottava.getEndParameters()
-        >>> en['type']
-        'stop'
-        >>> en['size']
-        8
-        '''
-        post = {}
-        post['size'] = self.shiftMagnitude()
-        post['type'] = 'stop'  # always stop
-        return post
-
     def interval(self, reverse=False):
         '''
         return an interval.Interval() object representing this ottava
@@ -1676,14 +1632,28 @@ class Ottava(Spanner):
         '''
         On a transposing spanner, switch to non-transposing,
         set hideObjectOnPrint to True, and transpose all notes and chords
-        in the spanner.
+        in the spanner.  Called by :meth:`~music21.stream.Stream.toSoundingPitch` in Stream
+        
+        >>> ottava = spanner.Ottava(type='8va')
+        >>> n1 = note.Note('D#4')
+        >>> n2 = note.Note('E#4')
+        >>> ottava.addSpannedElements([n1, n2])
+        >>> ottava.transposing
+        True
+
+        >>> ottava.performTransposition()
+
+        >>> ottava.transposing
+        False
+        >>> n1.nameWithOctave
+        'D#5'        
         '''
         if not self.transposing:
             return
         self.transposing = False
         self.hideObjectOnPrint = True
         
-        myInterval = self.interval(reverse=True)
+        myInterval = self.interval()
         for n in self.getSpannedElements():
             if not hasattr(n, 'pitches'):
                 continue
@@ -1695,13 +1665,29 @@ class Ottava(Spanner):
         Change a non-transposing spanner to a transposing spanner,
         making sure it is not hidden and transpose back all the notes
         and chords in the spanner.
+        
+        Called by :meth:`~music21.stream.Stream.toWrittenPitch` in Stream
+
+        >>> ottava = spanner.Ottava(type='8va')
+        >>> n1 = note.Note('D#4')
+        >>> n2 = note.Note('E#4')
+        >>> ottava.addSpannedElements([n1, n2])
+        >>> ottava.transposing = False
+
+        >>> ottava.undoTransposition()
+
+        >>> ottava.transposing
+        True
+        >>> n1.nameWithOctave
+        'D#3'
+        
         '''
         if self.transposing:
             return
         self.transposing = True
         self.hideObjectOnPrint = False
         
-        myInterval = self.interval()
+        myInterval = self.interval(reverse=True)
         for n in self.getSpannedElements():
             if not hasattr(n, 'pitches'):
                 continue
@@ -1727,8 +1713,7 @@ class Line(Spanner):
     validLineTypes = ('solid', 'dashed', 'dotted', 'wavy')
 
     def __init__(self, *arguments, **keywords):
-
-        Spanner.__init__(self, *arguments, **keywords)
+        super(Line, self).__init__(*arguments, **keywords)
 
         self._endTick = 'down'  # can ne up/down/arrow/both/None
         self._startTick = 'down'  # can ne up/down/arrow/both/None
@@ -1855,39 +1840,31 @@ class Line(Spanner):
         ''')
 
 
-    def getStartParameters(self):
-        '''
-        Return a dict of the parameters for the start of this spanners required by MusicXML output.
-        '''
-        post = {}
-        post['type'] = 'start'
-        post['line-end'] = self._getStartTick()
-        post['end-length'] = self._getStartHeight()
-        return post
-
-    def getEndParameters(self):
-        '''
-        Return a dict of the parameters for the start of this spanner required by MusicXML output.
-        '''
-        post = {}
-        post['type'] = 'stop'  # always stop
-        post['line-end'] = self._getEndTick()
-        post['end-length'] = self._getEndHeight()
-        return post
-
-
 class Glissando(Spanner):
     '''
     A between two Notes specifying a glissando or similar alteration.
     Different line types can be specified.
+    
+    Glissandos can have a label and a lineType.  Label is a string or None.
+    lineType defaults to 'wavy'
+    
+    >>> gl = spanner.Glissando()
+    >>> gl.lineType
+    'wavy'
+    >>> print(gl.label)
+    None
+    
+    >>> gl.label = 'gliss.'
+    
+    Note -- not a Line subclass for now, but that might change.
     '''
     validLineTypes = ('solid', 'dashed', 'dotted', 'wavy')
-
+    
     def __init__(self, *arguments, **keywords):
-        Spanner.__init__(self, *arguments, **keywords)
+        super(Glissando, self).__init__(*arguments, **keywords)
 
         self._lineType = 'wavy'
-        self._label = None
+        self.label = None
 
         if 'lineType' in keywords:
             self.lineType = keywords['lineType']  # use property
@@ -1910,61 +1887,6 @@ class Glissando(Spanner):
     lineType = property(_getLineType, _setLineType, doc='''
         Get or set the lineType property. See Line for valid line types
         ''')
-
-
-    def _getLabel(self):
-        return self._label
-
-    def _setLabel(self, value):
-        self._label = value
-
-    label = property(_getLabel, _setLabel, doc='''
-        Get or set the label property.
-        ''')
-
-
-# class DashedLine(Spanner):
-#     '''A dashed line represented as a spanner between two Notes.
-#     '''
-#     # this is the musicxml dashes entity
-#     def __init__(self, *arguments, **keywords):
-#         Spanner.__init__(self, *arguments, **keywords)
-#         # note: musicxml provides a color attribute
-#         self.placement = 'above' # can above or below, after musicxml
-#
-#     def __repr__(self):
-#         msg = Spanner.__repr__(self)
-#         msg = msg.replace(self._reprHead, '<music21.spanner.DashedLine ')
-#         return msg
-#
-#
-
-#-------------------------------------------------------------------------------
-# other ideas for spanners
-
-
-
-
-# associate two or more notes to be beamed together
-# use a stored time signature to apply beaming values
-# class BeamingGroup(Spanner):
-#     pass
-
-# optionally define one or more Streams as a staff
-# provide settings for staff presentation such as number lines
-# presentation of part name?
-# class Staff(Spanner):
-#     pass
-
-# collection of measures within a Score
-# class System(Spanner):
-#     pass
-#
-# # association of all measures or streams on a page
-# class Page(Spanner):
-#     pass
-
-
 
 #-------------------------------------------------------------------------------
 
