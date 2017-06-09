@@ -332,11 +332,6 @@ class Spanner(base.Music21Object):
         self.spannerStorage.purgeLocations(rescanIsDead=rescanIsDead)
         base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
 
-    def getSpannerStorageId(self):
-        '''Return the object id of the SpannerStorage object
-        '''
-        return id(self.spannerStorage)
-
     #---------------------------------------------------------------------------
     def __getitem__(self, key):
         '''
@@ -603,58 +598,6 @@ class Spanner(base.Music21Object):
         return objRef
 
 
-    def getDurationSpanBySite(self, site):
-        '''
-        Return the duration span, or the distance between the first spanned element's
-        offset and the last spanned element's offset plus its duration in quarterLength.
-
-        returns a two-element tuple of the offset of the first element and the
-        end-time of the last element.
-
-        Offsets are relative to the `site` given; this is because it's very
-        likely that different elements in the Spanner are located in different
-        Streams in the hierarchy.
-        '''
-        # these are in order
-        idSite = id(site)
-
-        # special handling for case of a single spannedElement spanner
-        if len(self.spannerStorage) == 1:
-            o = site.elementOffset(self.spannerStorage[0])
-            return o, o + self.spannerStorage[0].duration.quarterLength
-
-        offsetSpannedElement = []  # store pairs
-        for c in self.spannerStorage._elements:
-        # for c in self.getSpannedElements():
-            objRef = c
-            if idSite in objRef.sites.getSiteIds():
-                o = site.elementOffset(objRef)
-                offsetSpannedElement.append([o, objRef])
-        offsetSpannedElement.sort()  # sort by offset
-        minOffset = offsetSpannedElement[0][0]
-        # minSpannedElement = offsetSpannedElement[0][1]
-
-        maxOffset = offsetSpannedElement[-1][0]
-        maxSpannedElement = offsetSpannedElement[-1][1]
-        if maxSpannedElement.duration is not None:
-            highestTime = maxOffset + maxSpannedElement.duration.quarterLength
-        else:
-            highestTime = maxOffset
-
-        return [minOffset, highestTime]
-
-
-    def getDurationBySite(self, site):
-        '''
-        Return a Duration object representing the value between the
-        first spanned element's offset and the last spanned-element's
-        offset plus duration.
-        '''
-        low, high = self.getDurationSpanBySite(site=site)
-        d = duration.Duration()
-        d.quarterLength = high - low
-        return d
-
 #-------------------------------------------------------------------------------
 class SpannerBundle(object):
     '''
@@ -770,7 +713,7 @@ class SpannerBundle(object):
         '''
         post = []
         for x in self._storage:
-            post.append(x.getSpannerStorageId())
+            post.append(id(x.spannerStorage))
         return post
 
     def getByIdLocal(self, idLocal=None):
@@ -2151,8 +2094,6 @@ class Test(unittest.TestCase):
         # p.show()
         # all spanners should be at the part level
         self.assertEqual(len(p.spanners), 2)
-        # have the offsets of the start of each measure
-        self.assertEqual(rb1.getDurationBySite(p).quarterLength, 8.0)
 
         # p.show()
         raw = self.xmlStr(p)

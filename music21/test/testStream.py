@@ -5482,7 +5482,8 @@ class Test(unittest.TestCase):
         melismaByBeat = {}
         for sp in ex.spanners:
             n = sp.getFirst()
-            oMin, oMax = sp.getDurationSpanBySite(exFlat)
+            oMin = min(exFlat.elementOffset(e) for e in sp.spannedElements())
+            oMax = min(exFlat.elementOffset(e) for e in sp.spannedElements())
             dur = oMax - oMin
             beatStr = n.beatStr
             if beatStr not in melismaByBeat:

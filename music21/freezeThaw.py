@@ -548,7 +548,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
         instead it's the id of the storage object:
 
-        >>> staffGroup.getSpannerStorageId() in foundIds
+        >>> id(staffGroup.spannerStorage) in foundIds
         True
 
         Variants are treated similarly:
