@@ -2625,6 +2625,8 @@ class MeasureExporter(XMLExporterBase):
             post['type'] = spanner.type
             if spanner.type == 'crescendo':
                 post['spread'] = 0
+                if spanner.niente:
+                    post['niente'] = 'yes'
             else:
                 post['spread'] = spanner.spread
                                 
@@ -2650,11 +2652,12 @@ class MeasureExporter(XMLExporterBase):
             post['line-end'] = spanner.endTick
             post['end-length'] = spanner.endHeight
         elif spannerClass == 'DynamicWedge':
-            post['type'] = spanner.type
             if spanner.type == 'crescendo':
                 post['spread'] = spanner.spread
             else:
                 post['spread'] = 0
+                if spanner.niente:
+                    post['niente'] = 'yes'
         
         return post
 

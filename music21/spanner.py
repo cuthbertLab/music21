@@ -207,8 +207,6 @@ class Spanner(base.Music21Object):
     def __init__(self, *arguments, **keywords):
         super(Spanner, self).__init__()
 
-        self._cache = {}
-
         # store this so subclasses can replace
         if self.__module__ != '__main__':
             self._reprHead = '<' + self.__module__ + '.' + self.__class__.__name__ + ' '
@@ -220,7 +218,10 @@ class Spanner(base.Music21Object):
         # create a stream subclass, spanner storage; pass a reference
         # to this spanner for getting this spanner from the SpannerStorage
         # directly
+        
+        # TODO: Move here! along with VariantStorage to variant.
         self.spannerStorage = stream.SpannerStorage(spannerParent=self)
+
         # we do not want to auto sort based on offset or class, as
         # both are meaningless inside of this Stream (and only have meaning
         # in Stream external to this
@@ -402,22 +403,16 @@ class Spanner(base.Music21Object):
         >>> sl.getSpannedElementsByClass('Clef') == [c1]
         True
         '''
-        # returns a Stream; pack in a list
+        # returns an iterator
         postStream = self.spannerStorage.getElementsByClass(classFilterList)
-#         post = []
-#         for c in postStream:
-#             post.append(objRef)
-
-        # return raw elements list for speed; attached to a temporary stream
+        # return raw elements list for speed
         return list(postStream)
 
     def getSpannedElementIds(self):
-        '''Return all id() for all stored objects.
         '''
-        if 'spannedElementIds' not in self._cache or self._cache['spannedElementIds'] is None:
-            self._cache['spannedElementIds'] = [id(c) for c in self.spannerStorage._elements]
-        return self._cache['spannedElementIds']
-
+        Return all id() for all stored objects.
+        '''
+        return list(self.spannerStorage._offsetDict)
 
     def addSpannedElements(self, spannedElements, *arguments, **keywords):
         '''
@@ -460,12 +455,17 @@ class Spanner(base.Music21Object):
                 #    this may not be an error.''' % (c, self)])
 
         self.spannerStorage.elementsChanged()
-        # always clear cache
-        if self._cache:
-            self._cache = {}
 
     def hasSpannedElement(self, spannedElement):
-        '''Return True if this Spanner has the spannedElement.'''
+        '''
+        Return True if this Spanner has the spannedElement.
+        '''
+        for c in self.spannerStorage._elements:
+            if c is spannedElement:
+                return True
+        return False
+
+    def __contains__(self, spannedElement):
         for c in self.spannerStorage._elements:
             if c is spannedElement:
                 return True
@@ -516,10 +516,6 @@ class Spanner(base.Music21Object):
         # while this Spanner now has proper elements in its spannerStorage Stream,
         # the element replaced likely has a site left-over from its previous Spanner
 
-        # always clear cache
-        if self._cache:
-            self._cache = {}
-
         # environLocal.printDebug(['replaceSpannedElement()', 'id(old)', id(old),
         #    'id(new)', id(new)])
 
@@ -545,14 +541,11 @@ class Spanner(base.Music21Object):
         >>> sl.isLast(n5)
         True
         '''
-        objRef = self.spannerStorage._elements[0]
-        if objRef is spannedElement:
-            return True
-        return False
+        return self.getFirst() is spannedElement
 
     def getFirst(self):
-        '''Get the object of the first spannedElement
-
+        '''
+        Get the object of the first spannedElement (or None if it's an empty spanner)
 
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
@@ -564,23 +557,24 @@ class Spanner(base.Music21Object):
         >>> sl.addSpannedElements(n1, n2, n3, n4, n5)
         >>> sl.getFirst() is n1
         True
+        
+        >>> spanner.Slur().getFirst() is None
+        True
         '''
-        return self.spannerStorage[0]
+        try:
+            return self.spannerStorage._elements[0]
+        except IndexError:
+            return None
 
     def isLast(self, spannedElement):
-        '''Given a spannedElement, is it last?  Returns True or False
         '''
-        objRef = self.spannerStorage._elements[-1]
-
-        if spannedElement is objRef:
-            return True
-        return False
-
-
+        Given a spannedElement, is it last?  Returns True or False
+        '''
+        return self.getLast() is spannedElement
 
     def getLast(self):
-        '''Get the object of the first spannedElement
-
+        '''
+        Get the object of the last spannedElement (or None if it's an empty spanner)
 
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
@@ -593,9 +587,13 @@ class Spanner(base.Music21Object):
         >>> sl.getLast() is n5
         True
 
+        >>> spanner.Slur().getLast() is None
+        True
         '''
-        objRef = self.spannerStorage.elements[-1]
-        return objRef
+        try:
+            return self.spannerStorage._elements[-1]
+        except IndexError:
+            return None
 
 
 #-------------------------------------------------------------------------------
@@ -709,7 +707,8 @@ class SpannerBundle(object):
         return post
 
     def getSpannerStorageIds(self):
-        '''Return all SpannerStorage ids from all contained Spanners
+        '''
+        Return all SpannerStorage ids from all contained Spanners
         '''
         post = []
         for x in self._storage:
@@ -717,7 +716,8 @@ class SpannerBundle(object):
         return post
 
     def getByIdLocal(self, idLocal=None):
-        '''Get spanners by `idLocal`.
+        '''
+        Get spanners by `idLocal`.
 
         Returns a new SpannerBundle object
 
@@ -1110,16 +1110,14 @@ class SpannerBundle(object):
 #-------------------------------------------------------------------------------
 # connect two or more notes anywhere in the score
 class Slur(Spanner):
-    '''A slur represented as a spanner between two Notes.
+    '''
+    A slur represented as a spanner between two Notes.
 
-    The `idLocal` attribute, defined in the Spanner base class,
-    is used to mark start and end tags of potentially overlapping indicators.
+    Slurs have `.placement` options ('above' or 'below') and `.lineType` ('dashed' or None)
     '''
     def __init__(self, *arguments, **keywords):
         super(Slur, self).__init__(*arguments, **keywords)
         self.placement = None  # can above or below, after musicxml
-        # line type is only needed as a start parameter; suggest that
-        # this should also have start/end parameters
         self.lineType = None  # can be "dashed" or None
 
     # TODO: add property for placement

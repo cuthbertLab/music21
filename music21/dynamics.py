@@ -355,7 +355,8 @@ class DynamicWedge(spanner.Spanner):
 
         self.type = None # crescendo or diminuendo
         self.placement = 'below' # can above or below, after musicxml
-        self.spread = 15 # this unit is probably in tenth
+        self.spread = 15 # this unit is in tenths
+        self.niente = False
 
     def __repr__(self):
         msg = spanner.Spanner.__repr__(self)
