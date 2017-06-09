@@ -318,7 +318,6 @@ class Test(unittest.TestCase):
 
         for sp in ex.spanners.getElementsByClass('Slur'):
             #environLocal.printDebug(['sp', n.nameWithOctave, sp])
-            unused_dur = sp.getDurationBySite(exFlatNotes)
             n = sp.getFirst()
 
 

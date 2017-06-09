@@ -603,35 +603,6 @@ class Spanner(base.Music21Object):
         return objRef
 
 
-    def getOffsetsBySite(self, site):
-        '''Given a site shared by all , return a list of offset values.
-
-
-        >>> n1 = note.Note('g')
-        >>> n2 = note.Note('f#')
-        >>> s = stream.Stream()
-        >>> s.insert(3, n1)
-        >>> s.insert(11, n2)
-        >>> sp = spanner.Spanner(n1, n2)
-        >>> sp.getOffsetsBySite(s)
-        [3.0, 11.0]
-        '''
-        post = []
-        idSite = id(site)
-        for c in self.spannerStorage._elements:
-            # getting site ids is fast, as weakrefs do not have to be unpacked
-            if idSite in c.sites.getSiteIds():
-                o = site.elementOffset(c)
-                post.append(o)
-        return post
-
-    def getOffsetSpanBySite(self, site):
-        '''Return the span, or min and max values, of all offsets for a given site.
-        '''
-        post = self.getOffsetsBySite(site)
-        return [min(post), max(post)]
-
-
     def getDurationSpanBySite(self, site):
         '''
         Return the duration span, or the distance between the first spanned element's
@@ -1944,7 +1915,6 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(s), 3)
         self.assertEqual(sg1.getSpannedElements(), [p1, p2])
-        self.assertEqual(sg1.getOffsetsBySite(s), [0.0, 0.0])
 
         # make sure spanners is unified
 
@@ -1964,8 +1934,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s), 3)
         self.assertEqual(slur1.getSpannedElements(), [n1, n3])
 
-        self.assertEqual(slur1.getOffsetsBySite(p1), [0.0, 2.0])
-        self.assertEqual(slur1.getOffsetSpanBySite(p1), [0.0, 2.0])
 
         # a note can access what spanners it is part of
         self.assertEqual(n1.getSpannerSites(), [slur1])
@@ -2184,7 +2152,6 @@ class Test(unittest.TestCase):
         # all spanners should be at the part level
         self.assertEqual(len(p.spanners), 2)
         # have the offsets of the start of each measure
-        self.assertEqual(rb1.getOffsetsBySite(p), [4.0, 8.0])
         self.assertEqual(rb1.getDurationBySite(p).quarterLength, 8.0)
 
         # p.show()
@@ -2274,12 +2241,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(p.getElementsByClass('Measure')), 12)
         self.assertEqual(len(p.spanners), 4)
 
-        self.assertEqual(rb3.getOffsetsBySite(p), [20.0, 28.0])
-        self.assertEqual(rb3.getDurationBySite(p).quarterLength, 12.0)
-
-        # have the offsets of the start of each measure
-        self.assertEqual(rb4.getOffsetsBySite(p), [32.0, 36.0, 40.0, 44.0])
-        self.assertEqual(rb4.getDurationBySite(p).quarterLength, 16.0)
         raw = self.xmlStr(p)
         self.assertEqual(raw.find("""<ending number="1" type="start" />""") > 1, True)
         self.assertEqual(raw.find("""<ending number="2" type="stop" />""") > 1, True)

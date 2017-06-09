@@ -964,8 +964,6 @@ class TrillExtension(spanner.Spanner):
     >>> # create between notes 2 and 3
     >>> te = expressions.TrillExtension(s.notes[1], s.notes[2])
     >>> s.append(te) # can go anywhere in the Stream
-    >>> te.getDurationBySite(s).quarterLength
-    2.0
     >>> print(te)
     <music21.expressions.TrillExtension <music21.note.Note C><music21.note.Note C>>
     '''
