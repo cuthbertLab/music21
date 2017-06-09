@@ -1430,7 +1430,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 #new.insert(e.getOffsetBySite(old), newElement,
                 #           ignoreSort=True)
                 offset = self.elementOffset(e)
-                newElement = copy.deepcopy(e, memo)
+                if not e.isStream:
+                    newElement = copy.deepcopy(e, memo)
+                else: # this prevents needing to make multipl replacements of spanner bundles
+                    newElement = e._deepcopySubclassable(memo)
+                
                 ### TEST on copying!!!!
                 #if 'Note' in newElement.classes:
                 #    newElement.pitch.ps += 2.0
@@ -1444,9 +1448,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 new._storeAtEndCore(copy.deepcopy(e, memo))
 
         return new
-
-
-
 
     def __deepcopy__(self, memo=None):
         '''
