@@ -944,10 +944,14 @@ class SpannerBundle(object):
 
         replacedSpanners = []
         # post = self.__class__() # return a bundle of spanners that had changes
+        if self._cache:
+            self._cache = {}
+
         for sp in self._storage:  # Spanners in a list
             # environLocal.printDebug(['looking at spanner', sp, sp.getSpannedElementIds()])
 
             # must check to see if this id is in this spanner
+            sp._cache = {}
             if idTarget in sp.getSpannedElementIds():
                 sp.replaceSpannedElement(old, new)
                 replacedSpanners.append(sp)
@@ -2729,6 +2733,10 @@ class Test(unittest.TestCase):
         self.assertIs(t.spanners[0].getFirst(), n2)
         self.assertIs(t.notes[0].getSpannerSites()[0], su2)
         self.assertIsNot(s.notes[0].getSpannerSites()[0], su2)
+        self.assertEqual(len(t.spannerBundle), 1)
+        tn2 = t.spannerBundle.getBySpannedElement(n2)
+        self.assertEqual(len(tn2), 1)
+        
 
 
 #-------------------------------------------------------------------------------
@@ -2737,11 +2745,8 @@ _DOC_ORDER = [Spanner]
 
 
 if __name__ == "__main__":
-    # sys.arg test options will be used in mainTest()
-    # import sys
-    # sys.argv.append('testDeepcopyNotesAndSpannerInStream')
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='testDeepcopyStreamWithSpanners')
 
 
 

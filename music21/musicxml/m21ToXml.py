@@ -1388,6 +1388,7 @@ class ScoreExporter(XMLExporterBase):
                 raise MusicXMLExportException('infinite stream encountered')
 
             pp = PartExporter(innerStream, parent=self)
+            pp.spannerBundle = self.spannerBundle
             pp.parse()
             self.partExporterList.append(pp)
 
@@ -2047,6 +2048,7 @@ class PartExporter(XMLExporterBase):
         self.spannerBundle.setIdLocals()
         for m in measureStream:
             measureExporter = MeasureExporter(m, parent=self)
+            measureExporter.spannerBundle = self.spannerBundle
             mxMeasure = measureExporter.parse()
             self.xmlRoot.append(mxMeasure)
 
@@ -5304,8 +5306,38 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+    def getXml(self, obj):
+        gex = GeneralObjectExporter()
+        bytesOut = gex.parse(obj)
+        bytesOutUnicode = bytesOut.decode('utf-8')
+        return bytesOutUnicode
+
     def testBasic(self):
         pass
+    
+    def testSpannersWrite(self):
+        from music21 import converter
+        p = converter.parse("tinynotation: 4/4 c4 d e f g a b c' b a g2")
+        listNotes = list(p.recurse().notes)
+        c = listNotes[0]
+        d = listNotes[1]
+        sl1 = spanner.Slur([c, d])
+        p.insert(0.0, sl1)
+        #p.getElementsByClass('Measure')[0].insert(0.0, sl1)
+        
+        f = listNotes[3]
+        g = listNotes[4]
+        a = listNotes[5]
+        sl2 = spanner.Slur([f, g, a])
+        p.insert(0.0, sl2)
+        #p.getElementsByClass('Measure')[0].insert(0.0, sl2)
+
+        c2 = listNotes[6]
+        g2 = listNotes[-1]
+        sl3 = spanner.Slur([c2, g2])
+        p.insert(0.0, sl3)
+        #p.getElementsByClass('Measure')[1].insert(0.0, sl3)
+        self.assertEqual(self.getXml(p).count(u'<slur '), 6)
 
 class TestExternal(unittest.TestCase):
     def runTest(self):
@@ -5313,29 +5345,6 @@ class TestExternal(unittest.TestCase):
 
     def testBasic(self):
         pass
-
-#     def testFindOneError(self):
-#         from music21 import corpus
-#
-#         b = corpus.parse('schoenberg')
-#
-#         SX = ScoreExporter(b)
-#         mxScore = SX.parse()
-#         for x in mxScore.findall('part'):
-#             print(x)
-#             for y in x:
-#                 print(y)
-#                 for z in y:
-#                     print(z)
-#                     for w in z:
-#                         print(w)
-#                         for v in w:
-#                             print(v)
-#                             SX.dump(v)
-#                             for u in v:
-#                                 print(u)
-#                                 SX.dump(u)
-#
 
     def testSimple(self):
         from xml.etree.ElementTree import ElementTree as ETObj
@@ -5385,6 +5394,6 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
-    # music21.mainTest(TestExternal, runTest='testSimple')
+    #music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='testSpannersWrite')
 

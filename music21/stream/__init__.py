@@ -1443,34 +1443,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # user here to provide new offset
                 new._storeAtEndCore(copy.deepcopy(e, memo))
 
-        # caching this is CRUCIAL! using new.spannerBundle ever time below added
-        # 40% to the test suite time!
-        newSpannerBundle = new.spannerBundle
-        # only proceed if there are spanners, otherwise creating semiFlat
-        if newSpannerBundle:
-            # iterate over complete semi-flat (need containers); find
-            # all new/old pairs
-            for e in new.recurse(skipSelf=True):
-                # update based on id of old object, and ref to new object
-                if e.sites.hasSpannerSite() and 'Spanner' not in e.classes:
-                    #environLocal.printDebug(['Stream.__deepcopy__', 'replacing component to', e])
-                    # this will clear and replace the proper locations on
-                    # the SpannerStorage Stream
-                    origin = e.derivation.origin
-                    if (origin is not None and e.derivation.method == '__deepcopy__'):
-                        newSpannerBundle.replaceSpannedElement(origin, e)
-                    # need to remove the old SpannerStorage Stream from this element;
-                    # however, all we have here is the new Spanner and new elements
-                    # this must be done here, not when originally copying
-
-
-                    e.purgeOrphans(excludeStorageStreams=False)
-
-        # purging these orphans works in nearly all cases, but there are a few
-        # cases where we rely on a Stream having access to Stream it was
-        # part of after deepcopying
-        #new.purgeOrphans()
         return new
+
 
 
 
@@ -1479,9 +1453,47 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Deepcopy the stream from copy.deepcopy()
         '''
         # does not purgeOrphans -- q: is that a bug or by design?
-        return self._deepcopySubclassable(memo)
+        new = self._deepcopySubclassable(memo)
+        self._replaceSpannerBundleForDeepcopy(new)
+       
+        # purging these orphans works in nearly all cases, but there are a few
+        # cases where we rely on a Stream having access to Stream it was
+        # part of after deepcopying
+        #new.purgeOrphans()
+        return new
 
 
+    def _replaceSpannerBundleForDeepcopy(self, new):
+        # perform the spanner bundle replacement on the outer stream.
+        # caching this is CRUCIAL! using new.spannerBundle ever time below added
+        # 40% to the test suite time!
+        newSpannerBundle = new.spannerBundle
+        # only proceed if there are spanners, otherwise creating semiFlat
+        if not newSpannerBundle:
+            return
+        # iterate over complete semi-flat (need containers); find
+        # all new/old pairs
+        for e in new.recurse(skipSelf=True):
+            # update based on id of old object, and ref to new object
+            if 'Spanner' in e.classes:
+                continue
+            if e.derivation.method != '__deepcopy__':
+                continue
+            
+            origin = e.derivation.origin
+            if origin is None:
+                continue # should not happen...
+            
+            if origin.sites.hasSpannerSite():
+                #environLocal.printDebug(['Stream.__deepcopy__', 'replacing component to', e])
+                # this will clear and replace the proper locations on
+                # the SpannerStorage Stream
+                newSpannerBundle.replaceSpannedElement(origin, e)
+                
+                # need to remove the old SpannerStorage Stream from this element;
+                # however, all we have here is the new Spanner and new elements
+                # this must be done here, not when originally copying
+                e.purgeOrphans(excludeStorageStreams=False)
 
 
     def setElementOffset(self, element, offset, addElement=False):
