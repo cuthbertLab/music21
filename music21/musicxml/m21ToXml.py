@@ -2586,7 +2586,7 @@ class MeasureExporter(XMLExporterBase):
         return preList, postList
     
     @staticmethod
-    def _spannerStartParameters(spannerClass, spanner):
+    def _spannerStartParameters(spannerClass, sp):
         '''
         Return a dict of the parameters for the start of this spanner required by MusicXML output.
 
@@ -2616,24 +2616,24 @@ class MeasureExporter(XMLExporterBase):
         post = {}
         post['type'] = 'start'
         if spannerClass == 'Ottava':
-            post['size'] = spanner.shiftMagnitude()
-            post['type'] = spanner.shiftDirection(reverse=True)  # up or down
+            post['size'] = sp.shiftMagnitude()
+            post['type'] = sp.shiftDirection(reverse=True)  # up or down
         elif spannerClass == 'Line':
-            post['line-end'] = spanner.startTick
-            post['end-length'] = spanner.startHeight
+            post['line-end'] = sp.startTick
+            post['end-length'] = sp.startHeight
         elif spannerClass == 'DynamicWedge':
-            post['type'] = spanner.type
-            if spanner.type == 'crescendo':
+            post['type'] = sp.type
+            if sp.type == 'crescendo':
                 post['spread'] = 0
-                if spanner.niente:
+                if sp.niente:
                     post['niente'] = 'yes'
             else:
-                post['spread'] = spanner.spread
+                post['spread'] = sp.spread
                                 
         return post
 
     @staticmethod
-    def _spannerEndParameters(spannerClass, spanner):
+    def _spannerEndParameters(spannerClass, sp):
         '''
         Return a dict of the parameters for the end of this spanner required by MusicXML output.
 
@@ -2647,16 +2647,16 @@ class MeasureExporter(XMLExporterBase):
         post = {}
         post['type'] = 'stop'
         if spannerClass == 'Ottava':
-            post['size'] = spanner.shiftMagnitude()
+            post['size'] = sp.shiftMagnitude()
         elif spannerClass == 'Line':
-            post['line-end'] = spanner.endTick
-            post['end-length'] = spanner.endHeight
+            post['line-end'] = sp.endTick
+            post['end-length'] = sp.endHeight
         elif spannerClass == 'DynamicWedge':
-            if spanner.type == 'crescendo':
-                post['spread'] = spanner.spread
+            if sp.type == 'crescendo':
+                post['spread'] = sp.spread
             else:
                 post['spread'] = 0
-                if spanner.niente:
+                if sp.niente:
                     post['niente'] = 'yes'
         
         return post

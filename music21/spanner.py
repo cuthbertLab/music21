@@ -28,7 +28,6 @@ from music21 import exceptions21
 from music21 import base
 from music21 import common
 from music21 import defaults
-from music21 import duration
 from music21 import style
 
 from music21.ext import six
@@ -412,7 +411,7 @@ class Spanner(base.Music21Object):
         '''
         Return all id() for all stored objects.
         '''
-        return list(self.spannerStorage._offsetDict)
+        return [id(n) for n in self.spannerStorage._elements]
 
     def addSpannedElements(self, spannedElements, *arguments, **keywords):
         '''
@@ -425,8 +424,8 @@ class Spanner(base.Music21Object):
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> n3 = note.Note('e')
-        >>> n4 = note.Note('c')
-        >>> n5 = note.Note('d-')
+        >>> n4 = note.Note('d-')
+        >>> n5 = note.Note('c')
 
         >>> sl = spanner.Spanner()
         >>> sl.addSpannedElements(n1)
@@ -439,6 +438,8 @@ class Spanner(base.Music21Object):
         # presently, this does not look for redundancies
         if not common.isListLike(spannedElements):
             spannedElements = [spannedElements]
+        else:
+            spannedElements = spannedElements[:] # copy
         # assume all other arguments
         spannedElements += arguments
         # environLocal.printDebug(['addSpannedElements():', spannedElements])
@@ -2638,6 +2639,22 @@ class Test(unittest.TestCase):
         self.assertEqual(len(tn2), 1)
         
 
+    def testGetSpannedElementIds(self):
+        from music21 import note
+        
+        n1 = note.Note('g')
+        n2 = note.Note('f#')
+        n3 = note.Note('e')
+        n4 = note.Note('d-')
+        n5 = note.Note('c')
+
+        sl = Spanner()
+        sl.addSpannedElements(n1)
+        sl.addSpannedElements(n2, n3)
+        sl.addSpannedElements([n4, n5])
+        idList = [id(n) for n in [n1, n2, n3, n4, n5]]
+        slList = sl.getSpannedElementIds()
+        self.assertEqual(idList, slList)
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -2646,7 +2663,7 @@ _DOC_ORDER = [Spanner]
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test) #, runTest='testDeepcopyStreamWithSpanners')
+    music21.mainTest(Test)
 
 
 
