@@ -322,7 +322,7 @@ class ModuleGather(object):
                 modules.append(moduleObject)
         return modules
 
-    def getModule(self, fp, restoreEnvironmentDefaults = False):
+    def getModule(self, fp, restoreEnvironmentDefaults=False):
         '''
         gets one module object from the file path
         '''
@@ -367,7 +367,7 @@ class ModuleGather(object):
                 mod.environLocal.restoreDefaults()
         return mod
 
-    def getModuleWithoutImp(self, fp, restoreEnvironmentDefaults = False):
+    def getModuleWithoutImp(self, fp, restoreEnvironmentDefaults=False):
         '''
         gets one module object from the file path without using Imp
         '''

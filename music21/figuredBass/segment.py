@@ -488,7 +488,7 @@ class Segment(object):
                 "Executing ordinary resolution.")
             return self._resolveOrdinarySegment(segmentB)
 
-    def resolveDiminishedSeventhSegment(self, segmentB, doubledRoot = False):
+    def resolveDiminishedSeventhSegment(self, segmentB, doubledRoot=False):
         '''
         Can resolve a Segment whose :attr:`~music21.figuredBass.segment.Segment.segmentChord`
         spells out a diminished seventh chord. If no applicable method in
@@ -937,7 +937,7 @@ def _unpackTriad(threePartChord):
     threePartChordInfo = [bass, root, third, fifth]
     return threePartChordInfo
 
-def _compileRules(rulesList, maxLength = 4):
+def _compileRules(rulesList, maxLength=4):
     ruleChecking = collections.defaultdict(list)
     for ruleIndex in range(len(rulesList)):
         args = []
@@ -952,7 +952,7 @@ def _compileRules(rulesList, maxLength = 4):
 
     return ruleChecking
 
-def printRules(rulesList, maxLength = 4):
+def printRules(rulesList, maxLength=4):
     '''
     Method which can print to the console rules inputted into
     :meth:`~music21.figuredBass.segment.Segment.singlePossibilityRules`,

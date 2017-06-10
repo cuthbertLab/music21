@@ -704,7 +704,7 @@ def translateDurationToBytes(n):
 
 #--------------------
 
-def mostCommonMeasureRythms(streamIn, transposeDiatonic = False):
+def mostCommonMeasureRythms(streamIn, transposeDiatonic=False):
     '''
     returns a sorted list of dictionaries
     of the most common rhythms in a stream where

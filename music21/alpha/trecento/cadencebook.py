@@ -109,7 +109,7 @@ class TrecentoSheet(object):
                 found.append(self.makeWork(i))
             return found
 
-    def makeWork(self, rownumber = 2):
+    def makeWork(self, rownumber=2):
         '''
         Returns the TrecentoCadenceWork at the given row number
         Same as using getItem above, but without slices...
@@ -202,7 +202,7 @@ class BallataSheet(TrecentoSheet):
 
     sheetname = "fischer_ballata"
 
-    def makeWork(self, rownumber = 1):
+    def makeWork(self, rownumber=1):
         rowvalues = self.sheet.row_values(rownumber - 1)
         return Ballata(rowvalues, self.rowDescriptions)
 
@@ -260,7 +260,7 @@ class GloriaSheet(TrecentoSheet):
 
     sheetname = "gloria"
 
-    def makeWork(self, rownumber = 1):
+    def makeWork(self, rownumber=1):
         rowvalues = self.sheet.row_values(rownumber - 1)
         return Gloria(rowvalues, self.rowDescriptions)
 

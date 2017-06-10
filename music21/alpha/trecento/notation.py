@@ -461,7 +461,7 @@ class Divisione(meter.TimeSignature):
     '.q.'
 
     '''
-    def __init__(self, nameOrSymbol = '.p.'):
+    def __init__(self, nameOrSymbol='.p.'):
         self.name = None
         self.standardSymbol = None
         self._minimaPerBrevis = 0
@@ -764,7 +764,7 @@ class BrevisLengthTranslator(object):
 #    [0.5, 0.5, 0.5, 0.5, 4.0, 4.0, 4.0, 4.0, 4.0, 0.666..., 0.666..., 0.666...]
     '''
 
-    def __init__(self, divisione = None, BL=None, pDS=False):
+    def __init__(self, divisione=None, BL=None, pDS=False):
         self.div = divisione
         if BL is None:
             BL = []

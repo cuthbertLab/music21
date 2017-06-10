@@ -76,7 +76,7 @@ class TonalityCounter(object):
     <BLANKLINE>
     '''
 
-    def __init__(self, worksList, streamName = "T", cadenceName = "A"):
+    def __init__(self, worksList, streamName="T", cadenceName="A"):
         self.worksList = worksList
         self.streamName = streamName
         self.cadenceName = cadenceName
@@ -329,7 +329,7 @@ def sacredTonality(show = True):
         print(tCounter.output)
         tCounter.displayStream.show('lily.png')
 
-def testAll(show = True, fast = False):
+def testAll(show=True, fast=False):
     sacredTonality(show)
     if fast is False:
         nonLandiniTonality(show)
@@ -340,13 +340,13 @@ class Test(unittest.TestCase):
     pass
 
     def runTest(self):
-        testAll(show = False, fast = True)
+        testAll(show=False, fast=True)
 
 class TestExternal(unittest.TestCase):
     pass
 
     def runTest(self):
-        testAll(show = True, fast = False)
+        testAll(show=True, fast=False)
 
 if __name__ == "__main__":
     import music21

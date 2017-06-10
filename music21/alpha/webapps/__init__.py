@@ -269,7 +269,7 @@ def ModWSGIApplication(environ, start_response):
 
 #-------------------------------------------------------------------------------
 
-def makeAgendaFromRequest(requestInput, environ, requestType = None):
+def makeAgendaFromRequest(requestInput, environ, requestType=None):
     '''
     Combines information from POST data and server info into an agenda object
     that can be used with the CommandProcessor.

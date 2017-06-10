@@ -60,7 +60,7 @@ def sortByPMFC(work):
     '''
     return (work.pmfcVol, work.pmfcPageStart)
 
-def makePDFfromPieces(start = 1, finish = 2):
+def makePDFfromPieces(start=1, finish=2):
     '''
     make a PDF from the pieces, in order of their PMFC volumes
 
@@ -106,7 +106,7 @@ def makePDFfromPieces(start = 1, finish = 2):
 #    lStr.writeTemp()
 #    lStr.runThroughLily()
 
-def makePDFfromPiecesWithCapua(start = 2, finish = 3):
+def makePDFfromPiecesWithCapua(start=2, finish=3):
     ballataObj = music21.trecento.cadencebook.BallataSheet()
 
     retrievedPieces = []

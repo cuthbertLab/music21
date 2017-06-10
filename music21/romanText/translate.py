@@ -721,7 +721,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
 letterToNumDict = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
 
 
-def appendMeasureToRepeatEndingsDict(t, m, repeatEndings, measureNumber = None):
+def appendMeasureToRepeatEndingsDict(t, m, repeatEndings, measureNumber=None):
     '''Takes an RTMeasure object (t), (which might represent one or more
     measures; but currently only one) and a music21 stream.Measure object and
     store it as a tuple in the repeatEndings dictionary to mark where the

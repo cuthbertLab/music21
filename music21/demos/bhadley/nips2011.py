@@ -23,9 +23,10 @@ from music21 import common
 from music21 import features
 from music21 import converter
 
-def nipsBuild(useOurExtractors = True, buildSet = 1, evaluationMethod = 'coarse'):
+def nipsBuild(useOurExtractors=True, buildSet=1, evaluationMethod='coarse'):
     '''
-    Runs a collection of Feature Extractors, especially those related to Harmony (ChordSymbol) bass motion
+    Runs a collection of Feature Extractors, especially those 
+    related to Harmony (ChordSymbol) bass motion
     in order to classify pop songs from
     the now-defunct website wikifonia as either early (pre-1960) or recent (post-1980)
     '''

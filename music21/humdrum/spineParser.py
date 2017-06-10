@@ -833,7 +833,7 @@ class SpineLine(HumdrumLine):
     isSpineLine = True
     numSpines = 0
 
-    def __init__(self, position = 0, contents = ""):
+    def __init__(self, position=0, contents=''):
         self.position = position
         contents = contents.rstrip()
         returnList = re.split("\t+", contents)
@@ -1979,7 +1979,7 @@ class EventCollection(object):
     >>> ec2.getAllOccurring()
     [<music21.humdrum.spineParser.SpineEvent D4>, <music21.humdrum.spineParser.SpineEvent pp>]
     '''
-    def __init__(self, maxSpines = 0):
+    def __init__(self, maxSpines=0):
         self.events = common.defaultlist(lambda:None)
         self.lastEvents = common.defaultlist(lambda:None)
         self.maxSpines = maxSpines

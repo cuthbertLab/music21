@@ -118,7 +118,7 @@ class Barline(base.Music21Object):
 
     classSortOrder = -5
 
-    def __init__(self, style = None, location = None):
+    def __init__(self, style=None, location=None):
         base.Music21Object.__init__(self)
 
         # this will raise an exception on error from property

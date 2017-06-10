@@ -336,7 +336,7 @@ class Enumeration(object):
     '''
     Utility object for defining binary MIDI message constants.
     '''
-    def __init__(self, enumList = None):
+    def __init__(self, enumList=None):
         if enumList is None:
             enumList = []
         lookup = { }

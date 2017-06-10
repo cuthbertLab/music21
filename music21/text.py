@@ -102,7 +102,7 @@ def assembleLyrics(streamIn, lineNumber=1):
                 raise Exception('no known Text syllabic setting: %s' % lyricObj.syllabic)
     return ' '.join(words)
 
-def assembleAllLyrics(streamIn, maxLyrics = 10, lyricSeparation='\n'):
+def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n'):
     r'''
     Concatenate all Lyrics text from a stream. The Stream is automatically flattened.
 
@@ -359,7 +359,7 @@ class LanguageDetector(object):
                     'nl': 'Dutch',
                     }
 
-    def __init__(self, text = None):
+    def __init__(self, text=None):
         self.text = text
         self.trigrams = {}
         self.readExcerpts()
@@ -406,7 +406,7 @@ class LanguageDetector(object):
         return maxLang
 
 
-    def mostLikelyLanguageNumeric(self, excerpt = None):
+    def mostLikelyLanguageNumeric(self, excerpt=None):
         '''
         returns a number representing the most likely language for a passage
         or 0 if there is no text.
@@ -487,7 +487,7 @@ class Trigram(object):
 
     '''
 
-    def __init__(self, excerptList = None):
+    def __init__(self, excerptList=None):
         self.lut = {}
         self._length = None
         if excerptList is not None:

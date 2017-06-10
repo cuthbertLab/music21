@@ -665,7 +665,7 @@ def compareNoteCapuaToEditor(note1):
         #    # print "In Capua: " + note1.editorial.harmonicInterval.name
     return statsDict
 
-def compareOnesrcStream(srcStream1, srcStream2, fictaType = "editor"):
+def compareOnesrcStream(srcStream1, srcStream2, fictaType='editor'):
     '''
     Helper function for evaluating Harmony that for each note in srcStream1 determines
     that notes starting interval in relation to srcStream2, and assigns identifiers to
@@ -743,7 +743,7 @@ neutralColor = "blue"
 ##    # also evaluate counters for perfect, imperfect, and other intervals
 ##    pass
 
-def colorCapuaFicta(srcStream1, srcStream2, oneOrBoth = "both"):
+def colorCapuaFicta(srcStream1, srcStream2, oneOrBoth='both'):
     '''
     Given two srcStreams, applies the capua rules and colors each note (in
     note.editorial.misc under "ficta-color") as compared to the srcStreams with no ficta,
@@ -761,8 +761,10 @@ def colorCapuaFicta(srcStream1, srcStream2, oneOrBoth = "both"):
     for note2 in srcStream2:
         colorNote(note2, oneOrBoth)
 
-def colorNote(note1, oneOrBoth = "both"):
-    '''Applies all rules to a note according to what harmonies are better/worse/neutral.'''
+def colorNote(note1, oneOrBoth='both'):
+    '''
+    Applies all rules to a note according to what harmonies are better/worse/neutral.
+    '''
     if "capua2FictaHarmony" not in note1.editorial.misc:
         return
     elif oneOrBoth == "one":

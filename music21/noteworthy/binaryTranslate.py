@@ -142,9 +142,7 @@ class NWCConverter(object):
         self.staffHeight = 0
 
 
-
-
-    def parseFile(self, fp = None):
+    def parseFile(self, fp=None):
         r'''
         Parse a file (calls .toStream)
 
@@ -169,7 +167,7 @@ class NWCConverter(object):
         self.parse()
         return self.toStream()
 
-    def parseString(self, bytesIn = None):
+    def parseString(self, bytesIn=None):
         '''
         same as parseFile but takes a string (in Py3, bytes) of binary data instead.
         '''
@@ -177,7 +175,7 @@ class NWCConverter(object):
         self.parse()
         return self.toStream()
 
-    def readLEShort(self, updateParsePosition = True):
+    def readLEShort(self, updateParsePosition=True):
         '''
         Helper module: read a little-endian short value to an integer
 
@@ -211,7 +209,7 @@ class NWCConverter(object):
             self.parsePosition = pp+2
         return value
 
-    def byteToInt(self, updateParsePosition = True):
+    def byteToInt(self, updateParsePosition=True):
         '''
         changes a byte into an unsigned int
         (i.e., if the byte is > 127 then it's subtracted from 256)
@@ -224,7 +222,7 @@ class NWCConverter(object):
             self.parsePosition = pp+1
         return value
 
-    def byteToSignedInt(self, updateParsePosition = True):
+    def byteToSignedInt(self, updateParsePosition=True):
         '''
         changes a byte into a signed int
         (i.e., if the byte is > 127 then it's subtracted from 256)
@@ -234,7 +232,7 @@ class NWCConverter(object):
             val = val - 256
         return val
 
-    def readBytes(self, bytesToRead = 1, updateParsePosition = True):
+    def readBytes(self, bytesToRead=1, updateParsePosition=True):
         '''
         reads the next bytesToRead bytes and then (optionally) updates self.parsePosition
         '''
@@ -245,7 +243,7 @@ class NWCConverter(object):
             self.parsePosition = pp+bytesToRead
         return value
 
-    def readToNUL(self, updateParsePosition = True):
+    def readToNUL(self, updateParsePosition=True):
         r'''
         reads self.fileContents up to, but not including, the next position of \x00.
 
@@ -271,7 +269,7 @@ class NWCConverter(object):
             self.parsePosition = nulPosition + 1
         return ret
 
-    def isValidNWCFile(self, updateParsePosition = True):
+    def isValidNWCFile(self, updateParsePosition=True):
         storedPP = self.parsePosition
         self.parsePosition = 0
         header1 = self.readToNUL()
@@ -298,7 +296,7 @@ class NWCConverter(object):
                       0x0201: 201,
                       }
 
-    def fileVersion(self, updateParsePosition = True):
+    def fileVersion(self, updateParsePosition=True):
         storedPP = self.parsePosition
         self.parsePosition = 45
         fileVersionRaw = self.readLEShort(updateParsePosition)
@@ -312,10 +310,10 @@ class NWCConverter(object):
 
         return self.version
 
-    def skipBytes(self, numBytes = 1):
+    def skipBytes(self, numBytes=1):
         self.parsePosition += numBytes
 
-    def advanceToNotNUL(self, nul = b'\x00'):
+    def advanceToNotNUL(self, nul=b'\x00'):
         pp = self.parsePosition
         fc = self.fileContents
         # the slice Notation [pp:pp+1] is needed to avoid Py3 conversion to bytes
@@ -594,7 +592,7 @@ class NWCStaff(object):
 
         #print "Number of objects: ", self.numberOfObjects
         for i in range(self.numberOfObjects):
-            thisObject = NWCObject(staffParent = self, parserParent = p)
+            thisObject = NWCObject(staffParent=self, parserParent=p)
             thisObject.parse()
             objects.append(thisObject)
         self.objects = objects
@@ -602,7 +600,7 @@ class NWCStaff(object):
         return objects
 
 class NWCObject(object):
-    def __init__(self, staffParent = None, parserParent = None):
+    def __init__(self, staffParent=None, parserParent=None):
         self.staffParent = staffParent
         self.parserParent = parserParent
         self.type = None

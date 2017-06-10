@@ -387,7 +387,7 @@ def twelveBarBlues():
 
 # -----------------------------------------------------------------
 # METHODS FOR GENERATION OF BLUES VAMPS
-def generateBoogieVamp(blRealization = None, numRepeats = 5):
+def generateBoogieVamp(blRealization=None, numRepeats=5):
     '''
     Turns whole notes in twelve bar blues bass line to blues boogie woogie bass line. Takes
     in numRepeats, which is the number of times to repeat the bass line. Also, takes in a
@@ -432,7 +432,7 @@ def generateBoogieVamp(blRealization = None, numRepeats = 5):
 
     return newScore
 
-def generateTripletBlues(blRealization = None, numRepeats = 5): #12/8
+def generateTripletBlues(blRealization=None, numRepeats=5): #12/8
     '''
     Turns whole notes in twelve bar blues bass line to triplet blues bass line. Takes
     in numRepeats, which is the number of times to repeat the bass line. Also, takes in a

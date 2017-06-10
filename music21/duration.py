@@ -2983,7 +2983,7 @@ class TupletFixer(object):
     reflect proper beaming, etc.  It does not alter the quarterLength
     of any notes.
     '''
-    def __init__(self, streamIn = None):
+    def __init__(self, streamIn=None):
         self.streamIn = streamIn
 
         self.allTupletGroups = None
@@ -3008,7 +3008,7 @@ class TupletFixer(object):
         self.totalTupletDuration = None
         self.currentTupletDuration = None
 
-    def findTupletGroups(self, incorporateGroupings = False):
+    def findTupletGroups(self, incorporateGroupings=False):
         '''
         Finds all tuplets in the stream and puts them into groups.
 

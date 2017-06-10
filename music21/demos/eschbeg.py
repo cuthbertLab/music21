@@ -99,7 +99,7 @@ def generateRandomRows(numberToGenerate = 1000):
     return returnRows
 
 
-def priorProbability(rowsToTest = 1000000, enforce12Tone = True):
+def priorProbability(rowsToTest=1000000, enforce12Tone=True):
     '''
     Returns the number of randomly generated
     tone rows (or random 12 pitch collections)
@@ -131,7 +131,7 @@ def priorProbability(rowsToTest = 1000000, enforce12Tone = True):
                 eschbegTransTotal += 1
     return (eschbegTotal, eschbegTransTotal)
 
-def findEmbeddedChords(testSet = "0234589", cardinality = 3, skipInverse = False):
+def findEmbeddedChords(testSet='0234589', cardinality=3, skipInverse=False):
     '''
     finds the trichords (or chords of other cardinalities) in the Aschbeg set or
     any other set.  This example shows that every possible trichord appears at least once
@@ -245,7 +245,7 @@ def findEmbeddedChords(testSet = "0234589", cardinality = 3, skipInverse = False
                         ret += "(" + transInverseString + ") "
     return ret.lstrip()
 
-def uniquenessOfEschbeg(cardinality = 7, searchCardinality = 3, skipInverse = False, showMatching=True):
+def uniquenessOfEschbeg(cardinality=7, searchCardinality=3, skipInverse=False, showMatching=True):
     '''
     the Eschbeg heptachord contains all trichords and their inversions.  How many heptachords do
     that?

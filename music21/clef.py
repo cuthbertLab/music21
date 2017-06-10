@@ -435,7 +435,7 @@ CLASS_FROM_TYPE = {
 
 
 
-def clefFromString(clefString, octaveShift = 0):
+def clefFromString(clefString, octaveShift=0):
     '''
     Returns a Clef object given a string like "G2" or "F4" etc.
 

@@ -79,7 +79,7 @@ class GregorianStream(stream.Stream):
                     outLine += "("
                     startedSyllable = True
 
-                outLine += e.toGABC(useClef = currentClef)
+                outLine += e.toGABC(useClef=currentClef)
             elif 'Clef' in e.classes:
                 if startedSyllable:
                     outLine += ") "
@@ -153,7 +153,7 @@ class GregorianNote(note.Note):
     def __init__(self, *arguments, **keywords):
         note.Note.__init__(self, *arguments, **keywords)
 
-    def toGABC(self, useClef = None, nextNote = None):
+    def toGABC(self, useClef=None, nextNote=None):
         letter = self.toBasicGABC(useClef)
         if self.debilis:
             letter = "-" + letter
@@ -209,7 +209,7 @@ class GregorianNote(note.Note):
         return letter
 
 
-    def toBasicGABC(self, useClef = None):
+    def toBasicGABC(self, useClef=None):
         '''
         returns the character representing inNote in the given clef (default = AltoClef)
 
@@ -361,7 +361,7 @@ class BaseScoreConverter(object):
         return fp
 
 
-    def launchGregorio(self, fp = None):
+    def launchGregorio(self, fp=None):
         '''
         converts a .gabc file to LaTeX using the
         gregorio converter.  Returns the filename with .tex substituted for .gabc
@@ -392,7 +392,7 @@ class BaseScoreConverter(object):
         newfp = re.sub(r'\.gabc', '.tex', fp)
         return newfp
 
-    def launchLaTeX(self, fp = None):
+    def launchLaTeX(self, fp=None):
         '''
         converts a .tex file to pdf using lulatex
         Returns the filename with .pdf substituted for .tex

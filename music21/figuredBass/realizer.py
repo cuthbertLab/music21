@@ -128,7 +128,7 @@ def figuredBassFromStream(streamPart):
     return fb
 
 
-def addLyricsToBassNote(bassNote, notationString = None):
+def addLyricsToBassNote(bassNote, notationString=None):
     '''
     Takes in a bassNote and a corresponding notationString as arguments.
     Adds the parsed notationString as lyrics to the bassNote, which is
@@ -191,7 +191,7 @@ class FiguredBassLine(object):
                     'time signature of realizations outputted to a ' +
                     ':class:`~music21.stream.Score`.'}
 
-    def __init__(self, inKey = None, inTime=None):
+    def __init__(self, inKey=None, inTime=None):
         if inKey is None:
             inKey = key.Key('C')
         if inTime is None:
@@ -204,7 +204,7 @@ class FiguredBassLine(object):
         self._fbScale = realizerScale.FiguredBassScale(inKey.pitchFromDegree(1), inKey.mode)
         self._fbList = []
 
-    def addElement(self, bassObject, notationString = None):
+    def addElement(self, bassObject, notationString=None):
         '''
         Use this method to add (bassNote, notationString) pairs to the bass line. Elements
         are realized in the order they are added.
@@ -298,7 +298,7 @@ class FiguredBassLine(object):
             m0.padAsAnacrusis()
         return bl2
 
-    def retrieveSegments(self, fbRules = None, numParts = 4, maxPitch = None):
+    def retrieveSegments(self, fbRules=None, numParts=4, maxPitch=None):
         '''
         generates the segmentList from an fbList, including any overlayed Segments
 
@@ -353,7 +353,7 @@ class FiguredBassLine(object):
     def overlayPart(self, music21Part):
         self._overlayedParts.append(music21Part)
 
-    def realize(self, fbRules = None, numParts = 4, maxPitch = None):
+    def realize(self, fbRules=None, numParts=4, maxPitch=None):
         '''
         Creates a :class:`~music21.figuredBass.segment.Segment`
         for each (bassNote, notationString) pair
@@ -536,6 +536,7 @@ class Realization(object):
                         are represented in keyboard style, with two staves. If False,
                         realizations are represented in chorale style with n staves,
                         where n is the number of parts. SATB if n = 4.'''}
+    
     def __init__(self, **fbLineOutputs):
         # fbLineOutputs always will have three elements, checks are for sphinx documentation only.
         if 'realizedSegmentList' in fbLineOutputs:
@@ -753,7 +754,7 @@ class Realization(object):
         possibilityProgression = self.getRandomPossibilityProgression()
         return self.generateRealizationFromPossibilityProgression(possibilityProgression)
 
-    def generateRandomRealizations(self, amountToGenerate = 20):
+    def generateRandomRealizations(self, amountToGenerate=20):
         '''
         Generates *amountToGenerate* unique realizations as a :class:`~music21.stream.Score`.
 

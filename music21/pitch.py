@@ -3326,7 +3326,7 @@ class Pitch(object):
 #         return harmonicMatch, fundamental
 
 
-    def harmonicString(self, fundamental = None):
+    def harmonicString(self, fundamental=None):
         '''
         Return a string representation of a harmonic equivalence.
 

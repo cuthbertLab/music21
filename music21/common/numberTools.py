@@ -477,7 +477,7 @@ def py3round(number, ndigits=None):
     else:
         return retAmount
 
-def almostEquals(x, y = 0.0, grain=1e-7):
+def almostEquals(x, y=0.0, grain=1e-7):
     '''
     almostEquals(x, y) -- returns True if x and y are
     within grain (default  0.0000001) of each other
@@ -537,7 +537,7 @@ def addFloatPrecision(x, grain=1e-2):
     return x
 
 
-def strTrimFloat(floatNum, maxNum = 4):
+def strTrimFloat(floatNum, maxNum=4):
     '''
     returns a string from a float that is at most maxNum of
     decimial digits long, but never less than 1.

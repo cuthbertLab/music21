@@ -155,7 +155,7 @@ class VexflowPickler(object):
 
         return loadM21formatted
 
-    def getJSBodyScript(self, dataSplit, defaults = None):
+    def getJSBodyScript(self, dataSplit, defaults=None):
         '''
         Get the <script>...</script> tag to render the JSON
 
@@ -177,7 +177,7 @@ class VexflowPickler(object):
         jsBodyScript = self.jsBodyScript.format(jsBody = jsBody)
         return jsBodyScript
 
-    def getJSBody(self, dataSplit, defaults = None):
+    def getJSBody(self, dataSplit, defaults=None):
         '''
         Get the javascript code without the <script> tags to render the JSON
 

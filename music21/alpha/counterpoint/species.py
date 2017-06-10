@@ -35,7 +35,7 @@ class ModalCounterpointException(exceptions21.Music21Exception):
     pass
 
 class ModalCounterpoint(object):
-    def __init__(self, stream1 = None, stream2 = None):
+    def __init__(self, stream1=None, stream2=None):
         self.stream1 = stream1
         self.stream2 = stream2
         self.legalHarmonicIntervals = ['P1', 'P5', 'P8', 'm3', 'M3', 'm6', 'M6']
@@ -791,7 +791,7 @@ class ModalCounterpoint(object):
         hidden = self.findHiddenOctaves(stream1, stream2)
         return parallel + hidden
 
-    def tooManyThirds(self, stream1, stream2, limit = 3):
+    def tooManyThirds(self, stream1, stream2, limit=3):
         '''Given two consecutive streams and a limit, returns True if the
         number of consecutive harmonic thirds exceeds the limit and False
         otherwise.
@@ -861,7 +861,7 @@ class ModalCounterpoint(object):
 ##            newList = intervalList[1:]
 ##            return self.thirdCounter(newList, numThirds)
 
-    def tooManySixths(self, stream1, stream2, limit = 3):
+    def tooManySixths(self, stream1, stream2, limit=3):
         '''Given two consecutive streams and a limit, returns True if the
         number of consecutive harmonic sixths exceeds the limit and False
         otherwise.
@@ -989,7 +989,7 @@ class ModalCounterpoint(object):
             stream2.append(copy.deepcopy(note1))
         return stream2
 
-    def generateFirstSpecies(self, cantusFirmus, minorScale, choice = 'random'):
+    def generateFirstSpecies(self, cantusFirmus, minorScale, choice='random'):
         '''
         Doc
         '''
@@ -1038,7 +1038,7 @@ class ModalCounterpoint(object):
 
         return top
 
-    def getValidSecondVoice(self, stream1, minorScale, choice = 'random'):
+    def getValidSecondVoice(self, stream1, minorScale, choice='random'):
         '''Given a stream (the cantus firmus) and the stream's key in the
         form of a MinorScale object, generates a stream of first species
         counterpoint that follows the rules of 21M.301.

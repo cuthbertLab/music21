@@ -16,7 +16,7 @@ from music21 import stream
 import copy
 import random
 
-def rhythmLine(baseNote = None, minLength = 8.0, maxProbability = 0.5):
+def rhythmLine(baseNote = None, minLength=8.0, maxProbability=0.5):
     if baseNote is None:
         baseNote = note.Note(type='quarter')
     newStream = stream.Part()

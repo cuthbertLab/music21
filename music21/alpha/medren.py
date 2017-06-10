@@ -84,8 +84,8 @@ class MensuralClef(clef.Clef):
     '0x5c'
     '''
 
-    def __init__(self, sign = 'C'):
-        clef.Clef.__init__(self)
+    def __init__(self, sign='C'):
+        super(MensuralClef, self).__init__()
         self._line = None
         self._fontString = None
 
@@ -129,7 +129,7 @@ class Mensuration(meter.TimeSignature):
 
     >>> from music21.alpha import medren
 
-    >>> ODot = medren.Mensuration(tempus = 'perfect', prolation = 'major')
+    >>> ODot = medren.Mensuration(tempus='perfect', prolation='major')
     >>> ODot.standardSymbol
     'O-dot'
     >>> ODot.fontString
@@ -244,8 +244,8 @@ class GeneralMensuralNote(base.Music21Object):
     Two general mensural notes are considered equal if they have the same mensural type,
     are present in the same context, and have the same offset within that context.
     '''
-    def __init__(self, mensuralTypeOrAbbr = 'brevis'):
-        base.Music21Object.__init__(self)
+    def __init__(self, mensuralTypeOrAbbr='brevis'):
+        super(GeneralMensuralNote, self).__init__()
         self._gettingDuration = False
         self._duration = None
         if mensuralTypeOrAbbr in _validMensuralTypes:
@@ -407,7 +407,7 @@ class GeneralMensuralNote(base.Music21Object):
             self.duration = duration.Duration(0.0)
 
 
-    def _getTranslator(self, mensurationOrDivisione = None, surroundingStream = None):
+    def _getTranslator(self, mensurationOrDivisione=None, surroundingStream=None):
 
         mOrD = mensurationOrDivisione
         if mOrD is None:

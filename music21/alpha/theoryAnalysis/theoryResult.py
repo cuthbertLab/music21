@@ -46,7 +46,7 @@ class VLQTheoryResult(TheoryResult):
         TheoryResult.__init__(self)
         self.vlq = vlq
 
-    def color(self, color='red', noteList = (1, 2, 3, 4)):
+    def color(self, color='red', noteList=(1, 2, 3, 4)):
         '''
         Color the notes in the vlq as specified by noteList, which is a list
         of numbers 1-4 corresponding to the vlq map:

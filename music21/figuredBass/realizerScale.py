@@ -69,7 +69,7 @@ class FiguredBassScale(object):
         except KeyError:
             raise FiguredBassScaleException("Unsupported scale type-> " + scaleMode)
 
-    def getPitchNames(self, bassPitch, notationString = None):
+    def getPitchNames(self, bassPitch, notationString=None):
         '''
         Takes a bassPitch and notationString and returns a list of corresponding
         pitch names based on the scale value and mode above and inclusive of the
@@ -109,7 +109,7 @@ class FiguredBassScale(object):
         pitchNames.reverse()
         return pitchNames
 
-    def getSamplePitches(self, bassPitch, notationString = None):
+    def getSamplePitches(self, bassPitch, notationString=None):
         '''
         Returns all pitches for a bassPitch and notationString within
         an octave of the bassPitch, inclusive of the bassPitch but

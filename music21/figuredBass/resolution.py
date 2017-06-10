@@ -245,7 +245,7 @@ def augmentedSixthToMinorTonic(augSixthPossib, augSixthType=None, augSixthChordI
 
     return _resolvePitches(augSixthPossib, howToResolve)
 
-def dominantSeventhToMajorTonic(domPossib, resolveV43toI6 = False, domChordInfo = None):
+def dominantSeventhToMajorTonic(domPossib, resolveV43toI6=False, domChordInfo=None):
     '''
     Resolves a dominant seventh chord in root position or any of its
     inversions to the major tonic, in root position or first inversion.
@@ -393,7 +393,7 @@ def dominantSeventhToMinorTonic(domPossib, resolveV43toi6=False, domChordInfo=No
 
     return _resolvePitches(domPossib, howToResolve)
 
-def dominantSeventhToMajorSubmediant(domPossib, domChordInfo = None):
+def dominantSeventhToMajorSubmediant(domPossib, domChordInfo=None):
     '''
     Resolves a dominant seventh chord in root position to the
     major submediant (VI) in root position.
@@ -429,7 +429,7 @@ def dominantSeventhToMajorSubmediant(domPossib, domChordInfo = None):
 
     return _resolvePitches(domPossib, howToResolve)
 
-def dominantSeventhToMinorSubmediant(domPossib, domChordInfo = None):
+def dominantSeventhToMinorSubmediant(domPossib, domChordInfo=None):
     '''
     Resolves a dominant seventh chord in root position to the
     minor submediant (vi) in root position.
@@ -465,7 +465,7 @@ def dominantSeventhToMinorSubmediant(domPossib, domChordInfo = None):
 
     return _resolvePitches(domPossib, howToResolve)
 
-def dominantSeventhToMajorSubdominant(domPossib, domChordInfo = None):
+def dominantSeventhToMajorSubdominant(domPossib, domChordInfo=None):
     '''
     Resolves a dominant seventh chord in root position
     to the major subdominant (IV) in first inversion.
@@ -500,7 +500,7 @@ def dominantSeventhToMajorSubdominant(domPossib, domChordInfo = None):
 
     return _resolvePitches(domPossib, howToResolve)
 
-def dominantSeventhToMinorSubdominant(domPossib, domChordInfo = None):
+def dominantSeventhToMinorSubdominant(domPossib, domChordInfo=None):
     '''
     Resolves a dominant seventh chord in root position
     to the minor subdominant (iv) in first inversion.
@@ -535,7 +535,7 @@ def dominantSeventhToMinorSubdominant(domPossib, domChordInfo = None):
 
     return _resolvePitches(domPossib, howToResolve)
 
-def diminishedSeventhToMajorTonic(dimPossib, doubledRoot = False, dimChordInfo = None):
+def diminishedSeventhToMajorTonic(dimPossib, doubledRoot=False, dimChordInfo=None):
     '''
     Resolves a fully diminished seventh chord to the major tonic,
     in root position or either inversion.
@@ -581,7 +581,7 @@ def diminishedSeventhToMajorTonic(dimPossib, doubledRoot = False, dimChordInfo =
 
     return _resolvePitches(dimPossib, howToResolve)
 
-def diminishedSeventhToMinorTonic(dimPossib, doubledRoot = False, dimChordInfo = None):
+def diminishedSeventhToMinorTonic(dimPossib, doubledRoot=False, dimChordInfo=None):
     '''
     Resolves a fully diminished seventh chord to the minor tonic,
     in root position or either inversion.
@@ -627,7 +627,7 @@ def diminishedSeventhToMinorTonic(dimPossib, doubledRoot = False, dimChordInfo =
 
     return _resolvePitches(dimPossib, howToResolve)
 
-def diminishedSeventhToMajorSubdominant(dimPossib, dimChordInfo = None):
+def diminishedSeventhToMajorSubdominant(dimPossib, dimChordInfo=None):
     '''
     Resolves a fully diminished seventh chord to the
     major subdominant (IV).
@@ -660,7 +660,7 @@ def diminishedSeventhToMajorSubdominant(dimPossib, dimChordInfo = None):
 
     return _resolvePitches(dimPossib, howToResolve)
 
-def diminishedSeventhToMinorSubdominant(dimPossib, dimChordInfo = None):
+def diminishedSeventhToMinorSubdominant(dimPossib, dimChordInfo=None):
     '''
     Resolves a fully diminished seventh chord to the
     minor subdominant (iv).

@@ -1148,7 +1148,7 @@ class Iterator(object):
         return self.__next__()
 
     #---Functions
-    def _returnChorale(self, choraleIndex = None):
+    def _returnChorale(self, choraleIndex=None):
         u'''
         This returns a chorale based upon the _currentIndex
         and the numberingSystem. The numberList is the list

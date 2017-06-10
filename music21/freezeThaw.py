@@ -230,7 +230,7 @@ class StreamFreezer(StreamFreezeThawBase):
         elif streamObj is not None:
             self.stream = streamObj
 
-    def packStream(self, streamObj = None):
+    def packStream(self, streamObj=None):
         '''
         Prepare the passed in Stream in place, return storage
         dictionary format.
@@ -251,7 +251,7 @@ class StreamFreezer(StreamFreezeThawBase):
         storage = {'stream': streamObj, 'm21Version': base.VERSION}
         return storage
 
-    def setupSerializationScaffold(self, streamObj = None):
+    def setupSerializationScaffold(self, streamObj=None):
         '''
         Prepare this stream and all of its contents for pickle/pickling, that
         is, serializing and storing an object representation on file or as a string.
@@ -754,7 +754,7 @@ class StreamThawer(StreamFreezeThawBase):
 
     # TODO: Test that the _NoneSite singleton is restored properly after freezeThaw.
 
-    def teardownSerializationScaffold(self, streamObj = None):
+    def teardownSerializationScaffold(self, streamObj=None):
         '''
         After rebuilding this Stream from pickled storage, prepare this as a normal `Stream`.
 
@@ -963,7 +963,7 @@ class StreamThawer(StreamFreezeThawBase):
 
         self.stream = self.unpackStream(storage)
 
-    def openStr(self, fileData, pickleFormat = None):
+    def openStr(self, fileData, pickleFormat=None):
         '''
         Take a string representing a Frozen(pickled/jsonpickled)
         Stream and convert it to a normal Stream.

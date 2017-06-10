@@ -896,7 +896,7 @@ class MeterTerminal(SlottedObjectMixin):
 #     quarterLengthToBeatLengthRatio = property(_getQuarterLengthToBeatLengthRatio)
 #
 #
-#     def quarterOffsetToBeat(self, currentQtrPosition = 0):
+#     def quarterOffsetToBeat(self, currentQtrPosition=0):
 #         return ((currentQtrPosition * self.quarterLengthToBeatLengthRatio) + 1)
 #
 

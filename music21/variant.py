@@ -1371,7 +1371,7 @@ def _getRegionsFromStreams(streamX, streamY):
     return regions
 
 
-def _mergeVariants(streamA, streamB, containsVariants = False, variantName=None, inPlace=False):
+def _mergeVariants(streamA, streamB, containsVariants=False, variantName=None, inPlace=False):
     '''
     This is a helper function for mergeVariantsEqualDuration which takes two streams
     (which cannot contain container

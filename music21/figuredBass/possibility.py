@@ -735,7 +735,7 @@ def upperPartsSame(possibA, possibB):
 
     return True
 
-def partsSame(possibA, possibB, partsToCheck = None):
+def partsSame(possibA, possibB, partsToCheck=None):
     '''
     Takes in partsToCheck, a list of part numbers. Checks if pitches at those part numbers of
     possibA and possibB are equal, determined by pitch space.

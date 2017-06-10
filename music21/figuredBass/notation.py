@@ -151,7 +151,7 @@ class Notation(object):
                     'associated with figures in the expanded ' +
                     ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.'}
 
-    def __init__(self, notationColumn = None):
+    def __init__(self, notationColumn=None):
         #Parse notation string
         if notationColumn is None:
             notationColumn = ""
@@ -370,7 +370,7 @@ class Figure(object):
                     'associated with an expanded ' +
                     ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.'}
 
-    def __init__(self, number = 1, modifierString = None):
+    def __init__(self, number=1, modifierString=None):
         self.number = number
         self.modifierString = modifierString
         self.modifier = Modifier(modifierString)
@@ -444,7 +444,7 @@ class Modifier(object):
                  'accidental': ' A :class:`~music21.pitch.Accidental` corresponding to ' +
                     ':attr:`~music21.figuredBass.notation.Modifier.modifierString`.'}
 
-    def __init__(self, modifierString = None):
+    def __init__(self, modifierString=None):
         self.modifierString = modifierString
         self.accidental = self._toAccidental()
 

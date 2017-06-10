@@ -1305,7 +1305,7 @@ class Verticality(base.Music21Object):
         [<music21.harmony.ChordSymbol C>, <music21.note.Note A>, <music21.note.Note C>]
         ''')
 
-    def getStream(self, streamVSCameFrom = None):
+    def getStream(self, streamVSCameFrom=None):
         '''
         returns the stream representation of this vertical slice. Optionally pass in
         the full stream that this verticality was extracted from, and correct key, meter, and time
@@ -1664,7 +1664,8 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
                   'couldBeNeighborTone',
                   'couldBeDiatonicNeighborTone',
                   'couldBeChromaticNeighborTone']
-    def __init__(self, noteListorn1=None, n2 = None, n3 = None):
+    
+    def __init__(self, noteListorn1=None, n2=None, n3=None):
         if isinstance(noteListorn1, (list, tuple)):
             NNoteLinearSegment.__init__(self, noteListorn1)
         else:

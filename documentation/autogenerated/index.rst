@@ -26,9 +26,4 @@
 .. toctree::
    :maxdepth: 2
 
-   tutorials/index
-
-.. toctree::
-   :maxdepth: 2
-
    developerReference/index

@@ -301,7 +301,7 @@ class LyLilypondTop(LyObject):
     error and \invalid are not defined by music21
     '''
     canContain = [None, "TopLevelExpression", "Assignment"]
-    def __init__(self, contents = None):
+    def __init__(self, contents=None):
         if contents is None:
             contents = []
         LyObject.__init__(self)
@@ -1983,7 +1983,7 @@ class LySimpleMarkup(LyObject):
 
     takes 1 required arg, 2nd for markup_function
     '''
-    def __init__(self, simpleType = 'string', argument1=None, argument2=None):
+    def __init__(self, simpleType='string', argument1=None, argument2=None):
         LyObject.__init__(self)
         self.simpleType = simpleType
         self.argument1 = argument1

@@ -4536,7 +4536,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             pass
         return post
 
-    def invertDiatonic(self, inversionNote = note.Note('C4'), inPlace = True ):
+    def invertDiatonic(self, inversionNote=note.Note('C4'), inPlace=True):
         '''
         inverts a stream diatonically around the given note (by default, middle C)
 

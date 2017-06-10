@@ -196,7 +196,8 @@ def expandShortHand(shorthand):
 
 
 def figureFromChordAndKey(chordObj, keyObj=None):
-    '''Returns the post RN figure for a given chord in a given key.
+    '''
+    Returns the post RN figure for a given chord in a given key.
 
     If keyObj is none, it uses the root as a major key:
 
@@ -797,7 +798,7 @@ class RomanNumeral(harmony.Harmony):
     >>> [str(p) for p in dominantV.pitches]
     ['B4', 'D#5', 'F#5', 'A5']
 
-    >>> minorV = roman.RomanNumeral('V43', em, caseMatters = False)
+    >>> minorV = roman.RomanNumeral('V43', em, caseMatters=False)
     >>> [str(p) for p in minorV.pitches]
     ['F#4', 'A4', 'B4', 'D5']
 
@@ -829,11 +830,11 @@ class RomanNumeral(harmony.Harmony):
 
     Either of these is the same way of getting a minor iii in a minor key:
 
-    >>> minoriii = roman.RomanNumeral('iii', em, caseMatters = True)
+    >>> minoriii = roman.RomanNumeral('iii', em, caseMatters=True)
     >>> [str(p) for p in minoriii.pitches]
     ['G4', 'B-4', 'D5']
 
-    >>> minoriiiB = roman.RomanNumeral('IIIb', em, caseMatters = False)
+    >>> minoriiiB = roman.RomanNumeral('IIIb', em, caseMatters=False)
     >>> [str(p) for p in minoriiiB.pitches]
     ['G4', 'B-4', 'D5']
 
@@ -939,7 +940,7 @@ class RomanNumeral(harmony.Harmony):
     ['C2', 'E-2', 'G-2', 'A2', 'C3']
 
     >>> romanNumeral2 = roman.RomanNumeral(
-    ...     'V7#5b3', ots, caseMatters = False)
+    ...     'V7#5b3', ots, caseMatters=False)
     >>> [str(p) for p in romanNumeral2.pitches]
     ['G-2', 'A-2', 'C#3', 'E-3']
 
@@ -1085,7 +1086,7 @@ class RomanNumeral(harmony.Harmony):
         self.key = keyOrScale
 
         updatePitches = keywords.get('updatePitches', True)
-        harmony.Harmony.__init__(self, figure, updatePitches=updatePitches)
+        super(RomanNumeral, self).__init__(figure, updatePitches=updatePitches)
 
         self._correctBracketedPitches()
         self._parsingComplete = True
@@ -1230,7 +1231,7 @@ class RomanNumeral(harmony.Harmony):
                     acc.set(correctedSemis)
 
 
-    def _correctForSecondaryRomanNumeral(self, useScale, figure = None):
+    def _correctForSecondaryRomanNumeral(self, useScale, figure=None):
         '''
         Creates .secondaryRomanNumeral object and .secondaryRomanNumeralKey Key object
         inside the RomanNumeral object (recursively in case of V/V/V/V etc.) and returns
@@ -1318,11 +1319,9 @@ class RomanNumeral(harmony.Harmony):
         Parse the .figure object into its component parts.
 
         Called from the superclass, Harmony.__init__()
-
         '''
         if not isinstance(self._figure, six.string_types):
-            raise RomanException('got a non-string figure: {!r}'.format(
-                self._figure))
+            raise RomanException('got a non-string figure: {!r}'.format(self._figure))
 
         if not self.useImpliedScale:
             useScale = self._scale
@@ -1753,7 +1752,7 @@ class RomanNumeral(harmony.Harmony):
             self._updatePitches()
 
 
-    def bassScaleDegreeFromNotation(self, notationObject = None):
+    def bassScaleDegreeFromNotation(self, notationObject=None):
         '''
         Given a notationObject from
         :class:`music21.figuredBass.notation.Notation`

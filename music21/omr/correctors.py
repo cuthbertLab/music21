@@ -420,7 +420,7 @@ class SinglePart(object):
         return self.measureStream
 
 
-    def getIncorrectMeasureIndices(self, runFast = False):
+    def getIncorrectMeasureIndices(self, runFast=False):
         '''
         Returns an array of all the measures that OMR software would flag - that is,
         measures that do
@@ -492,7 +492,7 @@ class SinglePart(object):
         return measureStreamNotes
 
 
-    def horizontalProbabilityDist(self, regenerate = False):
+    def horizontalProbabilityDist(self, regenerate=False):
         '''
         Uses (takes?) an array of hashed measures and returns an array of probabilities.
         For n in the array, n is the the probability that the measure (n-(length of score)) away
@@ -700,7 +700,7 @@ class MeasureHash(object):
     a given measure object
     '''
 
-    def __init__(self, measureObject = None):
+    def __init__(self, measureObject=None):
         self.measureObject = measureObject
         self.hashString = None
         self.sequenceMatcher = None
@@ -824,7 +824,7 @@ class MeasureHash(object):
             duration1to127 = 1
         return duration1to127
 
-    def setSequenceMatcher(self, hashes = None):
+    def setSequenceMatcher(self, hashes=None):
         if hashes is None:
             if self.hashString is None:
                 hashes = self.getHashString()
@@ -871,7 +871,7 @@ class MeasureHash(object):
             myRatio = 0.0
         return 1-myRatio
 
-    def getOpCodes(self, otherHash = None):
+    def getOpCodes(self, otherHash=None):
         '''
         Gets the opcodes from a simple sequenceMatcher for the current measureHash
 

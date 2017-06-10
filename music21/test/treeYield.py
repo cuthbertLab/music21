@@ -14,7 +14,7 @@ if sys.version_info[0] >= 3:
     unicode = str
 
 class TreeYielder(object):
-    def __init__(self, yieldValue = None):
+    def __init__(self, yieldValue=None):
         '''
         `yieldValue` should be a lambda function that
         returns True/False or a function/method call that
@@ -27,7 +27,7 @@ class TreeYielder(object):
         self.nonIterables = [int, str, unicode, # t.LongType,
                              float, type(None), bool]
 
-    def run(self, obj, memo = None):
+    def run(self, obj, memo=None):
         '''
         traverse all attributes of an object looking
         for subObjects that meet a certain criteria.
@@ -120,18 +120,19 @@ class TreeYielder(object):
 
 def testCode():
     class Mock(object):
-        def __init__(self, mockThing, embedMock = True):
+        def __init__(self, mockThing, embedMock=True):
             self.abby = 30
             self.mocker = mockThing
             self.mockList = [mockThing, mockThing, 40]
             self.embeddedMock = None
             if embedMock is True:
-                self.embeddedMock = Mock(mockThing, embedMock = False)
+                self.embeddedMock = Mock(mockThing, embedMock=False)
 
     mockType = lambda x: x.__class__.__name__ == 'Mock'
 
     subList = [100, 60, -2]
-    myList = [5, 20, [5, 12, 17], 30, {'hello': 10, 'goodbye': 22, 'mock': Mock(subList)}, -20, Mock(subList)]
+    myList = [5, 20, [5, 12, 17], 30, 
+              {'hello': 10, 'goodbye': 22, 'mock': Mock(subList)}, -20, Mock(subList)]
     myList.append(myList)
 
     ty = TreeYielder(mockType)
