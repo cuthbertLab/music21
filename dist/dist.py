@@ -25,7 +25,7 @@ To do a release,
 4. run test/testLint.py and fix any lint errors
 5. commit and then check test/testSingleCoreAll.py results on Travis-CI
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
-     but should be done before making a release).  Done automatically by Travis-CI on GitHub commit
+     but should be done before making a release).
 6. then python3 test/testDocumentation.py # only designed for Python 3...
 7. run documentation/make.py clean
 8. run documentation/make.py   [*]
