@@ -300,8 +300,8 @@ def base40Interval(base40NumA, base40NumB):
     music21.musedata.base40.Base40Exception: Pitch name not assigned to these Base40 numbers
         12 and 6 Interval does not exist
     '''
-    pitchA = base40Equivalent[(base40NumA-1)%40 + 1]
-    pitchB = base40Equivalent[(base40NumB-1)%40 + 1]
+    pitchA = base40Equivalent[(base40NumA - 1) % 40 + 1]
+    pitchB = base40Equivalent[(base40NumB - 1) % 40 + 1]
 
     delta = base40NumB - base40NumA
 
@@ -332,20 +332,20 @@ def base40ActualInterval(base40NumA, base40NumB):
     by music21.
 
 
-    >>> musedata.base40.base40ActualInterval(163,191)
+    >>> musedata.base40.base40ActualInterval(163, 191)
     <music21.interval.Interval m6>
-    >>> musedata.base40.base40ActualInterval(186,174) #Descending M3
+    >>> musedata.base40.base40ActualInterval(186, 174) #Descending M3
     <music21.interval.Interval M-3>
-    >>> musedata.base40.base40ActualInterval(1,5)
+    >>> musedata.base40.base40ActualInterval(1, 5)
     <music21.interval.Interval AAAA1>
-    >>> musedata.base40.base40ActualInterval(1,3)
+    >>> musedata.base40.base40ActualInterval(1, 3)
     <music21.interval.Interval AA1>
-    >>> musedata.base40.base40ActualInterval(2,6)
+    >>> musedata.base40.base40ActualInterval(2, 6)
     Traceback (most recent call last):
     music21.musedata.base40.Base40Exception: Pitch name not assigned to this Base40 number 6
 
     OMIT_FROM_DOCS
-    >>> musedata.base40.base40ActualInterval(12,6)
+    >>> musedata.base40.base40ActualInterval(12, 6)
     Traceback (most recent call last):
     music21.musedata.base40.Base40Exception: Pitch name not assigned to this Base40 number 12
     '''

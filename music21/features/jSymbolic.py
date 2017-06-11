@@ -14,6 +14,7 @@ defined in Cory McKay's MA Thesis, "Automatic Genre Classification of MIDI Recor
 
 The LGPL jSymbolic system can be found here: http://jmir.sourceforge.net/jSymbolic.html
 '''
+from __future__ import division, print_function
 
 import copy
 import math
@@ -594,7 +595,7 @@ class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
                     rising += 1
                 elif c < 0:
                     falling += 1
-        self._feature.vector[0] = rising / float(falling+rising)
+        self._feature.vector[0] = rising / float(falling + rising)
 
 
 class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
@@ -2046,7 +2047,7 @@ class VariabilityOfNoteDurationFeature(featuresModule.FeatureExtractor):
     def _process(self):
         pass
         # TODO: implement
-        # if using numpy, can use:>>> numpy.std([1,2,3])
+        # if using numpy, can use:>>> numpy.std([1, 2, 3])
 
 class MaximumNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
@@ -3492,7 +3493,7 @@ class StringKeyboardFractionFeature(InstrumentFractionFeature):
         self.isSequential = True
         self.dimensions = 1
 
-        self._targetPrograms = range(0,8)
+        self._targetPrograms = range(0, 8)
 
 
 

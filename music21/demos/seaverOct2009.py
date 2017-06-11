@@ -215,7 +215,7 @@ def simple4c(show=True):
     question 178: Generate a set matrix for a given tone row.
     '''
     from music21 import serial
-    p = [8,1,7,9,0,2,3,5,4,11,6,10]
+    p = [8, 1, 7, 9, 0, 2, 3, 5, 4, 11, 6, 10]
 
     if show == True:
         print(serial.rowToMatrix(p))

@@ -260,7 +260,7 @@ class Segment(object):
         >>> fbRules = rules.Rules()
         >>> fbRules.forbidVoiceOverlap = False
         >>> fbRules.forbidHiddenOctaves = False
-        >>> fbRules.partMovementLimits.append((1,2))
+        >>> fbRules.partMovementLimits.append((1, 2))
         >>> allConsecRules = segmentA.consecutivePossibilityRules(fbRules)
         >>> segment.printRules(allConsecRules)
         Will run:  Method:                       Keep solutions which return:  Arguments:
@@ -325,7 +325,7 @@ class Segment(object):
         >>> from music21.figuredBass import segment
         >>> segmentA = segment.Segment()
         >>> allSpecialResRules = segmentA.specialResolutionRules()
-        >>> segment.printRules(allSpecialResRules, maxLength = 3)
+        >>> segment.printRules(allSpecialResRules, maxLength=3)
         Will run:  Method:                          Arguments:
         False      resolveDominantSeventhSegment    None
         False      resolveDiminishedSeventhSegment  False
@@ -338,7 +338,7 @@ class Segment(object):
         >>> from music21 import note
         >>> segmentA = segment.Segment(bassNote=note.Note('B2'), notationString='6,5')
         >>> allSpecialResRules = segmentA.specialResolutionRules()
-        >>> segment.printRules(allSpecialResRules, maxLength = 3)
+        >>> segment.printRules(allSpecialResRules, maxLength=3)
         Will run:  Method:                          Arguments:
         True       resolveDominantSeventhSegment    None
         False      resolveDiminishedSeventhSegment  False
@@ -350,7 +350,7 @@ class Segment(object):
 
         >>> segmentA = segment.Segment(bassNote=note.Note('B2'), notationString='-7')
         >>> allSpecialResRules = segmentA.specialResolutionRules()
-        >>> segment.printRules(allSpecialResRules, maxLength = 3)
+        >>> segment.printRules(allSpecialResRules, maxLength=3)
         Will run:  Method:                          Arguments:
         False      resolveDominantSeventhSegment    None
         True       resolveDiminishedSeventhSegment  False
@@ -362,7 +362,7 @@ class Segment(object):
 
         >>> segmentA = segment.Segment(bassNote=note.Note('A-2'), notationString='#6,b5')
         >>> allSpecialResRules = segmentA.specialResolutionRules()
-        >>> segment.printRules(allSpecialResRules, maxLength = 3)
+        >>> segment.printRules(allSpecialResRules, maxLength=3)
         Will run:  Method:                          Arguments:
         False      resolveDominantSeventhSegment    None
         False      resolveDiminishedSeventhSegment  False

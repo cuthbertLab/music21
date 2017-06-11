@@ -529,7 +529,7 @@ class ChoraleListRKBWV(object):
         self.byTitle
 
         '''
-        # ----Existence problems with R82,141,210,245,309,337----------------------- #
+        # ----Existence problems with R82, 141, 210, 245, 309, 337----------------------- #
         # 82---||---46.6s---||---O großer Gott von Macht---||---0                    #
         # 141---||---409---||---Seelenbräutigam, Jesu, Gottes Lamm---||---306        #
         # 210---||---275---||---Christe, du Beistand deiner Kreuz-gemeine---||---35  #
@@ -925,7 +925,7 @@ class Iterator(object):
     change the range values to span the entire numberList.
     The iterator can be initialized with three parameters
     (currentNumber, highestNumber, numberingSystem). For example
-    BachChoraleIterator(1,26,'riemenschneider') iterates
+    BachChoraleIterator(1, 26,'riemenschneider') iterates
     through the riemenschneider numbered chorales from 1 to 26.
     Additionally, the following kwargs can be set:
 
@@ -938,7 +938,7 @@ class Iterator(object):
     numberList = [list, of, numbers]
 
     >>> from music21 import corpus
-    >>> for chorale in corpus.chorales.Iterator(1,4, returnType='filename'):
+    >>> for chorale in corpus.chorales.Iterator(1, 4, returnType='filename'):
     ...    print(chorale)
     bach/bwv269
     bach/bwv347
@@ -997,7 +997,8 @@ class Iterator(object):
     highestNumber to 7 would have the same effect as the given example.
 
     >>> BCI = corpus.chorales.Iterator(2, 371, numberingSystem='riemenschneider',
-    ...                                numberList=[1,2,3,4,6,25,190,371], returnType='filename')
+    ...                                numberList=[1, 2, 3, 4, 6, 25, 190, 371], 
+    ...                                returnType='filename')
     25 will be skipped because it is not in the numberingSystem riemenschneider
 
     >>> for chorale in BCI:

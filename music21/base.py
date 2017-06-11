@@ -3106,7 +3106,7 @@ class Music21Object(object):
 
         >>> n = note.Note()
         >>> n.quarterLength = 3
-        >>> post = n.splitByQuarterLengths([1,1,1])
+        >>> post = n.splitByQuarterLengths([1, 1, 1])
         >>> [n.quarterLength for n in post]
         [1.0, 1.0, 1.0]
         '''
@@ -3703,7 +3703,7 @@ class ElementWrapper(Music21Object):
     >>> s.id = 'mainStream'
     >>> s.append(meter.TimeSignature('fast 6/8'))
     >>> for i in range(10):
-    ...    fileName = 'thisSound_' + str(random.randint(1,20)) + '.wav'
+    ...    fileName = 'thisSound_' + str(random.randint(1, 20)) + '.wav'
     ...    fileName = 'thisSound_' + str(1+((i * 100) % 19)) + '.wav' #_DOCS_HIDE
     ...    soundFile = Wave_read() #_DOCS_HIDE # #make a more predictable "random" set.
     ...    #_DOCS_SHOW soundFile = wave.open(fileName)
@@ -4508,7 +4508,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.append(meter.TimeSignature('fast 6/8'))
         storage = []
-        for i in range(0,2):
+        for i in range(0, 2):
             mock = Mock()
             el = base.ElementWrapper(mock)
             storage.append(el)
@@ -4534,7 +4534,7 @@ class Test(unittest.TestCase):
         s.append(meter.TimeSignature('fast 6/8'))
         #s.show('t')
         storage = []
-        for i in range(0,6):
+        for i in range(0, 6):
             soundFile = Wave_read() #_DOCS_HIDE
             #el = music21.Music21Object() #
             el = base.ElementWrapper(soundFile)

@@ -233,7 +233,7 @@ class ScoreCorrector(object):
         (having an incorrect number of beats)
         while the source measure is in the set C of correcting measures.
 
-        >>> s = corpus.parse('bwv66.6').measures(1,2)
+        >>> s = corpus.parse('bwv66.6').measures(1, 2)
         >>> s.show('text')
         {0.0} <music21.stream.Part Soprano>
             ...

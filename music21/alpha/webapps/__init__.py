@@ -512,7 +512,7 @@ class Agenda(dict):
         >>> agenda.addData('a', 2)
         >>> pp(agenda)
         {'commandList': [], 'dataDict': {'a': {'data': 2}}, 'returnDict': {}}
-        >>> agenda.addData(variableName='b', data=[1,2,3], fmt='list')
+        >>> agenda.addData(variableName='b', data=[1, 2, 3], fmt='list')
         >>> pp(agenda)
         {'commandList': [],
          'dataDict': {'a': {'data': 2}, 'b': {'data': [1, 2, 3], 'fmt': 'list'}},
@@ -1158,7 +1158,7 @@ class CommandProcessor(object):
 
         >>> agenda = alpha.webapps.Agenda()
         >>> agenda.addData("a",2)
-        >>> agenda.addData("b",[1,2,3],"list")
+        >>> agenda.addData("b",[1, 2, 3],"list")
 
         >>> processor = alpha.webapps.CommandProcessor(agenda)
         >>> processor.parseInputToPrimitive("a")
@@ -1179,9 +1179,9 @@ class CommandProcessor(object):
         'hi'
         >>> processor.parseInputToPrimitive("'Madam I\'m Adam'")
         "Madam I'm Adam"
-        >>> processor.parseInputToPrimitive("[1,2,3]")
+        >>> processor.parseInputToPrimitive("[1, 2, 3]")
         [1, 2, 3]
-        >>> processor.parseInputToPrimitive("[1,'hi',3.0,True, a, justAStr]")
+        >>> processor.parseInputToPrimitive("[1, 'hi', 3.0, True, a, justAStr]")
         [1, 'hi', 3.0, True, 2, 'justAStr']
         '''
         returnVal = None

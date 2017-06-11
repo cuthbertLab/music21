@@ -208,16 +208,16 @@ def _preFracLimitDenominator(n, d):
         return (n, d)
     p0, q0, p1, q1 = 0, 1, 1, 0
     while True:
-        a = n//d
-        q2 = q0+a*q1
+        a = n // d
+        q2 = q0 + a * q1
         if q2 > DENOM_LIMIT:
             break
-        p0, q0, p1, q1 = p1, q1, p0+a*p1, q2
-        n, d = d, n-a*d
+        p0, q0, p1, q1 = p1, q1, p0 + a * p1, q2
+        n, d = d, n - a * d
 
-    k = (DENOM_LIMIT-q0)//q1
-    bound1n = p0+k*p1
-    bound1d = q0+k*q1
+    k = (DENOM_LIMIT - q0) // q1
+    bound1n = p0 + k * p1
+    bound1d = q0 + k * q1
     bound2n = p1
     bound2d = q1
     #s = (0.0 + n)/d
@@ -265,7 +265,7 @@ def opFrac(num):
     Fraction(1, 3)
     >>> common.opFrac(1.0/4)
     0.25
-    >>> f = Fraction(1,3)
+    >>> f = Fraction(1, 3)
     >>> common.opFrac(f + f + f)
     1.0
     >>> common.opFrac(0.123456789)
@@ -348,13 +348,13 @@ def mixedNumeral(expr, limitDenominator=defaults.limitOffsetDenominator):
     Works with Fraction objects too
 
     >>> from fractions import Fraction
-    >>> common.mixedNumeral( Fraction(31,7) )
+    >>> common.mixedNumeral(Fraction(31, 7))
     '4 3/7'
-    >>> common.mixedNumeral( Fraction(1,5) )
+    >>> common.mixedNumeral(Fraction(1, 5))
     '1/5'
-    >>> common.mixedNumeral( Fraction(-1,5) )
+    >>> common.mixedNumeral(Fraction(-1, 5))
     '-1/5'
-    >>> common.mixedNumeral( Fraction(-31,7) )
+    >>> common.mixedNumeral(Fraction(-31, 7))
     '-4 3/7'
 
     Denominator is limited by default but can be changed.
@@ -529,8 +529,8 @@ def addFloatPrecision(x, grain=1e-2):
     if isinstance(x, six.string_types):
         x = float(x)
 
-    values = (1/3., 2/3.,
-              1/6., 5/6.)
+    values = (1/3, 2/3,
+              1/6, 5/6)
     for v in values:
         if almostEquals(x, v, grain=grain):
             return opFrac(v)
@@ -642,7 +642,7 @@ def nearestMultiple(n, unit):
 def standardDeviation(coll, bassel=False):
     '''Given a collection of values, return the standard deviation.
 
-    >>> common.standardDeviation([2,4,4,4,5,5,7,9])
+    >>> common.standardDeviation([2, 4, 4, 4, 5, 5, 7, 9])
     2.0
     >>> common.standardDeviation([600, 470, 170, 430, 300])
     147.3227...
@@ -652,12 +652,12 @@ def standardDeviation(coll, bassel=False):
     :rtype: float
     '''
     avg = sum(coll) / float(len(coll))
-    diffColl = [math.pow(val-avg, 2) for val in coll]
+    diffColl = [math.pow(val - avg, 2) for val in coll]
     # with a sample standard deviation (not a whole population)
     # subtract 1 from the length
     # this is bassel's correction
     if bassel:
-        return math.sqrt(sum(diffColl) / float(len(diffColl)-1))
+        return math.sqrt(sum(diffColl) / float(len(diffColl) - 1))
     else:
         return math.sqrt(sum(diffColl) / float(len(diffColl)))
 
@@ -721,11 +721,11 @@ def decimalToTuplet(decNum):
 
     def findSimpleFraction(working):
         'Utility function.'
-        for i in range(1,1000):
-            for j in range(i,2*i):
-                if almostEquals(working, (j+0.0)/i):
+        for i in range(1, 1000):
+            for j in range(i, i * 2):
+                if almostEquals(working, (j + 0.0) / i):
                     return (int(j), int(i))
-        return (0,0)
+        return (0, 0)
 
     flipNumerator = False
     if decNum <= 0:
@@ -760,9 +760,9 @@ def unitNormalizeProportion(values):
     Normalize values within the unit interval, where max is determined by the sum of the series.
 
 
-    >>> common.unitNormalizeProportion([0,3,4])
+    >>> common.unitNormalizeProportion([0, 3, 4])
     [0.0, 0.42857142857142855, 0.5714285714285714]
-    >>> common.unitNormalizeProportion([1,1,1])
+    >>> common.unitNormalizeProportion([1, 1, 1])
     [0.3333333..., 0.333333..., 0.333333...]
 
 
@@ -792,9 +792,9 @@ def unitBoundaryProportion(series):
     unit-interval boundaries proportional to the series components.
 
 
-    >>> common.unitBoundaryProportion([1,1,2])
+    >>> common.unitBoundaryProportion([1, 1, 2])
     [(0, 0.25), (0.25, 0.5), (0.5, 1.0)]
-    >>> common.unitBoundaryProportion([8,1,1])
+    >>> common.unitBoundaryProportion([8, 1, 1])
     [(0, 0.8...), (0.8..., 0.9...), (0.9..., 1.0)]
 
 
@@ -845,11 +845,11 @@ def euclidGCD(a, b):
     '''use Euclid\'s algorithm to find the GCD of a and b
 
 
-    >>> common.euclidGCD(2,4)
+    >>> common.euclidGCD(2, 4)
     2
-    >>> common.euclidGCD(20,8)
+    >>> common.euclidGCD(20, 8)
     4
-    >>> common.euclidGCD(20,16)
+    >>> common.euclidGCD(20, 16)
     4
 
     :rtype: int
@@ -863,17 +863,17 @@ def euclidGCD(a, b):
 def approximateGCD(values, grain=1e-4):
     '''Given a list of values, find the lowest common divisor of floating point values.
 
-    >>> common.approximateGCD([2.5,10, .25])
+    >>> common.approximateGCD([2.5, 10, .25])
     0.25
-    >>> common.approximateGCD([2.5,10])
+    >>> common.approximateGCD([2.5, 10])
     2.5
-    >>> common.approximateGCD([2,10])
+    >>> common.approximateGCD([2, 10])
     2.0
     >>> common.approximateGCD([1.5, 5, 2, 7])
     0.5
-    >>> common.approximateGCD([2,5,10])
+    >>> common.approximateGCD([2, 5, 10])
     1.0
-    >>> common.approximateGCD([2,5,10,.25])
+    >>> common.approximateGCD([2, 5, 10,.25])
     0.25
     >>> common.strTrimFloat(common.approximateGCD([1/3.,2/3.]))
     '0.3333'
@@ -933,13 +933,13 @@ def lcm(filterList):
     '''
     Find the least common multiple of a list of values
 
-    >>> common.lcm([3,4,5])
+    >>> common.lcm([3, 4, 5])
     60
-    >>> common.lcm([3,4])
+    >>> common.lcm([3, 4])
     12
-    >>> common.lcm([1,2])
+    >>> common.lcm([1, 2])
     2
-    >>> common.lcm([3,6])
+    >>> common.lcm([3, 6])
     6
 
     :rtype: int
@@ -1191,8 +1191,8 @@ class Test(unittest.TestCase):
             x = 0
             for i in range(1000):
                 # equal chance of -1, 1
-                x += weightedSelection([-1, 1], [1,1])
-            #environLocal.printDebug(['weightedSelection([-1, 1], [1,1])', x])
+                x += weightedSelection([-1, 1], [1, 1])
+            #environLocal.printDebug(['weightedSelection([-1, 1], [1, 1])', x])
             self.assertTrue(-250 < x < 250)
 
 
@@ -1200,9 +1200,9 @@ class Test(unittest.TestCase):
         for j in range(10):
             x = 0
             for i in range(1000):
-                # 10,000 more chance of 0 than 1.
+                # 10000 more chance of 0 than 1.
                 x += weightedSelection([0, 1], [10000, 1])
-            #environLocal.printDebug(['weightedSelection([0, 1], [10000,1])', x])
+            #environLocal.printDebug(['weightedSelection([0, 1], [10000, 1])', x])
             self.assertTrue(0 <= x < 20)
 
         for j in range(10):

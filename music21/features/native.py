@@ -764,7 +764,7 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
         # use for total number of chords
         harms = self.data['flat.getElementsByClass.Harmony']
 
-        totMotion = [0,0,0,0,0,0,0,0,0,0,0,0]
+        totMotion = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         totalHarmonicMotion = 0
         lastHarm = None
 
@@ -793,7 +793,7 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
         if totalHarmonicMotion == 0:
             vector = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         else:
-            totHarmonicMotionFraction = [0.0, 0,0, 0,0,0, 0,0,0, 0,0,0]
+            totHarmonicMotionFraction = [0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
             for i in range(1, 12):
                 totHarmonicMotionFraction[i] = float(totMotion[i]) / totalHarmonicMotion
             vector = totHarmonicMotionFraction

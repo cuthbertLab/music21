@@ -151,7 +151,7 @@ def rhythmicSearch(thisStream, searchStream):
     streamLength = len(thisStream)
     foundEls = []
     for start in range(1 + streamLength - searchLength):
-        #miniStream = thisStream[start:start+searchLength]
+        #miniStream = thisStream[start:start + searchLength]
         foundException = False
         for j in range(searchLength):
             #x = searchStream[j].duration
@@ -323,10 +323,10 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
         ratioDuration = difflib.SequenceMatcher(isJunk,
                                                 thisStreamStrDuration,
                                                 thatStreamStrDuration).ratio()
-        ratio = (3*ratioPitches+ratioDuration)/4.0
+        ratio = (3 * ratioPitches + ratioDuration) / 4.0
         s.matchProbability = ratio
         sorterList.append((ratio, s))
-    sortedList = sorted(sorterList, key = lambda x: 1-x[0])
+    sortedList = sorted(sorterList, key = lambda x: 1 - x[0])
     sortedStreams = [x[1] for x in sortedList]
     return sortedStreams
 

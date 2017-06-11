@@ -49,7 +49,7 @@ def musicxmlText(outputStream):
     Takes in a stream outputStream and returns its musicxml with
     content-type 'text/plain' for displaying in a browser
 
-    >>> sc = corpus.parse('bwv7.7').measures(0,2)
+    >>> sc = corpus.parse('bwv7.7').measures(0, 2)
     >>> (output, contentType) = alpha.webapps.templates.musicxmlText(sc)
     >>> contentType
     'text/plain; charset=utf-8'
@@ -65,7 +65,7 @@ def musicxmlFile(outputStream):
     Takes in a stream outputStream and returns its musicxml with
     content-type 'application/vnd.recordare.musicxml+xml' for downloading
 
-    >>> sc = corpus.parse('bwv7.7').measures(0,2)
+    >>> sc = corpus.parse('bwv7.7').measures(0, 2)
     >>> (output, contentType) = alpha.webapps.templates.musicxmlFile(sc)
     >>> contentType
     'application/vnd.recordare.musicxml+xml; charset=utf-8'
@@ -82,7 +82,7 @@ def vexflow(outputStream):
     Takes in a stream outputStream, generates an HTML representation of it using vexflow, and
     outputs it with content-type text/html for displying in a browser.
 
-    >>> sc = corpus.parse('bwv7.7').measures(0,2)
+    >>> sc = corpus.parse('bwv7.7').measures(0, 2)
     >>> (output, contentType) = alpha.webapps.templates.vexflow(sc)
     >>> contentType
     'text/html; charset=utf-8'
@@ -96,7 +96,7 @@ def braille(outputStream):
     Takes in a stream outputStream, generates the braille representation of it, and returns
     the unicode output with content-type text/html for display in a browser
 
-    >>> sc = corpus.parse('bwv7.7').measures(0,2)
+    >>> sc = corpus.parse('bwv7.7').measures(0, 2)
     >>> (output, contentType) = alpha.webapps.templates.braille(sc)
     >>> contentType
     'text/html; charset=utf-8'
@@ -116,7 +116,7 @@ def noteflightEmbed(outputStream):
 
     TODO: Change javascript and noteflight embed to relate to be server-specific
 
-    >>> sc = corpus.parse('bwv7.7').measures(0,2)
+    >>> sc = corpus.parse('bwv7.7').measures(0, 2)
     >>> (output, contentType) = alpha.webapps.templates.noteflightEmbed(sc)
     >>> contentType
     'text/html; charset=utf-8'
@@ -146,7 +146,7 @@ m21 = new Music21interface();
 
 function setup() {
     m21.noteflight.createNoteflightEmbed('noteflightembed', 'nfscore',
-        'fc79df30896da6aa03f90ff771015913ca6880be',800,450,1.0);
+        'fc79df30896da6aa03f90ff771015913ca6880be',800, 450, 1.0);
 }
 </script>
 

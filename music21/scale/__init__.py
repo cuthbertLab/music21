@@ -283,7 +283,7 @@ class AbstractScale(Scale):
             raise ScaleException("Cannot build a network from this pitch list: %s" % pitchList)
         intervalList = []
         for i in range(len(pitchList) - 1):
-            intervalList.append(interval.notesToInterval(pitchList[i], pitchList[i+1]))
+            intervalList.append(interval.notesToInterval(pitchList[i], pitchList[i + 1]))
         if pitchList[-1].name == pitchList[0].name: # the completion of the scale has been given.
             #print ("hi %s " % pitchList)
             # this scale is only octave duplicating if the top note is exactly
@@ -1632,13 +1632,13 @@ class ConcreteScale(Scale):
 
 
         >>> sc = scale.MajorScale('e-')
-        >>> sc.pitchesFromScaleDegrees([3,7])
+        >>> sc.pitchesFromScaleDegrees([3, 7])
         [<music21.pitch.Pitch G4>, <music21.pitch.Pitch D5>]
-        >>> [str(p) for p in sc.pitchesFromScaleDegrees([3,7], 'c2', 'c6')]
+        >>> [str(p) for p in sc.pitchesFromScaleDegrees([3, 7], 'c2', 'c6')]
         ['D2', 'G2', 'D3', 'G3', 'D4', 'G4', 'D5', 'G5']
 
         >>> sc = scale.HarmonicMinorScale('a')
-        >>> [str(p) for p in sc.pitchesFromScaleDegrees([3,7], 'c2', 'c6')]
+        >>> [str(p) for p in sc.pitchesFromScaleDegrees([3, 7], 'c2', 'c6')]
         ['C2', 'G#2', 'C3', 'G#3', 'C4', 'G#4', 'C5', 'G#5', 'C6']
         '''
         # TODO: rely here on intervalNetwork for caching
@@ -3233,8 +3233,8 @@ class Test(unittest.TestCase):
         # getting pitches from scale degrees
         self.assertEqual(str(sc3.pitchFromDegree(3)), 'C4')
         self.assertEqual(str(sc3.pitchFromDegree(7)), 'G4')
-        self.assertEqual(self.pitchOut(sc3.pitchesFromScaleDegrees([1,5,6])), '[A3, E4, F4, A4]')
-        self.assertEqual(self.pitchOut(sc3.pitchesFromScaleDegrees([2,3],
+        self.assertEqual(self.pitchOut(sc3.pitchesFromScaleDegrees([1, 5, 6])), '[A3, E4, F4, A4]')
+        self.assertEqual(self.pitchOut(sc3.pitchesFromScaleDegrees([2, 3],
                                                                    minPitch='c6', maxPitch='c9')),
                          '[C6, B6, C7, B7, C8, B8, C9]')
 
@@ -3754,10 +3754,10 @@ class Test(unittest.TestCase):
     def testIntervalBetweenDegrees(self):
 
         sc = MajorScale('c4')
-        self.assertEqual(str(sc.intervalBetweenDegrees(3,4)), '<music21.interval.Interval m2>')
-        self.assertEqual(str(sc.intervalBetweenDegrees(1,7)), '<music21.interval.Interval M7>')
-        self.assertEqual(str(sc.intervalBetweenDegrees(1,5)), '<music21.interval.Interval P5>')
-        self.assertEqual(str(sc.intervalBetweenDegrees(2,4)), '<music21.interval.Interval m3>')
+        self.assertEqual(str(sc.intervalBetweenDegrees(3, 4)), '<music21.interval.Interval m2>')
+        self.assertEqual(str(sc.intervalBetweenDegrees(1, 7)), '<music21.interval.Interval M7>')
+        self.assertEqual(str(sc.intervalBetweenDegrees(1, 5)), '<music21.interval.Interval P5>')
+        self.assertEqual(str(sc.intervalBetweenDegrees(2, 4)), '<music21.interval.Interval m3>')
 
         # with a probabilistic non deterministci scale,
         # an exception may be raised for step that may not exist
@@ -3971,7 +3971,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
         from music21 import corpus, instrument
 
-        s = corpus.parse('luca/gloria').measures(70,79)
+        s = corpus.parse('luca/gloria').measures(70, 79)
         for p in s.parts:
             inst = p.flat.getElementsByClass(instrument.Instrument)[0]
             inst.midiProgram = 52

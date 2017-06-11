@@ -252,7 +252,7 @@ def pitchToSharps(value, mode=None):
 #
 #    # start at C and continue in both directions
 #    sharpSource = [0]
-#    for i in range(1,13):
+#    for i in range(1, 13):
 #        sharpSource.append(i)
 #        sharpSource.append(-i)
 #

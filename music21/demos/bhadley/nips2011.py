@@ -376,7 +376,7 @@ def probabilityOfChance():
             guessesOld = []
             guessesNew = []
             for answer in answerKey:
-                guess = random.randint(0,1)
+                guess = random.randint(0, 1)
                 #the algorithm is smart - it knows
                 #there is a maximum number of times it
                 #can guess old vs. new, and if it

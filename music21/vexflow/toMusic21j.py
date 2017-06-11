@@ -126,7 +126,7 @@ class VexflowPickler(object):
     def splitLongJSON(self, jsonString, chunkSize=110):
         allJSONList = []
         for i in range(0, len(jsonString), chunkSize):
-            allJSONList.append('\'' + jsonString[i:i+chunkSize] + '\'')
+            allJSONList.append('\'' + jsonString[i:i + chunkSize] + '\'')
         return ' + \n    '.join(allJSONList)
 
     def getLoadTemplate(self, urls=None):
@@ -290,8 +290,8 @@ class TestExternal(unittest.TestCase):
         from music21 import corpus, environment
         environLocal = environment.Environment()
 
-        s = corpus.parse('luca/gloria').measures(1,19)
-        #s = corpus.parse('beethoven/opus18no1', 2).parts[0].measures(4,10)
+        s = corpus.parse('luca/gloria').measures(1, 19)
+        #s = corpus.parse('beethoven/opus18no1', 2).parts[0].measures(4, 10)
 
         vfp = VexflowPickler()
         vfp.defaults['m21URI'] = 'file:///Users/Cuthbert/git/music21j/src/music21'

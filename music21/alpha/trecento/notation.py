@@ -1546,7 +1546,7 @@ class BrevisLengthTranslator(object):
                                 master_list[curIndex + 1] in semiminima_left_flag_list ) or
                              (curIndex == len(master_list) - 1 and
                                 master_list[curIndex - 1] in semiminima_left_flag_list ) or
-                             (master_list[curIndex-1] in semiminima_left_flag_list and
+                             (master_list[curIndex - 1] in semiminima_left_flag_list and
                                 master_list[curIndex + 1] in semiminima_left_flag_list)):
 
                             knownLengthsList_changeable[ind] = left_length
@@ -1558,7 +1558,7 @@ class BrevisLengthTranslator(object):
                                 master_list[curIndex + 1] in semiminima_right_flag_list) or
                               (curIndex == len(master_list) - 1 and
                                 master_list[curIndex - 1] in semiminima_right_flag_list) or
-                              (master_list[curIndex-1] in semiminima_right_flag_list and
+                              (master_list[curIndex - 1] in semiminima_right_flag_list and
                                 master_list[curIndex + 1] in semiminima_right_flag_list)):
 
                             knownLengthsList_changeable[ind] = right_length
@@ -1791,7 +1791,7 @@ class BrevisLengthTranslator(object):
                                 master_list[curIndex + 1] in semiminima_left_flag_list) or
                              (curIndex == len(master_list) - 1 and
                                 master_list[curIndex - 1] in semiminima_left_flag_list) or
-                             (master_list[curIndex-1] in semiminima_left_flag_list and
+                             (master_list[curIndex - 1] in semiminima_left_flag_list and
                                     master_list[curIndex + 1] in semiminima_left_flag_list)):
                             knownLengthsList_changeable[ind] = left_length
                             minRem_changeable -= left_length
@@ -1800,7 +1800,7 @@ class BrevisLengthTranslator(object):
                                     master_list[curIndex + 1] in semiminima_right_flag_list) or
                               (curIndex == len(master_list) - 1 and
                                     master_list[curIndex - 1] in semiminima_right_flag_list) or
-                              (master_list[curIndex-1] in semiminima_right_flag_list and
+                              (master_list[curIndex - 1] in semiminima_right_flag_list and
                                     master_list[curIndex + 1] in semiminima_right_flag_list)):
 
                             knownLengthsList_changeable[ind] = right_length
@@ -2041,7 +2041,7 @@ class TestExternal(unittest.TestCase):
                            'M', 'M', 'P', 'SB', 'M', 'SB', 'M', 'P', 'SB', 'SB', 'SB', 'P', 'SB',
                            'M', 'SB', 'M', 'P', 'SB', 'SB', 'SB', 'P', 'SB', 'SB',
                            'P', 'SB', 'SB', 'SB', 'Mx']
-        downStems_lower_5 = [0,3]
+        downStems_lower_5 = [0, 3]
 
         upperClef = medren.MensuralClef('C')
         upperClef.line = 1

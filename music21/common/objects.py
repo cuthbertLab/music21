@@ -191,7 +191,7 @@ class Iterator(object):
     '''A simple Iterator object used to handle iteration of Streams and other
     list-like objects.
 
-    >>> i = common.Iterator([2,3,4])
+    >>> i = common.Iterator([2, 3, 4])
     >>> for x in i:
     ...     print(x)
     2

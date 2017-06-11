@@ -1226,7 +1226,7 @@ class RepeatBracket(Spanner):
     >>> sp.number
     '1-3'
 
-    >>> sp.number = [2,3] # range of repeats
+    >>> sp.number = [2, 3] # range of repeats
     >>> sp.getNumberList()
     [2, 3]
     >>> sp.number
@@ -2470,7 +2470,7 @@ class Test(unittest.TestCase):
 #         s = stream.Stream()
 #         s.repeatAppend(note.Note(), 12)
 #         for i, n in enumerate(s.notes):
-#             n.transpose(i + (i%2*12), inPlace=True)
+#             n.transpose(i + (i % 2 * 12), inPlace=True)
 #
 #         # note: musedata presently does not support these
 #         n1 = s.notes[0]

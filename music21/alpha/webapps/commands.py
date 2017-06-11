@@ -31,15 +31,15 @@ def reduction(sc):
 
 def generateIntervals(numIntervals, kind=None, octaveSpacing=None):
     if kind in ['anyChords', 'majorChords', 'diatonicTriads', 'diatonicTriadInversions']:
-        return generateChords(numIntervals,kind)
+        return generateChords(numIntervals, kind)
 
     sc = stream.Stream()
     for i in range(numIntervals):
         loPs = pitch.Pitch("C3").ps
         hiPs = pitch.Pitch("C#5").ps
-        startPs = random.randrange(loPs,hiPs)
+        startPs = random.randrange(loPs ,hiPs)
         startPitch = pitch.Pitch(ps=startPs)
-        numHalfSteps = random.randrange(-19,20)
+        numHalfSteps = random.randrange(-19, 20)
         intv = interval.ChromaticInterval(numHalfSteps)
         if kind == 'consonant':
             invType = random.choice(['m3', 'M3', 'P5', 'm6', 'M6', 'P8'])
@@ -60,7 +60,7 @@ def generateIntervals(numIntervals, kind=None, octaveSpacing=None):
             startPitch.octave = 4
             endPitch.octave = 4 - octaveSpacing
 
-        c = chord.Chord([startPitch,endPitch])
+        c = chord.Chord([startPitch, endPitch])
         c.volume.velocity = 127
         c.quarterLength = 2
         sc.append(c)
@@ -111,8 +111,8 @@ def generateChords(numChords,kind=''):
             startDegree = random.randrange(0, 8)
             inversion = random.randrange(0, 3)
             chordPitches = []
-            #testDegrees = [d+startDegree-1 for d in traidInversions[inversion] ]
-            chordPitches = [scl.pitchFromDegree(d+startDegree-1) for d in
+            #testDegrees = [d + startDegree - 1 for d in traidInversions[inversion] ]
+            chordPitches = [scl.pitchFromDegree(d + startDegree - 1) for d in
                                 traidInversions[inversion]]
             chordType = possibleChordTypes[random.randrange(0, len(possibleChordTypes))]
             c = chord.Chord(chordPitches)
@@ -125,13 +125,13 @@ def generateChords(numChords,kind=''):
         for i in range(numChords):
             loPs = pitch.Pitch("C4").ps
             hiPs = pitch.Pitch("C#5").ps
-            startPs = random.randrange(loPs,hiPs)
+            startPs = random.randrange(loPs, hiPs)
             startPitch = pitch.Pitch(ps=startPs)
             startPitchName = startPitch.name
             chordType = possibleChordTypes[random.randrange(0, len(possibleChordTypes))]
             c = harmony.ChordSymbol(startPitchName + ',' + chordType)
             c.writeAsChord = True
-            c.quarterLength=2
+            c.quarterLength = 2
             c.volume.velocity = 127
             p.append(c)
         p.makeMeasures(inPlace=True)
@@ -167,7 +167,7 @@ def runPerceivedDissonanceAnalysis(scoreIn, offsetList, keyStr=None):
     'numMusic21Identified', 'numBothIdentified',
     'accuracy', 'romans', 'key'}
 
-    >>> piece = corpus.parse('bwv7.7').measures(0,3)
+    >>> piece = corpus.parse('bwv7.7').measures(0, 3)
     >>> offsetList = [
     ...     1.19166,
     ...     2.364166,
@@ -345,7 +345,7 @@ def createMensuralCanon(sc):
     melody = sc.parts[0].flat.notesAndRests
 
     canonStream = stream.Score()
-    for scalar, t in [(1, 'p1'), (2, 'p-5'), (.5, 'p-11'), (1.5, -24)]:
+    for scalar, t in [(1, 'p1'), (2, 'p-5'), (0.5, 'p-11'), (1.5, -24)]:
         part = melody.augmentOrDiminish(scalar)
         part.transpose(t, inPlace=True)
         canonStream.insert(0, part)
@@ -505,7 +505,7 @@ def writeMIDIFileToServer(sc):
     urlPath = "/music21/OutputFiles/cognitionEx.mid"
     writePath = documentRoot + urlPath
 
-    sc.write('mid',writePath)
+    sc.write('midi', writePath)
 
     return urlPath
 

@@ -1329,7 +1329,7 @@ class Test(unittest.TestCase):
 #        ahh..this test taks a realy long time....
 #        '''
 #        from music21 import stream, features, pitch
-#        s = corpus.parse('bwv66.6').measures(1,5)
+#        s = corpus.parse('bwv66.6').measures(1, 5)
 #        self.assertEqual( len(features.alljSymbolicFeatures(s)), 70)
 #        self.assertEqual(len (features.allNativeFeatures(s)),21)
 #        self.assertEqual(str(features.alljSymbolicVectors(s)[1:5]),

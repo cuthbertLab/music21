@@ -571,7 +571,7 @@ class TrecentoCadenceWork(object):
         '''
 
         if self.rowvalues[snippetPosition].strip() != "":
-            thisBlock = self.rowvalues[snippetPosition:snippetPosition+5]
+            thisBlock = self.rowvalues[snippetPosition:snippetPosition + 5]
             if thisBlock[4].strip() == "":
                 if self.timeSigBegin == "":
                     return None  ## need a timesig
@@ -618,7 +618,7 @@ class TrecentoCadenceWork(object):
         currentTimeSig = thisBlock[4]
         returnBlock[4] = currentTimeSig
         returnBlock[3] = thisBlock[3]
-        for i in range(0,3):
+        for i in range(3):
             thisVoice = thisBlock[i]
             thisVoice = thisVoice.strip()
             if (thisVoice):

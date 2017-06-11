@@ -1593,7 +1593,7 @@ class ConfigurationAssistant(object):
 #
 #     post = None
 #     while True:
-#     #for host in range(60,70):
+#     #for host in range(60, 70):
 #         if not current.isAlive() or current.status is not None:
 #             break
 #         if current.timeLeft <= 0:

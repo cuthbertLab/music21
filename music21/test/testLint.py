@@ -59,7 +59,7 @@ def main(fnAccept=None, strict=False):
     fnPathReject = [
                     'demos/',
                     'alpha/webapps/server',
-                    'test/',
+                    # 'test/',
                     '/ext/',
                     #'bar.py',  # used to crash pylint...
                     #'repeat.py', # used to hang pylint...

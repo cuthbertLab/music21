@@ -2790,7 +2790,7 @@ class Test(unittest.TestCase):
                 vChord = []
                 for i, unused_cSub in enumerate(c):
                     v = volume.Volume()
-                    v.velocityScalar = amps[(j+shift[i]) % len(amps)]
+                    v.velocityScalar = amps[(j + shift[i]) % len(amps)]
                     v.velocityIsRelative = False
                     vChord.append(v)
                 c.volume = vChord # can set to list
@@ -2897,7 +2897,7 @@ class Test(unittest.TestCase):
 
 
         s = corpus.parse('bach/bwv66.6')
-        part = s.parts[0].measures(6,9) # last meausres
+        part = s.parts[0].measures(6, 9) # last meausres
         #part.show('musicxml')
         #part.show('midi')
 

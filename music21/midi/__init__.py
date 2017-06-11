@@ -1157,7 +1157,7 @@ class MidiTrack(object):
     def setChannel(self, value):
         '''Set the channel of all events in this Track.
         '''
-        if value not in range(1,17): # count from 1
+        if value not in range(1, 17): # count from 1
             raise MidiException('bad channel value: %s' % value)
         for e in self.events:
             e.channel = value

@@ -110,8 +110,10 @@ def exShenker():
     analysis = stream.Score()
     chordReduction = copy.deepcopy(measureTemplate)
     for i, m in enumerate(chordReduction.getElementsByClass('Measure')):
-        mNotes = src.flat.getElementsByOffset(m.offset,
-            m.offset+m.barDuration.quarterLength, includeEndBoundary=False)
+        mNotes = src.flat.getElementsByOffset(
+            m.offset,
+            m.offset + m.barDuration.quarterLength,
+            includeEndBoundary=False)
         mNotes.makeChords(minimumWindowSize=4, inPlace=True)
         c = mNotes.flat.notes[0]
         c.duration.type = 'whole'

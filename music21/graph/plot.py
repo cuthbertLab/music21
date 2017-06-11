@@ -1135,7 +1135,7 @@ class HorizontalBarWeighted(primitives.GraphHorizontalBarWeighted, PlotStreamMix
                 if start not in uniqueOffsets:
                     uniqueOffsets.append(start)
                 if start + dur not in uniqueOffsets:
-                    uniqueOffsets.append(start+dur)
+                    uniqueOffsets.append(start + dur)
         # use default args for now
         self.axisX.minValue = min(uniqueOffsets)
         self.axisX.maxValue = max(uniqueOffsets)
@@ -1465,7 +1465,7 @@ class TestExternal(unittest.TestCase):
 
 
         a = corpus.parse('bach/bwv57.8')
-        b = HorizontalBarPitchClassOffset(a.parts[0].measures(3,6),
+        b = HorizontalBarPitchClassOffset(a.parts[0].measures(3, 6),
                                               title='Bach (soprano voice, mm 3-6)')
         b.run()
 
@@ -1681,7 +1681,7 @@ class Test(unittest.TestCase):
             unused_directory, fn = os.path.split(fp)
             a = corpus.parse(fp)
             windowStep = 3 #'2'
-            #windowStep = random.choice([1,2,4,8,16,32])
+            #windowStep = random.choice([1, 2, 4, 8, 16, 32])
             #a.show()
         else:
             a = corpus.parse('bach/bwv66.6')

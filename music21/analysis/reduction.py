@@ -120,7 +120,7 @@ class ReductiveNote(object):
         self._parameters = copy.deepcopy(self._defaultParameters)
         spec = spec.strip()
         #spec = spec.replace(' ', '')
-        if not spec.startswith(self._delimitValue+self._delimitValue):
+        if not spec.startswith(self._delimitValue + self._delimitValue):
             return # nothing to parse
         args = spec.split(self._delimitArg)
         for a in args[1:]: # skip the first arg, as it is just delmiiter
@@ -1103,8 +1103,8 @@ class Test(unittest.TestCase):
         self._matchWeightedData(match, target)
 
         if show is True:
-            p = graph.PlotDolan(s, title='Dynamics')
-            p.process()
+            p = graph.plot.Dolan(s, title='Dynamics')
+            p.run()
 
 
     def testPartReductionC(self):

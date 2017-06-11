@@ -561,7 +561,7 @@ class Verticality(object):
     def getAllVoiceLeadingQuartets(self, includeRests=True, includeOblique=True,
                                    includeNoMotion=False, returnObjects=True, partPairNumbers=None):
         '''
-        >>> c = corpus.parse('luca/gloria').measures(1,8)
+        >>> c = corpus.parse('luca/gloria').measures(1, 8)
         >>> tsCol = tree.fromStream.asTimespans(c, flatten=True,
         ...            classList=(note.Note, chord.Chord))
         >>> verticality22 = tsCol.getVerticalityAt(22.0)
@@ -612,13 +612,13 @@ class Verticality(object):
          (<PitchedTimespan (21.5 to 22.5) <music21.note.Note A>>,
           <PitchedTimespan (21.5 to 22.5) <music21.note.Note A>>))
 
-        >>> for vlq in verticality22.getAllVoiceLeadingQuartets(partPairNumbers=[(0,1)]):
+        >>> for vlq in verticality22.getAllVoiceLeadingQuartets(partPairNumbers=[(0, 1)]):
         ...     pp(vlq)
         <music21.voiceLeading.VoiceLeadingQuartet
             v1n1=<music21.note.Note G>, v1n2=<music21.note.Note C>,
             v2n1=<music21.note.Note E>, v2n2=<music21.note.Note F> >
 
-        >>> for vlq in verticality22.getAllVoiceLeadingQuartets(partPairNumbers=[(0,2),(1,2)]):
+        >>> for vlq in verticality22.getAllVoiceLeadingQuartets(partPairNumbers=[(0, 2), (1, 2)]):
         ...     pp(vlq)
         <music21.voiceLeading.VoiceLeadingQuartet
             v1n1=<music21.note.Note G>, v1n2=<music21.note.Note C>,
@@ -679,7 +679,7 @@ class Verticality(object):
         Get a list of two-element tuples that are in the same part [TODO: or containing stream??]
         and which move here.
 
-        >>> c = corpus.parse('luca/gloria').measures(1,8)
+        >>> c = corpus.parse('luca/gloria').measures(1, 8)
         >>> tsCol = tree.fromStream.asTimespans(c, flatten=True,
         ...            classList=(note.Note, chord.Chord))
         >>> verticality22 = tsCol.getVerticalityAt(22.0)

@@ -249,7 +249,8 @@ class ElementTree(core.AVLTree):
         >>> len(offTree)
         0
 
-        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> tsList = [(0, 2), (0, 9), (1, 1), (2, 3), (3, 4), 
+        ...           (4, 9), (5, 6), (5, 8), (6, 8), (7, 7)]
         >>> noteList = [note.Note() for _ in tsList]
         >>> for i,n in enumerate(noteList):
         ...     n.offset, n.quarterLength = tsList[i]
@@ -336,7 +337,7 @@ class ElementTree(core.AVLTree):
             if not isinstance(new, list):
                 message = 'If {} is a slice, then {} must be a list'.format(i, new)
                 raise TypeError(message)
-            sliceLen = (i.stop - i.start)/i.step
+            sliceLen = (i.stop - i.start) / i.step
             if sliceLen != len(new):
                 message = '{} is a slice of len {}, so {} cannot have len {}'.format(i, sliceLen,
                                                                                      new, len(new))

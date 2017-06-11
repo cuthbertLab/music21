@@ -1377,7 +1377,7 @@ class JSONFreezer(JSONFreezeThawBase):
         Lists and Tuples and Dicts return False, but they
         are not just stored as __repr__, don't worry...
 
-        >>> jsf.canBeFrozen([7,8])
+        >>> jsf.canBeFrozen([7, 8])
         False
 
         >>> jsf.canBeFrozen(pitch.Microtone())
@@ -1865,7 +1865,7 @@ class Test(unittest.TestCase):
         Works now
         '''
         from music21 import corpus
-        c = corpus.parse('luca/gloria').parts[2].measures(1,2)
+        c = corpus.parse('luca/gloria').parts[2].measures(1, 2)
         sf2 = StreamFreezer(c)
         data2 = sf2.writeStr(fmt='jsonpickle')
         st2 = StreamThawer()

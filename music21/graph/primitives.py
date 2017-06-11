@@ -1076,7 +1076,7 @@ class GraphHorizontalBarWeighted(Graph):
                 # x points used to get x ticks
                 if x not in xPoints:
                     xPoints.append(x)
-                if x+span not in xPoints:
+                if (x + span) not in xPoints:
                     xPoints.append(x + span)
 
                 # TODO: add high/low shift to position w/n range

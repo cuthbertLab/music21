@@ -929,7 +929,7 @@ def addVariant(s, startOffset, sVariant, variantName=None,
             sVariantMeasures = sVariant.getElementsByClass('Measure')
             if sVariantMeasures == []: # If there are no measures, work element-wise
                 for e in sVariant:
-                    offset = e.getOffsetBySite(sVariant)+startOffset
+                    offset = e.getOffsetBySite(sVariant) + startOffset
                     tempVariant.insert(offset, e)
             else: # if there are measures work measure-wise
                 for m in sVariantMeasures:
@@ -1035,7 +1035,7 @@ def refineVariant(s, sVariant, inPlace=False):
     variantGroups = sVariant.groups
     replacementDuration = sVariant.replacementDuration
     startOffset = sVariant.getOffsetBySite(s)
-    #endOffset = replacementDuration+startOffset
+    #endOffset = replacementDuration + startOffset
 
     # region associated with the given variant in the stream
     returnRegion = variantRegion.replacedElements(returnObject)
@@ -1831,12 +1831,12 @@ def _getNextElements(s, v, numberOfElements=1):
     else:
         replacementDuration = v.replacementDuration
         variantOffset = v.getOffsetBySite(s)
-        potentialTargets = s.getElementsByOffset(variantOffset+replacementDuration,
-                                          offsetEnd = s.highestTime,
-                                          includeEndBoundary = True,
-                                          mustFinishInSpan = False,
-                                          mustBeginInSpan = True,
-                                          classList = [vClass])
+        potentialTargets = s.getElementsByOffset(variantOffset + replacementDuration,
+                                                  offsetEnd = s.highestTime,
+                                                  includeEndBoundary = True,
+                                                  mustFinishInSpan = False,
+                                                  mustBeginInSpan = True,
+                                                  classList = [vClass])
         returnElement = potentialTargets[0]
 
 
@@ -2359,7 +2359,7 @@ class Variant(base.Music21Object):
             returnStream = returnPart1
             for e in returnPart2.elements:
                 oInPart = e.getOffsetBySite(returnPart2)
-                returnStream.insert(vMiddle-vStart+oInPart, e)
+                returnStream.insert(vMiddle - vStart + oInPart, e)
 
         if self in returnStream:
             returnStream.remove(self)

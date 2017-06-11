@@ -964,7 +964,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                 raisedMinorCorrectly = self.key.getScaleDegreeFromPitch(self.v1n2) == 1
         else:
             raisedMinorCorrectly = True
-        preclosings = [6,3]
+        preclosings = [6, 3]
         closingPitches = [self.v1n2.pitch.name, self.v2n2.name]
         return not ( self.vIntervals[0].generic.simpleUndirected in preclosings
                      and self.vIntervals[1].generic.simpleUndirected == 1
@@ -1267,7 +1267,7 @@ class Verticality(base.Music21Object):
         >>> vs1.getObjectsByClass('Note')
         [<music21.note.Note A>, <music21.note.Note C>,
          <music21.note.Note B>, <music21.note.Note F#>]
-        >>> vs1.getObjectsByClass('Note', [1,2])
+        >>> vs1.getObjectsByClass('Note', [1, 2])
         [<music21.note.Note C>, <music21.note.Note B>, <music21.note.Note F#>]
 
         '''
@@ -1754,7 +1754,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
 
     def color(self, color='red', noteList=(2,)):
         '''
-        color all the notes in noteList (1,2,3). Default is to color only the second note red
+        color all the notes in noteList (1, 2, 3). Default is to color only the second note red
         '''
         if 1 in noteList:
             self.n1.color = color

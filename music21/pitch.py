@@ -363,7 +363,7 @@ def _convertCentsToAlterAndCents(shift):
         cents = value - 100
     else:
         raise Exception('value exceeded range: %s' % value)
-    return alterShift+alterAdd, float(cents)
+    return alterShift + alterAdd, float(cents)
 
 
 def _convertHarmonicToCents(value):
@@ -2958,9 +2958,9 @@ class Pitch(object):
                 return solfege
             elif abs(tempAlter) > 4:
                 raise PitchException('Unsupported accidental type.')
-            elif tempAlter in [-4,-3,-2,-1]:
+            elif tempAlter in [-4, -3, -2, -1]:
                 return solfege + self._getSpanishCardinal() + u' bèmol'
-            elif tempAlter in [1,2,3,4]:
+            elif tempAlter in [1, 2, 3, 4]:
                 return solfege + self._getSpanishCardinal() + u' sostenido'
 
     @property
@@ -3141,7 +3141,7 @@ class Pitch(object):
         Or we can iterate over a list of the next 8 odd harmonics:
 
         >>> allHarmonics = ""
-        >>> for i in [9,11,13,15,17,19,21,23]:
+        >>> for i in [9, 11, 13, 15, 17, 19, 21, 23]:
         ...     allHarmonics += " " + str(p.getHarmonic(i))
         >>> print(allHarmonics)
         B7(+4c) D~8(+1c) F~8(-9c) G#8(-12c) B-8(+5c) C9(-2c) C#~9(+21c) E`9(-22c)

@@ -89,7 +89,7 @@ def generateRandomRows(numberToGenerate=1000):
         myRow = []
         lastLetter = ""
         for j in range(12):
-            newLetter = numberToLetter(random.randint(0,11))
+            newLetter = numberToLetter(random.randint(0, 11))
             if newLetter != lastLetter:
                 myRow.append(newLetter)
                 lastLetter = newLetter
@@ -126,7 +126,7 @@ def priorProbability(rowsToTest=1000000, enforce12Tone=True):
     for myRow in allRows:
         if eschbeg in myRow:
             eschbegTotal += 1
-        for i in range(1,12):
+        for i in range(1, 12):
             if eschbegTransposed[i] in myRow:
                 eschbegTransTotal += 1
     return (eschbegTotal, eschbegTransTotal)

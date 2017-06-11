@@ -18,6 +18,7 @@ parseData method that sets self.stream.
 #-------------------------------------------------------------------------------
 # Converters are associated classes; they are not subclasses, but most define a pareData() method,
 # a parseFile() method, and a .stream attribute or property.
+import base64
 import io
 import os
 import sys
@@ -349,7 +350,6 @@ class ConverterIPython(SubConverter):
                         display(Image(data=ipo.getData(), retina=True))
                     else:
                         # smallest transparent pixel
-                        import base64
                         pngData64 = (b'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA'
                                      + b'6fptVAAAACklEQVQYV2P4DwABAQEAWk1v8QAAAABJRU5ErkJggg==')
                         pngData = base64.b64decode(pngData64)
@@ -360,8 +360,6 @@ class ConverterIPython(SubConverter):
             return None
 
         elif helperFormat == 'midi':
-            import base64
-
             fp = helperSubConverter.write(obj, helperFormat, subformats=helperSubformats)
             with open(fp, 'rb') as f:
                 binaryMidiData = f.read()
@@ -507,7 +505,7 @@ class ConverterTextLine(SubConverter):
     single line of text; most for debugging. returned, not printed
 
     >>> s = corpus.parse('bwv66.6')
-    >>> s.measures(1,4).show('textline')
+    >>> s.measures(1, 4).show('textline')
     '{0.0} <music21.stream.Part Soprano> / {0.0} <music21.instrument.Instrument ... 1>...'
     '''
     registerFormats = ('textline',)

@@ -149,7 +149,7 @@ class Edge(object):
 
     def __repr__(self):
         return '<music21.scale.intervalNetwork.Edge %s %s %s>' % (self._direction,
-             self._interval.name, repr(self._connections).replace(' ', ''))
+             self._interval.name, repr(self._connections))
 
     @property
     def interval(self):
@@ -202,7 +202,7 @@ class Edge(object):
         >>> e1.connections
         [(0, 1)]
         >>> e1
-        <music21.scale.intervalNetwork.Edge ascending M3 [(0,1)]>
+        <music21.scale.intervalNetwork.Edge ascending M3 [(0, 1)]>
         '''
         # may be Node objects, or number, or string
         if isinstance(node1, six.string_types) or common.isNum(node1):
@@ -237,7 +237,7 @@ class Edge(object):
         >>> e1.connections
         [('terminusLow', 1), (1, 'terminusLow')]
         >>> e1
-        <music21.scale.intervalNetwork.Edge bi M3 [('terminusLow',1),(1,'terminusLow')]>
+        <music21.scale.intervalNetwork.Edge bi M3 [('terminusLow', 1), (1, 'terminusLow')]>
         '''
         # must assume here that n1 to n2 is ascending; need to know
         self.addDirectedConnection(node1, node2, DIRECTION_ASCENDING)
@@ -3121,13 +3121,13 @@ class Test(unittest.TestCase):
             "<music21.scale.intervalNetwork.Node id='terminusLow'>")
 
         self.assertEqual(repr(net._edges[0]),
-            "<music21.scale.intervalNetwork.Edge bi M2 [('terminusLow',0),(0,'terminusLow')]>")
+            "<music21.scale.intervalNetwork.Edge bi M2 [('terminusLow', 0), (0, 'terminusLow')]>")
 
         self.assertEqual(repr(net._edges[3]),
-            "<music21.scale.intervalNetwork.Edge bi M2 [(2,3),(3,2)]>")
+            "<music21.scale.intervalNetwork.Edge bi M2 [(2, 3), (3, 2)]>")
 
         self.assertEqual(repr(net._edges[6]),
-            "<music21.scale.intervalNetwork.Edge bi m2 [(5,'terminusHigh'),('terminusHigh',5)]>")
+            "<music21.scale.intervalNetwork.Edge bi m2 [(5, 'terminusHigh'), ('terminusHigh', 5)]>")
 
 
         # getting connections: can filter by direction
@@ -3196,20 +3196,20 @@ class Test(unittest.TestCase):
         # returns a list of edges and notes
         self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_LOW], 'ascending')),
                          "([<music21.scale.intervalNetwork.Edge ascending M2 " +
-                         "[('terminusLow',0)]>], [<music21.scale.intervalNetwork.Node id=0>])")
+                         "[('terminusLow', 0)]>], [<music21.scale.intervalNetwork.Node id=0>])")
 
         self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_LOW], 'descending')),
                          "([<music21.scale.intervalNetwork.Edge descending M2 " +
-                         "[('terminusHigh',11)]>], [<music21.scale.intervalNetwork.Node id=11>])")
+                         "[('terminusHigh', 11)]>], [<music21.scale.intervalNetwork.Node id=11>])")
 
         # high terminus gets the same result, as this is the wrapping point
         self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_HIGH], 'ascending')),
                          "([<music21.scale.intervalNetwork.Edge ascending M2 " +
-                         "[('terminusLow',0)]>], [<music21.scale.intervalNetwork.Node id=0>])")
+                         "[('terminusLow', 0)]>], [<music21.scale.intervalNetwork.Node id=0>])")
 
         self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_LOW], 'descending')),
                          "([<music21.scale.intervalNetwork.Edge descending M2 " +
-                         "[('terminusHigh',11)]>], [<music21.scale.intervalNetwork.Node id=11>])")
+                         "[('terminusHigh', 11)]>], [<music21.scale.intervalNetwork.Node id=11>])")
 
 
         # this is ascending from a4 to a5, then descending from a4 to a3

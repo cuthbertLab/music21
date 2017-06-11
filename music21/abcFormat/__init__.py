@@ -1984,7 +1984,7 @@ class ABCHandler(object):
                 j += 1 # need character that caused break
                 # prepend chord symbol
                 if activeChordSymbol != '':
-                    collect = activeChordSymbol+strSrc[currentIndex:j]
+                    collect = activeChordSymbol + strSrc[currentIndex:j]
                     activeChordSymbol = '' # reset
                 else:
                     collect = strSrc[currentIndex:j]
@@ -2060,7 +2060,7 @@ class ABCHandler(object):
                         break
                 # prepend chord symbol
                 if activeChordSymbol != '':
-                    collect = activeChordSymbol+strSrc[currentIndex:j]
+                    collect = activeChordSymbol + strSrc[currentIndex:j]
                     activeChordSymbol = '' # reset
                 else:
                     collect = strSrc[currentIndex:j]

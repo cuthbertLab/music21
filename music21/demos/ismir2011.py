@@ -56,7 +56,7 @@ def testDataSet():
     ds = features.DataSet(classLabel='Composer')
     ds.addFeatureExtractors(fes)
 
-    b1 = corpus.parse('bwv1080', 7).measures(0,50)
+    b1 = corpus.parse('bwv1080', 7).measures(0, 50)
     ds.addData(b1, classValue='Bach', id='artOfFugue')
     ds.addData('bwv66.6.xml', classValue='Bach')
 #    ds.addData('c:/handel/hwv56/movement3-05.md',
@@ -77,8 +77,8 @@ def testDataSet():
             pass
 #            ds.streams[i].show('lily.png')
 
-    p = graph.PlotFeatures(ds.streams, fes[1:], roundDigits = 2)
-    p.process()
+    p = graph.plot.Features(ds.streams, fes[1:], roundDigits = 2)
+    p.run()
 
 def prepareChinaEurope1():
     featureExtractors = features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35',

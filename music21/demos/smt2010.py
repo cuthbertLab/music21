@@ -81,7 +81,7 @@ def ex02(show=True, *arguments, **keywords):
     # determine which are dominant sevenths; store this in a list and display the results.
     found = stream.Stream()
     for i in range(len(pitches)-3):
-        testChord = chord.Chord(pitches[i:i+4])
+        testChord = chord.Chord(pitches[i:i + 4])
         if testChord.isDominantSeventh():
             found.append(testChord)
     if show:
@@ -197,7 +197,7 @@ def ex1_revised(show=True, *arguments, **keywords):
                                                  noNone=True )
         pitches = [n.pitch for n in notes]
         for i in range(len(pitches) - 3):
-            testChord = chord.Chord(pitches[i:i+4])
+            testChord = chord.Chord(pitches[i:i + 4])
             testChord.duration.type = "whole"
             if testChord.isDominantSeventh() is True:
                 # since a chord was found in this measure,
@@ -220,7 +220,7 @@ def ex1_revised(show=True, *arguments, **keywords):
 
 def findPotentialPassingTones(show=True):
     g = corpus.parse('gloria')
-    gcn = g.parts['cantus'].measures(1,126).flat.notesAndRests
+    gcn = g.parts['cantus'].measures(1, 126).flat.notesAndRests
 
     gcn[0].lyric = ""
     gcn[-1].lyric = ""
@@ -395,7 +395,7 @@ def chordifyAnalysis():
     sSrc = o.mergeScores()
     #sSrc = corpus.parse('bwv1080', 1)
 
-    sExcerpt = sSrc.measures(0,20)
+    sExcerpt = sSrc.measures(0, 20)
 
     display = stream.Score()
     display.metadata = sSrc.metadata
@@ -413,7 +413,7 @@ def chordifyAnalysis():
 
 def chordifyAnalysisHandel():
     sExcerpt = corpus.parse('hwv56', '3-03')
-    sExcerpt = sExcerpt.measures(0,10)
+    sExcerpt = sExcerpt.measures(0, 10)
     display = stream.Score()
     for p in sExcerpt.parts:
         display.insert(0, p)
@@ -429,7 +429,7 @@ def chordifyAnalysisHandel():
 
 def chordifyAnalysisBrief():
     #sSrc = corpus.parse('josquin/milleRegrets').mergeScores()
-    #sExcerpt = corpus.parse('bwv1080', 8).measures(10,12)
+    #sExcerpt = corpus.parse('bwv1080', 8).measures(10, 12)
 
     # 128, 134
     #o = corpus.parse('josquin/milleRegrets')

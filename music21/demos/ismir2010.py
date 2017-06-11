@@ -38,7 +38,7 @@ def newDots(show=True):
     # display measure 0 (pickup) to measure 6 in the default viewer
     # (here Finale Reader 2009)
     if (show is True):
-        bass.measures(0,6).show()
+        bass.measures(0, 6).show()
 
 
 def altDots(show=True):
@@ -46,7 +46,7 @@ def altDots(show=True):
     '''
     bwv30_6 = corpus.parse('bach/bwv30.6.xml')
     bass = bwv30_6.getElementById('Bass')
-    excerpt = bass.measures(1,10)
+    excerpt = bass.measures(1, 10)
     music21.analysis.metrical.labelBeatDepth(excerpt)
     if (show is True):
         excerpt.show()
@@ -54,7 +54,7 @@ def altDots(show=True):
 
     bwv11_6 = corpus.parse('bach/bwv11.6.xml')
     alto = bwv11_6.getElementById('Alto')
-    excerpt = alto.measures(13,20)
+    excerpt = alto.measures(13, 20)
     music21.analysis.metrical.labelBeatDepth(excerpt)
     if (show is True):
         excerpt.show()
@@ -80,7 +80,7 @@ def newDomSev(show=True):
 
         for i in range(len(pitches) - 3):
             # makes every set of 4 notes into a whole-note chord
-            testChord = chord.Chord(pitches[i:i+4])
+            testChord = chord.Chord(pitches[i:i + 4])
             testChord.duration.type = "whole"
 
             if testChord.isDominantSeventh():
@@ -129,7 +129,7 @@ def melodicChordExpression(show=True):
         # examine four-note gruops, where i is the first of four
         for i in range(len(pitches) - 3):
             # createa chord from four pitches
-            testChord = chord.Chord(pitches[i:i+4])
+            testChord = chord.Chord(pitches[i:i + 4])
             # modify duration for final presentation
             testChord.duration.type = "whole"
             if testChord.isDominantSeventh():
@@ -325,13 +325,13 @@ def demoBasic():
 
     # A Part might contain numerous Measure Streams
     len(soprano.getElementsByClass('Measure'))
-    unused_mRange = soprano.measures(14,16) # @UnusedVariable
+    unused_mRange = soprano.measures(14, 16) # @UnusedVariable
     #mRange.show()
     # mRange.sorted.show('text') # here we can see this
 
 
 
-    sNew = soprano.measures(14,16).flat.notesAndRests.transpose('p-5')
+    sNew = soprano.measures(14, 16).flat.notesAndRests.transpose('p-5')
     sNew.makeAccidentals(overrideStatus=True)
     ts1 = meter.TimeSignature('3/4')
     ts2 = meter.TimeSignature('5/8')
@@ -383,7 +383,7 @@ def beethovenSearch():
         pitches = stream.Stream(notes).pitches
         for i in range(len(pitches) - 3):
         # makes every set of 4 notes into a whole-note chord
-            testChord = chord.Chord(pitches[i:i+4])
+            testChord = chord.Chord(pitches[i:i + 4])
             testChord.duration.type = "whole"
 
             if testChord.isDominantSeventh():
@@ -422,7 +422,7 @@ def demoGraphMessiaen():
 
     s.plot('scatterweighted', values=['pitch', 'quarterlength'], dpi=dpi, title='Pitch and Duration, %s' % pieceTitle, xLog=False)
 
-    # s.getMeasuresRange(10,20)plot('PlotHorizontalBarPitchSpaceOffset')
+    # s.getMeasuresRange(10, 20)plot('PlotHorizontalBarPitchSpaceOffset')
     # s.plot('PlotScatterWeightedPitchSpaceQuarterLength')
 
 

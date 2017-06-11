@@ -1871,7 +1871,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> a = stream.Stream()
         >>> notes = []
-        >>> for x in range(0,3):
+        >>> for x in range(3):
         ...     n = note.Note('G#')
         ...     n.duration.quarterLength = 3
         ...     notes.append(n)
@@ -1889,7 +1889,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Since notes are not embedded in Elements here, their offset
         changes when they are added to a stream!
 
-        >>> for x in range(0,3):
+        >>> for x in range(3):
         ...     n = note.Note("A-")
         ...     n.duration.quarterLength = 3
         ...     n.offset = 0
@@ -2983,10 +2983,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> a.repeatInsert(n, list(range(8)))
         >>> b = stream.Stream()
         >>> b.repeatInsert(a, [0, 3, 6])
-        >>> c = b.getElementsByOffset(2,6.9)
+        >>> c = b.getElementsByOffset(2, 6.9)
         >>> len(c)
         2
-        >>> c = b.flat.getElementsByOffset(2,6.9)
+        >>> c = b.flat.getElementsByOffset(2, 6.9)
         >>> len(c)
         10
 
@@ -3470,7 +3470,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         new Measure objects are created and returned.
 
         >>> a = corpus.parse('bach/bwv324.xml')
-        >>> b = a.parts[0].measures(1,3)
+        >>> b = a.parts[0].measures(1, 3)
         >>> len(b.getElementsByClass('Measure'))
         3
         >>> b.getElementsByClass('Measure')[0].notes[0] is a.parts[0].flat.notes[0]
@@ -4551,7 +4551,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         a new piece.
 
 
-        >>> qj = corpus.parse('ciconia/quod_jactatur').parts[0].measures(1,2)
+        >>> qj = corpus.parse('ciconia/quod_jactatur').parts[0].measures(1, 2)
         >>> qj.id = 'measureExcerpt'
 
         >>> qj.show('text')
@@ -4644,7 +4644,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         shifted
 
         >>> a = stream.Stream()
-        >>> a.repeatInsert(note.Note("C"), list(range(0,10)))
+        >>> a.repeatInsert(note.Note("C"), list(range(10)))
         >>> a.shiftElements(30)
         >>> a.lowestOffset
         30.0
@@ -4712,7 +4712,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         the offset of this stream to zero.
 
         >>> a = stream.Stream()
-        >>> a.repeatInsert(note.Note("C"), list(range(0,10)))
+        >>> a.repeatInsert(note.Note("C"), list(range(10)))
         >>> a.offset = 30
         >>> a.transferOffsetToElements()
         >>> a.lowestOffset
@@ -5504,7 +5504,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
         >>> stream1 = stream.Stream()
-        >>> for x in range(30,81):
+        >>> for x in range(30, 81):
         ...     n = note.Note()
         ...     n.pitch.midi = x
         ...     stream1.append(n)
@@ -7214,7 +7214,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Get the start time of the Element with the lowest offset in the Stream.
 
         >>> stream1 = stream.Stream()
-        >>> for x in range(3,5):
+        >>> for x in range(3, 5):
         ...     n = note.Note('G#')
         ...     stream1.insert(x, n)
         ...
@@ -7234,7 +7234,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> p = stream.Stream()
         >>> p.repeatInsert(note.Note('D5'), [0, 1, 2, 3, 4])
         >>> q = stream.Stream()
-        >>> q.repeatInsert(p, list(range(0,50,10)))
+        >>> q.repeatInsert(p, list(range(0, 50, 10)))
         >>> len(q.flat)
         25
         >>> q.lowestOffset
@@ -7307,7 +7307,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> a = stream.Stream()
         >>> q = note.Note(type='quarter')
-        >>> a.repeatInsert(q, [0,1,2,3])
+        >>> a.repeatInsert(q, [0, 1, 2, 3])
         >>> a.highestOffset
         3.0
         >>> a.highestTime
@@ -9147,7 +9147,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 durSpan = (e.offset, e.offset)
             else:
                 dur = e.duration.quarterLength
-                durSpan = (e.offset, opFrac(e.offset+dur))
+                durSpan = (e.offset, opFrac(e.offset + dur))
             post.append(durSpan)
         # assume this is already sorted
         # index found here will be the same as elementsSorted
@@ -9396,7 +9396,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Notes starting at the same time overlap:
 
         >>> a = stream.Stream()
-        >>> for x in [0,0,0,0,13,13,13]:
+        >>> for x in [0, 0, 0, 0, 13, 13, 13]:
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('half')
         ...     n.offset = x
@@ -9408,7 +9408,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(d[13])
         3
         >>> a = stream.Stream()
-        >>> for x in [0,0,0,0,3,3,3]:
+        >>> for x in [0, 0, 0, 0, 3, 3, 3]:
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('whole')
         ...     n.offset = x
@@ -9432,7 +9432,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
         >>> a = stream.Stream()
-        >>> for x in [0,0,0,0,3,3,3]:
+        >>> for x in [0, 0, 0, 0, 3, 3, 3]:
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('whole')
         ...     n.offset = x * 1
@@ -9445,7 +9445,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         TODO: check that co-incident boundaries are properly handled
 
         >>> a = stream.Stream()
-        >>> for x in [0,4,8.0]:
+        >>> for x in [0, 4, 8.0]:
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('whole')
         ...     a.append(n)
@@ -9744,7 +9744,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> s = stream.Stream()
         >>> s.insert(0, note.Note('C4', quarterLength=4))
-        >>> s.repeatInsert(note.Note('b-4', quarterLength=.5), [x*.5 for x in list(range(0,8))])
+        >>> s.repeatInsert(note.Note('b-4', quarterLength=0.5), [x * 0.5 for x in list(range(8))])
         >>> s.makeVoices(inPlace=True)
         >>> len(s.voices)
         2
@@ -10904,7 +10904,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.insert(15.0, n)
 
         >>> sGapsRemoved = s._removeOrExpandGaps(
-        ...             [(0.0,5.0, []), (6.0,4.0, []), (14.0,6.0, [n])], isRemove=True)
+        ...             [(0.0, 5.0, []), (6.0, 4.0, []), (14.0, 6.0, [n])], isRemove=True)
         >>> sGapsRemoved.show('text')
         {0.0} <music21.note.Note A>
         {1.0} <music21.note.Note B>
@@ -10915,7 +10915,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {5.0} <music21.note.Note F>
 
         >>> sGapsExpanded = s._removeOrExpandGaps(
-        ...            [(0.0,5.0, []), (11.0,5.0, []), (14.0,1.0, [n])], isRemove=False)
+        ...            [(0.0, 5.0, []), (11.0, 5.0, []), (14.0, 1.0, [n])], isRemove=False)
         >>> sGapsExpanded.show('text')
         {10.0} <music21.note.Note A>
         {15.0} <music21.note.Note B>
@@ -10957,7 +10957,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     includeEnd = True
 
                 shiftDur = shiftDur + durationAmount
-                for e in returnObj.getElementsByOffset(startOffset+durationAmount,
+                for e in returnObj.getElementsByOffset(startOffset + durationAmount,
                     endOffset,
                     includeEndBoundary=includeEnd,
                     mustFinishInSpan=False,
@@ -11330,7 +11330,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 #        hV.insert(hVendOffset, r)
                 #        for el in cV._stream:
                 #            oldOffset = el.getOffsetBySite(cV._stream)
-                #            hV.insert(hVendOffset+shiftOffset+oldOffset, el)
+                #            hV.insert(hVendOffset + shiftOffset + oldOffset, el)
                 #        hV.replacementDuration += shiftOffset + cV.replacementDuration
                 #        forDeletion.append(cV)
                 #        variantsToBeDone.append(hV)
@@ -11347,7 +11347,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     r.hideObjectOnPrint = True
                     for el in cV._stream:
                         oldOffset = el.getOffsetBySite(cV._stream)
-                        cV._stream.setElementOffset(el, oldOffset+shiftOffset)
+                        cV._stream.setElementOffset(el, oldOffset + shiftOffset)
                     cV.insert(0.0, r)
                     cV.replacementDuration = oldReplacementDuration
                     self.remove(cV)
@@ -12318,7 +12318,7 @@ class Score(Stream):
         Stream.measures()
 
         >>> s = corpus.parse('bwv66.6')
-        >>> post = s.measures(3,5) # range is inclusive, i.e., [3, 5]
+        >>> post = s.measures(3, 5) # range is inclusive, i.e., [3, 5]
         >>> len(post.parts)
         4
         >>> len(post.parts[0].getElementsByClass('Measure'))

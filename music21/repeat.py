@@ -1943,7 +1943,7 @@ class RepeatFinder(object):
         >>> noPickup = corpus.parse('bwv10.7.mxl')
         >>> repeat.RepeatFinder(noPickup).getQuarterLengthOfPickupMeasure()
         0.0
-        >>> #_DOCS_SHOW noPickup.parts[0].measures(0,5).show()
+        >>> #_DOCS_SHOW noPickup.parts[0].measures(0, 5).show()
 
         .. image:: images/repeat-rf_noPickup.*
            :width: 600
@@ -1951,7 +1951,7 @@ class RepeatFinder(object):
         >>> hasPickup = corpus.parse('bwv101.7.mxl')
         >>> repeat.RepeatFinder(hasPickup).getQuarterLengthOfPickupMeasure()
         1.0
-        >>> #_DOCS_SHOW hasPickup.parts[0].measures(0,2).show()
+        >>> #_DOCS_SHOW hasPickup.parts[0].measures(0, 2).show()
 
         .. image:: images/repeat-rf_hasPickup.*
            :width: 600
@@ -1996,7 +1996,7 @@ class RepeatFinder(object):
         >>> noPickup = corpus.parse('bwv10.7.mxl')
         >>> repeat.RepeatFinder(noPickup).hasPickup()
         False
-        >>> #_DOCS_SHOW noPickup.parts[0].measures(0,5).show()
+        >>> #_DOCS_SHOW noPickup.parts[0].measures(0, 5).show()
 
         .. image:: images/repeat-rf_noPickup.*
            :width: 600
@@ -2004,7 +2004,7 @@ class RepeatFinder(object):
         >>> hasPickup = corpus.parse('bwv101.7.mxl')
         >>> repeat.RepeatFinder(hasPickup).hasPickup()
         True
-        >>> #_DOCS_SHOW hasPickup.parts[0].measures(0,2).show()
+        >>> #_DOCS_SHOW hasPickup.parts[0].measures(0, 2).show()
 
         .. image:: images/repeat-rf_hasPickup.*
            :width: 600
@@ -2031,7 +2031,7 @@ class RepeatFinder(object):
         as measure 0 regardless of whether
         s starts with measure 0 or 1 (i.e. treats a pickup bar as an entire measure).
 
-        For instance, if getMeasureSimilarityList returned [[4], [5], [6], [7,8],
+        For instance, if getMeasureSimilarityList returned [[4], [5], [6], [7, 8],
         [], [], [], [8], []], we would know that the first
         four measures repeat and the 4th, 8th, and 9th measures are the same.
 
@@ -2234,7 +2234,7 @@ class RepeatFinder(object):
         ...    m.append(n4)
 
         >>> rf = repeat.RepeatFinder()
-        >>> res3 = rf._getSimilarMeasureTuples([[1,2],[2],[]], False)
+        >>> res3 = rf._getSimilarMeasureTuples([[1, 2], [2], []], False)
         >>> ([1], [2]) in res3
         True
         >>> ([2], [3]) in res3
@@ -2257,7 +2257,7 @@ class RepeatFinder(object):
         ...    m.append(n3)
         ...    m.append(n4)
         >>> rf = repeat.RepeatFinder()
-        >>> res3 = rf._getSimilarMeasureTuples([[1,2,3,4],[2,3,4],[3,4],[4],[]], False)
+        >>> res3 = rf._getSimilarMeasureTuples([[1, 2, 3, 4], [2, 3, 4], [3, 4], [4], []], False)
         >>> ([1, 2], [3, 4]) in res3
         True
         >>> ([1, 2], [4, 5]) in res3
@@ -3929,7 +3929,7 @@ class Test(unittest.TestCase):
 
 
     def testRepeatEndingsE(self):
-        '''Expanding two endings (1,2, then 3) without a start repeat
+        '''Expanding two endings (1, 2, then 3) without a start repeat
         '''
         from music21 import stream, note, bar
 
@@ -3967,7 +3967,7 @@ class Test(unittest.TestCase):
 
 
     def testRepeatEndingsF(self):
-        '''Two sets of two endings (1,2, then 3) without a start repeat
+        '''Two sets of two endings (1, 2, then 3) without a start repeat
         '''
         from music21 import stream, note, bar
 
@@ -4024,7 +4024,7 @@ class Test(unittest.TestCase):
 
 
     def testRepeatEndingsG(self):
-        '''Two sets of two endings (1,2, then 3) without a start repeat
+        '''Two sets of two endings (1, 2, then 3) without a start repeat
         '''
         from music21 import stream, note, bar
 
@@ -4066,7 +4066,7 @@ class Test(unittest.TestCase):
 
 
     def testRepeatEndingsH(self):
-        '''Two sets of two endings (1,2, then 3) without a start repeat
+        '''Two sets of two endings (1, 2, then 3) without a start repeat
         '''
         from music21 import stream, note, bar
 
@@ -4113,7 +4113,7 @@ class Test(unittest.TestCase):
 
 
     def testRepeatEndingsI(self):
-        '''Two sets of two endings (1,2, then 3) without a start repeat
+        '''Two sets of two endings (1, 2, then 3) without a start repeat
         '''
         from music21 import stream, note, bar
 
@@ -4173,7 +4173,7 @@ class Test(unittest.TestCase):
 
 
     def testRepeatEndingsJ(self):
-        '''Two sets of two endings (1,2, then 3) without a start repeat
+        '''Two sets of two endings (1, 2, then 3) without a start repeat
         '''
         from music21 import stream, note, bar
 

@@ -126,7 +126,7 @@ As an example, the steps involved in these methods calls include:
 8. the gap created by the deletion is filled in by extending the duration of the previous note
 
 
->>> p = corpus.parse('bwv6.6').measures(0,20)
+>>> p = corpus.parse('bwv6.6').measures(0, 20)
 >>> #_DOCS_SHOW p.show()
     .. image:: images/completebach.*
     :width: 500
@@ -578,9 +578,9 @@ class Analyzer(object):
             verticalities = self.store[sid]['Verticalities']
             if verticalities is None:
                 verticalities = self.getVerticalities(score)
-        for i in range(0, len(verticalities)-(ntupletNum-1)):
+        for i in range(len(verticalities) - (ntupletNum - 1)):
             verticalityList = []
-            for countNum in range(i,i+ntupletNum):
+            for countNum in range(i, i + ntupletNum):
                 verticalityList.append(verticalities[countNum])
             if ntupletNum == 3:
                 vsnt = voiceLeading.VerticalityTriplet(verticalityList)
@@ -612,11 +612,11 @@ class Analyzer(object):
         >>> sc.insert(part1)
 
         >>> ads = alpha.theoryAnalysis.theoryAnalyzer.Analyzer()
-        >>> len(ads.getHarmonicIntervals(sc, 0,1))
+        >>> len(ads.getHarmonicIntervals(sc, 0, 1))
         2
-        >>> ads.getHarmonicIntervals(sc, 0,1)[0].name
+        >>> ads.getHarmonicIntervals(sc, 0, 1)[0].name
         'P5'
-        >>> ads.getHarmonicIntervals(sc, 0,1)[1].name
+        >>> ads.getHarmonicIntervals(sc, 0, 1)[1].name
         'm3'
         '''
         hInvList = []
@@ -728,9 +728,9 @@ class Analyzer(object):
         '''
         partNumPairs = []
         numParts = len(score.parts)
-        for partNum1 in range(0, numParts-1):
+        for partNum1 in range(0, numParts - 1):
             for partNum2 in range(partNum1 + 1, numParts):
-                partNumPairs.append((partNum1,partNum2))
+                partNumPairs.append((partNum1, partNum2))
 
         return partNumPairs
 
@@ -1818,7 +1818,7 @@ class Analyzer(object):
             self.identifyNeighborTones(score, partNum1, dictKey='nt2',
                                        unaccentedOnly=unaccentedOnly)
             self.identifyImproperResolutions(score, partNum1, partNum2, dictKey='res',
-                                        editorialMarkList=[1,2,3,4])
+                                        editorialMarkList=[1, 2, 3, 4])
             if 'ResultDict' in self.store[sid] and 'h1' in self.store[sid]['ResultDict']:
                 for resultTheoryObject in self.store[sid]['ResultDict']['h1'] :
                     if ((resultTheoryObject.hasEditorial('isPassingTone', True) or
@@ -1990,7 +1990,7 @@ class Analyzer(object):
         ``verticality's.offset(leftAlign=True)`` included
         in the list. For example, if only roman numerals were to be written for the vertical
         slice at offset 0, 6, and 7
-        in the piece, pass ``responseOffsetMap=[0,6,7]``
+        in the piece, pass ``responseOffsetMap=[0, 6, 7]``
 
         >>> sc = stream.Score()
         >>> part0 = stream.Part()
@@ -2060,7 +2060,7 @@ class Analyzer(object):
     #    verticality's.offset(leftAlign=True) included in the list.
     #    For example, if only roman numerals
     #    were to be written for the vertical slice at offset 0, 6, and 7 in the piece, pass
-    #    responseOffsetMap = [0,6,7]
+    #    responseOffsetMap = [0, 6, 7]
     #
     #    '''
     #    def testFunction(vs, score, responseOffsetMap=[]):
@@ -2177,7 +2177,7 @@ class Analyzer(object):
                                             n.measureNumber).getScale().getScaleDegreeFromPitch(
                                                 n.pitch)) ) if n is not None else False
         textFunction = lambda n, pn, scaleDegree: ("scale degree of " + n.name + ' in part ' +
-                                                   str(pn+ 1) + ' is ' + str(scaleDegree))
+                                                   str(pn + 1) + ' is ' + str(scaleDegree))
         self._identifyBasedOnNote(score, partNum, color, dictKey, testFunction, textFunction)
 
     def identifyMotionType(self, score, partNum1=None, partNum2=None,
@@ -2401,7 +2401,7 @@ class Analyzer(object):
         '''
         easily specify the key of the score by measure in a dictionary correlating measure number
         to key, such as
-        {1:'C', 2:'D', 3:'B-',5:'g'}. optionally pass in the music21 key object or the key string.
+        {1:'C', 2:'D', 3:'B-', 5:'g'}. optionally pass in the music21 key object or the key string.
         This is used
         for analysis purposes only - no key object is actually added to the score.
         Check the music xml to verify measure numbers; pickup measures are usually 0.
@@ -2482,9 +2482,9 @@ class Test(unittest.TestCase):
 #         p = corpus.parse('leadsheet').flat.getElementsByClass('Harmony')
 #         harmony.realizeChordSymbolDurations(p)
 #         averageMotion = 0
-#         l = ads.getLinearSegments(p,0,2, ['Harmony'])
+#         l = ads.getLinearSegments(p, 0, 2, ['Harmony'])
 #         for x in l:
-#             averageMotion+= abs(x.rootInterval().intervalClass)
+#             averageMotion += abs(x.rootInterval().intervalClass)
 #         averageMotion = averageMotion // len(l)
 #         self.assertEqual(averageMotion, 4)
 #

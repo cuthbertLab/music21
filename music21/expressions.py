@@ -1144,7 +1144,7 @@ class Test(unittest.TestCase):
 
 #     def testCPEBachRealizeOrnaments(self):
 #         from music21 import corpus
-#         cpe = corpus.parse('cpebach/h186').parts[0].measures(1,4)
+#         cpe = corpus.parse('cpebach/h186').parts[0].measures(1, 4)
 #         cpe2 = cpe.realizeOrnaments()
 #         #cpe2.show()
 

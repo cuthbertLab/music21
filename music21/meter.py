@@ -234,13 +234,13 @@ def fractionSum(fList):
     Given a list of fractions represented as a list,
     find the sum; does NOT reduce to lowest terms.
 
-    >>> meter.fractionSum([(3,8), (5,8), (1,8)])
+    >>> meter.fractionSum([(3, 8), (5, 8), (1, 8)])
     (9, 8)
-    >>> meter.fractionSum([(1,6), (2,3)])
+    >>> meter.fractionSum([(1, 6), (2, 3)])
     (5, 6)
-    >>> meter.fractionSum([(3,4), (1,2)])
+    >>> meter.fractionSum([(3, 4), (1, 2)])
     (5, 4)
-    >>> meter.fractionSum([(1,13), (2,17)])
+    >>> meter.fractionSum([(1, 13), (2, 17)])
     (43, 221)
     >>> meter.fractionSum([])
     (0, 1)
@@ -249,7 +249,7 @@ def fractionSum(fList):
     by just doing a fractions.Fraction() sum (I tried!), but not reducing to lowest
     terms is a feature of this method. 3/8 + 3/8 = 6/8, not 3/4:
 
-    >>> meter.fractionSum([(3,8), (3,8)])
+    >>> meter.fractionSum([(3, 8), (3, 8)])
     (6, 8)
     '''
     nList = []
@@ -460,7 +460,7 @@ def bestTimeSignature(meas):
         denominator = denominator // denom
 
     # simplifies rare time signatures like 16/16 and 1/1 to 4/4
-    if numerator == denominator and numerator not in [2,4]:
+    if numerator == denominator and numerator not in [2, 4]:
         numerator = 4
         denominator = 4
     elif numerator != denominator and denominator == 1:
@@ -698,7 +698,7 @@ class MeterTerminal(SlottedObjectMixin):
 
 
         >>> a = meter.MeterTerminal('3/4')
-        >>> b = a.subdivideByList([1,1,1])
+        >>> b = a.subdivideByList([1, 1, 1])
         >>> len(b)
         3
         >>> b[0]
@@ -706,7 +706,7 @@ class MeterTerminal(SlottedObjectMixin):
 
         Unequal subdivisions work:
 
-        >>> c = a.subdivideByList([1,2])
+        >>> c = a.subdivideByList([1, 2])
         >>> len(c)
         2
         >>> (c[0], c[1])
@@ -1354,20 +1354,20 @@ class MeterSequence(MeterTerminal):
             opts.append(seq)
         # odd meters with common groupings
         if n == 5:
-            for group in [[2,3], [3,2]]:
+            for group in [[2, 3], [3, 2]]:
                 seq = []
                 for nMod in group:
                     seq.append('%s/%s' % (nMod, d))
                 opts.append(seq)
         if n == 7:
-            for group in [[2,2,3], [3,2,2], [2,3,2]]:
+            for group in [[2, 2, 3], [3, 2, 2], [2, 3, 2]]:
                 seq = []
                 for nMod in group:
                     seq.append('%s/%s' % (nMod, d))
                 opts.append(seq)
         # not really necessary but an example of a possibility
         if n == 10:
-            for group in [[2,2,3,3]]:
+            for group in [[2, 2, 3, 3]]:
                 seq = []
                 for nMod in group:
                     seq.append('%s/%s' % (nMod, d))
@@ -1578,13 +1578,13 @@ class MeterSequence(MeterTerminal):
 
 
         >>> a = meter.MeterSequence('4/4')
-        >>> a.partitionByList([1,1,1,1])
+        >>> a.partitionByList([1, 1, 1, 1])
         >>> str(a)
         '{1/4+1/4+1/4+1/4}'
 
         This divides it into two equal parts:
 
-        >>> a.partitionByList([1,1])
+        >>> a.partitionByList([1, 1])
         >>> str(a)
         '{1/2+1/2}'
 
@@ -1619,7 +1619,7 @@ class MeterSequence(MeterTerminal):
             else:
                 raise MeterException('Cannot set partition by %s' % numeratorList)
 
-        elif sum(numeratorList) in [self.numerator * x for x in range(1,9)]:
+        elif sum(numeratorList) in [self.numerator * x for x in range(1, 9)]:
             for i in range(1, 9):
                 if sum(numeratorList) == self.numerator * i:
                     optMatch = []
@@ -2448,7 +2448,7 @@ class MeterSequence(MeterTerminal):
         3
 
 
-        >>> a.partition([1,2,1])
+        >>> a.partition([1, 2, 1])
         >>> len(a)
         3
         >>> a.offsetToIndex(2.9)
@@ -3402,7 +3402,7 @@ class TimeSignature(base.Music21Object):
         3
         >>> ts.beatDuration.quarterLength
         1.0
-        >>> ts.beatCount = [1,1,1,1,1,1]
+        >>> ts.beatCount = [1, 1, 1, 1, 1, 1]
         >>> ts.beatCount
         6
         >>> ts.beatDuration.quarterLength
@@ -3947,7 +3947,7 @@ class TimeSignature(base.Music21Object):
 
 
         >>> a = meter.TimeSignature('3/4', 3)
-        >>> a.accentSequence.partition([2,1])
+        >>> a.accentSequence.partition([2, 1])
         >>> a.accentSequence
         <MeterSequence {2/4+1/4}>
         >>> a.getAccent(0)
@@ -4560,13 +4560,13 @@ class Test(unittest.TestCase):
                     a[h][i][j] = a[h][i][j].subdivide(2)
 
         # matching with starts result in a lerdahl jackendoff style depth
-        match = [4,1,2,1,3,1,2,1]
+        match = [4, 1, 2, 1, 3, 1, 2, 1]
         for x in range(8):
             pos = x * .5
             test = a.offsetToDepth(pos, align='start')
             self.assertEqual(test, match[x])
 
-        match = [1,2,1,3,1,2,1]
+        match = [1, 2, 1, 3, 1, 2, 1]
         for x in range(7):
             pos = (x * .5) + .5
             test = a.offsetToDepth(pos, align='end')
@@ -4574,7 +4574,7 @@ class Test(unittest.TestCase):
             self.assertEqual(test, match[x])
 
         # can quantize by lowest value
-        match = [4,1,2,1,3,1,2,1]
+        match = [4, 1, 2, 1, 3, 1, 2, 1]
         for x in range(8):
             pos = (x * .5) + .25
             test = a.offsetToDepth(pos, align='quantize')

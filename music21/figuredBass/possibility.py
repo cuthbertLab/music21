@@ -749,7 +749,7 @@ def partsSame(possibA, possibB, partsToCheck=None):
     >>> C5 = pitch.Pitch('C5')
     >>> possibA1 = (C5, G4, E4, C4)
     >>> possibB1 = (B4, G4, E4, C4)
-    >>> possibility.partsSame(possibA1, possibB1, [2,3,4])
+    >>> possibility.partsSame(possibA1, possibB1, [2, 3, 4])
     True
     '''
     if partsToCheck is None:

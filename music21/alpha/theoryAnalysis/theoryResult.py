@@ -133,7 +133,7 @@ class IntervalTheoryResult(TheoryResult):
         TheoryResult.__init__(self)
         self.intv = intv
 
-    def color(self, color='red', noteList=(1,2)):
+    def color(self, color='red', noteList=(1, 2)):
         '''
         Color the notes in the interval as specified by noteList, 1 for the noteStart and
         2 for the noteEnd
@@ -228,7 +228,7 @@ class ThreeNoteLinearSegmentTheoryResult(TheoryResult):
 
     def color(self, color ='red', noteList=(2,)):
         '''
-        color all the notes in noteList (1,2,3). Default is to color only the second note red
+        color all the notes in noteList (1, 2, 3). Default is to color only the second note red
         '''
         if 1 in noteList:
             self.tnls.n1.color = color
@@ -251,7 +251,7 @@ class VerticalityNTupletTheoryResult(TheoryResult):
 
     def color(self,  color ='red', partNum=None, noteList=None):
         '''
-        color the notes in partNum as specified by noteList (1,2,3, etc.)
+        color the notes in partNum as specified by noteList (1, 2, 3, etc.)
         '''
         if noteList is None:
             noteList = []

@@ -884,7 +884,7 @@ def findCorrections(correctionType="Maj3", startPiece=2, endPiece=459):
                         else:
                             nextFewNotes = srcStreamNotes[i + 1:]
                     else:
-                        nextFewNotes = srcStreamNotes[i + 1:i + 1+notesToCheck]
+                        nextFewNotes = srcStreamNotes[(i + 1):(i + 1 + notesToCheck)]
                     #nextFewNotes = srcStream1.notesFollowingNote(note1,
                     #        notesToCheck, allowRests = False)
                     foundP8 = False

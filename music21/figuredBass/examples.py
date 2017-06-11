@@ -46,7 +46,7 @@ def exampleA():
 
     >>> from music21.figuredBass import rules
     >>> fbRules = rules.Rules()
-    >>> fbRules.partMovementLimits = [(1,2),(2,12),(3,12)]
+    >>> fbRules.partMovementLimits = [(1, 2), (2, 12), (3, 12)]
     >>> fbRealization1 = fbLine.realize(fbRules)
     >>> fbRealization1.getNumSolutions()
     360
@@ -94,7 +94,7 @@ def exampleD():
 
     >>> from music21.figuredBass import rules
     >>> fbRules = rules.Rules()
-    >>> fbRules.partMovementLimits = [(1,2),(2,12),(3,12)]
+    >>> fbRules.partMovementLimits = [(1, 2), (2, 12), (3, 12)]
     >>> fbRealization1 = fbLine.realize(fbRules)
     >>> fbRealization1.getNumSolutions()
     1560
@@ -330,7 +330,7 @@ def italianA6ResolutionExample():
     >>> fbLine = examples.italianA6ResolutionExample()
     >>> fbRules = rules.Rules()
     >>> fbRules.upperPartsMaxSemitoneSeparation = None
-    >>> fbRules.partMovementLimits.append([1,4])
+    >>> fbRules.partMovementLimits.append([1, 4])
     >>> fbRealization = fbLine.realize(fbRules)
     >>> fbRealization.keyboardStyleOutput = False
     >>> #_DOCS_SHOW fbRealization.generateRandomRealization().show()
@@ -368,7 +368,7 @@ def twelveBarBlues():
         :width: 700
 
     >>> fbRules = rules.Rules()
-    >>> fbRules.partMovementLimits = [(1,4),(2,12),(3,12)]
+    >>> fbRules.partMovementLimits = [(1, 4), (2, 12), (3, 12)]
     >>> fbRules.forbidVoiceOverlap = False
     >>> blRealization = bluesLine.realize(fbRules)
     >>> blRealization.getNumSolutions()
@@ -394,7 +394,7 @@ def generateBoogieVamp(blRealization=None, numRepeats=5):
     realization of :meth:`~music21.figuredBass.examples.twelveBarBlues`. If none is provided,
     a default realization with :attr:`~music21.figuredBass.rules.Rules.forbidVoiceOverlap`
     set to False and :attr:`~music21.figuredBass.rules.Rules.partMovementLimits` set to
-    [(1,4),(2,12),(3,12)] is used.
+    [(1, 4), (2, 12), (3, 12)] is used.
 
     >>> from music21.figuredBass import examples
     >>> #_DOCS_SHOW examples.generateBoogieVamp(numRepeats=1).show()
@@ -406,7 +406,7 @@ def generateBoogieVamp(blRealization=None, numRepeats=5):
     if blRealization is None:
         bluesLine = twelveBarBlues()
         fbRules = rules.Rules()
-        fbRules.partMovementLimits = [(1,4),(2,12),(3,12)]
+        fbRules.partMovementLimits = [(1, 4), (2, 12), (3, 12)]
         fbRules.forbidVoiceOverlap = False
         blRealization = bluesLine.realize(fbRules)
         sampleScore = blRealization.generateRandomRealizations(numRepeats)
@@ -439,7 +439,7 @@ def generateTripletBlues(blRealization=None, numRepeats=5): #12/8
     realization of :meth:`~music21.figuredBass.examples.twelveBarBlues`. If none is provided,
     a default realization with :attr:`~music21.figuredBass.rules.Rules.forbidVoiceOverlap`
     set to False and :attr:`~music21.figuredBass.rules.Rules.partMovementLimits` set to
-    [(1,4),(2,12),(3,12)] is used.
+    [(1, 4), (2, 12), (3, 12)] is used.
 
     >>> from music21.figuredBass import examples
     >>> #_DOCS_SHOW examples.generateTripletBlues(numRepeats=1).show()
@@ -451,7 +451,7 @@ def generateTripletBlues(blRealization=None, numRepeats=5): #12/8
     if blRealization is None:
         bluesLine = twelveBarBlues()
         fbRules = rules.Rules()
-        fbRules.partMovementLimits = [(1,4),(2,12),(3,12)]
+        fbRules.partMovementLimits = [(1, 4), (2, 12), (3, 12)]
         fbRules.forbidVoiceOverlap = False
         blRealization = bluesLine.realize(fbRules)
         sampleScore = blRealization.generateRandomRealizations(numRepeats)

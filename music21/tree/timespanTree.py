@@ -174,7 +174,8 @@ class TimespanTree(trees.OffsetTree):
 
         Since Timespans do not have .sites, there is only one offset to deal with...
 
-        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> tsList = [(0, 2), (0, 9), (1, 1), (2, 3), (3, 4), 
+        ...           (4, 9), (5, 6), (5, 8), (6, 8), (7, 7)]
         >>> ts = [tree.spans.Timespan(x, y) for x, y in tsList]
         >>> tsTree = tree.timespanTree.TimespanTree()
         >>> tsTree.insert(ts)

@@ -25,7 +25,7 @@ def getVoiceLeadingMoments(music21Stream):
     Takes in a :class:`~music21.stream.Stream` and returns a :class:`~music21.stream.Score`
     of the :class:`~music21.stream.Stream` broken up into its voice leading moments.
 
-    >>> #_DOCS_SHOW score = corpus.parse("corelli/opus3no1/1grave").measures(1,3)
+    >>> #_DOCS_SHOW score = corpus.parse("corelli/opus3no1/1grave").measures(1, 3)
     >>> #_DOCS_SHOW score.show()
 
     .. image:: images/figuredBass/corelli_grave.*
@@ -71,7 +71,7 @@ def extractHarmonies(music21Stream):
     to the lowest one.
 
     >>> from music21 import corpus
-    >>> score = corpus.parse("corelli/opus3no1/1grave").measures(1,3)
+    >>> score = corpus.parse("corelli/opus3no1/1grave").measures(1, 3)
     >>> #_DOCS_SHOW score.show()
 
     .. image:: images/figuredBass/corelli_grave.*
@@ -115,7 +115,7 @@ def createOffsetMapping(music21Part):
 
     >>> from music21 import corpus
     >>> from music21.figuredBass import checker
-    >>> score = corpus.parse("corelli/opus3no1/1grave").measures(1,3)
+    >>> score = corpus.parse("corelli/opus3no1/1grave").measures(1, 3)
     >>> v0 = score[0]
     >>> offsetMapping = checker.createOffsetMapping(v0)
     >>> for (offsets, notes) in sorted(offsetMapping.items()):
@@ -146,7 +146,7 @@ def correlateHarmonies(currentMapping, music21Part):
 
     >>> from music21 import corpus
     >>> from music21.figuredBass import checker
-    >>> score = corpus.parse("corelli/opus3no1/1grave").measures(1,3)
+    >>> score = corpus.parse("corelli/opus3no1/1grave").measures(1, 3)
     >>> v0 = score[0]
     >>> offsetMapping = checker.createOffsetMapping(v0)
     >>> v1 = score[1]
@@ -206,7 +206,7 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
     .. note:: Colored notes are NOT supported in Finale.
 
     >>> from music21 import corpus
-    >>> music21Stream = corpus.parse("corelli/opus3no1/1grave").measures(1,6)
+    >>> music21Stream = corpus.parse("corelli/opus3no1/1grave").measures(1, 6)
     >>> #_DOCS_SHOW music21Stream.show()
 
     .. image:: images/figuredBass/corelli_grave2.*
@@ -215,7 +215,7 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
 
     >>> from music21.figuredBass import checker
     >>> functionToApply = checker.voiceCrossing
-    >>> checker.checkSinglePossibilities(music21Stream, functionToApply, debug = True)
+    >>> checker.checkSinglePossibilities(music21Stream, functionToApply, debug=True)
     Function To Apply: voiceCrossing
     (Offset, End Time):      Part Numbers:
     (16.0, 16.5)             (1, 2)

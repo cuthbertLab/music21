@@ -1423,10 +1423,10 @@ class Chord(note.NotRest):
     def getZRelation(self):
         '''Return a Z relation if it exists, otherwise return None.
 
-        >>> chord.fromIntervalVector((1,1,1,1,1,1))
+        >>> chord.fromIntervalVector((1, 1, 1, 1, 1, 1))
         <music21.chord.Chord C C# E F#>
 
-        >>> chord.fromIntervalVector((1,1,1,1,1,1)).getZRelation()
+        >>> chord.fromIntervalVector((1, 1, 1, 1, 1, 1)).getZRelation()
         <music21.chord.Chord C D- E- G>
 
 
@@ -2949,7 +2949,7 @@ class Chord(note.NotRest):
 
         In the case of chords such as C, E-, E, semitonesFromChordStep(3)
         will return the number for the first third, in this case 3.  It
-        will not return 4, nor a list object (3,4).  You probably do not
+        will not return 4, nor a list object (3, 4).  You probably do not
         want to be using tonal chord manipulation functions on chords such
         as these anyway.  Check for such cases with
         chord.hasAnyRepeatedDiatonicNote first.
@@ -3105,7 +3105,7 @@ class Chord(note.NotRest):
         >>> c2 = chord.Chord(['D4', 'D4'])
         >>> secondD4 = c2.pitches[1]
         >>> c2.setNotehead('diamond', secondD4)
-        >>> for i in [0,1]:
+        >>> for i in [0, 1]:
         ...     c2.getNotehead(c2.pitches[i])
         ...
         'normal'
@@ -3172,7 +3172,7 @@ class Chord(note.NotRest):
         >>> c2 = chord.Chord(['D4', 'D4'])
         >>> secondD4 = c2.pitches[1]
         >>> c2.setNoteheadFill(False, secondD4)
-        >>> for i in [0,1]:
+        >>> for i in [0, 1]:
         ...     print(c2.getNoteheadFill(c2.pitches[i]))
         ...
         None
@@ -3250,7 +3250,7 @@ class Chord(note.NotRest):
         >>> c2 = chord.Chord(['D4', 'D4'])
         >>> secondD4 = c2.pitches[1]
         >>> c2.setStemDirection('double', secondD4)
-        >>> for i in [0,1]:
+        >>> for i in [0, 1]:
         ...    print(c2.getStemDirection(c2.pitches[i]))
         ...
         unspecified
@@ -3311,7 +3311,7 @@ class Chord(note.NotRest):
         >>> c2 = chord.Chord(['D4', 'D4'])
         >>> secondD4 = c2.pitches[1]
         >>> c2.setTie('start', secondD4)
-        >>> for i in [0,1]:
+        >>> for i in [0, 1]:
         ...    print(c2.getTie(c2.pitches[i]))
         ...
         None
@@ -4453,7 +4453,7 @@ def fromForteClass(notation):
     '''
     Return a Chord given a Forte-class notation. The Forte class can be
     specified as string (e.g., 3-11) or as a list of cardinality and number
-    (e.g., [8,1]).
+    (e.g., [8, 1]).
 
     If no match is available, None is returned.
 
@@ -4466,7 +4466,7 @@ def fromForteClass(notation):
     >>> chord.fromForteClass('3-11a')
     <music21.chord.Chord C E- G>
 
-    >>> chord.fromForteClass((11,1))
+    >>> chord.fromForteClass((11, 1))
     <music21.chord.Chord C D- D E- E F G- G A- A B->
 
     '''
@@ -4507,19 +4507,19 @@ def fromIntervalVector(notation, getZRelation=False):
     '''
     Return one or more Chords given an interval vector.
 
-    >>> chord.fromIntervalVector([0,0,0,0,0,1])
+    >>> chord.fromIntervalVector([0, 0, 0, 0, 0, 1])
     <music21.chord.Chord C F#>
 
-    >>> chord.fromIntervalVector((5,5,5,5,5,5)) == None
+    >>> chord.fromIntervalVector((5, 5, 5, 5, 5, 5)) == None
     True
 
-    >>> chord.fromIntervalVector((1,1,1,1,1,1))
+    >>> chord.fromIntervalVector((1, 1, 1, 1, 1, 1))
     <music21.chord.Chord C C# E F#>
 
-    >>> chord.fromIntervalVector((1,1,1,1,1,1), getZRelation=True)
+    >>> chord.fromIntervalVector((1, 1, 1, 1, 1, 1), getZRelation=True)
     <music21.chord.Chord C D- E- G>
 
-    >>> chord.fromIntervalVector((1,1,1,1,1,1)).getZRelation()
+    >>> chord.fromIntervalVector((1, 1, 1, 1, 1, 1)).getZRelation()
     <music21.chord.Chord C D- E- G>
 
     '''

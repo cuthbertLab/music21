@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2003,2010 Christopher Ariza
+# Copyright:    Copyright © 2003, 2010 Christopher Ariza
 #               Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ A :class:`music21.sieve.CompressionSegment` can be used to derive a Sieve from a
 ny sequence of integers.
 
 
->>> a = sieve.CompressionSegment([3,4,5,6,7,8,13,19])
+>>> a = sieve.CompressionSegment([3, 4, 5, 6, 7, 8, 13, 19])
 >>> str(a)
 '6@1|7@6|8@5|9@4|10@3|11@8'
 
@@ -187,7 +187,7 @@ def rabinMiller(n):
     False
     """
     n = abs(n)
-    if n in [2,3]:
+    if n in [2, 3]:
         return True
     m = n % 6 # if n (except 2 and 3) mod 6 is not 1 or 5, then n isn't prime
     if m != 1 and m != 5:
@@ -197,7 +197,7 @@ def rabinMiller(n):
               47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
     if n <= 100:
         if n in primes:
-            return True # must include 2,3
+            return True # must include 2, 3
         return False
     for prime in primes:
         if n % prime == 0:
@@ -233,15 +233,15 @@ def discreteBinaryPad(series, fixRange=None):
     Treat a sequence of integers as defining contiguous binary integers,
     where provided values are 1's and excluded values are zero.
 
-    For instance, running [3,10,12] through this method gives a 1 for
+    For instance, running [3, 10, 12] through this method gives a 1 for
     the first entry (signifying 3), 0s for the next six entries (signifying
     4-9), a 1 (for 10), a 0 (for 11), and a 1 (for 12).
 
 
-    >>> sieve.discreteBinaryPad([3,10,12])
+    >>> sieve.discreteBinaryPad([3, 10, 12])
     [1, 0, 0, 0, 0, 0, 0, 1, 0, 1]
 
-    >>> sieve.discreteBinaryPad([3,4,5])
+    >>> sieve.discreteBinaryPad([3, 4, 5])
     [1, 1, 1]
 
     """
@@ -276,7 +276,7 @@ def unitNormRange(series, fixRange=None):
     the middle entry will be 0.75 since 3 is 3/4 of the distance between 0 and 4:
 
 
-    >>> sieve.unitNormRange([0,3,4])
+    >>> sieve.unitNormRange([0, 3, 4])
     [0.0, 0.75, 1.0]
 
 
@@ -284,7 +284,7 @@ def unitNormRange(series, fixRange=None):
     1 and 4
 
 
-    >>> sieve.unitNormRange([1,3,4])
+    >>> sieve.unitNormRange([1, 3, 4])
     [0.0, 0.666..., 1.0]
 
 
@@ -330,7 +330,7 @@ def unitNormEqual(parts):
     if parts <= 1:
         return [0]
     elif parts == 2:
-        return [0,1]
+        return [0, 1]
     else:
         unit = []
         step = 1 / (parts - 1)
@@ -427,7 +427,7 @@ def _lcm(a, b):
     """find lowest common multiple of a,b
 
 
-    >>> sieve._lcm(30,20)
+    >>> sieve._lcm(30, 20)
     60
     """
     # // forces integer style division (no remainder)
@@ -471,7 +471,7 @@ def _meziriac(c1, c2):
     # where e and g come from the recursive equations
     #           (e * c2) % c1 == 1  and
     #           (g'* c1) % c2 == 1  ### this is version used here
-    # while letting e, g' run through values 0,1,2,3...
+    # while letting e, g' run through values 0, 1, 2, 3...
     # except if c1 == 1 and c2 == 1
     g = 0
     if c2 == 1:
@@ -641,7 +641,7 @@ class Residual(object):
         >>> a.segment(3)
         [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35, 38, 41, 44, 47, 50, 53, 56, 59,
          62, 65, 68, 71, 74, 77, 80, 83, 86, 89, 92, 95, 98]
-        >>> a.segment(3, range(3,15))
+        >>> a.segment(3, range(3, 15))
         [5, 8, 11, 14]
         """
         if z is None: # z is temporary; if none
@@ -881,7 +881,7 @@ class CompressionSegment(object):
     # the min and max of the list, but this may not be true in all cases.
     def __init__(self, src, z=None):
         """
-        >>> a = sieve.CompressionSegment([3,4,5,6,7,8,13,19])
+        >>> a = sieve.CompressionSegment([3, 4, 5, 6, 7, 8, 13, 19])
         >>> str(a)
         '6@1|7@6|8@5|9@4|10@3|11@8'
 
@@ -930,7 +930,7 @@ class CompressionSegment(object):
     def __call__(self):
         """
 
-        >>> a = sieve.CompressionSegment([3,4,5,6,7,8])
+        >>> a = sieve.CompressionSegment([3, 4, 5, 6, 7, 8])
         >>> b = a()
         >>> str(b[0])
         '1@0'
@@ -1008,9 +1008,9 @@ class CompressionSegment(object):
 # http://docs.python.org/lib/set-objects.html
 # set object precedence is places & before |
 
-# >>> a = set([3,4])
-# >>> b = set([4,5])
-# >>> c = set([3,4,5])
+# >>> a = set([3, 4])
+# >>> b = set([4, 5])
+# >>> c = set([3, 4, 5])
 # >>> a & b & c
 # Set([4])
 
@@ -1026,19 +1026,19 @@ class CompressionSegment(object):
 # <R0>&<R1>&<R2>|<R3>
 # >>> str(b)
 # '2&4&8|5'
-# >>> b(0, range(0,20))
+# >>> b(0, range(0, 20))
 # [0, 5, 8, 10, 15, 16]
 # >>> b = sieve.SieveBound('2&4&(8|5)')
 # <R0>&<R1>&(<R2>|<R3>)
-# >>> b(0, range(0,20))
+# >>> b(0, range(0, 20))
 # [0, 8, 16]
 # >>> b = sieve.SieveBound('5|2&4&8')
 # <R0>|<R1>&<R2>&<R3>
-# >>> b(0, range(0,20))
+# >>> b(0, range(0, 20))
 # [0, 5, 8, 10, 15, 16]
 # >>> b = sieve.SieveBound('(5|2)&4&8')
 # (<R0>|<R1>)&<R2>&<R3>
-# >>> b(0, range(0,20))
+# >>> b(0, range(0, 20))
 # [0, 8, 16]
 # >>>
 
@@ -2013,7 +2013,7 @@ class Test(unittest.TestCase):
 
     def testIntersection(self):
         a = Residual(3)
-        testArgs = [(3,6,2,5), (4,6,1,3), (5,4,3,2), ]
+        testArgs = [(3, 6, 2, 5), (4, 6, 1, 3), (5, 4, 3, 2), ]
         for m1, m2, n1, n2 in testArgs:
             a = Residual(m1, n1)
             b = Residual(m2, n2)
@@ -2024,9 +2024,9 @@ class Test(unittest.TestCase):
         testArgs = ['-5 | 4 & 4sub3 & 6 | 4 & 4',
                  '2 or 4 and 4 & 6 or 4 & 4',
                  3,
-                # '3 and 4 or not 3,1 and 4,1 or not 3 and 4,2 or not 3,2 and 4,3',
-                 (2,4,6,8),
-                 (1,6,11,16,17),
+                # '3 and 4 or not 3, 1 and 4, 1 or not 3 and 4, 2 or not 3, 2 and 4, 3',
+                 (2, 4, 6, 8),
+                 (1, 6, 11, 16, 17),
                     ]
         for arg in testArgs:
             #environLocal.printDebug(['testSieveParse', arg])
@@ -2042,14 +2042,15 @@ class Test(unittest.TestCase):
 
 
     def testTimePoint(self):
-        args = [(3,6,12),(0, 6, 12, 15, 18, 24, 30, 36, 42),
-                  (4,6,13),
-            (2, 3, 4, 5, 8, 9, 10, 11, 14, 17, 19, 20, 23, 24, 26, 29, 31),
-              #  (3,23,33,47,63,70,71,93,95,119,123,143,153,167),
-                  (0,2,4,5,7,9,11,12,14,16,17,19,21,23,24),
-                  (1,2,3,4,5,6,7,8,9,10),
-                (-8,-6,-4,-2,0,2,1),
-                 ]
+        args = [(3, 6, 12), 
+                (0, 6, 12, 15, 18, 24, 30, 36, 42),
+                (4, 6, 13),
+                (2, 3, 4, 5, 8, 9, 10, 11, 14, 17, 19, 20, 23, 24, 26, 29, 31),
+                #  (3, 23, 33, 47, 63, 70, 71, 93, 95, 119, 123, 143, 153, 167),
+                (0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24),
+                (1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+                (-8, -6, -4, -2, 0, 2, 1),
+                ]
         for src in args:
             obj = CompressionSegment(src)
             sObj = Sieve(str(obj))
@@ -2057,7 +2058,7 @@ class Test(unittest.TestCase):
 
 
     def testSieve(self):
-        z = list(range(0,100))
+        z = list(range(100))
         usrStr = '3@2 & 4@1 | 2@0 & 3@1 | 3@3 | -4@2'
         a = Sieve(usrStr, z)
         self.assertEqual(str(a), '3@2&4@1|2@0&3@1|3@0|-4@2')
@@ -2127,7 +2128,7 @@ class Test(unittest.TestCase):
 
 
 # sieve that break LCM
-# >>> t = sieve.Sieve((3,99,123123,2433,2050))
+# >>> t = sieve.Sieve((3, 99, 123123, 2433, 2050))
 
 
 

@@ -1034,7 +1034,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
        this is not a consistent way to determine the root of 13th chords, for example
     2. a chord vector is extracted from the chord
         using  :meth:`music21.chord.semitonesFromChordStep`
-        this vector extracts the following degrees: (2,3,4,5,6,7,9,11,and13)
+        this vector extracts the following degrees: (2, 3, 4, 5, 6, 7, 9, 11, and 13)
     3. this vector is converted to fbNotationString (in the form of chord step,
         and a '-' or '#' to indicate semitone distance)
     4. the fbNotationString is matched against the CHORD_TYPES dictionary in this harmony module,
@@ -1194,7 +1194,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
                 degrees = [int(x) for x in degrees]
                 degrees.sort()
 
-                data = {2:d2,3:d3,4:d4,5:d5,6:d6,7:d7,9:d9,11:d11,13:d13}
+                data = {2:d2, 3:d3, 4:d4, 5:d5, 6:d6, 7:d7, 9:d9, 11:d11, 13:d13}
                 toCompare = []
                 for x in degrees:
                     if x != 1:

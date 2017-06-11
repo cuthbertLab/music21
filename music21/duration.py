@@ -625,7 +625,7 @@ def quarterConversion(qLen):
             qLenDict = 4/qLen
         else:
             qLenDict = 0
-        # hashes are awesome. will catch Fraction(1,1), 1, 1.0 etc.
+        # hashes are awesome. will catch Fraction(1, 1), 1, 1.0 etc.
         durType = typeFromNumDict[qLenDict]
         dt = durationTupleFromTypeDots(durType, 0)
         return QuarterLengthConversion((dt,), None)
@@ -721,7 +721,7 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
     Conceptually, these are dotted-(dotted-half) notes.  See
     trecento.trecentoCadence for more information
     ).
-    >>> duration.convertTypeToQuarterLength('half', dots=1, dotGroups=[1,1])
+    >>> duration.convertTypeToQuarterLength('half', dots=1, dotGroups=[1, 1])
     4.5
     '''
     if dType in typeToDuration:
@@ -2176,7 +2176,7 @@ class Duration(SlottedObjectMixin):
         Never seen one, so probably okay.
 
         >>> d1 = duration.Duration(type='half')
-        >>> d1.dotGroups = (1,1)
+        >>> d1.dotGroups = (1, 1)
         >>> d1.quarterLength
         4.5
         >>> d2 = d1.splitDotGroups()
@@ -2309,7 +2309,7 @@ class Duration(SlottedObjectMixin):
     def dotGroups(self):
         '''
         Dot groups are medieval dotted-dotted notes (written one above another).
-        For instance a half note with dotGroups = (1,1) represents a dotted half note that
+        For instance a half note with dotGroups = (1, 1) represents a dotted half note that
         is itself dotted.  Worth 9 eighth notes (dotted-half tied to dotted-quarter).  It
         is not the same as a double-dotted half note, which is only worth 7 eighth notes.
 
@@ -2322,7 +2322,7 @@ class Duration(SlottedObjectMixin):
         >>> a.dots = 1
 
 
-        >>> a.dotGroups = (1,1)
+        >>> a.dotGroups = (1, 1)
         >>> a.quarterLength
         4.5
         '''
@@ -3327,7 +3327,7 @@ class Test(unittest.TestCase):
 #         print "times as long as it would normally be."
 
         self.assertEqual(tup2.totalTupletLength(), 0.5)
-        self.assertEqual(tup2.tupletMultiplier(), fractions.Fraction(2,3))
+        self.assertEqual(tup2.tupletMultiplier(), fractions.Fraction(2, 3))
 
         dur3.tuplets = (tup1, tup2)
 #         print "So a tuplet-dotted-quarter's length under both tuplets is",

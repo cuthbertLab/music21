@@ -285,7 +285,7 @@ class ToneRow(stream.Stream):
         Convenience function showing the pitch classes of a
         :class:`~music21.serial.ToneRow` as a list.
 
-        >>> L = [5*i for i in range(0,12)]
+        >>> L = [5*i for i in range(12)]
         >>> quintupleRow = serial.pcToToneRow(L)
         >>> quintupleRow
         <music21.serial.TwelveToneRow 0x104760780>
@@ -305,10 +305,10 @@ class ToneRow(stream.Stream):
         :class:`~music21.serial.ToneRow` as a list.
 
 
-        >>> chromatic = serial.pcToToneRow(range(0,12))
+        >>> chromatic = serial.pcToToneRow(range(12))
         >>> chromatic.noteNames()
         ['C', 'C#', 'D', 'E-', 'E', 'F', 'F#', 'G', 'G#', 'A', 'B-', 'B']
-        >>> halfStep = serial.pcToToneRow([0,1])
+        >>> halfStep = serial.pcToToneRow([0, 1])
         >>> halfStep.noteNames()
         ['C', 'C#']
         '''
@@ -322,11 +322,11 @@ class ToneRow(stream.Stream):
         :class:`~music21.serial.TwelveToneRow` object might not be a twelve-tone row.
 
 
-        >>> serial.pcToToneRow(range(0,12)).isTwelveToneRow()
+        >>> serial.pcToToneRow(range(12)).isTwelveToneRow()
         True
-        >>> serial.pcToToneRow(range(0,10)).isTwelveToneRow()
+        >>> serial.pcToToneRow(range(10)).isTwelveToneRow()
         False
-        >>> serial.pcToToneRow([3,3,3,3,3,3,3,3,3,3,3,3]).isTwelveToneRow()
+        >>> serial.pcToToneRow([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]).isTwelveToneRow()
         False
         '''
         pitchList = self.pitchClasses()
@@ -334,7 +334,7 @@ class ToneRow(stream.Stream):
             return False
         else:
             temp = True
-            for i in range(0,12):
+            for i in range(12):
                 if i not in pitchList:
                     temp = False
             return temp
@@ -347,7 +347,7 @@ class ToneRow(stream.Stream):
         true twelve tone row.
 
 
-        >>> a = serial.pcToToneRow(range(0,11))
+        >>> a = serial.pcToToneRow(range(11))
         >>> type(a)
         <class 'music21.serial.ToneRow'>
         >>> n = note.Note()
@@ -430,7 +430,7 @@ class ToneRow(stream.Stream):
         the transformations Pn and In start on the pitch class n, and the transformations
         Rn and RIn end on the pitch class n.
 
-        >>> chromatic = serial.pcToToneRow(range(0,12))
+        >>> chromatic = serial.pcToToneRow(range(12))
         >>> chromatic.pitchClasses()
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
         >>> chromaticP3 = chromatic.zeroCenteredTransformation('P',3)
@@ -491,7 +491,7 @@ class ToneRow(stream.Stream):
         row by n semitones.
 
 
-        >>> chromatic = serial.pcToToneRow(range(0,12))
+        >>> chromatic = serial.pcToToneRow(range(12))
         >>> chromatic.pitchClasses()
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
         >>> chromaticP3 = chromatic.originalCenteredTransformation('T',3)
@@ -675,8 +675,8 @@ class TwelveToneRow(ToneRow):
         # add again the same pitches to the elements list twice.
         noteList = self.getElementsByClass('Note')
 
-        i = [(12-x.pitch.pitchClass) % 12 for x in noteList]
-        matrix = [[(x.pitch.pitchClass+t) % 12 for x in noteList] for t in i]
+        i = [(12 - x.pitch.pitchClass) % 12 for x in noteList]
+        matrix = [[(x.pitch.pitchClass + t) % 12 for x in noteList] for t in i]
 
         matrixObj = TwelveToneMatrix()
         i = 0
@@ -709,7 +709,7 @@ class TwelveToneRow(ToneRow):
         >>> row = serial.pcToToneRow([2, 3, 9, 1, 11, 5, 8, 7, 4, 0, 10, 6])
         >>> row.findHistorical()
         ['RowSchoenbergOp32']
-        >>> chromatic = serial.pcToToneRow(range(0,12))
+        >>> chromatic = serial.pcToToneRow(range(12))
         >>> chromatic.findHistorical()
         []
         '''
@@ -759,7 +759,7 @@ class TwelveToneRow(ToneRow):
         '''
         Describes whether or not a :class:`~music21.serial.TwelveToneRow` is an all-interval row.
 
-        >>> chromatic = serial.pcToToneRow(range(0,12))
+        >>> chromatic = serial.pcToToneRow(range(12))
         >>> chromatic.pitchClasses()
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
         >>> chromatic.isAllInterval()
@@ -776,7 +776,7 @@ class TwelveToneRow(ToneRow):
         else:
             tempAllInterval = True
             intervalString = self.getIntervalsAsString()
-            for i in range(1,10):
+            for i in range(1, 10):
                 if str(i) not in intervalString:
                     tempAllInterval = False
             if 'T' not in intervalString:
@@ -1030,9 +1030,9 @@ class TwelveToneRow(ToneRow):
                 pitches1 = trans1.pitchClasses()
                 trans2 = self.zeroCenteredTransformation(transType2, index2)
                 pitches2 = trans2.pitchClasses()
-                for i in range(0,6):
+                for i in range(6):
                     testRow.append(pitches1[i])
-                for i in range(0,6):
+                for i in range(6):
                     testRow.append(pitches2[i])
                 return pcToToneRow(testRow).isTwelveToneRow()
             elif convention == 'original':
@@ -1206,7 +1206,7 @@ def pcToToneRow(pcSet):
       B  0  1  2  3  4  5  6  7  8  9  A
     ...
 
-    >>> a = serial.pcToToneRow([4,5,0,6,7,2,'a',8,9,1,'b',3])
+    >>> a = serial.pcToToneRow([4, 5, 0, 6, 7, 2, 'a', 8, 9, 1, 'b', 3])
     >>> matrixObj = a.matrix()
     >>> print(matrixObj)
       0  1  8  2  3  A  6  4  5  9  7  B
@@ -1215,7 +1215,7 @@ def pcToToneRow(pcSet):
 
     OMIT_FROM_DOCS
 
-    >>> a = serial.pcToToneRow([1,1,1,1,1,1,1,1,1,1,1,1])
+    >>> a = serial.pcToToneRow([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
     >>> a.pitchClasses()
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     >>> serial.pcToToneRow([3, 4]).pitchClasses()

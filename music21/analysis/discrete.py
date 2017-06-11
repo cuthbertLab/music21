@@ -617,10 +617,10 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         '''
         sStream = sStream.flat.notesAndRests
         # this is the sample distribution used in the paper, for some testing purposes
-        #pcDistribution = [7,0,5,0,7,16,0,16,0,15,6,0]
+        #pcDistribution = [7, 0, 5, 0, 7, 16, 0, 16, 0, 15, 6, 0]
 
         # this is the distribution for the melody of "happy birthday"
-        #pcDistribution = [9,0,3,0,2,5,0,2,0,2,2,0]
+        #pcDistribution = [9, 0, 3, 0, 2, 5, 0, 2, 0, 2, 2, 0]
 
         likelyKeysMajor, likelyKeysMinor = self._likelyKeys(sStream)
 

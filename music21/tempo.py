@@ -692,8 +692,8 @@ class MetronomeMark(TempoIndication):
         #environLocal.printDebug(['matches', matches])
         post = None
         for tempoValue, tempoStr in matches:
-            if (tempoNumber >= (tempoValue-spread) and tempoNumber <=
-                (tempoValue+spread)): # found a match
+            if ((tempoNumber >= (tempoValue - spread) 
+                    and tempoNumber <= (tempoValue + spread))): # found a match
                 post = tempoStr
                 break
         return post

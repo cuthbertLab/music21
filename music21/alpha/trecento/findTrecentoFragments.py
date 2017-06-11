@@ -33,7 +33,7 @@ class IntervalSearcher(object):
         #print "Length of Stream: " + str(streamLength)
         for i in range(0, stIntervalListLength + 1 - self.intervalLength):
             for j in range(0, self.intervalLength):
-                streamInterval = stIntervalList[i+j]
+                streamInterval = stIntervalList[i + j]
                 genI1 = self.intervalList[j].diatonic.generic.simpleDirected
                 genI2 = streamInterval.diatonic.generic.simpleDirected
                 if genI1 != genI2:
@@ -60,7 +60,7 @@ class NoteSearcher(object):
             return False
         for i in range(streamLength + 1 - self.noteLength):
             for j in range(self.noteLength):
-                streamNote = sN[i+j]
+                streamNote = sN[i + j]
                 if self.noteList[j].isRest != streamNote.isRest:
                     break
                 if streamNote.isNote and (self.noteList[j].step != streamNote.step):

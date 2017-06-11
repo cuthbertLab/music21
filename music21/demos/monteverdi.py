@@ -28,10 +28,10 @@ def spliceAnalysis(book=3, madrigal=1):
     analysis = corpus.parse('monteverdi/madrigal.%s.%s.rntxt' % (book, madrigal))
 
     # these are multiple parts in a score stream
-    #excerpt = mad.measures(1,20)
+    #excerpt = mad.measures(1, 20)
 
     # get from first part
-    aMeasures = analysis.parts[0].measures(1,20)
+    aMeasures = analysis.parts[0].measures(1, 20)
     aMeasures.getElementsByClass('Measure')[0].clef = clef.TrebleClef()
     for myN in aMeasures.flat.notesAndRests:
         myN.hideObjectOnPrint = True
@@ -324,7 +324,7 @@ def findPhraseBoundaries(book=4, madrigal=12):
 
 if __name__ == '__main__':
     #spliceAnalysis()
-    #analyzeBooks(books=[3,4,5])
+    #analyzeBooks(books=[3, 4, 5])
     #analyzeBooks(books=[4], start=10, end=10, show=True, strict=True)
     findPhraseBoundaries(book=4, madrigal=12)
     #monteverdiParallels(books=[3], start=1, end=1, show=True, strict=True)

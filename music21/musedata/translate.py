@@ -534,7 +534,7 @@ class Test(unittest.TestCase):
         s = converter.parse(fpDir)
         # note: this is a multi-staff work, but presently gets encoded
         # as multiple voices
-        measures = s.parts[0].measures(1,5)
+        measures = s.parts[0].measures(1, 5)
         self.assertEqual(len(measures[0].flat.notesAndRests), 2)
         self.assertEqual(len(measures[1].flat.notesAndRests), 5)
         self.assertEqual(len(measures[2].flat.notesAndRests), 5)

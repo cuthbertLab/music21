@@ -1579,7 +1579,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import m21ToXml
         s = stream.Stream()
 
-        for i in range(1,11):
+        for i in range(1, 11):
             m = stream.Measure()
             m.number = i
             n = note.Note()

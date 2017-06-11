@@ -237,7 +237,7 @@ class LyricSearcher(object):
             if foundPos == -1:
                 continueIt = False
                 break
-            matchText = self._indexText[foundPos:foundPos+tLen]
+            matchText = self._indexText[foundPos:foundPos + tLen]
             indices = self._findObjsInIndexByPos(foundPos, foundPos + tLen - 1)
             indexStart = indices[0]
             indexEnd = indices[-1]

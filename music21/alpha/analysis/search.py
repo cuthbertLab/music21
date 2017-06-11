@@ -132,7 +132,7 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
                     # cannot determine direction here
                 # this will permit octave shifts; need to compare pitch
                 # attributes
-                elif repeatsAllowed and degreeLast-d == 0:
+                elif repeatsAllowed and degreeLast - d == 0:
                     collect = True
                 # in this case we know have a previous pitch/degree
                 elif (targetScale.isNext(p, pLast, 'ascending',
@@ -408,7 +408,7 @@ class Test(unittest.TestCase):
         scAMajor = scale.MajorScale('a4')
         scDMajor = scale.MajorScale('d4')
 
-        s = corpus.parse('mozart/k80/movement1').measures(1,28)
+        s = corpus.parse('mozart/k80/movement1').measures(1, 28)
         for sc in [scGMajor, scDMajor, scAMajor]:
             for part in s.parts: # just first part
                 # must provide flat version

@@ -238,9 +238,9 @@ class NWCConverter(object):
         '''
         fc = self.fileContents
         pp = self.parsePosition
-        value = fc[pp:pp+bytesToRead]
+        value = fc[pp:pp + bytesToRead]
         if updateParsePosition is True:
-            self.parsePosition = pp+bytesToRead
+            self.parsePosition = pp + bytesToRead
         return value
 
     def readToNUL(self, updateParsePosition=True):

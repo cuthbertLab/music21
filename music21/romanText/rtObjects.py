@@ -1478,7 +1478,7 @@ class Test(unittest.TestCase):
 
         rtm = RTMeasure('m3-4 = m1-2')
         self.assertEqual(rtm.data, '= m1-2')
-        self.assertEqual(rtm.number, [3,4])
+        self.assertEqual(rtm.number, [3, 4])
         self.assertEqual(rtm.tag, 'm3-4')
         self.assertEqual(rtm.variantNumber, None)
         self.assertEqual(rtm.isCopyDefinition, True)
