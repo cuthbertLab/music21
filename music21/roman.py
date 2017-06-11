@@ -13,6 +13,8 @@
 '''
 Music21 class for dealing with Roman Numeral analysis
 '''
+from __future__ import division, print_function
+
 import unittest
 import copy
 import re
