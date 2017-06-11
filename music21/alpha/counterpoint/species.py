@@ -1262,8 +1262,8 @@ class Test(unittest.TestCase):
     pass
 
 #     def xtestCounterpoint(self):
-#         (n11,n12,n13,n14) = (Note(), Note(), Note(), Note())
-#         (n21,n22,n23,n24) = (Note(), Note(), Note(), Note())
+#         (n11, n12, n13, n14) = (Note(), Note(), Note(), Note())
+#         (n21, n22, n23, n24) = (Note(), Note(), Note(), Note())
 #         n11.duration.type = "whole"
 #         n12.duration.type = "whole"
 #         n13.duration.type = "whole"

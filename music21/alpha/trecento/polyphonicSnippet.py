@@ -253,7 +253,7 @@ class Incipit(PolyphonicSnippet):
                 oldRightBarline = lastMeasure.rightBarline
                 lastMeasure.rightBarline = None
 
-            for i in range(0, shortMeasures):
+            for i in range(shortMeasures):
                 newRest = note.Rest()
                 newRest.duration = copy.deepcopy(shortDuration)
                 newRest.transparent = 1
@@ -327,7 +327,7 @@ class FrontPaddedSnippet(PolyphonicSnippet):
                     thisNote.setOffsetBySite(thisStream, thisStream.elementOffset(m) + offsetShift)
 
 
-            for i in range(0, shortMeasures):
+            for i in range(shortMeasures):
                 newRest = note.Rest()
                 newRest.duration = copy.deepcopy(shortDuration)
                 newRest.transparent = True

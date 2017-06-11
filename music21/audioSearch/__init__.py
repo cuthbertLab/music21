@@ -75,14 +75,14 @@ def histogram(data, bins):
     '''
     maxValue = max(data)
     minValue = min(data)
-    lengthEachBin = (maxValue-minValue) / bins
+    lengthEachBin = (maxValue - minValue) / bins
 
     container = []
     for i in range(int(bins)):
         container.append(0)
     for i in data:
         count = 1
-        while i > minValue + count*lengthEachBin:
+        while i > minValue + count * lengthEachBin:
             count += 1
         container[count - 1] += 1
 
@@ -90,7 +90,7 @@ def histogram(data, bins):
     binsLimits.append(minValue)
     count = 1
     for i in range(int(bins)):
-        binsLimits.append(minValue+count*lengthEachBin)
+        binsLimits.append(minValue + count * lengthEachBin)
         count +=1
     return container, binsLimits
 

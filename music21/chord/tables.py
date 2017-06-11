@@ -2552,22 +2552,22 @@ def forteIndexToInversionsAvailable(card, index):
 def _validateAddress(address):
     '''Check that an address is valid
 
-    >>> chord.tables._validateAddress((3,1,0))
+    >>> chord.tables._validateAddress((3, 1, 0))
     (3, 1, 0)
-    >>> chord.tables._validateAddress((2,3))
+    >>> chord.tables._validateAddress((2, 3))
     (2, 3, 0)
-    >>> chord.tables._validateAddress((3,12,None))
+    >>> chord.tables._validateAddress((3, 12, None))
     (3, 12, 0)
 
-    >>> chord.tables._validateAddress((20,1,0))
+    >>> chord.tables._validateAddress((20, 1, 0))
     Traceback (most recent call last):
     music21.chord.tables.ChordTablesException: cardinality 20 not valid
 
-    >>> chord.tables._validateAddress((8,3000,0))
+    >>> chord.tables._validateAddress((8, 3000, 0))
     Traceback (most recent call last):
     music21.chord.tables.ChordTablesException: index 3000 not valid
 
-    >>> chord.tables._validateAddress((8,3,-30))
+    >>> chord.tables._validateAddress((8, 3, -30))
     Traceback (most recent call last):
     music21.chord.tables.ChordTablesException: inversion -30 not valid
     '''
@@ -2814,7 +2814,7 @@ def seekChordTablesAddress(c):
 
     # go through each rotation of pcSet
     candidates = []
-    for rot in range(0, card):
+    for rot in range(card):
         testSet = pcSet[rot:] + pcSet[0:rot]
         # transpose to lead with zero
         testSetOriginalPC = testSet[0]

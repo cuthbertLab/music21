@@ -138,7 +138,7 @@ class wwnortonExercise(object):
                         firstNote = False
                     m.insert(oldNotRest.offset, markerNote)
         inst.instrumentName = newPartTitle
-        newPart.insert(0,inst)
+        newPart.insert(0, inst)
         for ks in newPart.flat.getElementsByClass('KeySignature'):
             ks.sharps = 0
         for c in newPart.flat.getElementsByClass('Clef'):

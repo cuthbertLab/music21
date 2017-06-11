@@ -54,7 +54,7 @@ def makeBeams(s, inPlace=False):
     >>> aMeasure.repeatAppend(aNote, 16)
     >>> bMeasure = aMeasure.makeBeams(inPlace=False)
 
-    >>> for i in range(0, 4):
+    >>> for i in range(4):
     ...   print("%d %r" % (i, bMeasure.notes[i].beams))
     0 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
     1 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>
@@ -71,7 +71,7 @@ def makeBeams(s, inPlace=False):
     ...     aMeasure.append(note.Rest(quarterLength=0.25))
     ...     aMeasure.repeatAppend(note.Note('C4', quarterLength=0.25), 3)
     >>> bMeasure = aMeasure.makeBeams(inPlace=False).notes
-    >>> for i in range(0, 6):
+    >>> for i in range(6):
     ...   print("%d %r" % (i, bMeasure[i].beams))
     0 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/partial/left>>
     1 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>

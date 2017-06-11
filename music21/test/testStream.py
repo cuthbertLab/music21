@@ -81,7 +81,7 @@ class TestExternal(unittest.TestCase):
         q.duration.appendTuplet(tup1)
 
 
-        for i in range(0, 5):
+        for i in range(5):
             b.append(copy.deepcopy(q))
             b.elements[i].accidental = pitch.Accidental(i - 2)
 
@@ -448,12 +448,12 @@ class Test(unittest.TestCase):
         offsets = [a.offset for a in farStream.flat]
 
         # create what we epxect to be the offsets
-        offsetsMatch = list(range(0, 6))
-        offsetsMatch += [x + 10 for x in range(0, 6)]
-        offsetsMatch += [x + 20 for x in range(0, 6)]
-        offsetsMatch += [x + 30 for x in range(0, 6)]
-        offsetsMatch += [x + 100 for x in range(0, 6)]
-        offsetsMatch += [x + 110 for x in range(0, 6)]
+        offsetsMatch = list(range(6))
+        offsetsMatch += [x + 10 for x in range(6)]
+        offsetsMatch += [x + 20 for x in range(6)]
+        offsetsMatch += [x + 30 for x in range(6)]
+        offsetsMatch += [x + 100 for x in range(6)]
+        offsetsMatch += [x + 110 for x in range(6)]
 
         self.assertEqual(offsets[:len(offsetsMatch)], offsetsMatch)
 
@@ -1163,8 +1163,8 @@ class Test(unittest.TestCase):
     def testTwoStreamMethods(self):
         from music21.note import Note
 
-        (n11,n12,n13,n14) = (Note(), Note(), Note(), Note())
-        (n21,n22,n23,n24) = (Note(), Note(), Note(), Note())
+        (n11, n12, n13, n14) = (Note(), Note(), Note(), Note())
+        (n21, n22, n23, n24) = (Note(), Note(), Note(), Note())
         n11.step = "C"
         n12.step = "D"
         n13.step = "E"
@@ -1186,9 +1186,9 @@ class Test(unittest.TestCase):
         n24.duration.type = "eighth"
 
         stream1 = Stream()
-        stream1.append([n11,n12,n13,n14])
+        stream1.append([n11, n12, n13, n14])
         stream2 = Stream()
-        stream2.append([n21,n22,n23,n24])
+        stream2.append([n21, n22, n23, n24])
 
         attackedTogether = stream1.simultaneousAttacks(stream2)
         self.assertEqual(len(attackedTogether), 3)  # nx1, nx2, nx4
@@ -4521,7 +4521,7 @@ class Test(unittest.TestCase):
         n4 = note.Note()
         n4.quarterLength = 1.5
 
-        for n in [n1,n2,n3,n4]:
+        for n in [n1, n2, n3, n4]:
             s.append(n)
 
         post = s.sliceByQuarterLengths(0.125, inPlace=False)
@@ -4620,7 +4620,7 @@ class Test(unittest.TestCase):
         n4 = note.Note('g#')
         n4.quarterLength = 1.5
 
-        for n in [n1,n2,n3,n4]:
+        for n in [n1, n2, n3, n4]:
             s.append(n)
 
         post = s.sliceByQuarterLengths(.125, inPlace=False)
@@ -4642,7 +4642,7 @@ class Test(unittest.TestCase):
         n4 = note.Note()
         n4.quarterLength = 1.5
 
-        for n in [n1,n2,n3,n4]:
+        for n in [n1, n2, n3, n4]:
             s.append(n)
 
         post = s.sliceByQuarterLengths(.5, inPlace=False)
@@ -4692,10 +4692,10 @@ class Test(unittest.TestCase):
         n2 = note.Note()
         n2.quarterLength = 2
         n3 = note.Note()
-        n3.quarterLength = .5
+        n3.quarterLength = 0.5
         n4 = note.Note()
         n4.quarterLength = 1.5
-        for n in [n1,n2,n3,n4]:
+        for n in [n1, n2, n3, n4]:
             s.append(n)
         post = s.sliceByGreatestDivisor(inPlace=False)
 
@@ -4713,10 +4713,10 @@ class Test(unittest.TestCase):
         n2 = note.Note()
         n2.quarterLength = 1/3.
         n3 = note.Note()
-        n3.quarterLength = .5
+        n3.quarterLength = 0.5
         n4 = note.Note()
         n4.quarterLength = 1.5
-        for n in [n1,n2,n3,n4]:
+        for n in [n1, n2, n3, n4]:
             s.append(n)
         post = s.sliceByGreatestDivisor(inPlace=False)
 

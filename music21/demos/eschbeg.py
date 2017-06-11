@@ -42,7 +42,7 @@ def numberToLetter(number):
 
 def setupTranspositions():
     _eschbegTransposed = []
-    for i in range(0, 12):
+    for i in range(12):
         thisTransposition = ""
         for letter in eschbeg:
             number = letterToNumber(letter)

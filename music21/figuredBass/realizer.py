@@ -82,7 +82,7 @@ def figuredBassFromStream(streamPart):
     <music21.figuredBass.realizer.FiguredBassLine object at 0x...>
 
     >>> fbRules = figuredBass.rules.Rules()
-    >>> fbRules.partMovementLimits = [(1,2),(2,12),(3,12)]
+    >>> fbRules.partMovementLimits = [(1, 2), (2, 12), (3, 12)]
     >>> fbRealization = fb.realize(fbRules)
     >>> fbRealization.getNumSolutions()
     13
@@ -643,7 +643,7 @@ class Realization(object):
         prevPossib = random.sample(currMovements.keys(), 1)[0]
         progression.append(prevPossib)
 
-        for segmentIndex in range(0, len(self._segmentList)-1):
+        for segmentIndex in range(len(self._segmentList) - 1):
             currMovements = self._segmentList[segmentIndex].movements
             nextPossib = random.sample(currMovements[prevPossib], 1)[0]
             progression.append(nextPossib)

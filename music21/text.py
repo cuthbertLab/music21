@@ -416,7 +416,7 @@ class LanguageDetector(object):
         The codes are the index of the language name in LanguageDetector.languageCodes + 1
 
         >>> ld = text.LanguageDetector()
-        >>> for i in range(0, len(ld.languageCodes)):
+        >>> for i in range(len(ld.languageCodes)):
         ...    print(str(i + 1) + " " +  ld.languageCodes[i])
         1 en
         2 fr

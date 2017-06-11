@@ -402,7 +402,7 @@ class GeneralMensuralNote(base.Music21Object):
             mLen = self.lenList[index]
         #print("MDUR! " + str(mDur) + "MLEN " + str(mLen) + "index " + str(index) +
         # " MEASURE " + str(self._getSurroundingMeasure()[0]))
-            self.duration = duration.Duration(mLen*mDur)
+            self.duration = duration.Duration(mLen * mDur)
         else:
             self.duration = duration.Duration(0.0)
 
@@ -562,7 +562,7 @@ class GeneralMensuralNote(base.Music21Object):
 
         mList.reverse()
         mList.insert(currentIndex, self)
-        for j in range(currentIndex + 1,len(tempList), 1):
+        for j in range(currentIndex + 1, len(tempList), 1):
             if (('Punctus' in tempList[j].classes) or
                     ('Ligature' in tempList[j].classes)):
                 break
@@ -1473,7 +1473,7 @@ class Ligature(base.Music21Object):
         >>> l.setStem(0, 'none', 'left')
         Traceback (most recent call last):
         MedRenException: direction "None" and orientation "left" not supported for ligatures
-        >>> l.setStem(1,'up', 'left')
+        >>> l.setStem(1, 'up', 'left')
         >>> l.getStem(1)
         ('up', 'left')
         >>> l.setStem(2, 'down', 'right')
@@ -1575,13 +1575,13 @@ class Ligature(base.Music21Object):
         >>> l.setStem(1, 'down', 'left')
         >>> l.setStem(2, 'down', 'left')
         >>> l.setStem(3, 'down', 'left')
-        >>> l.setReverse(1,True)
+        >>> l.setReverse(1, True)
         >>> l.isReversed(1)
         True
-        >>> l.setReverse(2,True)
+        >>> l.setReverse(2, True)
         Traceback (most recent call last):
         MedRenException: the note at index 2 cannot be given reverse value True
-        >>> l.setReverse(3,True)
+        >>> l.setReverse(3, True)
         Traceback (most recent call last):
         MedRenException: the note at index 3 cannot be given reverse value True
         '''

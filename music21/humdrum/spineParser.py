@@ -504,10 +504,10 @@ class HumdrumDataCollection(object):
                 protoSpineEventList.append(None)
 
         # end doOneCell
-        for j in range(0, self.maxSpines):
+        for j in range(self.maxSpines):
             protoSpineEventList = []
 
-            for i in range(0, self.fileLength):
+            for i in range(self.fileLength):
                 if j == 0:
                     returnEventCollections.append(EventCollection(self.maxSpines))
 
@@ -553,9 +553,9 @@ class HumdrumDataCollection(object):
         spineCollection = SpineCollection()
 
         # go through the event collections line by line
-        for i in range(0, self.fileLength):
+        for i in range(self.fileLength):
             thisEventCollection = eventCollections[i]
-            for j in range(0, maxSpines):
+            for j in range(maxSpines):
                 thisEvent = protoSpines[j].eventList[i]
 
                 if thisEvent is None:  # nothing there
@@ -585,7 +585,7 @@ class HumdrumDataCollection(object):
             newSpineList = common.defaultlist(lambda:None)
             mergerActive = False
             exchangeActive = False
-            for j in range(0, maxSpines):
+            for j in range(maxSpines):
                 thisEvent = protoSpines[j].eventList[i]
                 currentSpine = currentSpineList[j]
 
@@ -1994,7 +1994,7 @@ class EventCollection(object):
         self.lastEvents[spineNum] = spineEvent
 
     def addGlobalEvent(self, globalEvent):
-        for i in range(0, self.maxSpines):
+        for i in range(self.maxSpines):
             self.events[i] = globalEvent
 
     def getSpineEvent(self, spineNum):
@@ -2011,7 +2011,7 @@ class EventCollection(object):
 
     def getAllOccurring(self):
         retEvents = []
-        for i in range(0, self.maxSpines):
+        for i in range(self.maxSpines):
             retEvents.append(self.getSpineOccurring(i))
         return retEvents
 
@@ -2132,16 +2132,16 @@ def hdStringToNote(contents):
     # 3.2.2 -- Slurs, Ties, Phrases
     # TODO: add music21 phrase information
     if contents.count('{'):
-        for i in range(0, contents.count('{')):
+        for i in range(contents.count('{')):
             pass # phraseMark start
     if contents.count('}'):
-        for i in range(0, contents.count('}')):
+        for i in range(contents.count('}')):
             pass # phraseMark end
     if contents.count('('):
-        for i in range(0, contents.count('(')):
+        for i in range(contents.count('(')):
             pass # slur start
     if contents.count(')'):
-        for i in range(0, contents.count(')')):
+        for i in range(contents.count(')')):
             pass # slur end
     if contents.count('['):
         thisObject.tie = tie.Tie("start")
@@ -2288,13 +2288,13 @@ def hdStringToNote(contents):
 
     # 3.2.10 Beaming
     # TODO: Support really complex beams
-    for i in range(0, contents.count('L')):
+    for i in range(contents.count('L')):
         thisObject.beams.append('start')
-    for i in range(0, contents.count('J')):
+    for i in range(contents.count('J')):
         thisObject.beams.append('stop')
-    for i in range(0, contents.count('k')):
+    for i in range(contents.count('k')):
         thisObject.beams.append('partial', 'right')
-    for i in range(0, contents.count('K')):
+    for i in range(contents.count('K')):
         thisObject.beams.append('partial', 'right')
 
     return thisObject

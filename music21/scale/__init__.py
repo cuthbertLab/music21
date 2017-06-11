@@ -2029,7 +2029,7 @@ class ConcreteScale(Scale):
             nodeName=self._abstract.tonicDegree,
             pitchOrigin=pitchOrigin,
             direction=direction,
-            stepSize = stepSize*stepScalar, # multiplied
+            stepSize = stepSize * stepScalar, # multiplied
             getNeighbor=getNeighbor
             )
         return post

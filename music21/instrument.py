@@ -241,7 +241,7 @@ class Instrument(base.Music21Object):
 
         OMIT_FROM_DOCS
 
-        >>> used2 = range(0,16)
+        >>> used2 = range(16)
         >>> i = instrument.Instrument()
         >>> i.autoAssignMidiChannel(used2)
         Traceback (most recent call last):

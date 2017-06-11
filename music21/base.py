@@ -4508,7 +4508,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.append(meter.TimeSignature('fast 6/8'))
         storage = []
-        for i in range(0, 2):
+        for i in range(2):
             mock = Mock()
             el = base.ElementWrapper(mock)
             storage.append(el)
@@ -4534,7 +4534,7 @@ class Test(unittest.TestCase):
         s.append(meter.TimeSignature('fast 6/8'))
         #s.show('t')
         storage = []
-        for i in range(0, 6):
+        for i in range(6):
             soundFile = Wave_read() #_DOCS_HIDE
             #el = music21.Music21Object() #
             el = base.ElementWrapper(soundFile)

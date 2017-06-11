@@ -3268,9 +3268,9 @@ class Test(unittest.TestCase):
             '''
             OrderedDict(
             [(0, <music21.scale.intervalNetwork.Edge bi m2
-                    [('terminusLow',0),(0,'terminusLow')]>),
+                    [('terminusLow', 0), (0, 'terminusLow')]>),
              (1, <music21.scale.intervalNetwork.Edge bi M3
-                     [(0,'terminusHigh'),('terminusHigh',0)]>)])'''
+                     [(0, 'terminusHigh'), ('terminusHigh', 0)]>)])'''
             ))
 
         self.assertEqual(net.degreeMax, 3)

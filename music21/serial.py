@@ -386,7 +386,7 @@ class ToneRow(stream.Stream):
             return False
         else:
             tempsame = True
-            for i in range(0,len(row)):
+            for i in range(len(row)):
                 if tempsame is True:
                     if self[i].pitch.pitchClass != row[i].pitch.pitchClass:
                         tempsame = False
@@ -410,9 +410,9 @@ class ToneRow(stream.Stream):
         numPitches = len(self)
         pitchList = self.pitchClasses()
         intervalString = ''
-        for i in range(0,numPitches - 1):
+        for i in range(numPitches - 1):
             interval = (pitchList[i + 1] - pitchList[i]) % 12
-            if interval in range(0, 10):
+            if interval in range(10):
                 intervalString = intervalString + str(interval)
             if interval == 10:
                 intervalString = intervalString + 'T'
@@ -457,19 +457,19 @@ class ToneRow(stream.Stream):
             firstPitch = pitchList[0]
             transformedPitchList = []
             if transformationType == 'P':
-                for i in range(0, numPitches):
+                for i in range(numPitches):
                     newPitch = (pitchList[i] - firstPitch + index) % 12
                     transformedPitchList.append(newPitch)
             elif transformationType == 'I':
-                for i in range(0, numPitches):
+                for i in range(numPitches):
                     newPitch = (index + firstPitch - pitchList[i]) % 12
                     transformedPitchList.append(newPitch)
             elif transformationType == 'R':
-                for i in range(0, numPitches):
+                for i in range(numPitches):
                     newPitch = (index + pitchList[numPitches-1-i] - firstPitch) % 12
                     transformedPitchList.append(newPitch)
             elif transformationType == 'RI':
-                for i in range(0, numPitches):
+                for i in range(numPitches):
                     newPitch = (index - pitchList[numPitches-1-i] + firstPitch) % 12
                     transformedPitchList.append(newPitch)
             else:
@@ -970,7 +970,7 @@ class TwelveToneRow(ToneRow):
             classification = None
             for row in rowchecklist:
                 intervals = row.getIntervalsAsString()
-                for i in range(0,numchords):
+                for i in range(numchords):
                     if fullLinkIntervals[i] == intervals:
                         classification = linkClassification[i]
                         specialintervals.append(specialLinkIntervals[i])

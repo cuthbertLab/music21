@@ -1102,7 +1102,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> n1, n2, n3, n4 = note.Note('a'), note.Note('b'), note.Note('c'), note.Note('d')
         >>> n5, n6, n7, n8 = note.Note('e'), note.Note('f'), note.Note('g'), note.Note('a')
         >>> s2.insert(0.0, c)
-        >>> s2.append([n1,n2,n3,n4,n5,n6,n7,n8])
+        >>> s2.append([n1, n2, n3, n4, n5, n6, n7, n8])
         >>> s2.remove(n1, shiftOffsets=True)
         >>> s2.show('text')
         {0.0} <music21.clef.TrebleClef>
@@ -4769,7 +4769,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #         else:
 #             element = item
 
-        for unused_i in range(0, numberOfTimes):
+        for unused_i in range(numberOfTimes):
             self.append(copy.deepcopy(element))
 
     def repeatInsert(self, item, offsets):
@@ -5298,7 +5298,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> p1.insert(2, note.Note('C'))
         >>> p1.insert(4, harmony.ChordSymbol('D', quarterLength=4.0))
         >>> p1.insert(7, note.Note('A'))
-        >>> s.insert(0,p1)
+        >>> s.insert(0, p1)
         >>> s.chordify().show('text')
         {0.0} <music21.chord.Chord C3 E-3 G3>
         {2.0} <music21.chord.Chord C C3 E-3 G3>
@@ -5315,8 +5315,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> p1.insert(2, note.Note('C'))
         >>> p2.insert(4, harmony.ChordSymbol('D', quarterLength=4.0))
         >>> p1.insert(7, note.Note('A'))
-        >>> s.insert(0,p1)
-        >>> s.insert(0,p2)
+        >>> s.insert(0, p1)
+        >>> s.insert(0, p2)
         >>> s.chordify().show('text')
         {0.0} <music21.chord.Chord C3 E-3 G3>
         {2.0} <music21.chord.Chord C C3 E-3 G3>
@@ -9780,7 +9780,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # store all voices in a list
         voices = []
-        for dummy in range(0, maxVoiceCount):
+        for dummy in range(maxVoiceCount):
             voices.append(Voice()) # add voice classes
 
         # iterate through all elements; if not in an overlap, place in

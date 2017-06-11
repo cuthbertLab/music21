@@ -56,7 +56,7 @@ class StreamPlayer(object):
 
     >>> import random
     >>> keyDetune = []
-    >>> for i in range(0, 127):
+    >>> for i in range(127):
     ...    keyDetune.append(random.randint(-30, 30))
 
     >>> #_DOCS_SHOW b = corpus.parse('bwv66.6')
@@ -168,7 +168,7 @@ class TestExternal(unittest.TestCase):
         import random
         b = corpus.parse('bwv66.6')
         keyDetune = []
-        for i in range(0, 127):
+        for i in range(127):
             keyDetune.append(random.randint(-30, 30))
         for n in b.flat.notes:
             n.pitch.microtone = keyDetune[n.pitch.midi]
@@ -196,7 +196,7 @@ class TestExternal(unittest.TestCase):
 
         b = corpus.parse('bach/bwv66.6')
         keyDetune = []
-        for i in range(0, 127):
+        for i in range(127):
             keyDetune.append(random.randint(-30, 30))
         for n in b.flat.notes:
             n.pitch.microtone = keyDetune[n.pitch.midi]

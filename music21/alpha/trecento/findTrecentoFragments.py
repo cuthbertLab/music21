@@ -31,8 +31,8 @@ class IntervalSearcher(object):
         if self.intervalLength > stIntervalListLength:
             return False
         #print "Length of Stream: " + str(streamLength)
-        for i in range(0, stIntervalListLength + 1 - self.intervalLength):
-            for j in range(0, self.intervalLength):
+        for i in range(stIntervalListLength + 1 - self.intervalLength):
+            for j in range(self.intervalLength):
                 streamInterval = stIntervalList[i + j]
                 genI1 = self.intervalList[j].diatonic.generic.simpleDirected
                 genI2 = streamInterval.diatonic.generic.simpleDirected
@@ -182,7 +182,7 @@ def searchForVat1969():
         if (cadB1 is None or not cadB1.parts):
             continue
 
-    for i in range(0, len(cadB2.parts)):
+    for i in range(len(cadB2.parts)):
         strB1 = cadB1.parts[i].flat
         strB2 = cadB2.parts[i].flat
         if len(strB1.notesAndRests) < 3 or len(strB2.notesAndRests) < 3:

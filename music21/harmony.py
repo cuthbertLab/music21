@@ -694,7 +694,7 @@ def changeAbbreviationFor(chordType, changeTo):
 
     >>> harmony.changeAbbreviationFor('minor', 'm') # must change it back for the rest of doctests
     '''
-    CHORD_TYPES[chordType][1].insert(0,changeTo)
+    CHORD_TYPES[chordType][1].insert(0, changeTo)
 
 
 def chordSymbolFigureFromChord(inChord, includeChordType=False):
@@ -2094,7 +2094,7 @@ class ChordSymbol(Harmony):
                         s = '#'
                     else:
                         s = 'b'
-                    prefix = s*abs(numAlter)
+                    prefix = s * abs(numAlter)
 
                     figure += ' ' + csmod.modType +" " +  prefix + str(csmod.degree)
                 else:

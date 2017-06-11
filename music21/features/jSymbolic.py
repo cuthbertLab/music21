@@ -3493,7 +3493,7 @@ class StringKeyboardFractionFeature(InstrumentFractionFeature):
         self.isSequential = True
         self.dimensions = 1
 
-        self._targetPrograms = range(0, 8)
+        self._targetPrograms = range(8)
 
 
 

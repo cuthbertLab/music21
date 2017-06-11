@@ -702,9 +702,9 @@ class NWCObject(object):
         p.skipBytes(7)
 
         ## too complex...
-        #for letter in ['A','B','C','D','E','F','G']:
-        #    bitshift = ord(letter) - ord('A')
-        #    letterMask = 1 << bitshift
+        # for letter in ['A', 'B', 'C', 'D', 'E', 'F', 'G']:
+        #     bitshift = ord(letter) - ord('A')
+        #     letterMask = 1 << bitshift
 
         flatMask = {0x00: '',
                     0x02: 'Bb',
@@ -822,7 +822,7 @@ class NWCObject(object):
         else:
             self.dots = 0
 
-        durationValues = ['Whole','Half','4th','8th','16th','32nd','64th']
+        durationValues = ['Whole', 'Half', '4th', '8th', '16th', '32nd', '64th']
         durStr = durationValues[self.duration]
         if self.dots == 1:
             durStr += ',Dotted'
@@ -835,9 +835,9 @@ class NWCObject(object):
     def note(self):
         p = self.parserParent
         self.type = 'Note'
-        #print "Note at parse position: ", p.parsePosition
+        # print("Note at parse position: ", p.parsePosition)
         if p.version < 170:
-            print("ughh. not yet")
+            print("Cannot yet handle versions before 170")
         else:
             self.duration = p.byteToInt()
             self.data2 = p.readBytes(3) #??

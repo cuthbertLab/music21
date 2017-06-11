@@ -334,8 +334,8 @@ def unitNormEqual(parts):
     else:
         unit = []
         step = 1 / (parts - 1)
-        for y in range(0, parts - 1): # one less value tn needed
-            unit.append(y*step)
+        for y in range(parts - 1): # one less value tn needed
+            unit.append(y * step)
         unit.append(1) # make last an integer, add manually
         return unit
 
@@ -417,7 +417,7 @@ def _gcd(a, b):
     #if a == 0:
     #    return b
     #else:
-    #    return _gcd(b, a%b)
+    #    return _gcd(b, a % b)
 
     while b != 0:
         a, b = b, a % b
@@ -431,7 +431,7 @@ def _lcm(a, b):
     60
     """
     # // forces integer style division (no remainder)
-    return abs(a*b) // _gcd(a,b)
+    return abs(a * b) // _gcd(a, b)
 
 def _lcmRecurse(filterList):
     '''
@@ -569,7 +569,7 @@ class PrimeSegment(object):
             return unitNormRange(self.seg, z)
         elif segmentFormat in ['wid', 'width']:
             wid = []
-            for i in range(0, len(self.seg) - 1):
+            for i in range(len(self.seg) - 1):
                 wid.append((self.seg[i + 1]-self.seg[i]))
             return wid
         else: # int, integer
@@ -597,7 +597,7 @@ class Residual(object):
         # is an actual range and not start/end points b/c when producing a not (-)
         # it is easy to remove the mod,n from the range
         if z is None: # supply default if necessary
-            z = list(range(0, 100))
+            z = list(range(100))
         self._z = z
         #print 'residual init self._z', self._z
         self._m = m
@@ -1026,19 +1026,19 @@ class CompressionSegment(object):
 # <R0>&<R1>&<R2>|<R3>
 # >>> str(b)
 # '2&4&8|5'
-# >>> b(0, range(0, 20))
+# >>> b(0, range(20))
 # [0, 5, 8, 10, 15, 16]
 # >>> b = sieve.SieveBound('2&4&(8|5)')
 # <R0>&<R1>&(<R2>|<R3>)
-# >>> b(0, range(0, 20))
+# >>> b(0, range(20))
 # [0, 8, 16]
 # >>> b = sieve.SieveBound('5|2&4&8')
 # <R0>|<R1>&<R2>&<R3>
-# >>> b(0, range(0, 20))
+# >>> b(0, range(20))
 # [0, 5, 8, 10, 15, 16]
 # >>> b = sieve.SieveBound('(5|2)&4&8')
 # (<R0>|<R1>)&<R2>&<R3>
-# >>> b(0, range(0, 20))
+# >>> b(0, range(20))
 # [0, 8, 16]
 # >>>
 
@@ -1056,7 +1056,7 @@ class Sieve(object):
         """
         # note: this z should only be used if usrStr is a str, and not a list
         if z is None and isinstance(usrStr, six.string_types):
-            z = list(range(0, 100))
+            z = list(range(100))
         elif z is None and common.isListLike(usrStr): # if a list
             pass
         self._z = z # may be none; will be handled in self._load
@@ -1436,7 +1436,7 @@ class Sieve(object):
         may need to re-label some residual classes if gaps develop
         ids should be coniguous integer sequence
         """
-        iVals = range(0, len(self._resLib.keys()))
+        iVals = range(len(self._resLib.keys()))
         for i in iVals:
             testKey = self._resKeyStr(i)
             if testKey not in self._cmpTree and testKey not in self._expTree:
@@ -1585,7 +1585,7 @@ class Sieve(object):
             if len(andList) == 1:
                 intersection = self._resLib[andList[0]]
             else:
-                for i in range(0, len(andList) - 1): # one less than len
+                for i in range(len(andList) - 1): # one less than len
                     if i == 0: # first, get first
                         # problem was here w/ and list value not being in _resLib
                         a = self._resLib[andList[i]]
@@ -1678,7 +1678,7 @@ class Sieve(object):
             return unitNormRange(seg, z)
         elif segmentFormat in ['wid', 'width']:
             wid = []
-            for i in range(0, len(seg) - 1):
+            for i in range(len(seg) - 1):
                 wid.append((seg[i + 1]-seg[i]))
             return wid
         else: # int, integer
@@ -1963,7 +1963,7 @@ class PitchSieve(object):
         #value = 0
         for i, width in enumerate(widthSegments):
             #environLocal.printDebug(['stepStart', stepStart, 'stepEnd', stepEnd])
-            intervalObj = interval.Interval(width*self.eld)
+            intervalObj = interval.Interval(width * self.eld)
             post.append(intervalObj)
 
         if not post:
@@ -2031,7 +2031,7 @@ class Test(unittest.TestCase):
         for arg in testArgs:
             #environLocal.printDebug(['testSieveParse', arg])
             testObj = Sieve(arg)
-            dummy = testObj(0, list(range(0, 30)))
+            dummy = testObj(0, list(range(30)))
 
 
     def testSievePitch(self):

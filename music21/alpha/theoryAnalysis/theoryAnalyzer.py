@@ -728,7 +728,7 @@ class Analyzer(object):
         '''
         partNumPairs = []
         numParts = len(score.parts)
-        for partNum1 in range(0, numParts - 1):
+        for partNum1 in range(numParts - 1):
             for partNum2 in range(partNum1 + 1, numParts):
                 partNumPairs.append((partNum1, partNum2))
 
@@ -828,7 +828,7 @@ class Analyzer(object):
                                         color, dictKey, testFunction, textFunction):
         self.addAnalysisData(score)
         if partNum is None:
-            for partNumInner in range(0, len(score.parts)):
+            for partNumInner in range(len(score.parts)):
                 self._identifyBasedOnMelodicInterval(score, partNumInner, color, dictKey,
                                                 testFunction, textFunction)
         else:
@@ -847,7 +847,7 @@ class Analyzer(object):
         self.addAnalysisData(score)
 
         if partNum is None:
-            for partNumInner in range(0, len(score.parts)):
+            for partNumInner in range(len(score.parts)):
                 self._identifyBasedOnNote(score, partNumInner,
                                           color, dictKey, testFunction, textFunction)
         else:
@@ -896,7 +896,7 @@ class Analyzer(object):
 
         self.addAnalysisData(score)
         if partNumToIdentify is None:
-            for partNum in range(0,len(score.parts)):
+            for partNum in range(len(score.parts)):
                 self._identifyBasedOnVerticalityNTuplet(score, partNum, dictKey, testFunction,
                                                    textFunction, color,
                                                    editorialDictKey=editorialDictKey,
@@ -920,7 +920,7 @@ class Analyzer(object):
 
         self.addAnalysisData(score)
         if partNum is None:
-            for partNumInner in range(0, len(score.parts)):
+            for partNumInner in range(len(score.parts)):
                 self._identifyBasedOnThreeNoteLinearSegment(score, partNumInner, color, dictKey,
                                                        testFunction, textFunction)
         else:

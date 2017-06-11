@@ -85,7 +85,7 @@ class KeyAnalyzer(object):
 
     def getRawKeyByMeasure(self):
         keyByMeasure = []
-        for i in range(0, self.numMeasures):
+        for i in range(self.numMeasures):
             m = self.stream.measure(i)
             if m is None or not m.recurse().notes:
                 k = None

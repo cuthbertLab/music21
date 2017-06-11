@@ -4565,7 +4565,7 @@ class TestExternal(unittest.TestCase):
         for i in range(30):
             chordRaw = []
             for i in range(random.choice([3, 4, 5, 6, 7, 8])):
-                pc = random.choice(list(range(0, 12))) # py3
+                pc = random.choice(list(range(12))) # py3
                 if pc not in chordRaw:
                     chordRaw.append(pc)
             c = Chord(chordRaw)

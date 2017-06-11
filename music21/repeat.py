@@ -1273,7 +1273,7 @@ class Expander(object):
                     #environLocal.printDebug(['found an end in left barline: %s' % lb])
                     if not startIndices:
                         # get from first to this one
-                        barRepeatIndices = range(0, i)
+                        barRepeatIndices = range(i)
                         break
                     else: # otherwise get the last start index
                         barRepeatIndices = range(startIndices[-1], i)
@@ -1284,7 +1284,7 @@ class Expander(object):
                 # if this is the first end found and no starts found,
                 # assume we are counting from zero
                 if not startIndices: # get from first to this one
-                    barRepeatIndices = range(0, i + 1)
+                    barRepeatIndices = range(i + 1)
                     break
                 else: # otherwise get the last start index
                     barRepeatIndices = range(startIndices[-1], i + 1)

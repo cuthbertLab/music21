@@ -447,7 +447,7 @@ class Test(unittest.TestCase):
 
         part1 = stream.Part()
         part2 = stream.Part()
-        durPart1 = [1, 1,.5,.5, 1]
+        durPart1 = [1, 1, 0.5, 0.5, 1]
         durPart2 = [3, 1]
         degrees = list(range(1, 9))
         for unused in range(4):

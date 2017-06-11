@@ -114,7 +114,7 @@ def capuaRuleOne(srcStream):
     numChanged = 0
 
     ssn = srcStream.flat.notesAndRests
-    for i in range(0, len(ssn) - 2):
+    for i in range(len(ssn) - 2):
         n1 = ssn[i]
         n2 = ssn[i + 1]
         n3 = ssn[i + 2]
@@ -171,7 +171,7 @@ def capuaRuleTwo(srcStream):
     numChanged = 0
 
     ssn = srcStream.flat.notesAndRests
-    for i in range(0, len(ssn) - 3):
+    for i in range(len(ssn) - 3):
         n1 = ssn[i]
         n2 = ssn[i + 1]
         n3 = ssn[i + 2]
@@ -241,7 +241,7 @@ def capuaRuleThree(srcStream):
     numChanged = 0
 
     ssn = srcStream.flat.notesAndRests
-    for i in range(0, len(ssn) - 2):
+    for i in range(len(ssn) - 2):
         n1 = ssn[i]
         n2 = ssn[i + 1]
         n3 = ssn[i + 2]
@@ -294,7 +294,7 @@ def capuaRuleFourA(srcStream):
     numChanged = 0
 
     ssn = srcStream.flat.notesAndRests
-    for i in range(0, len(ssn) - 2):
+    for i in range(len(ssn) - 2):
         n1 = ssn[i]
         n2 = ssn[i + 1]
         n3 = ssn[i + 2]
@@ -344,7 +344,7 @@ def capuaRuleFourB(srcStream):
     '''
     numChanged = 0
     ssn = srcStream.flat.notesAndRests
-    for i in range(0, len(ssn) - 2):
+    for i in range(len(ssn) - 2):
         n1 = ssn[i]
         n2 = ssn[i + 1]
         n3 = ssn[i + 2]
@@ -1098,26 +1098,9 @@ class Test(unittest.TestCase):
     def testColorCapuaFicta(self):
         from music21.note import Note
         from music21.stream import Stream
-        (n11,n12,n13,n14) = (Note(), Note(), Note(), Note())
-        (n21,n22,n23,n24) = (Note(), Note(), Note(), Note())
-        n11.duration.type = "quarter"
-        n11.name = "D"
-        n12.duration.type = "quarter"
-        n12.name = "E"
-        n13.duration.type = "quarter"
-        n13.name = "F"
-        n14.duration.type = "quarter"
-        n14.name = "G"
 
-        n21.name = "C"
-        n21.duration.type = "quarter"
-        n22.name = "C"
-        n22.duration.type = "quarter"
-        n23.name = "B"
-        n23.octave = 3
-        n23.duration.type = "quarter"
-        n24.name = "C"
-        n24.duration.type = "quarter"
+        (n11, n12, n13, n14) = (Note('D'), Note('E'), Note('F'), Note('G'))
+        (n21, n22, n23, n24) = (Note('C'), Note('C'), Note('B3'), Note('C'))
 
         stream1 = Stream()
         stream1.append([n11, n12, n13, n14])
@@ -1146,8 +1129,6 @@ class Test(unittest.TestCase):
 #        assert n13.editorial.misc["capua2FictaHarmony"] == "perfect cons"
 #        assert n13.editorial.misc["capua2FictaInterval"].name == "P5"
 #        assert n13.style.color == "green"
-#        assert stream1.lily.strip() == (r'''\clef "treble" \color "yellow" d'4 ''' +
-#                r'''\color "yellow" e'4 \ficta \color "green" fis'!4 \color "yellow" g'4''')
 
 class TestExternal(unittest.TestCase):
 

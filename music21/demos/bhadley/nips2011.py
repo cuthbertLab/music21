@@ -360,12 +360,12 @@ def probabilityOfChance():
         old = 0
         new = 1
         avg = 0.0
-        for unused_trials in range(0, 10000):
+        for unused_trials in range(10000):
             #generating the answerKey
             answerKey = []
-            for i in range(0,NUM_OLD_PIECES):
+            for i in range(NUM_OLD_PIECES):
                 answerKey.append(old)
-            for i in range(0,NUM_NEW_PIECES):
+            for i in range(NUM_NEW_PIECES):
                 answerKey.append(new)
             random.shuffle(answerKey)
 

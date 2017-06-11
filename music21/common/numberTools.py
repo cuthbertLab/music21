@@ -228,7 +228,7 @@ def _preFracLimitDenominator(n, d):
         # bound1 is farther from zero than bound2; return bound2
         return (p1, q1)
     else:
-        return (p0 + k*p1, q0 + k * q1)
+        return (p0 + k * p1, q0 + k * q1)
 
 
 
@@ -863,7 +863,7 @@ def euclidGCD(a, b):
 def approximateGCD(values, grain=1e-4):
     '''Given a list of values, find the lowest common divisor of floating point values.
 
-    >>> common.approximateGCD([2.5, 10, .25])
+    >>> common.approximateGCD([2.5, 10, 0.25])
     0.25
     >>> common.approximateGCD([2.5, 10])
     2.5
@@ -873,15 +873,15 @@ def approximateGCD(values, grain=1e-4):
     0.5
     >>> common.approximateGCD([2, 5, 10])
     1.0
-    >>> common.approximateGCD([2, 5, 10,.25])
+    >>> common.approximateGCD([2, 5, 10, 0.25])
     0.25
-    >>> common.strTrimFloat(common.approximateGCD([1/3.,2/3.]))
+    >>> common.strTrimFloat(common.approximateGCD([1/3., 2/3.]))
     '0.3333'
-    >>> common.strTrimFloat(common.approximateGCD([5/3.,2/3.,4]))
+    >>> common.strTrimFloat(common.approximateGCD([5/3., 2/3., 4]))
     '0.3333'
-    >>> common.strTrimFloat(common.approximateGCD([5/3.,2/3.,5]))
+    >>> common.strTrimFloat(common.approximateGCD([5/3., 2/3., 5]))
     '0.3333'
-    >>> common.strTrimFloat(common.approximateGCD([5/3.,2/3.,5/6.,3/6.]))
+    >>> common.strTrimFloat(common.approximateGCD([5/3., 2/3., 5/6., 3/6.]))
     '0.1667'
 
     :rtype: float
@@ -947,7 +947,7 @@ def lcm(filterList):
     def _lcm(a, b):
         """find lowest common multiple of a,b"""
         # // forcers integer style division (no remainder)
-        return abs(a*b) // euclidGCD(a,b)
+        return abs(a * b) // euclidGCD(a,b)
 
     # derived from
     # http://www.oreillynet.com/cs/user/view/cs_msg/41022

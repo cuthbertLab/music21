@@ -142,7 +142,7 @@ def generatePopSongRules():
 
     fbRules._upperPartsRemainSame = False        #False
 
-    fbRules.partMovementLimits.append((1,5))
+    fbRules.partMovementLimits.append((1, 5))
 
     return fbRules
 

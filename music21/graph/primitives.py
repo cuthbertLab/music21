@@ -1614,7 +1614,7 @@ class TestExternal(unittest.TestCase):
 
     def testBasic(self):
         a = GraphScatter(doneAction=None, title='x to x*x', alpha=1)
-        data = [(x, x*x) for x in range(50)]
+        data = [(x, x * x) for x in range(50)]
         a.data = data
         a.process()
 
@@ -1694,7 +1694,7 @@ class TestExternal(unittest.TestCase):
         (GraphScatterWeighted,
             [(23, 15, 234), (10, 23, 12), (4, 23, 5), (15, 18, 120)]),
         (GraphScatter,
-            [(x, x*x) for x in range(50)]),
+            [(x, x * x) for x in range(50)]),
         (GraphHistogram,
             [(x, random.choice(range(30))) for x in range(50)]),
         (Graph3DBars, data3DPolygonBars),
@@ -1758,12 +1758,12 @@ class TestExternal(unittest.TestCase):
         post = []
 
         a = GraphScatter(doneAction=None)
-        data = [(x, x*x) for x in range(50)]
+        data = [(x, x * x) for x in range(50)]
         a.data = data
         post.append([a, 'graphing-01'])
 
         a = GraphScatter(title='Exponential Graph', alpha=1, doneAction=None)
-        data = [(x, x*x) for x in range(50)]
+        data = [(x, x * x) for x in range(50)]
         a.data = data
         post.append([a, 'graphing-02'])
 

@@ -1873,7 +1873,7 @@ class LilypondConverter(object):
         >>> for el in s4:
         ...     v4.append(el)
 
-        >>> variantList = [v4,v1,v3,v2]
+        >>> variantList = [v4, v1, v3, v2]
         >>> for v in variantList :
         ...     v.groups = ['london']
         ...     activeSite.insert(0.0, v)

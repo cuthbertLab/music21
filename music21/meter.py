@@ -205,7 +205,7 @@ def fractionToSlashMixed(fList):
         # look at previous fration and determin if denominator is the same
 
         match = None
-        search = list(range(0,len(pre)))
+        search = list(range(len(pre)))
         search.reverse() # go backwards
         for j in search:
             if pre[j][1] == d:
@@ -276,7 +276,7 @@ def fractionSum(fList):
             nSrc = nList[i]
             dSrc = dList[i]
             scalar = d // dSrc
-            nShift.append(nSrc*scalar)
+            nShift.append(nSrc * scalar)
         return (sum(nShift), d)
 
 

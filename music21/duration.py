@@ -352,7 +352,7 @@ def dottedMatch(qLen, maxDots=4):
     (False, False)
 
     '''
-    for dots in range(0, maxDots + 1):
+    for dots in range(maxDots + 1):
         ## assume qLen has n dots, so find its non-dotted length
         preDottedLength = (qLen + 0.0) / common.dotMultiplier(dots)
         try:
@@ -3240,7 +3240,7 @@ class TestExternal(unittest.TestCase):
 
         for i in range(30):
             ql = random.choice([1, 2, 3, 4, 5]) + random.choice([0, .25, .5, .75])
-            # w/ random.choice([0,.33333,.666666] gets an error
+            # w/ random.choice([0, 0.33333, 0.666666] gets an error
             n = note.Note()
             b = Duration()
             b.quarterLength = ql

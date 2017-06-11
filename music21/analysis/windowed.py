@@ -162,7 +162,7 @@ class WindowedAnalysis(object):
 
         elif windowType == 'noOverlap':
             start = 0
-            end = start+windowSize
+            end = start + windowSize
             i = 0
             while True:
                 if end >= len(self._windowedStream):
@@ -191,7 +191,7 @@ class WindowedAnalysis(object):
                 current = stream.Stream()
                 # store indices of min windows that participate
                 participants = []
-                for j in range(i, i+windowSize):
+                for j in range(i, i + windowSize):
                     current.append(self._windowedStream[j])
                     participants.append(j)
                 overlapped.append([current, participants])

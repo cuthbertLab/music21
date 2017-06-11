@@ -30,7 +30,7 @@ def getLandiniRandomStart(i):
 #     according to chance, given Landini\'s distribution of pitches.
 #     '''
 #     same = 0
-#     for i in range(0,total):
+#     for i in range(total):
 #         (n1, n2) = (random.randrange(138), random.randrange(138))
 #         if getLetter(n1) == getLetter(n2):
 #             same += 1
@@ -41,7 +41,7 @@ def getLandiniRandomStart(i):
 #     which is either 64 out of 138 (for A cadences) or 49 (for B cadences)
 #     '''
 #     mulFS = 0
-#     for i in range(0, total):
+#     for i in range(total):
 #         same = findsame(138)
 #         if same >= 64:
 #             mulFS += 1

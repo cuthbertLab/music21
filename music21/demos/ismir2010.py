@@ -447,8 +447,8 @@ def demoGraphBach():
     dpi = 300
 
     # loping off first measure to avoid pickup
-    s1 = corpus.parse('bach/bwv103.6').measures(1,None)
-    s2 = corpus.parse('bach/bwv18.5-lz').measures(1,None)
+    s1 = corpus.parse('bach/bwv103.6').measures(1, None)
+    s2 = corpus.parse('bach/bwv18.5-lz').measures(1, None)
 
     s1.plot('key', dpi=dpi, title='Windowed Key Analysis, Bach, BWV 103.6', windowStep='pow2')
     s2.plot('key', dpi=dpi, title='Windowed Key Analysis, Bach, BWV 18.5', windowStep='pow2')

@@ -1460,7 +1460,7 @@ class VerticalityTriplet(VerticalityNTuplet):
         '''
         calculates the three note linear segments if only three vertical slices provided
         '''
-        for partNum in range(0, min(len(self.verticalities[0].getObjectsByClass(note.Note)),
+        for partNum in range(min(len(self.verticalities[0].getObjectsByClass(note.Note)),
                                     len(self.verticalities[1].getObjectsByClass(note.Note)),
                                     len(self.verticalities[2].getObjectsByClass(note.Note)))
                              ):
@@ -1665,11 +1665,11 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
                   'couldBeDiatonicNeighborTone',
                   'couldBeChromaticNeighborTone']
     
-    def __init__(self, noteListorn1=None, n2=None, n3=None):
-        if isinstance(noteListorn1, (list, tuple)):
-            NNoteLinearSegment.__init__(self, noteListorn1)
+    def __init__(self, noteListOrN1=None, n2=None, n3=None):
+        if common.isIterable(noteListOrN1):
+            NNoteLinearSegment.__init__(self, noteListOrN1)
         else:
-            NNoteLinearSegment.__init__(self, [noteListorn1,n2,n3])
+            NNoteLinearSegment.__init__(self, [noteListOrN1, n2, n3])
 
     def _getN1(self):
         return self.noteList[0]

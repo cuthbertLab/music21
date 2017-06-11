@@ -238,7 +238,7 @@ def findRetrogradeVoices(show=True):
                 else:
                     int1 = interval.Interval(n.pitches[0], n.pitches[1])
                     #print int1.generic.simpleUndirected
-                    if int1.generic.simpleUndirected in [1,3,4,5]:
+                    if int1.generic.simpleUndirected in [1, 3, 4, 5]:
                         thisScore = strength
                     elif int1.generic.simpleUndirected == 6: # less good
                         thisScore = strength / 2.0

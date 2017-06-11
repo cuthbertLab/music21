@@ -90,7 +90,7 @@ class Test(unittest.TestCase):
         a = cn.stream.flat.notes[0] # returns the stored music21 note.
         self.assertEqual(a.name, 'C#')
         self.assertEqual(a.duration.type, 'half')
-        self.assertEqual(a.duration.dotGroups, (1,1))
+        self.assertEqual(a.duration.dotGroups, (1, 1))
         self.assertEqual(a.duration.quarterLength, 4.5)
 
 

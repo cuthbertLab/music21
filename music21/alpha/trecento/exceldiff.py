@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 
 import sys
 
@@ -48,7 +49,7 @@ elif (totalRows1 < totalRows2):
 else:
     minRows = totalRows1 # doesnt matter which
 
-for i in range(0, minRows):
+for i in range(minRows):
     rowvalues1 = sheet1.row_values(i)
     rowvalues2 = sheet2.row_values(i)
     longrow = 0
@@ -65,13 +66,13 @@ for i in range(0, minRows):
         minCells = totalCells1
     else:
         minCells = totalCells1 # doesnt matter which
-    for j in range(0, minCells):
+    for j in range(minCells):
         if (rowvalues1[j] != rowvalues2[j]):
             print("%3d,%2s--%34s : %34s" % (i + 1,xlrd.colname(j),
                                                six.u(rowvalues1[j]).encode('utf-8')[:34],
                                                six.u(rowvalues2[j]).encode('utf-8')[:34]))
     if (extraCells > 0):
-        print("%3d extra cells in row %3d in" % (extraCells, i + 1),)
+        print("%3d extra cells in row %3d in" % (extraCells, i + 1), end='')
         if (longrow == 1):
             print(book1name + ":" + sheetname1)
         elif (longrow == 2):
