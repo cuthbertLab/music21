@@ -38,6 +38,7 @@ from music21 import environment
 _MOD = 'roman.py'
 environLocal = environment.Environment(_MOD)
 
+# TODO: setting inversion should change the figure
 
 #------------------------------------------------------------------------------
 
@@ -717,11 +718,7 @@ def romanNumeralFromChord(chordObj,
     <music21.roman.RomanNumeral I#853 in C major>
 
 
-    Known bugs:
-
-
-
-    # Should be III+642 gives III+#642 (# before 6 is unnecessary)
+    Note that this should be III+642 gives III+#642 (# before 6 is unnecessary)
 
     # >>> roman.romanNumeralFromChord(chord.Chord("B3 D3 E-3 G3"), key.Key('c'))
     # <music21.roman.RomanNumeral III+642 in c minor>
@@ -1056,6 +1053,13 @@ class RomanNumeral(harmony.Harmony):
     >>> [str(p) for p in r2.pitches]
     ['A4', 'B4', 'D#5', 'F#5']
 
+    >>> r2.secondaryRomanNumeral
+    <music21.roman.RomanNumeral V7/vi in C major>
+
+    >>> r2.secondaryRomanNumeral.secondaryRomanNumeral
+    <music21.roman.RomanNumeral vi in C major>
+
+
 
     OMIT_FROM_DOCS
 
@@ -1337,8 +1341,6 @@ class RomanNumeral(harmony.Harmony):
         >>> r._matchAccidentalsToQuality('diminished')
         >>> " ".join([p.name for p in r.pitches])
         'C E- G- B--'
-
-
         '''
         correctSemitones = self._findSemitoneSizeForQuality(impliedQuality)
         chordStepsToExamine = (3, 5, 7)
@@ -1418,8 +1420,6 @@ class RomanNumeral(harmony.Harmony):
         <music21.roman.RomanNumeral V in C major>
         >>> r.secondaryRomanNumeral.secondaryRomanNumeralKey
         <music21.key.Key of G major>
-
-
         '''
         if figure is None:
             figure = self._figure
@@ -2008,9 +2008,38 @@ class RomanNumeral(harmony.Harmony):
         >>> rn2.functionalityScore = 99
         >>> rn2.functionalityScore
         99
+        
+        For secondary dominants, the functionality scores are multiplied, reducing
+        all but the first by 1/100th:
+        
+        >>> rn3 = roman.RomanNumeral('V')
+        >>> rn3.functionalityScore
+        70
+        
+        >>> rn4 = roman.RomanNumeral('vi')
+        >>> rn4.functionalityScore
+        40
+        
+        >>> rn5 = roman.RomanNumeral('V/vi')
+        >>> rn5.functionalityScore
+        28
         '''
         if self._functionalityScore is not None:
             return self._functionalityScore
+        
+        if self.secondaryRomanNumeral:
+            figures = self.figure.split('/') # error for half-diminished in secondary...
+            score = 100
+            for f in figures:
+                try:
+                    scorePart = functionalityScores[f] / 100
+                except KeyError:
+                    scorePart = 0
+                score *= scorePart
+            return int(score)
+        
+        
+        
         try:
             score = functionalityScores[self.figure]
         except KeyError:

@@ -170,6 +170,12 @@ class Notation(object):
         self._getModifiers()
         self._getFigures()
 
+    def __repr__(self):
+            return '<{0}.{1} {2}>'.format(self.__module__,
+                                          self.__class__.__name__,
+                                          self.notationColumn
+                                          )
+
     def _parseNotationColumn(self):
         '''
         Given a notation column below a pitch, defines both self.numbers

@@ -498,8 +498,12 @@ class StreamIterator(object):
         '''
         for f in self.filters:
             try:
-                if f(e, self) is False:
-                    return False
+                try:
+                    if f(e, self) is False:
+                        return False
+                except TypeError: # one element filters are acceptable.
+                    if f(e) is False:
+                        return False
             except StopIteration:
                 raise
         return True
@@ -619,7 +623,11 @@ class StreamIterator(object):
         else:
             derivationMethods = []
             for f in self.filters:
-                derivationMethods.append(f.derivationStr)
+                if hasattr(f, 'derivationStr'):
+                    dStr = f.derivationStream
+                else:
+                    dStr = f.__name__ # function; lambda returns <lambda>
+                derivationMethods.append(dStr)
             found.derivation.method = '.'.join(derivationMethods)
 
         fe = self.matchingElements()
@@ -747,24 +755,29 @@ class StreamIterator(object):
         In lieu of a list, a single class can be used as the `classFilterList` parameter.
 
         >>> a = stream.Stream()
-        >>> a.repeatInsert(note.Rest(), list(range(10)))
+        >>> a.repeatInsert(note.Rest(), range(10))
         >>> for x in range(4):
         ...     n = note.Note('G#')
         ...     n.offset = x * 3
         ...     a.insert(n)
-        >>> found = list(a.iter.getElementsNotOfClass(note.Note))
+        >>> found = a.iter.getElementsNotOfClass(note.Note)
         >>> len(found)
         10
-
-        >>> b = stream.Stream()
-        >>> b.repeatInsert(note.Rest(), list(range(15)))
-        >>> a.insert(b)
-        >>> # here, it gets elements from within a stream
-        >>> # this probably should not do this, as it is one layer lower
-        >>> found = list(a.flat.iter.getElementsNotOfClass(note.Rest))
+        >>> found = a.iter.getElementsNotOfClass('Rest')
         >>> len(found)
         4
-        >>> found = list(a.flat.iter.getElementsNotOfClass(note.Note))
+        >>> found = a.iter.getElementsNotOfClass(['Note', 'Rest'])
+        >>> len(found)
+        0
+
+        >>> b = stream.Stream()
+        >>> b.repeatInsert(note.Rest(), range(15))
+        >>> a.insert(b)
+
+        >>> found = a.recurse().getElementsNotOfClass([note.Rest, 'Stream'])
+        >>> len(found)
+        4
+        >>> found = a.recurse().getElementsNotOfClass([note.Note, 'Stream'])
         >>> len(found)
         25
         '''
