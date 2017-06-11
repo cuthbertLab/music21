@@ -2638,7 +2638,8 @@ class Test(unittest.TestCase):
         def procCompare(s, scalar, anchorZeroRecurse, match):
             oListSrc = scaleOffsetMap(s)
             oListSrc.sort()
-            sNew = s.scaleOffsets(scalar, anchorZeroRecurse=anchorZeroRecurse,
+            sNew = s.scaleOffsets(scalar, 
+                                  anchorZeroRecurse=anchorZeroRecurse,
                                   inPlace=False)
             oListPost = scaleOffsetMap(sNew)
             oListPost.sort()
@@ -2663,19 +2664,20 @@ class Test(unittest.TestCase):
         # offset map gives us a nested list presentation of all offsets
         # usefulfor testing
         self.assertEqual(scaleOffsetMap(s1),
-        [[0.0], [2.0], [4.0], [6.0], [8.0, [[0.0], [0.5], [1.0], [1.5]]]])
+                         [[0.0], [2.0], [4.0], [6.0], 
+                          [8.0, [[0.0], [0.5], [1.0], [1.5]]]])
 
         # provide start of resulting values
         # half not spacing becomes whole note spacing
         procCompare(s1, 2, 'lowest',
-        [[0.0], [4.0], [8.0], [12.0], [16.0, [[0.0], [1.0], [2.0], [3.0]]]]
-        )
+                    [[0.0], [4.0], [8.0], [12.0], 
+                     [16.0, [[0.0], [1.0], [2.0], [3.0]]]])
         procCompare(s1, 4, 'lowest',
-        [[0.0], [8.0], [16.0], [24.0], [32.0, [[0.0], [2.0], [4.0], [6.0]]]]
-        )
+                    [[0.0], [8.0], [16.0], [24.0], 
+                     [32.0, [[0.0], [2.0], [4.0], [6.0]]]])
         procCompare(s1, .25, 'lowest',
-        [[0.0], [0.5], [1.0], [1.5], [2.0, [[0.0], [0.125], [0.25], [0.375]]]]
-        )
+                    [[0.0], [0.5], [1.0], [1.5], 
+                     [2.0, [[0.0], [0.125], [0.25], [0.375]]]])
 
         # test unequally spaced notes starting at non-zero
         n1 = note.Note()
@@ -2687,7 +2689,9 @@ class Test(unittest.TestCase):
         n2.quarterLength = 9.5
         s2 = stream.Stream()
         s2.repeatInsert(n2, [40, 40.5, 41, 41.5])
+        self.assertEqual(s2.highestTime, 51)
         s1.append(s2)
+        self.assertEqual(s1.highestTime, 17 + 1 + 51)
         s1.append(copy.deepcopy(s2))
         s1.append(copy.deepcopy(s2))
 
@@ -2701,42 +2705,42 @@ class Test(unittest.TestCase):
 
         # provide anchorZeroRecurse value
         self.assertEqual(scaleOffsetMap(s1),
-        [[10.0], [14.0], [15.0], [17.0],
-            [18.0, [[40.0], [40.5], [41.0], [41.5]]],
-            [60.0, [[40.0], [40.5], [41.0], [41.5]]],
-            [102.0, [[40.0], [40.5], [41.0], [41.5]]]]
+                         [[10.0], [14.0], [15.0], [17.0],
+                          [18.0,  [[40.0], [40.5], [41.0], [41.5]]],
+                          [69.0,  [[40.0], [40.5], [41.0], [41.5]]],
+                          [120.0, [[40.0], [40.5], [41.0], [41.5]]]]
         )
 
         procCompare(s1, 2, 'lowest',
-        [[10.0], [18.0], [20.0], [24.0],
-            [26.0, [[40.0], [41.0], [42.0], [43.0]]],
-            [110.0, [[40.0], [41.0], [42.0], [43.0]]],
-            [194.0, [[40.0], [41.0], [42.0], [43.0]]]]
+                    [[10.0], [18.0], [20.0], [24.0],
+                     [26.0, [[40.0], [41.0], [42.0], [43.0]]],
+                     [128.0, [[40.0], [41.0], [42.0], [43.0]]],
+                     [230.0, [[40.0], [41.0], [42.0], [43.0]]]]
         )
 
         # if anchorZeroRecurse is None, embedded stream that do not
         # start at zero are scaled proportionally
         procCompare(s1, 2, None,
-        [[10.0], [18.0], [20.0], [24.0],
-            [26.0, [[80.0], [81.0], [82.0], [83.0]]],
-            [110.0, [[80.0], [81.0], [82.0], [83.0]]],
-            [194.0, [[80.0], [81.0], [82.0], [83.0]]]]
+                    [[10.0], [18.0], [20.0], [24.0],
+                     [26.0, [[80.0], [81.0], [82.0], [83.0]]],
+                     [128.0, [[80.0], [81.0], [82.0], [83.0]]],
+                     [230.0, [[80.0], [81.0], [82.0], [83.0]]]]
         )
 
         procCompare(s1, 0.25, 'lowest',
-        [[10.0], [11.0], [11.25], [11.75],
-            [12.0, [[40.0], [40.125], [40.25], [40.375]]],
-            [22.5, [[40.0], [40.125], [40.25], [40.375]]],
-            [33.0, [[40.0], [40.125], [40.25], [40.375]]]]
+                    [[10.0], [11.0], [11.25], [11.75],
+                     [12.0, [[40.0], [40.125], [40.25], [40.375]]],
+                     [24.75, [[40.0], [40.125], [40.25], [40.375]]],
+                     [37.5, [[40.0], [40.125], [40.25], [40.375]]]]
         )
 
         # if anchorZeroRecurse is None, embedded stream that do not
         # start at zero are scaled proportionally
         procCompare(s1, 0.25, None,
-        [[10.0], [11.0], [11.25], [11.75],
-            [12.0, [[10.0], [10.125], [10.25], [10.375]]],
-            [22.5, [[10.0], [10.125], [10.25], [10.375]]],
-            [33.0, [[10.0], [10.125], [10.25], [10.375]]]]
+                    [[10.0], [11.0], [11.25], [11.75],
+                     [12.0, [[10.0], [10.125], [10.25], [10.375]]],
+                     [24.75, [[10.0], [10.125], [10.25], [10.375]]],
+                     [37.5, [[10.0], [10.125], [10.25], [10.375]]]]
         )
 
 
@@ -7806,7 +7810,7 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    music21.mainTest(Test, 'verbose') #, runTest='testMakeNotationByMeasuresB')
+    music21.mainTest(Test, 'verbose') # , runTest='testScaleOffsetsNested')
 
 #------------------------------------------------------------------------------
 # eof
