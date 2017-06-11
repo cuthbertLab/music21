@@ -624,7 +624,7 @@ class StreamIterator(object):
             derivationMethods = []
             for f in self.filters:
                 if hasattr(f, 'derivationStr'):
-                    dStr = f.derivationStream
+                    dStr = f.derivationStr
                 else:
                     dStr = f.__name__ # function; lambda returns <lambda>
                 derivationMethods.append(dStr)
