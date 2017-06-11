@@ -277,14 +277,14 @@ class HumdrumDataCollection(object):
         for i in range(len(endPositions)):
             if i == 0:
                 endPos = endPositions[i]
-                dataCollections.append(dataStream[:endPos+1])
+                dataCollections.append(dataStream[:endPos + 1])
             elif i == len(endPositions) -1:
                 # ignore endPosition and grab to end of file
-                startPos = endPositions[i-1] + 1
+                startPos = endPositions[i - 1] + 1
                 dataCollections.append(dataStream[startPos:])
             else:
                 # ignore startPositions, grab comments etc. between scores
-                startPos = endPositions[i-1] + 1
+                startPos = endPositions[i - 1] + 1
                 endPos = endPositions[i] + 1
                 dataCollections.append(dataStream[startPos:endPos])
 
@@ -483,10 +483,10 @@ class HumdrumDataCollection(object):
                     protoSpineEventList.append(thisEvent)
                     thisEventCollection.addSpineEvent(j, thisEvent)
                     if thisEvent.contents == '.' and i > 0:
-                        lastEvent = returnEventCollections[i-1].events[j]
+                        lastEvent = returnEventCollections[i - 1].events[j]
                         if lastEvent is not None:
                             thisEventCollection.addLastSpineEvent(j,
-                                returnEventCollections[i-1].getSpineOccurring(j))
+                                returnEventCollections[i - 1].getSpineOccurring(j))
                 else:  ## no data here
                     thisEvent = SpineEvent(None)
                     thisEvent.position = i
@@ -598,11 +598,11 @@ class HumdrumDataCollection(object):
                     currentSpine.endingPosition = i
                 elif thisEvent.contents == "*^":  ## split spine assume they are voices
                     newSpine1 = spineCollection.addSpine(streamClass=stream.Voice)
-                    newSpine1.insertPoint = i+1
+                    newSpine1.insertPoint = i + 1
                     newSpine1.parentSpine = currentSpine
                     newSpine1.isFirstVoice = True
                     newSpine2 = spineCollection.addSpine(streamClass=stream.Voice)
-                    newSpine2.insertPoint = i+1
+                    newSpine2.insertPoint = i + 1
                     newSpine2.parentSpine = currentSpine
                     currentSpine.endingPosition = i # will be overridden if merged
                     currentSpine.childSpines.append(newSpine1)
@@ -683,7 +683,7 @@ class HumdrumDataCollection(object):
                 numberOfGlobalEventsInARow += 1
                 insertOffset = None
                 insertPriority = 0
-                for j in range(i+1, maxEventList):
+                for j in range(i + 1, maxEventList):
                     if j in positionDict:
                         insertOffset = positionDict[j][0]
                         # hopefully not more than 20 events in a row...

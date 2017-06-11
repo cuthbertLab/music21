@@ -559,7 +559,7 @@ class ElementTree(core.AVLTree):
             lenL = len(l)
             if lenL == 0:
                 return None
-            midpoint = lenL//2
+            midpoint = lenL // 2
             midtuple = l[midpoint]
             n = NodeClass(midtuple[0], midtuple[1])
             n.payloadElementIndex = globalStartOffset + midpoint

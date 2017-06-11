@@ -1978,14 +1978,14 @@ class NoteDensityFeature(featuresModule.FeatureExtractor):
                 maxKey = keyEnd
 
             # increment all contiguous regions
-            for i in range(keyStart, keyEnd+1):
+            for i in range(keyStart, keyEnd + 1):
                 if i in regions:
                     regions[i] += 1 # increment
                 else:
                     regions[i] = 1
         # have counts of all start events for each second; average
         total = 0
-        for i in range(minKey, maxKey+1):
+        for i in range(minKey, maxKey + 1):
             if i in regions: # there may be gaps
                 total += regions[i]
         self._feature.vector[0] = float(total) / (maxKey - minKey + 1) # number of slots, inclusive
@@ -2168,7 +2168,7 @@ class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
         for i, o in enumerate(onsets):
             if i == len(onsets) - 1: # last
                 break
-            oNext = onsets[i+1]
+            oNext = onsets[i + 1]
             # not including simultaneous attacks
             dif = oNext-o
             if not common.almostEquals(dif, 0.0):
@@ -2206,7 +2206,7 @@ class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
         for i, o in enumerate(onsets):
             if i == len(onsets) - 1: # last
                 break
-            oNext = onsets[i+1]
+            oNext = onsets[i + 1]
             # not including simultaneous attacks
             dif = oNext-o
             if not common.almostEquals(dif, 0.0):
@@ -2259,7 +2259,7 @@ class AverageTimeBetweenAttacksForEachVoiceFeature(
             for i, o in enumerate(onsets):
                 if i == len(onsets) - 1: # last
                     break
-                oNext = onsets[i+1]
+                oNext = onsets[i + 1]
                 # not including simultaneous attacks
                 dif = oNext-o
                 if not common.almostEquals(dif, 0.0):
@@ -2313,7 +2313,7 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
             for i, o in enumerate(onsets):
                 if i == len(onsets) - 1: # last
                     break
-                oNext = onsets[i+1]
+                oNext = onsets[i + 1]
                 dif = oNext-o # not including simultaneous attacks
                 if not common.almostEquals(dif, 0.0):
                     differences.append(dif)

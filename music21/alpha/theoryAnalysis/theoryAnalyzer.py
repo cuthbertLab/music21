@@ -1488,7 +1488,7 @@ class Analyzer(object):
             dictKey = 'accentedPassingTones'
         testFunction = lambda vst, pn: vst.hasPassingTone(pn, unaccentedOnly)
         textFunction = lambda vsnt, pn: (vsnt.tnlsDict[pn].n2.name +
-                                         ' identified as a passing tone in part ' + str(pn+1))
+                                         ' identified as a passing tone in part ' + str(pn + 1))
         self._identifyBasedOnVerticalityNTuplet(score, partNumToIdentify, dictKey, testFunction,
                                            textFunction, color, editorialDictKey, editorialValue,
                                            editorialMarkDict={1: [partNumToIdentify]}, nTupletNum=3)
@@ -1709,7 +1709,7 @@ class Analyzer(object):
 
         testFunction = lambda vst, pn: vst.hasNeighborTone(pn, unaccentedOnly)
         textFunction = lambda vsnt, pn: (vsnt.tnlsDict[pn].n2.name +
-                                         ' identified as a neighbor tone in part ' + str(pn+1))
+                                         ' identified as a neighbor tone in part ' + str(pn + 1))
         self._identifyBasedOnVerticalityNTuplet(score, partNumToIdentify,  dictKey, testFunction,
                                            textFunction, color, editorialDictKey, editorialValue,
                                            editorialMarkDict={1:[partNumToIdentify]}, nTupletNum=3)

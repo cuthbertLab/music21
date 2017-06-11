@@ -1342,7 +1342,7 @@ class JSONFreezer(JSONFreezeThawBase):
                     inheritAttributes = self.storedClassAttributes[inheritClass]
                     attributeList2.extend(inheritAttributes)
                     if inheritMarkerIndex != len(attributeList) - 1:
-                        attributeList2.extend(attributeList[inheritMarkerIndex+1:])
+                        attributeList2.extend(attributeList[inheritMarkerIndex + 1:])
                     attributeList = attributeList2
 
                 if "__AUTO_GATHER__" in attributeList:
@@ -1352,7 +1352,7 @@ class JSONFreezer(JSONFreezeThawBase):
                     attributeList2 = attributeList[0:autoGatherMarkerIndex]
                     attributeList2.extend(autoGathered)
                     if autoGatherMarkerIndex != len(attributeList) - 1:
-                        attributeList2.extend(attributeList[autoGatherMarkerIndex+1:])
+                        attributeList2.extend(attributeList[autoGatherMarkerIndex + 1:])
                     attributeList = attributeList2
                 return attributeList
         if attributeList == [] and autoGather is True:

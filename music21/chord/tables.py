@@ -2905,11 +2905,11 @@ class Test(unittest.TestCase):
         for setSize, setCount in TNIMAX.items(): # look at tni structures
             if setSize == 0:
                 continue
-            for i in range(1, setCount+1):
+            for i in range(1, setCount + 1):
                 self.assertEqual(len(FORTE[setSize][1]), 4)
             # must subtract one b/c all groups contain a zero set to pad
             # index values
-            self.assertEqual(len(FORTE[setSize])-1, setCount)
+            self.assertEqual(len(FORTE[setSize]) - 1, setCount)
 
 
 

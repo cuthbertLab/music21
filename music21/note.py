@@ -1819,7 +1819,7 @@ class Test(unittest.TestCase):
             m.timeSignature = meter.TimeSignature(tsStr)
             m.repeatAppend(n, nCount)
 
-            self.assertEqual(len(m), nCount+1)
+            self.assertEqual(len(m), nCount + 1)
 
             # test matching beat proportion value
             post = [m.notesAndRests[i].beat for i in range(nCount)]

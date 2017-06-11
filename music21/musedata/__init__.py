@@ -751,7 +751,7 @@ class MuseDataMeasureIterator(object):
             raise StopIteration
         start, end = self.boundaries[self.index]
         # add one b/c end is inclusive
-        mdm = MuseDataMeasure(self.src[start:end+1], self.parent)
+        mdm = MuseDataMeasure(self.src[start:end + 1], self.parent)
         self.index += 1
         return mdm
 
@@ -1259,7 +1259,7 @@ class MuseDataPart(object):
             return None # cannot yet determine
         else:
             # there may be more than one clef definition
-            charPair = self._getClefParameters()[voice-1]
+            charPair = self._getClefParameters()[voice - 1]
             # convert to int and back to string to strip zeros
             charPair = str(int(charPair))
             from music21 import clef
@@ -1444,7 +1444,7 @@ class MuseDataPart(object):
                 if i == len(mIndices) - 1:
                     boundaries.append((mIndices[i], lastIndex))
                 else:
-                    boundaries.append((mIndices[i], mIndices[i+1]-1))
+                    boundaries.append((mIndices[i], mIndices[i + 1] - 1))
 
         return boundaries
 

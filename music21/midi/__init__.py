@@ -1048,7 +1048,7 @@ class MidiTrack(object):
         # an object for each of 16 channels is created
 #         self.channels = []
 #         for i in range(16):
-#             self.channels.append(MidiChannel(self, i+1))
+#             self.channels.append(MidiChannel(self, i + 1))
 
     def read(self, midiStr):
         '''
@@ -1473,10 +1473,10 @@ class Test(unittest.TestCase):
         i = 0
         while i < len(track2.events)-1:
             self.assertTrue(isinstance(track2.events[i], DeltaTime))
-            self.assertTrue(isinstance(track2.events[i+1], MidiEvent))
+            self.assertTrue(isinstance(track2.events[i + 1], MidiEvent))
 
             #environLocal.printDebug(['sample events: ', track2.events[i]])
-            #environLocal.printDebug(['sample events: ', track2.events[i+1]])
+            #environLocal.printDebug(['sample events: ', track2.events[i + 1]])
             i += 2
 
         # first object is delta time
@@ -1487,8 +1487,10 @@ class Test(unittest.TestCase):
 
         mt = MidiTrack(1)
         # duration, pitch, velocity
-        data = [[1024, 60, 90], [1024, 50, 70], [1024, 51, 120],[1024, 62, 80],
-                ]
+        data = [[1024, 60, 90], 
+                [1024, 50, 70], 
+                [1024, 51, 120], 
+                [1024, 62, 80]]
         t = 0
         tLast = 0
         for d, p, v in data:

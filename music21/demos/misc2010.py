@@ -40,7 +40,7 @@ def bachParallels():
                 continue
             ifn = c.parts[i].flat.notesAndRests.stream()
             omi = ifn.offsetMap()
-            for j in range(i+1, len(c.parts)):
+            for j in range(i + 1, len(c.parts)):
                 jName = c.parts[j].id
                 if jName.lower() not in ['soprano', 'alto', 'tenor', 'bass']:
                     continue
@@ -48,12 +48,12 @@ def bachParallels():
                 jfn = c.parts[j].flat.notesAndRests.stream()
                 for k in range(len(omi) - 1):
                     n1pi = omi[k]['element']
-                    n2pi = omi[k+1]['element']
+                    n2pi = omi[k + 1]['element']
                     n1pj = jfn.getElementsByOffset(offsetStart=omi[k]['endTime'] - .001,
                                                    offsetEnd=omi[k]['endTime'] - .001,
                                                    mustBeginInSpan=False)[0]
-                    n2pj = jfn.getElementsByOffset(offsetStart=omi[k+1]['offset'],
-                                                   offsetEnd=omi[k+1]['offset'],
+                    n2pj = jfn.getElementsByOffset(offsetStart=omi[k + 1]['offset'],
+                                                   offsetEnd=omi[k + 1]['offset'],
                                                    mustBeginInSpan=False)[0]
                     if n1pj is n2pj:
                         continue # no oblique motion

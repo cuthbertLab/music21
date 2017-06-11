@@ -570,7 +570,7 @@ class AVLTree(object):
             '''
             if not l:
                 return None
-            midpoint = len(l)//2
+            midpoint = len(l) // 2
             midtuple = l[midpoint]
             n = NodeClass(midtuple[0], midtuple[1])
             n.leftChild = recurse(l[:midpoint])

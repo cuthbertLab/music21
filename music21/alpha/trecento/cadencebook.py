@@ -161,7 +161,7 @@ class TrecentoSheet(object):
             if rowValues[1] is None:
                 continue
             elif title in rowValues[1].lower():
-                return self.makeWork(i+1)
+                return self.makeWork(i + 1)
         return None
 
 

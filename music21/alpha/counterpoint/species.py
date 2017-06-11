@@ -733,7 +733,7 @@ class ModalCounterpoint(object):
         sn = stream1.notes
         for i in range(len(sn)-1):
             note1 = sn[i]
-            note2 = sn[i+1]
+            note2 = sn[i + 1]
             if note2 is not None:
                 if not self.isValidStep(note1, note2):
                     numBadSteps += 1
@@ -977,12 +977,12 @@ class ModalCounterpoint(object):
         for i in range(maxNote):
             note1 = s1notes[i]
             if (note1.name == sixth and i < maxNote - 2):
-                note2 = s1notes[i+1]
-                note3 = s1notes[i+2]
+                note2 = s1notes[i + 1]
+                note3 = s1notes[i + 2]
                 if (note2.name == seventh and note3.name == tonic):
                     note1 = note1.transpose("A1")
             elif (note1.name == seventh and i < maxNote - 1):
-                note2 = s1notes[i+1]
+                note2 = s1notes[i + 1]
                 if note2.name == tonic:
                     note1 = note1.transpose("A1")
 
@@ -1069,9 +1069,9 @@ class ModalCounterpoint(object):
         stream2.append(note1)
         afterLeap = False
         for i in range(1, len(stream1.notes)):
-            prevFirmus = stream1.notes[i-1]
+            prevFirmus = stream1.notes[i - 1]
             currFirmus = stream1.notes[i]
-            prevNote = stream2.notes[i-1]
+            prevNote = stream2.notes[i - 1]
             choices = self.generateValidNotes(prevFirmus, currFirmus, prevNote,
                                               afterLeap, minorScale)
             if not choices:

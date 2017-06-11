@@ -1156,13 +1156,13 @@ class Chord(note.NotRest):
         # Remove duplicates
         uniquePitchClassList = [sortedPitchClassList[0]]
         for i in range (1, len(sortedPitchClassList)):
-            if sortedPitchClassList[i] != sortedPitchClassList[i-1]:
+            if sortedPitchClassList[i] != sortedPitchClassList[i - 1]:
                 uniquePitchClassList.append(sortedPitchClassList[i])
         intervalList = []
         for i in range (1, len(uniquePitchClassList)):
-            l = (uniquePitchClassList[i] - uniquePitchClassList[i-1])%12
+            l = (uniquePitchClassList[i] - uniquePitchClassList[i - 1]) % 12
             intervalList.append(l)
-        intervalList.append((uniquePitchClassList[0] - uniquePitchClassList[-1])%12)
+        intervalList.append((uniquePitchClassList[0] - uniquePitchClassList[-1]) % 12)
         # make list of rotations
         rotationList = []
         for i in range (0, len(intervalList)):

@@ -1214,7 +1214,7 @@ class BrevisLengthTranslator(object):
                     minRem -= 2.0
                 elif (2 < avgSBLength) and (avgSBLength < 3):
                     if (ind < (len(self.brevisLength)-1) and
-                            self.brevisLength[ind+1].mensuralType == 'minima'):
+                            self.brevisLength[ind + 1].mensuralType == 'minima'):
                         knownLengthsList[ind] = 2.0
                         minRem -= 2.0
                     else:
@@ -1304,7 +1304,7 @@ class BrevisLengthTranslator(object):
 
             for ind in semibrevis_list[:-1]:
                 # make all but final non-downstem semibreves followed by minima = 2.0
-                if self.brevisLength[ind+1].mensuralType == 'minima':
+                if self.brevisLength[ind + 1].mensuralType == 'minima':
                     knownLengthsList[ind] = 2.0
                     minRem -= 2.0
                     extend_list.append(ind)
@@ -1316,7 +1316,7 @@ class BrevisLengthTranslator(object):
             if self.numberOfDownstems > 0:
 
                 if ((not self.hasLastSB) and
-                        (self.brevisLength[semibrevis_list[-1]+1].mensuralType == 'minima')):
+                        (self.brevisLength[semibrevis_list[-1] + 1].mensuralType == 'minima')):
                     knownLengthsList[semibrevis_list[-1]] = 2.0
                     minRem -= 2.0
                     extend_list.append(semibrevis_list[-1])
@@ -1341,7 +1341,7 @@ class BrevisLengthTranslator(object):
                     shrink_tup += -1,
 
                 elif self.numberOfSemibreves > 0: #SBs, but no last SB
-                    if (self.brevisLength[semibrevis_list[-1]+1].mensuralType == 'minima'):
+                    if (self.brevisLength[semibrevis_list[-1] + 1].mensuralType == 'minima'):
                         knownLengthsList[semibrevis_list[-1]] = 2.0
                         minRem -= 2.0
                         extend_list.append(semibrevis_list[-1])
@@ -1543,11 +1543,11 @@ class BrevisLengthTranslator(object):
                         # or, SM Rest is surrounded by left flag SMs.
                         # Then, SM rest = left_length
                         if ((curIndex == 0 and
-                                master_list[curIndex+1] in semiminima_left_flag_list ) or
+                                master_list[curIndex + 1] in semiminima_left_flag_list ) or
                              (curIndex == len(master_list) - 1 and
                                 master_list[curIndex - 1] in semiminima_left_flag_list ) or
                              (master_list[curIndex-1] in semiminima_left_flag_list and
-                                master_list[curIndex+1] in semiminima_left_flag_list)):
+                                master_list[curIndex + 1] in semiminima_left_flag_list)):
 
                             knownLengthsList_changeable[ind] = left_length
                             minRem_changeable -= left_length
@@ -1555,11 +1555,11 @@ class BrevisLengthTranslator(object):
                         # Same as above, but with right flag SMs.
                         # Then, SM rest = right_length
                         elif ((curIndex == 0 and
-                                master_list[curIndex+1] in semiminima_right_flag_list) or
+                                master_list[curIndex + 1] in semiminima_right_flag_list) or
                               (curIndex == len(master_list) - 1 and
                                 master_list[curIndex - 1] in semiminima_right_flag_list) or
                               (master_list[curIndex-1] in semiminima_right_flag_list and
-                                master_list[curIndex+1] in semiminima_right_flag_list)):
+                                master_list[curIndex + 1] in semiminima_right_flag_list)):
 
                             knownLengthsList_changeable[ind] = right_length
                             minRem_changeable -= right_length
@@ -1788,20 +1788,20 @@ class BrevisLengthTranslator(object):
                     for ind in semiminima_rest_list:
                         curIndex = int(master_list.index(ind))
                         if ((curIndex == 0 and
-                                master_list[curIndex+1] in semiminima_left_flag_list) or
+                                master_list[curIndex + 1] in semiminima_left_flag_list) or
                              (curIndex == len(master_list) - 1 and
                                 master_list[curIndex - 1] in semiminima_left_flag_list) or
                              (master_list[curIndex-1] in semiminima_left_flag_list and
-                                    master_list[curIndex+1] in semiminima_left_flag_list)):
+                                    master_list[curIndex + 1] in semiminima_left_flag_list)):
                             knownLengthsList_changeable[ind] = left_length
                             minRem_changeable -= left_length
 
                         elif ((curIndex == 0 and
-                                    master_list[curIndex+1] in semiminima_right_flag_list) or
+                                    master_list[curIndex + 1] in semiminima_right_flag_list) or
                               (curIndex == len(master_list) - 1 and
                                     master_list[curIndex - 1] in semiminima_right_flag_list) or
                               (master_list[curIndex-1] in semiminima_right_flag_list and
-                                    master_list[curIndex+1] in semiminima_right_flag_list)):
+                                    master_list[curIndex + 1] in semiminima_right_flag_list)):
 
                             knownLengthsList_changeable[ind] = right_length
                             minRem_changeable -= right_length
@@ -1913,7 +1913,7 @@ def _allCombinations(combinationList, num):
     if num > 0:
         for i in range(len(combinationList)):
             comb = [combinationList[i]]
-            for c in _allCombinations(combinationList[(i+1):], num-1):
+            for c in _allCombinations(combinationList[(i + 1):], num-1):
                 combs.append(comb + c)
     combs.reverse()
     combs.insert(0, [])
@@ -2103,13 +2103,13 @@ class TestExternal(unittest.TestCase):
         ''' % (len(list(SePerDureca.recurse())), len(list(TinySePerDureca.recurse()))))
 
         for i in range(2):
-            for j in range(len(SePerDureca[i+1])):
-                if j < len(TinySePerDureca[i+1]):
-                    print('norm: %s' % SePerDureca[i+1][j])
-                    print('tiny: %s' % TinySePerDureca[i+1][j])
+            for j in range(len(SePerDureca[i + 1])):
+                if j < len(TinySePerDureca[i + 1]):
+                    print('norm: %s' % SePerDureca[i + 1][j])
+                    print('tiny: %s' % TinySePerDureca[i + 1][j])
                     print('')
                 else:
-                    print('norm only: %s' % SePerDureca[i+1][j])
+                    print('norm only: %s' % SePerDureca[i + 1][j])
                     print('')
 
         #TinySePerDureca.show('text')

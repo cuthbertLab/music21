@@ -528,8 +528,8 @@ def reBar(music21Part, inPlace=True):
                                                               music21Measure,
                                                               e))
                 if measureIndex != len(allMeasures) - 1:
-                    if allMeasures[measureIndex+1].timeSignature is None:
-                        allMeasures[measureIndex+1].timeSignature = lastTimeSignature
+                    if allMeasures[measureIndex + 1].timeSignature is None:
+                        allMeasures[measureIndex + 1].timeSignature = lastTimeSignature
             m2.keySignature = None # suppress the key signature
             m2.clef = None # suppress the clef
             m2.number = m1.number + 1
@@ -539,8 +539,8 @@ def reBar(music21Part, inPlace=True):
         #elif (mEnd + music21Measure.paddingLeft) < tsEnd and measureIndex != len(allMeasures) - 1:
         #    The first and last measures are allowed to be incomplete
         #    music21Measure.timeSignature = music21Measure.bestTimeSignature()
-        #    if allMeasures[measureIndex+1].timeSignature is None:
-        #        allMeasures[measureIndex+1].timeSignature = lastTimeSignature
+        #    if allMeasures[measureIndex + 1].timeSignature is None:
+        #        allMeasures[measureIndex + 1].timeSignature = lastTimeSignature
         #
 
     if not inPlace:

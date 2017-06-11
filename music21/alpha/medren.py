@@ -543,17 +543,17 @@ class GeneralMensuralNote(base.Music21Object):
             if self is item:
                 currentIndex = ind
 
-        for i in range(currentIndex-1, -1, -1):
+        for i in range(currentIndex - 1, -1, -1):
             # Punctus and ligature marks indicate a new measure
             if (('Punctus' in tempList[i].classes) or
                     ('Ligature' in tempList[i].classes)):
-                indOffset = i+1
+                indOffset = i + 1
                 break
             elif 'GeneralMensuralNote' in tempList[i].classes:
                 # In Italian notation, brevis, longa, and maxima indicate a new measure
                 if (('Divisione' in mOrD.classes) and
                         (tempList[i].mensuralType in ['brevis', 'longa', 'maxima'])):
-                    indOffset = i+1
+                    indOffset = i + 1
                     break
                 else:
                     mList.insert(i, tempList[i])
@@ -562,7 +562,7 @@ class GeneralMensuralNote(base.Music21Object):
 
         mList.reverse()
         mList.insert(currentIndex, self)
-        for j in range(currentIndex+1,len(tempList), 1):
+        for j in range(currentIndex + 1,len(tempList), 1):
             if (('Punctus' in tempList[j].classes) or
                     ('Ligature' in tempList[j].classes)):
                 break
@@ -1171,7 +1171,7 @@ class Ligature(base.Music21Object):
         Returns True if the ligature is cum perfectione,
         and False if the ligature is sine perfectione.
         '''
-        return self.notes[self._ligatureLength()-1].mensuralType == 'longa'
+        return self.notes[self._ligatureLength() - 1].mensuralType == 'longa'
 
     def isCOP(self):
         '''
@@ -1335,16 +1335,16 @@ class Ligature(base.Music21Object):
         '''
         if startIndex < self._ligatureLength() - 1:
             currentShape = self.noteheadShape[startIndex]
-            nextShape = self.noteheadShape[startIndex+1]
+            nextShape = self.noteheadShape[startIndex + 1]
             if  ((currentShape == ('oblique', 'end') or nextShape == ('oblique', 'start')) or
-                 (self.isMaxima(startIndex) or self.isMaxima(startIndex+1))):
+                 (self.isMaxima(startIndex) or self.isMaxima(startIndex + 1))):
                 raise MedRenException('cannot start oblique notehead at index %d' % startIndex)
 
             else:
                 self.noteheadShape[startIndex] = ('oblique', 'start')
-                self.noteheadShape[startIndex+1] = ('oblique', 'end')
+                self.noteheadShape[startIndex + 1] = ('oblique', 'end')
         else:
-            raise MedRenException('no note exists at index %d' % (startIndex+1))
+            raise MedRenException('no note exists at index %d' % (startIndex + 1))
         self._notes = []
 
     def makeSquare(self, index):
@@ -1423,7 +1423,7 @@ class Ligature(base.Music21Object):
             if value in (True, 'True', 'true'):
                 if ((self.getNoteheadShape(index) == 'oblique') or
                         (self.getStem(index) != (None, None)) or
-                        (index > 0 and self.getStem(index-1)[0] == 'up')):
+                        (index > 0 and self.getStem(index - 1)[0] == 'up')):
                     raise MedRenException('cannot make note at index %d a maxima' % index)
                 else:
                     self.maximaNotes[index] = value
@@ -1597,12 +1597,12 @@ class Ligature(base.Music21Object):
                 else:
                     if endIndex > 0:
                         tempPitchCurrent = copy.copy(self.pitches[endIndex])
-                        tempPitchPrev = copy.copy(self.pitches[endIndex-1])
+                        tempPitchPrev = copy.copy(self.pitches[endIndex - 1])
 
                         tempPitchCurrent._setAccidental(None)
                         tempPitchPrev._setAccidental(None)
-                        if ((not self.isReversed(endIndex-1))
-                                and (self.getStem(endIndex-1)[0] != 'up')
+                        if ((not self.isReversed(endIndex - 1))
+                                and (self.getStem(endIndex - 1)[0] != 'up')
                                 and (self.getStem(endIndex) == ('down', 'left'))
                                 and (tempPitchCurrent > tempPitchPrev)):
                             self.reversedNotes[endIndex] = True
@@ -1612,7 +1612,7 @@ class Ligature(base.Music21Object):
                                 'the note at index %d cannot be given reverse value %s' %
                                 (endIndex, value))
                     else:
-                        raise MedRenException('no note exists at index %d' % (endIndex-1,))
+                        raise MedRenException('no note exists at index %d' % (endIndex - 1,))
             else:
                 raise MedRenException('reverse value %s not supported for ligatures.' % (value,))
         else:
@@ -1632,13 +1632,13 @@ class Ligature(base.Music21Object):
 
         if self.getStem(ind)[0] == 'up':
             notes.append(MensuralNote(self.pitches[ind], 'semibrevis'))
-            notes.append(MensuralNote(self.pitches[ind+1], 'semibrevis'))
+            notes.append(MensuralNote(self.pitches[ind + 1], 'semibrevis'))
             ind += 2
         elif self.getStem(ind)[0] == 'down':
             if self.getNoteheadShape(ind) == 'oblique':
                 notes.append(MensuralNote(self.pitches[ind], 'brevis'))
             else:
-                if self.pitches[ind+1] < self.pitches[ind]:
+                if self.pitches[ind + 1] < self.pitches[ind]:
                     notes.append(MensuralNote(self.pitches[ind], 'brevis'))
                 else:
                     notes.append(MensuralNote(self.pitches[ind], 'longa'))
@@ -1650,16 +1650,16 @@ class Ligature(base.Music21Object):
                 if self.getNoteheadShape(ind) == 'oblique':
                     notes.append(MensuralNote(self.pitches[ind], 'longa'))
                 else:
-                    if self.pitches[ind+1] < self.pitches[ind]:
+                    if self.pitches[ind + 1] < self.pitches[ind]:
                         notes.append(MensuralNote(self.pitches[ind], 'longa'))
                     else:
                         notes.append(MensuralNote(self.pitches[ind], 'brevis'))
             ind += 1
 
-        while ind < self._ligatureLength()-1:
+        while ind < self._ligatureLength() - 1:
             if self.getStem(ind)[0] == 'up':
                 notes.append(MensuralNote(self.pitches[ind],  'semibrevis'))
-                notes.append(MensuralNote(self.pitches[ind+1], 'semibrevis'))
+                notes.append(MensuralNote(self.pitches[ind + 1], 'semibrevis'))
                 ind += 2
             elif self.getStem(ind)[0] == 'down':
                 notes.append(MensuralNote(self.pitches[ind], 'longa'))
@@ -1676,7 +1676,7 @@ class Ligature(base.Music21Object):
                 if self.getNoteheadShape(ind) == 'oblique':
                     notes.append(MensuralNote(self.pitches[ind], 'longa'))
                 else:
-                    if self.pitches[ind-1] < self.pitches[ind]:
+                    if self.pitches[ind - 1] < self.pitches[ind]:
                         notes.append(MensuralNote(self.pitches[ind], 'longa'))
                     else:
                         notes.append(MensuralNote(self.pitches[ind], 'brevis'))
@@ -1687,7 +1687,7 @@ class Ligature(base.Music21Object):
                     if self.getNoteheadShape(ind) == 'oblique':
                         notes.append(MensuralNote(self.pitches[ind], 'brevis'))
                     else:
-                        if self.pitches[ind-1] < self.pitches[ind]:
+                        if self.pitches[ind - 1] < self.pitches[ind]:
                             notes.append(MensuralNote(self.pitches[ind], 'brevis'))
                         else:
                             notes.append(MensuralNote(self.pitches[ind], 'longa'))
@@ -2053,8 +2053,8 @@ def cummingSchubertStrettoFuga(score):
     sn = score.flat.notes
     strettoKeys = {8: 0, -8: 0, 5: 0, -5: 0, 4: 0, -4: 0}
 
-    for i in range(len(sn)-1):
-        thisInt = interval.notesToInterval(sn[i], sn[i+1])
+    for i in range(len(sn) - 1):
+        thisInt = interval.notesToInterval(sn[i], sn[i + 1])
         thisGeneric = thisInt.generic.directed
         for strettoType in [8, -8, 5, -5, 4, -4]:
             strettoAllowed = [x[0] for x in allowableStrettoIntervals[strettoType]]
@@ -2074,7 +2074,7 @@ def cummingSchubertStrettoFuga(score):
 
     print("intv.\tcount\tpercent")
     for l in sorted(strettoKeys):
-        print("%2d\t%3d\t%2d%%" % (l, strettoKeys[l], strettoKeys[l] * 100/len(sn) - 1))
+        print("%2d\t%3d\t%2d%%" % (l, strettoKeys[l], strettoKeys[l] * 100 / len(sn) - 1))
     print("\n")
 
 class MedRenException(exceptions21.Music21Exception):

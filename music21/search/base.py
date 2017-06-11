@@ -503,7 +503,7 @@ def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
         if previousQL is None or previousQL == ql:
             ascShift = 27 + 14
         elif previousQL > ql:
-            ascShift = 27*2 + 14
+            ascShift = 27 * 2 + 14
         else:
             ascShift = 14
         previousQL = ql

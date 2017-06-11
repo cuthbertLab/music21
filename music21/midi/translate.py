@@ -1448,24 +1448,24 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     while i < len(mt.events):
         # in pairs, first should be delta time, second should be event
         #environLocal.printDebug(['midiTrackToStream(): index', 'i', i, mt.events[i]])
-        #environLocal.printDebug(['midiTrackToStream(): index', 'i+1', i+1, mt.events[i+1]])
+        #environLocal.printDebug(['midiTrackToStream(): index', 'i + 1', i + 1, mt.events[i + 1]])
 
         # need to find pairs of delta time and events
         # in some cases, there are delta times that are out of order, or
         # packed in the beginning
-        if mt.events[i].isDeltaTime() and not mt.events[i+1].isDeltaTime():
+        if mt.events[i].isDeltaTime() and not mt.events[i + 1].isDeltaTime():
             td = mt.events[i]
-            e = mt.events[i+1]
+            e = mt.events[i + 1]
             t += td.time # increment time
             events.append([t, e])
             i += 2
             continue
         elif (not mt.events[i].isDeltaTime() and not
-            mt.events[i+1].isDeltaTime()):
+            mt.events[i + 1].isDeltaTime()):
             #environLocal.printDebug(['midiTrackToStream(): got two non delta times in a row'])
             i += 1
             continue
-        elif mt.events[i].isDeltaTime() and mt.events[i+1].isDeltaTime():
+        elif mt.events[i].isDeltaTime() and mt.events[i + 1].isDeltaTime():
             #environLocal.printDebug(['midiTrackToStream(): got two delta times in a row'])
             i += 1
             continue
@@ -1489,7 +1489,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
         if e.isNoteOn():
             match = None
             #environLocal.printDebug(['midiTrackToStream(): isNoteOn', e])
-            for j in range(i+1, len(events)):
+            for j in range(i + 1, len(events)):
                 if j in memo:
                     continue
                 tSub, eSub = events[j]
@@ -1556,7 +1556,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
             # window to make into a chord
             # if we find a note with a different end time but same start
             # time, through into a different voice
-            for j in range(i+1, len(notes)):
+            for j in range(i + 1, len(notes)):
                 # look at each on time event
                 onSub, offSub = notes[j]
                 tSub, unused_eSub = onSub
@@ -2748,7 +2748,7 @@ class Test(unittest.TestCase):
         period = 50
         s = stream.Stream()
         for i in range(100):
-            scalar = (math.sin(i * (math.pi*2) / period) + 1) * .5
+            scalar = (math.sin(i * (math.pi * 2) / period) + 1) * 0.5
             n = ((maxTempo - minTempo) * scalar) + minTempo
             s.append(tempo.MetronomeMark(number=n))
             s.append(note.Note('g3'))
@@ -2891,7 +2891,7 @@ class Test(unittest.TestCase):
             triples = []
             for i in range(0, len(mf.tracks[0].events), 2):
                 d  = mf.tracks[0].events[i] # delta
-                e  = mf.tracks[0].events[i+1] # events
+                e  = mf.tracks[0].events[i + 1] # events
                 triples.append((d.time, e.type, e.pitch))
             self.assertEqual(triples, match)
 

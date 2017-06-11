@@ -23,9 +23,9 @@ def simple1():
                 instrument.Instrument)[0].bestName()
             title='%s, Movement %s, %s' % (work, movementNumber, instrumentName)
 
-            g = graph.PlotScatterPitchSpaceQuarterLength(part.flat.sorted,
+            g = graph.plot.ScatterPitchSpaceQuarterLength(part.flat.sorted,
                 title=title)
-            g.process()
+            g.run()
 
 def simple2():
     '''
@@ -172,9 +172,9 @@ def simple4a(show=True):
         else:
             doneAction = 'write'
 
-        p = graph.PlotScatterWeightedPitchSpaceDynamicSymbol(s.parts[0].flat,
+        p = graph.plot.ScatterWeightedPitchSpaceDynamicSymbol(s.parts[0].flat,
              doneAction=doneAction, title=titleStr)
-        p.process()
+        p.run()
 
 
 
@@ -267,7 +267,7 @@ def simple4f(show=True):
         eventStream = part.flat.notesAndRests
         for i in range(len(eventStream)):
             e = eventStream[i]
-            if isinstance(e, note.Rest) or i == len(eventStream)-1:
+            if isinstance(e, note.Rest) or i == len(eventStream) - 1:
                 if len(candidateSet) > 0:
                     candidateSet.sort()
                     # this removes redundancies for simplicity
@@ -288,13 +288,13 @@ def simple4g():
     work = 'opus18no1'
     movements = corpus.getWork(work)
     movementNumber = 3
-    s = converter.parse(movements[movementNumber-1])
+    s = converter.parse(movements[movementNumber - 1])
     count = 0
     for part in s:
         noteStream = part.flat.getElementsByClass(note.Note)
-        for i in range(len(noteStream)-1):
+        for i in range(len(noteStream) - 1):
             # assuming spelling does not count
-            if noteStream[i].midi == noteStream[i+1].midi:
+            if noteStream[i].midi == noteStream[i + 1].midi:
                 count += 1
     print('repeated pitches for %s, movement %s: %s counts' % (work,
                      movementNumber, count))
@@ -306,8 +306,8 @@ def threeDimChopin():
 
     streamObject = converter.parse(testFiles.mazurka6)
     stream2 = streamObject.stripTies()
-    g = graph.Plot3DBarsPitchSpaceQuarterLength(stream2)
-    g.process()
+    g = graph.plot.Plot3DBarsPitchSpaceQuarterLength(stream2)
+    g.run()
 
 
 def threeDimMozart():
@@ -316,8 +316,8 @@ def threeDimMozart():
     streamObject = converter.parse(mozartTrioK581Excerpt) #
 #    stream2 = streamObject.stripTies() # adds one outlier that makes the graph difficult to read
 
-    g = graph.Plot3DBarsPitchSpaceQuarterLength(streamObject.flat)
-    g.process()
+    g = graph.plot.Plot3DBarsPitchSpaceQuarterLength(streamObject.flat)
+    g.run()
 
 
 
@@ -326,12 +326,12 @@ def threeDimBoth():
     from music21.humdrum import testFiles as kernTest
 
     mozartStream = converter.parse(mozartTrioK581Excerpt)
-    g = graph.Plot3DBarsPitchSpaceQuarterLength(mozartStream.flat)
-    g.process()
+    g = graph.plot.Plot3DBarsPitchSpaceQuarterLength(mozartStream.flat)
+    g.run()
 
     chopinStream = converter.parse(kernTest.mazurka6)
-    g = graph.Plot3DBarsPitchSpaceQuarterLength(chopinStream.flat)
-    g.process()
+    g = graph.plot.Plot3DBarsPitchSpaceQuarterLength(chopinStream.flat)
+    g.run()
 
 
 
@@ -345,10 +345,10 @@ def januaryThankYou():
             print(workName, str(partNum))
             thisPart = beethovenScore[partNum]
             display = stream.Stream()
-            notes = thisPart.flat.findConsecutiveNotes(skipUnisons = True, skipChords = True,
-                       skipOctaves = True, skipRests = True, noNone = True )
+            notes = thisPart.flat.findConsecutiveNotes(skipUnisons=True, skipChords=True,
+                       skipOctaves=True, skipRests=True, noNone=True )
             for i in range(len(notes) - 4):
-                if notes[i].name == 'E-' and notes[i+1].name == 'E' and notes[i+2].name == 'A':
+                if notes[i].name == 'E-' and notes[i + 1].name == 'E' and notes[i + 2].name == 'A':
                     measureNumber = 0
                     for site in notes[i].sites.get():
                         if isinstance(site, stream.Measure):
@@ -357,9 +357,9 @@ def januaryThankYou():
                     notes[i].lyric = workName + " " + str(thisPart.id) + " " + str(measureNumber)
                     m = stream.Measure()
                     m.append(notes[i])
-                    m.append(notes[i+1])
-                    m.append(notes[i+2])
-                    m.append(notes[i+3])
+                    m.append(notes[i + 1])
+                    m.append(notes[i + 2])
+                    m.append(notes[i + 3])
                     m.insert(0, m.bestClef())
                     display.append(m)
 

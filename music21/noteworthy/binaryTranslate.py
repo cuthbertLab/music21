@@ -203,10 +203,10 @@ class NWCConverter(object):
         '''
         fc = self.fileContents
         pp = self.parsePosition
-        value = struct.unpack('<h', fc[pp:pp+2])[0]
+        value = struct.unpack('<h', fc[pp:pp + 2])[0]
 
         if updateParsePosition is True:
-            self.parsePosition = pp+2
+            self.parsePosition = pp + 2
         return value
 
     def byteToInt(self, updateParsePosition=True):
@@ -216,10 +216,10 @@ class NWCConverter(object):
         '''
         fc = self.fileContents
         pp = self.parsePosition
-        value = ord(fc[pp:pp+1])
+        value = ord(fc[pp:pp + 1])
         #print value
         if updateParsePosition is True:
-            self.parsePosition = pp+1
+            self.parsePosition = pp + 1
         return value
 
     def byteToSignedInt(self, updateParsePosition=True):
@@ -316,8 +316,8 @@ class NWCConverter(object):
     def advanceToNotNUL(self, nul=b'\x00'):
         pp = self.parsePosition
         fc = self.fileContents
-        # the slice Notation [pp:pp+1] is needed to avoid Py3 conversion to bytes
-        while fc[pp:pp+1] == nul:
+        # the slice Notation [pp:pp + 1] is needed to avoid Py3 conversion to bytes
+        while fc[pp:pp + 1] == nul:
             pp += 1
         self.parsePosition = pp
 

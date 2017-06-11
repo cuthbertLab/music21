@@ -81,7 +81,7 @@ def assembleLyrics(streamIn, lineNumber=1):
     # need to find maximum number of lyrics on each note
     for n in noteStream:
         try:
-            lyricObj = n.lyrics[lineNumber-1] # a list of lyric objs
+            lyricObj = n.lyrics[lineNumber - 1] # a list of lyric objs
         except IndexError:
             continue
         #environLocal.printDebug(['lyricObj', 'lyricObj.text', lyricObj.text,
@@ -417,7 +417,7 @@ class LanguageDetector(object):
 
         >>> ld = text.LanguageDetector()
         >>> for i in range(0, len(ld.languageCodes)):
-        ...    print(str(i+1) + " " +  ld.languageCodes[i])
+        ...    print(str(i + 1) + " " +  ld.languageCodes[i])
         1 en
         2 fr
         3 it
@@ -438,7 +438,7 @@ class LanguageDetector(object):
             langCode = self.mostLikelyLanguage(excerpt)
             for i in range(len(self.languageCodes)):
                 if self.languageCodes[i] == langCode:
-                    return i+1
+                    return i + 1
             raise TextException("got a language that was not in the codes; should not happen")
 
 #-------------------------------------------------------------------------------

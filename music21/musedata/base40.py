@@ -477,7 +477,7 @@ class BaseN(object):
                 outLetters.append(letter + '-' * i)
             outLetters.append(letter)
             for i in range(self.order):
-                outLetters.append(letter + '#' * (i+1))
+                outLetters.append(letter + '#' * (i + 1))
             if letter not in ('E', 'B'):
                 outLetters.append(None)
         return outLetters

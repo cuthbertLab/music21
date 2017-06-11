@@ -191,7 +191,7 @@ def pendulumMusic(show = True,
     parts[3].insert(0, clef.Bass8vbClef())
     for i in range(totalParts):
         j = 1.0
-        while j < (jMax+1.0):
+        while j < (jMax + 1.0):
             ps = p.ps
             if ps > 84:
                 active = 0

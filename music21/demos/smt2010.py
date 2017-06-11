@@ -225,9 +225,9 @@ def findPotentialPassingTones(show=True):
     gcn[0].lyric = ""
     gcn[-1].lyric = ""
     for i in range(1, len(gcn) - 1):
-        prev = gcn[i-1]
+        prev = gcn[i - 1]
         cur  = gcn[i]
-        nextN = gcn[i+1]
+        nextN = gcn[i + 1]
 
         cur.lyric = ""
 
@@ -369,7 +369,7 @@ def corpusFindMelodicSevenths(show=True):
         noteStream = s.flat.getElementsByClass('Note')
         for i, n in enumerate(noteStream):
             if i <= len(noteStream) - 2:
-                nNext = noteStream[i+1]
+                nNext = noteStream[i + 1]
             else:
                 nNext = None
 

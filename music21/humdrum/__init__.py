@@ -81,7 +81,7 @@ trans_        `.transpose(Interval)`                             Note: :meth:`~m
 urrhythm_     To-Do                                              will be "`analysis.JohnsonLaird.urrhythm(Stream)`" but not yet written -- low priority
 veritas_      None                                               Not needed.  use `import md5` or other checksum files
 vox_          None                                               `len(Chord.pitches())` works for a chord.  Stream has many methods for performing this function.
-xdelta_       None                                               Not needed.  Use `stream[i+1].property - stream[i].property` for similar effects.
+xdelta_       None                                               Not needed.  Use `stream[i + 1].property - stream[i].property` for similar effects.
 yank_         "if"
 ydelta_       None                                               Not needed.
 ============  =================================================  =========================================================================================================================================================================

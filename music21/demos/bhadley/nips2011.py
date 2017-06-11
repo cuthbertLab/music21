@@ -316,7 +316,7 @@ def getLeadsheetDatesFromBillboard():
                 matches = matches + 1
                 outputjson = outputjson + '{\"%s":[%s,%s]}, ' % (i, date, rank)
         if (i % 500) == 0:
-            j = ((i-1000) / (11938.00)) * 100.00
+            j = ((i - 1000) / (11938.00)) * 100.00
             print ('%s %%' %round(j, 2))
             print (outputjson)
 

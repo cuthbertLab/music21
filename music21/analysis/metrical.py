@@ -126,9 +126,9 @@ def thomassenMelodicAccent(streamIn):
             n.melodicAccent = p2Accent
             continue
 
-        lastPs = streamIn[i-1].pitch.ps
+        lastPs = streamIn[i - 1].pitch.ps
         thisPs = n.pitch.ps
-        nextPs = streamIn[i+1].pitch.ps
+        nextPs = streamIn[i + 1].pitch.ps
 
         if lastPs == thisPs and thisPs == nextPs:
             thisAccent = 0.0

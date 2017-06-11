@@ -285,7 +285,7 @@ class WindowedAnalysis(object):
         metaMatrix = []
 
         if common.isNum(windowStepSize):
-            windowSizes = list(range(minLength, maxLength+1, windowStepSize))
+            windowSizes = list(range(minLength, maxLength + 1, windowStepSize))
         else:
             num, junk = common.getNumFromStr(windowStepSize)
             windowSizes = []
@@ -293,7 +293,7 @@ class WindowedAnalysis(object):
             while True:
                 windowSizes.append(x)
                 x = x * round(int(num))
-                if x > (maxLength * .75):
+                if x > (maxLength * 0.75):
                     break
 
         if includeTotalWindow:

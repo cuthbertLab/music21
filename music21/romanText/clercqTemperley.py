@@ -404,9 +404,10 @@ class CTSong(object):
         for line in self.lines[1:]:
             if "%" in line:
                 if line.split()[0].endswith(':'):
-                    comments.append([ line.split()[0] , (line[line.index('%')+1:].strip()) ] )
+                    comments.append([line.split()[0], 
+                                     (line[line.index('%') + 1:].strip())] )
                 else:
-                    comments.append([ line[line.index('%')+1:].strip() ])
+                    comments.append([line[line.index('%') + 1:].strip()])
         return comments
 
     @property
@@ -722,8 +723,8 @@ class CTRule(object):
         # first pass -- separate by | or |*3, etc.
         for i in range(0, len(measureGroupTemp), 2):
             content = measureGroupTemp[i].strip()
-            if i+1 < len(measureGroupTemp):
-                sep = measureGroupTemp[i+1]
+            if i + 1 < len(measureGroupTemp):
+                sep = measureGroupTemp[i + 1]
             else:
                 sep = ""
             if content != "" or sep != "":
@@ -885,7 +886,7 @@ class CTRule(object):
         'This is a comment'
         '''
         if "%" in self.text:
-            return self.text[self.text.index('%')+1:].strip()
+            return self.text[self.text.index('%') + 1:].strip()
         else:
             return None
 

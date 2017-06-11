@@ -31,7 +31,7 @@ def countTimeSig():
 
     for thisKey in sorted(timeSigCounter):
         print(thisKey, ":", timeSigCounter[thisKey],
-              str(int(timeSigCounter[thisKey]*100/totalPieces)) + "%")
+              str(int(timeSigCounter[thisKey] * 100 / totalPieces)) + "%")
 
 def sortByPMFC(work):
     '''

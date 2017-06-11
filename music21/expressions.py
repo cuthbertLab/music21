@@ -298,7 +298,7 @@ class GeneralMordent(Ornament):
             raise ExpressionException("Cannot realize a mordent if there is no size given")
         if srcObj.duration is None or srcObj.duration.quarterLength == 0:
             raise ExpressionException("Cannot steal time from an object with no duration")
-        if srcObj.duration.quarterLength < self.quarterLength*2:
+        if srcObj.duration.quarterLength < self.quarterLength * 2:
             raise ExpressionException("The note is not long enough to realize a mordent")
 
         remainderDuration = srcObj.duration.quarterLength - (2 * self.quarterLength)

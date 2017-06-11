@@ -922,8 +922,8 @@ class Test(unittest.TestCase):
         l1 = s.findConsecutiveNotes()
         self.assertTrue(l1[0] is n1)
         self.assertTrue(l1[1] is n2)
-        l2 = s.findConsecutiveNotes(skipChord=True)
-        self.assertTrue(len(l2) == 1)
+        l2 = s.findConsecutiveNotes(skipChords=True)
+        self.assertEqual(len(l2), 1)
         self.assertTrue(l2[0] is n1)
 
         r1 = note.Rest()
@@ -2339,7 +2339,7 @@ class Test(unittest.TestCase):
                 m = Measure()
                 m.timeSignature = meter.TimeSignature('4/4')
                 m.keySignature = ks
-                for p in scale*2:
+                for p in scale * 2:
                     n = note.Note(p)
                     n.quarterLength = .25
                     n.addLyric(n.pitch.name)
@@ -2358,7 +2358,7 @@ class Test(unittest.TestCase):
         bm = converter.parse(
                 "tinynotation: 4/4 c#'2 b-2~ b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8",
                 makeNotation=False)
-        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat = False)
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         allNotes = bm.flat.notes
         #      0C#  1B-~  | 2B-  3C#~  4C#    6B-     7C#    8B-~   9B-~   10B-
         ds = [True, True, False, True, False, True, False, False, False, False]
@@ -2373,7 +2373,7 @@ class Test(unittest.TestCase):
         bm = converter.parse(
             "tinynotation: 4/4 c#'2 b-2~ b-8 b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8",
             makeNotation=False)
-        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat = False)
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         allNotes = bm.flat.notes
         #      0C#  1B-~  | 2B-   3B-  4C#~  5C#    6B-     7C#    8B-~   9B-~  | 10B-
         ds = [True, True, False, True, True, False, False, False, False, False, False]
@@ -2943,7 +2943,7 @@ class Test(unittest.TestCase):
             sProc.insertAndShift(insertOffset, nAlter)
             self.assertEqual(sProc.highestOffset, newHighOffset)
             self.assertEqual(sProc.highestTime, newHighTime)
-            self.assertEqual(len(sProc), len(s)+1)
+            self.assertEqual(len(sProc), len(s) + 1)
 
             # try the same with scrambled elements
             sProc = copy.deepcopy(s)
@@ -2957,7 +2957,7 @@ class Test(unittest.TestCase):
             sProc.insertAndShift(insertOffset, nAlter)
             self.assertEqual(sProc.highestOffset, newHighOffset)
             self.assertEqual(sProc.highestTime, newHighTime)
-            self.assertEqual(len(sProc), len(s)+1)
+            self.assertEqual(len(sProc), len(s) + 1)
 
 
     def testInsertAndShiftNoDuration(self):
@@ -2987,7 +2987,7 @@ class Test(unittest.TestCase):
             sProc.insertAndShift(insertOffset, c)
             self.assertEqual(sProc.highestOffset, newHighOffset)
             self.assertEqual(sProc.highestTime, newHighTime)
-            self.assertEqual(len(sProc), len(s)+1)
+            self.assertEqual(len(sProc), len(s) + 1)
 
 
 
@@ -3258,7 +3258,7 @@ class Test(unittest.TestCase):
             triples = []
             for i in range(0, len(mf.tracks[0].events), 2):
                 d  = mf.tracks[0].events[i] # delta
-                e  = mf.tracks[0].events[i+1] # events
+                e  = mf.tracks[0].events[i + 1] # events
                 triples.append((d.time, e.type, e.pitch))
             # TODO: temporary removed
             #self.assertEqual(triples, match)
@@ -3740,10 +3740,10 @@ class Test(unittest.TestCase):
         # TODO: the output of this is missing a tie to the last dotted half
         from music21 import stream
         s = stream.Stream()
-        for duration in [.5, 1.5, 3]:
+        for duration in [0.5, 1.5, 3]:
             for offset in [0, 1.5, 4, 6]:
                 # create a midi pitch value from duration
-                s.insert(offset, note.Note(50+(duration*2)+(offset*2),
+                s.insert(offset, note.Note(50 + (duration * 2) + (offset * 2),
                             quarterLength=duration))
         #s.show()
         sPost = s.makeNotation()
@@ -5460,7 +5460,7 @@ class Test(unittest.TestCase):
 
         for i, n in enumerate(exFlatNotes):
             if i < len(exFlatNotes) - 1:
-                nNext = exFlatNotes[i+1]
+                nNext = exFlatNotes[i + 1]
             else:
                 continue
 

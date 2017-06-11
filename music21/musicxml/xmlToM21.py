@@ -2744,12 +2744,12 @@ class MeasureParser(XMLParserBase):
             post.duration.slash = False
 
         try:
-            post.duration.stealTimePrevious = int(mxGrace.get('steal-time-previous'))/100
+            post.duration.stealTimePrevious = int(mxGrace.get('steal-time-previous')) / 100
         except TypeError:
             pass
 
         try:
-            post.duration.stealTimeFollowing = int(mxGrace.get('steal-time-following'))/100
+            post.duration.stealTimeFollowing = int(mxGrace.get('steal-time-following')) / 100
         except TypeError:
             pass
 

@@ -94,7 +94,7 @@ def generateRandomRows(numberToGenerate=1000):
                 myRow.append(newLetter)
                 lastLetter = newLetter
             else:
-                j = j-1
+                j = j - 1
         returnRows.append(''.join(myRow))
     return returnRows
 
@@ -215,7 +215,7 @@ def findEmbeddedChords(testSet='0234589', cardinality=3, skipInverse=False):
         ret += "\n[" + myPitchString + "]: "
         for i in range(12):
             notFound = False
-            transPitches = [(p+i)%12 for p in myPitches]
+            transPitches = [(p + i) % 12 for p in myPitches]
             for p in transPitches:
                 if p not in eschbegSplit12:
                     notFound = True
@@ -236,7 +236,7 @@ def findEmbeddedChords(testSet='0234589', cardinality=3, skipInverse=False):
                 ret += "\n[" + myInverseString + "]: "
                 for i in range(12):
                     notFound = False
-                    transInverse = [(p+i)%12 for p in myInverse]
+                    transInverse = [(p + i) % 12 for p in myInverse]
                     for p in transInverse:
                         if p not in eschbegSplit12:
                             notFound = True

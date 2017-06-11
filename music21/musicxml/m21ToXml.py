@@ -5390,7 +5390,7 @@ class TestExternal(unittest.TestCase):
         for i, l in enumerate(differ):
             if l.startswith('-') or l.startswith('?') or l.startswith('+'):
                 print(l)
-                # for j in range(i-1,i+1):
+                # for j in range(i - 1,i + 1):
                 #    print(differ[j])
                 # print('------------------')
 

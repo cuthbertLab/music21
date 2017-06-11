@@ -2982,7 +2982,7 @@ class Test(unittest.TestCase):
         import random
         from music21 import bar, note, stream, meter
 
-        dur = [.125, .25, .5, .125]
+        dur = [0.125, 0.25, 0.5, 0.125]
         durA = dur
         durB = dur[1:] + dur[:1]
         durC = dur[2:] + dur[:2]
@@ -3006,7 +3006,7 @@ class Test(unittest.TestCase):
         # alter all repeatTimes values, expand, and append to final
         for i in range(6):
             for rb in repeatHandles:
-                rb.times = random.choice([0,1,3])
+                rb.times = random.choice([0, 1, 3])
             expanded = s.expandRepeats()
             for m in expanded:
                 final.append(m)
@@ -3030,7 +3030,7 @@ class Test(unittest.TestCase):
         from music21 import bar, note, stream, meter, pitch
         from music21 import features
 
-        dur = [.125, .25, .5, .125]
+        dur = [0.125, 0.25, 0.5, 0.125]
         repeatTimesCycle = [0, 1, 3, 5]
         pitches = [pitch.Pitch(p) for p in ['a2', 'b-3', 'a2', 'a2']]
 

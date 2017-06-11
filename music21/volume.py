@@ -604,7 +604,7 @@ class Test(unittest.TestCase):
         self.assertEqual(match, ['0.71'] * 16)
 
         for i, d in enumerate(['pp', 'p', 'mp', 'f', 'mf', 'ff', 'ppp', 'mf']):
-            s.insert(i*2, dynamics.Dynamic(d))
+            s.insert(i * 2, dynamics.Dynamic(d))
 
         # cached will be out of date in regard to new dynamics
         match = [n.volume.cachedRealizedStr for n in s.notes]

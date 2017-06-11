@@ -790,7 +790,7 @@ class CapellaImporter(object):
             slashIndex = baseValue.find("/")
             if slashIndex != -1:
                 firstNumber = int(baseValue[0:slashIndex])
-                secondNumber = int(baseValue[slashIndex+1:])
+                secondNumber = int(baseValue[slashIndex + 1:])
                 quarterLength = (4.0 * firstNumber)/secondNumber
                 dur.quarterLength = quarterLength
 

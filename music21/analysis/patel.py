@@ -55,12 +55,12 @@ def nPVI(streamForAnalysis):
     for i in range(1, totalElements):
         thisQL = s[i].quarterLength
         if thisQL > 0 and prevQL > 0:
-            summation += abs(thisQL - prevQL)/((thisQL + prevQL)/2.0)
+            summation += abs(thisQL - prevQL) / ((thisQL + prevQL) / 2.0)
         else:
             pass
         prevQL = thisQL
 
-    final = summation * 100/(totalElements - 1)
+    final = summation * 100 / (totalElements - 1)
     return final
 
 def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
@@ -104,7 +104,7 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
         mean = mean + a
     mean = mean / float(totalElements)
     for a in semitoneList:
-        std = std + (a - mean)**2
+        std = std + (a - mean) ** 2
     std = math.sqrt(std / float(totalElements - 1))
     return 100*(std/mean)
 

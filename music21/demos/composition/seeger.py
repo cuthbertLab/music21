@@ -20,8 +20,8 @@ def lowerLines():
     currentNote = 0
     rotationNumber = 1
     myRow = stream.Part()
-    for phraseNumber in range(1,21):
-        myRow.append(note.Rest(quarterLength=restLengths[phraseNumber]/2.0))
+    for phraseNumber in range(1, 21):
+        myRow.append(note.Rest(quarterLength=restLengths[phraseNumber] / 2.0))
         if phraseNumber == 8: ## inconsistency in RCS's scheme
             currentNote += 2
         for addNote in range(21 - phraseNumber):
@@ -65,7 +65,7 @@ def lowerLines():
 
     #retrograde
     totalNotes = len(myRow)
-    for i in range(2, totalNotes+1): #skip last note
+    for i in range(2, totalNotes + 1): #skip last note
         el = myRow[totalNotes-i]
         if 'Note' in el.classes:
             elNote = el.transpose('A1')

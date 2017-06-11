@@ -232,7 +232,7 @@ def _copyMultipleMeasures(t, p, kCurrent):
 
     measures = []
     for mPast in p.getElementsByClass('Measure'):
-        if mPast.number in range(targetStart, targetEnd +1):
+        if mPast.number in range(targetStart, targetEnd + 1):
             try:
                 m = copy.deepcopy(mPast)
             except TypeError:

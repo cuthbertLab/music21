@@ -173,7 +173,7 @@ class RTTagged(RTToken):
             iFirst = src.find(':') # first index found at
             self.tag = src[:iFirst].strip()
             # add one to skip colon
-            self.data = src[iFirst+1:].strip()
+            self.data = src[iFirst + 1:].strip()
         else: # we do not have a clear tag; perhaps store all as data
             self.data = src
 

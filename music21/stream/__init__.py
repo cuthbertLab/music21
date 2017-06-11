@@ -1685,7 +1685,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             i = 0
             while i < len(offsetOrItemOrList):
                 offset = offsetOrItemOrList[i]
-                item = offsetOrItemOrList[i+1]
+                item = offsetOrItemOrList[i + 1]
                 # recursively calling insert() here
                 self.insert(offset, item, ignoreSort=ignoreSort)
                 i += 2
@@ -2095,7 +2095,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             i = 0
             while i < len(insertList):
                 o = insertList[i]
-                e = insertList[i+1]
+                e = insertList[i + 1]
                 #if hasattr(e, 'duration')  and e.duration is not None:
                 if e.duration is not None:
                     qL = e.duration.quarterLength
@@ -5185,7 +5185,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for i in range(len(onAndOffOffsets) - 1):
                 # get all notes within the start and the minwindow size
                 oStart = onAndOffOffsets[i]
-                oEnd = onAndOffOffsets[i+1]
+                oEnd = onAndOffOffsets[i + 1]
                 subNotes = returnObj.getElementsByOffset(
                                 oStart,
                                 oEnd,
@@ -5917,16 +5917,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if m.keySignature is not None:
                     ksLast = m.keySignature
                 if i > 0 and m.keySignature is None:
-                    if (measureStream[i-1]
-                            and hasattr(measureStream[i-1][-1], "tie")
-                            and measureStream[i-1][-1].tie is not None
-                            and measureStream[i-1][-1].tie.type != 'stop'):
+                    if (measureStream[i - 1]
+                            and hasattr(measureStream[i - 1][-1], "tie")
+                            and measureStream[i - 1][-1].tie is not None
+                            and measureStream[i - 1][-1].tie.type != 'stop'):
                         lastNoteWasTied = True
                     else:
                         lastNoteWasTied = False
 
                     m.makeAccidentals(
-                        pitchPastMeasure=measureStream[i-1].pitches,
+                        pitchPastMeasure=measureStream[i - 1].pitches,
                         useKeySignature=ksLast,
                         searchKeySignatureByContext=False,
                         lastNoteWasTied=lastNoteWasTied,
@@ -6031,7 +6031,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # print(_MOD, elements)
         for i in range(len(elements)-1):
             #print(i, len(elements))
-            span = self.elementOffset(elements[i+1]) - self.elementOffset(elements[i])
+            span = self.elementOffset(elements[i + 1]) - self.elementOffset(elements[i])
             elements[i].duration.quarterLength = span
 
         # handle last element
@@ -6317,7 +6317,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # iterate over all possible elements
             if ignoreRests:
                 # need to find the offset of the first thing that is not rest
-                for j in range(currentIndex+1, len(srcStream._elements)):
+                for j in range(currentIndex + 1, len(srcStream._elements)):
                     e = srcStream._elements[j]
                     if 'NotRest' in e.classes:
                         # change target offset to this position
@@ -7384,7 +7384,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # if not the last ti, get the next by index to get the offset
             if i < len(offsetMetronomeMarkPairs) - 1:
                 # cases of two or more remain
-                oEnd, unused_mmEnd = offsetMetronomeMarkPairs[i+1]
+                oEnd, unused_mmEnd = offsetMetronomeMarkPairs[i + 1]
             else: # at the last
                 oEnd = self.highestTime
             sec += mmStart.durationToSeconds(oEnd-oStart)
@@ -7485,7 +7485,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     mmBoundaries.append((offsetPairs[i][0], highestTime,
                                          offsetPairs[i][1]))
                 else: # add with next boundary
-                    mmBoundaries.append((offsetPairs[i][0], offsetPairs[i+1][0],
+                    mmBoundaries.append((offsetPairs[i][0], offsetPairs[i + 1][0],
                                          offsetPairs[i][1]))
 
         #environLocal.printDebug(['self.metronomeMarkBoundaries()',
@@ -9098,7 +9098,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         returnStream = self.cloneEmpty(derivationMethod='melodicIntervals')
         for i in range(len(returnList) - 1):
             firstNote = returnList[i]
-            secondNote = returnList[i+1]
+            secondNote = returnList[i + 1]
             firstPitch = None
             secondPitch = None
             if firstNote is not None and secondNote is not None:
@@ -10949,8 +10949,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             listSorted = sorted(listOffsetDurExemption, key=lambda target: target[0])
             for i,durTuple in enumerate(listSorted):
                 startOffset, durationAmount, exemptObjects = durTuple
-                if i+1 < len(listSorted):
-                    endOffset = listSorted[i+1][0]
+                if i + 1 < len(listSorted):
+                    endOffset = listSorted[i + 1][0]
                     includeEnd = False
                 else:
                     endOffset = returnObjDuration
@@ -10976,8 +10976,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for i, durTuple in enumerate(listSorted):
                 startOffset, durationAmount, exemptObjects = durTuple
 
-                if i+1 < len(listSorted):
-                    endOffset = listSorted[i+1][0]
+                if i + 1 < len(listSorted):
+                    endOffset = listSorted[i + 1][0]
                     includeEnd = False
                 else:
                     endOffset = returnObjDuration
@@ -11149,8 +11149,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 newCorrections[nextMeasure] = cummulativeNumberShift
             else: #integer implies deletion
                 cummulativeNumberShift -= 1
-                oldCorrections[measureNumber+1] = cummulativeNumberShift
-                newCorrections[measureNumber+1] = cummulativeNumberShift
+                oldCorrections[measureNumber + 1] = cummulativeNumberShift
+                newCorrections[measureNumber + 1] = cummulativeNumberShift
 
         # Second, make corrections based on the dictionaries. The key is the measure number
         # above which measures should be shifted by the value up to the next key. It is easiest
@@ -12152,11 +12152,11 @@ class Part(Stream):
             # if beyond the first measure, use the pitches from the last
             # measure for context
             if i > 0:
-                pitchPastMeasure = measureStream[i-1].pitches
-                if (measureStream[i-1]
-                        and hasattr(measureStream[i-1][-1], "tie")
-                        and measureStream[i-1][-1].tie is not None
-                        and measureStream[i-1][-1].tie.type != 'stop'
+                pitchPastMeasure = measureStream[i - 1].pitches
+                if (measureStream[i - 1]
+                        and hasattr(measureStream[i - 1][-1], "tie")
+                        and measureStream[i - 1][-1].tie is not None
+                        and measureStream[i - 1][-1].tie.type != 'stop'
                     ):
                     lastNoteWasTied = True
                 else:

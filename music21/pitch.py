@@ -2669,11 +2669,8 @@ class Pitch(object):
         >>> p.microtone = 90
         >>> p
         <music21.pitch.Pitch C4(+90c)>
-        >>> p.pitchClass + p.microtone.cents/100.0
+        >>> p.pitchClass + (p.microtone.cents / 100.0)
         1.9
-
-
-
         ''')
 
 

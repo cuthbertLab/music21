@@ -253,7 +253,7 @@ class BrailleElementGrouping(list):
                 except (AttributeError, TypeError):
                     allObjects.append(unicode(obj))
         if self.numRepeats > 0:
-            allObjects.append(u"** Grouping x {0} **".format(self.numRepeats+1))
+            allObjects.append(u"** Grouping x {0} **".format(self.numRepeats + 1))
         if self.withHyphen is True:
             allObjects.append(u"music hyphen {0}".format(lookup.symbols['music_hyphen']))
         out = u"\n".join(allObjects)

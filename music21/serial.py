@@ -411,8 +411,8 @@ class ToneRow(stream.Stream):
         pitchList = self.pitchClasses()
         intervalString = ''
         for i in range(0,numPitches - 1):
-            interval = (pitchList[i+1] - pitchList[i]) % 12
-            if interval in range(0,10):
+            interval = (pitchList[i + 1] - pitchList[i]) % 12
+            if interval in range(0, 10):
                 intervalString = intervalString + str(interval)
             if interval == 10:
                 intervalString = intervalString + 'T'
@@ -1041,10 +1041,10 @@ class TwelveToneRow(ToneRow):
                 pitches1 = trans1.pitchClasses()
                 trans2 = self.originalCenteredTransformation(transType2, index2)
                 pitches2 = trans2.pitchClasses()
-                for i in range(0,6):
+                for i in range(6):
                     testRow.append(pitches1[i])
-                for i in range(0,6):
-                    testRow.append(pitches2[6+i])
+                for i in range(6):
+                    testRow.append(pitches2[6 + i])
                 return pcToToneRow(testRow).isTwelveToneRow()
             else:
                 raise SerialException("Invalid convention - choose 'zero' or 'original'.")

@@ -240,7 +240,7 @@ def ch1_basic_II_B_2(show=True, *arguments, **keywords):
 def ch1_basic_II_C(data, intervalShift):
     '''Function for C1, C2, C3, and C4
     '''
-    from music21 import stream, common, chord
+    from music21 import stream, chord
     ex = stream.Stream()
     for chunk in data:
         m = stream.Measure()

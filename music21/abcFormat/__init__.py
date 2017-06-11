@@ -1677,20 +1677,20 @@ class ABCHandler(object):
 
         # find local area of string
         if i > 0:
-            cPrev = strSrc[i-1]
+            cPrev = strSrc[i - 1]
         else:
             cPrev = None
         # set this characters
         c = strSrc[i]
 
         cNext = None
-        if i < len(strSrc)-1:
-            cNext = strSrc[i+1]
+        if i < len(strSrc) - 1:
+            cNext = strSrc[i + 1]
 
         # get 2 chars forward
         cNextNext = None
-        if i < len(strSrc)-2:
-            cNextNext = strSrc[i+2]
+        if i < len(strSrc) - 2:
+            cNextNext = strSrc[i + 2]
 
         return cPrev, c, cNext, cNextNext
         #return cPrevNotSpace, cPrev, c, cNext, cNextNotSpace, cNextNext
@@ -1822,7 +1822,7 @@ class ABCHandler(object):
             # comment lines, also encoding defs
             if c == '%':
                 skipAhead = self._getNextLineBreak(strSrc, currentIndex) - (currentIndex + 1)
-                #environLocal.printDebug(['got comment:', repr(strSrc[i:j+1])])
+                #environLocal.printDebug(['got comment:', repr(strSrc[i:j + 1])])
                 continue
 
             # metadata: capital letter, with next char as ':'
@@ -1931,8 +1931,8 @@ class ABCHandler(object):
                 j = currentIndex + 1
                 while j < currentIndex + 20: #a reasonable upper bound
                     if strSrc[j] == "!":
-                        if strSrc[currentIndex:j+1] in exclaimDict:
-                            exclaimClass = exclaimDict[strSrc[currentIndex:j+1]]
+                        if strSrc[currentIndex:j + 1] in exclaimDict:
+                            exclaimClass = exclaimDict[strSrc[currentIndex:j + 1]]
                             exclaimObject = exclaimClass(c)
                             self._tokens.append(exclaimObject)
                             skipAhead = j - currentIndex # not + 1
@@ -2922,8 +2922,8 @@ def mergeLeadingMetaData(barHandlers):
         while i < len(barHandlers):
             # if we find metadata and it is not the last valid index
             # merge into a single handler
-            if i in metadataPos and i != len(barHandlers)-1:
-                mergedHandlers.append(barHandlers[i] + barHandlers[i+1])
+            if i in metadataPos and i != len(barHandlers) - 1:
+                mergedHandlers.append(barHandlers[i] + barHandlers[i + 1])
                 i += 2
             else:
                 mergedHandlers.append(barHandlers[i])

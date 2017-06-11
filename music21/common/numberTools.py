@@ -1018,7 +1018,7 @@ def groupContiguousIntegers(src):
     while i < (len(src)-1):
         e = src[i]
         group.append(e)
-        eNext = src[i+1]
+        eNext = src[i + 1]
         # if next is contiguous, add to grou
         if eNext != e + 1:
         # if not contiguous
@@ -1081,7 +1081,7 @@ def fromRoman(num):
         value = ints[nums.index(c)]
         # If the next place holds a larger number, this value is negative.
         try:
-            nextvalue = ints[nums.index(inputRoman[i +1])]
+            nextvalue = ints[nums.index(inputRoman[i  + 1])]
             if nextvalue > value and value in [1, 10, 100]:
                 value *= -1
             elif nextvalue > value:

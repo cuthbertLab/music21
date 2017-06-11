@@ -167,9 +167,9 @@ class Test(unittest.TestCase):
 #        # offsets
 #        keyStream = analysis.key(partStream, 'chew.spiralArray')
 #
-#        for i in range(len(chordStream)-1):
+#        for i in range(len(chordStream) - 1):
 #            chordThis = chordStream[i]
-#            chordNext = chordStream[i+1]
+#            chordNext = chordStream[i + 1]
 #
 #            # get key at this offset
 #            # here, it is important that the offsets of the chords

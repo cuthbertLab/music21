@@ -114,16 +114,16 @@ def capuaRuleOne(srcStream):
     numChanged = 0
 
     ssn = srcStream.flat.notesAndRests
-    for i in range(0, len(ssn)-2):
+    for i in range(0, len(ssn) - 2):
         n1 = ssn[i]
-        n2 = ssn[i+1]
-        n3 = ssn[i+2]
+        n2 = ssn[i + 1]
+        n3 = ssn[i + 2]
 
         if (n1.isRest or n2.isRest or n3.isRest):
             continue
 
-        i1 = interval.notesToInterval(n1,n2)
-        i2 = interval.notesToInterval(n2,n3)
+        i1 = interval.notesToInterval(n1, n2)
+        i2 = interval.notesToInterval(n2, n3)
 
         if (n1.pitch.accidental is not None
                 or n3.pitch.accidental is not None):
@@ -183,9 +183,9 @@ def capuaRuleTwo(srcStream):
                 or n4.isRest):
             continue
 
-        i1 = interval.notesToInterval(n1,n2)
-        i2 = interval.notesToInterval(n2,n3)
-        i3 = interval.notesToInterval(n3,n4)
+        i1 = interval.notesToInterval(n1, n2)
+        i2 = interval.notesToInterval(n2, n3)
+        i3 = interval.notesToInterval(n3, n4)
 
         if (n1.pitch.accidental is not None
                 or n2.pitch.accidental is not None
@@ -241,16 +241,16 @@ def capuaRuleThree(srcStream):
     numChanged = 0
 
     ssn = srcStream.flat.notesAndRests
-    for i in range(0, len(ssn)-2):
+    for i in range(0, len(ssn) - 2):
         n1 = ssn[i]
-        n2 = ssn[i+1]
-        n3 = ssn[i+2]
+        n2 = ssn[i + 1]
+        n3 = ssn[i + 2]
 
         if n1.isRest or n2.isRest or n3.isRest:
             continue
 
-        i1 = interval.notesToInterval(n1,n2)
-        i2 = interval.notesToInterval(n2,n3)
+        i1 = interval.notesToInterval(n1, n2)
+        i2 = interval.notesToInterval(n2, n3)
 
         if (n1.pitch.accidental is not None
                 or n2.pitch.accidental is not None
@@ -294,16 +294,16 @@ def capuaRuleFourA(srcStream):
     numChanged = 0
 
     ssn = srcStream.flat.notesAndRests
-    for i in range(0, len(ssn)-2):
+    for i in range(0, len(ssn) - 2):
         n1 = ssn[i]
-        n2 = ssn[i+1]
-        n3 = ssn[i+2]
+        n2 = ssn[i + 1]
+        n3 = ssn[i + 2]
 
         if n1.isRest or n2.isRest or n3.isRest:
             continue
 
-        i1 = interval.notesToInterval(n1,n2)
-        i2 = interval.notesToInterval(n2,n3)
+        i1 = interval.notesToInterval(n1, n2)
+        i2 = interval.notesToInterval(n2, n3)
 
         if (n1.pitch.accidental is not None
                 or n2.pitch.accidental is not None
@@ -352,8 +352,8 @@ def capuaRuleFourB(srcStream):
         if n1.isRest or n2.isRest or n3.isRest:
             continue
 
-        i1 = interval.notesToInterval(n1,n2)
-        i2 = interval.notesToInterval(n2,n3)
+        i1 = interval.notesToInterval(n1, n2)
+        i2 = interval.notesToInterval(n2, n3)
 
         if (n1.pitch.accidental is not None
                 or n3.pitch.accidental is not None):
@@ -882,9 +882,9 @@ def findCorrections(correctionType="Maj3", startPiece=2, endPiece=459):
                         if i == srcStreamLen - 1:
                             continue
                         else:
-                            nextFewNotes = srcStreamNotes[i+1:]
+                            nextFewNotes = srcStreamNotes[i + 1:]
                     else:
-                        nextFewNotes = srcStreamNotes[i+1:i+1+notesToCheck]
+                        nextFewNotes = srcStreamNotes[i + 1:i + 1+notesToCheck]
                     #nextFewNotes = srcStream1.notesFollowingNote(note1,
                     #        notesToCheck, allowRests = False)
                     foundP8 = False

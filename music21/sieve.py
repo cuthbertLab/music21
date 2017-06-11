@@ -202,22 +202,22 @@ def rabinMiller(n):
     for prime in primes:
         if n % prime == 0:
             return 0
-    s, r = n-1, 1
+    s, r = n - 1, 1
     while not s & 1:
         s >>= 1
         r = r + 1
     for i in range(10): # random tests
         # calculate a^s mod n, where a is a random number
-        y = pow(random.randint(1, n-1), s, n)
+        y = pow(random.randint(1, n - 1), s, n)
         if y == 1:
             continue # n passed test, is composite
-        # try values of j from 1 to r-1
+        # try values of j from 1 to r - 1
         for j in range(1, r):
             if y == n - 1:
-                break # if y = n-1, n passed the test this time
-            y = pow(y,2,n) # a^((2^j)*s) mod n
+                break # if y = n - 1, n passed the test this time
+            y = pow(y, 2, n) # a^((2^j)*s) mod n
         else:
-            return False # y never equaled n-1, then n is composite
+            return False # y never equaled n - 1, then n is composite
     # n passed all of the tests, it is very likely prime
     return True
 
@@ -259,7 +259,7 @@ def discreteBinaryPad(series, fixRange=None):
         seriesAlt.sort()
         minVal = seriesAlt[0]
         maxVal = seriesAlt[-1]
-    for x in range(minVal, maxVal+1):
+    for x in range(minVal, maxVal + 1):
         if x in series:
             discrete.append(1)
         else: # not in series
@@ -334,7 +334,7 @@ def unitNormEqual(parts):
     else:
         unit = []
         step = 1 / (parts - 1)
-        for y in range(0, parts-1): # one less value tn needed
+        for y in range(0, parts - 1): # one less value tn needed
             unit.append(y*step)
         unit.append(1) # make last an integer, add manually
         return unit
@@ -569,8 +569,8 @@ class PrimeSegment(object):
             return unitNormRange(self.seg, z)
         elif segmentFormat in ['wid', 'width']:
             wid = []
-            for i in range(0, len(self.seg)-1):
-                wid.append((self.seg[i+1]-self.seg[i]))
+            for i in range(0, len(self.seg) - 1):
+                wid.append((self.seg[i + 1]-self.seg[i]))
             return wid
         else: # int, integer
             return self.seg
@@ -621,7 +621,7 @@ class Residual(object):
         """z is the range of integers to use when generating a list
         convenience functiont that fixes max
         """
-        self._z = list(range(minInt, maxInt+1))
+        self._z = list(range(minInt, maxInt + 1))
 
     def setSegmentFormat(self, fmt):
         #fmt = drawer.strScrub(fmt, 'l')
@@ -671,7 +671,7 @@ class Residual(object):
         elif segmentFormat in ['unit']:
             return unitNormRange(seg, z)
         elif segmentFormat in ['wid', 'width']: # difference always equal to m
-            wid = [self._m] * (len(seg)-1) # one shorter than segment
+            wid = [self._m] * (len(seg) - 1) # one shorter than segment
             return wid
         elif segmentFormat in ['int', 'integer']: # int, integer
             return seg
@@ -979,7 +979,7 @@ class CompressionSegment(object):
 
     def _process(self):
         """take a copy of match; move through each value of this list as if it
-        were n; for each n test all modulos (from 1 to len(z)+1) to find a
+        were n; for each n test all modulos (from 1 to len(z) + 1) to find a
         residual. when found (one will be found), keep it; remove the found
         segments from the match, and repeat"""
         # process residuals
@@ -1185,7 +1185,7 @@ class Sieve(object):
         Set the z as a min and max value. The z is the range of
         integers to use when generating a sieve segment.
         """
-        self._z = list(range(minInt, maxInt+1))
+        self._z = list(range(minInt, maxInt + 1))
 
     def setSegmentFormat(self, fmt):
         #fmt = drawer.strScrub(fmt, 'l')
@@ -1496,11 +1496,11 @@ class Sieve(object):
             if i == 0:
                 charPrevious = None # first
             else:
-                charPrevious = logStr[i-1]
+                charPrevious = logStr[i - 1]
             if i == len(logStr) - 1:
                 charNext = None # last
             else:
-                charNext = logStr[i+1]
+                charNext = logStr[i + 1]
 
 
             # if a boundary symbol ({}&|) symply add to string
@@ -1585,13 +1585,13 @@ class Sieve(object):
             if len(andList) == 1:
                 intersection = self._resLib[andList[0]]
             else:
-                for i in range(0, len(andList)-1): # one less than len
+                for i in range(0, len(andList) - 1): # one less than len
                     if i == 0: # first, get first
                         # problem was here w/ and list value not being in _resLib
                         a = self._resLib[andList[i]]
                     else:
                         a = intersection
-                    b = self._resLib[andList[i+1]] # get second
+                    b = self._resLib[andList[i + 1]] # get second
                     # this may raise an exception if not possible
                     intersection = a & b # operator overloadin
             # store resKey in dict, store as string
@@ -1678,8 +1678,8 @@ class Sieve(object):
             return unitNormRange(seg, z)
         elif segmentFormat in ['wid', 'width']:
             wid = []
-            for i in range(0, len(seg)-1):
-                wid.append((seg[i+1]-seg[i]))
+            for i in range(0, len(seg) - 1):
+                wid.append((seg[i + 1]-seg[i]))
             return wid
         else: # int, integer
             return seg
@@ -1762,10 +1762,10 @@ class Sieve(object):
         # for unit and binary, derive new z based on min and max
         if format in ['unit']:
             # make z to minimum and max value found
-            return unitNormRange(seg, range(seg[0], seg[-1]+1))
+            return unitNormRange(seg, range(seg[0], seg[-1] + 1))
         elif format in ['bin', 'binary']:
             # make to minimum and max value found
-            return discreteBinaryPad(seg, range(seg[0], seg[-1]+1))
+            return discreteBinaryPad(seg, range(seg[0], seg[-1] + 1))
         else:
             return seg
 
@@ -1880,7 +1880,7 @@ class PitchSieve(object):
         """
         minPS = self.pitchLower.ps
         maxPS = self.pitchUpper.ps
-        z = list(range(int(minPS), int(maxPS+1)))
+        z = list(range(int(minPS), int(maxPS + 1)))
         n = self.pitchOrigin.ps # shift origin
 
         # get integer range
@@ -1945,13 +1945,13 @@ class PitchSieve(object):
         '''
         # get a z for the complete period
 #         try:
-#             z = range(self.sieveObject.period()+1)
+#             z = range(self.sieveObject.period() + 1)
 #         except (OverflowError, MemoryError):
 #             environLocal.printDebug('failed to generates a z with period:',
 #                    self.sieveObject.period())
         p = self.sieveObject.period()
         if p < 999999999:
-            z = list(range(p+1))
+            z = list(range(p + 1))
         else: # too big to get z as list of values
             z = None
 
@@ -1977,8 +1977,8 @@ class PitchSieve(object):
 #         post = []
 #         for i, step in enumerate(integerSteps):
 #             stepStart = step
-#             if i < len(integerSteps)-1:
-#                 stepEnd = integerSteps[i+1]
+#             if i < len(integerSteps) - 1:
+#                 stepEnd = integerSteps[i + 1]
 #             else:
 #                 break
 #             #environLocal.printDebug(['stepStart', stepStart, 'stepEnd', stepEnd])

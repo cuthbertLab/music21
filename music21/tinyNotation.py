@@ -310,7 +310,7 @@ class State(object):
                 # this is a hack that should be done away with...
                 p = common.unwrapWeakref(self.parent)
                 for i in range(len(p.activeStates)):
-                    backCount = -1 * (i+1)
+                    backCount = -1 * (i + 1)
                     if p.activeStates[backCount] is self:
                         p.activeStates.pop(backCount)
                         break

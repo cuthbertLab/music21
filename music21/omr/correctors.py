@@ -770,10 +770,10 @@ class MeasureHash(object):
         '''
 
         duration1to127 = self.hashQuarterLength(n.duration.quarterLength)
-        if duration1to127%2==0 and duration1to127>0:
+        if duration1to127 % 2 == 0 and duration1to127 > 0:
             byteEncoding = chr(duration1to127)
-        elif duration1to127%2==1 and duration1to127>0:
-            byteEncoding = chr(duration1to127+1)
+        elif duration1to127 % 2 == 1 and duration1to127 > 0:
+            byteEncoding = chr(duration1to127 + 1)
         elif duration1to127 < 0:
             byteEncoding = chr(1)
         return byteEncoding
@@ -798,9 +798,9 @@ class MeasureHash(object):
 
         '''
         duration1to127 = self.hashQuarterLength(r.duration.quarterLength)
-        if duration1to127%2==0 and duration1to127 > 0:
-            byteEncoding = chr(duration1to127+1)
-        elif duration1to127%2==1 and duration1to127 > 0:
+        if duration1to127 % 2 == 0 and duration1to127 > 0:
+            byteEncoding = chr(duration1to127 + 1)
+        elif duration1to127 % 2 == 1 and duration1to127 > 0:
             byteEncoding = chr(duration1to127)
         elif duration1to127 < 0:
             byteEncoding = chr(1)
@@ -1093,12 +1093,12 @@ class MeasureHash(object):
         ld = len(destination)
         if ls > ld:
             numberOfAdditions = ls - ld
-            baseProbability = self.getProbabilityOnAddition()**numberOfAdditions
-            source = source[0:-1*(numberOfAdditions)]
+            baseProbability = self.getProbabilityOnAddition() ** numberOfAdditions
+            source = source[0:-1 * (numberOfAdditions)]
         elif ls < ld:
             numberOfOmissions = ld - ls
-            baseProbability = self.getProbabilityOnOmission()**numberOfOmissions
-            destination = destination[0:-1*(numberOfOmissions)]
+            baseProbability = self.getProbabilityOnOmission() ** numberOfOmissions
+            destination = destination[0:-1 * (numberOfOmissions)]
         else:
             baseProbability = 1.0
         for i in range(len(source)):

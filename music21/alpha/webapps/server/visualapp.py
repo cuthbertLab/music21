@@ -108,7 +108,7 @@ def imageEmbedTemplate(title, imgSrc):
 <h1>"""
     htmlData += title
     htmlData += "</h1>"
-    htmlData += "<img src='"+imgSrc+"'/>"
+    htmlData += "<img src='" + imgSrc + "'/>"
     htmlData += """
 </body>
 </html>

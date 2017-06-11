@@ -392,8 +392,8 @@ def quarterLengthToNonPowerOf2Tuplet(qLen):
     if qFrac.numerator < qFrac.denominator:
         while qFrac.numerator < qFrac.denominator:
             qFrac = qFrac * 2
-    elif qFrac.numerator > qFrac.denominator*2:
-        while qFrac.numerator > qFrac.denominator*2:
+    elif qFrac.numerator > qFrac.denominator * 2:
+        while qFrac.numerator > qFrac.denominator * 2:
             qFrac = qFrac / 2
     # qFrac will always be in lowest terms
 
@@ -2261,8 +2261,8 @@ class Duration(SlottedObjectMixin):
 #             newDuration.dotGroups = [0]
 #             newDuration.components[0].dots = dG[0]
 #             for i in range(1, len(dG)):
-#                 newComponent = copy.deepcopy(newDuration.components[i-1])
-#                 newComponent.type = nextSmallerType(newDuration.components[i-1].type)
+#                 newComponent = copy.deepcopy(newDuration.components[i - 1])
+#                 newComponent.type = nextSmallerType(newDuration.components[i - 1].type)
 #                 newComponent.dots = dG[i]
 #                 newDuration.components.append(newComponent)
 #             return newDuration

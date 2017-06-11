@@ -302,7 +302,7 @@ class Beams(EqualSlottedObjectMixin):
             count = 6
         else:
             raise BeamException('cannot fill beams for level %s' % level)
-        for i in range(1, count+1):
+        for i in range(1, count + 1):
             if i == 0:
                 raise BeamException('level zero does not exist for this range')
             obj = Beam()

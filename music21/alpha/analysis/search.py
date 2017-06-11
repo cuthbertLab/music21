@@ -91,7 +91,7 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
         # at this time, not handling chords
 
         if eCount < len(sourceClean) - 1:
-            eNext = sourceClean[eCount+1]
+            eNext = sourceClean[eCount + 1]
         else:
             eNext = None
 
@@ -416,7 +416,7 @@ class Test(unittest.TestCase):
                        comparisonAttribute='name')
                 for g, group in enumerate(post):
                     for n in group:
-                        n.addLyric('%s%s' % (sc.getTonic().name, g+1))
+                        n.addLyric('%s%s' % (sc.getTonic().name, g + 1))
 
         #s.show()
 

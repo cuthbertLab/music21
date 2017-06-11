@@ -425,18 +425,18 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         for i in range(len(soln)):
             for j in range(len(toneWeights)):
                 top[i] = top[i] + ((
-                    toneWeights[(j - i) % 12]-profileAverage) * (
-                    pcDistribution[j]-histogramAverage))
+                    toneWeights[(j - i) % 12] - profileAverage) * (
+                        pcDistribution[j] - histogramAverage))
 
                 bottomRight[i] = bottomRight[i] + ((
-                    toneWeights[(j-i)%12]-profileAverage)**2)
+                    toneWeights[(j - i) % 12] - profileAverage) ** 2)
                 bottomLeft[i] = bottomLeft[i] + ((
-                    pcDistribution[j]-histogramAverage)**2)
+                    pcDistribution[j] - histogramAverage) ** 2)
 
                 if (bottomRight[i] == 0 or bottomLeft[i] == 0):
                     soln[i] = 0
                 else:
-                    soln[i] = float(top[i]) / ((bottomRight[i]*bottomLeft[i])**.5)
+                    soln[i] = float(top[i]) / ((bottomRight[i] * bottomLeft[i]) ** 0.5)
         return soln
 
     def solutionLegend(self, compress=False):
@@ -1113,9 +1113,9 @@ class Ambitus(DiscreteAnalysis):
                 psFound.append(p.ps)
         psFound.sort()
         psRange = []
-        for i in range(len(psFound)-1):
+        for i in range(len(psFound) - 1):
             p1 = psFound[i]
-            for j in range(i+1, len(psFound)):
+            for j in range(i + 1, len(psFound)):
                 p2 = psFound[j]
                 # p2 should always be equal or greater than p1
                 psRange.append(p2-p1)
@@ -1179,8 +1179,8 @@ class Ambitus(DiscreteAnalysis):
         keys = list(colors.keys())
         keys.sort()
 
-        keysTopRow = keys[:(len(keys)//2)]
-        keysBottomRow = keys[(len(keys)//2):]
+        keysTopRow = keys[:(len(keys) // 2)]
+        keysBottomRow = keys[(len(keys) // 2):]
 
         # split keys into two groups for two rows (optional)
         for keyGroup in [keysTopRow, keysBottomRow]:
@@ -1306,7 +1306,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
             #noteStream.show()
             for i, n in enumerate(noteStream):
                 if i <= len(noteStream) - 2:
-                    nNext = noteStream[i+1]
+                    nNext = noteStream[i + 1]
                 else:
                     nNext = None
 
@@ -1517,7 +1517,7 @@ class Test(unittest.TestCase):
         for i in range(len(allResults1)):
             p, count1 = allResults1[i]
             p, count2 = allResults2[i]
-            avg.append((p, (count1+count2)/2.0))
+            avg.append((p, (count1 + count2) / 2.0))
         #print
         #post = []
         unused_post = sorted([(y, x) for x, y in avg])

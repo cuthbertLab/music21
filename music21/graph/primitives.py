@@ -1488,8 +1488,8 @@ class Graph3DBars(Graph):
     >>> g.doneAction = None #_DOCS_HIDE
     >>> data = []
     >>> ri = random.randint
-    >>> for i in range(1, 10+1):
-    ...    q = [i, i//2, 10-i]
+    >>> for i in range(1, 10 + 1):
+    ...    q = [i, i//2, 10 - i]
     ...    data.append(q)
     >>> g.data = data
     >>> g.process()
@@ -1634,7 +1634,7 @@ class TestExternal(unittest.TestCase):
                                colors=['b', 'g'])
         data = {1:[], 2:[], 3:[], 4:[], 5:[]}
         for i in range(len(data.keys())):
-            q = [(x, random.choice(range(10*i, 10*(i+1)))) for x in range(50)]
+            q = [(x, random.choice(range(10 * i, 10 * (i + 1)))) for x in range(50)]
             dk = list(data.keys())
             data[dk[i]] = q
         a.data = data
@@ -1681,7 +1681,7 @@ class TestExternal(unittest.TestCase):
         # get some data
         data3DPolygonBars = {1:[], 2:[], 3:[]}
         for i in range(len(data3DPolygonBars.keys())):
-            q = [(x, random.choice(range(10*(i+1)))) for x in range(20)]
+            q = [(x, random.choice(range(10 * (i + 1)))) for x in range(20)]
             data3DPolygonBars[data3DPolygonBars.keys()[i]] = q
 
         # pair data with class name
@@ -1775,7 +1775,7 @@ class TestExternal(unittest.TestCase):
         a = Graph3DBars(doneAction=None)
         data = {1:[], 2:[], 3:[]}
         for i in range(len(data.keys())):
-            q = [(x, random.choice(range(10*(i+1)))) for x in range(20)]
+            q = [(x, random.choice(range(10 * (i + 1)))) for x in range(20)]
             data[data.keys()[i]] = q
         a.data = data
         post.append([a, 'graphing-04'])

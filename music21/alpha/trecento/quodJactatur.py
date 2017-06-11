@@ -241,7 +241,7 @@ def findRetrogradeVoices(show=True):
                     if int1.generic.simpleUndirected in [1,3,4,5]:
                         thisScore = strength
                     elif int1.generic.simpleUndirected == 6: # less good
-                        thisScore = strength/2.0
+                        thisScore = strength / 2.0
                     else:
                         thisScore = -2 * strength
                 if n.duration.quarterLength < 2:
@@ -328,7 +328,7 @@ def getStrengthForNote(n):
     solutions should use n.beat
     '''
 
-    if (n.offset/2.0) == int(n.offset/2.0): # downbeat
+    if (n.offset / 2.0) == int(n.offset / 2.0): # downbeat
         strength = 4
     elif (n.offset) == int(n.offset): # strong beat
         strength = 2

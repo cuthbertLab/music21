@@ -31,7 +31,7 @@ class IntervalSearcher(object):
         if self.intervalLength > stIntervalListLength:
             return False
         #print "Length of Stream: " + str(streamLength)
-        for i in range(0, stIntervalListLength+1 - self.intervalLength):
+        for i in range(0, stIntervalListLength + 1 - self.intervalLength):
             for j in range(0, self.intervalLength):
                 streamInterval = stIntervalList[i+j]
                 genI1 = self.intervalList[j].diatonic.generic.simpleDirected
@@ -135,7 +135,7 @@ def searchForIntervals(notesStr):
 
     interObjArr = []
     for i in range(len(noteObjArr) - 1):
-        int1 = interval.notesToInterval(noteObjArr[i], noteObjArr[i+1])
+        int1 = interval.notesToInterval(noteObjArr[i], noteObjArr[i + 1])
         interObjArr.append(int1)
     #print interObjArr
 

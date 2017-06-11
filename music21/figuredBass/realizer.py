@@ -341,7 +341,7 @@ class FiguredBassLine(object):
                 previousBassNote = bassLine[bassNoteIndex]
                 currentSegment.quarterLength = previousBassNote.quarterLength
             else:
-                for partNumber in range(len(currentMapping[k]), numParts+1):
+                for partNumber in range(len(currentMapping[k]), numParts + 1):
                     previousSegment.fbRules._partsToCheck.append(partNumber)
                 # Fictitious, representative only for harmonies preserved
                 # with addition of melody or melodies

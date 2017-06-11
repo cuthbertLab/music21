@@ -335,7 +335,7 @@ class CBaritoneClef(CClef):
         '''
         CClef.__init__(self)
         self.line = 5
-        self.lowestLine = (7*2) + 7
+        self.lowestLine = (7 * 2) + 7
 
 
 #-------------------------------------------------------------------------------
@@ -368,7 +368,7 @@ class FBaritoneClef(FClef):
         '''
         FClef.__init__(self)
         self.line = 3
-        self.lowestLine = (7*2) + 7
+        self.lowestLine = (7 * 2) + 7
 
 class BassClef(FClef):
     def __init__(self):
@@ -380,7 +380,7 @@ class BassClef(FClef):
         '''
         FClef.__init__(self)
         self.line = 4
-        self.lowestLine = (7*2) + 5
+        self.lowestLine = (7 * 2) + 5
 
 class Bass8vbClef(FClef):
     def __init__(self):
@@ -395,7 +395,7 @@ class Bass8vbClef(FClef):
         FClef.__init__(self)
         self.line = 4
         self.octaveChange = -1
-        self.lowestLine = (7*2) + 5
+        self.lowestLine = (7 * 2) + 5
 
 class Bass8vaClef(FClef):
     def __init__(self):
@@ -408,7 +408,7 @@ class Bass8vaClef(FClef):
         FClef.__init__(self)
         self.line = 4
         self.octaveChange = 1
-        self.lowestLine = (7*2) + 5
+        self.lowestLine = (7 * 2) + 5
 
 class SubBassClef(FClef):
     def __init__(self):
@@ -422,7 +422,7 @@ class SubBassClef(FClef):
         '''
         FClef.__init__(self)
         self.line = 5
-        self.lowestLine = (7*2) + 3
+        self.lowestLine = (7 * 2) + 3
 
 
 #-------------------------------------------------------------------------------

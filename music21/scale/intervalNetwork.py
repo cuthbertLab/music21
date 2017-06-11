@@ -979,8 +979,8 @@ class IntervalNetwork(object):
         spanCount = sMax - sMin
         # assume continuous span, assume start at min
         # example for diatonic scale degree 3:
-        # ((3-1) % 7)+1
-        #if (((id-1) % spanCount) + sMin) == nStep:
+        # ((3 - 1) % 7) + 1
+        #if (((id - 1) % spanCount) + sMin) == nStep:
 
         return ((degree-1) % spanCount) + sMin
 
@@ -1941,7 +1941,7 @@ class IntervalNetwork(object):
         iList = []
         for i, p1 in enumerate(pList):
             if i < len(pList) - 1:
-                p2 = pList[i+1]
+                p2 = pList[i + 1]
                 iList.append(interval.Interval(p1, p2))
         return iList
 

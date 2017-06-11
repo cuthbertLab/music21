@@ -167,7 +167,7 @@ def prepareThresholds(useScale=None):
 
     >>> pitchThresholds, pitches = audioSearch.prepareThresholds(scale.MajorScale('A3'))
     >>> for i in range(len(pitchThresholds)):
-    ...    print("%s < %.2f < %s" % (pitches[i], pitchThresholds[i], pitches[i+1]))
+    ...    print("%s < %.2f < %s" % (pitches[i], pitchThresholds[i], pitches[i + 1]))
     A3 < 0.86 < B3
     B3 < 0.53 < C#4
     C#4 < 0.16 < D4
@@ -620,7 +620,7 @@ def joinConsecutiveIdenticalPitches(detectedPitchObjects):
             durationList.append(good)
             total_notes = total_notes + 1
             ### doesn't this unnecessarily create a note that it doesn't need?
-            ### notesList.append(detectedPitchObjects[j-1].frequency) should work
+            ### notesList.append(detectedPitchObjects[j - 1].frequency) should work
             n = note.Note()
             n.pitch = detectedPitchObjects[j - 1]
             notesList.append(n)

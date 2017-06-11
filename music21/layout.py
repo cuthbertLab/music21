@@ -1221,7 +1221,7 @@ class LayoutScore(stream.Opus):
             #print("Got staffLayouts: ")
             staffLayoutObj = allStaffLayouts[0]
             if staffLayoutObj.staffSize is not None:
-                staffSize = staffSizeBase * (staffLayoutObj.staffSize/100.0)
+                staffSize = staffSizeBase * (staffLayoutObj.staffSize / 100.0)
                 #print("Got staffHeight of %d for partId %d" % (staffHeight, partId))
                 staffSizeDefinedLocally = True
 

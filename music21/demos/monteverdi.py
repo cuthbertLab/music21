@@ -57,7 +57,7 @@ def analyzeBooks(books=(3,), start=1, end=20, show=False, strict=False):
     majorRoot = ""
     minorRoot = ""
     for book in books:
-        for i in range(start, end+1):
+        for i in range(start, end + 1):
             filename = 'monteverdi/madrigal.%s.%s.rntxt' % (book, i)
             if strict == True:
                 analysis = corpus.parse(filename)
@@ -192,7 +192,7 @@ def monteverdiParallels(books=(3,), start=1, end=20, show=True, strict=False):
     find all instances of parallel fifths or octaves in Monteverdi madrigals.
     '''
     for book in books:
-        for i in range(start, end+1):
+        for i in range(start, end + 1):
             filename = 'monteverdi/madrigal.%s.%s.xml' % (book, i)
             if strict == True:
                 c = corpus.parse(filename)
@@ -209,21 +209,21 @@ def monteverdiParallels(books=(3,), start=1, end=20, show=True, strict=False):
                 #iName = c.parts[i].id
                 ifn = c.parts[i].flat.notesAndRests.stream()
                 omi = ifn.offsetMap()
-                for j in range(i+1, len(c.parts)):
+                for j in range(i + 1, len(c.parts)):
                     jName = c.parts[j].id
 
                     jfn = c.parts[j].flat.notesAndRests.stream()
                     for k in range(len(omi) - 1):
                         n1pi = omi[k]['element']
-                        n2pi = omi[k+1]['element']
+                        n2pi = omi[k + 1]['element']
                         n1pjAll = jfn.getElementsByOffset(offsetStart=omi[k]['endTime'] - .001,
                                                           offsetEnd=omi[k]['endTime'] - .001,
                                                           mustBeginInSpan=False)
                         if len(n1pjAll) == 0:
                             continue
                         n1pj = n1pjAll[0]
-                        n2pjAll = jfn.getElementsByOffset(offsetStart=omi[k+1]['offset'],
-                                                          offsetEnd=omi[k+1]['offset'],
+                        n2pjAll = jfn.getElementsByOffset(offsetStart=omi[k + 1]['offset'],
+                                                          offsetEnd=omi[k + 1]['offset'],
                                                           mustBeginInSpan=False)
                         if len(n2pjAll) == 0:
                             continue
@@ -257,11 +257,11 @@ def findPhraseBoundaries(book=4, madrigal=12):
         #thisPartPhraseScores = [] # keeps track of the likelihood that a phrase boundary is after note i
         for i in range(2, len(partNotes) - 2): # start on the third note and stop searching on the third to last note...
             thisScore = 0
-            twoNotesBack = partNotes[i-2]
-            previousNote = partNotes[i-1]
+            twoNotesBack = partNotes[i - 2]
+            previousNote = partNotes[i - 1]
             thisNote = partNotes[i]
-            nextNote = partNotes[i+1]
-            nextAfterThatNote = partNotes[i+2]
+            nextNote = partNotes[i + 1]
+            nextAfterThatNote = partNotes[i + 2]
 
             phraseOffset = nextNote.offset
             if phraseOffset in phraseScoresByOffset:

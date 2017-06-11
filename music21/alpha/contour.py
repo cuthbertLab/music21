@@ -143,10 +143,10 @@ class ContourFinder(object):
         numMeasures = len(mOffsets) - hasPickup
 
 
-        for i in range(1, numMeasures+1, slide):  #or numMeasures-window+1
-            fragment = s.measures(i, i+window-1)
+        for i in range(1, numMeasures + 1, slide):  #or numMeasures-window + 1
+            fragment = s.measures(i, i + window - 1)
 
-            #TODO: maybe check that i+window-1 is less than numMeasures + window/2
+            #TODO: maybe check that i+window-1 is less than numMeasures + window / 2
 
             resValue = metric(fragment)
 
@@ -305,9 +305,9 @@ class ContourFinder(object):
 
 
         if regression:
-            p = numpy.poly1d( numpy.polyfit(x, y, order) )
+            p = numpy.poly1d(numpy.polyfit(x, y, order))
 
-            t = numpy.linspace(0, x[-1], x[-1]+1)
+            t = numpy.linspace(0, x[-1], x[-1] + 1)
 
 
 
@@ -415,11 +415,11 @@ class ContourFinder(object):
             if len(pitches) <= 1:
                 return 0
             elif len(pitches) == 2:
-                return (pitches[1]-pitches[0])
+                return (pitches[1] - pitches[0])
             else:
-                res += (pitches[1]-pitches[0])**(.7)
+                res += (pitches[1] - pitches[0]) ** (0.7)
                 for i in range(1, len(pitches)-1):
-                    res += (pitches[i+1]-pitches[i])**(1.5)
+                    res += (pitches[i + 1]-pitches[i]) ** (1.5)
             return res
 
         return self._calcGenericMetric(inpStream, spacingForChord)
@@ -447,7 +447,7 @@ class ContourFinder(object):
                     certainty =  pkey.correlationCoefficient
                     break
 
-        return (1 - certainty)/2.0
+        return (1 - certainty) / 2.0
 
 
 
@@ -601,7 +601,7 @@ class AggregateContour(object):
         p = self.getCombinedContourPoly(cType)
 
         if regression:
-            t = numpy.linspace(0, max(x), max(x)+1)
+            t = numpy.linspace(0, max(x), max(x) + 1)
             plt.plot(t, p(t), 'o-', label='estimate', markersize=1) #probably change label
 
         plt.xlabel('Time (percentage of piece)')

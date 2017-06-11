@@ -198,7 +198,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
         #m = stream.Measure()
         # get a measure object with a left configured bar line
         if mIndex <= len(mdmObjs) - 2:
-            mdmNext = mdmObjs[mIndex+1]
+            mdmNext = mdmObjs[mIndex + 1]
         else:
             mdmNext = None
 
