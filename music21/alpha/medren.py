@@ -245,7 +245,7 @@ class GeneralMensuralNote(base.Music21Object):
     are present in the same context, and have the same offset within that context.
     '''
     def __init__(self, mensuralTypeOrAbbr='brevis'):
-        super(GeneralMensuralNote, self).__init__()
+        base.Music21Object.__init__(self) # do not use super here...
         self._gettingDuration = False
         self._duration = None
         if mensuralTypeOrAbbr in _validMensuralTypes:
@@ -494,7 +494,7 @@ class GeneralMensuralNote(base.Music21Object):
         >>> s_1.append(gmn_1)
         >>> s_1.append(medren.MensuralNote('C', 'minima'))
         >>> s_1.append(trecento.notation.Punctus())
-        >>> gmn_1._getSurroundingMeasure(activeSite = s_1)
+        >>> gmn_1._getSurroundingMeasure(activeSite=s_1)
         ([<music21.medren.MensuralNote minima B>,
           <music21.medren.MensuralNote minima B>,
           <music21.medren.MensuralNote minima B>,
@@ -510,7 +510,7 @@ class GeneralMensuralNote(base.Music21Object):
         >>> gmn_2 = medren.GeneralMensuralNote('semibrevis')
         >>> s_2.append(gmn_2)
         >>> s_2.append(medren.Ligature(['A', 'B']))
-        >>> gmn_2._getSurroundingMeasure(activeSite = s_2)
+        >>> gmn_2._getSurroundingMeasure(activeSite=s_2)
         ([<music21.medren.MensuralNote semibrevis A>,
           <music21.medren.MensuralNote semibrevis B>,
           <music21.medren.GeneralMensuralNote semibrevis>], 2)
@@ -588,8 +588,8 @@ class MensuralRest(GeneralMensuralNote, note.Rest):
 
     # scaling?
     def __init__(self, *arguments, **keywords):
-        note.Rest.__init__(self, *arguments, **keywords)
-        GeneralMensuralNote.__init__(self)
+        note.Rest.__init__(self, *arguments, **keywords) # do not replace with super
+        GeneralMensuralNote.__init__(self)  # due to different keywords...
         self._gettingDuration = False
         self._mensuralType = 'brevis'
 
@@ -673,8 +673,8 @@ class MensuralNote(GeneralMensuralNote, note.Note):
 
     # scaling?
     def __init__(self, *arguments, **keywords):
-        note.Note.__init__(self, *arguments, **keywords)
-        GeneralMensuralNote.__init__(self)
+        note.Note.__init__(self, *arguments, **keywords) # do not replace with super
+        GeneralMensuralNote.__init__(self) # due to different arguments, keywords
         self._gettingDuration = False
         self._mensuralType = 'brevis'
 
@@ -1867,7 +1867,7 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD=None, printUpdates=F
                 for m in breakMensuralStreamIntoBrevisLengths(tempStream, printUpdates):
                     newStream.append(m)
             elif ('GeneralMensuralNote' in e.classes) and (e not in mensuralMeasure):
-                m = stream.Measure(number = measureNum)
+                m = stream.Measure(number=measureNum)
                 if printUpdates is True:
                     print('Getting measure %s...' % measureNum)
                 mensuralMeasure = e._getSurroundingMeasure(mOrD, inpStream_copy)[0]
@@ -1900,7 +1900,7 @@ def setBarlineStyle(score, newStyle, oldStyle='regular', inPlace=True):
         if isinstance(m, stream.Measure):
             barline = m.rightBarline
             if barline is None:
-                m.rightBarline = bar.Barline(style = newStyle)
+                m.rightBarline = bar.Barline(style=newStyle)
             else:
                 if barline.style == oldStyle:
                     barline.style = newStyle

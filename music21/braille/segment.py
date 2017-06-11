@@ -1928,11 +1928,11 @@ def extractBrailleElements(music21Measure):
             if isExempt.count(True) == 0:
                 environRules.warn("{0}".format(notSupportedException))
 
-    allElements.sort(key = lambda x: (x.offset, x.classSortOrder))
+    allElements.sort(key=lambda x: (x.offset, x.classSortOrder))
     if len(allElements) >= 2 and isinstance(allElements[-1], dynamics.Dynamic):
         if isinstance(allElements[-2], bar.Barline):
             allElements[-1].classSortOrder = -1
-            allElements.sort(key = lambda x: (x.offset, x.classSortOrder))
+            allElements.sort(key=lambda x: (x.offset, x.classSortOrder))
 
     return allElements
 

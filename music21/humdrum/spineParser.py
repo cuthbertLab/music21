@@ -631,7 +631,7 @@ class HumdrumDataCollection(object):
                             newSpineList.append(mergerActive)
                         # or make a new spine...
                         else:
-                            s = spineCollection.addSpine(streamClass = stream.Part)
+                            s = spineCollection.addSpine(streamClass=stream.Part)
                             s.insertPoint = i
                             newSpineList.append(s)
 
@@ -1567,7 +1567,7 @@ class SpineCollection(object):
         0
         >>> newSpine.stream
         <music21.stream.Part ...>
-        >>> newSpine2 = hsc.addSpine(streamClass = stream.Stream)
+        >>> newSpine2 = hsc.addSpine(streamClass=stream.Stream)
         >>> newSpine2.id
         1
         >>> newSpine2
@@ -1969,9 +1969,9 @@ class EventCollection(object):
     >>> SE = humdrum.spineParser.SpineEvent
     >>> eventList1 = [SE('C4'),SE('pp')]
     >>> eventList2 = [SE('D4'),SE('.')]
-    >>> ec1 = humdrum.spineParser.EventCollection(maxSpines = 2)
+    >>> ec1 = humdrum.spineParser.EventCollection(maxSpines=2)
     >>> ec1.events = eventList1
-    >>> ec2 = humdrum.spineParser.EventCollection(maxSpines = 2)
+    >>> ec2 = humdrum.spineParser.EventCollection(maxSpines=2)
     >>> ec2.events = eventList2
     >>> ec2.lastEvents[1] = eventList1[1]
     >>> ec2.maxSpines
@@ -2110,7 +2110,7 @@ def hdStringToNote(contents):
             octave = 3 + len(kernNoteName)
         else: # below middle C
             octave = 4 - len(kernNoteName)
-        thisObject = note.Note(octave = octave)
+        thisObject = note.Note(octave=octave)
         thisObject.step = step
 
     # 3.3 -- Rests

@@ -100,9 +100,9 @@ def ex03(show=True, *arguments, **keywords):
 
     # Create a graph of pitch class for the first and second part
     for part in [sStream[0], sStream[1]]:
-        g = graph.PlotHistogramPitchClass(part, title=part.partName)
+        g = graph.plot.HistogramPitchClass(part, title=part.partName)
         if show:
-            g.process()
+            g.run()
 
 
 
@@ -125,9 +125,9 @@ def ex04(show=True, *arguments, **keywords):
     part = sStream.parts[3]
 
 
-    g = graph.PlotScatterPitchClassOffset(part.flat, title=part.partName)
+    g = graph.plot.ScatterPitchClassOffset(part.flat, title=part.partName)
     if show:
-        g.process()
+        g.run()
 
 
 
@@ -269,7 +269,7 @@ def demoJesse(show=True):
 # new examples
 
 
-def corpusMelodicIntervalSearch(show = True):
+def corpusMelodicIntervalSearch(show=True):
     # this version compares china to netherlands
     from music21.analysis import discrete
 
@@ -343,7 +343,7 @@ def corpusMelodicIntervalSearchBrief(show=False):
             print (sub)
 
 
-def corpusFindMelodicSevenths(show = True):
+def corpusFindMelodicSevenths(show=True):
     # find and display melodic sevenths
     import os
     from music21.analysis import discrete

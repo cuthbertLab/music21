@@ -1843,7 +1843,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
-    #ch2_writing_III_A_1(show = True)
+    #ch2_writing_III_A_1(show=True)
     if len(sys.argv) == 1:
         music21.mainTest(Test)
     else:

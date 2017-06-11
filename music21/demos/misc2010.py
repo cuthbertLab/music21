@@ -118,15 +118,15 @@ def towersOfHanoi(show=False, numParts=6, transpose=False):
         firstNote = note.Note("E5")
         firstNote.quarterLength = baseQuarterLength
 
-        if (i/2.0) == int(i/2.0):
+        if (i / 2.0) == int(i / 2.0):
             pitchCycle = copy.deepcopy(evenPitches)
         else:
             pitchCycle = copy.deepcopy(oddPitches)
 
         if transpose == True and i != 1:
             for pe in pitchCycle: # take down P4s
-                pe.transpose(-5 * (i-1), inPlace = True)
-            firstNote.transpose(-5 * (i-1), inPlace = True)
+                pe.transpose(-5 * ( i -1), inPlace=True)
+            firstNote.transpose(-5 * (i - 1), inPlace=True)
 
 
 
@@ -180,8 +180,8 @@ if (__name__ == "__main__"):
 #    annotateWithGerman()
 #    countCs()
     bachParallels()
-#    towersOfHanoi(show = False, transpose = False, numParts = 8)
-#    pcsFromHumdrum(show = True)
+#    towersOfHanoi(show=False, transpose=False, numParts=8)
+#    pcsFromHumdrum(show=True)
 #------------------------------------------------------------------------------
 # eof
 

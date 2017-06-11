@@ -76,8 +76,8 @@ def rhythmicSearch(thisStream, searchStream):
     Now we will search for all dotted-quarter/eighth elements in the Stream:
 
     >>> searchStream1 = stream.Stream()
-    >>> searchStream1.append(note.Note(quarterLength = 1.5))
-    >>> searchStream1.append(note.Note(quarterLength = .5))
+    >>> searchStream1.append(note.Note(quarterLength=1.5))
+    >>> searchStream1.append(note.Note(quarterLength=0.5))
     >>> l = search.rhythmicSearch(thisStream, searchStream1)
     >>> l
     [2, 5]
@@ -93,9 +93,9 @@ def rhythmicSearch(thisStream, searchStream):
 
 
     >>> searchStream2 = stream.Stream()
-    >>> searchStream2.append(note.Note(quarterLength = .5))
+    >>> searchStream2.append(note.Note(quarterLength=0.5))
     >>> searchStream2.append(search.Wildcard())
-    >>> searchStream2.append(note.Note(quarterLength = 1.5))
+    >>> searchStream2.append(note.Note(quarterLength=1.5))
     >>> l = search.rhythmicSearch(thisStream, searchStream2)
     >>> l
     [3, 6]

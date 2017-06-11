@@ -712,6 +712,7 @@ def romanNumeralFromChord(chordObj,
             pass # do something for odd odd chords...
     #print (inversionString, fifthName)
     rnString = rootAlterationString + stepRoman + fifthName + inversionString
+    
     try:
         rn = RomanNumeral(rnString, keyObj, updatePitches=False)
     except fbNotation.ModifierException as strerror:

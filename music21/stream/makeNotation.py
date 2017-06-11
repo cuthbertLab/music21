@@ -299,7 +299,7 @@ def makeMeasures(
     >>> sScr.insert(0, meter.TimeSignature('3/4'))
     >>> sScr.append(note.Note('C4', quarterLength = 3.0))
     >>> sScr.append(note.Note('D4', quarterLength = 3.0))
-    >>> sScr.makeMeasures(inPlace = True)
+    >>> sScr.makeMeasures(inPlace=True)
     >>> sScr.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.clef.TrebleClef>
@@ -322,7 +322,7 @@ def makeMeasures(
     >>> longNote.lyric = "hi"
     >>> p1.append(longNote)
     >>> partWithMeasures = p1.makeMeasures()
-    >>> dummy = partWithMeasures.makeTies(inPlace = True)
+    >>> dummy = partWithMeasures.makeTies(inPlace=True)
     >>> partWithMeasures.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.clef.TrebleClef>
@@ -673,7 +673,7 @@ def makeRests(s,
 
     Now make some rests...
 
-    >>> b = a.makeRests(inPlace = False)
+    >>> b = a.makeRests(inPlace=False)
     >>> len(b)
     2
     >>> b.lowestOffset
@@ -719,7 +719,7 @@ def makeRests(s,
     >>> a.lowestOffset
     4.0
     >>> a.insert(0, meter.TimeSignature('4/4'))
-    >>> a.makeMeasures(inPlace = True)
+    >>> a.makeMeasures(inPlace=True)
     >>> a.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.clef.TrebleClef>
@@ -729,7 +729,7 @@ def makeRests(s,
     {8.0} <music21.stream.Measure 3 offset=8.0>
         {0.0} <music21.note.Note D>
         {1.0} <music21.bar.Barline style=final>
-    >>> a.makeRests(fillGaps = True, inPlace=True)
+    >>> a.makeRests(fillGaps=True, inPlace=True)
     >>> a.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.clef.TrebleClef>
@@ -745,7 +745,7 @@ def makeRests(s,
     Obviously there are problems TODO: fix them
 
     OMIT_FROM_DOCS
-    TODO: default inPlace = False
+    TODO: default inPlace=False
     '''
     from music21 import stream
 

@@ -180,7 +180,7 @@ class ScoreLayout(LayoutBase):
         is undefined.
 
 
-        >>> sl = layout.ScoreLayout(scalingMillimeters = 2.0, scalingTenths=10)
+        >>> sl = layout.ScoreLayout(scalingMillimeters=2.0, scalingTenths=10)
         >>> print(sl.tenthsToMillimeters(10))
         2.0
         >>> print(sl.tenthsToMillimeters(17)) # printing to round

@@ -104,7 +104,8 @@ RESIDUAL = list(string.digits) + ['@']
 # other implementations
 # http://c2.com/cgi-bin/wiki?SieveOfEratosthenesInManyProgrammingLanguages
 # http://www.mycgiserver.com/~gpiancastelli/blog/archives/000042.html
-def eratosthenes(firstCandidate = 2):
+
+def eratosthenes(firstCandidate=2):
     """Yields the sequence of prime numbers via the Sieve of Eratosthenes.
     rather than creating a fixed list of a range (z) and crossing out
     multiples of sequential candidates, this algorithm stores primes under

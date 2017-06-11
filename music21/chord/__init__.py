@@ -823,11 +823,11 @@ class Chord(note.NotRest):
         Force octave changes the octave of the bass note (and all notes above it...)
 
         >>> c2 = chord.Chord(["C#4", "G5", "E6"])
-        >>> c2.closedPosition(forceOctave = 2)
+        >>> c2.closedPosition(forceOctave=2)
         <music21.chord.Chord C#2 E2 G2>
 
         >>> c3 = chord.Chord(["C#4", "G5", "E6"])
-        >>> c3.closedPosition(forceOctave = 6)
+        >>> c3.closedPosition(forceOctave=6)
         <music21.chord.Chord C#6 E6 G6>
 
         Redundant pitches are removed by default, but can be retained...
@@ -2408,12 +2408,12 @@ class Chord(note.NotRest):
 
 
         >>> c4 = chord.Chord(['A-4', 'C5', 'F#6', 'C6', 'C7'])
-        >>> c4.isItalianAugmentedSixth(restrictDoublings = True)
+        >>> c4.isItalianAugmentedSixth(restrictDoublings=True)
         True
         >>> c5 = chord.Chord(['A-4', 'C5', 'F#6', 'C5', 'F#7'])
-        >>> c5.isItalianAugmentedSixth(restrictDoublings = True)
+        >>> c5.isItalianAugmentedSixth(restrictDoublings=True)
         False
-        >>> c5.isItalianAugmentedSixth(restrictDoublings = False)
+        >>> c5.isItalianAugmentedSixth(restrictDoublings=False)
         True
         '''
         ### It+6 => Minor sixth scale step in bass, tonic, raised 4th + doubling of tonic note.

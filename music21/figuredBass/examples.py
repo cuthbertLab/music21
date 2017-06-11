@@ -397,7 +397,7 @@ def generateBoogieVamp(blRealization=None, numRepeats=5):
     [(1,4),(2,12),(3,12)] is used.
 
     >>> from music21.figuredBass import examples
-    >>> #_DOCS_SHOW examples.generateBoogieVamp(numRepeats = 1).show()
+    >>> #_DOCS_SHOW examples.generateBoogieVamp(numRepeats=1).show()
 
     .. image:: images/figuredBass/fbExamples_boogieVamp.*
         :width: 700
@@ -442,7 +442,7 @@ def generateTripletBlues(blRealization=None, numRepeats=5): #12/8
     [(1,4),(2,12),(3,12)] is used.
 
     >>> from music21.figuredBass import examples
-    >>> #_DOCS_SHOW examples.generateTripletBlues(numRepeats = 1).show()
+    >>> #_DOCS_SHOW examples.generateTripletBlues(numRepeats=1).show()
 
     .. image:: images/figuredBass/fbExamples_tripletBlues.*
         :width: 700

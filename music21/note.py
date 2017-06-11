@@ -319,7 +319,7 @@ class GeneralNote(base.Music21Object):
     structure.
 
 
-    >>> gn = note.GeneralNote(type = '16th', dots = 2)
+    >>> gn = note.GeneralNote(type='16th', dots=2)
     >>> gn.quarterLength
     0.4375
     '''
@@ -654,7 +654,7 @@ class GeneralNote(base.Music21Object):
         Set inPlace to True to change the duration element on the Note.  This can have
         negative consequences if the Note is in a stream.
 
-        >>> r = note.Rest(quarterLength = .5)
+        >>> r = note.Rest(quarterLength=0.5)
         >>> r.getGrace(inPlace=True)
         >>> r.duration
         <music21.duration.GraceDuration unlinked type:zero quarterLength:0.0>

@@ -1011,7 +1011,7 @@ class Iterator(object):
 
     Elements in the iterator can be accessed by index as well as slice.
 
-    >>> for chorale in corpus.chorales.Iterator(returnType = 'filename')[4:10]:
+    >>> for chorale in corpus.chorales.Iterator(returnType='filename')[4:10]:
     ...    print(chorale)
     bach/bwv86.6
     bach/bwv267
@@ -1021,7 +1021,7 @@ class Iterator(object):
     bach/bwv248.12-2
     bach/bwv38.6
 
-    >>> print(corpus.chorales.Iterator(returnType = 'filename')[55])
+    >>> print(corpus.chorales.Iterator(returnType='filename')[55])
     bach/bwv159.5
 
 
@@ -1034,7 +1034,7 @@ class Iterator(object):
     correct German title. This is different from the metadata returned by the parser which does
     not give the German title but rather the BWV number.
 
-    >>> corpus.chorales.Iterator(returnType = 'stream')[1].metadata.title
+    >>> corpus.chorales.Iterator(returnType='stream')[1].metadata.title
     'Ich dank dir, lieber Herre'
 
 

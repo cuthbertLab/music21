@@ -1752,7 +1752,7 @@ def intervalFromGenericAndChromatic(gInt, cInt):
 
     specifier = _getSpecifierFromGenericChromatic(gInt, cInt)
     dInt = DiatonicInterval(specifier, gInt)
-    return Interval(diatonic = dInt, chromatic = cInt)
+    return Interval(diatonic=dInt, chromatic=cInt)
 
 
 #-------------------------------------------------------------------------------
@@ -2140,7 +2140,7 @@ class Interval(IntervalBase):
         >>> n1 = note.Note("C4")
         >>> n2 = note.Note("D4")
         >>> n2.pitch.microtone = 30
-        >>> microtoneInterval = interval.Interval(noteStart = n1, noteEnd = n2)
+        >>> microtoneInterval = interval.Interval(noteStart=n1, noteEnd=n2)
         >>> microtoneInterval.cents
         230.0
         '''

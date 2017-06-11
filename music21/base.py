@@ -3853,7 +3853,7 @@ class ElementWrapper(Music21Object):
         >>> import copy
         >>> import music21
 
-        >>> aE = music21.ElementWrapper(obj = "hello")
+        >>> aE = music21.ElementWrapper(obj='hello')
 
         >>> bE = copy.copy(aE)
         >>> aE is bE

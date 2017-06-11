@@ -1970,7 +1970,7 @@ def midiAsciiStringToBinaryString(midiFormat=1, ticksPerQuarterNote=960, tracksE
     >>> asciiMidiEventList.append('0 90 31 15')
     >>> midiTrack = []
     >>> midiTrack.append(asciiMidiEventList)
-    >>> midiBinStr = midi.translate.midiAsciiStringToBinaryString(tracksEventsList = midiTrack)
+    >>> midiBinStr = midi.translate.midiAsciiStringToBinaryString(tracksEventsList=midiTrack)
     >>> midiBinStr
     b'MThd\x00\x00\x00\x06\x00\x01\x00\x01\x03\xc0MTrk\x00\x00\x00\x04\x00\x901\x0f'
     '''
@@ -2120,7 +2120,7 @@ class Test(unittest.TestCase):
         #midiTrack.append(asciiMidiEventList)
         #midiTrack.append(asciiMidiEventList)
 
-        midiBinStr = midiAsciiStringToBinaryString(tracksEventsList = midiTrack)
+        midiBinStr = midiAsciiStringToBinaryString(tracksEventsList=midiTrack)
 
         self.assertEqual(midiBinStr, b"MThd" + a2b_hex("000000060001000103c0") +
                                      b"MTrk" + a2b_hex("0000000400901f0f"))

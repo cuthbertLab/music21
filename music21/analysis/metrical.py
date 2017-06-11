@@ -38,7 +38,7 @@ def labelBeatDepth(streamIn):
     >>> s.insert(0, ts)
     >>> n = note.Note(type='eighth')
     >>> s.repeatAppend(n, 8)
-    >>> s.makeMeasures(inPlace = True)
+    >>> s.makeMeasures(inPlace=True)
     >>> post = analysis.metrical.labelBeatDepth(s)
     >>> sOut = []
     >>> for n in s.flat.notes:

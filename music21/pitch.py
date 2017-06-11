@@ -1350,7 +1350,7 @@ class Pitch(object):
     Instead of using a single string or integer for creating the object, a succession
     of named keywords can be used instead:
 
-    >>> p3 = pitch.Pitch(name = 'C', accidental = '#', octave = 7, microtone = -30)
+    >>> p3 = pitch.Pitch(name='C', accidental='#', octave=7, microtone=-30)
     >>> p3.fullName
     'C-sharp in octave 7 (-30c)'
 
@@ -3680,7 +3680,7 @@ class Pitch(object):
         'C6'
 
         >>> p2 = pitch.Pitch("A#2")
-        >>> p2.simplifyEnharmonic(inPlace = True)
+        >>> p2.simplifyEnharmonic(inPlace=True)
         >>> p2
         <music21.pitch.Pitch A#2>
 
@@ -3694,7 +3694,7 @@ class Pitch(object):
 
         >>> pList = [pitch.Pitch("A#4"), pitch.Pitch("B-4"),
         ...          pitch.Pitch("G-4"), pitch.Pitch("F#4")]
-        >>> [str(p.simplifyEnharmonic(mostCommon = True)) for p in pList]
+        >>> [str(p.simplifyEnharmonic(mostCommon=True)) for p in pList]
         ['B-4', 'B-4', 'F#4', 'F#4']
 
         Note that pitches with implicit octaves retain their implicit octaves.

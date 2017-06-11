@@ -336,7 +336,7 @@ class Segment(object):
 
 
         >>> from music21 import note
-        >>> segmentA = segment.Segment(bassNote = note.Note('B2'), notationString = "6,5")
+        >>> segmentA = segment.Segment(bassNote=note.Note('B2'), notationString='6,5')
         >>> allSpecialResRules = segmentA.specialResolutionRules()
         >>> segment.printRules(allSpecialResRules, maxLength = 3)
         Will run:  Method:                          Arguments:
@@ -348,7 +348,7 @@ class Segment(object):
         Fully-Diminished Seventh Segment:
 
 
-        >>> segmentA = segment.Segment(bassNote = note.Note('B2'), notationString = "-7")
+        >>> segmentA = segment.Segment(bassNote=note.Note('B2'), notationString='-7')
         >>> allSpecialResRules = segmentA.specialResolutionRules()
         >>> segment.printRules(allSpecialResRules, maxLength = 3)
         Will run:  Method:                          Arguments:
@@ -360,7 +360,7 @@ class Segment(object):
         Augmented Sixth Segment:
 
 
-        >>> segmentA = segment.Segment(bassNote = note.Note('A-2'), notationString = "#6,b5")
+        >>> segmentA = segment.Segment(bassNote=note.Note('A-2'), notationString='#6,b5')
         >>> allSpecialResRules = segmentA.specialResolutionRules()
         >>> segment.printRules(allSpecialResRules, maxLength = 3)
         Will run:  Method:                          Arguments:
@@ -397,7 +397,7 @@ class Segment(object):
 
         >>> from music21.figuredBass import segment
         >>> from music21 import note
-        >>> segmentA = segment.Segment(bassNote = note.Note('G2'), notationString = "7")
+        >>> segmentA = segment.Segment(bassNote=note.Note('G2'), notationString='7')
         >>> allDomPossib = segmentA.allCorrectSinglePossibilities()
         >>> allDomPossibList = list(allDomPossib)
         >>> len(allDomPossibList)
@@ -416,7 +416,7 @@ class Segment(object):
         ['B5', 'F5', 'D5', 'G2']
 
 
-        >>> segmentB = segment.Segment(bassNote = note.Note('C3'), notationString = "")
+        >>> segmentB = segment.Segment(bassNote=note.Note('C3'), notationString='')
         >>> domResPairs = segmentA.resolveDominantSeventhSegment(segmentB)
         >>> domResPairsList = list(domResPairs)
         >>> len(domResPairsList)
@@ -430,7 +430,7 @@ class Segment(object):
         domChord = self.segmentChord
         if not domChord.isDominantSeventh():
             #Put here for stand-alone purposes.
-            raise SegmentException("Dominant seventh resolution: Not a dominant seventh Segment.")
+            raise SegmentException('Dominant seventh resolution: Not a dominant seventh Segment.')
         domChordInfo = _unpackSeventhChord(domChord)
         dominantScale = scale.MajorScale().derive(domChord)
         minorScale = dominantScale.getParallelMinor()
@@ -484,8 +484,8 @@ class Segment(object):
             return self._resolveSpecialSegment(segmentB, dominantResolutionMethods)
         except SegmentException:
             self._environRules.warn(
-                "Dominant seventh resolution: No proper resolution available. " +
-                "Executing ordinary resolution.")
+                'Dominant seventh resolution: No proper resolution available. ' +
+                'Executing ordinary resolution.')
             return self._resolveOrdinarySegment(segmentB)
 
     def resolveDiminishedSeventhSegment(self, segmentB, doubledRoot=False):
@@ -497,7 +497,7 @@ class Segment(object):
 
         >>> from music21.figuredBass import segment
         >>> from music21 import note
-        >>> segmentA = segment.Segment(bassNote = note.Note('B2'), notationString = "b7")
+        >>> segmentA = segment.Segment(bassNote=note.Note('B2'), notationString='b7')
         >>> allDimPossib = segmentA.allCorrectSinglePossibilities()
         >>> allDimPossibList = list(allDimPossib)
         >>> len(allDimPossibList)
@@ -508,7 +508,7 @@ class Segment(object):
         ['A-5', 'F5', 'D5', 'B2']
 
 
-        >>> segmentB = segment.Segment(bassNote = note.Note('C3'), notationString = "")
+        >>> segmentB = segment.Segment(bassNote=note.Note('C3'), notationString='')
         >>> dimResPairs = segmentA.resolveDiminishedSeventhSegment(segmentB)
         >>> dimResPairsList = list(dimResPairs)
         >>> len(dimResPairsList)
@@ -522,7 +522,7 @@ class Segment(object):
         if not dimChord.isDiminishedSeventh():
             #Put here for stand-alone purposes.
             raise SegmentException(
-                    "Diminished seventh resolution: Not a diminished seventh Segment.")
+                    'Diminished seventh resolution: Not a diminished seventh Segment.')
         dimChordInfo = _unpackSeventhChord(dimChord)
         dimScale = scale.HarmonicMinorScale().deriveByDegree(7, dimChord.root())
         #minorScale = dimScale.getParallelMinor()
@@ -556,8 +556,8 @@ class Segment(object):
             return self._resolveSpecialSegment(segmentB, diminishedResolutionMethods)
         except SegmentException:
             self._environRules.warn(
-                "Diminished seventh resolution: No proper resolution available. " +
-                "Executing ordinary resolution.")
+                'Diminished seventh resolution: No proper resolution available. ' +
+                'Executing ordinary resolution.')
             return self._resolveOrdinarySegment(segmentB)
 
     def resolveAugmentedSixthSegment(self, segmentB):
@@ -575,7 +575,7 @@ class Segment(object):
 
         >>> from music21.figuredBass import segment
         >>> from music21 import note
-        >>> segmentA = segment.Segment(bassNote = note.Note("A-2"), notationString = "#6,b5,3")
+        >>> segmentA = segment.Segment(bassNote=note.Note('A-2'), notationString='#6,b5,3')
         >>> segmentA.pitchNamesInChord # spell out a Gr+6 chord
         ['A-', 'C', 'E-', 'F#']
         >>> allAugSixthPossib = segmentA.allCorrectSinglePossibilities()
@@ -589,7 +589,7 @@ class Segment(object):
         (<music21.pitch.Pitch C5>, <music21.pitch.Pitch F#4>, <...E-4>, <...A-2>)
 
 
-        >>> segmentB = segment.Segment(bassNote = note.Note("G2"), notationString = "")
+        >>> segmentB = segment.Segment(bassNote=note.Note('G2'), notationString='')
         >>> allAugResPossibPairs = segmentA.resolveAugmentedSixthSegment(segmentB)
         >>> allAugResPossibPairsList = list(allAugResPossibPairs)
         >>> len(allAugResPossibPairsList)
@@ -602,7 +602,7 @@ class Segment(object):
         augSixthChord = self.segmentChord
         if not augSixthChord.isAugmentedSixth():
             #Put here for stand-alone purposes.
-            raise SegmentException("Augmented sixth resolution: Not an augmented sixth Segment.")
+            raise SegmentException('Augmented sixth resolution: Not an augmented sixth Segment.')
         if augSixthChord.isItalianAugmentedSixth():
             return self._resolveOrdinarySegment(segmentB)
         elif augSixthChord.isFrenchAugmentedSixth():
@@ -612,8 +612,8 @@ class Segment(object):
         elif augSixthChord.isSwissAugmentedSixth():
             augSixthType = 3
         else:
-            self._environRules.warn("Augmented sixth resolution: " +
-                    "Augmented sixth type not supported. Executing ordinary resolution.")
+            self._environRules.warn('Augmented sixth resolution: ' +
+                    'Augmented sixth type not supported. Executing ordinary resolution.')
             return self._resolveOrdinarySegment(segmentB)
 
         tonic = resolution._transpose(augSixthChord.bass(), 'M3')
@@ -642,8 +642,8 @@ class Segment(object):
             return self._resolveSpecialSegment(segmentB, augmentedSixthResolutionMethods)
         except SegmentException:
             self._environRules.warn(
-                "Augmented sixth resolution: No proper resolution available. " +
-                "Executing ordinary resolution.")
+                'Augmented sixth resolution: No proper resolution available. ' +
+                'Executing ordinary resolution.')
             return self._resolveOrdinarySegment(segmentB)
 
     def allSinglePossibilities(self):
@@ -757,8 +757,8 @@ class Segment(object):
 
         >>> from music21.figuredBass import segment
         >>> from music21 import note
-        >>> segmentA = segment.Segment(bassNote = note.Note('C3'), notationString = "")
-        >>> segmentB = segment.Segment(bassNote = note.Note('D3'), notationString = "4,3")
+        >>> segmentA = segment.Segment(bassNote=note.Note('C3'), notationString='')
+        >>> segmentB = segment.Segment(bassNote=note.Note('D3'), notationString='4,3')
 
 
         Here, an ordinary resolution is being executed, because segmentA is an ordinary Segment.
@@ -776,8 +776,8 @@ class Segment(object):
         special Segment.
 
 
-        >>> segmentA = segment.Segment(bassNote = note.Note('D3'), notationString = "4,3")
-        >>> segmentB = segment.Segment(bassNote = note.Note('C3'), notationString = "")
+        >>> segmentA = segment.Segment(bassNote=note.Note('D3'), notationString='4,3')
+        >>> segmentB = segment.Segment(bassNote=note.Note('C3'), notationString='')
         >>> consecPairs2 = segmentA.allCorrectConsecutivePossibilities(segmentB)
         >>> consecPairsList2 = list(consecPairs2)
         >>> len(consecPairsList2)
@@ -786,9 +786,9 @@ class Segment(object):
         ((<...G5>, <...F5>, <...B4>, <...D3>), (<...G5>, <...E5>, <...C5>, <...C3>))
         '''
         if not (self.numParts == segmentB.numParts):
-            raise SegmentException("Two segments with unequal numParts cannot be compared.")
+            raise SegmentException('Two segments with unequal numParts cannot be compared.')
         if not (self._maxPitch == segmentB._maxPitch):
-            raise SegmentException("Two segments with unequal maxPitch cannot be compared.")
+            raise SegmentException('Two segments with unequal maxPitch cannot be compared.')
         self._specialResolutionRuleChecking = _compileRules(
                                 self.specialResolutionRules(self.fbRules), 3)
         for (resolutionMethod, args) in self._specialResolutionRuleChecking[True]:
@@ -870,7 +870,7 @@ class Segment(object):
                                     correctAB)
             return correctAB
 
-        raise SegmentException("No standard resolution available.")
+        raise SegmentException('No standard resolution available.')
 
 
 class OverlayedSegment(Segment):
@@ -969,13 +969,13 @@ def printRules(rulesList, maxLength=4):
         if len(rule[1].__name__) >= MAX_SIZE:
             MAX_SIZE = len(rule[1].__name__) + 2
     if maxLength == 4:
-        print("{0:11}{1:{maxSize}}{2:30}{3}".format("Will run:", "Method:",
-                                                    "Keep solutions which return:",
-                                                    "Arguments:", maxSize=MAX_SIZE))
+        print('{0:11}{1:{maxSize}}{2:30}{3}'.format('Will run:', 'Method:',
+                                                    'Keep solutions which return:',
+                                                    'Arguments:', maxSize=MAX_SIZE))
     elif maxLength == 3:
-        print("{0:11}{1:{maxSize}}{2}".format("Will run:",
-                                              "Method:",
-                                              "Arguments:",
+        print('{0:11}{1:{maxSize}}{2}'.format('Will run:',
+                                              'Method:',
+                                              'Arguments:',
                                               maxSize=MAX_SIZE))
 
     for ruleIndex in range(len(rulesList)):
@@ -984,23 +984,23 @@ def printRules(rulesList, maxLength=4):
         if len(rulesList[ruleIndex]) == maxLength:
             args = rulesList[ruleIndex][-1]
         if not args:
-            argsString = "None"
+            argsString = 'None'
         else:
-            argsString = ""
+            argsString = ''
             for itemIndex in range(len(args)):
                 argsString += str(args[itemIndex])
                 if not itemIndex == len(args) - 1:
-                    argsString += ", "
+                    argsString += ', '
         if maxLength == 4:
             (shouldRunMethod, method, isCorrect) = rulesList[ruleIndex][0:3]
-            ruleToPrint = "{0:11}{1:{maxSize}}{2:30}{3}".format(str(shouldRunMethod),
+            ruleToPrint = '{0:11}{1:{maxSize}}{2:30}{3}'.format(str(shouldRunMethod),
                                                                 method.__name__,
                                                                 str(isCorrect),
                                                                 argsString,
                                                                 maxSize=MAX_SIZE)
         elif maxLength == 3:
             (shouldRunMethod, method) = rulesList[ruleIndex][0:2]
-            ruleToPrint = "{0:11}{1:{maxSize}}{2}".format(str(shouldRunMethod),
+            ruleToPrint = '{0:11}{1:{maxSize}}{2}'.format(str(shouldRunMethod),
                                                           method.__name__,
                                                           argsString,
                                                           maxSize=MAX_SIZE)
@@ -1016,7 +1016,7 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

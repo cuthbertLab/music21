@@ -646,7 +646,7 @@ def convertBrevisLength(brevisLength, convertedStream, inpDiv=None, measureNumOf
     :meth:`music21.alpha.trecento.notation.convertTrecentoStream`.
     '''
     div = inpDiv
-    m = stream.Measure(number = brevisLength.number + measureNumOffset)
+    m = stream.Measure(number=brevisLength.number + measureNumOffset)
     rem = None
     measureList = []
 
@@ -690,7 +690,7 @@ def convertBrevisLength(brevisLength, convertedStream, inpDiv=None, measureNumOf
         for dummy in range(int(lenList[0]/div.minimaPerBrevis) - 2):
             measureNumOffset += 1
 
-            tempMeasure = stream.Measure(number = brevisLength.number + measureNumOffset)
+            tempMeasure = stream.Measure(number=brevisLength.number + measureNumOffset)
             tempNote = note.Note(mList[0].pitch)
             tempNote.duration = div.barDuration
             tempNote.tie = tie.Tie('continue')
@@ -698,7 +698,7 @@ def convertBrevisLength(brevisLength, convertedStream, inpDiv=None, measureNumOf
             measureList.append(tempMeasure)
 
         measureNumOffset += 1
-        finalMeasure = stream.Measure(number = brevisLength.number + measureNumOffset)
+        finalMeasure = stream.Measure(number=brevisLength.number + measureNumOffset)
         finalNote = note.Note(mList[0].pitch)
         finalNote.duration = div.barDuration
         finalNote.tie = tie.Tie('stop')
@@ -725,7 +725,7 @@ def convertBrevisLength(brevisLength, convertedStream, inpDiv=None, measureNumOf
                 measureList.append(m)
                 measureNumOffset += 1
 
-                m = stream.Measure(number = brevisLength.number + measureNumOffset)
+                m = stream.Measure(number=brevisLength.number + measureNumOffset)
                 n_tied = note.Note(mList[i].pitch)
                 n_tied.duration = duration.Duration(dur - rem)
                 n_tied.tie = tie.Tie('end')

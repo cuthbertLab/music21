@@ -253,7 +253,7 @@ def findPhraseBoundaries(book=4, madrigal=12):
     phraseScoresByOffset = {}
 
     for p in sc.parts:
-        partNotes = p.flat.stripTies(matchByPitch = True).notesAndRests
+        partNotes = p.flat.stripTies(matchByPitch=True).notesAndRests
         #thisPartPhraseScores = [] # keeps track of the likelihood that a phrase boundary is after note i
         for i in range(2, len(partNotes) - 2): # start on the third note and stop searching on the third to last note...
             thisScore = 0

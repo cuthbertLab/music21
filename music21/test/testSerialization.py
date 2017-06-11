@@ -176,10 +176,10 @@ class Test(unittest.TestCase):
 
         p1 = stream.Part()
         p1.repeatAppend(note.Note('C4'), 12)
-        p1.makeMeasures(inPlace = True)
+        p1.makeMeasures(inPlace=True)
         p2 = stream.Part()
         p2.repeatAppend(note.Note('G4'), 12)
-        p2.makeMeasures(inPlace = True)
+        p2.makeMeasures(inPlace=True)
         s = stream.Score()
         s.insert(0, p1)
         s.insert(0, p2)

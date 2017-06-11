@@ -56,7 +56,7 @@ class TestExternal(unittest.TestCase):
         q.octave = 5
         b.repeatInsert(q, [0,1,2,3])
 
-        bestC = b.bestClef(allowTreble8vb = True)
+        bestC = b.bestClef(allowTreble8vb=True)
         a.insert(0, bestC)
         a.insert(0, ts)
         a.insert(0, b)
@@ -89,7 +89,7 @@ class TestExternal(unittest.TestCase):
         b.elements[-1].duration.tuplets[0].type = "stop"
         b.elements[2].lyric = "a real C"
 
-        bestC = b.bestClef(allowTreble8vb = True)
+        bestC = b.bestClef(allowTreble8vb=True)
         a.insert(0, bestC)
         a.insert(0, ts)
         a.insert(0, b)
@@ -922,7 +922,7 @@ class Test(unittest.TestCase):
         l1 = s.findConsecutiveNotes()
         self.assertTrue(l1[0] is n1)
         self.assertTrue(l1[1] is n2)
-        l2 = s.findConsecutiveNotes(skipChords = True)
+        l2 = s.findConsecutiveNotes(skipChord=True)
         self.assertTrue(len(l2) == 1)
         self.assertTrue(l2[0] is n1)
 
@@ -933,15 +933,15 @@ class Test(unittest.TestCase):
                    2.0, n2])
         l3 = s2.findConsecutiveNotes()
         self.assertTrue(l3[1] is None)
-        l4 = s2.findConsecutiveNotes(skipRests = True)
+        l4 = s2.findConsecutiveNotes(skipRests=True)
         self.assertTrue(len(l4) == 2)
         s3 = Stream()
         s3.insert([0.0, n1,
                    1.0, r1,
                    10.0, n2])
-        l5 = s3.findConsecutiveNotes(skipRests = False)
+        l5 = s3.findConsecutiveNotes(skipRests=False)
         self.assertTrue(len(l5) == 3)  # not 4 because two Nones allowed in a row!
-        l6 = s3.findConsecutiveNotes(skipRests = True, skipGaps = True)
+        l6 = s3.findConsecutiveNotes(skipRests=True, skipGaps=True)
         self.assertTrue(len(l6) == 2)
 
         n1.quarterLength = 10
@@ -952,10 +952,10 @@ class Test(unittest.TestCase):
                    10.0, n3])
         l7 = s4.findConsecutiveNotes()
         self.assertTrue(len(l7) == 2) # n2 is hidden because it is in an overlap
-        l8 = s4.findConsecutiveNotes(getOverlaps = True)
+        l8 = s4.findConsecutiveNotes(getOverlaps=True)
         self.assertTrue(len(l8) == 3)
         self.assertTrue(l8[1] is n2)
-        l9 = s4.findConsecutiveNotes(getOverlaps = True, skipChords = True)
+        l9 = s4.findConsecutiveNotes(getOverlaps=True, skipChords=True)
         self.assertTrue(len(l9) == 3)
         self.assertTrue(l9[1] is None)
 
@@ -970,7 +970,7 @@ class Test(unittest.TestCase):
                    3.0, n4])
         l10 = s5.findConsecutiveNotes()
         self.assertTrue(len(l10) == 4)
-        l11 = s5.findConsecutiveNotes(skipUnisons = True)
+        l11 = s5.findConsecutiveNotes(skipUnisons=True)
         self.assertTrue(len(l11) == 3)
 
         self.assertTrue(l11[2] is n3)
@@ -981,11 +981,11 @@ class Test(unittest.TestCase):
         s6.insert([0.0, n1,
                    1.0, n5,
                    2.0, n2])
-        l12 = s6.findConsecutiveNotes(noNone = True)
+        l12 = s6.findConsecutiveNotes(noNone=True)
         self.assertTrue(len(l12) == 3)
-        l13 = s6.findConsecutiveNotes(noNone = True, skipUnisons = True)
+        l13 = s6.findConsecutiveNotes(noNone=True, skipUnisons=True)
         self.assertTrue(len(l13) == 3)
-        l14 = s6.findConsecutiveNotes(noNone = True, skipOctaves = True)
+        l14 = s6.findConsecutiveNotes(noNone=True, skipOctaves=True)
         self.assertTrue(len(l14) == 2)
         self.assertTrue(l14[0] is n1)
         self.assertTrue(l14[1] is n2)
@@ -1820,7 +1820,7 @@ class Test(unittest.TestCase):
         sScr.insert(0, meter.TimeSignature('3/4'))
         sScr.append(note.Note('C4', quarterLength = 3.0))
         sScr.append(note.Note('D4', quarterLength = 3.0))
-        sScr.makeMeasures(inPlace = True)
+        sScr.makeMeasures(inPlace=True)
         self.assertEqual(len(sScr.getElementsByClass('Measure')), 2)
         self.assertEqual(sScr.measure(1).notes[0].name, 'C')
         self.assertEqual(sScr.measure(2).notes[0].name, 'D')
@@ -2358,7 +2358,7 @@ class Test(unittest.TestCase):
         bm = converter.parse(
                 "tinynotation: 4/4 c#'2 b-2~ b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8",
                 makeNotation=False)
-        bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat = False)
         allNotes = bm.flat.notes
         #      0C#  1B-~  | 2B-  3C#~  4C#    6B-     7C#    8B-~   9B-~   10B-
         ds = [True, True, False, True, False, True, False, False, False, False]
@@ -2373,7 +2373,7 @@ class Test(unittest.TestCase):
         bm = converter.parse(
             "tinynotation: 4/4 c#'2 b-2~ b-8 b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8",
             makeNotation=False)
-        bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
+        bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat = False)
         allNotes = bm.flat.notes
         #      0C#  1B-~  | 2B-   3B-  4C#~  5C#    6B-     7C#    8B-~   9B-~  | 10B-
         ds = [True, True, False, True, True, False, False, False, False, False, False]
@@ -2392,7 +2392,7 @@ class Test(unittest.TestCase):
         for n in s.notes:
             self.assertEqual(n.pitch.accidental.displayStatus, None)
 
-        s.makeAccidentals(inPlace = True)
+        s.makeAccidentals(inPlace=True)
         for n in s.notes:
             self.assertEqual(n.pitch.accidental.displayStatus, False)
 
@@ -3552,7 +3552,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        makeNotation.makeTupletBrackets(s, inPlace = True)
+        makeNotation.makeTupletBrackets(s, inPlace=True)
         self.assertEqual(collectType(s), [None, None, None, 'startStop'])
         self.assertEqual(collectBracket(s), [None, None, None, False])
         #s.show()
@@ -3586,7 +3586,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        makeNotation.makeTupletBrackets(s, inPlace = True)
+        makeNotation.makeTupletBrackets(s, inPlace=True)
         self.assertEqual(collectType(s), [None, 'start', None, 'stop', None, None])
         #s.show()
 
@@ -3597,7 +3597,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        makeNotation.makeTupletBrackets(s, inPlace = True)
+        makeNotation.makeTupletBrackets(s, inPlace=True)
         # this is the correct type settings but this displays by dividing
         # into two brackets
         self.assertEqual(collectType(s), [None, 'start', None, 'stop', 'start', None, 'stop', None, None] )
@@ -3610,7 +3610,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        makeNotation.makeTupletBrackets(s, inPlace = True)
+        makeNotation.makeTupletBrackets(s, inPlace=True)
         self.assertEqual(collectType(s), [None, None, None, 'start', None, 'stop'] )
         #s.show()
 
@@ -3622,7 +3622,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        makeNotation.makeTupletBrackets(s, inPlace = True)
+        makeNotation.makeTupletBrackets(s, inPlace=True)
         self.assertEqual(collectType(s), [None, 'startStop', None,  'startStop', None,  'startStop'])
         self.assertEqual(collectBracket(s), [None, False, None, False, None, False])
         #s.show()
@@ -3634,7 +3634,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        makeNotation.makeTupletBrackets(s, inPlace = True)
+        makeNotation.makeTupletBrackets(s, inPlace=True)
         self.assertEqual(collectType(s), [None, 'start', 'stop', 'start', None, 'stop', None])
         #s.show()
 
@@ -3646,7 +3646,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        makeNotation.makeTupletBrackets(s, inPlace = True)
+        makeNotation.makeTupletBrackets(s, inPlace=True)
         self.assertEqual(collectType(s), [None, 'start', 'stop', None, 'start', 'stop', 'start', 'stop'] )
         self.assertEqual(collectBracket(s), [None, True, True, None, True, True, True, True])
         #s.show()
@@ -3659,7 +3659,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        makeNotation.makeTupletBrackets(s, inPlace = True)
+        makeNotation.makeTupletBrackets(s, inPlace=True)
         self.assertEqual(collectType(s), [None, 'start', None, None, None, None, 'stop', None]  )
         self.assertEqual(collectBracket(s), [None, True, True, True, True, True, True, None] )
         #s.show()
@@ -6079,7 +6079,7 @@ class Test(unittest.TestCase):
             junk = n.getContextByClass(key.KeySignature)
             #print junk
 
-        unused_qj2 = qj.invertDiatonic(note.Note('F4'), inPlace = False)
+        unused_qj2 = qj.invertDiatonic(note.Note('F4'), inPlace=False)
         #qj2.measures(1,2).show('text')
 
 
@@ -6927,7 +6927,7 @@ class Test(unittest.TestCase):
         k1 = qj.flat.getElementsByClass(key.KeySignature)[0]
         qj.flat.replace(k1, key.KeySignature(-3))
         qj.getElementsByClass(stream.Measure)[1].insert(0, key.KeySignature(5))
-        unused_qj2 = qj.invertDiatonic(note.Note('F4'), inPlace = False)
+        unused_qj2 = qj.invertDiatonic(note.Note('F4'), inPlace=False)
 
 
     def testMeasuresA(self):

@@ -174,7 +174,7 @@ class VexflowPickler(object):
         if defaults is None:
             defaults = self.defaults
         jsBody = self.getJSBody(dataSplit, defaults)
-        jsBodyScript = self.jsBodyScript.format(jsBody = jsBody)
+        jsBodyScript = self.jsBodyScript.format(jsBody=jsBody)
         return jsBodyScript
 
     def getJSBody(self, dataSplit, defaults=None):

@@ -24,7 +24,7 @@ class IntervalSearcher(object):
         streamLength = len(cmpStream.flat.notesAndRests)
         if self.intervalLength > streamLength:
             return False
-        stIntervalList = cmpStream.melodicIntervals(skipRests = True)
+        stIntervalList = cmpStream.melodicIntervals(skipRests=True)
         if stIntervalList is None:
             return False
         stIntervalListLength = len(stIntervalList)
@@ -201,10 +201,10 @@ def searchForVat1969():
 def findUpDown(n1, n2, n3):
     if n1.isRest or n2.isRest or n3.isRest:
         return False
-    i1 = interval.Interval(note1 = n1, note2 = n2)
+    i1 = interval.Interval(note1=n1, note2=n2)
     if i1.diatonic.generic.simpleDirected != 2:
         return False
-    i2 = interval.Interval(note1 = n2, note2 = n3)
+    i2 = interval.Interval(note1=n2, note2=n3)
     if i2.diatonic.generic.simpleDirected != -2:
         return False
     return True
@@ -213,7 +213,7 @@ def audioVirelaiSearch():
     #from music21 import audioSearch
     from music21.audioSearch import transcriber
     from music21 import search
-    virelaisSheet = cadencebook.TrecentoSheet(sheetname = 'virelais')
+    virelaisSheet = cadencebook.TrecentoSheet(sheetname='virelais')
 
     virelaiCantuses = []
     for i in range(2, 54):
@@ -221,7 +221,7 @@ def audioVirelaiSearch():
         if thisVirelai.title != "":
             try:
                 vc = thisVirelai.incipit.getElementsByClass('Part')[0]
-                vc.insert(0, metadata.Metadata(title = thisVirelai.title))
+                vc.insert(0, metadata.Metadata(title=thisVirelai.title))
                 virelaiCantuses.append(vc)
             except IndexError:
                 pass

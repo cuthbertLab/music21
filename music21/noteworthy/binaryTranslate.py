@@ -336,7 +336,7 @@ class NWCConverter(object):
         #print(self.numberOfStaves)
 
         for i in range(self.numberOfStaves):
-            thisStaff = NWCStaff(parent = self)
+            thisStaff = NWCStaff(parent=self)
             thisStaff.parse()
             self.staves.append(thisStaff)
 

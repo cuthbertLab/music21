@@ -674,7 +674,7 @@ class Expander(object):
     score
 
     >>> s = converter.parse('tinynotation: 3/4 A2. C4 D E F2.')
-    >>> s.makeMeasures(inPlace = True)
+    >>> s.makeMeasures(inPlace=True)
     >>> s.measure(2).leftBarline = bar.Repeat(direction='start')
     >>> s.measure(2).rightBarline = bar.Repeat(direction='end', times=3)
     >>> s.show('text')
@@ -833,7 +833,7 @@ class Expander(object):
 
 
         >>> s = converter.parse('tinynotation: 3/4 A2.  C4 D E   F2.    G4 a b   c2.')
-        >>> s.makeMeasures(inPlace = True)
+        >>> s.makeMeasures(inPlace=True)
         >>> s.measure(2).leftBarline = bar.Repeat(direction='start')
         >>> s.measure(2).rightBarline = bar.Repeat(direction='end', times=3)
         >>> s.measure(4).leftBarline = bar.Repeat(direction='start')
@@ -1078,7 +1078,7 @@ class Expander(object):
 
 
         >>> s = converter.parse('tinynotation: 3/4 A2.  C4 D E   F2.    G4 a b   c2.')
-        >>> s.makeMeasures(inPlace = True)
+        >>> s.makeMeasures(inPlace=True)
         >>> s.measure(2).leftBarline = bar.Repeat(direction='start')
         >>> s.measure(2).rightBarline = bar.Repeat(direction='end', times=3)
         >>> s.measure(4).leftBarline = bar.Repeat(direction='start')
@@ -1237,7 +1237,7 @@ class Expander(object):
 
 
         >>> s = converter.parse('tinynotation: 3/4 A2.  C4 D E   F2.    G4 a b   c2.')
-        >>> s.makeMeasures(inPlace = True)
+        >>> s.makeMeasures(inPlace=True)
         >>> s.measure(2).leftBarline = bar.Repeat(direction='start')
         >>> s.measure(2).rightBarline = bar.Repeat(direction='end', times=3)
         >>> s.measure(4).leftBarline = bar.Repeat(direction='start')
@@ -1348,7 +1348,7 @@ class Expander(object):
 
 
         >>> s = converter.parse('tinynotation: 3/4 A2.  C4 D E   F2.    G4 a b   c2.')
-        >>> s.makeMeasures(inPlace = True)
+        >>> s.makeMeasures(inPlace=True)
         >>> s.measure(2).leftBarline = bar.Repeat(direction='start')
         >>> s.measure(2).rightBarline = bar.Repeat(direction='end', times=3)
         >>> s.measure(4).leftBarline = bar.Repeat(direction='start')
@@ -1676,7 +1676,7 @@ class Expander(object):
 
 
         >>> s = converter.parse('tinynotation: 3/4 A2. C4 D E F2.')
-        >>> s.makeMeasures(inPlace = True)
+        >>> s.makeMeasures(inPlace=True)
         >>> s.measure(3).append(repeat.Segno())
         >>> e = repeat.Expander()
 
@@ -2395,7 +2395,7 @@ class RepeatFinder(object):
         ...    m.append(note.Note('E-'))
         ...    m.append(note.Note('C'))
         ...    m.append(note.Note('B3'))
-        >>> s2 = repeat.RepeatFinder(s).simplify(repeatThreshold = 2)
+        >>> s2 = repeat.RepeatFinder(s).simplify(repeatThreshold=2)
         >>> len(s2.getElementsByClass(stream.Measure))
         3
         >>> len(s2.flat.getElementsByClass(bar.Repeat))

@@ -1206,7 +1206,7 @@ class ConcreteScale(Scale):
 
     Here we treat a diminished triad as a scale:
 
-    >>> myscale = scale.ConcreteScale(pitches = ["C4", "E-4", "G-4", "A4"])
+    >>> myscale = scale.ConcreteScale(pitches=["C4", "E-4", "G-4", "A4"])
     >>> myscale.getTonic()
     <music21.pitch.Pitch C4>
     >>> myscale.next("G-2")
@@ -1367,7 +1367,7 @@ class ConcreteScale(Scale):
         '''Return the tonic.
 
 
-        >>> sc = scale.ConcreteScale(tonic = 'e-4')
+        >>> sc = scale.ConcreteScale(tonic='e-4')
         >>> sc.getTonic()
         <music21.pitch.Pitch E-4>
         '''
@@ -3884,7 +3884,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
     def testConcreteScaleA(self):
         # testing of arbitrary concrete scales
-        sc = ConcreteScale(pitches = ["C#3", "E-3", "F3", "G3", "B3", "D~4", "F#4", "A4", "C#5"])
+        sc = ConcreteScale(pitches=["C#3", "E-3", "F3", "G3", "B3", "D~4", "F#4", "A4", "C#5"])
         self.assertEqual(str(sc.getTonic()), 'C#3')
 
         self.assertEqual(sc.abstract.octaveDuplicating, False)
@@ -3906,7 +3906,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
             '[C#7, A6, F#6, D~6, B5, G5, F5, E-5, C#5]')
 
 
-        sc = ConcreteScale(pitches = ["C#3", "E-3", "F3", "G3", "B3", "C#4"])
+        sc = ConcreteScale(pitches=["C#3", "E-3", "F3", "G3", "B3", "C#4"])
         self.assertEqual(str(sc.getTonic()), 'C#3')
         self.assertEqual(sc.abstract.octaveDuplicating, True)
 
@@ -4028,7 +4028,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
 
     def testDerivedScaleNoOctaves(self):
-        d = ConcreteScale(pitches = ['a', 'b', 'c', 'd', 'e', 'f', 'g#', 'a'])
+        d = ConcreteScale(pitches=['a', 'b', 'c', 'd', 'e', 'f', 'g#', 'a'])
         e = d.deriveRanked(['C', 'E', 'G'], comparisonAttribute='name')
         self.assertEqual(str(e), ''.join(["[(3, <music21.scale.ConcreteScale F Concrete>), ",
                                           "(3, <music21.scale.ConcreteScale E Concrete>), ",

@@ -157,7 +157,7 @@ class TonalityCounter(object):
         self.displayStream = allScores
         self.output = output
 
-def landiniTonality(show = True):
+def landiniTonality(show=True):
     '''
     generates information about the tonality of Landini's ballate using
     the tenor (streamName = "T") and the A cadence (which we would believe
@@ -175,7 +175,7 @@ def landiniTonality(show = True):
     if show is True:
         print(tCounter.output)
 
-def nonLandiniTonality(show = True):
+def nonLandiniTonality(show=True):
     '''
     generates information about the tonality of not anonymous ballate
     that are not by Francesco (Landini) using
@@ -183,7 +183,7 @@ def nonLandiniTonality(show = True):
     would end the piece)
 
 
-    >>> #_DOCS_SHOW trecento.tonality.nonLandiniTonality(show = True)
+    >>> #_DOCS_SHOW trecento.tonality.nonLandiniTonality(show=True)
 
 
     Prints something like this::
@@ -280,7 +280,7 @@ def nonLandiniTonality(show = True):
     if show is True:
         print(tCounter.output)
 
-def anonBallataTonality(show = True):
+def anonBallataTonality(show=True):
     '''
     Gives a list of all anonymous ballate with their incipit tenor note and cadence tenor notes
     keeps track of how often they are the same and how often they are different.
@@ -302,7 +302,7 @@ def anonBallataTonality(show = True):
         print("It might take a while, esp. on the first Lilypond run...")
         tCounter.displayStream.show('lily.png')
 
-def sacredTonality(show = True):
+def sacredTonality(show=True):
     '''
     Gives a list of all sacred pieces by incipit tenor note and last cadence tenor note
     and then notices which are the same and which are different.

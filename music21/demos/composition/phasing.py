@@ -9,6 +9,7 @@
 # Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
+from __future__ import division
 
 import sys
 import copy
@@ -38,7 +39,7 @@ def pitchedPhase(cycles=None, show=False):
     The source code describes how this works.
 
 
-    >>> #_DOCS_SHOW composition.phasing.pitchedPhase(cycles = 4, show = True)
+    >>> #_DOCS_SHOW composition.phasing.pitchedPhase(cycles=4, show=True)
 
     .. image:: images/phasingDemo.*
             :width: 576
@@ -55,7 +56,7 @@ def pitchedPhase(cycles=None, show=False):
     durationToShift = duration.Duration('64th')
     increment = durationToShift.quarterLength
     if cycles == None:
-        cycles = int(round(1/increment)) + 1
+        cycles = int(round(1 / increment)) + 1
 
     for i in range(cycles):
         sPost.parts[0].append(copy.deepcopy(sSrc))
@@ -75,7 +76,7 @@ def pitchedPhase(cycles=None, show=False):
         pass
 
 
-def partPari(show = True):
+def partPari(show=True):
     '''
     generate the score of Arvo Pärt's "Pari Intervallo" algorithmically
     using music21.scale.ConcreteScale() to simulate Tintinabulation.
@@ -109,11 +110,11 @@ def partPari(show = True):
     middle = copy.deepcopy(main.flat)
 
 
-    cMinorArpeg = scale.ConcreteScale(pitches = ["C2", "E-2", "G2"])
-    # dummy test on other data
-    #myA = pitch.Pitch("A2")
-    #myA.microtone = -15
-    #cMinorArpeg = scale.ConcreteScale(pitches = ["C2", "E`2", "F~2", myA])
+    cMinorArpeg = scale.ConcreteScale(pitches=["C2", "E-2", "G2"])
+    ##  dummy test on other data
+    # myA = pitch.Pitch("A2")
+    # myA.microtone = -15
+    # cMinorArpeg = scale.ConcreteScale(pitches=["C2", "E`2", "F~2", myA])
 
     lastNote = top.notes[-1]
     top.remove(lastNote)
@@ -126,7 +127,7 @@ def partPari(show = True):
             else:
                 n.duration.quarterLength = 6.0
                 n.tie = None
-    r1 = note.Rest(type = 'half')
+    r1 = note.Rest(type='half')
     top.insertAndShift(0, r1)
     top.getElementsByClass(key.Key)[0].setOffsetBySite(top, 0)
     lastNote = middle.notes[-1]
@@ -135,20 +136,20 @@ def partPari(show = True):
     for n in middle:
         if 'Note' in n.classes:
             n.pitch = cMinorArpeg.next(n.pitch, direction=scale.DIRECTION_DESCENDING, stepSize=2)
-            if n.offset != (73-1)*4.0:  # m. 73 is different
+            if n.offset != (73 - 1) *4.0:  # m. 73 is different
                 n.duration.quarterLength = 3.0
                 middle.insert(n.offset + 3, note.Rest())
             else:
                 n.duration.quarterLength = 5.0
                 n.tie = None
-    r2 = note.Rest(quarterLength = 3.0)
+    r2 = note.Rest(quarterLength=3.0)
     middle.insertAndShift(0, r2)
     middle.getElementsByClass(key.Key)[0].setOffsetBySite(middle, 0)
 
     ttied = top.makeMeasures().makeTies(inPlace=False)
     mtied = middle.makeMeasures().makeTies(inPlace=False)
-    bass.makeMeasures(inPlace = True)
-    main.makeMeasures(inPlace = True)
+    bass.makeMeasures(inPlace=True)
+    main.makeMeasures(inPlace=True)
 
     s.insert(0, ttied)
     s.insert(0, main)
@@ -217,9 +218,9 @@ def pendulumMusic(show = True,
         p = octo.next(p, stepSize = scaleStepSize)
 
 
-    parts[0].insert(0, tempo.MetronomeMark(number = 120, referent = duration.Duration(2.0)))
+    parts[0].insert(0, tempo.MetronomeMark(number=120, referent=duration.Duration(2.0)))
     for i in range(4):
-        parts[i].insert(int((jMax + 4.0)/4)*4, note.Rest(quarterLength=4.0))
+        parts[i].insert(int((jMax + 4.0) / 4) * 4, note.Rest(quarterLength=4.0))
         parts[i].makeRests(fillGaps=True, inPlace=True)
         parts[i] = parts[i].makeNotation()
         s.insert(0, parts[i])

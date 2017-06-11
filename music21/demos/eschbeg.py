@@ -54,7 +54,7 @@ def setupTranspositions():
 
 eschbegTransposed = setupTranspositions()
 
-def generateToneRows(numberToGenerate = 1000, cardinality=12):
+def generateToneRows(numberToGenerate=1000, cardinality=12):
     '''
     generates a list of random 12-tone rows.
 
@@ -75,7 +75,7 @@ def generateToneRows(numberToGenerate = 1000, cardinality=12):
         returnRows.append(''.join(firstRow[0:cardinality]))
     return returnRows
 
-def generateRandomRows(numberToGenerate = 1000):
+def generateRandomRows(numberToGenerate=1000):
     '''
     generates random rows which might have the
     same note twice, but never twice in a row.
@@ -268,7 +268,7 @@ def uniquenessOfEschbeg(cardinality=7, searchCardinality=3, skipInverse=False, s
     So almost half of all heptachords have a complete set of trichords and inversions. How many
     have all trichords without inversion?
 
-    >>> len(demos.eschbeg.uniquenessOfEschbeg(skipInverse = True))
+    >>> len(demos.eschbeg.uniquenessOfEschbeg(skipInverse=True))
     18
 
     So, not too many more.
@@ -277,17 +277,17 @@ def uniquenessOfEschbeg(cardinality=7, searchCardinality=3, skipInverse=False, s
 
     Is there an all-tetrachord heptachord?
 
-    >>> len(demos.eschbeg.uniquenessOfEschbeg(searchCardinality = 4, skipInverse = True))
+    >>> len(demos.eschbeg.uniquenessOfEschbeg(searchCardinality=4, skipInverse=True))
     0
 
     Nope.  What about octachord?
 
-    >>> len(demos.eschbeg.uniquenessOfEschbeg(cardinality = 8, searchCardinality = 4, skipInverse = True))
+    >>> len(demos.eschbeg.uniquenessOfEschbeg(cardinality=8, searchCardinality=4, skipInverse=True))
     2
 
     Yep! what are they?
 
-    >>> demos.eschbeg.uniquenessOfEschbeg(cardinality = 8, searchCardinality = 4, skipInverse = True)
+    >>> demos.eschbeg.uniquenessOfEschbeg(cardinality=8, searchCardinality=4, skipInverse=True)
     ['01234689', '01235679']
 
     Notice that they're the complement sets of the all-interval tetrachords 0146 and 0137!
@@ -297,12 +297,13 @@ def uniquenessOfEschbeg(cardinality=7, searchCardinality=3, skipInverse=False, s
     >>> numOctochords = len(chord.tables.FORTE[8]) - 1
     >>> numOctochords
     29
-    >>> len(demos.eschbeg.uniquenessOfEschbeg(cardinality = 8, searchCardinality = 3, skipInverse = True))
+    >>> len(demos.eschbeg.uniquenessOfEschbeg(cardinality=8, searchCardinality=3, skipInverse=True))
     22
 
     Nope.  Seven are not.  We can see them by reversing showMatching
 
-    >>> demos.eschbeg.uniquenessOfEschbeg(cardinality = 8, searchCardinality = 3, skipInverse = True, showMatching = False)
+    >>> demos.eschbeg.uniquenessOfEschbeg(cardinality=8, searchCardinality=3, skipInverse=True, 
+    ...                                   showMatching=False)
     ['01234567', '01235678', '01236789', '02345679', '01234679', '0123578T', '0134679T']
 
     These are the complement sets of 0123 0128 0167 0235 0136 0258 0369
@@ -332,8 +333,8 @@ if __name__ == "__main__":
     import music21
     music21.mainTest()
 
-    #print findEmbeddedChords(cardinality = 5)
-    #p, t = priorProbability(100000, enforce12Tone = False)
+    #print findEmbeddedChords(cardinality=5)
+    #p, t = priorProbability(100000, enforce12Tone=False)
     #print p
     #print t
 

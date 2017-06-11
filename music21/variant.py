@@ -1626,10 +1626,10 @@ def makeAllVariantsReplacements(streamWithVariants,
         returnStream = copy.deepcopy(streamWithVariants)
 
     if recurse is True:
-        for s in returnStream.recurse(streamsOnly = True):
-            _doVariantFixingOnStream(s, variantNames = variantNames)
+        for s in returnStream.recurse(streamsOnly=True):
+            _doVariantFixingOnStream(s, variantNames=variantNames)
     else:
-        _doVariantFixingOnStream(returnStream, variantNames = variantNames)
+        _doVariantFixingOnStream(returnStream, variantNames=variantNames)
 
 
     if inPlace is True:

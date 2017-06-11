@@ -708,11 +708,11 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
     1.75
 
 
-    >>> tup = duration.Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
+    >>> tup = duration.Tuplet(numberNotesActual=5, numberNotesNormal=4)
     >>> duration.convertTypeToQuarterLength('quarter', 0, [tup])
     Fraction(4, 5)
 
-    >>> tup = duration.Tuplet(numberNotesActual = 3, numberNotesNormal = 4)
+    >>> tup = duration.Tuplet(numberNotesActual=3, numberNotesNormal=4)
     >>> duration.convertTypeToQuarterLength('quarter', 0, [tup])
     Fraction(4, 3)
 
@@ -721,7 +721,7 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
     Conceptually, these are dotted-(dotted-half) notes.  See
     trecento.trecentoCadence for more information
     ).
-    >>> duration.convertTypeToQuarterLength('half', dots = 1, dotGroups = [1,1])
+    >>> duration.convertTypeToQuarterLength('half', dots=1, dotGroups=[1,1])
     4.5
     '''
     if dType in typeToDuration:
@@ -2175,7 +2175,7 @@ class Duration(SlottedObjectMixin):
         Probably does not handle properly tuplets of dot-groups.
         Never seen one, so probably okay.
 
-        >>> d1 = duration.Duration(type = 'half')
+        >>> d1 = duration.Duration(type='half')
         >>> d1.dotGroups = (1,1)
         >>> d1.quarterLength
         4.5
@@ -3048,7 +3048,7 @@ class TupletFixer(object):
         ...        n.duration.tuplets[0].type = 'stop'
         ...    s.append(n)
         >>> tf = duration.TupletFixer(s)
-        >>> tupletGroups = tf.findTupletGroups(incorporateGroupings = True)
+        >>> tupletGroups = tf.findTupletGroups(incorporateGroupings=True)
         >>> tupletGroups
         [[<music21.note.Note C>, <music21.note.Note C#>, <music21.note.Note D>],
          [<music21.note.Note E->, <music21.note.Note E>, <music21.note.Note F>],

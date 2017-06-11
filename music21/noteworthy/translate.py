@@ -626,7 +626,7 @@ class NoteworthyTranslator(object):
 
 
         >>> measureIn = stream.Measure()
-        >>> measureIn.append(note.Rest(quarterLength = 3.0))
+        >>> measureIn.append(note.Rest(quarterLength=3.0))
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentMeasure = measureIn

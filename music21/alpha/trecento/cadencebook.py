@@ -44,7 +44,7 @@ class TrecentoSheet(object):
 
 
 
-    >>> kyrieSheet = alpha.trecento.cadencebook.TrecentoSheet(sheetname = 'kyrie')
+    >>> kyrieSheet = alpha.trecento.cadencebook.TrecentoSheet(sheetname='kyrie')
     >>> for thisKyrie in kyrieSheet:
     ...     print(thisKyrie.title)
     Questa Fanc.
@@ -835,7 +835,7 @@ class TestExternal(unittest.TestCase):
         '''
         test showing a virelai's incipit to see if it works
         '''
-        virelaisSheet = TrecentoSheet(sheetname = 'virelais')
+        virelaisSheet = TrecentoSheet(sheetname='virelais')
         thisVirelai = virelaisSheet.makeWork(54)
         if thisVirelai.title != "":
             print(thisVirelai.title)
@@ -845,7 +845,7 @@ class TestExternal(unittest.TestCase):
         '''
         test showing a rondeaux's incipit to see if it works
         '''
-        rondeauxSheet = TrecentoSheet(sheetname = 'rondeaux')
+        rondeauxSheet = TrecentoSheet(sheetname='rondeaux')
         thisRondeaux = rondeauxSheet.makeWork(41)
         if thisRondeaux.title != "":
             print(thisRondeaux.title)

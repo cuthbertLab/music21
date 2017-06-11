@@ -25,7 +25,7 @@ def getLandiniRandomStart(i):
         return "F"
     return "G"
 
-# def findsame(total = 1000):
+# def findsame(total=1000):
 #     '''find out how often the first note and second note should be the same
 #     according to chance, given Landini\'s distribution of pitches.
 #     '''
@@ -36,7 +36,7 @@ def getLandiniRandomStart(i):
 #             same += 1
 #     return same
 
-# def multipleFindsame(total = 10000):
+# def multipleFindsame(total=10000):
 #     '''find out how often findsame percentage meets or exceeds Landini\'s same count
 #     which is either 64 out of 138 (for A cadences) or 49 (for B cadences)
 #     '''

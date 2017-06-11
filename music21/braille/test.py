@@ -1656,7 +1656,7 @@ class Test(unittest.TestCase):
                              "E BB G E BB E4 EE EE8 EE4 r8 EE8 EE DD " +
                              "EE EE EE EE EE EE EE4 EE8 EE4~ EE8 r8 r").flat
         bm.insert(0, key.KeySignature(1))
-        bm.insert(0, tempo.MetronomeMark(number = 100, referent = note.Note(type='quarter')))
+        bm.insert(0, tempo.MetronomeMark(number=100, referent=note.Note(type='quarter')))
         bm.insert(0, tempo.TempoText("Not too fast"))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bmsave = bm
@@ -2435,7 +2435,7 @@ Barline final ⠣⠅
         e1 = expressions.TextExpression('decresc.')
         ml[0].insert(0.0, e0)
         ml[1].insert(0.0, e1)
-        #w1 = dynamics.Wedge(type = 'crescendo')
+        #w1 = dynamics.Wedge(type='crescendo')
         self.s = bm
         #self.b = '''
         #'''

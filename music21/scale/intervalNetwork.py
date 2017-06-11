@@ -2866,7 +2866,7 @@ class IntervalNetwork(object):
 
         PitchSimplifcation can also be specified in the creation of the IntervalNetwork object
 
-        >>> b = scale.intervalNetwork.IntervalNetwork(pitchSimplification = None)
+        >>> b = scale.intervalNetwork.IntervalNetwork(pitchSimplification=None)
         >>> p = pitch.Pitch("C4")
         >>> allPitches = []
         >>> for j in range(5):

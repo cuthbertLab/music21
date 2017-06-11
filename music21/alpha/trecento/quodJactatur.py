@@ -201,12 +201,12 @@ def getQJ():
 
     qj = corpus.parse("ciconia/quod_jactatur")
     qjPart = qj.getElementsByClass(stream.Part)[0]
-    qjPart.transpose("P-8", inPlace = True)
+    qjPart.transpose("P-8", inPlace=True)
     qjPart.replace(qjPart.flat.getElementsByClass(clef.Clef)[0], clef.BassClef())
     cachedParts['1-0-False-False'] = copy.deepcopy(qjPart)
     return qjPart
 
-def findRetrogradeVoices(show = True):
+def findRetrogradeVoices(show=True):
     '''
     the structure of the piece strongly suggests a retrograde solution
     (e.g., there is a cadence in m5 and five measures from the end and one
@@ -223,7 +223,7 @@ def findRetrogradeVoices(show = True):
             if transpose != 1:
                 transposeStreamDiatonic(qj2, transpose)
             if invert is True:
-                qj2.invertDiatonic(qj2.flat.notesAndRests[0], inPlace = True)
+                qj2.invertDiatonic(qj2.flat.notesAndRests[0], inPlace=True)
             qj2 = reverse(qj2, makeNotation = False)
             qj = stream.Score()
             qj.insert(0, qj2.flat)
@@ -279,7 +279,7 @@ def prepareSolution(triplumTup, ctTup, tenorTup):
             if retro is True:
                 qjPart = reverse(qjPart, makeNotation = False)
             if invert is True:
-                qjPart.invertDiatonic(qjPart.flat.notesAndRests[0], inPlace = True)
+                qjPart.invertDiatonic(qjPart.flat.notesAndRests[0], inPlace=True)
             if transpose != 1:
                 transposeStreamDiatonic(qjPart, transpose)
             if delay > 0:
@@ -289,7 +289,7 @@ def prepareSolution(triplumTup, ctTup, tenorTup):
 
     #DOESN'T WORK -- am I doing something wrong?
     #for tp in qjSolved.parts:
-    #    tp.makeMeasures(inPlace = True)
+    #    tp.makeMeasures(inPlace=True)
     qjChords = qjSolved.chordify()
 
     consScore = 0

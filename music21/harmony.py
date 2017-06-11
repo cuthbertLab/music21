@@ -284,7 +284,7 @@ class Harmony(chord.Chord):
         >>> h.figure
         'CM'
 
-        >>> harmony.ChordSymbol(root = 'C', bass = 'A', kind = 'minor').figure
+        >>> harmony.ChordSymbol(root='C', bass='A', kind='minor').figure
         'Cm/A'
 
         >>> h.bass(note.Note('E'))
@@ -1987,7 +1987,7 @@ class ChordSymbol(Harmony):
         This method tries to deduce what information it can from the provided
         pitches.
 
-        >>> h = harmony.ChordSymbol(root = 'F', bass = 'D-', kind = 'Neapolitan')
+        >>> h = harmony.ChordSymbol(root='F', bass='D-', kind='Neapolitan')
         >>> h.figure
         'FN6/D-'
 

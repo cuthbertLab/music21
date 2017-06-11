@@ -337,9 +337,9 @@ class LilypondConverter(object):
             contents.append(lpHeader)
             contents.append(lpScoreBlock)
 
-        lpOutputDefHead = lyo.LyOutputDefHead(defType = 'paper')
-        lpOutputDefBody = lyo.LyOutputDefBody(outputDefHead = lpOutputDefHead)
-        lpOutputDef = lyo.LyOutputDef(outputDefBody = lpOutputDefBody)
+        lpOutputDefHead = lyo.LyOutputDefHead(defType='paper')
+        lpOutputDefBody = lyo.LyOutputDefBody(outputDefHead=lpOutputDefHead)
+        lpOutputDef = lyo.LyOutputDef(outputDefBody=lpOutputDefBody)
         contents.append(lpOutputDef)
 
         lpLayout = lyo.LyLayout()
@@ -430,10 +430,10 @@ class LilypondConverter(object):
         >>> p1,p2 = stream.Part(), stream.Part()
         >>> p1.insert(0, meter.TimeSignature('4/4'))
         >>> p2.insert(0, meter.TimeSignature('4/4'))
-        >>> p1.append(variant.Variant(name = 'london'))
-        >>> p2.append(variant.Variant(name = 'london'))
-        >>> p1.append(variant.Variant(name = 'rome'))
-        >>> p2.append(variant.Variant(name = 'rome'))
+        >>> p1.append(variant.Variant(name='london'))
+        >>> p2.append(variant.Variant(name='london'))
+        >>> p1.append(variant.Variant(name='rome'))
+        >>> p2.append(variant.Variant(name='rome'))
         >>> for i in range(4):
         ...    m = stream.Measure()
         ...    n = note.Note('D4', type='whole')
@@ -741,7 +741,7 @@ class LilypondConverter(object):
 
             lpLyricList = lyo.LyMusicList(lyricList)
 
-            lpSequentialMusic = lyo.LySequentialMusic(musicList = lpLyricList)
+            lpSequentialMusic = lyo.LySequentialMusic(musicList=lpLyricList)
             lpGroupedMusicList = lyo.LyGroupedMusicList(sequentialMusic=lpSequentialMusic)
             lpGroupedMusicLists.append(lpGroupedMusicList)
 
@@ -905,7 +905,7 @@ class LilypondConverter(object):
         lpGroupedMusicList = lyo.LyGroupedMusicList(sequentialMusic=lpSequentialMusic)
         lpCompositeMusic = lyo.LyCompositeMusic(groupedMusicList=lpGroupedMusicList,
                                                 newLyrics=lpNewLyrics)
-        lpMusic = lyo.LyMusic(compositeMusic = lpCompositeMusic)
+        lpMusic = lyo.LyMusic(compositeMusic=lpCompositeMusic)
 
         if compositeMusicType is None:
             compositeMusicType = 'new'
@@ -1304,12 +1304,12 @@ class LilypondConverter(object):
             elif noteOrRest.beams.beamsList[0].type == 'stop':
                 simpleElementParts.append("] ")  # no start-stop in music21...
 
-        simpleElement = lyo.LySimpleElement(parts = simpleElementParts)
+        simpleElement = lyo.LySimpleElement(parts=simpleElementParts)
 
         postEvents = self.postEventsFromObject(noteOrRest)
 
-        evc = lyo.LyEventChord(simpleElement, postEvents = postEvents)
-        mlSM = lyo.LySimpleMusic(eventChord = evc)
+        evc = lyo.LyEventChord(simpleElement, postEvents=postEvents)
+        mlSM = lyo.LySimpleMusic(eventChord=evc)
 
         return mlSM
 
@@ -1323,8 +1323,8 @@ class LilypondConverter(object):
         >>> lpc.context = lpMusicList
         >>> lpc.context.contents
         []
-        >>> n1 = note.Note(quarterLength = 0.25)
-        >>> n2 = note.Note(quarterLength = 0.25)
+        >>> n1 = note.Note(quarterLength=0.25)
+        >>> n2 = note.Note(quarterLength=0.25)
         >>> n1.beams.fill(2, 'start')
         >>> n2.beams.fill(2, 'stop')
 
@@ -1448,8 +1448,8 @@ class LilypondConverter(object):
         lpNoteChordElement = lyo.LyNoteChordElement(chordBody=lpChordBody,
                                                     optionalNoteModeDuration=lpMultipliedDuration,
                                                     postEvents=postEvents)
-        evc = lyo.LyEventChord(noteChordElement = lpNoteChordElement)
-        mlSM = lyo.LySimpleMusic(eventChord = evc)
+        evc = lyo.LyEventChord(noteChordElement=lpNoteChordElement)
+        mlSM = lyo.LySimpleMusic(eventChord=evc)
         return mlSM
         # TODO: Chord beaming...
 
@@ -1733,11 +1733,11 @@ class LilypondConverter(object):
         else: # pragma: no cover
             fraction = str(numerator) + '/' + str(denominator)
         lpMusicList = lyo.LyMusicList()
-        lpSequentialMusic = lyo.LySequentialMusic(musicList = lpMusicList)
+        lpSequentialMusic = lyo.LySequentialMusic(musicList=lpMusicList)
         ## technically needed, but we can speed things up
-        #lpGroupedMusicList = lyo.LyGroupedMusicList(sequentialMusic = lpSequentialMusic)
-        #lpCompositeMusic = lyo.LyCompositeMusic(groupedMusicList = lpGroupedMusicList)
-        #lpMusic = lyo.LyMusic(compositeMusic = lpCompositeMusic)
+        #lpGroupedMusicList = lyo.LyGroupedMusicList(sequentialMusic=lpSequentialMusic)
+        #lpCompositeMusic = lyo.LyCompositeMusic(groupedMusicList=lpGroupedMusicList)
+        #lpMusic = lyo.LyMusic(compositeMusic=lpCompositeMusic)
         lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type='times',
                                                             fraction=fraction,
                                                             music=lpSequentialMusic)
@@ -1934,7 +1934,7 @@ class LilypondConverter(object):
                 else:
                     return inputStream.elementOffset(el)
 
-        variantList.sort(key = lambda v: findOffsetOfFirstNonSpacerElement(v._stream))
+        variantList.sort(key=lambda v: findOffsetOfFirstNonSpacerElement(v._stream))
 
 
         # Stuff that can be done on the first element only (clef, new/old, id, color)
@@ -2147,25 +2147,27 @@ class LilypondConverter(object):
             lpVariantTuplet = lyo.LyPrefixCompositeMusic(type='times',
                                                         fraction=fraction,
                                                         music=lpOssiaMusicVariant)
-            lpInternalSequentialMusic = lyo.LySequentialMusic(musicList = lpVariantTuplet)
+            lpInternalSequentialMusic = lyo.LySequentialMusic(musicList=lpVariantTuplet)
             musicList.append(lpInternalSequentialMusic)
         else:
             musicList.append(lpOssiaMusicVariant)
 
 
         lpMusicList = lyo.LyMusicList(musicList)
-        lpOssiaMusicVariantWithSpacer = lyo.LySequentialMusic(musicList = lpMusicList )
+        lpOssiaMusicVariantWithSpacer = lyo.LySequentialMusic(musicList=lpMusicList )
 
         if newVariant is True:
-            lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type='new',
+            lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(
+                                                        type='new',
                                                         optionalId=variantId,
                                                         simpleString="Staff",
                                                         music=lpOssiaMusicVariantWithSpacer)
         else:
-            lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type='context',
-                                                          optionalId=variantId,
-                                                          simpleString="Staff",
-                                                          music=lpOssiaMusicVariantWithSpacer)
+            lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(
+                                                        type='context',
+                                                         optionalId=variantId,
+                                                         simpleString="Staff",
+                                                         music=lpOssiaMusicVariantWithSpacer)
 
 #        optionalContextMod = r'''
 #\with {
@@ -2230,7 +2232,7 @@ class LilypondConverter(object):
         musicList = []
 
         lpMusicList = lyo.LyMusicList(contents=musicList)
-        lpOssiaMusic = lyo.LyOssiaMusic(musicList = lpMusicList)
+        lpOssiaMusic = lyo.LyOssiaMusic(musicList=lpMusicList)
         self.newContext(lpMusicList)
 
         self.variantMode = True

@@ -467,7 +467,7 @@ class LyAssignment(LyObject):
 class LyIdentifierInit(LyObject):
     r'''
 
-    >>> lyii = lily.lilyObjects.LyIdentifierInit(string = "hello")
+    >>> lyii = lily.lilyObjects.LyIdentifierInit(string='hello')
     >>> print(lyii)
     "hello"
     '''
@@ -656,7 +656,7 @@ class LyScoreBlock(LyObject):
 
     with all the real stuff being in self.scoreBody
 
-    >>> lysb = lily.lilyObjects.LyScoreBlock(scoreBody = "hello")
+    >>> lysb = lily.lilyObjects.LyScoreBlock(scoreBody='hello')
     >>> print(lysb)
     \score { hello }
     '''
@@ -2070,14 +2070,14 @@ class Test(unittest.TestCase):
         stenoDuration = LyStenoDuration('2', 1)
         multipliedDuration = LyMultipliedDuration(stenoDuration)
 
-        simpleElement = LySimpleElement(parts = [lypitch, multipliedDuration])
+        simpleElement = LySimpleElement(parts=[lypitch, multipliedDuration])
 
         eventChord = LyEventChord(simpleElement)
-        simpleMusic = LySimpleMusic(eventChord = eventChord)
-        musicInner = LyMusic(simpleMusic = simpleMusic)
+        simpleMusic = LySimpleMusic(eventChord=eventChord)
+        musicInner = LyMusic(simpleMusic=simpleMusic)
         musicList = LyMusicList([musicInner])
         sequentialMusic = LySequentialMusic(musicList)
-        compositeMusic = LyCompositeMusic(groupedMusicList = sequentialMusic)
+        compositeMusic = LyCompositeMusic(groupedMusicList=sequentialMusic)
         lilypondTop = LyLilypondTop([compositeMusic])
         lilypondOutput = lilypondTop.stringOutput()
 
@@ -2095,7 +2095,7 @@ class Test(unittest.TestCase):
 
 #        musicOut = LyMusic()
 #        scoreBody = LyScoreBody()
-#        simpleMarkup = LySimpleMarkup(simpleType = 'score-body')
+#        simpleMarkup = LySimpleMarkup(simpleType='score-body')
 
 
 

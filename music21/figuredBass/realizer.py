@@ -285,7 +285,7 @@ class FiguredBassLine(object):
         bassLine.append(copy.deepcopy(self.inTime))
         r = None
         if self._paddingLeft != 0.0:
-            r = note.Rest(quarterLength = self._paddingLeft)
+            r = note.Rest(quarterLength=self._paddingLeft)
             bassLine.append(r)
 
         for (bassNote, unused_notationString) in self._fbList:
@@ -476,9 +476,9 @@ class FiguredBassLine(object):
         elif not segmentList:
             raise FiguredBassLineException("No (bassNote, notationString) pairs to realize.")
 
-        return Realization(realizedSegmentList = segmentList, inKey = self.inKey,
-                           inTime = self.inTime, overlayedParts = self._overlayedParts[0:-1],
-                           paddingLeft = self._paddingLeft)
+        return Realization(realizedSegmentList=segmentList, inKey=self.inKey,
+                           inTime=self.inTime, overlayedParts=self._overlayedParts[0:-1],
+                           paddingLeft=self._paddingLeft)
 
 
     def _trimAllMovements(self, segmentList):
@@ -661,7 +661,7 @@ class Realization(object):
         bassLine.append([copy.deepcopy(self._keySig), copy.deepcopy(self._inTime)])
         r = None
         if self._paddingLeft != 0.0:
-            r = note.Rest(quarterLength = self._paddingLeft)
+            r = note.Rest(quarterLength=self._paddingLeft)
             bassLine.append(copy.deepcopy(r))
 
         if self.keyboardStyleOutput:

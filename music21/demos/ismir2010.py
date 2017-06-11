@@ -112,8 +112,7 @@ def melodicChordExpression(show=True):
     '''
     #from music21 import *
     #from music21 import corpus, stream, chord
-    beethovenScore = corpus.parseWork(
-                  'beethoven/opus133.xml')
+    beethovenScore = corpus.parse('beethoven/opus133.xml')
     # parts are given IDs by the MusicXML part name
     violin2 = beethovenScore.getElementById(
                             '2nd Violin')
@@ -163,9 +162,9 @@ def  pitchDensity(show=True):
     #First, we take a "flat" view of the Stream, which removes nested containers such as Measures. Second, we combine tied notes into single notes with summed durations.
 
     notes = celloPart.flat.stripTies()
-    g = graph.PlotScatterPitchClassOffset(notes,
+    g = graph.plot.ScatterPitchClassOffset(notes,
         title='Beethoven Opus 133, Cello', alpha=.2)
-    g.process()
+    g.run()
 
 
 
@@ -179,24 +178,24 @@ def pitchQuarterLengthUsageWeightedScatter(show=True):
 
     mozartStream = converter.parse(xml.mozartTrioK581Excerpt) # @UndefinedVariable
     notes = mozartStream.flat.stripTies()
-    g = graph.PlotScatterWeightedPitchSpaceQuarterLength(notes,
+    g = graph.plot.ScatterWeightedPitchSpaceQuarterLength(notes,
         title='Mozart Trio K. 581 Excerpt')
-    g.process()
+    g.run()
 
-    g = graph.PlotScatterWeightedPitchClassQuarterLength(notes,
+    g = graph.plot.ScatterWeightedPitchClassQuarterLength(notes,
         title='Mozart Trio K. 581 Excerpt')
-    g.process()
+    g.run()
 
 
     chopinStream = converter.parse(kern.mazurka6)
     notes = chopinStream.flat.stripTies()
-    g = graph.PlotScatterWeightedPitchSpaceQuarterLength(notes,
+    g = graph.plot.ScatterWeightedPitchSpaceQuarterLength(notes,
         title='Chopin Mazurka 6 Excerpt')
-    g.process()
+    g.run()
 
-    g = graph.PlotScatterWeightedPitchClassQuarterLength(notes,
+    g = graph.plot.ScatterWeightedPitchClassQuarterLength(notes,
         title='Chopin Mazurka 6 Excerpt')
-    g.process()
+    g.run()
 
 
 def pitchQuarterLengthUsage3D(show=True):
@@ -205,35 +204,35 @@ def pitchQuarterLengthUsage3D(show=True):
 
     mozartStream = converter.parse(
         xml.mozartTrioK581Excerpt) # @UndefinedVariable
-    g = graph.Plot3DBarsPitchSpaceQuarterLength(
+    g = graph.plot.Plot3DBarsPitchSpaceQuarterLength(
         mozartStream.flat.stripTies(), colors=['r'])
-    g.process()
+    g.run()
 
     chopinStream = converter.parse(kern.mazurka6)
-    g = graph.Plot3DBarsPitchSpaceQuarterLength(
+    g = graph.plot.Plot3DBarsPitchSpaceQuarterLength(
         chopinStream.flat.stripTies(), colors=['b'])
-    g.process()
+    g.run()
 
 
 
 
 
-def messiaen(show = True):
+def messiaen(show=True):
     #messiaen = #converter.parse('d:/docs/research/music21/ismir-2010/messiaen_valeurs_part2.xml')
     #messiaen = converter.parse('/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml')
     mall = converter.parse('/Users/cuthbert/desktop/messiaen_valeurs_2012.xml')
     messiaenP = mall[1]
     #messiaen.show()
     notes = messiaenP.flat.stripTies()
-    g = graph.PlotScatterWeightedPitchSpaceQuarterLength(notes,
+    g = graph.plot.ScatterWeightedPitchSpaceQuarterLength(notes,
         title='Messiaen, Mode de Valeurs', xLog=False)
 
     if (show is True):
-        g.process()
+        g.run()
 
 
 
-def schumann(show = True):
+def schumann(show=True):
     streamObject = corpus.parse('schumann/opus41no1', 3)
     streamObject.plot('pitch')
 
@@ -463,12 +462,12 @@ def demoGraphMozartChopin():
     dpi = 300
 
     mozartStream = converter.parse(xmlTest.mozartTrioK581Excerpt) # @UndefinedVariable
-    g = graph.Plot3DBarsPitchSpaceQuarterLength(mozartStream.stripTies(), dpi=dpi, title='Mozart Trio K. 581, Excerpt', colors=['#CD4F39'], alpha=.8)
-    g.process()
+    g = graph.plot.Plot3DBarsPitchSpaceQuarterLength(mozartStream.stripTies(), dpi=dpi, title='Mozart Trio K. 581, Excerpt', colors=['#CD4F39'], alpha=.8)
+    g.run()
 
     chopinStream = converter.parse(kernTest.mazurka6)
-    g = graph.Plot3DBarsPitchSpaceQuarterLength(chopinStream.stripTies(), dpi=dpi, title='Chopin Mazurka 6, Excerpt', colors=['#6495ED'], alpha=.8)
-    g.process()
+    g = graph.plot.Plot3DBarsPitchSpaceQuarterLength(chopinStream.stripTies(), dpi=dpi, title='Chopin Mazurka 6, Excerpt', colors=['#6495ED'], alpha=.8)
+    g.run()
 
 
 

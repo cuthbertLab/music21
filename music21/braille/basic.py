@@ -1094,7 +1094,7 @@ def transcribeHeading(music21KeySignature=None,
     >>> from music21.braille import basic
     >>> print(basic.transcribeHeading(key.KeySignature(5), meter.TimeSignature('3/8'),
     ...         tempo.TempoText("Allegretto"),
-    ...         tempo.MetronomeMark(number = 135, referent = note.Note(type='eighth'))))
+    ...         tempo.MetronomeMark(number=135, referent=note.Note(type='eighth'))))
     ⠀⠀⠀⠀⠀⠀⠀⠠⠁⠇⠇⠑⠛⠗⠑⠞⠞⠕⠲⠀⠙⠶⠼⠁⠉⠑⠀⠼⠑⠩⠼⠉⠦⠀⠀⠀⠀⠀⠀⠀
     >>> print(basic.transcribeHeading(key.KeySignature(-2), meter.TimeSignature('common'),
     ... tempo.TempoText("Lento assai, cantante e tranquillo"), None))

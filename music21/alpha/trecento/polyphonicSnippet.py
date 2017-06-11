@@ -118,7 +118,7 @@ class PolyphonicSnippet(stream.Score):
             if thisVoice is not None:
                 if not foundTs and any(thisVoice.getElementsByClass(meter.TimeSignature)):
                     foundTs = True
-                thisVoice.makeNotation(inPlace = True)
+                thisVoice.makeNotation(inPlace=True)
                 self.insert(0, thisVoice)
 
         self.rightBarline = 'final'

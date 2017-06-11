@@ -315,7 +315,7 @@ class GeneralMordent(Ornament):
         secondNote = copy.deepcopy(srcObj)
         secondNote.duration.quarterLength = self.quarterLength
         #secondNote.expressions = None
-        secondNote.transpose(transposeInterval, inPlace = True)
+        secondNote.transpose(transposeInterval, inPlace=True)
 
         mordNotes.append(firstNote)
         mordNotes.append(secondNote)
@@ -520,7 +520,7 @@ class Trill(Ornament):
             secondNote = copy.deepcopy(srcObj)
             #TODO: remove expressions
             secondNote.duration.quarterLength = self.quarterLength
-            secondNote.transpose(transposeInterval, inPlace = True)
+            secondNote.transpose(transposeInterval, inPlace=True)
 
             trillNotes.append(firstNote)
             trillNotes.append(secondNote)
@@ -543,7 +543,7 @@ class Trill(Ornament):
             #TODO: remove expressions
             secondNoteNachschlag.duration.quarterLength = self.quarterLength
             secondNoteNachschlag.transpose(transposeIntervalReverse,
-                inPlace = True)
+                inPlace=True)
             secondNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
                                                         secondNoteNachschlag.step)
 
@@ -676,7 +676,7 @@ class Turn(Ornament):
         firstNote = copy.deepcopy(srcObject)
         #TODO: remove expressions
         firstNote.duration.quarterLength = self.quarterLength
-        firstNote.transpose(transposeIntervalUp, inPlace = True)
+        firstNote.transpose(transposeIntervalUp, inPlace=True)
 
         secondNote = copy.deepcopy(srcObject)
         #TODO: remove expressions
@@ -685,7 +685,7 @@ class Turn(Ornament):
         thirdNote = copy.deepcopy(srcObject)
         #TODO: remove expressions
         thirdNote.duration.quarterLength = self.quarterLength
-        thirdNote.transpose(transposeIntervalDown, inPlace = True)
+        thirdNote.transpose(transposeIntervalDown, inPlace=True)
 
         fourthNote = copy.deepcopy(srcObject)
         #TODO: remove expressions
@@ -768,7 +768,7 @@ class GeneralAppoggiatura(Ornament):
 
         appogNote = copy.deepcopy(srcObj)
         appogNote.duration.quarterLength = newDuration
-        appogNote.transpose(transposeInterval, inPlace = True)
+        appogNote.transpose(transposeInterval, inPlace=True)
 
         remainderNote = copy.deepcopy(srcObj)
         remainderNote.duration.quarterLength = newDuration
