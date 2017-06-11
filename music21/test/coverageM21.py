@@ -9,8 +9,6 @@
 # Copyright:    Copyright © 2014-15 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
-import sys
 from music21.ext import six
 
 omit_modules = [

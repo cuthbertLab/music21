@@ -71,7 +71,7 @@ def generateIntervals(numIntervals, kind=None, octaveSpacing=None):
 
 traidInversions = [[1, 3, 5], [1, 3, 6], [1, 4, 6]]
 
-def generateChords(numChords,kind=''):
+def generateChords(numChords, kind=''):
     '''
     Randomly generate a score of chords for use with the perceived dissonances
     app. These chords may be dissonant or consonant. if kind = 'diatonicTriads',

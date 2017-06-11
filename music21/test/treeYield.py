@@ -7,8 +7,11 @@
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert
-# License:      CC-BY (see http://stackoverflow.com/questions/12611337/recursively-dir-a-python-object-to-find-values-of-a-certain-type-or-with-a-cer)
+# License:      CC-BY (see StackOverflow link below)
 #-------------------------------------------------------------------------------
+# http://stackoverflow.com/questions/12611337/
+#     recursively-dir-a-python-object-to-find-values-of-a-certain-type-or-with-a-cer
+
 import sys
 if sys.version_info[0] >= 3:
     unicode = str
@@ -86,7 +89,7 @@ class TreeYielder(object):
             for x in instance_dict:
                 try:
                     gotValue = object.__getattribute__(obj, x)
-                except Exception: # ?? property that relies on something else being set.
+                except Exception: # pylint: disable=broad-except
                     continue
                 objTuple = ('getattr', x)
                 self.stackVals.append(objTuple)

@@ -655,7 +655,7 @@ class CommandProcessor(object):
 
     TODO: MORE DOCS!
     '''
-    def __init__(self,agenda):
+    def __init__(self, agenda):
         '''
         OMIT_FROM_DOCS
         Given an agenda

@@ -63,7 +63,8 @@ class Test(unittest.TestCase):
         freezeThaw.JSONThawer(c2).json = raw
 
 
-        self.assertEqual(str(c1.pitches), '(<music21.pitch.Pitch C2>, <music21.pitch.Pitch A4>, <music21.pitch.Pitch E5>)')
+        self.assertEqual(str(c1.pitches), 
+                '(<music21.pitch.Pitch C2>, <music21.pitch.Pitch A4>, <music21.pitch.Pitch E5>)')
         self.assertEqual(c1.quarterLength, 1.25)
 
 

@@ -29,6 +29,6 @@ where the contents of the POST is a JSON string.
 See docs for music21.webapps for specifications about the JSON string structure
 '''
 
-from music21 import webapps
+from music21.alpha import webapps
 
 application = webapps.modWSGIJSONApplication #### HHHEEEELLLPPP #  # @UndefinedVariable

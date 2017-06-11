@@ -121,13 +121,10 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None):
 
 
 def travisMain():
+    # the main call for travis-ci tests.
     # exits with the returnCode
     returnCode = main()
     exit(returnCode)
-
-    # this should work but requires python 2.7 and the testRunner arg does not
-    # seem to work properly
-    #unittest.main(testRunner=runner, failfast=True)
 
 
 #-------------------------------------------------------------------------------
@@ -141,9 +138,9 @@ if __name__ == '__main__':
     # if optional command line arguments are given, assume they are
     # test group arguments
     if len(sys.argv) >= 2:
-        returnCode = main(sys.argv[1:])
+        unused_returnCode = main(sys.argv[1:])
     else:
-        returnCode = main()
+        unused_returnCode = main()
 
 #------------------------------------------------------------------------------
 # eof

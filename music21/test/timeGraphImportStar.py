@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
+import time
 
 # script to create a graph to time how fast some things are happening...
 # generates pretty graphs showing what the bottlenecks in the system are, for helping to
@@ -17,7 +17,6 @@
 
 import pycallgraph  # @UnresolvedImport @UnusedImport
 import pycallgraph.output # @UnresolvedImport
-import time
 
 # this class is duplicated from common.py in order to avoid
 # import the module for clean testing
@@ -31,7 +30,10 @@ class Timer(object):
         self._tStop = None
 
     def start(self):
-        '''Explicit start method; will clear previous values. Start always happens on initialization.'''
+        '''
+        Explicit start method; will clear previous values. 
+        Start always happens on initialization.
+        '''
         self._tStart = time.time()
         self._tStop = None # show that a new run has started so __call__ works
         self._tDif = 0
@@ -49,18 +51,18 @@ class Timer(object):
         '''Reports current time or, if stopped, stopped time.
         '''
         # if stopped, gets _tDif; if not stopped, gets current time
-        if self._tStop == None: # if not stoped yet
+        if self._tStop is None: # if not stoped yet
             t = time.time() - self._tStart
         else:
             t = self._tDif
         return t
 
     def __str__(self):
-        if self._tStop == None: # if not stoped yet
+        if self._tStop is None: # if not stoped yet
             t = time.time() - self._tStart
         else:
             t = self._tDif
-        return str(round(t,3))
+        return str(round(t, 3))
 
 
 
@@ -83,7 +85,7 @@ class CallTest(object):
 class TestImportStar(CallTest):
     def testFocus(self):
         import music21 # @UnusedImport # the point is timing the import!
-
+        unused_assign = music21
 
 
 
@@ -92,6 +94,7 @@ class TestImportStar(CallTest):
 class CallGraph:
 
     def __init__(self):
+        super(CallGraph, self).__init__()
         self.includeList = ['music21.*']
         self.excludeList = ['pycallgraph.*']
         self.excludeList += ['re.*', 'sre_*']
@@ -103,7 +106,8 @@ class CallGraph:
         self.excludeList += ['unittest*', 'doctest*']
         self.excludeList += ['encodings*', 'pkg_resources*', 'ntpath*', 'shutil.*', 'pkgutil.*']
         self.excludeList += ['difflib*', 'urlparse*', 'dateutil.*', 'calendar.*',]
-        self.excludeList += ['zipfile*', 'io.*', 'collections.*', 'tempfile.*', 'urllib.*', 'StringIO*']
+        self.excludeList += ['zipfile*', 'io.*', 'collections.*', 'tempfile.*', 
+                             'urllib.*', 'StringIO*']
         self.excludeList += ['csv.*', 'json.*', 'os.*', 'distutils.*', 'ctypes*']
         self.excludeList += ['FileDialog.*', 'Tk*', 'PIL*', 'tk*', 'pillow*']
 
@@ -130,10 +134,11 @@ class CallGraph:
             self.includeList = self.callTest.includeList
 
     def run(self, runWithEnviron=False):
-        '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__().
+        '''
+        Main code runner for testing. To set a new test, 
+        update the self.callTest attribute in __init__().
         '''
         suffix = '.png' # '.svg' no reader for now...
-        fmt = suffix[1:]
         _MOD = "test.timeGraphImportStar.py"
 
         if runWithEnviron:

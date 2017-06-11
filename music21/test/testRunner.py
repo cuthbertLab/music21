@@ -139,7 +139,7 @@ def addDocAttrTestsToSuite(suite,
             documentation = docattr[dockey]
             #print(documentation)
             dt = dtp.get_doctest(documentation, globs, dockey, outerFilename, 0)
-            if len(dt.examples) == 0:
+            if not dt.examples:
                 continue
             dtc = doctest.DocTestCase(dt,
                                       optionflags=optionflags,
@@ -187,7 +187,7 @@ def fixTestsForPy2and3(doctestSuite):
         dt = dtc._dt_test # DocTest
         for example in dt.examples: # fix Traceback exception differences Py2 to Py3
             if six.PY3:
-                if example.exc_msg is not None and len(example.exc_msg) > 0:
+                if example.exc_msg is not None and example.exc_msg:
                     example.exc_msg = "..." + example.exc_msg
                 elif (example.want is not None
                         and example.want.startswith('u\'')):
@@ -196,7 +196,7 @@ def fixTestsForPy2and3(doctestSuite):
                     # won't be caught, but saves a lot of anguish
                     example.want = example.want[1:]
             elif six.PY2:
-                if example.exc_msg is not None and len(example.exc_msg) > 0:
+                if example.exc_msg is not None and example.exc_msg:
                     example.exc_msg = re.sub(r'^(\w|\.)*\.(\w+\:)', r'\2', example.exc_msg)
                 if (example.want is not None
                         and example.want.startswith('b\'')):

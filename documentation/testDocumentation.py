@@ -28,7 +28,8 @@ from docutils.core import publish_doctree
 
 from music21.exceptions21 import Music21Exception
 from music21.test import testRunner
-from music21.test import nbvalNotebook
+
+import nbvalNotebook # @UnresolvedImport
 
 
 ModTuple = namedtuple('ModTuple', 'module fullModulePath moduleNoExtension autoGen')
@@ -151,7 +152,7 @@ def getDocumentationFiles(runOne=False):
     ...]
     '''
     from music21 import common
-    music21basedir = common.getSourceFilePath()
+    music21basedir = common.getRootFilePath()
     builddocRstDir = os.path.join(music21basedir,
                                   'documentation',
                                   'source')

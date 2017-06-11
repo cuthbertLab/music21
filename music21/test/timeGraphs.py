@@ -9,6 +9,7 @@
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
+import time
 
 
 # script to create a graph to time how fast some things are happening...
@@ -17,7 +18,6 @@
 
 import pycallgraph  # @UnusedImport @UnresolvedImport
 import pycallgraph.output  # @UnresolvedImport
-import time
 
 
 #from music21 import *
@@ -64,18 +64,18 @@ class Timer(object):
         '''Reports current time or, if stopped, stopped time.
         '''
         # if stopped, gets _tDif; if not stopped, gets current time
-        if self._tStop == None: # if not stoped yet
+        if self._tStop is None: # if not stoped yet
             t = time.time() - self._tStart
         else:
             t = self._tDif
         return t
 
     def __str__(self):
-        if self._tStop == None: # if not stoped yet
+        if self._tStop is None: # if not stoped yet
             t = time.time() - self._tStart
         else:
             t = self._tDif
-        return str(round(t,3))
+        return str(round(t, 3))
 
 
 
@@ -108,8 +108,8 @@ class M21CallTest(object):
 class TestTimeHumdrum(M21CallTest):
     def testFocus(self):
         music21 = self.m21
-        masterStream = music21.humdrum.parseData(music21.humdrum.humdrumTestFiles.mazurka6).stream #@UnusedVariable @UndefinedVariable
-
+        unused = music21.humdrum.parseData(music21.humdrum.humdrumTestFiles.mazurka6).stream 
+        
 class TestTimeMozart(M21CallTest):
     def testFocus(self):
         music21 = self.m21
@@ -136,6 +136,7 @@ class TestTimeIsmir(M21CallTest):
 
 class TestMakeMeasures(CallTest):
     def __init__(self):
+        super(TestMakeMeasures, self).__init__()
         import music21.stream
         import music21.note
         self.s = music21.stream.Stream()
@@ -152,6 +153,8 @@ class TestMakeTies(CallTest):
         import music21.stream
         import music21.note
 
+        super(TestMakeTies, self).__init__()
+
         self.s = music21.stream.Stream()
         for i in range(100):
             n = music21.note.Note()
@@ -167,6 +170,7 @@ class TestMakeBeams(CallTest):
     def __init__(self):
         import music21.stream
         import music21.note
+        super(TestMakeBeams, self).__init__()
 
         self.s = music21.stream.Stream()
         for i in range(100):
@@ -184,6 +188,8 @@ class TestMakeAccidentals(CallTest):
         import music21.stream
         import music21.note
 
+        super(TestMakeAccidentals, self).__init__()
+
         self.s = music21.stream.Stream()
         for i in range(100):
             n = music21.note.Note()
@@ -200,6 +206,8 @@ class TestMusicXMLOutput(CallTest):
         import music21.stream
         import music21.note
 
+        super(TestMusicXMLOutput, self).__init__()
+
         self.s = music21.stream.Stream()
         for i in range(100):
             n = music21.note.Note()
@@ -215,6 +223,8 @@ class TestMusicXMLOutputParts(CallTest):
     '''
     def __init__(self):
         from music21 import corpus
+        super(TestMusicXMLOutputParts, self).__init__()
+
         self.s = corpus.parse('bach/bwv66.6', forceSource=True)
         #self.s = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
 
@@ -228,6 +238,9 @@ class TestMusicXMLOutputScore(CallTest):
     '''
     def __init__(self):
         from music21 import corpus
+
+        super(TestMusicXMLOutputScore, self).__init__()
+
         self.s = corpus.parse('bach/bwv66.6', forceSource=True)
         #self.s = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
 
@@ -249,6 +262,8 @@ class TestCreateTimeSignature(CallTest):
 
     def __init__(self):
         from music21.test import testPerformance
+        super(TestCreateTimeSignature, self).__init__()
+
         self.t = testPerformance.Test()
 
     def testFocus(self):
@@ -261,6 +276,8 @@ class TestCreateDurations(CallTest):
 
     def __init__(self):
         from music21.test import testPerformance
+        super(TestCreateDurations, self).__init__()
+
         self.t = testPerformance.Test()
 
     def testFocus(self):

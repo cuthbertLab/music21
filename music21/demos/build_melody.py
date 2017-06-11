@@ -1,9 +1,9 @@
+# -*- coding: utf-8 -*-
 """
 Demo script showing how to work with MidiFile and MidiTrack directly.
 Generates a completely random collection of 8th notes
 First we create a MidiTrack, insert MidiEvent's into it. Then we add
 that track to a MidiFile and write it to disc.
-
 """
 
 import random

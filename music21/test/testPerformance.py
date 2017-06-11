@@ -8,8 +8,10 @@
 # Copyright:    Copyright © 2009-2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
-'''This method defines a number of performance test. Results for these performances are stored and dated, and used to track long-term performance changes.
+'''
+This module defines a number of performance test.
+ Results for these performances are stored and dated, 
+ and used to track long-term performance changes.
 
 This file is not run with the standard test battery presently.
 '''
@@ -118,7 +120,8 @@ class Test(unittest.TestCase):
             junk = GEX().parse(p)
 
     def runMusicxmlOutScoreBeethoven(self):
-        '''Loading file and rendering musicxml output of complete score: beethoven/opus59no2/movement3
+        '''
+        Loading file and rendering musicxml output of complete score: beethoven/opus59no2/movement3
         '''
         x = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
         #problem: doing each part is much faster than the whole score
@@ -155,7 +158,8 @@ class Test(unittest.TestCase):
         '''Creating 500 TimeSignature objects
         '''
         from music21 import meter
-        tsStr = ['4/4', '4/4', '4/4', '3/4', '3/4', '2/4', '2/4', '2/2', '2/2', '3/8', '6/8', '9/8', '5/4', '12/8']
+        tsStr = ['4/4', '4/4', '4/4', '3/4', '3/4', '2/4', '2/4', '2/2', 
+                 '2/2', '3/8', '6/8', '9/8', '5/4', '12/8']
 
         for i in range(500):
             meter.TimeSignature(tsStr[i%len(tsStr)])
@@ -255,7 +259,9 @@ class Test(unittest.TestCase):
 
     #---------------------------------------------------------------------------
     def testTimingTolerance(self):
-        '''Test the performance of methods defined above, comparing the resulting time to the time obtained in past runs.
+        '''
+        Test the performance of methods defined above, 
+        comparing the resulting time to the time obtained in past runs.
 
         This should not produce errors as such, but is used to provide reference
         if overall performance has changed.

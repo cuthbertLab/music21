@@ -15,6 +15,8 @@ import random
 import unittest
 import copy
 
+import music21
+
 from music21.stream import Stream
 from music21.stream import Voice
 from music21.stream import Measure
@@ -291,8 +293,6 @@ class Test(unittest.TestCase):
         pass
 
     def testAdd(self):
-        import music21 # needed to do fully-qualified isinstance name checking
-
         a = Stream()
         for dummy in range(5):
             a.insert(0, music21.Music21Object())
@@ -475,7 +475,7 @@ class Test(unittest.TestCase):
         fsfs = farStream.flat.sorted
         offsets = [a.offset for a in fsfs]  # safer is a.getOffsetBySite(fsfs)
         offsetsBrief = offsets[:20]
-        self.assertEquals(offsetsBrief, 
+        self.assertEqual(offsetsBrief, 
                           [0, 2, 4, 5, 6, 7, 9, 10, 
                            11, 12, 13, 14, 15, 15, 16, 17, 17, 18, 19, 19])
 
@@ -587,7 +587,8 @@ class Test(unittest.TestCase):
 
 
     def testMultipartStream(self):
-        '''Test the creation of streams with multiple parts. See versions
+        '''
+        Test the creation of streams with multiple parts. See versions
         of this tests in TestExternal for more details
         '''
         q = Stream()
@@ -631,7 +632,8 @@ class Test(unittest.TestCase):
 
 
     def testActiveSites(self):
-        '''Test activeSite relationships.
+        '''
+        Test activeSite relationships.
 
         Note that here we see why sometimes qualified class names are needed.
         This test passes fine with class names Part and Measure when run interactively,
@@ -639,13 +641,12 @@ class Test(unittest.TestCase):
         Part and Measure do not match, and instead music21.stream.Part has to be
         employed instead.
         '''
-        import music21.stream # needed to do fully-qualified isinstance name checking
-
+        from music21 import stream # needed to do fully-qualified isinstance name checking
         from music21 import corpus
         a = corpus.parse('corelli/opus3no1/1grave')
         # test basic activeSite relationships
         b = a[8]
-        self.assertEqual(isinstance(b, music21.stream.Part), True)
+        self.assertEqual(isinstance(b, stream.Part), True)
         self.assertEqual(b.activeSite, a)
 
         # this, if called, actively destroys the activeSite relationship!
@@ -658,7 +659,7 @@ class Test(unittest.TestCase):
         # NOTE: this is dependent on raw element order, and might change
         # due to importing changes
         #b.show('t')
-        self.assertEqual(isinstance(b[15], music21.stream.Measure), True)
+        self.assertEqual(isinstance(b[15], stream.Measure), True)
         self.assertEqual(b[8].activeSite, b) #measures activeSite should be part
 
 
@@ -888,7 +889,7 @@ class Test(unittest.TestCase):
     def testElements(self):
         '''Test basic Elements wrapping non music21 objects
         '''
-        import music21 # needed to do fully-qualified isinstance name checking
+        # needed to do fully-qualified isinstance name checking music21 vs base
 
         a = Stream()
         a.insert(50, music21.Music21Object())
@@ -2309,9 +2310,11 @@ class Test(unittest.TestCase):
         self.assertEqual(len(ex.flat.notes[2:]), 6)
         #ex.flat.notes[2:].show()
 
-        # all sharps, unknown display status (displayStatus == None)
+        # all sharps, unknown display status (displayStatus is None)
         acc = [str(n.pitch.accidental) for n in ex.flat.notes[2:]]
-        self.assertEqual(acc, ['<accidental sharp>', '<accidental sharp>', '<accidental sharp>', '<accidental sharp>', '<accidental sharp>', '<accidental sharp>'])
+        self.assertEqual(acc, ['<accidental sharp>', '<accidental sharp>', 
+                               '<accidental sharp>', '<accidental sharp>', 
+                               '<accidental sharp>', '<accidental sharp>'])
         display = [n.pitch.accidental.displayStatus for n in ex.flat.notes[2:]]
         self.assertEqual(display, [None, None, None, None, None, None])
 
@@ -2334,7 +2337,10 @@ class Test(unittest.TestCase):
         #ex.show('text')
 
         display = [n.pitch.accidental.displayStatus for n in ex.flat.notes]
-        self.assertEqual(display, [1, 0, 0, 0, 0, 0,   1, 0, 0, 0, 1,  1, 0, 0,  1, 0, 0])
+        self.assertEqual(display, [1, 0, 0, 0, 0, 0,   
+                                   1, 0, 0, 0, 1,  
+                                   1, 0, 0,  
+                                   1, 0, 0])
 
     def testMakeAccidentalsD(self):
         from music21 import stream
@@ -2368,7 +2374,7 @@ class Test(unittest.TestCase):
                 m.keySignature = ks
                 for p in scale * 2:
                     n = note.Note(p)
-                    n.quarterLength = .25
+                    n.quarterLength = 0.25
                     n.addLyric(n.pitch.name)
                     m.append(n)
                 m.makeBeams(inPlace=True)
@@ -2426,8 +2432,6 @@ class Test(unittest.TestCase):
 
 
     def testScaleOffsetsBasic(self):
-        '''
-        '''
         from music21 import stream
 
         def procCompare(s, scalar, match):
@@ -2498,8 +2502,6 @@ class Test(unittest.TestCase):
 
 
     def testScaleOffsetsBasicInPlaceA(self):
-        '''
-        '''
         from music21 import stream
 
         def procCompare(s, scalar, match):
@@ -2529,8 +2531,6 @@ class Test(unittest.TestCase):
 
 
     def testScaleOffsetsBasicInPlaceB(self):
-        '''
-        '''
         from music21 import stream
 
         def procCompare(s, scalar, match):
@@ -2559,8 +2559,6 @@ class Test(unittest.TestCase):
 
 
     def testScaleOffsetsBasicInPlaceC(self):
-        '''
-        '''
         from music21 import stream
 
         def procCompare(s, scalar, match):
@@ -2591,8 +2589,6 @@ class Test(unittest.TestCase):
 
 
     def testScaleOffsetsBasicInPlaceD(self):
-        '''
-        '''
         from music21 import stream
 
         def procCompare(s, scalar, match):
@@ -2617,7 +2613,7 @@ class Test(unittest.TestCase):
         # procCompare will  sort offsets; this test non sorted operation
         s = None # placeholder
         procCompare(s, 1, [100.0, 101.0, 103.0, 104.0, 106.0, 107.0])
-        procCompare(s, .5, [100.0, 100.5, 101.5, 102.0, 103.0, 103.5])
+        procCompare(s, 0.5, [100.0, 100.5, 101.5, 102.0, 103.0, 103.5])
         procCompare(s, 2, [100.0, 102.0, 106.0, 108.0, 112.0, 114.0])
         procCompare(s, 6, [100.0, 106.0, 118.0, 124.0, 136.0, 142.0])
 
@@ -2625,10 +2621,7 @@ class Test(unittest.TestCase):
 
 
     def testScaleOffsetsNested(self):
-        '''
-        '''
         from music21 import stream
-
 
         def scaleOffsetMap(s): # lists of offsets, with lists of lists
             post = []
@@ -2662,14 +2655,14 @@ class Test(unittest.TestCase):
         s1.repeatAppend(n1, 4)
 
         n2 = note.Note()
-        n2.quarterLength = .5
+        n2.quarterLength = 0.5
         s2 = stream.Stream()
         s2.repeatAppend(n2, 4)
         s1.append(s2)
 
         # offset map gives us a nested list presentation of all offsets
         # usefulfor testing
-        self.assertEquals(scaleOffsetMap(s1),
+        self.assertEqual(scaleOffsetMap(s1),
         [[0.0], [2.0], [4.0], [6.0], [8.0, [[0.0], [0.5], [1.0], [1.5]]]])
 
         # provide start of resulting values
@@ -2691,7 +2684,7 @@ class Test(unittest.TestCase):
         s1.repeatInsert(n1, [10, 14, 15, 17])
 
         n2 = note.Note()
-        n2.quarterLength = .5
+        n2.quarterLength = 9.5
         s2 = stream.Stream()
         s2.repeatInsert(n2, [40, 40.5, 41, 41.5])
         s1.append(s2)
@@ -2707,7 +2700,7 @@ class Test(unittest.TestCase):
         # that is, it should have no shift
 
         # provide anchorZeroRecurse value
-        self.assertEquals(scaleOffsetMap(s1),
+        self.assertEqual(scaleOffsetMap(s1),
         [[10.0], [14.0], [15.0], [17.0],
             [18.0, [[40.0], [40.5], [41.0], [41.5]]],
             [60.0, [[40.0], [40.5], [41.0], [41.5]]],
@@ -2730,7 +2723,7 @@ class Test(unittest.TestCase):
             [194.0, [[80.0], [81.0], [82.0], [83.0]]]]
         )
 
-        procCompare(s1, .25, 'lowest',
+        procCompare(s1, 0.25, 'lowest',
         [[10.0], [11.0], [11.25], [11.75],
             [12.0, [[40.0], [40.125], [40.25], [40.375]]],
             [22.5, [[40.0], [40.125], [40.25], [40.375]]],
@@ -2739,7 +2732,7 @@ class Test(unittest.TestCase):
 
         # if anchorZeroRecurse is None, embedded stream that do not
         # start at zero are scaled proportionally
-        procCompare(s1, .25, None,
+        procCompare(s1, 0.25, None,
         [[10.0], [11.0], [11.25], [11.75],
             [12.0, [[10.0], [10.125], [10.25], [10.375]]],
             [22.5, [[10.0], [10.125], [10.25], [10.375]]],
@@ -2758,7 +2751,7 @@ class Test(unittest.TestCase):
             self.assertEqual(oListPost[:len(match)], match)
 
         n1 = note.Note()
-        n1.quarterLength = .5
+        n1.quarterLength = 0.5
         s1 = Stream()
         s1.repeatInsert(n1, list(range(6)))
 
@@ -2768,12 +2761,12 @@ class Test(unittest.TestCase):
         self.assertEqual([e.duration.quarterLength for e in sNew], [1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
 
         # basic test
-        procCompare(s1, .5, [0.25, 0.25, 0.25])
+        procCompare(s1, 0.5, [0.25, 0.25, 0.25])
         procCompare(s1, 3, [1.5, 1.5, 1.5])
 
         # a sequence of Durations of different values
         s1 = Stream()
-        for ql in [.5, 1.5, 2, 3, .25, .25, .5]:
+        for ql in [0.5, 1.5, 2, 3, 0.25, 0.25, 0.5]:
             n = note.Note('g')
             n.quarterLength = ql
             s1.append(n)
@@ -3349,7 +3342,7 @@ class Test(unittest.TestCase):
         s = Stream()
         data = [('c2', 1), (None, .5), ('c#3', 1), (None, .5), ('a#2', 1), (None, .5), ('a4', 1)]
         for p, d in data:
-            if p == None:
+            if p is None:
                 n = note.Rest()
             else:
                 n = note.Note(p)
@@ -3370,7 +3363,7 @@ class Test(unittest.TestCase):
         s = Stream()
         data = [('c2', 1), (None, .25), ('c#3', 1), (None, 1.5), ('a#2', 1), (None, 2), ('a4', 1)]
         for p, d in data:
-            if p == None:
+            if p is None:
                 n = note.Rest()
             else:
                 n = note.Note(p)
@@ -3391,7 +3384,7 @@ class Test(unittest.TestCase):
         data = [('c2', 1), (None, 1), (None, 1), ('c#3', 1), ('c#3', 1), 
                 (None, .5), (None, .5), (None, .5), (None, .5), ('a#2', 1), (None, 2), ('a4', 1)]
         for p, d in data:
-            if p == None:
+            if p is None:
                 n = note.Rest()
             else:
                 n = note.Note(p)
@@ -3416,7 +3409,7 @@ class Test(unittest.TestCase):
                 (None, 2), (['d2', 'a4'], .5), (['d-2', 'a#3', 'g#6'], .5), (None, 1), 
                 (['f#3', 'a4', 'c#5'], 4)]
         for p, d in data:
-            if p == None:
+            if p is None:
                 n = note.Rest()
             elif isinstance(p, list):
                 n = chord.Chord(p)
@@ -3802,11 +3795,11 @@ class Test(unittest.TestCase):
         # TODO: the output of this is missing a tie to the last dotted half
         from music21 import stream
         s = stream.Stream()
-        for duration in [0.5, 1.5, 3]:
+        for dur in [0.5, 1.5, 3]:
             for offset in [0, 1.5, 4, 6]:
                 # create a midi pitch value from duration
-                s.insert(offset, note.Note(50 + (duration * 2) + (offset * 2),
-                            quarterLength=duration))
+                s.insert(offset, note.Note(50 + (dur * 2) + (offset * 2),
+                            quarterLength=dur))
         #s.show()
         sPost = s.makeNotation()
         self.assertEqual(len(sPost.getElementsByClass('Measure')), 3)
@@ -4232,18 +4225,18 @@ class Test(unittest.TestCase):
         s1.insert(.5, n6)
 
         sMod = s1.makeChords(inPlace=False, removeRedundantPitches=True)
-        self.assertEquals([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[0].pitches], 
+        self.assertEqual([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[0].pitches], 
                           ['C2', 'G2'])
 
-        self.assertEquals([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[1].pitches], 
+        self.assertEqual([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[1].pitches], 
                           ['E4', 'F#4'])
 
         # without redundant pitch gathering
         sMod = s1.makeChords(inPlace=False, removeRedundantPitches=False)
-        self.assertEquals([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[0].pitches], 
+        self.assertEqual([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[0].pitches], 
                           ['C2', 'C2', 'G2'])
 
-        self.assertEquals([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[1].pitches], 
+        self.assertEqual([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[1].pitches], 
                           ['E4', 'E4', 'F#4'] )
 
 
@@ -4516,7 +4509,7 @@ class Test(unittest.TestCase):
         n2.quarterLength = 2
 
         n3 = note.Note()
-        n3.quarterLength = .5
+        n3.quarterLength = 0.5
 
         n4 = note.Note()
         n4.quarterLength = 1.5
@@ -4542,7 +4535,7 @@ class Test(unittest.TestCase):
                           'continue', 'continue', 'stop'] )
 
         post = s.sliceByQuarterLengths(0.5, inPlace=False)
-        self.assertEqual([n.tie == None for n in post.notesAndRests],
+        self.assertEqual([n.tie is None for n in post.notesAndRests],
                          [False, False, False, False, False, False, True, False, False, False] )
 
         # cannot map .3333 into .5, so this raises an exception
@@ -4559,8 +4552,8 @@ class Test(unittest.TestCase):
         #post.show()
 
         # try to slice just a target
-        post = s.sliceByQuarterLengths(.125, target=n2, inPlace=False)
-        self.assertEqual([n.tie == None for n in post.notesAndRests],
+        post = s.sliceByQuarterLengths(0.125, target=n2, inPlace=False)
+        self.assertEqual([n.tie is None for n in post.notesAndRests],
                          [True,
                           False, False, False, False, False, False, False,
                           False, False, False, False, False, False, False, False, False,
@@ -4588,13 +4581,13 @@ class Test(unittest.TestCase):
         sMeasures = s.makeMeasures()
         sMeasures.makeTies(inPlace=True)
 
-        self.assertEquals([n.tie.type for n in sMeasures.flat.notesAndRests],
+        self.assertEqual([n.tie.type for n in sMeasures.flat.notesAndRests],
             ['start', 'stop', 'start', 'stop', 'start', 'stop'] )
 
         # this shows that the previous ties across the bar line are maintained
         # even after slicing
         sMeasures.sliceByQuarterLengths([0.5], inPlace=True)
-        self.assertEquals([n.tie.type for n in sMeasures.flat.notesAndRests],
+        self.assertEqual([n.tie.type for n in sMeasures.flat.notesAndRests],
             ['start', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 
              'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 
              'continue', 'stop', 'start', 'continue', 'continue', 'continue', 'continue', 
@@ -4615,7 +4608,7 @@ class Test(unittest.TestCase):
         n2.quarterLength = 2
 
         n3 = note.Note('f#')
-        n3.quarterLength = .5
+        n3.quarterLength = 0.5
 
         n4 = note.Note('g#')
         n4.quarterLength = 1.5
@@ -4623,7 +4616,7 @@ class Test(unittest.TestCase):
         for n in [n1, n2, n3, n4]:
             s.append(n)
 
-        post = s.sliceByQuarterLengths(.125, inPlace=False)
+        post = s.sliceByQuarterLengths(0.125, inPlace=False)
         #post.show()
 
         self.assertTrue(all([n.tie is not None for n in post.notesAndRests]))
@@ -4631,10 +4624,10 @@ class Test(unittest.TestCase):
 
         s = Stream()
         n1 = note.Note()
-        n1.quarterLength = .25
+        n1.quarterLength = 0.25
 
         n2 = note.Note()
-        n2.quarterLength = .5
+        n2.quarterLength = 0.5
 
         n3 = note.Note()
         n3.quarterLength = 1
@@ -4645,8 +4638,8 @@ class Test(unittest.TestCase):
         for n in [n1, n2, n3, n4]:
             s.append(n)
 
-        post = s.sliceByQuarterLengths(.5, inPlace=False)
-        self.assertEqual([n.tie == None for n in post.notesAndRests],
+        post = s.sliceByQuarterLengths(0.5, inPlace=False)
+        self.assertEqual([n.tie is None for n in post.notesAndRests],
                          [True, True, False, False, False, False, False])
 
 
@@ -4898,8 +4891,8 @@ class Test(unittest.TestCase):
         # test that chordify does not choke on rests
         from music21 import stream
         p1 = stream.Part()
-        for p, ql in [(None, 2), ('d2',2), (None, 2), ('e3',2), ('f3', 2)]:
-            if p == None:
+        for p, ql in [(None, 2), ('d2', 2), (None, 2), ('e3', 2), ('f3', 2)]:
+            if p is None:
                 n = note.Rest()
             else:
                 n = note.Note(p)
@@ -4907,8 +4900,8 @@ class Test(unittest.TestCase):
             p1.append(n)
 
         p2 = stream.Part()
-        for p, ql in [(None, 2), ('c#3',1), ('d#3',1), (None, 2), ('e-5',2), (None, 2)]:
-            if p == None:
+        for p, ql in [(None, 2), ('c#3', 1), ('d#3', 1), (None, 2), ('e-5', 2), (None, 2)]:
+            if p is None:
                 n = note.Rest()
             else:
                 n = note.Note(p)
@@ -5819,11 +5812,11 @@ class Test(unittest.TestCase):
         s1 = stream.Stream()
         s1.repeatAppend(note.Note(), 10)
         s1Flat = s1.flat
-        self.assertEqual(s1Flat.derivation.origin is s1, True)
-        self.assertEqual(s1Flat.derivation.method is 'flat', True)
+        self.assertIs(s1Flat.derivation.origin, s1)
+        self.assertEqual(s1Flat.derivation.method,'flat')
 
         s1Elements = s1Flat.getElementsByClass('Note').stream()
-        self.assertEqual(s1Elements.derivation.method is 'getElementsByClass', True)
+        self.assertEqual(s1Elements.derivation.method, 'getElementsByClass')
 
 
         s1 = converter.parse("tinyNotation: 4/4 C2 D2")
@@ -5934,27 +5927,26 @@ class Test(unittest.TestCase):
             # removes self, while [x for x in s.recurse()] does not.
         self.assertTrue(s in rElements)
         self.assertEqual(len(rElements), 240)
-        return
 
-        rElements = list(s.recurse(streamsOnly=True))
-        self.assertEqual(len(rElements), 45)
-
-        p1 = rElements[1]
-        m1 = rElements[2]
-        #m2 = rElements[3]
-        m2 = rElements[4]
-        self.assertIs(p1.activeSite, s)
-        self.assertIs(m1.activeSite, p1)
-        self.assertIs(m2.activeSite, p1)
-
-
-        rElements = list(s.recurse(classFilter='KeySignature'))
-        self.assertEqual(len(rElements), 4)
-        # the first elements active site is the measure
-        self.assertEqual(id(rElements[0].activeSite), id(m1))
-
-        rElements = list(s.recurse(classFilter=['TimeSignature']))
-        self.assertEqual(len(rElements), 4)
+#         rElements = list(s.recurse(streamsOnly=True))
+#         self.assertEqual(len(rElements), 45)
+# 
+#         p1 = rElements[1]
+#         m1 = rElements[2]
+#         #m2 = rElements[3]
+#         m2 = rElements[4]
+#         self.assertIs(p1.activeSite, s)
+#         self.assertIs(m1.activeSite, p1)
+#         self.assertIs(m2.activeSite, p1)
+# 
+# 
+#         rElements = list(s.recurse(classFilter='KeySignature'))
+#         self.assertEqual(len(rElements), 4)
+#         # the first elements active site is the measure
+#         self.assertEqual(id(rElements[0].activeSite), id(m1))
+# 
+#         rElements = list(s.recurse(classFilter=['TimeSignature']))
+#         self.assertEqual(len(rElements), 4)
 
 
 #         s = corpus.parse('bwv66.6')
@@ -6499,15 +6491,15 @@ class Test(unittest.TestCase):
         # we have not tempo
         self.assertEqual(len(sFlat.getElementsByClass('TempoIndication')), 0)
         sFlat.insert(0, tempo.MetronomeMark('adagio'))
-        self.assertAlmostEquals(sFlat.seconds, 38.57142857)
+        self.assertAlmostEqual(sFlat.seconds, 38.57142857)
 
         sFlat.removeByClass('TempoIndication')
         sFlat.insert(0, tempo.MetronomeMark('presto'))
-        self.assertAlmostEquals(sFlat.seconds, 11.73913043)
+        self.assertAlmostEqual(sFlat.seconds, 11.73913043)
 
         sFlat.removeByClass('TempoIndication')
         sFlat.insert(0, tempo.MetronomeMark('prestissimo'))
-        self.assertAlmostEquals(sFlat.seconds, 10.38461538)
+        self.assertAlmostEqual(sFlat.seconds, 10.38461538)
 
     def testSecondsPropertyC(self):
         from music21 import stream, tempo
@@ -6970,8 +6962,8 @@ class Test(unittest.TestCase):
         #sChords = s.chordify()
         sChords.extendTies()
         post = []
-        for chord in sChords.flat.getElementsByClass('Chord'):
-            post.append([repr(n.tie) for n in chord])
+        for ch in sChords.flat.getElementsByClass('Chord'):
+            post.append([repr(n.tie) for n in ch])
         self.assertEqual(post,
                          [['<music21.tie.Tie continue>',
                            '<music21.tie.Tie start>',
@@ -7390,7 +7382,7 @@ class Test(unittest.TestCase):
 
     def testGracesInStream(self):
         '''testing grace notes'''
-        from music21 import stream, duration, dynamics
+        from music21 import stream, dynamics
 
         s = stream.Measure()
         s.append(note.Note('G3'))
@@ -7814,7 +7806,6 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    import music21
     music21.mainTest(Test, 'verbose') #, runTest='testMakeNotationByMeasuresB')
 
 #------------------------------------------------------------------------------

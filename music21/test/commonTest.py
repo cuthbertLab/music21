@@ -67,7 +67,7 @@ class Music21TestRunner(unittest.runner.TextTestRunner):
                 if self.warnings in ['default', 'always']:
                     warnings.filterwarnings('module',
                             category=DeprecationWarning,
-                            message='Please use assert\w+ instead.')
+                            message=r'Please use assert\w+ instead.')
             #startTime = time.time()
             startTestRun = getattr(result, 'startTestRun', None)
             if startTestRun is not None:
@@ -358,7 +358,7 @@ class ModuleGather(object):
             with warnings.catch_warnings():
                 warnings.simplefilter('ignore', RuntimeWarning)
                 mod = imp.load_source(name, fp)
-        except Exception as excp: # this takes all exceptions!
+        except Exception as excp: # pylint: disable=broad-except
             environLocal.printDebug(['failed import:', fp, '\n',
                 '\tEXCEPTION:', str(excp).strip()])
             return None
