@@ -945,9 +945,9 @@ def lcm(filterList):
     :rtype: int
     '''
     def _lcm(a, b):
-        """find lowest common multiple of a,b"""
+        """find lowest common multiple of a, b"""
         # // forcers integer style division (no remainder)
-        return abs(a * b) // euclidGCD(a,b)
+        return abs(a * b) // euclidGCD(a, b)
 
     # derived from
     # http://www.oreillynet.com/cs/user/view/cs_msg/41022

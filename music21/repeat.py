@@ -2409,7 +2409,7 @@ class RepeatFinder(object):
         # Want to give priority first to the longest repeated sections,
         # and then to the repeated sections that happen earlier.
         # We sort the tuples of mGroups accordingly
-#         def myComp(x,y):
+#         def myComp(x, y):
 #             if len(x[0]) != len(y[0]):
 #                 return len(y[0])-len(x[0])
 #             elif x[0][0] != y[0][0]:
@@ -2534,11 +2534,11 @@ class RepeatFinder(object):
         #only want long enough measure groups
 
         #sort them giving first priority to larger groups, then to groups that occur earlier
-#         def aGoodOrder(x,y):
+#         def aGoodOrder(x, y):
 #             if len(x[0]) != len(y[0]):
-#                 return len(y[0])-len(x[0])
+#                 return len(y[0]) - len(x[0])
 #             elif x[0][0] != y[0][0]:
-#                 return x[0][0]-y[0][0]
+#                 return x[0][0] - y[0][0]
 #             else:
 #                 return x[1][0] - y[1][0]
 

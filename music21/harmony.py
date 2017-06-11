@@ -357,7 +357,6 @@ class Harmony(chord.Chord):
             self._roman = None
 
     @property
-    # TODO: move this attribute to roman class which inherits from harmony.Harmony objects
     def romanNumeral(self):
         '''
         Get or set the romanNumeral numeral function of the Harmony as a
@@ -409,7 +408,7 @@ class Harmony(chord.Chord):
     def writeAsChord(self):
         '''
         Boolean attribute of all harmony objects that specifies how this
-        object will be written to the musicxml of a stream. If `True`
+        object will be written to the rendered output (such as musicxml). If `True`
         (default for romanNumerals), the chord with pitches is written. If
         False (default for ChordSymbols) the harmony symbol is written.
         '''
@@ -450,7 +449,8 @@ class Harmony(chord.Chord):
         return 'No Figure Representation'
 
     def getChordStepModifications(self):
-        '''Return all harmony degrees as a list.
+        '''
+        Return all harmony degrees as a list.
         '''
         return self.chordStepModifications
 
@@ -1078,9 +1078,9 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
 
     if len(inChord.pitches) == 1:
         if includeChordType:
-            return (inChord.root().name.replace('-', 'b')+'pedal', 'pedal')
+            return (inChord.root().name.replace('-', 'b') + 'pedal', 'pedal')
         else:
-            return inChord.root().name.replace('-', 'b')+'pedal'
+            return inChord.root().name.replace('-', 'b') + 'pedal'
 
     d3 = inChord.semitonesFromChordStep(3) #4  #triad
     d5 = inChord.semitonesFromChordStep(5) #7  #triad
@@ -1167,15 +1167,15 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
                     kind = chordKind
                     kindStr = chordKindStr[0]
             elif len(chordDegrees) == 4 and d9 and not d11 and not d13:
-                if compare((d3, d5, d7, d9), chordDegrees, permittedOmitions=[5]):
+                if compare((d3, d5, d7, d9), chordDegrees, permittedOmitions=(5,)):
                     kind = chordKind
                     kindStr = chordKindStr[0]
             elif len(chordDegrees) == 5 and d11 and not d13:
-                if compare((d3, d5, d7, d9, d11), chordDegrees, permittedOmitions=[3, 5]):
+                if compare((d3, d5, d7, d9, d11), chordDegrees, permittedOmitions=(3, 5)):
                     kind = chordKind
                     kindStr = chordKindStr[0]
             elif len(chordDegrees) == 6 and d13:
-                if compare((d3, d5, d7, d9, d11, d13), chordDegrees, permittedOmitions=[5, 11, 9]):
+                if compare((d3, d5, d7, d9, d11, d13), chordDegrees, permittedOmitions=(5, 11, 9)):
                     kind = chordKind
                     kindStr = chordKindStr[0]
 
@@ -1247,10 +1247,16 @@ def chordSymbolFromChord(inChord):
     Get the :class:`~music21.harmony.chordSymbol` object from the chord, using
     :meth:`music21.harmony.chordSymbolFigureFromChord`
 
-    >>> harmony.chordSymbolFromChord(chord.Chord(['D3', 'F3', 'A3', 'B-3']))
+    >>> c = chord.Chord(['D3', 'F3', 'A4', 'B-5'])
+    >>> cs = harmony.chordSymbolFromChord(c)
+    >>> cs
     <music21.harmony.ChordSymbol B-maj7/D>
+    >>> c.pitches == cs.pitches
+    True
     '''
-    return ChordSymbol(chordSymbolFigureFromChord(inChord))
+    cs = ChordSymbol(chordSymbolFigureFromChord(inChord))
+    cs.pitches = inChord.pitches
+    return cs
 
 
 def getAbbreviationListGivenChordType(chordType):
@@ -1699,9 +1705,9 @@ class ChordSymbol(Harmony):
             sH = sH[0:sH.index('add')]
         if 'omit' in sH:
             sH = sH[0:sH.index('omit')]
-        if '#' in sH and sH[sH.index('#')+1].isdigit():
+        if '#' in sH and sH[sH.index('#') + 1].isdigit():
             sH = sH[0:sH.index('#')]
-        if 'b' in sH and sH[sH.index('b')+1].isdigit() and 'ob9' not in sH:
+        if 'b' in sH and sH[sH.index('b') + 1].isdigit() and 'ob9' not in sH:
             # yuck, special exception
             sH = sH[0:sH.index('b')]
         for chordKind in CHORD_TYPES:
@@ -1713,13 +1719,13 @@ class ChordSymbol(Harmony):
 
     def _hasPitchAboveC4(self, pitches):
         for p in pitches:
-            if p.diatonicNoteNum > 30: #if there are pitches above middle C, bump the octave down
+            if p.diatonicNoteNum > 30: # if there are pitches above middle C, bump the octave down
                 return True
         return False
 
     def _hasPitchBelowA1(self, pitches):
         for p in pitches:
-            if p.diatonicNoteNum < 13: #anything below this is just obnoxious
+            if p.diatonicNoteNum < 13: # anything below this is just obnoxious
                 return True
         return False
 
@@ -1936,10 +1942,9 @@ class ChordSymbol(Harmony):
         else:
             self.inversion(None, transposeOnSet=False)
             inversionNum = None
-        if inversionNum != None:
-            index = -1
+        
+        if inversionNum not in (0, None):
             for p in pitches[0:inversionNum]:
-                index = index + 1
                 if self.chordKind in nineElevenThirteen:
                     #bump octave up by two for nineths,elevenths, and thirteenths
                     p.octave = p.octave + 2
@@ -1960,20 +1965,14 @@ class ChordSymbol(Harmony):
         pitches = list(self._adjustPitchesForChordStepModifications(pitches))
 
         while self._hasPitchAboveC4(pitches) :
-            i = -1
             for thisPitch in pitches:
-                i = i + 1
-                temp = str(thisPitch.name) + str((thisPitch.octave - 1))
-                pitches[i] = pitch.Pitch(temp)
+                thisPitch.octave -= 1
 
         #but if this has created pitches below lowest note (the A 3 octaves below middle C)
         #on a standard piano, we're going to have to bump all the octaves back up
         while self._hasPitchBelowA1(pitches) :
-            i = -1
             for thisPitch in pitches:
-                i = i + 1
-                temp = str(thisPitch.name) + str((thisPitch.octave + 1))
-                pitches[i] = pitch.Pitch(temp)
+                thisPitch.octave += 1
 
         self.pitches = tuple(pitches)
         self.sortDiatonicAscending(inPlace=True)

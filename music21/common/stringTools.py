@@ -48,9 +48,9 @@ def whitespaceEqual(a, b):
     >>> a = "    hello \nthere "
     >>> b = "hello there"
     >>> c = " bye there "
-    >>> common.whitespaceEqual(a,b)
+    >>> common.whitespaceEqual(a, b)
     True
-    >>> common.whitespaceEqual(a,c)
+    >>> common.whitespaceEqual(a, c)
     False
     '''
     a = WHITESPACE.sub('', a)

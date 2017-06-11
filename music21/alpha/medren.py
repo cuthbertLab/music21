@@ -811,7 +811,7 @@ class MensuralNote(GeneralMensuralNote, note.Note):
             if self._fontString in ['41', '61']:
                 self._fontString = ''
             else:
-                self._fontString = hex(int(self._fontString, 16)+32)
+                self._fontString = hex(int(self._fontString, 16) + 32)
 
         return self._fontString
 
