@@ -1159,13 +1159,16 @@ class RomanNumeral(harmony.Harmony):
         # This is set when _setKeyOrScale() is called:
         self._scale = None
         self.scaleDegree = None
+        self.frontAlterationString = None
         self.frontAlterationTransposeInterval = None
         self.frontAlterationAccidental = None
+        self.romanNumeralAlone = None
+        
         self.impliedQuality = None
         self.impliedScale = None
         self.useImpliedScale = False
         self.bracketedAlterations = None
-
+        self.omittedSteps = []
         # do not update pitches...
         self._parsingComplete = False
         self.key = keyOrScale

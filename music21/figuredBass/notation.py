@@ -171,10 +171,10 @@ class Notation(object):
         self._getFigures()
 
     def __repr__(self):
-            return '<{0}.{1} {2}>'.format(self.__module__,
-                                          self.__class__.__name__,
-                                          self.notationColumn
-                                          )
+        return '<{0}.{1} {2}>'.format(self.__module__,
+                                      self.__class__.__name__,
+                                      self.notationColumn
+                                      )
 
     def _parseNotationColumn(self):
         '''
