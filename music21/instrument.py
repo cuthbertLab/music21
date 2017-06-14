@@ -1615,7 +1615,7 @@ def partitionByInstrument(streamObj):
     >>> for p in s2.parts:
     ...     unused = p.makeRests(fillGaps=True, inPlace=True)
 
-    # TODO: this step SHOULD not be necessary (measureTemplate)...
+    # TODO: this step SHOULD not be necessary (.template())...
 
     >>> for p in s2.parts:
     ...     p.makeMeasures(inPlace=True)

@@ -7752,11 +7752,11 @@ class Test(unittest.TestCase):
             "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
         #s.show()
 
-    def testMeasureTemplateAll(self):
+    def testTemplateAll(self):
         from music21 import corpus
         b = corpus.parse('bwv66.6')
         bass = b.parts[3]
-        bassEmpty = bass.measureTemplate(fillWithRests=False, customRemove=True)
+        bassEmpty = bass.template(fillWithRests=False, removeClasses=True)
         for x in bassEmpty:
             if 'Measure' in x.classes:
                 self.assertEqual(len(x), 0)

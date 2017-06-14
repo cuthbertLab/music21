@@ -255,7 +255,7 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, group
                                     if e.isClassOrSubclass(classList)]
         outputTree.populateFromSortedList(elementTupleList)
         return outputTree
-        # * to make this work for an OffsetTree, we'd need to use .groupElementsByOffset
+        # * to make this work for an OffsetTree, we'd need to use OffsetIterator
         #   first to make it so that the midpoint of the list is also the rootnode, etc.
 
     else:

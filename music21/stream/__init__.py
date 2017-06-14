@@ -857,7 +857,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def cloneEmpty(self, derivationMethod=None):
         '''
         Create a Stream that is identical to this one except that the elements are empty
-        and set derivation (Should this be deleted???
+        and set derivation (Should this be deleted???)
 
         >>> p = stream.Part()
         >>> p.autoSort = False
@@ -3379,9 +3379,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     #-----------------------------------------------------
     # end .getElement filters
-
+    @common.deprecated('June 2017', 'May 2018', '''Use stream.iterator.OffsetIterator 
+        instead, creating the returnDict if needed from the offset of the first element.
+        ''')
     def groupElementsByOffset(self, returnDict=False):
         '''
+        DEPRECATED: Use :class:`music21.stream.iterator.OffsetIterator` instead
+        as the instructions below show.
+    
         Returns a List of lists in which each entry in the
         main list is a list of elements occurring at the same time.
         list is ordered by offset (since we need to sort the list
@@ -3401,13 +3406,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.insert(4, note.Note('D-'))
         >>> s.insert(16.0/3, note.Note('D'))
 
-        >>> returnList = s.groupElementsByOffset()
+        >>> returnList = list(stream.iterator.OffsetIterator(s))
         >>> returnList
         [[<music21.note.Note C>],
          [<music21.note.Note C#>, <music21.note.Note D->],
          [<music21.note.Note D>]]
 
-        >>> returnDict = s.groupElementsByOffset(returnDict=True)
+        >>> returnDict = {v[0].offset: v for v in returnList}
         >>> pp(returnDict)
         {3.0: [<music21.note.Note C>],
          4.0: [<music21.note.Note C#>, <music21.note.Note D->],
@@ -3417,7 +3422,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> s.insert(0, meter.TimeSignature('2/4'))
         >>> s.insert(0, clef.TrebleClef()) # sorts first
-        >>> s.groupElementsByOffset()[0]
+        >>> list(stream.iterator.OffsetIterator(s))[0]
         [<music21.clef.TrebleClef>, <music21.meter.TimeSignature 2/4>]
 
         it is DEFINITELY a feature that this method does not
@@ -3697,11 +3702,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return None
 
 
-    def measureTemplate(self,
-                        fillWithRests=True,
-                        classType='Measure',
-                        customRemove=None):
+    def template(self,
+                 fillWithRests=True,
+                 removeClasses=None,
+                 retainVoices=True,
+                 ):
         '''
+        Return a new Stream based on this one, but with 
         If this Stream contains measures, return a new Stream
         with new Measures populated with the same characteristics of those found in this Stream.
 
@@ -3709,8 +3716,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> b = corpus.parse('bwv66.6')
         >>> sopr = b.parts[0]
-        >>> soprEmpty = sopr.measureTemplate()
+        >>> soprEmpty = sopr.template()
         >>> soprEmpty.show('text')
+        {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.key.Key of f# minor>
@@ -3730,8 +3738,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Really make empty with fillWithRests = False
 
         >>> alto = b.parts[1]
-        >>> altoEmpty = alto.measureTemplate(fillWithRests=False)
+        >>> altoEmpty = alto.template(fillWithRests=False)
         >>> altoEmpty.show('text')
+        {0.0} <music21.instrument.Instrument P2: Alto: Instrument 2>
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.key.Key of f# minor>
@@ -3745,14 +3754,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ...
 
 
-        customRemove can be a list of classes to remove.  By default it is
-        ['GeneralNote', 'Stream', 'Dynamic', 'Expression']
-
-        if GeneralNote is not included in customRemove, make sure fillWithRests is False
+        customRemove can be a list or set of classes to remove.  By default it is
+        ['GeneralNote', 'Dynamic', 'Expression']
 
         >>> tenor = b.parts[2]
-        >>> tenorNoClefsSignatures = tenor.measureTemplate(fillWithRests=False,
-        ...       customRemove=['Clef', 'KeySignature', 'TimeSignature'])
+        >>> tenorNoClefsSignatures = tenor.template(fillWithRests=False,
+        ...       removeClasses=['Clef', 'KeySignature', 'TimeSignature', 'Instrument'])
         >>> tenorNoClefsSignatures.show('text')
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.note.Note A>
@@ -3765,11 +3772,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {5.0} <music21.stream.Measure 2 offset=5.0>
         ...
 
-
-        Setting customRemove to True removes everything:
+        Setting removeClasses to True removes everything:
 
         >>> bass = b.parts[3]
-        >>> bassEmpty = bass.measureTemplate(fillWithRests=False, customRemove=True)
+        >>> bassEmpty = bass.template(fillWithRests=False, removeClasses=True)
         >>> bassEmpty.show('text')
         {0.0} <music21.stream.Measure 0 offset=0.0>
         <BLANKLINE>
@@ -3783,33 +3789,132 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         <BLANKLINE>
         ...
 
+        On the whole score:
+        
+        >>> b.template().show('text')
+        {0.0} <music21.metadata.Metadata object at 0x106151940>
+        {0.0} <music21.stream.Part Soprano>
+            {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
+            {0.0} <music21.stream.Measure 0 offset=0.0>
+                {0.0} <music21.clef.TrebleClef>
+                {0.0} <music21.key.Key of f# minor>
+                {0.0} <music21.meter.TimeSignature 4/4>
+                {0.0} <music21.note.Rest rest>
+            {1.0} <music21.stream.Measure 1 offset=1.0>
+                {0.0} <music21.note.Rest rest>
+                ...
+            {33.0} <music21.stream.Measure 9 offset=33.0>
+                {0.0} <music21.note.Rest rest>
+                {3.0} <music21.bar.Barline style=final>
+        {0.0} <music21.stream.Part Alto>
+            {0.0} <music21.instrument.Instrument P2: Alto: Instrument 2>
+            {0.0} <music21.stream.Measure 0 offset=0.0>
+                {0.0} <music21.clef.TrebleClef>
+                {0.0} <music21.key.Key of f# minor>
+                {0.0} <music21.meter.TimeSignature 4/4>
+                {0.0} <music21.note.Rest rest>
+            {1.0} <music21.stream.Measure 1 offset=1.0>
+                {0.0} <music21.note.Rest rest>
+            ...
+            {33.0} <music21.stream.Measure 9 offset=33.0>
+                {0.0} <music21.note.Rest rest>
+                {3.0} <music21.bar.Barline style=final>
+        {0.0} <music21.layout.StaffGroup ...>    
+        
+        
+        If retainVoices is False (default True) then Voice streams are treated
+        differently from all other Streams and are removed.  All elements in the
+        voice are removed even if they do not match the classList:
+        
+        >>> p = stream.Part(id='part0')
+        >>> m1 = stream.Measure(number=1)
+        >>> v1 = stream.Voice(id='voice1')
+        >>> v1.insert(0, note.Note('E', quarterLength=4.0))
+        >>> v2 = stream.Voice(id='voice2')
+        >>> v2.insert(0, note.Note('G', quarterLength=2.0))
+        >>> m1.insert(0, v1)
+        >>> m1.insert(0, v2)
+        >>> m2 = stream.Measure(number=2)
+        >>> m2.insert(0, note.Note('D', quarterLength=4.0))
+        >>> p.append([m1, m2])
+        >>> pt = p.template(retainVoices=False)
+        >>> pt.show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.note.Rest rest>
+        {4.0} <music21.stream.Measure 2 offset=4.0>
+            {0.0} <music21.note.Rest rest>
+        >>> pt[0][0].quarterLength
+        4.0            
+        
+        Developer note -- if you just want a copy of a Score with new
+        Part and Measure objects, but you don't care that the notes, etc.
+        inside are the same objects as the original (i.e., you do not
+        plan to manipulate them, or you want the manipulations to
+        return to the original objects), using .template() is several
+        times faster than a deepcopy of the stream (about 4x faster
+        on bwv66.6)
+        '''
+        out = self.cloneEmpty('template')
+        if removeClasses is None:
+            removeClasses = set(['GeneralNote', 'Dynamic', 'Expression'])
+        elif common.isIterable(removeClasses):
+            removeClasses = set(removeClasses)
 
-        classType explains what to extract.  Might be Voice, etc.
+        restInfo = {'offset': None, 'endTime': None}
+        
+        def optionalAddRest():
+            # six.PY3  nonlocal currentRest  would remove the need for restInfo struct
+            if not fillWithRests:
+                return
+            if restInfo['offset'] is None:
+                return
+            
+            restQL = restInfo['endTime'] - restInfo['offset']
+            restObj = note.Rest(quarterLength=restQL)
+            out.insert(restInfo['offset'], restObj)
+            restInfo['offset'] = None
+            restInfo['endTime'] = None
 
-        Is not recursive, so cannot template a whole Score...yet.
-        TODO: rename to template -- set default to Stream not Measure, add recurse...
+        for el in self:
+            if el.isStream and (retainVoices or ('Voice' not in el.classes)):
+                optionalAddRest()
+                outEl = el.template(fillWithRests=fillWithRests,
+                                    removeClasses=removeClasses,
+                                    retainVoices=retainVoices)
+                out.insert(el.offset, outEl)
+            
+            elif (removeClasses is True 
+                    or el.classSet.intersection(removeClasses)
+                    or (not retainVoices and 'Voice' in el.classes)):
+                # remove this element
+                if fillWithRests and el.duration.quarterLength:
+                    endTime = el.offset + el.duration.quarterLength
+                    if restInfo['offset'] is None:
+                        restInfo['offset'] = el.offset
+                        restInfo['endTime'] = endTime
+                    elif endTime > restInfo['endTime']:
+                        restInfo['endTime'] = endTime
+            else:
+                optionalAddRest()
+                out.insert(el.offset, el)
+                
+        optionalAddRest()
+
+        return out
+
+    @common.deprecated('June 2017 v4.0.7', 'Jan 2018', 'use .template() instead')
+    def measureTemplate(self,
+                        fillWithRests=True,
+                        classType='Measure',
+                        customRemove=None):
+        '''
+        DEPRECATED, to be removed, use Stream.template(), retainVoices=False
         '''
         if not self.hasMeasures():
             raise StreamException('the requested Stream does not have Measures')
-        # should this be deepcopy or just a recursive call...
-        measureTemplate = copy.deepcopy(self.getElementsByClass(classType).stream())
-        for m in measureTemplate:
-            ql = m.duration.quarterLength
-            if customRemove is not None:
-                if customRemove is True:
-                    m.removeByClass('Music21Object')
-                else:
-                    m.removeByClass(customRemove)
-            else:
-                #                 + rests    voices/substreams
-                m.removeByClass(['GeneralNote', 'Stream', 'Dynamic', 'Expression'])
-
-            if fillWithRests:
-                if self.id == 'Soprano':
-                    pass
-                # quarterLength duration will be appropriate to pickup
-                m.insert(0.0, note.Rest(quarterLength=ql))
-        return measureTemplate
+        return self.measures(fillWithRests=fillWithRests,
+                             removeClasses=customRemove,
+                             retainVoices=False)
 
     def measureOffsetMap(self, classFilterList=None):
         '''
@@ -9487,8 +9592,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> print(st1.simultaneousAttacks(st2))
         [0.0, 3.0]
         '''
-        stream1Offsets = self.groupElementsByOffset()
-        stream2Offsets = stream2.groupElementsByOffset()
+        stream1Offsets = iterator.OffsetIterator(self)
+        stream2Offsets = iterator.OffsetIterator(stream2)
 
         returnKey = {}
 
@@ -12657,6 +12762,8 @@ class Score(Stream):
         contained in Measures are transferred.
 
         It also flattens all voices within a part.
+        
+        To be deprecated at some point...
 
         >>> s = corpus.parse('bwv66.6')
         >>> len(s.parts)
@@ -12669,7 +12776,7 @@ class Score(Stream):
         >>> len(post.flat.notes)
         165
         '''
-        post = self.parts[0].measureTemplate(fillWithRests=False)
+        post = self.parts[0].template(fillWithRests=False, retainVoices=False)
         for i, m in enumerate(post.getElementsByClass('Measure')):
             for p in self.parts:
                 mNew = copy.deepcopy(p.getElementsByClass('Measure')[i]).flat
@@ -12684,8 +12791,12 @@ class Score(Stream):
         return post
 
 
-    def makeNotation(self, meterStream=None, refStreamOrTimeRange=None,
-                        inPlace=False, bestClef=False, **subroutineKeywords):
+    def makeNotation(self, 
+                     meterStream=None, 
+                     refStreamOrTimeRange=None,
+                     inPlace=False, 
+                     bestClef=False, 
+                     **subroutineKeywords):
         '''
         This method overrides the makeNotation method on Stream,
         such that a Score object with one or more Parts or Streams

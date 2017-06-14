@@ -32,6 +32,7 @@ def chordified(timespans, templateStream=None):
     >>> chordifiedScore = tree.toStream.chordified(
     ...     scoreTree, templateStream=score)
     >>> chordifiedScore.show('text')
+    {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
     {0.0} <music21.stream.Measure 0 offset=0.0>
         {0.0} <music21.clef.TrebleClef>
         {0.0} <music21.key.Key of f# minor>
@@ -52,12 +53,6 @@ def chordified(timespans, templateStream=None):
         {3.0} <music21.chord.Chord E#3 C#4 G#4 C#5>
     {9.0} <music21.stream.Measure 3 offset=9.0>
         {0.0} <music21.layout.SystemLayout>
-        {0.0} <music21.chord.Chord F#3 C#4 F#4 A4>
-        {0.5} <music21.chord.Chord B2 D4 G#4 B4>
-        {1.0} <music21.chord.Chord C#3 C#4 E#4 G#4>
-        {1.5} <music21.chord.Chord C#3 B3 E#4 G#4>
-        {2.0} <music21.chord.Chord F#2 A3 C#4 F#4>
-        {3.0} <music21.chord.Chord F#3 C#4 F#4 A4>
     ...
     '''
     from music21 import stream
@@ -68,15 +63,19 @@ def chordified(timespans, templateStream=None):
         templateOffsets = list(mos)
         templateOffsets.append(templateStream.duration.quarterLength)
         if (hasattr(templateStream, 'parts')
-                and templateStream.iter.parts):
-            outputStream = templateStream.iter.parts[0].measureTemplate(fillWithRests=False)
+                and templateStream.parts):
+            outputStream = templateStream.parts[0].template(fillWithRests=False, 
+                                                                 retainVoices=False)
         else:
-            outputStream = templateStream.measureTemplate(fillWithRests=False)
+            outputStream = templateStream.template(fillWithRests=False, retainVoices=False)
         timespans = timespans.copy()
         timespans.splitAt(templateOffsets)
         measureIndex = 0
         allTimePoints = timespans.allTimePoints() + tuple(templateOffsets)
         allTimePoints = sorted(set(allTimePoints))
+        
+        measureList = list(outputStream.getElementsByClass('Measure'))
+        
         for offset, endTime in zip(allTimePoints, allTimePoints[1:]):
             while templateOffsets[1] <= offset:
                 templateOffsets.pop(0)
@@ -88,7 +87,7 @@ def chordified(timespans, templateStream=None):
                         "%r its endTime %f is less than its offset %f" %
                                          (vert, endTime, offset))
             element = vert.makeElement(quarterLength)
-            outputStream[measureIndex].append(element)
+            measureList[measureIndex].append(element)
         return outputStream
     else:
         allTimePoints = timespans.allTimePoints()
