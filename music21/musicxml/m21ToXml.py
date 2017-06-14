@@ -259,7 +259,7 @@ class GeneralObjectExporter():
         ('Dynamic', 'fromDynamic'),
         ('DiatonicScale', 'fromDiatonicScale'),
         ('Scale', 'fromScale'),
-        ('TimeSignature', 'fromTimeSignature'),
+        ('Music21Object', 'fromMusic21Object'),
     ])
 
     def __init__(self, obj=None):
@@ -404,7 +404,8 @@ class GeneralObjectExporter():
         solutions in Part or Stream production.
         '''
         mCopy = m.makeNotation()
-        mCopy.clef = mCopy.bestClef()
+        if not m.recurse().getElementsByClass('Clef').getElementsByOffset(0.0):
+            mCopy.clef = mCopy.bestClef()
         p = stream.Part()
         p.append(mCopy)
         p.metadata = copy.deepcopy(getMetadataFromContext(m))
@@ -438,13 +439,21 @@ class GeneralObjectExporter():
             st2 = stream.Part()
             st2.mergeAttributes(st)
             st2.elements = copy.deepcopy(st)
-            st2.makeNotation(inPlace=True, bestClef=True)
+            if not st.getElementsByClass('Clef').getElementsByOffset(0.0):
+                bestClef = True
+            else:
+                bestClef = False
+            st2.makeNotation(inPlace=True, bestClef=bestClef)
             st2.metadata = copy.deepcopy(getMetadataFromContext(st))
             return self.fromPart(st2)
 
         else:
             # probably a problem? or a voice...
-            st2 = st.makeNotation(inPlace=False, bestClef=True)
+            if not st.getElementsByClass('Clef').getElementsByOffset(0.0):
+                bestClef = True
+            else:
+                bestClef = False
+            st2 = st.makeNotation(inPlace=False, bestClef=bestClef)
             return self.fromScore(st)
 
     def fromDuration(self, d):
@@ -521,18 +530,17 @@ class GeneralObjectExporter():
         m.timeSignature = m.bestTimeSignature()
         return self.fromMeasure(m)
 
-    def fromTimeSignature(self, ts):
+    def fromMusic21Object(self, obj):
         '''
         return a single TimeSignature as a musicxml document
         '''
-
         # return a complete musicxml representation
-        tsCopy = copy.deepcopy(ts)
+        objCopy = copy.deepcopy(obj)
     #         m = stream.Measure()
     #         m.timeSignature = tsCopy
     #         m.append(note.Rest())
         out = stream.Measure(number=1)
-        out.append(tsCopy)
+        out.append(objCopy)
         return self.fromMeasure(out)
 
     def fromGeneralNote(self, n):

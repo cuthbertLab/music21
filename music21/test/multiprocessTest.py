@@ -8,7 +8,6 @@
 # Copyright:    Copyright © 2012-15 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 '''
 Multiprocess testing.  Tests all doctests and Test unittest objects in all
 modules that are imported when running "import music21".  Runs threads on

@@ -101,13 +101,14 @@ class ArchiveManager(object):
     >>> data = am.getData()
     >>> data[0:70]
     '<?xml version="1.0" encoding="UTF-8"?>\r<!DOCTYPE score-partwise PUBLIC'
+
+
+    The only archive type supported now is zip. But .mxl is zip...
     '''
     # for info on mxl files, see
     # http://www.recordare.com/xml/compressed-mxl.html
 
     def __init__(self, fp, archiveType='zip'):
-        '''Only archive type supported now is zip. But .mxl is zip...
-        '''
         self.fp = common.cleanpath(fp)
         self.archiveType = archiveType
 
@@ -230,14 +231,13 @@ class PickleFilter(object):
 
     If the user has not specified a scratch directory, or if forceSource is True
     then a pickle path will not be created.
+
+    Provide a file path to check if there is pickled version.
+
+    If forceSource is True, pickled files, if available, will not be
+    returned.
     '''
     def __init__(self, fp, forceSource=False, number=None):
-        '''
-        Provide a file path to check if there is pickled version.
-
-        If forceSource is True, pickled files, if available, will not be
-        returned.
-        '''
         self.fp = common.cleanpath(fp)
         self.forceSource = forceSource
         self.number = number

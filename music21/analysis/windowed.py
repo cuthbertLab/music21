@@ -50,13 +50,14 @@ class WindowedAnalysisException(exceptions21.Music21Exception):
 #------------------------------------------------------------------------------
 
 class WindowedAnalysis(object):
-    def __init__(self, streamObj, analysisProcessor):
-        '''Create a WindowedAnalysis object.
+    '''
+    Create a WindowedAnalysis object.
 
-        The provided `analysisProcessor` must provide a `process()` method that,
-        when given a windowed Stream (a Measure) returns two element tuple containing
-        (a) a data value (implementation dependent) and (b) a color code.
-        '''
+    The provided `analysisProcessor` must provide a `process()` method that,
+    when given a windowed Stream (a Measure) returns two element tuple containing
+    (a) a data value (implementation dependent) and (b) a color code.
+    '''
+    def __init__(self, streamObj, analysisProcessor):
         self.processor = analysisProcessor
         #environLocal.printDebug(self.processor)
         if 'Stream' not in streamObj.classes:

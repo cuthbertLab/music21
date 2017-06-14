@@ -1442,9 +1442,8 @@ class Duration(SlottedObjectMixin):
     ### INITIALIZER ###
 
     def __init__(self, *arguments, **keywords):
-        '''
-        First positional argument is assumed to be type string or a quarterLength.
-        '''
+        # First positional argument is assumed to be type string or a quarterLength.
+
         # store a reference to the object that has this duration object as a property
         self._client = None
 

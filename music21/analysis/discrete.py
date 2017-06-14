@@ -968,6 +968,10 @@ keyWeightKeyAnalysisClasses = [KrumhanslSchmuckler, KrumhanslKessler,
 class Ambitus(DiscreteAnalysis):
     '''
     An basic analysis method for measuring register.
+
+    >>> ambitusAnalysis = analysis.discrete.Ambitus()
+    >>> ambitusAnalysis.identifiers[0]
+    'ambitus'
     '''
     _DOC_ALL_INHERITED = False
 
@@ -976,12 +980,6 @@ class Ambitus(DiscreteAnalysis):
     identifiers = ['ambitus', 'range', 'span']
 
     def __init__(self, referenceStream=None):
-        '''
-
-        >>> ambitusAnalysis = analysis.discrete.Ambitus()
-        >>> ambitusAnalysis.identifiers[0]
-        'ambitus'
-        '''
         DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
         self._pitchSpanColors = OrderedDict()
         self._generateColors()
@@ -1271,8 +1269,6 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
     identifiers = ['interval.diversity', 'intervals']
 
     def __init__(self, referenceStream=None):
-        '''
-        '''
         DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
 
 

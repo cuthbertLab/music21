@@ -53,6 +53,15 @@ class ReductiveNote(object):
     and how it should be presented in a reductive score.
 
     A specification string, as well as Note, must be provided for parsing.
+
+    A specification must be created when access the Measure that the source note
+    is found in. Storing the measure and index position provides significant
+    performance optimization, as we do no have to search
+    every note when generated the reduction.
+
+    The `measureIndex` is the index of measure where this is found, not
+    the measure number. The `measureOffset` is the position in the measure
+    specified by the index.
     '''
     _delimitValue = ':' # store the delimit string, must start with 2
     _delimitArg = '/'
@@ -77,16 +86,6 @@ class ReductiveNote(object):
     }
 
     def __init__(self, specification, inputNote, measureIndex, measureOffset):
-        '''
-        A specification must be created when access the Measure that the source note
-        is found in. Storing the measure and index position provides significant
-        performance optimization, as we do no have to search
-        every note when generated the reduction.
-
-        The `measureIndex` is the index of measure where this is found, not
-        the measure number. The `measureOffset` is the position in the measure
-        specified by the index.
-        '''
         self._specification = specification
 
         self._note = None # store a reference to the note this is attached to

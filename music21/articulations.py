@@ -407,29 +407,29 @@ class Bowing(TechnicalIndication):
     '''
 
 class Fingering(TechnicalIndication):
+    '''
+    Fingering is a technical indication that covers the fingering of
+    a note (in a guitar/fret context, this covers the fret finger,
+    see FrettedPluck for that).
+
+    Converts the MusicXML -- <fingering> object
+
+    >>> f = articulations.Fingering(5)
+    >>> f
+    <music21.articulations.Fingering 5>
+    >>> f.fingerNumber
+    5
+
+    `.substitution` indicates that this fingering indicates a substitute fingering:
+
+    >>> f.substitution = True
+
+    MusicXML distinguishes between a substitution and an alternate
+    fingering:
+
+    >>> f.alternate = True
+    '''
     def __init__(self, fingerNumber=None):
-        '''
-        Fingering is a technical indication that covers the fingering of
-        a note (in a guitar/fret context, this covers the fret finger,
-        see FrettedPluck for that).
-
-        Converts the MusicXML -- <fingering> object
-
-        >>> f = articulations.Fingering(5)
-        >>> f
-        <music21.articulations.Fingering 5>
-        >>> f.fingerNumber
-        5
-
-        `.substitution` indicates that this fingering indicates a substitute fingering:
-
-        >>> f.substitution = True
-
-        MusicXML distinguishes between a substitution and an alternate
-        fingering:
-
-        >>> f.alternate = True
-        '''
         super(Fingering, self).__init__()
         self.fingerNumber = fingerNumber
         self.substitution = False

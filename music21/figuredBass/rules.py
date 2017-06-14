@@ -97,6 +97,43 @@ specialResDoc.sort()
 
 
 class Rules(object):
+    '''
+    A Rules object is provided as an input to a :class:`~music21.figuredBass.segment.Segment`,
+    and controls the application of methods designed to filter out undesired possibilities in
+    a single Segment or undesired progressions between two consecutive Segments.
+
+
+    The rules are categorized in an identical manner to methods
+    in :mod:`~music21.figuredBass.possibility`:
+
+
+    1) Single Possibility Rules. These rules apply to any possibility within a
+    single Segment (possibA), and
+    are applied in finding correct possibilities for a Segment
+    in :meth:`~music21.figuredBass.segment.Segment.allCorrectSinglePossibilities`.
+
+
+    2) Consecutive Possibility Rules. These rules apply between any correct
+    single possibility in segmentA
+    (possibA) and any correct single possibility in segmentB (possibB),
+    segmentB coming directly after segmentA.
+    They are applied in finding correct (possibA, possibB) pairs between
+    two Segments
+    in :meth:`~music21.figuredBass.segment.Segment.allCorrectConsecutivePossibilities`.
+
+
+    3) Special Resolution Rules. These rules apply to Segments
+    whose :attr:`~music21.figuredBass.segment.Segment.segmentChord` is an
+    augmented sixth, dominant seventh, or diminished seventh chord, and are
+    applied as necessary in
+    :meth:`~music21.figuredBass.segment.Segment.allCorrectConsecutivePossibilities`.
+
+
+    >>> from music21.figuredBass import rules
+    >>> fbRules = rules.Rules()
+    >>> fbRules.forbidParallelFifths = False
+    >>> fbRules.upperPartsMaxSemitoneSeparation = None
+    '''
     #Attributes in rules should just point to their corresponding methods in possibility
     _DOC_ORDER = ([_x[0] for _x in singlePossibilityDoc] +
                   [_y[0] for _y in consecPossibilityDoc] +
@@ -104,43 +141,6 @@ class Rules(object):
     _DOC_ATTR = dict(singlePossibilityDoc + consecPossibilityDoc + specialResDoc)
 
     def __init__(self):
-        '''
-        A Rules object is provided as an input to a :class:`~music21.figuredBass.segment.Segment`,
-        and controls the application of methods designed to filter out undesired possibilities in
-        a single Segment or undesired progressions between two consecutive Segments.
-
-
-        The rules are categorized in an identical manner to methods
-        in :mod:`~music21.figuredBass.possibility`:
-
-
-        1) Single Possibility Rules. These rules apply to any possibility within a
-        single Segment (possibA), and
-        are applied in finding correct possibilities for a Segment
-        in :meth:`~music21.figuredBass.segment.Segment.allCorrectSinglePossibilities`.
-
-
-        2) Consecutive Possibility Rules. These rules apply between any correct
-        single possibility in segmentA
-        (possibA) and any correct single possibility in segmentB (possibB),
-        segmentB coming directly after segmentA.
-        They are applied in finding correct (possibA, possibB) pairs between
-        two Segments
-        in :meth:`~music21.figuredBass.segment.Segment.allCorrectConsecutivePossibilities`.
-
-
-        3) Special Resolution Rules. These rules apply to Segments
-        whose :attr:`~music21.figuredBass.segment.Segment.segmentChord` is an
-        augmented sixth, dominant seventh, or diminished seventh chord, and are
-        applied as necessary in
-        :meth:`~music21.figuredBass.segment.Segment.allCorrectConsecutivePossibilities`.
-
-
-        >>> from music21.figuredBass import rules
-        >>> fbRules = rules.Rules()
-        >>> fbRules.forbidParallelFifths = False
-        >>> fbRules.upperPartsMaxSemitoneSeparation = None
-        '''
         #Single Possibility rules
         self.forbidIncompletePossibilities = True
         self.upperPartsMaxSemitoneSeparation = 12

@@ -35,33 +35,33 @@ scaleModes = {'major' : scale.MajorScale,
 #-------------------------------------------------------------------------------
 
 class FiguredBassScale(object):
+    '''
+    Acts as a wrapper for :class:`~music21.scale.Scale`. Used to represent the
+    concept of a figured bass scale, with a scale value and mode.
+
+
+    Accepted scale types: major, minor, dorian, phrygian, and hypophrygian.
+    A FiguredBassScale is raised if an invalid scale type is provided.
+
+    >>> from music21.figuredBass import realizerScale
+    >>> fbScale = realizerScale.FiguredBassScale()
+    >>> fbScale.realizerScale
+    <music21.scale.MajorScale C major>
+    >>> fbScale.keySig
+    <music21.key.KeySignature of no sharps or flats>
+
+    >>> fbScale = realizerScale.FiguredBassScale('d', 'minor')
+    >>> fbScale.realizerScale
+    <music21.scale.MinorScale D minor>
+    >>> fbScale.keySig
+    <music21.key.KeySignature of 1 flat>
+    '''
     _DOC_ATTR = {'realizerScale': 'A :class:`~music21.scale.Scale` based on the ' +
                     'desired value and mode.',
                  'keySig': 'A :class:`~music21.key.KeySignature` corresponding to ' +
                     'the scale value and mode.'}
 
     def __init__(self, scaleValue='C', scaleMode='major'):
-        '''
-        Acts as a wrapper for :class:`~music21.scale.Scale`. Used to represent the
-        concept of a figured bass scale, with a scale value and mode.
-
-
-        Accepted scale types: major, minor, dorian, phrygian, and hypophrygian.
-        A FiguredBassScale is raised if an invalid scale type is provided.
-
-        >>> from music21.figuredBass import realizerScale
-        >>> fbScale = realizerScale.FiguredBassScale()
-        >>> fbScale.realizerScale
-        <music21.scale.MajorScale C major>
-        >>> fbScale.keySig
-        <music21.key.KeySignature of no sharps or flats>
-
-        >>> fbScale = realizerScale.FiguredBassScale('d', 'minor')
-        >>> fbScale.realizerScale
-        <music21.scale.MinorScale D minor>
-        >>> fbScale.keySig
-        <music21.key.KeySignature of 1 flat>
-        '''
         try:
             foo = scaleModes[scaleMode]
             self.realizerScale = foo(scaleValue)

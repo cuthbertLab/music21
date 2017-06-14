@@ -51,28 +51,28 @@ def _getExtendedModules():
 
 
 class ContourFinder(object):
+    '''
+    ContourFinder is a class for finding 2-dimensional contours
+    of a piece based on different metrics.
+
+    Predefined metrics are 'dissonance', 'tonality', and 'spacing'.
+    To get a contour, use ContourFinder(myStream).getContour('dissonance'), for example.
+
+    If you wish to create your own metric for giving a numerical score to a stream, you can call
+    ContourFinder(myStream).getContour('myMetricName', metric=myMetric)
+
+    ContourFinder looks at a moving window of m measures, and moves that window by
+    n measures each time.
+    M and n are specified by 'window' and 'slide', which are both 1 by default.
+
+
+    >>> s = corpus.parse('bwv29.8')
+    >>> #_DOCS_SHOW ContourFinder(s).plot('tonality')
+
+    TODO: image here...
+
+    '''
     def __init__(self, s=None):
-        '''
-        ContourFinder is a class for finding 2-dimensional contours
-        of a piece based on different metrics.
-
-        Predefined metrics are 'dissonance', 'tonality', and 'spacing'.
-        To get a contour, use ContourFinder(myStream).getContour('dissonance'), for example.
-
-        If you wish to create your own metric for giving a numerical score to a stream, you can call
-        ContourFinder(myStream).getContour('myMetricName', metric=myMetric)
-
-        ContourFinder looks at a moving window of m measures, and moves that window by
-        n measures each time.
-        M and n are specified by 'window' and 'slide', which are both 1 by default.
-
-
-        >>> s = corpus.parse('bwv29.8')
-        >>> #_DOCS_SHOW ContourFinder(s).plot('tonality')
-
-        TODO: image here...
-
-        '''
         self.s = s # a stream.Score object
         self.sChords = None #lazy evaluation...
         self.key = None
@@ -452,29 +452,27 @@ class ContourFinder(object):
 
 
 class AggregateContour(object):
+    '''
+    An AggragateContour object is an object that stores and consolidates
+    contour information for a large group
+    of pieces.
 
+    To add a piece to the aggregate contour, use
+    AggregateContour.addPieceToContour(piece, cType), where cType is
+    the type of contour (the default possibilities are
+    'tonality', 'spacing', and 'dissonance'), and piece is either
+    a parsed music21 stream or a ContourFinder object.
+
+    To get the combined contour as list of ordered pairs, use
+    AggragateContour.getCombinedContour(), and to
+    get the combined contour as a polynomial approximation, use
+    AggragateContour.getCombinedContourPoly().
+    You can plot contours with AggragateContour.plotAggragateContour(cType).
+
+    To compare a normalized contour to the aggragate, use
+    AggragateContour.dissimilarityScore(cType, contour).
+    '''
     def __init__(self, aggContours=None):
-        '''
-        An AggragateContour object is an object that stores and consolidates
-        contour information for a large group
-        of pieces.
-
-        To add a piece to the aggregate contour, use
-        AggregateContour.addPieceToContour(piece, cType), where cType is
-        the type of contour (the default possibilities are
-        'tonality', 'spacing', and 'dissonance'), and piece is either
-        a parsed music21 stream or a ContourFinder object.
-
-        To get the combined contour as list of ordered pairs, use
-        AggragateContour.getCombinedContour(), and to
-        get the combined contour as a polynomial approximation, use
-        AggragateContour.getCombinedContourPoly().
-        You can plot contours with AggragateContour.plotAggragateContour(cType).
-
-        To compare a normalized contour to the aggragate, use
-        AggragateContour.dissimilarityScore(cType, contour).
-
-        '''
         if aggContours is None:
             self.aggContours = {}
             # = {'spacing': [ {1:2, 2:3}, {...}, ...], 'tonality': [...], ... }

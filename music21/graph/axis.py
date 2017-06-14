@@ -348,6 +348,23 @@ class PitchAxis(Axis):
 
         helperDict = {}
         octavesSeen = set()
+        
+        def weightedSortHelper(x):
+            '''
+            ensure that higher weighed weights come first, but
+            then alphabetical by name, except that G comes before
+            A... since we are only comparing enharmonics...
+            '''
+            weight, name = x
+            if name.startswith('A'):
+                name = 'H' + name[1:]
+            return (-1 * weight, name)
+
+        def unweightedSortHelper(x):
+            weight, name = x
+            if name.startswith('A'):
+                name = 'H' + name[1:]
+            return (weight, name)
 
         for i in range(int(self.minValue), int(self.maxValue) + 1):
             p = pitch.Pitch()
@@ -362,7 +379,11 @@ class PitchAxis(Axis):
                 if helperDict[key] == i:
                     weights.append((nameCount[key], key))
 
-            weights.sort()
+            if self.showEnharmonic:
+                weights.sort(key=unweightedSortHelper)
+            else:
+                weights.sort(key=weightedSortHelper)
+                
             label = None
             if not weights: # get a default
                 if self.hideUnused:
@@ -485,6 +506,9 @@ class PitchClassAxis(PitchAxis):
         .showEnharmonic will change here...
 
         >>> s.append(note.Note('A#4'))
+        >>> s.append(note.Note('G#4'))
+        >>> s.append(note.Note('A-4'))
+        >>> s.append(note.Note('A-4'))
         >>> for position, noteName in ax.ticks():
         ...            print (str(position) + " " + noteName)
         0 C
@@ -495,9 +519,27 @@ class PitchClassAxis(PitchAxis):
         5 F
         6
         7 G
-        8
+        8 G♯/A♭
         9 A
         10 A♯/B♭
+        11 B
+
+        Make sure that Ab shows since there are two of them and only one G#
+
+        >>> ax.showEnharmonic = False
+        >>> for position, noteName in ax.ticks():
+        ...            print (str(position) + " " + noteName)
+        0 C
+        1
+        2 D
+        3 E♭
+        4 E
+        5 F
+        6
+        7 G
+        8 A♭
+        9 A
+        10 B♭
         11 B
 
 

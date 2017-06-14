@@ -1314,15 +1314,14 @@ class MultiStream(primitives.GraphGroupedVerticalBar, PlotStreamMixin):
     Approaches to plotting and graphing multiple Streams.
     A base class from which Stream plotting Classes inherit.
 
-    Not yet integrated into the new system, unfortunately...
+    Not yet integrated into the new 2017 system, unfortunately...
+
+    Provide a list of Streams as an argument. Optionally
+    provide an additional list of labels for each list.
     '''
     axesClasses = {}
 
     def __init__(self, streamList, labelList=None, *args, **keywords):
-        '''
-        Provide a list of Streams as an argument. Optionally
-        provide an additional list of labels for each list.
-        '''
         primitives.GraphGroupedVerticalBar.__init__(self, *args, **keywords)
         PlotStreamMixin.__init__(self, None)
 

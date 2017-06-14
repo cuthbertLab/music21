@@ -119,6 +119,7 @@ functionalityScores = {
     'VI': 42,
     '#VI': 41,
     'vi': 40,
+    'viio': 39,
     '#viio': 39,
     'iio': 37,  # common in Minor
     'iio42': 36,

@@ -32,6 +32,19 @@ class ContiguousSegmentOfNotes(base.Music21Object):
     within a :class:`~music21.stream.Stream`. Generally speaking, these objects are instantiated
     internally, though it is possible
     for the user to create them as well.
+
+    >>> s = stream.Stream()
+    >>> p = stream.Part()
+    >>> n1 = note.Note('c4')
+    >>> n2 = note.Note('d4')
+    >>> p.append(n1)
+    >>> p.append(n2)
+    >>> p = p.makeMeasures()
+    >>> s.insert(0, p)
+    >>> cdContiguousSegment = search.serial.ContiguousSegmentOfNotes([n1, n2], s, 0)
+    >>> cdContiguousSegment
+    <music21.search.serial.ContiguousSegmentOfNotes ['C4', 'D4']>
+
     '''
     matchedSegment = None
 
@@ -60,17 +73,6 @@ class ContiguousSegmentOfNotes(base.Music21Object):
                   'originalCenteredTransformationsFromMatched']
 
     def __init__(self, segment=None, containerStream=None, partNumber=0):
-        '''
-        >>> s = stream.Stream()
-        >>> p = stream.Part()
-        >>> n1 = note.Note('c4')
-        >>> n2 = note.Note('d4')
-        >>> p.append(n1)
-        >>> p.append(n2)
-        >>> p = p.makeMeasures()
-        >>> s.insert(0, p)
-        >>> CD_ContiguousSegment = search.serial.ContiguousSegmentOfNotes([n1, n2], s, 0)
-        '''
         base.Music21Object.__init__(self)
         self.segment = segment
         self.containerStream = containerStream

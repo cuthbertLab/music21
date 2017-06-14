@@ -68,14 +68,13 @@ class VirtualWork(object):
 # keep these in alphabetical order
 
 class BachBWV1007Prelude(VirtualWork):
+    '''
+
+    >>> a = corpus.virtual.BachBWV1007Prelude()
+    >>> a.getUrlByExt('.xml')
+    ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
+    '''
     def __init__(self):
-        '''
-
-        >>> a = corpus.virtual.BachBWV1007Prelude()
-        >>> a.getUrlByExt('.xml')
-        ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
-
-        '''
         VirtualWork.__init__(self)
 
         self.composer = 'Johann Sebastian Bach'

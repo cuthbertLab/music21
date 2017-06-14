@@ -582,80 +582,78 @@ class GenericInterval(IntervalBase):
 
     Two generic intervals are the equal if their size and direction are the same.
 
+    >>> gi = interval.GenericInterval(8)
+    >>> gi
+    <music21.interval.GenericInterval 8>
+
+    >>> aInterval = interval.GenericInterval(3)
+    >>> aInterval.directed
+    3
+    >>> aInterval.direction
+    <Direction.ASCENDING: 1>
+    >>> aInterval.perfectable
+    False
+    >>> aInterval.staffDistance
+    2
+
+    >>> aInterval = interval.GenericInterval('Third')
+    >>> aInterval.directed
+    3
+    >>> aInterval.staffDistance
+    2
+
+    >>> aInterval = interval.GenericInterval(-12)
+    >>> aInterval.niceName
+    'Twelfth'
+    >>> aInterval.perfectable
+    True
+    >>> aInterval.staffDistance
+    -11
+    >>> aInterval.mod7
+    4
+    >>> aInterval.directed
+    -12
+    >>> aInterval.undirected
+    12
+
+    >>> bInterval = aInterval.complement()
+    >>> bInterval.staffDistance
+    3
+
+    >>> aInterval = interval.GenericInterval('descending twelfth')
+    >>> aInterval.perfectable
+    True
+    >>> aInterval.staffDistance
+    -11
+
+    >>> aInterval = interval.GenericInterval(0)
+    Traceback (most recent call last):
+    music21.interval.IntervalException: The Zeroth is not an interval
+
+    >>> aInterval = interval.GenericInterval(24)
+    >>> aInterval.niceName
+    '24'
+    >>> aInterval.isDiatonicStep
+    False
+    >>> aInterval.isStep
+    False
+
+    >>> aInterval = interval.GenericInterval(2)
+    >>> aInterval.isDiatonicStep
+    True
+    >>> aInterval.isStep
+    True
+
+
+    Intervals >= 23rd use numbers instead of names
+
+    >>> aInterval = interval.GenericInterval(23)
+    >>> aInterval.niceName
+    '23'
+
     '''
     def __init__(self, value="unison"):
-        '''
-
-        >>> gi = interval.GenericInterval(8)
-        >>> gi
-        <music21.interval.GenericInterval 8>
-
-        >>> aInterval = interval.GenericInterval(3)
-        >>> aInterval.directed
-        3
-        >>> aInterval.direction
-        <Direction.ASCENDING: 1>
-        >>> aInterval.perfectable
-        False
-        >>> aInterval.staffDistance
-        2
-
-        >>> aInterval = interval.GenericInterval('Third')
-        >>> aInterval.directed
-        3
-        >>> aInterval.staffDistance
-        2
-
-        >>> aInterval = interval.GenericInterval(-12)
-        >>> aInterval.niceName
-        'Twelfth'
-        >>> aInterval.perfectable
-        True
-        >>> aInterval.staffDistance
-        -11
-        >>> aInterval.mod7
-        4
-        >>> aInterval.directed
-        -12
-        >>> aInterval.undirected
-        12
-
-        >>> bInterval = aInterval.complement()
-        >>> bInterval.staffDistance
-        3
-
-        >>> aInterval = interval.GenericInterval('descending twelfth')
-        >>> aInterval.perfectable
-        True
-        >>> aInterval.staffDistance
-        -11
-
-        >>> aInterval = interval.GenericInterval(0)
-        Traceback (most recent call last):
-        music21.interval.IntervalException: The Zeroth is not an interval
-
-        >>> aInterval = interval.GenericInterval(24)
-        >>> aInterval.niceName
-        '24'
-        >>> aInterval.isDiatonicStep
-        False
-        >>> aInterval.isStep
-        False
-
-        >>> aInterval = interval.GenericInterval(2)
-        >>> aInterval.isDiatonicStep
-        True
-        >>> aInterval.isStep
-        True
-
-
-        Intervals >= 23rd use numbers instead of names
-
-        >>> aInterval = interval.GenericInterval(23)
-        >>> aInterval.niceName
-        '23'
-        '''
-        IntervalBase.__init__(self)
+        super(GenericInterval, self).__init__()
 
         self.value = convertGeneric(value)
         self.directed = self.value
@@ -992,6 +990,80 @@ class DiatonicInterval(IntervalBase):
     Two DiatonicIntervals are the same if their GenericIntervals are the same and their specifiers
     are the same and they should be
     if their directions are the same, but this is not checked yet.
+
+    The `specifier` is an integer or string specifying a value in the `prefixSpecs` and
+    `niceSpecNames` lists.
+
+    The `generic` is an integer or GenericInterval instance.
+
+
+    >>> aInterval = interval.DiatonicInterval(1, 1)
+    >>> aInterval.simpleName
+    'P1'
+    >>> aInterval = interval.DiatonicInterval('p', 1)
+    >>> aInterval.simpleName
+    'P1'
+    >>> aInterval = interval.DiatonicInterval('major', 3)
+    >>> aInterval.simpleName
+    'M3'
+    >>> aInterval.niceName
+    'Major Third'
+    >>> aInterval.semiSimpleName
+    'M3'
+    >>> aInterval.directedSimpleName
+    'M3'
+    >>> aInterval.invertedOrderedSpecifier
+    'm'
+    >>> aInterval.mod7
+    'M3'
+
+    >>> aInterval = interval.DiatonicInterval('major', 'third')
+    >>> aInterval.niceName
+    'Major Third'
+
+    >>> aInterval = interval.DiatonicInterval('perfect', 'octave')
+    >>> aInterval.niceName
+    'Perfect Octave'
+
+    >>> aInterval = interval.DiatonicInterval('minor', 10)
+    >>> aInterval.mod7
+    'm3'
+    >>> aInterval.isDiatonicStep
+    False
+    >>> aInterval.isStep
+    False
+
+    >>> aInterval = interval.DiatonicInterval('major', 2)
+    >>> aInterval.isDiatonicStep
+    True
+    >>> aInterval.isStep
+    True
+
+
+    >>> augAscending = interval.DiatonicInterval('augmented', 1)
+    >>> augAscending
+    <music21.interval.DiatonicInterval A1>
+    >>> augAscending.isDiatonicStep
+    False
+    >>> augAscending.isStep  # TODO: should this be True???
+    False
+    >>> augAscending.directedNiceName
+    'Ascending Augmented Unison'
+
+    Diatonic interval is ascending, but generic is oblique:
+
+    >>> augAscending.direction
+    <Direction.ASCENDING: 1>
+    >>> augAscending.generic.direction
+    <Direction.OBLIQUE: 0>
+
+    >>> dimDescending = augAscending.reverse()
+    >>> dimDescending
+    <music21.interval.DiatonicInterval d1>
+    >>> dimDescending.directedNiceName
+    'Descending Diminished Unison'
+    >>> dimDescending.direction
+    <Direction.DESCENDING: -1>
     '''
     _DOC_ATTR = {
         'name': 'The name of the interval in abbreviated form without direction.',
@@ -1001,82 +1073,7 @@ class DiatonicInterval(IntervalBase):
     }
 
     def __init__(self, specifier="P", generic=1):
-        '''
-        The `specifier` is an integer or string specifying a value in the `prefixSpecs` and
-        `niceSpecNames` lists.
-
-        The `generic` is an integer or GenericInterval instance.
-
-
-        >>> aInterval = interval.DiatonicInterval(1, 1)
-        >>> aInterval.simpleName
-        'P1'
-        >>> aInterval = interval.DiatonicInterval('p', 1)
-        >>> aInterval.simpleName
-        'P1'
-        >>> aInterval = interval.DiatonicInterval('major', 3)
-        >>> aInterval.simpleName
-        'M3'
-        >>> aInterval.niceName
-        'Major Third'
-        >>> aInterval.semiSimpleName
-        'M3'
-        >>> aInterval.directedSimpleName
-        'M3'
-        >>> aInterval.invertedOrderedSpecifier
-        'm'
-        >>> aInterval.mod7
-        'M3'
-
-        >>> aInterval = interval.DiatonicInterval('major', 'third')
-        >>> aInterval.niceName
-        'Major Third'
-
-        >>> aInterval = interval.DiatonicInterval('perfect', 'octave')
-        >>> aInterval.niceName
-        'Perfect Octave'
-
-        >>> aInterval = interval.DiatonicInterval('minor', 10)
-        >>> aInterval.mod7
-        'm3'
-        >>> aInterval.isDiatonicStep
-        False
-        >>> aInterval.isStep
-        False
-
-        >>> aInterval = interval.DiatonicInterval('major', 2)
-        >>> aInterval.isDiatonicStep
-        True
-        >>> aInterval.isStep
-        True
-
-
-        >>> augAscending = interval.DiatonicInterval('augmented', 1)
-        >>> augAscending
-        <music21.interval.DiatonicInterval A1>
-        >>> augAscending.isDiatonicStep
-        False
-        >>> augAscending.isStep  # TODO: should this be True???
-        False
-        >>> augAscending.directedNiceName
-        'Ascending Augmented Unison'
-
-        Diatonic interval is ascending, but generic is oblique:
-
-        >>> augAscending.direction
-        <Direction.ASCENDING: 1>
-        >>> augAscending.generic.direction
-        <Direction.OBLIQUE: 0>
-
-        >>> dimDescending = augAscending.reverse()
-        >>> dimDescending
-        <music21.interval.DiatonicInterval d1>
-        >>> dimDescending.directedNiceName
-        'Descending Diminished Unison'
-        >>> dimDescending.direction
-        <Direction.DESCENDING: -1>
-        '''
-        IntervalBase.__init__(self)
+        super(DiatonicInterval, self).__init__()
 
         if specifier is not None and generic is not None:
             if common.isNum(generic) or isinstance(generic, six.string_types):
@@ -1334,31 +1331,28 @@ class ChromaticInterval(IntervalBase):
 
     Two ChromaticIntervals are equal if their size and direction are equal.
 
+    >>> aInterval = interval.ChromaticInterval(-14)
+    >>> aInterval.semitones
+    -14
+    >>> aInterval.undirected
+    14
+    >>> aInterval.mod12
+    10
+    >>> aInterval.intervalClass
+    2
+    >>> aInterval.isChromaticStep
+    False
+    >>> aInterval.isStep
+    False
+
+    >>> aInterval = interval.ChromaticInterval(1)
+    >>> aInterval.isChromaticStep
+    True
+    >>> aInterval.isStep
+    True
     '''
     def __init__(self, value=0):
-        '''
-
-        >>> aInterval = interval.ChromaticInterval(-14)
-        >>> aInterval.semitones
-        -14
-        >>> aInterval.undirected
-        14
-        >>> aInterval.mod12
-        10
-        >>> aInterval.intervalClass
-        2
-        >>> aInterval.isChromaticStep
-        False
-        >>> aInterval.isStep
-        False
-
-        >>> aInterval = interval.ChromaticInterval(1)
-        >>> aInterval.isChromaticStep
-        True
-        >>> aInterval.isStep
-        True
-        '''
-        IntervalBase.__init__(self)
+        super(ChromaticInterval, self).__init__()
 
         if value == int(value):
             value = int(value)
@@ -1898,7 +1892,7 @@ class Interval(IntervalBase):
 #     in which case it figures out the diatonic and chromatic intervals itself
 
     def __init__(self, *arguments, **keywords):
-        IntervalBase.__init__(self)
+        super(Interval, self).__init__()
         self.diatonic = None
         self.chromatic = None
         self.direction = None
