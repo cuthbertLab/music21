@@ -18,6 +18,11 @@ import os
 import types
 import warnings
 
+with warnings.catch_warnings():
+    warnings.simplefilter('ignore', DeprecationWarning)
+    import imp
+
+
 from unittest.signals import registerResult
 import unittest.runner
 
@@ -25,15 +30,6 @@ import music21
 from music21 import common
 from music21 import environment
 from music21.test import testRunner
-from music21.ext import six
-
-import sys
-
-if six.PY2 or sys.version_info.minor < 6:
-    import imp
-else:
-    import importlib.machinery
-    import importlib.util
 
 
 _MOD = 'commonTest.py'
@@ -364,9 +360,9 @@ class ModuleGather(object):
         try:
             #environLocal.printDebug(['import:', fp])
             #mod = imp.load_module(name, fmFile, fmPathname, fmDescription)
-            #with warnings.catch_warnings():
-            #    warnings.simplefilter('ignore', RuntimeWarning)
-            mod = self.load_source(name, fp)
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore', RuntimeWarning)
+                mod = imp.load_source(name, fp)
         except Exception as excp: # pylint: disable=broad-except
             environLocal.printDebug(['failed import:', fp, '\n',
                 '\tEXCEPTION:', str(excp).strip()])
@@ -376,21 +372,6 @@ class ModuleGather(object):
                 mod.environLocal.restoreDefaults()
         return mod
     
-    def load_source(self, name, fp):
-        if six.PY2 or sys.version_info.minor < 6:
-            return imp.load_source(name, fp)
-        
-        # PY 3
-        # from https://stackoverflow.com/questions/19009932/
-        #  import-arbitrary-python-source-file-python-3-3
-        loader = importlib.machinery.SourceFileLoader(name, fp)
-        spec = importlib.util.spec_from_loader(loader.name, loader)
-        mod = importlib.util.module_from_spec(spec)
-        loader.exec_module(mod)
-        sys.modules[name] = mod
-        return mod
-
-
     def getModuleWithoutImp(self, fp, restoreEnvironmentDefaults=False):
         '''
         gets one module object from the file path without using Imp
