@@ -871,7 +871,7 @@ class SegmentMatcher(object):
     >>> n7.quarterLength = 1
     >>> part.append(n7)
     >>> newpart = part.makeMeasures()
-    >>> newpart.makeTies()
+    >>> newpart.makeTies(inPlace=True)
     >>> #_DOCS_SHOW newpart.show()
 
     .. image:: images/serial-findSegments.png
@@ -1238,7 +1238,7 @@ class TransposedSegmentMatcher(SegmentMatcher):
     >>> n7.quarterLength = 1
     >>> part.append(n7)
     >>> newpart = part.makeMeasures()
-    >>> newpart.makeTies()
+    >>> newpart.makeTies(inPlace=True)
     >>> #_DOCS_SHOW newpart.show()
 
     .. image:: images/serial-findTransposedSegments.png
@@ -2040,7 +2040,7 @@ def labelSegments(inputStream, segmentDict, reps='skipConsecutive', includeChord
     >>> n7.quarterLength = 1
     >>> part.append(n7)
     >>> newpart = part.makeMeasures()
-    >>> newpart.makeTies()
+    >>> newpart.makeTies(inPlace=True)
 
     We can then label the segment of pitch classes [7, 9, 11], which corresponds to a G,
     followed by an A,
@@ -2105,7 +2105,7 @@ def labelTransposedSegments(inputStream, segmentDict, reps='skipConsecutive', in
     >>> n7.quarterLength = 1
     >>> part.append(n7)
     >>> newpart = part.makeMeasures()
-    >>> newpart.makeTies()
+    >>> newpart.makeTies(inPlace=True)
 
     We have a soprano line; let us now form a bass line.
 

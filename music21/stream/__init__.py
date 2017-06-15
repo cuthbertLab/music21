@@ -5682,11 +5682,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     def makeTies(self,
         meterStream=None,
-        inPlace=True,
+        inPlace=False,
         displayTiedAccidentals=False,
         ):
         '''
         Calls :py:func:`~music21.stream.makeNotation.makeTies`.
+        
+        Changed in v.4., inPlace=False by default.
         '''
         return makeNotation.makeTies(
             self,
@@ -6127,7 +6129,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> n.quarterLength = 6
         >>> a.append(n)
         >>> m = a.makeMeasures()
-        >>> m.makeTies()
+        >>> m.makeTies(inPlace=True)
         >>> len(m.flat.notes)
         2
 

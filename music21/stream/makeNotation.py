@@ -840,7 +840,7 @@ def makeRests(s,
 
 def makeTies(s,
              meterStream=None,
-             inPlace=True,
+             inPlace=False,
              displayTiedAccidentals=False):
     '''
     Given a stream containing measures, examine each element in the
@@ -933,8 +933,9 @@ def makeTies(s,
     Notes: uses base.Music21Object.splitAtQuarterLength() once it has figured out
     what to split.
 
+    Changed in v. 4 -- inPlace = False by default.
+
     OMIT_FROM_DOCS
-    TODO: inPlace should be False
     TODO: take a list of clases to act as filter on what elements are tied.
 
     configure ".previous" and ".next" attributes
@@ -960,7 +961,7 @@ def makeTies(s,
     >>> m1.insert(0, v1)
     >>> m1.insert(0, v2)
     >>> p.append([m1, m2])
-    >>> p2 = p.makeTies(inPlace=False)
+    >>> p2 = p.makeTies()
 
     test same thing with needed makeTies...creates a possibly unnecessary voice...
 
@@ -978,7 +979,7 @@ def makeTies(s,
     >>> m1.insert(0, v2)
     >>> p.append(m1)
     >>> p.insert(1.0, m2)
-    >>> p2 = p.makeTies(inPlace=False)
+    >>> p2 = p.makeTies()
     >>> p2.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.meter.TimeSignature 1/4>

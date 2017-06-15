@@ -387,6 +387,7 @@ class ModuleGather(object):
         spec = importlib.util.spec_from_loader(loader.name, loader)
         mod = importlib.util.module_from_spec(spec)
         loader.exec_module(mod)
+        sys.modules[name] = mod
         return mod
 
 

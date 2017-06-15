@@ -1017,7 +1017,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s1.notes), 1)
 
         s1 = s1.makeMeasures()
-        s1.makeTies() # makes ties but no end tie positions!
+        s1.makeTies(inPlace=True) # makes ties but no end tie positions!
         # flat version has 2 notes
         self.assertEqual(len(s1.flat.notes), 2)
 
@@ -1039,7 +1039,7 @@ class Test(unittest.TestCase):
         a.insert(40, meter.TimeSignature("10/4") )
 
         b = a.makeMeasures()
-        b.makeTies()
+        b.makeTies(inPlace=True)
 
         # we now have 65 notes, as ties have been created
         self.assertEqual(len(b.flat.notes), 65)
