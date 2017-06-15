@@ -2190,8 +2190,7 @@ class PartExporter(XMLExporterBase):
         # see if accidentals/beams can be processed
         if not measureStream.streamStatus.haveAccidentalsBeenMade():
             measureStream.makeAccidentals(inPlace=True)
-        if not measureStream.streamStatus.haveBeamsBeenMade():
-            # if making beams, have to make a deep copy, as modifying notes
+        if not measureStream.streamStatus.beams:
             try:
                 measureStream.makeBeams(inPlace=True)
             except exceptions21.StreamException:

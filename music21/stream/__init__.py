@@ -5956,13 +5956,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             environLocal.warn("StreamException: makeTies: " + strE)
 
         #measureStream.makeBeams(inPlace=True)
-        try:
-            measureStream.makeBeams(inPlace=True)
-        except (StreamException, meter.MeterException):
-            # this is a result of makeMeaures not getting everything
-            # note to measure allocation right
-            #environLocal.printDebug(['skipping makeBeams exception', StreamException])
-            pass
+        if not measureStream.streamStatus.beams:
+            try:
+                measureStream.makeBeams(inPlace=True)
+            except (StreamException, meter.MeterException):
+                # this is a result of makeMeaures not getting everything
+                # note to measure allocation right
+                #environLocal.printDebug(['skipping makeBeams exception', StreamException])
+                pass
 
         # note: this needs to be after makeBeams, as placing this before
         # makeBeams was causing the duration's tuplet to loose its type setting
@@ -11620,7 +11621,7 @@ class Measure(Stream):
             m.timeSignature = ts  # a Stream; get the first element
 
         #environLocal.printDebug(['have time signature', m.timeSignature])
-        if m.streamStatus.haveBeamsBeenMade() is False:
+        if m.streamStatus.beams is False:
             try:
                 m.makeBeams(inPlace=True)
             except StreamException:

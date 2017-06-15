@@ -227,9 +227,21 @@ class Beams(EqualSlottedObjectMixin):
         >>> beams.beamsList
         [<music21.beam.Beam 1/start>, <music21.beam.Beam 2/partial/right>]
 
+
+        A beam object can also be specified:
+        
+        >>> beams = beam.Beams()
+        >>> beam1 = beam.Beam(type='start', number=1)
+        >>> beams.append(beam1)
+        >>> beams.beamsList
+        [<music21.beam.Beam 1/start>]
         '''
-        obj = Beam(type, direction)
-        obj.number = len(self.beamsList) + 1
+        if isinstance(type, str):
+            obj = Beam(type, direction)
+            obj.number = len(self.beamsList) + 1
+        else:
+            obj = type
+        
         self.beamsList.append(obj)
 
     def fill(self, level=None, type=None): # type is okay @ReservedAssignment

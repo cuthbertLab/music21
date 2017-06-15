@@ -171,6 +171,8 @@ def makeBeams(s, inPlace=False):
                 noteStream[i].beams = beamsList[i]
 
     del mColl  # remove Stream no longer needed
+    
+    s.streamStatus.beams = True
     if inPlace is not True:
         return returnObj
 

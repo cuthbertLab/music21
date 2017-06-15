@@ -6132,9 +6132,9 @@ class Test(unittest.TestCase):
         m2.repeatAppend(note.Note('c', quarterLength=.5), 8)
         p = stream.Part()
         p.append([m1, m2])
-        self.assertEqual(p.streamStatus.haveBeamsBeenMade(), False)
+        self.assertEqual(p.streamStatus.beams, False)
         p.makeBeams(inPlace=True)
-        self.assertEqual(p.streamStatus.haveBeamsBeenMade(), True)
+        self.assertEqual(p.streamStatus.beams, True)
 
 
     def testHaveBeamsBeenMadeB(self):
@@ -6146,12 +6146,12 @@ class Test(unittest.TestCase):
         m2.repeatAppend(note.Note('c', quarterLength=.5), 8)
         p = stream.Part()
         p.append([m1, m2])
-        self.assertEqual(p.streamStatus.haveBeamsBeenMade(), False)
+        self.assertEqual(p.streamStatus.beams, False)
         GEX = m21ToXml.GeneralObjectExporter()
         raw = GEX.parse(p).decode('utf-8')
         # after getting musicxml, make sure that we have not changed the source
         #p.show()
-        self.assertEqual(p.streamStatus.haveBeamsBeenMade(), False)
+        self.assertEqual(p.streamStatus.beams, False)
         self.assertEqual(raw.find('<beam number="1">end</beam>') > 0, True)
 
 
@@ -7091,6 +7091,7 @@ class Test(unittest.TestCase):
         <duration>5040</duration>
         <type>eighth</type>
         <stem>up</stem>
+        <beam number="1">begin</beam>
       </note>
       <note>
         <rest/>
@@ -7115,7 +7116,7 @@ class Test(unittest.TestCase):
         match = match.replace('\n', '')
         raw = originalRaw.replace(' ', '')
         raw = raw.replace('\n', '')
-        self.assertEqual(raw.find(match) > 0, True, (match, originalRaw))
+        self.assertEqual(raw.find(match) > 0, True, (raw))
 
 
     def testInvertDiatonicA(self):

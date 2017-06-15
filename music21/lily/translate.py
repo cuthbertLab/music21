@@ -890,7 +890,7 @@ class LilypondConverter(object):
             newContext = contextType
             optionalId = lyo.LyOptionalId(makeLettersOnlyId(streamIn.id))
 
-        if streamIn.streamStatus.haveBeamsBeenMade() is True:
+        if streamIn.streamStatus.beams is True:
             contextModList.append(r"\autoBeamOff ")
 
         if hasattr(streamIn, 'staffLines') and streamIn.staffLines != 5:
