@@ -1029,6 +1029,10 @@ class StreamIterator(object):
     @property
     def notes(self):
         '''
+        Returns all NotRest objects
+        
+        (will sometime become simply Note and Chord objects...)
+        
         >>> s = stream.Stream()
         >>> s.append(note.Note('C'))
         >>> s.append(note.Rest())
@@ -1044,6 +1048,8 @@ class StreamIterator(object):
     @property
     def notesAndRests(self):
         '''
+        Returns all GeneralNote objects
+        
         >>> s = stream.Stream()
         >>> s.append(meter.TimeSignature('4/4'))
         >>> s.append(note.Note('C'))
@@ -1055,9 +1061,7 @@ class StreamIterator(object):
         <music21.note.Rest rest>
         <music21.note.Note D>
 
-
         chained filters... (this makes no sense since notes is a subset of notesAndRests
-
 
         >>> for el in s.iter.notesAndRests.notes:
         ...     print(el)
@@ -1069,22 +1073,36 @@ class StreamIterator(object):
 
     @property
     def parts(self):
+        '''
+        Adds a ClassFilter for Part objects
+        '''
         self.addFilter(filters.ClassFilter('Part'))
         return self
 
 
     @property
     def spanners(self):
+        '''
+        Adds a ClassFilter for Variant objects
+        '''
         self.addFilter(filters.ClassFilter('Spanner'))
         return self
 
     @property
     def variants(self):
+        '''
+        To be deprecated soon...
+        
+        Adds a ClassFilter for Variant
+        '''
         self.addFilter(filters.ClassFilter('Variant'))
         return self
 
     @property
     def voices(self):
+        '''
+        Adds a ClassFilter for Voice objects
+        '''
         self.addFilter(filters.ClassFilter('Voice'))
         return self
 
@@ -1411,6 +1429,7 @@ class Test(unittest.TestCase):
         n = rec.getElementById('id2')
         self.assertEqual(n.activeSite.number, 2)
 
+_DOC_ORDER = [StreamIterator, RecursiveIterator, OffsetIterator]
 
 if __name__ == '__main__':
     import music21

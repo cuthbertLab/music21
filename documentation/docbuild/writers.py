@@ -383,6 +383,9 @@ class IPythonNotebookReSTWriter(ReSTWriter):
     def cleanConvertedNotebook(self, oldLines, ipythonNotebookFilePath):
         '''
         Take a notebook directly as parsed and make it look better for HTML
+        
+        Fixes up the internal references to class, ref, func, meth, attr.
+        
         '''
         notebookFileNameWithoutExtension = os.path.splitext(
             os.path.basename(ipythonNotebookFilePath))[0]
@@ -390,7 +393,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
 
         ipythonPromptPattern = re.compile(r'^In\[[\d ]+\]:')
         mangledInternalReference = re.compile(
-            r'\:(class|ref|func|meth)\:\`\`?(.*?)\`\`?')
+            r'\:(class|ref|func|meth|attr)\:\`\`?(.*?)\`\`?')
         newLines = ['.. _' + notebookFileNameWithoutExtension + ":" ,
                     ''] + self.rstEditingWarningFormat
         currentLineNumber = 0

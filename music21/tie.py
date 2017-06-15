@@ -86,7 +86,7 @@ class Tie(SlottedObjectMixin):
             The tie type, can be 'start', 'stop', or 'continue'.
             ''',
         'style': '''
-            The style of the tie.  Currently can only be 'normal'
+            The style of the tie.  Currently can be 'normal', 'dotted', 'dashed' or 'hidden'
             ''',
         'placement': '''
             Whether the tie should go up or down. Can be None, meaning
@@ -142,7 +142,6 @@ class Tie(SlottedObjectMixin):
 
     def __repr__(self):
         return '<music21.tie.Tie %s>' % self.type
-
 
 
 class Test(unittest.TestCase):

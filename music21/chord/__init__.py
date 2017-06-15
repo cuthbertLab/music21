@@ -281,6 +281,9 @@ class Chord(note.NotRest):
         Get item makes access pitch components for the Chord easier
 
         >>> c = chord.Chord('C#4 D-4')
+        >>> c[0]
+        <music21.note.Note C#>
+        
         >>> c['0.step']
         'C'
         >>> c['3.accidental']
@@ -290,20 +293,29 @@ class Chord(note.NotRest):
         >>> c[5]
         Traceback (most recent call last):
         KeyError: 'cannot access component with: 5'
+        
+        >>> c['D-4']
+        <music21.note.Note D->
+        
+        >>> c['D-4.style.color'] is None
+        True
         '''
         keyErrorStr = 'cannot access component with: %s' % key
-        if isinstance(key, six.string_types) and key.count('.'):
-            key, attrStr = key.split('.', 1)
+        if isinstance(key, six.string_types):
+            if key.count('.'):
+                key, attrStr = key.split('.', 1)
+                if not attrStr.count('.'):
+                    attributes = (attrStr,)
+                else:
+                    attributes = attrStr.split('.')
+            else:
+                attributes = ()
+            
             try:
                 key = int(key)
             except ValueError:
                 pass
             
-            if not attrStr.count('.'):
-                attributes = (attrStr,)
-            else:
-                attributes = attrStr.split('.')
-        
         else:
             attributes = ()
 
@@ -314,6 +326,7 @@ class Chord(note.NotRest):
                 raise KeyError(keyErrorStr)
             
         elif isinstance(key, six.string_types):
+            key = key.upper()
             for n in self._notes:
                 if n.pitch.nameWithOctave == key:
                     foundNote = n
@@ -365,6 +378,52 @@ class Chord(note.NotRest):
                 currentValue = getattr(currentValue, attr)
 
         return currentValue
+
+    def __setitem__(self, key, value):
+        '''
+        Change either a note in the chord components, or set an attribute on a
+        component
+        
+        >>> c = chord.Chord('C4 E4 G4')
+        >>> c[0] = note.Note('C#4')
+        >>> c
+        <music21.chord.Chord C#4 E4 G4>
+        >>> c['0.octave'] = 3
+        >>> c
+        <music21.chord.Chord C#3 E4 G4>
+        >>> c['E4'] = 'F4'
+        >>> c
+        <music21.chord.Chord C#3 F4 G4>
+        >>> c['G4.style.color'] = 'red'
+        >>> c['G4.style.color']
+        'red'
+        >>> c[-1].style.color
+        'red'
+        
+        '''
+        if isinstance(key, six.string_types) and key.count('.'):
+            keySplit = key.split('.')
+            keyFind = '.'.join(keySplit[0:-1])
+            attr = keySplit[-1]
+            keyObj = self[keyFind]
+            setattr(keyObj, attr, value)
+            return
+
+        keyObj = self[key]
+        keyIndex = self._notes.index(keyObj)
+        
+        if isinstance(value, six.string_types):
+            value = note.Note(value)
+        elif not hasattr(value, 'classes'):
+            raise ValueError("Chord index must be set to a valid note object")
+        elif 'Pitch' in value.classes:
+            value = note.Note(pitch=value)
+        elif 'Note' not in value.classes:
+            raise ValueError("Chord index must be set to a valid note object")
+
+        self._notes[keyIndex] = value
+            
+
 
     def __iter__(self):
         return common.Iterator(self._notes)
@@ -1462,19 +1521,11 @@ class Chord(note.NotRest):
 
         >>> c1.getTie('B-')
         <music21.tie.Tie start>
-
         '''
-        for d in self._notes:
-            if d.pitch is p or d is p:
-                return d.tie
-            
-        for d in self._notes:
-            if d.pitch == p or d == p:
-                return d.tie
-            if d.pitch.nameWithOctave == p:
-                return d.tie
-        
-        return None
+        try:
+            return self[p].tie
+        except KeyError:
+            return None
 
     def getVolume(self, p):
         '''
@@ -1496,16 +1547,11 @@ class Chord(note.NotRest):
         Traceback (most recent call last):
         music21.chord.ChordException: the given pitch is not in the Chord: G4
         '''
-        # NOTE: pitch matching is potentially problematic if we have more than
-        # one of the same pitch
-        if isinstance(p, six.string_types):
-            p = pitch.Pitch(p)
-
-        for d in self._notes:
-            if d.pitch is p or d.pitch == p:
-                # will create if not set; otherwise will set client to Note
-                return d._getVolume(forceClient=self)
-        raise ChordException('the given pitch is not in the Chord: %s' % p)
+        try:
+            n = self[p]
+            return n._getVolume(forceClient=self)
+        except KeyError:
+            raise ChordException('the given pitch is not in the Chord: %s' % p)
 
     def getZRelation(self):
         '''Return a Z relation if it exists, otherwise return None.
