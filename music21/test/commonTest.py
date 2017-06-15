@@ -27,7 +27,9 @@ from music21 import environment
 from music21.test import testRunner
 from music21.ext import six
 
-if six.PY2:
+import sys
+
+if six.PY2 or sys.version_info.minor < 6:
     import imp
 else:
     import importlib.machinery
@@ -375,7 +377,7 @@ class ModuleGather(object):
         return mod
     
     def load_source(self, name, fp):
-        if six.PY2:
+        if six.PY2 or sys.version_info.minor < 6:
             return imp.load_source(name, fp)
         
         # PY 3
