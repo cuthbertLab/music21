@@ -174,27 +174,58 @@ class StreamIterator(object):
         >>> s = stream.Measure()
         >>> s.insert(0, note.Rest())
         >>> s.repeatAppend(note.Note('C'), 2)
+        
         >>> s.definesExplicitSystemBreaks
         False
 
         >>> s.notes
         <music21.stream.iterator.StreamIterator for Measure:0x101c1a208 @:0>
 
-        >>> s.notes.definesExplicitSystemBreaks
+        >>> import warnings #_DOCS_HIDE
+        >>> SIIW = stream.iterator.StreamIteratorInefficientWarning #_DOCS_HIDE
+        >>> with warnings.catch_warnings(): #_DOCS_HIDE
+        ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
+        ...      explicit = s.notes.definesExplicitSystemBreaks #_DOCS_HIDE
+        >>> #_DOCS_SHOW explicit = s.notes.definesExplicitSystemBreaks
+        >>> explicit
         False
 
         Works with methods as well:
 
-        >>> s.notes.pop(0)
+        >>> import warnings #_DOCS_HIDE
+        >>> SIIW = stream.iterator.StreamIteratorInefficientWarning #_DOCS_HIDE
+        >>> with warnings.catch_warnings(): #_DOCS_HIDE
+        ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
+        ...      popc = s.notes.pop(0) #_DOCS_HIDE
+        >>> #_DOCS_SHOW popc = s.notes.pop(0)
+        >>> popc
         <music21.note.Note C>
 
         But remember that a new Stream is being created each time, so you can pop() forever:
 
-        >>> s.notes.pop(0)
+        >>> import warnings #_DOCS_HIDE
+        >>> SIIW = stream.iterator.StreamIteratorInefficientWarning #_DOCS_HIDE
+        >>> with warnings.catch_warnings(): #_DOCS_HIDE
+        ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
+        ...      popc = s.notes.pop(0) #_DOCS_HIDE
+        >>> #_DOCS_SHOW popc = s.notes.pop(0)
+        >>> popc
         <music21.note.Note C>
-        >>> s.notes.pop(0)
+        >>> import warnings #_DOCS_HIDE
+        >>> SIIW = stream.iterator.StreamIteratorInefficientWarning #_DOCS_HIDE
+        >>> with warnings.catch_warnings(): #_DOCS_HIDE
+        ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
+        ...      popc = s.notes.pop(0) #_DOCS_HIDE
+        >>> #_DOCS_SHOW popc = s.notes.pop(0)
+        >>> popc
         <music21.note.Note C>
-        >>> s.notes.pop(0)
+        >>> import warnings #_DOCS_HIDE
+        >>> SIIW = stream.iterator.StreamIteratorInefficientWarning #_DOCS_HIDE
+        >>> with warnings.catch_warnings(): #_DOCS_HIDE
+        ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
+        ...      popc = s.notes.pop(0) #_DOCS_HIDE
+        >>> #_DOCS_SHOW popc = s.notes.pop(0)
+        >>> popc
         <music21.note.Note C>
 
         If run with -w, this call will send a StreamIteratorInefficientWarning to stderr

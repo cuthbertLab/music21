@@ -12,21 +12,24 @@
 Original music21 feature extractors.
 '''
 
+
 import unittest
 import re
 import math
 
+from music21.ext import six
+
 # pylint: disable=no-name-in-module,import-error
-try:
+if six.PY2:
     from urllib import FancyURLopener # @UnusedImport @UnresolvedImport
     from urllib import urlencode # @UnusedImport @UnresolvedImport
-except ImportError: # python3
+else: # python3
+    from urllib.request import Request, urlopen
     from urllib.request import FancyURLopener # @UnresolvedImport @Reimport
     from urllib.parse import urlencode # @UnresolvedImport @Reimport
 
 
 from music21.features import base as featuresModule
-from music21.ext import six
 from music21 import text
 from music21 import environment
 _MOD = 'features/native.py'
@@ -805,9 +808,11 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
 #-------------------------------------------------------------------------------
 # metadata
 
-class URLOpenerUI(FancyURLopener):
-    version = ('Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) ' +
+_M21UserAgent = ('Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) ' +
         'Gecko/20071127 Firefox/2.0.0.11')
+
+class URLOpenerUI(FancyURLopener):
+    version = _M21UserAgent
 
 googleResultsRE = re.compile(r'([\d\,]+) results')
 
@@ -853,12 +858,19 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
             return 0
         paramsBasic = {'q': composer}
 
-        myGoogle = URLOpenerUI()
         params = urlencode(paramsBasic)
-        page = myGoogle.open("http://www.google.com/search?%s" % params)
-        the_page = page.read()
-        if six.PY3:
-            the_page = the_page.decode('utf-8')
+        urlStr = "http://www.google.com/search?%s" % params
+
+        if six.PY2:
+            myGoogle = URLOpenerUI()
+            page = myGoogle.open(urlStr)
+            the_page = page.read()
+        elif six.PY3:
+            headers = {'User-Agent': _M21UserAgent}
+            req = Request(urlStr, headers=headers)
+            with urlopen(req) as response:
+                the_page = response.read()
+                the_page = the_page.decode('utf-8')
 
         m = googleResultsRE.search(the_page)
         if m is not None and m.group(0):

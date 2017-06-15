@@ -256,13 +256,8 @@ class ContiguousSegmentSearcher(object):
     >>> searcher = search.serial.ContiguousSegmentSearcher(s, 'skipConsecutive', False)
     >>> contiglist = searcher.byLength(3)
     >>> print(contiglist)
-    []
-
-    On our first attempt, no contiguous segments of notes were found above
-    because the inputStream has no measures -
-    hence we replace s with s.makeNotation().
-
-    >>> s = s.makeNotation()
+    [<music21.search.serial.ContiguousSegmentOfNotes ['G4', 'A4', 'B4']>, 
+     <music21.search.serial.ContiguousSegmentOfNotes ['A4', 'B4', 'C5']>]
 
     .. image:: images/serial-findTransposedSegments.png
        :width: 500
@@ -319,8 +314,9 @@ class ContiguousSegmentSearcher(object):
     :attr:`~music21.search.serial.ContiguousSegmentOfNotes` we can
     determine its location (the measure number of its first note).
 
-    We'll return to our original searcher:
+    We'll return to our original searcher, but make sure that it has measures now:
 
+    >>> searcher = search.serial.ContiguousSegmentSearcher(s.makeMeasures(), includeChords=False)
     >>> searcher.reps = 'rowsOnly'
     >>> rowsOnlyList = searcher.byLength(3)
     >>> [(instance.segment, instance.startMeasureNumber) for instance in rowsOnlyList]
@@ -606,13 +602,12 @@ class ContiguousSegmentSearcher(object):
 
         self.listOfContiguousSegments = []
         for partNumber, partObj in enumerate(partList):
-            measures = partObj.getElementsByClass(stream.Measure)
             if hasParts is False:
                 partNumber = None  #
 
             self.chordList = []
             self.totalLength = 0 # counts each pitch within a chord once
-            for n in measures.recurse().notes:
+            for n in partObj.recurse().notes:
                 if n.tie is not None and n.tie.type != 'start':
                     continue
                 searchMethod(n, partNumber)

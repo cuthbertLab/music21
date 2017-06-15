@@ -23,6 +23,7 @@ import copy
 import math
 import os
 import wave
+import warnings
 import unittest
 
 # cannot call this base, because when audioSearch.__init__.py
@@ -124,7 +125,11 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
                 "numpy, scipy, and matplotlib installed.  Missing %s" % base._missingImport)
     import numpy
     try:
-        from scipy.signal import fftconvolve # @UnresolvedImport
+        with warnings.catch_warnings(): # scipy.signal gives ImportWarning...
+            warnings.simplefilter('ignore', ImportWarning)
+            # numpy warns scipy that oldnumeric will be dropped soon.
+            warnings.simplefilter('ignore', DeprecationWarning)
+            from scipy.signal import fftconvolve # @UnresolvedImport
     except ImportError:
         raise AudioSearchException(
             "autocorrelationFunction needs scipy -- the only part of music21 that needs it")

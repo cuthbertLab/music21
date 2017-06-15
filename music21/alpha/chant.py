@@ -516,7 +516,7 @@ SCOREGOESHERE
         wrapper = re.sub(r'INCIPITGOESHERE', incipit, wrapper)
         wrapper = re.sub(r'MODEGOESHERE', mode, wrapper)
         wrapper = re.sub(r'PAPERTYPEGOESHERE', paperType, wrapper)
-        wrapper = re.sub(r'\\endinput %', r'\end{document}' + "\n" + r'\endinput %', wrapper)
+        wrapper = re.sub(r'\\endinput %', r'\\end{document}' + "\n" + r'\\endinput %', wrapper)
         return wrapper
 
 

@@ -78,7 +78,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
 
     >>> import os
     >>> c = os.path.join(common.getSourceFilePath(), 'common', '__init__.py')
-    >>> f = open(c)
+    >>> #_DOCS_SHOW f = open(c)
     >>> #_DOCS_SHOW data = f.read()
     Traceback (most recent call last):
     UnicodeDecodeError: 'ascii' codec can't decode byte 0xc2 in position ...:

@@ -21,7 +21,7 @@ To do a release,
     every once in a while run corpus.corpora.CoreCorpus().metadataBundle.rebuild()
     (40 min on MacPro) -- either of these MAY change a lot of tests in corpus, metadata, etc.
     so don't skip the next step!
-3. run test/multiprocessTest.py  for Python2 AND Python3
+3. run test/warningMultiprocessTest.py  for Python2 AND Python3 -- fix all warnings!
 4. run test/testLint.py and fix any lint errors
 5. commit and then check test/testSingleCoreAll.py results on Travis-CI
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,

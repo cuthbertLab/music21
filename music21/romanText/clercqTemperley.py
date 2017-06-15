@@ -112,17 +112,14 @@ class CTSong(object):
     Create a CTSong object one of two ways:
     1) by passing in the string, with newline characters (\\n) at the end of each line
     2) by passing in the text file as a string, and have python open the file and read the text
-    #_DOCS_HIDE Please note: the backslashes included in the
-    file below are for sphinx documentation
-    #_DOCS_HIDE purposes only. They are not permitted in the clercq-temperley file format
 
     >>> exampleClercqTemperley = '''
     ... % Brown-Eyed Girl
-    ... VP: I \| IV \| I \| V \|
-    ... In: $VP\*2
-    ... Vr: $VP\*4 IV \| V \| I \| vi \| IV \| V \| I \| V \| % Second half could be called chorus
-    ... Ch: V \| \| $VP\*2 I \|\*4
-    ... Ch2: V \| \| $VP\*3     % Fadeout
+    ... VP: I | IV | I | V |
+    ... In: $VP*2
+    ... Vr: $VP*4 IV | V | I | vi | IV | V | I | V | % Second half could be called chorus
+    ... Ch: V | | $VP*2 I |*4
+    ... Ch2: V | | $VP*3     % Fadeout
     ... S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2
     ... '''
 
@@ -203,17 +200,13 @@ class CTSong(object):
 
     Examples used throughout this class utilize the following Clercq-Temperley text file
 
-    #_DOCS_HIDE Please note: the backslashes included in
-    #_DOCS_HIDE the file below are for sphinx documentation
-    #_DOCS_HIDE purposes only. They are not permitted in the clercq-temperley file format
-
     >>> BlitzkriegBopCT = '''
     ... % Blitzkrieg Bop
-    ... BP: I \| IV V \| %THIS IS A COMMENT
-    ... In: $BP\*3 I IV \| I \| $BP\*3 I IV \| I \| R \|\*4 I \|\*4
-    ... Vr: $BP\*3 I IV \| I \|
-    ... Br: IV \| \| I \| IV I \| IV \| \| ii \| IV V \|
-    ... Co: R \|\*4 I \|\*4
+    ... BP: I | IV V | %THIS IS A COMMENT
+    ... In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4
+    ... Vr: $BP*3 I IV | I |
+    ... Br: IV | | I | IV I | IV | | ii | IV V |
+    ... Co: R |*4 I |*4
     ... S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co
     ... '''
 

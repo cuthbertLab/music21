@@ -380,7 +380,7 @@ class JobProcessor(object):
         job_queue.close()
         for worker in workers:
             worker.join()
-        raise StopIteration
+        return # end generator
 
     @staticmethod
     def process_serial(jobs):
@@ -398,7 +398,7 @@ class JobProcessor(object):
                 'filePath': job.filePath,
                 'remainingJobs': remainingJobs,
                 }
-        raise StopIteration
+        return # end generator
 
 
 #------------------------------------------------------------------------------

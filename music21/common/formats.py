@@ -230,7 +230,7 @@ def findInputExtension(fmt):
 
 #@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 def findFormatFile(fp):
-    '''
+    r'''
     Given a file path (relative or absolute) return the format
 
     DEPRECATED May 2014 -- moving to converter
@@ -244,7 +244,7 @@ def findFormatFile(fp):
     'musicxml'
 
     On a windows networked filesystem
-    >>> common.findFormatFile('\\\\long\\file\\path\\test.krn')
+    >>> common.findFormatFile(r'\\long\file\path\test.krn')
     'humdrum'
     '''
     fmt, unused_ext = findFormat(fp.split('.')[-1])
@@ -252,7 +252,7 @@ def findFormatFile(fp):
 
 #@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 def findFormatExtFile(fp):
-    '''
+    r'''
     Given a file path (relative or absolute)
     find format and extension used (not the output extension)
 
@@ -273,7 +273,7 @@ def findFormatExtFile(fp):
     ('musicxml', '.xml')
 
     On a windows networked filesystem
-    >>> common.findFormatExtFile('\\\\long\\file\\path\\test.krn')
+    >>> common.findFormatExtFile(r'\\long\file\path\test.krn')
     ('humdrum', '.krn')
     '''
     fileFormat, unused_extOut = findFormat(fp.split('.')[-1])

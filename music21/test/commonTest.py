@@ -13,7 +13,6 @@
 Things that are common to testing...
 '''
 import doctest
-import imp
 import os
 #import time
 import types
@@ -26,6 +25,14 @@ import music21
 from music21 import common
 from music21 import environment
 from music21.test import testRunner
+from music21.ext import six
+
+if six.PY2:
+    import imp
+else:
+    import importlib.machinery
+    import importlib.util
+
 
 _MOD = 'commonTest.py'
 environLocal = environment.Environment(_MOD)
@@ -355,9 +362,9 @@ class ModuleGather(object):
         try:
             #environLocal.printDebug(['import:', fp])
             #mod = imp.load_module(name, fmFile, fmPathname, fmDescription)
-            with warnings.catch_warnings():
-                warnings.simplefilter('ignore', RuntimeWarning)
-                mod = imp.load_source(name, fp)
+            #with warnings.catch_warnings():
+            #    warnings.simplefilter('ignore', RuntimeWarning)
+            mod = self.load_source(name, fp)
         except Exception as excp: # pylint: disable=broad-except
             environLocal.printDebug(['failed import:', fp, '\n',
                 '\tEXCEPTION:', str(excp).strip()])
@@ -366,6 +373,20 @@ class ModuleGather(object):
             if hasattr(mod, 'environLocal'):
                 mod.environLocal.restoreDefaults()
         return mod
+    
+    def load_source(self, name, fp):
+        if six.PY2:
+            return imp.load_source(name, fp)
+        
+        # PY 3
+        # from https://stackoverflow.com/questions/19009932/
+        #  import-arbitrary-python-source-file-python-3-3
+        loader = importlib.machinery.SourceFileLoader(name, fp)
+        spec = importlib.util.spec_from_loader(loader.name, loader)
+        mod = importlib.util.module_from_spec(spec)
+        loader.exec_module(mod)
+        return mod
+
 
     def getModuleWithoutImp(self, fp, restoreEnvironmentDefaults=False):
         '''
