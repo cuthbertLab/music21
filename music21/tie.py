@@ -81,6 +81,18 @@ class Tie(SlottedObjectMixin):
         'type',
         )
 
+    _DOC_ATTR = {
+        'type': '''
+            The tie type, can be 'start', 'stop', or 'continue'.
+            ''',
+        'style': '''
+            The style of the tie.  Currently can only be 'normal'
+            ''',
+        'placement': '''
+            Whether the tie should go up or down. Can be None, meaning
+            it is unknown or should be determined from context, or 'above' or 'below.
+            ''',
+    }
     ### INITIALIZER ###
     # pylint: disable=redefined-builtin
     def __init__(self, type='start'): #@ReservedAssignment
@@ -119,7 +131,7 @@ class Tie(SlottedObjectMixin):
 
     def __ne__(self, other):
         '''
-        Tests for object inequality. Needed for pitch comparisons.
+        Tests for object inequality.
 
         >>> a = tie.Tie('start')
         >>> b = tie.Tie('stop')

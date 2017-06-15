@@ -146,7 +146,7 @@ class Test(unittest.TestCase):
         m4.append([n5, n6])
 
         r1 = note.Rest(type='whole')
-        cf2 = m4.bestClef() # = BassClef
+        cf2 = clef.bestClef(m4) # = BassClef
         m3 = stream.Measure(number=1)
         m3.append([cf2, r1])
 

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, division
 
-from music21 import stream, converter, corpus, instrument, graph, note, meter, humdrum
+from music21 import stream
+from music21 import clef
+from music21 import converter, corpus, instrument, graph, note, meter, humdrum
 import music21.pitch
 from collections import defaultdict
 
@@ -85,7 +87,7 @@ def simple3():
 
     for thisRhythmProfile in sorted(rhythmicHash, key=lsort, reverse=True):
         for thisMeasure in rhythmicHash[thisRhythmProfile]:
-            thisMeasure.insert(0, thisMeasure.bestClef())
+            thisMeasure.insert(0, clef.bestClef(thisMeasure))
             s.append(thisMeasure)
     s.show('lily.png')
 
@@ -137,7 +139,7 @@ def displayChopinRhythms():
 
     for thisRhythmProfile in sorted(rhythmicHash, key=lsort, reverse=True):
         for thisMeasure in rhythmicHash[thisRhythmProfile]:
-            thisMeasure.insert(0, thisMeasure.bestClef())
+            thisMeasure.insert(0, clef.bestClef(thisMeasure))
             s.append(thisMeasure)
     s.show('lily.png')
 
@@ -360,7 +362,7 @@ def januaryThankYou():
                     m.append(notes[i + 1])
                     m.append(notes[i + 2])
                     m.append(notes[i + 3])
-                    m.insert(0, m.bestClef())
+                    m.insert(0, clef.bestClef(m))
                     display.append(m)
 
 

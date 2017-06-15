@@ -58,7 +58,7 @@ class TestExternal(unittest.TestCase):
         q.octave = 5
         b.repeatInsert(q, [0, 1, 2, 3])
 
-        bestC = b.bestClef(allowTreble8vb=True)
+        bestC = clef.bestClef(b, allowTreble8vb=True)
         a.insert(0, bestC)
         a.insert(0, ts)
         a.insert(0, b)
@@ -91,7 +91,7 @@ class TestExternal(unittest.TestCase):
         b.elements[-1].duration.tuplets[0].type = "stop"
         b.elements[2].lyric = "a real C"
 
-        bestC = b.bestClef(allowTreble8vb=True)
+        bestC = clef.bestClef(b, allowTreble8vb=True)
         a.insert(0, bestC)
         a.insert(0, ts)
         a.insert(0, b)
@@ -909,7 +909,7 @@ class Test(unittest.TestCase):
         for x in ['c3', 'a3', 'c#4', 'd3'] * 5:
             n = note.Note(x)
             s.append(n)
-        clefObj = s.bestClef()
+        clefObj = clef.bestClef(s)
         self.assertEqual(clefObj.sign, 'F')
         measureStream = s.makeMeasures()
         clefObj = measureStream[0].clef

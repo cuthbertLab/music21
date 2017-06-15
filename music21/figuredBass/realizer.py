@@ -707,7 +707,8 @@ class Realization(object):
                     upperParts[partNumber].append(n1)
 
             for upperPart in upperParts:
-                upperPart.insert(0.0, upperPart.bestClef(True))
+                c = clef.bestClef(upperPart, allowTreble8vb=True, recurse=True)
+                upperPart.insert(0.0, c)
                 upperPart.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
                 if r is not None:
                     upperPart[0].pop(3)

@@ -24,6 +24,7 @@ converter module's :func:`~music21.converter.parse` function.
 
 import unittest
 
+from music21 import clef
 from music21 import environment
 from music21 import exceptions21
 _MOD = 'musedata.translate.py'
@@ -314,7 +315,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
 
     if museDataPart.stage == 1:
         # cannot yet get stage 1 clef data
-        p.getElementsByClass('Measure')[0].clef = p.flat.bestClef()
+        p.getElementsByClass('Measure')[0].clef = clef.bestClef(p, recurse=True)
         p.makeBeams(inPlace=True)
         # will call overridden method on Part
         p.makeAccidentals()

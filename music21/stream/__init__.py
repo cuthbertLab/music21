@@ -4467,104 +4467,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             return None
 
-
+    @common.deprecated('June 2017, v. 4', 'June 2018', 'call clef.bestClef instead')
     def bestClef(self, allowTreble8vb=False, recurse=False):
-        '''
-        TODO: Move to Clef
-
-        Returns the clef that is the best fit for notes and chords found in this Stream.
-
-
-        >>> import random
-        >>> a = stream.Stream()
-        >>> for x in range(30):
-        ...    n = note.Note()
-        ...    n.pitch.midi = random.randint(70, 81)
-        ...    a.insert(n)
-        >>> b = a.bestClef()
-        >>> b
-        <music21.clef.TrebleClef>
-        >>> b.line
-        2
-        >>> b.sign
-        'G'
-
-        >>> c = stream.Stream()
-        >>> for x in range(10):
-        ...    n = note.Note()
-        ...    n.pitch.midi = random.randint(45, 54)
-        ...    c.insert(n)
-        >>> d = c.bestClef()
-        >>> d
-        <music21.clef.BassClef>
-        >>> d.line
-        4
-        >>> d.sign
-        'F'
-
-        This does not automatically get a flat representation of the Stream.
-
-        There are a lot more high notes in `a` (30) than low notes in `c` (10),
-        but it will not matter here, because the pitches in `a` will not be found:
-
-        >>> c.insert(0, a)
-        >>> c.bestClef()
-        <music21.clef.BassClef>
-
-        But with recursion, it will matter:
-
-        >>> c.bestClef(recurse=True)
-        <music21.clef.TrebleClef>
-        '''
-        def findHeight(p):
-            height = p.diatonicNoteNum
-            if p.diatonicNoteNum > 33: # a4
-                height += 3 # bonus
-            elif p.diatonicNoteNum < 24: # Bass F or lower
-                height += -3 # bonus
-            return height
-        #environLocal.printDebug(['calling bestClef()'])
-
-        totalNotes = 0
-        totalHeight = 0
-
-        sIter = self.recurse() if recurse else self.iter
-
-        notes = sIter.getElementsByClass('GeneralNote')
-
-        for n in notes:
-            if n.isRest:
-                pass
-            elif n.isNote:
-                totalNotes  += 1
-                totalHeight += findHeight(n.pitch)
-            elif n.isChord:
-                for p in n.pitches:
-                    totalNotes += 1
-                    totalHeight += findHeight(p)
-        if totalNotes == 0:
-            averageHeight = 29
-        else:
-            averageHeight = (totalHeight + 0.0) / totalNotes
-
-        #environLocal.printDebug(['average height', averageHeight])
-        if (allowTreble8vb is False):
-            if averageHeight > 52: # value found with experimentation; revise
-                return clef.Treble8vaClef()
-            elif averageHeight > 28:    # c4
-                return clef.TrebleClef()
-            elif averageHeight > 10: # value found with experimentation; revise
-                return clef.BassClef()
-            else:
-                return clef.Bass8vbClef()
-        else:
-            if averageHeight > 32:    # g4
-                return clef.TrebleClef()
-            elif averageHeight > 26:  # a3
-                return clef.Treble8vbClef()
-            else:
-                return clef.BassClef()
-
+        return clef.bestClef(self, allowTreble8vb=allowTreble8vb, recurse=recurse)
 
     def getClefs(self, searchActiveSite=False, searchContext=True,
         returnDefault=True):
@@ -4576,7 +4481,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         activeSite Stream and/or contexts.
 
         If no Clef objects are defined, get a default
-        using :meth:`~music21.stream.Stream.bestClef`
+        using :meth:`~music21.clef.bestClef`
 
 
         >>> a = stream.Stream()
@@ -4606,7 +4511,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # get a default and/or place default at zero if nothing at zero
         if returnDefault and (not post or post[0].offset > 0):
             #environLocal.printDebug(['getClefs(): using bestClef()'])
-            post.insert(0, self.bestClef())
+            post.insert(0, clef.bestClef(self))
         return post
 
     def getKeySignatures(self, searchActiveSite=True, searchContext=True):
@@ -10096,7 +10001,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # best clef will be assigned later
             if p.hasMeasures():
                 # place in first measure
-                p.getElementsByClass('Measure')[0].clef = p.flat.bestClef()
+                p.getElementsByClass('Measure')[0].clef = clef.bestClef(p, recurse=True)
         return s
 
     def explode(self):

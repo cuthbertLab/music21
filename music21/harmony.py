@@ -195,11 +195,12 @@ class Harmony(chord.Chord):
         # if the bass is not specified, but the root is,
         # assume the bass and root are identical and
         # assign the values accordingly
-        if self._bass is None:
-            self.bass(self._root)
+        if 'bass' not in self._overrides and 'root' in self._overrides:
+            self.bass(self._overrides['root'])
 
         updatePitches = keywords.get('updatePitches', True)
-        if updatePitches and self._figure is not None or self._root or self._bass:
+        if (updatePitches and self._figure is not None 
+                or 'root' in self._overrides or 'bass' in self._overrides):
             self._updatePitches()
         self._updateBasedOnXMLInput(keywords)
 
@@ -1089,14 +1090,14 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
     d11 = inChord.semitonesFromChordStep(4) #5  #eleventh
     d13 = inChord.semitonesFromChordStep(6) #9  #thirteenth
 
-    d2 = inChord.semitonesFromChordStep(2)
-    d4 = inChord.semitonesFromChordStep(4)
-    d6 = inChord.semitonesFromChordStep(6)
+    d2 = d9
+    d4 = d11 
+    d6 = d13 
 
     def compare(inChordNums, givenChordNums, permittedOmitions=()):
         '''
         inChord is the chord the user submits to analyze,
-        givenChord is the chord type that the method is currently looking at
+        givenChordNum is the chord type that the method is currently looking at
         to determine if it could be a match for inChord
 
         the corresponding semitones are compared, and if they do not match it is determined
@@ -1905,30 +1906,30 @@ class ChordSymbol(Harmony):
             'minor-ninth',
             )
 
-        if self._root is None or self.chordKind is None:
+        if 'root' not in self._overrides or self.chordKind is None:
             return
 
         # create figured bass scale with root as scale
-        scaleInitTuple = (self._root.name, 'major')
+        scaleInitTuple = (self._overrides['root'].name, 'major')
         if scaleInitTuple in realizerScaleCache:
             fbScale = realizerScaleCache[scaleInitTuple]
         else:
-            fbScale = realizerScale.FiguredBassScale(self._root, 'major')
+            fbScale = realizerScale.FiguredBassScale(self._overrides['root'], 'major')
             realizerScaleCache[scaleInitTuple] = fbScale
         # render in the 3rd octave by default
-        self._root.octave = 3
-
+        self._overrides['root'].octave = 3
+        
         if self._notationString():
-            pitches = fbScale.getSamplePitches(self._root, self._notationString())
+            pitches = fbScale.getSamplePitches(self._overrides['root'], self._notationString())
             # remove duplicated bass note due to figured bass method.
             pitches.pop(0)
         else:
             pitches = []
-            pitches.append(self._root)
+            pitches.append(self._overrides['root'])
 
         pitches = self._adjustOctaves(pitches)
 
-        if self._root.name != self._bass.name:
+        if self._overrides['root'].name != self._overrides['bass'].name:
 
             inversionNum = self.inversion()
 
@@ -1936,9 +1937,10 @@ class ChordSymbol(Harmony):
                 #there is a bass, yet no normal inversion was found....must be added note
 
                 inversionNum = None
-                self._bass.octave = 2 # arbitrary octave, must be below root,
-                                    # which was arbitrarily chosen as 3 above
-                pitches.append(self._bass)
+                self._overrides['bass'].octave = 2 
+                    # arbitrary octave, must be below root,
+                    # which was arbitrarily chosen as 3 above
+                pitches.append(self._overrides['bass'])
         else:
             self.inversion(None, transposeOnSet=False)
             inversionNum = None
@@ -1959,7 +1961,7 @@ class ChordSymbol(Harmony):
 
             #self.bass(bassPitch)
             for p in pitches:
-                if p.diatonicNoteNum < self._bass.diatonicNoteNum:
+                if p.diatonicNoteNum < self._overrides['bass'].diatonicNoteNum:
                     p.octave = p.octave + 1
 
         pitches = list(self._adjustPitchesForChordStepModifications(pitches))
@@ -1973,9 +1975,14 @@ class ChordSymbol(Harmony):
         while self._hasPitchBelowA1(pitches) :
             for thisPitch in pitches:
                 thisPitch.octave += 1
-
+        
         self.pitches = tuple(pitches)
         self.sortDiatonicAscending(inPlace=True)
+
+        # set overrides to be pitches in the harmony
+        self._overrides = {}
+        self.bass(self.bass())
+        self.root(self.root())
 
     ### PUBLIC METHODS ###
 
@@ -2349,6 +2356,14 @@ class Test(unittest.TestCase):
         fig = chordSymbolFigureFromChord(cisisdim)
         self.assertEqual(fig, "C##dim")
 
+    def chordSymbolSetsBassOctave(self):
+        d = ChordSymbol('Cm/E-')
+        root = d.root()
+        self.assertEqual(root.nameWithOctave, 'C4')
+        b = d.bass()
+        self.assertEqual(b.nameWithOctave, 'E-3')
+
+
 class TestExternal(unittest.TestCase):
 
     def runTest(self):
@@ -2515,7 +2530,7 @@ _DOC_ORDER = [Harmony, chordSymbolFigureFromChord, ChordSymbol, ChordStepModific
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='chordSymbolSetsBassOctave')
 
 
 #------------------------------------------------------------------------------

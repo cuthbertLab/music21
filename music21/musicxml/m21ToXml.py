@@ -405,7 +405,7 @@ class GeneralObjectExporter():
         '''
         mCopy = m.makeNotation()
         if not m.recurse().getElementsByClass('Clef').getElementsByOffset(0.0):
-            mCopy.clef = mCopy.bestClef()
+            mCopy.clef = clef.bestClef(mCopy, recurse=True)
         p = stream.Part()
         p.append(mCopy)
         p.metadata = copy.deepcopy(getMetadataFromContext(m))
@@ -422,7 +422,7 @@ class GeneralObjectExporter():
             st2.mergeAttributes(st)
             st2.elements = copy.deepcopy(st)
             if not st.getElementsByClass('Clef').getElementsByOffset(0.0):
-                st2.clef = st2.bestClef()
+                st2.clef = clef.bestClef(st2)
             st2.makeNotation(inPlace=True)
             st2.metadata = copy.deepcopy(getMetadataFromContext(st))
             return self.fromPart(st2)

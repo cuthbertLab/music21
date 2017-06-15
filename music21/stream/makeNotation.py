@@ -15,6 +15,7 @@
 import copy
 import unittest
 
+from music21 import clef
 from music21 import common
 from music21 import defaults
 from music21 import environment
@@ -425,7 +426,7 @@ def makeMeasures(
         clefList = list(srcObj.iter.getElementsByClass('Clef').getElementsByOffset(0))
         # only return clefs that have offset = 0.0
         if not clefList:
-            clefObj = srcObj.bestClef()
+            clefObj = clef.bestClef(srcObj, recurse=True)
         else:
             clefObj = clefList[0]
 
@@ -613,7 +614,7 @@ def makeMeasures(
             if finalBarline not in ['regular', None]:
                 m.rightBarline = finalBarline
         if bestClef:
-            m.clef = m.bestClef()  # may need flat for voices
+            m.clef = clef.bestClef(m, recurse=True)  
 
     if not inPlace:
         return post  # returns a new stream populated w/ new measure streams

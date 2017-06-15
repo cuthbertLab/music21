@@ -16,6 +16,7 @@ from __future__ import division, print_function, absolute_import
 import unittest
 import copy
 
+from music21 import clef
 from music21 import meter
 from music21 import stream
 from music21 import tie
@@ -260,7 +261,7 @@ class ChordReducer(object):
                 if i % 20 == 0 and i != 0:
                     print("")
         p.elementsChanged()
-        p.getElementsByClass('Measure')[0].insert(0, p.bestClef(allowTreble8vb=True))
+        p.getElementsByClass('Measure')[0].insert(0, clef.bestClef(p, allowTreble8vb=True))
         p.makeNotation(inPlace=True)
         return p
 

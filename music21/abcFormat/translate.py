@@ -23,6 +23,7 @@ module's :func:`~music21.converter.parse` function.
 import copy
 import unittest
 
+from music21 import clef
 from music21 import common
 from music21 import environment
 from music21 import exceptions21
@@ -183,9 +184,9 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     # following the meta data, or in the open stream
     if not clefSet and not p.recurse().getElementsByClass('Clef'):
         if useMeasures:  # assume at start of measures
-            p.getElementsByClass('Measure')[0].clef = p.flat.bestClef()
+            p.getElementsByClass('Measure')[0].clef = clef.bestClef(p, recurse=True)
         else:
-            p._insertCore(0, p.bestClef())
+            p._insertCore(0, clef.bestClef(p, recurse=True))
 
     if postTransposition != 0:
         p.transpose(postTransposition, inPlace=True)

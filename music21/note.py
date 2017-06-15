@@ -682,8 +682,9 @@ class NotRest(GeneralNote):
     # unspecified means that there may be a stem, but its orientation
     # has not been declared.
     _DOC_ATTR = {
-    'beams': '''A :class:`~music21.beam.Beams` object that contains
-        information about the beaming of this note.''',
+        'beams': '''
+            A :class:`~music21.beam.Beams` object that contains
+            information about the beaming of this note.''',
     }
     def __init__(self, *arguments, **keywords):
         super(NotRest, self).__init__(**keywords)

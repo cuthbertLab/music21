@@ -24,7 +24,10 @@ import copy
 
 from music21 import exceptions21
 
-from music21 import stream, note, expressions
+from music21 import clef
+from music21 import stream
+from music21 import note
+from music21 import expressions
 from music21 import instrument
 from music21 import pitch
 from music21 import common
@@ -942,7 +945,7 @@ class Test(unittest.TestCase):
         for c in chords.flat.notes:
             c.quarterLength = 4
         for m in chords.getElementsByClass('Measure'):
-            m.clef = m.bestClef()
+            m.clef = clef.bestClef(m, recurse=True)
 
         chords.measure(1).notes[0].addLyric('::/p:e/o:5/nf:no/ta:3/g:Ursatz')
         chords.measure(1).notes[0].addLyric('::/p:c/o:4/nf:no/tb:I')

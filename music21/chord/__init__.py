@@ -55,7 +55,7 @@ class Chord(note.NotRest):
 
     A Chord functions like a Note object but has multiple pitches.
 
-    Create chords by passing a string of pitch names
+    Create chords by passing a list of strings of pitch names
 
     >>> dmaj = chord.Chord(["D", "F#", "A"])
     >>> dmaj
@@ -67,7 +67,7 @@ class Chord(note.NotRest):
     >>> dmaj
     <music21.chord.Chord D3 F#4 A5>
 
-    String attribute is also okay...
+    A single string with note names separated by spaces also works:
 
     >>> myChord = chord.Chord('A4 C#5 E5')
     >>> myChord
@@ -85,6 +85,14 @@ class Chord(note.NotRest):
     >>> cmaj = chord.Chord([Cnote, Enote, Gnote])
     >>> cmaj # default octave of 4 is used for these notes, since octave was not specified
     <music21.chord.Chord C E G>
+    
+    Or with pitches:
+    
+    >>> cmaj2 = chord.Chord([Cnote.pitch, Enote.pitch, Gnote.pitch])
+    >>> cmaj2
+    <music21.chord.Chord C E G>
+    
+    
 
     Chord has the ability to determine the root of a chord, as well as the bass note of a chord.
     In addition, Chord is capable of determining what type of chord a particular chord is, whether
@@ -106,8 +114,12 @@ class Chord(note.NotRest):
     >>> c.pitches
     (<music21.pitch.Pitch C5>, <music21.pitch.Pitch E5>, <music21.pitch.Pitch G5>)
 
+    (If the number is < 12, it is assumed to be an octaveless pitch-class number, if above
+    12, then a MIDI number.  To create chords below MIDI 12, create a Pitch object with that
+    MIDI number instead and then pass that to the Chord creator).
 
-    Duration as keyword works
+
+    Duration or quarterLength also works:
 
     >>> d = duration.Duration(2.0)
     >>> myChord = chord.Chord('A4 C#5 E5', duration=d)
@@ -117,6 +129,13 @@ class Chord(note.NotRest):
     <music21.duration.Duration 2.0>
     >>> myChord.duration is d
     True
+
+    >>> myChord = chord.Chord('A4 C#5 E5', quarterLength=3.75)
+    >>> myChord.duration.type
+    'half'
+    >>> myChord.duration.dots
+    3
+
 
 
     OMIT_FROM_DOCS
@@ -155,10 +174,6 @@ class Chord(note.NotRest):
 
     '''
     ### CLASS VARIABLES ###
-
-    _bass = None
-    _root = None
-    _inversion = None
     isChord = True
     isNote = False
     isRest = False
@@ -196,6 +211,9 @@ class Chord(note.NotRest):
 
         # a list of dictionaries; each storing pitch, tie, and volume objects
         # one for each component of the chord
+        self._overrides = {}
+        self._cache = {}
+
         self._notes = []
         self._chordTablesAddress = None
         self._chordTablesAddressNeedsUpdating = True # only update when needed
@@ -203,6 +221,7 @@ class Chord(note.NotRest):
         # if provided
 
         note.NotRest.__init__(self, **keywords)
+
 
         # inherit Duration object from GeneralNote
         # keep it here in case we have no notes
@@ -266,32 +285,86 @@ class Chord(note.NotRest):
         'C'
         >>> c['3.accidental']
         Traceback (most recent call last):
-        KeyError: 'cannot access component with string: 3.accidental'
+        KeyError: 'cannot access component with: 3.accidental'
 
         >>> c[5]
         Traceback (most recent call last):
         KeyError: 'cannot access component with: 5'
         '''
-
-        if isinstance(key, six.string_types) and key.count('.') == 1:
-            first, last = key.split('.')
+        keyErrorStr = 'cannot access component with: %s' % key
+        if isinstance(key, six.string_types) and key.count('.'):
+            key, attrStr = key.split('.', 1)
             try:
-                component = self._notes[int(first)]
-            except:
-                raise KeyError('cannot access component with string: %s' % key)
-
-            # get by name of attribute on Note
-            if last == 'volume': # special handling to avoid setting client
-                return component._getVolume(forceClient=self)
-            elif last == 'color':
-                return component.style.color
+                key = int(key)
+            except ValueError:
+                pass
+            
+            if not attrStr.count('.'):
+                attributes = (attrStr,)
             else:
-                return getattr(component, last)
+                attributes = attrStr.split('.')
+        
         else:
+            attributes = ()
+
+        if isinstance(key, int):
             try:
-                return self._notes[key] # must be a number
+                foundNote = self._notes[key] # must be a number
             except (KeyError, IndexError):
-                raise KeyError('cannot access component with: %s' % key)
+                raise KeyError(keyErrorStr)
+            
+        elif isinstance(key, six.string_types):
+            for n in self._notes:
+                if n.pitch.nameWithOctave == key:
+                    foundNote = n
+                    break
+            else:
+                raise KeyError(keyErrorStr)
+        
+        elif not hasattr(key, 'classes'):
+            raise KeyError(keyErrorStr)
+        
+        elif 'Note' in key.classes:
+            for n in self._notes:
+                if n is key:
+                    foundNote = n
+                    break
+            else:
+                for n in self._notes:
+                    if n == key:
+                        foundNote = n
+                        break
+                else:
+                    raise KeyError(keyErrorStr)
+                
+        elif 'Pitch' in key.classes:
+            for n in self._notes:
+                if n.pitch is key:
+                    foundNote = n
+                    break
+            else:
+                for n in self._notes:
+                    if n.pitch == key:
+                        foundNote = n
+                        break
+                else:
+                    raise KeyError(keyErrorStr)
+        else:
+            raise KeyError(keyErrorStr)
+
+
+        if not attributes:
+            return foundNote
+        
+        currentValue = foundNote
+        
+        for attr in attributes:
+            if attr == 'volume': # special handling
+                currentValue = currentValue._getVolume(forceClient=self)
+            else:
+                currentValue = getattr(currentValue, attr)
+
+        return currentValue
 
     def __iter__(self):
         return common.Iterator(self._notes)
@@ -399,8 +472,7 @@ class Chord(note.NotRest):
         returnObj._notes = altered
         if deleteComponents:
             returnObj._chordTablesAddressNeedsUpdating = True
-            returnObj._bass = None
-            returnObj._root = None
+            returnObj._cache = {}
 
         if not inPlace:
             return returnObj
@@ -759,16 +831,24 @@ class Chord(note.NotRest):
         if newbass:
             if isinstance(newbass, six.string_types):
                 newbass = newbass.replace('b', '-')
-                self._bass = pitch.Pitch(newbass)
+                newbass = pitch.Pitch(newbass)
+
+            self._overrides['bass'] = newbass
+            self._cache['bass'] = newbass
+            if 'inversion' in self._cache:
+                del self._cache['inversion']
+            # reset inversion if bass changes
+        elif ('bass' not in self._overrides) and (find):
+            if 'bass' in self._cache:
+                return self._cache['bass']
             else:
-                self._bass = newbass
-            self._inversion = None # reset inversion if root changes
-        elif (self._bass is None) and (find):
-            # TODO: stop caching basses
-            self._bass = self._findBass()
-            return self._bass
+                self._cache['bass'] = self._findBass()
+                return self._cache['bass']
         else:
-            return self._bass
+            if 'bass' in self._overrides:
+                return self._overrides['bass']
+            else:
+                return None
 
     def canBeDominantV(self):
         '''
@@ -1236,7 +1316,7 @@ class Chord(note.NotRest):
         The color of any pitch (even a non-existing one) is the color of the chord if
         the color of that pitch is not defined.
 
-        >>> c.color = 'pink'
+        >>> c.style.color = 'pink'
         >>> c.getColor('E4')
         'pink'
         >>> c.getColor('D#7')
@@ -1380,13 +1460,20 @@ class Chord(note.NotRest):
         >>> c1.getTie(pitch.Pitch('F#2')) is None
         True
 
+        >>> c1.getTie('B-')
+        <music21.tie.Tie start>
+
         '''
         for d in self._notes:
-            if d.pitch is p:
+            if d.pitch is p or d is p:
                 return d.tie
+            
         for d in self._notes:
-            if d.pitch == p:
+            if d.pitch == p or d == p:
                 return d.tie
+            if d.pitch.nameWithOctave == p:
+                return d.tie
+        
         return None
 
     def getVolume(self, p):
@@ -1658,7 +1745,6 @@ class Chord(note.NotRest):
         >>> chord.Chord().inversion(testRoot=pitch.Pitch('C5')) is None
         True
         '''
-        #self._inversion = None
         if testRoot is not None:
             rootPitch = testRoot
         else:
@@ -1671,13 +1757,14 @@ class Chord(note.NotRest):
                 except:
                     raise ChordException("Inversion must be an integer")
             if transposeOnSet is False:
-                self._inversion = newInversion
+                self._overrides['inversion'] = newInversion
             else:
                 # could have set bass or root externally
                 numberOfRunsBeforeCrashing = len(self.pitches) + 2
                 soughtInversion = newInversion
 
-                self._inversion = None
+                if 'inversion' in self._overrides:
+                    del self._overrides['inversion']
                 currentInversion = self.inversion(find=True)
                 while currentInversion != soughtInversion and numberOfRunsBeforeCrashing > 0:
                     currentMaxMidi = max(self.pitches).ps
@@ -1690,9 +1777,7 @@ class Chord(note.NotRest):
                             tempBassPitch.octave = tempBassPitch.implicitOctave + 1
 
                     # housekeeping for next loop tests
-                    self._inversion = None
-                    self._bass = None
-                    self._root = None
+                    self._cache = {}
                     currentInversion = self.inversion(find=True)
                     numberOfRunsBeforeCrashing -= 1
                 if numberOfRunsBeforeCrashing == 0:
@@ -1701,7 +1786,7 @@ class Chord(note.NotRest):
                     self.sortAscending(inPlace=True)
                 return
 
-        elif (self._inversion is None and find is True) or testRoot is not None:
+        elif ('inversion' not in self._overrides and find) or testRoot is not None:
             try:
                 if rootPitch is None or self.bass() is None:
                     return None
@@ -1735,10 +1820,12 @@ class Chord(note.NotRest):
             else:
                 inv = None #no longer raise an exception if not normal inversion
             # is this cache worth it? or more trouble than it's worth...
-            self._inversion = inv
+            self._cache['inversion'] = inv
             return inv
+        elif 'inversion' in self._overrides:
+            return self._overrides['inversion']
         else:
-            return self._inversion
+            return None
 
     def inversionName(self):
         '''
@@ -2857,25 +2944,30 @@ class Chord(note.NotRest):
         True
 
         >>> d = harmony.ChordSymbol('CM/E')
-        >>> d.root(find=False) == None
-        True
-
-        >>> d.root()
+        >>> d.root(find=False)
         <music21.pitch.Pitch C4>
-
         '''
         if newroot:
             if isinstance(newroot, six.string_types):
                 newroot = newroot.replace('b', '-')
-                self._root = pitch.Pitch(newroot)
+                newroot = pitch.Pitch(newroot)
+            
+            self._overrides['root'] = newroot
+            self._cache['root'] = newroot
+            
+            if 'inversion' in self._cache:
+                del self._cache['inversion']
+                # reset inversion if root changes
+        elif ('root' not in self._overrides) and find:
+            if 'root' in self._cache:
+                return self._cache['root']
             else:
-                self._root = newroot
-            self._inversion = None # reset inversion if root changes
-        elif (self._root is None) and find:
-            self._root = self.findRoot()
-            return self._root
+                self._cache['root'] = self.findRoot()
+                return self._cache['root']
+        elif ('root' in self._overrides):
+            return self._overrides['root']
         else:
-            return self._root
+            return None
 
     def semiClosedPosition(self, forceOctave=None, inPlace=False, leaveRedundantPitches=False):
         '''
@@ -3022,11 +3114,14 @@ class Chord(note.NotRest):
 
         >>> c = chord.Chord('C4 E4 G4')
         >>> c.setColor('red', 'C4')
-        >>> c['0.color']
+        >>> c['0.style.color']
         'red'
         >>> c.setColor('blue') # set for whole chord...
-        >>> c.color
+        >>> c.style.color
         'blue'
+        >>> c['E4.style.color']
+        'blue'
+        
         >>> c.setColor('red', 'C9')
         Traceback (most recent call last):
         music21.chord.ChordException: the given pitch is not in the Chord: C9
@@ -3034,6 +3129,9 @@ class Chord(note.NotRest):
         # assign to base
         if pitchTarget is None and self._notes:
             self.style.color = value
+            for n in self._notes:
+                n.style.color = value
+            
             return
         elif isinstance(pitchTarget, six.string_types):
             pitchTarget = pitch.Pitch(pitchTarget)
@@ -3296,7 +3394,8 @@ class Chord(note.NotRest):
                 'the given pitch is not in the Chord: {}'.format(pitchTarget))
 
     def setTie(self, t, pitchTarget):
-        '''Given a tie object (or a tie type string) and a pitch in this Chord,
+        '''
+        Given a tie object (or a tie type string) and a pitch or Note in this Chord,
         set the pitch's tie attribute in this chord to that tie type.
 
         >>> c1 = chord.Chord(['d3', 'e-4', 'b-4'])
@@ -3323,7 +3422,13 @@ class Chord(note.NotRest):
         >>> c3.getTie(c3.pitches[0])
         <music21.tie.Tie start>
 
-        Less safe to match by string, but possible:
+        Less safe to match by string, because there might be multiple 
+        pitches with the same name in the chord, but possible:
+
+        >>> c4 = chord.Chord('D4 F#4')
+        >>> c4.setTie('start', 'F#4')
+        >>> c4.getTie('F#4')
+        <music21.tie.Tie start>
 
 
         Error:
@@ -3337,19 +3442,19 @@ class Chord(note.NotRest):
             pitchTarget = self._notes[0].pitch
         elif isinstance(pitchTarget, six.string_types):
             pitchTarget = pitch.Pitch(pitchTarget)
+            
         if isinstance(t, six.string_types):
             t = tie.Tie(t)
-        else:
-            pass # assume a tie object
+        
         match = False
         for d in self._notes:
-            if d.pitch is pitchTarget: # compare by obj id first
+            if d.pitch is pitchTarget or d is pitchTarget: # compare by obj id first
                 d.tie = t
                 match = True
                 break
         if not match: # more loose comparison: by ==
             for d in self._notes:
-                if d.pitch == pitchTarget:
+                if d.pitch == pitchTarget or d == pitchTarget:
                     d.tie = t
                     match = True
                     break
@@ -3530,14 +3635,15 @@ class Chord(note.NotRest):
         return self._chordTablesAddress
 
     @property
+    @common.deprecated('June 2017 v4', 'June 2018', 'use .style.color instead')
     def color(self):
         '''
         Get or set the Chord color.
 
         >>> a = chord.Chord(['c4', 'e4', 'g4'])
         >>> a.duration.type = 'whole'
-        >>> a.color = '#235409'
-        >>> a.color
+        >>> a.style.color = '#235409'
+        >>> a.style.color
         '#235409'
 
         >>> a.style.color
@@ -3560,6 +3666,7 @@ class Chord(note.NotRest):
             return None
 
     @color.setter
+    @common.deprecated('June 2017 v4', 'June 2018', 'use .style.color instead')
     def color(self, expr):
         self.style.color = expr
 
@@ -4092,9 +4199,7 @@ class Chord(note.NotRest):
         if value != [d.pitch for d in self._notes]:
             self._chordTablesAddressNeedsUpdating = True
         self._notes = []
-        self._root = None
-        self._bass = None
-        self._inversion = None
+        self._cache = {}
         # assume we have pitch objects here
         # TODO: individual ties are not being retained here
         for p in value:
@@ -4593,7 +4698,8 @@ class Test(unittest.TestCase):
         return out
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
+        '''
+        Test copying all objects defined in this module
         '''
         import sys, types
         for part in sys.modules[self.__module__].__dict__:
@@ -5265,6 +5371,11 @@ class Test(unittest.TestCase):
         self.assertEqual(str(s.pitches),
             '[<music21.pitch.Pitch D2>, <music21.pitch.Pitch E-1>, <music21.pitch.Pitch B-6>]')
 
+    def testInvertingSimple(self):
+        a = Chord(['g4', 'b4', 'd5', 'f5'])
+        self.assertEqual(a.inversion(), 0)
+        a.inversion(1)
+        self.assertEqual(repr(a), '<music21.chord.Chord B4 D5 F5 G5>')
 
 #-------------------------------------------------------------------------------
 
@@ -5274,7 +5385,7 @@ _DOC_ORDER = [Chord]
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='testInvertingSimple')
 
 #------------------------------------------------------------------------------
 # eof
