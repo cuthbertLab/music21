@@ -3663,9 +3663,9 @@ class TimeSignature(base.Music21Object):
          <music21.beam.Beams <music21.beam.Beam 1/stop>>]
 
         >>> fourFour = meter.TimeSignature('4/4')
-        >>> dList = [note.Note(type=d) for d in ('eighth', 'quarter', 'eighth',
+        >>> nList = [note.Note(type=d) for d in ('eighth', 'quarter', 'eighth',
         ...                                      'eighth', 'quarter', 'eighth')]
-        >>> beamList = fourFour.getBeams(dList)
+        >>> beamList = fourFour.getBeams(nList)
         >>> print(beamList)
         [None, None, None, None, None, None]
 
@@ -3673,8 +3673,8 @@ class TimeSignature(base.Music21Object):
         Pickup measure support included by taking in an additional measureStartOffset argument.
 
         >>> threeFour = meter.TimeSignature("3/4")
-        >>> dList = [note.Note(type='eighth') for _ in range(3)]
-        >>> beamList = threeFour.getBeams(dList, measureStartOffset=1.5)
+        >>> nList = [note.Note(type='eighth') for _ in range(3)]
+        >>> beamList = threeFour.getBeams(nList, measureStartOffset=1.5)
         >>> print(beamList)
         [<music21.beam.Beams <music21.beam.Beam 1/start>>,
          <music21.beam.Beams <music21.beam.Beam 1/continue>>,
@@ -3682,194 +3682,156 @@ class TimeSignature(base.Music21Object):
         '''
         if isinstance(srcList, base.Music21Object):
             srcList = list(srcList)
+            srcStream = srcList
         elif srcList and isinstance(srcList[0], base.Music21Object):
             # make into a stream to get proper offsets:
             # for eventually removing measureStartOffset
             from music21 import stream
-            srcStream = stream.Stream()
-            srcStream.paddingLeft = measureStartOffset
+            srcStream = stream.Measure()
             srcStream.append(srcList)
-            
 
         if len(srcList) <= 1:
             return [None for _ in srcList]
 
-        beamsList = self._naiveBeams(srcList) # hold maximum Beams objects
+        beamsList = TimeSignature._naiveBeams(srcList) # hold maximum Beams objects
+        beamsList = TimeSignature._removeSandwichedUnbeamables(beamsList)
     
-        #environLocal.printDebug(['beamsList', beamsList])
-        # iter over each beams line, from top to bottom (1 thourgh 5)
-        for depth in range(len(beamableDurationTypes)):
-            # increment to count from 1 not 0
+        def fixBeamsOneElementDepth(i, el, depth):
+            beams = beamsList[i]
+            if beams is None:
+                return
+
             beamNumber = depth + 1
-            # assume we are always starting at offset w/n this meter (Jose)
-            pos = measureStartOffset
+            # see if there is a component defined for this beam number
+            # if not, continue
+            if beamNumber not in beams.getNumbers():
+                return 
             
-            for i in range(len(srcList)):
-                el = srcList[i]
-                dur = el.duration
-                beams = beamsList[i]
-                
-                if beams is None: # if a place holder
-                    pos += dur.quarterLength
-                    continue
+            dur = el.duration
+            pos = el.offset + measureStartOffset
+            
+            start = opFrac(pos)
+            end = opFrac(pos + dur.quarterLength)
+            startNext = end
 
-                # see if there is a component defined for this beam number
-                # if not, continue
-                if beamNumber not in beams.getNumbers():
-                    pos += dur.quarterLength
-                    continue
+            isLast = (i == len(srcList) - 1)
+            isFirst = (i == 0)
 
-                start = opFrac(pos)
-                end = opFrac(pos + dur.quarterLength)
-                startNext = opFrac(pos + dur.quarterLength)
+            beamNext = beamsList[i + 1] if not isLast else None
+            beamPrevious = beamsList[i - 1] if not isFirst else None
 
-                if i == len(srcList) - 1: # last
-                    beamNext = None
-                    srcNext = None
-                else:
-                    beamNext = beamsList[i + 1]
-                    srcNext = srcStream[i + 1]
+            
+            # get an archetype of the MeterSequence for this level
+            # level is depth, starting at zero
+            archetype = self.beamSequence.getLevel(depth)
+            # span is the quarter note duration points for each partition
+            # at this level
+            archetypeSpanStart, archetypeSpanEnd = archetype.offsetToSpan(start)
+            #environLocal.printDebug(['at level, got archetype span', depth,
+            #                         archetypeSpan])
+            
+            if beamNext is None: # last note or before a non-beamable note (half, whole, etc.)
+                archetypeSpanNextStart = 0.0
+            else:
+                archetypeSpanNextStart = archetype.offsetToSpan(startNext)[0]
 
-                if i == 0: # first note in measure
-                    beamPrevious = None
-                    srcPrevious = None
-                else:
-                    beamPrevious = beamsList[i - 1]
-                    srcPrevious = srcStream[i - 1]
+            # watch for a special case where a duration completely fills
+            # the archetype; this generally should not be beamed
+            if (start == archetypeSpanStart
+                    and end == archetypeSpanEnd):
+                # increment position and continue loop
+                beamsList[i] = None # replace with None!
+                return
 
-                
-                # Check for whether we are sandwhiched between two unbeamables:
-                if ((beamPrevious is None and beamNext is None)
-                        or (srcPrevious and srcPrevious.isRest
-                            and srcNext and srcNext.isRest)
-                        or (beamPrevious is None
-                            and srcNext and srcNext.isRest)
-                        or (srcPrevious and srcPrevious.isRest
-                            and beamNext is None)
-                    ):
-                    # sandwiched between two unbeamables = no beams
-                    # delete beams, increment position, and continue loop
+            # determine beamType
+            if isFirst: # if the first, we always start
+                beamType = 'start'
+                # get a partial beam if we cannot continue this
+                if (beamNext is None or beamNumber not in beamNext.getNumbers()):
+                    beamType = 'partial-right'
+
+            elif isLast: # last is always stop
+                beamType = 'stop'
+                # get a partial beam if we cannot come form a beam
+                if (beamPrevious is None or beamNumber not in beamPrevious.getNumbers()):
+                    # environLocal.warn(['triggering partial left where a stop normally falls'])
+                    beamType = 'partial-left'
+
+            # here on we know that it is neither the first nor last
+
+            # if last beam was not defined, we need to either
+            # start or have a partial left beam
+            # or, if beam number was not active in last beams
+            elif beamPrevious is None or beamNumber not in beamPrevious.getNumbers():
+                if beamNumber == 1 and beamNext is None:
                     beamsList[i] = None
-                    pos += dur.quarterLength
-                    continue
-                
-                    
-                # get an archetype of the MeterSequence for this level
-                # level is depth, starting at zero
-                archetype = self.beamSequence.getLevel(depth)
-                # span is the quarter note duration points for each partition
-                # at this level
-                archetypeSpan = archetype.offsetToSpan(start)
-                #environLocal.printDebug(['at level, got archetype span', depth,
-                #                         archetypeSpan])
-                if beamNext is None: # last note or before a non-beamable note (half, whole, etc.)
-                    archetypeSpanNext = None
+                    return
+                elif beamNext is None and beamNumber > 1:
+                    beamType = 'partial-left'
+
+                elif (startNext >= archetypeSpanEnd):
+                    # case of where we need a partial left:
+                    # if the next start value is outside of this span (or at the
+                    # the greater boundary of this span), and we did not have a
+                    # beam or beam number in the previous beam
+
+                    # may need to check: beamNext is not None and
+                    #   beamNumber in beamNext.getNumbers()
+                    # note: it is critical that we check archetypeSpan here
+                    # not archetypeSpanNext
+                    #environLocal.printDebug(['matching partial left'])
+                    beamType = 'partial-left'
                 else:
-                    archetypeSpanNext = archetype.offsetToSpan(startNext)
-
-                # watch for a special case where a duration completely fills
-                # the archetype; this generally should not be beamed
-                if (start == archetypeSpan[0]
-                        and end == archetypeSpan[1]):
-                    # increment position and continue loop
-                    beamsList[i] = None # replace with None!
-                    pos += dur.quarterLength
-                    continue
-
-                # determine beamType
-                if i == 0: # if the first, we always start
-                    beamType = 'start'
-                    # get a partial beam if we cannot continue this
-                    if (beamNext is None
-                            or beamNumber not in beamNext.getNumbers()):
-                        beamType = 'partial-right'
-
-                elif i == len(srcList) - 1: # last is always stop
-                    beamType = 'stop'
-                    # get a partial beam if we cannot come form a beam
-                    if (beamPrevious is None
-                            or beamNumber not in beamPrevious.getNumbers()):
-                        #environLocal.printDebug(
-                        #   ['triggering partial left where a stop normally falls'])
-                        beamType = 'partial-left'
-
-                # here on we know that it is neither the first nor last
-
-                # if last beam was not defined, we need to either
-                # start or have a partial left beam
-                # or, if beam number was not active in last beams
-                elif beamPrevious is None or beamNumber not in beamPrevious.getNumbers():
-                    if beamNumber == 1 and beamNext is None:
-                        beamsList[i] = None
-                        pos += dur.quarterLength
-                        continue
-                    elif beamNext is None and beamNumber > 1:
-                        beamType = 'partial-left'
-
-                    elif (startNext >= archetypeSpan[1]):
-                        # case of where we need a partial left:
-                        # if the next start value is outside of this span (or at the
-                        # the greater boundary of this span), and we did not have a
-                        # beam or beam number in the previous beam
-
-                        # may need to check: beamNext is not None and
-                        #   beamNumber in beamNext.getNumbers()
-                        # note: it is critical that we check archetypeSpan here
-                        # not archetypeSpanNext
-                        #environLocal.printDebug(['matching partial left'])
-                        beamType = 'partial-left'
-                    else:
-                        beamType = 'start'
-
-
-                # last beams was active, last beamNumber was active,
-                # and it was stopped or was a partial-left
-                elif (beamPrevious is not None
-                      and beamNumber in beamPrevious.getNumbers()
-                      and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left']
-                      and beamNext is not None):
                     beamType = 'start'
 
 
-                # last note had beams but stopped, next note cannot be beamed to
-                # was active, last beamNumber was active,
-                # and it was stopped or was a partial-left
-                elif (beamPrevious is not None
-                      and beamNumber in beamPrevious.getNumbers()
-                      and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left']
-                      and beamNext is None):
-                    beamType = 'partial-left'  # will be deleted later in the script
-
-                # if no beam is defined next (we know this already)
-                # then must stop
-                elif (beamNext is None
-                      or beamNumber not in beamNext.getNumbers()):
-                    beamType = 'stop'
-
-                # the last cases are when to stop, or when to continue
-                # when we know we have a beam next
-
-                # we continue if the next beam is in the same beaming archetype
-                # as this one.
-                # if endNext is outside of the archetype span,
-                # not sure what to do
-                elif startNext < archetypeSpan[1]:
-                    #environLocal.printDebug(['continue match: durtype, startNext, archetypeSpan',
-                    #   dur.type, startNext, archetypeSpan])
-                    beamType = 'continue'
-                    if srcNext and srcNext.isRest:
-                        beamType = 'stop'
-
-                # we stop if the next beam is not in the same beaming archetype
-                # and (as shown above) a valid beam number is not previous
-                elif startNext >= archetypeSpanNext[0]:
-                    beamType = 'stop'
-
-                else:
-                    raise TimeSignatureException('cannot match beamType')
+            # last beams was active, last beamNumber was active,
+            # and it was stopped or was a partial-left
+            elif (beamPrevious is not None
+                  and beamNumber in beamPrevious.getNumbers()
+                  and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left']
+                  and beamNext is not None):
+                beamType = 'start'
 
 
-                # debugging information displays:
+            # last note had beams but stopped, next note cannot be beamed to
+            # was active, last beamNumber was active,
+            # and it was stopped or was a partial-left
+            elif (beamPrevious is not None
+                  and beamNumber in beamPrevious.getNumbers()
+                  and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left']
+                  and beamNext is None):
+                beamType = 'partial-left'  # will be deleted later in the script                
+
+
+            # if no beam is defined next (we know this already)
+            # then must stop
+            elif (beamNext is None
+                  or beamNumber not in beamNext.getNumbers()):
+                beamType = 'stop'
+
+            # the last cases are when to stop, or when to continue
+            # when we know we have a beam next
+
+            # we continue if the next beam is in the same beaming archetype
+            # as this one.
+            # if endNext is outside of the archetype span,
+            # not sure what to do
+            elif startNext < archetypeSpanEnd:
+                #environLocal.printDebug(['continue match: durtype, startNext, archetypeSpan',
+                #   dur.type, startNext, archetypeSpan])
+                beamType = 'continue'
+
+            # we stop if the next beam is not in the same beaming archetype
+            # and (as shown above) a valid beam number is not previous
+            elif startNext >= archetypeSpanNextStart:
+                beamType = 'stop'
+
+            else:
+                raise TimeSignatureException('cannot match beamType')
+
+
+            # debugging information displays:
 #                 if beamPrevious is not None:
 #                     environLocal.printDebug(['beamPrevious', beamPrevious,
 #                     'beamPrevious.getNumbers()', beamPrevious.getNumbers(),
@@ -3879,23 +3841,22 @@ class TimeSignature(base.Music21Object):
 #                         environLocal.printDebug(['beamPrevious type',
 #                            beamPrevious.getByNumber(beamNumber).type])
 
-                #environLocal.printDebug(['beamNumber, start, archetypeSpan, beamType',
-                # beamNumber, start, dur.type, archetypeSpan, beamType])
+            #environLocal.printDebug(['beamNumber, start, archetypeSpan, beamType',
+            # beamNumber, start, dur.type, archetypeSpan, beamType])
 
-                beams.setByNumber(beamNumber, beamType)
+            beams.setByNumber(beamNumber, beamType)
 
-                # increment position and continue loop
-                pos += dur.quarterLength
+    
+        #environLocal.printDebug(['beamsList', beamsList])
+        # iter over each beams line, from top to bottom (1 thourgh 5)
+        for depth in range(len(beamableDurationTypes)):
+            # increment to count from 1 not 0
+            # assume we are always starting at offset w/n this meter (Jose)            
+            for i, el in enumerate(srcStream):
+                fixBeamsOneElementDepth(i, el, depth)
 
-        ## clear elements that have partial beams with no full beams:
-        for i in range(len(beamsList)):
-            if beamsList[i] is None:
-                continue
-            allTypes = beamsList[i].getTypes()
-            if 'start' not in allTypes and 'stop' not in allTypes and 'continue' not in allTypes:
-                # nothing but partials
-                beamsList[i] = None
-
+        beamsList = TimeSignature._sanitizePartialBeams(beamsList) 
+        
         return beamsList
 
     @staticmethod
@@ -3936,7 +3897,93 @@ class TimeSignature(base.Music21Object):
                 b.fill(el.duration.type)
                 beamsList.append(b)
         return beamsList
+    
+    @staticmethod
+    def _removeSandwichedUnbeamables(beamsList):
+        '''
+        Go through the naiveBeamsList and remove beams from objects surrounded
+        by None objects -- you can't beam to nothing!
+        
+        Modifies beamsList in place
+        
+        >>> N = note.Note
+        >>> R = note.Rest
+        >>> e = 'eighth'
+        >>> nList = [N(type=e), R(type=e), N(type=e), N(type=e), 
+        ...          R(type=e), N(type=e), R(type=e), N(type=e)]
+        >>> beamsList = meter.TimeSignature._naiveBeams(nList)
+        >>> beamsList
+        [<music21.beam.Beams <music21.beam.Beam 1/None>>, 
+         None, 
+         <music21.beam.Beams <music21.beam.Beam 1/None>>, 
+         <music21.beam.Beams <music21.beam.Beam 1/None>>, 
+         None, 
+         <music21.beam.Beams <music21.beam.Beam 1/None>>,
+         None, 
+         <music21.beam.Beams <music21.beam.Beam 1/None>>]
 
+        >>> beamsList2 = meter.TimeSignature._removeSandwichedUnbeamables(beamsList)
+        >>> beamsList2 is beamsList
+        True
+        >>> beamsList2
+        [None, 
+         None,
+         <music21.beam.Beams <music21.beam.Beam 1/None>>, 
+         <music21.beam.Beams <music21.beam.Beam 1/None>>, 
+         None, 
+         None, 
+         None, 
+         None]
+        '''
+        beamLast = None
+        for i in range(len(beamsList)):
+            if i != len(beamsList) - 1:
+                beamNext = beamsList[i + 1]
+            else:
+                beamNext = None
+            
+            if beamLast is None and beamNext is None:
+                beamsList[i] = None
+            
+            beamLast = beamsList[i]
+        
+        return beamsList
+
+    @staticmethod
+    def _sanitizePartialBeams(beamsList):              
+        '''
+        It is possible at a late stage to have beams that only consist of partials
+        or beams with a 'start' followed by 'partial/left' or possibly 'stop' followed
+        by 'partial/right'; beams entirely consisting of partials are removed
+        and the direction of irrational partials is fixed.
+        '''
+        for i in range(len(beamsList)):
+            if beamsList[i] is None:
+                continue
+            allTypes = beamsList[i].getTypes()
+            ## clear elements that have partial beams with no full beams:
+            if 'start' not in allTypes and 'stop' not in allTypes and 'continue' not in allTypes:
+                # nothing but partials
+                beamsList[i] = None
+                continue
+            ## make sure a partial-left does not follow a start or a partial-right does not
+            ## follow a stop
+            hasStart = False
+            hasStop = False
+            for b in beamsList[i].beamsList:
+                if b.type == 'start':
+                    hasStart = True
+                    continue
+                if b.type == 'stop':
+                    hasStop = True
+                    continue
+                if hasStart and b.type == 'partial' and b.direction == 'left':
+                    b.direction = 'right'
+                elif hasStop and b.type == 'partial' and b.direction == 'right':
+                    b.direction = 'left'
+
+        
+        return beamsList
 
     def setDisplay(self, value, partitionRequest=None):
         '''
@@ -4922,6 +4969,8 @@ class Test(unittest.TestCase):
             '5 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>',
             '6 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/left>>',
             ])
+                
+        
 
     def testBestTimeSignature(self):
         from music21 import converter, stream

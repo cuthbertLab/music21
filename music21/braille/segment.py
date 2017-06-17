@@ -1974,12 +1974,12 @@ def prepareBeamedNotes(music21Measure):
     True
     """
     allNotes = music21Measure.notes.stream()
+    
     for sampleNote in allNotes:
         sampleNote.beamStart = False
         sampleNote.beamContinue = False
     allNotesAndRests = music21Measure.notesAndRests.stream()
 
-    # TODO: change these into filters on iterators
     withBeamFilter  = lambda el, unused: (el.beams is not None) and len(el.beams) > 0
     beamStartFilter = lambda el, unused: (el.beams.getByNumber(1).type == 'start')
     beamStopFilter  = lambda el, unused: (el.beams.getByNumber(1).type == 'stop')

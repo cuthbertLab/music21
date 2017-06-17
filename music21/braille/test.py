@@ -3472,7 +3472,7 @@ Barline final ⠣⠅
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test) #, verbose=True) #, runTest='test_example24_2')
+    music21.mainTest(Test) # , runTest='test_example10_4')
 
 #------------------------------------------------------------------------------
 # eof

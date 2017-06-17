@@ -15,6 +15,7 @@
 import copy
 import unittest
 
+from music21 import beam
 from music21 import clef
 from music21 import common
 from music21 import defaults
@@ -63,8 +64,8 @@ def makeBeams(s, inPlace=False):
     3 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>
 
 
-    This is currently a bug -- we can't have a partial-left beam at the start of a
-    beam group:
+    This was formerly a bug -- we could not have a partial-left beam at the start of a
+    beam group.  Now gives partial/right
 
     >>> aMeasure = stream.Measure()
     >>> aMeasure.timeSignature = meter.TimeSignature('4/4')
@@ -74,15 +75,15 @@ def makeBeams(s, inPlace=False):
     >>> bMeasure = aMeasure.makeBeams(inPlace=False).notes
     >>> for i in range(6):
     ...   print("%d %r" % (i, bMeasure[i].beams))
-    0 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/partial/left>>
+    0 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/partial/right>>
     1 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>
     2 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>
-    3 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/partial/left>>
+    3 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/partial/right>>
     4 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>
     5 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>
 
     OMIT_FROM_DOCS
-    TODO: inPlace=False does not work in many cases
+    TODO: inPlace=False does not work in many cases  ?? still an issue? 2017
     '''
     from music21 import stream
 
@@ -167,7 +168,9 @@ def makeBeams(s, inPlace=False):
             for i, n in enumerate(noteStream):
                 thisBeams = beamsList[i]
                 if thisBeams is not None:
-                    n.beams = thisBeams                        
+                    n.beams = thisBeams
+                else:
+                    n.beams = beam.Beams()
 
     del mColl  # remove Stream no longer needed
     
