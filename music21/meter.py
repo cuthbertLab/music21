@@ -3696,7 +3696,7 @@ class TimeSignature(base.Music21Object):
         elif srcList and isinstance(srcList[0], base.Music21Object):
             # assume all are objects:
             durList = [n.duration for n in srcList]
-            srcStream = None
+            srcStream = srcList
         else:
             # a list of durations
             durList = srcList
@@ -3706,6 +3706,7 @@ class TimeSignature(base.Music21Object):
             raise MeterException('length of durList must be 2 or greater, not %s' % len(durList))
 
         beamsList = [] # hold completed Beams objects
+        
         for i in range(len(durList)):
             # if a dur cannot be beamable under any circumstance, replace
             # it with None; this includes Rests
@@ -3730,11 +3731,11 @@ class TimeSignature(base.Music21Object):
             beamNumber = depth + 1
             # assume we are always starting at offset w/n this meter (Jose)
             pos = measureStartOffset
+            
             for i in range(len(durList)):
-
                 dur = durList[i]
                 beams = beamsList[i]
-
+                
                 if beams is None: # if a place holder
                     pos += dur.quarterLength
                     continue
@@ -3753,25 +3754,38 @@ class TimeSignature(base.Music21Object):
                 if i == len(durList) - 1: # last
                     #durNext = None
                     beamNext = None
+                    srcNext = None
                 else:
                     #durNext = durList[i + 1]
                     beamNext = beamsList[i + 1]
+                    srcNext = srcStream[i + 1] if srcStream else None
 
                 if i == 0: # first note in measure
                     #durPrevious = None
                     beamPrevious = None
+                    srcPrevious = None
                 else:
                     #durPrevious = durList[i - 1]
                     beamPrevious = beamsList[i - 1]
+                    srcPrevious = srcStream[i - 1] if srcStream else None
 
-                if beamNext is None and beamPrevious is None:
+                
+                # Check for whether we are sandwhiched between two unbeamables:
+                if ((beamPrevious is None and beamNext is None)
+                        or (srcPrevious and srcPrevious.isRest
+                            and srcNext and srcNext.isRest)
+                        or (beamPrevious is None
+                            and srcNext and srcNext.isRest)
+                        or (srcPrevious and srcPrevious.isRest
+                            and beamNext is None)
+                    ):
                     # sandwiched between two unbeamables = no beams
                     # delete beams, increment position, and continue loop
                     beamsList[i] = None
                     pos += dur.quarterLength
                     continue
-
-
+                
+                    
                 # get an archetype of the MeterSequence for this level
                 # level is depth, starting at zero
                 archetype = self.beamSequence.getLevel(depth)
@@ -3824,7 +3838,7 @@ class TimeSignature(base.Music21Object):
                     elif beamNext is None and beamNumber > 1:
                         beamType = 'partial-left'
 
-                    elif startNext >= archetypeSpan[1]:
+                    elif (startNext >= archetypeSpan[1]):
                         # case of where we need a partial left:
                         # if the next start value is outside of this span (or at the
                         # the greater boundary of this span), and we did not have a
@@ -3875,6 +3889,8 @@ class TimeSignature(base.Music21Object):
                     #environLocal.printDebug(['continue match: durtype, startNext, archetypeSpan',
                     #   dur.type, startNext, archetypeSpan])
                     beamType = 'continue'
+                    if srcNext and srcNext.isRest:
+                        beamType = 'stop'
 
                 # we stop if the next beam is not in the same beaming archetype
                 # and (as shown above) a valid beam number is not previous
@@ -3883,6 +3899,7 @@ class TimeSignature(base.Music21Object):
 
                 else:
                     raise TimeSignatureException('cannot match beamType')
+
 
                 # debugging information displays:
 #                 if beamPrevious is not None:
@@ -3903,7 +3920,6 @@ class TimeSignature(base.Music21Object):
                 pos += dur.quarterLength
 
         ## clear elements that have partial beams with no full beams:
-
         for i in range(len(beamsList)):
             if beamsList[i] is None:
                 continue

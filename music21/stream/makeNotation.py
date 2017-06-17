@@ -140,6 +140,8 @@ def makeBeams(s, inPlace=False):
             # fails, it represents a problem that happens before time signature
             # processing
             summed = sum([d.quarterLength for d in durList])
+            # note, this ^^ is faster than a generator expression
+             
             durSum = opFrac(opFrac(summed)) # the double call corrects for tiny errors in adding
                     # floats and Fractions in the sum() call -- the first opFrac makes it
                     # impossible to have 4.00000000001, but returns Fraction(4, 1). The
@@ -160,15 +162,14 @@ def makeBeams(s, inPlace=False):
             offset = 0.0
             if m.paddingLeft != 0.0:
                 offset = opFrac(m.paddingLeft)
-            elif (noteStream.highestTime <
-                lastTimeSignature.barDuration.quarterLength):
+            elif (noteStream.highestTime < lastTimeSignature.barDuration.quarterLength):
                 offset = (lastTimeSignature.barDuration.quarterLength - noteStream.highestTime)
             beamsList = lastTimeSignature.getBeams(noteStream, measureStartOffset=offset)
 
-            # pylint: disable=consider-using-enumerate
-            for i in range(len(noteStream)):
-                # this may try to assign a beam to a Rest
-                noteStream[i].beams = beamsList[i]
+            for i, n in enumerate(noteStream):
+                thisBeams = beamsList[i]
+                if thisBeams is not None:
+                    n.beams = thisBeams                        
 
     del mColl  # remove Stream no longer needed
     
