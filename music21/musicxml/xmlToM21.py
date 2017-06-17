@@ -2127,6 +2127,11 @@ class MeasureParser(XMLParserBase):
         for mxNote in mxNoteList:
             notes.append(self.xmlToSimpleNote(mxNote, freeSpanners=False))
         c = chord.Chord(notes)
+        
+        # move beams from first note -- TODO: what else should be moved?
+        if notes:
+            c.beams = notes[0].beams
+            notes[0].beams = beam.Beams()
         # move spanners from first note to Chord.  See slur in m2 of schoenberg/op19 #2
         for n in notes:
             ss = n.getSpannerSites()
