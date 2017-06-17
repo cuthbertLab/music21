@@ -3621,7 +3621,7 @@ class TimeSignature(base.Music21Object):
         Given a qLen position and an iterable music21Objects, return a list of Beams object.  
         
         The iterable can be a list (of elements) or a Stream (preferably flat) 
-        or a :ref:`~music21.stream.iterator.StreamIterator` from which Durations 
+        or a :class:`~music21.stream.iterator.StreamIterator` from which Durations 
         and information about note vs. rest will be
         extracted.
 

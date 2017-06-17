@@ -347,6 +347,22 @@ class BezierStyle(Style):
         self.bezierX2 = None
         self.bezierY2 = None
 
+class LineStyle(Style):
+    '''
+    from the MusicXML Definition
+    
+    Defines lineShape ('straight', 'curved' or None)
+    lineType ('solid', 'dashed', 'dotted', 'wavy' or None)
+    dashLength (in tenths)
+    spaceLength (in tenths)
+    '''
+    def __init__(self):
+        super(LineStyle, self).__init__()
+        
+        self.lineShape = None
+        self.lineType = None
+        self.dashLength = None
+        self.spaceLength = None
 
 class StyleMixin(common.SlottedObjectMixin):
     '''

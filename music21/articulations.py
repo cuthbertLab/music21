@@ -34,16 +34,7 @@ are found in music21.expressions.
 >>> c1.articulations = [articulations.OrganHeel(), articulations.Accent()]
 >>> #_DOCS_SHOW c1.show()
 
-
-
-
 A longer test showing the utility of the module:
-
-
-
-
-
-
 
 >>> s = stream.Stream()
 >>> n1 = note.Note('c#5')
@@ -51,12 +42,10 @@ A longer test showing the utility of the module:
 >>> n1.quarterLength = 1.25
 >>> s.append(n1)
 
-
 >>> n2 = note.Note('d5')
 >>> n2.articulations = [articulations.StrongAccent()]
 >>> n2.quarterLength = 0.75
 >>> s.append(n2)
-
 
 >>> n3 = note.Note('b4')
 >>> n3.articulations = [articulations.Staccato()]
@@ -64,29 +53,24 @@ A longer test showing the utility of the module:
 >>> n3.tie = tie.Tie('start')
 >>> s.append(n3)
 
-
 >>> n4 = note.Note('b4')
 >>> n4.articulations = [articulations.Staccatissimo()]
 >>> n4.quarterLength = 0.75
 >>> s.append(n4)
-
 
 >>> n5 = note.Note('a4')
 >>> n5.articulations = [articulations.Tenuto()]
 >>> n5.quarterLength = 1.3333333333333
 >>> s.append(n5)
 
-
 >>> n6 = note.Note('b-4')
 >>> n6.articulations = [articulations.Staccatissimo(), articulations.Tenuto()]
 >>> n6.quarterLength = 0.6666666666667
 >>> s.append(n6)
 
-
 >>> s.metadata = metadata.Metadata()
 >>> s.metadata.title = 'Prova articolazioni' # ital: "Articulation Test"
 >>> s.metadata.composer = 'Giuliano Lancioni'
-
 
 >>> #_DOCS_SHOW s.show()
 
@@ -121,16 +105,19 @@ class Articulation(base.Music21Object):
     >>> x = articulations.Articulation()
     >>> x.placement = 'below'
     >>> x.style.absoluteY = 20
+    >>> x.displayText = '>'
 
     '''
     _styleClass = style.TextStyle
 
     def __init__(self):
         base.Music21Object.__init__(self)
-        self.placement = 'above'
+        self.placement = None
         # declare a unit interval shift for the performance of this articulation
         self._volumeShift = 0.0
+        self.lengthShift = 1.0
         self.tieAttach = 'first' # attach to first or last or all notes after split
+        self.displayText = None
 
     def __repr__(self):
         return '<music21.articulations.%s>' % (self.__class__.__name__)
@@ -275,12 +262,18 @@ class Accent(DynamicArticulation):
 
 class StrongAccent(Accent):
     '''
-
+    Like an accent but even stronger.  Has an extra
+    attribute of pointDirection
+    
     >>> a = articulations.StrongAccent()
+    >>> a.pointDirection
+    'up'
+    >>> a.pointDirection = 'down'
     '''
     def __init__(self):
         super(StrongAccent, self).__init__()
         self._volumeShift = 0.15
+        self.pointDirection = 'up'
 
 class Staccato(LengthArticulation):
     '''
@@ -290,6 +283,7 @@ class Staccato(LengthArticulation):
     def __init__(self):
         super(Staccato, self).__init__()
         self._volumeShift = 0.05
+        self.lengthShift = 0.7
 
 class Staccatissimo(Staccato):
     '''
@@ -301,17 +295,19 @@ class Staccatissimo(Staccato):
     def __init__(self):
         super(Staccatissimo, self).__init__()
         self._volumeShift = 0.05
+        self.lengthShift = 0.5
 
-class Spiccato(Staccato):
+class Spiccato(Staccato, Accent):
     '''
     A staccato note + accent in one
 
     >>> a = articulations.Spiccato()
     '''
     def __init__(self):
-        super(Spiccato, self).__init__()
-        self._volumeShift = 0.05
-
+        Staccato.__init__(self)
+        Accent.__init__(self)
+        
+        
 class Tenuto(LengthArticulation):
     '''
     >>> a = articulations.Tenuto()
@@ -319,6 +315,7 @@ class Tenuto(LengthArticulation):
     def __init__(self):
         super(Tenuto, self).__init__()
         self._volumeShift = -0.05 # is this the right thing to do?
+        self.lengthShift = 1.1
 
 class DetachedLegato(LengthArticulation):
     '''
@@ -326,18 +323,24 @@ class DetachedLegato(LengthArticulation):
     '''
     def __init__(self):
         super(DetachedLegato, self).__init__()
-        self._volumeShift = 0
+        self.lengthShift = 0.9
 
+#---------- indeterminant slides
 
 class IndeterminantSlide(PitchArticulation):
     '''
     Represents a whole class of slides that are
     of indeterminent pitch amount (scoops, plops, etc.)
+    
+    All these have style information of .style.lineShape
+    .style.lineType, .style.dashLength, and .style.spaceLength
     '''
+    _styleClass = style.LineStyle
 
 
 class Scoop(IndeterminantSlide):
     '''
+    An indeterminantSlide coming before the main note and going up
 
     >>> a = articulations.Scoop()
     '''
@@ -345,44 +348,69 @@ class Scoop(IndeterminantSlide):
 
 class Plop(IndeterminantSlide):
     '''
+    An indeterminantSlide coming before the main note and going down.
 
     >>> a = articulations.Plop()
     '''
 
 class Doit(IndeterminantSlide):
     '''
+    An indeterminantSlide coming after the main note and going up.
 
     >>> a = articulations.Doit()
     '''
+    def __init__(self):
+        super(Doit, self).__init__()
+        self.tieAttach = 'last'
 
 class Falloff(IndeterminantSlide):
     '''
+    An indeterminantSlide coming after the main note and going down.
 
     >>> a = articulations.Falloff()
     '''
+    def __init__(self):
+        super(Falloff, self).__init__()
+        self.tieAttach = 'last'
+
+#---------- end indeterminant slide
+
 
 class BreathMark(LengthArticulation):
     '''
+    Can have as a symbol 'comma' or 'tick' or None
 
     >>> a = articulations.BreathMark()
+    >>> a.symbol = 'comma'
     '''
+    def __init__(self):
+        super(BreathMark, self).__init__()
+        self.lengthShift = 0.7
+        self.symbol = None
 
 class Caesura(Articulation):
     '''
     >>> a = articulations.Caesura()
     '''
 
-class Stress(DynamicArticulation):
+class Stress(DynamicArticulation, LengthArticulation):
     '''
 
     >>> a = articulations.Stress()
     '''
+    def __init__(self):
+        super(Stress, self).__init__()
+        self._volumeShift = 0.05
+        self.lengthShift = 1.1
 
 class Unstress(DynamicArticulation):
     '''
 
     >>> a = articulations.Unstress()
     '''
+    def __init__(self):
+        super(Unstress, self).__init__()
+        self._volumeShift = -0.05
 
 
 #-------------------------------------------------------------------------------
@@ -397,8 +425,7 @@ class TechnicalIndication(Articulation):
 
 class Harmonic(TechnicalIndication):
     '''
-
-    >>> a = articulations.Harmonic()
+    A general harmonic indicator -- StringHarmonic is probably what you want...
     '''
 
 class Bowing(TechnicalIndication):
@@ -451,8 +478,24 @@ class DownBow(Bowing):
     '''
 
 class StringHarmonic(Bowing, Harmonic):
-    pass
+    '''
+    Indicates that a note is a harmonic, and can also specify
+    whether it is the base pitch, the sounding pitch, or the touching pitch.
 
+    >>> h = articulations.StringHarmonic()
+    >>> h.harmonicType
+    'natural'
+    >>> h.harmonicType = 'artificial'
+
+    pitchType can be 'base', 'sounding', or 'touching' or None
+
+    >>> h.pitchType = 'base'
+    '''
+    def __init__(self):
+        super(StringHarmonic, self).__init__()
+        self.harmonicType = 'natural'
+        self.pitchType = None
+        
 class OpenString(Bowing):
     pass
 
@@ -485,7 +528,9 @@ class SnapPizzicato(Pizzicato):
     pass
 
 class NailPizzicato(Pizzicato):
-    '''not in MusicXML'''
+    '''
+    not in MusicXML
+    '''
     pass
 
 class FretIndication(TechnicalIndication):
@@ -535,8 +580,18 @@ class TripleTongue(TonguingIndication):
 class Stopped(WindIndication):
     pass
 
+#--------------------------------
 class OrganIndication(TechnicalIndication):
-    pass
+    '''
+    Indicates whether a pitch should be played with heel or toe.
+    
+    Has one attribute, "substitution" default to False, which
+    indicates whether the mark is a substitution mark
+    '''
+    def __init__(self):
+        super(OrganIndication, self).__init__()
+        self.substitution = False
+    
 
 class OrganHeel(OrganIndication):
     pass
@@ -553,11 +608,15 @@ class HarpFingerNails(HarpIndication):
     '''
     pass
 
-
-
-
-
-
+class HandbellIndication(TechnicalIndication):
+    '''
+    displayText is used to store any of the techniques in handbell music.
+    
+    Values are damp, echo, gyro, hand martellato, mallet lift,
+    mallet table, martellato, martellato lift,
+    muted martellato, pluck lift, and swing
+    '''
+    pass
 
 
 #-------------------------------------------------------------------------------

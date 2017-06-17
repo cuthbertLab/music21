@@ -622,7 +622,8 @@ class XMLExporterBase(object):
         return v
 
     #-------------------------------------------------------------------------------
-    def dump(self, obj):
+    @staticmethod
+    def dump(obj):
         r'''
         wrapper around xml.etree.ElementTree as ET that returns a string
         in every case, whether Py2 or Py3...
@@ -643,7 +644,7 @@ class XMLExporterBase(object):
         Output differs in Python2 vs 3.
         '''
         xmlEl = copy.deepcopy(obj)  # adds 5% overhead
-        self.indent(xmlEl)  # adds 5% overhead
+        XMLExporterBase.indent(xmlEl)  # adds 5% overhead
         if six.PY2:
             xStr = ET.tostring(xmlEl)
         else:
@@ -651,7 +652,8 @@ class XMLExporterBase(object):
         xStr = xStr.rstrip()
         print(xStr)
 
-    def indent(self, elem, level=0):
+    @staticmethod
+    def indent(elem, level=0):
         '''
         helper method, indent an element in place:
         '''
@@ -662,7 +664,7 @@ class XMLExporterBase(object):
             if not elem.tail or not elem.tail.strip():
                 elem.tail = i
             for subelem in elem:
-                self.indent(subelem, level + 1)
+                XMLExporterBase.indent(subelem, level + 1)
             if not elem.tail or not elem.tail.strip():
                 elem.tail = i
         else:
@@ -3801,15 +3803,24 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxArticulationMark)
         <staccatissimo placement="below" />
 
-        '''
-        # TODO: OrderedDict for ordering
-        # TODO: positioning other than default-x, default-y
-        # these articulations have extra information
-        # TODO: strong-accent
-        # TODO: scoop/plop/doit/falloff - empty-line
-        # TODO: breath-mark
-        # TODO: other-articulation
 
+        Some style!
+
+        >>> a = articulations.Doit()
+        >>> a.style.lineShape = 'curved'
+        >>> a.style.lineType = 'dashed'
+        >>> a.style.dashLength = 2
+        >>> a.style.spaceLength = 1
+        >>> a.style.absoluteX = 5
+        >>> a.style.absoluteY = 2
+        
+        
+        >>> mxArticulationMark = MEX.articulationToXmlArticulation(a)
+        >>> MEX.dump(mxArticulationMark)
+        <doit dash-length="2" default-x="5" default-y="2" 
+            line-shape="curved" line-type="dashed" space-length="1" />
+        '''
+        # these articulations have extra information
         musicXMLArticulationName = None
         for c in xmlObjects.ARTICULATION_MARKS_REV:
             if isinstance(articulationMark, c):
@@ -3819,11 +3830,31 @@ class MeasureExporter(XMLExporterBase):
             musicXMLArticulationName = 'other-articulation'
             # raise MusicXMLExportException("Cannot translate %s to musicxml" % articulationMark)
         mxArticulationMark = Element(musicXMLArticulationName)
-        mxArticulationMark.set('placement', articulationMark.placement)
-        self.setPosition(mxArticulationMark, articulationMark)
+        if articulationMark.placement is not None:
+            mxArticulationMark.set('placement', articulationMark.placement)
+        self.setPrintStyle(mxArticulationMark, articulationMark)
+        if musicXMLArticulationName == 'strong-accent':
+            mxArticulationMark.set('type', articulationMark.pointDirection)
+        if musicXMLArticulationName in ('doit', 'falloff', 'plop', 'scoop'):
+            self.setLineStyle(mxArticulationMark, articulationMark)
+        if musicXMLArticulationName == 'breath-mark' and articulationMark.symbol is not None:
+            mxArticulationMark.text = articulationMark.symbol
+        if (musicXMLArticulationName == 'other-articulation' 
+                and articulationMark.displayText is not None):
+            mxArticulationMark.text = articulationMark.displayText
         # mxArticulations.append(mxArticulationMark)
         return mxArticulationMark
 
+
+    def setLineStyle(self, mxObject, m21Object):
+        '''
+        Sets four additional elements for line elements, conforms to entity
+        %line-shape, %line-type, %dashed-formatting (dash-length and space-length)
+        '''
+        musicXMLNames = ('line-shape', 'line-type', 'dash-length', 'space-length')
+        m21Names = ('lineShape', 'lineType', 'dashLength', 'spaceLength')
+        self.setStyleAttributes(mxObject, m21Object, musicXMLNames, m21Names)
+        
 
 #     def fretboardToXmlFrame(self, fretboardMark):
 #         '''
@@ -3856,20 +3887,16 @@ class MeasureExporter(XMLExporterBase):
         >>> f.substitution = True
         >>> mxFingering = MEX.articulationToXmlTechnical(f)
         >>> MEX.dump(mxFingering)
-        <fingering alternate="no" placement="above" substitution="yes">4</fingering>
+        <fingering alternate="no" substitution="yes">4</fingering>
         '''
-        # TODO: OrderedDict to make the generic other-technical TechnicalIndication work...
         # these technical have extra information
-        # TODO: handbell
-        # TODO: arrow
-        # TODO: hole
-        # TODO: heel-toe
-        # TODO: bend
-        # TODO: pull-off/hammer-on
-        # TODO: string
         # TODO: fret
-        # TODO: harmonic
-
+        # TODO: string
+        # TODO: hammer-on
+        # TODO: pull-off
+        # TODO: bend
+        # TODO: hole
+        # TODO: arrow
         musicXMLTechnicalName = None
         for c in xmlObjects.TECHNICAL_MARKS_REV:
             if isinstance(articulationMark, c):
@@ -3879,17 +3906,64 @@ class MeasureExporter(XMLExporterBase):
             raise MusicXMLExportException(
                 "Cannot translate technical indication %s to musicxml" % articulationMark)
         mxTechnicalMark = Element(musicXMLTechnicalName)
-        mxTechnicalMark.set('placement', articulationMark.placement)
+        if articulationMark.placement is not None:
+            mxTechnicalMark.set('placement', articulationMark.placement)
         if musicXMLTechnicalName == 'fingering':
             mxTechnicalMark.text = str(articulationMark.fingerNumber)
             mxTechnicalMark.set('alternate',
                                 xmlObjects.booleanToYesNo(articulationMark.alternate))
+        if (musicXMLTechnicalName in ('handbell', 'other-technical')
+                and articulationMark.displayText is not None):
+            mxTechnicalMark.text = articulationMark.displayText
+        if musicXMLTechnicalName in ('heel', 'toe', 'fingering'):
             mxTechnicalMark.set('substitution',
                                 xmlObjects.booleanToYesNo(articulationMark.substitution))
+                    
+            
+        # harmonic needs to check for whether it is artificial or natural, and 
+        # whether it is base-pitch, sounding-pitch, or touching-pitch
+        if musicXMLTechnicalName == 'harmonic':
+            self.setHarmonic(mxTechnicalMark, articulationMark)
+            
         self.setPrintStyle(mxTechnicalMark, articulationMark)
         # mxArticulations.append(mxArticulationMark)
         return mxTechnicalMark
 
+    @staticmethod
+    def setHarmonic(mxh, harm):
+        '''
+        Sets the artificial or natural tag (or no tag) and
+        zero or one of base-pitch, sounding-pitch, touching-pitch
+
+        Called from articulationToXmlTechnical
+        
+        >>> MEXClass = musicxml.m21ToXml.MeasureExporter
+
+        >>> a = articulations.Harmonic()
+        >>> a.harmonicType = 'artificial'
+        >>> a.pitchType = 'sounding'
+        
+        >>> from music21.musicxml.m21ToXml import Element
+        >>> mxh = Element('harmonic')
+
+        >>> MEXClass.setHarmonic(mxh, a)
+        >>> MEXClass.dump(mxh)
+        <harmonic>
+          <artificial />
+          <sounding-pitch />
+        </harmonic>
+        '''
+        if harm.harmonicType == 'artificial':
+            SubElement(mxh, 'artificial')
+        elif harm.harmonicType == 'natural':
+            SubElement(mxh, 'natural')
+        
+        if harm.pitchType == 'base':
+            SubElement(mxh, 'base-pitch')
+        elif harm.pitchType == 'sounding':
+            SubElement(mxh, 'sounding-pitch')
+        elif harm.pitchType == 'touching':
+            SubElement(mxh, 'touching-pitch')
 
     def chordSymbolToXml(self, cs):
         '''

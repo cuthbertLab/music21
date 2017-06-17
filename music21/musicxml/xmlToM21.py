@@ -264,6 +264,15 @@ class XMLParserBase(object):
         self.setStyleAttributes(mxObject, m21Object, musicXMLNames, m21Names)
         self.setPrintStyleAlign(mxObject, m21Object)
 
+    def setLineStyle(self, mxObject, m21Object):
+        '''
+        Sets four additional elements for line elements, conforms to entity
+        %line-shape, %line-type, %dashed-formatting (dash-length and space-length)
+        '''
+        musicXMLNames = ('line-shape', 'line-type', 'dash-length', 'space-length')
+        m21Names = ('lineShape', 'lineType', 'dashLength', 'spaceLength')
+        self.setStyleAttributes(mxObject, m21Object, musicXMLNames, m21Names)
+
     def setPrintStyleAlign(self, mxObject, m21Object):
         '''
         runs setPrintStyle and then sets horizontalAlign and verticalAlign, on an
@@ -2880,8 +2889,17 @@ class MeasureParser(XMLParserBase):
         tag = mxObj.tag
         if tag in xmlObjects.TECHNICAL_MARKS:
             tech = xmlObjects.TECHNICAL_MARKS[tag]()
+
             if tag == 'fingering':
                 self.handleFingering(tech, mxObj)
+            if tag in ('handbell', 'other-technical') and mxObj.text is not None:
+                tech.displayText = mxObj.text
+            if tag == 'harmonic':
+                self.setHarmonic(mxObj, tech)
+            if tag in ('heel', 'toe'):
+                if mxObj.get('substitution') is not None:
+                    tech.substitution = xmlObjects.yesNoToBoolean(mxObj.get('substitution'))
+                
 
             # print-style
             placement = mxObj.get('placement')
@@ -2891,6 +2909,41 @@ class MeasureParser(XMLParserBase):
         else:
             environLocal.printDebug("Cannot translate %s in %s." % (tag, mxObj))
             return None
+
+    @staticmethod
+    def setHarmonic(mxh, harm):
+        '''
+        From the artificial or natural tag (or no tag) and
+        zero or one of base-pitch, sounding-pitch, touching-pitch,
+        sets .harmonicType and .pitchType on a articulations.Harmonic object
+
+        Called from xmlTechnicalToArticulation
+        
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+
+        >>> mxTech = EL('<harmonic><artificial/><sounding-pitch/></harmonic>')
+        >>> a = MP.xmlTechnicalToArticulation(mxTech)
+        >>> a
+        <music21.articulations.StringHarmonic>
+        
+        >>> a.harmonicType
+        'artificial'
+        >>> a.pitchType
+        'sounding'
+        '''
+        if mxh.find('artificial') != None:
+            harm.harmonicType = 'artificial'
+        elif mxh.find('natural') != None:
+            harm.harmonicType = 'natural'
+        
+        if mxh.find('base-pitch') != None:
+            harm.pitchType = 'base'
+        elif mxh.find('sounding-pitch') != None:
+            harm.pitchType = 'sounding'
+        elif mxh.find('touching-pitch') != None:
+            harm.pitchType = 'touching'
+        
 
     def handleFingering(self, tech, mxObj):
         '''
@@ -2921,6 +2974,20 @@ class MeasureParser(XMLParserBase):
         <music21.articulations.Spiccato>
         >>> a.placement
         'above'
+        
+        >>> mxArt = EL('<doit dash-length="2" default-x="5" default-y="2" ' 
+        ...            + 'line-shape="curved" line-type="dashed" space-length="1" />')
+        >>> a = MP.xmlToArticulation(mxArt)
+        >>> a
+        <music21.articulations.Doit>
+        >>> a.placement is None
+        True
+        >>> a.style.dashLength
+        2
+        >>> a.style.absoluteX
+        5
+        >>> a.style.lineShape
+        'curved'
         '''
         tag = mxObj.tag
         if tag in xmlObjects.ARTICULATION_MARKS:
@@ -2930,6 +2997,20 @@ class MeasureParser(XMLParserBase):
             placement = mxObj.get('placement')
             if placement is not None:
                 artic.placement = placement
+                
+            # particular articulations have extra information.
+            if tag == 'strong-accent':
+                pointDirection = mxObj.get('type')
+                if pointDirection is not None:
+                    artic.pointDirection = pointDirection
+            if tag in ('doit', 'falloff', 'plop', 'scoop'):
+                self.setLineStyle(mxObj, artic)
+            if tag == 'breath-mark' and mxObj.text is not None:
+                artic.symbol = mxObj.text
+            if tag == 'other-articulation' and mxObj.text is not None:
+                artic.displayText = mxObj.text
+
+                
             return artic
         else:
             environLocal.printDebug("Cannot translate %s in %s." % (tag, mxObj))

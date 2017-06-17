@@ -21,23 +21,24 @@ DYNAMIC_MARKS = ['p', 'pp', 'ppp', 'pppp', 'ppppp', 'pppppp',
         'other-dynamics' # non-empty...
         ]
 
-ARTICULATION_MARKS = { 'accent'       : articulations.Accent,
-                       'strong-accent'   : articulations.StrongAccent,
-                       'staccato'        : articulations.Staccato,
-                       'staccatissimo'   : articulations.Staccatissimo,
-                       'spiccato'        : articulations.Spiccato,
-                       'tenuto'          : articulations.Tenuto,
-                       'detached-legato' : articulations.DetachedLegato,
-                       'scoop'           : articulations.Scoop,
-                       'plop'            : articulations.Plop,
-                       'doit'            : articulations.Doit,
-                       'falloff'         : articulations.Falloff,
-                       'breath-mark'     : articulations.BreathMark,
-                       'caesura'         : articulations.Caesura,
-                       'stress'          : articulations.Stress,
-                       'unstress'        : articulations.Unstress,
-                       'other-articulation': articulations.Articulation,
-                   }
+ARTICULATION_MARKS = OrderedDict(
+    [('accent',          articulations.Accent),
+     ('strong-accent',   articulations.StrongAccent),
+     ('staccato',        articulations.Staccato),
+     ('staccatissimo',   articulations.Staccatissimo),
+     ('spiccato',        articulations.Spiccato),
+     ('tenuto',          articulations.Tenuto),
+     ('detached-legato', articulations.DetachedLegato),
+     ('scoop',           articulations.Scoop),
+     ('plop',            articulations.Plop),
+     ('doit',            articulations.Doit),
+     ('falloff',         articulations.Falloff),
+     ('breath-mark',     articulations.BreathMark),
+     ('caesura',         articulations.Caesura),
+     ('stress',          articulations.Stress),
+     ('unstress',        articulations.Unstress),
+     ('other-articulation', articulations.Articulation),
+    ])
 
 # A reversed dictionary mapping classes to names, excepting Articulation
 # which does not get mapped, and Staccato which must come after Staccatissimo,
@@ -51,7 +52,7 @@ ARTICULATION_MARKS_REV[articulations.Accent] = 'accent' # py3: move_to_end
 
 TECHNICAL_MARKS = OrderedDict([('up-bow',           articulations.UpBow),
                                ('down-bow',         articulations.DownBow),
-                               ('harmonic',         articulations.Harmonic),
+                               ('harmonic',         articulations.StringHarmonic),
                                ('open-string',      articulations.OpenString),
                                ('thumb-position',   articulations.StringThumbPosition),
                                ('fingering',        articulations.Fingering),
@@ -70,6 +71,9 @@ TECHNICAL_MARKS = OrderedDict([('up-bow',           articulations.UpBow),
                                ('heel',             articulations.OrganHeel),
                                ('toe',              articulations.OrganToe),
                                ('fingernails',      articulations.HarpFingerNails),
+                               # TODO: hole
+                               # TODO: arrow
+                               ('handbell',         articulations.HandbellIndication), 
                                ('other-technical',  articulations.TechnicalIndication),
                                ])
 TECHNICAL_MARKS_REV = OrderedDict([(v, k) for k, v in TECHNICAL_MARKS.items()])
