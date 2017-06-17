@@ -3856,6 +3856,7 @@ class TimeSignature(base.Music21Object):
                 fixBeamsOneElementDepth(i, el, depth)
 
         beamsList = TimeSignature._sanitizePartialBeams(beamsList) 
+        beamsList = TimeSignature._mergeConnectingPartialBeams(beamsList)
         
         return beamsList
 
@@ -3955,7 +3956,7 @@ class TimeSignature(base.Music21Object):
         It is possible at a late stage to have beams that only consist of partials
         or beams with a 'start' followed by 'partial/left' or possibly 'stop' followed
         by 'partial/right'; beams entirely consisting of partials are removed
-        and the direction of irrational partials is fixed.
+        and the direction of irrational partials is fixed.        
         '''
         for i in range(len(beamsList)):
             if beamsList[i] is None:
@@ -3982,7 +3983,82 @@ class TimeSignature(base.Music21Object):
                 elif hasStop and b.type == 'partial' and b.direction == 'right':
                     b.direction = 'left'
 
-        
+        return beamsList
+
+
+    @staticmethod
+    def _mergeConnectingPartialBeams(beamsList):
+        '''
+        Partial-right followed by partial-left must also be connected, even if otherwise
+        over a archetypeSpan, such as 16th notes 2 and 3 in a quarter note span where
+        16ths are not beamed by default.
+        '''
+        ## sanitize two partials in a row:
+        for i in range(len(beamsList) - 1):
+            bThis = beamsList[i]
+            bNext = beamsList[i + 1]
+            if not bThis or not bNext:
+                continue
+            
+            bThisNum = bThis.getNumbers()
+            if not bThisNum:
+                continue
+            
+            for thisNum in bThisNum:                
+                thisBeam = bThis.getByNumber(thisNum)
+                if thisBeam.type != 'partial' or thisBeam.direction != 'right':
+                    continue
+                
+                if thisNum not in bNext.getNumbers():
+                    continue
+                
+                nextBeam = bNext.getByNumber(thisNum)
+                if nextBeam.type == 'partial' and nextBeam.direction == 'right':
+                    continue
+                if nextBeam.type in ('continue', 'stop'):
+                    environLocal.warn(
+                        "Found a messed up beam pair {}, {}, at index {} of \n{}".format(
+                            bThis, bNext, i, beamsList))
+                    continue #
+                
+                
+                thisBeam.type = 'start'
+                thisBeam.direction = None
+                if nextBeam.type == 'partial':                
+                    nextBeam.type = 'stop'
+                elif nextBeam.type == 'start':
+                    nextBeam.type = 'continue'
+                    
+                nextBeam.direction = None
+                
+        # now fix partial-lefts that follow stops:
+        for i in range(1, len(beamsList)):
+            bThis = beamsList[i]
+            bPrev = beamsList[i - 1]
+            if not bThis or not bPrev:
+                continue
+            
+            bThisNum = bThis.getNumbers()
+            if not bThisNum:
+                continue
+
+            for thisNum in bThisNum:                
+                thisBeam = bThis.getByNumber(thisNum)
+                if thisBeam.type != 'partial' or thisBeam.direction != 'left':
+                    continue
+
+                if thisNum not in bPrev.getNumbers():
+                    continue
+
+                prevBeam = bPrev.getByNumber(thisNum)
+                if prevBeam.type != 'stop':
+                    continue
+
+                thisBeam.type = 'stop'
+                thisBeam.direction = None
+                prevBeam.type = 'continue'
+
+                    
         return beamsList
 
     def setDisplay(self, value, partitionRequest=None):
@@ -4966,8 +5042,8 @@ class Test(unittest.TestCase):
             '2 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>',
             '3 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>',
             '4 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>',
-            '5 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>',
-            '6 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/left>>',
+            '5 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>',
+            '6 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>',
             ])
                 
         
