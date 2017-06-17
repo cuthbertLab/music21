@@ -154,16 +154,14 @@ def makeBeams(s, inPlace=False):
                 #    that sum greater than bar duration (%s > %s)' %
                 #    (durSum, barQL)])
                 continue
-            # getBeams can take a list of Durations; however, this cannot
-            # distinguish a Note from a Rest; thus, we can submit a flat
-            # stream of note or note-like entities; will return
-            # the same list of beam objects
 
+            # getBeams
             offset = 0.0
             if m.paddingLeft != 0.0:
                 offset = opFrac(m.paddingLeft)
             elif (noteStream.highestTime < lastTimeSignature.barDuration.quarterLength):
                 offset = (lastTimeSignature.barDuration.quarterLength - noteStream.highestTime)
+
             beamsList = lastTimeSignature.getBeams(noteStream, measureStartOffset=offset)
 
             for i, n in enumerate(noteStream):
