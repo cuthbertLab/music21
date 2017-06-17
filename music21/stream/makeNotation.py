@@ -65,7 +65,7 @@ def makeBeams(s, inPlace=False):
 
 
     This was formerly a bug -- we could not have a partial-left beam at the start of a
-    beam group.  Now gives partial/right
+    beam group.  Now merges across the archetypeSpan
 
     >>> aMeasure = stream.Measure()
     >>> aMeasure.timeSignature = meter.TimeSignature('4/4')
@@ -75,11 +75,11 @@ def makeBeams(s, inPlace=False):
     >>> bMeasure = aMeasure.makeBeams(inPlace=False).notes
     >>> for i in range(6):
     ...   print("%d %r" % (i, bMeasure[i].beams))
-    0 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/partial/right>>
-    1 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>
+    0 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
+    1 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>
     2 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>
-    3 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/partial/right>>
-    4 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>
+    3 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
+    4 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>
     5 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>
 
     OMIT_FROM_DOCS
