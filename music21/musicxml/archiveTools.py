@@ -80,12 +80,13 @@ def uncompressMXL(filename, deleteOriginal=False):
     unarchivedName = os.path.splitext(archivedName)[0] + '.xml'
     extractPath = os.path.sep.join(filenames)
     # Export container and original xml file to system as a compressed XML.
-    with zipfile.ZipFile(
-        filename,
-        'r',
-        compression=zipfile.ZIP_DEFLATED,
-        ) as myZip:
-        myZip.extract(member=unarchivedName, path=extractPath)
+    with zipfile.ZipFile(filename, 'r', compression=zipfile.ZIP_DEFLATED) as myZip:
+        try:
+            myZip.extract(member=unarchivedName, path=extractPath)
+        except KeyError:
+            for storedName in myZip.namelist():
+                myZip.extract(member=storedName, path=extractPath)
+            
     # Delete uncompressed xml file from system
     if deleteOriginal:
         os.remove(filename)

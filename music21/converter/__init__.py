@@ -82,7 +82,8 @@ class ConverterFileException(exceptions21.Music21Exception):
 
 #-------------------------------------------------------------------------------
 class ArchiveManager(object):
-    r'''Before opening a file path, this class can check if this is an
+    r'''
+    Before opening a file path, this class can check if this is an
     archived file collection, such as a .zip or or .mxl file. This will return the
     data from the archive.
 
@@ -134,7 +135,8 @@ class ArchiveManager(object):
 
 
     def getNames(self):
-        '''Return a list of all names contained in this archive.
+        '''
+        Return a list of all names contained in this archive.
         '''
         post = []
         if self.archiveType == 'zip':

@@ -209,6 +209,7 @@ class Test(unittest.TestCase):
         pass
 
     def testHaveBeamsBeenMadeAfterDeepcopy(self):
+        import copy
         from music21 import stream, note
         m = stream.Measure()
         c = note.Note('C4', type='quarter')
@@ -221,6 +222,12 @@ class Test(unittest.TestCase):
         m.append([e3, e4])
         d1.beams.append('start')
         d2.beams.append('stop')
+        self.assertEqual(m.streamStatus.haveBeamsBeenMade(), True)
+        mm = copy.deepcopy(m)
+        self.assertEqual(mm.streamStatus.haveBeamsBeenMade(), True)
+        mm.streamStatus.beams = False
+        mmm = copy.deepcopy(mm)
+        self.assertEqual(mmm.streamStatus.beams, False)
         # m.show()
         
 
