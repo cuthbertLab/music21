@@ -82,7 +82,7 @@ class Date(object):
         self.hour = None
         self.minute = None
         self.second = None
-        
+
         # error: can be 'approximate', 'uncertain'
         # None is assumed to be certain
         self.yearError = None
@@ -501,7 +501,7 @@ class DateRelative(DateSingle):
 
     >>> dd = metadata.DateRelative('2009/12/31', 'certain')
     Traceback (most recent call last):
-    music21.exceptions21.MetadataException: Relevance value is not 
+    music21.exceptions21.MetadataException: Relevance value is not
         supported by this object: 'certain'
     '''
 
@@ -541,7 +541,7 @@ class DateRelative(DateSingle):
     def relevance(self, value):
         if value == 'before':
             value = 'prior'
-        
+
         if value.lower() not in ('prior', 'after', 'onorbefore', 'onorafter'):
             raise exceptions21.MetadataException(
                 'Relevance value is not supported by this object: '
@@ -563,7 +563,7 @@ class DateBetween(DateSingle):
 
     >>> dd = metadata.DateBetween(['2009/12/31', '2010/1/28'], 'certain')
     Traceback (most recent call last):
-    music21.exceptions21.MetadataException: Relevance value is not 
+    music21.exceptions21.MetadataException: Relevance value is not
         supported by this object: 'certain'
     '''
 
@@ -641,7 +641,7 @@ class DateSelection(DateSingle):
     ...     'certain',
     ...     )
     Traceback (most recent call last):
-    music21.exceptions21.MetadataException: Relevance value is not 
+    music21.exceptions21.MetadataException: Relevance value is not
         supported by this object: 'certain'
     '''
 
@@ -733,7 +733,7 @@ class Text(object):
                 return str(self._data)
             else:
                 return self._data
-        else:      
+        else:
             if isinstance(self._data, unicode): #unicode in PY2, str in PY3
                 # not sure if this should be wrapped in in str() call
                 return self._data.encode('utf-8')
@@ -802,7 +802,7 @@ class Contributor(object):
 
     >>> td.relevance
     'contributor'
-    
+
     >>> td
     <music21.metadata.primitives.Contributor composer:Chopin, Fryderyk>
     '''
@@ -869,7 +869,7 @@ class Contributor(object):
             self._dateRange[1] = DateSingle(keywords['death'])
 
     def __repr__(self):
-        return '<music21.metadata.primitives.{} {}:{}>'.format(                                                           
+        return '<music21.metadata.primitives.{} {}:{}>'.format(
                                 self.__class__.__name__, self.role, self.name)
 
     ### PUBLIC METHODS ###
@@ -922,7 +922,7 @@ class Contributor(object):
         ['Chopin, Fryderyk', 'Chopin, Frederick']
         '''
         # return first name
-        if len(self._names) > 0:
+        if self._names:
             return str(self._names[0])
         else:
             return None

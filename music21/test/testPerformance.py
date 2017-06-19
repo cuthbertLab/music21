@@ -8,8 +8,10 @@
 # Copyright:    Copyright © 2009-2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
-'''This method defines a number of performance test. Results for these performances are stored and dated, and used to track long-term performance changes.
+'''
+This module defines a number of performance test.
+ Results for these performances are stored and dated, 
+ and used to track long-term performance changes.
 
 This file is not run with the standard test battery presently.
 '''
@@ -45,7 +47,7 @@ class Test(unittest.TestCase):
             r = note.Rest()
             s.append(r)
 
-        for i in range(100):        
+        for i in range(100):
             for j in s: # this will create an iterator instances
                 pass
 
@@ -62,7 +64,7 @@ class Test(unittest.TestCase):
             r = note.Rest()
             s.append(r)
 
-        for i in range(100):        
+        for i in range(100):
             for j in s.elements: # this will create an iterator instances
                 pass
 
@@ -81,7 +83,7 @@ class Test(unittest.TestCase):
             r = note.Rest()
             s.append(r)
 
-        for i in range(2):        
+        for i in range(2):
             post = s.flat.getElementsByClass([note.Rest, note.Note])
             self.assertEqual(len(post), 1500)
 
@@ -99,7 +101,7 @@ class Test(unittest.TestCase):
             r = note.Rest()
             s.append(r)
 
-        for i in range(2):        
+        for i in range(2):
             post = s.flat.getElementsByClass(['Rest', 'Note'])
             self.assertEqual(len(post), 1500)
 
@@ -118,7 +120,8 @@ class Test(unittest.TestCase):
             junk = GEX().parse(p)
 
     def runMusicxmlOutScoreBeethoven(self):
-        '''Loading file and rendering musicxml output of complete score: beethoven/opus59no2/movement3
+        '''
+        Loading file and rendering musicxml output of complete score: beethoven/opus59no2/movement3
         '''
         x = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
         #problem: doing each part is much faster than the whole score
@@ -155,7 +158,8 @@ class Test(unittest.TestCase):
         '''Creating 500 TimeSignature objects
         '''
         from music21 import meter
-        tsStr = ['4/4', '4/4', '4/4', '3/4', '3/4', '2/4', '2/4', '2/2', '2/2', '3/8', '6/8', '9/8', '5/4', '12/8']
+        tsStr = ['4/4', '4/4', '4/4', '3/4', '3/4', '2/4', '2/4', '2/2', 
+                 '2/2', '3/8', '6/8', '9/8', '5/4', '12/8']
 
         for i in range(500):
             meter.TimeSignature(tsStr[i%len(tsStr)])
@@ -218,7 +222,7 @@ class Test(unittest.TestCase):
                     assert post != None
                     post = n.getContextByClass('KeySignature')
                     assert post != None
-            
+
 
     def runGetElementsByPrevious(self):
         '''Test getting elements by using the previous method
@@ -244,7 +248,7 @@ class Test(unittest.TestCase):
                     assert post != None
                     post = n.getContextByClass('KeySignature')
                     assert post != None
-            
+
 
 
 
@@ -255,7 +259,9 @@ class Test(unittest.TestCase):
 
     #---------------------------------------------------------------------------
     def testTimingTolerance(self):
-        '''Test the performance of methods defined above, comparing the resulting time to the time obtained in past runs. 
+        '''
+        Test the performance of methods defined above, 
+        comparing the resulting time to the time obtained in past runs.
 
         This should not produce errors as such, but is used to provide reference
         if overall performance has changed.
@@ -263,111 +269,111 @@ class Test(unittest.TestCase):
         # provide work and expected min/max in seconds
         for testMethod, best in [
 
-            (self.runGetElementsByPrevious, 
+            (self.runGetElementsByPrevious,
                 {
-                 '2011.11.29': 4.69, 
+                 '2011.11.29': 4.69,
                 }),
 
-            (self.runGetElementsByContext, 
+            (self.runGetElementsByContext,
                 {
-                 '2010.11.10': 7.3888170, 
-                 '2010.11.11': 3.96121883392, 
+                 '2010.11.10': 7.3888170,
+                 '2010.11.11': 3.96121883392,
                 }),
 
 
-# 
-# 
-# 
-# #             (self.runParseABC, 
+#
+#
+#
+# #             (self.runParseABC,
 # #                 {
-# #                  '2010.10.20': 38.6760668755, 
+# #                  '2010.10.20': 38.6760668755,
 # #                  '2010.10.21': 35.4297668934,
 # #                 }),
-# 
-# 
-#             (self.runCreateDurations, 
+#
+#
+#             (self.runCreateDurations,
 #                 {
-#                  '2010.10.07': 0.201117992401, 
-# 
+#                  '2010.10.07': 0.201117992401,
+#
 #                 }),
-# 
-#             (self.runCreateTimeSignatures, 
+#
+#             (self.runCreateTimeSignatures,
 #                 {
-#                  '2010.10.07': 2.88308691978, 
-#                  '2010.10.08': 1.40892004967 , 
-# 
+#                  '2010.10.07': 2.88308691978,
+#                  '2010.10.08': 1.40892004967 ,
+#
 #                 }),
-# 
-# 
-#             (self.runStreamIterationByIterator, 
-#                 {'2010.09.20': 2.2524, 
-#                  '2010.10.07': 1.8214, 
+#
+#
+#             (self.runStreamIterationByIterator,
+#                 {'2010.09.20': 2.2524,
+#                  '2010.10.07': 1.8214,
 #                 }),
-# 
-#             (self.runStreamIterationByElements, 
-#                 {'2010.09.20': 0.8317, 
+#
+#             (self.runStreamIterationByElements,
+#                 {'2010.09.20': 0.8317,
 #                 }),
-# 
-# 
-#             (self.runGetElementsByClassType, 
-#                 {'2010.09.20': 3.28, 
+#
+#
+#             (self.runGetElementsByClassType,
+#                 {'2010.09.20': 3.28,
 #                 }),
-# 
-#             (self.runGetElementsByClassString, 
-#                 {'2010.09.20': 3.22, 
+#
+#             (self.runGetElementsByClassString,
+#                 {'2010.09.20': 3.22,
 #                 }),
-# 
-#             (self.runParseBeethoven, 
-#                 {'2009.12.14': 7.42, 
+#
+#             (self.runParseBeethoven,
+#                 {'2009.12.14': 7.42,
 #                  '2009.12.15': 6.686,
 #                  '2010.06.24': 7.475,
 #                  '2010.07.08': 3.562,
 #                 }),
-# 
-#             (self.runMusicxmlOutPartsBeethoven, 
-#                 {'2010.09.20': 7.706, 
+#
+#             (self.runMusicxmlOutPartsBeethoven,
+#                 {'2010.09.20': 7.706,
 #                 }),
-# 
-#             (self.runMusicxmlOutScoreBeethoven, 
-#                 {'2010.09.20': 33.273, 
-#                  '2010.10.07': 11.9290, 
-#                 }),
-
-
-# 
-#             (self.runCreatePitches, 
-#                 {'2011.04.12': 31.071, 
+#
+#             (self.runMusicxmlOutScoreBeethoven,
+#                 {'2010.09.20': 33.273,
+#                  '2010.10.07': 11.9290,
 #                 }),
 
 
-#             (self.runParseHaydn, 
-#                 {'2009.12.14': 4.08, 
+#
+#             (self.runCreatePitches,
+#                 {'2011.04.12': 31.071,
+#                 }),
+
+
+#             (self.runParseHaydn,
+#                 {'2009.12.14': 4.08,
 #                  '2009.12.15': 3.531,
 #                  '2010.06.24': 3.932,
 #                  '2010.07.08': 1.935,
 #                 }),
-#             (self.runParseSchumann, 
-#                 {'2009.12.14': 5.88, 
+#             (self.runParseSchumann,
+#                 {'2009.12.14': 5.88,
 #                  '2009.12.15': 5.126,
 #                  '2010.06.24': 5.799,
 #                  '2010.07.08': 2.761,
 #                 }),
-#             (self.runParseLuca, 
-#                 {'2009.12.14': 3.174, 
+#             (self.runParseLuca,
+#                 {'2009.12.14': 3.174,
 #                  '2009.12.15': 2.954,
 #                  '2010.06.24': 3.063,
 #                  '2010.07.08': 1.508,
 #                 }),
-# 
-#             (self.runMusicxmlOutLuca, 
-#                 {'2010.09.20': 8.372, 
-#                  '2010.10.07': 4.5613, 
+#
+#             (self.runMusicxmlOutLuca,
+#                 {'2010.09.20': 8.372,
+#                  '2010.10.07': 4.5613,
 #                 }),
-# 
+#
 
-#             (self.runParseMonteverdiRNText, 
-#                 {'2011.02.27': 6.411, 
-#                  '2011.02.28': 2.944, 
+#             (self.runParseMonteverdiRNText,
+#                 {'2011.02.27': 6.411,
+#                  '2011.02.28': 2.944,
 #                 }),
 
             ]: # end of long for loop
@@ -381,9 +387,9 @@ class Test(unittest.TestCase):
             items = best.items()
             items.sort()
             items.reverse()
-            environLocal.printDebug(['\n\ntiming tolerance for:',     
-                str(testMethod.__doc__.strip()), 
-                '\nthis run:', dur, '\nbest runs:', 
+            environLocal.printDebug(['\n\ntiming tolerance for:',
+                str(testMethod.__doc__.strip()),
+                '\nthis run:', dur, '\nbest runs:',
                 ['%s: %s' % (x, y) for x, y in items], '\n'
                 ]
             )

@@ -3,10 +3,10 @@
 This file contains Music21's version number information.
 
 As of v.2.0.0, Music21 uses something close to the principles of Semantic Versioning, we'll
-try very hard so that X.Y.Z have meanings about changes to the system.  
+try very hard so that X.Y.Z have meanings about changes to the system.
 Changes in X represent changes that will break old features.
 New Y numbers add new features; Z -- bug fixes.  This means that the X number
-will change more often than before.  
+will change more often than before.
 
 Differences with strict semantic versioning: I won't make 100% guarantees that we'll never
 break anything without a change in the major number, esp. if the change affects a tiny
@@ -38,12 +38,12 @@ tuple assigned to __version_info__, and the __version__ string will be
 updated along with it.
 
 When changing, update the single test case in base.py, and in freezeThaw.JSONFreezer.jsonPrint
-(on a major version change). If you dare edit a 28MB file, change it 
+(on a major version change). If you dare edit a 28MB file, change it
 at the end of the two corpus/metadataCache .jsons, but only a problem there sometimes.
 
 Changing this number invalidates old pickles -- do it if the old pickles create a problem.
 '''
 
-__version_info__ = (4, 0, 4)
+__version_info__ = (4, 0, 7)
 __version__ = '.'.join(str(x) for x in __version_info__)
 

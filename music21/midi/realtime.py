@@ -10,13 +10,13 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
-Objects for realtime playback of Music21 Streams as MIDI. 
+Objects for realtime playback of Music21 Streams as MIDI.
 
 From an idea of Joe "Codeswell":
 
 http://joecodeswell.wordpress.com/2012/06/13/
 how-to-produce-python-controlled-audio-output-from-music-made-with-music21
-  
+
 http://stackoverflow.com/questions/10983462/
 how-can-i-produce-real-time-audio-output-from-music-made-with-music21
 
@@ -49,112 +49,112 @@ class StreamPlayer(object):
     '''
     Create a player for a stream that plays its midi version in realtime using pygame.
 
-    Set up a detuned piano (where each key has a random but 
+    Set up a detuned piano (where each key has a random but
     consistent detuning from 30 cents flat to sharp)
     and play a Bach Chorale on it in real time.
-    
-    
+
+
     >>> import random
     >>> keyDetune = []
-    >>> for i in range(0, 127):
+    >>> for i in range(127):
     ...    keyDetune.append(random.randint(-30, 30))
-    
+
     >>> #_DOCS_SHOW b = corpus.parse('bwv66.6')
     >>> #_DOCS_SHOW for n in b.flat.notes:
     >>> class PitchMock(): midi = 20 #_DOCS_HIDE
-    >>> class Mock(): pitch = PitchMock() #_DOCS_HIDE 
+    >>> class Mock(): pitch = PitchMock() #_DOCS_HIDE
     >>> #_DOCS_HIDE -- should not playback in doctests, see TestExternal
     >>> n = Mock() #_DOCS_HIDE
     >>> for i in [1]: #_DOCS_HIDE
     ...    n.pitch.microtone = keyDetune[n.pitch.midi]
     >>> #_DOCS_SHOW sp = midi.realtime.StreamPlayer(b)
     >>> #_DOCS_SHOW sp.play()
-     
+
     The stream is stored (unaltered) in `StreamPlayer.streamIn`, and can be changed any time the
     midi file is not playing.
-     
+
     A number of mixer controls can be passed in with keywords:
-    
+
     *  mixerFreq (default 44100 -- CD quality)
-    *  mixerBitSize (default -16 (=unsigned 16bit) -- 
+    *  mixerBitSize (default -16 (=unsigned 16bit) --
          really, are you going to do 24bit audio with Python?? :-)  )
     *  mixerChannels (default 2 = stereo)
     *  mixerBuffer (default 1024 = number of samples)
     '''
     mixerInitialized = False
-    
+
     def __init__(self, streamIn, **keywords):
         try:
             import pygame
             self.pygame = pygame
         except ImportError:
             raise StreamPlayerException("StreamPlayer requires pygame.  Install first")
-        if (self.mixerInitialized is False or 
+        if (self.mixerInitialized is False or
                 ("reinitMixer" in keywords and keywords["reinitMixer"] != False)):
             if "mixerFreq" in keywords:
                 mixerFreq = keywords["mixerFreq"]
             else:
                 mixerFreq = 44100
-            
+
             if "mixerBitSize" in keywords:
                 mixerBitSize = keywords['mixerBitSize']
             else:
                 mixerBitSize = -16
-            
+
             if "mixerChannels" in keywords:
                 mixerChannels = keywords['mixerChannels']
             else:
                 mixerChannels = 2
-            
+
             if "mixerBuffer" in keywords:
                 mixerBuffer = keywords['mixerBuffer']
             else:
                 mixerBuffer = 1024
-            
+
             pygame.mixer.init(mixerFreq, mixerBitSize, mixerChannels, mixerBuffer)
-        
+
         self.streamIn = streamIn
-    
-    def play(self, busyFunction=None, busyArgs=None, 
+
+    def play(self, busyFunction=None, busyArgs=None,
              endFunction=None, endArgs=None, busyWaitMilliseconds=50):
         '''
         busyFunction is a function that is called with busyArgs when the music is busy every
         busyWaitMilliseconds.
-        
-        endFunction is a function that is called with endArgs when the music finishes playing.    
+
+        endFunction is a function that is called with endArgs when the music finishes playing.
         '''
         streamStringIOFile = self.getStringOrBytesIOFile()
-        self.playStringIOFile(streamStringIOFile, busyFunction, busyArgs, 
+        self.playStringIOFile(streamStringIOFile, busyFunction, busyArgs,
                               endFunction, endArgs, busyWaitMilliseconds)
 
     def getStringOrBytesIOFile(self):
         streamMidiFile = midiTranslate.streamToMidiFile(self.streamIn)
         streamMidiWritten = streamMidiFile.writestr()
         return StrByIO(streamMidiWritten)
-    
-    def playStringIOFile(self, stringIOFile, busyFunction=None, busyArgs=None, 
+
+    def playStringIOFile(self, stringIOFile, busyFunction=None, busyArgs=None,
                          endFunction=None, endArgs=None, busyWaitMilliseconds=50):
         '''
         busyFunction is a function that is called with busyArgs when the music is busy every
         busyWaitMilliseconds.
-        
-        endFunction is a function that is called with endArgs when the music finishes playing.    
+
+        endFunction is a function that is called with endArgs when the music finishes playing.
         '''
         pygameClock = self.pygame.time.Clock()
         try:
             self.pygame.mixer.music.load(stringIOFile)
         except self.pygame.error:
             raise StreamPlayerException(
-                "Could not play music file %s because: %s" % (stringIOFile, 
+                "Could not play music file %s because: %s" % (stringIOFile,
                                                               self.pygame.get_error()))
         self.pygame.mixer.music.play()
         framerate = int(1000/busyWaitMilliseconds) # coerce into int even if given a float.
-        
+
         while self.pygame.mixer.music.get_busy():
             if busyFunction is not None:
                 busyFunction.__call__(busyArgs)
             pygameClock.tick(framerate)
-        
+
         if endFunction is not None:
             endFunction.__call__(endArgs)
 
@@ -162,13 +162,13 @@ class Test(unittest.TestCase):
     pass
 
 class TestExternal(unittest.TestCase):
-    
+
     def testBachDetune(self):
         from music21 import corpus
         import random
         b = corpus.parse('bwv66.6')
         keyDetune = []
-        for i in range(0, 127):
+        for i in range(127):
             keyDetune.append(random.randint(-30, 30))
         for n in b.flat.notes:
             n.pitch.microtone = keyDetune[n.pitch.midi]
@@ -179,30 +179,30 @@ class TestExternal(unittest.TestCase):
         '''
         tests to see if the busyCallback function is called properly
         '''
-        
+
         from music21 import corpus
         import random
-        
+
         def busyCounter(timeList):
             timeCounter = timeList[0]
             timeCounter.times += timeCounter.updateTime
             print("hi! waited %d milliseconds" % (timeCounter.times))
-        
+
         class Mock():
             times = 0
-        
+
         timeCounter = Mock()
         timeCounter.updateTime = 500 # pylint: disable=attribute-defined-outside-init
-        
+
         b = corpus.parse('bach/bwv66.6')
         keyDetune = []
-        for i in range(0, 127):
+        for i in range(127):
             keyDetune.append(random.randint(-30, 30))
         for n in b.flat.notes:
             n.pitch.microtone = keyDetune[n.pitch.midi]
         sp = StreamPlayer(b)
         sp.play(busyFunction=busyCounter, busyArgs=[timeCounter], busyWaitMilliseconds=500)
-            
+
     def xtestPlayOneMeasureAtATime(self):
         from music21 import corpus
         defaults.ticksAtStart = 0
@@ -212,7 +212,7 @@ class TestExternal(unittest.TestCase):
         for i in range(maxMeasure):
             measures.append(b.measure(i))
         sp = StreamPlayer(b)
-                
+
         for i in range(len(measures)):
             sp.streamIn = measures[i]
             sp.play()
@@ -224,7 +224,7 @@ class TestExternal(unittest.TestCase):
         # pylint: disable=attribute-defined-outside-init
         from music21 import stream, note
         import random
-        
+
         def getRandomStream():
             s = stream.Stream()
             for i in range(4):
@@ -235,12 +235,12 @@ class TestExternal(unittest.TestCase):
             #lastN.duration.quarterLength = .75
             s.append(lastN)
             return s
-        
+
         def restoreList(timeList):
             timeCounter = timeList[0]
             streamPlayer = timeList[1]
-            currentPos = streamPlayer.pygame.mixer.music.get_pos() 
-            if currentPos < 500 and timeCounter.lastPos >= 500: 
+            currentPos = streamPlayer.pygame.mixer.music.get_pos()
+            if currentPos < 500 and timeCounter.lastPos >= 500:
                 timeCounter.times -= 1
                 if timeCounter.times > 0:
                     streamPlayer.streamIn = getRandomStream()
@@ -250,7 +250,7 @@ class TestExternal(unittest.TestCase):
                     timeCounter.lastPos = currentPos
             else:
                 timeCounter.lastPos = currentPos
-        
+
         class TimePlayer():
             ready = False
             times = 3
@@ -260,12 +260,12 @@ class TestExternal(unittest.TestCase):
 
         b = getRandomStream()
         sp = StreamPlayer(b)
-        timeCounter.storedIOFile = sp.getStringOrBytesIOFile()  
+        timeCounter.storedIOFile = sp.getStringOrBytesIOFile()
         while timeCounter.times > 0:
             timeCounter.ready = False
-            sp.playStringIOFile(timeCounter.storedIOFile, 
-                                busyFunction=restoreList, 
-                                busyArgs=[timeCounter, sp], 
+            sp.playStringIOFile(timeCounter.storedIOFile,
+                                busyFunction=restoreList,
+                                busyArgs=[timeCounter, sp],
                                 busyWaitMilliseconds = 30)
 
 if __name__ == '__main__':

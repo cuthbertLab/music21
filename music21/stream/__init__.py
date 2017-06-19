@@ -8,7 +8,7 @@
 #               Josiah Wolf Oberholtzer
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 '''
@@ -113,7 +113,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     The first element passed to the Stream is an optional list,
     tuple, or other Stream of music21 objects which is used to
-    populate the Stream by inserting each object at 
+    populate the Stream by inserting each object at
     its :attr:`~music21.base.Music21Object.offset`
     property. Other arguments and keywords are ignored, but are
     allowed so that subclassing the Stream is easier.
@@ -171,15 +171,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
         'recursionType': '''
-            Class variable: 
-            
+            Class variable:
+
             String of ('elementsFirst' (default), 'flatten', 'elementsOnly)
             that decides whether the stream likely holds relevant
-            contexts for the elements in it.  
-            
+            contexts for the elements in it.
+
             Define this for a stream class, not an individual object.
-            
-            see :meth:`~music21.base.Music21Object.contextSites` 
+
+            see :meth:`~music21.base.Music21Object.contextSites`
             ''',
         'isSorted': '''
             Boolean describing whether the Stream is sorted or not.
@@ -210,7 +210,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         base.Music21Object.__init__(self, **keywords)
         core.StreamCoreMixin.__init__(self)
 
-        self.streamStatus = streamStatus.StreamStatus(self)        
+        self.streamStatus = streamStatus.StreamStatus(self)
         self._unlinkedDuration = None
 
         self.autoSort = True
@@ -222,13 +222,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         self._atSoundingPitch = 'unknown' # True, False, or unknown
 
         # experimental
-        self._mutable = True        
+        self._mutable = True
 
         if givenElements is not None:
             # TODO: perhaps convert a single element into a list?
             try:
                 for e in givenElements:
-                    self._insertCore(e.offset, e) 
+                    self._insertCore(e.offset, e)
             except (AttributeError, TypeError):
                 raise StreamException("Unable to insert {0}".format(e))
             self.elementsChanged()
@@ -249,7 +249,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self.sort()
         return super(Stream, self).write(*args, **kwargs)
 
-    
+
     def show(self, *args, **kwargs):
         #...    --- see base.py calls .write(
         if self.isSorted is False and self.autoSort:
@@ -282,7 +282,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         16
 
         Includes end elements:
-        
+
         >>> b.storeAtEnd(bar.Barline('double'))
         >>> len(b)
         5
@@ -315,15 +315,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         Get a Music21Object from the Stream using a variety of keys or indices.
 
-        If an int is given, the Music21Object at the index is returned. If the Stream is sorted 
+        If an int is given, the Music21Object at the index is returned. If the Stream is sorted
         (if isSorted is True), the elements are returned in order.
 
-        If a class name is given (as a string or name), 
-        :meth:`~music21.stream.Stream.getElementsByClass` is used to return a Stream of the 
+        If a class name is given (as a string or name),
+        :meth:`~music21.stream.Stream.getElementsByClass` is used to return a Stream of the
         elements that match the requested class.
 
-        If a string is given, :meth:`~music21.stream.Stream.getElementById` first, then 
-        (if no results are found) :meth:`~music21.stream.Stream.getElementsByGroup` is used to 
+        If a string is given, :meth:`~music21.stream.Stream.getElementById` first, then
+        (if no results are found) :meth:`~music21.stream.Stream.getElementsByGroup` is used to
         collect and return elements as a Stream.
 
         >>> a = stream.Part(id='hello')
@@ -332,7 +332,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> subslice
         <music21.stream.Part hello>
         >>> subslice.derivation
-        <Derivation of <music21.stream.Part hello> from 
+        <Derivation of <music21.stream.Part hello> from
             <music21.stream.Part hello> via "__getitem__">
         >>> len(subslice)
         3
@@ -340,7 +340,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         1.0
         >>> subslice[1].offset
         3.0
-        
+
         >>> b = note.Note()
         >>> b.id = 'green'
         >>> b.groups.append('violin')
@@ -352,24 +352,24 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> allNotes
         <music21.stream.Part hello>
         >>> allNotes.derivation
-        <Derivation of <music21.stream.Part hello> from 
+        <Derivation of <music21.stream.Part hello> from
             <music21.stream.Part hello> via "getElementsByClass">
         >>> allNotes[0] is b
         True
-        
+
         Get items by groups:
-        
+
         >>> violinGroup = a['violin']
         >>> violinGroup
         <music21.stream.Part hello>
         >>> violinGroup.derivation
-        <Derivation of <music21.stream.Part hello> from 
+        <Derivation of <music21.stream.Part hello> from
             <music21.stream.Part hello> via "getElementsByGroup">
         >>> violinGroup[0] is b
         True
-        
+
         Get a single element by id:
-        
+
         >>> a['green'] is b
         True
         '''
@@ -389,7 +389,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     match = self.elements[k]
                 except IndexError:
                     raise StreamException(
-                            'attempting to access index %s while elements is of size %s' % 
+                            'attempting to access index %s while elements is of size %s' %
                                           (k, len(self.elements)))
             # setting active site as cautionary measure
             match.activeSite = self
@@ -401,12 +401,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             try:
                 found = self.cloneEmpty(derivationMethod='__getitem__')
             except TypeError:
-                raise StreamException(("Error in defining class: %r. "  % self.__class__) + 
+                raise StreamException(("Error in defining class: %r. "  % self.__class__) +
                                 "Stream subclasses and Music21Objects cannot have required " +
                                 "arguments in __init__" )
             for e in self.elements[k]:
                 found._insertCore(self.elementOffset(e), e)
-            
+
             found.elementsChanged(clearIsSorted=False)
             return found
 
@@ -446,7 +446,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         they appear as a single list.
 
         Note that by the time you call .elements
-        the offsets 
+        the offsets
         '''
         if 'elements' not in self._cache or self._cache["elements"] is None:
             # this list concatenation may take time; thus, only do when
@@ -460,35 +460,35 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         Sets this streams elements to the elements in another stream (just give
         the stream, not the stream's .elements), or to a list of elements.
-        
+
         Safe:
-        
+
         newStream.elements = oldStream
-        
+
         Unsafe:
-        
+
         newStream.elements = oldStream.elements
-        
+
         Why?
-        
+
         The activeSites of some elements may have changed between retrieving
         and setting (esp. if a lot else has happened in the meantime). Where
         are we going to get the new stream's elements' offsets from? why
         from their active sites! So don't do this!
         '''
         if (not common.isListLike(value)
-                and hasattr(value, 'isStream') 
+                and hasattr(value, 'isStream')
                 and value.isStream):
             # set from a Stream. Best way to do it
             self._offsetDict = {}
             self._elements = list(value._elements) # copy list.
             for e in self._elements:
-                self.setElementOffset(e, value.elementOffset(e))
+                self.setElementOffset(e, value.elementOffset(e), addElement=True)
                 e.sites.add(self)
                 e.activeSite = self
             self._endElements = list(value._endElements)
             for e in self._endElements:
-                self.setElementOffset(e, value.elementOffset(e, stringReturn=True))
+                self.setElementOffset(e, value.elementOffset(e, stringReturn=True), addElement=True)
                 e.sites.add(self)
                 e.activeSite = self
         else:
@@ -497,7 +497,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self._endElements = []
             self._offsetDict = {}
             for e in self._elements:
-                self.setElementOffset(e, e.offset)
+                self.setElementOffset(e, e.offset, addElement=True)
                 e.sites.add(self)
                 e.activeSite = self
         self.elementsChanged()
@@ -509,12 +509,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Directly getting, setting, and manipulating this list is
         reserved for advanced usage. Instead, use the the
-        provided high-level methods. 
-        
+        provided high-level methods.
+
         In other words:  Don't use unless you really know what you're doing.
         Treat a Stream like a list!
-        
-        
+
+
         When setting .elements, a
         list of Music21Objects can be provided, or a complete Stream.
         If a complete Stream is provided, elements are extracted
@@ -542,7 +542,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> len(a.flat.notes) == len(b.flat.notes) == 20
         True
-        
+
         :rtype: list(base.Music21Object)
         ''')
 
@@ -569,12 +569,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         # remove old value at this position
         oldValue = self._elements[k]
+        del self._offsetDict[id(oldValue)]
         oldValue.sites.remove(self)
         oldValue.activeSite = None
 
         # assign in new position
         self._elements[k] = value
-        self.setElementOffset(value, value.offset)
+        self.setElementOffset(value, value.offset, addElement=True)
         value.activeSite = self
         # must get native offset
 
@@ -609,8 +610,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         Add, or concatenate, two Streams.
 
-        Presently, this does not manipulate the offsets of the incoming elements 
-        to actually be at the end of the Stream. This may be a problem that 
+        Presently, this does not manipulate the offsets of the incoming elements
+        to actually be at the end of the Stream. This may be a problem that
         makes this method not so useful?
 
 
@@ -620,9 +621,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> b.repeatInsert(note.Note("G"), list(range(5)))
         >>> c = a + b
         >>> c.pitches[0:4] # autoSort is True, thus a sorted version results
-        [<music21.pitch.Pitch C>, 
-         <music21.pitch.Pitch G>, 
-         <music21.pitch.Pitch C>, 
+        [<music21.pitch.Pitch C>,
+         <music21.pitch.Pitch G>,
+         <music21.pitch.Pitch C>,
          <music21.pitch.Pitch G>]
         >>> len(c.notes)
         10
@@ -665,13 +666,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         As a container class, Streams return True if they are non-empty
         and False if they are empty:
-        
+
         >>> def testBool(s):
         ...    if s:
         ...        return True
         ...    else:
         ...        return False
-        
+
         >>> s = stream.Stream()
         >>> testBool(s)
         False
@@ -687,7 +688,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if self._endElements:
             return True
         return False
-    
+
     if six.PY2:
         __nonzero__ = __bool__
 
@@ -695,7 +696,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def _getClef(self):
         clefList = self.iter.getElementsByClass('Clef').getElementsByOffset(0)
         # casting to list added 20microseconds...
-        if len(clefList) == 0:
+        if not clefList:
             return None
         else:
             return clefList[0]
@@ -713,8 +714,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         self.insert(0.0, clefObj)
         # for some reason needed to make sure that sorting of Clef happens before TimeSignature
         # TODO: Test if this can be deleted...
-        self.elementsChanged() 
-        
+        self.elementsChanged()
+
     clef = property(_getClef, _setClef, doc='''
         Finds or sets a :class:`~music21.clef.Clef` at offset 0.0 in the measure:
 
@@ -739,7 +740,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> thisTrebleClef.getOffsetBySite(m)
         Traceback (most recent call last):
-        music21.sites.SitesException: an entry for this object <music21.clef.TrebleClef> is not 
+        music21.sites.SitesException: an entry for this object <music21.clef.TrebleClef> is not
               stored in stream <music21.stream.Measure 10 offset=0.0>
 
 
@@ -764,7 +765,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #environLocal.printDebug([
         #    'matched Measure classes of type TimeSignature', tsList, len(tsList)])
         # only return timeSignatures at offset = 0.0
-        if len(tsList) == 0:
+        if not tsList:
             return None
         else:
             return tsList[0]
@@ -809,7 +810,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         keyList = self.iter.getElementsByClass('KeySignature').getElementsByOffset(0)
         # for k in keyList:  # this method was 40 microseconds slower than the len(x) below
         #     return k
-        if len(keyList) == 0:
+        if not keyList:
             return None
         else:
             return keyList[0]
@@ -843,11 +844,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         During the transition period to the new iteration system,
         there may be times when someone thinks something is a StreamIterator
         (which needs to have .stream() called on it to make a new Stream) but
-        actually already has a `Stream`.  
-        
+        actually already has a `Stream`.
+
         So this is a temporary method.  It will eventually become deprecated
         and then removed.
-        
+
         TODO: 2016 May??? Remove.
         '''
         return self
@@ -856,8 +857,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def cloneEmpty(self, derivationMethod=None):
         '''
         Create a Stream that is identical to this one except that the elements are empty
-        and set derivation (Should this be deleted??? 
-        
+        and set derivation (Should this be deleted???)
+
         >>> p = stream.Part()
         >>> p.autoSort = False
         >>> p.id = 'hi'
@@ -885,7 +886,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def mergeAttributes(self, other):
         '''
         Merge relevant attributes from the Other stream into this one.
-        
+
         >>> s = stream.Stream()
         >>> s.autoSort = False
         >>> s.id = 'hi'
@@ -898,7 +899,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         base.Music21Object.mergeAttributes(self, other)
 
-        for attr in ('autoSort','isSorted'):
+        for attr in ('autoSort', 'isSorted'):
             if hasattr(other, attr):
                 setattr(self, attr, getattr(other, attr))
 
@@ -1059,20 +1060,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         raise StreamException('cannot find object (%s) in Stream' % obj)
 
 
-    def remove(self, 
-               targetOrList, 
-               firstMatchOnly=True, 
-               shiftOffsets=False, 
-               recurse=False): 
+    def remove(self,
+               targetOrList,
+               firstMatchOnly=True,
+               shiftOffsets=False,
+               recurse=False):
         '''
         Remove an object from this Stream. Additionally, this Stream is
         removed from the object's sites in :class:`~music21.sites.Sites`.
 
-        By default, only the first match is removed. This can be adjusted 
+        By default, only the first match is removed. This can be adjusted
         with the `firstMatchOnly` parameters.
-        If a list of objects is passed, they will all be removed. 
+        If a list of objects is passed, they will all be removed.
         If shiftOffsets is True, then offsets will be
-        corrected after object removal. It is more efficient to pass 
+        corrected after object removal. It is more efficient to pass
         a list of objects than to call remove on
         each object individually if shiftOffsets is True.
 
@@ -1101,7 +1102,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> n1, n2, n3, n4 = note.Note('a'), note.Note('b'), note.Note('c'), note.Note('d')
         >>> n5, n6, n7, n8 = note.Note('e'), note.Note('f'), note.Note('g'), note.Note('a')
         >>> s2.insert(0.0, c)
-        >>> s2.append([n1,n2,n3,n4,n5,n6,n7,n8])
+        >>> s2.append([n1, n2, n3, n4, n5, n6, n7, n8])
         >>> s2.remove(n1, shiftOffsets=True)
         >>> s2.show('text')
         {0.0} <music21.clef.TrebleClef>
@@ -1121,10 +1122,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {2.0} <music21.note.Note G>
         {3.0} <music21.note.Note A>
 
-        With the recurse=True parameter, we can remove elements deeply nested. 
+        With the recurse=True parameter, we can remove elements deeply nested.
         However, shiftOffsets
         does not work with recurse=True yet.
-        
+
         >>> p1 = stream.Part()
         >>> m1 = stream.Measure(number=1)
         >>> c = clef.BassClef()
@@ -1146,7 +1147,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             {2.0} <music21.note.Note C>
 
         Without recurse=True:
-        
+
         >>> p1.remove(n2)
         >>> p1.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -1157,7 +1158,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             {2.0} <music21.note.Note C>
 
         With recurse=True:
-        
+
         >>> p1.remove(n2, recurse=True)
         >>> p1.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -1167,7 +1168,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             {2.0} <music21.note.Note C>
 
         With recurse=True and a list to remove:
-        
+
         >>> p1.remove([c, n3], recurse=True)
         >>> p1.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -1179,13 +1180,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if self._mutable is False:
             raise ImmutableStreamException()
         # TODO: Next to clean up... a doozy -- filter out all the different options.
-        
+
         # TODO: Add a renumber measures option
         # TODO: Shift offsets if recurse is True
         if shiftOffsets is True and recurse is True:
             raise StreamException(
                     "Cannot do both shiftOffsets and recurse search at the same time...yet")
-        
+
         if not common.isListLike(targetOrList):
             targetList = [targetOrList]
         elif len(targetOrList) > 1:
@@ -1200,7 +1201,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         if shiftOffsets:
             shiftDur = 0.0
-            
+
         for i, target in enumerate(targetList):
             try:
                 indexInStream = self.index(target)
@@ -1216,8 +1217,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         except (StreamException, sites.SitesException):
                             continue
                 # recursion matched or didn't or wasn't run. either way no need for rest...
-                continue 
-            
+                continue
+
             # TODO: Anything that messes with ._elements or ._endElements should be in core.py
             # move it...
             match = None
@@ -1241,7 +1242,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 match.sites.remove(self)
                 match.activeSite = None
 
-            if shiftOffsets is True and matchedEndElement is False: 
+            if shiftOffsets is True and matchedEndElement is False:
                 matchDuration = match.duration.quarterLength
                 shiftedRegionStart = matchOffset + matchDuration
                 if (i + 1) < len(targetList):
@@ -1276,7 +1277,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> junk = a.pop(0)
         >>> len(a)
         9
-        
+
         :rtype: base.Music21Object
         '''
         eLen = len(self._elements)
@@ -1310,7 +1311,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             popDict[ai['iterSection']].append(ai['sectionIndex'])
 
         # do not pop while iterating...
-        
+
         for section in popDict:
             sectionList = getattr(self, section) # _elements or _endElements
             popList = popDict[section]
@@ -1327,7 +1328,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # call elements changed once; sorted arrangement has not changed
         self.elementsChanged(clearIsSorted=False)
-        return  
+        return
 
     def removeByClass(self, classFilterList):
         '''
@@ -1358,7 +1359,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.removeByClass('Barline')
         >>> len(s)
         5
-        
+
         '''
         elFilter = self.iter.getElementsByClass(classFilterList)
         return self._removeIteration(elFilter)
@@ -1383,11 +1384,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #if classFilterList == []:
         #    classFilterList = ['Music21Object']
         elFilter = self.iter.getElementsNotOfClass(classFilterList)
-        return self._removeIteration(elFilter)    
+        return self._removeIteration(elFilter)
 
 
     def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
-        # NOTE: this is a performance critical operation        
+        # NOTE: this is a performance critical operation
         defaultIgnoreSet = {'_offsetDict', 'streamStatus', '_elements', '_endElements', '_cache',
                             }
         if ignoreAttributes is None:
@@ -1419,9 +1420,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if '_elements' in ignoreAttributes:
             # must manually add elements to new Stream
             for e in self._elements:
-                #environLocal.printDebug(['deepcopy()', e, 'old', old, 'id(old)', id(old), 
-                # 'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e), 
-                # 'e.activeSite', e.activeSite, 'e.getSites()', e.getSites(), 'e.getSiteIds()', 
+                #environLocal.printDebug(['deepcopy()', e, 'old', old, 'id(old)', id(old),
+                # 'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e),
+                # 'e.activeSite', e.activeSite, 'e.getSites()', e.getSites(), 'e.getSiteIds()',
                 # e.getSiteIds()], format='block')
                 # this will work for all with __deepcopy___
                 # get the old offset from the activeSite Stream
@@ -1429,7 +1430,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 #new.insert(e.getOffsetBySite(old), newElement,
                 #           ignoreSort=True)
                 offset = self.elementOffset(e)
-                newElement = copy.deepcopy(e, memo)
+                if not e.isStream:
+                    newElement = copy.deepcopy(e, memo)
+                else: # this prevents needing to make multipl replacements of spanner bundles
+                    newElement = e._deepcopySubclassable(memo)
+                
                 ### TEST on copying!!!!
                 #if 'Note' in newElement.classes:
                 #    newElement.pitch.ps += 2.0
@@ -1440,31 +1445,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # this will work for all with __deepcopy___
                 # get the old offset from the activeSite Stream
                 # user here to provide new offset
-                new._storeAtEndCore(copy.deepcopy(e, memo))                
+                new._storeAtEndCore(copy.deepcopy(e, memo))
 
-        # caching this is CRUCIAL! using new.spannerBundle ever time below added
-        # 40% to the test suite time!
-        newSpannerBundle = new.spannerBundle
-        # only proceed if there are spanners, otherwise creating semiFlat
-        if len(newSpannerBundle) > 0:
-            # iterate over complete semi-flat (need containers); find
-            # all new/old pairs
-            for e in new.recurse(skipSelf=True):
-                # update based on id of old object, and ref to new object
-                if e.sites.hasSpannerSite() and 'Spanner' not in e.classes:
-                    #environLocal.printDebug(['Stream.__deepcopy__', 'replacing component to', e])
-                    # this will clear and replace the proper locations on
-                    # the SpannerStorage Stream
-                    origin = e.derivation.origin
-                    if (origin is not None and e.derivation.method == '__deepcopy__'):
-                        newSpannerBundle.replaceSpannedElement(origin, e)
-                    # need to remove the old SpannerStorage Stream from this element; 
-                    # however, all we have here is the new Spanner and new elements
-                    # this must be done here, not when originally copying
+        return new
 
-                            
-                    e.purgeOrphans(excludeStorageStreams=False)
-
+    def __deepcopy__(self, memo=None):
+        '''
+        Deepcopy the stream from copy.deepcopy()
+        '''
+        # does not purgeOrphans -- q: is that a bug or by design?
+        new = self._deepcopySubclassable(memo)
+        self._replaceSpannerBundleForDeepcopy(new)
+       
         # purging these orphans works in nearly all cases, but there are a few
         # cases where we rely on a Stream having access to Stream it was
         # part of after deepcopying
@@ -1472,35 +1464,88 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return new
 
 
+    def _replaceSpannerBundleForDeepcopy(self, new):
+        # perform the spanner bundle replacement on the outer stream.
+        # caching this is CRUCIAL! using new.spannerBundle ever time below added
+        # 40% to the test suite time!
+        newSpannerBundle = new.spannerBundle
+        # only proceed if there are spanners, otherwise creating semiFlat
+        if not newSpannerBundle:
+            return
+        # iterate over complete semi-flat (need containers); find
+        # all new/old pairs
+        for e in new.recurse(skipSelf=True):
+            # update based on id of old object, and ref to new object
+            if 'Spanner' in e.classes:
+                continue
+            if e.derivation.method != '__deepcopy__':
+                continue
+            
+            origin = e.derivation.origin
+            if origin is None:
+                continue # should not happen...
+            
+            if origin.sites.hasSpannerSite():
+                #environLocal.printDebug(['Stream.__deepcopy__', 'replacing component to', e])
+                # this will clear and replace the proper locations on
+                # the SpannerStorage Stream
+                newSpannerBundle.replaceSpannedElement(origin, e)
+                
+                # need to remove the old SpannerStorage Stream from this element;
+                # however, all we have here is the new Spanner and new elements
+                # this must be done here, not when originally copying
+                e.purgeOrphans(excludeStorageStreams=False)
 
-    def __deepcopy__(self, memo=None):
-        '''
-        Deepcopy the stream from copy.deepcopy()
-        '''
-        # does not purgeOrphans -- q: is that a bug or by design?
-        return self._deepcopySubclassable(memo)
 
-
-
-
-    def setElementOffset(self, element, offset):
+    def setElementOffset(self, element, offset, addElement=False):
         '''
         Sets the Offset for an element, very quickly.
-        
-        Too quickly.  TODO: check if the offset is actually in the stream!
+
+        >>> s = stream.Stream()
+        >>> s.id = 'Stream1'
+        >>> n = note.Note("B-4")
+        >>> s.insert(10, n)
+        >>> n.offset
+        10.0
+        >>> s.setElementOffset(n, 20.0)
+        >>> n.offset
+        20.0
+        >>> n.getOffsetBySite(s)
+        20.0
+
+        If the element is not in the Stream, raises a StreamException:
+
+        >>> n2 = note.Note('D')
+        >>> s.setElementOffset(n2, 30.0)
+        Traceback (most recent call last):
+        music21.exceptions21.StreamException: Cannot set the offset for element
+            <music21.note.Note D>, not in Stream <music21.stream.Stream Stream1>.
+
+        ...unless addElement is explicitly set to True (this is a core function that should NOT be
+        used in normal situations.
+        it is used by .insert() and .append() and other core functions; other things
+        must also be done to
+        properly add an element.)
+
+        >>> n2 = note.Note('D')
+        >>> s.setElementOffset(n2, 30.0, addElement=True)
         '''
         try:
             offset = opFrac(offset)
         except TypeError:
             pass
-        
-        self._offsetDict[id(element)] = (offset, element) # fast
-    
+
+        idEl = id(element)
+        if not addElement and idEl not in self._offsetDict:
+            raise StreamException(
+                "Cannot set the offset for element {}, not in Stream {}.".format(element, self))
+        self._offsetDict[idEl] = (offset, element) # fast
+
     def elementOffset(self, element, stringReturns=False):
         '''
         Return the offset as an opFrac (float or Fraction) from the offsetMap.
         highly optimized for speed.
-        
+
 
         >>> m = stream.Measure(number=1)
         >>> m.append(note.Note('C'))
@@ -1510,17 +1555,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         1.0
 
         If stringReturns is True then returns like 'highestOffset' are allowed.
-        
+
         >>> b = bar.Barline()
         >>> m.storeAtEnd(b)
         >>> m.elementOffset(b)
         2.0
         >>> m.elementOffset(b, stringReturns=True)
-        'highestTime' 
-        
+        'highestTime'
+
         Unlike element.getOffsetBySite(self), this method will NOT follow derivation chains
         and in fact will raise a sites.SitesException
-        
+
         >>> import copy
         >>> p = stream.Part(id='sPart')
         >>> p.insert(20, m)
@@ -1528,28 +1573,28 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         20.0
         >>> p.elementOffset(m)
         20.0
-        
+
         >>> mCopy = copy.deepcopy(m)
         >>> mCopy.number = 10
         >>> mCopy.derivation
-        <Derivation of <music21.stream.Measure 10 offset=0.0> from 
+        <Derivation of <music21.stream.Measure 10 offset=0.0> from
             <music21.stream.Measure 1 offset=20.0> via "__deepcopy__">
         >>> mCopy.getOffsetBySite(p)
         20.0
-        >>> p.elementOffset(mCopy) 
+        >>> p.elementOffset(mCopy)
         Traceback (most recent call last):
-        music21.sites.SitesException: an entry for this object 0x... is not stored in 
+        music21.sites.SitesException: an entry for this object 0x... is not stored in
             stream <music21.stream.Part sPart>
-        
-        
+
+
         Performance note: because it will not follow derivation chains, and does
-        not need to unwrap a weakref, this method 
-        should usually be about 3x faster than element.getOffsetBySite(self) -- 
+        not need to unwrap a weakref, this method
+        should usually be about 3x faster than element.getOffsetBySite(self) --
         currently 600ns instead of 1.5 microseconds.
         '''
         try:
             o = self._offsetDict[id(element)][0] # 2.3 million times found in TestStream
-            #if returnedElement is not element: # stale reference...   
+            #if returnedElement is not element: # stale reference...
             #    o = None  #             0 in TestStream -- not worth testing
         except KeyError: # 445k - 442,443 = 3k in TestStream
             for idElement in self._offsetDict: # slower search
@@ -1558,15 +1603,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     break
             else:
                 raise base.SitesException(
-                    "an entry for this object 0x%x is not stored in stream %s" % 
+                    "an entry for this object 0x%x is not stored in stream %s" %
                     (id(element), self))
-            
+
         if stringReturns is False and o in ('highestTime', 'lowestOffset', 'highestOffset'):
             try:
                 return getattr(self, o)
             except AttributeError:
                 raise base.SitesException(
-                        'attempted to retrieve a bound offset with a string ' + 
+                        'attempted to retrieve a bound offset with a string ' +
                         'attribute that is not supported: %s' % o)
         else:
             return o
@@ -1577,7 +1622,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Inserts an item(s) at the given offset(s).
 
         If `ignoreSort` is True then the inserting does not
-        change whether the Stream is sorted or not (much faster if you're 
+        change whether the Stream is sorted or not (much faster if you're
         going to be inserting dozens
         of items that don't change the sort status)
 
@@ -1621,10 +1666,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         2
 
         OMIT_FROM_DOCS
-        
+
         Raise an error if offset is not a number
-        
-        >>> stream.Stream().insert("l","g")
+
+        >>> stream.Stream().insert("l", "g")
         Traceback (most recent call last):
         music21.exceptions21.StreamException: ...
 
@@ -1640,7 +1685,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             i = 0
             while i < len(offsetOrItemOrList):
                 offset = offsetOrItemOrList[i]
-                item = offsetOrItemOrList[i+1]
+                item = offsetOrItemOrList[i + 1]
                 # recursively calling insert() here
                 self.insert(offset, item, ignoreSort=ignoreSort)
                 i += 2
@@ -1653,7 +1698,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             try:
                 offset = item.getOffsetBySite(item.activeSite)
             except AttributeError:
-                raise StreamException("Cannot insert item %s to stream " % (item,) + 
+                raise StreamException("Cannot insert item %s to stream " % (item,) +
                                       "-- is it a music21 object?")
 
         #if not common.isNum(offset):
@@ -1666,15 +1711,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 raise StreamException("offset %s must be a number", offset)
 
         if not isinstance(item, base.Music21Object):
-            raise StreamException('to put a non Music21Object in a stream, ' + 
-                                  'create a music21.ElementWrapper for the item') 
+            raise StreamException('to put a non Music21Object in a stream, ' +
+                                  'create a music21.ElementWrapper for the item')
         else:
             element = item
 
         # checks of element is self; possibly performs additional checks
         self._addElementPreProcess(element)
         # main insert procedure here
-        
+
         storeSorted = self._insertCore(offset, element,
                      ignoreSort=ignoreSort, setActiveSite=setActiveSite)
         updateIsFlat = False
@@ -1699,7 +1744,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> n1.duration.quarterLength = 2.0
         >>> r1 = note.Rest()
         >>> r1.duration.quarterLength = 2.0
-        >>> c1 = chord.Chord(['C4','E4'])
+        >>> c1 = chord.Chord(['C4', 'E4'])
         >>> s = stream.Stream()
         >>> s.append(n1)
         >>> s.append(r1)
@@ -1740,14 +1785,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         targets = list(self.iter.getElementsByOffset(offset,
                             offset + noteOrChord.quarterLength, # set end to dur of supplied
                             includeEndBoundary=False,
-                            mustFinishInSpan=False, 
+                            mustFinishInSpan=False,
                             mustBeginInSpan=True).notesAndRests)
         removeTarget = None
         #environLocal.printDebug(['insertIntoNoteOrChord', [e for e in targets]])
         if len(targets) == 1:
             pitches = []      # avoid an undefined variable warning...
             components = []   # ditto
-            
+
             target = targets[0] # assume first
             removeTarget = target
             if 'Rest' in target.classes:
@@ -1756,7 +1801,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     components = [noteOrChord]
                 elif 'Chord' in noteOrChord.classes:
                     pitches = list(noteOrChord.pitches)
-                    components = [c for c in noteOrChord]                
+                    components = [c for c in noteOrChord]
             if 'Note' in target.classes:
                 # if a note, make it into a chord
                 if 'Note' in noteOrChord.classes:
@@ -1826,7 +1871,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> a = stream.Stream()
         >>> notes = []
-        >>> for x in range(0,3):
+        >>> for x in range(3):
         ...     n = note.Note('G#')
         ...     n.duration.quarterLength = 3
         ...     notes.append(n)
@@ -1844,7 +1889,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Since notes are not embedded in Elements here, their offset
         changes when they are added to a stream!
 
-        >>> for x in range(0,3):
+        >>> for x in range(3):
         ...     n = note.Note("A-")
         ...     n.duration.quarterLength = 3
         ...     n.offset = 0
@@ -1866,7 +1911,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         (18.0, 21.0)
         >>> n3.getOffsetBySite(a)
         18.0
-        
+
         TODO: Appending a Clef after a KeySignature will not cause sorting to be re-run.
         '''
         # store and increment highest time for insert offset
@@ -1882,20 +1927,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             except AttributeError:
                 raise StreamException(
                     "The object you tried to add to the Stream, {0}, ".format(repr(e)) +
-                    "is not a Music21Object.  Use an ElementWrapper object " + 
+                    "is not a Music21Object.  Use an ElementWrapper object " +
                     "if this is what you intend" )
             self._addElementPreProcess(e)
             # add this Stream as a location for the new elements, with the
             # the offset set to the current highestTime
-            self.setElementOffset(e, highestTime)
+            self.setElementOffset(e, highestTime, addElement=True)
             e.sites.add(self)
             # need to explicitly set the activeSite of the element
             e.activeSite = self
             self._elements.append(e)
 
             if e.duration.quarterLength != 0:
-                #environLocal.printDebug(['incrementing highest time', 
-                #                         'e.duration.quarterLength', 
+                #environLocal.printDebug(['incrementing highest time',
+                #                         'e.duration.quarterLength',
                 #                          e.duration.quarterLength])
                 highestTime += e.duration.quarterLength
 
@@ -1933,7 +1978,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             element = item
         except AttributeError: # need to wrap
             #element = music21.ElementWrapper(item)
-            raise StreamException('to put a non Music21Object in a stream, ' + 
+            raise StreamException('to put a non Music21Object in a stream, ' +
                                   'create a music21.ElementWrapper for the item')
         # if not a Music21Object, embed
 #         if not isinstance(item, music21.Music21Object):
@@ -1943,7 +1988,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # cannot support elements with Durations in the highest time list
         if element.duration is not None and element.duration.quarterLength != 0:
-            raise StreamException('cannot insert an object with a non-zero ' + 
+            raise StreamException('cannot insert an object with a non-zero ' +
                                   'Duration into the highest time elements list')
 
         # checks of element is self; possibly performs additional checks
@@ -1970,7 +2015,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         This presently does not shift elements that have durations
         that extend into the lowest insert position.
-        
+
         >>> st1 = stream.Stream()
         >>> st1.insertAndShift(32, note.Note("B-"))
         >>> st1.highestOffset
@@ -2050,7 +2095,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             i = 0
             while i < len(insertList):
                 o = insertList[i]
-                e = insertList[i+1]
+                e = insertList[i + 1]
                 #if hasattr(e, 'duration')  and e.duration is not None:
                 if e.duration is not None:
                     qL = e.duration.quarterLength
@@ -2075,9 +2120,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # this shift is the additional time to move due to the duration
         # of the newly inserted elements
 
-        #environLocal.printDebug(['insertAndShift()', 
-        #                         'adding one or more elements', 
-        #                         'lowestOffsetInsert', lowestOffsetInsert, 
+        #environLocal.printDebug(['insertAndShift()',
+        #                         'adding one or more elements',
+        #                         'lowestOffsetInsert', lowestOffsetInsert,
         #                         'highestTimeInsert', highestTimeInsert])
 
         # are not assuming that elements are ordered
@@ -2104,7 +2149,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         if shiftPos <= 0:
             pass  # no need to move any objects
-        # See testStream.py - testInsertAndShiftNoDuration clef 
+        # See testStream.py - testInsertAndShiftNoDuration clef
         #      insertion at offset 3 which gives shiftPos < 0
         else:
             # need to move all the elements already in this stream
@@ -2115,9 +2160,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 gap = o - lowestOffsetInsert
                 # only process elments whose offsets are after the lowest insert
                 if gap >= 0.0:
-                    #environLocal.printDebug(['insertAndShift()', e, 'offset', o, 
-                    #                         'gap:', gap, 'shiftDur:', shiftDur, 
-                    #                         'shiftPos:', shiftPos, 'o+shiftDur', o+shiftDur, 
+                    #environLocal.printDebug(['insertAndShift()', e, 'offset', o,
+                    #                         'gap:', gap, 'shiftDur:', shiftDur,
+                    #                         'shiftPos:', shiftPos, 'o+shiftDur', o+shiftDur,
                     #                         'o+shiftPos', o+shiftPos])
 
                     # need original offset, shiftDur, plus the distance from the start
@@ -2135,7 +2180,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         Sets the .derivation.method for each element in the Stream
         if it has a .derivation object.
-        
+
         >>> import copy
         >>> s = converter.parse('tinyNotation: 2/4 c2 d e f')
         >>> s2 = copy.deepcopy(s)
@@ -2146,7 +2191,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         <Derivation of <music21.note.Note F> from <music21.note.Note F> via "exampleCopy">
 
         Without recurse:
-        
+
         >>> s = converter.parse('tinyNotation: 2/4 c2 d e f')
         >>> s2 = copy.deepcopy(s)
         >>> s2.setDerivationMethod('exampleCopy')
@@ -2157,15 +2202,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             sIter = self.recurse()
         else:
             sIter = self.iter
-            
+
         for el in sIter:
             if el.derivation is not None:
                 el.derivation.method = derivationMethod
 
 
-    def replace(self, 
-                target, 
-                replacement, 
+    def replace(self,
+                target,
+                replacement,
                 recurse=False,
                 allDerived=True):
         '''
@@ -2175,13 +2220,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         If `allDerived` is True (as it is by default), all sites that
         have a reference for the replacement will be similarly changed.
         This is useful for altering both a flat and nested representation.
-        
+
         firstMatchOnly did NOTHING because each element can only be in a site ONCE.
         Removed!
-        
+
         allTargetSites RENAMED to allDerived -- only searches in derivation chain.
-        
-        
+
+
         >>> csharp = note.Note("C#4")
         >>> s = stream.Stream()
         >>> s.insert(0, csharp)
@@ -2189,10 +2234,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.replace(csharp, dflat)
         >>> s.show('t')
         {0.0} <music21.note.Note D->
-        
-        If allDerived is True then all streams that this stream comes from get changed 
+
+        If allDerived is True then all streams that this stream comes from get changed
         (but not non-derived streams)
-        
+
         >>> otherStream = stream.Stream()
         >>> otherStream.insert(0, dflat)
         >>> f = note.Note('F4')
@@ -2206,12 +2251,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         True
         >>> otherStream[0] is dflat
         True
-        
+
         OMIT_FROM_DOCS
-        
+
         Yes, you can recurse, but not showing it yet... gotta find a good general form...
         and figure out how to make it work properly with allDerived
-        
+
         >>> s = stream.Score()
         >>> p = stream.Part()
         >>> s.append(p)
@@ -2223,50 +2268,51 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {0.0} <music21.stream.Part 0x109842f98>
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.note.Note C#>
-                        
+
         OMIT_FROM_DOCS
-        
+
         Recurse temporarily turned off.
-        
+
         >>> dflat = note.Note("D-4")
         >>> s.replace(csharp, dflat, recurse=True)
         >>> # s.show('t')
-        
+
         {0.0} <music21.stream.Part 0x109842f98>
             {0.0} <music21.stream.Measure 0 offset=0.0>
-                {0.0} <music21.note.Note D->        
+                {0.0} <music21.note.Note D->
         '''
         try:
             i = self.index(target)
         except StreamException:
             return  # do nothing if no match
- 
+
         eLen = len(self._elements)
         if i < eLen:
             target = self._elements[i] # target may have been obj id; reclassing
             self._elements[i] = replacement
             # place the replacement at the old objects offset for this site
-            self.setElementOffset(replacement, self.elementOffset(target))
+            self.setElementOffset(replacement, self.elementOffset(target), addElement=True)
             replacement.sites.add(self)
         else:
             # target may have been obj id; reassign
             target = self._endElements[i - eLen]
             self._endElements[i - eLen] = replacement
-            self.setElementOffset(replacement, 'highestTime')
+
+            self.setElementOffset(replacement, 'highestTime', addElement=True)
             replacement.sites.add(self)
- 
+
         target.sites.remove(self)
         target.activeSite = None
         if id(target) in self._offsetDict:
             del(self._offsetDict[id(target)])
-             
- 
+
+
         updateIsFlat = False
         if replacement.isStream:
             updateIsFlat = True
         # elements have changed: sort order may change b/c have diff classes
-        self.elementsChanged(updateIsFlat=updateIsFlat)            
-        
+        self.elementsChanged(updateIsFlat=updateIsFlat)
+
 #         if target is None:
 #             raise StreamException('received a target of None as a candidate for replacement.')
 #         if recurse is False:
@@ -2274,8 +2320,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #         else:
 #             siterator = self.recurse()
 #         siterator.addFilter(filters.IsFilter(target))
-#  
-#  
+#
+#
 #         found = False
 #         for el in siterator:
 #             # el should be target...
@@ -2285,19 +2331,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #             elementList = siterator.activeElementList
 #             found = True
 #             break
-# 
+#
 #         if found:
 #             elementList[index] = replacement
-#             
+#
 #             containingStream.setElementOffset(
-#                                         replacement, 
+#                                         replacement,
 #                                         containingStream.elementOffset(el, stringReturns=True))
 #             replacement.sites.add(containingStream)
 #             target.sites.remove(containingStream)
 #             target.activeSite = None
 #             if id(target) in containingStream._offsetDict:
 #                 del(containingStream._offsetDict[id(target)])
-#             
+#
 #             updateIsFlat = False
 #             if replacement.isStream:
 #                 updateIsFlat = True
@@ -2308,15 +2354,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for derivedSite in self.derivation.chain():
                 for subsite in derivedSite.recurse(streamsOnly=True, skipSelf=False):
                     if subsite in target.sites:
-                        subsite.replace(target, 
-                                        replacement, 
+                        subsite.replace(target,
+                                        replacement,
                                         allDerived=False)
 
-    def splitAtQuarterLength(self, 
-                             quarterLength, 
+    def splitAtQuarterLength(self,
+                             quarterLength,
                              retainOrigin=True,
-                             addTies=True, 
-                             displayTiedAccidentals=False, 
+                             addTies=True,
+                             displayTiedAccidentals=False,
                              searchContext=True):
         '''
         This method overrides the method on Music21Object to provide
@@ -2337,22 +2383,22 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if sLeft.isMeasure:
             timeSignatures = sLeft.getTimeSignatures(
                             searchContext=searchContext)
-            if len(timeSignatures) > 0:
-                sRight.keySignature = copy.deepcopy(timeSignatures[0]) 
+            if timeSignatures:
+                sRight.keySignature = copy.deepcopy(timeSignatures[0])
             keySignatures = sLeft.getKeySignatures(searchContext=searchContext)
-            if len(keySignatures) > 0:
-                sRight.keySignature = copy.deepcopy(keySignatures[0]) 
+            if keySignatures:
+                sRight.keySignature = copy.deepcopy(keySignatures[0])
             endClef = sLeft.getContextByClass('Clef')
             if endClef is not None:
-                sRight.clef = copy.deepcopy(endClef) 
+                sRight.clef = copy.deepcopy(endClef)
 
         if (quarterLength > sLeft.highestTime): # nothing to do
             return sLeft, sRight
 
         # use quarterLength as start time
         targets = sLeft.getElementsByOffset(quarterLength, sLeft.highestTime,
-            includeEndBoundary=True, 
-            mustFinishInSpan=False, 
+            includeEndBoundary=True,
+            mustFinishInSpan=False,
             includeElementsThatEndAtStart=False,
             mustBeginInSpan=False)
 
@@ -2389,12 +2435,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return sLeft, sRight
 
     #---------------------------------------------------------------------------
-    def _recurseRepr(self, 
-                     thisStream, 
+    def _recurseRepr(self,
+                     thisStream,
                      prefixSpaces=0,
-                     addBreaks=True, 
-                     addIndent=True, 
-                     addEndTimes=False, 
+                     addBreaks=True,
+                     addIndent=True,
+                     addEndTimes=False,
                      useMixedNumerals=False):
         '''
         Used by .show('text')
@@ -2416,7 +2462,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if useMixedNumerals:
                 off = common.mixedNumeral(offGet)
             else:
-                off = common.strTrimFloat(offGet)            
+                off = common.strTrimFloat(offGet)
             if addEndTimes is False:
                 return indent + "{" + off + "} " + element.__repr__()
             else:
@@ -2426,7 +2472,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 else:
                     qlStr = common.strTrimFloat(ql)
                 return indent + "{" + off + ' - ' + qlStr + '} ' + element.__repr__()
-            
+
         msg = []
         insertSpaces = 4
         for element in thisStream:
@@ -2437,16 +2483,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
             #if isinstance(element, Stream):
             if element.isStream:
-                msg.append(singleElement(element, indent, 
+                msg.append(singleElement(element, indent,
                                          thisStream, addEndTimes, useMixedNumerals))
                 msg.append(self._recurseRepr(element,
                                              prefixSpaces + insertSpaces,
-                                             addBreaks=addBreaks, 
-                                             addIndent=addIndent, 
+                                             addBreaks=addBreaks,
+                                             addIndent=addIndent,
                                              addEndTimes=addEndTimes,
                                              useMixedNumerals=useMixedNumerals))
             else:
-                msg.append(singleElement(element, indent, 
+                msg.append(singleElement(element, indent,
                                          thisStream, addEndTimes, useMixedNumerals))
         if addBreaks:
             msg = '\n'.join(msg)
@@ -2470,9 +2516,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             useMixedNumerals = keywords['useMixedNumerals']
         else:
             useMixedNumerals = False
-        
-        return self._recurseRepr(self, 
-                                 addEndTimes=addEndTimes, 
+
+        return self._recurseRepr(self,
+                                 addEndTimes=addEndTimes,
                                  useMixedNumerals=useMixedNumerals)
 
     def _reprTextLine(self, **keywords):
@@ -2489,49 +2535,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     # display methods; in the same manner as show() and write()
 
     def plot(self, *args, **keywords):
-        '''Given a method and keyword configuration arguments, create and display a plot.
+        '''
+        Given a method and keyword configuration arguments, create and display a plot.
 
         Note: plot() requires the Python package matplotib to be installed.
 
-        For details on arguments this function takes, see :func:`~music21.graph.plotStream`.
+        For details on arguments this function takes, see 
+        :ref:`User's Guide, Chapter 22: Graphing <usersGuide_22_graphing>`.
 
-        Available plots include the following Plot classes:
-
-        :class:`~music21.graph.PlotHistogramPitchSpace`
-        :class:`~music21.graph.PlotHistogramPitchClass`
-        :class:`~music21.graph.PlotHistogramQuarterLength`
-
-        :class:`~music21.graph.PlotScatterPitchSpaceQuarterLength`
-        :class:`~music21.graph.PlotScatterPitchClassQuarterLength`
-        :class:`~music21.graph.PlotScatterPitchClassOffset`
-        :class:`~music21.graph.PlotScatterPitchSpaceDynamicSymbol`
-
-        :class:`~music21.graph.PlotHorizontalBarPitchSpaceOffset`
-        :class:`~music21.graph.PlotHorizontalBarPitchClassOffset`
-
-        :class:`~music21.graph.PlotScatterWeightedPitchSpaceQuarterLength`
-        :class:`~music21.graph.PlotScatterWeightedPitchClassQuarterLength`
-        :class:`~music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol`
-
-        :class:`~music21.graph.Plot3DBarsPitchSpaceQuarterLength`
-
-        :class:`~music21.graph.PlotWindowedKrumhanslSchmuckler`
-        :class:`~music21.graph.PlotWindowedKrumhanslKessler`
-        :class:`~music21.graph.PlotWindowedAardenEssen`
-        :class:`~music21.graph.PlotWindowedSimpleWeights`
-        :class:`~music21.graph.PlotWindowedBellmanBudge`
-        :class:`~music21.graph.PlotWindowedTemperleyKostkaPayne`
-        :class:`~music21.graph.PlotWindowedAmbitus`
-
-        :class:`~music21.graph.PlotDolan`
-
-
-        >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
+        >>> s = corpus.parse('demos/two-parts.xml') #_DOCS_HIDE
         >>> s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
         >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
         >>> #_DOCS_SHOW s.plot('pianoroll')
 
-        .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
+        .. image:: images/HorizontalBarPitchSpaceOffset.*
             :width: 600
 
         '''
@@ -2590,8 +2607,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         possible interpretations sorted from most likely to least:
 
         >>> analyzedKey.alternateInterpretations
-        [<music21.key.Key of d minor>, 
-         <music21.key.Key of C major>, 
+        [<music21.key.Key of d minor>,
+         <music21.key.Key of C major>,
          <music21.key.Key of g minor>,
          ...]
 
@@ -2648,7 +2665,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
     #---------------------------------------------------------------------------
-    # getElementsByX(self): anything that returns a collection of Elements 
+    # getElementsByX(self): anything that returns a collection of Elements
     #  formerly always returned a Stream; turning to Iterators in September 2015
 
     def getElementsByClass(self, classFilterList):
@@ -2666,7 +2683,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> found = a.getElementsByClass(note.Note)
         >>> found
         <music21.stream.iterator.StreamIterator for Score:0x104f2f400 @:0>
-        
+
         >>> len(found)
         4
         >>> found[0].pitch.accidental.name
@@ -2758,7 +2775,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> found = a.flat.getElementsNotOfClass(note.Note)
         >>> len(found)
         25
-        
+
         :rtype: Stream
         '''
         return self.iter.getElementsNotOfClass(classFilterList)
@@ -2792,12 +2809,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # TODO: group comparisons are not YET case insensitive.
         '''
         return self.iter.getElementsByGroup(groupFilterList).stream()
-                    
+
 
     def getElementById(self, elementId, classFilter=None):
         '''
         Returns the first encountered element for a given id. Return None
-        if no match. Note: this uses the id attribute stored on elements, 
+        if no match. Note: this uses the id attribute stored on elements,
         which may not be the same as id(e).
 
         >>> a = stream.Stream()
@@ -2824,7 +2841,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         True
         >>> ew.activeSite is a
         True
-        
+
         :rtype: base.Music21Object
         '''
         siterator = self.iter.addFilter(filters.IdFilter(elementId))
@@ -2835,13 +2852,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return None
 
 
-    def getElementsByOffset(self, 
-                            offsetStart, 
+    def getElementsByOffset(self,
+                            offsetStart,
                             offsetEnd=None,
                             includeEndBoundary=True,
                             mustFinishInSpan=False,
-                            mustBeginInSpan=True, 
-                            includeElementsThatEndAtStart=True, 
+                            mustBeginInSpan=True,
+                            includeElementsThatEndAtStart=True,
                             classList=None):
         '''
         Returns a Stream containing all Music21Objects that
@@ -2939,10 +2956,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         2
         >>> [el.step for el in out7]
         ['C', 'D']
-        
-        
+
+
         Note, that elements that end at the start offset are included if mustBeginInSpan is False
-        
+
         >>> out8 = st1.getElementsByOffset(2, 4, mustBeginInSpan=False)
         >>> len(out8)
         2
@@ -2951,7 +2968,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         To change this behavior set includeElementsThatEndAtStart=False
 
-        >>> out9 = st1.getElementsByOffset(2, 4, 
+        >>> out9 = st1.getElementsByOffset(2, 4,
         ...                     mustBeginInSpan=False, includeElementsThatEndAtStart=False)
         >>> len(out9)
         1
@@ -2966,10 +2983,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> a.repeatInsert(n, list(range(8)))
         >>> b = stream.Stream()
         >>> b.repeatInsert(a, [0, 3, 6])
-        >>> c = b.getElementsByOffset(2,6.9)
+        >>> c = b.getElementsByOffset(2, 6.9)
         >>> len(c)
         2
-        >>> c = b.flat.getElementsByOffset(2,6.9)
+        >>> c = b.flat.getElementsByOffset(2, 6.9)
         >>> len(c)
         10
 
@@ -2989,9 +3006,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         3
 
         OMIT_FROM_DOCS
-        
+
         Same test as above, but with floats
-        
+
         >>> out1 = st1.getElementsByOffset(2.0)
         >>> len(out1)
         1
@@ -3010,7 +3027,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         1
         >>> out3b[0].step
         'C'
-        >>> out3b = st1.getElementsByOffset(1.0, 3.001, 
+        >>> out3b = st1.getElementsByOffset(1.0, 3.001,
         ...                                   mustFinishInSpan=True, mustBeginInSpan=False)
         >>> len(out3b)
         1
@@ -3026,7 +3043,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> out5 = st1.getElementsByOffset(1.0, 2.0, includeEndBoundary=False)
         >>> len(out5)
         0
-        >>> out6 = st1.getElementsByOffset(1.0, 2.0, 
+        >>> out6 = st1.getElementsByOffset(1.0, 2.0,
         ...                                   includeEndBoundary=False, mustBeginInSpan=False)
         >>> len(out6)
         1
@@ -3041,11 +3058,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         :rtype: Stream
         '''
         siterator = self.iter.getElementsByOffset(
-                         offsetStart=offsetStart, 
+                         offsetStart=offsetStart,
                          offsetEnd=offsetEnd,
-                         includeEndBoundary=includeEndBoundary, 
+                         includeEndBoundary=includeEndBoundary,
                          mustFinishInSpan=mustFinishInSpan,
-                         mustBeginInSpan=mustBeginInSpan, 
+                         mustBeginInSpan=mustBeginInSpan,
                          includeElementsThatEndAtStart=includeElementsThatEndAtStart)
         if classList is not None:
             siterator.getElementsByClass(classList)
@@ -3130,14 +3147,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #>>> e = stream1.getElementAtOrBefore(21)
         #>>> e
         #<music21.note.Note D4>
-        
+
         # FAILS, returns the clef!
 
         '''
         # NOTE: this is a performance critical method
         # TODO: need to deal with more than on object the same
         # offset and span from the source
-        
+
         # TODO: switch to trees
         candidates = []
         offset = opFrac(offset)
@@ -3149,9 +3166,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if not e.isClassOrSubclass(classList):
                     continue
             span = opFrac(offset - self.elementOffset(e))
-            #environLocal.printDebug(['e span check', span, 'offset', offset, 
+            #environLocal.printDebug(['e span check', span, 'offset', offset,
             #   'e.offset', e.offset, 'self.elementOffset(e)', self.elementOffset(e), 'e', e])
-            if span < 0: 
+            if span < 0:
                 continue
             elif span == 0:
                 candidates.append((span, e))
@@ -3162,8 +3179,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     candidates.append((span, e))
                     nearestTrailSpan = span
         #environLocal.printDebug(['getElementAtOrBefore(), e candidates', candidates])
-        if len(candidates) > 0:
-            candidates.sort(key=lambda x: (-1 * x[0], x[1].sortTuple())) 
+        if candidates:
+            candidates.sort(key=lambda x: (-1 * x[0], x[1].sortTuple()))
             # TODO: this sort has side effects -- see icmc2011 -- sorting clef vs. note, etc.
             candidates[-1][1].activeSite = self
             return candidates[-1][1]
@@ -3228,13 +3245,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> stream1.insert( 0, w)
 
         This should get w because it was inserted last.
-        
+
         >>> b = stream1.getElementBeforeOffset(0.1)
         >>> b.offset, b.id
         (0.0, 'w')
-        
+
         But if we give it a lower priority than z then z will appear first.
-        
+
         >>> w.priority = z.priority - 1
         >>> b = stream1.getElementBeforeOffset(0.1)
         >>> b.offset, b.id
@@ -3251,7 +3268,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if not e.isClassOrSubclass(classList):
                     continue
             span = opFrac(offset - self.elementOffset(e))
-            #environLocal.printDebug(['e span check', span, 'offset', offset, 
+            #environLocal.printDebug(['e span check', span, 'offset', offset,
             #     'e.offset', e.offset, 'self.elementOffset(e)', self.elementOffset(e), 'e', e])
             # by forcing <= here, we are sure to get offsets not at zero
             if span <= 0: # the e is after this offset
@@ -3261,8 +3278,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     candidates.append((span, e))
                     nearestTrailSpan = span
         #environLocal.printDebug(['getElementBeforeOffset(), e candidates', candidates])
-        if len(candidates) > 0:
-            candidates.sort(key=lambda x: (-1 * x[0], x[1].sortTuple())) 
+        if candidates:
+            candidates.sort(key=lambda x: (-1 * x[0], x[1].sortTuple()))
             candidates[-1][1].activeSite = self
             return candidates[-1][1]
         else:
@@ -3306,7 +3323,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         st1.getElementAfterElement("hi") is None
         True
-        
+
         >>> t5 = st1.getElementAfterElement(n1, [note.Rest])
         >>> t5
         <music21.note.Rest rest>
@@ -3330,11 +3347,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         elements = self.elements
         if classList is None:
             if elPos == len(elements) - 1:
-                return None        
+                return None
             else:
                 e = elements[elPos + 1]
                 e.activeSite = self
-                return e                
+                return e
         else:
             for i in range(elPos + 1, len(elements)):
                 if elements[i].isClassOrSubclass(classList):
@@ -3345,7 +3362,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #         iterator = self.iter
 #         isFilter = filters.IsFilter(element)
 #         iterator.addFilter(isFilter)
-# 
+#
 #         foundElement = False
 #         for x in iterator:
 #             if foundElement is True:
@@ -3353,18 +3370,23 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #             else:
 #                 foundElement = True
 #                 iterator.removeFilter(isFilter)
-#                 # now add the filter... 
+#                 # now add the filter...
 #                 iterator.addFilter(filters.IsNotFilter(element))
 #                 if classList is not None:
 #                     iterator.addFilter(filters.ClassFilter(classList))
-# 
+#
 #         return None
 
     #-----------------------------------------------------
     # end .getElement filters
-
+    @common.deprecated('June 2017', 'May 2018', '''Use stream.iterator.OffsetIterator 
+        instead, creating the returnDict if needed from the offset of the first element.
+        ''')
     def groupElementsByOffset(self, returnDict=False):
         '''
+        DEPRECATED: Use :class:`music21.stream.iterator.OffsetIterator` instead
+        as the instructions below show.
+    
         Returns a List of lists in which each entry in the
         main list is a list of elements occurring at the same time.
         list is ordered by offset (since we need to sort the list
@@ -3384,30 +3406,30 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.insert(4, note.Note('D-'))
         >>> s.insert(16.0/3, note.Note('D'))
 
-        >>> returnList = s.groupElementsByOffset()
+        >>> returnList = list(stream.iterator.OffsetIterator(s))
         >>> returnList
-        [[<music21.note.Note C>], 
-         [<music21.note.Note C#>, <music21.note.Note D->], 
+        [[<music21.note.Note C>],
+         [<music21.note.Note C#>, <music21.note.Note D->],
          [<music21.note.Note D>]]
 
-        >>> returnDict = s.groupElementsByOffset(returnDict=True)
+        >>> returnDict = {v[0].offset: v for v in returnList}
         >>> pp(returnDict)
-        {3.0: [<music21.note.Note C>], 
-         4.0: [<music21.note.Note C#>, <music21.note.Note D->], 
+        {3.0: [<music21.note.Note C>],
+         4.0: [<music21.note.Note C#>, <music21.note.Note D->],
          Fraction(16, 3): [<music21.note.Note D>]}
-        
+
         Test that sorting still works...
 
         >>> s.insert(0, meter.TimeSignature('2/4'))
         >>> s.insert(0, clef.TrebleClef()) # sorts first
-        >>> s.groupElementsByOffset()[0]
+        >>> list(stream.iterator.OffsetIterator(s))[0]
         [<music21.clef.TrebleClef>, <music21.meter.TimeSignature 2/4>]
 
         it is DEFINITELY a feature that this method does not
         find elements within substreams that have the same
         absolute offset.  See lily.translate for how this is
-        useful for finding voices.  
-        
+        useful for finding voices.
+
         For the other behavior, call Stream.flat first or Stream.recurse()
         '''
         offsetsRepresented = {}
@@ -3431,42 +3453,42 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     # routines for obtaining specific types of elements from a Stream
     # _getNotes and _getPitches are found with the interval routines
 
-    def measures(self, 
-                 numberStart, 
+    def measures(self,
+                 numberStart,
                  numberEnd,
-                 collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'), 
-                 gatherSpanners=True, 
+                 collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
+                 gatherSpanners=True,
                  ignoreNumbers=False):
         '''
-        Get a region of Measures based on a start and end Measure number, 
-        where the boundary numbers are both included. 
+        Get a region of Measures based on a start and end Measure number,
+        where the boundary numbers are both included.
         That is, a request for measures 4 through 10 will return 7 Measures, numbers 4 through 10.
-        It is allowed to pass `numberEnd=None`, which will be 
+        It is allowed to pass `numberEnd=None`, which will be
         interpreted as the last measure of the stream.
 
         Additionally, any number of associated classes can be gathered from the context
         and put into the measure.  By default we collect the Clef, TimeSignature, KeySignature,
         and Instrument so that there is enough context to perform.  (See getContextByClass()
-        and .previous() for definitions of the context)         
+        and .previous() for definitions of the context)
 
-        While all elements in the source are the original elements in the extracted region, 
+        While all elements in the source are the original elements in the extracted region,
         new Measure objects are created and returned.
 
         >>> a = corpus.parse('bach/bwv324.xml')
-        >>> b = a.parts[0].measures(1,3)
+        >>> b = a.parts[0].measures(1, 3)
         >>> len(b.getElementsByClass('Measure'))
         3
         >>> b.getElementsByClass('Measure')[0].notes[0] is a.parts[0].flat.notes[0]
         True
 
-        if gatherSpanners is True or the string 'all' then all spanners in 
+        if gatherSpanners is True or the string 'all' then all spanners in
         the score are gathered and
-        included.  
-        
+        included.
+
         TODO: make True only return spanners from the region.  Use core.gatherMissingSpanners()
         to do so.
 
-        if ignoreNumbers is True, then it ignores defined measureNumbers and 
+        if ignoreNumbers is True, then it ignores defined measureNumbers and
         uses 0-indexed measure objects
         '''
         returnObj = self.cloneEmpty(derivationMethod='measures')
@@ -3479,7 +3501,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         mStreamIter = self.getElementsByClass('Measure')
         # if we have no Measures defined, call makeNotation
         # this will  return a deepcopy of all objects
-        if len(mStreamIter) == 0:
+        if not mStreamIter:
             srcObj = self.makeNotation(inPlace=False)
             # need to set srcObj to this new stream
             mStreamIter = srcObj.getElementsByClass('Measure')
@@ -3555,7 +3577,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if number == i:
                     matches.append(mapCooked[(number, suffix)])
             # numbers may not be contiguous
-            if len(matches) == 0: # None found in this range
+            if not matches: # None found in this range
                 continue
             # if not startOffset then let us make one
             # this assumes measure are in offset order
@@ -3563,7 +3585,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if startOffset is None:
                 # is m 2X before 2 or after? can't be sure,
                 # so we get the min...
-                
+
                 # m is in a list of lists...
                 for m in itertools.chain.from_iterable(matches):
                     thisOffset = m.getOffsetBySite(srcObj)
@@ -3574,7 +3596,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         if thisOffset < startOffset:
                             startOffset = thisOffset
                             startMeasure = m
-                #environLocal.printDebug(['startOffset', startOffset, 
+                #environLocal.printDebug(['startOffset', startOffset,
                 #    'startMeasure', startMeasure, 'm', m])
 
             # need to make offsets relative to this new Stream
@@ -3616,7 +3638,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #         startMeasureNew.elementsChanged()
         if changedObjects:
             returnObj.elementsChanged()
-            
+
         if gatherSpanners:
             sf = srcObj.flat
             for sp in spannerBundle:
@@ -3633,7 +3655,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return returnObj
 
 
-    def measure(self, 
+    def measure(self,
                 measureNumber,
                 collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
                 ignoreNumbers=False):
@@ -3659,17 +3681,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         # we must be able to obtain a measure from this (not a flat)
         # representation (e.g., this is a Stream or Part, not a Score)
-        if len(self.getElementsByClass('Measure')) >= 1:
+        if self.getElementsByClass('Measure'):
             #environLocal.printDebug(['got measures from getElementsByClass'])
-            s = self.measures(measureNumber, 
-                              measureNumber, 
+            s = self.measures(measureNumber,
+                              measureNumber,
                               collect=collect,
                               ignoreNumbers=ignoreNumbers)
-            if len(s) == 0:
+            if not s:
                 return None
             else:
                 m = s.getElementsByClass('Measure')[0]
-                # NO m is the same object as before so it does not get a new derivation                
+                # NO m is the same object as before so it does not get a new derivation
 #                 m.derivation.client = m
 #                 m.derivation.origin = s # was self, will change some things
 #                 m.derivation.method = 'measure'
@@ -3680,20 +3702,23 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return None
 
 
-    def measureTemplate(self, 
-                        fillWithRests=True, 
-                        classType='Measure', 
-                        customRemove=None):
+    def template(self,
+                 fillWithRests=True,
+                 removeClasses=None,
+                 retainVoices=True,
+                 ):
         '''
+        Return a new Stream based on this one, but with 
         If this Stream contains measures, return a new Stream
         with new Measures populated with the same characteristics of those found in this Stream.
 
         That is, TimeSignatures, KeySignatures, etc. are retained.
-        
+
         >>> b = corpus.parse('bwv66.6')
         >>> sopr = b.parts[0]
-        >>> soprEmpty = sopr.measureTemplate()
+        >>> soprEmpty = sopr.template()
         >>> soprEmpty.show('text')
+        {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.key.Key of f# minor>
@@ -3708,13 +3733,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             {0.0} <music21.note.Rest rest>
         {13.0} <music21.stream.Measure 4 offset=13.0>
         ...
-        
-        
+
+
         Really make empty with fillWithRests = False
-        
+
         >>> alto = b.parts[1]
-        >>> altoEmpty = alto.measureTemplate(fillWithRests=False)
+        >>> altoEmpty = alto.template(fillWithRests=False)
         >>> altoEmpty.show('text')
+        {0.0} <music21.instrument.Instrument P2: Alto: Instrument 2>
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.key.Key of f# minor>
@@ -3726,16 +3752,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {9.0} <music21.stream.Measure 3 offset=9.0>
             {0.0} <music21.layout.SystemLayout>
         ...
-        
-        
-        customRemove can be a list of classes to remove.  By default it is
-        ['GeneralNote', 'Stream', 'Dynamic', 'Expression']
-        
-        if GeneralNote is not included in customRemove, make sure fillWithRests is False
-        
+
+
+        customRemove can be a list or set of classes to remove.  By default it is
+        ['GeneralNote', 'Dynamic', 'Expression']
+
         >>> tenor = b.parts[2]
-        >>> tenorNoClefsSignatures = tenor.measureTemplate(fillWithRests=False, 
-        ...       customRemove=['Clef','KeySignature','TimeSignature'])
+        >>> tenorNoClefsSignatures = tenor.template(fillWithRests=False,
+        ...       removeClasses=['Clef', 'KeySignature', 'TimeSignature', 'Instrument'])
         >>> tenorNoClefsSignatures.show('text')
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.note.Note A>
@@ -3747,12 +3771,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             {3.0} <music21.note.Note B>
         {5.0} <music21.stream.Measure 2 offset=5.0>
         ...
-        
-        
-        Setting customRemove to True removes everything:
-        
+
+        Setting removeClasses to True removes everything:
+
         >>> bass = b.parts[3]
-        >>> bassEmpty = bass.measureTemplate(fillWithRests=False, customRemove=True)
+        >>> bassEmpty = bass.template(fillWithRests=False, removeClasses=True)
         >>> bassEmpty.show('text')
         {0.0} <music21.stream.Measure 0 offset=0.0>
         <BLANKLINE>
@@ -3765,34 +3788,133 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {13.0} <music21.stream.Measure 4 offset=13.0>
         <BLANKLINE>
         ...
+
+        On the whole score:
+        
+        >>> b.template().show('text')
+        {0.0} <music21.metadata.Metadata object at 0x106151940>
+        {0.0} <music21.stream.Part Soprano>
+            {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
+            {0.0} <music21.stream.Measure 0 offset=0.0>
+                {0.0} <music21.clef.TrebleClef>
+                {0.0} <music21.key.Key of f# minor>
+                {0.0} <music21.meter.TimeSignature 4/4>
+                {0.0} <music21.note.Rest rest>
+            {1.0} <music21.stream.Measure 1 offset=1.0>
+                {0.0} <music21.note.Rest rest>
+                ...
+            {33.0} <music21.stream.Measure 9 offset=33.0>
+                {0.0} <music21.note.Rest rest>
+                {3.0} <music21.bar.Barline style=final>
+        {0.0} <music21.stream.Part Alto>
+            {0.0} <music21.instrument.Instrument P2: Alto: Instrument 2>
+            {0.0} <music21.stream.Measure 0 offset=0.0>
+                {0.0} <music21.clef.TrebleClef>
+                {0.0} <music21.key.Key of f# minor>
+                {0.0} <music21.meter.TimeSignature 4/4>
+                {0.0} <music21.note.Rest rest>
+            {1.0} <music21.stream.Measure 1 offset=1.0>
+                {0.0} <music21.note.Rest rest>
+            ...
+            {33.0} <music21.stream.Measure 9 offset=33.0>
+                {0.0} <music21.note.Rest rest>
+                {3.0} <music21.bar.Barline style=final>
+        {0.0} <music21.layout.StaffGroup ...>    
         
         
-        classType explains what to extract.  Might be Voice, etc. 
+        If retainVoices is False (default True) then Voice streams are treated
+        differently from all other Streams and are removed.  All elements in the
+        voice are removed even if they do not match the classList:
         
-        Is not recursive, so cannot template a whole Score...yet.
-        TODO: rename to template -- set default to Stream not Measure, add recurse...
+        >>> p = stream.Part(id='part0')
+        >>> m1 = stream.Measure(number=1)
+        >>> v1 = stream.Voice(id='voice1')
+        >>> v1.insert(0, note.Note('E', quarterLength=4.0))
+        >>> v2 = stream.Voice(id='voice2')
+        >>> v2.insert(0, note.Note('G', quarterLength=2.0))
+        >>> m1.insert(0, v1)
+        >>> m1.insert(0, v2)
+        >>> m2 = stream.Measure(number=2)
+        >>> m2.insert(0, note.Note('D', quarterLength=4.0))
+        >>> p.append([m1, m2])
+        >>> pt = p.template(retainVoices=False)
+        >>> pt.show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.note.Rest rest>
+        {4.0} <music21.stream.Measure 2 offset=4.0>
+            {0.0} <music21.note.Rest rest>
+        >>> pt[0][0].quarterLength
+        4.0            
+        
+        Developer note -- if you just want a copy of a Score with new
+        Part and Measure objects, but you don't care that the notes, etc.
+        inside are the same objects as the original (i.e., you do not
+        plan to manipulate them, or you want the manipulations to
+        return to the original objects), using .template() is several
+        times faster than a deepcopy of the stream (about 4x faster
+        on bwv66.6)
+        '''
+        out = self.cloneEmpty('template')
+        if removeClasses is None:
+            removeClasses = set(['GeneralNote', 'Dynamic', 'Expression'])
+        elif common.isIterable(removeClasses):
+            removeClasses = set(removeClasses)
+
+        restInfo = {'offset': None, 'endTime': None}
+        
+        def optionalAddRest():
+            # six.PY3  nonlocal currentRest  would remove the need for restInfo struct
+            if not fillWithRests:
+                return
+            if restInfo['offset'] is None:
+                return
+            
+            restQL = restInfo['endTime'] - restInfo['offset']
+            restObj = note.Rest(quarterLength=restQL)
+            out.insert(restInfo['offset'], restObj)
+            restInfo['offset'] = None
+            restInfo['endTime'] = None
+
+        for el in self:
+            if el.isStream and (retainVoices or ('Voice' not in el.classes)):
+                optionalAddRest()
+                outEl = el.template(fillWithRests=fillWithRests,
+                                    removeClasses=removeClasses,
+                                    retainVoices=retainVoices)
+                out.insert(el.offset, outEl)
+            
+            elif (removeClasses is True 
+                    or el.classSet.intersection(removeClasses)
+                    or (not retainVoices and 'Voice' in el.classes)):
+                # remove this element
+                if fillWithRests and el.duration.quarterLength:
+                    endTime = el.offset + el.duration.quarterLength
+                    if restInfo['offset'] is None:
+                        restInfo['offset'] = el.offset
+                        restInfo['endTime'] = endTime
+                    elif endTime > restInfo['endTime']:
+                        restInfo['endTime'] = endTime
+            else:
+                optionalAddRest()
+                out.insert(el.offset, el)
+                
+        optionalAddRest()
+
+        return out
+
+    @common.deprecated('June 2017 v4.0.7', 'Jan 2018', 'use .template() instead')
+    def measureTemplate(self,
+                        fillWithRests=True,
+                        classType='Measure',
+                        customRemove=None):
+        '''
+        DEPRECATED, to be removed, use Stream.template(), retainVoices=False
         '''
         if not self.hasMeasures():
             raise StreamException('the requested Stream does not have Measures')
-        # should this be deepcopy or just a recursive call...
-        measureTemplate = copy.deepcopy(self.getElementsByClass(classType).stream())
-        for m in measureTemplate:
-            ql = m.duration.quarterLength
-            if customRemove is not None:
-                if customRemove is True:
-                    m.removeByClass('Music21Object')
-                else:
-                    m.removeByClass(customRemove)
-            else:
-                #                 + rests    voices/substreams
-                m.removeByClass(['GeneralNote', 'Stream', 'Dynamic', 'Expression'])
-
-            if fillWithRests:
-                if self.id == 'Soprano':
-                    pass
-                # quarterLength duration will be appropriate to pickup
-                m.insert(0.0, note.Rest(quarterLength=ql))
-        return measureTemplate
+        return self.measures(fillWithRests=fillWithRests,
+                             removeClasses=customRemove,
+                             retainVoices=False)
 
     def measureOffsetMap(self, classFilterList=None):
         '''
@@ -3855,9 +3977,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> choraleSemiFlat = chorale.semiFlat
         >>> choraleMeasures = choraleSemiFlat.measureOffsetMap()
         >>> choraleMeasures[4.0]
-        [<music21.stream.Measure 2 offset=4.0>, 
-         <music21.stream.Measure 2 offset=4.0>, 
-         <music21.stream.Measure 2 offset=4.0>, 
+        [<music21.stream.Measure 2 offset=4.0>,
+         <music21.stream.Measure 2 offset=4.0>,
+         <music21.stream.Measure 2 offset=4.0>,
          <music21.stream.Measure 2 offset=4.0>]
 
         OMIT_FROM_DOCS
@@ -3903,7 +4025,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     offsetMap[offset] = []
                 if m not in offsetMap[offset]:
                     offsetMap[offset].append(m)
-        
+
         orderedOffsetMap = collections.OrderedDict(sorted(offsetMap.items(), key=lambda o: o[0]))
         return orderedOffsetMap
 
@@ -3921,7 +4043,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 return self.getElementsByClass('Measure')[-1].rightBarline
             else:
                 raise StreamException(
-                        ('cannot get a final barline on this Stream (%s)' % self) + 
+                        ('cannot get a final barline on this Stream (%s)' % self) +
                         ' if no Measures are defined. Add Measures or call makeMeasures() first.')
 
     def _setFinalBarline(self, value):
@@ -3940,7 +4062,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 self.getElementsByClass('Measure')[-1].rightBarline = value
             else:
                 raise StreamException(
-                        ('cannot set a final barline on this Stream (%s)' % self) + 
+                        ('cannot set a final barline on this Stream (%s)' % self) +
                         ' if no Measures are defined. Add Measures or call makeMeasures() first.')
 
     finalBarline = property(_getFinalBarline, _setFinalBarline, doc='''
@@ -3956,9 +4078,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s = corpus.parse('bwv66.6')
         >>> s.finalBarline = 'none'
         >>> s.finalBarline
-        [<music21.bar.Barline style=none>, 
-         <music21.bar.Barline style=none>, 
-         <music21.bar.Barline style=none>, 
+        [<music21.bar.Barline style=none>,
+         <music21.bar.Barline style=none>,
+         <music21.bar.Barline style=none>,
          <music21.bar.Barline style=none>]
         ''')
 
@@ -3967,7 +4089,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         Return all :class:`~music21.stream.Voices` objects
         in an iterator
-        
+
         >>> s = stream.Stream()
         >>> s.insert(0, stream.Voice())
         >>> s.insert(0, stream.Voice())
@@ -3983,7 +4105,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         (things such as Slurs, long trills, or anything that
         connects many objects)
         in an Iterator
-        
+
         >>> s = stream.Stream()
         >>> s.insert(0, spanner.Slur())
         >>> s.insert(0, spanner.Slur())
@@ -4026,13 +4148,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ''')
 
 
-    def _transposeByInstrument(self, 
-                               reverse=False, 
+    def _transposeByInstrument(self,
+                               reverse=False,
                                inPlace=True,
                                transposeKeySignature=True):
         '''
         Transpose the Stream according to each instrument's transpostion.
-        
+
         If reverse is False, the transposition will happen in the direction
         opposite of what is specified by the Instrument. for instance,
         for changing a concert score to a transposed score or for
@@ -4092,8 +4214,32 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         elements to sounding pitch. The atSoundingPitch property
         is used to determine if transposition is necessary.
 
+        Affected by the presence of Instruments and by Ottava spanners
+
         v2.0.10 changes -- inPlace is False
 
+        >>> sc = stream.Score()
+        >>> p = stream.Part(id='barisax')
+        >>> p.append(instrument.BaritoneSaxophone())
+        >>> m = stream.Measure(number=1)
+        >>> m.append(note.Note('A4'))
+        >>> p.append(m)
+        >>> sc.append(p)
+        >>> sc.atSoundingPitch = False
+        
+        >>> scSounding = sc.toSoundingPitch()
+        >>> scSounding.show('text')
+        {0.0} <music21.stream.Part barisax>
+            {0.0} <music21.instrument.BaritoneSaxophone Baritone Saxophone>
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.note.Note C>
+
+        >>> scSounding.atSoundingPitch
+        True
+        >>> scSounding.parts[0].atSoundingPitch
+        True
+        >>> scSounding.recurse().notes[0].nameWithOctave
+        'C3'
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
@@ -4104,16 +4250,27 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for p in returnObj.getElementsByClass('Stream'):
                 # call on each part
                 p.toSoundingPitch(inPlace=True)
+                returnObj.atSoundingPitch = True
             return returnObj
-        
+
         # else...
-        if returnObj.atSoundingPitch == 'unknown':
-            raise StreamException('atSoundingPitch is unknown: cannot transpose')
-        elif not returnObj.atSoundingPitch:
+        atSoundingPitch = self.atSoundingPitch
+        if atSoundingPitch == 'unknown':
+            for site in self.sites:
+                if hasattr(site, 'atSoundingPitch') and site.atSoundingPitch != 'unknown':
+                    atSoundingPitch = site.atSoundingPitch
+                    break
+            else:
+                raise StreamException('atSoundingPitch is unknown: cannot transpose')
+        
+        if atSoundingPitch is False:
             # transposition defined on instrument goes from written to sounding
             returnObj._transposeByInstrument(reverse=False, inPlace=True)
-        elif returnObj.atSoundingPitch:
-            pass
+            returnObj.atSoundingPitch = True
+                
+        for ottava in returnObj.recurse().getElementsByClass('Ottava'):
+            ottava.performTransposition()
+        
         return returnObj # the Stream or None
 
     def toWrittenPitch(self, inPlace=False):
@@ -4121,9 +4278,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         If not at written pitch, transpose all Pitch elements to
         written pitch. The atSoundingPitch property is used to
         determine if transposition is necessary.
-        
+
         music21 v.3 changes -- inPlace=False
-        
+
         >>> sc = stream.Score()
         >>> p = stream.Part(id='barisax')
         >>> p.append(instrument.BaritoneSaxophone())
@@ -4135,9 +4292,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> scWritten = sc.toWrittenPitch()
         >>> scWritten.show('text')
         {0.0} <music21.stream.Part barisax>
-            {0.0} <music21.instrument.Instrument Baritone Saxophone>
+            {0.0} <music21.instrument.BaritoneSaxophone Baritone Saxophone>
             {0.0} <music21.stream.Measure 1 offset=0.0>
-                {0.0} <music21.note.Note A>        
+                {0.0} <music21.note.Note A>
         >>> scWritten.atSoundingPitch
         False
         >>> scWritten.parts[0].atSoundingPitch
@@ -4156,7 +4313,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 partLike.toWrittenPitch(inPlace=True)
             returnObj.atSoundingPitch = False
             return returnObj
-        
+
         # else...
         atSoundingPitch = self.atSoundingPitch
         if atSoundingPitch == 'unknown':
@@ -4166,19 +4323,22 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     break
             else:
                 raise StreamException('atSoundingPitch is unknown: cannot transpose')
-        
+
         if atSoundingPitch is True:
             # transposition defined on instrument goes from written to sounding
             # need to reverse to go to written
             returnObj._transposeByInstrument(reverse=True, inPlace=True)
             returnObj.atSoundingPitch = False
-        
+
+        for ottava in returnObj.recurse().getElementsByClass('Ottava'):
+            ottava.undoTransposition()
+
         if not inPlace:
             return returnObj
 
     #---------------------------------------------------------------------------
-    def getTimeSignatures(self, 
-                          searchContext=True, 
+    def getTimeSignatures(self,
+                          searchContext=True,
                           returnDefault=True,
                           sortByCreationTime=True):
         '''
@@ -4200,7 +4360,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         post = self.getElementsByClass('TimeSignature').stream()
 
         # search activeSite Streams through contexts
-        if len(post) == 0 and searchContext:
+        if not post and searchContext:
             # returns a single value
             post = self.cloneEmpty(derivationMethod='getTimeSignatures')
 
@@ -4212,16 +4372,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 post.append(obj)
 
         #if there is no timeSignature, we will look at any stream at offset 0:
-        if not(post):
+        if not post:
             streamsAtStart = self.getElementsByOffset(0.0).getElementsByClass('Stream')
             for s in streamsAtStart:
                 tss = s.getElementsByOffset(0.0).getElementsByClass('TimeSignature')
                 for ts in tss:
                     post.append(ts)
-        
+
         # get a default and/or place default at zero if nothing at zero
         if returnDefault:
-            if len(post) == 0 or post[0].offset > 0:
+            if not post or post[0].offset > 0:
                 ts = meter.TimeSignature('%s/%s' % (defaults.meterNumerator,
                                    defaults.meterDenominatorBeatType))
                 post.insert(0, ts)
@@ -4245,7 +4405,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             sIter = self.recurse()
         else:
             sIter = self.iter
-        
+
         post = sIter.getElementsByClass('Instrument').stream()
         if post:
             #environLocal.printDebug(['found local instrument:', post[0]])
@@ -4253,7 +4413,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             if searchActiveSite:
                 #if isinstance(self.activeSite, Stream) and self.activeSite != self:
-                if (self.activeSite is not None 
+                if (self.activeSite is not None
                     and self.activeSite.isStream
                     and self.activeSite is not self):
                     #environLocal.printDebug(['searching activeSite Stream',
@@ -4302,121 +4462,26 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         post = self.getInstruments(searchActiveSite=searchActiveSite,
                                 returnDefault=returnDefault)
-        if len(post) > 0:
+        if post:
             return post[0]
         else:
             return None
 
-
+    @common.deprecated('June 2017, v. 4', 'June 2018', 'call clef.bestClef instead')
     def bestClef(self, allowTreble8vb=False, recurse=False):
-        '''
-        TODO: Move to Clef
-        
-        Returns the clef that is the best fit for notes and chords found in this Stream.
-
-
-        >>> import random
-        >>> a = stream.Stream()
-        >>> for x in range(30):
-        ...    n = note.Note()
-        ...    n.pitch.midi = random.randint(70, 81)
-        ...    a.insert(n)
-        >>> b = a.bestClef()
-        >>> b
-        <music21.clef.TrebleClef>
-        >>> b.line
-        2
-        >>> b.sign
-        'G'
-
-        >>> c = stream.Stream()
-        >>> for x in range(10):
-        ...    n = note.Note()
-        ...    n.pitch.midi = random.randint(45, 54)
-        ...    c.insert(n)
-        >>> d = c.bestClef()
-        >>> d
-        <music21.clef.BassClef>
-        >>> d.line
-        4
-        >>> d.sign
-        'F'
-        
-        This does not automatically get a flat representation of the Stream.
-        
-        There are a lot more high notes in `a` (30) than low notes in `c` (10),
-        but it will not matter here, because the pitches in `a` will not be found:
-        
-        >>> c.insert(0, a)
-        >>> c.bestClef()
-        <music21.clef.BassClef>
-        
-        But with recursion, it will matter:
-        
-        >>> c.bestClef(recurse=True)
-        <music21.clef.TrebleClef>
-        '''
-        def findHeight(p):
-            height = p.diatonicNoteNum
-            if p.diatonicNoteNum > 33: # a4
-                height += 3 # bonus
-            elif p.diatonicNoteNum < 24: # Bass F or lower
-                height += -3 # bonus
-            return height
-        #environLocal.printDebug(['calling bestClef()'])
-
-        totalNotes = 0
-        totalHeight = 0
-
-        sIter = self.recurse() if recurse else self.iter
-
-        notes = sIter.getElementsByClass('GeneralNote')
-
-        for n in notes:
-            if n.isRest:
-                pass
-            elif n.isNote:
-                totalNotes  += 1
-                totalHeight += findHeight(n.pitch)
-            elif n.isChord:
-                for p in n.pitches:
-                    totalNotes += 1
-                    totalHeight += findHeight(p)
-        if totalNotes == 0:
-            averageHeight = 29
-        else:
-            averageHeight = (totalHeight + 0.0) / totalNotes
-
-        #environLocal.printDebug(['average height', averageHeight])
-        if (allowTreble8vb is False):
-            if averageHeight > 52: # value found with experimentation; revise
-                return clef.Treble8vaClef()
-            elif averageHeight > 28:    # c4
-                return clef.TrebleClef()
-            elif averageHeight > 10: # value found with experimentation; revise
-                return clef.BassClef()
-            else:
-                return clef.Bass8vbClef()
-        else:
-            if averageHeight > 32:    # g4
-                return clef.TrebleClef()
-            elif averageHeight > 26:  # a3
-                return clef.Treble8vbClef()
-            else:
-                return clef.BassClef()
-
+        return clef.bestClef(self, allowTreble8vb=allowTreble8vb, recurse=recurse)
 
     def getClefs(self, searchActiveSite=False, searchContext=True,
         returnDefault=True):
         '''
         DEPRECATED...
-        
+
         Collect all :class:`~music21.clef.Clef` objects in
         this Stream in a list. Optionally search the
         activeSite Stream and/or contexts.
 
         If no Clef objects are defined, get a default
-        using :meth:`~music21.stream.Stream.bestClef`
+        using :meth:`~music21.clef.bestClef`
 
 
         >>> a = stream.Stream()
@@ -4432,11 +4497,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         post = list(self.getElementsByClass('Clef'))
 
         #environLocal.printDebug(['getClefs(); count of local', len(post), post])
-        if len(post) == 0 and searchActiveSite and self.activeSite is not None:
+        if not post and searchActiveSite and self.activeSite is not None:
             #environLocal.printDebug(['getClefs(): search activeSite'])
             post = list(self.activeSite.getElementsByClass('Clef'))
 
-        if len(post) == 0 and searchContext:
+        if not post and searchContext:
             # returns a single element match
             #post = self.__class__()
             obj = self.getContextByClass('Clef')
@@ -4444,9 +4509,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 post.append(obj)
 
         # get a default and/or place default at zero if nothing at zero
-        if returnDefault and (len(post) == 0 or post[0].offset > 0):
+        if returnDefault and (not post or post[0].offset > 0):
             #environLocal.printDebug(['getClefs(): using bestClef()'])
-            post.insert(0, self.bestClef())
+            post.insert(0, clef.bestClef(self))
         return post
 
     def getKeySignatures(self, searchActiveSite=True, searchContext=True):
@@ -4469,19 +4534,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # TODO: activeSite searching is not yet implemented
         # this may not be useful unless a stream is flat
         post = self.getElementsByClass('KeySignature')
-        if len(post) == 0 and searchContext:
+        if not post and searchContext:
             # returns a single value
             post = self.cloneEmpty(derivationMethod='getKeySignatures')
             obj = self.getContextByClass(key.KeySignature)
             if obj is not None:
                 post.append(obj)
 
-        # do nothing if empty  
-        if len(post) == 0 or post[0].offset > 0:
+        # do nothing if empty
+        if not post or post[0].offset > 0:
             pass
         return post
 
-    def invertDiatonic(self, inversionNote = note.Note('C4'), inPlace = True ):
+    def invertDiatonic(self, inversionNote=note.Note('C4'), inPlace=True):
         '''
         inverts a stream diatonically around the given note (by default, middle C)
 
@@ -4496,7 +4561,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         a new piece.
 
 
-        >>> qj = corpus.parse('ciconia/quod_jactatur').parts[0].measures(1,2)
+        >>> qj = corpus.parse('ciconia/quod_jactatur').parts[0].measures(1, 2)
         >>> qj.id = 'measureExcerpt'
 
         >>> qj.show('text')
@@ -4540,10 +4605,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             returnStream = copy.deepcopy(self)
 
-        keySigSearch = returnStream.flat.getElementsByClass(key.KeySignature)
+        keySigSearch = returnStream.recurse().getElementsByClass(key.KeySignature)
 
         quickSearch = True
-        if len(keySigSearch) == 0:
+        if not keySigSearch:
             ourKey = key.Key('C')
         elif len(keySigSearch) == 1:
             ourKey = keySigSearch[0]
@@ -4551,7 +4616,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             quickSearch = False
 
         inversionDNN = inversionNote.pitch.diatonicNoteNum
-        for n in returnStream.recurse(classFilter=('NotRest')):
+        for n in returnStream.recurse().getElementsByClass('NotRest'):
             n.pitch.diatonicNoteNum = (2*inversionDNN) - n.pitch.diatonicNoteNum
             if quickSearch: # use previously found
                 n.pitch.accidental = ourKey.accidentalByStep(n.pitch.step)
@@ -4589,7 +4654,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         shifted
 
         >>> a = stream.Stream()
-        >>> a.repeatInsert(note.Note("C"), list(range(0,10)))
+        >>> a.repeatInsert(note.Note("C"), list(range(10)))
         >>> a.shiftElements(30)
         >>> a.lowestOffset
         30.0
@@ -4657,7 +4722,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         the offset of this stream to zero.
 
         >>> a = stream.Stream()
-        >>> a.repeatInsert(note.Note("C"), list(range(0,10)))
+        >>> a.repeatInsert(note.Note("C"), list(range(10)))
         >>> a.offset = 30
         >>> a.transferOffsetToElements()
         >>> a.lowestOffset
@@ -4706,7 +4771,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #if not isinstance(item, music21.Music21Object):
         except AttributeError:
             #element = music21.ElementWrapper(item)
-            raise StreamException('to put a non Music21Object in a stream, ' + 
+            raise StreamException('to put a non Music21Object in a stream, ' +
                                   'create a music21.ElementWrapper for the item')
         # if not an element, embed
 #         if not isinstance(item, music21.Music21Object):
@@ -4714,7 +4779,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #         else:
 #             element = item
 
-        for unused_i in range(0, numberOfTimes):
+        for unused_i in range(numberOfTimes):
             self.append(copy.deepcopy(element))
 
     def repeatInsert(self, item, offsets):
@@ -4789,8 +4854,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             display = self.__class__()
         else:
             # is this ever used? prevents using .cloneEmpty('extractContext')
-            display = forceOutputClass() 
-            
+            display = forceOutputClass()
+
         display.derivation.origin = self
         display.derivation.method = 'extractContext'
 
@@ -4850,9 +4915,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> p2.insert(5.5, note.Rest())
         >>> s.insert(0, p1)
         >>> s.insert(0, p2)
-        
+
         We will get a mix of float and fractions.Fraction() objects
-        
+
         >>> [str(o) for o in s.flat._uniqueOffsetsAndEndTimes()]
         ['53/25', '4.0', '103/25', '5.0', '53/10', '5.5', '63/10', '6.5']
 
@@ -4882,15 +4947,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         uniqueOffsets.sort() # might be faster in-place
         return uniqueOffsets
 
-    def makeChords(self, 
-                   minimumWindowSize=.125, 
+    def makeChords(self,
+                   minimumWindowSize=.125,
                    includePostWindow=True,
-                   removeRedundantPitches=True, 
+                   removeRedundantPitches=True,
                    useExactOffsets=False,
-                   gatherArticulations=True, 
-                   gatherExpressions=True, 
+                   gatherArticulations=True,
+                   gatherExpressions=True,
                    inPlace=False,
-                   transferGroupsToPitches=False, 
+                   transferGroupsToPitches=False,
                    makeRests=True):
         '''
         Gathers simultaneously sounding :class:`~music21.note.Note` objects
@@ -4911,14 +4976,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
         >>> p1 = stream.Part()
-        >>> p1.append([note.Note('C4', type='quarter'), 
-        ...            note.Note('D4', type='quarter'), 
-        ...            note.Note('E4', type='quarter'), 
+        >>> p1.append([note.Note('C4', type='quarter'),
+        ...            note.Note('D4', type='quarter'),
+        ...            note.Note('E4', type='quarter'),
         ...            note.Note('B2', type='quarter')])
         >>> p2 = stream.Part()
-        >>> p2.append([note.Note('C#5', type='half'), 
-        ...            note.Note('E#5', type='quarter'), 
-        ...            chord.Chord(["E4","G5","C#7"])])
+        >>> p2.append([note.Note('C#5', type='half'),
+        ...            note.Note('E#5', type='quarter'),
+        ...            chord.Chord(["E4", "G5", "C#7"])])
         >>> sc1 = stream.Score()
         >>> sc1.insert(0, p1)
         >>> sc1.insert(0, p2)
@@ -4959,10 +5024,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         The resulting Stream, if not in-place, can also gather
         additional objects by placing class names in the `collect` list.
-        By default, TimeSignature and KeySignature objects are collected.     
+        By default, TimeSignature and KeySignature objects are collected.
         '''
         def dealWithSubNotes(chordLength, subNotes, returnObj):
-            #environLocal.printDebug(['creating chord from subNotes', 
+            #environLocal.printDebug(['creating chord from subNotes',
             #   subNotes, 'inPlace', inPlace])
             c = chord.Chord()
             c.duration.quarterLength = chordLength
@@ -4999,10 +5064,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # remove all rests found in source
             for r in list(returnObj.getElementsByClass('Rest')):
                 returnObj.remove(r)
-                
+
             if removeRedundantPitches:
                 removedPitches = c.removeRedundantPitches(inPlace=True)
-                
+
                 if transferGroupsToPitches:
                     for rem_p, cn in itertools.product(removedPitches, c):
                         if cn.pitch.nameWithOctave == rem_p.nameWithOctave:
@@ -5010,7 +5075,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             #print(cn.pitch.groups, rem_p.groups)
                             cn.pitch.groups.extend(rem_p.groups)
             return c
-        #environLocal.printDebug(['makeChords():', 
+        #environLocal.printDebug(['makeChords():',
         #              'transferGroupsToPitches', transferGroupsToPitches])
 
         if not inPlace: # make a copy
@@ -5036,7 +5101,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     gatherArticulations=gatherArticulations,
                     gatherExpressions=gatherExpressions,
                     transferGroupsToPitches=transferGroupsToPitches,
-                    inPlace=True, 
+                    inPlace=True,
                     makeRests=makeRests
                     )
             return returnObj # exit
@@ -5051,7 +5116,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     gatherArticulations=gatherArticulations,
                     gatherExpressions=gatherExpressions,
                     transferGroupsToPitches=transferGroupsToPitches,
-                    inPlace=True, 
+                    inPlace=True,
                     makeRests=makeRests
                     )
             return returnObj # exit
@@ -5073,16 +5138,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 oStart = o
                 oEnd = oStart + minimumWindowSize
                 subNotes = returnObj.getElementsByOffset(
-                                    oStart, 
+                                    oStart,
                                     oEnd,
-                                    includeEndBoundary=False, 
-                                    mustFinishInSpan=False, 
+                                    includeEndBoundary=False,
+                                    mustFinishInSpan=False,
                                     mustBeginInSpan=True
                         ).getElementsByClass(matchClasses).stream() # get once for speed
                 #environLocal.printDebug(['subNotes', subNotes])
                 qlMax = None
                 # get the max duration found from within the window
-                if len(subNotes) > 0:
+                if subNotes:
                     # get largest duration, use for duration of Chord, next span
                     qlMax = max([n.quarterLength for n in subNotes])
 
@@ -5098,8 +5163,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     subAdd = returnObj.getElementsByOffset(
                                             oStart + minimumWindowSize,
                                             oStart + qlMax,
-                                            includeEndBoundary=False, 
-                                            mustFinishInSpan=False, 
+                                            includeEndBoundary=False,
+                                            mustFinishInSpan=False,
                                             mustBeginInSpan=True
                                     ).getElementsByClass(matchClasses).stream()
                     # concatenate any additional notes found
@@ -5124,18 +5189,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     break
         else: # useExactOffsets is True:
             onAndOffOffsets = self.flat.notesAndRests.stream()._uniqueOffsetsAndEndTimes()
-            #environLocal.printDebug(['makeChords: useExactOffsets=True; 
+            #environLocal.printDebug(['makeChords: useExactOffsets=True;
             #   onAndOffOffsets:', onAndOffOffsets])
 
             for i in range(len(onAndOffOffsets) - 1):
                 # get all notes within the start and the minwindow size
                 oStart = onAndOffOffsets[i]
-                oEnd = onAndOffOffsets[i+1]
+                oEnd = onAndOffOffsets[i + 1]
                 subNotes = returnObj.getElementsByOffset(
-                                oStart, 
+                                oStart,
                                 oEnd,
-                                includeEndBoundary=False, 
-                                mustFinishInSpan=False, 
+                                includeEndBoundary=False,
+                                mustFinishInSpan=False,
                                 mustBeginInSpan=True
                             ).getElementsByClass(matchClasses).stream()
                 #environLocal.printDebug(['subNotes', subNotes])
@@ -5143,7 +5208,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
                 # make subNotes into a chord
                 if subNotes:
-                    c = dealWithSubNotes(oEnd - oStart, subNotes, returnObj)                    
+                    c = dealWithSubNotes(oEnd - oStart, subNotes, returnObj)
                     # insert chord at start location
                     returnObj._insertCore(oStart, c)
 
@@ -5157,10 +5222,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return returnObj
 
 
-    def chordify(self, 
-                 addTies=True, 
+    def chordify(self,
+                 addTies=True,
                  displayTiedAccidentals=False,
-                 addPartIdAsGroup=False, 
+                 addPartIdAsGroup=False,
                  removeRedundantPitches=True,
                  toSoundingPitch=True):
         '''
@@ -5239,11 +5304,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> s = stream.Stream()
         >>> p1 = stream.Part()
-        >>> p1.insert(0, harmony.ChordSymbol('Cm', quarterLength = 4.0))
+        >>> p1.insert(0, harmony.ChordSymbol('Cm', quarterLength=4.0))
         >>> p1.insert(2, note.Note('C'))
-        >>> p1.insert(4, harmony.ChordSymbol('D', quarterLength = 4.0))
+        >>> p1.insert(4, harmony.ChordSymbol('D', quarterLength=4.0))
         >>> p1.insert(7, note.Note('A'))
-        >>> s.insert(0,p1)
+        >>> s.insert(0, p1)
         >>> s.chordify().show('text')
         {0.0} <music21.chord.Chord C3 E-3 G3>
         {2.0} <music21.chord.Chord C C3 E-3 G3>
@@ -5256,12 +5321,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s = stream.Stream()
         >>> p2 = stream.Part()
         >>> p1 = stream.Part()
-        >>> p2.insert(0, harmony.ChordSymbol('Cm', quarterLength = 4.0))
+        >>> p2.insert(0, harmony.ChordSymbol('Cm', quarterLength=4.0))
         >>> p1.insert(2, note.Note('C'))
-        >>> p2.insert(4, harmony.ChordSymbol('D', quarterLength = 4.0))
+        >>> p2.insert(4, harmony.ChordSymbol('D', quarterLength=4.0))
         >>> p1.insert(7, note.Note('A'))
-        >>> s.insert(0,p1)
-        >>> s.insert(0,p2)
+        >>> s.insert(0, p1)
+        >>> s.insert(0, p2)
         >>> s.chordify().show('text')
         {0.0} <music21.chord.Chord C3 E-3 G3>
         {2.0} <music21.chord.Chord C C3 E-3 G3>
@@ -5304,10 +5369,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # TODO: need to handle voices
         #       even if those component Stream do not have Measures
 
-        # TODO: make chordify have an option where the Pitches are not deepcopied 
+        # TODO: make chordify have an option where the Pitches are not deepcopied
         #       from the original, but are the same.
 
-        # for makeChords, below        
+        # for makeChords, below
         transferGroupsToPitches = False
         if addPartIdAsGroup:
             transferGroupsToPitches = True
@@ -5350,8 +5415,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         uniqueOffsets.append(t)
             #environLocal.printDebug(['chordify: uniqueOffsets for all parts, m', uniqueOffsets, i])
             uniqueOffsets = sorted(uniqueOffsets)
-            
-            
+
+
             for pNum, p in enumerate(allParts):
                 # get one measure at a time
                 if hasMeasures is True:
@@ -5376,8 +5441,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         post = returnObj.flat.makeChords(includePostWindow=True,
                                          useExactOffsets=True,
                                          removeRedundantPitches=removeRedundantPitches,
-                                         gatherArticulations=True, 
-                                         gatherExpressions=True, 
+                                         gatherArticulations=True,
+                                         gatherExpressions=True,
                                          inPlace=True,
                                          transferGroupsToPitches=transferGroupsToPitches)
 
@@ -5406,7 +5471,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     if o >= mOffsetStart and o < mOffsetEnd:
                         # get offset in relation to inside of Measure
                         localOffset = o - mOffsetStart
-                        #environLocal.printDebug(['inserting element', e, 'at', o, 
+                        #environLocal.printDebug(['inserting element', e, 'at', o,
                         #  'in', m, 'localOffset', localOffset])
                         m.insert(localOffset, e)
                 # call for each measure
@@ -5416,8 +5481,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else: # place in a single flat Stream
             post.elementsChanged()
 
-        if (hasattr(returnObj, 'metadata') 
-                and returnObj.metadata is not None 
+        if (hasattr(returnObj, 'metadata')
+                and returnObj.metadata is not None
                 and returnObj.hasPartLikeStreams() is True):
             post.insert(0, returnObj.metadata)
         return post
@@ -5449,7 +5514,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
         >>> stream1 = stream.Stream()
-        >>> for x in range(30,81):
+        >>> for x in range(30, 81):
         ...     n = note.Note()
         ...     n.pitch.midi = x
         ...     stream1.append(n)
@@ -5514,8 +5579,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> om[2].element is n2
         True
         >>> om[2].voiceIndex
-        
-                
+
+
         Needed for makeMeasures and a few other places
 
         The Stream source of elements is self by default,
@@ -5617,11 +5682,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     def makeTies(self,
         meterStream=None,
-        inPlace=True,
+        inPlace=False,
         displayTiedAccidentals=False,
         ):
         '''
         Calls :py:func:`~music21.stream.makeNotation.makeTies`.
+        
+        Changed in v.4., inPlace=False by default.
         '''
         return makeNotation.makeTies(
             self,
@@ -5642,17 +5709,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             inPlace=inPlace,
             )
 
-    def makeAccidentals(self, 
-                        pitchPast=None, 
+    def makeAccidentals(self,
+                        pitchPast=None,
                         pitchPastMeasure=None,
-                        useKeySignature=True, 
+                        useKeySignature=True,
                         alteredPitches=None,
-                        searchKeySignatureByContext=False, 
+                        searchKeySignatureByContext=False,
                         cautionaryPitchClass=True,
-                        cautionaryAll=False, 
-                        inPlace=True, 
+                        cautionaryAll=False,
+                        inPlace=True,
                         overrideStatus=False,
-                        cautionaryNotImmediateRepeat=True, 
+                        cautionaryNotImmediateRepeat=True,
                         lastNoteWasTied=False):
         '''
         A method to set and provide accidentals given various conditions and contexts.
@@ -5693,7 +5760,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         This will assume that the complete Stream is the context of evaluation. For smaller context
         ranges, call this on Measure objects.
 
-        If `inPlace` is True, this is done in-place; if `inPlace` is False, 
+        If `inPlace` is True, this is done in-place; if `inPlace` is False,
         this returns a modified deep copy.
 
         TODO: inPlace default should become False
@@ -5719,12 +5786,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # will search local, then activeSite
             ksStream = self.getKeySignatures(
                 searchContext=searchKeySignatureByContext)
-            if len(ksStream) > 0:
+            if ksStream:
                 # assume we want the first found; in some cases it is possible
                 # that this may not be true
                 addAlteredPitches = ksStream[0].alteredPitches
         alteredPitches += addAlteredPitches
-        #environLocal.printDebug(['processing makeAccidentals() with alteredPitches:', 
+        #environLocal.printDebug(['processing makeAccidentals() with alteredPitches:',
         #   alteredPitches])
 
         # need to move through notes in order
@@ -5788,11 +5855,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         return self.streamStatus.haveAccidentalsBeenMade()
 
-    def makeNotation(self, 
-                     meterStream=None, 
+    def makeNotation(self,
+                     meterStream=None,
                      refStreamOrTimeRange=None,
-                     inPlace=False, 
-                     bestClef=False, 
+                     inPlace=False,
+                     bestClef=False,
                      **subroutineKeywords):
         '''
         This method calls a sequence of Stream methods on this Stream to prepare
@@ -5838,11 +5905,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnStream.makeMeasures(
                 meterStream=meterStream,
                 refStreamOrTimeRange=refStreamOrTimeRange,
-                inPlace=True, 
+                inPlace=True,
                 bestClef=bestClef)
 
         measureStream = returnStream.getElementsByClass('Measure').stream()
-        #environLocal.printDebug(['Stream.makeNotation(): post makeMeasures, 
+        #environLocal.printDebug(['Stream.makeNotation(): post makeMeasures,
         #   length', len(returnStream)])
 
         # for now, calling makeAccidentals once per measures
@@ -5862,24 +5929,24 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if m.keySignature is not None:
                     ksLast = m.keySignature
                 if i > 0 and m.keySignature is None:
-                    if (measureStream[i-1] 
-                            and hasattr(measureStream[i-1][-1], "tie") 
-                            and measureStream[i-1][-1].tie is not None 
-                            and measureStream[i-1][-1].tie.type != 'stop'):
+                    if (measureStream[i - 1]
+                            and hasattr(measureStream[i - 1][-1], "tie")
+                            and measureStream[i - 1][-1].tie is not None
+                            and measureStream[i - 1][-1].tie.type != 'stop'):
                         lastNoteWasTied = True
                     else:
                         lastNoteWasTied = False
-                        
+
                     m.makeAccidentals(
-                        pitchPastMeasure=measureStream[i-1].pitches,
-                        useKeySignature=ksLast, 
+                        pitchPastMeasure=measureStream[i - 1].pitches,
+                        useKeySignature=ksLast,
                         searchKeySignatureByContext=False,
-                        lastNoteWasTied=lastNoteWasTied, 
+                        lastNoteWasTied=lastNoteWasTied,
                         **srkCopy)
                 else:
                     m.makeAccidentals(
                         useKeySignature=ksLast,
-                        searchKeySignatureByContext=False, 
+                        searchKeySignatureByContext=False,
                         **srkCopy)
         #environLocal.printDebug(['makeNotation(): meterStream:', meterStream, meterStream[0]])
         try:
@@ -5887,15 +5954,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         except StreamException as e:
             strE = str(e)
             environLocal.warn("StreamException: makeTies: " + strE)
-            
+
         #measureStream.makeBeams(inPlace=True)
-        try:
-            measureStream.makeBeams(inPlace=True)
-        except (StreamException, meter.MeterException):
-            # this is a result of makeMeaures not getting everything
-            # note to measure allocation right
-            #environLocal.printDebug(['skipping makeBeams exception', StreamException])
-            pass
+        if not measureStream.streamStatus.beams:
+            try:
+                measureStream.makeBeams(inPlace=True)
+            except (StreamException, meter.MeterException):
+                # this is a result of makeMeaures not getting everything
+                # note to measure allocation right
+                #environLocal.printDebug(['skipping makeBeams exception', StreamException])
+                pass
 
         # note: this needs to be after makeBeams, as placing this before
         # makeBeams was causing the duration's tuplet to loose its type setting
@@ -5905,11 +5973,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if m.streamStatus.haveTupletBracketsBeenMade() is False:
                 makeNotation.makeTupletBrackets(m, inPlace=True)
 
-        if len(measureStream) == 0:
+        if not measureStream:
             raise StreamException(
                     'no measures found in stream with %s elements' % (self.__len__()))
         #environLocal.printDebug(['Stream.makeNotation(): created measures:', len(measureStream)])
-        
+
         return returnStream
 
     def extendDuration(self, objName, inPlace=True):
@@ -5945,7 +6013,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         10.0
 
         The Dynamic does not affect the second note:
-        
+
         >>> stream2[1].offset
         10.0
         >>> stream2[1].duration.quarterLength
@@ -5970,24 +6038,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnObj = self
 
         qLenTotal = returnObj.duration.quarterLength
-        elements = []
-        for element in returnObj.getElementsByClass(objName):
-#             if not hasattr(element, 'duration'):
-#                 raise StreamException('can only process objects with duration attributes')
-            if element.duration is None:
-                element.duration = duration.Duration()
-            elements.append(element)
+        elements = list(returnObj.getElementsByClass(objName))
 
         #print(elements[-1], qLenTotal, elements[-1].duration)
         # print(_MOD, elements)
         for i in range(len(elements)-1):
             #print(i, len(elements))
-            span = self.elementOffset(elements[i+1]) - self.elementOffset(elements[i])
+            span = self.elementOffset(elements[i + 1]) - self.elementOffset(elements[i])
             elements[i].duration.quarterLength = span
 
         # handle last element
         #print(elements[-1], qLenTotal, elements[-1].duration)
-        if len(elements) != 0:
+        if elements:
             elements[-1].duration.quarterLength = (qLenTotal -
                         self.elementOffset(elements[-1]))
             #print(elements[-1], elements[-1].duration)
@@ -5995,8 +6057,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
     def extendDurationAndGetBoundaries(self, objName, inPlace=True):
-        '''Extend the Duration of elements specified by objName; 
-        then, collect a dictionary for every matched element of objName class, 
+        '''Extend the Duration of elements specified by objName;
+        then, collect a dictionary for every matched element of objName class,
         where the matched element is the value and the key is the (start, end) offset value.
 
         >>> from pprint import pprint as pp
@@ -6007,7 +6069,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> pp(s.extendDurationAndGetBoundaries('Dynamic'))
         {(3.0, 7.0): <music21.dynamics.Dynamic mf >,
          (7.0, 12.0): <music21.dynamics.Dynamic f >,
-         (12.0, 12.0): <music21.dynamics.Dynamic ff >}        
+         (12.0, 12.0): <music21.dynamics.Dynamic ff >}
 
 
         TODO: only allow inPlace = True or delete or something, can't return two different things
@@ -6020,18 +6082,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # TODO: use iteration.
         elements = returnObj.getElementsByClass(objName)
         boundaries = {}
-        if len(elements) == 0:
+        if not elements:
             raise StreamException('no elements of this class defined in this Stream')
-        else:
-            for e in elements:
-                start = e.getOffsetBySite(returnObj)
-                end = start + e.duration.quarterLength
-                boundaries[(start, end)] = e
+
+        for e in elements:
+            start = returnObj.elementOffset(e)
+            end = start + e.duration.quarterLength
+            boundaries[(start, end)] = e
         return boundaries
 
 
-    def stripTies(self, 
-                  inPlace=False, 
+    def stripTies(self,
+                  inPlace=False,
                   matchByPitch=False,
                   retainContainers=False):
         '''
@@ -6058,9 +6120,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for sequential notes with matching pitches. The `matchByPitch` option can
         be used to use this technique.
 
-        Note that inPlace=True on a Stream with substream currently has buggy behavior.  
+        Note that inPlace=True on a Stream with substream currently has buggy behavior.
         Use inPlace=False for now.
-        
+
         TODO: Fix this.
 
         >>> a = stream.Stream()
@@ -6068,7 +6130,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> n.quarterLength = 6
         >>> a.append(n)
         >>> m = a.makeMeasures()
-        >>> m.makeTies()
+        >>> m.makeTies(inPlace=True)
         >>> len(m.flat.notes)
         2
 
@@ -6088,7 +6150,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # partlike does not necessarily mean that the next level down is a stream.Part
             # object or that this is a stream.Score object, so do not substitute
             # returnObj.parts for this...
-            for p in returnObj.getElementsByClass('Stream'):                
+            for p in returnObj.getElementsByClass('Stream'):
                 # already copied if necessary; edit in place
                 # when handling a score, retain containers should be true
                 p.stripTies(inPlace=True, matchByPitch=matchByPitch,
@@ -6099,7 +6161,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # that come before the first Note, such as a SystemLayout object
         f = returnObj.flat
         notes = f.notesAndRests.stream()
-        
+
         posConnected = [] # temporary storage for index of tied notes
         posDelete = [] # store deletions to be processed later
 
@@ -6108,7 +6170,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             updateEndMatch based on nList, iLast, matchByPitch, etc.
             '''
             # ties tell us when the are ended
-            if (hasattr(n, 'tie') 
+            if (hasattr(n, 'tie')
                     and n.tie is not None
                     and n.tie.type == 'stop'):
                 return True
@@ -6123,17 +6185,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # find out if the last index is in position connected
             # if the pitches are the same for each note
             endMatch = False
-            if (nLast is not None 
+            if (nLast is not None
                     and iLast in posConnected
-                    and hasattr(nLast, "pitch") 
+                    and hasattr(nLast, "pitch")
                     and hasattr(n, "pitch")
                     and nLast.pitch == n.pitch):
                 endMatch = True
             # looking for two chords of equal size
-            elif (nLast is not None 
-                    and not n.isClassOrSubclass('Note') 
+            elif (nLast is not None
+                    and not n.isClassOrSubclass('Note')
                     and iLast in posConnected
-                    and hasattr(nLast, "pitches") 
+                    and hasattr(nLast, "pitches")
                     and hasattr(n, "pitches")
                     and len(nLast.pitches) == len(n.pitches)):
                 allPitchesMatched = True
@@ -6158,8 +6220,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
             # see if we have a tie and it is started
             # a start typed tie may not be a true start tie
-            if (hasattr(n, 'tie') 
-                    and n.tie is not None 
+            if (hasattr(n, 'tie')
+                    and n.tie is not None
                     and n.tie.type == 'start'):
                 # find a true start, add to known connected positions
                 if iLast is None or iLast not in posConnected:
@@ -6171,7 +6233,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # a connection has been started or continued, so no endMatch
                 endMatch = False
 
-            elif (hasattr(n, 'tie') 
+            elif (hasattr(n, 'tie')
                   and n.tie is not None
                   and n.tie.type == 'continue'):
                 # a continue always implies a connection
@@ -6188,10 +6250,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if len(posConnected) < 2:
                     # an open tie, not connected to anything
                     # should be an error; presently, just skipping
-                    #raise StreamException('cannot consolidate ties when only one tie is present', 
+                    #raise StreamException('cannot consolidate ties when only one tie is present',
                     #    notes[posConnected[0]])
                     #environLocal.printDebug(
-                    #   ['cannot consolidate ties when only one tie is present', 
+                    #   ['cannot consolidate ties when only one tie is present',
                     #     notes[posConnected[0]]])
                     posConnected = []
                     continue
@@ -6262,13 +6324,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                          ignoreRests=ignoreRests):
             # need to find next event that start at the appropriate offset
             if currentIndex == len(srcStream) - 1: # assume flat
-                #environLocal.printDebug(['_getNextElements: nothing to process', 
+                #environLocal.printDebug(['_getNextElements: nothing to process',
                 # currentIndex, len(srcStream.notes) ])
                 return [] # nothing left
             # iterate over all possible elements
             if ignoreRests:
                 # need to find the offset of the first thing that is not rest
-                for j in range(currentIndex+1, len(srcStream._elements)):
+                for j in range(currentIndex + 1, len(srcStream._elements)):
                     e = srcStream._elements[j]
                     if 'NotRest' in e.classes:
                         # change target offset to this position
@@ -6314,7 +6376,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         # create a tie from p to q
                         if p.tie is None:
                             p.tie = tie.Tie('start')
-                        elif p.tie.type is 'stop':
+                        elif p.tie.type == 'stop':
                             p.tie.type = 'continue'
                         # if dst tie exists, assume it connects
                         q.tie = tie.Tie('stop')
@@ -6370,7 +6432,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         For instance, here is an unsorted Stream
 
-
         >>> s = stream.Stream()
         >>> s.autoSort = False # if true, sorting is automatic
         >>> s.insert(1, note.Note("D"))
@@ -6382,14 +6443,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         But a sorted version of the Stream puts the C first:
 
-
         >>> s.sorted.show('text')
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Note D>
 
-
         While the original stream remains unsorted:
-
 
         >>> s.show('text')
         {1.0} <music21.note.Note D>
@@ -6397,6 +6455,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
         OMIT_FROM_DOCS
+
         >>> s = stream.Stream()
         >>> s.autoSort = False
         >>> s.repeatInsert(note.Note("C#"), [0, 2, 4])
@@ -6444,7 +6503,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             s._endElements = shallowEndElements
 
             for e in shallowElements + shallowEndElements:
-                s.setElementOffset(e, self.elementOffset(e))
+                s.setElementOffset(e, self.elementOffset(e), addElement=True)
                 e.sites.add(s)
                 # need to explicitly set activeSite
                 e.activeSite = s
@@ -6477,7 +6536,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         A private method that implements the .flat or .semiFlat reduction types by using
         `retainContainers` = False to get .flat and retainContainers = True to get .semiFlat
         '''
-        #environLocal.printDebug(['_getFlatOrSemiFlat(): self', self, 
+        #environLocal.printDebug(['_getFlatOrSemiFlat(): self', self,
         #  'self.activeSite', self.activeSite])
 
         # this copy will have a shared locations object
@@ -6498,13 +6557,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 sNew.id = newId
             except UnicodeEncodeError:
                 sNew.id = "_" + method
-        
+
         sNew._derivation = derivation.Derivation(sNew)
         sNew._derivation.origin = self
         sNew.derivation.method = method
         # storing .elements in here necessitates
         # create a new, independent cache instance in the flat representation
-        sNew._cache = {} 
+        sNew._cache = {}
         sNew._offsetDict = {}
         sNew._elements = []
         sNew._endElements = []
@@ -6522,7 +6581,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 recurseStreamOffset = self.elementOffset(e)
 
                 if retainContainers is True: # semiFlat
-                    #environLocal.printDebug(['_getFlatOrSemiFlat(), 
+                    #environLocal.printDebug(['_getFlatOrSemiFlat(),
                     #   retaining containers, storing element:', e])
 
                     # this will change the activeSite of e to be sNew, previously
@@ -6537,12 +6596,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 else:
                     recurseStream = e.flat
 
-                #environLocal.printDebug("recurseStreamOffset: " + str(e.id) + 
+                #environLocal.printDebug("recurseStreamOffset: " + str(e.id) +
                 #    " " + str(recurseStreamOffset))
                 # recurse Stream is the flat or semiFlat contents of a Stream
                 # contained within the caller
                 for eSub in recurseStream:
-                    #environLocal.printDebug(['subElement', id(eSub), 
+                    #environLocal.printDebug(['subElement', id(eSub),
                     #   'inserted in', sNew, 'id(sNew)', id(sNew)])
                     #oldOffset =
                     #sNew.insert(eSub.getOffsetBySite(recurseStream) +
@@ -6615,7 +6674,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         there:
 
         >>> sc.flat.elements
-        (<music21.note.Note C>, <music21.note.Note E>, 
+        (<music21.note.Note C>, <music21.note.Note E>,
          <music21.note.Note D>, <music21.note.Note F>)
 
         Flattening a stream is a great way to get at all the notes in
@@ -6742,9 +6801,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.insert(0, p2)
         >>> sf = s.semiFlat
         >>> sf.elements
-        (<music21.stream.Part part1>, 
-         <music21.stream.Part part2>, 
-         <music21.note.Note C>, 
+        (<music21.stream.Part part1>,
+         <music21.stream.Part part2>,
+         <music21.note.Note C>,
          <music21.note.Note D>)
         >>> sf[0]
         <music21.stream.Part part1>
@@ -6759,19 +6818,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                     retainContainers=True)
         return self._cache['semiFlat']
 
-        
+
 
     def _yieldReverseUpwardsSearch(self, memo=None, streamsOnly=False,
                              skipDuplicates=True, classFilter=()):
         '''
         Yield all containers (Stream subclasses), including self, and going upward
         and outward.
-        
+
         NOT CURRENTLY USED.
 
-        Note: on first call, a new, fresh memo list must be provided; 
+        Note: on first call, a new, fresh memo list must be provided;
         otherwise, values are retained from one call to the next.
-        
+
         >>> b = corpus.parse('bwv66.6')
         >>> nMid = b[2][4][2]
         >>> nMid
@@ -6780,23 +6839,23 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> nMidMeasure
         <music21.stream.Measure 3 offset=9.0>
         >>> list(nMidMeasure._yieldReverseUpwardsSearch())
-        [<music21.stream.Measure 3 offset=9.0>, 
-         <music21.instrument.Instrument P2: Alto: Instrument 2>, 
-         <music21.stream.Part Alto>, 
-         <music21.metadata.Metadata object at 0x...>, 
-         <music21.stream.Part Soprano>, 
-         <music21.stream.Score ...>, 
-         <music21.stream.Part Tenor>, 
-         <music21.stream.Part Bass>, 
-         <music21.layout.StaffGroup <music21.stream.Part Soprano>...>, 
-         <music21.stream.Measure 0 offset=0.0>, 
-         <music21.stream.Measure 1 offset=1.0>, 
-         <music21.stream.Measure 2 offset=5.0>, 
-         <music21.stream.Measure 4 offset=13.0>, 
-         <music21.stream.Measure 5 offset=17.0>, 
-         <music21.stream.Measure 6 offset=21.0>, 
-         <music21.stream.Measure 7 offset=25.0>, 
-         <music21.stream.Measure 8 offset=29.0>, 
+        [<music21.stream.Measure 3 offset=9.0>,
+         <music21.instrument.Instrument P2: Alto: Instrument 2>,
+         <music21.stream.Part Alto>,
+         <music21.metadata.Metadata object at 0x...>,
+         <music21.stream.Part Soprano>,
+         <music21.stream.Score ...>,
+         <music21.stream.Part Tenor>,
+         <music21.stream.Part Bass>,
+         <music21.layout.StaffGroup <music21.stream.Part Soprano>...>,
+         <music21.stream.Measure 0 offset=0.0>,
+         <music21.stream.Measure 1 offset=1.0>,
+         <music21.stream.Measure 2 offset=5.0>,
+         <music21.stream.Measure 4 offset=13.0>,
+         <music21.stream.Measure 5 offset=17.0>,
+         <music21.stream.Measure 6 offset=21.0>,
+         <music21.stream.Measure 7 offset=25.0>,
+         <music21.stream.Measure 8 offset=29.0>,
          <music21.stream.Measure 9 offset=33.0>]
         '''
         # TODO: add support for filter list
@@ -6836,9 +6895,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 #elif (hasattr(e, 'elements') and e.activeSite is not None
                 #    and hasattr(e.activeSite, 'elements')):
 
-                elif (e.isStream 
-                      and e.activeSite is not None 
-                      and e.activeSite.isStream 
+                elif (e.isStream
+                      and e.activeSite is not None
+                      and e.activeSite.isStream
                       and 'SpannerStorage' not in e.classes):
                     # this returns a generator, so need to iterate over it
                     # to get results
@@ -6860,15 +6919,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         NOTE: skipSelf is going to become True by default soon -- make sure that you
         are NOT relying on the default value.
-        
-        Returns an iterator that iterates over a list of Music21Objects 
-        contained in the Stream, starting with self (unless skipSelf is True), 
+
+        Returns an iterator that iterates over a list of Music21Objects
+        contained in the Stream, starting with self (unless skipSelf is True),
         continuing with self's elements,
-        and whenever finding a Stream subclass in self, 
+        and whenever finding a Stream subclass in self,
         that Stream subclass's elements.
 
         Here's an example. Let's create a simple score.
-        
+
         >>> s = stream.Score(id='mainScore')
         >>> p0 = stream.Part(id='part0')
         >>> p1 = stream.Part(id='part1')
@@ -6898,15 +6957,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 {0.0} <music21.note.Note E>
             {4.0} <music21.stream.Measure 2 offset=4.0>
                 {0.0} <music21.note.Note F>
-                
+
         Now we could assign the `.recurse()` method to something, but that won't have much effect:
-        
+
         >>> sRecurse = s.recurse()
         >>> sRecurse
         <music21.stream.iterator.RecursiveIterator for Score:mainScore @:0>
-        
+
         So, that's not how we use `.recurse()`.  Instead use it in a for loop:
-        
+
         >>> for el in s.recurse():
         ...     tup = (el, el.offset, el.activeSite)
         ...     print(tup)
@@ -6920,12 +6979,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         (<music21.stream.Measure 1 offset=0.0>, 0.0, <music21.stream.Part part1>)
         (<music21.note.Note E>, 0.0, <music21.stream.Measure 1 offset=0.0>)
         (<music21.stream.Measure 2 offset=4.0>, 4.0, <music21.stream.Part part1>)
-        (<music21.note.Note F>, 0.0, <music21.stream.Measure 2 offset=4.0>)        
-        
+        (<music21.note.Note F>, 0.0, <music21.stream.Measure 2 offset=4.0>)
+
         Notice that like calling `.show('text')`, the offsets are relative to their containers.
-        
+
         Compare the difference between putting `classFilter='Note'` and `.flat.notes`:
-        
+
         >>> for el in s.recurse(classFilter='Note'):
         ...     tup = (el, el.offset, el.activeSite)
         ...     print(tup)
@@ -6945,25 +7004,25 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         If you don't need correct offsets or activeSites, set `restoreActiveSites` to `False`.
         Then the last offset/activeSite will be used.  It's a bit of a speedup, but leads to some
         bad code, so use it only in highly optimized situations.
-        
+
         We'll also test using multiple classes here... the Stream given is the same as the
         s.flat.notes stream.
-        
-        >>> for el in s.recurse(classFilter=('Note','Rest'), restoreActiveSites=False):
+
+        >>> for el in s.recurse(classFilter=('Note', 'Rest'), restoreActiveSites=False):
         ...     tup = (el, el.offset, el.activeSite)
         ...     print(tup)
         (<music21.note.Note C>, 0.0, <music21.stream.Score mainScore_flat>)
         (<music21.note.Note D>, 4.0, <music21.stream.Score mainScore_flat>)
         (<music21.note.Note E>, 0.0, <music21.stream.Score mainScore_flat>)
-        (<music21.note.Note F>, 4.0, <music21.stream.Score mainScore_flat>)        
+        (<music21.note.Note F>, 4.0, <music21.stream.Score mainScore_flat>)
 
         So, this is pretty unreliable so don't use it unless the tiny speedup is worth it.
-        
+
         The other two attributes are pretty self-explanatory: `streamsOnly` will put only Streams
         in, while `skipSelf` will ignore the initial stream from recursion.  If the inclusion or
         exclusion of `self` is important to you, put it in explicitly, because the default
         will likely change in the future.
-        
+
         >>> for el in s.recurse(skipSelf=True, streamsOnly=True):
         ...     tup = (el, el.offset, el.activeSite)
         ...     print(tup)
@@ -6975,22 +7034,22 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         (<music21.stream.Measure 2 offset=4.0>, 4.0, <music21.stream.Part part1>)
 
         .. warning::
-        
+
             Remember that like all iterators, it is dangerous to alter
             the components of the Stream being iterated over during iteration.
             if you need to edit while recusing, list(s.recurse()) is safer.
-        
+
         #TODO: change skipSelf by January 2016.
         '''
         includeSelf = not skipSelf
-        ri = iterator.RecursiveIterator(self, 
+        ri = iterator.RecursiveIterator(self,
                                         streamsOnly=streamsOnly,
                                         restoreActiveSites=restoreActiveSites,
                                         includeSelf=includeSelf
                                         )
         if classFilter != ():
             ri.addFilter(filters.ClassFilter(classFilter))
-        return ri        
+        return ri
 
     def restoreActiveSites(self):
         '''
@@ -7048,7 +7107,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # TODO: Perfect timespans candidate
         if 'HighestOffset' in self._cache and self._cache["HighestOffset"] is not None:
             pass  # return cache unaltered
-        elif len(self._elements) == 0:
+        elif not self._elements:
             self._cache["HighestOffset"] = 0.0
         elif self.isSorted is True:
             eLast = self._elements[-1]
@@ -7059,7 +7118,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 candidateOffset = self.elementOffset(e)
                 if highestOffsetSoFar is None or candidateOffset > highestOffsetSoFar:
                     highestOffsetSoFar = candidateOffset
-            
+
             if highestOffsetSoFar is not None:
                 self._cache["HighestOffset"] = float(highestOffsetSoFar)
             else:
@@ -7109,10 +7168,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> p1.repeatInsert(n, [1, 2, 3, 4])
         >>> p1.highestTime
         7.0
-        
-        
+
+
         Another example.
-        
+
         >>> n = note.Note('C#')
         >>> n.quarterLength = 3
 
@@ -7139,14 +7198,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # remove cache -- durations might change...
         if 'HighestTime' in self._cache and self._cache["HighestTime"] is not None:
             pass  # return cache unaltered
-        elif len(self._elements) == 0:
-        #if len(self._elements) == 0:
+        elif not self._elements:
             self._cache["HighestTime"] = 0.0
             return 0.0
         else:
             highestTimeSoFar = Fraction(0, 1)
             # TODO: optimize for a faster way of doing this.
-            # but cannot simply look at the last element because what if the penultimate 
+            # but cannot simply look at the last element because what if the penultimate
             # element, with a
             # lower offset has a longer duration than the last?
             # Take the case where a whole note appears a 0.0, but a textExpression (ql=0) at 0.25 --
@@ -7169,7 +7227,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Get the start time of the Element with the lowest offset in the Stream.
 
         >>> stream1 = stream.Stream()
-        >>> for x in range(3,5):
+        >>> for x in range(3, 5):
         ...     n = note.Note('G#')
         ...     stream1.insert(x, n)
         ...
@@ -7189,7 +7247,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> p = stream.Stream()
         >>> p.repeatInsert(note.Note('D5'), [0, 1, 2, 3, 4])
         >>> q = stream.Stream()
-        >>> q.repeatInsert(p, list(range(0,50,10)))
+        >>> q.repeatInsert(p, list(range(0, 50, 10)))
         >>> len(q.flat)
         25
         >>> q.lowestOffset
@@ -7203,7 +7261,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         if 'lowestOffset' in self._cache and self._cache["LowestOffset"] is not None:
             pass  # return cache unaltered
-        elif len(self._elements) == 0:
+        elif not self._elements:
             self._cache["LowestOffset"] = 0.0
         elif self.isSorted is True:
             eFirst = self._elements[0]
@@ -7243,7 +7301,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         of the stream.  Useful to define the scope of the stream as independent
         of its constituted elements.
 
-        If set to None, then the default behavior of computing automatically from 
+        If set to None, then the default behavior of computing automatically from
         highestTime is reestablished.
         '''
         if (isinstance(durationObj, duration.Duration)):
@@ -7254,7 +7312,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             raise Exception('this must be a Duration object, not %s' % durationObj)
 
     duration = property(_getDuration, _setDuration, doc='''
-        Returns the total duration of the Stream, from the beginning of the 
+        Returns the total duration of the Stream, from the beginning of the
         stream until the end of the final element.
         May be set independently by supplying a Duration object.
 
@@ -7262,7 +7320,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> a = stream.Stream()
         >>> q = note.Note(type='quarter')
-        >>> a.repeatInsert(q, [0,1,2,3])
+        >>> a.repeatInsert(q, [0, 1, 2, 3])
         >>> a.highestOffset
         3.0
         >>> a.highestTime
@@ -7304,7 +7362,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         tiStream = self.getElementsByClass('TempoIndication')
         offsetMetronomeMarkPairs = []
 
-        if len(tiStream) == 0:
+        if not tiStream:
             getTempoFromContext = True
         else:
             for ti in tiStream:
@@ -7322,7 +7380,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             ti = self.getContextByClass('TempoIndication')
             if ti is None:
                 raise StreamException(
-                    'cannot get a seconds duration when no TempoIndication classes ' + 
+                    'cannot get a seconds duration when no TempoIndication classes ' +
                     'are found in or before this Stream.')
             else: # insert at zero offset position, even though coming from
                 # outside this stream
@@ -7339,7 +7397,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # if not the last ti, get the next by index to get the offset
             if i < len(offsetMetronomeMarkPairs) - 1:
                 # cases of two or more remain
-                oEnd, unused_mmEnd = offsetMetronomeMarkPairs[i+1]
+                oEnd, unused_mmEnd = offsetMetronomeMarkPairs[i + 1]
             else: # at the last
                 oEnd = self.highestTime
             sec += mmStart.durationToSeconds(oEnd-oStart)
@@ -7348,8 +7406,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
     seconds = property(_getSeconds, _setSeconds, doc = '''
-        Get or set the duration of this Stream in seconds, assuming that 
-        this object contains a :class:`~music21.tempo.MetronomeMark` or 
+        Get or set the duration of this Stream in seconds, assuming that
+        this object contains a :class:`~music21.tempo.MetronomeMark` or
         :class:`~music21.tempo.MetricModulation`.
 
 
@@ -7383,7 +7441,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.repeatAppend(note.Note(), 8)
         >>> s.insert([6, tempo.MetronomeMark(number=240)])
         >>> s.metronomeMarkBoundaries()
-        [(0.0, 6.0, <music21.tempo.MetronomeMark animato Quarter=120>), 
+        [(0.0, 6.0, <music21.tempo.MetronomeMark animato Quarter=120>),
          (6.0, 8.0, <music21.tempo.MetronomeMark Quarter=240>)]
         '''
         if srcObj is None:
@@ -7400,7 +7458,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         lowestOffset = srcFlat.lowestOffset
 
         # if no tempo
-        if len(tiStream) == 0:
+        if not tiStream:
             mmDefault = tempo.MetronomeMark(number=120) # a default
             mmBoundaries.append((lowestOffset, highestTime, mmDefault))
         # if just one tempo
@@ -7440,10 +7498,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     mmBoundaries.append((offsetPairs[i][0], highestTime,
                                          offsetPairs[i][1]))
                 else: # add with next boundary
-                    mmBoundaries.append((offsetPairs[i][0], offsetPairs[i+1][0],
+                    mmBoundaries.append((offsetPairs[i][0], offsetPairs[i + 1][0],
                                          offsetPairs[i][1]))
 
-        #environLocal.printDebug(['self.metronomeMarkBoundaries()', 
+        #environLocal.printDebug(['self.metronomeMarkBoundaries()',
         # 'got mmBoundaries:', mmBoundaries])
         return mmBoundaries
 
@@ -7463,7 +7521,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     activeEnd = oEnd
                 else: # if end after this region
                     activeEnd = e
-                #environLocal.printDebug(['activeStart', activeStart, 
+                #environLocal.printDebug(['activeStart', activeStart,
                 # 'activeEnd', activeEnd, 's, e, mm', s, e, mm])
                 totalSeconds += mm.durationToSeconds(activeEnd-activeStart)
             else:
@@ -7526,10 +7584,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     # do not make a property decorator since _getSecondsMap takes arguments
     secondsMap = property(_getSecondsMap, doc='''
-        Returns a list where each element is a dictionary 
-        consisting of the 'offsetSeconds' in seconds of each element in a Stream, 
-        the 'duration' in seconds, the 'endTimeSeconds' in seconds (that is, the offset 
-        plus the duration), and the 'element' itself. Also contains a 'voiceIndex' entry which 
+        Returns a list where each element is a dictionary
+        consisting of the 'offsetSeconds' in seconds of each element in a Stream,
+        the 'duration' in seconds, the 'endTimeSeconds' in seconds (that is, the offset
+        plus the duration), and the 'element' itself. Also contains a 'voiceIndex' entry which
         contains the voice number of the element, or None if there
         are no voices.
 
@@ -7564,7 +7622,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         mdList = self.getElementsByClass('Metadata')
         # only return metadata that has an offset = 0.0
         mdList = mdList.getElementsByOffset(0)
-        if len(mdList) == 0:
+        if not mdList:
             return None
         else:
             return mdList[0]
@@ -7618,7 +7676,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def beatStr(self):
         '''
         unlike other Music21Objects, streams always have beatStr (beat string) of None
-        
+
         May change to "" soon.
         '''
         return None
@@ -7627,7 +7685,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def beatDuration(self):
         '''
         unlike other Music21Objects, streams always have beatDuration of None
-        ''' 
+        '''
         # this returns the duration of the active beat
         return None
 
@@ -7635,7 +7693,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def beatStrength(self):
         '''
         unlike other Music21Objects, streams always have beatStrength of None
-        '''        
+        '''
         # this returns the accent weight of the active beat
         return None
 
@@ -7660,10 +7718,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> for offset in [0.0, 1.0, 2.0, 5.0, 5.5]:
         ...     returnTuples.append(bach.beatAndMeasureFromOffset(offset))
         >>> returnTuples
-        [(4.0, <music21.stream.Measure 0 offset=0.0>), 
-         (1.0, <music21.stream.Measure 1 offset=1.0>), 
-         (2.0, <music21.stream.Measure 1 offset=1.0>), 
-         (1.0, <music21.stream.Measure 2 offset=5.0>), 
+        [(4.0, <music21.stream.Measure 0 offset=0.0>),
+         (1.0, <music21.stream.Measure 1 offset=1.0>),
+         (2.0, <music21.stream.Measure 1 offset=1.0>),
+         (1.0, <music21.stream.Measure 2 offset=5.0>),
          (1.5, <music21.stream.Measure 2 offset=5.0>)]
 
         To get just the measureNumber and beat, use a transformation like this:
@@ -7710,11 +7768,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         foundMeasureNumber = myMeas.number
         # deal with second half of partial measures...
 
-        #Now we deal with the problem case, where we have the second half of a partial measure.  
+        #Now we deal with the problem case, where we have the second half of a partial measure.
         #These are
-        #treated as unnumbered measures (or measures with suffix 'X') by notation programs, 
+        #treated as unnumbered measures (or measures with suffix 'X') by notation programs,
         #even though they are
-        #logically part of the previous measure.  
+        #logically part of the previous measure.
         #The variable padBeats will represent extra beats we add to the front
         #of our partial measure
         numSuffix = myMeas.numberSuffix
@@ -7726,21 +7784,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if prevMeas:
                 ts2 = prevMeas.getContextByClass('TimeSignature')
                 if not ts2:
-                    raise StreamException("beatAndMeasureFromOffset: partial measure found, " + 
+                    raise StreamException("beatAndMeasureFromOffset: partial measure found, " +
                                 "but could not find a time signature for the preceeding measure")
                 #foundMeasureNumber = prevMeas.number
-                
+
                 # need this for chorales 197 and 280, where we
                 # have a full-length measure followed by a pickup in
                 # a new time signature
-                if prevMeas.highestTime == ts2.barDuration.quarterLength:       
-                    padBeats = ts2.beatCount                                    
-                else:                                                           
+                if prevMeas.highestTime == ts2.barDuration.quarterLength:
+                    padBeats = ts2.beatCount
+                else:
                     padBeats = ts2.getBeatProportion(prevMeas.highestTime) - 1
                 return (myBeat + padBeats, prevMeas)
             else:
                 padBeats = ts1.getBeatProportion(
-                                ts1.barDuration.quarterLength - myMeas.duration.quarterLength) - 1    
+                                ts1.barDuration.quarterLength - myMeas.duration.quarterLength) - 1
                                 # partial measure at start of piece
                 return (myBeat + padBeats, myMeas)
         else:
@@ -7751,9 +7809,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     #---------------------------------------------------------------------------
     # transformations
 
-    def transpose(self, 
-                  value, 
-                  inPlace=False, 
+    def transpose(self,
+                  value,
+                  inPlace=False,
                   recurse=True,
                   classFilterList=None):
         '''
@@ -7767,10 +7825,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         returns a new Stream by default, but if the
         optional "inPlace" key is set to True then
         it modifies pitches in place.
-        
+
         TODO: for generic interval set accidental by key signature.
 
-        
+
 
         >>> aInterval = interval.Interval('d5')
 
@@ -7815,21 +7873,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             siterator = post.recurse()
         else:
             siterator = post.__iter__()
-        
+
         if classFilterList:
             siterator.addFilter(filters.ClassFilter(classFilterList))
-        
+
         for e in siterator:
             if e.isStream:
                 continue
             if hasattr(e, 'transpose'):
-                if (hasattr(value, 'classes') 
+                if (hasattr(value, 'classes')
                     and 'GenericInterval' in value.classes):
                     # do not transpose KeySignatures w/ Generic Intervals
                     if 'KeySignature' not in e.classes and hasattr(e, 'pitches'):
                         k = e.getContextByClass('KeySignature')
                         for p in e.pitches:
-                            value.transposePitchKeyAware(p, k, inPlace=True)                         
+                            value.transposePitchKeyAware(p, k, inPlace=True)
                 else:
                     e.transpose(value, inPlace=True)
         if not inPlace:
@@ -7928,7 +7986,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         Scale all durations by a provided scalar. Offsets are not modified.
 
-        To augment or diminish a Stream, see the 
+        To augment or diminish a Stream, see the
         :meth:`~music21.stream.Stream.augmentOrDiminish` method.
 
         We do not retain durations in any circumstance; if inPlace=True, two deepcopies are done
@@ -8009,7 +8067,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
     def quantize(self, quarterLengthDivisors=None,
-                 processOffsets=True, processDurations=True, 
+                 processOffsets=True, processDurations=True,
                  inPlace=False, recurse=True):
         '''
         Quantize time values in this Stream by snapping offsets
@@ -8045,17 +8103,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> nshort = note.Note()
         >>> nshort.quarterLength = .26
         >>> s.repeatInsert(nshort, [1.49, 1.76])
-        
+
         >>> s.quantize([4], processOffsets=True, processDurations=True, inPlace=True)
         >>> [e.offset for e in s]
         [0.0, 0.5, 1.0, 1.5, 1.75]
         >>> [e.duration.quarterLength for e in s]
         [0.5, 0.5, 0.5, 0.25, 0.25]
-        
-        
+
+
         The error in quantization is set in the editorial attribute for the note in
         two places `.offsetQuantizationError` and `.quarterLengthQuantizationError`
-        
+
         >>> [e.editorial.offsetQuantizationError for e in s.notes]
         [0.1, -0.01, -0.1, -0.01, 0.01]
         >>> [e.editorial.quarterLengthQuantizationError for e in s.notes]
@@ -8079,7 +8137,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
         Test changing defaults, running, and changing back...
-        
+
 
         >>> dd = defaults.quantizationQuarterLengthDivisors
         >>> defaults.quantizationQuarterLengthDivisors = (3,)
@@ -8096,14 +8154,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         [0.0, 0.5, 1.0, 1.5, 1.75]
         >>> [e.duration.quarterLength for e in v]
         [0.5, 0.5, 0.5, 0.25, 0.25]
-        
+
 
         TODO: test recurse and inPlace etc.
         TODO: recurse should be off by default -- standard
         '''
         if quarterLengthDivisors is None:
             quarterLengthDivisors = defaults.quantizationQuarterLengthDivisors
-            
+
         # this presently is not trying to avoid overlaps that
         # result from quantization; this may be necessary
 
@@ -8145,13 +8203,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         o = -1 * o
                     unused_error, oNew, signedError = bestMatch(float(o), quarterLengthDivisors)
                     useStream.setElementOffset(e, oNew * sign)
-                    if (hasattr(e, 'editorial') 
+                    if (hasattr(e, 'editorial')
                             and signedError != 0):
                         e.editorial.offsetQuantizationError = signedError * sign
                 if processDurations:
                     if e.duration is not None:
                         ql = e.duration.quarterLength
-                        if ql < 0:  # buggy MIDI file? 
+                        if ql < 0:  # buggy MIDI file?
                             ql = 0
                         unused_error, qlNew, signedError = bestMatch(
                                                             float(ql), quarterLengthDivisors)
@@ -8213,7 +8271,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def sliceByQuarterLengths(self, quarterLengthList, target=None,
         addTies=True, inPlace=False):
         '''
-        Slice all :class:`~music21.duration.Duration` objects on all Notes and Rests 
+        Slice all :class:`~music21.duration.Duration` objects on all Notes and Rests
         of this Stream.
         Duration are sliced according to values provided in `quarterLengthList` list.
         If the sum of these values is less than the Duration, the values are accumulated
@@ -8273,7 +8331,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             else:
                 qlProcess = quarterLengthList
 
-            #environLocal.printDebug(['got qlProcess', qlProcess, 
+            #environLocal.printDebug(['got qlProcess', qlProcess,
             #'for element', e, e.quarterLength])
 
             if not opFrac(sum(qlProcess)) == e.quarterLength:
@@ -8300,7 +8358,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         TODO: return None if inPlace is True
         '''
-        # when operating on a Stream, this should take all durations found 
+        # when operating on a Stream, this should take all durations found
         # and use the approximateGCD to get a min duration; then, call sliceByQuarterLengths
 
         if not inPlace: # make a copy
@@ -8333,11 +8391,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return returnObj
 
 
-    def sliceAtOffsets(self, 
-                       offsetList, 
+    def sliceAtOffsets(self,
+                       offsetList,
                        target=None,
-                       addTies=True, 
-                       inPlace=False, 
+                       addTies=True,
+                       inPlace=False,
                        displayTiedAccidentals=False):
         '''
         Given a list of quarter lengths, slice and optionally tie all
@@ -8363,7 +8421,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # shift by each measure's offset
                 offsetListLocal = [o - m.getOffsetBySite(returnObj) for o in offsetList]
                 m.sliceAtOffsets(offsetList=offsetListLocal,
-                    addTies=addTies, 
+                    addTies=addTies,
                     inPlace=True,
                     displayTiedAccidentals=displayTiedAccidentals)
             return returnObj # exit
@@ -8373,7 +8431,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for p in returnObj.getElementsByClass('Stream'):
                 offsetListLocal = [o - p.getOffsetBySite(returnObj) for o in offsetList]
                 p.sliceAtOffsets(offsetList=offsetListLocal,
-                    addTies=addTies, 
+                    addTies=addTies,
                     inPlace=True,
                     displayTiedAccidentals=displayTiedAccidentals)
             return returnObj # exit
@@ -8417,10 +8475,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return returnObj
 
 
-    def sliceByBeat(self, 
+    def sliceByBeat(self,
                     target=None,
-                    addTies=True, 
-                    inPlace=False, 
+                    addTies=True,
+                    inPlace=False,
                     displayTiedAccidentals=False):
         '''
         Slice all elements in the Stream that have a Duration at
@@ -8453,7 +8511,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # using this method to work on Stream, not just Measures
         tsStream = returnObj.getTimeSignatures(returnDefault=True)
 
-        if len(tsStream) == 0:
+        if not tsStream:
             raise StreamException('no time signature was found')
         elif len(tsStream) > 1:
             raise StreamException('not yet implemented: slice by changing time signatures')
@@ -8512,9 +8570,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     def hasPartLikeStreams(self):
         '''
-        Return a boolean value showing if this Stream contains multiple Parts, 
+        Return a boolean value showing if this Stream contains multiple Parts,
         or Part-like sub-Streams.
-        
+
         Part-like sub-streams are Streams that contain Measures or Notes.
         And where no sub-stream begins at an offset besides zero.
 
@@ -8526,19 +8584,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.insert(0, p1)
         >>> s.hasPartLikeStreams()
         True
-        
+
         A stream that has a measure in it is not a partlike stream.
-        
+
         >>> s = stream.Score()
         >>> m1 = stream.Measure()
         >>> m1.repeatAppend(note.Note(), 4)
         >>> s.append(m1)
         >>> s.hasPartLikeStreams()
         False
-        
-        
+
+
         A stream with a single generic Stream substream at the beginning has partlike Streams...
-        
+
         >>> s = stream.Score()
         >>> m1 = stream.Stream()
         >>> m1.repeatAppend(note.Note(), 4)
@@ -8570,15 +8628,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     if obj.isClassOrSubclass(['Part']):
                         multiPart = True
                         break
-                    
+
                     elif obj.isClassOrSubclass(['Measure', 'Voice']):
                         multiPart = False
                         break
-                    
+
                     elif obj.offset != 0.0:
                         multiPart = False
                         break
-                    
+
                     # if components are streams of Notes or Measures,
                     # than assume this is like a Part
                     elif (obj.getElementsByClass('Measure')
@@ -8720,7 +8778,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {2.0} <music21.chord.Chord A B->
 
         Notice that `.notes` returns a :class:`~music21.stream.iterator.StreamIterator` object
-        
+
         >>> p1.notes
         <music21.stream.iterator.StreamIterator for Part:0x105b56128 @:0>
 
@@ -8790,13 +8848,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         `.pitches` properties (the docs you are reading now), pitches from embedded streams
         are also returned.  Flattening a stream is not necessary.  Whether this is a
         feature or a bug is in the eye of the beholder.
-        
+
         >>> len(a.pitches)
         104
 
         Chords get their pitches found as well:
 
-        >>> c = chord.Chord(['C4','E4','G4'])
+        >>> c = chord.Chord(['C4', 'E4', 'G4'])
         >>> n = note.Note('F#4')
         >>> m = stream.Measure()
         >>> m.append(n)
@@ -8807,7 +8865,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         post = []
         for e in self.elements:
-            if 'music21.key.Key' in e.classSet: # use fully qualified name 
+            if 'music21.key.Key' in e.classSet: # use fully qualified name
                 continue
             if hasattr(e, "pitch"):
                 post.append(e.pitch)
@@ -8822,100 +8880,38 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return post
 
 
-    def pitchAttributeCount(self, pitchAttr='name'):
+    @common.deprecated('May 2017', 'September 2018', 'see analysis.pitchAnalysis instead')
+    def pitchAttributeCount(self, pitchAttr='name'): # pragma: no-cover
         '''
-        Return a dictionary of pitch class usage (count)
-        by selecting an attribute of the Pitch object.
-
-        >>> from music21 import corpus
-        >>> a = corpus.parse('bach/bwv324.xml')
-        >>> pcCount = a.pitchAttributeCount('pitchClass')
-        >>> for n in sorted(list(pcCount.keys())):
-        ...     print ("%2d: %2d" % (n, pcCount[n]))
-         0:  3
-         2: 25
-         3:  3
-         4: 14
-         6: 15
-         7: 13
-         9: 17
-        11: 14
-        >>> nameCount = a.pitchAttributeCount('name')
-        >>> for n in sorted(list(nameCount.keys())):
-        ...     print ("%2s: %2d" % (n, nameCount[n]))
-         A: 17
-         B: 14
-         C:  3
-         D: 25
-        D#:  3
-         E: 14
-        F#: 15
-         G: 13
-        >>> nameOctaveCount = a.pitchAttributeCount('nameWithOctave')
-        >>> for n in sorted(list(nameOctaveCount.keys())):
-        ...     print ("%3s: %2d" % (n, nameOctaveCount[n]))
-         A2:  2
-         A3:  5
-         A4: 10
-         B2:  3
-         B3:  4
-         B4:  7
-         C3:  2
-         C5:  1
-        D#3:  1
-        D#4:  2
-         D3:  9
-         D4: 14
-         D5:  2
-         E2:  1
-         E3:  4
-         E4:  9
-        F#3: 13
-        F#4:  2
-         G2:  1
-         G3: 10
-         G4:  2
+        see :func:music21.analysis.pitchAnalysis.pitchAttributeCount
         '''
-        post = {}
-        for p in self.pitches:
-            k = getattr(p, pitchAttr)
-            if k not in post:
-                post[k] = 0
-            post[k] += 1
-        return post
+        from music21.analysis.pitchAnalysis import pitchAttributeCount
+        return pitchAttributeCount(self, pitchAttr)
 
-
-    def attributeCount(self, classFilterList, attrName='quarterLength'):
+    @common.deprecated('May 2017', 'September 2018', 'see analysis.elements instead')
+    def attributeCount(self, classFilterList=None, attrName='quarterLength'):  # pragma: no-cover
         '''
-        Return a dictionary of attribute usage for one or more
-        classes provided in a the `classFilterList` list and having
-        the attribute specified by `attrName`.
-
-        >>> from music21 import corpus
-        >>> a = corpus.parse('bach/bwv324.xml')
-        >>> a.parts[0].flat.attributeCount(note.Note, 'quarterLength')
-        {1.0: 12, 2.0: 11, 4.0: 2}
+        see :func:music21.analysis.elements.attributeCount
         '''
-        post = {}
-        for e in self.getElementsByClass(classFilterList):
-            if hasattr(e, attrName):
-                k = getattr(e, attrName)
-                if k not in post:
-                    post[k] = 0
-                post[k] += 1
-        return post
+        if classFilterList is not None:
+            passedObject = self.iter
+            passedObject.addFilter(filters.ClassFilter(classFilterList))
+        else:
+            passedObject = self
+        from music21.analysis.elements import attributeCount
+        return attributeCount(passedObject, attrName)
 
 
     #---------------------------------------------------------------------------
     # interval routines
 
-    def findConsecutiveNotes(self, 
-                             skipRests=False, 
+    def findConsecutiveNotes(self,
+                             skipRests=False,
                              skipChords=False,
-                             skipUnisons=False, 
+                             skipUnisons=False,
                              skipOctaves=False,
-                             skipGaps=False, 
-                             getOverlaps=False, 
+                             skipGaps=False,
+                             getOverlaps=False,
                              noNone=False, **keywords):
         r'''
         Returns a list of consecutive *pitched* Notes in a Stream.
@@ -8943,13 +8939,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> m = s.measure(1)
         >>> m.findConsecutiveNotes(skipUnisons=True, skipOctaves=True,
         ...                        skipRests=True, noNone=True)
-        [<music21.note.Note F>, <music21.note.Note D>, 
+        [<music21.note.Note F>, <music21.note.Note D>,
          <music21.note.Note B->, <music21.note.Note A->]
-         
+
         >>> m.findConsecutiveNotes(skipUnisons=False,
         ...                        skipRests=True, noNone=True)
-        [<music21.note.Note F>, <music21.note.Note D>, 
-         <music21.note.Note D>, <music21.note.Note D>, <music21.note.Note D>, 
+        [<music21.note.Note F>, <music21.note.Note D>,
+         <music21.note.Note D>, <music21.note.Note D>, <music21.note.Note D>,
          <music21.note.Note B->, <music21.note.Note A->]
 
         OMIT_FROM_DOCS
@@ -8962,7 +8958,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         their own args; this method is used in melodicIntervals.)
         '''
         if self.isSorted is False and self.autoSort:
-            self.sort()  
+            self.sort()
         returnList = []
         lastStart = 0.0
         lastEnd = 0.0
@@ -8982,20 +8978,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         for v in vGroups:
             for e in v.elements:
-                if (lastWasNone is False 
-                        and skipGaps is False 
+                if (lastWasNone is False
+                        and skipGaps is False
                         and e.offset > lastEnd):
                     if not noNone:
                         returnList.append(None)
                         lastWasNone = True
                 if hasattr(e, "pitch"):
                     #if (skipUnisons is False or isinstance(lastPitch, list)
-                    if not(skipUnisons is False 
+                    if not(skipUnisons is False
                             or isinstance(lastPitch, tuple)
                             or lastPitch is None
-                            or (hasattr(lastPitch, 'pitchClass') 
+                            or (hasattr(lastPitch, 'pitchClass')
                                 and e.pitch.pitchClass != lastPitch.pitchClass)
-                            or (skipOctaves is False 
+                            or (skipOctaves is False
                                 and hasattr(lastPitch, 'pitchClass')
                                 and e.pitch.ps != lastPitch.ps)):
                         continue
@@ -9013,7 +9009,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         lastEnd = lastStart
                     lastWasNone = False
                     lastPitch = e.pitch
-                    
+
                 # if we have a chord
                 elif hasattr(e, "pitches") and len(e.pitches) > 1:
                     if skipChords is True:
@@ -9022,14 +9018,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             lastWasNone = True
                             lastPitch = None
                     # if we have a chord
-                    elif (not (skipUnisons is True 
-                                and isinstance(lastPitch, (list, tuple)) 
+                    elif (not (skipUnisons is True
+                                and isinstance(lastPitch, (list, tuple))
                                 and e.pitches[0].ps == lastPitch[0].ps
                                 ) and (getOverlaps is True or e.offset >= lastEnd)):
                         returnList.append(e)
                         if e.offset < lastEnd:  # is an overlap...
                             continue
-                        
+
                         lastStart = e.offset
                         if hasattr(e, "duration"):
                             lastEnd = opFrac(lastStart + e.duration.quarterLength)
@@ -9041,8 +9037,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         lastWasNone = False
 
 
-                elif (skipRests is False 
-                      and isinstance(e, note.Rest) 
+                elif (skipRests is False
+                      and isinstance(e, note.Rest)
                       and lastWasNone is False):
                     if noNone is False:
                         returnList.append(None)
@@ -9115,7 +9111,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         returnStream = self.cloneEmpty(derivationMethod='melodicIntervals')
         for i in range(len(returnList) - 1):
             firstNote = returnList[i]
-            secondNote = returnList[i+1]
+            secondNote = returnList[i + 1]
             firstPitch = None
             secondPitch = None
             if firstNote is not None and secondNote is not None:
@@ -9164,7 +9160,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 durSpan = (e.offset, e.offset)
             else:
                 dur = e.duration.quarterLength
-                durSpan = (e.offset, opFrac(e.offset+dur))
+                durSpan = (e.offset, opFrac(e.offset + dur))
             post.append(durSpan)
         # assume this is already sorted
         # index found here will be the same as elementsSorted
@@ -9213,14 +9209,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     def _findLayering(self):
         '''
-        Find any elements in an elementsSorted list that have 
+        Find any elements in an elementsSorted list that have
         durations that cause overlaps.
 
         Returns a lists that has elements with overlaps,
         all index values that match are included in that list.
 
         See testOverlaps, in unit tests, for examples.
-        
+
         Used in getOverlaps inside makeVoices.
         '''
         flatStream = self.flat
@@ -9244,16 +9240,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     continue # do not compare to self
                 dst = durSpanSorted[j]
                 # print(src, dst, self._durSpanOverlap(src, dst, includeEndBoundary))
-                
+
                 # the current fractions.Fraction.__hash__ is EXTREMELY SLOW! so we
                 # construct our own hash key.  If we miss (as with '0.0' vs '0') it is not
                 # a big deal, since it's just a speedup
                 hashKey = str(src[0]) + ',' + str(src[1]) + ':' + str(dst[0]) + ',' + str(dst[1])
-                
+
                 try:
                     if durSpanOverlapCache[hashKey]:
                         overlapMap[i].append(j)
-                except KeyError: 
+                except KeyError:
                     durSpanResult = self._durSpanOverlap(src, dst)
                     durSpanOverlapCache[hashKey] = durSpanResult
                     if durSpanResult:
@@ -9279,7 +9275,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for i in range(len(layeringMap)):
             # print('examining i:', i)
             indices = layeringMap[i]
-            if len(indices) == 0:
+            if not indices:
                 continue
 
             srcElementObj = flatStream[i]
@@ -9346,9 +9342,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self.sort()
 
         sortedElements = self.elements
-            
+
         gapStream = self.cloneEmpty(derivationMethod='findGaps')
-        
+
         highestCurrentEndTime = 0.0
         for e in sortedElements:
             if e.offset > highestCurrentEndTime:
@@ -9363,7 +9359,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 eDur = 0.
             highestCurrentEndTime = opFrac(max(highestCurrentEndTime, e.offset + eDur))
 
-        if len(gapStream) == 0:
+        if not gapStream:
             return None
         else:
             self._cache["GapStream"] = gapStream
@@ -9374,7 +9370,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         Returns True if there are no gaps between the lowest offset and the highest time.
         Otherwise returns False
-        
+
         TODO: Demos, tests...
         '''
         if 'isGapless' in self._cache and self._cache["isGapless"] is not None:
@@ -9413,7 +9409,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Notes starting at the same time overlap:
 
         >>> a = stream.Stream()
-        >>> for x in [0,0,0,0,13,13,13]:
+        >>> for x in [0, 0, 0, 0, 13, 13, 13]:
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('half')
         ...     n.offset = x
@@ -9425,7 +9421,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(d[13])
         3
         >>> a = stream.Stream()
-        >>> for x in [0,0,0,0,3,3,3]:
+        >>> for x in [0, 0, 0, 0, 3, 3, 3]:
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('whole')
         ...     n.offset = x
@@ -9449,7 +9445,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
         >>> a = stream.Stream()
-        >>> for x in [0,0,0,0,3,3,3]:
+        >>> for x in [0, 0, 0, 0, 3, 3, 3]:
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('whole')
         ...     n.offset = x * 1
@@ -9462,7 +9458,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         TODO: check that co-incident boundaries are properly handled
 
         >>> a = stream.Stream()
-        >>> for x in [0,4,8.0]:
+        >>> for x in [0, 4, 8.0]:
         ...     n = note.Note('G#')
         ...     n.duration = duration.Duration('whole')
         ...     a.append(n)
@@ -9495,29 +9491,29 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> st1 = stream.Stream()
         >>> st2 = stream.Stream()
-        >>> st1.append([note.Note(type='quarter'), 
-        ...             note.Note(type='half'), 
+        >>> st1.append([note.Note(type='quarter'),
+        ...             note.Note(type='half'),
         ...             note.Note(type='quarter')])
-        >>> st2.append([note.Note(type='half'), 
-        ...             note.Note(type='quarter'), 
+        >>> st2.append([note.Note(type='half'),
+        ...             note.Note(type='quarter'),
         ...             note.Note(type='quarter')])
         >>> print(st1.simultaneousAttacks(st2))
         [0.0, 3.0]
         '''
-        stream1Offsets = self.groupElementsByOffset()
-        stream2Offsets = stream2.groupElementsByOffset()
- 
+        stream1Offsets = iterator.OffsetIterator(self)
+        stream2Offsets = iterator.OffsetIterator(stream2)
+
         returnKey = {}
- 
+
         for thisList in stream1Offsets:
             thisOffset = self.elementOffset(thisList[0])
             returnKey[thisOffset] = 1
- 
+
         for thatList in stream2Offsets:
             thatOffset = thatList[0].getOffsetBySite(stream2)
             if thatOffset in returnKey:
                 returnKey[thatOffset] += 1
- 
+
         returnList = []
         for foundOffset in sorted(returnKey):
             if returnKey[foundOffset] >= 2:
@@ -9554,9 +9550,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s2 = converter.parse('tinynotation: 7/4 g4 e8 d c4   a2 r2', makeNotation=False)
         >>> s1.attachIntervalsBetweenStreams(s2)
         >>> for n in s1.notes:
-        ...     if n.editorial.harmonicInterval is None: 
+        ...     if n.editorial.harmonicInterval is None:
         ...         print("None") # if other voice had a rest...
-        ...     else: 
+        ...     else:
         ...         print(n.editorial.harmonicInterval.directedName)
         P12
         M2
@@ -9591,9 +9587,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s1 = converter.parse('tinyNotation: 7/4 C4 d8 e f# g A2 d2', makeNotation=False)
         >>> s1.attachMelodicIntervals()
         >>> for n in s1.notes:
-        ...     if n.editorial.melodicInterval is None: 
+        ...     if n.editorial.melodicInterval is None:
         ...         print("None")
-        ...     else: 
+        ...     else:
         ...         print(n.editorial.melodicInterval.directedName)
         None
         M9
@@ -9606,13 +9602,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s = stream.Stream()
         >>> s.append(note.Note('C'))
         >>> s.append(note.Note('D'))
-        >>> s.append(note.Rest(quarterLength = 4.0))
+        >>> s.append(note.Rest(quarterLength=4.0))
         >>> s.append(note.Note('D'))
         >>> s.attachMelodicIntervals()
         >>> for n in s.notes:
-        ...     if n.editorial.melodicInterval is None: 
+        ...     if n.editorial.melodicInterval is None:
         ...         print("None") # if other voice had a rest...
-        ...     else: 
+        ...     else:
         ...         print(n.editorial.melodicInterval.directedName)
         None
         M2
@@ -9623,8 +9619,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         currentObject = notes[0]
         previousObject = None
         while currentObject is not None:
-            if (previousObject is not None 
-                    and "Note" in currentObject.classes 
+            if (previousObject is not None
+                    and "Note" in currentObject.classes
                     and "Note" in previousObject.classes):
                 currentObject.editorial.melodicInterval = interval.notesToInterval(
                                                                 previousObject, currentObject)
@@ -9687,7 +9683,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             elOffset = el.offset
 
         otherElements = self.getElementsByOffset(elOffset, mustBeginInSpan=False)
-        if len(otherElements) == 0:
+        if not otherElements:
             return None
         elif len(otherElements) == 1:
             return otherElements[0]
@@ -9736,9 +9732,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         elEnd = elOffset + el.quarterLength
 
         if elEnd != elOffset: # i.e. not zero length
-            otherElements = self.getElementsByOffset(elOffset, elEnd, 
-                                                     mustBeginInSpan=False, 
-                                                     includeEndBoundary=False, 
+            otherElements = self.getElementsByOffset(elOffset, elEnd,
+                                                     mustBeginInSpan=False,
+                                                     includeEndBoundary=False,
                                                      includeElementsThatEndAtStart=False)
         else:
             otherElements = self.getElementsByOffset(elOffset, mustBeginInSpan=False)
@@ -9761,7 +9757,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> s = stream.Stream()
         >>> s.insert(0, note.Note('C4', quarterLength=4))
-        >>> s.repeatInsert(note.Note('b-4', quarterLength=.5), [x*.5 for x in list(range(0,8))])
+        >>> s.repeatInsert(note.Note('b-4', quarterLength=0.5), [x * 0.5 for x in list(range(8))])
         >>> s.makeVoices(inPlace=True)
         >>> len(s.voices)
         2
@@ -9797,7 +9793,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # store all voices in a list
         voices = []
-        for dummy in range(0, maxVoiceCount):
+        for dummy in range(maxVoiceCount):
             voices.append(Voice()) # add voice classes
 
         # iterate through all elements; if not in an overlap, place in
@@ -9830,13 +9826,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return returnObj
         return None
 
-    
+
     def internalize(self, container=None,
                     classFilterList=('GeneralNote',)):
         '''
         Gather all notes and related classes of this Stream
         and place inside a new container (like a Voice) in this Stream.
-        
+
         DEPRECATED: This is badly named and does not belong in Stream.
         Will be removed.
         '''
@@ -9862,7 +9858,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         extract each into a Part, returning a Score.
 
         If this Stream has no voices, return the Stream as a Part within a Score.
-        
+
         >>> c = corpus.parse('demos/two-voices')
         >>> c.show('t')
         {0.0} <music21.text.TextBox "Music21 Fr...">
@@ -9896,7 +9892,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     {3.5} <music21.note.Note A>
             {8.0} <music21.stream.Measure 3 offset=8.0>
                 {0.0} <music21.note.Rest rest>
-        {0.0} <music21.layout.ScoreLayout>        
+        {0.0} <music21.layout.ScoreLayout>
         >>> ce = c.voicesToParts()
         >>> ce.show('t')
         {0.0} <music21.stream.Part 0x109bbb828>
@@ -9924,7 +9920,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 ...
                 {3.5} <music21.note.Note A>
             {8.0} <music21.stream.Measure 3 offset=8.0>
-        <BLANKLINE>        
+        <BLANKLINE>
         '''
         s = Score()
         #s.metadata = self.metadata
@@ -9976,8 +9972,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         mNew.mergeElements(v)
                         # insert in the appropriate part
                         s.parts[vIndex].insert(self.elementOffset(m), mNew)
-                    
-                    # vIndex is now the number of voices - 1.  Fill empty voices 
+
+                    # vIndex is now the number of voices - 1.  Fill empty voices
                     for emptyIndex in range(vIndex + 1, partCount):
                         s.parts[emptyIndex].insert(self.elementOffset(m), copy.deepcopy(mActive))
                 # if a measure does not have voices, simply populate
@@ -10008,7 +10004,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # best clef will be assigned later
             if p.hasMeasures():
                 # place in first measure
-                p.getElementsByClass('Measure')[0].clef = p.flat.bestClef()
+                p.getElementsByClass('Measure')[0].clef = clef.bestClef(p, recurse=True)
         return s
 
     def explode(self):
@@ -10035,7 +10031,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         TODO: by default inPlace should be False
         '''
-        if len(self.voices) == 0:
+        if not self.voices:
             return None # do not make copy; return immediately
 
         if not inPlace: # make a copy
@@ -10047,10 +10043,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         remove = []
         flatten = []
         for v in returnObj.voices:
-            if len(v) == 0: # might add other criteria
+            if not v: # might add other criteria
                 remove.append(v)
             else:
                 flatten.append(v)
+
         for v in remove:
             returnObj.remove(v)
 
@@ -10076,7 +10073,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         Returns a dict of lists of lyric objects (with the keys being
         the lyric numbers) found in self. Each list will have an element for each
-        note in the stream (which may be a note.Lyric() or None). 
+        note in the stream (which may be a note.Lyric() or None).
         By default, this method automatically
         recurses through measures, but not other container streams.
 
@@ -10088,33 +10085,33 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
         >>> s.lyrics()
-        {1: [<music21.note.Lyric number=1 syllabic=single text="this">, ..., 
+        {1: [<music21.note.Lyric number=1 syllabic=single text="this">, ...,
              <music21.note.Lyric number=1 syllabic=single text="words">]}
 
         >>> s.notes[3].lyric = None
         >>> s.lyrics()[1]
-        [<music21.note.Lyric number=1 syllabic=single text="this">, ..., None, ..., 
+        [<music21.note.Lyric number=1 syllabic=single text="this">, ..., None, ...,
          <music21.note.Lyric number=1 syllabic=single text="words">]
 
-        If ignoreBarlines is True, it will behave as if the elements in measures are all 
+        If ignoreBarlines is True, it will behave as if the elements in measures are all
         in a flattened stream (note that this is not stream.flat as it does not copy the elements)
-        together without measure containers. This means that even if recurse is 
+        together without measure containers. This means that even if recurse is
         False, lyrics() will still essentially recurse through measures.
 
         >>> s.makeMeasures(inPlace=True)
         >>> s.lyrics()[1]
-        [<music21.note.Lyric number=1 syllabic=single text="this">, ..., None, ..., 
+        [<music21.note.Lyric number=1 syllabic=single text="this">, ..., None, ...,
          <music21.note.Lyric number=1 syllabic=single text="words">]
 
         >>> list(s.lyrics(ignoreBarlines=False).keys())
         []
 
-        If recurse is True, this method will recurse through all container streams and 
+        If recurse is True, this method will recurse through all container streams and
         build a nested list structure mirroring the hierarchy of the stream.
-        Note that if ignoreBarlines is True, measure structure will not be reflected 
+        Note that if ignoreBarlines is True, measure structure will not be reflected
         in the hierarchy, although if ignoreBarlines is False, it will.
 
-        Note that streams which do not contain any instance of a lyric number will not 
+        Note that streams which do not contain any instance of a lyric number will not
         appear anywhere in the final list (not as a [] or otherwise).
 
         >>> p = stream.Part(s)
@@ -10122,7 +10119,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> scr.append(p)
 
         >>> scr.lyrics(ignoreBarlines=False, recurse=True)[1]
-        [[[<music21.note.Lyric number=1 syllabic=single text="this">, <..."is">, <..."a">, None], 
+        [[[<music21.note.Lyric number=1 syllabic=single text="this">, <..."is">, <..."a">, None],
           [<..."of">, <..."eight">, <..."lyric">, <..."words">]]]
 
         Notice that the measures are nested in the part which is nested in the score.
@@ -10143,7 +10140,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #---------------------
 
         def appendLyricsFromNote(n, returnLists, numNonesToAppend):
-            if len(n.lyrics) == 0:
+            if not n.lyrics:
                 for k in returnLists:
                     returnLists[k].append(None)
                 return
@@ -10193,8 +10190,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 else:
                     appendLyricsFromNote(n, returnLists, numNotes)
                     numNotes +=1
-            else: 
-                # e is a stream 
+            else:
+                # e is a stream
                 # (could be a measure if ignoreBarlines is False) and recurse is False
                 pass  # do nothing
 
@@ -10344,9 +10341,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             {0.0} <music21.note.Note F>
             {4.0} <music21.bar.Barline style=final>
 
-        After a variant group has been activated, the regions it replaced are 
+        After a variant group has been activated, the regions it replaced are
         stored as variants with the group 'default'.
-        It should be noted that this means .activateVariants should rarely if 
+        It should be noted that this means .activateVariants should rarely if
         ever be used on a stream which is returned
         by activateVariants because the group information is lost.
 
@@ -10408,7 +10405,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         elongationVariants = []
         deletionVariants = []
 
-        # Loop through all variants, deal with replacement variants and 
+        # Loop through all variants, deal with replacement variants and
         # save insertion and deletion for later.
         for v in returnObj.variants:
             if group is not None:
@@ -10429,48 +10426,48 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # Now deal with deletions before insertion variants.
         # For keeping track of which measure numbers have been removed
-        deletedMeasures = [] 
-        # For keeping track of where new measures without measure numbers have been inserted, 
+        deletedMeasures = []
+        # For keeping track of where new measures without measure numbers have been inserted,
         # will be a list of tuples (measureNumberPrior, [List, of, inserted, measures])
-        insertedMeasures = [] 
-        # For keeping track of the sections that are deleted 
+        insertedMeasures = []
+        # For keeping track of the sections that are deleted
         # (so the offset gap can be closed later)
-        deletedRegionsForRemoval = [] 
+        deletedRegionsForRemoval = []
         for v in deletionVariants:
             (deletedRegion, vDeletedMeasures, vInsertedMeasuresTuple
                     ) = returnObj._insertDeletionVariant(v, matchBySpan) #deletes and inserts
             deletedRegionsForRemoval.append(deletedRegion) #Saves the deleted region
             deletedMeasures.extend(vDeletedMeasures) # Saves the deleted measure numbers
-            #saves the inserted numberless measures (this will be empty unless there are 
-            # more bars in the variant than in the replacement region, which is unlikely 
+            #saves the inserted numberless measures (this will be empty unless there are
+            # more bars in the variant than in the replacement region, which is unlikely
             # for a deletion variant.
-            insertedMeasures.append(vInsertedMeasuresTuple) 
+            insertedMeasures.append(vInsertedMeasuresTuple)
 
         #Squeeze out the gaps that were saved.
-        returnObj._removeOrExpandGaps(deletedRegionsForRemoval, isRemove=True, inPlace=True) 
+        returnObj._removeOrExpandGaps(deletedRegionsForRemoval, isRemove=True, inPlace=True)
 
         #Before we can deal with insertions, we have to expand the stream to make space.
         insertionRegionsForExpansion = [] #For saving the insertion regions
         #go through all elongation variants to find the insertion regions.
-        for v in elongationVariants: 
+        for v in elongationVariants:
             lengthDifference = v.replacementDuration - v.containedHighestTime
             insertionStart = v.getOffsetBySite(returnObj) + v.replacementDuration
             #Saves the information for each gap to be expanded
-            insertionRegionsForExpansion.append((insertionStart, -1 * lengthDifference, [v]))   
-            
+            insertionRegionsForExpansion.append((insertionStart, -1 * lengthDifference, [v]))
+
         #Expands the appropriate gaps in the stream.
-        returnObj._removeOrExpandGaps(insertionRegionsForExpansion, isRemove=False, inPlace=True)  
+        returnObj._removeOrExpandGaps(insertionRegionsForExpansion, isRemove=False, inPlace=True)
         # Now deal with elongation variants properly
         for v in elongationVariants:
             (vInsertedMeasuresTuple, vDeletedMeasures
              ) = returnObj._insertInsertionVariant(v, matchBySpan) #deletes and inserts
-            insertedMeasures.append(vInsertedMeasuresTuple) 
+            insertedMeasures.append(vInsertedMeasuresTuple)
             # Saves the numberless inserted measures
-            # Saves deleted measures if any (it is unlikely that there will be unless 
-            # there are fewer measures in the variant than the replacement region, 
+            # Saves deleted measures if any (it is unlikely that there will be unless
+            # there are fewer measures in the variant than the replacement region,
             # which is unlikely for an elongation variant)
-            deletedMeasures.extend(vDeletedMeasures) 
-            
+            deletedMeasures.extend(vDeletedMeasures)
+
         #Now fix measure numbers given the saved information
         returnObj._fixMeasureNumbers(deletedMeasures, insertedMeasures)
 
@@ -10488,7 +10485,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
         >>> v = variant.Variant()
-        >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), 
+        >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'),
         ...                  ('a', 'quarter'), ('a', 'quarter'),('b', 'quarter')]
         >>> variantDataM2 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
         >>> variantData = [variantDataM1, variantDataM2]
@@ -10504,7 +10501,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> s = stream.Stream()
         >>> streamDataM1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
-        >>> streamDataM2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), 
+        >>> streamDataM2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'),
         ...                 ('a', 'quarter'), ('b', 'quarter')]
         >>> streamDataM3 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
         >>> streamDataM4 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
@@ -10565,7 +10562,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     targetsMatched += 1
                     # always assume we just want the first one?
                     targetToReplace = targets[0]
-                    #environLocal.printDebug(['matchBySpan', matchBySpan, 
+                    #environLocal.printDebug(['matchBySpan', matchBySpan,
                     #     'found target to replace:', targetToReplace])
                     # remove the target, place in removed Variant
                     removed.append(targetToReplace)
@@ -10608,24 +10605,24 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if "Measure" in e.classes:
                     if deletedMeasures != []: #If there measure numbers left to use, use them.
                         #Assign the next highest deleted measure number
-                        e.number = deletedMeasures.pop(False) 
-                        #Save the highest number used so far (for use in the case 
+                        e.number = deletedMeasures.pop(False)
+                        #Save the highest number used so far (for use in the case
                         # that there are extra measures with no numbers at the end)
-                        highestNumber = e.number 
-                        
+                        highestNumber = e.number
+
                     else:
                         e.number = 0
-                        # If no measure numbers left, add this 
+                        # If no measure numbers left, add this
                         # numberless measure to insertedMeasures
-                        insertedMeasures.append(e)                         
+                        insertedMeasures.append(e)
             # remove the source variant
             self.remove(v)
             # place newly contained elements in position
             self.insert(vStart, removed)
 
-            # If deletedMeasures != [], then there were more deleted measures than 
+            # If deletedMeasures != [], then there were more deleted measures than
             # inserted and the remaining numbers in deletedMeasures are those that were removed.
-            return deletedMeasures, (highestNumber, insertedMeasures) 
+            return deletedMeasures, (highestNumber, insertedMeasures)
             # In the case that the variant and stream are in the same time-signature,
             # this should return []
 
@@ -10637,15 +10634,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Returns a tuple describing the region where elements were removed, the
         gap is left behind to be dealt with by _removeOrExpandGaps.
-        Tuple is of form (startOffset, lengthOfDeletedRegion, []). The empty list is 
+        Tuple is of form (startOffset, lengthOfDeletedRegion, []). The empty list is
         expected by _removeOrExpandGaps
-        and describes the list of elements which should be exempted from shifting 
+        and describes the list of elements which should be exempted from shifting
         for a particular gap. In the
         case of deletion, no elements need be exempted.
 
 
         >>> v = variant.Variant()
-        >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), 
+        >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'),
         ...                  ('a', 'quarter'),('b', 'quarter')]
         >>> variantDataM2 = [('c', 'quarter'), ('d', 'quarter'),
         ...                  ('e', 'quarter'), ('e', 'quarter')]
@@ -10662,7 +10659,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> s = stream.Stream()
         >>> streamDataM1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
-        >>> streamDataM2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), 
+        >>> streamDataM2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'),
         ...                 ('a', 'quarter'), ('b', 'quarter')]
         >>> streamDataM3 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
         >>> streamDataM4 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
@@ -10708,7 +10705,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         deletedMeasures = [] # For keeping track of what measure numbers are deleted
         #length of the deleted region
-        lengthDifference = v.replacementDuration - v.containedHighestTime 
+        lengthDifference = v.replacementDuration - v.containedHighestTime
         removed = variant.Variant() # what group should this have?
         removed.groups = ['default'] #for now, default
         removed.replacementDuration = v.containedHighestTime
@@ -10730,19 +10727,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         insertedMeasures = []
         for e in v.elements:
             if "Measure" in e.classes:
-                #If there are deleted numbers still saved, assign this measure the 
-                # next highest and remove it from the list.                    
-                if deletedMeasures != []: 
+                #If there are deleted numbers still saved, assign this measure the
+                # next highest and remove it from the list.
+                if deletedMeasures != []:
                     e.number = deletedMeasures.pop(False)
-                    #Save the highest number assigned so far. If there are numberless 
+                    #Save the highest number assigned so far. If there are numberless
                     # inserted measures at the end, this will name where to begin numbering.
-                    highestNumber = e.number                     
+                    highestNumber = e.number
                 else:
                     e.number = 0
-                    #If there are no deleted numbers left (unlikely) 
+                    #If there are no deleted numbers left (unlikely)
                     # save the inserted measures for renumbering later.
-                    insertedMeasures.append(e) 
-                    
+                    insertedMeasures.append(e)
+
             oInStream = vStart + e.getOffsetBySite(v.containedSite)
             self.insert(oInStream, e)
 
@@ -10754,19 +10751,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #each variant leaves a gap, this saves the required information about those gaps
         #In most cases, inserted measures should be [].
         return (deletionStart, lengthDifference, []), deletedMeasures, (
-                                                            highestNumber, insertedMeasures) 
-        
+                                                            highestNumber, insertedMeasures)
+
     def _insertInsertionVariant(self, v, matchBySpan=True):
         '''
-        Helper function for activateVariants. _removeOrExpandGaps must be called on the 
+        Helper function for activateVariants. _removeOrExpandGaps must be called on the
         expanded regions before this function
         or it will not work properly.
 
 
         >>> v = variant.Variant()
-        >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), 
+        >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'),
         ...                  ('a', 'quarter'),('b', 'quarter')]
-        >>> variantDataM2 = [('c', 'quarter'), ('d', 'quarter'), 
+        >>> variantDataM2 = [('c', 'quarter'), ('d', 'quarter'),
         ...                  ('e', 'quarter'), ('e', 'quarter')]
         >>> variantData = [variantDataM1, variantDataM2]
         >>> for d in variantData:
@@ -10781,7 +10778,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> s = stream.Stream()
         >>> streamDataM1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
-        >>> streamDataM2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'), 
+        >>> streamDataM2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'),
         ...                 ('a', 'quarter'), ('b', 'quarter')]
         >>> streamDataM3 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
         >>> streamDataM4 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
@@ -10858,24 +10855,24 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         highestMeasure = None
         insertedMeasures = []
         for e in v.elements:
-            if "Measure" in e.classes: 
-                # If there are deleted measure numbers left, assign the next 
+            if "Measure" in e.classes:
+                # If there are deleted measure numbers left, assign the next
                 # inserted measure the next highest number and remove it.
                 if deletedMeasures != []:
                     e.number = deletedMeasures.pop(False)
-                    highestMeasure = e.number 
-                    # Save the highest number assigned so far 
+                    highestMeasure = e.number
+                    # Save the highest number assigned so far
                     # so we know where to being numbering new measures.
                 else:
                     e.number = 0
-                    insertedMeasures.append(e) 
+                    insertedMeasures.append(e)
                     # If there are no deleted measures, we have begun inserting as yet
                     # unnumbered measures, save which those are.
             oInStream = vStart + e.getOffsetBySite(v.containedSite)
             self.insert(oInStream, e)
 
-        if highestMeasure is None: 
-            #If the highestMeasure is None (which will occur if the variant is 
+        if highestMeasure is None:
+            #If the highestMeasure is None (which will occur if the variant is
             #a strict insertion and replaces no measures,
             #we need to choose the highest measure number prior to the variant.
             measuresToCheck = self.getElementsByOffset(0.0, self.elementOffset(v),
@@ -10897,14 +10894,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         return (highestMeasure, insertedMeasures), deletedMeasures
 
-    def _removeOrExpandGaps(self, listOffsetDurExemption, 
+    def _removeOrExpandGaps(self, listOffsetDurExemption,
                             isRemove=True, inPlace=False, exemptClasses=None):
         '''
-        Helper for activateVariants. Takes a list of tuples in the form 
+        Helper for activateVariants. Takes a list of tuples in the form
         (startoffset, duration, [list, of, exempt, objects]). If isRemove is True,
-        gaps with duration will be closed at each startOffset. 
+        gaps with duration will be closed at each startOffset.
         Exempt objects are useful for gap-expansion with variants. The gap must push all objects
-        that occur after the insertion ahead, but the variant object 
+        that occur after the insertion ahead, but the variant object
         itself should not be moved except by other gaps. This is poorly written
         and should be re-written, but it is difficult to describe.
 
@@ -10920,7 +10917,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.insert(15.0, n)
 
         >>> sGapsRemoved = s._removeOrExpandGaps(
-        ...             [(0.0,5.0, []), (6.0,4.0, []), (14.0,6.0, [n])], isRemove=True)
+        ...             [(0.0, 5.0, []), (6.0, 4.0, []), (14.0, 6.0, [n])], isRemove=True)
         >>> sGapsRemoved.show('text')
         {0.0} <music21.note.Note A>
         {1.0} <music21.note.Note B>
@@ -10931,7 +10928,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {5.0} <music21.note.Note F>
 
         >>> sGapsExpanded = s._removeOrExpandGaps(
-        ...            [(0.0,5.0, []), (11.0,5.0, []), (14.0,1.0, [n])], isRemove=False)
+        ...            [(0.0, 5.0, []), (11.0, 5.0, []), (14.0, 1.0, [n])], isRemove=False)
         >>> sGapsExpanded.show('text')
         {10.0} <music21.note.Note A>
         {15.0} <music21.note.Note B>
@@ -10965,15 +10962,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             listSorted = sorted(listOffsetDurExemption, key=lambda target: target[0])
             for i,durTuple in enumerate(listSorted):
                 startOffset, durationAmount, exemptObjects = durTuple
-                if i+1 < len(listSorted):
-                    endOffset = listSorted[i+1][0]
+                if i + 1 < len(listSorted):
+                    endOffset = listSorted[i + 1][0]
                     includeEnd = False
                 else:
                     endOffset = returnObjDuration
                     includeEnd = True
 
                 shiftDur = shiftDur + durationAmount
-                for e in returnObj.getElementsByOffset(startOffset+durationAmount,
+                for e in returnObj.getElementsByOffset(startOffset + durationAmount,
                     endOffset,
                     includeEndBoundary=includeEnd,
                     mustFinishInSpan=False,
@@ -10992,8 +10989,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for i, durTuple in enumerate(listSorted):
                 startOffset, durationAmount, exemptObjects = durTuple
 
-                if i+1 < len(listSorted):
-                    endOffset = listSorted[i+1][0]
+                if i + 1 < len(listSorted):
+                    endOffset = listSorted[i + 1][0]
                     includeEnd = False
                 else:
                     endOffset = returnObjDuration
@@ -11001,7 +10998,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
                 exemptShift = shiftDur
                 shiftDur = shiftDur + durationAmount
-                shiftsDict[startOffset] = (shiftDur, endOffset, includeEnd, 
+                shiftsDict[startOffset] = (shiftDur, endOffset, includeEnd,
                                            exemptObjects, exemptShift)
 
             for offset in sorted(shiftsDict, key=lambda offset: -1 * offset):
@@ -11028,7 +11025,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     def _fixMeasureNumbers(self, deletedMeasures, insertedMeasures):
         '''
-        Corrects the measures numbers of a string of measures given a list of measure numbers 
+        Corrects the measures numbers of a string of measures given a list of measure numbers
         that have been deleted and a
         list of tuples (highest measure number below insertion, number of inserted measures).
 
@@ -11065,7 +11062,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             ...
         {20.0} <music21.stream.Measure 4 offset=20.0>
             {0.0} <music21.note.Note G>
-            {4.0} <music21.bar.Barline style=final>        
+            {4.0} <music21.bar.Barline style=final>
         >>> deletedMeasures = [2]
         >>> m1 = stream.Measure()
         >>> m1.repeatAppend(note.Note('e'),4)
@@ -11094,7 +11091,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             {0.0} <music21.note.Note G>
             {4.0} <music21.bar.Barline style=final>
         >>> insertedMeasures = [(3, [m1, m2])]
-        
+
         >>> s._fixMeasureNumbers(deletedMeasures, insertedMeasures)
         >>> s.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -11123,17 +11120,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         deletedMeasures.extend(insertedMeasures)
         allMeasures = deletedMeasures
 
-        if allMeasures is [] or allMeasures is None:
+        if not allMeasures:
             return
-        
+
         def measureNumberSortRoutine(numOrNumTuple):
             if isinstance(numOrNumTuple, tuple):
                 return measureNumberSortRoutine(numOrNumTuple[0])
             elif numOrNumTuple is None:
-                return -9999 
+                return -9999
             else:
                 return numOrNumTuple
-            
+
         allMeasures.sort(key=measureNumberSortRoutine)
 
         oldMeasures = self.getElementsByClass("Measure").stream()
@@ -11143,7 +11140,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         oldCorrections = {}
         newCorrections = {}
         # the inserted measures must be treated differently than the original measures.
-        # an inserted measure should not shift itself, 
+        # an inserted measure should not shift itself,
         # but it should shift measures with the same number.
         # However, inserted measures should still be shifted by every other correction.
 
@@ -11165,8 +11162,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 newCorrections[nextMeasure] = cummulativeNumberShift
             else: #integer implies deletion
                 cummulativeNumberShift -= 1
-                oldCorrections[measureNumber+1] = cummulativeNumberShift
-                newCorrections[measureNumber+1] = cummulativeNumberShift
+                oldCorrections[measureNumber + 1] = cummulativeNumberShift
+                newCorrections[measureNumber + 1] = cummulativeNumberShift
 
         # Second, make corrections based on the dictionaries. The key is the measure number
         # above which measures should be shifted by the value up to the next key. It is easiest
@@ -11191,7 +11188,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     def showVariantAsOssialikePart(self, containedPart, variantGroups, inPlace=False):
         '''
-        Takes a part within the score and a list of variant groups within that part. 
+        Takes a part within the score and a list of variant groups within that part.
         Puts the variant object
         in a part surrounded by hidden rests to mimic the appearence of an ossia despite limited
         musicXML support for ossia staves. Note that this will ignore variants with .lengthType
@@ -11208,7 +11205,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> sPartStream.makeMeasures(inPlace=True) # maybe not necessary?
         >>> v1stream = converter.parse("tinynotation: 4/4 " + v1Str)
         >>> v2stream = converter.parse("tinynotation: 4/4 " + v2Str)
-        
+
         >>> v1 = variant.Variant()
         >>> v1measure = stream.Measure()
         >>> v1.insert(0.0, v1measure)
@@ -11237,7 +11234,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> sPart.insert(20.0, v3) #This is a deletion variant and will be skipped
         >>> s = stream.Score()
         >>> s.insert(0.0, sPart)
-        >>> streamWithOssia = s.showVariantAsOssialikePart(sPart, 
+        >>> streamWithOssia = s.showVariantAsOssialikePart(sPart,
         ...          ['variant1', 'variant2', 'variant3'], inPlace=False)
         >>> #_DOCS_SHOW streamWithOssia.show()
 
@@ -11256,15 +11253,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             containedPartIndex = self.parts.stream().index(containedPart)
             returnPart = returnObj.parts[containedPartIndex]
 
-        #First build a new part object that is the same length as returnPart 
+        #First build a new part object that is the same length as returnPart
         # but entirely hidden rests.
-        #This is done by copying the part and removing unnecessary objects 
+        #This is done by copying the part and removing unnecessary objects
         # including irrelevant variants
         #but saving relevant variants.
         for variantGroup in variantGroups:
             newPart = copy.deepcopy(returnPart)
             expressedVariantsExist = False
-            for e in newPart.elements: 
+            for e in newPart.elements:
                 eclasses = e.classes
                 if "Variant" in eclasses:
                     elementGroups = e.groups
@@ -11346,7 +11343,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 #        hV.insert(hVendOffset, r)
                 #        for el in cV._stream:
                 #            oldOffset = el.getOffsetBySite(cV._stream)
-                #            hV.insert(hVendOffset+shiftOffset+oldOffset, el)
+                #            hV.insert(hVendOffset + shiftOffset + oldOffset, el)
                 #        hV.replacementDuration += shiftOffset + cV.replacementDuration
                 #        forDeletion.append(cV)
                 #        variantsToBeDone.append(hV)
@@ -11363,7 +11360,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     r.hideObjectOnPrint = True
                     for el in cV._stream:
                         oldOffset = el.getOffsetBySite(cV._stream)
-                        cV._stream.setElementOffset(el, oldOffset+shiftOffset)
+                        cV._stream.setElementOffset(el, oldOffset + shiftOffset)
                     cV.insert(0.0, r)
                     cV.replacementDuration = oldReplacementDuration
                     self.remove(cV)
@@ -11385,7 +11382,7 @@ class Voice(Stream):
 
     Note that both Finale's Layers and Voices as concepts are
     considered Voices here.
-    
+
     Voices have a sort order of 1 greater than time signatures
     '''
     recursionType = 'elementsFirst'
@@ -11410,33 +11407,33 @@ class Measure(Stream):
     _DOC_ORDER = ['']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
-    'timeSignatureIsNew': '''Boolean describing if the TimeSignature 
+    'timeSignatureIsNew': '''Boolean describing if the TimeSignature
                             is different than the previous Measure.''',
     'clefIsNew': 'Boolean describing if the Clef is different than the previous Measure.',
     'keyIsNew': 'Boolean describing if KeySignature is different than the previous Measure.',
-    'number': '''A number representing the displayed or shown 
+    'number': '''A number representing the displayed or shown
                     Measure number as presented in a written Score.''',
     'numberSuffix': '''If a Measure number has a string annotation, such as "a" or similar,
-                       this string is stored here. Note that in MusicXML, such 
+                       this string is stored here. Note that in MusicXML, such
                        suffixes often appear as
-                       prefixes to measure numbers.  In music21 (like most measure 
+                       prefixes to measure numbers.  In music21 (like most measure
                        numbering systems), these
                        numbers appear as suffixes.''',
     'layoutWidth': '''A suggestion for layout width, though most rendering systems do not support
-                      this designation. Use :class:`~music21.layout.SystemLayout` 
+                      this designation. Use :class:`~music21.layout.SystemLayout`
                       objects instead.''',
     'paddingLeft': '''defines empty space at the front of the measure for purposes of determining
-                      beat, etc for pickup/anacrusis bars.  In 4/4, a 
+                      beat, etc for pickup/anacrusis bars.  In 4/4, a
                       measure with a one-beat pickup
-                      note will have a `paddingLeft` of 3.0. 
+                      note will have a `paddingLeft` of 3.0.
                       (The name comes from the CSS graphical term
                       for the amount of padding on the left side of a region.)''',
     'paddingRight': '''defines empty space at the end of the measure for purposes of determining
-                       whether or not a measure is filleds.  
+                       whether or not a measure is filleds.
                        In 4/4, a piece beginning a one-beat pickup
-                       note will often have a final measure of three beats, instead of four.  
+                       note will often have a final measure of three beats, instead of four.
                        The final
-                       measure should have a `paddingRight` of 1.0. 
+                       measure should have a `paddingRight` of 1.0.
                        (The name comes from the CSS graphical term
                        for the amount of padding on the right side of a region.)''',
     }
@@ -11481,15 +11478,15 @@ class Measure(Stream):
     def measureNumberWithSuffix(self):
         '''
         Return the measure `.number` with the `.numberSuffix` as a string.
-        
+
         >>> m = stream.Measure()
         >>> m.number = 4
         >>> m.numberSuffix = "A"
         >>> m.measureNumberWithSuffix()
         '4A'
-        
+
         Test that it works as musicxml
-        
+
         >>> xml = musicxml.m21ToXml.GeneralObjectExporter().parse(m)
         >>> print(xml.decode('utf-8'))
         <?xml version="1.0"...?>
@@ -11497,14 +11494,14 @@ class Measure(Stream):
         <part id="...">
             <measure number="4A">
         ...
-        
+
         Test round tripping:
-        
+
         >>> s2 = converter.parseData(xml)
         >>> print(s2.semiFlat.getElementsByClass('Measure')[0].measureNumberWithSuffix())
-        4A        
-        
-        Note that we use print here because in parsing the data will become a unicode string.        
+        4A
+
+        Note that we use print here because in parsing the data will become a unicode string.
         '''
         if self.numberSuffix:
             return str(self.number) + self.numberSuffix
@@ -11512,8 +11509,8 @@ class Measure(Stream):
             return str(self.number)
 
     def __repr__(self):
-        return "<music21.stream.%s %s offset=%s>" % (self.__class__.__name__, 
-                                                     self.measureNumberWithSuffix(), 
+        return "<music21.stream.%s %s offset=%s>" % (self.__class__.__name__,
+                                                     self.measureNumberWithSuffix(),
                                                      self.offset)
 
     #--------------------------------------------------------------------------
@@ -11527,14 +11524,14 @@ class Measure(Stream):
         have attributes independent of any stored elements.
 
         Overrides base.Music21Object.mergeAttributes
-        
+
         >>> m1 = stream.Measure()
         >>> m1.id = 'MyMeasure'
         >>> m1.clefIsNew = True
         >>> m1.number = 2
         >>> m1.numberSuffix = 'b'
         >>> m1.layoutWidth = 200
-        
+
         >>> m2 = stream.Measure()
         >>> m2.mergeAttributes(m1)
         >>> m2.layoutWidth
@@ -11543,9 +11540,9 @@ class Measure(Stream):
         'MyMeasure'
         >>> m2
         <music21.stream.Measure 2b offset=0.0>
-        
+
         Try with not another Measure...
-        
+
         >>> m3 = stream.Stream()
         >>> m3.id = 'hello'
         >>> m2.mergeAttributes(m3)
@@ -11557,14 +11554,14 @@ class Measure(Stream):
         # calling bass class sets id, groups
         super(Measure, self).mergeAttributes(other)
 
-        for attr in ('timeSignatureIsNew', 'clefIsNew', 'keyIsNew', 'filled', 
+        for attr in ('timeSignatureIsNew', 'clefIsNew', 'keyIsNew', 'filled',
                      'paddingLeft', 'paddingRight', 'number', 'numberSuffix', 'layoutWidth'):
             if hasattr(other, attr):
                 setattr(self, attr, getattr(other, attr))
 
     #--------------------------------------------------------------------------
-    def makeNotation(self, 
-                     inPlace=False, 
+    def makeNotation(self,
+                     inPlace=False,
                      **subroutineKeywords):
         '''
         This method calls a sequence of Stream methods on this
@@ -11582,12 +11579,12 @@ class Measure(Stream):
         <accidental natural>
         '''
         #environLocal.printDebug(['Measure.makeNotation'])
-        # TODO: this probably needs to look to see what processes need to be done; 
+        # TODO: this probably needs to look to see what processes need to be done;
         # for example, existing beaming may be destroyed.
 
 
         # do this before deepcopy...
-        
+
         # assuming we are not trying to get context of previous measure
         if not inPlace: # make a copy
             m = copy.deepcopy(self)
@@ -11595,11 +11592,11 @@ class Measure(Stream):
             m = self
 
         srkCopy = subroutineKeywords.copy()
-        
+
         for illegalKey in ('meterStream', 'refStreamOrTimeRange', 'bestClef'):
             if illegalKey in srkCopy:
                 del(srkCopy[illegalKey])
-        
+
         m.makeAccidentals(searchKeySignatureByContext=True, inPlace=True, **srkCopy)
         # makeTies is for cross-bar associations, and cannot be used
         # at just the measure level
@@ -11613,7 +11610,7 @@ class Measure(Stream):
                             returnDefault=False)
             defaultMeters = m.getTimeSignatures(searchContext=False,
                             returnDefault=True)
-            if len(contextMeters) > 0:
+            if contextMeters:
                 ts = contextMeters[0]
             else:
                 try:
@@ -11624,7 +11621,7 @@ class Measure(Stream):
             m.timeSignature = ts  # a Stream; get the first element
 
         #environLocal.printDebug(['have time signature', m.timeSignature])
-        if m.streamStatus.haveBeamsBeenMade() is False:
+        if m.streamStatus.beams is False:
             try:
                 m.makeBeams(inPlace=True)
             except StreamException:
@@ -11697,10 +11694,10 @@ class Measure(Stream):
         >>> m.padAsAnacrusis()
         >>> m.paddingLeft
         4.0
-        
+
 
         Empty space at the beginning of the measure will not be taken in account:
-        
+
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> n = note.Note(type='quarter')
@@ -11708,28 +11705,28 @@ class Measure(Stream):
         >>> m.padAsAnacrusis()
         >>> m.paddingLeft
         0
-        
+
         If useInitialRests is True, then rests at the beginning of the measure
         are removed.  This is especially useful for formats that don't give a
         way to specify a pickup measure (such as tinynotation) or software
         that generates incorrect opening measures.  So, to fix the problem before,
         put a rest at the beginning and call useInitialRests:
-        
+
         >>> r = note.Rest(type='half')
         >>> m.insert(0, r)
         >>> m.padAsAnacrusis(useInitialRests=True)
         >>> m.paddingLeft
         2.0
-        
+
         And the rest is gone!
-        
+
         >>> m.show('text')
         {0.0} <music21.meter.TimeSignature 3/4>
-        {0.0} <music21.note.Note C>        
+        {0.0} <music21.note.Note C>
 
 
         Only initial rests count for useInitialRests:
-        
+
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.append(note.Rest(type='eighth'))
@@ -11743,7 +11740,7 @@ class Measure(Stream):
         {0.5} <music21.note.Rest rest>
         {1.0} <music21.note.Note C>
         {2.0} <music21.note.Rest rest>
-        {2.5} <music21.note.Note D>        
+        {2.5} <music21.note.Note D>
         >>> m.padAsAnacrusis(useInitialRests=True)
         >>> m.paddingLeft
         1.0
@@ -11751,7 +11748,7 @@ class Measure(Stream):
         {0.0} <music21.meter.TimeSignature 3/4>
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Rest rest>
-        {1.5} <music21.note.Note D>        
+        {1.5} <music21.note.Note D>
         '''
         if useInitialRests:
             removeList = []
@@ -11761,7 +11758,7 @@ class Measure(Stream):
                 removeList.append(gn)
             if removeList:
                 self.remove(removeList, shiftOffsets=True)
-        
+
         # note: may need to set paddingLeft to 0 before examining
 
         # bar duration is that suggested by time signature; it may
@@ -11780,7 +11777,7 @@ class Measure(Stream):
             #self.shiftElements(shift, classFilterList=(note.GeneralNote,))
         else:
             pass
-            # environLocal.printDebug(['padAsAnacrusis() called; however, 
+            # environLocal.printDebug(['padAsAnacrusis() called; however,
             # no anacrusis shift necessary:', barDuration.quarterLength, proportion])
 
     #---------------------------------------------------------------------------
@@ -11810,7 +11807,7 @@ class Measure(Stream):
         >>> m.duration
         <music21.duration.Duration 5.0>
 
-        The objects returned by `barDuration` and `duration` are 
+        The objects returned by `barDuration` and `duration` are
         full :class:`~music21.duration.Duration`
         objects, will all the relevant properties:
 
@@ -11826,7 +11823,7 @@ class Measure(Stream):
         else: # do a context-based search
             tsStream = self.getTimeSignatures(searchContext=True,
                        returnDefault=False, sortByCreationTime=True)
-            if len(tsStream) == 0:
+            if not tsStream:
                 try:
                     ts = self.bestTimeSignature()
                 except exceptions21.Music21Exception:
@@ -11888,7 +11885,6 @@ class Measure(Stream):
         return meter.bestTimeSignature(self)
 
 
-
     def _getLeftBarline(self):
         barList = []
         # directly access _elements, as do not want to get any bars
@@ -11898,7 +11894,7 @@ class Measure(Stream):
                 if self.elementOffset(e) == 0.0:
                     barList.append(e)
                     break
-        if len(barList) == 0:
+        if not barList:
             return None
         else:
             return barList[0]
@@ -11918,7 +11914,7 @@ class Measure(Stream):
             #environLocal.printDebug(['_setLeftBarline()', 'removing left barline'])
             junk = self.pop(self.index(oldLeftBarline))
         if insert:
-            #environLocal.printDebug(['_setLeftBarline()', 
+            #environLocal.printDebug(['_setLeftBarline()',
             #'inserting new left barline', barlineObj])
             self.insert(0, barlineObj)
 
@@ -11940,7 +11936,7 @@ class Measure(Stream):
                 barList.append(e)
                 break
         #barList = self.getElementsByClass(bar.Barline)
-        if len(barList) == 0: # do this before searching for barQL
+        if not barList: # do this before searching for barQL
             return None
         else:
             return barList[0]
@@ -11969,12 +11965,12 @@ class Measure(Stream):
         if insert:
             self.storeAtEnd(barlineObj)
 
-        #environLocal.printDebug(['post _setRightBarline', barlineObj, 
+        #environLocal.printDebug(['post _setRightBarline', barlineObj,
         #    'len of elements highest', len(self._endElements)])
 
     rightBarline = property(_getRightBarline, _setRightBarline,
         doc = '''
-        Get or set the right barline, or the Barline object 
+        Get or set the right barline, or the Barline object
         found at the offset equal to the bar duration.
 
         >>> b = bar.Barline('final')
@@ -12026,13 +12022,13 @@ class Part(Stream):
     part
     '''
     recursionType = 'flatten'
-    
+
     def __init__(self, *args, **keywords):
         Stream.__init__(self, *args, **keywords)
         self.staffLines = 5
         self._partName = None
         self._partAbbreviation = None
-        
+
     def _getPartName(self):
         if self._partName is not None:
             return self._partName
@@ -12048,21 +12044,21 @@ class Part(Stream):
                     break
             self._cache['_partName'] = pn
             return pn
-    
+
     def _setPartName(self, newName):
         self._partName = newName
 
     partName = property(_getPartName, _setPartName, doc='''
         Gets or sets a string representing the name of this part
         as a whole (not counting instrument changes, etc.).
-        
+
         It can be set explicitly (or set on parsing) or it
         can take its name from the first :class:`~music21.instrument.Instrument` object
-        encountered in the stream (or within a substream), 
+        encountered in the stream (or within a substream),
         first checking its .partName, then checking its .instrumentName
-        
+
         Can also return None.
-        
+
         >>> p = stream.Part()
         >>> p.partName is None
         True
@@ -12079,9 +12075,9 @@ class Part(Stream):
         >>> p.partName = 'Reed 1'
         >>> p.partName
         'Reed 1'
-        
+
         Note that changing an instrument's .partName or .instrumentName while it
-        is already in the Stream will not automatically update this unless 
+        is already in the Stream will not automatically update this unless
         .elementsChanged() is called or this Stream's elements are otherwise altered.
         This is because the value is cached so that O(n) searches through the Stream
         do not need to be done every time.
@@ -12102,21 +12098,21 @@ class Part(Stream):
                     break
             self._cache['_partAbbreviation'] = pn
             return pn
-    
+
     def _setPartAbbreviation(self, newName):
         self._partAbbreviation = newName
 
     partAbbreviation = property(_getPartAbbreviation, _setPartAbbreviation, doc='''
         Gets or sets a string representing the abbreviated name of this part
         as a whole (not counting instrument changes, etc.).
-        
+
         It can be set explicitly (or set on parsing) or it
         can take its name from the first :class:`~music21.instrument.Instrument` object
-        encountered in the stream (or within a substream), 
+        encountered in the stream (or within a substream),
         first checking its .partAbbreviation, then checking its .instrumentAbbreviation
-        
+
         Can also return None.
-        
+
         >>> p = stream.Part()
         >>> p.partAbbreviation is None
         True
@@ -12133,9 +12129,9 @@ class Part(Stream):
         >>> p.partAbbreviation = 'Rd 1'
         >>> p.partAbbreviation
         'Rd 1'
-        
+
         Note that changing an instrument's .partAbbreviation or .instrumentAbbreviation while it
-        is already in the Stream will not automatically update this unless 
+        is already in the Stream will not automatically update this unless
         .elementsChanged() is called or this Stream's elements are otherwise altered.
         This is because the value is cached so that O(n) searches through the Stream
         do not need to be done every time.
@@ -12169,11 +12165,11 @@ class Part(Stream):
             # if beyond the first measure, use the pitches from the last
             # measure for context
             if i > 0:
-                pitchPastMeasure = measureStream[i-1].pitches
-                if (measureStream[i-1] 
-                        and hasattr(measureStream[i-1][-1], "tie") 
-                        and measureStream[i-1][-1].tie is not None 
-                        and measureStream[i-1][-1].tie.type != 'stop'
+                pitchPastMeasure = measureStream[i - 1].pitches
+                if (measureStream[i - 1]
+                        and hasattr(measureStream[i - 1][-1], "tie")
+                        and measureStream[i - 1][-1].tie is not None
+                        and measureStream[i - 1][-1].tie.type != 'stop'
                     ):
                     lastNoteWasTied = True
                 else:
@@ -12183,7 +12179,7 @@ class Part(Stream):
                 lastNoteWasTied = False
 
             m.makeAccidentals(pitchPastMeasure=pitchPastMeasure,
-                              useKeySignature=ksLast, 
+                              useKeySignature=ksLast,
                               alteredPitches=alteredPitches,
                               searchKeySignatureByContext=False,
                               cautionaryPitchClass=cautionaryPitchClass,
@@ -12296,12 +12292,12 @@ class Score(Stream):
         Alto
         Tenor
         Bass
-        
-        
+
+
         OMIT_FROM_DOCS
-        
+
         Ensure that getting from cache still will reset the iteration.
-        
+
         >>> for i, p in enumerate(s.parts):
         ...     print(i, p)
         ...     break
@@ -12311,7 +12307,7 @@ class Score(Stream):
         ...     print(i, p)
         ...     break
         0 <music21.stream.Part Soprano>
-        '''        
+        '''
 #         return self.getElementsByClass('Part')
         if 'parts' not in self._cache or self._cache['parts'] is None:
             partIterator = self.getElementsByClass('Part')
@@ -12320,22 +12316,22 @@ class Score(Stream):
         return self._cache['parts']
 
 
-    def measures(self, 
-                 numberStart, 
+    def measures(self,
+                 numberStart,
                  numberEnd,
-                 collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'), 
-                 gatherSpanners=True, 
+                 collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
+                 gatherSpanners=True,
                  ignoreNumbers=False):
         '''
-        This method overrides the :meth:`~music21.stream.Stream.measures` 
-        method on Stream. This creates a new Score stream that has the same measure 
+        This method overrides the :meth:`~music21.stream.Stream.measures`
+        method on Stream. This creates a new Score stream that has the same measure
         range for all Parts.
 
         The `collect` argument is a list of classes that will be collected; see
         Stream.measures()
 
         >>> s = corpus.parse('bwv66.6')
-        >>> post = s.measures(3,5) # range is inclusive, i.e., [3, 5]
+        >>> post = s.measures(3, 5) # range is inclusive, i.e., [3, 5]
         >>> len(post.parts)
         4
         >>> len(post.parts[0].getElementsByClass('Measure'))
@@ -12349,10 +12345,10 @@ class Score(Stream):
         # note that this will strip all objects that are not Parts
         for p in self.parts:
             # insert all at zero
-            measuredPart = p.measures(numberStart, 
+            measuredPart = p.measures(numberStart,
                                       numberEnd,
-                                      collect, 
-                                      gatherSpanners=gatherSpanners, 
+                                      collect,
+                                      gatherSpanners=gatherSpanners,
                                       ignoreNumbers=ignoreNumbers)
             post.insert(0, measuredPart)
         # must manually add any spanners; do not need to add .flat,
@@ -12361,21 +12357,21 @@ class Score(Stream):
             spStream = self.spanners
             for sp in spStream:
                 post.insert(0, sp)
-                
+
         post.derivation.client = post
         post.derivation.origin = self
         post.derivation.method = 'measures'
         return post
 
 
-    def measure(self, 
+    def measure(self,
                 measureNumber,
-                collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'), 
-                gatherSpanners=True, 
+                collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
+                gatherSpanners=True,
                 ignoreNumbers=False):
         '''
         Given a measure number,
-        return a single :class:`~music21.stream.Measure` object if the 
+        return a single :class:`~music21.stream.Measure` object if the
         Measure number exists, otherwise return None.
 
 
@@ -12396,12 +12392,12 @@ class Score(Stream):
         # note that this will strip all objects that are not Parts
         for p in self.getElementsByClass('Part'):
             # insert all at zero
-            mStream = p.measures(measureNumber, 
+            mStream = p.measures(measureNumber,
                                  measureNumber,
-                                 collect=collect, 
-                                 gatherSpanners=gatherSpanners, 
+                                 collect=collect,
+                                 gatherSpanners=gatherSpanners,
                                  ignoreNumbers=ignoreNumbers)
-            if len(mStream) > 0:
+            if mStream:
                 post.insert(0, mStream)
 
         if gatherSpanners:
@@ -12465,7 +12461,7 @@ class Score(Stream):
         have measures with identical offsets.
         '''
         parts = self.iter.parts
-        if len(parts) == 0:
+        if not parts:
             return Stream.measureOffsetMap(self, classFilterList)
         #else:
         offsetMap = {}
@@ -12478,7 +12474,7 @@ class Score(Stream):
                 for m in mapPartial[k]: # get measures from partial
                     if m not in offsetMap[k]:
                         offsetMap[k].append(m)
-        orderedOffsetMap = collections.OrderedDict(sorted(offsetMap.items(), key=lambda o: o[0]))                
+        orderedOffsetMap = collections.OrderedDict(sorted(offsetMap.items(), key=lambda o: o[0]))
         return orderedOffsetMap
 
     def sliceByGreatestDivisor(self, inPlace=True, addTies=True):
@@ -12517,7 +12513,7 @@ class Score(Stream):
 
             # after ql for all parts, find divisor
             divisor = common.approximateGCD(uniqueQuarterLengths)
-            # environLocal.printDebug(['Score.sliceByGreatestDivisor: 
+            # environLocal.printDebug(['Score.sliceByGreatestDivisor:
             # got divisor from unique ql:', divisor, uniqueQuarterLengths])
 
             for p in returnObj.getElementsByClass('Part'):
@@ -12608,7 +12604,7 @@ class Score(Stream):
                     hasMeasures = False
 
                 for mIndex, m in enumerate(p.getElementsByClass('Measure')):
-                    #environLocal.printDebug(['pindex, p', pIndex, p, 
+                    #environLocal.printDebug(['pindex, p', pIndex, p,
                     #     'mIndex, m', mIndex, m, 'hasMeasures', hasMeasures])
                     # only create measures if non already exist
                     if not hasMeasures:
@@ -12674,6 +12670,8 @@ class Score(Stream):
         contained in Measures are transferred.
 
         It also flattens all voices within a part.
+        
+        To be deprecated at some point...
 
         >>> s = corpus.parse('bwv66.6')
         >>> len(s.parts)
@@ -12686,7 +12684,7 @@ class Score(Stream):
         >>> len(post.flat.notes)
         165
         '''
-        post = self.parts[0].measureTemplate(fillWithRests=False)
+        post = self.parts[0].template(fillWithRests=False, retainVoices=False)
         for i, m in enumerate(post.getElementsByClass('Measure')):
             for p in self.parts:
                 mNew = copy.deepcopy(p.getElementsByClass('Measure')[i]).flat
@@ -12701,8 +12699,12 @@ class Score(Stream):
         return post
 
 
-    def makeNotation(self, meterStream=None, refStreamOrTimeRange=None,
-                        inPlace=False, bestClef=False, **subroutineKeywords):
+    def makeNotation(self, 
+                     meterStream=None, 
+                     refStreamOrTimeRange=None,
+                     inPlace=False, 
+                     bestClef=False, 
+                     **subroutineKeywords):
         '''
         This method overrides the makeNotation method on Stream,
         such that a Score object with one or more Parts or Streams
@@ -12717,25 +12719,25 @@ class Score(Stream):
         else:
             returnStream = copy.deepcopy(self)
         returnStream.coreGatherMissingSpanners() # get spanners needed but not here!
-        
+
         # do not assume that we have parts here
         if self.hasPartLikeStreams():
             for s in returnStream.iter.getElementsByClass('Stream'):
                 # process all component Streams inPlace
-                s.makeNotation(meterStream=meterStream, 
-                               refStreamOrTimeRange=refStreamOrTimeRange, 
-                               inPlace=True, 
-                               bestClef=bestClef, 
+                s.makeNotation(meterStream=meterStream,
+                               refStreamOrTimeRange=refStreamOrTimeRange,
+                               inPlace=True,
+                               bestClef=bestClef,
                                **subroutineKeywords)
             # note: while the local-streams have updated their caches, the
             # containing score has an out-of-date cache of flat.
             # this, must call elements changed
             returnStream.elementsChanged()
         else: # call the base method
-            super(Score, returnStream).makeNotation(meterStream=meterStream, 
-                                            refStreamOrTimeRange=refStreamOrTimeRange, 
-                                            inPlace=True, 
-                                            bestClef=bestClef, 
+            super(Score, returnStream).makeNotation(meterStream=meterStream,
+                                            refStreamOrTimeRange=refStreamOrTimeRange,
+                                            inPlace=True,
+                                            bestClef=bestClef,
                                             **subroutineKeywords)
 
         if inPlace:
@@ -12748,12 +12750,12 @@ class Score(Stream):
 # could be useful later in a variety of contexts
 #     def mergeStaticNotes(self, attributesList=['pitch'], inPlace=False):
 #         '''
-#         Given a multipart work, look to see if the next verticality causes 
-#         a change in one or more attributes, as specified by the `attributesList` 
+#         Given a multipart work, look to see if the next verticality causes
+#         a change in one or more attributes, as specified by the `attributesList`
 #         parameter. If no change is found, merge the next durations with the previous.
 #
-#         Presently, this assumes that all parts have the same number of notes. 
-#         This must thus be used in conjunction with sliceByGreatestDivisor() to properly 
+#         Presently, this assumes that all parts have the same number of notes.
+#         This must thus be used in conjunction with sliceByGreatestDivisor() to properly
 #         match notes between different parts.
 #         '''
 #
@@ -12941,7 +12943,7 @@ class Opus(Stream):
             md = s.metadata
             # presently just getting the first of attributes encountered
             if md is not None:
-                #environLocal.printDebug(['subscore meta data', md, 
+                #environLocal.printDebug(['subscore meta data', md,
                 #   'md.composer', md.composer, 'md.title', md.title])
                 if md.title is not None and mdNew.title is None:
                     mdNew.title = md.title
@@ -12973,7 +12975,7 @@ class Opus(Stream):
     def show(self, fmt=None, app=None):
         '''
         Show an Opus file.
-        
+
         This method overrides the behavior specified in
         :class:`~music21.base.Music21Object` for all
         formats besides explicit lily.x calls. or when running under IPython notebook.
@@ -13035,9 +13037,9 @@ class VariantStorage(Stream):
 
     A `variantParent` keyword argument must be provided
     by the Variant in creation.
-    
+
     # TODO: rename to client
-    
+
     '''
     def __init__(self, *arguments, **keywords):
         Stream.__init__(self, *arguments, **keywords)

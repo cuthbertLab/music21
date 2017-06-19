@@ -218,6 +218,7 @@ class Test(unittest.TestCase):
                         "pitchHighest": "E5",
                         "pitchLowest": "F#2",
                         "quarterLength": 36.0,
+                        "sourcePath": "bach/bwv66.6.mxl",
                         "tempos": [],
                         "timeSignatureFirst": "4/4",
                         "timeSignatures": [

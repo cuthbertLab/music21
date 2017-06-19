@@ -21,48 +21,48 @@ if six.PY2:
     import Tkinter as tkinter # @UnresolvedImport @UnusedImport
 else:
     import tkinter #  @UnresolvedImport @Reimport
- 
- 
+
+
 class SFApp():
-   
+
     def __init__(self, master):
         self.master = master
         self.frame = tkinter.Frame(master)
         #self.frame.pack()
-        self.master.wm_title("Repetition game")        
-          
-        self.sizeButton = 11    
+        self.master.wm_title("Repetition game")
+
+        self.sizeButton = 11
         self.startScreen()
 
-                
+
     def startScreen(self):
-        master = self.master        
+        master = self.master
         self.textRules = tkinter.StringVar()
         self.boxRules = tkinter.Label(master, textvariable=self.textRules)
-        self.textRules.set("Welcome to the music21 game!\n Rules:\n " + 
-                           "Two players: the first one plays a note.\n " + 
-                           "The second one has to play the first note and a new one.\n " + 
+        self.textRules.set("Welcome to the music21 game!\n Rules:\n " +
+                           "Two players: the first one plays a note.\n " +
+                           "The second one has to play the first note and a new one.\n " +
                            "Continue doing the same until one fails.")
-        self.boxRules.grid(row=0, column=0, columnspan=4, rowspan=5, sticky=tkinter.W)       
- 
-        self.buttonAccept = tkinter.Button(master, text="Accept", width=self.sizeButton, 
+        self.boxRules.grid(row=0, column=0, columnspan=4, rowspan=5, sticky=tkinter.W)
+
+        self.buttonAccept = tkinter.Button(master, text="Accept", width=self.sizeButton,
                                            command=self.callback, bg='white')
-        self.buttonAccept.grid(row=8, column=1, columnspan=2)       
-        
+        self.buttonAccept.grid(row=8, column=1, columnspan=2)
+
         print('Initialized!')
-        
-        
+
+
     def callback(self):
-              
+
         master = self.master
         self.boxRules.destroy()
         self.buttonAccept.destroy()
-        
+
         self.textP1 = tkinter.StringVar()
         self.boxName1 = tkinter.Label(self.master, textvariable=self.textP1)
         self.textP1.set('Player 1')
         self.boxName1.grid(row=0, column=0)
-        
+
         self.textP1Result = tkinter.StringVar()
         self.boxName2 = tkinter.Label(master, textvariable=self.textP1Result)
         self.textP1Result.set('')
@@ -72,48 +72,48 @@ class SFApp():
         self.boxName3 = tkinter.Label(master, textvariable=self.textP2)
         self.textP2.set('Player 2')
         self.boxName3.grid(row=0, column=2)
-        
+
         self.textP2Result = tkinter.StringVar()
         self.boxName4 = tkinter.Label(master, textvariable=self.textP2Result)
         self.textP2Result.set('')
         self.boxName4.grid(row=2, column=2)
-        
+
         self.textRound = tkinter.StringVar()
         self.boxName5 = tkinter.Label(master, width=2*self.sizeButton, textvariable=self.textRound)
         self.textRound.set('Round')
         self.boxName5.grid(row=2, column=1)
-        
+
         self.textFinal = tkinter.StringVar()
         self.boxName6 = tkinter.Label(master, textvariable=self.textFinal)
         self.textFinal.set('')
         self.boxName6.grid(row=4, column=0, columnspan=3)
-        
+
         self.canvas1 = tkinter.Canvas(master, width=40, height=40)
         self.canvas1.create_oval(1, 1, 40, 40, fill='red')
         self.canvas1.grid(row=1, column=0)
-        
+
         self.canvas2 = tkinter.Canvas(master, width=40, height=40)
         self.canvas2.create_oval(1, 1, 40, 40, fill='red')
         self.canvas2.grid(row=1, column=2)
-               
+
         self.buttonStart = tkinter.Button(master, text="Start Recording", width=self.sizeButton,
                                           command=self.startGame, bg='green')
         self.buttonStart.grid(row=3, column=0, columnspan=3)
-    
+
     def startGame(self):
         #master = self.master
         self.good = True
         self.textFinal.set('WAIT...')
-        #self.boxName6.grid(row=4, column=0, columnspan=3) 
+        #self.boxName6.grid(row=4, column=0, columnspan=3)
         self.rG = repetitionGame.repetitionGame()
         self.good = True
         self.textFinal.set('GO!')
         self.master.after(0, self.mainLoop)
-        
-        
+
+
     def mainLoop(self):
         #master = self.master
-        
+
 
         if self.good == True:
             print('rounddddddddddddasdasdadsadad', self.rG.round)
@@ -124,42 +124,42 @@ class SFApp():
                 self.canvas1.grid(row=1, column=0)
 
                 self.canvas2.create_oval(1, 1, 40, 40, fill='red')
-                self.canvas2.grid(row=1, column=2)                
+                self.canvas2.grid(row=1, column=2)
 
             else:
                 self.canvas1.create_oval(1, 1, 40, 40, fill='red')
                 self.canvas1.grid(row=1, column=0)
 
                 self.canvas2.create_oval(1, 1, 40, 40, fill='green')
-                self.canvas2.grid(row=1, column=2)       
+                self.canvas2.grid(row=1, column=2)
 
-                
+
             self.good = self.rG.game()
-            self.master.after(10, self.mainLoop)   
-        else:            
+            self.master.after(10, self.mainLoop)
+        else:
             if self.counter == -1:
                 self.textP1Result.set('WINNER!')
                 #boxName.grid(row=2, column=0)
                 self.textP2Result.set('LOSER')
-                #boxName.grid(row=2, column=2) 
+                #boxName.grid(row=2, column=2)
                 self.canvas1.create_oval(1, 1, 40, 40, fill='yellow')
-                self.canvas1.grid(row=1, column=0)                
+                self.canvas1.grid(row=1, column=0)
 
                 self.canvas2.create_oval(1, 1, 40, 40, fill='grey')
-                self.canvas2.grid(row=1, column=2) 
-            else:     
+                self.canvas2.grid(row=1, column=2)
+            else:
                 self.textP1Result.set('LOSER')
                 self.textP2Result.set('WINNER!')
 
                 self.canvas1.create_oval(1, 1, 40, 40, fill='grey')
-                self.canvas1.grid(row=1, column=0)                
+                self.canvas1.grid(row=1, column=0)
                 #self.canvas2.destroy()
                 self.canvas2.create_oval(1, 1, 40, 40, fill='yellow')
-                self.canvas2.grid(row=1, column=2) 
+                self.canvas2.grid(row=1, column=2)
 
             self.textFinal.set('Another game?')
             self.boxName6.grid(row=4, column=0, columnspan=3)
-        
+
 if __name__ == "__main__":
     root = tkinter.Tk()
     sfapp = SFApp(root)

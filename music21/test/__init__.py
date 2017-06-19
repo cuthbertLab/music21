@@ -6,11 +6,10 @@ __all__ = [
     'coverageM21',
     'commonTest',
     'dedent',
-    'testDocumentation', 
-    'testExternal', 
-    'testPerformance', 
+    'testExternal',
+    'testPerformance',
     'testRunner',
-    'timeGraphs', 
+    'timeGraphs',
     'testStream',
     ]
 

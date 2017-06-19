@@ -76,7 +76,7 @@ def _is_dunder(name):
 
 def _is_sunder(name):
     """Returns True if a _sunder_ name, False otherwise."""
-    return (name[0] == name[-1] == '_' and 
+    return (name[0] == name[-1] == '_' and
             name[1:2] != '_' and
             name[-2:-1] != '_' and
             len(name) > 2)
@@ -459,7 +459,7 @@ class EnumMeta(type):
         """
         if not bases or Enum is None:
             return object, Enum
-        
+
 
         # double check that we are not subclassing a class with existing
         # enumeration members; while we're at it, see if any other data
@@ -703,7 +703,7 @@ else:
         raise TypeError("unorderable types: %s() > %s()" % (self.__class__.__name__, other.__class__.__name__))
     temp_enum_dict['__gt__'] = __gt__
     del __gt__
-    
+
 
 def __eq__(self, other):
     if type(other) is self.__class__:

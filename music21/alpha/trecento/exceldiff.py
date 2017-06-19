@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 
 import sys
 
@@ -25,7 +26,7 @@ else:
 
 if (book2name.count('.xls') == 0):
     book2name += ".xls"
-    
+
 book1 = xlrd.open_workbook(book1name)
 book2 = xlrd.open_workbook(book2name)
 
@@ -48,7 +49,7 @@ elif (totalRows1 < totalRows2):
 else:
     minRows = totalRows1 # doesnt matter which
 
-for i in range(0, minRows):
+for i in range(minRows):
     rowvalues1 = sheet1.row_values(i)
     rowvalues2 = sheet2.row_values(i)
     longrow = 0
@@ -65,27 +66,27 @@ for i in range(0, minRows):
         minCells = totalCells1
     else:
         minCells = totalCells1 # doesnt matter which
-    for j in range(0, minCells):
+    for j in range(minCells):
         if (rowvalues1[j] != rowvalues2[j]):
-            print("%3d,%2s--%34s : %34s" % (i+1,xlrd.colname(j),
+            print("%3d,%2s--%34s : %34s" % (i + 1,xlrd.colname(j),
                                                six.u(rowvalues1[j]).encode('utf-8')[:34],
                                                six.u(rowvalues2[j]).encode('utf-8')[:34]))
     if (extraCells > 0):
-        print("%3d extra cells in row %3d in" % (extraCells, i+1),)
-        if (longrow == 1): 
+        print("%3d extra cells in row %3d in" % (extraCells, i + 1), end='')
+        if (longrow == 1):
             print(book1name + ":" + sheetname1)
-        elif (longrow == 2): 
+        elif (longrow == 2):
             print(book2name + ":" + sheetname2)
-        else: 
+        else:
             raise Exception("What?  longrow was not set!")
 
 if (extraRows > 0):
     print("%3d extra rows in" % extraRows,)
-    if (longsheet == 1): 
+    if (longsheet == 1):
         print(book1name + ":" + sheetname1)
-    elif (longsheet == 2): 
+    elif (longsheet == 2):
         print(book2name + ":" + sheetname2)
-    else: 
+    else:
         raise Exception("What?  longsheet was not set!")
 
 

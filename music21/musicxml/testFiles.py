@@ -11,7 +11,6 @@ import unittest
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
-
 chantQuemQueritis = """<?xml version="1.0" standalone="no"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
@@ -16078,20 +16077,20 @@ tabTest = """<?xml version="1.0" encoding="UTF-8" ?>
 #-------------------------------------------------------------------------------
 # define all strings for access
 
-# 
-# dictionary storing does not work 
+#
+# dictionary storing does not work
 
 # CONTENTS = {'mozartTrioK581Excerpt': mozartTrioK581Excerpt,
 #             'schumannOp48No1': schumannOp48No1,
 #         'chantQuemQueritis': chantQuemQueritis,
 #     'beethovenOp98': beethovenOp98,
 #             }
-# 
+#
 # ALL1 = CONTENTS.items()
- 
 
 
-ALL  = [chantQuemQueritis, mozartTrioK581Excerpt, schumannOp48No1, 
+
+ALL = [chantQuemQueritis, mozartTrioK581Excerpt, schumannOp48No1,
 		binchoisMagnificat, edgefield82b, tabTest]
 
 

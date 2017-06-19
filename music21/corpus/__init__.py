@@ -19,6 +19,22 @@ visit  :ref:`referenceCorpus`.  Note that music21 does not own
 most of the music in the corpus -- it has been licensed to us (or
 in a free license).  It may not be free in all parts of the world,
 but to the best of our knowledge is true for the US.
+
+Use `corpus.parse` if you know the name of a file in the corpus:
+
+>>> b = corpus.parse('bwv66.6')
+>>> b
+<music21.stream.Score 0x1050ce920>
+
+And use `corpus.search` if you do not:
+
+>>> cb = corpus.search('shandy')
+>>> cb
+<music21.metadata.bundles.MetadataBundle {1 entry}>
+>>> cb[0]
+<music21.metadata.bundles.MetadataEntry: airdsAirs_book1_abc_191>
+>>> cb[0].parse()
+<music21.stream.Score 0x1050ce940>
 '''
 from __future__ import unicode_literals
 
@@ -38,11 +54,15 @@ from music21.corpus import manager
 from music21.corpus import virtual
 from music21.corpus import work
 
+from music21.musicxml import archiveTools
+
 from music21 import environment
 _MOD = "corpus.base.py"
 environLocal = environment.Environment(_MOD)
 
 from music21.exceptions21 import CorpusException
+
+from music21.corpus.manager import search
 #------------------------------------------------------------------------------
 
 
@@ -58,7 +78,7 @@ def getCorePaths(fileExtensions=None, expandExtensions=True):
     extensions.
 
     >>> corpusFilePaths = corpus.getCorePaths()
-    >>> cpl = len(corpusFilePaths) 
+    >>> cpl = len(corpusFilePaths)
     >>> 2550 < cpl < 2600
     True
 
@@ -179,41 +199,6 @@ def cacheMetadata(corpusNames=('local',), verbose=True):
         # todo -- create cache names for local corpora
         manager._metadataBundles[name] = None
     metadata.caching.cacheMetadata(corpusNames, verbose=verbose)
-
-
-def search(
-    query,
-    field=None,
-    corpusNames=None,
-    fileExtensions=None,
-    ):
-    r'''
-    Search all stored metadata and return a list of file paths; to return a
-    list of parsed Streams, use `searchParse()`.
-
-    The `name` parameter can be used to specify one of three corpora: core
-    (included with music21), virtual (defined in music21 but hosted online),
-    and local (hosted on the user's system (not yet implemented)).
-
-    This method uses stored metadata and thus, on first usage, will incur a
-    performance penalty during metadata loading.
-    
-    >>> corpus.search('china')
-    <music21.metadata.bundles.MetadataBundle {1235 entries}>
-
-    >>> corpus.search('china', fileExtensions='.mid')
-    <music21.metadata.bundles.MetadataBundle {0 entries}>
-
-    >>> corpus.search('bach', field='composer')
-    <music21.metadata.bundles.MetadataBundle {22 entries}>
-   
-    >>> corpus.search('coltrane', corpusNames=('virtual',))
-    <music21.metadata.bundles.MetadataBundle {1 entry}>
-    '''
-    return manager.search(query,
-                        field=field,
-                        corpusNames=corpusNames,
-                        fileExtensions=fileExtensions)
 
 
 #------------------------------------------------------------------------------
@@ -358,90 +343,18 @@ def parse(workName,
 def compressAllXMLFiles(deleteOriginal=False):
     '''
     Takes all filenames in corpus.paths and runs
-    :meth:`music21.corpus.compressXML` on each.  If the musicXML files are
+    :meth:`music21.musicxml.archiveTools.compressXML` on each.  If the musicXML files are
     compressed, the originals are deleted from the system.
     '''
     environLocal.warn("Compressing musicXML files...")
     for filename in getPaths(fileExtensions=('.xml',)):
-        compressXML(filename, deleteOriginal=deleteOriginal)
+        archiveTools.compressXML(filename, deleteOriginal=deleteOriginal)
     environLocal.warn(
         'Compression complete. '
         'Run the main test suite, fix bugs if necessary,'
         'and then commit modified directories in corpus.'
         )
 
-
-def compressXML(filename, deleteOriginal=False):
-    '''
-    Takes a filename, and if the filename corresponds to a musicXML file with
-    an .xml extension, creates a corresponding compressed .mxl file in the same
-    directory.
-
-    If deleteOriginal is set to True, the original musicXML file is deleted
-    from the system.
-    '''
-    if not filename.endswith('.xml'):
-        return  # not a musicXML file
-    environLocal.warn("Updating file: {0}".format(filename))
-    filenameList = filename.split(os.path.sep)
-    # find the archive name (name w/out filepath)
-    archivedName = filenameList.pop()
-    # new archive name
-    filenameList.append(archivedName[0:len(archivedName) - 4] + ".mxl")
-    newFilename = os.path.sep.join(filenameList)  # new filename
-    # contents of container.xml file in META-INF folder
-    container = '''<?xml version="1.0" encoding="UTF-8"?>
-<container>
-  <rootfiles>
-    <rootfile full-path="{0}"/>
-  </rootfiles>
-</container>
-    '''.format(archivedName)
-    # Export container and original xml file to system as a compressed XML.
-    with zipfile.ZipFile(
-        newFilename,
-        'w',
-        compression=zipfile.ZIP_DEFLATED,
-        ) as myZip:
-        myZip.write(filename=filename, archivedName=archivedName)
-        myZip.writestr(
-            zinfo_or_archivedName='META-INF{0}container.xml'.format(
-                os.path.sep),
-            bytes=container,
-            )
-    # Delete uncompressed xml file from system
-    if deleteOriginal:
-        os.remove(filename)
-
-
-def uncompressMXL(filename, deleteOriginal=False):
-    '''
-    Takes a filename, and if the filename corresponds to a compressed musicXML
-    file with an .mxl extension, creates a corresponding uncompressed .xml file
-    in the same directory.
-
-    If deleteOriginal is set to True, the original compressed musicXML file is
-    deleted from the system.
-    '''
-    if not filename.endswith(".mxl"):
-        return  # not a musicXML file
-    environLocal.warn("Updating file: {0}".format(filename))
-    filenames = filename.split(os.path.sep)
-    # find the archive name (name w/out filepath)
-    archivedName = filenames.pop()
-
-    unarchivedName = os.path.splitext(archivedName)[0] + '.xml'
-    extractPath = os.path.sep.join(filenames)
-    # Export container and original xml file to system as a compressed XML.
-    with zipfile.ZipFile(
-        filename,
-        'r',
-        compression=zipfile.ZIP_DEFLATED,
-        ) as myZip:
-        myZip.extract(member=unarchivedName, path=extractPath)
-    # Delete uncompressed xml file from system
-    if deleteOriginal:
-        os.remove(filename)
 
 
 #------------------------------------------------------------------------------

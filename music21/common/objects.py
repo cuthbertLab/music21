@@ -14,7 +14,7 @@ __all__ = ['defaultlist',
            'SlottedObjectMixin',
            'EqualSlottedObjectMixin',
            'Iterator',
-           'Timer',           
+           'Timer',
           ]
 
 import time
@@ -23,17 +23,17 @@ import weakref
 class defaultlist(list):
     '''
     Call a function for every time something is missing:
-    
+
     TO BE DEPRECATED... soon...
-    
+
     >>> a = common.defaultlist(lambda:True)
     >>> a[5]
-    True    
+    True
     '''
     def __init__(self, fx):
         list.__init__(self)
         self._fx = fx
-        
+
     def _fill(self, index):
         while len(self) <= index:
             self.append(self._fx())
@@ -51,11 +51,11 @@ _singletonCounter['value'] = 0
 
 class SingletonCounter(object):
     '''
-    A simple counter that can produce unique numbers (in ascending order) 
+    A simple counter that can produce unique numbers (in ascending order)
     regardless of how many instances exist.
-    
+
     Instantiate and then call it.
-    
+
     >>> sc = common.SingletonCounter()
     >>> v0 = sc()
     >>> v1 = sc()
@@ -65,8 +65,8 @@ class SingletonCounter(object):
     >>> v2 = sc2()
     >>> v2 > v1
     True
-    
-    
+
+
     '''
     def __init__(self):
         pass
@@ -81,11 +81,11 @@ class SlottedObjectMixin(object):
     r'''
     Provides template for classes implementing slots allowing it to be pickled
     properly.
-    
+
     Only use SlottedObjectMixins for objects that we expect to make so many of
-    that memory storage and speed become an issue. Thus, unless you are Xenakis, 
+    that memory storage and speed become an issue. Thus, unless you are Xenakis,
     Glissdata is probably not the best example:
-    
+
     >>> import pickle
     >>> class Glissdata(common.SlottedObjectMixin):
     ...     __slots__ = ('time', 'frequency')
@@ -99,10 +99,10 @@ class SlottedObjectMixin(object):
     (0.125, 440.0)
 
     OMIT_FROM_DOCS
-    
+
     >>> class BadSubclass(Glissdata):
     ...     pass
-    
+
     >>> bsc = BadSubclass()
     >>> bsc.amplitude = 2
     >>> #_DOCS_SHOW out = pickle.dumps(bsc)
@@ -111,7 +111,7 @@ class SlottedObjectMixin(object):
     >>> t.amplitude
     2
     '''
-    
+
     ### CLASS VARIABLES ###
 
     __slots__ = ()
@@ -128,7 +128,7 @@ class SlottedObjectMixin(object):
             sValue = getattr(self, slot, None)
             if isinstance(sValue, weakref.ref):
                 sValue = sValue()
-                print("Warning: uncaught weakref found in %r - %s, will not be rewrapped" % 
+                print("Warning: uncaught weakref found in %r - %s, will not be rewrapped" %
                       (self, slot))
             state[slot] = sValue
         return state
@@ -140,16 +140,16 @@ class SlottedObjectMixin(object):
     def _getSlotsRecursive(self):
         '''
         Find all slots recursively.
-        
+
         A private attribute so as not to change the contents of inheriting
         objects private interfaces:
-        
+
         >>> b = beam.Beam()
         >>> sSet = b._getSlotsRecursive()
-        
+
         sSet is a set -- independent order.  Thus for the doctest
         we need to preserve the order:
-        
+
         >>> sorted(list(sSet))
         ['direction', 'independentAngle', 'number', 'type']
 
@@ -157,7 +157,7 @@ class SlottedObjectMixin(object):
 
         >>> class FunkyBeam(beam.Beam):
         ...     __slots__ = ('funkiness', 'groovability')
-        
+
         >>> fb = FunkyBeam()
         >>> sSet = fb._getSlotsRecursive()
         >>> sorted(list(sSet))
@@ -181,7 +181,7 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
             if getattr(self, thisSlot) != getattr(other, thisSlot):
                 return False
         return True
-    
+
     def __ne__(self, other):
         return not (self == other)
 
@@ -190,8 +190,8 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
 class Iterator(object):
     '''A simple Iterator object used to handle iteration of Streams and other
     list-like objects.
-    
-    >>> i = common.Iterator([2,3,4])
+
+    >>> i = common.Iterator([2, 3, 4])
     >>> for x in i:
     ...     print(x)
     2
@@ -226,23 +226,23 @@ class Iterator(object):
 class Timer(object):
     """
     An object for timing. Call it to get the current time since starting.
-    
+
     >>> t = common.Timer()
     >>> now = t()
     >>> nownow = t()
     >>> nownow > now
     True
-    
+
     Call `stop` to stop it. Calling `start` again will reset the number
-    
+
     >>> t.stop()
     >>> stopTime = t()
     >>> stopNow = t()
     >>> stopTime == stopNow
     True
-    
+
     All this had better take less than one second!
-    
+
     >>> stopTime < 1
     True
     """
@@ -255,8 +255,8 @@ class Timer(object):
 
     def start(self):
         '''
-        Explicit start method; will clear previous values. 
-        
+        Explicit start method; will clear previous values.
+
         Start always happens on initialization.
         '''
         self._tStart = time.time()

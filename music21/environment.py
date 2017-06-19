@@ -18,7 +18,7 @@ whether music21 is allowed to download files directly (via the virtual corpus),
 and other settings.
 
 Additional documentation for and examples of using this module are found in
-:ref:`environment`.
+:ref:`User's Guide, Chapter 24, Environment <usersGuide_24_environment>`.
 
 # TODO: Update to user's guide
 '''
@@ -44,13 +44,13 @@ def etIndent(elem, level=0, spaces=2):
     indent an elementTree element for printing
     '''
     i = "\n" + level * spaces * " "
-    if len(elem):
+    if len(elem): # pylint: disable=len-as-condition
         if not elem.text or not elem.text.strip():
             elem.text = i + spaces * " "
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
-        for elem in elem:
-            etIndent(elem, level+1)
+        for subEl in elem:
+            etIndent(subEl, level + 1)
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
     else:
@@ -258,7 +258,7 @@ class _EnvironmentCore(object):
         self._ref['lilypondFormat'] = 'pdf'
         self._ref['lilypondBackend'] = 'ps'
 
-        # path to a MusicXML reader: default, will find "Finale Notepad"
+        # path to a MusicXML reader: default, will find "MuseScore"
         self._ref['musicxmlPath'] = None
 
         # path to a midi reader
@@ -313,13 +313,14 @@ class _EnvironmentCore(object):
                 self.__setitem__(name, value)  # use for key checking
         elif platform == 'darwin':
             for name, value in [
-                ('lilypondPath', '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
-                ('musicxmlPath', '/Applications/Finale Notepad 2014.app'),
-                ('graphicsPath', '/Applications/Preview.app'),
-                ('vectorPath', '/Applications/Preview.app'),
-                ('pdfPath', '/Applications/Preview.app'),
-                ('midiPath', '/Applications/QuickTime Player.app'),
-                ('musescoreDirectPNGPath', '/Applications/MuseScore 2.app/Contents/MacOS/mscore'),
+                    ('lilypondPath', '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
+                    ('musicxmlPath', '/Applications/MuseScore 2.app/Contents/MacOS/mscore'),
+                    ('graphicsPath', '/Applications/Preview.app'),
+                    ('vectorPath', '/Applications/Preview.app'),
+                    ('pdfPath', '/Applications/Preview.app'),
+                    ('midiPath', '/Applications/Utilities/QuickTime Player 7.app'),
+                    ('musescoreDirectPNGPath',
+                        '/Applications/MuseScore 2.app/Contents/MacOS/mscore'),
                 ]:
                 self.__setitem__(name, value)  # use for key checking
 
@@ -481,7 +482,7 @@ class _EnvironmentCore(object):
         '''
         # get the root dir, which may be the user-specified dir
         rootDir = self.getRootTempDir()
-        if len(suffix) > 0 and not suffix.startswith('.'):
+        if suffix and not suffix.startswith('.'):
             suffix = '.' + suffix
 
 
@@ -633,7 +634,13 @@ class _EnvironmentCore(object):
             filePath = self.getSettingsPath()
         if not os.path.exists(filePath):
             return None  # do nothing if no file exists
-        settingsTree = ET.parse(filePath)
+
+        try:
+            settingsTree = ET.parse(filePath)
+        except ET.ParseError as pe:
+            raise EnvironmentException(
+                    'Cannot parse file %s: %s' %
+                                           (filePath, str(pe)))
         # load from XML into dictionary
         # updates self._ref in place
         self._fromSettings(settingsTree, self._ref)
@@ -1156,7 +1163,7 @@ class UserSettings(object):
         # this will accept localCorpusPath
         if key in self._environment.getKeysToPaths():
             # try to expand user if found; otherwise return unaltered
-            if value is not None:
+            if value is not None and value != '/skip':
                 value = os.path.expanduser(value)
                 if not os.path.exists(value):
                     raise UserSettingsException(
@@ -1300,10 +1307,10 @@ class Test(unittest.TestCase):
   <localCorporaSettings />
   <localCorpusSettings />
   <preference name="manualCoreCorpusPath" />
-  <preference name="midiPath" value="/Applications/QuickTime Player.app" />
+  <preference name="midiPath" value="/Applications/Utilities/QuickTime Player 7.app" />
   <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
-  <preference name="musicxmlPath" value="/Applications/Finale Notepad 2014.app" />
+  <preference name="musicxmlPath" value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
   <preference name="pdfPath" value="/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
   <preference name="vectorPath" value="/Applications/Preview.app" />
@@ -1348,10 +1355,10 @@ class Test(unittest.TestCase):
     <localCorpusPath>c</localCorpusPath>
   </localCorpusSettings>
   <preference name="manualCoreCorpusPath" />
-  <preference name="midiPath" value="/Applications/QuickTime Player.app" />
+  <preference name="midiPath" value="/Applications/Utilities/QuickTime Player 7.app" />
   <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
-  <preference name="musicxmlPath" value="/Applications/Finale Notepad 2014.app" />
+  <preference name="musicxmlPath" value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
   <preference name="pdfPath" value="/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
   <preference name="vectorPath" value="/Applications/Preview.app" />
@@ -1403,7 +1410,7 @@ class Test(unittest.TestCase):
   <preference name="midiPath" value="w" />
   <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
-  <preference name="musicxmlPath" value="/Applications/Finale Notepad 2014.app" />
+  <preference name="musicxmlPath" value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
   <preference name="pdfPath" value="/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
   <preference name="vectorPath" value="/Applications/Preview.app" />

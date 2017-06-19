@@ -24,9 +24,6 @@ environLocal = environment.Environment(__file__)
 
 from music21.exceptions21 import CorpusException
 
-if six.PY3:
-    unicode = str # @ReservedAssignment
-
 #------------------------------------------------------------------------------
 
 class Corpus(object):
@@ -82,8 +79,8 @@ class Corpus(object):
         from music21 import corpus
         matched = []
         if six.PY2:
-            rootDirectoryPath = unicode(rootDirectoryPath)
-            
+            rootDirectoryPath = six.u(rootDirectoryPath)
+
         for rootDirectory, directoryNames, filenames in os.walk(rootDirectoryPath):
             if '.svn' in directoryNames:
                 directoryNames.remove('.svn')
@@ -183,9 +180,9 @@ class Corpus(object):
 
         >>> from music21 import corpus
         >>> coreCorpus = corpus.corpora.CoreCorpus()
-        
+
         # returns 1 even though there is a '.mus' file, which cannot be read...
-        
+
         >>> len(coreCorpus.getWorkList('cpebach/h186'))
         1
         >>> len(coreCorpus.getWorkList('cpebach/h186', None, '.xml'))
@@ -219,7 +216,7 @@ class Corpus(object):
                 results.append(path)
             elif workSlashes.lower() in path.lower():
                 results.append(path)
-        if len(results):
+        if results:
             # more than one matched...use more stringent criterion:
             # must have a slash before the name
             previousResults = results
@@ -228,10 +225,10 @@ class Corpus(object):
             for path in previousResults:
                 if longName in path.lower():
                     results.append(path)
-            if not len(results):
+            if not results:
                 results = previousResults
         movementResults = []
-        if movementNumber is not None and len(results):
+        if movementNumber is not None and results:
             # store one ore more possible mappings of movement number
             movementStrList = []
             # see if this is a pair
@@ -267,27 +264,27 @@ class Corpus(object):
                 # if we have one direct match, all other matches must
                 # be direct. this will match multiple files with different
                 # file extensions
-                if len(movementResults):
+                if movementResults:
                     continue
                 if searchPartialMatch:
                     for movementStr in movementStrList:
                         if filename.startswith(movementStr.lower()):
                             movementResults.append(filePath)
-            if not len(movementResults):
+            if not movementResults:
                 pass
         else:
             movementResults = results
         return sorted(set(movementResults))
 
-    def search(self, 
-               query, 
-               field=None, 
+    def search(self,
+               query,
+               field=None,
                fileExtensions=None):
         r'''
         Search this corpus for metadata entries, returning a metadataBundle
 
         >>> corpus.corpora.CoreCorpus().search('3/4')
-        <music21.metadata.bundles.MetadataBundle {1867 entries}>
+        <music21.metadata.bundles.MetadataBundle {1875 entries}>
 
         >>> corpus.corpora.CoreCorpus().search(
         ...      'bach',
@@ -300,7 +297,7 @@ class Corpus(object):
         ...     predicate,
         ...     field='noteCount',
         ...     )
-        <music21.metadata.bundles.MetadataBundle {132 entries}>
+        <music21.metadata.bundles.MetadataBundle {134 entries}>
 
         '''
         return self.metadataBundle.search(
@@ -316,15 +313,16 @@ class Corpus(object):
         '''
         Returns a tuple of DirectoryInformation objects for a
         each directory in self._directoryInformation.
-        
+
         >>> core = corpus.corpora.CoreCorpus()
-        >>> diBrief = core.directoryInformation[0:4]
+        >>> diBrief = core.directoryInformation[0:5]
         >>> diBrief
         (<music21.corpus.work.DirectoryInformation airdsAirs>,
-         <music21.corpus.work.DirectoryInformation bach>, 
-         <music21.corpus.work.DirectoryInformation beethoven>, 
+         <music21.corpus.work.DirectoryInformation bach>,
+         <music21.corpus.work.DirectoryInformation beethoven>,
+         <music21.corpus.work.DirectoryInformation chopin>,
          <music21.corpus.work.DirectoryInformation ciconia>)
-        >>> diBrief[3].directoryTitle
+        >>> diBrief[4].directoryTitle
         'Johannes Ciconia'
         '''
         dirInfo = []
@@ -408,20 +406,20 @@ class Corpus(object):
 
     def getWorkReferences(self):
         '''
-        Return a data dictionary for all works in this corpus 
+        Return a data dictionary for all works in this corpus
         Returns a list of corpus.work.DirectoryInformation objects, one
         for each directory. A 'works' dictionary for each composer
         provides references to dictionaries for all associated works.
-    
+
         This is used in the generation of corpus documentation
-    
+
         >>> workRefs = corpus.corpora.CoreCorpus().getWorkReferences()
         >>> workRefs[1:3]
-        [<music21.corpus.work.DirectoryInformation bach>, 
+        [<music21.corpus.work.DirectoryInformation bach>,
          <music21.corpus.work.DirectoryInformation beethoven>]
                  '''
         results = [di for di in self.directoryInformation]
-    
+
         return results
 
 #------------------------------------------------------------------------------
@@ -441,6 +439,7 @@ class CoreCorpus(Corpus):
         ('airdsAirs', 'Aird\'s Airs', False),
         ('bach', 'Johann Sebastian Bach', True),
         ('beethoven', 'Ludwig van Beethoven', True),
+        ('chopin', 'Frederic Chopin', True),
         ('ciconia', 'Johannes Ciconia', True),
         ('corelli', 'Arcangelo Corelli', True),
         ('cpebach', 'C.P.E. Bach', True),
@@ -626,8 +625,8 @@ class CoreCorpus(Corpus):
 
     def getComposerDirectoryPath(self, composerName):
         '''
-        To be DEPRECATED 
-        
+        To be DEPRECATED
+
         Given the name of a composer, get the path to the top-level directory
         of that composer:
 
@@ -781,7 +780,7 @@ class CoreCorpus(Corpus):
 
     @manualCoreCorpusPath.setter
     def manualCoreCorpusPath(self, expr):
-        userSettings = environment.UserSettings() 
+        userSettings = environment.UserSettings()
         if expr is not None:
             path = common.cleanpath(expr)
             if not os.path.isdir(path) or not os.path.exists(path):
@@ -811,7 +810,7 @@ class CoreCorpus(Corpus):
                 CoreCorpus._noCorpus = True
             else:
                 CoreCorpus._noCorpus = False
-        
+
         return CoreCorpus._noCorpus
 
 
@@ -837,9 +836,9 @@ class LocalCorpus(Corpus):
     ### INITIALIZER ###
 
     def __init__(self, name=None):
-        if not isinstance(name, (str, unicode, type(None))):
+        if not isinstance(name, (six.string_types, type(None))):
             raise CorpusException("Name must be a string or None")
-        if name is not None and len(name) == 0:
+        if name is not None and not name:
             raise CorpusException("Name cannot be blank")
         if name == 'local':
             self._name = None
@@ -864,7 +863,7 @@ class LocalCorpus(Corpus):
 
     def _getSettings(self):
         userSettings = environment.UserSettings()
-        if self.name is 'local':
+        if self.name == 'local':
             return userSettings['localCorpusSettings']
         return userSettings['localCorporaSettings'].get(self.name, None)
 
@@ -890,12 +889,12 @@ class LocalCorpus(Corpus):
         unless explicitly saved by a call to ``LocalCorpus.save()``.
         '''
         from music21 import corpus
-        if not isinstance(directoryPath, (str, unicode)):
+        if not isinstance(directoryPath, six.string_types):
             raise corpus.CorpusException(
                 'an invalid file path has been provided: {0!r}'.format(
                     directoryPath))
         directoryPath = os.path.expanduser(directoryPath)
-        if (not os.path.exists(directoryPath) or 
+        if (not os.path.exists(directoryPath) or
                 not os.path.isdir(directoryPath)):
             raise corpus.CorpusException(
                 'an invalid file path has been provided: {0!r}'.format(
@@ -979,7 +978,7 @@ class LocalCorpus(Corpus):
         the user settings.
         '''
         userSettings = environment.UserSettings()
-        if self.name is 'local':
+        if self.name == 'local':
             userSettings['localCorpusSettings'] = self.directoryPaths
         else:
             userSettings['localCorporaSettings'][self.name] = self.directoryPaths
@@ -1047,7 +1046,7 @@ class VirtualCorpus(Corpus):
     ### CLASS VARIABLES ###
 
     _virtual_works = []
-    
+
     corpusName = None
     for corpusName in dir(virtual):
         className = getattr(virtual, corpusName)

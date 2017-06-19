@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 
+# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
@@ -31,14 +31,14 @@ point, along with chant and trecento.
 When adding files here, update documentation.library.iterators
 '''
 __all__ = [ #dirs
-           'analysis',  
+           'analysis',
            'counterpoint',
-           'theoryAnalysis', 
-           'trecento', 
+           'theoryAnalysis',
+           'trecento',
            'webapps',
-           
+
            #files
-           'chant', 
+           'chant',
            'contour',
            'medren']
 
@@ -50,6 +50,6 @@ from music21.alpha import webapps
 
 from music21.alpha import chant
 from music21.alpha import contour
-from music21.alpha import medren 
+from music21.alpha import medren
 
 

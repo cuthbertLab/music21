@@ -10,13 +10,14 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 __all__ = [
+           'getRootFilePath',
            'getSourceFilePath',
            'getMetadataCacheFilePath',
            'getCorpusFilePath',
            'getCorpusContentDirs',
            'getPackageDir',
            'getPackageData',
-           'relativepath', 
+           'relativepath',
            'cleanpath',
            ]
 
@@ -26,10 +27,10 @@ import os
 #-------------------------------------------------------------------------------
 def getSourceFilePath():
     '''
-    Get the music21 directory that contains source files such as note.py, etc.. 
+    Get the music21 directory that contains source files such as note.py, etc..
     This is not the same as the
     outermost package development directory.
-    
+
     :rtype: str
     '''
     fpThis = inspect.getfile(getSourceFilePath)
@@ -47,7 +48,7 @@ def getMetadataCacheFilePath():
     >>> fp = common.getMetadataCacheFilePath()
     >>> fp.endswith('corpus/_metadataCache') or fp.endswith(r'corpus\_metadataCache')
     True
-    
+
     :rtype: str
     '''
     return os.path.join(getSourceFilePath(), 'corpus', '_metadataCache')
@@ -69,20 +70,20 @@ def getCorpusFilePath():
 
 def getCorpusContentDirs():
     '''
-    Get all dirs that are found in the corpus that contain content; 
+    Get all dirs that are found in the corpus that contain content;
     that is, exclude dirs that have code or other resources.
 
     >>> fp = common.getCorpusContentDirs()
     >>> fp # this test will be fragile, depending on composition of dirs
-    ['airdsAirs', 'bach', 'beethoven', 'ciconia', 'corelli', 'cpebach',
+    ['airdsAirs', 'bach', 'beethoven', 'chopin', 'ciconia', 'corelli', 'cpebach',
     'demos', 'essenFolksong', 'handel', 'haydn', 'josquin', 'leadSheet',
     'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'palestrina',
     'ryansMammoth', 'schoenberg', 'schumann', 'schumann_clara',
     'theoryExercises', 'trecento', 'verdi', 'weber']
-    
+
     Make sure that all corpus data has a directoryInformation tag in
     CoreCorpus.
-    
+
     >>> cc = corpus.corpora.CoreCorpus()
     >>> failed = []
     >>> di = [d.directoryName for d in cc.directoryInformation]
@@ -91,7 +92,7 @@ def getCorpusContentDirs():
     ...         failed.append(f)
     >>> failed
     []
-    
+
     '''
     directoryName = getCorpusFilePath()
     result = []
@@ -111,11 +112,19 @@ def getCorpusContentDirs():
         result.append(filename)
     return sorted(result)
 
+def getRootFilePath():
+    '''
+    Return the root directory for music21 -- outside of the music21 namespace
+    which has directories such as "dist", "documentation", "music21"
+    '''
+    fpMusic21 = getSourceFilePath()
+    fpParent = os.path.dirname(fpMusic21)
+    return fpParent
 
 def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
                   packageOnly=True):
     '''
-    Manually get all directories in the music21 package, 
+    Manually get all directories in the music21 package,
     including the top level directory. This is used in setup.py.
 
     If `relative` is True, relative paths will be returned.
@@ -155,7 +164,7 @@ def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
 
 def getPackageData():
     '''
-    Return a list of package data in 
+    Return a list of package data in
     the format specified by setup.py. This creates a very inclusive list of all data types.
     '''
     # include these extensions for all directories, even if they are not normally there.
@@ -191,7 +200,7 @@ def relativepath(path, start=None):
 
     This avoids problems under Windows when the current working directory is
     on a different drive letter from `path`.
-    
+
     :type path: str
     :type start: str
     :rtype: str

@@ -10,7 +10,7 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
-Object models of barlines, including repeat barlines. 
+Object models of barlines, including repeat barlines.
 '''
 
 import unittest
@@ -33,7 +33,7 @@ class BarException(exceptions21.Music21Exception):
 
 # store alternative names for styles; use this dictionary for translation
 # reference
-barStyleList = ['regular', 'dotted', 'dashed', 'heavy', 'double', 'final', 
+barStyleList = ['regular', 'dotted', 'dashed', 'heavy', 'double', 'final',
                 'heavy-light', 'heavy-heavy', 'tick', 'short', 'none']
 barStyleDict = {'light-light': 'double',
                 'light-heavy': 'final', }
@@ -43,13 +43,13 @@ reverseBarStyleDict = {'double': 'light-light',
 
 def styleToMusicXMLBarStyle(value):
     '''
-    Convert a music21 barline name into the musicxml name -- 
+    Convert a music21 barline name into the musicxml name --
     essentially just changes the names of 'double' and 'final'
     to 'light-light' and 'light-heavy'
 
     Does not do error checking to make sure it's a valid name,
     since setting the style on a Barline object already does that.
-    
+
     >>> bar.styleToMusicXMLBarStyle('final')
     'light-heavy'
     >>> bar.styleToMusicXMLBarStyle('regular')
@@ -63,16 +63,16 @@ def styleToMusicXMLBarStyle(value):
 def standardizeBarStyle(value):
     '''
     Standardizes bar style names.
-    
+
     converts all names to lower case, None to 'regular',
     and 'light-light' to 'double' and 'light-heavy' to 'final',
     raises an error for unknown styles.
-    '''  
+    '''
     if value is None:
         return 'regular' # for now, return with string
 
     value = value.lower()
-    
+
     if value in barStyleList:
         return value
     elif value in barStyleDict:
@@ -80,20 +80,20 @@ def standardizeBarStyle(value):
     # if not match
     else:
         raise BarException('cannot process style: %s' % value)
- 
+
 
 #-------------------------------------------------------------------------------
 class Barline(base.Music21Object):
-    '''A representation of a barline. 
-    Barlines are conventionally assigned to Measure objects 
+    '''A representation of a barline.
+    Barlines are conventionally assigned to Measure objects
     using the leftBarline and rightBarline attributes.
 
-    
+
     >>> bl = bar.Barline('double')
     >>> bl
     <music21.bar.Barline style=double>
 
-    The style can also just be set via a keyword of "style".  Or if no style is specified, 
+    The style can also just be set via a keyword of "style".  Or if no style is specified,
     a regular barline is returned.  Location can also be explicitly stored, but it's not
     needed except for musicxml translation:
 
@@ -108,17 +108,17 @@ class Barline(base.Music21Object):
     <music21.bar.Barline style=final>
     >>> bl4.style
     'final'
-    
+
     Note that the barline style 'ticked' only is displayed correctly in Finale and Finale Notepad.
     '''
     validStyles = list(barStyleDict.keys())
 
     _style = None
     _pause = None  # can be music21.expressions.Fermata object
-    
-    classSortOrder = -5 
 
-    def __init__(self, style = None, location = None):
+    classSortOrder = -5
+
+    def __init__(self, style=None, location=None):
         base.Music21Object.__init__(self)
 
         # this will raise an exception on error from property
@@ -138,22 +138,22 @@ class Barline(base.Music21Object):
         # will raise exception on error
         self._style = standardizeBarStyle(value)
 
-    style = property(_getStyle, _setStyle, 
+    style = property(_getStyle, _setStyle,
         doc = '''Get and set the Barline style property.
 
-        
+
         >>> b = bar.Barline()
         >>> b.style = 'tick'
         >>> b.style
         'tick'
-        
+
         Synonyms are given for some styles:
-        
+
         >>> b.style = 'light-light'
         >>> b.style
         'double'
         ''')
-    
+
     @property
     def musicXMLBarStyle(self):
         return styleToMusicXMLBarStyle(self.style)
@@ -179,15 +179,15 @@ class Repeat(RepeatMark, Barline):
     The `direction` parameter can be one of `start` or `end`.  A `end` followed by a `start`
     should be encoded as two `bar.Repeat` signs.
 
-    
+
     >>> rep = bar.Repeat(direction='end', times=3)
     >>> rep
     <music21.bar.Repeat direction=end times=3>
 
-    To apply a repeat barline assign it to either the `.leftBarline` or 
+    To apply a repeat barline assign it to either the `.leftBarline` or
     `.rightBarline` attribute
     of a measure.
-    
+
     >>> m = stream.Measure()
     >>> m.leftBarline = bar.Repeat(direction='start')
     >>> m.rightBarline = bar.Repeat(direction='end')
@@ -205,7 +205,7 @@ class Repeat(RepeatMark, Barline):
         {3.0} <music21.note.Note D-->
         {4.0} <music21.bar.Repeat direction=end>
 
-    The method :meth:`~music21.stream.Part.expandRepeats` on a 
+    The method :meth:`~music21.stream.Part.expandRepeats` on a
     :class:`~music21.stream.Part` object expands the repeats, but
     does not update measure numbers
 
@@ -265,9 +265,9 @@ class Repeat(RepeatMark, Barline):
     def _getDirection(self):
         return self._direction
 
-    direction = property(_getDirection, _setDirection, 
-        doc = '''Get or set the direction of this Repeat barline. Can be start or end. 
-        
+    direction = property(_getDirection, _setDirection,
+        doc = '''Get or set the direction of this Repeat barline. Can be start or end.
+
         TODO: show how changing direction changes style.
         ''')
 
@@ -289,22 +289,22 @@ class Repeat(RepeatMark, Barline):
     def _getTimes(self):
         return self._times
 
-    times = property(_getTimes, _setTimes, 
+    times = property(_getTimes, _setTimes,
         doc = '''
-        Get or set the times property of this barline. This 
-        defines how many times the repeat happens. A standard repeat 
-        repeats 2 times; values equal to or greater than 0 are permitted. 
-        A repeat of 0 skips the repeated passage. 
-        
+        Get or set the times property of this barline. This
+        defines how many times the repeat happens. A standard repeat
+        repeats 2 times; values equal to or greater than 0 are permitted.
+        A repeat of 0 skips the repeated passage.
+
         >>> lb = bar.Repeat(direction='start')
         >>> rb = bar.Repeat(direction='end')
-        
+
         Only end expressions can have times:
-        
+
         >>> lb.times = 3
         Traceback (most recent call last):
         music21.bar.BarException: cannot set repeat times on a start Repeat
-        
+
         >>> rb.times = 3
         >>> rb.times = -3
         Traceback (most recent call last):
@@ -314,17 +314,17 @@ class Repeat(RepeatMark, Barline):
 
     def getTextExpression(self, prefix='', postfix='x'):
         '''
-        Return a configured :class:`~music21.expressions.TextExpressions` 
-        object describing the repeat times. Append this to the stream 
-        for annotation of repeat times. 
-        
+        Return a configured :class:`~music21.expressions.TextExpressions`
+        object describing the repeat times. Append this to the stream
+        for annotation of repeat times.
+
         >>> rb = bar.Repeat(direction='end')
         >>> rb.times = 3
         >>> rb.getTextExpression()
         <music21.expressions.TextExpression "3x">
-        
+
         >>> rb.getTextExpression(prefix='repeat ', postfix=' times')
-        <music21.expressions.TextExpression "repeat 3 t...">        
+        <music21.expressions.TextExpression "repeat 3 t...">
         '''
         value = '%s%s%s' % (prefix, self._times, postfix)
         return expressions.TextExpression(value)
@@ -332,10 +332,10 @@ class Repeat(RepeatMark, Barline):
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-    
+
     def runTest(self):
         pass
-   
+
 
     def testSortorder(self):
         from music21 import stream, clef, note, metadata

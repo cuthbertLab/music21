@@ -25,5 +25,5 @@ class SoundTagMixin(object):
         # pylint: disable=unused-variable
         tempoNum = mxSound.get('tempo') # @UnusedVariable
         dynamicsNum = mxSound.get('dynamics') # @UnusedVariable
-        
+
         return soundObjs

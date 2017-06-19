@@ -23,7 +23,7 @@ Humdrum       music21                                            notes
 ============  =================================================  =========================================================================================================================================================================
 assemble_     None                                               Use python commands to unite objects and `s.insert(0, p)` to put a part at the beginning of a multipart score.
 census_       None                                               Use python to create census equivalents
-cents_        `interval.ChromaticInterval.cents`                 
+cents_        `interval.ChromaticInterval.cents`
 cleave_       None                                               kern specific, not needed
 context_      None                                               Not needed.  Use object.next and object.prev to get some context for many objects and :meth:`~music21.base.Music21Object.getContextByClass` to find the most recent object of a given type
 correl_       None                                               Use numpy.corrcoef() or other, more sophisticated code
@@ -35,14 +35,14 @@ encode_       `midi.(severaltools)`                              Multifunction h
 extract_      None                                               Use python commands to extract objects with certain properties
 fields_       None                                               Not needed.
 fin2hum_      `music21.converter.parse` (filename)               Enigma Transport Format did not take off and is rarely used. An Enigma to music21 converter is very low priority. Software to convert Enigma to MusicXML is available from recordare
-freq_         see :meth:`~music21.pitch.Pitch.frequency` 
+freq_         see :meth:`~music21.pitch.Pitch.frequency`
 hint_         see Notes                                          :meth:`~music21.stream.Stream.attachIntervalsBetweenStreams` See alpha.trecento.capua demo to show how it can be done.
 hum2fin_      `.write('musicxml')`                               Writes to musicXML.  A music21 to Enigma converter will not be written (obsolete format)
 humdrum_      None                                               Not needed.  The `spineParser` will report errors when parsing.
 humsed_       None                                               Not needed.
 humver_       None                                               Not needed.
 infot_        None                                               Use general purpose python information theory models
-iv_           :meth:`~music21.chord.Chord.intervalVector` 
+iv_           :meth:`~music21.chord.Chord.intervalVector`
 kern_         None                                               Output to Humdrum is not supported
 key_          :meth:`~music21.stream.Stream.analyze` ('key')
 melac_        see Notes                                          :meth:`~music21.analysis.metrical.thomassenMelodicAccent`.  incorporates humdrum additions for giving accent of the first and last notes.
@@ -76,12 +76,12 @@ strophe_      :meth:`~music21.text.assembleLyrics`               You probably wo
 synco_        To-Do                                              Will be "analysis.leeLHiggins" but not yet written -- low priority
 tacet_        None                                               see `midireset` above; -i will not be supported
 timebase_     None                                               Not needed.  stream.getElementsByOffset() will cover most uses
-tonh_         :meth:`~music21.pitch.Pitch.german` 
+tonh_         :meth:`~music21.pitch.Pitch.german`
 trans_        `.transpose(Interval)`                             Note: :meth:`~music21.note.Note.transpose`, Stream: :meth:`~music21.stream.Stream.transpose`, etc
 urrhythm_     To-Do                                              will be "`analysis.JohnsonLaird.urrhythm(Stream)`" but not yet written -- low priority
 veritas_      None                                               Not needed.  use `import md5` or other checksum files
 vox_          None                                               `len(Chord.pitches())` works for a chord.  Stream has many methods for performing this function.
-xdelta_       None                                               Not needed.  Use `stream[i+1].property - stream[i].property` for similar effects.
+xdelta_       None                                               Not needed.  Use `stream[i + 1].property - stream[i].property` for similar effects.
 yank_         "if"
 ydelta_       None                                               Not needed.
 ============  =================================================  =========================================================================================================================================================================
@@ -160,14 +160,14 @@ from music21.humdrum import testFiles
 
 def parseFile(filename):
     '''
-    shortcut to :class:`~music21.humdrum.spineParser.HumdrumFile`.  
+    shortcut to :class:`~music21.humdrum.spineParser.HumdrumFile`.
     Most users will call `converter.parse()` instead.
     '''
     return spineParser.HumdrumFile(filename)
 
 def parseData(data):
     '''
-    shortcut to :class:`~music21.humdrum.spineParser.HumdrumDataCollection`. 
+    shortcut to :class:`~music21.humdrum.spineParser.HumdrumDataCollection`.
     Most users will call `converter.parse()` instead.
     '''
     return spineParser.HumdrumDataCollection(data)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         reduceChords.py
-# Purpose:      Tools for eliminating passing chords, etc. 
+# Purpose:      Tools for eliminating passing chords, etc.
 #
 # Authors:      Michael Scott Cuthbert
 #
@@ -16,6 +16,7 @@ from __future__ import division, print_function, absolute_import
 import unittest
 import copy
 
+from music21 import clef
 from music21 import meter
 from music21 import stream
 from music21 import tie
@@ -30,7 +31,7 @@ if six.PY2:
 def testMeasureStream1():
     '''
     returns a simple measure stream for testing:
-    
+
     >>> s = analysis.reduceChords.testMeasureStream1()
     >>> s.show('text')
     {0.0} <music21.meter.TimeSignature 4/4>
@@ -56,26 +57,26 @@ class ChordReducer(object):
         self.maxChords = 3
         self.positionInMeasure = None
         self.numberOfElementsInMeasure = None
-        
+
         # for working...
         self._lastPitchedObject = None
         self._lastTs = None
 
-    def reduceMeasureToNChords(self, 
-                               measureObj, 
-                               numChords=1, 
-                               weightAlgorithm=None, 
+    def reduceMeasureToNChords(self,
+                               measureObj,
+                               numChords=1,
+                               weightAlgorithm=None,
                                trimBelow=0.25):
         '''
-        
-        >>> s = analysis.reduceChords.testMeasureStream1()     
+
+        >>> s = analysis.reduceChords.testMeasureStream1()
         >>> cr = analysis.reduceChords.ChordReducer()
-        
-        Reduce to a maximum of 3 chords; though here we will 
+
+        Reduce to a maximum of 3 chords; though here we will
         only get one because the other chord is
         below the trimBelow threshold.
-        
-        >>> newS = cr.reduceMeasureToNChords(s, 3, 
+
+        >>> newS = cr.reduceMeasureToNChords(s, 3,
         ...    weightAlgorithm=cr.qlbsmpConsonance, trimBelow = 0.3)
         >>> newS.show('text')
         {0.0} <music21.meter.TimeSignature 4/4>
@@ -88,14 +89,14 @@ class ChordReducer(object):
             mObj = measureObj.flat.notes.stream()
         else:
             mObj = measureObj.notes.stream()
-        
+
         chordWeights = self.computeMeasureChordWeights(mObj, weightAlgorithm)
 
         if numChords > len(chordWeights):
             numChords = len(chordWeights)
 
         maxNChords = sorted(chordWeights, key=chordWeights.get, reverse=True)[:numChords]
-        if len(maxNChords) == 0:
+        if not maxNChords:
             r = note.Rest()
             r.quarterLength = mObj.duration.quarterLength
             for c in mObj:
@@ -103,7 +104,7 @@ class ChordReducer(object):
             mObj.insert(0, r)
             return mObj
         maxChordWeight = chordWeights[maxNChords[0]]
-        
+
         trimmedMaxChords = []
         for pcTuples in maxNChords:
             if chordWeights[pcTuples] >= maxChordWeight * trimBelow:
@@ -111,7 +112,7 @@ class ChordReducer(object):
                 #print chordWeights[pcTuples], maxChordWeight
             else:
                 break
-        
+
         currentGreedyChord = None
         currentGreedyChordPCs = None
         currentGreedyChordNewLength = 0.0
@@ -152,16 +153,16 @@ class ChordReducer(object):
                 lastC.quarterLength -= cOffsetSyncop
                 c.offset = int(cOffsetCurrent)
                 c.quarterLength += cOffsetSyncop
-            
 
-                        
+
+
         return mObj
         # closed position
-    
+
     def computeMeasureChordWeights(self, measureObj, weightAlgorithm=None):
         '''
-        
-        >>> s = analysis.reduceChords.testMeasureStream1().notes      
+
+        >>> s = analysis.reduceChords.testMeasureStream1().notes
         >>> cr = analysis.reduceChords.ChordReducer()
         >>> cws = cr.computeMeasureChordWeights(s)
         >>> for pcs in sorted(cws):
@@ -178,8 +179,8 @@ class ChordReducer(object):
          (0, 11, 4, 5)  0.5
 
         Give extra weight to the last element in a measure:
-        
-        >>> cws = cr.computeMeasureChordWeights(s, 
+
+        >>> cws = cr.computeMeasureChordWeights(s,
         ...              weightAlgorithm=cr.quarterLengthBeatStrengthMeasurePosition)
         >>> for pcs in sorted(cws):
         ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
@@ -187,7 +188,7 @@ class ChordReducer(object):
          (0, 11, 4, 5)  0.5
 
         Make consonance count a lot:
-        
+
         >>> cws = cr.computeMeasureChordWeights(s, weightAlgorithm=cr.qlbsmpConsonance)
         >>> for pcs in sorted(cws):
         ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
@@ -197,10 +198,10 @@ class ChordReducer(object):
         if weightAlgorithm is None:
             weightAlgorithm = self.quarterLengthOnly
         presentPCs = {}
-        
+
         self.positionInMeasure = 0
         self.numberOfElementsInMeasure = len(measureObj)
-        
+
         for i, c in enumerate(measureObj):
             self.positionInMeasure = i
             if c.isNote:
@@ -215,13 +216,13 @@ class ChordReducer(object):
         self.numberOfElementsInMeasure = 0
 
         return presentPCs
-            
+
     def quarterLengthOnly(self, c):
         return c.quarterLength
 
     def quarterLengthBeatStrength(self, c):
         return c.quarterLength * c.beatStrength
-    
+
     def quarterLengthBeatStrengthMeasurePosition(self, c):
         if self.positionInMeasure == self.numberOfElementsInMeasure - 1:
             return c.quarterLength # call beatStrength 1
@@ -246,7 +247,7 @@ class ChordReducer(object):
         self._lastTs = None
         for i in range(lenMeasures):
             mI = inStream.measure(i, ignoreNumbers=True)
-            if len(mI.flat.notesAndRests) == 0:
+            if not mI.recurse().notesAndRests:
                 if i == 0:
                     pass
                 else:
@@ -254,13 +255,13 @@ class ChordReducer(object):
             else:
                 m = self.reduceThisMeasure(mI, i, maxChords, closedPosition, forceOctave)
                 p._appendCore(m)
-                
+
             if self.printDebug:
                 print(i, " ", end="")
                 if i % 20 == 0 and i != 0:
                     print("")
         p.elementsChanged()
-        p.getElementsByClass('Measure')[0].insert(0, p.bestClef(allowTreble8vb=True))
+        p.getElementsByClass('Measure')[0].insert(0, clef.bestClef(p, allowTreble8vb=True))
         p.makeNotation(inPlace=True)
         return p
 
@@ -270,9 +271,9 @@ class ChordReducer(object):
         m.number = measureIndex
 
         mIchord = mI.chordify()
-        newPart = self.reduceMeasureToNChords(mIchord, 
-                                              maxChords, 
-                                              weightAlgorithm=self.qlbsmpConsonance, 
+        newPart = self.reduceMeasureToNChords(mIchord,
+                                              maxChords,
+                                              weightAlgorithm=self.qlbsmpConsonance,
                                               trimBelow=0.3)
         #newPart.show('text')
         cLast = None
@@ -286,7 +287,7 @@ class ChordReducer(object):
                     cElCopy.closedPosition(inPlace=True)
                 cElCopy.removeRedundantPitches(inPlace=True)
             newOffset = cEl.getOffsetBySite(newPart)
-            
+
             # extend over gaps
             if cLast is not None:
                 if round(newOffset - cLastEnd, 6) != 0.0:
@@ -294,13 +295,13 @@ class ChordReducer(object):
             cLast = cElCopy
             cLastEnd = newOffset + cElCopy.quarterLength
             m._insertCore(newOffset, cElCopy)
-        
+
         tsContext = mI.parts[0].getContextByClass('TimeSignature')
         if tsContext is not None:
             if round(tsContext.barDuration.quarterLength - cLastEnd, 6) != 0.0:
                 cLast.quarterLength += tsContext.barDuration.quarterLength - cLastEnd
-        
-        
+
+
         m.elementsChanged()
 
         # add ties
@@ -313,7 +314,7 @@ class ChordReducer(object):
                 if len(self._lastPitchedObject) == len(firstPitched):
                     allSame = True
                     for pitchI in range(len(self._lastPitchedObject)):
-                        if (self._lastPitchedObject.pitches[pitchI] != 
+                        if (self._lastPitchedObject.pitches[pitchI] !=
                                 firstPitched.pitches[pitchI]):
                             allSame = False
                     if allSame is True:
@@ -326,7 +327,7 @@ class ChordReducer(object):
             self._lastTs = sourceMeasureTs
 
         return m
-#-------------------------------------------------------------------------------    
+#-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -350,25 +351,24 @@ class TestExternal(unittest.TestCase):
     def testTrecentoMadrigal(self):
         from music21 import corpus
         # c = corpus.parse('beethoven/opus18no1', 2).measures(1, 19)
-        
-        
+
+
         c = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
         # c = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
         # c = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
         # c = corpus.parse('PMFC_06-Jacopo').measures(1, 30)
-        
+
         # c = corpus.parse('PMFC_12_13').measures(1, 40)
 
         # fix clef
         fixClef = True
         if fixClef:
-            from music21 import clef
             startClefs = c.parts[1].getElementsByClass('Measure')[0].getElementsByClass('Clef')
-            if len(startClefs):
+            if startClefs:
                 clef1 = startClefs[0]
                 c.parts[1].getElementsByClass('Measure')[0].remove(clef1)
             c.parts[1].getElementsByClass('Measure')[0].insert(0, clef.Treble8vbClef())
-        
+
 
         cr = ChordReducer()
         #cr.printDebug = True
@@ -377,14 +377,14 @@ class TestExternal(unittest.TestCase):
         from music21 import key, roman
         cm = key.Key('G')
         for thisChord in p.recurse().getElementsByClass('Chord'):
-            thisChord.lyric = roman.romanNumeralFromChord(thisChord, 
-                                                          cm, 
+            thisChord.lyric = roman.romanNumeralFromChord(thisChord,
+                                                          cm,
                                                           preferSecondaryDominants=True).figure
-        
-        
+
+
         c.insert(0, p)
         c.show()
-        
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

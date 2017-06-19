@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         testExternal.py
-# Purpose:      Controller for all tests employing external software and 
+# Purpose:      Controller for all tests employing external software and
 #               human-confirmation. Uses TestExternal classes in modules.
 #
 # Authors:      Christopher Ariza
@@ -12,7 +12,7 @@
 #-------------------------------------------------------------------------------
 
 from music21.test import testSingleCoreAll as test
-           
+
 #-------------------------------------------------------------------------------
 if __name__ == '__main__':
     test.main('external')

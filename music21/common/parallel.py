@@ -17,13 +17,13 @@ import multiprocessing
 
 from music21.ext.joblib import Parallel, delayed  # @UnresolvedImport
 
-def runParallel(iterable, parallelFunction, 
+def runParallel(iterable, parallelFunction,
                 updateFunction=None, updateMultiply=3,
-                unpackIterable=False):
+                unpackIterable=False, updateSendsIterable=False):
     '''
     runs parallelFunction over iterable in parallel, optionally calling updateFunction after
     each common.cpus * updateMultiply calls.
-    
+
     Setting updateMultiply too small can make it so that cores wait around when they
     could be working if one CPU has a particularly hard task.  Setting it too high
     can make it seem like the job has hung.
@@ -34,7 +34,10 @@ def runParallel(iterable, parallelFunction,
     which just prints a generic message.
 
     If unpackIterable is True then each element in iterable is considered a list or
-    tuple of different arguments to delayFunction.
+    tuple of different arguments to parallelFunction.
+
+    If updateSendsIterable is True then the update function will get the iterable
+    content, not the output
 
     As of Python 2.7, partial functions are pickleable, so if you need to pass the same
     arguments to parallelFunction each time, make it a partial function before passing
@@ -49,44 +52,48 @@ def runParallel(iterable, parallelFunction,
     iterLength = len(iterable)
     totalRun = 0
     numCpus = cpus()
-    
+
     resultsList = []
-    
+
     # multiprocessing has trouble with introspection
     # pylint: disable=not-callable
     if multiprocessing.current_process().daemon: # @UndefinedVariable
         return runNonParallel(iterable, parallelFunction, updateFunction,
                               updateMultiply, unpackIterable)
-    
+
     with Parallel(n_jobs=numCpus) as para:
         delayFunction = delayed(parallelFunction)
         while totalRun < iterLength:
             endPosition = min(totalRun + numCpus * updateMultiply, iterLength)
             rangeGen = range(totalRun, endPosition)
-            
+
             if unpackIterable:
                 _r = para(delayFunction(*iterable[i]) for i in rangeGen)
             else:
                 _r = para(delayFunction(iterable[i]) for i in rangeGen)
 
-            totalRun = endPosition
-            resultsList.extend(_r)
             if updateFunction is True:
                 print("Done {} tasks of {}".format(totalRun, iterLength))
             elif updateFunction is not None:
-                updateFunction(totalRun, iterLength, _r)
+                for i in range(totalRun, endPosition):
+                    if updateSendsIterable is False:
+                        updateFunction(i, iterLength, _r[i - totalRun])
+                    else:
+                        updateFunction(i, iterLength, iterable[i])
 
+            totalRun = endPosition
+            resultsList.extend(_r)
 
     return resultsList
 
 
-def runNonParallel(iterable, parallelFunction, 
+def runNonParallel(iterable, parallelFunction,
                 updateFunction=None, updateMultiply=3,
-                unpackIterable=False):
+                unpackIterable=False, updateSendsIterable=False):
     '''
     This is intended to be a perfect drop in replacement for runParallel, except that
     it runs on one core only, and not in parallel.
-    
+
     Used, for instance, if we're already in a parallel function.
     '''
     iterLength = len(iterable)
@@ -97,16 +104,19 @@ def runNonParallel(iterable, parallelFunction,
             _r = parallelFunction(*iterable[i])
         else:
             _r = parallelFunction(iterable[i])
-        
+
         resultsList.append(_r)
-            
+
         if updateFunction is True and i % updateMultiply == 0:
             print("Done {} tasks of {} not in parallel".format(i, iterLength))
         elif updateFunction is not None and i % updateMultiply == 0:
-            updateFunction(i, iterLength, [_r])
-        
+            if updateSendsIterable is False:
+                updateFunction(i, iterLength, _r)
+            else:
+                updateFunction(i, iterLength, iterable[i])
+
     return resultsList
-    
+
 
 def cpus():
     '''

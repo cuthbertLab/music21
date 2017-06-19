@@ -13,4 +13,4 @@ if __name__ == '__main__':
     x = corpus.parse('bwv66.6')
     h = hp.heap()
     print(h)
-    
+

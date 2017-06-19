@@ -48,9 +48,9 @@ def whitespaceEqual(a, b):
     >>> a = "    hello \nthere "
     >>> b = "hello there"
     >>> c = " bye there "
-    >>> common.whitespaceEqual(a,b)
+    >>> common.whitespaceEqual(a, b)
     True
-    >>> common.whitespaceEqual(a,c)
+    >>> common.whitespaceEqual(a, c)
     False
     '''
     a = WHITESPACE.sub('', a)
@@ -69,12 +69,12 @@ def toUnicode(usrStr):
     'test'
     >>> common.toUnicode(u'test')
     'test'
-    
+
     Note: this method is NOT USED and could disappear
     without notice.
-    
+
     # TODO: Remove
-    
+
     :rtype: str
     '''
     if six.PY3:
@@ -88,7 +88,7 @@ def toUnicode(usrStr):
     else:
         try:
             # pylint: disable=undefined-variable
-            usrStr = unicode(usrStr, 'utf-8') # @UndefinedVariable  
+            usrStr = unicode(usrStr, 'utf-8') # @UndefinedVariable
         # some documentation may already be in unicode; if so, a TypeException will be raised
         except TypeError: #TypeError: decoding Unicode is not supported
             pass
@@ -97,7 +97,7 @@ def toUnicode(usrStr):
 
 def getNumFromStr(usrStr, numbers='0123456789'):
     '''
-    Given a string, extract any numbers. 
+    Given a string, extract any numbers.
     Return two strings, the numbers (as strings) and the remaining characters.
 
     >>> common.getNumFromStr('23a')
@@ -106,7 +106,7 @@ def getNumFromStr(usrStr, numbers='0123456789'):
     ('23954', 'asdfwer')
     >>> common.getNumFromStr('')
     ('', '')
-    
+
     :rtype: tuple(str)
     '''
     found = []
@@ -126,12 +126,12 @@ def getNumFromStr(usrStr, numbers='0123456789'):
 def hyphenToCamelCase(usrStr, replacement='-'):
     '''
     given a hyphen-connected-string, change it to
-    a camelCaseConnectedString.  
+    a camelCaseConnectedString.
 
     The replacement can be specified to be something besides a hyphen.
 
-    This code is from: 
-    
+    This code is from:
+
     http://stackoverflow.com/questions/4303492/
     how-can-i-simplify-this-conversion-from-underscore-to-camelcase-in-python
 
@@ -146,17 +146,17 @@ def hyphenToCamelCase(usrStr, replacement='-'):
     (?<!\A) # not at the start of the string
     ''' + replacement + r'''
     (?=[a-zA-Z]) # followed by a letter
-    ''', re.X)
-    
+    ''', re.X) # @UndefinedVariable
+
     tokens = PATTERN.split(usrStr)
     response = tokens.pop(0).lower()
     for remain in tokens:
         response += remain.capitalize()
     return response
-    
+
 def camelCaseToHyphen(usrStr, replacement='-'):
     '''
-    Given a camel-cased string, or a mixture of numbers and characters, 
+    Given a camel-cased string, or a mixture of numbers and characters,
     create a space separated string.
 
     The replacement can be specified to be something besides a hyphen, but only
@@ -169,13 +169,13 @@ def camelCaseToHyphen(usrStr, replacement='-'):
     'movement-name'
 
     First letter can be uppercase as well:
-    
+
     >>> common.camelCaseToHyphen('MovementName')
     'movement-name'
 
     >>> common.camelCaseToHyphen('movementNameName')
     'movement-name-name'
-    
+
     >>> common.camelCaseToHyphen('fileName', replacement='_')
     'file_name'
 
@@ -184,7 +184,7 @@ def camelCaseToHyphen(usrStr, replacement='-'):
     >>> common.camelCaseToHyphen('fileName', replacement='NotFound')
     Traceback (most recent call last):
     ValueError: Replacement must be a single character.
-    
+
     >>> common.camelCaseToHyphen('fileName', replacement='A')
     Traceback (most recent call last):
     ValueError: Replacement cannot be an uppercase character.
@@ -198,7 +198,7 @@ def camelCaseToHyphen(usrStr, replacement='-'):
 
 def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
     '''
-    Given a camel-cased string, or a mixture of numbers and characters, 
+    Given a camel-cased string, or a mixture of numbers and characters,
     create a space separated string.
 
     If replaceUnderscore is True (default) then underscores also become spaces (but without the _)
@@ -216,9 +216,9 @@ def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
     'opus 23402 no 219235'
     >>> common.spaceCamelCase('opus23402no219235').title()
     'Opus 23402 No 219235'
-    
+
     There is a small list called fixMeList that can fix mistakes.
-    
+
     >>> common.spaceCamelCase('PMFC22')
     'PMFC 22'
 
@@ -232,10 +232,10 @@ def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
     numbers = '0123456789.'
     firstNum = False
     firstChar = False
-    isNumber = False  
+    isNumber = False
     lastIsNum = False
     post = []
-    
+
     # do not split these...
     if fixMeList is None:
         fixupList = ('PMFC',)
@@ -259,7 +259,7 @@ def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
         else:
             firstChar = False
 
-        if len(post) > 0:
+        if post:
             if char.isupper() or firstNum or firstChar:
                 post.append(' ')
             post.append(char)
@@ -274,7 +274,7 @@ def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
     for fixMe in fixupList:
         fixMeSpaced = ' '.join(fixMe)
         postStr = postStr.replace(fixMeSpaced, fixMe)
-    
+
     if replaceUnderscore:
         postStr = postStr.replace('_', ' ')
     return postStr
@@ -298,7 +298,7 @@ def getMd5(value=None):
         m.update(value)
     except TypeError: # unicode...
         m.update(value.encode('UTF-8'))
-    
+
     return m.hexdigest()
 
 
@@ -321,7 +321,7 @@ def formatStr(msg, *arguments, **keywords):
     if six.PY3:
         for i in range(len(msg)):
             x = msg[i]
-            if isinstance(x, bytes): 
+            if isinstance(x, bytes):
                 msg[i] = x.decode('utf-8')
             if not isinstance(x, str):
                 try:
@@ -344,12 +344,12 @@ def stripAccents(inputString):
     removes accents from unicode strings.
 
     >>> s = u'trés vite'
-    
+
     >>> u'é' in s
     True
-    
+
     This works on Python2, but the doctest does not.
-    
+
     >>> if ext.six.PY3:
     ...     common.stripAccents(s)
     ... else: 'tres vite'
@@ -416,7 +416,7 @@ def removePunctuation(s):
         out = s.translate(string.maketrans("", ""), string.punctuation) # @UndefinedVariable
         if wasUnicode:
             out = unicode(out, encoding='utf-8') # @UndefinedVariable
-    
+
     else:
         maketrans = str.maketrans("", "", string.punctuation)
         out = s.translate(maketrans)

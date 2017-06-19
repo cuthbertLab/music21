@@ -91,8 +91,9 @@ def music21ModWSGIZipFileApplication(environ, start_response):
     
     resultStr = outputBuffer.getvalue()
 
-    response_headers = [('Content-type', 'application/zip'),  ('Content-disposition','attachment; filename='+outputFileName),
-            ('Content-Length', str(len(resultStr)))]
+    response_headers = [('Content-type', 'application/zip'),  
+                        ('Content-disposition', 'attachment; filename=' + outputFileName),
+                        ('Content-Length', str(len(resultStr)))]
 
     start_response(status, response_headers)
 
@@ -104,7 +105,8 @@ application = music21ModWSGIZipFileApplication
 def performFunction(sc, command):
     '''
     Function that determines what command to perform on the score and returns the resulting score.
-    Currently is a lookup table based on the URL, but will be improved and incorporated into webapps/__init__.py
+    Currently is a lookup table based on the URL, 
+    but will be improved and incorporated into webapps/__init__.py
     as it changes to allow for more standard music21 functions 
     '''
     commandParts = command.split("/")

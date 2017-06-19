@@ -9,7 +9,6 @@
 #-------------------------------------------------------------------------------
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
-
 import unittest
 
 
@@ -20,9 +19,9 @@ pitches01a = """<?xml version="1.0" encoding="UTF-8"?>
   <movement-title>Pitches and accidentals</movement-title>
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">All pitches from G to c'''' in 
-          ascending steps; First without accidentals, then with a sharp and then 
-          with a flat accidental. Double alterations and cautionary accidentals 
+      <miscellaneous-field name="description">All pitches from G to c'''' in
+          ascending steps; First without accidentals, then with a sharp and then
+          with a flat accidental. Double alterations and cautionary accidentals
           are tested at the end.</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -1201,7 +1200,7 @@ directions31a = """<?xml version="1.0" encoding="UTF-8"?>
   <movement-title>MusicXML directions (attached to staff)</movement-title>
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">All &lt;direction&gt; elements 
+      <miscellaneous-field name="description">All &lt;direction&gt; elements
           defined in MusicXML. The lyrics for each note describes the direction
           element assigned to that note.</miscellaneous-field>
     </miscellaneous>
@@ -1215,8 +1214,8 @@ directions31a = """<?xml version="1.0" encoding="UTF-8"?>
   <part id="P1">
     <!-- Direction type can contain the following child types:
          rehearsal+ | segno+ | words+ |
-         coda+ | wedge | dynamics+ | dashes | bracket | pedal | 
-         metronome | octave-shift | harp-pedals | damp | 
+         coda+ | wedge | dynamics+ | dashes | bracket | pedal |
+         metronome | octave-shift | harp-pedals | damp |
          damp-all | eyeglasses | scordatura | image |
          accordion-registration | other-direction -->
     <!-- Rehearsal marks -->
@@ -1338,7 +1337,7 @@ directions31a = """<?xml version="1.0" encoding="UTF-8"?>
     </measure>
     <!-- Dynamics: p | pp | ppp | pppp | ppppp | pppppp |
         f | ff | fff | ffff | fffff | ffffff | mp | mf | sf |
-        sfp | sfpp | fp | rf | rfz | sfz | sffz | fz | 
+        sfp | sfpp | fp | rf | rfz | sfz | sffz | fz |
         other-dynamics -->
     <measure number="3">
       <direction>
@@ -1996,8 +1995,8 @@ lyricsMelisma61d = """<?xml version="1.0" encoding="UTF-8"?>
 <score-partwise>
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">How to treat lyrics and slurred 
-          notes. Normally, a slurred group of notes is assigned only one lyrics 
+      <miscellaneous-field name="description">How to treat lyrics and slurred
+          notes. Normally, a slurred group of notes is assigned only one lyrics
           syllable.</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -2173,8 +2172,8 @@ notations32a = """<?xml version="1.0" encoding="UTF-8"?>
   <movement-title>MusicXML notations (attached to note)</movement-title>
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">All &lt;notation&gt; elements 
-          defined in MusicXML. The lyrics show the notation assigned to each 
+      <miscellaneous-field name="description">All &lt;notation&gt; elements
+          defined in MusicXML. The lyrics show the notation assigned to each
           note.</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -2337,7 +2336,7 @@ notations32a = """<?xml version="1.0" encoding="UTF-8"?>
       </barline>
     </measure>
 
-    <!-- Articulations: 
+    <!-- Articulations:
             accent | strong-accent | staccato | tenuto |
             detached-legato | staccatissimo | spiccato |
             scoop | plop | doit | falloff | breath-mark |
@@ -2542,11 +2541,11 @@ notations32a = """<?xml version="1.0" encoding="UTF-8"?>
 
     <!-- Ornaments:
          trill-mark | turn | delayed-turn | inverted-turn |
-         shake | wavy-line | mordent | inverted-mordent | 
-         schleifer | tremolo | other-ornament), 
-         accidental-mark 
-         
-         Test cases for various tremolo options are in a separate 
+         shake | wavy-line | mordent | inverted-mordent |
+         schleifer | tremolo | other-ornament),
+         accidental-mark
+
+         Test cases for various tremolo options are in a separate
          unit test file
          -->
     <measure number="7">
@@ -3303,7 +3302,7 @@ notations32a = """<?xml version="1.0" encoding="UTF-8"?>
         <bar-style>light-light</bar-style>
       </barline>
     </measure>
-    
+
     <!-- Dynamics, attached to notes by putting them inside <notations> tags -->
     <measure number="22">
       <note>
@@ -3355,7 +3354,7 @@ notations32a = """<?xml version="1.0" encoding="UTF-8"?>
         <lyric number="1"><text>Oth.dyn.</text></lyric>
       </note>
     </measure>
-    
+
     <!-- General tests: multiple notations, directions, etc. -->
     <measure number="23">
       <note>
@@ -3413,8 +3412,8 @@ restsDurations02a = """<?xml version="1.0" encoding="UTF-8"?>
   <movement-title>Rest unit test</movement-title>
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">All different rest lengths: A 
-          two-bar multi-measure rest, a whole rest, a half, etc. until a 
+      <miscellaneous-field name="description">All different rest lengths: A
+          two-bar multi-measure rest, a whole rest, a half, etc. until a
           128th-rest; Then the same with dotted durations.</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -3595,8 +3594,8 @@ rhythmDurations03a = """<?xml version="1.0" encoding="UTF-8"?>
 <score-partwise>
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">All note durations, from long, 
-          brevis, whole until 128th; First with their plain values, then dotted 
+      <miscellaneous-field name="description">All note durations, from long,
+          brevis, whole until 128th; First with their plain values, then dotted
           and finally doubly-dotted.</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -3983,12 +3982,12 @@ rhythmDurations03a = """<?xml version="1.0" encoding="UTF-8"?>
 chordsThreeNotesDuration21c = """<?xml version="1.0"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 0.6 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
-	<identification> 
+	<identification>
 		<miscellaneous>
-			<miscellaneous-field name="description">Some three-note 
+			<miscellaneous-field name="description">Some three-note
                             chords, with various durations.</miscellaneous-field>
 		</miscellaneous>
-	</identification> 
+	</identification>
 	<part-list>
 		<score-part id="P0">
 			<part-name>MusicXML Part</part-name>
@@ -5160,7 +5159,7 @@ timeSignatures11c = """<?xml version="1.0" encoding="UTF-8"?>
 <score-partwise version="1.1">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Compound time signatures with 
+      <miscellaneous-field name="description">Compound time signatures with
           same denominator: (3+2)/8 and (5+3+1)/4.</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -5300,7 +5299,7 @@ timeSignatures11d = """<?xml version="1.0" encoding="UTF-8"?>
 <score-partwise version="1.1">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Compound time signatures with 
+      <miscellaneous-field name="description">Compound time signatures with
           separate fractions displayed: 3/8+2/8+3/4 and 5/2+1/8.</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -5462,11 +5461,11 @@ clefs12a = """<?xml version="1.0" encoding="UTF-8"?>
 <score-partwise>
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Various clefs: G, C, F, percussion, 
-          TAB and none; some are also possible with octavation and  on other 
-          staff lines than their default (e.g. soprano/alto/tenor/bariton C 
-          clefs); Each measure shows a different clef (measure 17 has the "none" 
-          clef), only measure 18 has the same treble clef as measure 
+      <miscellaneous-field name="description">Various clefs: G, C, F, percussion,
+          TAB and none; some are also possible with octavation and  on other
+          staff lines than their default (e.g. soprano/alto/tenor/bariton C
+          clefs); Each measure shows a different clef (measure 17 has the "none"
+          clef), only measure 18 has the same treble clef as measure
           1.</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -6093,9 +6092,9 @@ tuplets23a = """<?xml version="1.0" encoding="UTF-8"?>
 <score-partwise>
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Some tuplets (3:2, 3:2, 3:2, 4:2, 
-          4:1, 7:3, 6:2) with the default tuplet bracket displaying the number 
-          of actual notes played. The second tuplet does not have a number 
+      <miscellaneous-field name="description">Some tuplets (3:2, 3:2, 3:2, 4:2,
+          4:1, 7:3, 6:2) with the default tuplet bracket displaying the number
+          of actual notes played. The second tuplet does not have a number
           attribute set.</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -7600,7 +7599,7 @@ tupletsNested23d = """<?xml version="1.0" encoding="UTF-8"?>
 <score-partwise version="1.1">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Tuplets can be nested. Here 
+      <miscellaneous-field name="description">Tuplets can be nested. Here
           there is a 5:2 tuplet inside a 3:2 tuple (all consisting of written
           eighth notes).</miscellaneous-field>
     </miscellaneous>
@@ -9148,9 +9147,9 @@ barlines46a = """<?xml version="1.0" encoding="UTF-8"?>
 <score-partwise>
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Different types of (non-repeat) 
+      <miscellaneous-field name="description">Different types of (non-repeat)
           barlines: default (no setting), regular, dotted, dashed, heavy,
-          light-light, light-heavy, heavy-light, heavy-heavy, tick, short, 
+          light-light, light-heavy, heavy-light, heavy-heavy, tick, short,
           none.</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -10751,7 +10750,7 @@ simpleRepeat45a = """<?xml version="1.0" encoding="UTF-8"?>
 <score-partwise>
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">A simple, repeated measure 
+      <miscellaneous-field name="description">A simple, repeated measure
           (repeated 5 times)</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -10811,10 +10810,10 @@ spannersSlurs33c = """<?xml version="1.0" encoding="UTF-8"?>
 <score-partwise version="1.1">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">A note can be the end of one 
-          slur and the start of a new slur. Also, in MusicXML, nested slurs 
+      <miscellaneous-field name="description">A note can be the end of one
+          slur and the start of a new slur. Also, in MusicXML, nested slurs
           are possible like in the second measure where one slur goes over all
-          four notes, and another slur goes from the second to the third 
+          four notes, and another slur goes from the second to the third
           note.</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -14731,8 +14730,8 @@ staffGroupsNested41d = """<?xml version="1.0" encoding="UTF-8"?>
 <score-partwise>
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Two properly nested part groups: 
-          One group  (with a square bracket) goes from staff 2 to 4) and another 
+      <miscellaneous-field name="description">Two properly nested part groups:
+          One group  (with a square bracket) goes from staff 2 to 4) and another
           group (with a curly bracket) goes from staff 3 to 4.</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -15033,8 +15032,8 @@ transposingInstruments72a = """<?xml version="1.0" encoding="UTF-8"?>
 <score-partwise version="1.1">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Transposing instruments: Trumpet 
-          in Bb, Horn in Eb, Piano; All of them show the C major scale (the 
+      <miscellaneous-field name="description">Transposing instruments: Trumpet
+          in Bb, Horn in Eb, Piano; All of them show the C major scale (the
           trumpet with 2 sharp, the horn with 3 sharp).</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -17827,19 +17826,19 @@ tremoloTest = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 ALL = [
        articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a, # 0
        restsDurations02a, rhythmDurations03a, chordsThreeNotesDuration21c, # 5
-       beams01, timeSignatures11c, timeSignatures11d, clefs12a, beams02, # 8  
-       tuplets23a, tuplets23b, tupletsNested23d, keySignatures13a, #13
+       beams01, timeSignatures11c, timeSignatures11d, clefs12a, beams02, # 8
+       tuplets23a, tuplets23b, tupletsNested23d, keySignatures13a, # 13
        barlines46a, simpleRepeat45a, repeatMultipleTimes45c, # 17
        spannersSlurs33c, metronomeMarks31c,  # 20
-       multipleAttributesPerMeasures, systemLayoutTwoPart, multiMeasureTies, #22
-       chordIndependentTies, textExpressions, repeatExpressionsA, repeatExpressionsB, # 25 
+       multipleAttributesPerMeasures, systemLayoutTwoPart, multiMeasureTies, # 22
+       chordIndependentTies, textExpressions, repeatExpressionsA, repeatExpressionsB, # 25
        repeatBracketsA, # 29
-       voiceDouble, pianoStaff43a, spanners33a, staffGroupsNested41d, #30
-       graceNotes24a, transposingInstruments72a, transposing01,  #34
-       mixedVoices1a, mixedVoices1b, mixedVoices2, #37
-       colors01, triplets01, textBoxes01, otaveShifts33d, #40
-       unicodeStrNoNonAscii, unicodeStrWithNonAscii, #44
-       tremoloTest #46
+       voiceDouble, pianoStaff43a, spanners33a, staffGroupsNested41d, # 30
+       graceNotes24a, transposingInstruments72a, transposing01,  # 34
+       mixedVoices1a, mixedVoices1b, mixedVoices2, # 37
+       colors01, triplets01, textBoxes01, otaveShifts33d, # 40
+       unicodeStrNoNonAscii, unicodeStrWithNonAscii, # 44
+       tremoloTest # 46
 ]
 
 
@@ -17893,7 +17892,7 @@ class Test(unittest.TestCase):
         xml = musicxml.m21ToXml.GeneralObjectExporter().parse(orig_stream)
         self.assertEqual(xml.count(b'<clef>'), 2) # clefs got out
         self.assertEqual(xml.count(b'<measure'), 1) # in one measure
-        
+
         new_stream = converter.parse(xml)
         new_clefs = new_stream.flat.getElementsByClass('Clef')
 
@@ -17910,7 +17909,7 @@ class Test(unittest.TestCase):
         orig_stream.append(stream.Part())
         orig_stream.append(stream.Part())
         orig_stream.append(meter.TimeSignature("3/4"))
-        
+
         for item in [clef.TrebleClef(), note.Note("C4"), clef.BassClef(),
             note.Note("C4"), note.Note("C4")]:
             orig_stream[0].append(item)

@@ -10,8 +10,9 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
-_all_ = ['lilypondTestSuite', 'm21ToXml', 'xmlObjects', 'xmlToM21']
+_all_ = ['archiveTools', 'lilypondTestSuite', 'm21ToXml', 'xmlObjects', 'xmlToM21']
 
+from music21.musicxml import archiveTools
 from music21.musicxml import lilypondTestSuite
 from music21.musicxml import m21ToXml
 from music21.musicxml import xmlObjects

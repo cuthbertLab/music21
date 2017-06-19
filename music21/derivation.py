@@ -42,15 +42,15 @@ class Derivation(SlottedObjectMixin):
     '''
     A Derivation object keeps track of which Streams (or perhaps other Music21Objects)
     a Stream has come from and how.
-    
+
     Derivation is automatically updated by many methods:
-    
+
     >>> import copy
     >>> sOrig = stream.Stream(id='orig')
     >>> sNew = copy.deepcopy(sOrig)
     >>> sNew.id = 'copy'
     >>> sNew.derivation
-    <Derivation of <music21.stream.Stream copy> 
+    <Derivation of <music21.stream.Stream copy>
         from <music21.stream.Stream orig> via "__deepcopy__">
 
     >>> sNew.derivation.client
@@ -61,7 +61,7 @@ class Derivation(SlottedObjectMixin):
     <music21.stream.Stream orig>
     >>> sNew.derivation.method
     '__deepcopy__'
-    
+
 
     >>> s1 = stream.Stream()
     >>> s1.id = "DerivedStream"
@@ -69,11 +69,11 @@ class Derivation(SlottedObjectMixin):
 
     >>> s2 = stream.Stream()
     >>> s2.id = "OriginalStream"
-        
+
     >>> d1.method = 'manual'
     >>> d1.origin = s2
     >>> d1
-    <Derivation of <music21.stream.Stream DerivedStream> from 
+    <Derivation of <music21.stream.Stream DerivedStream> from
         <music21.stream.Stream OriginalStream> via "manual">
     >>> d1.origin is s2
     True
@@ -89,14 +89,14 @@ class Derivation(SlottedObjectMixin):
     >>> d1.method = 'measure'
     >>> d1.method
     'measure'
-        
+
     Deleting the origin stream does not change the Derivation, since origin is held by strong ref:
-    
+
     >>> import gc  # Garbage collection...
     >>> del(s2)
     >>> unused = gc.collect()  # ensure Garbage collection is run
     >>> d1
-    <Derivation of <music21.stream.Stream DerivedStream> 
+    <Derivation of <music21.stream.Stream DerivedStream>
         from <music21.stream.Stream OriginalStream> via "measure">
 
     But deleting the client stream changes the Derivation, since client is held by weak ref,
@@ -190,7 +190,7 @@ class Derivation(SlottedObjectMixin):
     def chain(self):
         '''
         Iterator/Generator
-        
+
         Returns Streams that this Derivation's client Stream was derived
         from. This provides a way to obtain all Streams that the client passed
         through, such as those created by
@@ -209,7 +209,7 @@ class Derivation(SlottedObjectMixin):
         ...     print(y)
         <music21.stream.Stream s2>
         <music21.stream.Stream s1>
-        
+
         >>> list(s3.derivation.chain()) == [s2, s1]
         True
         '''
@@ -240,7 +240,7 @@ class Derivation(SlottedObjectMixin):
         >>> s.append(note.Note())
         >>> sNotes = s.notes.stream()
         >>> sNotes.derivation
-        <Derivation of <music21.stream.Stream lonelyStream> 
+        <Derivation of <music21.stream.Stream lonelyStream>
             from <music21.stream.Stream lonelyStream> via "notes">
 
         >>> derived = sNotes.derivation
@@ -252,7 +252,7 @@ class Derivation(SlottedObjectMixin):
         'blah'
 
         >>> derived is sNotes.derivation
-        True        
+        True
         >>> sNotes.derivation.method
         'blah'
         '''
@@ -293,7 +293,7 @@ class Derivation(SlottedObjectMixin):
         True
         '''
         derivationChain = list(self.chain())
-        if len(derivationChain):
+        if derivationChain:
             return derivationChain[-1]
         else:
             return None

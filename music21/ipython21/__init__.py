@@ -12,7 +12,7 @@
 iPython extension to music21.  In IPython Notebook call:
 
    %load_ext music21.ipython21
-   
+
 and show will take place inside the browser
 '''
 __all__ = ['ipExtension', 'objects']
@@ -29,10 +29,10 @@ def loadNoMagic():
     '''
     if common.runningUnderIPython():
         from IPython.core.interactiveshell import InteractiveShell
-        if InteractiveShell.initialized():        
-            localIP = InteractiveShell.instance()    
+        if InteractiveShell.initialized():
+            localIP = InteractiveShell.instance()
             load_ipython_extension(localIP)
-            
+
 # if we are imported in an IPython environment, then load magic after half a second
 if common.runningUnderIPython(): # @UndefinedVariable
     from threading import Timer

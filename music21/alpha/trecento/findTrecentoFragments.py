@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 '''
-Runs a series of tests against the database to see if any of the 
+Runs a series of tests against the database to see if any of the
 following unidentified fragments are in there...'''
 
 
@@ -22,18 +22,18 @@ class IntervalSearcher(object):
 
     def compareToStream(self, cmpStream):
         streamLength = len(cmpStream.flat.notesAndRests)
-        if self.intervalLength > streamLength: 
+        if self.intervalLength > streamLength:
             return False
-        stIntervalList = cmpStream.melodicIntervals(skipRests = True)
+        stIntervalList = cmpStream.melodicIntervals(skipRests=True)
         if stIntervalList is None:
             return False
         stIntervalListLength = len(stIntervalList)
-        if self.intervalLength > stIntervalListLength: 
+        if self.intervalLength > stIntervalListLength:
             return False
         #print "Length of Stream: " + str(streamLength)
-        for i in range(0, stIntervalListLength+1 - self.intervalLength):
-            for j in range(0, self.intervalLength):
-                streamInterval = stIntervalList[i+j]
+        for i in range(stIntervalListLength + 1 - self.intervalLength):
+            for j in range(self.intervalLength):
+                streamInterval = stIntervalList[i + j]
                 genI1 = self.intervalList[j].diatonic.generic.simpleDirected
                 genI2 = streamInterval.diatonic.generic.simpleDirected
                 if genI1 != genI2:
@@ -56,11 +56,11 @@ class NoteSearcher(object):
     def compareToStream(self, cmpStream):
         sN = cmpStream.notesAndRests
         streamLength = len(sN)
-        if streamLength < self.noteLength: 
+        if streamLength < self.noteLength:
             return False
         for i in range(streamLength + 1 - self.noteLength):
             for j in range(self.noteLength):
-                streamNote = sN[i+j]
+                streamNote = sN[i + j]
                 if self.noteList[j].isRest != streamNote.isRest:
                     break
                 if streamNote.isNote and (self.noteList[j].step != streamNote.step):
@@ -76,7 +76,7 @@ def searchForNotes(notesStr):
     "C4 D4 E4 B3 C4"
     that's it: name, octave. With no accidentals.  If octave is 0 then
     it means do not bother checking for octaves.
-    
+
     Currently octave is ignored anyhow.
     '''
     notesArr = notesStr.split()
@@ -91,7 +91,7 @@ def searchForNotes(notesStr):
             tNObj = note.Rest()
         noteObjArr.append(tNObj)
     ballataObj  = cadencebook.BallataSheet()
-    searcher1 = NoteSearcher(noteObjArr) 
+    searcher1 = NoteSearcher(noteObjArr)
     streamOpus = stream.Opus()
 
     for thisWork in ballataObj:
@@ -132,14 +132,14 @@ def searchForIntervals(notesStr):
         tNObj.name = tN[0]
         tNObj.octave = int(tN[1])
         noteObjArr.append(tNObj)
-    
+
     interObjArr = []
     for i in range(len(noteObjArr) - 1):
-        int1 = interval.notesToInterval(noteObjArr[i], noteObjArr[i+1])
+        int1 = interval.notesToInterval(noteObjArr[i], noteObjArr[i + 1])
         interObjArr.append(int1)
     #print interObjArr
 
-    searcher1 = IntervalSearcher(interObjArr) 
+    searcher1 = IntervalSearcher(interObjArr)
     ballataObj  = cadencebook.BallataSheet()
 
     streamOpus = stream.Opus()
@@ -167,45 +167,45 @@ def findRavi3ORegina():
 
 
 def searchForVat1969():
-    '''There is a particular piece in Vatican MS 1969 that I have been 
+    '''There is a particular piece in Vatican MS 1969 that I have been
     searching for forever, its first
-    ending concludes DED and second ending CDC, OR SOME TRANSPOSITION of 
+    ending concludes DED and second ending CDC, OR SOME TRANSPOSITION of
     these notes.  Find it!'''
-    
+
     ballataObj = cadencebook.BallataSheet()
     thisWork = None
     for thisWork in ballataObj:
         cadB1 = thisWork.cadenceB1Class()
         cadB2 = thisWork.cadenceB2Class()
-        if (cadB2 is None or len(cadB2.parts) == 0): 
+        if (cadB2 is None or not cadB2.parts):
             continue
-        if (cadB1 is None or len(cadB1.parts) == 0): 
+        if (cadB1 is None or not cadB1.parts):
             continue
-        
-    for i in range(0, len(cadB2.parts)): 
+
+    for i in range(len(cadB2.parts)):
         strB1 = cadB1.parts[i].flat
         strB2 = cadB2.parts[i].flat
         if len(strB1.notesAndRests) < 3 or len(strB2.notesAndRests) < 3:
             break
-#             if findUpDown(strB1.notesAndRests[-3], 
-#                           strB1.notesAndRests[-2], 
+#             if findUpDown(strB1.notesAndRests[-3],
+#                           strB1.notesAndRests[-2],
 #                           strB1.notesAndRests[-1]):
-#                 if findUpDown(strB2.notesAndRests[-3], 
-#                               strB2.notesAndRests[-2], 
+#                 if findUpDown(strB2.notesAndRests[-3],
+#                               strB2.notesAndRests[-2],
 #                               strB2.notesAndRests[-1]):
 #                     print(thisWork.title.encode('utf-8') + "   ",)
-#                     b1b2int = interval.Interval(note1=strB1.notesAndRests[-1], 
+#                     b1b2int = interval.Interval(note1=strB1.notesAndRests[-1],
 #                                                 note2=strB2.notesAndRests[-1])
 #                     print(b1b2int.diatonic.generic.niceName)
-                  
+
 def findUpDown(n1, n2, n3):
-    if n1.isRest or n2.isRest or n3.isRest: 
+    if n1.isRest or n2.isRest or n3.isRest:
         return False
-    i1 = interval.Interval(note1 = n1, note2 = n2)
-    if i1.diatonic.generic.simpleDirected != 2: 
+    i1 = interval.Interval(note1=n1, note2=n2)
+    if i1.diatonic.generic.simpleDirected != 2:
         return False
-    i2 = interval.Interval(note1 = n2, note2 = n3)
-    if i2.diatonic.generic.simpleDirected != -2: 
+    i2 = interval.Interval(note1=n2, note2=n3)
+    if i2.diatonic.generic.simpleDirected != -2:
         return False
     return True
 
@@ -213,15 +213,15 @@ def audioVirelaiSearch():
     #from music21 import audioSearch
     from music21.audioSearch import transcriber
     from music21 import search
-    virelaisSheet = cadencebook.TrecentoSheet(sheetname = 'virelais')
-    
+    virelaisSheet = cadencebook.TrecentoSheet(sheetname='virelais')
+
     virelaiCantuses = []
     for i in range(2, 54):
         thisVirelai = virelaisSheet.makeWork(i)
         if thisVirelai.title != "":
             try:
                 vc = thisVirelai.incipit.getElementsByClass('Part')[0]
-                vc.insert(0, metadata.Metadata(title = thisVirelai.title))
+                vc.insert(0, metadata.Metadata(title=thisVirelai.title))
                 virelaiCantuses.append(vc)
             except IndexError:
                 pass
@@ -236,7 +236,7 @@ def audioVirelaiSearch():
 
 def findSimilarGloriaParts():
     '''
-    Looks in the list of Gloria incipits, cadences, etc. and tries to 
+    Looks in the list of Gloria incipits, cadences, etc. and tries to
     find ones which are very similar
     to each other.
     '''
@@ -250,29 +250,29 @@ def savedSearches():
 #    searchForNotes("G3 D3 R D3 D3 E3 F3") # Donna si to fallito TEST - last note = F#
 #    searchForIntervals("F3 C3 C3 F3 G3") # Bologna Archivio: Per seguirla TEST
 #    searchForNotes("F3 E3 F3 G3 F3 E3")  # Mons archive fragment -- see FB Aetas Aurea post
-    searchForNotes("F4 G4 F4 B4 G4 A4 G4 F4 E4") # or B-4.  Paris 25406 -- 
-    #   Dominique Gatte pen tests  
+    searchForNotes("F4 G4 F4 B4 G4 A4 G4 F4 E4") # or B-4.  Paris 25406 --
+    #   Dominique Gatte pen tests
 
-#    searchForNotes("D4 D4 C4 D4") # Fortuna Rira Seville 25 TEST! CANNOT FIND    
+#    searchForNotes("D4 D4 C4 D4") # Fortuna Rira Seville 25 TEST! CANNOT FIND
 #    searchForNotes("D4 C4 B3 A3 G3") # Tenor de monaco so tucto Seville 25
 #    searchForNotes("E4 D4 C4 B3 A3 B3 C4") # Benedicamus Domino Seville 25
 #    searchForNotes("D4 E4 C4 D4 E4 D4 C4") # Benedicamus Domino Seville 25
 ######    searchForIntervals("A4 A4 G4 A4 G4 A4") # Reina f. 18r top. = QUAL NOVITA
 #    searchForIntervals("G4 F4 F4 E4 E4 D4 D4 C4") # london 29987 88v C
 #    searchForIntervals("C4 B3 A3 A3 G3 G3 A3") # London 29987 88v T
-    #searchForNotes("G3 E3 F3 G3 F3 E3 D3 C3")  # probable French piece, 
-    #   Nuremberg 9, but worth a check    
+    #searchForNotes("G3 E3 F3 G3 F3 E3 D3 C3")  # probable French piece,
+    #   Nuremberg 9, but worth a check
 #    searchForIntervals("A4 A4 G4 G4 F4 E4") # Nuremberg 9a, staff 6 probable French Piece
 #    findCasanatense522()
 #    findRandomVerona()
 #    findRavi3ORegina()
-    #searchForIntervals("D4 B4 D4 C4 D4") # cadence formula from 15th c. that 
+    #searchForIntervals("D4 B4 D4 C4 D4") # cadence formula from 15th c. that
     # Lisa Colton was searching for in earlier sources -- none found
-    #searchForIntervals("G4 A4 G4 F4 E4 F4 G4 E4") # Prague XVII.J.17-14_1r piece 1 
+    #searchForIntervals("G4 A4 G4 F4 E4 F4 G4 E4") # Prague XVII.J.17-14_1r piece 1
     # -- possible contrafact -- no correct matches
-    #searchForIntervals("G4 A4 B4 G4 F4 G4 F4 E4") # Prague XVII.J.17-14_1r piece 2 
+    #searchForIntervals("G4 A4 B4 G4 F4 G4 F4 E4") # Prague XVII.J.17-14_1r piece 2
     # -- possible contrafact -- no matches
-    #searchForIntervals("F4 A4 F4 G4 F4 G4 A4") # Duke white notation manuscript 
+    #searchForIntervals("F4 A4 F4 G4 F4 G4 A4") # Duke white notation manuscript
 
 if __name__ == "__main__":
     savedSearches()

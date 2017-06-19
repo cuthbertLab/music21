@@ -3,7 +3,7 @@
 # Name:         corpus/testCorpus.py
 # Purpose:      testing for the corpus
 #
-# Authors:      Chris Ariza 
+# Authors:      Chris Ariza
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
@@ -152,7 +152,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(searchResults) > 0, True)
         # returns items in pairs: url and work number
         self.assertEqual(searchResults[0].sourcePath,
-            'http://impromastering.com/uploads/transcription_file/' + 
+            'http://impromastering.com/uploads/transcription_file/' +
             'file/196/Giant_Steps__John_Coltrane_C.xml')
 
 #     def testGetWorkList(self):
@@ -167,10 +167,10 @@ class Test(unittest.TestCase):
 #                corpus.corpora.CoreCorpus().getWorkList('bach/artOfFugue_bwv1080')), 21)
 #         self.assertEqual(len(
 #                corpus.corpora.CoreCorpus().getWorkList('bach/artOfFugue_bwv1080', 1)), 1)
-# 
+#
 #         # there are two versions of this file
 #         self.assertEqual(len(corpus.getWorkList('beethoven/opus18no1', 1)), 2)
-# 
+#
 #         # if specify movement
 #         for bwv in [
 #             'bwv846', 'bwv847', 'bwv848', 'bwv849', 'bwv850', 'bwv851',

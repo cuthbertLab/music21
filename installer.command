@@ -4,7 +4,7 @@
 
 # change to the current directory
 DIRFILE=$(dirname "$0")
-eval cd $DIRFILE
+eval cd \"$DIRFILE\"
 python installer.py
 
 

@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 
+# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
@@ -108,14 +108,14 @@ class Beam(EqualSlottedObjectMixin):
     >>> b3 = beam.Beam(number=1, type='partial', direction='left')
     >>> b3
     <music21.beam.Beam 1/partial/left>
-    
+
     >>> b4 = beam.Beam('partial', 'left')
     >>> b4.number = 1
     >>> b4
     <music21.beam.Beam 1/partial/left>
 
     All attributes must be the same for equality:
-    
+
     >>> b3 == b4
     True
 
@@ -168,7 +168,7 @@ class Beams(EqualSlottedObjectMixin):
     >>> n.beams.fill(2, 'start')
     >>> len(n.beams)
     2
-    
+
     >>> for thisBeam in n.beams:
     ...     thisBeam.type
     'start'
@@ -187,7 +187,7 @@ class Beams(EqualSlottedObjectMixin):
         )
 
     _DOC_ATTR = {
-        'feathered': 'Boolean determining if this is a feathered beam or not ' + 
+        'feathered': 'Boolean determining if this is a feathered beam or not ' +
             '(does nothing for now).',
         }
 
@@ -222,14 +222,26 @@ class Beams(EqualSlottedObjectMixin):
         >>> beams.append('start')
         >>> beams.beamsList
         [<music21.beam.Beam 1/start>]
-        
+
         >>> beams.append('partial', 'right')
         >>> beams.beamsList
         [<music21.beam.Beam 1/start>, <music21.beam.Beam 2/partial/right>]
 
+
+        A beam object can also be specified:
+        
+        >>> beams = beam.Beams()
+        >>> beam1 = beam.Beam(type='start', number=1)
+        >>> beams.append(beam1)
+        >>> beams.beamsList
+        [<music21.beam.Beam 1/start>]
         '''
-        obj = Beam(type, direction)
-        obj.number = len(self.beamsList) + 1
+        if isinstance(type, str):
+            obj = Beam(type, direction)
+            obj.number = len(self.beamsList) + 1
+        else:
+            obj = type
+        
         self.beamsList.append(obj)
 
     def fill(self, level=None, type=None): # type is okay @ReservedAssignment
@@ -302,8 +314,8 @@ class Beams(EqualSlottedObjectMixin):
             count = 6
         else:
             raise BeamException('cannot fill beams for level %s' % level)
-        for i in range(1, count+1):
-            if i == 0: 
+        for i in range(1, count + 1):
+            if i == 0:
                 raise BeamException('level zero does not exist for this range')
             obj = Beam()
             obj.number = i
@@ -465,4 +477,4 @@ _DOC_ORDER = [Beams, Beam]
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test)
-    
+

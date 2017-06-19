@@ -190,6 +190,8 @@ class ScalaData(object):
     ...                   'scale', 'scala', 'scl', 'tanaka.scl'])
     >>> sf.open(fp)
     >>> sd = sf.read()
+    >>> sf.close()
+    
     >>> print(sd.description) # converted to unicode...
     26-note choice system of Shohé Tanaka, Studien i.G.d. reinen Stimmung (1890)
     >>> sd.pitchCount
@@ -392,6 +394,7 @@ class ScalaFile(object):
     True
     >>> sd.pitchCount
     26
+    >>> sf.close()
     '''
     
     def __init__(self, data=None): 

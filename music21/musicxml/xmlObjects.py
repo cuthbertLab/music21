@@ -11,7 +11,7 @@
 #-------------------------------------------------------------------------------
 
 from collections import OrderedDict
-# these single-entity tags are bundled together. 
+# these single-entity tags are bundled together.
 from music21 import articulations
 from music21 import expressions
 
@@ -19,25 +19,26 @@ DYNAMIC_MARKS = ['p', 'pp', 'ppp', 'pppp', 'ppppp', 'pppppp',
         'f', 'ff', 'fff', 'ffff', 'fffff', 'ffffff',
         'mp', 'mf', 'sf', 'sfp', 'sfpp', 'fp', 'rf', 'rfz', 'sfz', 'sffz', 'fz',
         'other-dynamics' # non-empty...
-        ] 
+        ]
 
-ARTICULATION_MARKS = { 'accent'       : articulations.Accent,
-                       'strong-accent'   : articulations.StrongAccent,
-                       'staccato'        : articulations.Staccato,
-                       'staccatissimo'   : articulations.Staccatissimo,
-                       'spiccato'        : articulations.Spiccato,
-                       'tenuto'          : articulations.Tenuto,
-                       'detached-legato' : articulations.DetachedLegato,
-                       'scoop'           : articulations.Scoop,
-                       'plop'            : articulations.Plop,
-                       'doit'            : articulations.Doit,
-                       'falloff'         : articulations.Falloff,
-                       'breath-mark'     : articulations.BreathMark,
-                       'caesura'         : articulations.Caesura,
-                       'stress'          : articulations.Stress,
-                       'unstress'        : articulations.Unstress,
-                       'other-articulation': articulations.Articulation,
-                   }
+ARTICULATION_MARKS = OrderedDict(
+    [('accent',          articulations.Accent),
+     ('strong-accent',   articulations.StrongAccent),
+     ('staccato',        articulations.Staccato),
+     ('staccatissimo',   articulations.Staccatissimo),
+     ('spiccato',        articulations.Spiccato),
+     ('tenuto',          articulations.Tenuto),
+     ('detached-legato', articulations.DetachedLegato),
+     ('scoop',           articulations.Scoop),
+     ('plop',            articulations.Plop),
+     ('doit',            articulations.Doit),
+     ('falloff',         articulations.Falloff),
+     ('breath-mark',     articulations.BreathMark),
+     ('caesura',         articulations.Caesura),
+     ('stress',          articulations.Stress),
+     ('unstress',        articulations.Unstress),
+     ('other-articulation', articulations.Articulation),
+    ])
 
 # A reversed dictionary mapping classes to names, excepting Articulation
 # which does not get mapped, and Staccato which must come after Staccatissimo,
@@ -51,7 +52,7 @@ ARTICULATION_MARKS_REV[articulations.Accent] = 'accent' # py3: move_to_end
 
 TECHNICAL_MARKS = OrderedDict([('up-bow',           articulations.UpBow),
                                ('down-bow',         articulations.DownBow),
-                               ('harmonic',         articulations.Harmonic),
+                               ('harmonic',         articulations.StringHarmonic),
                                ('open-string',      articulations.OpenString),
                                ('thumb-position',   articulations.StringThumbPosition),
                                ('fingering',        articulations.Fingering),
@@ -70,6 +71,9 @@ TECHNICAL_MARKS = OrderedDict([('up-bow',           articulations.UpBow),
                                ('heel',             articulations.OrganHeel),
                                ('toe',              articulations.OrganToe),
                                ('fingernails',      articulations.HarpFingerNails),
+                               # TODO: hole
+                               # TODO: arrow
+                               ('handbell',         articulations.HandbellIndication), 
                                ('other-technical',  articulations.TechnicalIndication),
                                ])
 TECHNICAL_MARKS_REV = OrderedDict([(v, k) for k, v in TECHNICAL_MARKS.items()])
@@ -105,17 +109,17 @@ def yesNoToBoolean(value):
 def booleanToYesNo(value):
     '''
     Convert a True, False bool to 'yes' or 'no'
-    
+
     >>> musicxml.xmlObjects.booleanToYesNo(True)
     'yes'
     >>> musicxml.xmlObjects.booleanToYesNo(False)
     'no'
 
     anything that evaluates to True becomes 'yes'
-    
+
     >>> musicxml.xmlObjects.booleanToYesNo(5)
     'yes'
-    
+
     '''
     if value: # purposely not "is True"
         return 'yes'
@@ -125,12 +129,12 @@ def booleanToYesNo(value):
 def fractionToPercent(value):
     '''
     Turns a fraction into a string percent
-    
+
     >>> musicxml.xmlObjects.fractionToPercent(0.25)
     '25'
 
     Only does whole numbers for now...
-    
+
     >>> musicxml.xmlObjects.fractionToPercent(0.251)
     '25'
 
@@ -141,4 +145,4 @@ def fractionToPercent(value):
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-    
+

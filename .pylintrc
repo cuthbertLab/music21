@@ -55,7 +55,7 @@ confidence=
 # no Warning level messages displayed, use"--disable=all --enable=classes
 # --disable=W"
 
-disable=cyclic-import,locally-disabled,duplicate-code,abstract-class-instantiated,fixme,superfluous-parens,too-many-statements,no-member,too-many-arguments,too-many-public-methods,too-many-branches,too-many-locals,too-many-lines,bad-whitespace,bad-continuation,too-many-return-statements,unpacking-non-sequence,too-many-instance-attributes,invalid-name,no-self-use,too-few-public-methods,trailing-whitespace,missing-docstring,star-args,protected-access,unused-argument,import-self,wrong-import-position
+disable=cyclic-import,locally-disabled,duplicate-code,abstract-class-instantiated,fixme,superfluous-parens,too-many-statements,no-member,too-many-arguments,too-many-public-methods,too-many-branches,too-many-locals,too-many-lines,bad-whitespace,bad-continuation,too-many-return-statements,unpacking-non-sequence,too-many-instance-attributes,invalid-name,no-self-use,too-few-public-methods,trailing-whitespace,missing-docstring,star-args,protected-access,unused-argument,import-self,wrong-import-position,no-else-return
 
 #               'cyclic-import', # we use these inside functions when there's a deep problem.
 #                'unnecessary-pass', # nice, but not really a problem...

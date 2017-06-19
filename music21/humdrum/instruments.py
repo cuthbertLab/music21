@@ -22,7 +22,7 @@ humdrumInstrumentClassToInstrument = {
                                   'klav': 'KeyboardInstrument',
                                   'perc': 'Percussion',
                                   }
-                                  
+
 # The following table identifies five pre-defined instrument groups:
 #
 #    *IGacmp    accompaniment instrument
@@ -30,7 +30,7 @@ humdrumInstrumentClassToInstrument = {
 #    *IGcont    basso-continuo instrument
 #    *IGripn    ripieno instrument
 #    *IGconc    concertino instrument
-                                  
+
 humdrumInstruments = {
 'soprn': 'Soprano',
 'mezzo': 'MezzoSoprano',
@@ -159,7 +159,7 @@ humdrumInstruments = {
 'saxR':     'BaritoneSaxophone', # (in E-flat)
 #*IsaxB    bass saxophone (in B-flat)
 #*IsaxC    contrabass saxophone (in E-flat)
-'shaku':    'Shakuhachi', 
+'shaku':    'Shakuhachi',
 #*Isheng    mouth organ (Chinese)
 #*Isho    mouth organ (Japanese)
 #*IsxhS    soprano saxhorn (in B-flat)
@@ -169,7 +169,7 @@ humdrumInstruments = {
 #*IsxhB    bass saxhorn (in B-flat)
 #*IsxhC    contrabass saxhorn (in E-flat)
 'tromt':    'Trombone', # tenor; trombone (It.); trombone (Fr.); Posaune (Ger.)
-'tromb':    'BassTrombone', 
+'tromb':    'BassTrombone',
 'tromp':    'Trumpet', #; tromba (It.); trompette (Fr.); Trompete (Ger.)
 'tuba':     'Tuba', #
 #*Izurna    zurna
@@ -190,7 +190,7 @@ humdrumInstruments = {
 'piatt':    'Cymbals', #; piatti (It.); cymbales (Fr.); Becken (Ger.); kymbos (Gk.)
 'ridec':    'RideCymbals', # (kit)
 'sdrum':    'SnareDrum', # (kit)
-'spshc':    'SplashCymbals', # (kit) 
+'spshc':    'SplashCymbals', # (kit)
 'steel':    'SteelDrum', #, tinpanny
 #*Itabla    tabla
 'tambn':    'Tambourine', #, timbrel; tamburino (It.); Tamburin (Ger.)
@@ -208,23 +208,23 @@ humdrumInstruments = {
 'clest':    'Celesta', #; céleste (Fr.)
 ## dup *Iforte    fortepiano
 'hammd':    'ElectricOrgan', #Hammond electronic organ
-## dup *Iorgan    pipe organ; orgue (Fr.); Orgel (Ger.); 
+## dup *Iorgan    pipe organ; orgue (Fr.); Orgel (Ger.);
 ##                   organo (It.); organo (Span.); organum (Lat.)
 ## dup *Ipiano    pianoforte
 ## dup *Iporta    portative organ
 ## dup *Ireedo    reed organ
 #'rhode':    'ElectricPiano', #Fender-Rhodes electric piano
 #*Isynth    keyboard synthesizer
-}                
+}
 
 class HumdrumInstrumentException(exceptions21.Music21Exception):
     pass
 
 def fromHumdrumClass(hdclass):
     '''
-    
+
     >>> humdrum.instruments.fromHumdrumClass('vox')
-    <music21.instrument.Instrument Voice>
+    <music21.instrument.Vocalist Voice>
     '''
     from music21 import instrument
     try:
@@ -237,9 +237,9 @@ def fromHumdrumClass(hdclass):
 
 def fromHumdrumInstrument(hdinst):
     '''
-    
+
     >>> humdrum.instruments.fromHumdrumInstrument('calto')
-    <music21.instrument.Instrument Alto>
+    <music21.instrument.Alto Alto>
     '''
     from music21 import instrument
     try:
@@ -275,9 +275,10 @@ class Test(unittest.TestCase):
         for x in c.recurse():
             if 'Instrument' in x.classes:
                 foundInstruments.append(str(x))
-        self.assertEqual(foundInstruments, 
+        self.assertEqual(foundInstruments,
                          ['Alto', 'Alto', 'Alto', 'Tenor', 'Alto', 'Bass', 'Tenor'])
-        print(c.parts[1].flat.getInstrument())
+        alto = c.parts[1].flat.getInstrument()
+        self.assertIn('Alto', alto.classes)
 
 if __name__ == '__main__':
     import music21

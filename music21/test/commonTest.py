@@ -13,11 +13,15 @@
 Things that are common to testing...
 '''
 import doctest
-import imp
 import os
 #import time
 import types
 import warnings
+
+with warnings.catch_warnings():
+    warnings.simplefilter('ignore', DeprecationWarning)
+    import imp
+
 
 from unittest.signals import registerResult
 import unittest.runner
@@ -26,6 +30,7 @@ import music21
 from music21 import common
 from music21 import environment
 from music21.test import testRunner
+
 
 _MOD = 'commonTest.py'
 environLocal = environment.Environment(_MOD)
@@ -36,7 +41,7 @@ def defaultDoctestSuite(name=None):
     kwArgs = {
               'globs': globs,
               'optionflags': docTestOptions,
-              'checker': testRunner.Py3In2OutputChecker()              
+              'checker': testRunner.Py3In2OutputChecker()
               }
     # in case there are any tests here, get a suite to load up later
     if name is not None:
@@ -67,7 +72,7 @@ class Music21TestRunner(unittest.runner.TextTestRunner):
                 if self.warnings in ['default', 'always']:
                     warnings.filterwarnings('module',
                             category=DeprecationWarning,
-                            message='Please use assert\w+ instead.')
+                            message=r'Please use assert\w+ instead.')
             #startTime = time.time()
             startTestRun = getattr(result, 'startTestRun', None)
             if startTestRun is not None:
@@ -119,7 +124,7 @@ class ModuleGather(object):
     r'''
     Utility class for gathering and importing all modules in the music21
     package. Puts them in self.modulePaths.
-    
+
     >>> from music21.test import commonTest
     >>> mg = commonTest.ModuleGather(useExtended=True)
     >>> #_DOCS_SHOW print mg.modulePaths[0]
@@ -129,35 +134,35 @@ class ModuleGather(object):
         self.dirParent = common.getSourceFilePath()
         self.useExtended = useExtended
         self.modulePaths = []
-    
+
         self.moduleSkip = [
-            'testSingleCoreAll.py', 
-            'testExternal.py', 
-            'testDefault.py', 
-            'testInstallation.py', 
-            'testLint.py', 
+            'testSingleCoreAll.py',
+            'testExternal.py',
+            'testDefault.py',
+            'testInstallation.py',
+            'testLint.py',
             'testPerformance.py',
             'timeGraphs.py',
-            'exceldiff.py', 
+            'exceldiff.py',
             'multiprocessTest.py',
             'figuredBass/examples.py', # 40 seconds and runs fine
             ]
-        
+
         self.moduleSkipExtended = self.moduleSkip + [
-            'exceldiff.py', 
+            'exceldiff.py',
             'mrjobaws.py', # takes too long.
             'configure.py', # runs oddly...
-                                                     
+
             'timeGraphImportStar.py',
             'testSerialization.py',
             'mptCurses.py',
             'memoryUsage.py',
             'dedent.py',
-            
+
             'testPerformance.py',
             'multiprocessTest.py',
             'timeGraphs.py',
-            
+
             'alpha/trecento/quodJactatur.py',
             'alpha/trecento/find_vatican1790.py',
             'alpha/trecento/findSevs.py',
@@ -167,14 +172,14 @@ class ModuleGather(object):
             'alpha/theoryAnalysis/wwnortonMGTA.py',
             'test/treeYield.py',
             'test/toggleDebug.py',
-            
+
             'musicxml/testPrimitive.py',
             'musicxml/testFiles.py',
             'musedata/testPrimitive/test01/__init__.py',
             'musedata/testPrimitive/__init__.py',
             'mei/test_base.py',
             'humdrum/questions.py',
-            
+
             'documentation/upload.py',
             'documentation/source/conf.py',
             'documentation/extensions.py',
@@ -191,38 +196,42 @@ class ModuleGather(object):
             'audioSearch/graphicalInterfaceSF.py',
             'audioSearch/graphicalInterfaceGame.py',
             'analysis/phrasing.py',
-            'abcFormat/testFiles.py',            
+            'abcFormat/testFiles.py',
             ]
         # run these first...
-        self.slowModules = ['graph', 
-                            'figuredBass/realizer', 
-                            'features/jSymbolic', 
-                            'features/native', 
-                            'figuredBass/examples', 
-                            'braille/test', 
-                            'test/testStream', 
-                            'analysis/windowed', 
-                            'converter/__init__', 
-                            'metadata/bundles', 
-                            
-                            'musicxml/m21ToXml',
-                            'musicxml/xmlToM21', 
+        self.slowModules = ['graph',
+                            'graph/plot',
+                            'graph/axis',
+                            'graph/primitives',
+                            'freezeThaw',
+                            'figuredBass/realizer',
+                            'features/jSymbolic',
+                            'features/native',
+                            'figuredBass/examples',
+                            'braille/test',
+                            'test/testStream',
+                            'analysis/windowed',
+                            'converter/__init__',
+                            'metadata/bundles',
 
-                            'romanText/translate', 
+                            'musicxml/m21ToXml',
+                            'musicxml/xmlToM21',
+
+                            'romanText/translate',
                             'alpha/theoryAnalysis/theoryAnalyzer',
                             ]
 
-        
+
         # skip any path that contains this string
-        self.pathSkip = ['obsolete', 
+        self.pathSkip = ['obsolete',
                          'music21/ext',  # not just "ext" because of "text!"
-                         'alpha/webapps/server', 
+                         'alpha/webapps/server',
                          'alpha/webapps/archive',
                          ]
         self.pathSkipExtended = self.pathSkip + [
-                         'demos',                                                 
+                         'demos',
                         ]
-        
+
         self.moduleSkip = [x.replace('/', os.sep) for x in self.moduleSkip]
         self.moduleSkipExtended = [x.replace('/', os.sep) for x in self.moduleSkipExtended]
         self.pathSkip = [x.replace('/', os.sep) for x in self.pathSkip]
@@ -251,7 +260,7 @@ class ModuleGather(object):
         def manyCoreSortFunc(name):
             '''
             for many core systems, like the MacPro, running slowest modules first
-            helps there be fewer idle cores later 
+            helps there be fewer idle cores later
             '''
             name = name[len(self.dirParent) + 1:]
             name = name.replace('.py', '')
@@ -273,7 +282,7 @@ class ModuleGather(object):
     def _getName(self, fp):
         r'''
         Given full file path, find a name for the module with _ as the separator.
-        
+
         >>> from music21.test import commonTest
         >>> mg = commonTest.ModuleGather()
         >>> #_DOCS_SHOW mg._getName(r'D:\Web\eclipse\music21base\music21\chord.py')
@@ -289,7 +298,7 @@ class ModuleGather(object):
     def _getNamePeriod(self, fp):
         r'''
         Given full file path, find a name for the module with . as the separator.
-        
+
         >>> from music21.test import commonTest
         >>> mg = commonTest.ModuleGather()
         >>> #_DOCS_SHOW mg._getName(r'D:\Web\eclipse\music21base\music21\trecento\findSevs.py')
@@ -303,11 +312,11 @@ class ModuleGather(object):
         fn = fn.replace('.py', '')
 
         return fn
-     
+
     def load(self, restoreEnvironmentDefaults=False):
         '''
         Return a list of module objects that are not in the skip list.
-        
+
         N.B. the list is a list of actual module objects not names,
         therefore cannot be pickled.
         '''
@@ -318,7 +327,7 @@ class ModuleGather(object):
                 modules.append(moduleObject)
         return modules
 
-    def getModule(self, fp, restoreEnvironmentDefaults = False):
+    def getModule(self, fp, restoreEnvironmentDefaults=False):
         '''
         gets one module object from the file path
         '''
@@ -326,7 +335,7 @@ class ModuleGather(object):
         ms = self.moduleSkip
         if self.useExtended:
             ms = self.moduleSkipExtended
-        
+
         for fnSkip in ms:
             if fp.endswith(fnSkip):
                 skip = True
@@ -338,10 +347,10 @@ class ModuleGather(object):
         if self.useExtended:
             ps = self.pathSkipExtended
 
-        
+
         for dirSkip in ps:
             if dirSkip in fp:
-                skip = True  
+                skip = True
                 break
         if skip:
             return None
@@ -349,21 +358,21 @@ class ModuleGather(object):
         #print(name, os.path.dirname(fp))
         #fmFile, fmPathname, fmDescription = imp.find_module(name, os.path.dirname(fp) + os.sep)
         try:
-            #environLocal.printDebug(['import:', fp]) 
+            #environLocal.printDebug(['import:', fp])
             #mod = imp.load_module(name, fmFile, fmPathname, fmDescription)
             with warnings.catch_warnings():
                 warnings.simplefilter('ignore', RuntimeWarning)
                 mod = imp.load_source(name, fp)
-        except Exception as excp: # this takes all exceptions!
-            environLocal.printDebug(['failed import:', fp, '\n', 
+        except Exception as excp: # pylint: disable=broad-except
+            environLocal.printDebug(['failed import:', fp, '\n',
                 '\tEXCEPTION:', str(excp).strip()])
             return None
         if restoreEnvironmentDefaults:
             if hasattr(mod, 'environLocal'):
                 mod.environLocal.restoreDefaults()
         return mod
-
-    def getModuleWithoutImp(self, fp, restoreEnvironmentDefaults = False):
+    
+    def getModuleWithoutImp(self, fp, restoreEnvironmentDefaults=False):
         '''
         gets one module object from the file path without using Imp
         '''
@@ -377,7 +386,7 @@ class ModuleGather(object):
         for dirSkip in self.pathSkip:
             dirSkipSlash = os.sep + dirSkip + os.sep
             if dirSkipSlash in fp:
-                skip = True  
+                skip = True
                 break
         if skip:
             return "skip"
@@ -392,7 +401,7 @@ class ModuleGather(object):
             else:
                 return "notInTree"
         mod = currentModule
-        
+
         if restoreEnvironmentDefaults:
             if hasattr(mod, 'environLocal'):
                 mod.environLocal.restoreDefaults()

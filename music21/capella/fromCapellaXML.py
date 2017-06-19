@@ -60,7 +60,7 @@ from music21 import tie
 #isSegno  = lambda char: isSegno1(char) or isSegno2(char)
 #isCodaLarge = lambda char: char == 'n'
 #isCodaSmall = lambda char: char == 'o'
-#isCoda = lambda char: isCodaLarge(char) or isCodaSmall(char) 
+#isCoda = lambda char: isCodaLarge(char) or isCodaSmall(char)
 #isPedalStart = lambda char: char == 'a'
 #isPedalStop = lambda char: char == 'b'
 #isFermataAbove = lambda char: char == 'u'
@@ -74,7 +74,7 @@ from music21 import tie
 #isInvertedMordent = lambda char: char == 'l'
 #isMordent = lambda char: char == 'x'
 #isTurn = lambda char: char == 'w'
-#isOrnament = lambda char: (isTrill(char) or isInvertedMordent(char) or 
+#isOrnament = lambda char: (isTrill(char) or isInvertedMordent(char) or
 #        isMordent(char) or isTurn(char))
 
 
@@ -98,7 +98,7 @@ class CapellaImporter(object):
         '''
         main program: opens a file given by filename and returns a complete
         music21 Score from it.
-        
+
         If systemScore is True then it skips the step of making Parts from Systems
         and Measures within Parts.
         '''
@@ -114,9 +114,9 @@ class CapellaImporter(object):
 
     def readCapellaXMLFile(self, filename):
         '''
-        Reads in a .capx file at `filename`, stores it as self.zipFilename, unzips it, 
+        Reads in a .capx file at `filename`, stores it as self.zipFilename, unzips it,
         extracts the score.xml embedded file, sets self.xmlText to the contents.
-        
+
         Returns self.xmlText
         '''
         self.zipFilename = filename
@@ -145,28 +145,28 @@ class CapellaImporter(object):
         '''
         Utility method, especially for the documentation examples/tests, which uses
         `xml.etree.ElementTree` to parse the string and returns its root object.
-        
+
         Not used by the main parser
-        
+
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> funnyTag = ci.domElementFromText(
-        ...    '<funny yes="definitely"><greg/>hi<greg><ha>ha</ha>' + 
+        ...    '<funny yes="definitely"><greg/>hi<greg><ha>ha</ha>' +
         ...    '<greg type="embedded"/></greg></funny>')
         >>> funnyTag
         <Element 'funny' at 0x...>
-        
+
         iter searches recursively
-        
+
         >>> len(list(funnyTag.iter('greg')))
         3
-        
+
         findall does not:
-        
+
         >>> len(funnyTag.findall('greg'))
         2
         '''
         return xml.etree.ElementTree.fromstring(xmlText)
-        
+
 
     def partScoreFromSystemScore(self, systemScore):
         '''
@@ -176,7 +176,7 @@ class CapellaImporter(object):
         '''
         # this line is redundant currently, since all we have in systemScore
         # are Systems, but later there will be other things.
-        systemStream = systemScore.getElementsByClass('System') 
+        systemStream = systemScore.getElementsByClass('System')
         partDictById = {}
         for thisSystem in systemStream:
             # this line is redundant currently, since all we have in
@@ -229,7 +229,7 @@ class CapellaImporter(object):
 #                    elif blOffset == m.highestTime:
 #                        m.remove(bl)
 #                        m.rightBarline = bl # will not yet work for double repeats!
-                        
+
             newScore._insertCore(0, p)
         newScore.elementsChanged()
         return newScore
@@ -237,9 +237,9 @@ class CapellaImporter(object):
     def systemScoreFromScore(self, scoreElement, scoreObj=None):
         '''
         returns an :class:`~music21.stream.Score` object from a <score> tag.
-        
+
         The Score object is not a standard music21 Score object which contains
-        parts, then measures, then voices, but instead contains systems which 
+        parts, then measures, then voices, but instead contains systems which
         optionally contain voices, which contain parts.  No measures have yet
         been created.
         '''
@@ -247,19 +247,19 @@ class CapellaImporter(object):
             scoreObj = stream.Score()
 
         systemsList = scoreElement.findall('systems')
-        if len(systemsList) == 0:
+        if not systemsList:
             raise CapellaImportException(
                 "Cannot find a <systems> tag in the <score> object")
         elif len(systemsList) > 1:
             raise CapellaImportException(
                 "Found more than one <systems> tag in the <score> object, what does this mean?")
         systemsElement = systemsList[0]
-        
+
         systemList = systemsElement.findall('system')
-        if len(systemList) == 0:
+        if not systemList:
             raise CapellaImportException(
                 'Cannot find any <system> tags in the <systems> tag in the <score> object')
-        
+
         for systemNumber, thisSystem in enumerate(systemList):
             systemObj = self.systemFromSystem(thisSystem)
             systemObj.systemNumber = systemNumber + 1 # 1 indexed, like musicians think
@@ -272,22 +272,22 @@ class CapellaImporter(object):
         r'''
         returns a :class:`~music21.stream.System` object from a <system> tag.
         The System object will contain :class:`~music21.stream.Part` objects
-        which will have the notes, etc. contained in it.  
+        which will have the notes, etc. contained in it.
 
         TODO: Handle multiple <voices>
         '''
         if systemObj is None:
             systemObj = stream.System()
-            
+
         stavesList = systemElement.findall('staves')
-        if len(stavesList) == 0:
+        if not stavesList:
             raise CapellaImportException("No <staves> tag found in this <system> element")
         elif len(stavesList) > 1:
             raise CapellaImportException(
                 "More than one <staves> tag found in this <system> element")
         stavesElement = stavesList[0]
         staffList = stavesElement.findall('staff')
-        if len(stavesList) == 0:
+        if not stavesList:
             raise CapellaImportException(
                 "No <staff> tag found in the <staves> element for this <system> element")
         for thisStaffElement in staffList:
@@ -297,45 +297,45 @@ class CapellaImporter(object):
                 partId = thisStaffElement.attrib['layout']
             partObj = stream.Part()
             partObj.id = partId
-            
+
             voicesList = thisStaffElement.findall('voices')
-            if len(voicesList) == 0:
+            if not voicesList:
                 raise CapellaImportException(
-                    "No <voices> tag found in the <staff> tag for the <staves> element " + 
+                    "No <voices> tag found in the <staff> tag for the <staves> element " +
                     "for this <system> element")
             voicesElement = voicesList[0]
             voiceList = voicesElement.findall('voice')
-            if len(voiceList) == 0:
+            if not voiceList:
                 raise CapellaImportException(
-                    "No <voice> tag found in the <voices> tag for the <staff> tag for the " + 
+                    "No <voice> tag found in the <voices> tag for the <staff> tag for the " +
                     "<staves> element for this <system> element")
             if len(voiceList) == 1: # single voice staff... perfect!
                 thisVoiceElement = voiceList[0]
                 noteObjectsList = thisVoiceElement.findall('noteObjects')
-                if len(noteObjectsList) == 0:
+                if not noteObjectsList:
                     raise CapellaImportException(
-                            "No <noteObjects> tag found in the <voice> tag found in the " + 
-                            "<voices> tag for the <staff> tag for the <staves> element for " + 
+                            "No <noteObjects> tag found in the <voice> tag found in the " +
+                            "<voices> tag for the <staff> tag for the <staves> element for " +
                             "this <system> element")
                 elif len(noteObjectsList) > 1:
                     raise CapellaImportException(
-                            "More than one <noteObjects> tag found in the <voice> tag found " + 
-                            "in the <voices> tag for the <staff> tag for the <staves> element " + 
+                            "More than one <noteObjects> tag found in the <voice> tag found " +
+                            "in the <voices> tag for the <staff> tag for the <staves> element " +
                             "for this <system> element")
                 thisNoteObject = noteObjectsList[0]
                 self.streamFromNoteObjects(thisNoteObject, partObj)
             systemObj.insert(0, partObj)
         return systemObj
-    
+
     def streamFromNoteObjects(self, noteObjectsElement, streamObj=None):
         r'''
-        
-        Converts a <noteObjects> tag into a :class:`~music21.stream.Stream` object 
+
+        Converts a <noteObjects> tag into a :class:`~music21.stream.Stream` object
         which is returned.
         A Stream can be given as an optional argument, in which case the objects of this
         Stream are appended to this object.
-        
-        
+
+
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> noteObjectsString = r"""
         ...           <noteObjects>
@@ -372,7 +372,7 @@ class CapellaImporter(object):
         {0.0} <music21.note.Note G>
         {2.0} <music21.note.Note A>
         {4.0} <music21.bar.Barline style=final>
-        
+
         >>> s.highestTime
         4.0
         '''
@@ -380,7 +380,7 @@ class CapellaImporter(object):
             s = stream.Stream()
         else:
             s = streamObj
-            
+
         mapping = {'clefSign': self.clefFromClefSign,
                    'keySign': self.keySignatureFromKeySign,
                    'timeSign': self.timeSignatureFromTimeSign,
@@ -403,15 +403,15 @@ class CapellaImporter(object):
                     pass
                 else:
                     s._appendCore(el)
-                    
+
         s.elementsChanged()
         return s
 
     def restFromRest(self, restElement):
         '''
-        Returns a :class:`~music21.rest.Rest` object from a <rest> tag. 
-        
-        
+        Returns a :class:`~music21.rest.Rest` object from a <rest> tag.
+
+
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> restElement = ci.domElementFromText('<rest><duration base="1/2"/></rest>')
         >>> r = ci.restFromRest(restElement)
@@ -424,15 +424,15 @@ class CapellaImporter(object):
         durationList = restElement.findall('duration')
         r.duration = self.durationFromDuration(durationList[0])
         return r
-    
+
     def chordOrNoteFromChord(self, chordElement):
         '''
-        returns a :class:`~music21.note.Note` or :class:`~music21.chord.Chord` 
+        returns a :class:`~music21.note.Note` or :class:`~music21.chord.Chord`
         from a chordElement -- a `Note`
-        is returned if the <chord> has one <head> element, a `Chord` is 
+        is returned if the <chord> has one <head> element, a `Chord` is
         returned if there are multiple <head> elements.
 
-        
+
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> chordElement = ci.domElementFromText(
         ...     '<chord><duration base="1/1"/><heads><head pitch="G4"/></heads></chord>')
@@ -443,49 +443,49 @@ class CapellaImporter(object):
         <music21.duration.Duration 4.0>
 
         This one is an actual chord
-        
+
         >>> chordElement = ci.domElementFromText(
-        ...        '<chord><duration base="1/8"/>' + 
+        ...        '<chord><duration base="1/8"/>' +
         ...        '<heads><head pitch="G4"/><head pitch="A5"/></heads></chord>')
         >>> c = ci.chordOrNoteFromChord(chordElement)
         >>> c
         <music21.chord.Chord G3 A4>
         >>> c.duration
         <music21.duration.Duration 0.5>
-        
-        
+
+
         TODO: test Lyrics
         '''
         durationList = chordElement.findall('duration')
         headsList = chordElement.findall('heads')
-        
+
         if len(durationList) != 1 or len(headsList) != 1:
             raise CapellaImportException("Malformed chord!")
 
         notesList = self.notesFromHeads(headsList[0])
-        
+
         noteOrChord = None
-        if len(notesList) == 0:
+        if not notesList:
             raise CapellaImportException("Malformed chord!")
         elif len(notesList) == 1:
             noteOrChord = notesList[0] # a Note object
         else:
             noteOrChord = chord.Chord(notesList)
-        
+
         noteOrChord.duration = self.durationFromDuration(durationList[0])
 
         lyricsList = chordElement.findall('lyric')
-        if len(lyricsList) > 0:
+        if lyricsList:
             lyricsList = self.lyricListFromLyric(lyricsList[0])
             noteOrChord.lyrics = lyricsList
-            
+
         return noteOrChord
-            
+
     def notesFromHeads(self, headsElement):
         '''
-        returns a list of :class:`~music21.note.Note` elements for each <head> in <heads> 
+        returns a list of :class:`~music21.note.Note` elements for each <head> in <heads>
 
-        
+
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> headsElement = ci.domElementFromText(
         ...    '<heads><head pitch="B7"><alter step="-1"/></head><head pitch="C2"/></heads>')
@@ -495,16 +495,16 @@ class CapellaImporter(object):
         notes = []
         headDomList = headsElement.findall('head')
         for headElement in headDomList:
-            notes.append(self.noteFromHead(headElement))            
+            notes.append(self.noteFromHead(headElement))
         return notes
 
     def noteFromHead(self, headElement):
-        ''' 
+        '''
         return a :class:`~music21.note.Note` object from a <head> element.  This will become
         part of Chord._notes if there are multiple, but in any case, it needs to be a Note
         not a Pitch for now, because it could have Tie information
 
-        
+
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> headElement = ci.domElementFromText(
         ...      '<head pitch="B7"><alter step="-1"/><tie end="true"/></head>')
@@ -518,7 +518,7 @@ class CapellaImporter(object):
         '''
         if 'pitch' not in headElement.attrib:
             raise CapellaImportException("Cannot deal with <head> element without pitch!")
-    
+
         noteNameWithOctave = headElement.attrib['pitch']
         n = note.Note()
         n.nameWithOctave = noteNameWithOctave
@@ -543,8 +543,8 @@ class CapellaImporter(object):
     def accidentalFromAlter(self, alterElement):
         '''
         return a :class:`~music21.pitch.Accidental` object from an <alter> tag.
-        
-        
+
+
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> alter = ci.domElementFromText('<alter step="-1"/>')
         >>> ci.accidentalFromAlter(alter)
@@ -569,14 +569,14 @@ class CapellaImporter(object):
         if 'display' in alterElement.attrib and alterElement.attrib['display'] == 'suppress':
             acc.displayType = 'never'
         return acc
-        
+
     def tieFromTie(self, tieElement):
         '''
         returns a :class:`~music21.tie.Tie` element from a <tie> tag
-        
+
         if begin == 'true' then Tie.type = start
-        
-        
+
+
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> tieEl = ci.domElementFromText('<tie begin="true"/>')
         >>> ci.tieFromTie(tieEl)
@@ -587,7 +587,7 @@ class CapellaImporter(object):
         >>> tieEl = ci.domElementFromText('<tie end="true"/>')
         >>> ci.tieFromTie(tieEl)
         <music21.tie.Tie stop>
-        
+
         if begin == 'true' and end == 'true' then Tie.type = continue (is this right???)
 
         >>> tieEl = ci.domElementFromText('<tie begin="true" end="true"/>')
@@ -600,7 +600,7 @@ class CapellaImporter(object):
             begin = True
         if 'end' in tieElement.attrib and tieElement.attrib['end'] == 'true':
             end = True
-        
+
         tieType = None
         if begin is True and end is True:
             tieType = 'continue'
@@ -610,22 +610,22 @@ class CapellaImporter(object):
             tieType = 'stop'
         else:
             return None
-            
+
         tieObj = tie.Tie(tieType)
         return tieObj
 
     def lyricListFromLyric(self, lyricElement):
         '''
         returns a list of :class:`~music21.note.Lyric` objects from a <lyric> tag
-        
-        
+
+
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> lyricEl = ci.domElementFromText(
-        ...      '<lyric><verse i="0" hyphen="true">di</verse>' + 
+        ...      '<lyric><verse i="0" hyphen="true">di</verse>' +
         ...      '<verse i="1">man,</verse><verse i="2">frau,</verse></lyric>')
         >>> ci.lyricListFromLyric(lyricEl)
-        [<music21.note.Lyric number=1 syllabic=begin text="di">, 
-         <music21.note.Lyric number=2 syllabic=single text="man,">, 
+        [<music21.note.Lyric number=1 syllabic=begin text="di">,
+         <music21.note.Lyric number=2 syllabic=single text="man,">,
          <music21.note.Lyric number=3 syllabic=single text="frau,">]
         '''
         lyricList = []
@@ -640,7 +640,7 @@ class CapellaImporter(object):
         '''
         returns a :class:`~music21.note.Lyric` object from a <verse> tag
 
-        
+
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> verse = ci.domElementFromText('<verse i="0" hyphen="true">di&quot;</verse>')
         >>> ci.lyricFromVerse(verse)
@@ -660,26 +660,26 @@ class CapellaImporter(object):
         if text is None or text == "":
             return None
         else:
-            lyric = note.Lyric(text=text, number=verseNumber, syllabic=syllabic, applyRaw=True)        
+            lyric = note.Lyric(text=text, number=verseNumber, syllabic=syllabic, applyRaw=True)
             return lyric
-        
+
         # i = number - 1
         # align
         # hyphen = true
-    
-    
+
+
     clefMapping = {'treble': clef.TrebleClef,
                    'bass': clef.BassClef,
                    'alto': clef.AltoClef,
                    'tenor': clef.TenorClef,
                    'G2-': clef.Treble8vbClef,
                    }
-    
+
     def clefFromClefSign(self, clefSign):
         '''
-        returns a :class:`~music21.clef.Clef` object or subclass from a <clefSign> tag. 
-        
-        
+        returns a :class:`~music21.clef.Clef` object or subclass from a <clefSign> tag.
+
+
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> clefSign = ci.domElementFromText('<clefSign clef="treble"/>')
         >>> ci.clefFromClefSign(clefSign)
@@ -716,14 +716,14 @@ class CapellaImporter(object):
                         clefOctaveChange = -1
                 clefObj = clef.clefFromString(clefSignAndLine, clefOctaveChange)
                 return clefObj
-                    
+
         return None
-    
+
     def keySignatureFromKeySign(self, keySign):
         '''
-        Returns a :class:`~music21.key.KeySignature` object from a keySign tag. 
-        
-        
+        Returns a :class:`~music21.key.KeySignature` object from a keySign tag.
+
+
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> keySign = ci.domElementFromText('<keySign fifths="-1"/>')
         >>> ci.keySignatureFromKeySign(keySign)
@@ -732,12 +732,12 @@ class CapellaImporter(object):
         if 'fifths' in keySign.attrib:
             keyFifths = int(keySign.attrib['fifths'])
             return key.KeySignature(keyFifths)
-    
+
     def timeSignatureFromTimeSign(self, timeSign):
         '''
-        Returns a :class:`~music21.meter.TimeSignature` object from a timeSign tag. 
-        
-        
+        Returns a :class:`~music21.meter.TimeSignature` object from a timeSign tag.
+
+
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> timeSign = ci.domElementFromText('<timeSign time="4/4"/>')
         >>> ci.timeSignatureFromTimeSign(timeSign)
@@ -755,11 +755,11 @@ class CapellaImporter(object):
                 return None
         else:
             return None
-    
-    
+
+
     def durationFromDuration(self, durationElement):
         '''
-        
+
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> durationTag = ci.domElementFromText('<duration base="1/32" dots="1"/>')
         >>> d = ci.durationFromDuration(durationTag)
@@ -790,31 +790,31 @@ class CapellaImporter(object):
             slashIndex = baseValue.find("/")
             if slashIndex != -1:
                 firstNumber = int(baseValue[0:slashIndex])
-                secondNumber = int(baseValue[slashIndex+1:])
+                secondNumber = int(baseValue[slashIndex + 1:])
                 quarterLength = (4.0 * firstNumber)/secondNumber
                 dur.quarterLength = quarterLength
 
         if 'dots' in durationElement.attrib:
             dotNumber = int(durationElement.attrib['dots'])
             dur.dots = dotNumber
-        
+
         tuplets = durationElement.findall('tuplet')
         for d in tuplets:
             tuplet = self.tupletFromTuplet(d)
             dur.appendTuplet(tuplet)
 
         return dur
-    
+
     def tupletFromTuplet(self, tupletElement):
         '''
-        Returns a :class:`~music21.duration.Tuplet` object from a <tuplet> tag. 
+        Returns a :class:`~music21.duration.Tuplet` object from a <tuplet> tag.
 
-        
+
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> tupletTag = ci.domElementFromText('<tuplet count="3"/>')
-        >>> ci.tupletFromTuplet(tupletTag)    
+        >>> ci.tupletFromTuplet(tupletTag)
         <music21.duration.Tuplet 3/2>
-        
+
         does not handle 'tripartite' = True
         '''
         numerator = 1
@@ -826,11 +826,11 @@ class CapellaImporter(object):
                 denominator *= 2
         if 'prolong' in tupletElement.attrib and tupletElement.attrib['count'] == 'true':
             denominator *= 2
-        
+
         if 'tripartite' in tupletElement.attrib:
             print(
                 "WE DON'T HANDLE TRIPARTITE YET! Email the file and a pdf so I can figure it out")
-        
+
         tup = duration.Tuplet(numerator, denominator)
         return tup
 
@@ -845,21 +845,21 @@ class CapellaImporter(object):
     def barlineListFromBarline(self, barlineElement):
         '''
         Indication that the barline at this point should be something other than normal.
-        
+
         Capella does not indicate measure breaks or barline breaks normally, so the only barlines
         that are indicated are unusual ones.
-        
+
         Returns a LIST of :class:`~music21.bar.Barline` or :class:`~music21.bar.Repeat` objects
-        because the `repEndBegin` type requires two `bar.Repeat` objects to encode in `music21`. 
-        
-        
+        because the `repEndBegin` type requires two `bar.Repeat` objects to encode in `music21`.
+
+
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> barlineTag = ci.domElementFromText('<barline type="end"/>')
-        >>> ci.barlineListFromBarline(barlineTag)    
+        >>> ci.barlineListFromBarline(barlineTag)
         [<music21.bar.Barline style=final>]
 
         >>> repeatTag = ci.domElementFromText('<barline type="repEndBegin"/>')
-        >>> ci.barlineListFromBarline(repeatTag)    
+        >>> ci.barlineListFromBarline(repeatTag)
         [<music21.bar.Repeat direction=end>, <music21.bar.Repeat direction=start>]
 
         '''
@@ -878,17 +878,17 @@ class CapellaImporter(object):
                         if hasRepeatEnd is True:
                             startRep.priority = 1
                         barlineList.append(startRep)
-            else:            
+            else:
                 if barlineType in self.barlineMap:
                     barlineList.append(bar.Barline(self.barlineMap[barlineType]))
-            
+
         return barlineList
     def slurFromDrawObjSlur(self, drawObj):
         '''
         not implemented
         '''
         pass
-    
+
 
 class Test(unittest.TestCase):
     pass
@@ -904,7 +904,7 @@ class TestExternal(unittest.TestCase):
         oswaldPath = capellaDirPath + os.path.sep + r'Nu_rue_mit_sorgen.capx'
         partScore = ci.scoreFromFile(oswaldPath)
         partScore.show()
-        
+
     def xtestImportSorgen(self):
         ci = CapellaImporter()
         import os

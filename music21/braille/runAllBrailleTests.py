@@ -2,7 +2,7 @@
 #-------------------------------------------------------------------------------
 # Name:         braille/runAllBrailleTests.py
 # Purpose:      Test runner for Bo-Cheng Jhan and others who would prefer
-#               to debug braille output with a minimum of screenreader output 
+#               to debug braille output with a minimum of screenreader output
 # Author:       Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2016 Michael Scott Cuthbert and the music21 Project
@@ -42,7 +42,7 @@ def runTest():
         run_module('music21.braille.' + modName, run_name='__main__')
         errOutput = myIO.getvalue()
         myIO.close()
-        for thisLine in errOutput.splitlines():            
+        for thisLine in errOutput.splitlines():
             if re.match(r'^\.*$', thisLine):
                 # all dots or blank line
                 continue

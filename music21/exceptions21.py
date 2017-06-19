@@ -22,7 +22,7 @@ class Music21Exception(Exception):
 
 # The rest of these are here because they are imported by more than one module
 # which cannot import the other module because of circular imports.
-# 
+#
 # if Circular imports have not been a problem and/or you don't plan to use
 # an exception in multiple modules (i.e., you're not going to catch a particular
 # exception in a different module, then define that exception in the module itself
@@ -33,7 +33,7 @@ class StreamException(Music21Exception):
     pass
 
 class ImmutableStreamException(StreamException):
-    def __init__(self, msg='An immutable Stream cannot be changed'):
+    def __init__(self, msg='An immutable Stream cannot be changed'): # pylint: disable=useless-super-delegation
         super(ImmutableStreamException, self).__init__(msg)
 
 

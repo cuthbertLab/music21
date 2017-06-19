@@ -186,7 +186,7 @@ def happyBirthday():
     '''
     fully copyright free!
     '''
-    hb = cp("tinynotation: 3/4 d8. d16 e4 d g f#2 d8. d16 e4 d a g2 d8. " + 
+    hb = cp("tinynotation: 3/4 d8. d16 e4 d g f#2 d8. d16 e4 d a g2 d8. " +
             "d16 d'4 b g8. g16 f#4 e c'8. c'16 b4 g a g2")
     hb.insert(0, key.KeySignature(1))
     hb.insert(0, tempo.TempoText("Brightly"))
@@ -199,10 +199,11 @@ class Test(unittest.TestCase):
 
     def runTest(self):
         pass
-    
+
     def testHappyBirthdayDebug(self):
         from music21.braille.translate import objectToBraille
-        x = objectToBraille(happyBirthday(), debug=True)
+        hb = happyBirthday()
+        x = objectToBraille(hb, debug=True)
         y = u'''---begin segment---
 <music21.braille.segment BrailleSegment>
 Measure 1, Signature Grouping 1:
@@ -829,6 +830,7 @@ Dot ⠄
 Interval 3 ⠬
 ====
 Measure 24 Right, Note Grouping 1:
+Triplet ⠆
 Articulation staccato ⠦
 Octave 5 ⠨
 E 16th ⠯
@@ -932,6 +934,7 @@ Dot ⠄
 Interval 3 ⠬
 ====
 Measure 28 Right, Note Grouping 1:
+Triplet ⠆
 Octave 6 ⠰
 E 16th ⠯
 F 16th ⠿
@@ -1067,11 +1070,13 @@ Octave 5 ⠨
 A 16th ⠮
 Octave 6 ⠰
 F 16th ⠿
+Triplet ⠆
 E 16th ⠯
 Octave 5 ⠨
 A 16th ⠮
 Octave 6 ⠰
 F 16th ⠿
+Triplet ⠆
 E 16th ⠯
 Octave 5 ⠨
 A 16th ⠮
@@ -1173,7 +1178,7 @@ Barline final ⠣⠅
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='testVerdiDebug')
 
 #------------------------------------------------------------------------------
 # eof

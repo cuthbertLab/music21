@@ -10,13 +10,13 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
-This module describes classes for performing windowed and overlapping windowed analysis. 
-The :class:`music21.analysis.windowed.WindowedAnalysis` provides a reusable framework for 
-systematic overlapping window analysis at the starting at the level of the quarter note 
+This module describes classes for performing windowed and overlapping windowed analysis.
+The :class:`music21.analysis.windowed.WindowedAnalysis` provides a reusable framework for
+systematic overlapping window analysis at the starting at the level of the quarter note
 and moving to the size of an entire :class:`music21.stream.Stream`.
 
-Modular analysis procedures inherit from :class:`music21.analysis.discrete.DiscreteAnalysis`. 
-The :class:`music21.analysis.discrete.KrumhanslSchmuckler` (for algorithmic key detection) 
+Modular analysis procedures inherit from :class:`music21.analysis.discrete.DiscreteAnalysis`.
+The :class:`music21.analysis.discrete.KrumhanslSchmuckler` (for algorithmic key detection)
 and :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) classes provide examples.
 '''
 from __future__ import division, print_function, absolute_import
@@ -27,7 +27,10 @@ from music21 import exceptions21
 
 from music21 import common
 from music21 import meter
-from music21 import stream 
+from music21 import stream
+
+from music21.analysis.discrete import DiscreteAnalysisException
+
 
 from music21.ext import six
 if six.PY2:
@@ -47,46 +50,47 @@ class WindowedAnalysisException(exceptions21.Music21Exception):
 #------------------------------------------------------------------------------
 
 class WindowedAnalysis(object):
-    def __init__(self, streamObj, analysisProcessor):
-        '''Create a WindowedAnalysis object.
+    '''
+    Create a WindowedAnalysis object.
 
-        The provided `analysisProcessor` must provide a `process()` method that, 
-        when given a windowed Stream (a Measure) returns two element tuple containing 
-        (a) a data value (implementation dependent) and (b) a color code. 
-        '''
+    The provided `analysisProcessor` must provide a `process()` method that,
+    when given a windowed Stream (a Measure) returns two element tuple containing
+    (a) a data value (implementation dependent) and (b) a color code.
+    '''
+    def __init__(self, streamObj, analysisProcessor):
         self.processor = analysisProcessor
         #environLocal.printDebug(self.processor)
         if 'Stream' not in streamObj.classes:
             raise WindowedAnalysisException('non-stream provided as argument')
         self._srcStream = streamObj
         # store a windowed Stream, partitioned into bars of 1/4
-        self._windowedStream = self._getMinimumWindowStream() 
+        self._windowedStream = self.getMinimumWindowStream()
 
-    def _getMinimumWindowStream(self, timeSignature='1/4'):
-        ''' Take the loaded stream and restructure it into measures of 1 quarter note duration.
+    def getMinimumWindowStream(self, timeSignature='1/4'):
+        '''
+        Take the loaded stream and restructure it into measures of 1 quarter note duration.
 
-        
         >>> s = corpus.parse('bach/bwv324')
         >>> p = analysis.discrete.Ambitus()
         >>> # placing one part into analysis
         >>> wa = analysis.windowed.WindowedAnalysis(s.parts[0], p)
 
-        >>> post = wa._getMinimumWindowStream()
+        >>> post = wa.getMinimumWindowStream()
         >>> len(post.getElementsByClass('Measure'))
         42
         >>> post.getElementsByClass('Measure')[0]
         <music21.stream.Measure 1 offset=0.0>
         >>> post.getElementsByClass('Measure')[0].timeSignature # set to 1/4 time signature
         <music21.meter.TimeSignature 1/4>
-        >>> len(post.getElementsByClass('Measure')[1].notes) # one note in this measures 
+        >>> len(post.getElementsByClass('Measure')[1].notes) # one note in this measures
         1
         '''
-        # create a stream that contains just a 1/4 time signature; this is 
+        # create a stream that contains just a 1/4 time signature; this is
         # the minimum window size (and partitioning will be done by measure)
         meterStream = stream.Stream()
         meterStream.insert(0, meter.TimeSignature(timeSignature))
-        
-        # makeTies() splits the durations into proper measure boundaries for 
+
+        # makeTies() splits the durations into proper measure boundaries for
         # analysis; this means that a duration that spans multiple 1/4 measures
         # will be represented in each of those measures
         measured = self._srcStream.makeMeasures(meterStream)
@@ -97,31 +101,31 @@ class WindowedAnalysis(object):
         return measured
 
 
-    def _analyze(self, windowSize, windowType='overlap'):
+    def analyze(self, windowSize, windowType='overlap'):
         '''
-        Calls, for a given window size, an analysis method across all windows in the source Stream. 
+        Calls, for a given window size, an analysis method across all windows in the source Stream.
 
-        If windowType is "overlap", windows above size 1 are always overlapped, so if a window 
-        of size 2 is used, windows 1-2, then 2-3, then 3-4 are compared. If a window of size 3 
-        is used, windows 1-3, then 2-4, then 3-5 are compared. 
+        If windowType is "overlap", windows above size 1 are always overlapped, so if a window
+        of size 2 is used, windows 1-2, then 2-3, then 3-4 are compared. If a window of size 3
+        is used, windows 1-3, then 2-4, then 3-5 are compared.
 
         Windows are assumed to be partitioned by :class:`music21.stream.Measure` objects.
 
-        Returns two lists for results, each equal in size to the length of minimum windows 
-        minus the window size plus one. If we have 20 1/4 windows, then the results lists 
-        will be of length 20 for window size 1, 19 for window size 2, 18 for window size 3, etc. 
+        Returns two lists for results, each equal in size to the length of minimum windows
+        minus the window size plus one. If we have 20 1/4 windows, then the results lists
+        will be of length 20 for window size 1, 19 for window size 2, 18 for window size 3, etc.
 
-        
+
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
         >>> wa = analysis.windowed.WindowedAnalysis(s, p)
         >>> len(wa._windowedStream)
         36
-        >>> a, b = wa._analyze(1)
+        >>> a, b = wa.analyze(1)
         >>> len(a), len(b)
         (36, 36)
 
-        >>> a, b = wa._analyze(4)
+        >>> a, b = wa.analyze(4)
         >>> len(a), len(b)
         (33, 33)
 
@@ -142,18 +146,24 @@ class WindowedAnalysis(object):
         color = [0] * windowCount
         # how many windows in this row
         windowCountIndices = range(windowCount)
-        
+
         if windowType == 'overlap':
             for i in windowCountIndices:
                 current = stream.Stream()
-                for j in range(i, i+windowSize):
+                for j in range(i, i + windowSize):
                     #environLocal.printDebug(['self._windowedStream[j]', self._windowedStream[j]])
                     current.append(self._windowedStream[j])
-                data[i], color[i] = self.processor.process(current)
+
+                try:
+                    data[i], color[i] = self.processor.process(current)
+                except DiscreteAnalysisException:
+                    # current might have no notes...all rests?
+                    data[i], color[i] = (None, None, 0), '#ffffff'
+
 
         elif windowType == 'noOverlap':
             start = 0
-            end = start+windowSize
+            end = start + windowSize
             i = 0
             while True:
                 if end >= len(self._windowedStream):
@@ -162,61 +172,71 @@ class WindowedAnalysis(object):
                 current = stream.Stream()
                 for j in range(start, end):
                     current.append(self._windowedStream[j])
-                data[i], color[i] = self.processor.process(current)
+
+                try:
+                    data[i], color[i] = self.processor.process(current)
+                except DiscreteAnalysisException:
+                    # current might have no notes...all rests?
+                    data[i], color[i] = (None, None, 0), '#ffffff'
 
                 start = end
                 end = start + windowSize
                 i += 1
                 if i >= windowCount:
                     break
-       
+
         elif windowType == 'adjacentAverage':
             # first get overlapping windows
             overlapped = []
             for i in range(maxWindowCount - windowSize + 1):
                 current = stream.Stream()
                 # store indices of min windows that participate
-                participants = [] 
-                for j in range(i, i+windowSize):
+                participants = []
+                for j in range(i, i + windowSize):
                     current.append(self._windowedStream[j])
                     participants.append(j)
                 overlapped.append([current, participants])
 
             # then distribute to each of maxWindowCount
             for i in range(maxWindowCount):
-                # get all participants, combine into a single 
+                # get all participants, combine into a single
                 current = stream.Stream()
                 for dataStream, participants in overlapped:
                     if i in participants:
                         for m in dataStream:
                             current.append(m)
-                data[i], color[i] = self.processor.process(current)
+                try:
+                    data[i], color[i] = self.processor.process(current)
+                except DiscreteAnalysisException:
+                    # current might have no notes...all rests?
+                    data[i], color[i] = (None, None, 0), '#ffffff'
 
         return data, color
 
-        
-    def process(self, minWindow=1, maxWindow=1, windowStepSize=1, 
+
+    def process(self, minWindow=1, maxWindow=1, windowStepSize=1,
                 windowType='overlap', includeTotalWindow=True):
 
-        ''' Main method for windowed analysis across one or more window size.
+        '''
+        Main method for windowed analysis across one or more window sizes.
 
-        Calls :meth:`~music21.analysis.WindowedAnalysis._analyze` for 
+        Calls :meth:`~music21.analysis.WindowedAnalysis.analyze` for
         the number of different window sizes to be analyzed.
 
-        The `minWindow` and `maxWindow` set the range of window sizes in quarter lengths. 
-        The `windowStepSize` parameter determines the increment between these window sizes, 
-        in quarter lengths. 
+        The `minWindow` and `maxWindow` set the range of window sizes in quarter lengths.
+        The `windowStepSize` parameter determines the increment between these window sizes,
+        in quarter lengths.
 
-        If `minWindow` or `maxWindow` is None, the largest window size available will be set. 
+        If `minWindow` or `maxWindow` is None, the largest window size available will be set.
 
-        If `includeTotalWindow` is True, the largest window size will always be added. 
+        If `includeTotalWindow` is True, the largest window size will always be added.
 
-        
+
         >>> s = corpus.parse('bach/bwv324')
         >>> ksAnalyzer = analysis.discrete.KrumhanslSchmuckler()
-        
+
         placing one part into analysis
-        
+
         >>> sopr = s.parts[0]
         >>> wa = analysis.windowed.WindowedAnalysis(sopr, ksAnalyzer)
         >>> solutions, colors, meta = wa.process(1, 1, includeTotalWindow=False)
@@ -228,11 +248,11 @@ class WindowedAnalysis(object):
         2
 
         >>> solutions[1]
-        [(<music21.pitch.Pitch B>, 'major', 0.6868...), 
-         (<music21.pitch.Pitch B>, 'minor', 0.8308...), 
-         (<music21.pitch.Pitch D>, 'major', 0.6868...), 
+        [(<music21.pitch.Pitch B>, 'major', 0.6868...),
+         (<music21.pitch.Pitch B>, 'minor', 0.8308...),
+         (<music21.pitch.Pitch D>, 'major', 0.6868...),
          (<music21.pitch.Pitch B>, 'minor', 0.8308...),...]
-         
+
         >>> colors[1]
         ['#ffb5ff', '#9b519b', '#ffd752', '#9b519b', ...]
 
@@ -248,7 +268,7 @@ class WindowedAnalysis(object):
             minLength = len(self._windowedStream)
         else:
             minLength = minWindow
-        
+
         if windowType is None:
             windowType = 'overlap'
         elif windowType.lower() in ['overlap']:
@@ -260,13 +280,13 @@ class WindowedAnalysis(object):
 
         # need to create storage for the output of each row, or the processing
         # of all windows of a single size across the entire Stream
-        solutionMatrix = [] 
-        colorMatrix = [] 
+        solutionMatrix = []
+        colorMatrix = []
         # store meta data about each row as a dictionary
-        metaMatrix = [] 
+        metaMatrix = []
 
         if common.isNum(windowStepSize):
-            windowSizes = list(range(minLength, maxLength+1, windowStepSize))
+            windowSizes = list(range(minLength, maxLength + 1, windowStepSize))
         else:
             num, junk = common.getNumFromStr(windowStepSize)
             windowSizes = []
@@ -274,7 +294,7 @@ class WindowedAnalysis(object):
             while True:
                 windowSizes.append(x)
                 x = x * round(int(num))
-                if x > (maxLength * .75):
+                if x > (maxLength * 0.75):
                     break
 
         if includeTotalWindow:
@@ -284,14 +304,14 @@ class WindowedAnalysis(object):
 
         for i in windowSizes:
             #environLocal.printDebug(['processing window:', i])
-            # each of these results are lists, where len is based on 
-            soln, colorn = self._analyze(i, windowType=windowType) 
+            # each of these results are lists, where len is based on
+            soln, colorn = self.analyze(i, windowType=windowType)
             # store lists of results in a list of lists
             solutionMatrix.append(soln)
             colorMatrix.append(colorn)
             meta = {'windowSize': i}
             metaMatrix.append(meta)
-        
+
         return solutionMatrix, colorMatrix, metaMatrix
 
 
@@ -307,12 +327,12 @@ class TestExternal(unittest.TestCase):
         pass
 
 class TestMockProcesor(object):
-    
+
     def process(self, subStream):
         '''Simply count the number of notes found
         '''
         return len(subStream.flat.notesAndRests), None
-    
+
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -321,23 +341,23 @@ class Test(unittest.TestCase):
     def testBasic(self):
         from music21 import corpus
         from music21.analysis import discrete
-        # get a procedure 
-        
+        # get a procedure
+
         s = corpus.parse('bach/bwv324')
 
         for pClass in [discrete.KrumhanslSchmuckler, discrete.Ambitus]:
             p = pClass()
 
-            # get windowing object, provide a stream for analysis as well as 
+            # get windowing object, provide a stream for analysis as well as
             # the processor
             wa = WindowedAnalysis(s, p)
             # do smallest and larges
             for i in list(range(1, 4)) + [None]:
                 unused_x, unused_y, unused_z = wa.process(i, i)
-    
+
 
     def testWindowing(self):
-        '''Test that windows are doing what they are supposed to do 
+        '''Test that windows are doing what they are supposed to do
         '''
         p = TestMockProcesor()
 
@@ -366,7 +386,7 @@ class Test(unittest.TestCase):
 
         # window size of 1 gets 2 solutions
         a, unused_b, unused_c = wa1.process(1, 1, 1, includeTotalWindow=False)
-        self.assertEqual(len(a[0]), 2) 
+        self.assertEqual(len(a[0]), 2)
         self.assertEqual(a[0][0], 1)
         self.assertEqual(a[0][1], 1)
 
@@ -400,16 +420,16 @@ class Test(unittest.TestCase):
     def testVariableWindowing(self):
         from music21.analysis import discrete
         from music21 import corpus, graph
-        
+
         p = discrete.KrumhanslSchmuckler()
         s = corpus.parse('bach/bwv66.6')
 
         unused_wa = WindowedAnalysis(s, p)
 
 
-        plot = graph.PlotWindowedKrumhanslSchmuckler(s, doneAction=None,
+        plot = graph.plot.WindowedKey(s, doneAction=None,
             windowStep=4, windowType='overlap')
-        plot.process()
+        plot.run()
         #plot.write()
 
 #-------------------------------------------------------------------------------

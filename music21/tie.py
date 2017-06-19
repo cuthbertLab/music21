@@ -48,12 +48,12 @@ class Tie(SlottedObjectMixin):
     True
 
     Differences from MusicXML:
-    
+
     *  notes do not need to know if they are tied from a
        previous note.  i.e., you can tie n1 to n2 just with
        a tie start on n1.  However, if you want proper musicXML output
        you need a tie stop on n2.
-    
+
     *  one tie with "continue" implies tied from and tied to.
 
     The tie.style only applies to ties of type 'start' or 'continue' (and then
@@ -77,10 +77,22 @@ class Tie(SlottedObjectMixin):
 
     __slots__ = (
         'placement',
-        'style',        
+        'style',
         'type',
         )
 
+    _DOC_ATTR = {
+        'type': '''
+            The tie type, can be 'start', 'stop', or 'continue'.
+            ''',
+        'style': '''
+            The style of the tie.  Currently can be 'normal', 'dotted', 'dashed' or 'hidden'
+            ''',
+        'placement': '''
+            Whether the tie should go up or down. Can be None, meaning
+            it is unknown or should be determined from context, or 'above' or 'below.
+            ''',
+    }
     ### INITIALIZER ###
     # pylint: disable=redefined-builtin
     def __init__(self, type='start'): #@ReservedAssignment
@@ -88,7 +100,7 @@ class Tie(SlottedObjectMixin):
         if type not in ('start', 'stop', 'continue'):
             raise TieException("Type must be one of 'start', 'stop', or 'continue', not %s" % type)
         # naming this "type" was a mistake, because cannot create a property of this name.
-        
+
         self.type = type
         self.style = "normal"
         self.placement = None # = unknown, can be 'above' or 'below'
@@ -119,7 +131,7 @@ class Tie(SlottedObjectMixin):
 
     def __ne__(self, other):
         '''
-        Tests for object inequality. Needed for pitch comparisons.
+        Tests for object inequality.
 
         >>> a = tie.Tie('start')
         >>> b = tie.Tie('stop')
@@ -130,7 +142,6 @@ class Tie(SlottedObjectMixin):
 
     def __repr__(self):
         return '<music21.tie.Tie %s>' % self.type
-
 
 
 class Test(unittest.TestCase):

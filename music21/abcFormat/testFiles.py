@@ -33,7 +33,7 @@ T: Fyrareprisarn
 O: Jät, Småland
 S: efter August Strömberg
 D: Svensson, Gustafsson mfl - Bålgetingen
-Z: Till abc av Jon Magnusson 100517 
+Z: Till abc av Jon Magnusson 100517
 R: Hambo
 M: 3/4
 L: 1/8
@@ -245,7 +245,7 @@ sicutRosa = """X:1
 T:9v. Sicut rosa
 C:Orlando Lassusio
 O: Bicinia, sive Cantionis
-H: transcribed from the Musica Alamire facsimile of the original 
+H: transcribed from the Musica Alamire facsimile of the original
 H: printed in Antwerp by Petrum Phalesium, 1609
 %%gchordfont Helvetica 12 box
 %%MIDI nobarlines
@@ -265,7 +265,7 @@ _B2 A2 A4 D2 F2 E2 F2 G4 G3 A B2 A2 F2 c2 B2 c2 d2 c3 B d4 c B c A c4 B2 "B"c4 z
 w:- am vir- go Ma- ri- am pro- ge- - - ni- am Ma- ri- am pro- ge- - - - - - - - ni- am ger- mi- na- vit e-
 %4
 d2 e3 d/ c/ B c d A d3 c/ B/ c2 "C"d4-d4 z2 d2 e2 d3 B ^c2 d2 e2 c2 G A B c d2 G4 z2 G2
-w:nim flo- - - - - - - - - - - rem, * qui vi- ta- - -  lem dat o- do- - - - - rem qui 
+w:nim flo- - - - - - - - - - - rem, * qui vi- ta- - -  lem dat o- do- - - - - rem qui
 %5
 A2 G3 E ^F2 G2 A2 c4 B3 A/ G/ A4 HG4 |]
 w:vi- ta- - - lem dat o- do- - - - rem.
@@ -476,7 +476,7 @@ K:G
 
 AB|cdec BcdB|ABAF GFE2|cdec BcdB|c2A2 A2:|
 
-% comment line 
+% comment line
 
 E2E EFE|E2E EFG|\
 M:9/8
@@ -502,9 +502,9 @@ D3 D3 | D6 | D3 D3 | D6 ||
 testPrimitiveTuplet = """M:4/4
 K:E
 T:Test Tuplet Primitve
-(3.c=c^c (5ccc=cc (6ccccc=f (7Bcc^^c=cc^f 
+(3.c=c^c (5ccc=cc (6ccccc=f (7Bcc^^c=cc^f
 
-(3.c2=c2^c2 (3.c2=c2^c2 
+(3.c2=c2^c2 (3.c2=c2^c2
 
 (6c/c/c/c/c/=f/ (6B/c/c/^^c/c/^f/ z4
 
@@ -551,8 +551,8 @@ fz((6:4F,//A,//C//F//A//c// e/d/)dz
 
 #-------------------------------------------------------------------------------
 
-ALL  = [fyrareprisarn, mysteryReel, fullRiggedShip, aleIsDear, kitchGirl, 
-        williamAndNancy, morrisonsJig, hectorTheHero, kingOfTheFairies, 
+ALL  = [fyrareprisarn, mysteryReel, fullRiggedShip, aleIsDear, kitchGirl,
+        williamAndNancy, morrisonsJig, hectorTheHero, kingOfTheFairies,
         sicutRosa, theAleWifesDaughter, theBeggerBoy, theBattleOfTheSnaBas,
 
         draughtOfAle,
@@ -585,7 +585,7 @@ class Test(unittest.TestCase):
         af = abcFormat.ABCFile()
 
         GEX = m21ToXml.GeneralObjectExporter()
-        
+
         for i, tf in enumerate(ALL):
             ah = af.readstr(tf)
             environLocal.printDebug([ah.getTitle()])
@@ -598,7 +598,7 @@ class Test(unittest.TestCase):
             except UnicodeDecodeError as ude:
                 environLocal.warn("About to fail on ABC file #{}".format(i))
                 raise ude
-                
+
 if __name__ == "__main__":
     import music21
     #music21.converter.parse(reelsABC21, format='abc').scores[1].show()

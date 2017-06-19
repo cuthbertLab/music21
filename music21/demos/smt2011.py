@@ -52,7 +52,7 @@ def chordsToAnalysis(chordStream, manifest, scale):
         m.removeByClass(['GeneralNote'])
         # assuming we have measure numbers
 
-    for (measureNumber, chordNumberOrNone, scaleDegree, octaveDisplay,         
+    for (measureNumber, chordNumberOrNone, scaleDegree, octaveDisplay,
         durationTypeDisplay, textDisplay) in manifest:
         # assume measures are in order; replace with different method
         m = chordMeasures[measureNumber-1]
@@ -110,8 +110,10 @@ def exShenker():
     analysis = stream.Score()
     chordReduction = copy.deepcopy(measureTemplate)
     for i, m in enumerate(chordReduction.getElementsByClass('Measure')):
-        mNotes = src.flat.getElementsByOffset(m.offset, 
-            m.offset+m.barDuration.quarterLength, includeEndBoundary=False)        
+        mNotes = src.flat.getElementsByOffset(
+            m.offset,
+            m.offset + m.barDuration.quarterLength,
+            includeEndBoundary=False)
         mNotes.makeChords(minimumWindowSize=4, inPlace=True)
         c = mNotes.flat.notes[0]
         c.duration.type = 'whole'
@@ -121,19 +123,19 @@ def exShenker():
 
     scaleCMajor = scale.MajorScale('c')
 
-    #measureNumber, chordNumberOrNone, scaleDegree, octaveDisplay,         
+    #measureNumber, chordNumberOrNone, scaleDegree, octaveDisplay,
     #    durationTypeDisplay, textDisplay
-    manifest = [(1, None, 3, 5, 'whole', '3'), 
-                (24, None, 2, 5, 'whole', '2'), 
-                (35, None, 1, 5, 'whole', '1'), 
+    manifest = [(1, None, 3, 5, 'whole', '3'),
+                (24, None, 2, 5, 'whole', '2'),
+                (35, None, 1, 5, 'whole', '1'),
                 ]
     analysis1 = chordsToAnalysis(chordReduction, manifest, scaleCMajor)
 
 
-    manifest = [(1, None, 1, 4, 'whole', 'I'), 
-                (24, None, 5, 3, 'whole', 'V'), 
-                (31, None, 4, 4, 'quarter', '--7'), 
-                (35, None, 1, 4, 'whole', 'I'), 
+    manifest = [(1, None, 1, 4, 'whole', 'I'),
+                (24, None, 5, 3, 'whole', 'V'),
+                (31, None, 4, 4, 'quarter', '--7'),
+                (35, None, 1, 4, 'whole', 'I'),
                ]
     analysis2 = chordsToAnalysis(chordReduction, manifest, scaleCMajor)
 

@@ -1,6 +1,6 @@
 """
-webcolors.py by James Bennett.  
-http://pypi.python.org/pypi/webcolors/ 
+webcolors.py by James Bennett.
+http://pypi.python.org/pypi/webcolors/
 License :: OSI Approved :: BSD License
 v.1.4
 
@@ -415,7 +415,7 @@ def normalize_integer_triplet(rgb_triplet):
     (255, 255, 255)
     >>> normalize_integer_triplet((270, -20, 128))
     (255, 0, 128)
-    
+
     """
     return tuple([_normalize_integer_rgb(value) for value in rgb_triplet])
 
@@ -423,9 +423,9 @@ def normalize_integer_triplet(rgb_triplet):
 def _normalize_integer_rgb(value):
     """
     Normalize ``value`` for use in an integer ``rgb()`` triplet, as follows:
-    
+
     * If ``value`` is less than 0, convert to 0.
-    
+
     * If ``value`` is greater than 255, convert to 255.
 
     Examples:
@@ -440,7 +440,7 @@ def _normalize_integer_rgb(value):
     0
     >>> _normalize_integer_rgb(270)
     255
-    
+
     """
     if 0 <= value <= 255:
         return value
@@ -463,10 +463,10 @@ def normalize_percent_triplet(rgb_triplet):
     ('0%', '100%', '0%')
     >>> normalize_percent_triplet(('-10%', '250%', '500%'))
     ('0%', '100%', '100%')
-    
+
     """
     return tuple([_normalize_percent_rgb(value) for value in rgb_triplet])
-    
+
 
 def _normalize_percent_rgb(value):
     """
@@ -491,18 +491,18 @@ def _normalize_percent_rgb(value):
     '100%'
     >>> _normalize_percent_rgb('85.49%')
     '85.49%'
-    
+
     """
     percent = value.split('%')[0]
     percent = float(percent) if '.' in percent else int(percent)
-    
+
     if 0 <= percent <= 100:
         return '%s%%' % percent
     if percent < 0:
         return '0%'
     if percent > 100:
         return '100%'
-    
+
 
 # Conversions from color names to various formats.
 #################################################################

@@ -14,11 +14,11 @@ class Test(unittest.TestCase):
 
     def runTest(self):
         pass
-            
+
 #### thoughts on how to do this...
 #    def xtest001(self):
 #        '''Above G4 do higher pitches tend to be louder?
-#        Is this asking if all pitches above G4 are louder, or if, above G4, 
+#        Is this asking if all pitches above G4 are louder, or if, above G4,
 #        as pitches get higher, are they louder?
 #        '''
 #        from music21 import analysis
@@ -30,7 +30,7 @@ class Test(unittest.TestCase):
 #        notesAbove, notesBelow = analysis.partition(partStream, 'pitch', 'G4')
 ##        notesAbove, notesBelow = analysis.partition(partStream, this.pitch.midiNote > G4.midiNote)
 #
-#        # assuming we want to somehow graph two values, pitch space and 
+#        # assuming we want to somehow graph two values, pitch space and
 #        # dynamics, by creating a table. this table could then be interpolated
 #        # to determine trends
 #        table = analysis.correlate(notesAbove, 'pitchSpace', 'dynamics')
@@ -42,17 +42,17 @@ class Test(unittest.TestCase):
 #        from music21 import converter
 #
 #        partStream = converter.parse("dichterliebe1.xml")
-#        # we are frequently going to need a way to partition data into      
+#        # we are frequently going to need a way to partition data into
 #        # phrases. this will be a very common operation that will
 #        # need a number of different approaches
 #
 #        # a phrase stream is partitioned stream of phrases
-#        # might provide a list of criteria that are used to partition 
+#        # might provide a list of criteria that are used to partition
 #        # phrases
-#        phraseStream = analysis.phraseExtract(partStream, 
+#        phraseStream = analysis.phraseExtract(partStream,
 #                               ['rest', 'slur', 'register'])
 #        for phrase in phraseStream:
-#            phraseNew = phrase.clone() 
+#            phraseNew = phrase.clone()
 #            phraseNew.append(articulations.BreathMark)
 #            # how do we edit/update the old score? assuming that
 #            # the objects are not linked, we need to find and replace
@@ -62,7 +62,7 @@ class Test(unittest.TestCase):
     def xtest003(self):
         '''Add key velocities to some MIDI data that reflect accent levels arising from the meter.
 
-        Modify this to just adjust dynamics based on meter; this should be 
+        Modify this to just adjust dynamics based on meter; this should be
         reflected in musical output
         '''
         from music21 import articulations
@@ -72,7 +72,7 @@ class Test(unittest.TestCase):
         #for part in partStream.partData:
         # a part stream could have an iterator that partitions itself
         # into measure-length part streams
-        for measure in partStream.getElementsByClass('Measure')():  # () ? 
+        for measure in partStream.getElementsByClass('Measure')():  # () ?
             # measure is a partStream isolated for just the desired measure
             # assuming only one meter per measure
             meterObj = measure['meter']
@@ -80,7 +80,7 @@ class Test(unittest.TestCase):
             for offset, accent in meterObj.accentPattern():
                 if accent > 'mf': # assuming symbolic representation
                     # get all relevant elements
-                    subStream = measure.getElementsByOffset(offset, 
+                    subStream = measure.getElementsByOffset(offset,
                                     offset + meterObj.denominator)
                     # get a stream of just dynamics
                     dynamics = subStream.filterClass(articulations.DynamicArticulation)
@@ -110,13 +110,13 @@ class Test(unittest.TestCase):
 #            # pages might be represented as a stream of Page objects
 #            # this could be contained w/n a part stream
 #            pageStream = partStream['pages']
-#            # assuming we have have classes for things on pages, such as 
+#            # assuming we have have classes for things on pages, such as
 #            # titles and other tex annotations
 #            # here, we get these only from the first page
 #            titleCandidates += pageStream[0].getElementsByClass(TextAnnotation)
 #            # an additional slot might be used to store meta data, also
 #            # as a stream
-#            metaStream = partStream['meta'] 
+#            metaStream = partStream['meta']
 #            titleCandidates += metaStream.getElementsByClass(TextAnnotation)
 #            sort.append(titleCandidates)
 #
@@ -135,7 +135,7 @@ class Test(unittest.TestCase):
 #
 #        partStream = converter.parse("dichterliebe1.xml")
 #
-#        # we might look at arpeggios as a type of extractable phrase, 
+#        # we might look at arpeggios as a type of extractable phrase,
 #        # looking fo open spacings, even rhythms, and chordal forms
 #        phraseStream = analysis.phraseExtract(partStream, ['arpeggio'])
 #        newStream = Stream()
@@ -146,12 +146,12 @@ class Test(unittest.TestCase):
 #                chord.addPitch(note.pitch)
 #            chord.duration = phrase.duration
 #            chord.showJazzName = True ## something
-#            chord.showFiguredBass = True ## 
+#            chord.showFiguredBass = True ##
 #            newStream.appendNext(chord)
 #
 #        newStream.append(partStream)  # this puts them in parallel
-#        newStream.show() 
-        
+#        newStream.show()
+
 #    def xtest007(self):
 #        '''Annotate a score identifying possible cadential 6-4 chords.'''
 #
@@ -159,51 +159,51 @@ class Test(unittest.TestCase):
 #
 #        partStream = music21.converter.parse("dichterliebe1.xml")
 #        ## when we have a passing-tone etc. removal program run here...
-#        
+#
 #        chordStream = analysis.phraseExtract(partStream, ['simultaneities'])
 #
 #        # might have many different approaches to key analysls
-#        # all return a stream of keys, with key objects at the appopriate 
+#        # all return a stream of keys, with key objects at the appopriate
 #        # offsets
 #        keyStream = analysis.key(partStream, 'chew.spiralArray')
 #
-#        for i in range(len(chordStream)-1):
+#        for i in range(len(chordStream) - 1):
 #            chordThis = chordStream[i]
-#            chordNext = chordStream[i+1]            
-#            
+#            chordNext = chordStream[i + 1]
+#
 #            # get key at this offset
 #            # here, it is important that the offsets of the chords
 #            # are the same scale as the offsets of the keyStream
 #            # may need a method here that looks for elements that
 #            # are active, not just present
 #            # keys thus do not need a duration
-#        
+#
 #            ### getElementsByOffsetRange....
-#            key = keyStream.getElementsByOffset(chordThis.offset, 
+#            key = keyStream.getElementsByOffset(chordThis.offset,
 #                            chordNext.offset, lastActive=True)
-##            if (common.toRoman(chordThis.scaleDegree(key)) == "V" and 
+##            if (common.toRoman(chordThis.scaleDegree(key)) == "V" and
 ##                chordThis.inversionName == "64" and
-##                common.toRoman(chordThis.scaleDegree(key)) == "I" and 
+##                common.toRoman(chordThis.scaleDegree(key)) == "I" and
 ##                chordThis.inversionName == "53"
 ##                )
-## OR>:::           
-#            if (chordThis.setKey(key) == chordSequenceMatch[0](key) and 
+## OR>:::
+#            if (chordThis.setKey(key) == chordSequenceMatch[0](key) and
 #                chordNext.setKey(key) == chordSequenceMatch[1](key)):
-#                # here it is important that the offsets match that 
+#                # here it is important that the offsets match that
 #                # of the source
 #                # not sure where/how part stream places this
 #                annotation = articulations.Annotation('big cadential moment')
 #                partStream.insert(chordThis.offset, annotation)
 
 #    def xtest008(self):
-#        '''Are dynamic swells (crescendo-diminuendos) more 
+#        '''Are dynamic swells (crescendo-diminuendos) more
 #        common than dips (diminuendos-crescendos)?'''
 #        partStream = music21.converter.parse("dichterliebe1.xml")
-#        
+#
 #        # an analysis package can identify dynamic countours, movements from
 #        # low to high or vice versa, and return these as a stream of
 #        # DynamicMovement objects
-#    
+#
 #        dynMovementStream = analysis.dynamicContour(partStream)
 #        swells = dynMovementStream.getElementsByClass(DynamicCrescendo)
 #        dips = dynMovementStream.getElementsByClass(DynamicDecrescendo)
@@ -241,12 +241,12 @@ class Test(unittest.TestCase):
 
     def xtest013(self):
         '''Calculate changes of listeners' heart-rate from physiological data.
-        
+
         We'll do something different from the Humdrum example which assumes you already
         have the data in spines.  Let's suppose you have the data in a Google Spreadsheet
         that has two columns: time and heart-rate.  We load the data in from the internet.
         We then convert the heart-rate data
-        to a delta value (that is, the change since the last heart-rate measurement). 
+        to a delta value (that is, the change since the last heart-rate measurement).
         Next we add time data to each offset in our score; we then add an editorial attribute
         of "heart-rate" to the note just preceding the heart-rate measurement.
         We can then see if heart-rate is related to the dissonance level of the preceeding
@@ -259,20 +259,20 @@ class Test(unittest.TestCase):
         pass
 
 
-    
+
     def xtest015(self):
         '''Calculate harmonic intervals ignoring unisons.'''
         from collections import defaultdict
         score1 = music21.converter.parse("dichterliebe1.xml")
         monoScore = score1.chordsToNotes()    # returns a new Stream
-        unused_notePairs = monoScore.getAllSimultaneousNotes()  
+        unused_notePairs = monoScore.getAllSimultaneousNotes()
         # returns a list of Tuples intervals = interval.generateFromNotePairs(notePairs)
         intervals2 = defaultdict(lambda:0)
         for thisInt in intervals2:
             if thisInt.name != "P1":
                 intervals2[thisInt.name] += 1
 
-        for key in intervals2.sort(key = 'simpleName'):
+        for key in intervals2.sort(key='simpleName'):
             print(key, intervals2[key])
 
 
@@ -282,12 +282,12 @@ class Test(unittest.TestCase):
         pass
 
     def test017(self):
-        '''Calculate melodic intervals not including intervals 
+        '''Calculate melodic intervals not including intervals
         between the last note of one phrase and the first note of the next phrase.'''
         pass
 
     def test018(self):
-        '''Calculate melodic intervals not including intervals 
+        '''Calculate melodic intervals not including intervals
         between the last note of one phrase and the first note of the next phrase.'''
         pass
 
@@ -359,18 +359,18 @@ class Test(unittest.TestCase):
 
 
     def test035(self):
-        '''Compare the average overall dynamic level between the 
+        '''Compare the average overall dynamic level between the
         exposition and development sections.'''
         pass
 
 
     def test036(self):
-        '''Compare the estimated keys for the 2nd theme in the 
+        '''Compare the estimated keys for the 2nd theme in the
         exposition versus the 2nd theme in the recapitulation.'''
         pass
 
     def test037(self):
-        '''Compare the first phrase of the Exposition with 
+        '''Compare the first phrase of the Exposition with
         the first phrase of the Recapitulation.'''
         pass
 
@@ -379,7 +379,7 @@ class Test(unittest.TestCase):
         pass
 
     def test039(self):
-        '''Contrast the sonorities that occur on the 
+        '''Contrast the sonorities that occur on the
         first versus the third beats in a waltz repertory.'''
         pass
 
@@ -389,7 +389,7 @@ class Test(unittest.TestCase):
 
 
     def test041(self):
-        '''Count the number of ascending major sixth 
+        '''Count the number of ascending major sixth
         intervals that occur in phrases that end on the dominant.'''
         pass
 
@@ -406,7 +406,7 @@ class Test(unittest.TestCase):
         pass
 
     def test045(self):
-        '''Count the number of notes in a work that 
+        '''Count the number of notes in a work that
         belong to the same whole-tone set.'''
         pass
 
@@ -430,9 +430,9 @@ class Test(unittest.TestCase):
         '''Count the number of phrases in the development.'''
         pass
 
- 
-# 
-# 
+
+#
+#
 #     1.    Above G4 do higher pitches tend to be louder?
 #     2.    Add explicit breath marks after each phrase.
 #     3.    Add key velocities to some MIDI data that reflect accent levels arising from the meter.
@@ -440,7 +440,7 @@ class Test(unittest.TestCase):
 #     5.    Alphabetize a list of titles.
 #     6.    Amalgamate arpeggios into chords and display as notation.
 #     7.    Annotate a score identifying possible cadential 6-4 chords.
-#     8.    Are dynamic swells (crescendo-diminuendos) more 
+#     8.    Are dynamic swells (crescendo-diminuendos) more
 #                common than dips (diminuendos-crescendos)?
 #     9.    Are lower pitches likely to be shorter and higher pitches likely to be longer?
 #     10.    Assemble individual parts into a full scores.
@@ -451,7 +451,7 @@ class Test(unittest.TestCase):
 #     15.    Calculate harmonic intervals ignoring unisons.
 #     16.    Calculate harmonic intervals in semitones.
 #     17.    Calculate implied harmonic intervals between parts.
-#     18.    Calculate melodic intervals not including intervals between 
+#     18.    Calculate melodic intervals not including intervals between
 #                the last note of one phrase and the first note of the next phrase.
 #     19.    Calculate pitch-class sets for melodic passages segmented by rests.
 #     20.    Calculate pitch-class sets for melodic passages segmented by slurs/phrases.
@@ -468,19 +468,19 @@ class Test(unittest.TestCase):
 #     31.    Classify vocal vowels as front or back, higher or low.
 #     32.    Compare Beethoven's use of dynamic marking with Brahms's.
 #     33.    Compare orchestration patterns between the exposition and the development.
-#     34.    Compare pitch-class sets used at the beginnings of 
+#     34.    Compare pitch-class sets used at the beginnings of
 #                slurs/phrases versus those used at the ends of slurs/phrases.
-#     35.    Compare the average overall dynamic level between the 
+#     35.    Compare the average overall dynamic level between the
 #                exposition and development sections.
-#     36.    Compare the estimated keys for the 2nd theme 
+#     36.    Compare the estimated keys for the 2nd theme
 #                in the exposition versus the 2nd theme in the recapitulation.
-#     37.    Compare the first phrase of the Exposition 
+#     37.    Compare the first phrase of the Exposition
 #                with the first phrase of the Recapitulation.
 #     38.    Compare the number of syllables in the first and second verses.
-#     39.    Contrast the sonorities that occur on the 
+#     39.    Contrast the sonorities that occur on the
 #                first versus the third beats in a waltz repertory.
 #     40.    Count how many measures contain at least one trill.
-#     41.    Count the number of ascending major sixth 
+#     41.    Count the number of ascending major sixth
 #                intervals that occur in phrases that end on the dominant.
 #     42.    Count the number of barlines in a work.
 #     43.    Count the number of closed-position chords.
@@ -494,14 +494,14 @@ class Test(unittest.TestCase):
 #     51.    Count the number of phrases that begin on the subdominant pitch.
 #     52.    Count the number of phrases that end on the subdominant pitch.
 #     53.    Count the number of sonorities where the oboe and bassoon sound concurrently.
-#     54.    Count the number of subdominant pitches in the soprano voice 
-#                that are approached by rising thirds or sixths and 
+#     54.    Count the number of subdominant pitches in the soprano voice
+#                that are approached by rising thirds or sixths and
 #                that coincide with a dominant seventh chord.
-#     55.    Count the number of tonic pitches that are approached by a 
-#                weak-to-strong context versus the number of 
+#     55.    Count the number of tonic pitches that are approached by a
+#                weak-to-strong context versus the number of
 #                tonic pitches approached by a strong-to-weak context.
 #     56.    Count the number of works by various composers.
-#     57.    Count the proportion of phrase endings in music by 
+#     57.    Count the proportion of phrase endings in music by
 #                Alban Berg where the phrase ends on either a major or minor chord.
 #     58.    Create an inventory of three-note long/short duration patterns.
 #     59.    Determine fret-board patterns that are similar to some specified finger combination.
@@ -509,10 +509,10 @@ class Test(unittest.TestCase):
 #     61.    Determine how much longer a passage is when all the repeats are played.
 #     62.    Determine how often a pitch is followed immediately by the same pitch.
 #     63.    Determine how often both the oboe and bassoon are inactive.
-#     64.    Determine the average semitone distance separating 
+#     64.    Determine the average semitone distance separating
 #                the cantus and altus voices in Lassus.
 #     65.    Determine the complement for some pitch-class set.
-#     66.    Determine the frequency of light-related words 
+#     66.    Determine the frequency of light-related words
 #                in the monastic offices for Thomas of Canterbury.
 #     67.    Determine the highest note in the trumpet part in measure 29.
 #     68.    Determine the longest duration of a note that is marked staccato.
@@ -523,17 +523,17 @@ class Test(unittest.TestCase):
 #     73.    Determine the total amount of time the trumpet plays.
 #     74.    Determine the total duration of a work for a given metronome marking.
 #     75.    Determine the total nominal duration of Gould's performance of a work.
-#     76.    Determine what transposition of a clarinet melody 
+#     76.    Determine what transposition of a clarinet melody
 #                minimizes the number of tones in the throat register.
-#     77.    Determine whether 90 percent of the notes in a 
+#     77.    Determine whether 90 percent of the notes in a
 #                work by Bach use just two durations (such as eighths and sixteenths).
 #     78.    Determine whether a composer uses B-A-C-H more often than would be expected by chance.
 #     79.    Determine whether a work tends to begin quietly and end loudly, or vice versa.
 #     80.    Determine whether any arpeggios form an augmented sixth chord.
 #     81.    Determine whether Bach tends to avoid or prefer augmented eleventh harmonic intervals.
 #     82.    Determine whether Bartok's articulation marks changed over his career.
-#     83.    Determine whether Beethoven tends to link activity 
-#                in the chalemeau register of the clarinet 
+#     83.    Determine whether Beethoven tends to link activity
+#                in the chalemeau register of the clarinet
 #                with low register activity in the strings.
 #     84.    Determine whether descending melodic seconds are more common than ascending seconds.
 #     85.    Determine whether descending minor seconds are more likely to be fah-mi or doh-ti.
@@ -543,28 +543,28 @@ class Test(unittest.TestCase):
 #     89.    Determine whether high pitches tend to have longer durations than low pitches.
 #     90.    Determine whether Liszt uses a greater variety of harmonies than does Chopin.
 #     91.    Determine whether Monteverdi used roughly equivalent numbers of sharps and flats.
-#     92.    Determine whether notes at the ends of phrases tend 
+#     92.    Determine whether notes at the ends of phrases tend
 #                to be longer than notes at the beginnings of phrases.
-#     93.    Determine whether Schoenberg tended to use simultaneities 
+#     93.    Determine whether Schoenberg tended to use simultaneities
 #                that have more semitone relations and fewer tritone relations.
-#     94.    Determine whether secondary dominants are more likely 
+#     94.    Determine whether secondary dominants are more likely
 #                to occur on the third beat of triple meter works.
 #     95.    Determine whether semitone trills tend to be longer or shorter than whole-tone trills.
-#     96.    Determine whether submediant chords are more likely 
+#     96.    Determine whether submediant chords are more likely
 #                to be approached in a strong-to-weak or weak-to-strong rhythmic context.
-#     97.    Determine whether the first pitch in a phrase is 
+#     97.    Determine whether the first pitch in a phrase is
 #                lower than the last pitch in the phrase.
-#     98.    Determine whether the initial phrase in a work 
+#     98.    Determine whether the initial phrase in a work
 #                tends to be shorter than the final phrase.
-#     99.    Determine whether the subdominant pitch is used 
+#     99.    Determine whether the subdominant pitch is used
 #                less often in pop melodies than in French chanson.
-#     100.    Determine whether the words `high,' `hoch,' or `haut' 
+#     100.    Determine whether the words `high,' `hoch,' or `haut'
 #                tend to coincide with higher pitches in a vocal work.
 #     101.    Determine whether there are any notes in the bassoon part.
-#     102.    Determine whether tonic pitches tend to be followed 
+#     102.    Determine whether tonic pitches tend to be followed
 #                by a greater variety of melodic intervals than precedes it.
 #     103.    Determine whether two works have similar vocabularies for their vocal texts.
-#     104.    Determine which English translation of a Schubert 
+#     104.    Determine which English translation of a Schubert
 #                text best preserves the vowel coloration.
 #                Use CMU Dict -- IPA dictionary.
 #     105.    Determine which of two MIDI performances exhibits more dynamic range.
@@ -633,7 +633,7 @@ class Test(unittest.TestCase):
 #     168.    Find all works that contain a change of key and a change of meter.
 #     169.    Find all works that contain a change of key.
 #     170.    Find other works that have the same instrumentation as a given work.
-#     171.    For some flute work, compare fingering 
+#     171.    For some flute work, compare fingering
 #                transitions for pre-Boehm and modern instruments.
 #     172.    Generate a concordance of lyrics for some vocal corpus.
 #     173.    Generate a list of all composers for some group of scores.
@@ -643,16 +643,16 @@ class Test(unittest.TestCase):
 #     177.    Generate a prime transposition for some tone-row.
 #     178.    Generate a set matrix for a given tone row.
 #     179.    Generate a standard MIDI file.
-#     180.    Generate an inventory of pitch-class sets for 
+#     180.    Generate an inventory of pitch-class sets for
 #                melodic passages segmented into groups of three pitches.
 #     181.    Generate an inventory of the patterns of stressed/unstressed syllables for some work.
 #     182.    Generate an inversion for some tone-row.
 #     183.    Group notes together by their beaming.
 #     184.    Identify all D major triads in a work.
 #     185.    Identify all encoded 17th century organ works in 6/8 meter.
-#     186.    Identify all encoded 17th century organ works that do 
+#     186.    Identify all encoded 17th century organ works that do
 #                not contain passages in 6/8 meter.
-#     187.    Identify all encoded works that were written in the 
+#     187.    Identify all encoded works that were written in the
 #                17th century, or were written for organ, or were written in 6/8 meter.
 #     188.    Identify all meter signatures in a score.
 #     189.    Identify all scores containing a tuba but not a trumpet.
@@ -666,14 +666,14 @@ class Test(unittest.TestCase):
 #     197.    Identify any cross-relations.
 #     198.    Identify any differences between two vocal texts.
 #     199.    Identify any diminished octave intervals in Beethoven's piano sonatas.
-#     200.    Identify any eighth-notes that contain at least one flat and 
+#     200.    Identify any eighth-notes that contain at least one flat and
 #                whose pitch lies within an octave of middle C.
 #     201.    Identify any French sixth chords.
 #     202.    Identify any German sixth chords.
 #     203.    Identify any Italian sixth chords.
 #     204.    Identify any Landini cadences.
 #     205.    Identify any major or minor ninths melodic intervals.
-#     206.    Identify any melody that contains both an ascending 
+#     206.    Identify any melody that contains both an ascending
 #                and descending major sixth interval.
 #     207.    Identify any Neapolitan sixth chord that is missing the fifth of the chord.
 #     208.    Identify any Neapolitan sixth chords spelled enharmonically on the raised tonic.
@@ -701,7 +701,7 @@ class Test(unittest.TestCase):
 #     229.    Identify crossing of parts.
 #     230.    Identify overlapping of parts.
 #     231.    Identify how frequently the dominant pitch occurs in the horn parts.
-#     232.    Identify how often a high subdominant note in a long-short-long rhythm is 
+#     232.    Identify how often a high subdominant note in a long-short-long rhythm is
 #                followed by a low submediant in a long-long-short context.
 #     233.    Identify how often the flute is resting when the trumpet is active.
 #     234.    Identify how the melodic intervals in measures 8 to 32.
@@ -732,12 +732,12 @@ class Test(unittest.TestCase):
 #     259.    Identify the number of notes per word for some score.
 #     260.    Identify the number of syllables per phrase for some work.
 #     261.    Identify the pitch-class sets used for vertical sonorities.
-#     262.    Identify the proportion of intervals 
+#     262.    Identify the proportion of intervals
 #                formed by the oboe and flute notes that are doubled.
 #     263.    [ dup of 262 ]
 #     264.    Identify the shortest note in a score.
 #     265.    Identify the stressed/unstressed pattern of syllables for some work.
-#     266.    Identify those measures containing a ii-IV progression that were 
+#     266.    Identify those measures containing a ii-IV progression that were
 #                preceded by a iii-V progression in the previous measure.
 #     267.    Identify those measures containing a iii-V progression.
 #     268.    Identify those notes that begin a phrase, but are not rests.
@@ -750,12 +750,12 @@ class Test(unittest.TestCase):
 #     275.    Identify whether any score contains an `Andante' section.
 #     276.    Identify whether drinking songs are more apt to be in triple meter.
 #     277.    Identify whether dynamics are gradual or terraced.
-#     278.    Identify whether large leaps involving 
+#     278.    Identify whether large leaps involving
 #                chromatically-altered tones tend to have longer durations on the altered tone.
 #     279.    Identify whether the dominant is more commonly approached from above or from below.
 #     280.    Identify whether the subdominant occurs more frequently in one repertory than another.
 #     281.    Identify whether there are any tritone melodic intervals in the vocal parts.
-#     282.    Identify whether titles containing the 
+#     282.    Identify whether titles containing the
 #                word `death' or more likely to be in minor keys.
 #     283.    Identify whether two songs have identical lyrics.
 #     284.    Identify whether two works are identical apart from transposition.
@@ -781,7 +781,7 @@ class Test(unittest.TestCase):
 #     304.    Locate any parallel fifths between the bass and alto voices.
 #     305.    Locate instances of the pitch sequence D-S-C-H in Shostakovich's music.
 #     306.    Locate occurences of the word `Liebe' in some lyrics.
-#     307.    Locate submediant pitches that are approached by 
+#     307.    Locate submediant pitches that are approached by
 #                an ascending major third followed by a descending major second.
 #     308.    Locate the most emotionally charged words in some vocal text.
 #     309.    Mark all instances of deceptive cadences.
@@ -804,7 +804,7 @@ class Test(unittest.TestCase):
 #     326.    Print a transposed version of the accompaniment parts.
 #     327.    Rearrange a score so the measures are in reverse order.
 #     328.    Renumber all measures in a score.
-#     329.    Scan a melody for passages that are similar in 
+#     329.    Scan a melody for passages that are similar in
 #                rhythm and pitch-contour to a given theme.
 #     330.    Scan a melody for pitch motions that are similar to a given theme.
 #     331.    Search for text phrases in the lyrics to some song.

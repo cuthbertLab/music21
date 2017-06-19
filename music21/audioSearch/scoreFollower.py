@@ -106,7 +106,7 @@ class ScoreFollower(object):
 
         >>> from music21.audioSearch import scoreFollower
         >>> scoreNotes = " ".join(["c4", "d", "e", "f", "g", "a", "b", "c'", "c", "e",
-        ...     "g", "c'", "a", "f", "d", "c#", "d#", "f#","c", "e", "g", "c'",
+        ...     "g", "c'", "a", "f", "d", "c#", "d#", "f#", "c", "e", "g", "c'",
         ...     "a", "f", "d", "c#", "d#", "f#"])
         >>> scNotes = converter.parse("tinynotation: 4/4 " + scoreNotes, makeNotation=False)
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
@@ -534,7 +534,7 @@ class ScoreFollower(object):
         number = int(listOfParts[position].id)
 
         if self.silencePeriod is True and self.silencePeriodCounter < 5:
-            # print(lastCountdown, self.countdown, lastNotePosition, 
+            # print(lastCountdown, self.countdown, lastNotePosition,
             #    beginningData[number], lengthData[number])
             environLocal.printDebug("All rest period")
             self.countdown -= 1

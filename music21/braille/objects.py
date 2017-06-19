@@ -28,7 +28,7 @@ class BrailleTranscriptionHelper(Music21Object):
 class BrailleSegmentDivision(BrailleTranscriptionHelper):
     '''
     Represents that a segment must divide at this point.
-    
+
     >>> bsd = braille.objects.BrailleSegmentDivision()
     >>> bsd
     <music21.braille.objects.BrailleSegmentDivision object at 0x10afc1a58>

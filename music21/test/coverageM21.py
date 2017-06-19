@@ -9,7 +9,6 @@
 # Copyright:    Copyright © 2014-15 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 from music21.ext import six
 
 omit_modules = [
@@ -25,7 +24,7 @@ omit_modules = [
                 'music21/alpha/*', #trecento/tonality.py'
                 ]
 
-# THESE ARE NOT RELEVANT FOR coveralls.io -- edit .coveragerc
+# THESE ARE NOT RELEVANT FOR coveralls.io -- edit .coveragerc to change that
 exclude_lines = [
                 r'\s*import music21\s*',
                 r'\s*music21.mainTest\(\)\s*',
@@ -33,8 +32,8 @@ exclude_lines = [
                 r'class TestExternal.*',
                 ]
 
-def getCoverage():    
-    if six.PY2:
+def getCoverage():
+    if six.PY2: # PY3 and sys.version_info.minor == 6:
         try:
             import coverage
             cov = coverage.coverage(omit=omit_modules)
