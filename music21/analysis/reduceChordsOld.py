@@ -363,7 +363,6 @@ class TestExternal(unittest.TestCase):
         # fix clef
         fixClef = True
         if fixClef:
-            from music21 import clef
             startClefs = c.parts[1].getElementsByClass('Measure')[0].getElementsByClass('Clef')
             if startClefs:
                 clef1 = startClefs[0]
