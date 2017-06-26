@@ -142,9 +142,12 @@ class Harmony(chord.Chord):
     >>> h
     <music21.harmony.ChordSymbol B-/D add 4>
 
-    >>> p = harmony.ChordSymbol(root='C', bass='E', kind = 'major')
-    >>> p
+    >>> c6 = harmony.ChordSymbol(root='C', bass='E', kind = 'major')
+    >>> c6
     <music21.harmony.ChordSymbol C/E>
+    >>> c6.writeAsChord = True
+    >>> c6
+    <music21.harmony.ChordSymbol C/E: E G C>
 
     >>> h = harmony.ChordSymbol('C7/E')
     >>> h.root()
@@ -213,7 +216,8 @@ class Harmony(chord.Chord):
     def __repr__(self):
         summary = self.figure
         if self.writeAsChord:
-            summary = self.pitches
+            summary += ': '
+            summary += ' '.join([p.name for p in self.pitches])
         return '<music21.harmony.{0} {1}>'.format(
                 self.__class__.__name__,
                 summary,
