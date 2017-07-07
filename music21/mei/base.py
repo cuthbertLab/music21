@@ -1016,8 +1016,9 @@ def _keySigFromAttrs(elem):
                        mode=elem.get('key.mode', ''))
     else:
         # @key.sig, @key.mode
+        # If @key.mode is null, assume it is a 'major' key (default for ks.asKey)
         ks = key.KeySignature(sharps=_sharpsFromAttr(elem.get('key.sig')))
-        return ks.asKey(mode=elem.get('key.mode'))
+        return ks.asKey(mode=elem.get('key.mode', 'major'))
 
 
 def _transpositionFromAttrs(elem):
