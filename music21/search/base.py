@@ -447,15 +447,17 @@ def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
     Each note gets one byte and encodes up from -13 to 13 (all notes > octave are 13 or -13)
 
 
-    >>> s = converter.parse("tinynotation: 3/4 c4 d8~ d16 r16 F8 F#8 a'8 b-2.")
+    >>> s = converter.parse("tinynotation: 3/4 c4 d8~ d16 r16 F8 F#8 F8 a'8 b-2")
     >>> sn = s.flat.notesAndRests.stream()
     >>> streamString = search.translateIntervalsAndSpeed(sn)
     >>> print(streamString)
-    Ib RH<9
+    Ib RHJ<9
+    >>> print([ord(x) for x in streamString])
+    [73, 98, 32, 82, 72, 74, 60, 57]
     >>> len(streamString)
-    7
+    8
 
-    If returnLastTuple is True, returns a triplet of whether the last note
+    If returnMeasures is True, returns a triplet of whether the last note
     was a rest, whether the last note was tied, what the last quarterLength was, and what the
     last pitches' midi number was
 
@@ -465,7 +467,7 @@ def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
     >>> streamString == streamString2
     True
     >>> measures
-    [1, 1, 1, 1, 1, 2, 2]
+    [1, 1, 1, 1, 1, 2, 2, 2]
     '''
     b = []
     measures = []
