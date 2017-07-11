@@ -319,6 +319,7 @@ class HumdrumDataCollection(object):
             hdc = HumdrumDataCollection(dc)
             sc = hdc.stream
             sc.id = 'section_' + str(i + 1)
+            sc.metadata.number = i + 1
             opus.append(sc)
 
         self._storedStream = opus

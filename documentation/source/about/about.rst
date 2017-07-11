@@ -112,6 +112,8 @@ to this project.  Their contributions and generosity are greatly appreciated.
    Her website contains all these chorales in additional formats.  
    Any discoveries we make regarding these chorales are done in her memory.
 
+* Bret Aarden for kindly contributing his conversions of Palestrina Mass corpus to `music21`.
+
 * Walter B. Hewlett and Craig Sapp of Stanford's CCARH for support.
 
 * `Justin London`_ compiled and maintained the list of Second-Viennese 
@@ -127,7 +129,7 @@ to this project.  Their contributions and generosity are greatly appreciated.
    encodings of the Essen folksong database with music21.
 
 * `Bryen Travis`_ has kindly gave permission to use his collection of 
-   Bach MIDI data in music21.
+   Bach MIDI data in `music21`.
 
 * `Project Gutenberg`_ houses public domain music, including the quartets of Beethoven, 
   Haydn, and Mozart, in musicxml format which we have been able to include in music21.
@@ -154,10 +156,10 @@ How to Contribute
 We are always interested in working with interested musicologists, 
 programmers, psychologists, composers, game-designers,
 performers, amateur music enthusiasts, etc.  In particular, we're interested 
-in hearing about how music21 helped you
-advance your work ... or in problems with music21 itself or contributions you've made.  
+in hearing about how `music21` helped you
+advance your work ... or in problems with `music21` itself or contributions you've made.  
 
-You can contact the larger music21 community through the `music21 list`_.
+You can contact the larger `music21` community through the `music21 list`_.
 
 .. _music21 list: http://groups.google.com/group/music21list
 
@@ -172,7 +174,7 @@ Licensing and Copyright
 The `music21` Toolkit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Music21 is Copyright (c) 2006-2016, Michael Scott Cuthbert and cuthbertLab.  
+Music21 is Copyright (c) 2006-2017, Michael Scott Cuthbert and cuthbertLab.  
 Music21 code (excluding content encoded in the corpus) is 
 free and open-source software, licensed under the Lesser GNU Public License (LGPL) or the
 BSD License.
@@ -180,7 +182,7 @@ BSD License.
 The `music21` Corpus
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The LGPL/BSD music21 software is distributed with a corpus of encoded 
+The LGPL/BSD `music21` software is distributed with a corpus of encoded 
 compositions which are distributed 
 with the permission of the encoders (and, where needed, the composers 
 or arrangers) and where permitted 

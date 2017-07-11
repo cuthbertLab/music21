@@ -269,6 +269,8 @@ class StrongAccent(Accent):
     >>> a.pointDirection
     'up'
     >>> a.pointDirection = 'down'
+    >>> a.pointDirection
+    'down'
     '''
     def __init__(self):
         super(StrongAccent, self).__init__()

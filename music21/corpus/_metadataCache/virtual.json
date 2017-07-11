@@ -9,7 +9,7 @@
               "_workIds": {
                 "movementName": {
                   "__attr__": {
-                    "_data": "m21-4.0.4-112d8da260908b23717e5c763f8c38c3.xml"
+                    "_data": "m21-4.0.7-112d8da260908b23717e5c763f8c38c3.xml"
                   },
                   "__class__": "music21.metadata.primitives.Text"
                 },
@@ -115,7 +115,7 @@
               "_workIds": {
                 "movementName": {
                   "__attr__": {
-                    "_data": "m21-4.0.4-73c69954b59e5b98278400657b88503a.xml"
+                    "_data": "m21-4.0.7-73c69954b59e5b98278400657b88503a.xml"
                   },
                   "__class__": "music21.metadata.primitives.Text"
                 }
@@ -157,7 +157,7 @@
               "_workIds": {
                 "movementName": {
                   "__attr__": {
-                    "_data": "m21-4.0.4-caa4768738c4d8813ce3f78b682572b8.xml"
+                    "_data": "m21-4.0.7-caa4768738c4d8813ce3f78b682572b8.xml"
                   },
                   "__class__": "music21.metadata.primitives.Text"
                 }
@@ -199,7 +199,7 @@
               "_workIds": {
                 "movementName": {
                   "__attr__": {
-                    "_data": "m21-4.0.4-43f075dbbe4328402234e85dc71d6332.xml"
+                    "_data": "m21-4.0.7-43f075dbbe4328402234e85dc71d6332.xml"
                   },
                   "__class__": "music21.metadata.primitives.Text"
                 }
@@ -241,7 +241,7 @@
               "_workIds": {
                 "movementName": {
                   "__attr__": {
-                    "_data": "m21-4.0.4-355cf399875d46b3ea75a6086d9e1caf.xml"
+                    "_data": "m21-4.0.7-355cf399875d46b3ea75a6086d9e1caf.xml"
                   },
                   "__class__": "music21.metadata.primitives.Text"
                 }
@@ -322,7 +322,7 @@
               "_workIds": {
                 "movementName": {
                   "__attr__": {
-                    "_data": "m21-4.0.4-75a4d45be4c266a1f7d9d6491e33ca5a.xml"
+                    "_data": "m21-4.0.7-75a4d45be4c266a1f7d9d6491e33ca5a.xml"
                   },
                   "__class__": "music21.metadata.primitives.Text"
                 }
@@ -364,7 +364,7 @@
               "_workIds": {
                 "movementName": {
                   "__attr__": {
-                    "_data": "m21-4.0.4-7a4081e06d963e526a925e5671704e90.xml"
+                    "_data": "m21-4.0.7-7a4081e06d963e526a925e5671704e90.xml"
                   },
                   "__class__": "music21.metadata.primitives.Text"
                 }
@@ -406,7 +406,7 @@
               "_workIds": {
                 "movementName": {
                   "__attr__": {
-                    "_data": "m21-4.0.4-a5574e2fdd8974f6eac9998f724bccfe.xml"
+                    "_data": "m21-4.0.7-a5574e2fdd8974f6eac9998f724bccfe.xml"
                   },
                   "__class__": "music21.metadata.primitives.Text"
                 }
@@ -448,7 +448,7 @@
               "_workIds": {
                 "movementName": {
                   "__attr__": {
-                    "_data": "m21-4.0.4-09037b882cbace8c89188abc2de880b1.xml"
+                    "_data": "m21-4.0.7-09037b882cbace8c89188abc2de880b1.xml"
                   },
                   "__class__": "music21.metadata.primitives.Text"
                 }
@@ -489,6 +489,6 @@
   "__version__": [
     4,
     0,
-    4
+    7
   ]
 }

@@ -208,7 +208,7 @@ class MetadataCachingJob(object):
         # is only a single source file
         try:
             for scoreNumber, score in enumerate(parsedObject.scores):
-                self.parseOpusScore(score, scoreNumber)
+                self.parseScoreInsideOpus(score, scoreNumber)
                 del score  # for memory conservation
         except Exception as exception: # wide catch is fine. pylint: disable=broad-except
             environLocal.warn(
@@ -225,7 +225,7 @@ class MetadataCachingJob(object):
             )
         self.results.append(metadataEntry)
 
-    def parseOpusScore(self, score, scoreNumber):
+    def parseScoreInsideOpus(self, score, scoreNumber):
         # scoreNumber is a zeroIndexed value.
         # score.metadata.number is the retrieval code; which is
         # probably 1 indexed, and might have gaps

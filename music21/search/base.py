@@ -5,16 +5,20 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2011-2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2013, 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
 base classes for searching scores.
+
+See User's Guide, Chapter 43: Searching in and Among Scores for details.
 '''
 import copy
 import difflib
 import math
 import unittest
+
+from music21.ext.more_itertools import windowed
 
 from music21 import base as m21Base
 from music21 import exceptions21
@@ -25,8 +29,8 @@ class WildcardDuration(duration.Duration):
     a wildcard duration (it might define a duration
     in itself, but the methods here will see that it
     is a wildcard of some sort)
-
-    TODO: Write
+    
+    No difference from any other duration.
     '''
     pass
 
@@ -47,7 +51,43 @@ class Wildcard(m21Base.Music21Object):
         m21Base.Music21Object.__init__(self)
         self.duration = WildcardDuration()
 
-def rhythmicSearch(thisStream, searchStream):
+def streamSearchBase(thisStreamOrIterator, searchList, algorithm=None):
+    '''
+    A basic search function that is used by other search mechanisms,
+    which takes in a stream or StreamIterator and a searchList or stream
+    and an algorithm to run on each pair of elements to determine if they match.
+    '''
+    if algorithm is None:
+        raise SearchException('algorithm must be a function not None')
+
+    if 'StreamIterator' in thisStreamOrIterator.classes:
+        thisStreamIterator = thisStreamOrIterator
+    else:    
+        thisStreamIterator = thisStreamOrIterator.recurse()
+
+    streamIteratorEls = list(thisStreamIterator)
+    streamLength = len(streamIteratorEls)
+    searchLength = len(searchList)
+    if searchLength == 0:
+        raise SearchException('the search Stream or list cannot be empty')
+
+    foundEls = []
+    if searchLength > streamLength:
+        return foundEls
+    
+    for startPosition, streamEls in enumerate(windowed(streamIteratorEls, searchLength)):
+        for j in range(searchLength):
+            streamEl = streamEls[j]
+            searchEl = searchList[j]
+            result = algorithm(streamEl, searchEl)
+            if not result:
+                break
+        if result:
+            foundEls.append(startPosition)
+    return foundEls
+
+
+def rhythmicSearch(thisStreamOrIterator, searchList):
     '''
     Takes two streams -- the first is the stream to be searched and the second
     is a stream of elements whose rhythms must match the first.  Returns a list
@@ -59,31 +99,38 @@ def rhythmicSearch(thisStream, searchStream):
 
     Example 1: First we will set up a simple stream for searching:
 
-
-    >>> thisStream = converter.parse("tinynotation: 3/4 c4. d8 e4 g4. a8 f4. c4.").flat
+    >>> thisStream = converter.parse("tinynotation: 3/4 c4. d8 e4 g4. a8 f4. c4. r4")
     >>> thisStream.show('text')
-    {0.0} <music21.clef.TrebleClef>
-    {0.0} <music21.meter.TimeSignature 3/4>
-    {0.0} <music21.note.Note C>
-    {1.5} <music21.note.Note D>
-    {2.0} <music21.note.Note E>
-    {3.0} <music21.note.Note G>
-    {4.5} <music21.note.Note A>
-    {5.0} <music21.note.Note F>
-    {6.5} <music21.note.Note C>
-    {8.0} <music21.bar.Barline style=final>
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 3/4>
+        {0.0} <music21.note.Note C>
+        {1.5} <music21.note.Note D>
+        {2.0} <music21.note.Note E>
+    {3.0} <music21.stream.Measure 2 offset=3.0>
+        {0.0} <music21.note.Note G>
+        {1.5} <music21.note.Note A>
+        {2.0} <music21.note.Note F>
+    {6.0} <music21.stream.Measure 3 offset=6.0>
+        {0.5} <music21.note.Note C>
+        {2.0} <music21.note.Rest rest>
+        {3.0} <music21.bar.Barline style=final>
 
     Now we will search for all dotted-quarter/eighth elements in the Stream:
+
+    >>> thisStreamIter = thisStream.recurse().notes
 
     >>> searchStream1 = stream.Stream()
     >>> searchStream1.append(note.Note(quarterLength=1.5))
     >>> searchStream1.append(note.Note(quarterLength=0.5))
-    >>> l = search.rhythmicSearch(thisStream, searchStream1)
+
+    >>> l = search.rhythmicSearch(thisStreamIter, searchStream1)
     >>> l
-    [2, 5]
-    >>> stream.Stream(thisStream[5:7]).show('text')
-    {3.0} <music21.note.Note G>
-    {4.5} <music21.note.Note A>
+    [0, 3]
+    >>> stream.Stream(thisStreamIter[3:5]).show('text')
+    {0.0} <music21.note.Note G>
+    {1.5} <music21.note.Note A>
+    
 
 
     Slightly more advanced search: we will look for any instances of eighth,
@@ -96,17 +143,16 @@ def rhythmicSearch(thisStream, searchStream):
     >>> searchStream2.append(note.Note(quarterLength=0.5))
     >>> searchStream2.append(search.Wildcard())
     >>> searchStream2.append(note.Note(quarterLength=1.5))
-    >>> l = search.rhythmicSearch(thisStream, searchStream2)
+    >>> l = search.rhythmicSearch(thisStreamIter, searchStream2)
     >>> l
-    [3, 6]
+    [1, 4]
     >>> for found in l:
-    ...     thisStream[found].lyric = "*"
+    ...     thisStreamIter[found].lyric = "*"
     >>> #_DOCS_SHOW thisStream.show()
 
 
     .. image:: images/searchRhythmic1.*
         :width: 221
-
 
     Now we can test the search on a real dataset and show the types
     of preparation that are needed to make it most likely a success.
@@ -121,16 +167,18 @@ def rhythmicSearch(thisStream, searchStream):
     >>> term1results = []
     >>> term2results = []
     >>> for p in grave.parts:
-    ...    pf = p.flat.stripTies()  # consider tied notes as one long note
+    ...    pf = p.flat.stripTies().notesAndRests  # consider tied notes as one long note
     ...    temp1 = search.rhythmicSearch(pf, searchStream1)
     ...    temp2 = search.rhythmicSearch(pf, searchStream2)
-    ...    for found in temp1: term1results.append(found)
-    ...    for found in temp2: term2results.append(found)
+    ...    for found in temp1: 
+    ...        term1results.append(found)
+    ...    for found in temp2: 
+    ...        term2results.append(found)
     >>> term1results
     [0, 7, 13, 21, 42, 57, 64, 66, 0, 5, 7, 19, 21, 40, 46, 63, 0, 8, 31, 61, 69, 71, 73, 97]
     >>> term2results
     [5, 29, 95]
-    >>> float(len(term1results))/len(term2results)
+    >>> float(len(term1results)) / len(term2results)
     8.0
 
 
@@ -139,39 +187,89 @@ def rhythmicSearch(thisStream, searchStream):
     >>> s = stream.Stream()
     >>> search.rhythmicSearch(pf, s)
     Traceback (most recent call last):
-    music21.search.base.SearchException: the search Stream cannot be empty
+    music21.search.base.SearchException: the search Stream or list cannot be empty
 
     why doesn't this work?  thisStream[found].expressions.append(expressions.TextExpression("*"))
-
     '''
+    def rhythmAlgorithm(streamEl, searchEl):
+        if "WildcardDuration" in searchEl.duration.classes:
+            return True
+        if searchEl.duration.quarterLength != streamEl.duration.quarterLength:
+            return False
+        return True
 
-    searchLength = len(searchStream)
-    if searchLength == 0:
-        raise SearchException('the search Stream cannot be empty')
-    streamLength = len(thisStream)
-    foundEls = []
-    for start in range(1 + streamLength - searchLength):
-        #miniStream = thisStream[start:start + searchLength]
-        foundException = False
-        for j in range(searchLength):
-            #x = searchStream[j].duration
-            if "WildcardDuration" in searchStream[j].duration.classes:
-                continue
-            elif searchStream[j].duration.quarterLength != thisStream[start +
-                                                                      j].duration.quarterLength:
-                foundException = True
-                break
-        if foundException is False:
-            foundEls.append(start)
-    return foundEls
+    return streamSearchBase(thisStreamOrIterator, searchList, algorithm=rhythmAlgorithm)
+
+    
+def noteNameSearch(thisStreamOrIterator, searchList):
+    '''
+    >>> thisStream = converter.parse("tinynotation: 3/4 c4 d8 e c d e f c D E c c4 d# e")
+    >>> searchList = [note.Note('C'), note.Note('D'), note.Note('E')]
+    >>> thisStreamIter = thisStream.recurse().notes
+    
+    >>> search.noteNameSearch(thisStreamIter, searchList)
+    [0, 3, 7]
+    >>> searchList2 = [note.Note('C'), search.Wildcard(), note.Note('E')]
+    >>> search.noteNameSearch(thisStreamIter, searchList2)
+    [0, 3, 7, 11]
+    '''
+    def noteNameAlgorithm(streamEl, searchEl):
+        if 'Wildcard' in searchEl.classes:
+            return True
+        if not hasattr(searchEl, 'name'):
+            return False
+        if not hasattr(streamEl, 'name'):
+            return False
+        
+        if searchEl.name != streamEl.name:
+            return False
+        return True
+
+    return streamSearchBase(thisStreamOrIterator, searchList, algorithm=noteNameAlgorithm)
+
+
+def noteNameRhythmSearch(thisStreamOrIterator, searchList):
+    '''
+    >>> thisStream = converter.parse("tinynotation: 3/4 c4 d8 e c d e f c D E c c4 d# e")
+    >>> searchList = [note.Note('C'), note.Note('D'), note.Note('E')]
+    >>> for n in searchList:
+    ...     n.duration.type = 'eighth'
+    >>> thisStreamIter = thisStream.recurse().notes
+    
+    >>> search.noteNameRhythmSearch(thisStreamIter, searchList)
+    [3, 7]
+    
+    >>> searchList[0].duration = search.WildcardDuration()
+    >>> search.noteNameRhythmSearch(thisStreamIter, searchList)
+    [0, 3, 7]
+    '''
+    def noteNameRhythmAlgorithm(streamEl, searchEl):
+        if 'Wildcard' in searchEl.classes:
+            return True
+        if not hasattr(searchEl, 'name'):
+            return False
+        if not hasattr(streamEl, 'name'):
+            return False
+        
+        if searchEl.name != streamEl.name:
+            return False
+
+        if "WildcardDuration" in searchEl.duration.classes:
+            return True
+        if searchEl.duration.quarterLength != streamEl.duration.quarterLength:
+            return False
+        
+        return True
+
+    return streamSearchBase(thisStreamOrIterator, searchList, algorithm=noteNameRhythmAlgorithm)
+
+
 
 def approximateNoteSearch(thisStream, otherStreams):
     '''
     searches the list of otherStreams and returns an ordered list of matches
     (each stream will have a new property of matchProbability to show how
     well it matches)
-
-
 
     >>> s = converter.parse("tinynotation: 4/4 c4 d8 e16 FF a'4 b-")
     >>> o1 = converter.parse("tinynotation: 4/4 c4 d8 e GG a' b-4")
@@ -210,8 +308,6 @@ def approximateNoteSearchNoRhythm(thisStream, otherStreams):
     (each stream will have a new property of matchProbability to show how
     well it matches)
 
-
-
     >>> s = converter.parse("tinynotation: 4/4 c4 d8 e16 FF a'4 b-")
     >>> o1 = converter.parse("tinynotation: 4/4 c4 d8 e GG a' b-4")
     >>> o1.id = 'o1'
@@ -248,8 +344,6 @@ def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
     (each stream will have a new property of matchProbability to show how
     well it matches)
 
-
-
     >>> s = converter.parse("tinynotation: 4/4 c4 d8 e16 FF a'4 b-")
     >>> o1 = converter.parse("tinynotation: 4/4 c4 d8 e GG a' b-4")
     >>> o1.id = 'o1'
@@ -284,8 +378,6 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
     searches the list of otherStreams and returns an ordered list of matches
     (each stream will have a new property of matchProbability to show how
     well it matches)
-
-
 
     >>> s = converter.parse("tinynotation: 4/4 c4 d8 e16 FF a'4 b-")
     >>> o1 = converter.parse("tinynotation: 4/4 c4 d8 e GG2 a' b-4")
@@ -331,12 +423,10 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
     return sortedStreams
 
 
-
 def translateStreamToString(inputStreamOrIterator, returnMeasures=False):
     '''
     takes a stream (or streamIterator) of notesAndRests only and returns
     a string for searching on.
-
 
     >>> s = converter.parse("tinynotation: 3/4 c4 d8 r16 FF8. a'8 b-2.")
     >>> sn = s.flat.notesAndRests
