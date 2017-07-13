@@ -17,6 +17,7 @@ import copy
 import difflib
 import math
 import unittest
+from collections import namedtuple
 
 from music21.ext.more_itertools import windowed
 
@@ -51,11 +52,216 @@ class Wildcard(m21Base.Music21Object):
         m21Base.Music21Object.__init__(self)
         self.duration = WildcardDuration()
 
+class SearchMatch(namedtuple('SearchMatch', 'elStart els index iterator')):
+    '''
+    A lightweight object representing the match (if any) for a search.  Derived from namedtuple
+    '''
+    __slots__ = ()
+    _DOC_ATTR = {'elStart': '''The first element that matches the list.''',
+                 'els': '''A tuple of all the matching elements.''',
+                 'index': '''The index in the iterator at which the first element can be found''',
+                 'iterator': '''The iterator which produced these elements.''',
+                }
+
+    def __repr__(self):
+        return 'SearchMatch(elStart={0}, els=len({1}), index={2}, iterator=[...])'.format(
+                        repr(self.elStart), len(self.els), repr(self.index))
+
+class StreamSearcher(object):
+    '''
+    An object that can search through streams for a set of elements
+    or notes or something of that sort.
+    
+    Create a basic Stream first:
+    
+    >>> thisStream = converter.parse("tinynotation: 3/4 c4. d8 e4 g4. a8 f4. c4. d4")
+    >>> thisStream.show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 3/4>
+        {0.0} <music21.note.Note C>
+        {1.5} <music21.note.Note D>
+        {2.0} <music21.note.Note E>
+    {3.0} <music21.stream.Measure 2 offset=3.0>
+        {0.0} <music21.note.Note G>
+        {1.5} <music21.note.Note A>
+        {2.0} <music21.note.Note F>
+    {6.0} <music21.stream.Measure 3 offset=6.0>
+        {0.5} <music21.note.Note C>
+        {2.0} <music21.note.Note D>
+        {3.0} <music21.bar.Barline style=final>
+    
+    Let's create something to search for:
+    
+    >>> c = note.Note('C', quarterLength=1.5)
+    >>> d = note.Note('D', quarterLength=0.5)
+    >>> searchList = [c, d]
+    
+        
+    Now create a StreamSearcher:
+    
+    >>> ss = search.StreamSearcher(thisStream, searchList)
+    
+    `searchList` could also be a Stream in itself.
+    
+    Let's configure it for recursive search and to filter so only notes are there:
+    
+    >>> ss.recurse = True
+    >>> ss.filterNotes = True  # or `.filterNotesAndRests`
+    
+    Alternatively, we could have passed in a StreamIterator instead of `thisStream`.
+    
+    Now let's configure the algorithms:
+    
+    >>> ss.algorithms
+    [<function StreamSearcher.wildcardAlgorithm at 0x104d94510>]
+    
+    Wildcard search is a default algorithm that lets you use wildcards.
+    I suggest you leave it in place and add to it.  We can add the
+    `rhythmAlgorithm` to it:
+    
+    >>> ss.algorithms.append(search.StreamSearcher.rhythmAlgorithm)
+    >>> ss.algorithms
+    [<function StreamSearcher.wildcardAlgorithm at 0x104e94510>, 
+     <function StreamSearcher.rhythmAlgorithm at 0x104e94598>]
+    
+    
+    Now run it:
+    
+    >>> results = ss.run()
+    >>> results
+    [SearchMatch(elStart=<music21.note.Note C>, els=len(2), index=0, iterator=[...]), 
+     SearchMatch(elStart=<music21.note.Note G>, els=len(2), index=3, iterator=[...])]
+
+    >>> results[0].elStart.measureNumber
+    1
+    >>> results[1].elStart.measureNumber
+    2
+
+    
+    Wildcards can be useful:
+    
+    >>> searchStream2 = stream.Stream()
+    >>> searchStream2.append(note.Note(quarterLength=0.5))
+    >>> searchStream2.append(search.Wildcard())
+    >>> searchStream2.append(note.Note(quarterLength=1.5))    
+        
+    >>> ss.searchList = searchStream2
+    >>> results = ss.run()
+    >>> results
+    [SearchMatch(elStart=<music21.note.Note D>, els=len(3), index=1, iterator=[...]), 
+     SearchMatch(elStart=<music21.note.Note A>, els=len(3), index=4, iterator=[...])]
+    >>> results[0].els
+    (<music21.note.Note D>, <music21.note.Note E>, <music21.note.Note G>)
+    >>> [n.duration.quarterLength for n in results[0].els]
+    [0.5, 1.0, 1.5]  
+    
+
+    OMIT_FROM_DOCS
+
+    >>> emptyS = stream.Stream()
+    >>> ss.searchList = emptyS
+    >>> ss.run()
+    Traceback (most recent call last):
+    music21.search.base.SearchException: the search Stream or list cannot be empty
+
+    why doesn't this work?  thisStream[found].expressions.append(expressions.TextExpression("*"))
+    '''
+    def __init__(self, streamSearch=None, searchList=None):
+        self.streamSearch = streamSearch
+        self.searchList = searchList
+        self.recurse = False
+        self.filterNotes = False
+        self.filterNotesAndRests = False
+        
+        self.algorithms = [StreamSearcher.wildcardAlgorithm]
+        
+        self.activeIterator = None
+    
+    def run(self):
+        if 'StreamIterator' in self.streamSearch.classes:
+            thisStreamIterator = self.streamSearch
+        else:            
+            if self.recurse:
+                thisStreamIterator = self.streamSearch.recurse()
+            else:
+                thisStreamIterator = self.searchStream.iter
+                
+            if self.filterNotesAndRests:
+                thisStreamIterator.notesAndRests
+            elif self.filterNotes:
+                thisStreamIterator.notes
+
+        self.activeIterator = thisStreamIterator
+
+        streamIteratorEls = list(thisStreamIterator)
+        streamLength = len(streamIteratorEls)
+        searchLength = len(self.searchList)
+
+
+
+        if searchLength == 0:
+            raise SearchException('the search Stream or list cannot be empty')
+    
+        foundEls = []
+        if searchLength > streamLength:
+            return foundEls
+        
+        for startPosition, streamEls in enumerate(windowed(streamIteratorEls, searchLength)):
+            result = None
+            for j in range(searchLength):
+                streamEl = streamEls[j]
+                searchEl = self.searchList[j]
+                for thisAlgorithm in self.algorithms:
+                    result = thisAlgorithm(self, streamEl, searchEl)
+                    if result is not None: # break on True or False
+                        break
+                if result is False:
+                    break
+                if result is True:
+                    result = None
+                
+            if result is not False:
+                sm = SearchMatch(streamEls[0], streamEls, startPosition, self.activeIterator)
+                foundEls.append(sm)
+                
+        return foundEls
+
+        
+    def wildcardAlgorithm(self, streamEl, searchEl):
+        '''
+        An algorithm that supports Wildcards -- added by default to the search function.
+        '''
+        if Wildcard in searchEl.classSet:
+            return True
+        else:
+            return None
+        
+    def rhythmAlgorithm(self, streamEl, searchEl):
+        if "WildcardDuration" in searchEl.duration.classes:
+            return True
+        if searchEl.duration.quarterLength != streamEl.duration.quarterLength:
+            return False
+        return None
+
+    def noteNameAlgorithm(self, streamEl, searchEl):
+        if not hasattr(searchEl, 'name'):
+            return False
+        if not hasattr(streamEl, 'name'):
+            return False        
+        if searchEl.name != streamEl.name:
+            return False
+        return None
+
+
+
 def streamSearchBase(thisStreamOrIterator, searchList, algorithm=None):
     '''
     A basic search function that is used by other search mechanisms,
     which takes in a stream or StreamIterator and a searchList or stream
     and an algorithm to run on each pair of elements to determine if they match.
+    
+    
     '''
     if algorithm is None:
         raise SearchException('algorithm must be a function not None')
@@ -180,16 +386,6 @@ def rhythmicSearch(thisStreamOrIterator, searchList):
     [5, 29, 95]
     >>> float(len(term1results)) / len(term2results)
     8.0
-
-
-    OMIT_FROM_DOCS
-
-    >>> s = stream.Stream()
-    >>> search.rhythmicSearch(pf, s)
-    Traceback (most recent call last):
-    music21.search.base.SearchException: the search Stream or list cannot be empty
-
-    why doesn't this work?  thisStream[found].expressions.append(expressions.TextExpression("*"))
     '''
     def rhythmAlgorithm(streamEl, searchEl):
         if "WildcardDuration" in searchEl.duration.classes:
@@ -228,7 +424,7 @@ def noteNameSearch(thisStreamOrIterator, searchList):
     return streamSearchBase(thisStreamOrIterator, searchList, algorithm=noteNameAlgorithm)
 
 
-def noteNameRhythmSearch(thisStreamOrIterator, searchList):
+def noteNameRhythmicSearch(thisStreamOrIterator, searchList):
     '''
     >>> thisStream = converter.parse("tinynotation: 3/4 c4 d8 e c d e f c D E c c4 d# e")
     >>> searchList = [note.Note('C'), note.Note('D'), note.Note('E')]
@@ -236,11 +432,11 @@ def noteNameRhythmSearch(thisStreamOrIterator, searchList):
     ...     n.duration.type = 'eighth'
     >>> thisStreamIter = thisStream.recurse().notes
     
-    >>> search.noteNameRhythmSearch(thisStreamIter, searchList)
+    >>> search.noteNameRhythmicSearch(thisStreamIter, searchList)
     [3, 7]
     
     >>> searchList[0].duration = search.WildcardDuration()
-    >>> search.noteNameRhythmSearch(thisStreamIter, searchList)
+    >>> search.noteNameRhythmicSearch(thisStreamIter, searchList)
     [0, 3, 7]
     '''
     def noteNameRhythmAlgorithm(streamEl, searchEl):
@@ -897,7 +1093,10 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER = ['StreamSearcher',
+              'Wildcard',
+              'WildcardDuration',
+]
 
 
 if __name__ == "__main__":

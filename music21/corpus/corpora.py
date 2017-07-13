@@ -826,7 +826,13 @@ class LocalCorpus(Corpus):
     The default local corpus is unnamed (or called "local" or None), but an arbitrary number of
     independent, named local corpora can be defined and persisted:
 
-    >>> namedLocalCorpus = corpus.corpora.LocalCorpus('with a name')
+    >>> namedLocalCorpus = corpus.corpora.LocalCorpus('funk')
+
+    Illegal local corpus name ('core' or 'virtual')
+
+    >>> corpus.corpora.LocalCorpus('core')
+    Traceback (most recent call last):
+    music21.exceptions21.CorpusException: The name 'core' is reserved.
     '''
 
     ### CLASS VARIABLES ###
@@ -842,6 +848,8 @@ class LocalCorpus(Corpus):
             raise CorpusException("Name cannot be blank")
         if name == 'local':
             self._name = None
+        elif name in ('core', 'virtual'):
+            raise CorpusException("The name '{}' is reserved.".format(name))
         else:
             self._name = name
 

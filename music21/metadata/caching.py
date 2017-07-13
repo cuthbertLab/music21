@@ -32,20 +32,22 @@ environLocal = environment.Environment(os.path.basename(__file__))
 class MetadataCacheException(exceptions21.Music21Exception):
     pass
 #------------------------------------------------------------------------------
-
-
-def cacheMetadata(corpusNames=('local', 'core', 'virtual'),
+def cacheMetadata(corpusNames=None,
                   useMultiprocessing=True,
                   verbose=False):
     '''
     Cache metadata from corpora in `corpusNames` as local cache files:
 
     Call as ``metadata.cacheMetadata()``
-
     '''
-    from music21 import corpus
     from music21.corpus import corpora
+    from music21.corpus import manager
 
+    localCorporaNames = manager.listLocalCorporaNames(skipNone=True)
+
+    if corpusNames is None:
+        corpusNames = localCorporaNames[:] + ['local', 'core', 'virtual']
+        
     if not common.isIterable(corpusNames):
         corpusNames = (corpusNames,)
 
@@ -59,22 +61,26 @@ def cacheMetadata(corpusNames=('local', 'core', 'virtual'),
     # virtual is on-line
     for corpusName in corpusNames:
         if corpusName == 'core':
-            metadataBundle = corpora.CoreCorpus().metadataBundle
-            paths = corpus.getCorePaths()
-            useCorpus = True
+            corporaObject = corpora.CoreCorpus()
+            parseUsingCorpus = True
         elif corpusName == 'local':
-            metadataBundle = corpora.LocalCorpus().metadataBundle
-            paths = corpus.getLocalPaths()
-            useCorpus = False
+            corporaObject = corpora.LocalCorpus()
+            parseUsingCorpus = False
         elif corpusName == 'virtual':
-            metadataBundle = corpora.VirtualCorpus().metadataBundle
-            paths = corpus.getVirtualPaths()
-            useCorpus = False
+            corporaObject = corpora.VirtualCorpus()
+            parseUsingCorpus = False
+        elif corpusName in localCorporaNames:
+            corporaObject = corpora.LocalCorpus(corpusName)
+            parseUsingCorpus = False       
         else:
             message = 'invalid corpus name provided: {0!r}'.format(corpusName)
             raise MetadataCacheException(message)
-        message = 'metadata cache: starting processing of paths: {0}'.format(
-                len(paths))
+
+        metadataBundle = corporaObject.metadataBundle
+        paths = corporaObject.getPaths()
+        
+        message = '{} metadata cache: starting processing of paths: {}'.format(
+                corpusName, len(paths))
         if verbose is True:
             environLocal.warn(message)
         else:
@@ -82,22 +88,32 @@ def cacheMetadata(corpusNames=('local', 'core', 'virtual'),
 
         failingFilePaths += metadataBundle.addFromPaths(
             paths,
-            useCorpus=useCorpus,
+            parseUsingCorpus=parseUsingCorpus,
             useMultiprocessing=useMultiprocessing,
             verbose=verbose
             )
-        message = 'cache: writing time: {0} md items: {1}'.format(
+        message = 'cache: writing time: {0} md items: {1}\n'.format(
             timer, len(metadataBundle))
+
+        if verbose is True:
+            environLocal.warn(message)
+        else:
+            environLocal.printDebug(message)
+        
+        message = 'cache: filename: {0}'.format(metadataBundle.filePath)
+        
         if verbose is True:
             environLocal.warn(message)
         else:
             environLocal.printDebug(message)
         del metadataBundle
+        
     message = 'cache: final writing time: {0} seconds'.format(timer)
     if verbose is True:
         environLocal.warn(message)
     else:
         environLocal.printDebug(message)
+        
     for failingFilePath in failingFilePaths:
         message = 'path failed to parse: {0}'.format(failingFilePath)
         if verbose is True:
@@ -117,25 +133,30 @@ class MetadataCachingJob(object):
     >>> from music21 import metadata
     >>> job = metadata.caching.MetadataCachingJob(
     ...     'bach/bwv66.6',
-    ...     useCorpus=True,
+    ...     parseUsingCorpus=True,
+    ...     corpusName='core',
     ...     )
+    >>> job.jobNumber
+    0
+    >>> job.corpusName
+    'core'
     >>> job.run()
     ((<music21.metadata.bundles.MetadataEntry: bach_bwv66_6>,), ())
     >>> results = job.getResults()
     >>> errors = job.getErrors()
 
-    TODO: error list, nut just numbers needs to be reported back up.
-
+    TODO: error list, not just numbers needs to be reported back up.
     '''
 
     ### INITIALIZER ###
 
-    def __init__(self, filePath, jobNumber=0, useCorpus=True):
+    def __init__(self, filePath, jobNumber=0, parseUsingCorpus=True, corpusName=None):
         self.filePath = filePath
         self.filePathErrors = []
         self.jobNumber = int(jobNumber)
         self.results = []
-        self.useCorpus = bool(useCorpus)
+        self.parseUsingCorpus = bool(parseUsingCorpus)
+        self.corpusName = corpusName
 
     def run(self):
         import gc
@@ -157,7 +178,7 @@ class MetadataCachingJob(object):
         from music21 import corpus
         parsedObject = None
         try:
-            if self.useCorpus is False:
+            if self.parseUsingCorpus is False:
                 parsedObject = converter.parse(
                     self.filePath, forceSource=True)
             else:
@@ -184,6 +205,7 @@ class MetadataCachingJob(object):
                 metadataEntry = metadata.bundles.MetadataEntry(
                     sourcePath=self.cleanFilePath,
                     metadataPayload=richMetadata,
+                    corpusName=self.corpusName,
                     )
                 self.results.append(metadataEntry)
             else:
@@ -194,6 +216,7 @@ class MetadataCachingJob(object):
                 metadataEntry = metadata.bundles.MetadataEntry(
                     sourcePath=self.cleanFilePath,
                     metadataPayload=None,
+                    corpusName=self.corpusName,
                     )
                 self.results.append(metadataEntry)
         except Exception: # wide catch is fine. pylint: disable=broad-except
@@ -302,7 +325,8 @@ class JobProcessor(object):
     >>> for corpusPath in corpus.getMonteverdiMadrigals()[:3]:
     ...     job = metadata.caching.MetadataCachingJob(
     ...         corpusPath,
-    ...         useCorpus=True,
+    ...         parseUsingCorpus=True,
+    ...         corpusName='core',
     ...         )
     ...     jobs.append(job)
     >>> jobGenerator = metadata.caching.JobProcessor.process_serial(jobs)

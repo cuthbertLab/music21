@@ -98,16 +98,19 @@ class _EnvironmentCore(object):
         # define all settings that are paths
         # store names of all values that are keys; check for validity
         self._keysToPaths = []
-        self._keysToPaths.append('braillePath')
-        self._keysToPaths.append('graphicsPath')
-        self._keysToPaths.append('lilypondPath')
-        self._keysToPaths.append('localCorpusPath')
-        self._keysToPaths.append('manualCoreCorpusPath')
-        self._keysToPaths.append('midiPath')
-        self._keysToPaths.append('musescoreDirectPNGPath')
-        self._keysToPaths.append('musicxmlPath')
-        self._keysToPaths.append('pdfPath')
-        self._keysToPaths.append('vectorPath')
+        for pathKey in [
+            'braillePath',
+            'graphicsPath',
+            'lilypondPath',
+            'localCorpusPath',
+            'manualCoreCorpusPath',
+            'midiPath', 
+            'musescoreDirectPNGPath',
+            'musicxmlPath',
+            'pdfPath',
+            'vectorPath',
+            ]:
+            self._keysToPaths.append(pathKey)
 
         # defines all valid keys in ref
         self._loadDefaults(forcePlatform=forcePlatform)
@@ -215,6 +218,10 @@ class _EnvironmentCore(object):
 
     ### PRIVATE METHODS ###
     def _fromSettings(self, settingsTree, ref=None):
+        '''
+        Takes in a ElementTree and possibly an already populated reference dictionary
+        (or creates a new one) and populates it.
+        '''
         if ref is None:
             ref = {}
         settings = settingsTree.getroot()
@@ -224,7 +231,7 @@ class _EnvironmentCore(object):
                 for lcp in slot:
                     fpCandidate = lcp.text.strip()
                     ref['localCorpusSettings'].append(fpCandidate)
-            elif slot.tag == 'LocalCorporaSettings':
+            elif slot.tag == 'localCorporaSettings':
                 ref['localCorporaSettings'] = {}
                 for localCorpusSettings in slot:
                     name = localCorpusSettings.get('name')
@@ -630,6 +637,10 @@ class _EnvironmentCore(object):
         os.system(cmd)
 
     def read(self, filePath=None):
+        '''
+        Read the environment file from .music21rc and call _fromSettings
+        Called only once per music21 instance.
+        '''
         if filePath is None:
             filePath = self.getSettingsPath()
         if not os.path.exists(filePath):
@@ -646,10 +657,16 @@ class _EnvironmentCore(object):
         self._fromSettings(settingsTree, self._ref)
 
     def restoreDefaults(self):
+        '''
+        Changes everything to default but does not write.
+        '''
         self._ref = {}
         self._loadDefaults()  # defines all valid keys in ref
 
     def write(self, filePath=None):
+        '''
+        Write the .music21rc using `.getSettingsPath` and `.toSettingsXML`.
+        '''
         if filePath is None:
             filePath = self.getSettingsPath()
         # need to use __getitem__ here b/c need to convert debug value
@@ -1174,6 +1191,19 @@ class UserSettings(object):
             if not common.isListLike(value):
                 raise UserSettingsException(
                     'localCorpusSettings must be provided as a list.')
+        elif key == 'localCorporaSettings':
+            if not isinstance(value, dict):
+                raise UserSettingsException(
+                    'localCorporaSettings must be provided as a dict.')
+            if value:
+                for key, innerValue in value.values():
+                    if not isinstance(key, six.string_types):
+                        raise UserSettingsException(
+                            'Each key in localCorporaSettings must be a string.')
+                    if not common.isListLike(innerValue):
+                        raise UserSettingsException(
+                            'Each entry in localCorporaSettings must point to a list.')
+
         # location specific, cannot test further
         self._environment.__setitem__(key, value)
         self._environment.write()

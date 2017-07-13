@@ -334,14 +334,17 @@ def readAllMetadataBundlesFromDisk():
     for corpusObject in iterateCorpora():
         cacheMetadataBundleFromDisk(corpusObject)
 
-def listLocalCorporaNames():
+def listLocalCorporaNames(skipNone=False):
     '''
     List the names of all user-defined local corpora.
 
     The entry for None refers to the default local corpus.
     '''
     userSettings = environment.UserSettings()
-    result = [None]
+    if not skipNone:
+        result = [None]
+    else:
+        result = []
     result.extend(userSettings['localCorporaSettings'].keys())
     return result
 

@@ -73,13 +73,15 @@ class MetadataEntry(object):
     ### INITIALIZER ###
 
     def __init__(self,
-        sourcePath=None,
-        number=None,
-        metadataPayload=None,
-        ):
+                 sourcePath=None,
+                 number=None,
+                 metadataPayload=None,
+                 corpusName=None,
+                 ):
         self._sourcePath = sourcePath
         self._number = number
         self._metadataPayload = metadataPayload
+        self._corpusName = corpusName
 
     ### SPECIAL METHODS ###
 
@@ -130,6 +132,10 @@ class MetadataEntry(object):
     @property
     def sourcePath(self):
         return self._sourcePath
+
+    @property
+    def corpusName(self):
+        return self._corpusName
 
 
 #------------------------------------------------------------------------------
@@ -614,6 +620,32 @@ class MetadataBundle(object):
         r'''
         The filesystem name of the cached metadata bundle, if the metadata
         bundle's name is not None.
+        
+        >>> ccPath = corpus.corpora.CoreCorpus().metadataBundle.filePath
+        >>> ccPath.endswith('core.json')
+        True
+        >>> '_metadataCache' in ccPath
+        True
+        
+        >>> virPath = corpus.corpora.VirtualCorpus().metadataBundle.filePath
+        >>> virPath.endswith('virtual.json')
+        True
+        >>> '_metadataCache' in virPath
+        True
+
+        >>> localPath = corpus.corpora.LocalCorpus().metadataBundle.filePath
+        >>> localPath.endswith('local.json')
+        True
+        
+        Local corpora metadata is stored in the scratch dir, not the
+        corpus directory
+        
+        >>> '_metadataCache' in localPath
+        False
+        
+        >>> funkPath = corpus.corpora.LocalCorpus('funk').metadataBundle.filePath
+        >>> funkPath.endswith('local-funk.json')
+        True       
         '''
         if self.name is None:
             return None
@@ -622,16 +654,16 @@ class MetadataBundle(object):
                 common.getMetadataCacheFilePath(),
                 self.name + '.json',
                 )
-        elif self.name == 'local':
+        elif self.name.startswith('local'):
             # write in temporary dir
             filePath = os.path.join(
                 environLocal.getRootTempDir(),
                 self.name + '.json',
                 )
-        else:
+        else: # pragma: no-cover
             filePath = os.path.join(
                 environLocal.getRootTempDir(),
-                'local-{0}.json'.format(self.name),
+                'unnamed-corpus.json',
                 )
         return filePath
 
@@ -640,7 +672,8 @@ class MetadataBundle(object):
         r'''
         The name of the metadata bundle.
 
-        Can be 'core', 'local', 'virtual' or None.
+        Can be 'core', 'local', 'virtual', 'local-{name}' where name is the name
+        of a named local corpus or None.
 
         The names 'core', 'local' and 'virtual refer to the core, local and
         virtual corpuses respectively:
@@ -648,8 +681,12 @@ class MetadataBundle(object):
         >>> from music21 import metadata
         >>> metadata.bundles.MetadataBundle().name is None
         True
-        >>> corpus.corpora.CoreCorpus().metadataBundle.name == 'core'
-        True
+        >>> corpus.corpora.CoreCorpus().metadataBundle.name
+        'core'
+
+        >>> funkCorpus = corpus.corpora.LocalCorpus('funk')
+        >>> funkCorpus.metadataBundle.name
+        'local-funk'
 
         Return string or None.
         '''
@@ -660,7 +697,7 @@ class MetadataBundle(object):
     def addFromPaths(
         self,
         paths,
-        useCorpus=False,
+        parseUsingCorpus=False,
         useMultiprocessing=True,
         storeOnDisk=True,
         verbose=False
@@ -679,7 +716,7 @@ class MetadataBundle(object):
         >>> p = corpus.corpora.CoreCorpus().getWorkList('bach/bwv66.6')
         >>> metadataBundle.addFromPaths(
         ...     p,
-        ...     useCorpus=False,
+        ...     parseUsingCorpus=False,
         ...     useMultiprocessing=False,
         ...     storeOnDisk=False, #_DOCS_HIDE
         ...     )
@@ -718,10 +755,17 @@ class MetadataBundle(object):
                     skippedJobsCount += 1
                     continue
             currentJobNumber += 1
+            corpusName = self.name
+            if corpusName is None:
+                corpusName = 'core' # TODO: remove this after rebuilding
+                
+            if corpusName.startswith('local-'):
+                corpusName = corpusName[6:]
             job = metadata.caching.MetadataCachingJob(
                 path,
                 jobNumber=currentJobNumber,
-                useCorpus=useCorpus,
+                parseUsingCorpus=parseUsingCorpus,
+                corpusName=corpusName,
                 )
             jobs.append(job)
         currentIteration = 0
@@ -1070,12 +1114,12 @@ class MetadataBundle(object):
             return self
         self.clear()
         self.delete()
-        useCorpus = False
+        parseUsingCorpus = False
         if isinstance(self.corpus, corpus.corpora.CoreCorpus):
-            useCorpus = True
+            parseUsingCorpus = True
         self.addFromPaths(
             self.corpus.getPaths(),
-            useCorpus=useCorpus,
+            parseUsingCorpus=parseUsingCorpus,
             useMultiprocessing=useMultiprocessing,
             verbose=verbose
             )
@@ -1091,7 +1135,7 @@ class MetadataBundle(object):
         >>> metadataBundle = metadata.bundles.MetadataBundle()
         >>> failedPaths = metadataBundle.addFromPaths(
         ...     workList,
-        ...     useCorpus=False,
+        ...     parseUsingCorpus=False,
         ...     useMultiprocessing=False,
         ...     storeOnDisk=False, #_DOCS_HIDE
         ...     )

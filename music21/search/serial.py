@@ -2408,7 +2408,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [
+_DOC_ORDER = [    
               'ContiguousSegmentSearcher',
               'ContiguousSegmentOfNotes',
               'SegmentMatcher',

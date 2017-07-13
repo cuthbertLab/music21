@@ -33,6 +33,7 @@ humdrumInstrumentClassToInstrument = {
 
 humdrumInstruments = {
 'soprn': 'Soprano',
+'cant': 'Soprano', # Found in many sources, but not a predefined humdrum instrument
 'mezzo': 'MezzoSoprano',
 'calto': 'Alto', # no distinction with contralto
 'tenor': 'Tenor',
