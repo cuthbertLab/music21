@@ -277,7 +277,9 @@ class Test(unittest.TestCase):
             if 'Instrument' in x.classes:
                 foundInstruments.append(str(x))
         self.assertEqual(foundInstruments,
-                         ['Alto', 'Alto', 'Alto', 'Tenor', 'Alto', 'Bass', 'Tenor'])
+                         ['Soprano', 'Alto', 
+                          'Soprano', 'Alto', 'Alto', 'Tenor', 
+                          'Alto', 'Bass', 'Tenor'])
         alto = c.parts[1].flat.getInstrument()
         self.assertIn('Alto', alto.classes)
 
