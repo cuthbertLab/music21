@@ -1326,7 +1326,7 @@ class SelectMusicXMLReader(SelectFilePath):
 
     def _getMusicXMLReaderDarwin(self):
         '''
-        Get all possible Finale or MuseScore paths on Darwin
+        Get all possible MusicXML Reader paths on Darwin (i.e., macOS)
         '''
         comparisonFinale = lambda x : reFinaleApp.match(x) is not None
         comparisonMuseScore = lambda x : reMuseScoreApp.match(x) is not None
@@ -1344,7 +1344,7 @@ class SelectMusicXMLReader(SelectFilePath):
 
     def _getMusicXMLReaderWin(self):
         '''
-        Get all possible Finale, MuseScore paths on Windows
+        Get all possible MusicXML Reader paths on Windows
         '''
         comparisonFinale = lambda x : reFinaleExe.match(x) is not None
         comparisonMuseScore = lambda x : reMuseScoreExe.match(x) is not None
