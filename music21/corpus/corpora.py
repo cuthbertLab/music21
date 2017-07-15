@@ -16,7 +16,7 @@ import os
 from music21.ext import six
 
 from music21 import common
-from music21.corpus import virtual
+# from music21.corpus import virtual
 from music21.corpus import work
 
 from music21 import environment
@@ -50,6 +50,8 @@ class Corpus(object):
     _pathsCache = {}
 
     _directoryInformation = () # a tuple of triples -- see coreCorpus
+    
+    parseUsingCorpus = True
     ### SPECIAL METHODS ###
 
     def __repr__(self):
@@ -158,6 +160,32 @@ class Corpus(object):
         raise NotImplementedError
 
     ### PUBLIC METHODS ###
+    def rebuildMetadataCache(self, useMultiprocessing=True, verbose=True):
+        r'''
+        Rebuild a named bundle from scratch.
+
+        If a bundle is associated with one of music21's corpuses, delete any
+        metadata cache on disk, clear the bundle's contents and reload in all
+        files from that associated corpus.
+
+        Return the rebuilt metadata bundle.
+        '''
+        mdb = self.metadataBundle
+        if not mdb:
+            return self 
+        if mdb.filePath is None:
+            return self
+        mdb.clear()
+        mdb.delete()
+        mdb.addFromPaths(
+            self.getPaths(),
+            parseUsingCorpus=self.parseUsingCorpus,
+            useMultiprocessing=useMultiprocessing,
+            verbose=verbose
+            )
+        return mdb
+    
+    
     @abc.abstractmethod
     def getPaths(self, fileExtensions=None, expandExtensions=True):
         r'''
@@ -839,6 +867,7 @@ class LocalCorpus(Corpus):
 
     _temporaryLocalPaths = {}
 
+    parseUsingCorpus = False
     ### INITIALIZER ###
 
     def __init__(self, name=None):
@@ -1043,101 +1072,101 @@ class LocalCorpus(Corpus):
 #------------------------------------------------------------------------------
 
 
-class VirtualCorpus(Corpus):
-    r'''
-    A model of the *virtual* corpus. that stays online...
-
-    >>> virtualCorpus = corpus.corpora.VirtualCorpus()
-
-    '''
-
-    ### CLASS VARIABLES ###
-
-    _virtual_works = []
-
-    corpusName = None
-    for corpusName in dir(virtual):
-        className = getattr(virtual, corpusName)
-        if callable(className):
-            obj = className()
-            if isinstance(obj, virtual.VirtualWork): # @UndefinedVariable
-                if obj.corpusPath is not None:
-                    _virtual_works.append(obj)
-    del corpusName
-    del className
-    del obj
-    ### PRIVATE PROPERTIES ###
-
-    @property
-    def cacheName(self):
-        return 'virtual'
-
-    ### PUBLIC METHODS ###
-
-    def getPaths(
-        self,
-        fileExtensions=None,
-        expandExtensions=True,
-        ):
-        '''
-        Get all paths in the virtual corpus that match a known extension.
-
-        An extension of None will return all known extensions.
-
-        >>> len(corpus.corpora.VirtualCorpus().getPaths()) > 6
-        True
-
-        '''
-        fileExtensions = self._translateExtensions(
-            fileExtensions=fileExtensions,
-            expandExtensions=expandExtensions,
-            )
-        paths = []
-        for obj in self._virtual_works:
-            if obj.corpusPath is not None:
-                for fileExtension in fileExtensions:
-                    results = obj.getUrlByExt(fileExtension)
-                    for result in results:
-                        if result not in paths:
-                            paths.append(result)
-        return paths
-
-    def getWorkList(
-        self,
-        workName,
-        movementNumber=None,
-        fileExtensions=None,
-        ):
-        '''
-        Given a work name, search all virtual works and return a list of URLs
-        for any matches.
-
-        >>> virtualCorpus = corpus.corpora.VirtualCorpus()
-        >>> virtualCorpus.getWorkList('bach/bwv1007/prelude')
-        ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
-
-        >>> virtualCorpus.getWorkList('junk')
-        []
-
-        '''
-        if not common.isListLike(fileExtensions):
-            fileExtensions = [fileExtensions]
-        for obj in VirtualCorpus._virtual_works:
-            if obj.corpusPath is not None and workName.lower() in obj.corpusPath.lower():
-                return obj.getUrlByExt(fileExtensions)
-        return []
-
-
-    @property
-    def name(self):
-        r'''
-        The name of the virtual corpus:
-
-        >>> corpus.corpora.VirtualCorpus().name
-        'virtual'
-
-        '''
-        return 'virtual'
+# class VirtualCorpus(Corpus):
+#     r'''
+#     A model of the *virtual* corpus. that stays online...
+# 
+#     >>> virtualCorpus = corpus.corpora.VirtualCorpus()
+# 
+#     '''
+# 
+#     ### CLASS VARIABLES ###
+# 
+#     _virtualWorks = []
+# 
+#     corpusName = None
+#     for corpusName in dir(virtual):
+#         className = getattr(virtual, corpusName)
+#         if callable(className):
+#             obj = className()
+#             if isinstance(obj, virtual.VirtualWork): # @UndefinedVariable
+#                 if obj.corpusPath is not None:
+#                     _virtualWorks.append(obj)
+#     del corpusName
+#     del className
+#     del obj
+#     ### PRIVATE PROPERTIES ###
+# 
+#     @property
+#     def cacheName(self):
+#         return 'virtual'
+# 
+#     ### PUBLIC METHODS ###
+# 
+#     def getPaths(
+#         self,
+#         fileExtensions=None,
+#         expandExtensions=True,
+#         ):
+#         '''
+#         Get all paths in the virtual corpus that match a known extension.
+# 
+#         An extension of None will return all known extensions.
+# 
+#         >>> len(corpus.corpora.VirtualCorpus().getPaths()) > 6
+#         True
+# 
+#         '''
+#         fileExtensions = self._translateExtensions(
+#             fileExtensions=fileExtensions,
+#             expandExtensions=expandExtensions,
+#             )
+#         paths = []
+#         for obj in self._virtualWorks:
+#             if obj.corpusPath is not None:
+#                 for fileExtension in fileExtensions:
+#                     results = obj.getUrlByExt(fileExtension)
+#                     for result in results:
+#                         if result not in paths:
+#                             paths.append(result)
+#         return paths
+# 
+#     def getWorkList(
+#         self,
+#         workName,
+#         movementNumber=None,
+#         fileExtensions=None,
+#         ):
+#         '''
+#         Given a work name, search all virtual works and return a list of URLs
+#         for any matches.
+# 
+#         >>> virtualCorpus = corpus.corpora.VirtualCorpus()
+#         >>> virtualCorpus.getWorkList('bach/bwv1007/prelude')
+#         ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
+# 
+#         >>> virtualCorpus.getWorkList('junk')
+#         []
+# 
+#         '''
+#         if not common.isListLike(fileExtensions):
+#             fileExtensions = [fileExtensions]
+#         for obj in VirtualCorpus._virtualWorks:
+#             if obj.corpusPath is not None and workName.lower() in obj.corpusPath.lower():
+#                 return obj.getUrlByExt(fileExtensions)
+#         return []
+# 
+# 
+#     @property
+#     def name(self):
+#         r'''
+#         The name of the virtual corpus:
+# 
+#         >>> corpus.corpora.VirtualCorpus().name
+#         'virtual'
+# 
+#         '''
+#         return 'virtual'
 
 
 
@@ -1145,14 +1174,14 @@ __all__ = (
     'Corpus',
     'CoreCorpus',
     'LocalCorpus',
-    'VirtualCorpus',
+    # 'VirtualCorpus',
     )
 
 _DOC_ORDER = (
     Corpus,
     CoreCorpus,
     LocalCorpus,
-    VirtualCorpus,
+    # VirtualCorpus,
     )
 
 if __name__ == "__main__":

@@ -61,7 +61,7 @@ reMuseScoreExe = re.compile(r'Musescore [0-9]\\bin\\MuseScore.exe',
 urlMusic21 = 'http://web.mit.edu/music21'
 urlFinaleNotepad = 'http://www.finalemusic.com/products/finale-notepad/resources/'
 urlMuseScore = 'http://musescore.org'
-urlGettingStarted = 'http://music21.readthedocs.org'
+urlGettingStarted = 'http://web.mit.edu/music21/doc/' # #'http://music21.readthedocs.org'
 urlMusic21List = 'http://groups.google.com/group/music21list'
 
 LINE_WIDTH = 78
@@ -1133,8 +1133,9 @@ class AskAutoDownload(SelectFromList):
         'included in this distribution, but are indexed as links to other web sites ' +
         'where they can be downloaded (the "virtual corpus"). If you would like, music21 ' +
         'can help your computer automatically resolve these links and bring them to your ' +
-        'hard drive for analysis. See corpus/virtual.py for a list of sites that music21 ' +
-        'might index.',
+        'hard drive for analysis. ' + 
+        # 'See corpus/virtual.py for a list of sites that music21 ' +
+        #'might index.',
         ' ',
         'To the best of our knowledge, the music (if not the encodings) in the corpus are ' +
             'either out of copyright in the United States and/or are licensed for ' +
@@ -1333,8 +1334,8 @@ class SelectMusicXMLReader(SelectFilePath):
         comparisonSibelius = lambda x : reSibeliusApp.match(x) is not None
 
         # order here results in ranks
-        results = self._getDarwinApp(comparisonFinale)
-        results += self._getDarwinApp(comparisonMuseScore)
+        results = self._getDarwinApp(comparisonMuseScore)
+        results += self._getDarwinApp(comparisonFinale)
         results += self._getDarwinApp(comparisonFinaleReader)
         results += self._getDarwinApp(comparisonSibelius)
 
@@ -1350,8 +1351,8 @@ class SelectMusicXMLReader(SelectFilePath):
         comparisonSibelius = lambda x : reSibeliusExe.match(x) is not None
 
         # order here results in ranks
-        results = self._getWinApp(comparisonFinale)
-        results += self._getWinApp(comparisonMuseScore)
+        results = self._getWinApp(comparisonMuseScore)
+        results += self._getWinApp(comparisonFinale)
         results += self._getWinApp(comparisonSibelius)
 
         return results

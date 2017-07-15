@@ -46,7 +46,7 @@ def cacheMetadata(corpusNames=None,
     localCorporaNames = manager.listLocalCorporaNames(skipNone=True)
 
     if corpusNames is None:
-        corpusNames = localCorporaNames[:] + ['local', 'core', 'virtual']
+        corpusNames = localCorporaNames[:] + ['local', 'core',] # + 'virtual']
         
     if not common.isIterable(corpusNames):
         corpusNames = (corpusNames,)
@@ -62,16 +62,12 @@ def cacheMetadata(corpusNames=None,
     for corpusName in corpusNames:
         if corpusName == 'core':
             corporaObject = corpora.CoreCorpus()
-            parseUsingCorpus = True
         elif corpusName == 'local':
             corporaObject = corpora.LocalCorpus()
-            parseUsingCorpus = False
-        elif corpusName == 'virtual':
-            corporaObject = corpora.VirtualCorpus()
-            parseUsingCorpus = False
+#         elif corpusName == 'virtual':
+#             corporaObject = corpora.VirtualCorpus()
         elif corpusName in localCorporaNames:
             corporaObject = corpora.LocalCorpus(corpusName)
-            parseUsingCorpus = False       
         else:
             message = 'invalid corpus name provided: {0!r}'.format(corpusName)
             raise MetadataCacheException(message)
@@ -88,7 +84,7 @@ def cacheMetadata(corpusNames=None,
 
         failingFilePaths += metadataBundle.addFromPaths(
             paths,
-            parseUsingCorpus=parseUsingCorpus,
+            parseUsingCorpus=corporaObject.parseUsingCorpus,
             useMultiprocessing=useMultiprocessing,
             verbose=verbose
             )
@@ -147,7 +143,6 @@ class MetadataCachingJob(object):
 
     TODO: error list, not just numbers needs to be reported back up.
     '''
-
     ### INITIALIZER ###
 
     def __init__(self, filePath, jobNumber=0, parseUsingCorpus=True, corpusName=None):

@@ -1513,7 +1513,7 @@ class CorpusDocumenter(Documenter):
     def rstCorpusIntroductionFormat(self):
         result = []
         result.append('The following list shows all files available in the ')
-        result.append('`music21` corpus and available through the virtual corpus.')
+        result.append('`music21` corpus.')
         result.append('To load a work from the corpus, provide the file path ')
         result.append('stub provided.')
         result.append('')
@@ -1570,15 +1570,15 @@ class CorpusDocumenter(Documenter):
         result = []
         isSingleWork = True if len(corpusWork.files) == 1 else False
         workTitle = str(corpusWork.title)
-        worksAreVirtual = corpusWork.virtual
-        if worksAreVirtual:
-            workTitle += ' (*virtual*)'
+#         worksAreVirtual = corpusWork.virtual
+#         if worksAreVirtual:
+#             workTitle += ' (*virtual*)'
         if isSingleWork is False:
             result.append(workTitle)
             result.append('')
         procedure = self.getRstWorkFileDictFormat
-        if worksAreVirtual:
-            procedure = self.getRstVirtualWorkFileDictFormat
+#         if worksAreVirtual:
+#             procedure = self.getRstVirtualWorkFileDictFormat
         if isSingleWork is False:
             for corpusFile in corpusWork.files:
                 result.extend(["- " + procedure(corpusFile), ''])
@@ -1587,18 +1587,18 @@ class CorpusDocumenter(Documenter):
             result.append('')
         return result
 
-    def getRstVirtualWorkFileDictFormat(self, corpusFile):
-        result = []
-        result.append('- {0} *({1})*: `{2}`'.format(
-            str(corpusFile.title),
-            str(corpusFile.format),
-            str(corpusFile.path),
-            )) 
-        result.append('')
-        result.append('  Source: {0}'.format(
-            str(corpusFile.url)))
-        result.append('')
-        return result
+#     def getRstVirtualWorkFileDictFormat(self, corpusFile):
+#         result = []
+#         result.append('- {0} *({1})*: `{2}`'.format(
+#             str(corpusFile.title),
+#             str(corpusFile.format),
+#             str(corpusFile.path),
+#             )) 
+#         result.append('')
+#         result.append('  Source: {0}'.format(
+#             str(corpusFile.url)))
+#         result.append('')
+#         return result
 
     def getRstWorkFileDictFormat(self, corpusFile):
         corpusPathWithoutSlashes = re.sub(

@@ -146,14 +146,14 @@ class Test(unittest.TestCase):
         searchResults = corpus.search(str(ks), field='keySignature')
         self.assertEqual(len(searchResults) >= 32, True, len(searchResults))
 
-    def testSearch12(self):
-        # searching virtual entries
-        searchResults = corpus.search('coltrane', field='composer')
-        self.assertEqual(len(searchResults) > 0, True)
-        # returns items in pairs: url and work number
-        self.assertEqual(searchResults[0].sourcePath,
-            'http://impromastering.com/uploads/transcription_file/' +
-            'file/196/Giant_Steps__John_Coltrane_C.xml')
+#     def testSearch12(self):
+#         # searching virtual entries
+#         searchResults = corpus.search('coltrane', field='composer')
+#         self.assertEqual(len(searchResults) > 0, True)
+#         # returns items in pairs: url and work number
+#         self.assertEqual(searchResults[0].sourcePath,
+#             'http://impromastering.com/uploads/transcription_file/' +
+#             'file/196/Giant_Steps__John_Coltrane_C.xml')
 
 #     def testGetWorkList(self):
 #         self.assertEqual(len(corpus.corpora.CoreCorpus().getPaths('.md')) >= 38, True)

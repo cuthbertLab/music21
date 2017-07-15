@@ -41,9 +41,6 @@ def fromName(name):
     >>> corpus.manager.fromName('core')
     <music21.corpus.corpora.CoreCorpus>
 
-    >>> corpus.manager.fromName('virtual')
-    <music21.corpus.corpora.VirtualCorpus>
-
     >>> corpus.manager.fromName('local')
     <music21.corpus.corpora.LocalCorpus: 'local'>
 
@@ -57,10 +54,13 @@ def fromName(name):
     >>> corpus.manager.fromName('testDummy')
     <music21.corpus.corpora.LocalCorpus: 'testDummy'>
     '''
+#     >>> corpus.manager.fromName('virtual')
+#     <music21.corpus.corpora.VirtualCorpus>
+
     if name == 'core':
         return corpora.CoreCorpus()
-    elif name == 'virtual':
-        return corpora.VirtualCorpus()
+#     elif name == 'virtual':
+#         return corpora.VirtualCorpus()
     elif name == 'local':
         return corpora.LocalCorpus()
     else:
@@ -74,9 +74,6 @@ def fromCacheName(name):
 
     >>> corpus.manager.fromCacheName('core')
     <music21.corpus.corpora.CoreCorpus>
-
-    >>> corpus.manager.fromCacheName('virtual')
-    <music21.corpus.corpora.VirtualCorpus>
 
     >>> corpus.manager.fromCacheName('local')
     <music21.corpus.corpora.LocalCorpus: 'local'>
@@ -96,10 +93,13 @@ def fromCacheName(name):
     Traceback (most recent call last):
     music21.exceptions21.CorpusException: Cannot parse a cacheName of 'testDummy'
     '''
+#     >>> corpus.manager.fromCacheName('virtual')
+#     <music21.corpus.corpora.VirtualCorpus>
+    
     if name == 'core':
         return corpora.CoreCorpus()
-    elif name == 'virtual':
-        return corpora.VirtualCorpus()
+#     elif name == 'virtual':
+#         return corpora.VirtualCorpus()
     elif name == 'local' or name is None:
         return corpora.LocalCorpus()
     elif name.startswith('local-'):
@@ -113,7 +113,7 @@ def iterateCorpora(returnObjects=True):
     a generator that iterates over the corpora (either as objects or as names)
     for use in pan corpus searching.
 
-    This test will only show the first three, because it needs to run the same
+    This test will only show the first two, because it needs to run the same
     on every system:
 
     >>> for i, corpusObject in enumerate(corpus.manager.iterateCorpora()):
@@ -121,7 +121,6 @@ def iterateCorpora(returnObjects=True):
     ...     if i == 2:
     ...        break
     <music21.corpus.corpora.CoreCorpus>
-    <music21.corpus.corpora.VirtualCorpus>
     <music21.corpus.corpora.LocalCorpus: 'local'>
 
     We can also get names instead... Note that the name of the main localcorpus is 'local' not
@@ -132,19 +131,18 @@ def iterateCorpora(returnObjects=True):
     ...     if i == 2:
     ...        break
     core
-    virtual
     local
 
     New in v.3
     '''
     if returnObjects is True:
         yield corpora.CoreCorpus()
-        yield corpora.VirtualCorpus()
+        # yield corpora.VirtualCorpus()
         for cn in listLocalCorporaNames():
             yield corpora.LocalCorpus(cn)
     else:
         yield corpora.CoreCorpus().name
-        yield corpora.VirtualCorpus().name
+        # yield corpora.VirtualCorpus().name
         for cn in listLocalCorporaNames():
             if cn is None:
                 yield 'local'
@@ -259,9 +257,6 @@ def search(query, field=None, corpusNames=None, fileExtensions=None):
     >>> corpus.search('bach', field='composer')
     <music21.metadata.bundles.MetadataBundle {22 entries}>
 
-    >>> corpus.search('coltrane', corpusNames=('virtual',))
-    <music21.metadata.bundles.MetadataBundle {1 entry}>
-
     This method is implemented in `corpus.manager` but loaded into corpus for
     ease of use.
 
@@ -270,7 +265,7 @@ def search(query, field=None, corpusNames=None, fileExtensions=None):
 
     >>> corpus.manager.search(
     ...     'bach',
-    ...     corpusNames=('core', 'virtual'),
+    ...     corpusNames=('core',),
     ...     )
     <music21.metadata.bundles.MetadataBundle {557 entries}>
 
@@ -279,6 +274,9 @@ def search(query, field=None, corpusNames=None, fileExtensions=None):
     See usersGuide (chapter 11) for more information on searching
 
     '''
+#     >>> corpus.search('coltrane', corpusNames=('virtual',))
+#     <music21.metadata.bundles.MetadataBundle {1 entry}>
+
     readAllMetadataBundlesFromDisk()
     allSearchResults = metadata.bundles.MetadataBundle()
 
@@ -298,16 +296,16 @@ def getMetadataBundleByCorpus(corpusObject):
     '''
     Return the metadata bundle for a single Corpus object
 
-    >>> vc = corpus.corpora.VirtualCorpus()
-    >>> mdb1 = corpus.manager.getMetadataBundleByCorpus(vc)
+    >>> cc = corpus.corpora.CoreCorpus()
+    >>> mdb1 = corpus.manager.getMetadataBundleByCorpus(cc)
     >>> mdb1
-    <music21.metadata.bundles.MetadataBundle 'virtual': {11 entries}>
+    <music21.metadata.bundles.MetadataBundle 'core': {... entries}>
 
     This is the same as calling `metadataBundle` on the corpus itself,
     but this is the routine that actually does the work. In other words,
     it's the call on the object that is redundant, not this routine.
 
-    >>> mdb1 is vc.metadataBundle
+    >>> mdb1 is cc.metadataBundle
     True
     '''
     cacheMetadataBundleFromDisk(corpusObject)

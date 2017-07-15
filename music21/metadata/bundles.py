@@ -179,14 +179,11 @@ class MetadataBundle(object):
     >>> coreBundle = metadata.bundles.MetadataBundle(coreCorpus)
     >>> localCorpus = corpus.corpora.LocalCorpus()
     >>> localBundle = metadata.bundles.MetadataBundle(localCorpus)
-    >>> virtualCorpus = corpus.corpora.VirtualCorpus()
-    >>> virtualBundle = metadata.bundles.MetadataBundle(virtualCorpus)
 
     Method 2:
 
     >>> coreBundle = metadata.bundles.MetadataBundle('core')
     >>> localBundle = metadata.bundles.MetadataBundle('local')
-    >>> virtualBundle = metadata.bundles.MetadataBundle('virtual')
 
     After calling these you'll need to call ``read()``:
 
@@ -204,7 +201,6 @@ class MetadataBundle(object):
 
     >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
     >>> localBundle = corpus.corpora.LocalCorpus().metadataBundle
-    >>> virtualBundle = corpus.corpora.VirtualCorpus().metadataBundle
 
     >>> coreBundle
     <music21.metadata.bundles.MetadataBundle 'core': {148... entries}>
@@ -627,12 +623,6 @@ class MetadataBundle(object):
         >>> '_metadataCache' in ccPath
         True
         
-        >>> virPath = corpus.corpora.VirtualCorpus().metadataBundle.filePath
-        >>> virPath.endswith('virtual.json')
-        True
-        >>> '_metadataCache' in virPath
-        True
-
         >>> localPath = corpus.corpora.LocalCorpus().metadataBundle.filePath
         >>> localPath.endswith('local.json')
         True
@@ -647,6 +637,14 @@ class MetadataBundle(object):
         >>> funkPath.endswith('local-funk.json')
         True       
         '''
+#         >>> virPath = corpus.corpora.VirtualCorpus().metadataBundle.filePath
+#         >>> virPath.endswith('virtual.json')
+#         True
+#         >>> '_metadataCache' in virPath
+#         True
+
+
+        
         if self.name is None:
             return None
         if self.name in ('virtual', 'core'):
@@ -672,11 +670,11 @@ class MetadataBundle(object):
         r'''
         The name of the metadata bundle.
 
-        Can be 'core', 'local', 'virtual', 'local-{name}' where name is the name
+        Can be 'core', 'local', 'local-{name}' where name is the name
         of a named local corpus or None.
 
-        The names 'core', 'local' and 'virtual refer to the core, local and
-        virtual corpuses respectively:
+        The names 'core' and 'local' refer to the core and local 
+        corpuses respectively: (virtual corpus is currently offline)
 
         >>> from music21 import metadata
         >>> metadata.bundles.MetadataBundle().name is None
@@ -1057,14 +1055,14 @@ class MetadataBundle(object):
     def read(self, filePath=None):
         r'''
         Load cached metadata from the file path suggested by the name of this
-        MetadataBundle ('core', 'local', or 'virtual').
+        MetadataBundle ('core', 'local', or a name).
 
         If a specific filepath is given with the `filePath` keyword, attempt to
         load cached metadata from the file at that location.
 
         If `filePath` is None, and `self.filePath` is also None, do nothing.
 
-        >>> virtualBundle = metadata.bundles.MetadataBundle('virtual').read()
+        >>> #_DOCS_SHOW coreBundle = metadata.bundles.MetadataBundle('core').read()
 
         If a metadata is unnamed, and no file path is specified, an exception
         will be thrown:
@@ -1097,32 +1095,6 @@ class MetadataBundle(object):
             'md items:',
             len(self._metadataEntries)
             ])
-        return self
-
-    def rebuild(self, useMultiprocessing=True, verbose=True):
-        r'''
-        Rebuild a named bundle from scratch.
-
-        If a bundle is associated with one of music21's corpuses, delete any
-        metadata cache on disk, clear the bundle's contents and reload in all
-        files from that associated corpus.
-
-        Return the rebuilt metadata bundle.
-        '''
-        from music21 import corpus
-        if self.filePath is None:
-            return self
-        self.clear()
-        self.delete()
-        parseUsingCorpus = False
-        if isinstance(self.corpus, corpus.corpora.CoreCorpus):
-            parseUsingCorpus = True
-        self.addFromPaths(
-            self.corpus.getPaths(),
-            parseUsingCorpus=parseUsingCorpus,
-            useMultiprocessing=useMultiprocessing,
-            verbose=verbose
-            )
         return self
 
     def search(self, query, field=None, fileExtensions=None):
@@ -1255,11 +1227,6 @@ class MetadataBundle(object):
         If the entry represents a non-virtual corpus asset, test that its
         source path is locatable on disk.  If not, remove the metadata entry
         from the metadata bundle.
-
-        Currently (Dec 2014) there is one entry in the metadata bundle that
-        has been removed, so calling validate (called from addFromPaths) results in
-        14083 instead of 14084 entries
-
         '''
         timer = common.Timer()
         timer.start()

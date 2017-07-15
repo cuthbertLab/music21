@@ -6,14 +6,14 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2009-2012, 2015 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2009-2017 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 '''
 The environment module describes an object for accessing and setting
 variables related to the user's music21 environment. Such variables include
-the location of external applications such as MusicXML readers (e.g. Finale),
+the location of external applications such as MusicXML readers (e.g. MuseScore),
 whether music21 is allowed to download files directly (via the virtual corpus),
 and other settings.
 

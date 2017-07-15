@@ -19,7 +19,7 @@ from music21 import common
 #------------------------------------------------------------------------------
 CorpusWork = namedtuple('CorpusWork', 'title files virtual')
 CorpusFile = namedtuple('CorpusFile', 'path title filename format ext')
-VirtualCorpusFile = namedtuple('VirtualCorpusFile', 'path title url format')
+# VirtualCorpusFile = namedtuple('VirtualCorpusFile', 'path title url format')
 
 class DirectoryInformation(object):
     '''

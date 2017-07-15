@@ -38,6 +38,11 @@ And use `corpus.search` if you do not:
 '''
 from __future__ import unicode_literals
 
+__all__ = ['chorales', 'corpora', 'manager', 
+           # virtual
+           'work', 
+           'parse']
+
 import re
 import os
 import unittest
@@ -51,7 +56,7 @@ from music21 import metadata
 from music21.corpus import chorales
 from music21.corpus import corpora
 from music21.corpus import manager
-from music21.corpus import virtual
+# from music21.corpus import virtual
 from music21.corpus import work
 
 from music21.musicxml import archiveTools
@@ -96,20 +101,20 @@ def getCorePaths(fileExtensions=None, expandExtensions=True):
         expandExtensions=expandExtensions,
         )
 
-def getVirtualPaths(fileExtensions=None, expandExtensions=True):
-    '''
-    Get all paths in the virtual corpus that match a known extension.
-
-    An extension of None will return all known extensions.
-
-    >>> len(corpus.getVirtualPaths()) > 6
-    True
-
-    '''
-    return corpora.VirtualCorpus().getPaths(
-        fileExtensions=fileExtensions,
-        expandExtensions=expandExtensions,
-        )
+# def getVirtualPaths(fileExtensions=None, expandExtensions=True):
+#     '''
+#     Get all paths in the virtual corpus that match a known extension.
+# 
+#     An extension of None will return all known extensions.
+# 
+#     >>> len(corpus.getVirtualPaths()) > 6
+#     True
+# 
+#     '''
+#     return corpora.VirtualCorpus().getPaths(
+#         fileExtensions=fileExtensions,
+#         expandExtensions=expandExtensions,
+#         )
 
 def getLocalPaths(fileExtensions=None, expandExtensions=True):
     '''
@@ -159,10 +164,10 @@ def addPath(filePath, corpusName=None):
 def getPaths(
     fileExtensions=None,
     expandExtensions=True,
-    name=('local', 'core', 'virtual'),
+    name=('local', 'core'), # , 'virtual'
     ):
     '''
-    Get paths from core, virtual, and/or local corpora.
+    Get paths from core and/or local corpora.
     This is the public interface for getting all corpus
     paths with one function.
     '''
@@ -177,11 +182,11 @@ def getPaths(
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
             )
-    if 'virtual' in name:
-        paths += corpora.VirtualCorpus().getPaths(
-            fileExtensions=fileExtensions,
-            expandExtensions=expandExtensions,
-            )
+#     if 'virtual' in name:
+#         paths += corpora.VirtualCorpus().getPaths(
+#             fileExtensions=fileExtensions,
+#             expandExtensions=expandExtensions,
+#             )
     return paths
 
 
@@ -295,7 +300,7 @@ def parse(workName,
 
     Similar to the :meth:`~music21.converter.parse` method of converter (which
     takes in a filepath on the local hard drive), this method searches the
-    corpus (including the virtual corpus) for a work fitting the workName
+    corpus (including local corpora) for a work fitting the workName
     description and returns a :class:`music21.stream.Stream`.
 
     If `movementNumber` is defined, and a movement is included in the corpus,
