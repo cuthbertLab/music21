@@ -145,6 +145,7 @@ class ModuleGather(object):
             'timeGraphs.py',
             'exceldiff.py',
             'multiprocessTest.py',
+            'corpus/virtual.py', # offline for v.4
             'figuredBass/examples.py', # 40 seconds and runs fine
             ]
 

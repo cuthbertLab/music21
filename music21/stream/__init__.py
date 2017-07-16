@@ -3772,7 +3772,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {5.0} <music21.stream.Measure 2 offset=5.0>
         ...
 
-        Setting removeClasses to True removes everything:
+        Setting removeClasses to True removes everything that is not a Stream:
 
         >>> bass = b.parts[3]
         >>> bassEmpty = bass.template(fillWithRests=False, removeClasses=True)
