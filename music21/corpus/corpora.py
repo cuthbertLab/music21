@@ -63,9 +63,13 @@ class Corpus(object):
     ### PRIVATE METHODS ###
 
     def _removeNameFromCache(self, name):
-        for key in Corpus._pathsCache.keys():
+        keysToRemove = []
+        for key in list(Corpus._pathsCache):
             if key[0] == name:
-                del(Corpus._pathsCache[key])
+                keysToRemove.append(key)
+                
+        for key in keysToRemove:
+            del(Corpus._pathsCache[key])
 
     def _findPaths(self, rootDirectoryPath, fileExtensions):
         '''
@@ -1012,15 +1016,17 @@ class LocalCorpus(Corpus):
     def save(self):
         r'''
         Save the current list of directory paths in use by a given corpus in
-        the user settings.
+        the user settings.  And reindex.
         '''
+        from music21.metadata.caching import cacheMetadata
+        
         userSettings = environment.UserSettings()
         if self.name == 'local':
             userSettings['localCorpusSettings'] = self.directoryPaths
         else:
             userSettings['localCorporaSettings'][self.name] = self.directoryPaths
         environment.Environment().write()
-
+        cacheMetadata([self.name], verbose=True)
 
     ### PUBLIC PROPERTIES ###
 

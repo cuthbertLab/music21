@@ -7,7 +7,7 @@
 #               Josiah Wolf Oberholtzer
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2009, 2013, 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009, 2013, 2015-17 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 '''
@@ -30,7 +30,7 @@ from music21.exceptions21 import CorpusException
 _metadataBundles = {
     'core': None,
     'local': None,
-    'virtual': None,
+    # 'virtual': None,
     }
 
 #------------------------------------------------------------------------------
@@ -307,10 +307,22 @@ def getMetadataBundleByCorpus(corpusObject):
 
     >>> mdb1 is cc.metadataBundle
     True
+
+    Non-existent corpus...
+
+    >>> lc = corpus.corpora.LocalCorpus('junk')
+    >>> mdb1 = corpus.manager.getMetadataBundleByCorpus(lc)
+    >>> mdb1
+    <music21.metadata.bundles.MetadataBundle 'local-junk': {0 entries}>
+
     '''
     cacheMetadataBundleFromDisk(corpusObject)
     cacheName = corpusObject.cacheName
-    return _metadataBundles[cacheName]
+    if cacheName in _metadataBundles:        
+        return _metadataBundles[cacheName]
+    else: # pragma: no-cover
+        raise CorpusException('No metadata bundle found for corpus {0} with name {1}'.format(
+            corpusObject, cacheName))
 
 def cacheMetadataBundleFromDisk(corpusObject):
     r'''
