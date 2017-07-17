@@ -159,7 +159,7 @@ def defaultDeepcopy(obj, memo, callInit=True):
             if self._noDeepcopy:
                 return self.__class__()
             else:
-                common.defaultDeepcopy(obj, memo)
+                return common.defaultDeepcopy(self, memo)
 
     looks through both __slots__ and __dict__ and does a deepcopy
     of anything in each of them and returns the new object.

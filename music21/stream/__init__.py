@@ -888,6 +888,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Merge relevant attributes from the Other stream into this one.
 
         >>> s = stream.Stream()
+        >>> s.append(note.Note())
         >>> s.autoSort = False
         >>> s.id = 'hi'
         >>> t = stream.Stream()
@@ -896,13 +897,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         False
         >>> t
         <music21.stream.Stream hi>
+        >>> len(t)
+        0
         '''
         base.Music21Object.mergeAttributes(self, other)
 
-        for attr in ('autoSort', 'isSorted'):
+        for attr in ('autoSort', 'isSorted', 'definesExplicitSystemBreaks', 
+                     'definesExplicitPageBreaks', '_atSoundingPitch', '_mutable'):
             if hasattr(other, attr):
                 setattr(self, attr, getattr(other, attr))
-
 
     def hasElement(self, obj):
         '''
@@ -3896,7 +3899,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         restInfo['endTime'] = endTime
             else:
                 optionalAddRest()
-                out.insert(el.offset, el)
+                elNew = copy.deepcopy(el)
+                out.insert(el.offset, elNew)
                 
         optionalAddRest()
 
@@ -3912,7 +3916,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         if not self.hasMeasures():
             raise StreamException('the requested Stream does not have Measures')
-        return self.measures(fillWithRests=fillWithRests,
+        return self.template(fillWithRests=fillWithRests,
                              removeClasses=customRemove,
                              retainVoices=False)
 

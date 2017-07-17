@@ -12,7 +12,6 @@
 # Copyright:    Copyright © 2009-2012, 17 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 '''
 This module represents instruments through objects that contain general information
 such as Metadata for instrument names, classifications, transpositions and default
@@ -38,9 +37,6 @@ from music21.ext import six
 from music21 import environment
 _MOD = "instrument.py"
 environLocal = environment.Environment(_MOD)
-
-
-
 
 def unbundleInstruments(streamIn, inPlace=False):
     '''
@@ -144,10 +140,14 @@ class Instrument(base.Music21Object):
         base.Music21Object.__init__(self)
 
         self.partId = None
+        self._partIdIsRandom = False
+        
         self.partName = None
         self.partAbbreviation = None
 
         self.instrumentId = None # apply to midi and instrument
+        self._instrumentIdIsRandom = False
+
         self.instrumentName = None
         self.instrumentAbbreviation = None
         self.midiProgram = None
@@ -177,6 +177,14 @@ class Instrument(base.Music21Object):
                                self.__class__.__name__,
                                self.__str__())
 
+    def __deepcopy__(self, memo):
+        new = common.defaultDeepcopy(self, memo)
+        if self._partIdIsRandom:
+            new.partIdRandomize()
+        if self._instrumentIdIsRandom:
+            new.instrumentIdRandomize()
+        return new
+
     def bestName(self):
         '''
         Find a viable name, looking first at instrument, then part, then
@@ -202,6 +210,7 @@ class Instrument(base.Music21Object):
         #environLocal.printDebug(['incrementing instrument from',
         #                         self.partId, 'to', idNew])
         self.partId = idNew
+        self._partIdIsRandom = True
 
     def instrumentIdRandomize(self):
         '''
@@ -211,6 +220,7 @@ class Instrument(base.Music21Object):
         #environLocal.printDebug(['incrementing instrument from',
         #                         self.partId, 'to', idNew])
         self.instrumentId = idNew
+        self._instrumentIdIsRandom = True
 
 
     # the empty list as default is actually CORRECT!

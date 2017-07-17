@@ -118,7 +118,7 @@ def iterateCorpora(returnObjects=True):
 
     >>> for i, corpusObject in enumerate(corpus.manager.iterateCorpora()):
     ...     print(corpusObject)
-    ...     if i == 2:
+    ...     if i == 1:
     ...        break
     <music21.corpus.corpora.CoreCorpus>
     <music21.corpus.corpora.LocalCorpus: 'local'>
@@ -128,7 +128,7 @@ def iterateCorpora(returnObjects=True):
 
     >>> for i, corpusName in enumerate(corpus.manager.iterateCorpora(returnObjects=False)):
     ...     print(corpusName)
-    ...     if i == 2:
+    ...     if i == 1:
     ...        break
     core
     local
