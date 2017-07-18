@@ -1323,11 +1323,11 @@ class Test(unittest.TestCase):
         os.rename(tempfp, tempfp + "-0001.png")
         tempfp += "-0001.png"
         if six.PY3:
-            from unittest import mock  # @UnusedImport # pylint: disable=no-name-in-module
+            from unittest import mock, MagicMock  # @UnusedImport # pylint: disable=no-name-in-module
         else:
-            from music21.ext import mock # @Reimport
+            from music21.ext import mock, MagicMock # @Reimport
         with mock.patch('music21.converter.subConverters.findPNGfpFromXMLfp.found') as mockConv:
-            mockConv.__len__ = 1000
+            mockConv.__len__ = MagicMock(return_value=1000)
             xmlconverter = ConverterMusicXML()
             self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, xmlfp)
 
