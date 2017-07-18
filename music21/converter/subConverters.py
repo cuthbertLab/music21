@@ -1322,8 +1322,14 @@ class Test(unittest.TestCase):
         xmlfp = tempfp + ".xml"
         os.rename(tempfp, tempfp + "-0001.png")
         tempfp += "-0001.png"
-        xmlconverter = ConverterMusicXML()
-        self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, xmlfp)
+        if six.PY3:
+            from unittest import mock  # @UnusedImport # pylint: disable=no-name-in-module
+        else:
+            from music21.ext import mock # @Reimport
+        with mock.patch('music21.converter.subConverters.findPNGfpFromXMLfp.found') as mockConv:
+            mockConv.__len__ = 1000
+            xmlconverter = ConverterMusicXML()
+            self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, xmlfp)
 
 
 class TestExternal(unittest.TestCase):
