@@ -819,7 +819,7 @@ class ConverterMusicXML(SubConverter):
                              , stderr=subprocess.STDOUT, env=env)
         except subprocess.CalledProcessError as cpe:
             print("program error:", cpe, file=sys.stderr)
-            raise Exception(err)
+            raise Exception(cpe)
 
         if subformatExtension == 'png':
             return self.findPNGfpFromXMLfp(fpOut)
