@@ -740,12 +740,10 @@ class ConverterMusicXML(SubConverter):
         Check whether total number of pngs is in 1-9, 10-99, or 100-999 range,
          then return appropriate fp. Raises and exception if png fp does not exist.
         '''
-        if os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + "-1.png"):
-            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + "-1.png"
-        elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + "-01.png"):
-            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + "-01.png"
-        elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + "-001.png"):
-            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + "-001.png"
+        import glob
+        found = sorted(glob.glob(xmlFilePath[0:len(xmlFilePath) - 4] + "-*.png"))
+        if found and len(found) < 999:
+            pngfp = found[0]
         else:
             raise SubConverterFileIOException("png file of xml not found. Is your file >999 pages?")
         return pngfp
@@ -814,19 +812,22 @@ class ConverterMusicXML(SubConverter):
         fpOut = fp[0:len(fp) - 3]
         fpOut += subformatExtension
 
-        musescoreRun = '"' + musescorePath + '" ' + fp + " -o " + fpOut + " -T 0 "
+        musescoreRun = '' + musescorePath + ' ' + fp + " -o " + fpOut + " -T 0 "
         if 'dpi' in keywords:
             musescoreRun += " -r " + str(keywords['dpi'])
 
         if common.runningUnderIPython():
             musescoreRun += " -r " + str(defaults.ipythonImageDpi)
 
-        storedStrErr = sys.stderr
-        fileLikeOpen = six.StringIO()
-        sys.stderr = fileLikeOpen
-        os.system(musescoreRun)
-        fileLikeOpen.close()
-        sys.stderr = storedStrErr
+        import subprocess
+        command = musescoreRun.split()
+        try:
+            env = dict(os.environ, QT_QPA_PLATFORM='offscreen')
+            output = subprocess.check_output(command
+                             , stderr=subprocess.STDOUT, env=env)
+        except subprocess.CalledProcessError as cpe:
+            print("program error:", cpe, file=sys.stderr)
+            raise Exception(err)
 
         if subformatExtension == 'png':
             return self.findPNGfpFromXMLfp(fpOut)
