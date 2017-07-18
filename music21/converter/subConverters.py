@@ -734,7 +734,7 @@ class ConverterMusicXML(SubConverter):
         '''
         import glob
         found = sorted(glob.glob(xmlFilePath[0:len(xmlFilePath) - 4] + "-*.png"))
-        if found and len(found) < 999:
+        if len(found) > 0 and len(found) < 999:
             pngfp = found[0]
         else:
             raise SubConverterFileIOException("png file of xml not found. Is your file >999 pages?")
