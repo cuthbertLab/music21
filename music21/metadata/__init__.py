@@ -475,8 +475,11 @@ class Metadata(base.Music21Object):
                 
         # now search all contributors.
         for contrib in self.contributors:
-            if field is not None and field.lower() not in contrib.role:
-                continue
+            if field is not None:
+                if contrib.role is None and field.lower() != 'contributor':
+                    continue
+                if contrib.role is not None and field.lower() not in contrib.role:
+                    continue
             for name in contrib.names:
                 valueFieldPairs.append((name, contrib.role))
                 

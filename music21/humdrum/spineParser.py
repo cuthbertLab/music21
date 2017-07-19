@@ -136,6 +136,7 @@ class HumdrumDataCollection(object):
         self.fileLength = None
         self.protoSpines = None
         self.eventCollections = None
+        self.spineCollection = None
 
         if dataStream is not None and not dataStream:
             raise HumdrumException("dataStream is not optional, specify some lines: \n" +
