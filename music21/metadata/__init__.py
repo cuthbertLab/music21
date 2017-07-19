@@ -104,8 +104,14 @@ class Metadata(base.Music21Object):
     made available by default.
 
     >>> md.searchAttributes
-    ('alternativeTitle', 'composer', 'copyright', 'date', 'localeOfComposition',
-     'movementName', 'movementNumber', 'number', 'opusNumber', 'title')
+    ('actNumber', 'alternativeTitle', 'associatedWork', 'collectionDesignation', 
+     'commission', 'composer', 'copyright', 'countryOfComposition', 'date', 'dedication', 
+     'groupTitle', 'localeOfComposition', 'movementName', 'movementNumber', 'number', 
+     'opusNumber', 'parentTitle', 'popularTitle', 'sceneNumber', 'textLanguage', 
+     'textOriginalLanguage', 'title', 'volume')
+
+    Plus anything that is in contributors...
+
 
     All contributors are stored in a .contributors list:
 
@@ -116,20 +122,6 @@ class Metadata(base.Music21Object):
     ### CLASS VARIABLES ###
 
     classSortOrder = -30
-
-    # add more as properties/import exists
-    searchAttributes = (
-        'alternativeTitle',
-        'composer',
-        'copyright',
-        'date',
-        'localeOfComposition',
-        'movementName',
-        'movementNumber',
-        'number',
-        'opusNumber',
-        'title',
-        )
 
     # !!!OTL: Title.
     # !!!OTP: Popular Title.
@@ -174,6 +166,14 @@ class Metadata(base.Music21Object):
         'txl': 'textLanguage',
         'txo': 'textOriginalLanguage',
         }
+
+    # add more as properties/import exists
+    searchAttributes = tuple(sorted([
+        'composer',
+        'copyright',
+        'date',
+        ] + list(workIdAbbreviationDict.values())))
+
 
     workIdLookupDict = {}
     for key, value in workIdAbbreviationDict.items():
@@ -335,6 +335,17 @@ class Metadata(base.Music21Object):
         >>> md.composers
         ['Beach, Amy', 'Cheney, Amy Marcy']
 
+        All contributor roles are searchable, even if they are not standard roles:
+        
+        >>> md.search('Beach')
+        (True, 'composer')
+        
+        >>> dancer = metadata.Contributor()
+        >>> dancer.names = ['Mark Gotham', 'I. Quinn']
+        >>> dancer.role = 'interpretive dancer'
+        >>> md.addContributor(dancer)
+        >>> md.search('Gotham')
+        (True, 'interpretive dancer')
         '''
         if not isinstance(c, Contributor):
             raise exceptions21.MetadataException(
@@ -438,7 +449,9 @@ class Metadata(base.Music21Object):
         (True, 'composer')
         '''
         valueFieldPairs = []
+        
         if field is not None:
+            field = field.lower()
             match = False
             try:
                 value = getattr(self, field)
@@ -455,13 +468,19 @@ class Metadata(base.Music21Object):
                         valueFieldPairs.append((value, searchAttribute))
                         match = True
                         break
-            # if cannot find a match for any field, return
-            if not match:
-                return False, None
         else:  # get all fields
             for innerField in self.searchAttributes:
                 value = getattr(self, innerField)
                 valueFieldPairs.append((value, innerField))
+                
+        # now search all contributors.
+        for contrib in self.contributors:
+            if field is not None and field.lower() not in contrib.role:
+                continue
+            for name in contrib.names:
+                valueFieldPairs.append((name, contrib.role))
+                
+                
         # for now, make all queries strings
         # ultimately, can look for regular expressions by checking for
         # .search
@@ -474,6 +493,7 @@ class Metadata(base.Music21Object):
               and any(character in query for character in '*.|+?{}')):
             useRegex = True
             reQuery = re.compile(query, flags=re.IGNORECASE) #  @UndefinedVariable
+
         if useRegex:
             for value, innerField in valueFieldPairs:
                 # re.I makes case insensitive
@@ -797,12 +817,13 @@ class RichMetadata(Metadata):
     >>> 'keySignatureFirst' in richMetadata.searchAttributes
     True
     >>> richMetadata.searchAttributes
-    ('alternativeTitle', 'ambitus', 'composer', 'copyright', 'date',
-     'keySignatureFirst', 'keySignatures', 'localeOfComposition',
-     'movementName', 'movementNumber', 'noteCount', 'number',
-     'opusNumber', 'pitchHighest', 'pitchLowest', 'quarterLength',
-     'sourcePath',
-     'tempoFirst', 'tempos', 'timeSignatureFirst', 'timeSignatures', 'title')
+    ('actNumber', 'alternativeTitle', 'ambitus', 'associatedWork', 'collectionDesignation', 
+     'commission', 'composer', 'copyright', 'countryOfComposition', 'date', 'dedication', 
+     'groupTitle', 'keySignatureFirst', 'keySignatures', 'localeOfComposition', 'movementName', 
+     'movementNumber', 'noteCount', 'number', 'opusNumber', 'parentTitle', 'pitchHighest', 
+     'pitchLowest', 'popularTitle', 'quarterLength', 'sceneNumber', 'sourcePath', 'tempoFirst', 
+     'tempos', 'textLanguage', 'textOriginalLanguage', 'timeSignatureFirst', 
+     'timeSignatures', 'title', 'volume')
     '''
 
     ### CLASS VARIABLES ###

@@ -929,7 +929,7 @@ class Contributor(object):
 
     @name.setter
     def name(self, value):
-        # return first name
+        # set first name
         self._names = []  # reset
         self._names.append(Text(value))
 
@@ -945,12 +945,28 @@ class Contributor(object):
         ...     )
         >>> td.names
         ['Chopin, Fryderyk', 'Chopin, Frederick']
+        
+        >>> td.names = ['Czerny', 'Spohr']
+        >>> td.names
+        ['Czerny', 'Spohr']
         '''
         # return first name
         msg = []
         for n in self._names:
             msg.append(str(n))
         return msg
+
+    @names.setter
+    def names(self, values):
+        if not common.isIterable(values):
+            raise exceptions21.MetadataException(
+                '.names must be a list -- do you mean .name instead?')
+        self._names = []  # reset
+        for n in values:
+            self._names.append(Text(n))
+            
+            
+
 
     @property
     def role(self):

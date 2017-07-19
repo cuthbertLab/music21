@@ -13,7 +13,8 @@
 If it doesn't fit anywhere else in the common directory, you'll find it here...
 '''
 
-__all__ = ['getMissingImportStr',
+__all__ = ['flattenList',
+           'getMissingImportStr',
            'getPlatform',
            'sortModules',
            'pitchList',
@@ -26,6 +27,20 @@ import os
 import sys
 import textwrap
 import time
+
+#------------------------------------------------------------------------------
+def flattenList(l):
+    '''
+    Flatten a list of lists into a flat list
+    
+    but not a list of lists of lists...
+    
+    >>> l = [[1, 2, 3], [4, 5], [6]]
+    >>> common.flattenList(l)
+    [1, 2, 3, 4, 5, 6]
+    '''
+    return [item for sublist in l for item in sublist]
+
 
 #-------------------------------------------------------------------------------
 # provide warning strings to users for use in conditional imports

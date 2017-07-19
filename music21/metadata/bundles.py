@@ -113,6 +113,7 @@ class MetadataEntry(object):
         score.show(showFormat)
 
     def search(self, query, field=None):
+        # runs search on the RichMetadata object
         return self.metadataPayload.search(query, field)
 
     ### PUBLIC PROPERTIES ###

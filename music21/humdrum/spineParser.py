@@ -45,6 +45,7 @@ SpineParsing consists of several steps.
 '''
 # pylint: disable=redefined-builtin
 #python3
+import copy
 import math
 import os
 import re
@@ -324,6 +325,10 @@ class HumdrumDataCollection(object):
             sc.id = 'section_' + str(i + 1)
             sc.metadata.number = i + 1
             opus.append(sc)
+
+        if dataCollections:
+            opus.metadata = copy.deepcopy(opus.scores[0].metadata)
+            opus.metadata.number = 0
 
         self.stream = opus
         return opus
