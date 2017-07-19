@@ -3468,10 +3468,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         
         That is, a request for measures 4 through 10 will return 7 Measures, numbers 4 through 10.
 
-        If `numberEnd=None` then it is interpreted as the last measure of the stream.
-
-
-
         Additionally, any number of associated classes can be gathered from the context
         and put into the measure.  By default we collect the Clef, TimeSignature, KeySignature,
         and Instrument so that there is enough context to perform.  (See getContextByClass()
@@ -3480,14 +3476,37 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         While all elements in the source are the original elements in the extracted region,
         new Measure objects are created and returned.
 
-        >>> a = corpus.parse('bach/bwv324.xml')
-        >>> b = a.parts[0].measures(1, 3)
-        >>> len(b.getElementsByClass('Measure'))
+        >>> bachIn = corpus.parse('bach/bwv66.6')
+        >>> bachExcerpt = bachIn.parts[0].measures(1, 3)
+        >>> len(bachExcerpt.getElementsByClass('Measure'))
         3
-        >>> b.getElementsByClass('Measure')[0].notes[0] is a.parts[0].flat.notes[0]
+
+        Because bwv66.6 has a pickup measure, and we requested to start at measure 1, 
+        this is NOT true:
+        
+        >>> firstExcerptMeasure = bachExcerpt.getElementsByClass('Measure')[0]
+        >>> firstBachMeasure = bachIn.parts[0].getElementsByClass('Measure')[0]
+        >>> firstExcerptMeasure is firstBachMeasure
+        False
+        >>> firstBachMeasure.number
+        0
+        >>> firstExcerptMeasure.number
+        1
+
+
+
+        To get all measures from the beginning, go ahead and always request measure 0 to x,
+        there will be no error if there is not a pickup measure.
+
+        >>> bachExcerpt = bachIn.parts[0].measures(0, 3)
+        >>> excerptNote = bachExcerpt.getElementsByClass('Measure')[0].notes[0]
+        >>> originalNote = bachIn.parts[0].flat.notes[0]
+        >>> excerptNote is originalNote
         True
 
-
+        
+        
+        
         if `indicesNotNumbers` is True, then it ignores defined measureNumbers and
         uses 0-indexed measure objects and half-open range.  For instance, if you have a piece
         that goes "m1, m2, m3, m4, ..." (like a standard piece without pickups, then
@@ -3496,8 +3515,71 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         index 0) up to but NOT including the object with index 3, which is measure 4.
         IndicesNotNumbers is like a Python-slice.
 
+        >>> bachExcerpt2 = bachIn.parts[0].measures(0, 2, indicesNotNumbers=True)
+        >>> for m in bachExcerpt2.getElementsByClass('Measure'):
+        ...     print(m)
+        ...     print(m.number)
+        <music21.stream.Measure 0 offset=0.0>
+        0
+        <music21.stream.Measure 1 offset=1.0>
+        1
 
-        if gatherSpanners is True or the string 'all' then all spanners in
+
+        If `numberEnd=None` then it is interpreted as the last measure of the stream:
+
+        >>> bachExcerpt3 = bachIn.parts[0].measures(7, None)
+        >>> for m in bachExcerpt3.getElementsByClass('Measure'):
+        ...     print(m)
+        <music21.stream.Measure 7 offset=0.0>
+        <music21.stream.Measure 8 offset=4.0>
+        <music21.stream.Measure 9 offset=8.0>
+
+        Note that the offsets in the new stream are shifted so that the first measure
+        in the excerpt begins at 0.0
+        
+        The measure elements are the same objects as the original:
+        
+        >>> lastExcerptMeasure = bachExcerpt3.getElementsByClass('Measure')[-1] 
+        >>> lastOriginalMeasure = bachIn.parts[0].getElementsByClass('Measure')[-1]
+        >>> lastExcerptMeasure is lastOriginalMeasure
+        True
+        
+        At the beginning of the Stream returned, before the measures will be some additional
+        objects so that the context is properly preserved:
+        
+        >>> for thing in bachExcerpt3:
+        ...     print(thing)
+        P1: Soprano: Instrument 1
+        <music21.clef.TrebleClef>
+        f# minor
+        <music21.meter.TimeSignature 4/4>
+        <music21.stream.Measure 7 offset=0.0>
+        <music21.stream.Measure 8 offset=4.0>
+        <music21.stream.Measure 9 offset=8.0>        
+
+        Collecting gets the most recent element in the context of the stream:
+        
+        >>> bachIn.parts[0].insert(10, key.Key('D-'))
+        >>> bachExcerpt4 = bachIn.parts[0].measures(7, None)
+        >>> for thing in bachExcerpt4:
+        ...     print(thing)
+        P1: Soprano: Instrument 1
+        <music21.clef.TrebleClef>
+        D- major
+        ...
+
+
+        What is collected is determined by the "collect" iterable.  To collect nothing
+        send an empty list:
+        
+        >>> bachExcerpt5 = bachIn.parts[0].measures(8, None, collect=[])
+        >>> for thing in bachExcerpt5:
+        ...     print(thing)
+        <music21.stream.Measure 8 offset=0.0>
+        <music21.stream.Measure 9 offset=4.0>        
+        
+
+        if gatherSpanners is True then all spanners in
         the score are gathered and
         included.
 
@@ -3632,11 +3714,23 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> a.parts[0].measure(3)
         <music21.stream.Measure 3 offset=8.0>
 
+        See :meth:`~music21.stream.Stream.measures` for an explanation of collect and
+        indicesNotNumbers
+
+        To get the last measure of a piece, use -1 as a measureNumber -- this will turn
+        on indicesNotNumbers if it is off:
+        
+        >>> a.parts[0].measure(-1)
+        <music21.stream.Measure 9 offset=38.0>
+        
         Getting a non-existent measure will return None:
 
-        >>> print(a.parts[0].measure(0))
+        >>> print(a.parts[0].measure(99))
         None
         '''
+        if measureNumber < 0:
+            indicesNotNumbers = True
+        
         startMeasureNumber = measureNumber
         endMeasureNumber = measureNumber
         if indicesNotNumbers:
@@ -3657,10 +3751,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 return None
             else:
                 m = measureIter[0]
-                # NO m is the same object as before so it does not get a new derivation
-#                 m.derivation.client = m
-#                 m.derivation.origin = s # was self, will change some things
-#                 m.derivation.method = 'measure'
                 m.activeSite = self # this sets its offset to something meaningful...
                 return m
         else:
@@ -12342,15 +12432,63 @@ class Score(Stream):
         single :class:`~music21.stream.Measure` object if the
         Measure number exists, otherwise returns a score with parts that are empty.
 
-        This method overrides the :meth:`~music21.stream.Stream.measures` method on Stream.
+        This method overrides the :meth:`~music21.stream.Stream.measure` method on Stream to
+        allow for finding a single "measure slice" within parts:
 
 
-        >>> from music21 import corpus
-        >>> a = corpus.parse('bach/bwv324.xml')
-        >>> # contains 1 measure
-        >>> len(a.measure(3).parts[0].getElementsByClass('Measure'))
-        1
+        >>> bachIn = corpus.parse('bach/bwv324.xml')
+        >>> excerpt = bachIn.measure(2)
+        >>> excerpt
+        <music21.stream.Score 0x10322b5f8>
+        >>> len(excerpt.parts)
+        4
+        >>> excerpt.parts[0].show('text')
+        {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.key.Key of e minor>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.stream.Measure 2 offset=0.0>
+            {0.0} <music21.note.Note B>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note B>
+            {3.0} <music21.note.Note B>        
+        
+        Note that the parts created have all the meta-information outside the measure
+        unless this information appears in the measure itself at the beginning:
+        
+        >>> bachIn.measure(1).parts[0].show('text')
+        {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.key.Key of e minor>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.layout.SystemLayout>
+            {0.0} <music21.note.Note B>
+            {2.0} <music21.note.Note D>
+        
+        This way the original measure objects can be returned without being altered.
+        
+        The final measure slice of the piece can be obtained with index -1.  Example:
+        quickly get the last chord of the piece, without needing to run .chordify()
+        on the whole piece:
+        
+        >>> excerpt = bachIn.measure(-1)
+        >>> excerptChords = excerpt.chordify()
+        >>> excerptChords.show('text')
+        {0.0} <music21.stream.Measure 9 offset=0.0>
+            {0.0} <music21.chord.Chord E4 B3 G3 E2>
+            {4.0} <music21.bar.Barline style=final>        
+        
+        >>> lastChord = excerptChords.recurse().getElementsByClass('Chord')[-1]
+        >>> lastChord
+        <music21.chord.Chord E4 B3 G3 E2>
+        
+        Note that we still do a .getElementsByClass('Chord') since many pieces end
+        with nothing but a rest...
         '''
+        if measureNumber < 0:
+            indicesNotNumbers = True
+            
         startMeasureNumber = measureNumber
         endMeasureNumber = measureNumber
         if indicesNotNumbers:
