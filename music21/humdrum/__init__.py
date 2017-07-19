@@ -163,14 +163,18 @@ def parseFile(filename):
     shortcut to :class:`~music21.humdrum.spineParser.HumdrumFile`.
     Most users will call `converter.parse()` instead.
     '''
-    return spineParser.HumdrumFile(filename)
+    hf = spineParser.HumdrumFile(filename)
+    hf.parseFilename()
+    return hf
 
 def parseData(data):
     '''
     shortcut to :class:`~music21.humdrum.spineParser.HumdrumDataCollection`.
     Most users will call `converter.parse()` instead.
     '''
-    return spineParser.HumdrumDataCollection(data)
+    hdf = spineParser.HumdrumDataCollection(data)
+    hdf.parse()
+    return hdf
 
 #------------------------------------------------------------------------------
 # eof

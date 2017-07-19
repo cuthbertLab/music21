@@ -966,6 +966,12 @@ class Contributor(object):
         >>> td.role = 'lor'
         >>> td.role
         'orchestrator'
+        
+        Roles can be created on the fly:
+        
+        >>> td.role = 'court jester'
+        >>> td.role
+        'court jester'        
         '''
         return self._role
 
@@ -976,9 +982,11 @@ class Contributor(object):
         elif value in self.roleAbbreviationsDict.keys():
             self._role = self.roleAbbreviationsDict[value]
         else:
-            raise exceptions21.MetadataException(
-                'Role value is not supported by this object: '
-                '{0!r}'.format(value))
+            self._role = value
+#         else:
+#             raise exceptions21.MetadataException(
+#                 'Role value is not supported by this object: '
+#                 '{0!r}'.format(value))
 
 
     @staticmethod
