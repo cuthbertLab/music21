@@ -746,6 +746,7 @@ class ConverterMusicXML(SubConverter):
             pngfp = found[0]
         else:
             raise SubConverterFileIOException("png file of xml not found. Is your file >999 pages?")
+        print(found)
         return pngfp
 
     def parseData(self, xmlString, number=None):
@@ -1324,20 +1325,18 @@ class Test(unittest.TestCase):
         '''
         env = environment.Environment()
         tempfp = env.getTempFile()
-        xmlfp = tempfp + ".xml"
-        os.rename(tempfp, tempfp + "-0001.png")
-        tempfp += "-0001.png"
+        tempfp += ".xml"
         if six.PY3:
             from unittest import mock  # @UnusedImport # pylint: disable=no-name-in-module
         else:
             from music21.ext import mock # @Reimport
-        with mock.patch('music21.converter.subConverters.len') as mockConv:
+        with mock.patch('music21.len') as mockConv:
             mockConv.return_value = 1000
             xmlconverter = ConverterMusicXML()
-            self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, xmlfp)
+            self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, tempfp)
             mockConv.return_value = 0
             xmlconverter = ConverterMusicXML()
-            self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, xmlfp)
+            self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, tempfp)
 
 
 class TestExternal(unittest.TestCase): # pragma: no cover
