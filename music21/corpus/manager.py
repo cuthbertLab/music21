@@ -255,7 +255,7 @@ def search(query, field=None, corpusNames=None, fileExtensions=None):
     <music21.metadata.bundles.MetadataBundle {0 entries}>
 
     >>> corpus.search('bach', field='composer')
-    <music21.metadata.bundles.MetadataBundle {22 entries}>
+    <music21.metadata.bundles.MetadataBundle {25 entries}>
 
     This method is implemented in `corpus.manager` but loaded into corpus for
     ease of use.
