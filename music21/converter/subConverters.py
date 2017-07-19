@@ -746,7 +746,6 @@ class ConverterMusicXML(SubConverter):
             pngfp = found[0]
         else:
             raise SubConverterFileIOException("png file of xml not found. Is your file >999 pages?")
-        print(found)
         return pngfp
 
     def parseData(self, xmlString, number=None):
