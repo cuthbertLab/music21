@@ -3461,13 +3461,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                  numberEnd,
                  collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
                  gatherSpanners=True,
-                 ignoreNumbers=False):
+                 indicesNotNumbers=False):
         '''
-        Get a region of Measures based on a start and end Measure number,
+        Get a region of Measures based on a start and end Measure number 
         where the boundary numbers are both included.
+        
         That is, a request for measures 4 through 10 will return 7 Measures, numbers 4 through 10.
-        It is allowed to pass `numberEnd=None`, which will be
-        interpreted as the last measure of the stream.
+
+        If `numberEnd=None` then it is interpreted as the last measure of the stream.
+
+
 
         Additionally, any number of associated classes can be gathered from the context
         and put into the measure.  By default we collect the Clef, TimeSignature, KeySignature,
@@ -3484,23 +3487,48 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> b.getElementsByClass('Measure')[0].notes[0] is a.parts[0].flat.notes[0]
         True
 
+
+        if `indicesNotNumbers` is True, then it ignores defined measureNumbers and
+        uses 0-indexed measure objects and half-open range.  For instance, if you have a piece
+        that goes "m1, m2, m3, m4, ..." (like a standard piece without pickups, then
+        `.measures(1, 3, indicesNotNumbers=True)` would return measures 2 and 3, because
+        it is interpreted as the slice from object with index 1, which is measure 2 (m1 has
+        index 0) up to but NOT including the object with index 3, which is measure 4.
+        IndicesNotNumbers is like a Python-slice.
+
+
         if gatherSpanners is True or the string 'all' then all spanners in
         the score are gathered and
         included.
 
         TODO: make True only return spanners from the region.  Use core.gatherMissingSpanners()
         to do so.
-
-        if ignoreNumbers is True, then it ignores defined measureNumbers and
-        uses 0-indexed measure objects
         '''
+        def hasMeasureNumberInformation(measureIterator):
+            '''
+            Many people create streams where every number is zero.
+            This will check for that as quickly as possible.
+            '''
+            uniqueMeasureNumbers = set()
+            for m in measureIterator:
+                try:
+                    mNumber = int(m.number)
+                except ValueError:
+                    raise StreamException('found problematic measure number: %s' % mNumber)
+                uniqueMeasureNumbers.add(mNumber)
+                if len(uniqueMeasureNumbers) > 1:
+                    break
+            if len(uniqueMeasureNumbers) > 1:
+                return True
+            elif len(uniqueMeasureNumbers.union({0})) > 1:
+                return True # is there a number other than zero? (or any number at all
+            else:
+                return False
+        
+        
         returnObj = self.cloneEmpty(derivationMethod='measures')
         srcObj = self
 
-        # create a dictionary of measure number: list of Meaures
-        # there may be more than one Measure with the same Measure number
-        mapRaw = {}
-        mNumbersUnique = [] # store just the numbers
         mStreamIter = self.getElementsByClass('Measure')
         # if we have no Measures defined, call makeNotation
         # this will  return a deepcopy of all objects
@@ -3512,136 +3540,65 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # TODO: make sure that makeNotation copies spanners
             #mStreamSpanners = mStream.spanners
 
-        # spanners may be store at the container/Part level, not w/n a measure
+        # spanners may be stored at the container/Part level, not within a measure
         # if they are within the Measure, or a voice, they will be transfered
         # below
+        
         # create empty bundle in case not created by other means
         spannerBundle = spanner.SpannerBundle()
         if gatherSpanners:
             spannerBundle = srcObj.spannerBundle
 
-        for index, m in enumerate(mStreamIter):
-            #environLocal.printDebug(['m', m])
-            # mId is a tuple of measure nmber and any suffix
-            if ignoreNumbers is False:
-                try:
-                    mNumber = int(m.number)
-                except ValueError:
-                    raise StreamException('found problematic measure number: %s' % mNumber)
-                # id combines suffice w/ number
-                mId = (mNumber, m.numberSuffix)
-            else:
-                mNumber = index
-                mId = (index, None)
-            # store unique measure numbers for reference
-            if mNumber not in mNumbersUnique:
-                mNumbersUnique.append(mNumber)
-            if mId not in mapRaw:
-                mapRaw[mId] = [] # use a list
-            # these will be in order by measure number
-            # there may be multiple None and/or 0 measure numbers
-            mapRaw[mId].append(m)
 
-        #environLocal.printDebug(['len(mapRaw)', len(mapRaw)])
-        #environLocal.printDebug(['mNumbersUnique', mNumbersUnique])
 
-        # if measure numbers are not defined, we should just count them
-        # in order, starting from 1
-        if len(mNumbersUnique) == 1:
-            #environLocal.printDebug(['measures()', 'attempting to assign measures order numbers'])
-            mapCooked = {}
-            # only one key but we do not know what it is
-            i = 1
-            for number, suffix in mapRaw:
-                for m in mapRaw[(number, suffix)]:
-                    # expecting a list of measures
-                    mapCooked[(i, None)] = [m]
-                    i += 1
+        #### FIND THE CORRECT ORIGINAL MEASURE OBJECTS
+        # for indicesNotNumbers, this is simple...
+        if indicesNotNumbers:
+            matches = mStreamIter[numberStart:numberEnd]
         else:
-            mapCooked = mapRaw
+            hasUniqueMeasureNumbers = hasMeasureNumberInformation(mStreamIter)
+            if numberEnd is not None:        
+                matchingMeasureNumbers = set(range(numberStart, numberEnd + 1))
+                if hasUniqueMeasureNumbers:
+                    matches = [m for m in mStreamIter if m.number in matchingMeasureNumbers]
+                else:
+                    matches = [m for i, m in enumerate(mStreamIter) 
+                                    if i + 1 in matchingMeasureNumbers]
+            else:
+                if hasUniqueMeasureNumbers:
+                    matches = [m for m in mStreamIter if m.number >= numberStart]
+                else:
+                    matches = [m for i, m in enumerate(mStreamIter) 
+                                    if i + 1 >= numberStart]       
+            
+            
+        if not matches:
+            startMeasure = None
+            startOffset = 0 # does not matter; could be any number...
+        else:
+            startMeasure = matches[0]
+            startOffset = startMeasure.getOffsetBySite(srcObj)
 
-        #environLocal.printDebug(['mapCooked', mapCooked])
-        #environLocal.printDebug(['len(mapCooked)', len(mapCooked)])
-        startOffset = None # set with the first measure
-        startMeasure = None # store for adding other objects
-        # get requested range
-        #startMeasureNew = None
-        # if end not specified, get last
-        if numberEnd is None:
-            numberEnd = max([x for x, dummy in mapCooked])
-        #environLocal.printDebug(['numberStart', numberStart, 'numberEnd', numberEnd])
 
-        for i in range(numberStart, numberEnd + 1):
-            matches = []
-            # do not know if we have suffixes for the number
-            for number, suffix in mapCooked:
-                # this will match regardless of suffix
-                # numbers may be strings still
-                if number == i:
-                    matches.append(mapCooked[(number, suffix)])
-            # numbers may not be contiguous
-            if not matches: # None found in this range
-                continue
-            # if not startOffset then let us make one
-            # this assumes measure are in offset order
-            # this may not always be the case
-            if startOffset is None:
-                # is m 2X before 2 or after? can't be sure,
-                # so we get the min...
-
-                # m is in a list of lists...
-                for m in itertools.chain.from_iterable(matches):
-                    thisOffset = m.getOffsetBySite(srcObj)
-                    if startOffset is None:
-                        startOffset = thisOffset # most common
-                        startMeasure = m
-                    else: # suffixes -- should check priority!
-                        if thisOffset < startOffset:
-                            startOffset = thisOffset
-                            startMeasure = m
-                #environLocal.printDebug(['startOffset', startOffset,
-                #    'startMeasure', startMeasure, 'm', m])
-
-            # need to make offsets relative to this new Stream
-            for mWithSameId in matches:
-                for m in mWithSameId:
-                    # get offset before doing spanner updates; not sure why yet
-                    oldOffset = m.getOffsetBySite(srcObj)
-                    # create a new Measure container, but populate it
-                    # with the same elements
-
-                    # using the same measure in the return obj
-                    newOffset = oldOffset - startOffset
-                    returnObj._insertCore(newOffset, m)
-
-        # manipulate startMeasure to add desired context objects
-        changedObjects = False
         for className in collect:
             # first, see if it is in this Measure
-            if startMeasure is None or startMeasure.hasElementOfClass(className):
+            if (startMeasure is None 
+                    or startMeasure.recurse().getElementsByClass(className).getElementsByOffset(0)):
                 continue
-
+            
             # placing missing objects in outer container, not Measure
-            found = srcObj.flat.getElementAtOrBefore(startOffset, [className])
+            found = startMeasure.getContextByClass(className)
             if found is not None:
                 if startMeasure is not None:
                     found.priority = startMeasure.priority - 1
                     # TODO: This should not change global priority on found, but
                     # instead priority, like offset, should be a per-site attribute
                 returnObj._insertCore(0, found)
-                changedObjects = True
-            # search the flat caller stream, which is usually a Part
-            # need to search self, as we ne need to get the instrument
-#             found = srcObj.flat.getElementAtOrBefore(startOffset, [className])
-#             if found is not None:
-#                 startMeasureNew._insertCore(0, found)
-#
-#
-#         # as we have inserted elements, need to call
-#         startMeasureNew.elementsChanged()
-        if changedObjects:
-            returnObj.elementsChanged()
 
+        for m in matches:
+            mOffset = m.getOffsetBySite(srcObj) - startOffset
+            returnObj._insertCore(mOffset, m)
+                
         if gatherSpanners:
             sf = srcObj.flat
             for sp in spannerBundle:
@@ -3661,7 +3618,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def measure(self,
                 measureNumber,
                 collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
-                ignoreNumbers=False):
+                indicesNotNumbers=False):
         '''
         Given a measure number, return a single
         :class:`~music21.stream.Measure` object if the Measure number exists, otherwise return None.
@@ -3675,25 +3632,31 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> a.parts[0].measure(3)
         <music21.stream.Measure 3 offset=8.0>
 
-        OMIT_FROM_DOCS
+        Getting a non-existent measure will return None:
 
-        Getting a non-existent measure should return None, but it doesnt!
-
-        #>>> print(a.measure(0))
-        #None
+        >>> print(a.parts[0].measure(0))
+        None
         '''
+        startMeasureNumber = measureNumber
+        endMeasureNumber = measureNumber
+        if indicesNotNumbers:
+            endMeasureNumber += 1
+            if startMeasureNumber == -1:
+                endMeasureNumber = None
+        
         # we must be able to obtain a measure from this (not a flat)
         # representation (e.g., this is a Stream or Part, not a Score)
         if self.getElementsByClass('Measure'):
             #environLocal.printDebug(['got measures from getElementsByClass'])
-            s = self.measures(measureNumber,
-                              measureNumber,
+            s = self.measures(startMeasureNumber,
+                              endMeasureNumber,
                               collect=collect,
-                              ignoreNumbers=ignoreNumbers)
-            if not s:
+                              indicesNotNumbers=indicesNotNumbers)
+            measureIter = s.getElementsByClass('Measure')
+            if not measureIter:
                 return None
             else:
-                m = s.getElementsByClass('Measure')[0]
+                m = measureIter[0]
                 # NO m is the same object as before so it does not get a new derivation
 #                 m.derivation.client = m
 #                 m.derivation.origin = s # was self, will change some things
@@ -12325,7 +12288,7 @@ class Score(Stream):
                  numberEnd,
                  collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
                  gatherSpanners=True,
-                 ignoreNumbers=False):
+                 indicesNotNumbers=False):
         '''
         This method overrides the :meth:`~music21.stream.Stream.measures`
         method on Stream. This creates a new Score stream that has the same measure
@@ -12353,7 +12316,7 @@ class Score(Stream):
                                       numberEnd,
                                       collect,
                                       gatherSpanners=gatherSpanners,
-                                      ignoreNumbers=ignoreNumbers)
+                                      indicesNotNumbers=indicesNotNumbers)
             post.insert(0, measuredPart)
         # must manually add any spanners; do not need to add .flat,
         # as Stream.measures will handle lower level
@@ -12372,16 +12335,14 @@ class Score(Stream):
                 measureNumber,
                 collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
                 gatherSpanners=True,
-                ignoreNumbers=False):
+                indicesNotNumbers=False):
         '''
-        Given a measure number,
-        return a single :class:`~music21.stream.Measure` object if the
-        Measure number exists, otherwise return None.
-
+        Given a measure number (or measure index, if indicesNotNumbers is True)
+        return another Score object which contains multiple parts but each of which has only a 
+        single :class:`~music21.stream.Measure` object if the
+        Measure number exists, otherwise returns a score with parts that are empty.
 
         This method overrides the :meth:`~music21.stream.Stream.measures` method on Stream.
-        This creates a new Score stream that has the
-        same measure range for all Parts.
 
 
         >>> from music21 import corpus
@@ -12390,19 +12351,26 @@ class Score(Stream):
         >>> len(a.measure(3).parts[0].getElementsByClass('Measure'))
         1
         '''
+        startMeasureNumber = measureNumber
+        endMeasureNumber = measureNumber
+        if indicesNotNumbers:
+            endMeasureNumber += 1
+            if startMeasureNumber == -1:
+                endMeasureNumber = None
+
+        
         post = self.__class__()
         # this calls on Music21Object, transfers id, groups
         post.mergeAttributes(self)
         # note that this will strip all objects that are not Parts
         for p in self.getElementsByClass('Part'):
             # insert all at zero
-            mStream = p.measures(measureNumber,
-                                 measureNumber,
+            mStream = p.measures(startMeasureNumber,
+                                 endMeasureNumber,
                                  collect=collect,
                                  gatherSpanners=gatherSpanners,
-                                 ignoreNumbers=ignoreNumbers)
-            if mStream:
-                post.insert(0, mStream)
+                                 indicesNotNumbers=indicesNotNumbers)
+            post.insert(0, mStream)
 
         if gatherSpanners:
             spStream = self.spanners

@@ -246,7 +246,7 @@ class ChordReducer(object):
         lenMeasures = len(inStream.parts[0].getElementsByClass('Measure'))
         self._lastTs = None
         for i in range(lenMeasures):
-            mI = inStream.measure(i, ignoreNumbers=True)
+            mI = inStream.measure(i, indicesNotNumbers=True)
             if not mI.recurse().notesAndRests:
                 if i == 0:
                     pass

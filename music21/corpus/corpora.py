@@ -388,6 +388,19 @@ class Corpus(object):
         from music21.corpus import manager
         return manager.getMetadataBundleByCorpus(self)
 
+
+    def all(self):
+        '''
+        This is a synonym for the metadataBundle property, but easier to understand
+        what it does.
+        
+        >>> from music21 import corpus
+        >>> corpus.corpora.CoreCorpus().all()
+        <music21.metadata.bundles.MetadataBundle 'core': {148... entries}>
+        '''
+        return self.metadataBundle
+
+
     def getComposer(
         self,
         composerName,
