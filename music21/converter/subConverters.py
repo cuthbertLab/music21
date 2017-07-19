@@ -722,6 +722,7 @@ class ConverterMusicXML(SubConverter):
     registerOutputSubformatExtensions = {'png': 'png',
                                          'pdf': 'pdf',
                                          }
+    glob = __import__('glob')
 
     def __init__(self, **keywords):
         SubConverter.__init__(self, **keywords)
@@ -732,8 +733,7 @@ class ConverterMusicXML(SubConverter):
         Check whether total number of pngs is in 1-9, 10-99, or 100-999 range,
          then return appropriate fp. Raises and exception if png fp does not exist.
         '''
-        import glob
-        found = sorted(glob.glob(xmlFilePath[0:len(xmlFilePath) - 4] + "-*.png"))
+        found = sorted(self.glob.glob(xmlFilePath[0:len(xmlFilePath) - 4] + "-*.png"))
         if len(found) > 0 and len(found) < 999:
             pngfp = found[0]
         else:
@@ -1325,11 +1325,11 @@ class Test(unittest.TestCase):
             from unittest import mock  # @UnusedImport # pylint: disable=no-name-in-module
         else:
             from music21.ext import mock # @Reimport
-        with mock.patch('music21.converter.subConverters.len') as mockConv:
-            mockConv.return_value = 1000
+        with mock.patch('music21.converter.subConverters.ConverterMusicXML.glob') as mockConv:
+            mockConv.return_value = [x for x in range(1000)]
             xmlconverter = ConverterMusicXML()
             self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, tempfp)
-            mockConv.return_value = 0
+            mockConv.return_value = [x for x in range(0)]
             xmlconverter = ConverterMusicXML()
             self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, tempfp)
 
