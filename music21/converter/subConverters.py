@@ -1330,7 +1330,7 @@ class Test(unittest.TestCase):
             from unittest import mock  # @UnusedImport # pylint: disable=no-name-in-module
         else:
             from music21.ext import mock # @Reimport
-        with mock.patch('music21.len') as mockConv:
+        with mock.patch('music21.converter.subConverters.len') as mockConv:
             mockConv.return_value = 1000
             xmlconverter = ConverterMusicXML()
             self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, tempfp)
