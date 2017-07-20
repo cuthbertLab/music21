@@ -6626,59 +6626,23 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         sNew._endElements = []
         sNew.elementsChanged()
 
-        for e in self._elements:
-            #environLocal.printDebug(['_getFlatOrSemiFlat', 'processing e:', e])
-            # check for stream instance instead
-
-            # if this element is a Stream, recurse
-            #if hasattr(e, "elements"):
-            if e.isStream:
-                #environLocal.printDebug(['_getFlatOrSemiFlat', '!!! processing substream:', e])
-
-                recurseStreamOffset = self.elementOffset(e)
-
-                if retainContainers is True: # semiFlat
-                    #environLocal.printDebug(['_getFlatOrSemiFlat(),
-                    #   retaining containers, storing element:', e])
-
-                    # this will change the activeSite of e to be sNew, previously
-                    # this was the activeSite was the caller; thus, the activeSite here
-                    # should not be set
-                    #sNew.insert(recurseStreamOffset, e, setActiveSite=False)
-                    sNew._insertCore(recurseStreamOffset, e,
-                        setActiveSite=False)
-                    # this may be a cached version;
-                    recurseStream = e.semiFlat
-                    #recurseStream = e._getFlatOrSemiFlat(retainContainers=True)
-                else:
-                    recurseStream = e.flat
-
-                #environLocal.printDebug("recurseStreamOffset: " + str(e.id) +
-                #    " " + str(recurseStreamOffset))
-                # recurse Stream is the flat or semiFlat contents of a Stream
-                # contained within the caller
-                for eSub in recurseStream:
-                    #environLocal.printDebug(['subElement', id(eSub),
-                    #   'inserted in', sNew, 'id(sNew)', id(sNew)])
-                    #oldOffset =
-                    #sNew.insert(eSub.getOffsetBySite(recurseStream) +
-                    #    recurseStreamOffset, eSub)
-                    sNew._insertCore(eSub.getOffsetBySite(recurseStream) +
-                        recurseStreamOffset, eSub)
-            # if element not a Stream
-            else:
-                # insert into new stream at offset in old stream
-                #self.elementOffset(sNew.insert(e), e)
-                sNew._insertCore(self.elementOffset(e), e)
-
-        # highest time elements should never be Streams
-        for e in self._endElements:
-            #sNew.storeAtEnd(e)
-            sNew._storeAtEndCore(e)
+        ri = iterator.RecursiveIterator(self,
+                                        restoreActiveSites=False,
+                                        includeSelf=False,
+                                        ignoreSorting=True,
+                                        )
+        for e in ri:
+            if e.isStream and not retainContainers:
+                continue
+            sNew._insertCore(ri.currentHierarchyOffset(), 
+                             e,
+                             setActiveSite=False)
 
         sNew.isFlat = True
         if self.autoSort is True:
             sNew.sort() # sort it immediately so that cache is not invalidated
+        else:
+            sNew.elementsChanged()
         # here, we store the source stream from which this stream was derived
         return sNew
 
@@ -6971,8 +6935,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         if skipDuplicates:
                             memo.append(id(e))
 
-    def recurse(self, streamsOnly=False,
-        restoreActiveSites=True, classFilter=(), skipSelf=False):
+    def recurse(self, 
+                streamsOnly=False,
+                restoreActiveSites=True, 
+                classFilter=(), 
+                skipSelf=False):
         '''
         NOTE: skipSelf is going to become True by default soon -- make sure that you
         are NOT relying on the default value.

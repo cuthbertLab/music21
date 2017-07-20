@@ -66,8 +66,10 @@ class StreamIterator(object):
                  srcStream,
                  filterList=None,
                  restoreActiveSites=True,
-                 activeInformation=None):
-        if srcStream.isSorted is False and srcStream.autoSort:
+                 activeInformation=None,
+                 ignoreSorting=False,
+                 ):
+        if not ignoreSorting and srcStream.isSorted is False and srcStream.autoSort:
             srcStream.sort()
         self.srcStream = srcStream
         self.index = 0
@@ -1184,11 +1186,15 @@ class OffsetIterator(StreamIterator):
                  srcStream,
                  filterList=None,
                  restoreActiveSites=True,
-                 activeInformation=None):
+                 activeInformation=None,
+                 ignoreSorting=False,
+                 ):
         super(OffsetIterator, self).__init__(srcStream,
-                                             filterList=None,
-                                             restoreActiveSites=True,
-                                             activeInformation=None)
+                                             filterList=filterList,
+                                             restoreActiveSites=restoreActiveSites,
+                                             activeInformation=activeInformation,
+                                             ignoreSorting=ignoreSorting,
+                                             )
         self.raiseStopIterationNext = False
         self.nextToYield = []
         self.nextOffsetToYield = None
@@ -1305,19 +1311,29 @@ class RecursiveIterator(StreamIterator):
                  filterList=None,
                  restoreActiveSites=True,
                  activeInformation=None,
-                 streamsOnly=False, # to be removed
-                 includeSelf=False, # to be removed
+                 streamsOnly=False, # to be removed?
+                 includeSelf=False, # to be removed?
+                 ignoreSorting=False
                  ): #, parentIterator=None):
         super(RecursiveIterator, self).__init__(srcStream,
-                                                filterList,
-                                                restoreActiveSites,
-                                                activeInformation=activeInformation)
+                                                filterList=filterList,
+                                                restoreActiveSites=restoreActiveSites,
+                                                activeInformation=activeInformation,
+                                                ignoreSorting=ignoreSorting,
+                                                )
+        if 'lastYielded' not in self.activeInformation:
+            self.activeInformation['lastYielded'] = None
+        
         self.returnSelf = includeSelf
         self.includeSelf = includeSelf
+        self.ignoreSorting = ignoreSorting
+
+        # within the list of parent/child recursive iterators, where does this start?
+        self.iteratorStartOffsetInHierarchy = 0.0
+        
         if streamsOnly is True:
             self.filters.append(filters.ClassFilter('Stream'))
         self.childRecursiveIterator = None 
-        self.lastYieldElement = None # for .currentHierarchyOffset()
         # not yet used.
         #self.parentIterator = None
 
@@ -1340,9 +1356,7 @@ class RecursiveIterator(StreamIterator):
             # depth
             if self.childRecursiveIterator is not None:
                 try:
-                    e = self.childRecursiveIterator.next()
-                    self.lastYieldElement = e
-                    return e
+                    return self.childRecursiveIterator.next()
                 except StopIteration:
                     #self.childRecursiveIterator.parentIterator = None
                     self.childRecursiveIterator = None
@@ -1350,8 +1364,8 @@ class RecursiveIterator(StreamIterator):
             if self.returnSelf is True and self.matchesFilters(self.srcStream):
                 self.activeInformation['stream'] = None
                 self.activeInformation['index'] = -1
+                self.activeInformation['lastYielded'] = self.srcStream
                 self.returnSelf = False
-                self.lastYieldElement = self.srcStream
                 return self.srcStream
 
             elif self.returnSelf is True:
@@ -1380,8 +1394,12 @@ class RecursiveIterator(StreamIterator):
                                             filterList=self.filters, # shared list...
                                             activeInformation=self.activeInformation, # shared dict
                                             includeSelf=False, # always for inner streams
-                                            #parentIterator=self
+                                            ignoreSorting=self.ignoreSorting,
+                                            #parentIterator=self,
                                             )
+                newStartOffset = (self.iteratorStartOffsetInHierarchy 
+                                  + self.srcStream.elementOffset(e))
+                self.childRecursiveIterator.iteratorStartOffsetInHierarchy = newStartOffset
             if self.matchesFilters(e) is False:
                 continue
 
@@ -1390,20 +1408,18 @@ class RecursiveIterator(StreamIterator):
 
 
             self.updateActiveInformation()
-            self.lastYieldElement = e
+            self.activeInformation['lastYielded'] = e
             return e
 
         ### the last element can still set a recursive iterator, so make sure we handle it.
         if self.childRecursiveIterator is not None:
             try:
-                e = self.childRecursiveIterator.next()
-                self.lastYieldElement = e
-                return e
+                return self.childRecursiveIterator.next()
             except StopIteration:
                 #self.childRecursiveIterator.parentIterator = None
                 self.childRecursiveIterator = None
 
-        self.lastYieldElement = None # always clean this up, no matter what...
+        self.activeInformation['lastYielded'] = None # always clean this up, no matter what...
         self.cleanup()
         raise StopIteration
 
@@ -1514,19 +1530,20 @@ class RecursiveIterator(StreamIterator):
         
         New in v.4
         '''
-        if self.lastYieldElement is None:
+        lastYield = self.activeInformation['lastYielded']
+        if lastYield is None:
             return None
-        streamStack = self.streamStack()
-        offsetSoFar = 0.0
-        for i, s in enumerate(streamStack[1:] + [self.lastYieldElement]): 
-            # should always have more than 1, because of source stream.
-            parentS = streamStack[i]
-            if s is parentS:
-                continue # we may be iterating over the last element and the streamStack is 
-            offsetSoFar += parentS.elementOffset(s)
-            # elementOffset returns the highest time as a number for endElements...
-            
-        return common.opFrac(offsetSoFar)
+        
+        iteratorStack = self.iteratorStack()
+        newestIterator = iteratorStack[-1]
+        lastStream = newestIterator.srcStream
+        lastStartOffset = newestIterator.iteratorStartOffsetInHierarchy
+        
+        if lastYield is lastStream:
+            return common.opFrac(lastStartOffset)
+        else:
+            return common.opFrac(lastStartOffset + lastStream.elementOffset(lastYield))
+            # will still return numbers even if _endElements
 
 class Test(unittest.TestCase):
     pass
