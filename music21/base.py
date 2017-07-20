@@ -1113,11 +1113,14 @@ class Music21Object(object):
 
         There is no corresponding `.setOffsetInHierarchy()` since it's unclear what that would mean.
 
+        See also :meth:`music21.stream.iterator.RecursiveIterator.currentHierarchyOffset` for
+        a method that is about 10x faster when running through a recursed stream.
+
         *new in v.3*
 
         OMIT_FROM_DOCS
 
-        Timing: 113microseconds for a search.  vs 1 microsecond for elementOffset vs .4 for
+        Timing: 113microseconds for a search.  vs 1 microsecond for getOffsetBySite vs .4 for
         elementOffset.  Hence the short-circuit for easy looking below...
 
         TODO: If timing permits, replace .flat and .semiFlat with this routine.

@@ -6591,7 +6591,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def _getFlatOrSemiFlat(self, retainContainers=False):
         '''
         A private method that implements the .flat or .semiFlat reduction types by using
-        `retainContainers` = False to get .flat and retainContainers = True to get .semiFlat
+        `retainContainers`=False to get .flat and retainContainers=True to get .semiFlat
         '''
         #environLocal.printDebug(['_getFlatOrSemiFlat(): self', self,
         #  'self.activeSite', self.activeSite])

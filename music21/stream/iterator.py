@@ -1316,7 +1316,8 @@ class RecursiveIterator(StreamIterator):
         self.includeSelf = includeSelf
         if streamsOnly is True:
             self.filters.append(filters.ClassFilter('Stream'))
-        self.recursiveIterator = None
+        self.childRecursiveIterator = None 
+        self.lastYieldElement = None # for .currentHierarchyOffset()
         # not yet used.
         #self.parentIterator = None
 
@@ -1325,7 +1326,8 @@ class RecursiveIterator(StreamIterator):
         reset prior to iteration
         '''
         self.returnSelf = self.includeSelf
-        self.recursiveIterator = None
+        self.childRecursiveIterator = None
+        self.lastYieldElement = None
         super(RecursiveIterator, self).reset()
 
     def __next__(self):
@@ -1336,21 +1338,24 @@ class RecursiveIterator(StreamIterator):
             # in a long score with a miserly filter
             # it is possible to exceed maximum recursion
             # depth
-            if self.recursiveIterator is not None:
+            if self.childRecursiveIterator is not None:
                 try:
-                    return self.recursiveIterator.next()
+                    e = self.childRecursiveIterator.next()
+                    self.lastYieldElement = e
+                    return e
                 except StopIteration:
-                    #self.recursiveIterator.parentIterator = None
-                    self.recursiveIterator = None
+                    #self.childRecursiveIterator.parentIterator = None
+                    self.childRecursiveIterator = None
 
             if self.returnSelf is True and self.matchesFilters(self.srcStream):
                 self.activeInformation['stream'] = None
                 self.activeInformation['index'] = -1
                 self.returnSelf = False
+                self.lastYieldElement = self.srcStream
                 return self.srcStream
+
             elif self.returnSelf is True:
                 self.returnSelf = False
-
 
             if self.index >= self.elementsLength:
                 self.iterSection = '_endElements'
@@ -1369,7 +1374,7 @@ class RecursiveIterator(StreamIterator):
             # in a recursive filter, the stream does not need to match the filter,
             # only the internal elements.
             if e.isStream:
-                self.recursiveIterator = RecursiveIterator(
+                self.childRecursiveIterator = RecursiveIterator(
                                             srcStream=e,
                                             restoreActiveSites=self.restoreActiveSites,
                                             filterList=self.filters, # shared list...
@@ -1385,28 +1390,34 @@ class RecursiveIterator(StreamIterator):
 
 
             self.updateActiveInformation()
+            self.lastYieldElement = e
             return e
 
         ### the last element can still set a recursive iterator, so make sure we handle it.
-        if self.recursiveIterator is not None:
+        if self.childRecursiveIterator is not None:
             try:
-                return self.recursiveIterator.next()
+                e = self.childRecursiveIterator.next()
+                self.lastYieldElement = e
+                return e
             except StopIteration:
-                #self.recursiveIterator.parentIterator = None
-                self.recursiveIterator = None
+                #self.childRecursiveIterator.parentIterator = None
+                self.childRecursiveIterator = None
 
-
+        self.lastYieldElement = None # always clean this up, no matter what...
         self.cleanup()
         raise StopIteration
 
+    #if six.PY2:
+    # this needs to be here to explicitly call next() in the same way
+    # later we can call next(...) once PY2 is dead...
     next = __next__
 
     def matchingElements(self):
         # saved parent iterator later?
         # will this work in mid-iteration? Test, or do not expose till then.
-        savedRecursiveIterator = self.recursiveIterator
+        savedRecursiveIterator = self.childRecursiveIterator
         fe = super(RecursiveIterator, self).matchingElements()
-        self.recursiveIterator = savedRecursiveIterator
+        self.childRecursiveIterator = savedRecursiveIterator
         return fe
 
     def iteratorStack(self):
@@ -1427,14 +1438,16 @@ class RecursiveIterator(StreamIterator):
         '''
         iterStack = [self]
         x = self
-        while x.recursiveIterator is not None:
-            x = x.recursiveIterator
+        while x.childRecursiveIterator is not None:
+            x = x.childRecursiveIterator
             iterStack.append(x)
         return iterStack
 
     def streamStack(self):
         '''
         Returns a stack of Streams at this point.  Last is most recent.
+        
+        However, the current element may be the same as the last element in the stack
 
         >>> b = corpus.parse('bwv66.6')
         >>> bRecurse = b.recurse()
@@ -1450,6 +1463,71 @@ class RecursiveIterator(StreamIterator):
         '''
         return [i.srcStream for i in self.iteratorStack()]
 
+    def currentHierarchyOffset(self):
+        '''
+        Called on the current iterator, returns the current offset in the hierarchy. 
+        Or None if we are not currently iterating.
+        
+        >>> b = corpus.parse('bwv66.6')
+        >>> bRecurse = b.recurse().notes
+        >>> print(bRecurse.currentHierarchyOffset())
+        None
+        >>> for n in bRecurse:
+        ...     print(n.measureNumber, bRecurse.currentHierarchyOffset(), n)
+        0 0.0 <music21.note.Note C#>
+        0 0.5 <music21.note.Note B>
+        1 1.0 <music21.note.Note A>
+        1 2.0 <music21.note.Note B>
+        1 3.0 <music21.note.Note C#>
+        1 4.0 <music21.note.Note E>
+        2 5.0 <music21.note.Note C#>
+        ...
+        9 34.5 <music21.note.Note E#>
+        9 35.0 <music21.note.Note F#>
+        0 0.0 <music21.note.Note E>
+        1 1.0 <music21.note.Note F#>
+        ...
+        
+        After iteration completes, the figure is reset to None:
+        
+        >>> print(bRecurse.currentHierarchyOffset())
+        None
+        
+        The offsets are with respect to the position inside the stream
+        being iterated, so for instance, this will not change the output from above:
+        
+        >>> o = stream.Opus()
+        >>> o.insert(20.0, b)
+        >>> bRecurse = b.recurse().notes
+        >>> for n in bRecurse:
+        ...     print(n.measureNumber, bRecurse.currentHierarchyOffset(), n)
+        0 0.0 <music21.note.Note C#>
+        ...
+        
+        But of course, this will add 20.0 to all numbers:
+        
+        >>> oRecurse = o.recurse().notes
+        >>> for n in oRecurse:
+        ...     print(n.measureNumber, oRecurse.currentHierarchyOffset(), n)
+        0 20.0 <music21.note.Note C#>
+        ...
+        
+        New in v.4
+        '''
+        if self.lastYieldElement is None:
+            return None
+        streamStack = self.streamStack()
+        offsetSoFar = 0.0
+        for i, s in enumerate(streamStack[1:] + [self.lastYieldElement]): 
+            # should always have more than 1, because of source stream.
+            parentS = streamStack[i]
+            if s is parentS:
+                continue # we may be iterating over the last element and the streamStack is 
+            offsetSoFar += parentS.elementOffset(s)
+            # elementOffset returns the highest time as a number for endElements...
+            
+        return common.opFrac(offsetSoFar)
+
 class Test(unittest.TestCase):
     pass
 
@@ -1459,9 +1537,26 @@ class Test(unittest.TestCase):
         rec = s.recurse()
         n = rec.getElementById('id2')
         self.assertEqual(n.activeSite.number, 2)
+        
+    def testCurrentHierarchyOffsetReset(self):
+        from music21 import note, stream
+        p = stream.Part()
+        m = stream.Measure()
+        m.append(note.Note('D'))
+        m.append(note.Note('E'))
+        p.insert(0, note.Note('C'))
+        p.append(m)
+        pRecurse = p.recurse()
+        allOffsets = []
+        for _ in pRecurse:
+            allOffsets.append(pRecurse.currentHierarchyOffset())
+        self.assertListEqual(allOffsets, [0.0, 0.0, 1.0, 1.0, 2.0])
+        currentOffset = pRecurse.currentHierarchyOffset()
+        self.assertIsNone(currentOffset)
+        
 
 _DOC_ORDER = [StreamIterator, RecursiveIterator, OffsetIterator]
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='testRecursiveActiveSites')
+    music21.mainTest(Test) #, runTest='testCurrentHierarchyOffsetReset')
