@@ -1324,10 +1324,10 @@ class Test(unittest.TestCase):
         else:
             from music21.ext import mock # @Reimport
         with mock.patch('music21.converter.subConverters.glob.glob') as mockConv:
-            mockConv.return_value = [x for x in range(1)]
+            mockConv.return_value = [0]
             xmlconverter = ConverterMusicXML()
             xmlconverter.findPNGfpFromXMLfp(tempfp)
-            mockConv.return_value = [x for x in range(0)]
+            mockConv.return_value = []
             xmlconverter = ConverterMusicXML()
             self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, tempfp)
 
