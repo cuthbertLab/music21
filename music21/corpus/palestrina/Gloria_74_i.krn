@@ -1,0 +1,83 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa In semidupl. maj. (II)
+!!!OMD: Gloria
+!!!OTL: Amen
+**kern	**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor 2	!Tenor 1	!Altus	!Cantus
+*clefF4	*clefGv2	*clefGv2	*clefG2	*clefG2
+*k[b-]	*k[b-]	*k[b-]	*k[b-]	*k[b-]
+*F:ion	*F:ion	*F:ion	*F:ion	*F:ion
+*M4/2	*M4/2	*M4/2	*M4/2	*M4/2
+=106	=106	=106	=106	=106
+0r	0r	0r	2r	1f
+.	.	.	1f	.
+.	.	.	.	2.g
+.	.	.	2e	.
+.	.	.	.	4a
+=107	=107	=107	=107	=107
+2r	0r	0r	2d	2b-
+1F	.	.	2c	1a
+.	.	.	2d	.
+2E	.	.	2e	2g
+=108	=108	=108	=108	=108
+2D	0r	0r	2f	2f
+2C	.	.	2.g	2e
+1D	.	.	.	1f
+.	.	.	4f	.
+.	.	.	[2f	.
+=109	=109	=109	=109	=109
+1C	1r	1r	2f]	1g
+.	.	.	2e	.
+1FF	1F	2r	2f	2f
+.	.	[2F	[2c	2a
+=110	=110	=110	=110	=110
+1C	2.G	2F]	4c]	1g
+.	.	.	4d	.
+.	.	2E	4e	.
+.	4A	.	4c	.
+2r	2B-	1D	1d	1f
+[2F	[2A	.	.	.
+=111	=111	=111	=111	=111
+2F]	2A]	1C	2r	1cc
+2E	2G	.	2G	.
+2D	2F	2r	2B-	2b-
+2C	2E	2C	2c	[2a
+=112	=112	=112	=112	=112
+1D	1F	2F	2A	4a]
+.	.	.	.	4g
+.	.	2D	2B-	1f
+1C	1G	4E	2c	.
+.	.	4C	.	.
+.	.	[2c	2G	2e
+=113	=113	=113	=113	=113
+[0FF	[0F	4c]	2.A	[0f
+.	.	4B-	.	.
+.	.	4A	.	.
+.	.	4G	4B-	.
+.	.	1A	1c	.
+=114	=114	=114	=114	=114
+1FF_	1F_	[0A	[0c	1f_
+1FF_	1F_	.	.	1f_
+=115	=115	=115	=115	=115
+0FF]	0F]	0A]	0c]	0f]
+==	==	==	==	==
+*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Paraphrase)
+!!!AST: renaissance, vocal
+!!!ASW: Gregorian Mass
+!!!PWK: Masses, Book Mantuan II
+!!!RNB: Cadence finals: C
+!!!YOR: Le Opere Complete, v. 19, p. 87
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

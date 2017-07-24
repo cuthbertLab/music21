@@ -1,0 +1,128 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Salve regina
+!!!OMD: Sanctus
+!!!OTL: Hosanna
+**kern	**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto	*Icalto	*Icant
+!Bassus	!Tenor	!Altus 2	!Altus 1	!Cantus
+*clefF4	*clefGv2	*clefG2	*clefG2	*clefG2
+*k[b-]	*k[b-]	*k[b-]	*k[b-]	*k[b-]
+*G:dor	*G:dor	*G:dor	*G:dor	*G:dor
+*M4/2	*M4/2	*M4/2	*M4/2	*M4/2
+=72	=72	=72	=72	=72
+0r	0r	1d	0r	0r
+.	.	1f	.	.
+=73	=73	=73	=73	=73
+1G	1r	1g	0r	1r
+[1B-	1G	1g	.	[1dd
+=74	=74	=74	=74	=74
+1B-]	1B-	2f	1d	1dd]
+.	.	2g	.	.
+1A	1c	1a	1f	1cc
+=75	=75	=75	=75	=75
+1G	1d	1b-	1g	4b-
+.	.	.	.	4cc
+.	.	.	.	4dd
+.	.	.	.	4ee
+1D	1d	2a	1a	[1ff
+.	.	2f	.	.
+=76	=76	=76	=76	=76
+1F	1.c	1f	1a	1ff]
+1G	.	1r	[1g	2ee
+.	2B	.	.	2dd
+=77	=77	=77	=77	=77
+0r	2c	1a	2g]	2ee
+.	2d	.	2f	4dd
+.	.	.	.	4ff
+.	1G	1b-	2.g	4ee
+.	.	.	.	4dd
+.	.	.	.	[2dd
+.	.	.	4f	.
+=78	=78	=78	=78	=78
+1r	1A	1a	1e	2dd]
+.	.	.	.	2cc#
+1D	2r	1f	2d	1dd
+.	2d	.	[2a	.
+=79	=79	=79	=79	=79
+1F	2c	1a	2a]	0r
+.	2f	.	1cc	.
+1G	2e	2.g	.	.
+.	2d	.	2b-	.
+.	.	4f	.	.
+=80	=80	=80	=80	=80
+1A	2c#	2e	1a	0r
+.	1d	2d	.	.
+1A	.	1e	1a	.
+.	2c#	.	.	.
+=81	=81	=81	=81	=81
+1.G	1d	1g	2.b-	0r
+.	.	.	4a	.
+.	2.d	2b-	2g	.
+2F#	.	2a	2a	.
+.	4c	.	.	.
+=82	=82	=82	=82	=82
+2.G	4B-	2.b-	1d	1g
+.	4A	.	.	.
+.	1G	.	.	.
+4F	.	4a	.	.
+2E-	.	2g	2r	1b-
+2D	[2B-	2f	2d	.
+=83	=83	=83	=83	=83
+1C	2B-]	1e-	2g	1cc
+.	2A	.	2c	.
+2.BB-	1B-	2d	2f	1dd
+.	.	[2b-	[2g	.
+4C	.	.	.	.
+=84	=84	=84	=84	=84
+1D	0r	2b-]	2g]	1dd
+.	.	1a	1f	.
+1r	.	.	.	[1cc
+.	.	2g	2e	.
+=85	=85	=85	=85	=85
+0r	2r	2a	2f	2cc]
+.	2G	2.g	2d	2b
+.	2c	.	2e	2cc
+.	.	4f	.	.
+.	2B	2d	[2g	2dd
+=86	=86	=86	=86	=86
+0r	2c#	2e	2g]	[0a
+.	2d	1d	2f	.
+.	1A	.	1e	.
+.	.	2c#	.	.
+=87	=87	=87	=87	=87
+1D	0d	2d	2d	1a]
+.	.	2f	2a	.
+2G	.	2g	2b-	2r
+2F#	.	2a	2a	2a
+=88	=88	=88	=88	=88
+2G	2r	2b-	2g	2dd
+2A	2A	1a	2e	2cc#
+2F#	2A	.	[1d	2dd
+2G	2B-	2g	.	2dd
+=89	=89	=89	=89	=89
+0D	2A	2f#	0d]	0dd
+.	2G	1g	.	.
+.	1A	.	.	.
+.	.	2f#	.	.
+=90	=90	=90	=90	=90
+0G	0G	0g	0d	0b
+==	==	==	==	==
+*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Paraphrase)
+!!!AST: renaissance, vocal
+!!!ASW: Antiphon
+!!!PWK: Masses, Book 11
+!!!RNB: Cadence finals: D
+!!!YOR: Le Opere Complete, v. 28, p. 185
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

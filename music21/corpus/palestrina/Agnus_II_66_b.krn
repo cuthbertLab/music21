@@ -1,0 +1,95 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Lauda Sion
+!!!OMD: Agnus II
+!!!OTL: dona nobis
+**kern	**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor 2	!Tenor 1	!Altus	!Cantus
+*clefF4	*clefGv2	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix	*G:mix
+*M3/2	*M3/2	*M3/2	*M3/2	*M3/2
+=24	=24	=24	=24	=24
+1G	2r	2d	2g	2b
+.	2B	2d	2g	2dd
+2r	2c	2r	2e	2ee
+=25	=25	=25	=25	=25
+1r	2A	1r	2.f	2cc
+.	2d	.	.	2a
+.	.	.	4d	.
+2r	2c	2r	4e	2cc
+.	.	.	4f	.
+=26	=26	=26	=26	=26
+1r	2G	1r	2.g	2b
+.	2.d	.	.	1a
+.	.	.	8f	.
+.	.	.	8e	.
+2r	.	2r	2f#	.
+.	4c	.	.	.
+=27	=27	=27	=27	=27
+1G	2B	1d	1.g	2g
+.	2G	.	.	2b
+2E	2G	2e	.	2b
+=28	=28	=28	=28	=28
+2.F	2A	2c	1r	2a
+.	2F	2A	.	2a
+4D	.	.	.	.
+4E	[2G	2c	2r	4g
+4F	.	.	.	4a
+=29	=29	=29	=29	=29
+2.G	2G]	2B	1r	4b
+.	.	.	.	4cc
+.	1D	1A	.	1dd
+8F	.	.	.	.
+8E	.	.	.	.
+2F#	.	.	2r	.
+=30	=30	=30	=30	=30
+1.G	1d	1.G	2r	2b
+.	.	.	1g	2dd
+.	2e	.	.	2b
+=31	=31	=31	=31	=31
+1r	2c	1r	2a	2cc
+.	2d	.	2f	2a
+2r	2G	2r	2d	4b
+.	.	.	.	4cc
+=32	=32	=32	=32	=32
+1r	2D	2r	2f	2.dd
+.	1A	2r	1e	.
+.	.	.	.	8cc
+.	.	.	.	8b
+2r	.	[2A	.	2cc#
+=33	=33	=33	=33	=33
+1D	2r	2A]	1d	1dd
+.	2d	2F	.	.
+2E	2B	2G	2r	2r
+=34	=34	=34	=34	=34
+2C	2.c	2E	2e	1r
+2AA	.	2.A	2e	.
+.	4d	.	.	.
+2C	2e	.	2c	2r
+.	.	4G	.	.
+=35	=35	=35	=35	=35
+2BB	2d	2.G	2d	1r
+1AA	2c	.	2e	.
+.	.	8F	.	.
+.	.	8E	.	.
+.	2A	2F#	2c	2r
+*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Parody)
+!!!AST: renaissance, vocal
+!!!ASW: Motet 1563 (Palestrina)
+!!!PWK: Masses, Book 4
+!!!RNB: Cadence finals: D
+!!!YOR: Le Opere Complete, v. 10, p. 1
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

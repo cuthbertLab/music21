@@ -34,6 +34,12 @@ from music21.analysis import pitchAnalysis
 
 
 class Axis(object):
+    '''
+    An Axis is an easier way of specifying what to plot on any given axis.
+    
+    Client should be a .plot.PlotStream or None.  Eventually a Stream may be allowed,
+    but not yet.
+    '''
     _DOC_ATTR = {
         'axisName': 'the name of the axis.  One of "x" or "y" or for 3D Plots, "z"',
         'minValue': '''
@@ -66,7 +72,7 @@ class Axis(object):
             >>> ax = graph.axis.DynamicsAxis()
             >>> ax.quantities
             ('dynamic', 'dynamics', 'volume')
-            '''
+            ''',
     }
 
     labelDefault = 'an axis'
@@ -75,7 +81,7 @@ class Axis(object):
 
     def __init__(self, client=None, axisName='x'):
         if isinstance(client, str):
-            raise GraphException('Client must be a PlotStream or None')
+            raise GraphException('Client must be a PlotStream, Stream, or None')
         self._client = None
         self._label = None
 
@@ -101,9 +107,15 @@ class Axis(object):
         >>> axIsolated = graph.axis.DynamicsAxis(axisName='z')
         >>> axIsolated
         <music21.graph.axis.DynamicsAxis: z axis for (no client)>
+
+        >>> s = stream.Part()
+        >>> axStream = graph.axis.DynamicsAxis(s, axisName='y')
+        >>> axStream
+        <music21.graph.axis.DynamicsAxis: y axis for Part>
+
         '''
         c = self.client
-        if c:
+        if c is not None:
             clientName = c.__class__.__name__
         else:
             clientName = '(no client)'
@@ -155,12 +167,16 @@ class Axis(object):
     def stream(self):
         '''
         Returns a reference to the client's .streamObj  (or None if client is None)
+        
+        If the client is itself a stream, return it.
 
         Read-only
         '''
         c = self.client
         if c is None:
             return None
+        elif isinstance(c, stream.Stream):
+            return c        
         else:
             return c.streamObj
 
@@ -233,6 +249,7 @@ class Axis(object):
         '''
         minV = self.minValue
         maxV = self.maxValue
+        
         if minV is None:
             minV = 0
         if maxV is None:
@@ -650,6 +667,63 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
         ticks = self.makePitchLabelsUnicode(ticks)
         return ticks
 
+class PitchDiatonicAxis(PitchAxis):
+    '''
+    Axis subclass for dealing with Diatonic Values (.diatonicNoteNum)
+    '''
+    labelDefault = 'Step'
+    quantities = ('diatonic', 'diatonicNoteNum')
+
+    def extractOneElement(self, n, formatDict):
+        if hasattr(n, 'pitch'):
+            return n.pitch.diatonicNoteNum
+
+    def ticks(self, dataMin=15, dataMax=43):
+        u'''
+        >>> ax = graph.axis.PitchDiatonicAxis()
+        >>> ax.hideUnused = False
+        >>> ax.blankLabelUnused = False
+        >>> ax.minValue = 20
+        >>> ax.maxValue = 30
+        >>> for ps, label in ax.ticks():
+        ...     print(str(ps) + " " + label)
+        20 G♯0
+        21 A
+        22 B♭
+        23 B
+        24 C1
+
+        >>> ax.showOctaves = False
+        >>> for ps, label in ax.ticks():
+        ...     print(str(ps) + " " + label)
+        20 G♯
+        21 A
+        22 B♭
+        23 B
+        24 C
+
+        >>> ax.showOctaves = True
+        >>> for ps, label in ax.ticks():
+        ...     print(str(ps) + " " + label)
+        20 G♯0
+        21 A0
+        22 B♭0
+        23 B0
+        24 C1
+
+        >>> bach = corpus.parse('bwv66.6')
+        >>> plotS = graph.plot.PlotStream(bach.parts[-1])
+        >>> ax = graph.axis.PitchSpaceAxis(plotS)
+        >>> ax.hideUnused = False
+        >>> ax.minValue = 36
+        >>> ax.maxValue = 100
+        >>> ticks = ax.ticks()
+        >>> ticks[0] # blank because no note 36 in data
+        (36, '')
+        >>> ticks[21]
+        (57, 'A')
+        '''
+        return self._pitchTickHelper('nameWithOctave', 'diatonicNoteNum')
 
 #------------------------------------------------------------------------------
 class PositionAxis(Axis):

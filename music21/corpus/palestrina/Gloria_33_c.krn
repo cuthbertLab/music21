@@ -1,0 +1,97 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa In duplicibus minoribus (I)
+!!!OMD: Gloria
+!!!OTL: Glorificamus
+**kern	**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor 2	!Tenor 1	!Altus	!Cantus
+*clefF4	*clefGv2	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]	*k[]
+*E:phr	*E:phr	*E:phr	*E:phr	*E:phr
+*M4/2	*M4/2	*M4/2	*M4/2	*M4/2
+=21	=21	=21	=21	=21
+0r	1E	0r	1B	1e
+.	2F	.	2A	1d
+.	2G	.	2B	.
+=22	=22	=22	=22	=22
+0r	2C	1r	2c	1e
+.	2E	.	2G	.
+.	1D	2r	2A	1f
+.	.	2A	[2d	.
+=23	=23	=23	=23	=23
+0r	1r	2B	4d]	1g
+.	.	.	8c	.
+.	.	.	8d	.
+.	.	2c	2e	.
+.	1A	2F	1c	1f
+.	.	[2A	.	.
+=24	=24	=24	=24	=24
+1E	2B	4A]	0r	1e
+.	.	4G	.	.
+.	1c	2G	.	.
+2F#	.	2A	.	1d
+2G	2B	2B	.	.
+=25	=25	=25	=25	=25
+2C	4A	4c	1r	1c
+.	4G	4B	.	.
+2E	1G	4A	.	.
+.	.	4G	.	.
+1D	.	2A	2r	[1d
+.	2F#	[2d	2A	.
+=26	=26	=26	=26	=26
+1G	1G	4d]	2B	1d]
+.	.	4c	.	.
+.	.	2B	2.d	.
+1r	2r	1A	.	1e
+.	.	.	4c	.
+.	2A	.	2c	.
+=27	=27	=27	=27	=27
+2r	2B	1r	2d	2.g
+1E	2c	.	1e	.
+.	.	.	.	4f
+.	2B	2r	.	2g
+[2F	2A	2A	4d	[2a
+.	.	.	4c	.
+=28	=28	=28	=28	=28
+2F]	2c	2A	2f	2a]
+2G	4B	2B	2d	2.g
+.	4A	.	.	.
+1C	2G	1c	1e	.
+.	.	.	.	4f
+.	2A	.	.	[2e
+=29	=29	=29	=29	=29
+0D	0F	0A	1a	2e]
+.	.	.	.	4d
+.	.	.	.	4c
+.	.	.	2r	1d
+.	.	.	2A	.
+=30	=30	=30	=30	=30
+0AA	[0E	2.c	2A	[0e
+.	.	.	2A	.
+.	.	4B	.	.
+.	.	1A	2c	.
+.	.	.	2c	.
+=31	=31	=31	=31	=31
+[0E	1E_	[0G#	[0B	1e_
+.	1E_	.	.	1e_
+=32	=32	=32	=32	=32
+0E]	0E]	0G#]	0B]	0e]
+*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Paraphrase)
+!!!AST: renaissance, vocal
+!!!ASW: Gregorian Mass
+!!!PWK: Masses, Book Mantuan I
+!!!RNB: Cadence finals: A
+!!!YOR: Le Opere Complete, v. 18, p. 42
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

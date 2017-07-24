@@ -1,0 +1,89 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa In semidupl. maj. (II)
+!!!OMD: Gloria
+!!!OTL: First Section
+**kern	**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor 2	!Tenor 1	!Altus	!Cantus
+*clefF4	*clefGv2	*clefGv2	*clefG2	*clefG2
+*k[b-]	*k[b-]	*k[b-]	*k[b-]	*k[b-]
+*F:ion	*F:ion	*F:ion	*F:ion	*F:ion
+*M4/2	*M4/2	*M4/2	*M4/2	*M4/2
+=1	=1	=1	=1	=1
+0r	0r	0r	1r	1.f
+.	.	.	1B-	.
+.	.	.	.	2g
+=2	=2	=2	=2	=2
+0r	0r	0r	2c	1a
+.	.	.	1d	.
+.	.	.	.	2f
+.	.	.	2B-	[2b-
+=3	=3	=3	=3	=3
+0r	0r	1r	1.f	2b-]
+.	.	.	.	4a
+.	.	.	.	4g
+.	.	[1F	.	4a
+.	.	.	.	4b-
+.	.	.	2e	[2cc
+=4	=4	=4	=4	=4
+0r	0r	2F]	1d	2cc]
+.	.	2G	.	2b
+.	.	1A	2c	2.cc
+.	.	.	2e	.
+.	.	.	.	4b-
+=5	=5	=5	=5	=5
+1r	0r	2F	2f	4a
+.	.	.	.	4g
+.	.	1B-	1d	4f
+.	.	.	.	4e
+[1BB-	.	.	.	4d
+.	.	.	.	4e
+.	.	2A	2d	[2f
+=6	=6	=6	=6	=6
+2BB-]	1r	1G	2d	2f]
+2C	.	.	4c	2e
+.	.	.	4B-	.
+1D	2r	2.F	1A	1f
+.	[2F	.	.	.
+.	.	4E	.	.
+=7	=7	=7	=7	=7
+1BB-	2F]	1D	1d	1b-
+.	2G	.	.	.
+2.F	1A	2r	1c	2a
+.	.	[2A	.	[2f
+4E-	.	.	.	.
+=8	=8	=8	=8	=8
+4D	2F	2A]	1d	2f]
+4C	.	.	.	.
+4BB-	1B-	2D	.	2f
+4AA	.	.	.	.
+2GG	.	2d	2B-	2g
+2AA	2A	2c	2c	[2f
+=9	=9	=9	=9	=9
+1BB-	0G	2.B-	1d	2f]
+.	.	.	.	4e
+.	.	4A	.	4d
+1C	.	1G	1c	1e
+=10	=10	=10	=10	=10
+[0FF	[0F	[0A	[0c	[0f
+=11	=11	=11	=11	=11
+0FF]	0F]	0A]	0c]	0f]
+*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Paraphrase)
+!!!AST: renaissance, vocal
+!!!ASW: Gregorian Mass
+!!!PWK: Masses, Book Mantuan II
+!!!RNB: Cadence finals: C
+!!!YOR: Le Opere Complete, v. 19, p. 87
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

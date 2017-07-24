@@ -1,0 +1,81 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Dies sanctificatus
+!!!OMD: Credo
+!!!OTL: Et vitam
+**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor	!Altus	!Cantus
+*clefF4	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix
+*M3/2	*M3/2	*M3/2	*M3/2
+=164	=164	=164	=164
+2E	2e	2g#	2b
+1A	1e	1a	1cc
+=165	=165	=165	=165
+1G	1g	1b	1dd
+2r	2g	2b	2dd
+=166	=166	=166	=166
+1r	1c	1cc	1ee
+2r	2c	2cc	2ee
+=167	=167	=167	=167
+1r	2g	2.b	2.dd
+.	2d	.	.
+.	.	4a	4cc
+2r	2e	2g#	2b
+=168	=168	=168	=168
+1r	2.A	2.a	2.cc
+.	4B	4g	4b
+2r	2c	4e	4g
+.	.	4f#	4a
+=169	=169	=169	=169
+1r	2G	1g	2b
+.	1d	.	1a
+2r	.	2f#	.
+=170	=170	=170	=170
+2G	2B	2g	2dd
+1C	1c	2g	1ee
+.	.	2g	.
+=171	=171	=171	=171
+1G	1B	1g	1dd
+2G	2d	2g	2b
+=172	=172	=172	=172
+1c	1e	1g	1cc
+2C	2e	2g	2cc
+=173	=173	=173	=173
+2G	2.d	2g	2.b
+2D	.	2f	.
+.	4c	.	4a
+2E	2B	2e	[2g
+=174	=174	=174	=174
+2.C	2.c	2.e	2g]
+.	.	.	2.a
+4D	4B	4d	.
+[2E	[2G	4B	.
+.	.	4c	4g
+=175	=175	=175	=175
+2E]	2G]	1.d	1g
+1D	1A	.	.
+.	.	.	2f#
+=176	=176	=176	=176
+1.G	1.B	1.d	1.g
+==	==	==	==
+*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Parody)
+!!!AST: renaissance, vocal
+!!!ASW: Motet 1563 (Palestrina)
+!!!PWK: Masses, Book 6
+!!!RNB: Cadence finals: D,A,C
+!!!YOR: Le Opere Complete, v. 21, p. 1
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

@@ -1,0 +1,142 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Jesu Nostra Redemptio
+!!!OMD: Gloria
+!!!OTL: Jesu Christe
+**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor	!Altus	!Cantus
+*clefF4	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]
+*E:phr	*E:phr	*E:phr	*E:phr
+*M4/2	*M4/2	*M4/2	*M4/2
+=78	=78	=78	=78
+0C	0e	0g	1cc
+.	.	.	2r
+.	.	.	[2cc
+=79	=79	=79	=79
+1G	1d	1g	2cc]
+.	.	.	1b
+1A	1c	1e	.
+.	.	.	[2a
+=80	=80	=80	=80
+0E	0B	0e	2a]
+.	.	.	4g#
+.	.	.	4f#
+.	.	.	1g#
+=81	=81	=81	=81
+0AA	1A	0c#	1a
+.	2r	.	2r
+.	2A	.	2a
+=82	=82	=82	=82
+1r	2B	1r	2g
+.	2c	.	2e
+2r	2d	2r	2f
+2E	2B	2e	2g
+=83	=83	=83	=83
+2F	1A	2c	2.a
+2D	.	2d	.
+.	.	.	8g
+.	.	.	8f
+2E	1r	2c	2g
+2F	.	2c	2a
+=84	=84	=84	=84
+2.G	2r	2B	1d
+.	2B	2d	.
+4F	.	.	.
+4E	[1c	[1e	1r
+4D	.	.	.
+2C	.	.	.
+=85	=85	=85	=85
+1G	2c]	2e]	1g
+.	2B	2d	.
+1r	2.A	1c	[1a
+.	4G	.	.
+=86	=86	=86	=86
+0r	2F	2A	2a]
+.	2E	2c	2g
+.	2D	1d	1f
+.	2F	.	.
+=87	=87	=87	=87
+0r	2G	2B	2d
+.	1A	1c	2f
+.	.	.	2.e
+.	4G	4B	.
+.	4F	4A	4f
+=88	=88	=88	=88
+2r	1E	2B	2g
+2G	.	2B	1e
+[1A	1F	2r	.
+.	.	2A	2d
+=89	=89	=89	=89
+2A]	1E	2c	1e
+2G	.	2B	.
+1F	1c	2A	[1a
+.	.	[2f	.
+=90	=90	=90	=90
+2D	2d	4f]	1a]
+.	.	4e	.
+2F	2A	4c	.
+.	.	4d	.
+2.E	2B	1e	1g
+.	[2c	.	.
+4F	.	.	.
+=91	=91	=91	=91
+2G	2c]	2d	2r
+2G	2B	1e	2g
+1F	2A	.	[1a
+.	2D	2d	.
+=92	=92	=92	=92
+1E	2r	1e	2a]
+.	2G	.	2g
+1D	[1A	2r	1f
+.	.	2A	.
+=93	=93	=93	=93
+2AA	2A]	1c	2e
+2C	2G	.	2e
+[1D	1F	1A	2d
+.	.	.	4d
+.	.	.	4e
+=94	=94	=94	=94
+1D]	2D	2.A	4f
+.	.	.	4g
+.	2F	.	1a
+.	.	4B	.
+2.C	2.E	4c	.
+.	.	4d	.
+.	.	2e	[2g
+8BB	4F	.	.
+8AA	.	.	.
+=95	=95	=95	=95
+2BB	2G	2d	4g]
+.	.	.	4f
+2C	2G	2c	1e
+2D	1F	2A	.
+2D	.	2B	2d
+=96	=96	=96	=96
+0AA	1E	0c	[0e
+.	1A	.	.
+=97	=97	=97	=97
+[0E	[0G#	[0B	1e_
+.	.	.	1e_
+=98	=98	=98	=98
+0E]	0G#]	0B]	0e]
+==	==	==	==
+*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Paraphrase)
+!!!AST: renaissance, vocal
+!!!ASW: Hymn
+!!!PWK: Masses, Book 4
+!!!RNB: Cadence finals: C,A
+!!!YOR: Le Opere Complete, v. 10, p. 38
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

@@ -1,0 +1,121 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Lauda Sion
+!!!OMD: Gloria
+!!!OTL: Quoniam
+**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor	!Altus	!Cantus
+*clefF4	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix
+*M3/2	*M3/2	*M3/2	*M3/2
+=56	=56	=56	=56
+1G	1B	1d	1g
+2G	2B	2d	2g
+=57	=57	=57	=57
+1F	1c	1f	1a
+2C	2c	2e	2g
+=58	=58	=58	=58
+1G	1d	1g	1b
+2E	2G	2g	2cc#
+=59	=59	=59	=59
+1D	1A	1f#	1dd
+2D	2A	2f#	2dd
+=60	=60	=60	=60
+2G	2B	2g	2dd
+2G	2d	2g	2b
+2G	2d	2g	2b
+=61	=61	=61	=61
+1C	1e	1g	1cc
+2C	2e	2g	2cc
+=62	=62	=62	=62
+1G	1d	1g	1b
+2G	2B	2d	2g
+=63	=63	=63	=63
+1F	1c	1f	1a
+2C	2c	2e	2g
+=64	=64	=64	=64
+2C	2c	2e	2g
+2G	2B	2d	2b
+2E	2G	2g	2cc#
+=65	=65	=65	=65
+2D	2A	2f#	2dd
+1G	1B	1g	1dd
+=66	=66	=66	=66
+1A	1c	2.e	2cc
+.	.	.	2.ee
+.	.	4f	.
+[2B-	[2d	2g	.
+.	.	.	4dd
+=67	=67	=67	=67
+2B-]	2d]	4f	2.dd
+.	.	4g	.
+1A	1e	1a	.
+.	.	.	8cc
+.	.	.	8b
+.	.	.	2cc#
+=68	=68	=68	=68
+1D	1d	2f#	1dd
+.	.	2r	.
+2D	2d	2f#	2a
+=69	=69	=69	=69
+1G	1d	1g	1b
+2G	2d	2g	2b
+=70	=70	=70	=70
+1C	1e	1g	1cc
+2C	2e	2g	2cc
+=71	=71	=71	=71
+1.G	2.d	1g	1b
+.	4c	.	.
+.	4B	2d	2dd
+.	4A	.	.
+=72	=72	=72	=72
+1G	1B	2.g	2.dd
+.	.	4g	4dd
+2r	2r	2e	2ee
+=73	=73	=73	=73
+1r	1r	2.f	2cc
+.	.	.	2a
+.	.	4d	.
+2r	2r	2e	2cc
+=74	=74	=74	=74
+2r	2r	1g	2b
+2r	2r	.	2a
+2D	2d	2f#	2a
+=75	=75	=75	=75
+2.G	2.d	1.g	2.b
+4G	4d	.	4b
+2E	2e	.	2cc
+=76	=76	=76	=76
+2.F	2c	2.f	2a
+.	2A	.	2a
+4D	.	4f	.
+2E	2c	2e	2g
+=77	=77	=77	=77
+2G	2B	2d	1g
+1D	1A	1d	.
+.	.	.	2f#
+=78	=78	=78	=78
+[1.GG	[1.G	[1.d	[1.g
+=79	=79	=79	=79
+1.GG]	1.G]	1.d]	1.g]
+==	==	==	==
+*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Parody)
+!!!AST: renaissance, vocal
+!!!ASW: Motet 1563 (Palestrina)
+!!!PWK: Masses, Book 4
+!!!RNB: Cadence finals: D
+!!!YOR: Le Opere Complete, v. 10, p. 1
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

@@ -1,0 +1,106 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa In festis Apostolorum (I)
+!!!OMD: Gloria
+!!!OTL: Quoniam
+**kern	**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor 2	!Tenor 1	!Altus	!Cantus
+*clefF4	*clefGv2	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]	*k[]
+*D:dor	*D:dor	*D:dor	*D:dor	*D:dor
+*M4/2	*M4/2	*M4/2	*M4/2	*M4/2
+=89	=89	=89	=89	=89
+0r	0r	0r	1r	1.a
+.	.	.	1e	.
+.	.	.	.	2g
+=90	=90	=90	=90	=90
+0r	2r	0r	2d	2f
+.	1A	.	2c	2a
+.	.	.	1e	2cc
+.	2G	.	.	2b-
+=91	=91	=91	=91	=91
+0r	2F	0r	1f	1.a
+.	2A	.	.	.
+.	2.c	.	2.e	.
+.	.	.	.	2g
+.	4B-	.	4d	.
+=92	=92	=92	=92	=92
+0r	2A	0r	2c	4f
+.	.	.	.	4e
+.	2G	.	2.e	2.g
+.	1B-	.	.	.
+.	.	.	4d	4f
+.	.	.	[2d	4f
+.	.	.	.	8e
+.	.	.	.	8d
+=93	=93	=93	=93	=93
+0r	2.A	2r	2d]	1e
+.	.	1A	2c#	.
+.	4G	.	.	.
+.	2F#	.	2d	2.d
+.	2G	2G	2B	.
+.	.	.	.	4e
+=94	=94	=94	=94	=94
+0r	1D	2F	0A	1f
+.	.	2A	.	.
+.	2r	[1c	.	2.e
+.	[2A	.	.	.
+.	.	.	.	4d
+=95	=95	=95	=95	=95
+1.E	2A]	2c]	0r	4e
+.	.	.	.	4f
+.	2G	4B	.	1g
+.	.	4A	.	.
+.	2E	2G	.	.
+2D	2F	2A	.	2f
+=96	=96	=96	=96	=96
+2C	2.G	2c	1r	1e
+2E	.	2B	.	.
+.	4A	.	.	.
+1G	4B	1E	2r	1r
+.	4c	.	.	.
+.	2B	.	2e	.
+=97	=97	=97	=97	=97
+1F	1A	2r	2d	1a
+.	.	2A	2c	.
+2E	1r	2B	2e	2g
+2D	.	[2d	[2f	2f
+=98	=98	=98	=98	=98
+0F	2r	2d]	2f]	2a
+.	2.A	4c	4e	2.cc
+.	.	4B	4d	.
+.	.	2A	2.c	.
+.	4B	.	.	4b
+.	[2c	4A	.	2a
+.	.	4B	4d	.
+=99	=99	=99	=99	=99
+0E	2c]	4c	0e	2g#
+.	.	4d	.	.
+.	4B	2.e	.	1a
+.	4A	.	.	.
+.	1B	.	.	.
+.	.	4d	.	.
+.	.	2B	.	2g#
+=100	=100	=100	=100	=100
+[0AA	[0A	[0c#	[0e	[0a
+=101	=101	=101	=101	=101
+0AA]	0A]	0c#]	0e]	0a]
+*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Paraphrase)
+!!!AST: renaissance, vocal
+!!!ASW: Gregorian Mass
+!!!PWK: Masses, Book Mantuan II
+!!!RNB: Cadence finals: A,E
+!!!YOR: Le Opere Complete, v. 19, p. 43
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

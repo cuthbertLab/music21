@@ -1,0 +1,66 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa In semidupl. maj. (I)
+!!!OMD: Gloria
+!!!OTL: Benedicimus te
+**kern	**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor 2	!Tenor 1	!Altus	!Cantus
+*clefF4	*clefGv2	*clefGv2	*clefG2	*clefG2
+*k[b-]	*k[b-]	*k[b-]	*k[b-]	*k[b-]
+*F:ion	*F:ion	*F:ion	*F:ion	*F:ion
+*M4/2	*M4/2	*M4/2	*M4/2	*M4/2
+=15	=15	=15	=15	=15
+0r	1r	0r	0r	1g
+.	1c	.	.	1e
+=16	=16	=16	=16	=16
+0r	1A	0r	0r	2f
+.	.	.	.	2e
+.	[1B-	.	.	2.d
+.	.	.	.	4e
+=17	=17	=17	=17	=17
+0r	2B-]	0r	0r	2f
+.	4A	.	.	2.g
+.	4G	.	.	.
+.	1A	.	.	.
+.	.	.	.	4f
+.	.	.	.	[2f
+=18	=18	=18	=18	=18
+1C	2G	1c	1r	2f]
+.	2G	.	.	2e
+1FF	1F	1A	1c	2f
+.	.	.	.	[2f
+=19	=19	=19	=19	=19
+2.BB-	1.D	1.B-	1F	2f]
+.	.	.	.	2f
+4AA	.	.	.	.
+1GG	.	.	1B-	1g
+.	2D	4A	.	.
+.	.	4G	.	.
+=20	=20	=20	=20	=20
+1FF	1F	1A	1c	2c
+.	.	.	.	1f
+1C	2G	2G	1c	.
+.	2c	2G	.	2e
+=21	=21	=21	=21	=21
+[0FF	[0A	[0F	[0c	[0f
+=22	=22	=22	=22	=22
+0FF]	0A]	0F]	0c]	0f]
+*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Paraphrase)
+!!!AST: renaissance, vocal
+!!!ASW: Gregorian Mass
+!!!PWK: Masses, Book Mantuan II
+!!!RNB: Cadence finals: C
+!!!YOR: Le Opere Complete, v. 19, p. 129
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

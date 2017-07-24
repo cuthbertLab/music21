@@ -1,0 +1,60 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Illumina oculos meos
+!!!OMD: Credo
+!!!OTL: resurrectionem
+**kern	**kern	**kern	**kern	**kern	**kern
+*Ibass	*Ibarit	*Itenor	*Itenor	*Icalto	*Icant
+!Bassus	!Baritone	!Tenor 2	!Tenor 1	!Altus	!Cantus
+*clefF4	*clefF4	*clefGv2	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]	*k[]	*k[]
+*E:phr	*E:phr	*E:phr	*E:phr	*E:phr	*E:phr
+*M3/2	*M3/2	*M3/2	*M3/2	*M3/2	*M3/2
+=229	=229	=229	=229	=229	=229
+1r	2.E	2.B	1r	2.e	2.g
+.	4E	4B	.	4d	4g
+2r	2E	2G	2r	2B	2g
+=230	=230	=230	=230	=230	=230
+1r	2D	2A	1r	2d	2f
+.	1F	1A	.	2c	1a
+2r	.	.	2r	2d	.
+=231	=231	=231	=231	=231	=231
+2r	1E	1B	2r	2e	2g
+2.E	.	.	2.e	2.g	2.b
+.	2r	2r	.	.	.
+4E	.	.	4e	4g	4b
+=232	=232	=232	=232	=232	=232
+2G	1r	1r	2d	2g	2b
+2D	.	.	2d	2f	2a
+[2A	2r	2r	[2c	2e	[2cc
+=233	=233	=233	=233	=233	=233
+2A]	1r	1r	2c]	2f	2cc]
+1G	.	.	1d	1g	1b
+.	2r	2r	.	.	.
+=234	=234	=234	=234	=234	=234
+2.A	1r	1r	2c	2e	2.cc
+.	.	.	1F	2c	.
+4G	.	.	.	.	4b
+2F	2r	2r	.	[2c	2a
+=235	=235	=235	=235	=235	=235
+2E	1r	1r	2G	2c]	2g
+1D	.	.	1A	1d	1f
+.	2r	2r	.	.	.
+*-	*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Parody)
+!!!AST: renaissance, vocal
+!!!ASW: Motet (Silva)
+!!!PWK: Masses, Book 10
+!!!RNB: Cadence finals: G,C,A
+!!!YOR: Le Opere Complete, v. 27, p. 155
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

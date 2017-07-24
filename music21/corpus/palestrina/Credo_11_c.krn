@@ -1,0 +1,89 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Ave regina coelorum
+!!!OMD: Credo
+!!!OTL: Et resurrexit
+**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto
+!Bassus	!Tenor	!Altus
+*clefF4	*clefGv2	*clefG2
+*k[]	*k[]	*k[]
+*C:ion	*C:ion	*C:ion
+*M3/2	*M3/2	*M3/2
+=121	=121	=121
+2G	2B	2d
+2E	2c	2e
+2D	2d	2f
+=122	=122	=122
+4C	2.e	2.g
+4D	.	.
+4E	.	.
+4F	4d	4f
+2G	2B	2d
+=123	=123	=123
+2C	2c	2e
+2c	2e	1g
+2B	2d	.
+=124	=124	=124
+2A	2c	2f
+2.G	2.B	2e
+.	.	2d
+4F	4A	.
+=125	=125	=125
+2G	2B	2e
+2.A	2.c	2.f
+4G	4B	4e
+=126	=126	=126
+2E	2G	1e
+2F	2A	.
+2G	2B	2d
+=127	=127	=127
+1.C	2c	2e
+.	2r	2g
+.	2c	2a
+=128	=128	=128
+1r	2d	2b
+.	2e	2.cc
+2r	2f	.
+.	.	4a
+=129	=129	=129
+2r	4g	4b
+.	4f	4a
+2G	4e	4g
+.	4d	4f
+2A	2c	2e
+=130	=130	=130
+2B	2G	2d
+2.c	2g	2.e
+.	2c	.
+4A	.	4f
+=131	=131	=131
+2B	2d	4g
+.	.	4f
+2.c	2.e	4e
+.	.	4d
+.	.	4c
+4B	4d	4d
+=132	=132	=132
+2A	1c	4e
+.	.	4c
+1G	.	1d
+.	2B	.
+*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Paraphrase)
+!!!AST: renaissance, vocal
+!!!ASW: Antiphon
+!!!PWK: Masses, Book 9
+!!!RNB: Cadence finals: G
+!!!YOR: Le Opere Complete, v. 25, p. 1
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

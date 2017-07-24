@@ -1,0 +1,72 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa De beata virgine (1570)
+!!!OMD: Gloria
+!!!OTL: coda
+**kern	**kern	**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Itenor	*Icalto	*Icant	*Icant
+!Bassus	!Tenor 2	!Tenor 1	!Altus	!Cantus 2	!Cantus 1
+*clefF4	*clefGv2	*clefGv2	*clefG2	*clefG2	*clefG2
+*k[b-]	*k[b-]	*k[b-]	*k[b-]	*k[b-]	*k[b-]
+*?:X	*?:X	*?:X	*?:X	*?:X	*?:X
+*M3/2	*M3/2	*M3/2	*M3/2	*M3/2	*M3/2
+=147	=147	=147	=147	=147	=147
+2r	1.G	1d	1r	[1.g	1.b
+2r	.	.	.	.	.
+2G	.	2d	2r	.	.
+=148	=148	=148	=148	=148	=148
+1c	2r	1e	1r	1.g]	1r
+.	2r	.	.	.	.
+2B	2G	2d	2r	.	2r
+=149	=149	=149	=149	=149	=149
+2.c	1g	2.e	2g	1r	1r
+.	.	.	1cc	.	.
+4B	.	4d	.	.	.
+2A	2f#	2c	.	2r	2r
+=150	=150	=150	=150	=150	=150
+1G	2g	2d	2b	1r	1r
+.	2d	2B	1g	.	.
+2C	2e	2c	.	2r	2r
+=151	=151	=151	=151	=151	=151
+2.F	2.f	2A	2a	1r	1r
+.	.	2f	2a	.	.
+4G	4e	.	.	.	.
+2A	2c	2e	2a	2r	2r
+=152	=152	=152	=152	=152	=152
+2B-	2d	2.d	2g	1r	1r
+1A	1e	.	1a	.	.
+.	.	8c	.	.	.
+.	.	8B	.	.	.
+.	.	2c#	.	2r	2r
+=153	=153	=153	=153	=153	=153
+1.D	1d	1d	1f#	2r	1r
+.	.	.	.	1a	.
+.	2f#	2d	2a	.	2r
+=154	=154	=154	=154	=154	=154
+1r	1g	1G	1b-	1dd	1r
+2r	2e	2A	2a	2cc#	2r
+=155	=155	=155	=155	=155	=155
+2r	1f	1d	1a	1dd	2r
+2r	.	.	.	.	1dd
+2G	2d	2G	2g	2b	.
+=156	=156	=156	=156	=156	=156
+1C	1c	1G	1e	1ee	1gg
+2D	2A	2d	2a	2dd	2ff#
+*-	*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Paraphrase)
+!!!AST: renaissance, vocal
+!!!ASW: Gregorian Mass
+!!!PWK: Masses, Book 3
+!!!RNB: Cadence finals: G,D,C,E,F
+!!!YOR: Le Opere Complete, v. 6, p. 175
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

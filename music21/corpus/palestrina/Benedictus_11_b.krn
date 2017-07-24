@@ -1,0 +1,82 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Brevis
+!!!OMD: Benedictus
+!!!OTL: Hosanna
+**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor	!Altus	!Cantus
+*clefF4	*clefGv2	*clefG2	*clefG2
+*k[b-]	*k[b-]	*k[b-]	*k[b-]
+*F:ion	*F:ion	*F:ion	*F:ion
+*M4/2	*M4/2	*M4/2	*M4/2
+=39	=39	=39	=39
+0c	0e	0g	0cc
+=40	=40	=40	=40
+1A	1e	1a	1cc
+1F	1f	1a	[1cc
+=41	=41	=41	=41
+0G	1e	0g	1cc]
+.	1d	.	1b-
+=42	=42	=42	=42
+0A	1c	1e	1a
+.	2A	1c	1f
+.	[2c	.	.
+=43	=43	=43	=43
+0G	2c]	0d	1g
+.	4B-	.	.
+.	4A	.	.
+.	1B	.	[1gg
+=44	=44	=44	=44
+0C	1c	1e	1gg]
+.	1c	2r	1ee
+.	.	[2cc	.
+=45	=45	=45	=45
+0F	1A	2cc]	1.cc
+.	.	1a	.
+.	1F	.	.
+.	.	2f	[2ff
+=46	=46	=46	=46
+1D	1f	1a	4ff]
+.	.	.	4ee
+.	.	.	2.dd
+1BB-	1d	2g	.
+.	.	.	4cc
+.	.	[2f	2b-
+=47	=47	=47	=47
+0C	2.c	2f]	2a
+.	.	4e	2g
+.	4B-	4d	.
+.	2A	1e	1cc
+.	2G	.	.
+=48	=48	=48	=48
+0D	1.F	2d	2b-
+.	.	1c	1a
+.	2G	2B	4g
+.	.	.	4f
+=49	=49	=49	=49
+0C	1A	0c	2e
+.	.	.	1f
+.	1G	.	.
+.	.	.	2e
+=50	=50	=50	=50
+0F	0A	0c	0f
+==	==	==	==
+*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Free)
+!!!AST: renaissance, vocal
+!!!ASW: Motet 1532 (Penet)
+!!!PWK: Masses, Book 3
+!!!RNB: Cadence finals: C
+!!!YOR: Le Opere Complete, v. 6, p. 62
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

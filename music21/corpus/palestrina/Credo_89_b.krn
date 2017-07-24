@@ -1,0 +1,209 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa O Rex gloriae
+!!!OMD: Credo
+!!!OTL: Crucifixus
+**kern	**kern	**kern
+*Icalto	*Icant	*Icant
+!Altus	!Cantus 2	!Cantus 1
+*clefG2	*clefG2	*clefG2
+*k[b-]	*k[b-]	*k[b-]
+*G:dor	*G:dor	*G:dor
+*M4/2	*M4/2	*M4/2
+=70	=70	=70
+1.g	1r	0r
+.	[1dd	.
+2g	.	.
+=71	=71	=71
+1b-	2dd]	0r
+.	2dd	.
+4a	1ff	.
+4g	.	.
+4a	.	.
+4b-	.	.
+=72	=72	=72
+2cc	2ee	0r
+1b-	1dd	.
+2a	2cc	.
+=73	=73	=73
+2g	2b-	1.dd
+2f#	2a	.
+1g	1b-	.
+.	.	2dd
+=74	=74	=74
+4d	1a	1ff
+4e	.	.
+4f	.	.
+4g	.	.
+4a	2r	2ee
+4g	.	.
+2b-	[2ff	[2dd
+=75	=75	=75
+1a	2ff]	2dd]
+.	2ee	2cc
+1r	2dd	2b-
+.	2cc	2a
+=76	=76	=76
+2r	1dd	1b-
+2d	.	.
+2.f	2cc	[1a
+.	2a	.
+4f	.	.
+=77	=77	=77
+2f	2.cc	1a]
+2f	.	.
+.	4cc	.
+1e	2cc	1r
+.	2cc	.
+=78	=78	=78
+0d	1b-	2r
+.	.	2dd
+.	1a	2.ff
+.	.	4ff
+=79	=79	=79
+1d	2r	2ff
+.	1dd	2ff
+1a	.	1ee
+.	2cc	.
+=80	=80	=80
+2.b-	2.dd	1dd
+4a	4cc	.
+2g	2b-	2r
+2f#	2a	[2dd
+=81	=81	=81
+2g	2b-	2dd]
+2e-	2g	2cc
+2d	2a	2.dd
+[2g	2b-	.
+.	.	4cc
+=82	=82	=82
+2g]	2g	2b-
+2f#	2.a	2a
+2g	.	2b-
+.	4g	.
+2e-	[2g	2g
+=83	=83	=83
+2d	2g]	1a
+2d	2f#	.
+1G	1g	1b-
+=84	=84	=84
+2r	2r	2r
+2g	2b-	2dd
+2f#	2a	2dd
+2g	2b-	2dd
+=85	=85	=85
+1c	1cc	1ee-
+2d	2b-	2dd
+[2f	[2a	[2cc
+=86	=86	=86
+4f]	4a]	4cc]
+4f	4a	4cc
+2d	2b-	2dd
+1e-	1g	2b-
+.	.	2cc
+=87	=87	=87
+0d	2a	1dd
+.	2dd	.
+.	1ff	2r
+.	.	2dd
+=88	=88	=88
+1r	2dd	1ff
+.	2.ff	.
+1d	.	2dd
+.	4ee	.
+.	2dd	[2ff
+=89	=89	=89
+1f	4cc	4ff]
+.	4b-	4ee
+.	4a	2cc
+.	4g	.
+2d	4f	2dd
+.	4g	.
+[2f	4a	4cc
+.	4b-	4b-
+=90	=90	=90
+4f]	2cc	2a
+4e	.	.
+2d	2dd	1b-
+1c	1ee-	.
+.	.	2a
+=91	=91	=91
+0B-	1dd	2b-
+.	.	1b-
+.	2r	.
+.	[2b-	2dd
+=92	=92	=92
+2r	2b-]	2.ff
+1B-	2dd	.
+.	.	4ee
+.	1ff	4dd
+.	.	4cc
+2d	.	[2b-
+=93	=93	=93
+1f	2dd	2b-]
+.	2cc	2a
+2d	2.ff	2dd
+2B-	.	[2ff
+.	4ee	.
+=94	=94	=94
+1b-	4dd	4ff]
+.	4ee	4ee
+.	4ff	1dd
+.	4dd	.
+1a	1ee	.
+.	.	2cc#
+=95	=95	=95
+2r	2dd	1dd
+2b-	2dd	.
+2g	2b-	1r
+2a	2cc	.
+=96	=96	=96
+2.b-	2.dd	0r
+4a	4cc	.
+2g	2b-	.
+[2a	[2cc	.
+=97	=97	=97
+4a]	4cc]	0r
+4g	4b-	.
+1g	2g	.
+.	1a	.
+2f#	.	.
+=98	=98	=98
+1g	2g	1dd
+.	2b-	.
+2r	2g	2b-
+2f	2a	2cc
+=99	=99	=99
+2B-	2.b-	2.dd
+2d	.	.
+.	4a	4cc
+2e-	2g	2b-
+2c	[2a	[2cc
+=100	=100	=100
+1e-	4a]	4cc]
+.	4g	4b-
+.	1g	4b-
+.	.	8a
+.	.	8g
+1d	.	1a
+.	2f#	.
+=101	=101	=101
+0G	0g	0g
+*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Parody)
+!!!AST: renaissance, vocal
+!!!ASW: Motet 1563 (Palestrina)
+!!!PWK: Masses, Book 12
+!!!RNB: Cadence finals: D
+!!!YOR: Le Opere Complete, v. 29, p. 30
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

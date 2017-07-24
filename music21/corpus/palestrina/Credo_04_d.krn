@@ -1,0 +1,103 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Ascendo ad Patrem
+!!!OMD: Credo
+!!!OTL: coda
+**kern	**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor 2	!Tenor 1	!Altus	!Cantus
+*clefF4	*clefGv2	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]	*k[]
+*C:ion	*C:ion	*C:ion	*C:ion	*C:ion
+*M3/2	*M3/2	*M3/2	*M3/2	*M3/2
+=159	=159	=159	=159	=159
+1r	2g	1r	2b	2dd
+.	2g	.	2b	2dd
+2r	2c	2r	2cc	2ee
+=160	=160	=160	=160	=160
+1r	2.g	1r	2.b	2.dd
+.	4G	.	4b	4dd
+2r	2A	2r	2a	2cc
+=161	=161	=161	=161	=161
+1r	2e	1r	2.g	2.b
+.	1d	.	.	.
+.	.	.	8f#	8a
+.	.	.	8e	8g
+2r	.	2r	2f#	2a
+=162	=162	=162	=162	=162
+2G	2B	2d	1g	1g
+2G	2B	2e	.	.
+2A	2c	2f	2r	2r
+=163	=163	=163	=163	=163
+2.G	2.B	2.e	1r	1r
+4G	4B	4e	.	.
+2F	2A	2d	2r	2r
+=164	=164	=164	=164	=164
+2.E	2.G	1c	2g	2ee
+.	.	.	2e	2ee
+4C	4A	.	.	.
+2D	2F	2B	2d	2ff
+=165	=165	=165	=165	=165
+1C	2G	1c	2.g	2.ee
+.	2G	.	.	.
+.	.	.	4g	4ee
+2r	2B-	2r	2f	2dd
+=166	=166	=166	=166	=166
+1r	2c	1.g	2.e	2.cc
+.	1G	.	.	.
+.	.	.	8d	8b
+.	.	.	8c	8a
+2r	.	.	2d	2b
+=167	=167	=167	=167	=167
+2r	2c	1e	2c	2cc
+1c	1g	.	2r	2r
+.	.	2e	2cc	2ee
+=168	=168	=168	=168	=168
+1F	1a	1c	1cc	1ff
+2c	2g	2e	2cc	2ee
+=169	=169	=169	=169	=169
+2C	2e	2g	2cc	2ee
+2C	2c	2g	2cc	2ee
+2F	2A	2a	2cc	2ff
+=170	=170	=170	=170	=170
+2.C	2c	2.g	2.cc	2.ee
+.	2G	.	.	.
+4C	.	4g	4cc	4ee
+2D	2d	2f	[2a	2dd
+=171	=171	=171	=171	=171
+2A	2e	2.e	2a]	2.cc
+1G	1g	.	2r	.
+.	.	8d	.	8b
+.	.	8c	.	8a
+.	.	2d	2d	2b
+=172	=172	=172	=172	=172
+2.C	2.g	2c	2.e	1.cc
+.	.	4e	.	.
+4D	4f	4d	4f	.
+2E	4e	4c	2g	.
+.	4d	4B	.	.
+=173	=173	=173	=173	=173
+1.F	2c	2A	1.a	1.cc
+.	1f	2.A	.	.
+.	.	4B	.	.
+=174	=174	=174	=174	=174
+1.C	1.e	1.c	1.g	1.cc
+==	==	==	==	==
+*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Parody)
+!!!AST: renaissance, vocal
+!!!ASW: Motet 1572 (Palestrina)
+!!!PWK: Masses, Book 12
+!!!RNB: Cadence finals: G,D
+!!!YOR: Le Opere Complete, v. 29, p. 54
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

@@ -1,0 +1,70 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Laudate Dominum
+!!!OMD: Credo
+!!!OTL: Et resurrexit
+**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto	*Icalto
+!Bassus	!Tenor	!Altus 2	!Altus 1
+*clefF4	*clefGv2	*clefG2	*clefG2
+*k[b-]	*k[b-]	*k[b-]	*k[b-]
+*F:ion	*F:ion	*F:ion	*F:ion
+*M3/2	*M3/2	*M3/2	*M3/2
+=95	=95	=95	=95
+1F	2c	1r	2A
+.	2A	.	2F
+2r	2d	2r	2B-
+=96	=96	=96	=96
+1r	4c	2e	2.A
+.	4B-	.	.
+.	4A	2c	.
+.	4G	.	8B-
+.	.	.	8c
+2r	4F	2f	2d
+.	4D	.	.
+=97	=97	=97	=97
+1r	1A	1e	2.c
+.	.	.	8d
+.	.	.	8e
+2r	2D	2d	2f
+=98	=98	=98	=98
+1r	2.A	2.c	2.e
+.	4F	4A	4f
+2r	2G	2B	2d
+=99	=99	=99	=99
+1r	2A	2.c	2c
+.	1G	.	1d
+.	.	8B	.
+.	.	8A	.
+2r	.	2B	.
+=100	=100	=100	=100
+2r	1C	1c	1e
+2r	.	.	.
+2C	2G	2c	2e
+=101	=101	=101	=101
+1BB-	2B-	1d	2f
+.	2F	.	1B-
+2GG	2G	2B-	.
+=102	=102	=102	=102
+2AA	2.F	2A	2c
+2BB-	.	1G	2d
+.	4D	.	.
+2C	2E	.	2c
+*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Parody)
+!!!AST: renaissance, vocal
+!!!ASW: Motet 1572 (Palestrina)
+!!!PWK: Masses, Book 8vce
+!!!RNB: Cadence finals: C
+!!!YOR: Le Opere Complete, v. 30, p. 1
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

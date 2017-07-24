@@ -1,0 +1,89 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa De Beata Marie Virginis (III)
+!!!OMD: Gloria
+!!!OTL: Glorificamus te
+**kern	**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor 2	!Tenor 1	!Altus	!Cantus
+*clefF4	*clefGv2	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix	*G:mix
+*M4/2	*M4/2	*M4/2	*M4/2	*M4/2
+=22	=22	=22	=22	=22
+1r	1d	0r	0r	0r
+1G	2e	.	.	.
+.	2d	.	.	.
+=23	=23	=23	=23	=23
+2A	2c	0r	2r	0r
+2G	2B	.	2g	.
+2F	4A	.	2a	.
+.	4B	.	.	.
+2E	4c	.	2g	.
+.	8B	.	.	.
+.	8c	.	.	.
+=24	=24	=24	=24	=24
+4D	2d	0r	1.f	0r
+4E	.	.	.	.
+4F	4c	.	.	.
+4G	4B	.	.	.
+4A	1c	.	.	.
+4B	.	.	.	.
+[2c	.	.	2e	.
+=25	=25	=25	=25	=25
+2c]	1G	2r	1d	1r
+2B	.	2d	.	.
+2c	[1g	2e	2r	2r
+2G	.	2d	2B	2dd
+=26	=26	=26	=26	=26
+2r	1g]	2c	2c	2ee
+2G	.	2B	2g	2dd
+1A	1r	4A	[1e	[1cc
+.	.	4B	.	.
+.	.	4c	.	.
+.	.	4d	.	.
+=27	=27	=27	=27	=27
+1E	1g	4e	1e]	2cc]
+.	.	4f	.	.
+.	.	2g	.	2b
+1F	[1a	1f	2c	4a
+.	.	.	.	4b
+.	.	.	4A	4cc
+.	.	.	4B	4dd
+=28	=28	=28	=28	=28
+1C	2a]	1e	4c	4ee
+.	.	.	4d	4ff
+.	2g	.	2e	2.ee
+1D	1f	[1A	4f	.
+.	.	.	4g	4dd
+.	.	.	4a	[2dd
+.	.	.	4b	.
+=29	=29	=29	=29	=29
+0A	0e	2A]	[0a	2dd]
+.	.	1a	.	4cc#
+.	.	.	.	4b
+.	.	.	.	1cc#
+.	.	2e	.	.
+=30	=30	=30	=30	=30
+[0D	[0d	[0f#	1a_	[0dd
+.	.	.	1a_	.
+=31	=31	=31	=31	=31
+0D]	0d]	0f#]	0a]	0dd]
+*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Paraphrase)
+!!!AST: renaissance, vocal
+!!!ASW: Gregorian Mass
+!!!PWK: Masses, Book Mantuan I
+!!!RNB: Cadence finals: D
+!!!YOR: Le Opere Complete, v. 18, p. 162
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

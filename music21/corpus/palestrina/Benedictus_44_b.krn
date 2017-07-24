@@ -1,0 +1,106 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Regina coeli (1601)
+!!!OMD: Benedictus
+!!!OTL: Hosanna
+**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor	!Altus	!Cantus
+*clefF4	*clefGv2	*clefG2	*clefG2
+*k[b-]	*k[b-]	*k[b-]	*k[b-]
+*F:ion	*F:ion	*F:ion	*F:ion
+*M4/2	*M4/2	*M4/2	*M4/2
+=32	=32	=32	=32
+0r	0r	1B-	1b-
+.	.	2c	2g
+.	.	2d	2f
+=33	=33	=33	=33
+0r	1r	2e	2g
+.	.	2c	2a
+.	2r	2.d	2f
+.	2F	.	2a
+.	.	4c	.
+=34	=34	=34	=34
+0r	2G	2B-	2g
+.	2A	2A	1f
+.	2B-	1G	.
+.	2G	.	2e
+=35	=35	=35	=35
+2r	2.A	2F	1f
+2F	.	2f	.
+.	8G	.	.
+.	8A	.	.
+2G	2B-	2d	1r
+2A	2A	2c	.
+=36	=36	=36	=36
+2B-	2G	2d	1r
+2G	2C	2e	.
+2.A	2F	2c	2r
+.	2C	2e	2c
+4G	.	.	.
+=37	=37	=37	=37
+2F	2r	2d	2d
+2E	2G	1c	2e
+1D	2A	.	2f
+.	2F	2B	2d
+=38	=38	=38	=38
+2C	2G	1c	4e
+.	.	.	4f
+2C	2c	.	4g
+.	.	.	4e
+2D	2A	1r	2f
+2E	2G	.	4e
+.	.	.	4d
+=39	=39	=39	=39
+2F	2A	0r	2c
+2D	2B-	.	2d
+2E	2G	.	[1c
+[2F	2A	.	.
+=40	=40	=40	=40
+2F]	1G	1r	1c]
+2E	.	.	.
+1F	2.A	1c	2r
+.	.	.	2cc
+.	4G	.	.
+=41	=41	=41	=41
+0r	2F	2d	2a
+.	2E	2e	2g
+.	2D	2f	2a
+.	2G	2d	2b-
+=42	=42	=42	=42
+1r	1C	2e	2g
+.	.	1f	2a
+1C	1c	.	1g
+.	.	2e	.
+=43	=43	=43	=43
+2D	2A	2d	2f
+2E	2G	2.c	2.g
+2F	2A	.	.
+.	.	4A	4f
+2BB-	2B-	2d	2f
+=44	=44	=44	=44
+0C	2G	0c	2e
+.	2A	.	1f
+.	1G	.	.
+.	.	.	2e
+=45	=45	=45	=45
+0FF	0F	0c	0f
+==	==	==	==
+*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Paraphrase)
+!!!AST: renaissance, vocal
+!!!ASW: Antiphon
+!!!PWK: Masses, Book 12
+!!!RNB: Cadence finals: C
+!!!YOR: Le Opere Complete, v. 29, p. 1
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

@@ -1,0 +1,55 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Spem In Alium
+!!!OMD: Credo
+!!!OTL: resurrectionem
+**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor	!Altus	!Cantus
+*clefF4	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]
+*A:aeo	*A:aeo	*A:aeo	*A:aeo
+*M3/2	*M3/2	*M3/2	*M3/2
+=240	=240	=240	=240
+2r	1d	1a	1.dd
+1d	.	.	.
+.	2r	2d	.
+=241	=241	=241	=241
+2c	1a	2e	1ee
+2A	.	2c	.
+2B	2g	2d	2r
+=242	=242	=242	=242
+2c	2e	2e	2r
+2d	2f	2d	1dd
+2B	2d	2r	.
+=243	=243	=243	=243
+2A	2e	1a	2cc
+2d	2f	.	2a
+2G	2d	2g	2b
+=244	=244	=244	=244
+2A	2.a	2e	2cc
+1d	.	2f	2a
+.	4g	.	.
+.	2f	2d	2b
+=245	=245	=245	=245
+2c	2e	2e	2cc
+1B-	1d	2f	1dd
+.	.	2g	.
+*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Parody)
+!!!AST: renaissance, vocal
+!!!ASW: Motet 1539 (Jacquet)
+!!!PWK: Masses, Book 3
+!!!RNB: Cadence finals: D
+!!!YOR: Le Opere Complete, v. 6, p. 1
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

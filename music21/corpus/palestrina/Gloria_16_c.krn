@@ -1,0 +1,87 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa De Beata Marie Virginis (II)
+!!!OMD: Gloria
+!!!OTL: Glorificamus te
+**kern	**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor 2	!Tenor 1	!Altus	!Cantus
+*clefF4	*clefGv2	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix	*G:mix
+*M4/2	*M4/2	*M4/2	*M4/2	*M4/2
+=16	=16	=16	=16	=16
+0r	0r	0r	0r	1dd
+.	.	.	.	[1ee
+=17	=17	=17	=17	=17
+0r	0r	0r	1g	2ee]
+.	.	.	.	2dd
+.	.	.	[1a	2cc
+.	.	.	.	4b
+.	.	.	.	4a
+=18	=18	=18	=18	=18
+0r	0r	0r	2a]	2cc
+.	.	.	2g	1dd
+.	.	.	2f	.
+.	.	.	4e	4cc
+.	.	.	4d	4b
+=19	=19	=19	=19	=19
+0r	1r	0r	2f	2a
+.	.	.	1g	2g
+.	1d	.	.	1a
+.	.	.	2f#	.
+=20	=20	=20	=20	=20
+1r	1.e	0r	2g	1g
+.	.	.	1c	.
+1G	.	.	.	1gg
+.	2d	.	2B	.
+=21	=21	=21	=21	=21
+1.A	2c	1r	2c	2.ee
+.	4B	.	2e	.
+.	4A	.	.	4dd
+.	2c	2r	2f	2cc
+2G	[2d	2g	2g	2b
+=22	=22	=22	=22	=22
+2F	2d]	1.a	1r	2a
+4E	4c	.	.	2cc
+4D	4B	.	.	.
+2F	2A	.	1d	2.dd
+2G	2B	2g	.	.
+.	.	.	.	4ee
+=23	=23	=23	=23	=23
+2D	0d	2f	1.a	4ff
+.	.	.	.	4dd
+2d	.	4e	.	2.ff
+.	.	4d	.	.
+2d	.	2f	.	.
+.	.	.	.	4ee
+2G	.	2g	2b-	[2dd
+=24	=24	=24	=24	=24
+1A	2r	0e	1a	2dd]
+.	2.a	.	.	4cc#
+.	.	.	.	4b
+1A	.	.	1a	1cc#
+.	4g	.	.	.
+.	2e	.	.	.
+=25	=25	=25	=25	=25
+[0D	[0f#	[0d	[0a	[0dd
+=26	=26	=26	=26	=26
+0D]	0f#]	0d]	0a]	0dd]
+*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Paraphrase)
+!!!AST: renaissance, vocal
+!!!ASW: Gregorian Mass
+!!!PWK: Masses, Book Mantuan I
+!!!RNB: Cadence finals: D
+!!!YOR: Le Opere Complete, v. 18, p. 126
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

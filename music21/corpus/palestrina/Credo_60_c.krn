@@ -1,0 +1,52 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Veni creator Spiritus
+!!!OMD: Credo
+!!!OTL: Et resurrexit
+**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor	!Altus	!Cantus
+*clefF4	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix
+*M3/2	*M3/2	*M3/2	*M3/2
+=97	=97	=97	=97
+2A	2c	2e	2a
+2A	2e	2a	2cc
+2G	2g	2b	2dd
+=98	=98	=98	=98
+1c	1g	1cc	1ee
+2c	2g	2cc	2ee
+=99	=99	=99	=99
+1r	1a	1cc	1ee
+2r	2e	2b	2ee
+=100	=100	=100	=100
+1r	2f	2a	2cc
+.	1d	1a	1ff
+2r	.	.	.
+=101	=101	=101	=101
+1c	2c	2cc	2ee
+.	2e	2g	2cc
+2G	2d	2g	2b
+=102	=102	=102	=102
+2A	2c	2e	2a
+1F	1A	1a	2cc
+.	.	.	2dd
+*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Tenor)
+!!!AST: renaissance, vocal
+!!!ASW: Hymn
+!!!PWK: Masses, Book 9
+!!!RNB: Cadence finals: C,D
+!!!YOR: Le Opere Complete, v. 25, p. 246
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

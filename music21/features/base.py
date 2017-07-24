@@ -413,36 +413,23 @@ class StreamForms(object):
                 histo[p.midi] += 1
             self._forms['midiPitchHistogram'] = histo
             return self._forms['midiPitchHistogram']
+        
+        elif key in ['diatonicNoteNumHistogram']:
+            histo = [0] * 128
+            for p in self.__getitem__('flat.pitches'): # recursive call
+                histo[p.diatonicNoteNum] += 1
+            self._forms['diatonicNoteNumHistogram'] = histo
+            return self._forms['diatonicNoteNumHistogram']
+        
 
         # bins for all abs spans between adjacent melodic notes
         elif key in ['midiIntervalHistogram']:
-            # note that this does not optimize and cache part presentations
-            histo = [0] * 128
-            # if we have parts, must add one at a time
-            if self._base.hasPartLikeStreams():
-                parts = self._base.parts
-            else:
-                parts = [self._base] # emulate a list
-            for p in parts:
-                # will be flat
+            histo = self._getIntervalHistogram('midi')
+            self._forms['midiIntervalHistogram'] = histo
+            return self._forms['midiIntervalHistogram']
 
-                # edit June 2012:
-                # was causing millions of deepcopy calls
-                # so I made it inPlace, but for some reason
-                # code errored with 'p =' not present
-                # also, this part has measures...so should retainContains be True?
-                p = p.stripTies(retainContainers=False, inPlace=True)
-                # noNone means that we will see all connections, even w/ a gap
-                post = p.findConsecutiveNotes(skipRests=True,
-                    skipChords=True, skipGaps=True, noNone=True)
-                for i, n in enumerate(post):
-                    if i < len(post) - 1: # if not last
-                        iNext = i + 1
-                        nNext = post[iNext]
-                        try:
-                            histo[abs(n.pitch.midi - nNext.pitch.midi)] += 1
-                        except AttributeError:
-                            pass # problem with not having midi
+        elif key in ['diatonicNoteNumIntervalHistogram']:
+            histo = self._getIntervalHistogram('diatonicNoteNum')
             self._forms['midiIntervalHistogram'] = histo
             return self._forms['midiIntervalHistogram']
 
@@ -521,6 +508,38 @@ class StreamForms(object):
 
 
 
+    def _getIntervalHistogram(self, algorithm='midi'):
+        # note that this does not optimize and cache part presentations
+        histo = [0] * 128
+        # if we have parts, must add one at a time
+        if self._base.hasPartLikeStreams():
+            parts = self._base.parts
+        else:
+            parts = [self._base] # emulate a list
+        for p in parts:
+            # will be flat
+
+            # edit June 2012:
+            # was causing millions of deepcopy calls
+            # so I made it inPlace, but for some reason
+            # code errored with 'p =' not present
+            # also, this part has measures...so should retainContains be True?
+            p = p.stripTies(retainContainers=False, inPlace=True)
+            # noNone means that we will see all connections, even w/ a gap
+            post = p.findConsecutiveNotes(skipRests=True,
+                skipChords=True, skipGaps=True, noNone=True)
+            for i, n in enumerate(post):
+                if i < len(post) - 1: # if not last
+                    iNext = i + 1
+                    nNext = post[iNext]
+                    nValue = getattr(n.pitch, algorithm)
+                    nextValue = getattr(nNext.pitch, algorithm)
+                    
+                    try:
+                        histo[abs(nValue - nextValue)] += 1
+                    except AttributeError:
+                        pass # problem with not having midi
+        return histo
 
 
 #-------------------------------------------------------------------------------

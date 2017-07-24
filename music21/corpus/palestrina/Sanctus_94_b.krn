@@ -1,0 +1,98 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Octavi toni
+!!!OMD: Sanctus
+!!!OTL: Hosanna
+**kern	**kern	**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Itenor	*Icalto	*Icant	*Icant
+!Bassus	!Tenor 2	!Tenor 1	!Altus	!Cantus 2	!Cantus 1
+*clefF4	*clefGv2	*clefGv2	*clefG2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix	*G:mix	*G:mix
+*M3/2	*M3/2	*M3/2	*M3/2	*M3/2	*M3/2
+=43	=43	=43	=43	=43	=43
+1C	1G	1c	1e	1g	1cc
+2C	2G	2e	2e	2cc	2cc
+=44	=44	=44	=44	=44	=44
+1G	2G	1d	1g	1b	1dd
+.	2r	.	.	.	.
+2E	2r	2e	2g	2cc#	2g
+=45	=45	=45	=45	=45	=45
+1D	1r	1A	1f	1dd	1a
+2A	2r	2A	2e	2cc#	2a
+=46	=46	=46	=46	=46	=46
+2D	1r	2A	2f#	1dd	2a
+2D	.	2A	2f#	.	2dd
+2C	2r	2c	2g	2r	2ee
+=47	=47	=47	=47	=47	=47
+1G	1d	2.B	1g	1r	1dd
+.	.	4A	.	.	.
+2C	2e	2G	[2g	2r	2cc
+=48	=48	=48	=48	=48	=48
+1D	1d	2r	2g]	1r	2b
+.	.	1A	2.f	.	1a
+2F	2c	.	.	2r	.
+.	.	.	4e	.	.
+=49	=49	=49	=49	=49	=49
+2G	2B	2B	2d	1r	1g
+2r	1A	1c	2e	.	.
+2r	.	.	2c	2r	2f#
+=50	=50	=50	=50	=50	=50
+1G	2G	2B	2d	1dd	[1.g
+.	2B	2r	2d	.	.
+2C	2c	2r	2c	2ee	.
+=51	=51	=51	=51	=51	=51
+1G	2.B	1d	2d	1dd	1.g]
+.	.	.	2G	.	.
+.	4A	.	.	.	.
+2C	2G	2e	[2g	2cc	.
+=52	=52	=52	=52	=52	=52
+2.D	2r	1d	2g]	2b	1r
+.	1A	.	1f	1a	.
+4E	.	.	.	.	.
+2F	.	2c	.	.	2r
+=53	=53	=53	=53	=53	=53
+2G	2B	2B	1.d	1g	1dd
+1D	1d	1A	.	.	.
+.	.	.	.	2f#	2a
+=54	=54	=54	=54	=54	=54
+1GG	2B	2G	1d	[1.g	1b
+.	2d	2G	.	.	.
+2r	2e	2C	2c	.	2cc
+=55	=55	=55	=55	=55	=55
+1G	1d	2G	2r	1.g]	1b
+.	.	2r	2d	.	.
+2C	2c	[2G	2e	.	2cc
+=56	=56	=56	=56	=56	=56
+1G	2.B	4G]	1d	[1.g	1dd
+.	.	4A	.	.	.
+.	.	2B	.	.	.
+.	4A	.	.	.	.
+2C	[2G	2c	2c	.	2ee
+=57	=57	=57	=57	=57	=57
+2GG	4G]	2d	2B	1.g]	2dd
+.	4F	.	.	.	.
+1C	2E	2.G	1e	.	1cc
+.	2E	.	.	.	.
+.	.	4A	.	.	.
+=58	=58	=58	=58	=58	=58
+1.GG	1.G	1.B	1.d	1.g	1.b
+==	==	==	==	==	==
+*-	*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Tenor)
+!!!AST: renaissance, vocal
+!!!ASW: Hymn
+!!!PWK: Masses, Book 11
+!!!RNB: Cadence finals: A,C
+!!!YOR: Le Opere Complete, v. 28, p. 114
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

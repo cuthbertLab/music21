@@ -1,0 +1,110 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Benedicta es
+!!!OMD: Credo
+!!!OTL: coda
+**kern	**kern	**kern	**kern	**kern	**kern
+*Ibass	*Ibass	*Itenor	*Icalto	*Icalto	*Icant
+!Bassus 2	!Bassus 1	!Tenor	!Altus 2	!Altus 1	!Cantus
+*clefF4	*clefF4	*clefGv2	*clefG2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix	*G:mix	*G:mix
+*M4/2	*M4/2	*M4/2	*M4/2	*M4/2	*M4/2
+=235	=235	=235	=235	=235	=235
+0G	0GG	1G	2d	1B	2g
+.	.	.	2.G	.	4g
+.	.	.	.	.	4a
+.	.	2r	.	2.G	4b
+.	.	.	4A	.	4cc
+.	.	[2G	4B	.	[2dd
+.	.	.	4c	4A	.
+=236	=236	=236	=236	=236	=236
+0G	0GG	4G]	1d	4B	2dd]
+.	.	4A	.	4c	.
+.	.	4B	.	1d	2.g
+.	.	4c	.	.	.
+.	.	1d	2.G	.	.
+.	.	.	.	.	4a
+.	.	.	.	[2G	4b
+.	.	.	4A	.	4cc
+=237	=237	=237	=237	=237	=237
+2r	0GG	2.G	4B	4G]	2.dd
+.	.	.	4c	4A	.
+2.GG	.	.	2d	4B	.
+.	.	4A	.	4c	4cc
+.	.	4B	2G	1d	1b
+4AA	.	4c	.	.	.
+4BB	.	[2d	[2g	.	.
+4C	.	.	.	.	.
+=238	=238	=238	=238	=238	=238
+0D	2r	2d]	2g]	1d	0a
+.	2.D	4c	4f	.	.
+.	.	4B	4e	.	.
+.	.	1A	2f	2.d	.
+.	4E	.	.	.	.
+.	4F	.	[2d	.	.
+.	4G	.	.	4e	.
+=239	=239	=239	=239	=239	=239
+1D	1A	2.D	4d]	4f	1r
+.	.	.	4e	4g	.
+.	.	.	4f	2a	.
+.	.	4E	4g	.	.
+2r	1D	4F	2a	2.f	2.d
+.	.	4G	.	.	.
+[2D	.	2A	[2d	.	.
+.	.	.	.	4e	4e
+=240	=240	=240	=240	=240	=240
+2D]	[0D	2.D	4d]	0d	2f
+.	.	.	4c	.	.
+2GG	.	.	2B-	.	2g
+.	.	4E	.	.	.
+2D	.	2F	2A	.	2a
+2GG	.	2G	4d	.	2b-
+.	.	.	4e	.	.
+=241	=241	=241	=241	=241	=241
+2D	0D]	2A	2f	1d	2a
+2GG	.	2B-	1g	.	2.dd
+1D	.	1A	.	2r	.
+.	.	.	.	.	4cc
+.	.	.	2f#	[2d	2a
+=242	=242	=242	=242	=242	=242
+1GG	2r	2.G	[0g	4d]	2.b
+.	.	.	.	4c	.
+.	1G	.	.	1B	.
+.	.	4A	.	.	4cc
+[1G	.	2B	.	.	2dd
+.	2C	2c	.	4A	2ee
+.	.	.	.	4G	.
+=243	=243	=243	=243	=243	=243
+1G]	2G	2d	0g]	2B	2dd
+.	2C	2e	.	2c	1cc
+1GG	1G	1d	.	2d	.
+.	.	.	.	[2g	2b
+=244	=244	=244	=244	=244	=244
+0C	1E	1.G	[0g	4g]	0cc
+.	.	.	.	4f	.
+.	.	.	.	4e	.
+.	.	.	.	4d	.
+.	1C	.	.	1e	.
+.	.	2A	.	.	.
+=245	=245	=245	=245	=245	=245
+0GG	0G	0B	0g]	0d	0b
+==	==	==	==	==	==
+*-	*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Parody)
+!!!AST: renaissance, vocal
+!!!ASW: Motet 1520 (Josquin)
+!!!PWK: Masses, Book 11
+!!!RNB: Cadence finals: D
+!!!YOR: Le Opere Complete, v. 28, p. 222
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

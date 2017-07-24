@@ -1,0 +1,51 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa De beata virgine (1570)
+!!!OMD: Credo
+!!!OTL: Et exspecto
+**kern	**kern	**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Itenor	*Icalto	*Icant	*Icant
+!Bassus	!Tenor 2	!Tenor 1	!Altus	!Cantus 2	!Cantus 1
+*clefF4	*clefGv2	*clefGv2	*clefG2	*clefG2	*clefG2
+*k[b-]	*k[b-]	*k[b-]	*k[b-]	*k[b-]	*k[b-]
+*?:X	*?:X	*?:X	*?:X	*?:X	*?:X
+*M3/2	*M3/2	*M3/2	*M3/2	*M3/2	*M3/2
+=201	=201	=201	=201	=201	=201
+1r	1r	1G	1g	1b	1dd
+2r	2r	2c	2g	2cc	2ee
+=202	=202	=202	=202	=202	=202
+1r	1r	1d	1f#	1a	1dd
+2r	2r	2G	2g	2dd	2b
+=203	=203	=203	=203	=203	=203
+1r	1r	2c	2e	2g	2cc
+.	.	2c	2e	2g	2cc
+2r	2r	2e	2g	2g	2b
+=204	=204	=204	=204	=204	=204
+1r	1r	2e	2c	2g	2cc
+.	.	1d	1f	2a	1dd
+2r	2r	.	.	2b	.
+=205	=205	=205	=205	=205	=205
+1r	1r	1c	1g	1cc	1ee
+2r	2r	2c	2g	2ee	2cc
+=206	=206	=206	=206	=206	=206
+1r	1r	2B	2g	2dd	2dd
+.	.	1c	1g	1cc	1ee
+2r	2r	.	.	.	.
+*-	*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Paraphrase)
+!!!AST: renaissance, vocal
+!!!ASW: Gregorian Mass
+!!!PWK: Masses, Book 3
+!!!RNB: Cadence finals: G,D,C,E,F
+!!!YOR: Le Opere Complete, v. 6, p. 175
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

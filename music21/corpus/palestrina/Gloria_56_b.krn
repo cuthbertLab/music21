@@ -1,0 +1,93 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Spem In Alium
+!!!OMD: Gloria
+!!!OTL: coda
+**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor	!Altus	!Cantus
+*clefF4	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]
+*A:aeo	*A:aeo	*A:aeo	*A:aeo
+*M3/2	*M3/2	*M3/2	*M3/2
+=117	=117	=117	=117
+[1.F	1.f	2f	1.a
+.	.	2r	.
+.	.	2c	.
+=118	=118	=118	=118
+1.F]	2r	2c	1a
+.	2c	2A	.
+.	2c	[2c	2r
+=119	=119	=119	=119
+1r	2A	4c]	2cc
+.	.	4d	.
+.	2c	2e	2cc
+2r	2d	2f	2a
+=120	=120	=120	=120
+1r	2e	2g	1cc
+.	1f	1a	.
+2r	.	.	2dd
+=121	=121	=121	=121
+1r	2e	2g	2ee
+.	2d	1a	1ff
+2F	[2f	.	.
+=122	=122	=122	=122
+2F	4f]	2a	2cc
+.	4g	.	.
+2D	1a	2f	1ff
+2F	.	2a	.
+=123	=123	=123	=123
+2G	2g	2b	2.ee
+2A	1f	2cc	.
+.	.	.	4cc
+2B	.	4b	2dd
+.	.	4a	.
+=124	=124	=124	=124
+2.c	2e	2g	1.ee
+.	2r	2.cc	.
+4B	.	.	.
+4A	2c	.	.
+4G	.	4b	.
+=125	=125	=125	=125
+2.A	2c	4a	2r
+.	.	4g	.
+.	2A	2.a	2cc
+4G	.	.	.
+[2F	2c	.	2cc
+.	.	4g	.
+=126	=126	=126	=126
+2F]	2d	2f	2a
+2E	2e	2g	2cc
+2D	2f	[2a	2dd
+=127	=127	=127	=127
+2C#	2e	2a]	2ee
+4D	1d	1a	1ff
+4E	.	.	.
+4F	.	.	.
+4G	.	.	.
+=128	=128	=128	=128
+2A	2c	1.a	2ee
+1D	1f	.	1dd
+=129	=129	=129	=129
+[1.A	[1.e	[1.a	[1.cc#
+=130	=130	=130	=130
+1.A]	1.e]	1.a]	1.cc#]
+==	==	==	==
+*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Parody)
+!!!AST: renaissance, vocal
+!!!ASW: Motet 1539 (Jacquet)
+!!!PWK: Masses, Book 3
+!!!RNB: Cadence finals: D
+!!!YOR: Le Opere Complete, v. 6, p. 1
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

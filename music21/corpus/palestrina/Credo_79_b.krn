@@ -1,0 +1,54 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Lauda Sion
+!!!OMD: Credo
+!!!OTL: Et expecto
+**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor	!Altus	!Cantus
+*clefF4	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix
+*M3/2	*M3/2	*M3/2	*M3/2
+=118	=118	=118	=118
+2r	2r	2f#	2a
+2G	2B	2d	2g
+2G	2B	2d	2g
+=119	=119	=119	=119
+1F	1c	1f	1a
+2C	2c	2e	2g
+=120	=120	=120	=120
+2.G	2.d	2.g	2.b
+4G	4d	4g	4b
+2G	2d	2g	2b
+=121	=121	=121	=121
+2E	2G	2g	2cc#
+1D	1A	1f#	1dd
+=122	=122	=122	=122
+1G	1B	1g	2dd
+.	.	.	2b
+2A	2c	2e	2a
+=123	=123	=123	=123
+2B-	2d	2g	2.dd
+1A	1e	1a	.
+.	.	.	8cc
+.	.	.	8b
+.	.	.	2cc#
+*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Parody)
+!!!AST: renaissance, vocal
+!!!ASW: Motet 1563 (Palestrina)
+!!!PWK: Masses, Book 4
+!!!RNB: Cadence finals: D
+!!!YOR: Le Opere Complete, v. 10, p. 1
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

@@ -1,0 +1,157 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa In illo tempore
+!!!OMD: Credo
+!!!OTL: Et vitam
+**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor	!Altus	!Cantus
+*clefF4	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]
+*A:aeo	*A:aeo	*A:aeo	*A:aeo
+*M4/2	*M4/2	*M4/2	*M4/2
+=207	=207	=207	=207
+[0C	0c	1g	2c
+.	.	.	2e
+.	.	2r	2e
+.	.	2e	2e
+=208	=208	=208	=208
+1C]	2r	2e	2.g
+.	2E	2e	.
+.	.	.	4a
+1r	2E	2.g	2b
+.	2E	.	2cc
+.	.	8f	.
+.	.	8e	.
+=209	=209	=209	=209
+0r	2.G	1d	2b
+.	.	.	2.dd
+.	8F	.	.
+.	8E	.	.
+.	2D	1f	.
+.	.	.	4cc
+.	2F	.	4a
+.	.	.	4b
+=210	=210	=210	=210
+0r	2C	2e	2cc
+.	1G	1d	4b
+.	.	.	4a
+.	.	.	2b
+.	2A	2c	[2a
+=211	=211	=211	=211
+2r	1E	0B	2a]
+2E	.	.	4g#
+.	.	.	4f#
+2E	2r	.	2g#
+2E	2e	.	2g#
+=212	=212	=212	=212
+2.F	2d	4A	1a
+.	.	4B	.
+.	2.c	4c	.
+8E	.	4d	.
+8D	.	.	.
+2C	.	2e	1r
+.	4B	.	.
+[2F	4A	2d	.
+.	4G	.	.
+=213	=213	=213	=213
+2F]	2A	2.c	0r
+2E	2G	.	.
+.	.	8B	.
+.	.	8A	.
+2.D	2.F	4B	.
+.	.	4A	.
+.	.	[2A	.
+4C	4E	.	.
+=214	=214	=214	=214
+2BB	2D	2A]	1r
+2BB	2D	2G#	.
+[1AA	1E	2.A	2r
+.	.	.	2a
+.	.	4B	.
+=215	=215	=215	=215
+0AA]	2r	1c	2a
+.	2A	.	2a
+.	2A	2r	2.cc
+.	2A	2e	.
+.	.	.	8b
+.	.	.	8a
+=216	=216	=216	=216
+0r	2.c	2e	2g
+.	.	2e	2cc
+.	8B	.	.
+.	8A	.	.
+.	2G	2g	2b
+.	[2c	[2e	[2a
+=217	=217	=217	=217
+1r	2c]	4e]	4a]
+.	.	4c	4g
+.	2B	2d	2g
+2r	2.A	1c	2f
+2A	.	.	[2e
+.	4G	.	.
+=218	=218	=218	=218
+2A	2F	1r	2e]
+2A	2F	.	2d
+2c	1E	2r	4e
+.	.	.	4f
+4B	.	2e	4g
+4A	.	.	4a
+=219	=219	=219	=219
+2G	2r	2e	2b
+1c	1e	2e	2.g
+.	.	1g	.
+.	.	.	4a
+2B	[2d	.	4b
+.	.	.	4g
+=220	=220	=220	=220
+1.A	2d]	2f	4a
+.	.	.	4b
+.	2c	2e	1cc
+.	2A	4f	.
+.	.	4e	.
+2G	2B	[2e	[2b
+=221	=221	=221	=221
+2F	2c	2e]	4b]
+.	.	.	4a
+2F	4B	2d	1a
+.	4A	.	.
+1E	1B	[1e	.
+.	.	.	2g#
+=222	=222	=222	=222
+0AA	2.c	0e]	1a
+.	4B	.	.
+.	2A	.	2.cc
+.	2G	.	.
+.	.	.	4b
+=223	=223	=223	=223
+[0D	2F	1r	2a
+.	2E	.	2g
+.	2D	2.a	2f
+.	2E	.	2e
+.	.	4g	.
+=224	=224	=224	=224
+0D]	2F	2f	2d
+.	2G	2e	2e
+.	1A	1d	1f
+=225	=225	=225	=225
+0AA	0A	0c#	0e
+==	==	==	==
+*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Parody)
+!!!AST: renaissance, vocal
+!!!ASW: Motet 1518 (Moulu)
+!!!PWK: Masses, Book 10
+!!!RNB: Cadence finals: E,G,C
+!!!YOR: Le Opere Complete, v. 27, p. 1
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

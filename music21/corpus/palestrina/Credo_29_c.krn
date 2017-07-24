@@ -1,0 +1,75 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Hodie Christus Natus Est
+!!!OMD: Credo
+!!!OTL: Et resurrexit
+**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Itenor	*Icalto
+!Bassus	!Tenor 2	!Tenor 1	!Altus
+*clefF4	*clefGv2	*clefGv2	*clefG2
+*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix
+*M3/2	*M3/2	*M3/2	*M3/2
+=77	=77	=77	=77
+1.G	1d	1B	[1.g
+.	2G	2B	.
+=78	=78	=78	=78
+1G	1B	1d	1.g]
+2E	2c	2e	.
+=79	=79	=79	=79
+1G	1B	1d	2r
+.	.	.	2r
+2A	2A	2c	2e
+=80	=80	=80	=80
+1G	1d	1B	1g
+2F	2d	2A	2a
+=81	=81	=81	=81
+1E	1e	2B	1g
+.	.	2c	.
+2D	4A	2d	2f
+.	4B	.	.
+=82	=82	=82	=82
+4C	2c	2G	1e
+4D	.	.	.
+4E	4B	2.g	.
+4F	4A	.	.
+2G	2B	.	2d
+.	.	4g	.
+=83	=83	=83	=83
+2A	2.c	2f	2c
+1G	.	1g	1d
+.	8B	.	.
+.	8A	.	.
+.	2B	.	.
+=84	=84	=84	=84
+2r	2c	2e	2c
+2C	2e	2g	2cc
+2G	[2d	2g	2b
+=85	=85	=85	=85
+4D	2d]	1f	1.a
+4E	.	.	.
+4F	1c	.	.
+4G	.	.	.
+2A	.	2e	.
+=86	=86	=86	=86
+2B-	2d	1d	2g
+1A	1e	.	1a
+.	.	2c#	.
+*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Parody)
+!!!AST: renaissance, vocal
+!!!ASW: Motet 1575 (Palestrina)
+!!!PWK: Masses, Book 8vce
+!!!RNB: Cadence finals: C,D
+!!!YOR: Le Opere Complete, v. 30, p. 59
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

@@ -1,0 +1,49 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa In illo tempore
+!!!OMD: Gloria
+!!!OTL: Cum Sancto Spiritu
+**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor	!Altus	!Cantus
+*clefF4	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]
+*A:aeo	*A:aeo	*A:aeo	*A:aeo
+*M3/2	*M3/2	*M3/2	*M3/2
+=120	=120	=120	=120
+2G	2B	2d	2g
+2G	2B	2d	2g
+2E	2B	2e	2g
+=121	=121	=121	=121
+1D	1d	1f	1a
+2G	2B	4e	2b
+.	.	4d	.
+=122	=122	=122	=122
+4C	[1.G	4e	2cc
+4D	.	4f	.
+4E	.	2.g	4b
+4F	.	.	4a
+2G	.	.	2b
+.	.	4f	.
+=123	=123	=123	=123
+2C	2G]	1e	2cc
+1F	1A	.	1a
+.	.	2d	.
+*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Parody)
+!!!AST: renaissance, vocal
+!!!ASW: Motet 1518 (Moulu)
+!!!PWK: Masses, Book 10
+!!!RNB: Cadence finals: E,G,C
+!!!YOR: Le Opere Complete, v. 27, p. 1
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

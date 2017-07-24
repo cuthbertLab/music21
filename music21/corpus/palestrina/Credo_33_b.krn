@@ -1,0 +1,64 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Sine nomine (1567)
+!!!OMD: Credo
+!!!OTL: Et resurrexit
+**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor	!Altus	!Cantus
+*clefF4	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]
+*E:phr	*E:phr	*E:phr	*E:phr
+*M3/2	*M3/2	*M3/2	*M3/2
+=59	=59	=59	=59
+1.D	1d	2f	1.d
+.	.	2f	.
+.	2r	2f	.
+=60	=60	=60	=60
+2A	2c	1e	1r
+2A	2c	.	.
+2A	2c	2c	2r
+=61	=61	=61	=61
+1G	1B	1d	1r
+2E	2G	2e	2r
+=62	=62	=62	=62
+1F	1A	2c	1r
+.	.	2.d	.
+2F	2A	.	2r
+.	.	4c	.
+=63	=63	=63	=63
+2E	2G	1c	1r
+1D	1F	.	.
+.	.	2B	2r
+=64	=64	=64	=64
+2C	2G	2c	1g
+2C	2c	2e	.
+2F	2c	2f	2a
+=65	=65	=65	=65
+2D	2d	2f	2b
+2C	2e	2.g	2cc
+[2D	[2d	.	2b
+.	.	4f	.
+=66	=66	=66	=66
+2D]	4d]	2f	1a
+.	4c	.	.
+1E	1B	1e	.
+.	.	.	2g#
+*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Free)
+!!!AST: renaissance, vocal
+!!!ASW: Motet 1539 (Jacquet)
+!!!PWK: Masses, Book 2
+!!!RNB: Cadence finals: A,C
+!!!YOR: Le Opere Complete, v. 4, p. 53
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

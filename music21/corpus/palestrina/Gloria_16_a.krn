@@ -1,0 +1,66 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa De Beata Marie Virginis (II)
+!!!OMD: Gloria
+!!!OTL: First Section
+**kern	**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor 2	!Tenor 1	!Altus	!Cantus
+*clefF4	*clefGv2	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix	*G:mix
+*M4/2	*M4/2	*M4/2	*M4/2	*M4/2
+=1	=1	=1	=1	=1
+0r	1r	0r	1c	1cc
+.	2r	.	2d	2a
+.	2c	.	2e	2g
+=2	=2	=2	=2	=2
+0r	2A	0r	2f#	2a
+.	2G	.	2.g	2.b
+.	2G	.	.	.
+.	.	.	4f	4a
+.	[2g	.	2e	4b
+.	.	.	.	4g
+=3	=3	=3	=3	=3
+1r	4g]	1r	1d	1a
+.	8f#	.	.	.
+.	8e	.	.	.
+.	2f#	.	.	.
+1C	2g	1c	2e	1g
+.	2e	.	2g	.
+=4	=4	=4	=4	=4
+2D	2d	2A	2f	2r
+2E	2c	2G	2e	2cc
+2F#	1d	2A	4d	2a
+.	.	.	4c	.
+[2G	.	[2B	4B	[2g
+.	.	.	4A	.
+=5	=5	=5	=5	=5
+4G]	2.B	4B]	2G	2g]
+4F	.	4A	.	.
+2E	.	4B	1g	2g
+.	4c	4G	.	.
+1D	1d	1A	.	1dd
+.	.	.	2f#	.
+=6	=6	=6	=6	=6
+[0G	[0d	[0G	[0g	[0b
+=7	=7	=7	=7	=7
+0G]	0d]	0G]	0g]	0b]
+*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Paraphrase)
+!!!AST: renaissance, vocal
+!!!ASW: Gregorian Mass
+!!!PWK: Masses, Book Mantuan I
+!!!RNB: Cadence finals: D
+!!!YOR: Le Opere Complete, v. 18, p. 126
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

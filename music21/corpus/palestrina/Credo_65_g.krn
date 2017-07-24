@@ -1,0 +1,183 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa In festis Apostolorum (I)
+!!!OMD: Credo
+!!!OTL: Qui cum Patre
+**kern	**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor 2	!Tenor 1	!Altus	!Cantus
+*clefF4	*clefGv2	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]	*k[]
+*D:dor	*D:dor	*D:dor	*D:dor	*D:dor
+*M4/2	*M4/2	*M4/2	*M4/2	*M4/2
+=124	=124	=124	=124	=124
+0r	0r	1r	1.e	0r
+.	.	1A	.	.
+.	.	.	2c	.
+=125	=125	=125	=125	=125
+1r	0r	2F	2d	0r
+.	.	2G	2e	.
+2r	.	2A	2f	.
+[2E	.	2B	[2g	.
+=126	=126	=126	=126	=126
+2E]	0r	2.c	4g]	0r
+.	.	.	4f	.
+2C	.	.	2e	.
+.	.	4B	.	.
+2D	.	2A	2d	.
+2E	.	2G	2c	.
+=127	=127	=127	=127	=127
+2F	1r	2A	2.d	0r
+1G	.	2B	.	.
+.	.	.	4c	.
+.	2r	2d	2B	.
+2F	[2A	2d	2A	.
+=128	=128	=128	=128	=128
+1E	2A]	2.e	2B	1r
+.	2G	.	1e	.
+.	.	4d	.	.
+1r	1A	4c	.	1a
+.	.	4B	.	.
+.	.	2A	2c	.
+=129	=129	=129	=129	=129
+0r	2B	2r	2d	2g
+.	1c	1A	2e	1a
+.	.	.	2f	.
+.	2B	2G	2e	2b
+=130	=130	=130	=130	=130
+0r	2A	2A	0e	2cc
+.	2G#	2B	.	2.b
+.	1A	1c	.	.
+.	.	.	.	4a
+.	.	.	.	[2a
+=131	=131	=131	=131	=131
+1r	1E	1B	2r	2a]
+.	.	.	2e	2g#
+2r	2.F	1A	2c	[1a
+[2D	.	.	[2d	.
+.	4G	.	.	.
+=132	=132	=132	=132	=132
+2D]	4A	2r	2d]	1a]
+.	4B	.	.	.
+2C	2c	1A	2e	.
+2D	2B	.	2f	1r
+2E	[2c	2G	4e	.
+.	.	.	4d	.
+=133	=133	=133	=133	=133
+1F	2c]	2.A	4c	0r
+.	.	.	4B	.
+.	1d	.	2A	.
+.	.	4A	.	.
+1E	.	2B	2G	.
+.	2c	2G	[2g	.
+=134	=134	=134	=134	=134
+1D	2d	1A	2g]	1r
+.	2d	.	2f	.
+1r	2c	1r	2e	2r
+.	2B	.	2d	2dd
+=135	=135	=135	=135	=135
+0r	2A	0r	1e	2cc
+.	2G	.	.	2b
+.	2F	.	2f	2a
+.	2C	.	2e	2g
+=136	=136	=136	=136	=136
+0r	1D	1d	4d	1f
+.	.	.	4e	.
+.	.	.	2.f	.
+.	1r	[1c	.	1g
+.	.	.	4e	.
+.	.	.	4e	.
+.	.	.	8d	.
+.	.	.	8c	.
+=137	=137	=137	=137	=137
+1G	2r	2c]	2d	1g
+.	2G	2B	2d	.
+2F	2A	2A	2d	2r
+2E	2B	2G	2e	2g
+=138	=138	=138	=138	=138
+2.D	1.d	0F	1f	2a
+.	.	.	.	2a
+4C	.	.	.	.
+2BB-	.	.	2d	2b-
+2D	2A	.	[2f	2f
+=139	=139	=139	=139	=139
+0C	0c	0G	2f]	0cc
+.	.	.	4e	.
+.	.	.	4d	.
+.	.	.	1e	.
+=140	=140	=140	=140	=140
+2.FF	1c	2F	2f	1a
+.	.	1A	1c	.
+4GG	.	.	.	.
+2AA	1r	.	.	2r
+2BB-	.	2G	2d	[2d
+=141	=141	=141	=141	=141
+1AA	0r	2A	2f	2d]
+.	.	2A	2e	2c
+1r	.	2D	2f	2d
+.	.	2A	2c	2e
+=142	=142	=142	=142	=142
+0r	0r	2B	2d	1g
+.	.	2.c	2.e	.
+.	.	.	.	[1a
+.	.	4B	4d	.
+.	.	4A	4c	.
+.	.	4G	4B	.
+=143	=143	=143	=143	=143
+0r	0r	2F	2A	2a]
+.	.	2G	2B	2d
+.	.	[1A	2c	1f
+.	.	.	[2d	.
+=144	=144	=144	=144	=144
+1r	1r	0A]	2d]	1e
+.	.	.	2c#	.
+1D	2r	.	4d	1d
+.	.	.	4e	.
+.	[2D	.	4f	.
+.	.	.	4d	.
+=145	=145	=145	=145	=145
+1AA	2D]	2.A	1e	2r
+.	2C	.	.	1a
+.	.	4G	.	.
+1BB-	1D	2F	2r	.
+.	.	2D	[2d	2g
+=146	=146	=146	=146	=146
+1AA	1E	1A	2d]	1a
+.	.	.	2c	.
+1GG	1G	2D	2d	1b-
+.	.	2G	2e	.
+=147	=147	=147	=147	=147
+1FF	1.A	2C	2f	1a
+.	.	2.c	2f	.
+2.F	.	.	2c	[1a
+.	.	4B	.	.
+.	2D	4A	[2f	.
+4E	.	4G	.	.
+=148	=148	=148	=148	=148
+1D	1F	1A	4f]	2a]
+.	.	.	4e	.
+.	.	.	1d	2a
+1AA	1E	1A	.	1a
+.	.	.	2c#	.
+=149	=149	=149	=149	=149
+[0D	[0D	[0A	[0d	[0f#
+=150	=150	=150	=150	=150
+0D]	0D]	0A]	0d]	0f#]
+*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Paraphrase)
+!!!AST: renaissance, vocal
+!!!ASW: Gregorian Mass
+!!!PWK: Masses, Book Mantuan II
+!!!RNB: Cadence finals: A,E
+!!!YOR: Le Opere Complete, v. 19, p. 43
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

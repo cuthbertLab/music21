@@ -1343,7 +1343,7 @@ class RecursiveIterator(StreamIterator):
         '''
         self.returnSelf = self.includeSelf
         self.childRecursiveIterator = None
-        self.lastYieldElement = None
+        self.activeInformation['lastYielded'] = None
         super(RecursiveIterator, self).reset()
 
     def __next__(self):

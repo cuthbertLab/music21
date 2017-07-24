@@ -1,0 +1,153 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Quam pulchra es
+!!!OMD: Benedictus
+!!!OTL: Hosanna
+**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor	!Altus	!Cantus
+*clefF4	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]
+*C:ion	*C:ion	*C:ion	*C:ion
+*M4/2	*M4/2	*M4/2	*M4/2
+=36	=36	=36	=36
+0r	0r	1e	0r
+.	.	1g	.
+=37	=37	=37	=37
+1A	0r	1a	0r
+1c	.	2g	.
+.	.	2e	.
+=38	=38	=38	=38
+1d	1r	1f	1a
+2c	1e	2e	1cc
+2A	.	2a	.
+=39	=39	=39	=39
+1B-	1g	1d	1dd
+1A	1a	2e	2cc
+.	.	2f	2a
+=40	=40	=40	=40
+0r	2g	1g	1b-
+.	2e	.	.
+.	1f	1d	2a
+.	.	.	[2dd
+=41	=41	=41	=41
+2r	1e	2g	2dd]
+2E	.	2g	1cc
+1G	1d	2.g	.
+.	.	.	2b
+.	.	4f	.
+=42	=42	=42	=42
+1A	2c	4e	2cc
+.	.	4d	.
+.	2A	2c	2e
+2G	1B	2d	1g
+2E	.	2e	.
+=43	=43	=43	=43
+1F	2r	4A	1a
+.	.	4B	.
+.	2A	4c	.
+.	.	4d	.
+2E	1c	1e	2g
+2A	.	.	2e
+=44	=44	=44	=44
+4D	1d	1a	1f
+4E	.	.	.
+4F	.	.	.
+4G	.	.	.
+2A	2c	1a	2e
+2F	2A	.	2a
+=45	=45	=45	=45
+2G	1B-	0r	4d
+.	.	.	4e
+4D	.	.	4f
+4E	.	.	4g
+4F	[1A	.	4a
+4G	.	.	4b
+4A	.	.	[2cc
+4B	.	.	.
+=46	=46	=46	=46
+2.c	1A]	1e	4cc]
+.	.	.	4dd
+.	.	.	2ee
+4A	.	.	.
+2B	1r	1g	2dd
+2c	.	.	2ee
+=47	=47	=47	=47
+1F	2r	1a	2cc
+.	2A	.	1ff
+1C	1c	2g	.
+.	.	2e	[2ee
+=48	=48	=48	=48
+0r	1d	1f	2ee]
+.	.	.	2dd
+.	2c	2e	2ee
+.	2A	2a	2cc
+=49	=49	=49	=49
+1r	1B-	4d	1dd
+.	.	4e	.
+.	.	4f	.
+.	.	4g	.
+1A	2A	2a	[1cc
+.	2a	2f	.
+=50	=50	=50	=50
+1c	2g	2e	1cc]
+.	2e	1a	.
+1d	1f	.	2r
+.	.	2f	2a
+=51	=51	=51	=51
+2c	2e	2g	1cc
+2A	2a	1f	.
+1B-	4d	.	1dd
+.	4e	.	.
+.	4f	2d	.
+.	4g	.	.
+=52	=52	=52	=52
+2A	2.a	1e	2cc
+2A	.	.	2ee
+.	4g	.	.
+4D	4f	1a	1ff
+4E	4e	.	.
+4F	2d	.	.
+4G	.	.	.
+=53	=53	=53	=53
+4A	1c	2a	2ee
+4B	.	.	.
+2c	.	2g	2ee
+4F	2r	1cc	4a
+4G	.	.	4b
+4A	2e	.	4cc
+4B	.	.	4dd
+=54	=54	=54	=54
+2c	4A	1.cc	2ee
+.	4B	.	.
+2F	4c	.	2ff
+.	4d	.	.
+2C	2e	.	2ee
+2D	[2f	[2a	[2dd
+=55	=55	=55	=55
+1A	4f]	2a]	2dd]
+.	4e	.	.
+.	2c	2f	1cc
+1G	1d	1g	.
+.	.	.	2b
+=56	=56	=56	=56
+0C	0c	0e	0cc
+==	==	==	==
+*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Parody)
+!!!AST: renaissance, vocal
+!!!ASW: Motet 1532 (Johannes Lupi)
+!!!PWK: Masses, Book 6
+!!!RNB: Cadence finals: G
+!!!YOR: Le Opere Complete, v. 21, p. 73
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

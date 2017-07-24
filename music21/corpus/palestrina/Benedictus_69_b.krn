@@ -1,0 +1,90 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa In majoribus duplicibus
+!!!OMD: Benedictus
+!!!OTL: B.Hosanna
+**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor	!Altus	!Cantus
+*clefF4	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]
+*?:X	*?:X	*?:X	*?:X
+*M4/2	*M4/2	*M4/2	*M4/2
+=37	=37	=37	=37
+0r	1r	0r	0f
+.	[1F	.	.
+=38	=38	=38	=38
+0r	1F]	0c	0a
+.	1A	.	.
+=39	=39	=39	=39
+0C	1c	0e	0g
+.	[1c	.	.
+=40	=40	=40	=40
+0G	2c]	1.d	0g
+.	4B	.	.
+.	4A	.	.
+.	1B	.	.
+.	.	[2g	.
+=41	=41	=41	=41
+0A	1r	2g]	0cc
+.	.	4f#	.
+.	.	4e	.
+.	1c	1f#	.
+=42	=42	=42	=42
+2.G	1d	0g	0b-
+4A	.	.	.
+4B-	1G	.	.
+4c	.	.	.
+[2d	.	.	.
+=43	=43	=43	=43
+2d]	1.A	1.e	0a
+4c#	.	.	.
+4B	.	.	.
+2c#	.	.	.
+2d	2d	2f	.
+=44	=44	=44	=44
+2B	2G	2.g	0g
+1c	4c	.	.
+.	4d	4f	.
+.	4e	2e	.
+.	4f	.	.
+2B-	[2g	2d	.
+=45	=45	=45	=45
+1A	2g]	1c	0a
+.	4f	.	.
+.	4e	.	.
+1D	1f#	[1d	.
+=46	=46	=46	=46
+1.G	1g	1d]	1.b-
+.	2G	[1g	.
+2F	2A	.	2a
+=47	=47	=47	=47
+2E-	1B-	2g]	[0g
+2D	.	2f	.
+2C	2c	2e-	.
+2BB	2d	2d	.
+=48	=48	=48	=48
+0C	2.e-	2.c	0g]
+.	4d	4d	.
+.	1c	1e-	.
+=49	=49	=49	=49
+0G	0B	0d	0g
+==	==	==	==
+*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Paraphrase)
+!!!AST: renaissance, vocal
+!!!ASW: Gregorian Mass
+!!!PWK: Masses, Book 7
+!!!RNB: Cadence finals: E,C,G,D,F
+!!!YOR: Le Opere Complete, v. 23, p. 149
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

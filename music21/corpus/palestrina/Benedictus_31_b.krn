@@ -1,0 +1,120 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa In duplicibus minoribus (I)
+!!!OMD: Benedictus
+!!!OTL: B.Hosanna
+**kern	**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor 2	!Tenor 1	!Altus	!Cantus
+*clefF4	*clefGv2	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]	*k[]
+*E:phr	*E:phr	*E:phr	*E:phr	*E:phr
+*M4/2	*M4/2	*M4/2	*M4/2	*M4/2
+=33	=33	=33	=33	=33
+1r	0r	1B	0r	0r
+1E	.	2c	.	.
+.	.	2B	.	.
+=34	=34	=34	=34	=34
+2F	2r	2A	0r	0r
+2E	2e	2G	.	.
+2D	2f	[1A	.	.
+2C	2e	.	.	.
+=35	=35	=35	=35	=35
+2D	2d	2A]	0r	0r
+1E	2B	2G	.	.
+.	2c	1F	.	.
+2D	4B	.	.	.
+.	4A	.	.	.
+=36	=36	=36	=36	=36
+1E	4G#	1E	1r	1b
+.	2A	.	.	.
+.	4G#	.	.	.
+1r	2A	1r	1e	2cc
+.	2G	.	.	2b
+=37	=37	=37	=37	=37
+0r	2F	0r	2f	2a
+.	2C	.	2e	2g
+.	[1F	.	2d	[1a
+.	.	.	2c	.
+=38	=38	=38	=38	=38
+0r	2F]	0r	2d	2a]
+.	2G	.	1e	2g
+.	2A	.	.	1f
+.	2B	.	2d	.
+=39	=39	=39	=39	=39
+0r	2.c	2r	1e	[0e
+.	.	2A	.	.
+.	4B	.	.	.
+.	2A	2c	2r	.
+.	2G#	2B	2B	.
+=40	=40	=40	=40	=40
+2r	2A	2A	2c	1e]
+2E	2e	2G	2B	.
+2F	1r	2A	2A	1r
+2E	.	[2B	2G	.
+=41	=41	=41	=41	=41
+2D	0r	4B]	2A	2r
+.	.	4A	.	.
+2C	.	1A	2c	2e
+2D	.	.	1B	2f
+2E	.	2G#	.	2e
+=42	=42	=42	=42	=42
+0F	1r	0A	1A	2d
+.	.	.	.	2c
+.	2r	.	2r	1d
+.	2A	.	[2a	.
+=43	=43	=43	=43	=43
+1E	2c	2r	2a]	1e
+.	2B	2B	2g	.
+1r	2A	2c	2f	2r
+.	2G	2B	[2e	2b
+=44	=44	=44	=44	=44
+0r	2A	2A	4e]	2cc
+.	.	.	4c	.
+.	2B	2G	4d	2b
+.	.	.	4e	.
+.	2c	2A	2f	2a
+.	2B	2E	[2e	2g
+=45	=45	=45	=45	=45
+2r	1A	1F	2e]	1.a
+2A	.	.	2d	.
+2c	2r	1E	[1e	.
+2B	2B	.	.	2g#
+=46	=46	=46	=46	=46
+2A	2c	1r	0e]	2r
+2G	2B	.	.	2b
+2A	2A	2r	.	2cc
+2E	2G	2B	.	2b
+=47	=47	=47	=47	=47
+2r	2A	2c	1.e	2a
+2E	2B	2B	.	2g
+2AA	2c	2A	.	2a
+2E	2B	2G#	2e	2b
+=48	=48	=48	=48	=48
+2AA	1A	2A	0e	2.cc
+2AA	.	2E	.	.
+.	.	.	.	4b
+1AA	1c	1A	.	1a
+=49	=49	=49	=49	=49
+[0E	[0B	[0G#	[0e	[0b
+=50	=50	=50	=50	=50
+0E]	0B]	0G#]	0e]	0b]
+==	==	==	==	==
+*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Paraphrase)
+!!!AST: renaissance, vocal
+!!!ASW: Gregorian Mass
+!!!PWK: Masses, Book Mantuan I
+!!!RNB: Cadence finals: A
+!!!YOR: Le Opere Complete, v. 18, p. 42
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

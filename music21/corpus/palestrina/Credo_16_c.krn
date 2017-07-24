@@ -1,0 +1,53 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa De beata virgine (1570)
+!!!OMD: Credo
+!!!OTL: Et resurrexit
+**kern	**kern	**kern	**kern
+*Itenor	*Icalto	*Icant	*Icant
+!Tenor	!Altus	!Cantus 2	!Cantus 1
+*clefGv2	*clefG2	*clefG2	*clefG2
+*k[b-]	*k[b-]	*k[b-]	*k[b-]
+*?:X	*?:X	*?:X	*?:X
+*M3/2	*M3/2	*M3/2	*M3/2
+=111	=111	=111	=111
+1G	1g	1b	1dd
+2r	2r	2r	2r
+=112	=112	=112	=112
+1r	2g	2dd	2b
+.	2g	2dd	2b
+2r	2c	2ee	2cc
+=113	=113	=113	=113
+1r	1g	1dd	1b
+2r	2g	2b	2dd
+=114	=114	=114	=114
+1r	1c	1cc	2.ee
+.	.	.	4ee
+2r	2g	2b	2dd
+=115	=115	=115	=115
+1r	2a	2cc	2.cc
+.	1g	1dd	.
+.	.	.	8b
+.	.	.	8a
+2r	.	.	2b
+=116	=116	=116	=116
+1r	1c	1ee	1cc
+2r	2r	2r	2r
+*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Paraphrase)
+!!!AST: renaissance, vocal
+!!!ASW: Gregorian Mass
+!!!PWK: Masses, Book 3
+!!!RNB: Cadence finals: G,D,C,E,F
+!!!YOR: Le Opere Complete, v. 6, p. 175
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

@@ -1,0 +1,65 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Benedicta es
+!!!OMD: Credo
+!!!OTL: Et vitam
+**kern	**kern	**kern	**kern	**kern	**kern
+*Ibass	*Ibass	*Itenor	*Icalto	*Icalto	*Icant
+!Bassus 2	!Bassus 1	!Tenor	!Altus 2	!Altus 1	!Cantus
+*clefF4	*clefF4	*clefGv2	*clefG2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix	*G:mix	*G:mix
+*M3/2	*M3/2	*M3/2	*M3/2	*M3/2	*M3/2
+=227	=227	=227	=227	=227	=227
+1G	1GG	1B	2g	2d	1b
+.	.	.	2d	2B	.
+2C	2r	2r	2e	2c	2r
+=228	=228	=228	=228	=228	=228
+1G	2r	1r	2d	2B	2r
+.	2G	.	2g	2d	2b
+2r	2A	2r	2f#	2c	2cc
+=229	=229	=229	=229	=229	=229
+1r	2G	1r	2g	2d	2.b
+.	2E	.	2G	2e	.
+.	.	.	.	.	4cc
+2r	2F	2r	2A	2c	2a
+=230	=230	=230	=230	=230	=230
+1r	2G	2d	2B	2B	2g
+.	2C	2e	2c	1A	2e
+2r	2D	2d	2A	.	2f#
+=231	=231	=231	=231	=231	=231
+2r	1GG	1B	1d	2G	2g
+2G	.	.	.	2g	2r
+2A	2r	2c	2r	2f#	2cc
+=232	=232	=232	=232	=232	=232
+2G	2r	2d	1r	2g	1b
+2E	2G	2e	.	2g	.
+2F	2A	2c	2r	2f	2a
+=233	=233	=233	=233	=233	=233
+2G	2G	2B	1g	2d	2dd
+2C	2E	2e	.	2r	2cc
+2D	2F	4.d	2f	2d	2a
+.	.	8c	.	.	.
+=234	=234	=234	=234	=234	=234
+2GG	2G	2B	2d	2d	2.g
+2r	2C	1A	2e	2c	.
+.	.	.	.	.	4e
+2r	2D	.	2d	2A	2f#
+*-	*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Parody)
+!!!AST: renaissance, vocal
+!!!ASW: Motet 1520 (Josquin)
+!!!PWK: Masses, Book 11
+!!!RNB: Cadence finals: D
+!!!YOR: Le Opere Complete, v. 28, p. 222
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

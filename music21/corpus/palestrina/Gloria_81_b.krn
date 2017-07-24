@@ -1,0 +1,65 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Missa Jesu Nostra Redemptio
+!!!OMD: Gloria
+!!!OTL: Quoniam
+**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor	!Altus	!Cantus
+*clefF4	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]
+*E:phr	*E:phr	*E:phr	*E:phr
+*M3/2	*M3/2	*M3/2	*M3/2
+=68	=68	=68	=68
+1E	1B	1e	1g#
+2r	2r	2r	2r
+=69	=69	=69	=69
+2.A	2.c#	2.e	2.a
+4A	4c#	4e	4a
+2A	2c#	2e	2a
+=70	=70	=70	=70
+2D	1d	2f	2a
+1F	.	1f	1a
+.	2c	.	.
+=71	=71	=71	=71
+2G	2B	2d	2g
+1A	2c	1c	2e
+.	2A	.	2f#
+=72	=72	=72	=72
+1G	1B	1d	1g
+2C	2c	2e	2g
+=73	=73	=73	=73
+1F	1c	1f	1a
+2G	2B	[2e	2g
+=74	=74	=74	=74
+1A	1c	2e]	1e
+.	.	2c	.
+2A	2A	2c	2f#
+=75	=75	=75	=75
+1G	1B	1d	1g
+2C	2c	2e	2g
+=76	=76	=76	=76
+1F	1c	1f	1a
+2G	2B	2d	2g
+=77	=77	=77	=77
+2E	2B	2e	2g
+2D	2d	2f#	2a
+2D	2d	2f#	2b
+*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Paraphrase)
+!!!AST: renaissance, vocal
+!!!ASW: Hymn
+!!!PWK: Masses, Book 4
+!!!RNB: Cadence finals: C,A
+!!!YOR: Le Opere Complete, v. 10, p. 38
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden
