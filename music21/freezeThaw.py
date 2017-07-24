@@ -1059,6 +1059,7 @@ class JSONFreezeThawBase(object):
             'keySignatures',
             'keySignatureFirst',
             'noteCount',
+            'numberOfParts',
             'pitchHighest',
             'pitchLowest',
             'quarterLength',

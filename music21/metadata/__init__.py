@@ -823,7 +823,8 @@ class RichMetadata(Metadata):
     ('actNumber', 'alternativeTitle', 'ambitus', 'associatedWork', 'collectionDesignation', 
      'commission', 'composer', 'copyright', 'countryOfComposition', 'date', 'dedication', 
      'groupTitle', 'keySignatureFirst', 'keySignatures', 'localeOfComposition', 'movementName', 
-     'movementNumber', 'noteCount', 'number', 'opusNumber', 'parentTitle', 'pitchHighest', 
+     'movementNumber', 'noteCount', 'number', 'numberOfParts', 
+     'opusNumber', 'parentTitle', 'pitchHighest', 
      'pitchLowest', 'popularTitle', 'quarterLength', 'sceneNumber', 'sourcePath', 'tempoFirst', 
      'tempos', 'textLanguage', 'textOriginalLanguage', 'timeSignatureFirst', 
      'timeSignatures', 'title', 'volume')
@@ -831,11 +832,13 @@ class RichMetadata(Metadata):
 
     ### CLASS VARIABLES ###
 
+    # When changing this, be sure to update freezeThaw.py
     searchAttributes = tuple(sorted(Metadata.searchAttributes + (
         'ambitus',
         'keySignatureFirst',
         'keySignatures',
         'noteCount',
+        'numberOfParts',
         'pitchHighest',
         'pitchLowest',
         'quarterLength',
@@ -854,6 +857,7 @@ class RichMetadata(Metadata):
         self.keySignatureFirst = None
         self.keySignatures = []
         self.noteCount = None
+        self.numberOfParts = None
         self.pitchHighest = None
         self.pitchLowest = None
         self.quarterLength = None
@@ -942,7 +946,8 @@ class RichMetadata(Metadata):
         '<music21.key.Key of f# minor>'
         >>> rmd.sourcePath
         'bach/bwv66.6.mxl'
-
+        >>> rmd.numberOfParts
+        4
         '''
         from music21 import key
         from music21 import meter
@@ -952,6 +957,8 @@ class RichMetadata(Metadata):
 
         flat = streamObj.flat.sorted
 
+
+        self.numberOfParts = len(streamObj.parts)
         self.keySignatureFirst = None
         self.keySignatures = []
         self.tempoFirst = None
