@@ -175,7 +175,7 @@ class Corpus(object):
         Return the rebuilt metadata bundle.
         '''
         mdb = self.metadataBundle
-        if not mdb:
+        if mdb is None:
             return self 
         if mdb.filePath is None:
             return self
