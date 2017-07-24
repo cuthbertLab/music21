@@ -150,7 +150,7 @@ class MetadataBundle(object):
     >>> from music21 import corpus, metadata
     >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
     >>> coreBundle
-    <music21.metadata.bundles.MetadataBundle 'core': {148... entries}>
+    <music21.metadata.bundles.MetadataBundle 'core': {150... entries}>
 
     >>> searchResults = coreBundle.search('bach', field='composer')
     >>> searchResults
@@ -191,9 +191,9 @@ class MetadataBundle(object):
     >>> coreBundle
     <music21.metadata.bundles.MetadataBundle 'core': {0 entries}>
     >>> coreBundle.read()
-    <music21.metadata.bundles.MetadataBundle 'core': {148... entries}>
+    <music21.metadata.bundles.MetadataBundle 'core': {150... entries}>
     >>> coreBundle
-    <music21.metadata.bundles.MetadataBundle 'core': {148... entries}>
+    <music21.metadata.bundles.MetadataBundle 'core': {150... entries}>
 
     The third method is to call `.metadataBundle` on the corpus itself. This
     calls `.read()` automatically:
@@ -204,7 +204,7 @@ class MetadataBundle(object):
     >>> localBundle = corpus.corpora.LocalCorpus().metadataBundle
 
     >>> coreBundle
-    <music21.metadata.bundles.MetadataBundle 'core': {148... entries}>
+    <music21.metadata.bundles.MetadataBundle 'core': {150... entries}>
 
 
 
@@ -603,7 +603,7 @@ class MetadataBundle(object):
         >>> from music21 import metadata
         >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> coreBundle
-        <music21.metadata.bundles.MetadataBundle 'core': {148... entries}>
+        <music21.metadata.bundles.MetadataBundle 'core': {150... entries}>
         >>> coreBundle.corpus
         <music21.corpus.corpora.CoreCorpus>
         '''
@@ -1046,6 +1046,7 @@ class MetadataBundle(object):
         'movementNumber'
         'noteCount'
         'number'
+        'numberOfParts'
         'opusNumber'
         'parentTitle'
         'pitchHighest'

@@ -271,15 +271,13 @@ class Test(unittest.TestCase):
 
     def testHumdrumParse(self):
         from music21 import corpus
-        c = corpus.parse('Palestrina/Kyrie')
+        c = corpus.parse('Palestrina/Kyrie_40')
         foundInstruments = []
         for x in c.recurse():
             if 'Instrument' in x.classes:
                 foundInstruments.append(str(x))
         self.assertEqual(foundInstruments,
-                         ['Soprano', 'Alto', 
-                          'Soprano', 'Alto', 'Alto', 'Tenor', 
-                          'Alto', 'Bass', 'Tenor'])
+                         ['Soprano', 'Alto', 'Tenor', 'Tenor', 'Bass'])
         alto = c.parts[1].flat.getInstrument()
         self.assertIn('Alto', alto.classes)
 

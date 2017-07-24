@@ -84,7 +84,7 @@ def getCorePaths(fileExtensions=None, expandExtensions=True):
 
     >>> corpusFilePaths = corpus.getCorePaths()
     >>> cpl = len(corpusFilePaths)
-    >>> 2550 < cpl < 2600
+    >>> 3000 < cpl < 4000
     True
 
     >>> kernFilePaths = corpus.getCorePaths('krn')

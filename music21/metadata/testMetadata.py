@@ -215,6 +215,7 @@ class Test(unittest.TestCase):
                             "<music21.key.Key of f# minor>"
                         ],
                         "noteCount": 165,
+                        "numberOfParts": 4,
                         "pitchHighest": "E5",
                         "pitchLowest": "F#2",
                         "quarterLength": 36.0,
