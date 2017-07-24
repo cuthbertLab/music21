@@ -667,63 +667,63 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
         ticks = self.makePitchLabelsUnicode(ticks)
         return ticks
 
-class PitchDiatonicAxis(PitchAxis):
-    '''
-    Axis subclass for dealing with Diatonic Values (.diatonicNoteNum)
-    '''
-    labelDefault = 'Step'
-    quantities = ('diatonic', 'diatonicNoteNum')
-
-    def extractOneElement(self, n, formatDict):
-        if hasattr(n, 'pitch'):
-            return n.pitch.diatonicNoteNum
-
-    def ticks(self, dataMin=15, dataMax=43):
-        u'''
-        >>> ax = graph.axis.PitchDiatonicAxis()
-        >>> ax.hideUnused = False
-        >>> ax.blankLabelUnused = False
-        >>> ax.minValue = 20
-        >>> ax.maxValue = 30
-        >>> for ps, label in ax.ticks():
-        ...     print(str(ps) + " " + label)
-        20 G♯0
-        21 A
-        22 B♭
-        23 B
-        24 C1
-
-        >>> ax.showOctaves = False
-        >>> for ps, label in ax.ticks():
-        ...     print(str(ps) + " " + label)
-        20 G♯
-        21 A
-        22 B♭
-        23 B
-        24 C
-
-        >>> ax.showOctaves = True
-        >>> for ps, label in ax.ticks():
-        ...     print(str(ps) + " " + label)
-        20 G♯0
-        21 A0
-        22 B♭0
-        23 B0
-        24 C1
-
-        >>> bach = corpus.parse('bwv66.6')
-        >>> plotS = graph.plot.PlotStream(bach.parts[-1])
-        >>> ax = graph.axis.PitchSpaceAxis(plotS)
-        >>> ax.hideUnused = False
-        >>> ax.minValue = 36
-        >>> ax.maxValue = 100
-        >>> ticks = ax.ticks()
-        >>> ticks[0] # blank because no note 36 in data
-        (36, '')
-        >>> ticks[21]
-        (57, 'A')
-        '''
-        return self._pitchTickHelper('nameWithOctave', 'diatonicNoteNum')
+# class PitchDiatonicAxis(PitchAxis):
+#     '''
+#     Axis subclass for dealing with Diatonic Values (.diatonicNoteNum)
+#     '''
+#     labelDefault = 'Step'
+#     quantities = ('diatonic', 'diatonicNoteNum')
+# 
+#     def extractOneElement(self, n, formatDict):
+#         if hasattr(n, 'pitch'):
+#             return n.pitch.diatonicNoteNum
+# 
+#     def ticks(self, dataMin=15, dataMax=43):
+#         u'''
+#         >>> ax = graph.axis.PitchDiatonicAxis()
+#         >>> ax.hideUnused = False
+#         >>> ax.blankLabelUnused = False
+#         >>> ax.minValue = 20
+#         >>> ax.maxValue = 30
+#         >>> for ps, label in ax.ticks():
+#         ...     print(str(ps) + " " + label)
+#         20 G♯0
+#         21 A
+#         22 B♭
+#         23 B
+#         24 C1
+# 
+#         >>> ax.showOctaves = False
+#         >>> for ps, label in ax.ticks():
+#         ...     print(str(ps) + " " + label)
+#         20 G♯
+#         21 A
+#         22 B♭
+#         23 B
+#         24 C
+# 
+#         >>> ax.showOctaves = True
+#         >>> for ps, label in ax.ticks():
+#         ...     print(str(ps) + " " + label)
+#         20 G♯0
+#         21 A0
+#         22 B♭0
+#         23 B0
+#         24 C1
+# 
+#         >>> bach = corpus.parse('bwv66.6')
+#         >>> plotS = graph.plot.PlotStream(bach.parts[-1])
+#         >>> ax = graph.axis.PitchSpaceAxis(plotS)
+#         >>> ax.hideUnused = False
+#         >>> ax.minValue = 36
+#         >>> ax.maxValue = 100
+#         >>> ticks = ax.ticks()
+#         >>> ticks[0] # blank because no note 36 in data
+#         (36, '')
+#         >>> ticks[21]
+#         (57, 'A')
+#         '''
+#         return self._pitchTickHelper('nameWithOctave', 'diatonicNoteNum')
 
 #------------------------------------------------------------------------------
 class PositionAxis(Axis):
