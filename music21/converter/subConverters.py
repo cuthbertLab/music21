@@ -821,7 +821,11 @@ class ConverterMusicXML(SubConverter):
 
         import subprocess
         try:
-            env = dict(os.environ, QT_QPA_PLATFORM='offscreen')
+            if sys.platform == 'linux' and not os.environ.get('DISPLAY'):
+                env = dict(os.environ, QT_QPA_PLATFORM='offscreen')
+            else:
+                env = dict(os.environ)
+
             output = subprocess.check_output(musescoreRun
                              , stderr=subprocess.STDOUT, env=env)
         except subprocess.CalledProcessError as cpe:
