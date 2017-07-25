@@ -53,7 +53,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
                 recordFormat=None,
                 recordChannels=default_recordChannels,
                 recordSampleRate=default_recordSampleRate,
-                recordChunkLength=default_recordChunkLength):
+                recordChunkLength=default_recordChunkLength):  # pragma: no cover
     '''
     records `seconds` length of sound in the given format (default Wave)
     and optionally stores it to disk using the filename of `storeFile`

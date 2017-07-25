@@ -32,7 +32,7 @@ def testMeasureStream1():
     '''
     returns a simple measure stream for testing:
 
-    >>> s = analysis.reduceChords.testMeasureStream1()
+    >>> s = analysis.reduceChordsOld.testMeasureStream1()
     >>> s.show('text')
     {0.0} <music21.meter.TimeSignature 4/4>
     {0.0} <music21.chord.Chord C4 E4 G4 C5>
@@ -69,8 +69,8 @@ class ChordReducer(object):
                                trimBelow=0.25):
         '''
 
-        >>> s = analysis.reduceChords.testMeasureStream1()
-        >>> cr = analysis.reduceChords.ChordReducer()
+        >>> s = analysis.reduceChordsOld.testMeasureStream1()
+        >>> cr = analysis.reduceChordsOld.ChordReducer()
 
         Reduce to a maximum of 3 chords; though here we will
         only get one because the other chord is
@@ -79,7 +79,6 @@ class ChordReducer(object):
         >>> newS = cr.reduceMeasureToNChords(s, 3,
         ...    weightAlgorithm=cr.qlbsmpConsonance, trimBelow = 0.3)
         >>> newS.show('text')
-        {0.0} <music21.meter.TimeSignature 4/4>
         {0.0} <music21.chord.Chord C4 E4 G4 C5>
         >>> newS.notes[0].quarterLength
         4.0
@@ -162,8 +161,8 @@ class ChordReducer(object):
     def computeMeasureChordWeights(self, measureObj, weightAlgorithm=None):
         '''
 
-        >>> s = analysis.reduceChords.testMeasureStream1().notes
-        >>> cr = analysis.reduceChords.ChordReducer()
+        >>> s = analysis.reduceChordsOld.testMeasureStream1().notes
+        >>> cr = analysis.reduceChordsOld.ChordReducer()
         >>> cws = cr.computeMeasureChordWeights(s)
         >>> for pcs in sorted(cws):
         ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
@@ -192,8 +191,8 @@ class ChordReducer(object):
         >>> cws = cr.computeMeasureChordWeights(s, weightAlgorithm=cr.qlbsmpConsonance)
         >>> for pcs in sorted(cws):
         ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
-             (0, 4, 7)  3.0
-         (0, 11, 4, 5)  0.1
+                 (0, 4, 7)  3.0
+             (0, 11, 4, 5)  0.5
         '''
         if weightAlgorithm is None:
             weightAlgorithm = self.quarterLengthOnly
@@ -394,7 +393,7 @@ _DOC_ORDER = []
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(TestExternal)
+    music21.mainTest(Test)
 
 
 #------------------------------------------------------------------------------

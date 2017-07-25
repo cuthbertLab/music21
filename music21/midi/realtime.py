@@ -30,7 +30,7 @@ from music21 import defaults
 
 from music21.ext import six
 
-if six.PY2:
+if six.PY2: # pragma: no cover
     try:
         from cStringIO import StringIO as StrByIO
     except ImportError:
@@ -38,14 +38,14 @@ if six.PY2:
             from StringIO import StringIO as StrByIO
         except ImportError:
             from io import StringIO as StrByIO # @UnusedImport
-else:
+else: # pragma: no cover
     from io import BytesIO as StrByIO # @Reimport
 
 
 class StreamPlayerException(Music21Exception):
     pass
 
-class StreamPlayer(object):
+class StreamPlayer(object):  # pragma: no cover
     '''
     Create a player for a stream that plays its midi version in realtime using pygame.
 

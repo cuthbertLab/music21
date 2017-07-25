@@ -414,12 +414,12 @@ class StreamForms(object):
             self._forms['midiPitchHistogram'] = histo
             return self._forms['midiPitchHistogram']
         
-        elif key in ['diatonicNoteNumHistogram']:
-            histo = [0] * 128
-            for p in self.__getitem__('flat.pitches'): # recursive call
-                histo[p.diatonicNoteNum] += 1
-            self._forms['diatonicNoteNumHistogram'] = histo
-            return self._forms['diatonicNoteNumHistogram']
+#         elif key in ['diatonicNoteNumHistogram']:
+#             histo = [0] * 128
+#             for p in self.__getitem__('flat.pitches'): # recursive call
+#                 histo[p.diatonicNoteNum] += 1
+#             self._forms['diatonicNoteNumHistogram'] = histo
+#             return self._forms['diatonicNoteNumHistogram']
         
 
         # bins for all abs spans between adjacent melodic notes
@@ -428,10 +428,10 @@ class StreamForms(object):
             self._forms['midiIntervalHistogram'] = histo
             return self._forms['midiIntervalHistogram']
 
-        elif key in ['diatonicNoteNumIntervalHistogram']:
-            histo = self._getIntervalHistogram('diatonicNoteNum')
-            self._forms['midiIntervalHistogram'] = histo
-            return self._forms['midiIntervalHistogram']
+#         elif key in ['diatonicNoteNumIntervalHistogram']:
+#             histo = self._getIntervalHistogram('diatonicNoteNum')
+#             self._forms['midiIntervalHistogram'] = histo
+#             return self._forms['midiIntervalHistogram']
 
 
         elif key in ['contourList']:

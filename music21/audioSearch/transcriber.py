@@ -23,7 +23,7 @@ environLocal = environment.Environment(_MOD)
 
 
 def runTranscribe(show=True, plot=True, useMic=True,
-                  seconds=20.0, useScale=None, saveFile=True):
+                  seconds=20.0, useScale=None, saveFile=True): # pragma: no cover
     '''
     runs all the methods to record from audio for `seconds` length (default 10.0)
     and transcribe the resulting melody returning a music21.Score object
