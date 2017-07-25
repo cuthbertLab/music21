@@ -108,14 +108,14 @@ except (ImportError, AttributeError):
 
 _missingImport = []
 for modName in ('matplotlib', 'numpy', 'scipy'):
-    if _useImportLib:
+    if _useImportLib: # pragma: no cover
         loader = importlib.util.find_spec(modName)
         if loader is None:
             _missingImport.append(modName)
     else:
         try:
             imp.find_module(modName)
-        except ImportError:
+        except ImportError: # pragma: no cover
             _missingImport.append(modName)
 
 # used for better PNG processing in lily -- not very important
@@ -136,7 +136,7 @@ for modName in ('matplotlib', 'numpy', 'scipy'):
     #sys.stderr.write('pyaudio is installed but PortAudio is not -- ' +
     #                 're-download pyaudio at http://people.csail.mit.edu/hubert/pyaudio/')
 
-if _missingImport:
+if _missingImport: # pragma: no cover
     if environLocal['warnings'] in (1, '1', True):
         environLocal.warn(common.getMissingImportStr(_missingImport),
         header='music21:')
@@ -561,7 +561,7 @@ class Music21Object(object):
             try:
                 deeplyCopiedObject = copy.deepcopy(attrValue, memo)
                 setattr(new, name, deeplyCopiedObject)
-            except TypeError:
+            except TypeError: # pragma: no cover
                 if not isinstance(attrValue, Music21Object):
                     # shallow copy then...
                     try:
@@ -576,7 +576,7 @@ class Music21Object(object):
                         environLocal.printDebug('__deepcopy__: Could not copy (deep or shallow) ' +
                             '%s in %s, not a music21Object so just making a link' % (name, self))
                         setattr(new, name, attrValue)
-                else: # raise error for our own problem.
+                else: # raise error for our own problem. # pragma: no cover
                     raise Music21Exception('__deepcopy__: Cannot deepcopy Music21Object ' +
                         '%s probably because it requires a default value in instantiation.' % name)
 
@@ -1222,7 +1222,7 @@ class Music21Object(object):
                 spannerClassList = [spannerClassList]
 
         for obj in found:
-            if obj is None:
+            if obj is None: # pragma: no cover
                 continue
             if spannerClassList is None:
                 post.append(obj.spannerParent)
@@ -1852,131 +1852,6 @@ class Music21Object(object):
 
     #--------------------------------------------------------------------------
 
-    def _adjacencySearch(self,
-                         className=None,
-                         forward=True,
-                         flattenLocalSites=False):
-        '''
-        Get the next (if forward is True) or previous (if forward is False) element
-        of this element, according to various definitions of forward and backwards.
-
-        It is pretty simple to define this for a simple object in one stream.  It's much
-        harder if a lot of other streams/sites have interfered.
-
-        If this element is in multiple Streams, the first next element found in any
-        site will be returned. If not found no next element is found in any site, the flat
-        representation of all sites of each immediate site are searched.
-
-        The `classFilterList` may specify one or more classes as targets.
-        '''
-        positionStart = None
-        def adjacentObject(site):
-            '''
-            Core method for finding adjacent objects given a single site.
-
-            The `site` argument is a Stream that contains this
-            element. The index of this element if sound in this site,
-            and either the next or previous element, if found, is returned.
-
-            '''
-            siteTree = site.asTree(flatten=False, classList=className)
-            try:
-                st = self.sortTuple(site, raiseExceptionOnMiss=True)
-            except SitesException:
-                st = ZeroSortTupleLow.modify(offset=positionStart)
-
-            if forward:
-                node = siteTree.getNodeAfter(st)
-            else:
-                node = siteTree.getNodeBefore(st)
-
-            if node:
-                return node.payload
-            else:
-                return None
-
-
-        if className is not None:
-            if not common.isListLike(className):
-                className = [className]
-
-        #siteMemo = set()
-        for site, positionStart, unused_searchType in self.contextSites(returnSortTuples=True):
-            # positionStart is used in the embedded adjacentObject
-            if className and site.isClassOrSubclass(className):
-                return site
-
-            foundEl = adjacentObject(site)
-            if foundEl is not None:
-                return foundEl
-            foundEl = site._adjacencySearch(className=className, forward=forward)
-            if foundEl:
-                return foundEl
-#             if searchType == 'elementsOnly' or searchType == 'elementsFirst':
-#                 contextEl = payloadExtractor(site, flatten=False, positionStart=positionStart)
-#                 if contextEl is not None:
-#                     return contextEl
-#                 # otherwise, continue to check for flattening...
-#
-#             if searchType != 'elementsOnly': # flatten or elementsFirst
-#                 contextEl = payloadExtractor(site, flatten=True, positionStart=positionStart)
-#                 if contextEl is not None:
-#                     return contextEl
-#                 # otherwise, continue to check in next contextSite.
-
-
-
-        selfSites = self.sites.get(excludeNone=True)
-        match = None
-
-        # store ids of first sites; might need to take flattened version
-        firstSites = []
-        for s in selfSites:
-            firstSites.append(id(s))
-        # this might use get(sortByCreationTime)
-        #environLocal.printDebug(['sites:', selfSites])
-        #siteSites = []
-
-        # first, look in sites that are do not req flat presentation
-        # these do not need to be flattened b/c we know the self is in these
-        # streams
-        memo = {}
-        while selfSites:
-            #environLocal.printDebug(['looking at siteSites:', s])
-            # check for duplicated sites; may be possible
-            s = selfSites.pop(0) # take the first off of sites
-            try:
-                unused = memo[id(s)]
-                continue # if in dict, do not continue
-            except KeyError: # if not in dict
-                memo[id(s)] = None # add to dict, value does not matter
-
-            if id(s) in firstSites:
-                if flattenLocalSites is True:
-                    if s.isFlat:
-                        target = s
-                    else:
-                        target = s.semiFlat
-                else: # do not flatten first sites
-                    target = s
-                    # add semi flat to sites, as we have not searched it yet
-                    selfSites.append(s.semiFlat)
-                firstSites.pop(firstSites.index(id(s))) # remove for efficiency
-            # if flat, do not get semiFlat
-            # note that semiFlat streams are marked as isFlat=True
-            elif s.isFlat:
-                target = s
-            else: # normal site
-                target = s.semiFlat
-            # use semiflat of site
-            match = adjacentObject(target)
-            if match is not None and match is not self:
-                return match
-            # append new sites to end of queue
-            # these are the sites of s, not target
-            selfSites += s.sites.get(excludeNone=True)
-        # if cannot be found, return None
-        return None
 
     def next(self, className=None):
         '''
@@ -2093,9 +1968,6 @@ class Music21Object(object):
 
         if maxRecurse == 0:
             raise Music21Exception('Maximum recursion!')
-#         return self._adjacencySearch(className=className,
-#                                      forward=True,
-#                                      flattenLocalSites=flattenLocalSites)
 
     def previous(self, className=None):
         '''

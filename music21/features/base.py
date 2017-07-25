@@ -1539,7 +1539,7 @@ class Test(unittest.TestCase):
     # silent tests
 
 
-    def xtestComposerClassificationJSymbolic(self):
+    def xtestComposerClassificationJSymbolic(self): # pragma: no cover
         '''
         Demonstrating writing out data files for feature extraction. Here,
         features are used from the jSymbolic library.
@@ -1581,7 +1581,7 @@ class Test(unittest.TestCase):
 
 
 
-    def xtestRegionClassificationJSymbolicA(self):
+    def xtestRegionClassificationJSymbolicA(self): # pragma: no cover
         '''
         Demonstrating writing out data files for feature extraction. Here,
         features are used from the jSymbolic library.
@@ -1624,7 +1624,7 @@ class Test(unittest.TestCase):
 
 
 
-    def xtestRegionClassificationJSymbolicB(self):
+    def xtestRegionClassificationJSymbolicB(self): # pragma: no cover
         '''
         Demonstrating writing out data files for feature extraction.
         Here, features are used from the jSymbolic library.
@@ -1685,7 +1685,7 @@ class Test(unittest.TestCase):
         ds.write('/_scratch/chinaMitteleuropaSplit-b.arff')
 
 
-    def xtestOrangeBayesA(self):
+    def xtestOrangeBayesA(self): # pragma: no cover
         '''Using an already created test file with a BayesLearner.
         '''
         import orange # @UnresolvedImport # pylint: disable=import-error
@@ -1697,7 +1697,7 @@ class Test(unittest.TestCase):
             print("original", data[i].getclass(), "BayesLearner:", c)
 
 
-    def xtestClassifiersA(self):
+    def xtestClassifiersA(self): # pragma: no cover
         '''Using an already created test file with a BayesLearner.
         '''
         import orange, orngTree # @UnresolvedImport  # pylint: disable=import-error
@@ -1737,7 +1737,7 @@ class Test(unittest.TestCase):
 
 
 
-    def xtestClassifiersB(self):
+    def xtestClassifiersB(self): # pragma: no cover
         '''Using an already created test file with a BayesLearner.
         '''
         import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
@@ -1781,7 +1781,7 @@ class Test(unittest.TestCase):
                             classifierStr, classifierType, mismatch, len(matchData), matchStr))
 
 
-    def xtestOrangeClassifiers(self):
+    def xtestOrangeClassifiers(self): # pragma: no cover
         '''
         This test shows how to compare four classifiers; replace the file path
         with a path to the .tab data file.
@@ -1816,7 +1816,7 @@ class Test(unittest.TestCase):
             print("")
 
 
-    def xtestOrangeClassifierTreeLearner(self):
+    def xtestOrangeClassifierTreeLearner(self): # pragma: no cover
         import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
         data = orange.ExampleTable('~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
 
