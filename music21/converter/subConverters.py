@@ -23,7 +23,6 @@ import io
 import os
 import sys
 import unittest
-import glob
 
 from music21.ext import six
 from music21 import common
@@ -733,11 +732,14 @@ class ConverterMusicXML(SubConverter):
         Check whether total number of pngs is in 1-9, 10-99, or 100-999 range,
          then return appropriate fp. Raises and exception if png fp does not exist.
         '''
-        found = sorted(glob.glob(xmlFilePath[0:len(xmlFilePath) - 4] + "-*.png"))
-        if found:
-            pngfp = found[0]
+        if os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + "-1.png"):
+            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + "-1.png"
+        elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + "-01.png"):
+            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + "-01.png"
+        elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + "-001.png"):
+            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + "-001.png"
         else:
-            raise SubConverterFileIOException("png file of xml not found.")
+            raise SubConverterFileIOException("png file of xml not found. Is your file >999 pages?")
         return pngfp
 
     def parseData(self, xmlString, number=None):
@@ -804,21 +806,19 @@ class ConverterMusicXML(SubConverter):
         fpOut = fp[0:len(fp) - 3]
         fpOut += subformatExtension
 
-        musescoreRun = [musescorePath, fp, "-o", fpOut, "-T", "0"]
+        musescoreRun = '"' + musescorePath + '" ' + fp + " -o " + fpOut + " -T 0 "
         if 'dpi' in keywords:
-            musescoreRun.extend(["-r", str(keywords['dpi'])])
+            musescoreRun += " -r " + str(keywords['dpi'])
 
         if common.runningUnderIPython():
-            musescoreRun.extend(["-r", str(defaults.ipythonImageDpi)])
+            musescoreRun += " -r " + str(defaults.ipythonImageDpi)
 
-        import subprocess
-        try:
-            env = dict(os.environ, QT_QPA_PLATFORM='offscreen')
-            output = subprocess.check_output(musescoreRun
-                             , stderr=subprocess.STDOUT, env=env)
-        except subprocess.CalledProcessError as cpe:
-            environLocal.warn(str(cpe), header='Error: musescore')
-            raise Exception(cpe)
+        storedStrErr = sys.stderr
+        fileLikeOpen = six.StringIO()
+        sys.stderr = fileLikeOpen
+        os.system(musescoreRun)
+        fileLikeOpen.close()
+        sys.stderr = storedStrErr
 
         if subformatExtension == 'png':
             return self.findPNGfpFromXMLfp(fpOut)
@@ -1318,18 +1318,11 @@ class Test(unittest.TestCase):
         '''
         env = environment.Environment()
         tempfp = env.getTempFile()
-        tempfp += ".xml"
-        if six.PY3:
-            from unittest import mock  # @UnusedImport # pylint: disable=no-name-in-module
-        else:
-            from music21.ext import mock # @Reimport
-        with mock.patch('music21.converter.subConverters.glob.glob') as mockConv:
-            mockConv.return_value = [0]
-            xmlconverter = ConverterMusicXML()
-            xmlconverter.findPNGfpFromXMLfp(tempfp)
-            mockConv.return_value = []
-            xmlconverter = ConverterMusicXML()
-            self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, tempfp)
+        xmlfp = tempfp + ".xml"
+        os.rename(tempfp, tempfp + "-0001.png")
+        tempfp += "-0001.png"
+        xmlconverter = ConverterMusicXML()
+        self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, xmlfp)
 
 
 class TestExternal(unittest.TestCase):
