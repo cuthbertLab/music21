@@ -159,7 +159,9 @@ class Lyric(style.StyleMixin):
             applyRaw = kwargs['applyRaw']
         else:
             applyRaw = False
-        self.setTextAndSyllabic(text, applyRaw)
+        if text is not None:
+            self.setTextAndSyllabic(text, applyRaw)
+        
         self.number = number
 
         if 'identifier' in kwargs:
@@ -267,6 +269,18 @@ class Lyric(style.StyleMixin):
         'hel'
         >>> l.rawText
         'hel-'
+
+        >>> l = note.Lyric("-lo")
+        >>> l.rawText
+        '-lo'
+
+        >>> l = note.Lyric("-ti-")
+        >>> l.rawText
+        '-ti-'
+
+        >>> l = note.Lyric("bye")
+        >>> l.rawText
+        'bye'
         '''
         if self.syllabic == 'begin':
             return self.text + '-'
@@ -285,6 +299,14 @@ class Lyric(style.StyleMixin):
         number; lyric order is always stored in this form. Descriptive
         identifiers like 'part2verse1' which can be found in the musicXML
         lyric number attribute should be stored in self.identifier.
+        
+        >>> l = note.Lyric("Hi")
+        >>> l.number = 5
+        >>> l.number
+        5
+        >>> l.number = None
+        Traceback (most recent call last):
+        music21.note.LyricException: Number best be number
         '''
         return self._number
 
@@ -368,7 +390,7 @@ class GeneralNote(base.Music21Object):
 
     #---------------------------------------------------------------------------
     @common.deprecated('December 2016', 'December 2017', 'use .style.color instead')
-    def _getColor(self):
+    def _getColor(self): # pragma: no-cover
         '''
         DEPRECATED: use `.style.color`
 
@@ -384,12 +406,13 @@ class GeneralNote(base.Music21Object):
         >>> a.style.color
         '#235409'
         '''
+        # pragma: no-cover
         if self._style is not None:
             return self.style.color
         else:
             return None
 
-    def _setColor(self, value):
+    def _setColor(self, value): # pragma: no-cover
         r'''
         should check data here
         uses this re: #[\dA-F]{6}([\dA-F][\dA-F])?
@@ -550,6 +573,16 @@ class GeneralNote(base.Music21Object):
         [<music21.note.Lyric number=1 syllabic=single text="first">,
          <music21.note.Lyric number=2 syllabic=single text="newSecond">,
          <music21.note.Lyric number=3 syllabic=single text="second">]
+         
+        Test number as lyric...
+         
+        >>> n1.insertLyric(0, 3)
+        >>> n1.lyrics
+        [<music21.note.Lyric number=1 syllabic=single text="first">, 
+         <music21.note.Lyric number=2 syllabic=single text="newSecond">, 
+         <music21.note.Lyric number=3 syllabic=single text="second">, 
+         <music21.note.Lyric number=4 syllabic=single text="0">]
+
         '''
         if not isinstance(text, six.string_types):
             text = str(text)
@@ -580,33 +613,45 @@ class GeneralNote(base.Music21Object):
         If `inPlace` is True, this is done in-place and the method returns None.
         If `inPlace` is False, this returns a modified deepcopy.
 
+        TODO: make inPlace=False as with all other tests...
+        
+        Note: inPlace will be False as of version 5.
 
-        >>> n = note.Note('g#')
+
+        >>> n = note.Note('g#', inPlace=True)
         >>> n.quarterLength = 3
         >>> n.augmentOrDiminish(2)
         >>> n.quarterLength
         6.0
 
         >>> c = chord.Chord(['g#', 'a#', 'd'])
-        >>> n.quarterLength = 2
-        >>> n.augmentOrDiminish(.25)
-        >>> n.quarterLength
+        >>> c.quarterLength = 2
+        >>> c.augmentOrDiminish(.25, inPlace=True)
+        >>> c.quarterLength
         0.5
 
         >>> n = note.Note('g#')
         >>> n.augmentOrDiminish(-1)
         Traceback (most recent call last):
         music21.note.NoteException: scalar must be greater than zero
+
+        >>> n = note.Note()
+        >>> n.quarterLength = 3
+        >>> n2 = n.augmentOrDiminish(1.0/3, inPlace=False)
+        >>> n2.quarterLength
+        1.0
+        >>> n.quarterLength
+        3.0
         '''
         if not scalar > 0:
             raise NoteException('scalar must be greater than zero')
 
         if inPlace:
             post = self
-        else:
+        else:  # slight speedup could happen by setting duration to Zero before copying.
             post = copy.deepcopy(self)
 
-        # inPlace always True b/c we have already made a copy if necessary
+        # this is never True.
         post.duration = post.duration.augmentOrDiminish(scalar)
 
         if not inPlace:
@@ -741,7 +786,7 @@ class NotRest(GeneralNote):
 
     def _setStemDirection(self, direction):
         if direction is None:
-            direction = None # allow setting to none or None
+            direction = 'unspecified' # allow setting to None meaning 
         elif direction == 'none':
             direction = 'noStem' # allow setting to none or None
         elif direction not in stemDirectionNames:
@@ -756,12 +801,33 @@ class NotRest(GeneralNote):
         >>> note.stemDirectionNames
         ['double', 'down', 'noStem', 'none', 'unspecified', 'up']
         >>> n = note.Note()
+        
+        By default a Note's stemDirection is 'unspecified'
+        meaning that it is unknown:
+        
+        >>> n.stemDirection
+        'unspecified'
+        
         >>> n.stemDirection = 'noStem'
         >>> n.stemDirection
         'noStem'
+        
+        The alias 'none' (the string) is the same as 'noStem'
+        
+        >>> n.stemDirection = 'none'
+        >>> n.stemDirection
+        'noStem'
+        
         >>> n.stemDirection = 'junk'
         Traceback (most recent call last):
         music21.note.NotRestException: not a valid stem direction name: junk
+        
+        Stem direction can be set explicitly to None to remove
+        any prior stem information, same as 'unspecified':
+        
+        >>> n.stemDirection = None
+        >>> n.stemDirection
+        'unspecified'
         ''')
 
 
@@ -967,6 +1033,11 @@ class Note(NotRest):
     >>> n = note.Note(name='D#')
     >>> n.name
     'D#'
+    >>> n = note.Note(nameWithOctave='D#5')
+    >>> n.nameWithOctave
+    'D#5'
+
+
     '''
     isNote = True
     isRest = False
@@ -1148,12 +1219,12 @@ class Note(NotRest):
         ''')
 
 
-    @common.deprecated("May 2014", "May 2017", "use pitch.accidental instead")
-    def _getAccidental(self):
+    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.accidental instead")
+    def _getAccidental(self): # pragma: no-cover
         return self.pitch.accidental
 
-    @common.deprecated("May 2014", "May 2017", "use pitch.accidental instead")
-    def _setAccidental(self, value):
+    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.accidental instead")
+    def _setAccidental(self, value): # pragma: no-cover
         '''
         Adds an accidental to the Note, given as an Accidental object.
         Also alters the name of the note
@@ -1168,6 +1239,7 @@ class Note(NotRest):
         >>> a.name
         'D#'
         '''
+        # pragma: no-cover
         if isinstance(value, six.string_types):
             accidental = pitch.Accidental(value)
         else:
@@ -1195,12 +1267,12 @@ class Note(NotRest):
         See :attr:`~music21.pitch.Pitch.step`.
         ''')
 
-    @common.deprecated("May 2014", "May 2017", "use pitch.frequency instead")
-    def _getFrequency(self):
+    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.frequency instead")
+    def _getFrequency(self): # pragma: no-cover
         return self.pitch.frequency
 
-    @common.deprecated("May 2014", "May 2017", "use pitch.frequency instead")
-    def _setFrequency(self, value):
+    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.frequency instead")
+    def _setFrequency(self, value): # pragma: no-cover
         self.pitch.frequency = value
 
     frequency = property(_getFrequency, _setFrequency,
@@ -1224,12 +1296,12 @@ class Note(NotRest):
         See :attr:`~music21.pitch.Pitch.octave`.''')
 
 
-    @common.deprecated("May 2014", "May 2017", "use pitch.midi instead")
-    def _getMidi(self):
+    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.midi instead")
+    def _getMidi(self): # pragma: no-cover
         return self.pitch.midi
 
-    @common.deprecated("May 2014", "May 2017", "use pitch.midi instead")
-    def _setMidi(self, value):
+    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.midi instead")
+    def _setMidi(self, value): # pragma: no-cover
         self.pitch.midi = value
 
     midi = property(_getMidi, _setMidi,
@@ -1243,12 +1315,12 @@ class Note(NotRest):
         DEPRECATED May 2014: use n.pitch.midi instead
         ''')
 
-    @common.deprecated("May 2014", "May 2017", "use pitch.ps instead")
-    def _getPs(self):
+    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.ps instead")
+    def _getPs(self): # pragma: no-cover
         return self.pitch.ps
 
-    @common.deprecated("May 2014", "May 2017", "use pitch.ps instead")
-    def _setPs(self, value):
+    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.ps instead")
+    def _setPs(self, value): # pragma: no-cover
         self.pitch.ps = value
 
     ps = property(_getPs, _setPs,
@@ -1262,12 +1334,12 @@ class Note(NotRest):
         DEPRECATED May 2014: use n.pitch.ps instead
         ''')
 
-    @common.deprecated("May 2014", "May 2017", "use pitch.microtone instead")
-    def _getMicrotone(self):
+    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.microtone instead")
+    def _getMicrotone(self): # pragma: no-cover
         return self.pitch.microtone
 
-    @common.deprecated("May 2014", "May 2017", "use pitch.microtone instead")
-    def _setMicrotone(self, value):
+    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.microtone instead")
+    def _setMicrotone(self, value): # pragma: no-cover
         self.pitch.microtone = value
 
     microtone = property(_getMicrotone, _setMicrotone,
@@ -1280,12 +1352,12 @@ class Note(NotRest):
         ''')
 
 
-    @common.deprecated("May 2014", "May 2017", "use pitch.pitchClass instead")
-    def _getPitchClass(self):
+    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.pitchClass instead")
+    def _getPitchClass(self): # pragma: no-cover
         return self.pitch.pitchClass
 
-    @common.deprecated("May 2014", "May 2017", "use pitch.pitchClass instead")
-    def _setPitchClass(self, value):
+    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.pitchClass instead")
+    def _setPitchClass(self, value): # pragma: no-cover
         self.pitch.pitchClass = value
 
     pitchClass = property(_getPitchClass, _setPitchClass,
@@ -1296,12 +1368,12 @@ class Note(NotRest):
         ''')
 
 
-    @common.deprecated("May 2014", "May 2017", "use pitch.pitchClassString instead")
-    def _getPitchClassString(self):
+    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.pitchClassString instead")
+    def _getPitchClassString(self): # pragma: no-cover
         return self.pitch.pitchClassString
 
-    @common.deprecated("May 2014", "May 2017", "use pitch.pitchClassString instead")
-    def _setPitchClassString(self, value):
+    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.pitchClassString instead")
+    def _setPitchClassString(self, value): # pragma: no-cover
         self.pitch.pitchClassString = value
 
     pitchClassString = property(_getPitchClassString, _setPitchClassString,
@@ -1316,8 +1388,8 @@ class Note(NotRest):
         ''')
 
     @property
-    @common.deprecated('December 2016', 'December 2017', 'use `.pitch.diatonicNoteNum instead')
-    def diatonicNoteNum(self):
+    @common.deprecated('December 2016', 'December 2017, v.5', 'use `.pitch.diatonicNoteNum instead')
+    def diatonicNoteNum(self): # pragma: no-cover
         '''
         DEPRECATED: use .pitch.diatonicNoteNum instead.
 
@@ -1334,10 +1406,7 @@ class Note(NotRest):
 
     def _setPitches(self, value):
         if common.isListLike(value):
-            if 'Pitch' in value[0].classes:
-                self.pitch = value[0]
-            else:
-                raise NoteException('must provide a list containing a Pitch, not: %s' % value)
+            self.pitch = value[0]
         else:
             raise NoteException('cannot set pitches with provided object: %s' % value)
 
@@ -1354,13 +1423,30 @@ class Note(NotRest):
         >>> n.pitches
         (<music21.pitch.Pitch G#>,)
 
-        If given a list or tuple, only the first one will be used:
+        Since this is a Note, not a chord, from the list or tuple, only the first one will be used:
 
         >>> n.pitches = [pitch.Pitch('c2'), pitch.Pitch('g2')]
         >>> n.nameWithOctave
         'C2'
         >>> n.pitches
         (<music21.pitch.Pitch C2>,)
+        
+        The value for setting must be a list or tuple:
+        
+        >>> n.pitches = pitch.Pitch('C4')
+        Traceback (most recent call last):
+        music21.note.NoteException: cannot set pitches with provided object: C4
+        
+        For setting a single one, use `n.pitch` instead.
+        
+        Don't use strings, or you will get a string back!
+        
+        >>> n.pitches = ('C4', 'D4')
+        >>> n.pitch
+        'C4'
+        >>> n.pitch.diatonicNoteNum
+        Traceback (most recent call last):
+        AttributeError: 'str' object has no attribute 'diatonicNoteNum'
         ''')
 
 
@@ -1479,14 +1565,29 @@ class Unpitched(NotRest):
 
     The `Unpitched` object does not currently do anything and should
     not be used.
+    
+    >>> unp = note.Unpitched()
+    
+    Unpitched elements have displayStep and displayOctave
+    which shows where they should be displayed, but they do not have pitch
+    objects:
+    
+    >>> unp.displayStep
+    'C'
+    >>> unp.displayOctave
+    4
+    >>> unp.displayStep = 'G'
+    >>> unp.pitch
+    Traceback (most recent call last):
+    AttributeError: 'Unpitched' object has no attribute 'pitch'
     '''
-    displayStep = "C"
-    displayOctave = 4
     isNote = False
     isRest = False
 
     def __init__(self):
         super(Unpitched, self).__init__()
+        self.displayStep = "C"
+        self.displayOctave = 4
         self._storedInstrument = None
 
     def _getStoredInstrument(self):
@@ -1499,7 +1600,14 @@ class Unpitched(NotRest):
 
     def displayPitch(self):
         '''
-        returns a pitch object that is the same as the displayStep and displayOctave
+        returns a pitch object that is the same as the displayStep and displayOctave.
+        it will never have an accidental.
+
+        >>> unp = note.Unpitched()
+        >>> unp.displayStep = 'E'
+        >>> unp.displayOctave = 4
+        >>> unp.displayPitch()
+        <music21.pitch.Pitch E4>
         '''
         p = pitch.Pitch()
         p.step = self.displayStep
@@ -1631,6 +1739,10 @@ class SpacerRest(Rest):
     This object should only be used for making hidden space in a score in lilypond.
 
     This may become deprecated at some point...
+    
+    >>> sr = note.SpacerRest(type='whole')
+    >>> sr
+    <music21.note.SpacerRest rest duration=4.0>
     '''
     def __init__(self, *arguments, **keywords):
         super(SpacerRest, self).__init__(**keywords)
@@ -1643,8 +1755,9 @@ class SpacerRest(Rest):
 #-------------------------------------------------------------------------------
 # test methods and classes
 
-class TestExternal(unittest.TestCase):
-    '''These are tests that open windows and rely on external software
+class TestExternal(unittest.TestCase): # pragma: no-cover
+    '''
+    These are tests that open windows and rely on external software
     '''
 
     def runTest(self):
@@ -1700,12 +1813,22 @@ class Test(unittest.TestCase):
             if callable(name) and not isinstance(name, types.FunctionType):
                 try: # see if obj can be made w/ args
                     obj = name()
-                except TypeError:
+                except TypeError: # pragma: no-cover
                     continue
                 a = copy.copy(obj)
                 b = copy.deepcopy(obj)
                 self.assertNotEqual(id(a), id(b))
 
+    def testLyricRepr(self):
+        l = Lyric()
+        self.assertEqual(repr(l), '<music21.note.Lyric number=1>')
+        l.text = 'hi'
+        self.assertEqual(repr(l), '<music21.note.Lyric number=1 text="hi">')
+        l.identifier = 'verse'
+        self.assertEqual(repr(l), '<music21.note.Lyric number=1 identifier="verse" text="hi">')
+        l.text = None
+        self.assertEqual(repr(l), '<music21.note.Lyric number=1 identifier="verse">')
+        
 
     def testComplex(self):
         note1 = Note()

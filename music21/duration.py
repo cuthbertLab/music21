@@ -1006,11 +1006,8 @@ class Tuplet(object):
         for the duration (by default).  Or if inPlace is
         set to False, returns a new duration that has
         the new length.
-
-        Note that the default for inPlace is the opposite
-        of what it is for augmentOrDiminish on a Stream.
-        This is done purposely to reflect the most common
-        usage.
+        
+        # TODO: add inPlace setting.
 
         >>> a = duration.Tuplet()
         >>> a.setRatio(6, 2)
@@ -1703,8 +1700,9 @@ class Duration(SlottedObjectMixin):
 
     def augmentOrDiminish(self, amountToScale, retainComponents=False):
         '''
-        Given a number greater than zero,
-        multiplies the current quarterLength of the
+        Given a number greater than zero, creates a new Duration object
+        after
+        multiplying the current quarterLength of the
         duration by the number and resets the components
         for the duration (by default).
 
