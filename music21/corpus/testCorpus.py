@@ -20,9 +20,9 @@ class Test(unittest.TestCase):
 
     def testGetPaths(self):
         for known in [
-            'schumann_clara/opus17/movement3.xml',
-            'schoenberg/opus19/movement2.mxl',
-            'palestrina/agnus_0.krn',
+                'schumann_clara/opus17/movement3.xml',
+                'schoenberg/opus19/movement2.mxl',
+                'palestrina/agnus_02.krn',
             ]:
             a = corpus.getWork(known)
             # make sure it is not an empty list
@@ -56,8 +56,7 @@ class Test(unittest.TestCase):
         # can get a single file just by file name
         filePath = corpus.getWork('fortunaDunGranTempo')
         filePath = re.sub(r'\\', '/', filePath)
-        self.assertEqual(filePath.endswith(
-            'josquin/fortunaDunGranTempo.abc'), True)
+        self.assertEqual(filePath.endswith('josquin/fortunaDunGranTempo.abc'), True)
         filePathCollection = corpus.getComposer('josquin')
         self.assertEqual(len(filePathCollection) >= 8, True)
         filePathCollection = corpus.getComposer('josquin', ['abc'])
@@ -95,23 +94,23 @@ class Test(unittest.TestCase):
             (u'essenFolksong/han1.abc', u'528'),
             (u'essenFolksong/han1.abc', u'529'),
             (u'essenFolksong/han1.abc', u'530'),
-             (u'essenFolksong/han2.abc', u'204'),
-             (u'essenFolksong/han2.abc', u'205'),
-             (u'essenFolksong/han2.abc', u'206'),
-             (u'essenFolksong/han2.abc', u'207'),
-             (u'essenFolksong/han2.abc', u'208'),
-             (u'essenFolksong/han2.abc', u'209'),
-             (u'essenFolksong/han2.abc', u'210'),
-             (u'essenFolksong/han2.abc', u'211'),
-             (u'essenFolksong/han2.abc', u'212'),
-             (u'essenFolksong/han2.abc', u'213'),
-             (u'essenFolksong/han2.abc', u'214'),
-             (u'essenFolksong/han2.abc', u'215'),
-             (u'essenFolksong/han2.abc', u'216'),
-             (u'essenFolksong/han2.abc', u'217'),
-             (u'essenFolksong/han2.abc', u'218'),
-             (u'essenFolksong/han2.abc', u'219'),
-             (u'essenFolksong/han2.abc', u'220'),
+            (u'essenFolksong/han2.abc', u'204'),
+            (u'essenFolksong/han2.abc', u'205'),
+            (u'essenFolksong/han2.abc', u'206'),
+            (u'essenFolksong/han2.abc', u'207'),
+            (u'essenFolksong/han2.abc', u'208'),
+            (u'essenFolksong/han2.abc', u'209'),
+            (u'essenFolksong/han2.abc', u'210'),
+            (u'essenFolksong/han2.abc', u'211'),
+            (u'essenFolksong/han2.abc', u'212'),
+            (u'essenFolksong/han2.abc', u'213'),
+            (u'essenFolksong/han2.abc', u'214'),
+            (u'essenFolksong/han2.abc', u'215'),
+            (u'essenFolksong/han2.abc', u'216'),
+            (u'essenFolksong/han2.abc', u'217'),
+            (u'essenFolksong/han2.abc', u'218'),
+            (u'essenFolksong/han2.abc', u'219'),
+            (u'essenFolksong/han2.abc', u'220'),
             ])
 
     def testSearch04(self):
