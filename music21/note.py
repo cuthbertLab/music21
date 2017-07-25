@@ -390,7 +390,7 @@ class GeneralNote(base.Music21Object):
 
     #---------------------------------------------------------------------------
     @common.deprecated('December 2016', 'December 2017', 'use .style.color instead')
-    def _getColor(self): # pragma: no-cover
+    def _getColor(self): # pragma: no cover
         '''
         DEPRECATED: use `.style.color`
 
@@ -406,13 +406,12 @@ class GeneralNote(base.Music21Object):
         >>> a.style.color
         '#235409'
         '''
-        # pragma: no-cover
         if self._style is not None:
             return self.style.color
         else:
             return None
 
-    def _setColor(self, value): # pragma: no-cover
+    def _setColor(self, value): # pragma: no cover
         r'''
         should check data here
         uses this re: #[\dA-F]{6}([\dA-F][\dA-F])?
@@ -1220,11 +1219,11 @@ class Note(NotRest):
 
 
     @common.deprecated("May 2014", "September 2017, v.5", "use pitch.accidental instead")
-    def _getAccidental(self): # pragma: no-cover
+    def _getAccidental(self): # pragma: no cover
         return self.pitch.accidental
 
     @common.deprecated("May 2014", "September 2017, v.5", "use pitch.accidental instead")
-    def _setAccidental(self, value): # pragma: no-cover
+    def _setAccidental(self, value): # pragma: no cover
         '''
         Adds an accidental to the Note, given as an Accidental object.
         Also alters the name of the note
@@ -1239,7 +1238,6 @@ class Note(NotRest):
         >>> a.name
         'D#'
         '''
-        # pragma: no-cover
         if isinstance(value, six.string_types):
             accidental = pitch.Accidental(value)
         else:
@@ -1268,11 +1266,11 @@ class Note(NotRest):
         ''')
 
     @common.deprecated("May 2014", "September 2017, v.5", "use pitch.frequency instead")
-    def _getFrequency(self): # pragma: no-cover
+    def _getFrequency(self): # pragma: no cover
         return self.pitch.frequency
 
     @common.deprecated("May 2014", "September 2017, v.5", "use pitch.frequency instead")
-    def _setFrequency(self, value): # pragma: no-cover
+    def _setFrequency(self, value): # pragma: no cover
         self.pitch.frequency = value
 
     frequency = property(_getFrequency, _setFrequency,
@@ -1297,11 +1295,11 @@ class Note(NotRest):
 
 
     @common.deprecated("May 2014", "September 2017, v.5", "use pitch.midi instead")
-    def _getMidi(self): # pragma: no-cover
+    def _getMidi(self): # pragma: no cover
         return self.pitch.midi
 
     @common.deprecated("May 2014", "September 2017, v.5", "use pitch.midi instead")
-    def _setMidi(self, value): # pragma: no-cover
+    def _setMidi(self, value): # pragma: no cover
         self.pitch.midi = value
 
     midi = property(_getMidi, _setMidi,
@@ -1316,11 +1314,11 @@ class Note(NotRest):
         ''')
 
     @common.deprecated("May 2014", "September 2017, v.5", "use pitch.ps instead")
-    def _getPs(self): # pragma: no-cover
+    def _getPs(self): # pragma: no cover
         return self.pitch.ps
 
     @common.deprecated("May 2014", "September 2017, v.5", "use pitch.ps instead")
-    def _setPs(self, value): # pragma: no-cover
+    def _setPs(self, value): # pragma: no cover
         self.pitch.ps = value
 
     ps = property(_getPs, _setPs,
@@ -1335,11 +1333,11 @@ class Note(NotRest):
         ''')
 
     @common.deprecated("May 2014", "September 2017, v.5", "use pitch.microtone instead")
-    def _getMicrotone(self): # pragma: no-cover
+    def _getMicrotone(self): # pragma: no cover
         return self.pitch.microtone
 
     @common.deprecated("May 2014", "September 2017, v.5", "use pitch.microtone instead")
-    def _setMicrotone(self, value): # pragma: no-cover
+    def _setMicrotone(self, value): # pragma: no cover
         self.pitch.microtone = value
 
     microtone = property(_getMicrotone, _setMicrotone,
@@ -1353,11 +1351,11 @@ class Note(NotRest):
 
 
     @common.deprecated("May 2014", "September 2017, v.5", "use pitch.pitchClass instead")
-    def _getPitchClass(self): # pragma: no-cover
+    def _getPitchClass(self): # pragma: no cover
         return self.pitch.pitchClass
 
     @common.deprecated("May 2014", "September 2017, v.5", "use pitch.pitchClass instead")
-    def _setPitchClass(self, value): # pragma: no-cover
+    def _setPitchClass(self, value): # pragma: no cover
         self.pitch.pitchClass = value
 
     pitchClass = property(_getPitchClass, _setPitchClass,
@@ -1369,11 +1367,11 @@ class Note(NotRest):
 
 
     @common.deprecated("May 2014", "September 2017, v.5", "use pitch.pitchClassString instead")
-    def _getPitchClassString(self): # pragma: no-cover
+    def _getPitchClassString(self): # pragma: no cover
         return self.pitch.pitchClassString
 
     @common.deprecated("May 2014", "September 2017, v.5", "use pitch.pitchClassString instead")
-    def _setPitchClassString(self, value): # pragma: no-cover
+    def _setPitchClassString(self, value): # pragma: no cover
         self.pitch.pitchClassString = value
 
     pitchClassString = property(_getPitchClassString, _setPitchClassString,
@@ -1389,7 +1387,7 @@ class Note(NotRest):
 
     @property
     @common.deprecated('December 2016', 'December 2017, v.5', 'use `.pitch.diatonicNoteNum instead')
-    def diatonicNoteNum(self): # pragma: no-cover
+    def diatonicNoteNum(self): # pragma: no cover
         '''
         DEPRECATED: use .pitch.diatonicNoteNum instead.
 
@@ -1755,7 +1753,7 @@ class SpacerRest(Rest):
 #-------------------------------------------------------------------------------
 # test methods and classes
 
-class TestExternal(unittest.TestCase): # pragma: no-cover
+class TestExternal(unittest.TestCase): # pragma: no cover
     '''
     These are tests that open windows and rely on external software
     '''
@@ -1813,7 +1811,7 @@ class Test(unittest.TestCase):
             if callable(name) and not isinstance(name, types.FunctionType):
                 try: # see if obj can be made w/ args
                     obj = name()
-                except TypeError: # pragma: no-cover
+                except TypeError: # pragma: no cover
                     continue
                 a = copy.copy(obj)
                 b = copy.deepcopy(obj)

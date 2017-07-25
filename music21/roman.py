@@ -2481,7 +2481,7 @@ class Test(unittest.TestCase):
         self.assertEqual(rn.figure, 'I#853')
 
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
         pass

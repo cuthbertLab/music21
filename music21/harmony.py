@@ -2368,7 +2368,7 @@ class Test(unittest.TestCase):
         self.assertEqual(b.nameWithOctave, 'E-3')
 
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
         pass

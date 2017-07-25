@@ -155,7 +155,7 @@ class Test(unittest.TestCase):
         # run a reduced version
         pitchedPhase(cycles=cycles, show=show)
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
         pass

@@ -1457,10 +1457,6 @@ def analysisClassFromMethodName(method):
     return match
 
 #------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
 
 class Test(unittest.TestCase):

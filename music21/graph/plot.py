@@ -1441,7 +1441,7 @@ class Features(MultiStream):
         return data, xTicks, yTicks
 
 #------------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
 
 
     def testHorizontalBarPitchSpaceOffset(self):

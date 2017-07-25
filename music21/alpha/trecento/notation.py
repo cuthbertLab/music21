@@ -1936,7 +1936,7 @@ class TrecentoNotationException(exceptions21.Music21Exception):
     pass
 
 #--------------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
 
     def testTinyTrecentoStream(self):
         from music21.alpha import medren, trecento

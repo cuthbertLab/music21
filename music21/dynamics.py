@@ -405,7 +405,7 @@ class Diminuendo(DynamicWedge):
         return msg
 
 #-------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
         pass

@@ -911,7 +911,7 @@ class Test(unittest.TestCase):
         self.assertEqual(n1.pitch.accidental.alter, -1.0)
 
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
     def runTest(self):
         pass
     def testComplete(self):

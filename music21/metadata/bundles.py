@@ -659,7 +659,7 @@ class MetadataBundle(object):
                 environLocal.getRootTempDir(),
                 self.name + '.json',
                 )
-        else: # pragma: no-cover
+        else: # pragma: no cover
             filePath = os.path.join(
                 environLocal.getRootTempDir(),
                 'unnamed-corpus.json',

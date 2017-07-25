@@ -285,7 +285,7 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
         pass

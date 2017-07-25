@@ -1343,11 +1343,8 @@ class Test(unittest.TestCase):
                          [(1, 2, {}), (2, 2, {'color': 'red'}),
                           (3, 2, {}), (4, 2, {'color': 'red'})])
 
-class TestExternal(unittest.TestCase):
-    pass
-
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test, TestExternal)
+    music21.mainTest(Test)
 

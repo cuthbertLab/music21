@@ -94,7 +94,7 @@ class Test(unittest.TestCase):
         self.assertEqual(a.duration.quarterLength, 4.5)
 
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
     '''
     These objects generate PNGs, etc.
     '''

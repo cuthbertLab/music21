@@ -2879,7 +2879,7 @@ class Test(unittest.TestCase):
                          "DurationTuple(type='eighth', dots=0, quarterLength=0.5)")
         self.assertEqual(dn.duration.tuplets[0].durationNormal.dots, 0)
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
         pass

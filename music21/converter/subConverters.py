@@ -1325,7 +1325,7 @@ class Test(unittest.TestCase):
         self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, xmlfp)
 
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
     def runTest(self):
         pass
 

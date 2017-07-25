@@ -490,7 +490,7 @@ def js_q5():
 #-------------------------------------------------------------------------------
 tests = [simple4a, simple4b, simple4c, simple4e, simple4f]
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
         pass

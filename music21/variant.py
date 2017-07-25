@@ -2640,7 +2640,7 @@ class Test(unittest.TestCase):
 #         self.assertEqual(str(vb), '<music21.variant.VariantBundle of size 1>')
 #         self.assertEqual(len(vb), 1) # has one variant
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
         pass

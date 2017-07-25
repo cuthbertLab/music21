@@ -893,7 +893,7 @@ class CapellaImporter(object):
 class Test(unittest.TestCase):
     pass
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
     pass
 
     def testComplete(self):

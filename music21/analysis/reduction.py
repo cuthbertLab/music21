@@ -1273,7 +1273,7 @@ class Test(unittest.TestCase):
 #                             segmentByTarget=True, normalizeByPart=False)
 #         p.process()
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
 
     def testPartReductionB(self):
         t = Test()

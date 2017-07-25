@@ -1735,7 +1735,7 @@ class BachException(exceptions21.Music21Exception):
 #     def runTest(self):
 #         pass
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
         pass

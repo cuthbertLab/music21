@@ -137,7 +137,7 @@ def monophonicStreamFromFile(fileName, useScale=None):
 
 
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
     pass
 
     def runTest(self):

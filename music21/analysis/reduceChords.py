@@ -701,7 +701,7 @@ class Test(unittest.TestCase):
             s.append(c)
 
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
         pass

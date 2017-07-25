@@ -2515,7 +2515,7 @@ class Test(unittest.TestCase):
                          'Roman Numeral of B-,G is I')
 
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
         pass

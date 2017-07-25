@@ -1176,7 +1176,7 @@ class Test(unittest.TestCase):
         self.assertEqual(sfn[12].duration.quarterLength, 1.0)
         self.assertEqual(sfn[12].expressions[0].classes, expressions.Fermata().classes)
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
     def runTest(self):
         pass
 

@@ -2593,7 +2593,7 @@ class Test(unittest.TestCase):
         #s.show('lily.png')
 
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
     def xtestConvertNote(self):
         n = note.Note("C5")
         n.show('lily.png')

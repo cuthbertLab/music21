@@ -1317,7 +1317,7 @@ class MidiFile(object):
 
 
 #-------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
     '''
     These are tests that open windows and rely on external software
     '''

@@ -161,7 +161,7 @@ class StreamPlayer(object):
 class Test(unittest.TestCase):
     pass
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
 
     def testBachDetune(self):
         from music21 import corpus

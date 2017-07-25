@@ -2108,7 +2108,7 @@ class Test(unittest.TestCase):
         assert d.hiddenInterval(interval.Interval("AA4")) is False
 
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
     def runTest(self):
         pass
 

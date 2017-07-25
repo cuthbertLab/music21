@@ -321,7 +321,7 @@ class WindowedAnalysis(object):
 
 
 #------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
         pass

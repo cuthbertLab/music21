@@ -1904,7 +1904,7 @@ def fromString(instrumentString):
 
 
 #-------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
         pass
@@ -1930,7 +1930,7 @@ class Test(unittest.TestCase):
             if callable(name) and not isinstance(name, types.FunctionType):
                 try: # see if obj can be made w/ args
                     obj = name()
-                except TypeError:
+                except TypeError: # pragma: no cover
                     continue
                 i = copy.copy(obj)
                 j = copy.deepcopy(obj)

@@ -1130,7 +1130,7 @@ class Test(unittest.TestCase):
 #        assert n13.editorial.misc["capua2FictaInterval"].name == "P5"
 #        assert n13.style.color == "green"
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
         pass

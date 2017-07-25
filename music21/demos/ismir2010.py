@@ -619,7 +619,7 @@ class Test(unittest.TestCase):
         for func in funcList:
             func(show=False)
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
         pass

@@ -4572,7 +4572,7 @@ class SenzaMisuraTimeSignature(base.Music21Object):
 #------------------------------------------------------------------------------
 
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
     def runTest(self):
         pass
 

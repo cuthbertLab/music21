@@ -320,7 +320,7 @@ def getMetadataBundleByCorpus(corpusObject):
     cacheName = corpusObject.cacheName
     if cacheName in _metadataBundles:        
         return _metadataBundles[cacheName]
-    else: # pragma: no-cover
+    else: # pragma: no cover
         raise CorpusException('No metadata bundle found for corpus {0} with name {1}'.format(
             corpusObject, cacheName))
 

@@ -1821,7 +1821,7 @@ FUNCTIONS = [ch1_basic_I_A,
 
             ]
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
     def runTest(self):
         pass
 

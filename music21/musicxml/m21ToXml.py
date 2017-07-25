@@ -5445,7 +5445,7 @@ class Test(unittest.TestCase):
         #p.getElementsByClass('Measure')[1].insert(0.0, sl3)
         self.assertEqual(self.getXml(p).count(u'<slur '), 6)
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
     def runTest(self):
         pass
 

@@ -568,7 +568,7 @@ class ScoreFollower(object):
 #------------------------------------------------------------------------------
 
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
     pass
 
     def runTest(self):

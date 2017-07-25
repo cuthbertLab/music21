@@ -1230,7 +1230,7 @@ def thawStr(strData):
 
 
 #-------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
     # interpreter loading
 
     def runTest(self):

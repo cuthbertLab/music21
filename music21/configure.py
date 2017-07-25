@@ -1625,7 +1625,7 @@ class ConfigurationAssistant(object):
 _DOC_ORDER = []
 
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
         pass
