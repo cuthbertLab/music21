@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-
 '''
 aug30.py -- Short algorithmic composition demo in music21
 
