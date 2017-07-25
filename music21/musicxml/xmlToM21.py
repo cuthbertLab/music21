@@ -3503,8 +3503,8 @@ class MeasureParser(XMLParserBase):
         >>> n = note.Note()
         >>> MP.updateLyricsFromList(n, [mxLyric1, mxLyric2])
         >>> n.lyrics
-        [<music21.note.Lyric number=1 syllabic=single text="Hi">,
-         <music21.note.Lyric number=2 syllabic=single text="Hi">]
+        [<music21.note.Lyric number=1 text="Hi">,
+         <music21.note.Lyric number=2 text="Hi">]
         '''
         currentLyricNumber = 1
         for mxLyric in lyricList:
