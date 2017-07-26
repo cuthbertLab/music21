@@ -591,7 +591,7 @@ class Chord(note.NotRest):
 
         return useDuration
 
-    def append(self, notes, runSort=True):
+    def add(self, notes, runSort=True):
         '''
         Add a note, pitch, the notes of another chord, or string representing a pitch, 
         or a list of any of the above to a Chord.  
@@ -600,27 +600,27 @@ class Chord(note.NotRest):
         chord will be sorted. 
         
         >>> c = chord.Chord('C4 E4 G4')
-        >>> c.append('B3')
+        >>> c.add('B3')
         >>> c
         <music21.chord.Chord B3 C4 E4 G4>
         >>> c.duration
         <music21.duration.Duration 1.0>
         
-        >>> c.append('A2', runSort=False)
+        >>> c.add('A2', runSort=False)
         >>> c
         <music21.chord.Chord B3 C4 E4 G4 A2>
         
-        >>> c.append(['B5', 'C6'])
+        >>> c.add(['B5', 'C6'])
         >>> c
         <music21.chord.Chord A2 B3 C4 E4 G4 B5 C6>
         
-        >>> c.append(pitch.Pitch('D6'))
+        >>> c.add(pitch.Pitch('D6'))
         >>> c
         <music21.chord.Chord A2 B3 C4 E4 G4 B5 C6 D6>
 
         >>> n = note.Note('E6')
         >>> n.duration.type = 'half'
-        >>> c.append(n)
+        >>> c.add(n)
         >>> c
         <music21.chord.Chord A2 B3 C4 E4 G4 B5 C6 D6 E6>
         >>> c.duration

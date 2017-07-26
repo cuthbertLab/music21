@@ -43,8 +43,7 @@ def getCoverage():
         except ImportError:
             cov = None
     else:
-        cov = None # coverage is extremely slow on Python 3.4 for some reason
-            # in any case we only need to run it once.
+        cov = None
     return cov
 
 def stopCoverage(cov):
