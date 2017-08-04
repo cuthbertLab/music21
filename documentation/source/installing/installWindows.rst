@@ -8,15 +8,16 @@ Installing `music21` in Windows
 Get Python
 -------------------------------
 
-Python is a simple but powerful programming language that music21
+Python is a simple but powerful programming language that `music21`
 is written in and in which you will write your own programs that 
 use `music21`.  
 
-Windows users should download and install Python version 3.4. Python 2.7
-is still supported, but if you're learning Python for the first time,
-definitely go for Python 3.X.
+Windows users should download and install Python version 3.6. Python 2.7 
+is still supported for `music21` v. 4, but if you're learning Python for the first time,
+definitely go for Python 3.X.  Version 5 of `music21` will no longer support
+Python 2.
 
-To get Python 3.4 for Windows, go to http://www.python.org/download/ 
+To get Python 3.6 for Windows, go to http://www.python.org/download/ 
 and click on the "Windows installer" link.  It is probably the 
 first link.  Save the file to your desktop
 and then click on it there.
@@ -38,30 +39,23 @@ typing in "IDLE" or (on Windows Vista and newer) typing
 in "IDLE" in the Search Programs list.
 
 The first lines of text displayed will include a version number.  
-Make sure it begins with 2.7.3 or higher or 3.4 or higher.
+Make sure it begins with 3.4 or higher.
 
 If your version is too old, download a newer version as above.
-
-Download `music21`
--------------------------------
-
-Download the most-recent `music21` package from the following URL:
-
-  https://github.com/cuthbertLab/music21/releases
-
-Windows users should download the .exe file to their desktops
-and then click on it.
 
 
 Install `music21`
 -------------------------------
 
-Windows installation is easy. After downloading the `music21.exe`
-installer, click on it on your desktop, then follow and accept 
-the prompts for default install options. This installer simply 
-copies files into the Python site-packages directory. If the 
-installer quits without further notice the installation has 
-been successful. 
+Open up a command prompt and type:
+
+    pip install music21
+
+This will download and install `music21`.  If you already
+have `music21` but want to upgrade to the latest version, run:
+
+    pip install --upgrade music21
+
 
 To test to see if `music21` has been installed properly, go
 to the start menu and run (either by clicking "Run" in older
@@ -73,15 +67,22 @@ cannot find `music21` then you may have more than one version of
 Python on your system.  Try uninstalling all of them along with `music21`
 and then restarting from scratch).
 
+You should then configure `music21` to find your helper programs
+such as MuseScore or Finale.  In IDLE
+type:
 
+    import music21
+    music21.configure.run()
+    
+or in the command prompt, type:
 
+    python3 -m music21.configure
+    
 After Installation
 -------------------------------
 
 After a successful installation, you may proceed to :ref:`Notes <usersGuide_02_notes>` 
 to begin using `music21`.
-
-
 
 
 Installation Help
