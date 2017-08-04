@@ -231,7 +231,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     self.coreInsert(e.offset, e)
             except (AttributeError, TypeError):
                 raise StreamException("Unable to insert {0}".format(e))
-            self.elementsChanged()
+            self.coreElementsChanged()
 
 
     def __repr__(self):
@@ -407,7 +407,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for e in self.elements[k]:
                 found.coreInsert(self.elementOffset(e), e)
 
-            found.elementsChanged(clearIsSorted=False)
+            found.coreElementsChanged(clearIsSorted=False)
             return found
 
         elif isinstance(k, six.string_types):
@@ -450,7 +450,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         if 'elements' not in self._cache or self._cache["elements"] is None:
             # this list concatenation may take time; thus, only do when
-            # elementsChanged has been called
+            # coreElementsChanged has been called
             if not self.isSorted and self.autoSort:
                 self.sort() # will set isSorted to True
             self._cache["elements"] = self._elements + self._endElements
@@ -500,7 +500,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 self.setElementOffset(e, e.offset, addElement=True)
                 e.sites.add(self)
                 e.activeSite = self
-        self.elementsChanged()
+        self.coreElementsChanged()
         return value
 
     elements = property(_getElements, _setElements,
@@ -583,12 +583,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         if isinstance(value, Stream):
             # know that this is now not flat
-            self.elementsChanged(updateIsFlat=False) # set manualy
+            self.coreElementsChanged(updateIsFlat=False) # set manualy
             self.isFlat = False
         else:
             # cannot be sure if this is flat, as we do not know if
             # we replaced a Stream at this index
-            self.elementsChanged()
+            self.coreElementsChanged()
 
 
     def __delitem__(self, k):
@@ -603,7 +603,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         9
         '''
         del self._elements[k]
-        self.elementsChanged()
+        self.coreElementsChanged()
 
 
     def __add__(self, other):
@@ -659,7 +659,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for e in other._endElements:
             s.storeAtEnd(e)
 
-        #s.elementsChanged()
+        #s.coreElementsChanged()
         return s
 
     def __bool__(self):
@@ -714,7 +714,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         self.insert(0.0, clefObj)
         # for some reason needed to make sure that sorting of Clef happens before TimeSignature
         # TODO: Test if this can be deleted...
-        self.elementsChanged()
+        self.coreElementsChanged()
 
     clef = property(_getClef, _setClef, doc='''
         Finds or sets a :class:`~music21.clef.Clef` at offset 0.0 in the measure:
@@ -923,7 +923,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         True
         '''
         objId = id(obj)
-        return self._hasElementByObjectId(objId)
+        return self.coreHasElementByMemoryLocation(objId)
 
     def hasElementOfClass(self, className, forceFlat=False):
         '''
@@ -1012,7 +1012,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #                     break
 #             if len(classFilterList) == 0 or match:
 #                 self.storeAtEnd(e)
-        self.elementsChanged()
+        self.coreElementsChanged()
 
 
     def index(self, obj):
@@ -1241,7 +1241,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     del self._offsetDict[id(match)]
                 except KeyError:
                     pass
-                self.elementsChanged(clearIsSorted=False)
+                self.coreElementsChanged(clearIsSorted=False)
                 match.sites.remove(self)
                 match.activeSite = None
 
@@ -1266,7 +1266,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         self.setElementOffset(e, elementOffset-shiftDur)
             #if renumberMeasures is True and matchedEndElement is False:
             #   pass  # This should maybe just call a function renumberMeasures
-        self.elementsChanged(clearIsSorted=False)
+        self.coreElementsChanged(clearIsSorted=False)
 
     def pop(self, index):
         '''
@@ -1290,7 +1290,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else: # its in the _endElements
             post = self._endElements.pop(index - eLen)
 
-        self.elementsChanged(clearIsSorted=False)
+        self.coreElementsChanged(clearIsSorted=False)
 
         try:
             del self._offsetDict[id(post)]
@@ -1330,7 +1330,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 removeElement.activeSite = None
 
         # call elements changed once; sorted arrangement has not changed
-        self.elementsChanged(clearIsSorted=False)
+        self.coreElementsChanged(clearIsSorted=False)
         return
 
     def removeByClass(self, classFilterList):
@@ -1720,7 +1720,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             element = item
 
         # checks of element is self; possibly performs additional checks
-        self._addElementPreProcess(element)
+        self.coreGuardBeforeAddElement(element)
         # main insert procedure here
 
         storeSorted = self.coreInsert(offset, element,
@@ -1728,7 +1728,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         updateIsFlat = False
         if element.isStream:
             updateIsFlat = True
-        self.elementsChanged(updateIsFlat=updateIsFlat)
+        self.coreElementsChanged(updateIsFlat=updateIsFlat)
         if ignoreSort is False:
             self.isSorted = storeSorted
 
@@ -1932,7 +1932,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     "The object you tried to add to the Stream, {0}, ".format(repr(e)) +
                     "is not a Music21Object.  Use an ElementWrapper object " +
                     "if this is what you intend" )
-            self._addElementPreProcess(e)
+            self.coreGuardBeforeAddElement(e)
             # add this Stream as a location for the new elements, with the
             # the offset set to the current highestTime
             self.setElementOffset(e, highestTime, addElement=True)
@@ -1950,7 +1950,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # does not change sorted state
         storeSorted = self.isSorted
         # we cannot keep the index cache here b/c we might
-        self.elementsChanged(updateIsFlat=updateIsFlat)
+        self.coreElementsChanged(updateIsFlat=updateIsFlat)
         self.isSorted = storeSorted
         self._setHighestTime(highestTime) # call after to store in cache
 
@@ -1995,7 +1995,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                   'Duration into the highest time elements list')
 
         # checks of element is self; possibly performs additional checks
-        self._addElementPreProcess(element)
+        self.coreGuardBeforeAddElement(element)
 
 #         element.sites.add(self, 'highestTime')
 #         # need to explicitly set the activeSite of the element
@@ -2004,7 +2004,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         self.coreStoreAtEnd(element)
         # Streams cannot reside in end elements, thus do not update is flat
-        self.elementsChanged(updateIsFlat=False)
+        self.coreElementsChanged(updateIsFlat=False)
 
 
     #---------------------------------------------------------------------------
@@ -2174,7 +2174,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # these will not be in order
         self.insert(offsetOrItemOrList, itemOrNone)
         # call this is elements are now out of order
-        self.elementsChanged()
+        self.coreElementsChanged()
 
     #---------------------------------------------------------------------------
     # searching and replacing routines
@@ -2314,7 +2314,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if replacement.isStream:
             updateIsFlat = True
         # elements have changed: sort order may change b/c have diff classes
-        self.elementsChanged(updateIsFlat=updateIsFlat)
+        self.coreElementsChanged(updateIsFlat=updateIsFlat)
 
 #         if target is None:
 #             raise StreamException('received a target of None as a candidate for replacement.')
@@ -2351,7 +2351,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #             if replacement.isStream:
 #                 updateIsFlat = True
 #             # elements have changed: sort order may change b/c have diff classes
-#             containingStream.elementsChanged(updateIsFlat=updateIsFlat)
+#             containingStream.coreElementsChanged(updateIsFlat=updateIsFlat)
 
         if allDerived:
             for derivedSite in self.derivation.chain():
@@ -2629,7 +2629,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     #---------------------------------------------------------------------------
     # methods that act on individual elements without requiring
-    # @ elementsChanged to fire
+    # @ coreElementsChanged to fire
 
     def addGroupForElements(self, group, classFilter=None):
         '''
@@ -3692,7 +3692,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 #environLocal.printDebug(['Stream.measrues: copying spanners:', sp])
 
         # used coreInsert
-        returnObj.elementsChanged()
+        returnObj.coreElementsChanged()
         #environLocal.printDebug(['len(returnObj.flat)', len(returnObj.flat)])
         return returnObj
 
@@ -4770,7 +4770,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if match:
                 self.setElementOffset(e, self.elementOffset(e) + offset)
 
-        self.elementsChanged()
+        self.coreElementsChanged()
 
     def transferOffsetToElements(self):
         '''
@@ -4793,7 +4793,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         self.shiftElements(self.offset)
         self.offset = 0.0
-        self.elementsChanged()
+        self.coreElementsChanged()
 
 
     #--------------------------------------------------------------------------
@@ -4876,7 +4876,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for offset in offsets:
             elementCopy = copy.deepcopy(element)
             self.coreInsert(offset, elementCopy)
-        self.elementsChanged()
+        self.coreElementsChanged()
 
 
     def extractContext(self, searchElement, before=4.0, after=4.0,
@@ -4946,7 +4946,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if (o >= foundOffset - before and o < foundEnd + after):
                 #display.storeAtEnd(e)
                 display.coreStoreAtEnd(e)
-        display.elementsChanged()
+        display.coreElementsChanged()
         return display
 
 
@@ -5275,7 +5275,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnObj.makeRests(
                 refStreamOrTimeRange=(preLowestOffset, preHighestTime),
                 fillGaps=True, inPlace=True)
-        returnObj.elementsChanged()
+        returnObj.coreElementsChanged()
         return returnObj
 
 
@@ -5532,11 +5532,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         #  'in', m, 'localOffset', localOffset])
                         m.insert(localOffset, e)
                 # call for each measure
-                m.elementsChanged()
+                m.coreElementsChanged()
             # call this post now
             post = mStream
         else: # place in a single flat Stream
-            post.elementsChanged()
+            post.coreElementsChanged()
 
         if (hasattr(returnObj, 'metadata')
                 and returnObj.metadata is not None
@@ -5544,7 +5544,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             post.insert(0, returnObj.metadata)
         return post
 
-        #post.elementsChanged()
+        #post.coreElementsChanged()
         #return mStream
         #return post
 
@@ -5609,8 +5609,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             else:
                 #b.storeAtEnd(e)
                 b.coreStoreAtEnd(e)
-        a.elementsChanged()
-        b.elementsChanged()
+        a.coreElementsChanged()
+        b.coreElementsChanged()
         return a, b
 
 
@@ -6355,14 +6355,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     # get a new note
                     # we should not continue searching Measures
                     break
-            returnObj.elementsChanged()
+            returnObj.coreElementsChanged()
             return returnObj
 
         else:
             for i in posDelete:
                 # removing the note from notes
                 junk = notes.pop(i)
-            notes.elementsChanged()
+            notes.coreElementsChanged()
             return notes
 
 
@@ -6473,7 +6473,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
             # as sorting changes order, elements have changed;
             # need to clear cache, but flat status is the same
-            self.elementsChanged(updateIsFlat=False, clearIsSorted=False)
+            self.coreElementsChanged(updateIsFlat=False, clearIsSorted=False)
             self.isSorted = True
             #environLocal.printDebug(['_elements', self._elements])
 
@@ -6555,7 +6555,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             shallowEndElements = copy.copy(self._endElements) # already a copy
             s = copy.copy(self)
             # assign directly to _elements, as we do not need to call
-            # elementsChanged()
+            # coreElementsChanged()
             s._elements = shallowElements
             s._endElements = shallowEndElements
 
@@ -6575,7 +6575,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #         shallowEndElements = copy.copy(self._endElements) # already a copy
 #         newStream = copy.copy(self)
 #         # assign directly to _elements, as we do not need to call
-#         # elementsChanged()
+#         # coreElementsChanged()
 #         newStream._elements = shallowElements
 #         newStream._endElements = shallowEndElements
 #
@@ -6624,7 +6624,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         sNew._offsetDict = {}
         sNew._elements = []
         sNew._endElements = []
-        sNew.elementsChanged()
+        sNew.coreElementsChanged()
 
         ri = iterator.RecursiveIterator(self,
                                         restoreActiveSites=False,
@@ -6642,7 +6642,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if self.autoSort is True:
             sNew.sort() # sort it immediately so that cache is not invalidated
         else:
-            sNew.elementsChanged()
+            sNew.coreElementsChanged()
         # here, we store the source stream from which this stream was derived
         return sNew
 
@@ -7106,7 +7106,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for e in self.recurse(streamsOnly=True):
                 # do not recurse, as will get all Stream
                 e.makeMutable(recurse=False)
-        self.elementsChanged()
+        self.coreElementsChanged()
 
     #---------------------------------------------------------------------------
     # duration and offset methods and properties
@@ -8002,7 +8002,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                anchorZeroRecurse=anchorZeroRecurse,
                 inPlace=True)
 
-        returnObj.elementsChanged()
+        returnObj.coreElementsChanged()
         return returnObj
 
 
@@ -8030,7 +8030,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if e.duration is not None:
                 e.duration = e.duration.augmentOrDiminish(amountToScale)
 
-        returnObj.elementsChanged()
+        returnObj.coreElementsChanged()
         if inPlace is not True:
             return returnObj
 
@@ -8084,7 +8084,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         returnObj.scaleOffsets(amountToScale=amountToScale, anchorZero='lowest',
             anchorZeroRecurse=None, inPlace=True)
         returnObj.scaleDurations(amountToScale=amountToScale, inPlace=True)
-        returnObj.elementsChanged()
+        returnObj.coreElementsChanged()
 
         # do not need to call elements changed, as called in sub methods
         return returnObj
@@ -8317,14 +8317,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for m in returnObj.getElementsByClass('Measure'):
                 m.sliceByQuarterLengths(quarterLengthList,
                     target=target, addTies=addTies, inPlace=True)
-            returnObj.elementsChanged()
+            returnObj.coreElementsChanged()
             return returnObj # exit
 
         if returnObj.hasPartLikeStreams():
             for p in returnObj.getElementsByClass('Part'):
                 p.sliceByQuarterLengths(quarterLengthList,
                     target=target, addTies=addTies, inPlace=True)
-            returnObj.elementsChanged()
+            returnObj.coreElementsChanged()
             return returnObj # exit
 
         if not common.isListLike(quarterLengthList):
@@ -8371,7 +8371,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 returnObj.coreInsert(oInsert, eNew)
                 oInsert = opFrac(oInsert + eNew.quarterLength)
 
-        returnObj.elementsChanged()
+        returnObj.coreElementsChanged()
         return returnObj
 
 
@@ -8394,7 +8394,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # call on component measures
             for m in returnObj.getElementsByClass('Measure'):
                 m.sliceByGreatestDivisor(addTies=addTies, inPlace=True)
-            returnObj.elementsChanged()
+            returnObj.coreElementsChanged()
             return returnObj # exit
 
         uniqueQuarterLengths = []
@@ -8411,7 +8411,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         returnObj.sliceByQuarterLengths(quarterLengthList=[divisor],
             target=None, addTies=addTies, inPlace=True)
 
-        returnObj.elementsChanged()
+        returnObj.coreElementsChanged()
         return returnObj
 
 
@@ -8494,7 +8494,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     # insert at o, not oCut (duration into element)
                     returnObj.coreInsert(o, eNext)
                     oStartNext = o
-        returnObj.elementsChanged()
+        returnObj.coreElementsChanged()
         if inPlace is False:
             return returnObj
 
@@ -9555,7 +9555,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #     sOuter.coreInsert(e.offset, e)
         # for e in stream2:
         #     sOuter.coreInsert(e.offset, e)
-        # sOuter.elementsChanged(updateIsFlat=False)
+        # sOuter.coreElementsChanged(updateIsFlat=False)
         # sOuterTree = sOuter.asTree(flatten=False, groupOffsets=True)
         # return sorted(sOuterTree.simultaneityDict().keys())
 
@@ -10062,7 +10062,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     returnObj.coreInsert(shiftOffset + e.getOffsetBySite(v), e)
                 returnObj.remove(v)
 
-        returnObj.elementsChanged()
+        returnObj.coreElementsChanged()
         if not inPlace:
             return returnObj
         else:
@@ -10474,7 +10474,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         returnObj._fixMeasureNumbers(deletedMeasures, insertedMeasures)
 
         # have to clear cached variants, as they are no longer the same
-        returnObj.elementsChanged()
+        returnObj.coreElementsChanged()
         if not inPlace:
             return returnObj
         else:
@@ -12080,7 +12080,7 @@ class Part(Stream):
 
         Note that changing an instrument's .partName or .instrumentName while it
         is already in the Stream will not automatically update this unless
-        .elementsChanged() is called or this Stream's elements are otherwise altered.
+        .coreElementsChanged() is called or this Stream's elements are otherwise altered.
         This is because the value is cached so that O(n) searches through the Stream
         do not need to be done every time.
     ''')
@@ -12134,7 +12134,7 @@ class Part(Stream):
 
         Note that changing an instrument's .partAbbreviation or .instrumentAbbreviation while it
         is already in the Stream will not automatically update this unless
-        .elementsChanged() is called or this Stream's elements are otherwise altered.
+        .coreElementsChanged() is called or this Stream's elements are otherwise altered.
         This is because the value is cached so that O(n) searches through the Stream
         do not need to be done every time.
     ''')
@@ -12581,7 +12581,7 @@ class Score(Stream):
                 m.sliceByQuarterLengths(quarterLengthList=[divisor],
                     target=None, addTies=addTies, inPlace=True)
         del mStream # cleanup Streams
-        returnObj.elementsChanged()
+        returnObj.coreElementsChanged()
         return returnObj
 
     def partsToVoices(self, voiceAllocation=2, permitOneVoicePerPart=False, setStems=True):
@@ -12787,7 +12787,7 @@ class Score(Stream):
             # note: while the local-streams have updated their caches, the
             # containing score has an out-of-date cache of flat.
             # this, must call elements changed
-            returnStream.elementsChanged()
+            returnStream.coreElementsChanged()
         else: # call the base method
             super(Score, returnStream).makeNotation(meterStream=meterStream,
                                             refStreamOrTimeRange=refStreamOrTimeRange,
@@ -13063,7 +13063,7 @@ class SpannerStorage(Stream):
     provided by the Spanner in creation.
     '''
     def __init__(self, *arguments, **keywords):
-        Stream.__init__(self, *arguments, **keywords)
+        super(SpannerStorage, self).__init__(*arguments, **keywords)
 
         # must provide a keyword argument with a reference to the spanner
         # parent could name spannerContainer or other?
@@ -13075,7 +13075,7 @@ class SpannerStorage(Stream):
         if 'spannerParent' in keywords:
             self.spannerParent = keywords['spannerParent']
 
-    # NOTE: for serialization, this will need to properly tage
+    # NOTE: for serialization, this will need to properly tag
     # the spanner parent by updating the scaffolding code.
 
 
@@ -13097,7 +13097,7 @@ class VariantStorage(Stream):
 
     '''
     def __init__(self, *arguments, **keywords):
-        Stream.__init__(self, *arguments, **keywords)
+        super(VariantStorage, self).__init__(*arguments, **keywords)
         # must provide a keyword argument with a reference to the variant
         # parent
         self.variantParent = None

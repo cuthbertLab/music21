@@ -684,7 +684,7 @@ class StreamIterator(object):
 
 
         if fe:
-            found.elementsChanged(clearIsSorted=clearIsSorted)
+            found.coreElementsChanged(clearIsSorted=clearIsSorted)
 
         return found
 

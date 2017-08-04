@@ -639,7 +639,7 @@ class CTRule(object):
                         rn = roman.RomanNumeral(atom, ks)
                         if self.isSame(rn, lastChord) and lastChordIsInSameMeasure:
                             lastChord.duration.quarterLength += atomLength
-                            m.elementsChanged()
+                            m.coreElementsChanged()
                         else:
                             rn.duration.quarterLength = atomLength
                             self.addOptionalTieAndLyrics(rn, lastChord)

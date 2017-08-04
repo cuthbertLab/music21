@@ -345,7 +345,7 @@ class PartTranslator(object):
                                                                                 tracebackMessage))
 
         p = self.p
-        p.elementsChanged()
+        p.coreElementsChanged()
         fixPickupMeasure(p)
         p.makeBeams(inPlace=True)
         p.makeAccidentals(inPlace=True)
@@ -433,7 +433,7 @@ class PartTranslator(object):
 
             # create a new measure or copy a past measure
             if len(t.number) == 1 and t.isCopyDefinition: # if not a range
-                p.elementsChanged()
+                p.coreElementsChanged()
                 m, self.kCurrent = _copySingleMeasure(t, p, self.kCurrent)
                 p.coreAppend(m)
                 self.lastMeasureNumber = m.number
@@ -443,7 +443,7 @@ class PartTranslator(object):
                     self.previousRn = romans[-1]
 
             elif len(t.number) > 1:
-                p.elementsChanged()
+                p.coreElementsChanged()
                 measures, self.kCurrent = _copyMultipleMeasures(t, p, self.kCurrent)
                 p.append(measures) # appendCore does not work with list
                 self.lastMeasureNumber = measures[-1].number
@@ -485,7 +485,7 @@ class PartTranslator(object):
         if self.tsCurrent is not None:
             self.previousRn.quarterLength = (self.tsCurrent.barDuration.quarterLength
                                                 - self.currentOffsetInMeasure)
-        m.elementsChanged()
+        m.coreElementsChanged()
         return m
 
     def translateSingleMeasureAtom(self, i, a, m):

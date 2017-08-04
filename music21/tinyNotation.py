@@ -774,14 +774,14 @@ class Converter(object):
     Then we parse the time signature:
 
     >>> tnc.parseOne(0, tnc.preTokens[0])
-    >>> tnc.stream.elementsChanged()
+    >>> tnc.stream.coreElementsChanged()
     >>> tnc.stream.show('text')
     {0.0} <music21.meter.TimeSignature 4/4>
 
     Then the first note:
 
     >>> tnc.parseOne(1, tnc.preTokens[1])
-    >>> tnc.stream.elementsChanged()
+    >>> tnc.stream.coreElementsChanged()
     >>> tnc.stream.show('text')
     {0.0} <music21.meter.TimeSignature 4/4>
     {0.0} <music21.note.Note C##>
@@ -790,7 +790,7 @@ class Converter(object):
 
     >>> for i in range(2, 8):
     ...     tnc.parseOne(i, tnc.preTokens[i])
-    >>> tnc.stream.elementsChanged()
+    >>> tnc.stream.coreElementsChanged()
     >>> tnc.stream.show('text')
     {0.0} <music21.meter.TimeSignature 4/4>
     {0.0} <music21.note.Note C##>
@@ -828,7 +828,7 @@ class Converter(object):
     >>> tnc.parseOne(10, tnc.preTokens[10])
     >>> tnc.activeStates
     []
-    >>> tnc.stream.elementsChanged()
+    >>> tnc.stream.coreElementsChanged()
     >>> tnc.stream.show('text')
     {0.0} <music21.meter.TimeSignature 4/4>
     ...
@@ -842,7 +842,7 @@ class Converter(object):
     >>> tnc.preTokens[11]
     'C2=hello'
     >>> tnc.parseOne(11, tnc.preTokens[11])
-    >>> tnc.stream.elementsChanged()
+    >>> tnc.stream.coreElementsChanged()
     >>> tnc.stream.show('text')
     {0.0} <music21.meter.TimeSignature 4/4>
     ...

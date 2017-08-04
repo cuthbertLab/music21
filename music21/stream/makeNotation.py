@@ -603,7 +603,7 @@ def makeMeasures(
     for sp in spannerBundleAccum:
         post.append(sp)
 
-    post.elementsChanged()
+    post.coreElementsChanged()
 
     # clean up temporary streams to avoid extra site accumulation
     del srcObj
@@ -626,7 +626,7 @@ def makeMeasures(
         # with Measures created above
         s._elements = []
         s._endElements = []
-        s.elementsChanged()
+        s.coreElementsChanged()
         if post.isSorted:
             postSorted = post
         else:
@@ -788,7 +788,7 @@ def makeRests(s,
         bundle = [returnObj]
 
     for v in bundle:
-        v.elementsChanged()  # required to get correct offset times
+        v.coreElementsChanged()  # required to get correct offset times
         oLow = v.lowestOffset
         oHigh = v.highestTime
 
@@ -811,7 +811,7 @@ def makeRests(s,
             r.hideObjectOnPrint = hideRests
             # place at oHigh to reach to oHighTarget
             v.coreInsert(oHigh, r)
-        v.elementsChanged()  # must update otherwise might add double r
+        v.coreElementsChanged()  # must update otherwise might add double r
 
         if fillGaps:
             gapStream = v.findGaps()
@@ -821,7 +821,7 @@ def makeRests(s,
                     r.duration.quarterLength = e.duration.quarterLength
                     r.hideObjectOnPrint = hideRests
                     v.coreInsert(e.offset, r)
-        v.elementsChanged()
+        v.coreElementsChanged()
         #environLocal.printDebug(['post makeRests show()', v])
 
         # NOTE: this sorting has been found to be necessary, as otherwise
@@ -835,7 +835,7 @@ def makeRests(s,
 
     #s.isSorted = False
     # changes elements
-#         returnObj.elementsChanged()
+#         returnObj.coreElementsChanged()
 #         if returnObj.autoSort:
 #             returnObj.sort()
     if inPlace is not True:
@@ -1167,7 +1167,7 @@ def makeTies(s,
     del measureStream  # clean up unused streams
 
     # changes elements
-    returnObj.elementsChanged()
+    returnObj.coreElementsChanged()
     if not inPlace:
         return returnObj
     else:

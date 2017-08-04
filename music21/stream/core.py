@@ -19,7 +19,7 @@ any changes here for efficiency reasons while being considered
 backwards compatible so long as the public methods that call this
 remain stable.
 
-All attributes here will eventually begin with `.core`.
+All functions here will eventually begin with `.core`.
 '''
 #pylint: disable=attribute-defined-outside-init
 
@@ -69,7 +69,7 @@ class StreamCoreMixin(object):
         Only be used in contexts that we know we have a proper, single Music21Object.
         Best for usage when taking objects in a known Stream and creating a new Stream
 
-        When using this method, the caller is responsible for calling Stream.elementsChanged
+        When using this method, the caller is responsible for calling Stream.coreElementsChanged
         after all operations are completed.
 
         Do not mix coreInsert with coreAppend operations.
@@ -124,7 +124,7 @@ class StreamCoreMixin(object):
         determine elements changed, or similar operations.
 
         When using this method, the caller is responsible for calling
-        Stream.elementsChanged after all operations are completed.
+        Stream.coreElementsChanged after all operations are completed.
         '''
         # NOTE: this is not called by append, as that is optimized
         # for looping multiple elements
@@ -142,13 +142,19 @@ class StreamCoreMixin(object):
         if element.duration is not None:
             self._setHighestTime(ht + element.duration.quarterLength)
     #---------------------------------------------------------------------------
-    # adding and editing Elements and Streams -- all need to call elementsChanged
+    # adding and editing Elements and Streams -- all need to call coreElementsChanged
     # most will set isSorted to False
-
+    @common.deprecated('August 2017', 'August 2018 v.5', 'use coreElementsChanged instead')
     def elementsChanged(self, updateIsFlat=True, clearIsSorted=True,
                         memo=None, keepIndex=False):
+        return self.coreElementsChanged(updateIsFlat, clearIsSorted,
+                        memo, keepIndex)
+
+
+    def coreElementsChanged(self, updateIsFlat=True, clearIsSorted=True,
+                        memo=None, keepIndex=False):
         '''
-        An advanced stream method that is not necessary for most users.
+        NB -- a "core" stream method that is not necessary for most users.
 
         This method is called automatically any time the elements in the Stream are changed.
         However, it may be called manually in case sites or other advanced features of an
@@ -163,13 +169,13 @@ class StreamCoreMixin(object):
         True
 
         Here we manipulate the private `._elements` storage (which generally shouldn't
-        be done) and thus need to call `.elementsChanged` directly.
+        be done) and thus need to call `.coreElementsChanged` directly.
 
         >>> a._elements.append(stream.Stream())
         >>> a.isFlat # this is wrong.
         True
 
-        >>> a.elementsChanged()
+        >>> a.coreElementsChanged()
         >>> a.isFlat
         False
         '''
@@ -188,7 +194,7 @@ class StreamCoreMixin(object):
         # if this Stream is a flat representation of something, and its
         # elements have changed, than we must clear the cache of that
         # ancestor so that subsequent calls get a new representation of this derivation;
-        # we can do that by calling elementsChanged on
+        # we can do that by calling coreElementsChanged on
         # the derivation.orgin
         if self._derivation is not None:
             sdm = self._derivation.method
@@ -202,7 +208,7 @@ class StreamCoreMixin(object):
         # always be a good idea since .flat has changed etc.
         # should not need to do derivation.origin sites.
         for livingSite in self.sites:
-            livingSite.elementsChanged()
+            livingSite.coreElementsChanged()
 
         # clear these attributes for setting later
         if clearIsSorted:
@@ -232,17 +238,19 @@ class StreamCoreMixin(object):
                 self._cache['index'] = indexCache
 
 
-    def _hasElementByObjectId(self, objId):
+    def coreHasElementByMemoryLocation(self, objId):
         '''
+        NB -- a "core" stream method that is not necessary for most users. use hasElement(obj)
+
         Return True if an element object id, provided as an argument, is contained in this Stream.
 
         >>> s = stream.Stream()
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('g#')
         >>> s.append(n1)
-        >>> s._hasElementByObjectId(id(n1))
+        >>> s.coreHasElementByMemoryLocation(id(n1))
         True
-        >>> s._hasElementByObjectId(id(n2))
+        >>> s.coreHasElementByMemoryLocation(id(n2))
         False
         '''
         if objId in self._offsetDict:
@@ -256,8 +264,10 @@ class StreamCoreMixin(object):
                 return True
         return False
 
-    def _getElementByObjectId(self, objId):
+    def coreGetElementByMemoryLocation(self, objId):
         '''
+        NB -- a "core" stream method that is not necessary for most users.
+
         Low-level tool to get an element based only on the object id.
 
         This is not the same as getElementById, which refers to the id
@@ -272,9 +282,9 @@ class StreamCoreMixin(object):
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('g#')
         >>> s.append(n1)
-        >>> s._getElementByObjectId(id(n1)) is n1
+        >>> s.coreGetElementByMemoryLocation(id(n1)) is n1
         True
-        >>> s._getElementByObjectId(id(n2)) is None
+        >>> s.coreGetElementByMemoryLocation(id(n2)) is None
         True
         '''
         # NOTE: this may be slightly faster than other approaches
@@ -288,7 +298,7 @@ class StreamCoreMixin(object):
         return None
 
     #---------------------------------------------------------------------------
-    def _addElementPreProcess(self, element, checkRedundancy=True):
+    def coreGuardBeforeAddElement(self, element, checkRedundancy=True):
         '''
         Before adding an element, this method provides
         important checks to that element.
@@ -559,7 +569,7 @@ class StreamCoreMixin(object):
         else:
             for sp in collectList:
                 self.coreInsert(0, sp)
-            self.elementsChanged(updateIsFlat=False)
+            self.coreElementsChanged(updateIsFlat=False)
 
 # timing before: Macbook Air 2012, i7
 # In [3]: timeit('s = stream.Stream()', setup='from music21 import stream', number=100000)

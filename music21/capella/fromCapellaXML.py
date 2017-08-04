@@ -192,7 +192,7 @@ class CapellaImporter(object):
                     newPart = partDictById[thisPart.id]['part']
                 for el in thisPart: # no need for recurse...
                     newPart.coreInsert(common.opFrac(el.offset + systemOffset), el)
-                newPart.elementsChanged()
+                newPart.coreElementsChanged()
         newScore = stream.Score()
         ## ORDERED DICT
         parts = [None for i in range(len(partDictById))]
@@ -231,7 +231,7 @@ class CapellaImporter(object):
 #                        m.rightBarline = bl # will not yet work for double repeats!
 
             newScore.coreInsert(0, p)
-        newScore.elementsChanged()
+        newScore.coreElementsChanged()
         return newScore
 
     def systemScoreFromScore(self, scoreElement, scoreObj=None):
@@ -265,7 +265,7 @@ class CapellaImporter(object):
             systemObj.systemNumber = systemNumber + 1 # 1 indexed, like musicians think
             scoreObj.coreAppend(systemObj)
 
-        scoreObj.elementsChanged()
+        scoreObj.coreElementsChanged()
         return scoreObj
 
     def systemFromSystem(self, systemElement, systemObj=None):
@@ -404,7 +404,7 @@ class CapellaImporter(object):
                 else:
                     s.coreAppend(el)
 
-        s.elementsChanged()
+        s.coreElementsChanged()
         return s
 
     def restFromRest(self, restElement):

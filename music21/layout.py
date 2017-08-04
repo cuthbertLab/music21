@@ -696,9 +696,9 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
 
             thisPage.coreAppend(thisSystem)
         thisPage.systemEnd = systemNumber
-        thisPage.elementsChanged()
+        thisPage.coreElementsChanged()
         scoreLists.coreAppend(thisPage)
-    scoreLists.elementsChanged()
+    scoreLists.coreElementsChanged()
     return scoreLists
 
 def getPageRegionMeasureNumbers(scoreIn):

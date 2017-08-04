@@ -720,13 +720,13 @@ class HumdrumDataCollection(object):
             self.stream.coreInsert(offset, el)
             
         if insertList:
-            self.stream.elementsChanged()
+            self.stream.coreElementsChanged()
         
         for el in appendList:
             self.stream.coreAppend(el)
         
         if appendList:
-            self.stream.elementsChanged()
+            self.stream.coreElementsChanged()
 
 #     @property
 #     def stream(self):
@@ -1203,7 +1203,7 @@ class HumdrumSpine(object):
         for el in streamIn:
             if 'Stream' in el.classes:
                 if currentMeasureNumber != 0 or currentMeasure:
-                    currentMeasure.elementsChanged()
+                    currentMeasure.coreElementsChanged()
                     #streamOut.append(currentMeasure)
                     streamOut.coreAppend(currentMeasure)
                 currentMeasure = el
@@ -1219,8 +1219,8 @@ class HumdrumSpine(object):
                     #streamOut.append(el)
                     streamOut.coreAppend(el)
         # update the most recent measure and the surrounding stream, then append the last
-        currentMeasure.elementsChanged()
-        streamOut.elementsChanged()
+        currentMeasure.coreElementsChanged()
+        streamOut.coreElementsChanged()
         if currentMeasure:
             streamOut.append(currentMeasure)
 
@@ -1276,7 +1276,7 @@ class HumdrumSpine(object):
 
             if thisObject is not None:
                 self.stream.coreAppend(thisObject)
-        self.stream.elementsChanged()
+        self.stream.coreElementsChanged()
 
 class KernSpine(HumdrumSpine):
     r'''
@@ -1339,7 +1339,7 @@ class KernSpine(HumdrumSpine):
                 environLocal.printDebug("Traceback for the exception: \n%s" % (tb))
                 # traceback... environLocal.printDebug()
 
-        self.stream.elementsChanged()
+        self.stream.coreElementsChanged()
         ## still to be done later... move things before first measure to first measure!
 
     def processNoteEvent(self, eventC):
@@ -1444,7 +1444,7 @@ class DynamSpine(HumdrumSpine):
                     thisObject = MiscTandem(eventC)
             elif eventC.startswith('='):
                 if thisContainer is not None:
-                    thisContainer.elementsChanged()
+                    thisContainer.coreElementsChanged()
                     self.stream.coreAppend(thisContainer)
                 thisContainer = hdStringToMeasure(eventC)
             elif eventC.startswith('!'):
@@ -1466,7 +1466,7 @@ class DynamSpine(HumdrumSpine):
                 else:
                     thisContainer.coreAppend(thisObject)
 
-        self.stream.elementsChanged()
+        self.stream.coreElementsChanged()
 
 ####### END HUMDRUM SPINES
 
@@ -1748,7 +1748,7 @@ class SpineCollection(object):
                     pass
                 newStream.coreAppend(el)
                 #newStream.append(el)
-            newStream.elementsChanged()
+            newStream.coreElementsChanged()
             thisSpine.stream = newStream
 
             # some spines were not inserted because the
@@ -1765,7 +1765,7 @@ class SpineCollection(object):
         Insert all the spines into newStream that should be
         inserted into thisSpine at insertionPoint.
         '''
-        newStream.elementsChanged() # update highestTime
+        newStream.coreElementsChanged() # update highestTime
         startPoint = newStream.highestTime
         childrenToInsert = thisSpine.childSpineInsertPoints[insertionPoint]
         voiceNumber = 0
@@ -1780,7 +1780,7 @@ class SpineCollection(object):
                     insertEl.groups.append(voiceStr)
                     #newStream.insert(startPoint + insertEl.offset, insertEl)
                     newStream.coreInsert(startPoint + insertEl.offset, insertEl)
-        newStream.elementsChanged() # call between coreInsert and coreAppend
+        newStream.coreElementsChanged() # call between coreInsert and coreAppend
 
 
     def reclassSpines(self):
@@ -1949,9 +1949,9 @@ class SpineCollection(object):
                 for voicePart in voices:
                     if voicePart is not None:
                         #voicePart.show('text')
-                        voicePart.elementsChanged()
+                        voicePart.coreElementsChanged()
                         el.coreInsert(lowestVoiceOffset, voicePart)
-                el.elementsChanged()
+                el.coreElementsChanged()
                 #print el.number, "has voices at", lowestVoiceOffset
 
 

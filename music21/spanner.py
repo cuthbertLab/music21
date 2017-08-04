@@ -455,7 +455,7 @@ class Spanner(base.Music21Object):
                 #    already found in the SpannerStorage stream of spanner %s;
                 #    this may not be an error.''' % (c, self)])
 
-        self.spannerStorage.elementsChanged()
+        self.spannerStorage.coreElementsChanged()
 
     def hasSpannedElement(self, spannedElement):
         '''
@@ -497,7 +497,7 @@ class Spanner(base.Music21Object):
             return None  # do nothing
         if common.isNum(old):
             # this must be id(obj), not obj.id
-            e = self.spannerStorage._getElementByObjectId(old)
+            e = self.spannerStorage.coreGetElementByMemoryLocation(old)
             # e here is the old element that was spanned by this Spanner
 
 

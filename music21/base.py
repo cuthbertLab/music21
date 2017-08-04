@@ -2472,8 +2472,8 @@ class Music21Object(object):
         subclass this to do very interesting things.
         '''
         for s in self.sites.get():
-            if hasattr(s, 'elementsChanged'):
-                s.elementsChanged(updateIsFlat=False, keepIndex=True)
+            if hasattr(s, 'coreElementsChanged'):
+                s.coreElementsChanged(updateIsFlat=False, keepIndex=True)
 
     def _getPriority(self):
         return self._priority
@@ -3519,7 +3519,7 @@ class Music21Object(object):
         self.duration = mm.secondsToDuration(value)
         for s in self.sites.get(excludeNone=True):
             if self in s._elements:
-                s.elementsChanged() # highest time is changed.
+                s.coreElementsChanged() # highest time is changed.
 
     def _getSeconds(self):
         # do not search of duration is zero

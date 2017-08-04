@@ -288,10 +288,10 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
 
         # may be bending elements in a voice to append to a measure
         if vActive is not None and vActive:
-            vActive.elementsChanged()
+            vActive.coreElementsChanged()
             m.coreInsert(0, vActive)
 
-        m.elementsChanged()
+        m.coreElementsChanged()
 
         if barCount == 0 and m.timeSignature != None: # easy case
             # can only do this b/c ts is defined
@@ -302,7 +302,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
         p.coreAppend(m)
         barCount += 1
 
-    p.elementsChanged()
+    p.coreElementsChanged()
     # for now, make all imports a c-score on import;
     tInterval = museDataPart.getTranspositionIntervalObject()
     #environLocal.printDebug(['got transposition interval', p.id, tInterval])

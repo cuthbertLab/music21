@@ -776,7 +776,7 @@ class MusicXMLImporter(XMLParserBase):
         for sp in rm:
             self.spannerBundle.remove(sp)
 
-        s.elementsChanged()
+        s.coreElementsChanged()
         s.definesExplicitSystemBreaks = self.definesExplicitSystemBreaks
         s.definesExplicitPageBreaks = self.definesExplicitPageBreaks
         for p in s.parts:
@@ -956,7 +956,7 @@ class MusicXMLImporter(XMLParserBase):
             staffGroup.completeStatus = True
             self.spannerBundle.append(staffGroup)
             #self.stream.coreInsert(0, staffGroup)
-        self.stream.elementsChanged()
+        self.stream.coreElementsChanged()
 
 
 
@@ -1156,7 +1156,7 @@ class PartParser(XMLParserBase):
         for sp in rm:
             self.spannerBundle.remove(sp)
         # s is the score; adding the part to the score
-        self.stream.elementsChanged()
+        self.stream.coreElementsChanged()
 
 
         if self.maxStaves > 1:
@@ -1169,7 +1169,7 @@ class PartParser(XMLParserBase):
         part = self.stream
         for mxMeasure in self.mxPart.iterfind('measure'):
             self.xmlMeasureToMeasure(mxMeasure)
-        part.elementsChanged()
+        part.coreElementsChanged()
 
     def separateOutPartStaves(self):
         '''
@@ -1225,7 +1225,7 @@ class PartParser(XMLParserBase):
             # in this part; should be deleted
             streamPartStaff.addGroupForElements(partStaffId)
             streamPartStaff.groups.append(partStaffId)
-            streamPartStaff.elementsChanged()
+            streamPartStaff.coreElementsChanged()
             self.parent.stream.coreInsert(0, streamPartStaff)
             self.parent.m21PartObjectsById[partStaffId] = streamPartStaff
 
@@ -1233,7 +1233,7 @@ class PartParser(XMLParserBase):
             separateOneStaffNumber(staffNumber)
 
         self.appendToScoreAfterParse = False
-        self.parent.stream.elementsChanged()
+        self.parent.stream.coreElementsChanged()
 
     def _getStaffExclude(self, staffReference, targetKey):
         '''
@@ -1336,7 +1336,7 @@ class PartParser(XMLParserBase):
                 and r1.duration.quarterLength != self.lastTimeSignature.barDuration.quarterLength):
 
                 r1.duration.quarterLength = self.lastTimeSignature.barDuration.quarterLength
-                m.elementsChanged() # TODO: Remove -- durationTrigger should handle this.
+                m.coreElementsChanged() # TODO: Remove -- durationTrigger should handle this.
 
         self.stream.coreInsert(self.lastMeasureOffset, m)
         self.adjustTimeAttributesFromMeasure(m)
@@ -1910,7 +1910,7 @@ class MeasureParser(XMLParserBase):
 
         Need to run at end:
 
-        >>> MP.stream.elementsChanged()
+        >>> MP.stream.coreElementsChanged()
         >>> MP.stream.show('text')
         {1.0} <music21.note.Note F>
         '''
@@ -1945,8 +1945,8 @@ class MeasureParser(XMLParserBase):
             for v in self.stream.iter.voices:
                 if v: # do not bother with empty voices
                     v.makeRests(inPlace=True, hideRests=True)
-                    v.elementsChanged()
-        self.stream.elementsChanged()
+                    v.coreElementsChanged()
+        self.stream.coreElementsChanged()
 
         if (self.restAndNoteCount['rest'] == 1
                 and self.restAndNoteCount['note'] == 0):
@@ -2009,7 +2009,7 @@ class MeasureParser(XMLParserBase):
                 if stl is None or stl.staffNumber is None:
                     continue # sibelius likes to give empty staff layouts!
                 self.insertCoreAndRef(0.0, str(stl.staffNumber), stl)
-        m.elementsChanged()
+        m.coreElementsChanged()
         # TODO: measure-layout -- affect self.stream
         # TODO: measure-numbering
         # TODO: part-name-display
@@ -4844,9 +4844,9 @@ class MeasureParser(XMLParserBase):
         >>> MP.useVoices
         False
 
-        `.updateVoiceInformation` runs `.coreInsert` so we need to call elementsChanged:
+        `.updateVoiceInformation` runs `.coreInsert` so we need to call coreElementsChanged:
 
-        >>> MP.stream.elementsChanged()
+        >>> MP.stream.coreElementsChanged()
         >>> len(MP.stream)
         0
 
@@ -4860,7 +4860,7 @@ class MeasureParser(XMLParserBase):
         ['1', '2']
         >>> MP.useVoices
         True
-        >>> MP.stream.elementsChanged()
+        >>> MP.stream.coreElementsChanged()
         >>> len(MP.stream)
         2
         >>> len(MP.stream.getElementsByClass('Voice'))

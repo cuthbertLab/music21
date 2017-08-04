@@ -2847,7 +2847,7 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
     theVoice = stream.Voice()
     for each in theLayer:
         theVoice.coreAppend(each)
-    theVoice.elementsChanged()
+    theVoice.coreElementsChanged()
 
     # try to set the Voice's "id" attribte
     if overrideN:
