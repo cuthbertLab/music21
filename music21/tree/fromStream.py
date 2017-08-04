@@ -146,8 +146,8 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, group
     <ElementTree {2} (0.0 <0.-20...> to 8.0) <music21.stream.Score exampleScore>>
     >>> for x in elementTree.iterNodes():
     ...     x
-    <ElementNode: Start:0.0 <0.-20...> Indices:(l:0 *0* r:2) Payload:<music21.stream.Part ...>>
-    <ElementNode: Start:0.0 <0.-20...> Indices:(l:1 *1* r:2) Payload:<music21.stream.Part ...>>
+    <ElementNode: Start:0.0 <0.-20...> Indices:(l:0 *0* r:1) Payload:<music21.stream.Part ...>>
+    <ElementNode: Start:0.0 <0.-20...> Indices:(l:0 *1* r:2) Payload:<music21.stream.Part ...>>
 
     >>> etFlat = tree.fromStream.asTree(score, flatten=True)
     >>> etFlat
@@ -241,10 +241,16 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, group
     else:
         treeClass = trees.OffsetTree
 
+    # this lets us use the much faster populateFromSortedList -- the one-time
+    # sort in C is faster than the node implementation.
+    if not inputStream.isSorted and inputStream.autoSort:
+        inputStream.sort()
+
     # check to see if we can shortcut and make a Tree very fast from a sorted list.
     if (inputStream.isSorted
             and groupOffsets is False  # currently we can't populate for an OffsetTree*
             and (inputStream.isFlat or flatten is False)):
+        
         outputTree = treeClass(source=inputStream)
         inputStreamElements = inputStream._elements[:] + inputStream._endElements
         # Can use tree.populateFromSortedList and speed up by an order of magnitude
@@ -254,6 +260,8 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, group
             elementTupleList = [(e.sortTuple(inputStream), e) for e in inputStreamElements
                                     if e.isClassOrSubclass(classList)]
         outputTree.populateFromSortedList(elementTupleList)
+        if outputTree.rootNode is not None:
+            outputTree.rootNode.updateEndTimes()
         return outputTree
         # * to make this work for an OffsetTree, we'd need to use OffsetIterator
         #   first to make it so that the midpoint of the list is also the rootnode, etc.
@@ -338,6 +346,15 @@ class Test(unittest.TestCase):
             slowi = sfTreeSlow[i]
             self.assertIs(fasti, slowi)
 
+
+    def testAutoSortExample(self):
+        from music21.tree import makeExampleScore
+        sc = makeExampleScore()
+        sc.sort()
+        t = asTree(sc)
+        self.assertEqual(t.endTime, 8.0)
+        #print(repr(t))
+
 #     def xtestExampleScoreAsTimespans(self):
 #         from music21 import tree
 #         score = tree.makeExampleScore()
@@ -349,4 +366,4 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='testExampleScoreAsTimespans')
+    music21.mainTest(Test) #, runTest='testAutoSortExample')

@@ -497,6 +497,9 @@ class KeySignature(base.Music21Object):
         ['B-', 'E-', 'A-', 'D-', 'G-', 'C-', 'F-', 'B--']
 
 
+        Non-standard, non-traditional key signatures can set their own
+        altered pitches cache.
+
         >>> nonTrad = key.KeySignature()
         >>> nonTrad.alteredPitches = ['B-', 'F#', 'E-', 'G#']
         >>> nonTrad.alteredPitches

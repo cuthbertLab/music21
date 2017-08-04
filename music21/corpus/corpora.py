@@ -962,13 +962,19 @@ class LocalCorpus(Corpus):
         r'''
         Delete a non-default local corpus from the user settings.
         '''
-        if self.name is None or self.name == 'local':
-            return
+        if self.name is None or self.name in ('core', 'virtual', 'local'):
+            raise CorpusException('Cannot delete this corpus')
         elif not self.existsInSettings:
             return
+        
+        if os.path.exists(self.metadataBundle.filePath):
+            os.remove(self.metadataBundle.filePath)
+        
         userSettings = environment.UserSettings()
         del(userSettings['localCorporaSettings'][self.name])
         environment.Environment().write()
+        
+        
 
     def getPaths(
         self,
