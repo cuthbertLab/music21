@@ -1112,7 +1112,7 @@ class MetadataBundle(object):
             ])
         return self
 
-    def search(self, query, field=None, fileExtensions=None):
+    def search(self, query=None, field=None, fileExtensions=None, **kwargs):
         r'''
         Perform search, on all stored metadata, permit regular expression
         matching.
@@ -1154,8 +1154,18 @@ class MetadataBundle(object):
         ...     )
         >>> len(searchResult)
         1
+        
+        Searches can also use keyword args:
+        
+        >>> metadataBundle.search(composer='cicon')
+        <music21.metadata.bundles.MetadataBundle {1 entry}>
         '''
         newMetadataBundle = MetadataBundle()
+        if query is None and field is None:
+            if not kwargs:
+                raise MetadataBundleException("Query cannot be empty")
+            field, query = kwargs.popitem()
+        
         for key in self._metadataEntries:
             metadataEntry = self._metadataEntries[key]
             # ignore stub entries
@@ -1179,6 +1189,9 @@ class MetadataBundle(object):
         newMetadataBundle._metadataEntries = OrderedDict(
                                 sorted(list(newMetadataBundle._metadataEntries.items()),
                                                         key=lambda mde: mde[1].sourcePath))
+
+        if kwargs:
+            return newMetadataBundle.search(**kwargs)
 
         return newMetadataBundle
 

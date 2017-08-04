@@ -241,7 +241,7 @@ def _addCorpusFilepathToStreamObject(streamObj, filePath):
     else:
         streamObj.corpusFilepath = filePath
 
-def search(query, field=None, corpusNames=None, fileExtensions=None):
+def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwargs):
     '''
     Search all stored metadata bundles and return a list of file paths.
 
@@ -256,6 +256,21 @@ def search(query, field=None, corpusNames=None, fileExtensions=None):
 
     >>> corpus.search('bach', field='composer')
     <music21.metadata.bundles.MetadataBundle {25 entries}>
+
+    Note the importance of good metadata -- there's almost 400 pieces by
+    Bach in the corpus, but many do not have correct metadata entries.
+    
+    This can also be specified as:
+    
+    >>> corpus.search(composer='bach')
+    <music21.metadata.bundles.MetadataBundle {25 entries}>
+
+    Or, to get all the chorales (without using `corpus.chorales.Iterator`):
+    
+    >>> corpus.search(sourcePath='bach', numberOfParts=4)
+    <music21.metadata.bundles.MetadataBundle {360 entries}>
+
+    
 
     This method is implemented in `corpus.manager` but loaded into corpus for
     ease of use.
@@ -286,7 +301,7 @@ def search(query, field=None, corpusNames=None, fileExtensions=None):
     for corpusName in corpusNames:
         c = fromName(corpusName)
         searchResults = c.metadataBundle.search(
-                query, field, fileExtensions=fileExtensions)
+                query, field, fileExtensions=fileExtensions, **kwargs)
         allSearchResults = allSearchResults.union(searchResults)
 
     return allSearchResults

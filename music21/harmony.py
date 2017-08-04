@@ -1508,7 +1508,7 @@ class ChordSymbol(Harmony):
             if kw == 'kindStr':
                 self.chordKindStr = keywords[kw]
 
-        Harmony.__init__(self, figure, **keywords)
+        super(ChordSymbol, self).__init__(figure, **keywords)
         if 'duration' not in keywords and 'quarterLength' not in keywords:
             self.duration = duration.Duration(0)
 
