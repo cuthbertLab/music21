@@ -447,7 +447,7 @@ class Spanner(base.Music21Object):
             if c is None:
                 continue
             if not self.hasSpannedElement(c):  # not already in storage
-                self.spannerStorage._appendCore(c)
+                self.spannerStorage.coreAppend(c)
             else:
                 pass
                 # it makes sense to not have multiple copies

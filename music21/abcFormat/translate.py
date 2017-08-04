@@ -174,7 +174,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
             else:
                 dst.number = measureNumber
                 measureNumber += 1
-            p._appendCore(dst)
+            p.coreAppend(dst)
 
     try:
         reBar(p, inPlace=True)
@@ -186,7 +186,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         if useMeasures:  # assume at start of measures
             p.getElementsByClass('Measure')[0].clef = clef.bestClef(p, recurse=True)
         else:
-            p._insertCore(0, clef.bestClef(p, recurse=True))
+            p.coreInsert(0, clef.bestClef(p, recurse=True))
 
     if postTransposition != 0:
         p.transpose(postTransposition, inPlace=True)
@@ -202,7 +202,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     # copy spanners into topmost container; here, a part
     rm = []
     for sp in spannerBundle.getByCompleteStatus(True):
-        p._insertCore(0, sp)
+        p.coreInsert(0, sp)
         rm.append(sp)
     # remove from original spanner bundle
     for sp in rm:
@@ -228,13 +228,13 @@ def parseTokens(mh, dst, p, useMeasures):
                     if useMeasures: # assume at start of measures
                         dst.timeSignature = ts
                     else:
-                        dst._appendCore(ts)
+                        dst.coreAppend(ts)
             elif t.isKey():
                 ks = t.getKeySignatureObject()
                 if useMeasures:  # assume at start of measures
                     dst.keySignature = ks
                 else:
-                    dst._appendCore(ks)
+                    dst.coreAppend(ks)
                 # check for clef information sometimes stored in key
                 clefObj, transposition = t.getClefObject()
                 if clefObj is not None:
@@ -244,11 +244,11 @@ def parseTokens(mh, dst, p, useMeasures):
                     if useMeasures:  # assume at start of measures
                         dst.clef = clefObj
                     else:
-                        dst._appendCore(clefObj)
+                        dst.coreAppend(clefObj)
                     postTransposition = transposition
             elif t.isTempo():
                 mmObj = t.getMetronomeMarkObject()
-                dst._appendCore(mmObj)
+                dst.coreAppend(mmObj)
 
         # as ABCChord is subclass of ABCNote, handle first
         elif isinstance(t, abcFormat.ABCChord):
@@ -272,7 +272,7 @@ def parseTokens(mh, dst, p, useMeasures):
                 if c.pitches[pIndex].accidental is None:
                     continue
                 c.pitches[pIndex].accidental.displayStatus = accStatusList[pIndex]
-            dst._appendCore(c)
+            dst.coreAppend(c)
 
             #ql += t.quarterLength
 
@@ -323,13 +323,14 @@ def parseTokens(mh, dst, p, useMeasures):
                 elif tmp == "tenuto":
                     n.articulations.append(articulations.Tenuto())
 
-            dst._appendCore(n)
+            dst.coreAppend(n, setActiveSite=False)
+            
         elif isinstance(t, abcFormat.ABCSlurStart):
-            p._appendCore(t.slurObj)
+            p.coreAppend(t.slurObj)
         elif isinstance(t, abcFormat.ABCCrescStart):
-            p._appendCore(t.crescObj)
+            p.coreAppend(t.crescObj)
         elif isinstance(t, abcFormat.ABCDimStart):
-            p._appendCore(t.dimObj)
+            p.coreAppend(t.dimObj)
     dst.elementsChanged()
     return postTransposition, clefSet
 
@@ -406,7 +407,7 @@ def abcToStreamScore(abcHandler, inputM21=None):
         partList.append(p)
 
     for p in partList:
-        s._insertCore(0, p)
+        s.coreInsert(0, p)
     s.elementsChanged()
     return s
 
@@ -442,7 +443,7 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
                 except IndexError:
                     environLocal.warn("Failure for piece number %d" % key)
             for scoreDocument in scoreList:
-                opus._appendCore(scoreDocument)
+                opus.coreAppend(scoreDocument, setActiveSite=False)
             opus.elementsChanged()
 
     else: # just return single entry in opus object

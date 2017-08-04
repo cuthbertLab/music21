@@ -228,7 +228,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # TODO: perhaps convert a single element into a list?
             try:
                 for e in givenElements:
-                    self._insertCore(e.offset, e)
+                    self.coreInsert(e.offset, e)
             except (AttributeError, TypeError):
                 raise StreamException("Unable to insert {0}".format(e))
             self.elementsChanged()
@@ -405,7 +405,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                 "Stream subclasses and Music21Objects cannot have required " +
                                 "arguments in __init__" )
             for e in self.elements[k]:
-                found._insertCore(self.elementOffset(e), e)
+                found.coreInsert(self.elementOffset(e), e)
 
             found.elementsChanged(clearIsSorted=False)
             return found
@@ -987,9 +987,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             #self.insert(other.offset, e)
             if classFilterList is not None:
                 if e.isClassOrSubclass(classFilterList):
-                    self._insertCore(other.elementOffset(e), e)
+                    self.coreInsert(other.elementOffset(e), e)
             else:
-                self._insertCore(other.elementOffset(e), e)
+                self.coreInsert(other.elementOffset(e), e)
 
 #             for c in classFilterList:
 #                 if c in e.classes:
@@ -1001,9 +1001,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for e in other._endElements:
             if classFilterList is not None:
                 if e.isClassOrSubclass(classFilterList):
-                    self._storeAtEndCore(e)
+                    self.coreStoreAtEnd(e)
             else:
-                self._storeAtEndCore(e)
+                self.coreStoreAtEnd(e)
 
 #             match = False
 #             for c in classFilterList:
@@ -1441,14 +1441,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 ### TEST on copying!!!!
                 #if 'Note' in newElement.classes:
                 #    newElement.pitch.ps += 2.0
-                new._insertCore(offset, newElement, ignoreSort=True)
+                new.coreInsert(offset, newElement, ignoreSort=True)
         if '_endElements' in ignoreAttributes:
             # must manually add elements to
             for e in self._endElements:
                 # this will work for all with __deepcopy___
                 # get the old offset from the activeSite Stream
                 # user here to provide new offset
-                new._storeAtEndCore(copy.deepcopy(e, memo))
+                new.coreStoreAtEnd(copy.deepcopy(e, memo))
 
         return new
 
@@ -1723,7 +1723,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         self._addElementPreProcess(element)
         # main insert procedure here
 
-        storeSorted = self._insertCore(offset, element,
+        storeSorted = self.coreInsert(offset, element,
                      ignoreSort=ignoreSort, setActiveSite=setActiveSite)
         updateIsFlat = False
         if element.isStream:
@@ -2002,7 +2002,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #         element.activeSite = self
 #         self._endElements.append(element)
 
-        self._storeAtEndCore(element)
+        self.coreStoreAtEnd(element)
         # Streams cannot reside in end elements, thus do not update is flat
         self.elementsChanged(updateIsFlat=False)
 
@@ -3675,11 +3675,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     found.priority = startMeasure.priority - 1
                     # TODO: This should not change global priority on found, but
                     # instead priority, like offset, should be a per-site attribute
-                returnObj._insertCore(0, found)
+                returnObj.coreInsert(0, found)
 
         for m in matches:
             mOffset = m.getOffsetBySite(srcObj) - startOffset
-            returnObj._insertCore(mOffset, m)
+            returnObj.coreInsert(mOffset, m)
                 
         if gatherSpanners:
             sf = srcObj.flat
@@ -3687,11 +3687,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # can use old offsets of spanners, even though components
                 # have been updated
                 #returnObj.insert(sp.getOffsetBySite(mStreamSpanners), sp)
-                returnObj._insertCore(sf.elementOffset(sp), sp)
+                returnObj.coreInsert(sf.elementOffset(sp), sp)
 
                 #environLocal.printDebug(['Stream.measrues: copying spanners:', sp])
 
-        # used _insertcore
+        # used coreInsert
         returnObj.elementsChanged()
         #environLocal.printDebug(['len(returnObj.flat)', len(returnObj.flat)])
         return returnObj
@@ -4875,7 +4875,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         for offset in offsets:
             elementCopy = copy.deepcopy(element)
-            self._insertCore(offset, elementCopy)
+            self.coreInsert(offset, elementCopy)
         self.elementsChanged()
 
 
@@ -4939,13 +4939,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for e in self._elements:
             o = self.elementOffset(e)
             if (o >= foundOffset - before and o < foundEnd + after):
-                display._insertCore(o, e)
+                display.coreInsert(o, e)
 
         for e in self._endElements:
             o = self.elementOffset(e)
             if (o >= foundOffset - before and o < foundEnd + after):
                 #display.storeAtEnd(e)
-                display._storeAtEndCore(e)
+                display.coreStoreAtEnd(e)
         display.elementsChanged()
         return display
 
@@ -5231,7 +5231,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if subNotes:
                     c = dealWithSubNotes(qlMax, subNotes, returnObj)
                     # insert chord at start location
-                    returnObj._insertCore(o, c)
+                    returnObj.coreInsert(o, c)
                 #environLocal.printDebug(['len of returnObj', len(returnObj)])
                 # shift offset to qlMax or minimumWindowSize
                 if qlMax is not None and qlMax >= minimumWindowSize:
@@ -5267,7 +5267,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if subNotes:
                     c = dealWithSubNotes(oEnd - oStart, subNotes, returnObj)
                     # insert chord at start location
-                    returnObj._insertCore(oStart, c)
+                    returnObj.coreInsert(oStart, c)
 
         # makeRests to fill any gaps produced by stripping
         #environLocal.printDebug(['pre makeRests show()'])
@@ -5599,16 +5599,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             found = self
         for e in found:
             if fx(e):
-                a._insertCore(found.elementOffset(e), e) # provide an offset here
+                a.coreInsert(found.elementOffset(e), e) # provide an offset here
             else:
-                b._insertCore(found.elementOffset(e), e)
+                b.coreInsert(found.elementOffset(e), e)
         for e in found._endElements:
             if fx(e):
                 #a.storeAtEnd(e)
-                a._storeAtEndCore(e)
+                a.coreStoreAtEnd(e)
             else:
                 #b.storeAtEnd(e)
-                b._storeAtEndCore(e)
+                b.coreStoreAtEnd(e)
         a.elementsChanged()
         b.elementsChanged()
         return a, b
@@ -6634,7 +6634,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for e in ri:
             if e.isStream and not retainContainers:
                 continue
-            sNew._insertCore(ri.currentHierarchyOffset(), 
+            sNew.coreInsert(ri.currentHierarchyOffset(), 
                              e,
                              setActiveSite=False)
 
@@ -8368,7 +8368,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             oInsert = e.getOffsetBySite(returnObj)
             returnObj.remove(e)
             for eNew in post:
-                returnObj._insertCore(oInsert, eNew)
+                returnObj.coreInsert(oInsert, eNew)
                 oInsert = opFrac(oInsert + eNew.quarterLength)
 
         returnObj.elementsChanged()
@@ -8492,7 +8492,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     # only need to insert eNext, as eComplete was modified
                     # in place due to retainOrigin option
                     # insert at o, not oCut (duration into element)
-                    returnObj._insertCore(o, eNext)
+                    returnObj.coreInsert(o, eNext)
                     oStartNext = o
         returnObj.elementsChanged()
         if inPlace is False:
@@ -9552,9 +9552,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # sOuter = Stream()
         # for e in self:
-        #     sOuter._insertCore(e.offset, e)
+        #     sOuter.coreInsert(e.offset, e)
         # for e in stream2:
-        #     sOuter._insertCore(e.offset, e)
+        #     sOuter.coreInsert(e.offset, e)
         # sOuter.elementsChanged(updateIsFlat=False)
         # sOuterTree = sOuter.asTree(flatten=False, groupOffsets=True)
         # return sorted(sOuterTree.simultaneityDict().keys())
@@ -9854,32 +9854,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return returnObj
         return None
 
-
-    def internalize(self, container=None,
-                    classFilterList=('GeneralNote',)):
-        '''
-        Gather all notes and related classes of this Stream
-        and place inside a new container (like a Voice) in this Stream.
-
-        DEPRECATED: This is badly named and does not belong in Stream.
-        Will be removed.
-        '''
-        if container is None:
-            container = Voice
-        dst = container()
-        for e in list(self.getElementsByClass(classFilterList)):
-            dst.insert( self.elementOffset(e), e)
-            self.remove(e)
-        self.insert(0, dst)
-
-#    def externalize(self):
-#        '''
-#        Assuming there is a container in this Stream
-#        (like a Voice), remove the container and place
-#        all contents in the Stream.
-#        '''
-#        pass
-
     def voicesToParts(self):
         '''
         If this Stream defines one or more voices,
@@ -10085,7 +10059,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 shiftOffset = v.getOffsetBySite(returnObj)
                 for e in v.elements:
                     # insert shift + offset w/ voice
-                    returnObj._insertCore(shiftOffset + e.getOffsetBySite(v), e)
+                    returnObj.coreInsert(shiftOffset + e.getOffsetBySite(v), e)
                 returnObj.remove(v)
 
         returnObj.elementsChanged()

@@ -717,13 +717,13 @@ class HumdrumDataCollection(object):
                 numberOfGlobalEventsInARow = 0
 
         for offset, el in insertList:
-            self.stream._insertCore(offset, el)
+            self.stream.coreInsert(offset, el)
             
         if insertList:
             self.stream.elementsChanged()
         
         for el in appendList:
-            self.stream._appendCore(el)
+            self.stream.coreAppend(el)
         
         if appendList:
             self.stream.elementsChanged()
@@ -1205,7 +1205,7 @@ class HumdrumSpine(object):
                 if currentMeasureNumber != 0 or currentMeasure:
                     currentMeasure.elementsChanged()
                     #streamOut.append(currentMeasure)
-                    streamOut._appendCore(currentMeasure)
+                    streamOut.coreAppend(currentMeasure)
                 currentMeasure = el
                 currentMeasureNumber = el.number
                 currentMeasureOffset = el.offset
@@ -1214,10 +1214,10 @@ class HumdrumSpine(object):
             else:
                 if currentMeasureNumber != 0 or el.duration.quarterLength != 0:
                     #currentMeasure.insert(el.offset - currentMeasureOffset, el)
-                    currentMeasure._insertCore(el.offset - currentMeasureOffset, el)
+                    currentMeasure.coreInsert(el.offset - currentMeasureOffset, el)
                 else:
                     #streamOut.append(el)
-                    streamOut._appendCore(el)
+                    streamOut.coreAppend(el)
         # update the most recent measure and the surrounding stream, then append the last
         currentMeasure.elementsChanged()
         streamOut.elementsChanged()
@@ -1275,7 +1275,7 @@ class HumdrumSpine(object):
                 thisObject.humdrumPosition = event.position
 
             if thisObject is not None:
-                self.stream._appendCore(thisObject)
+                self.stream.coreAppend(thisObject)
         self.stream.elementsChanged()
 
 class KernSpine(HumdrumSpine):
@@ -1329,7 +1329,7 @@ class KernSpine(HumdrumSpine):
                     # pylint: disable=attribute-defined-outside-init
                     thisObject.humdrumPosition = event.position
                     thisObject.priority = event.position
-                    self.stream._appendCore(thisObject)
+                    self.stream.coreAppend(thisObject)
             except Exception as e: # pylint: disable=broad-except
                 import traceback
                 environLocal.warn(
@@ -1445,7 +1445,7 @@ class DynamSpine(HumdrumSpine):
             elif eventC.startswith('='):
                 if thisContainer is not None:
                     thisContainer.elementsChanged()
-                    self.stream._appendCore(thisContainer)
+                    self.stream.coreAppend(thisContainer)
                 thisContainer = hdStringToMeasure(eventC)
             elif eventC.startswith('!'):
                 thisObject = SpineComment(eventC)
@@ -1462,9 +1462,9 @@ class DynamSpine(HumdrumSpine):
             if thisObject is not None:
                 thisObject.humdrumPosition = event.position # pylint: disable=attribute-defined-outside-init
                 if thisContainer is None:
-                    self.stream._appendCore(thisObject)
+                    self.stream.coreAppend(thisObject)
                 else:
-                    thisContainer._appendCore(thisObject)
+                    thisContainer.coreAppend(thisObject)
 
         self.stream.elementsChanged()
 
@@ -1746,7 +1746,7 @@ class SpineCollection(object):
                     del el.humdrumPosition
                 except AttributeError: # no el.humdrumPosition
                     pass
-                newStream._appendCore(el)
+                newStream.coreAppend(el)
                 #newStream.append(el)
             newStream.elementsChanged()
             thisSpine.stream = newStream
@@ -1779,8 +1779,8 @@ class SpineCollection(object):
                 else:
                     insertEl.groups.append(voiceStr)
                     #newStream.insert(startPoint + insertEl.offset, insertEl)
-                    newStream._insertCore(startPoint + insertEl.offset, insertEl)
-        newStream.elementsChanged() # call between _insertCore and _appendCore
+                    newStream.coreInsert(startPoint + insertEl.offset, insertEl)
+        newStream.elementsChanged() # call between coreInsert and coreAppend
 
 
     def reclassSpines(self):
@@ -1944,13 +1944,13 @@ class SpineCollection(object):
                         voicePart.groups.append(voiceName)
                     mElOffset = mEl.offset
                     el.remove(mEl)
-                    voicePart._insertCore(mElOffset - lowestVoiceOffset, mEl)
+                    voicePart.coreInsert(mElOffset - lowestVoiceOffset, mEl)
                 #print voices
                 for voicePart in voices:
                     if voicePart is not None:
                         #voicePart.show('text')
                         voicePart.elementsChanged()
-                        el._insertCore(lowestVoiceOffset, voicePart)
+                        el.coreInsert(lowestVoiceOffset, voicePart)
                 el.elementsChanged()
                 #print el.number, "has voices at", lowestVoiceOffset
 

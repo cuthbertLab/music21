@@ -253,7 +253,7 @@ class ChordReducer(object):
                     break
             else:
                 m = self.reduceThisMeasure(mI, i, maxChords, closedPosition, forceOctave)
-                p._appendCore(m)
+                p.coreAppend(m)
 
             if self.printDebug:
                 print(i, " ", end="")
@@ -293,7 +293,7 @@ class ChordReducer(object):
                     cLast.quarterLength += newOffset - cLastEnd
             cLast = cElCopy
             cLastEnd = newOffset + cElCopy.quarterLength
-            m._insertCore(newOffset, cElCopy)
+            m.coreInsert(newOffset, cElCopy)
 
         tsContext = mI.parts[0].getContextByClass('TimeSignature')
         if tsContext is not None:

@@ -694,10 +694,10 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
             else:
                 thisSystem.systemLayout = None
 
-            thisPage._appendCore(thisSystem)
+            thisPage.coreAppend(thisSystem)
         thisPage.systemEnd = systemNumber
         thisPage.elementsChanged()
-        scoreLists._appendCore(thisPage)
+        scoreLists.coreAppend(thisPage)
     scoreLists.elementsChanged()
     return scoreLists
 

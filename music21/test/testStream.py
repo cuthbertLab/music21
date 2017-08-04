@@ -1008,6 +1008,11 @@ class Test(unittest.TestCase):
         self.assertEqual(M9.niceName, "Major Ninth")
         ## TODO: Many more tests
 
+    def testMelodicIntervalsB(self):
+        from music21 import converter
+        s1 = converter.parse("tinynotation: 3/4 c4 d' r b b'", makeNotation=False)
+        intS1 = s1.melodicIntervals()
+        self.assertEqual(len(intS1), 2)
 
     def testStripTiesBuiltA(self):
         s1 = Stream()
@@ -5519,24 +5524,6 @@ class Test(unittest.TestCase):
         s3.mergeElements(s1, classFilterList=['GeneralNote'])
         self.assertEqual(len(s3), 2)
 
-
-    def testInternalize(self):
-        s = Stream()
-        n1 = note.Note()
-        s.repeatAppend(n1, 4)
-        self.assertEqual(len(s), 4)
-
-        s.internalize()
-        # now have one component
-        self.assertEqual(len(s), 1)
-        self.assertEqual(s[0].classes[0], 'Voice') # default is a Voice
-        self.assertEqual(len(s[0]), 4)
-        self.assertEqual(str([n for n in s.voices[0].notesAndRests]), 
-                         '[<music21.note.Note C>, <music21.note.Note C>, ' 
-                         + '<music21.note.Note C>, <music21.note.Note C>]')
-
-
-
     def testDeepcopySpanners(self):
         from music21 import spanner, stream
         n1 = note.Note()
@@ -7811,7 +7798,7 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    music21.mainTest(Test, 'verbose') # , runTest='testScaleOffsetsNested')
+    music21.mainTest(Test, 'verbose') # , runTest='testMelodicIntervalsB')
 
 #------------------------------------------------------------------------------
 # eof

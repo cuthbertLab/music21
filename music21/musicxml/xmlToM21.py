@@ -732,16 +732,16 @@ class MusicXMLImporter(XMLParserBase):
         self.musicXmlVersion = mxVersion
 
         md = self.xmlMetadata(mxScore)
-        s._insertCore(0, md)
+        s.coreInsert(0, md)
 
         mxDefaults = mxScore.find('defaults')
         if mxDefaults is not None:
             scoreLayout = self.xmlDefaultsToScoreLayout(mxDefaults)
-            s._insertCore(0, scoreLayout)
+            s.coreInsert(0, scoreLayout)
 
         for mxCredit in mxScore.findall('credit'):
             credit = self.xmlCreditToTextBox(mxCredit)
-            s._insertCore(0, credit)
+            s.coreInsert(0, credit)
 
         self.parsePartList(mxScore)
         for p in mxScore.findall('part'):
@@ -760,7 +760,7 @@ class MusicXMLImporter(XMLParserBase):
 
 
             if part is not None: # for instance, in partStreams
-                s._insertCore(0.0, part)
+                s.coreInsert(0.0, part)
                 self.m21PartObjectsById[partId] = part
 
 
@@ -770,7 +770,7 @@ class MusicXMLImporter(XMLParserBase):
         # basically just the StaffGroups for now.
         rm = []
         for sp in self.spannerBundle.getByCompleteStatus(True):
-            self.stream._insertCore(0, sp)
+            self.stream.coreInsert(0, sp)
             rm.append(sp)
         # remove from original spanner bundle
         for sp in rm:
@@ -955,7 +955,7 @@ class MusicXMLImporter(XMLParserBase):
             self.setEditorial(mxPartGroup, staffGroup)
             staffGroup.completeStatus = True
             self.spannerBundle.append(staffGroup)
-            #self.stream._insertCore(0, staffGroup)
+            #self.stream.coreInsert(0, staffGroup)
         self.stream.elementsChanged()
 
 
@@ -1150,7 +1150,7 @@ class PartParser(XMLParserBase):
         # highest level container that needs them
         rm = []
         for sp in self.spannerBundle.getByCompleteStatus(True):
-            self.stream._insertCore(0, sp)
+            self.stream.coreInsert(0, sp)
             rm.append(sp)
         # remove from original spanner bundle
         for sp in rm:
@@ -1226,7 +1226,7 @@ class PartParser(XMLParserBase):
             streamPartStaff.addGroupForElements(partStaffId)
             streamPartStaff.groups.append(partStaffId)
             streamPartStaff.elementsChanged()
-            self.parent.stream._insertCore(0, streamPartStaff)
+            self.parent.stream.coreInsert(0, streamPartStaff)
             self.parent.m21PartObjectsById[partStaffId] = streamPartStaff
 
         for staffNumber in self._getUniqueStaffKeys():
@@ -1338,7 +1338,7 @@ class PartParser(XMLParserBase):
                 r1.duration.quarterLength = self.lastTimeSignature.barDuration.quarterLength
                 m.elementsChanged() # TODO: Remove -- durationTrigger should handle this.
 
-        self.stream._insertCore(self.lastMeasureOffset, m)
+        self.stream.coreInsert(self.lastMeasureOffset, m)
         self.adjustTimeAttributesFromMeasure(m)
 
         return m
@@ -1374,7 +1374,7 @@ class PartParser(XMLParserBase):
                 newInst = copy.deepcopy(self.activeInstrument)
                 #environLocal.warn("Put trans on new instrument")
                 self.activeInstrument = newInst
-                self.stream._insertCore(self.lastMeasureOffset, newInst)
+                self.stream.coreInsert(self.lastMeasureOffset, newInst)
         else:
             # There is no activeInstrument and we're not at the beginning
             # of the piece... this shouldn't happen, but let's send a warning
@@ -1382,7 +1382,7 @@ class PartParser(XMLParserBase):
             environLocal.warn("Received a transposition tag, but instrument to put it on!")
             fakeInst = instrument.Instrument()
             self.activeInstrument = fakeInst
-            self.stream._insertCore(self.lastMeasureOffset, fakeInst)
+            self.stream.coreInsert(self.lastMeasureOffset, fakeInst)
 
         # STEP 2:
         # Actually change the trnasposition of the instrument
@@ -1551,7 +1551,7 @@ class PartParser(XMLParserBase):
 
         self.stream.partName = instrumentObj.partName
         self.stream.partAbbreviation = instrumentObj.partAbbreviation
-        self.stream._insertCore(0.0, instrumentObj) # add instrument at zero offset
+        self.stream.coreInsert(0.0, instrumentObj) # add instrument at zero offset
 
     def getDefaultInstrument(self, mxPartInfo=None):
         r'''
@@ -1915,7 +1915,7 @@ class MeasureParser(XMLParserBase):
         {1.0} <music21.note.Note F>
         '''
         self.addToStaffReference(mxObjectOrNumber, m21Object)
-        self.stream._insertCore(offset, m21Object)
+        self.stream.coreInsert(offset, m21Object)
 
     def parse(self):
         # handle <print> before anything else, because it can affect
@@ -1994,10 +1994,10 @@ class MeasureParser(XMLParserBase):
         m = self.stream
         if addPageLayout is True:
             pl = self.xmlPrintToPageLayout(mxPrint)
-            m._insertCore(0.0, pl) # should this be parserOffset?
+            m.coreInsert(0.0, pl) # should this be parserOffset?
         if addSystemLayout is True or addPageLayout is False:
             sl = self.xmlPrintToSystemLayout(mxPrint)
-            m._insertCore(0.0, sl)
+            m.coreInsert(0.0, sl)
         if addStaffLayout is True:
             # assumes addStaffLayout is there...
             slFunc = self.xmlStaffLayoutToStaffLayout
@@ -3611,11 +3611,11 @@ class MeasureParser(XMLParserBase):
                                   (useVoice, mxNote))
                 environLocal.warn('Current voices: {0}'.format([v for v in m.voices]))
 
-                m._insertCore(self.offsetMeasureNote, n)
+                m.coreInsert(self.offsetMeasureNote, n)
             else:
-                thisVoice._insertCore(self.offsetMeasureNote, n)
+                thisVoice.coreInsert(self.offsetMeasureNote, n)
         else:
-            m._insertCore(self.offsetMeasureNote, n)
+            m.coreInsert(self.offsetMeasureNote, n)
 
 
     def xmlBarline(self, mxBarline):
@@ -4844,7 +4844,7 @@ class MeasureParser(XMLParserBase):
         >>> MP.useVoices
         False
 
-        `.updateVoiceInformation` runs `._insertCore` so we need to call elementsChanged:
+        `.updateVoiceInformation` runs `.coreInsert` so we need to call elementsChanged:
 
         >>> MP.stream.elementsChanged()
         >>> len(MP.stream)
@@ -4879,7 +4879,7 @@ class MeasureParser(XMLParserBase):
             for vIndex in sorted(self.voiceIndices):
                 v = stream.Voice()
                 v.id = vIndex # TODO: should use a separate voiceId or something in Voice.
-                self.stream._insertCore(0.0, v)
+                self.stream.coreInsert(0.0, v)
             self.useVoices = True
 #------------------------------------------------------------------------------
 

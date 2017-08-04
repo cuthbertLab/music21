@@ -674,13 +674,13 @@ class StreamIterator(object):
                 clearIsSorted = True # now the stream is probably not sorted...
 
             if not isinstance(o, str):
-                found._insertCore(o, e, ignoreSort=True)
+                found.coreInsert(o, e, ignoreSort=True)
             else:
                 if o == 'highestTime':
-                    found._storeAtEndCore(e)
+                    found.coreStoreAtEnd(e)
                 else:
                     # TODO: something different...
-                    found._storeAtEndCore(e)
+                    found.coreStoreAtEnd(e)
 
 
         if fe:

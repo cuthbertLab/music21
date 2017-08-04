@@ -25,6 +25,7 @@ All attributes here will eventually begin with `.core`.
 
 import unittest
 
+from music21 import common
 from music21 import spanner
 from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException
@@ -49,10 +50,19 @@ class StreamCoreMixin(object):
         #self._elementTree = tree.trees.ElementTree(source=self)
 
 
+    @common.deprecated('Aug 4 2017', 'Aug 2018 v5', 'use coreInsert instead')
     def _insertCore(self, offset, element,
                     ignoreSort=False,
                     setActiveSite=True):
+        self.coreInsert(self, offset, element, ignoreSort, setActiveSite)
+
+
+    def coreInsert(self, offset, element, 
+                   ignoreSort=False, setActiveSite=True, 
+                   ):        
         '''
+        N.B. -- a "core" method, not to be used by general users.  Run .insert() instead.
+        
         A faster way of inserting elements that does no checks,
         just insertion.
 
@@ -62,11 +72,11 @@ class StreamCoreMixin(object):
         When using this method, the caller is responsible for calling Stream.elementsChanged
         after all operations are completed.
 
-        Do not mix _insertCore with _appendCore operations.
+        Do not mix coreInsert with coreAppend operations.
 
         Returns boolean if the Stream is now sorted.
         '''
-        #environLocal.printDebug(['_insertCore', 'self', self,
+        #environLocal.printDebug(['coreInsert', 'self', self,
         #    'offset', offset, 'element', element])
         # need to compare highest time before inserting the element in
         # the elements list
@@ -102,9 +112,15 @@ class StreamCoreMixin(object):
         #self._elementTree.insert(float(offset), element)
         return storeSorted
 
+    @common.deprecated('Aug 4 2017', 'Aug 2018 v5', 'use coreAppend instead')
     def _appendCore(self, element):
+        self.coreAppend(element)
+
+    def coreAppend(self, element, setActiveSite=True):        
         '''
-        Low level appending; like `_insertCore` does not error check,
+        N.B. -- a "core" method, not to be used by general users.  Run .append() instead.
+        
+        Low level appending; like `coreInsert` does not error check,
         determine elements changed, or similar operations.
 
         When using this method, the caller is responsible for calling
@@ -112,18 +128,19 @@ class StreamCoreMixin(object):
         '''
         # NOTE: this is not called by append, as that is optimized
         # for looping multiple elements
-        self.setElementOffset(element, self.highestTime, addElement=True)
+        ht = self.highestTime
+        self.setElementOffset(element, ht, addElement=True)
         element.sites.add(self)
         # need to explicitly set the activeSite of the element
-        element.activeSite = self
+        if setActiveSite:
+            element.activeSite = self
         self._elements.append(element)
 
         # Make this faster
         #self._elementTree.insert(self.highestTime, element)
         # does not change sorted state
         if element.duration is not None:
-            self._setHighestTime(self.highestTime +
-                element.duration.quarterLength)
+            self._setHighestTime(ht + element.duration.quarterLength)
     #---------------------------------------------------------------------------
     # adding and editing Elements and Streams -- all need to call elementsChanged
     # most will set isSorted to False
@@ -302,18 +319,34 @@ class StreamCoreMixin(object):
         # all get() calls.
         element.purgeLocations()
 
+
+    @common.deprecated('Aug 4 2017', 'Aug 2018 v5', 'use coreStoreAtEnd')
     def _storeAtEndCore(self, element):
         '''
         Core method for adding end elements.
         To be called by other methods.
+        
+        DEPRECATED -- use coreStoreAtEnd
         '''
-        self._addElementPreProcess(element)
+        return self.coreStoreAtEnd(element)
+        
+        
+    def coreStoreAtEnd(self, element, setActiveSite=True):
+        '''
+        NB -- this is a "core" method.  Use .storeAtEnd() instead.
+        
+        Core method for adding end elements.
+        To be called by other methods.
+        '''
         self.setElementOffset(element, 'highestTime', addElement=True)
         element.sites.add(self)
         # need to explicitly set the activeSite of the element
-        element.activeSite = self
+        if setActiveSite:
+            element.activeSite = self
         #self._elements.append(element)
         self._endElements.append(element)
+
+
 
     @property
     def spannerBundle(self):
@@ -525,7 +558,7 @@ class StreamCoreMixin(object):
             return collectList
         else:
             for sp in collectList:
-                self._insertCore(0, sp)
+                self.coreInsert(0, sp)
             self.elementsChanged(updateIsFlat=False)
 
 # timing before: Macbook Air 2012, i7

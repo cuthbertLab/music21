@@ -1592,7 +1592,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                 o = notes[i][0][0] / float(ticksPerQuarter)
                 c.midiTickStart = notes[i][0][0]
 
-                s._insertCore(o, c)
+                s.coreInsert(o, c)
                 #iSkip = len(chordSub) # amount of accumulated chords
                 chordSub = None
             else: # just append the note, chordSub is None
@@ -1605,7 +1605,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                 o = notes[i][0][0] / float(ticksPerQuarter)
                 n.midiTickStart = notes[i][0][0]
 
-                s._insertCore(o, n)
+                s.coreInsert(o, n)
                 #iSkip = 1
             #break # exit secondary loop
             i += 1
@@ -1616,7 +1616,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
         # need to round, as floating point error is likely
         o = notes[0][0][0] / float(ticksPerQuarter)
         n.midiTickStart = notes[i][0][0]
-        s._insertCore(o, n)
+        s.coreInsert(o, n)
 
     s.elementsChanged()
     # quantize to nearest 16th

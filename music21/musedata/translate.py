@@ -150,13 +150,13 @@ def _processPending(hasVoices, pendingRecords, eLast, m, vActive):
     e, dynamicObjs = _musedataRecordListToNoteOrChord(pendingRecords, eLast)
     # place dynamics at same position as element
     if hasVoices:
-        vActive._appendCore(e)
+        vActive.coreAppend(e)
         for d in dynamicObjs:
-            vActive._insertCore(e.getOffsetBySite(vActive), d)
+            vActive.coreInsert(e.getOffsetBySite(vActive), d)
     else:
-        m._appendCore(e)
+        m.coreAppend(e)
         for d in dynamicObjs:
-            m._insertCore(e.getOffsetBySite(m), d)
+            m.coreInsert(e.getOffsetBySite(m), d)
     return e
 
 def musedataPartToStreamPart(museDataPart, inputM21=None):
@@ -260,9 +260,9 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
                 r = note.Rest()
                 r.quarterLength = mdr.getQuarterLength()
                 if hasVoices:
-                    vActive._appendCore(r)
+                    vActive.coreAppend(r)
                 else:
-                    m._appendCore(r)
+                    m.coreAppend(r)
                 eLast = r
                 continue
             # a note is note as chord, but may have chord tones
@@ -289,7 +289,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
         # may be bending elements in a voice to append to a measure
         if vActive is not None and vActive:
             vActive.elementsChanged()
-            m._insertCore(0, vActive)
+            m.coreInsert(0, vActive)
 
         m.elementsChanged()
 
@@ -299,7 +299,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
                 m.padAsAnacrusis()
                 #environLocal.printDebug(['incompletely filled Measure found on musedata import; ',
                 #   'interpreting as a anacrusis:', 'padingLeft:', m.paddingLeft])
-        p._appendCore(m)
+        p.coreAppend(m)
         barCount += 1
 
     p.elementsChanged()

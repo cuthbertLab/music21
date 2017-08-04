@@ -1021,13 +1021,13 @@ class Converter(object):
             m21Obj = stateObj.affectTokenAfterParse(m21Obj)
 
         if m21Obj is not None:
-            self.stream._appendCore(m21Obj)
+            self.stream.coreAppend(m21Obj)
 
         for i in range(numberOfStatesToEnd):
             stateToRemove = self.activeStates.pop()
             possibleObj = stateToRemove.end()
             if possibleObj is not None:
-                self.stream._appendCore(possibleObj)
+                self.stream.coreAppend(possibleObj)
 
 
     def parseStartStates(self, t):

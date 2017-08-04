@@ -2846,7 +2846,7 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
     # make the Voice
     theVoice = stream.Voice()
     for each in theLayer:
-        theVoice._appendCore(each)  # pylint: disable=protected-access
+        theVoice.coreAppend(each)
     theVoice.elementsChanged()
 
     # try to set the Voice's "id" attribte

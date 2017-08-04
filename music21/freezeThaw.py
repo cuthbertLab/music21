@@ -870,7 +870,7 @@ class StreamThawer(StreamFreezeThawBase):
             for e, offset in streamObj._storedElementOffsetTuples:
                 if offset != 'end':
                     try:
-                        streamObj._insertCore(offset, e)
+                        streamObj.coreInsert(offset, e)
                     except AttributeError:
                         print("Problem in decoding... some debug info...")
                         print(offset, e)
@@ -878,7 +878,7 @@ class StreamThawer(StreamFreezeThawBase):
                         print(streamObj.activeSite)
                         raise
                 else:
-                    streamObj._storeAtEndCore(e)
+                    streamObj.coreStoreAtEnd(e)
             del(streamObj._storedElementOffsetTuples)
             streamObj.elementsChanged()
 

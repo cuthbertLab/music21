@@ -505,14 +505,14 @@ def makeMeasures(
         for voiceIndex in range(voiceCount):
             v = stream.Voice()
             v.id = voiceIndex  # id is voice index, starting at 0
-            m._insertCore(0, v)
+            m.coreInsert(0, v)
 
         # avoid an infinite loop
         if thisTimeSignature.barDuration.quarterLength == 0:
             raise stream.StreamException(
                 'time signature {0!r} has no duration'.format(
                     thisTimeSignature))
-        post._insertCore(o, m)  # insert measure
+        post.coreInsert(o, m)  # insert measure
         # increment by meter length
         o += thisTimeSignature.barDuration.quarterLength
         if o >= oMax:  # may be zero
@@ -593,7 +593,7 @@ def makeMeasures(
             continue
 
         #environLocal.printDebug(['makeMeasures()', 'inserting', oNew, e])
-        # NOTE: cannot use _insertCore here for some reason
+        # NOTE: cannot use coreInsert here for some reason
         if voiceIndex is None:
             m.insert(oNew, e)
         else:  # insert into voice specified by the voice index
@@ -800,7 +800,7 @@ def makeRests(s,
             r.hideObjectOnPrint = hideRests
             #environLocal.printDebug(['makeRests(): add rests', r, r.duration])
             # place at oLowTarget to reach to oLow
-            v._insertCore(oLowTarget, r)
+            v.coreInsert(oLowTarget, r)
 
         # create rest from end to highest
         qLen = oHighTarget - oHigh
@@ -810,7 +810,7 @@ def makeRests(s,
             r.duration.quarterLength = qLen
             r.hideObjectOnPrint = hideRests
             # place at oHigh to reach to oHighTarget
-            v._insertCore(oHigh, r)
+            v.coreInsert(oHigh, r)
         v.elementsChanged()  # must update otherwise might add double r
 
         if fillGaps:
@@ -820,7 +820,7 @@ def makeRests(s,
                     r = note.Rest()
                     r.duration.quarterLength = e.duration.quarterLength
                     r.hideObjectOnPrint = hideRests
-                    v._insertCore(e.offset, r)
+                    v.coreInsert(e.offset, r)
         v.elementsChanged()
         #environLocal.printDebug(['post makeRests show()', v])
 
@@ -1141,7 +1141,7 @@ def makeTies(s,
                     # mNext has no voices but this one does
                     if mHasVoices:
                         # internalize all components in a voice
-                        mNext.internalize(container=stream.Voice)
+                        moveNotesToVoices(mNext)
                         # place in first voice
                         dst = mNext.voices[0]
                     else:  # no voices in either
@@ -1152,7 +1152,7 @@ def makeTies(s,
 
                 #eRemain.activeSite = mNext
                 # manually set activeSite
-                # cannot use _insertCore here
+                # cannot use coreInsert here
                 dst.insert(0, eRemain)
 
                 # we are not sure that this element fits
@@ -1380,6 +1380,23 @@ def realizeOrnaments(s):
 
     return newStream
 
+
+def moveNotesToVoices(source, classFilterList=('GeneralNote',)):
+    '''
+    Move 
+    '''
+    from music21.stream import Voice
+    dst = Voice()
+    
+    # cast to list so source can be edited.
+    affectedElements = list(source.iter.getElementsByClass(classFilterList))
+
+    for e in affectedElements:
+        dst.insert(source.elementOffset(e), e)
+        source.remove(e)
+    source.insert(0, dst)
+    
+
 #------------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
@@ -1389,6 +1406,23 @@ class Test(unittest.TestCase):
 
     def runTest(self):
         pass
+
+    def testNotesToVoices(self):
+        from music21 import stream
+        s = stream.Stream()
+        n1 = note.Note()
+        s.repeatAppend(n1, 4)
+        self.assertEqual(len(s), 4)
+
+        moveNotesToVoices(s)
+        # now have one component
+        self.assertEqual(len(s), 1)
+        self.assertEqual(s[0].classes[0], 'Voice') # default is a Voice
+        self.assertEqual(len(s[0]), 4)
+        self.assertEqual(str([n for n in s.voices[0].notesAndRests]), 
+                         '[<music21.note.Note C>, <music21.note.Note C>, ' 
+                         + '<music21.note.Note C>, <music21.note.Note C>]')
+
 
 #------------------------------------------------------------------------------
 

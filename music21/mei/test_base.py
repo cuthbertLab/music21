@@ -1993,7 +1993,7 @@ class TestLayerFromElement(unittest.TestCase):
         self.assertSequenceEqual(expectedMNFEOrder, mockNoteFromElement.call_args_list)
         mockVoice.assert_called_once_with()
         self.assertSequenceEqual(expectedAppendCalls,
-                                 mockVoice.return_value._appendCore.call_args_list)
+                                 mockVoice.return_value.coreAppend.call_args_list)
         mockVoice.return_value.elementsChanged.assert_called_once_with()
         self.assertEqual(theNAttribute, actual.id)
         self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
@@ -2029,7 +2029,7 @@ class TestLayerFromElement(unittest.TestCase):
         self.assertSequenceEqual(expectedMNFEOrder, mockNoteFromElement.call_args_list)
         mockVoice.assert_called_once_with()
         self.assertSequenceEqual(expectedAppendCalls,
-                                 mockVoice.return_value._appendCore.call_args_list)
+                                 mockVoice.return_value.coreAppend.call_args_list)
         mockVoice.return_value.elementsChanged.assert_called_once_with()
         self.assertEqual(overrideN, actual.id)
         self.assertEqual(0, elem.get.call_count)

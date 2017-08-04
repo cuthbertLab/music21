@@ -427,7 +427,7 @@ class PartTranslator(object):
                     appendMeasureToRepeatEndingsDict(self.lastMeasureToken,
                                                      mFill,
                                                      self.repeatEndings, i)
-                    p._appendCore(mFill)
+                    p.coreAppend(mFill)
                 self.lastMeasureNumber = t.number[0] - 1
                 self.lastMeasureToken = t
 
@@ -435,7 +435,7 @@ class PartTranslator(object):
             if len(t.number) == 1 and t.isCopyDefinition: # if not a range
                 p.elementsChanged()
                 m, self.kCurrent = _copySingleMeasure(t, p, self.kCurrent)
-                p._appendCore(m)
+                p.coreAppend(m)
                 self.lastMeasureNumber = m.number
                 self.lastMeasureToken = t
                 romans = m.getElementsByClass(roman.RomanNumeral)
@@ -454,7 +454,7 @@ class PartTranslator(object):
 
             else:
                 m = self.translateSingleMeasure(t)
-                p._appendCore(m)
+                p.coreAppend(m)
 
     def translateSingleMeasure(self, measureToken):
         self.currentMeasureToken = measureToken
@@ -508,9 +508,9 @@ class PartTranslator(object):
             # insert at beginning of measure if at beginning
             #    -- for things like pickups.
             if m.number < 2:
-                m._insertCore(0, self.kCurrent)
+                m.coreInsert(0, self.kCurrent)
             else:
-                m._insertCore(o, self.kCurrent)
+                m.coreInsert(o, self.kCurrent)
             self.foundAKeySignatureSoFar = True
             self.setKeyChangeToken = True
 
@@ -524,9 +524,9 @@ class PartTranslator(object):
             #insert at beginning of measure if at beginning
             #     -- for things like pickups.
             if m.number < 2:
-                m._insertCore(0, thisSig)
+                m.coreInsert(0, thisSig)
             else:
-                m._insertCore(o, thisSig)
+                m.coreInsert(o, thisSig)
             self.foundAKeySignatureSoFar = True
 
         elif isinstance(a, rtObjects.RTAnalyticKey):
@@ -564,7 +564,7 @@ class PartTranslator(object):
                 firstChord.tie = tie.Tie('stop')
                 self.previousRn = firstChord
                 self.previousChordInMeasure = firstChord
-                m._insertCore(0, firstChord)
+                m.coreInsert(0, firstChord)
             self.pivotChordPossible = False
 
         elif isinstance(a, rtObjects.RTNoChord):
@@ -583,7 +583,7 @@ class PartTranslator(object):
                             'too many notes in this measure: %s' % self.currentMeasureToken.src)
                     self.previousChordInMeasure.quarterLength = newQL
                 self.prefixLyric = ""
-                m._insertCore(o, rn)
+                m.coreInsert(o, rn)
                 self.previousChordInMeasure = rn
                 self.previousRn = rn
                 self.pivotChordPossible = False
@@ -653,7 +653,7 @@ class PartTranslator(object):
 
                 rn.addLyric(self.prefixLyric + a.src)
                 self.prefixLyric = ""
-                m._insertCore(o, rn)
+                m.coreInsert(o, rn)
                 self.previousChordInMeasure = rn
                 self.previousRn = rn
                 self.pivotChordPossible = True
@@ -669,7 +669,7 @@ class PartTranslator(object):
                     m.leftBarline = bar.Repeat(direction='start')
                 else:
                     rtt = RomanTextUnprocessedToken(a)
-                    m._insertCore(o, rtt)
+                    m.coreInsert(o, rtt)
             elif (self.tsCurrent is not None
                     and (self.tsCurrent.barDuration.quarterLength == o
                          or i == self.numberOfAtomsInCurrentMeasure - 1)):
@@ -677,14 +677,14 @@ class PartTranslator(object):
                     m.rightBarline = bar.Repeat(direction='end')
                 else:
                     rtt = RomanTextUnprocessedToken(a)
-                    m._insertCore(o, rtt)
+                    m.coreInsert(o, rtt)
             else: # mid measure repeat signs
                 rtt = RomanTextUnprocessedToken(a)
-                m._insertCore(o, rtt)
+                m.coreInsert(o, rtt)
 
         else:
             rtt = RomanTextUnprocessedToken(a)
-            m._insertCore(o, rtt)
+            m.coreInsert(o, rtt)
             #environLocal.warn("Got an unknown token: %r" % a)
 
         self.currentOffsetInMeasure = o
