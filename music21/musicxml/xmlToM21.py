@@ -1305,9 +1305,12 @@ class PartParser(XMLParserBase):
 
         Test that the rest lasts three, not four beats:
 
-        >>> m.notesAndRests[0]
+        >>> measureRest = m.notesAndRests[0]
+        >>> measureRest
         <music21.note.Rest rest>
-        >>> m.notesAndRests[0].duration.quarterLength
+        >>> measureRest.duration.type
+        'half'
+        >>> measureRest.duration.quarterLength
         3.0
         '''
         measureParser = MeasureParser(mxMeasure, parent=self)
@@ -1332,11 +1335,14 @@ class PartParser(XMLParserBase):
         if measureParser.fullMeasureRest is True:
             # recurse is necessary because it could be in voices...
             r1 = m.recurse().getElementsByClass('Rest')[0]
-            if (r1.duration.quarterLength == 4.0
-                and r1.duration.quarterLength != self.lastTimeSignature.barDuration.quarterLength):
-
+            if (r1.fullMeasure # set by xml measure='yes'
+                or (r1.duration.quarterLength != self.lastTimeSignature.barDuration.quarterLength
+                    and r1.duration.type in ('whole', 'breve')
+                    and r1.duration.dots == 0
+                    and not r1.duration.tuplets)
+                ):
                 r1.duration.quarterLength = self.lastTimeSignature.barDuration.quarterLength
-                m.coreElementsChanged() # TODO: Remove -- durationTrigger should handle this.
+                r1.fullMeasure = True
 
         self.stream.coreInsert(self.lastMeasureOffset, m)
         self.adjustTimeAttributesFromMeasure(m)
@@ -2547,6 +2553,7 @@ class MeasureParser(XMLParserBase):
         isFullMeasure = mxRestTag.get('measure')
         if isFullMeasure == "yes":
             self.fullMeasureRest = True # force full measure rest...
+            r.measureRest = True
             # this attribute is not 100% necessary to get a multimeasure rest spanner
 
         if self.parent: # will apply if active
@@ -5822,10 +5829,21 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(nList[12].duration.tuplets),
                 '(<music21.duration.Tuplet 3/2/eighth>,)')
 
+    def test34MeasureRestWithoutTag(self):
+        from xml.etree.ElementTree import fromstring as EL
+        
+        scoreMeasure = '<measure><note><rest/><duration>40320</duration></note></measure>'
+        mxMeasure = EL(scoreMeasure)
+        pp = PartParser()
+        pp.lastTimeSignature = meter.TimeSignature('3/4')
+        m = pp.xmlMeasureToMeasure(mxMeasure)
+        measureRest = m.notesAndRests[0]
+        self.assertEqual(measureRest.duration.type, 'half')
+        self.assertEqual(measureRest.duration.quarterLength, 3.0)
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='testParseTupletStartStop')
+    music21.mainTest(Test) #, runTest='test34MeasureRestWithoutTag')
 
 
 

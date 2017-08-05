@@ -2089,7 +2089,8 @@ class Duration(SlottedObjectMixin):
         cl = self.client
         if cl is None:
             return False
-        cl.informSites({'changedAttribute': 'duration', 'quarterLength': self._qtrLength})
+        cl.informSites({'changedAttribute': 'duration', 
+                        'quarterLength': self._qtrLength})
         return True
 
 
