@@ -243,6 +243,9 @@ def music21ObjectToMidiFile(music21Object):
     '''
     classes = music21Object.classes
     if 'Stream' in classes:
+        if music21Object.atSoundingPitch is False:
+            music21Object = music21Object.toSoundingPitch()
+        
         return streamToMidiFile(music21Object)
     else:
         m21ObjectCopy = copy.deepcopy(music21Object)
