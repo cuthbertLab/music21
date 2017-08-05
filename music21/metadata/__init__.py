@@ -392,7 +392,7 @@ class Metadata(base.Music21Object):
         else:
             return None
 
-    def search(self, query, field=None):
+    def search(self, query=None, field=None, **kwargs):
         r'''
         Search one or all fields with a query, given either as a string or a
         regular expression match.
@@ -416,7 +416,7 @@ class Metadata(base.Music21Object):
         ...     )
         (True, 'composer')
 
-        These don't work (Richard W. didn't have the rhythm...)
+        These don't work (Richard W. didn't have the rhythm to write this...)
 
         >>> md.search(
         ...     'Wagner',
@@ -447,8 +447,24 @@ class Metadata(base.Music21Object):
 
         >>> md.search('opl(.*)cott')
         (True, 'composer')
+        
+        
+        New in v.4 -- use a keyword argument to search
+        that field directly:
+        
+        >>> md.search(composer='Joplin')
+        (True, 'composer')
+        
+        TODO: Change to a namedtuple and add as a third element
+        during a succesful search, the full value of the retrieved
+        field (so that 'Joplin' would return 'Joplin, Scott')
         '''
         valueFieldPairs = []
+        if query is None and field is None and not kwargs:
+            return (False, None)
+        elif query is None and field is None and kwargs:
+            field, query = kwargs.popitem()
+        
         
         if field is not None:
             field = field.lower()

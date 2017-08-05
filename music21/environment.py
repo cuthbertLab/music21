@@ -69,6 +69,61 @@ class UserSettingsException(EnvironmentException):
 
 
 #------------------------------------------------------------------------------
+# this must be above EnvironmentSingleton
+class LocalCorpusSettings(list):
+    '''
+    A lightweight object for storing the 'LocalCorpusSettings' tag in the
+    .music21rc
+    
+    It is a subclass of list and has two additional attributes, name (which
+    should be None for the unnamed localCorpus) and metadataBundlePath
+    for a full filepath (ending in .json) as a location 
+    to store the .metadataBundle (.json) cache for the
+    LocalCorpus.  This can be None, in which case the (volitile) temp
+    directory is used.
+    
+    >>> lcs = environment.LocalCorpusSettings(['/tmp', '/home'])
+    >>> lcs
+    LocalCorpusSettings(['/tmp', '/home'])
+    
+    >>> lcs.name = 'theWholeEnchilada'
+    >>> lcs
+    LocalCorpusSettings(['/tmp', '/home'], name='theWholeEnchilada')
+    
+    >>> lcs.metadataBundlePath = '/home/enchilada.json'
+    >>> lcs
+    LocalCorpusSettings(['/tmp', '/home'], 
+                        name='theWholeEnchilada', 
+                        metadataBundlePath='/home/enchilada.json')
+
+
+    >>> list(lcs)
+    ['/tmp', '/home']
+    >>> lcs.name
+    'theWholeEnchilada'
+    >>> lcs.metadataBundlePath
+    '/home/enchilada.json'
+    >>> '/home' in lcs
+    True
+    >>> '/root' in lcs
+    False
+    '''
+    def __init__(self, paths=None, name=None, metadataBundlePath=None):
+        if paths is None:
+            paths = []
+        super(LocalCorpusSettings, self).__init__(paths)
+        self.name = name
+        self.metadataBundlePath = metadataBundlePath
+        
+    def __repr__(self):
+        listRepr = super(LocalCorpusSettings, self).__repr__()
+        namePart = ''
+        mdbpPart = ''
+        if self.name is not None:
+            namePart = ', name=' + repr(self.name)
+        if self.metadataBundlePath is not None:
+            mdbpPart = ', metadataBundlePath=' + repr(self.metadataBundlePath)
+        return 'LocalCorpusSettings({}{}{})'.format(listRepr, namePart, mdbpPart)
 #------------------------------------------------------------------------------
 
 
@@ -191,7 +246,7 @@ class _EnvironmentCore(object):
                 valid = True
         elif key == 'localCorpusSettings':
             # needs to be a list of strings for now
-            if common.isListLike(value):
+            if isinstance(value, LocalCorpusSettings):
                 valid = True
         else:  # temporarily not validating other preferences
             valid = True
@@ -227,18 +282,29 @@ class _EnvironmentCore(object):
         settings = settingsTree.getroot()
         for slot in settings:
             if slot.tag == 'localCorpusSettings':
-                ref['localCorpusSettings'] = []
-                for lcp in slot:
-                    fpCandidate = lcp.text.strip()
-                    ref['localCorpusSettings'].append(fpCandidate)
+                lcs = LocalCorpusSettings()
+                for slotChild in slot:
+                    if slotChild.tag == 'localCorpusPath':
+                        fpCandidate = slotChild.text.strip()
+                        lcs.append(fpCandidate)
+                    elif slotChild.tag == 'metadataBundlePath':
+                        lcs.metadataBundlePath = slotChild.text.strip()
+                ref['localCorpusSettings'] = lcs
+                        
             elif slot.tag == 'localCorporaSettings':
                 ref['localCorporaSettings'] = {}
                 for localCorpusSettings in slot:
                     name = localCorpusSettings.get('name')
-                    ref['localCorporaSettings'][name] = []
-                    for localCorpusPath in localCorpusSettings:
-                        fpCandidate = localCorpusPath.text.strip()
-                        ref['localCorporaSettings'][name].append(fpCandidate)
+                    lcs = LocalCorpusSettings()
+                    lcs.name = name
+                    for slotChild in localCorpusSettings:
+                        if slotChild.tag == 'localCorpusPath':
+                            fpCandidate = slotChild.text.strip()
+                            lcs.append(fpCandidate)
+                        elif slotChild.tag == 'metadataBundlePath':
+                            lcs.metadataBundlePath = slotChild.text.strip()
+                    ref['localCorporaSettings'][name] = lcs
+
             else:
                 name = slot.get('name')
                 value = slot.get('value')
@@ -298,7 +364,7 @@ class _EnvironmentCore(object):
         self._ref['warnings'] = 1
 
         # store a list of strings
-        self._ref['localCorpusSettings'] = []
+        self._ref['localCorpusSettings'] = LocalCorpusSettings()
         self._ref['localCorporaSettings'] = {}
 
         self._ref['manualCoreCorpusPath'] = None
@@ -344,23 +410,35 @@ class _EnvironmentCore(object):
 
         settingsTree = ET.ElementTree(settings)
         for key, value in sorted(ref.items()):
+            lcs = value
+            # assert isinstance(lcs, LocalCorpusSettings)
             if key == 'localCorpusSettings':
                 localCorpusSettings = ET.Element('localCorpusSettings')
-                for filePath in sorted(value):
+                for filePath in sorted(lcs):
                     localCorpusPath = ET.Element('localCorpusPath')
                     if filePath is not None:
                         localCorpusPath.text = filePath
                     localCorpusSettings.append(localCorpusPath)
+                if lcs.metadataBundlePath is not None:
+                    mdbp = ET.Element('metadataBundlePath')
+                    mdbp.text = lcs.metadataBundlePath
+                    localCorpusSettings.append(mdbp)
+                    
                 settings.append(localCorpusSettings)
             elif key == 'localCorporaSettings':
                 localCorporaSettings = ET.Element('localCorporaSettings')
-                for name, paths in sorted(value.items()):
+                for name, lcs in sorted(value.items()):
                     localCorpusSettings = ET.Element('localCorpusSettings', name=name)
-                    for filePath in sorted(paths):
+                    for filePath in sorted(lcs):
                         localCorpusPath = ET.Element('localCorpusPath')
                         if filePath is not None:
                             localCorpusPath.text = filePath
                         localCorpusSettings.append(localCorpusPath)
+                    if lcs.metadataBundlePath is not None:
+                        mdbp = ET.Element('metadataBundlePath')
+                        mdbp.text = lcs.metadataBundlePath
+                        localCorpusSettings.append(mdbp)
+                    
                     localCorporaSettings.append(localCorpusSettings)
                 settings.append(localCorporaSettings)
             else:
@@ -1118,7 +1196,7 @@ class UserSettings(object):
     paths.
 
     >>> #_DOCS_SHOW us['localCorpusPath'] = '~/Documents'
-    >>> #_DOCS_SHOW us['localCorpusSettings']
+    >>> #_DOCS_SHOW list(us['localCorpusSettings'])
     ['~/Documents']
 
     Alternatively, the environment.py module provides convenience functions for
@@ -1300,6 +1378,8 @@ def get(key):
     return us[key]
 
 
+
+
 #------------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
@@ -1351,8 +1431,12 @@ class Test(unittest.TestCase):
         self.assertTrue(common.whitespaceEqual(canonic, match))
 
         # try adding some local corpus settings
-        env['localCorpusSettings'] = ['a', 'b', 'c']
-        env['localCorporaSettings']['foo'] = ['bar', 'baz', 'quux']
+        env['localCorpusSettings'] = LocalCorpusSettings(['a', 'b', 'c'])
+        
+        lcFoo = LocalCorpusSettings(['bar', 'baz', 'quux'])
+        lcFoo.metadataBundlePath = '/tmp/local.json'
+        lcFoo.name = 'foo'
+        env['localCorporaSettings']['foo'] = lcFoo
         settingsTree = envSingleton().toSettingsXML()
         match = self.stringFromTree(settingsTree)
         if 'encoding' in match:
@@ -1377,6 +1461,7 @@ class Test(unittest.TestCase):
       <localCorpusPath>bar</localCorpusPath>
       <localCorpusPath>baz</localCorpusPath>
       <localCorpusPath>quux</localCorpusPath>
+      <metadataBundlePath>/tmp/local.json</metadataBundlePath>
     </localCorpusSettings>
   </localCorporaSettings>
   <localCorpusSettings>
@@ -1404,7 +1489,7 @@ class Test(unittest.TestCase):
 
         # use a fake ref dict to get settings
         ref = {}
-        ref['localCorpusSettings'] = ['x', 'y', 'z']
+        ref['localCorpusSettings'] = LocalCorpusSettings(['x', 'y', 'z'])
         ref['midiPath'] = 'w'
         settings = envSingleton().toSettingsXML(ref)
 
@@ -1455,16 +1540,16 @@ class Test(unittest.TestCase):
 
         # setting the local corpus path pref is like adding a path
         env['localCorpusPath'] = '/a'
-        self.assertEqual(env['localCorpusSettings'], ['/a'])
+        self.assertEqual(list(env['localCorpusSettings']), ['/a'])
 
         env['localCorpusPath'] = '/b'
-        self.assertEqual(env['localCorpusSettings'], ['/a', '/b'])
+        self.assertEqual(list(env['localCorpusSettings']), ['/a', '/b'])
 
 
 #------------------------------------------------------------------------------
 
 
-_DOC_ORDER = [UserSettings, Environment]
+_DOC_ORDER = [UserSettings, Environment, LocalCorpusSettings]
 
 if __name__ == "__main__":
     import music21

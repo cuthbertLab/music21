@@ -311,7 +311,8 @@ class Corpus(object):
     def search(self,
                query,
                field=None,
-               fileExtensions=None):
+               fileExtensions=None,
+               **kwargs):
         r'''
         Search this corpus for metadata entries, returning a metadataBundle
 
@@ -336,6 +337,7 @@ class Corpus(object):
             query,
             field=field,
             fileExtensions=fileExtensions,
+            **kwargs
             )
 
     ### PUBLIC PROPERTIES ###
@@ -925,6 +927,12 @@ class LocalCorpus(Corpus):
 
     @property
     def cacheName(self):
+        '''
+        Returns the name of the cache:
+        
+        >>> corpus.corpora.LocalCorpus('funk').cacheName
+        'local-funk'
+        '''
         cacheName = 'local'
         if self.name is not None and self.name != 'local':
             cacheName += '-{0}'.format(self.name)
@@ -1040,10 +1048,16 @@ class LocalCorpus(Corpus):
         from music21.metadata.caching import cacheMetadata
         
         userSettings = environment.UserSettings()
+        lcs = environment.LocalCorpusSettings(self.directoryPaths)
+        if self.name != 'local':
+            lcs.name = self.name
+        ## TODO: save metadata location!
+            
+            
         if self.name == 'local':
-            userSettings['localCorpusSettings'] = self.directoryPaths
+            userSettings['localCorpusSettings'] = lcs
         else:
-            userSettings['localCorporaSettings'][self.name] = self.directoryPaths
+            userSettings['localCorporaSettings'][self.name] = lcs
         environment.Environment().write()
         cacheMetadata([self.name], verbose=True)
 
@@ -1079,14 +1093,15 @@ class LocalCorpus(Corpus):
     @property
     def name(self):
         r'''
-        The name of a given local corpus.
+        The name of a given local corpus.  Either 'local' for the unnamed corpus
+        or a name for a named corpus
 
         >>> from music21 import corpus
         >>> corpus.corpora.LocalCorpus().name
         'local'
 
-        >>> corpus.corpora.LocalCorpus(name='Bach Chorales').name
-        'Bach Chorales'
+        >>> corpus.corpora.LocalCorpus('funkCorpus').name
+        'funkCorpus'
 
         '''
         if self._name is None:

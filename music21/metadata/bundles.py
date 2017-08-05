@@ -59,9 +59,9 @@ class MetadataEntry(object):
     >>> metadataEntry.sourcePath
     'bach/bwv66.6.mxl'
 
-    The metadata payload contains its metadata object:
+    The metadata property contains its :class:`~music21.metadata.RichMetadata` object:
 
-    >>> metadataEntry.metadataPayload
+    >>> metadataEntry.metadata
     <music21.metadata.RichMetadata object at 0x...>
 
     And the metadata entry can be parsed:
@@ -88,7 +88,7 @@ class MetadataEntry(object):
     def __getnewargs__(self):
         return (
             self.sourcePath,
-            self.metadataPayload,
+            self.metadata,
             self.number,
             )
 
@@ -112,9 +112,9 @@ class MetadataEntry(object):
         score = self.parse()
         score.show(showFormat)
 
-    def search(self, query, field=None):
+    def search(self, query=None, field=None, **kwargs):
         # runs search on the RichMetadata object
-        return self.metadataPayload.search(query, field)
+        return self.metadata.search(query, field, **kwargs)
 
     ### PUBLIC PROPERTIES ###
 
@@ -123,6 +123,14 @@ class MetadataEntry(object):
         return MetadataBundle.corpusPathToKey(self.sourcePath, self.number)
 
     @property
+    def metadata(self):
+        '''
+        Returns the Metadata object that is stored in the bundle.
+        '''
+        return self._metadataPayload
+    
+    @property
+    @common.deprecated('Aug 5 2017', 'Aug 2018 v5', 'just use .metadata instead')
     def metadataPayload(self):
         return self._metadataPayload
 
@@ -172,7 +180,11 @@ class MetadataBundle(object):
     <music21.stream.Score ...>
 
     A metadata bundle can be instantiated in three ways, (1) from a ``Corpus`` instance,
-    or (2) a string indicating which corpus cacheName to draw from:
+    or (2) a string indicating which corpus name to draw from, and then calling 
+    .read() or (3) by calling 
+    .metadataBundle on a corpus object.  This
+    calls `.read()` automatically:
+
 
     Method 1:
 
@@ -194,9 +206,6 @@ class MetadataBundle(object):
     <music21.metadata.bundles.MetadataBundle 'core': {150... entries}>
     >>> coreBundle
     <music21.metadata.bundles.MetadataBundle 'core': {150... entries}>
-
-    The third method is to call `.metadataBundle` on the corpus itself. This
-    calls `.read()` automatically:
 
     Method 3:
 
@@ -244,10 +253,15 @@ class MetadataBundle(object):
         self._metadataEntries = OrderedDict()
         if not isinstance(expr, (str, corpus.corpora.Corpus, type(None))):
             raise MetadataBundleException("Need to take a string, corpus, or None as expression")
+
+        self._corpus = None
+
         if isinstance(expr, corpus.corpora.Corpus):
             self._name = expr.name
+            self.corpus = expr
         else:
             self._name = expr
+            self.corpus = None
 
     ### SPECIAL METHODS ###
 
@@ -594,6 +608,8 @@ class MetadataBundle(object):
 
     ### PUBLIC PROPERTIES ###
 
+    ### PUBLIC PROPERTIES ###
+
     @property
     def corpus(self):
         r'''
@@ -607,10 +623,18 @@ class MetadataBundle(object):
         >>> coreBundle.corpus
         <music21.corpus.corpora.CoreCorpus>
         '''
-        from music21.corpus import manager
+        if self._corpus is not None:
+            return self._corpus
         if self.name is None:
             return None
+        
+        from music21.corpus import manager
         return manager.fromName(self.name)
+
+    @corpus.setter
+    def corpus(self, newCorpus):
+        self._corpus = newCorpus
+
 
     @property
     def filePath(self):
@@ -662,7 +686,7 @@ class MetadataBundle(object):
         else: # pragma: no cover
             filePath = os.path.join(
                 environLocal.getRootTempDir(),
-                'unnamed-corpus.json',
+                'local-' + self.name + '.json',
                 )
         return filePath
 
@@ -1169,7 +1193,7 @@ class MetadataBundle(object):
         for key in self._metadataEntries:
             metadataEntry = self._metadataEntries[key]
             # ignore stub entries
-            if metadataEntry.metadataPayload is None:
+            if metadataEntry.metadata is None:
                 continue
             if metadataEntry.search(query, field)[0]:
                 include = False
