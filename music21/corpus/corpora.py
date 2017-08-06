@@ -1081,8 +1081,7 @@ class LocalCorpus(Corpus):
         lcs = environment.LocalCorpusSettings(self.directoryPaths)
         if self.name != 'local':
             lcs.name = self.name
-        ## TODO: save metadata location!
-            
+        lcs.cacheFilePath = self.cacheFilePath
             
         if self.name == 'local':
             userSettings['localCorpusSettings'] = lcs
@@ -1095,6 +1094,12 @@ class LocalCorpus(Corpus):
         '''
         Cache the metadata for a single corpus.
         '''
+        def update(message):
+            if verbose is True:
+                environLocal.warn(message)
+            else:
+                environLocal.printDebug(message)
+        
         if timer is None:
             timer = common.Timer()
             timer.start()
@@ -1103,12 +1108,9 @@ class LocalCorpus(Corpus):
         metadataBundle = self.metadataBundle
         paths = self.getPaths()
         
-        message = '{} metadata cache: starting processing of paths: {}'.format(
-                self.name, len(paths))
-        if verbose is True:
-            environLocal.warn(message)
-        else:
-            environLocal.printDebug(message)
+        update('{} metadata cache: starting processing of paths: {}'.format(
+                self.name, len(paths)))
+        update('cache: filename: {0}'.format(metadataBundle.filePath))
 
         failingFilePaths = metadataBundle.addFromPaths(
             paths,
@@ -1117,20 +1119,11 @@ class LocalCorpus(Corpus):
             verbose=verbose
             )
         
-        message = 'cache: writing time: {0} md items: {1}\n'.format(
-            timer, len(metadataBundle))
+        update('cache: writing time: {0} md items: {1}\n'.format(
+            timer, len(metadataBundle)))
 
-        if verbose is True:
-            environLocal.warn(message)
-        else:
-            environLocal.printDebug(message)
+        update('cache: filename: {0}'.format(metadataBundle.filePath))
         
-        message = 'cache: filename: {0}'.format(metadataBundle.filePath)
-        
-        if verbose is True:
-            environLocal.warn(message)
-        else:
-            environLocal.printDebug(message)
         del metadataBundle
         return failingFilePaths
 
