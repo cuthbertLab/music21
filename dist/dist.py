@@ -26,13 +26,17 @@ To do a release,
 5. commit and then check test/testSingleCoreAll.py results on Travis-CI
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
      but should be done before making a release).
-6. then python3 test/testDocumentation.py # only designed for Python 3...
+6. then python3 test/testDocumentation.py # only designed for Python 3... [*]
+
+[*] you will need pytest and nbval installed (along with ipython and jupyter)
+
 7. run documentation/make.py clean
 8. run documentation/make.py   [*]
 
 [*] you will need sphinx, IPython (pip or easy_install), markdown, and pandoc (.dmg) installed
 
 9. run documentation/upload.py [not via eclipse] or upload via ssh.
+   -- you will need an MIT username and password
 
 10. And finally this file.
 
