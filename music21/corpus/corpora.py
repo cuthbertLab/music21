@@ -178,18 +178,53 @@ class Corpus(object):
         mdb = self.metadataBundle
         if mdb is None:
             return self 
-        if mdb.filePath is None:
+        if self.cacheFilePath is None:
             return self
+
         mdb.clear()
         mdb.delete()
-        mdb.addFromPaths(
-            self.getPaths(),
+        self.cacheMetadata(useMultiprocessing=useMultiprocessing, verbose=True)
+        return self.metadataBundle
+    
+    def cacheMetadata(self, useMultiprocessing=True, verbose=True, timer=None):
+        '''
+        Cache the metadata for a single corpus.
+        '''
+        def update(message):
+            if verbose is True:
+                environLocal.warn(message)
+            else:
+                environLocal.printDebug(message)
+        
+        if timer is None:
+            timer = common.Timer()
+            timer.start()
+        
+        
+        metadataBundle = self.metadataBundle
+        paths = self.getPaths()
+        
+        update('{} metadata cache: starting processing of paths: {}'.format(
+                self.name, len(paths)))
+        update('cache: filename: {0}'.format(metadataBundle.filePath))
+
+        failingFilePaths = metadataBundle.addFromPaths(
+            paths,
             parseUsingCorpus=self.parseUsingCorpus,
             useMultiprocessing=useMultiprocessing,
             verbose=verbose
             )
-        return mdb
-    
+        
+        update('cache: writing time: {0} md items: {1}\n'.format(
+            timer, len(metadataBundle)))
+
+        update('cache: filename: {0}'.format(metadataBundle.filePath))
+        
+        del metadataBundle
+        return failingFilePaths
+
+
+
     
     @abc.abstractmethod
     def getPaths(self, fileExtensions=None, expandExtensions=True):
@@ -1090,43 +1125,6 @@ class LocalCorpus(Corpus):
         environment.Environment().write()
         self.cacheMetadata()
         
-    def cacheMetadata(self, useMultiprocessing=True, verbose=True, timer=None):
-        '''
-        Cache the metadata for a single corpus.
-        '''
-        def update(message):
-            if verbose is True:
-                environLocal.warn(message)
-            else:
-                environLocal.printDebug(message)
-        
-        if timer is None:
-            timer = common.Timer()
-            timer.start()
-        
-        
-        metadataBundle = self.metadataBundle
-        paths = self.getPaths()
-        
-        update('{} metadata cache: starting processing of paths: {}'.format(
-                self.name, len(paths)))
-        update('cache: filename: {0}'.format(metadataBundle.filePath))
-
-        failingFilePaths = metadataBundle.addFromPaths(
-            paths,
-            parseUsingCorpus=self.parseUsingCorpus,
-            useMultiprocessing=useMultiprocessing,
-            verbose=verbose
-            )
-        
-        update('cache: writing time: {0} md items: {1}\n'.format(
-            timer, len(metadataBundle)))
-
-        update('cache: filename: {0}'.format(metadataBundle.filePath))
-        
-        del metadataBundle
-        return failingFilePaths
-
 
     ### PUBLIC PROPERTIES ###
 
