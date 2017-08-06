@@ -50,15 +50,19 @@ To do a release,
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-13. Unless this is a pre-release, update PyPI by going to pypi.python.org and logging in and
-    selecting music21 and clicking
-    edit at the top and augment the version number and the download URL.
-    The URL will be printed when
-    running dist.py -- (the md5 hash is no longer needed)
+13. Upload the new file with "twine upload music21-4.1.0.tar.gz" [*]
 
-14. Unless this is a pre-release,
-    Upload the .tar.gz file to PyPi by clicking "files" at the time.  Click Choose File.
-    File Type is Source.  Leave everything else blank, then click "upload new file"
+    [*] Requires twine to be installed
+    
+    You will need a file called ~/.pypirc with
+
+        [distutils]
+        index-servers =
+            pypi
+        
+        [pypi]
+        username:yourusername
+        password:yourpassword
 
 15. Delete the two .tar.gz files in dist...
 
