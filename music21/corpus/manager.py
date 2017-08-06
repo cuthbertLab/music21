@@ -66,47 +66,6 @@ def fromName(name):
     else:
         return corpora.LocalCorpus(name=name)
 
-def fromCacheName(name):
-    '''
-    Instantiate a specific corpus based on its `cacheName`:
-
-    These are the same as `fromName`.
-
-    >>> corpus.manager.fromCacheName('core')
-    <music21.corpus.corpora.CoreCorpus>
-
-    >>> corpus.manager.fromCacheName('local')
-    <music21.corpus.corpora.LocalCorpus: 'local'>
-
-    >>> corpus.manager.fromCacheName(None)
-    <music21.corpus.corpora.LocalCorpus: 'local'>
-
-    Other local corpora are different and prefaced by "local-":
-
-    >>> corpus.manager.fromCacheName('local-testDummy')
-    <music21.corpus.corpora.LocalCorpus: 'testDummy'>
-
-    Raises a corpus exception if
-    it is not an allowable cache name.
-
-    >>> corpus.manager.fromCacheName('testDummy')
-    Traceback (most recent call last):
-    music21.exceptions21.CorpusException: Cannot parse a cacheName of 'testDummy'
-    '''
-#     >>> corpus.manager.fromCacheName('virtual')
-#     <music21.corpus.corpora.VirtualCorpus>
-    
-    if name == 'core':
-        return corpora.CoreCorpus()
-#     elif name == 'virtual':
-#         return corpora.VirtualCorpus()
-    elif name == 'local' or name is None:
-        return corpora.LocalCorpus()
-    elif name.startswith('local-'):
-        return corpora.LocalCorpus(name=name[6:])
-    else:
-        raise CorpusException("Cannot parse a cacheName of '{0}'".format(name))
-
 
 def iterateCorpora(returnObjects=True):
     '''
@@ -328,28 +287,28 @@ def getMetadataBundleByCorpus(corpusObject):
     >>> lc = corpus.corpora.LocalCorpus('junk')
     >>> mdb1 = corpus.manager.getMetadataBundleByCorpus(lc)
     >>> mdb1
-    <music21.metadata.bundles.MetadataBundle 'local-junk': {0 entries}>
+    <music21.metadata.bundles.MetadataBundle 'junk': {0 entries}>
 
     '''
     cacheMetadataBundleFromDisk(corpusObject)
-    cacheName = corpusObject.cacheName
-    if cacheName in _metadataBundles:        
-        return _metadataBundles[cacheName]
+    corpusName = corpusObject.name
+    if corpusName in _metadataBundles:        
+        return _metadataBundles[corpusName]
     else: # pragma: no cover
         raise CorpusException('No metadata bundle found for corpus {0} with name {1}'.format(
-            corpusObject, cacheName))
+            corpusObject, corpusName))
 
 def cacheMetadataBundleFromDisk(corpusObject):
     r'''
     Update a corpus' metadata bundle from its stored JSON file on disk.
     '''
-    corpusCacheName = corpusObject.cacheName
-    if (corpusCacheName not in _metadataBundles or
-            _metadataBundles[corpusCacheName] is None):
-        metadataBundle = metadata.bundles.MetadataBundle(corpusCacheName)
+    corpusName = corpusObject.name
+    if (corpusName not in _metadataBundles or
+            _metadataBundles[corpusName] is None):
+        metadataBundle = metadata.bundles.MetadataBundle(corpusName)
         metadataBundle.read()
         metadataBundle.validate()
-        _metadataBundles[corpusCacheName] = metadataBundle
+        _metadataBundles[corpusName] = metadataBundle
 
 
 def readAllMetadataBundlesFromDisk():

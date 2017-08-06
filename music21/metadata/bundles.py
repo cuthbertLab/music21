@@ -624,7 +624,10 @@ class MetadataBundle(object):
         <music21.corpus.corpora.CoreCorpus>
         '''
         if self._corpus is not None:
-            return self._corpus
+            cObj = common.unwrapWeakref(self._corpus)
+            if cObj is not None:
+                return cObj
+            
         if self.name is None:
             return None
         
@@ -633,7 +636,7 @@ class MetadataBundle(object):
 
     @corpus.setter
     def corpus(self, newCorpus):
-        self._corpus = newCorpus
+        self._corpus = common.wrapWeakref(newCorpus)
 
 
     @property
@@ -658,44 +661,23 @@ class MetadataBundle(object):
         >>> '_metadataCache' in localPath
         False
         
-        >>> funkPath = corpus.corpora.LocalCorpus('funk').metadataBundle.filePath
+        >>> funkCorpus = corpus.corpora.LocalCorpus('funk')
+        >>> funkPath = funkCorpus.metadataBundle.filePath
         >>> funkPath.endswith('local-funk.json')
-        True       
+        True        
         '''
-#         >>> virPath = corpus.corpora.VirtualCorpus().metadataBundle.filePath
-#         >>> virPath.endswith('virtual.json')
-#         True
-#         >>> '_metadataCache' in virPath
-#         True
-
-
-        
-        if self.name is None:
+        c = self.corpus
+        if c is None:
             return None
-        if self.name in ('virtual', 'core'):
-            filePath = os.path.join(
-                common.getMetadataCacheFilePath(),
-                self.name + '.json',
-                )
-        elif self.name.startswith('local'):
-            # write in temporary dir
-            filePath = os.path.join(
-                environLocal.getRootTempDir(),
-                self.name + '.json',
-                )
-        else: # pragma: no cover
-            filePath = os.path.join(
-                environLocal.getRootTempDir(),
-                'local-' + self.name + '.json',
-                )
-        return filePath
+        else:
+            return c.cacheFilePath
 
     @property
     def name(self):
         r'''
         The name of the metadata bundle.
 
-        Can be 'core', 'local', 'local-{name}' where name is the name
+        Can be 'core', 'local', '{name}' where name is the name
         of a named local corpus or None.
 
         The names 'core' and 'local' refer to the core and local 
@@ -709,7 +691,7 @@ class MetadataBundle(object):
 
         >>> funkCorpus = corpus.corpora.LocalCorpus('funk')
         >>> funkCorpus.metadataBundle.name
-        'local-funk'
+        'funk'
 
         Return string or None.
         '''
@@ -770,7 +752,7 @@ class MetadataBundle(object):
         skippedJobsCount = 0
         for path in paths:
             if not path.startswith('http'):
-                path = os.path.abspath(path)
+                path = common.cleanpath(path)
             key = self.corpusPathToKey(path)
             if key in self._metadataEntries and not key.startswith('http'):
                 pathModificationTime = os.path.getctime(path)
@@ -1295,7 +1277,7 @@ class MetadataBundle(object):
                 validatedPaths.add(metadataEntry.sourcePath)
                 continue
             if not os.path.isabs(sourcePath):
-                sourcePath = os.path.abspath(os.path.join(
+                sourcePath = common.cleanpath(os.path.join(
                     common.getCorpusFilePath(),
                     sourcePath,
                     ))
@@ -1349,7 +1331,6 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-
 #------------------------------------------------------------------------------
 
 
@@ -1364,7 +1345,7 @@ __all__ = [
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='testUserSpecifiedPath')
 
 
 #------------------------------------------------------------------------------

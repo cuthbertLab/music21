@@ -40,7 +40,6 @@ def cacheMetadata(corpusNames=None,
 
     Call as ``metadata.cacheMetadata()``
     '''
-    from music21.corpus import corpora
     from music21.corpus import manager
 
     localCorporaNames = manager.listLocalCorporaNames(skipNone=True)
@@ -60,49 +59,9 @@ def cacheMetadata(corpusNames=None,
     # the core cache is based on local files stored in music21
     # virtual is on-line
     for corpusName in corpusNames:
-        if corpusName == 'core':
-            corporaObject = corpora.CoreCorpus()
-        elif corpusName == 'local':
-            corporaObject = corpora.LocalCorpus()
-#         elif corpusName == 'virtual':
-#             corporaObject = corpora.VirtualCorpus()
-        elif corpusName in localCorporaNames:
-            corporaObject = corpora.LocalCorpus(corpusName)
-        else:
-            message = 'invalid corpus name provided: {0!r}'.format(corpusName)
-            raise MetadataCacheException(message)
+        corpusObject = manager.fromName(corpusName)
+        failingFilePaths += corpusObject.cacheMetadata(useMultiprocessing, verbose, timer)
 
-        metadataBundle = corporaObject.metadataBundle
-        paths = corporaObject.getPaths()
-        
-        message = '{} metadata cache: starting processing of paths: {}'.format(
-                corpusName, len(paths))
-        if verbose is True:
-            environLocal.warn(message)
-        else:
-            environLocal.printDebug(message)
-
-        failingFilePaths += metadataBundle.addFromPaths(
-            paths,
-            parseUsingCorpus=corporaObject.parseUsingCorpus,
-            useMultiprocessing=useMultiprocessing,
-            verbose=verbose
-            )
-        message = 'cache: writing time: {0} md items: {1}\n'.format(
-            timer, len(metadataBundle))
-
-        if verbose is True:
-            environLocal.warn(message)
-        else:
-            environLocal.printDebug(message)
-        
-        message = 'cache: filename: {0}'.format(metadataBundle.filePath)
-        
-        if verbose is True:
-            environLocal.warn(message)
-        else:
-            environLocal.printDebug(message)
-        del metadataBundle
         
     message = 'cache: final writing time: {0} seconds'.format(timer)
     if verbose is True:

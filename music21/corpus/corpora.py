@@ -35,6 +35,7 @@ class Corpus(object):
 
     __metaclass__ = abc.ABCMeta
 
+    ## TODO: this is volitile -- should be elsewhere...
     _allExtensions = (
         common.findInputExtension('abc') +
         common.findInputExtension('capella') +
@@ -160,7 +161,7 @@ class Corpus(object):
     ### PRIVATE PROPERTIES ###
 
     @abc.abstractproperty
-    def cacheName(self):
+    def cacheFilePath(self):
         raise NotImplementedError
 
     ### PUBLIC METHODS ###
@@ -388,8 +389,9 @@ class Corpus(object):
         class.
         '''
         from music21.corpus import manager
-        return manager.getMetadataBundleByCorpus(self)
-
+        mdb = manager.getMetadataBundleByCorpus(self)
+        mdb.corpus = self
+        return mdb
 
     def all(self):
         '''
@@ -514,12 +516,20 @@ class CoreCorpus(Corpus):
 
     _noCorpus = False
 
+    name = 'core'
+
     ### PRIVATE PROPERTIES ###
 
-    @property
-    def cacheName(self):
-        return 'core'
 
+    @property
+    def cacheFilePath(self):
+        filePath = os.path.join(
+            common.getMetadataCacheFilePath(),
+            'core.json',
+        )
+        return filePath
+
+        
     ### PUBLIC METHODS ###
 
     def getBachChorales(
@@ -900,7 +910,7 @@ class LocalCorpus(Corpus):
             raise CorpusException("The name '{}' is reserved.".format(name))
         else:
             self._name = name
-
+            
     ### SPECIAL METHODS ###
 
     def __repr__(self):
@@ -926,17 +936,37 @@ class LocalCorpus(Corpus):
     ### PRIVATE PROPERTIES ###
 
     @property
-    def cacheName(self):
+    def cacheFilePath(self):
         '''
-        Returns the name of the cache:
+        Get the path to the file path that stores the .json file.
+        '''
+        localCorpusSettings = self._getSettings()
+        if localCorpusSettings.cacheFilePath is not None:
+            return localCorpusSettings.cacheFilePath
         
-        >>> corpus.corpora.LocalCorpus('funk').cacheName
-        'local-funk'
+        filePath = os.path.join(
+            environLocal.getRootTempDir(),
+            'local-' + self.name + '.json',
+            )
+        return filePath
+
+    @cacheFilePath.setter
+    def cacheFilePath(self, value):
         '''
-        cacheName = 'local'
-        if self.name is not None and self.name != 'local':
-            cacheName += '-{0}'.format(self.name)
-        return cacheName
+        Set the path to the file path that stores the .json file.
+        '''
+        if not self.existsInSettings:
+            raise CorpusException('Save this corpus before changing the cacheFilePath')
+        localCorpusSettings = self._getSettings()
+        localCorpusSettings.cacheFilePath = common.cleanpath(value)
+        en = environment.Environment()
+
+        if self.name == 'local':
+            en['localCorpusSettings'] = localCorpusSettings
+        else:
+            en['localCorporaSettings'][self.name] = localCorpusSettings
+
+        en.write()
 
     ### PUBLIC METHODS ###
 
@@ -955,16 +985,18 @@ class LocalCorpus(Corpus):
             raise corpus.CorpusException(
                 'an invalid file path has been provided: {0!r}'.format(
                     directoryPath))
-        directoryPath = os.path.expanduser(directoryPath)
+        
+        directoryPath = common.cleanpath(directoryPath)
         if (not os.path.exists(directoryPath) or
                 not os.path.isdir(directoryPath)):
             raise corpus.CorpusException(
                 'an invalid file path has been provided: {0!r}'.format(
                     directoryPath))
-        if self.cacheName not in LocalCorpus._temporaryLocalPaths:
-            LocalCorpus._temporaryLocalPaths[self.cacheName] = set()
-        LocalCorpus._temporaryLocalPaths[self.cacheName].add(directoryPath)
-        self._removeNameFromCache(self.cacheName)
+        if self.name not in LocalCorpus._temporaryLocalPaths:
+            LocalCorpus._temporaryLocalPaths[self.name] = set()
+            
+        LocalCorpus._temporaryLocalPaths[self.name].add(directoryPath)
+        self._removeNameFromCache(self.name)
 
     def delete(self):
         r'''
@@ -1001,7 +1033,7 @@ class LocalCorpus(Corpus):
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
             )
-        cacheKey = (self.cacheName, tuple(fileExtensions))
+        cacheKey = (self.name, tuple(fileExtensions))
         # not cached, fetch and reset
         #if cacheKey not in Corpus._pathsCache:
             # check paths before trying to search
@@ -1029,8 +1061,8 @@ class LocalCorpus(Corpus):
         corpus, it will be removed permanently.
         '''
         temporaryPaths = LocalCorpus._temporaryLocalPaths.get(
-            self.cacheName, [])
-        directoryPath = os.path.abspath(os.path.expanduser(directoryPath))
+            self.name, [])
+        directoryPath = common.cleanpath(directoryPath)
         if directoryPath in temporaryPaths:
             temporaryPaths.remove(directoryPath)
         if self.existsInSettings:
@@ -1038,15 +1070,13 @@ class LocalCorpus(Corpus):
             if settings is not None and directoryPath in settings:
                 settings.remove(directoryPath)
             self.save()
-        self._removeNameFromCache(self.cacheName)
+        self._removeNameFromCache(self.name)
 
     def save(self):
         r'''
         Save the current list of directory paths in use by a given corpus in
         the user settings.  And reindex.
         '''
-        from music21.metadata.caching import cacheMetadata
-        
         userSettings = environment.UserSettings()
         lcs = environment.LocalCorpusSettings(self.directoryPaths)
         if self.name != 'local':
@@ -1059,7 +1089,51 @@ class LocalCorpus(Corpus):
         else:
             userSettings['localCorporaSettings'][self.name] = lcs
         environment.Environment().write()
-        cacheMetadata([self.name], verbose=True)
+        self.cacheMetadata()
+        
+    def cacheMetadata(self, useMultiprocessing=True, verbose=True, timer=None):
+        '''
+        Cache the metadata for a single corpus.
+        '''
+        if timer is None:
+            timer = common.Timer()
+            timer.start()
+        
+        
+        metadataBundle = self.metadataBundle
+        paths = self.getPaths()
+        
+        message = '{} metadata cache: starting processing of paths: {}'.format(
+                self.name, len(paths))
+        if verbose is True:
+            environLocal.warn(message)
+        else:
+            environLocal.printDebug(message)
+
+        failingFilePaths = metadataBundle.addFromPaths(
+            paths,
+            parseUsingCorpus=self.parseUsingCorpus,
+            useMultiprocessing=useMultiprocessing,
+            verbose=verbose
+            )
+        
+        message = 'cache: writing time: {0} md items: {1}\n'.format(
+            timer, len(metadataBundle))
+
+        if verbose is True:
+            environLocal.warn(message)
+        else:
+            environLocal.printDebug(message)
+        
+        message = 'cache: filename: {0}'.format(metadataBundle.filePath)
+        
+        if verbose is True:
+            environLocal.warn(message)
+        else:
+            environLocal.printDebug(message)
+        del metadataBundle
+        return failingFilePaths
+
 
     ### PUBLIC PROPERTIES ###
 
@@ -1070,12 +1144,10 @@ class LocalCorpus(Corpus):
         '''
         candidatePaths = []
         if self.existsInSettings:
-            if self.name == 'local':
-                candidatePaths = environLocal['localCorpusSettings']
-            else:
-                candidatePaths = environLocal['localCorporaSettings'][self.name]
+            settings = self._getSettings()
+            candidatePaths = list(settings)
         temporaryPaths = LocalCorpus._temporaryLocalPaths.get(
-            self.cacheName, [])
+            self.name, [])
         allPaths = tuple(sorted(set(candidatePaths).union(temporaryPaths)))
         return allPaths
 
@@ -1123,6 +1195,8 @@ class LocalCorpus(Corpus):
 #     ### CLASS VARIABLES ###
 # 
 #     _virtualWorks = []
+#
+#     name = 'virtual'
 # 
 #     corpusName = None
 #     for corpusName in dir(virtual):
@@ -1138,8 +1212,12 @@ class LocalCorpus(Corpus):
 #     ### PRIVATE PROPERTIES ###
 # 
 #     @property
-#     def cacheName(self):
-#         return 'virtual'
+#     def cacheFilePath(self):
+#         filePath = os.path.join(
+#             common.getMetadataCacheFilePath(),
+#             'virtual.json',
+#         )
+#         return filePath
 # 
 #     ### PUBLIC METHODS ###
 # 

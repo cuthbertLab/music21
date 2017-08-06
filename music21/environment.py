@@ -76,7 +76,7 @@ class LocalCorpusSettings(list):
     .music21rc
     
     It is a subclass of list and has two additional attributes, name (which
-    should be None for the unnamed localCorpus) and metadataBundlePath
+    should be None for the unnamed localCorpus) and cacheFilePath
     for a full filepath (ending in .json) as a location 
     to store the .metadataBundle (.json) cache for the
     LocalCorpus.  This can be None, in which case the (volitile) temp
@@ -90,30 +90,30 @@ class LocalCorpusSettings(list):
     >>> lcs
     LocalCorpusSettings(['/tmp', '/home'], name='theWholeEnchilada')
     
-    >>> lcs.metadataBundlePath = '/home/enchilada.json'
+    >>> lcs.cacheFilePath = '/home/enchilada.json'
     >>> lcs
     LocalCorpusSettings(['/tmp', '/home'], 
                         name='theWholeEnchilada', 
-                        metadataBundlePath='/home/enchilada.json')
+                        cacheFilePath='/home/enchilada.json')
 
 
     >>> list(lcs)
     ['/tmp', '/home']
     >>> lcs.name
     'theWholeEnchilada'
-    >>> lcs.metadataBundlePath
+    >>> lcs.cacheFilePath
     '/home/enchilada.json'
     >>> '/home' in lcs
     True
     >>> '/root' in lcs
     False
     '''
-    def __init__(self, paths=None, name=None, metadataBundlePath=None):
+    def __init__(self, paths=None, name=None, cacheFilePath=None):
         if paths is None:
             paths = []
         super(LocalCorpusSettings, self).__init__(paths)
         self.name = name
-        self.metadataBundlePath = metadataBundlePath
+        self.cacheFilePath = cacheFilePath
         
     def __repr__(self):
         listRepr = super(LocalCorpusSettings, self).__repr__()
@@ -121,8 +121,8 @@ class LocalCorpusSettings(list):
         mdbpPart = ''
         if self.name is not None:
             namePart = ', name=' + repr(self.name)
-        if self.metadataBundlePath is not None:
-            mdbpPart = ', metadataBundlePath=' + repr(self.metadataBundlePath)
+        if self.cacheFilePath is not None:
+            mdbpPart = ', cacheFilePath=' + repr(self.cacheFilePath)
         return 'LocalCorpusSettings({}{}{})'.format(listRepr, namePart, mdbpPart)
 #------------------------------------------------------------------------------
 
@@ -287,8 +287,8 @@ class _EnvironmentCore(object):
                     if slotChild.tag == 'localCorpusPath':
                         fpCandidate = slotChild.text.strip()
                         lcs.append(fpCandidate)
-                    elif slotChild.tag == 'metadataBundlePath':
-                        lcs.metadataBundlePath = slotChild.text.strip()
+                    elif slotChild.tag == 'cacheFilePath':
+                        lcs.cacheFilePath = slotChild.text.strip()
                 ref['localCorpusSettings'] = lcs
                         
             elif slot.tag == 'localCorporaSettings':
@@ -301,8 +301,8 @@ class _EnvironmentCore(object):
                         if slotChild.tag == 'localCorpusPath':
                             fpCandidate = slotChild.text.strip()
                             lcs.append(fpCandidate)
-                        elif slotChild.tag == 'metadataBundlePath':
-                            lcs.metadataBundlePath = slotChild.text.strip()
+                        elif slotChild.tag == 'cacheFilePath':
+                            lcs.cacheFilePath = slotChild.text.strip()
                     ref['localCorporaSettings'][name] = lcs
 
             else:
@@ -419,9 +419,9 @@ class _EnvironmentCore(object):
                     if filePath is not None:
                         localCorpusPath.text = filePath
                     localCorpusSettings.append(localCorpusPath)
-                if lcs.metadataBundlePath is not None:
-                    mdbp = ET.Element('metadataBundlePath')
-                    mdbp.text = lcs.metadataBundlePath
+                if lcs.cacheFilePath is not None:
+                    mdbp = ET.Element('cacheFilePath')
+                    mdbp.text = lcs.cacheFilePath
                     localCorpusSettings.append(mdbp)
                     
                 settings.append(localCorpusSettings)
@@ -434,9 +434,9 @@ class _EnvironmentCore(object):
                         if filePath is not None:
                             localCorpusPath.text = filePath
                         localCorpusSettings.append(localCorpusPath)
-                    if lcs.metadataBundlePath is not None:
-                        mdbp = ET.Element('metadataBundlePath')
-                        mdbp.text = lcs.metadataBundlePath
+                    if lcs.cacheFilePath is not None:
+                        mdbp = ET.Element('cacheFilePath')
+                        mdbp.text = lcs.cacheFilePath
                         localCorpusSettings.append(mdbp)
                     
                     localCorporaSettings.append(localCorpusSettings)
@@ -549,7 +549,6 @@ class _EnvironmentCore(object):
                 directory = os.path.expanduser('~')
             return os.path.join(directory, 'music21-settings.xml')
         elif platform in ['nix', 'darwin']:
-            # alt : os.path.expanduser('~')
             # might not exist if running as nobody in a webserver...
             if 'HOME' in os.environ:
                 directory = os.environ['HOME']
@@ -1259,7 +1258,7 @@ class UserSettings(object):
         if key in self._environment.getKeysToPaths():
             # try to expand user if found; otherwise return unaltered
             if value is not None and value != '/skip':
-                value = os.path.expanduser(value)
+                value = common.cleanpath(value)
                 if not os.path.exists(value):
                     raise UserSettingsException(
                         'attempting to set a value to a path that does not exist: {}'.format(
@@ -1434,7 +1433,7 @@ class Test(unittest.TestCase):
         env['localCorpusSettings'] = LocalCorpusSettings(['a', 'b', 'c'])
         
         lcFoo = LocalCorpusSettings(['bar', 'baz', 'quux'])
-        lcFoo.metadataBundlePath = '/tmp/local.json'
+        lcFoo.cacheFilePath = '/tmp/local.json'
         lcFoo.name = 'foo'
         env['localCorporaSettings']['foo'] = lcFoo
         settingsTree = envSingleton().toSettingsXML()
@@ -1461,7 +1460,7 @@ class Test(unittest.TestCase):
       <localCorpusPath>bar</localCorpusPath>
       <localCorpusPath>baz</localCorpusPath>
       <localCorpusPath>quux</localCorpusPath>
-      <metadataBundlePath>/tmp/local.json</metadataBundlePath>
+      <cacheFilePath>/tmp/local.json</cacheFilePath>
     </localCorpusSettings>
   </localCorporaSettings>
   <localCorpusSettings>
