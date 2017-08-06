@@ -27,7 +27,6 @@ from music21 import key
 from music21 import pitch
 from music21 import style
 
-from music21.ext import six
 from music21.figuredBass import realizerScale
 
 from music21 import environment
@@ -246,13 +245,13 @@ class Harmony(chord.Chord):
         '''
         for kw in keywords:
             if kw == 'root':
-                if isinstance(keywords[kw], six.string_types):
+                if isinstance(keywords[kw], str):
                     keywords[kw].replace('b', '-')
                     self.root(pitch.Pitch(keywords[kw]))
                 else:
                     self.root(keywords[kw])
             elif kw == 'bass':
-                if isinstance(keywords[kw], six.string_types):
+                if isinstance(keywords[kw], str):
                     keywords[kw].replace('b', '-')
                     self.bass(pitch.Pitch(keywords[kw]))
                 else:
@@ -355,7 +354,7 @@ class Harmony(chord.Chord):
 
     @key.setter
     def key(self, keyOrScale):
-        if isinstance(keyOrScale, six.string_types):
+        if isinstance(keyOrScale, str):
             self._key = key.Key(keyOrScale)
         else:
             self._key = keyOrScale
@@ -649,7 +648,7 @@ class ChordStepModification(object):
 
     @modType.setter
     def modType(self, expr):
-        if expr is not None and isinstance(expr, six.string_types):
+        if expr is not None and isinstance(expr, str):
             if expr.lower() in ['add', 'subtract', 'alter']:
                 self._modType = expr.lower()
                 return

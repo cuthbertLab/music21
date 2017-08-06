@@ -11,8 +11,6 @@
 #-------------------------------------------------------------------------------
 
 #from music21 import exceptions21
-from music21.ext import six
-
 __all__ = ['isNum', 'isListLike', 'isIterable', 'classToClassStr', 'getClassSet']
 
 def isNum(usrData):
@@ -108,9 +106,8 @@ def isIterable(usrData):
     :rtype: bool
     """
     if hasattr(usrData, "__iter__"):
-        if six.PY3: # no __iter__ on strings in py2
-            if isinstance(usrData, (str, bytes)):
-                return False
+        if isinstance(usrData, (str, bytes)):
+            return False
         return True
     else:
         return False

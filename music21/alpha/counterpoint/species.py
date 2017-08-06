@@ -6,8 +6,6 @@ later other forms of counterpoint.
 Mostly coded by Jackie Rogoff -- some routines have been moved to
 by VoiceLeadingQuartet, and that module should be used for future work
 '''
-from __future__ import division, print_function
-
 import copy
 import random
 import unittest

@@ -8,13 +8,6 @@
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-#python3
-try:
-    basestring # @UndefinedVariable
-except NameError:
-    basestring = str # @ReservedAssignment
-
-
 import collections
 import copy
 import itertools
@@ -30,12 +23,7 @@ from music21.figuredBass import possibility
 from music21.figuredBass import realizerScale
 from music21.figuredBass import resolution
 from music21.figuredBass import rules
-from music21.ext import six
-
-imap = six.moves.map # @UndefinedVariable
-izip = six.moves.zip # @UndefinedVariable
-ifilter = six.moves.filter # @UndefinedVariable
-ifilterfalse = six.moves.filterfalse # @UndefinedVariable
+from itertools import filterfalse
 
 _MOD = 'segment.py'
 
@@ -112,9 +100,9 @@ class Segment(object):
         >>> s1.segmentChord
         <music21.chord.Chord C3 E3 G3 C4 E4 G4 C5 E5 G5>
         '''
-        if isinstance(bassNote, six.string_types):
+        if isinstance(bassNote, str):
             bassNote = note.Note(bassNote)
-        if isinstance(maxPitch, six.string_types):
+        if isinstance(maxPitch, str):
             maxPitch = pitch.Pitch(maxPitch)
 
         if fbScale is None:
@@ -841,7 +829,7 @@ class Segment(object):
         correctA = self.allCorrectSinglePossibilities()
         correctB = segmentB.allCorrectSinglePossibilities()
         correctAB = itertools.product(correctA, correctB)
-        return ifilter(lambda possibAB: self._isCorrectConsecutivePossibility(possibA=possibAB[0],
+        return filter(lambda possibAB: self._isCorrectConsecutivePossibility(possibA=possibAB[0],
                                                                               possibB=possibAB[1]),
                        correctAB)
 
@@ -851,21 +839,21 @@ class Segment(object):
             iterables = []
             for arg in args:
                 iterables.append(itertools.repeat(arg))
-            resolutions = imap(resolutionMethod, self.allCorrectSinglePossibilities(), *iterables)
-            correctAB = izip(self.allCorrectSinglePossibilities(), resolutions)
-            correctAB = ifilter(lambda possibAB: possibility.pitchesWithinLimit(
+            resolutions = map(resolutionMethod, self.allCorrectSinglePossibilities(), *iterables)
+            correctAB = zip(self.allCorrectSinglePossibilities(), resolutions)
+            correctAB = filter(lambda possibAB: possibility.pitchesWithinLimit(
                                                                 possibA=possibAB[1],
                                                                 maxPitch=segmentB._maxPitch),
                                 correctAB)
             if self.fbRules.applyConsecutivePossibRulesToResolution:
-                correctAB = ifilter(lambda possibAB: self._isCorrectConsecutivePossibility(
+                correctAB = filter(lambda possibAB: self._isCorrectConsecutivePossibility(
                                                                 possibA=possibAB[0],
                                                                 possibB=possibAB[1]),
                                     correctAB)
             if self.fbRules.applySinglePossibRulesToResolution:
                 segmentB._singlePossibilityRuleChecking = _compileRules(
                             segmentB.singlePossibilityRules(segmentB.fbRules))
-                correctAB = ifilter(lambda possibAB: segmentB._isCorrectSinglePossibility(
+                correctAB = filter(lambda possibAB: segmentB._isCorrectSinglePossibility(
                                                                 possibA=possibAB[1]),
                                     correctAB)
             return correctAB
@@ -907,15 +895,15 @@ def getPitches(pitchNames=('C', 'E', 'G'), bassPitch='C3', maxPitch='C8'):
     >>> print(', '.join([p.nameWithOctave for p in pitches]))
     A#3, C#4, F##4, A#4, C#5, F##5, A#5, C#6, F##6, A#6, C#7, F##7, A#7
     '''
-    if isinstance(bassPitch, basestring):
+    if isinstance(bassPitch, str):
         bassPitch = pitch.Pitch(bassPitch)
-    if isinstance(maxPitch, basestring):
+    if isinstance(maxPitch, str):
         maxPitch = pitch.Pitch(maxPitch)
 
     iter1 = itertools.product(pitchNames, range(maxPitch.octave + 1))
-    iter2 = imap(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)
-    iter3 = ifilterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)
-    iter4 = ifilterfalse(lambda samplePitch: samplePitch > maxPitch, iter3)
+    iter2 = map(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)
+    iter3 = filterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)
+    iter4 = filterfalse(lambda samplePitch: samplePitch > maxPitch, iter3)
     allPitches = list(iter4)
     allPitches.sort()
     return allPitches

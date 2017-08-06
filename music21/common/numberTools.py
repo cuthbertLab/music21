@@ -20,15 +20,13 @@ from music21 import defaults
 
 from music21.exceptions21 import Music21CommonException
 
-from music21.ext import six
-
 __all__ = ['ordinals', 'musicOrdinals',
 
            'cleanupFloat',
            'numToIntOrFloat',
 
            'opFrac', 'mixedNumeral',
-           'roundToHalfInteger', 'py3round',
+           'roundToHalfInteger',
            'almostEquals',
            'addFloatPrecision', 'strTrimFloat',
            'nearestMultiple',
@@ -438,44 +436,6 @@ def roundToHalfInteger(num):
         floatVal = 1
     return intVal + floatVal
 
-def py3round(number, ndigits=None):
-    '''
-    Simulates Python3 rounding behavior in Python 2
-
-    >>> common.py3round(2.3)
-    2
-    >>> common.py3round(2.7)
-    3
-    >>> common.py3round(2.7, 0)
-    3.0
-    >>> common.py3round(1.5, 0)
-    2.0
-    >>> common.py3round(2.5, 0)
-    2.0
-    >>> common.py3round(-1.5)
-    -2
-    >>> common.py3round(-2.5)
-    -2
-    '''
-    if six.PY3:
-        if ndigits is not None:
-            return round(number, ndigits)
-        else:
-            return round(number)
-
-    f = number
-    intIt = True if ndigits is None else False
-    ndigits = ndigits if ndigits is not None else 0
-
-    if abs(round(float(f)) - float(f)) == 0.5:
-        retAmount = 2.0 * round(f / 2.0, ndigits)
-    else:
-        retAmount = round(f, ndigits)
-
-    if intIt:
-        return int(retAmount)
-    else:
-        return retAmount
 
 def almostEquals(x, y=0.0, grain=1e-7):
     '''
@@ -526,7 +486,7 @@ def addFloatPrecision(x, grain=1e-2):
 
     :rtype: float
     '''
-    if isinstance(x, six.string_types):
+    if isinstance(x, str):
         x = float(x)
 
     values = (1/3, 2/3,
@@ -633,10 +593,10 @@ def nearestMultiple(n, unit):
         raise Exception('cannot place n between multiples: %s, %s', matchLow, matchHigh)
 
     if n >= matchLow and n <= (matchLow + halfUnit):
-        return matchLow, py3round(n - matchLow, 7), py3round(n - matchLow, 7)
+        return matchLow, round(n - matchLow, 7), round(n - matchLow, 7)
     else:
     #elif n >= (matchHigh - halfUnit) and n <= matchHigh:
-        return matchHigh, py3round(matchHigh - n, 7), py3round(n - matchHigh, 7)
+        return matchHigh, round(matchHigh - n, 7), round(n - matchHigh, 7)
 
 
 def standardDeviation(coll, bassel=False):

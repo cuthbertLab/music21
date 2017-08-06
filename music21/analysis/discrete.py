@@ -21,7 +21,6 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 (for algorithmic key detection) and
 :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) provide examples.
 '''
-from __future__ import division, print_function, absolute_import
 #TODO: make an analysis.base for the Discrete and analyzeStream aspects, then create
 # range and key modules in analysis
 
@@ -33,12 +32,6 @@ from music21 import exceptions21
 from music21 import pitch
 from music21 import interval
 from music21 import key
-
-from music21.ext import six
-if six.PY2:
-    # pylint: disable=redefined-builtin
-    from music21.common import py3round as round
-
 
 
 from music21 import environment

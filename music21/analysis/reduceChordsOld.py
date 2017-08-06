@@ -11,8 +11,6 @@
 '''
 Automatically reduce a MeasureStack to a single chord or group of chords.
 '''
-from __future__ import division, print_function, absolute_import
-
 import unittest
 import copy
 
@@ -21,10 +19,6 @@ from music21 import meter
 from music21 import stream
 from music21 import tie
 
-from music21.ext import six
-if six.PY2:
-    # pylint: disable=redefined-builtin
-    from music21.common import py3round as round
 
 
 

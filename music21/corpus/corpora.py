@@ -13,7 +13,6 @@
 
 import abc
 import os
-from music21.ext import six
 
 from music21 import common
 # from music21.corpus import virtual
@@ -85,9 +84,6 @@ class Corpus(object):
         '''
         from music21 import corpus
         matched = []
-        if six.PY2:
-            rootDirectoryPath = six.u(rootDirectoryPath)
-
         for rootDirectory, directoryNames, filenames in os.walk(rootDirectoryPath):
             if '.svn' in directoryNames:
                 directoryNames.remove('.svn')
@@ -931,7 +927,7 @@ class LocalCorpus(Corpus):
     ### INITIALIZER ###
 
     def __init__(self, name=None):
-        if not isinstance(name, (six.string_types, type(None))):
+        if not isinstance(name, (str, type(None))):
             raise CorpusException("Name must be a string or None")
         if name is not None and not name:
             raise CorpusException("Name cannot be blank")
@@ -1012,7 +1008,7 @@ class LocalCorpus(Corpus):
         unless explicitly saved by a call to ``LocalCorpus.save()``.
         '''
         from music21 import corpus
-        if not isinstance(directoryPath, six.string_types):
+        if not isinstance(directoryPath, str):
             raise corpus.CorpusException(
                 'an invalid file path has been provided: {0!r}'.format(
                     directoryPath))

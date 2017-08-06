@@ -47,7 +47,6 @@ Example usage:
 >>> d.tuplets[0].numberNotesNormal
 2
 '''
-from __future__ import print_function, division
 
 import fractions
 import unittest
@@ -61,13 +60,6 @@ from music21 import exceptions21
 from music21 import environment
 
 from music21.common import SlottedObjectMixin, opFrac
-from music21.ext import six
-
-
-try:
-    basestring # @UndefinedVariable
-except NameError:
-    basestring = str # @ReservedAssignment
 
 
 _MOD = "duration.py"
@@ -933,7 +925,7 @@ class Tuplet(object):
 
         # this stores a durationTuple
         if 'durationActual' in keywords and keywords['durationActual'] != None:
-            if isinstance(keywords['durationActual'], basestring):
+            if isinstance(keywords['durationActual'], str):
                 self.durationActual = durationTupleFromTypeDots(keywords['durationActual'], 0)
             elif common.isIterable(keywords['durationActual']):
                 self.durationActual = durationTupleFromTypeDots(keywords['durationActual'][0],
@@ -951,7 +943,7 @@ class Tuplet(object):
 
 
         if 'durationNormal' in keywords and keywords['durationNormal'] != None:
-            if isinstance(keywords['durationNormal'], basestring):
+            if isinstance(keywords['durationNormal'], str):
                 self.durationNormal = durationTupleFromTypeDots(keywords['durationNormal'], 0)
             elif common.isIterable(keywords['durationNormal']):
                 self.durationNormal = durationTupleFromTypeDots(keywords['durationNormal'][0],
@@ -1460,7 +1452,7 @@ class Duration(SlottedObjectMixin):
         for a in arguments:
             if common.isNum(a) and 'quarterLength' not in keywords:
                 keywords['quarterLength'] = a
-            elif isinstance(a, six.string_types) and 'type' not in keywords:
+            elif isinstance(a, str) and 'type' not in keywords:
                 keywords['type'] = a
             elif isinstance(a, DurationTuple):
                 self.addDurationTuple(a)

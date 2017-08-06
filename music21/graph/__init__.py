@@ -20,8 +20,6 @@ object subclasses provide reusable approaches to graphing data and structures in
 
 The most common way of using plotting functions is to call `.plot()` on a Stream.
 '''
-from __future__ import division, print_function, absolute_import
-
 __all__ = ['axis', 'findPlot', 'plot', 'primitives', 'utilities']
 
 import unittest

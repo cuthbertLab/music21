@@ -16,8 +16,6 @@ and one or more reductive representation lines.
 
 Used by graph.PlotHorizontalBarWeighted()
 '''
-from __future__ import division, print_function, absolute_import
-
 import re
 import unittest
 import copy
@@ -31,8 +29,6 @@ from music21 import expressions
 from music21 import instrument
 from music21 import pitch
 from music21 import common
-
-from music21.ext import six
 
 from music21 import environment
 _MOD = "analysis.reduction"
@@ -524,7 +520,7 @@ class PartReduction(object):
                         matches = [name]
                     pId = str(p.id).lower()
                     for m in matches: # strings or instruments
-                        if (isinstance(m, six.string_types)
+                        if (isinstance(m, str)
                                 and pId.find(m.lower()) >= 0):
                             sub.append(p)
                             break

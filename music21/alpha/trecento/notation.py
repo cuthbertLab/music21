@@ -19,7 +19,6 @@ Also contains functions for converting Trecento notation to modern notation.
 
 Also a good example of subclassing TinyNotation
 '''
-from __future__ import division
 import unittest
 
 from music21 import base

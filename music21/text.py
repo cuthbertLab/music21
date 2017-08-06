@@ -12,7 +12,6 @@
 '''
 Utility routines for processing text in scores and other musical objects.
 '''
-
 import unittest
 import os
 import random
@@ -25,8 +24,6 @@ from music21 import common
 from music21 import exceptions21
 from music21 import environment
 from music21 import style
-
-from music21.ext import six
 
 _MOD = "text.py"
 environLocal = environment.Environment(_MOD)
@@ -297,7 +294,7 @@ class TextBox(base.Music21Object):
         return self._content
 
     def _setContent(self, value):
-        if not isinstance(value, six.string_types):
+        if not isinstance(value, str):
             self._content = str(value)
         else:
             self._content = value

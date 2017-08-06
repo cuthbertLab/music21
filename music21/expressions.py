@@ -31,8 +31,6 @@ from music21 import interval
 from music21 import spanner
 from music21 import style
 
-from music21.ext import six
-
 _MOD = 'expressions'
 
 def realizeOrnaments(srcObject):
@@ -159,7 +157,7 @@ class TextExpression(Expression):
         # numerous properties are inherited from TextFormat
         # the text string to be displayed; not that line breaks
         # are given in the xml with this non-printing character: (#)
-        if not isinstance(content, six.string_types):
+        if not isinstance(content, str):
             self._content = str(content)
         else:
             self._content = content

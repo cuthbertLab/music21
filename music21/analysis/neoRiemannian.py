@@ -13,8 +13,6 @@
 This module defines the L, P, and R objects and their
 related transformations as called on a chord.Chord, according to Neo-Riemannian theory.
 '''
-from __future__ import division, print_function, absolute_import
-
 import copy
 import unittest
 

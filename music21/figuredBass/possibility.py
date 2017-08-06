@@ -75,9 +75,7 @@ from music21 import exceptions21
 from music21 import interval
 from music21 import pitch
 from music21 import voiceLeading
-from music21.ext import six
 
-izip = six.moves.zip # @UndefinedVariable
 
 # SINGLE POSSIBILITY RULE-CHECKING METHODS
 # ----------------------------------------
@@ -960,7 +958,7 @@ def partPairs(possibA, possibB):
      (<music21.pitch.Pitch C4>, <music21.pitch.Pitch D4>)]
 
     '''
-    return list(izip(possibA, possibB))
+    return list(zip(possibA, possibB))
 
 # apply a function to one pitch of possibA at a time
 # apply a function to two pitches of possibA at a time

@@ -9,8 +9,6 @@
 # Copyright:    Copyright © 2011-2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-from __future__ import print_function
-
 import unittest
 import os
 
@@ -20,8 +18,6 @@ from music21 import corpus
 from music21 import exceptions21
 from music21 import stream
 from music21 import text
-
-from music21.ext import six
 
 from music21 import environment
 _MOD = 'features/base.py'
@@ -1035,7 +1031,7 @@ class DataSet(object):
         if isinstance(dataOrStreamOrPath, DataInstance):
             di = dataOrStreamOrPath
             s = di.stream
-        elif isinstance(dataOrStreamOrPath, six.string_types):
+        elif isinstance(dataOrStreamOrPath, str):
             # could be corpus or file path
             if os.path.exists(dataOrStreamOrPath) or dataOrStreamOrPath.startswith('http'):
                 s = converter.parse(dataOrStreamOrPath)

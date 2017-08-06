@@ -12,8 +12,6 @@
 '''
 Methods for finding appropriate plots for plotStream.
 '''
-from __future__ import division, print_function, absolute_import
-
 import collections
 import types
 import unittest

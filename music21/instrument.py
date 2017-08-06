@@ -32,8 +32,6 @@ from music21 import pitch
 
 from music21.exceptions21 import InstrumentException
 
-from music21.ext import six
-
 from music21 import environment
 _MOD = "instrument.py"
 environLocal = environment.Environment(_MOD)
@@ -1848,11 +1846,7 @@ def fromString(instrumentString):
     bestName = None
     for substring in allCombinations:
         try:
-            if six.PY2:
-                uss = unicode(substring.lower()) #@UndefinedVariable
-                englishName = instrumentLookup.allToBestName[uss]
-            else:
-                englishName = instrumentLookup.allToBestName[substring.lower()]
+            englishName = instrumentLookup.allToBestName[substring.lower()]
             className = instrumentLookup.bestNameToInstrumentClass[englishName]
 
             # This would be unsafe...
@@ -1886,11 +1880,7 @@ def fromString(instrumentString):
     # Second task: Determine appropriate transposition (if any)
     for substring in allCombinations:
         try:
-            if six.PY2:
-                uss = unicode(substring.lower()) # @UndefinedVariable
-                bestPitch = instrumentLookup.pitchFullNameToName[uss]
-            else:
-                bestPitch = instrumentLookup.pitchFullNameToName[substring.lower()]
+            bestPitch = instrumentLookup.pitchFullNameToName[substring.lower()]
             bestInterval = instrumentLookup.transposition[bestName][bestPitch]
             bestInstrument.transposition = interval.Interval(bestInterval)
             break

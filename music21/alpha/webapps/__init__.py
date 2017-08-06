@@ -99,17 +99,13 @@ import traceback
 import sys
 import unittest
 import zipfile #@UnusedImport
-try:
-    import urlparse
-except ImportError:
-    from urllib import parse as urlparse
+from urllib import parse as urlparse
+
+import io
 
 # some reason, pylint looks at method name not whether actually deprecated
 # pylint: disable=deprecated-method,ungrouped-imports
-try:
-    from html import escape as cgiescape # PY3
-except ImportError:
-    from cgi import escape as cgiescape # PY2
+from html import escape as cgiescape 
 
 # music21 imports
 from music21 import common
@@ -123,18 +119,11 @@ from music21 import clef #@UnusedImport
 from music21 import tempo #@UnusedImport
 from music21.alpha.theoryAnalysis import theoryAnalyzer #@UnusedImport
 
-from music21.ext import six
-
 from music21.alpha.webapps import templates
 from music21.alpha.webapps import apps
 from music21.alpha.webapps import commands
 
-from music21.ext.six import StringIO
 
-if six.PY3:
-    import io
-    file = io.IOBase # @ReservedAssignment
-    unicode = str # @ReservedAssignment
 
 # TODO: REWRITE WITHOUT EVAL!
 # pylint: disable=eval-used
@@ -214,7 +203,7 @@ def ModWSGIApplication(environ, start_response):
 
     The request to the application should have the following structures:
 
-    >>> from music21.ext.six import StringIO
+    >>> from io import StringIO
 
     environ is usually created by the server. Manually constructing dictionary for demonstrated
 
@@ -286,7 +275,7 @@ def makeAgendaFromRequest(requestInput, environ, requestType=None):
 
     requestInput should be buffer from the server application. Using StringIO for demonstration
 
-    >>> from music21.ext.six import StringIO
+    >>> from io import StringIO
     >>> requestInput = StringIO()
     >>> unused = requestInput.write('{"dataDict":{"a":{"data":3}}}')
     >>> unused = requestInput.seek(0)
@@ -327,7 +316,7 @@ def makeAgendaFromRequest(requestInput, environ, requestType=None):
     elif requestType == 'multipart/form-data':
         postFormFields = cgi.FieldStorage(requestInput, environ = environ)
         for key in postFormFields:
-            if hasattr(postFormFields[key],'filename') and postFormFields[key].filename != None:
+            if hasattr(postFormFields[key], 'filename') and postFormFields[key].filename != None:
                 # Its an uploaded file
                 value = postFormFields[key].file
             else:
@@ -365,7 +354,7 @@ def makeAgendaFromRequest(requestInput, environ, requestType=None):
         elif key in ['appName', 'outputTemplate', 'outputArgList']:
             agenda[key] = value
 
-        elif isinstance(value, file):
+        elif isinstance(value, io.IOBase):
             agenda['dataDict'][key] = collections.OrderedDict([("data", value),
                                                                ("fmt", "file")])
 
@@ -715,7 +704,7 @@ class CommandProcessor(object):
         '''
         for (name,dataDictElement) in self.rawDataDict.items():
             if 'data' not in dataDictElement:
-                self.recordError("no data specified for data element "+unicode(dataDictElement))
+                self.recordError("no data specified for data element " + str(dataDictElement))
                 continue
 
             dataStr = dataDictElement['data']
@@ -763,7 +752,7 @@ class CommandProcessor(object):
                         continue
                     data = []
                     for elementStr in dataStr:
-                        if isinstance(elementStr, six.string_types):
+                        if isinstance(elementStr, str):
                             dataElement = self.parseInputToPrimitive(elementStr)
                         else:
                             dataElement = elementStr
@@ -783,7 +772,7 @@ class CommandProcessor(object):
                         data = converter.parseData(dataStr)
                     except converter.ConverterException as e:
                         self.recordError("Error parsing data variable " + name + ": " +
-                                         six.u(e) + "\n\n" + dataStr, e)
+                                         str(e) + "\n\n" + dataStr, e)
                         continue
             else: # No format specified
                 dataStr = str(dataStr)
@@ -1117,7 +1106,7 @@ class CommandProcessor(object):
             elif fmt == 'reprtext':
                 dataStr = data._reprText()
             else:
-                dataStr = unicode(data)
+                dataStr = str(data)
 
             return_obj['dataDict'][dataName] = {"fmt":fmt, "data":dataStr}
 
@@ -1192,7 +1181,7 @@ class CommandProcessor(object):
         if common.isIterable(inpVal):
             return [self.parseInputToPrimitive(element) for element in inpVal]
 
-        if not isinstance(inpVal, six.string_types):
+        if not isinstance(inpVal, str):
             self.recordError("Unknown type for parseInputToPrimitive "+str(inpVal))
 
         strVal = inpVal
@@ -1254,15 +1243,15 @@ class CommandProcessor(object):
             resDict = self.getResultObject()
             resOrderedDict = collections.OrderedDict(sorted(list(resDict.items())))
             output =  json.dumps(resOrderedDict)
-            output = unicode(output).encode('utf-8')
+            output = str(output).encode('utf-8')
             outputType = 'text/html; charset=utf-8'
             # TODO: unify these two -- duplicate code
         elif self.outputTemplate not in availableOutputTemplates:
-            self.recordError("Unknown output template "+str(self.outputTemplate))
+            self.recordError("Unknown output template  "+ str(self.outputTemplate))
             resDict = self.getResultObject()
             resOrderedDict = collections.OrderedDict(sorted(list(resDict.items())))
-            output =  json.dumps(resOrderedDict,indent=4)
-            output = unicode(output).encode('utf-8')
+            output = json.dumps(resOrderedDict,indent=4)
+            output = str(output).encode('utf-8')
             outputType = 'text/html; charset=utf-8'
 
         else:

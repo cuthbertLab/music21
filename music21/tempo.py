@@ -12,8 +12,6 @@
 '''
 This module defines objects for describing tempo and changes in tempo.
 '''
-from __future__ import unicode_literals, division, print_function
-
 import unittest
 import copy
 
@@ -24,8 +22,6 @@ from music21 import exceptions21
 from music21 import expressions
 from music21 import note
 from music21 import style
-
-from music21.ext import six
 
 from music21 import environment
 _MOD = "tempo.py"
@@ -392,9 +388,9 @@ class MetronomeMark(TempoIndication):
     Unicode values sometimes are hard to work with.  Here's an example that works...
 
 
-    >>> marking = u'très vite'
-    >>> print(marking)
-    très vite
+    >>> marking = 'très vite'
+    >>> marking    
+    'très vite'
     >>> print(tempo.defaultTempoValues[marking])
     144
     >>> tm2 = tempo.MetronomeMark(marking)
@@ -473,7 +469,7 @@ class MetronomeMark(TempoIndication):
             # if referent is None, set a default quarter note duration
             self._referent = duration.Duration(type='quarter')
         # assume ql value or a type string
-        elif common.isNum(value) or isinstance(value, six.string_types):
+        elif common.isNum(value) or isinstance(value, str):
             self._referent = duration.Duration(value)
         elif 'Duration' not in value.classes:
             # try get duration object, like from Note
@@ -752,7 +748,7 @@ class MetronomeMark(TempoIndication):
         '''
         if common.isNum(referent): # assume quarter length
             quarterLength = referent
-        elif isinstance(referent, six.string_types): # try to get quarter len
+        elif isinstance(referent, str): # try to get quarter len
             d = duration.Duration(referent)
             quarterLength = d.quarterLength
         else: # TODO: test if a Duration

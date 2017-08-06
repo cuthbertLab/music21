@@ -169,7 +169,6 @@ from music21 import roman
 from music21 import voiceLeading
 
 from music21.alpha.theoryAnalysis import theoryResult
-from music21.ext import six
 
 from music21 import environment
 _MOD = 'theoryAnalyzer.py'
@@ -2456,7 +2455,7 @@ class Analyzer(object):
         if keyMeasureMap:
             for dictKey in sorted(list(keyMeasureMap.keys()), reverse=True):
                 if measureNumber >= dictKey:
-                    if isinstance(keyMeasureMap[dictKey], six.string_types):
+                    if isinstance(keyMeasureMap[dictKey], str):
                         kName = key.convertKeyStringToMusic21KeyString(keyMeasureMap[dictKey])
                         return key.Key(kName)
                     else:

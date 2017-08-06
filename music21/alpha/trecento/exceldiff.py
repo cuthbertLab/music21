@@ -5,7 +5,6 @@ from __future__ import print_function
 import sys
 
 from music21.ext import xlrd
-from music21.ext import six
 #sys.path.append('/mit/cuthbert/www/music21')
 
 
@@ -69,8 +68,8 @@ for i in range(minRows):
     for j in range(minCells):
         if (rowvalues1[j] != rowvalues2[j]):
             print("%3d,%2s--%34s : %34s" % (i + 1,xlrd.colname(j),
-                                               six.u(rowvalues1[j]).encode('utf-8')[:34],
-                                               six.u(rowvalues2[j]).encode('utf-8')[:34]))
+                                               (rowvalues1[j]).encode('utf-8')[:34],
+                                               (rowvalues2[j]).encode('utf-8')[:34]))
     if (extraCells > 0):
         print("%3d extra cells in row %3d in" % (extraCells, i + 1), end='')
         if (longrow == 1):

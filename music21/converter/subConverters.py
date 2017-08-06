@@ -24,7 +24,6 @@ import os
 import sys
 import unittest
 
-from music21.ext import six
 from music21 import common
 from music21 import defaults
 from music21 import stream
@@ -247,7 +246,7 @@ class SubConverter(object):
                 f = open(fp, writeFlags)
 
             try:
-                if six.PY3 and isinstance(dataStr, bytes):
+                if isinstance(dataStr, bytes):
                     f.write(dataStr.decode('utf-8'))
 
                 else:
@@ -631,7 +630,7 @@ class ConverterTinyNotation(SubConverter):
             {2.0} <music21.note.Note C>
             {2.5} <music21.bar.Barline style=final>
         '''
-        if isinstance(tnData, six.string_types):
+        if isinstance(tnData, str):
             tnStr = tnData
         else: # assume a 2 element sequence  # pragma: no cover
             raise SubConverterException(
@@ -822,7 +821,7 @@ class ConverterMusicXML(SubConverter):
             musescoreRun += " -r " + str(defaults.ipythonImageDpi)
 
         storedStrErr = sys.stderr
-        fileLikeOpen = six.StringIO()
+        fileLikeOpen = io.StringIO()
         sys.stderr = fileLikeOpen
         os.system(musescoreRun)
         fileLikeOpen.close()
@@ -1077,7 +1076,7 @@ class ConverterMuseData(SubConverter):
         from music21 import musedata as musedataModule
         from music21.musedata import translate as musedataTranslate
 
-        if isinstance(strData, six.string_types):
+        if isinstance(strData, str):
             strDataList = [strData]
         else:
             strDataList = strData
@@ -1167,18 +1166,15 @@ class ConverterMEI(SubConverter):
         :return: The music21 objects corresponding to the MEI file.
         :rtype: :class:`~music21.stream.Stream` or subclass
         '''
-        if six.PY2:
-            with open(filePath) as f:
+        
+        # In Python 3 we try the two most likely encodings to work. (UTF-16 is outputted from
+        # "sibmei", the Sibelius-to-MEI exporter).
+        try:
+            with open(filePath, 'rt', encoding='utf-8') as f:
                 dataStream = f.read()
-        else:
-            # In Python 3 we try the two most likely encodings to work. (UTF-16 is outputted from
-            # "sibmei", the Sibelius-to-MEI exporter).
-            try:
-                with open(filePath, 'rt', encoding='utf-8') as f:
-                    dataStream = f.read()
-            except UnicodeDecodeError:
-                with open(filePath, 'rt', encoding='utf-16') as f:
-                    dataStream = f.read()
+        except UnicodeDecodeError:
+            with open(filePath, 'rt', encoding='utf-16') as f:
+                dataStream = f.read()
 
         self.parseData(dataStream, number)
 
@@ -1219,10 +1215,7 @@ class Test(unittest.TestCase):
         '''
         When the string starts with "mei:"
         '''
-        if six.PY3:
-            from unittest import mock  # @UnusedImport # pylint: disable=no-name-in-module
-        else:
-            from music21.ext import mock # @Reimport
+        from unittest import mock
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             testConverter = ConverterMEI()
             testConverter.parseData('mei: <?xml><mei><note/></mei>')
@@ -1232,10 +1225,7 @@ class Test(unittest.TestCase):
         '''
         When the string doesn't start with "mei:"
         '''
-        if six.PY3:
-            from unittest import mock  # @UnusedImport # pylint: disable=no-name-in-module
-        else:
-            from music21.ext import mock # @Reimport
+        from unittest import mock 
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             testConverter = ConverterMEI()
             testConverter.parseData('<?xml><mei><note/></mei>')

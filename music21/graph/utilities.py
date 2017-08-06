@@ -12,8 +12,6 @@
 '''
 Methods for finding external modules, converting colors to Matplotlib colors, etc.
 '''
-from __future__ import division, print_function, absolute_import
-
 import unittest
 from collections import namedtuple
 
@@ -24,7 +22,6 @@ from music21 import common
 from music21 import exceptions21
 from music21 import pitch
 
-from music21.ext import six
 from music21.ext import webcolors
 
 
@@ -96,11 +93,8 @@ def accidentalLabelToUnicode(label):
     In Python 2, all strings are converted to unicode strings even if there is
     no need to.
     '''
-    if not isinstance(label, six.string_types):
+    if not isinstance(label, str):
         return label
-    if six.PY2 and isinstance(label, str):
-        label = six.u(label)
-
     for modifier, unicodeAcc in pitch.unicodeFromModifier.items():
         if modifier != '' and modifier in label and modifier in ('-', '#'):
             # ideally eventually matplotlib will do the other accidentals...
@@ -149,7 +143,7 @@ def getColor(color):
     # expand a single value to three
     if common.isNum(color):
         color = [color, color, color]
-    if isinstance(color, six.string_types):
+    if isinstance(color, str):
         if color[0] == '#': # assume is hex
             # this will expand three-value codes, and check for badly
             # formed codes

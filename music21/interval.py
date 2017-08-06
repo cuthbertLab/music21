@@ -28,7 +28,6 @@ from music21 import base
 from music21 import common
 from music21 import exceptions21
 
-from music21.ext import six
 #from music21 import pitch # SHOULD NOT, b/c of enharmonics
 
 from music21 import environment
@@ -244,7 +243,7 @@ def convertSpecifier(specifier):
     if common.isNum(specifier):
         post = specifier
     # check string matches
-    if isinstance(specifier, six.string_types):
+    if isinstance(specifier, str):
         if specifier in prefixSpecs:
             post = prefixSpecs.index(specifier)
         # permit specifiers as prefixes without case; this will not distinguish
@@ -310,7 +309,7 @@ def convertGeneric(value):
     if common.isNum(value):
         post = value
         directionScalar = 1 # may still be negative
-    elif isinstance(value, six.string_types):
+    elif isinstance(value, str):
         # first, see if there is a direction term
         directionScalar = Direction.ASCENDING # assume ascending
         for direction in [Direction.DESCENDING, Direction.ASCENDING]:
@@ -1076,7 +1075,7 @@ class DiatonicInterval(IntervalBase):
         super(DiatonicInterval, self).__init__()
 
         if specifier is not None and generic is not None:
-            if common.isNum(generic) or isinstance(generic, six.string_types):
+            if common.isNum(generic) or isinstance(generic, str):
                 self.generic = GenericInterval(generic)
             elif isinstance(generic, GenericInterval):
                 self.generic = generic
@@ -1908,7 +1907,7 @@ class Interval(IntervalBase):
         self.implicitDiatonic = False # is this basically a ChromaticInterval object in disguise?
 
 
-        if len(arguments) == 1 and isinstance(arguments[0], six.string_types):
+        if len(arguments) == 1 and isinstance(arguments[0], str):
             # convert common string representations
             dInterval, cInterval = _stringToDiatonicChromatic(arguments[0])
             self.diatonic = dInterval
@@ -2568,7 +2567,7 @@ def transposePitch(pitch1, interval1):
 
     # check if interval1 is a string,
     # then convert it to interval object if necessary
-    if isinstance(interval1, (six.string_types, int)):
+    if isinstance(interval1, (str, int)):
         interval1 = Interval(interval1)
     else:
         if not hasattr(interval1, 'transposePitch'):

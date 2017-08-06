@@ -11,8 +11,6 @@
 '''
 This module defines the ContourFinder and AggregateContour objects.
 '''
-from __future__ import division, print_function
-
 import random
 import unittest
 

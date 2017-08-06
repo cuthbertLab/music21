@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2014-15 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-from music21.ext import six
+import sys
 
 omit_modules = [
                 'music21/ext/*',
@@ -33,7 +33,7 @@ exclude_lines = [
                 ]
 
 def getCoverage():
-    if six.PY2: # PY3 and sys.version_info.minor == 6:
+    if sys.version_info.minor == 6:
         try:
             import coverage
             cov = coverage.coverage(omit=omit_modules)

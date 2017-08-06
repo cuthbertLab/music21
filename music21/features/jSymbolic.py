@@ -14,8 +14,6 @@ defined in Cory McKay's MA Thesis, "Automatic Genre Classification of MIDI Recor
 
 The LGPL jSymbolic system can be found here: http://jmir.sourceforge.net/jSymbolic.html
 '''
-from __future__ import division, print_function
-
 import copy
 import math
 import unittest

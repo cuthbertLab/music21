@@ -17,10 +17,6 @@ Requires the amazing Gregoio library: http://gregorio-project.github.io , which 
 requires LaTeX. (MacTeX, etc.; I suggest Basic TeX instead of the full MacTeX for this,
 since it's only 100MB instead of 2.5GB)
 '''
-
-
-from __future__ import unicode_literals
-
 import re
 import unittest
 import os.path
@@ -30,8 +26,6 @@ from music21 import common
 from music21 import exceptions21
 from music21 import note
 from music21 import stream
-
-from music21.ext import six
 
 from music21 import environment
 _MOD = "chant.py"
@@ -259,7 +253,7 @@ class GregorianNote(note.Note):
                 raise ChantException(
                     "note is too high for the clef (%s), choose a higher one" % str(useClef))
         else:
-            return six.unichr(asciiNote) # unichr on python2; chr python3
+            return chr(asciiNote) 
 
 
     def _getFill(self):

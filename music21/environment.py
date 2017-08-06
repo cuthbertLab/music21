@@ -24,6 +24,7 @@ Additional documentation for and examples of using this module are found in
 '''
 from __future__ import print_function
 
+import io
 import os
 import sys
 import tempfile
@@ -34,7 +35,6 @@ from xml.sax import saxutils
 
 from music21 import exceptions21
 from music21 import common
-from music21.ext import six
 
 
 _MOD = 'environment.py'
@@ -186,7 +186,7 @@ class _EnvironmentCore(object):
         if key not in self._ref:
             raise EnvironmentException('no preference: %s' % key)
         value = self._ref[key]
-        if six.PY3 and isinstance(value, bytes):
+        if isinstance(value, bytes):
             value = value.decode(encoding='utf-8', errors='replace')
 
         valueStr = str(value).lower()
@@ -220,7 +220,7 @@ class _EnvironmentCore(object):
         # saxutils.escape(msg).encode('UTF-8')
 
         # add local corpus path as a key
-        #if six.PY3 and isinstance(value, bytes):
+        #if isinstance(value, bytes):
         #    value = value.decode(errors='replace')
         if 'path' in key.lower() and value is not None:
             value = common.cleanpath(value)
@@ -257,7 +257,7 @@ class _EnvironmentCore(object):
                     value, key))
 
         # need to escape problematic characters for xml storage
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             value = saxutils.escape(value) #.encode('UTF-8')
         # set value
         if key == 'localCorpusPath':
@@ -1031,7 +1031,7 @@ class Environment(object):
         concatenated with common.formatStr().
         '''
         if envSingleton().__getitem__('debug') >= statusLevel:
-            if isinstance(msg, six.string_types):
+            if isinstance(msg, str):
                 msg = [msg]  # make into a list
             if msg[0] != self.modNameParent and self.modNameParent is not None:
                 msg = [self.modNameParent + ':'] + msg
@@ -1070,7 +1070,7 @@ class Environment(object):
         To print a warning to the user, send a list of strings to this method.
         Similar to printDebug but even if debug is off.
         '''
-        if isinstance(msg, six.string_types):
+        if isinstance(msg, str):
             msg = [msg]  # make into a list
         elif isinstance(msg, dict):
             msg = [repr(msg)]
@@ -1274,7 +1274,7 @@ class UserSettings(object):
                     'localCorporaSettings must be provided as a dict.')
             if value:
                 for innerKey, innerValue in value.values():
-                    if not isinstance(innerKey, six.string_types):
+                    if not isinstance(innerKey, str):
                         raise UserSettingsException(
                             'Each key in localCorporaSettings must be a string.')
                     if not common.isListLike(innerValue):
@@ -1385,7 +1385,7 @@ class Test(unittest.TestCase):
 
     def stringFromTree(self, settingsTree):
         etIndent(settingsTree.getroot())
-        bio = six.BytesIO()
+        bio = io.BytesIO()
         settingsTree.write(bio, encoding='utf-8', xml_declaration=True)
         match = bio.getvalue().decode('utf-8')
         return match

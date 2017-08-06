@@ -29,13 +29,8 @@ import itertools
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
-try:
-    unichr # @UndefinedVariable
-except NameError:
-    unichr = chr
-
 def makeBrailleDictionary():
-    u'''
+    '''
     return a dictionary mapping six-dot braille characters to lists of dot orders.
 
     >>> B = braille.lookup.makeBrailleDictionary()
@@ -60,7 +55,7 @@ def makeBrailleDictionary():
             bList.append(str(posBackOffset) if trueOrFalse is True else "")
         bText = ''.join(reversed(bList))
         bVal = int(bText) if bText != "" else 0
-        currentStrValue = unichr(_BRAILLE_START + i)
+        currentStrValue = chr(_BRAILLE_START + i)
         braille_dict[bVal] = currentStrValue
         #print(bVal, currentStrValue)
         i += 1

@@ -27,8 +27,6 @@ __all__ = ['classTools', 'decorators', 'fileTools', 'formats', 'misc',
 
 from music21 import defaults
 from music21 import exceptions21
-from music21.ext import six
-
 # pylint: disable=wildcard-import
 from music21.common.classTools import * #including isNum, isListLike
 from music21.common.decorators import * # gives the deprecated decorator
@@ -43,17 +41,8 @@ from music21.common.stringTools import *
 from music21.common.weakrefTools import * # including wrapWeakref
 
 
-#### This is used in FreezeThaw and elsewhere as
-#### a standard way to get cPickle w/ fallback. Do not remove.
-if six.PY2:
-    try:
-        import cPickle as pickleMod # much faster on Python 2
-    except ImportError:
-        import pickle as pickleMod # @UnusedImport
-else:
-    import pickle as pickleMod # @Reimport
-    # on python 3 -- do NOT import _pickle directly. it will be used if
-    #     it exists, and _pickle lacks HIGHEST_PROTOCOL constant.
+import pickle as pickleMod # @Reimport
+
 DEBUG_OFF = 0
 DEBUG_USER = 1
 DEBUG_DEVEL = 63

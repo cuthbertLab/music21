@@ -19,8 +19,6 @@ Modular analysis procedures inherit from :class:`music21.analysis.discrete.Discr
 The :class:`music21.analysis.discrete.KrumhanslSchmuckler` (for algorithmic key detection)
 and :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) classes provide examples.
 '''
-from __future__ import division, print_function, absolute_import
-
 import unittest
 
 from music21 import exceptions21
@@ -31,11 +29,6 @@ from music21 import stream
 
 from music21.analysis.discrete import DiscreteAnalysisException
 
-
-from music21.ext import six
-if six.PY2:
-    # pylint: disable=redefined-builtin
-    from music21.common import py3round as round
 
 from music21 import environment
 _MOD = 'windowed.py'

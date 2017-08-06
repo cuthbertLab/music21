@@ -16,8 +16,6 @@ Each :class:`~music21.note.Note` object has a `Pitch` object embedded in it.
 Some of the methods below, such as `Pitch.name`, `Pitch.step`, etc. are
 made available directly in the `Note` object, so they will seem familiar.
 '''
-from __future__ import division, print_function, absolute_import
-
 import copy
 import math
 import itertools
@@ -32,12 +30,6 @@ from music21 import interval
 from music21 import style
 
 from music21.common import SlottedObjectMixin
-from music21.ext import six
-
-if six.PY2:
-    # pylint: disable=redefined-builtin
-    from music21.common import py3round as round
-
 from music21 import environment
 _MOD = "pitch.py"
 environLocal = environment.Environment(_MOD)
@@ -1004,7 +996,7 @@ class Accidental(style.StyleMixin):
         >>> a.alter
         -2.0
         '''
-        if isinstance(name, six.string_types):
+        if isinstance(name, str):
             name = name.lower() # sometimes args get capitalized
         if name in ['natural', 'n', 0]:
             self._name = 'natural'
@@ -1183,23 +1175,23 @@ class Accidental(style.StyleMixin):
         if that is not possible.
 
         >>> flat = pitch.Accidental('flat')
-        >>> print(flat.unicode)
-        ♭
+        >>> flat.unicode
+        '♭'
 
         Compare:
 
         >>> sharp = pitch.Accidental('sharp')
-        >>> print(sharp.modifier)
-        #
-        >>> print(sharp.unicode)
-        ♯
+        >>> sharp.modifier
+        '#'
+        >>> sharp.unicode
+        '♯'
         '''
         # all unicode musical symbols can be found here:
         # http://www.fileformat.info/info/unicode/block/musical_symbols/images.htm
         if self.modifier in unicodeFromModifier:
             return unicodeFromModifier[self.modifier]
         else: # get our best representation
-            return six.u(self.modifier)
+            return self.modifier
 
     @property
     def fullName(self):
@@ -2801,10 +2793,6 @@ class Pitch(object):
         else:
             tempAlter = 0
         tempStep = self.step
-        if six.PY2:
-            # pylint: disable=undefined-variable
-            tempStep = unicode(tempStep) # @UndefinedVariable
-
         if tempAlter != int(tempAlter):
             raise PitchException(u'Es geht nicht "german" zu benutzen mit Microtönen.  Schade!')
         else:
@@ -2994,10 +2982,6 @@ class Pitch(object):
         else:
             tempAlter = 0
         tempStep = self.step
-
-        if six.PY2:
-            # pylint: disable=undefined-variable
-            tempStep = unicode(tempStep) # @UndefinedVariable
 
         if tempAlter != int(tempAlter):
             raise PitchException(
@@ -3246,7 +3230,7 @@ class Pitch(object):
         (7, -31.0)
         '''
 
-        if isinstance(fundamental, six.string_types):
+        if isinstance(fundamental, str):
             fundamental = Pitch(fundamental)
         # else assume a Pitch object
         # got through all harmonics and find the one closes to this ps value
@@ -3371,7 +3355,7 @@ class Pitch(object):
                                      'provide one as an arugment')
             else:
                 fundamental = self.fundamental
-        if isinstance(fundamental, six.string_types):
+        if isinstance(fundamental, str):
             fundamental = Pitch(fundamental)
 
         harmonic, cents = self.harmonicFromFundamental(fundamental)
@@ -3395,7 +3379,7 @@ class Pitch(object):
         >>> g4.harmonicAndFundamentalFromPitch('c3')
         (3, <music21.pitch.Pitch C3(-2c)>)
         '''
-        if isinstance(target, six.string_types):
+        if isinstance(target, str):
             target = Pitch(target)
         else: # make a copy
             target = copy.deepcopy(target)

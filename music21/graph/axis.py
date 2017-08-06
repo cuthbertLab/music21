@@ -14,8 +14,6 @@
 Definitions for extracting data from a Stream to place on one axis of a
 :class:`~music21.graph.plot.PlotStream` or similar object.
 '''
-from __future__ import division, print_function, absolute_import
-
 import collections
 import math
 import unittest

@@ -7,9 +7,6 @@
 # Copyright:    Copyright © 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
-from __future__ import division, print_function
-
 import unittest
 
 from music21.base import Music21Object

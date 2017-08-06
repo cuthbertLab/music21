@@ -44,12 +44,8 @@ from music21 import pitch
 from music21 import key
 from music21 import note
 from music21 import chord
-from music21.ext import six
 
-try:
-    import enum # @UnresolvedImport
-except ImportError:
-    from music21.ext import enum # enum34 backport
+import enum 
 
 #from music21 import harmony can't do this either
 #from music21 import roman Can't import roman because of circular
@@ -126,7 +122,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
 
     def _setKey(self, keyValue):
-        if isinstance(keyValue, six.string_types):
+        if isinstance(keyValue, str):
             try:
                 keyValue = key.Key(key.convertKeyStringToMusic21KeyString(keyValue))
             except:
@@ -158,7 +154,7 @@ class VoiceLeadingQuartet(base.Music21Object):
     def _setVoiceNote(self, value, which):
         if value is None:
             setattr(self, which, None)
-        elif isinstance(value, six.string_types):
+        elif isinstance(value, str):
             setattr(self, which, note.Note(value))
         else:
             try:
@@ -421,7 +417,7 @@ class VoiceLeadingQuartet(base.Music21Object):
             if requiredInterval is None:
                 return True
             else:
-                if isinstance(requiredInterval, six.string_types):
+                if isinstance(requiredInterval, str):
                     requiredInterval = interval.Interval(requiredInterval)
 
                 if self.vIntervals[0].simpleName == requiredInterval.simpleName:
@@ -565,7 +561,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                 if simpleName is None:
                     return True
                 else:
-                    if isinstance(simpleName, six.string_types):
+                    if isinstance(simpleName, str):
                         if self.vIntervals[0].simpleName == simpleName:
                             return True
                         else:
@@ -1564,7 +1560,7 @@ class NNoteLinearSegment(base.Music21Object):
         for value in noteList:
             if value is None:
                 self._noteList.append(None)
-            elif isinstance(value, six.string_types):
+            elif isinstance(value, str):
                 self._noteList.append(note.Note(value))
             else:
                 try:
@@ -1692,7 +1688,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     def _correctNoteInput(self, value):
         if value is None:
             return None
-        elif isinstance(value, six.string_types):
+        elif isinstance(value, str):
             return note.Note(value)
         else:
             try:

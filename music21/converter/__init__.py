@@ -38,8 +38,6 @@ the temp folder on the disk.
 >>> s
 <music21.stream.Score ...>
 '''
-
-
 import unittest
 
 import copy
@@ -57,7 +55,6 @@ from music21.converter import subConverters
 from music21 import exceptions21
 from music21 import common
 from music21 import stream
-from music21.ext import six
 from music21 import musedata as musedataModule
 
 from music21 import _version
@@ -175,7 +172,7 @@ class ArchiveManager(object):
                     continue
 
                 post = f.read(subFp)
-                if six.PY3 and isinstance(post, bytes):
+                if isinstance(post, bytes):
                     foundEncoding = re.match(br"encoding=[\'\"](\S*?)[\'\"]", post[:1000])
                     if foundEncoding:
                         defaultEncoding = foundEncoding.group(1).decode('ascii')
@@ -203,14 +200,12 @@ class ArchiveManager(object):
                 component = f.open(subFp, 'rU')
                 lines = component.readlines()
                 #environLocal.printDebug(['subFp', subFp, len(lines)])
-                if six.PY2:
-                    post.append(''.join(lines))
-                else:
-                    try:
-                        post.append(''.join([l.decode(encoding='UTF-8') for l in lines]))
-                    except UnicodeDecodeError:
-                        # python3 UTF-8 failed to read corpus/haydn/opus103/movement1.zip
-                        post.append(''.join([l.decode(encoding='ISO-8859-1') for l in lines]))
+            
+                try:
+                    post.append(''.join([l.decode(encoding='UTF-8') for l in lines]))
+                except UnicodeDecodeError:
+                    # python3 UTF-8 failed to read corpus/haydn/opus103/movement1.zip
+                    post.append(''.join([l.decode(encoding='ISO-8859-1') for l in lines]))
 
                 # note: the following methods do not properly employ
                 # universal new lines; this is a python problem:
@@ -558,7 +553,7 @@ class Converter(object):
             dataStr = dataStr.lstrip()
             useFormat, dataStr = self.formatFromHeader(dataStr)
 
-            if six.PY3 and isinstance(dataStr, bytes):
+            if isinstance(dataStr, bytes):
                 dataStrMakeStr = dataStr.decode('utf-8', 'ignore')
             else:
                 dataStrMakeStr = dataStr
@@ -882,7 +877,7 @@ class Converter(object):
         >>> converter.resetSubconverters() #_DOCS_HIDE
         '''
         dataStrStartLower = dataStr[:20].lower()
-        if six.PY3 and isinstance(dataStrStartLower, bytes):
+        if isinstance(dataStrStartLower, bytes):
             dataStrStartLower = dataStrStartLower.decode('utf-8', 'ignore')
 
         foundFormat = None
@@ -1081,7 +1076,7 @@ def parse(value, *args, **keywords):
     else:
         m21Format = None
 
-    if six.PY3 and isinstance(value, bytes):
+    if isinstance(value, bytes):
         valueStr = value.decode('utf-8', 'ignore')
     else:
         valueStr = value

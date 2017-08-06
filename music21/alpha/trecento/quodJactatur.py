@@ -41,7 +41,6 @@ try out different solutions, moving notes over a measure or two, etc.
 without any problems.  Working on this problem also gave a great test
 of music21's ability to manipulate diatonic Streams.
 '''
-from __future__ import print_function
 
 import copy
 import unittest

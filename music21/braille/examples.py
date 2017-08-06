@@ -7,8 +7,7 @@
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
-u"""
+"""
 The melody to the "Happy Birthday" song, in G major and 3/4 time.
 
 

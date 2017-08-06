@@ -10,12 +10,11 @@
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
-
-
-from time import time
 import math
 import os
 import unittest
+
+from time import time
 
 from music21 import scale
 from music21 import search

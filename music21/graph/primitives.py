@@ -31,11 +31,6 @@ from music21.graph.utilities import (getExtendedModules,
                                      )
 
 
-from music21.ext import six
-if six.PY2:
-    # pylint: disable=redefined-builtin
-    from music21.common import py3round as round
-
 
 from music21 import environment
 _MOD = 'graph/primitives.py'
@@ -1418,7 +1413,7 @@ class GraphGroupedVerticalBar(Graph):
             height = rect.get_height()
             subplot.text(adjustedX,
                          height,
-                         str(common.py3round(height, self.roundDigits)),
+                         str(round(height, self.roundDigits)),
                          ha='center',
                          va='bottom',
                          fontsize=self.tickFontSize,

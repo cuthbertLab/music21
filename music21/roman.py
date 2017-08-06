@@ -13,8 +13,6 @@
 '''
 Music21 class for dealing with Roman Numeral analysis
 '''
-from __future__ import division, print_function
-
 import unittest
 import copy
 import re
@@ -33,7 +31,6 @@ from music21 import key
 from music21 import pitch
 from music21 import scale
 
-from music21.ext import six
 from music21.figuredBass import notation as fbNotation
 
 from music21 import environment
@@ -1199,7 +1196,7 @@ class RomanNumeral(harmony.Harmony):
 
         Called from the superclass, Harmony.__init__()
         '''
-        if not isinstance(self._figure, six.string_types):
+        if not isinstance(self._figure, str):
             raise RomanException('got a non-string figure: {!r}'.format(self._figure))
 
         if not self.useImpliedScale:
@@ -1840,7 +1837,7 @@ class RomanNumeral(harmony.Harmony):
 
         # try to get Scale or Key object from cache: this will offer
         # performance boost as Scale stores cached pitch segments
-        if isinstance(keyOrScale, six.string_types):
+        if isinstance(keyOrScale, str):
             keyOrScale = _getKeyFromCache(keyOrScale)
         elif keyOrScale is not None:
             #environLocal.printDebug(['got keyOrScale', keyOrScale])

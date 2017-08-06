@@ -43,6 +43,11 @@ Files in the ext/ folder are not copyright music21 Project but whose distributio
 is compatible with music21.  The corpus files have copyrights retained by their
 owners who have allowed them to be included with music21.
 '''
+import sys
+if sys.version_info[0] < 3:
+    raise ImportError('Music21 v.5 is a Python 3 only library.  Use v.4 to run on Python 2.7')
+del sys
+
 # this defines what  is loaded when importing __all__
 # put these in alphabetical order FIRST dirs then modules
 # but: base must come first; in some cases other modules depend on
@@ -127,7 +132,6 @@ __all__ = [
     'voiceLeading',
     'volume',
     ]
-
 
 #-------------------------------------------------------------------------------
 # for sub packages, need to manually add the modules in these subpackages

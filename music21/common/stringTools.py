@@ -14,7 +14,6 @@ Tools for working with strings
 '''
 __all__ = [
            'whitespaceEqual',
-           'toUnicode',
            'getNumFromStr',
            'hyphenToCamelCase',
            'camelCaseToHyphen',
@@ -32,8 +31,6 @@ import re
 import time
 import string
 import unicodedata # @UnresolvedImport
-
-from music21.ext import six
 
 #-------------------------------------------------------------------------------
 WHITESPACE = re.compile(r'\s+')
@@ -62,39 +59,6 @@ def whitespaceEqual(a, b):
     else: return False
 
 
-def toUnicode(usrStr):
-    '''Convert this tring to a unicode string; if already a unicode string, do nothing.
-
-    >>> common.toUnicode('test')
-    'test'
-    >>> common.toUnicode(u'test')
-    'test'
-
-    Note: this method is NOT USED and could disappear
-    without notice.
-
-    # TODO: Remove
-
-    :rtype: str
-    '''
-    if six.PY3:
-        if not isinstance(usrStr, str):
-            try:
-                return usrStr.decode('utf-8')
-            except TypeError:
-                return usrStr
-        else:
-            return usrStr
-    else:
-        try:
-            # pylint: disable=undefined-variable
-            usrStr = unicode(usrStr, 'utf-8') # @UndefinedVariable
-        # some documentation may already be in unicode; if so, a TypeException will be raised
-        except TypeError: #TypeError: decoding Unicode is not supported
-            pass
-        return usrStr
-
-
 def getNumFromStr(usrStr, numbers='0123456789'):
     '''
     Given a string, extract any numbers.
@@ -118,9 +82,6 @@ def getNumFromStr(usrStr, numbers='0123456789'):
             remain.append(char)
     # returns numbers, and then characters
     return ''.join(found), ''.join(remain)
-
-
-
 
 
 def hyphenToCamelCase(usrStr, replacement='-'):
@@ -318,21 +279,18 @@ def formatStr(msg, *arguments, **keywords):
         formatType = None
 
     msg = [msg] + list(arguments)
-    if six.PY3:
-        for i in range(len(msg)):
-            x = msg[i]
-            if isinstance(x, bytes):
-                msg[i] = x.decode('utf-8')
-            if not isinstance(x, str):
+    for i in range(len(msg)):
+        x = msg[i]
+        if isinstance(x, bytes):
+            msg[i] = x.decode('utf-8')
+        if not isinstance(x, str):
+            try:
+                msg[i] = repr(x)
+            except TypeError:
                 try:
-                    msg[i] = repr(x)
-                except TypeError:
-                    try:
-                        msg[i] = x.decode('utf-8')
-                    except AttributeError:
-                        msg[i] = ""
-    else:
-        msg = [str(x) for x in msg]
+                    msg[i] = x.decode('utf-8')
+                except AttributeError:
+                    msg[i] = ""
     if formatType == 'block':
         return '\n*** '.join(msg)+'\n'
     else: # catch all others
@@ -383,14 +341,8 @@ def normalizeFilename(name):
         extension = str(name[lenName - 4:])
         name = name[:lenName -4]
 
-    if isinstance(name, str) and six.PY2:
-        name = unicode(name) # @UndefinedVariable pylint: disable=undefined-variable
-
     name = stripAccents(name)
-    if six.PY2:
-        name = name.encode('ascii', 'ignore')
-    else:
-        name = name.encode('ascii', 'ignore').decode('UTF-8')
+    name = name.encode('ascii', 'ignore').decode('UTF-8')
     name = re.sub(r'[^\w-]', '_', name).strip()
     if extension is not None:
         name += extension
@@ -398,8 +350,7 @@ def normalizeFilename(name):
 
 def removePunctuation(s):
     '''
-    Remove all punctuation from a string -- very different in Py2 vs Py3
-    so moved out...
+    Remove all punctuation from a string.
 
     >>> common.removePunctuation("This, is! my (face).")
     'This is my face'
@@ -407,19 +358,8 @@ def removePunctuation(s):
     >>> common.removePunctuation(u"This, is! my (face).")
     u'This is my face'
     '''
-    if six.PY2:
-        # pylint: disable=undefined-variable
-        wasUnicode = False
-        if isinstance(s, unicode): # @UndefinedVariable
-            s = s.encode('utf-8')
-            wasUnicode = True
-        out = s.translate(string.maketrans("", ""), string.punctuation) # @UndefinedVariable
-        if wasUnicode:
-            out = unicode(out, encoding='utf-8') # @UndefinedVariable
-
-    else:
-        maketrans = str.maketrans("", "", string.punctuation)
-        out = s.translate(maketrans)
+    maketrans = str.maketrans("", "", string.punctuation)
+    out = s.translate(maketrans)
     return out
 
 

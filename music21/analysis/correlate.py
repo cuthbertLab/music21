@@ -11,9 +11,6 @@
 '''
 Various tools and utilities to find correlations between disparate objects in a Stream.
 '''
-from __future__ import division, print_function, absolute_import
-
-
 import unittest
 from collections import OrderedDict
 

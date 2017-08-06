@@ -10,7 +10,7 @@ http://web.mit.edu/music21 or http://music21.readthedocs.org/en/latest/index.htm
 And to install, see:
 http://web.mit.edu/music21/doc/usersGuide/usersGuide_01_installing.html
 
-Music21 runs on Python 2.7 or preferably Python 3.4+
+Music21 runs on Python 3.4+.  Version 4 was the last version to support Python 2
 
 Released under either the BSD (3-clause) or GNU LGPL license according to your choice. See LICENSE.
 Externally provided software (including the MIT licensed Lilypond/MusicXML test Suite) and 

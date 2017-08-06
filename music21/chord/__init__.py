@@ -13,7 +13,6 @@
 This module defines the Chord object, a sub-class of :class:`~music21.note.GeneralNote`
 as well as other methods, functions, and objects related to chords.
 '''
-from __future__ import division, print_function
 __all__ = ['tables', 'Chord']
 
 import copy
@@ -33,7 +32,6 @@ from music21 import volume
 from music21 import environment
 from music21.chord import tables as chordTables
 from music21.common import deprecated
-from music21.ext import six
 
 _MOD = "chord.py"
 environLocal = environment.Environment(_MOD)
@@ -201,7 +199,7 @@ class Chord(note.NotRest):
     def __init__(self, notes=None, **keywords):
         if notes is None:
             notes = []
-        if isinstance(notes, six.string_types) and " " in notes:
+        if isinstance(notes, str) and " " in notes:
             notes = notes.split()
         # the list of pitch objects is managed by a property; this permits
         # only updating the _chordTablesAddress when pitches has changed
@@ -301,7 +299,7 @@ class Chord(note.NotRest):
         True
         '''
         keyErrorStr = 'cannot access component with: %s' % key
-        if isinstance(key, six.string_types):
+        if isinstance(key, str):
             if key.count('.'):
                 key, attrStr = key.split('.', 1)
                 if not attrStr.count('.'):
@@ -325,7 +323,7 @@ class Chord(note.NotRest):
             except (KeyError, IndexError):
                 raise KeyError(keyErrorStr)
             
-        elif isinstance(key, six.string_types):
+        elif isinstance(key, str):
             key = key.upper()
             for n in self._notes:
                 if n.pitch.nameWithOctave == key:
@@ -401,7 +399,7 @@ class Chord(note.NotRest):
         'red'
         
         '''
-        if isinstance(key, six.string_types) and key.count('.'):
+        if isinstance(key, str) and key.count('.'):
             keySplit = key.split('.')
             keyFind = '.'.join(keySplit[0:-1])
             attr = keySplit[-1]
@@ -412,7 +410,7 @@ class Chord(note.NotRest):
         keyObj = self[key]
         keyIndex = self._notes.index(keyObj)
         
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             value = note.Note(value)
         elif not hasattr(value, 'classes'):
             raise ValueError("Chord index must be set to a valid note object")
@@ -580,7 +578,7 @@ class Chord(note.NotRest):
                     self.duration = n.duration
                     useDuration = None
                     quickDuration = False
-            elif isinstance(n, (six.string_types, int)):
+            elif isinstance(n, (str, int)):
                 if useDuration:
                     self._notes.append(note.Note(n, duration=useDuration))
                 else:
@@ -888,7 +886,7 @@ class Chord(note.NotRest):
 
         '''
         if newbass:
-            if isinstance(newbass, six.string_types):
+            if isinstance(newbass, str):
                 newbass = newbass.replace('b', '-')
                 newbass = pitch.Pitch(newbass)
 
@@ -1381,7 +1379,7 @@ class Chord(note.NotRest):
         >>> c.getColor('D#7')
         'pink'
         '''
-        if isinstance(pitchTarget, six.string_types):
+        if isinstance(pitchTarget, str):
             pitchTarget = pitch.Pitch(pitchTarget)
         for n in self._notes:
             if n.pitch is pitchTarget:
@@ -2994,7 +2992,7 @@ class Chord(note.NotRest):
         <music21.pitch.Pitch C4>
         '''
         if newroot:
-            if isinstance(newroot, six.string_types):
+            if isinstance(newroot, str):
                 newroot = newroot.replace('b', '-')
                 newroot = pitch.Pitch(newroot)
             
@@ -3179,7 +3177,7 @@ class Chord(note.NotRest):
                 n.style.color = value
             
             return
-        elif isinstance(pitchTarget, six.string_types):
+        elif isinstance(pitchTarget, str):
             pitchTarget = pitch.Pitch(pitchTarget)
 
         match = False
@@ -3278,7 +3276,7 @@ class Chord(note.NotRest):
         # assign to first pitch by default
         if pitchTarget is None and self._notes:
             pitchTarget = self._notes[0].pitch
-        elif isinstance(pitchTarget, six.string_types):
+        elif isinstance(pitchTarget, str):
             pitchTarget = pitch.Pitch(pitchTarget)
         match = False
         for d in self._notes:
@@ -3344,7 +3342,7 @@ class Chord(note.NotRest):
         # assign to first pitch by default
         if pitchTarget is None and self._notes:
             pitchTarget = self._notes[0].pitch
-        elif isinstance(pitchTarget, six.string_types):
+        elif isinstance(pitchTarget, str):
             pitchTarget = pitch.Pitch(pitchTarget)
         match = False
         for d in self._notes:
@@ -3421,7 +3419,7 @@ class Chord(note.NotRest):
         '''
         if pitchTarget is None and self._notes:
             pitchTarget = self._notes[0].pitch # first is default
-        elif isinstance(pitchTarget, six.string_types):
+        elif isinstance(pitchTarget, str):
             pitchTarget = pitch.Pitch(pitchTarget)
         match = False
         for d in self._notes:
@@ -3486,10 +3484,10 @@ class Chord(note.NotRest):
         '''
         if pitchTarget is None and self._notes: # if no pitch
             pitchTarget = self._notes[0].pitch
-        elif isinstance(pitchTarget, six.string_types):
+        elif isinstance(pitchTarget, str):
             pitchTarget = pitch.Pitch(pitchTarget)
             
-        if isinstance(t, six.string_types):
+        if isinstance(t, str):
             t = tie.Tie(t)
         
         match = False
@@ -3516,7 +3514,7 @@ class Chord(note.NotRest):
         # assign to first pitch by default
         if pitchTarget is None and self._notes: # if no pitches
             pitchTarget = self._notes[0].pitch
-        elif isinstance(pitchTarget, six.string_types):
+        elif isinstance(pitchTarget, str):
             pitchTarget = pitch.Pitch(pitchTarget)
         match = False
         for d in self._notes:
@@ -4154,7 +4152,7 @@ class Chord(note.NotRest):
     @pitchNames.setter
     def pitchNames(self, value):
         if common.isListLike(value):
-            if isinstance(value[0], six.string_types): # only checking first
+            if isinstance(value[0], str): # only checking first
                 self._notes = [] # clear
                 for name in value:
                     self._notes.append(note.Note(name))
@@ -4624,7 +4622,7 @@ def fromForteClass(notation):
     card = None
     num = 1
     inv = None
-    if isinstance(notation, six.string_types):
+    if isinstance(notation, str):
         if '-' in notation:
             parts = notation.split('-')
             card = int(parts[0])

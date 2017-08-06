@@ -31,8 +31,6 @@ from music21 import style
 from music21 import tie
 from music21 import volume
 
-from music21.ext import six
-
 from music21 import environment
 _MOD = "note.py"
 environLocal = environment.Environment(_MOD)
@@ -210,7 +208,7 @@ class Lyric(style.StyleMixin):
         '''
         # do not want to do this unless we are sure this is not a string
         # possible might alter unicode or other string-like representations
-        if not isinstance(rawText, six.string_types):
+        if not isinstance(rawText, str):
             rawText = str(rawText)
         else:
             rawText = rawText
@@ -531,7 +529,7 @@ class GeneralNote(base.Music21Object):
 
 
         '''
-        if not isinstance(text, six.string_types):
+        if not isinstance(text, str):
             text = str(text)
         if lyricNumber is None:
             maxLyrics = len(self.lyrics) + 1
@@ -583,7 +581,7 @@ class GeneralNote(base.Music21Object):
          <music21.note.Lyric number=4 syllabic=single text="0">]
 
         '''
-        if not isinstance(text, six.string_types):
+        if not isinstance(text, str):
             text = str(text)
         for lyric in self.lyrics[index:]:
             lyric.number += 1
@@ -1238,7 +1236,7 @@ class Note(NotRest):
         >>> a.name
         'D#'
         '''
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             accidental = pitch.Accidental(value)
         else:
             accidental = value

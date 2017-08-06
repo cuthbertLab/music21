@@ -30,8 +30,6 @@ from music21 import common
 from music21 import defaults
 from music21 import style
 
-from music21.ext import six
-
 from music21 import environment
 _MOD = "spanner.py"
 environLocal = environment.Environment(_MOD)
@@ -903,7 +901,7 @@ class SpannerBundle(object):
         # NOTE: this is called very frequently: optimize
 #         post = self.__class__()
 #         for sp in self._storage:
-#             if isinstance(className, six.string_types):
+#             if isinstance(className, str):
 #                 if className in sp.classes:
 #                     post.append(sp)
 #             else:
@@ -915,7 +913,7 @@ class SpannerBundle(object):
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             post = self.__class__()
             for sp in self._storage:
-                if isinstance(className, six.string_types):
+                if isinstance(className, str):
                     if className in sp.classes:
                         post.append(sp)
                 else:
@@ -1299,7 +1297,7 @@ class RepeatBracket(Spanner):
             else:
                 self._numberSpanIsAdjacent = False
 
-        elif isinstance(value, six.string_types):
+        elif isinstance(value, str):
             # assume defined a range with a dash; assumed inclusive
             if '-' in value:
                 start, end = value.split('-')
@@ -1476,7 +1474,7 @@ class Ottava(Spanner):
                 stub.append('a')
             self._type = ''.join(stub)
         else:
-            if (not isinstance(newType, six.string_types)
+            if (not isinstance(newType, str)
                     or newType.lower() not in self.validOttavaTypes):
                 raise SpannerException(
                     'cannot create Ottava of type: %s' % newType)
@@ -1819,10 +1817,7 @@ class Test(unittest.TestCase):
 
     def xmlStr(self, obj):
         xmlBytes = self.GEX.parse(obj)
-        if six.PY2:
-            return xmlBytes
-        else:
-            return xmlBytes.decode('utf-8')
+        return xmlBytes.decode('utf-8')
 
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module

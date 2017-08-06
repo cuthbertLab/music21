@@ -3,8 +3,6 @@
 Python script to find out certain statistics about the trecento cadences
 '''
 
-from __future__ import unicode_literals
-
 import unittest
 from music21.alpha import trecento
 

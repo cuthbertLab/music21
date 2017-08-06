@@ -21,7 +21,7 @@ import xml.etree.ElementTree
 import unittest
 import zipfile
 
-from music21.ext.six import StringIO, string_types
+from io import StringIO
 
 from music21 import bar
 from music21 import chord
@@ -132,7 +132,7 @@ class CapellaImporter(object):
         '''
         if xmlText is None:
             xmlText = self.xmlText
-        if not isinstance(xmlText, string_types):
+        if not isinstance(xmlText, str):
             xmlText = xmlText.decode('utf-8')
         it = xml.etree.ElementTree.iterparse(StringIO(xmlText))
         for unused, el in it:

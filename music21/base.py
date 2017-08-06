@@ -36,17 +36,14 @@ under the module "base":
 >>> base.Music21Object
 <class 'music21.base.Music21Object'>
 '''
-from __future__ import (print_function, division)
-
-import copy
 import sys
+import copy
 import types
 import unittest
 
 from collections import namedtuple
 
 from music21.test.testRunner import mainTest
-from music21.ext import six
 ## all other music21 modules below...
 
 #------------------------------------------------------------------------------
@@ -142,17 +139,6 @@ if _missingImport: # pragma: no cover
         header='music21:')
 del _useImportLib
 
-if six.PY2:
-    from textwrap import dedent
-    if environLocal['warnings'] in (1, '1', True):
-        environLocal.warn(dedent('''
-        Music21 v.4 is the last version that will support Python 2.
-        Please start using Python 3 instead.
-
-        Set music21.environment.UserSettings()['warnings'] = 0
-        to disable this message.
-        '''), header='')
-    del dedent
 
 class Music21ObjectException(exceptions21.Music21Exception):
     pass
@@ -226,7 +212,7 @@ class Groups(list): # no need to inherit from slotted object
     __slots__ = ()
 
     def _validName(self, value):
-        if not isinstance(value, six.string_types):
+        if not isinstance(value, str):
             raise exceptions21.GroupException("Only strings can be used as group names, " +
                                               "not {}".format(repr(value)))
         #if ' ' in value:

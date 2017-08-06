@@ -18,8 +18,6 @@ object subclasses combine a Graph object with the PlotStreamMixin to give
 reusable approaches to graphing data and structures in
 :class:`~music21.stream.Stream` objects.
 '''
-from __future__ import division, print_function, absolute_import
-
 import collections
 import os
 import random
@@ -41,8 +39,6 @@ from music21.analysis import correlate
 from music21.analysis import discrete
 from music21.analysis import reduction
 from music21.analysis import windowed
-
-from music21.ext import six
 
 from music21 import environment
 _MOD = 'graph/plots.py'
@@ -1343,7 +1339,7 @@ class MultiStream(primitives.GraphGroupedVerticalBar, PlotStreamMixin):
         foundPaths = []
         for s in streamList:
             # could be corpus or file path
-            if isinstance(s, six.string_types):
+            if isinstance(s, str):
                 foundPaths.append(os.path.basename(s))
                 if os.path.exists(s):
                     s = converter.parse(s)
@@ -1402,7 +1398,7 @@ class Features(MultiStream):
 
         feList = []
         for fe in self.featureExtractors:
-            if isinstance(fe, six.string_types):
+            if isinstance(fe, str):
                 post = features.extractorsById(fe)
                 for sub in post:
                     feList.append(sub())

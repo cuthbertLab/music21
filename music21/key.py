@@ -30,8 +30,6 @@ from music21 import pitch
 from music21 import scale
 from music21 import style
 
-from music21.ext import six
-
 from music21 import environment
 _MOD = "key.py"
 environLocal = environment.Environment(_MOD)
@@ -220,7 +218,7 @@ def pitchToSharps(value, mode=None):
     Traceback (most recent call last):
     music21.key.KeyException: Cannot determine sharps for quarter-tone keys! silly!
     '''
-    if isinstance(value, six.string_types):
+    if isinstance(value, str):
         value = pitch.Pitch(value)
     elif 'Pitch' in value.classes:
         value = value
@@ -241,7 +239,7 @@ def pitchToSharps(value, mode=None):
         sharps += modeSharpsAlter[mode]
 
     return sharps
-#    if isinstance(value, six.string_types):
+#    if isinstance(value, str):
 #        p = pitch.Pitch(value)
 #    else:
 #        p = value

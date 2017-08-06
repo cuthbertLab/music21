@@ -18,8 +18,6 @@ to people who are programming music21 on a screen reader.
 
 For Bo-Cheng Jhan with my thanks.
 '''
-from __future__ import print_function
-
 import re
 import sys
 
@@ -27,12 +25,8 @@ from io import StringIO
 from runpy import run_module
 
 from music21 import braille
-from music21.ext import six
 
 def runTest():
-    if six.PY2:
-        print("This module runs on Python 3 only")
-        return
     savedStderr = sys.stderr
     totalTests = 0
     hadError = False

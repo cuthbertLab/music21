@@ -61,9 +61,6 @@ from music21.figuredBass import notation
 from music21.figuredBass import realizerScale
 from music21.figuredBass import rules
 from music21.figuredBass import segment
-from music21.ext import six
-
-ifilter = six.moves.filter # @UndefinedVariable
 
 _MOD = 'realizer.py'
 
@@ -506,7 +503,7 @@ class FiguredBassLine(object):
                         del movementsBC[possibB]
                 for (possibA, possibBList) in list(movementsAB.items()):
                     movementsAB[possibA] = list(
-                                ifilter(lambda possibB: possibB in movementsBC, possibBList))
+                                filter(lambda possibB: possibB in movementsBC, possibBList))
 
             for (possibA, possibBList) in list(movementsAB.items()):
                 if not possibBList:

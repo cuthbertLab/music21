@@ -87,13 +87,12 @@ from music21 import pitch
 #from music21.tree.trees import ElementTree
 
 from music21.ext import jsonpickle
-from music21.ext import six
 
 from music21 import environment
 _MOD = "freezeThaw.py"
 environLocal = environment.Environment(_MOD)
 
-from music21.common import pickleMod
+import pickle
 #------------------------------------------------------------------------------
 
 
@@ -670,7 +669,7 @@ class StreamFreezer(StreamFreezeThawBase):
             # a negative protocol value will get the highest protocol;
             # this is generally desirable
             # packStream() returns a storage dictionary
-            pickleString = pickleMod.dumps(storage, protocol=pickleMod.HIGHEST_PROTOCOL)
+            pickleString = pickle.dumps(storage, protocol=pickle.HIGHEST_PROTOCOL)
             if zipType == 'zlib':
                 pickleString = zlib.compress(pickleString)
             with open(fp, 'wb') as f: # binary
@@ -699,7 +698,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
 
         if fmt == 'pickle':
-            out = pickleMod.dumps(storage, protocol=-1)
+            out = pickle.dumps(storage, protocol=-1)
         elif fmt == 'jsonpickle':
             out = jsonpickle.encode(storage, **keywords)
         else:
@@ -910,7 +909,7 @@ class StreamThawer(StreamFreezeThawBase):
         '''
         Look at the file and determine the format
         '''
-        if (six.PY3 and isinstance(storage, bytes)):
+        if isinstance(storage, bytes):
             if storage.startswith(b'{"'):
                 # was m21Version": {"py/tuple" but order of dict may change
                 return 'jsonpickle'
@@ -942,12 +941,12 @@ class StreamThawer(StreamFreezeThawBase):
             #environLocal.printDebug(['opening fp', fp])
             f = open(fp, 'rb')
             if zipType is None:
-                storage = pickleMod.load(f)
+                storage = pickle.load(f)
             elif zipType == 'zlib':
                 compressedString = f.read()
                 uncompressed = zlib.decompress(compressedString)
                 try:
-                    storage = pickleMod.loads(uncompressed)
+                    storage = pickle.loads(uncompressed)
                 except AttributeError as e:
                     raise FreezeThawException('Problem in decoding: {}'.format(e))
             else:
@@ -977,7 +976,7 @@ class StreamThawer(StreamFreezeThawBase):
             fmt = self.parseOpenFmt(fileData)
 
         if fmt == 'pickle':
-            storage = pickleMod.loads(fileData)
+            storage = pickle.loads(fileData)
         elif fmt == 'jsonpickle':
             storage = jsonpickle.decode(fileData)
         else:
@@ -1390,10 +1389,7 @@ class JSONFreezer(JSONFreezeThawBase):
             return True
         if isinstance(possiblyFreezeable, (list, tuple, dict)):
             return False
-        if six.PY2 and isinstance(possiblyFreezeable,
-                (int, str, unicode, float)): # @UndefinedVariable pylint: disable=undefined-variable
-            return False
-        elif six.PY3 and isinstance(possiblyFreezeable, (int, str, bytes, float)):
+        if isinstance(possiblyFreezeable, (int, str, bytes, float)):
             return False
 
         fqClassList = [self.fullyQualifiedClassFromObject(x)
@@ -1613,10 +1609,6 @@ class JSONFreezer(JSONFreezeThawBase):
                     sort_keys=True,
                     indent=2,
                     )
-            if six.PY2:
-                # pylint: disable=undefined-variable
-                jsonString = unicode(jsonString) # @UndefinedVariable
-
             f.write(jsonString)
 
 class JSONThawer(JSONFreezeThawBase):
@@ -1910,7 +1902,7 @@ class Test(unittest.TestCase):
             #print idKey
             #print n2.sites.siteDict[idKey]['obj']
 
-        dummy = pickleMod.dumps(c, protocol=-1)
+        dummy = pickle.dumps(c, protocol=-1)
 
 
         #data = sf.writeStr(fmt='pickle')

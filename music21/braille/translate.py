@@ -86,11 +86,6 @@ memorization" (BMTM, 71). Some of these keywords are changed automatically in co
 import re
 import unittest
 
-try: # gives Py2 the zip of Py3
-    from future_builtins import zip # pylint: disable=redefined-builtin
-except ImportError:
-    pass
-
 
 from music21 import exceptions21
 from music21 import metadata
@@ -99,11 +94,6 @@ from music21 import stream
 from music21.braille.basic import wordToBraille
 from music21.braille.lookup import alphabet
 from music21.braille import segment
-from music21.ext import six
-
-# pylint: disable=redefined-builtin
-if six.PY3:
-    unicode = str # @ReservedAssignment
 
 
 #------------------------------------------------------------------------------
@@ -273,21 +263,13 @@ def partToBraille(music21Part, **keywords):
         if not debug:
             allBrailleText.append(transcription)
         else:
-            if six.PY2:
-                bsStr = str(brailleSegment)
-                bsUni = bsStr.decode('utf-8')
-                allBrailleText.append(bsUni)
-            else:
-                allBrailleText.append(str(brailleSegment))
+            allBrailleText.append(str(brailleSegment))
 
     from music21.braille.basic import beamStatus
     for x in list(beamStatus): # coerce to list first so that dictionary does not change size
         del beamStatus[x]      # while iterating.
 
-    if six.PY2 and debug:
-        return u"\n".join(allBrailleText)
-    else:
-        return u"\n".join([unicode(bt) for bt in allBrailleText])
+    return "\n".join([str(bt) for bt in allBrailleText])
 
 
 
@@ -325,17 +307,9 @@ def keyboardPartsToBraille(keyboardScore, **keywords):
         if not debug:
             allBrailleText.append(bg.brailleText)
         else:
-            if six.PY2:
-                bsStr = str(bg)
-                bsUni = bsStr.decode('utf-8')
-                allBrailleText.append(bsUni)
-            else:
-                allBrailleText.append(str(bg))
+            allBrailleText.append(str(bg))
 
-    if six.PY2 and debug:
-        return u"\n".join(allBrailleText)
-    else:
-        return u"\n".join([unicode(bt) for bt in allBrailleText])
+    return u"\n".join([str(bt) for bt in allBrailleText])
 
 
 def _translateArgs(**keywords):

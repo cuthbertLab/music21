@@ -7,8 +7,6 @@
 # Copyright:    Copyright © 2012, 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-from __future__ import unicode_literals
-
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 import re

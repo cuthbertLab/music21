@@ -36,8 +36,6 @@ And use `corpus.search` if you do not:
 >>> cb[0].parse()
 <music21.stream.Score 0x1050ce940>
 '''
-from __future__ import unicode_literals
-
 __all__ = ['chorales', 'corpora', 'manager', 
            # virtual
            'work', 

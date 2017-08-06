@@ -18,10 +18,6 @@ import weakref
 
 from music21 import common
 from music21 import exceptions21
-from music21.ext import six
-
-if six.PY3:
-    basestring = str # @ReservedAssignment
 
 # define whether weakrefs are used for storage of object locations
 WEAKREF_ACTIVE = True
@@ -648,7 +644,7 @@ class Sites(common.SlottedObjectMixin):
             excludeNone=True,
             )
         #printMemo(memo, 'getObjByClass() called: looking at %s sites' % len(objs))
-        classNameIsStr = isinstance(className, six.string_types)
+        classNameIsStr = isinstance(className, str)
         for obj in objs:
             #environLocal.printDebug(['memo', memo])
             if classNameIsStr:

@@ -8,20 +8,14 @@
 # Copyright:    Copyright © 2011, 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-from __future__ import division, print_function
-
 import unittest
 
 from music21 import exceptions21
 
 from music21.braille import lookup
 from music21.braille.basic import numberToBraille, yieldDots
-from music21.ext import six
 
 symbols = lookup.symbols
-
-if six.PY3:
-    unicode = str # @ReservedAssignment
 
 class BrailleText(object):
     """
@@ -77,7 +71,6 @@ class BrailleText(object):
         (since each BrailleTextLine knows whether it is a heading or not, storing
         the index of headings might be overkill)
 
-        >>> if ext.six.PY2: str = unicode #_DOCS_HIDE
         >>> bt = braille.text.BrailleText(lineLength=10)
         >>> headingText = braille.basic.timeSigToBraille(meter.TimeSignature('4/8'))
         >>> bt.addHeading(headingText)
@@ -116,7 +109,6 @@ class BrailleText(object):
         each space symbol such that line wrapping could occur.
 
 
-        >>> if ext.six.PY2: str = unicode #_DOCS_HIDE
         >>> bt = braille.text.BrailleText(lineLength=10)
         >>>
         '''
@@ -129,7 +121,6 @@ class BrailleText(object):
         Adds a NoteGrouping to a new line, prefacing that new line
         with the appropriate spaces or keyboard symbols and dots.
 
-        >>> if ext.six.PY2: str = unicode #_DOCS_HIDE
         >>> bt = braille.text.BrailleText(10)
         >>> bt.currentLine.append('hi', addSpace=False)
         >>> print(str(bt))
@@ -164,7 +155,6 @@ class BrailleText(object):
         append expression to the current line if it is possible,
         or make a new line and insert it there:
 
-        >>> if ext.six.PY2: str = unicode #_DOCS_HIDE
         >>> bt = braille.text.BrailleText(lineLength=10)
         >>> bt.appendOrInsertCurrent(u"hello", addSpace=False)
         >>> print(str(bt))
@@ -208,7 +198,6 @@ class BrailleText(object):
         u'''
         Add a measure number (either a braille number or an int).
 
-        >>> if ext.six.PY2: str = unicode #_DOCS_HIDE
         >>> bt = braille.text.BrailleText(lineLength=10)
         >>> bt.allLines
         [<music21.braille.text.BrailleTextLine object at 0x10af8a6a0>]
@@ -268,7 +257,6 @@ class BrailleText(object):
         Appends signatures to the current location if there is space, otherwise appends to
         a new line:
 
-        >>> if ext.six.PY2: str = unicode #_DOCS_HIDE
         >>> bt = braille.text.BrailleText(lineLength=5)
         >>> bt.addSignatures(braille.basic.timeSigToBraille(meter.TimeSignature('4/8')))
         >>> print(str(bt.currentLine))
@@ -309,9 +297,8 @@ class BrailleText(object):
 
         Demonstration with non braille text...
 
-        >>> if ext.six.PY2: str = unicode #_DOCS_HIDE
-        >>> heading1 = u'hello'
-        >>> body1 = u'anyoneHome?' + braille.lookup.symbols['space'] + u'yup!'
+        >>> heading1 = 'hello'
+        >>> body1 = 'anyoneHome?' + braille.lookup.symbols['space'] + 'yup!'
         >>> bt = braille.text.BrailleText(lineLength=12)
         >>> bt.addHeading(heading1)
         >>> bt.addLongExpression(body1)
@@ -325,8 +312,8 @@ class BrailleText(object):
 
         Each heading is aligned with its own text
 
-        >>> heading2 = u'buh'
-        >>> body2 = u'short' + braille.lookup.symbols['space'] + u'court'
+        >>> heading2 = 'buh'
+        >>> body2 = 'short' + braille.lookup.symbols['space'] + 'court'
         >>> bt.addHeading(heading2)
         >>> bt.addLongExpression(body2)
         >>> bt.allHeadings
@@ -349,7 +336,7 @@ class BrailleText(object):
                     maxLineLength = lineLength
             for j in range(indexStart, indexFinal):
                 brailleTextLine = self.allLines[j]
-                lineStrToCenter = unicode(brailleTextLine)
+                lineStrToCenter = str(brailleTextLine)
                 lineStrToCenter = lineStrToCenter.strip(symbols['space'])
                 if maxLineLength > len(lineStrToCenter):
                     lineStrToCenter = lineStrToCenter.center(maxLineLength, symbols['space'])
@@ -357,13 +344,9 @@ class BrailleText(object):
                     brailleTextLine.textLocation = maxLineLength
 
 
-    def __unicode__(self):
+    def __str__(self):
         self.recenterHeadings()
-        return u"\n".join([unicode(l) for l in self.allLines])
-
-    if six.PY3:
-        __str__ = __unicode__
-        del(__unicode__)
+        return u"\n".join([str(l) for l in self.allLines])
 
 
 class BrailleKeyboard(BrailleText):
@@ -674,12 +657,8 @@ class BrailleTextLine(object):
             self.allChars[prevLoc] = symbols['space']
             self.textLocation -= 1
 
-    def __unicode__(self):
-        return u"".join(self.allChars[0:self.textLocation])
-
-    if six.PY3:
-        __str__ = __unicode__
-        del(__unicode__)
+    def __str__(self):
+        return "".join(self.allChars[0:self.textLocation])
 
 
 #-------------------------------------------------------------------------------

@@ -14,8 +14,6 @@
 as well as component objects for defining nested metrical structures,
 :class:`~music21.meter.MeterTerminal` and :class:`~music21.meter.MeterSequence` objects.
 '''
-from __future__ import division, print_function
-
 import collections
 import copy
 import fractions
@@ -32,7 +30,6 @@ from music21 import exceptions21
 from music21 import style
 
 from music21.common import SlottedObjectMixin, opFrac
-from music21.ext import six
 
 _MOD = 'meter.py'
 environLocal = environment.Environment(_MOD)
@@ -1442,7 +1439,7 @@ class MeterSequence(MeterTerminal):
         else: # assume it is a string
             mt = MeterTerminal(value)
 
-#         if isinstance(value, six.string_types):
+#         if isinstance(value, str):
 #             mt = MeterTerminal(value)
 #         elif isinstance(value, MeterTerminal): # may be a MeterSequence
 #             mt = value
@@ -1608,7 +1605,7 @@ class MeterSequence(MeterTerminal):
         music21.meter.MeterException: Cannot set partition by ['3/4', '1/8', '5/8']
         '''
         # assume a list of terminal definitions
-        if isinstance(numeratorList[0], six.string_types):
+        if isinstance(numeratorList[0], str):
             test = MeterSequence()
             for mtStr in numeratorList:
                 test._addTerminal(mtStr)
@@ -2014,7 +2011,7 @@ class MeterSequence(MeterTerminal):
         #environLocal.printDebug(['calling load in MeterSequence, got targetWeight', targetWeight])
         self._clearPartition()
 
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             ratioList, self.summedNumerator = slashMixedToFraction(value)
             for n, d in ratioList:
                 slashNotation = '%s/%s' % (n, d)
@@ -3157,11 +3154,11 @@ class TimeSignature(base.Music21Object):
 
         # used for drawing the time signature symbol
         # this is the only one that can be  unlinked
-        if (isinstance(value, six.string_types)
+        if (isinstance(value, str)
                 and value.lower() in ('common', 'c')):
             value = '4/4'
             self.symbol = 'common'
-        elif (isinstance(value, six.string_types)
+        elif (isinstance(value, str)
                 and value.lower() in ('cut', 'allabreve')):
             # allaBreve is the capella version
             value = '2/2'
@@ -3173,7 +3170,7 @@ class TimeSignature(base.Music21Object):
 
         # get simple representation; presently, only slashToslashToTuple
         # supports the fast/slow indication
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             valTuplet = slashToTuple(value)
             if valTuplet is not None:
                 tempoIndication = valTuplet.tempoIndication

@@ -15,8 +15,6 @@ Base routines used throughout audioSearching and score-folling.
 
 Requires numpy, scipy, and matplotlib.
 '''
-from __future__ import division, print_function
-
 __all__ = ['transcriber', 'recording', 'scoreFollower']
 
 import copy
@@ -40,8 +38,6 @@ from music21 import stream
 
 from music21.audioSearch import recording
 from music21.audioSearch import transcriber
-
-from music21.ext import six
 
 from music21 import environment
 _MOD = 'audioSearch/base.py'
@@ -445,7 +441,7 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     if waveFilenameOrHandle == 'temp':
         waveFilenameOrHandle = environLocal.getRootTempDir() + os.path.sep + 'temp.wav'
 
-    if isinstance(waveFilenameOrHandle, six.string_types):
+    if isinstance(waveFilenameOrHandle, str):
         # waveFilenameOrHandle is a filename
         waveFilename = waveFilenameOrHandle
         try:

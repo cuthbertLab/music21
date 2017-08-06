@@ -43,15 +43,11 @@ SpineParsing consists of several steps.
 * Stream elements are moved into their measures within a Stream
 * Measures are searched for elements with voice groups and Voice objects are created
 '''
-# pylint: disable=redefined-builtin
-#python3
 import copy
 import math
 import os
 import re
 import unittest
-
-from music21.ext import six
 
 from music21 import articulations
 from music21 import bar
@@ -143,7 +139,7 @@ class HumdrumDataCollection(object):
                                    "DataStream was: " + repr(dataStream))
         elif dataStream is None:
             dataStream = []
-        elif isinstance(dataStream, six.string_types):
+        elif isinstance(dataStream, str):
             dataStream = dataStream.splitlines()
 
         self.dataStream = dataStream
@@ -790,13 +786,8 @@ class HumdrumFile(HumdrumDataCollection):
             raise HumdrumException('Cannot parse humdrum file without a filename!')
         
         try:
-            if six.PY3:
-                with open(filename, encoding="latin-1") as humFH:
-                    self.eventList = self.parseFileHandle(humFH)
-            else:
-                with open(filename) as humFH:
-                    self.eventList = self.parseFileHandle(humFH)
-
+            with open(filename, encoding="latin-1") as humFH:
+                self.eventList = self.parseFileHandle(humFH)
         except IOError:
             raise
 

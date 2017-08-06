@@ -134,7 +134,7 @@ def cpus():
 #     use pickle to serialize/deserialize a copy of an object -- much faster than deepcopy,
 #     but only works for things that are completely pickleable.
 #     '''
-#     return pickleMod.loads(pickleMod.dumps(obj, protocol=-1))
+#     return pickle.loads(pickle.dumps(obj, protocol=-1))
 
 
 if __name__ == "__main__":

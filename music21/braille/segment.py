@@ -23,12 +23,6 @@ and will henceforth be referred to as BMTM.
 
 # pylint: disable=attribute-defined-outside-init
 
-# pylint: disable=redefined-builtin
-try:  # gives Py2 the zip of Py3
-    from future_builtins import zip
-except ImportError:
-    pass
-
 import collections
 import copy
 import unittest
@@ -54,15 +48,8 @@ from music21.braille import text
 from music21.braille.objects import BrailleTranscriptionHelper
 
 from music21.common import opFrac
-from music21.ext import six
 
-try:
-    import enum
-except ImportError:
-    from music21.ext import enum
-
-if six.PY3:
-    unicode = str
+import enum
 
 symbols = lookup.symbols
 
@@ -234,7 +221,7 @@ class BrailleElementGrouping(list):
         self.withHyphen = GROUPING_WITHHYPHEN # False
         self.numRepeats = GROUPING_NUMREPEATS
 
-    def __unicode__(self):
+    def __str__(self):
         '''
         Return an unicode braille representation
         of each object in the BrailleElementGrouping.
@@ -246,27 +233,17 @@ class BrailleElementGrouping(list):
                     try:
                         allObjects.append(u"\n".join(obj2._brailleEnglish))
                     except (AttributeError, TypeError):
-                        allObjects.append(unicode(obj2))
+                        allObjects.append(str(obj2))
             else:
                 try:
                     allObjects.append(u"\n".join(obj._brailleEnglish))
                 except (AttributeError, TypeError):
-                    allObjects.append(unicode(obj))
+                    allObjects.append(str(obj))
         if self.numRepeats > 0:
             allObjects.append(u"** Grouping x {0} **".format(self.numRepeats + 1))
         if self.withHyphen is True:
             allObjects.append(u"music hyphen {0}".format(lookup.symbols['music_hyphen']))
         out = u"\n".join(allObjects)
-        return out
-
-    def __str__(self):
-        '''
-        Return an quasi-ascii representation followed by a unicode braille representation
-        of each object in the BrailleElementGrouping.
-        '''
-        out = self.__unicode__()
-        if six.PY2:
-            out = out.encode(encoding='utf_8', errors='ignore')
         return out
 
     def __repr__(self):
@@ -381,12 +358,9 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
 
     @property
     def brailleText(self):
-        if six.PY2:
-            return text.BrailleText.__unicode__(self)
-        else:
-            return text.BrailleText.__str__(self)
+        return text.BrailleText.__str__(self)
 
-    def __unicode__(self):
+    def __str__(self):
         name = u"<music21.braille.segment BrailleSegment>"
 
         allItems = sorted(self.items())
@@ -405,8 +379,6 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
                                                              affinityNames[itemKey.affinity],
                                                              itemKey.ordinal + 1))
             gStr = str(grouping)
-            if six.PY2:
-                gStr = gStr.decode(encoding='utf_8', errors='ignore')
             allGroupings.append(gStr)
             prevKey = itemKey
         allElementGroupings = u"\n".join([u"".join([k, g, u"\n==="])
@@ -417,11 +389,6 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
                           u"---end segment---"])
         return out
 
-    def __str__(self):
-        out = self.__unicode__()
-        if six.PY2:
-            out = out.encode(encoding='utf_8', errors='ignore')
-        return out
 
     def __repr__(self):
         return str(self)
@@ -1059,12 +1026,9 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
 
     @property
     def brailleText(self):
-        if six.PY2:
-            return text.BrailleKeyboard.__unicode__(self)
-        else:
-            return text.BrailleKeyboard.__str__(self)
+        return text.BrailleKeyboard.__str__(self)
 
-    def __unicode__(self):
+    def __str__(self):
         name = u"<music21.braille.segment BrailleGrandSegment>\n==="
         allPairs = []
         for (rightKey, leftKey) in self.yieldCombinedGroupingKeys():
@@ -1072,8 +1036,6 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                 rightHeading = u"Measure {0} Right, {1} {2}:\n".format(
                     rightKey.measure, affinityNames[rightKey.affinity], rightKey.ordinal + 1)
                 rightContents = str(self.get(rightKey))
-                if six.PY2:
-                    rightContents = rightContents.decode(encoding='utf_8', errors='ignore')
                 rightFull = u"".join([rightHeading, rightContents])
             else:
                 rightFull = u""
@@ -1081,8 +1043,6 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                 leftHeading = u"\nMeasure {0} Left, {1} {2}:\n".format(
                     leftKey.measure, affinityNames[leftKey.affinity], leftKey.ordinal + 1)
                 leftContents = str(self.get(leftKey))
-                if six.PY2:
-                    leftContents = leftContents.decode(encoding='utf_8', errors='ignore')
                 leftFull = u"".join([leftHeading, leftContents])
             else:
                 leftFull = u""
@@ -1091,11 +1051,6 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                            u"---end grand segment---"])
         return out
 
-    def __str__(self):
-        out = self.__unicode__()
-        if six.PY2:
-            out = out.encode(encoding='utf_8', errors='ignore')
-        return out
 
 
     def yieldCombinedGroupingKeys(self):
