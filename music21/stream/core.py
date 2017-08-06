@@ -53,7 +53,7 @@ class StreamCoreMixin(object):
     @common.deprecated('Aug 4 2017', 'Aug 2018 v5', 'use coreInsert instead')
     def _insertCore(self, offset, element,
                     ignoreSort=False,
-                    setActiveSite=True):
+                    setActiveSite=True): # pylint: disable=too-many-function-args
         self.coreInsert(self, offset, element, ignoreSort, setActiveSite)
 
 

@@ -1565,7 +1565,7 @@ class Test(unittest.TestCase):
         p.append(m)
         pRecurse = p.recurse()
         allOffsets = []
-        for _ in pRecurse:
+        for unused in pRecurse:
             allOffsets.append(pRecurse.currentHierarchyOffset())
         self.assertListEqual(allOffsets, [0.0, 0.0, 1.0, 1.0, 2.0])
         currentOffset = pRecurse.currentHierarchyOffset()

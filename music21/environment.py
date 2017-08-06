@@ -1274,8 +1274,8 @@ class UserSettings(object):
                 raise UserSettingsException(
                     'localCorporaSettings must be provided as a dict.')
             if value:
-                for key, innerValue in value.values():
-                    if not isinstance(key, six.string_types):
+                for innerKey, innerValue in value.values():
+                    if not isinstance(innerKey, six.string_types):
                         raise UserSettingsException(
                             'Each key in localCorporaSettings must be a string.')
                     if not common.isListLike(innerValue):

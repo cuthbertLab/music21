@@ -177,7 +177,7 @@ class Instrument(base.Music21Object):
                                self.__class__.__name__,
                                self.__str__())
 
-    def __deepcopy__(self, memo):
+    def __deepcopy__(self, memo=None):
         new = common.defaultDeepcopy(self, memo)
         if self._partIdIsRandom:
             new.partIdRandomize()

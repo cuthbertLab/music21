@@ -4496,7 +4496,7 @@ class MeasureExporter(XMLExporterBase):
 
         # if writing just a sound tag, place an empty words tag in a
         # direction type and then follow with sound declaration
-        if len(durs) > 0:
+        if durs:
             mxDirection = self.placeInDirection(mxMetro, ti)
         else:
             mxWords = Element('words')

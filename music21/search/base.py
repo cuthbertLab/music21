@@ -24,6 +24,7 @@ from music21.ext.more_itertools import windowed
 from music21 import base as m21Base
 from music21 import exceptions21
 from music21 import duration
+from music21.stream import filters
 
 class WildcardDuration(duration.Duration):
     '''
@@ -188,9 +189,9 @@ class StreamSearcher(object):
                 thisStreamIterator = self.searchStream.iter
 
             if self.filterNotesAndRests:
-                thisStreamIterator.notesAndRests
+                thisStreamIterator.addFilter(filters.ClassFilter('GeneralNote'))
             elif self.filterNotes:
-                thisStreamIterator.notes
+                thisStreamIterator.addFilter(filters.ClassFilter(['Note', 'Chord']))
 
         self.activeIterator = thisStreamIterator
 
