@@ -155,6 +155,7 @@ class ArchiveManager(object):
         For 'musedata' format this will be a list of strings.
         For 'musicxml' this will be a single string.
         '''
+        post = None
         if self.archiveType != 'zip':
             raise ArchiveManagerException('no support for extension: %s' % self.archiveType)
 
