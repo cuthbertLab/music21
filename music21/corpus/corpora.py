@@ -883,10 +883,6 @@ class CoreCorpus(Corpus):
         environment.Environment().write()
 
     @property
-    def name(self):
-        return 'core'
-
-    @property
     def noCorpus(self):
         '''
         Return True or False if this is a `corpus` or `noCoprus` distribution.
@@ -1266,16 +1262,6 @@ class LocalCorpus(Corpus):
 #         return []
 # 
 # 
-#     @property
-#     def name(self):
-#         r'''
-#         The name of the virtual corpus:
-# 
-#         >>> corpus.corpora.VirtualCorpus().name
-#         'virtual'
-# 
-#         '''
-#         return 'virtual'
 
 
 
