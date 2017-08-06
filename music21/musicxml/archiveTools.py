@@ -15,6 +15,7 @@ Tools for compressing and uncompressing musicxml files.
 import os
 import zipfile
 
+from music21 import common
 from music21 import environment
 _MOD = 'musicxml/archiveTools.py'
 environLocal = environment.Environment(_MOD)
@@ -28,8 +29,9 @@ def compressXML(filename, deleteOriginal=False):
     If deleteOriginal is set to True, the original musicXML file is deleted
     from the system.
     '''
-    if not filename.endswith('.xml'):
+    if not filename.endswith('.xml') and not filename.endswith('.musicxml'):
         return  # not a musicXML file
+    filename = common.pathTools.cleanpath(filename)
     environLocal.warn("Updating file: {0}".format(filename))
     filenameList = filename.split(os.path.sep)
     # find the archive name (name w/out filepath)
@@ -70,8 +72,9 @@ def uncompressMXL(filename, deleteOriginal=False):
     If deleteOriginal is set to True, the original compressed musicXML file is
     deleted from the system.
     '''
-    if not filename.endswith(".mxl"):
+    if not filename.endswith(".mxl") and not filename.endswith('.musicxml'):
         return  # not a musicXML file
+    filename = common.pathTools.cleanpath(filename)
     environLocal.warn("Updating file: {0}".format(filename))
     filenames = filename.split(os.path.sep)
     # find the archive name (name w/out filepath)

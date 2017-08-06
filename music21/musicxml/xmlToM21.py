@@ -1335,7 +1335,7 @@ class PartParser(XMLParserBase):
         if measureParser.fullMeasureRest is True:
             # recurse is necessary because it could be in voices...
             r1 = m.recurse().getElementsByClass('Rest')[0]
-            if (r1.fullMeasure # set by xml measure='yes'
+            if (r1.fullMeasure is True # set by xml measure='yes'
                 or (r1.duration.quarterLength != self.lastTimeSignature.barDuration.quarterLength
                     and r1.duration.type in ('whole', 'breve')
                     and r1.duration.dots == 0
@@ -5841,9 +5841,22 @@ class Test(unittest.TestCase):
         self.assertEqual(measureRest.duration.type, 'half')
         self.assertEqual(measureRest.duration.quarterLength, 3.0)
 
+    def testPickupMeasureRestSchoenberg(self):
+        '''
+        Staff 2 of piano part 0 of schoenberg opus19.6 has a quarter rest not
+        marked as a full measure rest (GOOD) as the last beat of a pickup measure.
+        
+        It should NOT become a full measure rest
+        '''
+        from music21 import corpus
+        sch = corpus.parse('schoenberg/opus19/movement6', forceSource=True)
+        r = sch.parts[1].measure(1).notesAndRests[0]
+        self.assertEqual(r.duration.type, 'quarter')
+        self.assertTrue(r.fullMeasure is not True)
+
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='test34MeasureRestWithoutTag')
+    music21.mainTest(Test) #, runTest='testPickupMeasureRestSchoenberg')
 
 
 
