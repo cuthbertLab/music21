@@ -36,7 +36,7 @@ def cacheMetadata(corpusNames=None,
                   useMultiprocessing=True,
                   verbose=False):
     '''
-    Cache metadata from corpora in `corpusNames` as local cache files:
+    Cache metadata from corpora in `corpusNames` as local cache files.
 
     Call as ``metadata.cacheMetadata()``
     '''

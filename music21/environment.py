@@ -1243,7 +1243,7 @@ class UserSettings(object):
         >>> us['musicxmlPath'] = 'asdfwerasdffasdfwer'
         Traceback (most recent call last):
         music21.environment.UserSettingsException: attempting to set a value
-            to a path that does not exist: asdfwerasdffasdfwer
+            to a path that does not exist: ...asdfwerasdffasdfwer
 
         >>> us['localCorpusPath'] = '/path/to/local'
         Traceback (most recent call last):

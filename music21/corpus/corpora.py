@@ -941,7 +941,7 @@ class LocalCorpus(Corpus):
         Get the path to the file path that stores the .json file.
         '''
         localCorpusSettings = self._getSettings()
-        if localCorpusSettings.cacheFilePath is not None:
+        if localCorpusSettings is not None and localCorpusSettings.cacheFilePath is not None:
             return localCorpusSettings.cacheFilePath
         
         filePath = os.path.join(
