@@ -185,7 +185,7 @@ class ex11_1_I(wwnortonExercise):
     Assignment 11.1 I. Chorale melody settings (A, B, C, and D)
     '''
     def __init__(self):
-        wwnortonExercise.__init__(self)
+        super().__init__()
         self.xmlFilename = '11_1_I_A.xml'
         self.pn['part1'] = 0
         self.pn['part2'] = 1
@@ -249,7 +249,7 @@ class ex11_3_A(wwnortonExercise):
     Assignment 11.3 A. Writing a note-to-note counterpoint in eighteenth-century style
     '''
     def __init__(self):
-        wwnortonExercise.__init__(self)
+        super().__init__()
         self.xmlFilename = '11_3_A_1.xml'
         self.pn['part1'] = 0
         self.pn['part2'] = 1

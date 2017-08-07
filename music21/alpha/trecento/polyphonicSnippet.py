@@ -71,7 +71,7 @@ class PolyphonicSnippet(stream.Score):
     snippetName = ""
 
     def __init__(self, fiveExcelCells=None, parentPiece=None):
-        stream.Score.__init__(self)
+        super().__init__()
         if fiveExcelCells is None:
             fiveExcelCells = []
         if fiveExcelCells != []:

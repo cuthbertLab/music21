@@ -714,7 +714,7 @@ class SFApp():
 
 class RecordThread(threading.Thread):
     def __init__(self, inQueue, outQueue, recordingObject):
-        threading.Thread.__init__(self)
+        super().__init__()
         self.inQueue = inQueue
         self.outQueue = outQueue
         self.l = []

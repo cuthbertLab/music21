@@ -427,7 +427,7 @@ class Punctus(base.Music21Object):
     '''
     def __init__(self):
         self._fontString = '0x70'
-        base.Music21Object.__init__(self)
+        super().__init__()
 
     @property
     def fontString(self):

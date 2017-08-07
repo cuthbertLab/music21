@@ -465,7 +465,7 @@ class Agenda(dict):
         self['dataDict'] = dict()
         self['commandList'] = list()
         self['returnDict'] = dict()
-        dict.__init__(self)
+        super().__init__()
 
     def __setitem__(self, key, value):
         '''

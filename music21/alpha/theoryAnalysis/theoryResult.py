@@ -43,7 +43,7 @@ class VLQTheoryResult(TheoryResult):
                     object associated with this theory result object''',
         }
     def __init__(self, vlq):
-        TheoryResult.__init__(self)
+        super().__init__()
         self.vlq = vlq
 
     def color(self, color='red', noteList=(1, 2, 3, 4)):
@@ -130,7 +130,7 @@ class IntervalTheoryResult(TheoryResult):
                             object associated with this theory result object'''}
 
     def __init__(self, intv):
-        TheoryResult.__init__(self)
+        super().__init__()
         self.intv = intv
 
     def color(self, color='red', noteList=(1, 2)):
@@ -186,7 +186,7 @@ class NoteTheoryResult(TheoryResult):
                             object associated with this theory result object'''}
 
     def __init__(self, n):
-        TheoryResult.__init__(self)
+        super().__init__()
         self.n = n
 
     def color(self, color='red'):
@@ -202,7 +202,7 @@ class VerticalityTheoryResult(TheoryResult):
                           object associated with this theory result object'''}
 
     def __init__(self, vs):
-        TheoryResult.__init__(self)
+        super().__init__()
         self.vs = vs
 
     def color(self, color ='red', partList=None):
@@ -223,7 +223,7 @@ class ThreeNoteLinearSegmentTheoryResult(TheoryResult):
                             object associated with this theory result object'''}
 
     def __init__(self, tnls):
-        TheoryResult.__init__(self)
+        super().__init__()
         self.tnls = tnls
 
     def color(self, color ='red', noteList=(2,)):
@@ -245,7 +245,7 @@ class VerticalityNTupletTheoryResult(TheoryResult):
                             the part of importance that can be used later to color the results''' }
 
     def __init__(self, vsnt, partNumIdentified=None):
-        TheoryResult.__init__(self)
+        super().__init__()
         self.vsnt = vsnt #vertical slice ntuplet
         self.partNumIdentified = partNumIdentified
 
