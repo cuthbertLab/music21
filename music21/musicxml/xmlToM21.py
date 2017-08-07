@@ -2344,7 +2344,7 @@ class MeasureParser(XMLParserBase):
             n.noteheadFill = xmlObjects.yesNoToBoolean(nhf)
 
         if mxNotehead.get('color') is not None:
-            n.color = mxNotehead.get('color')
+            n.style.color = mxNotehead.get('color')
         # TODO font
 
         nhp = mxNotehead.get('parentheses')
