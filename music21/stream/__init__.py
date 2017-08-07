@@ -4238,7 +4238,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 partLike.toWrittenPitch(inPlace=True)
             returnObj.atSoundingPitch = False
             if inPlace:
-                return None:
+                return None
             else:
                 return returnObj
 
