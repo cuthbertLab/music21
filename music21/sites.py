@@ -1009,6 +1009,8 @@ class Test(unittest.TestCase):
         c.sites.add(n)
 
         self.assertEqual(n2.sites.getAttrByName('number'), 34)
+        c.sites.setAttrByName('lyric', str(n2.sites.getAttrByName('number')))
+        self.assertEqual(n.lyric, '34')
         c.sites.setAttrByName('lyric', n2.sites.getAttrByName('number'))
         # converted to a string now
         self.assertEqual(n.lyric, '34')

@@ -399,6 +399,10 @@ class GeneralNote(base.Music21Object):
         self.lyrics = []
         if value in (None, False):
             return
+        
+        if not isinstance(value, str):
+            value = str(value)
+        
         values = value.split('\n')
         for i, v in enumerate(values):    
             self.lyrics.append(Lyric(v, number=i + 1))

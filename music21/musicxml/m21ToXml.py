@@ -2892,7 +2892,7 @@ class MeasureExporter(XMLExporterBase):
                 environLocal.warn("Duration set as Grace while not being a GraceDuration %s" % d)
 
         # TODO: cue...
-        if chordOrN.style.color is not None:
+        if chordOrN.hasStyleInformation and chordOrN.style.color is not None:
             mxNote.set('color', normalizeColor(chordOrN.style.color))
 
         if n.hideObjectOnPrint is True:
@@ -3367,7 +3367,7 @@ class MeasureExporter(XMLExporterBase):
         <notehead parentheses="no">diamond</notehead>
 
         >>> n1 = note.Note('c3')
-        >>> n1.color = 'red'
+        >>> n1.style.color = 'red'
         >>> n1.notehead = 'diamond'
         >>> n1.noteheadParenthesis = True
         >>> n1.noteheadFill = False
@@ -3376,7 +3376,7 @@ class MeasureExporter(XMLExporterBase):
         <notehead color="#FF0000" filled="no" parentheses="yes">diamond</notehead>
 
         >>> n1 = note.Note('c3')
-        >>> n1.color = 'red'
+        >>> n1.style.color = 'red'
         >>> n1.notehead = 'diamond'
         >>> n1.noteheadParenthesis = True
         >>> n1.noteheadFill = False

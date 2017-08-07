@@ -1698,7 +1698,7 @@ def partitionByInstrument(streamObj):
 
     # first, lets extend the duration of each instrument to match stream
     for sub in s.getElementsByClass('Stream'):
-        sub.extendDuration('Instrument')
+        sub.extendDuration('Instrument', inPlace=True)
 
     # first, find all unique instruments
     instrumentIterator = s.recurse().getElementsByClass('Instrument')

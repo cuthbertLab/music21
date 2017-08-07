@@ -2781,8 +2781,8 @@ class TestAddSlurs(unittest.TestCase):
         actual = base.addSlurs(elem, obj, slurBundle)
 
         self.assertEqual(expected, actual)
-        self.assertSequenceEqual([theSlur], slurBundle.list)
-        self.assertSequenceEqual([obj], slurBundle.list[0].getSpannedElements())
+        self.assertSequenceEqual([theSlur], list(slurBundle))
+        self.assertSequenceEqual([obj], list(slurBundle)[0].getSpannedElements())
 
     def testUnit2(self):
         '''
@@ -2850,10 +2850,10 @@ class TestAddSlurs(unittest.TestCase):
         actual = base.addSlurs(elem, obj, slurBundle)
 
         self.assertEqual(expected, actual)
-        self.assertSequenceEqual([theSlur, mock.ANY], slurBundle.list)
-        self.assertIsInstance(slurBundle.list[1], spanner.Slur)
-        self.assertSequenceEqual([obj], slurBundle.list[0].getSpannedElements())
-        self.assertSequenceEqual([obj], slurBundle.list[1].getSpannedElements())
+        self.assertSequenceEqual([theSlur, mock.ANY], list(slurBundle))
+        self.assertIsInstance(list(slurBundle)[1], spanner.Slur)
+        self.assertSequenceEqual([obj], list(slurBundle)[0].getSpannedElements())
+        self.assertSequenceEqual([obj], list(slurBundle)[1].getSpannedElements())
 
     def testUnit4(self):
         '''
@@ -2919,7 +2919,7 @@ class TestAddSlurs(unittest.TestCase):
         actual = base.addSlurs(elem, obj, slurBundle)
 
         self.assertEqual(expected, actual)
-        self.assertSequenceEqual([], slurBundle.list)
+        self.assertSequenceEqual([], list(slurBundle))
 
 
 
