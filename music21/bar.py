@@ -237,7 +237,7 @@ class Repeat(RepeatMark, Barline):
             style = 'heavy-light'
         else:
             style = 'final'
-        Barline.__init__(self, style=style)
+        super().__init__(style=style)
 
         self._direction = None # either start or end
         self._times = None  # if an end, how many repeats

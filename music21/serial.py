@@ -77,7 +77,7 @@ class TwelveToneMatrix(stream.Stream):
     '''
 
     def __init__(self, *arguments, **keywords):
-        stream.Stream.__init__(self, *arguments, **keywords)
+        super().__init__(*arguments, **keywords)
 
     def __str__(self):
         '''
@@ -267,7 +267,7 @@ class ToneRow(stream.Stream):
                   'findZeroCenteredTransformations', 'findOriginalCenteredTransformations']
 
     def __init__(self, row=None, *arguments, **keywords):
-        stream.Stream.__init__(self, *arguments, **keywords)
+        super().__init__(*arguments, **keywords)
         if row is not None:
             self.row = row
         else:
@@ -642,7 +642,7 @@ class TwelveToneRow(ToneRow):
                   'getLinkClassification', 'isLinkChord', 'areCombinatorial']
 
     def __init__(self, *arguments, **keywords):
-        ToneRow.__init__(self, *arguments, **keywords)
+        super().__init__(*arguments, **keywords)
         #environLocal.printDebug(['TwelveToneRow.__init__: length of elements', len(self)])
 
         #if self.row != None:
@@ -1066,7 +1066,7 @@ class HistoricalTwelveToneRow(TwelveToneRow):
     title = None
 
     def __init__(self, composer=None, opus=None, title=None, row=None):
-        TwelveToneRow.__init__(self, row)
+        super().__init__(row)
         self.composer = composer
         self.opus = opus
         self.title = title

@@ -1447,7 +1447,7 @@ class VerticalityNTuplet(base.Music21Object):
 class VerticalityTriplet(VerticalityNTuplet):
     '''a collection of three vertical slices'''
     def __init__(self, listofVerticalities):
-        VerticalityNTuplet.__init__(self, listofVerticalities)
+        super().__init__(listofVerticalities)
 
         self.tnlsDict = {} #defaultdict(int) #Three Note Linear Segments
         self._calcTNLS()
@@ -1663,9 +1663,9 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     
     def __init__(self, noteListOrN1=None, n2=None, n3=None):
         if common.isIterable(noteListOrN1):
-            NNoteLinearSegment.__init__(self, noteListOrN1)
+            super().__init__(noteListOrN1)
         else:
-            NNoteLinearSegment.__init__(self, [noteListOrN1, n2, n3])
+            super().__init__([noteListOrN1, n2, n3])
 
     def _getN1(self):
         return self.noteList[0]
@@ -1962,7 +1962,7 @@ class NObjectLinearSegment(base.Music21Object):
 
 class NChordLinearSegment(NObjectLinearSegment):
     def __init__(self, chordList):
-        NObjectLinearSegment.__init__(self, chordList)
+        super().__init__(chordList)
         self._chordList = []
         for value in chordList:
             if value is None:
@@ -2001,9 +2001,9 @@ class NChordLinearSegment(NObjectLinearSegment):
 class TwoChordLinearSegment(NChordLinearSegment):
     def __init__(self, chordList, chord2=None):
         if isinstance(chordList, (list, tuple)):
-            NChordLinearSegment.__init__(self, chordList)
+            super().__init__(chordList)
         else:
-            NChordLinearSegment.__init__(self, [chordList,chord2])
+            super().__init__([chordList,chord2])
 
     def rootInterval(self):
         '''

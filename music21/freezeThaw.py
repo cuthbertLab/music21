@@ -1212,7 +1212,7 @@ class JSONFreezer(JSONFreezeThawBase):
     'music21.note.Note'
     '''
     def __init__(self, storedObject=None):
-        JSONFreezeThawBase.__init__(self, storedObject)
+        super().__init__(storedObject)
     #---------------------------------------------------------------------------
     # override these methods for json functionality
 
@@ -1616,7 +1616,7 @@ class JSONThawer(JSONFreezeThawBase):
     Class that takes JSON input and makes a Music21Object.
     '''
     def __init__(self, storedObject=None):
-        JSONFreezeThawBase.__init__(self, storedObject)
+        super().__init__(storedObject)
 
     def _isComponent(self, target):
         '''

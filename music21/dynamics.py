@@ -349,7 +349,7 @@ class DynamicWedge(spanner.Spanner):
     '''Common base-class for Crescendo and Diminuendo.
     '''
     def __init__(self, *arguments, **keywords):
-        spanner.Spanner.__init__(self, *arguments, **keywords)
+        super().__init__(*arguments, **keywords)
 
         self.type = None # crescendo or diminuendo
         self.placement = 'below' # can above or below, after musicxml
@@ -375,7 +375,7 @@ class Crescendo(DynamicWedge):
     'crescendo'
     '''
     def __init__(self, *arguments, **keywords):
-        DynamicWedge.__init__(self, *arguments, **keywords)
+        super().__init__(*arguments, **keywords)
         self.type = 'crescendo'
 
     def __repr__(self):
@@ -394,7 +394,7 @@ class Diminuendo(DynamicWedge):
     20
     '''
     def __init__(self, *arguments, **keywords):
-        DynamicWedge.__init__(self, *arguments, **keywords)
+        super().__init__(*arguments, **keywords)
         self.type = 'diminuendo'
 
     def __repr__(self):

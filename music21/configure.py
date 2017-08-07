@@ -280,7 +280,7 @@ class KeyInterruptError(DialogError):
     Subclass of DialogError that deals with Keyboard Interruptions.
     '''
     def __init__(self, src=None):
-        DialogError.__init__(self, src=src)
+        super().__init__(src=src)
 
 class IncompleteInput(DialogError):
     '''
@@ -288,14 +288,14 @@ class IncompleteInput(DialogError):
     incomplete input that cannot be understood.
     '''
     def __init__(self, src=None):
-        DialogError.__init__(self, src=src)
+        super().__init__(src=src)
 
 class NoInput(DialogError):
     '''
     Subclass of DialogError for when the user has provided no input, and there is not a default.
     '''
     def __init__(self, src=None):
-        DialogError.__init__(self, src=src)
+        super().__init__(src=src)
 
 class BadConditions(DialogError):
     '''
@@ -304,7 +304,7 @@ class BadConditions(DialogError):
     otherwise prohibits operation.
     '''
     def __init__(self, src=None):
-        DialogError.__init__(self, src=src)
+        super().__init__(src=src)
 
 
 #-------------------------------------------------------------------------------
@@ -630,7 +630,7 @@ class AnyKey(Dialog):
     Press any key to continue
     '''
     def __init__(self, default=None, tryAgain=False, promptHeader=None):
-        Dialog.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader)
+        super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
     def _rawQuery(self):
         '''
@@ -669,7 +669,7 @@ class YesOrNo(Dialog):
      <music21.configure.IncompleteInput: junk>
     '''
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
-        Dialog.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader)
+        super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
 
     def _formatResultForUser(self, result):
@@ -789,7 +789,7 @@ class AskOpenInBrowser(YesOrNo):
     '''
     def __init__(self, urlTarget, default=True, tryAgain=True,
         promptHeader=None, prompt=None):
-        YesOrNo.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader)
+        super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
         self._urlTarget = urlTarget
         # try to directly set prompt header
@@ -831,7 +831,7 @@ class AskInstall(YesOrNo):
     '''
     def __init__(self, default=True, tryAgain=True,
         promptHeader=None):
-        YesOrNo.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader)
+        super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
         # define platforms that this will run on
         self._platforms = ['darwin', 'nix']
@@ -891,7 +891,7 @@ class AskSendInstallationReport(YesOrNo):
     '''
     def __init__(self, default=True, tryAgain=True,
         promptHeader=None, additionalEntries=None):
-        YesOrNo.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader)
+        super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
         if additionalEntries is None:
             additionalEntries = {}
@@ -972,7 +972,7 @@ class SelectFromList(Dialog):
     2
     '''
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
-        Dialog.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader)
+        super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
     def _getValidResults(self, force=None):
         '''
@@ -1117,7 +1117,7 @@ class AskAutoDownload(SelectFromList):
     General class to select values from a list.
     '''
     def __init__(self, default=1, tryAgain=True, promptHeader=None):
-        SelectFromList.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader)
+        super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
     def _rawIntroduction(self):
         '''Return a multiline presentation of an introduction.
@@ -1211,7 +1211,7 @@ class SelectFilePath(SelectFromList):
     General class to select values from a list.
     '''
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
-        SelectFromList.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader)
+        super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
 
     def _getAppOSIndependent(self, comparisonFunction, path0, post):

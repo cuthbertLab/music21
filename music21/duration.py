@@ -2889,7 +2889,7 @@ class GraceDuration(Duration):
     ### INITIALIZER ###
 
     def __init__(self, *arguments, **keywords):
-        Duration.__init__(self, *arguments, **keywords)
+        super().__init__(*arguments, **keywords)
         # update components to derive types; this sets ql, but this
         # will later be removed
         if self._componentsNeedUpdating:
@@ -2955,7 +2955,7 @@ class AppogiaturaDuration(GraceDuration):
     ### INITIALIZER ###
 
     def __init__(self, *arguments, **keywords):
-        GraceDuration.__init__(self, *arguments, **keywords)
+        super().__init__(*arguments, **keywords)
         self.slash = False # can be True, False, or None; make None go to True?
         self.makeTime = True
 
