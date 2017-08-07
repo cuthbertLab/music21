@@ -190,7 +190,7 @@ class Test(unittest.TestCase):
         self.assertEqual(richMetadata.noteCount, 165)
         self.assertEqual(richMetadata.quarterLength, 36.0)
         self.assertMultiLineEqual(
-            freezeThaw.JSONFreezer(richMetadata).prettyJson,
+            freezeThaw.JSONFreezer(richMetadata).prettyJson.strip(),
             textwrap.dedent('''
                 {
                     "__attr__": {
@@ -229,13 +229,12 @@ class Test(unittest.TestCase):
                     },
                     "__class__": "music21.metadata.RichMetadata",
                     "__version__": [
-                        ''' + str(VERSION[0]) + ''',
-                        ''' + str(VERSION[1]) + ''',
-                        ''' + str(VERSION[2]) + '''
+                        %d,
+                        %d,
+                        %d
                     ]
-                }
-                ''',
-                ))
+                }''' % (VERSION[0], VERSION[1], VERSION[2]),
+                ).strip())
 
 #------------------------------------------------------------------------------
 

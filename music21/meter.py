@@ -4933,7 +4933,7 @@ class Test(unittest.TestCase):
         ts = meter.TimeSignature('3/4')
         freezer = freezeThaw.JSONFreezer(ts)
         self.assertMultiLineEqual(
-            freezeThaw.JSONFreezer(ts).prettyJson,
+            freezeThaw.JSONFreezer(ts).prettyJson.strip(),
             textwrap.dedent('''
                 {
                     "__attr__": {
@@ -4941,13 +4941,13 @@ class Test(unittest.TestCase):
                     },
                     "__class__": "music21.meter.TimeSignature",
                     "__version__": [
-                        ''' + str(base.VERSION[0]) + ''',
-                        ''' + str(base.VERSION[1]) + ''',
-                        ''' + str(base.VERSION[2]) + '''
+                        %d,
+                        %d,
+                        %d
                     ]
                 }
-                ''',
-                ))
+                ''' % (base.VERSION[0], base.VERSION[1], base.VERSION[2]),
+                ).strip())
 
         tsNew = meter.TimeSignature()
         freezeThaw.JSONThawer(tsNew).json = freezer.json
