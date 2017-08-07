@@ -218,7 +218,7 @@ class Chord(note.NotRest):
         # here, pitch and duration data is extracted from notes
         # if provided
 
-        note.NotRest.__init__(self, **keywords)
+        super().__init__(**keywords)
 
 
         # inherit Duration object from GeneralNote

@@ -983,7 +983,7 @@ class DeltaTime(MidiEvent):
 
     '''
     def __init__(self, track, time=None, channel=None):
-        MidiEvent.__init__(self, track, time=time, channel=channel)
+        super().__init__(track, time=time, channel=channel)
         self.type = "DeltaTime"
 
     def read(self, oldstr):

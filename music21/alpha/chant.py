@@ -145,7 +145,7 @@ class GregorianNote(note.Note):
     choralSign = False
 
     def __init__(self, *arguments, **keywords):
-        note.Note.__init__(self, *arguments, **keywords)
+        super().__init__(*arguments, **keywords)
 
     def toGABC(self, useClef=None, nextNote=None):
         letter = self.toBasicGABC(useClef)

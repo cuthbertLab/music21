@@ -540,7 +540,7 @@ class ConverterHumdrum(SubConverter):
     registerInputExtensions = ('krn',)
 
     def __init__(self, **keywords):
-        SubConverter.__init__(self, **keywords)
+        super().__init__(**keywords)
         self.data = None
 
 
@@ -605,7 +605,7 @@ class ConverterTinyNotation(SubConverter):
     registerInputExtensions = ('tntxt', 'tinynotation')
 
     def __init__(self, **keywords):
-        SubConverter.__init__(self, **keywords)
+        super().__init__(**keywords)
         self.data = None
 
     #---------------------------------------------------------------------------
@@ -1138,7 +1138,7 @@ class ConverterMEI(SubConverter):
     #registerOutputExtensions = ('mei',)
 
     def __init__(self, **keywords):
-        SubConverter.__init__(self, **keywords)
+        super().__init__(**keywords)
 
     def parseData(self, dataString, number=None):
         '''

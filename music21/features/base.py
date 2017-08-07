@@ -683,7 +683,7 @@ class OutputTabOrange(OutputFormat):
     http://docs.orange.biolab.si/3/data-mining-library/tutorial/data.html#saving-the-data
     '''
     def __init__(self, dataSet=None):
-        OutputFormat.__init__(self, dataSet=dataSet)
+        super().__init__(dataSet=dataSet)
         self._ext = '.tab'
 
     def getHeaderLines(self, includeClassLabel=True, includeId=True):
@@ -760,7 +760,7 @@ class OutputCSV(OutputFormat):
     Comma-separated value list.
     '''
     def __init__(self, dataSet=None):
-        OutputFormat.__init__(self, dataSet=dataSet)
+        super().__init__(dataSet=dataSet)
         self._ext = '.csv'
 
     def getHeaderLines(self, includeClassLabel=True, includeId=True):
@@ -807,7 +807,7 @@ class OutputARFF(OutputFormat):
     '.arff'
     '''
     def __init__(self, dataSet=None):
-        OutputFormat.__init__(self, dataSet=dataSet)
+        super().__init__(dataSet=dataSet)
         self._ext = '.arff'
 
     def getHeaderLines(self, includeClassLabel=True, includeId=True):

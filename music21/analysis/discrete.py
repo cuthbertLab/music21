@@ -222,7 +222,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                     )
 
     def __init__(self, referenceStream=None):
-        DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
+        super().__init__(referenceStream=referenceStream)
         # store sharp/flat count on init if available
         if referenceStream is not None:
             self.sharpFlatCount = self._getSharpFlatCount(referenceStream)
@@ -723,7 +723,7 @@ class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
                    ]
 
     def __init__(self, referenceStream=None):
-        KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
+        super().__init__(referenceStream=referenceStream)
 
     def getWeights(self, weightType='major'):
         '''
@@ -762,7 +762,7 @@ class KrumhanslKessler(KeyWeightKeyAnalysis):
                    ]
 
     def __init__(self, referenceStream=None):
-        KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
+        super().__init__(referenceStream=referenceStream)
 
     def getWeights(self, weightType='major'):
         '''
@@ -806,7 +806,7 @@ class AardenEssen(KeyWeightKeyAnalysis):
     identifiers.append('keyscape')
 
     def __init__(self, referenceStream=None):
-        KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
+        super().__init__(referenceStream=referenceStream)
 
     def getWeights(self, weightType='major'):
         '''
@@ -848,7 +848,7 @@ class SimpleWeights(KeyWeightKeyAnalysis):
                    ]
 
     def __init__(self, referenceStream=None):
-        KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
+        super().__init__(referenceStream=referenceStream)
 
     def getWeights(self, weightType='major'):
         '''
@@ -885,7 +885,7 @@ class BellmanBudge(KeyWeightKeyAnalysis):
                    ]
 
     def __init__(self, referenceStream=None):
-        KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
+        super().__init__(referenceStream=referenceStream)
 
     def getWeights(self, weightType='major'):
         '''
@@ -930,7 +930,7 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
                    ]
 
     def __init__(self, referenceStream=None):
-        KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
+        super().__init__(referenceStream=referenceStream)
 
     def getWeights(self, weightType='major'):
         ''' Returns the key weights.
@@ -973,7 +973,7 @@ class Ambitus(DiscreteAnalysis):
     identifiers = ['ambitus', 'range', 'span']
 
     def __init__(self, referenceStream=None):
-        DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
+        super().__init__(referenceStream=referenceStream)
         self._pitchSpanColors = OrderedDict()
         self._generateColors()
 
@@ -1262,7 +1262,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
     identifiers = ['interval.diversity', 'intervals']
 
     def __init__(self, referenceStream=None):
-        DiscreteAnalysis.__init__(self, referenceStream=referenceStream)
+        super().__init__(referenceStream=referenceStream)
 
 
     def solutionToColor(self, solution):

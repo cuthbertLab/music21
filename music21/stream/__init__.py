@@ -239,7 +239,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             else:
                 return '<%s.%s 0x%x>' % (self.__module__, self.__class__.__name__, self.id)
         else:
-            return base.Music21Object.__repr__(self)
+            return super().__repr__(self)
 
     def write(self, *args, **kwargs):
         #...    --- see base.py calls .write(
@@ -11436,7 +11436,7 @@ class Measure(Stream):
     }
 
     def __init__(self, *args, **keywords):
-        Stream.__init__(self, *args, **keywords)
+        super().__init__(*args, **keywords)
 
         # clef and timeSignature is defined as a property below
         self.timeSignatureIsNew = False
@@ -12021,7 +12021,7 @@ class Part(Stream):
     recursionType = 'flatten'
 
     def __init__(self, *args, **keywords):
-        Stream.__init__(self, *args, **keywords)
+        super().__init__(*args, **keywords)
         self.staffLines = 5
         self._partName = None
         self._partAbbreviation = None
@@ -12201,7 +12201,7 @@ class PartStaff(Part):
     of many staves for a single part.
     '''
     def __init__(self, *args, **keywords):
-        Part.__init__(self, *args, **keywords)
+        super().__init__(*args, **keywords)
 
 
 #
@@ -12253,7 +12253,7 @@ class Score(Stream):
     recursionType = 'elementsOnly'
 
     def __init__(self, *args, **keywords):
-        Stream.__init__(self, *args, **keywords)
+        super().__init__(*args, **keywords)
         # while a metadata object is often expected, adding here prob not
         # a good idea.
         #self.insert(0, metadata.Metadata())
@@ -12899,7 +12899,7 @@ class Opus(Stream):
     #TODO: get by title, possibly w/ regex
 
     def __init__(self, *args, **keywords):
-        Stream.__init__(self, *args, **keywords)
+        super().__init__(*args, **keywords)
 
     def getNumbers(self):
         '''
