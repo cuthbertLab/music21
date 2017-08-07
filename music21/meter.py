@@ -4929,13 +4929,12 @@ class Test(unittest.TestCase):
     def testJSONStorage(self):
         from music21 import meter
         from music21 import freezeThaw
-        from music21 import test
-
+        import textwrap
         ts = meter.TimeSignature('3/4')
         freezer = freezeThaw.JSONFreezer(ts)
         self.assertMultiLineEqual(
             freezeThaw.JSONFreezer(ts).prettyJson,
-            test.dedent('''
+            textwrap.dedent('''
                 {
                     "__attr__": {
                         "ratioString": "3/4"

@@ -181,7 +181,8 @@ class Test(unittest.TestCase):
         from music21 import VERSION
         from music21 import corpus
         from music21 import metadata
-        from music21 import test
+        import textwrap
+        
         score = corpus.parse('bwv66.6')
         richMetadata = metadata.RichMetadata()
         richMetadata.merge(score.metadata)
@@ -190,7 +191,7 @@ class Test(unittest.TestCase):
         self.assertEqual(richMetadata.quarterLength, 36.0)
         self.assertMultiLineEqual(
             freezeThaw.JSONFreezer(richMetadata).prettyJson,
-            test.dedent('''
+            textwrap.dedent('''
                 {
                     "__attr__": {
                         "_urls": [],

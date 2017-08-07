@@ -155,7 +155,6 @@ class ModuleGather:
             'testSerialization.py',
             'mptCurses.py',
             'memoryUsage.py',
-            'dedent.py',
 
             'testPerformance.py',
             'multiprocessTest.py',
