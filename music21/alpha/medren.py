@@ -324,7 +324,8 @@ class GeneralMensuralNote(base.Music21Object):
                         'semibrevis'
                         >>> gmn_2 = medren.GeneralMensuralNote('blah')
                         Traceback (most recent call last):
-                        MedRenException: blah is not a valid mensural type or abbreviation
+                        music21.alpha.medren.MedRenException: blah is not a valid 
+                            mensural type or abbreviation
                         ''')
 
     def updateDurationFromMensuration(self, mensuration=None, surroundingStream=None):
@@ -862,7 +863,8 @@ class MensuralNote(GeneralMensuralNote, note.Note):
         >>> r_1 = medren.MensuralNote('A', 'brevis')
         >>> r_1.setStem('down')
         Traceback (most recent call last):
-        MedRenException: A note of type brevis cannot be equipped with a stem
+        music21.alpha.medren.MedRenException: A note of type brevis cannot be equipped with a stem
+
         >>> r_2 = medren.MensuralNote('A', 'semibrevis')
         >>> r_2.setStem('down')
         >>> r_2.setStem('side')
@@ -872,9 +874,11 @@ class MensuralNote(GeneralMensuralNote, note.Note):
         >>> r_3.setStem('side')
         >>> r_3.getStems()
         ['up', 'side']
+
         >>> r_3.setStem('down')
         Traceback (most recent call last):
-        MedRenException: This note already has the maximum number of stems
+        music21.alpha.medren.MedRenException: This note already has the maximum number of stems
+
         >>> r_3.setStem(None)
         >>> r_3.getStems()
         ['up']
@@ -943,7 +947,9 @@ class MensuralNote(GeneralMensuralNote, note.Note):
         >>> r_1 = medren.MensuralNote('A', 'minima')
         >>> r_1.setFlag('up', 'right')
         Traceback (most recent call last):
-        MedRenException: a flag may not be added to an upstem of note type minima
+        music21.alpha.medren.MedRenException: a flag may not be added 
+            to an upstem of note type minima
+
         >>> r_1.setStem('down')
         >>> r_1.setFlag('down', 'left')
         >>> r_1.getFlags()['down']
@@ -960,7 +966,7 @@ class MensuralNote(GeneralMensuralNote, note.Note):
         >>> r_3.setStem('side')
         >>> r_3.setFlag('side', 'left')
         Traceback (most recent call last):
-        MedRenException: a flag cannot be added to a stem with direction side
+        music21.alpha.medren.MedRenException: a flag cannot be added to a stem with direction side
         '''
 
         if stemDirection == 'up':
@@ -1325,13 +1331,15 @@ class Ligature(base.Music21Object):
         'oblique'
         >>> l.makeOblique(0)
         Traceback (most recent call last):
-        MedRenException: cannot start oblique notehead at index 0
+        music21.alpha.medren.MedRenException: cannot start oblique notehead at index 0
+        
         >>> l.makeOblique(2)
         Traceback (most recent call last):
-        MedRenException: cannot start oblique notehead at index 2
+        music21.alpha.medren.MedRenException: cannot start oblique notehead at index 2
+        
         >>> l.makeOblique(3)
         Traceback (most recent call last):
-        MedRenException: no note exists at index 4
+        music21.alpha.medren.MedRenException: no note exists at index 4
         '''
         if startIndex < self._ligatureLength() - 1:
             currentShape = self.noteheadShape[startIndex]
@@ -1408,12 +1416,15 @@ class Ligature(base.Music21Object):
         >>> l.setMaxima(2, True)
         >>> l.isMaxima(2)
         True
+        
         >>> l.setMaxima(1, True)
         Traceback (most recent call last):
-        MedRenException: cannot make note at index 1 a maxima
+        music21.alpha.medren.MedRenException: cannot make note at index 1 a maxima
+
         >>> l.setMaxima(0, True)
         Traceback (most recent call last):
-        MedRenException: cannot make note at index 0 a maxima
+        music21.alpha.medren.MedRenException: cannot make note at index 0 a maxima
+
         >>> l.setMaxima(2, False)
         >>> l.isMaxima(2)
         False
@@ -1472,20 +1483,25 @@ class Ligature(base.Music21Object):
         >>> l = medren.Ligature(['A4', 'C5', 'B4', 'A4', 'B4'])
         >>> l.setStem(0, 'none', 'left')
         Traceback (most recent call last):
-        MedRenException: direction "None" and orientation "left" not supported for ligatures
+        music21.alpha.medren.MedRenException: direction "None" and orientation "left" 
+            not supported for ligatures
+        
         >>> l.setStem(1, 'up', 'left')
         >>> l.getStem(1)
         ('up', 'left')
+        
         >>> l.setStem(2, 'down', 'right')
         Traceback (most recent call last):
-        MedRenException: a stem with direction "down" not permitted at index 2
+        music21.alpha.medren.MedRenException: a stem with direction "down" not permitted at index 2
+        
         >>> l.setMaxima(4, True)
         >>> l.setStem(4, 'up', 'left')
         Traceback (most recent call last):
-        MedRenException: cannot place stem at index 4
+        music21.alpha.medren.MedRenException: cannot place stem at index 4
+        
         >>> l.setStem(3, 'up', 'left')
         Traceback (most recent call last):
-        MedRenException: a stem with direction "up" not permitted at index 3
+        music21.alpha.medren.MedRenException: a stem with direction "up" not permitted at index 3
         '''
         if direction == 'None' or direction == 'none':
             direction = None
@@ -1578,12 +1594,16 @@ class Ligature(base.Music21Object):
         >>> l.setReverse(1, True)
         >>> l.isReversed(1)
         True
+        
         >>> l.setReverse(2, True)
         Traceback (most recent call last):
-        MedRenException: the note at index 2 cannot be given reverse value True
+        music21.alpha.medren.MedRenException: the note at index 2 
+            cannot be given reverse value True
+        
         >>> l.setReverse(3, True)
         Traceback (most recent call last):
-        MedRenException: the note at index 3 cannot be given reverse value True
+        music21.alpha.medren.MedRenException: the note at index 3 
+            cannot be given reverse value True
         '''
         if value == 'True' or value == 'true':
             value = True
@@ -1729,14 +1749,15 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD=None, printUpdates=F
     >>> s.append(medren.GeneralMensuralNote('B'))
     >>> medren.breakMensuralStreamIntoBrevisLengths(s)
     Traceback (most recent call last):
-    MedRenException: cannot combine objects of type <class 'music21.stream.Part'>,
+    music21.alpha.medren.MedRenException: cannot combine objects 
+       of type <class 'music21.stream.Part'>,
        <class 'music21.alpha.medren.GeneralMensuralNote'> within stream
 
     >>> s = stream.Score()
     >>> p.append(s)
     >>> medren.breakMensuralStreamIntoBrevisLengths(p)
     Traceback (most recent call last):
-    MedRenException: Hierarchy of <class 'music21.stream.Part'>
+    music21.alpha.medren.MedRenException: Hierarchy of <class 'music21.stream.Part'>
        violated by <class 'music21.stream.Score'>
 
     >>> from music21.alpha import trecento
@@ -1753,7 +1774,7 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD=None, printUpdates=F
     >>> s.append(m)
     >>> medren.breakMensuralStreamIntoBrevisLengths(s, printUpdates = True)
     Traceback (most recent call last):
-    MedRenException: Mensuration or divisione
+    music21.alpha.medren.MedRenException: Mensuration or divisione
        <music21.alpha.trecento.notation.Divisione .q.> not consistent within hierarchy
 
     >>> s = stream.Stream()

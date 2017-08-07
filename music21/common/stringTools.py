@@ -349,9 +349,6 @@ def removePunctuation(s):
 
     >>> common.removePunctuation("This, is! my (face).")
     'This is my face'
-
-    >>> common.removePunctuation(u"This, is! my (face).")
-    u'This is my face'
     '''
     maketrans = str.maketrans("", "", string.punctuation)
     out = s.translate(maketrans)

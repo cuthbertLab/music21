@@ -93,52 +93,20 @@ _MOD = 'music21.base.py'
 environLocal = environment.Environment(_MOD)
 
 
-# check external dependencies and display
-_useImportLib = True
-
-try:
-    import importlib
-    fs = importlib.util.find_spec
-except (ImportError, AttributeError):
-    import imp
-    _useImportLib = False
+import importlib
 
 _missingImport = []
 for modName in ('matplotlib', 'numpy', 'scipy'):
-    if _useImportLib: # pragma: no cover
-        loader = importlib.util.find_spec(modName)
-        if loader is None:
-            _missingImport.append(modName)
-    else:
-        try:
-            imp.find_module(modName)
-        except ImportError: # pragma: no cover
-            _missingImport.append(modName)
+    loader = importlib.util.find_spec(modName)
+    if loader is None:
+        _missingImport.append(modName)
 
-# used for better PNG processing in lily -- not very important
-#try:
-#    from PIL import Image
-#except ImportError:
-#    try:
-#         import Image
-#    except ImportError:
-#        _missingImport.append('PIL')
-
-# as this is only needed for one module, and error messages print
-# to standard io, this has been removed
-# try:
-#     import pyaudio
-# except (ImportError, SystemExit):
-#     _missingImport.append('pyaudio')
-    #sys.stderr.write('pyaudio is installed but PortAudio is not -- ' +
-    #                 're-download pyaudio at http://people.csail.mit.edu/hubert/pyaudio/')
+del importlib
 
 if _missingImport: # pragma: no cover
     if environLocal['warnings'] in (1, '1', True):
         environLocal.warn(common.getMissingImportStr(_missingImport),
         header='music21:')
-del _useImportLib
-
 
 class Music21ObjectException(exceptions21.Music21Exception):
     pass
@@ -1822,13 +1790,13 @@ class Music21Object:
         >>> s.append(n)
 
 
-        for ts in n.getAllContextsByClass('TimeSignature'):
+        >>> for ts in n.getAllContextsByClass('TimeSignature'):
         ...     print(ts, ts.offset)
         <music21.meter.TimeSignature 3/4> 1.0
         <music21.meter.TimeSignature 2/4> 0.0
 
         TODO: make it so that it does not skip over multiple matching classes
-        at the same offset.
+        at the same offset. with sortTuple
 
         '''
         el = self.getContextByClass(className)
@@ -2053,7 +2021,7 @@ class Music21Object:
                 #environLocal.printDebug(['_getActiveSite() called:',
                 #                          'self._activeSite', self._activeSite])
                 return common.unwrapWeakref(self._activeSite)
-        else:
+        else: # pragma: no cover
             return self._activeSite
 
     def _setActiveSite(self, site):
@@ -2081,7 +2049,7 @@ class Music21Object:
                 self._activeSite = None
             else:
                 self._activeSite = common.wrapWeakref(site)
-        else:
+        else: # pragma: no cover
             self._activeSite = site
 
     activeSite = property(_getActiveSite, _setActiveSite,
@@ -2818,7 +2786,7 @@ class Music21Object:
         from music21 import tie
         quarterLength = opFrac(quarterLength)
 
-        if self.duration is None:
+        if self.duration is None: # pragma: no cover
             raise Exception('cannot split an element that has a Duration of None')
 
         if quarterLength > self.duration.quarterLength:
@@ -2971,7 +2939,7 @@ class Music21Object:
         >>> [n.quarterLength for n in post]
         [1.0, 1.0, 1.0]
         '''
-        if self.duration is None:
+        if self.duration is None: # pragma: no cover
             raise Music21ObjectException('cannot split an element that has a Duration of None')
 
         if opFrac(sum(quarterLengthList)) != self.duration.quarterLength:
@@ -3255,52 +3223,6 @@ class Music21Object:
         #     ['_getMeasureOffset(): found local offset as:', offsetLocal, self])
         return offsetLocal
 
-    def _getMeasureOffsetOrMeterModulusOffset(self, ts):
-        '''
-        Return the measure offset based on a Measure, if it exists,
-        otherwise based on meter modulus of the TimeSignature.
-        This assumes that a TimeSignature has already been found.
-
-        >>> m = stream.Measure()
-        >>> ts1 = meter.TimeSignature('3/4')
-        >>> m.insert(0, ts1)
-        >>> n1 = note.Note()
-        >>> m.insert(2, n1)
-        >>> n1._getMeasureOffsetOrMeterModulusOffset(ts1)
-        2.0
-        >>> n2 = note.Note()
-        >>> m.insert(4, n2) # exceeding the range of the Measure gets a modulus
-        >>> n1._getMeasureOffsetOrMeterModulusOffset(ts1)
-        2.0
-
-        Can be applied to Notes in a Stream with a TimeSignature.
-
-        >>> ts2 = meter.TimeSignature('5/4')
-        >>> s2 = stream.Stream()
-        >>> s2.insert(0, ts2)
-        >>> n3 = note.Note()
-        >>> s2.insert(3, n3)
-        >>> n3._getMeasureOffsetOrMeterModulusOffset(ts2)
-        3.0
-        >>> n4 = note.Note()
-        >>> s2.insert(5, n4)
-        >>> n4._getMeasureOffsetOrMeterModulusOffset(ts2)
-        0.0
-        '''
-        #environLocal.printDebug(['_getMeasureOffsetOrMeterModulusOffset',
-        # self, ts, 'ts._getMeasureOffset()', ts._getMeasureOffset(),
-        # 'self._getMeasureOffset()', self._getMeasureOffset()])
-        mOffset = self._getMeasureOffset()
-        tsMeasureOffset = ts._getMeasureOffset(includeMeasurePadding=False)
-        if (mOffset + tsMeasureOffset) < ts.barDuration.quarterLength:
-            return mOffset
-        else:
-            # must get offset relative to not just start of Stream, but the last
-            # time signature
-            post = ((mOffset - tsMeasureOffset) % ts.barDuration.quarterLength)
-            #environLocal.printDebug(['result', post])
-            return post
-
 
     def _getTimeSignatureForBeat(self):
         '''
@@ -3364,8 +3286,7 @@ class Music21Object:
         7/3
         '''
         ts = self._getTimeSignatureForBeat()
-        return ts.getBeatProportion(
-            self._getMeasureOffsetOrMeterModulusOffset(ts))
+        return ts.getBeatProportion(ts.getMeasureOffsetOrMeterModulusOffset(self))
 
     @property
     def beatStr(self):
@@ -3394,8 +3315,7 @@ class Music21Object:
         ['1', '2', '3', '1', '2', '3', '1', '2']
         '''
         ts = self._getTimeSignatureForBeat()
-        return ts.getBeatProportionStr(
-            self._getMeasureOffsetOrMeterModulusOffset(ts))
+        return ts.getBeatProportionStr(ts.getMeasureOffsetOrMeterModulusOffset(self))
 
     @property
     def beatDuration(self):
@@ -3426,7 +3346,7 @@ class Music21Object:
         [2.0, 2.0, 3.0, 3.0, 3.0, 2.0, 2.0, 3.0]
         '''
         ts = self._getTimeSignatureForBeat()
-        return ts.getBeatDuration(self._getMeasureOffsetOrMeterModulusOffset(ts))
+        return ts.getBeatDuration(ts.getMeasureOffsetOrMeterModulusOffset(self))
 
 
     @property
@@ -3493,9 +3413,11 @@ class Music21Object:
         0.5
         '''
         ts = self._getTimeSignatureForBeat()
-        return ts.getAccentWeight(
-            self._getMeasureOffsetOrMeterModulusOffset(ts),
-                forcePositionMatch=True, permitMeterModulus=False)
+        meterModulus = ts.getMeasureOffsetOrMeterModulusOffset(self)
+        
+        return ts.getAccentWeight(meterModulus,
+                                  forcePositionMatch=True, 
+                                  permitMeterModulus=False)
 
     def _setSeconds(self, value):
         ti = self.getContextByClass('TempoIndication')

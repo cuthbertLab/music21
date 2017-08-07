@@ -113,8 +113,8 @@ class ActivityMatch:
         >>> am = analysis.correlate.ActivityMatch(s.parts[0].flat)
         >>> am.pitchToDynamic()
         Traceback (most recent call last):
-        CorrelateException: cannot create correlation an object that is not found in the
-        Stream: <class 'music21.dynamics.Dynamic'>
+        music21.analysis.correlate.CorrelateException: cannot create correlation: 
+            an object that is not found in the Stream: <class 'music21.dynamics.Dynamic'>
 
         Many dynamics
 
@@ -133,7 +133,7 @@ class ActivityMatch:
         for objName in [objNameSrc, objNameDst]:
             dstCheck = self.streamObj.flat.getElementsByClass(objName)
             if not dstCheck:
-                raise CorrelateException('cannot create correlation an object ' +
+                raise CorrelateException('cannot create correlation: an object ' +
                                          'that is not found in the Stream: %s' % objName)
 
         self._findActive(objNameSrc, objNameDst)

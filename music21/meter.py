@@ -3369,7 +3369,7 @@ class TimeSignature(base.Music21Object):
         'Simple'
         >>> ts.beatCount = 123
         Traceback (most recent call last):
-        TimeSignatureException: cannot partion beat with provided value: 123
+        music21.meter.TimeSignatureException: cannot partion beat with provided value: 123
 
         >>> ts = meter.TimeSignature('3/4')
         >>> ts.beatCount = 6
@@ -3449,7 +3449,7 @@ class TimeSignature(base.Music21Object):
         >>> ts = meter.TimeSignature('2/4+3/16')
         >>> ts.beatDuration
         Traceback (most recent call last):
-        TimeSignatureException: non-uniform beat unit: [2.0, 0.75]
+        music21.meter.TimeSignatureException: non-uniform beat unit: [2.0, 0.75]
         '''
         post = []
         if len(self.beatSequence) == 1:
@@ -3487,7 +3487,8 @@ class TimeSignature(base.Music21Object):
         >>> ts = meter.TimeSignature('13/8', 13)
         >>> ts.beatDivisionCount
         Traceback (most recent call last):
-        TimeSignatureException: cannot determine beat backgrond when each beat is not partitioned
+        music21.meter.TimeSignatureException: cannot determine beat backgrond 
+            when each beat is not partitioned
         '''
         # first, find if there is more than one beat and if all beats are uniformly partitioned
         post = []
@@ -4177,6 +4178,55 @@ class TimeSignature(base.Music21Object):
                 forcePositionMatch=True, permitMeterModulus=False)
             totalWeight += elWeight
         return totalWeight/totalObjects
+
+
+    def getMeasureOffsetOrMeterModulusOffset(self, el):
+        '''
+        Return the measure offset based on a Measure, if it exists,
+        otherwise based on meter modulus of the TimeSignature.
+
+        >>> m = stream.Measure()
+        >>> ts1 = meter.TimeSignature('3/4')
+        >>> m.insert(0, ts1)
+        >>> n1 = note.Note()
+        >>> m.insert(2, n1)
+        >>> ts1.getMeasureOffsetOrMeterModulusOffset(n1)
+        2.0
+        
+        Exceeding the range of the Measure gets a modulus
+        
+        >>> n2 = note.Note()
+        >>> m.insert(4.0, n2)
+        >>> ts1.getMeasureOffsetOrMeterModulusOffset(n2)
+        1.0
+
+        Can be applied to Notes in a Stream with a TimeSignature.
+
+        >>> ts2 = meter.TimeSignature('5/4')
+        >>> s2 = stream.Stream()
+        >>> s2.insert(0, ts2)
+        >>> n3 = note.Note()
+        >>> s2.insert(3, n3)
+        >>> ts2.getMeasureOffsetOrMeterModulusOffset(n3)
+        3.0
+        
+        >>> n4 = note.Note()
+        >>> s2.insert(5, n4)
+        >>> ts2.getMeasureOffsetOrMeterModulusOffset(n4)
+        0.0
+        '''
+        mOffset = el._getMeasureOffset()
+        tsMeasureOffset = self._getMeasureOffset(includeMeasurePadding=False)
+        if (mOffset + tsMeasureOffset) < self.barDuration.quarterLength:
+            return mOffset
+        else:
+            # must get offset relative to not just start of Stream, but the last
+            # time signature
+            post = ((mOffset - tsMeasureOffset) % self.barDuration.quarterLength)
+            #environLocal.printDebug(['result', post])
+            return post
+
+
 
     def getAccentWeight(self, qLenPos, level=0, forcePositionMatch=False,
         permitMeterModulus=False):

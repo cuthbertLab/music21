@@ -117,15 +117,15 @@ def fixTestsForPy2and3(doctestSuite):
             continue
         dt = dtc._dt_test # DocTest
         for example in dt.examples: # fix Traceback exception differences Py2 to Py3
-            if example.exc_msg is not None and example.exc_msg:
-                # TODO: version 5 -- remove.
-                example.exc_msg = "..." + example.exc_msg
-            elif (example.want is not None
-                    and example.want.startswith('u\'')):
-                # probably a unicode example:
-                # simplistic, since (u'hi', u'bye')
-                # won't be caught, but saves a lot of anguish
-                example.want = example.want[1:]
+#             if example.exc_msg is not None and example.exc_msg:
+#                 # TODO: version 5 -- remove.
+#                 example.exc_msg = "..." + example.exc_msg
+#             elif (example.want is not None
+#                     and example.want.startswith('u\'')):
+#                 # probably a unicode example:
+#                 # simplistic, since (u'hi', u'bye')
+#                 # won't be caught, but saves a lot of anguish
+#                 example.want = example.want[1:]
             example.want = stripAddresses(example.want, '0x...')
 
 ADDRESS = re.compile('0x[0-9A-Fa-f]+')

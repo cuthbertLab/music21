@@ -2258,7 +2258,7 @@ class MeasureParser(XMLParserBase):
         >>> mxBeam = EL('<beam>crazy</beam>')
         >>> a = MP.xmlToBeam(mxBeam)
         Traceback (most recent call last):
-        MusicXMLImportException: unexpected beam type encountered (crazy)
+        music21.musicxml.xmlToM21.MusicXMLImportException: unexpected beam type encountered (crazy)
         '''
         if inputM21 is None:
             beamOut = beam.Beam()

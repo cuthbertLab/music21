@@ -7679,7 +7679,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     def _getMeasureOffset(self):
         # this normally returns the offset of this object in its container
-        # for now, simply return the offset
+        # for now, simply return the offset for the activeSite
         return self.getOffsetBySite(self.activeSite)
 
     @property

@@ -38,4 +38,4 @@ script:
     - python -c 'from music21.test.testSingleCoreAll import travisMain as tm; tm()'
     
 after_success:
-      coveralls
+    - if [ "$TRAVIS_PYTHON_VERSION" == "3.5" ]; then coveralls; fi
