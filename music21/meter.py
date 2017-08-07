@@ -4174,7 +4174,7 @@ class TimeSignature(base.Music21Object):
             return 0.0 # or raise exception?  add doc test
         for el in streamIn:
             elWeight = self.getAccentWeight(
-                el._getMeasureOffsetOrMeterModulusOffset(self),
+                self.getMeasureOffsetOrMeterModulusOffset(el),
                 forcePositionMatch=True, permitMeterModulus=False)
             totalWeight += elWeight
         return totalWeight/totalObjects

@@ -707,9 +707,12 @@ class Test(unittest.TestCase):
         #environLocal.printDebug(['m1.notesAndRests[0].activeSite', m1.notesAndRests[0].activeSite])
 
         #self.assertEqual(m1.notesAndRests.activeSite)
-        self.assertEqual(m1.notesAndRests[0]._getMeasureOffset(), 1.0)
+        
+        n0 = m1.notesAndRests[0]
+        n1 = m1.notesAndRests[1]
+        self.assertEqual(n0.getOffsetBySite(m1) + m1.paddingLeft, 1.0)
         self.assertEqual(m1.notesAndRests[0].beat, 2.0)
-        self.assertEqual(m1.notesAndRests[1]._getMeasureOffset(), 2.0)
+        self.assertEqual(n1.getOffsetBySite(m1) + m1.paddingLeft, 2.0)
         self.assertEqual(m1.notesAndRests[1].beat, 3.0)
 
 
@@ -724,9 +727,12 @@ class Test(unittest.TestCase):
         # filled with two 16th
         self.assertEqual(m1.duration.quarterLength, 0.5)
         # notes are shown as being on beat 2 and 3
-        self.assertEqual(m1.notesAndRests[0]._getMeasureOffset(), 3.5)
+        n0 = m1.notesAndRests[0]
+        n1 = m1.notesAndRests[1]
+        
+        self.assertEqual(n0.getOffsetBySite(m1) + m1.paddingLeft, 3.5)
         self.assertEqual(m1.notesAndRests[0].beat, 4.5)
-        self.assertEqual(m1.notesAndRests[1]._getMeasureOffset(), 3.75)
+        self.assertEqual(n1.getOffsetBySite(m1) + m1.paddingLeft, 3.75)
         self.assertEqual(m1.notesAndRests[1].beat, 4.75)
 
 
