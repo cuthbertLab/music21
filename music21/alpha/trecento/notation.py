@@ -70,7 +70,7 @@ class LigatureState(tinyNotation.State):
     defines that the notes in here will be in a ligature
     '''
     def __init__(self, parent, stateInfo):
-        super(LigatureState, self).__init__(parent, stateInfo)
+        super().__init__(parent, stateInfo)
 
         self.ligature = None
         self.obliqueNums = []
@@ -102,7 +102,7 @@ class LigatureState(tinyNotation.State):
         return n
 
     def affectTokenAfterParse(self, n):
-        super(LigatureState, self).affectTokenAfterParse(n)
+        super().affectTokenAfterParse(n)
         #        n.ligatureParent = self
         return None # do not add note to Stream
 
@@ -378,7 +378,7 @@ class TrecentoTinyConverter(tinyNotation.Converter):
         'lig': LigatureState
     }
     def __init__(self, stringRep=""):
-        super(TrecentoTinyConverter, self).__init__(stringRep)
+        super().__init__(stringRep)
         self.tokenMap = [
                          (r'(\$[A-Z]\d?)', ClefToken),
                          (r'(\.[a-z]\.)', DivisioneToken),

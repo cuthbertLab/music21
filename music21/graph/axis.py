@@ -309,7 +309,7 @@ class PitchAxis(Axis):
     quantities = ('pitchGeneric', )
 
     def __init__(self, client=None, axisName='x'):
-        super(PitchAxis, self).__init__(client, axisName)
+        super().__init__(client, axisName)
         self.showOctaves = 'few'
         self.showEnharmonic = True
         self.blankLabelUnused = True
@@ -442,7 +442,7 @@ class PitchClassAxis(PitchAxis):
 
     def __init__(self, client=None, axisName='x'):
         self.showOctaves = False
-        super(PitchClassAxis, self).__init__(client, axisName)
+        super().__init__(client, axisName)
         self.minValue = 0
         self.maxValue = 11
 
@@ -638,7 +638,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
     quantities = ('octave', 'octaves')
 
     def __init__(self, client=None, axisName='x'):
-        super(PitchSpaceOctaveAxis, self).__init__(client, axisName)
+        super().__init__(client, axisName)
         self.startNameWithOctave = 'C2'
 
     def ticks(self):
@@ -739,7 +739,7 @@ class PositionAxis(Axis):
     quantities = ('position', 'positions')
 
     def __init__(self, client=None, axisName='x'):
-        super(PositionAxis, self).__init__(client, axisName)
+        super().__init__(client, axisName)
         self.graceNoteQL = 2**-4
 
 
@@ -768,7 +768,7 @@ class OffsetAxis(PositionAxis):
     quantities = ('offset', 'measure', 'offsets', 'measures', 'time')
 
     def __init__(self, client=None, axisName='x'):
-        super(OffsetAxis, self).__init__(client, axisName)
+        super().__init__(client, axisName)
         self.useMeasures = None
         # self.displayMeasureNumberZero = False # not used...
         self.offsetStepSize = 10
@@ -1039,7 +1039,7 @@ class QuarterLengthAxis(PositionAxis):
     quantities = ('quarterLength', 'ql', 'quarterlengths', 'durations', 'duration')
 
     def __init__(self, client=None, axisName='x'):
-        super(QuarterLengthAxis, self).__init__(client, axisName)
+        super().__init__(client, axisName)
         self.useLogScale = True
         self.useDurationNames = False
 
@@ -1150,11 +1150,11 @@ class QuarterLengthAxis(PositionAxis):
 
     @property
     def label(self):
-        return super(QuarterLengthAxis, self).label + self.labelLogTag()
+        return super().label + self.labelLogTag()
 
     @label.setter
     def label(self, value):
-        super(QuarterLengthAxis, self).label = value
+        super().label = value
 
     def remapQuarterLength(self, x):
         '''
@@ -1183,7 +1183,7 @@ class OffsetEndAxis(OffsetAxis):
     quantities = ('offsetEnd', 'timespans', 'timespan')
 
     def __init__(self, client=None, axisName='x'):
-        super(OffsetEndAxis, self).__init__(client, axisName)
+        super().__init__(client, axisName)
         self.noteSpacing = self.graceNoteQL
 
     def extractOneElement(self, n, formatDict):
@@ -1212,7 +1212,7 @@ class DynamicsAxis(Axis):
             self.minValue = 0
             self.maxValue = len(dynamics.shortNames) - 1
         else:
-            super(DynamicsAxis, self).setBoundariesFromData(values)
+            super().setBoundariesFromData(values)
             self.minValue = int(self.minValue)
             self.maxValue = int(self.maxValue)
 
@@ -1268,7 +1268,7 @@ class CountingAxis(Axis):
     quantities = ('count', 'quantity', 'frequency', 'counting')
 
     def __init__(self, client=None, axisName='y'):
-        super(CountingAxis, self).__init__(client, axisName)
+        super().__init__(client, axisName)
         self.countAxes = 'x'
 
     def postProcessData(self):

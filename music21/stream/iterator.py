@@ -1182,7 +1182,7 @@ class OffsetIterator(StreamIterator):
                  activeInformation=None,
                  ignoreSorting=False,
                  ):
-        super(OffsetIterator, self).__init__(srcStream,
+        super().__init__(srcStream,
                                              filterList=filterList,
                                              restoreActiveSites=restoreActiveSites,
                                              activeInformation=activeInformation,
@@ -1203,12 +1203,12 @@ class OffsetIterator(StreamIterator):
                 retElementList = self.nextToYield
                 retElOffset = self.nextOffsetToYield
             else:
-                retEl = super(OffsetIterator, self).__next__()
+                retEl = super().__next__()
                 retElOffset = self.srcStream.elementOffset(retEl)
                 retElementList = [retEl]
 
             while self.index <= self.streamLength:
-                nextEl = super(OffsetIterator, self).__next__()
+                nextEl = super().__next__()
                 nextElOffset = self.srcStream.elementOffset(nextEl)
                 if nextElOffset == retElOffset:
                     retElementList.append(nextEl)
@@ -1229,7 +1229,7 @@ class OffsetIterator(StreamIterator):
         '''
         runs before iteration
         '''
-        super(OffsetIterator, self).reset()
+        super().reset()
         self.nextToYield = []
         self.nextOffsetToYield = None
         self.raiseStopIterationNext = False
@@ -1305,7 +1305,7 @@ class RecursiveIterator(StreamIterator):
                  includeSelf=False, # to be removed?
                  ignoreSorting=False
                  ): #, parentIterator=None):
-        super(RecursiveIterator, self).__init__(srcStream,
+        super().__init__(srcStream,
                                                 filterList=filterList,
                                                 restoreActiveSites=restoreActiveSites,
                                                 activeInformation=activeInformation,
@@ -1334,7 +1334,7 @@ class RecursiveIterator(StreamIterator):
         self.returnSelf = self.includeSelf
         self.childRecursiveIterator = None
         self.activeInformation['lastYielded'] = None
-        super(RecursiveIterator, self).reset()
+        super().reset()
 
     def __next__(self):
 
@@ -1418,7 +1418,7 @@ class RecursiveIterator(StreamIterator):
         # saved parent iterator later?
         # will this work in mid-iteration? Test, or do not expose till then.
         savedRecursiveIterator = self.childRecursiveIterator
-        fe = super(RecursiveIterator, self).matchingElements()
+        fe = super().matchingElements()
         self.childRecursiveIterator = savedRecursiveIterator
         return fe
 

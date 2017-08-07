@@ -354,7 +354,7 @@ class BrailleKeyboard(BrailleText):
     A subclass of BrailleText that handles both hands at once.
     '''
     def __init__(self, lineLength=40):
-        super(BrailleKeyboard, self).__init__(lineLength=lineLength)
+        super().__init__(lineLength=lineLength)
         self.rightHandLine = None
         self.leftHandLine = None
         self.highestMeasureNumberLength = 0 # used in BraileKeyboard layouts
@@ -364,7 +364,7 @@ class BrailleKeyboard(BrailleText):
 #             (measureNumber, noteGroupingR, noteGroupingL) = elementKeywords['pair']
 #             self.addNoteGroupings(measureNumber, noteGroupingL, noteGroupingR)
 #         else:
-#             return super(BrailleKeyboard, self).addElement(**elementKeywords)
+#             return super().addElement(**elementKeywords)
 
 
     def makeNewLines(self):

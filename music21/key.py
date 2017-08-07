@@ -1139,10 +1139,10 @@ class Key(KeySignature, scale.DiatonicScale):
 
         '''
         if inPlace is True:
-            super(Key, self).transpose(value, inPlace)
+            super().transpose(value, inPlace)
             post = self
         else:
-            post = super(Key, self).transpose(value, inPlace)
+            post = super().transpose(value, inPlace)
 
         postKey = post.asKey(self.mode)
         post.tonic = postKey.tonic

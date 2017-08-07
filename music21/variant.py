@@ -1988,7 +1988,7 @@ class Variant(base.Music21Object):
         else:
             ignoreAttributes = ignoreAttributes | defaultIgnoreSet
 
-        new = super(Variant, self)._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
+        new = super()._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
 
         return new
 

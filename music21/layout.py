@@ -108,7 +108,7 @@ PageSize = namedtuple("PageSize", "top left right bottom width height")
 class LayoutBase(base.Music21Object):
     classSortOrder = -10
     def __init__(self, *args, **keywords):
-        super(LayoutBase, self).__init__()
+        super().__init__()
 
 
 #-------------------------------------------------------------------------------
@@ -137,7 +137,7 @@ class ScoreLayout(LayoutBase):
 
     '''
     def __init__(self, *args, **keywords):
-        super(ScoreLayout, self).__init__()
+        super().__init__()
 
         self.scalingMillimeters = None
         self.scalingTenths = None
@@ -219,7 +219,7 @@ class PageLayout(LayoutBase):
 
     '''
     def __init__(self, *args, **keywords):
-        super(PageLayout, self).__init__()
+        super().__init__()
 
         self.pageNumber = None
         self.leftMargin = None
@@ -277,7 +277,7 @@ class SystemLayout(LayoutBase):
     True
     '''
     def __init__(self, *args, **keywords):
-        super(SystemLayout, self).__init__()
+        super().__init__()
 
         self.leftMargin = None
         self.rightMargin = None
@@ -356,7 +356,7 @@ class StaffLayout(LayoutBase):
 
     '''
     def __init__(self, *args, **keywords):
-        super(StaffLayout, self).__init__()
+        super().__init__()
 
         # this is the distance between adjacent staves
         self.distance = None
@@ -428,7 +428,7 @@ class StaffGroup(spanner.Spanner):
 
     '''
     def __init__(self, *arguments, **keywords):
-        super(StaffGroup, self).__init__(*arguments, **keywords)
+        super().__init__(*arguments, **keywords)
 
         self.name = None # if this group has a name
         self.abbreviation = None
@@ -751,7 +751,7 @@ class LayoutScore(stream.Opus):
     it is much faster as it uses a cache.
     '''
     def __init__(self, *args, **keywords):
-        super(LayoutScore, self).__init__(*args, **keywords)
+        super().__init__(*args, **keywords)
         self.scoreLayout = None
         self.measureStart = None
         self.measureEnd = None
@@ -1500,7 +1500,7 @@ class Page(stream.Opus):
     belongs on a single notated page.
     '''
     def __init__(self, *args, **keywords):
-        super(Page, self).__init__(*args, **keywords)
+        super().__init__(*args, **keywords)
         self.pageNumber = 1
         self.measureStart = None
         self.measureEnd = None
@@ -1519,7 +1519,7 @@ class System(stream.Score):
     belongs on a single notated system.
     '''
     def __init__(self, *args, **keywords):
-        super(System, self).__init__(*args, **keywords)
+        super().__init__(*args, **keywords)
         self.systemNumber = 0
 
         self.pageNumber = 0
@@ -1545,7 +1545,7 @@ class Staff(stream.Part):
     belongs on a single Staff.
     '''
     def __init__(self, *args, **keywords):
-        super(Staff, self).__init__(*args, **keywords)
+        super().__init__(*args, **keywords)
         self.staffNumber = 1 # number in this system NOT GLOBAL
 
         self.scoreStaffNumber = 0

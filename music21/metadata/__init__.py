@@ -851,7 +851,7 @@ class RichMetadata(Metadata):
     ### INITIALIZER ###
 
     def __init__(self, *args, **keywords):
-        super(RichMetadata, self).__init__(*args, **keywords)
+        super().__init__(*args, **keywords)
         self.ambitus = None
         self.keySignatureFirst = None
         self.keySignatures = []

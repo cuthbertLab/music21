@@ -131,7 +131,7 @@ class TextStyle(Style):
     A Style object that also includes text formatting.
     '''
     def __init__(self):
-        super(TextStyle, self).__init__()
+        super().__init__()
         self._fontFamily = None
         self._fontSize = None
         self._fontStyle = None
@@ -337,7 +337,7 @@ class BezierStyle(Style):
     From the MusicXML Definition.
     '''
     def __init__(self):
-        super(BezierStyle, self).__init__()
+        super().__init__()
 
         self.bezierOffset = None
         self.bezierOffset2 = None
@@ -357,7 +357,7 @@ class LineStyle(Style):
     spaceLength (in tenths)
     '''
     def __init__(self):
-        super(LineStyle, self).__init__()
+        super().__init__()
         
         self.lineShape = None
         self.lineType = None
@@ -377,7 +377,7 @@ class StyleMixin(common.SlottedObjectMixin):
     __slots__ = ('_style', '_editorial')
 
     def __init__(self):
-        super(StyleMixin, self).__init__()
+        super().__init__()
         self._style = None
         self._editorial = None
 

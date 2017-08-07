@@ -111,12 +111,12 @@ class LocalCorpusSettings(list):
     def __init__(self, paths=None, name=None, cacheFilePath=None):
         if paths is None:
             paths = []
-        super(LocalCorpusSettings, self).__init__(paths)
+        super().__init__(paths)
         self.name = name
         self.cacheFilePath = cacheFilePath
         
     def __repr__(self):
-        listRepr = super(LocalCorpusSettings, self).__repr__()
+        listRepr = super().__repr__()
         namePart = ''
         mdbpPart = ''
         if self.name is not None:

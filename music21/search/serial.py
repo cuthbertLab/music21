@@ -1913,7 +1913,7 @@ class TransposedInvertedMultisetMatcher(TransposedMultisetMatcher):
             searchSegmentCounter = Counter([(-1 * (p + i)) % 12 for p in multiset])
             if searchSegmentCounter in self.searchedAlready:
                 return True
-        return super(TransposedInvertedMultisetMatcher, self).checkSearchedAlready(multiset)
+        return super().checkSearchedAlready(multiset)
 
 
     def equalSubset(self, searchSegment, subsetToCheck):
@@ -1921,7 +1921,7 @@ class TransposedInvertedMultisetMatcher(TransposedMultisetMatcher):
         Returns True if there are the same number of each pitchClass in searchSegment
         as in subsetToCheck
         '''
-        if super(TransposedInvertedMultisetMatcher, self).equalSubset(searchSegment, subsetToCheck):
+        if super().equalSubset(searchSegment, subsetToCheck):
             return True
 
         subsetCounter = Counter(subsetToCheck)

@@ -393,7 +393,7 @@ class Music21Object:
         }
 
     def __init__(self, *arguments, **keywords):
-        super(Music21Object, self).__init__()
+        super().__init__()
         # None is stored as the internal location of an obj w/o any sites
         self._activeSite = None
         # offset when no activeSite is available

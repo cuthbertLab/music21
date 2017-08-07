@@ -798,7 +798,7 @@ class Accidental(style.StyleMixin):
     ### INITIALIZER ###
 
     def __init__(self, specifier='natural'):
-        super(Accidental, self).__init__()
+        super().__init__()
         # managed by properties
         self._displayType = 'normal' # always, never, unless-repeated, even-tied
         self._displayStatus = None # None, True, False

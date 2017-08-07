@@ -389,7 +389,7 @@ class WorkerProcess(multiprocessing.Process): # @UndefinedVariable pylint: disab
     ### INITIALIZER ###
 
     def __init__(self, job_queue, result_queue):
-        super(WorkerProcess, self).__init__()
+        super().__init__()
         self.job_queue = job_queue
         self.result_queue = result_queue
 

@@ -4540,7 +4540,7 @@ class SenzaMisuraTimeSignature(base.Music21Object):
     <music21.meter.SenzaMisuraTimeSignature 0 >
     '''
     def __init__(self, text=None):
-        super(SenzaMisuraTimeSignature, self).__init__()
+        super().__init__()
         self.text = text
 
     def __repr__(self):

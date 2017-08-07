@@ -168,7 +168,7 @@ class ElementNode(core.AVLNode):
     ### INITIALIZER ###
 
     def __init__(self, position, payload=None):
-        super(ElementNode, self).__init__(position, payload)
+        super().__init__(position, payload)
         self.payloadElementIndex = -1
 
         self.endTimeHigh = None
@@ -449,7 +449,7 @@ class OffsetNode(ElementNode):
     ### INITIALIZER ###
 
     def __init__(self, offset, payload=None):
-        super(OffsetNode, self).__init__(offset)
+        super().__init__(offset)
         self.payload = []
         self.payloadElementsStartIndex = -1
         self.payloadElementsStopIndex = -1

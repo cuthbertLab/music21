@@ -85,7 +85,7 @@ class MensuralClef(clef.Clef):
     '''
 
     def __init__(self, sign='C'):
-        super(MensuralClef, self).__init__()
+        super().__init__()
         self._line = None
         self._fontString = None
 

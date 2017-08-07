@@ -319,7 +319,7 @@ class ElementTimespan(Timespan):
                  offset=None,
                  endTime=None,
                  ):
-        super(ElementTimespan, self).__init__(offset=offset, endTime=endTime)
+        super().__init__(offset=offset, endTime=endTime)
 
         self.element = element
         if parentage is not None:
@@ -508,7 +508,7 @@ class PitchedTimespan(ElementTimespan):
                  offset=None,
                  endTime=None,
                  ):
-        super(PitchedTimespan, self).__init__(element=element,
+        super().__init__(element=element,
                                               parentOffset=parentOffset,
                                               parentEndTime=parentEndTime,
                                               parentage=parentage,
@@ -606,7 +606,7 @@ class PitchedTimespan(ElementTimespan):
         <music21.stream.Part Soprano>
 
         '''
-        can, message = super(PitchedTimespan, self).canMerge(other)
+        can, message = super().canMerge(other)
         if can is True:
             if self.pitches != other.pitches:
                 message = 'Cannot merge {} with {}: different pitches'.format(

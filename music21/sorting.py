@@ -98,7 +98,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
 
     def __eq__(self, other):
         if isinstance(other, tuple):
-            return super(SortTuple, self).__eq__(other)
+            return super().__eq__(other)
         try:
             if self.atEnd == 1 and other != INFINITY:
                 return False
@@ -111,7 +111,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
 
     def __lt__(self, other):
         if isinstance(other, tuple):
-            return super(SortTuple, self).__lt__(other)
+            return super().__lt__(other)
         try:
             if self.atEnd == 1:
                 return False
@@ -122,7 +122,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
 
     def __gt__(self, other):
         if isinstance(other, tuple):
-            return super(SortTuple, self).__gt__(other)
+            return super().__gt__(other)
         try:
             if self.atEnd == 1 and other != INFINITY:
                 return True

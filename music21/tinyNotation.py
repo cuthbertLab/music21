@@ -201,7 +201,7 @@ over the years:
 
 >>> class ChordState(tinyNotation.State):
 ...    def affectTokenAfterParse(self, n):
-...        super(ChordState, self).affectTokenAfterParse(n)
+...        super().affectTokenAfterParse(n)
 ...        return None # do not append Note object
 ...    def end(self):
 ...        ch = chord.Chord(self.affectedTokens)
@@ -358,7 +358,7 @@ class TupletState(State):
         '''
         puts a tuplet on the note
         '''
-        super(TupletState, self).affectTokenAfterParse(n)
+        super().affectTokenAfterParse(n)
         newTup = duration.Tuplet()
         newTup.durationActual = duration.durationTupleFromTypeDots(n.duration.type, 0)
         newTup.durationNormal = duration.durationTupleFromTypeDots(n.duration.type, 0)
@@ -459,7 +459,7 @@ class NoteOrRestToken(Token):
     represents a Note or Rest.  Chords are represented by Note objects
     '''
     def __init__(self, token=""):
-        super(NoteOrRestToken, self).__init__(token)
+        super().__init__(token)
         self.durationMap = [
                             (r'(\d+)', 'durationType'),
                             (r'(\.+)', 'dots'),
@@ -556,7 +556,7 @@ class NoteToken(NoteOrRestToken):
         ('natural', r'(n)'),
     ])
     def __init__(self, token=""):
-        super(NoteToken, self).__init__(token)
+        super().__init__(token)
         self.isEditorial = False
 
     def parse(self, parent=None):

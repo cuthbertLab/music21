@@ -84,7 +84,7 @@ class Editorial(dict):
     predefinedNones = ('ficta', 'harmonicInterval', 'melodicInterval')
 
     def __repr__(self):
-        return '<music21.editorial.Editorial ' + super(Editorial, self).__repr__() + ' >'
+        return '<music21.editorial.Editorial ' + super().__repr__() + ' >'
 
     ### INITIALIZER ###
     def __getattr__(self, name):
@@ -126,7 +126,7 @@ class Comment(style.StyleMixin):
     <music21.editorial.Comment 'presented as C na...' >
     '''
     def __init__(self, text=None):
-        super(Comment, self).__init__()
+        super().__init__()
         self.text = text
         self.isFootnote = False
         self.isReference = False

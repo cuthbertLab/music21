@@ -571,7 +571,7 @@ class GraphNetworxGraph(Graph):
         self.networkxGraph = None
         self.hideLeftBottomSpines = True
 
-        super(GraphNetworxGraph, self).__init__(*args, **keywords)
+        super().__init__(*args, **keywords)
 
         extm = getExtendedModules()
 
@@ -666,7 +666,7 @@ class GraphColorGrid(Graph):
 
     def __init__(self, *args, **kwargs):
         self.hideLeftBottomSpines = True
-        super(GraphColorGrid, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
     def renderSubplot(self, subplot):        # do not need grid for outer container
@@ -775,7 +775,7 @@ class GraphColorGridLegend(Graph):
     def __init__(self, *args, **keywords):
         self.hideLeftBottomSpines = True
 
-        super(GraphColorGridLegend, self).__init__(*args, **keywords)
+        super().__init__(*args, **keywords)
 
         if 'title' not in keywords:
             self.title = 'Legend'
@@ -918,7 +918,7 @@ class GraphHorizontalBar(Graph):
         self.barSpace = 8
         self.margin = 2
 
-        super(GraphHorizontalBar, self).__init__(*args, **keywords)
+        super().__init__(*args, **keywords)
 
         if 'alpha' not in keywords:
             self.alpha = 0.6
@@ -1011,7 +1011,7 @@ class GraphHorizontalBarWeighted(Graph):
         self.barSpace = 8
         self.margin = 0.25 # was 8; determines space between channels
 
-        super(GraphHorizontalBarWeighted, self).__init__(*args, **keywords)
+        super().__init__(*args, **keywords)
 
         # this default alpha is used if not specified per bar
         if 'alpha' not in keywords:
@@ -1151,7 +1151,7 @@ class GraphScatterWeighted(Graph):
         self.maxDiameter = 1.25
         self.minDiameter = 0.25
 
-        super(GraphScatterWeighted, self).__init__(*args, **keywords)
+        super().__init__(*args, **keywords)
 
         if 'alpha' not in keywords:
             self.alpha = 0.6
@@ -1350,7 +1350,7 @@ class GraphHistogram(Graph):
 
     def __init__(self, *args, **keywords):
         self.binWidth = 0.8
-        super(GraphHistogram, self).__init__(*args, **keywords)
+        super().__init__(*args, **keywords)
 
         if 'alpha' not in keywords:
             self.alpha = 0.8
@@ -1403,7 +1403,7 @@ class GraphGroupedVerticalBar(Graph):
         self.roundDigits = 1
         self.groupLabelHeight = 0.0
 
-        super(GraphGroupedVerticalBar, self).__init__(*args, **keywords)
+        super().__init__(*args, **keywords)
 
 
     def labelBars(self, subplot, rects):
@@ -1493,7 +1493,7 @@ class Graph3DBars(Graph):
     graphType = '3DBars'
     axisKeys = ('x', 'y', 'z')
     def __init__(self, *args, **keywords):
-        super(Graph3DBars, self).__init__(*args, **keywords)
+        super().__init__(*args, **keywords)
         if 'alpha' not in keywords:
             self.alpha = 0.8
         if 'colors' not in keywords:

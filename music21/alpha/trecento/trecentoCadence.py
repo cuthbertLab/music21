@@ -51,7 +51,7 @@ class CadenceConverter(tinyNotation.Converter):
      <music21.stream.Measure 3 offset=6.0>)
     '''
     def __init__(self, stringRep=""):
-        super(CadenceConverter, self).__init__(stringRep)
+        super().__init__(stringRep)
         self.tokenMap = [
                     (r'(\d+\/\d+)', tinyNotation.TimeSignatureToken),
                     (r'r(\S*)', CadenceRestToken),

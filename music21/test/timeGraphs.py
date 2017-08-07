@@ -136,7 +136,7 @@ class TestTimeIsmir(M21CallTest):
 
 class TestMakeMeasures(CallTest):
     def __init__(self):
-        super(TestMakeMeasures, self).__init__()
+        super().__init__()
         import music21.stream
         import music21.note
         self.s = music21.stream.Stream()
@@ -153,7 +153,7 @@ class TestMakeTies(CallTest):
         import music21.stream
         import music21.note
 
-        super(TestMakeTies, self).__init__()
+        super().__init__()
 
         self.s = music21.stream.Stream()
         for i in range(100):
@@ -170,7 +170,7 @@ class TestMakeBeams(CallTest):
     def __init__(self):
         import music21.stream
         import music21.note
-        super(TestMakeBeams, self).__init__()
+        super().__init__()
 
         self.s = music21.stream.Stream()
         for i in range(100):
@@ -188,7 +188,7 @@ class TestMakeAccidentals(CallTest):
         import music21.stream
         import music21.note
 
-        super(TestMakeAccidentals, self).__init__()
+        super().__init__()
 
         self.s = music21.stream.Stream()
         for i in range(100):
@@ -206,7 +206,7 @@ class TestMusicXMLOutput(CallTest):
         import music21.stream
         import music21.note
 
-        super(TestMusicXMLOutput, self).__init__()
+        super().__init__()
 
         self.s = music21.stream.Stream()
         for i in range(100):
@@ -223,7 +223,7 @@ class TestMusicXMLOutputParts(CallTest):
     '''
     def __init__(self):
         from music21 import corpus
-        super(TestMusicXMLOutputParts, self).__init__()
+        super().__init__()
 
         self.s = corpus.parse('bach/bwv66.6', forceSource=True)
         #self.s = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
@@ -239,7 +239,7 @@ class TestMusicXMLOutputScore(CallTest):
     def __init__(self):
         from music21 import corpus
 
-        super(TestMusicXMLOutputScore, self).__init__()
+        super().__init__()
 
         self.s = corpus.parse('bach/bwv66.6', forceSource=True)
         #self.s = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
@@ -262,7 +262,7 @@ class TestCreateTimeSignature(CallTest):
 
     def __init__(self):
         from music21.test import testPerformance
-        super(TestCreateTimeSignature, self).__init__()
+        super().__init__()
 
         self.t = testPerformance.Test()
 
@@ -276,7 +276,7 @@ class TestCreateDurations(CallTest):
 
     def __init__(self):
         from music21.test import testPerformance
-        super(TestCreateDurations, self).__init__()
+        super().__init__()
 
         self.t = testPerformance.Test()
 

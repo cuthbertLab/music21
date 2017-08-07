@@ -652,7 +652,7 @@ class GenericInterval(IntervalBase):
 
     '''
     def __init__(self, value="unison"):
-        super(GenericInterval, self).__init__()
+        super().__init__()
 
         self.value = convertGeneric(value)
         self.directed = self.value
@@ -1072,7 +1072,7 @@ class DiatonicInterval(IntervalBase):
     }
 
     def __init__(self, specifier="P", generic=1):
-        super(DiatonicInterval, self).__init__()
+        super().__init__()
 
         if specifier is not None and generic is not None:
             if common.isNum(generic) or isinstance(generic, str):
@@ -1351,7 +1351,7 @@ class ChromaticInterval(IntervalBase):
     True
     '''
     def __init__(self, value=0):
-        super(ChromaticInterval, self).__init__()
+        super().__init__()
 
         if value == int(value):
             value = int(value)
@@ -1891,7 +1891,7 @@ class Interval(IntervalBase):
 #     in which case it figures out the diatonic and chromatic intervals itself
 
     def __init__(self, *arguments, **keywords):
-        super(Interval, self).__init__()
+        super().__init__()
         self.diatonic = None
         self.chromatic = None
         self.direction = None

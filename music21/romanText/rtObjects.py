@@ -165,7 +165,7 @@ class RTTagged(RTToken):
     False
     '''
     def __init__(self, src=u''):
-        super(RTTagged, self).__init__(src)
+        super().__init__(src)
         # try to split off tag from data
         self.tag = ''
         self.data = ''
@@ -417,7 +417,7 @@ class RTMeasure(RTToken):
 
     '''
     def __init__(self, src=u''):
-        super(RTMeasure, self).__init__(src)
+        super().__init__(src)
         # try to split off tag from data
         self.tag = '' # the measure number or range
         self.data = '' # only chord, phrase, and similar definitions
@@ -544,7 +544,7 @@ class RTAtom(RTToken):
     '''
     def __init__(self, src=u'', container=None):
         # this stores the source
-        super(RTAtom, self).__init__(src)
+        super().__init__(src)
         self.container = container
 
     def __repr__(self):
@@ -566,7 +566,7 @@ class RTChord(RTAtom):
     '''
 
     def __init__(self, src=u'', container=None):
-        super(RTChord, self).__init__(src, container)
+        super().__init__(src, container)
 
         # store offset within measure
         self.offset = None
@@ -587,7 +587,7 @@ class RTNoChord(RTAtom):
     '''
 
     def __init__(self, src=u'', container=None):
-        super(RTNoChord, self).__init__(src, container)
+        super().__init__(src, container)
 
         # store offset within measure
         self.offset = None
@@ -853,7 +853,7 @@ class RTOpenParens(RTAtom):
     <RTOpenParens '('>
     '''
     def __init__(self, src=u'(', container=None): # pylint: disable=useless-super-delegation
-        super(RTOpenParens, self).__init__(src, container)
+        super().__init__(src, container)
 
     def __repr__(self):
         return '<RTOpenParens %r>' % self.src
@@ -867,7 +867,7 @@ class RTCloseParens(RTAtom):
     <RTCloseParens ')'>
     '''
     def __init__(self, src=u')', container=None): # pylint: disable=useless-super-delegation
-        super(RTCloseParens, self).__init__(src, container)
+        super().__init__(src, container)
 
     def __repr__(self):
         return '<RTCloseParens %r>' % self.src
@@ -950,7 +950,7 @@ class RTPhraseBoundary(RTPhraseMarker):
     <RTPhraseBoundary '||'>
     '''
     def __init__(self, src=u'||', container=None): # pylint: disable=useless-super-delegation
-        super(RTPhraseBoundary, self).__init__(src, container)
+        super().__init__(src, container)
 
     def __repr__(self):
         return '<RTPhraseBoundary %r>' % self.src
@@ -963,7 +963,7 @@ class RTEllisonStart(RTPhraseMarker):
     <RTEllisonStart '|*'>
     '''
     def __init__(self, src=u'|*', container=None): # pylint: disable=useless-super-delegation
-        super(RTEllisonStart, self).__init__(src, container)
+        super().__init__(src, container)
 
     def __repr__(self):
         return '<RTEllisonStart %r>' % self.src
@@ -976,7 +976,7 @@ class RTEllisonStop(RTPhraseMarker):
     <RTEllisonStop '*|'>
     '''
     def __init__(self, src=u'*|', container=None): # pylint: disable=useless-super-delegation
-        super(RTEllisonStop, self).__init__(src, container)
+        super().__init__(src, container)
 
     def __repr__(self):
         return '<RTEllisonStop %r>' % self.src
@@ -998,7 +998,7 @@ class RTRepeatStart(RTRepeat):
     <RTRepeatStart ...'||:'>
     '''
     def __init__(self, src=u'||:', container=None): # pylint: disable=useless-super-delegation
-        super(RTRepeatStart, self).__init__(src, container)
+        super().__init__(src, container)
 
     def __repr__(self):
         return '<RTRepeatStart %r>' % self.src
@@ -1011,7 +1011,7 @@ class RTRepeatStop(RTRepeat):
     <RTRepeatStop ...':||'>
     '''
     def __init__(self, src=u':||', container=None): # pylint: disable=useless-super-delegation
-        super(RTRepeatStop, self).__init__(src, container)
+        super().__init__(src, container)
 
     def __repr__(self):
         return '<RTRepeatStop %r>' % self.src

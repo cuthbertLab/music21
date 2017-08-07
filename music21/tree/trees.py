@@ -100,7 +100,7 @@ class ElementTree(core.AVLTree):
     ### INITIALIZER ###
 
     def __init__(self, elements=None, source=None):
-        super(ElementTree, self).__init__()
+        super().__init__()
         self.parentTrees = weakref.WeakSet()
         self._source = None
         if elements and elements is not None:
@@ -684,8 +684,8 @@ class ElementTree(core.AVLTree):
                 Payload:<music21.bar.Barline style=final>>
         '''
         # py 3 only
-        # yield from super(ElementTree, self).__iter__()
-        for n in super(ElementTree, self).__iter__():
+        # yield from super().__iter__()
+        for n in super().__iter__():
             yield n
 
     def index(self, element, position=None):

@@ -514,7 +514,7 @@ class DateRelative(DateSingle):
 
     def __str__(self):
         r = self.relevance
-        ds = super(DateRelative, self).__str__()
+        ds = super().__str__()
         if r == 'prior':
             return 'prior to ' + ds
         elif r == 'onorbefore':
@@ -572,7 +572,7 @@ class DateBetween(DateSingle):
     def __init__(self, data=None, relevance='between'):
         if data is None:
             data = []
-        super(DateBetween, self).__init__(data, relevance)
+        super().__init__(data, relevance)
 
     ### SPECIAL METHODS ###
 

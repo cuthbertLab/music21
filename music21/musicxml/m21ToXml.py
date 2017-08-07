@@ -1154,7 +1154,7 @@ class ScoreExporter(XMLExporterBase):
     a musicxml Element.
     '''
     def __init__(self, score=None):
-        super(ScoreExporter, self).__init__()
+        super().__init__()
         if score is None:
             # should not be done this way.
             self.stream = stream.Score()
@@ -1998,7 +1998,7 @@ class PartExporter(XMLExporterBase):
     '''
 
     def __init__(self, partObj=None, parent=None):
-        super(PartExporter, self).__init__()
+        super().__init__()
         if partObj is None:
             partObj = stream.Part()
         self.stream = partObj
@@ -2329,7 +2329,7 @@ class MeasureExporter(XMLExporterBase):
 
 
     def __init__(self, measureObj=None, parent=None):
-        super(MeasureExporter, self).__init__()
+        super().__init__()
         if measureObj is not None:
             self.stream = measureObj
         else:  # no point, but...

@@ -1172,7 +1172,7 @@ class RomanNumeral(harmony.Harmony):
         self.key = keyOrScale
 
         updatePitches = keywords.get('updatePitches', True)
-        super(RomanNumeral, self).__init__(figure, updatePitches=updatePitches)
+        super().__init__(figure, updatePitches=updatePitches)
 
         self._correctBracketedPitches()
         self._parsingComplete = True

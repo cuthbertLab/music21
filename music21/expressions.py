@@ -968,7 +968,7 @@ class TrillExtension(spanner.Spanner):
     # musicxml defines a start, stop, and a continue; will try to avoid continue
     # note that this always includes a trill symbol
     def __init__(self, *arguments, **keywords):
-        super(TrillExtension, self).__init__(*arguments, **keywords)
+        super().__init__(*arguments, **keywords)
         self._placement = None # can above or below or None, after musicxml
 
     def _getPlacement(self):

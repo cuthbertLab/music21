@@ -245,14 +245,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #...    --- see base.py calls .write(
         if self.isSorted is False and self.autoSort:
             self.sort()
-        return super(Stream, self).write(*args, **kwargs)
+        return super().write(*args, **kwargs)
 
 
     def show(self, *args, **kwargs):
         #...    --- see base.py calls .write(
         if self.isSorted is False and self.autoSort:
             self.sort()
-        return super(Stream, self).show(*args, **kwargs)
+        return super().show(*args, **kwargs)
 
     #---------------------------------------------------------------------------
     # sequence like operations
@@ -1393,7 +1393,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             ignoreAttributes = defaultIgnoreSet
         else:
             ignoreAttributes = ignoreAttributes | defaultIgnoreSet
-        new = super(Stream, self)._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
+        new = super()._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
 
         if removeFromIgnore is not None:
             ignoreAttributes = ignoreAttributes - removeFromIgnore
@@ -11549,7 +11549,7 @@ class Measure(Stream):
         200
         '''
         # calling bass class sets id, groups
-        super(Measure, self).mergeAttributes(other)
+        super().mergeAttributes(other)
 
         for attr in ('timeSignatureIsNew', 'clefIsNew', 'keyIsNew', 'filled',
                      'paddingLeft', 'paddingRight', 'number', 'numberSuffix', 'layoutWidth'):
@@ -13058,7 +13058,7 @@ class SpannerStorage(Stream):
     provided by the Spanner in creation.
     '''
     def __init__(self, *arguments, **keywords):
-        super(SpannerStorage, self).__init__(*arguments, **keywords)
+        super().__init__(*arguments, **keywords)
 
         # must provide a keyword argument with a reference to the spanner
         # parent could name spannerContainer or other?
@@ -13092,7 +13092,7 @@ class VariantStorage(Stream):
 
     '''
     def __init__(self, *arguments, **keywords):
-        super(VariantStorage, self).__init__(*arguments, **keywords)
+        super().__init__(*arguments, **keywords)
         # must provide a keyword argument with a reference to the variant
         # parent
         self.variantParent = None

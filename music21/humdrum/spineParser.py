@@ -776,7 +776,7 @@ class HumdrumFile(HumdrumDataCollection):
     as a mandatory argument a filename to be opened and read.
     '''
     def __init__(self, filename=None):
-        super(HumdrumFile, self).__init__()
+        super().__init__()
         self.filename = filename
 
     def parseFilename(self, filename=None):
@@ -1276,7 +1276,7 @@ class KernSpine(HumdrumSpine):
     are kern notes
     '''
     def __init__(self, id=0, eventList=None, streamClass=stream.Stream): #@ReservedAssignment
-        super(KernSpine, self).__init__(id, eventList, streamClass)
+        super().__init__(id, eventList, streamClass)
         self.lastContainer = None
         self.inTuplet = None
         self.lastNote = None
@@ -2525,7 +2525,7 @@ def kernTandemToObject(tandem):
 
 class MiscTandem(base.Music21Object):
     def __init__(self, tandem=""):
-        super(MiscTandem, self).__init__()
+        super().__init__()
         self.tandem = tandem
 
     def __repr__(self):
@@ -2544,7 +2544,7 @@ class SpineComment(base.Music21Object):
     '''
 
     def __init__(self, comment=""):
-        super(SpineComment, self).__init__()
+        super().__init__()
         commentPart = re.sub(r'^\!+\s?', '', comment)
         self.comment = commentPart
 
@@ -2564,7 +2564,7 @@ class GlobalComment(base.Music21Object):
     '''
 
     def __init__(self, comment=""):
-        super(GlobalComment, self).__init__()
+        super().__init__()
         commentPart = re.sub(r'^\!\!+\s?', '', comment)
         commentPart = commentPart.strip()
         self.comment = commentPart
@@ -2617,7 +2617,7 @@ class GlobalReference(base.Music21Object):
     '''
 
     def __init__(self, codeOrAll="", valueOrNone=None):
-        super(GlobalReference, self).__init__()
+        super().__init__()
         codeOrAll = re.sub(r'^\!\!\!+', '', codeOrAll)
         codeOrAll = codeOrAll.strip()
         if valueOrNone is None and ':' in codeOrAll:

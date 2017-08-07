@@ -34,7 +34,7 @@ class StreamException(Music21Exception):
 
 class ImmutableStreamException(StreamException):
     def __init__(self, msg='An immutable Stream cannot be changed'): # pylint: disable=useless-super-delegation
-        super(ImmutableStreamException, self).__init__(msg)
+        super().__init__(msg)
 
 
 class MetadataException(Music21Exception):

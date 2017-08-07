@@ -136,7 +136,7 @@ class IsFilter(StreamFilter):
     derivationStr = 'is'
 
     def __init__(self, target=()):
-        super(IsFilter, self).__init__()
+        super().__init__()
         if not common.isListLike(target):
             target = (target,)
 
@@ -194,14 +194,14 @@ class IsNotFilter(IsFilter):
     derivationStr = 'isNot'
 
     def __init__(self, target=()):
-        super(IsNotFilter, self).__init__(target)
+        super().__init__(target)
         self.numToFind = float('inf') # there can always be more to find
 
     def reset(self):
         pass # do nothing: inf - 1 = inf
 
     def __call__(self, item, iterator):
-        return not super(IsNotFilter, self).__call__(item, iterator)
+        return not super().__call__(item, iterator)
 
 
 class IdFilter(StreamFilter):
@@ -215,7 +215,7 @@ class IdFilter(StreamFilter):
     derivationStr = 'getElementById'
 
     def __init__(self, searchId=None):
-        super(IdFilter, self).__init__()
+        super().__init__()
         try:
             searchIdLower = searchId.lower()
         except AttributeError: # not a string
@@ -263,7 +263,7 @@ class ClassFilter(StreamFilter):
     derivationStr = 'getElementsByClass'
 
     def __init__(self, classList=()):
-        super(ClassFilter, self).__init__()
+        super().__init__()
 
         if not common.isListLike(classList):
             classList = (classList,)
@@ -341,7 +341,7 @@ class GroupFilter(StreamFilter):
     derivationStr = 'getElementsByGroup'
 
     def __init__(self, groupFilterList=()):
-        super(GroupFilter, self).__init__()
+        super().__init__()
 
         if not common.isListLike(groupFilterList):
             groupFilterList = [groupFilterList]
@@ -365,7 +365,7 @@ class OffsetFilter(StreamFilter):
     def __init__(self, offsetStart=0.0, offsetEnd=None,
                     includeEndBoundary=True, mustFinishInSpan=False,
                     mustBeginInSpan=True, includeElementsThatEndAtStart=True):
-        super(OffsetFilter, self).__init__()
+        super().__init__()
 
         self.offsetStart = opFrac(offsetStart)
         if offsetEnd is None:

@@ -94,7 +94,7 @@ class TestImportStar(CallTest):
 class CallGraph:
 
     def __init__(self):
-        super(CallGraph, self).__init__()
+        super().__init__()
         self.includeList = ['music21.*']
         self.excludeList = ['pycallgraph.*']
         self.excludeList += ['re.*', 'sre_*']

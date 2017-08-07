@@ -202,7 +202,7 @@ class Spanner(base.Music21Object):
     >>> sp1.completeStatus = True
     '''
     def __init__(self, *arguments, **keywords):
-        super(Spanner, self).__init__()
+        super().__init__()
 
         # store this so subclasses can replace
         if self.__module__ != '__main__':
@@ -264,7 +264,7 @@ class Spanner(base.Music21Object):
         else:
             ignoreAttributes = ignoreAttributes | defaultIgnoreSet
 
-        new = super(Spanner, self)._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
+        new = super()._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
 
         if removeFromIgnore is not None:
             ignoreAttributes = ignoreAttributes - removeFromIgnore
@@ -1115,7 +1115,7 @@ class Slur(Spanner):
     Slurs have `.placement` options ('above' or 'below') and `.lineType` ('dashed' or None)
     '''
     def __init__(self, *arguments, **keywords):
-        super(Slur, self).__init__(*arguments, **keywords)
+        super().__init__(*arguments, **keywords)
         self.placement = None  # can above or below, after musicxml
         self.lineType = None  # can be "dashed" or None
 
@@ -1153,7 +1153,7 @@ class MultiMeasureRest(Spanner):
                  }
 
     def __init__(self, *arguments, **keywords):
-        super(MultiMeasureRest, self).__init__(*arguments, **keywords)
+        super().__init__(*arguments, **keywords)
         self._overriddenNumber = None
         self.useSymbols = keywords.get('useSymbols', defaults.multiMeasureRestUseSymbols)
         self.maxSymbols = keywords.get('maxSymbols', defaults.multiMeasureRestMaxSymbols)
@@ -1247,7 +1247,7 @@ class RepeatBracket(Spanner):
 
     '''
     def __init__(self, *arguments, **keywords):
-        super(RepeatBracket, self).__init__(*arguments, **keywords)
+        super().__init__(*arguments, **keywords)
 
         self._number = None
         self._numberRange = []  # store a range, inclusive of the single number assignment
@@ -1426,7 +1426,7 @@ class Ottava(Spanner):
     validOttavaTypes = ('8va', '8vb', '15ma', '15mb', '22da', '22db')
 
     def __init__(self, *arguments, **keywords):
-        super(Ottava, self).__init__(*arguments, **keywords)
+        super().__init__(*arguments, **keywords)
         self._type = None  # can be 8va, 8vb, 15ma, 15mb
         if 'type' in keywords:
             self.type = keywords['type']  # use property
@@ -1628,7 +1628,7 @@ class Line(Spanner):
     validLineTypes = ('solid', 'dashed', 'dotted', 'wavy')
 
     def __init__(self, *arguments, **keywords):
-        super(Line, self).__init__(*arguments, **keywords)
+        super().__init__(*arguments, **keywords)
 
         self._endTick = 'down'  # can ne up/down/arrow/both/None
         self._startTick = 'down'  # can ne up/down/arrow/both/None
@@ -1776,7 +1776,7 @@ class Glissando(Spanner):
     validLineTypes = ('solid', 'dashed', 'dotted', 'wavy')
     
     def __init__(self, *arguments, **keywords):
-        super(Glissando, self).__init__(*arguments, **keywords)
+        super().__init__(*arguments, **keywords)
 
         self._lineType = 'wavy'
         self.label = None

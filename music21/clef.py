@@ -98,7 +98,7 @@ class Clef(base.Music21Object):
     classSortOrder = 0
 
     def __init__(self):
-        super(Clef, self).__init__()
+        super().__init__()
         self.sign = None
         # line counts start from the bottom up, the reverse of musedata
         self.line = None
@@ -186,7 +186,7 @@ class PitchClef(Clef):
             ''',
     }
     def __init__(self):
-        super(PitchClef, self).__init__()
+        super().__init__()
         self.lowestLine = None
 
 
@@ -210,7 +210,7 @@ class PercussionClef(Clef):
     '''
     _DOC_ATTR = {}
     def __init__(self):
-        super(PercussionClef, self).__init__()
+        super().__init__()
         self.sign = 'percussion'
         self.lowestLine = (7 * 4) + 3  # 4 octaves + 3 notes = e4
 
@@ -229,7 +229,7 @@ class NoClef(Clef):
     '''
     _DOC_ATTR = {}
     def __init__(self):
-        super(NoClef, self).__init__()
+        super().__init__()
         self.sign = 'none'
 
 class JianpuClef(NoClef):
@@ -242,7 +242,7 @@ class JianpuClef(NoClef):
     'jianpu'
     '''
     def __init__(self):
-        super(JianpuClef, self).__init__()
+        super().__init__()
         self.sign = 'jianpu'
 
 
@@ -255,7 +255,7 @@ class TabClef(PitchClef):
     'TAB'
     '''
     def __init__(self):
-        super(TabClef, self).__init__()
+        super().__init__()
         self.sign = "TAB"
         self.line = 5
 
@@ -271,7 +271,7 @@ class GClef(PitchClef):
     True
     '''
     def __init__(self):
-        super(GClef, self).__init__()
+        super().__init__()
         self.sign = "G"
 
 class FrenchViolinClef(GClef):
@@ -306,7 +306,7 @@ class TrebleClef(GClef):
     31
     '''
     def __init__(self):
-        super(TrebleClef, self).__init__()
+        super().__init__()
         self.line = 2
         self.lowestLine = (7 * 4) + 3  # 4 octaves + 3 notes = e4
 

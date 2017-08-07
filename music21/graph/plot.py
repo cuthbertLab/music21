@@ -424,7 +424,7 @@ class ScatterPitchSpaceQuarterLength(Scatter):
                    'y': axis.PitchSpaceAxis}
 
     def __init__(self, streamObj=None, *args, **keywords):
-        super(ScatterPitchSpaceQuarterLength, self).__init__(streamObj, *args, **keywords)
+        super().__init__(streamObj, *args, **keywords)
         self.axisX.useLogScale = True
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
@@ -453,7 +453,7 @@ class ScatterPitchClassQuarterLength(ScatterPitchSpaceQuarterLength):
                    'y': axis.PitchClassAxis}
 
     def __init__(self, streamObj=None, *args, **keywords):
-        super(ScatterPitchClassQuarterLength, self).__init__(streamObj, *args, **keywords)
+        super().__init__(streamObj, *args, **keywords)
         if 'title' not in keywords:
             self.title = 'Pitch Class by Quarter Length Scatter'
 
@@ -476,7 +476,7 @@ class ScatterPitchClassOffset(Scatter):
                    'y': axis.PitchClassAxis}
 
     def __init__(self, streamObj=None, *args, **keywords):
-        super(ScatterPitchClassOffset, self).__init__(streamObj, *args, **keywords)
+        super().__init__(streamObj, *args, **keywords)
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
@@ -508,7 +508,7 @@ class ScatterPitchSpaceDynamicSymbol(Scatter):
                    'y': axis.DynamicsAxis}
 
     def __init__(self, streamObj=None, *args, **keywords):
-        super(ScatterPitchSpaceDynamicSymbol, self).__init__(streamObj, *args, **keywords)
+        super().__init__(streamObj, *args, **keywords)
 
         self.axisX.showEnharmonic = False
         # need more space for pitch axis labels
@@ -617,7 +617,7 @@ class HistogramPitchSpace(Histogram):
     axesClasses = _mergeDicts(Histogram.axesClasses, {'x': axis.PitchSpaceAxis})
 
     def __init__(self, streamObj=None, *args, **keywords):
-        super(HistogramPitchSpace, self).__init__(streamObj, *args, **keywords)
+        super().__init__(streamObj, *args, **keywords)
         self.axisX.showEnharmonic = False
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
@@ -644,7 +644,7 @@ class HistogramPitchClass(Histogram):
     axesClasses = _mergeDicts(Histogram.axesClasses, {'x': axis.PitchClassAxis})
 
     def __init__(self, streamObj=None, *args, **keywords):
-        super(HistogramPitchClass, self).__init__(streamObj, *args, **keywords)
+        super().__init__(streamObj, *args, **keywords)
         self.axisX.showEnharmonic = False
         if 'title' not in keywords:
             self.title = 'Pitch Class Histogram'
@@ -670,7 +670,7 @@ class HistogramQuarterLength(Histogram):
     axesClasses = _mergeDicts(Histogram.axesClasses, {'x': axis.QuarterLengthAxis})
 
     def __init__(self, streamObj=None, *args, **keywords):
-        super(HistogramQuarterLength, self).__init__(streamObj, *args, **keywords)
+        super().__init__(streamObj, *args, **keywords)
         self.axisX = axis.QuarterLengthAxis(self, 'x')
         self.axisX.useLogScale = False
         if 'title' not in keywords:
@@ -713,7 +713,7 @@ class ScatterWeightedPitchSpaceQuarterLength(ScatterWeighted):
                                                             'y': axis.PitchSpaceAxis})
 
     def __init__(self, streamObj=None, *args, **keywords):
-        super(ScatterWeightedPitchSpaceQuarterLength, self).__init__(
+        super().__init__(
                                                 streamObj, *args, **keywords)
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
@@ -742,7 +742,7 @@ class ScatterWeightedPitchClassQuarterLength(ScatterWeighted):
                                                             'y': axis.PitchClassAxis})
 
     def __init__(self, streamObj=None, *args, **keywords):
-        super(ScatterWeightedPitchClassQuarterLength, self).__init__(
+        super().__init__(
                                                             streamObj, *args, **keywords)
 
         # need more space for pitch axis labels
@@ -775,7 +775,7 @@ class ScatterWeightedPitchSpaceDynamicSymbol(ScatterWeighted):
                                                             })
 
     def __init__(self, streamObj=None, *args, **keywords):
-        super(ScatterWeightedPitchSpaceDynamicSymbol, self).__init__(
+        super().__init__(
                                                 streamObj, *args, **keywords)
 
         self.axisX.showEnharmonic = False
@@ -928,7 +928,7 @@ class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
         Process method here overridden to provide legend.
         '''
         # call the process routine in the base graph
-        super(WindowedAnalysis, self).write(fp)
+        super().write(fp)
 
         if fp is None:
             fp = environLocal.getTempFile('.png')
@@ -1007,7 +1007,7 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
         '''
         Call any post data processing routines here and on any axes.
         '''
-        super(HorizontalBar, self).postProcessData()
+        super().postProcessData()
         self.axisY.setBoundariesFromData([d[1] for d in self.data])
         yTicks = self.axisY.ticks()
 
@@ -1053,7 +1053,7 @@ class HorizontalBarPitchClassOffset(HorizontalBar):
     axesClasses = _mergeDicts(HorizontalBar.axesClasses, {'y': axis.PitchClassAxis})
 
     def __init__(self, streamObj=None, *args, **keywords):
-        super(HorizontalBarPitchClassOffset, self).__init__(streamObj, *args, **keywords)
+        super().__init__(streamObj, *args, **keywords)
         self.axisY = axis.PitchClassAxis(self, 'y')
         self.axisY.hideUnused = False
 
@@ -1078,7 +1078,7 @@ class HorizontalBarPitchSpaceOffset(HorizontalBar):
         :width: 600
     '''
     def __init__(self, streamObj=None, *args, **keywords):
-        super(HorizontalBarPitchSpaceOffset, self).__init__(streamObj, *args, **keywords)
+        super().__init__(streamObj, *args, **keywords)
 
         if 'figureSize' not in keywords:
             self.figureSize = (10, 6)
@@ -1176,7 +1176,7 @@ class Dolan(HorizontalBarWeighted):
 
     '''
     def __init__(self, streamObj=None, *args, **keywords):
-        super(Dolan, self).__init__(streamObj, *args, **keywords)
+        super().__init__(streamObj, *args, **keywords)
 
         #self.fy = lambda n: n.pitch.pitchClass
         #self.fyTicks = self.ticksPitchClassUsage
@@ -1293,7 +1293,7 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
     axesClasses = _mergeDicts(Plot3DBars.axesClasses, {'y': axis.PitchSpaceAxis})
 
     def __init__(self, streamObj=None, *args, **keywords):
-        super(Plot3DBarsPitchSpaceQuarterLength, self).__init__(streamObj, *args, **keywords)
+        super().__init__(streamObj, *args, **keywords)
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
@@ -1361,7 +1361,7 @@ class Features(MultiStream):
         if labelList is None:
             labelList = []
 
-        super(Features, self).__init__(streamList, labelList, *args, **keywords)
+        super().__init__(streamList, labelList, *args, **keywords)
 
         self.featureExtractors = featureExtractors
 

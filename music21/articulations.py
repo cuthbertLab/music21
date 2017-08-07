@@ -230,7 +230,7 @@ class LengthArticulation(Articulation):
     Superclass for all articulations that change the length of a note.
     '''
     def __init__(self):
-        super(LengthArticulation, self).__init__()
+        super().__init__()
         self.tieAttach = 'last'
 
 class DynamicArticulation(Articulation):
@@ -256,7 +256,7 @@ class Accent(DynamicArticulation):
     >>> a = articulations.Accent()
     '''
     def __init__(self):
-        super(Accent, self).__init__()
+        super().__init__()
         self._volumeShift = 0.1
 
 
@@ -273,7 +273,7 @@ class StrongAccent(Accent):
     'down'
     '''
     def __init__(self):
-        super(StrongAccent, self).__init__()
+        super().__init__()
         self._volumeShift = 0.15
         self.pointDirection = 'up'
 
@@ -283,7 +283,7 @@ class Staccato(LengthArticulation):
     >>> a = articulations.Staccato()
     '''
     def __init__(self):
-        super(Staccato, self).__init__()
+        super().__init__()
         self._volumeShift = 0.05
         self.lengthShift = 0.7
 
@@ -295,7 +295,7 @@ class Staccatissimo(Staccato):
     >>> a = articulations.Staccatissimo()
     '''
     def __init__(self):
-        super(Staccatissimo, self).__init__()
+        super().__init__()
         self._volumeShift = 0.05
         self.lengthShift = 0.5
 
@@ -315,7 +315,7 @@ class Tenuto(LengthArticulation):
     >>> a = articulations.Tenuto()
     '''
     def __init__(self):
-        super(Tenuto, self).__init__()
+        super().__init__()
         self._volumeShift = -0.05 # is this the right thing to do?
         self.lengthShift = 1.1
 
@@ -324,7 +324,7 @@ class DetachedLegato(LengthArticulation):
     >>> a = articulations.DetachedLegato()
     '''
     def __init__(self):
-        super(DetachedLegato, self).__init__()
+        super().__init__()
         self.lengthShift = 0.9
 
 #---------- indeterminant slides
@@ -362,7 +362,7 @@ class Doit(IndeterminantSlide):
     >>> a = articulations.Doit()
     '''
     def __init__(self):
-        super(Doit, self).__init__()
+        super().__init__()
         self.tieAttach = 'last'
 
 class Falloff(IndeterminantSlide):
@@ -372,7 +372,7 @@ class Falloff(IndeterminantSlide):
     >>> a = articulations.Falloff()
     '''
     def __init__(self):
-        super(Falloff, self).__init__()
+        super().__init__()
         self.tieAttach = 'last'
 
 #---------- end indeterminant slide
@@ -386,7 +386,7 @@ class BreathMark(LengthArticulation):
     >>> a.symbol = 'comma'
     '''
     def __init__(self):
-        super(BreathMark, self).__init__()
+        super().__init__()
         self.lengthShift = 0.7
         self.symbol = None
 
@@ -401,7 +401,7 @@ class Stress(DynamicArticulation, LengthArticulation):
     >>> a = articulations.Stress()
     '''
     def __init__(self):
-        super(Stress, self).__init__()
+        super().__init__()
         self._volumeShift = 0.05
         self.lengthShift = 1.1
 
@@ -411,7 +411,7 @@ class Unstress(DynamicArticulation):
     >>> a = articulations.Unstress()
     '''
     def __init__(self):
-        super(Unstress, self).__init__()
+        super().__init__()
         self._volumeShift = -0.05
 
 
@@ -459,7 +459,7 @@ class Fingering(TechnicalIndication):
     >>> f.alternate = True
     '''
     def __init__(self, fingerNumber=None):
-        super(Fingering, self).__init__()
+        super().__init__()
         self.fingerNumber = fingerNumber
         self.substitution = False
         self.alternate = False
@@ -494,7 +494,7 @@ class StringHarmonic(Bowing, Harmonic):
     >>> h.pitchType = 'base'
     '''
     def __init__(self):
-        super(StringHarmonic, self).__init__()
+        super().__init__()
         self.harmonicType = 'natural'
         self.pitchType = None
         
@@ -591,7 +591,7 @@ class OrganIndication(TechnicalIndication):
     indicates whether the mark is a substitution mark
     '''
     def __init__(self):
-        super(OrganIndication, self).__init__()
+        super().__init__()
         self.substitution = False
     
 

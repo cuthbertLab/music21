@@ -141,7 +141,7 @@ class Lyric(style.StyleMixin):
     ### INITIALIZER ###
 
     def __init__(self, text=None, number=1, **kwargs):
-        super(Lyric, self).__init__()
+        super().__init__()
         self._identifier = None
         self._number = None
 
@@ -374,7 +374,7 @@ class GeneralNote(base.Music21Object):
         else:
             tempDuration = keywords['duration']
         # this sets the stored duration defined in Music21Object
-        super(GeneralNote, self).__init__(duration=tempDuration)
+        super().__init__(duration=tempDuration)
 
         self.lyrics = [] # a list of lyric objects
         self.expressions = []
@@ -729,7 +729,7 @@ class NotRest(GeneralNote):
             information about the beaming of this note.''',
     }
     def __init__(self, *arguments, **keywords):
-        super(NotRest, self).__init__(**keywords)
+        super().__init__(**keywords)
         self._notehead = 'normal'
         self._noteheadFill = None
         self._noteheadParenthesis = False
@@ -759,7 +759,7 @@ class NotRest(GeneralNote):
         True
         '''
         #environLocal.printDebug(['calling NotRest.__deepcopy__', self])
-        new = super(NotRest, self).__deepcopy__(memo=memo)
+        new = super().__deepcopy__(memo=memo)
         # after copying, if a Volume exists, it is linked to the old object
         # look at _volume so as not to create object if not already there
         if self._volume is not None:
@@ -767,13 +767,13 @@ class NotRest(GeneralNote):
         return new
 
     def __getstate__(self):
-        state = super(NotRest, self).__getstate__()
+        state = super().__getstate__()
         if '_volume' in state and state['_volume'] is not None:
             state['_volume'].client = None
         return state
 
     def __setstate__(self, state):
-        super(NotRest, self).__setstate__(state)
+        super().__setstate__(state)
         if self._volume is not None:
             self._volume.client = self
     ####
@@ -1052,7 +1052,7 @@ class Note(NotRest):
 
     # Accepts an argument for pitch
     def __init__(self, *arguments, **keywords):
-        super(Note, self).__init__(**keywords)
+        super().__init__(**keywords)
         if arguments:
             if isinstance(arguments[0], pitch.Pitch):
                 self.pitch = arguments[0]
@@ -1581,7 +1581,7 @@ class Unpitched(NotRest):
     isRest = False
 
     def __init__(self):
-        super(Unpitched, self).__init__()
+        super().__init__()
         self.displayStep = "C"
         self.displayOctave = 4
         self._storedInstrument = None
@@ -1667,7 +1667,7 @@ class Rest(GeneralNote):
     }
 
     def __init__(self, *arguments, **keywords):
-        super(Rest, self).__init__(**keywords)
+        super().__init__(**keywords)
         self.stepShift = 0 # display line
         self.fullMeasure = "auto" # see docs; True, False, 'always',
 
@@ -1741,7 +1741,7 @@ class SpacerRest(Rest):
     <music21.note.SpacerRest rest duration=4.0>
     '''
     def __init__(self, *arguments, **keywords):
-        super(SpacerRest, self).__init__(**keywords)
+        super().__init__(**keywords)
 
     def __repr__(self):
         return "<music21.note.SpacerRest %s duration=%s>" % (

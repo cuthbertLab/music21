@@ -457,7 +457,7 @@ class ConverterBraille(SubConverter):
 
     def show(self, obj, fmt, app=None, subformats=None, **keywords): # pragma: no cover
         if not common.runningUnderIPython():
-            super(ConverterBraille, self).show(obj, fmt, app=None, subformats=None, **keywords)
+            super().show(obj, fmt, app=None, subformats=None, **keywords)
         else:
             from music21 import braille
             dataStr = braille.translate.objectToBraille(obj)

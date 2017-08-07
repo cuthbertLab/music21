@@ -405,7 +405,7 @@ class MetronomeMark(TempoIndication):
 #     90
 
     def __init__(self, text=None, number=None, referent=None, parentheses=False):
-        super(MetronomeMark, self).__init__()
+        super().__init__()
 
         self._number = number # may be None
         self.numberImplicit = None
