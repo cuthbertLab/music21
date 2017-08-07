@@ -279,7 +279,7 @@ class ScoreReduction:
                         }
         m = infoDict['measure']
 
-        if not n.hasLyrics():
+        if not n.lyrics:
             return
 
         removalIndices = []

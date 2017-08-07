@@ -1902,7 +1902,7 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD=None, printUpdates=F
     return newStream
 
 #------------------------------------------------------------
-def setBarlineStyle(score, newStyle, oldStyle='regular', inPlace=True):
+def setBarlineStyle(score, newStyle, oldStyle='regular', inPlace=False):
     '''
     Converts any right barlines in the previous style (oldStyle; default = 'regular')
     to have the newStyle (such as 'tick', 'none', etc., see bar.py).
@@ -1964,13 +1964,13 @@ def scaleDurations(score, scalingNum=1, inPlace=False, scaleUnlinked=True):
         p.makeBeams(inPlace=True)
     return score
 
-def transferTies(score, inPlace=True):
+def transferTies(score, inPlace=False):
     '''
     transfer the duration of tied notes (if possible) to the first note and
     fill the remaining places
     with invisible rests:
 
-    returns the new Score object
+    returns the new Score object if inPlace is False.
     '''
     if inPlace is False:
         score = copy.deepcopy(score)
@@ -2008,7 +2008,8 @@ def transferTies(score, inPlace=True):
                         tiedEl.hideObjectOnPrint = True
             tiedNotes = []
 
-    return score
+    if inPlace is False:
+        return score
 
 def convertHouseStyle(score, durationScale=2, barlineStyle='tick',
                       tieTransfer=True, inPlace=False):
@@ -2113,7 +2114,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
     def xtestBarlineConvert(self):
         from music21 import corpus
         testPiece = corpus.parse('luca/gloria')
-        setBarlineStyle(testPiece, 'tick')
+        setBarlineStyle(testPiece, 'tick', inPlace=True)
         testPiece.show()
 
     def xtestScaling(self):
@@ -2125,7 +2126,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
     def xtestTransferTies(self):
         from music21 import corpus
         testPiece = corpus.parse('luca/gloria')
-        transferTies(testPiece)
+        transferTies(testPiece, inPlace=True)
         testPiece.show()
 
     def xtestUnlinked(self):

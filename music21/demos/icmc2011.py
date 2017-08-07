@@ -304,10 +304,10 @@ class Test(unittest.TestCase):
                 nNext = exFlatNotes[i + 1]
             else: continue
 
-            if n.hasLyrics():
+            if n.lyrics:
                 nStart = n
             # if next is a begin, then this is an end
-            elif nStart is not None and nNext.hasLyrics() and n.tie is None:
+            elif nStart is not None and nNext.lyrics and n.tie is None:
                 nEnd = n
             elif nNext is nLast:
                 nEnd = n

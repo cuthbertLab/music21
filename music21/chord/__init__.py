@@ -500,7 +500,7 @@ class Chord(note.NotRest):
                 lowest = interval.getWrittenLowerNote(lowest, thisPitch)
         return lowest
 
-    def _removePitchByRedundantAttribute(self, attribute, inPlace):
+    def _removePitchByRedundantAttribute(self, attribute, *, inPlace=False):
         '''
         Common method for stripping pitches based on redundancy of one pitch
         attribute. The `attribute` is provided by a string.
@@ -2920,7 +2920,8 @@ class Chord(note.NotRest):
 
         >>> c3.pitches[0] is p2
         False
-
+        
+        TODO: inPlace will become False in v. 6
         '''
         return self._removePitchByRedundantAttribute('nameWithOctave',
                                                      inPlace=inPlace)
@@ -2943,6 +2944,7 @@ class Chord(note.NotRest):
         >>> c2.pitches
         (<music21.pitch.Pitch C5>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G4>)
 
+        TODO: inPlace will become False in v. 6
         '''
         return self._removePitchByRedundantAttribute('pitchClass',
               inPlace=inPlace)
@@ -2966,6 +2968,8 @@ class Chord(note.NotRest):
         <music21.chord.Chord C5 E3 G4 F-4>
         >>> rem
         [<music21.pitch.Pitch C2>, <music21.pitch.Pitch E3>]
+        
+        TODO: inPlace will become False in v. 6        
         '''
         return self._removePitchByRedundantAttribute('name',
               inPlace=inPlace)
@@ -3526,7 +3530,7 @@ class Chord(note.NotRest):
         if not match:
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
 
-    def simplifyEnharmonics(self, inPlace=False):
+    def simplifyEnharmonics(self, *, inPlace=False):
         '''
         Calls `pitch.simplifyMultipleEnharmonics` on the pitches of the chord.
 
@@ -3553,7 +3557,7 @@ class Chord(note.NotRest):
         if inPlace is False:
             return returnObj
 
-    def sortAscending(self, inPlace=False):
+    def sortAscending(self, *, inPlace=False):
         return self.sortDiatonicAscending(inPlace=inPlace)
 
     def sortChromaticAscending(self):
@@ -3565,7 +3569,7 @@ class Chord(note.NotRest):
         newChord._notes.sort(key=lambda x: x.pitch.ps)
         return newChord
 
-    def sortDiatonicAscending(self, inPlace=False):
+    def sortDiatonicAscending(self, *, inPlace=False):
         '''
         The notes are sorted by Scale degree and then by Offset (so F## sorts below G-).
         Notes that are the identical pitch retain their order
@@ -3601,7 +3605,7 @@ class Chord(note.NotRest):
         newChord._notes.sort(key=lambda x: x.pitch.frequency)
         return newChord
 
-    def transpose(self, value, inPlace=False):
+    def transpose(self, value, *, inPlace=False):
         '''Transpose the Note by the user-provided value. If the value
         is an integer, the transposition is treated in half steps and
         enharmonics might be simplified (not done yet). If the value is a

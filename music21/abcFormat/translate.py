@@ -450,7 +450,7 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
         opus.append(abcToStreamScore(abcHandler))
     return opus
 
-def reBar(music21Part, inPlace=True):
+def reBar(music21Part, *, inPlace=False):
     """
     Re-bar overflow measures using the last known time signature.
 
@@ -501,6 +501,8 @@ def reBar(music21Part, inPlace=True):
     >>> music21Part2.measure(2).show("text")
     {0.0} <music21.meter.TimeSignature 1/8>
     {0.0} <music21.note.Note E>
+    
+    Changed in v.5: inPlace is False by default, and a keyword only argument.
     """
     if not inPlace:
         music21Part = copy.deepcopy(music21Part)

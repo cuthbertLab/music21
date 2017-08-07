@@ -4106,22 +4106,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # this will change the working Stream; not sure if a problem
         try:
-            boundaries = returnObj.extendDurationAndGetBoundaries('Instrument',
-                            inPlace=True)
+            boundaries = returnObj.extendDurationAndGetBoundaries('Instrument')
         except StreamException:
             return returnObj  # there are no instruments in the Stream.
-
-#         returnObj.extendDuration('Instrument', inPlace=True)
-#         insts = returnObj.getElementsByClass('Instrument')
-#
-#         boundaries = {}
-#         if len(insts) == 0:
-#             raise StreamException('no Instruments defined in this Stream')
-#         else:
-#             for i in insts:
-#                 start = i.getOffsetBySite(returnObj)
-#                 end = start + i.duration.quarterLength
-#                 boundaries[(start, end)] = i
 
         # store class filter list for transposition
         if transposeKeySignature:
@@ -4145,7 +4132,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             #print(k, i.transposition)
         return returnObj
 
-    def toSoundingPitch(self, inPlace=False):
+    def toSoundingPitch(self, *, inPlace=False):
         '''
         If not at sounding pitch, transpose all Pitch
         elements to sounding pitch. The atSoundingPitch property
@@ -4153,7 +4140,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Affected by the presence of Instruments and by Ottava spanners
 
-        v2.0.10 changes -- inPlace is False
+        v2.0.10 changes -- inPlace is False; v. 5 returns None if inPlace=True
 
         >>> sc = stream.Score()
         >>> p = stream.Part(id='barisax')
@@ -4208,15 +4195,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for ottava in returnObj.recurse().getElementsByClass('Ottava'):
             ottava.performTransposition()
         
-        return returnObj # the Stream or None
+        if not inPlace:
+            return returnObj # the Stream or None
 
-    def toWrittenPitch(self, inPlace=False):
+    def toWrittenPitch(self, *, inPlace=False):
         '''
         If not at written pitch, transpose all Pitch elements to
         written pitch. The atSoundingPitch property is used to
         determine if transposition is necessary.
 
-        music21 v.3 changes -- inPlace=False
+        music21 v.3 changes -- inPlace=False, v. 5 -- returns None if inPlace=True
 
         >>> sc = stream.Score()
         >>> p = stream.Part(id='barisax')
@@ -4249,7 +4237,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # call on each part
                 partLike.toWrittenPitch(inPlace=True)
             returnObj.atSoundingPitch = False
-            return returnObj
+            if inPlace:
+                return None:
+            else:
+                return returnObj
 
         # else...
         atSoundingPitch = self.atSoundingPitch
@@ -4274,7 +4265,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return returnObj
 
     #---------------------------------------------------------------------------
-    def getTimeSignatures(self,
+    def getTimeSignatures(self, *,
                           searchContext=True,
                           returnDefault=True,
                           sortByCreationTime=True):
@@ -4479,7 +4470,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             pass
         return post
 
-    def invertDiatonic(self, inversionNote=note.Note('C4'), inPlace=True):
+    def invertDiatonic(self, inversionNote=note.Note('C4'), *, inPlace=False):
         '''
         inverts a stream diatonically around the given note (by default, middle C)
 
@@ -4492,6 +4483,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         into 3 flats (instead of its original 1 flat) in measure 1, but
         into 5 sharps in measure 2 and then invert around F4, creating
         a new piece.
+        
+        Changed in v. 5 -- inPlace is False by default.
 
 
         >>> qj = corpus.parse('ciconia/quod_jactatur').parts[0].measures(1, 2)
@@ -4511,11 +4504,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             {0.5} <music21.note.Note D>
             {1.0} <music21.note.Note C>
             {1.5} <music21.note.Note D>
+            
         >>> qjflat = qj.flat
         >>> k1 = qjflat.getElementsByClass(key.KeySignature)[0]
         >>> k3flats = key.KeySignature(-3)
         >>> qjflat.replace(k1, k3flats, allDerived=True)
         >>> qj.getElementsByClass(stream.Measure)[1].insert(0, key.KeySignature(5))
+        
         >>> qj2 = qj.invertDiatonic(note.Note('F4'), inPlace=False)
         >>> qj2.show('text')
         {0.0} <music21.instrument.Instrument P1: MusicXML Part: Grand Piano>
@@ -4566,7 +4561,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #                n.pitch.accidental.displayStatus = None
 ##            n.pitch.accidental = n.getContextByClass(key.KeySignature
 #                                                            ).accidentalByStep(n.pitch.step)
-        return returnStream
+        if not inPlace:
+            return returnStream
 
 
 
@@ -5630,7 +5626,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             displayTiedAccidentals=displayTiedAccidentals,
             )
 
-    def makeBeams(self, inPlace=False):
+    def makeBeams(self, *, inPlace=False):
         '''
         Return a new Stream, or modify the Stream in place, with beams applied to all
         notes.
@@ -5913,7 +5909,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         return returnStream
 
-    def extendDuration(self, objName, inPlace=True):
+    def extendDuration(self, objName, *, inPlace=False):
         '''
         Given a Stream and an object class name, go through the Stream
         and find each instance of the desired object. The time between
@@ -5939,7 +5935,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(stream1)
         6
 
-        >>> stream2 = stream1.flat.extendDuration(note.GeneralNote)
+        >>> stream2 = stream1.flat.extendDuration(note.GeneralNote, inPlace=False)
         >>> len(stream2)
         6
         >>> stream2[0].duration.quarterLength
@@ -5958,11 +5954,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         41.0
         >>> stream2[-1].offset
         40.0
-
-
-
-        TODO: extendDuration inPlace should be False by default
-        TODO: if inPlace is True, return None
         '''
 
         if not inPlace: # make a copy
@@ -5986,11 +5977,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             elements[-1].duration.quarterLength = (qLenTotal -
                         self.elementOffset(elements[-1]))
             #print(elements[-1], elements[-1].duration)
-        return returnObj
+        if not inPlace:
+            return returnObj
 
 
-    def extendDurationAndGetBoundaries(self, objName, inPlace=True):
-        '''Extend the Duration of elements specified by objName;
+    def extendDurationAndGetBoundaries(self, objName):
+        '''
+        DEPRECATED v.5 -- to be removed in v.6
+        
+        Extend the Duration of elements specified by objName;
         then, collect a dictionary for every matched element of objName class,
         where the matched element is the value and the key is the (start, end) offset value.
 
@@ -6005,7 +6000,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
          (12.0, 12.0): <music21.dynamics.Dynamic ff >}
 
 
-        TODO: only allow inPlace = True or delete or something, can't return two different things
+        TODO: only allow inPlace=True or delete or something, can't return two different things
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
@@ -7796,8 +7791,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return None
 
 
-    def scaleOffsets(self, amountToScale, anchorZero='lowest',
-            anchorZeroRecurse=None, inPlace=True):
+    def scaleOffsets(self, amountToScale, *, anchorZero='lowest',
+                     anchorZeroRecurse=None, inPlace=False):
         '''
         Scale all offsets by a multiplication factor given
         in `amountToScale`. Durations are not altered.
@@ -7826,9 +7821,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         To shift all the elements in a Stream, see the
         :meth:`~music21.stream.Stream.shiftElements` method.
-
-        TODO: inPlace by default should be False
-        TODO: if inPlace is True, return None
+        
+        Changed in v.5 -- inPlace is default False, and anchorZero, anchorZeroRecurse
+        and inPlace are keyword only arguments.
         '''
         # if we have offsets at 0, 2, 4
         # we scale by 2, getting offsets at 0, 4, 8
@@ -7876,13 +7871,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 e.scaleOffsets(amountToScale,
                                anchorZero=anchorZeroRecurse,
                                anchorZeroRecurse=anchorZeroRecurse,
-                inPlace=True)
+                               inPlace=True)
 
         returnObj.coreElementsChanged()
-        return returnObj
+        if not inPlace:
+            return returnObj
 
 
-    def scaleDurations(self, amountToScale, inPlace=False):
+    def scaleDurations(self, amountToScale, *, inPlace=False):
         '''
         Scale all durations by a provided scalar. Offsets are not modified.
 
@@ -7911,7 +7907,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return returnObj
 
 
-    def augmentOrDiminish(self, amountToScale, inPlace=False):
+    def augmentOrDiminish(self, amountToScale, *, inPlace=False):
         '''
         Given a number greater than zero,
         multiplies the current quarterLength of the
@@ -8168,7 +8164,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     #---------------------------------------------------------------------------
     # slicing and recasting a note as many notes
 
-    def sliceByQuarterLengths(self, quarterLengthList, target=None,
+    def sliceByQuarterLengths(self, quarterLengthList, *, target=None,
         addTies=True, inPlace=False):
         '''
         Slice all :class:`~music21.duration.Duration` objects on all Notes and Rests
@@ -8181,7 +8177,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         If `target` is None, the entire Stream is processed. Otherwise, only the element
         specified is manipulated.
 
-        TODO: return None if inPlace = True
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
@@ -8248,15 +8243,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 oInsert = opFrac(oInsert + eNew.quarterLength)
 
         returnObj.coreElementsChanged()
-        return returnObj
+        
+        if not inPlace:
+            return returnObj
 
 
-    def sliceByGreatestDivisor(self, addTies=True, inPlace=False):
+    def sliceByGreatestDivisor(self, *, addTies=True, inPlace=False):
         '''
         Slice all :class:`~music21.duration.Duration` objects on all Notes and Rests of this Stream.
         Duration are sliced according to the approximate GCD found in all durations.
-
-        TODO: return None if inPlace is True
         '''
         # when operating on a Stream, this should take all durations found
         # and use the approximateGCD to get a min duration; then, call sliceByQuarterLengths
@@ -8288,8 +8283,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             target=None, addTies=addTies, inPlace=True)
 
         returnObj.coreElementsChanged()
-        return returnObj
-
+        if not inPlace:
+            return returnObj
 
     def sliceAtOffsets(self,
                        offsetList,
@@ -9870,7 +9865,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         return self.voicesToParts()
 
-    def flattenUnnecessaryVoices(self, force=False, inPlace=True):
+    def flattenUnnecessaryVoices(self, force=False, *, inPlace=False):
         '''
         If this Stream defines one or more internal voices, do the following:
 
@@ -9881,7 +9876,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         * If `force` is True, even if there is more than one Voice left,
           all voices will be flattened.
 
-        TODO: by default inPlace should be False
+        Changed in v. 5 -- inPlace is default False and a keyword only arg.
         '''
         if not self.voices:
             return None # do not make copy; return immediately
@@ -10081,7 +10076,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     #---- Variant Activation Methods
 
-    def activateVariants(self, group=None, matchBySpan=True, inPlace=False):
+    def activateVariants(self, group=None, *, matchBySpan=True, inPlace=False):
         '''
         For any :class:`~music21.variant.Variant` objects defined in this Stream
         (or selected by matching the `group` parameter),
@@ -11038,7 +11033,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         m.number = m.number + shift
             previousBoundary = k
 
-    def showVariantAsOssialikePart(self, containedPart, variantGroups, inPlace=False):
+    def showVariantAsOssialikePart(self, containedPart, variantGroups, *, inPlace=False):
         '''
         Takes a part within the score and a list of variant groups within that part.
         Puts the variant object
@@ -12653,7 +12648,7 @@ class Score(Stream):
 
 # this was commented out as it is not immediately needed
 # could be useful later in a variety of contexts
-#     def mergeStaticNotes(self, attributesList=['pitch'], inPlace=False):
+#     def mergeStaticNotes(self, attributesList=('pitch',), *, inPlace=False):
 #         '''
 #         Given a multipart work, look to see if the next verticality causes
 #         a change in one or more attributes, as specified by the `attributesList`

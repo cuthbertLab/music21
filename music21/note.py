@@ -389,27 +389,22 @@ class GeneralNote(base.Music21Object):
 
     #---------------------------------------------------------------------------
     def _getLyric(self):
-        '''
-        returns the first Lyric's text
-
-        TODO: should return a \\n separated string of lyrics.  See text.assembleAllLyrics
-        '''
-        if self.lyrics:
-            return self.lyrics[0].text
-        else:
+        if not self.lyrics:
             return None
+        
+        allText = [l.text for l in self.lyrics]
+        return '\n'.join(allText)
 
     def _setLyric(self, value):
-        '''
-        presently only creates one lyric, and destroys any existing
-        lyrics
-        '''
         self.lyrics = []
-        if value is not None and value is not False:
-            self.lyrics.append(Lyric(value))
+        if value in (None, False):
+            return
+        values = value.split('\n')
+        for i, v in enumerate(values):    
+            self.lyrics.append(Lyric(v, number=i + 1))
 
     lyric = property(_getLyric, _setLyric,
-        doc = '''
+        doc = r'''
         The lyric property can
         be used to get and set a lyric for this
         Note, Chord, or Rest. This is a simplified version of the more general
@@ -431,14 +426,18 @@ class GeneralNote(base.Music21Object):
         >>> a.lyrics
         []
 
-        TODO: should check data here
-        should split \\n separated lyrics into different lyrics
+        Set multiple lyrics with \n separated text:
+        
+        >>> a.lyric = '1. Hi\n2. Bye'
+        >>> a.lyric
+        '1. Hi\n2. Bye'
+        >>> a.lyrics
+        [<music21.note.Lyric number=1 syllabic=single text="1. Hi">,
+         <music21.note.Lyric number=2 syllabic=single text="2. Bye">]
 
-        presently only creates one lyric, and destroys any existing
-        lyrics
         ''')
 
-    def addLyric(self, text, lyricNumber=None, applyRaw=False, lyricIdentifier=None):
+    def addLyric(self, text, lyricNumber=None, *, applyRaw=False, lyricIdentifier=None):
         '''
         Adds a lyric, or an additional lyric, to a Note, Chord, or Rest's lyric list.
         If `lyricNumber` is not None, a specific line of lyric text can be set. The lyricIdentifier
@@ -451,22 +450,19 @@ class GeneralNote(base.Music21Object):
         >>> n1.lyrics[0].number
         1
 
-
         An added option gives the lyric number, not the list position
-
 
         >>> n1.addLyric("bye", 3)
         >>> n1.lyrics[1].text
         'bye'
         >>> n1.lyrics[1].number
         3
-        >>> for lyr in n1.lyrics: print(lyr.text)
+        >>> for lyr in n1.lyrics: 
+        ...     print(lyr.text)
         hello
         bye
 
-
         Replace an existing lyric by specifying the same number:
-
 
         >>> n1.addLyric("ciao", 3)
         >>> n1.lyrics[1].text
@@ -474,10 +470,8 @@ class GeneralNote(base.Music21Object):
         >>> n1.lyrics[1].number
         3
 
-
         Giving a lyric with a hyphen at either end will set whether it
         is part of a multisyllable word:
-
 
         >>> n1.addLyric("good-")
         >>> n1.lyrics[2].text
@@ -485,17 +479,13 @@ class GeneralNote(base.Music21Object):
         >>> n1.lyrics[2].syllabic
         'begin'
 
+        This feature can be overridden by specifying the keyword only argument "applyRaw = True":
 
-        This feature can be overridden by specifying "applyRaw = True":
-
-
-        >>> n1.addLyric("-5", applyRaw = True)
+        >>> n1.addLyric("-5", applyRaw=True)
         >>> n1.lyrics[3].text
         '-5'
         >>> n1.lyrics[3].syllabic
         'single'
-
-
         '''
         if not isinstance(text, str):
             text = str(text)
@@ -514,11 +504,11 @@ class GeneralNote(base.Music21Object):
                 self.lyrics.append(Lyric(text, lyricNumber,
                                          applyRaw=applyRaw, identifier=lyricIdentifier))
 
-    def insertLyric(self, text, index=0, applyRaw=False, identifier=None):
-        '''Inserts a lyric into the Note, Chord, or Rest's lyric list in front of
+    def insertLyric(self, text, index=0, *, applyRaw=False, identifier=None):
+        '''
+        Inserts a lyric into the Note, Chord, or Rest's lyric list in front of
         the index specified (0 by default), using index + 1 as the inserted lyric's
         line number. shifts line numbers of all following lyrics in list
-
 
         >>> n1 = note.Note()
         >>> n1.addLyric("second")
@@ -547,7 +537,6 @@ class GeneralNote(base.Music21Object):
          <music21.note.Lyric number=2 syllabic=single text="newSecond">, 
          <music21.note.Lyric number=3 syllabic=single text="second">, 
          <music21.note.Lyric number=4 syllabic=single text="0">]
-
         '''
         if not isinstance(text, str):
             text = str(text)
@@ -556,6 +545,7 @@ class GeneralNote(base.Music21Object):
         self.lyrics.insert(index, Lyric(text, (index + 1),
                                         applyRaw=applyRaw, identifier=identifier))
 
+    @common.deprecated('August 2017 v5', 'September 2018 v6', 'use "if n.lyrics" instead.')
     def hasLyrics(self):
         '''
         Return True if this object has any lyrics defined
@@ -572,20 +562,17 @@ class GeneralNote(base.Music21Object):
     # properties common to Notes, Rests,
 
     #---------------------------------------------------------------------------
-    def augmentOrDiminish(self, scalar, inPlace=True):
+    def augmentOrDiminish(self, scalar, *, inPlace=False):
         '''
         Given a scalar greater than zero, return a Note with a scaled Duration.
         If `inPlace` is True, this is done in-place and the method returns None.
-        If `inPlace` is False, this returns a modified deepcopy.
+        If `inPlace` is False [default], this returns a modified deepcopy.
 
-        TODO: make inPlace=False as with all other tests...
-        
-        Note: inPlace will be False as of version 5.
+        Changed -- inPlace is now False as of version 5.
 
-
-        >>> n = note.Note('g#', inPlace=True)
+        >>> n = note.Note('g#')
         >>> n.quarterLength = 3
-        >>> n.augmentOrDiminish(2)
+        >>> n.augmentOrDiminish(2, inPlace=True)
         >>> n.quarterLength
         6.0
 

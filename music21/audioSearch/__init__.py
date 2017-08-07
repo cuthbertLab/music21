@@ -516,6 +516,8 @@ def smoothFrequencies(detectedPitchesFreq, smoothLevels=7, inPlace=True):
     [409, 409, 409, 428, 435, 438, 442, 444, 441, 441, 441,
      441, 434, 433, 432, 431, 437, 438, 439, 440, 440, 440,
      440, 440, 440, 441, 441, 441, 441, 441, 441, 441]
+
+    TODO: rename inPlace because that's not really what it does...
     '''
     dpf = detectedPitchesFreq
     if inPlace:

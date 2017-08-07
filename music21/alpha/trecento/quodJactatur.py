@@ -121,7 +121,7 @@ def reverse(self, inPlace=False,
     else:
         return returnObj
 
-def prependBlankMeasures(myStream, measuresToAppend=1, inPlace=True):
+def prependBlankMeasures(myStream, measuresToAppend=1, inPlace=False):
     '''
     adds one (default) or more blank measures (filled with
     rests) to be beginning of myStream
@@ -135,7 +135,7 @@ def prependBlankMeasures(myStream, measuresToAppend=1, inPlace=True):
     <music21.note.Note C>
     >>> len(qj.getElementsByClass(stream.Measure))
     35
-    >>> qj2 = quodJactatur.prependBlankMeasures(qj, 10, inPlace = False)
+    >>> qj2 = quodJactatur.prependBlankMeasures(qj, 10, inPlace=False)
     >>> qj2.duration.quarterLength
     90.0
     >>> qj2.flat.notesAndRests[0]
