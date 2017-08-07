@@ -216,7 +216,7 @@ class Dynamic(base.Music21Object):
 
 
     def __init__(self, value=None):
-        base.Music21Object.__init__(self)
+        super().__init__()
 
         # the scalar is used to calculate the final output of a note
         # under this dynamic. if this property is set, it will override

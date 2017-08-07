@@ -73,7 +73,7 @@ LINE_WIDTH = 78
 #     or opening in a webbrowser.
 #     '''
 #     def __init__ (self, prompt, timeOutTime):
-#         threading.Thread.__init__(self)
+#         super().__init__()
 #         self.status = None
 #
 #     def run(self):
@@ -1568,7 +1568,7 @@ class ConfigurationAssistant:
 
 # class Prompt(threading.Thread):
 #     def __init__ (self, prompt, timeOutTime):
-#         threading.Thread.__init__(self)
+#         super().__init__()
 #         self.status = None
 #         self.timeLeft = timeOutTime
 #         self.prompt = prompt

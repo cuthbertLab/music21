@@ -918,7 +918,7 @@ class MeterSequence(MeterTerminal):
     ### INITIALIZER ###
 
     def __init__(self, value=None, partitionRequest=None):
-        MeterTerminal.__init__(self)
+        super().__init__()
 
         self._numerator = None # rationalized
         self._denominator = None # lowest common multiple
@@ -2876,7 +2876,7 @@ class TimeSignature(base.Music21Object):
         }
 
     def __init__(self, value=None, partitionRequest=None):
-        base.Music21Object.__init__(self)
+        super().__init__()
 
         if value is None:
             value = '{0}/{1}'.format(defaults.meterNumerator, defaults.meterDenominatorBeatType)

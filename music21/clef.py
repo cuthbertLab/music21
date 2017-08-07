@@ -287,7 +287,7 @@ class FrenchViolinClef(GClef):
     1
     '''
     def __init__(self):
-        GClef.__init__(self)
+        super().__init__()
         self.line = 1
         self.lowestLine = (7 * 4) + 5
 
@@ -321,7 +321,7 @@ class Treble8vbClef(TrebleClef):
     -1
     '''
     def __init__(self):
-        TrebleClef.__init__(self)
+        super().__init__()
         self.octaveChange = -1
         self.lowestLine = (7 * 3) + 3
 
@@ -336,7 +336,7 @@ class Treble8vaClef(TrebleClef):
     1
     '''
     def __init__(self):
-        TrebleClef.__init__(self)
+        super().__init__()
         self.octaveChange = 1
         self.lowestLine = (7 * 3) + 3
 
@@ -352,7 +352,7 @@ class GSopranoClef(GClef):
     3
     '''
     def __init__(self):
-        GClef.__init__(self)
+        super().__init__()
         self.line = 3
         self.lowestLine = (7 * 4) + 1
 
@@ -366,7 +366,7 @@ class CClef(PitchClef):
     'C'
     '''
     def __init__(self):
-        PitchClef.__init__(self)
+        super().__init__()
         self.sign = "C"
 
 class SopranoClef(CClef):
@@ -381,7 +381,7 @@ class SopranoClef(CClef):
     1
     '''
     def __init__(self):
-        CClef.__init__(self)
+        super().__init__()
         self.line = 1
         self.lowestLine = (7 * 4) + 1
 
@@ -397,7 +397,7 @@ class MezzoSopranoClef(CClef):
     2
     '''
     def __init__(self):
-        CClef.__init__(self)
+        super().__init__()
         self.line = 2
         self.lowestLine = (7 * 3) + 6
 
@@ -412,7 +412,7 @@ class AltoClef(CClef):
     3
     '''
     def __init__(self):
-        CClef.__init__(self)
+        super().__init__()
         self.line = 3
         self.lowestLine = (7 * 3) + 4
 
@@ -429,7 +429,7 @@ class TenorClef(CClef):
 
     '''
     def __init__(self):
-        CClef.__init__(self)
+        super().__init__()
         self.line = 4
         self.lowestLine = (7 * 3) + 2
 
@@ -444,7 +444,7 @@ class CBaritoneClef(CClef):
     5
     '''
     def __init__(self):
-        CClef.__init__(self)
+        super().__init__()
         self.line = 5
         self.lowestLine = (7 * 2) + 7
 
@@ -459,7 +459,7 @@ class FClef(PitchClef):
     'F'
     '''
     def __init__(self):
-        PitchClef.__init__(self)
+        super().__init__()
         self.sign = "F"
 
 class FBaritoneClef(FClef):
@@ -478,7 +478,7 @@ class FBaritoneClef(FClef):
     False
     '''
     def __init__(self):
-        FClef.__init__(self)
+        super().__init__()
         self.line = 3
         self.lowestLine = (7 * 2) + 7
 
@@ -491,7 +491,7 @@ class BassClef(FClef):
     'F'
     '''
     def __init__(self):        
-        FClef.__init__(self)
+        super().__init__()
         self.line = 4
         self.lowestLine = (7 * 2) + 5
 
@@ -506,7 +506,7 @@ class Bass8vbClef(FClef):
     -1
     '''
     def __init__(self):
-        FClef.__init__(self)
+        super().__init__()
         self.line = 4
         self.octaveChange = -1
         self.lowestLine = (7 * 2) + 5
@@ -520,7 +520,7 @@ class Bass8vaClef(FClef):
     'F'
     '''
     def __init__(self):
-        FClef.__init__(self)
+        super().__init__()
         self.line = 4
         self.octaveChange = 1
         self.lowestLine = (7 * 2) + 5
@@ -534,7 +534,7 @@ class SubBassClef(FClef):
     'F'
     '''
     def __init__(self):
-        FClef.__init__(self)
+        super().__init__()
         self.line = 5
         self.lowestLine = (7 * 2) + 3
 

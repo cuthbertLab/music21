@@ -173,7 +173,7 @@ class Harmony(chord.Chord):
 
     def __init__(self, figure=None, **keywords):
         self._writeAsChord = False
-        chord.Chord.__init__(self)
+        super().__init__()
         # TODO: Deal with the roman numeral property of harmonies.
         #       MusicXML documentation is ambiguous:
         #       A root is a pitch name like C, D, E, where a function is an

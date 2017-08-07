@@ -382,7 +382,7 @@ class KeySignature(base.Music21Object):
     classSortOrder = 2
 
     def __init__(self, sharps=None):
-        base.Music21Object.__init__(self)
+        super().__init__()
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
 
         try:

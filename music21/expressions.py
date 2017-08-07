@@ -101,7 +101,7 @@ class Expression(base.Music21Object):
     _styleClass = style.TextStyle
 
     def __init__(self):
-        base.Music21Object.__init__(self)
+        super().__init__()
 
     def __repr__(self):
         return '<music21.expressions.%s>' % (self.__class__.__name__)
@@ -153,7 +153,7 @@ class TextExpression(Expression):
     _styleClass = style.TextStyle
 
     def __init__(self, content=None):
-        Expression.__init__(self)
+        super().__init__()
         # numerous properties are inherited from TextFormat
         # the text string to be displayed; not that line breaks
         # are given in the xml with this non-printing character: (#)
@@ -233,7 +233,7 @@ class TextExpression(Expression):
 class Ornament(Expression):
 
     def __init__(self):
-        Expression.__init__(self)
+        super().__init__()
         self.connectedToPrevious = True
         # should follow directly on previous; true for most "ornaments".
         self.tieAttach = 'first' # attach to first note of a tied group.
@@ -254,7 +254,7 @@ class GeneralMordent(Ornament):
     '''Base class for all Mordent types.
     '''
     def __init__(self):
-        Ornament.__init__(self)
+        super().__init__()
         self.direction = ""  # up or down
         self.size = None # interval.Interval (General, etc.) class
         self.quarterLength = 0.125 # 32nd note default
@@ -342,7 +342,7 @@ class Mordent(GeneralMordent):
     '''
 
     def __init__(self):
-        GeneralMordent.__init__(self)
+        super().__init__()
         self.direction = "down" # up or down
 
 class HalfStepMordent(Mordent):
@@ -356,7 +356,7 @@ class HalfStepMordent(Mordent):
     <music21.interval.Interval m2>
     '''
     def __init__(self):
-        Mordent.__init__(self)
+        super().__init__()
         self.size = interval.Interval("m2")
 
 class WholeStepMordent(Mordent):
@@ -370,7 +370,7 @@ class WholeStepMordent(Mordent):
     <music21.interval.Interval M2>
     '''
     def __init__(self):
-        Mordent.__init__(self)
+        super().__init__()
         self.size = interval.Interval("M2")
 
 
@@ -386,7 +386,7 @@ class InvertedMordent(GeneralMordent):
     <music21.interval.Interval M2>
     '''
     def __init__(self):
-        GeneralMordent.__init__(self)
+        super().__init__()
         self.direction = "up"
 
 class HalfStepInvertedMordent(InvertedMordent):
@@ -400,7 +400,7 @@ class HalfStepInvertedMordent(InvertedMordent):
     <music21.interval.Interval m2>
     '''
     def __init__(self):
-        InvertedMordent.__init__(self)
+        super().__init__()
         self.size = interval.Interval("m2")
 
 class WholeStepInvertedMordent(InvertedMordent):
@@ -414,7 +414,7 @@ class WholeStepInvertedMordent(InvertedMordent):
     <music21.interval.Interval M2>
     '''
     def __init__(self):
-        InvertedMordent.__init__(self)
+        super().__init__()
         self.size = interval.Interval("M2")
 
 
@@ -431,7 +431,7 @@ class Trill(Ornament):
     '''
 
     def __init__(self):
-        Ornament.__init__(self)
+        super().__init__()
         self.size = interval.Interval("M2")
 
         self.placement = 'above'
@@ -563,7 +563,7 @@ class HalfStepTrill(Trill):
     <music21.interval.Interval m2>
     '''
     def __init__(self):
-        Trill.__init__(self)
+        super().__init__()
         self.size = interval.Interval("m2")
 
 class WholeStepTrill(Trill):
@@ -577,13 +577,13 @@ class WholeStepTrill(Trill):
     <music21.interval.Interval M2>
     '''
     def __init__(self):
-        Trill.__init__(self)
+        super().__init__()
         self.size = interval.Interval("M2")
 
 
 class Shake(Trill):
     def __init__(self):
-        Trill.__init__(self)
+        super().__init__()
         self.size = interval.Interval("M2")
         self.quarterLength = 0.25
 
@@ -596,7 +596,7 @@ class Shake(Trill):
 # this is a slide or culee
 class Schleifer(Ornament):
     def __init__(self):
-        Ornament.__init__(self)
+        super().__init__()
         self.size = interval.Interval("M2")
         self.quarterLength = 0.25
 
@@ -604,7 +604,7 @@ class Schleifer(Ornament):
 #-------------------------------------------------------------------------------
 class Turn(Ornament):
     def __init__(self):
-        Ornament.__init__(self)
+        super().__init__()
         self.size = interval.Interval("M2")
         self.placement = 'above'
         self.nachschlag = False # play little notes at the end of the trill?
@@ -709,7 +709,7 @@ class Turn(Ornament):
 
 class InvertedTurn(Turn):
     def __init__(self):
-        Turn.__init__(self)
+        super().__init__()
         self.size = self.size.reverse()
 
 
@@ -720,7 +720,7 @@ class GeneralAppoggiatura(Ornament):
     size = None # interval.Interval (General, etc.) class
 
     def __init__(self):
-        Ornament.__init__(self)
+        super().__init__()
         self.size = interval.Interval(2)
 
     def realize(self, srcObj):
@@ -782,31 +782,31 @@ class GeneralAppoggiatura(Ornament):
 class Appoggiatura(GeneralAppoggiatura):
     direction = "down"
     def __init__(self):
-        GeneralAppoggiatura.__init__(self)
+        super().__init__()
 
 class HalfStepAppoggiatura(Appoggiatura):
     def __init__(self):
-        Appoggiatura.__init__(self)
+        super().__init__()
         self.size = interval.Interval("m2")
 
 class WholeStepAppoggiatura(Appoggiatura):
     def __init__(self):
-        Appoggiatura.__init__(self)
+        super().__init__()
         self.size = interval.Interval("M2")
 
 class InvertedAppoggiatura(GeneralAppoggiatura):
     direction = "up"
     def __init__(self):
-        GeneralAppoggiatura.__init__(self)
+        super().__init__()
 
 class HalfStepInvertedAppoggiatura(InvertedAppoggiatura):
     def __init__(self):
-        InvertedAppoggiatura.__init__(self)
+        super().__init__()
         self.size = interval.Interval("m2")
 
 class WholeStepInvertedAppoggiatura(InvertedAppoggiatura):
     def __init__(self):
-        InvertedAppoggiatura.__init__(self)
+        super().__init__()
         self.size = interval.Interval("M2")
 
 #-------------------------------------------------------------------------------
@@ -835,7 +835,7 @@ class Tremolo(Ornament):
     TODO: deal with unmeasured tremolos.
     '''
     def __init__(self):
-        Ornament.__init__(self)
+        super().__init__()
         self.measured = True
         self._numberOfMarks = 3
 

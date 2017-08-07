@@ -1439,7 +1439,7 @@ class Pitch:
         if isinstance(name, type(self)):
             name = name.nameWithOctave
 
-        #base.Music21Object.__init__(self, **keywords)
+        #super().__init__(**keywords)
 
         # this should not be set, as will be updated when needed
         self._step = defaults.pitchStep # this is only the pitch step

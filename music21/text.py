@@ -267,7 +267,7 @@ class TextBox(base.Music21Object):
     classSortOrder = -31 # text expressions are -30
 
     def __init__(self, content=None, x=500, y=500):
-        base.Music21Object.__init__(self)
+        super().__init__()
         # numerous properties are inherited from TextFormat
         # the text string to be displayed; not that line breaks
         # are given in the xml with this non-printing character: (#)

@@ -3609,7 +3609,7 @@ class ElementWrapper(Music21Object):
         }
 
     def __init__(self, obj=None):
-        Music21Object.__init__(self)
+        super().__init__()
         self.obj = obj # object stored here
         # the unlinkedDuration is the duration that is inherited from
         # Music21Object
@@ -3745,7 +3745,7 @@ class ElementWrapper(Music21Object):
 
 class TestMock(Music21Object):
     def __init__(self):
-        Music21Object.__init__(self)
+        super().__init__()
 
 
 class Test(unittest.TestCase):

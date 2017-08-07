@@ -493,7 +493,7 @@ class Divisione(meter.TimeSignature):
                 'cannot make out the divisione from name or symbol %s' % nameOrSymbol)
 
         if self.timeString is not None:
-            meter.TimeSignature.__init__(self, self.timeString)
+            super().__init__(self.timeString)
 
     def __str__(self):
         return '<music21.alpha.trecento.notation.Divisione %s>' % self.standardSymbol

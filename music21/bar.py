@@ -119,7 +119,7 @@ class Barline(base.Music21Object):
     classSortOrder = -5
 
     def __init__(self, style=None, location=None):
-        base.Music21Object.__init__(self)
+        super().__init__()
 
         # this will raise an exception on error from property
         self.style = style
@@ -237,7 +237,7 @@ class Repeat(RepeatMark, Barline):
             style = 'heavy-light'
         else:
             style = 'final'
-        super().__init__(style=style)
+        Barline.__init__(self, style=style)
 
         self._direction = None # either start or end
         self._times = None  # if an end, how many repeats

@@ -137,7 +137,7 @@ class TempoIndication(base.Music21Object):
     _styleClass = style.TextStyle
 
     def __init__(self):
-        base.Music21Object.__init__(self)
+        super().__init__()
         # self.style.justify = 'left' # creates a style object to share.
 
     def getSoundingMetronomeMark(self, found=None):
@@ -190,7 +190,7 @@ class TempoText(TempoIndication):
     adagio
     '''
     def __init__(self, text=None):
-        TempoIndication.__init__(self)
+        super().__init__()
 
         # store text in a TextExpression instance
         self._textExpression = None # a stored object
@@ -925,7 +925,7 @@ class MetricModulation(TempoIndication):
 
     '''
     def __init__(self):
-        TempoIndication.__init__(self)
+        super().__init__()
 
         self.classicalStyle = False
         self.maintainBeat = False

@@ -210,7 +210,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
     '''
     def __init__(self, streamObj=None, fastButUnsafe=False, topLevel=True, streamIds=None):
-        StreamFreezeThawBase.__init__(self)
+        super().__init__()
         # must make a deepcopy, as we will be altering .sites
         self.stream = None
         # clear all sites only if the top level.
@@ -748,7 +748,7 @@ class StreamThawer(StreamFreezeThawBase):
 #    >>> #s.show('t')
     '''
     def __init__(self):
-        StreamFreezeThawBase.__init__(self)
+        super().__init__()
         self.stream = None
 
     # TODO: Test that the _NoneSite singleton is restored properly after freezeThaw.

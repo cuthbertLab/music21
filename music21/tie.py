@@ -96,7 +96,7 @@ class Tie(SlottedObjectMixin):
     ### INITIALIZER ###
     # pylint: disable=redefined-builtin
     def __init__(self, type='start'): #@ReservedAssignment
-        #music21.Music21Object.__init__(self)
+        #super().__init__()
         if type not in ('start', 'stop', 'continue'):
             raise TieException("Type must be one of 'start', 'stop', or 'continue', not %s" % type)
         # naming this "type" was a mistake, because cannot create a property of this name.

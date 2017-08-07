@@ -135,7 +135,7 @@ class Instrument(base.Music21Object):
     classSortOrder = -25
 
     def __init__(self):
-        base.Music21Object.__init__(self)
+        super().__init__()
 
         self.partId = None
         self._partIdIsRandom = False
@@ -285,7 +285,7 @@ class Instrument(base.Music21Object):
 class KeyboardInstrument(Instrument):
 
     def __init__(self):
-        Instrument.__init__(self)
+        super().__init__()
         self.instrumentName = 'Keyboard'
         self.instrumentAbbreviation = 'Kb'
 
@@ -299,7 +299,7 @@ class Piano(KeyboardInstrument):
     0
     '''
     def __init__(self):
-        KeyboardInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Piano'
         self.instrumentAbbreviation = 'Pno'
@@ -313,7 +313,7 @@ class Piano(KeyboardInstrument):
 
 class Harpsichord(KeyboardInstrument):
     def __init__(self):
-        KeyboardInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Harpsichord'
         self.instrumentAbbreviation = 'Hpschd'
@@ -324,7 +324,7 @@ class Harpsichord(KeyboardInstrument):
 
 class Clavichord(KeyboardInstrument):
     def __init__(self):
-        KeyboardInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Clavichord'
         self.instrumentAbbreviation = 'Clv'
@@ -335,7 +335,7 @@ class Clavichord(KeyboardInstrument):
 
 class Celesta(KeyboardInstrument):
     def __init__(self):
-        KeyboardInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Celesta'
         self.instrumentAbbreviation = 'Clst'
@@ -345,13 +345,13 @@ class Celesta(KeyboardInstrument):
 #-------------------------------------------------------------------------------
 class Organ(Instrument):
     def __init__(self):
-        Instrument.__init__(self)
+        super().__init__()
 
         self.midiProgram = 19
 
 class PipeOrgan(Organ):
     def __init__(self):
-        Organ.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Pipe Organ'
         self.instrumentAbbreviation = 'P Org'
@@ -362,7 +362,7 @@ class PipeOrgan(Organ):
 
 class ElectricOrgan(Organ):
     def __init__(self):
-        Organ.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Electric Organ'
         self.instrumentAbbreviation = 'Elec Org'
@@ -373,7 +373,7 @@ class ElectricOrgan(Organ):
 
 class ReedOrgan(Organ):
     def __init__(self):
-        Organ.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Reed Organ'
         #TODO self.instrumentAbbreviation = ''
@@ -384,7 +384,7 @@ class ReedOrgan(Organ):
 
 class Accordion(Organ):
     def __init__(self):
-        Organ.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Accordion'
         self.instrumentAbbreviation = 'Acc'
@@ -395,7 +395,7 @@ class Accordion(Organ):
 
 class Harmonica(Organ):
     def __init__(self):
-        Organ.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Harmonica'
         self.instrumentAbbreviation = 'Hmca'
@@ -409,7 +409,7 @@ class Harmonica(Organ):
 class StringInstrument(Instrument):
 
     def __init__(self):
-        Instrument.__init__(self)
+        super().__init__()
         self._stringPitches = None
         self._cachedPitches = None
         self.instrumentName = 'StringInstrument'
@@ -465,7 +465,7 @@ class StringInstrument(Instrument):
 
 class Violin(StringInstrument):
     def __init__(self):
-        StringInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Violin'
         self.instrumentAbbreviation = 'Vln'
@@ -476,7 +476,7 @@ class Violin(StringInstrument):
 
 class Viola(StringInstrument):
     def __init__(self):
-        StringInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Viola'
         self.instrumentAbbreviation = 'Vla'
@@ -487,7 +487,7 @@ class Viola(StringInstrument):
 
 class Violoncello(StringInstrument):
     def __init__(self):
-        StringInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Violoncello'
         self.instrumentAbbreviation = 'Vc'
@@ -504,7 +504,7 @@ class Contrabass(StringInstrument):
 
     '''
     def __init__(self):
-        StringInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Contrabass'
         self.instrumentAbbreviation = 'Cb'
@@ -516,7 +516,7 @@ class Contrabass(StringInstrument):
 
 class Harp(StringInstrument):
     def __init__(self):
-        StringInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Harp'
         self.instrumentAbbreviation = 'Hp'
@@ -528,7 +528,7 @@ class Harp(StringInstrument):
 
 class Guitar(StringInstrument):
     def __init__(self):
-        StringInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Guitar'
         self.instrumentAbbreviation = 'Gtr'
@@ -539,7 +539,7 @@ class Guitar(StringInstrument):
 
 class AcousticGuitar(Guitar):
     def __init__(self):
-        Guitar.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Acoustic Guitar'
         self.instrumentAbbreviation = 'Ac Gtr'
@@ -547,7 +547,7 @@ class AcousticGuitar(Guitar):
 
 class ElectricGuitar(Guitar):
     def __init__(self):
-        Guitar.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Electric Guitar'
         self.instrumentAbbreviation = 'Elec Gtr'
@@ -555,7 +555,7 @@ class ElectricGuitar(Guitar):
 
 class AcousticBass(Guitar):
     def __init__(self):
-        Guitar.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Acoustic Bass'
         self.instrumentAbbreviation = 'Ac b'
@@ -566,7 +566,7 @@ class AcousticBass(Guitar):
 
 class ElectricBass(Guitar):
     def __init__(self):
-        Guitar.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Electric Bass'
         self.instrumentAbbreviation = 'Elec b'
@@ -577,7 +577,7 @@ class ElectricBass(Guitar):
 
 class FretlessBass(Guitar):
     def __init__(self):
-        Guitar.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Fretless Bass'
         #TODO: self.instrumentAbbreviation = ''
@@ -589,7 +589,7 @@ class FretlessBass(Guitar):
 
 class Mandolin(StringInstrument):
     def __init__(self):
-        StringInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Mandolin'
         self.instrumentAbbreviation = 'Mdln'
@@ -599,7 +599,7 @@ class Mandolin(StringInstrument):
 
 class Ukulele(StringInstrument):
     def __init__(self):
-        StringInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Ukulele'
         self.instrumentAbbreviation = 'Uke'
@@ -609,7 +609,7 @@ class Ukulele(StringInstrument):
 
 class Banjo(StringInstrument):
     def __init__(self):
-        StringInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Banjo'
         self.instrumentAbbreviation = 'Bjo'
@@ -621,7 +621,7 @@ class Banjo(StringInstrument):
 
 class Lute(StringInstrument):
     def __init__(self):
-        StringInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Lute'
         self.instrumentAbbreviation = 'Lte'
@@ -629,7 +629,7 @@ class Lute(StringInstrument):
 
 class Sitar(StringInstrument):
     def __init__(self):
-        StringInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Sitar'
         self.instrumentAbbreviation = 'Sit'
@@ -637,7 +637,7 @@ class Sitar(StringInstrument):
 
 class Shamisen(StringInstrument):
     def __init__(self):
-        StringInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Shamisen'
         #TODO: self.instrumentAbbreviation = ''
@@ -645,7 +645,7 @@ class Shamisen(StringInstrument):
 
 class Koto(StringInstrument):
     def __init__(self):
-        StringInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Koto'
         #TODO: self.instrumentAbbreviation = ''
@@ -654,13 +654,13 @@ class Koto(StringInstrument):
 #-------------------------------------------------------------------------------
 class WoodwindInstrument(Instrument):
     def __init__(self):
-        Instrument.__init__(self)
+        super().__init__()
         self.instrumentName = 'Woodwind'
         self.instrumentAbbreviation = 'Ww'
 
 class Flute(WoodwindInstrument):
     def __init__(self):
-        WoodwindInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Flute'
         self.instrumentAbbreviation = 'Fl'
@@ -670,7 +670,7 @@ class Flute(WoodwindInstrument):
 
 class Piccolo(Flute):
     def __init__(self):
-        Flute.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Piccolo'
         self.instrumentAbbreviation = 'Picc'
@@ -681,7 +681,7 @@ class Piccolo(Flute):
 
 class Recorder(Flute):
     def __init__(self):
-        Flute.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Recorder'
         self.instrumentAbbreviation = 'Rec'
@@ -691,7 +691,7 @@ class Recorder(Flute):
 
 class PanFlute(Flute):
     def __init__(self):
-        Flute.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Pan Flute'
         self.instrumentAbbreviation = 'P Fl'
@@ -699,7 +699,7 @@ class PanFlute(Flute):
 
 class Shakuhachi(Flute):
     def __init__(self):
-        Flute.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Shakuhachi'
         self.instrumentAbbreviation = 'Shk Fl'
@@ -707,7 +707,7 @@ class Shakuhachi(Flute):
 
 class Whistle(Flute):
     def __init__(self):
-        Flute.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Whistle'
         self.instrumentAbbreviation = 'Whs'
@@ -717,7 +717,7 @@ class Whistle(Flute):
 
 class Ocarina(Flute):
     def __init__(self):
-        Flute.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Ocarina'
         self.instrumentAbbreviation = 'Oc'
@@ -725,7 +725,7 @@ class Ocarina(Flute):
 
 class Oboe(WoodwindInstrument):
     def __init__(self):
-        WoodwindInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Oboe'
         self.instrumentAbbreviation = 'Ob'
@@ -735,7 +735,7 @@ class Oboe(WoodwindInstrument):
 
 class EnglishHorn(WoodwindInstrument):
     def __init__(self):
-        WoodwindInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'English Horn'
         self.instrumentAbbreviation = 'Eng Hn'
@@ -746,7 +746,7 @@ class EnglishHorn(WoodwindInstrument):
 
 class Clarinet(WoodwindInstrument):
     def __init__(self):
-        WoodwindInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Clarinet'
         self.instrumentAbbreviation = 'Cl'
@@ -768,7 +768,7 @@ class BassClarinet(Clarinet):
     True
     '''
     def __init__(self):
-        Clarinet.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Bass clarinet'
         self.instrumentAbbreviation = 'Bs Cl'
@@ -778,7 +778,7 @@ class BassClarinet(Clarinet):
 
 class Bassoon(WoodwindInstrument):
     def __init__(self):
-        WoodwindInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Bassoon'
         self.instrumentAbbreviation = 'Bs'
@@ -789,7 +789,7 @@ class Bassoon(WoodwindInstrument):
 
 class Saxophone(WoodwindInstrument):
     def __init__(self):
-        WoodwindInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Saxophone'
         self.instrumentAbbreviation = 'Sax'
@@ -797,7 +797,7 @@ class Saxophone(WoodwindInstrument):
 
 class SopranoSaxophone(Saxophone):
     def __init__(self):
-        Saxophone.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Soprano Saxophone'
         self.instrumentAbbreviation = 'S Sax'
@@ -808,7 +808,7 @@ class SopranoSaxophone(Saxophone):
 
 class AltoSaxophone(Saxophone):
     def __init__(self):
-        Saxophone.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Alto Saxophone'
         self.instrumentAbbreviation = 'A Sax'
@@ -819,7 +819,7 @@ class AltoSaxophone(Saxophone):
 
 class TenorSaxophone(Saxophone):
     def __init__(self):
-        Saxophone.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Tenor Saxophone'
         self.instrumentAbbreviation = 'T Sax'
@@ -830,7 +830,7 @@ class TenorSaxophone(Saxophone):
 
 class BaritoneSaxophone(Saxophone):
     def __init__(self):
-        Saxophone.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Baritone Saxophone'
         self.instrumentAbbreviation = 'Bar Sax'
@@ -842,7 +842,7 @@ class BaritoneSaxophone(Saxophone):
 
 class Bagpipes(WoodwindInstrument):
     def __init__(self):
-        WoodwindInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Bagpipes'
         self.instrumentAbbreviation = 'Bag'
@@ -850,7 +850,7 @@ class Bagpipes(WoodwindInstrument):
 
 class Shehnai(WoodwindInstrument):
     def __init__(self):
-        WoodwindInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Shehnai'
         self.instrumentAbbreviation = 'Shn'
@@ -862,7 +862,7 @@ class Shehnai(WoodwindInstrument):
 
 class BrassInstrument(Instrument):
     def __init__(self):
-        Instrument.__init__(self)
+        super().__init__()
         self.instrumentName = 'Brass'
         self.instrumentAbbreviation = 'Brs'
 
@@ -880,7 +880,7 @@ class Horn(BrassInstrument):
     True
     '''
     def __init__(self):
-        BrassInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Horn'
         self.instrumentAbbreviation = 'Hn'
@@ -891,7 +891,7 @@ class Horn(BrassInstrument):
 
 class Trumpet(BrassInstrument):
     def __init__(self):
-        BrassInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Trumpet'
         self.instrumentAbbreviation = 'Tpt'
@@ -902,7 +902,7 @@ class Trumpet(BrassInstrument):
 
 class Trombone(BrassInstrument):
     def __init__(self):
-        BrassInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Trombone'
         self.instrumentAbbreviation = 'Trb'
@@ -912,7 +912,7 @@ class Trombone(BrassInstrument):
 
 class BassTrombone(Trombone):
     def __init__(self):
-        Trombone.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Bass Trombone'
         self.instrumentAbbreviation = 'BTrb'
@@ -920,7 +920,7 @@ class BassTrombone(Trombone):
 
 class Tuba(BrassInstrument):
     def __init__(self):
-        BrassInstrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Tuba'
         self.instrumentAbbreviation = 'Tba'
@@ -932,7 +932,7 @@ class Tuba(BrassInstrument):
 #-------------
 class Percussion(Instrument):
     def __init__(self):
-        Instrument.__init__(self)
+        super().__init__()
         self.inGMPercMap = False
         self.percMapPitch = None
         self.instrumentName = 'Percussion'
@@ -945,7 +945,7 @@ class PitchedPercussion(Percussion):
 
 class UnpitchedPercussion(Percussion):
     def __init__(self):
-        Percussion.__init__(self)
+        super().__init__()
         self._modifier = None
         self._modifierToPercMapPitch = {}
 
@@ -999,7 +999,7 @@ class UnpitchedPercussion(Percussion):
 
 class Vibraphone(PitchedPercussion):
     def __init__(self):
-        PitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Vibraphone'
         self.instrumentAbbreviation = 'Vbp'
@@ -1007,7 +1007,7 @@ class Vibraphone(PitchedPercussion):
 
 class Marimba(PitchedPercussion):
     def __init__(self):
-        PitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Marimba'
         self.instrumentAbbreviation = 'Mar'
@@ -1015,7 +1015,7 @@ class Marimba(PitchedPercussion):
 
 class Xylophone(PitchedPercussion):
     def __init__(self):
-        PitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Xylophone'
         self.instrumentAbbreviation = 'Xyl.'
@@ -1023,7 +1023,7 @@ class Xylophone(PitchedPercussion):
 
 class Glockenspiel(PitchedPercussion):
     def __init__(self):
-        PitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Glockenspiel'
         self.instrumentAbbreviation = 'Gsp'
@@ -1031,7 +1031,7 @@ class Glockenspiel(PitchedPercussion):
 
 class ChurchBells(PitchedPercussion):
     def __init__(self):
-        PitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Church Bells'
         self.instrumentAbbreviation = 'Bells'
@@ -1039,7 +1039,7 @@ class ChurchBells(PitchedPercussion):
 
 class TubularBells(PitchedPercussion):
     def __init__(self):
-        PitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Tubular Bells'
         self.instrumentAbbreviation = 'Tbells'
@@ -1047,21 +1047,21 @@ class TubularBells(PitchedPercussion):
 
 class Gong(PitchedPercussion):
     def __init__(self):
-        PitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Gong'
         self.instrumentAbbreviation = 'Gng'
 
 class Handbells(PitchedPercussion):
     def __init__(self):
-        PitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Handbells'
         #TODO: self.instrumentAbbreviation = ''
 
 class Dulcimer(PitchedPercussion):
     def __init__(self):
-        PitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Dulcimer'
         #TODO: self.instrumentAbbreviation = ''
@@ -1069,7 +1069,7 @@ class Dulcimer(PitchedPercussion):
 
 class SteelDrum(PitchedPercussion):
     def __init__(self):
-        PitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Steel Drum'
         self.instrumentAbbreviation = 'St Dr'
@@ -1077,7 +1077,7 @@ class SteelDrum(PitchedPercussion):
 
 class Timpani(PitchedPercussion):
     def __init__(self):
-        PitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Timpani'
         self.instrumentAbbreviation = 'Timp'
@@ -1085,7 +1085,7 @@ class Timpani(PitchedPercussion):
 
 class Kalimba(PitchedPercussion):
     def __init__(self):
-        PitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Kalimba'
         self.instrumentAbbreviation = 'Kal'
@@ -1094,7 +1094,7 @@ class Kalimba(PitchedPercussion):
 
 class Woodblock(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Woodblock'
         self.instrumentAbbreviation = 'Wd Bl'
@@ -1108,21 +1108,21 @@ class Woodblock(UnpitchedPercussion):
 
 class TempleBlock(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Temple Block'
         self.instrumentAbbreviation = 'Temp Bl'
 
 class Castanets(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Castanets'
         self.instrumentAbbreviation = 'Cas'
 
 class Maracas(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Maracas'
         self.inGMPercMap = True
@@ -1131,7 +1131,7 @@ class Maracas(UnpitchedPercussion):
 
 class Vibraslap(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Vibraslap'
         self.instrumenAbbreviation = 'Vbslp'
@@ -1142,20 +1142,20 @@ class Vibraslap(UnpitchedPercussion):
 
 class Cymbals(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
         self.instrumentName = 'Cymbals'
         self.instrumentAbbreviation = 'Cym'
 
 class FingerCymbals(Cymbals):
     def __init__(self):
-        Cymbals.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Finger Cymbals'
         self.instrumentAbbreviation = 'Fing Cym'
 
 class CrashCymbals(Cymbals):
     def __init__(self):
-        Cymbals.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Crash Cymbals'
         self.instrumentAbbreviation = 'Cym'
@@ -1173,35 +1173,35 @@ class CrashCymbals(Cymbals):
 
 class SuspendedCymbal(Cymbals):
     def __init__(self):
-        Cymbals.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Suspended Cymbal'
         #TODO: self.instrumentAbbreviation = ''
 
 class SizzleCymbal(Cymbals):
     def __init__(self):
-        Cymbals.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Sizzle Cymbal'
         #TODO: self.instrumentAbbreviation = ''
 
 class SplashCymbals(Cymbals):
     def __init__(self):
-        Cymbals.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Splash Cymbals'
         #TODO: self.instrumentAbbreviation = ''
 
 class RideCymbals(Cymbals):
     def __init__(self):
-        Cymbals.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Ride Cymbals'
         #TODO: self.instrumentAbbreviation = ''
 
 class HiHatCymbal(Cymbals):
     def __init__(self):
-        Cymbals.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Hi-Hat Cymbal'
         self.inGMPercMap = True
@@ -1222,7 +1222,7 @@ class HiHatCymbal(Cymbals):
 
 class Triangle(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Triangle'
         self.instrumentAbbreviation = 'Tri'
@@ -1240,7 +1240,7 @@ class Triangle(UnpitchedPercussion):
 
 class Cowbell(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Cowbell'
         self.instrumentAbbreviation = 'Cwb'
@@ -1249,7 +1249,7 @@ class Cowbell(UnpitchedPercussion):
 
 class Agogo(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Agogo'
         #TODO: self.instrumentAbbreviation = ''
@@ -1259,21 +1259,21 @@ class Agogo(UnpitchedPercussion):
 
 class TamTam(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Tam-Tam'
         #TODO: self.instrumentAbbreviation = ''
 
 class SleighBells(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Sleigh Bells'
         #TODO: self.instrumentAbbreviation = ''
 
 class SnareDrum(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Snare Drum'
         self.instrumentAbbreviation = 'Sn Dr'
@@ -1291,14 +1291,14 @@ class SnareDrum(UnpitchedPercussion):
 
 class TenorDrum(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Tenor Drum'
         self.instrumentAbbreviation = 'Ten Dr'
 
 class BongoDrums(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Bongo Drums'
         self.instrumentAbbreviation = 'Bgo Dr'
@@ -1312,7 +1312,7 @@ class BongoDrums(UnpitchedPercussion):
 
 class TomTom(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Tom-Tom'
         #TODO: self.instrumentAbbreviation = ''
@@ -1327,7 +1327,7 @@ class TomTom(UnpitchedPercussion):
 
 class Timbales(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Timbales'
         self.instrumentAbbreviation = 'Tim'
@@ -1340,7 +1340,7 @@ class Timbales(UnpitchedPercussion):
 
 class CongaDrum(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Conga Drum'
         self.instrumentAbbreviation = 'Cga Dr'
@@ -1353,7 +1353,7 @@ class CongaDrum(UnpitchedPercussion):
 
 class BassDrum(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Bass Drum'
         self.instrumentAbbreviation = 'B Dr'
@@ -1366,7 +1366,7 @@ class BassDrum(UnpitchedPercussion):
 
 class Taiko(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Taiko'
         #TODO: self.instrumentAbbreviation = ''
@@ -1374,7 +1374,7 @@ class Taiko(UnpitchedPercussion):
 
 class Tambourine(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Tambourine'
         self.instrumentAbbreviation = 'Tmbn'
@@ -1383,35 +1383,35 @@ class Tambourine(UnpitchedPercussion):
 
 class Whip(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Whip'
         #TODO: self.instrumentAbbreviation = ''
 
 class Ratchet(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Ratchet'
         #TODO: self.instrumentAbbreviation = ''
 
 class Siren(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Siren'
         #TODO: self.instrumentAbbreviation = ''
 
 class SandpaperBlocks(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Sandpaper Blocks'
         self.instrumentAbbreviation = 'Sand Bl'
 
 class WindMachine(UnpitchedPercussion):
     def __init__(self):
-        UnpitchedPercussion.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Wind Machine'
         #TODO: self.instrumentAbbreviation = ''
@@ -1424,7 +1424,7 @@ class Vocalist(Instrument):
     n.b. called Vocalist to not be confused with stream.Voice
     '''
     def __init__(self):
-        Instrument.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Voice'
         self.instrumentAbbreviation = 'V'
@@ -1432,42 +1432,42 @@ class Vocalist(Instrument):
 
 class Soprano(Vocalist):
     def __init__(self):
-        Vocalist.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Soprano'
         self.instrumentAbbreviation = 'S'
 
 class MezzoSoprano(Soprano):
     def __init__(self):
-        Soprano.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Mezzo-Soprano'
         self.instrumentAbbreviation = 'Mez'
 
 class Alto(Vocalist):
     def __init__(self):
-        Vocalist.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Alto'
         self.instrumentAbbreviation = 'A'
 
 class Tenor(Vocalist):
     def __init__(self):
-        Vocalist.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Tenor'
         self.instrumentAbbreviation = 'T'
 
 class Baritone(Vocalist):
     def __init__(self):
-        Vocalist.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Baritone'
         self.instrumentAbbreviation = 'Bar'
 
 class Bass(Vocalist):
     def __init__(self):
-        Vocalist.__init__(self)
+        super().__init__()
 
         self.instrumentName = 'Bass'
         self.instrumentAbbreviation = 'B'

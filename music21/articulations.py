@@ -111,7 +111,7 @@ class Articulation(base.Music21Object):
     _styleClass = style.TextStyle
 
     def __init__(self):
-        base.Music21Object.__init__(self)
+        super().__init__()
         self.placement = None
         # declare a unit interval shift for the performance of this articulation
         self._volumeShift = 0.0
@@ -303,11 +303,19 @@ class Spiccato(Staccato, Accent):
     '''
     A staccato note + accent in one
 
-    >>> a = articulations.Spiccato()
+    >>> spiccato = articulations.Spiccato()
+    >>> staccato = articulations.Staccato()
+    >>> accent = articulations.Accent()
+    >>> spiccato.lengthShift == staccato.lengthShift
+    True
+    >>> spiccato.volumeShift == accent.volumeShift
+    True
     '''
     def __init__(self):
         Staccato.__init__(self)
-        Accent.__init__(self)
+        storedLengthShift = self.lengthShift
+        Accent.__init__(self) # order matters...
+        self.lengthShift = storedLengthShift
         
         
 class Tenuto(LengthArticulation):

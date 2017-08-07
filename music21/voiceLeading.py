@@ -81,7 +81,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                      v1n1 to v1n2 and v2n1 to v2n2'''}
 
     def __init__(self, v1n1=None, v1n2=None, v2n1=None, v2n2=None, analyticKey=key.Key('C')):
-        base.Music21Object.__init__(self)
+        super().__init__()
         if not intervalCache:
             # populate interval cache if not done yet
             # more efficient than doing it as Class level variables
@@ -1064,7 +1064,7 @@ class Verticality(base.Music21Object):
     }
 
     def __init__(self, contentDict):
-        base.Music21Object.__init__(self)
+        super().__init__()
         for partNum, element in contentDict.items():
             if not isinstance(element, list):
                 contentDict[partNum] = [element]
@@ -1425,7 +1425,7 @@ class VerticalityNTuplet(base.Music21Object):
     analyzing counterpoint
     motion and music theory elements such as passing tones'''
     def __init__(self, listofVerticalities):
-        base.Music21Object.__init__(self)
+        super().__init__()
 
         self.verticalities = listofVerticalities
         self.nTupletNum = len(listofVerticalities)
@@ -1555,7 +1555,7 @@ class NNoteLinearSegment(base.Music21Object):
 
     '''
     def __init__(self, noteList):
-        base.Music21Object.__init__(self)
+        super().__init__()
         self._noteList = []
         for value in noteList:
             if value is None:
@@ -1952,7 +1952,7 @@ class NChordLinearSegmentException(exceptions21.Music21Exception):
 class NObjectLinearSegment(base.Music21Object):
 
     def __init__(self, objectList):
-        base.Music21Object.__init__(self)
+        super().__init__()
         self.objectList = objectList
 
     def __repr__(self):
