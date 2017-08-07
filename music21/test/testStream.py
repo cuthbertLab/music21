@@ -9,8 +9,6 @@
 # Copyright:    Copyright © 2009-2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-from __future__ import division, print_function
-
 import random
 import unittest
 import copy

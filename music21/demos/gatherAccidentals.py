@@ -17,27 +17,44 @@ a score and returns of dictionary containing a tally of each type of accidental 
 score (a music21.stream.Score object). getAccidentalCountSum() is simply a helpful extension of
 getAccidentalCount() and is meant for counting accidentals in a batch of scores.
 
-These tallies are dictionaries. Dictionaries are ideal for this situation since they are simple and
-mutable data structures that can associate each type of accidental with a positive integer corresponding
-to the number of occurrences of that accidental. Both getAccidentalCount() and getAccidentalCountSum()
-return a dictionary designed in this way. We use _initializeTally() to generate the initial dictionary and
-_excludeZeros() after searching the score to remove accidentals from the dictionary that were not found at all.
-The purpose of this is to simplify the data structure by removing keys for uncommon accidentals (i.e. the triple-
-sharp and the quadruple-flat). However, both functions have an excludeZeros option (default: true) that allows you
+These tallies are dictionaries. Dictionaries are ideal for this 
+situation since they are simple and
+mutable data structures that can associate each type of accidental 
+with a positive integer corresponding
+to the number of occurrences of that accidental. 
+Both getAccidentalCount() and getAccidentalCountSum()
+return a dictionary designed in this way. We use _initializeTally() 
+to generate the initial dictionary and
+_excludeZeros() after searching the score to remove accidentals 
+from the dictionary that were not found at all.
+The purpose of this is to simplify the data structure by removing 
+keys for uncommon accidentals (i.e. the triple-
+sharp and the quadruple-flat). However, both functions have an 
+excludeZeros option (default: True) that allows you
 to keep all accidentals in the dictionary regardless of the number of occurrences.
 
-How does getAccidentalCount work? Well, it first creates our tally object, which will be updated by incrementing the
-appropriate key that corresponds to the newly found accidental. As a basic validation check, we can check that our
-input score is in a fact a music21.stream.Stream object, and if it isn't we throw an exception. Next, we "flatten" the
-score and extract a list of notes using music21.stream.Stream.flat and music21.stream.Stream.notes. Finally, the loop
-in getAccidentalCount() simply iterates though the notes in the work and updates the tally object each time it comes
-across an accidental. Interestingly, we are not simply iterating through notes. The .notes method also gathers chords,
-and indeed we do find chords within a voice in some of the Chorales, so we must account for that. The chord is then
-de-constructed into each of its pitches, and the pitches are then checked for accidentals with pitch.accidental.
+How does getAccidentalCount work? Well, it first creates our tally object, 
+which will be updated by incrementing the
+appropriate key that corresponds to the newly found accidental. 
+As a basic validation check, we can check that our
+input score is in a fact a music21.stream.Stream object, 
+and if it isn't we throw an exception. Next, we "flatten" the
+score and extract a list of notes using music21.stream.Stream.flat 
+and music21.stream.Stream.notes. Finally, the loop
+in getAccidentalCount() simply iterates though the notes in the work 
+and updates the tally object each time it comes
+across an accidental. Interestingly, we are not simply iterating through notes. 
+The .notes method also gathers chords,
+and indeed we do find chords within a voice in some of the Chorales, 
+so we must account for that. The chord is then
+de-constructed into each of its pitches, and the pitches are then checked 
+for accidentals with pitch.accidental.
 
-Look at the bottom of the tests to see how these functions are used to count the total accidentals in the Bach Chorales.
+Look at the bottom of the tests to see how these functions are used to count 
+the total accidentals in the Bach Chorales.
 
-Based on this demo, can you figure out how to determine how many accidentals occur on the beat versus off the beat? How
+Based on this demo, can you figure out how to determine how many accidentals 
+occur on the beat versus off the beat? How
 is it similar to the demo below? What are your corner cases?
 Here's some inspiration:
 "Some art is off the beat, but 'Mostart' is on the beat."

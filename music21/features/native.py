@@ -26,8 +26,6 @@ from music21 import environment
 _MOD = 'features/native.py'
 environLocal = environment.Environment(_MOD)
 
-#from music21.ext import six
-
 #-------------------------------------------------------------------------------
 # ideas for other music21 features extractors
 

@@ -9,26 +9,16 @@
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-from __future__ import division, print_function
-
 import copy
 import fractions
+import io
 import math
 #import pprint
 import re
 import sys
 #import traceback
 import unittest
-from music21.ext import six
-
-if six.PY3:
-    import xml.etree.ElementTree as ET  # @UnusedImport
-else:
-    try:
-        import xml.etree.cElementTree as ET
-    except ImportError:
-        import xml.etree.ElementTree as ET
-
+import xml.etree.ElementTree as ET
 
 from music21 import common
 from music21 import exceptions21
@@ -698,12 +688,9 @@ class MusicXMLImporter(XMLParserBase):
 
     def parseXMLText(self):
         # pylint: disable=undefined-variable
-        if six.PY3 and isinstance(self.xmlText, bytes):
+        if isinstance(self.xmlText, bytes):
             self.xmlText = self.xmlText.decode('utf-8')
-        elif six.PY2 and isinstance(self.xmlText, unicode): # @UndefinedVariable
-            self.xmlText = self.xmlText.encode('utf-8')
-
-        sio = six.StringIO(self.xmlText)
+        sio = io.StringIO(self.xmlText)
         try:
             etree = ET.parse(sio)
             self.xmlRoot = etree.getroot()
@@ -1824,7 +1811,7 @@ class MeasureParser(XMLParserBase):
         '''
         if isinstance(mxObjectOrNumber, int):
             return str(mxObjectOrNumber)
-        elif isinstance(mxObjectOrNumber, six.string_types):
+        elif isinstance(mxObjectOrNumber, str):
             return mxObjectOrNumber
         elif mxObjectOrNumber is None:
             return None

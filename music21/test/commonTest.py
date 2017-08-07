@@ -29,8 +29,6 @@ import unittest.runner
 import music21
 from music21 import common
 from music21 import environment
-from music21.test import testRunner
-
 
 _MOD = 'commonTest.py'
 environLocal = environment.Environment(_MOD)
@@ -41,7 +39,6 @@ def defaultDoctestSuite(name=None):
     kwArgs = {
               'globs': globs,
               'optionflags': docTestOptions,
-              'checker': testRunner.Py3In2OutputChecker()
               }
     # in case there are any tests here, get a suite to load up later
     if name is not None:

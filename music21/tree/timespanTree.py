@@ -15,8 +15,6 @@ Tools for grouping elements, timespans, and especially
 pitched elements into kinds of searchable tree organized by start and stop offsets
 and other positions.
 '''
-from __future__ import division, print_function
-
 import collections
 import random
 import unittest

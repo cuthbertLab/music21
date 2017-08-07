@@ -16,8 +16,6 @@ by Dmitri T.
 The workshop gave the excuse to add the romanText format, which DT and others
 have encoded lots of analyses in.  Some demos of the format are below
 '''
-from __future__ import division, print_function
-
 from music21 import corpus, clef, interval, pitch, voiceLeading, roman
 
 def spliceAnalysis(book=3, madrigal=1):

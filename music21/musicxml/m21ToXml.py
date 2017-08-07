@@ -16,24 +16,14 @@ from __future__ import print_function, division
 
 from collections import OrderedDict
 import copy
-import fractions
 import datetime
+import fractions
+import io
 import unittest
+import xml.etree.ElementTree as ET
+from xml.etree.ElementTree import Element, SubElement, ElementTree
 
-from music21.ext import webcolors, six
-
-if six.PY3:
-    import xml.etree.ElementTree as ET  # @UnusedImport
-    from xml.etree.ElementTree import Element, SubElement, ElementTree  # @UnusedImport
-
-else:
-    try:
-        import xml.etree.cElementTree as ET
-        from xml.etree.cElementTree import Element, SubElement, ElementTree
-
-    except ImportError:
-        import xml.etree.ElementTree as ET  # @UnusedImport
-        from xml.etree.ElementTree import Element, SubElement, ElementTree
+from music21.ext import webcolors
 
 
 # modules that import this include converter.py.
@@ -609,7 +599,7 @@ class XMLExporterBase(object):
         (default), modifies the file for pretty-printing in place.  Otherwise,
         make a copy.
         '''
-        sio = six.BytesIO()
+        sio = io.BytesIO()
         sio.write(self.xmlHeader())
         rootObj = self.xmlRoot
         if noCopy is False:
@@ -645,10 +635,7 @@ class XMLExporterBase(object):
         '''
         xmlEl = copy.deepcopy(obj)  # adds 5% overhead
         XMLExporterBase.indent(xmlEl)  # adds 5% overhead
-        if six.PY2:
-            xStr = ET.tostring(xmlEl)
-        else:
-            xStr = ET.tostring(xmlEl, encoding='unicode')
+        xStr = ET.tostring(xmlEl, encoding='unicode')
         xStr = xStr.rstrip()
         print(xStr)
 
@@ -5455,7 +5442,6 @@ class TestExternal(unittest.TestCase): # pragma: no cover
     def testSimple(self):
         from xml.etree.ElementTree import ElementTree as ETObj
         from music21 import corpus  # , converter
-        import io
         import difflib
 
         # b = converter.parse(corpus.corpora.CoreCorpus().getWorkList('cpebach')[0],
@@ -5471,7 +5457,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
         SX.indent(mxScore)
 
-        sio = six.BytesIO()
+        sio = io.BytesIO()
 
         sio.write(SX.xmlHeader())
 

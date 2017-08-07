@@ -26,7 +26,8 @@ class repetitionGame():
         self.gameNotes = []
         print("Welcome to the music21 game!")
         print("Rules:")
-        print("Two players: the first one plays a note. \nThe second one has to play the first note and a new one.")
+        print("Two players: the first one plays a note. \n" 
+              + "The second one has to play the first note and a new one.")
         print("Continue doing the same until one fails.")
 #        time.sleep(2)
         print("3, 2, 1 GO!")
@@ -44,8 +45,10 @@ class repetitionGame():
         freqFromAQList = base.getFrequenciesFromMicrophone(length=seconds, storeWaveFilename=None)
         detectedPitchesFreq = base.detectPitchFrequencies(freqFromAQList, self.useScale)
         detectedPitchesFreq = base.smoothFrequencies(detectedPitchesFreq)
-        (detectedPitchObjects, unused_listplot) = base.pitchFrequenciesToObjects(detectedPitchesFreq, self.useScale)
-        (notesList, unused_durationList) = base.joinConsecutiveIdenticalPitches(detectedPitchObjects)
+        (detectedPitchObjects, 
+         unused_listplot) = base.pitchFrequenciesToObjects(detectedPitchesFreq, self.useScale)
+        (notesList, 
+         unused_durationList) = base.joinConsecutiveIdenticalPitches(detectedPitchObjects)
         j = 0
         i = 0
         while i < len(notesList) and j < len(self.gameNotes) and self.good == True:
@@ -55,7 +58,8 @@ class repetitionGame():
                 i = i + 1
                 j = j + 1
             else:
-                print("WRONG NOTE! You played", notesList[i].fullName, "and should have been", self.gameNotes[j].fullName)
+                print("WRONG NOTE! You played", notesList[i].fullName, 
+                      "and should have been", self.gameNotes[j].fullName)
                 self.good = False
 
         if self.good == True and j != len(self.gameNotes):

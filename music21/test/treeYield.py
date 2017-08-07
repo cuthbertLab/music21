@@ -12,10 +12,6 @@
 # http://stackoverflow.com/questions/12611337/
 #     recursively-dir-a-python-object-to-find-values-of-a-certain-type-or-with-a-cer
 
-import sys
-if sys.version_info[0] >= 3:
-    unicode = str
-
 class TreeYielder(object):
     def __init__(self, yieldValue=None):
         '''
@@ -27,7 +23,7 @@ class TreeYielder(object):
         self.memo = None
         self.yieldValue = yieldValue
         self.stackVals = []
-        self.nonIterables = [int, str, unicode, # t.LongType,
+        self.nonIterables = [int, str, # t.LongType,
                              float, type(None), bool]
 
     def run(self, obj, memo=None):
@@ -108,8 +104,6 @@ class TreeYielder(object):
             if stackType == 'dict':
                 if isinstance(stackValue, str):
                     currentStr += "['" + stackValue + "']"
-                elif isinstance(stackValue, unicode):
-                    currentStr += "[u'" + stackValue + "']"
                 else: # numeric key...
                     currentStr += "[" + str(stackValue) + "]"
             elif stackType == 'listLike':

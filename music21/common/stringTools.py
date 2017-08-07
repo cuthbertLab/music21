@@ -301,16 +301,11 @@ def stripAccents(inputString):
     r'''
     removes accents from unicode strings.
 
-    >>> s = u'trés vite'
+    >>> s = 'trés vite'
 
-    >>> u'é' in s
+    >>> 'é' in s
     True
-
-    This works on Python2, but the doctest does not.
-
-    >>> if ext.six.PY3:
-    ...     common.stripAccents(s)
-    ... else: 'tres vite'
+    >>> common.stripAccents(s)
     'tres vite'
     '''
     nfkd_form = unicodedata.normalize('NFKD', inputString)

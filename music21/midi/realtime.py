@@ -28,18 +28,7 @@ from music21.exceptions21 import Music21Exception
 from music21.midi import translate as midiTranslate
 from music21 import defaults
 
-from music21.ext import six
-
-if six.PY2: # pragma: no cover
-    try:
-        from cStringIO import StringIO as StrByIO
-    except ImportError:
-        try:
-            from StringIO import StringIO as StrByIO
-        except ImportError:
-            from io import StringIO as StrByIO # @UnusedImport
-else: # pragma: no cover
-    from io import BytesIO as StrByIO # @Reimport
+from io import BytesIO
 
 
 class StreamPlayerException(Music21Exception):
@@ -130,7 +119,7 @@ class StreamPlayer(object):  # pragma: no cover
     def getStringOrBytesIOFile(self):
         streamMidiFile = midiTranslate.streamToMidiFile(self.streamIn)
         streamMidiWritten = streamMidiFile.writestr()
-        return StrByIO(streamMidiWritten)
+        return BytesIO(streamMidiWritten)
 
     def playStringIOFile(self, stringIOFile, busyFunction=None, busyArgs=None,
                          endFunction=None, endArgs=None, busyWaitMilliseconds=50):

@@ -1324,7 +1324,7 @@ def findSegments(music21Part, **partKeywords):
     >>> from music21.braille import test
     >>> example = test.example11_2()
     >>> allSegments = braille.segment.findSegments(example)
-    >>> if ext.six.PY2: str = unicode #_DOCS_HIDE
+
     >>> print(str(allSegments[0]))
     ---begin segment---
     <music21.braille.segment BrailleSegment>

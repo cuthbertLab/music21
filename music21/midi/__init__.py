@@ -24,7 +24,7 @@ see http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e
 '''
 __all__ = ['translate', 'realtime', 'percussion']
 
-
+import io
 import os
 import string
 import struct
@@ -35,7 +35,6 @@ import unittest
 from music21 import common
 from music21 import environment
 from music21 import exceptions21
-from music21.ext import six
 
 from music21.midi import realtime
 from music21.midi import percussion
@@ -194,7 +193,7 @@ def getVariableLengthNumber(midiStr):
     # a msb of 0, you know that it was the last (least significant) byte of the number.
     summation = 0
     i = 0
-    if six.PY3 and isinstance(midiStr, str):
+    if isinstance(midiStr, str):
         midiStr = midiStr.encode('utf-8')
 
     while i < 999: # should return eventually... was while True
@@ -238,23 +237,14 @@ def putNumber(num, length):
     >>> midi.putNumber(0, 1)
     b'\\x00'
     '''
-    if six.PY2:
-        lst = []
-    else:
-        lst = bytearray()
+    lst = bytearray()
 
     for i in range(length):
         n = 8 * (length - 1 - i)
         thisNum = (num >> n) & 0xFF
-        if six.PY2:
-            lst.append(chr(thisNum))
-        else:
-            lst.append(thisNum)
+        lst.append(thisNum)
 
-    if six.PY2:
-        return string.join(lst, "") # @UndefinedVariable
-    else:
-        return bytes(lst)
+    return bytes(lst)
 
 def putVariableLengthNumber(x):
     '''
@@ -279,25 +269,17 @@ def putVariableLengthNumber(x):
     # note: negative numbers will cause an infinite loop here
     if x < 0:
         raise MidiException('cannot putVariableLengthNumber() when number is negative: %s' % x)
-    if six.PY2:
-        lst = []
-    else:
-        lst = bytearray()
+    
+    lst = bytearray()
     while True:
         y, x = x & 0x7F, x >> 7
-        if six.PY2:
-            lst.append(chr(y + 0x80))
-        else:
-            lst.append(y + 0x80)
+        lst.append(y + 0x80)
         if x == 0:
             break
     lst.reverse()
-    if six.PY2:
-        lst[-1] = chr(ord(lst[-1]) & 0x7f)
-        return string.join(lst, "")  # @UndefinedVariable
-    else:
-        lst[-1] = lst[-1] & 0x7f
-        return bytes(lst)
+    
+    lst[-1] = lst[-1] & 0x7f
+    return bytes(lst)
 
 def putNumbersAsList(numList):
     '''
@@ -565,7 +547,7 @@ class MidiEvent(object):
     # store generic data in parameter 1
     def _setData(self, value):
         if value is not None and not isinstance(value, bytes):
-            if isinstance(value, six.string_types):
+            if isinstance(value, str):
                 value = value.encode('utf-8')
 
         self._parameter1 = value
@@ -742,10 +724,7 @@ class MidiEvent(object):
                 if common.isNum(rsb):
                     rsb = bytes([rsb])
             else: # provide a default
-                if six.PY3:
-                    rsb = bytes([0x90])
-                else:
-                    rsb = chr(0x90)
+                rsb = bytes([0x90])
             #post = self._parseChannelVoiceMessage(str, runningStatusByte=rsb)
             #return post
             # add the running status byte to the front of the string
@@ -857,18 +836,12 @@ class MidiEvent(object):
             return x
 
         elif self.type in sysex_event_dict:
-            if six.PY2:
-                s = chr(sysex_event_dict[self.type])
-            else:
-                s = bytes([sysex_event_dict[self.type]])
+            s = bytes([sysex_event_dict[self.type]])
             s = s + putVariableLengthNumber(len(self.data))
             return s + self.data
 
         elif metaEvents.hasattr(self.type):
-            if six.PY2:
-                s = chr(0xFF) + chr(getattr(metaEvents, self.type))
-            else:
-                s = bytes([0xFF]) + bytes([getattr(metaEvents, self.type)])
+            s = bytes([0xFF]) + bytes([getattr(metaEvents, self.type)])
             s = s + putVariableLengthNumber(len(self.data))
 
             try: # TODO: need to handle unicode
@@ -1118,14 +1091,13 @@ class MidiTrack(object):
             # this writes both delta time and message events
             try:
                 ew = e.getBytes()
-                if six.PY3:
-                    intArray = []
-                    for x in ew:
-                        if common.isNum(x):
-                            intArray.append(x)
-                        else:
-                            intArray.append(ord(x))
-                    ew = bytes(bytearray(intArray))
+                intArray = []
+                for x in ew:
+                    if common.isNum(x):
+                        intArray.append(x)
+                    else:
+                        intArray.append(ord(x))
+                ew = bytes(bytearray(intArray))
                 midiStr = midiStr + ew
             except MidiException as me:
                 environLocal.warn("Conversion error for %s: %s; ignored." % (e, me))
@@ -1375,7 +1347,7 @@ class Test(unittest.TestCase):
         #self.assertEqual(mf.writestr(), None)
 
         # try to write contents
-        fileLikeOpen = six.BytesIO()
+        fileLikeOpen = io.BytesIO()
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()
@@ -1394,7 +1366,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mf.ticksPerSecond, None)
 
         # try to write contents
-        fileLikeOpen = six.BytesIO()
+        fileLikeOpen = io.BytesIO()
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()
@@ -1413,7 +1385,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mf.ticksPerSecond, None)
 
         # try to write contents
-        fileLikeOpen = six.BytesIO()
+        fileLikeOpen = io.BytesIO()
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()
@@ -1431,7 +1403,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mf.ticksPerSecond, None)
 
         # try to write contents
-        fileLikeOpen = six.BytesIO()
+        fileLikeOpen = io.BytesIO()
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()
@@ -1543,7 +1515,7 @@ class Test(unittest.TestCase):
         mf.tracks.append(mt)
 
 
-        fileLikeOpen = six.BytesIO()
+        fileLikeOpen = io.BytesIO()
         #mf.open('/src/music21/music21/midi/out.mid', 'wb')
         mf.openFileLike(fileLikeOpen)
         mf.write()
@@ -1632,7 +1604,7 @@ class Test(unittest.TestCase):
         mf.tracks.append(mt)
 
 
-        fileLikeOpen = six.BytesIO()
+        fileLikeOpen = io.BytesIO()
         #mf.open('/_scratch/test.mid', 'wb')
         mf.openFileLike(fileLikeOpen)
         mf.write()

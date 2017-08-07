@@ -16,11 +16,7 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 import math
 from music21.demos.audioSearchDemos import repetitionGame
 
-from music21.ext import six
-if six.PY2:
-    import Tkinter as tkinter # @UnresolvedImport @UnusedImport
-else:
-    import tkinter #  @UnresolvedImport @Reimport
+import tkinter #  @UnresolvedImport @Reimport
 
 
 class SFApp():

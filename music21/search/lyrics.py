@@ -13,7 +13,6 @@ Classes for searching for Lyric objects.
 '''
 from collections import namedtuple
 
-from music21.ext import six
 from music21.exceptions21 import Music21Exception
 #from music21 import common
 
@@ -188,7 +187,7 @@ class LyricSearcher(object):
         if s is not self.stream or self._indexTuples is None:
             self.index(s)
 
-        if isinstance(textOrRe, six.string_types):
+        if isinstance(textOrRe, str):
             plainText = True
         elif hasattr(textOrRe, 'finditer'):
             plainText = False

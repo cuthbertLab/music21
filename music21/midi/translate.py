@@ -13,9 +13,6 @@
 Module to translate MIDI data to music21 Streams and voice versa.  Note that quantization of
 notes takes place in the :meth:`~music21.stream.Stream.quantize` method not here.
 '''
-from __future__ import division, print_function
-
-
 import unittest
 import math
 import copy
@@ -27,7 +24,6 @@ from music21 import note
 from music21 import exceptions21
 from music21 import environment
 from music21 import stream
-from music21.ext import six
 
 _MOD = "midi.translate.py"
 environLocal = environment.Environment(_MOD)
@@ -2179,10 +2175,6 @@ class Test(unittest.TestCase):
         <MidiEvent DeltaTime, t=1024, track=1, channel=1>,
         <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=b''>]"""
 
-        if six.PY2:
-            #mta.events[1].data = mta.events[1].data.encode('ascii') # unicode fix
-            match = match.replace('data=b', 'data=')
-
 
         self.assertTrue(common.whitespaceEqual(str(mtAlt.events), match), str(mtAlt.events))
 
@@ -2228,9 +2220,6 @@ class Test(unittest.TestCase):
          <MidiEvent DeltaTime, t=0, track=1, channel=1>]"""
 
         self.maxDiff = None
-        if six.PY2:
-            #mta.events[1].data = mta.events[1].data.encode('ascii') # unicode fix
-            match = match.replace('data=b', 'data=')
         self.assertTrue(common.whitespaceEqual(str(mts.events[:5]), match))
 
         # first note-on is not delayed, even w anacrusis
@@ -2248,10 +2237,6 @@ class Test(unittest.TestCase):
 
         alto = s.parts['alto']
         mta = streamHierarchyToMidiTracks(alto)[0]
-
-        if six.PY2:
-            #mta.events[1].data = mta.events[1].data.encode('ascii') # unicode fix
-            match = match.replace('data=b', 'data=')
 
         self.assertTrue(common.whitespaceEqual(str(mta.events[:10]), match))
 
@@ -2274,10 +2259,6 @@ class Test(unittest.TestCase):
         <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data=b'\\x02\\x01'>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data=b'\\x04\\x02\\x18\\x08'>]"""
-        if six.PY2:
-            #mtList[0].events[1].data = mtList[0].events[1].data.encode('ascii') # unicode fix
-            match = match.replace('data=b', 'data=')
-
         self.assertTrue(common.whitespaceEqual(str(mtList[0].events[:12]), match))
 
     def testMidiProgramChangeA(self):
@@ -2359,10 +2340,6 @@ class Test(unittest.TestCase):
         <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=54, velocity=0>,
         <MidiEvent DeltaTime, t=1024, track=1, channel=1>,
         <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=b''>]"""
-
-        if six.PY2:
-            #mta.events[1].data = mta.events[1].data.encode('ascii') # unicode fix
-            match = match.replace('data=b', 'data=')
 
         results = str(mtList[0].events[-20:])
         self.assertTrue(common.whitespaceEqual(results, match), results)

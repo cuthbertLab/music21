@@ -10,8 +10,6 @@
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
-
-
 import multiprocessing
 import os
 import pickle

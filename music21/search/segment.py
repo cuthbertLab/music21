@@ -24,8 +24,6 @@ Speed notes:
    slightly different, but the speedup is between 10 and 100x! (but then PyPy probably won't work)
 
 '''
-from __future__ import print_function, division
-
 import copy
 import difflib
 import json

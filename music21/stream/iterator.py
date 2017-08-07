@@ -18,7 +18,6 @@ import unittest
 import warnings
 from music21 import common
 from music21.exceptions21 import StreamException
-from music21.ext import six
 from music21.stream import filters
 
 from music21.sites import SitesException
@@ -161,9 +160,6 @@ class StreamIterator(object):
 
         self.cleanup()
         raise StopIteration
-
-    if six.PY2:
-        next = __next__
 
     def __getattr__(self, attr):
         '''
@@ -397,9 +393,6 @@ class StreamIterator(object):
         for unused in self:
             return True
         return False
-
-    if six.PY2:
-        __nonzero__ = __bool__
 
     #----------------------------------------------------------------
     # start and stop
@@ -1232,9 +1225,6 @@ class OffsetIterator(StreamIterator):
             else:
                 raise StopIteration
 
-    if six.PY2:
-        next = __next__
-
     def reset(self):
         '''
         runs before iteration
@@ -1356,7 +1346,7 @@ class RecursiveIterator(StreamIterator):
             # depth
             if self.childRecursiveIterator is not None:
                 try:
-                    return self.childRecursiveIterator.next()
+                    return next(self.childRecursiveIterator)
                 except StopIteration:
                     #self.childRecursiveIterator.parentIterator = None
                     self.childRecursiveIterator = None
@@ -1414,7 +1404,7 @@ class RecursiveIterator(StreamIterator):
         ### the last element can still set a recursive iterator, so make sure we handle it.
         if self.childRecursiveIterator is not None:
             try:
-                return self.childRecursiveIterator.next()
+                return next(self.childRecursiveIterator)
             except StopIteration:
                 #self.childRecursiveIterator.parentIterator = None
                 self.childRecursiveIterator = None
@@ -1423,10 +1413,6 @@ class RecursiveIterator(StreamIterator):
         self.cleanup()
         raise StopIteration
 
-    #if six.PY2:
-    # this needs to be here to explicitly call next() in the same way
-    # later we can call next(...) once PY2 is dead...
-    next = __next__
 
     def matchingElements(self):
         # saved parent iterator later?

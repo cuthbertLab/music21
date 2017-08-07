@@ -11,12 +11,8 @@
 '''
 music21 translates to Lilypond format and if Lilypond is installed on the
 local computer, can automatically generate .pdf, .png, and .svg versions
-of musical files using Lilypond
-
-this replaces (July 2012) the old LilyString() conversion methods.
+of musical files using Lilypond.
 '''
-from __future__ import unicode_literals
-
 import os
 import re
 import subprocess
@@ -34,7 +30,6 @@ from music21 import exceptions21
 from music21 import variant
 from music21 import note
 from music21.lily import lilyObjects as lyo
-from music21.ext import six
 
 _MOD = 'lily.translate2012.py'
 environLocal = environment.Environment(_MOD)
@@ -198,8 +193,7 @@ class LilypondConverter(object):
                  "Please be sure it is installed. And that your " +
                  "environment.UserSettings()['lilypondPath'] is set to find it.")
         stdout, unused = proc.communicate()
-        if six.PY3: # pragma: no cover
-            stdout = stdout.decode(encoding='utf-8')
+        stdout = stdout.decode(encoding='utf-8')
         versionString = stdout.split()[2]
         versionPieces = versionString.split('.')
 
@@ -1728,11 +1722,7 @@ class LilypondConverter(object):
         >>> lpc.context.getParent().getParent().getParent() is lyTop
         True
         '''
-        # pylint: disable=undefined-variable
-        if six.PY2:
-            fraction = unicode(numerator) + '/' + unicode(denominator) # @UndefinedVariable
-        else: # pragma: no cover
-            fraction = str(numerator) + '/' + str(denominator)
+        fraction = str(numerator) + '/' + str(denominator)
         lpMusicList = lyo.LyMusicList()
         lpSequentialMusic = lyo.LySequentialMusic(musicList=lpMusicList)
         ## technically needed, but we can speed things up
@@ -2390,9 +2380,6 @@ class LilypondConverter(object):
 
         '''
         tloOut = str(self.topLevelObject)
-        if six.PY2:
-            tloOut = tloOut.encode('utf-8')
-
         if fp is None:
             fp = environLocal.getTempFile(ext)
 

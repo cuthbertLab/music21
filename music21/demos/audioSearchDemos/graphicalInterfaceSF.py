@@ -16,12 +16,8 @@ from music21 import corpus
 from music21 import converter
 from music21 import exceptions21
 import threading
-try:
-    import queue
-    import tkinter
-except ImportError:
-    import Queue as queue
-    import Tkinter as tkinter
+import queue
+import tkinter
 import time
 import math
 

@@ -29,9 +29,6 @@ where the contents of the POST is a JSON string.
 See docs for music21.webapps for specifications about the JSON string structure
 '''
 
-#sys.path.insert(0, '/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/')
-#sys.path.insert(0, '/Library/Python/2.7/site-packages/')
-
 from music21 import note
 
 

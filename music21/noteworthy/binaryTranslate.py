@@ -79,7 +79,6 @@ convert the file into .xml or .nwctxt first.
 import struct
 from music21 import environment
 from music21 import exceptions21
-from music21.ext import six
 
 environLocal = environment.Environment("noteworthy.translate")
 
@@ -250,15 +249,12 @@ class NWCConverter(object):
         updates the parsePosition unless updateParsePosition is False
         '''
         fc = self.fileContents
-        if six.PY2:
-            nulPosition = fc.find(b'\x00', self.parsePosition)
-        else:
-            try:
-                nulPosition = fc.index(0, self.parsePosition)
-            except ValueError:
-                nulPosition = -1
-                #raise NoteworthyBinaryTranslateException(fc[self.parsePosition:],
-                #            self.parsePosition)
+        try:
+            nulPosition = fc.index(0, self.parsePosition)
+        except ValueError:
+            nulPosition = -1
+            #raise NoteworthyBinaryTranslateException(fc[self.parsePosition:],
+            #            self.parsePosition)
         #print(self.parsePosition, nulPosition)
         ret = None
         if nulPosition == -1:
@@ -810,10 +806,7 @@ class NWCObject(object):
         else:
             self.dotAttribute = self.data2[3]
 
-        if six.PY2:
-            ordDot = ord(self.dotAttribute)
-        else:
-            ordDot = self.dotAttribute
+        ordDot = self.dotAttribute
 
         if (ordDot & 0x01) > 0:
             self.dots = 2
@@ -883,10 +876,7 @@ class NWCObject(object):
             self.alterationStr = ""
 
         self.tieInfo = ""
-        if six.PY2:
-            ordAtt1 = ord(self.attribute1[0])
-        else:
-            ordAtt1 = self.attribute1[0]
+        ordAtt1 = self.attribute1[0]
         if (ordAtt1 & 0x10) > 0:
             self.tieInfo = "^"
 

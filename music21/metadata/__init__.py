@@ -51,8 +51,6 @@ from music21 import common
 from music21 import freezeThaw
 from music21 import exceptions21
 
-from music21.ext import six
-
 from music21.metadata import bundles
 from music21.metadata import caching
 from music21.metadata import primitives
@@ -243,33 +241,18 @@ class Metadata(base.Music21Object):
             val = self._workIds[wid]
             if val is None:
                 continue
-            if six.PY3:
-                t = (str(wid), str(val))
-            else:
-                try:
-                    t = (str(wid), unicode(val)) # @UndefinedVariable
-                except UnicodeDecodeError as ude:
-                    print(val, repr(val), ude)
+            t = (str(wid), str(val))
             allOut.append(t)
         if not skipContributors:
             for contri in self.contributors:
                 for n in contri._names:
-                    if six.PY3:
-                        t = (str(contri.role), str(n))
-                    else:
-                        t = (str(contri.role), unicode(n)) # @UndefinedVariable
+                    t = (str(contri.role), str(n))
                     allOut.append(t)
         if self._date is not None:
-            if six.PY3:
-                t = ('date', str(self._date))
-            else:
-                t = ('date', unicode(self._date)) # @UndefinedVariable
+            t = ('date', str(self._date))
             allOut.append(t)
         if self.copyright is not None:
-            if six.PY3:
-                t = ('copyright', str(self.copyright))
-            else:
-                t = ('copyright', unicode(self.copyright)) # @UndefinedVariable
+            t = ('copyright', str(self.copyright))
             allOut.append(t)
 
 
@@ -508,7 +491,7 @@ class Metadata(base.Music21Object):
             useRegex = True
             reQuery = query  # already compiled
         # look for regex characters
-        elif (isinstance(query, six.string_types)
+        elif (isinstance(query, str)
               and any(character in query for character in '*.|+?{}')):
             useRegex = True
             reQuery = re.compile(query, flags=re.IGNORECASE) #  @UndefinedVariable
@@ -516,7 +499,7 @@ class Metadata(base.Music21Object):
         if useRegex:
             for value, innerField in valueFieldPairs:
                 # re.I makes case insensitive
-                if isinstance(value, six.string_types):
+                if isinstance(value, str):
                     match = reQuery.search(value)
                     if match is not None:
                         return True, innerField
@@ -526,7 +509,7 @@ class Metadata(base.Music21Object):
                     return True, innerField
         else:
             for value, innerField in valueFieldPairs:
-                if isinstance(value, six.string_types):
+                if isinstance(value, str):
                     query = str(query)
                     if query.lower() in value.lower():
                         return True, innerField

@@ -13,7 +13,7 @@
 A Sample mrjob. This mrjob is designed to extract all 91 features (jsymbolic and native)
 from every corpus file (1,200 scores). This is a work in progress =)
 '''
-from mrjob.job import MRJob
+from mrjob.job import MRJob # @UnresolvedImport
 
 from music21.demos.bhadley.mrjobaws import awsutility
 from music21.features import base

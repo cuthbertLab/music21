@@ -11,8 +11,6 @@
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      BSD or LGPL, see license.txt
 #-------------------------------------------------------------------------------
-from __future__ import division, print_function
-
 from music21 import corpus, features, converter, graph
 from music21 import figuredBass
 from music21 import expressions, stream
@@ -180,9 +178,10 @@ def xtestChinaEuropeSimpler():
 
 
 def prepareTrecentoCadences():
-    featureExtractors = features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9',
-                                                 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21',
-                                                 'mc1', # LANDINI CADENCE
+    featureExtractors = features.extractorsById(
+        ['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9',
+         'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21',
+         'mc1', # LANDINI CADENCE
                                                  ])
     ds = features.DataSet(classLabel='Composer')
     ds.addFeatureExtractors(featureExtractors)
@@ -247,7 +246,8 @@ def wekaCommands():
     # remove features that are the same for all pieces
     # -i: input file
     # -o: output file
-    java weka.filters.unsupervised.attribute.RemoveUseless -i chinaMitteleuropa-all.arff -o chinaMitteleuropa-no-useless.arff
+    java weka.filters.unsupervised.attribute.RemoveUseless 
+        -i chinaMitteleuropa-all.arff -o chinaMitteleuropa-no-useless.arff
 
     # run Naive Bayes
     # -t: data file. Default: uses the file for both training and testing data,

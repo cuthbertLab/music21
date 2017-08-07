@@ -166,10 +166,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
 #
 #     else:
 #         from music21 import environment
-#         if six.PY3:
-#             pip = 'pip3'
-#         else:
-#             pip = 'pip'
+#         pip = 'pip3'
 #         environLocal = environment.Environment('common.py')
 #         environLocal.warn('PIL/Pillow is not installed -- "sudo ' + pip + ' install Pillow"')
 #         return False

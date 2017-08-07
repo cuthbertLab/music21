@@ -453,7 +453,6 @@ class BrailleTextLine(object):
     >>> btl.append(braille.lookup.symbols['tie'])
     >>> btl
     <music21.braille.text.BrailleTextLine object at 0x10af9c630>
-    >>> if ext.six.PY2: str = unicode #_DOCS_HIDE
     >>> print(str(btl))
     ⠀⠈⠉
     """
@@ -472,7 +471,6 @@ class BrailleTextLine(object):
 
         >>> btl = braille.text.BrailleTextLine(6)
         >>> btl.append(braille.lookup.symbols['tie'], addSpace=False)
-        >>> if ext.six.PY2: str = unicode #_DOCS_HIDE
         >>> print(str(btl))
         ⠈⠉
         >>> btl.textLocation
@@ -517,7 +515,6 @@ class BrailleTextLine(object):
 
         >>> btl = braille.text.BrailleTextLine(6)
         >>> btl.insert(2, braille.lookup.symbols['tie'])
-        >>> if ext.six.PY2: str = unicode #_DOCS_HIDE
         >>> print(str(btl))
         ⠀⠀⠈⠉
         >>> btl.textLocation
@@ -634,7 +631,6 @@ class BrailleTextLine(object):
         >>> bt = braille.text.BrailleTextLine(10)
         >>> bt.append('hi', addSpace=False)
         >>> bt.append(braille.lookup.symbols['music_hyphen'], addSpace=False)
-        >>> if ext.six.PY2: str = unicode # _DOCS_HIDE
         >>> print(str(bt))
         hi⠐
         >>> bt.textLocation

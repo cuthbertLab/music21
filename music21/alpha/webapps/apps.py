@@ -40,10 +40,7 @@ def setupURLCorpusParseApp(agenda):
     >>> responseContentType
     'application/vnd.recordare.musicxml+xml; charset=utf-8'
 
-    Python 3 conversion first...
-
-    >>> if ext.six.PY3:
-    ...     responseData = responseData.decode('utf-8')
+    >>> responseData = responseData.decode('utf-8')
 
     >>> converter.parse(responseData).flat.highestOffset
     16.5
@@ -95,10 +92,7 @@ def setupConverterApp(agenda):
     >>> responseContentType
     'application/vnd.recordare.musicxml+xml; charset=utf-8'
 
-    Python 3 conversion first...
-
-    >>> if ext.six.PY3:
-    ...     responseData = responseData.decode('utf-8')
+    >>> responseData = responseData.decode('utf-8')
 
 
     >>> print(responseData)

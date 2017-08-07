@@ -27,18 +27,19 @@ To use the application, send a POST request to WEBSERVER:/music21interface
 where the contents of the POST is a POST from a form containing a zip file.
 
 '''
+
+from io import StringIO
+
+import zipfile
+import cgi
+import re
+
 from music21 import common
 from music21 import converter
 from music21 import note
 from music21 import interval
 from music21 import exceptions21
 
-from music21.ext import six
-StringIO = six.StringIO
-
-import zipfile
-import cgi
-import re
 #
 
 def music21ModWSGIZipFileApplication(environ, start_response):

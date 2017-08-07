@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function
-
 from music21 import audioSearch
 from music21 import converter
 from music21 import search

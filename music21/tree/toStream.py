@@ -15,7 +15,6 @@ Tools for generating new Streams from trees (fast, manipulatable objects)
 
 None of these things work acceptably yet.  This is super beta.
 '''
-
 from music21.exceptions21 import TreeException
 from music21.tree import timespanTree
 

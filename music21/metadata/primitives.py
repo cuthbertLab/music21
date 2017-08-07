@@ -24,9 +24,6 @@ import unittest
 from music21 import common
 from music21 import exceptions21
 
-from music21.ext import six
-if six.PY3:
-    unicode = str
 #------------------------------------------------------------------------------
 
 
@@ -136,8 +133,7 @@ class Date(object):
                     sub = fmt % value + Date.errorToSymbol(error)
                 else:
                     sub = fmt % value
-                if (six.PY3):
-                    sub = str(sub)
+                sub = str(sub)
                 msg.append(sub)
         return '/'.join(msg)
 
@@ -212,7 +208,7 @@ class Date(object):
         '''
         if isinstance(value, datetime.datetime):
             self.loadDatetime(value)
-        elif isinstance(value, six.string_types):
+        elif isinstance(value, str):
             self.loadStr(value)
         elif isinstance(value, Date):
             self.loadOther(value)
@@ -725,25 +721,12 @@ class Text(object):
     ### SPECIAL METHODS ###
 
     def __str__(self):
-        # print type(self._data)
-        if six.PY3:
-            if isinstance(self._data, bytes):
-                return self._data.decode('UTF-8')
-            elif not isinstance(self._data, str):
-                return str(self._data)
-            else:
-                return self._data
+        if isinstance(self._data, bytes):
+            return self._data.decode('UTF-8')
+        elif not isinstance(self._data, str):
+            return str(self._data)
         else:
-            if isinstance(self._data, unicode): #unicode in PY2, str in PY3
-                # not sure if this should be wrapped in in str() call
-                return self._data.encode('utf-8')
-            elif not isinstance(self._data, str):
-                return str(self._data)
-            else:
-                return self._data
-
-    def __unicode__(self):
-        return self.__str__().decode('utf-8')
+            return self._data
 
     ### PUBLIC PROPERTIES ###
 

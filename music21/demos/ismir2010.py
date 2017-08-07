@@ -108,7 +108,10 @@ def newDomSev(show=True):
         display.show()
 
 def melodicChordExpression(show=True):
-    '''This method not only searches the entire second violin part of a complete string quarter for a seventh chord expressed melodically, but creates new notation to display the results with analytical markup.
+    '''
+    This method not only searches the entire second violin part of a 
+    complete string quarter for a seventh chord expressed melodically, 
+    but creates new notation to display the results with analytical markup.
     '''
     #from music21 import *
     #from music21 import corpus, stream, chord
@@ -159,7 +162,9 @@ def  pitchDensity(show=True):
     beethovenScore = corpus.parse('beethoven/opus133.xml')
     celloPart = beethovenScore.getElementById('Cello')
 
-    #First, we take a "flat" view of the Stream, which removes nested containers such as Measures. Second, we combine tied notes into single notes with summed durations.
+    # First, we take a "flat" view of the Stream, which removes 
+    # nested containers such as Measures. Second, 
+    # we combine tied notes into single notes with summed durations.
 
     notes = celloPart.flat.stripTies()
     g = graph.plot.ScatterPitchClassOffset(notes,
@@ -218,8 +223,6 @@ def pitchQuarterLengthUsage3D(show=True):
 
 
 def messiaen(show=True):
-    #messiaen = #converter.parse('d:/docs/research/music21/ismir-2010/messiaen_valeurs_part2.xml')
-    #messiaen = converter.parse('/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml')
     mall = converter.parse('/Users/cuthbert/desktop/messiaen_valeurs_2012.xml')
     messiaenP = mall[1]
     #messiaen.show()
@@ -293,10 +296,12 @@ def demoGettingWorks():
     unused_s2 = corpus.parse('bach/bwv18.5-lz') # @UnusedVariable
 
     # Can parse data stored in MusicXML files locally or online:
-    unused_s = converter.parse('http://www.musicxml.org/xml/elite.xml') # @UnusedVariable
+    unused_s = converter.parse(
+        'http://www.musicxml.org/xml/elite.xml') # @UnusedVariable
 
     # Can parse data stored in MIDI files locally or online:
-    unused_s = converter.parse('http://www.jsbchorales.net/down/midi/010306b_.mid') # @UnusedVariable
+    unused_s = converter.parse(
+        'http://www.jsbchorales.net/down/midi/010306b_.mid') # @UnusedVariable
 
 
 
@@ -415,12 +420,15 @@ def demoGraphMessiaen():
     s.plot('histogram', 'pitchclass', dpi=dpi, title='Pitch Class Usage, %s' % pieceTitle)
 
 
-    s.plot('scatter', values=['pitchclass', 'offset'], dpi=dpi, title='Pitch Class By Measure, %s' % pieceTitle)
+    s.plot('scatter', values=['pitchclass', 'offset'], 
+           dpi=dpi, title='Pitch Class By Measure, %s' % pieceTitle)
 
-    s.plot('horizontalBar', values=['pitch', 'offset'], dpi=dpi, title='Pitch By Measure, %s' % pieceTitle)
+    s.plot('horizontalBar', values=['pitch', 'offset'], 
+           dpi=dpi, title='Pitch By Measure, %s' % pieceTitle)
 
 
-    s.plot('scatterweighted', values=['pitch', 'quarterlength'], dpi=dpi, title='Pitch and Duration, %s' % pieceTitle, xLog=False)
+    s.plot('scatterweighted', values=['pitch', 'quarterlength'], 
+           dpi=dpi, title='Pitch and Duration, %s' % pieceTitle, xLog=False)
 
     # s.getMeasuresRange(10, 20)plot('PlotHorizontalBarPitchSpaceOffset')
     # s.plot('PlotScatterWeightedPitchSpaceQuarterLength')
@@ -438,7 +446,8 @@ def demoGraphMessiaenBrief():
 
     #s.plot('scatter', values=['pitchclass', 'offset'], dpi=dpi)
 
-    s.plot('scatterweighted', title='', colorGrid=None, values=['pitch', 'quarterlength'], dpi=dpi, xLog=False)
+    s.plot('scatterweighted', title='', colorGrid=None, 
+           values=['pitch', 'quarterlength'], dpi=dpi, xLog=False)
 
 
 
@@ -462,11 +471,18 @@ def demoGraphMozartChopin():
     dpi = 300
 
     mozartStream = converter.parse(xmlTest.mozartTrioK581Excerpt) # @UndefinedVariable
-    g = graph.plot.Plot3DBarsPitchSpaceQuarterLength(mozartStream.stripTies(), dpi=dpi, title='Mozart Trio K. 581, Excerpt', colors=['#CD4F39'], alpha=.8)
+    g = graph.plot.Plot3DBarsPitchSpaceQuarterLength(mozartStream.stripTies(), 
+                                                     dpi=dpi, 
+                                                     title='Mozart Trio K. 581, Excerpt', 
+                                                     colors=['#CD4F39'], 
+                                                     alpha=.8)
     g.run()
 
     chopinStream = converter.parse(kernTest.mazurka6)
-    g = graph.plot.Plot3DBarsPitchSpaceQuarterLength(chopinStream.stripTies(), dpi=dpi, title='Chopin Mazurka 6, Excerpt', colors=['#6495ED'], alpha=.8)
+    g = graph.plot.Plot3DBarsPitchSpaceQuarterLength(chopinStream.stripTies(),
+                                                     dpi=dpi, 
+                                                     title='Chopin Mazurka 6, Excerpt', 
+                                                     colors=['#6495ED'], alpha=.8)
     g.run()
 
 

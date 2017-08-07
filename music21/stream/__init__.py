@@ -51,8 +51,6 @@ from music21 import repeat
 from music21 import sites
 from music21 import tempo
 
-from music21.ext import six
-
 from music21.stream import core
 from music21.stream import makeNotation
 from music21.stream import streamStatus
@@ -410,7 +408,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             found.coreElementsChanged(clearIsSorted=False)
             return found
 
-        elif isinstance(k, six.string_types):
+        elif isinstance(k, str):
             # first search id, then search groups
             idMatch = self.getElementById(k)
             if idMatch is not None:
@@ -688,9 +686,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if self._endElements:
             return True
         return False
-
-    if six.PY2:
-        __nonzero__ = __bool__
 
     #-------------------------------
     def _getClef(self):
@@ -11903,7 +11898,7 @@ class Measure(Stream):
 
     def _setLeftBarline(self, barlineObj):
         insert = True
-        if isinstance(barlineObj, six.string_types):
+        if isinstance(barlineObj, str):
             barlineObj = bar.Barline(barlineObj)
             barlineObj.location = 'left'
         elif barlineObj is None: # assume removal
@@ -11945,7 +11940,7 @@ class Measure(Stream):
 
     def _setRightBarline(self, barlineObj):
         insert = True
-        if isinstance(barlineObj, six.string_types):
+        if isinstance(barlineObj, str):
             barlineObj = bar.Barline(barlineObj)
             barlineObj.location = 'right'
         elif barlineObj is None: # assume removal

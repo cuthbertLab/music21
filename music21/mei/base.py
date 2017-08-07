@@ -209,8 +209,6 @@ from music21 import tie
 _MOD = 'mei.base'
 environLocal = environment.Environment(_MOD)
 
-from music21.ext import six
-
 
 # Module-Level Constants
 #------------------------------------------------------------------------------
@@ -2137,11 +2135,11 @@ def noteFromElement(elem, slurBundle=None):
                                                tagToFunction,
                                                elem.tag,
                                                slurBundle):
-        if isinstance(subElement, six.integer_types):
+        if isinstance(subElement, int):
             dotElements += subElement
         elif isinstance(subElement, articulations.Articulation):
             theNote.articulations.append(subElement)
-        elif isinstance(subElement, six.string_types):
+        elif isinstance(subElement, str):
             theNote.pitch.accidental = pitch.Accidental(subElement)
         elif isinstance(subElement, note.Lyric):
             theNote.lyrics = [subElement]
@@ -2939,7 +2937,7 @@ def _correctMRestDurs(staves, targetLength):
 
     Nothing is returned; the duration of affected objects is modified in-place.
     '''
-    for eachMeasure in six.itervalues(staves):
+    for eachMeasure in staves.values():
         for eachVoice in eachMeasure:
             if not isinstance(eachVoice, stream.Stream):
                 continue
@@ -2971,7 +2969,7 @@ def _makeBarlines(elem, staves):
         if hasattr(barz, '__len__'):
             # this means @left was "rptboth"
             barz = barz[1]
-        for eachMeasure in six.itervalues(staves):
+        for eachMeasure in staves.values():
             if isinstance(eachMeasure, stream.Measure):
                 eachMeasure.leftBarline = barz
 
@@ -2981,7 +2979,7 @@ def _makeBarlines(elem, staves):
             # this means @right was "rptboth"
             staves['next @left'] = barz[1]
             barz = barz[0]
-        for eachMeasure in six.itervalues(staves):
+        for eachMeasure in staves.values():
             if isinstance(eachMeasure, stream.Measure):
                 eachMeasure.rightBarline = barz
 
@@ -3088,8 +3086,8 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
     # Process objects from a <staffDef>...
     # We must process them now because, if we did it in the loop above, the respective <staff> may
     # not be processed before the <staffDef>.
-    for whichN, eachDict in six.iteritems(stavesWaiting):
-        for eachObj in six.itervalues(eachDict):
+    for whichN, eachDict in stavesWaiting.items():
+        for eachObj in eachDict.values():
             # We must insert() these objects because a <staffDef> signals its changes for the
             # *start* of the <measure> in which it appears.
             staves[whichN].insert(0, eachObj)
@@ -3241,12 +3239,12 @@ def sectionScoreCore(elem, allPartNs, slurBundle, **kwargs):
                     inNextThing[eachN].append(allPartObject)
             for eachN in allPartNs:
                 if eachN in localResult:
-                    for eachObj in six.itervalues(localResult[eachN]):
+                    for eachObj in localResult[eachN].values():
                         inNextThing[eachN].append(eachObj)
 
         elif staffDefTag == eachElem.tag:
             if eachElem.get('n') is not None:
-                for eachObj in six.itervalues(staffDefFromElement(eachElem, slurBundle)):
+                for eachObj in staffDefFromElement(eachElem, slurBundle).values():
                     if isinstance(eachObj, meter.TimeSignature):
                         activeMeter = eachObj
                     inNextThing[eachElem.get('n')].append(eachObj)
@@ -3265,7 +3263,7 @@ def sectionScoreCore(elem, allPartNs, slurBundle, **kwargs):
                                                                  nextMeasureLeft=nextMeasureLeft,
                                                                  backupMeasureNum=backupMeasureNum,
                                                                  slurBundle=slurBundle)
-            for eachN, eachList in six.iteritems(localParsed):
+            for eachN, eachList in localParsed.items():
                 # NOTE: "eachList" is a list of objects that will become a music21 Part.
                 #
                 # first: if there were objects from a previous <scoreDef> or <staffDef>, we need to

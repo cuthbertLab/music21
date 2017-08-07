@@ -62,7 +62,6 @@ from music21 import pitch
 from music21 import interval
 from music21 import sieve
 
-from music21.ext import six
 _MOD = "scale.py"
 environLocal = environment.Environment(_MOD)
 
@@ -269,7 +268,7 @@ class AbstractScale(Scale):
         '''
         pitchListReal = []
         for p in pitchList:
-            if isinstance(p, six.string_types):
+            if isinstance(p, str):
                 pitchListReal.append(pitch.Pitch(p))
             elif hasattr(p, 'classes') and 'GeneralNote' in p.classes:
                 pitchListReal.append(p.pitch)
@@ -1257,7 +1256,7 @@ class ConcreteScale(Scale):
         # no default tonic is defined; as such, it is mostly an abstract scale
         if tonic is None:
             self.tonic = None #pitch.Pitch()
-        elif isinstance(tonic, six.string_types):
+        elif isinstance(tonic, str):
             self.tonic = pitch.Pitch(tonic)
         elif hasattr(tonic, 'classes') and 'GeneralNote' in tonic.classes:
             self.tonic = tonic.pitch
@@ -1525,9 +1524,9 @@ class ConcreteScale(Scale):
                 pitchObj = self.tonic
             stepOfPitch = self._abstract.tonicDegree
 
-            if isinstance(minPitch, six.string_types):
+            if isinstance(minPitch, str):
                 minPitch = pitch.Pitch(minPitch)
-            if isinstance(maxPitch, six.string_types):
+            if isinstance(maxPitch, str):
                 maxPitch = pitch.Pitch(maxPitch)
 
             if (minPitch is not None
@@ -1919,7 +1918,7 @@ class ConcreteScale(Scale):
         >>> eflatMaj.solfeg(pitch.Pitch('G#'), variant='humdrum')
         'my'
         '''
-        if isinstance(pitchTarget, six.string_types):
+        if isinstance(pitchTarget, str):
             pitchTarget = pitch.Pitch(pitchTarget)
         (scaleDeg, accidental) = self.getScaleDegreeAndAccidentalFromPitch(pitchTarget, direction)
         if variant == 'music21':
@@ -2050,7 +2049,7 @@ class ConcreteScale(Scale):
         >>> sc1.isNext('d4', 'c4', 'ascending')
         True
         '''
-        if isinstance(other, six.string_types): # convert to pitch
+        if isinstance(other, str): # convert to pitch
             other = pitch.Pitch(other)
         elif hasattr(other, 'pitch'): # possibly a note
             other = other.pitch # just get pitch component
@@ -3021,7 +3020,7 @@ class ScalaScale(ConcreteScale):
     def __init__(self, tonic=None, scalaString=None):
         if (tonic is not None
             and scalaString is None
-            and isinstance(tonic, six.string_types)
+            and isinstance(tonic, str)
             and (len(tonic) >= 4
                  or tonic.endswith('scl')) ):
             # just a scale was wanted

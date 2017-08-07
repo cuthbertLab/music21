@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function, division
-
 from music21 import stream
 from music21 import clef
 from music21 import converter, corpus, instrument, graph, note, meter, humdrum

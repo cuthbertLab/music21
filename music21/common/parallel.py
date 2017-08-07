@@ -39,7 +39,7 @@ def runParallel(iterable, parallelFunction,
     If updateSendsIterable is True then the update function will get the iterable
     content, not the output
 
-    As of Python 2.7, partial functions are pickleable, so if you need to pass the same
+    As of Python 3, partial functions are pickleable, so if you need to pass the same
     arguments to parallelFunction each time, make it a partial function before passing
     it to runParallel.
 

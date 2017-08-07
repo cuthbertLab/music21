@@ -22,7 +22,6 @@ from music21 import interval
 from music21 import note
 from music21 import musicxml
 
-from music21.ext import six
 from music21 import environment
 _MOD = 'mgtaPart1.py'
 environLocal = environment.Environment(_MOD)
@@ -245,7 +244,7 @@ def ch1_basic_II_C(data, intervalShift):
     for chunk in data:
         m = stream.Measure()
         for e in chunk:
-            if isinstance(e, six.string_types):
+            if isinstance(e, str):
                 n1 = note.Note(e)
                 n1.quarterLength = 4
                 n2 = n1.transpose(intervalShift)

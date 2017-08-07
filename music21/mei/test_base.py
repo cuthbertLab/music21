@@ -26,7 +26,6 @@ Tests for :mod:`music21.mei.base`.
 # pylint is bad at guessing types in these tests---reasonably so
 # pylint: disable=maybe-no-member
 
-# pylint doesn't realize that we need music21.ext.six before we know where mock is.
 # pylint: disable=ungrouped-imports
 # pylint: disable=redefined-builtin
 # pylint: disable=import-error
@@ -40,16 +39,7 @@ from xml.etree import ElementTree as ETree
 
 from collections import defaultdict
 from fractions import Fraction
-
-from music21.ext import six
-from six.moves import xrange   # @UnusedImport @UnresolvedImport
-from six.moves import range  # @UnresolvedImport @NoMove
-
-if six.PY3:
-    from unittest import mock  # @UnusedImport @NoMove # pylint: disable=no-name-in-module
-else:
-    from music21.ext import mock  # @Reimport
-
+from unittest import mock  # @UnusedImport @NoMove # pylint: disable=no-name-in-module
 
 from music21 import articulations
 from music21 import bar

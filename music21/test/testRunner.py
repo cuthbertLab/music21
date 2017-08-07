@@ -15,84 +15,16 @@ The testRunner module contains the all important "mainTest" function that runs t
 in a given module.  Except for the one instance of "defaultImports", everything here
 can run on any system, not just music21.
 '''
-from __future__ import (division, print_function, absolute_import)
-
-import __future__
-
 import doctest
 import inspect
 import re
 import sys
 import unittest
-from music21.ext import six
-
 
 defaultImports = ['music21']
 
-###### monkey patch doctest...
-
-def _msc_extract_future_flags(globs):
-    '''
-    Pretend like no matter what, the PY2 code has
-    all __future__ flags set.
-    '''
-    flags = 0
-    for fname in __future__.all_feature_names:
-        if fname in ('absolute_import',
-                     'print_function',
-                     'division',
-                     ):
-            flags |= getattr(__future__, fname).compiler_flag
-    return flags
-
-if six.PY2:
-    doctest._extract_future_flags = _msc_extract_future_flags
-
-    naive_single_quote_re = re.compile(r"(^|.)'((\\'|[^'])*?)'")
-    naive_double_quote_re = re.compile(r'(^|.)"((\\"|[^"])*?)"')
-
-    # s = single; d = double; u = unicode; b = binary;
-    # thus suquoteConv = single unicode quote converter
-    suquoteConv = lambda m: (m.group(1) if m.group(1) != "u" else "") + "'" + m.group(2) + "'"
-    duquoteConv = lambda m: (m.group(1) if m.group(1) != "u" else "") + '"' + m.group(2) + '"'
-
-    sbquoteConv = lambda m: (m.group(1) if m.group(1) != "b" else "") + "'" + m.group(2) + "'"
-    dbquoteConv = lambda m: (m.group(1) if m.group(1) != "b" else "") + '"' + m.group(2) + '"'
 
 #ALL_OUTPUT = []
-
-class Py3In2OutputChecker(doctest.OutputChecker):
-    '''
-    In music21, we write all doctests for passing
-    under Python 3.  The differences between it and
-    Py2 mean that we need to find certain differences
-    and remove them.
-
-    First version: removes bytes from the expected output (want) and unicode from received (got)
-    '''
-    def check_output(self, want, got, optionflags):
-        '''
-        cannot use super with Py2 since we have old-style classes going on.
-        '''
-        if six.PY3:
-            return super().check_output(want, got, optionflags)
-        else:
-            #x = [want, got]
-            wantOrig = want
-            gotOrig = got
-
-            want = naive_single_quote_re.sub(sbquoteConv, want) # bytes in WANT disappear
-            want = naive_double_quote_re.sub(dbquoteConv, want) # bytes in WANT disappear
-
-            got = naive_single_quote_re.sub(suquoteConv, got) # unicode in GOT disappears
-            got = naive_double_quote_re.sub(duquoteConv, got) # unicode in GOT disappears
-
-            #x.extend([want, got])
-            #ALL_OUTPUT.append(x)
-            # if either the original output or the replaced output matches, then it's good.
-            return (doctest.OutputChecker.check_output(self, want, got, optionflags) or
-                    doctest.OutputChecker.check_output(self, wantOrig, gotOrig, optionflags)
-                    )
 
 ###### test related functions
 
@@ -143,7 +75,6 @@ def addDocAttrTestsToSuite(suite,
                 continue
             dtc = doctest.DocTestCase(dt,
                                       optionflags=optionflags,
-                                      checker=Py3In2OutputChecker()
                                       )
             #print(dtc)
             suite.addTest(dtc)
@@ -186,26 +117,15 @@ def fixTestsForPy2and3(doctestSuite):
             continue
         dt = dtc._dt_test # DocTest
         for example in dt.examples: # fix Traceback exception differences Py2 to Py3
-            if six.PY3:
-                if example.exc_msg is not None and example.exc_msg:
-                    example.exc_msg = "..." + example.exc_msg
-                elif (example.want is not None
-                        and example.want.startswith('u\'')):
-                    # probably a unicode example:
-                    # simplistic, since (u'hi', u'bye')
-                    # won't be caught, but saves a lot of anguish
-                    example.want = example.want[1:]
-            elif six.PY2:
-                if example.exc_msg is not None and example.exc_msg:
-                    example.exc_msg = re.sub(r'^(\w|\.)*\.(\w+\:)', r'\2', example.exc_msg)
-                if (example.want is not None
-                        and example.want.startswith('b\'')):
-                    # probably a unicode example:
-                    # simplistic, since (b'hi', b'bye')
-                    # won't be caught, but saves a lot of anguish
-                    example.want = example.want[1:]
-            # this probably should not go here, but we are already iterating over
-            # examples
+            if example.exc_msg is not None and example.exc_msg:
+                # TODO: version 5 -- remove.
+                example.exc_msg = "..." + example.exc_msg
+            elif (example.want is not None
+                    and example.want.startswith('u\'')):
+                # probably a unicode example:
+                # simplistic, since (u'hi', u'bye')
+                # won't be caught, but saves a lot of anguish
+                example.want = example.want[1:]
             example.want = stripAddresses(example.want, '0x...')
 
 ADDRESS = re.compile('0x[0-9A-Fa-f]+')
@@ -312,7 +232,6 @@ def mainTest(*testClasses, **kwargs):
                 '__main__',
                 globs=globs,
                 optionflags=optionflags,
-                checker=Py3In2OutputChecker()
                 )
         except ValueError as ve: # no docstrings
             print("Problem in docstrings [usually a missing r value before " +
@@ -350,7 +269,7 @@ def mainTest(*testClasses, **kwargs):
             ):
         testClasses = [] # remove cases
     for t in testClasses:
-        if not isinstance(t, six.string_types):
+        if not isinstance(t, str):
             if displayNames is True:
                 for tName in unittest.defaultTestLoader.getTestCaseNames(t):
                     print('Unit Test Method: %s' % tName)

@@ -20,14 +20,6 @@ this replaces (April 2012) the old LilyString() conversion methods.
 The Grammar for Lilypond comes from
 http://lilypond.org/doc/v2.14/Documentation/notation/lilypond-grammar
 '''
-from __future__ import unicode_literals
-#python3
-try:
-    basestring # @UndefinedVariable
-except NameError: # pragma: no cover
-    basestring = str # @ReservedAssignment
-
-
 import unittest
 from music21 import common
 from music21 import exceptions21
@@ -1902,7 +1894,7 @@ class LyFullMarkupList(LyObject):
         self.markupListOrIdentifier = markupListOrIdentifier
 
     def stringOutput(self):
-        if isinstance(self.markupListOrIdentifier, basestring):
+        if isinstance(self.markupListOrIdentifier, str):
             return self.markupListOrIdentifier + " "
         else:
             return self.backslash + "markuplines " + self.markupListOrIdentifier.stringOutput()
@@ -1913,7 +1905,7 @@ class LyFullMarkup(LyObject):
         self.markupTopOrIdentifier = markupTopOrIdentifier
 
     def stringOutput(self):
-        if isinstance(self.markupTopOrIdentifier, basestring):
+        if isinstance(self.markupTopOrIdentifier, str):
             return self.markupTopOrIdentifier + " "
         else:
             return self.backslash + "markup " + self.markupTopOrIdentifier.stringOutput()

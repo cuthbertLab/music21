@@ -93,7 +93,7 @@ def unbundleOpus(opusStream):
     md5hash = md5OfCorpusFile(corpusFilepath)
     for num in opusStream.getNumbers():
         st = opusStream.getScoreByNumber(num)
-        corpus._addCorpusFilepath(st, corpusFilepath)
+        corpus.corpora.LocalCorpus().saddPath(st, corpusFilepath)
         results.append ( (st, (md5hash+'.'+num) ) )
     return results
 
@@ -101,12 +101,14 @@ def getStreamAndmd5(corpusFilepath):
     '''
     returns a list of all the corpus,md5hash pairs associated with this file, typically
     this is just a list of one tuple but if the file path contains an opus file, these
-    are parsed into tuples with :meth:`music21.demos.bhadley.aws.unbundleOpus` and the list is returned
+    are parsed into tuples with :meth:`music21.demos.bhadley.aws.unbundleOpus` 
+    and the list is returned
 
     >>> from music21.demos.bhadley.mrjobaws.awsutility import getStreamAndmd5
 
     >>> #_DOCS_SHOW getStreamAndmd5('airdsAirs/book3.abc')[12:14]
-    [(<music21.stream.Score ...>, 'c1666c19d63fc0940f111008e2269f75.413'), (<music21.stream.Score ...>, 'c1666c19d63fc0940f111008e2269f75.414')]
+    [(<music21.stream.Score ...>, 'c1666c19d63fc0940f111008e2269f75.413'), 
+     (<music21.stream.Score ...>, 'c1666c19d63fc0940f111008e2269f75.414')]
     >>> getStreamAndmd5('bach/bwv412.mxl')
     [(<music21.stream.Score ...>, 'f9d5807477e61f03b66c99ce825a3b5f')]
 

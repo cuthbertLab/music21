@@ -41,8 +41,6 @@ from music21.common.stringTools import *
 from music21.common.weakrefTools import * # including wrapWeakref
 
 
-import pickle as pickleMod # @Reimport
-
 DEBUG_OFF = 0
 DEBUG_USER = 1
 DEBUG_DEVEL = 63
