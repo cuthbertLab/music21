@@ -180,7 +180,7 @@ class Metadata(base.Music21Object):
     ### INITIALIZER ###
 
     def __init__(self, *args, **keywords):
-        base.Music21Object.__init__(self)
+        super().__init__()
 
         # a list of Contributor objects
         # there can be more than one composer, or any other combination

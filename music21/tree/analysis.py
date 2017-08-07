@@ -160,7 +160,7 @@ class Horizontality(collections.Sequence):
 #         voiceTwoNoteTwo=None,
 #         key_signature=None,
 #         ):
-#         base.Music21Object.__init__(self)
+#         super().__init__()
 #         if key_signature is None:
 #             key_signature = key.Key('C')
 #         self._key_signature = key.Key(key_signature)

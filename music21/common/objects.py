@@ -31,7 +31,7 @@ class defaultlist(list):
     True
     '''
     def __init__(self, fx):
-        list.__init__(self)
+        super().__init__()
         self._fx = fx
 
     def _fill(self, index):

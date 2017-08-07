@@ -1076,7 +1076,7 @@ class Ligature(base.Music21Object):
     '''
 
     def __init__(self, pitches=None, color='black', filled='yes'):
-        base.Music21Object.__init__(self)
+        super().__init__()
         self.noteheadShape = None
         self.stems = None
         self.maximaNotes = None

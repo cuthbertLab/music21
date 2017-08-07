@@ -651,7 +651,7 @@ class MusicXMLImporter(XMLParserBase):
     Object for importing .xml, .mxl, .musicxml, MusicXML files into music21.
     '''
     def __init__(self):
-        XMLParserBase.__init__(self)
+        super().__init__()
         self.xmlText = None
         self.xmlFilename = None
         self.xmlRoot = None
@@ -1080,7 +1080,7 @@ class PartParser(XMLParserBase):
     called out for multiprocessing potential in future
     '''
     def __init__(self, mxPart=None, mxPartInfo=None, parent=None):
-        XMLParserBase.__init__(self)
+        super().__init__()
         self.mxPart = mxPart
         self.mxPartInfo = mxPartInfo
         if mxPart is not None:
@@ -1727,7 +1727,7 @@ class MeasureParser(XMLParserBase):
     # TODO: part-symbol
     # not TODO: directive DEPRECATED since MusicXML 2.0
     def __init__(self, mxMeasure=None, parent=None):
-        XMLParserBase.__init__(self)
+        super().__init__()
 
         self.mxMeasure = mxMeasure
         self.mxMeasureElements = []

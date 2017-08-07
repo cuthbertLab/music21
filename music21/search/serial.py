@@ -73,7 +73,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
                   'originalCenteredTransformationsFromMatched']
 
     def __init__(self, segment=None, containerStream=None, partNumber=0):
-        base.Music21Object.__init__(self)
+        super().__init__()
         self.segment = segment
         self.containerStream = containerStream
         self.partNumber = partNumber

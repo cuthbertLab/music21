@@ -82,7 +82,7 @@ class BachBWV1007Prelude(VirtualWork):
     ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
     '''
     def __init__(self):
-        VirtualWork.__init__(self)
+        super().__init__()
 
         self.composer = 'Johann Sebastian Bach'
         self.title = 'Prelude from Cello Suite No. 1 in G Major, BWV 1007'
@@ -94,7 +94,7 @@ class BachBWV1007Prelude(VirtualWork):
 
 class BachBWV772(VirtualWork):
     def __init__(self):
-        VirtualWork.__init__(self)
+        super().__init__()
 
         self.composer = 'Johann Sebastian Bach'
         self.title = 'Invention No. 1 in C Major, BWV 772'
@@ -105,7 +105,7 @@ class BachBWV772(VirtualWork):
 
 class BachBWV773(VirtualWork):
     def __init__(self):
-        VirtualWork.__init__(self)
+        super().__init__()
 
         self.composer = 'Johann Sebastian Bach'
         self.title = 'Invention No. 2 in C Minor, BWV 773'
@@ -118,7 +118,7 @@ class BachBWV773(VirtualWork):
 class ColtraneGiantSteps(VirtualWork):
     # post operation: needs make accidentals
     def __init__(self):
-        VirtualWork.__init__(self)
+        super().__init__()
 
         self.composer = 'John Coltrane'
         self.title = 'Giant Steps'
@@ -130,7 +130,7 @@ class ColtraneGiantSteps(VirtualWork):
 
 class SchubertD576(VirtualWork):
     def __init__(self):
-        VirtualWork.__init__(self)
+        super().__init__()
 
         self.composer = 'Franz Schubert'
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
@@ -141,7 +141,7 @@ class SchubertD576(VirtualWork):
 
 class SchubertD5762(VirtualWork):
     def __init__(self):
-        VirtualWork.__init__(self)
+        super().__init__()
 
         self.composer = 'Franz Schubert'
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
@@ -152,7 +152,7 @@ class SchubertD5762(VirtualWork):
 
 class SchubertD5763(VirtualWork):
     def __init__(self):
-        VirtualWork.__init__(self)
+        super().__init__()
 
         self.composer = 'Franz Schubert'
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
@@ -163,7 +163,7 @@ class SchubertD5763(VirtualWork):
 
 class SchubertD5764(VirtualWork):
     def __init__(self):
-        VirtualWork.__init__(self)
+        super().__init__()
 
         self.composer = 'Franz Schubert'
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
@@ -174,7 +174,7 @@ class SchubertD5764(VirtualWork):
 
 class PachelbelCanonD(VirtualWork):
     def __init__(self):
-        VirtualWork.__init__(self)
+        super().__init__()
 
         self.composer = 'Johann Pachelbel'
         self.title = 'Canon in D Major'

@@ -50,7 +50,7 @@ class Wildcard(m21Base.Music21Object):
     >>> st1.append(wc1)
     '''
     def __init__(self):
-        m21Base.Music21Object.__init__(self)
+        super().__init__()
         self.duration = WildcardDuration()
 
 class SearchMatch(namedtuple('SearchMatch', 'elStart els index iterator')):
