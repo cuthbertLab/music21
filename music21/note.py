@@ -1578,7 +1578,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
             b = Note()
             b.quarterLength = qLen
             b.name = pitchName
-            b.color = '#FF00FF'
+            b.style.color = '#FF00FF'
             # print a.musicxml
             a.append(b)
 

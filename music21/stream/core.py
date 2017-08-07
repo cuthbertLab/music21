@@ -25,7 +25,6 @@ All functions here will eventually begin with `.core`.
 
 import unittest
 
-from music21 import common
 from music21 import spanner
 from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException
@@ -238,10 +237,10 @@ class StreamCoreMixin:
             return True
 
         for e in self._elements:
-            if id(e) == objId:
+            if id(e) == objId: # pragma: no cover
                 return True
         for e in self._endElements:
-            if id(e) == objId:
+            if id(e) == objId: # pragma: no cover
                 return True
         return False
 
@@ -267,6 +266,10 @@ class StreamCoreMixin:
         True
         >>> s.coreGetElementByMemoryLocation(id(n2)) is None
         True
+        >>> b = bar.Barline()
+        >>> s.storeAtEnd(b)
+        >>> s.coreGetELementByMemoryLocation(id(b)) is b
+        True
         '''
         # NOTE: this may be slightly faster than other approaches
         # as it does not sort.
@@ -285,6 +288,13 @@ class StreamCoreMixin:
         important checks to that element.
 
         Used by both insert() and append()
+        
+        Returns None or raises a StreamException
+        
+        >>> s = stream.Stream()
+        >>> s.coreGuardBeforeAddElement(s)
+        Traceback (most recent call last):
+        music21.exceptions21.StreamException: this Stream cannot be contained within itself
         '''
         # using id() here b/c we do not want to get __eq__ comparisons
         if element is self: # cannot add this Stream into itself
@@ -303,7 +313,7 @@ class StreamCoreMixin:
                                                     (element, id(element), self, id(self)))
                 # something was old... delete from _offsetDict
                 # environLocal.warn('stale object')
-                del self._offsetDict[idElement]
+                del self._offsetDict[idElement] # pragma: no cover
         # if we do not purge locations here, we may have ids() for
         # Stream that no longer exist stored in the locations entry
         # note that dead locations are also purged from .sites during
