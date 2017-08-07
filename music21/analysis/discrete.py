@@ -44,7 +44,7 @@ environLocal = environment.Environment(_MOD)
 class DiscreteAnalysisException(exceptions21.Music21Exception):
     pass
 
-class DiscreteAnalysis(object):
+class DiscreteAnalysis:
     ''' Parent class for analytical methods.
 
     Each analytical method returns a discrete numerical (or other) results as well as a color.

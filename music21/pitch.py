@@ -1236,7 +1236,7 @@ class Accidental(style.StyleMixin):
 
 #-------------------------------------------------------------------------------
 ## tried as SlottedObjectMixin -- made creation time slower! Not worth the restrictions
-class Pitch(object):
+class Pitch:
     '''
     A fundamental object that represents a single pitch.
 

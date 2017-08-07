@@ -19,7 +19,7 @@ import unittest
 from music21 import common
 from music21.exceptions21 import Music21Exception
 
-class Documenter(object):
+class Documenter:
     '''
     Abstract base class for documenting classes.
     '''

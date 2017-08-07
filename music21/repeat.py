@@ -29,7 +29,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-class RepeatMark(object):
+class RepeatMark:
     '''
     Base class of all repeat objects, including RepeatExpression objects and
     Repeat (Barline) objects.
@@ -658,7 +658,7 @@ def deleteMeasures(s, toDelete, inPlace=False, correctMeasureNumbers=True):
 class ExpanderException(exceptions21.Music21Exception):
     pass
 
-class Expander(object):
+class Expander:
     '''
     The Expander object can expand a single Part or Part-like Stream with repeats. Nested
     repeats given with :class:`~music21.bar.Repeat` objects, or
@@ -1869,7 +1869,7 @@ class NoInternalStreamException(exceptions21.Music21Exception):
 
 
 #TODO: change terminology for defaultHash.  It's not really a hash function...
-class RepeatFinder(object):
+class RepeatFinder:
     '''
     An object for finding and simplifying repeated sections of music. Must be passed a stream
     which contains either measures or parts containing measures.

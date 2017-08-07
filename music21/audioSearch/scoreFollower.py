@@ -24,7 +24,7 @@ _MOD = 'audioSearch/transcriber.py'
 environLocal = environment.Environment(_MOD)
 
 
-class ScoreFollower(object):
+class ScoreFollower:
 
     def __init__(self, scoreStream=None):
         self.scoreStream = scoreStream

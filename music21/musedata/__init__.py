@@ -51,7 +51,7 @@ class MuseDataException(exceptions21.Music21Exception):
 
 
 #-------------------------------------------------------------------------------
-class MuseDataRecord(object):
+class MuseDataRecord:
     '''
     Object for extracting data from a Note or other related record, or a
     single line of musedata data.
@@ -574,7 +574,7 @@ class MuseDataRecord(object):
         return False
 
 #-------------------------------------------------------------------------------
-class MuseDataRecordIterator(object):
+class MuseDataRecordIterator:
     '''
     Create MuseDataRecord objects on demand, in order
     '''
@@ -597,7 +597,7 @@ class MuseDataRecordIterator(object):
     next = __next__ #py2
 
 #-------------------------------------------------------------------------------
-class MuseDataMeasure(object):
+class MuseDataMeasure:
     '''
     A MuseDataMeasure is an abstraction of the data contained within a measure definitions.
 
@@ -733,7 +733,7 @@ class MuseDataMeasure(object):
 
 
 #-------------------------------------------------------------------------------
-class MuseDataMeasureIterator(object):
+class MuseDataMeasureIterator:
     '''Create MuseDataMeasure objects on demand, in order
     '''
     def __init__(self, src, boundaries, parent):
@@ -757,7 +757,7 @@ class MuseDataMeasureIterator(object):
     next = __next__ # py2
 
 #-------------------------------------------------------------------------------
-class MuseDataPart(object):
+class MuseDataPart:
     '''A MuseData part is defined by collection of lines
     '''
     def __init__(self, src=None, stage=None):
@@ -1477,7 +1477,7 @@ class MuseDataPart(object):
 
 
 #-------------------------------------------------------------------------------
-class MuseDataFile(object):
+class MuseDataFile:
     '''
     A MuseDataFile file may describe one or more MuseDataPart;
     a Score might need multiple files for complete definition.
@@ -1562,7 +1562,7 @@ class MuseDataFile(object):
 
 
 #-------------------------------------------------------------------------------
-class MuseDataWork(object):
+class MuseDataWork:
     '''A work might consist of one ore more files.
     '''
 
@@ -1633,7 +1633,7 @@ class MuseDataWork(object):
 
 
 #-------------------------------------------------------------------------------
-class MuseDataDirectory(object):
+class MuseDataDirectory:
     '''
     This class manages finding musedata files stored in a directory,
     comparing file names and examining sub directories to determine which files are parts.

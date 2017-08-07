@@ -34,7 +34,7 @@ from io import BytesIO
 class StreamPlayerException(Music21Exception):
     pass
 
-class StreamPlayer(object):  # pragma: no cover
+class StreamPlayer:  # pragma: no cover
     '''
     Create a player for a stream that plays its midi version in realtime using pygame.
 

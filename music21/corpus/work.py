@@ -21,7 +21,7 @@ CorpusWork = namedtuple('CorpusWork', 'title files virtual')
 CorpusFile = namedtuple('CorpusFile', 'path title filename format ext')
 # VirtualCorpusFile = namedtuple('VirtualCorpusFile', 'path title url format')
 
-class DirectoryInformation(object):
+class DirectoryInformation:
     '''
     returns information about a directory in a Corpus.  Called from corpus.corpora.Corpus
 

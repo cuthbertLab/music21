@@ -99,7 +99,7 @@ S: [G] $In $Vr $Ch $In*2 $Ch $Vr2 $Ch $Ch $Co
 class CTSongException(exceptions21.Music21Exception):
     pass
 
-class CTSong(object):
+class CTSong:
     r"""
     This parser is an object-oriented approach to parsing clercqTemperley text files into music.
 
@@ -521,7 +521,7 @@ class CTSong(object):
 class CTRuleException(exceptions21.Music21Exception):
     pass
 
-class CTRule(object):
+class CTRule:
     '''
     CTRule objects correspond to the individual lines defined in a
     :class:`~music21.romanText.clercqTemperley.CTSong` object. They are typically

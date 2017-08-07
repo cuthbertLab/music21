@@ -13,7 +13,7 @@ from music21 import stream
 
 from music21.alpha.trecento import cadencebook
 
-class IntervalSearcher(object):
+class IntervalSearcher:
     def __init__(self, intervalList=None):
         if intervalList is None:
             intervalList = []
@@ -45,7 +45,7 @@ class IntervalSearcher(object):
                 return True
         return False
 
-class NoteSearcher(object):
+class NoteSearcher:
     '''Needs an exact list -- make sure no rests!'''
     def __init__(self, noteList=None):
         if noteList is None:

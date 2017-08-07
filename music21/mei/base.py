@@ -267,7 +267,7 @@ _BAD_VERSE_NUMBER = 'Verse number must be an int (got "{}")'
 
 # Module-level Functions
 #------------------------------------------------------------------------------
-class MeiToM21Converter(object):
+class MeiToM21Converter:
     '''
     A :class:`MeiToM21Converter` instance manages the conversion of an MEI document into music21
     objects.

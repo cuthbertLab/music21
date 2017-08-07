@@ -37,7 +37,7 @@ def sortByPMFC(work):
 
     >>> from music21.alpha.trecento.runTrecentoCadence import sortByPMFC
 
-    >>> class Work(object):
+    >>> class Work:
     ...    def __init__(self, id):
     ...        self.id = id
     ...

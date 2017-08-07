@@ -3,7 +3,7 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 import os
 
-class IPythonPNGObject(object):
+class IPythonPNGObject:
     '''
     we need to define a certain type of object that when encountered we
     can handle. see ipExtension.

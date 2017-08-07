@@ -27,7 +27,7 @@ from collections import defaultdict
 
 from music21.alpha.trecento import cadencebook
 
-class TonalityCounter(object):
+class TonalityCounter:
     '''
     The TonalityCounter object takes a list of Trecento Works
     (defined in music21.trecento.cadencebook) and when run()

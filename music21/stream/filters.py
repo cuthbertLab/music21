@@ -24,7 +24,7 @@ from music21.common import opFrac
 
 #------------------------------------------------------------------------------
 
-class StreamFilter(object):
+class StreamFilter:
     '''
     A filter is an object that when called returns True or False
     about whether an element in the stream matches the filter.

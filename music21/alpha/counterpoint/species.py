@@ -32,7 +32,7 @@ environLocal = environment.Environment(_MOD)
 class ModalCounterpointException(exceptions21.Music21Exception):
     pass
 
-class ModalCounterpoint(object):
+class ModalCounterpoint:
     def __init__(self, stream1=None, stream2=None):
         self.stream1 = stream1
         self.stream2 = stream2

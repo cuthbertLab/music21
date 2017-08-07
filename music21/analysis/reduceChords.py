@@ -56,7 +56,7 @@ def testMeasureStream1():
 class ChordReducerException(exceptions21.Music21Exception):
     pass
 
-class ChordReducer(object):
+class ChordReducer:
     r'''
     A chord reducer.
     '''

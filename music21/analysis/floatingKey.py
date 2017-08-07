@@ -20,7 +20,7 @@ from music21.exceptions21 import AnalysisException
 class FloatingKeyException(AnalysisException):
     pass
 
-class KeyAnalyzer(object):
+class KeyAnalyzer:
     '''
     KeyAnalyzer is the main object to use for floating analysis.
 

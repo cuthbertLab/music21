@@ -772,7 +772,7 @@ class TupletException(exceptions21.Music21Exception):
     pass
 
 
-class Tuplet(object):
+class Tuplet:
     '''
     A tuplet object is a representation of a musical tuplet (like a triplet).
     It expresses a ratio that modifies duration values and are stored in
@@ -2966,7 +2966,7 @@ class AppogiaturaDuration(GraceDuration):
 #     pass
 
 
-class TupletFixer(object):
+class TupletFixer:
     '''
     The TupletFixer object takes in a flat stream and tries to fix the
     brackets and time modification values of the tuplet so that they

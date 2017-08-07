@@ -85,7 +85,7 @@ class HumdrumException(exceptions21.Music21Exception):
     pass
 
 
-class HumdrumDataCollection(object):
+class HumdrumDataCollection:
     r'''
     A HumdrumDataCollection takes in a mandatory list where each element
     is a line of humdrum data.  Together this list represents a collection
@@ -802,7 +802,7 @@ class HumdrumFile(HumdrumDataCollection):
         self.dataStream = spineDataCollection
         return self.parse()
 
-class HumdrumLine(object):
+class HumdrumLine:
     '''
     HumdrumLine is a dummy class for subclassing
     :class:`~music21.humdrum.spineParser.SpineLine`,
@@ -954,7 +954,7 @@ class GlobalCommentLine(HumdrumLine):
         self.contents = contents
         self.value = value
 
-class ProtoSpine(object):
+class ProtoSpine:
     '''
     A ProtoSpine is a collection of events arranged vertically.
     It differs from a HumdrumSpine in that spine paths are not followed.
@@ -974,7 +974,7 @@ class ProtoSpine(object):
 ############ HUMDRUMSPINES #########################
 # Ready to be parsed...
 
-class HumdrumSpine(object):
+class HumdrumSpine:
     r'''
     A HumdrumSpine is a representation of a generic HumdrumSpine
     regardless of \*\*definition after spine path indicators have
@@ -1462,7 +1462,7 @@ class DynamSpine(HumdrumSpine):
 ####### END HUMDRUM SPINES
 
 
-class SpineEvent(object):
+class SpineEvent:
     '''
     A SpineEvent is an event in a HumdrumSpine or ProtoSpine.
 
@@ -1530,7 +1530,7 @@ class SpineEvent(object):
 
 #------SPINE COLLECTION------------
 
-class SpineCollection(object):
+class SpineCollection:
     '''
     A SpineCollection is a set of HumdrumSpines with relationships to each
     other and where their position attributes indicate
@@ -1958,7 +1958,7 @@ class SpineCollection(object):
     # TODO: append global comments and have a way of recalling them
 
 
-class EventCollection(object):
+class EventCollection:
     '''
     An EventCollection is a time slice of all events that have
     an onset of a certain time.  If an event does not occur at

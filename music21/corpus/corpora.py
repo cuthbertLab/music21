@@ -25,7 +25,7 @@ from music21.exceptions21 import CorpusException
 
 #------------------------------------------------------------------------------
 
-class Corpus(object):
+class Corpus:
     r'''
     Abstract base class of all corpora subclasses.
     '''

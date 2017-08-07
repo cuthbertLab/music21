@@ -11,7 +11,7 @@
 
 import unittest
 
-class TheoryResult(object):
+class TheoryResult:
     '''
     A TheoryResult object is used to store information about the results
     of the theory analysis. Each object includes a direct references to the original segment

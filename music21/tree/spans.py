@@ -25,7 +25,7 @@ class TimespanException(exceptions21.TreeException):
     pass
 
 #------------------------------------------------------------------------------
-class Timespan(object):
+class Timespan:
     r'''
     A span of time, with a start offset and stop offset.
 

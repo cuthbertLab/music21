@@ -221,7 +221,7 @@ def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, transform=No
     setattr(m21El, attributeName, value)
 
 #-------------------------------------------------------------------------------
-class XMLParserBase(object):
+class XMLParserBase:
     '''
     contains functions that could be called
     at multiple levels of parsing (Score, Part, Measure).
@@ -626,7 +626,7 @@ class XMLParserBase(object):
             return staffLayout
 
 
-class PartGroup(object):
+class PartGroup:
     '''
     Small helper class for keeping track of part-groups from XML since they
     are converted to StaffGroup spanners much later.

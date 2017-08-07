@@ -35,7 +35,7 @@ class CorrelateException(exceptions21.Music21Exception):
 
 
 #-------------------------------------------------------------------------------
-class ActivityMatch(object):
+class ActivityMatch:
     '''Given a Stream, find if one object is active while another is also active.
 
     Plotting routines to graph the output of dedicated methods in this class are available.

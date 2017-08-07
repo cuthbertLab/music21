@@ -49,7 +49,7 @@ class defaultlist(list):
 _singletonCounter = {}
 _singletonCounter['value'] = 0
 
-class SingletonCounter(object):
+class SingletonCounter:
     '''
     A simple counter that can produce unique numbers (in ascending order)
     regardless of how many instances exist.
@@ -77,7 +77,7 @@ class SingletonCounter(object):
         return post
 
 #-------------------------------------------------------------------------------
-class SlottedObjectMixin(object):
+class SlottedObjectMixin:
     r'''
     Provides template for classes implementing slots allowing it to be pickled
     properly.
@@ -187,7 +187,7 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
 
 
 #-------------------------------------------------------------------------------
-class Iterator(object):
+class Iterator:
     '''A simple Iterator object used to handle iteration of Streams and other
     list-like objects.
 
@@ -223,7 +223,7 @@ class Iterator(object):
 
 
 #-------------------------------------------------------------------------------
-class Timer(object):
+class Timer:
     """
     An object for timing. Call it to get the current time since starting.
 

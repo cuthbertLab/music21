@@ -115,7 +115,7 @@ def getPaths():
 
 
 
-class ScalaPitch(object):
+class ScalaPitch:
     '''
     Representation of a scala pitch notation
     
@@ -175,7 +175,7 @@ class ScalaPitch(object):
 
 
 
-class ScalaData(object):
+class ScalaData:
     u'''
     Object representation of data stored in a Scale scale file. This object is used to 
     access Scala information stored in a file. To create a music21 scale with a Scala file, 
@@ -375,7 +375,7 @@ class ScalaData(object):
 
 
 #-------------------------------------------------------------------------------
-class ScalaFile(object):
+class ScalaFile:
     '''
     Interface for reading and writing scala files. 
     On reading, returns a :class:`~music21.scala.ScalaData` object.

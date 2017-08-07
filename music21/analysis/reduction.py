@@ -46,7 +46,7 @@ class ReductiveEventException(exceptions21.Music21Exception):
 # ::/p:g#/o:5/nh:f/ns:n/l:1/g:ursatz/v:1
 
 
-class ReductiveNote(object):
+class ReductiveNote:
     '''
     The extraction of an event from a score and specification of where
     and how it should be presented in a reductive score.
@@ -195,7 +195,7 @@ class ScoreReductionException(exceptions21.Music21Exception):
     pass
 
 
-class ScoreReduction(object):
+class ScoreReduction:
     '''
     An object to reduce a score.
     '''
@@ -431,7 +431,7 @@ class PartReductionException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
-class PartReduction(object):
+class PartReduction:
     '''
     A part reduction reduces a Score into one or more parts.
     Parts are combined based on a part group dictionary.

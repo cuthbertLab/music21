@@ -21,7 +21,7 @@ from music21 import exceptions21
 class TextFormatException(exceptions21.Music21Exception):
     pass
 
-class Style(object):
+class Style:
     '''
     A style object is a lightweight object that
     keeps track of information about the look of an object.

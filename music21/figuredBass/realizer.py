@@ -159,7 +159,7 @@ def addLyricsToBassNote(bassNote, notationString=None):
         bassNote.addLyric(spacesInFront + fs, applyRaw = True)
 
 
-class FiguredBassLine(object):
+class FiguredBassLine:
     '''
     A FiguredBassLine is an interface for realization of a line of (bassNote, notationString) pairs.
     Currently, only 1:1 realization is supported, meaning that every bassNote is realized and the
@@ -512,7 +512,7 @@ class FiguredBassLine(object):
             segmentList.reverse()
             return True
 
-class Realization(object):
+class Realization:
     '''
     Returned by :class:`~music21.figuredBass.realizer.FiguredBassLine` after calling
     :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`. Allows for the

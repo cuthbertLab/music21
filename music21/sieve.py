@@ -488,7 +488,7 @@ def _meziriac(c1, c2):
 
 
 #-------------------------------------------------------------------------------
-class PrimeSegment(object):
+class PrimeSegment:
     def __init__(self, start, length):
         """A generator of prime number segments, given a start value and desired length of primes.
 
@@ -579,7 +579,7 @@ class PrimeSegment(object):
 
 
 #-------------------------------------------------------------------------------
-class Residual(object):
+class Residual:
     """object that represents a modulus and a start point
     each object stores a range of integers (self._z) from which sections are drawn
     this range of integers can be changed whenever the section os drawn
@@ -854,7 +854,7 @@ class Residual(object):
 
 
 #-------------------------------------------------------------------------------
-class CompressionSegment(object):
+class CompressionSegment:
     """
     Utility to convert from a point sequence to sieve.
 
@@ -1040,7 +1040,7 @@ class CompressionSegment(object):
 
 # precedence is -, &, |
 
-class Sieve(object):
+class Sieve:
     """Create a sieve segment from a sieve logical string of any complexity.
     """
     def __init__(self, usrStr, z=None):
@@ -1793,7 +1793,7 @@ class Sieve(object):
 #-------------------------------------------------------------------------------
 # high level utility obj
 
-class PitchSieve(object):
+class PitchSieve:
     """
     Quick utility generator of :class:`music21.pitch.Pitch` lists
     from :class:`music21.sieve.Sieve` objects.

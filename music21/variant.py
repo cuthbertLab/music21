@@ -2445,7 +2445,7 @@ class Variant(base.Music21Object):
             referenceStream.remove(el)
 
 #-------------------------------------------------------------------------------
-# class VariantBundle(object):
+# class VariantBundle:
 #     '''A utility object for processing collections of Varaints.
 #
 #     This object serves a very similar purpose as the SpannerBundle;

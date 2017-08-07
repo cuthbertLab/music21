@@ -63,7 +63,7 @@ class SearchMatch(namedtuple('SearchMatch', 'mStart mEnd matchText els indices')
 class LyricSearcherException(Music21Exception):
     pass
 
-class LyricSearcher(object):
+class LyricSearcher:
     '''
     An object that can find lyrics that match a certain regular expression
     and return relevant information about the match.

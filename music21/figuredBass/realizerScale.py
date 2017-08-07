@@ -28,7 +28,7 @@ scaleModes = {'major' : scale.MajorScale,
 
 #-------------------------------------------------------------------------------
 
-class FiguredBassScale(object):
+class FiguredBassScale:
     '''
     Acts as a wrapper for :class:`~music21.scale.Scale`. Used to represent the
     concept of a figured bass scale, with a scale value and mode.

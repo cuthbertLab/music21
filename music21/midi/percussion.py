@@ -19,7 +19,7 @@ from music21 import instrument
 class MIDIPercussionException(exceptions21.Music21Exception):
     pass
 
-class PercussionMapper(object):
+class PercussionMapper:
     '''
     PercussionMapper provides tools to convert between MIDI notes and music21 instruments,
     based on the official General MIDI Level 1 Percussion Key Map.

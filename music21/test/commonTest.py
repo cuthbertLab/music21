@@ -117,7 +117,7 @@ class Music21TestRunner(unittest.runner.TextTestRunner):
         return result
 
 #-------------------------------------------------------------------------------
-class ModuleGather(object):
+class ModuleGather:
     r'''
     Utility class for gathering and importing all modules in the music21
     package. Puts them in self.modulePaths.

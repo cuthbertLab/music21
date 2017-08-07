@@ -49,7 +49,7 @@ except ImportError: # pragma: no cover
         noPIL = True
 
 ### speed up tests! move to music21 base...
-class _sharedCorpusTestObject(object):
+class _sharedCorpusTestObject:
     sharedCache = {}
 
 sharedCacheObject = _sharedCorpusTestObject()
@@ -81,7 +81,7 @@ def makeLettersOnlyId(inputString):
     return returnString
 
 #-------------------------------------------------------------------------------
-class LilypondConverter(object):
+class LilypondConverter:
     fictaDef = (
     r'''
     ficta = #(define-music-function (parser location) () #{ \once \set suggestAccidentals = ##t #})

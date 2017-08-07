@@ -472,7 +472,7 @@ class AVLNode(common.SlottedObjectMixin):
 
 #----------------------------------------------------------------------------
 
-class AVLTree(object):
+class AVLTree:
     r'''
     Data structure for working with tree.node.AVLNode objects.
 

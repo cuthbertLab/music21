@@ -42,7 +42,7 @@ class SubConverterException(exceptions21.Music21Exception):
 class SubConverterFileIOException(SubConverterException):
     pass
 
-class SubConverter(object):
+class SubConverter:
     '''
     Class wrapper for parsing data or outputting data.
 

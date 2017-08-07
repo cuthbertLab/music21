@@ -290,7 +290,7 @@ class GregorianNote(note.Note):
 
     ''')
 
-class BaseScoreConverter(object):
+class BaseScoreConverter:
     '''
     Converter for all Score objects.
     '''
@@ -409,7 +409,7 @@ class BaseScoreConverter(object):
         return newfp
 
 
-class DefaultTeXWrapper(object):
+class DefaultTeXWrapper:
 
     def __init__(self):
         self.baseWrapper = '''% !TEX TS-program = lualatex

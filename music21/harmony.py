@@ -468,7 +468,7 @@ class ChordStepModificationException(exceptions21.Music21Exception):
 #-------------------------------------------------------------------------------
 
 
-class ChordStepModification(object):
+class ChordStepModification:
     '''
     ChordStepModification objects define the specification of harmony degree
     alterations, subtractions, or additions, used in

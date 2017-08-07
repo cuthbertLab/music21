@@ -84,7 +84,7 @@ class EdgeException(exceptions21.Music21Exception):
     pass
 
 
-class Edge(object):
+class Edge:
     '''
     Abstraction of an Interval as an Edge.
 
@@ -384,7 +384,7 @@ class IntervalNetworkException(exceptions21.Music21Exception):
 
 #-------------------------------------------------------------------------------
 
-class IntervalNetwork(object):
+class IntervalNetwork:
     '''
     A graph of undefined Pitch nodes connected by a defined,
     ordered list of :class:`~music21.interval.Interval` objects as edges.

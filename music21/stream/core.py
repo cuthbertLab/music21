@@ -30,7 +30,7 @@ from music21 import spanner
 from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException
 
-class StreamCoreMixin(object):
+class StreamCoreMixin:
     def __init__(self):
         self._cache = {}
 

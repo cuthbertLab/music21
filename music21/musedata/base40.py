@@ -466,7 +466,7 @@ class Base40Exception(exceptions21.Music21Exception):
 
 
 
-class BaseN(object):
+class BaseN:
     def __init__(self, order=2):
         self.order = order
 

@@ -42,7 +42,7 @@ class WindowedAnalysisException(exceptions21.Music21Exception):
 
 #------------------------------------------------------------------------------
 
-class WindowedAnalysis(object):
+class WindowedAnalysis:
     '''
     Create a WindowedAnalysis object.
 
@@ -319,7 +319,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
     def runTest(self):
         pass
 
-class TestMockProcesor(object):
+class TestMockProcesor:
 
     def process(self, subStream):
         '''Simply count the number of notes found

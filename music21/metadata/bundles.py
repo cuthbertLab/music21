@@ -35,7 +35,7 @@ class MetadataBundleException(exceptions21.Music21Exception):
 #------------------------------------------------------------------------------
 
 
-class MetadataEntry(object):
+class MetadataEntry:
     '''
     An entry in a metadata bundle.
 
@@ -146,7 +146,7 @@ class MetadataEntry(object):
 #------------------------------------------------------------------------------
 
 
-class MetadataBundle(object):
+class MetadataBundle:
     r'''
     An object that provides access to, searches within, and stores and loads
     multiple Metadata objects.

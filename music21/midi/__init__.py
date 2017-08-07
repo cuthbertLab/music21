@@ -314,7 +314,7 @@ def putNumbersAsList(numList):
     return bytes(post)
 
 #-------------------------------------------------------------------------------
-class Enumeration(object):
+class Enumeration:
     '''
     Utility object for defining binary MIDI message constants.
     '''
@@ -416,7 +416,7 @@ metaEvents = Enumeration([("SEQUENCE_NUMBER", 0x00),
                           ("SEQUENCER_SPECIFIC_META_EVENT", 0x7F)])
 
 #-------------------------------------------------------------------------------
-class MidiEvent(object):
+class MidiEvent:
     '''
     A model of a MIDI event, including note-on, note-off, program change,
     controller change, any many others.
@@ -996,7 +996,7 @@ class DeltaTime(MidiEvent):
 
 
 
-class MidiTrack(object):
+class MidiTrack:
     '''
     A MIDI Track. Each track contains a list of
     :class:`~music21.midi.base.MidiChannel` objects, one for each channel.
@@ -1154,7 +1154,7 @@ class MidiTrack(object):
         return post
 
 
-class MidiFile(object):
+class MidiFile:
     '''
     Low-level MIDI file writing, emulating methods from normal Python files.
 

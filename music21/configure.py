@@ -264,7 +264,7 @@ def findSetup():
 
 #-------------------------------------------------------------------------------
 # error objects, not exceptions
-class DialogError(object):
+class DialogError:
     '''
     DialogError is a normal object, not an Exception.
     '''
@@ -312,7 +312,7 @@ class DialogException(exceptions21.Music21Exception, DialogError):
     pass
 
 #-------------------------------------------------------------------------------
-class Dialog(object):
+class Dialog:
     '''
     Model a dialog as a question and response. Have different subclases for
     different types of questions. Store all in a Conversation, or multiple dialog passes.
@@ -1442,7 +1442,7 @@ class SelectMusicXMLReader(SelectFilePath):
 
 
 #-------------------------------------------------------------------------------
-class ConfigurationAssistant(object):
+class ConfigurationAssistant:
     '''
     Class for managing numerous configuration tasks.
     '''

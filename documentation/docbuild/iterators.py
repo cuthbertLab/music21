@@ -16,7 +16,7 @@ import types
 
 from music21 import common
 
-class Iterator(object):
+class Iterator:
     '''
     Abstract base class for documentation iterators.
     '''

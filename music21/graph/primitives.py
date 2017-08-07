@@ -38,7 +38,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-class Graph(object):
+class Graph:
     '''
     A music21.graph.primitives.Graph is an object that represents a visual graph or
     plot, automating the creation and configuration of this graph in matplotlib.

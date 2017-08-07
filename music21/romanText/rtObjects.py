@@ -66,7 +66,7 @@ class RTFileException(exceptions21.Music21Exception):
 
 #-------------------------------------------------------------------------------
 
-class RTToken(object):
+class RTToken:
     '''Stores each linear, logical entity of a RomanText.
 
     A multi-pass parsing procedure is likely necessary, as RomanText permits
@@ -1019,7 +1019,7 @@ class RTRepeatStop(RTRepeat):
 
 #-------------------------------------------------------------------------------
 
-class RTHandler(object):
+class RTHandler:
 
     # divide elements of a character stream into rtObjects and handle
     # store in a list, and pass global information to components
@@ -1310,7 +1310,7 @@ class RTHandler(object):
 
 #-------------------------------------------------------------------------------
 
-class RTFile(object):
+class RTFile:
     '''
     Roman Text File access.
     '''

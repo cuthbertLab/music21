@@ -734,7 +734,7 @@ def convertBrevisLength(brevisLength, convertedStream, inpDiv=None, measureNumOf
 
     return measureList
 
-class BrevisLengthTranslator(object):
+class BrevisLengthTranslator:
     '''
     The class :class:`music21.alpha.trecento.notation.BrevisLengthTranslator` takes a
     divisione sign and a list comprising one brevis length's worth of mensural

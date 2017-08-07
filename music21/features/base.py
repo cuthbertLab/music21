@@ -31,7 +31,7 @@ class FeatureException(exceptions21.Music21Exception):
     pass
 
 
-class Feature(object):
+class Feature:
     '''
     An object representation of a feature, capable of presentation in a variety of formats,
     and returned from FeatureExtractor objects.
@@ -83,7 +83,7 @@ class Feature(object):
 class FeatureExtractorException(exceptions21.Music21Exception):
     pass
 
-class FeatureExtractor(object):
+class FeatureExtractor:
     '''
     A model of process that extracts a feature from a Music21 Stream.
     The main public interface is the extract() method.
@@ -223,7 +223,7 @@ class FeatureExtractor(object):
 
 
 #-------------------------------------------------------------------------------
-class StreamForms(object):
+class StreamForms:
     '''A dictionary-like wrapper of a Stream, providing
     numerous representations, generated on-demand, and cached.
 
@@ -539,7 +539,7 @@ class StreamForms(object):
 
 
 #-------------------------------------------------------------------------------
-class DataInstance(object):
+class DataInstance:
     '''
     A data instance for analysis. This object prepares a Stream
     (by stripping ties, etc.) and stores
@@ -647,7 +647,7 @@ class DataInstance(object):
 class OutputFormatException(exceptions21.Music21Exception):
     pass
 
-class OutputFormat(object):
+class OutputFormat:
     '''Provide output for a DataSet, passed as an initial argument.
     '''
     def __init__(self, dataSet=None):
@@ -881,7 +881,7 @@ class OutputARFF(OutputFormat):
 class DataSetException(exceptions21.Music21Exception):
     pass
 
-class DataSet(object):
+class DataSet:
     '''
     A set of features, as well as a collection of data to operate on
 

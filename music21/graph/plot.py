@@ -54,7 +54,7 @@ def _mergeDicts(a, b):
 #-------------------------------------------------------------------------------
 # graphing utilities that operate on streams
 
-class PlotStreamMixin(object):
+class PlotStreamMixin:
     '''
     This Mixin adds Stream extracting and Axis holding features to any
     class derived from Graph.

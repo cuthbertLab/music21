@@ -81,7 +81,7 @@ from music21 import tie
 class CapellaImportException(exceptions21.Music21Exception):
     pass
 
-class CapellaImporter(object):
+class CapellaImporter:
     '''
     Object for importing .capx, CapellaXML files into music21 (from which they can be
     converted to musicxml, MIDI, lilypond, etc.

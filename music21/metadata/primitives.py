@@ -34,7 +34,7 @@ environLocal = environment.Environment(os.path.basename(__file__))
 #------------------------------------------------------------------------------
 
 
-class Date(object):
+class Date:
     r'''
     A single date value, specified by year, month, day, hour, minute, and
     second. Note that this class has been created, instead of using Python's
@@ -382,7 +382,7 @@ class Date(object):
 #------------------------------------------------------------------------------
 
 
-class DateSingle(object):
+class DateSingle:
     r'''
     Store a date, either as certain, approximate, or uncertain relevance.
 
@@ -696,7 +696,7 @@ class DateSelection(DateSingle):
 #------------------------------------------------------------------------------
 
 
-class Text(object):
+class Text:
     r'''
     One unit of text data: a title, a name, or some other text data. Store the
     string and a language name or code. This object can be used and/or
@@ -771,7 +771,7 @@ class Text(object):
 #------------------------------------------------------------------------------
 
 
-class Contributor(object):
+class Contributor:
     r'''
     A person that contributed to a work. Can be a composer, lyricist, arranger,
     or other type of contributor.  In MusicXML, these are "creator" elements.
@@ -1053,7 +1053,7 @@ class Creator(Contributor):
 #------------------------------------------------------------------------------
 
 
-class Imprint(object):
+class Imprint:
     r'''
     An object representation of imprint, or publication.
     '''
@@ -1075,7 +1075,7 @@ class Imprint(object):
 #------------------------------------------------------------------------------
 
 
-class Copyright(object):
+class Copyright:
     r'''
     An object representation of copyright.
     '''

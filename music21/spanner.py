@@ -596,7 +596,7 @@ class Spanner(base.Music21Object):
 
 
 #-------------------------------------------------------------------------------
-class SpannerBundle(object):
+class SpannerBundle:
     '''
     A utility object for collecting and processing
     collections of Spanner objects. This is necessary because

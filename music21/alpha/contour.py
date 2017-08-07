@@ -48,7 +48,7 @@ def _getExtendedModules():
 
 
 
-class ContourFinder(object):
+class ContourFinder:
     '''
     ContourFinder is a class for finding 2-dimensional contours
     of a piece based on different metrics.
@@ -449,7 +449,7 @@ class ContourFinder(object):
 
 
 
-class AggregateContour(object):
+class AggregateContour:
     '''
     An AggragateContour object is an object that stores and consolidates
     contour information for a large group

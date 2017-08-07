@@ -28,7 +28,7 @@ _MOD = 'converter.py'
 environLocal = environment.Environment(_MOD)
 
 
-class VirtualWork(object):
+class VirtualWork:
     def __init__(self):
         self.composer = None
         self.title = None

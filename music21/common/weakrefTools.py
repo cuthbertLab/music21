@@ -21,7 +21,7 @@ def wrapWeakref(referent):
     already wrapped objects; also prevents wrapping the unwrapable "None" type, etc.
 
     >>> import weakref
-    >>> class Mock(object):
+    >>> class Mock:
     ...     pass
     >>> a1 = Mock()
     >>> ref1 = common.wrapWeakref(a1)
@@ -53,7 +53,7 @@ def unwrapWeakref(referent):
     and obj if it's not.
 
 
-    >>> class Mock(object):
+    >>> class Mock:
     ...     pass
     >>> a1 = Mock()
     >>> a2 = Mock()

@@ -94,7 +94,7 @@ Simply call from the command line.
 PY = sys.executable
 environLocal.warn("using python executable at %s" % PY)
 
-class Distributor(object):
+class Distributor:
     def __init__(self):
         #self.fpEgg = None
         #self.fpWin = None

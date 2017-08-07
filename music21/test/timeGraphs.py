@@ -36,7 +36,7 @@ import pycallgraph.output  # @UnresolvedImport
 
 # this class is duplicated from common.py in order to avoid
 # import the module for clean testing
-class Timer(object):
+class Timer:
     """An object for timing."""
 
     def __init__(self):
@@ -80,7 +80,7 @@ class Timer(object):
 
 
 #-------------------------------------------------------------------------------
-class CallTest(object):
+class CallTest:
     '''Base class for timed tests
     '''
     def __init__(self):
@@ -94,7 +94,7 @@ class CallTest(object):
         pass # run tests
 
 
-class M21CallTest(object):
+class M21CallTest:
     '''Base class for timed tests that need music21 importerd
     '''
     def __init__(self):
@@ -528,7 +528,7 @@ class TestRomantextParse(CallTest):
 
 #-------------------------------------------------------------------------------
 # handler
-class CallGraph(object):
+class CallGraph:
 
     def __init__(self):
         self.includeList = ['*xmlToM21*', '*meter*']

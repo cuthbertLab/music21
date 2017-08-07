@@ -29,7 +29,7 @@ _MOD = 'segment.py'
 
 _defaultRealizerScale = {'scale': None} # singleton
 
-class Segment(object):
+class Segment:
     _DOC_ORDER = ['allSinglePossibilities',
                   'singlePossibilityRules',
                   'allCorrectSinglePossibilities',

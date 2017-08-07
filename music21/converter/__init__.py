@@ -78,7 +78,7 @@ class ConverterFileException(exceptions21.Music21Exception):
 
 
 #-------------------------------------------------------------------------------
-class ArchiveManager(object):
+class ArchiveManager:
     r'''
     Before opening a file path, this class can check if this is an
     archived file collection, such as a .zip or or .mxl file. This will return the
@@ -222,7 +222,7 @@ class ArchiveManager(object):
 
 
 #-------------------------------------------------------------------------------
-class PickleFilter(object):
+class PickleFilter:
     '''
     Before opening a file path, this class checks to see if there is an up-to-date
     version of the file pickled and stored in the scratch directory.
@@ -417,7 +417,7 @@ def unregisterSubconverter(removeSubconverter):
 #-------------------------------------------------------------------------------
 
 
-class Converter(object):
+class Converter:
     '''
     A class used for converting all supported data formats into music21 objects.
 

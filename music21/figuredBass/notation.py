@@ -28,7 +28,7 @@ shorthandNotation = {(None,) : (5, 3),
                      (2,)  : (6, 4, 2),
                      }
 
-class Notation(object):
+class Notation:
     '''
     Breaks apart and stores the information in a figured bass notation
     column, which is a string of figures, each associated with a number
@@ -351,7 +351,7 @@ class NotationException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
-class Figure(object):
+class Figure:
     '''
     A Figure is created by providing a number and a modifierString. The
     modifierString is turned into a :class:`~music21.figuredBass.notation.Modifier`,
@@ -402,7 +402,7 @@ specialModifiers = {'+' : '#',
                     '++++' : '####',
                     }
 
-class Modifier(object):
+class Modifier:
     '''
     Turns a modifierString (a modifier in a
     :attr:`~music21.figuredBass.notation.Notation.notationColumn`)

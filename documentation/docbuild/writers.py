@@ -29,7 +29,7 @@ from . import iterators
 class DocumentationWritersException(exceptions21.Music21Exception):
     pass
 
-class DocumentationWriter(object):
+class DocumentationWriter:
     '''
     Abstract base class for writers.
 

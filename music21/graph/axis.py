@@ -31,7 +31,7 @@ from music21.analysis import elements as elementAnalysis
 from music21.analysis import pitchAnalysis
 
 
-class Axis(object):
+class Axis:
     '''
     An Axis is an easier way of specifying what to plot on any given axis.
     

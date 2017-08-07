@@ -30,7 +30,7 @@ from music21.ext import xlrd
 from music21.alpha.trecento import trecentoCadence
 from music21.alpha.trecento import polyphonicSnippet
 
-class TrecentoSheet(object):
+class TrecentoSheet:
     '''
     A TrecentoSheet represents a single worksheet of an excel spreadsheet
     that contains data about particular pieces of trecento music.
@@ -271,7 +271,7 @@ class SanctusSheet(TrecentoSheet):
 class AgnusDeiSheet(TrecentoSheet):
     sheetname = "agnus"
 
-class TrecentoCadenceWork(object):
+class TrecentoCadenceWork:
     '''
     A class representing a work that takes one line in the Trecento Cadence excel workbook
 

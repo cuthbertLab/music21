@@ -12,7 +12,7 @@
 # http://stackoverflow.com/questions/12611337/
 #     recursively-dir-a-python-object-to-find-values-of-a-certain-type-or-with-a-cer
 
-class TreeYielder(object):
+class TreeYielder:
     def __init__(self, yieldValue=None):
         '''
         `yieldValue` should be a lambda function that
@@ -116,7 +116,7 @@ class TreeYielder(object):
 
 
 def testCode():
-    class Mock(object):
+    class Mock:
         def __init__(self, mockThing, embedMock=True):
             self.abby = 30
             self.mocker = mockThing

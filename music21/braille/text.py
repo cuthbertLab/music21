@@ -17,7 +17,7 @@ from music21.braille.basic import numberToBraille, yieldDots
 
 symbols = lookup.symbols
 
-class BrailleText(object):
+class BrailleText:
     """
     Object that handles all the formatting associated with braille music notation on multiple lines.
 
@@ -430,7 +430,7 @@ class BrailleKeyboard(BrailleText):
 
 
 
-class BrailleTextLine(object):
+class BrailleTextLine:
     u"""
     An object representing a single line of braille text:
 

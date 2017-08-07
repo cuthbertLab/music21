@@ -336,7 +336,7 @@ class TextBox(base.Music21Object):
 
 
 #-------------------------------------------------------------------------------
-class LanguageDetector(object):
+class LanguageDetector:
     '''
     Attempts to detect language on the basis of trigrams
 
@@ -439,7 +439,7 @@ class LanguageDetector(object):
             raise TextException("got a language that was not in the codes; should not happen")
 
 #-------------------------------------------------------------------------------
-class Trigram(object):
+class Trigram:
     '''
     See LanguageDector above.
     From http://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/

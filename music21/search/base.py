@@ -68,7 +68,7 @@ class SearchMatch(namedtuple('SearchMatch', 'elStart els index iterator')):
         return 'SearchMatch(elStart={0}, els=len({1}), index={2}, iterator=[...])'.format(
                         repr(self.elStart), len(self.els), repr(self.index))
 
-class StreamSearcher(object):
+class StreamSearcher:
     '''
     An object that can search through streams for a set of elements
     or notes or something of that sort.

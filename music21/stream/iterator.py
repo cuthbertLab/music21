@@ -31,7 +31,7 @@ class StreamIteratorInefficientWarning(PendingDeprecationWarning):
 
 #------------------------------------------------------------------------------
 
-class StreamIterator(object):
+class StreamIterator:
     '''
     An Iterator object used to handle getting items from Streams.
     The :meth:`~music21.stream.Stream.__iter__` method

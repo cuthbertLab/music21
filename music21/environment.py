@@ -127,7 +127,7 @@ class LocalCorpusSettings(list):
 #------------------------------------------------------------------------------
 
 
-class _EnvironmentCore(object):
+class _EnvironmentCore:
     '''
     This private class should never be directly created; use the Environment
     object to access this object.
@@ -775,7 +775,7 @@ def envSingleton():
     return _environStorage['instance']
 
 #------------------------------------------------------------------------------
-class Environment(object):
+class Environment:
     '''
     The environment.Environment object stores user preferences as a
     dictionary-like object.  Additionally, the Environment object provides
@@ -1139,7 +1139,7 @@ class Environment(object):
 #------------------------------------------------------------------------------
 
 
-class UserSettings(object):
+class UserSettings:
     '''
     The UserSettings object provides a simple interface for configuring the
     user preferences in the :class:`~music21.environment.Environment` object.

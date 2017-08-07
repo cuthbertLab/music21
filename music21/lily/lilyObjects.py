@@ -28,7 +28,7 @@ from music21 import exceptions21
 class LilyObjectsException(exceptions21.Music21Exception):
     pass
 
-class LyObject(object):
+class LyObject:
     '''
     LyObject is the base class of all other Lily Objects
 
@@ -2040,7 +2040,7 @@ class LyMarkup(LyObject):
 #
 #
 ###--------Tools-----------##
-#class LyCodePrinter(object):
+#class LyCodePrinter:
 #    pass
 #
 #    def __init__(self):

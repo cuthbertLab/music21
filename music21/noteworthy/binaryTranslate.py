@@ -85,7 +85,7 @@ environLocal = environment.Environment("noteworthy.translate")
 class NoteworthyBinaryTranslateException(exceptions21.Music21Exception):
     pass
 
-class NWCConverter(object):
+class NWCConverter:
     '''
     A converter object for binary .nwc files.  Do not normally use directly; use converter.parse.
 
@@ -443,7 +443,7 @@ class NWCConverter(object):
         s = nwt.parseList(self.dumpToNWCText())
         return s
 
-class NWCStaff(object):
+class NWCStaff:
     def __init__(self, parent=None):
         self.parent = parent
         self.lyrics = []
@@ -595,7 +595,7 @@ class NWCStaff(object):
         #print objects
         return objects
 
-class NWCObject(object):
+class NWCObject:
     def __init__(self, staffParent=None, parserParent=None):
         self.staffParent = staffParent
         self.parserParent = parserParent

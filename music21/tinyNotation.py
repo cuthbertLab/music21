@@ -249,7 +249,7 @@ environLocal = environment.Environment(_MOD)
 class TinyNotationException(exceptions21.Music21Exception):
     pass
 
-class State(object):
+class State:
     '''
     State tokens apply something to
     every note found within it.
@@ -381,7 +381,7 @@ class QuadrupletState(TupletState):
     actual = 4
     normal = 3
 
-class Modifier(object):
+class Modifier:
     '''
     a modifier is something that changes the current
     token, like setting the Id or Lyric.
@@ -428,7 +428,7 @@ class LyricModifier(Modifier):
 
 
 
-class Token(object):
+class Token:
     '''
     A single token made from the parser.
 
@@ -724,7 +724,7 @@ class NoteToken(NoteOrRestToken):
         return t
 
 
-class Converter(object):
+class Converter:
     '''
     Main conversion object for TinyNotation.
 

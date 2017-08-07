@@ -86,7 +86,7 @@ from music21.exceptions21 import Music21Exception
 
 
 
-class NoteworthyTranslator(object):
+class NoteworthyTranslator:
     '''
     stores all the data about the current parse context (whether we're in a slur, tuplet, etc.)
     '''

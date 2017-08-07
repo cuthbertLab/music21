@@ -23,7 +23,7 @@ from music21 import exceptions21
 class DocBuilderException(exceptions21.Music21Exception):
     pass
 
-class DocBuilder(object):
+class DocBuilder:
     def __init__(self, command='html'):
         self.useMultiprocessing = True
         self.cpus_to_use = common.cpus()

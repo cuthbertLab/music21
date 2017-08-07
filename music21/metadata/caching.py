@@ -79,7 +79,7 @@ def cacheMetadata(corpusNames=None,
 #------------------------------------------------------------------------------
 
 
-class MetadataCachingJob(object):
+class MetadataCachingJob:
     '''
     Parses one corpus path, and attempts to extract metadata from it:
 
@@ -261,7 +261,7 @@ class MetadataCachingJob(object):
 #------------------------------------------------------------------------------
 
 
-class JobProcessor(object):
+class JobProcessor:
     '''
     Processes metadata-caching jobs, either serially (e.g. single-threaded) or
     in parallel, as a generator.

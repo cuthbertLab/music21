@@ -25,7 +25,7 @@ from music21 import converter
 
 globalDebug = False
 
-class OmrGroundTruthPair(object):
+class OmrGroundTruthPair:
     '''
     Object for making comparisons between an OMR score and the GroundTruth
 

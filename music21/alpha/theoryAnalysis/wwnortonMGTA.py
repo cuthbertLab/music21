@@ -23,7 +23,7 @@ from music21 import note
 from music21.alpha.theoryAnalysis import theoryAnalyzer
 
 
-class wwnortonExercise(object):
+class wwnortonExercise:
     '''
     wwnortonExercise is a base class for all wwwnorton exercises
 

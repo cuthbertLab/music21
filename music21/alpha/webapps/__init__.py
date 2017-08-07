@@ -628,7 +628,7 @@ class Agenda(dict):
 
 #-------------------------------------------------------------------------------
 
-class CommandProcessor(object):
+class CommandProcessor:
     '''
     Processes server request for music21.
 

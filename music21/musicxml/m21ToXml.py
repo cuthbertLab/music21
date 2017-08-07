@@ -585,7 +585,7 @@ class GeneralObjectExporter():
         return self.fromMeasure(out)
 
 
-class XMLExporterBase(object):
+class XMLExporterBase:
     '''
     contains functions that could be called
     at multiple levels of exporting (Score, Part, Measure).

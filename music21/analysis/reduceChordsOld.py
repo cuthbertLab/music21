@@ -44,7 +44,7 @@ def testMeasureStream1():
         s.append(c)
     return s
 
-class ChordReducer(object):
+class ChordReducer:
     def __init__(self):
         self.printDebug = False
         self.weightAlgorithm = self.qlbsmpConsonance

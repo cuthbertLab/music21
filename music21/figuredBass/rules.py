@@ -96,7 +96,7 @@ specialResDoc = [('resolveDominantSeventhProperly', doc_domSeventh),
 specialResDoc.sort()
 
 
-class Rules(object):
+class Rules:
     '''
     A Rules object is provided as an input to a :class:`~music21.figuredBass.segment.Segment`,
     and controls the application of methods designed to filter out undesired possibilities in

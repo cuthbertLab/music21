@@ -33,7 +33,7 @@ MeasureRelationship = collections.namedtuple('MeasureRelationship',
 PriorsIntegrationScore = collections.namedtuple('PriorsIntegrationScore',
                                                 ['total', 'horizontal', 'vertical', 'ignored'])
 
-class ScoreCorrector(object):
+class ScoreCorrector:
     '''
     takes in a music21.stream.Score object and runs OMR correction on it.
     '''
@@ -398,7 +398,7 @@ class ScoreCorrector(object):
                             self.singleParts[p].getSequenceHashesFromMeasureStream()    )
         return PriorsIntegrationScore(totalFlagged, totalHorizontal, totalVertical, totalIgnored)
 
-class SinglePart(object):
+class SinglePart:
     def __init__(self, part=None, pn=None):
         self.scorePart = part
         self.partNumber = pn
@@ -598,7 +598,7 @@ class SinglePart(object):
 
         return distanceProbability
 
-class MeasureSlice(object):
+class MeasureSlice:
     '''
     represents a single measure from all parts
     '''
@@ -694,7 +694,7 @@ class MeasureSlice(object):
         return self.correctingMeasure
 
 
-class MeasureHash(object):
+class MeasureHash:
     '''
     Able to do a number of matching, substitution and hashing operations on
     a given measure object

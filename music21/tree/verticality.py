@@ -30,7 +30,7 @@ environLocal = environment.Environment("tree.verticality")
 class VerticalityException(exceptions21.TreeException):
     pass
 
-class Verticality(object):
+class Verticality:
     r'''
     A collection of information about elements that are sounding at a given
     offset or just finished at that offset or are continuing from before, etc..

@@ -174,7 +174,7 @@ from music21 import environment
 _MOD = 'theoryAnalyzer.py'
 environLocal = environment.Environment(_MOD)
 
-class Analyzer(object):
+class Analyzer:
     _DOC_ORDER = ['getVerticalities', 'getVLQs', 'getThreeNoteLinearSegments',
               'getLinearSegments', 'getVerticalityNTuplets', 'getHarmonicIntervals',
               'getMelodicIntervals', 'getParallelFifths', 'getPassingTones',

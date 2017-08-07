@@ -295,7 +295,7 @@ def _getKeyAndPrefix(rtKeyOrString):
 
 rnKeyCache = {}
 
-class PartTranslator(object):
+class PartTranslator:
     '''
     A refactoring of the previously massive romanTextToStreamScore function
     to allow for more fine-grained testing (eventually), and to

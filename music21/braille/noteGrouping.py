@@ -19,7 +19,7 @@ from music21.braille.lookup import symbols
 
 environRules = environment.Environment('braille/noteGrouping.py')
 
-class NoteGroupingTranscriber(object):
+class NoteGroupingTranscriber:
     '''
     Object that can transcribe note groupings...
     '''

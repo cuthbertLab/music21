@@ -24,7 +24,7 @@ from music21 import metadata
 _MOD = "corpus.chorales.py"
 environLocal = environment.Environment(_MOD)
 
-class ChoraleList(object):
+class ChoraleList:
     u'''
     A searchable list of BachChorales by various numbering systems:
 
@@ -484,7 +484,7 @@ class ChoraleList(object):
                 self.byBudapest[int(budapest)] = lineDict
                 self.byRiemenschneider[int(riemenschneider)] = lineDict
 
-class ChoraleListRKBWV(object):
+class ChoraleListRKBWV:
     u'''
     A searchable list of BachChorales by various numbering systems:
 
@@ -910,7 +910,7 @@ class ChoraleListRKBWV(object):
 
 
 
-class Iterator(object):
+class Iterator:
     u'''
     This is a class for iterating over many Bach Chorales. It is designed to make it easier to use
     one of music21's most accessible datasets. It will parse each chorale in the selected

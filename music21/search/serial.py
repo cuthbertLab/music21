@@ -201,7 +201,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
 
 
 
-class ContiguousSegmentSearcher(object):
+class ContiguousSegmentSearcher:
     '''
     Class that when given a :class:`~music21.stream.Stream`
     and `.byLength()` is called, returns a
@@ -822,7 +822,7 @@ class ContiguousSegmentSearcher(object):
             removedChord = chordList.pop(0)
             self.totalLength -= len(removedChord.pitches)
 
-class SegmentMatcher(object):
+class SegmentMatcher:
     '''
     Matches all the ContiguousSegmentsOfNotes (found by ContiguousSegmentSearcher)
     within a :class:`~music21.stream.Stream`

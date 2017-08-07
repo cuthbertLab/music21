@@ -291,7 +291,7 @@ class Groups(list): # no need to inherit from slotted object
 #------------------------------------------------------------------------------
 
 
-class Music21Object(object):
+class Music21Object:
     '''
     Base class for all music21 objects.
 
@@ -3557,7 +3557,7 @@ class ElementWrapper(Music21Object):
     >>> import music21
     >>> #_DOCS_SHOW import wave
     >>> import random
-    >>> class Wave_read(object): #_DOCS_HIDE
+    >>> class Wave_read: #_DOCS_HIDE
     ...    def getnchannels(self): return 2 #_DOCS_HIDE
 
     >>> s = stream.Stream()
@@ -4363,7 +4363,7 @@ class Test(unittest.TestCase):
     def testElementWrapperOffsetAccess(self):
         from music21 import stream, meter
         from music21 import base
-        class Mock(object):
+        class Mock:
             pass
 
         s = stream.Stream()
@@ -4387,7 +4387,7 @@ class Test(unittest.TestCase):
     def testGetActiveSiteTimeSignature(self):
         from music21 import base
         from music21 import stream, meter
-        class Wave_read(object):
+        class Wave_read:
             def getnchannels(self):
                 return 2
 

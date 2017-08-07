@@ -107,7 +107,7 @@ class ABCFileException(exceptions21.Music21Exception):
 
 
 #-------------------------------------------------------------------------------
-class ABCToken(object):
+class ABCToken:
     '''
     ABC processing works with a multi-pass procedure. The first pass
     breaks the data stream into a list of ABCToken objects. ABCToken
@@ -1632,7 +1632,7 @@ class ABCChord(ABCNote):
 
 
 #-------------------------------------------------------------------------------
-class ABCHandler(object):
+class ABCHandler:
 
     # divide elements of a character stream into objects and handle
     # store in a list, and pass global information to compontns
@@ -2933,7 +2933,7 @@ def mergeLeadingMetaData(barHandlers):
     return mergedHandlers
 
 #-------------------------------------------------------------------------------
-class ABCFile(object):
+class ABCFile:
     '''
     ABC File or String access
     '''

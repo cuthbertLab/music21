@@ -102,7 +102,7 @@ class FreezeThawException(exceptions21.Music21Exception):
 #------------------------------------------------------------------------------
 
 
-class StreamFreezeThawBase(object):
+class StreamFreezeThawBase:
     '''
     Contains a few methods that are used for both
     StreamFreezer and StreamThawer
@@ -991,7 +991,7 @@ class JSONFreezerException(FreezeThawException):
 class JSONThawerException(FreezeThawException):
     pass
 
-class JSONFreezeThawBase(object):
+class JSONFreezeThawBase:
     '''
     Shared functionality for JSONFreeze and JSONThaw
     '''
