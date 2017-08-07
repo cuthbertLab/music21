@@ -123,7 +123,7 @@ class ABCToken:
     The source ABC string itself is stored in self.src
 
     '''
-    def __init__(self, src=u''):
+    def __init__(self, src=''):
         self.src = src # store source character sequence
 
     def __repr__(self):
@@ -169,8 +169,8 @@ class ABCMetadata(ABCToken):
 
     # given a logical unit, create an object
     # may be a chord, notes, metadata, bars
-    def __init__(self, src=u''):
-        ABCToken.__init__(self, src)
+    def __init__(self, src=''):
+        super().__init__(src)
         self.tag = None
         self.data = None
 
@@ -183,12 +183,12 @@ class ABCMetadata(ABCToken):
         to have access to data.  Divides a token into
         .tag (a single capital letter or w) and .data representations.
 
-        >>> x = abcFormat.ABCMetadata(u'T:tagData')
+        >>> x = abcFormat.ABCMetadata('T:tagData')
         >>> x.preParse()
         >>> x.tag
-        u'T'
+        'T'
         >>> x.data
-        u'tagData'
+        'tagData'
         '''
         div = reMetadataTag.match(self.src).end()
         strSrc = self.stripComment(self.src) # remove any comments
@@ -708,7 +708,7 @@ class ABCBar(ABCToken):
     # given a logical unit, create an object
     # may be a chord, notes, metadata, bars
     def __init__(self, src):
-        ABCToken.__init__(self, src)
+        super().__init__(src)
         self.barType = None # repeat or barline
         self.barStyle = None # regular, heavy-light, etc
         self.repeatForm = None # end, start, bidrectional, first, second
@@ -856,7 +856,7 @@ class ABCTuplet(ABCToken):
     In ABCHandler.tokenProcess(), rhythms are adjusted.
     '''
     def __init__(self, src):
-        ABCToken.__init__(self, src)
+        super().__init__(src)
 
         #self.qlRemain = None # how many ql are left of this tuplets activity
         # how many notes are affected by this; this assumes equal duration
@@ -1023,7 +1023,7 @@ class ABCTie(ABCToken):
     '''
 
     def __init__(self, src):
-        ABCToken.__init__(self, src)
+        super().__init__(src)
         self.noteObj = None
 
     def __repr__(self):
@@ -1037,7 +1037,7 @@ class ABCSlurStart(ABCToken):
     '''
 
     def __init__(self, src):
-        ABCToken.__init__(self, src)
+        super().__init__(src)
         self.slurObj = None
 
     def __repr__(self):
@@ -1059,7 +1059,7 @@ class ABCParenStop(ABCToken):
     '''
 
     def __init__(self, src):
-        ABCToken.__init__(self, src)
+        super().__init__(src)
 
     def __repr__(self):
         return '<music21.abcFormat.ABCParenStop %r>' % self.src
@@ -1072,7 +1072,7 @@ class ABCCrescStart(ABCToken):
     '''
 
     def __init__(self, src):
-        ABCToken.__init__(self, src)
+        super().__init__(src)
         self.crescObj = None
 
     def __repr__(self):
@@ -1089,7 +1089,7 @@ class ABCDimStart(ABCToken):
     '''
 
     def __init__(self, src):    # previous typo?: used to be __init
-        ABCToken.__init__(self, src)
+        super().__init__(src)
         self.dimObj = None
 
     def __repr__(self):
@@ -1106,7 +1106,7 @@ class ABCStaccato(ABCToken):
     '''
 
     def __init(self, src):
-        ABCToken.__init__(self, src)
+        super().__init__(src)
 
     def __repr__(self):
         return '<music21.abcFormat.ABCStaccato %r>' % self.src
@@ -1118,7 +1118,7 @@ class ABCUpbow(ABCToken):
     '''
 
     def __init(self, src):
-        ABCToken.__init__(self, src)
+        super().__init__(src)
 
     def __repr__(self):
         return '<music21.abcFormat.ABCUpbow %r>' % self.src
@@ -1130,7 +1130,7 @@ class ABCDownbow(ABCToken):
     '''
 
     def __init(self, src):
-        ABCToken.__init__(self, src)
+        super().__init__(src)
 
     def __repr__(self):
         return '<music21.abcFormat.ABCDownbow %r>' % self.src
@@ -1143,7 +1143,7 @@ class ABCAccent(ABCToken):
     '''
 
     def __init(self, src):
-        ABCToken.__init__(self, src)
+        super().__init__(src)
 
     def __repr__(self):
         return '<music21.abcFormat.ABCAccent %r>' % self.src
@@ -1156,7 +1156,7 @@ class ABCStraccent(ABCToken):
     '''
 
     def __init(self, src):
-        ABCToken.__init__(self, src)
+        super().__init__(src)
 
     def __repr__(self):
         return '<music21.abcFormat.ABCStraccent %r>' % self.src
@@ -1168,21 +1168,21 @@ class ABCTenuto(ABCToken):
     '''
 
     def __init(self, src):
-        ABCToken.__init__(self, src)
+        super().__init__(src)
 
     def __repr__(self):
         return '<music21.abcFormat.ABCTenuto %r>' % self.src
 
 class ABCGraceStart(ABCToken):
     def __init(self, src):
-        ABCToken.__init__(self, src)
+        super().__init__(src)
 
     def __repr__(self):
         return '<music21.abcFormat.ABCGraceStart %r>' % self.src
 
 class ABCGraceStop(ABCToken):
     def __init(self, src):
-        ABCToken.__init__(self, src)
+        super().__init__(src)
 
     def __repr__(self):
         return '<music21.abcFormat.ABCGraceStop %r>' % self.src
@@ -1192,7 +1192,7 @@ class ABCBrokenRhythmMarker(ABCToken):
     # given a logical unit, create an object
     # may be a chord, notes, metadata, bars
     def __init__(self, src):
-        ABCToken.__init__(self, src)
+        super().__init__(src)
         self.data = None
 
     def __repr__(self):
@@ -1230,7 +1230,7 @@ class ABCNote(ABCToken):
     # may be a chord, notes, bars
 
     def __init__(self, src=''):
-        ABCToken.__init__(self, src)
+        super().__init__(src)
         # store chord string if connected to this note
         self.chordSymbols = []
 
@@ -1581,7 +1581,7 @@ class ABCChord(ABCNote):
     # may be a chord, notes, bars
 
     def __init__(self, src):
-        ABCNote.__init__(self, src)
+        super().__init__(src)
         # store a list of component objects
         self.subTokens = []
 
@@ -1806,7 +1806,7 @@ class ABCHandler:
         lastIndex = len(strSrc) - 1
         skipAhead = 0
 
-        activeChordSymbol = u'' # accumulate, then prepend
+        activeChordSymbol = '' # accumulate, then prepend
 
         while currentIndex < lastIndex:
             currentIndex += 1
@@ -2858,7 +2858,7 @@ class ABCHandlerBar(ABCHandler):
     # store in a list, and pass global information to compontns
     def __init__(self):
         # tokens are ABC objects in a linear stream
-        ABCHandler.__init__(self)
+        super().__init__()
 
         self.leftBarToken = None
         self.rightBarToken = None

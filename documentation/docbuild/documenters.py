@@ -126,7 +126,7 @@ class FunctionDocumenter(ObjectDocumenter):
     def __init__(self, referent=None):
         if not isinstance(referent, types.FunctionType):
             raise Music21Exception("referent must be a function")
-        ObjectDocumenter.__init__(self, referent)
+        super().__init__(referent)
 
     ### SPECIAL METHODS ###
 
@@ -200,7 +200,7 @@ class MemberDocumenter(ObjectDocumenter):
     def __init__(self, referent, memberName, definingClass):
         if not isinstance(definingClass, type):
             raise Music21Exception("referent must be a class, not {0}".format(referent))
-        ObjectDocumenter.__init__(self, referent)
+        super().__init__(referent)
         self.memberName = memberName
         self.definingClass = definingClass
 
@@ -406,7 +406,7 @@ class ClassDocumenter(ObjectDocumenter):
     def __init__(self, referent=None):
         if referent is None or not isinstance(referent, type):
             raise Music21Exception("Need to pass in a class an instantiation time")
-        ObjectDocumenter.__init__(self, referent)
+        super().__init__(referent)
 
 
         self._baseClasses = None
@@ -1294,7 +1294,7 @@ class ModuleDocumenter(ObjectDocumenter):
     def __init__(self, referent):
         if not isinstance(referent, types.ModuleType):
             raise Music21Exception("referent must be a module")
-        ObjectDocumenter.__init__(self, referent)
+        super().__init__(referent)
         namesMapping = self._examineModule()
         self._namesMapping = namesMapping
         docOrder = self.referent.__dict__.get('_DOC_ORDER')
