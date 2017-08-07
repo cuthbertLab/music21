@@ -25,7 +25,7 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 
 # http://abcnotation.com/tunePage?a=www.folkwiki.se/pub/cache/_Fyrareprisarn_0bf5b5/0001
-fyrareprisarn = u"""
+fyrareprisarn = """
 %%abc-charset utf-8
 
 X: 1

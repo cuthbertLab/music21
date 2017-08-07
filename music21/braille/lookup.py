@@ -65,16 +65,16 @@ def makeBrailleDictionary():
 _B = makeBrailleDictionary()
 
 def dotsAdd(dotIter):
-    u'''
+    '''
     takes in an iterable of dots and returns them added together.
 
-    >>> print(braille.lookup.dotsAdd([12, 3, 4]))
-    ⠏
+    >>> braille.lookup.dotsAdd([12, 3, 4])
+    '⠏'
 
     Order does not matter:
 
-    >>> print(braille.lookup.dotsAdd([4, 31, 2]))
-    ⠏
+    >>> braille.lookup.dotsAdd([4, 31, 2])
+    '⠏'
     '''
     dotsOut = []
     for n in dotIter:
@@ -167,7 +167,7 @@ keySignatures = {-7:    _B[3456] + _B[1245] + _B[126],
                  -3:    _B[126]  + _B[126]  + _B[126],
                  -2:    _B[126]  + _B[126],
                  -1:    _B[126],
-                 0:     u'',
+                 0:     '',
                  1:     _B[146],
                  2:     _B[146]  + _B[146],
                  3:     _B[146]  + _B[146]  + _B[146],
@@ -176,7 +176,7 @@ keySignatures = {-7:    _B[3456] + _B[1245] + _B[126],
                  6:     _B[3456] + _B[124]  + _B[146],
                  7:     _B[3456] + _B[1245] + _B[146]}
 
-naturals = {0: u'',
+naturals = {0: '',
             1: _B[16],
             2: _B[16] + _B[16],
             3: _B[16] + _B[16] + _B[16],

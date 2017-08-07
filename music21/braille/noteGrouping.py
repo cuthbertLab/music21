@@ -128,7 +128,7 @@ class NoteGroupingTranscriber:
         if brailleElementGrouping.withHyphen:
             self.trans.append(symbols['music_hyphen'])
 
-        return u"".join(self.trans)
+        return ''.join(self.trans)
 
     def translateNote(self, currentNote):
         if self.previousNote is None:
@@ -205,15 +205,15 @@ class NoteGroupingTranscriber:
     ])
 
     def transcribeOneElement(self, el):
-        u'''
+        '''
         Transcribe a single element and add it to self.trans, setting self.previousElement
         along the way.
 
         >>> ngt = braille.noteGrouping.NoteGroupingTranscriber()
         >>> n = note.Note('C4')
         >>> ngt.transcribeOneElement(n)
-        >>> print(u''.join(ngt.trans))
-        ⠐⠹
+        >>> ''.join(ngt.trans)
+        '⠐⠹'
         >>> ngt.previousElement
         <music21.note.Note C>
         '''
@@ -266,7 +266,7 @@ class NoteGroupingTranscriber:
             ):
             for dot in basic.yieldDots(self.trans[-1][0]):
                 self.trans.insert(-1, dot) # insert one before the end, not append...
-                prev._brailleEnglish.append(u"Dot 3 {0}".format(dot))
+                prev._brailleEnglish.append("Dot 3 {0}".format(dot))
                 return True # only append max one dot.
 
         return False

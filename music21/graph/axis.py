@@ -317,7 +317,7 @@ class PitchAxis(Axis):
 
     @staticmethod
     def makePitchLabelsUnicode(ticks):
-        u'''
+        '''
         Given a list of ticks, replace all labels with alternative/unicode symbols where necessary.
 
         >>> ticks = [(60, 'C4'), (61, 'C#4'), (62, 'D4'), (63, 'E-4')]
@@ -451,7 +451,7 @@ class PitchClassAxis(PitchAxis):
             return n.pitch.pitchClass
 
     def ticks(self):
-        u'''
+        '''
         Get ticks and labels for pitch classes.
 
         If `showEnharmonic` is `True` (default) then
@@ -579,7 +579,7 @@ class PitchSpaceAxis(PitchAxis):
             return n.pitch.ps
 
     def ticks(self, dataMin=36, dataMax=100):
-        u'''
+        '''
         >>> ax = graph.axis.PitchSpaceAxis()
         >>> ax.hideUnused = False
         >>> ax.blankLabelUnused = False
@@ -677,7 +677,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
 #             return n.pitch.diatonicNoteNum
 # 
 #     def ticks(self, dataMin=15, dataMax=43):
-#         u'''
+#         '''
 #         >>> ax = graph.axis.PitchDiatonicAxis()
 #         >>> ax.hideUnused = False
 #         >>> ax.blankLabelUnused = False

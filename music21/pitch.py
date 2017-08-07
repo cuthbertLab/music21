@@ -80,20 +80,21 @@ accidentalNameToModifier = {
     'one-and-a-half-flat': '-`',
 }
 
+# TODO: replace surrogate pair
 unicodeFromModifier = OrderedDict([
-    ('####', u'\uD834\uDD2A\uD834\uDD2A'),
-    ('###', u'\u266f\uD834\uDD2A'),
-    ('##', u'\uD834\uDD2A'), # 1D12A  # note that this must be expressed as a surrogate pair
-    ('#~', u'\u266f\uD834\uDD32'), # 1D132
-    ('#', u'\u266f'),
-    ('~', u'\uD834\uDD32'), # 1D132
-    ('----', u'\uD834\uDD2B\uD834\uDD2B'),
-    ('---', u'\u266D'),
-    ('--', u'\uD834\uDD2B'),
-    ('-`', u'\u266D\uD834\uDD32'),
-    ('-', u'\u266D'),
-    ('`', u'\uD834\uDD32'), # 1D132 # raised flat: 1D12C
-    ('', u'\u266e'), # natural
+    ('####', '\uD834\uDD2A\uD834\uDD2A'),
+    ('###', '\u266f\uD834\uDD2A'),
+    ('##', '\uD834\uDD2A'), # 1D12A  # note that this must be expressed as a surrogate pair
+    ('#~', '\u266f\uD834\uDD32'), # 1D132
+    ('#', '\u266f'),
+    ('~', '\uD834\uDD32'), # 1D132
+    ('----', '\uD834\uDD2B\uD834\uDD2B'),
+    ('---', '\u266D'),
+    ('--', '\uD834\uDD2B'),
+    ('-`', '\u266D\uD834\uDD32'),
+    ('-', '\u266D'),
+    ('`', '\uD834\uDD32'), # 1D132 # raised flat: 1D12C
+    ('', '\u266e'), # natural
 ])
 
 
@@ -1170,7 +1171,7 @@ class Accidental(style.StyleMixin):
 
     @property
     def unicode(self):
-        u'''
+        '''
         Return a unicode representation of this accidental or the best unicode representation
         if that is not possible.
 
@@ -2449,7 +2450,7 @@ class Pitch:
 
     @property
     def unicodeNameWithOctave(self):
-        u'''
+        '''
         Return the pitch name with octave with unicode accidental symbols,
         if available.
 
@@ -2757,7 +2758,7 @@ class Pitch:
 
     @property
     def german(self):
-        u'''
+        '''
         Read-only property. Returns a unicode string of the name
         of a Pitch in the German system
         (where B-flat = B, B = H, etc.)
@@ -2794,31 +2795,31 @@ class Pitch:
             tempAlter = 0
         tempStep = self.step
         if tempAlter != int(tempAlter):
-            raise PitchException(u'Es geht nicht "german" zu benutzen mit Microtönen.  Schade!')
+            raise PitchException('Es geht nicht "german" zu benutzen mit Microtönen.  Schade!')
         else:
             tempAlter = int(tempAlter)
-        if tempStep == u'B':
+        if tempStep == 'B':
             if tempAlter != -1:
-                tempStep = u'H'
+                tempStep = 'H'
             else:
                 tempAlter += 1
         if tempAlter == 0:
             return tempStep
         elif tempAlter > 0:
-            tempName = tempStep + (tempAlter * u'is')
+            tempName = tempStep + (tempAlter * 'is')
             return tempName
         else: # flats
-            if tempStep in [u'C', u'D', u'F', u'G', u'H']:
-                firstFlatName = u'es'
+            if tempStep in ['C', 'D', 'F', 'G', 'H']:
+                firstFlatName = 'es'
             else: # A, E.  Bs should never occur...
                 firstFlatName = u's'
             multipleFlats = abs(tempAlter) - 1
-            tempName =  tempStep + firstFlatName + (multipleFlats * u'es')
+            tempName =  tempStep + firstFlatName + (multipleFlats * 'es')
             return tempName
 
     @property
     def italian(self):
-        u'''
+        '''
         Read-only attribute. Returns the name
         of a Pitch in the Italian system
         (F-sharp is fa diesis, C-flat is do bemolle, etc.)
@@ -2854,61 +2855,61 @@ class Pitch:
             tempAlter = 0
         tempStep = self.step
         if tempAlter != int(tempAlter):
-            raise PitchException(u'Non si puo usare `italian` con microtoni')
+            raise PitchException('Non si puo usare `italian` con microtoni')
         else:
             tempAlter = int(tempAlter)
 
-        cardinalityMap = {1: u" ", 2: u" doppio ", 3: u" triplo ", 4: u" quadruplo "}
-        solfeggeMap = {"C": u"do", "D": u"re", "E": u"mi", "F": u"fa",
-                       "G": u"sol", "A": u"la", "B": u"si"}
+        cardinalityMap = {1: " ", 2: " doppio ", 3: " triplo ", 4: " quadruplo "}
+        solfeggeMap = {"C": "do", "D": "re", "E": "mi", "F": "fa",
+                       "G": "sol", "A": "la", "B": "si"}
 
         if tempAlter == 0:
             return solfeggeMap[tempStep]
         elif tempAlter > 0:
             if tempAlter > 4:
                 raise PitchException('Entirely too many sharps')
-            return solfeggeMap[tempStep] + cardinalityMap[tempAlter] + u"diesis"
+            return solfeggeMap[tempStep] + cardinalityMap[tempAlter] + "diesis"
         else: # flats
             tempAlter = tempAlter*-1
             if tempAlter > 4:
                 raise PitchException('Entirely too many flats')
-            return solfeggeMap[tempStep] + cardinalityMap[tempAlter] + u"bemolle"
+            return solfeggeMap[tempStep] + cardinalityMap[tempAlter] + "bemolle"
 
     def _getSpanishCardinal(self):
         if self.accidental is None:
-            return u''
+            return ''
         else:
             i = abs(self.accidental.alter)
             # already checked for microtones, etc.
             if i == 1:
-                return u''
+                return ''
             elif i == 2:
-                return u' doble'
+                return ' doble'
             elif i == 3:
-                return u' triple'
+                return ' triple'
             elif i == 4:
-                return u' cuádruple'
+                return ' cuádruple'
 
     def _getSpanishSolfege(self):
         p = self.step
         if p == 'A':
-            return u'la'
+            return 'la'
         if p == 'B':
-            return u'si'
+            return 'si'
         if p == 'C':
-            return u'do'
+            return 'do'
         if p == 'D':
-            return u're'
+            return 're'
         if p == 'E':
-            return u'mi'
+            return 'mi'
         if p == 'F':
-            return u'fa'
+            return 'fa'
         if p == 'G':
-            return u'sol'
+            return 'sol'
 
     @property
     def spanish(self):
-        u'''
+        '''
         Read-only attribute. Returns the name
         of a Pitch in Spanish
         (Microtones and Quartertones raise an error).
@@ -2947,13 +2948,13 @@ class Pitch:
             elif abs(tempAlter) > 4:
                 raise PitchException('Unsupported accidental type.')
             elif tempAlter in [-4, -3, -2, -1]:
-                return solfege + self._getSpanishCardinal() + u' bèmol'
+                return solfege + self._getSpanishCardinal() + ' bèmol'
             elif tempAlter in [1, 2, 3, 4]:
-                return solfege + self._getSpanishCardinal() + u' sostenido'
+                return solfege + self._getSpanishCardinal() + ' sostenido'
 
     @property
     def french(self):
-        u'''
+        '''
         Read-only attribute. Returns the name
         of a Pitch in the French system
         (where A = la, B = si, B-flat = si bémol, C-sharp = do dièse, etc.)
@@ -2985,44 +2986,44 @@ class Pitch:
 
         if tempAlter != int(tempAlter):
             raise PitchException(
-                u'On ne peut pas utiliser les microtones avec "french." Quelle Dommage!')
+                'On ne peut pas utiliser les microtones avec "french." Quelle Dommage!')
         elif abs(tempAlter) > 4.0:
             raise PitchException(
-                u'On ne peut pas utiliser les altération avec puissance supérieure à quatre ' +
-                u'avec "french." Ça me fait une belle jambe!')
+                'On ne peut pas utiliser les altération avec puissance supérieure à quatre ' +
+                'avec "french." Ça me fait une belle jambe!')
         else:
             tempAlter = int(tempAlter)
-        if tempStep == u'A':
-            tempStep = u'la'
-        if tempStep == u'B':
-            tempStep = u'si'
-        if tempStep == u'C':
-            tempStep = u'do'
-        if tempStep == u'D':
-            tempStep = u'ré'
-        if tempStep == u'E':
-            tempStep = u'mi'
-        if tempStep == u'F':
-            tempStep = u'fa'
-        if tempStep == u'G':
-            tempStep = u'sol'
+        if tempStep == 'A':
+            tempStep = 'la'
+        if tempStep == 'B':
+            tempStep = 'si'
+        if tempStep == 'C':
+            tempStep = 'do'
+        if tempStep == 'D':
+            tempStep = 'ré'
+        if tempStep == 'E':
+            tempStep = 'mi'
+        if tempStep == 'F':
+            tempStep = 'fa'
+        if tempStep == 'G':
+            tempStep = 'sol'
 
         if tempAlter == 0:
             return tempStep
         elif abs(tempAlter) == 1.0:
             tempNumberedStep = tempStep
         elif abs(tempAlter) == 2.0:
-            tempNumberedStep = tempStep + u' double'
+            tempNumberedStep = tempStep + ' double'
         elif abs(tempAlter) == 3.0:
-            tempNumberedStep = tempStep + u' triple'
+            tempNumberedStep = tempStep + ' triple'
         elif abs(tempAlter) == 4.0:
-            tempNumberedStep = tempStep + u' quadruple'
+            tempNumberedStep = tempStep + ' quadruple'
 
         if tempAlter/abs(tempAlter) == 1.0: #sharps are positive
-            tempName = tempNumberedStep + u' dièse'
+            tempName = tempNumberedStep + ' dièse'
             return tempName
         else: # flats are negative
-            tempName = tempNumberedStep + u' bémol'
+            tempName = tempNumberedStep + ' bémol'
             return tempName
 
 

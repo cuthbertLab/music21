@@ -104,8 +104,8 @@ def braille(outputStream):
 #    from music21 import braille
     from music21.braille import translate as btranslate
 
-    brailleOutput = (u"<html><body><pre>" + btranslate.objectToBraille(outputStream) +
-                     u"</pre></body></html>")
+    brailleOutput = ("<html><body><pre>" + btranslate.objectToBraille(outputStream) +
+                     "</pre></body></html>")
     return (brailleOutput.encode('utf-8'), 'text/html; charset=utf-8')
 
 def noteflightEmbed(outputStream):

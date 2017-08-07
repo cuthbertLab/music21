@@ -498,10 +498,10 @@ class Trigram:
             return self._length
 
     def parseExcerpt(self, excerpt):
-        pair = u'  '
+        pair = '  '
         if isinstance(excerpt, list):
             for line in excerpt:
-                for letter in line.strip() + u' ':
+                for letter in line.strip() + ' ':
                     d = self.lut.setdefault(pair, {})
                     d[letter] = d.get(letter, 0) + 1
                     pair = pair[1] + letter
@@ -513,8 +513,10 @@ class Trigram:
         self.measure()
 
     def measure(self):
-        """calculates the scalar length of the trigram vector and
-        stores it in self.length."""
+        """
+        calculates the scalar length of the trigram vector and
+        stores it in self.length.
+        """
         total = 0
         for y in self.lut.values():
             total += sum([ x * x for x in y.values() ])
@@ -627,12 +629,12 @@ class Test(unittest.TestCase):
         self.assertTrue(0.99 < ld.trigrams['fr'] - ld.trigrams['cn'] < 1.0)
 
         self.assertEqual('en',
-                         ld.mostLikelyLanguage(u"hello friends, this is a test of the " +
-                                               u"ability of language detector to " +
-                                               u"tell what language I am writing in."))
+                         ld.mostLikelyLanguage("hello friends, this is a test of the " +
+                                               "ability of language detector to " +
+                                               "tell what language I am writing in."))
         self.assertEqual('it', ld.mostLikelyLanguage(
-            u"ciao amici! cosé trovo in quale lingua ho scritto questo passaggio. Spero che " +
-            u"troverà che é stata scritta in italiano"))
+            "ciao amici! cosé trovo in quale lingua ho scritto questo passaggio. Spero che " +
+            "troverà che é stata scritta in italiano"))
 
         ## TODO: Replace
         #messiahGovernment = corpus.parse('handel/hwv56/movement1-13.md')

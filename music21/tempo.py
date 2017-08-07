@@ -230,15 +230,10 @@ class TempoText(TempoIndication):
     text = property(_getText, _setText, doc = '''
         Get or set the text as a string.
 
-
-        Depending on whether "from __future__ import unicode_literals" is turned on,
-        this might give a unicode literal (u'adagio')
-
-
         >>> import music21
         >>> tm = music21.tempo.TempoText("adagio")
-        >>> print(tm.text)
-        adagio
+        >>> tm.text
+        'adagio'
         >>> tm.getTextExpression()
         <music21.expressions.TextExpression "adagio">
         ''')
@@ -1380,9 +1375,9 @@ class Test(unittest.TestCase):
         self.assertEqual(mm.numberImplicit, True)
 
         self.assertEqual(mm.number, 56)
-        tm2 = TempoText(u"très vite")
+        tm2 = TempoText("très vite")
 
-        self.assertEqual(tm2.text, u'très vite')
+        self.assertEqual(tm2.text, 'très vite')
         mm = tm2.getMetronomeMark()
         self.assertEqual(mm.number, 144)
 

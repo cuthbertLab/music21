@@ -522,7 +522,7 @@ class Divisione(meter.TimeSignature):
         ''')
 
 def convertTrecentoStream(inpStream, inpDiv=None):
-    u'''
+    '''
     Take one argument: input stream.
     Converts an entire stream containing only mensural and trecento objects into one
     containing modern clef, note, and time signature objects.

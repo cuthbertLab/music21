@@ -205,8 +205,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'music21.tex', u'music21 Documentation',
-   u'Michael Scott Cuthbert', 'manual'),
+  ('index', 'music21.tex', 'music21 Documentation',
+   'Michael Scott Cuthbert', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -235,7 +235,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'music21', u'music21 Documentation',
+    ('index', 'music21', 'music21 Documentation',
      ['Michael Scott Cuthbert and cuthbertLab'], 1)
 ]
 
@@ -249,7 +249,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'music21', u'music21 Documentation',
+  ('index', 'music21', 'music21 Documentation',
    'Michael Scott Cuthbert and cuthbertLab', 'music21', 'One line description of project.',
    'Miscellaneous'),
 ]

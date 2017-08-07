@@ -1021,7 +1021,7 @@ class Test(unittest.TestCase):
         self.assertTrue(bm.measure(7).notes[3].pitch.accidental.displayStatus)
 
     def test_example07_7(self):
-        u"""
+        """
         "Whenever the marking “8va” occurs in print over or under certain notes,
         these notes should be transcribed according to the octaves in which they
         are actually to be played." page 42, Braille Transcription Manual
@@ -1138,13 +1138,13 @@ class Test(unittest.TestCase):
             self.assertEqual(timeSigToBraille(meter.TimeSignature(ts)), r)
 
     def xtest_example08_3(self):
-        u"""
+        """
         Time signatures with one number. Not currently supported.
         """
         pass
 
     def xtest_example08_4(self):
-        u"""
+        """
         Combined time signatures. Not currently supported.
         """
         pass
@@ -2656,7 +2656,7 @@ Barline final ⠣⠅
         '''
 
     def test_example14_2(self):
-        u"""
+        """
         Doubling of Tenuto marking is demonstrated. Accent is used in place of
         Reversed Accent because music21
         doesn't support the latter.

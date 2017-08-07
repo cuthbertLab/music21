@@ -176,7 +176,7 @@ class ScalaPitch:
 
 
 class ScalaData:
-    u'''
+    '''
     Object representation of data stored in a Scale scale file. This object is used to 
     access Scala information stored in a file. To create a music21 scale with a Scala file, 
     use :class:`~music21.scale.ScalaScale`.
@@ -350,28 +350,28 @@ class ScalaData:
         '''
         msg = []
         if self.fileName is not None:
-            msg.append(u'! %s' % self.fileName)
+            msg.append('! %s' % self.fileName)
         # conventional to add a comment space
-        msg.append(u'!')
+        msg.append('!')
 
         if self.description is not None:
             msg.append(self.description)
         else: # must supply empty line
-            msg.append(u'')
+            msg.append('')
 
         if self.pitchCount is not None:
             msg.append(str(self.pitchCount))
         else: # must supply empty line
-            msg.append(u'')
+            msg.append('')
     
         # conventional to add a comment space
-        msg.append(u'!')
+        msg.append('!')
         for sp in self.pitchValues:
             msg.append(str(sp.cents))
         # add space
-        msg.append(u'') 
+        msg.append('') 
 
-        return u'\n'.join(msg)
+        return '\n'.join(msg)
 
 
 #-------------------------------------------------------------------------------

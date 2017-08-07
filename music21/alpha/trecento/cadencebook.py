@@ -862,7 +862,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
     def xtestAsScore(self):
         deduto = BallataSheet().workByTitle('deduto')
-        self.assertEqual(deduto.title, u'Deduto sey a quel')
+        self.assertEqual(deduto.title, 'Deduto sey a quel')
 #        for s in deduto.snippets:
 #            s.show('text')
         dedutoScore = deduto.asScore()

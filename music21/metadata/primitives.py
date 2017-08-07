@@ -1138,7 +1138,8 @@ class Test(unittest.TestCase):
         text.language = 'en'
         jsf = freezeThaw.JSONFreezer(text)
         jsonDict = json.loads(jsf.json)
-        self.assertEqual(sorted(list(jsonDict['__attr__'].keys())), [u'_data', u'_language'])
+        self.assertEqual(sorted(list(jsonDict['__attr__'].keys())), 
+                         ['_data', '_language'])
 
         textNew = metadata.primitives.Text()
         jst = freezeThaw.JSONThawer(textNew)

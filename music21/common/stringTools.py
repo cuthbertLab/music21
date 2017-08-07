@@ -309,10 +309,10 @@ def stripAccents(inputString):
     'tres vite'
     '''
     nfkd_form = unicodedata.normalize('NFKD', inputString)
-    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
+    return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 def normalizeFilename(name):
-    u'''
+    '''
     take a name that might contain unicode characters, punctuation,
     or spaces and
     normalize it so that it is POSIX compliant (except for the limit
@@ -321,7 +321,7 @@ def normalizeFilename(name):
     Takes in a string or unicode string and returns a string (unicode in Py3)
     without any accented characters.
 
-    >>> common.normalizeFilename(u'03-Niccolò all’lessandra.not really.xml')
+    >>> common.normalizeFilename('03-Niccolò all’lessandra.not really.xml')
     '03-Niccolo_alllessandra_not_really.xml'
 
 

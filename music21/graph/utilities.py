@@ -77,21 +77,18 @@ class PlotStreamException(exceptions21.Music21Exception):
     pass
 
 def accidentalLabelToUnicode(label):
-    u'''
+    '''
     Changes a label possibly containing a modifier such as "-" or "#" into
     a unicode string.
 
-    >>> print(graph.utilities.accidentalLabelToUnicode('B-4'))
-    B♭4
+    >>> graph.utilities.accidentalLabelToUnicode('B-4')
+    'B♭4'
 
     Since matplotlib's default fonts do not support double sharps or double flats,
     etc. these are converted as best we can...
 
-    >>> print(graph.utilities.accidentalLabelToUnicode('B--4'))
-    B♭♭4
-
-    In Python 2, all strings are converted to unicode strings even if there is
-    no need to.
+    >>> graph.utilities.accidentalLabelToUnicode('B--4')
+    'B♭♭4'
     '''
     if not isinstance(label, str):
         return label

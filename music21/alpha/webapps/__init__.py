@@ -686,7 +686,7 @@ class CommandProcessor:
         is the traceback of the exception if exceptionObj is specified, otherwise
         errorTraceback is the empty string
         '''
-        errorTraceback = u''
+        errorTraceback = ''
         if exceptionObj is not None:
             errorTraceback += traceback.format_exc()
 

@@ -625,13 +625,11 @@ class XMLExporterBase:
         >>> XB.dump(e)
         <accidental />
 
-        >>> e.text = u'∆'
-        >>> e.text == u'∆'
+        >>> e.text = '∆'
+        >>> e.text == '∆'
         True
         >>> XB.dump(e)
-        <accidental>...</accidental>
-
-        Output differs in Python2 vs 3.
+        <accidental>∆</accidental>
         '''
         xmlEl = copy.deepcopy(obj)  # adds 5% overhead
         XMLExporterBase.indent(xmlEl)  # adds 5% overhead

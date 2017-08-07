@@ -1763,7 +1763,7 @@ def _combinations(instrumentString):
     allComb = []
     for size in range(1, len(sampleList) + 1):
         for i in range(len(sampleList) - size + 1):
-            allComb.append(u" ".join(sampleList[i:i + size]))
+            allComb.append(" ".join(sampleList[i:i + size]))
     return allComb
 
 

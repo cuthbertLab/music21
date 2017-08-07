@@ -1184,7 +1184,7 @@ class UserSettings:
 
     >>> #_DOCS_SHOW us['musicxmlPath'] = '/Applications/Finale Reader.app'
     >>> #_DOCS_SHOW us['musicxmlPath']
-    u'/Applications/Finale Reader.app'
+    '/Applications/Finale Reader.app'
 
     Note that the 'localCorpusPath' setting operates in a slightly different
     manner than other settings. Each time the 'localCorpusPath' setting is set,

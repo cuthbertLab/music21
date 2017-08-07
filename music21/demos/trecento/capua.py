@@ -1062,14 +1062,14 @@ class Test(unittest.TestCase):
                 outList.append(outSublist)
 
         self.assertEqual(outList,
-                         [[u'A', 'P5', None], [u'A', 'M6', None],
-                          [u'G', 'P5', None], [u'G', 'm6', None],
-                          [u'A', 'm7', None], [u'F', 'd5', '<accidental sharp>'],
-                          [u'G', 'm6', None], [u'A', 'P1', None],
-                          [u'B', 'M6', None], [u'A', 'P5', None],
-                          [u'G', 'm7', None], [u'G', 'm6', None],
-                          [u'F', 'd5', None], [u'E', 'M3', None],
-                          [u'D', 'P1', None]
+                         [['A', 'P5', None], ['A', 'M6', None],
+                          ['G', 'P5', None], ['G', 'm6', None],
+                          ['A', 'm7', None], ['F', 'd5', '<accidental sharp>'],
+                          ['G', 'm6', None], ['A', 'P1', None],
+                          ['B', 'M6', None], ['A', 'P5', None],
+                          ['G', 'm7', None], ['G', 'm6', None],
+                          ['F', 'd5', None], ['E', 'M3', None],
+                          ['D', 'P1', None]
                          ])
         #pieceObj.asOpus().show('lily.pdf')
 

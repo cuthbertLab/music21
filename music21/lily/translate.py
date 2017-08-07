@@ -116,14 +116,14 @@ class LilypondConverter:
     \include "lilypond-book-preamble.ly"
     '''.lstrip()
 
-    accidentalConvert = {"double-sharp": u"isis",
-                         "double-flat": u"eses",
-                         "one-and-a-half-sharp": u"isih",
-                         "one-and-a-half-flat": u"eseh",
-                         "sharp": u"is",
-                         "flat": u"es",
-                         "half-sharp": u"ih",
-                         "half-flat": u"eh",
+    accidentalConvert = {"double-sharp": "isis",
+                         "double-flat": "eses",
+                         "one-and-a-half-sharp": "isih",
+                         "one-and-a-half-flat": "eseh",
+                         "sharp": "is",
+                         "flat": "es",
+                         "half-sharp": "ih",
+                         "half-flat": "eh",
                          }
 
     barlineDict = {'regular': '|',
@@ -1504,10 +1504,10 @@ class LilypondConverter:
         spio = pitch.implicitOctave
         if (spio < 3):
             correctedOctave = 3 - spio
-            octaveModChars = u',' * correctedOctave #  C2 = c,  C1 = c,,
+            octaveModChars = ',' * correctedOctave #  C2 = c,  C1 = c,,
         else:
             correctedOctave = spio - 3
-            octaveModChars  = u'\'' * correctedOctave # C4 = c', C5 = c''  etc.
+            octaveModChars  = '\'' * correctedOctave # C4 = c', C5 = c''  etc.
         return octaveModChars
 
     def lyMultipliedDurationFromDuration(self, durationObj):

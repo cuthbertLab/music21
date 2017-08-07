@@ -2766,7 +2766,7 @@ class MeasureParser(XMLParserBase):
         return post
 
     def xmlNotations(self, mxNotations, n):
-        u'''
+        '''
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
 
@@ -4925,7 +4925,7 @@ class Test(unittest.TestCase):
         m1 = s.parts[0].getElementsByClass('Measure')[0]
         self.assertEqual(m1.hasVoices(), True)
 
-        self.assertEqual([v.id for v in m1.voices], [u'1', u'2'])
+        self.assertEqual([v.id for v in m1.voices], ['1', '2'])
 
         self.assertEqual([e.offset for e in m1.voices[0]], [0.0, 1.0, 2.0, 3.0])
         self.assertEqual([e.offset for e in m1.voices['1']], [0.0, 1.0, 2.0, 3.0])
@@ -5338,10 +5338,10 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 19)
 
         match = [h.chordKind for h in s.flat.getElementsByClass('ChordSymbol')]
-        self.assertEqual(match, [u'major', u'dominant', u'major', u'major', u'major',
-                                 u'major', u'dominant', u'major', u'dominant', u'major',
-                                 u'dominant', u'major', u'dominant', u'major', u'dominant',
-                                 u'major', u'dominant', u'major', u'major'])
+        self.assertEqual(match, ['major', 'dominant', 'major', 'major', 'major',
+                                 'major', 'dominant', 'major', 'dominant', 'major',
+                                 'dominant', 'major', 'dominant', 'major', 'dominant',
+                                 'major', 'dominant', 'major', 'major'])
 
         match = [str(h.root()) for h in s.flat.getElementsByClass('ChordSymbol')]
 
@@ -5440,9 +5440,9 @@ class Test(unittest.TestCase):
         msg = []
         for tb in tbs:
             msg.append(tb.content)
-        self.assertEqual(msg, [u'This is a text box!', u'pos 200/300 (lower left)',
-                               u'pos 1000/300 (lower right)', u'pos 200/1500 (upper left)',
-                               u'pos 1000/1500 (upper right)'])
+        self.assertEqual(msg, ['This is a text box!', 'pos 200/300 (lower left)',
+                               'pos 1000/300 (lower right)', 'pos 200/1500 (upper left)',
+                               'pos 1000/1500 (upper right)'])
 
     def testImportSlursA(self):
         from music21 import corpus

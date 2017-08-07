@@ -89,7 +89,7 @@ class RTToken:
     >>> rtt.isMovement() or rtt.isAtom()
     False
     '''
-    def __init__(self, src=u''):
+    def __init__(self, src=''):
         self.src = src # store source character sequence
         self.lineNumber = 0
 
@@ -164,7 +164,7 @@ class RTTagged(RTToken):
     >>> rttag.isComposer()
     False
     '''
-    def __init__(self, src=u''):
+    def __init__(self, src=''):
         super().__init__(src)
         # try to split off tag from data
         self.tag = ''
@@ -416,7 +416,7 @@ class RTMeasure(RTToken):
 
 
     '''
-    def __init__(self, src=u''):
+    def __init__(self, src=''):
         super().__init__(src)
         # try to split off tag from data
         self.tag = '' # the measure number or range
@@ -542,7 +542,7 @@ class RTAtom(RTToken):
     However, see RTChord, RTBeat, etc. which are subclasses of RTAtom
     specifically for storing chords, beats, etc.
     '''
-    def __init__(self, src=u'', container=None):
+    def __init__(self, src='', container=None):
         # this stores the source
         super().__init__(src)
         self.container = container
@@ -565,7 +565,7 @@ class RTChord(RTAtom):
     <RTChord 'IV'>
     '''
 
-    def __init__(self, src=u'', container=None):
+    def __init__(self, src='', container=None):
         super().__init__(src, container)
 
         # store offset within measure
@@ -586,7 +586,7 @@ class RTNoChord(RTAtom):
     <RTNoChord 'NC'>
     '''
 
-    def __init__(self, src=u'', container=None):
+    def __init__(self, src='', container=None):
         super().__init__(src, container)
 
         # store offset within measure
@@ -852,7 +852,7 @@ class RTOpenParens(RTAtom):
     >>> romanText.rtObjects.RTOpenParens('(')
     <RTOpenParens '('>
     '''
-    def __init__(self, src=u'(', container=None): # pylint: disable=useless-super-delegation
+    def __init__(self, src='(', container=None): # pylint: disable=useless-super-delegation
         super().__init__(src, container)
 
     def __repr__(self):
@@ -866,7 +866,7 @@ class RTCloseParens(RTAtom):
     >>> romanText.rtObjects.RTCloseParens(')')
     <RTCloseParens ')'>
     '''
-    def __init__(self, src=u')', container=None): # pylint: disable=useless-super-delegation
+    def __init__(self, src=')', container=None): # pylint: disable=useless-super-delegation
         super().__init__(src, container)
 
     def __repr__(self):
@@ -949,7 +949,7 @@ class RTPhraseBoundary(RTPhraseMarker):
     >>> phrase
     <RTPhraseBoundary '||'>
     '''
-    def __init__(self, src=u'||', container=None): # pylint: disable=useless-super-delegation
+    def __init__(self, src='||', container=None): # pylint: disable=useless-super-delegation
         super().__init__(src, container)
 
     def __repr__(self):
@@ -962,7 +962,7 @@ class RTEllisonStart(RTPhraseMarker):
     >>> phrase
     <RTEllisonStart '|*'>
     '''
-    def __init__(self, src=u'|*', container=None): # pylint: disable=useless-super-delegation
+    def __init__(self, src='|*', container=None): # pylint: disable=useless-super-delegation
         super().__init__(src, container)
 
     def __repr__(self):
@@ -975,7 +975,7 @@ class RTEllisonStop(RTPhraseMarker):
     >>> phrase
     <RTEllisonStop '*|'>
     '''
-    def __init__(self, src=u'*|', container=None): # pylint: disable=useless-super-delegation
+    def __init__(self, src='*|', container=None): # pylint: disable=useless-super-delegation
         super().__init__(src, container)
 
     def __repr__(self):
@@ -997,7 +997,7 @@ class RTRepeatStart(RTRepeat):
     >>> repeat
     <RTRepeatStart ...'||:'>
     '''
-    def __init__(self, src=u'||:', container=None): # pylint: disable=useless-super-delegation
+    def __init__(self, src='||:', container=None): # pylint: disable=useless-super-delegation
         super().__init__(src, container)
 
     def __repr__(self):
@@ -1010,7 +1010,7 @@ class RTRepeatStop(RTRepeat):
     >>> repeat
     <RTRepeatStop ...':||'>
     '''
-    def __init__(self, src=u':||', container=None): # pylint: disable=useless-super-delegation
+    def __init__(self, src=':||', container=None): # pylint: disable=useless-super-delegation
         super().__init__(src, container)
 
     def __repr__(self):

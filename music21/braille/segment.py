@@ -231,19 +231,19 @@ class BrailleElementGrouping(list):
             if isinstance(obj, stream.Voice):
                 for obj2 in obj:
                     try:
-                        allObjects.append(u"\n".join(obj2._brailleEnglish))
+                        allObjects.append("\n".join(obj2._brailleEnglish))
                     except (AttributeError, TypeError):
                         allObjects.append(str(obj2))
             else:
                 try:
-                    allObjects.append(u"\n".join(obj._brailleEnglish))
+                    allObjects.append("\n".join(obj._brailleEnglish))
                 except (AttributeError, TypeError):
                     allObjects.append(str(obj))
         if self.numRepeats > 0:
-            allObjects.append(u"** Grouping x {0} **".format(self.numRepeats + 1))
+            allObjects.append("** Grouping x {0} **".format(self.numRepeats + 1))
         if self.withHyphen is True:
-            allObjects.append(u"music hyphen {0}".format(lookup.symbols['music_hyphen']))
-        out = u"\n".join(allObjects)
+            allObjects.append("music hyphen {0}".format(lookup.symbols['music_hyphen']))
+        out = "\n".join(allObjects)
         return out
 
     def __repr__(self):
@@ -279,7 +279,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
     }
 
     def __init__(self):
-        u"""
+        """
         A segment is "a group of measures occupying more than one braille line."
         Music is divided into segments so as to "present the music to the reader
         in a meaningful manner and to give him convenient reference points to
@@ -361,7 +361,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
         return text.BrailleText.__str__(self)
 
     def __str__(self):
-        name = u"<music21.braille.segment BrailleSegment>"
+        name = "<music21.braille.segment BrailleSegment>"
 
         allItems = sorted(self.items())
         allKeys = []
@@ -375,18 +375,18 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
                     continue
             except TypeError:
                 pass
-            allKeys.append(u"Measure {0}, {1} {2}:\n".format(itemKey.measure,
+            allKeys.append("Measure {0}, {1} {2}:\n".format(itemKey.measure,
                                                              affinityNames[itemKey.affinity],
                                                              itemKey.ordinal + 1))
             gStr = str(grouping)
             allGroupings.append(gStr)
             prevKey = itemKey
-        allElementGroupings = u"\n".join([u"".join([k, g, u"\n==="])
+        allElementGroupings = "\n".join(["".join([k, g, "\n==="])
                                           for (k,g) in list(zip(allKeys, allGroupings))])
-        out = u"\n".join([u"---begin segment---",
+        out = "\n".join(["---begin segment---",
                           name,
                           allElementGroupings,
-                          u"---end segment---"])
+                          "---end segment---"])
         return out
 
 
@@ -437,7 +437,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
         return self.brailleText
 
     def addDummyRests(self):
-        u'''
+        '''
         Adds as many dummy rests as self.dummyRestLength to the signatures of
         brailleText
 
@@ -451,10 +451,10 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
         ⠄⠄⠄⠄
         '''
         dummyRests = [self.dummyRestLength * lookup.rests['dummy']]
-        self.addSignatures(u"".join(dummyRests))
+        self.addSignatures("".join(dummyRests))
 
     def extractMeasureNumber(self):
-        u"""
+        """
         Adds a measure number from the segmentKey needing processing
 
         >>> segKey = braille.segment.SegmentKey(measure=4, ordinal=1, affinity=9)
@@ -755,7 +755,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
         self.addRepeatSymbols(noteGrouping.numRepeats)
 
     def addRepeatSymbols(self, repeatTimes):
-        u'''
+        '''
         Adds the appropriate number of repeat symbols, following DeGarmo chapter 17.
 
         >>> seg = braille.segment.BrailleSegment()
@@ -814,7 +814,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
                 pass
 
         brailleSig = basic.transcribeSignatures(keySignature, timeSignature, outgoingKeySig)
-        if brailleSig != u"":
+        if brailleSig != "":
             self.addSignatures(brailleSig)
 
     def extractTempoTextGrouping(self):
@@ -1029,32 +1029,32 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
         return text.BrailleKeyboard.__str__(self)
 
     def __str__(self):
-        name = u"<music21.braille.segment BrailleGrandSegment>\n==="
+        name = "<music21.braille.segment BrailleGrandSegment>\n==="
         allPairs = []
         for (rightKey, leftKey) in self.yieldCombinedGroupingKeys():
             if rightKey is not None:
-                rightHeading = u"Measure {0} Right, {1} {2}:\n".format(
+                rightHeading = "Measure {0} Right, {1} {2}:\n".format(
                     rightKey.measure, affinityNames[rightKey.affinity], rightKey.ordinal + 1)
                 rightContents = str(self.get(rightKey))
-                rightFull = u"".join([rightHeading, rightContents])
+                rightFull = "".join([rightHeading, rightContents])
             else:
-                rightFull = u""
+                rightFull = ""
             if leftKey is not None:
-                leftHeading = u"\nMeasure {0} Left, {1} {2}:\n".format(
+                leftHeading = "\nMeasure {0} Left, {1} {2}:\n".format(
                     leftKey.measure, affinityNames[leftKey.affinity], leftKey.ordinal + 1)
                 leftContents = str(self.get(leftKey))
-                leftFull = u"".join([leftHeading, leftContents])
+                leftFull = "".join([leftHeading, leftContents])
             else:
-                leftFull = u""
-            allPairs.append(u"\n".join([rightFull, leftFull, "====\n"]))
-        out = u"\n".join([u"---begin grand segment---", name, u"".join(allPairs),
-                           u"---end grand segment---"])
+                leftFull = ""
+            allPairs.append("\n".join([rightFull, leftFull, "====\n"]))
+        out = "\n".join(["---begin grand segment---", name, "".join(allPairs),
+                           "---end grand segment---"])
         return out
 
 
 
     def yieldCombinedGroupingKeys(self):
-        u'''
+        '''
         yields all the keys in order as a tuple of (rightKey, leftKey) where
         two keys are grouped if they have the same segmentKey except for the hand.
 
@@ -1272,7 +1272,7 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
         elif rightKey is not None:
             rh_braille = ngMod.transcribeNoteGrouping(self.get(rightKey))
         else:
-            rh_braille = u""
+            rh_braille = ""
         if leftKey is not None and leftKey.affinity == Affinity.INACCORD:
             inaccords = self.get(leftKey)
             voice_trans = []
@@ -1286,7 +1286,7 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
         elif leftKey is not None:
             lh_braille = ngMod.transcribeNoteGrouping(self.get(leftKey))
         else:
-            lh_braille = u""
+            lh_braille = ""
         self.addNoteGroupings(currentMeasureNumber, rh_braille, lh_braille)
         return None
 
@@ -1307,7 +1307,7 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
 # Grouping + Segment creation from music21.stream Part
 
 def findSegments(music21Part, **partKeywords):
-    u"""
+    """
     Takes in a :class:`~music21.stream.Part`
     and a list of partKeywords.
 
@@ -1460,7 +1460,7 @@ def findSegments(music21Part, **partKeywords):
 
 
 def prepareSlurredNotes(music21Part, **keywords):
-    u"""
+    """
     Takes in a :class:`~music21.stream.Part` and three keywords:
 
     * slurLongPhraseWithBrackets
@@ -1639,7 +1639,7 @@ def prepareSlurredNotes(music21Part, **keywords):
                 allNotes[endIndex - 1].endLongDoubleSlur = True
 
 def getRawSegments(music21Part, setHand=None):
-    u"""
+    """
     Takes in a :class:`~music21.stream.Part` divided it up into segments (i.e. instances of
     :class:`~music21.braille.segment.BrailleSegment`). This method assumes
     that the Part is already divided up into measures
@@ -1826,7 +1826,7 @@ def getRawSegments(music21Part, setHand=None):
     return allSegments
 
 def extractBrailleElements(music21Measure):
-    u"""
+    """
     Takes in a :class:`~music21.stream.Measure` and returns a
     :class:`~music21.braille.segment.BrailleElementGrouping` of correctly ordered
     :class:`~music21.base.Music21Object` instances which can be directly transcribed to
@@ -1892,7 +1892,7 @@ def extractBrailleElements(music21Measure):
     return allElements
 
 def prepareBeamedNotes(music21Measure):
-    u"""
+    """
     Takes in a :class:`~music21.stream.Measure` and labels beamed notes
     of smaller value than an 8th with beamStart and beamContinue keywords
     in accordance with beaming rules in braille music.
@@ -2083,7 +2083,7 @@ def areGroupingsIdentical(noteGroupingA, noteGroupingB):
 # Helper Methods
 
 def splitNoteGrouping(noteGrouping, beatDivisionOffset=0):
-    u"""
+    """
     Almost identical to :meth:`~music21.braille.segment.splitMeasure`, but
     functions on a :class:`~music21.braille.segment.BrailleElementGrouping`
     instead.

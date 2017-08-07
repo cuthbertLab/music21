@@ -721,8 +721,8 @@ class Test(unittest.TestCase):
         # activeSite of b is no longer a
         # self.assertEqual(b.activeSite, None)
         instObj = b.getInstrument()
-        self.assertEqual(instObj.partName, u'Violone e Organo')
-        self.assertEqual(b.partName, u'Violone e Organo')
+        self.assertEqual(instObj.partName, 'Violone e Organo')
+        self.assertEqual(b.partName, 'Violone e Organo')
 
 
 
@@ -3927,11 +3927,11 @@ class Test(unittest.TestCase):
         #sSub.show()
         # only notes that deviate from key signature are True
         self.assertEqual(collectAccidentalDisplayStatus(sSub), 
-                         ['x', (u'C#', False), 'x', 'x', (u'E#', True), (u'F#', False), 'x', 
-                          (u'C#', False), (u'F#', False), (u'F#', False), (u'G#', False), 
-                          (u'F#', False), (u'G#', False), 'x', 'x', 'x', (u'C#', False), 
-                          (u'F#', False), (u'G#', False), 'x', 'x', 'x', 'x', 
-                          (u'E#', True), (u'F#', False)] )
+                         ['x', ('C#', False), 'x', 'x', ('E#', True), ('F#', False), 'x', 
+                          ('C#', False), ('F#', False), ('F#', False), ('G#', False), 
+                          ('F#', False), ('G#', False), 'x', 'x', 'x', ('C#', False), 
+                          ('F#', False), ('G#', False), 'x', 'x', 'x', 'x', 
+                          ('E#', True), ('F#', False)] )
 
         # this removes key signature
         sSub = sSub.flat.notesAndRests.stream()
@@ -3952,14 +3952,14 @@ class Test(unittest.TestCase):
         # that were in the orignal. in Finale display, however, sharps are
         # displayed when the should not be.
         self.assertEqual(collectAccidentalDisplayStatus(mStream), 
-                         ['x', (u'C#', False), (u'C#', False), 'x', 'x', 'x', 'x', 
-                          (u'E#', True), (u'E#', False), (u'F#', False), 'x', 
-                          (u'C#', False), (u'C#', False), (u'F#', False), (u'F#', False), 
-                          (u'F#', False), (u'F#', False), (u'G#', False), (u'G#', False), 
-                          (u'F#', False), (u'G#', False), 'x', 'x', 'x', 'x', (u'C#', False), 
-                          (u'C#', False), (u'F#', False), (u'F#', False), (u'G#', False), 
-                          (u'G#', False), 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 
-                          (u'E#', True), (u'E#', False), (u'F#', False), (u'F#', False)]
+                         ['x', ('C#', False), ('C#', False), 'x', 'x', 'x', 'x', 
+                          ('E#', True), ('E#', False), ('F#', False), 'x', 
+                          ('C#', False), ('C#', False), ('F#', False), ('F#', False), 
+                          ('F#', False), ('F#', False), ('G#', False), ('G#', False), 
+                          ('F#', False), ('G#', False), 'x', 'x', 'x', 'x', ('C#', False), 
+                          ('C#', False), ('F#', False), ('F#', False), ('G#', False), 
+                          ('G#', False), 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 
+                          ('E#', True), ('E#', False), ('F#', False), ('F#', False)]
         )
 
 
@@ -6802,20 +6802,20 @@ class Test(unittest.TestCase):
                 if 'Bass' in p.groups:
                     idBass.append(p.name)
 
-        self.assertEqual(idSoprano, [u'C#', u'B', u'A', u'B', u'C#', u'E', u'C#', u'C#', u'B',
-                                     u'B', u'A', u'C#', u'A', u'B', u'G#', u'G#', u'F#', u'A',
-                                     u'B', u'B', u'B', u'B', u'F#', u'F#', u'E', u'A', u'A',
-                                     u'B', u'B', u'C#', u'C#', u'A', u'B', u'C#', u'A', u'G#',
-                                     u'G#', u'F#', u'F#', u'G#', u'F#', u'F#', u'F#', u'F#',
-                                     u'F#', u'F#', u'F#', u'F#', u'F#', u'E#', u'F#'])
+        self.assertEqual(idSoprano, ['C#', 'B', 'A', 'B', 'C#', 'E', 'C#', 'C#', 'B',
+                                     'B', 'A', 'C#', 'A', 'B', 'G#', 'G#', 'F#', 'A',
+                                     'B', 'B', 'B', 'B', 'F#', 'F#', 'E', 'A', 'A',
+                                     'B', 'B', 'C#', 'C#', 'A', 'B', 'C#', 'A', 'G#',
+                                     'G#', 'F#', 'F#', 'G#', 'F#', 'F#', 'F#', 'F#',
+                                     'F#', 'F#', 'F#', 'F#', 'F#', 'E#', 'F#'])
 
-        self.assertEqual(idAlto, [u'E', u'E', u'F#', u'E', u'E', u'E', u'E', u'A', u'G#',
-                                  u'G#', u'E', u'G#', u'F#', u'G#', u'E#', u'E#', u'C#',
-                                  u'F#', u'F#', u'F#', u'E', u'E', u'D#', u'D#', u'C#',
-                                  u'C#', u'F#', u'E', u'E', u'E', u'A', u'F#', u'F#',
-                                  u'G#', u'F#', u'F#', u'E#', u'F#', u'F#', u'C#',
-                                  u'C#', u'D', u'E', u'E', u'D', u'C#', u'B', u'C#',
-                                  u'D', u'D', u'C#'])
+        self.assertEqual(idAlto, ['E', 'E', 'F#', 'E', 'E', 'E', 'E', 'A', 'G#',
+                                  'G#', 'E', 'G#', 'F#', 'G#', 'E#', 'E#', 'C#',
+                                  'F#', 'F#', 'F#', 'E', 'E', 'D#', 'D#', 'C#',
+                                  'C#', 'F#', 'E', 'E', 'E', 'A', 'F#', 'F#',
+                                  'G#', 'F#', 'F#', 'E#', 'F#', 'F#', 'C#',
+                                  'C#', 'D', 'E', 'E', 'D', 'C#', 'B', 'C#',
+                                  'D', 'D', 'C#'])
 
         # length should be the same
         self.assertEqual(len(idSoprano), len(idAlto))

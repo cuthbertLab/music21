@@ -60,7 +60,7 @@ class BrailleText:
 
 
     def addHeading(self, heading):
-        u'''
+        '''
         adds a heading to the BrailleText.  Heading can be a single or multiple line
         Unicode string representing a heading.
 
@@ -117,7 +117,7 @@ class BrailleText:
 
 
     def addToNewLine(self, brailleNoteGrouping):
-        u'''
+        '''
         Adds a NoteGrouping to a new line, prefacing that new line
         with the appropriate spaces or keyboard symbols and dots.
 
@@ -151,18 +151,18 @@ class BrailleText:
 
 
     def appendOrInsertCurrent(self, brailleExpr, addSpace=True):
-        u'''
+        '''
         append expression to the current line if it is possible,
         or make a new line and insert it there:
 
         >>> bt = braille.text.BrailleText(lineLength=10)
-        >>> bt.appendOrInsertCurrent(u"hello", addSpace=False)
+        >>> bt.appendOrInsertCurrent("hello", addSpace=False)
         >>> print(str(bt))
         hello
-        >>> bt.appendOrInsertCurrent(braille.lookup.symbols['space'] + u"hi")
+        >>> bt.appendOrInsertCurrent(braille.lookup.symbols['space'] + "hi")
         >>> print(str(bt))
         hello⠀⠀hi
-        >>> bt.appendOrInsertCurrent(braille.lookup.symbols['space'] + u"there")
+        >>> bt.appendOrInsertCurrent(braille.lookup.symbols['space'] + "there")
         >>> print(str(bt))
         hello⠀⠀hi
         ⠀⠀⠀there
@@ -195,7 +195,7 @@ class BrailleText:
 #         self.currentLine.containsNoteGrouping = True
 
     def addMeasureNumber(self, measureNumber):
-        u'''
+        '''
         Add a measure number (either a braille number or an int).
 
         >>> bt = braille.text.BrailleText(lineLength=10)
@@ -253,7 +253,7 @@ class BrailleText:
 
 
     def addSignatures(self, signatures):
-        u'''
+        '''
         Appends signatures to the current location if there is space, otherwise appends to
         a new line:
 
@@ -274,7 +274,7 @@ class BrailleText:
         self.appendOrInsertCurrent(signatures, addSpace=addSpace)
 
     def makeNewLine(self):
-        u'''
+        '''
         Add a newline to the BrailleText
 
         >>> bt = braille.text.BrailleText(lineLength=10)
@@ -291,7 +291,7 @@ class BrailleText:
         self.allLines.append(self.currentLine)
 
     def recenterHeadings(self):
-        u'''
+        '''
         Recenter each of the headings so that they exactly align
         with the text beneath them.
 
@@ -346,7 +346,7 @@ class BrailleText:
 
     def __str__(self):
         self.recenterHeadings()
-        return u"\n".join([str(l) for l in self.allLines])
+        return "\n".join([str(l) for l in self.allLines])
 
 
 class BrailleKeyboard(BrailleText):
@@ -431,7 +431,7 @@ class BrailleKeyboard(BrailleText):
 
 
 class BrailleTextLine:
-    u"""
+    """
     An object representing a single line of braille text:
 
     The initial value is the length of the line:
@@ -465,7 +465,7 @@ class BrailleTextLine:
         self.highestUsedLocation = 0
 
     def append(self, text, addSpace=True):
-        u'''
+        '''
         Appends text (with optional space at the beginning) or raises an
         exception if it cannot be appended.
 
@@ -509,7 +509,7 @@ class BrailleTextLine:
         self.highestUsedLocation = self.textLocation
 
     def insert(self, textLocation, text):
-        u'''
+        '''
         Inserts text at a certain location, updating textLocation and possibly
         highestUsedLocation:
 
@@ -620,7 +620,7 @@ class BrailleTextLine:
             return True
 
     def lastHyphenToSpace(self):
-        u'''
+        '''
         Occasionally a line ends with a hyphen because
         the last appender thought it would be helpful, such as
         to put more characters into a line.  But in case it

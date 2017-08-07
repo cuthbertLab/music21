@@ -17231,7 +17231,7 @@ otaveShifts33d = """<?xml version="1.0" encoding="UTF-8"?>
 """
 
 # Copyright string in the Creator name...
-unicodeStrWithNonAscii = u"""<?xml version="1.0" encoding="utf-8"?>
+unicodeStrWithNonAscii = """<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE score-partwise
   PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
   'http://www.musicxml.org/dtds/partwise.dtd'>
@@ -17427,7 +17427,7 @@ unicodeStrWithNonAscii = u"""<?xml version="1.0" encoding="utf-8"?>
 """
 
 
-unicodeStrNoNonAscii = u"""<?xml version="1.0" encoding="utf-8"?>
+unicodeStrNoNonAscii = """<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE score-partwise
   PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
   'http://www.musicxml.org/dtds/partwise.dtd'>
@@ -17622,7 +17622,7 @@ unicodeStrNoNonAscii = u"""<?xml version="1.0" encoding="utf-8"?>
 </score-partwise>
 """
 
-tremoloTest = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+tremoloTest = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="3.0">
   <identification>
