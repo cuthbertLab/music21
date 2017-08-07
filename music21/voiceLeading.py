@@ -1267,7 +1267,7 @@ class Verticality(base.Music21Object):
         [<music21.note.Note C>, <music21.note.Note B>, <music21.note.Note F#>]
 
         '''
-        if not common.isIterable( classFilterList):
+        if not common.isIterable(classFilterList):
             classFilterList = [classFilterList]
         retList = []
         for part, objList in self.contentDict.items():

@@ -114,7 +114,7 @@ def getStreamAndmd5(corpusFilepath):
 
     '''
     s = corpus.parse(corpusFilepath)
-    if s.isClassOrSubclass(['Opus']):
+    if 'Opus' in s.classes:
         return unbundleOpus(s)
     else:
         return [(s,md5OfCorpusFile(corpusFilepath))]

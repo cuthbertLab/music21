@@ -126,11 +126,6 @@ class MetadataEntry:
         return self._metadataPayload
     
     @property
-    @common.deprecated('Aug 5 2017', 'Aug 2018 v5', 'just use .metadata instead')
-    def metadataPayload(self):
-        return self._metadataPayload
-
-    @property
     def number(self):
         return self._number
 

@@ -3678,41 +3678,6 @@ class Chord(note.NotRest):
         self._chordTablesAddressNeedsUpdating = False
         return self._chordTablesAddress
 
-    @property
-    @common.deprecated('June 2017 v4', 'June 2018', 'use .style.color instead')
-    def color(self):
-        '''
-        Get or set the Chord color.
-
-        >>> a = chord.Chord(['c4', 'e4', 'g4'])
-        >>> a.duration.type = 'whole'
-        >>> a.style.color = '#235409'
-        >>> a.style.color
-        '#235409'
-
-        >>> a.style.color
-        '#235409'
-
-        >>> a.setColor('#ff0000', 'e4')
-        >>> a.getColor('c4')
-        '#235409'
-
-        >>> for p in a.pitches:
-        ...    print(a.getColor(p))
-        #235409
-        #ff0000
-        #235409
-
-        '''
-        if self.hasStyleInformation:
-            return self.style.color
-        else:
-            return None
-
-    @color.setter
-    @common.deprecated('June 2017 v4', 'June 2018', 'use .style.color instead')
-    def color(self, expr):
-        self.style.color = expr
 
     @property
     def commonName(self):
@@ -4034,39 +3999,6 @@ class Chord(note.NotRest):
 
         '''
         return Chord.formatVectorString(self.normalOrder)
-
-
-    @property
-    @deprecated("July 2016", "July 2017",
-                "Deprecated because it gives the wrong answer -- use normalOrder")
-    def normalForm(self):
-        '''
-        Gives the normalOrder transposed to PC0 -- this method is deprecated because
-        this is not the right thing to do,
-
-        ::
-            c3 = chord.Chord(['B-4', 'D5', 'F5'])
-            c3.normalForm
-            [0, 4, 7]
-        '''
-        normalOrderList = self.normalOrder
-        firstPC = normalOrderList[0]
-        return [(pc - firstPC) % 12 for pc in normalOrderList]
-
-    @property
-    @deprecated("July 2016", "July 2017",
-                "Deprecated because it gives the wrong answer -- use normalOrderString")
-    def normalFormString(self):
-        '''
-        Return a string representation of the normal form of the Chord TRANSPOSED to PC0
-
-        ::
-
-            c1 = chord.Chord(['f#', 'e-', 'g'])
-            c1.normalFormString
-            '<034>'
-        '''
-        return Chord.formatVectorString(self.normalForm)
 
     @property
     def orderedPitchClasses(self):

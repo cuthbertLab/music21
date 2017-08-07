@@ -168,10 +168,6 @@ class Graph:
             etm = getExtendedModules()
             etm.plt.close(self.figure)
 
-    @common.deprecated('August 2016', 'August 2017', 'use self.data = data instead')
-    def setData(self, data):
-        self.data = data
-
     @property
     def doneAction(self):
         '''

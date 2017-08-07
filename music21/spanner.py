@@ -684,27 +684,6 @@ class SpannerBundle:
     def __repr__(self):
         return '<music21.spanner.SpannerBundle of size %s>' % self.__len__()
 
-    @property
-    @common.deprecated('January 2016; w/ decorator Dec 2016', 'May 2017', 'use list(sb) instead')
-    def list(self):
-        '''
-        Return the bundle as a list.
-
-        >>> su1 = spanner.Slur()
-        >>> su1.idLocal = 1
-        >>> su2 = spanner.Glissando()
-        >>> su2.idLocal = 2
-        >>> sb = spanner.SpannerBundle()
-        >>> sb.append(su1)
-        >>> sb.append(su2)
-        >>> list(sb)
-        [<music21.spanner.Slur >, <music21.spanner.Glissando >]
-        '''
-        post = []
-        for x in self._storage:
-            post.append(x)
-        return post
-
     def getSpannerStorageIds(self):
         '''
         Return all SpannerStorage ids from all contained Spanners
@@ -1094,7 +1073,7 @@ class SpannerBundle:
         for i, ref in enumerate(self._pendingSpannedElementAssignment):
             # environLocal.printDebug(['calling freePendingSpannedElementAssignment()',
             #    self._pendingSpannedElementAssignment])
-            if spannedElementCandidate.isClassOrSubclass([ref['className']]):
+            if ref['className'] in spannedElementCandidate.classSet:
                 ref['spanner'].addSpannedElements(spannedElementCandidate)
                 remove = i
                 # environLocal.printDebug(['freePendingSpannedElementAssignment()',

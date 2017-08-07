@@ -24,8 +24,6 @@ class defaultlist(list):
     '''
     Call a function for every time something is missing:
 
-    TO BE DEPRECATED... soon...
-
     >>> a = common.defaultlist(lambda:True)
     >>> a[5]
     True
@@ -41,6 +39,7 @@ class defaultlist(list):
     def __setitem__(self, index, value):
         self._fill(index)
         list.__setitem__(self, index, value)
+
     def __getitem__(self, index):
         self._fill(index)
         return list.__getitem__(self, index)

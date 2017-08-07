@@ -659,7 +659,7 @@ class Analyzer:
         for (i,n1) in enumerate(noteList[:-1]):
             n2 = noteList[i + 1]
 
-            if n1.isClassOrSubclass(['Note']) and n2.isClassOrSubclass(['Note']):
+            if 'Note' in n1.classes and 'Note' in n2.classes:
                 mIntv = interval.notesToInterval(n1, n2)
             else:
                 mIntv = None
@@ -687,7 +687,7 @@ class Analyzer:
         noteList = []
         noteOrRestList = score.parts[partNum].flat.getElementsByClass(['Note', 'Rest'])
         for nr in noteOrRestList:
-            if nr.isClassOrSubclass(['Note']):
+            if 'Note' in nr.classes:
                 n = nr
             else:
                 n = None

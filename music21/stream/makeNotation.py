@@ -95,7 +95,6 @@ def makeBeams(s, inPlace=False):
 
     #if s.isClass(Measure):
     if 'Measure' in s.classes:
-    #if s.isClassOrSubclass('Measure'):
         mColl = [returnObj]  # store a list of measures for processing
     else:
         mColl = list(returnObj.iter.getElementsByClass('Measure'))  # a list of measures

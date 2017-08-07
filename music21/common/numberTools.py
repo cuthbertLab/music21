@@ -627,24 +627,24 @@ def dotMultiplier(dots):
     dotMultiplier(dots) returns how long to multiply the note
     length of a note in order to get the note length with n dots
 
-    NOTE: the return of a Fraction is deprecated -- in v.4, a float will be returned.
     Since dotMultiplier always returns a power of two in the denominator,
     the float will be exact.
 
-    >>> common.dotMultiplier(1)
+    >>> from fractions import Fraction
+    >>> Fraction(common.dotMultiplier(1))
     Fraction(3, 2)
-    >>> common.dotMultiplier(2)
+    >>> Fraction(common.dotMultiplier(2))
     Fraction(7, 4)
-    >>> common.dotMultiplier(3)
+    >>> Fraction(common.dotMultiplier(3))
     Fraction(15, 8)
 
     >>> common.dotMultiplier(0)
-    Fraction(1, 1)
+    1.0
 
-    :rtype: Fraction
+    :rtype: float
     '''
-    x = (((2 ** (dots + 1.0)) - 1.0) / (2 ** dots))
-    return Fraction(x)
+    return (((2 ** (dots + 1.0)) - 1.0) / (2 ** dots))
+    
 
 
 

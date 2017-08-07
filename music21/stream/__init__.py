@@ -830,25 +830,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     keySignature = property(_getKeySignature, _setKeySignature)
 
 
-    #-------------------------------
-    # Temporary -- Remove in  2016
-    @common.deprecated('2016 December', '2017 December', 'No need to call `.stream()` on a stream. '
-                                                        + 'just use the object itself')
-    def stream(self, returnStreamSubclass=None):
-        '''
-        During the transition period to the new iteration system,
-        there may be times when someone thinks something is a StreamIterator
-        (which needs to have .stream() called on it to make a new Stream) but
-        actually already has a `Stream`.
-
-        So this is a temporary method.  It will eventually become deprecated
-        and then removed.
-
-        TODO: 2016 May??? Remove.
-        '''
-        return self
-
-
     def cloneEmpty(self, derivationMethod=None):
         '''
         Create a Stream that is identical to this one except that the elements are empty
@@ -928,6 +909,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Only a single class name can be given.
 
+        Possibly to be deprecated in v.5
 
         >>> s = stream.Stream()
         >>> s.append(meter.TimeSignature('5/8'))
@@ -938,17 +920,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.hasElementOfClass('Measure')
         False
         '''
-        clist = [className]
         #environLocal.printDebug(['calling hasElementOfClass()', className])
         for e in self._elements:
-            if e.isClassOrSubclass(clist):
+            if className in e.classSet:
                 return True
         for e in self._endElements:
-            if e.isClassOrSubclass(clist):
+            if className in e.classSet:
                 return True
         return False
-
-
 
 
     def mergeElements(self, other, classFilterList=None):
@@ -978,10 +957,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s1[1] is s2[1]
         True
         '''
+        if classFilterList is not None:
+            classFilterSet = set(classFilterList)
+        
         for e in other._elements:
             #self.insert(other.offset, e)
             if classFilterList is not None:
-                if e.isClassOrSubclass(classFilterList):
+                if classFilterSet.intersection(e.classSet):
                     self.coreInsert(other.elementOffset(e), e)
             else:
                 self.coreInsert(other.elementOffset(e), e)
@@ -995,7 +977,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #                 self.insert(e.getOffsetBySite(other), e)
         for e in other._endElements:
             if classFilterList is not None:
-                if e.isClassOrSubclass(classFilterList):
+                if classFilterSet.intersection(e.classSet):
                     self.coreStoreAtEnd(e)
             else:
                 self.coreStoreAtEnd(e)
@@ -3158,11 +3140,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         offset = opFrac(offset)
         nearestTrailSpan = offset # start with max time
 
+        iterator = self.iter
+        if classList:
+            iterator.getElementsByClass(classList)
+
         # need both _elements and _endElements
-        for e in self.elements:
-            if classList is not None:
-                if not e.isClassOrSubclass(classList):
-                    continue
+        for e in iterator:
             span = opFrac(offset - self.elementOffset(e))
             #environLocal.printDebug(['e span check', span, 'offset', offset,
             #   'e.offset', e.offset, 'self.elementOffset(e)', self.elementOffset(e), 'e', e])
@@ -3184,21 +3167,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return candidates[-1][1]
         else:
             return None
-
-#         if len(candidates) == 1:
-#             x = candidates[0][1]
-#             x.activeSite = self
-#             return x
-#         elif len(candidates) > 0:
-#             s = Stream([x[1] for x in candidates])
-#             s.sort() # TODO: this sort has side effects
-#             x = s[-1]
-#             x.activeSite = self
-#             return x
-#         else:
-#             return None
-
-
 
     def getElementBeforeOffset(self, offset, classList=None):
         '''
@@ -3260,11 +3228,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         offset = opFrac(offset)
         nearestTrailSpan = offset # start with max time
 
-        # need both _elements and _endElements
-        for e in self.elements:
-            if classList is not None:
-                if not e.isClassOrSubclass(classList):
-                    continue
+        iterator = self.iter
+        if classList:
+            iterator.getElementsByClass(classList)
+
+        for e in iterator:
             span = opFrac(offset - self.elementOffset(e))
             #environLocal.printDebug(['e span check', span, 'offset', offset,
             #     'e.offset', e.offset, 'self.elementOffset(e)', self.elementOffset(e), 'e', e])
@@ -3335,6 +3303,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> t7 is None
         True
         '''
+        if classList is not None:
+            classSet = set(classList)
+        
         try:
             # index() ultimately does an autoSort check, so no check here or
             # sorting is necessary
@@ -3352,7 +3323,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 return e
         else:
             for i in range(elPos + 1, len(elements)):
-                if elements[i].isClassOrSubclass(classList):
+                if classList is None or classSet.intersection(elements[i].classSet):
                     e = elements[i]
                     e.activeSite = self
                     return e
@@ -3377,75 +3348,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     #-----------------------------------------------------
     # end .getElement filters
-    @common.deprecated('June 2017', 'May 2018', '''Use stream.iterator.OffsetIterator 
-        instead, creating the returnDict if needed from the offset of the first element.
-        ''')
-    def groupElementsByOffset(self, returnDict=False):
-        '''
-        DEPRECATED: Use :class:`music21.stream.iterator.OffsetIterator` instead
-        as the instructions below show.
-    
-        Returns a List of lists in which each entry in the
-        main list is a list of elements occurring at the same time.
-        list is ordered by offset (since we need to sort the list
-        anyhow in order to group the elements), so there is
-        no need to call stream.sorted before running this.
-
-        if returnDict is True then it returns a dictionary of offsets
-        and everything at that offset.  If returnDict is False (default)
-        then only a list of lists of elements grouped by offset is returned.
-        (in other words, you'll need to call self.elementOffset(list[i][0]) to
-        get the offset)
-
-        >>> from pprint import pprint as pp
-        >>> s = stream.Stream()
-        >>> s.insert(3, note.Note('C'))
-        >>> s.insert(4, note.Note('C#'))
-        >>> s.insert(4, note.Note('D-'))
-        >>> s.insert(16.0/3, note.Note('D'))
-
-        >>> returnList = list(stream.iterator.OffsetIterator(s))
-        >>> returnList
-        [[<music21.note.Note C>],
-         [<music21.note.Note C#>, <music21.note.Note D->],
-         [<music21.note.Note D>]]
-
-        >>> returnDict = {v[0].offset: v for v in returnList}
-        >>> pp(returnDict)
-        {3.0: [<music21.note.Note C>],
-         4.0: [<music21.note.Note C#>, <music21.note.Note D->],
-         Fraction(16, 3): [<music21.note.Note D>]}
-
-        Test that sorting still works...
-
-        >>> s.insert(0, meter.TimeSignature('2/4'))
-        >>> s.insert(0, clef.TrebleClef()) # sorts first
-        >>> list(stream.iterator.OffsetIterator(s))[0]
-        [<music21.clef.TrebleClef>, <music21.meter.TimeSignature 2/4>]
-
-        it is DEFINITELY a feature that this method does not
-        find elements within substreams that have the same
-        absolute offset.  See lily.translate for how this is
-        useful for finding voices.
-
-        For the other behavior, call Stream.flat first or Stream.recurse()
-        '''
-        offsetsRepresented = {}
-        for el in self.elements:
-            elOff = self.elementOffset(el)
-            if elOff not in offsetsRepresented:
-                offsetsRepresented[elOff] = []
-            offsetsRepresented[elOff].append(el)
-
-        if returnDict is True:
-            return offsetsRepresented
-        else:
-            offsetList = []
-            for thisOffset in sorted(offsetsRepresented):
-                offsetList.append(offsetsRepresented[thisOffset])
-            return offsetList
-
-
 
     #--------------------------------------------------------------------------
     # routines for obtaining specific types of elements from a Stream
@@ -3499,9 +3401,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> excerptNote is originalNote
         True
 
-        
-        
-        
         if `indicesNotNumbers` is True, then it ignores defined measureNumbers and
         uses 0-indexed measure objects and half-open range.  For instance, if you have a piece
         that goes "m1, m2, m3, m4, ..." (like a standard piece without pickups, then
@@ -3953,20 +3852,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         optionalAddRest()
 
         return out
-
-    @common.deprecated('June 2017 v4.0.7', 'Jan 2018', 'use .template() instead')
-    def measureTemplate(self,
-                        fillWithRests=True,
-                        classType='Measure',
-                        customRemove=None):
-        '''
-        DEPRECATED, to be removed, use Stream.template(), retainVoices=False
-        '''
-        if not self.hasMeasures():
-            raise StreamException('the requested Stream does not have Measures')
-        return self.template(fillWithRests=fillWithRests,
-                             removeClasses=customRemove,
-                             retainVoices=False)
 
     def measureOffsetMap(self, classFilterList=None):
         '''
@@ -4518,10 +4403,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return post[0]
         else:
             return None
-
-    @common.deprecated('June 2017, v. 4', 'June 2018', 'call clef.bestClef instead')
-    def bestClef(self, allowTreble8vb=False, recurse=False):
-        return clef.bestClef(self, allowTreble8vb=allowTreble8vb, recurse=recurse)
 
     def getClefs(self, searchActiveSite=False, searchContext=True,
         returnDefault=True):
@@ -6245,7 +6126,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 endMatch = True
             # looking for two chords of equal size
             elif (nLast is not None
-                    and not n.isClassOrSubclass('Note')
+                    and 'Note' not in n.classes
                     and iLast in posConnected
                     and hasattr(nLast, "pitches")
                     and hasattr(n, "pitches")
@@ -8644,11 +8525,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # do not need to look in endElements
                 for obj in self.getElementsByClass('Stream'):
                     # if obj is a Part, we have multi-parts
-                    if obj.isClassOrSubclass(['Part']):
+                    if 'Part' in obj.classes:
                         multiPart = True
                         break
 
-                    elif obj.isClassOrSubclass(['Measure', 'Voice']):
+                    elif 'Measure' in obj.classes or 'Voice' in obj.classes:
                         multiPart = False
                         break
 
@@ -8897,32 +8778,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             elif 'Pitch' in e.classes:
                 post.append(e)
         return post
-
-
-    @common.deprecated('May 2017', 'September 2018', 'see analysis.pitchAnalysis instead')
-    def pitchAttributeCount(self, pitchAttr='name'): # pragma: no cover
-        '''
-        see :func:music21.analysis.pitchAnalysis.pitchAttributeCount
-        
-        DEPRICATED
-        '''
-        from music21.analysis.pitchAnalysis import pitchAttributeCount
-        return pitchAttributeCount(self, pitchAttr)
-
-    @common.deprecated('May 2017', 'September 2018', 'see analysis.elements instead')
-    def attributeCount(self, classFilterList=None, attrName='quarterLength'):  # pragma: no cover
-        '''
-        see :func:music21.analysis.elements.attributeCount
-
-        DEPRICATED
-        '''
-        if classFilterList is not None:
-            passedObject = self.iter
-            passedObject.addFilter(filters.ClassFilter(classFilterList))
-        else:
-            passedObject = self
-        from music21.analysis.elements import attributeCount
-        return attributeCount(passedObject, attrName)
 
 
     #---------------------------------------------------------------------------

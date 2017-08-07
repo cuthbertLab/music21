@@ -258,7 +258,7 @@ class Lyric(style.StyleMixin):
         self._identifier = value
 
     @property
-    def rawText(self):
+    def rawText(self) -> str:
         '''
         returns the text of the syllable with '-' etc.
 
@@ -288,8 +288,9 @@ class Lyric(style.StyleMixin):
             return '-' + self.text
         else:
             return self.text
+
     @property
-    def number(self):
+    def number(self) -> int:
         '''
         This stores the number of the lyric (which determines the order
         lyrics appear in the score if there are multiple lyrics). Unlike
@@ -309,7 +310,7 @@ class Lyric(style.StyleMixin):
         return self._number
 
     @number.setter
-    def number(self, value):
+    def number(self, value: int) -> None:
         if not common.isNum(value):
             raise LyricException('Number best be number')
         else:
@@ -387,39 +388,6 @@ class GeneralNote(base.Music21Object):
         self.tie = None # store a Tie object
 
     #---------------------------------------------------------------------------
-    @common.deprecated('December 2016', 'December 2017', 'use .style.color instead')
-    def _getColor(self): # pragma: no cover
-        '''
-        DEPRECATED: use `.style.color`
-
-        Return the Note color.
-
-        >>> a = note.GeneralNote()
-        >>> a.duration.type = 'whole'
-        >>> a.style.color is None
-        True
-        >>> a.style.color = '#235409'
-        >>> a.style.color
-        '#235409'
-        >>> a.style.color
-        '#235409'
-        '''
-        if self._style is not None:
-            return self.style.color
-        else:
-            return None
-
-    def _setColor(self, value): # pragma: no cover
-        r'''
-        should check data here
-        uses this re: #[\dA-F]{6}([\dA-F][\dA-F])?
-        No: because Lilypond supports "blue", "red" etc., as does CSS; musicxml also supports alpha
-        '''
-        self.style.color = value
-
-    color = property(_getColor, _setColor)
-
-
     def _getLyric(self):
         '''
         returns the first Lyric's text
@@ -1216,42 +1184,6 @@ class Note(NotRest):
         ''')
 
 
-    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.accidental instead")
-    def _getAccidental(self): # pragma: no cover
-        return self.pitch.accidental
-
-    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.accidental instead")
-    def _setAccidental(self, value): # pragma: no cover
-        '''
-        Adds an accidental to the Note, given as an Accidental object.
-        Also alters the name of the note
-
-
-        >>> a = note.Note()
-        >>> a.step = "D"
-        >>> a.name
-        'D'
-        >>> b = pitch.Accidental("sharp")
-        >>> a.pitch.accidental = (b)
-        >>> a.name
-        'D#'
-        '''
-        if isinstance(value, str):
-            accidental = pitch.Accidental(value)
-        else:
-            accidental = value
-        self.pitch.accidental = accidental
-
-
-    accidental = property(_getAccidental, _setAccidental,
-        doc = '''
-        Return or set the :class:`~music21.pitch.Accidental` object
-        from the :class:`~music21.pitch.Pitch` object.
-
-        DEPRECATED May 2014: use n.pitch.accidental instead
-        ''')
-
-
     def _getStep(self):
         return self.pitch.step
 
@@ -1263,24 +1195,6 @@ class Note(NotRest):
         See :attr:`~music21.pitch.Pitch.step`.
         ''')
 
-    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.frequency instead")
-    def _getFrequency(self): # pragma: no cover
-        return self.pitch.frequency
-
-    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.frequency instead")
-    def _setFrequency(self, value): # pragma: no cover
-        self.pitch.frequency = value
-
-    frequency = property(_getFrequency, _setFrequency,
-        doc = '''
-        Return or set the frequency from
-        the :class:`~music21.pitch.Pitch` object.
-
-        See :attr:`~music21.pitch.Pitch.frequency`.
-
-        DEPRECATED May 2014: use n.pitch.frequency instead
-        ''')
-
     def _getOctave(self):
         return self.pitch.octave
 
@@ -1290,111 +1204,6 @@ class Note(NotRest):
     octave = property(_getOctave, _setOctave,
         doc = '''Return or set the octave value from the :class:`~music21.pitch.Pitch` object.
         See :attr:`~music21.pitch.Pitch.octave`.''')
-
-
-    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.midi instead")
-    def _getMidi(self): # pragma: no cover
-        return self.pitch.midi
-
-    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.midi instead")
-    def _setMidi(self, value): # pragma: no cover
-        self.pitch.midi = value
-
-    midi = property(_getMidi, _setMidi,
-        doc = '''
-        Return or set the numerical MIDI pitch
-        representation from the
-        :class:`~music21.pitch.Pitch` object.
-
-        See :attr:`~music21.pitch.Pitch.midi`.
-
-        DEPRECATED May 2014: use n.pitch.midi instead
-        ''')
-
-    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.ps instead")
-    def _getPs(self): # pragma: no cover
-        return self.pitch.ps
-
-    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.ps instead")
-    def _setPs(self, value): # pragma: no cover
-        self.pitch.ps = value
-
-    ps = property(_getPs, _setPs,
-        doc = '''
-        Return or set the numerical pitch space
-        representation from the
-        :class:`music21.pitch.Pitch` object.
-
-        See :attr:`music21.pitch.Pitch.ps`.
-
-        DEPRECATED May 2014: use n.pitch.ps instead
-        ''')
-
-    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.microtone instead")
-    def _getMicrotone(self): # pragma: no cover
-        return self.pitch.microtone
-
-    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.microtone instead")
-    def _setMicrotone(self, value): # pragma: no cover
-        self.pitch.microtone = value
-
-    microtone = property(_getMicrotone, _setMicrotone,
-        doc = '''Return or set the microtone value from the
-        :class:`~music21.pitch.Pitch` object.
-
-        See :attr:`~music21.pitch.Pitch.microtone`.
-
-        DEPRECATED May 2014: use n.pitch.microtone instead
-        ''')
-
-
-    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.pitchClass instead")
-    def _getPitchClass(self): # pragma: no cover
-        return self.pitch.pitchClass
-
-    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.pitchClass instead")
-    def _setPitchClass(self, value): # pragma: no cover
-        self.pitch.pitchClass = value
-
-    pitchClass = property(_getPitchClass, _setPitchClass,
-        doc = '''Return or set the pitch class from the :class:`~music21.pitch.Pitch` object.
-        See :attr:`music21.pitch.Pitch.pitchClass`.
-
-        DEPRECATED May 2014: use n.pitch.pitchClass instead
-        ''')
-
-
-    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.pitchClassString instead")
-    def _getPitchClassString(self): # pragma: no cover
-        return self.pitch.pitchClassString
-
-    @common.deprecated("May 2014", "September 2017, v.5", "use pitch.pitchClassString instead")
-    def _setPitchClassString(self, value): # pragma: no cover
-        self.pitch.pitchClassString = value
-
-    pitchClassString = property(_getPitchClassString, _setPitchClassString,
-        doc = '''
-        Return or set the pitch class string
-        from the :class:`~music21.pitch.Pitch`
-        object.
-
-        See :attr:`~music21.pitch.Pitch.pitchClassString`.
-
-        DEPRECATED May 2014: use n.pitch.pitchClassString instead
-        ''')
-
-    @property
-    @common.deprecated('December 2016', 'December 2017, v.5', 'use `.pitch.diatonicNoteNum instead')
-    def diatonicNoteNum(self): # pragma: no cover
-        '''
-        DEPRECATED: use .pitch.diatonicNoteNum instead.
-
-        Return the diatonic note number from the :class:`~music21.pitch.Pitch` object.
-        See :attr:`~music21.pitch.Pitch.diatonicNoteNum`.
-        '''
-        return self.pitch.diatonicNoteNum
-
-
 
 
     def _getPitches(self):

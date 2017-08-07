@@ -321,7 +321,7 @@ class Music21Object:
         'groups': '''An instance of a :class:`~music21.base.Group` object which describes
             arbitrary `Groups` that this object belongs to.''',
         'isStream': '''Boolean value for quickly identifying
-            :class:`~music21.stream.Stream` objects (False by default). Deprecated''',
+            :class:`~music21.stream.Stream` objects (False by default).''',
         'classSortOrder' : '''Property which returns an number (int or otherwise)
             depending on the class of the Music21Object that
             represents a priority for an object based on its class alone --

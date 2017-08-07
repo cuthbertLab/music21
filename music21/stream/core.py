@@ -49,14 +49,6 @@ class StreamCoreMixin:
         ### v4!
         #self._elementTree = tree.trees.ElementTree(source=self)
 
-
-    @common.deprecated('Aug 4 2017', 'Aug 2018 v5', 'use coreInsert instead')
-    def _insertCore(self, offset, element,
-                    ignoreSort=False,
-                    setActiveSite=True): # pylint: disable=too-many-function-args
-        self.coreInsert(self, offset, element, ignoreSort, setActiveSite)
-
-
     def coreInsert(self, offset, element, 
                    ignoreSort=False, setActiveSite=True, 
                    ):        
@@ -112,10 +104,6 @@ class StreamCoreMixin:
         #self._elementTree.insert(float(offset), element)
         return storeSorted
 
-    @common.deprecated('Aug 4 2017', 'Aug 2018 v5', 'use coreAppend instead')
-    def _appendCore(self, element):
-        self.coreAppend(element)
-
     def coreAppend(self, element, setActiveSite=True):        
         '''
         N.B. -- a "core" method, not to be used by general users.  Run .append() instead.
@@ -144,13 +132,6 @@ class StreamCoreMixin:
     #---------------------------------------------------------------------------
     # adding and editing Elements and Streams -- all need to call coreElementsChanged
     # most will set isSorted to False
-    @common.deprecated('August 2017', 'August 2018 v.5', 'use coreElementsChanged instead')
-    def elementsChanged(self, updateIsFlat=True, clearIsSorted=True,
-                        memo=None, keepIndex=False):
-        return self.coreElementsChanged(updateIsFlat, clearIsSorted,
-                        memo, keepIndex)
-
-
     def coreElementsChanged(self, updateIsFlat=True, clearIsSorted=True,
                         memo=None, keepIndex=False):
         '''
@@ -329,17 +310,6 @@ class StreamCoreMixin:
         # all get() calls.
         element.purgeLocations()
 
-
-    @common.deprecated('Aug 4 2017', 'Aug 2018 v5', 'use coreStoreAtEnd')
-    def _storeAtEndCore(self, element):
-        '''
-        Core method for adding end elements.
-        To be called by other methods.
-        
-        DEPRECATED -- use coreStoreAtEnd
-        '''
-        return self.coreStoreAtEnd(element)
-        
         
     def coreStoreAtEnd(self, element, setActiveSite=True):
         '''
