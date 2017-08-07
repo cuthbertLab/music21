@@ -4,6 +4,7 @@ sudo: false
 
 python:
     - "3.4"
+    - "3.5"
     - "3.6"
 
 before_install:
@@ -17,7 +18,7 @@ before_install:
     - export DISPLAY=:99.0
     - sh -e /etc/init.d/xvfb start
     - wget -q http://download.linuxaudio.org/lilypond/binaries/linux-64/lilypond-2.19.54-1.linux-64.sh
-    - pip install coveralls
+    - pip3 install coveralls
     - sh lilypond-2.19.54-1.linux-64.sh --batch
     - export PATH=/home/travis/bin:$PATH
 
