@@ -58,9 +58,11 @@ def addDocAttrTestsToSuite(suite,
     '''
     dtp = doctest.DocTestParser()
     if globs is False:
-        globs = __import__(defaultImports[0]).__dict__.copy()
+        globs = __import__(defaultImports[0]).__dict__.copy()        
+        
     elif globs is None:
         globs = {}
+
     for lvk in moduleVariableLists:
         if not (inspect.isclass(lvk)):
             continue
@@ -80,37 +82,9 @@ def addDocAttrTestsToSuite(suite,
             suite.addTest(dtc)
 
 
-def fixTestsForPy2and3(doctestSuite):
+def fixDoctests(doctestSuite):
     r'''
-    Fix doctests so that they work in both python2 and python3, namely
-    unicode/byte characters and added module names to exceptions.
-
-    >>> import doctest
-    >>> suite1 = doctest.DocTestSuite(chord)
-    >>> doctestCase = list(iter(suite1))[0]
-    >>> dt = doctestCase._dt_test
-    >>> testWithTraceback = None
-    >>> for testExample in dt.examples:
-    ...     if testExample.exc_msg is not None:
-    ...         testWithTraceback = testExample
-    ...         break
-
-    Py3 example:
-
-    <<< testWithTraceback.exc_msg
-    "ChordException: Could not process input argument\n"
-    <<< test.testRunner.fixTestsForPy2and3(suite1)
-    <<< testWithTraceback.exc_msg
-    "...ChordException: Could not process input argument\n"
-
-    Py2 example:
-
-    <<< testWithTraceback.exc_msg
-    "music21.chord.ChordException: Could not process input argument\n"
-    <<< test.testRunner.fixTestsForPy2and3(suite1)
-    <<< testWithTraceback.exc_msg
-    "ChordException: Could not process input argument\n"
-
+    Fix doctests so that adderesses are sanitized, and perhaps a few others.
     '''
     for dtc in doctestSuite: # Suite to DocTestCase -- undocumented.
         if not hasattr(dtc, '_dt_test'):
@@ -308,7 +282,7 @@ def mainTest(*testClasses, **kwargs):
         addDocAttrTestsToSuite(s1, localVariables, outerFilename, globs, optionflags)
 
     if runAllTests is True:
-        fixTestsForPy2and3(s1)
+        fixDoctests(s1)
 
         runner = unittest.TextTestRunner()
         runner.verbosity = verbosity

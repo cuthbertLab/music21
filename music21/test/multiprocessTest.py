@@ -81,7 +81,7 @@ def runOneModuleWithoutImp(args):
             environLocal.printDebug('%s cannot load Doctests' % moduleObject)
             pass
 
-        testRunner.fixTestsForPy2and3(s1)
+        testRunner.fixDoctests(s1)
 
 
         environLocal.printDebug('running Tests...\n')

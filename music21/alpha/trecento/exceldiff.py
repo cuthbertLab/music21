@@ -5,7 +5,6 @@ from __future__ import print_function
 import sys
 
 from music21.ext import xlrd
-#sys.path.append('/mit/cuthbert/www/music21')
 
 
 if len(sys.argv) != 3:

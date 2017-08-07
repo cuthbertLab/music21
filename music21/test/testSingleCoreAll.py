@@ -98,7 +98,7 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None):
                                           # no checker here
                                           )
 
-    testRunner.fixTestsForPy2and3(s1)
+    testRunner.fixDoctests(s1)
 
     environLocal.printDebug('running Tests...\n')
 

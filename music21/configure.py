@@ -28,13 +28,8 @@ except NameError:
 #    pass
 
 import io
-# pylint: disable=redefined-builtin
-try:
-    input = raw_input # @ReservedAssignment @UndefinedVariable # pylint: disable=undefined-variable
-except NameError:
-    pass
 
-# assume that we will manually add this dire to sys.path top get access to
+# assume that we will manually add this dir to sys.path top get access to
 # all modules before installation
 from music21 import common
 from music21 import environment
