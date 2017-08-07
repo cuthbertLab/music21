@@ -5966,22 +5966,22 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         #print(elements[-1], qLenTotal, elements[-1].duration)
         # print(_MOD, elements)
-        for i in range(len(elements)-1):
+        for i in range(len(elements) - 1):
             #print(i, len(elements))
-            span = self.elementOffset(elements[i + 1]) - self.elementOffset(elements[i])
+            span = returnObj.elementOffset(elements[i + 1]) - returnObj.elementOffset(elements[i])
             elements[i].duration.quarterLength = span
 
         # handle last element
         #print(elements[-1], qLenTotal, elements[-1].duration)
         if elements:
             elements[-1].duration.quarterLength = (qLenTotal -
-                        self.elementOffset(elements[-1]))
+                        returnObj.elementOffset(elements[-1]))
             #print(elements[-1], elements[-1].duration)
         if not inPlace:
             return returnObj
 
 
-    def extendDurationAndGetBoundaries(self, objName):
+    def extendDurationAndGetBoundaries(self, objName, *, inPlace=False):
         '''
         DEPRECATED v.5 -- to be removed in v.6
         
