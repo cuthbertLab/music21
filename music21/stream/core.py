@@ -268,7 +268,7 @@ class StreamCoreMixin:
         True
         >>> b = bar.Barline()
         >>> s.storeAtEnd(b)
-        >>> s.coreGetELementByMemoryLocation(id(b)) is b
+        >>> s.coreGetElementByMemoryLocation(id(b)) is b
         True
         '''
         # NOTE: this may be slightly faster than other approaches
