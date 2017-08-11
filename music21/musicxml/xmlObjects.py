@@ -9,6 +9,7 @@
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
+import re
 
 from collections import OrderedDict
 # these single-entity tags are bundled together.
@@ -18,6 +19,7 @@ from music21 import expressions
 DYNAMIC_MARKS = ['p', 'pp', 'ppp', 'pppp', 'ppppp', 'pppppp',
         'f', 'ff', 'fff', 'ffff', 'fffff', 'ffffff',
         'mp', 'mf', 'sf', 'sfp', 'sfpp', 'fp', 'rf', 'rfz', 'sfz', 'sffz', 'fz',
+        'n', 'pf', 'sfzp', # musicxml 3.1
         'other-dynamics' # non-empty...
         ]
 
@@ -141,6 +143,46 @@ def fractionToPercent(value):
     '''
     return str(int(value * 100))
 
+
+_NCNAME = re.compile(r'^[a-zA-Z_][\w.-]*$')
+
+def isValidXSDID(text):
+    '''
+    Returns True or False if text is a valid xsd:id, that is, an NCName
+    
+    From http://www.datypic.com/sc/xsd/t-xsd_NCName.html:
+    
+        The type xsd:NCName represents an XML non-colonized name, 
+        which is simply a name that does not contain colons. An xsd:NCName value must 
+        start with either a letter or underscore (_) and may contain only letters, 
+        digits, underscores (_), hyphens (-), and periods (.). This is equivalent 
+        to the Name type, except that colons are not permitted.
+    
+    >>> musicxml.xmlObjects.isValidXSDID('hel_lo')
+    True
+    
+    Names cannot begin with digits:
+    
+    >>> musicxml.xmlObjects.isValidXSDID('4sad')
+    False
+    
+    Names must be strings:
+    
+    >>> musicxml.xmlObjects.isValidXSDID(12345)
+    False
+    
+    '''
+    if not isinstance(text, str):
+        return False
+    
+    if not text:
+        return False
+
+    if _NCNAME.match(text):
+        return True
+    else:
+        return False
+    
 #-------------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21

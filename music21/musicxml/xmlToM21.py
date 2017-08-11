@@ -220,6 +220,34 @@ def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, transform=No
         attributeName = common.hyphenToCamelCase(tag)
     setattr(m21El, attributeName, value)
 
+def _setIdFromXmlOptionalId(element, m21Object):
+    '''
+    MusicXML 3.1 defines the optional-unique-id attribute
+    on many elements which is perfect for setting as .id on
+    a music21 element.  
+    
+    >>> from xml.etree.ElementTree import fromstring as El
+    >>> e = El('<fermata optional-unique-id="fermata1"/>')
+    >>> f = expressions.Fermata()
+    >>> musicxml.xmlToM21._setIdFromXmlOptionalId(e, f)
+    >>> f.id
+    'fermata1'
+    
+    Does not change the id if the id is not specified:
+    
+    >>> e = El('<fermata />')
+    >>> f = expressions.Fermata()
+    >>> f.id = 'doNotOverwrite'
+    >>> musicxml.xmlToM21._setIdFromXmlOptionalId(e, f)
+    >>> f.id
+    'doNotOverwrite'
+    '''
+    newId = element.get('optional-unique-id', None)
+    if not newId:
+        return
+    m21Object.id = newId
+
+
 #-------------------------------------------------------------------------------
 class XMLParserBase:
     '''
