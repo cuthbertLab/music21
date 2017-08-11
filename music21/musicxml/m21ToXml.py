@@ -192,9 +192,7 @@ def _setAttributeFromAttribute(m21El, xmlEl, xmlAttributeName, attributeName=Non
 
     Pass a function or lambda function as transform to transform the value before setting it
 
-    >>> El = musicxml.m21ToXml.ET.fromstring #_DOCS_HIDE -- py2 cElementTree needed
-    >>> #_DOCS_SHOW from xml.etree.ElementTree import fromstring as El
-
+    >>> from xml.etree.ElementTree import fromstring as El
     >>> e = El('<page-layout/>')
 
     >>> setb = musicxml.m21ToXml._setAttributeFromAttribute
@@ -233,7 +231,37 @@ def _setAttributeFromAttribute(m21El, xmlEl, xmlAttributeName, attributeName=Non
         value = transform(value)
 
     xmlEl.set(xmlAttributeName, str(value))
-
+    
+def _setXmlOptionalIdFromId(element, m21Object):
+    '''
+    MusicXML 3.1 defines the id attribute (entity: %optional-unique-id)
+    on many elements which is perfect for setting as .id on
+    a music21 element.  
+    
+    >>> from xml.etree.ElementTree import fromstring as El
+    >>> e = El('<fermata />')
+    >>> f = expressions.Fermata()
+    >>> f.id = 'fermata1'
+    >>> musicxml.m21ToXml._setXmlOptionalIdFromId(e, f)
+    >>> e.get('id')
+    'fermata1'
+    
+    Does not set attr: id if el.id is not valid or default:
+    
+    >>> e = El('<fermata />')
+    >>> f = expressions.Fermata()
+    >>> musicxml.m21ToXml._setXmlOptionalIdFromId(e, f)
+    >>> e.get('id', None) is None
+    True
+    >>> f.id = '123456' # invalid for MusicXML id
+    >>> musicxml.m21ToXml._setXmlOptionalIdFromId(e, f)
+    >>> e.get('id', None) is None
+    True
+    '''
+    if not xmlObjects.isValidXSDID(m21Object.id):
+        return
+    element.set('id', m21Object.id)
+    
 
 class GeneralObjectExporter():
     classMapping = OrderedDict([
@@ -720,8 +748,7 @@ class XMLExporterBase:
 
         conforms to attr-group %font in the MusicXML DTD
 
-        >>> El = musicxml.m21ToXml.ET.fromstring #_DOCS_HIDE -- py2 cElementTree needed
-        >>> #_DOCS_SHOW from xml.etree.ElementTree import fromstring as El
+        >>> from xml.etree.ElementTree import fromstring as El
         >>> XB = musicxml.m21ToXml.XMLExporterBase()
         >>> mxObj = El('<text>hi</text>')
         >>> te = expressions.TextExpression('hi!')
@@ -776,8 +803,7 @@ class XMLExporterBase:
 
     def setEditorial(self, mxObject, m21Object):
         '''
-        >>> El = musicxml.m21ToXml.ET.fromstring #_DOCS_HIDE -- py2 cElementTree needed
-        >>> #_DOCS_SHOW from xml.etree.ElementTree import fromstring as El
+        >>> from xml.etree.ElementTree import fromstring as El
         >>> XB = musicxml.m21ToXml.XMLExporterBase()
         >>> mxObj = El('<note />')
         >>> n = note.Note('C-5')
@@ -1159,7 +1185,7 @@ class ScoreExporter(XMLExporterBase):
         else:
             self.stream = score
 
-        self.musicxmlVersion = "3.0"
+        self.musicxmlVersion = "3.1"
         self.xmlRoot = Element('score-partwise')
         self.mxIdentification = None
 
@@ -2547,6 +2573,8 @@ class MeasureExporter(XMLExporterBase):
                 for posSub in getProc(thisSpanner, target):
                     # create new tag
                     mxElement = Element(mxtag)
+                    _setXmlOptionalIdFromId(mxElement, thisSpanner)
+
                     mxElement.set('number', str(thisSpanner.idLocal))
                     if m21spannerClass == 'Line':
                         mxElement.set('line-type', str(thisSpanner.lineType))
@@ -2566,11 +2594,14 @@ class MeasureExporter(XMLExporterBase):
                             mxElement.set(attrName, str(pmtrs[attrName]))
 
                     mxDirection = Element('direction')
+                    _setXmlOptionalIdFromId(mxDirection, thisSpanner)
+                    
                     # Not all spanners have placements
                     if hasattr(thisSpanner, 'placement') and thisSpanner.placement is not None:
                         mxDirection.set('placement', str(thisSpanner.placement))
                     mxDirectionType = SubElement(mxDirection, 'direction-type')
                     mxDirectionType.append(mxElement)
+                    # Not todo: ID: direction-type has no direct music21 equivalent.
 
                     if posSub == 'first':
                         preList.append(mxDirection)
@@ -2858,14 +2889,17 @@ class MeasureExporter(XMLExporterBase):
             chordOrN = chordParent
 
         mxNote = Element('note')
-        # TODO: attrGroup x-position
-        self.setFont(mxNote, chordOrN)
-        # TODO: attrGroup font
+        # self.setFont(mxNote, chordOrN)
+        self.setPrintStyle(mxNote, chordOrN)
+        # TODO: attr-group: printout -- replaces print-object, print-spacing below (3.1)
+        # TODO: attr: print-leger # musicxml 3.1
         # TODO: attr: dynamics
         # TODO: attr: end-dynamics
         # TODO: attr: attack
         # TODO: attr: release
         # TODO: attr: time-only
+        self.setColor(mxNote, n)
+        _setXmlOptionalIdFromId(mxNote, n)
 
         d = chordOrN.duration
 
@@ -3759,6 +3793,7 @@ class MeasureExporter(XMLExporterBase):
             mx.set('type', str(expression.type))
             if expression.shape in ('angled', 'square'):  # only valid shapes
                 mx.text = expression.shape
+            _setXmlOptionalIdFromId(mx, expression)
 
         if 'Tremolo' in classes:
             mx.set('type', 'single')
@@ -4079,6 +4114,8 @@ class MeasureExporter(XMLExporterBase):
         from music21 import harmony
 
         mxHarmony = Element('harmony')
+        _setXmlOptionalIdFromId(mxHarmony, cs)
+        
         self.setPrintStyle(mxHarmony, cs)
 
         csRoot = cs.root()
@@ -4242,11 +4279,13 @@ class MeasureExporter(XMLExporterBase):
 
         '''
         mxDynamics = Element('dynamics')
+        _setXmlOptionalIdFromId(mxDynamics, d)
         if d.value in xmlObjects.DYNAMIC_MARKS:
             mxThisDynamic = SubElement(mxDynamics, d.value)
         else:
             mxThisDynamic = SubElement(mxDynamics, 'other-dynamics')
             mxThisDynamic.text = str(d.value)
+            # TODO: smufl
 
         self.setPrintStyleAlign(mxDynamics, d)
         # TODO: attrGroup: placement (but done for direction, so okay...
@@ -4265,6 +4304,8 @@ class MeasureExporter(XMLExporterBase):
         vS = d.volumeScalar
         if vS is not None:
             mxSound = SubElement(mxDirection, 'sound')
+            # do not set id, since the element is the same in music21.
+            
             dynamicVolume = int(vS * 127)
             mxSound.set('dynamics', str(dynamicVolume))
 
@@ -4286,8 +4327,20 @@ class MeasureExporter(XMLExporterBase):
             <segno default-y="20" halign="left" valign="top" />
           </direction-type>
         </direction>
+
+        >>> s.id = 'segno0'
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> mxSegnoDir = MEX.segnoToXml(s)
+        >>> MEX.dump(mxSegnoDir)
+        <direction>
+          <direction-type>
+            <segno default-y="20" halign="left" id="segno0" valign="top" />
+          </direction-type>
+        </direction>
+
         '''
         mxSegno = Element('segno')
+        _setXmlOptionalIdFromId(mxSegno, segno)
         self.setPrintStyleAlign(mxSegno, segno)
         mxDirection = self.placeInDirection(mxSegno, segno)
         self.xmlRoot.append(mxDirection)
@@ -4326,6 +4379,7 @@ class MeasureExporter(XMLExporterBase):
         '''
         if coda.useSymbol:
             mxCoda = Element('coda')
+            _setXmlOptionalIdFromId(mxCoda, coda)
             self.setPrintStyleAlign(mxCoda, coda)
             mxDirection = self.placeInDirection(mxCoda, coda)
             self.xmlRoot.append(mxDirection)
@@ -4463,6 +4517,8 @@ class MeasureExporter(XMLExporterBase):
             # environLocal.printDebug(['found metric modulation', ti, durs, numbers])
 
         mxMetro = Element('metronome')
+        _setXmlOptionalIdFromId(mxMetro, ti)
+
         for i, d in enumerate(durs):
             # charData of BeatUnit is the type string
             mxSub = Element('beat-unit')
@@ -4485,6 +4541,8 @@ class MeasureExporter(XMLExporterBase):
             mxDirection = self.placeInDirection(mxMetro, ti)
         else:
             mxWords = Element('words')
+            _setXmlOptionalIdFromId(mxWords, ti)
+            
             mxDirection = self.placeInDirection(mxWords, ti)
 
         if soundingQuarterBPM is not None:
@@ -4688,6 +4746,7 @@ class MeasureExporter(XMLExporterBase):
         music21.musicxml.m21ToXml.MusicXMLExportException: unexpected beam type encountered (crazy)
         '''
         mxBeam = Element('beam')
+
         if beamObject.type == 'start':
             mxBeam.text = 'begin'
         elif beamObject.type == 'continue':
@@ -4707,9 +4766,13 @@ class MeasureExporter(XMLExporterBase):
             raise MusicXMLExportException('unexpected beam type encountered (%s)' % beamObject.type)
 
         mxBeam.set('number', str(beamObject.number))
+        # BeamObject has no .id -- fix?
+        #_setXmlOptionalIdFromId(mxBeam, beamObject)
+        
         # not to be done: repeater (deprecated)
         # TODO: attr: fan
-        # TODO: attr: color group
+        # TODO: attr: color -- beamObject has no style attributes...
+        #self.setColor(mxBeam, beamObject)
         return mxBeam
 
 
@@ -4761,6 +4824,8 @@ class MeasureExporter(XMLExporterBase):
                 mxRepeat = self.repeatToXml(barline)
             else:
                 mxBarline = self.barlineToXml(barline)
+
+        _setXmlOptionalIdFromId(mxBarline, barline)
 
         mxBarline.set('location', position)
         # TODO: editorial
@@ -4925,8 +4990,11 @@ class MeasureExporter(XMLExporterBase):
                     else:
                         mxMultipleRest.set('use-symbols', 'no')
                     mxMultipleRest.text = str(firstRestMMR.numRests)
+        
         if mxMultipleRest is not None:
             mxMeasureStyle = Element('measure-style')
+            # Skip: id: has no corresponding element.
+            # TODO or skip: font, color, number.
             mxMeasureStyle.append(mxMultipleRest)
 
         return mxMeasureStyle
@@ -5025,6 +5093,7 @@ class MeasureExporter(XMLExporterBase):
         '''
         # mxTimeList = []
         mxTime = Element('time')
+        _setXmlOptionalIdFromId(mxTime, ts)
         if 'SenzaMisuraTimeSignature' in ts.classes:
             mxSenzaMisura = SubElement(mxTime, 'senza-misura')
             if ts.text is not None:
@@ -5102,6 +5171,7 @@ class MeasureExporter(XMLExporterBase):
         '''
         seta = _setTagTextFromAttribute
         mxKey = Element('key')
+        _setXmlOptionalIdFromId(mxKey, keyOrKeySignature)
         # TODO: attr: number
         self.setPrintStyle(mxKey, keyOrKeySignature)
         # TODO: attr: print-object
@@ -5182,6 +5252,8 @@ class MeasureExporter(XMLExporterBase):
         </clef>
         '''
         mxClef = Element('clef')
+        _setXmlOptionalIdFromId(mxClef, clefObj)
+        
         # TODO: attr: number
         self.setPrintStyle(mxClef, clefObj)
         # TODO: attr: print-object
@@ -5250,6 +5322,9 @@ class MeasureExporter(XMLExporterBase):
             generic = rawGeneric
 
         mxTranspose = Element('transpose')
+        _setXmlOptionalIdFromId(mxTranspose, i)
+        
+        
         mxDiatonic = SubElement(mxTranspose, 'diatonic')
 
         # must implement the necessary shifts
@@ -5315,6 +5390,8 @@ class MeasureExporter(XMLExporterBase):
     def staffLayoutToXmlPrint(self, staffLayout, mxPrint=None):
         if mxPrint is None:
             mxPrint = Element('print')
+        _setXmlOptionalIdFromId(mxPrint, staffLayout)
+
         mxStaffLayout = self.staffLayoutToXmlStaffLayout(staffLayout)
         mxPrint.append(mxStaffLayout)
         return mxPrint

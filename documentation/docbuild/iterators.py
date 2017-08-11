@@ -9,7 +9,6 @@
 # Copyright:    Copyright © 2013, 17 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 import abc  # for @abc.abstractmethod decorator: requires a function to be defined in subclasses
 import os
 import types
@@ -45,8 +44,8 @@ class IPythonNotebookIterator(Iterator):
     ...         break
     ...     print(nb.replace(sp, 'ROOT'))
     ROOT/documentation/source/about/what.ipynb
-    ROOT/documentation/source/developerReference/installJupyter.ipynb
-    ROOT/documentation/source/developerReference/musicxmlTest.ipynb
+    ROOT/documentation/source/developerReference/devTest_inversions.ipynb
+    ROOT/documentation/source/developerReference/devTest_timespans.ipynb
     '''
 
     ### SPECIAL METHODS ###
@@ -87,9 +86,9 @@ class ModuleIterator(Iterator):
     'music21.abcFormat.translate'
     'music21.alpha.__init__'
     'music21.alpha.analysis.__init__'
-    'music21.alpha.analysis.scoreDiff'
     'music21.alpha.analysis.search'
     'music21.alpha.chant'
+    'music21.alpha.contour'
     '''
 
     ### CLASS VARIABLES ###
@@ -160,7 +159,6 @@ class ModuleIterator(Iterator):
                     yield module
                 except ImportError:
                     pass
-        raise StopIteration
 
 
 class CodebaseIterator(Iterator):
@@ -200,8 +198,6 @@ class CodebaseIterator(Iterator):
                 if (isinstance(named, validTypes)
                         and named.__module__ == module.__name__):
                     yield named
-        pass
-        raise StopIteration
 
 
 class ClassIterator(Iterator):
@@ -234,7 +230,6 @@ class ClassIterator(Iterator):
         for x in CodebaseIterator(verbose=self.verbose):
             if isinstance(x, type):
                 yield x
-        raise StopIteration
 
 
 class FunctionIterator(Iterator):
@@ -265,7 +260,6 @@ class FunctionIterator(Iterator):
         for x in CodebaseIterator(verbose=self.verbose):
             if isinstance(x, types.FunctionType):
                 yield x
-        raise StopIteration
 
 if __name__ == '__main__':
     import music21

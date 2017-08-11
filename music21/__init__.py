@@ -130,6 +130,7 @@ __all__ = [
     'tinyNotation',
     'variant',
     'voiceLeading',
+    'volpiano',
     'volume',
     ]
 

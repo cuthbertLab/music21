@@ -89,17 +89,9 @@ def fixDoctests(doctestSuite):
     for dtc in doctestSuite: # Suite to DocTestCase -- undocumented.
         if not hasattr(dtc, '_dt_test'):
             continue
+            
         dt = dtc._dt_test # DocTest
         for example in dt.examples: # fix Traceback exception differences Py2 to Py3
-#             if example.exc_msg is not None and example.exc_msg:
-#                 # TODO: version 5 -- remove.
-#                 example.exc_msg = "..." + example.exc_msg
-#             elif (example.want is not None
-#                     and example.want.startswith('u\'')):
-#                 # probably a unicode example:
-#                 # simplistic, since (u'hi', u'bye')
-#                 # won't be caught, but saves a lot of anguish
-#                 example.want = example.want[1:]
             example.want = stripAddresses(example.want, '0x...')
 
 ADDRESS = re.compile('0x[0-9A-Fa-f]+')
@@ -201,6 +193,11 @@ def mainTest(*testClasses, **kwargs):
         else:
             for di in defaultImports:
                 globs = __import__(di).__dict__.copy()
+            if ('importPlusRelative' in testClasses or
+                    'importPlusRelative' in sys.argv or
+                    bool(kwargs.get('importPlusRelative', False))):
+                globs.update(globals())
+        
         try:
             s1 = doctest.DocTestSuite(
                 '__main__',
