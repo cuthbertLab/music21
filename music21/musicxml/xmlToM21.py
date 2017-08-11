@@ -220,16 +220,17 @@ def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, *, transform
         attributeName = common.hyphenToCamelCase(tag)
     setattr(m21El, attributeName, value)
 
-def _setIdFromXmlOptionalId(element, m21Object):
+def _synchronizeIds(element, m21Object):
     '''
-    MusicXML 3.1 defines the optional-unique-id attribute
+    MusicXML 3.1 defines the id attribute
+    (%optional-unique-id)
     on many elements which is perfect for setting as .id on
     a music21 element.  
     
     >>> from xml.etree.ElementTree import fromstring as El
-    >>> e = El('<fermata optional-unique-id="fermata1"/>')
+    >>> e = El('<fermata id="fermata1"/>')
     >>> f = expressions.Fermata()
-    >>> musicxml.xmlToM21._setIdFromXmlOptionalId(e, f)
+    >>> musicxml.xmlToM21._synchronizeIds(e, f)
     >>> f.id
     'fermata1'
     
@@ -238,11 +239,11 @@ def _setIdFromXmlOptionalId(element, m21Object):
     >>> e = El('<fermata />')
     >>> f = expressions.Fermata()
     >>> f.id = 'doNotOverwrite'
-    >>> musicxml.xmlToM21._setIdFromXmlOptionalId(e, f)
+    >>> musicxml.xmlToM21._synchronizeIds(e, f)
     >>> f.id
     'doNotOverwrite'
     '''
-    newId = element.get('optional-unique-id', None)
+    newId = element.get('id', None)
     if not newId:
         return
     m21Object.id = newId
@@ -3344,10 +3345,13 @@ class MeasureParser(XMLParserBase):
         if mxNotations != None:
             mxTiedList = mxNotations.findall('tied')
             if mxTiedList:
-                tieStyle = mxTiedList[0].get('line-type')
+                firstTied = mxTiedList[0]
+                _synchronizeIds(firstTied, t)
+                
+                tieStyle = firstTied.get('line-type')
                 if tieStyle is not None and tieStyle != 'wavy': # do not support wavy...
                     t.style = tieStyle
-                placement = mxTiedList[0].get('placement')
+                placement = firstTied.get('placement')
                 if placement is not None:
                     t.placement = placement
                 else:
@@ -4249,31 +4253,33 @@ class MeasureParser(XMLParserBase):
         >>> import xml.etree.ElementTree as ET
         >>> MP = musicxml.xmlToM21.MeasureParser()
 
-        >>> t = ET.fromstring('<transpose><diatonic>-1</diatonic>' +
-        ...                   '<chromatic>-2</chromatic></transpose>')
+        >>> t = ET.fromstring('<transpose><diatonic>-1</diatonic>'
+        ...                   + '<chromatic>-2</chromatic></transpose>')
         >>> MP.xmlTransposeToInterval(t)
         <music21.interval.Interval M-2>
 
-        >>> t = ET.fromstring('<transpose><diatonic>-5</diatonic>' +
-        ...                   '<chromatic>-9</chromatic></transpose>')
+        >>> t = ET.fromstring('<transpose><diatonic>-5</diatonic>'
+        ...                   + '<chromatic>-9</chromatic></transpose>')
         >>> MP.xmlTransposeToInterval(t)
         <music21.interval.Interval M-6>
 
         It should be like this -- where the diatonic includes the complete octave information:
 
-        >>> t = ET.fromstring('<transpose><diatonic>-8</diatonic><chromatic>-2</chromatic>' +
-        ...         '<octave-change>-1</octave-change></transpose>')
+        >>> t = ET.fromstring('<transpose><diatonic>-8</diatonic><chromatic>-2</chromatic>'
+        ...         + '<octave-change>-1</octave-change></transpose>')
         >>> MP.xmlTransposeToInterval(t)
         <music21.interval.Interval M-9>
 
         but it is sometimes encoded this way (Finale; MuseScore) where octave-change
         refers to both diatonic and chromatic, so we will deal...
 
-        >>> t = ET.fromstring('<transpose><diatonic>-1</diatonic><chromatic>-2</chromatic>' +
-        ...         '<octave-change>-1</octave-change></transpose>')
-        >>> MP.xmlTransposeToInterval(t)
+        >>> t = ET.fromstring('<transpose id="x"><diatonic>-1</diatonic><chromatic>-2</chromatic>'
+        ...         + '<octave-change>-1</octave-change></transpose>')
+        >>> inv = MP.xmlTransposeToInterval(t)
+        >>> inv
         <music21.interval.Interval M-9>
-
+        >>> inv.id
+        'x'
         '''
         diatonicStep = None
 
@@ -4322,9 +4328,11 @@ class MeasureParser(XMLParserBase):
             post = interval.Interval(chromaticStep + octaveChange)
         elif diatonicStep is not None:
             post = interval.GenericInterval(diatonicStep)
-        else:
+        else:        
             post = interval.Interval('P1') # guaranteed to return an interval object.
 
+        _synchronizeIds(mxTranspose, post)
+        
         return post
 
     def handleTimeSignature(self, mxTime):

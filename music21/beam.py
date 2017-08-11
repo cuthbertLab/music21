@@ -129,6 +129,7 @@ class Beam(EqualSlottedObjectMixin):
 
     __slots__ = (
         'direction',
+        'id',
         'independentAngle',
         'number',
         'type',
@@ -143,6 +144,7 @@ class Beam(EqualSlottedObjectMixin):
         # represents which beam line referred to
         # 8th, 16th, etc represented as 1, 2, ...
         self.number = number
+        self.id = id(self)
 
     ### SPECIAL METHODS ###
     def __repr__(self):
@@ -184,6 +186,7 @@ class Beams(EqualSlottedObjectMixin):
     __slots__ = (
         'beamsList',
         'feathered',
+        'id',
         )
 
     _DOC_ATTR = {
@@ -196,6 +199,7 @@ class Beams(EqualSlottedObjectMixin):
     def __init__(self):
         self.beamsList = []
         self.feathered = False
+        self.id = id(self)
 
     ### SPECIAL METHODS ###
 

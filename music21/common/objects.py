@@ -79,7 +79,8 @@ class SingletonCounter:
 class SlottedObjectMixin:
     r'''
     Provides template for classes implementing slots allowing it to be pickled
-    properly.
+    properly, even if there are weakrefs in the slots, or it is subclassed
+    by something that does not define slots.
 
     Only use SlottedObjectMixins for objects that we expect to make so many of
     that memory storage and speed become an issue. Thus, unless you are Xenakis,
@@ -150,7 +151,7 @@ class SlottedObjectMixin:
         we need to preserve the order:
 
         >>> sorted(list(sSet))
-        ['direction', 'independentAngle', 'number', 'type']
+        ['direction', 'id', 'independentAngle', 'number', 'type']
 
         When a normal Beam won't cut it...
 
@@ -160,7 +161,7 @@ class SlottedObjectMixin:
         >>> fb = FunkyBeam()
         >>> sSet = fb._getSlotsRecursive()
         >>> sorted(list(sSet))
-        ['direction', 'funkiness', 'groovability', 'independentAngle', 'number', 'type']
+        ['direction', 'funkiness', 'groovability', 'id', 'independentAngle', 'number', 'type']
         '''
         slots = set()
         for cls in self.__class__.mro():
@@ -172,11 +173,15 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
     Same as above, but __eq__ and __ne__ functions are defined based on the slots.
 
     Slots are the only things compared, so do not mix with a __dict__ based object.
+    
+    Ignores differences in .id
     '''
     def __eq__(self, other):
         if type(self) is not type(other):
             return False
         for thisSlot in self._getSlotsRecursive():
+            if thisSlot == 'id':
+                continue
             if getattr(self, thisSlot) != getattr(other, thisSlot):
                 return False
         return True

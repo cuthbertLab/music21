@@ -41,6 +41,7 @@ noteheadTypeNames = [
     'back slashed',
     'circle dot',
     'circle-x',
+    'circled',
     'cluster',
     'cross',
     'diamond',
@@ -52,6 +53,7 @@ noteheadTypeNames = [
     'mi',
     'none',
     'normal',
+    'other',
     're',
     'rectangle',
     'slash',
@@ -804,9 +806,9 @@ class NotRest(GeneralNote):
 
 
         >>> note.noteheadTypeNames
-        ['arrow down', 'arrow up', 'back slashed', 'circle dot', 'circle-x', 'cluster',
+        ['arrow down', 'arrow up', 'back slashed', 'circle dot', 'circle-x', 'circled', 'cluster',
          'cross', 'diamond', 'do', 'fa', 'inverted triangle', 'la', 'left triangle',
-         'mi', 'none', 'normal', 're', 'rectangle', 'slash', 'slashed', 'so',
+         'mi', 'none', 'normal', 'other', 're', 'rectangle', 'slash', 'slashed', 'so',
          'square', 'ti', 'triangle', 'x']
         >>> n = note.Note()
         >>> n.notehead = 'diamond'

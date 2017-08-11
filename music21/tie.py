@@ -76,6 +76,7 @@ class Tie(SlottedObjectMixin):
     ### CLASS VARIABLES ###
 
     __slots__ = (
+        'id',
         'placement',
         'style',
         'type',
@@ -83,7 +84,7 @@ class Tie(SlottedObjectMixin):
 
     _DOC_ATTR = {
         'type': '''
-            The tie type, can be 'start', 'stop', or 'continue'.
+            The tie type, can be 'start', 'stop', 'continue', or 'let-ring'.
             ''',
         'style': '''
             The style of the tie.  Currently can be 'normal', 'dotted', 'dashed' or 'hidden'
@@ -93,14 +94,18 @@ class Tie(SlottedObjectMixin):
             it is unknown or should be determined from context, or 'above' or 'below.
             ''',
     }
+    
+    VALID_TIE_TYPES = ('start', 'stop', 'continue', 'let-ring')
     ### INITIALIZER ###
     # pylint: disable=redefined-builtin
     def __init__(self, type='start'): #@ReservedAssignment
         #super().__init__()
-        if type not in ('start', 'stop', 'continue'):
-            raise TieException("Type must be one of 'start', 'stop', or 'continue', not %s" % type)
+        if type not in self.VALID_TIE_TYPES:
+            raise TieException(
+                "Type must be one of {}, not {}".format(self.VALID_TIE_TYPES, type))
         # naming this "type" was a mistake, because cannot create a property of this name.
 
+        self.id = id(self)
         self.type = type
         self.style = "normal"
         self.placement = None # = unknown, can be 'above' or 'below'
