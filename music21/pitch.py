@@ -80,20 +80,19 @@ accidentalNameToModifier = {
     'one-and-a-half-flat': '-`',
 }
 
-# TODO: replace surrogate pair
 unicodeFromModifier = OrderedDict([
-    ('####', '\uD834\uDD2A\uD834\uDD2A'),
-    ('###', '\u266f\uD834\uDD2A'),
-    ('##', '\uD834\uDD2A'), # 1D12A  # note that this must be expressed as a surrogate pair
-    ('#~', '\u266f\uD834\uDD32'), # 1D132
+    ('####', chr(0x1d12a) + chr(0x1d12a)),
+    ('###', '\u266f' + chr(0x1d12a)),
+    ('##', chr(0x1d12a)), # 1D12A  # note that this must be expressed as a surrogate pair
+    ('#~', '\u266f' + chr(0x1d132)), # 1D132
     ('#', '\u266f'),
-    ('~', '\uD834\uDD32'), # 1D132
-    ('----', '\uD834\uDD2B\uD834\uDD2B'),
+    ('~', chr(0x1d132)), # 1D132
+    ('----', chr(0x1d12b) + chr(0x1d12b)),
     ('---', '\u266D'),
-    ('--', '\uD834\uDD2B'),
-    ('-`', '\u266D\uD834\uDD32'),
+    ('--', chr(0x1d12b)),
+    ('-`', '\u266D' + chr(0x1d132)),
     ('-', '\u266D'),
-    ('`', '\uD834\uDD32'), # 1D132 # raised flat: 1D12C
+    ('`', chr(0x1d132)), # 1D132 # raised flat: 1D12C
     ('', '\u266e'), # natural
 ])
 
@@ -114,9 +113,10 @@ accidentalModifiersSorted = _sortModifiers()
 # utility functions
 
 def _convertPitchClassToNumber(ps):
-    '''Given a pitch class or pitch class value,
-    look for strings. If a string is found,
-    replace it with the default pitch class representation.
+    '''
+    Given a pitch class string
+    return the pitch class representation.
+    Ints are returned unchanged; 
 
     >>> pitch._convertPitchClassToNumber(3)
     3
@@ -134,11 +134,12 @@ def _convertPitchClassToNumber(ps):
             return 10
         if ps in ['b', 'B']:
             return 11
-        # maybe its a string of an integer?
+        # maybe it is a string of an integer?
         return int(ps)
 
 def _convertPitchClassToStr(pc):
-    '''Given a pitch class number, return a string.
+    '''
+    Given a pitch class number, return a string.
 
     >>> pitch._convertPitchClassToStr(3)
     '3'
@@ -151,7 +152,8 @@ def _convertPitchClassToStr(pc):
 
 
 def _convertPsToOct(ps):
-    '''Utility conversion; does not process internals.
+    '''
+    Utility conversion; does not process internals.
     Converts a midiNote number to an octave number.
     Assume C4 middle C, so 60 returns 4
 
@@ -752,7 +754,7 @@ class Accidental(style.StyleMixin):
 
     Accidentals up to quadruple-sharp and quadruple-flat are allowed.
 
-    Natural-sharp etc. (for canceling a previous flat) are not yet supported.
+    Natural-sharp etc. (for canceling a previous flat) are not yet supported officially.
 
     >>> a = pitch.Accidental('sharp')
     >>> a.name, a.alter, a.modifier
@@ -763,6 +765,9 @@ class Accidental(style.StyleMixin):
     >>> b = copy.deepcopy(a)
     >>> b.style.color
     'red'
+
+
+    Note that if alter is set first,
 
     '''
     _styleClass = style.TextStyle
@@ -971,7 +976,7 @@ class Accidental(style.StyleMixin):
 
     ### PUBLIC METHODS ###
 
-    def set(self, name):
+    def set(self, name, *, allowNonStandardValue=False):
         '''
         Change the type of the Accidental. Strings values, numbers, and Lilypond
         Abbreviations are all accepted.  All other values will change
@@ -996,65 +1001,103 @@ class Accidental(style.StyleMixin):
         >>> a = pitch.Accidental('--')
         >>> a.alter
         -2.0
+        >>> a.set('half-sharp')
+        >>> a.alter
+        0.5
+        >>> a.name
+        'half-sharp'
+        
+        Setting an illegal name is generally an error:
+        
+        >>> a.set('flat-flat-up')
+        Traceback (most recent call last):
+        music21.pitch.AccidentalException: flat-flat-up is not a supported accidental type
+        
+        But if 'allowNonStandardValue' is True then other names (if strings) or alters (if numbers)
+        are allowed:
+            
+        >>> a.set('quintuple-sharp', allowNonStandardValue=True)
+        >>> a.set(5.0, allowNonStandardValue=True)
+        >>> a.name
+        'quintuple-sharp'
+        >>> a.alter
+        5.0
+        
+        This is the argument that .name and .alter use to allow non-standard names
+        
+        
+        Changed in v. 5 -- added allowNonStandardValue
+
         '''
         if isinstance(name, str):
             name = name.lower() # sometimes args get capitalized
-        if name in ['natural', 'n', 0]:
+        if name in ('natural', 'n', 0):
             self._name = 'natural'
             self._alter = 0.0
-        elif name in ['sharp', accidentalNameToModifier['sharp'], 'is', 1, 1.0]:
+        elif name in ('sharp', accidentalNameToModifier['sharp'], 'is', 1):
             self._name = 'sharp'
             self._alter = 1.0
-        elif name in ['double-sharp', accidentalNameToModifier['double-sharp'],
-            'isis', 2]:
+        elif name in ('double-sharp', accidentalNameToModifier['double-sharp'],
+                      'isis', 2):
             self._name = 'double-sharp'
             self._alter = 2.0
-        elif name in ['flat', accidentalNameToModifier['flat'], 'es', -1]:
+        elif name in ('flat', accidentalNameToModifier['flat'], 'es', -1):
             self._name = 'flat'
             self._alter = -1.0
-        elif name in ['double-flat', accidentalNameToModifier['double-flat'],
-            'eses', -2]:
+        elif name in ('double-flat', accidentalNameToModifier['double-flat'],
+                      'eses', -2):
             self._name = 'double-flat'
             self._alter = -2.0
 
-        elif name in ['half-sharp', accidentalNameToModifier['half-sharp'],
-            'quarter-sharp', 'ih', 'semisharp', .5]:
+        elif name in ('half-sharp', accidentalNameToModifier['half-sharp'],
+                      'quarter-sharp', 'ih', 'semisharp', .5):
             self._name = 'half-sharp'
             self._alter = 0.5
-        elif name in ['one-and-a-half-sharp',
-            accidentalNameToModifier['one-and-a-half-sharp'],
-            'three-quarter-sharp', 'three-quarters-sharp', 'isih',
-            'sesquisharp', 1.5]:
+        elif name in ('one-and-a-half-sharp',
+                      accidentalNameToModifier['one-and-a-half-sharp'],
+                      'three-quarter-sharp', 'three-quarters-sharp', 'isih',
+                      'sesquisharp', 1.5):
             self._name = 'one-and-a-half-sharp'
             self._alter = 1.5
-        elif name in ['half-flat', accidentalNameToModifier['half-flat'],
-            'quarter-flat', 'eh', 'semiflat', -.5]:
+        elif name in ('half-flat', accidentalNameToModifier['half-flat'],
+                      'quarter-flat', 'eh', 'semiflat', -.5):
             self._name = 'half-flat'
             self._alter = -0.5
-        elif name in ['one-and-a-half-flat',
-            accidentalNameToModifier['one-and-a-half-flat'],
-            'three-quarter-flat', 'three-quarters-flat', 'eseh',
-            'sesquiflat', -1.5]:
+        elif name in ('one-and-a-half-flat',
+                      accidentalNameToModifier['one-and-a-half-flat'],
+                      'three-quarter-flat', 'three-quarters-flat', 'eseh',
+                      'sesquiflat', -1.5):
             self._name = 'one-and-a-half-flat'
             self._alter = -1.5
-        elif name in ['triple-sharp', accidentalNameToModifier['triple-sharp'],
-            'isisis', 3]:
+        elif name in ('triple-sharp', accidentalNameToModifier['triple-sharp'],
+                      'isisis', 3):
             self._name = 'triple-sharp'
             self._alter = 3.0
-        elif name in ['quadruple-sharp',
-            accidentalNameToModifier['quadruple-sharp'], 'isisisis', 4]:
+        elif name in ('quadruple-sharp',
+                      accidentalNameToModifier['quadruple-sharp'], 'isisisis', 4):
             self._name = 'quadruple-sharp'
             self._alter = 4.0
-        elif name in ['triple-flat', accidentalNameToModifier['triple-flat'],
-            'eseses', -3]:
+        elif name in ('triple-flat', accidentalNameToModifier['triple-flat'],
+                      'eseses', -3):
             self._name = 'triple-flat'
             self._alter = -3.0
-        elif name in ['quadruple-flat',
-            accidentalNameToModifier['quadruple-flat'], 'eseseses', -4]:
+        elif name in ('quadruple-flat',
+                      accidentalNameToModifier['quadruple-flat'], 'eseseses', -4):
             self._name = 'quadruple-flat'
             self._alter = -4.0
         else:
-            raise AccidentalException('%s is not a supported accidental type' % name)
+            if not allowNonStandardValue:
+                raise AccidentalException('%s is not a supported accidental type' % name)
+            else:
+                if isinstance(name, str):
+                    self._name = name
+                    return
+                elif isinstance(name, (int, float)):
+                    self._alter = name
+                    return
+                else: # pragma: no cover
+                    raise AccidentalException('%s is not a supported accidental type' % name)
+                    
 
         self._modifier = accidentalNameToModifier[self._name]
 
@@ -1083,12 +1126,27 @@ class Accidental(style.StyleMixin):
         return self._name
 
     def _setName(self, value):
-        # can alternatively call set()
-        self._name = value
+        self.set(value, allowNonStandardValue=True)
 
     name = property(_getName, _setName,
         doc = '''
         Get or set the name of the Accidental, like 'sharp' or 'double-flat'
+        
+        If the name is set to a standard name then it changes alter and modifier.
+        
+        If set to a non-standard name, then it does not change them:
+        
+        >>> a = pitch.Accidental()
+        >>> a.name = 'flat'
+        >>> a.alter
+        -1.0
+        >>> a.modifier
+        '-'
+        >>> a.name = 'flat-flat-up'
+        >>> a.alter
+        -1.0
+        
+        Changed in v. 5 -- changing the name here changes other values, condiditionally
         ''')
 
     def _getAlter(self):
@@ -1096,7 +1154,7 @@ class Accidental(style.StyleMixin):
 
     def _setAlter(self, value):
         # can alternatively call set()
-        self._alter = value
+        self.set(value, allowNonStandardValue=True)
 
     alter = property(_getAlter, _setAlter,
         doc = '''
@@ -1109,21 +1167,50 @@ class Accidental(style.StyleMixin):
 
         >>> sharp.alter = -1
 
-        Note that name is still the same after changing alter... should it be?
-
+        After changing alter to a known other value, name changes:
+        
         >>> sharp.name
-        'sharp'
+        'flat'
+
+        But changing it to an unusual value does not change the name:
+        
+        >>> notSoFlat = pitch.Accidental('flat')
+        >>> notSoFlat.alter = -0.9
+        >>> notSoFlat.name
+        'flat'
+
+        Changed in v. 5 -- changing the alter here changes other values, condiditionally
         ''')
 
     def _getModifier(self):
         return self._modifier
 
     def _setModifier(self, value):
-        # can alternatively call set()
-        self._modifier = value
+        try:
+            self.set(value, allowNonStandardValue=False)
+        except AccidentalException:
+            self._modifier = value
 
     modifier = property(_getModifier, _setModifier,
-        doc = '''Get or set the alter of the modifier, or the string representation.'
+        doc = '''
+        Get or set the alter of the modifier, or the string representation.'
+        
+        >>> f = pitch.Accidental('flat')
+        >>> f.modifier
+        '-'
+        >>> f.modifier = '#'
+        >>> f.name
+        'sharp'
+
+        However, an unknown modifier does not change anything but is preserved:
+        
+        >>> f.modifier = '&'
+        >>> f.modifier
+        '&'
+        >>> f.name
+        'sharp'
+        
+        Changed in v. 5 -- changing the midifer here changes other values, condiditionally        
         ''')
 
     def _getDisplayType(self):
@@ -1186,6 +1273,8 @@ class Accidental(style.StyleMixin):
         '#'
         >>> sharp.unicode
         '♯'
+
+        Some produce code points outside the 2-byte set
         '''
         # all unicode musical symbols can be found here:
         # http://www.fileformat.info/info/unicode/block/musical_symbols/images.htm

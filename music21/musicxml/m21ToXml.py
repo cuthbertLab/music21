@@ -1151,7 +1151,37 @@ class XMLExporterBase:
         >>> a.style.relativeX = -2
         >>> XB.dump(a2m(a))
         <accidental relative-x="-2">flat</accidental>
+        
+        >>> a = pitch.Accidental()
+        >>> a.name = 'double-sharp-down' # musicxml 3.1
+        >>> XB.dump(a2m(a))
+        <accidental>double-sharp-down</accidental>
+
+        >>> a.name = 'funnyAccidental' # unknown
+        >>> XB.dump(a2m(a))
+        <accidental>other</accidental>
         '''
+        otherMusicXMLAccidentals = (
+            # v. 3.1
+            'double-sharp-down', 'double-sharp-up',
+            'flat-flat-down', 'flat-flat-up',
+            'arrow-down', 'arrow-up', 
+            'other',
+            
+            # v. 3.0    
+            'sharp-down', 'sharp-up',
+            'natural-down', 'natural-up',
+            'flat-down', 'flat-up',
+            'slash-quarter-sharp', 'slash-sharp',
+            'slash-flat', 'double-slash-flat',
+            'sharp-1', 'sharp-2',
+            'sharp-3', 'sharp-5',
+            'flat-1', 'flat-2',
+            'flat-3', 'flat-4',
+            'sori', 'koron',
+        )
+        
+        
         if a.name == "half-sharp":
             mxName = "quarter-sharp"
         elif a.name == "one-and-a-half-sharp":
@@ -1164,6 +1194,9 @@ class XMLExporterBase:
             mxName = "flat-flat"
         else:  # all others are the same
             mxName = a.name
+            if (mxName not in pitch.accidentalNameToModifier
+                    and mxName not in otherMusicXMLAccidentals):
+                mxName = 'other'
 
         mxAccidental = Element('accidental')
         # need to remove display in this case and return None
@@ -2934,7 +2967,7 @@ class MeasureExporter(XMLExporterBase):
             except AttributeError:
                 environLocal.warn("Duration set as Grace while not being a GraceDuration %s" % d)
 
-        # TODO: cue...
+        # TODO: cue... / cue-grace
         if chordOrN.hasStyleInformation and chordOrN.style.color is not None:
             mxNote.set('color', normalizeColor(chordOrN.style.color))
 
