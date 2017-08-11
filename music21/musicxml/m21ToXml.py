@@ -257,7 +257,16 @@ def _setXmlOptionalIdFromId(element, m21Object):
     >>> musicxml.m21ToXml._setXmlOptionalIdFromId(e, f)
     >>> e.get('id', None) is None
     True
+
+    None can be passed in instead of a m21object.
+
+    >>> e = El('<fermata />')
+    >>> musicxml.m21ToXml._setXmlOptionalIdFromId(e, None)
+    >>> e.get('id', 'no idea')
+    'no idea'
     '''
+    if m21Object is None or not hasattr(m21Object, 'id'):
+        return
     if not xmlObjects.isValidXSDID(m21Object.id):
         return
     element.set('id', m21Object.id)
