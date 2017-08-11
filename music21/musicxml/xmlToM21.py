@@ -2837,7 +2837,7 @@ class MeasureParser(XMLParserBase):
 
         def flatten(mx, name):
             findall = mx.findall(name)
-            return [item for sublist in findall for item in sublist]
+            return common.flattenList(findall)
 
         for mxObj in flatten(mxNotations, 'technical'):
             technicalObj = self.xmlTechnicalToArticulation(mxObj)
@@ -3258,7 +3258,7 @@ class MeasureParser(XMLParserBase):
             tremSpan.numberOfMarks = numMarks
             return tremSpan
 
-    def xmlOneSpanner(self, mxObj, target, spannerClass, allowDuplicateIds=False):
+    def xmlOneSpanner(self, mxObj, target, spannerClass, *, allowDuplicateIds=False):
         '''
         Some spanner types do not have an id necessarily, we allow duplicates of them
         if allowDuplicateIds is True. Wedges are one.
@@ -3290,6 +3290,9 @@ class MeasureParser(XMLParserBase):
         if mxObj.get('type') == 'stop':
             su.completeStatus = True
             # only add after complete
+        elif mxObj.get('type') == 'start':
+            _synchronizeIds(mxObj, su)
+        
         return su
 
     def xmlToTie(self, mxNote):
@@ -3947,9 +3950,9 @@ class MeasureParser(XMLParserBase):
 
         for mxDegree in mxDegrees: # a list of components
             hd = harmony.ChordStepModification()
-            seta(hd, mxDegree, 'degree-value', 'degree', int)
+            seta(hd, mxDegree, 'degree-value', 'degree', transform=int)
             # TODO: - should allow float, but meaningless to allow microtones in this context.
-            seta(hd, mxDegree, 'degree-alter', 'interval', int)
+            seta(hd, mxDegree, 'degree-alter', 'interval', transform=int)
             seta(hd, mxDegree, 'degree-type', 'modType')
             cs.addChordStepModification(hd)
 
@@ -3994,8 +3997,13 @@ class MeasureParser(XMLParserBase):
                     # in rare cases there may be more than one dynamic in the same
                     # direction, so we iterate
                     for dyn in mxDir:
-                        # TODO: other-dynamic
-                        d = dynamics.Dynamic(dyn.tag)
+                        m21DynamicText = dyn.tag
+                        if dyn.tag == 'other-dynamic':
+                            m21DynamicText = dyn.text.strip()                        
+                        
+                        d = dynamics.Dynamic(m21DynamicText)
+                        
+                        _synchronizeIds(dyn, d)
                         _setAttributeFromAttribute(d, mxDirection,
                                                    'placement', '_positionPlacement')
 
@@ -4012,6 +4020,8 @@ class MeasureParser(XMLParserBase):
                         rm = repeat.Segno()
                     else:
                         rm = repeat.Coda()
+                        
+                    _synchronizeIds(mxDir, rm)
                     dX = mxDir.get('default-x')
                     if dX is not None:
                         rm.style.absoluteX = common.numToIntOrFloat(dX)
@@ -4158,6 +4168,8 @@ class MeasureParser(XMLParserBase):
         if paren is not None:
             if paren == 'yes':
                 mm.parentheses = True
+                
+        _synchronizeIds(mxMetronome, mm)
         return mm
 
 

@@ -53,7 +53,6 @@ class Style:
         # SMuFL characters are allowed.
         self.fontRepresentation = None
 
-        # TODO: migrate from elsewhere
         self.color = None
 
         self.units = 'tenths'
@@ -67,7 +66,9 @@ class Style:
         elif value == 'none':
             self._enclosure = None
         elif value.lower() in ('rectangle', 'square', 'oval', 'circle',
-                               'bracket', 'triangle', 'diamond'):
+                               'bracket', 'triangle', 'diamond', 
+                               'pentagon', 'hexagon', 'heptagon', 'octagon',
+                               'nonagon', 'decagon'):
             self._enclosure = value.lower()
         else:
             raise TextFormatException('Not a supported enclosure: %s' % value)
@@ -75,7 +76,9 @@ class Style:
     enclosure = property(_getEnclosure, _setEnclosure,
         doc = '''
         Get or set the enclosure.  Valid names are
-        rectangle, square, oval, circle, bracket, triangle, diamond, or None.
+        rectangle, square, oval, circle, bracket, triangle, diamond, 
+        pentagon, hexagon, heptagon, octagon,
+        nonagon, decagon or None.
 
 
         >>> tst = style.TextStyle()
@@ -117,7 +120,6 @@ class Style:
         >>> te.absoluteY = 10
         >>> te.absoluteY
         10
-
 
         >>> te.absoluteY = 'below'
         >>> te.absoluteY
