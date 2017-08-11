@@ -126,7 +126,7 @@ def getMetadataFromContext(s):
     return md
 
 def _setTagTextFromAttribute(m21El, xmlEl, tag, attributeName=None,
-                             transform=None, forceEmpty=False):
+                             *, transform=None, forceEmpty=False):
     '''
     If m21El has an attribute called attributeName, create a new SubElement
     for xmlEl and set its text to the value of the m21El attribute.
@@ -143,24 +143,25 @@ def _setTagTextFromAttribute(m21El, xmlEl, tag, attributeName=None,
 
     >>> seta = musicxml.m21ToXml._setTagTextFromAttribute
     >>> acc = pitch.Accidental()
-    >>> acc.alter = -2
+    >>> acc.alter = -2.0
+
     >>> subEl = seta(acc, e, 'alter')
     >>> subEl.text
-    '-2'
+    '-2.0'
     >>> subEl in e
     True
 
     >>> XB = musicxml.m21ToXml.XMLExporterBase()
     >>> XB.dump(e)
     <accidental>
-      <alter>-2</alter>
+      <alter>-2.0</alter>
     </accidental>
 
     add a transform
 
-    >>> subEl = seta(acc, e, 'alter', transform=float)
+    >>> subEl = seta(acc, e, 'alter', transform=int)
     >>> subEl.text
-    '-2.0'
+    '-2'
 
     '''
     if attributeName is None:

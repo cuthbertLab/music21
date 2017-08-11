@@ -167,7 +167,7 @@ def _setAttributeFromAttribute(m21El, xmlEl, xmlAttributeName, attributeName=Non
         attributeName = common.hyphenToCamelCase(xmlAttributeName)
     setattr(m21El, attributeName, value)
 
-def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, transform=None):
+def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, *, transform=None):
     '''
     If xmlEl has a at least one element of tag==tag with some text. If
     it does, set the attribute either with the same name (with "foo-bar" changed to
@@ -182,15 +182,15 @@ def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, transform=No
 
     >>> seta = musicxml.xmlToM21._setAttributeFromTagText
     >>> acc = pitch.Accidental()
-    >>> seta(acc, e, 'alter')
+    >>> seta(acc, e, 'alter', '_alter')
     >>> acc.alter
     '-2'
 
-    Transform the alter text to an int.
+    Transform the alter text to a float.
 
-    >>> seta(acc, e, 'alter', transform=int)
+    >>> seta(acc, e, 'alter', transform=float)
     >>> acc.alter
-    -2
+    -2.0
 
     >>> e2 = Element('score-partwise')
     >>> a2 = SubElement(e2, 'movement-title')
@@ -2392,13 +2392,24 @@ class MeasureParser(XMLParserBase):
         >>> print(a)
         E-3
 
-        Conflicting alter and accidental -- accidental wins:
+        Conflicting alter and accidental -- alter is still stored, but name is :
 
         >>> b = EL('<note><pitch><step>E</step><alter>-1</alter><octave>3</octave></pitch>' +
         ...              '<accidental>sharp</accidental></note>')
         >>> a = MP.xmlToPitch(b)
         >>> print(a)
         E#3
+        >>> a.fullName
+        'E-sharp in octave 3'
+        
+        >>> a.accidental.alter
+        -1.0
+        
+        >>> a.accidental.name
+        'sharp'
+        
+        >>> a.accidental.modifier
+        '#'
         '''
         seta = _setAttributeFromTagText
         if inputM21 is None:
@@ -2433,6 +2444,11 @@ class MeasureParser(XMLParserBase):
                 accObj = self.xmlToAccidental(mxAccidental)
                 p.accidental = accObj
                 p.accidental.displayStatus = True
+                
+                if accAlter is not None and accAlter != accObj.alter:
+                    accObj.setAttributeIndependently('alter', float(accAlter))
+                
+                
             except pitch.AccidentalException:
                 # MuseScore 0.9.6 generates Accidentals with empty objects
                 pass
@@ -2484,12 +2500,9 @@ class MeasureParser(XMLParserBase):
             name = self.mxAccidentalNameToM21[mxName]
         else:
             name = mxName
+            
         # need to use set here to get all attributes up to date
-        acc.set(name)
-        # TODO: natural-sharp, natural-flat, sharp-down, sharp-up,
-        #       natural-down, natural-up, flat-down, flat-up,
-        #       slash-quarter-sharp, slash-sharp, slash-flat, double-slash-flat
-        #       sharp-1, 2, 3, 5, flat-1, 2, 3, 4, sori, koron
+        acc.set(name, allowNonStandardValue=True)
         self.setPrintStyle(mxAccidental, acc)
 
         # level display...

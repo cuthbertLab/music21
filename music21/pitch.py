@@ -1300,11 +1300,50 @@ class Accidental(style.StyleMixin):
         # keep lower case
         return self.name
 
+    #---------------------------------------------------------------------------
+    def setAttributeIndependently(self, attribute, value):
+        '''
+        Set an attribute of 'name', 'alter', and 'modifier', independently
+        from other attributes.
+        
+        >>> a = pitch.Accidental('natural')
+        >>> a.setAttributeIndependently('alter', 1.0)
+        >>> a.alter
+        1.0
+        >>> a.name
+        'natural'
+        
+        >>> a.setAttributeIndependently('name', 'sori')
+        >>> a.setAttributeIndependently('modifier', '$')
+        >>> a.modifier
+        '$'
+        >>> a.name
+        'sori'
+        >>> a.alter
+        1.0
+        
+        Only 'name', 'alter', and 'modifier' can be set independently:
+        
+        >>> a.setAttributeIndependently('color', 'red')
+        Traceback (most recent call last):
+        music21.pitch.AccidentalException: Cannot set attribute color independently of other parts.
+        
+        New in v.5 -- needed because .name, .alter, and .modifier run .set()
+        '''
+        if attribute not in ('name', 'alter', 'modifier'):
+            raise AccidentalException(
+                'Cannot set attribute {} independently of other parts.'.format(attribute))
 
+        if attribute == 'alter':
+            value = float(value)
+        
+        privateAttrName = '_' + attribute
+        setattr(self, privateAttrName, value)
 
     #---------------------------------------------------------------------------
     def inheritDisplay(self, other):
-        '''Given another Accidental object, inherit all the display properites
+        '''
+        Given another Accidental object, inherit all the display properites
         of that object.
 
         This is needed when transposing Pitches: we need to retain accidental display properties.
