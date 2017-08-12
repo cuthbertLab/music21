@@ -265,6 +265,57 @@ class XMLParserBase:
 
     #### style attributes
 
+    def setStyleAttributes(self, mxObject, m21Object, musicXMLNames, m21Names):
+        '''
+        Takes an mxObject, a music21Object, and a list/tuple of musicXMLnames and
+        a list/tuple of m21Names, and assigns each of the mxObject's attributes
+        that fits this style name to the corresponding style object's m21Name attribute.
+
+        >>> from xml.etree.ElementTree import fromstring as El
+        >>> XP = musicxml.xmlToM21.XMLParserBase()
+        >>> mxObj = El('<a x="20.1" y="10.0" z="yes" />')
+        >>> m21Obj = base.Music21Object()
+        >>> musicXMLNames = ('w', 'x', 'y', 'z')
+        >>> m21Names = ('justify', 'absoluteX', 'absoluteY', 'hideObjectOnPrint')
+
+        >>> XP.setStyleAttributes(mxObj, m21Obj, musicXMLNames, m21Names)
+
+        `.justify` requires a TextStyle object.
+
+        >>> m21Obj.style.justify
+        Traceback (most recent call last):
+        AttributeError: 'Style' object has no attribute 'justify'
+
+        >>> m21Obj.style.absoluteX
+        20.1
+        >>> m21Obj.style.absoluteY
+        10
+        >>> m21Obj.style.hideObjectOnPrint
+        True
+        '''
+        stObj = None
+        for xmlName, m21Name in zip(musicXMLNames, m21Names):
+            mxValue = mxObject.get(xmlName)
+            if mxValue is None:
+                continue
+            
+            if m21Name in xmlObjects.STYLE_ATTRIBUTES_STR_NONE_TO_NONE and mxValue == 'none':
+                mxValue = None
+            if m21Name in xmlObjects.STYLE_ATTRIBUTES_YES_NO_TO_BOOL:
+                mxValue = xmlObjects.yesNoToBoolean(mxValue)
+            
+            try:
+                if mxValue is not True and mxValue is not False:
+                    mxValue = common.numToIntOrFloat(mxValue)
+            except (ValueError, TypeError):
+                pass
+
+            # only create a style object if we get this far...
+            if stObj is None:
+                stObj = m21Object.style
+            setattr(stObj, m21Name, mxValue)
+
+
     def setTextFormatting(self, mxObject, m21Object):
         '''
         sets the justification, print-style-align group, and
@@ -362,48 +413,6 @@ class XMLParserBase:
         m21Names = ('absoluteX', 'absoluteY', 'relativeX', 'relativeY')
         self.setStyleAttributes(mxObject, m21Object, musicXMLNames, m21Names)
 
-    def setStyleAttributes(self, mxObject, m21Object, musicXMLNames, m21Names):
-        '''
-        Takes an mxObject, a music21Object, and a list/tuple of musicXMLnames and
-        a list/tuple of m21Names, and assigns each of the mxObject's attributes
-        that fits this style name to the corresponding style object's m21Name attribute.
-
-        >>> from xml.etree.ElementTree import fromstring as El
-        >>> XP = musicxml.xmlToM21.XMLParserBase()
-        >>> mxObj = El('<a x="20.1" y="10.0" z="yes" />')
-        >>> m21Obj = base.Music21Object()
-        >>> musicXMLNames = ('w', 'x', 'y', 'z')
-        >>> m21Names = ('justify', 'absoluteX', 'absoluteY', 'hideObjectOnPrint')
-
-        >>> XP.setStyleAttributes(mxObj, m21Obj, musicXMLNames, m21Names)
-
-        `.justify` requires a TextStyle object.
-
-        >>> m21Obj.style.justify
-        Traceback (most recent call last):
-        AttributeError: 'Style' object has no attribute 'justify'
-
-        >>> m21Obj.style.absoluteX
-        20.1
-        >>> m21Obj.style.absoluteY
-        10
-        >>> m21Obj.style.hideObjectOnPrint
-        'yes'
-        '''
-        stObj = None
-        for xmlName, m21Name in zip(musicXMLNames, m21Names):
-            mxValue = mxObject.get(xmlName)
-            if mxValue is None:
-                continue
-            try:
-                mxValue = common.numToIntOrFloat(mxValue)
-            except (ValueError, TypeError):
-                pass
-
-            # only create a style object if we get this far...
-            if stObj is None:
-                stObj = m21Object.style
-            setattr(stObj, m21Name, mxValue)
 
     def setEditorial(self, mxObj, m21Obj):
         '''
@@ -4069,33 +4078,8 @@ class MeasureParser(XMLParserBase):
         if mxWords.text is None:
             mxWords.text = "" # easier...
         te = expressions.TextExpression(mxWords.text.strip())
-
-        setb = _setAttributeFromAttribute
-        st = te.style
-        setb(st, mxWords, 'justify')
-        setb(st, mxWords, 'font-family')
-        setb(st, mxWords, 'font-size',  transform=_floatOrIntStr)
-        setb(st, mxWords, 'letter-spacing', transform=_floatOrIntStr)
-        setb(st, mxWords, 'enclosure')
-        setb(st, mxWords, 'default-y', 'absoluteY', transform=_floatOrIntStr)
-
-        # two parameters that are combined
-        style = mxWords.get('font-style')
-        if style == 'normal':
-            style = None
-
-        weight = mxWords.get('font-weight')
-        if weight == 'normal':
-            weight = None
-        if style is not None and weight is not None:
-            if style == 'italic' and weight == 'bold':
-                st.fontStyle = 'bolditalic'
-        # one is None
-        elif style == 'italic':
-            st.fontStyle = 'italic'
-        elif weight == 'bold':
-            st.fontStyle = 'bold'
-
+        self.setTextFormatting(mxWords, te)
+        self.setPosition(mxWords, te)
         return te
 
     def xmlToRehearsalMark(self, mxRehearsal):
@@ -4103,7 +4087,7 @@ class MeasureParser(XMLParserBase):
         Return a rehearsal mark from a rehearsal tag.
         '''
         rm = expressions.RehearsalMark(mxRehearsal.text.strip())
-        
+        self.setTextFormatting(mxRehearsal, rm)
         return rm
 
     def xmlToTempoIndication(self, mxMetronome, mxWords=None):
@@ -5120,7 +5104,7 @@ class Test(unittest.TestCase):
                     msg = '%s\n%s' % (n.pitch.nameWithOctave, n.duration.quarterLength)
                     te = expressions.TextExpression(msg)
                     te.style.fontSize = 14
-                    te.style.fontStyle = 'bold'
+                    te.style.fontWeight = 'bold'
                     te.style.justify = 'center'
                     te.style.enclosure = 'rectangle'
                     te.style.absoluteY = -80
@@ -5136,7 +5120,7 @@ class Test(unittest.TestCase):
         for m in p.getElementsByClass('Measure')[1:]:
             for pos in [1.5, 2.5]:
                 te = expressions.TextExpression(pos)
-                te.style.fontStyle = 'bold'
+                te.style.fontWeight = 'bold'
                 te.style.justify = 'center'
                 te.style.enclosure = 'rectangle'
                 m.insert(pos, te)
@@ -5156,7 +5140,7 @@ class Test(unittest.TestCase):
             offsets = offsets[:4]
             for o in offsets:
                 te = expressions.TextExpression(o)
-                te.style.fontStyle = 'bold'
+                te.style.fontWeight = 'bold'
                 te.style.justify = 'center'
                 te.style.enclosure = 'rectangle'
                 m.insert(o, te)
@@ -5914,10 +5898,23 @@ class Test(unittest.TestCase):
         r = sch.parts[1].measure(1).notesAndRests[0]
         self.assertEqual(r.duration.type, 'quarter')
         self.assertTrue(r.fullMeasure is not True)
+        
+    def testRehearsalMarks(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.directions31a, forceSource=True)
+        rmIterator = s.recurse().getElementsByClass('RehearsalMark')
+        self.assertEqual(len(rmIterator), 4)
+        self.assertEqual(rmIterator[0].content, 'A')
+        self.assertEqual(rmIterator[1].content, 'B')
+        self.assertEqual(rmIterator[1].style.enclosure, None)
+        self.assertEqual(rmIterator[2].content, 'Test')
+        self.assertEqual(rmIterator[2].style.enclosure, 'square')
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='testPickupMeasureRestSchoenberg')
+    music21.mainTest(Test) #, runTest='testRehearsalMarks')
 
 
 

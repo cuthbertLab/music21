@@ -150,6 +150,8 @@ class RehearsalMark(Expression):
             raise ExpressionException(
                 'Numbering must be "alphabetical", "roman", "number", or None')
         self.numbering = numbering
+        self.style.alignHorizontal = 'center'
+        self.style.alignVertical = 'middle'
 
     def __repr__(self):
         return '<music21.expressions.%s %s>' % (self.__class__.__name__, repr(self.content))
@@ -293,7 +295,8 @@ class TextExpression(Expression):
     >>> te.style.fontSize = 24.0
     >>> te.style.fontSize
     24
-    >>> te.style.fontStyle = 'bolditalic'
+    >>> te.style.fontStyle = 'italic'
+    >>> te.style.fontWeight = 'bold'
     >>> te.style.letterSpacing = 0.5
     '''
 

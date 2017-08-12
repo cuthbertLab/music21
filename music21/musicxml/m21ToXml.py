@@ -701,6 +701,39 @@ class XMLExporterBase:
 
 
     #### style attributes
+
+    def setStyleAttributes(self, mxObject, m21Object, musicXMLNames, m21Names):
+        '''
+        Sets any attribute from .style, doing some conversions.
+        '''
+        if m21Object.hasStyleInformation is False:
+            return
+        stObj = m21Object.style
+
+        for xmlName, m21Name in zip(musicXMLNames, m21Names):
+            try:
+                m21Value = getattr(stObj, m21Name)
+            except AttributeError:
+                continue
+
+            if m21Name in xmlObjects.STYLE_ATTRIBUTES_STR_NONE_TO_NONE and m21Value is None:
+                m21Value = 'none'
+            if m21Name in xmlObjects.STYLE_ATTRIBUTES_YES_NO_TO_BOOL:
+                m21Value = xmlObjects.booleanToYesNo(m21Value)
+
+            if m21Value is None:
+                continue
+            
+            
+            
+            try:
+                m21Value = str(m21Value)
+            except ValueError:
+                continue
+
+            mxObject.set(xmlName, m21Value)
+
+
     def setTextFormatting(self, mxObject, m21Object):
         '''
         sets the justification, print-style-align group, and
@@ -769,8 +802,8 @@ class XMLExporterBase:
         >>> XB.dump(mxObj)
         <text font-family="Courier,monospaced" font-size="24" font-style="italic">hi</text>
         '''
-        musicXMLNames = ['font-style', 'font-size', 'font-weight']
-        m21Names = ['fontStyle', 'fontSize', 'fontWeight']
+        musicXMLNames = ('font-style', 'font-size', 'font-weight')
+        m21Names = ('fontStyle', 'fontSize', 'fontWeight')
         self.setStyleAttributes(mxObject, m21Object, musicXMLNames, m21Names)
         if (m21Object.hasStyleInformation and hasattr(m21Object.style, 'fontFamily')
                 and m21Object.style.fontFamily):
@@ -787,29 +820,6 @@ class XMLExporterBase:
         musicXMLNames = ('default-x', 'default-y', 'relative-x', 'relative-y')
         m21Names = ('absoluteX', 'absoluteY', 'relativeX', 'relativeY')
         self.setStyleAttributes(mxObject, m21Object, musicXMLNames, m21Names)
-
-    def setStyleAttributes(self, mxObject, m21Object, musicXMLNames, m21Names):
-        '''
-        Sets any attribute from .style
-        '''
-        if m21Object.hasStyleInformation is False:
-            return
-        stObj = m21Object.style
-
-        for xmlName, m21Name in zip(musicXMLNames, m21Names):
-            try:
-                m21Value = getattr(stObj, m21Name)
-            except AttributeError:
-                continue
-
-            if m21Value is None:
-                continue
-            try:
-                m21Value = str(m21Value)
-            except ValueError:
-                continue
-
-            mxObject.set(xmlName, m21Value)
 
     def setEditorial(self, mxObject, m21Object):
         '''
@@ -2385,7 +2395,10 @@ class MeasureExporter(XMLExporterBase):
                 ('MetricModulation', 'tempoIndicationToXml'),
                 ('TextExpression', 'textExpressionToXml'),
                 ('RepeatExpression', 'textExpressionToXml'),
+                ('RehearsalMark', 'rehearsalMarkToXml'),
                ])
+    
+    # these need to be wrapped in an attributes tag if not at the beginning of the measure.
     wrapAttributeMethodClasses = OrderedDict(
         [('Clef', 'clefToXml'),
          ('KeySignature', 'keySignatureToXml'),
@@ -4419,9 +4432,9 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxCodaText)
         <direction>
           <direction-type>
-            <words default-y="20" justify="center">Coda</words>
+            <words default-y="20" enclosure="none" halign="left" 
+                justify="center" valign="top">Coda</words>
           </direction-type>
-          <offset>0</offset>
         </direction>
         '''
         if coda.useSymbol:
@@ -4463,9 +4476,9 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(MEX.xmlRoot.findall('direction')[1])
         <direction>
           <direction-type>
-            <words default-y="45" font-weight="bold" justify="left">slow</words>
+            <words default-y="45" enclosure="none" font-style="bold" halign="left" 
+                justify="left" valign="top">slow</words>
           </direction-type>
-          <offset>0</offset>
         </direction>
 
 
@@ -4606,6 +4619,32 @@ class MeasureExporter(XMLExporterBase):
 
         return mxDirection
 
+
+    def rehearsalMarkToXml(self, rm):
+        '''
+        Convert a RehearsalMark object to a MusicXML <direction> tag with a <rehearsal> tag
+        inside it.
+
+        >>> rm = expressions.RehearsalMark('II')
+        >>> rm.style.enclosure = 'square'
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> mxRehearsal = MEX.rehearsalMarkToXml(rm)
+        >>> MEX.dump(mxRehearsal)
+        <direction>
+          <direction-type>
+            <rehearsal enclosure="square" halign="center" valign="middle">II</rehearsal>
+            </direction-type>
+          </direction>
+        '''
+        mxRehearsal = Element('rehearsal')
+        self.setTextFormatting(mxRehearsal, rm)
+        mxRehearsal.text = str(rm.content)
+        mxDirection = self.placeInDirection(mxRehearsal, rm)
+        
+        self.xmlRoot.append(mxDirection)
+        return mxDirection
+
+
     def textExpressionToXml(self, teOrRe):
         '''
         Convert a TextExpression or RepreatExpression to a MusicXML mxDirection type.
@@ -4619,29 +4658,12 @@ class MeasureExporter(XMLExporterBase):
             te = teOrRe.getTextExpression()
             mxWords.text = str(te.content)
 
-        for src, dst in [(te.style.absoluteX, 'default-x'),
-                         (te.style.absoluteY, 'default-y'),
-                         (te.style.relativeX, 'relative-x'),
-                         (te.style.relativeY, 'relative-y'),
-                         (te.style.enclosure, 'enclosure'),
-                         (te.style.justify, 'justify'),
-                         (te.style.fontSize, 'font-size'),
-                         (te.style.letterSpacing, 'letter-spacing'),
-                     ]:
-            if src is not None:
-                mxWords.set(dst, str(src))
-        if te.style.fontStyle is not None and te.style.fontStyle.lower() == 'bolditalic':
-            mxWords.set('font-style', 'italic')
-            mxWords.set('font-weight', 'bold')
-        elif te.style.fontStyle == 'italic':
-            mxWords.set('font-style', 'italic')
-        elif te.style.fontStyle == 'bold':
-            mxWords.set('font-weight', 'bold')
+        self.setTextFormatting(mxWords, te)
 
         mxDirection = self.placeInDirection(mxWords, te)
-        # for complete old compatibility...
-        mxOffset = SubElement(mxDirection, 'offset')
-        mxOffset.text = str(0)
+        ## for complete old compatibility...
+        #mxOffset = SubElement(mxDirection, 'offset')
+        #mxOffset.text = str(0)
 
         self.xmlRoot.append(mxDirection)
         return mxDirection

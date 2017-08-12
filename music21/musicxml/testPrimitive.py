@@ -1764,7 +1764,7 @@ directions31a = """<?xml version="1.0" encoding="UTF-8"?>
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><syllabic>continue</syllabic><text>change</text></lyric>
+        <lyric number="1"><syllabic>middle</syllabic><text>change</text></lyric>
       </note>
       <note>
         <pitch><step>C</step><octave>4</octave></pitch>
@@ -2638,7 +2638,7 @@ notations32a = """<?xml version="1.0" encoding="UTF-8"?>
             <wavy-line placement="below" type="start"/>
           </ornaments>
         </notations>
-        <lyric number="1"><syllabic>continue</syllabic><text>wavy</text></lyric>
+        <lyric number="1"><syllabic>middle</syllabic><text>wavy</text></lyric>
       </note>
       <note>
         <pitch>

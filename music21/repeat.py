@@ -120,11 +120,14 @@ class RepeatExpression(RepeatMark, expressions.Expression):
             self._textExpression.content = value
 
     def applyTextFormatting(self, te=None):
-        '''Apply the default text formatting to the text expression version of of this repeat
+        '''
+        Apply the default text formatting to the text expression version of of this repeat
         '''
         if te is None: # use the stored version if possible
             te = self._textExpression
-        te.justify = self._textJustification
+            
+        if te is not None:
+            te.style.justify = self.style.justify
         return te
 
     def setTextExpression(self, value):
@@ -137,10 +140,9 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         self.applyTextFormatting()
 
     def getTextExpression(self):
-        '''Return a copy of the TextExpression stored in this object.
         '''
-        # whenever getting, set justifation
-        #self._textJustification
+        Return a copy of the TextExpression stored in this object.
+        '''
         if self._textExpression is None:
             return None
         else:
@@ -174,7 +176,7 @@ class RepeatExpressionMarker(RepeatExpression):
     def __init__(self):
         super().__init__()
         # these are generally centered
-        self._textJustification = 'center'
+        self.style.justify = 'center'
 
 
 class Coda(RepeatExpressionMarker):
@@ -226,7 +228,7 @@ class Fine(RepeatExpressionMarker):
         # default text expression is coda
         self._textAlternatives = ['fine']
         self.setText(self._textAlternatives[0])
-        self._textJustification = 'right'
+        self.style.justify = 'right'
 
 
 
@@ -246,7 +248,7 @@ class RepeatExpressionCommand(RepeatExpression):
         self.repeatAfterJump = False
         # generally these should be right aligned, as they are placed
         # at the end of the measure they alter
-        self._textJustification = 'right'
+        self.style.justify = 'right'
 
 
 class DaCapo(RepeatExpressionCommand):
