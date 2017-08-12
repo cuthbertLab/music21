@@ -656,7 +656,7 @@ class KeySignature(base.Music21Object):
 
     #---------------------------------------------------------------------------
     # methods
-    def transpose(self, value, inPlace=False):
+    def transpose(self, value, *, inPlace=False):
         '''
         Transpose the KeySignature by the user-provided value.
         If the value is an integer, the transposition is treated
@@ -1087,7 +1087,7 @@ class Key(KeySignature, scale.DiatonicScale):
             return self._tonalCertainityCorrelationCoefficient(
                     args, keywords)
 
-    def transpose(self, value, inPlace=False):
+    def transpose(self, value, *, inPlace=False):
         '''
         Transpose the Key by the user-provided value.
         If the value is an integer, the transposition is treated
@@ -1139,10 +1139,10 @@ class Key(KeySignature, scale.DiatonicScale):
 
         '''
         if inPlace is True:
-            super().transpose(value, inPlace)
+            super().transpose(value, inPlace=inPlace)
             post = self
         else:
-            post = super().transpose(value, inPlace)
+            post = super().transpose(value, inPlace=inPlace)
 
         postKey = post.asKey(self.mode)
         post.tonic = postKey.tonic
@@ -1151,8 +1151,6 @@ class Key(KeySignature, scale.DiatonicScale):
         # mode is already set
         if not inPlace:
             return post
-        else:
-            return None
 
 
 

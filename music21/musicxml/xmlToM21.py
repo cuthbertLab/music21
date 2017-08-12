@@ -2934,10 +2934,15 @@ class MeasureParser(XMLParserBase):
         tag = mxObj.tag
         if tag in xmlObjects.TECHNICAL_MARKS:
             tech = xmlObjects.TECHNICAL_MARKS[tag]()
-
+            _synchronizeIds(mxObj, tech)
             if tag == 'fingering':
                 self.handleFingering(tech, mxObj)
             if tag in ('handbell', 'other-technical') and mxObj.text is not None:
+                #     The handbell element represents notation for various
+                #     techniques used in handbell and handchime music. Valid
+                #     values are belltree [v3.1], damp, echo, gyro, hand martellato,
+                #     mallet lift, mallet table, martellato, martellato lift,
+                #     muted martellato, pluck lift, and swing.                
                 tech.displayText = mxObj.text
             if tag == 'harmonic':
                 self.setHarmonic(mxObj, tech)
@@ -3037,6 +3042,7 @@ class MeasureParser(XMLParserBase):
         tag = mxObj.tag
         if tag in xmlObjects.ARTICULATION_MARKS:
             artic = xmlObjects.ARTICULATION_MARKS[tag]()
+            _synchronizeIds(mxObj, artic)
 
             self.setPrintStyle(mxObj, artic)
             placement = mxObj.get('placement')
@@ -3237,6 +3243,7 @@ class MeasureParser(XMLParserBase):
             # TODO: attr line-type
             # TODO: attr dashed-formatting
             self.setPrintStyle(mxObj, gliss)
+            _synchronizeIds(mxObj, gliss)
 
         # TODO: slide?
 
@@ -3599,6 +3606,8 @@ class MeasureParser(XMLParserBase):
             l = note.Lyric()
         else:
             l = inputM21
+
+        # TODO: id when lyrics get ids...
 
         try:
             l.text = mxLyric.find('text').text.strip()

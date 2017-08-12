@@ -20,7 +20,7 @@ and other settings.
 Additional documentation for and examples of using this module are found in
 :ref:`User's Guide, Chapter 24, Environment <usersGuide_24_environment>`.
 
-# TODO: Update to user's guide
+# TODO: Update to user's guide -- showing each function
 '''
 from __future__ import print_function
 
@@ -753,6 +753,10 @@ class _EnvironmentCore:
             raise EnvironmentException('bad file path for .music21rc: %s' % filePath)
         settingsTree = self.toSettingsXML()
         etIndent(settingsTree.getroot())
+
+        ## uncomment to figure out where something in the test set is writing .music21rc
+        # import traceback
+        # traceback.print_stack()
         settingsTree.write(filePath, encoding='utf-8')
 
 
@@ -792,8 +796,9 @@ class Environment:
     the :class:`~music21.environment.UserSettings` object.
 
     >>> env = environment.Environment(forcePlatform='darwin')
-    >>> env['musicxmlPath'] = '/Applications/Finale Reader.app'
-    >>> env['musicxmlPath']
+    >>> #_DOCS_SHOW env['musicxmlPath'] = '/Applications/Finale Reader.app'
+    >>> #_DOCS_SHOW env['musicxmlPath']
+    >>> '/Applications/Finale Reader.app' #_DOCS_HIDE
     '/Applications/Finale Reader.app'
     '''
 

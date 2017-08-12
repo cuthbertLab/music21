@@ -39,7 +39,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------Public Merge Functions
-def mergeVariants(streamX, streamY, variantName='variant', inPlace=False):
+def mergeVariants(streamX, streamY, variantName='variant', *, inPlace=False):
     '''
     Takes two streams objects or their derivatives (Score, Part, Measure, etc.) which
     should be variant versions of the same stream,
@@ -165,7 +165,7 @@ def mergeVariants(streamX, streamY, variantName='variant', inPlace=False):
             "Could not determine what merging method to use. " +
             "Try using a more specific merging function.")
 
-def mergeVariantScores(aScore, vScore, variantName='variant', inPlace=False):
+def mergeVariantScores(aScore, vScore, variantName='variant', *, inPlace=False):
     '''
     Takes two scores and merges them with mergeVariantMeasureStreams, part-by-part.
 
@@ -243,7 +243,7 @@ def mergeVariantScores(aScore, vScore, variantName='variant', inPlace=False):
         return returnObj
 
 
-def mergeVariantMeasureStreams(streamX, streamY, variantName='variant', inPlace=False):
+def mergeVariantMeasureStreams(streamX, streamY, variantName='variant', *, inPlace=False):
     '''
     Takes two streams of measures and returns a stream (new if inPlace is False) with the second
     merged with the first as variants. This function differs from mergeVariantsEqualDuration by
@@ -439,7 +439,7 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName='variant', inPlace=
         return returnObj
 
 
-def mergeVariantsEqualDuration(streams, variantNames, inPlace=False):
+def mergeVariantsEqualDuration(streams, variantNames, *, inPlace=False):
     '''
     Pass this function a list of streams (they must be of the same
     length or a VariantException will be raised).
@@ -939,7 +939,7 @@ def addVariant(s, startOffset, sVariant, variantName=None,
 
 
 
-def refineVariant(s, sVariant, inPlace=False):
+def refineVariant(s, sVariant, *, inPlace=False):
     '''
     Given a stream and variant contained in that stream, returns a
     stream with that variant 'refined.'
@@ -1099,7 +1099,7 @@ def refineVariant(s, sVariant, inPlace=False):
         return returnObject
 
 
-def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, inPlace=False):
+def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, *, inPlace=False):
     '''
     There seem to be some problems with this function and it isn't well tested.
     It is not recommended to use it at this time.
@@ -1156,9 +1156,7 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, inPlace=
         addVariant(returnObject, startOffset, variantSubRegion,
                    variantGroups=[variantName], replacementDuration=replacementDuration)
 
-    if inPlace:
-        return
-    else:
+    if not inPlace:
         return returnObject
 
 def getMeasureHashes(s):
@@ -1371,7 +1369,7 @@ def _getRegionsFromStreams(streamX, streamY):
     return regions
 
 
-def _mergeVariants(streamA, streamB, containsVariants=False, variantName=None, inPlace=False):
+def _mergeVariants(streamA, streamB, *, variantName=None, inPlace=False):
     '''
     This is a helper function for mergeVariantsEqualDuration which takes two streams
     (which cannot contain container

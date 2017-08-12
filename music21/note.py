@@ -618,7 +618,7 @@ class GeneralNote(base.Music21Object):
             return None
 
     #---------------------------------------------------------------------------
-    def getGrace(self, appogiatura=False, inPlace=False):
+    def getGrace(self, *, appogiatura=False, inPlace=False):
         '''
         Return a grace version of this GeneralNote
 
@@ -1248,7 +1248,7 @@ class Note(NotRest):
         ''')
 
 
-    def transpose(self, value, inPlace=False):
+    def transpose(self, value, *, inPlace=False):
         '''
         Transpose the Note by the user-provided
         value. If the value is an integer, the transposition is treated in half steps.

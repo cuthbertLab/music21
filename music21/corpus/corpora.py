@@ -852,12 +852,13 @@ class CoreCorpus(Corpus):
         Set it to a directory:
 
         >>> coreCorpus = corpus.corpora.CoreCorpus()
-        >>> coreCorpus.manualCoreCorpusPath = '~/Desktop'
+        >>> #_DOCS_SHOW coreCorpus.manualCoreCorpusPath = '~/Desktop'
 
         Unset it:
 
-        >>> coreCorpus.manualCoreCorpusPath = None
-        >>> coreCorpus.manualCoreCorpusPath is None
+        >>> #_DOCS_SHOW coreCorpus.manualCoreCorpusPath = None
+        >>> #_DOCS_SHOW coreCorpus.manualCoreCorpusPath is None
+        >>> True #_DOCS_HIDE
         True
 
         '''
@@ -867,7 +868,7 @@ class CoreCorpus(Corpus):
         return None
 
     @manualCoreCorpusPath.setter
-    def manualCoreCorpusPath(self, expr):
+    def manualCoreCorpusPath(self, expr): # pragma: no cover
         userSettings = environment.UserSettings()
         if expr is not None:
             path = common.cleanpath(expr)

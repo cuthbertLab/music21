@@ -1902,9 +1902,9 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD=None, printUpdates=F
     return newStream
 
 #------------------------------------------------------------
-def setBarlineStyle(score, newStyle, oldStyle='regular', inPlace=False):
+def setBarlineStyle(score, newStyle, oldStyle='regular', *, inPlace=False):
     '''
-    Converts any right barlines in the previous style (oldStyle; default = 'regular')
+    Converts any right barlines in the previous style (oldStyle; default='regular')
     to have the newStyle (such as 'tick', 'none', etc., see bar.py).
 
     Leaves alone any other barline types (such as
@@ -1927,7 +1927,7 @@ def setBarlineStyle(score, newStyle, oldStyle='regular', inPlace=False):
                     barline.style = newStyle
     return score
 
-def scaleDurations(score, scalingNum=1, inPlace=False, scaleUnlinked=True):
+def scaleDurations(score, scalingNum=1, *, inPlace=False, scaleUnlinked=True):
     '''
     scale all notes and TimeSignatures by the scaling amount.
 
@@ -1964,7 +1964,7 @@ def scaleDurations(score, scalingNum=1, inPlace=False, scaleUnlinked=True):
         p.makeBeams(inPlace=True)
     return score
 
-def transferTies(score, inPlace=False):
+def transferTies(score, *, inPlace=False):
     '''
     transfer the duration of tied notes (if possible) to the first note and
     fill the remaining places

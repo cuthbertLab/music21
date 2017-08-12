@@ -819,7 +819,7 @@ class GenericInterval(IntervalBase):
         else:
             return GenericInterval(self.undirected * (-1 * self.direction))
 
-    def transposePitch(self, p, inPlace=False):
+    def transposePitch(self, p, *, inPlace=False):
         '''
         transpose a pitch, retaining the accidental if any.
 
@@ -858,7 +858,7 @@ class GenericInterval(IntervalBase):
         if not inPlace:
             return newPitch
 
-    def transposePitchKeyAware(self, p, k=None, inPlace=False):
+    def transposePitchKeyAware(self, p, k=None, *, inPlace=False):
         '''
         Transposes a pitch while remaining aware of its key context,
         for modal transposition:
@@ -929,7 +929,7 @@ class GenericInterval(IntervalBase):
         from music21 import pitch
 
         if k is None:
-            return self.transposePitch(p, inPlace)
+            return self.transposePitch(p, inPlace=inPlace)
 
 
         accidentalByStep = k.accidentalByStep(p.step)
@@ -937,7 +937,7 @@ class GenericInterval(IntervalBase):
         pAlter = p.accidental.alter if p.accidental is not None else 0
         offsetFromKey = pAlter - stepAlter
 
-        newPitch = self.transposePitch(p, inPlace)
+        newPitch = self.transposePitch(p, inPlace=inPlace)
         if inPlace is True:
             newPitch = p
 

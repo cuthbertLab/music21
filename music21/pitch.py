@@ -2052,7 +2052,7 @@ class Pitch:
         return post
 
 
-    def convertQuarterTonesToMicrotones(self, inPlace=True):
+    def convertQuarterTonesToMicrotones(self, *, inPlace=False):
         '''
         Convert any quarter tone Accidentals to Microtones.
 
@@ -2099,14 +2099,12 @@ class Pitch:
                 returnObj.accidental = -1.0
                 returnObj.microtone = returnObj.microtone.cents - 50 # in cents
 
-        if inPlace:
-            return None
-        else:
+        if not inPlace:
             return returnObj
 
 
 
-    def convertMicrotonesToQuarterTones(self, inPlace=True):
+    def convertMicrotonesToQuarterTones(self, *, inPlace=False):
         '''
         Convert any Microtones available to quarter tones, if possible.
 
@@ -2148,9 +2146,7 @@ class Pitch:
             returnObj.accidental = Accidental(alterShift)
         returnObj.microtone = cents
 
-        if inPlace:
-            return None
-        else:
+        if not inPlace:
             return returnObj
 
     #---------------------------------------------------------------------------
@@ -3688,7 +3684,7 @@ class Pitch:
                 self.octave = p.octave
             return None
 
-    def getHigherEnharmonic(self, inPlace=False):
+    def getHigherEnharmonic(self, *, inPlace=False):
         '''
         Returns an enharmonic `Pitch` object that is a higher
         enharmonic.  That is, the `Pitch` a diminished-second above
@@ -3738,7 +3734,7 @@ class Pitch:
         '''
         return self._getEnharmonicHelper(inPlace, 'd2')
 
-    def getLowerEnharmonic(self, inPlace=False):
+    def getLowerEnharmonic(self, *, inPlace=False):
         '''
         returns a Pitch enharmonic that is a diminished second
         below the current note
@@ -3768,7 +3764,7 @@ class Pitch:
         '''
         return self._getEnharmonicHelper(inPlace, '-d2')
 
-    def simplifyEnharmonic(self, inPlace=False, mostCommon=False):
+    def simplifyEnharmonic(self, *, inPlace=False, mostCommon=False):
         '''
         Returns a new Pitch (or sets the current one if inPlace is True)
         that is either the same as the current pitch or has fewer
@@ -3861,7 +3857,7 @@ class Pitch:
             return returnObj
 
 
-    def getEnharmonic(self, inPlace=False):
+    def getEnharmonic(self, *, inPlace=False):
         '''
         Returns a new Pitch that is the(/an) enharmonic equivalent of this Pitch.
         Can be thought of as flipEnharmonic or something like that.
@@ -4129,7 +4125,7 @@ class Pitch:
     diatonicNoteNum = property(_getDiatonicNoteNum, _setDiatonicNoteNum,
         doc = _getDiatonicNoteNum.__doc__)
 
-    def transpose(self, value, inPlace=False):
+    def transpose(self, value, *, inPlace=False):
         '''
         Transpose the pitch by the user-provided value.  If the value is an
         integer, the transposition is treated in half steps. If the value is a
@@ -4243,7 +4239,7 @@ class Pitch:
     #---------------------------------------------------------------------------
     # utilities for pitch object manipulation
 
-    def transposeBelowTarget(self, target, minimize=False, inPlace=False):
+    def transposeBelowTarget(self, target, *, minimize=False, inPlace=False):
         '''
         Given a source Pitch, shift it down some number of octaves until it is below the
         target.
@@ -4318,7 +4314,7 @@ class Pitch:
         if not inPlace:
             return src
 
-    def transposeAboveTarget(self, target, minimize=False, inPlace=False):
+    def transposeAboveTarget(self, target, *, minimize=False, inPlace=False):
         '''
         Given a source Pitch, shift it up octaves until it is above the target.
 

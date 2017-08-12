@@ -59,7 +59,7 @@ from music21 import meter
 from music21 import note
 from music21 import stream
 
-def reverse(self, inPlace=False,
+def reverse(self, *, inPlace=False,
                 classesToMove=(key.KeySignature, meter.TimeSignature, clef.Clef,
                                  metadata.Metadata, instrument.Instrument, layout.SystemLayout),
                 makeNotation=False,
@@ -121,7 +121,7 @@ def reverse(self, inPlace=False,
     else:
         return returnObj
 
-def prependBlankMeasures(myStream, measuresToAppend=1, inPlace=False):
+def prependBlankMeasures(myStream, measuresToAppend=1, *, inPlace=False):
     '''
     adds one (default) or more blank measures (filled with
     rests) to be beginning of myStream

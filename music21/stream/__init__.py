@@ -9622,11 +9622,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     #---------------------------------------------------------------------------
     # voice processing routines
-    def makeVoices(self, inPlace=True, fillGaps=True):
+    def makeVoices(self, *, inPlace=False, fillGaps=True):
         '''
         If this Stream has overlapping Notes or Chords, this method will isolate
         all overlaps in unique Voices, and place those Voices in the Stream.
-
 
         >>> s = stream.Stream()
         >>> s.insert(0, note.Note('C4', quarterLength=4))
@@ -9638,8 +9637,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         [<music21.pitch.Pitch C4>]
         >>> [str(n.pitch) for n in s.voices[1].notes]
         ['B-4', 'B-4', 'B-4', 'B-4', 'B-4', 'B-4', 'B-4', 'B-4']
-
-        TODO: by default inPlace should be False
         '''
         # this method may not always
         # produce the optimal voice assignment based on context (register
@@ -9697,7 +9694,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # elements changed will already have been called
         if not inPlace:
             return returnObj
-        return None
 
     def voicesToParts(self):
         '''
@@ -9865,7 +9861,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         return self.voicesToParts()
 
-    def flattenUnnecessaryVoices(self, force=False, *, inPlace=False):
+    def flattenUnnecessaryVoices(self, *, force=False, inPlace=False):
         '''
         If this Stream defines one or more internal voices, do the following:
 
@@ -12377,14 +12373,12 @@ class Score(Stream):
         orderedOffsetMap = collections.OrderedDict(sorted(offsetMap.items(), key=lambda o: o[0]))
         return orderedOffsetMap
 
-    def sliceByGreatestDivisor(self, inPlace=True, addTies=True):
+    def sliceByGreatestDivisor(self, *, addTies=True, inPlace=False):
         '''
         Slice all duration of all part by the minimum duration
         that can be summed to each concurrent duration.
 
         Overrides method defined on Stream.
-
-        TODO: by default inPlace should be False
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
@@ -12427,7 +12421,8 @@ class Score(Stream):
                     target=None, addTies=addTies, inPlace=True)
         del mStream # cleanup Streams
         returnObj.coreElementsChanged()
-        return returnObj
+        if not inPlace:
+            return returnObj
 
     def partsToVoices(self, voiceAllocation=2, permitOneVoicePerPart=False, setStems=True):
         '''

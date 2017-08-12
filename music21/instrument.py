@@ -36,7 +36,7 @@ from music21 import environment
 _MOD = "instrument.py"
 environLocal = environment.Environment(_MOD)
 
-def unbundleInstruments(streamIn, inPlace=False):
+def unbundleInstruments(streamIn, *, inPlace=False):
     '''
     takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.Unpitched` objects
     and moves their `.storedInstrument` attributes to a new Stream (unless inPlace=True)
@@ -70,7 +70,7 @@ def unbundleInstruments(streamIn, inPlace=False):
     if inPlace is False:
         return s
 
-def bundleInstruments(streamIn, inPlace=False):
+def bundleInstruments(streamIn, *, inPlace=False):
     '''
     >>> up1 = note.Unpitched()
     >>> up1.storedInstrument = instrument.BassDrum()

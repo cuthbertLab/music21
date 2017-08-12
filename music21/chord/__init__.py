@@ -537,7 +537,7 @@ class Chord(note.NotRest):
             return [n.pitch for n in deleteComponents]
 
     ### PUBLIC METHODS ###
-    def _append_core_or_init(self, notes, useDuration=None):
+    def _append_core_or_init(self, notes, *, useDuration=None):
         '''
         This is the private append method called by .append and called by __init__.
         
@@ -589,7 +589,7 @@ class Chord(note.NotRest):
 
         return useDuration
 
-    def add(self, notes, runSort=True):
+    def add(self, notes, *, runSort=True):
         '''
         Add a note, pitch, the notes of another chord, or string representing a pitch, 
         or a list of any of the above to a Chord.  
@@ -708,7 +708,7 @@ class Chord(note.NotRest):
         except ValueError:
             raise ValueError('Chord.remove(x), x not in chord')
 
-    def annotateIntervals(self, inPlace=True, stripSpecifiers=True,
+    def annotateIntervals(self, *, inPlace=True, stripSpecifiers=True,
                           sortPitches=True, returnList=False):
         '''
         Add lyrics to the chord that show the distance of each note from
@@ -836,7 +836,7 @@ class Chord(note.NotRest):
             return True
         return False
 
-    def bass(self, newbass=None, find=True):
+    def bass(self, newbass=None, *, find=True):
         '''
         Return the bass Pitch or set it to the given Pitch:
 
@@ -942,7 +942,7 @@ class Chord(note.NotRest):
         else:
             return False
 
-    def closedPosition(self, forceOctave=None, inPlace=False, leaveRedundantPitches=False):
+    def closedPosition(self, *, forceOctave=None, inPlace=False, leaveRedundantPitches=False):
         '''
         Returns a new Chord object with the same pitch classes,
         but now in closed position.
@@ -970,18 +970,18 @@ class Chord(note.NotRest):
         Redundant pitches are removed by default, but can be retained...
 
         >>> c4 = chord.Chord(["C#4", "C5", "F7", "F8"])
-        >>> c5 = c4.closedPosition(4, inPlace=False)
+        >>> c5 = c4.closedPosition(forceOctave=4, inPlace=False)
         >>> c5
         <music21.chord.Chord C#4 F4 C5>
 
-        >>> c6 = c4.closedPosition(4, inPlace=False, leaveRedundantPitches=True)
+        >>> c6 = c4.closedPosition(forceOctave=4, inPlace=False, leaveRedundantPitches=True)
         >>> c6
         <music21.chord.Chord C#4 F4 F4 C5>
 
         Implicit octaves work fine...
 
         >>> c7 = chord.Chord(["A4", "B4", "A"])
-        >>> c7.closedPosition(4, inPlace=True)
+        >>> c7.closedPosition(forceOctave=4, inPlace=True)
         >>> c7
         <music21.chord.Chord A4 B4>
 
@@ -1228,7 +1228,7 @@ class Chord(note.NotRest):
         for i, p in enumerate(closedChord.pitches):
             currentListOfThirds = []
             for chordStepTest in (3, 5, 7, 2, 4, 6):
-                if closedChord.getChordStep(chordStepTest, p):
+                if closedChord.getChordStep(chordStepTest, testRoot=p):
                     currentListOfThirds.append(True)
                 else:
                     currentListOfThirds.append(False)
@@ -1321,7 +1321,7 @@ class Chord(note.NotRest):
             intervalSum += geomNormChord[i]
         return geomNormChordPitches
 
-    def getChordStep(self, chordStep, testRoot=None):
+    def getChordStep(self, chordStep, *, testRoot=None):
         '''
         Returns the (first) pitch at the provided scaleDegree (Thus, it's
         exactly like semitonesFromChordStep, except it instead of the number of
@@ -1578,7 +1578,7 @@ class Chord(note.NotRest):
         # c2.getZRelation()  # returns a list in non-ET12 space...
         # <music21.chord.ForteSet at 0x234892>
 
-    def hasAnyRepeatedDiatonicNote(self, testRoot=None):
+    def hasAnyRepeatedDiatonicNote(self, *, testRoot=None):
         '''
         Returns True if for any diatonic note (e.g., C or C# = C) there are two or more
         different notes (such as E and E-) in the chord. If there are no repeated
@@ -1597,7 +1597,7 @@ class Chord(note.NotRest):
 
         '''
         for i in range(1, 8): ## == 1 - 7 inclusive
-            if self.hasRepeatedChordStep(i, testRoot):
+            if self.hasRepeatedChordStep(i, testRoot=testRoot):
                 return True
         return False
 
@@ -1645,7 +1645,7 @@ class Chord(note.NotRest):
             #environLocal.printDebug(['hasComponentVolumes:', False])
             return False
 
-    def hasRepeatedChordStep(self, chordStep, testRoot=None):
+    def hasRepeatedChordStep(self, chordStep, *, testRoot=None):
         '''
         Returns True if chordStep above testRoot (or self.root()) has two
         or more different notes (such as E and E-) in it.  Otherwise
@@ -1673,7 +1673,7 @@ class Chord(note.NotRest):
 
         return False
 
-    def intervalFromChordStep(self, chordStep, testRoot=None):
+    def intervalFromChordStep(self, chordStep, *, testRoot=None):
         '''
         Exactly like semitonesFromChordStep, except it returns the interval
         itself instead of the number of semitones:
@@ -1702,7 +1702,7 @@ class Chord(note.NotRest):
                 return thisInterval
         return None
 
-    def inversion(self, newInversion=None, find=True, testRoot=None, transposeOnSet=True):
+    def inversion(self, newInversion=None, *, find=True, testRoot=None, transposeOnSet=True):
         '''
         Returns an integer representing which inversion (if any) the chord is in. Chord
         does not have to be complete, but determines the inversion by looking at the relationship
@@ -2859,7 +2859,7 @@ class Chord(note.NotRest):
                 return False
         return True
 
-    def removeRedundantPitches(self, inPlace=True):
+    def removeRedundantPitches(self, *, inPlace=True):
         '''
         Remove all but one instance of a pitch that appears twice.
 
@@ -2926,7 +2926,7 @@ class Chord(note.NotRest):
         return self._removePitchByRedundantAttribute('nameWithOctave',
                                                      inPlace=inPlace)
 
-    def removeRedundantPitchClasses(self, inPlace=True):
+    def removeRedundantPitchClasses(self, *, inPlace=True):
         '''
         Remove all but the FIRST instance of a pitch class with more than one
         instance of that pitch class.
@@ -2949,7 +2949,7 @@ class Chord(note.NotRest):
         return self._removePitchByRedundantAttribute('pitchClass',
               inPlace=inPlace)
 
-    def removeRedundantPitchNames(self, inPlace=True):
+    def removeRedundantPitchNames(self, *, inPlace=True):
         '''
         Remove all but the FIRST instance of a pitch class with more than one
         instance of that pitch name regardless of octave (but note that
@@ -3017,7 +3017,7 @@ class Chord(note.NotRest):
         else:
             return None
 
-    def semiClosedPosition(self, forceOctave=None, inPlace=False, leaveRedundantPitches=False):
+    def semiClosedPosition(self, *, forceOctave=None, inPlace=False, leaveRedundantPitches=False):
         '''
         Similar to :meth:`~music21.chord.Chord.ClosedPosition` in that it
         moves everything within an octave EXCEPT if there's already
@@ -3049,10 +3049,9 @@ class Chord(note.NotRest):
         <music21.chord.Chord C2 E-2 G2 C3 E3 C#4 E#4>
 
         '''
-        if inPlace is False:
-            c2 = self.closedPosition(forceOctave, inPlace, leaveRedundantPitches)
-        else:
-            self.closedPosition(forceOctave, inPlace, leaveRedundantPitches)
+        c2 = self.closedPosition(forceOctave=forceOctave, 
+                                 inPlace=inPlace, leaveRedundantPitches=leaveRedundantPitches)
+        if inPlace is True:
             c2 = self
         #startOctave = c2.bass().octave
         remainingPitches = copy.copy(c2.pitches) # no deepcopy needed
@@ -3150,7 +3149,7 @@ class Chord(note.NotRest):
 
 
         '''
-        tempInt = self.intervalFromChordStep(chordStep, testRoot)
+        tempInt = self.intervalFromChordStep(chordStep, testRoot=testRoot)
         if tempInt is None:
             return None
         else:

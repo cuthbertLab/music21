@@ -400,7 +400,7 @@ repeatExpressionReference = [Coda(), Segno(), Fine(), DaCapo(), DaCapoAlFine(),
 
 
 #-------------------------------
-def insertRepeatEnding(s, start, end, endingNumber=1, inPlace=False):
+def insertRepeatEnding(s, start, end, endingNumber=1, *, inPlace=False):
     '''
     Designates a range of measures as being repeated endings (i.e. first and second endings)
     within a stream s, where s either contains measures,
@@ -458,7 +458,7 @@ def insertRepeatEnding(s, start, end, endingNumber=1, inPlace=False):
         return s
 
 
-def insertRepeat(s, start, end, inPlace=False):
+def insertRepeat(s, start, end, *, inPlace=False):
     '''
     Given a stream s, inserts a start-repeat at the beginning of the
     bar specified by start and inserts an end-repeat at the bar specified
@@ -502,7 +502,7 @@ def insertRepeat(s, start, end, inPlace=False):
 
     if not s.hasMeasures():
         for part in s.parts:
-            insertRepeat(part, start, end, True)
+            insertRepeat(part, start, end, inPlace=True)
         if inPlace:
             return
         else:
@@ -520,7 +520,7 @@ def insertRepeat(s, start, end, inPlace=False):
     else:
         return s
 
-def deleteMeasures(s, toDelete, inPlace=False, correctMeasureNumbers=True):
+def deleteMeasures(s, toDelete, *, inPlace=False, correctMeasureNumbers=True):
     '''
     Given a Stream `s` and a list of numbers, toDelete, removes each measure with a number
     corresponding to a number in toDelete and then renumbers the remaining measures in the Stream.
@@ -552,7 +552,7 @@ def deleteMeasures(s, toDelete, inPlace=False, correctMeasureNumbers=True):
 
     >>> chorale2 = corpus.parse('bwv101.7.mxl')
     >>> s = deepcopy(chorale2)
-    >>> repeat.deleteMeasures(s, [3, 4, 5], True)
+    >>> repeat.deleteMeasures(s, [3, 4, 5], inPlace=True)
     >>> m2 = search.translateStreamToString(chorale2.parts[0].measure(2).notesAndRests)
     >>> resm2 = search.translateStreamToString(s.parts[0].measure(2).notesAndRests)
     >>> m3 = search.translateStreamToString(chorale2.parts[0].measure(3).notesAndRests)
@@ -2292,7 +2292,7 @@ class RepeatFinder:
         return realRes
 
 
-    def simplify(self, repeatThreshold=4, repeatEndingThreshold=3, inPlace=False):
+    def simplify(self, repeatThreshold=4, repeatEndingThreshold=3, *, inPlace=False):
         '''
         Takes the piece stored in the RepeatFinder object and collapses repeated sections by
         replacing them with repeat signs. Includes first and second endings where appropriate.
@@ -2472,26 +2472,24 @@ class RepeatFinder:
 
         for startingBar, firstEndingBar, repeatSignBar in repeatEndingBars:
             #print startingBar, firstEndingBar, repeatSignBar
-            insertRepeat(s, startingBar, repeatSignBar, True)
+            insertRepeat(s, startingBar, repeatSignBar, inPlace=True)
             lengthOfRepeatEnding = repeatSignBar - firstEndingBar + 1
             lengthOfRepeatedSection = firstEndingBar - startingBar + 1
             startOfSecondEnding = repeatSignBar + lengthOfRepeatedSection
-            insertRepeatEnding(s, firstEndingBar, repeatSignBar, 1, True)
+            insertRepeatEnding(s, firstEndingBar, repeatSignBar, 1, inPlace=True)
             insertRepeatEnding(s,
                                startOfSecondEnding,
                                startOfSecondEnding + lengthOfRepeatEnding,
                                2,
-                               True)
+                               inPlace=True)
 
         for startBar, endBar in repeatBars:
-            insertRepeat(s, startBar, endBar, True)
+            insertRepeat(s, startBar, endBar, inPlace=True)
 
         #might want to look at stream._removeOrExpand and stream._fixMeasureNumbers
-        deleteMeasures(s, toDelete, True, correctMeasureNumbers=self.correctMeasureNumbers)
+        deleteMeasures(s, toDelete, inPlace=True, correctMeasureNumbers=self.correctMeasureNumbers)
 
-        if inPlace:
-            return
-        else:
+        if not inPlace:
             return s
 
     def getSimilarMeasureGroups(self, threshold=1):

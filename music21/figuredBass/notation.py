@@ -510,10 +510,10 @@ class Modifier:
         'C'
         '''
         pitchToAlter = pitch.Pitch(pitchNameToAlter)
-        self.modifyPitch(pitchToAlter, True)
+        self.modifyPitch(pitchToAlter, inPlace=True)
         return pitchToAlter.name
 
-    def modifyPitch(self, pitchToAlter, inPlace=False):
+    def modifyPitch(self, pitchToAlter, *, inPlace=False):
         '''
         Given a :class:`~music21.pitch.Pitch`, modify its :attr:`~music21.pitch.Pitch.accidental`
         given the Modifier's :attr:`~music21.figuredBass.notation.Modifier.accidental`.

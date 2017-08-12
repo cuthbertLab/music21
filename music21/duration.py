@@ -2157,7 +2157,7 @@ class Duration(SlottedObjectMixin):
         '''
         return self._components
 
-    def splitDotGroups(self, inPlace=False):
+    def splitDotGroups(self, *, inPlace=False):
         '''
         splits a dotGroup-duration (of 1 component) into a new duration of two
         components.  Returns a new duration
@@ -2220,8 +2220,6 @@ class Duration(SlottedObjectMixin):
          DurationTuple(type='eighth', dots=1, quarterLength=0.75),
          DurationTuple(type='16th', dots=1, quarterLength=0.375))
 
-
-
         Does NOT handle tuplets etc.
         '''
         t = self.type
@@ -2243,19 +2241,6 @@ class Duration(SlottedObjectMixin):
 
         if not inPlace:
             return d
-#         dG = self.dotGroups
-#         if len(dG) < 2:
-#             return copy.deepcopy(self)
-#         else:
-#             newDuration = copy.deepcopy(self)
-#             newDuration.dotGroups = [0]
-#             newDuration.components[0].dots = dG[0]
-#             for i in range(1, len(dG)):
-#                 newComponent = copy.deepcopy(newDuration.components[i - 1])
-#                 newComponent.type = nextSmallerType(newDuration.components[i - 1].type)
-#                 newComponent.dots = dG[i]
-#                 newDuration.components.append(newComponent)
-#             return newDuration
 
 
     def updateQuarterLength(self):

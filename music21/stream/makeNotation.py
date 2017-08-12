@@ -31,7 +31,7 @@ environLocal = environment.Environment(__file__)
 #------------------------------------------------------------------------------
 
 
-def makeBeams(s, inPlace=False):
+def makeBeams(s, *, inPlace=False):
     '''
     Return a new Measure, or Stream of Measures, with beams applied to all
     notes. Measures with Voices will process voices independently.
@@ -1173,7 +1173,7 @@ def makeTies(s,
         return None
 
 
-def makeTupletBrackets(s, inPlace=False):
+def makeTupletBrackets(s, *, inPlace=False):
     '''
     Given a Stream of mixed durations, designates the first and last tuplet of any group
     of tuplets as the start or end of the tuplet, respectively.

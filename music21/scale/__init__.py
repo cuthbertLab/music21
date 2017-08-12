@@ -1393,7 +1393,7 @@ class ConcreteScale(Scale):
         '''
         return self._abstract.getDegreeMaxUnique()
 
-    def transpose(self, value, inPlace=False):
+    def transpose(self, value, *, inPlace=False):
         '''
         Transpose this Scale by the given interval
 
@@ -1408,6 +1408,11 @@ class ConcreteScale(Scale):
         >>> sc3 = sc2.transpose('p5')
         >>> sc3
         <music21.scale.MajorScale D major>
+
+        >>> sc3.transpose('p5', inPlace=True)
+        >>> sc3
+        <music21.scale.MajorScale A major>
+
         '''
         if inPlace:
             post = self
@@ -1420,7 +1425,8 @@ class ConcreteScale(Scale):
         else:
             post.tonic.transpose(value, inPlace=True)
         # may need to clear cache here
-        return post
+        if not inPlace:
+            return post
 
     def tune(self, streamObj, minPitch=None, maxPitch=None, direction=None):
         '''

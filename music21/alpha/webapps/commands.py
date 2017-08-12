@@ -286,7 +286,7 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
     from music21 import roman
     ads = theoryAnalyzer.Analyzer()
 
-    score = scoreIn.sliceByGreatestDivisor(addTies=True)
+    score = scoreIn.sliceByGreatestDivisor(addTies=True, inPlace=False)
     vsList = ads.getVerticalities(score)
     user = len(offsetList)
     music21VS = 0
@@ -320,8 +320,10 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
                 #the user recognized it as a dissonant vertical slice BLUE
 
     score.insert(metadata.Metadata())
-    score.metadata.composer = scoreIn.metadata.composer
-    score.metadata.movementName = scoreIn.metadata.movementName
+    scoreInMetadata = scoreIn.metadata
+    if scoreInMetadata:
+        score.metadata.composer = scoreInMetadata.composer
+        score.metadata.movementName = scoreInMetadata.movementName
     analysisData = {'stream': score,
                     'numUserIdentified': user,
                     'numMusic21Identified': music21VS,

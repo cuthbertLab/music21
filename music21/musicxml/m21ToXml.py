@@ -2786,6 +2786,8 @@ class MeasureExporter(XMLExporterBase):
                 mxGlissando.set('type', 'stop')
             else:
                 continue  # do not put a notation on mid-gliss notes.
+
+            _synchronizeIds(su, mxGlissando)
             # placement???
             notations.append(mxGlissando)
 
@@ -3533,6 +3535,7 @@ class MeasureExporter(XMLExporterBase):
                         mxArticulations = Element('articulations')
                     mxArticulations.append(self.articulationToXmlArticulation(artObj))
 
+
         # TODO: attrGroup: print-object (for individual notations)
         # TODO: editorial (hard! -- requires parsing again in order...)
 
@@ -3994,6 +3997,11 @@ class MeasureExporter(XMLExporterBase):
                                 xmlObjects.booleanToYesNo(articulationMark.alternate))
         if (musicXMLTechnicalName in ('handbell', 'other-technical')
                 and articulationMark.displayText is not None):
+            #     The handbell element represents notation for various
+            #     techniques used in handbell and handchime music. Valid
+            #     values are belltree [v 3.1], damp, echo, gyro, hand martellato,
+            #     mallet lift, mallet table, martellato, martellato lift,
+            #     muted martellato, pluck lift, and swing.            
             mxTechnicalMark.text = articulationMark.displayText
         if musicXMLTechnicalName in ('heel', 'toe', 'fingering'):
             mxTechnicalMark.set('substitution',
@@ -4052,7 +4060,7 @@ class MeasureExporter(XMLExporterBase):
         >>> cs = harmony.ChordSymbol()
         >>> cs.root('E-')
         >>> cs.bass('B-')
-        >>> cs.inversion(2, transposeOnSet = False)
+        >>> cs.inversion(2, transposeOnSet=False)
         >>> cs.chordKind = 'major'
         >>> cs.chordKindStr = 'M'
         >>> cs
