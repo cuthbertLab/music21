@@ -54,16 +54,16 @@ from music21 import instrument
 from music21 import interval
 from music21 import key
 from music21 import layout
-from music21 import metadata
+from music21 import metadata # @UnusedImport  # pydev bug -- is used...
 from music21 import meter
 from music21 import note
 from music21 import stream
 
-def reverse(self, *, inPlace=False,
-                classesToMove=(key.KeySignature, meter.TimeSignature, clef.Clef,
-                                 metadata.Metadata, instrument.Instrument, layout.SystemLayout),
-                makeNotation=False,
-                ):
+def reverse(self, *, 
+            inPlace=False,
+            classesToMove=(key.KeySignature, meter.TimeSignature, clef.Clef, 
+                           metadata.Metadata, instrument.Instrument, layout.SystemLayout),
+            makeNotation=False):
     '''
     synonym: retrograde()
 
