@@ -995,7 +995,7 @@ def groupContiguousIntegers(src):
     return post
 
 
-def fromRoman(num):
+def fromRoman(num, *, strictModern=False):
     '''
 
     Convert a Roman numeral (upper or lower) to an int
@@ -1016,37 +1016,51 @@ def fromRoman(num):
     1489
 
 
-    Some people consider this an error, but you see it in medieval documents:
+    Some people consider this an error, but you see it in medieval and ancient roman documents:
 
     >>> common.fromRoman('ic')
     99
+    
+    unless strictModern is True
+    
+    >>> common.fromRoman('ic', strictModern=True)
+    Traceback (most recent call last):
+    ValueError: input contains an invalid subtraction element (modern interpretation): ic
+
 
     But things like this are never seen, and thus cause an error:
 
     >>> common.fromRoman('vx')
     Traceback (most recent call last):
-    music21.exceptions21.Music21CommonException: input contains an invalid subtraction element: vx
+    ValueError: input contains an invalid subtraction element: vx
 
     :rtype: int
     '''
     inputRoman = num.upper()
-    nums = ['M', 'D', 'C', 'L', 'X', 'V', 'I']
-    ints = [1000, 500, 100, 50,  10,  5,   1]
+    subtractionValues = (1, 10, 100)    
+    nums = ('M', 'D', 'C', 'L', 'X', 'V', 'I')
+    ints = (1000, 500, 100, 50,  10,  5,   1)
     places = []
     for c in inputRoman:
         if not c in nums:
-            raise Music21CommonException("value is not a valid roman numeral: %s" % inputRoman)
+            raise ValueError('value is not a valid roman numeral: %s' % inputRoman)
+
     for i in range(len(inputRoman)):
         c = inputRoman[i]
         value = ints[nums.index(c)]
         # If the next place holds a larger number, this value is negative.
         try:
             nextvalue = ints[nums.index(inputRoman[i  + 1])]
-            if nextvalue > value and value in [1, 10, 100]:
+            if nextvalue > value and value in subtractionValues:
+                if strictModern and nextvalue >= value * 10:
+                    raise ValueError(
+                        'input contains an invalid subtraction element (modern interpretation): ' 
+                        + '%s' % num)
+                
                 value *= -1
             elif nextvalue > value:
-                raise Music21CommonException(
-                    "input contains an invalid subtraction element: %s" % num)
+                raise ValueError(
+                    'input contains an invalid subtraction element: %s' % num)
         except IndexError:
             # there is no next place.
             pass
@@ -1059,7 +1073,7 @@ def fromRoman(num):
     #if int_to_roman(sum) == input:
     #   return sum
     #else:
-    #   raise ValueError, 'input is not a valid roman numeral: %s' % input
+    #   raise ValueError('input is not a valid roman numeral: %s' % input)
 
 def toRoman(num):
     '''

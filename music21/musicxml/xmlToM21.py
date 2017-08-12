@@ -3978,7 +3978,6 @@ class MeasureParser(XMLParserBase):
         # TODO: sound
         for mxDirType in mxDirection.findall('direction-type'):
             for mxDir in mxDirType:
-                # TODO: rehearsal
                 # TODO: pedal
                 # TODO: octave-shift
                 # TODO: harp-pedals
@@ -4037,6 +4036,12 @@ class MeasureParser(XMLParserBase):
                     self.insertCoreAndRef(totalOffset, staffKey, mm)
                     self.setEditorial(mxDirection, mm)
 
+                elif tag == 'rehearsal':
+                    rm = self.xmlToRehearsalMark(mxDir)
+                    self.insertCoreAndRef(totalOffset, staffKey, rm)
+                    self.setEditorial(mxDirection, rm)
+                    
+
                 elif tag == 'words':
                     textExpression = self.xmlToTextExpression(mxDir)
                     #environLocal.printDebug(['got TextExpression object', repr(te)])
@@ -4092,6 +4097,14 @@ class MeasureParser(XMLParserBase):
             st.fontStyle = 'bold'
 
         return te
+
+    def xmlToRehearsalMark(self, mxRehearsal):
+        '''
+        Return a rehearsal mark from a rehearsal tag.
+        '''
+        rm = expressions.RehearsalMark(mxRehearsal.text.strip())
+        
+        return rm
 
     def xmlToTempoIndication(self, mxMetronome, mxWords=None):
         '''
