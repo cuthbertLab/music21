@@ -20,6 +20,7 @@ __all__ = ['transcriber', 'recording', 'scoreFollower']
 import copy
 import math
 import os
+import pathlib
 import wave
 import warnings
 import unittest
@@ -101,11 +102,10 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
 
 
     >>> import wave
-    >>> import os
     >>> import numpy  # you need to have numpy, scipy, and matplotlib installed to use this
 
-    >>> wv = wave.open(common.getSourceFilePath() + os.path.sep +
-    ...        'audioSearch' + os.path.sep + 'test_audio.wav', 'r')
+    >>> wv = wave.open(str(common.getSourceFilePath() /
+    ...                     'audioSearch' / 'test_audio.wav'), 'r')
     >>> data = wv.readframes(1024)
     >>> samps = numpy.fromstring(data, dtype=numpy.int16)
     >>> finalResult = audioSearch.autocorrelationFunction(samps, 44100)
@@ -282,9 +282,7 @@ def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=None):
 
     TODO: only return the former.  The latter can be generated in other ways.
 
-    >>> import os
-    >>> sep = os.path.sep
-    >>> readPath = common.getSourceFilePath() + sep + 'audioSearch' + sep + 'test_audio.wav'
+    >>> readPath = common.getSourceFilePath() / 'audioSearch' / 'test_audio.wav'
     >>> freqFromAQList = audioSearch.getFrequenciesFromAudioFile(waveFilename=readPath)
 
     >>> detectedPitchesFreq = audioSearch.detectPitchFrequencies(
@@ -361,8 +359,7 @@ def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
     >>> audioSearch.audioChunkLength
     1024
 
-    >>> import os
-    >>> readPath = os.path.join(common.getSourceFilePath(), 'audioSearch', 'test_audio.wav')
+    >>> readPath = common.getSourceFilePath() / 'audioSearch' / 'test_audio.wav'
     >>> freq = audioSearch.getFrequenciesFromAudioFile(waveFilename=readPath)
     >>> print(freq)
     [143.627689055..., 99.083545201..., 211.004784688..., 4700.313479623..., ...]
@@ -375,7 +372,7 @@ def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
     storedWaveSampleList = []
     environLocal.printDebug("* reading entire file from disk")
     try:
-        wv = wave.open(waveFilename, 'r')
+        wv = wave.open(str(waveFilename), 'r')
     except IOError:
         raise AudioSearchException("Cannot open %s for reading, does not exist" % waveFilename)
 
@@ -403,9 +400,8 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     and the end sample position.
 
     >>> #_DOCS_SHOW readFile = 'pachelbel.wav'
-    >>> import os #_DOCS_HIDE
     >>> sp = common.getSourceFilePath() #_DOCS_HIDE
-    >>> readFile = os.path.join(sp, 'audioSearch', 'test_audio.wav') #_DOCS_HIDE
+    >>> readFile = sp / 'audioSearch' / 'test_audio.wav' #_DOCS_HIDE
     >>> fTup  = audioSearch.getFrequenciesFromPartialAudioFile(readFile, length=1.0)
     >>> frequencyList, pachelbelFileHandle, currentSample = fTup
     >>> for i in range(5):
@@ -439,7 +435,10 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     import numpy
 
     if waveFilenameOrHandle == 'temp':
-        waveFilenameOrHandle = environLocal.getRootTempDir() + os.path.sep + 'temp.wav'
+        waveFilenameOrHandle = environLocal.getRootTempDir() / 'temp.wav'
+
+    if isinstance(waveFilenameOrHandle, pathlib.Path):
+        waveFilenameOrHandle = str(waveFilenameOrHandle)
 
     if isinstance(waveFilenameOrHandle, str):
         # waveFilenameOrHandle is a filename
@@ -564,8 +563,7 @@ def joinConsecutiveIdenticalPitches(detectedPitchObjects):
 
     N.B. the returned list is NOT a :class:`~music21.stream.Stream`.
 
-    >>> import os
-    >>> readPath = os.path.join(common.getSourceFilePath(), 'audioSearch', 'test_audio.wav')
+    >>> readPath = common.getSourceFilePath() / 'audioSearch' / 'test_audio.wav'
     >>> freqFromAQList = audioSearch.getFrequenciesFromAudioFile(waveFilename=readPath)
     >>> chrome = scale.ChromaticScale('C4')
     >>> detectedPitchesFreq = audioSearch.detectPitchFrequencies(freqFromAQList, useScale=chrome)
@@ -800,9 +798,8 @@ def decisionProcess(partsList, notePrediction, beginningData,
 
     >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes.stream()
     >>> scoreStream = scNotes
-    >>> import os #_DOCS_HIDE
     >>> sfp = common.getSourceFilePath() #_DOCS_HIDE
-    >>> readPath = sfp + os.path.sep + 'audioSearch' + os.path.sep + 'test_audio.wav' #_DOCS_HIDE
+    >>> readPath = sfp / 'audioSearch' / 'test_audio.wav' #_DOCS_HIDE
     >>> freqFromAQList = audioSearch.getFrequenciesFromAudioFile(waveFilename=readPath) #_DOCS_HIDE
 
     >>> tf = 'test_audio.wav'

@@ -16,11 +16,11 @@ Tools for working with files
 import codecs
 import contextlib # for with statements
 import io
+import pathlib
 import os
 import time
 
 from music21.ext import chardet
-from music21.common.pathTools import cleanpath
 
 __all__ = ['readFileEncodingSafe',
            'sortFilesRecent',
@@ -105,7 +105,11 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
 
     :rtype: str
     '''
-    filePath = cleanpath(filePath)
+    if not isinstance(filePath, pathlib.Path):
+        filePath = pathlib.Path(filePath)
+
+    filePath = filePath.resolve()
+
     try:
         with io.open(filePath, 'r', encoding=firstGuess) as thisFile:
             data = thisFile.read()

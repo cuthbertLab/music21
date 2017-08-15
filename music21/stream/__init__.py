@@ -4112,9 +4112,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # store class filter list for transposition
         if transposeKeySignature:
-            classFilterList = ['Note', 'Chord', 'KeySignature']
+            classFilterList = ('Note', 'Chord', 'KeySignature')
         else:
-            classFilterList = ['Note', 'Chord']
+            classFilterList = ('Note', 'Chord')
 
         for k in boundaries:
             i = boundaries[k]

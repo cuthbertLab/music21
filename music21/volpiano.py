@@ -278,7 +278,8 @@ def toPart(volpianoText, *, breaksToLayout=False):
             elif token.lower() in bflatTokens and token in flatTokens:
                 bIsFlat = True
             else: # pragma: no cover
-                raise VolpianoException('Unknown accidental: ' + token + ': Should not happen')
+                raise VolpianoException(
+                    'Unknown accidental: ' + token + ': Should not happen')
     
     
     if continuousNumberOfBreakTokens > 0:

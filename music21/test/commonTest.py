@@ -128,7 +128,7 @@ class ModuleGather:
     D:\Web\eclipse\music21base\music21\volume.py
     '''
     def __init__(self, useExtended=False, autoWalk=True):
-        self.dirParent = common.getSourceFilePath()
+        self.dirParent = str(common.getSourceFilePath())
         self.useExtended = useExtended
         self.modulePaths = []
 
@@ -278,14 +278,14 @@ class ModuleGather:
 
     def _getName(self, fp):
         r'''
-        Given full file path, find a name for the module with _ as the separator.
+        Given full file pathlib.Path, find a name for the module with _ as the separator.
 
         >>> from music21.test import commonTest
         >>> mg = commonTest.ModuleGather()
         >>> #_DOCS_SHOW mg._getName(r'D:\Web\eclipse\music21base\music21\chord.py')
         'chord'
         '''
-        fn = fp.replace(self.dirParent, '') # remove parent
+        fn = fp.replace(str(self.dirParent), '') # remove parent
         if fn.startswith(os.sep):
             fn = fn[1:]
         fn = fn.replace(os.sep, '_') # replace w/ _

@@ -16,14 +16,12 @@ from music21 import converter
 from music21 import common
 
 def allFiles():
-    thisDir = os.sep.join([common.getSourceFilePath(),
-                           'musicxml',
-                           'lilypondTestSuite'])
+    thisDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
     allOut = []
-    for f in os.listdir(thisDir):
-        if f.startswith('__'):
+    for f in thisDir.iterdir():
+        if f.name.startswith('__'):
             continue
-        allOut.append(thisDir + os.sep + f)
+        allOut.append(f)
     return allOut
 
 class Test(unittest.TestCase):

@@ -186,11 +186,9 @@ class ScalaData:
 
     >>> import os
     >>> sf = scale.scala.ScalaFile()
-    >>> fp = os.sep.join([common.getSourceFilePath(), 
-    ...                   'scale', 'scala', 'scl', 'tanaka.scl'])
+    >>> fp = common.getSourceFilePath() / 'scale' / 'scala' / 'scl' / 'tanaka.scl'
     >>> sf.open(fp)
     >>> sd = sf.read()
-    >>> sf.close()
     
     >>> print(sd.description) # converted to unicode...
     26-note choice system of Shohé Tanaka, Studien i.G.d. reinen Stimmung (1890)
@@ -382,8 +380,7 @@ class ScalaFile:
 
     >>> import os
     >>> sf = scale.scala.ScalaFile()
-    >>> fp = os.sep.join([common.getSourceFilePath(), 
-    ...                   'scale', 'scala', 'scl', 'tanaka.scl'])
+    >>> fp = common.getSourceFilePath() / 'scale' / 'scala' / 'scl' / 'tanaka.scl'
     >>> sf.open(fp)
     >>> sd = sf.read()
     >>> sd

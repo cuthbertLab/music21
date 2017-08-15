@@ -650,9 +650,8 @@ class ConverterNoteworthy(SubConverter):
     Users should not need this routine.  The basic format is converter.parse("file.nwctxt")
 
 
-    >>> import os #_DOCS_HIDE
-    >>> nwcTranslatePath = common.getSourceFilePath() + os.path.sep + 'noteworthy'
-    >>> paertPath = nwcTranslatePath + os.path.sep + 'Part_OWeisheit.nwctxt' #_DOCS_HIDE
+    >>> nwcTranslatePath = common.getSourceFilePath() / 'noteworthy' #_DOCS_HIDE
+    >>> paertPath = nwcTranslatePath / 'Part_OWeisheit.nwctxt' #_DOCS_HIDE
     >>> #_DOCS_SHOW paertPath = converter.parse(r'd:/desktop/arvo_part_o_weisheit.nwctxt')
     >>> paertStream = converter.parse(paertPath)
     >>> len(paertStream.parts)
@@ -687,8 +686,8 @@ class ConverterNoteworthy(SubConverter):
         Open Noteworthy data (as nwctxt) from a file path.
 
         >>> import os #_DOCS_HIDE
-        >>> nwcTranslatePath = common.getSourceFilePath() + os.path.sep + 'noteworthy' #_DOCS_HIDE
-        >>> filePath = nwcTranslatePath + os.path.sep + 'Part_OWeisheit.nwctxt' #_DOCS_HIDE
+        >>> nwcTranslatePath = common.getSourceFilePath() / 'noteworthy' #_DOCS_HIDE
+        >>> filePath = nwcTranslatePath / 'Part_OWeisheit.nwctxt' #_DOCS_HIDE
         >>> #_DOCS_SHOW paertPath = converter.parse('d:/desktop/arvo_part_o_weisheit.nwctxt')
         >>> c = converter.subConverters.ConverterNoteworthy()
         >>> c.parseFile(filePath)

@@ -189,7 +189,7 @@ def _addCorpusFilepathToStreamObject(streamObj, filePath):
     # for use later in identifying the score
     #if streamObj.metadata == None:
     #    streamObj.insert(metadata.Metadata())
-    corpusFilePath = common.getCorpusFilePath()
+    corpusFilePath = str(common.getCorpusFilePath())
     lenCFP = len(corpusFilePath) + len(os.sep)
     if filePath.startswith(corpusFilePath):
         fp2 = filePath[lenCFP:]

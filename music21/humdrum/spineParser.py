@@ -45,7 +45,6 @@ SpineParsing consists of several steps.
 '''
 import copy
 import math
-import os
 import re
 import unittest
 
@@ -2793,8 +2792,8 @@ class Test(unittest.TestCase):
 
     def testParseSineNomine(self):
         from music21 import converter
-        parserPath = common.getSourceFilePath() + os.path.sep + 'humdrum'
-        sineNominePath = parserPath + os.path.sep + 'Missa_Sine_nomine-Kyrie.krn'
+        parserPath = common.getSourceFilePath() / 'humdrum'
+        sineNominePath = parserPath / 'Missa_Sine_nomine-Kyrie.krn'
         unused_myScore = converter.parse(sineNominePath)
         #unused_myScore.show('text')
 

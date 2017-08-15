@@ -37,7 +37,8 @@ _MOD = 'multiprocessTest.py'
 environLocal = environment.Environment(_MOD)
 
 ModuleResponse = collections.namedtuple('ModuleResponse',
-                    'returnCode fp moduleName success testRunner errors failures testsRun runTime')
+                    'returnCode fp moduleName success testRunner '
+                    + 'errors failures testsRun runTime')
 ModuleResponse.__new__.__defaults__ = (None,) * len(ModuleResponse._fields)
 
 

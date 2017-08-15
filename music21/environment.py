@@ -22,10 +22,9 @@ Additional documentation for and examples of using this module are found in
 
 # TODO: Update to user's guide -- showing each function
 '''
-from __future__ import print_function
-
 import io
 import os
+import pathlib
 import sys
 import tempfile
 import unittest
@@ -459,26 +458,27 @@ class _EnvironmentCore:
         Creates the subdirectory if it doesn't exist:
 
         >>> import tempfile
+        >>> import pathlib
         >>> t = tempfile.gettempdir()
         >>> #_DOCS_SHOW t
         '/var/folders/x5/rymq2tx16lqbpytwb1n_cc4c0000gn/T'
 
         >>> import os
         >>> e = environment.Environment()
-        >>> e.getDefaultRootTempDir() == os.path.join(t, 'music21')
+        >>> e.getDefaultRootTempDir() == pathlib.Path(t) / 'music21'
         True
         '''
         # this returns the root temp dir; this does not create a new dir
-        dstDir = os.path.join(tempfile.gettempdir(), 'music21')
+        dstDir = pathlib.Path(tempfile.gettempdir()) / 'music21'
         # if this path already exists, we have nothing more to do
-        if os.path.exists(dstDir):
+        if dstDir.exists():
             return dstDir
         else:
             # make this directory as a temp directory
             try:
-                os.mkdir(dstDir)
+                dstDir.mkdir()
             except OSError:  # cannot make the directory
-                dstDir = tempfile.gettempdir()
+                dstDir = dstDir.parent
             return dstDir
 
     def getKeysToPaths(self):
@@ -524,13 +524,16 @@ class _EnvironmentCore:
         if self._ref['directoryScratch'] is None:
             return self.getDefaultRootTempDir()
         # check that the user-specified directory exists
-        elif not os.path.exists(self._ref['directoryScratch']):
+        
+        refDir = pathlib.Path(self._ref['directoryScratch'])
+        
+        if not refDir.exists():
             raise EnvironmentException(
-                'user-specified scratch directory ({}) does not exist; '
+                'user-specified scratch directory ({:s}) does not exist; '
                 'remove preference file or reset Environment'.format(
-                    self._ref['directoryScratch']))
+                    refDir))
         else:
-            return self._ref['directoryScratch']
+            return refDir
 
     def getSettingsPath(self):
         platform = common.getPlatform()

@@ -38,13 +38,13 @@ the temp folder on the disk.
 >>> s
 <music21.stream.Score ...>
 '''
-import unittest
-
 import copy
 import os
 import re
+import pathlib
 import sys
 import types
+import unittest
 import urllib
 import zipfile
 
@@ -236,7 +236,10 @@ class PickleFilter:
     returned.
     '''
     def __init__(self, fp, forceSource=False, number=None):
-        self.fp = common.cleanpath(fp)
+        if not isinstance(fp, pathlib.Path):
+            fp = pathlib.Path(fp)
+
+        self.fp = fp.resolve()
         self.forceSource = forceSource
         self.number = number
         #environLocal.printDebug(['creating pickle filter'])
@@ -254,7 +257,9 @@ class PickleFilter:
             extension = '.pgz'
         pythonVersion = 'py' + str(sys.version_info[0]) + '.' + str(sys.version_info[1])
 
-        baseName = '-'.join(['m21', _version.__version__, pythonVersion, common.getMd5(self.fp)])
+        baseName = '-'.join(['m21', _version.__version__, pythonVersion, 
+                             common.getMd5(str(self.fp))])
+
         if self.number is not None:
             baseName += '-' + str(self.number)
         baseName += extension
@@ -447,9 +452,11 @@ class Converter:
 
         Does not use or store pickles in any circumstance.
         '''
-        fp = common.cleanpath(fp)
+        if not isinstance(fp, pathlib.Path):
+            fp = pathlib.Path(fp)
+        fp = fp.resolve()
         #environLocal.printDebug(['attempting to parseFile', fp])
-        if not os.path.exists(fp):
+        if not fp.exists():
             raise ConverterFileException('no such file exists: %s' % fp)
         useFormat = format
 
@@ -463,7 +470,7 @@ class Converter:
         except NotImplementedError:
             raise ConverterFileException('File is not in a correct format: %s' % fp)
 
-        self.stream.filePath = fp
+        self.stream.filePath = str(fp)
         self.stream.fileNumber = number
         self.stream.fileFormat = useFormat
 
@@ -471,17 +478,16 @@ class Converter:
         '''
         gets the format from a file extension.
 
-        >>> import os
-        >>> fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
+        >>> fp = common.getSourceFilePath() / 'musedata' / 'testZip.zip'
         >>> c = converter.Converter()
         >>> c.getFormatFromFileExtension(fp)
         'musedata'
         '''
-        fp = common.cleanpath(fp)
+        fp = fp.resolve()
         # if the file path is to a directory, assume it is a collection of
         # musedata parts
         useFormat = None
-        if os.path.isdir(fp):
+        if fp.is_dir():
             useFormat = 'musedata'
         else:
             useFormat = common.findFormatFile(fp)
@@ -501,14 +507,17 @@ class Converter:
         Will store as a pickle unless storePickle is False
         '''
         from music21 import freezeThaw
-        fp = common.cleanpath(fp)
+        if not isinstance(fp, pathlib.Path):
+            fp = pathlib.Path(fp)
 
-        if not os.path.exists(fp):
+        fp = fp.resolve()
+        if not fp.exists():
             raise ConverterFileException('no such file exists: %s' % fp)
         useFormat = format
 
         if useFormat is None:
             useFormat = self.getFormatFromFileExtension(fp)
+
         pfObj = PickleFilter(fp, forceSource, number)
         unused_fpDst, writePickle, fpPickle = pfObj.status()
         if writePickle is False and fpPickle is not None and forceSource is False:
@@ -1078,6 +1087,8 @@ def parse(value, *args, **keywords):
 
     if isinstance(value, bytes):
         valueStr = value.decode('utf-8', 'ignore')
+    if isinstance(value, pathlib.Path):
+        valueStr = str(value)
     else:
         valueStr = value
 
@@ -1098,16 +1109,17 @@ def parse(value, *args, **keywords):
             value = [value] + list(args)
         return parseData(value, number=number, **keywords)
     # a midi string, must come before os.path.exists test
-    elif valueStr.startswith('MThd'):
+    elif not isinstance(valueStr, bytes) and valueStr.startswith('MThd'):
         return parseData(value, number=number, format=m21Format, **keywords)
-    elif os.path.exists(value):
+    elif not isinstance(value, bytes) and os.path.exists(value):
         return parseFile(value, number=number, format=m21Format,
                          forceSource=forceSource, **keywords)
-    elif os.path.exists(common.cleanpath(value)):
+    elif not isinstance(value, bytes) and os.path.exists(common.cleanpath(value)):
         return parseFile(common.cleanpath(value), number=number, format=m21Format,
                          forceSource=forceSource, **keywords)
 
-    elif (valueStr.startswith('http://') or valueStr.startswith('https://')):
+    elif not isinstance(valueStr, bytes) and (valueStr.startswith('http://') 
+                                              or valueStr.startswith('https://')):
         # its a url; may need to broaden these criteria
         return parseURL(value, number=number, format=m21Format,
                         forceSource=forceSource, **keywords)
@@ -1627,7 +1639,7 @@ class Test(unittest.TestCase):
 
         c.parseData(data)
 
-        # try module-leve; function
+        # try module-level; function
         parseData(data)
         parse(data)
 

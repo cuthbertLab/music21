@@ -43,6 +43,7 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 '''
 from collections import OrderedDict
 import os
+import pathlib
 import re
 import unittest
 
@@ -919,7 +920,12 @@ class RichMetadata(Metadata):
             return '' # for some abc files...
         if not streamObj.filePath:
             return ''
-        corpusParts = streamObj.filePath.split(os.sep)
+        
+        streamFp = streamObj.filePath
+        if not isinstance(streamFp, pathlib.Path):
+            streamFp = pathlib.Path(streamFp)
+        
+        corpusParts = streamFp.parts
         try:
             corpusIndex = corpusParts.index('corpus')
         except ValueError:

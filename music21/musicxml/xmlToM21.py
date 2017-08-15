@@ -5271,7 +5271,7 @@ class Test(unittest.TestCase):
         c.quarterLength = 2
 
         GEX = m21ToXml.GeneralObjectExporter()
-        xml = GEX.parse(c)
+        xml = GEX.parse(c).decode('utf-8')
         #print(xml.decode('utf-8'))
         #c.show()
         inputStream = converter.parse(xml)
@@ -5705,10 +5705,9 @@ class Test(unittest.TestCase):
         self.assertEqual(pCount, 97)
 
     def testTrillOnOneNote(self):
-        import os
         from music21 import converter
-        thisDir = common.getSourceFilePath() + os.sep + 'musicxml' + os.sep
-        testFp = thisDir + 'testTrillOnOneNote.xml'
+        thisDir = common.getSourceFilePath() / 'musicxml'
+        testFp = thisDir / 'testTrillOnOneNote.xml'
         c = converter.parse(testFp) #, forceSource=True)
 
         trillExtension = c.parts[0].getElementsByClass('TrillExtension')[0]

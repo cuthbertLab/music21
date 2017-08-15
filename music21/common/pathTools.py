@@ -23,6 +23,7 @@ __all__ = [
 
 import inspect
 import os
+import pathlib
 
 #-------------------------------------------------------------------------------
 def getSourceFilePath():
@@ -31,10 +32,10 @@ def getSourceFilePath():
     This is not the same as the
     outermost package development directory.
 
-    :rtype: str
+    :rtype: pathlib.Path
     '''
-    fpThis = inspect.getfile(getSourceFilePath)
-    fpMusic21 = os.path.dirname(os.path.dirname(fpThis)) # common is two levels deep
+    fpThis = pathlib.Path(inspect.getfile(getSourceFilePath)).resolve()
+    fpMusic21 = fpThis.parent.parent # common is two levels deep
     # use stream as a test case
     if 'stream' not in os.listdir(fpMusic21):
         raise Exception('cannot find expected music21 directory: %s' % fpMusic21)
@@ -43,29 +44,32 @@ def getSourceFilePath():
 
 
 def getMetadataCacheFilePath():
-    r'''Get the stored music21 directory that contains the corpus metadata cache.
+    r'''
+    Get the stored music21 directory that contains the corpus metadata cache.
 
     >>> fp = common.getMetadataCacheFilePath()
-    >>> fp.endswith('corpus/_metadataCache') or fp.endswith(r'corpus\_metadataCache')
+    >>> fp.name == '_metadataCache' and fp.parent.name == 'corpus'
     True
 
-    :rtype: str
+    :rtype: pathlib.Path
     '''
-    return os.path.join(getSourceFilePath(), 'corpus', '_metadataCache')
+    return getSourceFilePath() / 'corpus' / '_metadataCache'
 
 
 def getCorpusFilePath():
     r'''Get the stored music21 directory that contains the corpus metadata cache.
 
     >>> fp = common.getCorpusFilePath()
-    >>> fp.endswith('music21/corpus') or fp.endswith(r'music21\corpus')
+    >>> fp.name == 'corpus' and fp.parent.name == 'music21'
     True
+    
+    :rtype: pathlib.Path    
     '''
     from music21 import corpus
     coreCorpus = corpus.corpora.CoreCorpus()
     if coreCorpus.manualCoreCorpusPath is None:
-        return os.path.join(getSourceFilePath(), 'corpus')
-    return coreCorpus.manualCoreCorpusPath
+        return getSourceFilePath() / 'corpus'
+    return pathlib.Path(coreCorpus.manualCoreCorpusPath)
 
 
 def getCorpusContentDirs():
@@ -116,9 +120,11 @@ def getRootFilePath():
     '''
     Return the root directory for music21 -- outside of the music21 namespace
     which has directories such as "dist", "documentation", "music21"
+
+    :rtype: pathlib.Path    
     '''
     fpMusic21 = getSourceFilePath()
-    fpParent = os.path.dirname(fpMusic21)
+    fpParent = fpMusic21.parent
     return fpParent
 
 def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
@@ -132,12 +138,14 @@ def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
     If `remapSep` is set to anything other than None, the path separator will be replaced.
 
     If `packageOnly` is true, only directories with __init__.py files are collected.
+
+    returns a list of strings...
     '''
     if fpMusic21 is None:
         fpMusic21 = getSourceFilePath()
 
     #fpCorpus = os.path.join(fpMusic21, 'corpus')
-    fpParent = os.path.dirname(fpMusic21)
+    fpParent = fpMusic21.parent
     match = []
     for dirpath, unused_dirnames, filenames in os.walk(fpMusic21):
         # remove hidden directories

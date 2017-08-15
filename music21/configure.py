@@ -512,14 +512,14 @@ class Dialog:
         pass
         # define in subclass
 
-    def askUser(self, force=None):
+    def askUser(self, force=None, *, skipIntro=False):
         '''
         Ask the user, display the query. The force argument can
         be provided to test. Sets self._result; does not return a value.
         '''
         # if an introduction is defined, try to use it
         intro = self._rawIntroduction()
-        if intro is not None:
+        if intro is not None and not skipIntro:
             self._writeToUser(intro)
 
         # always call preAskUser: can customize in subclass. must return True
@@ -1455,7 +1455,7 @@ class ConfigurationAssistant:
         self.getDialogs()
 
     def getDialogs(self):
-        if 'site-packages' not in common.getSourceFilePath():
+        if 'site-packages' not in common.getSourceFilePath().parts:
             d = AskInstall(default=1)
             self._dialogs.append(d)
 
@@ -1744,7 +1744,7 @@ class Test(unittest.TestCase):
             return []
 
         d._getValidResults = getValidResults
-        d.askUser('n') # reject option to open in a browser
+        d.askUser(force='n', skipIntro=True) # reject option to open in a browser
         post = d.getResult()
         # returns a bad condition b/c there are no options and user entered 'n'
         self.assertEqual(isinstance(post, configure.BadConditions), True)
@@ -1798,16 +1798,16 @@ def run():
     ca.run()
 
 if __name__ == "__main__":
-    # only if running tests
     if len(sys.argv) == 1: # normal conditions
         #music21.mainTest(Test)
         run()
 
-    elif len(sys.argv) > 1:
+    else:
+        # only if running tests
         t = Test()
         te = TestExternal()
 
-        if sys.argv[1] in ['all', 'test']:
+        if len(sys.argv) < 2 or sys.argv[1] in ['all', 'test']:
             import music21
             music21.mainTest(Test)
 

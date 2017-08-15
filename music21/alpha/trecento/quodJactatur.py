@@ -83,7 +83,7 @@ def reverse(self, *,
 
     if inPlace is True:
         returnObj = self
-        raise Exception("Whoops haven't written inPlace = True yet for reverse")
+        raise Exception("Whoops haven't written inPlace=True yet for reverse")
     else:
         returnObj = stream.Part()
 

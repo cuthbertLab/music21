@@ -19,6 +19,8 @@ __all__ = ['findSubConverterForFormat', 'findFormat',
            'findFormatExtURL',
            'VALID_SHOW_FORMATS', 'VALID_WRITE_FORMATS', 'VALID_AUTO_DOWNLOAD']
 
+import pathlib
+
 # used for checking preferences, and for setting environment variables
 # TODO: only check top-level.  Let subconverters check sub formats.
 VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi',
@@ -247,7 +249,9 @@ def findFormatFile(fp):
     >>> common.findFormatFile(r'\\long\file\path\test.krn')
     'humdrum'
     '''
-    fmt, unused_ext = findFormat(fp.split('.')[-1])
+    if not isinstance(fp, pathlib.Path):
+        fp = pathlib.Path(fp)
+    fmt, unused_ext = findFormat(fp.suffix)
     return fmt # may be None if no match
 
 #@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
@@ -276,11 +280,14 @@ def findFormatExtFile(fp):
     >>> common.findFormatExtFile(r'\\long\file\path\test.krn')
     ('humdrum', '.krn')
     '''
-    fileFormat, unused_extOut = findFormat(fp.split('.')[-1])
+    if not isinstance(fp, pathlib.Path):
+        fp = pathlib.Path(fp)
+    
+    fileFormat, unused_extOut = findFormat(fp.suffix)
     if fileFormat is None:
         return (None, None)
     else:
-        return (fileFormat, '.'+fp.split('.')[-1]) # may be None if no match
+        return (fileFormat, fp.suffix) # may be None if no match
 
 #@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 def findFormatExtURL(url):

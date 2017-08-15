@@ -863,9 +863,8 @@ class Test(unittest.TestCase):
         pass
 
     def testBasic(self):
-        import os
-        nwcTranslatePath = common.getSourceFilePath() + os.path.sep + 'noteworthy'
-        simplePath = nwcTranslatePath + os.path.sep + 'verySimple.nwctxt'
+        nwcTranslatePath = common.getSourceFilePath() / 'noteworthy'
+        simplePath = nwcTranslatePath / 'verySimple.nwctxt'
         #'NWCTEXT_Really_complete_example_file.nwctxt' # ## #'Part_OWeisheit.nwctxt' #
         myScore = NoteworthyTranslator().parseFile(simplePath)
         self.assertEqual(len(myScore.flat.notes), 1)
