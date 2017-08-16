@@ -17,6 +17,7 @@ interface to searching corpora.
 New in v3 -- previously most were static methods on corpus.corpora.Corpus, but that
 seemed inappropriate since these work across corpora.
 '''
+import pathlib
 import os
 
 from music21 import common
@@ -108,7 +109,6 @@ def iterateCorpora(returnObjects=True):
             else:
                 yield cn
 
-# pylint: disable=redefined-builtin
 def getWork(workName,
             movementNumber=None,
             fileExtensions=None,
@@ -142,7 +142,7 @@ def getWork(workName,
             workList = corpusObject.getWorkList(mxlWorkName, movementNumber, fileExtensions)
             if not workList:
                 continue
-        if len(workList) >= 1:
+        if workList:
             filePaths = workList
             break
 
@@ -156,9 +156,9 @@ def getWork(workName,
         raise CorpusException(warningMessage)
     else:
         if len(filePaths) == 1:
-            return filePaths[0]
+            return pathlib.Path(filePaths[0])
         else:
-            return filePaths
+            return [pathlib.Path(p) for p in filePaths]
 
 # pylint: disable=redefined-builtin
 def parse(workName,
@@ -185,12 +185,21 @@ def parse(workName,
     return streamObject
 
 def _addCorpusFilepathToStreamObject(streamObj, filePath):
+    '''
+    Adds an entry 'corpusFilepath' to the Stream object.
+    
+    TODO: this should work for non-core-corpora
+    TODO: this should be in the metadata object
+    TODO: this should set a pathlib.Path object
+    '''
     # metadata attribute added to store the file path,
     # for use later in identifying the score
     #if streamObj.metadata == None:
     #    streamObj.insert(metadata.Metadata())
     corpusFilePath = str(common.getCorpusFilePath())
     lenCFP = len(corpusFilePath) + len(os.sep)
+    filePath = str(filePath)
+    
     if filePath.startswith(corpusFilePath):
         fp2 = filePath[lenCFP:]
         ### corpus fix for windows

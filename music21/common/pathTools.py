@@ -227,7 +227,7 @@ def cleanpath(path, *, returnPathlib=None):
     '''
     
     if isinstance(path, pathlib.Path):
-        path = path.expanduser(path)
+        path = path.expanduser()
         path = path.resolve()
         path = str(path)
         if returnPathlib is None:

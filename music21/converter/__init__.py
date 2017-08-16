@@ -107,7 +107,7 @@ class ArchiveManager:
     # http://www.recordare.com/xml/compressed-mxl.html
 
     def __init__(self, fp, archiveType='zip'):
-        self.fp = common.cleanpath(fp)
+        self.fp = common.cleanpath(fp, returnPathlib=True)
         self.archiveType = archiveType
 
     def isArchive(self):
@@ -117,14 +117,14 @@ class ArchiveManager:
         '''
         if self.archiveType == 'zip':
             # some .md files can be zipped
-            if self.fp.endswith('mxl') or self.fp.endswith('md'):
+            if self.fp.suffix in ('.mxl', '.md'):
                 # try to open it, as some mxl files are not zips
                 try:
                     unused = zipfile.ZipFile(self.fp, 'r')
                 except zipfile.BadZipfile:
                     return False
                 return True
-            elif self.fp.endswith('zip'):
+            elif self.fp.suffix == '.zip':
                 return True
         else:
             raise ArchiveManagerException('no support for archiveType: %s' % self.archiveType)
@@ -481,7 +481,7 @@ class Converter:
         >>> c.getFormatFromFileExtension(fp)
         'musedata'
         '''
-        fp = common.cleanpath(returnPathlib=True)
+        fp = common.cleanpath(fp, returnPathlib=True)
         # if the file path is to a directory, assume it is a collection of
         # musedata parts
         useFormat = None

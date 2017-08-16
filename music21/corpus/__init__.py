@@ -273,11 +273,15 @@ def getWork(workName, movementNumber=None, fileExtensions=None):
     single match, a single file path. If no matches are found an Exception is
     raised.
 
+    returns a pathlib.Path object
+
     >>> import os
     >>> a = corpus.getWork('luca/gloria')
-    >>> a.endswith(os.path.sep.join([
-    ...     'luca', 'gloria.xml']))
-    True
+    >>> a.name
+    'gloria.xml'
+    
+    >>> a.parent.name
+    'luca'
 
     >>> trecentoFiles = corpus.getWork('trecento')
     >>> len(trecentoFiles) > 100 and len(trecentoFiles) < 200
