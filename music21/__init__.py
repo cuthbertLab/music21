@@ -44,9 +44,34 @@ is compatible with music21.  The corpus files have copyrights retained by their
 owners who have allowed them to be included with music21.
 '''
 import sys
-if sys.version_info[0] < 3:
-    raise ImportError('Music21 v.5 is a Python 3 only library.  Use v.4 to run on Python 2.7')
+
+minPythonVersion = (3, 4)
+minPythonVersionStr = '.'.join([str(x) for x in minPythonVersion])
+if sys.version_info < minPythonVersion:
+    raise ImportError('''
+    Music21 v.5 is a Python {}+ only library.  
+    Use music21 v.4 to run on Python 2.7.
+    
+    If you got this library by installing there are several options.
+    
+    - 1. (Best) Upgrade to Python 3, latest.  
+    
+         The great features there will more
+         than make up for the headache of downloading 
+         a new version from https://www.python.org/
+         
+         You may already have Python 3 on your system.  
+         Try running "python3" instead of "python"
+         
+    - 2. Upgrade pip and setuptools to the latest version 
+         and then "upgrade" music21 to version 4.
+         
+         $ pip install --upgrade pip setuptools
+         $ pip install 'music21<5.0'
+    '''.format(minPythonVersionStr))
 del sys
+del minPythonVersion
+del minPythonVersionStr
 
 # this defines what  is loaded when importing __all__
 # put these in alphabetical order FIRST dirs then modules

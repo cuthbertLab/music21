@@ -46,6 +46,7 @@ classifiers = [
     'Operating System :: POSIX',
     'Operating System :: OS Independent',
     'Programming Language :: Python',
+    'Programming Language :: Python :: 3 :: Only',
     'Topic :: Multimedia :: Sound/Audio',
     'Topic :: Multimedia :: Sound/Audio :: MIDI',
     'Topic :: Multimedia :: Sound/Audio :: Conversion',
@@ -57,6 +58,7 @@ if __name__ == '__main__':
     setuptools.setup(
         name='music21',
         version=m21version,
+        python_requires='>=3.4',
         description=DESCRIPTION,
         long_description=DESCRIPTION_LONG,
         author='Michael Scott Cuthbert, the music21 project, others',

@@ -8,6 +8,7 @@
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
+import pathlib
 import re
 import unittest
 
@@ -26,8 +27,8 @@ class Test(unittest.TestCase):
             ]:
             a = corpus.getWork(known)
             # make sure it is not an empty list
-            self.assertNotEqual(len(a), 0)
-            workSlashes = re.sub(r'\\', '/', a)
+            self.assertTrue(a)
+            workSlashes = re.sub(r'\\', '/', str(a))
             self.assertTrue(workSlashes.lower().endswith(known.lower()), (workSlashes, known))
 
     def testBachKeys(self):
@@ -45,8 +46,8 @@ class Test(unittest.TestCase):
     def testEssenImport(self):
         # can get a single file just by file name
         filePath = corpus.getWork('altdeu10')
-        self.assertTrue(filePath.endswith('essenFolksong/altdeu10.abc') or
-            filePath.endswith(r'essenFolksong\altdeu10.abc'))
+        self.assertEqual(filePath.name, 'altdeu10.abc')
+        self.assertEqual(filePath.parent.name, 'essenFolksong')
         filePathCollection = corpus.getComposer('essenFolksong')
         self.assertEqual(len(filePathCollection), 31)
         filePathCollection = corpus.getComposer('essenFolksong', ['abc'])
@@ -54,7 +55,7 @@ class Test(unittest.TestCase):
 
     def testDesPrezImport(self):
         # can get a single file just by file name
-        filePath = corpus.getWork('fortunaDunGranTempo')
+        filePath = str(corpus.getWork('fortunaDunGranTempo'))
         filePath = re.sub(r'\\', '/', filePath)
         self.assertEqual(filePath.endswith('josquin/fortunaDunGranTempo.abc'), True)
         filePathCollection = corpus.getComposer('josquin')
