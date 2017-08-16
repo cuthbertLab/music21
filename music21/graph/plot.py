@@ -1671,17 +1671,9 @@ class Test(unittest.TestCase):
 
 
     def testWindowed(self, doneAction=None):
-        if doneAction is not None: # pragma: no cover
-            fp = random.choice(corpus.getBachChorales('.xml'))
-            unused_directory, fn = os.path.split(fp)
-            a = corpus.parse(fp)
-            windowStep = 3 #'2'
-            #windowStep = random.choice([1, 2, 4, 8, 16, 32])
-            #a.show()
-        else:
-            a = corpus.parse('bach/bwv66.6')
-            fn = 'bach/bwv66.6'
-            windowStep = 20 # set high to be fast
+        a = corpus.parse('bach/bwv66.6')
+        fn = 'bach/bwv66.6'
+        windowStep = 20 # set high to be fast
 
 #         b = WindowedAmbitus(a.parts, title='Bach Ambitus',
 #             minWindow=1, maxWindow=8, windowStep=3,
@@ -2017,14 +2009,6 @@ class Test(unittest.TestCase):
 
         #b.show()
 
-
-    def xtestGraphVerticalBar(self): # pragma: no cover
-        #streamList = corpus.parse('essenFolksong/han1')
-        streamList = corpus.getBachChorales()[100:108]
-        feList = ['m17', 'm18', 'm19', 'ql1']
-        #labelList = [os.path.basename(fp) for fp in streamList]
-        p = Features(streamList, feList)
-        p.run()
 
 
 #-------------------------------------------------------------------------------

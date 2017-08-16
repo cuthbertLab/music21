@@ -1551,10 +1551,9 @@ class Test(unittest.TestCase):
                             'jSymbolic')
 
         #worksBach = corpus.getBachChorales()[100:143] # a middle range
-        worksMonteverdi = corpus.getMonteverdiMadrigals()[:43]
+        worksMonteverdi = corpus.search('monteverdi').search('.xml')[:43]
 
-        worksBach = corpus.getBachChorales()[:5]
-#         worksMonteverdi = corpus.getMonteverdiMadrigals()[:5]
+        worksBach = corpus.search('bach').search(numberOfParts=4)[:5]
 
         # need to define what the class label will be
         ds = features.DataSet(classLabel='Composer')

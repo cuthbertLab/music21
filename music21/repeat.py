@@ -2035,12 +2035,12 @@ class RepeatFinder:
         Measures are considered the same if the defaultHash maps them to two values which are
         equal under the '==' operator.
 
-        >>> chorales = corpus.getBachChorales()
         >>> chorale = corpus.parse('bwv154.3.mxl')
         >>> repeat.RepeatFinder(chorale).getMeasureSimilarityList()
         [[4], [5], [6], [7, 15], [], [], [], [15], [], [], [], [], [], [], [], []]
         >>> repeat.RepeatFinder(chorale.parts[0]).getMeasureSimilarityList()
         [[4, 12], [5], [6], [7, 15], [12], [], [], [15], [], [], [], [], [], [], [], []]
+
         >>> chorale2 = corpus.parse('bwv153.5.mxl')
         >>> repeat.RepeatFinder(chorale2).getMeasureSimilarityList()    #bwv153.5 has a pickup
         [[], [5], [6], [7], [], [], [], [], [], [], [], [], [], [], [], [], []]
@@ -2336,7 +2336,6 @@ class RepeatFinder:
 
         OMIT_FROM_DOCS
 
-        >>> chorales = corpus.getBachChorales()
         >>> c1 = corpus.parse('bwv115.6.mxl')    #has a repeated section
         >>> c1simple = repeat.RepeatFinder(c1).simplify()
         >>> m4 = search.translateStreamToString( c1.parts[0].measure(4).notesAndRests)

@@ -505,7 +505,7 @@ class TestImportCorpus2(M21CallTest):
 
     def testFocus(self):
         music21 = self.m21
-        unused = music21.corpus.getBachChorales()
+        unused = music21.corpus.getWork('bach/bwv66.6')
 
 
 class TestImportCorpus3(CallTest):

@@ -12,6 +12,7 @@
 #------------------------------------------------------------------------------
 import multiprocessing
 import os
+import pathlib
 import pickle
 import traceback
 import unittest
@@ -103,7 +104,7 @@ class MetadataCachingJob:
     ### INITIALIZER ###
 
     def __init__(self, filePath, jobNumber=0, parseUsingCorpus=True, corpusName=None):
-        self.filePath = filePath
+        self.filePath = pathlib.Path(filePath)
         self.filePathErrors = []
         self.jobNumber = int(jobNumber)
         self.results = []
@@ -131,11 +132,9 @@ class MetadataCachingJob:
         parsedObject = None
         try:
             if self.parseUsingCorpus is False:
-                parsedObject = converter.parse(
-                    self.filePath, forceSource=True)
+                parsedObject = converter.parse(self.filePath, forceSource=True)
             else:
-                parsedObject = corpus.parse(
-                    self.filePath, forceSource=True)
+                parsedObject = corpus.parse(str(self.filePath), forceSource=True)
         except Exception as e: # wide catch is fine. pylint: disable=broad-except
             environLocal.printDebug('parse failed: {0}, {1}'.format(
                 self.filePath, str(e)))
@@ -250,10 +249,10 @@ class MetadataCachingJob:
 
     @property
     def cleanFilePath(self):
-        corpusPath = os.path.abspath(common.getCorpusFilePath())
-        if self.filePath.startswith(corpusPath):
-            cleanFilePath = common.relativepath(self.filePath, corpusPath)
-        else:
+        corpusPath = common.getCorpusFilePath()
+        try:
+            cleanFilePath = self.filePath.relative_to(corpusPath)
+        except ValueError:
             cleanFilePath = self.filePath
         return cleanFilePath
 
@@ -274,7 +273,10 @@ class JobProcessor:
     * the number of remaining jobs
 
     >>> jobs = []
-    >>> for corpusPath in corpus.getMonteverdiMadrigals()[:3]:
+    >>> mdb = corpus.corpora.CoreCorpus().search('monteverdi')[:3]
+    >>> paths = [x.sourcePath for x in mdb]
+
+    >>> for corpusPath in paths:
     ...     job = metadata.caching.MetadataCachingJob(
     ...         corpusPath,
     ...         parseUsingCorpus=True,

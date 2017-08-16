@@ -77,9 +77,12 @@ class Corpus:
         NB: we've tried optimizing with `fnmatch` but it does not save any
         time.
         '''
-        rdp = common.cleanpath(rootDirectoryPath)
+        rdp = common.cleanpath(rootDirectoryPath, returnPathlib=True)
         matched = []
-        for filename in rdp.rglob(''):
+        
+        for filename in rdp.rglob('*'):
+            if filename.name.startswith('__'):
+                continue
             if filename.name.startswith('.'):
                 continue
             for extension in fileExtensions:
@@ -303,7 +306,6 @@ class Corpus:
                     filenameWithoutExtension = filePath.stem
                 else:
                     filenameWithoutExtension = None
-
                 searchPartialMatch = True
                 if filenameWithoutExtension is not None:
                     # look for direct matches first
@@ -455,7 +457,7 @@ class Corpus:
         for path in paths:
             # iterate through path components; cannot match entire string
             # composer name may be at any level
-            stubs = path.split(os.sep)
+            stubs = path.parts
             for stub in stubs:
                 # need to remove extension if found
                 if composerName.lower() == stub.lower():
@@ -550,154 +552,6 @@ class CoreCorpus(Corpus):
         
     ### PUBLIC METHODS ###
 
-    def getBachChorales(
-        self,
-        fileExtensions='xml',
-        ):
-        r'''
-        Return the file name of all Bach chorales.
-
-        By default, only Bach Chorales in xml format are returned, because the
-        quality of the encoding and our parsing of those is superior.
-
-        N.B. Look at the module corpus.chorales for many better ways to work
-        with the chorales.
-
-        >>> from music21 import corpus
-        >>> coreCorpus = corpus.corpora.CoreCorpus()
-        >>> a = coreCorpus.getBachChorales()
-        >>> len(a) > 400
-        True
-
-        >>> a = coreCorpus.getBachChorales('krn')
-        >>> len(a) > 10
-        False
-
-        >>> a = coreCorpus.getBachChorales('xml')
-        >>> len(a) > 400
-        True
-
-        >>> #_DOCS_SHOW a[0]
-        >>> '/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl' #_DOCS_HIDE
-        '/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl'
-
-        '''
-        names = ( 'bwv1.6.mxl', 'bwv10.7.mxl', 'bwv101.7.mxl', 'bwv102.7.mxl',
-        'bwv103.6.mxl', 'bwv104.6.mxl', 'bwv108.6.mxl', 'bwv11.6.mxl',
-        'bwv110.7.mxl', 'bwv111.6.mxl', 'bwv112.5-sc.mxl', 'bwv112.5.mxl',
-        'bwv113.8.mxl', 'bwv114.7.mxl', 'bwv115.6.mxl', 'bwv116.6.mxl',
-        'bwv117.4.mxl', 'bwv119.9.mxl', 'bwv12.7.mxl', 'bwv120.6.mxl',
-        'bwv120.8-a.mxl', 'bwv121.6.mxl', 'bwv122.6.mxl', 'bwv123.6.mxl',
-        'bwv124.6.mxl', 'bwv125.6.mxl', 'bwv126.6.mxl', 'bwv127.5.mxl',
-        'bwv128.5.mxl', 'bwv13.6.mxl', 'bwv130.6.mxl', 'bwv133.6.mxl',
-        'bwv135.6.mxl', 'bwv136.6.mxl', 'bwv137.5.mxl', 'bwv139.6.mxl',
-        'bwv14.5.mxl', 'bwv140.7.mxl', 'bwv144.3.mxl', 'bwv144.6.mxl',
-        'bwv145-a.mxl', 'bwv145.5.mxl', 'bwv146.8.mxl', 'bwv148.6.mxl',
-        'bwv149.7.mxl', 'bwv151.5.mxl', 'bwv153.1.mxl', 'bwv153.5.mxl',
-        'bwv153.9.mxl', 'bwv154.3.mxl', 'bwv154.8.mxl', 'bwv155.5.mxl',
-        'bwv156.6.mxl', 'bwv157.5.mxl', 'bwv158.4.mxl', 'bwv159.5.mxl',
-        'bwv16.6.mxl', 'bwv161.6.mxl', 'bwv162.6-lpz.mxl', 'bwv164.6.mxl',
-        'bwv165.6.mxl', 'bwv166.6.mxl', 'bwv168.6.mxl', 'bwv169.7.mxl',
-        'bwv17.7.mxl', 'bwv171.6.mxl', 'bwv172.6.mxl', 'bwv174.5.mxl',
-        'bwv175.7.mxl', 'bwv176.6.mxl', 'bwv177.5.mxl', 'bwv178.7.mxl',
-        'bwv179.6.mxl', 'bwv18.5-lz.mxl', 'bwv18.5-w.mxl', 'bwv180.7.mxl',
-        'bwv183.5.mxl', 'bwv184.5.mxl', 'bwv185.6.mxl', 'bwv187.7.mxl',
-        'bwv188.6.mxl', 'bwv19.7.mxl', 'bwv190.7-inst.mxl', 'bwv190.7.mxl',
-        'bwv194.12.mxl', 'bwv194.6.mxl', 'bwv195.6.mxl', 'bwv197.10.mxl',
-        'bwv197.5.mxl', 'bwv197.7-a.mxl', 'bwv2.6.mxl', 'bwv20.11.mxl',
-        'bwv20.7.mxl', 'bwv226.2.mxl', 'bwv227.1.mxl', 'bwv227.11.mxl',
-        'bwv227.3.mxl', 'bwv227.7.mxl', 'bwv229.2.mxl', 'bwv244.10.mxl',
-        'bwv244.15.mxl', 'bwv244.17.mxl', 'bwv244.25.mxl', 'bwv244.29-a.mxl',
-        'bwv244.3.mxl', 'bwv244.32.mxl', 'bwv244.37.mxl', 'bwv244.40.mxl',
-        'bwv244.44.mxl', 'bwv244.46.mxl', 'bwv244.54.mxl', 'bwv244.62.mxl',
-        'bwv245.11.mxl', 'bwv245.14.mxl', 'bwv245.15.mxl', 'bwv245.17.mxl',
-        'bwv245.22.mxl', 'bwv245.26.mxl', 'bwv245.28.mxl', 'bwv245.3.mxl',
-        'bwv245.37.mxl', 'bwv245.40.mxl', 'bwv245.5.mxl', 'bwv248.12-2.mxl',
-        'bwv248.17.mxl', 'bwv248.23-2.mxl', 'bwv248.23-s.mxl', 'bwv248.28.mxl',
-        'bwv248.33-3.mxl', 'bwv248.35-3.mxl', 'bwv248.35-3c.mxl',
-        'bwv248.42-4.mxl', 'bwv248.42-s.mxl', 'bwv248.46-5.mxl',
-        'bwv248.5.mxl', 'bwv248.53-5.mxl', 'bwv248.59-6.mxl',
-        'bwv248.64-6.mxl', 'bwv248.64-s.mxl', 'bwv248.9-1.mxl',
-        'bwv248.9-s.mxl', 'bwv25.6.mxl', 'bwv250.mxl', 'bwv251.mxl',
-        'bwv252.mxl', 'bwv253.mxl', 'bwv254.mxl', 'bwv255.mxl', 'bwv256.mxl',
-        'bwv257.mxl', 'bwv258.mxl', 'bwv259.mxl', 'bwv26.6.mxl', 'bwv260.mxl',
-        'bwv261.mxl', 'bwv262.mxl', 'bwv263.mxl', 'bwv264.mxl', 'bwv265.mxl',
-        'bwv266.mxl', 'bwv267.mxl', 'bwv268.mxl', 'bwv269.mxl', 'bwv27.6.mxl',
-        'bwv270.mxl', 'bwv271.mxl', 'bwv272.mxl', 'bwv273.mxl', 'bwv276.mxl',
-        'bwv277.krn', 'bwv277.mxl', 'bwv278.mxl', 'bwv279.mxl', 'bwv28.6.mxl',
-        'bwv280.mxl', 'bwv281.krn', 'bwv281.mxl', 'bwv282.mxl', 'bwv283.mxl',
-        'bwv284.mxl', 'bwv285.mxl', 'bwv286.mxl', 'bwv287.mxl', 'bwv288.mxl',
-        'bwv289.mxl', 'bwv29.8.mxl', 'bwv290.mxl', 'bwv291.mxl', 'bwv292.mxl',
-        'bwv293.mxl', 'bwv294.mxl', 'bwv295.mxl', 'bwv296.mxl', 'bwv297.mxl',
-        'bwv298.mxl', 'bwv299.mxl', 'bwv3.6.mxl', 'bwv30.6.mxl', 'bwv300.mxl',
-        'bwv301.mxl', 'bwv302.mxl', 'bwv303.mxl', 'bwv304.mxl', 'bwv305.mxl',
-        'bwv306.mxl', 'bwv307.mxl', 'bwv308.mxl', 'bwv309.mxl', 'bwv31.9.mxl',
-        'bwv310.mxl', 'bwv311.mxl', 'bwv312.mxl', 'bwv313.mxl', 'bwv314.mxl',
-        'bwv315.mxl', 'bwv316.mxl', 'bwv317.mxl', 'bwv318.mxl', 'bwv319.mxl',
-        'bwv32.6.mxl', 'bwv320.mxl', 'bwv321.mxl', 'bwv322.mxl', 'bwv323.mxl',
-        'bwv324.mxl', 'bwv325.mxl', 'bwv326.mxl', 'bwv327.mxl', 'bwv328.mxl',
-        'bwv329.mxl', 'bwv33.6.mxl', 'bwv330.mxl', 'bwv331.mxl', 'bwv332.mxl',
-        'bwv333.mxl', 'bwv334.mxl', 'bwv335.mxl', 'bwv336.mxl', 'bwv337.mxl',
-        'bwv338.mxl', 'bwv339.mxl', 'bwv340.mxl', 'bwv341.mxl', 'bwv342.mxl',
-        'bwv343.mxl', 'bwv344.mxl', 'bwv345.mxl', 'bwv346.mxl', 'bwv347.mxl',
-        'bwv348.mxl', 'bwv349.mxl', 'bwv350.mxl', 'bwv351.mxl', 'bwv352.mxl',
-        'bwv353.mxl', 'bwv354.mxl', 'bwv355.mxl', 'bwv356.mxl', 'bwv357.mxl',
-        'bwv358.mxl', 'bwv359.mxl', 'bwv36.4-2.mxl', 'bwv36.8-2.mxl',
-        'bwv360.mxl', 'bwv361.mxl', 'bwv362.mxl', 'bwv363.mxl', 'bwv364.mxl',
-        'bwv365.mxl', 'bwv366.krn', 'bwv366.mxl', 'bwv367.mxl', 'bwv368.mxl',
-        'bwv369.mxl', 'bwv37.6.mxl', 'bwv370.mxl', 'bwv371.mxl', 'bwv372.mxl',
-        'bwv373.mxl', 'bwv374.mxl', 'bwv375.mxl', 'bwv376.mxl', 'bwv377.mxl',
-        'bwv378.mxl', 'bwv379.mxl', 'bwv38.6.mxl', 'bwv380.mxl', 'bwv381.mxl',
-        'bwv382.mxl', 'bwv383.mxl', 'bwv384.mxl', 'bwv385.mxl', 'bwv386.mxl',
-        'bwv387.mxl', 'bwv388.mxl', 'bwv389.mxl', 'bwv39.7.mxl', 'bwv390.mxl',
-        'bwv391.mxl', 'bwv392.mxl', 'bwv393.mxl', 'bwv394.mxl', 'bwv395.mxl',
-        'bwv396.mxl', 'bwv397.mxl', 'bwv398.mxl', 'bwv399.mxl', 'bwv4.8.mxl',
-        'bwv40.3.mxl', 'bwv40.6.mxl', 'bwv40.8.mxl', 'bwv400.mxl',
-        'bwv401.mxl', 'bwv402.mxl', 'bwv403.mxl', 'bwv404.mxl', 'bwv405.mxl',
-        'bwv406.mxl', 'bwv407.mxl', 'bwv408.mxl', 'bwv41.6.mxl', 'bwv410.mxl',
-        'bwv411.mxl', 'bwv412.mxl', 'bwv413.mxl', 'bwv414.mxl', 'bwv415.mxl',
-        'bwv416.mxl', 'bwv417.mxl', 'bwv418.mxl', 'bwv419.mxl', 'bwv42.7.mxl',
-        'bwv420.mxl', 'bwv421.mxl', 'bwv422.mxl', 'bwv423.mxl', 'bwv424.mxl',
-        'bwv425.mxl', 'bwv426.mxl', 'bwv427.mxl', 'bwv428.mxl', 'bwv429.mxl',
-        'bwv43.11.mxl', 'bwv430.mxl', 'bwv431.mxl', 'bwv432.mxl', 'bwv433.mxl',
-        'bwv434.mxl', 'bwv435.mxl', 'bwv436.mxl', 'bwv437.mxl', 'bwv438.mxl',
-        'bwv44.7.mxl', 'bwv45.7.mxl', 'bwv47.5.mxl', 'bwv48.3.mxl',
-        'bwv48.7.mxl', 'bwv5.7.mxl', 'bwv52.6.mxl', 'bwv55.5.mxl',
-        'bwv56.5.mxl', 'bwv57.8.mxl', 'bwv59.3.mxl', 'bwv6.6.mxl',
-        'bwv60.5.mxl', 'bwv64.2.mxl', 'bwv64.4.mxl', 'bwv64.8.mxl',
-        'bwv65.2.mxl', 'bwv65.7.mxl', 'bwv66.6.mxl', 'bwv67.4.mxl',
-        'bwv67.7.mxl', 'bwv69.6-a.mxl', 'bwv69.6.mxl', 'bwv7.7.mxl',
-        'bwv70.11.mxl', 'bwv70.7.mxl', 'bwv72.6.mxl', 'bwv73.5.mxl',
-        'bwv74.8.mxl', 'bwv77.6.mxl', 'bwv78.7.mxl', 'bwv79.3.mxl',
-        'bwv79.6.mxl', 'bwv8.6.mxl', 'bwv80.8.mxl', 'bwv81.7.mxl',
-        'bwv83.5.mxl', 'bwv84.5.mxl', 'bwv85.6.mxl', 'bwv86.6.mxl',
-        'bwv87.7.mxl', 'bwv88.7.mxl', 'bwv89.6.mxl', 'bwv9.7.mxl',
-        'bwv90.5.mxl', 'bwv91.6.mxl', 'bwv92.9.mxl', 'bwv93.7.mxl',
-        'bwv94.8.mxl', 'bwv95.7.mxl', 'bwv96.6.mxl', 'bwv97.9.mxl',
-        'bwv99.6.mxl',
-        )
-        composerDirectory = self.getComposerDirectoryPath('bach')
-        results = []
-        if composerDirectory is None:  # case where we have no corpus
-            return results
-        paths = self.getPaths(fileExtensions)
-        for filename in names:
-            candidate = os.path.join(composerDirectory, filename)
-            if candidate not in paths:  # it may not match extensions
-                if not os.path.exists(candidate):  # it does not exist at all
-                    filename2 = filename.replace('mxl', 'xml')
-                    candidate2 = os.path.join(composerDirectory, filename2)
-                    if candidate2 in paths:
-                        results.append(candidate2)
-                    else:
-                        environLocal.printDebug([
-                            'corpus missing expected file path',
-                            candidate,
-                            ])
-            else:
-                results.append(candidate)
-        return results
-
     def getComposerDirectoryPath(self, composerName):
         '''
         To be DEPRECATED
@@ -709,77 +563,34 @@ class CoreCorpus(Corpus):
         >>> from music21 import corpus
         >>> coreCorpus = corpus.corpora.CoreCorpus()
         >>> a = coreCorpus.getComposerDirectoryPath('ciconia')
-        >>> a.endswith(os.path.join('corpus', os.sep, 'ciconia'))
-        True
+        >>> a.name
+        'ciconia'
+        >>> a.parent.name
+        'corpus'
 
         >>> a = coreCorpus.getComposerDirectoryPath('bach')
-        >>> a.endswith(os.path.join('corpus', os.sep, 'bach'))
-        True
+        >>> a.name
+        'bach'
+        >>> a.parent.name
+        'corpus'
 
         >>> a = coreCorpus.getComposerDirectoryPath('handel')
-        >>> a.endswith(os.path.join('corpus', os.sep, 'handel'))
-        True
+        >>> a.name
+        'handel'
+        >>> a.parent.name
+        'corpus'
 
         '''
+        composerName = composerName.lower()
         match = None
-        for moduleName in sorted(os.listdir(common.getCorpusFilePath())):
-            candidate = moduleName
-            if composerName.lower() not in candidate.lower():
+        for moduleName in common.getCorpusFilePath().iterdir():
+            if composerName not in str(moduleName).lower():
                 continue
-            directory = os.path.join(common.getCorpusFilePath(), moduleName)
-            if directory.lower().endswith(composerName.lower()):
-                match = directory
+            if str(moduleName).lower().endswith(composerName):
+                match = moduleName
                 break
         return match
 
-    def getMonteverdiMadrigals(
-        self,
-        fileExtensions='xml',
-        ):
-        '''
-        Return a list of the filenames of all Monteverdi madrigals.
-
-        >>> from music21 import corpus
-        >>> coreCorpus = corpus.corpora.CoreCorpus()
-        >>> a = coreCorpus.getMonteverdiMadrigals()
-        >>> len(a) > 40
-        True
-
-        '''
-        results = []
-        names = (
-            'madrigal.3.1.mxl', 'madrigal.3.2.mxl', 'madrigal.3.3.mxl',
-            'madrigal.3.4.mxl', 'madrigal.3.5.mxl', 'madrigal.3.6.mxl',
-            'madrigal.3.7.mxl', 'madrigal.3.8.mxl', 'madrigal.3.9.mxl',
-            'madrigal.3.10.mxl', 'madrigal.3.11.mxl', 'madrigal.3.12.mxl',
-            'madrigal.3.13.mxl', 'madrigal.3.14.mxl', 'madrigal.3.15.mxl',
-            'madrigal.3.16.mxl', 'madrigal.3.17.mxl', 'madrigal.3.18.mxl',
-            'madrigal.3.19.mxl', 'madrigal.3.20.mxl', 'madrigal.4.1.mxl',
-            'madrigal.4.2.mxl', 'madrigal.4.3.mxl', 'madrigal.4.4.mxl',
-            'madrigal.4.5.mxl', 'madrigal.4.6.mxl', 'madrigal.4.7.mxl',
-            'madrigal.4.8.mxl', 'madrigal.4.9.mxl', 'madrigal.4.10.mxl',
-            'madrigal.4.11.mxl', 'madrigal.4.12.mxl', 'madrigal.4.13.mxl',
-            'madrigal.4.14.mxl', 'madrigal.4.15.mxl', 'madrigal.4.16.mxl',
-            'madrigal.4.17.mxl', 'madrigal.4.18.mxl', 'madrigal.4.19.mxl',
-            'madrigal.4.20.mxl', 'madrigal.5.1.mxl', 'madrigal.5.2.mxl',
-            'madrigal.5.3.mxl', 'madrigal.5.5.mxl', 'madrigal.5.5.mxl',
-            'madrigal.5.6.mxl', 'madrigal.5.7.mxl', 'madrigal.5.8.mxl',
-            )
-        composerDirectoryPath = self.getComposerDirectoryPath('monteverdi')
-        if composerDirectoryPath is None:
-            return results
-        paths = self.getPaths(fileExtensions)
-        for filename in names:
-            candidate = os.path.join(composerDirectoryPath, filename)
-            if candidate not in paths:
-                if not os.path.exists(candidate):
-                    environLocal.printDebug([
-                        'corpus missing expected file path',
-                        candidate,
-                        ])
-            else:
-                results.append(candidate)
-        return results
 
     def getPaths(
         self,
@@ -818,8 +629,9 @@ class CoreCorpus(Corpus):
         cacheKey = ('core', tuple(fileExtensions))
         # not cached, fetch and reset
         if cacheKey not in Corpus._pathsCache:
+            basePath = common.getCorpusFilePath()
             Corpus._pathsCache[cacheKey] = self._findPaths(
-                common.getCorpusFilePath(),
+                basePath,
                 fileExtensions,
                 )
         return Corpus._pathsCache[cacheKey]

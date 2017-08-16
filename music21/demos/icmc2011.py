@@ -715,16 +715,20 @@ class Test(unittest.TestCase):
         #from music21 import graph
 
         results = {}
-        for fn in corpus.getBachChorales()[:2]:
-            s = corpus.parse(fn)
-            ksScale = s.flat.getElementsByClass('KeySignature')[0].getScale()
-            for p in s.parts:
+        
+        stopCount = 2
+        for chorale in corpus.chorales.Iterator():
+            ksScale = chorale.recurse().getElementsByClass('Key')[0].getScale()
+            for p in chorale.parts:
                 if p.id.lower() == 'soprano':
-                    n = s.parts['soprano'].flat.getElementsByClass('Note')[-1]
+                    n = chorale.parts['soprano'].recurse().getElementsByClass('Note')[-1]
                     degree = ksScale.getScaleDegreeFromPitch(n.pitch)
                     if degree not in results.keys():
                         results[degree] = 0
                     results[degree] += 1
+            stopCount -= 1
+            if stopCount == 0:
+                break
         #print(results)
 
         # Results for all Bach chorales

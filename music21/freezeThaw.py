@@ -1800,7 +1800,8 @@ class JSONThawer(JSONFreezeThawBase):
         returns the stored object
         '''
         f = open(fp)
-        self.json = f.read()
+        fileContents = f.read()
+        self.json = fileContents
         f.close()
         return self.storedObject
 

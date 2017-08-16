@@ -12,11 +12,13 @@
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 
-
 import os
+import pathlib
 import time
 import unittest
+
 from collections import OrderedDict
+
 from music21 import common
 from music21 import exceptions21
 from music21 import freezeThaw
@@ -228,7 +230,8 @@ class MetadataBundle:
     and can be populated ad hoc:
 
     >>> anonymousBundle = metadata.bundles.MetadataBundle()
-    >>> paths = corpus.corpora.CoreCorpus().getMonteverdiMadrigals()[:4]
+    >>> mdb = corpus.corpora.CoreCorpus().search('monteverdi')[:4]
+    >>> paths = [common.getCorpusFilePath() / x.sourcePath for x in mdb]
     >>> failedPaths = anonymousBundle.addFromPaths(
     ...     paths, useMultiprocessing=False)
     >>> failedPaths
@@ -742,11 +745,9 @@ class MetadataBundle:
         currentJobNumber = 0
         skippedJobsCount = 0
         for path in paths:
-            if not path.startswith('http'):
-                path = common.cleanpath(path)
             key = self.corpusPathToKey(path)
-            if key in self._metadataEntries and not key.startswith('http'):
-                pathModificationTime = os.path.getctime(path)
+            if key in self._metadataEntries:
+                pathModificationTime = path.stat().st_ctime
                 if pathModificationTime < metadataBundleModificationTime:
                     skippedJobsCount += 1
                     continue
@@ -757,6 +758,7 @@ class MetadataBundle:
                 
             if corpusName.startswith('local-'):
                 corpusName = corpusName[6:]
+                
             job = metadata.caching.MetadataCachingJob(
                 path,
                 jobNumber=currentJobNumber,
@@ -826,7 +828,7 @@ class MetadataBundle:
     @staticmethod
     def corpusPathToKey(filePath, number=None):
         r'''
-        Given a file path or corpus path, return the meta-data path:
+        Given a file path or corpus path, return the metadata key:
 
         >>> from music21 import metadata
         >>> mb = metadata.bundles.MetadataBundle()
@@ -838,15 +840,29 @@ class MetadataBundle:
         >>> key.endswith('corelli_opus3no1_1grave_xml')
         True
         '''
-        if 'corpus' in filePath or 'music21' in filePath:
-            # get filePath after corpus
-            corpusPath = filePath.split('corpus')[-1]
+        if isinstance(filePath, pathlib.Path):
+            try:
+                filePath = filePath.relative_to(common.getSourceFilePath() / 'corpus')
+            except ValueError:
+                pass
+            
+            parts = filePath.parts
+            if parts[0] == '/' and len(parts) > 1:
+                parts = parts[1:]
+            
+            corpusPath = '_'.join(parts)
         else:
-            corpusPath = filePath
-        if corpusPath.startswith(os.sep):
-            corpusPath = corpusPath[1:]
-        corpusPath = corpusPath.replace('/', '_')
-        corpusPath = corpusPath.replace(os.sep, '_')
+            if 'corpus' in filePath:
+                # get filePath after corpus
+                corpusPath = filePath.split('corpus')[-1]
+            else:
+                corpusPath = filePath
+    
+            if corpusPath.startswith(os.sep):
+                corpusPath = corpusPath[1:]
+            corpusPath = corpusPath.replace('/', '_')
+            corpusPath = corpusPath.replace(os.sep, '_')
+        
         corpusPath = corpusPath.replace('.', '_')
         # append name to metadata path
         if number is not None:
@@ -1114,7 +1130,6 @@ class MetadataBundle:
         Perform search, on all stored metadata, permit regular expression
         matching.
 
-        >>> from music21 import corpus, metadata
         >>> workList = corpus.corpora.CoreCorpus().getWorkList('ciconia')
         >>> metadataBundle = metadata.bundles.MetadataBundle()
         >>> failedPaths = metadataBundle.addFromPaths(
@@ -1157,6 +1172,9 @@ class MetadataBundle:
         >>> metadataBundle.search(composer='cicon')
         <music21.metadata.bundles.MetadataBundle {1 entry}>
         '''
+        if fileExtensions is not None and not common.isIterable(fileExtensions):
+            fileExtensions = [fileExtensions]
+            
         newMetadataBundle = MetadataBundle()
         if query is None and field is None:
             if not kwargs:
@@ -1172,11 +1190,14 @@ class MetadataBundle:
                 include = False
                 if fileExtensions is not None:
                     for fileExtension in fileExtensions:
-                        if metadataEntry.sourcePath.endswith(fileExtension):
+                        if fileExtension and fileExtension[0] != '.':
+                            fileExtension = '.' + fileExtension
+                            
+                        if metadataEntry.sourcePath.suffix == fileExtension:
                             include = True
                             break
                         elif (fileExtension.endswith('xml')
-                                and metadataEntry.sourcePath.endswith(('mxl', 'mx'))):
+                                and metadataEntry.sourcePath.suffix in ('.mxl', '.mx')):
                             include = True
                             break
                 else:
@@ -1264,16 +1285,19 @@ class MetadataBundle:
             sourcePath = metadataEntry.sourcePath
             if sourcePath in validatedPaths:
                 continue
-            if sourcePath.startswith('http:'):
+            
+            if isinstance(sourcePath, str) and sourcePath.startswith('http:'):
                 validatedPaths.add(metadataEntry.sourcePath)
                 continue
-            if not os.path.isabs(sourcePath):
-                sourcePath = common.cleanpath(os.path.join(
-                    common.getCorpusFilePath(),
-                    sourcePath,
-                    ))
-            if not os.path.exists(sourcePath):
+            elif isinstance(sourcePath, str):
+                sourcePath = pathlib.Path(sourcePath)
+            
+            if not sourcePath.is_absolute():
+                sourcePath = common.getCorpusFilePath() / sourcePath
+                
+            if not sourcePath.exists():
                 invalidatedKeys.append(key)
+
             validatedPaths.add(metadataEntry.sourcePath)
         for key in invalidatedKeys:
             del(self._metadataEntries[key])
@@ -1321,7 +1345,47 @@ class Test(unittest.TestCase):
 
     def runTest(self):
         pass
+    
+    def testOneFromCorpus(self):
+        from music21.corpus.corpora import CoreCorpus
+        cc = CoreCorpus()
+        coreBundle = cc.metadataBundle
+        metadataEntry = coreBundle.search('bwv66.6')[0]
+        self.assertEqual(repr(metadataEntry), 
+                         '<music21.metadata.bundles.MetadataEntry: bach_bwv66_6_mxl>')
 
+    def testFileExtensions(self):
+        from music21.corpus.corpora import CoreCorpus
+        cc = CoreCorpus()
+        workList = cc.getWorkList('ciconia')
+        mdb = MetadataBundle()
+        failedPaths = mdb.addFromPaths(
+            workList,
+            parseUsingCorpus=False,
+            useMultiprocessing=False,
+            storeOnDisk=False,
+        )
+        self.assertFalse(failedPaths)
+        searchResult = mdb.search(
+            'cicon',
+            field='composer'
+        )
+        self.assertEqual(len(searchResult), 1)
+        self.assertEqual(repr(searchResult[0]), 
+                         '<music21.metadata.bundles.MetadataEntry: ciconia_quod_jactatur_xml>')
+        searchResult = mdb.search(
+            'cicon',
+            field='composer',
+            fileExtensions=('.krn',),
+        )
+        self.assertEqual(len(searchResult), 0)
+        searchResult = mdb.search(
+            'cicon',
+            field='composer',
+            fileExtensions=('.xml'),
+        )
+        self.assertEqual(len(searchResult), 1)
+        
 #------------------------------------------------------------------------------
 
 
@@ -1336,7 +1400,7 @@ __all__ = [
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test) #, runTest='testUserSpecifiedPath')
+    music21.mainTest(Test) #, runTest='testFileExtensions')
 
 
 #------------------------------------------------------------------------------

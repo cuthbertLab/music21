@@ -1059,7 +1059,6 @@ def parse(value, *args, **keywords):
     >>> s.getElementsByClass(meter.TimeSignature)[0]
     <music21.meter.TimeSignature 2/16>
     '''
-
     #environLocal.printDebug(['attempting to parse()', value])
     if 'forceSource' in keywords:
         forceSource = keywords['forceSource']
@@ -1104,13 +1103,13 @@ def parse(value, *args, **keywords):
             value = [value] + list(args)
         return parseData(value, number=number, **keywords)
     # a midi string, must come before os.path.exists test
-    elif not isinstance(valueStr, bytes) and valueStr.startswith('MThd'):
+    elif not isinstance(value, bytes) and valueStr.startswith('MThd'):
         return parseData(value, number=number, format=m21Format, **keywords)
-    elif not isinstance(value, bytes) and os.path.exists(value):
-        return parseFile(value, number=number, format=m21Format,
+    elif not isinstance(value, bytes) and os.path.exists(valueStr):
+        return parseFile(valueStr, number=number, format=m21Format,
                          forceSource=forceSource, **keywords)
-    elif not isinstance(value, bytes) and os.path.exists(common.cleanpath(value)):
-        return parseFile(common.cleanpath(value), number=number, format=m21Format,
+    elif not isinstance(value, bytes) and os.path.exists(common.cleanpath(valueStr)):
+        return parseFile(common.cleanpath(valueStr), number=number, format=m21Format,
                          forceSource=forceSource, **keywords)
 
     elif not isinstance(valueStr, bytes) and (valueStr.startswith('http://') 
@@ -1118,6 +1117,9 @@ def parse(value, *args, **keywords):
         # its a url; may need to broaden these criteria
         return parseURL(value, number=number, format=m21Format,
                         forceSource=forceSource, **keywords)
+
+    elif isinstance(value, pathlib.Path):
+        raise FileNotFoundError('Cannot find file in {:s}'.format(str(value)))
     else:
         return parseData(value, number=number, format=m21Format, **keywords)
 
@@ -1865,7 +1867,7 @@ class Test(unittest.TestCase):
         Here is a filename with an incorrect extension (.txt for .rnText).  Make sure that
         it is not cached the second time...
         '''
-        fp = os.path.join(common.getSourceFilePath(), 'converter', 'incorrectExtension.txt')
+        fp = common.getSourceFilePath() / 'converter' / 'incorrectExtension.txt'
         pf = PickleFilter(fp)
         pf.removePickle()
 
@@ -1874,6 +1876,17 @@ class Test(unittest.TestCase):
 
         c = parse(fp, format='romantext')
         self.assertEqual(len(c.recurse().getElementsByClass('Harmony')), 1)
+
+    def testConverterFromPath(self):
+        fp = common.getSourceFilePath() / 'corpus' / 'bach' / 'bwv66.6.mxl'
+        s = parse(fp)
+        self.assertIn('Stream', s.classes)
+
+        fp = common.getSourceFilePath() / 'corpus' / 'bach' / 'bwv66.6'
+
+        with self.assertRaises(FileNotFoundError):
+            parse(fp)
+
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -1884,7 +1897,7 @@ _DOC_ORDER = [parse, parseFile, parseData, parseURL, freeze, thaw, freezeStr, th
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='testConverterFromPath')
 
 
 

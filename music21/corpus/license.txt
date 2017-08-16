@@ -5,7 +5,7 @@
 #
 #-------------------------------------------------------------------------------
 
-The LGPL / BSD music21 software is distributed with a corpus of encoded compositions 
+The BSD licensed music21 software is distributed with a corpus of encoded compositions 
 which are distributed with the permission of the encoders (and, where needed, the 
 composers or arrangers) and where permitted under United States copyright law. 
 Some encodings included in the corpus may not be used for commercial uses or have 

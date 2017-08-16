@@ -57,8 +57,6 @@ from music21.corpus import manager
 # from music21.corpus import virtual
 from music21.corpus import work
 
-from music21.musicxml import archiveTools
-
 from music21 import environment
 _MOD = "corpus.base.py"
 environLocal = environment.Environment(_MOD)
@@ -242,8 +240,12 @@ def getComposerDir(composerName):
 
     >>> import os
     >>> a = corpus.getComposerDir('bach')
-    >>> a.endswith(os.path.join('corpus', os.sep, 'bach'))
-    True
+    >>> a.name
+    'bach'
+    >>> a.parent.name
+    'corpus'
+    
+    Returns a pathlib.Path object
     '''
     return corpora.CoreCorpus().getComposerDirectoryPath(composerName)
 
@@ -340,82 +342,6 @@ def parse(workName,
         forceSource=forceSource,
         format=format # @ReservedAssignment
         )
-
-
-
-#------------------------------------------------------------------------------
-# compression
-
-
-def compressAllXMLFiles(deleteOriginal=False):
-    '''
-    Takes all filenames in corpus.paths and runs
-    :meth:`music21.musicxml.archiveTools.compressXML` on each.  If the musicXML files are
-    compressed, the originals are deleted from the system.
-    '''
-    environLocal.warn("Compressing musicXML files...")
-    for filename in getPaths(fileExtensions=('.xml',)):
-        archiveTools.compressXML(filename, deleteOriginal=deleteOriginal)
-    environLocal.warn(
-        'Compression complete. '
-        'Run the main test suite, fix bugs if necessary,'
-        'and then commit modified directories in corpus.'
-        )
-
-
-
-#------------------------------------------------------------------------------
-# libraries
-
-
-# additional libraries to define
-
-
-def getBachChorales(fileExtensions='xml'):
-    r'''
-    Return the file name of all Bach chorales.
-
-    By default, only Bach Chorales in xml format are returned, because the
-    quality of the encoding and our parsing of those is superior.
-
-    N.B. Look at the module corpus.chorales for many better ways to work with
-    the chorales.
-
-    >>> a = corpus.getBachChorales()
-    >>> len(a) > 400
-    True
-
-    >>> a = corpus.getBachChorales('krn')
-    >>> len(a) > 10
-    False
-
-    >>> a = corpus.getBachChorales('xml')
-    >>> len(a) > 400
-    True
-
-    >>> #_DOCS_SHOW a[0]
-    >>> '/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl' #_DOCS_HIDE
-    '/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl'
-
-    '''
-    cc = corpora.CoreCorpus()
-    return cc.getBachChorales(fileExtensions=fileExtensions,)
-
-
-def getMonteverdiMadrigals(fileExtensions='xml'):
-    '''
-    Return a list of the filenames of all Monteverdi madrigals.
-
-    >>> a = corpus.getMonteverdiMadrigals()
-    >>> len(a) > 40
-    True
-
-    '''
-    return corpora.CoreCorpus().getMonteverdiMadrigals(
-        fileExtensions=fileExtensions,
-        )
-
-#------------------------------------------------------------------------------
 
 
 if __name__ == "__main__":

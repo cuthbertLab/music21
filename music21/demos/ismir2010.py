@@ -525,14 +525,13 @@ def demoBachSearch():
     import random
     from music21 import key
 
-    fpList = corpus.getBachChorales('.xml')
+    fpList = corpus.search('bach').search('.xml')
     random.shuffle(fpList)
     results = stream.Stream()
 
     for fp in fpList[:40]:
-        fn = os.path.split(fp)[1]
-        print (fn)
-        s = converter.parse(fp)
+        print (fp.sourcePath)
+        s = fp.parse()
         # get key, mode
         key, mode = s.analyze('key')[:2]
         if mode == 'minor':
@@ -573,13 +572,9 @@ def demoBachSearch():
 
 
 def demoBachSearchBrief():
-    choraleList = corpus.getBachChorales()
     results = stream.Stream()
-    for filePath in choraleList:
-        fileName = os.path.split(filePath)[1]
-        pieceName = fileName.replace('.xml', '')
-        chorale = converter.parse(filePath)
-        print (fileName)
+    for chorale in corpus.chorales.Iterator():
+        print (chorale.metadata.title)
         key = chorale.analyze('key')
         if key.mode == 'minor':
             lastChordPitches = []
@@ -590,7 +585,7 @@ def demoBachSearchBrief():
             lastChord.transpose("P8", inPlace=True)
             if lastChord.isMinorTriad() is False and lastChord.isIncompleteMinorTriad() is False:
                 continue
-            lastChord.lyric = pieceName
+            lastChord.lyric = chorale.metadata.title
             m = stream.Measure()
             m.keySignature = chorale.flat.getElementsByClass(
               'KeySignature')[0]

@@ -20,6 +20,28 @@ from music21 import environment
 _MOD = 'musicxml/archiveTools.py'
 environLocal = environment.Environment(_MOD)
 
+
+#------------------------------------------------------------------------------
+# compression
+
+
+def compressAllXMLFiles(deleteOriginal=False):
+    '''
+    Takes all filenames in corpus.paths and runs
+    :meth:`music21.musicxml.archiveTools.compressXML` on each.  If the musicXML files are
+    compressed, the originals are deleted from the system.
+    '''
+    from music21.corpus.corpora import CoreCorpus
+    environLocal.warn("Compressing musicXML files...")
+    for filename in CoreCorpus().getPaths(fileExtensions=('.xml',)):
+        compressXML(filename, deleteOriginal=deleteOriginal)
+    environLocal.warn(
+        'Compression complete. '
+        'Run the main test suite, fix bugs if necessary,'
+        'and then commit modified directories in corpus.'
+        )
+
+
 def compressXML(filename, deleteOriginal=False):
     '''
     Takes a filename, and if the filename corresponds to a musicXML file with
