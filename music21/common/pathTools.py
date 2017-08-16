@@ -37,7 +37,7 @@ def getSourceFilePath():
     fpThis = pathlib.Path(inspect.getfile(getSourceFilePath)).resolve()
     fpMusic21 = fpThis.parent.parent # common is two levels deep
     # use stream as a test case
-    if 'stream' not in os.listdir(fpMusic21):
+    if 'stream' not in [x.name for x in fpMusic21.iterdir()]:
         raise Exception('cannot find expected music21 directory: %s' % fpMusic21)
     return fpMusic21
 
@@ -218,20 +218,33 @@ def relativepath(path, start=None):
         return path
     return os.path.relpath(path, start)
 
-def cleanpath(path):
+def cleanpath(path, *, returnPathlib=None):
     '''
     Normalizes the path by expanding ~user on Unix, ${var} environmental vars
     (is this a good idea?), expanding %name% on Windows, normalizing path names (Windows
     turns backslashes to forward slashes, and finally if that file is not an absolute path,
     turns it from a relative path to an absolute path.
     '''
-    path = os.path.expanduser(path)
-    path = os.path.expandvars(path)
-    path = os.path.normpath(path)
-    if not os.path.isabs(path):
-        path = os.path.abspath(path)
-    return path
+    
+    if isinstance(path, pathlib.Path):
+        path = path.expanduser(path)
+        path = path.resolve()
+        path = str(path)
+        if returnPathlib is None:
+            returnPathlib = True
+    else:
+        if returnPathlib is None:
+            returnPathlib = False
+        path = os.path.expanduser(path)
+        path = os.path.normpath(path)
+        if not os.path.isabs(path):
+            path = os.path.abspath(path)
 
+    path = os.path.expandvars(path)
+    if not returnPathlib:
+        return path
+    else:
+        return pathlib.Path(path)
 
 if __name__ == '__main__':
     import music21

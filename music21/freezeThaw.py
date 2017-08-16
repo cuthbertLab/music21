@@ -793,7 +793,8 @@ class StreamThawer(StreamFreezeThawBase):
         allEls = self.findAllM21Objects(streamObj)
 
         for e in allEls:
-            if 'Variant' in e.classes:
+            eClasses = e.classes
+            if 'Variant' in eClasses:
 #                # works like a whole new hierarchy... # no need for deepcopy
                 subSF = StreamThawer()
                 subSF.teardownSerializationScaffold(e._stream)
@@ -801,7 +802,7 @@ class StreamThawer(StreamFreezeThawBase):
                 e._cache = {}
                 #for el in e._stream.flat:
                 #    print el, el.offset, el.sites.siteDict
-            elif 'Spanner' in e.classes:
+            elif 'Spanner' in eClasses:
                 subSF = StreamThawer()
                 subSF.teardownSerializationScaffold(e.spannerStorage)
                 e.spannerStorage.coreElementsChanged()
@@ -889,8 +890,13 @@ class StreamThawer(StreamFreezeThawBase):
                 self.restoreElementsFromTuples(subElement)
 
     def restoreStreamStatusClient(self, streamObj):
+        '''
+        Restore the streamStatus client to point to the Stream
+        (do we do this for derivations?  No: there should not be derivations stored.
+        Other objects?  Unclear...)
+        '''
         if hasattr(streamObj, 'streamStatus'):
-            streamObj.streamStatus._client = streamObj
+            streamObj.streamStatus.client = streamObj
 
 
     def unpackStream(self, storage):

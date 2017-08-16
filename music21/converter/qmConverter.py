@@ -71,8 +71,8 @@ class QMConverter(converter.subConverters.SubConverter):
         file ending in .qm will automatically be parsed.
 
         >>> import os
-        >>> parserPath = common.getSourceFilePath() + os.path.sep + 'converter'
-        >>> testPath = parserPath + os.path.sep + 'quarterMusicTestIn.qm'
+        >>> parserPath = common.getSourceFilePath() / 'converter'
+        >>> testPath = parserPath / 'quarterMusicTestIn.qm'
 
         >>> from music21.converter.qmConverter import QMConverter
         >>> qmc = QMConverter()

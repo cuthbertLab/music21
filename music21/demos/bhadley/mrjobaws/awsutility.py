@@ -9,9 +9,11 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
+import pathlib
 import unittest
+
 import music21
-import os
+
 from music21 import corpus
 from music21 import common
 
@@ -65,9 +67,10 @@ def md5OfCorpusFile(fileDir, scoreNumber=None):
     'c1666c19d63fc0940f111008e2269f75.413'
     '''
 
-    corpusFP = common.getCorpusFilePath()
-    fileIn = open(corpusFP + os.sep + fileDir,'rb')
-    md5 = common.getMd5 ( fileIn.read() )
+    corpusFP = common.getCorpusFilePath() / pathlib.Path(fileDir)
+    with corpusFP.open('rb') as fileIn:
+        md5 = common.getMd5 ( fileIn.read() )
+    
     if scoreNumber:
         return md5 + '.' + scoreNumber
     else:

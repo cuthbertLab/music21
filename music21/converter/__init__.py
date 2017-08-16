@@ -239,7 +239,7 @@ class PickleFilter:
         if not isinstance(fp, pathlib.Path):
             fp = pathlib.Path(fp)
 
-        self.fp = fp.resolve()
+        self.fp = common.cleanpath(fp)
         self.forceSource = forceSource
         self.number = number
         #environLocal.printDebug(['creating pickle filter'])
@@ -452,9 +452,7 @@ class Converter:
 
         Does not use or store pickles in any circumstance.
         '''
-        if not isinstance(fp, pathlib.Path):
-            fp = pathlib.Path(fp)
-        fp = fp.resolve()
+        fp = common.cleanpath(fp, returnPathlib=True)
         #environLocal.printDebug(['attempting to parseFile', fp])
         if not fp.exists():
             raise ConverterFileException('no such file exists: %s' % fp)
@@ -483,7 +481,7 @@ class Converter:
         >>> c.getFormatFromFileExtension(fp)
         'musedata'
         '''
-        fp = fp.resolve()
+        fp = common.cleanpath(returnPathlib=True)
         # if the file path is to a directory, assume it is a collection of
         # musedata parts
         useFormat = None
@@ -507,10 +505,7 @@ class Converter:
         Will store as a pickle unless storePickle is False
         '''
         from music21 import freezeThaw
-        if not isinstance(fp, pathlib.Path):
-            fp = pathlib.Path(fp)
-
-        fp = fp.resolve()
+        fp = common.cleanpath(fp, returnPathlib=True)
         if not fp.exists():
             raise ConverterFileException('no such file exists: %s' % fp)
         useFormat = format
@@ -998,7 +993,7 @@ def parseFile(fp, number=None, format=None, forceSource=False, **keywords):  #@R
     Given a file path, attempt to parse the file into a Stream.
     '''
     v = Converter()
-    fp = common.cleanpath(fp)
+    fp = common.cleanpath(fp, returnPathlib=True)
     v.parseFile(fp, number=number, format=format, forceSource=forceSource, **keywords)
     return v.stream
 

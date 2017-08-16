@@ -21,6 +21,7 @@ parseData method that sets self.stream.
 import base64
 import io
 import os
+import pathlib
 import sys
 import unittest
 
@@ -1089,8 +1090,11 @@ class ConverterMuseData(SubConverter):
 
     def parseFile(self, fp, number=None):
         '''
-        parse fp and number
+        parse fp (a pathlib.Path()) and number
         '''
+        if not isinstance(fp, pathlib.Path):
+            fp = pathlib.Path(fp)
+        
         from music21 import converter
         from music21 import musedata as musedataModule
         from music21.musedata import translate as musedataTranslate
@@ -1101,14 +1105,14 @@ class ConverterMuseData(SubConverter):
 
         #environLocal.printDebug(['ConverterMuseData: parseFile', fp, af.isArchive()])
         # for dealing with one or more files
-        if fp.endswith('.zip') or af.isArchive():
+        if fp.suffix == '.zip' or af.isArchive():
             #environLocal.printDebug(['ConverterMuseData: found archive', fp])
             # get data will return all data from the zip as a single string
             for partStr in af.getData(dataFormat='musedata'):
                 #environLocal.printDebug(['partStr', len(partStr)])
                 mdw.addString(partStr)
         else:
-            if os.path.isdir(fp):
+            if fp.is_dir:
                 mdd = musedataModule.MuseDataDirectory(fp)
                 fpList = mdd.getPaths()
             elif not common.isListLike(fp):
