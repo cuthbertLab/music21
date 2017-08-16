@@ -1186,6 +1186,10 @@ class MetadataBundle:
             # ignore stub entries
             if metadataEntry.metadata is None:
                 continue
+            sp = metadataEntry.sourcePath
+            if not isinstance(sp, pathlib.Path):
+                sp = pathlib.Path(sp)
+
             if metadataEntry.search(query, field)[0]:
                 include = False
                 if fileExtensions is not None:
@@ -1193,11 +1197,11 @@ class MetadataBundle:
                         if fileExtension and fileExtension[0] != '.':
                             fileExtension = '.' + fileExtension
                             
-                        if metadataEntry.sourcePath.suffix == fileExtension:
+                        if sp.suffix == fileExtension:
                             include = True
                             break
                         elif (fileExtension.endswith('xml')
-                                and metadataEntry.sourcePath.suffix in ('.mxl', '.mx')):
+                                and sp.suffix in ('.mxl', '.mx')):
                             include = True
                             break
                 else:
