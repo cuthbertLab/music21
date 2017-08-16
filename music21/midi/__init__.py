@@ -1323,19 +1323,9 @@ class Test(unittest.TestCase):
         self.assertEqual(midiBinStr, b"MThd"+ a2b_hex(b"000000060001000103c0") )
 
     def testBasicImport(self):
-
-        directory = common.getPackageDir(relative=False, remapSep=os.sep)
-        fp = None
-        for fp in directory:
-            if fp.endswith('midi'):
-                break
-        if fp is None:
-            raise MidiException("No MIDI directory found!")
-
-        dirLib = os.path.join(fp, 'testPrimitive')
-        # a simple file created in athenacl
-        fp = os.path.join(dirLib, 'test01.mid')
-        environLocal.printDebug([fp])
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive' 
+        fp = dirLib / 'test01.mid'
+        environLocal.printDebug(fp)
         mf = MidiFile()
         mf.open(fp)
         mf.read()
@@ -1354,7 +1344,7 @@ class Test(unittest.TestCase):
 
 
         # a simple file created in athenacl
-        fp = os.path.join(dirLib, 'test02.mid')
+        fp = dirLib / 'test02.mid'
         environLocal.printDebug([fp])
         mf = MidiFile()
         mf.open(fp)
@@ -1373,7 +1363,8 @@ class Test(unittest.TestCase):
 
 
         # random files from the internet
-        fp = os.path.join(dirLib, 'test03.mid')
+        fp = dirLib / 'test03.mid'
+        
         environLocal.printDebug([fp])
         mf = MidiFile()
         mf.open(fp)
@@ -1391,7 +1382,7 @@ class Test(unittest.TestCase):
         mf.close()
 
         # random files from the internet
-        fp = os.path.join(dirLib, 'test04.mid')
+        fp = dirLib / 'test04.mid'
         environLocal.printDebug([fp])
         mf = MidiFile()
         mf.open(fp)
@@ -1415,18 +1406,9 @@ class Test(unittest.TestCase):
 
 
     def testInternalDataModel(self):
-
-        directory = common.getPackageDir(relative=False, remapSep=os.sep)
-        fp = None
-        for fp in directory:
-            if fp.endswith('midi'):
-                break
-        if fp is None:
-            raise MidiException("No MIDI directory found!")
-
-        dirLib = os.path.join(fp, 'testPrimitive')
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive' 
+        fp = dirLib / 'test01.mid'
         # a simple file created in athenacl
-        fp = os.path.join(dirLib, 'test01.mid')
         environLocal.printDebug([fp])
         mf = MidiFile()
         mf.open(fp)
@@ -1613,16 +1595,9 @@ class Test(unittest.TestCase):
     def testImportWithRunningStatus(self):
         from music21 import converter
 
-        directory = common.getPackageDir(relative=False, remapSep=os.sep)
-        fp = None
-        for fp in directory:
-            if fp.endswith('midi'):
-                break
-        if fp is None:
-            raise MidiException("No MIDI directory found!")
-        dirLib = os.path.join(fp, 'testPrimitive')
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive' 
+        fp = dirLib / 'test09.mid'
         # a simple file created in athenacl
-        fp = os.path.join(dirLib, 'test09.mid')
         # dealing with midi files that use running status compression
         s = converter.parse(fp)
         self.assertEqual(len(s.parts), 2)

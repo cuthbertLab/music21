@@ -1607,19 +1607,10 @@ class Test(unittest.TestCase):
 
 
     def testConversionMidiBasic(self):
-        directory = common.getPackageDir(relative=False, remapSep=os.sep)
-        fp = None
-        for fp in directory:
-            if fp.endswith('midi'):
-                break
-        else:
-            raise ConverterException('Could not find a directory with MIDI')
-        if fp is None:
-            raise ConverterException('Could not find a directory with MIDI')
-
-        dirLib = os.path.join(fp, 'testPrimitive')
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive' 
+        fp = dirLib / 'test01.mid'
+        
         # a simple file created in athenacl
-        fp = os.path.join(dirLib, 'test01.mid')
 
         unused_s = parseFile(fp)
         unused_s = parse(fp)

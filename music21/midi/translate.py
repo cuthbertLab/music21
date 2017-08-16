@@ -2628,18 +2628,11 @@ class Test(unittest.TestCase):
         #post.show('midi')#, app='Logic Express')
 
     def testMidiTempoImportA(self):
-        import os
         from music21 import converter
 
-        directory = common.getPackageDir(relative=False, remapSep=os.sep)
-        for fp in directory:
-            if fp.endswith('midi'):
-                break
-        else:
-            fp = None
-        dirLib = os.path.join(fp, 'testPrimitive')
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive' 
         # a simple file created in athenacl
-        fp = os.path.join(dirLib, 'test10.mid')
+        fp = dirLib / 'test10.mid'
         s = converter.parse(fp)
         mmStream = s.flat.getElementsByClass('MetronomeMark')
         self.assertEqual(len(mmStream), 4)
@@ -2649,31 +2642,24 @@ class Test(unittest.TestCase):
         self.assertEqual(mmStream[3].number, 60.0)
 
 
-        fp = os.path.join(dirLib, 'test06.mid')
+        fp = dirLib / 'test06.mid'
         s = converter.parse(fp)
         mmStream = s.flat.getElementsByClass('MetronomeMark')
         self.assertEqual(len(mmStream), 1)
         self.assertEqual(mmStream[0].number, 120.0)
 
-        fp = os.path.join(dirLib, 'test07.mid')
+        fp = dirLib / 'test07.mid'
         s = converter.parse(fp)
         mmStream = s.flat.getElementsByClass('MetronomeMark')
         self.assertEqual(len(mmStream), 1)
         self.assertEqual(mmStream[0].number, 180.0)
 
     def testMidiTempoImportB(self):
-        import os
         from music21 import converter
 
-        directory = common.getPackageDir(relative=False, remapSep=os.sep)
-        for fp in directory:
-            if fp.endswith('midi'):
-                break
-        else:
-            fp = None
-        dirLib = os.path.join(fp, 'testPrimitive')
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive' 
         # a file with three tracks and one conductor track
-        fp = os.path.join(dirLib, 'test11.mid')
+        fp = dirLib / 'test11.mid'
         s = converter.parse(fp)
         self.assertEqual(len(s.parts), 3)
         # metronome marks end up only on the top-most staff
@@ -2797,19 +2783,11 @@ class Test(unittest.TestCase):
         #s.show('midi')
 
     def testImportTruncationProblemA(self):
-        import os
         from music21 import converter
 
         # specialized problem of not importing last notes
-        directory = common.getPackageDir(relative=False, remapSep=os.sep)
-        for fp in directory:
-            if fp.endswith('midi'):
-                break
-        else:
-            fp = None
-        dirLib = os.path.join(fp, 'testPrimitive')
-        # a simple file created in athenacl
-        fp = os.path.join(dirLib, 'test12.mid')
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive' 
+        fp = dirLib / 'test12.mid'
         s = converter.parse(fp)
 
         self.assertEqual(len(s.parts[0].flat.notes), 3)
@@ -2823,42 +2801,28 @@ class Test(unittest.TestCase):
     def testImportChordVoiceA(self):
         # looking at cases where notes appear to be chord but
         # are better seen as voices
-
-        import os
         from music21 import converter
         # specialized problem of not importing last notes
-        directory = common.getPackageDir(relative=False, remapSep=os.sep)
-        for fp in directory:
-            if fp.endswith('midi'):
-                break
-        else:
-            fp = None
-        fpMidi = fp
-        fp = os.path.join(fpMidi, 'testPrimitive', 'test13.mid')
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive' 
+        fp = dirLib / 'test13.mid'
         s = converter.parse(fp)
         #s.show('t')
         self.assertEqual(len(s.flat.notes), 7)
         #s.show('midi')
 
-        fp = os.path.join(fpMidi, 'testPrimitive', 'test14.mid')
+        fp = dirLib / 'test14.mid'
         s = converter.parse(fp)
         # three chords will be created, as well as two voices
         self.assertEqual(len(s.flat.getElementsByClass('Chord')), 3)
         self.assertEqual(len(s.parts[0].voices), 2)
 
     def testImportChordsA(self):
-        import os
         from music21 import converter
 
-        directory = common.getPackageDir(relative=False, remapSep=os.sep)
-        for fp in directory:
-            if fp.endswith('midi'):
-                break
-        else:
-            fp = None
-        dirLib = os.path.join(fp, 'testPrimitive')
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive' 
+        fp = dirLib / 'test05.mid'
+
         # a simple file created in athenacl
-        fp = os.path.join(dirLib, 'test05.mid')
         s = converter.parse(fp)
         #s.show('t')
         self.assertEqual(len(s.flat.getElementsByClass('Chord')), 4)

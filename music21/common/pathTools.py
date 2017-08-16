@@ -15,8 +15,6 @@ __all__ = [
            'getMetadataCacheFilePath',
            'getCorpusFilePath',
            'getCorpusContentDirs',
-           'getPackageDir',
-           'getPackageData',
            'relativepath',
            'cleanpath',
            ]
@@ -126,80 +124,6 @@ def getRootFilePath():
     fpMusic21 = getSourceFilePath()
     fpParent = fpMusic21.parent
     return fpParent
-
-def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
-                  packageOnly=True):
-    '''
-    Manually get all directories in the music21 package,
-    including the top level directory. This is used in setup.py.
-
-    If `relative` is True, relative paths will be returned.
-
-    If `remapSep` is set to anything other than None, the path separator will be replaced.
-
-    If `packageOnly` is true, only directories with __init__.py files are collected.
-
-    returns a list of strings...
-    '''
-    if fpMusic21 is None:
-        fpMusic21 = getSourceFilePath()
-
-    #fpCorpus = os.path.join(fpMusic21, 'corpus')
-    fpParent = fpMusic21.parent
-    match = []
-    for dirpath, unused_dirnames, filenames in os.walk(fpMusic21):
-        # remove hidden directories
-        if ('%s.' % os.sep) in dirpath:
-            continue
-        elif '.git' in dirpath:
-            continue
-        if packageOnly:
-            if '__init__.py' not in filenames: # must be to be a package
-                continue
-        # make relative
-        if relative:
-            fp = dirpath.replace(fpParent, '')
-            if fp.startswith(os.sep):
-                fp = fp[fp.find(os.sep)+len(os.sep):]
-        else:
-            fp = dirpath
-        # replace os.sep
-        if remapSep != None:
-            fp = fp.replace(os.sep, remapSep)
-        match.append(fp)
-    return match
-
-
-def getPackageData():
-    '''
-    Return a list of package data in
-    the format specified by setup.py. This creates a very inclusive list of all data types.
-    '''
-    # include these extensions for all directories, even if they are not normally there.
-    # also need to update writeManifestTemplate() in setup.py when adding
-    # new file extensions
-    ext = ['txt', 'xml', 'krn', 'mxl', 'pdf', 'html',
-           'css', 'js', 'png', 'tiff', 'jpg', 'xls', 'mid', 'abc', 'json', 'md',
-           'zip', 'rntxt', 'command', 'scl', 'nwc', 'nwctxt', 'wav']
-
-    # need all dirs, not just packages, and relative to music21
-    fpList = getPackageDir(fpMusic21=None, relative=True, remapSep=None,
-                            packageOnly=False)
-    stub = 'music21%s' % os.sep
-    match = []
-    for fp in fpList:
-        # these are relative to music21 package, so remove music21
-        if fp == 'music21':
-            continue
-        elif fp.startswith(stub):
-            fp = fp[fp.find(stub)+len(stub):]
-        for e in ext:
-            target = fp + os.sep + '*.%s' % e
-            match.append(target)
-
-    return match
-
-
 
 def relativepath(path, start=None):
     '''

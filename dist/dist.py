@@ -177,9 +177,6 @@ class Distributor:
         if fp.endswith('.tar.gz'):
             mode = TAR
             modeExt = '.tar.gz'
-        #elif fp.endswith('.egg'):
-        #    mode = EGG
-        #    modeExt = '.egg'
         else:
             raise Exception('incorrect source file path')
 
