@@ -13,6 +13,7 @@
 
 import abc
 import os
+import pathlib
 
 from music21 import common
 # from music21.corpus import virtual
@@ -35,17 +36,11 @@ class Corpus:
     __metaclass__ = abc.ABCMeta
 
     ## TODO: this is volitile -- should be elsewhere...
-    _allExtensions = (
-        common.findInputExtension('abc') +
-        common.findInputExtension('capella') +
-        common.findInputExtension('midi') +
-        common.findInputExtension('musicxml') +
-        common.findInputExtension('musedata') +
-        common.findInputExtension('humdrum') +
-        common.findInputExtension('romantext') +
-        common.findInputExtension('noteworthytext') +
-        common.findInputExtension('noteworthy')
-        )
+    _acceptableExtensions = ['abc', 'capella', 'midi', 'musicxml', 'musedata',
+                             'humdrum', 'romantext', 'noteworthytext', 'noteworthy']
+    
+    _allExtensions = tuple(common.flattenList([common.findInputExtension(x) 
+                                              for x in _acceptableExtensions]))
 
     _pathsCache = {}
 
@@ -65,7 +60,7 @@ class Corpus:
     def _removeNameFromCache(self, name):
         keysToRemove = []
         for key in list(Corpus._pathsCache):
-            if key[0] == name:
+            if str(key[0]) == name:
                 keysToRemove.append(key)
                 
         for key in keysToRemove:
@@ -82,22 +77,15 @@ class Corpus:
         NB: we've tried optimizing with `fnmatch` but it does not save any
         time.
         '''
-        from music21 import corpus
+        rdp = common.cleanpath(rootDirectoryPath)
         matched = []
-        for rootDirectory, directoryNames, filenames in os.walk(rootDirectoryPath):
-            if '.svn' in directoryNames:
-                directoryNames.remove('.svn')
-            for filename in filenames:
-                try:
-                    if filename.startswith('.'):
-                        continue
-                except UnicodeDecodeError as error:
-                    raise corpus.CorpusException(
-                        'Incorrect filename in corpus path: {0}: {1!r}'.format(filename, error))
-                for extension in fileExtensions:
-                    if filename.endswith(extension):
-                        matched.append(os.path.join(rootDirectory, filename))
-                        break
+        for filename in rdp.rglob(''):
+            if filename.name.startswith('.'):
+                continue
+            for extension in fileExtensions:
+                if filename.suffix.endswith(extension):
+                    matched.append(filename)
+                    break
         return matched
 
     def _translateExtensions(
@@ -268,29 +256,27 @@ class Corpus:
             fileExtensions = [fileExtensions]
         paths = self.getPaths(fileExtensions)
         results = []
-        # permit workName to be a list of paths/branches
-        if common.isIterable(workName):
-            workName = os.path.sep.join(workName)
-        workSlashes = workName.replace('/', os.path.sep)
+
+        workPath = pathlib.PurePath(workName)
+        workPosix = workPath.as_posix().lower()
         # find all matches for the work name
         # TODO: this should match by path component, not just
         # substring
         for path in paths:
-            if workName.lower() in path.lower():
+            if workPosix in path.as_posix().lower():
                 results.append(path)
-            elif workSlashes.lower() in path.lower():
-                results.append(path)
+
         if results:
             # more than one matched...use more stringent criterion:
             # must have a slash before the name
             previousResults = results
             results = []
-            longName = os.sep + workSlashes.lower()
             for path in previousResults:
-                if longName in path.lower():
+                if '/' + workPosix in path.as_posix().lower():
                     results.append(path)
             if not results:
                 results = previousResults
+            
         movementResults = []
         if movementNumber is not None and results:
             # store one ore more possible mappings of movement number
@@ -312,11 +298,12 @@ class Corpus:
                     'movement{0}'.format(movementNumber),
                     ]
             for filePath in sorted(results):
-                filename = os.path.split(filePath)[1]
-                if '.' in filename:
-                    filenameWithoutExtension = os.path.splitext(filename)[0]
+                filename = filePath.name
+                if filePath.suffix:
+                    filenameWithoutExtension = filePath.stem
                 else:
                     filenameWithoutExtension = None
+
                 searchPartialMatch = True
                 if filenameWithoutExtension is not None:
                     # look for direct matches first
@@ -1067,7 +1054,7 @@ class LocalCorpus(Corpus):
             # check paths before trying to search
         validPaths = []
         for directoryPath in self.directoryPaths:
-            if not os.path.isdir(directoryPath):
+            if not directoryPath.is_dir():
                 environLocal.warn(
                     'invalid path set as localCorpusSetting: {0}'.format(
                         directoryPath))
@@ -1133,7 +1120,7 @@ class LocalCorpus(Corpus):
         temporaryPaths = LocalCorpus._temporaryLocalPaths.get(
             self.name, [])
         allPaths = tuple(sorted(set(candidatePaths).union(temporaryPaths)))
-        return allPaths
+        return tuple([pathlib.Path(p) for p in allPaths])
 
     @property
     def existsInSettings(self):

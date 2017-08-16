@@ -205,7 +205,12 @@ class _EnvironmentCore:
                 value = common.DEBUG_ALL
             else:
                 value = int(value)
-        if value == '':
+                
+        
+        if value is not None and value != '':
+            if key in self.getKeysToPaths():
+                value = pathlib.Path(value)
+        else:
             value = None  # return None for values not set
         return value
 
@@ -222,7 +227,7 @@ class _EnvironmentCore:
         #if isinstance(value, bytes):
         #    value = value.decode(errors='replace')
         if 'path' in key.lower() and value is not None:
-            value = common.cleanpath(value)
+            value = common.cleanpath(value, returnPathlib=False)
 
         if key not in self._ref:
             if key != 'localCorpusPath':
@@ -261,9 +266,9 @@ class _EnvironmentCore:
         # set value
         if key == 'localCorpusPath':
             # only add if unique
-            if value not in self._ref['localCorpusSettings']:
+            if str(value) not in self._ref['localCorpusSettings']:
                 # check for malicious values here
-                self._ref['localCorpusSettings'].append(value)
+                self._ref['localCorpusSettings'].append(str(value))
         else:
             self._ref[key] = value
 
@@ -536,28 +541,32 @@ class _EnvironmentCore:
             return refDir
 
     def getSettingsPath(self):
+        '''
+        Return a pathlib.Path object to the '.music21rc' object
+        '''
         platform = common.getPlatform()
+        if 'USERPROFILE' in os.environ:
+            userProfilePath = pathlib.Path(os.environ['USERPROFILE']) / 'Application Data'
+        else:
+            userProfilePath = None
+        
         if platform == 'win':
             # try to use defined app data directory for preference file
             # this is not available on all windows versions
             if 'APPDATA' in os.environ:
-                directory = os.environ['APPDATA']
-            elif ('USERPROFILE' in os.environ
-                  and os.path.exists(os.path.join(os.environ['USERPROFILE'], 'Application Data'))):
-                directory = os.path.join(
-                    os.environ['USERPROFILE'],
-                    'Application Data',
-                    )
+                directory = pathlib.Path(os.environ['APPDATA'])
+            elif userProfilePath:
+                directory = userProfilePath
             else:  # use home directory
-                directory = os.path.expanduser('~')
-            return os.path.join(directory, 'music21-settings.xml')
+                directory = pathlib.Path(os.path.expanduser('~'))
+            return directory / 'music21-settings.xml'
         elif platform in ['nix', 'darwin']:
             # might not exist if running as nobody in a webserver...
             if 'HOME' in os.environ:
-                directory = os.environ['HOME']
+                directory = pathlib.Path(os.environ['HOME'])
             else:
-                directory = '/tmp/'
-            return os.path.join(directory, '.music21rc')
+                directory = pathlib.Path('/tmp/')
+            return directory / '.music21rc'
         # darwin specific option
         # os.path.join(os.environ['HOME'], 'Library',)
 
@@ -661,6 +670,8 @@ class _EnvironmentCore:
         Create a png, svg, etc. converter (or just a graphics converter) and call launch on it
         '''
         # see common.fileExtensions for format names
+        filePath = common.cleanpath(filePath, returnPathlib=True)
+        
         m21Format, unused_ext = common.findFormat(fmt)
         environmentKey = self.formatToKey(m21Format)
         if environmentKey is None:
@@ -668,12 +679,7 @@ class _EnvironmentCore:
         if m21Format == 'vexflow':
             try:
                 import webbrowser
-                if filePath.find('\\') != -1:
-                    pass
-                else:
-                    if filePath.startswith('/'):
-                        filePath = 'file://' + filePath
-
+                filePath = filePath.as_uri()
                 webbrowser.open(filePath)
                 return
             except ImportError:
@@ -723,11 +729,11 @@ class _EnvironmentCore:
         '''
         if filePath is None:
             filePath = self.getSettingsPath()
-        if not os.path.exists(filePath):
+        if not filePath.exists():
             return None  # do nothing if no file exists
 
         try:
-            settingsTree = ET.parse(filePath)
+            settingsTree = ET.parse(str(filePath))
         except ET.ParseError as pe:
             raise EnvironmentException(
                     'Cannot parse file %s: %s' %
@@ -751,8 +757,7 @@ class _EnvironmentCore:
             filePath = self.getSettingsPath()
         # need to use __getitem__ here b/c need to convert debug value
         # to an integer
-        directory = os.path.split(filePath)[0]
-        if filePath is None or not os.path.exists(directory):
+        if filePath is None or not filePath.parent.exists():
             raise EnvironmentException('bad file path for .music21rc: %s' % filePath)
         settingsTree = self.toSettingsXML()
         etIndent(settingsTree.getroot())
@@ -760,7 +765,7 @@ class _EnvironmentCore:
         ## uncomment to figure out where something in the test set is writing .music21rc
         # import traceback
         # traceback.print_stack()
-        settingsTree.write(filePath, encoding='utf-8')
+        settingsTree.write(str(filePath), encoding='utf-8')
 
 
 #------------------------------------------------------------------------------
@@ -801,8 +806,8 @@ class Environment:
     >>> env = environment.Environment(forcePlatform='darwin')
     >>> #_DOCS_SHOW env['musicxmlPath'] = '/Applications/Finale Reader.app'
     >>> #_DOCS_SHOW env['musicxmlPath']
-    >>> '/Applications/Finale Reader.app' #_DOCS_HIDE
-    '/Applications/Finale Reader.app'
+    >>> print("PosixPath('/Applications/Finale Reader.app')") #_DOCS_HIDE
+    PosixPath('/Applications/Finale Reader.app')
     '''
 
     # define order to present names in documentation; use strings
@@ -861,7 +866,7 @@ class Environment:
         >>> a['debug'] = 1
         >>> a['graphicsPath'] = '/test&Encode'
         >>> a['graphicsPath']
-        '/test&amp;Encode'
+        PosixPath('/test&amp;Encode')
 
         >>> a['autoDownload'] = 'adsf'
         Traceback (most recent call last):
@@ -1132,9 +1137,9 @@ class Environment:
         if common.runningUnderIPython():
             xp = self['musescoreDirectPNGPath']
 
-        if xp is None:
+        if not xp:
             return None
-        xp = xp.lower()
+        xp = str(xp).lower()
         if 'sibelius' in xp:
             return 'Sibelius'
         elif 'finale' in xp:
@@ -1266,7 +1271,7 @@ class UserSettings:
         if key in self._environment.getKeysToPaths():
             # try to expand user if found; otherwise return unaltered
             if value is not None and value != '/skip':
-                value = common.cleanpath(value)
+                value = common.cleanpath(value, returnPathlib=False)
                 if not os.path.exists(value):
                     raise UserSettingsException(
                         'attempting to set a value to a path that does not exist: {}'.format(
@@ -1301,7 +1306,7 @@ class UserSettings:
         If a environment configuration file does not exist, create one based on
         the default settings.
         '''
-        if not os.path.exists(self._environment.getSettingsPath()):
+        if not self._environment.getSettingsPath().exists():
             self._environment.write()
         else:
             raise UserSettingsException(
@@ -1312,8 +1317,8 @@ class UserSettings:
         '''
         Permanently remove the user configuration file.
         '''
-        if os.path.exists(self._environment.getSettingsPath()):
-            os.remove(self._environment.getSettingsPath())
+        if self._environment.getSettingsPath().exists():
+            self._environment.getSettingsPath().unlink()
         else:
             raise UserSettingsException(
                 'An environment configuration file does not exist.')

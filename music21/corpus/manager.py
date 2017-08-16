@@ -127,8 +127,6 @@ def getWork(workName,
             'a work name must be provided as an argument')
     if not common.isListLike(fileExtensions):
         fileExtensions = [fileExtensions]
-    if common.isIterable(workName):
-        workNameJoined = os.path.sep.join(workName)
 
     if workNameJoined.endswith(".xml"):
         # might be compressed MXL file
