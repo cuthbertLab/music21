@@ -137,7 +137,7 @@ class ArchiveManager:
         '''
         post = []
         if self.archiveType == 'zip':
-            f = zipfile.ZipFile(self.fp, 'r')
+            f = zipfile.ZipFile(str(self.fp), 'r') # remove str in Py3.6
             for subFp in f.namelist():
                 post.append(subFp)
             f.close()

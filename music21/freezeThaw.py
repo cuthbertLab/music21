@@ -674,12 +674,18 @@ class StreamFreezer(StreamFreezeThawBase):
             pickleString = pickle.dumps(storage, protocol=pickle.HIGHEST_PROTOCOL)
             if zipType == 'zlib':
                 pickleString = zlib.compress(pickleString)
+            
+            if isinstance(fp, pathlib.Path):
+                fp = str(fp)
             with open(fp, 'wb') as f: # binary
                 f.write(pickleString)
         elif fmt == 'jsonpickle':
             data = jsonpickle.encode(storage, **keywords)
             if zipType == 'zlib':
                 data = zlib.compress(data)
+
+            if isinstance(fp, pathlib.Path):
+                fp = str(fp)
             with open(fp, 'w') as f:
                 f.write(data)
 

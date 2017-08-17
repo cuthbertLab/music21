@@ -96,6 +96,19 @@ class MetadataEntry:
             self.__class__.__name__,
             self.corpusPath,
             )
+        
+    @classmethod
+    def __fspath__(cls, metadataEntryObject):
+        '''
+        for Py3.6 to allow MetadataEntries to be used where filepaths are being employed
+        
+        Returns self.sourcePath()
+        
+        >>> mde1 = metadata.bundles.MetadataEntry(sourcePath='/tmp/myFile.xml')
+        >>> type(mde1).__fspath__(mde1)
+        '/tmp/myFile.xml'
+        '''
+        return metadataEntryObject.sourcePath
 
     ### PUBLIC METHODS ###
 
