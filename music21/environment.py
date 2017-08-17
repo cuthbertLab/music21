@@ -525,6 +525,8 @@ class _EnvironmentCore:
         gets either the directory in key 'directoryScratch' or self.getDefaultRootTempDir
 
         Returns an exception if directoryScratch is defined but does not exist.
+        
+        Returns a pathlib.Path
         '''
         if self._ref['directoryScratch'] is None:
             return self.getDefaultRootTempDir()
@@ -899,9 +901,11 @@ class Environment:
 
         If not able to create a 'music21' directory, the standard default is
         returned.
+        
+        Returns a pathlib.Path
         '''
         dstDir = envSingleton().getDefaultRootTempDir()
-        self.printDebug([_MOD, 'using temporary directory:', dstDir])
+        self.printDebug([_MOD, 'using temporary directory:', str(dstDir)])
         return dstDir
 
     def getKeysToPaths(self):

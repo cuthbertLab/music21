@@ -236,10 +236,7 @@ class PickleFilter:
     returned.
     '''
     def __init__(self, fp, forceSource=False, number=None):
-        if not isinstance(fp, pathlib.Path):
-            fp = pathlib.Path(fp)
-
-        self.fp = common.cleanpath(fp)
+        self.fp = common.cleanpath(fp, returnPathlib=True)
         self.forceSource = forceSource
         self.number = number
         #environLocal.printDebug(['creating pickle filter'])
@@ -247,9 +244,11 @@ class PickleFilter:
     def getPickleFp(self, directory=None, zipType=None):
         '''
         Returns the file path of the pickle file for this file.
+        
+        Returns a pathlib.Path
         '''
         if directory is None:
-            directory = environLocal.getRootTempDir()
+            directory = environLocal.getRootTempDir() # pathlibPath
         elif isinstance(directory, str):
             directory = pathlib.Path(directory)
 
@@ -276,8 +275,8 @@ class PickleFilter:
         Generally not necessary to call, since we can just overwrite obsolete pickles,
         but useful elsewhere.
         '''
-        pickleFp = self.getPickleFp(zipType='gz')
-        if os.path.exists(pickleFp):
+        pickleFp = self.getPickleFp(zipType='gz') # pathlib...
+        if pickleFp.exists():
             os.remove(pickleFp)
 
 
@@ -288,15 +287,15 @@ class PickleFilter:
         original file path.
 
         Return arguments are file path to load, boolean whether to write a pickle, and
-        the file path of the pickle.
+        the file path of the pickle.  All file paths can be pathlib.Path objects or None
 
         Does not check that fp exists or create the pickle file.
 
         >>> fp = '/Users/Cuthbert/Desktop/musicFile.mxl'
         >>> pickfilt = converter.PickleFilter(fp)
         >>> #_DOCS_SHOW pickfilt.status()
-        ('/Users/Cuthbert/Desktop/musicFile.mxl', True,
-              '/var/folders/music21/m21-18b8c5a5f07826bd67ea0f20462f0b8d.pgz')
+        (PosixPath('/Users/Cuthbert/Desktop/musicFile.mxl'), True,
+              PosixPath('/tmp/music21/m21-5.0.0-py3.6-18b8c5a5f07826bd67ea0f20462f0b8d.pgz'))
 
         '''
         fpScratch = environLocal.getRootTempDir()
@@ -305,7 +304,7 @@ class PickleFilter:
         if m21Format == 'pickle': # do not pickle a pickle
             if self.forceSource:
                 raise PickleFilterException(
-                        'cannot access source file when only given a file path to a pickled file.')
+                    'cannot access source file when only given a file path to a pickled file.')
             writePickle = False # cannot write pickle if no scratch dir
             fpLoad = self.fp
             fpPickle = None
@@ -314,16 +313,16 @@ class PickleFilter:
             fpLoad = self.fp
             fpPickle = None
         else: # see which is more up to date
-            fpPickle = self.getPickleFp(fpScratch, zipType='gz')
-            if not os.path.exists(fpPickle):
+            fpPickle = self.getPickleFp(fpScratch, zipType='gz') # pathlib Path
+            if not fpPickle.exists():
                 writePickle = True # if pickled file does not exist
                 fpLoad = self.fp
             else:
-                post = common.sortFilesRecent([self.fp, fpPickle])
-                if post[0] == fpPickle: # pickle is most recent
+                if self.fp.stat().st_mtime < fpPickle.stat().st_mtime:
+                    # pickle is most recent
                     writePickle = False
                     fpLoad = fpPickle
-                elif post[0] == self.fp: # file is most recent
+                else: # file is most recent
                     writePickle = True
                     fpLoad = self.fp
         return fpLoad, writePickle, fpPickle

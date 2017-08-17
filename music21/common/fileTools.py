@@ -18,12 +18,10 @@ import contextlib # for with statements
 import io
 import pathlib
 import os
-import time
 
 from music21.ext import chardet
 
 __all__ = ['readFileEncodingSafe',
-           'sortFilesRecent',
            'cd',
            ]
 
@@ -48,25 +46,6 @@ def cd(targetDir):
     finally:
         os.chdir(cwd)
 
-
-def sortFilesRecent(fileList):
-    '''Given two files, sort by most recent. Return only the file
-    paths.
-
-    >>> import os
-    >>> a = os.listdir(os.curdir)
-    >>> b = common.sortFilesRecent(a)
-
-    :rtype: list(str)
-    '''
-    sort = []
-    for fp in fileList:
-        lastmod = time.localtime(os.stat(fp)[8])
-        sort.append([lastmod, fp])
-    sort.sort()
-    sort.reverse()
-    # just return
-    return [y for dummy, y in sort]
 
 def readFileEncodingSafe(filePath, firstGuess='utf-8'):
     r'''
