@@ -156,7 +156,8 @@ class ArchiveManager:
         if self.archiveType != 'zip':
             raise ArchiveManagerException('no support for extension: %s' % self.archiveType)
 
-        f = zipfile.ZipFile(self.fp, 'r')
+        f = zipfile.ZipFile(str(self.fp), 'r')  # remove str in Py3.6
+        
         if name is None and dataFormat == 'musicxml': # try to auto-harvest
             # will return data as a string
             # note that we need to read the META-INF/container.xml file
@@ -1637,7 +1638,7 @@ class Test(unittest.TestCase):
     def testConversionMidiNotes(self):
         from music21 import meter, key, chord, note
 
-        fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test01.mid')
+        fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test01.mid'
         # a simple file created in athenacl
         #for fn in ['test01.mid', 'test02.mid', 'test03.mid', 'test04.mid']:
         s = parseFile(fp)
@@ -1646,7 +1647,7 @@ class Test(unittest.TestCase):
 
 
         # has chords and notes
-        fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test05.mid')
+        fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test05.mid'
         s = parseFile(fp)
         #s.show()
         #environLocal.printDebug(['\nopening fp', fp])
@@ -1659,7 +1660,7 @@ class Test(unittest.TestCase):
 
 
         # this sample has eight note triplets
-        fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test06.mid')
+        fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test06.mid'
         s = parseFile(fp)
         #s.show()
 
@@ -1681,7 +1682,7 @@ class Test(unittest.TestCase):
         # this sample has sixteenth note triplets
         # TODO much work is still needed on getting timing right
         # this produces numerous errors in makeMeasure partitioning
-        fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test07.mid')
+        fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test07.mid'
         #environLocal.printDebug(['\nopening fp', fp])
         s = parseFile(fp)
         #s.show('t')
@@ -1692,7 +1693,7 @@ class Test(unittest.TestCase):
 
 
         # this sample has dynamic changes in key signature
-        fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test08.mid')
+        fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test08.mid'
         #environLocal.printDebug(['\nopening fp', fp])
         s = parseFile(fp)
         #s.show('t')
@@ -1774,7 +1775,7 @@ class Test(unittest.TestCase):
 
 
     def testConversionMusedata(self):
-        fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01')
+        fp = common.getSourceFilePath() /  'musedata' / 'testPrimitive' / 'test01'
         s = parse(fp)
         self.assertEqual(len(s.parts), 5)
         #s.show()
@@ -1784,7 +1785,7 @@ class Test(unittest.TestCase):
     def testMixedArchiveHandling(self):
         '''Test getting data out of musedata or musicxml zip files.
         '''
-        fp = os.path.join(common.getSourceFilePath(), 'musicxml', 'testMxl.mxl')
+        fp = common.getSourceFilePath() / 'musicxml' / 'testMxl.mxl'
         af = ArchiveManager(fp)
         # for now, only support zip
         self.assertEqual(af.archiveType, 'zip')
@@ -1797,7 +1798,7 @@ class Test(unittest.TestCase):
 
 #         # test from a file that ends in zip
 #         # note: this is a stage1 file!
-#         fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
+#         fp = common.getSourceFilePath() / 'musedata' / 'testZip.zip'
 #         af = ArchiveManager(fp)
 #         # for now, only support zip
 #         self.assertEqual(af.archiveType, 'zip')
@@ -1821,10 +1822,9 @@ class Test(unittest.TestCase):
         #s = parse(fp)
 
         # test loading a directory
-        fp = os.path.join(common.getSourceFilePath(), 'musedata',
-                'testPrimitive', 'test01')
+        fp = common.getSourceFilePath() / 'musedata' / 'testPrimitive' / 'test01'
         cmd = subConverters.ConverterMuseData()
-        cmd.parseFile(fp)
+        cmd.parseFile(str(fp)) # remove str in Py3.6
 
     def testMEIvsMX(self):
         '''

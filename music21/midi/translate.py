@@ -1408,9 +1408,9 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     Note that quantization takes place in stream.py since it's useful not just for MIDI.
 
     >>> import os
-    >>> fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test05.mid')
+    >>> fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test05.mid'
     >>> mf = midi.MidiFile()
-    >>> mf.open(fp)
+    >>> mf.open(str(fp))
     >>> mf.read()
     >>> mf.close()
     >>> len(mf.tracks)
@@ -2058,9 +2058,9 @@ def midiFileToStream(mf, inputM21=None, quantizePost=True, **keywords):
     The `inputM21` object can specify an existing Stream (or Stream subclass) to fill.
 
     >>> import os
-    >>> fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test05.mid')
+    >>> fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test05.mid'
     >>> mf = midi.MidiFile()
-    >>> mf.open(fp)
+    >>> mf.open(str(fp))
     >>> mf.read()
     >>> mf.close()
     >>> len(mf.tracks)

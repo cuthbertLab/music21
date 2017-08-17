@@ -56,7 +56,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
     so it won't load in Python3:
 
     >>> import os
-    >>> c = os.path.join(common.getSourceFilePath(), 'common', '__init__.py')
+    >>> c = str(common.getSourceFilePath() / 'common' / '__init__.py')
     >>> #_DOCS_SHOW f = open(c)
     >>> #_DOCS_SHOW data = f.read()
     Traceback (most recent call last):

@@ -28,6 +28,7 @@ Low level MuseData conversion is facilitated by the objects in this module and
 
 import unittest
 import os
+import pathlib
 
 from music21 import exceptions21
 from music21.musedata import base40
@@ -881,9 +882,8 @@ class MuseDataPart:
         '''
         Returns a String not an int, representing an opus number
 
-        >>> import os
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
+        >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                    / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getWorkNumber()
@@ -904,9 +904,8 @@ class MuseDataPart:
         '''
         Returns a string, not an int.
 
-        >>> import os
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
+        >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                    / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getMovementNumber()
@@ -924,9 +923,8 @@ class MuseDataPart:
         The directive field is generally used to store tempo indications.
         This indication, however, is frequently not provided.
 
-        >>> import os
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
+        >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                    / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getDirective() is None
@@ -947,9 +945,8 @@ class MuseDataPart:
 
     def getSource(self):
         '''
-        >>> import os
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
+        >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                    / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getSource()
@@ -970,9 +967,8 @@ class MuseDataPart:
         '''
         For stage 1 just gets the catalogue number
 
-        >>> import os
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
+        >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                    / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getWorkTitle()
@@ -986,9 +982,8 @@ class MuseDataPart:
 
     def getMovementTitle(self):
         '''
-        >>> import os
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
+        >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                    / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getMovementTitle()
@@ -1001,9 +996,8 @@ class MuseDataPart:
 
     def getPartName(self):
         '''
-        >>> import os
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
+        >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                    / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getPartName()
@@ -1016,9 +1010,8 @@ class MuseDataPart:
 
     def getGroupMemberships(self):
         '''
-        >>> import os
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
+        >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                    / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getGroupMemberships()
@@ -1064,9 +1057,8 @@ class MuseDataPart:
 
     def getGroupMembershipNumber(self, membership='score'):
         '''
-        >>> import os
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
+        >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                    / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getGroupMembershipNumber()
@@ -1134,9 +1126,8 @@ class MuseDataPart:
 
     def getKeySignature(self):
         '''
-        >>> import os
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
+        >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                    / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getKeySignature()
@@ -1174,9 +1165,8 @@ class MuseDataPart:
 
     def getTimeSignatureObject(self):
         '''
-        >>> import os
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
+        >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                    / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getTimeSignatureObject()
@@ -1187,9 +1177,8 @@ class MuseDataPart:
 
     def _getNumberOfStaves(self):
         '''
-        >>> import os
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
+        >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                    / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0]._getNumberOfStaves()
@@ -1246,9 +1235,8 @@ class MuseDataPart:
     def getClefObject(self, voice=1):
         '''Return a music21 clef object based on a two character clef definition.
 
-        >>> import os
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
+        >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                    / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getClefObject().sign
@@ -1304,11 +1292,10 @@ class MuseDataPart:
         Get the transposition, if defined, from the Metadata header.
 
 
-        >>> import os.path
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
-        >>> fp2 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '02.md')
+        >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                    / 'test01' / '01.md')
+        >>> fp2 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                    / 'test01' / '02.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.addFile(fp2)
@@ -1330,11 +1317,10 @@ class MuseDataPart:
     def getTranspositionIntervalObject(self):
         '''If this part defines a transposition, return a corresponding Interval object.
 
-        >>> import os.path
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
-        >>> fp2 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '02.md')
+        >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                    / 'test01' / '01.md')
+        >>> fp2 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                    / 'test01' / '02.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.addFile(fp2)
@@ -1350,9 +1336,8 @@ class MuseDataPart:
 
     def getDivisionsPerQuarterNote(self):
         '''
-        >>> import os
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
+        >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                    / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getDivisionsPerQuarterNote()
@@ -1497,6 +1482,9 @@ class MuseDataFile:
 
     def open(self, fp):
         #self.file = io.open(filename, encoding='utf-8')
+        if isinstance(fp, pathlib.Path):
+            fp = str(fp)
+        
         self.file = open(fp, 'rb')
         self.filename = fp
 
@@ -1571,9 +1559,13 @@ class MuseDataWork:
 
 
     def addFile(self, fp):
-        '''Open and read this file path as
         '''
-        if not common.isIterable(fp):
+        Open and read this file path or list of paths as MuseDataFile objects
+        and set self.files
+        '''
+        if isinstance(fp, pathlib.Path):
+            fpList = [str(fp)]
+        elif not common.isIterable(fp):
             fpList = [fp]
         else:
             fpList = fp
@@ -1793,7 +1785,7 @@ class Test(unittest.TestCase):
     def testLoadFromFile(self):
 
 
-        fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive')
+        fp = str(common.getSourceFilePath() / 'musedata' / 'testPrimitive')
 
 
         mdw = MuseDataWork()
@@ -1890,12 +1882,12 @@ class Test(unittest.TestCase):
 
         #fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
 
-        fpDir = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01')
+        fpDir = str(common.getSourceFilePath() / 'musedata' / 'testPrimitive' / 'test01')
 
         unused_mdd = MuseDataDirectory(fpDir)
 
         # from archive: note: this is a stage 1 file
-        #fpArchive = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
+        #fpArchive = str(common.getSourceFilePath() / 'musedata' / 'testZip.zip')
         #af = converter.ArchiveManager(fpArchive)
         #unused_mdd = MuseDataDirectory(af.getNames())
 

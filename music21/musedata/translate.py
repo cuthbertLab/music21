@@ -375,13 +375,12 @@ class Test(unittest.TestCase):
 
     def testBasic(self):
         from music21 import musedata
-        import os
         from music21 import common
 
-        fp1 = os.path.join(common.getSourceFilePath(),
-                           'musedata', 'testPrimitive', 'test01', '01.md')
+        fp1 = (common.getSourceFilePath()
+                           / 'musedata' / 'testPrimitive' / 'test01' /'01.md')
         mdw = musedata.MuseDataWork()
-        mdw.addFile(fp1)
+        mdw.addFile(str(fp1)) # remove str in Py3.6
 
         s = museDataWorkToStreamScore(mdw)
         #post = s.musicxml
@@ -515,23 +514,10 @@ class Test(unittest.TestCase):
 
 
 
-#     def testTransposingInstruments(self):
-#         import os
-#         from music21 import converter, common
-#         fpDir = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01')
-#         s = converter.parse(fpDir)
-#         p = s.parts['Clarinet in A']
-#         self.assertEqual(str(p.getElementsByClass('Measure')[0].keySignature),
-#             '<music21.key.KeySignature of 3 sharps>')
-#         self.assertEqual(str(p.flat.notesAndRests[0]), '<music21.note.Note A>')
-
-        #s.show()
-
 
     def testBackBasic(self):
-        import os
         from music21 import converter, common
-        fpDir = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01')
+        fpDir = common.getSourceFilePath() / 'musedata' / 'testPrimitive' / 'test01'
         s = converter.parse(fpDir)
         # note: this is a multi-staff work, but presently gets encoded
         # as multiple voices

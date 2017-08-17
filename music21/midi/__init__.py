@@ -1178,7 +1178,7 @@ class MidiFile:
         '''
         if attrib not in ['rb', 'wb']:
             raise MidiException('cannot read or write unless in binary mode, not:', attrib)
-        self.file = open(filename, attrib)
+        self.file = open(str(filename), attrib)
 
     def openFileLike(self, fileLike):
         '''Assign a file-like object, such as those provided by StringIO, as an open file object.
