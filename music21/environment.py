@@ -586,7 +586,8 @@ class _EnvironmentCore:
 
         if common.getPlatform() != 'win':
             fileDescriptor, filePath = tempfile.mkstemp(
-                dir=rootDir, suffix=suffix)
+                dir=str(rootDir), # Py3.6 remove str 
+                suffix=suffix)
             if isinstance(fileDescriptor, int):
                 # on MacOS, fd returns an int, like 3, when this is called
                 # in some context (specifically, programmatically in a
@@ -595,7 +596,9 @@ class _EnvironmentCore:
             else:
                 fileDescriptor.close()
         else:  # win
-            tf = tempfile.NamedTemporaryFile(dir=rootDir, suffix=suffix)
+            tf = tempfile.NamedTemporaryFile(
+                dir=str(rootDir), # Py3.6 remove str 
+                suffix=suffix)
             filePath = tf.name
             tf.close()
         #self.printDebug([_MOD, 'temporary file:', filePath])

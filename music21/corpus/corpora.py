@@ -543,9 +543,9 @@ class CoreCorpus(Corpus):
 
     @property
     def cacheFilePath(self):
-        filePath = os.path.join(
-            common.getMetadataCacheFilePath(),
-            'core.json',
+        filePath = str(
+            common.getMetadataCacheFilePath()
+                / 'core.json'
         )
         return filePath
 

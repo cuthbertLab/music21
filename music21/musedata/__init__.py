@@ -1030,9 +1030,8 @@ class MuseDataPart:
 
     def getGroupMembershipsTotal(self, membership='score'):
         '''
-        >>> import os
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
+        >>> fp1 = str(common.getSourceFilePath() /'musedata' / 'testPrimitive'
+        ...                    / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getGroupMembershipsTotal()
@@ -1087,9 +1086,8 @@ class MuseDataPart:
         but is the first line that starts with a $.
 
 
-        >>> import os
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
+        >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                    / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0]._getAttributesRecord()
@@ -1109,9 +1107,8 @@ class MuseDataPart:
 
     def _getKeyParameters(self):
         '''
-        >>> import os
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
+        >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                   / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0]._getKeyParameters()
@@ -1138,9 +1135,8 @@ class MuseDataPart:
 
     def _getTimeSignatureParameters(self):
         '''
-        >>> import os
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
+        >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                   / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0]._getTimeSignatureParameters()
@@ -1199,9 +1195,8 @@ class MuseDataPart:
 
     def _getClefParameters(self):
         '''
-        >>> import os
-        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive',
-        ...                    'test01', '01.md')
+        >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
+        ...                   / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0]._getClefParameters()
@@ -1643,6 +1638,9 @@ class MuseDataDirectory:
 
     def _prepareGroups(self, dirOrList):
         #environLocal.printDebug(['_prepareGroups', dirOrList])
+
+        if isinstance(dirOrList, pathlib.Path):
+            dirOrList = str(dirOrList) # Py3.6 remove
 
         allPaths = []
         # these two were unusued variables.
