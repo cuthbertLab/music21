@@ -708,14 +708,13 @@ class Test(unittest.TestCase):
 
 
     def testGetInstrumentFromMxl(self):
-        '''Test getting an instrument from an mxl file
         '''
-        import os
-        from music21 import corpus, converter
+        Test getting an instrument from an mxl file
+        '''
+        from music21 import corpus
 
         # manually set activeSite to associate
-        a = converter.parse(corpus.getWork(os.sep.join(['corelli', 'opus3no1',
-                                            '1grave.xml'])))
+        a = corpus.parse('corelli/opus3no1/1grave.xml')
 
         b = a.parts[2]
         # by calling the .part property, we create a new stream; thus, the

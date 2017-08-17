@@ -656,15 +656,16 @@ class StreamFreezer(StreamFreezeThawBase):
                 fp = self.getJsonFp(directory)
             else:
                 fp = self.getPickleFp(directory)
-        elif os.sep in fp: # assume its a complete path
-            fp = fp
         else:
-            directory = environLocal.getRootTempDir()
-            fp = os.path.join(directory, fp)
+            if not isinstance(fp, pathlib.Path):
+                fp = pathlib.Path(fp)
+            
+            if not fp.is_absolute(): # assume its a complete path
+                fp = environLocal.getRootTempDir() / fp
 
         storage = self.packStream(self.stream)
 
-        environLocal.printDebug(['writing fp', fp])
+        environLocal.printDebug(['writing fp', str(fp)])
 
         if fmt == 'pickle':
             # a negative protocol value will get the highest protocol;
