@@ -4316,8 +4316,7 @@ class Test(unittest.TestCase):
         when triplets are involved...
         '''
         from music21 import converter
-        import os
-        bugtestFile = os.path.join(common.getSourceFilePath(), 'stream', 'tripletOffsetBugtest.xml')
+        bugtestFile = common.getSourceFilePath() / 'stream' / 'tripletOffsetBugtest.xml'
         s = converter.parse(bugtestFile)
         p = s.parts[0]
         m = p.getElementAtOrBefore(2)

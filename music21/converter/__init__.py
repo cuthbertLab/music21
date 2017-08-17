@@ -120,7 +120,7 @@ class ArchiveManager:
             if self.fp.suffix in ('.mxl', '.md'):
                 # try to open it, as some mxl files are not zips
                 try:
-                    unused = zipfile.ZipFile(self.fp, 'r')
+                    unused = zipfile.ZipFile(str(self.fp), 'r') # remove str Py3.6
                 except zipfile.BadZipfile:
                     return False
                 return True

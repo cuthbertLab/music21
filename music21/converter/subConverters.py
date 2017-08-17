@@ -774,6 +774,10 @@ class ConverterMusicXML(SubConverter):
 
         c = xmlToM21.MusicXMLImporter()
 
+        if isinstance(fp, pathlib.Path):
+            fp  = str(fp) # remove in Py3.6
+
+
         # here, we can see if this is a mxl or similar archive
         arch = converter.ArchiveManager(fp)
         if arch.isArchive():

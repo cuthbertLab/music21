@@ -363,11 +363,10 @@ class LanguageDetector:
 
     def readExcerpts(self):
         for languageCode in self.languageCodes:
-            thisExcerpt = os.path.join(common.getSourceFilePath(),
-                                       'languageExcerpts',
-                                       languageCode + '.txt')
+            thisExcerpt = (common.getSourceFilePath() / 'languageExcerpts' 
+                            / (languageCode + '.txt'))
 
-            with codecs.open(thisExcerpt, encoding='utf-8') as f:
+            with thisExcerpt.open(encoding='utf-8') as f:
                 excerptWords = f.read().split()
                 self.trigrams[languageCode] = Trigram(excerptWords)
 

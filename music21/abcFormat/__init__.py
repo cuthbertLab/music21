@@ -46,6 +46,7 @@ __all__ = [
 
 import copy
 import io
+import pathlib
 import re
 import unittest
 
@@ -2945,6 +2946,8 @@ class ABCFile:
         '''
         Open a file for reading
         '''
+        if isinstance(filename, pathlib.Path):
+            filename = str(filename) # remove in Py3.6
         #try:
         self.file = io.open(filename, encoding='utf-8')
         #except
