@@ -52,7 +52,7 @@ STEPREF = {
                }
 STEPNAMES = set(['C', 'D', 'E', 'F', 'G', 'A', 'B'])
 
-TWELFTH_ROOT_OF_TWO = 2.0 ** (1/12)
+TWELFTH_ROOT_OF_TWO = 2.0 ** (1 / 12)
 
 # how many significant digits to keep in pitch space resolution
 # where 1 is a half step. this means that 4 significant digits of cents will be kept

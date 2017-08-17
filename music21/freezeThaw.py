@@ -114,9 +114,12 @@ class StreamFreezeThawBase:
     def getPickleFp(self, directory):
         if directory is None:
             raise ValueError
+        if not isinstance(directory, pathlib.Path):
+            directory = pathlib.Path(directory)
+        
         # cannot get data from stream, as offsets are broken
         streamStr = str(time.time())
-        return os.path.join(directory, 'm21-' + common.getMd5(streamStr) + '.p')
+        return directory / ('m21-' + common.getMd5(streamStr) + '.p')
 
     def getJsonFp(self, directory):
         return self.getPickleFp(directory) + '.json'

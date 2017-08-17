@@ -96,7 +96,7 @@ def getCorpusContentDirs():
     []
 
     '''
-    directoryName = getCorpusFilePath()
+    directoryName = str(getCorpusFilePath()) # Py3.6 remove
     result = []
     # dirs to exclude; all files will be retained
     excludedNames = (

@@ -32,7 +32,7 @@ class ScoreFollower:
             self.scoreNotesOnly = scoreStream.flat.notesAndRests.stream()
         else:
             self.scoreNotesOnly = None
-        self.waveFile = os.path.join(environLocal.getRootTempDir(), 'scoreFollowerTemp.wav')
+        self.waveFile = str(environLocal.getRootTempDir() / 'scoreFollowerTemp.wav')
         self.lastNotePostion = 0
         self.currentSample = 0
         self.totalFile = 0

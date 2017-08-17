@@ -766,15 +766,14 @@ class LocalCorpus(Corpus):
     def cacheFilePath(self):
         '''
         Get the path to the file path that stores the .json file.
+        
+        returns a pathlib.Path
         '''
         localCorpusSettings = self._getSettings()
         if localCorpusSettings is not None and localCorpusSettings.cacheFilePath is not None:
             return localCorpusSettings.cacheFilePath
         
-        filePath = os.path.join(
-            environLocal.getRootTempDir(),
-            'local-' + self.name + '.json',
-            )
+        filePath =  environLocal.getRootTempDir() / ('local-' + self.name + '.json')
         return filePath
 
     @cacheFilePath.setter
