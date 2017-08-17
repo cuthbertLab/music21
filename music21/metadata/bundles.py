@@ -14,6 +14,7 @@
 
 import os
 import pathlib
+import pickle
 import time
 import unittest
 
@@ -21,7 +22,6 @@ from collections import OrderedDict
 
 from music21 import common
 from music21 import exceptions21
-from music21 import freezeThaw
 
 
 #------------------------------------------------------------------------------
@@ -1114,8 +1114,12 @@ class MetadataBundle:
                 'try building cache with corpus.cacheMetadata({1!r})'.format(
                     self.name, self.name))
             return self
-        jst = freezeThaw.JSONThawer(self)
-        jst.jsonRead(filePath)
+        
+        with open(filePath, 'rb') as pickledFile:
+            newMdb = pickle.load(pickledFile)
+
+        self._metadataEntries = newMdb._metadataEntries
+
         environLocal.printDebug([
             'MetadataBundle: loading time:',
             self.name,
@@ -1337,8 +1341,13 @@ class MetadataBundle:
         if self.filePath is not None:
             filePath = self.filePath
             environLocal.printDebug(['MetadataBundle: writing:', filePath])
-            jsf = freezeThaw.JSONFreezer(self)
-            return jsf.jsonWrite(filePath)
+            storedCorpusClient = self._corpus # no weakrefs allowed...
+            self._corpus = None
+            
+            with open(filePath, 'wb') as outFp:
+                pickle.dump(self, outFp, protocol=3) # 3 is a safe protocol for some time to come.
+            self._corpus = storedCorpusClient
+
         return self
 
 

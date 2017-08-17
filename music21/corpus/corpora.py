@@ -543,10 +543,7 @@ class CoreCorpus(Corpus):
 
     @property
     def cacheFilePath(self):
-        filePath = os.path.join(
-            common.getMetadataCacheFilePath(),
-            'core.json',
-        )
+        filePath = os.sep.join([str(common.getMetadataCacheFilePath()), 'core.p'])
         return filePath
 
         
@@ -772,8 +769,8 @@ class LocalCorpus(Corpus):
             return localCorpusSettings.cacheFilePath
         
         filePath = os.path.join(
-            environLocal.getRootTempDir(),
-            'local-' + self.name + '.json',
+            str(environLocal.getRootTempDir()),
+            'local-' + self.name + '.p',
             )
         return filePath
 

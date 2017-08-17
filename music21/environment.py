@@ -421,11 +421,11 @@ class _EnvironmentCore:
                 for filePath in sorted(lcs):
                     localCorpusPath = ET.Element('localCorpusPath')
                     if filePath is not None:
-                        localCorpusPath.text = filePath
+                        localCorpusPath.text = str(filePath)
                     localCorpusSettings.append(localCorpusPath)
                 if lcs.cacheFilePath is not None:
                     mdbp = ET.Element('cacheFilePath')
-                    mdbp.text = lcs.cacheFilePath
+                    mdbp.text = str(lcs.cacheFilePath)
                     localCorpusSettings.append(mdbp)
                     
                 settings.append(localCorpusSettings)
@@ -436,11 +436,11 @@ class _EnvironmentCore:
                     for filePath in sorted(lcs):
                         localCorpusPath = ET.Element('localCorpusPath')
                         if filePath is not None:
-                            localCorpusPath.text = filePath
+                            localCorpusPath.text = str(filePath)
                         localCorpusSettings.append(localCorpusPath)
                     if lcs.cacheFilePath is not None:
                         mdbp = ET.Element('cacheFilePath')
-                        mdbp.text = lcs.cacheFilePath
+                        mdbp.text = str(lcs.cacheFilePath)
                         localCorpusSettings.append(mdbp)
                     
                     localCorporaSettings.append(localCorpusSettings)

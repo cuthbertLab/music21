@@ -237,27 +237,38 @@ class Metadata(base.Music21Object):
          ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
         '''
         # pylint: disable=undefined-variable
-        allOut = []
-        for wid in self._workIds.keys():
-            val = self._workIds[wid]
-            if val is None:
+        allOut = {}
+        
+        searchAttributes = self.searchAttributes
+        
+        for thisAttribute in sorted(set(searchAttributes)):
+            try:
+                val = getattr(self, thisAttribute)
+            except AttributeError:
                 continue
-            t = (str(wid), str(val))
-            allOut.append(t)
+            
+            if skipContributors:
+                if isinstance(val, Contributor):
+                    continue
+                if thisAttribute == 'composer':
+                    continue
+            if val == 'None' or not val:
+                continue
+            allOut[str(thisAttribute)] = str(val)
+
         if not skipContributors:
-            for contri in self.contributors:
-                for n in contri._names:
-                    t = (str(contri.role), str(n))
-                    allOut.append(t)
-        if self._date is not None:
-            t = ('date', str(self._date))
-            allOut.append(t)
-        if self.copyright is not None:
-            t = ('copyright', str(self.copyright))
-            allOut.append(t)
+            for c in self.contributors:
+                if c.role in allOut:
+                    continue
+                if not c.name or c.name == 'None':
+                    continue
+                allOut[str(c.role)] = str(c.name)
 
+        if 'title' in allOut and 'movementName' in allOut:
+            if allOut['movementName'] == allOut['title']:
+                del(allOut['title'])
 
-        return sorted(allOut)
+        return list(sorted(allOut.items()))
 
     def __getattr__(self, name):
         r'''

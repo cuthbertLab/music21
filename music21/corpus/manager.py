@@ -119,7 +119,7 @@ def getWork(workName,
     Searches all corpora for a file that matches the name and returns it parsed.
     '''
     addXMLWarning = False
-    workNameJoined = workName
+    workNameJoined = str(workName)
     mxlWorkName = workName
 
     if workName in (None, ''):
