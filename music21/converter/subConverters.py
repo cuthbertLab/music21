@@ -99,10 +99,10 @@ class SubConverter:
         to do anything except set self.readBinary (True|False).
         '''
         if self.readBinary is False:
-            with open(filePath) as f:
+            with open(str(filePath)) as f:  # remove str in Py3.6
                 dataStream = f.read()
         else:
-            with open(filePath, 'rb') as f:
+            with open(str(filePath), 'rb') as f: # remove str in Py3.6
                 dataStream = f.read()
 
         try:

@@ -653,25 +653,25 @@ class MetadataBundle:
         bundle's name is not None.
         
         >>> ccPath = corpus.corpora.CoreCorpus().metadataBundle.filePath
-        >>> ccPath.endswith('core.json')
-        True
-        >>> '_metadataCache' in ccPath
+        >>> ccPath.name
+        'core.json'
+        >>> '_metadataCache' in ccPath.parts
         True
         
         >>> localPath = corpus.corpora.LocalCorpus().metadataBundle.filePath
-        >>> localPath.endswith('local.json')
-        True
+        >>> localPath.name
+        'local.json'
         
         Local corpora metadata is stored in the scratch dir, not the
         corpus directory
         
-        >>> '_metadataCache' in localPath
+        >>> '_metadataCache' in localPath.parts
         False
         
         >>> funkCorpus = corpus.corpora.LocalCorpus('funk')
         >>> funkPath = funkCorpus.metadataBundle.filePath
-        >>> funkPath.endswith('local-funk.json')
-        True        
+        >>> funkPath.name
+        'local-funk.json'
         '''
         c = self.corpus
         if c is None:
@@ -1122,7 +1122,8 @@ class MetadataBundle:
             raise exceptions21.MetadataException(
                 'Unnamed MetadataBundles have no default file path to read '
                 'from.')
-        if not os.path.exists(filePath):
+            
+        if not os.path.exists(str(filePath)): # remove str in Py3.6
             environLocal.printDebug('no metadata found for: {0!r}; '
                 'try building cache with corpus.cacheMetadata({1!r})'.format(
                     self.name, self.name))
