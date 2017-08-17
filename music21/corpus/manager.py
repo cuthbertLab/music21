@@ -119,8 +119,8 @@ def getWork(workName,
     Searches all corpora for a file that matches the name and returns it parsed.
     '''
     addXMLWarning = False
-    workNameJoined = workName
-    mxlWorkName = workName
+    workNameJoined = str(workName)
+    mxlWorkName = str(workName)
 
     if workName in (None, ''):
         raise CorpusException(

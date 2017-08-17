@@ -74,6 +74,7 @@ import inspect
 import io
 import json
 import os
+import pathlib
 import time
 import unittest
 import zlib
@@ -932,6 +933,9 @@ class StreamThawer(StreamFreezeThawBase):
         '''
         For a supplied file path to a pickled stream, unpickle
         '''
+        if isinstance(fp, pathlib.Path):
+            fp = str(fp) # TODO: reverse this... use Pathlib...
+                        
         if os.sep in fp: # assume it's a complete path
             fp = fp
         else:
@@ -1799,7 +1803,7 @@ class JSONThawer(JSONFreezeThawBase):
 
         returns the stored object
         '''
-        f = open(fp)
+        f = open(fp, encoding='utf8')
         fileContents = f.read()
         self.json = fileContents
         f.close()

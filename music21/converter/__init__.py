@@ -250,6 +250,8 @@ class PickleFilter:
         '''
         if directory is None:
             directory = environLocal.getRootTempDir()
+        elif isinstance(directory, str):
+            directory = pathlib.Path(directory)
 
         if zipType is None:
             extension = '.p'
@@ -264,7 +266,8 @@ class PickleFilter:
             baseName += '-' + str(self.number)
         baseName += extension
 
-        return os.path.join(directory, baseName)
+        
+        return directory / baseName
 
     def removePickle(self):
         '''

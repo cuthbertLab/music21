@@ -710,11 +710,12 @@ class Test(unittest.TestCase):
     def testGetInstrumentFromMxl(self):
         '''Test getting an instrument from an mxl file
         '''
+        import os
         from music21 import corpus, converter
 
         # manually set activeSite to associate
-        a = converter.parse(corpus.getWork(['corelli', 'opus3no1',
-                                            '1grave.xml']))
+        a = converter.parse(corpus.getWork(os.sep.join(['corelli', 'opus3no1',
+                                            '1grave.xml'])))
 
         b = a.parts[2]
         # by calling the .part property, we create a new stream; thus, the
@@ -7796,7 +7797,7 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    music21.mainTest(Test, 'failFast', 'verbose' ) #, runTest='testChordifyC')
+    music21.mainTest(Test, 'verbose' ) #, runTest='testChordifyC')
 
 #------------------------------------------------------------------------------
 # eof
