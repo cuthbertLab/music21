@@ -1134,7 +1134,6 @@ class MetadataBundle:
                 'try building cache with corpus.cacheMetadata({1!r})'.format(
                     self.name, self.name))
             return self
-        
         with filePath.open('rb') as pickledFile:
             newMdb = pickle.load(pickledFile)
 

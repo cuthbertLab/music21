@@ -161,7 +161,7 @@ class LilypondConverter:
     def findLilyExec(self):
         lpEnvironment = environLocal['lilypondPath']
         if lpEnvironment is not None and lpEnvironment.exists():
-            LILYEXEC = lpEnvironment # pragma: no cover
+            LILYEXEC = str(lpEnvironment) # pragma: no cover
         else: # pragma: no cover
             platform = common.getPlatform()
             if platform == "darwin":
