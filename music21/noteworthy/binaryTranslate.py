@@ -28,11 +28,9 @@ convert the file into .xml or .nwctxt first.
 
 ::
 
-    >>> from music21 import *
     >>> #_DOCS_SHOW c = converter.parse('/Users/cuthbert/desktop/cuthbert_test1.nwc')
-    >>> import os #_DOCS_HIDE
-    >>> p = os.path.join(common.getSourceFilePath(), 'noteworthy', 'cuthbert_test1.nwc') #_DOCS_HIDE
-    >>> c = converter.parse(p, forceSource=True) #_DOCS_HIDE
+    >>> p = common.getSourceFilePath() / 'noteworthy' / 'cuthbert_test1.nwc' #_DOCS_HIDE
+    >>> c = converter.parse(str(p), forceSource=True) #_DOCS_HIDE
     >>> c.show('text')
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 0 offset=0.0>
@@ -146,8 +144,7 @@ class NWCConverter:
         Parse a file (calls .toStream)
 
         >>> #_DOCS_SHOW fp = '/Users/cuthbert/desktop/cuthbert_test1.nwc'
-        >>> from os.path import join as j #_DOCS_HIDE
-        >>> fp = j(common.getSourceFilePath(), 'noteworthy', 'cuthbert_test1.nwc') #_DOCS_HIDE
+        >>> fp = str(common.getSourceFilePath()/'noteworthy'/'cuthbert_test1.nwc') #_DOCS_HIDE
         >>> nwcc = noteworthy.binaryTranslate.NWCConverter(fp=fp)
         >>> nwcc.fileContents
         >>> streamObj = nwcc.parseFile()
@@ -161,7 +158,7 @@ class NWCConverter:
         '''
         if fp is None:
             fp = self.fp
-        with open(fp, 'rb') as f:
+        with open(str(fp), 'rb') as f: # remove in Py3.6...
             self.fileContents = f.read()
         self.parse()
         return self.toStream()

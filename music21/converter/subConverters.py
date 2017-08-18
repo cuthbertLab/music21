@@ -99,10 +99,10 @@ class SubConverter:
         to do anything except set self.readBinary (True|False).
         '''
         if self.readBinary is False:
-            with open(filePath) as f:
+            with open(str(filePath)) as f:  # remove str in Py3.6
                 dataStream = f.read()
         else:
-            with open(filePath, 'rb') as f:
+            with open(str(filePath), 'rb') as f: # remove str in Py3.6
                 dataStream = f.read()
 
         try:
@@ -774,6 +774,10 @@ class ConverterMusicXML(SubConverter):
 
         c = xmlToM21.MusicXMLImporter()
 
+        if isinstance(fp, pathlib.Path):
+            fp  = str(fp) # remove in Py3.6
+
+
         # here, we can see if this is a mxl or similar archive
         arch = converter.ArchiveManager(fp)
         if arch.isArchive():
@@ -1251,10 +1255,9 @@ class Test(unittest.TestCase):
                 # last resort
                 from music21.ext import mock
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
-            from os import path
-            testPath = path.join(common.getSourceFilePath(), 'mei', 'test', 'notes_in_utf16.mei')
+            testPath = common.getSourceFilePath() / 'mei' / 'test' / 'notes_in_utf16.mei'
             testConverter = ConverterMEI()
-            testConverter.parseFile(testPath)
+            testConverter.parseFile(str(testPath))
             self.assertEqual(1, mockConv.call_count)
 
     def testImportMei4(self):
@@ -1272,10 +1275,9 @@ class Test(unittest.TestCase):
                 # last resort
                 from music21.ext import mock
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
-            from os import path
-            testPath = path.join(common.getSourceFilePath(), 'mei', 'test', 'notes_in_utf8.mei')
+            testPath = common.getSourceFilePath() / 'mei' / 'test' / 'notes_in_utf8.mei'
             testConverter = ConverterMEI()
-            testConverter.parseFile(testPath)
+            testConverter.parseFile(str(testPath)) # remove str in Py3.6
             self.assertEqual(1, mockConv.call_count)
 
     def testXMLtoPNG(self):
@@ -1283,8 +1285,9 @@ class Test(unittest.TestCase):
         testing the findPNGfpFromXMLfp method with three different files of lengths
         that create .png files with -1, -01, and -001 in the fp
         '''
+        # TODO: Convert to pathlib....
         env = environment.Environment()
-        tempfp1 = env.getTempFile()
+        tempfp1 = str(env.getTempFile())
         xmlfp1 = tempfp1 + ".xml"
         os.rename(tempfp1, tempfp1 + "-1.png")
         tempfp1 += "-1.png"
@@ -1293,7 +1296,7 @@ class Test(unittest.TestCase):
         self.assertEqual(pngfp1, tempfp1)
 
         env = environment.Environment()
-        tempfp2 = env.getTempFile()
+        tempfp2 = str(env.getTempFile())
         xmlfp2 = tempfp2 + ".xml"
         os.rename(tempfp2, tempfp2 + "-01.png")
         tempfp2 += "-01.png"
@@ -1302,7 +1305,7 @@ class Test(unittest.TestCase):
         self.assertEqual(pngfp2, tempfp2)
 
         env = environment.Environment()
-        tempfp3 = env.getTempFile()
+        tempfp3 = str(env.getTempFile())
         xmlfp3 = tempfp3 + ".xml"
         os.rename(tempfp3, tempfp3 + "-001.png")
         tempfp3 += "-001.png"
@@ -1315,7 +1318,7 @@ class Test(unittest.TestCase):
         testing the findPNGfpFromXMLfp method with a file that is >999 pages long
         '''
         env = environment.Environment()
-        tempfp = env.getTempFile()
+        tempfp = str(env.getTempFile())
         xmlfp = tempfp + ".xml"
         os.rename(tempfp, tempfp + "-0001.png")
         tempfp += "-0001.png"

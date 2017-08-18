@@ -120,7 +120,7 @@ def getWork(workName,
     '''
     addXMLWarning = False
     workNameJoined = str(workName)
-    mxlWorkName = workName
+    mxlWorkName = workNameJoined
 
     if workName in (None, ''):
         raise CorpusException(

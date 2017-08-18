@@ -112,7 +112,7 @@ class NoteworthyTranslator:
             data = common.readFileEncodingSafe(filePath)
             dataList = data.split('\n')
             return self.parseList(dataList)
-        except OSError.FileNotFoundError:
+        except (OSError, FileNotFoundError):
             raise NoteworthyTranslateException('cannot open %s: ' % filePath)
 
     def parseString(self, data):

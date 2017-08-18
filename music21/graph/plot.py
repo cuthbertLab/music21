@@ -20,7 +20,6 @@ reusable approaches to graphing data and structures in
 '''
 import collections
 import os
-import random
 import unittest
 
 # from music21 import common

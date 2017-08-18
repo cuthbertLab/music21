@@ -13,9 +13,7 @@
 Utility routines for processing text in scores and other musical objects.
 '''
 import unittest
-import os
 import random
-import codecs
 
 #import music21 # needed to properly do isinstance checking
 
@@ -363,11 +361,10 @@ class LanguageDetector:
 
     def readExcerpts(self):
         for languageCode in self.languageCodes:
-            thisExcerpt = os.path.join(common.getSourceFilePath(),
-                                       'languageExcerpts',
-                                       languageCode + '.txt')
+            thisExcerpt = (common.getSourceFilePath() / 'languageExcerpts' 
+                            / (languageCode + '.txt'))
 
-            with codecs.open(thisExcerpt, encoding='utf-8') as f:
+            with thisExcerpt.open(encoding='utf-8') as f:
                 excerptWords = f.read().split()
                 self.trigrams[languageCode] = Trigram(excerptWords)
 

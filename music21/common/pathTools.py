@@ -96,7 +96,7 @@ def getCorpusContentDirs():
     []
 
     '''
-    directoryName = getCorpusFilePath()
+    directoryName = str(getCorpusFilePath()) # Py3.6 remove
     result = []
     # dirs to exclude; all files will be retained
     excludedNames = (
@@ -151,18 +151,16 @@ def cleanpath(path, *, returnPathlib=None):
     '''
     
     if isinstance(path, pathlib.Path):
-        path = path.expanduser()
-        path = path.resolve()
         path = str(path)
         if returnPathlib is None:
             returnPathlib = True
     else:
         if returnPathlib is None:
             returnPathlib = False
-        path = os.path.expanduser(path)
-        path = os.path.normpath(path)
-        if not os.path.isabs(path):
-            path = os.path.abspath(path)
+    path = os.path.expanduser(path)
+    path = os.path.normpath(path)
+    if not os.path.isabs(path):
+        path = os.path.abspath(path)
 
     path = os.path.expandvars(path)
     if not returnPathlib:

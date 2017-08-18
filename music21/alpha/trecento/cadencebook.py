@@ -61,11 +61,11 @@ class TrecentoSheet:
             self.filename = keywords["filename"]
         if self.filename:
             try:
-                xbook = xlrd.open_workbook(self.filename)
+                xbook = xlrd.open_workbook(str(self.filename))
             except IOError:
-                xbook = xlrd.open_workbook(os.path.join(common.getSourceFilePath(),
-                                                        'alpha', 'trecento',
-                                                        self.filename))
+                xbook = xlrd.open_workbook(str(common.getSourceFilePath()
+                                                        / 'alpha' / 'trecento'
+                                                        / self.filename))
 
 
             if ("sheetname" in keywords):

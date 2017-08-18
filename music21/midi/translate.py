@@ -1408,9 +1408,9 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     Note that quantization takes place in stream.py since it's useful not just for MIDI.
 
     >>> import os
-    >>> fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test05.mid')
+    >>> fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test05.mid'
     >>> mf = midi.MidiFile()
-    >>> mf.open(fp)
+    >>> mf.open(str(fp))
     >>> mf.read()
     >>> mf.close()
     >>> len(mf.tracks)
@@ -1932,9 +1932,8 @@ def midiFilePathToStream(filePath, inputM21=None, **keywords):
     return a :class:`~music21.stream.Score` object (or if inputM21 is passed in,
     use that object instead).
 
-    >>> import os #_DOCS_HIDE
     >>> sfp = common.getSourceFilePath() #_DOCS_HIDE
-    >>> fp = os.path.join(sfp, 'midi', 'testPrimitive', 'test05.mid') #_DOCS_HIDE
+    >>> fp = str(sfp / 'midi' / 'testPrimitive' / 'test05.mid') #_DOCS_HIDE
     >>> #_DOCS_SHOW fp = '/Users/test/music21/midi/testPrimitive/test05.mid'
     >>> streamScore = midi.translate.midiFilePathToStream(fp)
     >>> streamScore
@@ -2058,9 +2057,9 @@ def midiFileToStream(mf, inputM21=None, quantizePost=True, **keywords):
     The `inputM21` object can specify an existing Stream (or Stream subclass) to fill.
 
     >>> import os
-    >>> fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test05.mid')
+    >>> fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test05.mid'
     >>> mf = midi.MidiFile()
-    >>> mf.open(fp)
+    >>> mf.open(str(fp))
     >>> mf.read()
     >>> mf.close()
     >>> len(mf.tracks)

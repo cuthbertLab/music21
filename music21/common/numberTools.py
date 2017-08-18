@@ -18,8 +18,6 @@ import unittest
 from fractions import Fraction
 from music21 import defaults
 
-from music21.exceptions21 import Music21CommonException
-
 __all__ = ['ordinals', 'musicOrdinals',
 
            'cleanupFloat',

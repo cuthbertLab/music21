@@ -708,13 +708,13 @@ class Test(unittest.TestCase):
 
 
     def testGetInstrumentFromMxl(self):
-        '''Test getting an instrument from an mxl file
         '''
-        from music21 import corpus, converter
+        Test getting an instrument from an mxl file
+        '''
+        from music21 import corpus
 
         # manually set activeSite to associate
-        a = converter.parse(corpus.getWork(['corelli', 'opus3no1',
-                                            '1grave.xml']))
+        a = corpus.parse('corelli/opus3no1/1grave.xml')
 
         b = a.parts[2]
         # by calling the .part property, we create a new stream; thus, the
@@ -4316,8 +4316,7 @@ class Test(unittest.TestCase):
         when triplets are involved...
         '''
         from music21 import converter
-        import os
-        bugtestFile = os.path.join(common.getSourceFilePath(), 'stream', 'tripletOffsetBugtest.xml')
+        bugtestFile = common.getSourceFilePath() / 'stream' / 'tripletOffsetBugtest.xml'
         s = converter.parse(bugtestFile)
         p = s.parts[0]
         m = p.getElementAtOrBefore(2)
@@ -7796,7 +7795,7 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    music21.mainTest(Test, 'failFast', 'verbose' ) #, runTest='testChordifyC')
+    music21.mainTest(Test, 'verbose' ) #, runTest='testChordifyC')
 
 #------------------------------------------------------------------------------
 # eof

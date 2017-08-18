@@ -74,6 +74,7 @@ import inspect
 import io
 import json
 import os
+import pathlib
 import time
 import unittest
 import zlib
@@ -113,9 +114,12 @@ class StreamFreezeThawBase:
     def getPickleFp(self, directory):
         if directory is None:
             raise ValueError
+        if not isinstance(directory, pathlib.Path):
+            directory = pathlib.Path(directory)
+        
         # cannot get data from stream, as offsets are broken
         streamStr = str(time.time())
-        return os.path.join(directory, 'm21-' + common.getMd5(streamStr) + '.p')
+        return directory / ('m21-' + common.getMd5(streamStr) + '.p')
 
     def getJsonFp(self, directory):
         return self.getPickleFp(directory) + '.json'
@@ -655,15 +659,16 @@ class StreamFreezer(StreamFreezeThawBase):
                 fp = self.getJsonFp(directory)
             else:
                 fp = self.getPickleFp(directory)
-        elif os.sep in fp: # assume its a complete path
-            fp = fp
         else:
-            directory = environLocal.getRootTempDir()
-            fp = os.path.join(directory, fp)
+            if not isinstance(fp, pathlib.Path):
+                fp = pathlib.Path(fp)
+            
+            if not fp.is_absolute(): # assume its a complete path
+                fp = environLocal.getRootTempDir() / fp
 
         storage = self.packStream(self.stream)
 
-        environLocal.printDebug(['writing fp', fp])
+        environLocal.printDebug(['writing fp', str(fp)])
 
         if fmt == 'pickle':
             # a negative protocol value will get the highest protocol;
@@ -672,12 +677,18 @@ class StreamFreezer(StreamFreezeThawBase):
             pickleString = pickle.dumps(storage, protocol=pickle.HIGHEST_PROTOCOL)
             if zipType == 'zlib':
                 pickleString = zlib.compress(pickleString)
+            
+            if isinstance(fp, pathlib.Path):
+                fp = str(fp)
             with open(fp, 'wb') as f: # binary
                 f.write(pickleString)
         elif fmt == 'jsonpickle':
             data = jsonpickle.encode(storage, **keywords)
             if zipType == 'zlib':
                 data = zlib.compress(data)
+
+            if isinstance(fp, pathlib.Path):
+                fp = str(fp)
             with open(fp, 'w') as f:
                 f.write(data)
 
@@ -932,6 +943,9 @@ class StreamThawer(StreamFreezeThawBase):
         '''
         For a supplied file path to a pickled stream, unpickle
         '''
+        if isinstance(fp, pathlib.Path):
+            fp = str(fp) # TODO: reverse this... use Pathlib...
+                        
         if os.sep in fp: # assume it's a complete path
             fp = fp
         else:
@@ -1799,7 +1813,7 @@ class JSONThawer(JSONFreezeThawBase):
 
         returns the stored object
         '''
-        f = open(fp)
+        f = open(fp, encoding='utf8')
         fileContents = f.read()
         self.json = fileContents
         f.close()
@@ -2087,10 +2101,10 @@ class Test(unittest.TestCase):
 
     def testPickleMidi(self):
         from music21 import converter
-        a = os.path.join(common.getSourceFilePath(),
-                         'midi',
-                         'testPrimitive',
-                         'test03.mid')
+        a = str(common.getSourceFilePath()
+                         / 'midi'
+                         / 'testPrimitive'
+                         / 'test03.mid')
 
         #a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
         c = converter.parse(a)

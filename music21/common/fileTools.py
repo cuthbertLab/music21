@@ -18,12 +18,10 @@ import contextlib # for with statements
 import io
 import pathlib
 import os
-import time
 
 from music21.ext import chardet
 
 __all__ = ['readFileEncodingSafe',
-           'sortFilesRecent',
            'cd',
            ]
 
@@ -49,25 +47,6 @@ def cd(targetDir):
         os.chdir(cwd)
 
 
-def sortFilesRecent(fileList):
-    '''Given two files, sort by most recent. Return only the file
-    paths.
-
-    >>> import os
-    >>> a = os.listdir(os.curdir)
-    >>> b = common.sortFilesRecent(a)
-
-    :rtype: list(str)
-    '''
-    sort = []
-    for fp in fileList:
-        lastmod = time.localtime(os.stat(fp)[8])
-        sort.append([lastmod, fp])
-    sort.sort()
-    sort.reverse()
-    # just return
-    return [y for dummy, y in sort]
-
 def readFileEncodingSafe(filePath, firstGuess='utf-8'):
     r'''
     Slow, but will read a file of unknown encoding as safely as possible using
@@ -77,7 +56,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
     so it won't load in Python3:
 
     >>> import os
-    >>> c = os.path.join(common.getSourceFilePath(), 'common', '__init__.py')
+    >>> c = str(common.getSourceFilePath() / 'common' / '__init__.py')
     >>> #_DOCS_SHOW f = open(c)
     >>> #_DOCS_SHOW data = f.read()
     Traceback (most recent call last):
@@ -105,10 +84,10 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
 
     :rtype: str
     '''
-    if not isinstance(filePath, pathlib.Path):
-        filePath = pathlib.Path(filePath)
+    if isinstance(filePath, pathlib.Path):
+        filePath = filePath.resolve()
+        filePath = str(filePath)
 
-    filePath = filePath.resolve()
 
     try:
         with io.open(filePath, 'r', encoding=firstGuess) as thisFile:

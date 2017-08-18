@@ -43,11 +43,11 @@ For most people you'll want to do something like this:
 ['A4', 'B4(-15c)', 'C#5(-11c)', 'E-5(-7c)', 'E~5(+6c)', 'F#5(+14c)', 'G~5(+1c)', 'B-5(+2c)']
 
 '''
-
-import os
-import unittest
-import math
 import io
+import math
+import os
+import pathlib
+import unittest
 
 
 from music21 import common
@@ -404,6 +404,8 @@ class ScalaFile:
         '''
         Open a file for reading
         '''
+        if isinstance(fp, pathlib.Path):
+            fp = str(fp)
         self.file = io.open(fp, mode, encoding='latin-1')
         self.fileName = os.path.basename(fp)
 

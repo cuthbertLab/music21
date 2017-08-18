@@ -543,7 +543,7 @@ class CoreCorpus(Corpus):
 
     @property
     def cacheFilePath(self):
-        filePath = os.sep.join([str(common.getMetadataCacheFilePath()), 'core.p'])
+        filePath = common.getMetadataCacheFilePath() / 'core.p'
         return filePath
 
         
@@ -763,15 +763,19 @@ class LocalCorpus(Corpus):
     def cacheFilePath(self):
         '''
         Get the path to the file path that stores the .json file.
+        
+        returns a pathlib.Path
         '''
         localCorpusSettings = self._getSettings()
         if localCorpusSettings is not None and localCorpusSettings.cacheFilePath is not None:
             return localCorpusSettings.cacheFilePath
         
-        filePath = os.path.join(
-            str(environLocal.getRootTempDir()),
-            'local-' + self.name + '.p',
-            )
+        localName = self.name
+        if localName == 'local':
+            localName = ''
+        else:
+            localName = '-' + self.name
+        filePath =  environLocal.getRootTempDir() / ('local' + localName + '.p')
         return filePath
 
     @cacheFilePath.setter
@@ -782,7 +786,7 @@ class LocalCorpus(Corpus):
         if not self.existsInSettings:
             raise CorpusException('Save this corpus before changing the cacheFilePath')
         localCorpusSettings = self._getSettings()
-        localCorpusSettings.cacheFilePath = common.cleanpath(value)
+        localCorpusSettings.cacheFilePath = common.cleanpath(value, returnPathlib=True)
         en = environment.Environment()
 
         if self.name == 'local':
@@ -993,10 +997,7 @@ class LocalCorpus(Corpus):
 # 
 #     @property
 #     def cacheFilePath(self):
-#         filePath = os.path.join(
-#             common.getMetadataCacheFilePath(),
-#             'virtual.json',
-#         )
+#         filePath = common.getMetadataCacheFilePath() / 'virtual.json'
 #         return filePath
 # 
 #     ### PUBLIC METHODS ###

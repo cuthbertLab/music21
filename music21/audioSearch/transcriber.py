@@ -104,7 +104,7 @@ def monophonicStreamFromFile(fileName, useScale=None):
 
     >>> import os #_DOCS_HIDE
     >>> taw = 'test_audio.wav' #_DOCS_HIDE
-    >>> waveFile = os.path.join(common.getSourceFilePath(), 'audioSearch', taw) #_DOCS_HIDE
+    >>> waveFile = str(common.getSourceFilePath() / 'audioSearch' / taw) #_DOCS_HIDE
     >>> #_DOCS_SHOW waveFile = 'test_audio.wav'
     >>> p = audioSearch.transcriber.monophonicStreamFromFile(waveFile)
     >>> p

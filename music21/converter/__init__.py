@@ -120,7 +120,7 @@ class ArchiveManager:
             if self.fp.suffix in ('.mxl', '.md'):
                 # try to open it, as some mxl files are not zips
                 try:
-                    unused = zipfile.ZipFile(self.fp, 'r')
+                    unused = zipfile.ZipFile(str(self.fp), 'r') # remove str Py3.6
                 except zipfile.BadZipfile:
                     return False
                 return True
@@ -137,7 +137,7 @@ class ArchiveManager:
         '''
         post = []
         if self.archiveType == 'zip':
-            f = zipfile.ZipFile(self.fp, 'r')
+            f = zipfile.ZipFile(str(self.fp), 'r') # remove str in Py3.6
             for subFp in f.namelist():
                 post.append(subFp)
             f.close()
@@ -156,7 +156,8 @@ class ArchiveManager:
         if self.archiveType != 'zip':
             raise ArchiveManagerException('no support for extension: %s' % self.archiveType)
 
-        f = zipfile.ZipFile(self.fp, 'r')
+        f = zipfile.ZipFile(str(self.fp), 'r')  # remove str in Py3.6
+        
         if name is None and dataFormat == 'musicxml': # try to auto-harvest
             # will return data as a string
             # note that we need to read the META-INF/container.xml file
@@ -236,10 +237,7 @@ class PickleFilter:
     returned.
     '''
     def __init__(self, fp, forceSource=False, number=None):
-        if not isinstance(fp, pathlib.Path):
-            fp = pathlib.Path(fp)
-
-        self.fp = common.cleanpath(fp)
+        self.fp = common.cleanpath(fp, returnPathlib=True)
         self.forceSource = forceSource
         self.number = number
         #environLocal.printDebug(['creating pickle filter'])
@@ -247,9 +245,13 @@ class PickleFilter:
     def getPickleFp(self, directory=None, zipType=None):
         '''
         Returns the file path of the pickle file for this file.
+        
+        Returns a pathlib.Path
         '''
         if directory is None:
-            directory = environLocal.getRootTempDir()
+            directory = environLocal.getRootTempDir() # pathlibPath
+        elif isinstance(directory, str):
+            directory = pathlib.Path(directory)
 
         if zipType is None:
             extension = '.p'
@@ -264,7 +266,8 @@ class PickleFilter:
             baseName += '-' + str(self.number)
         baseName += extension
 
-        return os.path.join(directory, baseName)
+        
+        return directory / baseName
 
     def removePickle(self):
         '''
@@ -273,8 +276,8 @@ class PickleFilter:
         Generally not necessary to call, since we can just overwrite obsolete pickles,
         but useful elsewhere.
         '''
-        pickleFp = self.getPickleFp(zipType='gz')
-        if os.path.exists(pickleFp):
+        pickleFp = self.getPickleFp(zipType='gz') # pathlib...
+        if pickleFp.exists():
             os.remove(pickleFp)
 
 
@@ -285,15 +288,15 @@ class PickleFilter:
         original file path.
 
         Return arguments are file path to load, boolean whether to write a pickle, and
-        the file path of the pickle.
+        the file path of the pickle.  All file paths can be pathlib.Path objects or None
 
         Does not check that fp exists or create the pickle file.
 
         >>> fp = '/Users/Cuthbert/Desktop/musicFile.mxl'
         >>> pickfilt = converter.PickleFilter(fp)
         >>> #_DOCS_SHOW pickfilt.status()
-        ('/Users/Cuthbert/Desktop/musicFile.mxl', True,
-              '/var/folders/music21/m21-18b8c5a5f07826bd67ea0f20462f0b8d.pgz')
+        (PosixPath('/Users/Cuthbert/Desktop/musicFile.mxl'), True,
+              PosixPath('/tmp/music21/m21-5.0.0-py3.6-18b8c5a5f07826bd67ea0f20462f0b8d.pgz'))
 
         '''
         fpScratch = environLocal.getRootTempDir()
@@ -302,7 +305,7 @@ class PickleFilter:
         if m21Format == 'pickle': # do not pickle a pickle
             if self.forceSource:
                 raise PickleFilterException(
-                        'cannot access source file when only given a file path to a pickled file.')
+                    'cannot access source file when only given a file path to a pickled file.')
             writePickle = False # cannot write pickle if no scratch dir
             fpLoad = self.fp
             fpPickle = None
@@ -311,16 +314,16 @@ class PickleFilter:
             fpLoad = self.fp
             fpPickle = None
         else: # see which is more up to date
-            fpPickle = self.getPickleFp(fpScratch, zipType='gz')
-            if not os.path.exists(fpPickle):
+            fpPickle = self.getPickleFp(fpScratch, zipType='gz') # pathlib Path
+            if not fpPickle.exists():
                 writePickle = True # if pickled file does not exist
                 fpLoad = self.fp
             else:
-                post = common.sortFilesRecent([self.fp, fpPickle])
-                if post[0] == fpPickle: # pickle is most recent
+                if self.fp.stat().st_mtime < fpPickle.stat().st_mtime:
+                    # pickle is most recent
                     writePickle = False
                     fpLoad = fpPickle
-                elif post[0] == self.fp: # file is most recent
+                else: # file is most recent
                     writePickle = True
                     fpLoad = self.fp
         return fpLoad, writePickle, fpPickle
@@ -1621,9 +1624,8 @@ class Test(unittest.TestCase):
         c.parseFile(fp)
 
         # try low level string data passing
-        f = open(fp, 'rb')
-        data = f.read()
-        f.close()
+        with fp.open('rb') as f:
+            data = f.read()
 
         c.parseData(data)
 
@@ -1635,7 +1637,7 @@ class Test(unittest.TestCase):
     def testConversionMidiNotes(self):
         from music21 import meter, key, chord, note
 
-        fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test01.mid')
+        fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test01.mid'
         # a simple file created in athenacl
         #for fn in ['test01.mid', 'test02.mid', 'test03.mid', 'test04.mid']:
         s = parseFile(fp)
@@ -1644,7 +1646,7 @@ class Test(unittest.TestCase):
 
 
         # has chords and notes
-        fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test05.mid')
+        fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test05.mid'
         s = parseFile(fp)
         #s.show()
         #environLocal.printDebug(['\nopening fp', fp])
@@ -1657,7 +1659,7 @@ class Test(unittest.TestCase):
 
 
         # this sample has eight note triplets
-        fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test06.mid')
+        fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test06.mid'
         s = parseFile(fp)
         #s.show()
 
@@ -1679,7 +1681,7 @@ class Test(unittest.TestCase):
         # this sample has sixteenth note triplets
         # TODO much work is still needed on getting timing right
         # this produces numerous errors in makeMeasure partitioning
-        fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test07.mid')
+        fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test07.mid'
         #environLocal.printDebug(['\nopening fp', fp])
         s = parseFile(fp)
         #s.show('t')
@@ -1690,7 +1692,7 @@ class Test(unittest.TestCase):
 
 
         # this sample has dynamic changes in key signature
-        fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test08.mid')
+        fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test08.mid'
         #environLocal.printDebug(['\nopening fp', fp])
         s = parseFile(fp)
         #s.show('t')
@@ -1772,7 +1774,7 @@ class Test(unittest.TestCase):
 
 
     def testConversionMusedata(self):
-        fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01')
+        fp = common.getSourceFilePath() /  'musedata' / 'testPrimitive' / 'test01'
         s = parse(fp)
         self.assertEqual(len(s.parts), 5)
         #s.show()
@@ -1782,7 +1784,7 @@ class Test(unittest.TestCase):
     def testMixedArchiveHandling(self):
         '''Test getting data out of musedata or musicxml zip files.
         '''
-        fp = os.path.join(common.getSourceFilePath(), 'musicxml', 'testMxl.mxl')
+        fp = common.getSourceFilePath() / 'musicxml' / 'testMxl.mxl'
         af = ArchiveManager(fp)
         # for now, only support zip
         self.assertEqual(af.archiveType, 'zip')
@@ -1795,7 +1797,7 @@ class Test(unittest.TestCase):
 
 #         # test from a file that ends in zip
 #         # note: this is a stage1 file!
-#         fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
+#         fp = common.getSourceFilePath() / 'musedata' / 'testZip.zip'
 #         af = ArchiveManager(fp)
 #         # for now, only support zip
 #         self.assertEqual(af.archiveType, 'zip')
@@ -1819,10 +1821,9 @@ class Test(unittest.TestCase):
         #s = parse(fp)
 
         # test loading a directory
-        fp = os.path.join(common.getSourceFilePath(), 'musedata',
-                'testPrimitive', 'test01')
+        fp = common.getSourceFilePath() / 'musedata' / 'testPrimitive' / 'test01'
         cmd = subConverters.ConverterMuseData()
-        cmd.parseFile(fp)
+        cmd.parseFile(str(fp)) # remove str in Py3.6
 
     def testMEIvsMX(self):
         '''

@@ -45,6 +45,7 @@ SpineParsing consists of several steps.
 '''
 import copy
 import math
+import pathlib
 import re
 import unittest
 
@@ -785,6 +786,8 @@ class HumdrumFile(HumdrumDataCollection):
             raise HumdrumException('Cannot parse humdrum file without a filename!')
         
         try:
+            if isinstance(filename, pathlib.Path):
+                filename = str(filename)
             with open(filename, encoding="latin-1") as humFH:
                 self.eventList = self.parseFileHandle(humFH)
         except IOError:

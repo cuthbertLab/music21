@@ -32,7 +32,7 @@ class ScoreFollower:
             self.scoreNotesOnly = scoreStream.flat.notesAndRests.stream()
         else:
             self.scoreNotesOnly = None
-        self.waveFile = os.path.join(environLocal.getRootTempDir(), 'scoreFollowerTemp.wav')
+        self.waveFile = str(environLocal.getRootTempDir() / 'scoreFollowerTemp.wav')
         self.lastNotePostion = 0
         self.currentSample = 0
         self.totalFile = 0
@@ -111,8 +111,8 @@ class ScoreFollower:
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> ScF.useMic = False
         >>> import os #_DOCS_HIDE
-        >>> ScF.waveFile = os.path.join(common.getSourceFilePath(), #_DOCS_HIDE
-        ...                 'audioSearch', 'test_audio.wav') #_DOCS_HIDE
+        >>> ScF.waveFile = str(common.getSourceFilePath() #_DOCS_HIDE
+        ...                 / 'audioSearch' / 'test_audio.wav') #_DOCS_HIDE
         >>> #_DOCS_SHOW ScF.waveFile = 'test_audio.wav'
         >>> ScF.seconds_recording = 10
         >>> ScF.useScale = scale.ChromaticScale('C4')
