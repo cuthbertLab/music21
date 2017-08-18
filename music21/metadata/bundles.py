@@ -1126,14 +1126,16 @@ class MetadataBundle:
             raise exceptions21.MetadataException(
                 'Unnamed MetadataBundles have no default file path to read '
                 'from.')
+        if not isinstance(filePath, pathlib.Path):
+            filePath = pathlib.Path(filePath)
             
-        if not os.path.exists(str(filePath)): # remove str in Py3.6
+        if not filePath.exists():
             environLocal.printDebug('no metadata found for: {0!r}; '
                 'try building cache with corpus.cacheMetadata({1!r})'.format(
                     self.name, self.name))
             return self
         
-        with open(filePath, 'rb') as pickledFile:
+        with filePath.open('rb') as pickledFile:
             newMdb = pickle.load(pickledFile)
 
         self._metadataEntries = newMdb._metadataEntries
