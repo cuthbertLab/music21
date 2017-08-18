@@ -37,8 +37,9 @@ cov = coverageM21.getCoverage()
 
 
 
-def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None):
-    '''Run all tests. Group can be test and external
+def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verbosity=2):
+    '''
+    Run all tests. Group can be test and external
 
     >>> print(None)
     None
@@ -47,10 +48,6 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None):
 
     modGather = commonTest.ModuleGather()
     modules = modGather.load(restoreEnvironmentDefaults)
-
-    verbosity = 2
-    if 'verbose' in sys.argv:
-        verbosity = 1 # this seems to hide most display
 
     environLocal.printDebug('looking for Test classes...\n')
     # look over each module and gather doc tests and unittests
@@ -123,7 +120,7 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None):
 def travisMain():
     # the main call for travis-ci tests.
     # exits with the returnCode
-    returnCode = main()
+    returnCode = main(verbosity=1)
     exit(returnCode)
 
 

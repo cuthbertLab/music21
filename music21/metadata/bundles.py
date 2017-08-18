@@ -1133,7 +1133,7 @@ class MetadataBundle:
                     self.name, self.name))
             return self
         jst = freezeThaw.JSONThawer(self)
-        jst.jsonRead(filePath)
+        jst.jsonRead(str(filePath))
         environLocal.printDebug([
             'MetadataBundle: loading time:',
             self.name,
