@@ -1624,9 +1624,8 @@ class Test(unittest.TestCase):
         c.parseFile(fp)
 
         # try low level string data passing
-        f = open(fp, 'rb')
-        data = f.read()
-        f.close()
+        with fp.open('rb') as f:
+            data = f.read()
 
         c.parseData(data)
 

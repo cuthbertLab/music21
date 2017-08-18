@@ -677,7 +677,11 @@ class MetadataBundle:
         if c is None:
             return None
         else:
-            return c.cacheFilePath
+            cfp = c.cacheFilePath
+            if not isinstance(cfp, pathlib.Path):
+                return pathlib.Path(cfp)
+            else:
+                return cfp
 
     @property
     def name(self):
