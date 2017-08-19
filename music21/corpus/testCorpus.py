@@ -81,7 +81,7 @@ class Test(unittest.TestCase):
     def testSearch03(self):
         searchResults = corpus.search('Taiwan', field='locale')
         self.assertEqual(len(searchResults), 27)
-        pathInfo = sorted((searchResult.sourcePath, searchResult.number)
+        pathInfo = sorted((str(searchResult.sourcePath), searchResult.number)
             for searchResult in searchResults)
         self.assertEqual(pathInfo, [
             ('essenFolksong/han1.abc', '269'),
