@@ -316,7 +316,7 @@ def cacheMetadataBundleFromDisk(corpusObject):
         metadataBundle.read()
         metadataBundle.validate()
         _metadataBundles[corpusName] = metadataBundle
-
+        
 
 def readAllMetadataBundlesFromDisk():
     '''
