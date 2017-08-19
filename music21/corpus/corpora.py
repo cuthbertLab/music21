@@ -543,51 +543,11 @@ class CoreCorpus(Corpus):
 
     @property
     def cacheFilePath(self):
-        filePath = common.getMetadataCacheFilePath() / 'core.p'
+        filePath = common.getMetadataCacheFilePath() / 'core.p.gz'
         return filePath
 
         
     ### PUBLIC METHODS ###
-
-    def getComposerDirectoryPath(self, composerName):
-        '''
-        To be DEPRECATED
-
-        Given the name of a composer, get the path to the top-level directory
-        of that composer:
-
-        >>> import os
-        >>> from music21 import corpus
-        >>> coreCorpus = corpus.corpora.CoreCorpus()
-        >>> a = coreCorpus.getComposerDirectoryPath('ciconia')
-        >>> a.name
-        'ciconia'
-        >>> a.parent.name
-        'corpus'
-
-        >>> a = coreCorpus.getComposerDirectoryPath('bach')
-        >>> a.name
-        'bach'
-        >>> a.parent.name
-        'corpus'
-
-        >>> a = coreCorpus.getComposerDirectoryPath('handel')
-        >>> a.name
-        'handel'
-        >>> a.parent.name
-        'corpus'
-
-        '''
-        composerName = composerName.lower()
-        match = None
-        for moduleName in common.getCorpusFilePath().iterdir():
-            if composerName not in str(moduleName).lower():
-                continue
-            if str(moduleName).lower().endswith(composerName):
-                match = moduleName
-                break
-        return match
-
 
     def getPaths(
         self,
@@ -687,11 +647,11 @@ class CoreCorpus(Corpus):
         '''
         if CoreCorpus._noCorpus is None:
             # assume that there will always be a 'bach' dir
-            if self.getComposerDirectoryPath('bach') is None:
-                CoreCorpus._noCorpus = True
-            else:
+            for unused in common.getCorpusFilePath().iterdir():
                 CoreCorpus._noCorpus = False
-
+                return False
+            
+        CoreCorpus._noCorpus = False
         return CoreCorpus._noCorpus
 
 
@@ -775,7 +735,7 @@ class LocalCorpus(Corpus):
             localName = ''
         else:
             localName = '-' + self.name
-        filePath =  environLocal.getRootTempDir() / ('local' + localName + '.p')
+        filePath =  environLocal.getRootTempDir() / ('local' + localName + '.p.gz')
         return filePath
 
     @cacheFilePath.setter
@@ -997,7 +957,7 @@ class LocalCorpus(Corpus):
 # 
 #     @property
 #     def cacheFilePath(self):
-#         filePath = common.getMetadataCacheFilePath() / 'virtual.json'
+#         filePath = common.getMetadataCacheFilePath() / 'virtual.p.gz'
 #         return filePath
 # 
 #     ### PUBLIC METHODS ###

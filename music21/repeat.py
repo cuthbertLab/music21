@@ -605,15 +605,15 @@ def deleteMeasures(s, toDelete, *, inPlace=False, correctMeasureNumbers=True):
         else:
             return s
 
-    #correct the measure numbers
+    # correct the measure numbers
     if correctMeasureNumbers:
         measures = list(s.getElementsByClass("Measure"))
         if len(measures) is not 0:
             i = measures[0].number
 
-            #if we deleted the first measure...  TODO: test this case
+            # if we deleted the first measure.  TODO: test this case
             if i != 0 and i != 1:
-                i = 1   #can simplify to one line with above.
+                i = 1   # can simplify to one line with above.
 
             for measure in measures:
                 measure.number = i
@@ -844,10 +844,6 @@ class Expander:
         measureNumberList = []
         post = self.process()
 
-        #if post.hasPartlikeStreams:
-        #    measureContainingStreams = post.parts[0]
-        #else:
-        # apparently the object works only on a part anyhow...
         measureContainingStreams = post
 
         for i, m in enumerate(measureContainingStreams.getElementsByClass('Measure')):
@@ -859,7 +855,7 @@ class Expander:
         measureNumberDict = {}
         for i, m in enumerate(self._srcMeasureStream):
             measureNumberDict[m.measureNumberWithSuffix()] = i
-            # could be overwritten if the same measureNumber is used multiple times...
+            # could be overwritten if the same measureNumber is used multiple times.
 
         indexList = []
         for measureNumberWithSuffix in measureNumberList:
@@ -1390,7 +1386,7 @@ class Expander:
             {0.0} <music21.note.Note C>
             {3.0} <music21.bar.Barline style=final>
 
-        Calling it again does the trick..., as _processRecursiveRepeatBars does
+        Calling it again does the trick, as _processRecursiveRepeatBars does
 
         >>> s3 = e.processInnermostRepeatBars(s2)
         >>> s3.show('text')
@@ -1867,7 +1863,8 @@ class NoInternalStreamException(exceptions21.Music21Exception):
     pass
 
 
-#TODO: change terminology for defaultHash.  It's not really a hash function...
+# TODO: change terminology for defaultHash.  It's not really a hash function.
+
 class RepeatFinder:
     '''
     An object for finding and simplifying repeated sections of music. Must be passed a stream
@@ -2065,7 +2062,7 @@ class RepeatFinder:
 
         s = self.s
 
-        #Check for different parts and change mlist to a list of
+        # Check for different parts and change mlist to a list of
         # measure-streams: [<measures from part1>, <measures from part2>, ... ]
         if s.hasMeasures():
             mlists = [s.getElementsByClass("Measure")]
@@ -2078,19 +2075,21 @@ class RepeatFinder:
                 raise UnequalPartsLengthException(
                         "Parts must each have the same number of measures.")
 
-        #Change mlist so each element of mlist is a list of hashed measures
-        #for each measure in a part.
-        #May look something like [['sdlkfj', 'ej2k', 'r9u3kj'...], ['fjk2', '23ijf9', ... ], ... ]
+        # Change mlist so each element of mlist is a list of hashed measures
+        # for each measure in a part.
+        # May look something like [['sdlkfj', 'ej2k', 'r9u3kj'...], 
+        #                          ['fjk2', '23ijf9', ... ], ... ]
         for i in range(len(mlists)):
             mlists[i] = [hashFunction(mlists[i][j].notesAndRests) for j in range(len(mlists[i]))]
 
-        #mlists is now one list for the whole stream, containing
+        # mlists is now one list for the whole stream, containing
         # a tuple with the hashed measure over each part,
         # i.e. mlists = [(part1_measure1_hash, part2_measure1_hash, ...),
         # (part1_measure2_hash, part2_measure2_hash, ... ), ... ]
         mlists = list(zip(*mlists))
 
-        tempDict = {} #maps the measure-hashes to the lowest examined measure number with that hash.
+        tempDict = {} 
+        # maps the measure-hashes to the lowest examined measure number with that hash.
         res = []
 
         #initialize res

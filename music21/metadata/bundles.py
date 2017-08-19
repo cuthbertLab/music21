@@ -12,6 +12,7 @@
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 
+import gzip
 import os
 import pathlib
 import pickle
@@ -101,13 +102,13 @@ class MetadataEntry:
         '''
         for Py3.6 to allow MetadataEntries to be used where filepaths are being employed
         
-        Returns self.sourcePath()
+        Returns self.sourcePath() as a string
         
         >>> mde1 = metadata.bundles.MetadataEntry(sourcePath='/tmp/myFile.xml')
-        >>> type(mde1).__fspath__(mde1)
+        >>> mde1.__fspath__()
         '/tmp/myFile.xml'
         '''
-        return self.sourcePath
+        return str(self.sourcePath)
 
     ### PUBLIC METHODS ###
 
@@ -653,13 +654,13 @@ class MetadataBundle:
         
         >>> ccPath = corpus.corpora.CoreCorpus().metadataBundle.filePath
         >>> ccPath.name
-        'core.p'
+        'core.p.gz'
         >>> '_metadataCache' in ccPath.parts
         True
         
         >>> localPath = corpus.corpora.LocalCorpus().metadataBundle.filePath
         >>> localPath.name
-        'local.p'
+        'local.p.gz'
         
         Local corpora metadata is stored in the scratch dir, not the
         corpus directory
@@ -670,7 +671,7 @@ class MetadataBundle:
         >>> funkCorpus = corpus.corpora.LocalCorpus('funk')
         >>> funkPath = funkCorpus.metadataBundle.filePath
         >>> funkPath.name
-        'local-funk.p'
+        'local-funk.p.gz'
         '''
         c = self.corpus
         if c is None:
@@ -1135,9 +1136,10 @@ class MetadataBundle:
             return self
         
         
-        with filePath.open('rb') as pickledFile:
+        with gzip.open(str(filePath), 'rb') as pickledFile:
             try:
-                newMdb = pickle.load(pickledFile)
+                uncompressed = pickledFile.read()
+                newMdb = pickle.loads(uncompressed)
             except Exception as e: # pylint: disable=too-broad-exception
                 # pickle exceptions cannot be caught directly
                 # because they might come from pickle or _pickle and the latter cannot
@@ -1370,9 +1372,11 @@ class MetadataBundle:
             environLocal.printDebug(['MetadataBundle: writing:', filePath])
             storedCorpusClient = self._corpus # no weakrefs allowed...
             self._corpus = None
-            
-            with open(filePath, 'wb') as outFp:
-                pickle.dump(self, outFp, protocol=3) # 3 is a safe protocol for some time to come.
+            uncompressed = pickle.dumps(self, protocol=3) 
+            # 3 is a safe protocol for some time to come.
+        
+            with gzip.open(str(filePath), 'wb') as outFp:
+                outFp.write(uncompressed)
             self._corpus = storedCorpusClient
 
         return self

@@ -342,7 +342,7 @@ class LanguageDetector:
     http://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
     unknown author.  No license given.
 
-    See Trigram docs below...
+    See Trigram docs below.
     '''
     languageCodes = ['en', 'fr', 'it', 'de', 'cn', 'la', 'nl']
     languageLong = {'en': 'English',

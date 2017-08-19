@@ -648,10 +648,13 @@ class VoiceLeadingQuartet(base.Music21Object):
         return self.parallelInterval(self.fifth)
 
     def parallelOctave(self):
-        '''Returns True if the motion is a parallel Perfect Octave...
+        '''
+        Returns True if the motion is a parallel Perfect Octave...
         a concept so abhorrent we shudder to illustrate it with an example, but alas, we must:
 
-        >>> N = note.Note # to make these examples shorter
+        We will make the examples shorter with this abbreviation:
+        
+        >>> N = note.Note
 
         >>> vlq = voiceLeading.VoiceLeadingQuartet(N("C4"), N("D4"), N("C5"), N("D5"))
         >>> vlq.parallelOctave()
@@ -672,9 +675,12 @@ class VoiceLeadingQuartet(base.Music21Object):
         return self.parallelInterval(self.octave)
 
     def parallelUnison(self):
-        '''Returns true if the motion is a parallel Perfect Unison (and not
+        '''
+        Returns true if the motion is a parallel Perfect Unison (and not
         Perfect Octave, etc.)
 
+        We will make the examples shorter with this abbreviation:
+        
         >>> N = note.Note
         >>> voiceLeading.VoiceLeadingQuartet(N("C4"), N("D4"), N("C4"), N("D4")).parallelUnison()
         True

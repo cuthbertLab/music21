@@ -738,14 +738,20 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.stream.Stream.append
         - music21.stream.Stream.attachIntervalsBetweenStreams
         - music21.stream.Stream.attachMelodicIntervals
-        - music21.stream.Stream.attributeCount
         - music21.stream.Stream.augmentOrDiminish
         - music21.stream.Stream.beatAndMeasureFromOffset
+        - music21.stream.Stream.chordify
         music21.stream.core.StreamCoreMixin:
         - music21.stream.core.StreamCoreMixin.asTimespans
         - music21.stream.core.StreamCoreMixin.asTree
+        - music21.stream.core.StreamCoreMixin.coreAppend
+        - music21.stream.core.StreamCoreMixin.coreElementsChanged
         - music21.stream.core.StreamCoreMixin.coreGatherMissingSpanners
-        - music21.stream.core.StreamCoreMixin.elementsChanged
+        - music21.stream.core.StreamCoreMixin.coreGetElementByMemoryLocation
+        - music21.stream.core.StreamCoreMixin.coreGuardBeforeAddElement
+        - music21.stream.core.StreamCoreMixin.coreHasElementByMemoryLocation
+        - music21.stream.core.StreamCoreMixin.coreInsert
+        - music21.stream.core.StreamCoreMixin.coreStoreAtEnd
         '''
         return self._inheritedMethodsMapping
 
@@ -813,11 +819,11 @@ class ClassDocumenter(ObjectDocumenter):
         <docbuild.documenters.MethodDocumenter:
             music21.stream.Stream.attachMelodicIntervals>
         <docbuild.documenters.MethodDocumenter:
-            music21.stream.Stream.attributeCount>
-        <docbuild.documenters.MethodDocumenter:
             music21.stream.Stream.augmentOrDiminish>
         <docbuild.documenters.MethodDocumenter:
             music21.stream.Stream.beatAndMeasureFromOffset>
+        <docbuild.documenters.MethodDocumenter:
+            music21.stream.Stream.chordify>
         '''
         return self._methods
 
@@ -1069,7 +1075,6 @@ class ClassDocumenter(ObjectDocumenter):
         '.. hlist::'
         '   :columns: 3'
         ''
-        '   - :attr:`~music21.note.GeneralNote.color`'
         '   - :attr:`~music21.note.GeneralNote.lyric`'
         ''
         'Read/write properties inherited from :class:`~music21.base.Music21Object`:'
@@ -1165,8 +1170,6 @@ class ClassDocumenter(ObjectDocumenter):
         >>> for line in documenter.rstReadonlyPropertiesFormat:
         ...     line
         '.. rubric:: :class:`~music21.note.Note` read-only properties'
-        ''
-        '.. autoattribute:: music21.note.Note.diatonicNoteNum'
         ''
         '.. autoattribute:: music21.note.Note.fullName'
         ''

@@ -63,7 +63,7 @@ class SiteRef(common.SlottedObjectMixin):
     >>> s.site
     <music21.stream.Stream hi>
     >>> s.siteWeakref
-    <weakref at 0x...; to 'Stream' at 0x...>
+    <weakref at 0x123456; to 'Stream' at 0x111111>
 
 
     If you turn sites.WEAKREF_ACTIVE to False then .siteWeakref just stores another reference to
@@ -298,7 +298,6 @@ class Sites(common.SlottedObjectMixin):
 
         >>> class Mock(base.Music21Object):
         ...     pass
-        ...
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> cObj = Mock()
@@ -418,7 +417,6 @@ class Sites(common.SlottedObjectMixin):
         >>> class Mock(base.Music21Object):
         ...     def __init__(self, idEl):
         ...         self.id = idEl
-        ...
         >>> aObj = Mock('a')
         >>> bObj = Mock('b')
         >>> cObj = Mock('c')
@@ -428,14 +426,14 @@ class Sites(common.SlottedObjectMixin):
         >>> aSites.add(bObj)
 
         Returns a generator (The ellipsis in the repr here is
-        because Python 3.5 gives a fully qualified name to a generator object):
+        because Python 3.5+ gives a fully qualified name to a generator object):
 
 
         >>> ys = aSites.yieldSites()
         >>> ys
         <generator object ...yieldSites at 0x1058085e8>
 
-        That's no help, so iterate over it instead...
+        That's no help, so iterate over it instead:
 
         >>> for s in aSites.yieldSites(sortByCreationTime=True, excludeNone=True):
         ...     print(s.id)
@@ -501,7 +499,6 @@ class Sites(common.SlottedObjectMixin):
 
         >>> class Mock(base.Music21Object):
         ...     pass
-        ...
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> cObj = Mock()
@@ -510,7 +507,7 @@ class Sites(common.SlottedObjectMixin):
         >>> aSites.add(aObj)
         >>> aSites.add(bObj)
 
-        Arbitrary order...
+        Arbitrary order, so we compare with sets:
 
         >>> set(aSites.get()) == set([None, cObj, aObj, bObj])
         True
@@ -548,7 +545,6 @@ class Sites(common.SlottedObjectMixin):
 
         >>> class Mock(base.Music21Object):
         ...     attr1 = 234
-        ...
         >>> aObj = Mock()
         >>> aObj.attr1 = 234
         >>> bObj = Mock()
@@ -605,16 +601,17 @@ class Sites(common.SlottedObjectMixin):
         The `getElementMethod` is a string that selects which Stream method is
         used to get elements for searching with getElementsByClass() calls.
 
+        >>> import time
         >>> class Mock(base.Music21Object):
         ...     pass
-        ...
-        >>> import time
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> aSites = sites.Sites()
         >>> aSites.add(aObj)
         >>> aSites.add(bObj)
-        >>> # we get the most recently added object first
+        
+        We get the most recently added object first
+        
         >>> aSites.getObjByClass('Mock', sortByCreationTime=True) == bObj
         True
 
@@ -664,10 +661,11 @@ class Sites(common.SlottedObjectMixin):
             #if DEBUG_CONTEXT: print('\tY: getObjByClass: iterating objs:', id(obj), obj)
             if (classNameIsStr and obj.isFlat):
                 #if DEBUG_CONTEXT:
-                #    print('\tY: skipping flat stream that does not contain object:', id(obj), obj)
+                #    print('\tY: skipping flat stream that does not contain object:', 
+                #                  id(obj), obj)
                 #environLocal.printDebug(
                 #    ['\tY: skipping flat stream that does not contain object:'])
-                if obj.sites.getSiteCount() == 0: # is top level; no more to search...
+                if obj.sites.getSiteCount() == 0: # is top level; no more to search
                     if not obj.hasElementOfClass(className, forceFlat=True):
                         continue # skip, not in this stream
 
@@ -733,7 +731,6 @@ class Sites(common.SlottedObjectMixin):
 
         >>> class Mock(base.Music21Object):
         ...     pass
-        ...
         >>> aSite = Mock()
         >>> dc = sites.Sites()
         >>> dc.add(aSite)
@@ -753,7 +750,6 @@ class Sites(common.SlottedObjectMixin):
 
         >>> class Mock(base.Music21Object):
         ...     pass
-        ...
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> cObj = stream.Stream()
@@ -789,7 +785,6 @@ class Sites(common.SlottedObjectMixin):
 
         >>> class Mock(base.Music21Object):
         ...     pass
-        ...
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> dc = sites.Sites()
@@ -843,7 +838,6 @@ class Sites(common.SlottedObjectMixin):
 
         >>> class Mock(base.Music21Object):
         ...     pass
-        ...
         >>> aStream = stream.Stream()
         >>> bStream = stream.Stream()
         >>> mySites = sites.Sites()
@@ -907,7 +901,6 @@ class Sites(common.SlottedObjectMixin):
 
         >>> class Mock(base.Music21Object):
         ...     pass
-        ...
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> cSite = Mock()
@@ -961,7 +954,7 @@ class Sites(common.SlottedObjectMixin):
         try:
             del self.siteDict[idKey]
         except KeyError:
-            pass # could already be gone...
+            pass # could already be gone.
 
     def setAttrByName(self, attrName, value):
         '''
@@ -970,7 +963,6 @@ class Sites(common.SlottedObjectMixin):
 
         >>> class Mock(base.Music21Object):
         ...     attr1 = 234
-        ...
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> bObj.attr1 = 98
