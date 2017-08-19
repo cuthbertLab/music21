@@ -102,13 +102,13 @@ class MetadataEntry:
         '''
         for Py3.6 to allow MetadataEntries to be used where filepaths are being employed
         
-        Returns self.sourcePath()
+        Returns self.sourcePath() as a string
         
         >>> mde1 = metadata.bundles.MetadataEntry(sourcePath='/tmp/myFile.xml')
-        >>> type(mde1).__fspath__(mde1)
+        >>> mde1.__fspath__()
         '/tmp/myFile.xml'
         '''
-        return self.sourcePath
+        return str(self.sourcePath)
 
     ### PUBLIC METHODS ###
 
