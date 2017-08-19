@@ -133,7 +133,7 @@ class _SplitTuple(tuple):
     >>> b
     2
     >>> st.__class__
-    <... 'music21.base._SplitTuple'>
+    <class 'music21.base._SplitTuple'>
     '''
     def __new__(cls, tupEls):
         return super(_SplitTuple, cls).__new__(cls, tuple(tupEls))
@@ -692,7 +692,7 @@ class Music21Object:
 
         >>> sorted([s for s in n.classSet if isinstance(s, str)])
         ['GeneralNote', 'Music21Object', 'NotRest', 'Note',
-         '....object',
+         'builtins.object',
          'music21.base.Music21Object',
          'music21.note.GeneralNote', 'music21.note.NotRest', 'music21.note.Note',
          'object']
@@ -702,7 +702,7 @@ class Music21Object:
          <class 'music21.base.Music21Object'>,
          <class 'music21.note.NotRest'>,
          <class 'music21.note.Note'>,
-         <... 'object'>]
+         <class 'object'>]
         '''
         try:
             return self._classSetCacheDict[self.__class__]

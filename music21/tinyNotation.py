@@ -331,7 +331,7 @@ class TieState(State):
             self.affectedTokens[0].tie = tie.Tie('start')
         else:
             self.affectedTokens[0].tie.type = 'continue'
-        if len(self.affectedTokens) > 1: # could be end...
+        if len(self.affectedTokens) > 1: # could be end.
             self.affectedTokens[1].tie = tie.Tie('stop')
         return None
 
@@ -463,7 +463,7 @@ class NoteOrRestToken(Token):
         self.durationMap = [
                             (r'(\d+)', 'durationType'),
                             (r'(\.+)', 'dots'),
-        ]  ## tie later...
+        ]  ## tie will be dealt with later.
 
 
         self.durationFound = False
@@ -753,7 +753,7 @@ class Converter:
         {4.0} <music21.bar.Barline style=final>
 
 
-    Or, breaking down what Parse does bit by bit...
+    Or, breaking down what Parse does bit by bit:
 
     >>> tnc = tinyNotation.Converter('4/4 C##4 D e-8 f~ f f# g4 trip{f8 e d} C2=hello')
     >>> tnc.stream
@@ -786,7 +786,7 @@ class Converter:
     {0.0} <music21.meter.TimeSignature 4/4>
     {0.0} <music21.note.Note C##>
 
-    The next notes to 'g4' are pretty similar...
+    The next notes to 'g4' are pretty similar:
 
     >>> for i in range(2, 8):
     ...     tnc.parseOne(i, tnc.preTokens[i])
@@ -946,7 +946,7 @@ class Converter:
         Right now just splits on spaces, but might be smarter to ignore spaces in
         quotes, etc. later.
         '''
-        self.preTokens = self.stringRep.split() # do something better...
+        self.preTokens = self.stringRep.split() # do something better alter.
 
     def setupRegularExpressions(self):
         '''
@@ -992,13 +992,14 @@ class Converter:
         t, activeModifiers = self.parseModifiers(t)
 
         # this copy is done so that an activeState can
-        # remove itself from this list...
+        # remove itself from this list:
         for stateObj in self.activeStates[:]:
             t = stateObj.affectTokenBeforeParse(t)
 
         m21Obj = None
         tokenObj = None
-        # parse token...with state...
+        
+        # parse token with state:
         for tokenRe, tokenClass in self._tokenMapRe:
             matchSuccess = tokenRe.match(t)
             if matchSuccess is None:
@@ -1010,14 +1011,14 @@ class Converter:
             if m21Obj is not None: # can only match one.
                 break
 
-        for stateObj in self.activeStates[:]: # iterate over copy so we can remove....
+        for stateObj in self.activeStates[:]: # iterate over copy so we can remove.
             m21Obj = stateObj.affectTokenAfterParseBeforeModifiers(m21Obj)
 
 
         for modObj in activeModifiers:
             m21Obj = modObj.postParse(m21Obj)
 
-        for stateObj in self.activeStates[:]: # iterate over copy so we can remove....
+        for stateObj in self.activeStates[:]: # iterate over copy so we can remove.
             m21Obj = stateObj.affectTokenAfterParse(m21Obj)
 
         if m21Obj is not None:

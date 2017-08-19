@@ -181,7 +181,7 @@ def expandShortHand(shorthand):
 
     Returns a list of expanded abbreviations.
     '''
-    shorthand = shorthand.replace('/', '') # this line actually seems unnecessary...
+    shorthand = shorthand.replace('/', '') # this line actually seems unnecessary.
     if ENDWITHFLAT_RE.match(shorthand):
         shorthand += "3"
     shorthand = re.sub('11', 'x', shorthand)
@@ -230,7 +230,7 @@ def correctSuffixForChordQuality(chordObj, inversionString):
         if seventhType == 10 and qualityName == 'o':
             qualityName = '/o'
         elif seventhType != 9:
-            pass # do something for odd odd chords...
+            pass # do something for odd odd chords.
     #print (inversionString, fifthName)
     return qualityName + inversionString
 
@@ -316,7 +316,7 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
                     allFigureStringList.insert(0, figureString)
         else:
             figureString = prefix + str(ft.aboveBass)
-            # filter out duplicates...
+            # filter out duplicates.
             if figureString not in allFigureStringList:
                 allFigureStringList.append(figureString)
 
@@ -608,7 +608,6 @@ def romanNumeralFromChord(chordObj,
 
     >>> for pitch in rn.pitches:
     ...     pitch
-    ...
     <music21.pitch.Pitch E-3>
     <music21.pitch.Pitch C4>
     <music21.pitch.Pitch G-6>
@@ -837,9 +836,10 @@ class RomanNumeral(harmony.Harmony):
     >>> V.scaleDegree
     5
 
-    >>> for pitch in V.pitches:  # default key-- C Major
+    Default key is C Major
+
+    >>> for pitch in V.pitches:
     ...     pitch
-    ...
     <music21.pitch.Pitch G4>
     <music21.pitch.Pitch B4>
     <music21.pitch.Pitch D5>
@@ -856,7 +856,6 @@ class RomanNumeral(harmony.Harmony):
 
     >>> for pitch in neapolitan.pitches:  # default octaves
     ...     pitch
-    ...
     <music21.pitch.Pitch F#4>
     <music21.pitch.Pitch A4>
     <music21.pitch.Pitch D5>
@@ -915,7 +914,7 @@ class RomanNumeral(harmony.Harmony):
 
     Can also take a scale object, here we build a first-inversion chord
     on the raised-three degree of D-flat major, that is, F#-major (late
-    Schubert would be proud...)
+    Schubert would be proud.)
 
     >>> sharp3 = roman.RomanNumeral('#III6', scale.MajorScale('D-'))
     >>> sharp3.scaleDegreeWithAlteration
@@ -944,7 +943,6 @@ class RomanNumeral(harmony.Harmony):
     ...     'vio', scale.MajorScale('c'))
     >>> for pitch in lessObviousDiminished.pitches:
     ...     pitch
-    ...
     <music21.pitch.Pitch A4>
     <music21.pitch.Pitch C5>
     <music21.pitch.Pitch E-5>
@@ -953,7 +951,6 @@ class RomanNumeral(harmony.Harmony):
     ...     'vio7', scale.MajorScale('c'))
     >>> for pitch in diminished7th.pitches:
     ...     pitch
-    ...
     <music21.pitch.Pitch A4>
     <music21.pitch.Pitch C5>
     <music21.pitch.Pitch E-5>
@@ -963,7 +960,6 @@ class RomanNumeral(harmony.Harmony):
     ...     'vio65', scale.MajorScale('c'))
     >>> for pitch in diminished7th1stInv.pitches:
     ...     pitch
-    ...
     <music21.pitch.Pitch C4>
     <music21.pitch.Pitch E-4>
     <music21.pitch.Pitch G-4>
@@ -973,7 +969,6 @@ class RomanNumeral(harmony.Harmony):
     ...     'iv/o43', scale.MajorScale('F'))
     >>> for pitch in halfDim7th2ndInv.pitches:
     ...     pitch
-    ...
     <music21.pitch.Pitch F-4>
     <music21.pitch.Pitch A-4>
     <music21.pitch.Pitch B-4>
@@ -1167,7 +1162,7 @@ class RomanNumeral(harmony.Harmony):
         self.useImpliedScale = False
         self.bracketedAlterations = None
         self.omittedSteps = []
-        # do not update pitches...
+        # do not update pitches.
         self._parsingComplete = False
         self.key = keyOrScale
 
@@ -1338,7 +1333,7 @@ class RomanNumeral(harmony.Harmony):
         >>> " ".join([p.name for p in r.pitches])
         'C E- G- B--'
 
-        This was a problem before...
+        This was a problem before:
 
         >>> r.pitches = ['C4', 'E4', 'G4', 'B#4']
         >>> r._matchAccidentalsToQuality('diminished')

@@ -39,7 +39,7 @@ class SortingException(exceptions21.Music21Exception):
 
 class SortTuple(namedtuple('SortTuple', _attrList)):
     '''
-    Derived class of namedTuple which allows for comparisons with pure ints/fractions...
+    Derived class of namedTuple which allows for comparisons with pure ints/fractions.
 
     >>> n = note.Note()
     >>> s = stream.Stream()

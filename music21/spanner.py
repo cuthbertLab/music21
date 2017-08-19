@@ -617,7 +617,7 @@ class SpannerBundle:
         self._cache = {}
         self._storage = []  # a simple List, not a Stream
         for arg in arguments:
-            if common.isListLike(arg):  # spannners are iterable but not listlike...
+            if common.isListLike(arg):  # spannners are iterable but not listlike.
                 for e in arg:
                     self._storage.append(e)
             # take a Stream and use its .spanners property to get all spanners
@@ -904,7 +904,7 @@ class SpannerBundle:
 
     def setIdLocalByClass(self, className, maxId=6):
         '''
-        (See `setIdLocals()` for an explanation of what an idLocal is...)
+        (See `setIdLocals()` for an explanation of what an idLocal is.)
 
         Automatically set idLocal values for all members of the provided class.
         This is necessary in cases where spanners are newly created in
@@ -1028,7 +1028,7 @@ class SpannerBundle:
 
         Call freePendingSpannedElementAssignment to attach.
 
-        Should not get a rest... because it is not a 'Note'
+        Should not get a rest, because it is not a 'Note'
 
         >>> sb.freePendingSpannedElementAssignment(r1)
         >>> su1.getSpannedElements()

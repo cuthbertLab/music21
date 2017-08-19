@@ -10,7 +10,8 @@
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-# currently the tinyNotation demos use alignment to show variation, making this necessary...
+# currently the tinyNotation demos use alignment to show variation, making this necessary.
+
 # pylint: disable=line-too-long
 # all other lines are linted.
 '''
@@ -733,25 +734,25 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName,
     >>> #_DOCS_SHOW s.show()
 
     >>> mainpartWithOssiaVariantsFT = variant.mergePartAsOssia(mainpart, ossiapart,
-    ...                                                            ossiaName = 'Parisian_Variant',
+    ...                                                            ossiaName='Parisian_Variant',
     ...                                                            inPlace=False,
-    ...                                                            compareByMeasureNumber = False,
-    ...                                                            recurseInMeasures = True)
+    ...                                                            compareByMeasureNumber=False,
+    ...                                                            recurseInMeasures=True)
     >>> mainpartWithOssiaVariantsTT = variant.mergePartAsOssia(mainpart, ossiapart,
-    ...                                                            ossiaName = 'Parisian_Variant',
+    ...                                                            ossiaName='Parisian_Variant',
     ...                                                            inPlace=False,
-    ...                                                            compareByMeasureNumber = True,
-    ...                                                            recurseInMeasures = True)
+    ...                                                            compareByMeasureNumber=True,
+    ...                                                            recurseInMeasures=True)
     >>> mainpartWithOssiaVariantsFF = variant.mergePartAsOssia(mainpart, ossiapart,
-    ...                                                            ossiaName = 'Parisian_Variant',
+    ...                                                            ossiaName='Parisian_Variant',
     ...                                                            inPlace=False,
-    ...                                                            compareByMeasureNumber = False,
-    ...                                                            recurseInMeasures = False)
+    ...                                                            compareByMeasureNumber=False,
+    ...                                                            recurseInMeasures=False)
     >>> mainpartWithOssiaVariantsTF = variant.mergePartAsOssia(mainpart, ossiapart,
-    ...                                                            ossiaName = 'Parisian_Variant',
+    ...                                                            ossiaName='Parisian_Variant',
     ...                                                            inPlace=False,
-    ...                                                            compareByMeasureNumber = True,
-    ...                                                            recurseInMeasures = False)
+    ...                                                            compareByMeasureNumber=True,
+    ...                                                            recurseInMeasures=False)
 
     >>> mainpartWithOssiaVariantsFT.show('text') == mainpartWithOssiaVariantsTT.show('text')
     {0.0} <music21.stream.Measure ...
@@ -814,7 +815,8 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName,
                 else:
                     ossiaOffset = returnMeasure.getOffsetBySite(returnObj)
                     addVariant(returnObj, ossiaOffset, ossiaMeasure,
-                               variantName=ossiaName, variantGroups=None, replacementDuration=None)
+                               variantName=ossiaName, variantGroups=None, 
+                               replacementDuration=None)
     else:
         for ossiaMeasure in ossiapart.getElementsByClass("Measure"):
             if ossiaMeasure.notes: #If the measure is not just rests
@@ -1609,7 +1611,7 @@ def makeAllVariantsReplacements(streamWithVariants,
     (16.0, 'elongation', 0.0)
     (20.0, 'deletion', 4.0)
 
-    >>> variant.makeAllVariantsReplacements(newStream, recurse = True, inPlace=True)
+    >>> variant.makeAllVariantsReplacements(newStream, recurse=True, inPlace=True)
     >>> for v in newStream.parts[0].variants:
     ...     (v.offset, v.lengthType, v.replacementDuration, v.containedHighestTime)
     (4.0, 'replacement', 4.0, 4.0)
@@ -1721,7 +1723,7 @@ def _doVariantFixingOnStream(s, variantNames=None):
         if v.getOffsetBySite(s) == 0.0:
             isInitial = True
             isFinal = False
-        elif v.getOffsetBySite(s)+v.replacementDuration == s.duration.quarterLength:
+        elif v.getOffsetBySite(s) + v.replacementDuration == s.duration.quarterLength:
             isInitial = False
             isFinal = True
         else:
@@ -1748,7 +1750,7 @@ def _doVariantFixingOnStream(s, variantNames=None):
         # #elif ((variantType == 'deletion' and (isFinal is True)) or
         #         (type == 'insertion' and (isInitial is False))):
         else:
-            targetElement = _getPreviousElements(s, v)
+            targetElement = _getPreviousElement(s, v)
             newVariantOffset = targetElement.getOffsetBySite(s)
             # Need to shift elements to make way for new element at front
             offsetShift = targetElement.duration.quarterLength
@@ -1819,29 +1821,29 @@ def _getNextElements(s, v, numberOfElements=1):
     if lengthType == 'elongation':
         variantOffset = v.getOffsetBySite(s)
         potentialTargets = s.getElementsByOffset(variantOffset,
-                                          offsetEnd = s.highestTime,
-                                          includeEndBoundary = True,
-                                          mustFinishInSpan = False,
-                                          mustBeginInSpan = True,
-                                          classList = [vClass])
+                                                  offsetEnd=s.highestTime,
+                                                  includeEndBoundary=True,
+                                                  mustFinishInSpan=False,
+                                                  mustBeginInSpan=True,
+                                                  classList=[vClass])
         returnElement = potentialTargets[0]
 
     else:
         replacementDuration = v.replacementDuration
         variantOffset = v.getOffsetBySite(s)
         potentialTargets = s.getElementsByOffset(variantOffset + replacementDuration,
-                                                  offsetEnd = s.highestTime,
-                                                  includeEndBoundary = True,
-                                                  mustFinishInSpan = False,
-                                                  mustBeginInSpan = True,
-                                                  classList = [vClass])
+                                                  offsetEnd=s.highestTime,
+                                                  includeEndBoundary=True,
+                                                  mustFinishInSpan=False,
+                                                  mustBeginInSpan=True,
+                                                  classList=[vClass])
         returnElement = potentialTargets[0]
 
 
     return returnElement
 
 
-def _getPreviousElements(s, v, numberOfElements=1):
+def _getPreviousElement(s, v):
     '''
     This is a helper function for makeAllVariantsReplacements() which returns
     the previous element in s
@@ -1856,7 +1858,7 @@ def _getPreviousElements(s, v, numberOfElements=1):
     >>> s2.makeMeasures(inPlace=True)
     >>> mergedStream = variant.mergeVariants(s1, s2, 'london')
     >>> for v in mergedStream.variants:
-    ...     returnElement = variant._getPreviousElements(mergedStream, v)
+    ...     returnElement = variant._getPreviousElement(mergedStream, v)
     ...     print(returnElement)
     <music21.stream.Measure 1 offset=0.0>
     <music21.stream.Measure 2 offset=4.0>
@@ -1876,7 +1878,7 @@ def _getPreviousElements(s, v, numberOfElements=1):
     >>> v2.groups = ['london']
     >>> s.insert(8.0, v2)
     >>> for v in s.variants:
-    ...     returnElement = variant._getPreviousElements(s, v)
+    ...     returnElement = variant._getPreviousElement(s, v)
     ...     print(returnElement)
     <music21.note.Note A>
     <music21.note.Note B>
@@ -1900,10 +1902,10 @@ def _getPreviousElements(s, v, numberOfElements=1):
     # Get next element in s after v which is of type vClass
     variantOffset = v.getOffsetBySite(s)
     potentialTargets = s.iter.getElementsByOffset(0.0,
-                                      offsetEnd = variantOffset,
-                                      includeEndBoundary = False,
-                                      mustFinishInSpan = False,
-                                      mustBeginInSpan = True,
+                                      offsetEnd=variantOffset,
+                                      includeEndBoundary=False,
+                                      mustFinishInSpan=False,
+                                      mustBeginInSpan=True,
                             ).getElementsByClass(vClass)
     returnElement = potentialTargets[-1]
 
@@ -2250,7 +2252,7 @@ class Variant(base.Music21Object):
             {2.0} <music21.note.Note B->
             {3.0} <music21.note.Note A>
 
-        >>> v3.replacedElements(s, keepOriginalOffsets = True).show('text')
+        >>> v3.replacedElements(s, keepOriginalOffsets=True).show('text')
         {20.0} <music21.stream.Measure 6 offset=20.0>
             {0.0} <music21.note.Note A>
             {2.0} <music21.note.Note B->

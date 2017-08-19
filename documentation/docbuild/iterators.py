@@ -42,34 +42,23 @@ class IPythonNotebookIterator(Iterator):
     >>> for i, nb in enumerate(ipnbi):
     ...     if i >= 3:
     ...         break
-    ...     print(nb.replace(sp, 'ROOT'))
-    ROOT/documentation/source/about/what.ipynb
-    ROOT/documentation/source/developerReference/devTest_inversions.ipynb
-    ROOT/documentation/source/developerReference/devTest_timespans.ipynb
+    ...     print(nb.relative_to(sp))
+    documentation/source/about/what.ipynb
+    documentation/source/developerReference/devTest_inversions.ipynb
+    documentation/source/developerReference/devTest_timespans.ipynb
     '''
 
     ### SPECIAL METHODS ###
 
     def __iter__(self):
         rootFilesystemPath = common.getRootFilePath()
-        documentationPath = os.path.join(
-            rootFilesystemPath,
-            'documentation',
-            'source',
-            )
-        for pathParts in os.walk(documentationPath):
-            directoryPath, fileNames = pathParts[0], pathParts[2]
-            if directoryPath.endswith('.ipynb_checkpoints'):
+        documentationPath = rootFilesystemPath / 'documentation' /'source'
+        for fileName in documentationPath.rglob('*.ipynb'):
+            if fileName.parent.name.endswith('.ipynb_checkpoints'):
                 continue
-            for fileName in fileNames:
-                if '-checkpoint' in fileName:
-                    continue
-                if fileName.endswith('.ipynb'):
-                    filePath = os.path.join(
-                        directoryPath,
-                        fileName,
-                        )
-                    yield filePath
+            if '-checkpoint' in fileName.name:
+                continue
+            yield fileName
 
 
 class ModuleIterator(Iterator):
@@ -109,7 +98,7 @@ class ModuleIterator(Iterator):
     ### SPECIAL METHODS ###
 
     def __iter__(self):
-        rootFilesystemPath = common.getSourceFilePath()
+        rootFilesystemPath = str(common.getSourceFilePath()) # Remove str in Py3.6
         for directoryPath, directoryNames, fileNames in os.walk(
             rootFilesystemPath):
             directoryNamesToRemove = []

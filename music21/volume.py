@@ -106,7 +106,7 @@ class Volume(SlottedObjectMixin):
         Return the dynamic context of this Volume, based on the position of the
         client of this object.
         '''
-        # TODO: find wedges and crescendi too  and demo/test...
+        # TODO: find wedges and crescendi too  and demo/test.
         return self.client.getContextByClass('Dynamic')
 
     def mergeAttributes(self, other):
@@ -663,7 +663,7 @@ class Test(unittest.TestCase):
         #s.show()
         #s.show('midi')
 
-        #### TODO: BUG -- one note too loud...
+        #### TODO: BUG -- one note too loud.
         match = [n.volume.cachedRealizedStr for n in s.parts[0].flat.notes]
         self.assertEqual(match, ['0.35', '0.35', '0.35', '0.35', '0.35',
                                  '0.5', '0.5', '0.5', '0.5',

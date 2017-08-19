@@ -378,10 +378,7 @@ class MetronomeMark(TempoIndication):
     >>> tm2.referent
     <music21.duration.Duration 1.0>
 
-
-
-    Unicode values sometimes are hard to work with.  Here's an example that works...
-
+    Unicode values work fine thanks to Python 3:
 
     >>> marking = 'très vite'
     >>> marking    
@@ -393,12 +390,7 @@ class MetronomeMark(TempoIndication):
     True
     >>> tm2.number
     144
-
     '''
-#     >>> tm3 = music21.tempo.TempoText("extremely, wicked fast!")
-#     >>> tm3.number
-#     90
-
     def __init__(self, text=None, number=None, referent=None, parentheses=False):
         super().__init__()
 
@@ -887,9 +879,8 @@ class MetricModulation(TempoIndication):
     >>> mmod2.newMetronome
     <music21.tempo.MetronomeMark animato Quarter=80.0>
 
-
     Note that an initial metric modulation can set old and new referents and get None as
-    tempo numbers...
+    tempo numbers:
 
     >>> mmod3 = tempo.MetricModulation()
     >>> mmod3.oldReferent = 'half'
@@ -911,7 +902,7 @@ class MetricModulation(TempoIndication):
     <music21.tempo.MetronomeMark Quarter=None>
     >>> mmod3.oldMetronome.number = 60
 
-    New number automatically updates...
+    New number automatically updates:
 
     >>> mmod3
     <music21.tempo.MetricModulation
@@ -1278,7 +1269,7 @@ def interpolateElements(element1, element2, sourceStream,
     40.4
 
 
-    (unless autoAdd is set to false, in which case a Tempo Exception arises...)
+    (unless autoAdd is set to False, in which case a Tempo Exception arises:)
 
 
     >>> destStream3 = stream.Stream()
@@ -1441,7 +1432,7 @@ class Test(unittest.TestCase):
         mmod1.oldMetronome = mm1
         mmod1.newMetronome = mm2
 
-        # this works, and new value is updated...
+        # this works, and new value is updated:
         self.assertEqual(str(mmod1),
                          '<music21.tempo.MetricModulation ' +
                          '<music21.tempo.MetronomeMark animato Eighth=120>=' +
