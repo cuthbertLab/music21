@@ -232,23 +232,6 @@ def getComposer(composerName, fileExtensions=None):
         )
 
 
-def getComposerDir(composerName):
-    '''
-    Given the name of a composer, get the path to the top-level directory of
-    that composer:
-
-    >>> import os
-    >>> a = corpus.getComposerDir('bach')
-    >>> a.name
-    'bach'
-    >>> a.parent.name
-    'corpus'
-    
-    Returns a pathlib.Path object
-    '''
-    return corpora.CoreCorpus().getComposerDirectoryPath(composerName)
-
-
 @property
 def noCorpus():
     '''
