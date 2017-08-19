@@ -44,7 +44,6 @@ __all__ = ['chorales', 'corpora', 'manager',
 import re
 import os
 import unittest
-import zipfile
 
 from music21 import common
 from music21 import converter

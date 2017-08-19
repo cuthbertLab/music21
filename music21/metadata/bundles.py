@@ -14,6 +14,7 @@
 
 import os
 import pathlib
+import pickle
 import time
 import unittest
 
@@ -21,7 +22,6 @@ from collections import OrderedDict
 
 from music21 import common
 from music21 import exceptions21
-from music21 import freezeThaw
 
 
 #------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ class MetadataEntry:
     score file is found:
 
     >>> metadataEntry.sourcePath
-    'bach/bwv66.6.mxl'
+    PosixPath('bach/bwv66.6.mxl')
 
     The metadata property contains its :class:`~music21.metadata.RichMetadata` object:
 
@@ -97,8 +97,7 @@ class MetadataEntry:
             self.corpusPath,
             )
         
-    @classmethod
-    def __fspath__(cls, metadataEntryObject):
+    def __fspath__(self):
         '''
         for Py3.6 to allow MetadataEntries to be used where filepaths are being employed
         
@@ -108,7 +107,7 @@ class MetadataEntry:
         >>> type(mde1).__fspath__(mde1)
         '/tmp/myFile.xml'
         '''
-        return metadataEntryObject.sourcePath
+        return self.sourcePath
 
     ### PUBLIC METHODS ###
 
@@ -654,13 +653,13 @@ class MetadataBundle:
         
         >>> ccPath = corpus.corpora.CoreCorpus().metadataBundle.filePath
         >>> ccPath.name
-        'core.json'
+        'core.p'
         >>> '_metadataCache' in ccPath.parts
         True
         
         >>> localPath = corpus.corpora.LocalCorpus().metadataBundle.filePath
         >>> localPath.name
-        'local.json'
+        'local.p'
         
         Local corpora metadata is stored in the scratch dir, not the
         corpus directory
@@ -671,7 +670,7 @@ class MetadataBundle:
         >>> funkCorpus = corpus.corpora.LocalCorpus('funk')
         >>> funkPath = funkCorpus.metadataBundle.filePath
         >>> funkPath.name
-        'local-funk.json'
+        'local-funk.p'
         '''
         c = self.corpus
         if c is None:
@@ -1126,14 +1125,28 @@ class MetadataBundle:
             raise exceptions21.MetadataException(
                 'Unnamed MetadataBundles have no default file path to read '
                 'from.')
+        if not isinstance(filePath, pathlib.Path):
+            filePath = pathlib.Path(filePath)
             
-        if not os.path.exists(str(filePath)): # remove str in Py3.6
+        if not filePath.exists():
             environLocal.printDebug('no metadata found for: {0!r}; '
                 'try building cache with corpus.cacheMetadata({1!r})'.format(
                     self.name, self.name))
             return self
-        jst = freezeThaw.JSONThawer(self)
-        jst.jsonRead(str(filePath))
+        
+        
+        with filePath.open('rb') as pickledFile:
+            try:
+                newMdb = pickle.load(pickledFile)
+            except Exception as e: # pylint: disable=too-broad-exception
+                # pickle exceptions cannot be caught directly
+                # because they might come from pickle or _pickle and the latter cannot
+                # be caught.
+                raise MetadataBundleException('Cannot load file ' + str(filePath)) from e
+
+
+        self._metadataEntries = newMdb._metadataEntries
+
         environLocal.printDebug([
             'MetadataBundle: loading time:',
             self.name,
@@ -1330,7 +1343,7 @@ class MetadataBundle:
 
     def write(self, filePath=None):
         r'''
-        Write the metadata bundle to disk as a JSON file.
+        Write the metadata bundle to disk as a pickle file.
 
         If `filePath` is None, use `self.filePath`.
 
@@ -1355,8 +1368,13 @@ class MetadataBundle:
         if self.filePath is not None:
             filePath = self.filePath
             environLocal.printDebug(['MetadataBundle: writing:', filePath])
-            jsf = freezeThaw.JSONFreezer(self)
-            return jsf.jsonWrite(filePath)
+            storedCorpusClient = self._corpus # no weakrefs allowed...
+            self._corpus = None
+            
+            with open(filePath, 'wb') as outFp:
+                pickle.dump(self, outFp, protocol=3) # 3 is a safe protocol for some time to come.
+            self._corpus = storedCorpusClient
+
         return self
 
 

@@ -120,7 +120,7 @@ def getWork(workName,
     '''
     addXMLWarning = False
     workNameJoined = str(workName)
-    mxlWorkName = str(workName)
+    mxlWorkName = workNameJoined
 
     if workName in (None, ''):
         raise CorpusException(
@@ -316,7 +316,7 @@ def cacheMetadataBundleFromDisk(corpusObject):
         metadataBundle.read()
         metadataBundle.validate()
         _metadataBundles[corpusName] = metadataBundle
-
+        
 
 def readAllMetadataBundlesFromDisk():
     '''

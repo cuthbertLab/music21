@@ -29,6 +29,7 @@ import difflib
 import json
 import math
 import os
+import pathlib
 import random
 
 from collections import OrderedDict
@@ -138,11 +139,19 @@ def indexScoreParts(scoreFile, *args, **kwds):
 
 
 def _indexSingleMulticore(filePath, *args, **kwds):
+    '''
+    Index one path in the context of multicore.
+    '''
     kwds2 = copy.copy(kwds)
     if 'failFast' in kwds2:
         del(kwds2['failFast'])
 
-    shortfp = filePath.split(os.sep)[-1]
+    if not isinstance(filePath, pathlib.Path):
+        filePath = pathlib.Path(filePath)
+    
+    shortfp = filePath.name
+
+    
     try:
         indexOutput = indexOnePath(filePath, *args, **kwds2)
     except Exception as e: # pylint: disable=broad-except
@@ -165,12 +174,13 @@ def indexScoreFilePaths(scoreFilePaths,
     Returns a dictionary of the lists from indexScoreParts for each score in
     scoreFilePaths
 
-    >>> searchResults = corpus.search('bwv19')
+    >>> #_DOCS_SHOW searchResults = corpus.search('bwv190')
+    >>> searchResults = corpus.corpora.CoreCorpus().search('bwv190') #_DOCS_HIDE
     >>> fpsNamesOnly = sorted([searchResult.sourcePath for searchResult in searchResults])
     >>> len(fpsNamesOnly)
-    9
+    2
 
-    >>> scoreDict = search.segment.indexScoreFilePaths(fpsNamesOnly[2:5])
+    >>> scoreDict = search.segment.indexScoreFilePaths(fpsNamesOnly)
     >>> len(scoreDict['bwv190.7.mxl'])
     4
 
@@ -195,10 +205,17 @@ def indexScoreFilePaths(scoreFilePaths,
 
 
 def indexOnePath(filePath, *args, **kwds):
-    if not os.path.isabs(filePath):
+    '''
+    Index a single path.  Returns a scoreDictEntry
+    '''
+    if not isinstance(filePath, pathlib.Path):
+        filePath = pathlib.Path(filePath)
+
+    if not filePath.is_absolute():
         scoreObj = corpus.parse(filePath)
     else:
         scoreObj = converter.parse(filePath)
+
     scoreDictEntry = indexScoreParts(scoreObj, *args, **kwds)
     return scoreDictEntry
 
@@ -208,19 +225,27 @@ def saveScoreDict(scoreDict, filePath=None):
     reloading
 
     Returns the filepath (assumes you'll probably be using a temporary file)
+    as a pathlib.Path()
     '''
     if filePath is None:
         filePath = environLocal.getTempFile('.json')
-    with open(filePath, 'wb') as f:
+    elif not isinstance(filePath, pathlib.Path):
+        filePath = pathlib.Path(filePath)
+        
+    with filePath.open('wb') as f:
         json.dump(scoreDict, f)
+
     return filePath
 
 
 def loadScoreDict(filePath):
     '''
-    Load the scoreDictionary from filePath
+    Load the scoreDictionary from filePath.
     '''
-    with open(filePath) as f:
+    if not isinstance(filePath, pathlib.Path):
+        filePath = pathlib.Path(filePath)
+        
+    with filePath.open('b') as f:
         scoreDict = json.load(f)
     return scoreDict
 
