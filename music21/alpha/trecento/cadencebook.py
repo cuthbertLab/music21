@@ -17,7 +17,6 @@ for working with this encoding, including transforming it into music21 Streams.
 
 import unittest
 import re
-import os
 import copy
 
 from music21 import common

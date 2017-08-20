@@ -11,7 +11,6 @@
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 import math
-import os
 import unittest
 
 from time import time
