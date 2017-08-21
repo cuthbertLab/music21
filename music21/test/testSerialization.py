@@ -32,42 +32,6 @@ class Test(unittest.TestCase):
         '''
         pass
 
-    def testBasicA(self):
-        from music21 import note
-        unused_t1 = note.Lyric('test')
-        #print t1.json
-
-        n1 = note.Note('G#3', quarterLength=3)
-        n1.lyric = 'testing'
-        self.assertEqual(n1.pitch.nameWithOctave, 'G#3')
-        self.assertEqual(n1.quarterLength, 3.0)
-        self.assertEqual(n1.lyric, 'testing')
-
-        n2 = note.Note()
-
-        raw = freezeThaw.JSONFreezer(n1).json
-        freezeThaw.JSONThawer(n2).json = raw
-
-        self.assertEqual(n2.pitch.nameWithOctave, 'G#3')
-        self.assertEqual(n2.quarterLength, 3.0)
-        #self.assertEqual(n2.lyric, 'testing')
-
-
-    def testBasicB(self):
-        from music21 import chord
-
-        c1 = chord.Chord(['c2', 'a4', 'e5'], quarterLength=1.25)
-        c2 = chord.Chord()
-
-        raw = freezeThaw.JSONFreezer(c1).json
-        freezeThaw.JSONThawer(c2).json = raw
-
-
-        self.assertEqual(str(c1.pitches), 
-                '(<music21.pitch.Pitch C2>, <music21.pitch.Pitch A4>, <music21.pitch.Pitch E5>)')
-        self.assertEqual(c1.quarterLength, 1.25)
-
-
     def testBasicC(self):
         from music21 import stream, note, converter
 

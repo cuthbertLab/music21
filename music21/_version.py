@@ -37,13 +37,11 @@ When it's time to update Music21's version, just change the numbers in the
 tuple assigned to __version_info__, and the __version__ string will be
 updated along with it.
 
-When changing, update the single test case in base.py, and in freezeThaw.JSONFreezer.jsonPrint
-(on a major version change). If you dare edit a 28MB file, change it
-at the end of the two corpus/metadataCache .jsons, but only a problem there sometimes.
+When changing, update the single test case in base.py. 
 
 Changing this number invalidates old pickles -- do it if the old pickles create a problem.
 '''
 
-__version_info__ = (5, 0, 0)
+__version_info__ = (5, 0, 1)
 __version__ = '.'.join(str(x) for x in __version_info__)
 

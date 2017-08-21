@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
 import unittest
-from music21 import freezeThaw
 
 
 class Test(unittest.TestCase):
@@ -43,18 +42,9 @@ class Test(unittest.TestCase):
             )
         #environLocal.printDebug([str(md.json)])
         self.assertEqual(md.composer, 'Frank')
-
-        #md.jsonPrint()
-
-        mdNew = metadata.Metadata()
-
-        jsonString = freezeThaw.JSONFreezer(md).json
-        freezeThaw.JSONThawer(mdNew).json = jsonString
-
-        self.assertEqual(mdNew.date, '2010/--/--')
-        self.assertEqual(mdNew.composer, 'Frank')
-
-        self.assertEqual(mdNew.title, 'Concerto in F')
+        self.assertEqual(md.date, '2010/--/--')
+        self.assertEqual(md.composer, 'Frank')
+        self.assertEqual(md.title, 'Concerto in F')
 
         # test getting meta data from an imported source
         c = converter.parse(mTF.mozartTrioK581Excerpt)  # @UndefinedVariable
@@ -66,20 +56,6 @@ class Test(unittest.TestCase):
         self.assertEqual(md.title, 'Quintet for Clarinet and Strings')
         self.assertEqual(md.number, 'K. 581')
         self.assertEqual(md.composer, 'Wolfgang Amadeus Mozart')
-
-        # convert to json and see if data is still there
-        #md.jsonPrint()
-        mdNew = metadata.Metadata()
-
-        jsonString = freezeThaw.JSONFreezer(md).json
-        freezeThaw.JSONThawer(mdNew).json = jsonString
-
-        self.assertEqual(mdNew.movementNumber, '3')
-        self.assertEqual(
-            mdNew.movementName, 'Menuetto (Excerpt from Second Trio)')
-        self.assertEqual(mdNew.title, 'Quintet for Clarinet and Strings')
-        self.assertEqual(mdNew.number, 'K. 581')
-        self.assertEqual(mdNew.composer, 'Wolfgang Amadeus Mozart')
 
     def testRichMetadata01(self):
         from music21 import corpus
@@ -102,19 +78,6 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str(richMetadata.timeSignatureFirst), '2/4')
 
-        rmdNew = metadata.RichMetadata()
-
-        jsonString = freezeThaw.JSONFreezer(richMetadata).json
-        freezeThaw.JSONThawer(rmdNew).json = jsonString
-
-        self.assertEqual(rmdNew.composer, 'Johannes Ciconia')
-
-        self.assertEqual(str(rmdNew.timeSignatureFirst), '2/4')
-        self.assertEqual(
-            str(rmdNew.keySignatureFirst),
-            '<music21.key.Key of F major>',
-            )
-
         score = corpus.parse('bwv66.6')
         richMetadata = metadata.RichMetadata()
         richMetadata.merge(score.metadata)
@@ -125,15 +88,6 @@ class Test(unittest.TestCase):
             '<music21.key.Key of f# minor>',
             )
         self.assertEqual(str(richMetadata.timeSignatureFirst), '4/4')
-
-        jsonString = freezeThaw.JSONFreezer(richMetadata).json
-        freezeThaw.JSONThawer(rmdNew).json = jsonString
-
-        self.assertEqual(str(rmdNew.timeSignatureFirst), '4/4')
-        self.assertEqual(
-            str(rmdNew.keySignatureFirst),
-            '<music21.key.Key of f# minor>',
-            )
 
     def testWorkIds(self):
         from music21 import corpus
@@ -178,10 +132,8 @@ class Test(unittest.TestCase):
             )
 
     def testRichMetadata02(self):
-        from music21 import VERSION
         from music21 import corpus
         from music21 import metadata
-        import textwrap
         
         score = corpus.parse('bwv66.6')
         richMetadata = metadata.RichMetadata()
@@ -189,51 +141,6 @@ class Test(unittest.TestCase):
         richMetadata.update(score)
         self.assertEqual(richMetadata.noteCount, 165)
         self.assertEqual(richMetadata.quarterLength, 36.0)
-        self.assertMultiLineEqual(
-            freezeThaw.JSONFreezer(richMetadata).prettyJson.strip(),
-            textwrap.dedent('''
-                {
-                    "__attr__": {
-                        "_urls": [],
-                        "_workIds": {
-                            "movementName": {
-                                "__attr__": {
-                                    "_data": "bwv66.6.mxl"
-                                },
-                                "__class__": "music21.metadata.primitives.Text"
-                            }
-                        },
-                        "ambitus": [
-                            34,
-                            "m7",
-                            "F#2",
-                            "E5"
-                        ],
-                        "contributors": [],
-                        "keySignatureFirst": "<music21.key.Key of f# minor>",
-                        "keySignatures": [
-                            "<music21.key.Key of f# minor>"
-                        ],
-                        "noteCount": 165,
-                        "numberOfParts": 4,
-                        "pitchHighest": "E5",
-                        "pitchLowest": "F#2",
-                        "quarterLength": 36.0,
-                        "sourcePath": "bach/bwv66.6.mxl",
-                        "tempos": [],
-                        "timeSignatureFirst": "4/4",
-                        "timeSignatures": [
-                            "4/4"
-                        ]
-                    },
-                    "__class__": "music21.metadata.RichMetadata",
-                    "__version__": [
-                        %d,
-                        %d,
-                        %d
-                    ]
-                }''' % (VERSION[0], VERSION[1], VERSION[2]),
-                ).strip())
 
 #------------------------------------------------------------------------------
 
