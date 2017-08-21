@@ -3704,7 +3704,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ...
 
 
-        customRemove can be a list or set of classes to remove.  By default it is
+        removeClasses can be a list or set of classes to remove.  By default it is
         ['GeneralNote', 'Dynamic', 'Expression']
 
         >>> tenor = b.parts[2]

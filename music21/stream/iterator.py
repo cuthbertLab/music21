@@ -1531,6 +1531,45 @@ class RecursiveIterator(StreamIterator):
             return common.opFrac(lastStartOffset + lastStream.elementOffset(lastYield))
             # will still return numbers even if _endElements
 
+
+    def getElementsByOffsetInHierarchy(self, offsetStart, offsetEnd=None,
+                    includeEndBoundary=True, mustFinishInSpan=False,
+                    mustBeginInSpan=True, includeElementsThatEndAtStart=True):
+        '''
+        Adds a filter keeping only Music21Objects that
+        are found at a certain offset or within a certain
+        offset time range (given the start and optional stop values) from
+        the beginning of the hierarchy.
+
+        >>> b = corpus.parse('bwv66.6')
+        >>> for n in b.recurse().getElementsByOffsetInHierarchy(8, 9.5).notes:
+        ...     print(n, n.getOffsetInHierarchy(b), 
+        ...           n.measureNumber, n.getContextByClass('Part').id)
+        <music21.note.Note C#> 8.0 2 Soprano
+        <music21.note.Note A> 9.0 3 Soprano
+        <music21.note.Note B> 9.5 3 Soprano
+        <music21.note.Note G#> 8.0 2 Alto
+        <music21.note.Note F#> 9.0 3 Alto
+        <music21.note.Note G#> 9.5 3 Alto
+        <music21.note.Note C#> 8.0 2 Tenor
+        <music21.note.Note C#> 9.0 3 Tenor
+        <music21.note.Note D> 9.5 3 Tenor
+        <music21.note.Note E#> 8.0 2 Bass
+        <music21.note.Note F#> 9.0 3 Bass
+        <music21.note.Note B> 9.5 3 Bass
+
+        :rtype: StreamIterator
+        '''
+        f = filters.OffsetHierarchyFilter(offsetStart,
+                                            offsetEnd,
+                                            includeEndBoundary,
+                                            mustFinishInSpan,
+                                            mustBeginInSpan,
+                                            includeElementsThatEndAtStart)
+        self.addFilter(f)
+        return self
+
+
 class Test(unittest.TestCase):
     pass
 

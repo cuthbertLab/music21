@@ -21,7 +21,10 @@ filtered.  Filters are used by methods on streams such as
 import unittest
 from music21 import common
 from music21.common import opFrac
+from music21.exceptions21 import Music21Exception
 
+class FilterException(Music21Exception):
+    pass
 #------------------------------------------------------------------------------
 
 class StreamFilter:
@@ -385,16 +388,30 @@ class OffsetFilter(StreamFilter):
 
 
     def __call__(self, e, iterator):
-        dur = e.duration
         s = iterator.srcStream
         if s is e:
             return False
         offset = s.elementOffset(e)
+        if s.isSorted:
+            return self.isElementOffsetInRange(e, offset, stopAfterEnd=True)
+        else:
+            return self.isElementOffsetInRange(e, offset, stopAfterEnd=False)
+    
+    def isElementOffsetInRange(self, e, offset, *, stopAfterEnd=False):
+        '''
+        Given an element, offset, and stream, return
+        True, False, or raise StopIteration if the
+        element is in the range, not in the range, or (if stopAfterEnd is True) is not
+        and no future elements will be in the range.
+        
+        Factored out from __call__ to be used by OffsetHierarchyFilter
+        '''
+        dur = e.duration
 
         #offset = common.cleanupFloat(offset)
 
         if offset > self.offsetEnd:  # anything that ends after the span is definitely out
-            if s.isSorted:
+            if stopAfterEnd:
                 # if sorted, optimize by breaking after exceeding offsetEnd
                 # eventually we could do a binary search to speed up...
                 raise StopIteration
@@ -450,6 +467,27 @@ class OffsetFilter(StreamFilter):
             return False
 
         return True
+
+
+class OffsetHierarchyFilter(OffsetFilter):
+    '''
+    see iterator.getElementsByOffsetInHierarchy()
+
+    Finds elements that match a given offset range in the hierarchy.
+    
+    Do not call .stream() afterwards or unstable results can occur.
+    '''
+    derivationStr = 'getElementsByOffsetInHierarchy'
+
+    def __call__(self, e, iterator):
+        s = iterator.srcStream
+        if s is e:
+            return False
+        if not hasattr(iterator, 'iteratorStartOffsetInHierarchy'):
+            raise FilterException('Can only run OffsetHierarchyFilter on a RecursiveIterator')
+        
+        offset = s.elementOffset(e) + iterator.iteratorStartOffsetInHierarchy
+        return self.isElementOffsetInRange(e, offset, stopAfterEnd=False)
 
 
 class Test(unittest.TestCase):
