@@ -203,13 +203,12 @@ class Test(unittest.TestCase):
                                 "__class__": "music21.metadata.primitives.Text"
                             }
                         },
-                        "ambitus": {
-                            "__attr__": {
-                                "_priority": 0,
-                                "offset": 0.0
-                            },
-                            "__class__": "music21.interval.Interval"
-                        },
+                        "ambitus": [
+                            34,
+                            "m7",
+                            "F#2",
+                            "E5"
+                        ],
                         "contributors": [],
                         "keySignatureFirst": "<music21.key.Key of f# minor>",
                         "keySignatures": [
