@@ -41,7 +41,7 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
     :width: 600
 
 '''
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 import os
 import pathlib
 import re
@@ -66,6 +66,8 @@ from music21.metadata import testMetadata
 from music21 import environment
 environLocal = environment.Environment(os.path.basename(__file__))
 
+
+AmbitusShort = namedtuple('AmbitusShort', 'semitones diatonic pitchLowest pitchHighest')
 
 #------------------------------------------------------------------------------
 
@@ -936,15 +938,11 @@ class RichMetadata(Metadata):
         if not isinstance(streamFp, pathlib.Path):
             streamFp = pathlib.Path(streamFp)
         
-        corpusParts = streamFp.parts
         try:
-            corpusIndex = corpusParts.index('corpus')
+            relativePath = streamFp.relative_to(common.getCorpusFilePath())
+            return relativePath.as_posix()
         except ValueError:
-            return ''
-        if corpusIndex == len(corpusParts) + 1:
-            return ''
-        relevantParts = corpusParts[corpusIndex + 1:]
-        return '/'.join(relevantParts)
+            return streamFp.as_posix()
 
     def update(self, streamObj):
         r'''
@@ -1044,9 +1042,14 @@ class RichMetadata(Metadata):
         psRange = analysisObject.getPitchSpan(streamObj)
         if psRange is not None:  # may be none if no pitches are stored
             # presently, these are numbers; convert to pitches later
-            self.pitchLowest = str(psRange[0])
-            self.pitchHighest = str(psRange[1])
-        self.ambitus = analysisObject.getSolution(streamObj)
+            self.pitchLowest = psRange[0].nameWithOctave
+            self.pitchHighest = psRange[1].nameWithOctave
+        ambitusInterval = analysisObject.getSolution(streamObj)
+        self.ambitus = AmbitusShort(semitones=ambitusInterval.semitones,
+                                    diatonic=ambitusInterval.diatonic.simpleName,
+                                    pitchLowest=self.pitchLowest,
+                                    pitchHighest=self.pitchHighest,
+                                    )
 
 #------------------------------------------------------------------------------
 class Test(unittest.TestCase):
