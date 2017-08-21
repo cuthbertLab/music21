@@ -600,9 +600,8 @@ class StreamFreezer(StreamFreezeThawBase):
             streamIds += spannerBundle.getSpannerStorageIds()
 
         if getVariants is True:
-            for el in streamObj.recurse():
-                if 'Variant' in el.classes:
-                    streamIds += self.findActiveStreamIdsInHierarchy(el._stream)
+            for el in streamObj.recurse().getElementsByClass('Variant'):
+                streamIds += self.findActiveStreamIdsInHierarchy(el._stream)
 
         # should not happen that there are duplicates, but possible with spanners...
         # Python's uniq value...
@@ -747,16 +746,6 @@ class StreamThawer(StreamFreezeThawBase):
     {5.0} <music21.note.Note F>
     {6.0} <music21.note.Note F#>
     {7.0} <music21.note.Note G>
-
-
-#    >>> c = corpus.parse('luca/gloria')
-#    >>> sf = freezeThaw.StreamFreezer(c)
-#    >>> data = sf.writeStr(fmt='jsonpickle')
-#
-#    >>> sfOut = freezeThaw.StreamThawer()
-#    >>> sfOut.openStr(data)
-#    >>> s = sfOut.stream
-#    >>> #s.show('t')
     '''
     def __init__(self):
         super().__init__()
