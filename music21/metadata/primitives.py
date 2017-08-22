@@ -1130,26 +1130,14 @@ class Test(unittest.TestCase):
         pass
 
     def testText(self):
-        from music21 import freezeThaw
         from music21 import metadata
-        import json
 
         text = metadata.primitives.Text('my text')
         text.language = 'en'
-        jsf = freezeThaw.JSONFreezer(text)
-        jsonDict = json.loads(jsf.json)
-        self.assertEqual(sorted(list(jsonDict['__attr__'].keys())), 
-                         ['_data', '_language'])
-
-        textNew = metadata.primitives.Text()
-        jst = freezeThaw.JSONThawer(textNew)
-        jst.json = jsf.json
-
-        self.assertEqual(textNew._data, 'my text')
-        self.assertEqual(textNew._language, 'en')
+        self.assertEqual(text._data, 'my text')
+        self.assertEqual(text._language, 'en')
 
     def testContributor(self):
-        from music21 import freezeThaw
         from music21 import metadata
 
         contributor = metadata.primitives.Contributor(
@@ -1158,15 +1146,9 @@ class Test(unittest.TestCase):
             )
         self.assertEqual(contributor.role, 'composer')
         self.assertEqual(contributor.relevance, 'contributor')
-        jsonStr = freezeThaw.JSONFreezer(contributor).json
-        contributorNew = metadata.primitives.Contributor()
-        freezeThaw.JSONThawer(contributorNew).json = jsonStr
-        self.assertEqual(contributorNew.role, 'composer')
-        self.assertEqual(contributorNew.name, 'Gilles Binchois')
-        self.assertEqual(contributorNew.relevance, 'contributor')
+        self.assertEqual(contributor.name, 'Gilles Binchois')
 
     def testCreator(self):
-        from music21 import freezeThaw
         from music21 import metadata
 
         creator = metadata.primitives.Creator(
@@ -1175,78 +1157,40 @@ class Test(unittest.TestCase):
             )
         self.assertEqual(creator.role, 'composer')
         self.assertEqual(creator.relevance, 'creator')
-
-        jsonStr = freezeThaw.JSONFreezer(creator).json
-        creatorNew = metadata.primitives.Contributor()
-        freezeThaw.JSONThawer(creatorNew).json = jsonStr
-        self.assertEqual(creatorNew.role, 'composer')
-        self.assertEqual(creatorNew.name, 'Gilles Binchois')
-        self.assertEqual(creatorNew.relevance, 'creator')
+        self.assertEqual(creator.name, 'Gilles Binchois')
 
     def testDate(self):
-        from music21 import freezeThaw
         from music21 import metadata
 
         date1 = metadata.primitives.Date(year=1843, yearError='approximate')
         date2 = metadata.primitives.Date(year='1843?')
 
-        dateNew = metadata.primitives.Date()
+        self.assertEqual(date1.year, 1843)
+        self.assertEqual(date1.yearError, 'approximate')
 
-        jsonStr = freezeThaw.JSONFreezer(date1).json
-        freezeThaw.JSONThawer(dateNew).json = jsonStr
-
-        self.assertEqual(dateNew.year, 1843)
-        self.assertEqual(dateNew.yearError, 'approximate')
-
-        dateNew = metadata.primitives.Date()
-
-        jsonStr = freezeThaw.JSONFreezer(date2).json
-        freezeThaw.JSONThawer(dateNew).json = jsonStr
-
-        self.assertEqual(dateNew.year, '1843')
-        self.assertEqual(dateNew.yearError, 'uncertain')
+        self.assertEqual(date2.year, '1843')
+        self.assertEqual(date2.yearError, 'uncertain')
 
     def testDateSingle(self):
-        from music21 import freezeThaw
         from music21 import metadata
 
         dateSingle = metadata.primitives.DateSingle(
             '2009/12/31', 'approximate')
         self.assertEqual(str(dateSingle), '2009/12/31')
         self.assertEqual(len(dateSingle._data), 1)
-
-        dateSingleNew = metadata.primitives.DateSingle()
-        self.assertEqual(len(dateSingleNew._data), 1)
-
-        jsonStr = freezeThaw.JSONFreezer(dateSingle).json
-        freezeThaw.JSONThawer(dateSingleNew).json = jsonStr
-
-        self.assertEqual(len(dateSingleNew._data), 1)
-        self.assertEqual(dateSingleNew._relevance, 'approximate')
-        self.assertEqual(dateSingleNew._dataError, ['approximate'])
-        self.assertEqual(str(dateSingleNew), '2009/12/31')
+        self.assertEqual(dateSingle._relevance, 'approximate')
+        self.assertEqual(dateSingle._dataError, ['approximate'])
 
     def testDateRelative(self):
-        from music21 import freezeThaw
         from music21 import metadata
 
         dateRelative = metadata.primitives.DateRelative('2001/12/31', 'prior')
         self.assertEqual(str(dateRelative), 'prior to 2001/12/31')
         self.assertEqual(dateRelative.relevance, 'prior')
         self.assertEqual(len(dateRelative._data), 1)
-
-        dateSingleNew = metadata.primitives.DateSingle()
-
-        jsonStr = freezeThaw.JSONFreezer(dateRelative).json
-        freezeThaw.JSONThawer(dateSingleNew).json = jsonStr
-
-        self.assertEqual(len(dateSingleNew._data), 1)
-        self.assertEqual(dateSingleNew._relevance, 'prior')
-        self.assertEqual(dateSingleNew._dataError, [])
-        self.assertEqual(str(dateSingleNew), '2001/12/31')
+        self.assertEqual(dateRelative._dataError, [])
 
     def testDateBetween(self):
-        from music21 import freezeThaw
         from music21 import metadata
 
         dateBetween = metadata.primitives.DateBetween(
@@ -1256,18 +1200,8 @@ class Test(unittest.TestCase):
         self.assertEqual(dateBetween._dataError, [None, None])
         self.assertEqual(len(dateBetween._data), 2)
 
-        dateBetweenNew = metadata.primitives.DateBetween()
-
-        jsonStr = freezeThaw.JSONFreezer(dateBetween).json
-        freezeThaw.JSONThawer(dateBetweenNew).json = jsonStr
-
-        self.assertEqual(len(dateBetweenNew._data), 2)
-        self.assertEqual(dateBetweenNew._relevance, 'between')
-        self.assertEqual(dateBetweenNew._dataError, [None, None])
-        self.assertEqual(str(dateBetweenNew), '2009/12/31 to 2010/01/28')
 
     def testDateSelection(self):
-        from music21 import freezeThaw
         from music21 import metadata
 
         dateSelection = metadata.primitives.DateSelection(
@@ -1279,17 +1213,6 @@ class Test(unittest.TestCase):
         self.assertEqual(dateSelection.relevance, 'or')
         self.assertEqual(dateSelection._dataError, [None, None, None])
         self.assertEqual(len(dateSelection._data), 3)
-
-        dateSelectionNew = metadata.primitives.DateSelection()
-
-        jsonStr = freezeThaw.JSONFreezer(dateSelection).json
-        freezeThaw.JSONThawer(dateSelectionNew).json = jsonStr
-
-        self.assertEqual(len(dateSelectionNew._data), 3)
-        self.assertEqual(dateSelectionNew._relevance, 'or')
-        self.assertEqual(dateSelectionNew._dataError, [None, None, None])
-        self.assertEqual(str(dateSelectionNew),
-            '2009/12/31 or 2010/01/28 or 1894/01/28')
 
 
 #------------------------------------------------------------------------------

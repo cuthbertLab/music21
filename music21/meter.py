@@ -4976,32 +4976,6 @@ class Test(unittest.TestCase):
             ts1._setDefaultAccentWeights(3) # going to a lower level here
             self.assertEqual([mt.weight for mt in ts1.accentSequence], match)
 
-    def testJSONStorage(self):
-        from music21 import meter
-        from music21 import freezeThaw
-        import textwrap
-        ts = meter.TimeSignature('3/4')
-        freezer = freezeThaw.JSONFreezer(ts)
-        self.assertMultiLineEqual(
-            freezeThaw.JSONFreezer(ts).prettyJson.strip(),
-            textwrap.dedent('''
-                {
-                    "__attr__": {
-                        "ratioString": "3/4"
-                    },
-                    "__class__": "music21.meter.TimeSignature",
-                    "__version__": [
-                        %d,
-                        %d,
-                        %d
-                    ]
-                }
-                ''' % (base.VERSION[0], base.VERSION[1], base.VERSION[2]),
-                ).strip())
-
-        tsNew = meter.TimeSignature()
-        freezeThaw.JSONThawer(tsNew).json = freezer.json
-        self.assertEqual(tsNew.ratioString, '3/4')
 
     def testMusicxmlDirectOut(self):
         # test rendering musicxml directly from meter
