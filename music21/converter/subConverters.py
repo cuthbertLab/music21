@@ -799,15 +799,18 @@ class ConverterMusicXML(SubConverter):
         Take the output of the conversion process and run it through musescore to convert it
         to a png.
         '''
+        if isinstance(fp, pathlib.Path):
+            fp = str(fp)
+        
         musescorePath = environLocal['musescoreDirectPNGPath']
         if not musescorePath:
             raise SubConverterException(
                 "To create PNG files directly from MusicXML you need to download MuseScore and " +
                 "put a link to it in your .music21rc via Environment.")
-        elif not os.path.exists(musescorePath):
+        elif not musescorePath.exists():
             raise SubConverterException(
                         "Cannot find a path to the 'mscore' file at " +
-                        "%s -- download MuseScore" % musescorePath)
+                        "%s -- download MuseScore" % str(musescorePath))
 
         if subformats is None:
             subformatExtension = 'png'
@@ -817,7 +820,7 @@ class ConverterMusicXML(SubConverter):
         fpOut = fp[0:len(fp) - 3]
         fpOut += subformatExtension
 
-        musescoreRun = '"' + musescorePath + '" ' + fp + " -o " + fpOut + " -T 0 "
+        musescoreRun = '"' + str(musescorePath) + '" ' + fp + " -o " + fpOut + " -T 0 "
         if 'dpi' in keywords:
             musescoreRun += " -r " + str(keywords['dpi'])
 
