@@ -9,6 +9,7 @@
 # Copyright:    Copyright © 2011-2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
+from collections import Counter
 import unittest
 import os
 
@@ -37,7 +38,45 @@ class Feature:
     and returned from FeatureExtractor objects.
 
     Feature objects are simple. It is FeatureExtractors that store all metadata and processing
-    routines for creating Feature objects.
+    routines for creating Feature objects.  Normally you wouldn't create one of these yourself.
+    
+    >>> myFeature = features.Feature()
+    >>> myFeature.dimensions = 3
+    >>> myFeature.name = 'Random arguments'
+    >>> myFeature.isSequential = True
+
+    This is a continuous Feature so we will set discrete to false.
+
+    >>> myFeature.discrete = False
+
+    The .vector is the most important part of the feature, and it starts out as None.
+
+    >>> myFeature.vector is None
+    True
+    
+    Calling .prepareVector() gives it a list of Zeros of the length of dimensions.
+    
+    >>> myFeature.prepareVectors()
+    
+    >>> myFeature.vector
+    [0, 0, 0]
+    
+    Now we can set the vector parts:
+    
+    >>> myFeature.vector[0] = 4
+    >>> myFeature.vector[1] = 2
+    >>> myFeature.vector[2] = 1
+    
+    It's okay just to assign a new list to .vector itself.
+    
+    There is a .normalize() method which will scale everything to between 0 and 1
+    (or technically -1 and 1) as a list of floats.
+    
+    >>> myFeature.normalize()
+    >>> myFeature.vector
+    [1.0, 0.5, 0.25]
+    
+    And that's it!  FeatureExtractors are much more interesting.
     '''
     def __init__(self):
         # these values will be filled by the extractor
@@ -72,7 +111,7 @@ class Feature:
         m = max(self.vector)
         if m == 0:
             return # do nothing
-        scalar = 1. / m # get floating point scalar for speed
+        scalar = 1.0 / m # get floating point scalar for speed
         temp = self._getVectors()
         for i, v in enumerate(self.vector):
             temp[i] = v * scalar
@@ -98,7 +137,7 @@ class FeatureExtractor:
         self.data = None # a DataInstance object: use to get data
         self.setData(dataOrStream)
 
-        self._feature = None # Feature object that results from processing
+        self.feature = None # Feature object that results from processing
 
         if not hasattr(self, "name"):
             self.name = None # string name representation
@@ -157,12 +196,12 @@ class FeatureExtractor:
                 post.append('%s_%s' % (self.name.replace(' ', '_'), i))
         return post
 
-    def _fillFeatureAttributes(self, feature=None):
+    def fillFeatureAttributes(self, feature=None):
         '''Fill the attributes of a Feature with the descriptors in the FeatureExtractor.
         '''
-        # operate on passed-in feature or self._feature
+        # operate on passed-in feature or self.feature
         if feature is None:
-            feature = self._feature
+            feature = self.feature
         feature.name = self.name
         feature.description = self.description
         feature.isSequential = self.isSequential
@@ -170,26 +209,26 @@ class FeatureExtractor:
         feature.discrete = self.discrete
         return feature
 
-    def _prepareFeature(self):
-        '''Prepare a new Feature object for data acquisition.
-
+    def prepareFeature(self):
+        '''
+        Prepare a new Feature object for data acquisition.
 
         >>> s = stream.Stream()
         >>> fe = features.jSymbolic.InitialTimeSignatureFeature(s)
-        >>> fe._prepareFeature()
-        >>> fe._feature.name
+        >>> fe.prepareFeature()
+        >>> fe.feature.name
         'Initial Time Signature'
-        >>> fe._feature.dimensions
+        >>> fe.feature.dimensions
         2
-        >>> fe._feature.vector
+        >>> fe.feature.vector
         [0, 0]
         '''
-        self._feature = Feature()
-        self._fillFeatureAttributes() # will fill self._feature
-        self._feature.prepareVectors() # will vector with necessary zeros
+        self.feature = Feature()
+        self.fillFeatureAttributes() # will fill self.feature
+        self.feature.prepareVectors() # will vector with necessary zeros
 
 
-    def _process(self):
+    def process(self):
         '''Do processing necessary, storing result in _feature.
         '''
         # do work in subclass, calling on self.data
@@ -200,31 +239,39 @@ class FeatureExtractor:
         '''
         if source is not None:
             self.stream = source
-        # preparing the feature always sets self._feature to a new instance
-        self._prepareFeature()
-        self._process() # will set Feature object to _feature
+        # preparing the feature always sets self.feature to a new instance
+        self.prepareFeature()
+        self.process() # will set Feature object to _feature
         # assume we always want to normalize?
         if self.normalize:
-            self._feature.normalize()
-        return self._feature
+            self.feature.normalize()
+        return self.feature
 
     def getBlankFeature(self):
-        '''Return a properly configured plain feature as a place holder
+        '''
+        Return a properly configured plain feature as a place holder
 
         >>> from music21 import features
         >>> fe = features.jSymbolic.InitialTimeSignatureFeature()
-        >>> fe.getBlankFeature().vector
+        >>> fe.name
+        'Initial Time Signature'
+        
+        >>> blankF = fe.getBlankFeature()
+        >>> blankF.vector
         [0, 0]
+        >>> blankF.name
+        'Initial Time Signature'
         '''
         f = Feature()
-        self._fillFeatureAttributes(f)
+        self.fillFeatureAttributes(f)
         f.prepareVectors() # will vector with necessary zeros
         return f
 
 
 #-------------------------------------------------------------------------------
 class StreamForms:
-    '''A dictionary-like wrapper of a Stream, providing
+    '''
+    A dictionary-like wrapper of a Stream, providing
     numerous representations, generated on-demand, and cached.
 
     A single StreamForms object can be created for an
@@ -232,27 +279,37 @@ class StreamForms:
 
     A DataSet object manages one or more StreamForms
     objects, and exposes them to FeatureExtractors for usage.
-    '''
+    
+    The streamObj is stored as self.stream and if "prepared" then
+    the prepared form is stored as .prepared
+    
+    A dictionary `.forms` stores various intermediary representations
+    of the stream which is the main power of this routine, making
+    it simple to 
+    
+    '''    
     def __init__(self, streamObj, prepareStream=True):
         self.stream = streamObj
         if self.stream is not None:
             if prepareStream:
-                self._base = self._prepareStream(self.stream)
-            else: # possibly make a copy?
-                self._base = self.stream
+                self.prepared = self._prepareStream(self.stream)
+            else:
+                self.prepared = self.stream
         else:
-            self._base = None
+            self.prepared = None
 
         # basic data storage is a dictionary
-        self._forms = {}
+        self.forms = {}
 
     def keys(self):
         # will only return forms that are established
-        return self._forms.keys()
+        return self.forms.keys()
 
     def _prepareStream(self, streamObj):
         '''
-        Common routines done on Streams prior to processing. Return a new Stream
+        Common routines done on Streams prior to processing. Returns a new Stream
+        
+        Currently: runs stripTies.
         '''
         # this causes lots of deepcopys, but an inPlace operation loses
         # accuracy on feature extractors
@@ -260,258 +317,46 @@ class StreamForms:
         return streamObj
 
     def __getitem__(self, key):
-        '''Get a form of this Stream, using a cached version if available.
+        '''
+        Get a form of this Stream, using a cached version if available.
         '''
         # first, check for cached version
-        if key in self._forms:
-            return self._forms[key]
-
-        # else, process, store, and return
-        elif key in ['flat']:
-            self._forms['flat'] = self._base.flat
-            return self._forms['flat']
-
-        elif key in ['flat.pitches']:
-            self._forms['flat.pitches'] = self._base.flat.pitches
-            return self._forms['flat.pitches']
-
-        elif key in ['flat.notes']:
-            self._forms['flat.notes'] = self._base.flat.notes
-            return self._forms['flat.notes']
-
-        elif key in ['getElementsByClass.Measure']:
-            # need to determine if should concatenate
-            # measure for all parts if a score?
-            if 'Score' in self._base.classes:
-                post = stream.Stream()
-                for p in self._base.parts:
-                    # insert in overlapping offset positions
-                    for m in p.getElementsByClass('Measure'):
-                        post.insert(m.getOffsetBySite(p), m)
-            else:
-                post = self._base.getElementsByClass('Measure')
-
-            self._forms['getElementsByClass.Measure'] = post
-            return self._forms['getElementsByClass.Measure']
-
-        elif key in ['flat.getElementsByClass.TimeSignature']:
-            self._forms['flat.getElementsByClass.TimeSignature'
-                        ] = self._base.flat.getElementsByClass('TimeSignature')
-            return self._forms['flat.getElementsByClass.TimeSignature']
-
-        elif key in ['flat.getElementsByClass.KeySignature']:
-            self._forms['flat.getElementsByClass.KeySignature'
-                        ] = self._base.flat.getElementsByClass('KeySignature')
-            return self._forms['flat.getElementsByClass.KeySignature']
-
-        elif key in ['flat.getElementsByClass.Harmony']:
-            self._forms['flat.getElementsByClass.Harmony'
-                        ] = self._base.flat.getElementsByClass('Harmony')
-            return self._forms['flat.getElementsByClass.Harmony']
-
-
-        elif key in ['metronomeMarkBoundaries']: # already flat
-            self._forms['metronomeMarkBoundaries'] = self._base.metronomeMarkBoundaries()
-            return self._forms['metronomeMarkBoundaries']
-
-        # some methods that return new streams
-        elif key in ['chordify']:
-            if 'Score' in self._base.classes:
-                # options here permit getting part information out
-                # of chordified representation
-                self._forms['chordify'] = self._base.chordify(
-                    addPartIdAsGroup=True, removeRedundantPitches=False)
-            else: # for now, just return a normal Part or Stream
-                self._forms['chordify'] = self._base
-            return self._forms['chordify']
-
-        elif key in ['chordify.getElementsByClass.Chord']:
-            # need flat here, as chordify might return Measures
-            x = self.__getitem__('chordify').flat.getElementsByClass('Chord')
-            self._forms['chordify.getElementsByClass.Chord'] = x
-            return self._forms['chordify.getElementsByClass.Chord']
-
-        # create a Part in a Score for each Instrument
-        elif key in ['partitionByInstrument']:
-            from music21 import instrument
-            x = instrument.partitionByInstrument(self._base)
-            self._forms['partitionByInstrument'] = x
-            return self._forms['partitionByInstrument']
-
-        # create a dictionary of encountered set classes and a count
-        elif key in ['chordifySetClassHistogram']:
-            histo = {}
-            for c in self.__getitem__('chordify.getElementsByClass.Chord'):
-                key = c.forteClassTnI
-                if key not in histo:
-                    histo[key] = 0
-                histo[key] += 1
-            self._forms['chordifySetClassHistogram'] = histo
-            return self._forms['chordifySetClassHistogram']
-
-        # a dictionary of pitch class sets
-        elif key in ['chordifyPitchClassSetHistogram']:
-            histo = {}
-            for c in self.__getitem__('chordify.getElementsByClass.Chord'):
-                key = c.orderedPitchClassesString
-                if key not in histo:
-                    histo[key] = 0
-                histo[key] += 1
-            self._forms['chordifyPitchClassSetHistogram'] = histo
-            return self._forms['chordifyPitchClassSetHistogram']
-
-        # dictionary of common chord types
-        elif key in ['chordifyTypesHistogram']:
-            histo = {}
-            # keys are methods on Chord
-            keys = ['isTriad', 'isSeventh', 'isMajorTriad', 'isMinorTriad',
-                    'isIncompleteMajorTriad', 'isIncompleteMinorTriad', 'isDiminishedTriad',
-                    'isAugmentedTriad', 'isDominantSeventh', 'isDiminishedSeventh',
-                    'isHalfDiminishedSeventh']
-
-            for c in self.__getitem__('chordify.getElementsByClass.Chord'):
-                for thisKey in keys:
-                    if thisKey not in histo:
-                        histo[thisKey] = 0
-                    # get the function attr, call it, check bool
-                    if getattr(c, thisKey)():
-                        histo[thisKey] += 1
-                        # not breaking here means that we may get multiple
-                        # hits for the same chord
-            self._forms['chordifyTypesHistogram'] = histo
-            return self._forms['chordifyTypesHistogram']
-
-        # a dictionary of intervals
-        #self.flat.melodicIntervals(skipRests=True, skipChords=False, skipGaps=True)
-
-        # a dictionary of quarter length values
-        elif key in ['noteQuarterLengthHistogram']:
-            histo = {}
-            for n in self.__getitem__('flat.notes'):
-                key = n.quarterLength
-                if key not in histo:
-                    histo[key] = 0
-                histo[key] += 1
-            self._forms['noteQuarterLengthHistogram'] = histo
-            return self._forms['noteQuarterLengthHistogram']
-
-        # data lists / histograms
-        elif key in ['pitchClassHistogram']:
-            histo = [0] * 12
-            for p in self.__getitem__('flat.pitches'): # recursive call
-                histo[p.pitchClass] += 1
-            self._forms['pitchClassHistogram'] = histo
-            return self._forms['pitchClassHistogram']
-
-        elif key in ['midiPitchHistogram']:
-            histo = [0] * 128
-            for p in self.__getitem__('flat.pitches'): # recursive call
-                histo[p.midi] += 1
-            self._forms['midiPitchHistogram'] = histo
-            return self._forms['midiPitchHistogram']
+        if key in self.forms:
+            return self.forms[key]
         
-#         elif key in ['diatonicNoteNumHistogram']:
-#             histo = [0] * 128
-#             for p in self.__getitem__('flat.pitches'): # recursive call
-#                 histo[p.diatonicNoteNum] += 1
-#             self._forms['diatonicNoteNumHistogram'] = histo
-#             return self._forms['diatonicNoteNumHistogram']
+        splitKeys = key.split('.')
         
-
-        # bins for all abs spans between adjacent melodic notes
-        elif key in ['midiIntervalHistogram']:
-            histo = self._getIntervalHistogram('midi')
-            self._forms['midiIntervalHistogram'] = histo
-            return self._forms['midiIntervalHistogram']
-
-#         elif key in ['diatonicNoteNumIntervalHistogram']:
-#             histo = self._getIntervalHistogram('diatonicNoteNum')
-#             self._forms['midiIntervalHistogram'] = histo
-#             return self._forms['midiIntervalHistogram']
-
-
-        elif key in ['contourList']:
-            # list of all directed half steps
-            cList = []
-            # if we have parts, must add one at a time
-            if self._base.hasPartLikeStreams():
-                parts = self._base.parts
+        prepared = self.prepared
+        for i in range(len(splitKeys)):
+            subKey = '.'.join(splitKeys[:i + 1])
+            if subKey in self.forms:
+                continue
+            if i > 0:
+                previousKey = '.'.join(splitKeys[:i])
+                # should always be there.
+                prepared = self.forms[previousKey]
+                
+            lastKey = splitKeys[i]
+            
+            if lastKey in self.keysToMethods:
+                prepared = self.keysToMethods[lastKey](self, prepared)
+            elif lastKey.startswith('getElementsByClass('):
+                classToGet = lastKey[len('getElementsByClass('):-1]
+                prepared = prepared.getElementsByClass(classToGet)
             else:
-                parts = [self._base] # emulate a list
-            for p in parts:
-                # this may be unnecessary but we cannot accessed cached part data
-
-                # edit June 2012:
-                # was causing lots of deepcopy calls, so I made
-                # it inPlace=True, but errors when 'p =' no present
-                # also, this part has measures...so should retainContains be True?
-                p = p.stripTies(retainContainers=False, inPlace=True) # will be flat
-                # noNone means that we will see all connections, even w/ a gap
-                post = p.findConsecutiveNotes(skipRests=True,
-                    skipChords=False, skipGaps=True, noNone=True)
-                for i, n in enumerate(post):
-                    if i < (len(post) - 1): # if not last
-                        iNext = i + 1
-                        nNext = post[iNext]
-
-                        if n.isChord:
-                            ps = n.sortDiatonicAscending().pitches[-1].midi
-                        else: # normal note
-                            ps = n.pitch.midi
-                        if nNext.isChord:
-                            psNext = nNext.sortDiatonicAscending().pitches[-1].midi
-                        else: # normal note
-                            psNext = nNext.pitch.midi
-
-                        cList.append(psNext - ps)
-            #environLocal.printDebug(['contourList', cList])
-            self._forms['contourList'] = cList
-            return self._forms['contourList']
-
-
-        elif key in ['flat.analyzedKey']:
-            # this will use default weightings
-            self._forms['analyzedKey'] = self.__getitem__('flat').analyze(
-                                         method='key')
-            return self._forms['analyzedKey']
-
-        elif key in ['flat.tonalCertainty']:
-            # this will use default weightings
-            foundKey = self.__getitem__('flat.analyzedKey')
-            self._forms['flat.tonalCertainty'] = foundKey.tonalCertainty()
-            return self._forms['flat.tonalCertainty']
-
-        elif key in ['metadata']:
-            self._forms['metadata'] = self._base.metadata
-            return self._forms['metadata']
-
-        elif key in ['secondsMap']:
-            secondsMap = self.__getitem__('flat').secondsMap
-            post = []
-            # filter only notes; all elements would otherwise be gathered
-            for bundle in secondsMap:
-                if 'GeneralNote' in bundle['element'].classes:
-                    post.append(bundle)
-            self._forms['secondsMap'] = post
-            return self._forms['secondsMap']
-
-        elif key in ['assembledLyrics']:
-            self._forms['assembledLyrics'] = text.assembleLyrics(self._base)
-            return self._forms['assembledLyrics']
-
-        else:
-            raise AttributeError('no such attribute: %s' % key)
-
-
+                raise AttributeError('no such attribute: %s in %s' % (lastKey, key))
+            self.forms[subKey] = prepared
+        
+        return prepared
 
     def _getIntervalHistogram(self, algorithm='midi'):
         # note that this does not optimize and cache part presentations
         histo = [0] * 128
         # if we have parts, must add one at a time
-        if self._base.hasPartLikeStreams():
-            parts = self._base.parts
+        if self.prepared.hasPartLikeStreams():
+            parts = self.prepared.parts
         else:
-            parts = [self._base] # emulate a list
+            parts = [self.prepared] # emulate a list
         for p in parts:
             # will be flat
 
@@ -536,7 +381,158 @@ class StreamForms:
                     except AttributeError:
                         pass # problem with not having midi
         return histo
+#-----------------------------------------------------------------------------
+    def formPartitionByInstrument(self, prepared):
+        from music21 import instrument
+        return instrument.partitionByInstrument(prepared)
+    
+    def formSetClassHistogram(self, prepared):
+        return Counter([c.forteClassTnI for c in prepared])
+    
+    def formPitchClassSetHistogram(self, prepared):
+        return Counter([c.orderedPitchClassesString for c in prepared])
+        
+    def formTypesHistogram(self, prepared):
+        histo = {}
+        
+        # keys are methods on Chord
+        keys = ['isTriad', 'isSeventh', 'isMajorTriad', 'isMinorTriad',
+                'isIncompleteMajorTriad', 'isIncompleteMinorTriad', 'isDiminishedTriad',
+                'isAugmentedTriad', 'isDominantSeventh', 'isDiminishedSeventh',
+                'isHalfDiminishedSeventh']
+        
+        for c in prepared:
+            for thisKey in keys:
+                if thisKey not in histo:
+                    histo[thisKey] = 0
+                # get the function attr, call it, check bool
+                if getattr(c, thisKey)():
+                    histo[thisKey] += 1
+        return histo
 
+    def formGetElementsByClassMeasure(self, prepared):
+        if 'Score' in prepared.classes:
+            post = stream.Stream()
+            for p in prepared.parts:
+                # insert in overlapping offset positions
+                for m in p.getElementsByClass('Measure'):
+                    post.insert(m.getOffsetBySite(p), m)
+        else:
+            post = prepared.getElementsByClass('Measure')
+        return post
+    
+    def formChordify(self, prepared):
+        if 'Score' in prepared.classes:
+            # options here permit getting part information out
+            # of chordified representation
+            return prepared.chordify(
+                addPartIdAsGroup=True, removeRedundantPitches=False)
+        else: # for now, just return a normal Part or Stream
+            # this seems wrong -- what if there are mutliple voices
+            # in the part?
+            return prepared
+
+    def formQuarterLengthHistogram(self, prepared):
+        return Counter([float(n.quarterLength) for n in prepared])
+    
+    def formMidiPitchHistogram(self, pitches):
+        return Counter([p.midi for p in pitches])
+
+    def formPitchClassHistogram(self, pitches):
+        cc = Counter([p.pitchClass for p in pitches])
+        histo = [0] * 12
+        for k in cc:
+            histo[k] = cc[k]
+        return histo
+    
+    def formMidiIntervalHistogram(self, unused):
+        return self._getIntervalHistogram('midi')
+    
+    def formContourList(self, prepared):
+        # list of all directed half steps
+        cList = []
+        # if we have parts, must add one at a time
+        if prepared.hasPartLikeStreams():
+            parts = prepared.parts
+        else:
+            parts = [prepared] # emulate a list
+
+        for p in parts:
+            # this may be unnecessary but we cannot accessed cached part data
+
+            # edit June 2012:
+            # was causing lots of deepcopy calls, so I made
+            # it inPlace=True, but errors when 'p =' no present
+            # also, this part has measures...so should retainContains be True?
+            
+            # REMOVE? Prepared is stripped!!!
+            p = p.stripTies(retainContainers=False, inPlace=True) # will be flat
+            # noNone means that we will see all connections, even w/ a gap
+            post = p.findConsecutiveNotes(skipRests=True,
+                skipChords=False, skipGaps=True, noNone=True)
+            for i, n in enumerate(post):
+                if i < (len(post) - 1): # if not last
+                    iNext = i + 1
+                    nNext = post[iNext]
+
+                    if n.isChord:
+                        ps = n.sortDiatonicAscending().pitches[-1].midi
+                    else: # normal note
+                        ps = n.pitch.midi
+                    if nNext.isChord:
+                        psNext = nNext.sortDiatonicAscending().pitches[-1].midi
+                    else: # normal note
+                        psNext = nNext.pitch.midi
+
+                    cList.append(psNext - ps)
+        #environLocal.printDebug(['contourList', cList])
+        return cList
+
+    def formSecondsMap(self, prepared):
+        post = []
+        secondsMap = prepared.secondsMap
+        # filter only notes; all elements would otherwise be gathered
+        for bundle in secondsMap:
+            if 'NotRest' in bundle['element'].classes:
+                post.append(bundle)
+        return post
+
+    def formBeatHistogram(self, secondsMap):
+        secondsList = [d['durationSeconds'] for d in secondsMap]
+        bpmList = [round(60.0 / d) for d in secondsList]
+        histogram = [0] * 200
+        for thisBPM in bpmList:
+            if thisBPM < 40 or thisBPM > 200:
+                continue
+            histogramIndex = int(thisBPM)
+            histogram[histogramIndex] += 1
+        return histogram
+
+
+    
+    keysToMethods = {
+       'flat': lambda unused, p: p.flat,
+       'pitches': lambda unused, p: p.pitches,
+       'notes': lambda unused, p: p.notes,
+       'getElementsByClass(Measure)': formGetElementsByClassMeasure,
+       'metronomeMarkBoundaries': lambda unused, p: p.metronomeMarkBoundaries(),
+       'chordify': formChordify,
+       'partitionByInstrument': formPartitionByInstrument,
+       'setClassHistogram': formSetClassHistogram,
+       'pitchClassHistogram': formPitchClassHistogram,
+       'typesHistogram': formTypesHistogram,
+       'quarterLengthHistogram': formQuarterLengthHistogram,
+       'pitchClassSetHistogram': formPitchClassSetHistogram,
+       'midiPitchHistogram': formMidiPitchHistogram,
+       'midiIntervalHistogram': formMidiIntervalHistogram,
+       'contourList': formContourList,
+       'analyzedKey': lambda unused, f: f.analyze(method='key'),
+       'tonalCertainty': lambda unused, foundKey: foundKey.tonalCertainty(),
+       'metadata': lambda unused, p: p.metadata,
+       'secondsMap': formSecondsMap,
+       'assembledLyrics': lambda unused, p: text.assembleLyrics(p),
+       'beatHistogram': formBeatHistogram,
+    }
 
 #-------------------------------------------------------------------------------
 class DataInstance:
@@ -560,30 +556,31 @@ class DataInstance:
             if hasattr(self.stream, 'metadata'):
                 self._id = self.stream.metadata # may be None
 
+
         # the attribute name in the data set for this label
         self._classLabel = None
         # store the class value for this data instance
         self._classValue = None
 
         # store a dictionary of StreamForms
-        self._forms = StreamForms(self.stream)
+        self.forms = StreamForms(self.stream)
 
         # if parts exist, store a forms for each
-        self._formsByPart = []
+        self.formsByPart = []
         if hasattr(self.stream, 'parts'):
             self.partsCount = len(self.stream.parts)
             for p in self.stream.parts:
                 # note that this will join ties and expand rests again
-                self._formsByPart.append(StreamForms(p))
+                self.formsByPart.append(StreamForms(p))
         else:
             self.partsCount = 0
 
         # TODO: store a list of voices, extracted from each part,
         # presently this will only work on a measure stream
-        self._formsByVoice = []
+        self.formsByVoice = []
         if hasattr(self.stream, 'voices'):
             for v in self.stream.voices:
-                self._formsByPart.append(StreamForms(v))
+                self.formsByPart.append(StreamForms(v))
 
     def setClassLabel(self, classLabel, classValue=None):
         '''
@@ -613,8 +610,8 @@ class DataInstance:
             return self._id.replace(' ', '_')
 
     def __getitem__(self, key):
-        '''Get a form of this Stream, using a cached version if available.
-
+        '''
+        Get a form of this Stream, using a cached version if available.
 
         >>> s = corpus.parse('bwv66.6')
         >>> di = features.DataInstance(s)
@@ -624,256 +621,21 @@ class DataInstance:
         163
         >>> len(di['flat.notes'])
         163
-        >>> len(di['getElementsByClass.Measure'])
+        >>> len(di['getElementsByClass(Measure)'])
         40
-        >>> len(di['getElementsByClass.Measure'])
-        40
-        >>> len(di['flat.getElementsByClass.TimeSignature'])
+        >>> len(di['flat.getElementsByClass(TimeSignature)'])
         4
         '''
         if key in ['parts']:
             # return a list of Forms for each part
-            return self._formsByPart
+            return self.formsByPart
         elif key in ['voices']:
             # return a list of Forms for voices
-            return self._formsByVoices
+            return self.formsByVoices
         # try to create by calling the attribute
         # will raise an attribute error if there is a problem
-        return self._forms[key]
+        return self.forms[key]
 
-
-
-#-------------------------------------------------------------------------------
-class OutputFormatException(exceptions21.Music21Exception):
-    pass
-
-class OutputFormat:
-    '''Provide output for a DataSet, passed as an initial argument.
-    '''
-    def __init__(self, dataSet=None):
-        # assume a two dimensional array
-        self._ext = None # store a file extension if necessary
-        # pass a data set object
-        self._dataSet = dataSet
-
-    def getHeaderLines(self):
-        '''Get the header as a list of lines.
-        '''
-        pass # define in subclass
-
-    def write(self, fp=None, includeClassLabel=True, includeId=True):
-        '''Write the file. If not file path is given, a temporary file will be written.
-        '''
-        if fp is None:
-            fp = environLocal.getTempFile(suffix=self._ext)
-        if not fp.endswith(self._ext):
-            raise OutputFormatException("Could not get a temp file with the right extension")
-        with open(fp, 'w') as f:
-            f.write(self.getString(includeClassLabel=includeClassLabel,
-                                   includeId=includeId))
-        return fp
-
-
-class OutputTabOrange(OutputFormat):
-    '''
-    Tab delimited file format used with Orange.
-
-    For more information, see:
-
-    http://docs.orange.biolab.si/3/data-mining-library/tutorial/data.html#saving-the-data
-    '''
-    def __init__(self, dataSet=None):
-        super().__init__(dataSet=dataSet)
-        self._ext = '.tab'
-
-    def getHeaderLines(self, includeClassLabel=True, includeId=True):
-        '''Get the header as a list of lines.
-
-
-        >>> f = [features.jSymbolic.ChangesOfMeterFeature]
-        >>> ds = features.DataSet()
-        >>> ds.addFeatureExtractors(f)
-        >>> of = features.OutputTabOrange(ds)
-        >>> for x in of.getHeaderLines(): print(x)
-        ['Identifier', 'Changes_of_Meter']
-        ['string', 'discrete']
-        ['meta', '']
-
-        >>> ds = features.DataSet(classLabel='Composer')
-        >>> ds.addFeatureExtractors(f)
-        >>> of = features.OutputTabOrange(ds)
-        >>> for x in of.getHeaderLines(): print(x)
-        ['Identifier', 'Changes_of_Meter', 'Composer']
-        ['string', 'discrete', 'discrete']
-        ['meta', '', 'class']
-
-        '''
-        post = []
-        post.append(self._dataSet.getAttributeLabels(
-            includeClassLabel=includeClassLabel, includeId=includeId))
-
-        # second row meta data
-        row = []
-        for x in self._dataSet.getDiscreteLabels(
-            includeClassLabel=includeClassLabel, includeId=includeId):
-            if x is None: # this is a string entry
-                row.append('string')
-            elif x is True: # if True, it is discrete
-                row.append('discrete')
-            else:
-                row.append('continuous')
-        post.append(row)
-
-        # third row metadata
-        row = []
-        for x in self._dataSet.getClassPositionLabels(includeId=includeId):
-            if x is None: # the id value
-                row.append('meta')
-            elif x is True: # if True, it is the class column
-                row.append('class')
-            else:
-                row.append('')
-        post.append(row)
-        return post
-
-    def getString(self, includeClassLabel=True, includeId=True, lineBreak=None):
-        '''Get the complete DataSet as a string with the appropriate headers.
-        '''
-        if lineBreak is None:
-            lineBreak = '\n'
-        msg = []
-        header = self.getHeaderLines(includeClassLabel=includeClassLabel,
-                                     includeId=includeId)
-        data = header + self._dataSet.getFeaturesAsList(
-            includeClassLabel=includeClassLabel)
-        for row in data:
-            sub = []
-            for e in row:
-                sub.append(str(e))
-            msg.append('\t'.join(sub))
-        return lineBreak.join(msg)
-
-
-
-class OutputCSV(OutputFormat):
-    '''
-    Comma-separated value list.
-    '''
-    def __init__(self, dataSet=None):
-        super().__init__(dataSet=dataSet)
-        self._ext = '.csv'
-
-    def getHeaderLines(self, includeClassLabel=True, includeId=True):
-        '''Get the header as a list of lines.
-
-
-        >>> f = [features.jSymbolic.ChangesOfMeterFeature]
-        >>> ds = features.DataSet(classLabel='Composer')
-        >>> ds.addFeatureExtractors(f)
-        >>> of = features.OutputCSV(ds)
-        >>> of.getHeaderLines()[0]
-        ['Identifier', 'Changes_of_Meter', 'Composer']
-        '''
-        post = []
-        post.append(self._dataSet.getAttributeLabels(
-            includeClassLabel=includeClassLabel, includeId=includeId))
-        return post
-
-    def getString(self, includeClassLabel=True, includeId=True, lineBreak=None):
-        if lineBreak is None:
-            lineBreak = '\n'
-        msg = []
-        header = self.getHeaderLines(includeClassLabel=includeClassLabel,
-                                    includeId=includeId)
-        data = header + self._dataSet.getFeaturesAsList(
-            includeClassLabel=includeClassLabel, includeId=includeId)
-        for row in data:
-            sub = []
-            for e in row:
-                sub.append(str(e))
-            msg.append(','.join(sub))
-        return lineBreak.join(msg)
-
-
-
-class OutputARFF(OutputFormat):
-    '''An ARFF (Attribute-Relation File Format) file.
-
-    See http://weka.wikispaces.com/ARFF+%28stable+version%29 for more details
-
-
-    >>> oa = features.OutputARFF()
-    >>> oa._ext
-    '.arff'
-    '''
-    def __init__(self, dataSet=None):
-        super().__init__(dataSet=dataSet)
-        self._ext = '.arff'
-
-    def getHeaderLines(self, includeClassLabel=True, includeId=True):
-        '''Get the header as a list of lines.
-
-
-        >>> f = [features.jSymbolic.ChangesOfMeterFeature]
-        >>> ds = features.DataSet(classLabel='Composer')
-        >>> ds.addFeatureExtractors(f)
-        >>> of = features.OutputARFF(ds)
-        >>> for x in of.getHeaderLines(): print(x)
-        @RELATION Composer
-        @ATTRIBUTE Identifier STRING
-        @ATTRIBUTE Changes_of_Meter NUMERIC
-        @ATTRIBUTE class {}
-        @DATA
-
-        '''
-        post = []
-
-        # get three parallel lists
-        attrs = self._dataSet.getAttributeLabels(
-                includeClassLabel=includeClassLabel, includeId=includeId)
-        discreteLabels = self._dataSet.getDiscreteLabels(
-                includeClassLabel=includeClassLabel, includeId=includeId)
-        classLabels = self._dataSet.getClassPositionLabels(includeId=includeId)
-
-        post.append('@RELATION %s' % self._dataSet.getClassLabel())
-
-        for i, attrLabel in enumerate(attrs):
-            discrete = discreteLabels[i]
-            classLabel = classLabels[i]
-            if not classLabel: # a normal attribute
-                if discrete is None: # this is an identifier
-                    post.append('@ATTRIBUTE %s STRING' % attrLabel)
-                elif discrete is True:
-                    post.append('@ATTRIBUTE %s NUMERIC' % attrLabel)
-                else: # this needs to be a NOMINAL type
-                    post.append('@ATTRIBUTE %s NUMERIC' % attrLabel)
-            else:
-                values = self._dataSet.getUniqueClassValues()
-                post.append('@ATTRIBUTE class {%s}' % ','.join(values))
-        # include start of data declaration
-        post.append('@DATA')
-        return post
-
-    def getString(self, includeClassLabel=True, includeId=True, lineBreak=None):
-        if lineBreak is None:
-            lineBreak = '\n'
-
-        msg = []
-
-        header = self.getHeaderLines(includeClassLabel=includeClassLabel,
-                                    includeId=includeId)
-        for row in header:
-            msg.append(row)
-
-        data = self._dataSet.getFeaturesAsList(
-                includeClassLabel=includeClassLabel)
-        # data is separated by commas
-        for row in data:
-            sub = []
-            for e in row:
-                sub.append(str(e))
-            msg.append(','.join(sub))
-        return lineBreak.join(msg)
 
 
 
@@ -917,11 +679,11 @@ class DataSet:
         self.dataInstances = []
         self.streams = []
         # order of feature extractors is the order used in the presentations
-        self._featureExtractors = []
+        self.featureExtractors = []
         # the label of the class
         self._classLabel = classLabel
         # store a multidimensional storage of all features
-        self._features = []
+        self.features = []
 
         self.failFast = False
         self.quiet = True
@@ -942,7 +704,7 @@ class DataSet:
             values = [values]
         # need to create instances
         for sub in values:
-            self._featureExtractors.append(sub())
+            self.featureExtractors.append(sub())
 
     def getAttributeLabels(self, includeClassLabel=True,
         includeId=True):
@@ -967,7 +729,7 @@ class DataSet:
         # place ids first
         if includeId:
             post.append('Identifier')
-        for fe in self._featureExtractors:
+        for fe in self.featureExtractors:
             post += fe.getAttributeLabels()
         if self._classLabel is not None and includeClassLabel:
             post.append(self._classLabel.replace(' ', '_'))
@@ -987,7 +749,7 @@ class DataSet:
         post = []
         if includeId:
             post.append(None) # just a spacer
-        for fe in self._featureExtractors:
+        for fe in self.featureExtractors:
             # need as many statements of discrete as there are dimensions
             post += [fe.discrete] * fe.dimensions
         # class label is assumed always discrete
@@ -1008,7 +770,7 @@ class DataSet:
         post = []
         if includeId:
             post.append(None) # just a spacer
-        for fe in self._featureExtractors:
+        for fe in self.featureExtractors:
             # need as many statements of discrete as there are dimensions
             post += [False] * fe.dimensions
         # class label is assumed always discrete
@@ -1054,10 +816,10 @@ class DataSet:
         Processed data is stored internally as numerous Feature objects.
         '''
         # clear features
-        self._features = []
+        self.features = []
         for data in self.dataInstances:
             row = []
-            for fe in self._featureExtractors:
+            for fe in self.featureExtractors:
                 fe.setData(data)
                 # in some cases there might be problem; to not fail
                 try:
@@ -1075,7 +837,7 @@ class DataSet:
 
                 row.append(fReturned) # get feature and store
             # rows will align with data the order of DataInstances
-            self._features.append(row)
+            self.features.append(row)
 
     def getFeaturesAsList(self, includeClassLabel=True, includeId=True, concatenateLists=True):
         '''
@@ -1083,7 +845,7 @@ class DataSet:
         in multi-dimensional features.
         '''
         post = []
-        for i, row in enumerate(self._features):
+        for i, row in enumerate(self.features):
             v = []
             di = self.dataInstances[i]
 
@@ -1114,12 +876,13 @@ class DataSet:
         return post
 
     def _getOutputFormat(self, featureFormat):
+        from music21.features import outputFormats
         if featureFormat.lower() in ['tab', 'orange', 'taborange', None]:
-            outputFormat = OutputTabOrange(dataSet=self)
+            outputFormat = outputFormats.OutputTabOrange(dataSet=self)
         elif featureFormat.lower() in ['csv', 'comma']:
-            outputFormat = OutputCSV(dataSet=self)
+            outputFormat = outputFormats.OutputCSV(dataSet=self)
         elif featureFormat.lower() in ['arff', 'attribute']:
-            outputFormat = OutputARFF(dataSet=self)
+            outputFormat = outputFormats.OutputARFF(dataSet=self)
         else:
             return None
         return outputFormat
@@ -1130,9 +893,9 @@ class DataSet:
 
         >>> ds = features.DataSet()
         >>> ds._getOutputFormatFromFilePath('test.tab')
-        <music21.features.base.OutputTabOrange object at ...>
+        <music21.features.outputFormats.OutputTabOrange object at ...>
         >>> ds._getOutputFormatFromFilePath('test.csv')
-        <music21.features.base.OutputCSV object at ...>
+        <music21.features.outputFormats.OutputCSV object at ...>
         >>> ds._getOutputFormatFromFilePath('junk') is None
         True
 
@@ -1146,7 +909,8 @@ class DataSet:
 
 
     def getString(self, outputFmt='tab'):
-        '''Get a string representation of the data set in a specific format.
+        '''
+        Get a string representation of the data set in a specific format.
         '''
         # pass reference to self to output
         outputFormat = self._getOutputFormat(outputFmt)
@@ -1161,7 +925,7 @@ class DataSet:
             outputFormat = self._getOutputFormatFromFilePath(fp)
         else:
             outputFormat = self._getOutputFormat(format)
-        if OutputFormat is None:
+        if outputFormat is None:
             raise DataSetException('no output format could be defined from file path ' +
                                    '%s or format %s' % (fp, format))
 
@@ -1192,8 +956,8 @@ def allFeaturesAsList(streamInput):
     ds.addData(streamInput)
     ds.process()
     jsymb = ds.getFeaturesAsList(includeClassLabel=False, includeId=False, concatenateLists=False)
-    ds._featureExtractors = []
-    ds._features = []
+    ds.featureExtractors = []
+    ds.features = []
     n = [f for f in native.featureExtractors]
     ds.addFeatureExtractors(n)
     ds.process()
@@ -1289,7 +1053,7 @@ def vectorById(streamObj, vectorId, library=('jSymbolic', 'native')):
     >>> features.vectorById(s, 'p20')
     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
     '''
-    fe = extractorById(vectorId)(streamObj) # call class with stream
+    fe = extractorById(vectorId, library)(streamObj) # call class with stream
     if fe is None:
         return None # could raise exception
     return fe.extract().vector
@@ -1363,24 +1127,25 @@ class Test(unittest.TestCase):
 
         #di['chordify'].show('t')
         self.assertEqual(len(di['chordify']), 20)
-        self.assertEqual(len(di['chordify.getElementsByClass.Chord']), 144)
+        chordifiedChords = di['chordify.flat.getElementsByClass(Chord)']
+        self.assertEqual(len(chordifiedChords), 144)
 
 
-        self.assertEqual(di['chordifySetClassHistogram'],
+        self.assertEqual(di['chordify.flat.getElementsByClass(Chord).setClassHistogram'],
                          {'2-2': 6, '2-3': 12, '2-4': 21, '2-5': 5,
                           '3-10': 4, '3-11': 33, '3-2': 3, '3-4': 7,
                           '3-6': 7, '3-7': 9, '3-8': 6, '3-9': 16,
                           '1-1': 15})
 
         self.maxDiff = None
-        self.assertEqual(di['chordifyTypesHistogram'],
+        self.assertEqual(di['chordify.flat.getElementsByClass(Chord).typesHistogram'],
                            {'isMinorTriad': 8, 'isAugmentedTriad': 0,
                             'isTriad': 37, 'isSeventh': 0, 'isDiminishedTriad': 4,
                             'isDiminishedSeventh': 0, 'isIncompleteMajorTriad': 21,
                             'isHalfDiminishedSeventh': 0, 'isMajorTriad': 25,
                             'isDominantSeventh': 0, 'isIncompleteMinorTriad': 12})
 
-        self.assertEqual(di['noteQuarterLengthHistogram'],
+        self.assertEqual(di['flat.notes.quarterLengthHistogram'],
                          {0.5: 116, 1.0: 39, 1.5: 27, 2.0: 31, 3.0: 2, 4.0: 3,
                           0.75: 4, 0.25: 16})
 
@@ -1392,14 +1157,14 @@ class Test(unittest.TestCase):
         self.assertEqual(len(di['parts'][1]['flat.notes']), 66)
 
         # getting a measure by part
-        self.assertEqual(len(di['parts'][0]['getElementsByClass.Measure']), 19)
-        self.assertEqual(len(di['parts'][1]['getElementsByClass.Measure']), 19)
+        self.assertEqual(len(di['parts'][0]['getElementsByClass(Measure)']), 19)
+        self.assertEqual(len(di['parts'][1]['getElementsByClass(Measure)']), 19)
 
-        self.assertEqual(di['parts'][0]['pitchClassHistogram'],
+        self.assertEqual(di['parts'][0]['pitches.pitchClassHistogram'],
                          [9, 1, 11, 0, 9, 13, 0, 11, 0, 12, 5, 0])
         # the sum of the two arrays is the pitch class histogram of the complete
         # work
-        self.assertEqual(di['pitchClassHistogram'],
+        self.assertEqual(di['pitches.pitchClassHistogram'],
                          [47, 2, 25, 0, 25, 42, 0, 33, 0, 38, 22, 4])
 
 
@@ -1411,7 +1176,7 @@ class Test(unittest.TestCase):
         for p in ['c4', 'c4', 'd-4', 'd#4', 'f#4', 'a#4', 'd#5', 'a5', 'a5']:
             s.append(note.Note(p))
         di = features.DataInstance(s)
-        self.assertEqual(di['midiIntervalHistogram'],
+        self.assertEqual(di['pitches.midiIntervalHistogram'],
                          [2, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1431,7 +1196,7 @@ class Test(unittest.TestCase):
             s.append(note.Note(p))
         di = features.DataInstance(s)
 
-        self.assertEqual(pformat(di['secondsMap']), """[{'durationSeconds': 0.5,
+        self.assertEqual(pformat(di['flat.secondsMap']), """[{'durationSeconds': 0.5,
   'element': <music21.note.Note C>,
   'endTimeSeconds': 0.5,
   'offsetSeconds': 0.0,
@@ -1475,6 +1240,7 @@ class Test(unittest.TestCase):
 
     def testDataSetOutput(self):
         from music21 import features
+        from music21.features import outputFormats
         # test just a few features
         featureExtractors = features.extractorsById(['ql1', 'ql2', 'ql4'], 'native')
 
@@ -1489,7 +1255,7 @@ class Test(unittest.TestCase):
         ds.process()
 
         # manually create an output format and get output
-        of = OutputCSV(ds)
+        of = outputFormats.OutputCSV(ds)
         post = of.getString(lineBreak='//')
         self.assertEqual(post, 'Identifier,Unique_Note_Quarter_Lengths,' +
                 'Most_Common_Note_Quarter_Length,Range_of_Note_Quarter_Lengths,' +
@@ -1826,12 +1592,12 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [FeatureExtractor]
+_DOC_ORDER = [DataSet, Feature, FeatureExtractor]
 
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='testStreamFormsA')
 
 
 #------------------------------------------------------------------------------

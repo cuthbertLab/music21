@@ -115,11 +115,11 @@ class QualityFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-    def _process(self):
+    def process(self):
         '''
-        Do processing necessary, storing result in _feature.
+        Do processing necessary, storing result in feature.
         '''
-        allKeys = self.data['flat.getElementsByClass.KeySignature']
+        allKeys = self.data['flat.getElementsByClass(KeySignature)']
         keyFeature = None
         for x in allKeys:
             if not hasattr(x, 'mode'):
@@ -142,7 +142,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
                     "should be able to get a mode from something here -- " +
                     "perhaps there are no notes?")
 
-        self._feature.vector[0] = keyFeature
+        self.feature.vector[0] = keyFeature
 
 
 #-------------------------------------------------------------------------------
@@ -173,10 +173,10 @@ class TonalCertainty(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = False
 
-    def _process(self):
-        '''Do processing necessary, storing result in _feature.
+    def process(self):
+        '''Do processing necessary, storing result in feature.
         '''
-        self._feature.vector[0] = self.data['flat.tonalCertainty']
+        self.feature.vector[0] = self.data['flat.analyzedKey.tonalCertainty']
 
 
 #-------------------------------------------------------------------------------
@@ -229,16 +229,16 @@ class UniqueNoteQuarterLengths(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = True
 
-    def _process(self):
-        '''Do processing necessary, storing result in _feature.
+    def process(self):
+        '''Do processing necessary, storing result in feature.
         '''
         count = 0
-        histo = self.data['noteQuarterLengthHistogram']
+        histo = self.data['flat.notes.quarterLengthHistogram']
         for key in histo:
             # all defined keys should be greater than zero, but just in case
             if histo[key] > 0:
                 count += 1
-        self._feature.vector[0] = count
+        self.feature.vector[0] = count
 
 
 class MostCommonNoteQuarterLength(featuresModule.FeatureExtractor):
@@ -258,10 +258,10 @@ class MostCommonNoteQuarterLength(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = False
 
-    def _process(self):
-        '''Do processing necessary, storing result in _feature.
+    def process(self):
+        '''Do processing necessary, storing result in feature.
         '''
-        histo = self.data['noteQuarterLengthHistogram']
+        histo = self.data['flat.notes.quarterLengthHistogram']
         maximum = 0
         ql = 0
         for key in histo:
@@ -269,7 +269,7 @@ class MostCommonNoteQuarterLength(featuresModule.FeatureExtractor):
             if histo[key] >= maximum:
                 maximum = histo[key]
                 ql = key
-        self._feature.vector[0] = ql
+        self.feature.vector[0] = ql
 
 
 class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
@@ -289,11 +289,11 @@ class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = False
 
-    def _process(self):
-        '''Do processing necessary, storing result in _feature.
+    def process(self):
+        '''Do processing necessary, storing result in feature.
         '''
         summation = 0 # count of all
-        histo = self.data['noteQuarterLengthHistogram']
+        histo = self.data['flat.notes.quarterLengthHistogram']
         maxKey = 0 # max found for any one key
         for key in histo:
             # all defined keys should be greater than zero, but just in case
@@ -301,7 +301,7 @@ class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
                 summation += histo[key]
                 if histo[key] >= maxKey:
                     maxKey = histo[key]
-        self._feature.vector[0] = maxKey / float(summation)
+        self.feature.vector[0] = maxKey / float(summation)
 
 
 
@@ -323,13 +323,13 @@ class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = False
 
-    def _process(self):
-        '''Do processing necessary, storing result in _feature.
+    def process(self):
+        '''Do processing necessary, storing result in feature.
         '''
-        histo = self.data['noteQuarterLengthHistogram']
+        histo = self.data['flat.notes.quarterLengthHistogram']
         minVal = min(histo.keys())
         maxVal = max(histo.keys())
-        self._feature.vector[0] = maxVal - minVal
+        self.feature.vector[0] = maxVal - minVal
 
 
 #-------------------------------------------------------------------------------
@@ -360,16 +360,16 @@ class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = False
 
-    def _process(self):
-        '''Do processing necessary, storing result in _feature.
+    def process(self):
+        '''Do processing necessary, storing result in feature.
         '''
         count = 0
-        histo = self.data['chordifyPitchClassSetHistogram']
+        histo = self.data['chordify.flat.getElementsByClass(Chord).pitchClassSetHistogram']
         for key in histo:
             # all defined keys should be greater than zero, but just in case
             if histo[key] > 0:
                 count += 1
-        self._feature.vector[0] = count
+        self.feature.vector[0] = count
 
 
 class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
@@ -390,16 +390,16 @@ class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = False
 
-    def _process(self):
-        '''Do processing necessary, storing result in _feature.
+    def process(self):
+        '''Do processing necessary, storing result in feature.
         '''
         count = 0
-        histo = self.data['chordifySetClassHistogram']
+        histo = self.data['chordify.flat.getElementsByClass(Chord).setClassHistogram']
         for key in histo:
             # all defined keys should be greater than zero, but just in case
             if histo[key] > 0:
                 count += 1
-        self._feature.vector[0] = count
+        self.feature.vector[0] = count
 
 
 class MostCommonPitchClassSetSimultaneityPrevalence(
@@ -422,11 +422,11 @@ class MostCommonPitchClassSetSimultaneityPrevalence(
         self.dimensions = 1
         self.discrete = False
 
-    def _process(self):
-        '''Do processing necessary, storing result in _feature.
+    def process(self):
+        '''Do processing necessary, storing result in feature.
         '''
         summation = 0 # count of all
-        histo = self.data['chordifyPitchClassSetHistogram']
+        histo = self.data['chordify.flat.getElementsByClass(Chord).pitchClassSetHistogram']
         maxKey = 0 # max found for any one key
         for key in histo:
             # all defined keys should be greater than zero, but just in case
@@ -434,7 +434,7 @@ class MostCommonPitchClassSetSimultaneityPrevalence(
                 summation += histo[key]
                 if histo[key] >= maxKey:
                     maxKey = histo[key]
-        self._feature.vector[0] = maxKey / float(summation)
+        self.feature.vector[0] = maxKey / float(summation)
 
 
 class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
@@ -462,12 +462,12 @@ class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = False
 
-    def _process(self):
+    def process(self):
         '''
-        Do processing necessary, storing result in _feature.
+        Do processing necessary, storing result in feature.
         '''
         summation = 0 # count of all
-        histo = self.data['chordifySetClassHistogram']
+        histo = self.data['chordify.flat.getElementsByClass(Chord).setClassHistogram']
         maxKey = 0 # max found for any one key
         for key in histo:
             # all defined keys should be greater than zero, but just in case
@@ -475,7 +475,7 @@ class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
                 summation += histo[key]
                 if histo[key] >= maxKey:
                     maxKey = histo[key]
-        self._feature.vector[0] = maxKey / float(summation)
+        self.feature.vector[0] = maxKey / float(summation)
 
 
 class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
@@ -497,16 +497,16 @@ class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = False
 
-    def _process(self):
-        '''Do processing necessary, storing result in _feature.
+    def process(self):
+        '''Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
-        total = len(self.data['chordify.getElementsByClass.Chord'])
+        total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
 
-        histo = self.data['chordifyTypesHistogram']
+        histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
         # using incomplete
         part = histo['isMajorTriad'] + histo['isIncompleteMajorTriad']
-        self._feature.vector[0] = part / float(total)
+        self.feature.vector[0] = part / float(total)
 
 
 class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
@@ -527,15 +527,15 @@ class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = False
 
-    def _process(self):
-        '''Do processing necessary, storing result in _feature.
+    def process(self):
+        '''Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
-        total = len(self.data['chordify.getElementsByClass.Chord'])
-        histo = self.data['chordifyTypesHistogram']
+        total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
+        histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
         # using incomplete
         part = histo['isMinorTriad'] + histo['isIncompleteMinorTriad']
-        self._feature.vector[0] = part / float(total)
+        self.feature.vector[0] = part / float(total)
 
 
 class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
@@ -556,15 +556,15 @@ class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = False
 
-    def _process(self):
-        '''Do processing necessary, storing result in _feature.
+    def process(self):
+        '''Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
-        total = len(self.data['chordify.getElementsByClass.Chord'])
-        histo = self.data['chordifyTypesHistogram']
+        total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
+        histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
         # using incomplete
         part = histo['isDominantSeventh']
-        self._feature.vector[0] = part / float(total)
+        self.feature.vector[0] = part / float(total)
 
 
 class DiminishedTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
@@ -586,15 +586,15 @@ class DiminishedTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = False
 
-    def _process(self):
-        '''Do processing necessary, storing result in _feature.
+    def process(self):
+        '''Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
-        total = len(self.data['chordify.getElementsByClass.Chord'])
-        histo = self.data['chordifyTypesHistogram']
+        total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
+        histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
         # using incomplete
         part = histo['isDiminishedTriad']
-        self._feature.vector[0] = part / float(total)
+        self.feature.vector[0] = part / float(total)
 
 
 class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
@@ -622,15 +622,15 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = False
 
-    def _process(self):
-        '''Do processing necessary, storing result in _feature.
+    def process(self):
+        '''Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
-        total = len(self.data['chordify.getElementsByClass.Chord'])
-        histo = self.data['chordifyTypesHistogram']
+        total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
+        histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
         # using incomplete
         part = histo['isTriad']
-        self._feature.vector[0] = part / float(total)
+        self.feature.vector[0] = part / float(total)
 
 
 
@@ -652,15 +652,15 @@ class DiminishedSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = False
 
-    def _process(self):
-        '''Do processing necessary, storing result in _feature.
+    def process(self):
+        '''Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
-        total = len(self.data['chordify.getElementsByClass.Chord'])
-        histo = self.data['chordifyTypesHistogram']
+        total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
+        histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
         # using incomplete
         part = histo['isDiminishedSeventh']
-        self._feature.vector[0] = part / float(total)
+        self.feature.vector[0] = part / float(total)
 
 class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
     '''
@@ -691,14 +691,14 @@ class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = False
 
-    def _process(self):
-        '''Do processing necessary, storing result in _feature.
+    def process(self):
+        '''Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
-        histo = self.data['chordifyTypesHistogram']
+        histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
         # using incomplete
         totalCorrectlySpelled = histo['isTriad']
-        forteData = self.data['chordifySetClassHistogram']
+        forteData = self.data['chordify.flat.getElementsByClass(Chord).setClassHistogram']
         totalForteTriads = 0
         if "3-11" in forteData:
             totalForteTriads += forteData['3-11']
@@ -709,7 +709,7 @@ class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
 
         totalIncorrectlySpelled = totalForteTriads - totalCorrectlySpelled
 
-        self._feature.vector[0] = totalIncorrectlySpelled / float(totalForteTriads)
+        self.feature.vector[0] = totalIncorrectlySpelled / float(totalForteTriads)
 
 
 class ChordBassMotionFeature(featuresModule.FeatureExtractor):
@@ -750,11 +750,11 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
         self.dimensions = 12
         self.discrete = False
 
-    def _process(self):
-        '''Do processing necessary, storing result in _feature.
+    def process(self):
+        '''Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
-        harms = self.data['flat.getElementsByClass.Harmony']
+        harms = self.data['flat.getElementsByClass(Harmony)']
 
         totMotion = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         totalHarmonicMotion = 0
@@ -791,7 +791,7 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
             vector = totHarmonicMotionFraction
 
 
-        self._feature.vector = vector
+        self.feature.vector = vector
 
 
 #-------------------------------------------------------------------------------
@@ -832,8 +832,8 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = False
 
-    def _process(self):
-        '''Do processing necessary, storing result in _feature.
+    def process(self):
+        '''Do processing necessary, storing result in feature.
         '''
         # use for total number of chords
 
@@ -866,7 +866,7 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
 #        except:
 #            resultsLog = 0
 
-        self._feature.vector[0] = resultsLog
+        self.feature.vector[0] = resultsLog
 
 
 
@@ -889,8 +889,9 @@ class LandiniCadence(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = False
 
-    def _process(self):
-        '''Do processing necessary, storing result in _feature.
+    def process(self):
+        '''
+        Do processing necessary, storing result in feature.
         '''
         # store plausible ending half step movements
         # these need to be lists for comparison
@@ -926,7 +927,7 @@ class LandiniCadence(featuresModule.FeatureExtractor):
             if found:
                 break
         if found:
-            self._feature.vector[0] = 1
+            self.feature.vector[0] = 1
 
 
 
@@ -939,13 +940,13 @@ class LanguageFeature(featuresModule.FeatureExtractor):
     the number is the index of text.LanguageDetector.languageCodes + 1
     or 0 if there is no language.
 
-
     Detect that the language of a Handel aria is Italian.
 
     >>> s = corpus.parse('handel/rinaldo/lascia_chio_pianga')
     >>> fe = features.native.LanguageFeature(s)
     >>> fe.extract().vector
     [3]
+    
     '''
     id = 'TX1'
 
@@ -959,11 +960,13 @@ class LanguageFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = True
         self.languageDetector = text.LanguageDetector()
-    def _process(self):
-        '''Do processing necessary, storing result in _feature.
+        
+    def process(self):
+        '''
+        Do processing necessary, storing result in feature.
         '''
         storedLyrics = self.data['assembledLyrics']
-        self._feature.vector[0] = self.languageDetector.mostLikelyLanguageNumeric(storedLyrics)
+        self.feature.vector[0] = self.languageDetector.mostLikelyLanguageNumeric(storedLyrics)
 
 
 

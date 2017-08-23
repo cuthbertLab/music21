@@ -189,7 +189,8 @@ def main(fnAccept=None, strict=False):
     pylintRun(cmdFile, exit=False)
 
 def argRun():
-    parser = argparse.ArgumentParser(description='Run pylint on music21 according to style guide.')
+    parser = argparse.ArgumentParser(
+        description='Run pylint on music21 according to style guide.')
     parser.add_argument('files', metavar='filename', type=str, nargs='*',
                         help='Files to parse (default nearly all)')
     parser.add_argument('--strict', action='store_true',
