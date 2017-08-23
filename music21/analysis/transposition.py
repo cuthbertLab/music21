@@ -49,7 +49,9 @@ class TranspositionChecker:
     >>> tc = analysis.transposition.TranspositionChecker(pList)
     >>> allNormalOrderChords = tc.getChordsOfDistinctTranspositions()
     >>> allNormalOrderChords
-    [<music21.chord.Chord C E- F# A>, <music21.chord.Chord C# E G A#>, <music21.chord.Chord D F G# B>]
+    [<music21.chord.Chord C E- F# A>,
+     <music21.chord.Chord C# E G A#>,
+     <music21.chord.Chord D F G# B>]
     '''
     def __init__(self, pitches=None):
         if pitches is None:
@@ -250,7 +252,7 @@ class Test(unittest.TestCase):
         self.assertIsInstance(allNormalOrderChords[0].pitches[0], pitch.Pitch)
         # self.assertEqual(allDistinctNormalOrders[0], [0,4,8])
 
-def testNormalOrdersPitches(self):
+    def testNormalOrdersPitches(self):
         pList = [pitch.Pitch('C4'), pitch.Pitch('E4'), pitch.Pitch('G#4')]
         tc = TranspositionChecker(pList)
 
