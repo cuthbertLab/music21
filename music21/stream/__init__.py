@@ -8767,11 +8767,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # both Chords and Stream have a pitches properties; this just
             # causes a recursive pitch gathering
             elif hasattr(e, "pitches"):
-                for p in e.pitches:
-                    post.append(p)
-            # do an ininstance comparison
-            elif 'Pitch' in e.classes:
-                post.append(e)
+                post.extend(list(e.pitches))
         return post
 
 

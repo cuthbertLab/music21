@@ -25,8 +25,8 @@ class MRFeatureExtractor(MRJob):
 
         for dataList in data:
             streamObj, md5hash = dataList
-            jsymb, nat = base.allFeaturesAsList(streamObj)
-            yield md5hash + '|' + streamObj.corpusFilepath + '|' + str(jsymb) + '|' + str(nat)
+            output = base.allFeaturesAsList(streamObj)
+            yield md5hash + '|' + streamObj.corpusFilepath + '|' + str(output)
 
     #def reducer(self, word, occurrences):
     #    yield word, sum(occurrences)

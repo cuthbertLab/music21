@@ -74,7 +74,7 @@ def runParallel(iterable, parallelFunction,
 
             if updateFunction is True:
                 print("Done {} tasks of {}".format(totalRun, iterLength))
-            elif updateFunction is not None:
+            elif updateFunction not in (False, None):
                 for i in range(totalRun, endPosition):
                     if updateSendsIterable is False:
                         updateFunction(i, iterLength, _r[i - totalRun])
@@ -109,7 +109,7 @@ def runNonParallel(iterable, parallelFunction,
 
         if updateFunction is True and i % updateMultiply == 0:
             print("Done {} tasks of {} not in parallel".format(i, iterLength))
-        elif updateFunction is not None and i % updateMultiply == 0:
+        elif updateFunction not in (False, None) and i % updateMultiply == 0:
             if updateSendsIterable is False:
                 updateFunction(i, iterLength, _r)
             else:

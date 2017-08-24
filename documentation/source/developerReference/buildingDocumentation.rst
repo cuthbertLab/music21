@@ -10,7 +10,7 @@ most importantly one called Sphinx. Sphinx is a documentation generator that use
 reStructuredText (rst) as its markup language and outputs HTML documents. 
 
 In addition, you will need to install `music21` from the .tar.gz file on
-Github (https://github.org/cuthbertLab/music21/releases) or from the
+Github (https://github.com/cuthbertLab/music21/releases) or from the
 git repository (git://github.org/cuthbertLab/music21.git).
 
 
