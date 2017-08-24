@@ -272,7 +272,7 @@ class XMLParserBase:
 
     #### style attributes
 
-    def setStyleAttributes(self, mxObject, m21Object, musicXMLNames, m21Names):
+    def setStyleAttributes(self, mxObject, m21Object, musicXMLNames, m21Names=None):
         '''
         Takes an mxObject, a music21Object, and a list/tuple of musicXMLnames and
         a list/tuple of m21Names, and assigns each of the mxObject's attributes
@@ -304,6 +304,14 @@ class XMLParserBase:
             stObj = m21Object
         else:
             stObj = None
+
+        if not common.isIterable(musicXMLNames):
+            musicXMLNames = [musicXMLNames]
+        
+        if m21Names is None:
+            m21Names = musicXMLNames
+        elif not common.isIterable(m21Names):
+            m21Names = [m21Names]        
         
         for xmlName, m21Name in zip(musicXMLNames, m21Names):
             mxValue = mxObject.get(xmlName)
@@ -382,7 +390,7 @@ class XMLParserBase:
         '''
         Sets m21Object.style.color to be the same as color...
         '''
-        self.setStyleAttributes(mxObject, m21Object, ('color',), ('color',))
+        self.setStyleAttributes(mxObject, m21Object, 'color')
 
     def setFont(self, mxObject, m21Object):
         '''
@@ -890,6 +898,12 @@ class MusicXMLImporter(XMLParserBase):
         <music21.text.TextBox "">
         '''
         tb = text.TextBox()
+        # center and middle these are good defaults for new textboxes
+        # but not for musicxml import
+        tb.style.alignHorizontal = None
+        tb.style.alignVertical = None
+        
+        
         pageNum = mxCredit.get('page')
         if pageNum is None:
             pageNum = 1
@@ -909,7 +923,6 @@ class MusicXMLImporter(XMLParserBase):
         cw1 = mxCredit.find('credit-words')
         # take formatting from the first, no matter if multiple are defined
         self.setPrintStyleAlign(cw1, tb)
-
         tb.style.justify = cw1.get('justify')
         # TODO: credit type
         # TODO: link
@@ -1105,12 +1118,16 @@ class MusicXMLImporter(XMLParserBase):
             # TODO: group-name-display
             seta(staffGroup, mxPartGroup, 'group-abbreviation', 'abbreviation')
             # TODO: group-abbreviation-display
-            if mxPartGroup.find('group-symbol') is not None:
+            mxGroupSymbol = mxPartGroup.find('group-symbol') 
+            if mxGroupSymbol is not None:
                 seta(staffGroup, mxPartGroup, 'group-symbol', 'symbol')
+                self.setPosition(mxGroupSymbol, staffGroup)
+                self.setColor(mxGroupSymbol, staffGroup)
             else:
                 staffGroup.symbol = 'brace' # MusicXML default
 
             seta(staffGroup, mxPartGroup, 'group-barline', 'barTogether')
+            
             # TODO: group-time
             self.setEditorial(mxPartGroup, staffGroup)
             staffGroup.completeStatus = True
@@ -1199,6 +1216,8 @@ class MusicXMLImporter(XMLParserBase):
                     
                 # found in wild: element=accidental type="no" -- No accidentals are indicated
                 # found in wild: transpose
+                # found in wild: beam
+                # found in wild: stem
                 if (attr, value) == ('new-system', 'yes'):
                     self.definesExplicitSystemBreaks = True
                 elif (attr, value) == ('new-page', 'yes'):
@@ -1395,11 +1414,22 @@ class PartParser(XMLParserBase):
         
         seta = _setAttributeFromTagText
         # put part info into the Part object and retrieve it later...
-        seta(part, mxScorePart, 'part-name', transform=_clean)              
+        seta(part, mxScorePart, 'part-name', transform=_clean)
+        mxPartName = mxScorePart.find('part-name')
+        if mxPartName is not None:
+            printObject = mxPartName.get('print-object')
+            if printObject == 'no':
+                part.style.printPartName = False
+         
         # This will later be put in the default instrument object also also...
 
         # TODO: partNameDisplay
         seta(part, mxScorePart, 'part-abbreviation', transform=_clean)
+        mxPartAbbrev = mxScorePart.find('part-abbreviation')
+        if mxPartAbbrev is not None:
+            printObject = mxPartAbbrev.get('print-object')
+            if printObject == 'no':
+                part.style.printPartAbbreviation = False
         # This will later be put in instrument.partAbbreviation also...
 
         # TODO: partAbbreviationDisplay
@@ -1456,7 +1486,7 @@ class PartParser(XMLParserBase):
         if mxScoreInstrument is not None:
             seta(i, mxScoreInstrument, 'instrument-name', transform=_clean)
             seta(i, mxScoreInstrument, 'instrument-abbreviation', transform=_clean)
-        # TODO: instrument-sound
+            seta(i, mxScoreInstrument, 'instrument-sound')
         # TODO: solo / ensemble
         # TODO: virtual-instrument
         # TODO: store id attribute somewhere
@@ -1596,7 +1626,7 @@ class PartParser(XMLParserBase):
             emessage = e.message
         else:
             emessage = execInfoTuple[0].__name__ + " : " #+ execInfoTuple[1].__name__
-        unused_message = "In measure (" + measureNumber + "): " + emessage
+        unused_message = "In measure (" + str(measureNumber) + "): " + str(emessage)
         raise(e)
         #raise type(e)(pprint.pformat(traceback.extract_tb(execInfoTuple[2])))
 
@@ -2233,6 +2263,12 @@ class MeasureParser(XMLParserBase):
                 self.insertCoreAndRef(0.0, str(stl.staffNumber), stl)
         m.coreElementsChanged()
         # TODO: measure-layout -- affect self.stream
+        mxMeasureNumbering = mxPrint.find('measure-numbering')
+        if mxMeasureNumbering is not None:
+            m.style.measureNumbering = mxMeasureNumbering.text
+            st = style.TextStyle()
+            self.setPrintStyleAlign(mxMeasureNumbering, st)
+            m.style.measureNumberingStyle = st
         # TODO: measure-numbering
         # TODO: part-name-display
         # TODO: part-abbreviation display
@@ -2433,8 +2469,11 @@ class MeasureParser(XMLParserBase):
         mxStem = mxNote.find('stem')
         if mxStem is not None:
             n.stemDirection = mxStem.text.strip()
-            # TODO: y-position
-            # TODO: color
+            if mxStem.attrib:
+                stemStyle = style.Style()
+                self.setColor(mxStem, stemStyle)
+                self.setPosition(mxStem, stemStyle)
+                n.style.stemStyle = stemStyle
 
         # gets the notehead object from the mxNote and sets value of the music21 note
         # to the value of the notehead object
@@ -2495,9 +2534,9 @@ class MeasureParser(XMLParserBase):
             beamOut = inputM21
 
         # TODO: get number to preserve
-        # TODO: repeater; is deprecated -- maybe not.
-        # TODO: fan
-        # TODO: color
+        # not to-do: repeater; is deprecated.
+        self.setColor(mxBeam, beamOut)
+        self.setStyleAttributes(mxBeam, beamOut, 'fan')
 
         mxType = mxBeam.text.strip()
         if mxType == 'begin':
@@ -2846,10 +2885,11 @@ class MeasureParser(XMLParserBase):
                 ET.SubElement(mxNote, '<type>eighth</type>')
 
         self.xmlToDuration(mxNote, n.duration)
-        colorAttr = mxNote.get('color')
-        if colorAttr is not None:
-            n.color = colorAttr
-
+        mxType = mxNote.find('type')
+        if mxType is not None:
+            self.setStyleAttributes(mxType, n, 'size', 'noteSize')
+        
+        self.setColor(mxNote, n)
         self.setPosition(mxNote, n)
 
         if mxNote.find('tie') is not None:
@@ -3779,12 +3819,14 @@ class MeasureParser(XMLParserBase):
         >>> import xml.etree.ElementTree as ET
         >>> MP = musicxml.xmlToM21.MeasureParser()
 
-        >>> mxLyric = ET.fromstring('<lyric number="4"><syllabic>single</syllabic>' +
+        >>> mxLyric = ET.fromstring('<lyric number="4" color="red"><syllabic>single</syllabic>' +
         ...                         '<text>word</text></lyric>')
         >>> lyricObj = note.Lyric()
         >>> MP.xmlToLyric(mxLyric, lyricObj)
         >>> lyricObj
         <music21.note.Lyric number=4 syllabic=single text="word">
+        >>> lyricObj.style.color
+        'red'
 
         Non-numeric MusicXML lyric "number"s are converted to identifiers:
 
@@ -3819,10 +3861,20 @@ class MeasureParser(XMLParserBase):
             if number is not None:
                 l.identifier = number
 
+        identifier = mxLyric.get('name')
+        if identifier is not None:
+            l.identifier = identifier
+
         # Used to be l.number = mxLyric.get('number')
         mxSyllabic = mxLyric.find('syllabic')
         if mxSyllabic is not None:
             l.syllabic = mxSyllabic.text.strip()
+
+        self.setStyleAttributes(mxLyric, l, 
+                                ('justify', 'placement', 'print-object'), 
+                                ('justify', 'placement', 'hideObjectOnPrint'))
+        self.setColor(mxLyric, l)
+        self.setPosition(mxLyric, l)
 
         if inputM21 is None:
             return l
@@ -4213,7 +4265,7 @@ class MeasureParser(XMLParserBase):
                         
                         _synchronizeIds(dyn, d)
                         _setAttributeFromAttribute(d, mxDirection,
-                                                   'placement', '_positionPlacement')
+                                                   'placement', 'positionPlacement')
 
                         self.insertCoreAndRef(totalOffset, staffKey, d)
                         self.setEditorial(mxDirection, d)
@@ -4247,6 +4299,7 @@ class MeasureParser(XMLParserBase):
 
                 elif tag == 'rehearsal':
                     rm = self.xmlToRehearsalMark(mxDir)
+                    self.setStyleAttributes(mxDirection, rm, 'placement')
                     self.insertCoreAndRef(totalOffset, staffKey, rm)
                     self.setEditorial(mxDirection, rm)
                     
@@ -4256,6 +4309,10 @@ class MeasureParser(XMLParserBase):
                     #environLocal.printDebug(['got TextExpression object', repr(te)])
                     # offset here is a combination of the current position
                     # (offsetMeasureNote) and and the direction's offset
+                    _setAttributeFromAttribute(textExpression, mxDirection,
+                                               'placement', 'positionPlacement')
+
+                    
                     repeatExpression = textExpression.getRepeatExpression()
                     if repeatExpression is not None:
                         # the repeat expression stores a copy of the text

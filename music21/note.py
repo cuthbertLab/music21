@@ -130,7 +130,7 @@ class Lyric(style.StyleMixin):
     the same as the number, but in cases where a string identifier is present,
     it will be different.
     '''
-    _styleClass = style.TextStyle
+    _styleClass = style.TextStylePlacement
     ### CLASS VARIABLES ###
 
     __slots__ = (
@@ -347,6 +347,7 @@ class GeneralNote(base.Music21Object):
     0.4375
     '''
     isChord = False
+    _styleClass = style.NoteStyle
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength']

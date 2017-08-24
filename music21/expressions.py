@@ -141,7 +141,7 @@ class RehearsalMark(Expression):
     
     '''
     classSortOrder = -30
-    _styleClass = style.TextStyle
+    _styleClass = style.TextStylePlacement
 
     def __init__(self, content=None, *, numbering=None):
         super().__init__()
@@ -316,10 +316,8 @@ class TextExpression(Expression):
 
         self._enclosure = None
 
-        self.style.absoluteY = 20
-
         # this does not do anything if default y is defined
-        self._positionPlacement = None
+        self.positionPlacement = None
 
 
     def __repr__(self):

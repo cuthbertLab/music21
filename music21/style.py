@@ -133,6 +133,17 @@ class Style:
         -70
         ''')
 
+class NoteStyle(Style):
+    '''
+    A Style object that also includes stem and accidental style information.
+    
+    Beam style is stored on the Beams object, as is lyric style
+    '''
+    def __init__(self):
+        super().__init__()
+        self.stemStyle = None
+        self.accidentalStyle = None
+        self.noteSize = None # can be 'cue'...
 
 
 class TextStyle(Style):
@@ -155,8 +166,8 @@ class TextStyle(Style):
         self.textDecoration = None
 
         self._justify = None
-        self._alignHorizontal = 'left'
-        self._alignVertical = 'top'
+        self._alignHorizontal = None
+        self._alignVertical = None
 
     def _getAlignVertical(self):
         return self._alignVertical
@@ -169,7 +180,8 @@ class TextStyle(Style):
 
     alignVertical = property(_getAlignVertical, _setAlignVertical,
         doc = '''
-        Get or set the vertical align. Valid values are top, middle, bottom, and baseline
+        Get or set the vertical align. Valid values are top, middle, bottom, baseline
+        or None
 
         >>> te = style.TextStyle()
         >>> te.alignVertical = 'top'
@@ -189,7 +201,8 @@ class TextStyle(Style):
     alignHorizontal = property(_getAlignHorizontal,
         _setAlignHorizontal,
         doc = '''
-        Get or set the horizontal alignment.  Valid values are left, right, center
+        Get or set the horizontal alignment.  Valid values are left, right, center,
+        or None
 
 
         >>> te = style.TextStyle()
@@ -212,7 +225,7 @@ class TextStyle(Style):
 
     justify = property(_getJustify, _setJustify,
         doc = '''Get or set the justification.  Valid values are left,
-        center, right, and full (the last not supported by MusicXML)
+        center, right, full (not supported by MusicXML), and None
 
         >>> tst = style.TextStyle()
         >>> tst.justify = 'center'
@@ -339,7 +352,13 @@ class TextStyle(Style):
         else:
             self._fontFamily = [f.strip() for f in newFamily.split(',')]
 
-
+class TextStylePlacement(TextStyle):
+    '''
+    TextStyle plus a placement attribute
+    '''
+    def __init__(self):
+        super().__init__()
+        self.placement = None
 
 class BezierStyle(Style):
     '''
@@ -390,6 +409,21 @@ class StreamStyle(Style):
         self.lyricFonts = [] # a list of TextStyle objects
         self.lyricLanguages = [] # a list of strings
         
+        self.printPartName = True
+        self.printPartAbbreviation = True
+        
+        self.measureNumbering = None # can be None -- meaning no comment,
+            # 'none', 'measure', or 'system'...
+        self.measureNumberStyle = None
+        
+
+class BeamStyle(Style):
+    '''
+    Style for beams
+    '''
+    def __init__(self):
+        self.fan = None
+        
         
 class StyleMixin(common.SlottedObjectMixin):
     '''
@@ -423,7 +457,7 @@ class StyleMixin(common.SlottedObjectMixin):
         >>> lObj.hasStyleInformation
         False
         >>> lObj.style
-        <music21.style.TextStyle object at 0x10b0a2080>
+        <music21.style.TextStylePlacement object at 0x10b0a2080>
         >>> lObj.hasStyleInformation
         True
         '''
@@ -513,6 +547,8 @@ class StyleMixin(common.SlottedObjectMixin):
     @editorial.setter
     def editorial(self, ed):
         self._editorial = ed
+
+
 
 
 class Test(unittest.TestCase):

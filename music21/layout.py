@@ -399,8 +399,6 @@ class StaffGroup(spanner.Spanner):
     specifying that they should be shown together with a bracket,
     brace, or other symbol, and may have a common name.
 
-
-
     >>> p1 = stream.Part()
     >>> p2 = stream.Part()
     >>> p1.append(note.Note('C5', type='whole'))
@@ -432,7 +430,7 @@ class StaffGroup(spanner.Spanner):
 
         self.name = None # if this group has a name
         self.abbreviation = None
-        self._symbol = None # can be bracket, line, brace
+        self._symbol = None # can be bracket, line, brace, square
         # determines if barlines are grouped through; this is group barline
         # in musicxml
         self._barTogether = True
@@ -486,11 +484,8 @@ class StaffGroup(spanner.Spanner):
     def _setSymbol(self, value):
         if value is None or str(value).lower() == 'none':
             self._symbol = None
-        elif value.lower() in ['brace', 'line', 'bracket']:
+        elif value.lower() in ['brace', 'line', 'bracket', 'square']:
             self._symbol = value.lower()
-        elif value.lower() in ['square']:
-            self._symbol = 'bracket' # not supported in XML2; in XML3
-
         else:
             raise StaffGroupException('the symbol value %s is not acceptable' % value)
 
