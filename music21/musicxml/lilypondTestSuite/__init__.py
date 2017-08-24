@@ -32,9 +32,7 @@ class Test(unittest.TestCase):
     
     def testAll(self):
         for f in allFiles():
-            with warnings.catch_warnings(record=True):
-                warnings.simplefilter('always')
-                converter.parse(f)
+            converter.parse(f)
             
 if __name__ == '__main__':
     import music21

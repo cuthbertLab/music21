@@ -138,6 +138,7 @@ class Beam(EqualSlottedObjectMixin, style.StyleMixin):
     ### INITIALIZER ###
     # pylint: disable=redefined-builtin
     def __init__(self, type=None, direction=None, number=None):  # type is okay @ReservedAssignment
+        super().__init__()
         self.type = type  # start, stop, continue, partial
         self.direction = direction  # left or right for partial
         self.independentAngle = None

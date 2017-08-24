@@ -796,7 +796,7 @@ class MusicXMLImporter(XMLParserBase):
             try:
                 partInfo = self.partIdDict[partId]
             except KeyError: # pragma: no cover
-                environLocal.warn("Cannot find info for part with name {}".format(partId)
+                environLocal.printDebug("Cannot find info for part with name {}".format(partId)
                                   + ", skipping the part")
                 continue
 
@@ -2211,6 +2211,7 @@ class MeasureParser(XMLParserBase):
         self.offsetMeasureNote -= change
 
     def xmlForward(self, mxObj):
+        # TODO: add a floating rest...
         change = float(mxObj.find('duration').text.strip()) / self.divisions
         self.offsetMeasureNote += change
 

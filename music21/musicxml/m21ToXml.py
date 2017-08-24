@@ -1814,13 +1814,17 @@ class ScoreExporter(XMLExporterBase):
             
         for lyricName, lyricFont in st.lyricFonts:
             mxLyricFont = SubElement(mxDefaults, 'lyric-font')
-            self.setFont(mxLyricFont, lyricFont)
-            mxLyricFont.set('name', lyricName)
+            if lyricFont is not None:
+                self.setFont(mxLyricFont, lyricFont)
+            if lyricName is not None:
+                mxLyricFont.set('name', lyricName)
             
         for lyricType, lyricLang in st.lyricLanguages:
             mxLyricLanguage = SubElement(mxDefaults, 'lyric-language')
-            mxLyricLanguage.set('name', lyricType)
-            mxLyricLanguage.set('xml:lang', lyricLang)
+            if lyricType is not None:
+                mxLyricLanguage.set('name', lyricType)
+            if lyricLang is not None:
+                mxLyricLanguage.set('xml:lang', lyricLang)
         
 
     def styleToXmlAppearance(self):
