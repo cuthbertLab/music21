@@ -398,7 +398,7 @@ class ScoreReduction:
                 m.flattenUnnecessaryVoices(inPlace=True)
                 # hide all rests in all containers
                 for r in m.recurse().getElementsByClass('Rest'):
-                    r.hideObjectOnPrint = True
+                    r.style.hideObjectOnPrint = True
                 #m.show('t')
             # add to score
             s.insert(0, g)

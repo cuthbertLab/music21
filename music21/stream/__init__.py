@@ -11118,7 +11118,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     nOffset = e.getOffsetBySite(newPart)
                     newPart.remove(e)
                     r = note.Rest()
-                    r.hideObjectOnPrint = True
+                    r.style.hideObjectOnPrint = True
                     r.duration.quarterLength = nQuarterLength
                     newPart.insert(nOffset, r)
                 elif "Measure" in eclasses: #Recurse if measure
@@ -11127,10 +11127,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         e.remove(n)
                     r = note.Rest()
                     r.duration.quarterLength = measureDuration
-                    r.hideObjectOnPrint = True
+                    r.style.hideObjectOnPrint = True
                     e.insert(0.0, r)
 
-                e.hideObjectOnPrint = True
+                e.style.hideObjectOnPrint = True
 
             newPart.activateVariants(variantGroup, inPlace=True, matchBySpan=True)
             if expressedVariantsExist:
@@ -11181,7 +11181,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 #        shiftOffset = cVoffset-hVendOffset
                 #        r = note.SpacerRest()
                 #        r.duration.quarterLength = shiftOffset
-                #        r.hideObjectOnPrint = True
+                #        r.style.hideObjectOnPrint = True
                 #        hV.insert(hVendOffset, r)
                 #        for el in cV._stream:
                 #            oldOffset = el.getOffsetBySite(cV._stream)
@@ -11199,7 +11199,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     shiftOffset = self.elementOffset(cV) - startOffset
                     r = note.SpacerRest()
                     r.duration.quarterLength = shiftOffset
-                    r.hideObjectOnPrint = True
+                    r.style.hideObjectOnPrint = True
                     for el in cV._stream:
                         oldOffset = el.getOffsetBySite(cV._stream)
                         cV._stream.setElementOffset(el, oldOffset + shiftOffset)

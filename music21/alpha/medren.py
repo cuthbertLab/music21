@@ -2005,7 +2005,7 @@ def transferTies(score, *, inPlace=False):
                     tieBeneficiary.tie = None #.style = 'hidden'
                     for tiedEl in tiedNotes:
                         tiedEl.tie = None #.style = 'hidden'
-                        tiedEl.hideObjectOnPrint = True
+                        tiedEl.style.hideObjectOnPrint = True
             tiedNotes = []
 
     if inPlace is False:

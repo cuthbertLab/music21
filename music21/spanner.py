@@ -1525,7 +1525,7 @@ class Ottava(Spanner):
     def performTransposition(self):
         '''
         On a transposing spanner, switch to non-transposing,
-        set hideObjectOnPrint to True, and transpose all notes and chords
+        set style.hideObjectOnPrint to True, and transpose all notes and chords
         in the spanner.  Called by :meth:`~music21.stream.Stream.toSoundingPitch` in Stream
         
         >>> ottava = spanner.Ottava(type='8va')
@@ -1545,7 +1545,7 @@ class Ottava(Spanner):
         if not self.transposing:
             return
         self.transposing = False
-        self.hideObjectOnPrint = True
+        self.style.hideObjectOnPrint = True
         
         myInterval = self.interval()
         for n in self.getSpannedElements():
@@ -1579,7 +1579,7 @@ class Ottava(Spanner):
         if self.transposing:
             return
         self.transposing = True
-        self.hideObjectOnPrint = False
+        self.style.hideObjectOnPrint = False
         
         myInterval = self.interval(reverse=True)
         for n in self.getSpannedElements():

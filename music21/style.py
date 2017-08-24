@@ -37,6 +37,12 @@ class Style:
     20.4
 
     '''
+    _DOC_ATTR = {
+        'hideObjectOnPrint': '''if set to `True` will not print upon output
+            (only used in MusicXML output at this point and
+            Lilypond for notes, chords, and rests).''',    
+    }
+    
     def __init__(self):
         self.size = None
 
@@ -56,6 +62,7 @@ class Style:
         self.color = None
 
         self.units = 'tenths'
+        self.hideObjectOnPrint = False
 
     def _getEnclosure(self):
         return self._enclosure
@@ -382,7 +389,8 @@ class StreamStyle(Style):
         self.wordFont = None # None or a TextStyle object
         self.lyricFonts = [] # a list of TextStyle objects
         self.lyricLanguages = [] # a list of strings
-
+        
+        
 class StyleMixin(common.SlottedObjectMixin):
     '''
     Mixin for any class that wants to support style and editorial, since several

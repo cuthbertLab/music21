@@ -710,7 +710,7 @@ def makeRests(s,
     {20.0} <music21.note.Note C>
     {21.0} <music21.note.Rest rest>
     {30.0} <music21.note.Note D>
-    >>> b[0].hideObjectOnPrint
+    >>> b[0].style.hideObjectOnPrint
     True
 
     Now with measures:
@@ -796,7 +796,7 @@ def makeRests(s,
         if qLen > 0:
             r = note.Rest()
             r.duration.quarterLength = qLen
-            r.hideObjectOnPrint = hideRests
+            r.style.hideObjectOnPrint = hideRests
             #environLocal.printDebug(['makeRests(): add rests', r, r.duration])
             # place at oLowTarget to reach to oLow
             v.coreInsert(oLowTarget, r)
@@ -807,7 +807,7 @@ def makeRests(s,
         if qLen > 0:
             r = note.Rest()
             r.duration.quarterLength = qLen
-            r.hideObjectOnPrint = hideRests
+            r.style.hideObjectOnPrint = hideRests
             # place at oHigh to reach to oHighTarget
             v.coreInsert(oHigh, r)
         v.coreElementsChanged()  # must update otherwise might add double r
@@ -818,7 +818,7 @@ def makeRests(s,
                 for e in gapStream:
                     r = note.Rest()
                     r.duration.quarterLength = e.duration.quarterLength
-                    r.hideObjectOnPrint = hideRests
+                    r.style.hideObjectOnPrint = hideRests
                     v.coreInsert(e.offset, r)
         v.coreElementsChanged()
         #environLocal.printDebug(['post makeRests show()', v])

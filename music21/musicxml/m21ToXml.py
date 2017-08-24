@@ -1997,13 +1997,18 @@ class ScoreExporter(XMLExporterBase):
             mxCreator.set('type', 'composer')
             mxCreator.text = defaults.author
 
-        # TODO: rights.
+        if self.scoreMetadata is not None and self.scoreMetadata.copyright is not None:
+            c = self.scoreMetadata.copyright
+            mxRights = SubElement(mxId, 'rights')
+            if c.role is not None:
+                mxRights.set('type', c.role)
+            mxRights.text = str(c)
+            
 
         # Encoding does its own append...
         self.setEncoding()
         # TODO: source
         # TODO: relation
-        # TODO: miscellaneous
         self.metadataToMiscellaneous()
 
         return mxId
@@ -2037,7 +2042,7 @@ class ScoreExporter(XMLExporterBase):
 
         foundOne = False
         for name, value in md.all(skipContributors=True):
-            if name in ('movementName', 'movementNumber', 'title'):
+            if name in ('movementName', 'movementNumber', 'title', 'copyright'):
                 continue
             mxMiscField = SubElement(mxMiscellaneous, 'miscellaneous-field')
             mxMiscField.set('name', name)
@@ -3109,7 +3114,7 @@ class MeasureExporter(XMLExporterBase):
         if chordOrN.hasStyleInformation and chordOrN.style.color is not None:
             mxNote.set('color', normalizeColor(chordOrN.style.color))
 
-        if n.hideObjectOnPrint is True:
+        if n.hasStyleInformation and n.style.hideObjectOnPrint is True:
             mxNote.set('print-object', 'no')
             mxNote.set('print-spacing', 'yes')
 

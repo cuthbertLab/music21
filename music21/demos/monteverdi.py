@@ -32,7 +32,7 @@ def spliceAnalysis(book=3, madrigal=1):
     aMeasures = analysis.parts[0].measures(1, 20)
     aMeasures.getElementsByClass('Measure')[0].clef = clef.TrebleClef()
     for myN in aMeasures.flat.notesAndRests:
-        myN.hideObjectOnPrint = True
+        myN.style.hideObjectOnPrint = True
     x = aMeasures.write()
     print (x)
     #excerpt.insert(0, aMeasures)

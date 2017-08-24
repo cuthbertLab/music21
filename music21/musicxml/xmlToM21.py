@@ -67,7 +67,13 @@ class XMLBarException(MusicXMLImportException):
 
 #-------------------------------------------------------------------------------
 # Helpers...
-
+def _clean(badStr):
+    # need to remove badly-formed strings
+    if badStr is None:
+        return None
+    badStr = badStr.strip()
+    goodStr = badStr.replace('\n', ' ')
+    return goodStr
 # Durations
 
 def musicXMLTypeToType(value):
@@ -818,7 +824,7 @@ class MusicXMLImporter(XMLParserBase):
             return s
 
     def xmlPartToPart(self, mxPart, partIdDict):
-        parser = PartParser(mxPart, mxPartInfo=partIdDict, parent=self)
+        parser = PartParser(mxPart, mxScorePart=partIdDict, parent=self)
         parser.parse()
         if parser.appendToScoreAfterParse is True:
             return parser.stream
@@ -1036,10 +1042,10 @@ class MusicXMLImporter(XMLParserBase):
         >>> st = MI.stream.style
         
         >>> st.lineWidths
-        [('beam', 5.0), ('ledger', 1.5625)]
+        [('beam', 5), ('ledger', 1.5625)]
         
         >>> st.noteSizes
-        [('grace', 60.0)]
+        [('grace', 60)]
         
         >>> st.distances
         [('hyphen', 0.5)]
@@ -1049,19 +1055,19 @@ class MusicXMLImporter(XMLParserBase):
         '''
         for mxLineWidth in mxAppearance.findall('line-width'):
             lineWidthType = mxLineWidth.get('type') # required
-            lineWidthValue = float(mxLineWidth.text)
+            lineWidthValue = common.numToIntOrFloat(mxLineWidth.text)
             lineWidthInfo = (lineWidthType, lineWidthValue)
             self.stream.style.lineWidths.append(lineWidthInfo)
             
         for mxNoteSize in mxAppearance.findall('note-size'):
             noteSizeType = mxNoteSize.get('type') # required
-            noteSizeValue = float(mxNoteSize.text)
+            noteSizeValue = common.numToIntOrFloat(mxNoteSize.text)
             noteSizeInfo = (noteSizeType, noteSizeValue)
             self.stream.style.noteSizes.append(noteSizeInfo)
 
         for mxDistance in mxAppearance.findall('distance'):
             distanceType = mxDistance.get('type') # required
-            distanceValue = float(mxDistance.text)
+            distanceValue = common.numToIntOrFloat(mxDistance.text)
             distanceInfo = (distanceType, distanceValue)
             self.stream.style.distances.append(distanceInfo)
 
@@ -1296,10 +1302,11 @@ class PartParser(XMLParserBase):
 
     called out for multiprocessing potential in future
     '''
-    def __init__(self, mxPart=None, mxPartInfo=None, parent=None):
+    def __init__(self, mxPart=None, mxScorePart=None, parent=None):
         super().__init__()
         self.mxPart = mxPart
-        self.mxPartInfo = mxPartInfo
+        self.mxScorePart = mxScorePart
+        
         if mxPart is not None:
             self.partId = mxPart.get('id')
             if self.partId is None and parent is not None:
@@ -1343,7 +1350,10 @@ class PartParser(XMLParserBase):
         return common.unwrapWeakref(self._parent)
 
     def parse(self):
-        self.parsePartInfo()
+        '''
+        Run the parser on a single part
+        '''
+        self.parseXmlScorePart()
         self.parseMeasures()
         self.stream.atSoundingPitch = self.atSoundingPitch
 
@@ -1369,7 +1379,112 @@ class PartParser(XMLParserBase):
             self.stream.addGroupForElements(self.partId) # set group for components
             self.stream.groups.append(self.partId) # set group for stream itself
 
+    def parseXmlScorePart(self):
+        '''
+        The <score-part> tag contains a lot of information about the
+        Part itself.  It was found in the <part-list> in the ScoreParser but
+        was not parsed and instead passed into the PartParser as .mxScorePart.
+        
+        Sets the stream.partName, stream.partAbbreivation, self.activeInstrument,
+        and inserts an instrument at the beginning of the stream.
+
+        The instrumentObj being configured comes from self.getDefaultInstrument.
+        '''
+        part = self.stream
+        mxScorePart = self.mxScorePart
+        
+        seta = _setAttributeFromTagText
+        # put part info into the Part object and retrieve it later...
+        seta(part, mxScorePart, 'part-name', transform=_clean)              
+        # This will later be put in the default instrument object also also...
+
+        # TODO: partNameDisplay
+        seta(part, mxScorePart, 'part-abbreviation', transform=_clean)
+        # This will later be put in instrument.partAbbreviation also...
+
+        # TODO: partAbbreviationDisplay
+
+        instrumentObj = self.getDefaultInstrument()
+        #self.firstInstrumentObject = instrumentObj # not used.
+        if instrumentObj.bestName() is not None:
+            part.id = instrumentObj.bestName()
+        self.activeInstrument = instrumentObj
+
+        part.partName = instrumentObj.partName
+        part.partAbbreviation = instrumentObj.partAbbreviation
+        part.coreInsert(0.0, instrumentObj) # add instrument at zero offset
+
+    def getDefaultInstrument(self, mxScorePart=None):
+        r'''
+        >>> scorePart = (r'<score-part id="P4"><part-name>Bass</part-name>' +
+        ...     '<part-abbreviation>B.</part-abbreviation>' +
+        ...     '<score-instrument id="P4-I4">' +
+        ...     '    <instrument-name>Instrument 4</instrument-name>' +
+        ...     '</score-instrument>' +
+        ...     '<midi-instrument id="P4-I4">' +
+        ...     '   <midi-channel>4</midi-channel>' +
+        ...     '<midi-program>1</midi-program>' +
+        ...     '</midi-instrument>' +
+        ...     '</score-part>')
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> PP = musicxml.xmlToM21.PartParser()
+
+        >>> mxScorePart = EL(scorePart)
+        >>> i = PP.getDefaultInstrument(mxScorePart)
+        >>> i.instrumentName
+        'Instrument 4'
+        '''
+        if mxScorePart is None:
+            mxScorePart = self.mxScorePart
+
+        def _adjustMidiData(mc):
+            return int(mc) - 1
+
+        seta = _setAttributeFromTagText
+
+        #print(ET.tostring(mxScorePart, encoding='unicode'))
+        i = instrument.Instrument()
+        i.partId = self.partId
+        i.groups.append(self.partId)
+        i.partName = self.stream.partName
+        i.partAbbreviation = self.stream.partAbbreviation
+        # TODO: groups
+
+        # for now, just get first instrument
+        # TODO: get all instruments!
+        mxScoreInstrument = mxScorePart.find('score-instrument')
+        if mxScoreInstrument is not None:
+            seta(i, mxScoreInstrument, 'instrument-name', transform=_clean)
+            seta(i, mxScoreInstrument, 'instrument-abbreviation', transform=_clean)
+        # TODO: instrument-sound
+        # TODO: solo / ensemble
+        # TODO: virtual-instrument
+        # TODO: store id attribute somewhere
+
+        # for now, just get first midi instrument
+        # TODO: get all
+        # TODO: midi-device
+        mxMIDIInstrument = mxScorePart.find('midi-instrument')
+        # TODO: midi-name
+        # TODO: midi-bank transform=_adjustMidiData
+        # TODO: midi-unpitched
+        # TODO: midi-volume
+        # TODO: pan
+        # TODO: elevation
+        # TODO: store id attribute somewhere
+        if mxMIDIInstrument is not None:
+            seta(i, mxMIDIInstrument, 'midi-program', transform=_adjustMidiData)
+            seta(i, mxMIDIInstrument, 'midi-channel', transform=_adjustMidiData)
+
+        # TODO: reclassify
+        return i
+
+
+
     def parseMeasures(self):
+        '''
+        Parse each <measure> tag using self.xmlMeasureToMeasure
+        '''
         part = self.stream
         for mxMeasure in self.mxPart.iterfind('measure'):
             self.xmlMeasureToMeasure(mxMeasure)
@@ -1744,109 +1859,6 @@ class PartParser(XMLParserBase):
                         self.lastMeasureWasShort = False
 
         self.lastMeasureOffset += mOffsetShift
-
-
-    def parsePartInfo(self):
-        '''
-        Sets the stream.partName, stream.partAbbreivation, self.activeInstrument,
-        and inserts an instrument at the beginning of the stream.
-
-        The instrumentObj being configured comes from self.getDefaultInstrument.
-        '''
-        instrumentObj = self.getDefaultInstrument()
-        #self.firstInstrumentObject = instrumentObj # not used.
-        if instrumentObj.bestName() is not None:
-            self.stream.id = instrumentObj.bestName()
-        self.activeInstrument = instrumentObj
-
-        self.stream.partName = instrumentObj.partName
-        self.stream.partAbbreviation = instrumentObj.partAbbreviation
-        self.stream.coreInsert(0.0, instrumentObj) # add instrument at zero offset
-
-    def getDefaultInstrument(self, mxPartInfo=None):
-        r'''
-        >>> scorePart = (r'<score-part id="P4"><part-name>Bass</part-name>' +
-        ...     '<part-abbreviation>B.</part-abbreviation>' +
-        ...     '<score-instrument id="P4-I4">' +
-        ...     '    <instrument-name>Instrument 4</instrument-name>' +
-        ...     '</score-instrument>' +
-        ...     '<midi-instrument id="P4-I4">' +
-        ...     '   <midi-channel>4</midi-channel>' +
-        ...     '<midi-program>1</midi-program>' +
-        ...     '</midi-instrument>' +
-        ...     '</score-part>')
-        >>> from xml.etree.ElementTree import fromstring as EL
-        >>> PP = musicxml.xmlToM21.PartParser()
-
-        >>> mxPartInfo = EL(scorePart)
-        >>> i = PP.getDefaultInstrument(mxPartInfo)
-        >>> i.partName
-        'Bass'
-        >>> i.partAbbreviation
-        'B.'
-        '''
-        if mxPartInfo is None:
-            mxInfo = self.mxPartInfo
-        else:
-            mxInfo = mxPartInfo
-
-        def _clean(badStr):
-            # need to remove badly-formed strings
-            if badStr is None:
-                return None
-            badStr = badStr.strip()
-            goodStr = badStr.replace('\n', ' ')
-            return goodStr
-
-        def _adjustMidiData(mc):
-            return int(mc) - 1
-
-        seta = _setAttributeFromTagText
-
-        #print(ET.tostring(mxInfo, encoding='unicode'))
-        i = instrument.Instrument()
-        i.partId = self.partId
-        i.groups.append(self.partId)
-
-        # put part info into the instrument object and retrieve it later...
-        seta(i, mxInfo, 'part-name', transform=_clean)
-        # This will later be put in part.partName also...
-
-        # TODO: partNameDisplay
-        seta(i, mxInfo, 'part-abbreviation', transform=_clean)
-        # This will later be put in part.partAbbreviation also...
-
-        # TODO: partAbbreviationDisplay
-        # TODO: groups
-
-        # for now, just get first instrument
-        # TODO: get all instruments!
-        mxScoreInstrument = mxInfo.find('score-instrument')
-        if mxScoreInstrument is not None:
-            seta(i, mxScoreInstrument, 'instrument-name', transform=_clean)
-            seta(i, mxScoreInstrument, 'instrument-abbreviation', transform=_clean)
-        # TODO: instrument-sound
-        # TODO: solo / ensemble
-        # TODO: virtual-instrument
-        # TODO: store id attribute somewhere
-
-        # for now, just get first midi instrument
-        # TODO: get all
-        # TODO: midi-device
-        mxMIDIInstrument = mxInfo.find('midi-instrument')
-        # TODO: midi-name
-        # TODO: midi-bank transform=_adjustMidiData
-        # TODO: midi-unpitched
-        # TODO: midi-volume
-        # TODO: pan
-        # TODO: elevation
-        # TODO: store id attribute somewhere
-        if mxMIDIInstrument is not None:
-            seta(i, mxMIDIInstrument, 'midi-program', transform=_adjustMidiData)
-            seta(i, mxMIDIInstrument, 'midi-channel', transform=_adjustMidiData)
-
-        # TODO: reclassify
-        return i
 
     def applyMultiMeasureRest(self, r):
         '''
@@ -2812,7 +2824,7 @@ class MeasureParser(XMLParserBase):
         # a duration. they may be filtered out at the level of Stream
         # processing
         if mxNote.get('print-object') == 'no':
-            n.hideObjectOnPrint = True
+            n.style.hideObjectOnPrint = True
         # TODO: attr dynamics -- MIDI Note On velocity
         # TODO: attr end-dynamics -- MIDI Note Off velocity
         # TODO: attr attack -- alter starting time of the note

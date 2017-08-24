@@ -392,7 +392,6 @@ class ClassDocumenter(ObjectDocumenter):
        :columns: 3
        - :attr:`~music21.base.Music21Object.classSortOrder`
        - :attr:`~music21.base.Music21Object.groups`
-       - :attr:`~music21.base.Music21Object.hideObjectOnPrint`
        - :attr:`~music21.base.Music21Object.id`
        - :attr:`~music21.base.Music21Object.isStream`
     '''

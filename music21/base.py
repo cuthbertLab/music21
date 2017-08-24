@@ -355,9 +355,6 @@ class Music21Object:
             >>> ec1.classSortOrder
             5
             ''',
-        'hideObjectOnPrint': '''if set to `True` will not print upon output
-            (only used in MusicXML output at this point and
-            Lilypond for notes, chords, and rests).''',
         }
 
     def __init__(self, *arguments, **keywords):
@@ -380,8 +377,6 @@ class Music21Object:
         # private duration storage; managed by property
         self._duration = None
         self._priority = 0 # default is zero
-
-        self.hideObjectOnPrint = False
 
         if "id" in keywords:
             self.id = keywords["id"]

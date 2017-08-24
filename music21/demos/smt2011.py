@@ -87,7 +87,7 @@ def chordsToAnalysis(chordStream, manifest, scale):
         # need to hide rests
         if len(m.notes) == 0:
             r = note.Rest(quarterLength=4)
-            r.hideObjectOnPrint = True
+            r.style.hideObjectOnPrint = True
             m.append(r)
 
     return measureTemplate

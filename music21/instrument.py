@@ -142,15 +142,21 @@ class Instrument(base.Music21Object):
         
         self.partName = None
         self.partAbbreviation = None
+        
+        self.printPartName = None # True = yes, False = no, None = let others decide
+        self.printPartAbbreviation = None
+        
 
         self.instrumentId = None # apply to midi and instrument
         self._instrumentIdIsRandom = False
 
+        
         self.instrumentName = None
         self.instrumentAbbreviation = None
         self.midiProgram = None
         self.midiChannel = None
-
+        self.instrumentSound = None
+        
         self.lowestNote = None
         self.highestNote = None
 
@@ -288,6 +294,7 @@ class KeyboardInstrument(Instrument):
         super().__init__()
         self.instrumentName = 'Keyboard'
         self.instrumentAbbreviation = 'Kb'
+        self.instrumentSound = 'keyboard.piano'
 
 class Piano(KeyboardInstrument):
     '''
@@ -318,6 +325,7 @@ class Harpsichord(KeyboardInstrument):
         self.instrumentName = 'Harpsichord'
         self.instrumentAbbreviation = 'Hpschd'
         self.midiProgram = 6
+        self.instrumentSound = 'keyboard.harpsichord'
 
         self.lowestNote = pitch.Pitch('F1')
         self.highestNote = pitch.Pitch('F6')
@@ -329,6 +337,7 @@ class Clavichord(KeyboardInstrument):
         self.instrumentName = 'Clavichord'
         self.instrumentAbbreviation = 'Clv'
         self.midiProgram = 7
+        self.instrumentSound = 'keyboard.clavichord'
 
         #TODO: self.lowestNote = pitch.Pitch('')
         #TODO: self.highestNote = pitch.Pitch('')
@@ -340,14 +349,15 @@ class Celesta(KeyboardInstrument):
         self.instrumentName = 'Celesta'
         self.instrumentAbbreviation = 'Clst'
         self.midiProgram = 8
-
+        self.instrumentSound = 'keyboard.celesta'
 
 #-------------------------------------------------------------------------------
 class Organ(Instrument):
     def __init__(self):
         super().__init__()
-
+        self.instrumentName = 'Organ'
         self.midiProgram = 19
+        self.instrumentSound = 'keyboard.organ'
 
 class PipeOrgan(Organ):
     def __init__(self):
@@ -356,7 +366,7 @@ class PipeOrgan(Organ):
         self.instrumentName = 'Pipe Organ'
         self.instrumentAbbreviation = 'P Org'
         self.midiProgram = 19
-
+        self.instrumentSound = 'keyboard.organ.pipe'
         self.lowestNote = pitch.Pitch('C2')
         self.highestNote = pitch.Pitch('C6')
 
@@ -367,7 +377,7 @@ class ElectricOrgan(Organ):
         self.instrumentName = 'Electric Organ'
         self.instrumentAbbreviation = 'Elec Org'
         self.midiProgram = 16
-
+        
         self.lowestNote = pitch.Pitch('C2')
         self.highestNote = pitch.Pitch('C6')
 
@@ -378,7 +388,8 @@ class ReedOrgan(Organ):
         self.instrumentName = 'Reed Organ'
         #TODO self.instrumentAbbreviation = ''
         self.midiProgram = 20
-
+        self.instrumentSound = 'keyboard.organ.reed'
+        
         self.lowestNote = pitch.Pitch('C2')
         self.highestNote = pitch.Pitch('C6')
 
@@ -389,18 +400,20 @@ class Accordion(Organ):
         self.instrumentName = 'Accordion'
         self.instrumentAbbreviation = 'Acc'
         self.midiProgram = 21
-
+        self.instrumentSound = 'keyboard.accordion'
+        
         self.lowestNote = pitch.Pitch('F3')
         self.highestNote = pitch.Pitch('A6')
 
-class Harmonica(Organ):
+class Harmonica(Instrument):
     def __init__(self):
         super().__init__()
 
         self.instrumentName = 'Harmonica'
         self.instrumentAbbreviation = 'Hmca'
         self.midiProgram = 22
-
+        self.instrumentSound = 'wind.reed.harmonica'
+        
         self.lowestNote = pitch.Pitch('C3')
         self.highestNote = pitch.Pitch('C6')
 
@@ -470,6 +483,7 @@ class Violin(StringInstrument):
         self.instrumentName = 'Violin'
         self.instrumentAbbreviation = 'Vln'
         self.midiProgram = 40
+        self.instrumentSound = 'strings.violin'
 
         self.lowestNote = pitch.Pitch('G3')
         self._stringPitches = ['G3', 'D4', 'A4', 'E5']
@@ -481,6 +495,7 @@ class Viola(StringInstrument):
         self.instrumentName = 'Viola'
         self.instrumentAbbreviation = 'Vla'
         self.midiProgram = 41
+        self.instrumentSound = 'strings.viola'
 
         self.lowestNote = pitch.Pitch('C3')
         self._stringPitches = ['C3', 'G3', 'D4', 'A4']
@@ -492,6 +507,7 @@ class Violoncello(StringInstrument):
         self.instrumentName = 'Violoncello'
         self.instrumentAbbreviation = 'Vc'
         self.midiProgram = 42
+        self.instrumentSound = 'strings.cello'
 
         self.lowestNote = pitch.Pitch('C2')
         self._stringPitches = ['C2', 'G2', 'D3', 'A3']
@@ -509,6 +525,7 @@ class Contrabass(StringInstrument):
         self.instrumentName = 'Contrabass'
         self.instrumentAbbreviation = 'Cb'
         self.midiProgram = 43
+        self.instrumentSound = 'strings.contrabass'
 
         self.lowestNote = pitch.Pitch('E2')
         self._stringPitches = ['E1', 'A1', 'D2', 'G2']
@@ -521,6 +538,7 @@ class Harp(StringInstrument):
         self.instrumentName = 'Harp'
         self.instrumentAbbreviation = 'Hp'
         self.midiProgram = 46
+        self.instrumentSound = 'pluck.harp'
 
         self.lowestNote = pitch.Pitch('C1')
         self.highestNote = pitch.Pitch('G#7')
@@ -533,6 +551,7 @@ class Guitar(StringInstrument):
         self.instrumentName = 'Guitar'
         self.instrumentAbbreviation = 'Gtr'
         self.midiProgram = 24  # default -- Acoustic
+        self.instrumentSound = 'pluck.guitar'
 
         self.lowestNote = pitch.Pitch('E2')
         self._stringPitches = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4']
@@ -544,6 +563,7 @@ class AcousticGuitar(Guitar):
         self.instrumentName = 'Acoustic Guitar'
         self.instrumentAbbreviation = 'Ac Gtr'
         self.midiProgram = 24
+        self.instrumentSound = 'pluck.guitar.acoustic'
 
 class ElectricGuitar(Guitar):
     def __init__(self):
@@ -552,7 +572,8 @@ class ElectricGuitar(Guitar):
         self.instrumentName = 'Electric Guitar'
         self.instrumentAbbreviation = 'Elec Gtr'
         self.midiProgram = 26
-
+        self.instrumentSound = 'pluck.guitar.electric'
+        
 class AcousticBass(Guitar):
     def __init__(self):
         super().__init__()
@@ -560,7 +581,8 @@ class AcousticBass(Guitar):
         self.instrumentName = 'Acoustic Bass'
         self.instrumentAbbreviation = 'Ac b'
         self.midiProgram = 32
-
+        self.instrumentSound = 'pluck.bass.acoustic'
+        
         self.lowestNote = pitch.Pitch('E1')
         self._stringPitches = ['E1', 'A1', 'D2', 'G2']
 
@@ -571,6 +593,7 @@ class ElectricBass(Guitar):
         self.instrumentName = 'Electric Bass'
         self.instrumentAbbreviation = 'Elec b'
         self.midiProgram = 33
+        self.instrumentSound = 'pluck.bass.electric'
 
         self.lowestNote = pitch.Pitch('E1')
         self._stringPitches = ['E1', 'A1', 'D2', 'G2']
@@ -582,6 +605,7 @@ class FretlessBass(Guitar):
         self.instrumentName = 'Fretless Bass'
         #TODO: self.instrumentAbbreviation = ''
         self.midiProgram = 35
+        self.instrumentSound = 'pluck.bass.fretless'
 
         self.lowestNote = pitch.Pitch('E1')
         self._stringPitches = ['E1', 'A1', 'D2', 'G2']
@@ -593,6 +617,7 @@ class Mandolin(StringInstrument):
 
         self.instrumentName = 'Mandolin'
         self.instrumentAbbreviation = 'Mdln'
+        self.instrumentSound = 'pluck.mandolin'
 
         self.lowestNote = pitch.Pitch('G3')
         self._stringPitches = ['G3', 'D4', 'A4', 'E5']
@@ -603,6 +628,7 @@ class Ukulele(StringInstrument):
 
         self.instrumentName = 'Ukulele'
         self.instrumentAbbreviation = 'Uke'
+        self.instrumentSound = 'pluck.ukulele'
 
         self.lowestNote = pitch.Pitch('C4')
         self._stringPitches = ['G4', 'C4', 'E4', 'A4']
