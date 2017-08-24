@@ -231,6 +231,7 @@ class Metadata(base.Music21Object):
         >>> c.metadata.all()
         [('arranger', 'Michael Scott Cuthbert'),
          ('composer', 'Arcangelo Corelli'),
+         ('copyright', '© 2014, Creative Commons License (CC-BY)'),
          ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
 
         Skip contributors is there to help with musicxml parsing -- there's no reason for it
@@ -239,7 +240,8 @@ class Metadata(base.Music21Object):
         >>> c.metadata.date = metadata.DateRelative('1689', 'onOrBefore')
         >>> c.metadata.localeOfComposition = 'Rome'
         >>> c.metadata.all(skipContributors=True)
-        [('date', '1689/--/-- or earlier'),
+        [('copyright', '© 2014, Creative Commons License (CC-BY)'),
+         ('date', '1689/--/-- or earlier'),
          ('localeOfComposition', 'Rome'),
          ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
         '''

@@ -12,6 +12,7 @@ and copyrighted by the Lilypond project.
 import os
 import unittest
 
+import warnings
 from music21 import converter
 from music21 import common
 
@@ -31,7 +32,9 @@ class Test(unittest.TestCase):
     
     def testAll(self):
         for f in allFiles():
-            converter.parse(f)
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter('always')
+                converter.parse(f)
             
 if __name__ == '__main__':
     import music21
