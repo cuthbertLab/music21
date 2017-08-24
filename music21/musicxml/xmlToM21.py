@@ -2211,8 +2211,12 @@ class MeasureParser(XMLParserBase):
         self.offsetMeasureNote -= change
 
     def xmlForward(self, mxObj):
-        # TODO: add a floating rest...
         change = float(mxObj.find('duration').text.strip()) / self.divisions
+        r = note.Rest()
+        r.duration.quarterLength = change
+        r.style.hideObjectOnPrint = True
+        self.stream.coreElementsChanged()
+        self.stream.append(r)
         self.offsetMeasureNote += change
 
     def xmlPrint(self, mxPrint):

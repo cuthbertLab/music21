@@ -151,7 +151,7 @@ class SlottedObjectMixin:
         we need to preserve the order:
 
         >>> sorted(list(sSet))
-        ['direction', 'id', 'independentAngle', 'number', 'type']
+        ['_editorial', '_style', 'direction', 'id', 'independentAngle', 'number', 'type']
 
         When a normal Beam won't cut it...
 
@@ -161,7 +161,8 @@ class SlottedObjectMixin:
         >>> fb = FunkyBeam()
         >>> sSet = fb._getSlotsRecursive()
         >>> sorted(list(sSet))
-        ['direction', 'funkiness', 'groovability', 'id', 'independentAngle', 'number', 'type']
+        ['_editorial', '_style', 'direction', 'funkiness', 'groovability', 
+            'id', 'independentAngle', 'number', 'type']
         '''
         slots = set()
         for cls in self.__class__.mro():

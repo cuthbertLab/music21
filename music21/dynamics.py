@@ -335,7 +335,7 @@ class Dynamic(base.Music21Object):
         <?xml...
         <direction>
             <direction-type>
-              <dynamics default-x="-36" default-y="-80" halign="left" valign="top">
+              <dynamics default-x="-36" default-y="-80">
                 <mf />
               </dynamics>
             </direction-type>

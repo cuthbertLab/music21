@@ -805,7 +805,7 @@ class Music21Object:
         >>> n = note.Note()
         >>> st = n.style
         >>> st
-        <music21.style.Style object at 0x10ba96208>
+        <music21.style.NoteStyle object at 0x10ba96208>
         >>> st.absoluteX = 20.0
         >>> st.absoluteX
         20.0
@@ -4156,6 +4156,7 @@ class Test(unittest.TestCase):
 
     def testPickupMeauresImported(self):
         from music21 import corpus
+        self.maxDiff = None
         s = corpus.parse('bach/bwv103.6')
 
         p = s.parts['soprano']
@@ -4175,7 +4176,7 @@ class Test(unittest.TestCase):
                           36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0,
                           44.0, 45.0, 47.0, 48.0, 48.5, 49.0, 50.0, 51.0,
                           52.0, 53.0, 54.0, 55.0, 56.0, 57.0, 58.0, 59.0,
-                          60.0, 60.5, 61.0, 63.0] )
+                          60.0, 60.5, 61.0, 63.0, 64.0] )
 
 
     def testHighestTime(self):
