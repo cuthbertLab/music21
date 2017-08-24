@@ -786,8 +786,8 @@ class Copyright(Text):
     >>> copyleft
     <music21.metadata.primitives.Copyright Copyright 1969 Cuthbert>
     >>> copyleft.role
-    'fictious'
-    >>> str(copyleft')
+    'fictitious'
+    >>> str(copyleft)
     'Copyright 1969 Cuthbert'
     '''
     def __init__(self, data='', language=None, *, role=None):
