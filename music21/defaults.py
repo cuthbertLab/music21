@@ -15,6 +15,7 @@ Simple storage for data defaults used throughout music21.
 
 
 import unittest
+from music21 import _version
 
 # note: this module should not import any higher level modules
 
@@ -34,7 +35,8 @@ class DefaultsException(Exception):
 
 title = 'Music21 Fragment'
 author = 'Music21'
-software = 'Music21' # used in xml encoding source software
+software = 'music21 v.' + _version.__version__ # used in xml encoding source software
+musicxmlVersion = '3.1'
 
 meterNumerator = 4
 meterDenominator = 'quarter'

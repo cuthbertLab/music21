@@ -49,6 +49,7 @@ from music21 import spanner
 from music21 import tie
 from music21 import repeat
 from music21 import sites
+from music21 import style
 from music21 import tempo
 
 from music21.stream import core
@@ -159,6 +160,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     isMeasure = False
     classSortOrder = -20
     recursionType = 'elementsFirst'
+
+    _styleClass = style.StreamStyle
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['append', 'insert', 'storeAtEnd', 'insertAndShift',

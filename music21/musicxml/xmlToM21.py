@@ -48,6 +48,7 @@ from music21 import pitch
 from music21 import repeat
 from music21 import spanner
 from music21 import stream
+from music21 import style
 from music21 import tempo
 from music21 import text # for text boxes
 from music21 import tie
@@ -293,7 +294,11 @@ class XMLParserBase:
         >>> m21Obj.style.hideObjectOnPrint
         True
         '''
-        stObj = None
+        if isinstance(m21Object, style.Style):
+            stObj = m21Object
+        else:
+            stObj = None
+        
         for xmlName, m21Name in zip(musicXMLNames, m21Names):
             mxValue = mxObject.get(xmlName)
             if mxValue is None:
@@ -935,13 +940,137 @@ class MusicXMLImporter(XMLParserBase):
             staffLayout = self.xmlStaffLayoutToStaffLayout(mxStaffLayout)
             scoreLayout.staffLayoutList.append(staffLayout)
 
-        # TODO: appearance
-        # TODO: music-font
-        # TODO: word-font
-        # TODO: lyric-font
-        # TODO: lyric-language
+        self.styleFromXmlDefaults(mxDefaults)
 
         return scoreLayout
+
+    def styleFromXmlDefaults(self, mxDefaults):
+        '''
+        Set the appearance and font information from mxDefault
+        <appearance>, <music-font>, <word-font>, <lyric-font> (multiple),
+        and <lyric-language> tags.
+        
+        Here the demo does not include the <appearance> tag since that is 
+        documented in `xmlAppearanceToStyle`
+        
+        >>> import xml.etree.ElementTree as ET
+        >>> defaults = ET.fromstring('<defaults>'
+        ...          + '<music-font font-family="Maestro, Opus" font-weight="bold" />'
+        ...          + '<word-font font-family="Garamond" font-style="italic" />'
+        ...          + '<lyric-font name="verse" font-size="12" />'
+        ...          + '<lyric-font name="chorus" font-size="14" />'
+        ...          + '<lyric-language name="verse" xml:lang="fr" />'
+        ...          + '<lyric-language name="chorus" xml:lang="en" />'
+        ...          + '</defaults>')
+        
+        >>> MI = musicxml.xmlToM21.MusicXMLImporter()
+        >>> MI.styleFromXmlDefaults(defaults)
+        >>> st = MI.stream.style
+        >>> st.musicFont
+        <music21.style.TextStyle object at 0x10535c0f0>
+        >>> st.musicFont.fontFamily
+        ['Maestro', 'Opus']
+        >>> st.musicFont.fontWeight
+        'bold'
+        >>> st.wordFont.fontFamily
+        ['Garamond']
+        >>> st.wordFont.fontStyle
+        'italic'
+        >>> len(st.lyricFonts)
+        2
+        >>> st.lyricFonts[0]
+        ('verse', <music21.style.TextStyle object at 0x10535d438>)
+        >>> st.lyricFonts[0][1].fontSize
+        12
+        >>> st.lyricLanguages
+        [('verse', 'fr'), ('chorus', 'en')]
+        '''
+        mxAppearance = mxDefaults.find('appearance')
+        if mxAppearance is not None:
+            self.xmlAppearanceToStyle(mxAppearance)
+
+        mxMusicFont = mxDefaults.find('music-font')
+        if mxMusicFont is not None:            
+            st = style.TextStyle()
+            self.setFont(mxMusicFont, st)            
+            self.stream.style.musicFont = st
+
+        mxWordFont = mxDefaults.find('word-font')
+        if mxWordFont is not None:            
+            st = style.TextStyle()
+            self.setFont(mxWordFont, st)            
+            self.stream.style.wordFont = st
+        
+        for mxLyricFont in mxDefaults.findall('lyric-font'):
+            st = style.TextStyle()
+            self.setFont(mxLyricFont, st)
+            lyricName = mxLyricFont.get('name')
+            styleTuple = (lyricName, st)
+            self.stream.style.lyricFonts.append(styleTuple)
+
+        for mxLyricLanguage in mxDefaults.findall('lyric-language'):
+            lyricName = mxLyricLanguage.get('name')
+            for key, value in mxLyricLanguage.attrib.items():
+                # {http://www.w3.org/XML/1998/namespace}lang
+                if key.endswith('}lang'): 
+                    lyricLanguage = value
+                    break
+            lyricTuple = lyricName, lyricLanguage
+            self.stream.style.lyricLanguages.append(lyricTuple)
+
+    def xmlAppearanceToStyle(self, mxAppearance):
+        '''
+        Parse the appearance tag for information about line widths and note sizes
+        
+        >>> import xml.etree.ElementTree as ET
+        >>> appear = ET.fromstring('<appearance>'
+        ...          + '<line-width type="beam">5</line-width>'
+        ...          + '<line-width type="ledger">1.5625</line-width>'
+        ...          + '<note-size type="grace">60</note-size>'
+        ...          + '<distance type="hyphen">0.5</distance>'
+        ...          + '<other-appearance type="sharps">dotted</other-appearance>'
+        ...          + '</appearance>')
+        
+        >>> MI = musicxml.xmlToM21.MusicXMLImporter()
+        >>> MI.xmlAppearanceToStyle(appear)
+        >>> st = MI.stream.style
+        
+        >>> st.lineWidths
+        [('beam', 5.0), ('ledger', 1.5625)]
+        
+        >>> st.noteSizes
+        [('grace', 60.0)]
+        
+        >>> st.distances
+        [('hyphen', 0.5)]
+        
+        >>> st.otherAppearances
+        [('sharps', 'dotted')]
+        '''
+        for mxLineWidth in mxAppearance.findall('line-width'):
+            lineWidthType = mxLineWidth.get('type') # required
+            lineWidthValue = float(mxLineWidth.text)
+            lineWidthInfo = (lineWidthType, lineWidthValue)
+            self.stream.style.lineWidths.append(lineWidthInfo)
+            
+        for mxNoteSize in mxAppearance.findall('note-size'):
+            noteSizeType = mxNoteSize.get('type') # required
+            noteSizeValue = float(mxNoteSize.text)
+            noteSizeInfo = (noteSizeType, noteSizeValue)
+            self.stream.style.noteSizes.append(noteSizeInfo)
+
+        for mxDistance in mxAppearance.findall('distance'):
+            distanceType = mxDistance.get('type') # required
+            distanceValue = float(mxDistance.text)
+            distanceInfo = (distanceType, distanceValue)
+            self.stream.style.distances.append(distanceInfo)
+
+        for mxOther in mxAppearance.findall('other-appearance'):
+            otherType = mxOther.get('type') # required
+            otherValue = mxOther.text # value can be anything
+            otherInfo = (otherType, otherValue)
+            self.stream.style.otherAppearances.append(otherInfo)
+
 
 
     def partGroups(self):
@@ -1020,10 +1149,12 @@ class MusicXMLImporter(XMLParserBase):
 
     def identificationToMetadata(self, identification, inputM21=None):
         '''
-        Converters an <identification> tag, containing <creator> tags and
+        Converter an <identification> tag, containing <creator> tags, <rights> tags, and
         <miscellaneous> tag.
 
-        Not supported: rights, source, relation
+        Not supported: source, relation
+
+        Only the first <rights> tag is supported
 
         Encoding only parses "supports" and that only has
         new-system (definesExplicitSystemBreaks) and
@@ -1037,18 +1168,36 @@ class MusicXMLImporter(XMLParserBase):
         for creator in identification.findall('creator'):
             c = self.creatorToContributor(creator)
             md.addContributor(c)
+            
+        for rights in identification.findall('rights'):
+            c = self.rightsToCopyright(rights)
+            md.copyright = c
+            break
+            
         encoding = identification.find('encoding')
         if encoding is not None:
+            # TODO: encoder (text + type = role) multiple
+            # TODO: encoding date multiple
+            # TODO: encoding-description (string) multiple
+            for software in encoding.findall('software'):
+                md.software.append(software.text.strip())
+                
             for supports in encoding.findall('supports'):
+                # todo: element: required
+                # todo: type: required -- not sure of the difference between this and value
+                #         though type is yes-no while value is string
                 attr = supports.get('attribute')
                 value = supports.get('value')
+                if value is None:
+                    value = supports.get('type')
+                    
+                # found in wild: element=accidental type="no" -- No accidentals are indicated
+                # found in wild: transpose
                 if (attr, value) == ('new-system', 'yes'):
                     self.definesExplicitSystemBreaks = True
                 elif (attr, value) == ('new-page', 'yes'):
                     self.definesExplicitPageBreaks = True
 
-        # TODO: rights
-        # TODO: encoding (incl. supports)
         # TODO: source
         # TODO: relation
         miscellaneous = identification.find('miscellaneous')
@@ -1100,7 +1249,7 @@ class MusicXMLImporter(XMLParserBase):
 
         creatorType = creator.get('type')
         if (creatorType is not None
-            and creatorType in metadata.Contributor.roleNames):
+                and creatorType in metadata.Contributor.roleNames):
             c.role = creatorType
 
         creatorText = creator.text
@@ -1108,6 +1257,36 @@ class MusicXMLImporter(XMLParserBase):
             c.name = creatorText.strip()
         if inputM21 is None:
             return c
+
+
+    def rightsToCopyright(self, rights):
+        '''
+        Given an <rights> tag, fill the necessary parameters of a 
+        :class:`~music21.metadata.primitives.Copyright` object.
+
+        >>> import xml.etree.ElementTree as ET
+        >>> rights = ET.fromstring('<rights type="owner">CC-SA-BY</rights>')
+
+        >>> MI = musicxml.xmlToM21.MusicXMLImporter()
+        >>> c = MI.rightsToCopyright(rights)
+        >>> c
+        <music21.metadata.primitives.Copyright CC-SA-BY>
+        >>> c.role
+        'owner'
+        >>> str(c)
+        'CC-SA-BY'
+        '''
+        rt = rights.text
+        if rt is not None:
+            rt = rt.strip()
+        
+        c = metadata.Copyright(rt)
+
+        coprightType = rights.get('type')
+        if coprightType is not None:
+            c.role = coprightType
+
+        return c
 
 
 #------------------------------------------------------------------------------

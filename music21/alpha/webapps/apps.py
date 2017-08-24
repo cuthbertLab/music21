@@ -98,7 +98,7 @@ def setupConverterApp(agenda):
     >>> print(responseData)
     <?xml version="1.0" ...?>
     <!DOCTYPE score-partwise
-      PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
+      PUBLIC '-//Recordare//DTD MusicXML ... Partwise//EN'
       'http://www.musicxml.org/dtds/partwise.dtd'>
     <score-partwise>
       <movement-title>Music21 Fragment</movement-title>

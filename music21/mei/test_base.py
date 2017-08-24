@@ -98,7 +98,7 @@ class TestMeiToM21Class(unittest.TestCase):
     def testInit4(self):
         '''__init__(): a MusicXML file causes an MeiElementError'''
         inputFile = '''<?xml version="1.0" encoding="UTF-8"?>
-                       <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+                       <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN"
                                                        "http://www.musicxml.org/dtds/partwise.dtd">
                        <score-partwise></score-partwise>'''
         self.assertRaises(base.MeiElementError, base.MeiToM21Converter, inputFile)
@@ -381,9 +381,9 @@ class TestMetadata(unittest.TestCase):
         documentRoot = mock.MagicMock(spec_set=ETree.Element)
         mockWork = mock.MagicMock(spec_set=ETree.Element)
         documentRoot.find.return_value = mockWork
-        mockDate.side_effect = lambda x, y: y
-        mockComposer.side_effect = lambda x, y: y
-        mockTitle.side_effect = lambda x, y: y
+        mockDate.side_effect = lambda unused, y: y
+        mockComposer.side_effect = lambda unused, y: y
+        mockTitle.side_effect = lambda unused, y: y
 
         actual = base.makeMetadata(documentRoot)
 
@@ -731,7 +731,7 @@ class TestAttrTranslators(unittest.TestCase):
         '''_makeArticList(): properly handles multi-articulation lists'''
         attr = 'acc stacc marc'
         mockReturns = [['accent'], ['staccato'], ['marcato']]
-        mockArtic.side_effect = lambda x: mockReturns.pop(0)
+        mockArtic.side_effect = lambda unused: mockReturns.pop(0)
         expected = ['accent', 'staccato', 'marcato']
         actual = base._makeArticList(attr)
         self.assertEqual(expected, actual)
@@ -741,7 +741,7 @@ class TestAttrTranslators(unittest.TestCase):
         '''_makeArticList(): properly handles the compound articulations'''
         attr = 'acc marc-stacc marc'
         mockReturns = [['accent'], ['marcato', 'staccato'], ['marcato']]
-        mockArtic.side_effect = lambda *x: mockReturns.pop(0)
+        mockArtic.side_effect = lambda *unused: mockReturns.pop(0)
         expected = ['accent', 'marcato', 'staccato', 'marcato']
         actual = base._makeArticList(attr)
         self.assertEqual(expected, actual)
@@ -1288,7 +1288,8 @@ class TestNoteFromElement(unittest.TestCase):
     @mock.patch('music21.mei.base.safePitch')
     @mock.patch('music21.mei.base.makeDuration')
     @mock.patch('music21.mei.base.verseFromElement')
-    def testUnit6(self, mockVerseFE, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
+    def testUnit6(self, mockVerseFE, unused_mockMakeDuration, 
+                  mockSafePitch, mockProcEmbEl, mockNote):
         '''
         noteFromElement(): test contained <verse>
 
@@ -1314,7 +1315,7 @@ class TestNoteFromElement(unittest.TestCase):
         # verseFromElement() return values
         vfeReturns = [[mock.MagicMock(name='au'), mock.MagicMock(name='luong')],
                       [mock.MagicMock(name='sun')]]
-        def mockVerseFESideEffect(elem, backupN):
+        def mockVerseFESideEffect(elem, unused_backupN):
             "this way we can check it gets called with the right elements"
             assert '{}verse'.format(_MEINS) == elem.tag
             return vfeReturns.pop(0)
@@ -1806,7 +1807,7 @@ class TestClefFromElement(unittest.TestCase):
         expectedGetOrder.extend([mock.ANY for _ in range(1)])
         # additional calls to elem.get(), not part of this test
         elemGetReturns = ['theClefShape', 'theClefShape', 'theClefShape', '2', '8', 'above']
-        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if elemGetReturns else None
+        elem.get.side_effect = lambda *unused: elemGetReturns.pop(0) if elemGetReturns else None
         mockClefFromString.return_value = mock.MagicMock(name='clefFromString()')
         expected = mockClefFromString.return_value
 
@@ -1831,7 +1832,7 @@ class TestClefFromElement(unittest.TestCase):
         expectedGetOrder.extend([mock.ANY for _ in range(1)])
         # additional calls to elem.get(), not part of this test
         elemGetReturns = ['perc']
-        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if elemGetReturns else None
+        elem.get.side_effect = lambda *unused: elemGetReturns.pop(0) if elemGetReturns else None
         mockPercClef.return_value = mock.MagicMock(name='PercussionClef()')
         expected = mockPercClef.return_value
 
@@ -1855,7 +1856,7 @@ class TestClefFromElement(unittest.TestCase):
         expectedGetOrder.extend([mock.ANY for _ in range(1)])
         # additional calls to elem.get(), not part of this test
         elemGetReturns = ['TAB', 'TAB']
-        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if elemGetReturns else None
+        elem.get.side_effect = lambda *unused: elemGetReturns.pop(0) if elemGetReturns else None
         mockPercClef.return_value = mock.MagicMock(name='PercussionClef()')
         expected = mockTabClef.return_value
 
@@ -1927,7 +1928,7 @@ class TestClefFromElement(unittest.TestCase):
         expectedGetOrder.extend([mock.ANY for _ in range(0)])
         # additional calls to elem.get(), not part of this test
         elemGetReturns = ['perc', 'theXMLID', 'theXMLID']
-        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if elemGetReturns else None
+        elem.get.side_effect = lambda *unused: elemGetReturns.pop(0) if elemGetReturns else None
         mockPercClef.return_value = mock.MagicMock(name='PercussionClef()')
         expected = mockPercClef.return_value
 
@@ -1959,7 +1960,7 @@ class TestLayerFromElement(unittest.TestCase):
         theNAttribute = '@n value'
         elem = mock.MagicMock()
         elemGetReturns = [theNAttribute, theNAttribute]
-        elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if elemGetReturns else None
+        elem.get.side_effect = lambda *unused: elemGetReturns.pop(0) if elemGetReturns else None
         expectedGetOrder = [mock.call('n'), mock.call('n')]
         iterfindReturn = [mock.MagicMock(name='note1'),
                           mock.MagicMock(name='imaginary'),
@@ -1969,9 +1970,10 @@ class TestLayerFromElement(unittest.TestCase):
         iterfindReturn[2].tag = '{}note'.format(base._MEINS)
         elem.iterfind = mock.MagicMock(return_value=iterfindReturn)
         # "MNFE" is "mockNoteFromElement"
-        expectedMNFEOrder = [mock.call(iterfindReturn[0], None), mock.call(iterfindReturn[2], None)]
+        expectedMNFEOrder = [mock.call(iterfindReturn[0], None), 
+                             mock.call(iterfindReturn[2], None)]
         mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2']
-        mockNoteFromElement.side_effect = lambda *x: mockNFEreturns.pop(0)
+        mockNoteFromElement.side_effect = lambda *unused: mockNFEreturns.pop(0)
         mockTuplets.side_effect = lambda x: x
         mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
         expectedAppendCalls = [mock.call(mockNFEreturns[0]), mock.call(mockNFEreturns[1])]
@@ -2004,9 +2006,10 @@ class TestLayerFromElement(unittest.TestCase):
         iterfindReturn[2].tag = '{}note'.format(base._MEINS)
         elem.iterfind = mock.MagicMock(return_value=iterfindReturn)
         # "MNFE" is "mockNoteFromElement"
-        expectedMNFEOrder = [mock.call(iterfindReturn[0], None), mock.call(iterfindReturn[2], None)]
+        expectedMNFEOrder = [mock.call(iterfindReturn[0], None), 
+                             mock.call(iterfindReturn[2], None)]
         mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2']
-        mockNoteFromElement.side_effect = lambda *x: mockNFEreturns.pop(0)
+        mockNoteFromElement.side_effect = lambda *unused: mockNFEreturns.pop(0)
         mockTuplets.side_effect = lambda x: x
         mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
         expectedAppendCalls = [mock.call(mockNFEreturns[0]), mock.call(mockNFEreturns[1])]
@@ -2044,7 +2047,7 @@ class TestLayerFromElement(unittest.TestCase):
         # "MNFE" is "mockNoteFromElement"
         mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2',
                           'mockNoteFromElement return 1', 'mockNoteFromElement return 2']
-        mockNoteFromElement.side_effect = lambda *x: mockNFEreturns.pop(0)
+        mockNoteFromElement.side_effect = lambda *unused: mockNFEreturns.pop(0)
         mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
 
         self.assertRaises(base.MeiAttributeError, base.layerFromElement, elem)
@@ -2147,7 +2150,8 @@ class TestStaffFromElement(unittest.TestCase):
         expectedMLFEOrder = [mock.call(findallReturn[i], str(i + 1), slurBundle=None)
                              for i in range(len(findallReturn))]
         mockLFEreturns = ['mockLayerFromElement return %i' for i in range(len(findallReturn))]
-        mockLayerFromElement.side_effect = lambda x, y, slurBundle: mockLFEreturns.pop(0)
+        mockLayerFromElement.side_effect = (
+            lambda unused_x, unused_y, unused_slurBundle: mockLFEreturns.pop(0))
         expected = ['mockLayerFromElement return %i' for i in range(len(findallReturn))]
 
         actual = base.staffFromElement(elem)
@@ -2342,7 +2346,9 @@ class TestStaffDefFromElement(unittest.TestCase):
                     'key': mockKey.return_value,
                     'clef': mockClef.return_value}
         # attributes on theMockInstrument that should be set by staffDefFromElement()
-        expectedAttrs = [('partName', 'the label'), ('partAbbreviation', 'the l.'), ('partId', '1'),
+        expectedAttrs = [('partName', 'the label'), 
+                         ('partAbbreviation', 'the l.'), 
+                         ('partId', '1'),
                          ('transposition', mockTrans.return_value)]
 
         # 2.) run
@@ -2373,7 +2379,8 @@ class TestStaffDefFromElement(unittest.TestCase):
         '''
         # 1.) prepare
         elem = ETree.Element('{}staffDef'.format(_MEINS),
-                             attrib={'n': '12', 'clef.line': '2', 'clef.shape': 'G', 'key.sig': '0',
+                             attrib={'n': '12', 'clef.line': '2', 'clef.shape': 'G', 
+                                     'key.sig': '0',
                                      'key.mode': 'major', 'trans.semi': '-3', 'trans.diat': '-2',
                                      'meter.count': '3', 'meter.unit': '8', 'label': 'clarinet'})
 
@@ -2455,7 +2462,8 @@ class TestStaffDefFromElement(unittest.TestCase):
         '''
         # 1.) prepare
         elem = ETree.Element('{}staffDef'.format(_MEINS),
-                             attrib={'n': '12', 'clef.line': '2', 'clef.shape': 'G', 'key.sig': '0',
+                             attrib={'n': '12', 'clef.line': '2', 'clef.shape': 'G', 
+                                     'key.sig': '0',
                                      'key.mode': 'major', 'trans.semi': '-3', 'trans.diat': '-2',
                                      'meter.count': '3', 'meter.unit': '8'})
 
@@ -2523,7 +2531,7 @@ class TestStaffDefFromElement(unittest.TestCase):
                                                                     for n in range(4)]
         for eachElem in innerElems:
             elem.append(eachElem)
-        mockStaffDefFE.side_effect = lambda x, y: 'processed {}'.format(x.get('n'))
+        mockStaffDefFE.side_effect = lambda x, unused_y: 'processed {}'.format(x.get('n'))
         expected = {str(n): 'processed {}'.format(n) for n in range(4)}
 
         actual = base.staffGrpFromElement(elem, None, {})

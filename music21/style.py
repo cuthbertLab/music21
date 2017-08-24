@@ -366,6 +366,23 @@ class LineStyle(Style):
         self.dashLength = None
         self.spaceLength = None
 
+
+class StreamStyle(Style):
+    '''
+    Includes several elements in the MusicXML <appearance> tag in <defaults>
+    along with <music-font> and <word-font>
+    '''
+    def __init__(self):
+        super().__init__()
+        self.lineWidths = [] # two-tuples of type, width measured in tenths
+        self.noteSizes = [] # two-tuples of type and percentages of the normal size
+        self.distances = [] # two-tuples of beam or hyphen and tenths
+        self.otherAppearances = [] # two-tuples of type and tenths
+        self.musicFont = None # None or a TextStyle object
+        self.wordFont = None # None or a TextStyle object
+        self.lyricFonts = [] # a list of TextStyle objects
+        self.lyricLanguages = [] # a list of strings
+
 class StyleMixin(common.SlottedObjectMixin):
     '''
     Mixin for any class that wants to support style and editorial, since several

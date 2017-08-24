@@ -49,6 +49,7 @@ import unittest
 
 from music21 import base
 from music21 import common
+from music21 import defaults
 from music21 import freezeThaw
 from music21 import exceptions21
 
@@ -194,8 +195,12 @@ class Metadata(base.Music21Object):
         # be local file paths or otherwise
         self._urls = []
 
-        # TODO: need a specific object for copyright and imprint
+        # TODO: need a specific object for imprint
         self._imprint = None
+        
+        self.software = [defaults.software]
+        
+        # Copyright can be None or a copyright object
         self.copyright = None
 
         # a dictionary of Text elements, where keys are work id strings

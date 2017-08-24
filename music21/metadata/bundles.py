@@ -184,6 +184,12 @@ class MetadataBundle:
 
     >>> resultsEntries[0].parse()
     <music21.stream.Score ...>
+    
+    Or pass it into converter:
+    
+    >>> converter.parse(resultsEntries[0])
+    <music21.stream.Score ...>
+    
 
     A metadata bundle can be instantiated in three ways, (1) from a ``Corpus`` instance,
     or (2) a string indicating which corpus name to draw from, and then calling 

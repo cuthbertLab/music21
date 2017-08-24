@@ -56,6 +56,8 @@ from music21 import exceptions21
 from music21 import common
 from music21 import stream
 from music21 import musedata as musedataModule
+from music21.metadata import bundles
+
 
 from music21 import _version
 from music21 import environment
@@ -454,7 +456,7 @@ class Converter:
         extension using `common.findFormatFile`.
 
         Does not use or store pickles in any circumstance.
-        '''
+        '''        
         fp = common.cleanpath(fp, returnPathlib=True)
         #environLocal.printDebug(['attempting to parseFile', fp])
         if not fp.exists():
@@ -1086,6 +1088,12 @@ def parse(value, *args, **keywords):
         valueStr = value.decode('utf-8', 'ignore')
     if isinstance(value, pathlib.Path):
         valueStr = str(value)
+    elif isinstance(value, bundles.MetadataEntry):
+        if value.sourcePath.is_absolute():
+            valueStr = str(value.sourcePath)
+        else:
+            valueStr = str(common.getCorpusFilePath() / value.sourcePath)
+        
     else:
         valueStr = value
 

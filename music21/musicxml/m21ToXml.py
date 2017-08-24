@@ -41,6 +41,7 @@ from music21 import meter
 from music21 import pitch
 from music21 import spanner
 from music21 import stream
+from music21 import style
 from music21.stream.iterator import OffsetIterator
 
 from music21.musicxml import xmlObjects
@@ -96,7 +97,8 @@ def normalizeColor(color):
 
 def getMetadataFromContext(s):
     '''
-    Get metadata from site or context.
+    Get metadata from site or context, so that a Part 
+    can be shown and have the rich metadata of its Score
 
     >>> s = stream.Stream()
     >>> s2 = s.transpose(4)
@@ -305,15 +307,15 @@ class GeneralObjectExporter():
         >>> print(outStr.strip())
         <?xml version="1.0" encoding="utf-8"?>
         <!DOCTYPE score-partwise
-          PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
+          PUBLIC '-//Recordare//DTD MusicXML 3.1 Partwise//EN'
           'http://www.musicxml.org/dtds/partwise.dtd'>
-        <score-partwise>
+        <score-partwise version="3.1">
           <movement-title>Music21 Fragment</movement-title>
           <identification>
             <creator type="composer">Music21</creator>
             <encoding>
               <encoding-date>...</encoding-date>
-              <software>Music21</software>
+              <software>music21 v...</software>
             </encoding>
           </identification>
           <defaults>
@@ -695,9 +697,11 @@ class XMLExporterBase:
                 elem.tail = i
 
     def xmlHeader(self):
-        return (b'''<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE score-partwise\n  ''' +
-                b'''PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'\n  ''' +
-                b''''http://www.musicxml.org/dtds/partwise.dtd'>\n''')
+        return (b'''<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE score-partwise\n  '''
+                + b'''PUBLIC '-//Recordare//DTD MusicXML ''' 
+                + defaults.musicxmlVersion.encode('utf-8') 
+                + b''' Partwise//EN'\n  '''
+                + b''''http://www.musicxml.org/dtds/partwise.dtd'>\n''')
 
 
     #### style attributes
@@ -705,10 +709,15 @@ class XMLExporterBase:
     def setStyleAttributes(self, mxObject, m21Object, musicXMLNames, m21Names):
         '''
         Sets any attribute from .style, doing some conversions.
+        
+        m21Object can also be a style.Style object itself.
         '''
-        if m21Object.hasStyleInformation is False:
+        if isinstance(m21Object, style.Style):
+            stObj = m21Object
+        elif m21Object.hasStyleInformation is False:
             return
-        stObj = m21Object.style
+        else:
+            stObj = m21Object.style
 
         for xmlName, m21Name in zip(musicXMLNames, m21Names):
             try:
@@ -805,9 +814,15 @@ class XMLExporterBase:
         musicXMLNames = ('font-style', 'font-size', 'font-weight')
         m21Names = ('fontStyle', 'fontSize', 'fontWeight')
         self.setStyleAttributes(mxObject, m21Object, musicXMLNames, m21Names)
-        if (m21Object.hasStyleInformation and hasattr(m21Object.style, 'fontFamily')
-                and m21Object.style.fontFamily):
-            mxObject.set('font-family', ','.join(m21Object.style.fontFamily))
+        if isinstance(m21Object, style.Style):
+            st = m21Object
+        elif m21Object.hasStyleInformation:
+            st = m21Object.style 
+        else:
+            return    
+        
+        if hasattr(st, 'fontFamily') and st.fontFamily:
+            mxObject.set('font-family', ','.join(st.fontFamily))
 
 
     def setPosition(self, mxObject, m21Object):
@@ -1239,7 +1254,7 @@ class ScoreExporter(XMLExporterBase):
             self.stream = score
 
         self.musicxmlVersion = "3.1"
-        self.xmlRoot = Element('score-partwise')
+        self.xmlRoot = Element('score-partwise', version=defaults.musicxmlVersion)
         self.mxIdentification = None
 
         self.scoreMetadata = None
@@ -1274,7 +1289,7 @@ class ScoreExporter(XMLExporterBase):
         >>> SX = musicxml.m21ToXml.ScoreExporter(b)
         >>> mxScore = SX.parse()
         >>> SX.dump(mxScore)
-        <score-partwise>...</score-partwise>
+        <score-partwise version="...">...</score-partwise>
         '''
         s = self.stream
         if not s:
@@ -1303,7 +1318,7 @@ class ScoreExporter(XMLExporterBase):
         >>> emptySX = musicxml.m21ToXml.ScoreExporter()
         >>> mxScore = emptySX.parse() # will call emptyObject
         >>> emptySX.dump(mxScore)
-        <score-partwise>
+        <score-partwise version="...">
           <work>
             <work-title>This Page Intentionally Left Blank</work-title>
           </work>
@@ -1678,13 +1693,112 @@ class ScoreExporter(XMLExporterBase):
             mxStaffLayout = self.staffLayoutToXmlStaffLayout(staffLayout)
             mxDefaults.append(mxStaffLayout)
 
-        # TODO: appearance
-        # TODO: music-font
-        # TODO: word-font
-        # TODO: lyric-font
-        # TODO: lyric-language
+        self.addStyleToXmlDefaults(mxDefaults)
         return mxDefaults  # mostly for testing...
 
+    def addStyleToXmlDefaults(self, mxDefaults):
+        '''
+        Optionally add an <appearance> tag (using `styleToXmlAppearance`)
+        and <music-font>, <word-font>, zero or more <lyric-font> tags,
+        and zero or more <lyric-language> tags to mxDefaults
+        
+        Demonstrating round tripping:
+
+        >>> import xml.etree.ElementTree as ET
+        >>> defaults = ET.fromstring('<defaults>'
+        ...          + '<music-font font-family="Maestro, Opus" font-weight="bold" />'
+        ...          + '<word-font font-family="Garamond" font-style="italic" />'
+        ...          + '<lyric-font name="verse" font-size="12" />'
+        ...          + '<lyric-font name="chorus" font-size="14" />'
+        ...          + '<lyric-language name="verse" xml:lang="fr" />'
+        ...          + '<lyric-language name="chorus" xml:lang="en" />'
+        ...          + '</defaults>')
+        
+        >>> MI = musicxml.xmlToM21.MusicXMLImporter()
+        >>> MI.styleFromXmlDefaults(defaults)
+        >>> SX = musicxml.m21ToXml.ScoreExporter(MI.stream)
+        >>> mxDefaults = ET.Element('defaults')
+        >>> SX.addStyleToXmlDefaults(mxDefaults)
+        >>> SX.dump(mxDefaults)
+        <defaults>
+            <music-font font-family="Maestro,Opus" font-weight="bold" />
+            <word-font font-family="Garamond" font-style="italic" />
+            <lyric-font font-size="12" name="verse" />
+            <lyric-font font-size="14" name="chorus" />
+            <lyric-language name="verse" xml:lang="fr" />
+            <lyric-language name="chorus" xml:lang="en" />
+        </defaults>
+        
+        '''
+        if not self.stream.hasStyleInformation:
+            return
+        
+        mxAppearance = self.styleToXmlAppearance()
+        if mxAppearance is not None:
+            mxDefaults.append(mxAppearance)
+        
+        st = self.stream.style
+        if st.musicFont is not None:
+            mxMusicFont = SubElement(mxDefaults, 'music-font')
+            self.setFont(mxMusicFont, st.musicFont)
+
+        if st.wordFont is not None:
+            mxWordFont = SubElement(mxDefaults, 'word-font')
+            self.setFont(mxWordFont, st.wordFont)
+            
+        for lyricName, lyricFont in st.lyricFonts:
+            mxLyricFont = SubElement(mxDefaults, 'lyric-font')
+            self.setFont(mxLyricFont, lyricFont)
+            mxLyricFont.set('name', lyricName)
+            
+        for lyricType, lyricLang in st.lyricLanguages:
+            mxLyricLanguage = SubElement(mxDefaults, 'lyric-language')
+            mxLyricLanguage.set('name', lyricType)
+            mxLyricLanguage.set('xml:lang', lyricLang)
+        
+
+    def styleToXmlAppearance(self):
+        '''
+        Populates the <appearance> tag of the <defaults> with
+        information from the stream's .style information.
+        
+        >>> s = stream.Score()
+        >>> s.style.lineWidths.append(('beam', 5.0))
+        >>> s.style.noteSizes.append(('cue', 75))
+        >>> s.style.distances.append(('hyphen', 0.1))
+        >>> s.style.otherAppearances.append(('flags', 'wavy'))
+        >>> SX = musicxml.m21ToXml.ScoreExporter(s)
+        >>> mxAppearance = SX.styleToXmlAppearance()
+        >>> SX.dump(mxAppearance)
+        <appearance>
+          <line-width type="beam">5.0</line-width>
+          <note-sizes type="cue">75</note-sizes>
+          <distance type="hyphen">0.1</distance>
+          <other-appearance type="flags">wavy</other-appearance>
+        </appearance>        
+        '''
+        st = self.stream.style
+        if not hasattr(st, 'lineWidths'):
+            return # TODO: remove in v.5 release after all old data is gone.
+        
+        if (not st.lineWidths 
+                and not st.noteSizes 
+                and not st.distances 
+                and not st.otherAppearances):
+            return None # appearance tag cannot be empty
+
+        mxAppearance = Element('appearance')
+        for thisProperty, tag in [('lineWidths', 'line-width'),
+                                  ('noteSizes', 'note-sizes'),
+                                  ('distances', 'distance'),
+                                  ('otherAppearances', 'other-appearance')]:
+            propertyList = getattr(st, thisProperty)
+            for propertyType, propertyValue in propertyList:
+                mxProperty = SubElement(mxAppearance, tag)
+                mxProperty.set('type', propertyType)
+                mxProperty.text = str(propertyValue)
+                
+        return mxAppearance
 
     def setPartList(self):
         '''
@@ -1836,7 +1950,7 @@ class ScoreExporter(XMLExporterBase):
           <creator type="composer">Music21</creator>
           <encoding>
             <encoding-date>20...-...-...</encoding-date>
-            <software>Music21</software>
+            <software>music21 v...</software>
           </encoding>
         </identification>
 
@@ -1859,7 +1973,7 @@ class ScoreExporter(XMLExporterBase):
           <creator type="arranger">Aliyah Shanti</creator>
           <encoding>
             <encoding-date>...</encoding-date>
-            <software>Music21</software>
+            <software>music21 v...</software>
           </encoding>
         </identification>
 
@@ -1948,7 +2062,7 @@ class ScoreExporter(XMLExporterBase):
         >>> SX.dump(mxEncoding)
         <encoding>
           <encoding-date>20...-...-...</encoding-date>
-          <software>Music21</software>
+          <software>music21 v...</software>
         </encoding>
 
         Encoding-date is in YYYY-MM-DD format.
@@ -1961,8 +2075,16 @@ class ScoreExporter(XMLExporterBase):
         mxEncodingDate = SubElement(mxEncoding, 'encoding-date')
         mxEncodingDate.text = str(datetime.date.today())  # right format...
         # TODO: encoder
-        mxSoftware = SubElement(mxEncoding, 'software')
-        mxSoftware.text = defaults.software
+        
+        if self.scoreMetadata is not None and hasattr(self.scoreMetadata, 'software'):
+            # TODO: Remove hasattr after all caches are cleared after v5 release.
+            for software in self.scoreMetadata.software:
+                mxSoftware = SubElement(mxEncoding, 'software')
+                mxSoftware.text = software
+                
+        else:
+            mxSoftware = SubElement(mxEncoding, 'software')
+            mxSoftware.text = defaults.software
 
         # TODO: encoding-description
         mxSupportsList = self.getSupports()
