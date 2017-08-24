@@ -100,13 +100,13 @@ def setupConverterApp(agenda):
     <!DOCTYPE score-partwise
       PUBLIC '-//Recordare//DTD MusicXML ... Partwise//EN'
       'http://www.musicxml.org/dtds/partwise.dtd'>
-    <score-partwise>
+    <score-partwise version="...">
       <movement-title>Music21 Fragment</movement-title>
       <identification>
         <creator type="composer">Music21</creator>
         <encoding>
           <encoding-date>...</encoding-date>
-          <software>Music21</software>
+          <software>music21 v...</software>
         </encoding>
       </identification>
       <defaults>

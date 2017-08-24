@@ -1315,7 +1315,7 @@ class TestNoteFromElement(unittest.TestCase):
         # verseFromElement() return values
         vfeReturns = [[mock.MagicMock(name='au'), mock.MagicMock(name='luong')],
                       [mock.MagicMock(name='sun')]]
-        def mockVerseFESideEffect(elem, unused_backupN):
+        def mockVerseFESideEffect(elem, backupN):
             "this way we can check it gets called with the right elements"
             assert '{}verse'.format(_MEINS) == elem.tag
             return vfeReturns.pop(0)
@@ -2151,7 +2151,7 @@ class TestStaffFromElement(unittest.TestCase):
                              for i in range(len(findallReturn))]
         mockLFEreturns = ['mockLayerFromElement return %i' for i in range(len(findallReturn))]
         mockLayerFromElement.side_effect = (
-            lambda unused_x, unused_y, unused_slurBundle: mockLFEreturns.pop(0))
+            lambda x, y, slurBundle: mockLFEreturns.pop(0))
         expected = ['mockLayerFromElement return %i' for i in range(len(findallReturn))]
 
         actual = base.staffFromElement(elem)
