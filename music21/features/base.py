@@ -650,7 +650,7 @@ class DataInstance:
         try:
             return self._id.replace(' ', '_')
         except AttributeError as e:
-            raise AttributeError(f"{self._id}") from e
+            raise AttributeError(str(self._id)) from e
 
     def parseStream(self):
         '''
