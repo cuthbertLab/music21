@@ -1772,7 +1772,7 @@ class ScoreExporter(XMLExporterBase):
         >>> SX.dump(mxAppearance)
         <appearance>
           <line-width type="beam">5.0</line-width>
-          <note-sizes type="cue">75</note-sizes>
+          <note-size type="cue">75</note-size>
           <distance type="hyphen">0.1</distance>
           <other-appearance type="flags">wavy</other-appearance>
         </appearance>        
@@ -1789,7 +1789,7 @@ class ScoreExporter(XMLExporterBase):
 
         mxAppearance = Element('appearance')
         for thisProperty, tag in [('lineWidths', 'line-width'),
-                                  ('noteSizes', 'note-sizes'),
+                                  ('noteSizes', 'note-size'),
                                   ('distances', 'distance'),
                                   ('otherAppearances', 'other-appearance')]:
             propertyList = getattr(st, thisProperty)
