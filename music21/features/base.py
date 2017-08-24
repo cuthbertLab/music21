@@ -6,12 +6,16 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2011-2014 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-from collections import Counter
-import unittest
 import os
+import pathlib
+import pickle
+import unittest
+
+from collections import Counter
+
 
 from music21 import common
 from music21 import converter
@@ -20,12 +24,11 @@ from music21 import exceptions21
 from music21 import stream
 from music21 import text
 
+from music21.metadata.bundles import MetadataEntry
+
 from music21 import environment
 _MOD = 'features/base.py'
 environLocal = environment.Environment(_MOD)
-
-
-
 
 #-------------------------------------------------------------------------------
 class FeatureException(exceptions21.Music21Exception):
@@ -542,25 +545,61 @@ class DataInstance:
     multiple commonly-used stream representations once, providing rapid processing.
     '''
     # pylint: disable=redefined-builtin
-    def __init__(self, streamObj=None, id=None): #@ReservedAssignment
-        self.stream = streamObj
-
-        # perform basic operations that are performed on all
-        # streams
-
+    def __init__(self, streamOrPath=None, id=None): #@ReservedAssignment        
+        if isinstance(streamOrPath, stream.Stream):
+            self.stream = streamOrPath
+            self.streamPath = None
+        else:
+            self.stream = None
+            self.streamPath = streamOrPath
+        
         # store an id for the source stream: file path url, corpus url
         # or metadata title
         if id is not None:
             self._id = id
+        elif (self.stream is not None 
+              and hasattr(self.stream, 'metadata') 
+              and self.stream.metadata is not None
+              and self.stream.metadata.title is not None
+              ):
+            self._id = self.stream.metadata.title
+        elif self.stream is not None and hasattr(self.stream, 'sourcePath'):
+            self._id = self.stream.sourcePath
+        elif self.streamPath is not None:
+            if hasattr(self.streamPath, 'sourcePath'):
+                self._id = str(self.streamPath.sourcePath)
+            else:
+                self._id = str(self.streamPath)
         else:
-            if hasattr(self.stream, 'metadata'):
-                self._id = self.stream.metadata # may be None
-
-
+            self._id = ''
+        
         # the attribute name in the data set for this label
-        self._classLabel = None
+        self.classLabel = None
         # store the class value for this data instance
         self._classValue = None
+
+        self.forms = None
+        
+        # store a list of voices, extracted from each part,
+        self.formsByVoice = []
+        # if parts exist, store a forms for each
+        self.formsByPart = []
+
+        self.featureExtractorClassesForParallelRunning = []
+
+        if self.stream is not None:
+            self.setupPostStreamParse()
+
+    def setupPostStreamParse(self):
+        '''
+        Setup the StreamForms objects and other things that
+        need to be done after a Stream is passed in but before
+        feature extracting is run.
+        
+        Run automatically at instantiation if a Stream is passed in.
+        '''
+        # perform basic operations that are performed on all
+        # streams
 
         # store a dictionary of StreamForms
         self.forms = StreamForms(self.stream)
@@ -575,46 +614,77 @@ class DataInstance:
         else:
             self.partsCount = 0
 
-        # TODO: store a list of voices, extracted from each part,
-        # presently this will only work on a measure stream
-        self.formsByVoice = []
-        if hasattr(self.stream, 'voices'):
-            for v in self.stream.voices:
-                self.formsByPart.append(StreamForms(v))
+        for v in self.stream.recurse().getElementsByClass('Voice'):
+            self.formsByPart.append(StreamForms(v))
 
     def setClassLabel(self, classLabel, classValue=None):
         '''
         Set the class label, as well as the class value if known.
         The class label is the attribute name used to define the class of this data instance.
 
-
         >>> #_DOCS_SHOW s = corpus.parse('bwv66.6')
         >>> s = stream.Stream() #_DOCS_HIDE
         >>> di = features.DataInstance(s)
         >>> di.setClassLabel('Composer', 'Bach')
         '''
-        self._classLabel = classLabel
+        self.classLabel = classLabel
         self._classValue = classValue
 
     def getClassValue(self):
-        if self._classValue is None:
+        if self._classValue is None or callable(self._classValue) and self.stream is None:
             return ''
-        else:
-            return self._classValue
+
+        if callable(self._classValue) and self.stream is not None:
+            self._classValue = self._classValue(self.stream)
+
+        return self._classValue
 
     def getId(self):
-        if self._id is None:
+        if self._id is None or callable(self._id) and self.stream is None:
             return ''
-        else:
-            # make sure there are no spaces
+        
+        if callable(self._id) and self.stream is not None:
+            self._id = self._id(self.stream)
+
+        # make sure there are no spaces
+        try:
             return self._id.replace(' ', '_')
+        except AttributeError as e:
+            raise AttributeError(f"{self._id}") from e
+
+    def parseStream(self):
+        '''
+        If a path to a Stream has been passed in at creation,
+        then this will parse it (whether it's a corpus string,
+        a converter string (url or filepath), a pathlib.Path,
+        or a metadata.bundles.MetadataEntry.
+        '''
+        if self.stream is not None:
+            return
+        
+        if isinstance(self.streamPath, str):
+            # could be corpus or file path
+            if os.path.exists(self.streamPath) or self.streamPath.startswith('http'):
+                s = converter.parse(self.streamPath)
+            else: # assume corpus
+                s = corpus.parse(self.streamPath)
+        elif isinstance(self.streamPath, pathlib.Path):
+            # could be corpus or file path
+            if self.streamPath.exists():
+                s = converter.parse(self.streamPath)
+            else: # assume corpus
+                s = corpus.parse(self.streamPath)
+        elif isinstance(self.streamPath, MetadataEntry):
+            s = self.streamPath.parse()
+            
+        self.stream = s
+        self.setupPostStreamParse()
 
     def __getitem__(self, key):
         '''
         Get a form of this Stream, using a cached version if available.
 
-        >>> s = corpus.parse('bwv66.6')
-        >>> di = features.DataInstance(s)
+        >>> di = features.DataInstance('bach/bwv66.6')
         >>> len(di['flat'])
         193
         >>> len(di['flat.pitches'])
@@ -626,6 +696,7 @@ class DataInstance:
         >>> len(di['flat.getElementsByClass(TimeSignature)'])
         4
         '''
+        self.parseStream()
         if key in ['parts']:
             # return a list of Forms for each part
             return self.formsByPart
@@ -645,9 +716,9 @@ class DataSetException(exceptions21.Music21Exception):
 
 class DataSet:
     '''
-    A set of features, as well as a collection of data to operate on
+    A set of features, as well as a collection of data to operate on.
 
-    Multiple DataInstance objects, a FeatureSet, and an OutputFormat.
+    Comprises multiple DataInstance objects, a FeatureSet, and an OutputFormat.
 
 
     >>> ds = features.DataSet(classLabel='Composer')
@@ -677,9 +748,10 @@ class DataSet:
     def __init__(self, classLabel=None, featureExtractors=()):
         # assume a two dimensional array
         self.dataInstances = []
-        self.streams = []
+        
         # order of feature extractors is the order used in the presentations
-        self.featureExtractors = []
+        self._featureExtractors = []
+        self._instantiatedFeatureExtractors = []
         # the label of the class
         self._classLabel = classLabel
         # store a multidimensional storage of all features
@@ -687,6 +759,8 @@ class DataSet:
 
         self.failFast = False
         self.quiet = True
+        
+        self.runParallel = True
         # set extractors
         self.addFeatureExtractors(featureExtractors)
 
@@ -704,7 +778,8 @@ class DataSet:
             values = [values]
         # need to create instances
         for sub in values:
-            self.featureExtractors.append(sub())
+            self._featureExtractors.append(sub)
+            self._instantiatedFeatureExtractors.append(sub())
 
     def getAttributeLabels(self, includeClassLabel=True,
         includeId=True):
@@ -729,15 +804,15 @@ class DataSet:
         # place ids first
         if includeId:
             post.append('Identifier')
-        for fe in self.featureExtractors:
+        for fe in self._instantiatedFeatureExtractors:
             post += fe.getAttributeLabels()
         if self._classLabel is not None and includeClassLabel:
             post.append(self._classLabel.replace(' ', '_'))
         return post
 
     def getDiscreteLabels(self, includeClassLabel=True, includeId=True):
-        '''Return column labels for discrete status.
-
+        '''
+        Return column labels for discrete status.
 
         >>> f = [features.jSymbolic.PitchClassDistributionFeature,
         ...      features.jSymbolic.ChangesOfMeterFeature]
@@ -749,7 +824,7 @@ class DataSet:
         post = []
         if includeId:
             post.append(None) # just a spacer
-        for fe in self.featureExtractors:
+        for fe in self._instantiatedFeatureExtractors:
             # need as many statements of discrete as there are dimensions
             post += [fe.discrete] * fe.dimensions
         # class label is assumed always discrete
@@ -758,7 +833,8 @@ class DataSet:
         return post
 
     def getClassPositionLabels(self, includeId=True):
-        '''Return column labels for the presence of a class definition
+        '''
+        Return column labels for the presence of a class definition
 
         >>> f = [features.jSymbolic.PitchClassDistributionFeature,
         ...      features.jSymbolic.ChangesOfMeterFeature]
@@ -770,7 +846,7 @@ class DataSet:
         post = []
         if includeId:
             post.append(None) # just a spacer
-        for fe in self.featureExtractors:
+        for fe in self._instantiatedFeatureExtractors:
             # need as many statements of discrete as there are dimensions
             post += [False] * fe.dimensions
         # class label is assumed always discrete
@@ -778,9 +854,61 @@ class DataSet:
             post.append(True)
         return post
 
+
+    def addMultipleData(self, dataList, classValues, ids=None):
+        '''
+        add multiple data points at the same time.
+        
+        Requires an iterable (including MetadataBundle) for dataList holding
+        types that can be passed to addData, and an equally sized list of dataValues
+        and an equally sized list of ids (or None)
+
+        classValues can also be a pickleable function that will be called on
+        each instance after parsing, as can ids.
+        '''
+        if (not callable(classValues) 
+                and len(dataList) != len(classValues)):
+            raise DataSetException(
+                "If classValues is not a function, it must have the same length as dataList")
+        if (ids is not None
+                and not callable(ids)
+                and len(dataList) != len(ids)):
+            raise DataSetException(
+                "If ids is not a function or None, it must have the same length as dataList")
+
+        if callable(classValues):
+            try:
+                pickle.dumps(classValues)
+            except pickle.PicklingError:
+                raise DataSetException('classValues if a function must be pickleable. '
+                                       + 'Lambda and some other functions are not.')
+
+            classValues = [classValues] * len(dataList)
+
+        if callable(ids):
+            try:
+                pickle.dumps(ids)
+            except pickle.PicklingError:
+                raise DataSetException('ids if a function must be pickleable. '
+                                       + 'Lambda and some other functions are not.')
+
+            ids = [ids] * len(dataList)
+        elif ids is None:
+            ids = [None] * len(dataList)
+        
+
+        for i in range(len(dataList)):
+            d = dataList[i]
+            cv = classValues[i]
+            thisId = ids[i]
+            self.addData(d, cv, thisId)
+
+
     # pylint: disable=redefined-builtin
     def addData(self, dataOrStreamOrPath, classValue=None, id=None): #@ReservedAssignment
-        '''Add a Stream, DataInstance, or path to a corpus or local file to this data set.
+        '''
+        Add a Stream, DataInstance, MetadataEntry, or path (Posix or str) 
+        to a corpus or local file to this data set.
 
         The class value passed here is assumed to be the same as
         the classLabel assigned at startup.
@@ -793,33 +921,64 @@ class DataSet:
         if isinstance(dataOrStreamOrPath, DataInstance):
             di = dataOrStreamOrPath
             s = di.stream
-        elif isinstance(dataOrStreamOrPath, str):
-            # could be corpus or file path
-            if os.path.exists(dataOrStreamOrPath) or dataOrStreamOrPath.startswith('http'):
-                s = converter.parse(dataOrStreamOrPath)
-            else: # assume corpus
-                s = corpus.parse(dataOrStreamOrPath)
-            # assume we can use this string as an id
-            di = DataInstance(s, id=dataOrStreamOrPath)
+            if s is None:
+                s = di.streamPath                
         else:
-            # for now, assume all else are streams
+            # all else are stored directly
             s = dataOrStreamOrPath
             di = DataInstance(dataOrStreamOrPath, id=id)
 
         di.setClassLabel(self._classLabel, classValue)
         self.dataInstances.append(di)
-        self.streams.append(s)
 
     def process(self):
         '''
         Process all Data with all FeatureExtractors.
         Processed data is stored internally as numerous Feature objects.
         '''
+        if self.runParallel:
+            return self._processParallel()
+        else:
+            return self._processNonParallel()
+    
+    def _processParallel(self):
+        '''
+        Run a set of processes in parallel.
+        '''
+        for di in self.dataInstances:
+            di.featureExtractorClassesForParallelRunning = self._featureExtractors
+        
+        shouldUpdate = not self.quiet
+        
+        outputData = common.runParallel(self.dataInstances, 
+                                           _dataSetParallelSubprocess, 
+                                           updateFunction=shouldUpdate,
+                                           )
+        featureData, errors, classValues, ids = zip(*outputData)
+        errors = common.flattenList(errors)
+        for e in errors:
+            if self.quiet is True:
+                environLocal.printDebug(e)
+            else:
+                environLocal.warn(e)
+        self.features = featureData
+        
+        for i, di in enumerate(self.dataInstances):
+            if callable(di._classValue):
+                di._classValue = classValues[i]
+            if callable(di._id):
+                di._id = ids[i]
+        
+                    
+    def _processNonParallel(self):
+        '''
+        The traditional method: run non-parallel
+        '''
         # clear features
         self.features = []
         for data in self.dataInstances:
             row = []
-            for fe in self.featureExtractors:
+            for fe in self._instantiatedFeatureExtractors:
                 fe.setData(data)
                 # in some cases there might be problem; to not fail
                 try:
@@ -851,6 +1010,7 @@ class DataSet:
 
             if includeId:
                 v.append(di.getId())
+            
             for f in row:
                 if concatenateLists:
                     v += f.vector
@@ -898,7 +1058,6 @@ class DataSet:
         <music21.features.outputFormats.OutputCSV object at ...>
         >>> ds._getOutputFormatFromFilePath('junk') is None
         True
-
         '''
         # get format from fp if possible
         of = None
@@ -931,39 +1090,50 @@ class DataSet:
 
         outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
 
+def _dataSetParallelSubprocess(dataInstance):
+    row = []
+    errors = []
+    
+    for feClass in dataInstance.featureExtractorClassesForParallelRunning:
+        fe = feClass()
+        fe.setData(dataInstance)
+        # in some cases there might be problem; to not fail
+        try:
+            fReturned = fe.extract()
+        except Exception as e: # for now take any error  # pylint: disable=broad-except
+            errors.append('failed feature extractor:' + str(fe) + ": " + str(e))
+            # provide a blank feature extractor
+            fReturned = fe.getBlankFeature()
+
+        row.append(fReturned) # get feature and store
+    # rows will align with data the order of DataInstances
+    return row, errors, dataInstance.getClassValue(), dataInstance.getId()
+
 def allFeaturesAsList(streamInput):
     '''
-    returns a tuple containing ALL currentingly implemented feature extractors. The first
-    in the tuple are jsymbolic vectors, and the second native vectors. Vectors are NOT nested
-
-    streamInput can be Add a Stream, DataInstance, or path to a corpus or local
+    returns a list containing ALL currentingly implemented feature extractors
+    
+    streamInput can be a Stream, DataInstance, or path to a corpus or local
     file to this data set.
-
 
     >>> s = converter.parse('tinynotation: 4/4 c4 d e2')
     >>> f = features.allFeaturesAsList(s)
-    >>> f[1][0:3]
-    [[1], [0.689999...], [2]]
-    >>> len(f[0]) > 65
-    True
-    >>> len(f[1]) > 20
+    >>> f[2:5]
+    [[2], [2], [1.0]]
+    >>> len(f) > 85
     True
     '''
     from music21.features import jSymbolic, native
     ds = DataSet(classLabel='')
-    f = [f for f in jSymbolic.featureExtractors]
+    f = list(jSymbolic.featureExtractors) + list(native.featureExtractors)
     ds.addFeatureExtractors(f)
     ds.addData(streamInput)
     ds.process()
-    jsymb = ds.getFeaturesAsList(includeClassLabel=False, includeId=False, concatenateLists=False)
-    ds.featureExtractors = []
-    ds.features = []
-    n = [f for f in native.featureExtractors]
-    ds.addFeatureExtractors(n)
-    ds.process()
-    nat = ds.getFeaturesAsList(includeClassLabel=False, includeId=False, concatenateLists=False)
+    allData = ds.getFeaturesAsList(includeClassLabel=False, 
+                                   includeId=False, 
+                                   concatenateLists=False)
 
-    return (jsymb, nat)
+    return allData
 
 
 #-------------------------------------------------------------------------------
@@ -1246,6 +1416,7 @@ class Test(unittest.TestCase):
 
         # need to define what the class label will be
         ds = features.DataSet(classLabel='Composer')
+        ds.runParallel = False
         ds.addFeatureExtractors(featureExtractors)
 
         # add works, defining the class value
@@ -1548,7 +1719,8 @@ class Test(unittest.TestCase):
         with a path to the .tab data file.
         '''
         import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
-        data = orange.ExampleTable('~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
+        data = orange.ExampleTable(
+            '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
 
         # setting up the classifiers
         majority = orange.MajorityLearner(data)
@@ -1579,7 +1751,8 @@ class Test(unittest.TestCase):
 
     def xtestOrangeClassifierTreeLearner(self): # pragma: no cover
         import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
-        data = orange.ExampleTable('~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
+        data = orange.ExampleTable(
+            '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
 
         tree = orngTree.TreeLearner(data, sameMajorityPruning=1, mForPruning=2)
         #tree = orngTree.TreeLearner(data)
@@ -1590,6 +1763,68 @@ class Test(unittest.TestCase):
         orngTree.printTxt(tree)
 
 
+    def testParallelRun(self):
+        from music21 import features
+        # test just a few features
+        featureExtractors = features.extractorsById(['ql1', 'ql2', 'ql4'], 'native')
+
+        # need to define what the class label will be
+        ds = features.DataSet(classLabel='Composer')
+        ds.addFeatureExtractors(featureExtractors)
+
+        # add works, defining the class value
+        ds.addData('bwv66.6', classValue='Bach')
+        ds.addData('corelli/opus3no1/1grave', classValue='Corelli')
+        ds.runParallel = True
+        ds.quiet = True
+        ds.process()
+        self.assertEqual(len(ds.features), 2)
+        self.assertEqual(len(ds.features[0]), 3)
+        fe00 = ds.features[0][0]
+        self.assertEqual(fe00.vector, [3])
+
+    def testMultipleSearches(self):
+        from music21.features import outputFormats
+        from music21 import features
+        import textwrap
+
+        self.maxDiff = None
+        
+        fewBach = corpus.search('bach/bwv6')
+        
+        self.assertEqual(len(fewBach), 12)
+        ds = features.DataSet(classLabel='NumPitches')
+        ds.addMultipleData(fewBach, classValues=pickleFunctionNumPitches)
+        featureExtractors = features.extractorsById(['ql1', 'ql4'], 'native')
+        ds.addFeatureExtractors(featureExtractors)
+        ds.runParallel = True
+        ds.process()
+        # manually create an output format and get output
+        of = outputFormats.OutputCSV(ds)
+        post = of.getString(lineBreak='\n')
+        self.assertEqual(post.strip(), textwrap.dedent('''
+            Identifier,Unique_Note_Quarter_Lengths,Range_of_Note_Quarter_Lengths,NumPitches
+            bach/bwv6.6.mxl,4,1.75,164
+            bach/bwv60.5.mxl,6,2.75,281
+            bach/bwv64.2.mxl,5,3.5,176
+            bach/bwv64.4.mxl,5,2.5,368
+            bach/bwv64.8.mxl,5,3.5,272
+            bach/bwv65.2.mxl,4,3.0,151
+            bach/bwv65.7.mxl,7,2.75,337
+            bach/bwv66.6.mxl,3,1.5,165
+            bach/bwv67.4.xml,3,1.5,173
+            bach/bwv67.7.mxl,4,2.5,190
+            bach/bwv69.6-a.xml,4,1.5,236
+            bach/bwv69.6.xml,8,4.25,623
+            ''').strip())
+
+
+def pickleFunctionNumPitches(bachStream):
+    '''
+    A function for documentation testing of a pickleable function
+    '''
+    return len(bachStream.pitches)
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [DataSet, Feature, FeatureExtractor]
@@ -1597,7 +1832,7 @@ _DOC_ORDER = [DataSet, Feature, FeatureExtractor]
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test) #, runTest='testStreamFormsA')
+    music21.mainTest(Test) #, runTest='testMultipleSearches')
 
 
 #------------------------------------------------------------------------------
