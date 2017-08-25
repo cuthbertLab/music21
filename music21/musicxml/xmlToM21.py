@@ -1029,9 +1029,9 @@ class MusicXMLImporter(XMLParserBase):
 
         for mxLyricLanguage in mxDefaults.findall('lyric-language'):
             lyricName = mxLyricLanguage.get('name')
-            for key, value in mxLyricLanguage.attrib.items():
+            for akey, value in mxLyricLanguage.attrib.items():
                 # {http://www.w3.org/XML/1998/namespace}lang
-                if key.endswith('}lang'):
+                if akey.endswith('}lang'):
                     lyricLanguage = value
                     break
             lyricTuple = lyricName, lyricLanguage
