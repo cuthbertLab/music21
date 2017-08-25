@@ -4,7 +4,7 @@ An interface for music21 using mod_wsgi
 
 To use, first install mod_wsgi and include it in the HTTPD.conf file.
 
-Add this file to the server, ideally not in the document root, 
+Add this file to the server, ideally not in the document root,
 on mac this could be /Library/WebServer/wsgi-scripts/music21wsgiapp.py
 
 Then edit the HTTPD.conf file to redirect any requests to WEBSERVER:/music21interface to call this file:
@@ -39,52 +39,52 @@ def music21ModWSGIVisualApplication(environ, start_response):
     '''
     Application function in proper format for a MOD-WSGI Application:
     Used to test returning visual images (plots, lily.png) to the user
-    
+
     '''
     status = '200 OK'
 
     #pathInfo = environ['PATH_INFO'] # Contents of path after mount point of wsgi app but before question mark
-    queryString = environ['QUERY_STRING'] # Contents of URL after question mark    
-    
+    queryString = environ['QUERY_STRING'] # Contents of URL after question mark
+
     documentRoot = environ['DOCUMENT_ROOT']
-    
-        
+
+
     #outputStr = ""
-        
+
     noteName = queryString
 
     n = note.Note(noteName)
-    
+
     tempPath = n.write('png')
     print(tempPath)
-    
+
     writePath = documentRoot + "/music21/OutputFiles/"
-    
-    
+
+
     fin = open(tempPath, 'r')
     fout = open(writePath + "out.jpg", "w")
     fout.write(fin.read())
     fout.close()
-        
+
     #plt.plot([1,2,3,4])
     #plt.ylabel(workName)
 
-    
+
     #p = graph.PlotHorizontalBarPitchClassOffset(sc,doneAction=None)
     #p.write('/Library/WebServer/Documents/OutputFiles/graph.jpg')
     #templateStr = tempPath
-    
-    
+
+
     templateStr = imageEmbedTemplate(tempPath, '/music21/OutputFiles/out.jpg')
-    
+
     response_headers = [('Content-type', 'text/html'),
                         ('Content-Length', str(len(templateStr)))]
 
     start_response(status, response_headers)
 
     return [templateStr]
-    
-    
+
+
 application = music21ModWSGIVisualApplication
 
 def reduction(sc):

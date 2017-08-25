@@ -13,11 +13,11 @@
 import os, sys
 
 
-def main():    
+def main():
     sys.stdout.write("Starting the music21 Configuration Assistant.\n"
                      + "Module loading could take a few moments, please wait...")
     sys.stdout.flush()
-    
+
     if 'music21' in os.listdir(os.getcwd()):
         p1 = os.path.join(os.getcwd(), 'music21')
         if p1 not in sys.path:
@@ -33,10 +33,10 @@ def main():
         run = True
     except ImportError:
         pass
-    
-    
+
+
     # need to be sure that we have the configure.py file found in the right place
-    
+
     if run:
         ca = configure.ConfigurationAssistant()
         ca.run()

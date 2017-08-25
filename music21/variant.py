@@ -815,7 +815,7 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName,
                 else:
                     ossiaOffset = returnMeasure.getOffsetBySite(returnObj)
                     addVariant(returnObj, ossiaOffset, ossiaMeasure,
-                               variantName=ossiaName, variantGroups=None, 
+                               variantName=ossiaName, variantGroups=None,
                                replacementDuration=None)
     else:
         for ossiaMeasure in ossiapart.getElementsByClass("Measure"):

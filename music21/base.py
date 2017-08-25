@@ -3409,9 +3409,9 @@ class Music21Object:
         '''
         ts = self._getTimeSignatureForBeat()
         meterModulus = ts.getMeasureOffsetOrMeterModulusOffset(self)
-        
+
         return ts.getAccentWeight(meterModulus,
-                                  forcePositionMatch=True, 
+                                  forcePositionMatch=True,
                                   permitMeterModulus=False)
 
     def _setSeconds(self, value):

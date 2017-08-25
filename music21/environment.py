@@ -73,26 +73,26 @@ class LocalCorpusSettings(list):
     '''
     A lightweight object for storing the 'LocalCorpusSettings' tag in the
     .music21rc
-    
+
     It is a subclass of list and has two additional attributes, name (which
     should be None for the unnamed localCorpus) and cacheFilePath
-    for a full filepath (ending in .json) as a location 
+    for a full filepath (ending in .json) as a location
     to store the .metadataBundle (.json) cache for the
     LocalCorpus.  This can be None, in which case the (volitile) temp
     directory is used.
-    
+
     >>> lcs = environment.LocalCorpusSettings(['/tmp', '/home'])
     >>> lcs
     LocalCorpusSettings(['/tmp', '/home'])
-    
+
     >>> lcs.name = 'theWholeEnchilada'
     >>> lcs
     LocalCorpusSettings(['/tmp', '/home'], name='theWholeEnchilada')
-    
+
     >>> lcs.cacheFilePath = '/home/enchilada.json'
     >>> lcs
-    LocalCorpusSettings(['/tmp', '/home'], 
-                        name='theWholeEnchilada', 
+    LocalCorpusSettings(['/tmp', '/home'],
+                        name='theWholeEnchilada',
                         cacheFilePath='/home/enchilada.json')
 
 
@@ -113,7 +113,7 @@ class LocalCorpusSettings(list):
         super().__init__(paths)
         self.name = name
         self.cacheFilePath = cacheFilePath
-        
+
     def __repr__(self):
         listRepr = super().__repr__()
         namePart = ''
@@ -158,7 +158,7 @@ class _EnvironmentCore:
             'lilypondPath',
             'localCorpusPath',
             'manualCoreCorpusPath',
-            'midiPath', 
+            'midiPath',
             'musescoreDirectPNGPath',
             'musicxmlPath',
             'pdfPath',
@@ -205,8 +205,8 @@ class _EnvironmentCore:
                 value = common.DEBUG_ALL
             else:
                 value = int(value)
-                
-        
+
+
         if value is not None and value != '':
             if key in self.getKeysToPaths():
                 value = pathlib.Path(value)
@@ -294,7 +294,7 @@ class _EnvironmentCore:
                     elif slotChild.tag == 'cacheFilePath':
                         lcs.cacheFilePath = slotChild.text.strip()
                 ref['localCorpusSettings'] = lcs
-                        
+
             elif slot.tag == 'localCorporaSettings':
                 ref['localCorporaSettings'] = {}
                 for localCorpusSettings in slot:
@@ -427,7 +427,7 @@ class _EnvironmentCore:
                     mdbp = ET.Element('cacheFilePath')
                     mdbp.text = str(lcs.cacheFilePath)
                     localCorpusSettings.append(mdbp)
-                    
+
                 settings.append(localCorpusSettings)
             elif key == 'localCorporaSettings':
                 localCorporaSettings = ET.Element('localCorporaSettings')
@@ -442,7 +442,7 @@ class _EnvironmentCore:
                         mdbp = ET.Element('cacheFilePath')
                         mdbp.text = str(lcs.cacheFilePath)
                         localCorpusSettings.append(mdbp)
-                    
+
                     localCorporaSettings.append(localCorpusSettings)
                 settings.append(localCorporaSettings)
             else:
@@ -525,15 +525,15 @@ class _EnvironmentCore:
         gets either the directory in key 'directoryScratch' or self.getDefaultRootTempDir
 
         Returns an exception if directoryScratch is defined but does not exist.
-        
+
         Returns a pathlib.Path
         '''
         if self._ref['directoryScratch'] is None:
             return self.getDefaultRootTempDir()
         # check that the user-specified directory exists
-        
+
         refDir = pathlib.Path(self._ref['directoryScratch'])
-        
+
         if not refDir.exists():
             raise EnvironmentException(
                 'user-specified scratch directory ({:s}) does not exist; '
@@ -551,7 +551,7 @@ class _EnvironmentCore:
             userProfilePath = pathlib.Path(os.environ['USERPROFILE']) / 'Application Data'
         else:
             userProfilePath = None
-        
+
         if platform == 'win':
             # try to use defined app data directory for preference file
             # this is not available on all windows versions
@@ -586,7 +586,7 @@ class _EnvironmentCore:
 
         if common.getPlatform() != 'win':
             fileDescriptor, filePath = tempfile.mkstemp(
-                dir=str(rootDir), # Py3.6 remove str 
+                dir=str(rootDir), # Py3.6 remove str
                 suffix=suffix)
             if isinstance(fileDescriptor, int):
                 # on MacOS, fd returns an int, like 3, when this is called
@@ -597,7 +597,7 @@ class _EnvironmentCore:
                 fileDescriptor.close()
         else:  # win
             tf = tempfile.NamedTemporaryFile(
-                dir=str(rootDir), # Py3.6 remove str 
+                dir=str(rootDir), # Py3.6 remove str
                 suffix=suffix)
             filePath = tf.name
             tf.close()
@@ -676,7 +676,7 @@ class _EnvironmentCore:
         '''
         # see common.fileExtensions for format names
         filePath = common.cleanpath(filePath, returnPathlib=True)
-        
+
         m21Format, unused_ext = common.findFormat(fmt)
         environmentKey = self.formatToKey(m21Format)
         if environmentKey is None:
@@ -904,7 +904,7 @@ class Environment:
 
         If not able to create a 'music21' directory, the standard default is
         returned.
-        
+
         Returns a pathlib.Path
         '''
         dstDir = envSingleton().getDefaultRootTempDir()
@@ -1451,7 +1451,7 @@ class Test(unittest.TestCase):
 
         # try adding some local corpus settings
         env['localCorpusSettings'] = LocalCorpusSettings(['a', 'b', 'c'])
-        
+
         lcFoo = LocalCorpusSettings(['bar', 'baz', 'quux'])
         lcFoo.cacheFilePath = '/tmp/local.json'
         lcFoo.name = 'foo'

@@ -1128,7 +1128,7 @@ class AskAutoDownload(SelectFromList):
         'included in this distribution, but are indexed as links to other web sites ' +
         'where they can be downloaded (the "virtual corpus"). If you would like, music21 ' +
         'can help your computer automatically resolve these links and bring them to your ' +
-        'hard drive for analysis. ' + 
+        'hard drive for analysis. ' +
         # 'See corpus/virtual.py for a list of sites that music21 ' +
         #'might index.',
         ' ',

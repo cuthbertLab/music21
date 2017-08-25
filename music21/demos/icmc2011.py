@@ -239,7 +239,7 @@ class Test(unittest.TestCase):
         match = []
         for e in s1.flat.notesAndRests:
             match.append([e.name, e.getContextByClass('Measure').number])
-        assert match == [['D', 1], ['rest', 1], ['G', 1], ['D#', 2], 
+        assert match == [['D', 1], ['rest', 1], ['G', 1], ['D#', 2],
                          ['E#', 2], ['A-', 2], ['F#', 2]]
         #==== "fig-df06" end
 
@@ -273,7 +273,7 @@ class Test(unittest.TestCase):
 
 #         p1Flat = p1.flat
 #         assert sp1.getDurationSpanBySite(p1Flat) == [0.0, 8.0]
-# 
+#
 #         p2Flat = p2.flat
 #         assert sp2.getDurationSpanBySite(p2Flat) == [4.0, 8.0]
 
@@ -423,7 +423,7 @@ class Test(unittest.TestCase):
         assert common.pitchList(sc1.getPitches(direction='ascending')
                                 ) == '[C4, D4, E-4, F4, G4, A4, B4, C5]'
         assert common.pitchList(sc1.getPitches('c3', 'c5', direction='descending')
-                                ) == ('[C5, B-4, A-4, G4, F4, E-4, D4, ' 
+                                ) == ('[C5, B-4, A-4, G4, F4, E-4, D4, '
                                         + 'C4, B-3, A-3, G3, F3, E-3, D3, C3]')
         assert str(sc1.getTonic()), str(sc1.getDominant()) == ('C4', 'G4')
 
@@ -556,12 +556,12 @@ class Test(unittest.TestCase):
         s.remove(s['viola'])
         for part in s.parts:
             for sc in [scGMajor, scDMajor]:
-                groups = alpha.analysis.search.findConsecutiveScale(part.flat, sc, 
-                                                                    degreesRequired=5, 
+                groups = alpha.analysis.search.findConsecutiveScale(part.flat, sc,
+                                                                    degreesRequired=5,
                                                                     comparisonAttribute='name')
                 for group in groups:
                     for n in group['stream'].notesAndRests:
-                        n.addLyric('%s^%s' % (sc.getTonic().name, 
+                        n.addLyric('%s^%s' % (sc.getTonic().name,
                                               sc.getScaleDegreeFromPitch(n.pitch)))
         #s['violin i'].show()
 
@@ -580,12 +580,12 @@ class Test(unittest.TestCase):
 #         part = corpus.parse('bwv1080/03').parts[0].measures(46, 53)
 #
 #         for sc in [scDMelodicMinor, scGMelodicMinor]:
-#             groups = alpha.analysis.search.findConsecutiveScale(part.flat, sc, 
+#             groups = alpha.analysis.search.findConsecutiveScale(part.flat, sc,
 #                           degreesRequired=4, comparisonAttribute='name')
 #             for group in groups:
 #                 for n in group['stream'].notes:
-#                     n.addLyric('%s^%s' % (sc.getTonic().name.lower(), 
-#                                           sc.getScaleDegreeFromPitch(n.pitch, 
+#                     n.addLyric('%s^%s' % (sc.getTonic().name.lower(),
+#                                           sc.getScaleDegreeFromPitch(n.pitch,
 #                                                                      group['direction'])))
 #         #part.show()
 
@@ -597,7 +597,7 @@ class Test(unittest.TestCase):
 #         s = corpus.parse('mozart/k80/movement1').measures(1, 28)
 #         for sc in [scGMajor, scDMajor, scAMajor]:
 #             for part in s.parts:
-#                 post = alpha.analysis.search.findConsecutiveScale(part.flat, sc, 
+#                 post = alpha.analysis.search.findConsecutiveScale(part.flat, sc,
 #                                                                   degreesRequired=5,
 #                                                                   comparisonAttribute='name')
 #                 for g, group in enumerate(post):
@@ -668,7 +668,7 @@ class Test(unittest.TestCase):
 
         # transpose the scale
         #print(sc2.transpose('m2').pitches)
-        self.assertEqual(common.pitchList(sc2.transpose('m2').pitches), 
+        self.assertEqual(common.pitchList(sc2.transpose('m2').pitches),
                         '[G4, A4, B4, C#5, D#5, E#5, G5]')
 
         # get as a chord and get its forte class
@@ -680,7 +680,7 @@ class Test(unittest.TestCase):
 
 
 #     def testEx02(self):
-#         # Labeling a vocal part based on scale degrees derived 
+#         # Labeling a vocal part based on scale degrees derived
 #         # from key signature and from a specified target key.
 #
 #         s = corpus.parse('hwv56/movement3-03.md')#.measures(1, 7)
@@ -715,7 +715,7 @@ class Test(unittest.TestCase):
         #from music21 import graph
 
         results = {}
-        
+
         stopCount = 2
         for chorale in corpus.chorales.Iterator():
             ksScale = chorale.recurse().getElementsByClass('Key')[0].getScale()
@@ -771,7 +771,7 @@ class Test(unittest.TestCase):
                + 'the following major scale degrees are not used the following number of times:')
         print (results)
 
-        # Of 104 works, the following major scale degrees are not 
+        # Of 104 works, the following major scale degrees are not
         # used the following number of times:
         # {4: 5, 5: 1, 6: 6, 7: 6}
 

@@ -97,9 +97,9 @@ def isIterable(usrData):
     True
     >>> common.isIterable(stream.Stream())
     True
-    
+
     Ranges are not iterators by python 3, but return True
-    
+
     >>> common.isIterable(range(20))
     True
 

@@ -1018,7 +1018,7 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
             if pitchData not in pitchSpanDict:
                 pitchSpanDict[pitchData] = []
                 dictOfFormatDicts[pitchData] = {}
-                
+
             pitchSpanDict[pitchData].append(positionData)
             _mergeDicts(dictOfFormatDicts[pitchData], formatDict)
 
@@ -1027,8 +1027,8 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
 
         for numericValue, label in yTicks:
             if numericValue in pitchSpanDict:
-                newData.append([label, 
-                                pitchSpanDict[numericValue], 
+                newData.append([label,
+                                pitchSpanDict[numericValue],
                                 dictOfFormatDicts[numericValue]])
             else:
                 newData.append([label, [], {}])

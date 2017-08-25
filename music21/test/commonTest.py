@@ -368,7 +368,7 @@ class ModuleGather:
             if hasattr(mod, 'environLocal'):
                 mod.environLocal.restoreDefaults()
         return mod
-    
+
     def getModuleWithoutImp(self, fp, restoreEnvironmentDefaults=False):
         '''
         gets one module object from the file path without using Imp

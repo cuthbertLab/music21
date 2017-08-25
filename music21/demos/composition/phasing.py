@@ -123,7 +123,7 @@ def pendulumMusic(show = True,
             else:
                 c = establishedChords[0]
                 c.append(p)
-                
+
             j += loopLength/(maxNotesPerLoop - totalParts + i)
             #j += (8+(8-i))/8.0
         p = octo.next(p, stepSize = scaleStepSize)

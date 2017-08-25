@@ -1289,7 +1289,7 @@ class Test(unittest.TestCase):
     @mock.patch('music21.mei.base.safePitch')
     @mock.patch('music21.mei.base.makeDuration')
     @mock.patch('music21.mei.base.verseFromElement')
-    def testUnit6(self, mockVerseFE, unused_mockMakeDuration, 
+    def testUnit6(self, mockVerseFE, unused_mockMakeDuration,
                   mockSafePitch, mockProcEmbEl, mockNote):
         '''
         noteFromElement(): test contained <verse>
@@ -1521,7 +1521,7 @@ class Test(unittest.TestCase):
     @mock.patch('music21.mei.base._processEmbeddedElements')
     @mock.patch('music21.mei.base.makeDuration')
     @mock.patch('music21.mei.base.noteFromElement')
-    def testUnit1ChordFromElement(self, mockNoteFromE, 
+    def testUnit1ChordFromElement(self, mockNoteFromE,
                                   mockMakeDuration, mockProcEmbEl, mockChord):
         '''
         chordFromElement(): all the basic attributes (i.e., @pname, @accid, @oct, @dur, @dots)
@@ -1679,7 +1679,7 @@ class Test(unittest.TestCase):
     @mock.patch('music21.mei.base.makeDuration')
     @mock.patch('music21.mei.base.noteFromElement')
     @mock.patch('music21.mei.base.scaleToTuplet')
-    def testUnit4ChordFromElement(self, mockTuplet, mockNoteFromE, 
+    def testUnit4ChordFromElement(self, mockTuplet, mockNoteFromE,
                                   mockMakeDuration, mockProcEmbEl, mockChord):
         '''
         chordFromElement(): adds tuplet-related attributes
@@ -1737,7 +1737,7 @@ class Test(unittest.TestCase):
     @mock.patch('music21.mei.base.makeDuration')
     @mock.patch('music21.mei.base.noteFromElement')
     @mock.patch('music21.duration.GraceDuration')
-    def testUnit5ChordFromElement(self, mockGrace, mockNoteFromE, 
+    def testUnit5ChordFromElement(self, mockGrace, mockNoteFromE,
                                   mockMakeDuration, mockProcEmbEl, mockChord):
         '''
         chordFromElement(): test @grace and @m21Beam when the duration does require
@@ -1974,7 +1974,7 @@ class Test(unittest.TestCase):
         iterfindReturn[2].tag = '{}note'.format(base._MEINS)
         elem.iterfind = mock.MagicMock(return_value=iterfindReturn)
         # "MNFE" is "mockNoteFromElement"
-        expectedMNFEOrder = [mock.call(iterfindReturn[0], None), 
+        expectedMNFEOrder = [mock.call(iterfindReturn[0], None),
                              mock.call(iterfindReturn[2], None)]
         mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2']
         mockNoteFromElement.side_effect = lambda *unused: mockNFEreturns.pop(0)
@@ -2010,7 +2010,7 @@ class Test(unittest.TestCase):
         iterfindReturn[2].tag = '{}note'.format(base._MEINS)
         elem.iterfind = mock.MagicMock(return_value=iterfindReturn)
         # "MNFE" is "mockNoteFromElement"
-        expectedMNFEOrder = [mock.call(iterfindReturn[0], None), 
+        expectedMNFEOrder = [mock.call(iterfindReturn[0], None),
                              mock.call(iterfindReturn[2], None)]
         mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2']
         mockNoteFromElement.side_effect = lambda *unused: mockNFEreturns.pop(0)
@@ -2034,7 +2034,7 @@ class Test(unittest.TestCase):
     @mock.patch('music21.mei.base.noteFromElement')
     @mock.patch('music21.stream.Voice')
     @mock.patch('music21.mei.base._guessTuplets')
-    def testUnit1cLayerFromElemen(self, 
+    def testUnit1cLayerFromElemen(self,
                 mockTuplets, mockVoice, mockNoteFromElement):# pylint: disable=unused-argument
         '''
         Same as testUnit1a() *but* without ``overrideN`` or @n.
@@ -2213,7 +2213,7 @@ class Test(unittest.TestCase):
     @mock.patch('music21.mei.base._keySigFromAttrs')
     @mock.patch('music21.mei.base.clefFromElement')
     @mock.patch('music21.mei.base._transpositionFromAttrs')
-    def testUnit1StaffFromElementStaffDefFromElement(self, mockTrans, 
+    def testUnit1StaffFromElementStaffDefFromElement(self, mockTrans,
                                                      mockClef, mockKey, mockTime, mockInstr):
         '''
         staffDefFromElement(): proper handling of the following attributes (see function docstring
@@ -2243,8 +2243,8 @@ class Test(unittest.TestCase):
                     'key': mockKey.return_value,
                     'clef': mockClef.return_value}
         # attributes on theMockInstrument that should be set by staffDefFromElement()
-        expectedAttrs = [('partName', 'the label'), 
-                         ('partAbbreviation', 'the l.'), 
+        expectedAttrs = [('partName', 'the label'),
+                         ('partAbbreviation', 'the l.'),
                          ('partId', '1'),
                          ('transposition', mockTrans.return_value)]
 
@@ -2331,7 +2331,7 @@ class Test(unittest.TestCase):
     @mock.patch('music21.mei.base._keySigFromAttrs')
     @mock.patch('music21.mei.base.clefFromElement')
     @mock.patch('music21.mei.base._transpositionFromAttrs')
-    def testUnit2StaffFromElement(self, mockTrans, mockClef, 
+    def testUnit2StaffFromElement(self, mockTrans, mockClef,
                                   mockKey, mockTime, mockInstr, mockFromString):
         '''
         staffDefFromElement(): same as testUnit1() *but* there's no <instrDef> so we have to use
@@ -2355,8 +2355,8 @@ class Test(unittest.TestCase):
                     'key': mockKey.return_value,
                     'clef': mockClef.return_value}
         # attributes on theMockInstrument that should be set by staffDefFromElement()
-        expectedAttrs = [('partName', 'the label'), 
-                         ('partAbbreviation', 'the l.'), 
+        expectedAttrs = [('partName', 'the label'),
+                         ('partAbbreviation', 'the l.'),
                          ('partId', '1'),
                          ('transposition', mockTrans.return_value)]
 
@@ -2388,7 +2388,7 @@ class Test(unittest.TestCase):
         '''
         # 1.) prepare
         elem = ETree.Element('{}staffDef'.format(_MEINS),
-                             attrib={'n': '12', 'clef.line': '2', 'clef.shape': 'G', 
+                             attrib={'n': '12', 'clef.line': '2', 'clef.shape': 'G',
                                      'key.sig': '0',
                                      'key.mode': 'major', 'trans.semi': '-3', 'trans.diat': '-2',
                                      'meter.count': '3', 'meter.unit': '8', 'label': 'clarinet'})
@@ -2471,7 +2471,7 @@ class Test(unittest.TestCase):
         '''
         # 1.) prepare
         elem = ETree.Element('{}staffDef'.format(_MEINS),
-                             attrib={'n': '12', 'clef.line': '2', 'clef.shape': 'G', 
+                             attrib={'n': '12', 'clef.line': '2', 'clef.shape': 'G',
                                      'key.sig': '0',
                                      'key.mode': 'major', 'trans.semi': '-3', 'trans.diat': '-2',
                                      'meter.count': '3', 'meter.unit': '8'})
@@ -4824,7 +4824,7 @@ class Test(unittest.TestCase):
         self.assertEqual(expected, actual)
         # ensure environLocal
         mockEnviron.printDebug.assert_called_once_with(expPrintDebug)
-        
+
         expWarn = base._UNIMPLEMENTED_IMPORT.format('<staffDef>', '@n')
         mockEnviron.warn.assert_called_once_with(expWarn)
         # ensure measureFromElement()

@@ -125,7 +125,7 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         '''
         if te is None: # use the stored version if possible
             te = self._textExpression
-            
+
         if te is not None:
             te.style.justify = self.style.justify
         return te
@@ -2077,7 +2077,7 @@ class RepeatFinder:
 
         # Change mlist so each element of mlist is a list of hashed measures
         # for each measure in a part.
-        # May look something like [['sdlkfj', 'ej2k', 'r9u3kj'...], 
+        # May look something like [['sdlkfj', 'ej2k', 'r9u3kj'...],
         #                          ['fjk2', '23ijf9', ... ], ... ]
         for i in range(len(mlists)):
             mlists[i] = [hashFunction(mlists[i][j].notesAndRests) for j in range(len(mlists[i]))]
@@ -2088,7 +2088,7 @@ class RepeatFinder:
         # (part1_measure2_hash, part2_measure2_hash, ... ), ... ]
         mlists = list(zip(*mlists))
 
-        tempDict = {} 
+        tempDict = {}
         # maps the measure-hashes to the lowest examined measure number with that hash.
         res = []
 

@@ -34,7 +34,7 @@ from music21.analysis import pitchAnalysis
 class Axis:
     '''
     An Axis is an easier way of specifying what to plot on any given axis.
-    
+
     Client should be a .plot.PlotStream or None.  Eventually a Stream may be allowed,
     but not yet.
     '''
@@ -165,7 +165,7 @@ class Axis:
     def stream(self):
         '''
         Returns a reference to the client's .streamObj  (or None if client is None)
-        
+
         If the client is itself a stream, return it.
 
         Read-only
@@ -174,7 +174,7 @@ class Axis:
         if c is None:
             return None
         elif isinstance(c, stream.Stream):
-            return c        
+            return c
         else:
             return c.streamObj
 
@@ -247,7 +247,7 @@ class Axis:
         '''
         minV = self.minValue
         maxV = self.maxValue
-        
+
         if minV is None:
             minV = 0
         if maxV is None:
@@ -363,7 +363,7 @@ class PitchAxis(Axis):
 
         helperDict = {}
         octavesSeen = set()
-        
+
         def weightedSortHelper(x):
             '''
             ensure that higher weighed weights come first, but
@@ -398,7 +398,7 @@ class PitchAxis(Axis):
                 weights.sort(key=unweightedSortHelper)
             else:
                 weights.sort(key=weightedSortHelper)
-                
+
             label = None
             if not weights: # get a default
                 if self.hideUnused:
@@ -671,11 +671,11 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
 #     '''
 #     labelDefault = 'Step'
 #     quantities = ('diatonic', 'diatonicNoteNum')
-# 
+#
 #     def extractOneElement(self, n, formatDict):
 #         if hasattr(n, 'pitch'):
 #             return n.pitch.diatonicNoteNum
-# 
+#
 #     def ticks(self, dataMin=15, dataMax=43):
 #         '''
 #         >>> ax = graph.axis.PitchDiatonicAxis()
@@ -690,7 +690,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
 #         22 B♭
 #         23 B
 #         24 C1
-# 
+#
 #         >>> ax.showOctaves = False
 #         >>> for ps, label in ax.ticks():
 #         ...     print(str(ps) + " " + label)
@@ -699,7 +699,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
 #         22 B♭
 #         23 B
 #         24 C
-# 
+#
 #         >>> ax.showOctaves = True
 #         >>> for ps, label in ax.ticks():
 #         ...     print(str(ps) + " " + label)
@@ -708,7 +708,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
 #         22 B♭0
 #         23 B0
 #         24 C1
-# 
+#
 #         >>> bach = corpus.parse('bwv66.6')
 #         >>> plotS = graph.plot.PlotStream(bach.parts[-1])
 #         >>> ax = graph.axis.PitchSpaceAxis(plotS)

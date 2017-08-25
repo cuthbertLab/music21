@@ -191,10 +191,10 @@ def nextLargerType(durType):
 
     >>> duration.nextLargerType("16th")
     'eighth'
-    
+
     >>> duration.nextLargerType("whole")
     'breve'
-    
+
     >>> duration.nextLargerType("duplex-maxima")
     Traceback (most recent call last):
     music21.duration.DurationException: cannot get the next larger of duplex-maxima
@@ -602,9 +602,9 @@ def quarterConversion(qLen):
 
 
     >>> duration.quarterConversion(99.0)
-    QuarterLengthConversion(components=(DurationTuple(type='inexpressible', 
-                                                      dots=0, 
-                                                      quarterLength=99.0),), 
+    QuarterLengthConversion(components=(DurationTuple(type='inexpressible',
+                                                      dots=0,
+                                                      quarterLength=99.0),),
                             tuplet=None)
 
     '''
@@ -642,11 +642,11 @@ def quarterConversion(qLen):
         typeNext = nextLargerType(closestSmallerType)
     except DurationException:
         # too big...
-        return QuarterLengthConversion((DurationTuple(type='inexpressible', 
-                                                      dots=0, 
+        return QuarterLengthConversion((DurationTuple(type='inexpressible',
+                                                      dots=0,
                                                       quarterLength=qLen),), None)
-    
-    
+
+
     tupleCandidates = quarterLengthToTuplet(qLen, 1)
     if tupleCandidates:
         # assume that the first tuplet candidate, using the smallest type, is best
@@ -998,7 +998,7 @@ class Tuplet:
         for the duration (by default).  Or if inPlace is
         set to False, returns a new duration that has
         the new length.
-        
+
         # TODO: add inPlace setting.
 
         >>> a = duration.Tuplet()
@@ -2081,7 +2081,7 @@ class Duration(SlottedObjectMixin):
         cl = self.client
         if cl is None:
             return False
-        cl.informSites({'changedAttribute': 'duration', 
+        cl.informSites({'changedAttribute': 'duration',
                         'quarterLength': self._qtrLength})
         return True
 
@@ -2597,7 +2597,7 @@ class Duration(SlottedObjectMixin):
     def _setQuarterLength(self, value):
         if self.linked is False:
             self._qtrLength = value
-        elif (self._qtrLength != value 
+        elif (self._qtrLength != value
                 or self._componentsNeedUpdating  # skip a type update for next type check
                 or self.type == 'inexpressible'):
             value = opFrac(value)

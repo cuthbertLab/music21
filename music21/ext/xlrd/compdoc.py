@@ -169,7 +169,7 @@ class CompDoc(object):
                 offset = 512 + sec_size * sid
                 MSAT.extend(unpack(fmt, mem[offset:offset+sec_size]))
                 sid = MSAT.pop() # last sector id is sid of next sector in the chain
-                
+
         if DEBUG and actual_MSATX_sectors != expected_MSATX_sectors:
             print("[2]===>>>", mem_data_secs, nent, SAT_sectors_reqd, expected_MSATX_sectors, actual_MSATX_sectors, file=logfile)
         if DEBUG:
@@ -326,7 +326,7 @@ class CompDoc(object):
                         )
             assert s == EOCSID
             if todo != 0:
-                fprintf(self.logfile, 
+                fprintf(self.logfile,
                     "WARNING *** OLE2 stream %r: expected size %d, actual size %d\n",
                     name, size, size - todo)
 
@@ -386,7 +386,7 @@ class CompDoc(object):
                 % (qname, d.tot_size, self.mem_data_len))
         if d.tot_size >= self.min_size_std_stream:
             result = self._locate_stream(
-                self.mem, 512, self.SAT, self.sec_size, d.first_SID, 
+                self.mem, 512, self.SAT, self.sec_size, d.first_SID,
                 d.tot_size, qname, d.DID+6)
             if self.DEBUG:
                 print("\nseen", file=self.logfile)

@@ -391,7 +391,7 @@ class CTSong:
         for line in self.lines[1:]:
             if "%" in line:
                 if line.split()[0].endswith(':'):
-                    comments.append([line.split()[0], 
+                    comments.append([line.split()[0],
                                      (line[line.index('%') + 1:].strip())] )
                 else:
                     comments.append([line[line.index('%') + 1:].strip()])

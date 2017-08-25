@@ -4,10 +4,10 @@ An interface for music21 using mod_wsgi
 
 To use, first install mod_wsgi and include it in the HTTPD.conf file.
 
-Add this file to the server, ideally not in the document root, 
+Add this file to the server, ideally not in the document root,
 on mac this could be /Library/WebServer/wsgi-scripts/zipfileapp.py
 
-Then edit the HTTPD.conf file to redirect any requests to WEBSERVER:/music21interface 
+Then edit the HTTPD.conf file to redirect any requests to WEBSERVER:/music21interface
 to call this file:
 Note: unlike with mod_python, the end of the URL does not determine which function is called,
 WSGIScriptAlias always calls application.
@@ -38,7 +38,7 @@ import cgi
 import re
 #
 
-##### 
+#####
 # Output constants
 CSV_OUTPUT_ID = 'csv'
 ORANGE_OUTPUT_ID = 'orange'
@@ -62,7 +62,7 @@ def music21ModWSGIFeatureApplication(environ, start_response):
     '''
     status = '200 OK'
 
-    pathInfo = environ['PATH_INFO'] 
+    pathInfo = environ['PATH_INFO']
     # Contents of path after mount point of wsgi app but before question mark
 
     if pathInfo == '/uploadForm':
@@ -71,15 +71,15 @@ def music21ModWSGIFeatureApplication(environ, start_response):
             ('Content-Length', str(len(output)))]
 
         start_response(status, response_headers)
-    
-    
+
+
         return [output]
 
 
     #command = pathInfo
 
     formFields = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
-                
+
     # Check if form data is present. If not found, display error
     try:
         unused_subUploadFormFile = formFields['subUploadForm']
@@ -102,15 +102,15 @@ def music21ModWSGIFeatureApplication(environ, start_response):
             ('Content-Length', str(len(html)))]
 
         start_response(status, response_headers)
-    
-    
+
+
         return [html]
 
-    
+
     # Get file from POST
     uploadedFile = formFields['fileupload'].file
     filename = formFields['fileupload'].filename
-    
+
     uploadType = formFields['fileupload'].type
 
     # Check if filename is empty - display no file chosen error
@@ -133,11 +133,11 @@ def music21ModWSGIFeatureApplication(environ, start_response):
             ('Content-Length', str(len(html)))]
 
         start_response(status, response_headers)
-    
-    
+
+
         return [html]
 
-    
+
     # Check if uploadType is zip - display no file chosen error
     if uploadType != "application/zip":
         html = """
@@ -158,18 +158,18 @@ def music21ModWSGIFeatureApplication(environ, start_response):
             ('Content-Length', str(len(html)))]
 
         start_response(status, response_headers)
-    
-    
+
+
         return [html]
 
-        
+
     # Setup Feature Extractors and Data Set
     ds = features.DataSet(classLabel='Class')
-    
-    
-    
+
+
+
     featureIDList = list()
-    
+
     # Check if features have been selected. Else display error
     try:
         unused_featureFile = formFields['features']
@@ -182,50 +182,50 @@ def music21ModWSGIFeatureApplication(environ, start_response):
             </body></html>
             """
         return html
-    
+
     if common.isIterable(formFields['features']):
         print(formFields['features'])
         for featureId in formFields['features']:
             featureIDList.append(str(featureId.value))
     else:
         featureIDList.append(formFields['features'].value)
-    
+
     fes = features.extractorsById(featureIDList)
     ds.addFeatureExtractors(fes)
-    
+
     # Create ZipFile Object
     zipf = zipfile.ZipFile(uploadedFile, 'r')
-    
+
     # Loop Through Files
     for scoreFileInfo in zipf.infolist():
-        
+
         filePath = scoreFileInfo.filename
-        
+
         # Skip Directories
         if(filePath.endswith('/')):
             continue
         scoreFile = zipf.open(filePath)
-        
+
         # Use Music21's converter to parse file
         parsedFile = idAndParseFile(scoreFile,filePath)
-        
+
         # If valid music21 format, add to data set
         if parsedFile is not None:
-            
+
             # Split into directory structure and filname
             pathPartitioned = filePath.rpartition('/')
             directory = pathPartitioned[0]
             filename = pathPartitioned[2]
-            
+
             if directory == "":
                 directory = 'uncategorized'
-            
+
             ds.addData(parsedFile,classValue=directory,id=filename)
-            
+
     # Process data set
     ds.process()
-    
-    # Get output format from POST and set appropriate output:     
+
+    # Get output format from POST and set appropriate output:
     outputFormatID = formFields['outputformat'].value
     if outputFormatID == CSV_OUTPUT_ID:
         output = features.OutputCSV(ds).getString()
@@ -235,7 +235,7 @@ def music21ModWSGIFeatureApplication(environ, start_response):
         output = features.OutputARFF(ds).getString()
     else:
         output = "invalid output format"
-       
+
     response_headers = [('Content-type', 'text/plain'),
             ('Content-Length', str(len(output)))]
 
@@ -245,7 +245,7 @@ def music21ModWSGIFeatureApplication(environ, start_response):
     return [output]
 
 application = music21ModWSGIFeatureApplication
-    
+
 def idAndParseFile(fileToParse,filename):
     '''Takes in a file object and filename, identifies format, and returns parsed file'''
     matchedFormat = re.sub(r'^.*\.', '', filename)
@@ -257,7 +257,7 @@ def idAndParseFile(fileToParse,filename):
             parsedFile = None
         else:
             parsedFile = converter.parse(fileToParse.read(), format=music21FormatName)
-            
+
     return parsedFile
 
 def getFeatureInfo():
@@ -272,8 +272,8 @@ def getFeatureInfo():
             fe.description + "','" + str(fe.dimensions) + "'],\n"
     output = output[:-2]
     output += "]\n"
-    
-    
+
+
     jsExtractorTypes = {
         "M": "Melody-based Extractors",
         "P": "Pitch-based Extractors",
@@ -322,7 +322,7 @@ def getUploadForm():
                 button.innerHTML = '[+]';
             }
         }
-        // 
+        //
         // Checks or unchecks all extractors for a given typeId, status: 1=checked 0=unchecked
         function changeAll(typeId, status) {
             form = document.getElementById('/uploadForm');
@@ -343,7 +343,7 @@ def getUploadForm():
             }
         }
         //
-        
+
         /// Shows all extractors
         function showAllExtractors() {
         """
@@ -353,7 +353,7 @@ def getUploadForm():
     html += "document.getElementById('m21extractors').style.display = '';\n"
     html += """
         }
-        
+
         /// Hides all extractors
         function hideAllExtractors() {
         """
@@ -363,7 +363,7 @@ def getUploadForm():
     html += "document.getElementById('m21extractors').style.display = 'none';\n"
     html += """
         }
-        
+
         var numextractors = 0
         var numvectors = 0
         function updateCounts(feature,value) {
@@ -377,7 +377,7 @@ def getUploadForm():
             document.getElementById('numextractors').innerHTML = numextractors;
             document.getElementById('numvectors').innerHTML = numvectors;
         }
-        
+
         </script>
         </head>
         <body style='font-family:calibri' bgcolor='#CCC' onLoad="toggleExtractors('m21')">
@@ -385,41 +385,41 @@ def getUploadForm():
         <tr><td align='center'>
         <table border=0 width='500px' cellpadding='10px' style='background-color:#FFF'>
         <tr><td align='left'>"""
-    
+
     # Heading and description
-    html += """ <h1><span style="font-family:'Courier New', Courier, monospace">music21</span> 
+    html += """ <h1><span style="font-family:'Courier New', Courier, monospace">music21</span>
         Feature Extraction:</h1>
         <a href='/music21/webapps/client'>Back</a>
 
         <hr />
-        <p style='font-size:15'>Multiple Feature Extractors on Multiple Scores 
+        <p style='font-size:15'>Multiple Feature Extractors on Multiple Scores
         using Music21 - <br />
-        Upload a .zip file containing musical scores. They can be of varying formats. 
+        Upload a .zip file containing musical scores. They can be of varying formats.
         music21 will convert and parse .xml, .md, .krn, .abc, .mid, and others.</p>
         """
     # form info
-    html += """<form id='/uploadForm' action="/music21/featureapp" method="POST" 
+    html += """<form id='/uploadForm' action="/music21/featureapp" method="POST"
         enctype="multipart/form-data" style='font-size:14'>"""
-    
+
     # file upload
     html += """
         <hr />
         <input type="hidden" name="subUploadForm" value=1/>
-        <span style='font-size:16'><b>File Selection: </b></span><input 
+        <span style='font-size:16'><b>File Selection: </b></span><input
             type="file" name="fileupload"/>
         <br />
         """
-    
+
     # class value info
     html += """
         <hr />
         <span style='font-size:16'><b>Class Value: </b></span>
-        <p>By default, the Class Value for each file is set to be the directory 
-            of the file in the zip archive (e.g. if identifying composers, the 
+        <p>By default, the Class Value for each file is set to be the directory
+            of the file in the zip archive (e.g. if identifying composers, the
             directories might be Bach, Beethoven, Unknown)
         <br />
         """
-    
+
     # output format
     html += """
         <hr />
@@ -433,7 +433,7 @@ def getUploadForm():
     html += """
         </select>
         """
-    
+
     # List native music21 extractors
     html += """
         <hr />
@@ -441,7 +441,7 @@ def getUploadForm():
         <div style='padding-left:20px'>
         """
     html += "<span style='font-size:13'><b>Select: </b><a href=\"javascript:changeAll('all',1)\">All</a>&nbsp;&nbsp;<a href=\"javascript:changeAll('all',0)\">None</a></span><br />"
-        
+
     # List Extractors
     for typeId, typeName in extractorTypeNames:
         html += "<p onClick=\"toggleExtractors('"+typeId+"')\"  style='font-size:15'><b>" + typeName +": <span id='" + typeId + "button'>[+]<span></b></p>\n"
@@ -454,14 +454,14 @@ def getUploadForm():
             dimensions = extractor[3]
             html += "<input type='checkbox' name='features' value='" + featureId + \
                 "' extractortype = '" + typeId + "' onchange='updateCounts(this.checked," + \
-                dimensions + ")'/>\n" 
+                dimensions + ")'/>\n"
             html += "<span onClick=toggleDesc('"+ featureId + "')>"+ name + "</span><br />\n"
             html += "<div style='font-size:12; display:none; padding-left:16px; " + \
                 "margin-bottom:7px' id ='" + featureId + "desc'>\n"
             html += desc + "<br />(vectors output: " + dimensions + ") " + "<br /></div>\n"
         html += "</div>\n"
     html += "</div>\n"
-    
+
     html += """<hr />
         <input type="submit" value="Process" onclick="this.value='Processing...';submit()">
         </form>
@@ -474,9 +474,9 @@ def getUploadForm():
 featureInfo = dict()
 featureInfo['m21']=[
     ['P22', 'Quality',
-        'Set to 0 if the key signature indicates that a recording is major, set ' + 
-        'to 1 if it indicates that it is minor and set to 0 if key signature is unknown. ' + 
-        'Music21 addition: if no key mode is found in the piece, analyze the piece to ' + 
+        'Set to 0 if the key signature indicates that a recording is major, set ' +
+        'to 1 if it indicates that it is minor and set to 0 if key signature is unknown. ' +
+        'Music21 addition: if no key mode is found in the piece, analyze the piece to ' +
         'discover what mode it is most likely in.', '1'],
     ['QL1', 'Unique Note Quarter Lengths', 'The number of unique note quarter lengths.', '1'],
     ['QL2', 'Most Common Note Quarter Length', 'The value of the most common quarter length.', '1'],

@@ -48,12 +48,12 @@ class StreamCoreMixin:
         ### v4!
         #self._elementTree = tree.trees.ElementTree(source=self)
 
-    def coreInsert(self, offset, element, 
-                   ignoreSort=False, setActiveSite=True, 
-                   ):        
+    def coreInsert(self, offset, element,
+                   ignoreSort=False, setActiveSite=True,
+                   ):
         '''
         N.B. -- a "core" method, not to be used by general users.  Run .insert() instead.
-        
+
         A faster way of inserting elements that does no checks,
         just insertion.
 
@@ -103,10 +103,10 @@ class StreamCoreMixin:
         #self._elementTree.insert(float(offset), element)
         return storeSorted
 
-    def coreAppend(self, element, setActiveSite=True):        
+    def coreAppend(self, element, setActiveSite=True):
         '''
         N.B. -- a "core" method, not to be used by general users.  Run .append() instead.
-        
+
         Low level appending; like `coreInsert` does not error check,
         determine elements changed, or similar operations.
 
@@ -288,9 +288,9 @@ class StreamCoreMixin:
         important checks to that element.
 
         Used by both insert() and append()
-        
+
         Returns None or raises a StreamException
-        
+
         >>> s = stream.Stream()
         >>> s.coreGuardBeforeAddElement(s)
         Traceback (most recent call last):
@@ -320,11 +320,11 @@ class StreamCoreMixin:
         # all get() calls.
         element.purgeLocations()
 
-        
+
     def coreStoreAtEnd(self, element, setActiveSite=True):
         '''
         NB -- this is a "core" method.  Use .storeAtEnd() instead.
-        
+
         Core method for adding end elements.
         To be called by other methods.
         '''

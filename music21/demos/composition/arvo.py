@@ -27,7 +27,7 @@ def partPari(show=True):
                             + 'E- F G E- D E- F E- D C E- G F E- C F E- D C E- D C D C~ C')
 
     # fake Paert
-    #main = converter.parse("E-1 F G A- G F c d e- G A- F E- D d e- c B- A- c d A- G F G " 
+    #main = converter.parse("E-1 F G A- G F c d e- G A- F E- D d e- c B- A- c d A- G F G "
     #                        + "F A- B- A- c d A- B- c B- A- G F G F E-~ E-", '4/4')
     main.transpose('P8', inPlace=True)
     main.insert(0, cminor)
@@ -100,4 +100,4 @@ def partPari(show=True):
 
     if show:
         s.show()
-        
+

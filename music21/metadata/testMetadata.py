@@ -134,7 +134,7 @@ class Test(unittest.TestCase):
     def testRichMetadata02(self):
         from music21 import corpus
         from music21 import metadata
-        
+
         score = corpus.parse('bwv66.6')
         richMetadata = metadata.RichMetadata()
         richMetadata.merge(score.metadata)

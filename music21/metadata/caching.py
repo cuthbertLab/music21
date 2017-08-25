@@ -45,7 +45,7 @@ def cacheMetadata(corpusNames=None,
 
     if corpusNames is None:
         corpusNames = localCorporaNames[:] + ['local', 'core',] # + 'virtual']
-        
+
     if not common.isIterable(corpusNames):
         corpusNames = (corpusNames,)
 
@@ -61,13 +61,13 @@ def cacheMetadata(corpusNames=None,
         corpusObject = manager.fromName(corpusName)
         failingFilePaths += corpusObject.cacheMetadata(useMultiprocessing, verbose, timer)
 
-        
+
     message = 'cache: final writing time: {0} seconds'.format(timer)
     if verbose is True:
         environLocal.warn(message)
     else:
         environLocal.printDebug(message)
-        
+
     for failingFilePath in failingFilePaths:
         message = 'path failed to parse: {0}'.format(failingFilePath)
         if verbose is True:

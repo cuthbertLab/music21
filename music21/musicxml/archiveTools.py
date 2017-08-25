@@ -111,7 +111,7 @@ def uncompressMXL(filename, deleteOriginal=False):
         except KeyError:
             for storedName in myZip.namelist():
                 myZip.extract(member=storedName, path=extractPath)
-            
+
     # Delete uncompressed xml file from system
     if deleteOriginal:
         os.remove(filename)

@@ -111,7 +111,7 @@ class StreamFreezeThawBase:
             raise ValueError
         if not isinstance(directory, pathlib.Path):
             directory = pathlib.Path(directory)
-        
+
         # cannot get data from stream, as offsets are broken
         streamStr = str(time.time())
         return directory / ('m21-' + common.getMd5(streamStr) + '.p')
@@ -656,7 +656,7 @@ class StreamFreezer(StreamFreezeThawBase):
         else:
             if not isinstance(fp, pathlib.Path):
                 fp = pathlib.Path(fp)
-            
+
             if not fp.is_absolute(): # assume its a complete path
                 fp = environLocal.getRootTempDir() / fp
 
@@ -671,7 +671,7 @@ class StreamFreezer(StreamFreezeThawBase):
             pickleString = pickle.dumps(storage, protocol=pickle.HIGHEST_PROTOCOL)
             if zipType == 'zlib':
                 pickleString = zlib.compress(pickleString)
-            
+
             if isinstance(fp, pathlib.Path):
                 fp = str(fp)
             with open(fp, 'wb') as f: # binary
@@ -929,7 +929,7 @@ class StreamThawer(StreamFreezeThawBase):
         '''
         if isinstance(fp, pathlib.Path):
             fp = str(fp) # TODO: reverse this... use Pathlib...
-                        
+
         if os.sep in fp: # assume it's a complete path
             fp = fp
         else:

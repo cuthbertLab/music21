@@ -28,7 +28,7 @@ class Documenter:
 
     def __repr__(self):
         raise NotImplementedError
-    
+
     ### PRIVATE PROPERTIES ###
 
     @property
@@ -320,7 +320,7 @@ class AttributeDocumenter(MemberDocumenter):
 class ClassDocumenter(ObjectDocumenter):
     '''
     A documenter for one class:
-    
+
     >>> from music21 import articulations
     >>> klass = articulations.Caesura
     >>> documenter = ClassDocumenter(klass)
@@ -1595,7 +1595,7 @@ class CorpusDocumenter(Documenter):
 #             str(corpusFile.title),
 #             str(corpusFile.format),
 #             str(corpusFile.path),
-#             )) 
+#             ))
 #         result.append('')
 #         result.append('  Source: {0}'.format(
 #             str(corpusFile.url)))

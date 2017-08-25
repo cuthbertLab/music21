@@ -50,7 +50,7 @@ def lowerLines():
                 if (currentNote % 10 == (rotationNumber + 9) % 10):
                     appendNote.lyrics.append(note.Lyric(text="r" + str(rotationNumber), number=2))
                     if rotationNumber in range(13, 22):
-                        appendNote.transpose(correctTranspositions[rotationNumber - 13], 
+                        appendNote.transpose(correctTranspositions[rotationNumber - 13],
                                              inPlace=True)
                         appendNote.pitch.simplifyEnharmonic(inPlace=True)
                         appendNote.lyrics.append(note.Lyric(text="*", number=3))

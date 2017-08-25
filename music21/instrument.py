@@ -139,24 +139,24 @@ class Instrument(base.Music21Object):
 
         self.partId = None
         self._partIdIsRandom = False
-        
+
         self.partName = None
         self.partAbbreviation = None
-        
+
         self.printPartName = None # True = yes, False = no, None = let others decide
         self.printPartAbbreviation = None
-        
+
 
         self.instrumentId = None # apply to midi and instrument
         self._instrumentIdIsRandom = False
 
-        
+
         self.instrumentName = None
         self.instrumentAbbreviation = None
         self.midiProgram = None
         self.midiChannel = None
         self.instrumentSound = None
-        
+
         self.lowestNote = None
         self.highestNote = None
 
@@ -377,7 +377,7 @@ class ElectricOrgan(Organ):
         self.instrumentName = 'Electric Organ'
         self.instrumentAbbreviation = 'Elec Org'
         self.midiProgram = 16
-        
+
         self.lowestNote = pitch.Pitch('C2')
         self.highestNote = pitch.Pitch('C6')
 
@@ -389,7 +389,7 @@ class ReedOrgan(Organ):
         #TODO self.instrumentAbbreviation = ''
         self.midiProgram = 20
         self.instrumentSound = 'keyboard.organ.reed'
-        
+
         self.lowestNote = pitch.Pitch('C2')
         self.highestNote = pitch.Pitch('C6')
 
@@ -401,7 +401,7 @@ class Accordion(Organ):
         self.instrumentAbbreviation = 'Acc'
         self.midiProgram = 21
         self.instrumentSound = 'keyboard.accordion'
-        
+
         self.lowestNote = pitch.Pitch('F3')
         self.highestNote = pitch.Pitch('A6')
 
@@ -413,7 +413,7 @@ class Harmonica(Instrument):
         self.instrumentAbbreviation = 'Hmca'
         self.midiProgram = 22
         self.instrumentSound = 'wind.reed.harmonica'
-        
+
         self.lowestNote = pitch.Pitch('C3')
         self.highestNote = pitch.Pitch('C6')
 
@@ -573,7 +573,7 @@ class ElectricGuitar(Guitar):
         self.instrumentAbbreviation = 'Elec Gtr'
         self.midiProgram = 26
         self.instrumentSound = 'pluck.guitar.electric'
-        
+
 class AcousticBass(Guitar):
     def __init__(self):
         super().__init__()
@@ -582,7 +582,7 @@ class AcousticBass(Guitar):
         self.instrumentAbbreviation = 'Ac b'
         self.midiProgram = 32
         self.instrumentSound = 'pluck.bass.acoustic'
-        
+
         self.lowestNote = pitch.Pitch('E1')
         self._stringPitches = ['E1', 'A1', 'D2', 'G2']
 
@@ -1735,7 +1735,7 @@ def partitionByInstrument(streamObj):
     for instrumentObj in instrumentIterator:
         # matching here by instrument name
         if instrumentObj.instrumentName not in names:
-            names[instrumentObj.instrumentName] = {'Instrument': instrumentObj} 
+            names[instrumentObj.instrumentName] = {'Instrument': instrumentObj}
             # just store one instance
 
     # create a return object that has a part for each instrument
@@ -1754,7 +1754,7 @@ def partitionByInstrument(streamObj):
     for el in s:
         if not el.isStream:
             post.insert(el.offset, el)
-        
+
         subStream = el
         for i in subStream.getElementsByClass('Instrument'):
             start = i.offset
@@ -1762,7 +1762,7 @@ def partitionByInstrument(streamObj):
             end = i.offset + i.duration.quarterLength
             # get destination Part
             p = names[i.instrumentName]['Part']
-            
+
             coll = subStream.getElementsByOffset(start, end,
                     # do not include elements that start at the end
                     includeEndBoundary=False,
@@ -2132,7 +2132,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 4)
         # piano spans are joined together
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
-        
+
         self.assertEqual(len(post.parts[0].notes), 12)
         offsetList = []
         ppn = post.parts[0].notes

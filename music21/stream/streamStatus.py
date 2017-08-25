@@ -229,7 +229,7 @@ class Test(unittest.TestCase):
         mmm = copy.deepcopy(mm)
         self.assertEqual(mmm.streamStatus.beams, False)
         # m.show()
-        
+
 
 #------------------------------------------------------------------------------
 

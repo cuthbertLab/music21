@@ -109,8 +109,8 @@ def newDomSev(show=True):
 
 def melodicChordExpression(show=True):
     '''
-    This method not only searches the entire second violin part of a 
-    complete string quarter for a seventh chord expressed melodically, 
+    This method not only searches the entire second violin part of a
+    complete string quarter for a seventh chord expressed melodically,
     but creates new notation to display the results with analytical markup.
     '''
     #from music21 import *
@@ -162,8 +162,8 @@ def  pitchDensity(show=True):
     beethovenScore = corpus.parse('beethoven/opus133.xml')
     celloPart = beethovenScore.getElementById('Cello')
 
-    # First, we take a "flat" view of the Stream, which removes 
-    # nested containers such as Measures. Second, 
+    # First, we take a "flat" view of the Stream, which removes
+    # nested containers such as Measures. Second,
     # we combine tied notes into single notes with summed durations.
 
     notes = celloPart.flat.stripTies()
@@ -420,14 +420,14 @@ def demoGraphMessiaen():
     s.plot('histogram', 'pitchclass', dpi=dpi, title='Pitch Class Usage, %s' % pieceTitle)
 
 
-    s.plot('scatter', values=['pitchclass', 'offset'], 
+    s.plot('scatter', values=['pitchclass', 'offset'],
            dpi=dpi, title='Pitch Class By Measure, %s' % pieceTitle)
 
-    s.plot('horizontalBar', values=['pitch', 'offset'], 
+    s.plot('horizontalBar', values=['pitch', 'offset'],
            dpi=dpi, title='Pitch By Measure, %s' % pieceTitle)
 
 
-    s.plot('scatterweighted', values=['pitch', 'quarterlength'], 
+    s.plot('scatterweighted', values=['pitch', 'quarterlength'],
            dpi=dpi, title='Pitch and Duration, %s' % pieceTitle, xLog=False)
 
     # s.getMeasuresRange(10, 20)plot('PlotHorizontalBarPitchSpaceOffset')
@@ -446,7 +446,7 @@ def demoGraphMessiaenBrief():
 
     #s.plot('scatter', values=['pitchclass', 'offset'], dpi=dpi)
 
-    s.plot('scatterweighted', title='', colorGrid=None, 
+    s.plot('scatterweighted', title='', colorGrid=None,
            values=['pitch', 'quarterlength'], dpi=dpi, xLog=False)
 
 
@@ -471,17 +471,17 @@ def demoGraphMozartChopin():
     dpi = 300
 
     mozartStream = converter.parse(xmlTest.mozartTrioK581Excerpt) # @UndefinedVariable
-    g = graph.plot.Plot3DBarsPitchSpaceQuarterLength(mozartStream.stripTies(), 
-                                                     dpi=dpi, 
-                                                     title='Mozart Trio K. 581, Excerpt', 
-                                                     colors=['#CD4F39'], 
+    g = graph.plot.Plot3DBarsPitchSpaceQuarterLength(mozartStream.stripTies(),
+                                                     dpi=dpi,
+                                                     title='Mozart Trio K. 581, Excerpt',
+                                                     colors=['#CD4F39'],
                                                      alpha=.8)
     g.run()
 
     chopinStream = converter.parse(kernTest.mazurka6)
     g = graph.plot.Plot3DBarsPitchSpaceQuarterLength(chopinStream.stripTies(),
-                                                     dpi=dpi, 
-                                                     title='Chopin Mazurka 6, Excerpt', 
+                                                     dpi=dpi,
+                                                     title='Chopin Mazurka 6, Excerpt',
                                                      colors=['#6495ED'], alpha=.8)
     g.run()
 

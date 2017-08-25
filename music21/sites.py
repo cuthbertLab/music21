@@ -609,9 +609,9 @@ class Sites(common.SlottedObjectMixin):
         >>> aSites = sites.Sites()
         >>> aSites.add(aObj)
         >>> aSites.add(bObj)
-        
+
         We get the most recently added object first
-        
+
         >>> aSites.getObjByClass('Mock', sortByCreationTime=True) == bObj
         True
 
@@ -661,7 +661,7 @@ class Sites(common.SlottedObjectMixin):
             #if DEBUG_CONTEXT: print('\tY: getObjByClass: iterating objs:', id(obj), obj)
             if (classNameIsStr and obj.isFlat):
                 #if DEBUG_CONTEXT:
-                #    print('\tY: skipping flat stream that does not contain object:', 
+                #    print('\tY: skipping flat stream that does not contain object:',
                 #                  id(obj), obj)
                 #environLocal.printDebug(
                 #    ['\tY: skipping flat stream that does not contain object:'])

@@ -59,9 +59,9 @@ from music21 import meter
 from music21 import note
 from music21 import stream
 
-def reverse(self, *, 
+def reverse(self, *,
             inPlace=False,
-            classesToMove=(key.KeySignature, meter.TimeSignature, clef.Clef, 
+            classesToMove=(key.KeySignature, meter.TimeSignature, clef.Clef,
                            metadata.Metadata, instrument.Instrument, layout.SystemLayout),
             makeNotation=False):
     '''

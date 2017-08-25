@@ -52,13 +52,13 @@ To do a release,
 13. Upload the new file with "twine upload music21-4.1.0.tar.gz" [*]
 
     [*] Requires twine to be installed
-    
+
     You will need a file called ~/.pypirc with
 
         [distutils]
         index-servers =
             pypi
-        
+
         [pypi]
         username:yourusername
         password:yourpassword

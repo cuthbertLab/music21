@@ -824,8 +824,8 @@ class RelativeStrengthOfTopPitchesFeature(featuresModule.FeatureExtractor):
 
         except IndexError:
             self.feature.vector[0] = 0.0
-            
-    
+
+
 
 class RelativeStrengthOfTopPitchClassesFeature(featuresModule.FeatureExtractor):
     '''
@@ -896,7 +896,7 @@ class IntervalBetweenStrongestPitchesFeature(featuresModule.FeatureExtractor):
 
         except IndexError:
             self.feature.vector[0] = 0.0
-        
+
 
 class IntervalBetweenStrongestPitchClassesFeature(
     featuresModule.FeatureExtractor):
@@ -1093,7 +1093,7 @@ class MostCommonPitchFeature(featuresModule.FeatureExtractor):
             pNumberMax = histo.most_common(1)[0][0]
             numPitches = float(len(histo))
             self.feature.vector[0] = pNumberMax / numPitches
-        except IndexError: 
+        except IndexError:
             self.feature.vector[0] = 0.0
 
 class PrimaryRegisterFeature(featuresModule.FeatureExtractor):
@@ -1586,8 +1586,8 @@ class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
 
 class StrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
-    Bin label of the beat bin of the peak with the highest frequency.    
-    
+    Bin label of the beat bin of the peak with the highest frequency.
+
     >>> sch = corpus.parse('schoenberg/opus19', 2)
     >>> for p in sch.parts:
     ...     p.insert(0, tempo.MetronomeMark('Langsam', 70))
@@ -1639,7 +1639,7 @@ class SecondStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
         beatHisto = copy.copy(self.data['flat.secondsMap.beatHistogram'])
         highestIndex = beatHisto.index(max(beatHisto))
         beatHisto[highestIndex] = 0
-        
+
         self.feature.vector[0] = beatHisto.index(max(beatHisto))
 
 
@@ -1649,7 +1649,7 @@ class HarmonicityOfTwoStrongestRhythmicPulsesFeature(
     '''
     The bin label of the higher (in terms of bin label) of the two beat bins of the
     peaks with the highest frequency divided by the bin label of the lower.
-    
+
     >>> sch = corpus.parse('schoenberg/opus19', 2)
     >>> for p in sch.parts:
     ...     p.insert(0, tempo.MetronomeMark('Langsam', 70))
@@ -1657,7 +1657,7 @@ class HarmonicityOfTwoStrongestRhythmicPulsesFeature(
     >>> f = fe.extract()
     >>> f.vector[0]
     2.0
-    
+
     '''
     id = 'R3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1675,7 +1675,7 @@ class HarmonicityOfTwoStrongestRhythmicPulsesFeature(
         beatHisto = copy.copy(self.data['flat.secondsMap.beatHistogram'])
         highestIndex = beatHisto.index(max(beatHisto))
         beatHisto[highestIndex] = 0
-        
+
         secondHighest = beatHisto.index(max(beatHisto))
         self.feature.vector[0] = float(highestIndex / secondHighest)
 
@@ -1731,10 +1731,10 @@ class StrengthOfSecondStrongestRhythmicPulseFeature(
     def process(self):
         beatHisto = copy.copy(self.data['flat.secondsMap.beatHistogram'])
         sumHisto = sum(beatHisto)
-        
+
         highestIndex = beatHisto.index(max(beatHisto))
         beatHisto[highestIndex] = 0
-        
+
         secondHighest = max(beatHisto)
         self.feature.vector[0] = secondHighest / sumHisto
 
@@ -1768,11 +1768,11 @@ class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(
 
     def process(self):
         beatHisto = copy.copy(self.data['flat.secondsMap.beatHistogram'])
-        
+
         theHighest = max(beatHisto)
         highestIndex = beatHisto.index(theHighest)
         beatHisto[highestIndex] = 0
-        
+
         secondHighest = max(beatHisto)
         self.feature.vector[0] = theHighest / secondHighest
 
@@ -1806,7 +1806,7 @@ class CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(
         theHighest = max(beatHisto)
         highestIndex = beatHisto.index(theHighest)
         beatHisto[highestIndex] = 0
-        
+
         secondHighest = max(beatHisto)
         self.feature.vector[0] = (theHighest + secondHighest) / sumHisto
 

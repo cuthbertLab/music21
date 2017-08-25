@@ -215,7 +215,7 @@ class Spanner(base.Music21Object):
         # create a stream subclass, spanner storage; pass a reference
         # to this spanner for getting this spanner from the SpannerStorage
         # directly
-        
+
         # TODO: Move here! along with VariantStorage to variant.
         self.spannerStorage = stream.SpannerStorage(spannerParent=self)
 
@@ -556,7 +556,7 @@ class Spanner(base.Music21Object):
         >>> sl.addSpannedElements(n1, n2, n3, n4, n5)
         >>> sl.getFirst() is n1
         True
-        
+
         >>> spanner.Slur().getFirst() is None
         True
         '''
@@ -1377,7 +1377,7 @@ class Ottava(Spanner):
     A non-transposing spanner has notes that are at the pitch that
     they would sound (therefore the Ottava spanner is a decorative
     line).
-    
+
     >>> ottava.transposing
     True
     >>> n1 = note.Note('D4')
@@ -1385,13 +1385,13 @@ class Ottava(Spanner):
     >>> ottava.addSpannedElements([n1, n2])
     >>> s = stream.Stream([ottava, n1, n2])
     >>> s.atSoundingPitch = False
-    
+
     >>> s2 = s.toSoundingPitch()
     >>> s2.show('text')
     {0.0} <music21.spanner.Ottava 8vb non-transposing<music21.note.Note D><music21.note.Note E>>
     {0.0} <music21.note.Note D>
     {1.0} <music21.note.Note E>
-    
+
     >>> for n in s2.notes:
     ...     print(n.nameWithOctave)
     D3
@@ -1424,7 +1424,7 @@ class Ottava(Spanner):
         transposing = 'transposing'
         if not self.transposing:
             transposing = 'non-transposing'
-        
+
         msg = msg.replace(self._reprHead, '<music21.spanner.Ottava {} {}'.format(
             self.type, transposing))
         return msg
@@ -1475,7 +1475,7 @@ class Ottava(Spanner):
     def shiftMagnitude(self):
         '''
         Get basic parameters of shift.
-        
+
         Returns either 8, 15, or 22 depending on the amount of shift
         '''
         if self._type.startswith('8'):
@@ -1507,7 +1507,7 @@ class Ottava(Spanner):
     def interval(self, reverse=False):
         '''
         return an interval.Interval() object representing this ottava
-        
+
         >>> ottava = spanner.Ottava(type='15mb')
         >>> i = ottava.interval()
         >>> i
@@ -1518,7 +1518,7 @@ class Ottava(Spanner):
             header = "P-"
         else:
             header = "P"
-            
+
         header += str(self.shiftMagnitude())
         return Interval(header)
 
@@ -1527,7 +1527,7 @@ class Ottava(Spanner):
         On a transposing spanner, switch to non-transposing,
         set style.hideObjectOnPrint to True, and transpose all notes and chords
         in the spanner.  Called by :meth:`~music21.stream.Stream.toSoundingPitch` in Stream
-        
+
         >>> ottava = spanner.Ottava(type='8va')
         >>> n1 = note.Note('D#4')
         >>> n2 = note.Note('E#4')
@@ -1540,26 +1540,26 @@ class Ottava(Spanner):
         >>> ottava.transposing
         False
         >>> n1.nameWithOctave
-        'D#5'        
+        'D#5'
         '''
         if not self.transposing:
             return
         self.transposing = False
         self.style.hideObjectOnPrint = True
-        
+
         myInterval = self.interval()
         for n in self.getSpannedElements():
             if not hasattr(n, 'pitches'):
                 continue
             for p in n.pitches:
                 p.transpose(myInterval, inPlace=True)
-                
+
     def undoTransposition(self):
         '''
         Change a non-transposing spanner to a transposing spanner,
         making sure it is not hidden and transpose back all the notes
         and chords in the spanner.
-        
+
         Called by :meth:`~music21.stream.Stream.toWrittenPitch` in Stream
 
         >>> ottava = spanner.Ottava(type='8va')
@@ -1574,20 +1574,20 @@ class Ottava(Spanner):
         True
         >>> n1.nameWithOctave
         'D#3'
-        
+
         '''
         if self.transposing:
             return
         self.transposing = True
         self.style.hideObjectOnPrint = False
-        
+
         myInterval = self.interval(reverse=True)
         for n in self.getSpannedElements():
             if not hasattr(n, 'pitches'):
                 continue
             for p in n.pitches:
                 p.transpose(myInterval, inPlace=True)
-                
+
 
 class Line(Spanner):
     '''A line or bracket represented as a spanner above two Notes.
@@ -1738,22 +1738,22 @@ class Glissando(Spanner):
     '''
     A between two Notes specifying a glissando or similar alteration.
     Different line types can be specified.
-    
+
     Glissandos can have a label and a lineType.  Label is a string or None.
     lineType defaults to 'wavy'
-    
+
     >>> gl = spanner.Glissando()
     >>> gl.lineType
     'wavy'
     >>> print(gl.label)
     None
-    
+
     >>> gl.label = 'gliss.'
-    
+
     Note -- not a Line subclass for now, but that might change.
     '''
     validLineTypes = ('solid', 'dashed', 'dotted', 'wavy')
-    
+
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
 
@@ -2611,11 +2611,11 @@ class Test(unittest.TestCase):
         self.assertEqual(len(t.spannerBundle), 1)
         tn2 = t.spannerBundle.getBySpannedElement(n2)
         self.assertEqual(len(tn2), 1)
-        
+
 
     def testGetSpannedElementIds(self):
         from music21 import note
-        
+
         n1 = note.Note('g')
         n2 = note.Note('f#')
         n3 = note.Note('e')

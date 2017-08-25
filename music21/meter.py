@@ -3487,7 +3487,7 @@ class TimeSignature(base.Music21Object):
         >>> ts = meter.TimeSignature('13/8', 13)
         >>> ts.beatDivisionCount
         Traceback (most recent call last):
-        music21.meter.TimeSignatureException: cannot determine beat backgrond 
+        music21.meter.TimeSignatureException: cannot determine beat backgrond
             when each beat is not partitioned
         '''
         # first, find if there is more than one beat and if all beats are uniformly partitioned
@@ -3616,14 +3616,14 @@ class TimeSignature(base.Music21Object):
 
     def getBeams(self, srcList, measureStartOffset=0.0):
         '''
-        Given a qLen position and an iterable music21Objects, return a list of Beams object.  
-        
-        The iterable can be a list (of elements) or a Stream (preferably flat) 
-        or a :class:`~music21.stream.iterator.StreamIterator` from which Durations 
+        Given a qLen position and an iterable music21Objects, return a list of Beams object.
+
+        The iterable can be a list (of elements) or a Stream (preferably flat)
+        or a :class:`~music21.stream.iterator.StreamIterator` from which Durations
         and information about note vs. rest will be
         extracted.
 
-        Objects are assumed to be adjoining; offsets are not used, except for 
+        Objects are assumed to be adjoining; offsets are not used, except for
         measureStartOffset()
 
         Must process a list/Stream at time, because we cannot tell when a beam ends
@@ -3693,7 +3693,7 @@ class TimeSignature(base.Music21Object):
 
         beamsList = TimeSignature._naiveBeams(srcList) # hold maximum Beams objects
         beamsList = TimeSignature._removeSandwichedUnbeamables(beamsList)
-    
+
         def fixBeamsOneElementDepth(i, el, depth):
             beams = beamsList[i]
             if beams is None:
@@ -3703,11 +3703,11 @@ class TimeSignature(base.Music21Object):
             # see if there is a component defined for this beam number
             # if not, continue
             if beamNumber not in beams.getNumbers():
-                return 
-            
+                return
+
             dur = el.duration
             pos = el.offset + measureStartOffset
-            
+
             start = opFrac(pos)
             end = opFrac(pos + dur.quarterLength)
             startNext = end
@@ -3718,7 +3718,7 @@ class TimeSignature(base.Music21Object):
             beamNext = beamsList[i + 1] if not isLast else None
             beamPrevious = beamsList[i - 1] if not isFirst else None
 
-            
+
             # get an archetype of the MeterSequence for this level
             # level is depth, starting at zero
             archetype = self.beamSequence.getLevel(depth)
@@ -3727,7 +3727,7 @@ class TimeSignature(base.Music21Object):
             archetypeSpanStart, archetypeSpanEnd = archetype.offsetToSpan(start)
             #environLocal.printDebug(['at level, got archetype span', depth,
             #                         archetypeSpan])
-            
+
             if beamNext is None: # last note or before a non-beamable note (half, whole, etc.)
                 archetypeSpanNextStart = 0.0
             else:
@@ -3799,7 +3799,7 @@ class TimeSignature(base.Music21Object):
                   and beamNumber in beamPrevious.getNumbers()
                   and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left']
                   and beamNext is None):
-                beamType = 'partial-left'  # will be deleted later in the script                
+                beamType = 'partial-left'  # will be deleted later in the script
 
 
             # if no beam is defined next (we know this already)
@@ -3844,18 +3844,18 @@ class TimeSignature(base.Music21Object):
 
             beams.setByNumber(beamNumber, beamType)
 
-    
+
         #environLocal.printDebug(['beamsList', beamsList])
         # iter over each beams line, from top to bottom (1 thourgh 5)
         for depth in range(len(beamableDurationTypes)):
             # increment to count from 1 not 0
-            # assume we are always starting at offset w/n this meter (Jose)            
+            # assume we are always starting at offset w/n this meter (Jose)
             for i, el in enumerate(srcStream):
                 fixBeamsOneElementDepth(i, el, depth)
 
-        beamsList = TimeSignature._sanitizePartialBeams(beamsList) 
+        beamsList = TimeSignature._sanitizePartialBeams(beamsList)
         beamsList = TimeSignature._mergeConnectingPartialBeams(beamsList)
-        
+
         return beamsList
 
     @staticmethod
@@ -3865,18 +3865,18 @@ class TimeSignature(base.Music21Object):
         each element: None if the element is a quarter or larger or
         if the element is a Rest, and the fullest possible set of beams
         for the duration if it is a beamable.  Each beam object has type of None
-        
+
         staticmethod, does not need instance:
-        
+
         >>> durList = [0, -1, -2, -3]
         >>> srcList = [note.Note(quarterLength=2**x) for x in durList]
         >>> srcList.append(note.Rest(type='32nd'))
         >>> meter.TimeSignature._naiveBeams(srcList)
-        [None, 
-         <music21.beam.Beams <music21.beam.Beam 1/None>>, 
-         <music21.beam.Beams <music21.beam.Beam 1/None>/<music21.beam.Beam 2/None>>, 
-         <music21.beam.Beams <music21.beam.Beam 1/None>/<music21.beam.Beam 
-                     2/None>/<music21.beam.Beam 3/None>>, 
+        [None,
+         <music21.beam.Beams <music21.beam.Beam 1/None>>,
+         <music21.beam.Beams <music21.beam.Beam 1/None>/<music21.beam.Beam 2/None>>,
+         <music21.beam.Beams <music21.beam.Beam 1/None>/<music21.beam.Beam
+                     2/None>/<music21.beam.Beam 3/None>>,
          None]
         '''
         beamsList = []
@@ -3896,42 +3896,42 @@ class TimeSignature(base.Music21Object):
                 b.fill(el.duration.type)
                 beamsList.append(b)
         return beamsList
-    
+
     @staticmethod
     def _removeSandwichedUnbeamables(beamsList):
         '''
         Go through the naiveBeamsList and remove beams from objects surrounded
         by None objects -- you can't beam to nothing!
-        
+
         Modifies beamsList in place
-        
+
         >>> N = note.Note
         >>> R = note.Rest
         >>> e = 'eighth'
-        >>> nList = [N(type=e), R(type=e), N(type=e), N(type=e), 
+        >>> nList = [N(type=e), R(type=e), N(type=e), N(type=e),
         ...          R(type=e), N(type=e), R(type=e), N(type=e)]
         >>> beamsList = meter.TimeSignature._naiveBeams(nList)
         >>> beamsList
-        [<music21.beam.Beams <music21.beam.Beam 1/None>>, 
-         None, 
-         <music21.beam.Beams <music21.beam.Beam 1/None>>, 
-         <music21.beam.Beams <music21.beam.Beam 1/None>>, 
-         None, 
+        [<music21.beam.Beams <music21.beam.Beam 1/None>>,
+         None,
          <music21.beam.Beams <music21.beam.Beam 1/None>>,
-         None, 
+         <music21.beam.Beams <music21.beam.Beam 1/None>>,
+         None,
+         <music21.beam.Beams <music21.beam.Beam 1/None>>,
+         None,
          <music21.beam.Beams <music21.beam.Beam 1/None>>]
 
         >>> beamsList2 = meter.TimeSignature._removeSandwichedUnbeamables(beamsList)
         >>> beamsList2 is beamsList
         True
         >>> beamsList2
-        [None, 
+        [None,
          None,
-         <music21.beam.Beams <music21.beam.Beam 1/None>>, 
-         <music21.beam.Beams <music21.beam.Beam 1/None>>, 
-         None, 
-         None, 
-         None, 
+         <music21.beam.Beams <music21.beam.Beam 1/None>>,
+         <music21.beam.Beams <music21.beam.Beam 1/None>>,
+         None,
+         None,
+         None,
          None]
         '''
         beamLast = None
@@ -3940,21 +3940,21 @@ class TimeSignature(base.Music21Object):
                 beamNext = beamsList[i + 1]
             else:
                 beamNext = None
-            
+
             if beamLast is None and beamNext is None:
                 beamsList[i] = None
-            
+
             beamLast = beamsList[i]
-        
+
         return beamsList
 
     @staticmethod
-    def _sanitizePartialBeams(beamsList):              
+    def _sanitizePartialBeams(beamsList):
         '''
         It is possible at a late stage to have beams that only consist of partials
         or beams with a 'start' followed by 'partial/left' or possibly 'stop' followed
         by 'partial/right'; beams entirely consisting of partials are removed
-        and the direction of irrational partials is fixed.        
+        and the direction of irrational partials is fixed.
         '''
         for i in range(len(beamsList)):
             if beamsList[i] is None:
@@ -3997,19 +3997,19 @@ class TimeSignature(base.Music21Object):
             bNext = beamsList[i + 1]
             if not bThis or not bNext:
                 continue
-            
+
             bThisNum = bThis.getNumbers()
             if not bThisNum:
                 continue
-            
-            for thisNum in bThisNum:                
+
+            for thisNum in bThisNum:
                 thisBeam = bThis.getByNumber(thisNum)
                 if thisBeam.type != 'partial' or thisBeam.direction != 'right':
                     continue
-                
+
                 if thisNum not in bNext.getNumbers():
                     continue
-                
+
                 nextBeam = bNext.getByNumber(thisNum)
                 if nextBeam.type == 'partial' and nextBeam.direction == 'right':
                     continue
@@ -4018,29 +4018,29 @@ class TimeSignature(base.Music21Object):
                         "Found a messed up beam pair {}, {}, at index {} of \n{}".format(
                             bThis, bNext, i, beamsList))
                     continue #
-                
-                
+
+
                 thisBeam.type = 'start'
                 thisBeam.direction = None
-                if nextBeam.type == 'partial':                
+                if nextBeam.type == 'partial':
                     nextBeam.type = 'stop'
                 elif nextBeam.type == 'start':
                     nextBeam.type = 'continue'
-                    
+
                 nextBeam.direction = None
-                
+
         # now fix partial-lefts that follow stops:
         for i in range(1, len(beamsList)):
             bThis = beamsList[i]
             bPrev = beamsList[i - 1]
             if not bThis or not bPrev:
                 continue
-            
+
             bThisNum = bThis.getNumbers()
             if not bThisNum:
                 continue
 
-            for thisNum in bThisNum:                
+            for thisNum in bThisNum:
                 thisBeam = bThis.getByNumber(thisNum)
                 if thisBeam.type != 'partial' or thisBeam.direction != 'left':
                     continue
@@ -4056,7 +4056,7 @@ class TimeSignature(base.Music21Object):
                 thisBeam.direction = None
                 prevBeam.type = 'continue'
 
-                    
+
         return beamsList
 
     def setDisplay(self, value, partitionRequest=None):
@@ -4192,9 +4192,9 @@ class TimeSignature(base.Music21Object):
         >>> m.insert(2, n1)
         >>> ts1.getMeasureOffsetOrMeterModulusOffset(n1)
         2.0
-        
+
         Exceeding the range of the Measure gets a modulus
-        
+
         >>> n2 = note.Note()
         >>> m.insert(4.0, n2)
         >>> ts1.getMeasureOffsetOrMeterModulusOffset(n2)
@@ -4209,7 +4209,7 @@ class TimeSignature(base.Music21Object):
         >>> s2.insert(3, n3)
         >>> ts2.getMeasureOffsetOrMeterModulusOffset(n3)
         3.0
-        
+
         >>> n4 = note.Note()
         >>> s2.insert(5, n4)
         >>> ts2.getMeasureOffsetOrMeterModulusOffset(n4)
@@ -4729,7 +4729,7 @@ class Test(unittest.TestCase):
         from music21 import note
         a = TimeSignature('6/8')
         durList = [16, 16, 16, 16, 8, 16, 16, 16, 16, 8]
-        
+
         b = [note.Note(quarterLength=4/d) for d in durList]
         c = a.getBeams(b)
         match = '''[<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>,
@@ -5025,12 +5025,12 @@ class Test(unittest.TestCase):
         from music21 import note
         fourFour = TimeSignature('4/4')
         n = note.Note
-        dList = [n(type='eighth'), n(type='quarter'), n(type='eighth'), 
+        dList = [n(type='eighth'), n(type='quarter'), n(type='eighth'),
                  n(type='eighth'), n(type='quarter'), n(type='eighth')]
         beamList = fourFour.getBeams(dList)
         self.assertEqual(beamList, [None] * 6)
 
-        dList = [n(type='eighth'), n(type='quarter'), n(type='eighth'), 
+        dList = [n(type='eighth'), n(type='quarter'), n(type='eighth'),
                  n(type='eighth'), n(type='eighth'), n(type='quarter')]
         beamList = fourFour.getBeams(dList)
         self.assertEqual([repr(b) for b in beamList],
@@ -5065,8 +5065,8 @@ class Test(unittest.TestCase):
             '5 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>',
             '6 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>',
             ])
-                
-        
+
+
 
     def testBestTimeSignature(self):
         from music21 import converter, stream

@@ -324,7 +324,7 @@ class GeneralMensuralNote(base.Music21Object):
                         'semibrevis'
                         >>> gmn_2 = medren.GeneralMensuralNote('blah')
                         Traceback (most recent call last):
-                        music21.alpha.medren.MedRenException: blah is not a valid 
+                        music21.alpha.medren.MedRenException: blah is not a valid
                             mensural type or abbreviation
                         ''')
 
@@ -947,7 +947,7 @@ class MensuralNote(GeneralMensuralNote, note.Note):
         >>> r_1 = medren.MensuralNote('A', 'minima')
         >>> r_1.setFlag('up', 'right')
         Traceback (most recent call last):
-        music21.alpha.medren.MedRenException: a flag may not be added 
+        music21.alpha.medren.MedRenException: a flag may not be added
             to an upstem of note type minima
 
         >>> r_1.setStem('down')
@@ -1332,11 +1332,11 @@ class Ligature(base.Music21Object):
         >>> l.makeOblique(0)
         Traceback (most recent call last):
         music21.alpha.medren.MedRenException: cannot start oblique notehead at index 0
-        
+
         >>> l.makeOblique(2)
         Traceback (most recent call last):
         music21.alpha.medren.MedRenException: cannot start oblique notehead at index 2
-        
+
         >>> l.makeOblique(3)
         Traceback (most recent call last):
         music21.alpha.medren.MedRenException: no note exists at index 4
@@ -1416,7 +1416,7 @@ class Ligature(base.Music21Object):
         >>> l.setMaxima(2, True)
         >>> l.isMaxima(2)
         True
-        
+
         >>> l.setMaxima(1, True)
         Traceback (most recent call last):
         music21.alpha.medren.MedRenException: cannot make note at index 1 a maxima
@@ -1483,22 +1483,22 @@ class Ligature(base.Music21Object):
         >>> l = medren.Ligature(['A4', 'C5', 'B4', 'A4', 'B4'])
         >>> l.setStem(0, 'none', 'left')
         Traceback (most recent call last):
-        music21.alpha.medren.MedRenException: direction "None" and orientation "left" 
+        music21.alpha.medren.MedRenException: direction "None" and orientation "left"
             not supported for ligatures
-        
+
         >>> l.setStem(1, 'up', 'left')
         >>> l.getStem(1)
         ('up', 'left')
-        
+
         >>> l.setStem(2, 'down', 'right')
         Traceback (most recent call last):
         music21.alpha.medren.MedRenException: a stem with direction "down" not permitted at index 2
-        
+
         >>> l.setMaxima(4, True)
         >>> l.setStem(4, 'up', 'left')
         Traceback (most recent call last):
         music21.alpha.medren.MedRenException: cannot place stem at index 4
-        
+
         >>> l.setStem(3, 'up', 'left')
         Traceback (most recent call last):
         music21.alpha.medren.MedRenException: a stem with direction "up" not permitted at index 3
@@ -1594,15 +1594,15 @@ class Ligature(base.Music21Object):
         >>> l.setReverse(1, True)
         >>> l.isReversed(1)
         True
-        
+
         >>> l.setReverse(2, True)
         Traceback (most recent call last):
-        music21.alpha.medren.MedRenException: the note at index 2 
+        music21.alpha.medren.MedRenException: the note at index 2
             cannot be given reverse value True
-        
+
         >>> l.setReverse(3, True)
         Traceback (most recent call last):
-        music21.alpha.medren.MedRenException: the note at index 3 
+        music21.alpha.medren.MedRenException: the note at index 3
             cannot be given reverse value True
         '''
         if value == 'True' or value == 'true':
@@ -1749,7 +1749,7 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD=None, printUpdates=F
     >>> s.append(medren.GeneralMensuralNote('B'))
     >>> medren.breakMensuralStreamIntoBrevisLengths(s)
     Traceback (most recent call last):
-    music21.alpha.medren.MedRenException: cannot combine objects 
+    music21.alpha.medren.MedRenException: cannot combine objects
        of type <class 'music21.stream.Part'>,
        <class 'music21.alpha.medren.GeneralMensuralNote'> within stream
 

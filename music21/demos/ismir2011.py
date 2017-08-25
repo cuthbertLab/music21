@@ -246,7 +246,7 @@ def wekaCommands():
     # remove features that are the same for all pieces
     # -i: input file
     # -o: output file
-    java weka.filters.unsupervised.attribute.RemoveUseless 
+    java weka.filters.unsupervised.attribute.RemoveUseless
         -i chinaMitteleuropa-all.arff -o chinaMitteleuropa-no-useless.arff
 
     # run Naive Bayes

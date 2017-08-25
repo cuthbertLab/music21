@@ -141,7 +141,7 @@ def makeBeams(s, *, inPlace=False):
             # processing
             summed = sum([d.quarterLength for d in durList])
             # note, this ^^ is faster than a generator expression
-             
+
             durSum = opFrac(opFrac(summed)) # the double call corrects for tiny errors in adding
                     # floats and Fractions in the sum() call -- the first opFrac makes it
                     # impossible to have 4.00000000001, but returns Fraction(4, 1). The
@@ -172,7 +172,7 @@ def makeBeams(s, *, inPlace=False):
                     n.beams = beam.Beams()
 
     del mColl  # remove Stream no longer needed
-    
+
     s.streamStatus.beams = True
     if inPlace is not True:
         return returnObj
@@ -617,7 +617,7 @@ def makeMeasures(
             if finalBarline not in ['regular', None]:
                 m.rightBarline = finalBarline
         if bestClef:
-            m.clef = clef.bestClef(m, recurse=True)  
+            m.clef = clef.bestClef(m, recurse=True)
 
     if not inPlace:
         return post  # returns a new stream populated w/ new measure streams
@@ -1382,11 +1382,11 @@ def realizeOrnaments(s):
 
 def moveNotesToVoices(source, classFilterList=('GeneralNote',)):
     '''
-    Move 
+    Move
     '''
     from music21.stream import Voice
     dst = Voice()
-    
+
     # cast to list so source can be edited.
     affectedElements = list(source.iter.getElementsByClass(classFilterList))
 
@@ -1394,7 +1394,7 @@ def moveNotesToVoices(source, classFilterList=('GeneralNote',)):
         dst.insert(source.elementOffset(e), e)
         source.remove(e)
     source.insert(0, dst)
-    
+
 
 #------------------------------------------------------------------------------
 
@@ -1418,8 +1418,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s), 1)
         self.assertEqual(s[0].classes[0], 'Voice') # default is a Voice
         self.assertEqual(len(s[0]), 4)
-        self.assertEqual(str([n for n in s.voices[0].notesAndRests]), 
-                         '[<music21.note.Note C>, <music21.note.Note C>, ' 
+        self.assertEqual(str([n for n in s.voices[0].notesAndRests]),
+                         '[<music21.note.Note C>, <music21.note.Note C>, '
                          + '<music21.note.Note C>, <music21.note.Note C>]')
 
 

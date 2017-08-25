@@ -4,7 +4,7 @@ An interface for music21 using mod_wsgi
 
 To use, first install mod_wsgi and include it in the HTTPD.conf file.
 
-Add this file to the server, ideally not in the document root, 
+Add this file to the server, ideally not in the document root,
 on mac this could be /Library/WebServer/wsgi-scripts/music21wsgiapp.py
 
 Then edit the HTTPD.conf file to redirect any requests to WEBSERVER:/music21interface to call this file:

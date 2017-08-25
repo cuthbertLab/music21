@@ -131,14 +131,14 @@ class RehearsalMark(Expression):
     '''
     A rehearsal mark is a type of Expression that designates a rehearsal
     marking, such as A., B., etc.
-    
+
     Takes two inputs, content ('B', 5, 'III') and an optional numbering system which
     is helpful for getting the next rehearsal mark.
-    
+
     >>> rm = expressions.RehearsalMark('B')
     >>> rm
     <music21.expressions.RehearsalMark 'B'>
-    
+
     '''
     classSortOrder = -30
     _styleClass = style.TextStylePlacement
@@ -156,12 +156,12 @@ class RehearsalMark(Expression):
     def __repr__(self):
         return '<music21.expressions.%s %s>' % (self.__class__.__name__, repr(self.content))
 
-        
+
     @staticmethod
     def _getNumberingFromContent(c):
         '''
         if numbering was not set, get it from the content
-        
+
         >>> ex = expressions.RehearsalMark()
         >>> ex._getNumberingFromContent('C')
         'alphabetical'
@@ -188,36 +188,36 @@ class RehearsalMark(Expression):
             return 'number'
         if not isinstance(c, str):
             return None
-        
+
         try:
             unused = int(c)
             return 'number'
         except ValueError:
             pass
-        
+
         try:
             romanValue = common.numberTools.fromRoman(c)
             if len(c) >= 2:
                 return 'roman' # two letters is enough
-            
+
             if romanValue < 50:
                 return 'roman' # I, X, V
             else:
-                return 'alphabetical' # L, C, D, M 
-            
+                return 'alphabetical' # L, C, D, M
+
         except ValueError:
             pass
-        
+
         if c in string.ascii_letters:
             return 'alphabetical'
         else:
             return None
-        
-        
+
+
     def nextContent(self):
         '''
         Return the next content based on the numbering
-        
+
         >>> expressions.RehearsalMark('A').nextContent()
         'B'
 
@@ -241,7 +241,7 @@ class RehearsalMark(Expression):
         numbering = self.numbering
         if not numbering:
             numbering = self._getNumberingFromContent(self.content)
-                
+
         if not numbering:
             if self.content is None:
                 return None
@@ -251,23 +251,23 @@ class RehearsalMark(Expression):
         if numbering == 'alphabetical':
             nextContent = chr(ord(self.content[-1]) + 1)
             if nextContent not in string.ascii_letters:
-                return 'A' * (len(self.content) + 1) 
+                return 'A' * (len(self.content) + 1)
             else:
                 return nextContent
         elif numbering == 'number':
             return int(self.content) + 1
         elif numbering == 'roman':
             return common.toRoman(common.fromRoman(self.content) + 1)
-            
+
     def nextMark(self):
         '''
         Return the next rehearsal mark.
-        
+
         >>> rm = expressions.RehearsalMark('C')
         >>> rm.nextMark()
         <music21.expressions.RehearsalMark 'D'>
-        
-        
+
+
         >>> rm = expressions.RehearsalMark('IV', numbering='roman')
         >>> nm = rm.nextMark()
         >>> nm.content

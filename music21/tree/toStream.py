@@ -63,7 +63,7 @@ def chordified(timespans, templateStream=None):
         templateOffsets.append(templateStream.duration.quarterLength)
         if (hasattr(templateStream, 'parts')
                 and templateStream.parts):
-            outputStream = templateStream.parts[0].template(fillWithRests=False, 
+            outputStream = templateStream.parts[0].template(fillWithRests=False,
                                                                  retainVoices=False)
         else:
             outputStream = templateStream.template(fillWithRests=False, retainVoices=False)
@@ -72,9 +72,9 @@ def chordified(timespans, templateStream=None):
         measureIndex = 0
         allTimePoints = timespans.allTimePoints() + tuple(templateOffsets)
         allTimePoints = sorted(set(allTimePoints))
-        
+
         measureList = list(outputStream.getElementsByClass('Measure'))
-        
+
         for offset, endTime in zip(allTimePoints, allTimePoints[1:]):
             while templateOffsets[1] <= offset:
                 templateOffsets.pop(0)

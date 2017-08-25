@@ -946,7 +946,7 @@ class LanguageFeature(featuresModule.FeatureExtractor):
     >>> fe = features.native.LanguageFeature(s)
     >>> fe.extract().vector
     [3]
-    
+
     '''
     id = 'TX1'
 
@@ -960,7 +960,7 @@ class LanguageFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
         self.discrete = True
         self.languageDetector = text.LanguageDetector()
-        
+
     def process(self):
         '''
         Do processing necessary, storing result in feature.

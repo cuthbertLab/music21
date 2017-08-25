@@ -201,7 +201,7 @@ class Harmony(chord.Chord):
             self.bass(self._overrides['root'])
 
         updatePitches = keywords.get('updatePitches', True)
-        if (updatePitches and self._figure is not None 
+        if (updatePitches and self._figure is not None
                 or 'root' in self._overrides or 'bass' in self._overrides):
             self._updatePitches()
         self._updateBasedOnXMLInput(keywords)
@@ -1094,8 +1094,8 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
     d13 = inChord.semitonesFromChordStep(6) #9  #thirteenth
 
     d2 = d9
-    d4 = d11 
-    d6 = d13 
+    d4 = d11
+    d6 = d13
 
     def compare(inChordNums, givenChordNums, permittedOmitions=()):
         '''
@@ -1921,7 +1921,7 @@ class ChordSymbol(Harmony):
             realizerScaleCache[scaleInitTuple] = fbScale
         # render in the 3rd octave by default
         self._overrides['root'].octave = 3
-        
+
         if self._notationString():
             pitches = fbScale.getSamplePitches(self._overrides['root'], self._notationString())
             # remove duplicated bass note due to figured bass method.
@@ -1940,14 +1940,14 @@ class ChordSymbol(Harmony):
                 #there is a bass, yet no normal inversion was found....must be added note
 
                 inversionNum = None
-                self._overrides['bass'].octave = 2 
+                self._overrides['bass'].octave = 2
                     # arbitrary octave, must be below root,
                     # which was arbitrarily chosen as 3 above
                 pitches.append(self._overrides['bass'])
         else:
             self.inversion(None, transposeOnSet=False)
             inversionNum = None
-        
+
         if inversionNum not in (0, None):
             for p in pitches[0:inversionNum]:
                 if self.chordKind in nineElevenThirteen:
@@ -1978,7 +1978,7 @@ class ChordSymbol(Harmony):
         while self._hasPitchBelowA1(pitches) :
             for thisPitch in pitches:
                 thisPitch.octave += 1
-        
+
         self.pitches = tuple(pitches)
         self.sortDiatonicAscending(inPlace=True)
 

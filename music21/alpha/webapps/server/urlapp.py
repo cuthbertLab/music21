@@ -4,7 +4,7 @@ An interface for music21 using mod_wsgi
 
 To use, first install mod_wsgi and include it in the HTTPD.conf file.
 
-Add this file to the server, ideally not in the document root, 
+Add this file to the server, ideally not in the document root,
 on mac this could be /Library/WebServer/wsgi-scripts/music21wsgiapp.py
 
 Then edit the HTTPD.conf file to redirect any requests to WEBSERVER:/music21interface to call this file:
@@ -34,22 +34,22 @@ from os import path
 def music21ModWSGICorpusURLApplication(environ, start_response):
     '''
     Application function in proper format for a MOD-WSGI Application:
-    A server-mounted app that uses portions of the URL to parse and return musicxml of manipulated sections of corpus files. 
+    A server-mounted app that uses portions of the URL to parse and return musicxml of manipulated sections of corpus files.
     Results can be returned either as a noteflight embed in the browser or downloaded as an xml file.
-    
+
     '''
     status = '200 OK'
 
     pathInfo = environ['PATH_INFO'] # Contents of path after mount point of wsgi app but before question mark
-    queryString = environ['QUERY_STRING'] # Contents of URL after question mark    
+    queryString = environ['QUERY_STRING'] # Contents of URL after question mark
     returnType = queryString
-    
+
     pathParts = pathInfo.split("/")
-    
+
     error = False
-    
+
     resultStr = ""
-    
+
     if len(pathParts) > 1 and pathParts[1] in ['corpusParse', 'corpusReduce']:
         workList = corpus.corpora.CoreCorpus().getWorkList(pathParts[2])
         if len(workList) >1:
@@ -58,17 +58,17 @@ def music21ModWSGICorpusURLApplication(environ, start_response):
                 resultStr += path.splitext(path.basename(p))[0] + "\n"
             response_headers = [('Content-type', 'text/plain'),
             ('Content-Length', str(len(resultStr)))]
-    
+
             start_response(status, response_headers)
-        
+
             return [resultStr]
         elif len(workList) == 0:
             resultStr = "No results for query "+pathParts[2]+"."
             response_headers = [('Content-type', 'text/plain'),
             ('Content-Length', str(len(resultStr)))]
-    
+
             start_response(status, response_headers)
-        
+
             return [resultStr]
         workName = workList[0]
         try:
@@ -91,7 +91,7 @@ def music21ModWSGICorpusURLApplication(environ, start_response):
                     sc = corpus.parse(pathParts[2])
                     if pathParts[1] == 'corpusReduce':
                         sc = reduction(sc)
-                    resultStr = sc.musicxml 
+                    resultStr = sc.musicxml
                     title = pathParts[2]
                     filename = str(pathParts[2])+"-reduced.xml"
                 except Exception as e:
@@ -113,14 +113,14 @@ def music21ModWSGICorpusURLApplication(environ, start_response):
         resultStr += "\n\n  Add ?xmltext to the end of the url to display the xmltext of the score as plain text"
         resultStr += "\n\n  Add ?xml to the end of the url to download the result as a .xml file"
         error = True
-        
+
         response_headers = [('Content-type', 'text/plain'),
                 ('Content-Length', str(len(resultStr)))]
-    
+
         start_response(status, response_headers)
-    
+
         return [resultStr]
-    
+
     else:
         if returnType == "xml":
             response_headers = [('Content-type', 'application/vnd.recordare.musicxml+xml'),
@@ -129,24 +129,24 @@ def music21ModWSGICorpusURLApplication(environ, start_response):
                                ]
             start_response(status, response_headers)
             return [resultStr]
-        
+
         elif returnType == "xmltext":
-            
+
             response_headers = [('Content-type', 'text/plain'),
                                 ('Content-Length', str(len(resultStr)))]
-    
+
             start_response(status, response_headers)
-        
+
             return [resultStr]
-        
+
         else:
             templateStr = noteflightEmbedTemplate(resultStr,title)
             response_headers = [('Content-type', 'text/html'),
                                 ('Content-Length', str(len(templateStr)))]
             start_response(status, response_headers)
-        
+
             return [templateStr]
-            
+
 application = music21ModWSGICorpusURLApplication
 
 def noteflightEmbedTemplate(musicxml, title):
@@ -182,7 +182,7 @@ function setup() {
 <h1>"""
     htmlData += title
     htmlData +="""
-</p> 
+</p>
 <div id="noteflightembed">
 </div>
 

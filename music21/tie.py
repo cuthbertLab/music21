@@ -94,7 +94,7 @@ class Tie(SlottedObjectMixin):
             it is unknown or should be determined from context, or 'above' or 'below.
             ''',
     }
-    
+
     VALID_TIE_TYPES = ('start', 'stop', 'continue', 'let-ring')
     ### INITIALIZER ###
     # pylint: disable=redefined-builtin

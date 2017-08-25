@@ -253,7 +253,7 @@ class GregorianNote(note.Note):
                 raise ChantException(
                     "note is too high for the clef (%s), choose a higher one" % str(useClef))
         else:
-            return chr(asciiNote) 
+            return chr(asciiNote)
 
 
     def _getFill(self):

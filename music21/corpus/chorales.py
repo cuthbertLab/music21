@@ -997,7 +997,7 @@ class Iterator:
     highestNumber to 7 would have the same effect as the given example.
 
     >>> BCI = corpus.chorales.Iterator(2, 371, numberingSystem='riemenschneider',
-    ...                                numberList=[1, 2, 3, 4, 6, 25, 190, 371], 
+    ...                                numberList=[1, 2, 3, 4, 6, 25, 190, 371],
     ...                                returnType='filename')
     25 will be skipped because it is not in the numberingSystem riemenschneider
 

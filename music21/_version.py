@@ -37,7 +37,7 @@ When it's time to update Music21's version, just change the numbers in the
 tuple assigned to __version_info__, and the __version__ string will be
 updated along with it.
 
-When changing, update the single test case in base.py. 
+When changing, update the single test case in base.py.
 
 Changing this number invalidates old pickles -- do it if the old pickles create a problem.
 '''

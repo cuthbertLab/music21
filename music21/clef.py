@@ -63,37 +63,37 @@ class Clef(base.Music21Object):
     _DOC_ATTR = {
         'sign': '''
             The sign of the clef, generally, 'C', 'G', 'F', 'percussion', 'none' or None.
-            
+
             >>> alto = clef.AltoClef()
             >>> alto.sign
             'C'
             >>> percussion = clef.PercussionClef()
             >>> percussion.sign
             'percussion'
-            
+
             Note the difference here:
-            
+
             >>> clef.Clef().sign is None
             True
             >>> clef.NoClef().sign
             'none'
-            
+
             ''',
         'line': '''
             The line, counting from the bottom up, that the clef resides on.
-            
+
             >>> clef.AltoClef().line
             3
             >>> clef.TenorClef().line
             4
-            
+
             May be None:
-            
+
             >>> print(clef.NoClef().line)
             None
             ''',
     }
-    
+
     _styleClass = style.TextStyle
     classSortOrder = 0
 
@@ -150,20 +150,20 @@ class Clef(base.Music21Object):
         0
         >>> clef.Treble8vbClef().octaveChange
         -1
-        
+
         Changing octaveChange changes lowestLine (but not vice-versa)
-        
+
         >>> tc.lowestLine
         31
-        >>> tc.octaveChange = 1            
+        >>> tc.octaveChange = 1
         >>> tc.lowestLine
         38
         >>> tc.octaveChange = -1
         >>> tc.lowestLine
-        24            
+        24
         '''
         return self._octaveChange
-    
+
     @octaveChange.setter
     def octaveChange(self, newValue):
         oldOctaveChange = self._octaveChange
@@ -180,7 +180,7 @@ class PitchClef(Clef):
         'lowestLine': '''
             The diatonicNoteNumber of the lowest line of the clef.
             (Can be none...)
-            
+
             >>> clef.TrebleClef().lowestLine
             31
             ''',
@@ -278,8 +278,8 @@ class FrenchViolinClef(GClef):
     '''
     A G Clef that appears in many old French Violin scores,
     appearing on the lowest line, and thus higher than
-    a treble clef. 
-    
+    a treble clef.
+
     >>> a = clef.FrenchViolinClef()
     >>> a.sign
     'G'
@@ -344,7 +344,7 @@ class GSopranoClef(GClef):
     '''
     A G clef on the middle line, formerly occasionally used
     for soprano parts.
-    
+
     >>> a = clef.GSopranoClef()
     >>> a.sign
     'G'
@@ -360,7 +360,7 @@ class GSopranoClef(GClef):
 class CClef(PitchClef):
     '''
     A generic C Clef, with no line set
-    
+
     >>> a = clef.CClef()
     >>> a.sign
     'C'
@@ -389,7 +389,7 @@ class MezzoSopranoClef(CClef):
     '''
     A C clef with C on the second line.  Perhaps
     the rarest of the C clefs
-    
+
     >>> a = clef.MezzoSopranoClef()
     >>> a.sign
     'C'
@@ -485,12 +485,12 @@ class FBaritoneClef(FClef):
 class BassClef(FClef):
     '''
     A standard Bass Clef
-    
+
     >>> a = clef.BassClef()
     >>> a.sign
     'F'
     '''
-    def __init__(self):        
+    def __init__(self):
         super().__init__()
         self.line = 4
         self.lowestLine = (7 * 2) + 5
@@ -603,10 +603,10 @@ def clefFromString(clefString, octaveShift=0):
     Traceback (most recent call last):
     music21.clef.ClefException: line number (second character) must be 1-5;
                 do not use this function for clefs on special staves such as 'F6'
-                
-    
-    Can find any clef in the module            
-    
+
+
+    Can find any clef in the module
+
     >>> clef.clefFromString('Treble')
     <music21.clef.TrebleClef>
     >>> clef.clefFromString('trebleclef')
@@ -646,7 +646,7 @@ def clefFromString(clefString, octaveShift=0):
             objType = getattr(myself, x)
             if isinstance(objType, type):
                 return objType()
-        
+
         raise ClefException("Could not find clef " + xnStr)
     else:
         raise ClefException("Entry has clef info but no clef specified")

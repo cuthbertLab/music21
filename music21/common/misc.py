@@ -32,9 +32,9 @@ import time
 def flattenList(l):
     '''
     Flatten a list of lists into a flat list
-    
+
     but not a list of lists of lists...
-    
+
     >>> l = [[1, 2, 3], [4, 5], [6]]
     >>> common.flattenList(l)
     [1, 2, 3, 4, 5, 6]

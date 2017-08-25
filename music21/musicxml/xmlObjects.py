@@ -75,7 +75,7 @@ TECHNICAL_MARKS = OrderedDict([('up-bow',           articulations.UpBow),
                                ('fingernails',      articulations.HarpFingerNails),
                                # TODO: hole
                                # TODO: arrow
-                               ('handbell',         articulations.HandbellIndication), 
+                               ('handbell',         articulations.HandbellIndication),
                                ('other-technical',  articulations.TechnicalIndication),
                                ])
 TECHNICAL_MARKS_REV = OrderedDict([(v, k) for k, v in TECHNICAL_MARKS.items()])
@@ -153,32 +153,32 @@ _NCNAME = re.compile(r'^[a-zA-Z_][\w.-]*$')
 def isValidXSDID(text):
     '''
     Returns True or False if text is a valid xsd:id, that is, an NCName
-    
+
     From http://www.datypic.com/sc/xsd/t-xsd_NCName.html:
-    
-        The type xsd:NCName represents an XML non-colonized name, 
-        which is simply a name that does not contain colons. An xsd:NCName value must 
-        start with either a letter or underscore (_) and may contain only letters, 
-        digits, underscores (_), hyphens (-), and periods (.). This is equivalent 
+
+        The type xsd:NCName represents an XML non-colonized name,
+        which is simply a name that does not contain colons. An xsd:NCName value must
+        start with either a letter or underscore (_) and may contain only letters,
+        digits, underscores (_), hyphens (-), and periods (.). This is equivalent
         to the Name type, except that colons are not permitted.
-    
+
     >>> musicxml.xmlObjects.isValidXSDID('hel_lo')
     True
-    
+
     Names cannot begin with digits:
-    
+
     >>> musicxml.xmlObjects.isValidXSDID('4sad')
     False
-    
+
     Names must be strings:
-    
+
     >>> musicxml.xmlObjects.isValidXSDID(12345)
     False
-    
+
     '''
     if not isinstance(text, str):
         return False
-    
+
     if not text:
         return False
 
@@ -186,7 +186,7 @@ def isValidXSDID(text):
         return True
     else:
         return False
-    
+
 #-------------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21

@@ -42,7 +42,7 @@ class Feature:
 
     Feature objects are simple. It is FeatureExtractors that store all metadata and processing
     routines for creating Feature objects.  Normally you wouldn't create one of these yourself.
-    
+
     >>> myFeature = features.Feature()
     >>> myFeature.dimensions = 3
     >>> myFeature.name = 'Random arguments'
@@ -56,29 +56,29 @@ class Feature:
 
     >>> myFeature.vector is None
     True
-    
+
     Calling .prepareVector() gives it a list of Zeros of the length of dimensions.
-    
+
     >>> myFeature.prepareVectors()
-    
+
     >>> myFeature.vector
     [0, 0, 0]
-    
+
     Now we can set the vector parts:
-    
+
     >>> myFeature.vector[0] = 4
     >>> myFeature.vector[1] = 2
     >>> myFeature.vector[2] = 1
-    
+
     It's okay just to assign a new list to .vector itself.
-    
+
     There is a .normalize() method which will scale everything to between 0 and 1
     (or technically -1 and 1) as a list of floats.
-    
+
     >>> myFeature.normalize()
     >>> myFeature.vector
     [1.0, 0.5, 0.25]
-    
+
     And that's it!  FeatureExtractors are much more interesting.
     '''
     def __init__(self):
@@ -258,7 +258,7 @@ class FeatureExtractor:
         >>> fe = features.jSymbolic.InitialTimeSignatureFeature()
         >>> fe.name
         'Initial Time Signature'
-        
+
         >>> blankF = fe.getBlankFeature()
         >>> blankF.vector
         [0, 0]
@@ -282,15 +282,15 @@ class StreamForms:
 
     A DataSet object manages one or more StreamForms
     objects, and exposes them to FeatureExtractors for usage.
-    
+
     The streamObj is stored as self.stream and if "prepared" then
     the prepared form is stored as .prepared
-    
+
     A dictionary `.forms` stores various intermediary representations
     of the stream which is the main power of this routine, making
-    it simple to 
-    
-    '''    
+    it simple to
+
+    '''
     def __init__(self, streamObj, prepareStream=True):
         self.stream = streamObj
         if self.stream is not None:
@@ -311,7 +311,7 @@ class StreamForms:
     def _prepareStream(self, streamObj):
         '''
         Common routines done on Streams prior to processing. Returns a new Stream
-        
+
         Currently: runs stripTies.
         '''
         # this causes lots of deepcopys, but an inPlace operation loses
@@ -326,9 +326,9 @@ class StreamForms:
         # first, check for cached version
         if key in self.forms:
             return self.forms[key]
-        
+
         splitKeys = key.split('.')
-        
+
         prepared = self.prepared
         for i in range(len(splitKeys)):
             subKey = '.'.join(splitKeys[:i + 1])
@@ -338,9 +338,9 @@ class StreamForms:
                 previousKey = '.'.join(splitKeys[:i])
                 # should always be there.
                 prepared = self.forms[previousKey]
-                
+
             lastKey = splitKeys[i]
-            
+
             if lastKey in self.keysToMethods:
                 prepared = self.keysToMethods[lastKey](self, prepared)
             elif lastKey.startswith('getElementsByClass('):
@@ -349,7 +349,7 @@ class StreamForms:
             else:
                 raise AttributeError('no such attribute: %s in %s' % (lastKey, key))
             self.forms[subKey] = prepared
-        
+
         return prepared
 
     def _getIntervalHistogram(self, algorithm='midi'):
@@ -378,7 +378,7 @@ class StreamForms:
                     nNext = post[iNext]
                     nValue = getattr(n.pitch, algorithm)
                     nextValue = getattr(nNext.pitch, algorithm)
-                    
+
                     try:
                         histo[abs(nValue - nextValue)] += 1
                     except AttributeError:
@@ -388,22 +388,22 @@ class StreamForms:
     def formPartitionByInstrument(self, prepared):
         from music21 import instrument
         return instrument.partitionByInstrument(prepared)
-    
+
     def formSetClassHistogram(self, prepared):
         return Counter([c.forteClassTnI for c in prepared])
-    
+
     def formPitchClassSetHistogram(self, prepared):
         return Counter([c.orderedPitchClassesString for c in prepared])
-        
+
     def formTypesHistogram(self, prepared):
         histo = {}
-        
+
         # keys are methods on Chord
         keys = ['isTriad', 'isSeventh', 'isMajorTriad', 'isMinorTriad',
                 'isIncompleteMajorTriad', 'isIncompleteMinorTriad', 'isDiminishedTriad',
                 'isAugmentedTriad', 'isDominantSeventh', 'isDiminishedSeventh',
                 'isHalfDiminishedSeventh']
-        
+
         for c in prepared:
             for thisKey in keys:
                 if thisKey not in histo:
@@ -423,7 +423,7 @@ class StreamForms:
         else:
             post = prepared.getElementsByClass('Measure')
         return post
-    
+
     def formChordify(self, prepared):
         if 'Score' in prepared.classes:
             # options here permit getting part information out
@@ -437,7 +437,7 @@ class StreamForms:
 
     def formQuarterLengthHistogram(self, prepared):
         return Counter([float(n.quarterLength) for n in prepared])
-    
+
     def formMidiPitchHistogram(self, pitches):
         return Counter([p.midi for p in pitches])
 
@@ -447,10 +447,10 @@ class StreamForms:
         for k in cc:
             histo[k] = cc[k]
         return histo
-    
+
     def formMidiIntervalHistogram(self, unused):
         return self._getIntervalHistogram('midi')
-    
+
     def formContourList(self, prepared):
         # list of all directed half steps
         cList = []
@@ -467,7 +467,7 @@ class StreamForms:
             # was causing lots of deepcopy calls, so I made
             # it inPlace=True, but errors when 'p =' no present
             # also, this part has measures...so should retainContains be True?
-            
+
             # REMOVE? Prepared is stripped!!!
             p = p.stripTies(retainContainers=False, inPlace=True) # will be flat
             # noNone means that we will see all connections, even w/ a gap
@@ -512,7 +512,7 @@ class StreamForms:
         return histogram
 
 
-    
+
     keysToMethods = {
        'flat': lambda unused, p: p.flat,
        'pitches': lambda unused, p: p.pitches,
@@ -545,20 +545,20 @@ class DataInstance:
     multiple commonly-used stream representations once, providing rapid processing.
     '''
     # pylint: disable=redefined-builtin
-    def __init__(self, streamOrPath=None, id=None): #@ReservedAssignment        
+    def __init__(self, streamOrPath=None, id=None): #@ReservedAssignment
         if isinstance(streamOrPath, stream.Stream):
             self.stream = streamOrPath
             self.streamPath = None
         else:
             self.stream = None
             self.streamPath = streamOrPath
-        
+
         # store an id for the source stream: file path url, corpus url
         # or metadata title
         if id is not None:
             self._id = id
-        elif (self.stream is not None 
-              and hasattr(self.stream, 'metadata') 
+        elif (self.stream is not None
+              and hasattr(self.stream, 'metadata')
               and self.stream.metadata is not None
               and self.stream.metadata.title is not None
               ):
@@ -572,14 +572,14 @@ class DataInstance:
                 self._id = str(self.streamPath)
         else:
             self._id = ''
-        
+
         # the attribute name in the data set for this label
         self.classLabel = None
         # store the class value for this data instance
         self._classValue = None
 
         self.forms = None
-        
+
         # store a list of voices, extracted from each part,
         self.formsByVoice = []
         # if parts exist, store a forms for each
@@ -595,7 +595,7 @@ class DataInstance:
         Setup the StreamForms objects and other things that
         need to be done after a Stream is passed in but before
         feature extracting is run.
-        
+
         Run automatically at instantiation if a Stream is passed in.
         '''
         # perform basic operations that are performed on all
@@ -642,7 +642,7 @@ class DataInstance:
     def getId(self):
         if self._id is None or callable(self._id) and self.stream is None:
             return ''
-        
+
         if callable(self._id) and self.stream is not None:
             self._id = self._id(self.stream)
 
@@ -661,7 +661,7 @@ class DataInstance:
         '''
         if self.stream is not None:
             return
-        
+
         if isinstance(self.streamPath, str):
             # could be corpus or file path
             if os.path.exists(self.streamPath) or self.streamPath.startswith('http'):
@@ -676,7 +676,7 @@ class DataInstance:
                 s = corpus.parse(self.streamPath)
         elif isinstance(self.streamPath, MetadataEntry):
             s = self.streamPath.parse()
-            
+
         self.stream = s
         self.setupPostStreamParse()
 
@@ -748,7 +748,7 @@ class DataSet:
     def __init__(self, classLabel=None, featureExtractors=()):
         # assume a two dimensional array
         self.dataInstances = []
-        
+
         # order of feature extractors is the order used in the presentations
         self._featureExtractors = []
         self._instantiatedFeatureExtractors = []
@@ -759,7 +759,7 @@ class DataSet:
 
         self.failFast = False
         self.quiet = True
-        
+
         self.runParallel = True
         # set extractors
         self.addFeatureExtractors(featureExtractors)
@@ -858,7 +858,7 @@ class DataSet:
     def addMultipleData(self, dataList, classValues, ids=None):
         '''
         add multiple data points at the same time.
-        
+
         Requires an iterable (including MetadataBundle) for dataList holding
         types that can be passed to addData, and an equally sized list of dataValues
         and an equally sized list of ids (or None)
@@ -866,7 +866,7 @@ class DataSet:
         classValues can also be a pickleable function that will be called on
         each instance after parsing, as can ids.
         '''
-        if (not callable(classValues) 
+        if (not callable(classValues)
                 and len(dataList) != len(classValues)):
             raise DataSetException(
                 "If classValues is not a function, it must have the same length as dataList")
@@ -895,7 +895,7 @@ class DataSet:
             ids = [ids] * len(dataList)
         elif ids is None:
             ids = [None] * len(dataList)
-        
+
 
         for i in range(len(dataList)):
             d = dataList[i]
@@ -907,7 +907,7 @@ class DataSet:
     # pylint: disable=redefined-builtin
     def addData(self, dataOrStreamOrPath, classValue=None, id=None): #@ReservedAssignment
         '''
-        Add a Stream, DataInstance, MetadataEntry, or path (Posix or str) 
+        Add a Stream, DataInstance, MetadataEntry, or path (Posix or str)
         to a corpus or local file to this data set.
 
         The class value passed here is assumed to be the same as
@@ -922,7 +922,7 @@ class DataSet:
             di = dataOrStreamOrPath
             s = di.stream
             if s is None:
-                s = di.streamPath                
+                s = di.streamPath
         else:
             # all else are stored directly
             s = dataOrStreamOrPath
@@ -940,18 +940,18 @@ class DataSet:
             return self._processParallel()
         else:
             return self._processNonParallel()
-    
+
     def _processParallel(self):
         '''
         Run a set of processes in parallel.
         '''
         for di in self.dataInstances:
             di.featureExtractorClassesForParallelRunning = self._featureExtractors
-        
+
         shouldUpdate = not self.quiet
-        
-        outputData = common.runParallel(self.dataInstances, 
-                                           _dataSetParallelSubprocess, 
+
+        outputData = common.runParallel(self.dataInstances,
+                                           _dataSetParallelSubprocess,
                                            updateFunction=shouldUpdate,
                                            )
         featureData, errors, classValues, ids = zip(*outputData)
@@ -962,14 +962,14 @@ class DataSet:
             else:
                 environLocal.warn(e)
         self.features = featureData
-        
+
         for i, di in enumerate(self.dataInstances):
             if callable(di._classValue):
                 di._classValue = classValues[i]
             if callable(di._id):
                 di._id = ids[i]
-        
-                    
+
+
     def _processNonParallel(self):
         '''
         The traditional method: run non-parallel
@@ -1010,7 +1010,7 @@ class DataSet:
 
             if includeId:
                 v.append(di.getId())
-            
+
             for f in row:
                 if concatenateLists:
                     v += f.vector
@@ -1093,7 +1093,7 @@ class DataSet:
 def _dataSetParallelSubprocess(dataInstance):
     row = []
     errors = []
-    
+
     for feClass in dataInstance.featureExtractorClassesForParallelRunning:
         fe = feClass()
         fe.setData(dataInstance)
@@ -1112,7 +1112,7 @@ def _dataSetParallelSubprocess(dataInstance):
 def allFeaturesAsList(streamInput):
     '''
     returns a list containing ALL currentingly implemented feature extractors
-    
+
     streamInput can be a Stream, DataInstance, or path to a corpus or local
     file to this data set.
 
@@ -1129,8 +1129,8 @@ def allFeaturesAsList(streamInput):
     ds.addFeatureExtractors(f)
     ds.addData(streamInput)
     ds.process()
-    allData = ds.getFeaturesAsList(includeClassLabel=False, 
-                                   includeId=False, 
+    allData = ds.getFeaturesAsList(includeClassLabel=False,
+                                   includeId=False,
                                    concatenateLists=False)
 
     return allData
@@ -1789,9 +1789,9 @@ class Test(unittest.TestCase):
         import textwrap
 
         self.maxDiff = None
-        
+
         fewBach = corpus.search('bach/bwv6')
-        
+
         self.assertEqual(len(fewBach), 12)
         ds = features.DataSet(classLabel='NumPitches')
         ds.addMultipleData(fewBach, classValues=pickleFunctionNumPitches)

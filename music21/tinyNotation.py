@@ -998,7 +998,7 @@ class Converter:
 
         m21Obj = None
         tokenObj = None
-        
+
         # parse token with state:
         for tokenRe, tokenClass in self._tokenMapRe:
             matchSuccess = tokenRe.match(t)

@@ -40,9 +40,9 @@ class Style:
     _DOC_ATTR = {
         'hideObjectOnPrint': '''if set to `True` will not print upon output
             (only used in MusicXML output at this point and
-            Lilypond for notes, chords, and rests).''',    
+            Lilypond for notes, chords, and rests).''',
     }
-    
+
     def __init__(self):
         self.size = None
 
@@ -73,7 +73,7 @@ class Style:
         elif value == 'none':
             self._enclosure = None
         elif value.lower() in ('rectangle', 'square', 'oval', 'circle',
-                               'bracket', 'triangle', 'diamond', 
+                               'bracket', 'triangle', 'diamond',
                                'pentagon', 'hexagon', 'heptagon', 'octagon',
                                'nonagon', 'decagon'):
             self._enclosure = value.lower()
@@ -83,7 +83,7 @@ class Style:
     enclosure = property(_getEnclosure, _setEnclosure,
         doc = '''
         Get or set the enclosure.  Valid names are
-        rectangle, square, oval, circle, bracket, triangle, diamond, 
+        rectangle, square, oval, circle, bracket, triangle, diamond,
         pentagon, hexagon, heptagon, octagon,
         nonagon, decagon or None.
 
@@ -136,7 +136,7 @@ class Style:
 class NoteStyle(Style):
     '''
     A Style object that also includes stem and accidental style information.
-    
+
     Beam style is stored on the Beams object, as is lyric style
     '''
     def __init__(self):
@@ -378,7 +378,7 @@ class BezierStyle(Style):
 class LineStyle(Style):
     '''
     from the MusicXML Definition
-    
+
     Defines lineShape ('straight', 'curved' or None)
     lineType ('solid', 'dashed', 'dotted', 'wavy' or None)
     dashLength (in tenths)
@@ -386,7 +386,7 @@ class LineStyle(Style):
     '''
     def __init__(self):
         super().__init__()
-        
+
         self.lineShape = None
         self.lineType = None
         self.dashLength = None
@@ -408,14 +408,14 @@ class StreamStyle(Style):
         self.wordFont = None # None or a TextStyle object
         self.lyricFonts = [] # a list of TextStyle objects
         self.lyricLanguages = [] # a list of strings
-        
+
         self.printPartName = True
         self.printPartAbbreviation = True
-        
+
         self.measureNumbering = None # can be None -- meaning no comment,
             # 'none', 'measure', or 'system'...
         self.measureNumberStyle = None
-        
+
 
 class BeamStyle(Style):
     '''
@@ -423,8 +423,8 @@ class BeamStyle(Style):
     '''
     def __init__(self):
         self.fan = None
-        
-        
+
+
 class StyleMixin(common.SlottedObjectMixin):
     '''
     Mixin for any class that wants to support style and editorial, since several

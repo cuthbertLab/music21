@@ -247,7 +247,7 @@ class ElementTree(core.AVLTree):
         >>> len(offTree)
         0
 
-        >>> tsList = [(0, 2), (0, 9), (1, 1), (2, 3), (3, 4), 
+        >>> tsList = [(0, 2), (0, 9), (1, 1), (2, 3), (3, 4),
         ...           (4, 9), (5, 6), (5, 8), (6, 8), (7, 7)]
         >>> noteList = [note.Note() for _ in tsList]
         >>> for i,n in enumerate(noteList):

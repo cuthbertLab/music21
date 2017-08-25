@@ -245,7 +245,7 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
                 failuresList = moduleResponse.failures
                 errorsFoundSummary.append(
                     "\n-----------------------------\n" +
-                    "%s had %d ERRORS and %d FAILURES in %d tests after %d seconds:\n" % 
+                    "%s had %d ERRORS and %d FAILURES in %d tests after %d seconds:\n" %
                     (moduleResponse.moduleName, len(errorsList),
                        len(failuresList), moduleResponse.testsRun, moduleResponse.runTime)
                     + "-----------------------------\n")

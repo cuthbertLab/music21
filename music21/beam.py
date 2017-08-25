@@ -234,7 +234,7 @@ class Beams(EqualSlottedObjectMixin):
 
 
         A beam object can also be specified:
-        
+
         >>> beams = beam.Beams()
         >>> beam1 = beam.Beam(type='start', number=1)
         >>> beams.append(beam1)
@@ -246,7 +246,7 @@ class Beams(EqualSlottedObjectMixin):
             obj.number = len(self.beamsList) + 1
         else:
             obj = type
-        
+
         self.beamsList.append(obj)
 
     def fill(self, level=None, type=None): # type is okay @ReservedAssignment

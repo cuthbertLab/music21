@@ -1325,7 +1325,7 @@ class RTFile:
         '''
         if isinstance(filename, pathlib.Path):
             filename = str(filename) # remove in Py3.6
-            
+
         for encoding in ('utf-8', 'macintosh', 'latin-1', 'utf-16'):
             try:
                 self.file = io.open(filename, encoding=encoding)

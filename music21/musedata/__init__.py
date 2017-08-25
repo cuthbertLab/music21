@@ -1479,7 +1479,7 @@ class MuseDataFile:
         #self.file = io.open(filename, encoding='utf-8')
         if isinstance(fp, pathlib.Path):
             fp = str(fp)
-        
+
         self.file = open(fp, 'rb')
         self.filename = fp
 
@@ -1491,7 +1491,7 @@ class MuseDataFile:
         except UnicodeDecodeError:
             fileContents = fileContents.decode('ISO-8859-1', 'ignore')
         return self.readstr(fileContents)
-    
+
     def close(self):
         self.file.close()
 

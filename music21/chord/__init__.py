@@ -83,14 +83,14 @@ class Chord(note.NotRest):
     >>> cmaj = chord.Chord([Cnote, Enote, Gnote])
     >>> cmaj # default octave of 4 is used for these notes, since octave was not specified
     <music21.chord.Chord C E G>
-    
+
     Or with pitches:
-    
+
     >>> cmaj2 = chord.Chord([Cnote.pitch, Enote.pitch, Gnote.pitch])
     >>> cmaj2
     <music21.chord.Chord C E G>
-    
-    
+
+
 
     Chord has the ability to determine the root of a chord, as well as the bass note of a chord.
     In addition, Chord is capable of determining what type of chord a particular chord is, whether
@@ -228,9 +228,9 @@ class Chord(note.NotRest):
         durationKeyword = None
         if 'duration' in keywords:
             durationKeyword = keywords['duration']
-        
+
         durationKeyword = self._append_core_or_init(notes, useDuration=durationKeyword)
-    
+
 
         if all(isinstance(n, int) for n in notes):
             self.simplifyEnharmonics(inPlace=True)
@@ -281,7 +281,7 @@ class Chord(note.NotRest):
         >>> c = chord.Chord('C#4 D-4')
         >>> c[0]
         <music21.note.Note C#>
-        
+
         >>> c['0.step']
         'C'
         >>> c['3.accidental']
@@ -291,10 +291,10 @@ class Chord(note.NotRest):
         >>> c[5]
         Traceback (most recent call last):
         KeyError: 'cannot access component with: 5'
-        
+
         >>> c['D-4']
         <music21.note.Note D->
-        
+
         >>> c['D-4.style.color'] is None
         True
         '''
@@ -308,12 +308,12 @@ class Chord(note.NotRest):
                     attributes = attrStr.split('.')
             else:
                 attributes = ()
-            
+
             try:
                 key = int(key)
             except ValueError:
                 pass
-            
+
         else:
             attributes = ()
 
@@ -322,7 +322,7 @@ class Chord(note.NotRest):
                 foundNote = self._notes[key] # must be a number
             except (KeyError, IndexError):
                 raise KeyError(keyErrorStr)
-            
+
         elif isinstance(key, str):
             key = key.upper()
             for n in self._notes:
@@ -331,10 +331,10 @@ class Chord(note.NotRest):
                     break
             else:
                 raise KeyError(keyErrorStr)
-        
+
         elif not hasattr(key, 'classes'):
             raise KeyError(keyErrorStr)
-        
+
         elif 'Note' in key.classes:
             for n in self._notes:
                 if n is key:
@@ -347,7 +347,7 @@ class Chord(note.NotRest):
                         break
                 else:
                     raise KeyError(keyErrorStr)
-                
+
         elif 'Pitch' in key.classes:
             for n in self._notes:
                 if n.pitch is key:
@@ -366,9 +366,9 @@ class Chord(note.NotRest):
 
         if not attributes:
             return foundNote
-        
+
         currentValue = foundNote
-        
+
         for attr in attributes:
             if attr == 'volume': # special handling
                 currentValue = currentValue._getVolume(forceClient=self)
@@ -381,7 +381,7 @@ class Chord(note.NotRest):
         '''
         Change either a note in the chord components, or set an attribute on a
         component
-        
+
         >>> c = chord.Chord('C4 E4 G4')
         >>> c[0] = note.Note('C#4')
         >>> c
@@ -397,7 +397,7 @@ class Chord(note.NotRest):
         'red'
         >>> c[-1].style.color
         'red'
-        
+
         '''
         if isinstance(key, str) and key.count('.'):
             keySplit = key.split('.')
@@ -409,7 +409,7 @@ class Chord(note.NotRest):
 
         keyObj = self[key]
         keyIndex = self._notes.index(keyObj)
-        
+
         if isinstance(value, str):
             value = note.Note(value)
         elif not hasattr(value, 'classes'):
@@ -420,7 +420,7 @@ class Chord(note.NotRest):
             raise ValueError("Chord index must be set to a valid note object")
 
         self._notes[keyIndex] = value
-            
+
 
 
     def __iter__(self):
@@ -540,12 +540,12 @@ class Chord(note.NotRest):
     def _append_core_or_init(self, notes, *, useDuration=None):
         '''
         This is the private append method called by .append and called by __init__.
-        
+
         It differs from the public method in that a duration object can
         be passed in which is used for the first note of the chord or as many pitches
         as can use it -- it's all an optimization step to create as few duration objects
         as is necessary.
-        
+
         Also requires that notes be an iterable.
         '''
         # quickDuration specifies whether the duration object for the chord
@@ -591,27 +591,27 @@ class Chord(note.NotRest):
 
     def add(self, notes, *, runSort=True):
         '''
-        Add a note, pitch, the notes of another chord, or string representing a pitch, 
-        or a list of any of the above to a Chord.  
-        
+        Add a note, pitch, the notes of another chord, or string representing a pitch,
+        or a list of any of the above to a Chord.
+
         If runSort is True (default=True) then after appending, the
-        chord will be sorted. 
-        
+        chord will be sorted.
+
         >>> c = chord.Chord('C4 E4 G4')
         >>> c.add('B3')
         >>> c
         <music21.chord.Chord B3 C4 E4 G4>
         >>> c.duration
         <music21.duration.Duration 1.0>
-        
+
         >>> c.add('A2', runSort=False)
         >>> c
         <music21.chord.Chord B3 C4 E4 G4 A2>
-        
+
         >>> c.add(['B5', 'C6'])
         >>> c
         <music21.chord.Chord A2 B3 C4 E4 G4 B5 C6>
-        
+
         >>> c.add(pitch.Pitch('D6'))
         >>> c
         <music21.chord.Chord A2 B3 C4 E4 G4 B5 C6 D6>
@@ -634,14 +634,14 @@ class Chord(note.NotRest):
         self._append_core_or_init(notes, useDuration=False)
         if runSort:
             self.sortAscending(inPlace=True)
-    
+
     def remove(self, removeItem):
         '''
         Removes a note or pitch from the chord.  Must be a pitch
         equal to a pitch in the chord or a string specifying the pitch
         name with octave or the a note from a chord.  If not found,
         raises a ValueError
-        
+
         >>> c = chord.Chord('C4 E4 G4')
         >>> c.remove('E4')
         >>> c
@@ -657,20 +657,20 @@ class Chord(note.NotRest):
         >>> c.remove(pitch.Pitch('F#5'))
         Traceback (most recent call last):
         ValueError: Chord.remove(x), x not in chord
-        
-        
+
+
         The Note also does not need to be the exact note of the
         chord, just matches on equality
-        
+
         >>> c = chord.Chord('C4 E4 G4')
         >>> c.remove(note.Note('E4'))
         >>> c
-        <music21.chord.Chord C4 G4>        
-        
+        <music21.chord.Chord C4 G4>
+
         >>> c.remove(c[1])
         >>> c
         <music21.chord.Chord C4>
-        
+
         >>> c.remove(note.Note('B-2'))
         Traceback (most recent call last):
         ValueError: Chord.remove(x), x not in chord
@@ -678,9 +678,9 @@ class Chord(note.NotRest):
         >>> c.remove(4)
         Traceback (most recent call last):
         ValueError: Cannot remove 4 from a chord; try a Pitch or Note object
-        
+
         Like Python's list object does not work on lists...
-        
+
         >>> c = chord.Chord('C4 E4 G4')
         >>> c.remove(['C4', 'E4'])
         Traceback (most recent call last):
@@ -692,7 +692,7 @@ class Chord(note.NotRest):
                     self._notes.remove(n)
                     return
             raise ValueError('Chord.remove(x), x not in chord')
-            
+
         if not hasattr(removeItem, 'classes'):
             raise ValueError("Cannot remove {} from a chord; try a Pitch or Note object".format(
                 removeItem))
@@ -2920,7 +2920,7 @@ class Chord(note.NotRest):
 
         >>> c3.pitches[0] is p2
         False
-        
+
         TODO: inPlace will become False in v. 6
         '''
         return self._removePitchByRedundantAttribute('nameWithOctave',
@@ -2968,8 +2968,8 @@ class Chord(note.NotRest):
         <music21.chord.Chord C5 E3 G4 F-4>
         >>> rem
         [<music21.pitch.Pitch C2>, <music21.pitch.Pitch E3>]
-        
-        TODO: inPlace will become False in v. 6        
+
+        TODO: inPlace will become False in v. 6
         '''
         return self._removePitchByRedundantAttribute('name',
               inPlace=inPlace)
@@ -2999,10 +2999,10 @@ class Chord(note.NotRest):
             if isinstance(newroot, str):
                 newroot = newroot.replace('b', '-')
                 newroot = pitch.Pitch(newroot)
-            
+
             self._overrides['root'] = newroot
             self._cache['root'] = newroot
-            
+
             if 'inversion' in self._cache:
                 del self._cache['inversion']
                 # reset inversion if root changes
@@ -3049,7 +3049,7 @@ class Chord(note.NotRest):
         <music21.chord.Chord C2 E-2 G2 C3 E3 C#4 E#4>
 
         '''
-        c2 = self.closedPosition(forceOctave=forceOctave, 
+        c2 = self.closedPosition(forceOctave=forceOctave,
                                  inPlace=inPlace, leaveRedundantPitches=leaveRedundantPitches)
         if inPlace is True:
             c2 = self
@@ -3168,7 +3168,7 @@ class Chord(note.NotRest):
         'blue'
         >>> c['E4.style.color']
         'blue'
-        
+
         >>> c.setColor('red', 'C9')
         Traceback (most recent call last):
         music21.chord.ChordException: the given pitch is not in the Chord: C9
@@ -3178,7 +3178,7 @@ class Chord(note.NotRest):
             self.style.color = value
             for n in self._notes:
                 n.style.color = value
-            
+
             return
         elif isinstance(pitchTarget, str):
             pitchTarget = pitch.Pitch(pitchTarget)
@@ -3471,7 +3471,7 @@ class Chord(note.NotRest):
         >>> c3.getTie(c3.pitches[0])
         <music21.tie.Tie start>
 
-        Less safe to match by string, because there might be multiple 
+        Less safe to match by string, because there might be multiple
         pitches with the same name in the chord, but possible:
 
         >>> c4 = chord.Chord('D4 F#4')
@@ -3491,10 +3491,10 @@ class Chord(note.NotRest):
             pitchTarget = self._notes[0].pitch
         elif isinstance(pitchTarget, str):
             pitchTarget = pitch.Pitch(pitchTarget)
-            
+
         if isinstance(t, str):
             t = tie.Tie(t)
-        
+
         match = False
         for d in self._notes:
             if d.pitch is pitchTarget or d is pitchTarget: # compare by obj id first
@@ -3554,7 +3554,7 @@ class Chord(note.NotRest):
         pitches = pitch.simplifyMultipleEnharmonics(self.pitches)
         for i in range(len(pitches)):
             returnObj._notes[i].pitch = pitches[i]
-        
+
         if inPlace is False:
             return returnObj
 
@@ -4156,9 +4156,9 @@ class Chord(note.NotRest):
         >>> c.pitches = ['C#4', 'A#4', 'E#5']
         >>> c.pitches
         (<music21.pitch.Pitch C#4>, <music21.pitch.Pitch A#4>, <music21.pitch.Pitch E#5>)
-        
+
         Bass and root information is also changed.
-        
+
         >>> c.bass()
         <music21.pitch.Pitch C#4>
 

@@ -250,7 +250,7 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, group
     if (inputStream.isSorted
             and groupOffsets is False  # currently we can't populate for an OffsetTree*
             and (inputStream.isFlat or flatten is False)):
-        
+
         outputTree = treeClass(source=inputStream)
         inputStreamElements = inputStream._elements[:] + inputStream._endElements
         # Can use tree.populateFromSortedList and speed up by an order of magnitude

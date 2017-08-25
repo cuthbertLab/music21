@@ -642,7 +642,7 @@ def dotMultiplier(dots):
     :rtype: float
     '''
     return (((2 ** (dots + 1.0)) - 1.0) / (2 ** dots))
-    
+
 
 
 
@@ -1018,9 +1018,9 @@ def fromRoman(num, *, strictModern=False):
 
     >>> common.fromRoman('ic')
     99
-    
+
     unless strictModern is True
-    
+
     >>> common.fromRoman('ic', strictModern=True)
     Traceback (most recent call last):
     ValueError: input contains an invalid subtraction element (modern interpretation): ic
@@ -1035,7 +1035,7 @@ def fromRoman(num, *, strictModern=False):
     :rtype: int
     '''
     inputRoman = num.upper()
-    subtractionValues = (1, 10, 100)    
+    subtractionValues = (1, 10, 100)
     nums = ('M', 'D', 'C', 'L', 'X', 'V', 'I')
     ints = (1000, 500, 100, 50,  10,  5,   1)
     places = []
@@ -1052,9 +1052,9 @@ def fromRoman(num, *, strictModern=False):
             if nextvalue > value and value in subtractionValues:
                 if strictModern and nextvalue >= value * 10:
                     raise ValueError(
-                        'input contains an invalid subtraction element (modern interpretation): ' 
+                        'input contains an invalid subtraction element (modern interpretation): '
                         + '%s' % num)
-                
+
                 value *= -1
             elif nextvalue > value:
                 raise ValueError(

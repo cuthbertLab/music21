@@ -302,7 +302,7 @@ def uniquenessOfEschbeg(cardinality=7, searchCardinality=3, skipInverse=False, s
 
     Nope.  Seven are not.  We can see them by reversing showMatching
 
-    >>> demos.eschbeg.uniquenessOfEschbeg(cardinality=8, searchCardinality=3, skipInverse=True, 
+    >>> demos.eschbeg.uniquenessOfEschbeg(cardinality=8, searchCardinality=3, skipInverse=True,
     ...                                   showMatching=False)
     ['01234567', '01235678', '01236789', '02345679', '01234679', '0123578T', '0134679T']
 

@@ -36,9 +36,9 @@ And use `corpus.search` if you do not:
 >>> cb[0].parse()
 <music21.stream.Score 0x1050ce940>
 '''
-__all__ = ['chorales', 'corpora', 'manager', 
+__all__ = ['chorales', 'corpora', 'manager',
            # virtual
-           'work', 
+           'work',
            'parse']
 
 import re
@@ -99,12 +99,12 @@ def getCorePaths(fileExtensions=None, expandExtensions=True):
 # def getVirtualPaths(fileExtensions=None, expandExtensions=True):
 #     '''
 #     Get all paths in the virtual corpus that match a known extension.
-# 
+#
 #     An extension of None will return all known extensions.
-# 
+#
 #     >>> len(corpus.getVirtualPaths()) > 6
 #     True
-# 
+#
 #     '''
 #     return corpora.VirtualCorpus().getPaths(
 #         fileExtensions=fileExtensions,
@@ -263,7 +263,7 @@ def getWork(workName, movementNumber=None, fileExtensions=None):
     >>> a = corpus.getWork('luca/gloria')
     >>> a.name
     'gloria.xml'
-    
+
     >>> a.parent.name
     'luca'
 

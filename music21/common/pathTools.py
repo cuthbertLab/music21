@@ -60,8 +60,8 @@ def getCorpusFilePath():
     >>> fp = common.getCorpusFilePath()
     >>> fp.name == 'corpus' and fp.parent.name == 'music21'
     True
-    
-    :rtype: pathlib.Path    
+
+    :rtype: pathlib.Path
     '''
     from music21 import corpus
     coreCorpus = corpus.corpora.CoreCorpus()
@@ -119,7 +119,7 @@ def getRootFilePath():
     Return the root directory for music21 -- outside of the music21 namespace
     which has directories such as "dist", "documentation", "music21"
 
-    :rtype: pathlib.Path    
+    :rtype: pathlib.Path
     '''
     fpMusic21 = getSourceFilePath()
     fpParent = fpMusic21.parent
@@ -149,7 +149,7 @@ def cleanpath(path, *, returnPathlib=None):
     turns backslashes to forward slashes, and finally if that file is not an absolute path,
     turns it from a relative path to an absolute path.
     '''
-    
+
     if isinstance(path, pathlib.Path):
         path = str(path)
         if returnPathlib is None:

@@ -31,7 +31,7 @@ class Timer:
 
     def start(self):
         '''
-        Explicit start method; will clear previous values. 
+        Explicit start method; will clear previous values.
         Start always happens on initialization.
         '''
         self._tStart = time.time()
@@ -106,7 +106,7 @@ class CallGraph:
         self.excludeList += ['unittest*', 'doctest*']
         self.excludeList += ['encodings*', 'pkg_resources*', 'ntpath*', 'shutil.*', 'pkgutil.*']
         self.excludeList += ['difflib*', 'urlparse*', 'dateutil.*', 'calendar.*',]
-        self.excludeList += ['zipfile*', 'io.*', 'collections.*', 'tempfile.*', 
+        self.excludeList += ['zipfile*', 'io.*', 'collections.*', 'tempfile.*',
                              'urllib.*', 'StringIO*']
         self.excludeList += ['csv.*', 'json.*', 'os.*', 'distutils.*', 'ctypes*']
         self.excludeList += ['FileDialog.*', 'Tk*', 'PIL*', 'tk*', 'pillow*']
@@ -135,7 +135,7 @@ class CallGraph:
 
     def run(self, runWithEnviron=False):
         '''
-        Main code runner for testing. To set a new test, 
+        Main code runner for testing. To set a new test,
         update the self.callTest attribute in __init__().
         '''
         suffix = '.png' # '.svg' no reader for now...

@@ -185,7 +185,7 @@ def parse(workName,
 def _addCorpusFilepathToStreamObject(streamObj, filePath):
     '''
     Adds an entry 'corpusFilepath' to the Stream object.
-    
+
     TODO: this should work for non-core-corpora
     TODO: this should be in the metadata object
     TODO: this should set a pathlib.Path object
@@ -197,7 +197,7 @@ def _addCorpusFilepathToStreamObject(streamObj, filePath):
     corpusFilePath = str(common.getCorpusFilePath())
     lenCFP = len(corpusFilePath) + len(os.sep)
     filePath = str(filePath)
-    
+
     if filePath.startswith(corpusFilePath):
         fp2 = filePath[lenCFP:]
         ### corpus fix for windows
@@ -225,18 +225,18 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwar
 
     Note the importance of good metadata -- there's almost 400 pieces by
     Bach in the corpus, but many do not have correct metadata entries.
-    
+
     This can also be specified as:
-    
+
     >>> corpus.search(composer='bach')
     <music21.metadata.bundles.MetadataBundle {25 entries}>
 
     Or, to get all the chorales (without using `corpus.chorales.Iterator`):
-    
+
     >>> corpus.search(sourcePath='bach', numberOfParts=4)
     <music21.metadata.bundles.MetadataBundle {360 entries}>
 
-    
+
 
     This method is implemented in `corpus.manager` but loaded into corpus for
     ease of use.
@@ -299,7 +299,7 @@ def getMetadataBundleByCorpus(corpusObject):
     '''
     cacheMetadataBundleFromDisk(corpusObject)
     corpusName = corpusObject.name
-    if corpusName in _metadataBundles:        
+    if corpusName in _metadataBundles:
         return _metadataBundles[corpusName]
     else: # pragma: no cover
         raise CorpusException('No metadata bundle found for corpus {0} with name {1}'.format(
@@ -316,7 +316,7 @@ def cacheMetadataBundleFromDisk(corpusObject):
         metadataBundle.read()
         metadataBundle.validate()
         _metadataBundles[corpusName] = metadataBundle
-        
+
 
 def readAllMetadataBundlesFromDisk():
     '''

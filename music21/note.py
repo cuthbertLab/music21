@@ -161,7 +161,7 @@ class Lyric(style.StyleMixin):
             applyRaw = False
         if text is not None:
             self.setTextAndSyllabic(text, applyRaw)
-        
+
         self.number = number
 
         if 'identifier' in kwargs:
@@ -300,7 +300,7 @@ class Lyric(style.StyleMixin):
         number; lyric order is always stored in this form. Descriptive
         identifiers like 'part2verse1' which can be found in the musicXML
         lyric number attribute should be stored in self.identifier.
-        
+
         >>> l = note.Lyric("Hi")
         >>> l.number = 5
         >>> l.number
@@ -394,7 +394,7 @@ class GeneralNote(base.Music21Object):
     def _getLyric(self):
         if not self.lyrics:
             return None
-        
+
         allText = [l.text for l in self.lyrics]
         return '\n'.join(allText)
 
@@ -402,12 +402,12 @@ class GeneralNote(base.Music21Object):
         self.lyrics = []
         if value in (None, False):
             return
-        
+
         if not isinstance(value, str):
             value = str(value)
-        
+
         values = value.split('\n')
-        for i, v in enumerate(values):    
+        for i, v in enumerate(values):
             self.lyrics.append(Lyric(v, number=i + 1))
 
     lyric = property(_getLyric, _setLyric,
@@ -434,7 +434,7 @@ class GeneralNote(base.Music21Object):
         []
 
         Set multiple lyrics with \n separated text:
-        
+
         >>> a.lyric = '1. Hi\n2. Bye'
         >>> a.lyric
         '1. Hi\n2. Bye'
@@ -464,7 +464,7 @@ class GeneralNote(base.Music21Object):
         'bye'
         >>> n1.lyrics[1].number
         3
-        >>> for lyr in n1.lyrics: 
+        >>> for lyr in n1.lyrics:
         ...     print(lyr.text)
         hello
         bye
@@ -535,14 +535,14 @@ class GeneralNote(base.Music21Object):
         [<music21.note.Lyric number=1 syllabic=single text="first">,
          <music21.note.Lyric number=2 syllabic=single text="newSecond">,
          <music21.note.Lyric number=3 syllabic=single text="second">]
-         
+
         Test number as lyric...
-         
+
         >>> n1.insertLyric(0, 3)
         >>> n1.lyrics
-        [<music21.note.Lyric number=1 syllabic=single text="first">, 
-         <music21.note.Lyric number=2 syllabic=single text="newSecond">, 
-         <music21.note.Lyric number=3 syllabic=single text="second">, 
+        [<music21.note.Lyric number=1 syllabic=single text="first">,
+         <music21.note.Lyric number=2 syllabic=single text="newSecond">,
+         <music21.note.Lyric number=3 syllabic=single text="second">,
          <music21.note.Lyric number=4 syllabic=single text="0">]
         '''
         if not isinstance(text, str):
@@ -745,7 +745,7 @@ class NotRest(GeneralNote):
 
     def _setStemDirection(self, direction):
         if direction is None:
-            direction = 'unspecified' # allow setting to None meaning 
+            direction = 'unspecified' # allow setting to None meaning
         elif direction == 'none':
             direction = 'noStem' # allow setting to none or None
         elif direction not in stemDirectionNames:
@@ -760,30 +760,30 @@ class NotRest(GeneralNote):
         >>> note.stemDirectionNames
         ['double', 'down', 'noStem', 'none', 'unspecified', 'up']
         >>> n = note.Note()
-        
+
         By default a Note's stemDirection is 'unspecified'
         meaning that it is unknown:
-        
+
         >>> n.stemDirection
         'unspecified'
-        
+
         >>> n.stemDirection = 'noStem'
         >>> n.stemDirection
         'noStem'
-        
+
         The alias 'none' (the string) is the same as 'noStem'
-        
+
         >>> n.stemDirection = 'none'
         >>> n.stemDirection
         'noStem'
-        
+
         >>> n.stemDirection = 'junk'
         Traceback (most recent call last):
         music21.note.NotRestException: not a valid stem direction name: junk
-        
+
         Stem direction can be set explicitly to None to remove
         any prior stem information, same as 'unspecified':
-        
+
         >>> n.stemDirection = None
         >>> n.stemDirection
         'unspecified'
@@ -1229,17 +1229,17 @@ class Note(NotRest):
         'C2'
         >>> n.pitches
         (<music21.pitch.Pitch C2>,)
-        
+
         The value for setting must be a list or tuple:
-        
+
         >>> n.pitches = pitch.Pitch('C4')
         Traceback (most recent call last):
         music21.note.NoteException: cannot set pitches with provided object: C4
-        
+
         For setting a single one, use `n.pitch` instead.
-        
+
         Don't use strings, or you will get a string back!
-        
+
         >>> n.pitches = ('C4', 'D4')
         >>> n.pitch
         'C4'
@@ -1364,13 +1364,13 @@ class Unpitched(NotRest):
 
     The `Unpitched` object does not currently do anything and should
     not be used.
-    
+
     >>> unp = note.Unpitched()
-    
+
     Unpitched elements have displayStep and displayOctave
     which shows where they should be displayed, but they do not have pitch
     objects:
-    
+
     >>> unp.displayStep
     'C'
     >>> unp.displayOctave
@@ -1538,7 +1538,7 @@ class SpacerRest(Rest):
     This object should only be used for making hidden space in a score in lilypond.
 
     This may become deprecated at some point...
-    
+
     >>> sr = note.SpacerRest(type='whole')
     >>> sr
     <music21.note.SpacerRest rest duration=4.0>
@@ -1627,7 +1627,7 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(l), '<music21.note.Lyric number=1 identifier="verse" text="hi">')
         l.text = None
         self.assertEqual(repr(l), '<music21.note.Lyric number=1 identifier="verse">')
-        
+
 
     def testComplex(self):
         note1 = Note()

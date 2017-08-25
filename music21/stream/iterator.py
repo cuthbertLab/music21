@@ -172,7 +172,7 @@ class StreamIterator:
         >>> s = stream.Measure()
         >>> s.insert(0, note.Rest())
         >>> s.repeatAppend(note.Note('C'), 2)
-        
+
         >>> s.definesExplicitSystemBreaks
         False
 
@@ -1056,9 +1056,9 @@ class StreamIterator:
     def notes(self):
         '''
         Returns all NotRest objects
-        
+
         (will sometime become simply Note and Chord objects...)
-        
+
         >>> s = stream.Stream()
         >>> s.append(note.Note('C'))
         >>> s.append(note.Rest())
@@ -1075,7 +1075,7 @@ class StreamIterator:
     def notesAndRests(self):
         '''
         Returns all GeneralNote objects
-        
+
         >>> s = stream.Stream()
         >>> s.append(meter.TimeSignature('4/4'))
         >>> s.append(note.Note('C'))
@@ -1118,7 +1118,7 @@ class StreamIterator:
     def variants(self):
         '''
         To be deprecated soon...
-        
+
         Adds a ClassFilter for Variant
         '''
         self.addFilter(filters.ClassFilter('Variant'))
@@ -1313,17 +1313,17 @@ class RecursiveIterator(StreamIterator):
                                                 )
         if 'lastYielded' not in self.activeInformation:
             self.activeInformation['lastYielded'] = None
-        
+
         self.returnSelf = includeSelf
         self.includeSelf = includeSelf
         self.ignoreSorting = ignoreSorting
 
         # within the list of parent/child recursive iterators, where does this start?
         self.iteratorStartOffsetInHierarchy = 0.0
-        
+
         if streamsOnly is True:
             self.filters.append(filters.ClassFilter('Stream'))
-        self.childRecursiveIterator = None 
+        self.childRecursiveIterator = None
         # not yet used.
         #self.parentIterator = None
 
@@ -1387,7 +1387,7 @@ class RecursiveIterator(StreamIterator):
                                             ignoreSorting=self.ignoreSorting,
                                             #parentIterator=self,
                                             )
-                newStartOffset = (self.iteratorStartOffsetInHierarchy 
+                newStartOffset = (self.iteratorStartOffsetInHierarchy
                                   + self.srcStream.elementOffset(e))
                 self.childRecursiveIterator.iteratorStartOffsetInHierarchy = newStartOffset
             if self.matchesFilters(e) is False:
@@ -1448,7 +1448,7 @@ class RecursiveIterator(StreamIterator):
     def streamStack(self):
         '''
         Returns a stack of Streams at this point.  Last is most recent.
-        
+
         However, the current element may be the same as the last element in the stack
 
         >>> b = corpus.parse('bwv66.6')
@@ -1467,9 +1467,9 @@ class RecursiveIterator(StreamIterator):
 
     def currentHierarchyOffset(self):
         '''
-        Called on the current iterator, returns the current offset in the hierarchy. 
+        Called on the current iterator, returns the current offset in the hierarchy.
         Or None if we are not currently iterating.
-        
+
         >>> b = corpus.parse('bwv66.6')
         >>> bRecurse = b.recurse().notes
         >>> print(bRecurse.currentHierarchyOffset())
@@ -1489,15 +1489,15 @@ class RecursiveIterator(StreamIterator):
         0 0.0 <music21.note.Note E>
         1 1.0 <music21.note.Note F#>
         ...
-        
+
         After iteration completes, the figure is reset to None:
-        
+
         >>> print(bRecurse.currentHierarchyOffset())
         None
-        
+
         The offsets are with respect to the position inside the stream
         being iterated, so for instance, this will not change the output from above:
-        
+
         >>> o = stream.Opus()
         >>> o.insert(20.0, b)
         >>> bRecurse = b.recurse().notes
@@ -1505,26 +1505,26 @@ class RecursiveIterator(StreamIterator):
         ...     print(n.measureNumber, bRecurse.currentHierarchyOffset(), n)
         0 0.0 <music21.note.Note C#>
         ...
-        
+
         But of course, this will add 20.0 to all numbers:
-        
+
         >>> oRecurse = o.recurse().notes
         >>> for n in oRecurse:
         ...     print(n.measureNumber, oRecurse.currentHierarchyOffset(), n)
         0 20.0 <music21.note.Note C#>
         ...
-        
+
         New in v.4
         '''
         lastYield = self.activeInformation['lastYielded']
         if lastYield is None:
             return None
-        
+
         iteratorStack = self.iteratorStack()
         newestIterator = iteratorStack[-1]
         lastStream = newestIterator.srcStream
         lastStartOffset = newestIterator.iteratorStartOffsetInHierarchy
-        
+
         if lastYield is lastStream:
             return common.opFrac(lastStartOffset)
         else:
@@ -1543,7 +1543,7 @@ class RecursiveIterator(StreamIterator):
 
         >>> b = corpus.parse('bwv66.6')
         >>> for n in b.recurse().getElementsByOffsetInHierarchy(8, 9.5).notes:
-        ...     print(n, n.getOffsetInHierarchy(b), 
+        ...     print(n, n.getOffsetInHierarchy(b),
         ...           n.measureNumber, n.getContextByClass('Part').id)
         <music21.note.Note C#> 8.0 2 Soprano
         <music21.note.Note A> 9.0 3 Soprano
@@ -1579,7 +1579,7 @@ class Test(unittest.TestCase):
         rec = s.recurse()
         n = rec.getElementById('id2')
         self.assertEqual(n.activeSite.number, 2)
-        
+
     def testCurrentHierarchyOffsetReset(self):
         from music21 import note, stream
         p = stream.Part()
@@ -1595,7 +1595,7 @@ class Test(unittest.TestCase):
         self.assertListEqual(allOffsets, [0.0, 0.0, 1.0, 1.0, 2.0])
         currentOffset = pRecurse.currentHierarchyOffset()
         self.assertIsNone(currentOffset)
-        
+
 
 _DOC_ORDER = [StreamIterator, RecursiveIterator, OffsetIterator]
 

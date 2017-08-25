@@ -159,7 +159,7 @@ class ArchiveManager:
             raise ArchiveManagerException('no support for extension: %s' % self.archiveType)
 
         f = zipfile.ZipFile(str(self.fp), 'r')  # remove str in Py3.6
-        
+
         if name is None and dataFormat == 'musicxml': # try to auto-harvest
             # will return data as a string
             # note that we need to read the META-INF/container.xml file
@@ -203,7 +203,7 @@ class ArchiveManager:
                 component = f.open(subFp, 'rU')
                 lines = component.readlines()
                 #environLocal.printDebug(['subFp', subFp, len(lines)])
-            
+
                 try:
                     post.append(''.join([l.decode(encoding='UTF-8') for l in lines]))
                 except UnicodeDecodeError:
@@ -247,7 +247,7 @@ class PickleFilter:
     def getPickleFp(self, directory=None, zipType=None):
         '''
         Returns the file path of the pickle file for this file.
-        
+
         Returns a pathlib.Path
         '''
         if directory is None:
@@ -261,14 +261,14 @@ class PickleFilter:
             extension = '.pgz'
         pythonVersion = 'py' + str(sys.version_info[0]) + '.' + str(sys.version_info[1])
 
-        baseName = '-'.join(['m21', _version.__version__, pythonVersion, 
+        baseName = '-'.join(['m21', _version.__version__, pythonVersion,
                              common.getMd5(str(self.fp))])
 
         if self.number is not None:
             baseName += '-' + str(self.number)
         baseName += extension
 
-        
+
         return directory / baseName
 
     def removePickle(self):
@@ -456,7 +456,7 @@ class Converter:
         extension using `common.findFormatFile`.
 
         Does not use or store pickles in any circumstance.
-        '''        
+        '''
         fp = common.cleanpath(fp, returnPathlib=True)
         #environLocal.printDebug(['attempting to parseFile', fp])
         if not fp.exists():
@@ -1093,7 +1093,7 @@ def parse(value, *args, **keywords):
             valueStr = str(value.sourcePath)
         else:
             valueStr = str(common.getCorpusFilePath() / value.sourcePath)
-        
+
     else:
         valueStr = value
 
@@ -1123,7 +1123,7 @@ def parse(value, *args, **keywords):
         return parseFile(common.cleanpath(valueStr), number=number, format=m21Format,
                          forceSource=forceSource, **keywords)
 
-    elif not isinstance(valueStr, bytes) and (valueStr.startswith('http://') 
+    elif not isinstance(valueStr, bytes) and (valueStr.startswith('http://')
                                               or valueStr.startswith('https://')):
         # its a url; may need to broaden these criteria
         return parseURL(value, number=number, format=m21Format,
@@ -1620,9 +1620,9 @@ class Test(unittest.TestCase):
 
 
     def testConversionMidiBasic(self):
-        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive' 
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         fp = dirLib / 'test01.mid'
-        
+
         # a simple file created in athenacl
 
         unused_s = parseFile(fp)

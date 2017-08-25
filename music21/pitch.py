@@ -116,7 +116,7 @@ def _convertPitchClassToNumber(ps):
     '''
     Given a pitch class string
     return the pitch class representation.
-    Ints are returned unchanged; 
+    Ints are returned unchanged;
 
     >>> pitch._convertPitchClassToNumber(3)
     3
@@ -1006,26 +1006,26 @@ class Accidental(style.StyleMixin):
         0.5
         >>> a.name
         'half-sharp'
-        
+
         Setting an illegal name is generally an error:
-        
+
         >>> a.set('flat-flat-up')
         Traceback (most recent call last):
         music21.pitch.AccidentalException: flat-flat-up is not a supported accidental type
-        
+
         But if 'allowNonStandardValue' is True then other names (if strings) or alters (if numbers)
         are allowed:
-            
+
         >>> a.set('quintuple-sharp', allowNonStandardValue=True)
         >>> a.set(5.0, allowNonStandardValue=True)
         >>> a.name
         'quintuple-sharp'
         >>> a.alter
         5.0
-        
+
         This is the argument that .name and .alter use to allow non-standard names
-        
-        
+
+
         Changed in v. 5 -- added allowNonStandardValue
 
         '''
@@ -1097,7 +1097,7 @@ class Accidental(style.StyleMixin):
                     return
                 else: # pragma: no cover
                     raise AccidentalException('%s is not a supported accidental type' % name)
-                    
+
 
         self._modifier = accidentalNameToModifier[self._name]
 
@@ -1131,11 +1131,11 @@ class Accidental(style.StyleMixin):
     name = property(_getName, _setName,
         doc = '''
         Get or set the name of the Accidental, like 'sharp' or 'double-flat'
-        
+
         If the name is set to a standard name then it changes alter and modifier.
-        
+
         If set to a non-standard name, then it does not change them:
-        
+
         >>> a = pitch.Accidental()
         >>> a.name = 'flat'
         >>> a.alter
@@ -1145,7 +1145,7 @@ class Accidental(style.StyleMixin):
         >>> a.name = 'flat-flat-up'
         >>> a.alter
         -1.0
-        
+
         Changed in v. 5 -- changing the name here changes other values, condiditionally
         ''')
 
@@ -1168,12 +1168,12 @@ class Accidental(style.StyleMixin):
         >>> sharp.alter = -1
 
         After changing alter to a known other value, name changes:
-        
+
         >>> sharp.name
         'flat'
 
         But changing it to an unusual value does not change the name:
-        
+
         >>> notSoFlat = pitch.Accidental('flat')
         >>> notSoFlat.alter = -0.9
         >>> notSoFlat.name
@@ -1194,7 +1194,7 @@ class Accidental(style.StyleMixin):
     modifier = property(_getModifier, _setModifier,
         doc = '''
         Get or set the alter of the modifier, or the string representation.'
-        
+
         >>> f = pitch.Accidental('flat')
         >>> f.modifier
         '-'
@@ -1203,14 +1203,14 @@ class Accidental(style.StyleMixin):
         'sharp'
 
         However, an unknown modifier does not change anything but is preserved:
-        
+
         >>> f.modifier = '&'
         >>> f.modifier
         '&'
         >>> f.name
         'sharp'
-        
-        Changed in v. 5 -- changing the midifer here changes other values, condiditionally        
+
+        Changed in v. 5 -- changing the midifer here changes other values, condiditionally
         ''')
 
     def _getDisplayType(self):
@@ -1305,14 +1305,14 @@ class Accidental(style.StyleMixin):
         '''
         Set an attribute of 'name', 'alter', and 'modifier', independently
         from other attributes.
-        
+
         >>> a = pitch.Accidental('natural')
         >>> a.setAttributeIndependently('alter', 1.0)
         >>> a.alter
         1.0
         >>> a.name
         'natural'
-        
+
         >>> a.setAttributeIndependently('name', 'sori')
         >>> a.setAttributeIndependently('modifier', '$')
         >>> a.modifier
@@ -1321,13 +1321,13 @@ class Accidental(style.StyleMixin):
         'sori'
         >>> a.alter
         1.0
-        
+
         Only 'name', 'alter', and 'modifier' can be set independently:
-        
+
         >>> a.setAttributeIndependently('color', 'red')
         Traceback (most recent call last):
         music21.pitch.AccidentalException: Cannot set attribute color independently of other parts.
-        
+
         New in v.5 -- needed because .name, .alter, and .modifier run .set()
         '''
         if attribute not in ('name', 'alter', 'modifier'):
@@ -1336,7 +1336,7 @@ class Accidental(style.StyleMixin):
 
         if attribute == 'alter':
             value = float(value)
-        
+
         privateAttrName = '_' + attribute
         setattr(self, privateAttrName, value)
 

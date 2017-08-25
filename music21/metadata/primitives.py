@@ -779,8 +779,8 @@ class Text:
 #------------------------------------------------------------------------------
 class Copyright(Text):
     '''
-    A subclass of text that can also have a role 
-    
+    A subclass of text that can also have a role
+
     >>> copyleft = metadata.primitives.Copyright('Copyright 1969 Cuthbert',
     ...                role='fictitious')
     >>> copyleft
@@ -793,7 +793,7 @@ class Copyright(Text):
     def __init__(self, data='', language=None, *, role=None):
         super().__init__(data, language)
         self.role = role
-    
+
 
 #------------------------------------------------------------------------------
 
@@ -955,7 +955,7 @@ class Contributor:
         ...     )
         >>> td.names
         ['Chopin, Fryderyk', 'Chopin, Frederick']
-        
+
         >>> td.names = ['Czerny', 'Spohr']
         >>> td.names
         ['Czerny', 'Spohr']
@@ -974,8 +974,8 @@ class Contributor:
         self._names = []  # reset
         for n in values:
             self._names.append(Text(n))
-            
-            
+
+
 
 
     @property
@@ -992,12 +992,12 @@ class Contributor:
         >>> td.role = 'lor'
         >>> td.role
         'orchestrator'
-        
+
         Roles can be created on the fly:
-        
+
         >>> td.role = 'court jester'
         >>> td.role
-        'court jester'        
+        'court jester'
         '''
         return self._role
 

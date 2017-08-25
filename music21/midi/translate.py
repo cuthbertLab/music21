@@ -241,7 +241,7 @@ def music21ObjectToMidiFile(music21Object):
     if 'Stream' in classes:
         if music21Object.atSoundingPitch is False:
             music21Object = music21Object.toSoundingPitch()
-        
+
         return streamToMidiFile(music21Object)
     else:
         m21ObjectCopy = copy.deepcopy(music21Object)
@@ -2629,7 +2629,7 @@ class Test(unittest.TestCase):
     def testMidiTempoImportA(self):
         from music21 import converter
 
-        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive' 
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         # a simple file created in athenacl
         fp = dirLib / 'test10.mid'
         s = converter.parse(fp)
@@ -2656,7 +2656,7 @@ class Test(unittest.TestCase):
     def testMidiTempoImportB(self):
         from music21 import converter
 
-        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive' 
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         # a file with three tracks and one conductor track
         fp = dirLib / 'test11.mid'
         s = converter.parse(fp)
@@ -2785,7 +2785,7 @@ class Test(unittest.TestCase):
         from music21 import converter
 
         # specialized problem of not importing last notes
-        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive' 
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         fp = dirLib / 'test12.mid'
         s = converter.parse(fp)
 
@@ -2802,7 +2802,7 @@ class Test(unittest.TestCase):
         # are better seen as voices
         from music21 import converter
         # specialized problem of not importing last notes
-        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive' 
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         fp = dirLib / 'test13.mid'
         s = converter.parse(fp)
         #s.show('t')
@@ -2818,7 +2818,7 @@ class Test(unittest.TestCase):
     def testImportChordsA(self):
         from music21 import converter
 
-        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive' 
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         fp = dirLib / 'test05.mid'
 
         # a simple file created in athenacl

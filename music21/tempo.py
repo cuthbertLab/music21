@@ -381,7 +381,7 @@ class MetronomeMark(TempoIndication):
     Unicode values work fine thanks to Python 3:
 
     >>> marking = 'très vite'
-    >>> marking    
+    >>> marking
     'très vite'
     >>> print(tempo.defaultTempoValues[marking])
     144
@@ -675,7 +675,7 @@ class MetronomeMark(TempoIndication):
         #environLocal.printDebug(['matches', matches])
         post = None
         for tempoValue, tempoStr in matches:
-            if ((tempoNumber >= (tempoValue - spread) 
+            if ((tempoNumber >= (tempoValue - spread)
                     and tempoNumber <= (tempoValue + spread))): # found a match
                 post = tempoStr
                 break

@@ -70,13 +70,13 @@ def generateSmoothBassLine(harmonyObjects):
         i. creates three generic intervals between the previous bass note
            and the current bass note, all using the previous bass note's newly defined
            octave and one of three current bass note octaves:
-            1. the last bass note's octave    
-            2. the last bass note's octave + 1    
+            1. the last bass note's octave
+            2. the last bass note's octave + 1
             3. the last bass note's octave - 1
-        ii. evaluates the size of each of the three intervals above 
+        ii. evaluates the size of each of the three intervals above
             (using interval.generic.undirected)
             and finds the smallest size
-        iii. assigns the bass note octave that yields 
+        iii. assigns the bass note octave that yields
              this smallest interval to the current bass note
              - if the newly found octave is determined to be greater than 3 or less than 1, the
                bass note octave is assigned to the last bass note's octave

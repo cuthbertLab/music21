@@ -264,7 +264,7 @@ class StrongAccent(Accent):
     '''
     Like an accent but even stronger.  Has an extra
     attribute of pointDirection
-    
+
     >>> a = articulations.StrongAccent()
     >>> a.pointDirection
     'up'
@@ -316,8 +316,8 @@ class Spiccato(Staccato, Accent):
         storedLengthShift = self.lengthShift
         Accent.__init__(self) # order matters...
         self.lengthShift = storedLengthShift
-        
-        
+
+
 class Tenuto(LengthArticulation):
     '''
     >>> a = articulations.Tenuto()
@@ -341,7 +341,7 @@ class IndeterminantSlide(PitchArticulation):
     '''
     Represents a whole class of slides that are
     of indeterminent pitch amount (scoops, plops, etc.)
-    
+
     All these have style information of .style.lineShape
     .style.lineType, .style.dashLength, and .style.spaceLength
     '''
@@ -505,7 +505,7 @@ class StringHarmonic(Bowing, Harmonic):
         super().__init__()
         self.harmonicType = 'natural'
         self.pitchType = None
-        
+
 class OpenString(Bowing):
     pass
 
@@ -594,14 +594,14 @@ class Stopped(WindIndication):
 class OrganIndication(TechnicalIndication):
     '''
     Indicates whether a pitch should be played with heel or toe.
-    
+
     Has one attribute, "substitution" default to False, which
     indicates whether the mark is a substitution mark
     '''
     def __init__(self):
         super().__init__()
         self.substitution = False
-    
+
 
 class OrganHeel(OrganIndication):
     pass
@@ -621,7 +621,7 @@ class HarpFingerNails(HarpIndication):
 class HandbellIndication(TechnicalIndication):
     '''
     displayText is used to store any of the techniques in handbell music.
-    
+
     Values are damp, echo, gyro, hand martellato, mallet lift,
     mallet table, martellato, martellato lift,
     muted martellato, pluck lift, and swing

@@ -1929,7 +1929,7 @@ def prepareBeamedNotes(music21Measure):
     True
     """
     allNotes = music21Measure.notes.stream()
-    
+
     for sampleNote in allNotes:
         sampleNote.beamStart = False
         sampleNote.beamContinue = False

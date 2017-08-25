@@ -106,10 +106,10 @@ class Metadata(base.Music21Object):
     made available by default.
 
     >>> md.searchAttributes
-    ('actNumber', 'alternativeTitle', 'associatedWork', 'collectionDesignation', 
-     'commission', 'composer', 'copyright', 'countryOfComposition', 'date', 'dedication', 
-     'groupTitle', 'localeOfComposition', 'movementName', 'movementNumber', 'number', 
-     'opusNumber', 'parentTitle', 'popularTitle', 'sceneNumber', 'textLanguage', 
+    ('actNumber', 'alternativeTitle', 'associatedWork', 'collectionDesignation',
+     'commission', 'composer', 'copyright', 'countryOfComposition', 'date', 'dedication',
+     'groupTitle', 'localeOfComposition', 'movementName', 'movementNumber', 'number',
+     'opusNumber', 'parentTitle', 'popularTitle', 'sceneNumber', 'textLanguage',
      'textOriginalLanguage', 'title', 'volume')
 
     Plus anything that is in contributors...
@@ -197,9 +197,9 @@ class Metadata(base.Music21Object):
 
         # TODO: need a specific object for imprint
         self._imprint = None
-        
+
         self.software = [defaults.software]
-        
+
         # Copyright can be None or a copyright object
         self.copyright = None
 
@@ -247,15 +247,15 @@ class Metadata(base.Music21Object):
         '''
         # pylint: disable=undefined-variable
         allOut = {}
-        
+
         searchAttributes = self.searchAttributes
-        
+
         for thisAttribute in sorted(set(searchAttributes)):
             try:
                 val = getattr(self, thisAttribute)
             except AttributeError:
                 continue
-            
+
             if skipContributors:
                 if isinstance(val, Contributor):
                     continue
@@ -340,10 +340,10 @@ class Metadata(base.Music21Object):
         ['Beach, Amy', 'Cheney, Amy Marcy']
 
         All contributor roles are searchable, even if they are not standard roles:
-        
+
         >>> md.search('Beach')
         (True, 'composer')
-        
+
         >>> dancer = metadata.Contributor()
         >>> dancer.names = ['Mark Gotham', 'I. Quinn']
         >>> dancer.role = 'interpretive dancer'
@@ -451,14 +451,14 @@ class Metadata(base.Music21Object):
 
         >>> md.search('opl(.*)cott')
         (True, 'composer')
-        
-        
+
+
         New in v.4 -- use a keyword argument to search
         that field directly:
-        
+
         >>> md.search(composer='Joplin')
         (True, 'composer')
-        
+
         TODO: Change to a namedtuple and add as a third element
         during a succesful search, the full value of the retrieved
         field (so that 'Joplin' would return 'Joplin, Scott')
@@ -468,8 +468,8 @@ class Metadata(base.Music21Object):
             return (False, None)
         elif query is None and field is None and kwargs:
             field, query = kwargs.popitem()
-        
-        
+
+
         if field is not None:
             field = field.lower()
             match = False
@@ -492,7 +492,7 @@ class Metadata(base.Music21Object):
             for innerField in self.searchAttributes:
                 value = getattr(self, innerField)
                 valueFieldPairs.append((value, innerField))
-                
+
         # now search all contributors.
         for contrib in self.contributors:
             if field is not None:
@@ -502,8 +502,8 @@ class Metadata(base.Music21Object):
                     continue
             for name in contrib.names:
                 valueFieldPairs.append((name, contrib.role))
-                
-                
+
+
         # for now, make all queries strings
         # ultimately, can look for regular expressions by checking for
         # .search
@@ -840,13 +840,13 @@ class RichMetadata(Metadata):
     >>> 'keySignatureFirst' in richMetadata.searchAttributes
     True
     >>> richMetadata.searchAttributes
-    ('actNumber', 'alternativeTitle', 'ambitus', 'associatedWork', 'collectionDesignation', 
-     'commission', 'composer', 'copyright', 'countryOfComposition', 'date', 'dedication', 
-     'groupTitle', 'keySignatureFirst', 'keySignatures', 'localeOfComposition', 'movementName', 
-     'movementNumber', 'noteCount', 'number', 'numberOfParts', 
-     'opusNumber', 'parentTitle', 'pitchHighest', 
-     'pitchLowest', 'popularTitle', 'quarterLength', 'sceneNumber', 'sourcePath', 'tempoFirst', 
-     'tempos', 'textLanguage', 'textOriginalLanguage', 'timeSignatureFirst', 
+    ('actNumber', 'alternativeTitle', 'ambitus', 'associatedWork', 'collectionDesignation',
+     'commission', 'composer', 'copyright', 'countryOfComposition', 'date', 'dedication',
+     'groupTitle', 'keySignatureFirst', 'keySignatures', 'localeOfComposition', 'movementName',
+     'movementNumber', 'noteCount', 'number', 'numberOfParts',
+     'opusNumber', 'parentTitle', 'pitchHighest',
+     'pitchLowest', 'popularTitle', 'quarterLength', 'sceneNumber', 'sourcePath', 'tempoFirst',
+     'tempos', 'textLanguage', 'textOriginalLanguage', 'timeSignatureFirst',
      'timeSignatures', 'title', 'volume')
     '''
 
@@ -940,11 +940,11 @@ class RichMetadata(Metadata):
             return '' # for some abc files...
         if not streamObj.filePath:
             return ''
-        
+
         streamFp = streamObj.filePath
         if not isinstance(streamFp, pathlib.Path):
             streamFp = pathlib.Path(streamFp)
-        
+
         try:
             relativePath = streamFp.relative_to(common.getCorpusFilePath())
             return relativePath.as_posix()

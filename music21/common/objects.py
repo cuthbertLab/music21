@@ -161,7 +161,7 @@ class SlottedObjectMixin:
         >>> fb = FunkyBeam()
         >>> sSet = fb._getSlotsRecursive()
         >>> sorted(list(sSet))
-        ['_editorial', '_style', 'direction', 'funkiness', 'groovability', 
+        ['_editorial', '_style', 'direction', 'funkiness', 'groovability',
             'id', 'independentAngle', 'number', 'type']
         '''
         slots = set()
@@ -174,7 +174,7 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
     Same as above, but __eq__ and __ne__ functions are defined based on the slots.
 
     Slots are the only things compared, so do not mix with a __dict__ based object.
-    
+
     Ignores differences in .id
     '''
     def __eq__(self, other):

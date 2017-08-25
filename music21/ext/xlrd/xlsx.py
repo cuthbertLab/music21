@@ -26,7 +26,7 @@ def ensure_elementtree_imported(verbosity, logfile):
         return
     if "IronPython" in sys.version:
         import xml.etree.ElementTree as ET
-        #### 2.7.2.1: fails later with 
+        #### 2.7.2.1: fails later with
         #### NotImplementedError: iterparse is not supported on IronPython. (CP #31923)
     else:
         try: import xml.etree.cElementTree as ET
@@ -54,7 +54,7 @@ def ensure_elementtree_imported(verbosity, logfile):
             if item.lower().replace('_', '') == 'version'
             ])
         print(ET.__file__, ET.__name__, etree_version, ET_has_iterparse, file=logfile)
-        
+
 def split_tag(tag):
     pos = tag.rfind('}') + 1
     if pos >= 2:
@@ -404,7 +404,7 @@ class X12SST(X12General):
             self.process_stream = self.process_stream_iterparse
         else:
             self.process_stream = self.process_stream_findall
-            
+
     def process_stream_iterparse(self, stream, heading=None):
         if self.verbosity >= 2 and heading is not None:
             fprintf(self.logfile, "\n=== %s ===\n", heading)
@@ -418,7 +418,7 @@ class X12SST(X12General):
                 fprintf(self.logfile, "element #%d\n", elemno)
                 self.dump_elem(elem)
             result = get_text_from_si_or_is(self, elem)
-            sst.append(result)                
+            sst.append(result)
             elem.clear() # destroy all child elements
         if self.verbosity >= 2:
             self.dumpout('Entries in SST: %d', len(sst))
@@ -577,10 +577,10 @@ class X12Sheet(X12General):
                                       first_colx, last_colx + 1))
 
     def do_row(self, row_elem):
-    
+
         def bad_child_tag(child_tag):
              raise Exception('cell type %s has unexpected child <%s> at rowx=%r colx=%r' % (cell_type, child_tag, rowx, colx))
- 
+
         row_number = row_elem.get('r')
         if row_number is None: # Yes, it's optional.
             self.rowx += 1

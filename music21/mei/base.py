@@ -276,7 +276,7 @@ class MeiToM21Converter:
     '''
 
     def __init__(self, theDocument=None):
-        #  The __init__() documentation doesn't isn't processed by Sphinx, 
+        #  The __init__() documentation doesn't isn't processed by Sphinx,
         #  so I put it at class level.
         environLocal.printDebug('*** initializing MeiToM21Converter')
 
