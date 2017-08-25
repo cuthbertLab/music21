@@ -950,9 +950,11 @@ class DataSet:
 
         shouldUpdate = not self.quiet
 
+        # print("about to run parallel")
         outputData = common.runParallel(self.dataInstances,
                                            _dataSetParallelSubprocess,
                                            updateFunction=shouldUpdate,
+                                           updateMultiply=1
                                            )
         featureData, errors, classValues, ids = zip(*outputData)
         errors = common.flattenList(errors)
@@ -1093,7 +1095,8 @@ class DataSet:
 def _dataSetParallelSubprocess(dataInstance):
     row = []
     errors = []
-
+    #howBigWeCopied = len(pickle.dumps(dataInstance))
+    #print("Starting ", dataInstance, " Size: ", howBigWeCopied)
     for feClass in dataInstance.featureExtractorClassesForParallelRunning:
         fe = feClass()
         fe.setData(dataInstance)

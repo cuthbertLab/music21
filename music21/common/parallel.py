@@ -73,7 +73,7 @@ def runParallel(iterable, parallelFunction,
                 _r = para(delayFunction(iterable[i]) for i in rangeGen)
 
             if updateFunction is True:
-                print("Done {} tasks of {}".format(totalRun, iterLength))
+                print("Done {} tasks of {}".format(totalRun + numCpus, iterLength))
             elif updateFunction not in (False, None):
                 for i in range(totalRun, endPosition):
                     if updateSendsIterable is False:
