@@ -4891,6 +4891,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                    transferGroupsToPitches=False,
                    makeRests=True):
         '''
+        TO BE DEPRECATED SOON!  Use Chordify instead!
+        
         Gathers simultaneously sounding :class:`~music21.note.Note` objects
         into :class:`~music21.chord.Chord` objects, each of which
         contains all the pitches sounding together.
@@ -5158,114 +5160,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                  addTies=True,
                  addPartIdAsGroup=False,
                  removeRedundantPitches=True,
-                 toSoundingPitch=True,
+                 toSoundingPitch=True
                  ):
-        '''
-        
-        Changes in v.5:
-        
-        Runs a little faster for small scores and a TON faster for big scores
-        running in O(n) time not O(n^2)
-        
-        no longer supported: displayTiedAccidentals=False,
-        '''
-        def chordifyOneMeasure(template, streamToChordify):
-            timespanTree = streamToChordify.asTimespans(classList=('GeneralNote',))
-            allTimePoints = timespanTree.allTimePoints()
-            if 0 not in allTimePoints:
-                allTimePoints = (0,) + allTimePoints 
-            
-            for offset, endTime in zip(allTimePoints, allTimePoints[1:]):
-                if common.almostEquals(offset, endTime):
-                    continue
-                vert = timespanTree.getVerticalityAt(offset)
-                quarterLength = endTime - offset
-                if quarterLength < 0:
-                    environLocal.warn("Something is wrong with the verticality " +
-                            "in stream %r: %r its endTime %f is less than its offset %f" %
-                                             (template, vert, endTime, offset))
-    
-                chordOrRest = vert.makeElement(quarterLength, 
-                                               addTies=addTies,
-                                               addPartIdAsGroup=addPartIdAsGroup,
-                                               removeRedundantPitches=removeRedundantPitches,
-                                               )
-                
-                template.coreInsert(opFrac(offset), chordOrRest)
-            template.coreElementsChanged()
-            consolodateRests(template)
-            
-        def consolodateRests(template):
-            consecutiveRests = []
-            for el in list(template.getElementsByClass('GeneralNote')):
-                if 'Rest' not in el.classes:
-                    removeConsecutiveRests(template, consecutiveRests)
-                    consecutiveRests = []
-                else:
-                    consecutiveRests.append(el)
-            removeConsecutiveRests(template, consecutiveRests)
-            
-        def removeConsecutiveRests(template, consecutiveRests):
-            if len(consecutiveRests) < 2:
-                return
-            totalDuration = sum(r.duration.quarterLength for r in consecutiveRests)
-            startOffset = template.elementOffset(consecutiveRests[0])
-            for r in consecutiveRests:
-                template.remove(r)
-            rNew = note.Rest()
-            rNew.duration.quarterLength = totalDuration
-            template.insert(startOffset, rNew)
-            
-            
-            
-            
-        #---------------------------------------
-        if toSoundingPitch:
-            #environLocal.printDebug(['at sounding pitch', allParts[0].atSoundingPitch])
-            if (self.hasPartLikeStreams()
-                     and self.getElementsByClass('Stream')[0].atSoundingPitch is False):
-                workObj = self.toSoundingPitch(inPlace=False)
-            elif self.atSoundingPitch is False:
-                workObj = self.toSoundingPitch(inPlace=False)
-            else:
-                workObj = self
-
-        if self.hasPartLikeStreams():
-            templateStream = workObj.getElementsByClass('Stream')[0]
-        else:
-            templateStream = workObj
-        
-        template = templateStream.template(fillWithRests=False,
-                                           removeClasses=('GeneralNote',),
-                                           retainVoices=False)
-            
-        if template.hasMeasures():
-            measureIterator = template.getElementsByClass('Measure')
-            for i, templateMeasure in enumerate(measureIterator):
-                measurePart = workObj.measure(i, collect=(), indicesNotNumbers=True)
-                chordifyOneMeasure(templateMeasure, measurePart)
-        else:
-            chordifyOneMeasure(template, workObj)
-        
-        # accidental displayStatus needs to change.
-        for p in template.pitches:
-            if p.accidental is not None and p.accidental.displayStatus != 'even-tied':
-                p.accidental.displayStatus = None            
-
-        if (hasattr(workObj, 'metadata')
-                and workObj.metadata is not None
-                and workObj.hasPartLikeStreams() is True):
-            template.insert(0, copy.deepcopy(workObj.metadata))
-
-        return template
-                
-
-    def chordifyOld(self,
-                 addTies=True,
-                 displayTiedAccidentals=False,
-                 addPartIdAsGroup=False,
-                 removeRedundantPitches=True,
-                 toSoundingPitch=True):
         '''
         Create a chordal reduction of polyphonic music, where each
         change to a new pitch results in a new chord. If a Score or
@@ -5390,6 +5286,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> c.pitches[0].groups
         ['p0', 'p1']
 
+        Changes in v.5:
+        
+        Runs a little faster for small scores and run a TON faster for big scores
+        running in O(n) time not O(n^2)
+        
+        no longer supported: displayTiedAccidentals=False,
+
 
         OMIT_FROM_DOCS
 
@@ -5404,132 +5307,96 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> cn[0].pitches
         (<music21.pitch.Pitch C4>, <music21.pitch.Pitch D#4>)
         '''
-        # TODO: need to handle flat Streams contained in a Stream
-        # TODO: need to handle voices
-        #       even if those component Stream do not have Measures
-
-        # TODO: make chordify have an option where the Pitches are not deepcopied
-        #       from the original, but are the same.
-
-        # for makeChords, below
-        transferGroupsToPitches = False
-        if addPartIdAsGroup:
-            transferGroupsToPitches = True
-
-        returnObj = copy.deepcopy(self)
-        returnObj.isSorted = False # this makes all the difference in the world for some reason...
-        if returnObj.hasPartLikeStreams():
-            allParts = list(returnObj.getElementsByClass('Stream'))
-        else: # simulate a list of Streams
-            allParts = [returnObj]
-
+        def chordifyOneMeasure(template, streamToChordify):
+            timespanTree = streamToChordify.asTimespans(classList=('GeneralNote',))
+            allTimePoints = timespanTree.allTimePoints()
+            if 0 not in allTimePoints:
+                allTimePoints = (0,) + allTimePoints 
+            
+            for offset, endTime in zip(allTimePoints, allTimePoints[1:]):
+                if common.almostEquals(offset, endTime):
+                    continue
+                vert = timespanTree.getVerticalityAt(offset)
+                quarterLength = endTime - offset
+                if quarterLength < 0:
+                    environLocal.warn("Something is wrong with the verticality " +
+                            "in stream %r: %r its endTime %f is less than its offset %f" %
+                                             (template, vert, endTime, offset))
+    
+                chordOrRest = vert.makeElement(quarterLength, 
+                                               addTies=addTies,
+                                               addPartIdAsGroup=addPartIdAsGroup,
+                                               removeRedundantPitches=removeRedundantPitches,
+                                               )
+                
+                template.coreInsert(opFrac(offset), chordOrRest)
+            template.coreElementsChanged()
+            consolodateRests(template)
+            
+        def consolodateRests(template):
+            consecutiveRests = []
+            for el in list(template.getElementsByClass('GeneralNote')):
+                if 'Rest' not in el.classes:
+                    removeConsecutiveRests(template, consecutiveRests)
+                    consecutiveRests = []
+                else:
+                    consecutiveRests.append(el)
+            removeConsecutiveRests(template, consecutiveRests)
+            
+        def removeConsecutiveRests(template, consecutiveRests):
+            if len(consecutiveRests) < 2:
+                return
+            totalDuration = sum(r.duration.quarterLength for r in consecutiveRests)
+            startOffset = template.elementOffset(consecutiveRests[0])
+            for r in consecutiveRests:
+                template.remove(r)
+            rNew = note.Rest()
+            rNew.duration.quarterLength = totalDuration
+            template.insert(startOffset, rNew)
+            
+            
+            
+            
+        #---------------------------------------
         if toSoundingPitch:
-            #environLocal.printDebug(['at sounding pitch',     allParts[0].atSoundingPitch])
-            if allParts[0].atSoundingPitch is False: # if false
-                returnObj.toSoundingPitch(inPlace=True)
+            #environLocal.printDebug(['at sounding pitch', allParts[0].atSoundingPitch])
+            if (self.hasPartLikeStreams()
+                     and self.getElementsByClass('Stream')[0].atSoundingPitch is False):
+                workObj = self.toSoundingPitch(inPlace=False)
+            elif self.atSoundingPitch is False:
+                workObj = self.toSoundingPitch(inPlace=False)
+            else:
+                workObj = self
 
-        mStream = allParts[0].getElementsByClass('Measure').stream()
-        mCount = len(mStream)
-        hasMeasures = True
-        if mCount == 0:
-            hasMeasures = False
-            mCount = 1 # treat as a single measure
+        if self.hasPartLikeStreams():
+            templateStream = workObj.getElementsByClass('Stream')[0]
         else:
-            partsMeasureCache = []
-            for p in allParts:
-                partsMeasureCache.append(p.getElementsByClass('Measure'))
+            templateStream = workObj
+        
+        template = templateStream.template(fillWithRests=False,
+                                           removeClasses=('GeneralNote',),
+                                           retainVoices=False)
+            
+        if template.hasMeasures():
+            measureIterator = template.getElementsByClass('Measure')
+            for i, templateMeasure in enumerate(measureIterator):
+                measurePart = workObj.measure(i, collect=(), indicesNotNumbers=True)
+                chordifyOneMeasure(templateMeasure, measurePart)
+        else:
+            chordifyOneMeasure(template, workObj)
+        
+        # accidental displayStatus needs to change.
+        for p in template.pitches:
+            if p.accidental is not None and p.accidental.displayStatus != 'even-tied':
+                p.accidental.displayStatus = None            
 
-        for i in range(mCount): # may be 1
-            # first, collect all unique offsets for each measure
-            uniqueOffsets = []
-            for pNum, p in enumerate(allParts):
-                if hasMeasures is True: # has measures
-                    m = partsMeasureCache[pNum][i]
-                else:
-                    m = p # treat the entire part as one measure
-                mFlatNotes = m.flat.notesAndRests.stream()
-                theseUniques = mFlatNotes._uniqueOffsetsAndEndTimes()
-                for t in theseUniques:
-                    if t not in uniqueOffsets:
-                        uniqueOffsets.append(t)
-            #environLocal.printDebug(['chordify: uniqueOffsets for all parts, m', uniqueOffsets, i])
-            uniqueOffsets = sorted(uniqueOffsets)
+        if (hasattr(workObj, 'metadata')
+                and workObj.metadata is not None
+                and workObj.hasPartLikeStreams() is True):
+            template.insert(0, copy.deepcopy(workObj.metadata))
 
-
-            for pNum, p in enumerate(allParts):
-                # get one measure at a time
-                if hasMeasures is True:
-                    m = partsMeasureCache[pNum][i]
-                else:
-                    m = p # treat the entire part as one measure
-                # working with a copy, in place can be true
-                m.sliceAtOffsets(offsetList=uniqueOffsets, addTies=addTies,
-                    inPlace=True,
-                    displayTiedAccidentals=displayTiedAccidentals)
-                # tag all sliced notes if requested
-                if addPartIdAsGroup:
-                    for e in m: # add to all elements
-                        # some ids may not be strings; must convert
-                        pidStr = str(p.id)
-                        pidStr = pidStr.replace(' ', '_') # spaces are not allowed as group names
-                        # they should not be as id names either...but not yet enforced.
-                        e.groups.append(pidStr)
-
-        # make chords from flat version of sliced parts
-        # do in place as already a copy has been made
-        post = returnObj.flat.makeChords(includePostWindow=True,
-                                         useExactOffsets=True,
-                                         removeRedundantPitches=removeRedundantPitches,
-                                         gatherArticulations=True,
-                                         gatherExpressions=True,
-                                         inPlace=True,
-                                         transferGroupsToPitches=transferGroupsToPitches)
-
-        # re-populate a measure stream with the new chords
-        # get a measure stream from the top voice
-        # assume we can manipulate this these measures as already have deepcopy
-        # the Part may not have had any Measures;
-        if mStream:
-            for i, m in enumerate(mStream.getElementsByClass('Measure')):
-                # get highest time before removal
-                mQl = m.duration.quarterLength
-                m.removeByClass('GeneralNote')
-                # remove any Streams (aka Voices) found in the Measure
-                m.removeByClass('Stream')
-                # get offset in original measure
-                mOffsetStart = m.getOffsetBySite(allParts[0])
-                mOffsetEnd = mOffsetStart + mQl
-                # not sure if this properly manages padding
-
-                # place all notes in their new location if offsets match
-                # TODO: this iterates over all notes at each iteration; can be faster
-                for e in post.notesAndRests:
-                    # these are flat offset values
-                    o = post.elementOffset(e)
-                    #environLocal.printDebug(['iterating elements', o, e])
-                    if o >= mOffsetStart and o < mOffsetEnd:
-                        # get offset in relation to inside of Measure
-                        localOffset = o - mOffsetStart
-                        #environLocal.printDebug(['inserting element', e, 'at', o,
-                        #  'in', m, 'localOffset', localOffset])
-                        m.insert(localOffset, e)
-                # call for each measure
-                m.coreElementsChanged()
-            # call this post now
-            post = mStream
-        else: # place in a single flat Stream
-            post.coreElementsChanged()
-
-        if (hasattr(returnObj, 'metadata')
-                and returnObj.metadata is not None
-                and returnObj.hasPartLikeStreams() is True):
-            post.insert(0, returnObj.metadata)
-        return post
-
-        #post.coreElementsChanged()
-        #return mStream
-        #return post
-
+        return template
+                
 
     def splitByClass(self, classObj, fx):
         '''
