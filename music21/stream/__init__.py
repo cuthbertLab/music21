@@ -12153,7 +12153,8 @@ class Part(Stream):
             # measure for context
             if i > 0:
                 try:
-                    previousNoteOrChord = measureStream[i - 1][-1]
+                    previousNoteOrChord = measureStream[i - 1][-1]                        
+                    
                     if not hasattr(previousNoteOrChord, 'pitches'):
                         tiePitchSet = None
                     else:
@@ -12166,7 +12167,7 @@ class Part(Stream):
                             if n.tie is not None and n.tie.type != 'stop':
                                 tiePitchSet.add(n.pitch.nameWithOctave)
                     
-                except IndexError:
+                except (IndexError, StreamException):
                     tiePitchSet = None
                 pitchPastMeasure = measureStream[i - 1].pitches
 

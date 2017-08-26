@@ -348,7 +348,7 @@ class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.UniquePitchClassSetSimultaneities(s)
     >>> fe.extract().vector
-    [25]
+    [27]
     '''
     id = 'CS1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -378,7 +378,7 @@ class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.UniqueSetClassSimultaneities(s)
     >>> fe.extract().vector
-    [12]
+    [14]
     '''
     id = 'CS2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -409,7 +409,7 @@ class MostCommonPitchClassSetSimultaneityPrevalence(
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.MostCommonPitchClassSetSimultaneityPrevalence(s)
     >>> fe.extract().vector
-    [0.132...]
+    [0.134...]
     '''
     id = 'CS3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -445,11 +445,11 @@ class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.MostCommonSetClassSimultaneityPrevalence(s)
     >>> fe.extract().vector
-    [0.679...]
+    [0.653...]
     >>> s2 = corpus.parse('schoenberg/opus19', 6)
     >>> fe2 = features.native.MostCommonSetClassSimultaneityPrevalence(s2)
     >>> fe2.extract().vector
-    [0.184...]
+    [0.222...]
     '''
     id = 'CS4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -485,7 +485,7 @@ class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.MajorTriadSimultaneityPrevalence(s)
     >>> fe.extract().vector
-    [0.45...]
+    [0.46...]
     '''
     id = 'CS5'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -515,7 +515,7 @@ class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.MinorTriadSimultaneityPrevalence(s)
     >>> fe.extract().vector # same as major in this work
-    [0.226...]
+    [0.211...]
     '''
     id = 'CS6'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -544,7 +544,7 @@ class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.DominantSeventhSimultaneityPrevalence(s)
     >>> fe.extract().vector
-    [0.075...]
+    [0.076...]
     '''
     id = 'CS7'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -574,7 +574,7 @@ class DiminishedTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.DiminishedTriadSimultaneityPrevalence(s)
     >>> fe.extract().vector
-    [0.018867924528...]
+    [0.019...]
     '''
     id = 'CS8'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -606,7 +606,7 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.TriadSimultaneityPrevalence(s)
     >>> fe.extract().vector
-    [0.71698...]
+    [0.692...]
     >>> s2 = corpus.parse('schoenberg/opus19', 2)
     >>> fe2 = features.native.TriadSimultaneityPrevalence(s2)
     >>> fe2.extract().vector

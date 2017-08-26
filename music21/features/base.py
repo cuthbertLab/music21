@@ -1292,31 +1292,32 @@ class Test(unittest.TestCase):
     def testStreamFormsA(self):
 
         from music21 import features
-
+        self.maxDiff = None
+        
         s = corpus.parse('corelli/opus3no1/1grave')
+        #s.chordify().show()
         di = features.DataInstance(s)
         self.assertEqual(len(di['flat']), 291)
         self.assertEqual(len(di['flat.notes']), 238)
 
         #di['chordify'].show('t')
-        self.assertEqual(len(di['chordify']), 20)
+        self.assertEqual(len(di['chordify']), 27)
         chordifiedChords = di['chordify.flat.getElementsByClass(Chord)']
-        self.assertEqual(len(chordifiedChords), 144)
+        self.assertEqual(len(chordifiedChords), 145)
+        histo = di['chordify.flat.getElementsByClass(Chord).setClassHistogram']
+        #print(histo)
 
+        self.assertEqual(histo,
+                         {'3-11': 30, '2-4': 26, '1-1': 25, '2-3': 16, '3-9': 12, '2-2': 6, 
+                          '3-7': 6, '2-5': 6, '3-4': 5, '3-6': 5, '3-10': 4, 
+                          '3-8': 2, '3-2': 2})
 
-        self.assertEqual(di['chordify.flat.getElementsByClass(Chord).setClassHistogram'],
-                         {'2-2': 6, '2-3': 12, '2-4': 21, '2-5': 5,
-                          '3-10': 4, '3-11': 33, '3-2': 3, '3-4': 7,
-                          '3-6': 7, '3-7': 9, '3-8': 6, '3-9': 16,
-                          '1-1': 15})
-
-        self.maxDiff = None
         self.assertEqual(di['chordify.flat.getElementsByClass(Chord).typesHistogram'],
-                           {'isMinorTriad': 8, 'isAugmentedTriad': 0,
-                            'isTriad': 37, 'isSeventh': 0, 'isDiminishedTriad': 4,
-                            'isDiminishedSeventh': 0, 'isIncompleteMajorTriad': 21,
-                            'isHalfDiminishedSeventh': 0, 'isMajorTriad': 25,
-                            'isDominantSeventh': 0, 'isIncompleteMinorTriad': 12})
+                           {'isMinorTriad': 6, 'isAugmentedTriad': 0,
+                            'isTriad': 34, 'isSeventh': 0, 'isDiminishedTriad': 4,
+                            'isDiminishedSeventh': 0, 'isIncompleteMajorTriad': 26,
+                            'isHalfDiminishedSeventh': 0, 'isMajorTriad': 24,
+                            'isDominantSeventh': 0, 'isIncompleteMinorTriad': 16})
 
         self.assertEqual(di['flat.notes.quarterLengthHistogram'],
                          {0.5: 116, 1.0: 39, 1.5: 27, 2.0: 31, 3.0: 2, 4.0: 3,
@@ -1835,7 +1836,7 @@ _DOC_ORDER = [DataSet, Feature, FeatureExtractor]
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test) #, runTest='testMultipleSearches')
+    music21.mainTest(Test) #, runTest='testStreamFormsA')
 
 
 #------------------------------------------------------------------------------
