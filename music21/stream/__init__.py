@@ -12154,7 +12154,7 @@ class Part(Stream):
             if i > 0:
                 try:
                     previousNoteOrChord = measureStream[i - 1][-1]
-                    if not hasattr(previousNoteOrChord, 'tie'):
+                    if not hasattr(previousNoteOrChord, 'pitches'):
                         tiePitchSet = None
                     else:
                         tiePitchSet = set()
