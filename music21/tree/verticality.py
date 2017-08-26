@@ -22,8 +22,8 @@ from music21 import tie
 from music21 import chord
 from music21 import environment
 from music21 import exceptions21
-#from music21 import key
-from music21 import pitch
+# from music21 import key
+# from music21 import pitch
 
 environLocal = environment.Environment("tree.verticality")
 
@@ -416,49 +416,58 @@ class Verticality:
         <music21.pitch.Pitch F#4>
         <music21.pitch.Pitch A4>
         '''
+        pitchNameSet = set()
         pitchSet = set()
-        for timespan in self.startTimespans:
-            if hasattr(timespan, 'element'):
-                element = timespan.element
-            else:
-                element = timespan
 
-            if 'music21.key.Key' not in element.classSet and hasattr(element, 'pitches'):
-                pitches = [x.nameWithOctave for x in element.pitches]
-                pitchSet.update(pitches)
-        for timespan in self.overlapTimespans:
-            if hasattr(timespan, 'element'):
-                element = timespan.element
-            else:
-                element = timespan
+        for timespanCollection in (self.startTimespans, self.overlapTimespans):
+            for timespan in timespanCollection:
+                if not hasattr(timespan, 'pitches'):
+                    continue
+                for p in timespan.pitches:
+                    pName = p.nameWithOctave
+                    if pName in pitchNameSet:
+                        continue
 
-            if 'music21.key.Key' not in element.classSet and hasattr(element, 'pitches'):
-                pitches = [x.nameWithOctave for x in element.pitches]
-                pitchSet.update(pitches)
-        pitchSet = set([pitch.Pitch(x) for x in pitchSet])
+                    pitchNameSet.add(pName)
+                    pitchSet.add(p)
+
         return pitchSet
 
     @property
     def pitchClassSet(self):
         r'''
-        Gets the pitch-class set of all elements in a verticality.
+        Gets a set of all pitches in a verticality with distinct pitchClasses
 
-        >>> score = corpus.parse('bwv66.6')
-        >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
-        ...            classList=(note.Note, chord.Chord))
-        >>> verticality = scoreTree.getVerticalityAt(1.0)
-        >>> for pitchClass in sorted(verticality.pitchClassSet):
-        ...     pitchClass
-        ...
-        <music21.pitch.Pitch C#>
-        <music21.pitch.Pitch F#>
-        <music21.pitch.Pitch A>
+        >>> n1 = note.Note('C4')
+        >>> n2 = note.Note('B#5')
+        >>> s = stream.Stream()
+        >>> s.insert(4.0, n1)
+        >>> s.insert(4.0, n2)
+        >>> scoreTree = s.asTimespans()
+        >>> verticality = scoreTree.getVerticalityAt(4.0)
+        >>> pitchSet = verticality.pitchSet
+        >>> list(sorted(pitchSet))
+        [<music21.pitch.Pitch C4>, <music21.pitch.Pitch B#5>]
+        
+        PitchClassSet will return only one pitch.  Which of these
+        is returned is arbitrary.
+        
+        >>> pitchClassSet = verticality.pitchClassSet
+        >>> #_DOCS_SHOW list(sorted(pitchClassSet))
+        >>> print('[<music21.pitch.Pitch B#5>]') #_DOCS_HIDE
+        [<music21.pitch.Pitch B#5>]
         '''
+        outPitchSet = set()
         pitchClassSet = set()
+
         for currentPitch in self.pitchSet:
-            pitchClass = pitch.Pitch(currentPitch.name)
+            pitchClass = currentPitch.pitchClass
+            if pitchClass in pitchClassSet:
+                continue
+            
             pitchClassSet.add(pitchClass)
-        return pitchClassSet
+            outPitchSet.add(currentPitch)
+        return outPitchSet
 
     @property
     def previousVerticality(self):
@@ -508,7 +517,7 @@ class Verticality:
 
     ######### makeElement
 
-    def makeElement(self, quarterLength=1.0):
+    def makeElement(self, quarterLength=1.0, *, returnOnePitchChord=True):
         r'''
         Makes a Chord or Rest from this verticality and quarterLength.
 
@@ -518,6 +527,10 @@ class Verticality:
         >>> verticality = scoreTree.getVerticalityAt(4.0)
         >>> verticality
         <Verticality 4.0 {E#3 G3}>
+        >>> verticality.startTimespans
+        (<PitchedTimespan (4.0 to 5.0) <music21.note.Note G>>, 
+         <PitchedTimespan (4.0 to 6.0) <music21.note.Note E#>>)
+         
         >>> el = verticality.makeElement(2.0)
         >>> el
         <music21.chord.Chord E#3 G3>
@@ -541,14 +554,44 @@ class Verticality:
         TODO: Consider if this is better to return a Note if only one pitch?
         '''
         if self.pitchSet:
-            element = chord.Chord(sorted(self.pitchSet))
+            isNote = False
+            if len(self.pitchSet) == 1 and not returnOnePitchChord:
+                element = note.Note(list(self.pitchSet)[0])            
+                isNote = True
+            else:
+                element = chord.Chord(sorted(self.pitchSet))
+            
             startElements = [x.element for x in self.startTimespans]
+#             ties = []
+#             for el in startElements:
+#                 if hasattr(el, 'tie') and el.tie is not None:
+#                     ties.append(el.tie.type)
+#                 else:
+#                     ties.append(None)
+#             tiesSet = set(ties)
+#             if len(tiesSet) == 0:
+#                 pass
+#             if len(tiesSet) == 1:
+#                 onlyTie = next(iter(tiesSet))
+#                 if onlyTie is not None:
+#                     element.tie = tie.Tie(onlyTie)
+#             else:
+#                 for i in range(len(startElements)):
+#                     thisStartElement = startElements[i]
+#                     thisTieType = ties[i]
+#                                         
+            
             try:
                 ties = [x.tie for x in startElements if x.tie is not None]
-                if any(x.type == 'start' for x in ties):
+                if all(x.type == 'start' for x in ties):
                     element.tie = tie.Tie('start')
-                elif any(x.type == 'continue' for x in ties):
+                elif all(x.type == 'continue' for x in ties):
                     element.tie = tie.Tie('continue')
+                elif all(x.type == 'stop' for x in ties):
+                    element.tie = tie.Tie('stop')
+                    
+                    
+                    
             except AttributeError:
                 pass
         else:

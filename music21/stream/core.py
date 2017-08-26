@@ -355,18 +355,16 @@ class StreamCoreMixin:
         highly optimized data structure for searching through elements and
         offsets.
 
-        TODO: these should not all be PitchedTimespans...
-
         >>> score = tree.makeExampleScore()
         >>> scoreTree = score.asTimespans()
         >>> print(scoreTree)
         <TimespanTree {20} (0.0 to 8.0) <music21.stream.Score exampleScore>>
-            <PitchedTimespan (0.0 to 0.0) <music21.clef.BassClef>>
-            <PitchedTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
-            <PitchedTimespan (0.0 to 0.0) <music21.instrument.Instrument PartA: : >>
-            <PitchedTimespan (0.0 to 0.0) <music21.clef.BassClef>>
-            <PitchedTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
-            <PitchedTimespan (0.0 to 0.0) <music21.instrument.Instrument PartB: : >>
+            <ElementTimespan (0.0 to 0.0) <music21.clef.BassClef>>
+            <ElementTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
+            <ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument PartA: : >>
+            <ElementTimespan (0.0 to 0.0) <music21.clef.BassClef>>
+            <ElementTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
+            <ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument PartB: : >>
             <PitchedTimespan (0.0 to 1.0) <music21.note.Note C>>
             <PitchedTimespan (0.0 to 2.0) <music21.note.Note C#>>
             <PitchedTimespan (1.0 to 2.0) <music21.note.Note D>>
@@ -379,8 +377,8 @@ class StreamCoreMixin:
             <PitchedTimespan (6.0 to 7.0) <music21.note.Note B>>
             <PitchedTimespan (6.0 to 8.0) <music21.note.Note D#>>
             <PitchedTimespan (7.0 to 8.0) <music21.note.Note C>>
-            <PitchedTimespan (8.0 to 8.0) <music21.bar.Barline style=final>>
-            <PitchedTimespan (8.0 to 8.0) <music21.bar.Barline style=final>>
+            <ElementTimespan (8.0 to 8.0) <music21.bar.Barline style=final>>
+            <ElementTimespan (8.0 to 8.0) <music21.bar.Barline style=final>>
         '''
         hashedAttributes = hash( (tuple(classList or () ), flatten) )
         cacheKey = "timespanTree" + str(hashedAttributes)

@@ -121,13 +121,17 @@ def listOfTreesByClass(inputStream,
                 if classList and not element.isClassOrSubclass(classList):
                     continue
                 if useTimespans:
-                    pitchedTimespan = spans.PitchedTimespan(element=element,
-                                                        parentage=tuple(reversed(currentParentage)),
-                                                        parentOffset=parentOffset,
-                                                        parentEndTime=parentEndTime,
-                                                        offset=offset,
-                                                        endTime=endTime)
-                    classBasedTree.insert(pitchedTimespan)
+                    if hasattr(element, 'pitches') and 'music21.key.Key' not in element.classSet:
+                        spanClass = spans.PitchedTimespan
+                    else:
+                        spanClass = spans.ElementTimespan
+                    elementTimespan = spanClass(element=element,
+                                                parentage=tuple(reversed(currentParentage)),
+                                                parentOffset=parentOffset,
+                                                parentEndTime=parentEndTime,
+                                                offset=offset,
+                                                endTime=endTime)
+                    classBasedTree.insert(elementTimespan)
                 else:
                     classBasedTree.insert(offset, element)
 
@@ -298,8 +302,8 @@ def asTimespans(inputStream, flatten, classList):
     >>> for x in scoreTree:
     ...     x
     ...
-    <PitchedTimespan (0.0 to 0.0) <music21.metadata.Metadata object at 0x...>>
-    <PitchedTimespan (0.0 to 0.0) <music21.layout.StaffGroup ...>>
+    <ElementTimespan (0.0 to 0.0) <music21.metadata.Metadata object at 0x...>>
+    <ElementTimespan (0.0 to 0.0) <music21.layout.StaffGroup ...>>
     <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Soprano>>
     <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Alto>>
     <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
