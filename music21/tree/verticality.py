@@ -18,11 +18,12 @@ import collections
 import copy
 import unittest
 
-from music21 import note
-from music21 import tie
 from music21 import chord
+from music21 import common
 from music21 import environment
 from music21 import exceptions21
+from music21 import note
+from music21 import tie
 # from music21 import key
 # from music21 import pitch
 
@@ -533,8 +534,12 @@ class Verticality:
 
     ######### makeElement
 
-    def makeElement(self, quarterLength=1.0, *,
-                    addTies=True):
+    def makeElement(self, 
+                    quarterLength=1.0, 
+                    *,
+                    addTies=True,
+                    addPartIdAsGroup=False,
+                    removeRedundantPitches=True):
         r'''
         Makes a Chord or Rest from this verticality and quarterLength.
 
@@ -568,24 +573,43 @@ class Verticality:
         'Eighth Triplet (1/3 QL)'
 
 
-        TODO: Consider if this is better to return a Note if only one pitch?
+        >>> n1 = note.Note('C4')
+        >>> n2 = note.Note('C4')
+        >>> s = stream.Score()
+        >>> s.insert(0, n1)
+        >>> s.insert(0.5, n2)
+        >>> scoreTree = s.asTimespans()
+        >>> verticality = scoreTree.getVerticalityAt(0.5)
+        >>> c = verticality.makeElement(0.5)
+        >>> c
+        <music21.chord.Chord C4>
+        
+        >>> c = verticality.makeElement(0.5, removeRedundantPitches=False)
+        >>> c
+        <music21.chord.Chord C4 C4>
         '''
         if not self.pitchSet:
             r = note.Rest()
-            r.duration.quarterLength = quarterLength
+            r.duration.quarterLength = common.opFrac(quarterLength)
             return r
         
         # easy stuff done, time to get to the hard stuff...
 
         c = chord.Chord()
-        c.duration.quarterLength = quarterLength
+        c.duration.quarterLength = common.opFrac(quarterLength)
         dur = c.duration
         
         seenPitches = set()
         notesToAdd = {}
+                
         startStopSet = set(['start', 'stop'])
+        pitchBust = 0 # used if removeRedundantPitches is False.
+
 
         def newNote(ts, n):
+            '''
+            Make a copy of the note and clear some settings
+            '''
             nNew = copy.deepcopy(n)
             nNew.duration = dur
             if nNew.stemDirection != 'noStem':
@@ -593,8 +617,8 @@ class Verticality:
             if not addTies:
                 return nNew            
             
-            offsetDifference = self.offset - ts.offset
-            endTimeDifference = ts.endTime - (self.offset + quarterLength)
+            offsetDifference = common.opFrac(self.offset - ts.offset)
+            endTimeDifference = common.opFrac(ts.endTime - (self.offset + quarterLength))
             if offsetDifference == 0 and endTimeDifference <= 0:
                 addTie = None
             elif offsetDifference > 0:
@@ -628,12 +652,32 @@ class Verticality:
             If it has more tie information than the previously
             added note, then remove the previously added note and add it
             '''
+            nonlocal pitchBust # love Py3!!!
             p = n.pitch
             pitchKey = p.nameWithOctave
+
+            pitchGroup = None
+            if addPartIdAsGroup:
+                partContext = n.getContextByClass('Part')
+                if partContext is not None:
+                    pidStr = str(partContext.id)
+                    pitchGroup = pidStr.replace(' ', '_') # spaces are not allowed as group names
+                    n.pitch.groups.append(pitchGroup)
+                    n.groups.append(pitchGroup)
+        
+            
             if pitchKey not in seenPitches:
                 seenPitches.add(pitchKey)                    
                 notesToAdd[pitchKey] = newNote(ts, n)
                 return
+            elif not removeRedundantPitches:
+                notesToAdd[pitchKey + str(pitchBust)] = newNote(ts, n)
+                pitchBust += 1
+                return
+            elif addPartIdAsGroup:
+                notesToAdd[pitchKey].groups.append(pitchGroup)
+                notesToAdd[pitchKey].pitch.groups.append(pitchGroup)
+
 
             if not addTies:
                 return
@@ -644,6 +688,8 @@ class Verticality:
                 return # previous note was as good or better
             
             possibleNewNote = newNote(ts, n)
+            possibleNewNote.groups = notesToAdd[pitchKey].groups
+            
             if possibleNewNote.tie is None:
                 return # do nothing
             elif oldNoteTie is None:
@@ -668,7 +714,8 @@ class Verticality:
             else:
                 conditionalAdd(ts, el)
 
-        c = chord.Chord(notesToAdd.values())
+        for n in notesToAdd.values():
+            c.add(n)
         c.sortAscending(inPlace=True)
         return c
 

@@ -5154,14 +5154,30 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         returnObj.coreElementsChanged()
         return returnObj
 
-    def chordifyNew(self, *,
-                    addTies=True):
+    def chordify(self, *,
+                 addTies=True,
+                 addPartIdAsGroup=False,
+                 removeRedundantPitches=True,
+                 toSoundingPitch=True,
+                 ):
         '''
+        
+        Changes in v.5:
+        
+        Runs a little faster for small scores and a TON faster for big scores
+        running in O(n) time not O(n^2)
+        
+        no longer supported: displayTiedAccidentals=False,
         '''
         def chordifyOneMeasure(template, streamToChordify):
-            timespanTree = streamToChordify.asTimespans()
+            timespanTree = streamToChordify.asTimespans(classList=('GeneralNote',))
             allTimePoints = timespanTree.allTimePoints()
+            if 0 not in allTimePoints:
+                allTimePoints = (0,) + allTimePoints 
+            
             for offset, endTime in zip(allTimePoints, allTimePoints[1:]):
+                if common.almostEquals(offset, endTime):
+                    continue
                 vert = timespanTree.getVerticalityAt(offset)
                 quarterLength = endTime - offset
                 if quarterLength < 0:
@@ -5169,36 +5185,82 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             "in stream %r: %r its endTime %f is less than its offset %f" %
                                              (template, vert, endTime, offset))
     
-                chordOrRest = vert.makeElement(quarterLength, addTies=addTies)
-                template.coreInsert(offset, chordOrRest)
+                chordOrRest = vert.makeElement(quarterLength, 
+                                               addTies=addTies,
+                                               addPartIdAsGroup=addPartIdAsGroup,
+                                               removeRedundantPitches=removeRedundantPitches,
+                                               )
+                
+                template.coreInsert(opFrac(offset), chordOrRest)
             template.coreElementsChanged()
+            consolodateRests(template)
+            
+        def consolodateRests(template):
+            consecutiveRests = []
+            for el in list(template.getElementsByClass('GeneralNote')):
+                if 'Rest' not in el.classes:
+                    removeConsecutiveRests(template, consecutiveRests)
+                    consecutiveRests = []
+                else:
+                    consecutiveRests.append(el)
+            removeConsecutiveRests(template, consecutiveRests)
+            
+        def removeConsecutiveRests(template, consecutiveRests):
+            if len(consecutiveRests) < 2:
+                return
+            totalDuration = sum(r.duration.quarterLength for r in consecutiveRests)
+            startOffset = template.elementOffset(consecutiveRests[0])
+            for r in consecutiveRests:
+                template.remove(r)
+            rNew = note.Rest()
+            rNew.duration.quarterLength = totalDuration
+            template.insert(startOffset, rNew)
+            
+            
+            
+            
+        #---------------------------------------
+        if toSoundingPitch:
+            #environLocal.printDebug(['at sounding pitch', allParts[0].atSoundingPitch])
+            if (self.hasPartLikeStreams()
+                     and self.getElementsByClass('Stream')[0].atSoundingPitch is False):
+                workObj = self.toSoundingPitch(inPlace=False)
+            elif self.atSoundingPitch is False:
+                workObj = self.toSoundingPitch(inPlace=False)
+            else:
+                workObj = self
 
         if self.hasPartLikeStreams():
-            templateStream = self.parts[0]
+            templateStream = workObj.getElementsByClass('Stream')[0]
         else:
-            templateStream = self
+            templateStream = workObj
         
         template = templateStream.template(fillWithRests=False,
-                                           removeClasses=None,
+                                           removeClasses=('GeneralNote',),
                                            retainVoices=False)
             
         if template.hasMeasures():
             measureIterator = template.getElementsByClass('Measure')
             for i, templateMeasure in enumerate(measureIterator):
-                measurePart = self.measure(i, collect=(), indicesNotNumbers=True)
+                measurePart = workObj.measure(i, collect=(), indicesNotNumbers=True)
                 chordifyOneMeasure(templateMeasure, measurePart)
         else:
-            chordifyOneMeasure(template, self)
+            chordifyOneMeasure(template, workObj)
         
         # accidental displayStatus needs to change.
         for p in template.pitches:
-            if p.accidental is not None:
+            if p.accidental is not None and p.accidental.displayStatus != 'even-tied':
                 p.accidental.displayStatus = None            
+
+        if (hasattr(workObj, 'metadata')
+                and workObj.metadata is not None
+                and workObj.hasPartLikeStreams() is True):
+            template.insert(0, copy.deepcopy(workObj.metadata))
 
         return template
                 
 
-    def chordify(self,
+    def chordifyOld(self,
                  addTies=True,
                  displayTiedAccidentals=False,
                  addPartIdAsGroup=False,
@@ -5257,6 +5319,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             {5.5 - 6.5} <music21.note.Rest rest>
 
         >>> cc = s.chordify()
+        
         >>> cc[3]
         <music21.chord.Chord C#4>
         >>> cc[3].duration.quarterLength
@@ -5281,16 +5344,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s = stream.Stream()
         >>> p1 = stream.Part()
         >>> p1.insert(0, harmony.ChordSymbol('Cm', quarterLength=4.0))
-        >>> p1.insert(2, note.Note('C'))
+        >>> p1.insert(2, note.Note('C2'))
         >>> p1.insert(4, harmony.ChordSymbol('D', quarterLength=4.0))
-        >>> p1.insert(7, note.Note('A'))
+        >>> p1.insert(7, note.Note('A2'))
         >>> s.insert(0, p1)
         >>> s.chordify().show('text')
         {0.0} <music21.chord.Chord C3 E-3 G3>
-        {2.0} <music21.chord.Chord C C3 E-3 G3>
+        {2.0} <music21.chord.Chord C2 C3 E-3 G3>
         {3.0} <music21.chord.Chord C3 E-3 G3>
         {4.0} <music21.chord.Chord D3 F#3 A3>
-        {7.0} <music21.chord.Chord A D3 F#3 A3>
+        {7.0} <music21.chord.Chord A2 D3 F#3 A3>
 
         Note that :class:`~music21.harmony.ChordSymbol` objects can also be chordified:
 
@@ -5298,17 +5361,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> p2 = stream.Part()
         >>> p1 = stream.Part()
         >>> p2.insert(0, harmony.ChordSymbol('Cm', quarterLength=4.0))
-        >>> p1.insert(2, note.Note('C'))
+        >>> p1.insert(2, note.Note('C2'))
         >>> p2.insert(4, harmony.ChordSymbol('D', quarterLength=4.0))
-        >>> p1.insert(7, note.Note('A'))
+        >>> p1.insert(7, note.Note('A2'))
         >>> s.insert(0, p1)
         >>> s.insert(0, p2)
         >>> s.chordify().show('text')
         {0.0} <music21.chord.Chord C3 E-3 G3>
-        {2.0} <music21.chord.Chord C C3 E-3 G3>
+        {2.0} <music21.chord.Chord C2 C3 E-3 G3>
         {3.0} <music21.chord.Chord C3 E-3 G3>
         {4.0} <music21.chord.Chord D3 F#3 A3>
-        {7.0} <music21.chord.Chord A D3 F#3 A3>
+        {7.0} <music21.chord.Chord A2 D3 F#3 A3>
 
         If addPartIdAsGroup is True, and there are redundant pitches,
         ensure that the merged pitch has both groups
@@ -5791,7 +5854,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 else:
                     lastNoteWasTied = False
 
-                e.pitch.updateAccidentalDisplay(pitchPast=pitchPast,
+                e.pitch.updateAccidentalDisplay(
+                    pitchPast=pitchPast,
                     pitchPastMeasure=pitchPastMeasure,
                     alteredPitches=alteredPitches,
                     cautionaryPitchClass=cautionaryPitchClass,
@@ -5819,7 +5883,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     else:
                         lastNoteWasTied = False
                         
-                    p.updateAccidentalDisplay(pitchPast=pitchPast,
+                    p.updateAccidentalDisplay(
+                        pitchPast=pitchPast,
                         pitchPastMeasure=pitchPastMeasure,
                         alteredPitches=alteredPitches,
                         cautionaryPitchClass=cautionaryPitchClass, 
@@ -5828,7 +5893,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
                         lastNoteWasTied=lastNoteWasTied)
                     
-                    if n.tie is not None and e.tie.type != 'stop':
+                    if n.tie is not None and n.tie.type != 'stop':
                         seenPitchNames.add(p.nameWithOctave)
                     
                 
@@ -12348,13 +12413,17 @@ class Score(Stream):
         >>> excerpt = bachIn.measure(-1)
         >>> excerptChords = excerpt.chordify()
         >>> excerptChords.show('text')
+        {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.key.Key of e minor>
+        {0.0} <music21.meter.TimeSignature 4/4>
         {0.0} <music21.stream.Measure 9 offset=0.0>
-            {0.0} <music21.chord.Chord E4 B3 G3 E2>
+            {0.0} <music21.chord.Chord E2 G3 B3 E4>
             {4.0} <music21.bar.Barline style=final>
 
         >>> lastChord = excerptChords.recurse().getElementsByClass('Chord')[-1]
         >>> lastChord
-        <music21.chord.Chord E4 B3 G3 E2>
+        <music21.chord.Chord E2 G3 B3 E4>
 
         Note that we still do a .getElementsByClass('Chord') since many pieces end
         with nothing but a rest...
