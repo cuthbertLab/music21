@@ -57,19 +57,25 @@ def chordified(timespans, templateStream=None):
     from music21 import stream
     if not isinstance(timespans, timespanTree.TimespanTree):
         raise timespanTree.TimespanTreeException('Needs a TimespanTree to run')
-    if isinstance(templateStream, stream.Stream):
+    
+    if templateStream is not None:
+
         mos = templateStream.measureOffsetMap()
         templateOffsets = list(mos)
         templateOffsets.append(templateStream.duration.quarterLength)
+        
         if (hasattr(templateStream, 'parts')
                 and templateStream.parts):
             outputStream = templateStream.parts[0].template(fillWithRests=False,
                                                                  retainVoices=False)
         else:
             outputStream = templateStream.template(fillWithRests=False, retainVoices=False)
+        
         timespans = timespans.copy()
         timespans.splitAt(templateOffsets)
+        
         measureIndex = 0
+        
         allTimePoints = timespans.allTimePoints() + tuple(templateOffsets)
         allTimePoints = sorted(set(allTimePoints))
 
@@ -99,6 +105,7 @@ def chordified(timespans, templateStream=None):
                     "%r, its endTime %f is less than its offset %f" % (vert, endTime, offset))
             element = vert.makeElement(quarterLength)
             elements.append(element)
+        
         outputStream = stream.Score()
         for element in elements:
             outputStream.append(element)

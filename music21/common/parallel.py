@@ -49,17 +49,38 @@ def runParallel(iterable, parallelFunction,
     from this function as you might expect.  The big culprit here is definitely
     music21 streams.
     '''
-    iterLength = len(iterable)
-    totalRun = 0
-    numCpus = cpus()
-
-    resultsList = []
-
     # multiprocessing has trouble with introspection
     # pylint: disable=not-callable
     if multiprocessing.current_process().daemon: # @UndefinedVariable
         return runNonParallel(iterable, parallelFunction, updateFunction,
                               updateMultiply, unpackIterable)
+
+    iterLength = len(iterable)
+    totalRun = 0
+    numCpus = cpus()
+
+    resultsList = []
+    
+    def callUpdate(ii):
+        if updateFunction is True:
+            print("Done {} tasks of {}".format(min([ii, iterLength]), 
+                                               iterLength))
+        elif updateFunction not in (False, None):
+            for thisPosition in range(ii - (updateMultiply * numCpus), ii):
+                if thisPosition < 0:
+                    continue
+                
+                if thisPosition >= len(resultsList):
+                    thisResult = None
+                else:
+                    thisResult = resultsList[thisPosition]
+                
+                if updateSendsIterable is False:
+                    updateFunction(thisPosition, iterLength, thisResult)
+                else:
+                    updateFunction(thisPosition, iterLength, iterable[thisPosition])
+
+    callUpdate(0)    
 
     with Parallel(n_jobs=numCpus) as para:
         delayFunction = delayed(parallelFunction)
@@ -72,17 +93,9 @@ def runParallel(iterable, parallelFunction,
             else:
                 _r = para(delayFunction(iterable[i]) for i in rangeGen)
 
-            if updateFunction is True:
-                print("Done {} tasks of {}".format(totalRun + numCpus, iterLength))
-            elif updateFunction not in (False, None):
-                for i in range(totalRun, endPosition):
-                    if updateSendsIterable is False:
-                        updateFunction(i, iterLength, _r[i - totalRun])
-                    else:
-                        updateFunction(i, iterLength, iterable[i])
-
             totalRun = endPosition
             resultsList.extend(_r)
+            callUpdate(totalRun)
 
     return resultsList
 
@@ -96,9 +109,34 @@ def runNonParallel(iterable, parallelFunction,
 
     Used, for instance, if we're already in a parallel function.
     '''
+    
     iterLength = len(iterable)
     resultsList = []
 
+    def callUpdate(ii):
+        if ii % updateMultiply != 0:
+            return
+        
+        if updateFunction is True:
+            print("Done {} tasks of {}".format(min([ii, iterLength]), 
+                                               iterLength))
+        elif updateFunction not in (False, None):
+            for thisPosition in range(ii - updateMultiply, ii):
+                if thisPosition < 0:
+                    continue
+                
+                if thisPosition >= len(resultsList):
+                    thisResult = None
+                else:
+                    thisResult = resultsList[thisPosition]
+                
+                if updateSendsIterable is False:
+                    updateFunction(thisPosition, iterLength, thisResult)
+                else:
+                    updateFunction(thisPosition, iterLength, iterable[thisPosition])
+
+
+    callUpdate(0)
     for i in range(iterLength):
         if unpackIterable:
             _r = parallelFunction(*iterable[i])
@@ -107,13 +145,7 @@ def runNonParallel(iterable, parallelFunction,
 
         resultsList.append(_r)
 
-        if updateFunction is True and i % updateMultiply == 0:
-            print("Done {} tasks of {} not in parallel".format(i, iterLength))
-        elif updateFunction not in (False, None) and i % updateMultiply == 0:
-            if updateSendsIterable is False:
-                updateFunction(i, iterLength, _r)
-            else:
-                updateFunction(i, iterLength, iterable[i])
+        callUpdate(i + 1)
 
     return resultsList
 

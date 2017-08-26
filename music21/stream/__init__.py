@@ -4828,8 +4828,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     #---------------------------------------------------------------------------
     # transformations of self that return a new Stream
 
-    def _uniqueOffsetsAndEndTimes(self, offsetsOnly=False,
-        endTimesOnly=False):
+    def _uniqueOffsetsAndEndTimes(self, offsetsOnly=False, endTimesOnly=False):
         '''
         Get a list of all offsets and endtimes
         of notes and rests in this stream.
@@ -4866,19 +4865,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         []
 
         '''
-        uniqueOffsets = []
-        for e in self.elements:
-            o = self.elementOffset(e)
-            if endTimesOnly is not True and o not in uniqueOffsets:
-                uniqueOffsets.append(o)
-            endTime = opFrac(o + e.duration.quarterLength)
-            if offsetsOnly is not True and endTime not in uniqueOffsets:
-                uniqueOffsets.append(endTime)
-        #uniqueOffsets = sorted(uniqueOffsets)
-        # must sort do to potential overlaps
-        uniqueOffsets.sort() # might be faster in-place
-        return uniqueOffsets
-
+        offsetDictValues = self._offsetDict.values()
+        if endTimesOnly:
+            offsets = set()
+        else:
+            offsets = set([opFrac(v[0]) for v in offsetDictValues])
+        
+        if offsetsOnly:
+            endTimes = set()
+        else:
+            endTimes = set([opFrac(v[0] + v[1].duration.quarterLength) 
+                            for v in offsetDictValues])
+        return sorted(offsets.union(endTimes))
+    
     def makeChords(self,
                    minimumWindowSize=.125,
                    includePostWindow=True,
