@@ -6953,7 +6953,7 @@ class Test(unittest.TestCase):
         
         s = corpus.parse('bwv66.6')
         sChords = s.measures(9, 9).chordify()
-        sChords.show()
+        # sChords.show()
         #sChords = s.chordify()
         sChords.extendTies()
         post = []
@@ -7801,7 +7801,7 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    music21.mainTest(Test, 'verbose', runTest='testExtendTiesB')
+    music21.mainTest(Test, 'verbose') #, runTest='testVoicesALonger')
 
 #------------------------------------------------------------------------------
 # eof
