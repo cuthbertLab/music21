@@ -43,5 +43,13 @@ Changing this number invalidates old pickles -- do it if the old pickles create 
 '''
 
 __version_info__ = (5, 0, 3, 'a1')
-__version__ = '.'.join(str(x) for x in __version_info__)
+
+v = '.'.join(str(x) for x in __version_info__[0:3])
+if len(__version_info__) > 3:
+    v += __version_info__[3]
+if len(__version_info__) > 4:
+    v += '.' + '.'.join(__version_info__[4:])
+
+__version__ = v
+del(v)
 

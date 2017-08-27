@@ -35,9 +35,10 @@ To do a release,
 [*] you will need sphinx, IPython (pip or easy_install), markdown, and pandoc (.dmg) installed
 
 9. run documentation/upload.py [not via eclipse] or upload via ssh.
-   -- you will need an MIT username and password
+   -- you will need an MIT username and password 
+   -- for each new major version ssh in and delete old files before uploading.
 
-10. And finally this file.
+10. And finally this file. (from the command line; not as python -m...)
 
 11. COMMIT to Github at this point w/ commit comment of the new version,
     then don't change anything until the next step is done.
@@ -49,7 +50,7 @@ To do a release,
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-13. Upload the new file with "twine upload music21-4.1.0.tar.gz" [*]
+13. Upload the new file with "twine upload music21-5.0.3.a3.tar.gz" [*]
 
     [*] Requires twine to be installed
 
@@ -72,8 +73,10 @@ To do a release,
 
 DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do.
 '''
-
-import hashlib, os, sys, tarfile
+import hashlib
+import os
+import sys
+import tarfile
 
 from music21 import base
 from music21 import common
@@ -143,8 +146,11 @@ class Distributor:
 #                 if fpNew != fp:
 #                     os.rename(fp, fpNew)
 #                 self.fpWin = fpNew
+            
             if self.version in fn and fn.endswith('.tar.gz'):
                 self.fpTar = fp
+            else:
+                environLocal.warn(fn + ' does not end with .tar.gz')
 
         environLocal.warn('giving path for tar.gz')
         for fn in [self.fpTar]:
@@ -320,24 +326,6 @@ class Distributor:
             return hashlib.md5(open(path, 'rb').read()).hexdigest()
         else:
             return hashlib.md5(open(path, 'rb').read()).digest()
-
-    def getMD5Path(self):
-        '''
-        for PyPi -- no longer used.
-        '''
-        gitHubPath = "https://github.com"
-        user = "cuthbertLab"
-        package = "music21"
-        releaseDownload = "releases/download"
-        version = "v" + self.version
-        filename = "music21-" + self.version + ".tar.gz"
-
-        fullUrl = "/".join([gitHubPath, user, package, releaseDownload, version, filename])
-        md5Prefix = "#md5="
-        md5Source = self.md5ForFile(self.fpTar)
-        hashedUrl = "".join([fullUrl, md5Prefix, md5Source])
-        print(hashedUrl)
-        return hashedUrl
 
 
 
