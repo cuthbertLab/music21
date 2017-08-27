@@ -12,6 +12,7 @@ import collections
 import copy
 import itertools
 import unittest
+from itertools import filterfalse
 
 from music21 import chord
 from music21 import environment
@@ -23,7 +24,6 @@ from music21.figuredBass import possibility
 from music21.figuredBass import realizerScale
 from music21.figuredBass import resolution
 from music21.figuredBass import rules
-from itertools import filterfalse
 
 _MOD = 'figuredBass.segment'
 

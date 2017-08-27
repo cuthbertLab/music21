@@ -1147,9 +1147,6 @@ class ConverterMEI(SubConverter):
     #registerShowFormats = ('mei',)
     #registerOutputExtensions = ('mei',)
 
-    def __init__(self, **keywords):
-        super().__init__(**keywords)
-
     def parseData(self, dataString, number=None):
         '''
         Convert a string with an MEI document into its corresponding music21 elements.

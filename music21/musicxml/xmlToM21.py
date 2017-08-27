@@ -2457,12 +2457,12 @@ class MeasureParser(XMLParserBase):
             for sp in ss:
                 sp.replaceSpannedElement(n, c)
             for art in n.articulations:
-                if type(art) in seenArticulations:
+                if type(art) in seenArticulations: # pylint: disable=unidiomatic-typecheck
                     pass
                 c.articulations.append(art)
                 seenArticulations.add(type(art))
             for exp in n.expressions:
-                if type(exp) in seenExpressions:
+                if type(exp) in seenExpressions: # pylint: disable=unidiomatic-typecheck
                     pass
                 c.expressions.append(exp)
                 seenExpressions.add(type(exp))

@@ -5829,7 +5829,6 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         pass
 
     def testSimple(self):
-        from xml.etree.ElementTree import ElementTree as ETObj
         from music21 import corpus  # , converter
         import difflib
 
@@ -5850,13 +5849,13 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
         sio.write(SX.xmlHeader())
 
-        et = ETObj(mxScore)
+        et = ElementTree(mxScore)
         et.write(sio, encoding="utf-8", xml_declaration=False)
         v = sio.getvalue()
         sio.close()
 
         v = v.decode('utf-8')
-        v = v.replace(' />', '/>')  # normalize
+        # v = v.replace(' />', '/>')  # normalize
 
         # b2 = converter.parse(v)
         fp = b.write('musicxml')
@@ -5867,6 +5866,8 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         differ = list(difflib.ndiff(v.splitlines(), v2.splitlines()))
         for i, l in enumerate(differ):
             if l.startswith('-') or l.startswith('?') or l.startswith('+'):
+                if "id=" in l:
+                    continue
                 print(l)
                 # for j in range(i - 1,i + 1):
                 #    print(differ[j])
@@ -5875,6 +5876,5 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
 if __name__ == '__main__':
     import music21
-    #music21.mainTest(Test)
     music21.mainTest(Test) #, runTest='testSpannersWrite')
 

@@ -199,13 +199,13 @@ def toPart(volpianoText, *, breaksToLayout=False):
         elif continuousNumberOfBreakTokens > 0:
             if not breaksToLayout: # default
                 breakClass = classByNumBreakTokens[continuousNumberOfBreakTokens]
-                breakToken = breakClass()
+                breakToken = breakClass() # pylint: disable=not-callable
             else:
                 breakClass = classByNumBreakTokensLayout[continuousNumberOfBreakTokens]
                 if continuousNumberOfBreakTokens < 3:
-                    breakToken = breakClass(isNew=True)
+                    breakToken = breakClass(isNew=True) # pylint: disable=not-callable
                 else:
-                    breakToken = breakClass()
+                    breakToken = breakClass() # pylint: disable=not-callable
 
             currentMeasure.append(breakToken)
 
@@ -284,7 +284,7 @@ def toPart(volpianoText, *, breaksToLayout=False):
 
     if continuousNumberOfBreakTokens > 0:
         breakClass = classByNumBreakTokens[continuousNumberOfBreakTokens]
-        breakToken = breakClass()
+        breakToken = breakClass() # pylint: disable=not-callable
         currentMeasure.append(breakToken)
 
     if m:

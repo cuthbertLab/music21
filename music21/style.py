@@ -422,6 +422,7 @@ class BeamStyle(Style):
     Style for beams
     '''
     def __init__(self):
+        super().__init__()
         self.fan = None
 
 

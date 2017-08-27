@@ -75,10 +75,6 @@ class TwelveToneMatrix(stream.Stream):
     '<music21.serial.TwelveToneMatrix for
          [<music21.serial.HistoricalTwelveToneRow Schoenberg Op. 37 Fourth String Quartet>]>'
     '''
-
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
-
     def __str__(self):
         '''
         Return a string representation of the matrix.
@@ -639,13 +635,13 @@ class TwelveToneRow(ToneRow):
     _DOC_ORDER = ['matrix', 'isAllInterval',
                   'getLinkClassification', 'isLinkChord', 'areCombinatorial']
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
-        #environLocal.printDebug(['TwelveToneRow.__init__: length of elements', len(self)])
-
-        #if self.row != None:
-        #    for pc in self.row:
-        #        self.append(pitch.Pitch(pc))
+#     def __init__(self, *arguments, **keywords):
+#         super().__init__(*arguments, **keywords)
+#         #environLocal.printDebug(['TwelveToneRow.__init__: length of elements', len(self)])
+# 
+#         #if self.row != None:
+#         #    for pc in self.row:
+#         #        self.append(pitch.Pitch(pc))
 
     def matrix(self):
         '''

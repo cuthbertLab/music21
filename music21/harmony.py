@@ -2470,59 +2470,59 @@ class TestExternal(unittest.TestCase): # pragma: no cover
                         print(n + m + ',' + harmony_type,
                               ChordSymbol(n + m + ',' + harmony_type).pitches)
 
-    def labelChordSymbols(self):
-        '''
-        A very rough sketch of code to label the chord symbols in a bach
-        chorale (in response to a post to the music21 list asking if this is
-        possible).
-        '''
-        from music21.alpha.theoryAnalysis import theoryAnalyzer
-        from music21 import harmony, corpus
-
-        score = corpus.parse('bach/bwv380')
-        excerpt = score.measures(2, 3)
-
-        # remove passing and/or neighbor tones?
-        analyzer = theoryAnalyzer.Analyzer()
-        analyzer.removePassingTones(excerpt)
-        analyzer.removeNeighborTones(excerpt)
-
-        slices = analyzer.getVerticalities(excerpt)
-        for vs in slices:
-            x = harmony.chordSymbolFigureFromChord(vs.getChord())
-            if x  != 'Chord Symbol Cannot Be Identified':
-                vs.lyric = x.replace('-', 'b')
-            print(x.replace('-', 'b'))
-#         Full, unmodified piece:
-#         Bb7
-#         Ebmaj7/Bb
-#         Bb7
-#         Chord Symbol Cannot Be Identified
-#         Bb7
-#         Eb
-#         Bb
-#         Chord Symbol Cannot Be Identified
-#         Bb/D
-#         Bb7
-#         CmaddD
-#         Cm/D
-#         Eb+M7/D
-#         Cm/Eb
-#         F7
-#
-#         piece with passing tones and neighbor tones removed:
-#         Bb7
-#         Bb7
-#         Chord Symbol Cannot Be Identified
-#         Eb
-#         Bb
-#         Bb/D
-#         Bb7
-#         CmaddD
-#         Cm/D
-#         Cm/Eb
-#         F7
-        excerpt.show()
+#     def labelChordSymbols(self):
+#         '''
+#         A very rough sketch of code to label the chord symbols in a bach
+#         chorale (in response to a post to the music21 list asking if this is
+#         possible).
+#         '''
+#         from music21.alpha.theoryAnalysis import theoryAnalyzer
+#         from music21 import harmony, corpus
+# 
+#         score = corpus.parse('bach/bwv380')
+#         excerpt = score.measures(2, 3)
+# 
+#         # remove passing and/or neighbor tones?
+#         analyzer = theoryAnalyzer.Analyzer()
+#         analyzer.removePassingTones(excerpt)
+#         analyzer.removeNeighborTones(excerpt)
+# 
+#         slices = analyzer.getVerticalities(excerpt)
+#         for vs in slices:
+#             x = harmony.chordSymbolFigureFromChord(vs.getChord())
+#             if x  != 'Chord Symbol Cannot Be Identified':
+#                 vs.lyric = x.replace('-', 'b')
+#             print(x.replace('-', 'b'))
+# #         Full, unmodified piece:
+# #         Bb7
+# #         Ebmaj7/Bb
+# #         Bb7
+# #         Chord Symbol Cannot Be Identified
+# #         Bb7
+# #         Eb
+# #         Bb
+# #         Chord Symbol Cannot Be Identified
+# #         Bb/D
+# #         Bb7
+# #         CmaddD
+# #         Cm/D
+# #         Eb+M7/D
+# #         Cm/Eb
+# #         F7
+# #
+# #         piece with passing tones and neighbor tones removed:
+# #         Bb7
+# #         Bb7
+# #         Chord Symbol Cannot Be Identified
+# #         Eb
+# #         Bb
+# #         Bb/D
+# #         Bb7
+# #         CmaddD
+# #         Cm/D
+# #         Cm/Eb
+# #         F7
+#         excerpt.show()
 
 
 #-------------------------------------------------------------------------------

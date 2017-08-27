@@ -71,6 +71,7 @@ exist in the Python namespace.
 import copy
 import os
 import pathlib
+import pickle
 import time
 import unittest
 import zlib
@@ -88,7 +89,6 @@ from music21 import environment
 _MOD = "freezeThaw"
 environLocal = environment.Environment(_MOD)
 
-import pickle
 #------------------------------------------------------------------------------
 
 

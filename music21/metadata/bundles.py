@@ -1146,7 +1146,7 @@ class MetadataBundle:
             try:
                 uncompressed = pickledFile.read()
                 newMdb = pickle.loads(uncompressed)
-            except Exception as e: # pylint: disable=too-broad-exception
+            except Exception as e: # pylint: disable=broad-except
                 # pickle exceptions cannot be caught directly
                 # because they might come from pickle or _pickle and the latter cannot
                 # be caught.

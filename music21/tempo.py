@@ -136,9 +136,9 @@ class TempoIndication(base.Music21Object):
     classSortOrder = 1
     _styleClass = style.TextStyle
 
-    def __init__(self):
-        super().__init__()
-        # self.style.justify = 'left' # creates a style object to share.
+#     def __init__(self):
+#         super().__init__()
+#         # self.style.justify = 'left' # creates a style object to share.
 
     def getSoundingMetronomeMark(self, found=None):
         '''Get the appropriate MetronomeMark from any sort of TempoIndication, regardless of class.

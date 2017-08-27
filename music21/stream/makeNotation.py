@@ -1396,6 +1396,58 @@ def moveNotesToVoices(source, classFilterList=('GeneralNote',)):
     source.insert(0, dst)
 
 
+
+def getTiePitchSet(previousNoteOrChord):
+    '''
+    helper method for makeAccidentals to get the tie pitch set (or None) 
+    from the previousNoteOrChord
+
+    >>> n1 = note.Note('C4')
+    >>> n2 = note.Note('D4')
+    >>> n2.tie = tie.Tie('start')
+    >>> n3 = note.Note('E4')
+    >>> n3.tie = tie.Tie('stop')
+    >>> n4 = note.Note('F4')
+    >>> n4.tie = tie.Tie('continue')
+    >>> c = chord.Chord([n1, n2, n3, n4])
+    >>> tps = stream.makeNotation.getTiePitchSet(c)
+    >>> isinstance(tps, set)
+    True
+    >>> sorted(tps)
+    ['D4', 'F4']
+    
+    Non tie possessing objects return None
+    
+    >>> r = bar.Repeat()
+    >>> stream.makeNotation.getTiePitchSet(r) is None
+    True
+
+    Note, Rest, or Chord without ties, returns an empty set:
+    
+    >>> n = note.Note('F#5')
+    >>> stream.makeNotation.getTiePitchSet(n)
+    set()
+
+    >>> r = note.Rest()
+    >>> stream.makeNotation.getTiePitchSet(r)
+    set()
+    '''
+    if not hasattr(previousNoteOrChord, 'tie'):
+        return None
+    else:
+        tiePitchSet = set()
+        if 'Chord' in previousNoteOrChord.classes:
+            previousNotes = list(previousNoteOrChord)
+        else:
+            previousNotes = [previousNoteOrChord]
+            
+        for n in previousNotes:
+            if n.tie is None or n.tie.type == 'stop':
+                continue
+            tiePitchSet.add(n.pitch.nameWithOctave)
+        return tiePitchSet
+
+
 #------------------------------------------------------------------------------
 
 class Test(unittest.TestCase):

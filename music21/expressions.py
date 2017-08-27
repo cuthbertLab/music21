@@ -931,8 +931,6 @@ class GeneralAppoggiatura(Ornament):
 
 class Appoggiatura(GeneralAppoggiatura):
     direction = "down"
-    def __init__(self):
-        super().__init__()
 
 class HalfStepAppoggiatura(Appoggiatura):
     def __init__(self):
@@ -946,8 +944,6 @@ class WholeStepAppoggiatura(Appoggiatura):
 
 class InvertedAppoggiatura(GeneralAppoggiatura):
     direction = "up"
-    def __init__(self):
-        super().__init__()
 
 class HalfStepInvertedAppoggiatura(InvertedAppoggiatura):
     def __init__(self):

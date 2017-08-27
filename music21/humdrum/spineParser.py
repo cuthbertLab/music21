@@ -1024,12 +1024,12 @@ class HumdrumSpine:
     >>> spine2.stream
     <music21.stream.Part ...>
     '''
-    def __init__(self, id=0, eventList=None, streamClass=stream.Stream): #@ReservedAssignment
-        self.id = id
+    def __init__(self, spineId=0, eventList=None, streamClass=stream.Stream):
+        self.id = spineId
         if eventList is None:
             eventList = []
         for event in eventList:
-            event.spineId = id
+            event.spineId = spineId
 
         self.eventList = eventList
         self.stream = streamClass()
@@ -1277,8 +1277,8 @@ class KernSpine(HumdrumSpine):
     attribute set and thus events are processed as if they
     are kern notes
     '''
-    def __init__(self, id=0, eventList=None, streamClass=stream.Stream): #@ReservedAssignment
-        super().__init__(id, eventList, streamClass)
+    def __init__(self, spineId=0, eventList=None, streamClass=stream.Stream):
+        super().__init__(spineId, eventList, streamClass)
         self.lastContainer = None
         self.inTuplet = None
         self.lastNote = None

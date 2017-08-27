@@ -36,8 +36,9 @@ under the module "base":
 >>> base.Music21Object
 <class 'music21.base.Music21Object'>
 '''
-import sys
+import importlib
 import copy
+import sys
 import types
 import unittest
 
@@ -91,9 +92,6 @@ from music21.sites import SitesException
 
 _MOD = 'base'
 environLocal = environment.Environment(_MOD)
-
-
-import importlib
 
 _missingImport = []
 for modName in ('matplotlib', 'numpy', 'scipy'):
@@ -3661,9 +3659,7 @@ class ElementWrapper(Music21Object):
 
 
 class TestMock(Music21Object):
-    def __init__(self):
-        super().__init__()
-
+    pass
 
 class Test(unittest.TestCase):
 
@@ -3694,7 +3690,7 @@ class Test(unittest.TestCase):
         a.groups.append("hello")
         a.id = "hi"
         a.offset = 2.0
-        assert(a.offset == 2.0)
+        self.assertEqual(a.offset, 2.0)
 
     def testElementEquality(self):
         from music21 import note

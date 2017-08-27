@@ -193,6 +193,7 @@ class ModuleGather:
         # run these first...
         self.slowModules = ['metadata/caching',
                             'metadata/bundles',
+                            'features',
                             'graph',
                             'graph/plot',
                             'graph/axis',

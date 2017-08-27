@@ -3140,12 +3140,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         offset = opFrac(offset)
         nearestTrailSpan = offset # start with max time
 
-        iterator = self.iter
+        sIterator = self.iter
         if classList:
-            iterator.getElementsByClass(classList)
+            sIterator.getElementsByClass(classList)
 
         # need both _elements and _endElements
-        for e in iterator:
+        for e in sIterator:
             span = opFrac(offset - self.elementOffset(e))
             #environLocal.printDebug(['e span check', span, 'offset', offset,
             #   'e.offset', e.offset, 'self.elementOffset(e)', self.elementOffset(e), 'e', e])
@@ -3228,11 +3228,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         offset = opFrac(offset)
         nearestTrailSpan = offset # start with max time
 
-        iterator = self.iter
+        sIterator = self.iter
         if classList:
-            iterator.getElementsByClass(classList)
+            sIterator.getElementsByClass(classList)
 
-        for e in iterator:
+        for e in sIterator:
             span = opFrac(offset - self.elementOffset(e))
             #environLocal.printDebug(['e span check', span, 'offset', offset,
             #     'e.offset', e.offset, 'self.elementOffset(e)', self.elementOffset(e), 'e', e])
@@ -3328,23 +3328,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     e.activeSite = self
                     return e
 
-#         iterator = self.iter
-#         isFilter = filters.IsFilter(element)
-#         iterator.addFilter(isFilter)
-#
-#         foundElement = False
-#         for x in iterator:
-#             if foundElement is True:
-#                 return x # it is the element after
-#             else:
-#                 foundElement = True
-#                 iterator.removeFilter(isFilter)
-#                 # now add the filter...
-#                 iterator.addFilter(filters.IsNotFilter(element))
-#                 if classList is not None:
-#                     iterator.addFilter(filters.ClassFilter(classList))
-#
-#         return None
 
     #-----------------------------------------------------
     # end .getElement filters
@@ -5811,7 +5794,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         4
         >>> sMeasures.getElementsByClass('Measure')[-1].rightBarline.style
         'final'
-        '''
+        '''                
         # determine what is the object to work on first
         if inPlace:
             returnStream = self
@@ -5861,18 +5844,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if i > 0 and ksLast is None:
                     try:
                         previousNoteOrChord = measureStream[i - 1][-1]
-                        if not hasattr(previousNoteOrChord, 'tie'):
-                            tiePitchSet = None
-                        else:
-                            tiePitchSet = set()
-                            if 'Chord' in previousNoteOrChord.classes:
-                                previousNotes = list(previousNoteOrChord)
-                            else:
-                                previousNotes = [previousNoteOrChord]
-                            for n in previousNotes:
-                                if n.tie is not None and n.tie.type != 'stop':
-                                    tiePitchSet.add(n.pitch.nameWithOctave)
-                        
+                        tiePitchSet = makeNotation.getTiePitchSet(previousNoteOrChord)                        
                     except (IndexError, StreamException):
                         tiePitchSet = None
                     pitchPastMeasure = measureStream[i - 1].pitches
@@ -12065,26 +12037,15 @@ class Part(Stream):
             if i > 0:
                 try:
                     previousNoteOrChord = measureStream[i - 1][-1]                        
-                    
-                    if not (hasattr(previousNoteOrChord, 'pitches') 
-                                and hasattr(previousNoteOrChord, 'tie')):
-                        tiePitchSet = None
-                    else:
-                        tiePitchSet = set()
-                        if 'Chord' in previousNoteOrChord.classes:
-                            previousNotes = list(previousNoteOrChord)
-                        else:
-                            previousNotes = [previousNoteOrChord]
-                        for n in previousNotes:
-                            if n.tie is not None and n.tie.type != 'stop':
-                                tiePitchSet.add(n.pitch.nameWithOctave)
-                    
+                    tiePitchSet = makeNotation.getTiePitchSet(previousNoteOrChord)                    
                 except (IndexError, StreamException):
                     tiePitchSet = None
+                    
                 pitchPastMeasure = measureStream[i - 1].pitches
 
             else:
                 pitchPastMeasure = None
+                # use the tie pitchSet from the method argument
                 
             m.makeAccidentals(pitchPastMeasure=pitchPastMeasure,
                               useKeySignature=ksLast,
@@ -12111,8 +12072,6 @@ class PartStaff(Part):
     represented on a single staff but may only be one
     of many staves for a single part.
     '''
-    def __init__(self, *args, **keywords):
-        super().__init__(*args, **keywords)
 
 
 #
@@ -12162,12 +12121,6 @@ class Score(Stream):
     container a Score and that this will become a standard.
     """
     recursionType = 'elementsOnly'
-
-    def __init__(self, *args, **keywords):
-        super().__init__(*args, **keywords)
-        # while a metadata object is often expected, adding here prob not
-        # a good idea.
-        #self.insert(0, metadata.Metadata())
 
     @property
     def parts(self):
@@ -12810,10 +12763,7 @@ class Opus(Stream):
     '''
     recursionType = 'elementsOnly'
 
-    #TODO: get by title, possibly w/ regex
-
-    def __init__(self, *args, **keywords):
-        super().__init__(*args, **keywords)
+    # TODO: get by title, possibly w/ regex
 
     def getNumbers(self):
         '''

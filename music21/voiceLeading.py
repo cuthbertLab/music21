@@ -34,6 +34,7 @@ The list of objects included here are:
 * :class:`~music21.voiceLeading.TwoChordLinearSegment` : 2 chord objects
 
 '''
+import enum
 import unittest
 
 from music21 import base
@@ -45,7 +46,6 @@ from music21 import key
 from music21 import note
 from music21 import chord
 
-import enum
 
 #from music21 import harmony can't do this either
 #from music21 import roman Can't import roman because of circular

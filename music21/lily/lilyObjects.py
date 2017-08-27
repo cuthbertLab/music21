@@ -716,10 +716,6 @@ class LyPaperBlock(LyObject):
             return self.outputDef.stringOutput()
 
 class LyLayout(LyObject):
-
-    def __init__(self):
-        super().__init__()
-
     def stringOutput(self):
         theseStrings = [self.backslash + "layout {",
                         " " + self.backslash + "context {",
