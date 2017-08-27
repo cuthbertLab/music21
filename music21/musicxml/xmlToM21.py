@@ -699,6 +699,9 @@ class PartGroup:
         self.number = number
 
     def add(self, partGroupId):
+        '''
+        Add a partGroupId to self.partGroupIds
+        '''
         self.partGroupIds.append(partGroupId)
 
 #-------------------------------------------------------------------------------
@@ -718,7 +721,7 @@ class MusicXMLImporter(XMLParserBase):
         self.definesExplicitPageBreaks = False
 
         self.spannerBundle = self.stream.spannerBundle
-        self.partIdDict = {}
+        self.mxScorePartDict = {}
         self.m21PartObjectsById = {}
         self.partGroupList = []
         self.parts = []
@@ -791,16 +794,16 @@ class MusicXMLImporter(XMLParserBase):
         for p in mxScore.findall('part'):
             partId = p.get('id')
             if partId is None: # pragma: no cover
-                partId = list(self.partIdDict.keys())[0]
+                partId = list(self.mxScorePartDict.keys())[0]
                 # Lilypond Test Suite allows for parsing w/o a part ID for one part...
             try:
-                partInfo = self.partIdDict[partId]
+                mxScorePart = self.mxScorePartDict[partId]
             except KeyError: # pragma: no cover
                 environLocal.printDebug("Cannot find info for part with name {}".format(partId)
                                   + ", skipping the part")
                 continue
 
-            part = self.xmlPartToPart(p, partInfo)
+            part = self.xmlPartToPart(p, mxScorePart)
 
 
             if part is not None: # for instance, in partStreams
@@ -831,8 +834,11 @@ class MusicXMLImporter(XMLParserBase):
         if inputM21 is None:
             return s
 
-    def xmlPartToPart(self, mxPart, partIdDict):
-        parser = PartParser(mxPart, mxScorePart=partIdDict, parent=self)
+    def xmlPartToPart(self, mxPart, mxScorePart):
+        '''
+        Given a <part> object and the <score-part> object, parse a complete part. 
+        '''
+        parser = PartParser(mxPart, mxScorePart=mxScorePart, parent=self)
         parser.parse()
         if parser.appendToScoreAfterParse is True:
             return parser.stream
@@ -842,7 +848,7 @@ class MusicXMLImporter(XMLParserBase):
     def parsePartList(self, mxScore):
         '''
         Parses the <part-list> tag and adds
-        <score-part> entries into self.partIdDict[partId]
+        <score-part> entries into self.mxScorePartDict[partId]
         and adds them to any open <part-group> entries,
         stored as PartGroup objects in self.partGroupList
 
@@ -854,7 +860,7 @@ class MusicXMLImporter(XMLParserBase):
         for partListElement in mxPartList:
             if partListElement.tag == 'score-part':
                 partId = partListElement.get('id')
-                self.partIdDict[partId] = partListElement
+                self.mxScorePartDict[partId] = partListElement
                 for pg in openPartGroups:
                     pg.add(partId)
             elif partListElement.tag == 'part-group':
@@ -1100,7 +1106,7 @@ class MusicXMLImporter(XMLParserBase):
         for pgObj in self.partGroupList:
             staffGroup = layout.StaffGroup()
             for partId in pgObj.partGroupIds:
-                # get music21 part from partIdDictionary
+                # get music21 part from mxScorePartDictionary
                 try:
                     staffGroup.addSpannedElements(self.m21PartObjectsById[partId])
                 except KeyError as ke:
@@ -1111,7 +1117,8 @@ class MusicXMLImporter(XMLParserBase):
                             foundOne = True
 
                     if foundOne is False:
-                        raise MusicXMLImportException("Cannot find part in m21PartIdDictionary:"
+                        raise MusicXMLImportException(
+                            "Cannot find part in m21PartObjectsById dictionary by Id:"
                                 + " %s \n   Full Dict:\n   %r " % (ke, self.m21PartObjectsById))
             mxPartGroup = pgObj.mxPartGroup
             seta(staffGroup, mxPartGroup, 'group-name', 'name')
@@ -1329,7 +1336,7 @@ class PartParser(XMLParserBase):
         if mxPart is not None:
             self.partId = mxPart.get('id')
             if self.partId is None and parent is not None:
-                self.partId = list(parent.partIdDict.keys())[0]
+                self.partId = list(parent.mxScorePartDict.keys())[0]
         else:
             self.partId = ""
         self._parent = common.wrapWeakref(parent)
@@ -2442,6 +2449,7 @@ class MeasureParser(XMLParserBase):
             for sp in ss:
                 sp.replaceSpannedElement(n, c)
         self.spannerBundle.freePendingSpannedElementAssignment(c)
+        c.sortAscending(inPlace=True)
         return c
 
     def xmlToSimpleNote(self, mxNote, freeSpanners=True):
