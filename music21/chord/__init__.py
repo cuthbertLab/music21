@@ -229,7 +229,7 @@ class Chord(note.NotRest):
         if 'duration' in keywords:
             durationKeyword = keywords['duration']
 
-        durationKeyword = self._append_core_or_init(notes, useDuration=durationKeyword)
+        durationKeyword = self._add_core_or_init(notes, useDuration=durationKeyword)
 
 
         if all(isinstance(n, int) for n in notes):
@@ -537,9 +537,9 @@ class Chord(note.NotRest):
             return [n.pitch for n in deleteComponents]
 
     ### PUBLIC METHODS ###
-    def _append_core_or_init(self, notes, *, useDuration=None):
+    def _add_core_or_init(self, notes, *, useDuration=None):
         '''
-        This is the private append method called by .append and called by __init__.
+        This is the private append method called by .add and called by __init__.
 
         It differs from the public method in that a duration object can
         be passed in which is used for the first note of the chord or as many pitches
@@ -631,7 +631,7 @@ class Chord(note.NotRest):
         if not common.isIterable(notes):
             notes = [notes]
 
-        self._append_core_or_init(notes, useDuration=False)
+        self._add_core_or_init(notes, useDuration=False)
         if runSort:
             self.sortAscending(inPlace=True)
 
