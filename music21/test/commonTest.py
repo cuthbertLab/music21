@@ -191,7 +191,9 @@ class ModuleGather:
             'abcFormat/testFiles.py',
             ]
         # run these first...
-        self.slowModules = ['graph',
+        self.slowModules = ['metadata/caching',
+                            'metadata/bundles',
+                            'graph',
                             'graph/plot',
                             'graph/axis',
                             'graph/primitives',
@@ -204,8 +206,7 @@ class ModuleGather:
                             'test/testStream',
                             'analysis/windowed',
                             'converter/__init__',
-                            'metadata/bundles',
-
+                            
                             'musicxml/m21ToXml',
                             'musicxml/xmlToM21',
 
