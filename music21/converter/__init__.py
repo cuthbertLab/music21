@@ -258,7 +258,7 @@ class PickleFilter:
         if zipType is None:
             extension = '.p'
         else:
-            extension = '.pgz'
+            extension = '.p.gz'
         pythonVersion = 'py' + str(sys.version_info[0]) + '.' + str(sys.version_info[1])
 
         baseName = '-'.join(['m21', _version.__version__, pythonVersion,
@@ -267,7 +267,6 @@ class PickleFilter:
         if self.number is not None:
             baseName += '-' + str(self.number)
         baseName += extension
-
 
         return directory / baseName
 
@@ -281,7 +280,6 @@ class PickleFilter:
         pickleFp = self.getPickleFp(zipType='gz') # pathlib...
         if pickleFp.exists():
             os.remove(pickleFp)
-
 
     def status(self):
         '''
@@ -298,7 +296,7 @@ class PickleFilter:
         >>> pickfilt = converter.PickleFilter(fp)
         >>> #_DOCS_SHOW pickfilt.status()
         (PosixPath('/Users/Cuthbert/Desktop/musicFile.mxl'), True,
-              PosixPath('/tmp/music21/m21-5.0.0-py3.6-18b8c5a5f07826bd67ea0f20462f0b8d.pgz'))
+              PosixPath('/tmp/music21/m21-5.0.0-py3.6-18b8c5a5f07826bd67ea0f20462f0b8d.p.gz'))
 
         '''
         fpScratch = environLocal.getRootTempDir()
@@ -337,7 +335,7 @@ _deregisteredSubconverters = [] # default subconverters to skip
 
 def resetSubconverters():
     '''
-    Reset state to default (removing all registered and deregistered subconverters.
+    Reset state to default (removing all registered and deregistered subconverters).
     '''
     global _registeredSubconverters # pylint: disable=global-statement
     global _deregisteredSubconverters # pylint: disable=global-statement
@@ -353,6 +351,7 @@ def registerSubconverter(newSubConverter):
     >>> class ConverterSonix(converter.subConverters.SubConverter):
     ...    registerFormats = ('sonix',)
     ...    registerInputExtensions = ('mus',)
+    
     >>> converter.registerSubconverter(ConverterSonix)
     >>> scf = converter.Converter().getSubConverterFormats()
     >>> for x in sorted(scf):
