@@ -292,7 +292,8 @@ class ModuleGather:
 
         >>> from music21.test import commonTest
         >>> mg = commonTest.ModuleGather()
-        >>> mg._getNamePeriod('/Users/cuthbert/git/music21base/music21/features/native.py')
+        >>> name = '/Users/cuthbert/git/music21base/music21/features/native.py'
+        >>> #_DOCS_SHOW mg._getNamePeriod(name)
         'features.native'
         '''
         fn = fp.replace(self.dirParent, '') # remove parent
