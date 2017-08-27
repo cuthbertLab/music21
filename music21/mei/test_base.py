@@ -61,7 +61,8 @@ import music21.mei.base as base
 from music21.mei.base import _XMLID
 from music21.mei.base import _MEINS
 
-class Test(unittest.TestCase): # pylint: disable=pointless-string-statement
+# pylint: disable=pointless-string-statement
+class Test(unittest.TestCase): 
 
 #class TestMeiToM21Class(unittest.TestCase):
     '''Tests for the MeiToM21Converter class.'''

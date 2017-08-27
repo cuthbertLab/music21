@@ -12,7 +12,6 @@ import collections
 import copy
 import itertools
 import unittest
-from itertools import filterfalse
 
 from music21 import chord
 from music21 import environment
@@ -902,8 +901,8 @@ def getPitches(pitchNames=('C', 'E', 'G'), bassPitch='C3', maxPitch='C8'):
 
     iter1 = itertools.product(pitchNames, range(maxPitch.octave + 1))
     iter2 = map(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)
-    iter3 = filterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)
-    iter4 = filterfalse(lambda samplePitch: samplePitch > maxPitch, iter3)
+    iter3 = itertools.filterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)
+    iter4 = itertools.filterfalse(lambda samplePitch: samplePitch > maxPitch, iter3)
     allPitches = list(iter4)
     allPitches.sort()
     return allPitches
