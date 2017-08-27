@@ -15,15 +15,19 @@
 Object for dealing with vertical simultaneities in a fast way w/o Chord's overhead.
 '''
 import collections
+import copy
 import unittest
 
-from music21 import note
-from music21 import tie
 from music21 import chord
+from music21 import common
 from music21 import environment
 from music21 import exceptions21
-#from music21 import key
-from music21 import pitch
+from music21 import note
+from music21 import tie
+# from music21 import key
+# from music21 import pitch
+
+from music21.tree import spans
 
 environLocal = environment.Environment("tree.verticality")
 
@@ -189,17 +193,16 @@ class Verticality:
 
     ### INITIALIZER ###
 
-    def __init__(
-        self,
-        offset=None,
-        overlapTimespans=None,
-        startTimespans=None,
-        stopTimespans=None,
-        timespanTree=None,
-        ):
+    def __init__(self,
+                offset=None,
+                overlapTimespans=None,
+                startTimespans=None,
+                stopTimespans=None,
+                timespanTree=None,
+                ):
+
         from music21.tree import trees
-        prototype = (trees.OffsetTree, type(None))
-        if not isinstance(timespanTree, prototype):
+        if timespanTree is not None and not isinstance(timespanTree, trees.OffsetTree):
             raise VerticalityException(
                 "timespanTree %r is not a OffsetTree or None" % (timespanTree,))
 
@@ -236,9 +239,6 @@ class Verticality:
         r'''
         Gets the bass timespan in this verticality.
 
-        This is CURRENTLY the lowest PART not the lowest note necessarily.
-        TODO: Fix this!
-
         >>> score = corpus.parse('bwv66.6')
         >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
         ...            classList=(note.Note, chord.Chord))
@@ -249,21 +249,26 @@ class Verticality:
         >>> verticality.bassTimespan
         <PitchedTimespan (1.0 to 2.0) <music21.note.Note F#>>
         '''
-        pitches = sorted(self.pitchSet)
-        lowestPitch = pitches[0]
-        timespans = self.startTimespans + self.overlapTimespans
-        bassTimespans = []
-        for timespan in timespans:
-            pitches = timespan.pitches
-            if lowestPitch in pitches:
-                bassTimespans.append(timespan)
-        if bassTimespans:
-            bassTimespans.sort(
-                key=lambda x: x.part.getInstrument().partId,
-                reverse=True,
-                )
-            return bassTimespans[0]
-        return None
+        overallLowestPitch = None
+        lowestTimespan = None
+        
+        for ts in self.startAndOverlapTimespans:
+            if not hasattr(ts, 'pitches'):
+                continue
+            
+            tsPitches = ts.pitches
+            if not tsPitches:
+                continue
+
+            lowestPitch = sorted(tsPitches)[0]
+            if overallLowestPitch is None:
+                overallLowestPitch = lowestPitch
+                lowestTimespan = ts
+            if lowestPitch <= overallLowestPitch:
+                overallLowestPitch = lowestPitch
+                lowestTimespan = ts
+
+        return lowestTimespan
 
     @property
     def beatStrength(self):
@@ -289,46 +294,28 @@ class Verticality:
         True
         '''
         try:
-            thisPitchedTimespan = self.startTimespans[0]
+            thisTimespan = self.startTimespans[0]
         except IndexError:
             return None
-        return thisPitchedTimespan.element.beatStrength
+        return thisTimespan.element.beatStrength
 
 
     def toChord(self):
         '''
-        creates a chord object from the verticality
-        '''
-        pitchSet = sorted(self.pitchSet)
-        testChord = chord.Chord(pitchSet)
-        return testChord
-
-    @property
-    def isConsonant(self):
-        r'''
-        Is true when the pitch set of a verticality is consonant.
-
-        TODO: remove, and use toChord.isConsonant() instead.
+        creates a chord.Chord object of default length (1.0 or
+        the duration of some note object) from the verticality.
+        
+        Does nothing about ties, etc. -- a very dumb chord, but useful
+        for querying consonance, etc.
+        
+        It may be a zero- or one-pitch chord.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
-        ...            classList=(note.Note, chord.Chord))
-        >>> verticalities = list(scoreTree.iterateVerticalities())
-        >>> for verticality in verticalities[:10]:
-        ...     print("%r %r" % (verticality, verticality.isConsonant))
-        ...
-        <Verticality 0.0 {A3 E4 C#5}> True
-        <Verticality 0.5 {G#3 B3 E4 B4}> True
-        <Verticality 1.0 {F#3 C#4 F#4 A4}> True
-        <Verticality 2.0 {G#3 B3 E4 B4}> True
-        <Verticality 3.0 {A3 E4 C#5}> True
-        <Verticality 4.0 {G#3 B3 E4 E5}> True
-        <Verticality 5.0 {A3 E4 C#5}> True
-        <Verticality 5.5 {C#3 E4 A4 C#5}> True
-        <Verticality 6.0 {E3 E4 G#4 B4}> True
-        <Verticality 6.5 {E3 D4 G#4 B4}> False
+        >>> scoreTree = score.asTimespans()
+        >>> verticality = scoreTree.getVerticalityAt(4.0)
         '''
-        return self.toChord().isConsonant()
+        c = chord.Chord(sorted(self.pitchSet))
+        return c
 
     @property
     def measureNumber(self):
@@ -416,49 +403,57 @@ class Verticality:
         <music21.pitch.Pitch F#4>
         <music21.pitch.Pitch A4>
         '''
+        pitchNameSet = set()
         pitchSet = set()
-        for timespan in self.startTimespans:
-            if hasattr(timespan, 'element'):
-                element = timespan.element
-            else:
-                element = timespan
 
-            if 'music21.key.Key' not in element.classSet and hasattr(element, 'pitches'):
-                pitches = [x.nameWithOctave for x in element.pitches]
-                pitchSet.update(pitches)
-        for timespan in self.overlapTimespans:
-            if hasattr(timespan, 'element'):
-                element = timespan.element
-            else:
-                element = timespan
+        for timespan in self.startAndOverlapTimespans:
+            if not hasattr(timespan, 'pitches'):
+                continue
+            for p in timespan.pitches:
+                pName = p.nameWithOctave
+                if pName in pitchNameSet:
+                    continue
 
-            if 'music21.key.Key' not in element.classSet and hasattr(element, 'pitches'):
-                pitches = [x.nameWithOctave for x in element.pitches]
-                pitchSet.update(pitches)
-        pitchSet = set([pitch.Pitch(x) for x in pitchSet])
+                pitchNameSet.add(pName)
+                pitchSet.add(p)
+
         return pitchSet
 
     @property
     def pitchClassSet(self):
         r'''
-        Gets the pitch-class set of all elements in a verticality.
+        Gets a set of all pitches in a verticality with distinct pitchClasses
 
-        >>> score = corpus.parse('bwv66.6')
-        >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
-        ...            classList=(note.Note, chord.Chord))
-        >>> verticality = scoreTree.getVerticalityAt(1.0)
-        >>> for pitchClass in sorted(verticality.pitchClassSet):
-        ...     pitchClass
-        ...
-        <music21.pitch.Pitch C#>
-        <music21.pitch.Pitch F#>
-        <music21.pitch.Pitch A>
+        >>> n1 = note.Note('C4')
+        >>> n2 = note.Note('B#5')
+        >>> s = stream.Stream()
+        >>> s.insert(4.0, n1)
+        >>> s.insert(4.0, n2)
+        >>> scoreTree = s.asTimespans()
+        >>> verticality = scoreTree.getVerticalityAt(4.0)
+        >>> pitchSet = verticality.pitchSet
+        >>> list(sorted(pitchSet))
+        [<music21.pitch.Pitch C4>, <music21.pitch.Pitch B#5>]
+        
+        PitchClassSet will return only one pitch.  Which of these
+        is returned is arbitrary.
+        
+        >>> pitchClassSet = verticality.pitchClassSet
+        >>> #_DOCS_SHOW list(sorted(pitchClassSet))
+        >>> print('[<music21.pitch.Pitch B#5>]') #_DOCS_HIDE
+        [<music21.pitch.Pitch B#5>]
         '''
+        outPitchSet = set()
         pitchClassSet = set()
+
         for currentPitch in self.pitchSet:
-            pitchClass = pitch.Pitch(currentPitch.name)
+            pitchClass = currentPitch.pitchClass
+            if pitchClass in pitchClassSet:
+                continue
+            
             pitchClassSet.add(pitchClass)
-        return pitchClassSet
+            outPitchSet.add(currentPitch)
+        return outPitchSet
 
     @property
     def previousVerticality(self):
@@ -505,10 +500,46 @@ class Verticality:
         return tree.getVerticalityAt(offset)
 
 
+    @property
+    def startAndOverlapTimespans(self):
+        '''
+        Return a tuple adding the start and overlap timespans into one.
+        
+        >>> n1 = note.Note('C4')
+        >>> n2 = note.Note('D4')
+        >>> s = stream.Stream()
+        >>> s.insert(4.0, n1)
+        >>> s.insert(4.5, n2)
+        >>> scoreTree = s.asTimespans()
+        >>> verticality = scoreTree.getVerticalityAt(4.5)
+        >>> verticality.startTimespans
+        (<PitchedTimespan (4.5 to 5.5) <music21.note.Note D>>,)
+
+        >>> verticality.overlapTimespans
+        (<PitchedTimespan (4.0 to 5.0) <music21.note.Note C>>,)
+
+        >>> verticality.startAndOverlapTimespans
+        (<PitchedTimespan (4.5 to 5.5) <music21.note.Note D>>,
+         <PitchedTimespan (4.0 to 5.0) <music21.note.Note C>>)
+        
+        >>> verticality = scoreTree.getVerticalityAt(4.0)
+        >>> verticality.startAndOverlapTimespans
+        (<PitchedTimespan (4.0 to 5.0) <music21.note.Note C>>,)
+        '''
+        if self.overlapTimespans is None:
+            return tuple(self.startTimespans)
+        
+        return tuple(self.startTimespans[:] + self.overlapTimespans[:])
+
 
     ######### makeElement
 
-    def makeElement(self, quarterLength=1.0):
+    def makeElement(self, 
+                    quarterLength=1.0, 
+                    *,
+                    addTies=True,
+                    addPartIdAsGroup=False,
+                    removeRedundantPitches=True):
         r'''
         Makes a Chord or Rest from this verticality and quarterLength.
 
@@ -518,6 +549,10 @@ class Verticality:
         >>> verticality = scoreTree.getVerticalityAt(4.0)
         >>> verticality
         <Verticality 4.0 {E#3 G3}>
+        >>> verticality.startTimespans
+        (<PitchedTimespan (4.0 to 5.0) <music21.note.Note G>>, 
+         <PitchedTimespan (4.0 to 6.0) <music21.note.Note E#>>)
+         
         >>> el = verticality.makeElement(2.0)
         >>> el
         <music21.chord.Chord E#3 G3>
@@ -538,28 +573,157 @@ class Verticality:
         'Eighth Triplet (1/3 QL)'
 
 
-        TODO: Consider if this is better to return a Note if only one pitch?
+        >>> n1 = note.Note('C4')
+        >>> n2 = note.Note('C4')
+        >>> s = stream.Score()
+        >>> s.insert(0, n1)
+        >>> s.insert(0.5, n2)
+        >>> scoreTree = s.asTimespans()
+        >>> verticality = scoreTree.getVerticalityAt(0.5)
+        >>> c = verticality.makeElement(0.5)
+        >>> c
+        <music21.chord.Chord C4>
+        
+        >>> c = verticality.makeElement(0.5, removeRedundantPitches=False)
+        >>> c
+        <music21.chord.Chord C4 C4>
         '''
-        if self.pitchSet:
-            element = chord.Chord(sorted(self.pitchSet))
-            startElements = [x.element for x in self.startTimespans]
-            try:
-                ties = [x.tie for x in startElements if x.tie is not None]
-                if any(x.type == 'start' for x in ties):
-                    element.tie = tie.Tie('start')
-                elif any(x.type == 'continue' for x in ties):
-                    element.tie = tie.Tie('continue')
-            except AttributeError:
-                pass
-        else:
-            element = note.Rest()
-        element.duration.quarterLength = quarterLength
-        return element
+        if not self.pitchSet:
+            r = note.Rest()
+            r.duration.quarterLength = common.opFrac(quarterLength)
+            return r
+        
+        # easy stuff done, time to get to the hard stuff...
+
+        c = chord.Chord()
+        c.duration.quarterLength = common.opFrac(quarterLength)
+        dur = c.duration
+        
+        seenPitches = set()
+        notesToAdd = {}
+                
+        startStopSet = set(['start', 'stop'])
+        pitchBust = 0 # used if removeRedundantPitches is False.
+
+
+        def newNote(ts, n):
+            '''
+            Make a copy of the note and clear some settings
+            '''
+            nNew = copy.deepcopy(n)
+            nNew.duration = dur
+            if nNew.stemDirection != 'noStem':
+                nNew.stemDirection = None
+            if not addTies:
+                return nNew            
+            
+            offsetDifference = common.opFrac(self.offset - ts.offset)
+            endTimeDifference = common.opFrac(ts.endTime - (self.offset + quarterLength))
+            if offsetDifference == 0 and endTimeDifference <= 0:
+                addTie = None
+            elif offsetDifference > 0:
+                if endTimeDifference > 0:
+                    addTie = 'continue'
+                else:
+                    addTie = 'stop'
+            elif endTimeDifference > 0:
+                addTie = 'start'
+            else:
+                raise VerticalityException("What possibility was missed?", 
+                                offsetDifference, endTimeDifference, ts, self)            
+            
+            
+            if nNew.tie is not None and set([nNew.tie.type, addTie]) == startStopSet: 
+                nNew.tie.type = 'continue'  
+            elif nNew.tie is not None and nNew.tie.type == 'continue':
+                nNew.tie.placement = None
+            elif addTie is None and nNew.tie is not None:
+                nNew.tie.placement = None
+            
+            elif addTie:
+                nNew.tie = tie.Tie(addTie)
+
+            return nNew
+        
+        def conditionalAdd(ts, n):
+            '''
+            Add an element only if it is not already in the chord.
+            
+            If it has more tie information than the previously
+            added note, then remove the previously added note and add it
+            '''
+            nonlocal pitchBust # love Py3!!!
+            p = n.pitch
+            pitchKey = p.nameWithOctave
+
+            pitchGroup = None
+            if addPartIdAsGroup:
+                partContext = n.getContextByClass('Part')
+                if partContext is not None:
+                    pidStr = str(partContext.id)
+                    pitchGroup = pidStr.replace(' ', '_') # spaces are not allowed as group names
+                    n.pitch.groups.append(pitchGroup)
+                    n.groups.append(pitchGroup)
+        
+            
+            if pitchKey not in seenPitches:
+                seenPitches.add(pitchKey)                    
+                notesToAdd[pitchKey] = newNote(ts, n)
+                return
+            elif not removeRedundantPitches:
+                notesToAdd[pitchKey + str(pitchBust)] = newNote(ts, n)
+                pitchBust += 1
+                return
+            elif addPartIdAsGroup:
+                notesToAdd[pitchKey].groups.append(pitchGroup)
+                notesToAdd[pitchKey].pitch.groups.append(pitchGroup)
+
+
+            if not addTies:
+                return
+
+            # else add derivation once multiple derivations are allowed.
+            oldNoteTie = notesToAdd[pitchKey].tie
+            if oldNoteTie is not None and oldNoteTie.type == 'continue':
+                return # previous note was as good or better
+            
+            possibleNewNote = newNote(ts, n)
+            possibleNewNote.groups = notesToAdd[pitchKey].groups
+            
+            if possibleNewNote.tie is None:
+                return # do nothing
+            elif oldNoteTie is None:
+                notesToAdd[pitchKey] = possibleNewNote # a better note to add
+            elif set([oldNoteTie.type, possibleNewNote.tie.type]) == startStopSet:
+                notesToAdd[pitchKey].tie.type = 'continue'
+            elif possibleNewNote.tie.type == 'continue':
+                notesToAdd[pitchKey] = possibleNewNote # a better note to add
+            elif possibleNewNote.tie.type == oldNoteTie.type:
+                return
+            else:
+                raise VerticalityException("Did I miss one? ", possibleNewNote.tie, oldNoteTie)
+            
+            
+        for ts in self.startAndOverlapTimespans:
+            if not isinstance(ts, spans.PitchedTimespan):
+                continue
+            el = ts.element
+            if 'Chord' in el.classes:
+                for subEl in el:
+                    conditionalAdd(ts, subEl)
+            else:
+                conditionalAdd(ts, el)
+
+        for n in notesToAdd.values():
+            c.add(n)
+        c.sortAscending(inPlace=True)
+        return c
 
     #########  Analysis type things...
 
     def getAllVoiceLeadingQuartets(self, includeRests=True, includeOblique=True,
-                                   includeNoMotion=False, returnObjects=True, partPairNumbers=None):
+                                   includeNoMotion=False, returnObjects=True, 
+                                   partPairNumbers=None):
         '''
         >>> c = corpus.parse('luca/gloria').measures(1, 8)
         >>> tsCol = tree.fromStream.asTimespans(c, flatten=True,

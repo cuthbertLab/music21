@@ -5031,6 +5031,9 @@ class Test(unittest.TestCase):
 
 
     def testChordifyC(self):
+        '''
+        Chordifies with triplets (floating point errors)
+        '''
         from music21 import corpus
         s = corpus.parse('schoenberg/opus19/movement6')
         #s.show()
@@ -5041,6 +5044,7 @@ class Test(unittest.TestCase):
         self.assertEqual([e.offset for e in m1.notes], [0.0])
         #s.parts[0].show()
         post = s.chordify()
+        #post.show('text', addEndTimes=True)
         self.assertEqual(post.getElementsByClass('Measure')[0].paddingLeft, 3.0)
         #self.assertEqual(len(post.flat), 3)
         #post.show()
@@ -6757,10 +6761,10 @@ class Test(unittest.TestCase):
 
     def testChordifyTagPartA(self):
         from music21 import stream
-        p1 = stream.Stream()
+        p1 = stream.Part()
         p1.id = 'a'
         p1.repeatAppend(note.Note('g4', quarterLength=2), 6)
-        p2 = stream.Stream()
+        p2 = stream.Part()
         p2.repeatAppend(note.Note('c4', quarterLength=3), 4)
         p2.id = 'b'
 
@@ -6945,33 +6949,35 @@ class Test(unittest.TestCase):
 
     def testExtendTiesB(self):
         from music21 import corpus
+        self.maxDiff = None
+        
         s = corpus.parse('bwv66.6')
         sChords = s.measures(9, 9).chordify()
+        # sChords.show()
         #sChords = s.chordify()
         sChords.extendTies()
         post = []
         for ch in sChords.flat.getElementsByClass('Chord'):
             post.append([repr(n.tie) for n in ch])
+
         self.assertEqual(post,
-                         [['<music21.tie.Tie continue>',
-                           '<music21.tie.Tie start>',
-                           '<music21.tie.Tie start>'],
-                          ['<music21.tie.Tie continue>',
-                           'None',
-                           '<music21.tie.Tie continue>',
-                           '<music21.tie.Tie stop>'],
-                          ['<music21.tie.Tie stop>',
-                           '<music21.tie.Tie start>',
-                           '<music21.tie.Tie continue>',
-                           '<music21.tie.Tie start>'],
-                          ['None',
-                           '<music21.tie.Tie stop>',
-                           '<music21.tie.Tie stop>',
-                           '<music21.tie.Tie stop>'],
-                          ['None',
-                           'None',
-                           'None',
-                           'None']])
+                        [['<music21.tie.Tie start>',
+                          '<music21.tie.Tie start>',
+                          '<music21.tie.Tie continue>'],
+                         ['<music21.tie.Tie stop>',
+                          '<music21.tie.Tie continue>',
+                          'None',
+                          '<music21.tie.Tie continue>'],
+                         ['<music21.tie.Tie start>',
+                          '<music21.tie.Tie continue>',
+                          '<music21.tie.Tie start>',
+                          '<music21.tie.Tie stop>'],
+                         ['<music21.tie.Tie stop>',
+                          '<music21.tie.Tie stop>',
+                          '<music21.tie.Tie stop>',
+                          'None'],
+                         ['None', 'None', 'None', 'None']]
+                         )
         #sChords.show()
 
 
@@ -7215,17 +7221,17 @@ class Test(unittest.TestCase):
 {0 - 0} <music21.clef.TrebleClef>
 {0 - 0} <music21.key.Key of B- major>
 {0 - 0} <music21.meter.TimeSignature 4/4>
-{0 - 2/3} <music21.chord.Chord B-4 B-2>
-{2/3 - 1 1/3} <music21.chord.Chord C5 B-2>
-{1 1/3 - 2} <music21.chord.Chord B-4 B-2>
-{2 - 4} <music21.chord.Chord A4 B-2>''')
+{0 - 2/3} <music21.chord.Chord B-2 B-4>
+{2/3 - 1 1/3} <music21.chord.Chord B-2 C5>
+{1 1/3 - 2} <music21.chord.Chord B-2 B-4>
+{2 - 4} <music21.chord.Chord B-2 A4>''')
         match = [([str(p) for p in n.pitches],
                   str(round(float(n.offset), 2)),
                   str(round(float(n.quarterLength), 3))) for n in m1.notes]
-        self.assertEqual(str(match), "[(['B-4', 'B-2'], '0.0', '0.667'), " +
-                                     "(['C5', 'B-2'], '0.67', '0.667'), " +
-                                     "(['B-4', 'B-2'], '1.33', '0.667'), " +
-                                     "(['A4', 'B-2'], '2.0', '2.0')]")
+        self.assertEqual(str(match), "[(['B-2', 'B-4'], '0.0', '0.667'), " +
+                                     "(['B-2', 'C5'], '0.67', '0.667'), " +
+                                     "(['B-2', 'B-4'], '1.33', '0.667'), " +
+                                     "(['B-2', 'A4'], '2.0', '2.0')]")
 
         #chords.show()
         GEX = m21ToXml.GeneralObjectExporter()
@@ -7783,7 +7789,7 @@ class Test(unittest.TestCase):
         bass.append([n1, n2, n3, n4])
         sop = Stream()
         sop.append([m1, m2, m3, m4])
-        for i in range(len(bass.notes)-1):
+        for i in range(len(bass.notes) - 1):
             note1 = bass.notes[i]
             note2 = bass.getElementAfterElement(note1, ['Note'])
             unused_note3 = sop.playingWhenAttacked(note1)
@@ -7795,7 +7801,7 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    music21.mainTest(Test, 'verbose' ) #, runTest='testChordifyC')
+    music21.mainTest(Test, 'verbose') #, runTest='testVoicesALonger')
 
 #------------------------------------------------------------------------------
 # eof

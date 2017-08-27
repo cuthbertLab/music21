@@ -345,7 +345,8 @@ class OffsetNode(ElementNode):
     The `Length: {1}` indicates that there is exactly one element at this location, that is,
     the F.
 
-    The "payload" of the node, is just that note wrapped in a list wrapped in an PitchedTimespan:
+    The "payload" of the node, is just that element wrapped in a list wrapped in an
+    ElementTimespan or PitchedTimespan:
 
     >>> rn.payload
     [<PitchedTimespan (3.0 to 4.0) <music21.note.Note F>>]
@@ -369,12 +370,12 @@ class OffsetNode(ElementNode):
     <OffsetNode: Start:0.0 Indices:(0:0:8:8) Length:{8}>
 
     >>> leftLeft.payload
-    [<PitchedTimespan (0.0 to 0.0) <music21.instrument.Instrument PartA: : >>,
-     <PitchedTimespan (0.0 to 0.0) <music21.instrument.Instrument PartB: : >>,
-     <PitchedTimespan (0.0 to 0.0) <music21.clef.BassClef>>,
-     <PitchedTimespan (0.0 to 0.0) <music21.clef.BassClef>>,
-     <PitchedTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>,
-     <PitchedTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>,
+    [<ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument PartA: : >>,
+     <ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument PartB: : >>,
+     <ElementTimespan (0.0 to 0.0) <music21.clef.BassClef>>,
+     <ElementTimespan (0.0 to 0.0) <music21.clef.BassClef>>,
+     <ElementTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>,
+     <ElementTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>,
      <PitchedTimespan (0.0 to 1.0) <music21.note.Note C>>,
      <PitchedTimespan (0.0 to 2.0) <music21.note.Note C#>>]
 
@@ -404,7 +405,8 @@ class OffsetNode(ElementNode):
 
     _DOC_ATTR = {
     'payload': r'''
-        The contents of the node at this point.  Usually a list of PitchedTimespans.
+        The contents of the node at this point.  Usually a list of ElementTimespans
+        or PitchedTimespans.
 
         >>> score = tree.makeExampleScore()
         >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,

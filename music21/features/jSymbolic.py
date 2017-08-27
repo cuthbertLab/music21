@@ -2817,13 +2817,13 @@ class AverageNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     >>> fe = features.jSymbolic.AverageNumberOfIndependentVoicesFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [2.1...]
+    [1.528...]
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.AverageNumberOfIndependentVoicesFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [3.96...]
+    [3.90...]
     '''
     id = 'T2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2862,7 +2862,7 @@ class VariabilityOfNumberOfIndependentVoicesFeature(
     >>> fe = features.jSymbolic.VariabilityOfNumberOfIndependentVoicesFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [0.19...]
+    [0.449...]
     '''
     id = 'T3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):

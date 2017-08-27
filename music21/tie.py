@@ -84,7 +84,7 @@ class Tie(SlottedObjectMixin):
 
     _DOC_ATTR = {
         'type': '''
-            The tie type, can be 'start', 'stop', 'continue', or 'let-ring'.
+            The tie type, can be 'start', 'stop', 'continue', 'let-ring', or 'continue-let-ring'.
             ''',
         'style': '''
             The style of the tie.  Currently can be 'normal', 'dotted', 'dashed' or 'hidden'
@@ -95,7 +95,7 @@ class Tie(SlottedObjectMixin):
             ''',
     }
 
-    VALID_TIE_TYPES = ('start', 'stop', 'continue', 'let-ring')
+    VALID_TIE_TYPES = ('start', 'stop', 'continue', 'let-ring', 'continue-let-ring')
     ### INITIALIZER ###
     # pylint: disable=redefined-builtin
     def __init__(self, type='start'): #@ReservedAssignment

@@ -521,26 +521,17 @@ class PitchedTimespan(ElementTimespan):
         r'''
         Gets the pitches of the element wrapped by this PitchedTimespan.
 
-        This treats notes as chords.
-
         >>> c = chord.Chord('C4 E4 G4')
         >>> pts = tree.spans.PitchedTimespan(c, offset=0.0, endTime=1.0)
         >>> pts.pitches
         (<music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch G4>)
-
-        Perhaps remove? except for this case:
-
-        >>> d = dynamics.Dynamic('f')
-        >>> pts2 = tree.spans.PitchedTimespan(d, offset=0.0, endTime=10.0)
-        >>> pts2.pitches
-        ()
+        >>> pts.pitches == c.pitches
+        True
+        >>> pts.pitches is c.pitches
+        False
+        
         '''
-        result = []
-        if hasattr(self.element, 'pitches') and 'music21.key.Key' not in self.element.classSet:
-            result.extend(self.element.pitches)
-        result.sort()
-        return tuple(result)
-
+        return self.element.pitches
 
     def canMerge(self, other):
         '''
