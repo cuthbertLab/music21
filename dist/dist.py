@@ -50,7 +50,7 @@ To do a release,
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-13. Upload the new file with "twine upload music21-5.0.3.a3.tar.gz" [*]
+13. Upload the new file with "twine upload music21-5.0.3a1.tar.gz" [*]
 
     [*] Requires twine to be installed
 
