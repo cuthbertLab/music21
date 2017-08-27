@@ -602,36 +602,66 @@ class Verticality:
         >>> s = stream.Stream()
         >>> s.insert(0, n1)
         >>> s.insert(0.5, n2)
+
+        >>> class AllAttachArticulation(articulations.Articulation):
+        ...     def __init__(self):
+        ...         super().__init__()
+        ...         self.tieAttach = 'all'
+
+        >>> class OtherAllAttachArticulation(articulations.Articulation):
+        ...     def __init__(self):
+        ...         super().__init__()
+        ...         self.tieAttach = 'all'
+
         
         >>> n1.articulations.append(articulations.Accent())
+        >>> n1.articulations.append(AllAttachArticulation())
         >>> n1.expressions.append(expressions.Fermata())
+
         >>> n2.articulations.append(articulations.Staccato())
+        >>> n2.articulations.append(AllAttachArticulation())
+        >>> n2.articulations.append(OtherAllAttachArticulation())
         >>> n2.expressions.append(expressions.Fermata())
 
         >>> scoreTree = s.asTimespans()
         
         >>> verticality = scoreTree.getVerticalityAt(0.0)
-        >>> c = verticality.makeElement(0.5)
+        >>> c = verticality.makeElement(1.0)
         >>> c.expressions
         [<music21.expressions.Fermata>]
         >>> c.articulations
-        [<music21.articulations.Accent>]
+        [<music21.articulations.Accent>, <music21.articulations.AllAttachArticulation>]
 
         >>> verticality = scoreTree.getVerticalityAt(0.5)
 
-        >>> c = verticality.makeElement(0.5)
+
+        Here there will be no expressions, because there is no note ending
+        at 0.75 and Fermatas attach to the last note:
+        
+        >>> c = verticality.makeElement(0.25)
+        >>> c.expressions
+        []
+
+        >>> c = verticality.makeElement(0.5)        
         >>> c.expressions
         [<music21.expressions.Fermata>]
         
-        >>> c.articulations
-        [<music21.articulations.Accent>, <music21.articulations.Staccato>]
+        Only two articulations, since accent attaches to beginning and staccato attaches to last
+        and we are beginning after the start of the first note (with an accent)
+        and cutting right through the second note (with a staccato)
         
-        >>> c = verticality.makeElement(0.5, gatherExpressions=True)
-        >>> c.expressions
-        [<music21.expressions.Fermata>, <music21.expressions.Fermata>]
+        >>> c.articulations
+        [<music21.articulations.AllAttachArticulation>, 
+         <music21.articulations.OtherAllAttachArticulation>]
+        
+        >>> c = verticality.makeElement(0.5, gatherArticulations=True)
+        >>> c.articulations
+        [<music21.articulations.AllAttachArticulation>, 
+         <music21.articulations.AllAttachArticulation>,
+         <music21.articulations.OtherAllAttachArticulation>]
 
-        >>> c = verticality.makeElement(0.5, gatherExpressions=False)
-        >>> c.expressions
+        >>> c = verticality.makeElement(0.5, gatherArticulations=False)
+        >>> c.articulations
         []
 
         >>> verticality = scoreTree.getVerticalityAt(1.0)
@@ -639,7 +669,9 @@ class Verticality:
         >>> c.expressions
         [<music21.expressions.Fermata>]
         >>> c.articulations
-        [<music21.articulations.Staccato>]
+        [<music21.articulations.Staccato>,
+         <music21.articulations.AllAttachArticulation>,
+         <music21.articulations.OtherAllAttachArticulation>]
 
         '''
         if not self.pitchSet:
@@ -792,7 +824,7 @@ class Verticality:
                     if art.tieAttach == 'last' and n.tie is not None and n.tie.type != 'stop':
                         continue
                     
-                    if gatherExpressions == 'single' and type(art) in seenArticulations:
+                    if gatherArticulations == 'single' and type(art) in seenArticulations:
                         continue
                     c.articulations.append(art)
                     seenArticulations.add(type(art))

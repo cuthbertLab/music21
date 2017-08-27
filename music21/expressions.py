@@ -1089,11 +1089,13 @@ class Fermata(Expression):
     .. image:: images/expressionsFermata.*
          :width: 193
     '''
-    shape = "normal" # angled, square.
-    # for musicmxml, can be upright or inverted, but Finale's idea of an
-    # inverted fermata is ass backwards.
-    type  = "inverted"
-    tieAttach = 'last'
+    def __init__(self):
+        super().__init__()
+        self.shape = "normal" # angled, square.
+        # for musicmxml, can be upright or inverted, but Finale's idea of an
+        # inverted fermata is ass backwards.
+        self.type  = "inverted"
+        self.tieAttach = 'last'
 
 
 #-------------------------------------------------------------------------------
