@@ -61,7 +61,7 @@ from music21.metadata import bundles
 
 from music21 import _version
 from music21 import environment
-_MOD = 'converter/__init__.py'
+_MOD = 'converter'
 environLocal = environment.Environment(_MOD)
 
 
@@ -259,10 +259,13 @@ class PickleFilter:
             extension = '.p'
         else:
             extension = '.p.gz'
-        pythonVersion = 'py' + str(sys.version_info[0]) + '.' + str(sys.version_info[1])
+
+        pythonVersion = 'py' + str(sys.version_info.major) + '.' + str(sys.version_info.minor)
+
+        pathNameToParse = str(self.fp)
 
         baseName = '-'.join(['m21', _version.__version__, pythonVersion,
-                             common.getMd5(str(self.fp))])
+                             common.getMd5(pathNameToParse)])
 
         if self.number is not None:
             baseName += '-' + str(self.number)

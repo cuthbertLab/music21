@@ -14,24 +14,19 @@ Things that are common to testing...
 '''
 import doctest
 import os
-#import time
 import types
 import warnings
+import importlib
 
-with warnings.catch_warnings():
-    warnings.simplefilter('ignore', DeprecationWarning)
-    import imp
-
-
-from unittest.signals import registerResult
 import unittest.runner
+from unittest.signals import registerResult
 
 import music21
+
 from music21 import common
 from music21 import environment
 
-_MOD = 'commonTest.py'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('test.commonTest')
 
 def defaultDoctestSuite(name=None):
     globs = __import__('music21').__dict__.copy()
@@ -220,14 +215,11 @@ class ModuleGather:
 
 
         # skip any path that contains this string
-        self.pathSkip = ['obsolete',
-                         'music21/ext',  # not just "ext" because of "text!"
+        self.pathSkip = ['music21/ext',  # not just "ext" because of "text!"
                          'alpha/webapps/server',
                          'alpha/webapps/archive',
                          ]
-        self.pathSkipExtended = self.pathSkip + [
-                         'demos',
-                        ]
+        self.pathSkipExtended = self.pathSkip + []
 
         self.moduleSkip = [x.replace('/', os.sep) for x in self.moduleSkip]
         self.moduleSkipExtended = [x.replace('/', os.sep) for x in self.moduleSkipExtended]
@@ -292,21 +284,27 @@ class ModuleGather:
         fn = fn.replace('.py', '')
         return fn
 
-    def _getNamePeriod(self, fp):
+    def _getNamePeriod(self, fp, *, addM21=False):
         r'''
         Given full file path, find a name for the module with . as the separator.
 
         >>> from music21.test import commonTest
         >>> mg = commonTest.ModuleGather()
-        >>> #_DOCS_SHOW mg._getName(r'D:\Web\eclipse\music21base\music21\trecento\findSevs.py')
-        'trecento.findSevs'
+        >>> mg._getNamePeriod('/Users/cuthbert/git/music21base/music21/features/native.py')
+        'features.native'
         '''
         fn = fp.replace(self.dirParent, '') # remove parent
         parts = [x for x in fn.split(os.sep) if x]
         if parts[-1] == '__init__.py':
             parts.pop()
         fn = '.'.join(parts) # replace w/ period
+
         fn = fn.replace('.py', '')
+        if addM21 and fn:
+            fn = 'music21.' + fn
+        elif addM21:
+            fn = 'music21'
+
 
         return fn
 
@@ -351,19 +349,18 @@ class ModuleGather:
                 break
         if skip:
             return None
-        name = self._getName(fp)
-        #print(name, os.path.dirname(fp))
-        #fmFile, fmPathname, fmDescription = imp.find_module(name, os.path.dirname(fp) + os.sep)
+        name = self._getNamePeriod(fp, addM21=True)
+        
+        # print(name, os.path.dirname(fp))
         try:
-            #environLocal.printDebug(['import:', fp])
-            #mod = imp.load_module(name, fmFile, fmPathname, fmDescription)
             with warnings.catch_warnings():
-                warnings.simplefilter('ignore', RuntimeWarning)
-                mod = imp.load_source(name, fp)
+                # warnings.simplefilter('ignore', RuntimeWarning)
+                mod = importlib.import_module(name)
         except Exception as excp: # pylint: disable=broad-except
-            environLocal.printDebug(['failed import:', fp, '\n',
+            environLocal.warn(['failed import:', fp, '\n',
                 '\tEXCEPTION:', str(excp).strip()])
             return None
+
         if restoreEnvironmentDefaults:
             if hasattr(mod, 'environLocal'):
                 mod.environLocal.restoreDefaults()
@@ -390,6 +387,8 @@ class ModuleGather:
         moduleName = self._getNamePeriod(fp)
         moduleNames = moduleName.split('.')
         currentModule = music21
+        # print(currentModule, moduleName, fp)
+        
         for thisName in moduleNames:
             if hasattr(currentModule, thisName):
                 currentModule = object.__getattribute__(currentModule, thisName)

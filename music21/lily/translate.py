@@ -31,7 +31,7 @@ from music21 import variant
 from music21 import note
 from music21.lily import lilyObjects as lyo
 
-_MOD = 'lily.translate2012.py'
+_MOD = 'lily.translate'
 environLocal = environment.Environment(_MOD)
 
 

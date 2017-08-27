@@ -31,7 +31,7 @@ from music21 import style
 
 from music21.common import SlottedObjectMixin, opFrac
 
-_MOD = 'meter.py'
+_MOD = 'meter'
 environLocal = environment.Environment(_MOD)
 
 

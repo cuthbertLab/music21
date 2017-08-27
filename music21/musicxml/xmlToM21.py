@@ -2438,18 +2438,39 @@ class MeasureParser(XMLParserBase):
             notes.append(self.xmlToSimpleNote(mxNote, freeSpanners=False))
         c = chord.Chord(notes)
 
-        # move beams from first note -- TODO: what else should be moved?
+        # move beams from first note (TODO: confirm style moved already?)
         if notes:
             c.beams = notes[0].beams
             notes[0].beams = beam.Beams()
-        # move spanners from first note to Chord.  See slur in m2 of schoenberg/op19 #2
-        for n in notes:
+
+        # move spanners, expressions, articulations from first note to Chord.  
+        # See slur in m2 of schoenberg/op19 #2
+        # but move only one of each class
+        # Is there anything else that should be moved???
+        
+        seenArticulations = set()
+        seenExpressions = set()
+        
+        for n in sorted(notes, key=lambda x: x.pitch.ps):
             ss = n.getSpannerSites()
             # transfer all spanners from the notes to the chord.
             for sp in ss:
                 sp.replaceSpannedElement(n, c)
+            for art in n.articulations:
+                if type(art) in seenArticulations:
+                    pass
+                c.articulations.append(art)
+                seenArticulations.add(type(art))
+            for exp in n.expressions:
+                if type(exp) in seenExpressions:
+                    pass
+                c.expressions.append(exp)
+                seenExpressions.add(type(exp))
+
+            n.articulations = []
+            n.expressions = []
+                
         self.spannerBundle.freePendingSpannedElementAssignment(c)
-        c.sortAscending(inPlace=True)
         return c
 
     def xmlToSimpleNote(self, mxNote, freeSpanners=True):

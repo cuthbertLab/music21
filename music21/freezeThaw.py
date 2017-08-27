@@ -85,7 +85,7 @@ from music21 import exceptions21
 from music21.ext import jsonpickle
 
 from music21 import environment
-_MOD = "freezeThaw.py"
+_MOD = "freezeThaw"
 environLocal = environment.Environment(_MOD)
 
 import pickle

@@ -9,7 +9,6 @@
 # Copyright:    Copyright © 2011-2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 '''
 Tools for generation reduction displays, showing a score and or a chord reduction,
 and one or more reductive representation lines.
@@ -698,7 +697,7 @@ class PartReduction:
                                 offsetEnd,
                                 includeEndBoundary=False,
                                 mustFinishInSpan=False,
-                                mustBeginInSpan=True).getElementsByClass(target).stream()
+                                mustBeginInSpan=True).stream().getElementsByClass(target).stream()
                     if not match:
                         w = None
                     else:
@@ -1169,9 +1168,9 @@ class Test(unittest.TestCase):
         match = pr.getGraphHorizontalBarWeightedData()
         #print match
         target = [(0, [[2.0, 2.0, 1.0, '#666666'],
-                       [6.0, 2.0, 0.166666666666666, '#666666'],
-                       [10.0, 2.0, 0.166666666666, '#666666']]),
-                  (1, [[2.0, 2.0, 0.7777777777777776, '#666666'],
+                       [6.0, 2.0, 1/6, '#666666'],
+                       [10.0, 2.0, 1/6, '#666666']]),
+                  (1, [[2.0, 2.0, 7/9, '#666666'],
                        [6.0, 2.0, 0.6111111111111112, '#666666'],
                        [10.0, 2.0, 0.6111111111111112, '#666666']])]
         self._matchWeightedData(match, target)
@@ -1206,7 +1205,6 @@ class Test(unittest.TestCase):
         s.insert(0, p1)
         s.insert(0, p2)
         #s.show()
-
         pr = analysis.reduction.PartReduction(s, fillByMeasure=True,
                     segmentByTarget=False, normalize=False)
         pr.process()
@@ -1224,7 +1222,6 @@ class Test(unittest.TestCase):
                     segmentByTarget=True, normalize=False)
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
-        #print target
         match = [(0, [[0.0, 2.0, 0.05, '#666666'],
                       [2.0, 2.0, 0.1285714285714286, '#666666'],
                       [6.0, 2.0, 0.0214285714286, '#666666'],
@@ -1233,6 +1230,8 @@ class Test(unittest.TestCase):
                       [2.0, 2.0, 0.1, '#666666'],
                       [6.0, 2.0, 0.07857142857142858, '#666666'],
                       [10.0, 2.0, 0.07857142857142858, '#666666']])]
+        # from pprint import pprint as print 
+        # print(target)
         self._matchWeightedData(match, target)
 
 

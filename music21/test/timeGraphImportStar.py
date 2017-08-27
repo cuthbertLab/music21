@@ -139,7 +139,7 @@ class CallGraph:
         update the self.callTest attribute in __init__().
         '''
         suffix = '.png' # '.svg' no reader for now...
-        _MOD = "test.timeGraphImportStar.py"
+        _MOD = "test.timeGraphImportStar"
 
         if runWithEnviron:
             from music21 import environment

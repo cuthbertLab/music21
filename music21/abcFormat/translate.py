@@ -35,8 +35,7 @@ from music21 import note
 from music21 import chord
 from music21 import spanner
 
-_MOD = 'abcFormat.translate.py'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('abcFormat.translate')
 
 
 

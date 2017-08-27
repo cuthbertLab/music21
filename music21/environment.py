@@ -36,7 +36,7 @@ from music21 import exceptions21
 from music21 import common
 
 
-_MOD = 'environment.py'
+_MOD = 'environment'
 
 def etIndent(elem, level=0, spaces=2):
     '''
@@ -1277,7 +1277,7 @@ class UserSettings:
         # this will accept localCorpusPath
         if key in self._environment.getKeysToPaths():
             # try to expand user if found; otherwise return unaltered
-            if value is not None and value != '/skip':
+            if value is not None and not str(value).startswith('/skip'):
                 value = common.cleanpath(value, returnPathlib=False)
                 if not os.path.exists(value):
                     raise UserSettingsException(

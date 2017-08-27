@@ -26,7 +26,7 @@ from music21.ext import webcolors
 
 
 from music21 import environment
-_MOD = 'graph/utilities.py'
+_MOD = 'graph.utilities'
 environLocal = environment.Environment(_MOD)
 
 

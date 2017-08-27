@@ -24,7 +24,7 @@ from music21 import note
 from music21 import style
 
 from music21 import environment
-_MOD = "tempo.py"
+_MOD = "tempo"
 environLocal = environment.Environment(_MOD)
 
 

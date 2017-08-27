@@ -24,7 +24,7 @@ from music21 import spanner
 from music21 import style
 
 from music21 import environment
-_MOD = 'dynamics.py'
+_MOD = 'dynamics'
 environLocal = environment.Environment(_MOD)
 
 

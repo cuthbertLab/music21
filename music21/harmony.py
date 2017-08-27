@@ -30,7 +30,7 @@ from music21 import style
 from music21.figuredBass import realizerScale
 
 from music21 import environment
-_MOD = "harmony.py"
+_MOD = "harmony"
 environLocal = environment.Environment(_MOD)
 
 
@@ -2421,7 +2421,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         #s.show()
         #s.show('text')
     #def realizeCSwithFB(self):
-    #see demos.bhadley.HarmonyRealizer
+    # see music21-demos : hadley.HarmonyRealizer
 
     def testALLchordKinds(self):
         '''

@@ -19,7 +19,7 @@ from music21 import _version
 
 # note: this module should not import any higher level modules
 
-_MOD = 'defaults.py'
+_MOD = 'defaults'
 
 
 

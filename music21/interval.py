@@ -31,7 +31,7 @@ from music21 import exceptions21
 #from music21 import pitch # SHOULD NOT, b/c of enharmonics
 
 from music21 import environment
-_MOD = "interval.py"
+_MOD = "interval"
 environLocal = environment.Environment(_MOD)
 
 try:

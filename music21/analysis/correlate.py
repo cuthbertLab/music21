@@ -21,7 +21,7 @@ from music21 import chord
 from music21 import dynamics
 
 from music21 import environment
-_MOD = 'correlate.py'
+_MOD = 'analysis.correlate'
 environLocal = environment.Environment(_MOD)
 
 

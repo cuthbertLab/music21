@@ -24,7 +24,7 @@ from music21 import common, corpus
 from music21.musicxml.m21ToXml import GeneralObjectExporter as GEX
 
 from music21 import environment
-_MOD = 'test/testPerformance.py'
+_MOD = 'test.testPerformance'
 environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------

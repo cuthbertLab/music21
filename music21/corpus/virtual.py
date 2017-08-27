@@ -24,7 +24,7 @@ import unittest
 
 from music21 import common
 from music21 import environment
-_MOD = 'converter.py'
+_MOD = 'converter.virtual'
 environLocal = environment.Environment(_MOD)
 
 

@@ -56,8 +56,7 @@ from music21 import exceptions21
 
 from music21.abcFormat import translate
 
-_MOD = 'abc'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('abcFormat')
 
 # for implementation
 # see http://abcnotation.com/abc2mtex/abc.txt

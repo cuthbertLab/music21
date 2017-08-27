@@ -61,7 +61,7 @@ from music21 import common
 from music21 import interval
 
 from music21 import environment
-_MOD = 'sieve.py'
+_MOD = 'sieve'
 environLocal = environment.Environment(_MOD)
 
 

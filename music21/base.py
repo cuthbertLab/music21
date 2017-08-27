@@ -89,7 +89,7 @@ from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
 from music21.sites import SitesException
 
 
-_MOD = 'music21.base.py'
+_MOD = 'base'
 environLocal = environment.Environment(_MOD)
 
 

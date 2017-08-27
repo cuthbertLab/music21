@@ -62,7 +62,7 @@ from music21 import environment
 from music21.common import SlottedObjectMixin, opFrac
 
 
-_MOD = "duration.py"
+_MOD = "duration"
 environLocal = environment.Environment(_MOD)
 
 DENOM_LIMIT = defaults.limitOffsetDenominator

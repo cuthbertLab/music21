@@ -583,7 +583,7 @@ class CallGraph:
         '''
         suffix = '.png' # '.svg'
         outputFormat = suffix[1:]
-        _MOD = "test.timeGraphs.py"
+        _MOD = "test.timeGraphs"
 
         if runWithEnviron:
             from music21 import environment

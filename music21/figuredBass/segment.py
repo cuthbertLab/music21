@@ -25,7 +25,7 @@ from music21.figuredBass import resolution
 from music21.figuredBass import rules
 from itertools import filterfalse
 
-_MOD = 'segment.py'
+_MOD = 'figuredBass.segment'
 
 _defaultRealizerScale = {'scale': None} # singleton
 

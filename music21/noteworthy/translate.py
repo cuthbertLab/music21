@@ -75,7 +75,7 @@ from music21 import stream
 from music21 import tie
 
 from music21 import environment
-_MOD = 'music21.noteworthy.translate'
+_MOD = 'noteworthy.translate'
 environLocal = environment.Environment(_MOD)
 
 from music21.exceptions21 import Music21Exception

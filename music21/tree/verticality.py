@@ -539,7 +539,10 @@ class Verticality:
                     *,
                     addTies=True,
                     addPartIdAsGroup=False,
-                    removeRedundantPitches=True):
+                    removeRedundantPitches=True,
+                    gatherArticulations='single',
+                    gatherExpressions='single'
+                    ):
         r'''
         Makes a Chord or Rest from this verticality and quarterLength.
 
@@ -587,6 +590,57 @@ class Verticality:
         >>> c = verticality.makeElement(0.5, removeRedundantPitches=False)
         >>> c
         <music21.chord.Chord C4 C4>
+        
+        gatherArticulations and gatherExpressions can be True, False, or (default) 'single'.
+        If False, no articulations (or expressions) are transferred to the chord.
+        If True, all articulations are transferred to the chord.
+        If 'single', then no more than one articulation of each class (chosen from the lowest
+            note) will be added.  This way, the chord does not get 4 fermatas, etc.
+                   
+        >>> n1 = note.Note('C4')
+        >>> n2 = note.Note('D4')
+        >>> s = stream.Stream()
+        >>> s.insert(0, n1)
+        >>> s.insert(0.5, n2)
+        
+        >>> n1.articulations.append(articulations.Accent())
+        >>> n1.expressions.append(expressions.Fermata())
+        >>> n2.articulations.append(articulations.Staccato())
+        >>> n2.expressions.append(expressions.Fermata())
+
+        >>> scoreTree = s.asTimespans()
+        
+        >>> verticality = scoreTree.getVerticalityAt(0.0)
+        >>> c = verticality.makeElement(0.5)
+        >>> c.expressions
+        [<music21.expressions.Fermata>]
+        >>> c.articulations
+        [<music21.articulations.Accent>]
+
+        >>> verticality = scoreTree.getVerticalityAt(0.5)
+
+        >>> c = verticality.makeElement(0.5)
+        >>> c.expressions
+        [<music21.expressions.Fermata>]
+        
+        >>> c.articulations
+        [<music21.articulations.Accent>, <music21.articulations.Staccato>]
+        
+        >>> c = verticality.makeElement(0.5, gatherExpressions=True)
+        >>> c.expressions
+        [<music21.expressions.Fermata>, <music21.expressions.Fermata>]
+
+        >>> c = verticality.makeElement(0.5, gatherExpressions=False)
+        >>> c.expressions
+        []
+
+        >>> verticality = scoreTree.getVerticalityAt(1.0)
+        >>> c = verticality.makeElement(0.5)
+        >>> c.expressions
+        [<music21.expressions.Fermata>]
+        >>> c.articulations
+        [<music21.articulations.Staccato>]
+
         '''
         if not self.pitchSet:
             r = note.Rest()
@@ -709,14 +763,51 @@ class Verticality:
                 continue
             el = ts.element
             if 'Chord' in el.classes:
-                for subEl in el:
-                    conditionalAdd(ts, subEl)
+                if len(el) == 0:
+                    continue
+
+                if el.articulations or el.expressions:
+                    firstSubEl = copy.deepcopy(el[0]) # this makes an additional deepcopy
+                    firstSubEl.articulations += el.articulations
+                    firstSubEl.expressions += el.expressions
+                else:
+                    firstSubEl = el[0]
+                conditionalAdd(ts, firstSubEl)
+                    
+                if len(el) > 1:
+                    for subEl in list(el)[1:]:
+                        conditionalAdd(ts, subEl)
             else:
                 conditionalAdd(ts, el)
 
-        for n in notesToAdd.values():
+        seenArticulations = set()
+        seenExpressions = set()
+        
+        for n in sorted(notesToAdd.values(), key=lambda x: x.pitch.ps):
             c.add(n)
-        c.sortAscending(inPlace=True)
+            if gatherArticulations:
+                for art in n.articulations:
+                    if art.tieAttach == 'first' and n.tie is not None and n.tie.type != 'start':
+                        continue
+                    if art.tieAttach == 'last' and n.tie is not None and n.tie.type != 'stop':
+                        continue
+                    
+                    if gatherExpressions == 'single' and type(art) in seenArticulations:
+                        continue
+                    c.articulations.append(art)
+                    seenArticulations.add(type(art))
+            if gatherExpressions:
+                for exp in n.expressions:
+                    if exp.tieAttach == 'first' and n.tie is not None and n.tie.type != 'start':
+                        continue
+                    if exp.tieAttach == 'last' and n.tie is not None and n.tie.type != 'stop':
+                        continue
+
+                    if gatherExpressions == 'single' and type(exp) in seenExpressions:
+                        continue
+                    c.expressions.append(exp)
+                    seenExpressions.add(type(exp))
+            
         return c
 
     #########  Analysis type things...

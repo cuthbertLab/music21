@@ -22,7 +22,7 @@ from music21 import expressions
 from music21 import repeat
 
 from music21 import environment
-_MOD = 'bar.py'
+_MOD = 'bar'
 environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------

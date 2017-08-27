@@ -27,7 +27,7 @@ from music21 import exceptions21
 from music21 import environment
 from music21 import style
 
-_MOD = "clef.py"
+_MOD = "clef"
 environLocal = environment.Environment(_MOD)
 
 

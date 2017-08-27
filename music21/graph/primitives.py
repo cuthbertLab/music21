@@ -33,7 +33,7 @@ from music21.graph.utilities import (getExtendedModules,
 
 
 from music21 import environment
-_MOD = 'graph/primitives.py'
+_MOD = 'graph.primitives'
 environLocal = environment.Environment(_MOD)
 
 

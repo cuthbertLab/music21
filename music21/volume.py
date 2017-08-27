@@ -21,7 +21,7 @@ from music21 import common
 from music21.common import SlottedObjectMixin
 
 from music21 import environment
-_MOD = "volume.py"
+_MOD = "volume"
 environLocal = environment.Environment(_MOD)
 
 

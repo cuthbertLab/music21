@@ -33,7 +33,7 @@ from music21 import environment
 from music21.chord import tables as chordTables
 from music21.common import deprecated
 
-_MOD = "chord.py"
+_MOD = "chord"
 environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------

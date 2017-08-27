@@ -21,7 +21,7 @@ import unittest
 from music21 import exceptions21
 
 from music21 import environment
-_MOD = "chordTables.py"
+_MOD = "chord.tables"
 environLocal = environment.Environment(_MOD)
 
 

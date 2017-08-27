@@ -889,11 +889,11 @@ class LocalCorpus(Corpus):
         candidatePaths = []
         if self.existsInSettings:
             settings = self._getSettings()
-            candidatePaths = list(settings)
-        temporaryPaths = LocalCorpus._temporaryLocalPaths.get(
-            self.name, [])
+            candidatePaths = [pathlib.Path(p) for p in settings]
+        temporaryPaths = [pathlib.Path(p) for p in LocalCorpus._temporaryLocalPaths.get(
+            self.name, [])]
         allPaths = tuple(sorted(set(candidatePaths).union(temporaryPaths)))
-        return tuple([pathlib.Path(p) for p in allPaths])
+        return allPaths
 
     @property
     def existsInSettings(self):

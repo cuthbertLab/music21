@@ -56,7 +56,7 @@ from music21 import interval
 from music21.scale.scala import scl
 
 from music21 import environment
-_MOD = "pitch.py"
+_MOD = "scale.scala"
 environLocal = environment.Environment(_MOD)
 
 
@@ -240,6 +240,8 @@ class ScalaData:
     182.40...
 
     Be sure to reencode `fs` as `latin-1` before writing to disk.
+    
+    >>> sf.close()
     '''
     def __init__(self, sourceString=None, fileName=None):
         self.src = sourceString

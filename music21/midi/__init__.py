@@ -40,7 +40,7 @@ from music21.midi import realtime
 from music21.midi import percussion
 
 
-_MOD = "midi.base.py"
+_MOD = "midi"
 environLocal = environment.Environment(_MOD)
 
 

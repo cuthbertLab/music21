@@ -10,7 +10,7 @@
 #-------------------------------------------------------------------------------
 import collections
 
-_MOD = 'analysis/pitchAnalysis.py'
+_MOD = 'analysis.pitchAnalysis'
 
 def pitchAttributeCount(s, pitchAttr='name'):
     '''

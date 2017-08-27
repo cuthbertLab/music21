@@ -201,6 +201,8 @@ class Metadata(base.Music21Object):
         self.software = [defaults.software]
 
         # Copyright can be None or a copyright object
+        # TODO: Change to property to prevent text setting
+        # (but need to regenerate CoreCorpus() after doing so.)
         self.copyright = None
 
         # a dictionary of Text elements, where keys are work id strings

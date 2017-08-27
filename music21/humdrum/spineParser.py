@@ -2673,7 +2673,7 @@ class GlobalReference(base.Music21Object):
             md.setWorkId(c, v)
 
         elif c == 'YEC': # electronic edition copyright.
-            md.copyright = v
+            md.copyright = metadata.Copyright(v)
 
         else:
             wasParsed = False

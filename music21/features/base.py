@@ -27,7 +27,7 @@ from music21 import text
 from music21.metadata.bundles import MetadataEntry
 
 from music21 import environment
-_MOD = 'features/base.py'
+_MOD = 'features.base'
 environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------

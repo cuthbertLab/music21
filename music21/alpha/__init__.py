@@ -22,7 +22,8 @@ requirement)
 
 This directory is a compromise between removing the features altogether and
 putting them in the main documentation.  Some of these features may "graduate"
-to the main music21 module set.  Some may be removed.  Some may stay here
+to the main music21 module set.  Some may be moved to 
+https://github.com/cuthbertLab/music21-demos .  Some may stay here
 indefinitely.
 
 medren will probably reappear in another form in a directory called "medren" at some
@@ -32,24 +33,10 @@ When adding files here, update documentation.library.iterators
 '''
 __all__ = [ #dirs
            'analysis',
-           'counterpoint',
-           'theoryAnalysis',
-           'trecento',
-           'webapps',
 
            #files
-           'chant',
-           'contour',
-           'medren']
+           ]
 
 from music21.alpha import analysis
-from music21.alpha import counterpoint
-from music21.alpha import theoryAnalysis
-from music21.alpha import trecento
-from music21.alpha import webapps
-
-from music21.alpha import chant
-from music21.alpha import contour
-from music21.alpha import medren
 
 

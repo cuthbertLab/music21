@@ -137,7 +137,7 @@ from music21 import tie
 from music21.romanText import rtObjects
 
 from music21 import environment
-_MOD = 'romanText.translate.py'
+_MOD = 'romanText.translate'
 environLocal = environment.Environment(_MOD)
 
 USE_RN_CACHE = False

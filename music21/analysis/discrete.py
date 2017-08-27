@@ -35,7 +35,7 @@ from music21 import key
 
 
 from music21 import environment
-_MOD = 'discrete.py'
+_MOD = 'analysis.discrete'
 environLocal = environment.Environment(_MOD)
 
 

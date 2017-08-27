@@ -26,7 +26,7 @@ from music21 import environment
 from music21.test import testRunner
 from music21.test import commonTest
 
-_MOD = 'testSingleCoreAll.py'
+_MOD = 'test.testSingleCoreAll'
 environLocal = environment.Environment(_MOD)
 
 from music21.test import coverageM21
@@ -52,8 +52,10 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
     environLocal.printDebug('looking for Test classes...\n')
     # look over each module and gather doc tests and unittests
     totalModules = 0
-
-    for moduleObject in common.sortModules(modules):
+    sortMods = common.misc.sortModules(modules)
+    # print(dir(sortMods[0]))
+    
+    for moduleObject in sortMods:
         unitTestCases = []
         if limit is not None:
             if totalModules > limit:

@@ -103,6 +103,7 @@ class Expression(base.Music21Object):
 
     def __init__(self):
         super().__init__()
+        self.tieAttach = 'first' # attach to first note of a tied group.
 
     def __repr__(self):
         return '<music21.expressions.%s>' % (self.__class__.__name__)
@@ -386,8 +387,7 @@ class Ornament(Expression):
         super().__init__()
         self.connectedToPrevious = True
         # should follow directly on previous; true for most "ornaments".
-        self.tieAttach = 'first' # attach to first note of a tied group.
-
+        
     def realize(self, srcObj):
         '''
         subclassible method call that takes a sourceObject

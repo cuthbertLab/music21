@@ -57,7 +57,7 @@ from music21.corpus import manager
 from music21.corpus import work
 
 from music21 import environment
-_MOD = "corpus.base.py"
+_MOD = "corpus"
 environLocal = environment.Environment(_MOD)
 
 from music21.exceptions21 import CorpusException

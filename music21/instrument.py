@@ -33,7 +33,7 @@ from music21 import pitch
 from music21.exceptions21 import InstrumentException
 
 from music21 import environment
-_MOD = "instrument.py"
+_MOD = "instrument"
 environLocal = environment.Environment(_MOD)
 
 def unbundleInstruments(streamIn, *, inPlace=False):

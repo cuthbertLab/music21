@@ -36,7 +36,7 @@ from music21.musedata import translate
 
 from music21 import common
 from music21 import environment
-_MOD = 'musedata.base.py'
+_MOD = 'musedata'
 environLocal = environment.Environment(_MOD)
 
 # for implementation

@@ -32,7 +32,7 @@ from music21 import tie
 from music21 import volume
 
 from music21 import environment
-_MOD = "note.py"
+_MOD = "note"
 environLocal = environment.Environment(_MOD)
 
 noteheadTypeNames = [

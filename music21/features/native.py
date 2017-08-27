@@ -23,7 +23,7 @@ from urllib.parse import urlencode # @UnresolvedImport @Reimport
 from music21.features import base as featuresModule
 from music21 import text
 from music21 import environment
-_MOD = 'features/native.py'
+_MOD = 'features.native'
 environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------

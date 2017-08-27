@@ -38,7 +38,7 @@ from music21.musicxml import m21ToXml
 from music21.midi import translate as midiTranslate
 
 from music21 import environment
-_MOD = "testStream.py"
+_MOD = 'testStream'
 environLocal = environment.Environment(_MOD)
 
 
@@ -4366,10 +4366,10 @@ class Test(unittest.TestCase):
 
         # get elements by offset
 
-        found1 = s.getElementsByOffset(0, 40)
+        found1 = s.getElementsByOffset(0, 40).stream()
         self.assertEqual(len(found1.notesAndRests), 2)
         # check within the maximum range
-        found2 = s.getElementsByOffset(40, 60)
+        found2 = s.getElementsByOffset(40, 60).stream()
         self.assertEqual(len(found2.notesAndRests), 0)
         # found the barline
         self.assertEqual(found2[0], b1)
@@ -7798,10 +7798,34 @@ class Test(unittest.TestCase):
             #print(note1.id, note2.id, note3.id, note4.id)
         # TEST???
 
+# REMOVED: Turns out that it DOES have fermata on every note!
+#     def testSchoenbergChordifyFermatas(self):
+#         '''
+#         test that aftter chordification, only
+#         the specific time point with a fermata has a fermata.
+#         '''
+#         from music21 import corpus
+#         schoenberg = corpus.parse('schoenberg/opus19', 6)
+#         excerpt = schoenberg.measures(10, 10)
+#         chordBefore = excerpt.parts[0].getElementsByClass('Measure')[0].notes[0]
+#         for n in chordBefore:
+#             print(n, n.expressions)
+#         return
+#         chorded = excerpt.chordify()
+#         
+#         m10 = chorded.getElementsByClass('Measure')[0]
+#         c0 = m10.notes[0]
+#         self.assertEqual(c0.expressions, [])
+#         cLastButOne = m10.notes[-2]
+#         self.assertEqual(len(cLastButOne.expressions), 1)
+#         self.assertIn('Fermata', cLastButOne.expressions[0])
+#         cLast = m10.notes[-1]
+#         self.assertEqual(cLast.expressions, [])
+        
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    music21.mainTest(Test, 'verbose') #, runTest='testVoicesALonger')
+    music21.mainTest(Test, 'verbose', runTest='testSchoenbergChordifyFermatas')
 
 #------------------------------------------------------------------------------
 # eof

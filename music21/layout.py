@@ -98,7 +98,7 @@ from music21 import spanner
 from music21 import stream
 
 from music21 import environment
-_MOD = "layout.py"
+_MOD = "layout"
 environLocal = environment.Environment(_MOD)
 
 

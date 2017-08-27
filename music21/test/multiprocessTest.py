@@ -33,7 +33,7 @@ from music21 import common
 from music21.test import testRunner
 from music21.test import commonTest
 
-_MOD = 'multiprocessTest.py'
+_MOD = 'test.multiprocessTest'
 environLocal = environment.Environment(_MOD)
 
 ModuleResponse = collections.namedtuple('ModuleResponse',
@@ -51,6 +51,7 @@ def runOneModuleWithoutImp(args):
     timeStart = time.time()
 
     moduleObject = modGath.getModuleWithoutImp(fp)
+    
     environLocal.printDebug('running %s \n' % fp)
     if moduleObject == 'skip':
         success = '%s is skipped \n' % fp
@@ -122,10 +123,9 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
 
 
     modGather = commonTest.ModuleGather(useExtended=True)
-
+    
     maxTimeout = 200
     pathsToRun = modGather.modulePaths # [30:60]
-
 
     pool = multiprocessing.Pool(processes=poolSize) # @UndefinedVariable # pylint: disable=not-callable
 

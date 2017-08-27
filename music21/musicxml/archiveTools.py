@@ -17,7 +17,7 @@ import zipfile
 
 from music21 import common
 from music21 import environment
-_MOD = 'musicxml/archiveTools.py'
+_MOD = 'musicxml.archiveTools'
 environLocal = environment.Environment(_MOD)
 
 

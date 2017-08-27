@@ -61,7 +61,7 @@ from music21.stream import filters
 from music21.common import opFrac
 
 from music21 import environment
-_MOD = "stream.py"
+_MOD = 'stream'
 environLocal = environment.Environment(_MOD)
 
 StreamException = exceptions21.StreamException
@@ -2844,7 +2844,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             includeElementsThatEndAtStart=True,
                             classList=None):
         '''
-        Returns a Stream containing all Music21Objects that
+        Returns a StreamIterator containing all Music21Objects that
         are found at a certain offset or within a certain
         offset time range (given the start and optional stop values).
 
@@ -2895,8 +2895,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
             .. image:: images/getElementsByOffset.*
                 :width: 600
-
-
 
 
         >>> st1 = stream.Stream()
@@ -2957,7 +2955,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         1
         >>> [el.step for el in out9]
         ['D']
-
 
 
         >>> a = stream.Stream()
@@ -3049,7 +3046,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                          includeElementsThatEndAtStart=includeElementsThatEndAtStart)
         if classList is not None:
             siterator.getElementsByClass(classList)
-        return siterator.stream()
+        return siterator
 
 
     def getElementAtOrBefore(self, offset, classList=None):
@@ -9613,12 +9610,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         elEnd = elOffset + el.quarterLength
 
         if elEnd != elOffset: # i.e. not zero length
-            otherElements = self.getElementsByOffset(elOffset, elEnd,
-                                                     mustBeginInSpan=False,
-                                                     includeEndBoundary=False,
-                                                     includeElementsThatEndAtStart=False)
+            otherElements = self.getElementsByOffset(
+                 elOffset, 
+                 elEnd,
+                 mustBeginInSpan=False,
+                 includeEndBoundary=False,
+                 includeElementsThatEndAtStart=False).stream()
         else:
-            otherElements = self.getElementsByOffset(elOffset, mustBeginInSpan=False)
+            otherElements = self.getElementsByOffset(elOffset, 
+                                                     mustBeginInSpan=False).stream()
 
         otherElements.offset = elOffset
         otherElements.quarterLength = el.quarterLength
@@ -10135,6 +10135,48 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.insert(4.0, v1)    # replacement variant
         >>> s.insert(12.0, v2)  # insertion variant (2 bars replace 1 bar)
         >>> s.insert(20.0, v3)  # deletion variant (0 bars replace 1 bar)
+        >>> s.show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note D>
+            {1.0} <music21.note.Note E>
+            {2.0} <music21.note.Note F>
+            {3.0} <music21.note.Note G>
+        {4.0} <music21.variant.Variant object of length 4.0>
+        {4.0} <music21.stream.Measure 2 offset=4.0>
+            {0.0} <music21.note.Note A>
+            {2.0} <music21.note.Note B->
+            {3.0} <music21.note.Note A>
+        {8.0} <music21.stream.Measure 3 offset=8.0>
+            {0.0} <music21.note.Note G>
+            {1.0} <music21.note.Note A>
+            {1.5} <music21.note.Note G>
+            {2.0} <music21.note.Note F>
+            {3.0} <music21.note.Note E>
+        {12.0} <music21.variant.Variant object of length 8.0>
+        {12.0} <music21.stream.Measure 4 offset=12.0>
+            {0.0} <music21.note.Note D>
+            {2.0} <music21.note.Note A>
+        {16.0} <music21.stream.Measure 5 offset=16.0>
+            {0.0} <music21.note.Note D>
+            {1.0} <music21.note.Note E>
+            {2.0} <music21.note.Note F>
+            {3.0} <music21.note.Note G>
+        {20.0} <music21.variant.Variant object of length 0.0>
+        {20.0} <music21.stream.Measure 6 offset=20.0>
+            {0.0} <music21.note.Note A>
+            {2.0} <music21.note.Note B->
+            {3.0} <music21.note.Note A>
+        {24.0} <music21.stream.Measure 7 offset=24.0>
+            {0.0} <music21.note.Note G>
+            {1.0} <music21.note.Note A>
+            {1.5} <music21.note.Note B->
+            {2.0} <music21.note.Note C>
+            {3.0} <music21.note.Note C>
+        {28.0} <music21.stream.Measure 8 offset=28.0>
+            {0.0} <music21.note.Note F>
+            {4.0} <music21.bar.Barline style=final>
 
         >>> docvariant = s.activateVariants('docvariants')
 
@@ -10557,9 +10599,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         deletedMeasures = [] # For keeping track of what measure numbers are deleted
         #length of the deleted region
         lengthDifference = v.replacementDuration - v.containedHighestTime
+        
         removed = variant.Variant() # what group should this have?
-        removed.groups = ['default'] #for now, default
+        removed.groups = ['default'] # for now, default
         removed.replacementDuration = v.containedHighestTime
+        
         vStart = self.elementOffset(v)
         deletionStart = vStart + v.containedHighestTime
 
@@ -10580,7 +10624,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if "Measure" in e.classes:
                 #If there are deleted numbers still saved, assign this measure the
                 # next highest and remove it from the list.
-                if deletedMeasures != []:
+                if deletedMeasures:
                     e.number = deletedMeasures.pop(False)
                     #Save the highest number assigned so far. If there are numberless
                     # inserted measures at the end, this will name where to begin numbering.

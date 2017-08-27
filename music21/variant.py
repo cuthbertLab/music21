@@ -34,7 +34,7 @@ from music21 import note
 from music21 import search
 from music21 import stream
 
-_MOD = "variant.py"
+_MOD = "variant"
 environLocal = environment.Environment(_MOD)
 
 
@@ -2336,7 +2336,7 @@ class Variant(base.Music21Object):
                 includeEndBoundary=False,
                 mustFinishInSpan=False,
                 mustBeginInSpan=True,
-                classList=classes)
+                classList=classes).stream()
 
         elif self.lengthType == 'deletion':
             vMiddle = vStart + self.containedHighestTime
@@ -2350,11 +2350,11 @@ class Variant(base.Music21Object):
                 includeEndBoundary=False,
                 mustFinishInSpan=False,
                 mustBeginInSpan=True,
-                classList=classes)
+                classList=classes).stream()
             returnPart2 = contextStream.getElementsByOffset(vMiddle, vEnd,
                 includeEndBoundary=False,
                 mustFinishInSpan=False,
-                mustBeginInSpan=True)
+                mustBeginInSpan=True).stream()
 
             returnStream = returnPart1
             for e in returnPart2.elements:

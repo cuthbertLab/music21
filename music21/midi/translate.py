@@ -25,7 +25,7 @@ from music21 import exceptions21
 from music21 import environment
 from music21 import stream
 
-_MOD = "midi.translate.py"
+_MOD = "midi.translate"
 environLocal = environment.Environment(_MOD)
 
 

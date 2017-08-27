@@ -31,7 +31,7 @@ from music21 import stream
 from music21 import exceptions21
 
 from music21 import environment
-_MOD = 'converter/subConverters.py'
+_MOD = 'converter.subConverters'
 environLocal = environment.Environment(_MOD)
 
 # pylint complains when abstract methods are not overwritten, but that's okay.
@@ -353,7 +353,7 @@ class ConverterIPython(SubConverter):
                                               subformats=helperSubformats, **keywords)
 
                 if helperSubformats[0] == 'png':
-                    if environLocal['musescoreDirectPNGPath'] != '/skip':
+                    if not str(environLocal['musescoreDirectPNGPath']).startswith('/skip'):
                         ipo = ipythonObjects.IPythonPNGObject(fp)
                         display(Image(data=ipo.getData(), retina=True))
                     else:
@@ -877,7 +877,7 @@ class ConverterMusicXML(SubConverter):
 
         if (subformats is not None
                 and ('png' in subformats or 'pdf' in subformats)
-                and environLocal['musescoreDirectPNGPath'] != '/skip'):
+                and not str(environLocal['musescoreDirectPNGPath']).startswith('/skip')):
             fp = self.runThroughMusescore(fp, subformats, **keywords)
 
         return fp

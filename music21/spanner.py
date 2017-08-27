@@ -31,7 +31,7 @@ from music21 import defaults
 from music21 import style
 
 from music21 import environment
-_MOD = "spanner.py"
+_MOD = "spanner"
 environLocal = environment.Environment(_MOD)
 
 

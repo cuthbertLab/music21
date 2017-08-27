@@ -88,7 +88,7 @@ from music21 import exceptions21
 from music21 import environment
 from music21 import style
 
-_MOD = "articulations.py"
+_MOD = "articulations"
 environLocal = environment.Environment(_MOD)
 
 

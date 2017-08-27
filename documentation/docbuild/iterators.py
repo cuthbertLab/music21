@@ -84,7 +84,6 @@ class ModuleIterator(Iterator):
 
     _ignoredDirectoryNames = (
         'archive',
-        'demos',
         'ext',
         'server',
         'source',

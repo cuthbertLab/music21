@@ -1152,12 +1152,6 @@ class Test(unittest.TestCase):
             self.assertEqual(dst, toRoman(src))
 
     def testWeightedSelection(self):
-
-        #from music21 import environment
-        #_MOD = "common.py"
-        #environLocal = environment.Environment(_MOD)
-
-
         # test equal selection
         for j in range(10):
             x = 0

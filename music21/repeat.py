@@ -24,7 +24,7 @@ from music21 import spanner
 from music21 import style
 
 from music21 import environment
-_MOD = 'repeat.py'
+_MOD = 'repeat'
 environLocal = environment.Environment(_MOD)
 
 

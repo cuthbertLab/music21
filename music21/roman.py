@@ -34,7 +34,7 @@ from music21 import scale
 from music21.figuredBass import notation as fbNotation
 
 from music21 import environment
-_MOD = 'roman.py'
+_MOD = 'roman'
 environLocal = environment.Environment(_MOD)
 
 # TODO: setting inversion should change the figure

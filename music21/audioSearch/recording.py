@@ -12,19 +12,13 @@
 '''
 modules for audio searching that directly record from the microphone.
 
-
 Requires PyAudio and portaudio to be installed (http://www.portaudio.com/download.html)
-
 
 To download pyaudio for windows 64-bit go to http://www.lfd.uci.edu/~gohlke/pythonlibs/
 
-
 users of 64-bit windows but 32-bit python should download the win32 port
 
-
 users of 64-bit windows and 64-bit python should download the amd64 port
-
-
 '''
 import os
 import unittest
@@ -34,7 +28,7 @@ import wave
 from music21 import exceptions21
 
 from music21 import environment
-_MOD = "audiosearch.recording.py"
+_MOD = "audioSearch.recording"
 environLocal = environment.Environment(_MOD)
 
 

@@ -94,7 +94,6 @@ __all__ = [
     'common',
     'converter',
     'corpus',
-    'demos',
     'features',
     'figuredBass',
     'humdrum',
@@ -190,4 +189,3 @@ from music21 import * # @UnresolvedImport # pylint: disable=wildcard-import
 
 #------------------------------------------------------------------------------
 # eof
-

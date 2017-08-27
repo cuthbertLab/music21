@@ -20,12 +20,12 @@ To do a release,
     every once in a while run corpus.corpora.CoreCorpus().rebuildMetadataCache()
     (40 min on MacPro) -- either of these MAY change a lot of tests in corpus, metadata, etc.
     so don't skip the next step!
-3. run test/warningMultiprocessTest.py  for Python2 AND Python3 -- fix all warnings!
+3. run test/warningMultiprocessTest.py for lowest and highest version -- fix all warnings!
 4. run test/testLint.py and fix any lint errors
 5. commit and then check test/testSingleCoreAll.py results on Travis-CI
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
      but should be done before making a release).
-6. then python3 test/testDocumentation.py # only designed for Python 3... [*]
+6. then python3 test/testDocumentation.py [*]
 
 [*] you will need pytest and nbval installed (along with ipython and jupyter)
 
@@ -73,22 +73,13 @@ To do a release,
 DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do.
 '''
 
-
 import hashlib, os, sys, tarfile
 
 from music21 import base
 from music21 import common
 
 from music21 import environment
-_MOD = 'dist.py'
-environLocal = environment.Environment(_MOD)
-
-
-'''
-Build and upload music21 in two formats: exe, and tar.
-
-Simply call from the command line.
-'''
+environLocal = environment.Environment('..dist.dist')
 
 PY = sys.executable
 environLocal.warn("using python executable at %s" % PY)

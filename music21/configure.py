@@ -35,17 +35,17 @@ from music21 import common
 from music21 import environment
 from music21 import exceptions21
 
-_MOD = "configure.py"
+_MOD = "configure"
 environLocal = environment.Environment(_MOD)
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 #-------------------------------------------------------------------------------
 # match finale name, which may be directory or something else
-reFinaleApp = re.compile(r'Finale (?:Notepad )?20[0-2][0-9][a-z\.0-9]*.app',
+reFinaleApp = re.compile(r'Finale.*.app',
                          re.IGNORECASE) # @UndefinedVariable
 reSibeliusApp = re.compile(r'Sibelius.app', re.IGNORECASE) # @UndefinedVariable
-reFinaleExe = re.compile(r'Finale (?:Notepad )?20[0-2][0-9][a-z\.0-9]*.exe',
+reFinaleExe = re.compile(r'Finale.*.exe',
                          re.IGNORECASE) # @UndefinedVariable
 reSibeliusExe = re.compile(r'Sibelius.exe', re.IGNORECASE) # @UndefinedVariable
 reFinaleReaderApp = re.compile(r'Finale Reader.app', re.IGNORECASE) # @UndefinedVariable
@@ -1755,10 +1755,10 @@ class Test(unittest.TestCase):
 
         self.assertEqual(reFinaleApp.match('final adsf 2011'), None)
 
-        g = reFinaleApp.match('Finale 2009.app')
-        self.assertEqual(g.group(0), 'Finale 2009.app')
+        g = reFinaleApp.match('Finale.app')
+        self.assertEqual(g.group(0), 'Finale.app')
 
-        self.assertEqual(reFinaleApp.match('Finale 1992.app'), None)
+        self.assertEqual(reFinaleApp.match('Final Cut 2017.app'), None)
 
 
     def testConfigurationAssistant(self):
