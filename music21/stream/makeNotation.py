@@ -1397,10 +1397,10 @@ def moveNotesToVoices(source, classFilterList=('GeneralNote',)):
 
 
 
-def getTiePitchSet(previousNoteOrChord):
+def getTiePitchSet(prior):
     '''
     helper method for makeAccidentals to get the tie pitch set (or None) 
-    from the previousNoteOrChord
+    from the prior
 
     >>> n1 = note.Note('C4')
     >>> n2 = note.Note('D4')
@@ -1422,24 +1422,26 @@ def getTiePitchSet(previousNoteOrChord):
     >>> stream.makeNotation.getTiePitchSet(r) is None
     True
 
-    Note, Rest, or Chord without ties, returns an empty set:
+    Note or Chord without ties, returns an empty set:
     
     >>> n = note.Note('F#5')
     >>> stream.makeNotation.getTiePitchSet(n)
     set()
 
+    Rest return None
+
     >>> r = note.Rest()
-    >>> stream.makeNotation.getTiePitchSet(r)
-    set()
+    >>> stream.makeNotation.getTiePitchSet(r) is None
+    True
     '''
-    if not hasattr(previousNoteOrChord, 'tie'):
+    if not hasattr(prior, 'tie') or not hasattr(prior, 'pitches'):
         return None
     else:
         tiePitchSet = set()
-        if 'Chord' in previousNoteOrChord.classes:
-            previousNotes = list(previousNoteOrChord)
+        if 'Chord' in prior.classes:
+            previousNotes = list(prior)
         else:
-            previousNotes = [previousNoteOrChord]
+            previousNotes = [prior]
             
         for n in previousNotes:
             if n.tie is None or n.tie.type == 'stop':
