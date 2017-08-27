@@ -32,8 +32,8 @@ exclude_lines = [
                 r'class TestExternal.*',
                 ]
 
-def getCoverage():
-    if sys.version_info.minor == 5: # run on Py 3.5 -- to get Py 3.4 and 3.6 timing...
+def getCoverage(overrideVersion=False):
+    if overrideVersion or sys.version_info.minor == 5: # run on Py 3.5 -- to get Py 3.4 and 3.6 timing...
         try:
             import coverage
             cov = coverage.coverage(omit=omit_modules)

@@ -358,6 +358,7 @@ class ModuleGather:
         try:
             with warnings.catch_warnings():
                 # warnings.simplefilter('ignore', RuntimeWarning)
+                importlib.invalidate_caches()
                 mod = importlib.import_module(name)
         except Exception as excp: # pylint: disable=broad-except
             environLocal.warn(['failed import:', fp, '\n',
