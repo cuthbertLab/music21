@@ -1127,7 +1127,8 @@ class MidiTrack:
         return False
 
     def setChannel(self, value):
-        '''Set the channel of all events in this Track.
+        '''
+        Set the channel of all events in this Track.
         '''
         if value not in range(1, 17): # count from 1
             raise MidiException('bad channel value: %s' % value)
@@ -1135,7 +1136,8 @@ class MidiTrack:
             e.channel = value
 
     def getChannels(self):
-        '''Get all channels used in this Track.
+        '''
+        Get all channels used in this Track.
         '''
         post = []
         for e in self.events:
@@ -1144,7 +1146,8 @@ class MidiTrack:
         return post
 
     def getProgramChanges(self):
-        '''Get all unique program changes used in this Track, sorted.
+        '''
+        Get all unique program changes used in this Track, sorted.
         '''
         post = []
         for e in self.events:

@@ -663,8 +663,10 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
 
 
 #-------------------------------------------------------------------------------
-def instrumentToMidiEvents(inputM21, includeDeltaTime=True,
-                            midiTrack=None, channel=1):
+def instrumentToMidiEvents(inputM21, 
+                           includeDeltaTime=True,
+                           midiTrack=None, 
+                           channel=1):
     '''
     Converts a :class:`~music21.instrument.Instrument` object to a list of MidiEvents
 
@@ -1115,8 +1117,10 @@ def _streamToPackets(s, trackId=1):
     return packetsByOffset
 
 
-def _processPackets(packets, channelForInstrument=None, channelsDynamic=None,
-        initChannelForTrack=None):
+def _processPackets(packets, 
+                    channelForInstrument=None, 
+                    channelsDynamic=None,
+                    initChannelForTrack=None):
     '''
     Given a list of packets, assign each to a channel.
 
@@ -1158,26 +1162,29 @@ def _processPackets(packets, channelForInstrument=None, channelsDynamic=None,
 
         # only need note_ons, as stored correspondingEvent attr can be used
         # to get noteOff
-        if p['midiEvent'].type not in ['NOTE_ON']:
+        if p['midiEvent'].type != 'NOTE_ON':
             # set all not note-off messages to init channel
-            if p['midiEvent'].type not in ['NOTE_OFF']:
+            if p['midiEvent'].type != 'NOTE_OFF':
                 p['midiEvent'].channel = p['initChannel']
             post.append(p) # add the non note_on packet first
             # if this is a note off, and has a cent shift, need to
             # rest the pitch bend back to 0 cents
-            if p['midiEvent'].type in ['NOTE_OFF']:
+            if p['midiEvent'].type == 'NOTE_OFF':
                 #environLocal.printDebug(['got note-off', p['midiEvent']])
                 # cent shift is set for note on and note off
                 if p['centShift'] is not None:
                     # do not set channel, as already set
                     me = midiModule.MidiEvent(p['midiEvent'].track,
-                        type="PITCH_BEND", channel=p['midiEvent'].channel)
+                                              type="PITCH_BEND", 
+                                              channel=p['midiEvent'].channel)
                     # note off stores note on's pitch; do not invert, simply
                     # set to zero
                     me.setPitchBend(0)
                     pBendEnd = _getPacket(trackId=p['trackId'],
-                        offset=p['offset'], midiEvent=me,
-                        obj=None, lastInstrument=None)
+                                            offset=p['offset'], 
+                                            midiEvent=me,
+                                            obj=None, 
+                                            lastInstrument=None)
                     post.append(pBendEnd)
                     #environLocal.printDebug(['adding pitch bend', pBendEnd])
             continue # store and continue
@@ -1246,11 +1253,14 @@ def _processPackets(packets, channelForInstrument=None, channelsDynamic=None,
             # move channels for a different reason
             if p['lastInstrument'] is not None:
                 meList = instrumentToMidiEvents(inputM21=p['lastInstrument'],
-                    includeDeltaTime=False,
-                    midiTrack=p['midiEvent'].track, channel=ch)
+                                                includeDeltaTime=False,
+                                                midiTrack=p['midiEvent'].track, 
+                                                channel=ch)
                 pgmChangePacket = _getPacket(trackId=p['trackId'],
-                    offset=o, midiEvent=meList[0], # keep offset here
-                    obj=None, lastInstrument=None)
+                                                offset=o, # keep offset here
+                                                midiEvent=meList[0], 
+                                                obj=None, 
+                                                lastInstrument=None)
                 post.append(pgmChangePacket)
 
         else: # use the existing channel
@@ -1264,7 +1274,8 @@ def _processPackets(packets, channelForInstrument=None, channelsDynamic=None,
         if centShift is not None:
             # add pitch bend
             me = midiModule.MidiEvent(p['midiEvent'].track,
-                                    type="PITCH_BEND", channel=ch)
+                                      type="PITCH_BEND", 
+                                      channel=ch)
             me.setPitchBend(centShift)
             pBendStart = _getPacket(trackId=p['trackId'],
                                     offset=o,
@@ -1308,16 +1319,21 @@ def _processPackets(packets, channelForInstrument=None, channelsDynamic=None,
     for trackId in usedTracks:
         ch = initChannelForTrack[trackId]
         # use None for track; will get updated later
-        me = midiModule.MidiEvent(track=trackId, type="PITCH_BEND", channel=ch)
+        me = midiModule.MidiEvent(track=trackId, 
+                                  type="PITCH_BEND", 
+                                  channel=ch)
         me.setPitchBend(0)
         pBendEnd = _getPacket(trackId=trackId,
-            offset=0, midiEvent=me, obj=None, lastInstrument=None)
+                              offset=0, 
+                              midiEvent=me, 
+                              obj=None, 
+                              lastInstrument=None)
         post.append(pBendEnd)
         #environLocal.printDebug(['adding pitch bend for found channels', me])
     # this sort is necessary
     post.sort(
         key=lambda x: (x['offset'], x['midiEvent'].sortOrder)
-        )
+    )
 
     # TODO: for each track, add an additional silent event to make sure
     # entire duration gets played
@@ -1402,8 +1418,11 @@ def packetsToMidiTrack(packets, trackId=1, channels=None):
     return mt
 
 
-def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
-    inputM21=None, **keywords):
+def midiTrackToStream(mt, 
+                      ticksPerQuarter=None, 
+                      quantizePost=True,
+                      inputM21=None, 
+                      **keywords):
     '''
     Note that quantization takes place in stream.py since it's useful not just for MIDI.
 
@@ -1525,8 +1544,8 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
     # first create meta events
     for t, obj in metaEvents:
         #environLocal.printDebug(['insert midi meta event:', t, obj])
-        s.insert(t / float(ticksPerQuarter), obj)
-
+        s.coreInsert(t / ticksPerQuarter, obj)
+    s.coreElementsChanged()
     #environLocal.printDebug([
     #    'midiTrackToStream(): found notes ready for Stream import', len(notes)])
 
@@ -1608,6 +1627,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                 #iSkip = 1
             #break # exit secondary loop
             i += 1
+
     elif len(notes) == 1: # rare case of just one note
         n = note.Note()
         midiEventsToNote(notes[0], ticksPerQuarter, n)
@@ -1630,7 +1650,6 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                    inPlace=True)
 
     if voicesRequired:
-        pass
         # this procedure will make the appropriate rests
         s.makeVoices(inPlace=True, fillGaps=True)
     else:
@@ -1800,9 +1819,9 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
 
     # process all channel assignments for all packets together
     netPackets = _processPackets(netPackets,
-        channelForInstrument=channelForInstrument,
-        channelsDynamic=channelsDynamic,
-        initChannelForTrack=initChannelForTrack)
+                                 channelForInstrument=channelForInstrument,
+                                 channelsDynamic=channelsDynamic,
+                                 initChannelForTrack=initChannelForTrack)
 
     #environLocal.printDebug(['got netPackets:', len(netPackets),
     #    'packetStorage keys (tracks)', packetStorage.keys()])
@@ -1814,7 +1833,8 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
         # TODO: for a given track id, need to find start/end channel
         mt = midiModule.MidiTrack(trackId)
         # need to pass preferred channel here
-        mt.events += getStartEvents(mt, channel=initChannel,
+        mt.events += getStartEvents(mt, 
+                                    channel=initChannel,
                                     instrumentObj=instObj)
         # note that netPackets is must be passed here, and then be filtered
         # packets have been added to net packets
@@ -1846,8 +1866,11 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
         #environLocal.printDebug(['raw midi trakcs', mt])
         if mt.hasNotes():
             streamPart = stream.Part() # create a part instance for each part
-            midiTrackToStream(mt, ticksPerQuarter, quantizePost,
-                              inputM21=streamPart, **keywords)
+            midiTrackToStream(mt, 
+                              ticksPerQuarter, 
+                              quantizePost,
+                              inputM21=streamPart, 
+                              **keywords)
 #             streamPart._setMidiTracksPart(mt,
 #                 ticksPerQuarter=ticksPerQuarter, quantizePost=quantizePost)
             s.insert(0, streamPart)
@@ -2030,16 +2053,15 @@ def midiStringToStream(strData):
     Convert a string of binary midi data to a Music21 stream.Score object.
 
     TODO: NOT WORKING AS IT SHOULD
-
     '''
-#   midiBinStr='MThd\x00\x00\x00\x06\x00\x01\x00\x01\x03\xc0MTrk\x00\x00\x00\x04\x00\x901\x0f'
-#
+    
+#     >>> midiBinStr = (b'MThd\x00\x00\x00\x06\x00\x01\x00\x01\x03\xc0'
+#     ...               + b'MTrk\x00\x00\x00\x04\x00\x901\x0f')
 #     >>> s = midi.translate.midiStringToStream(midiBinStr)
 #     >>> s.show('text')
 #     {0.0} <music21.stream.Part ...>
 #         {0.0} <music21.note.Note G>
-#
-
+    
 
     from music21 import midi as midiModule
 
@@ -2477,8 +2499,10 @@ class Test(unittest.TestCase):
         # test instrument assignments
         from music21 import instrument
 
-        iList = [instrument.Harpsichord,  instrument.Viola,
-                    instrument.ElectricGuitar, instrument.Flute]
+        iList = [instrument.Harpsichord,  
+                 instrument.Viola,
+                 instrument.ElectricGuitar, 
+                 instrument.Flute]
 
         # number of notes, ql, pitch
         pmtr = [(8, 1, 'C6'), (4, 2, 'G3'), (2, 4, 'E4'), (6, 1.25, 'C5')]

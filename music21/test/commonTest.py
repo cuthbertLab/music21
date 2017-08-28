@@ -16,7 +16,12 @@ import doctest
 import os
 import types
 import warnings
-import importlib
+
+#import importlib
+with warnings.catch_warnings():
+    warnings.simplefilter('ignore', DeprecationWarning)
+    warnings.simplefilter('ignore', PendingDeprecationWarning)
+    import imp
 
 import unittest.runner
 from unittest.signals import registerResult
@@ -352,14 +357,18 @@ class ModuleGather:
                 break
         if skip:
             return None
-        name = self._getNamePeriod(fp, addM21=True)
+        
+        name = self._getName(fp)
+        # for importlib
+        # name = self._getNamePeriod(fp, addM21=True)
         
         # print(name, os.path.dirname(fp))
         try:
             with warnings.catch_warnings():
                 # warnings.simplefilter('ignore', RuntimeWarning)
-                importlib.invalidate_caches()
-                mod = importlib.import_module(name)
+                # importlib is messing with coverage...
+                mod = imp.load_source(name, fp)
+                # mod = importlib.import_module(name)
         except Exception as excp: # pylint: disable=broad-except
             environLocal.warn(['failed import:', fp, '\n',
                 '\tEXCEPTION:', str(excp).strip()])
