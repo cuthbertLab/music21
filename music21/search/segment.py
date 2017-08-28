@@ -198,7 +198,7 @@ def indexScoreFilePaths(scoreFilePaths,
 
     indexFunc = partial(_indexSingleMulticore, *args, **kwds)
 
-    rpList = common.runParallel(scoreFilePaths, indexFunc, updateFunction)
+    rpList = common.runParallel(scoreFilePaths, indexFunc, updateFunction=updateFunction)
     scoreDict = OrderedDict(rpList)
 
     return scoreDict

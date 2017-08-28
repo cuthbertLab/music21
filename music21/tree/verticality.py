@@ -69,8 +69,7 @@ class Verticality:
     AttributeError: 'Verticality' object has no attribute 'endTime'
 
 
-    However, we can find when the next verticality starts by looking at the
-    nextVerticality
+    However, we can find when the next verticality starts by looking at the nextVerticality
 
     >>> nv = verticality.nextVerticality
     >>> nv
@@ -306,13 +305,15 @@ class Verticality:
         the duration of some note object) from the verticality.
         
         Does nothing about ties, etc. -- a very dumb chord, but useful
-        for querying consonance, etc.
+        for querying consonance, etc.  See makeElement() for the smart version.
         
         It may be a zero- or one-pitch chord.
 
         >>> score = corpus.parse('bwv66.6')
         >>> scoreTree = score.asTimespans()
         >>> verticality = scoreTree.getVerticalityAt(4.0)
+        >>> verticality.toChord()
+        <music21.chord.Chord G#3 B3 E4 E5>
         '''
         c = chord.Chord(sorted(self.pitchSet))
         return c
@@ -343,8 +344,7 @@ class Verticality:
         >>> verticality.nextStartOffset
         2.0
 
-        If a verticality has no tree attached, then it cannot be
-
+        If a verticality has no tree attached, then it will return None
         '''
         tree = self.timespanTree
         if tree is None:
@@ -592,10 +592,11 @@ class Verticality:
         <music21.chord.Chord C4 C4>
         
         gatherArticulations and gatherExpressions can be True, False, or (default) 'single'.
-        If False, no articulations (or expressions) are transferred to the chord.
-        If True, all articulations are transferred to the chord.
-        If 'single', then no more than one articulation of each class (chosen from the lowest
-            note) will be added.  This way, the chord does not get 4 fermatas, etc.
+        
+        * If False, no articulations (or expressions) are transferred to the chord.
+        * If True, all articulations are transferred to the chord.
+        * If 'single', then no more than one articulation of each class (chosen from the lowest
+          note) will be added.  This way, the chord does not get 4 fermatas, etc.
                    
         >>> n1 = note.Note('C4')
         >>> n2 = note.Note('D4')

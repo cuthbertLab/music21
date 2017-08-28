@@ -20,6 +20,8 @@ from music21.tree import timespanTree
 
 def chordified(timespans, templateStream=None):
     r'''
+    DEPRECATED -- DO NOT USE.  Use stream.chordify() instead.
+    
     Creates a score from the PitchedTimespan objects stored in this
     offset-tree.
 
