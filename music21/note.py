@@ -6,8 +6,8 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2016 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# Copyright:    Copyright © 2006-2017 Michael Scott Cuthbert and the music21 Project
+# License:      BSD or LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
 Classes and functions for creating Notes, Rests, and Lyrics.
@@ -893,6 +893,25 @@ class NotRest(GeneralNote):
         ''')
 
     #---------------------------------------------------------------------------
+    def hasVolumeInformation(self):
+        '''
+        Returns bool whether volume was set -- saving some time for advanced
+        users (such as musicxml exporters) that only want to look at the volume
+        if it is already there.
+        
+        >>> n = note.Note()
+        >>> n.hasVolumeInformation()
+        False
+        >>> n.volume
+         <music21.volume.Volume realized=0.71>
+        >>> n.hasVolumeInformation()
+        True
+        '''
+        if self._volume is None:
+            return False
+        else:
+            return True
+    
     def _getVolume(self, forceClient=None):
         # lazy volume creation
         if self._volume is None:
@@ -906,11 +925,12 @@ class NotRest(GeneralNote):
     def _setVolume(self, value, setClient=True):
         # setParent is only False when Chords bundling Notes
         # test by looking for method
-        if hasattr(value, "getDynamicContext"):
+        if value is None:
+            self._volume = None
+        elif hasattr(value, "getDynamicContext"):
             if setClient:
                 if value.client is not None:
-                    raise NotRestException(
-                        'cannot set a volume object that has a defined client: %s' % value.client)
+                    value = copy.deepcopy(value)
                 value.client = self # set to self
             self._volume = value
         elif common.isNum(value) and setClient:
@@ -929,7 +949,6 @@ class NotRest(GeneralNote):
         doc = '''
         Get and set the :class:`~music21.volume.Volume` object of this object.
         Volume objects are created on demand.
-
 
         >>> n1 = note.Note()
         >>> n1.volume.velocity = 120
@@ -1013,13 +1032,18 @@ class Note(NotRest):
     }
 
     # Accepts an argument for pitch
-    def __init__(self, *arguments, **keywords):
+    def __init__(self, pitchName=None, **keywords):
         super().__init__(**keywords)
-        if arguments:
-            if isinstance(arguments[0], pitch.Pitch):
-                self.pitch = arguments[0]
+
+        if 'pitch' in keywords and pitchName is None:
+            pitchName = keywords['pitch']
+            del keywords['pitch']
+        
+        if pitchName is not None:
+            if isinstance(pitchName, pitch.Pitch):
+                self.pitch = pitchName
             else: # assume first argument is pitch
-                self.pitch = pitch.Pitch(arguments[0], **keywords)
+                self.pitch = pitch.Pitch(pitchName, **keywords)
         else: # supply a default pitch
             name = 'C4'
             if 'name' in keywords:

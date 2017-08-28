@@ -1496,8 +1496,18 @@ class ChromaticInterval(IntervalBase):
         >>> p4.ps
         71.0
         >>> p5 = ci.transposePitch(p4)
+        
+        Since the octave on p4 was implicit, the ps here wraps around
+        
         >>> p5.ps
         65.0
+        
+        Afterwards, spelling of the new pitch will always be inferred.
+        
+        >>> p4.spellingIsInferred
+        False
+        >>> p5.spellingIsInferred
+        True
         '''
         if p.octave is None:
             useImplicitOctave = True

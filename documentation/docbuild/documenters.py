@@ -990,6 +990,13 @@ class ClassDocumenter(ObjectDocumenter):
         >>> for line in documenter.rstInheritedMethodsFormat:
         ...     line
         ...
+        'Methods inherited from :class:`~music21.note.NotRest`:'
+        ''
+        '.. hlist::'
+        '   :columns: 3'
+        ''
+        '   - :meth:`~music21.note.NotRest.hasVolumeInformation`'
+        ''
         'Methods inherited from :class:`~music21.note.GeneralNote`:'
         ''
         '.. hlist::'

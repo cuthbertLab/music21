@@ -14,6 +14,7 @@ __all__ = ['runParallel',
            ]
 
 import multiprocessing
+import unittest
 
 from music21.ext.joblib import Parallel, delayed  # @UnresolvedImport
 
@@ -113,6 +114,10 @@ def runParallel(iterable, parallelFunction, *,
     iterLength = len(iterable)
     totalRun = 0
     numCpus = cpus()
+    if updateFunction is None:
+        updateMultiply = iterLength 
+        # if there is no need for updates, run at max speed 
+        #    -- do the whole list at once.
 
     resultsList = []
     
@@ -223,9 +228,49 @@ def cpus():
 #     return pickle.loads(pickle.dumps(obj, protocol=-1))
 
 
+
+class Test(unittest.TestCase):
+    def testMultiprocess(self):
+        files = ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']
+        output = runParallel(files, self._countN)
+        self.assertEqual(output, [165, 50, 131])
+        runParallel(files, self._countN, 
+                    updateFunction=self._customUpdate1)
+        runParallel(files, self._countN, 
+                    updateFunction=self._customUpdate2,
+                    updateSendsIterable=True)
+        passed = runParallel(list(enumerate(files)), self.unpacked,
+                    unpackIterable=True)
+        self.assertEqual(len(passed), 3)
+        self.assertNotIn(False, passed)
+
+    # testing functions
+    def _customUpdate1(self, i, total, output):
+        self.assertEqual(total, 3)
+        self.assertLess(i, 3)
+        self.assertIn(output, [165, 50, 131])
+    
+    def _customUpdate2(self, i, unused_total, unused_output, fn):
+        self.assertIn(fn, ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel'])
+    
+    @staticmethod
+    def _countN(fn):
+        from music21 import corpus
+        c = corpus.parse(fn)
+        return len(c.recurse().notes)
+
+    @staticmethod
+    def unpacked(i, fn):
+        if i >= 3:
+            return False
+        if fn not in ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']:
+            return False
+        return True
+
+
 if __name__ == "__main__":
     import music21
-    music21.mainTest()
+    music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof

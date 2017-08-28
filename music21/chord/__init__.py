@@ -269,7 +269,7 @@ class Chord(note.NotRest):
         # look at _volume so as not to create object if not already there
         for d in new._notes:
             # if .volume is called, a new Volume obj will be created
-            if d._volume is not None:
+            if d.hasVolumeInformation():
                 d.volume.client = new # update with new instance
         return new
 
@@ -1636,7 +1636,7 @@ class Chord(note.NotRest):
         count = 0
         for c in self._notes:
             # access private attribute, as property will create otherwise
-            if c._volume is not None:
+            if c.hasVolumeInformation():
                 count += 1
         if count == len(self._notes):
             #environLocal.printDebug(['hasComponentVolumes:', True])
@@ -4468,11 +4468,18 @@ class Chord(note.NotRest):
         >>> c.hasComponentVolumes()
         True
 
-        >>> c._volume == None
-        True
+        Note that this means that the chord itself does not have a volume at this moment!
+
+        >>> c.hasVolumeInformation()
+        False
 
         >>> c.volume.velocity
         96
+
+        But after called, now it does:
+        
+        >>> c.hasVolumeInformation()
+        True
 
         >>> c.volume.velocityIsRelative = False
         >>> c.volume  # return a new volume that is an average
@@ -4490,7 +4497,7 @@ class Chord(note.NotRest):
         elif self.hasComponentVolumes():
             vels = []
             for d in self._notes:
-                vels.append(d._volume.velocity)
+                vels.append(d.volume.velocity)
             # create new local object
             self._volume = volume.Volume(client=self)
             self._volume.velocity = int(round(sum(vels) / float(len(vels))))
@@ -5200,6 +5207,14 @@ class Test(unittest.TestCase):
     def testChordQuality(self):
         c1 = Chord(['c', 'e-'])
         self.assertEqual(c1.quality, 'minor')
+
+    def testVolumeInformation(self):
+        c = Chord(['g#', 'd-'])
+        c.volume = [volume.Volume(velocity=96), volume.Volume(velocity=96)]
+        self.assertTrue(c.hasComponentVolumes())
+
+        self.assertFalse(c.hasVolumeInformation())
+        self.assertIsNone(c._volume)
 
     def testVolumePerPitchA(self):
         c = Chord(['c4', 'd-4', 'g4'])

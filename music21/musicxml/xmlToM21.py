@@ -2929,7 +2929,13 @@ class MeasureParser(XMLParserBase):
         # processing
         if mxNote.get('print-object') == 'no':
             n.style.hideObjectOnPrint = True
-        # TODO: attr dynamics -- MIDI Note On velocity
+            
+        # attr dynamics -- MIDI Note On velocity with 90 = 100, but unbounded on the top
+        dynamPercentage = mxNote.get('dynamics')
+        if dynamPercentage is not None and not n.isRest:
+            dynamFloat = float(dynamPercentage) * (90 / 12700)
+            n.volume.velocityScalar = dynamFloat
+            
         # TODO: attr end-dynamics -- MIDI Note Off velocity
         # TODO: attr attack -- alter starting time of the note
         # TODO: attr release -- alter the release time of the note

@@ -3161,7 +3161,12 @@ class MeasureExporter(XMLExporterBase):
         self.setPrintStyle(mxNote, chordOrN)
         # TODO: attr-group: printout -- replaces print-object, print-spacing below (3.1)
         # TODO: attr: print-leger # musicxml 3.1
-        # TODO: attr: dynamics
+        if (chordOrN.isRest is False 
+                and chordOrN.hasVolumeInformation() 
+                and chordOrN.volume.velocityScalar is not None):
+            vel = chordOrN.volume.velocityScalar * 100 * (127 / 90)
+            mxNote.set('dynamics', "{:.2f}".format(vel))
+            
         # TODO: attr: end-dynamics
         # TODO: attr: attack
         # TODO: attr: release
