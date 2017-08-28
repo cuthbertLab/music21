@@ -140,33 +140,21 @@ class ModuleGather:
             'testLint.py',
             'testPerformance.py',
             'timeGraphs.py',
-            'exceldiff.py',
+            'timeGraphImportStar.py',
             'multiprocessTest.py',
+
             'corpus/virtual.py', # offline for v.4
             'figuredBass/examples.py', # 40 seconds and runs fine
+
             ]
 
         self.moduleSkipExtended = self.moduleSkip + [
-            'exceldiff.py',
-            'mrjobaws.py', # takes too long.
             'configure.py', # runs oddly...
 
-            'timeGraphImportStar.py',
             'testSerialization.py',
             'mptCurses.py',
             'memoryUsage.py',
 
-            'testPerformance.py',
-            'multiprocessTest.py',
-            'timeGraphs.py',
-
-            'alpha/trecento/quodJactatur.py',
-            'alpha/trecento/find_vatican1790.py',
-            'alpha/trecento/findSevs.py',
-            'alpha/trecento/correlations.py',
-            'alpha/trecento/contenanceAngloise.py',
-            'alpha/trecento/capuaProbabilities.py',
-            'alpha/theoryAnalysis/wwnortonMGTA.py',
             'test/treeYield.py',
             'test/toggleDebug.py',
 
@@ -182,17 +170,8 @@ class ModuleGather:
             'documentation/extensions.py',
 
             'corpus/testCorpus.py',
-            'composition/seeger.py',
-            'composition/aug30.py',
-            'audioSearch/scores/__init__.py',
             'audioSearch/scoreFollower.py',
             'audioSearch/repetitionGame.py',
-            'audioSearch/omrfollow.py',
-            'audioSearch/humanVScomputer.py',
-            'audioSearch/graphicalInterfaceTranscriber.py',
-            'audioSearch/graphicalInterfaceSF.py',
-            'audioSearch/graphicalInterfaceGame.py',
-            'analysis/phrasing.py',
             'abcFormat/testFiles.py',
             ]
         # run these first...

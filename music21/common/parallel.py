@@ -17,7 +17,7 @@ import multiprocessing
 
 from music21.ext.joblib import Parallel, delayed  # @UnresolvedImport
 
-def runParallel(iterable, parallelFunction,
+def runParallel(iterable, parallelFunction, *,
                 updateFunction=None, updateMultiply=3,
                 unpackIterable=False, updateSendsIterable=False):
     '''
@@ -37,7 +37,7 @@ def runParallel(iterable, parallelFunction,
     tuple of different arguments to parallelFunction.
 
     If updateSendsIterable is True then the update function will get the iterable
-    content, not the output
+    content, after the output.
 
     As of Python 3, partial functions are pickleable, so if you need to pass the same
     arguments to parallelFunction each time, make it a partial function before passing
@@ -48,12 +48,52 @@ def runParallel(iterable, parallelFunction,
     unpickling the results takes a lot of time, you won't get nearly the speedup
     from this function as you might expect.  The big culprit here is definitely
     music21 streams.
+    
+    >>> files = ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']
+    >>> def countNotes(fn):
+    ...     c = corpus.parse(fn)
+    ...     return len(c.recurse().notes)
+    >>> #_DOCS_SHOW outputs = common.runParallel(files, countNotes)
+    >>> outputs = common.runNonParallel(files, countNotes) #_DOCS_HIDE cant pickle doctest funcs.
+    >>> outputs
+    [165, 50, 131]
+    
+    Set updateFunction=True to get an update every 3 * numCpus (-1 if > 2)
+    
+    >>> #_DOCS_SHOW outputs = common.runParallel(files, countNotes, updateFunction=True)
+    >>> outputs = common.runNonParallel(files, countNotes, updateFunction=True) #_DOCS_HIDE
+    Done 0 tasks of 3
+    Done 3 tasks of 3
+    
+    With a custom updateFunction that gets each output:
+    
+    >>> def yak(position, length, output):
+    ...     print("%d:%d %d is a lot of notes!" % (position, length, output))
+    >>> #_DOCS_SHOW outputs = common.runParallel(files, countNotes, updateFunction=yak)
+    >>> outputs = common.runNonParallel(files, countNotes, updateFunction=yak) #_DOCS_HIDE
+    0:3 165 is a lot of notes!
+    1:3 50 is a lot of notes!
+    2:3 131 is a lot of notes!    
+    
+    Or with updateSendsIterable, we can get the original files data as well:
+    
+    >>> def yik(position, length, output, fn):
+    ...     print("%d:%d (%s) %d is a lot of notes!" % (position, length, fn, output))
+    >>> #_DOCS_SHOW outputs = common.runParallel(files, countNotes, updateFunction=yik,
+    >>> outputs = common.runNonParallel(files, countNotes, updateFunction=yik, #_DOCS_HIDE
+    ...             updateSendsIterable=True)
+    0:3 (bach/bwv66.6) 165 is a lot of notes!
+    1:3 (schoenberg/opus19) 50 is a lot of notes!
+    2:3 (AcaciaReel) 131 is a lot of notes!    
     '''
     # multiprocessing has trouble with introspection
     # pylint: disable=not-callable
     if multiprocessing.current_process().daemon: # @UndefinedVariable
-        return runNonParallel(iterable, parallelFunction, updateFunction,
-                              updateMultiply, unpackIterable)
+        return runNonParallel(iterable, parallelFunction, 
+                              updateFunction=updateFunction,
+                              updateMultiply=updateMultiply, 
+                              unpackIterable=unpackIterable,
+                              updateSendsIterable=updateSendsIterable)
 
     iterLength = len(iterable)
     totalRun = 0
@@ -78,7 +118,7 @@ def runParallel(iterable, parallelFunction,
                 if updateSendsIterable is False:
                     updateFunction(thisPosition, iterLength, thisResult)
                 else:
-                    updateFunction(thisPosition, iterLength, iterable[thisPosition])
+                    updateFunction(thisPosition, iterLength, thisResult, iterable[thisPosition])
 
     callUpdate(0)    
 
@@ -100,16 +140,15 @@ def runParallel(iterable, parallelFunction,
     return resultsList
 
 
-def runNonParallel(iterable, parallelFunction,
+def runNonParallel(iterable, parallelFunction, *,
                 updateFunction=None, updateMultiply=3,
                 unpackIterable=False, updateSendsIterable=False):
     '''
     This is intended to be a perfect drop in replacement for runParallel, except that
     it runs on one core only, and not in parallel.
 
-    Used, for instance, if we're already in a parallel function.
+    Used automatically if we're already in a parallelized function.
     '''
-    
     iterLength = len(iterable)
     resultsList = []
 
@@ -133,7 +172,7 @@ def runNonParallel(iterable, parallelFunction,
                 if updateSendsIterable is False:
                     updateFunction(thisPosition, iterLength, thisResult)
                 else:
-                    updateFunction(thisPosition, iterLength, iterable[thisPosition])
+                    updateFunction(thisPosition, iterLength, thisResult, iterable[thisPosition])
 
 
     callUpdate(0)
