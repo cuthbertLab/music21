@@ -104,7 +104,9 @@ def runParallel(iterable, parallelFunction, *,
     '''
     # multiprocessing has trouble with introspection
     # pylint: disable=not-callable
-    if multiprocessing.current_process().daemon: # @UndefinedVariable
+    numCpus = cpus()
+
+    if numCpus == 1 or multiprocessing.current_process().daemon: # @UndefinedVariable
         return runNonParallel(iterable, parallelFunction, 
                               updateFunction=updateFunction,
                               updateMultiply=updateMultiply, 
@@ -113,7 +115,6 @@ def runParallel(iterable, parallelFunction, *,
 
     iterLength = len(iterable)
     totalRun = 0
-    numCpus = cpus()
     if updateFunction is None:
         updateMultiply = iterLength 
         # if there is no need for updates, run at max speed 
@@ -228,18 +229,31 @@ def cpus():
 #     return pickle.loads(pickle.dumps(obj, protocol=-1))
 
 
+# pickleable testing functions.
+
+def _countN(fn):
+    from music21 import corpus
+    c = corpus.parse(fn)
+    return len(c.recurse().notes)
+
+def _countUnpacked(i, fn):
+    if i >= 3:
+        return False
+    if fn not in ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']:
+        return False
+    return True
 
 class Test(unittest.TestCase):
     def testMultiprocess(self):
         files = ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']
-        output = runParallel(files, self._countN)
+        output = runParallel(files, _countN)
         self.assertEqual(output, [165, 50, 131])
         runParallel(files, self._countN, 
                     updateFunction=self._customUpdate1)
         runParallel(files, self._countN, 
                     updateFunction=self._customUpdate2,
                     updateSendsIterable=True)
-        passed = runParallel(list(enumerate(files)), self.unpacked,
+        passed = runParallel(list(enumerate(files)), _countUnpacked,
                     unpackIterable=True)
         self.assertEqual(len(passed), 3)
         self.assertNotIn(False, passed)
@@ -252,20 +266,6 @@ class Test(unittest.TestCase):
     
     def _customUpdate2(self, i, unused_total, unused_output, fn):
         self.assertIn(fn, ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel'])
-    
-    @staticmethod
-    def _countN(fn):
-        from music21 import corpus
-        c = corpus.parse(fn)
-        return len(c.recurse().notes)
-
-    @staticmethod
-    def unpacked(i, fn):
-        if i >= 3:
-            return False
-        if fn not in ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']:
-            return False
-        return True
 
 
 if __name__ == "__main__":
