@@ -1527,26 +1527,26 @@ class PartParser(XMLParserBase):
         for mxMeasure in self.mxPart.iterfind('measure'):
             self.xmlMeasureToMeasure(mxMeasure)
 
-        self.removeEndForwardRest()
+        # self.removeEndForwardRest()
         part.coreElementsChanged()
 
-    def removeEndForwardRest(self):
-        '''
-        If the last measure ended with a forward tag, as happens
-        in some pieces that end with incomplete measures,
-        remove the rest there (for backwards compatibility, esp.
-        since bwv66.6 uses it)
-        '''
-        if self.lastMeasureParser is None:
-            return
-        lmp = self.lastMeasureParser
-        self.lastMeasureParser = None # clean memory
-
-        if lmp.endedWithForwardTag is None:
-            return
-        endedForwardRest = lmp.endedWithForwardTag
-        if lmp.stream.recurse().notesAndRests[-1] is endedForwardRest:
-            lmp.stream.remove(endedForwardRest, recurse=True)
+#     def removeEndForwardRest(self):
+#         '''
+#         If the last measure ended with a forward tag, as happens
+#         in some pieces that end with incomplete measures,
+#         remove the rest there (for backwards compatibility, esp.
+#         since bwv66.6 uses it)
+#         '''
+#         if self.lastMeasureParser is None:
+#             return
+#         lmp = self.lastMeasureParser
+#         self.lastMeasureParser = None # clean memory
+# 
+#         if lmp.endedWithForwardTag is None:
+#             return
+#         endedForwardRest = lmp.endedWithForwardTag
+#         if lmp.stream.recurse().notesAndRests[-1] is endedForwardRest:
+#             lmp.stream.remove(endedForwardRest, recurse=True)
 
 
     def separateOutPartStaves(self):
@@ -2035,6 +2035,7 @@ class MeasureParser(XMLParserBase):
             self.activeTuplets = [None] * 7
 
         self.useVoices = False
+        self.voicesById = {}
         self.voiceIndices = set()
         self.staves = 1
 
@@ -2066,12 +2067,12 @@ class MeasureParser(XMLParserBase):
         self.parseIndex = 0
         self.offsetMeasureNote = 0.0
 
-        # keep track of the last rest that was added with a forward tag.
-        # there are many pieces that end with incomplete measures that
-        # older versions of Finale put a forward tag at the end, but this
-        # disguises the incomplete last measure.  The PartParser will
-        # pick this up from the last measure.
-        self.endedWithForwardTag = None
+        # # keep track of the last rest that was added with a forward tag.
+        # # there are many pieces that end with incomplete measures that
+        # # older versions of Finale put a forward tag at the end, but this
+        # # disguises the incomplete last measure.  The PartParser will
+        # # pick this up from the last measure.
+        #self.endedWithForwardTag = None
 
     @staticmethod
     def getStaffNumberStr(mxObjectOrNumber):
@@ -2249,12 +2250,12 @@ class MeasureParser(XMLParserBase):
 
     def xmlForward(self, mxObj):
         change = float(mxObj.find('duration').text.strip()) / self.divisions
-        r = note.Rest()
-        r.duration.quarterLength = change
-        r.style.hideObjectOnPrint = True
-        self.stream.coreElementsChanged()
-        self.stream.append(r)
-        self.endedWithForwardTag = r
+#         r = note.Rest()
+#         r.duration.quarterLength = change
+#         r.style.hideObjectOnPrint = True
+#         self.stream.coreElementsChanged()
+#         self.stream.append(r)
+#         self.endedWithForwardTag = r
         self.offsetMeasureNote += change
 
     def xmlPrint(self, mxPrint):
@@ -2380,7 +2381,7 @@ class MeasureParser(XMLParserBase):
         if isChord is False: # normal note or rest...
             self.updateLyricsFromList(n, mxNote.findall('lyric'))
             self.addToStaffReference(mxNote, n)
-            self.addNoteToMeasureOrVoice(mxNote, n)
+            self.insertInMeasureOrVoice(mxNote, n)
             offsetIncrement = n.duration.quarterLength
             self.nLast = n # update
 
@@ -2394,7 +2395,7 @@ class MeasureParser(XMLParserBase):
             # add any accumulated lyrics
             self.updateLyricsFromList(c, self.mxLyricList)
             self.addToStaffReference(self.mxNoteList[0], c)
-            self.addNoteToMeasureOrVoice(mxNote, c)
+            self.insertInMeasureOrVoice(mxNote, c)
             self.mxNoteList = [] # clear for next chord
             self.mxLyricList = []
 
@@ -3950,46 +3951,48 @@ class MeasureParser(XMLParserBase):
         if inputM21 is None:
             return l
 
+    def insertInMeasureOrVoice(self, mxElement, el):
+        '''
+        Adds an object to a measure or a voice.  Need n (obviously)
+        but also mxNote to get the voice.
+        '''
+        insertStream = self.stream
+        if not self.useVoices:
+            insertStream.coreInsert(self.offsetMeasureNote, el)
+            return
+        
+        mxVoice = mxElement.find('voice')
+        thisVoice = self.findM21VoiceFromXmlVoice(mxVoice)
+        if thisVoice is not None:
+            insertStream = thisVoice
+        insertStream.coreInsert(self.offsetMeasureNote, el)
 
-    def addNoteToMeasureOrVoice(self, mxNote, n):
+    def findM21VoiceFromXmlVoice(self, mxVoice=None):
+        '''
+        Find the stream.Voice object from a <voice> tag or None.
+        '''
         m = self.stream
-        if self.useVoices:
-            useVoice = mxNote.find('voice')
+        if mxVoice is None:
+            useVoice = self.chordVoice
             if useVoice is None:
-                useVoice = self.chordVoice
-                if useVoice is None:
-                    environLocal.warn("Cannot translate a note with a missing voice tag when " +
-                                      "no previous voice tag was given.  Assuming voice 1... " +
-                                      "Object is %r " % mxNote)
-                    useVoice = 1
-            else:
-                useVoice = useVoice.text.strip()
-
-            try:
-                thisVoice = None
-                for v in m.voices:
-                    if v.id == useVoice:
-                        thisVoice = v
-                        break
-                    try:
-                        if int(v.id) == int(useVoice):
-                            thisVoice = v
-                            break
-                    except ValueError:
-                        pass
-            except stream.StreamException:
-                thisVoice = None
-
-            if thisVoice is None:
-                environLocal.warn('Cannot find voice %d for Note %r; putting outside of voices...' %
-                                  (useVoice, mxNote))
-                environLocal.warn('Current voices: {0}'.format([v for v in m.voices]))
-
-                m.coreInsert(self.offsetMeasureNote, n)
-            else:
-                thisVoice.coreInsert(self.offsetMeasureNote, n)
+                environLocal.warn("Cannot put in an element with a missing voice tag when "
+                                  + "no previous voice tag was given.  Assuming voice 1... "
+                                  )
+                useVoice = 1
         else:
-            m.coreInsert(self.offsetMeasureNote, n)
+            useVoice = mxVoice.text.strip()
+
+        thisVoice = None
+        if useVoice in self.voicesById:
+            thisVoice = self.voicesById[useVoice]
+        elif int(useVoice) in self.voicesById:
+            thisVoice = self.voicesById[int(useVoice)]
+        else:
+            environLocal.warn('Cannot find voice %d; putting outside of voices...' %
+                              (useVoice))
+            environLocal.warn('Current voices: {0}'.format([v for v in m.voices]))
+
+        return thisVoice
 
 
     def xmlBarline(self, mxBarline):
@@ -4600,14 +4603,8 @@ class MeasureParser(XMLParserBase):
         >>> MP.xmlTransposeToInterval(t)
         <music21.interval.Interval M-6>
 
-        It should be like this -- where the diatonic includes the complete octave information:
 
-        >>> t = ET.fromstring('<transpose><diatonic>-8</diatonic><chromatic>-2</chromatic>'
-        ...         + '<octave-change>-1</octave-change></transpose>')
-        >>> MP.xmlTransposeToInterval(t)
-        <music21.interval.Interval M-9>
-
-        but it is sometimes encoded this way (Finale; MuseScore) where octave-change
+        Not mentioned in MusicXML XSD but supported in (Finale; MuseScore): octave-change
         refers to both diatonic and chromatic, so we will deal...
 
         >>> t = ET.fromstring('<transpose id="x"><diatonic>-1</diatonic><chromatic>-2</chromatic>'
@@ -4633,7 +4630,7 @@ class MeasureParser(XMLParserBase):
         mxOctaveChange = mxTranspose.find('octave-change')
         if mxOctaveChange is not None:
             octaveChange = int(mxOctaveChange.text) * 12
-
+            diatonicStep += 7 * int(mxOctaveChange.text)
         # TODO: presently not dealing with <double>
         # doubled one octave down from what is currently written
         # (as is the case for mixed cello / bass parts in orchestral literature)
@@ -4650,12 +4647,12 @@ class MeasureParser(XMLParserBase):
                 post = interval.intervalFromGenericAndChromatic(diatonicActual,
                                                                 chromaticStep + octaveChange)
             except interval.IntervalException:
-                # some people don't use -8 for diatonic for down a 9th, assuming
-                # that octave-change will take care of it.  So try again.
+                # some people might use -8 for diatonic for down a 9th, assuming
+                # even if there is an octave change because schema is ambiguous.  So try again.
                 if diatonicStep < 0:
-                    diatonicActual = (diatonicStep + int(octaveChange * 7 / 12)) - 1
+                    diatonicActual = (diatonicStep - int(octaveChange * 7 / 12)) - 1
                 else:
-                    diatonicActual = (diatonicStep + int(octaveChange * 7 / 12)) + 1
+                    diatonicActual = (diatonicStep - int(octaveChange * 7 / 12)) + 1
 
                 post = interval.intervalFromGenericAndChromatic(diatonicActual,
                                                                 chromaticStep + octaveChange)
@@ -5260,6 +5257,7 @@ class MeasureParser(XMLParserBase):
                 v = stream.Voice()
                 v.id = vIndex # TODO: should use a separate voiceId or something in Voice.
                 self.stream.coreInsert(0.0, v)
+                self.voicesById[v.id] = v
             self.useVoices = True
 #------------------------------------------------------------------------------
 
@@ -6238,6 +6236,7 @@ class Test(unittest.TestCase):
         self.assertEqual(rmIterator[1].style.enclosure, None)
         self.assertEqual(rmIterator[2].content, 'Test')
         self.assertEqual(rmIterator[2].style.enclosure, 'square')
+
 
 if __name__ == '__main__':
     import music21

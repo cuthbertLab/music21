@@ -2659,7 +2659,9 @@ class MeasureExporter(XMLExporterBase):
         self.setMxPrint()
         self.setMxAttributesObjectForStartOfMeasure()
         self.setLeftBarline()
+        ### BIG ONE
         self.mainElementsParse()
+        ### continue
         self.setRightBarline()
         return self.xmlRoot
 
@@ -2671,19 +2673,25 @@ class MeasureExporter(XMLExporterBase):
         # need to handle objects in order when creating musicxml
         # we thus assume that objects are sorted here
 
-        if m.hasVoices():
-            # TODO... Voice not Stream
-            nonVoiceMeasureItems = m.getElementsNotOfClass('Stream').stream()
-        else:
-            nonVoiceMeasureItems = m  # use self.
+        if not m.hasVoices():
+            self.parseFlatElements(m, backupAfterwards=False)
+            return
 
-        for v in m.voices:
+        nonVoiceMeasureItems = m.getElementsNotOfClass('Voice').stream()
+        self.parseFlatElements(nonVoiceMeasureItems, backupAfterwards=True)
+
+        allVoices = list(m.voices)
+        for i, v in enumerate(allVoices):
+            if i == len(allVoices) - 1:
+                backupAfterwards = False
+            else:
+                backupAfterwards = True
+            
             # Assumes voices are flat...
-            self.parseFlatElements(v)
+            self.parseFlatElements(v, backupAfterwards=backupAfterwards)
+        
 
-        self.parseFlatElements(nonVoiceMeasureItems)
-
-    def parseFlatElements(self, m):
+    def parseFlatElements(self, m, *, backupAfterwards=False):
         '''
         Deals with parsing all the elements in .elements, assuming that .elements is flat.
 
@@ -2709,6 +2717,19 @@ class MeasureExporter(XMLExporterBase):
         # that way chord symbols and other 0-width objects appear before notes as much as
         # possible.
         for objGroup in OffsetIterator(m):
+            groupOffset = m.elementOffset(objGroup[0])
+            amountToMoveForward = int(round(divisions * (groupOffset 
+                                                             - self.offsetInMeasure)))
+            if amountToMoveForward > 0:
+                # gap in stream!    
+                mxForward = Element('forward')
+                mxDuration = SubElement(mxForward, 'duration')
+                mxDuration.text = str(amountToMoveForward)
+                root.append(mxForward)
+                self.offsetInMeasure = groupOffset
+
+
+            
             notesForLater = []
             for obj in objGroup:
                 # we do all non-note elements (including ChordSymbols)
@@ -2721,15 +2742,15 @@ class MeasureExporter(XMLExporterBase):
             for n in notesForLater:
                 self.parseOneElement(n)
 
-        if voiceId is not None:
+        if backupAfterwards:
             # return to the beginning of the measure.
             amountToBackup = int(round(divisions * self.offsetInMeasure))
             if amountToBackup:
                 mxBackup = Element('backup')
                 mxDuration = SubElement(mxBackup, 'duration')
                 mxDuration.text = str(amountToBackup)
-                # TODO: editorial -- nowhere to store?
                 root.append(mxBackup)
+
         self.currentVoiceId = None
 
     def parseOneElement(self, obj):
@@ -5603,7 +5624,7 @@ class MeasureExporter(XMLExporterBase):
         >>> mxTranspose = ME.intervalToXmlTranspose(i)
         >>> ME.dump(mxTranspose)
         <transpose>
-          <diatonic>19</diatonic>
+          <diatonic>5</diatonic>
           <chromatic>10</chromatic>
           <octave-change>1</octave-change>
         </transpose>
@@ -5615,41 +5636,44 @@ class MeasureExporter(XMLExporterBase):
           <diatonic>-5</diatonic>
           <chromatic>-9</chromatic>
         </transpose>
+
+
+        >>> i = interval.Interval('-M9')
+        >>> mxTranspose = ME.intervalToXmlTranspose(i)
+        >>> ME.dump(mxTranspose)
+        <transpose>
+          <diatonic>-1</diatonic>
+          <chromatic>-2</chromatic>
+          <octave-change>-1</octave-change>
+        </transpose>
+
         '''
         # TODO: number attribute (staff number)
         # TODO: double empty attribute
         if i is None:
             i = self.transpositionInterval
-        rawSemitones = i.chromatic.semitones  # will be directed
-        octShift = 0
-        if abs(rawSemitones) > 12:
-            octShift, semitones = divmod(rawSemitones, 12)
-        else:
-            semitones = rawSemitones
-        rawGeneric = i.diatonic.generic.directed
-        if octShift != 0:
-            # need to shift 7 for each octave; sign will be correct
-            generic = rawGeneric + (octShift * 7)
-        else:
-            generic = rawGeneric
-
+        
+        genericSteps = i.diatonic.generic.directed
+        musicxmlOctaveShift, musicxmlDiatonic = divmod(abs(genericSteps) - 1, 7)
+        musicxmlChromatic = abs(i.chromatic.semitones) % 12
+        
+        if genericSteps < 0:
+            musicxmlDiatonic *= -1
+            musicxmlOctaveShift *= -1
+            musicxmlChromatic *= -1
+            
         mxTranspose = Element('transpose')
         _synchronizeIds(mxTranspose, i)
 
         mxDiatonic = SubElement(mxTranspose, 'diatonic')
-
-        # must implement the necessary shifts
-        if rawGeneric > 0:
-            mxDiatonic.text = str(generic - 1)
-        elif rawGeneric < 0:
-            mxDiatonic.text = str(generic + 1)
-
+        mxDiatonic.text = str(musicxmlDiatonic)
+        
         mxChromatic = SubElement(mxTranspose, 'chromatic')
-        mxChromatic.text = str(semitones)
+        mxChromatic.text = str(musicxmlChromatic)
 
-        if octShift != 0:
+        if musicxmlOctaveShift != 0:
             mxOctaveChange = SubElement(mxTranspose, 'octave-change')
-            mxOctaveChange.text = str(octShift)
+            mxOctaveChange.text = str(musicxmlOctaveShift)
 
         return mxTranspose
 

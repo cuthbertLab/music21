@@ -1564,19 +1564,27 @@ def instrumentFromMidiProgram(number):
     >>> instrument.instrumentFromMidiProgram(500)
     Traceback (most recent call last):
     music21.exceptions21.InstrumentException: No instrument found with given midi program
+    
+    SLOW! creates each instrument in order
     '''
-    foundInstrument = False
     for myThing in sys.modules[__name__].__dict__.values():
         try:
+            isAnInstrument = False
+            for mroClass in myThing.mro():
+                if mroClass is Instrument:
+                    isAnInstrument = True
+                    break
+            
+            if not isAnInstrument:
+                continue
             i = myThing()
             mp = getattr(i, 'midiProgram')
             if mp == number:
-                foundInstrument = True
                 return i
         except (AttributeError, TypeError):
             pass
-    if not foundInstrument:
-        raise InstrumentException('No instrument found with given midi program')
+
+    raise InstrumentException('No instrument found with given midi program')
 
 
 
@@ -1824,7 +1832,7 @@ def fromString(instrumentString):
     <music21.instrument.TenorSaxophone Tenor Saxophone>
 
 
-    #_OMIT_FROM_DOCS
+    Some more demos:
 
 
     >>> t5 = instrument.fromString("Bb Clarinet")
