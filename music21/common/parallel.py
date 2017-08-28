@@ -51,7 +51,7 @@ def runParallel(iterable, parallelFunction, *,
     
     >>> files = ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']
     >>> def countNotes(fn):
-    ...     c = corpus.parse(fn)
+    ...     c = corpus.parse(fn) # this is the slow call that is good to parallelize
     ...     return len(c.recurse().notes)
     >>> #_DOCS_SHOW outputs = common.runParallel(files, countNotes)
     >>> outputs = common.runNonParallel(files, countNotes) #_DOCS_HIDE cant pickle doctest funcs.
@@ -84,7 +84,22 @@ def runParallel(iterable, parallelFunction, *,
     ...             updateSendsIterable=True)
     0:3 (bach/bwv66.6) 165 is a lot of notes!
     1:3 (schoenberg/opus19) 50 is a lot of notes!
-    2:3 (AcaciaReel) 131 is a lot of notes!    
+    2:3 (AcaciaReel) 131 is a lot of notes!
+    
+    unpackIterable is useful for when you need to send multiple values to your function
+    call as separate arguments.  For instance, something like:
+    
+    >>> def pitchesAbove(fn, minPitch): # a two-argument function
+    ...     c = corpus.parse(fn) # again, the slow call goes in the function
+    ...     return len([p for p in c.pitches if p.ps > minPitch])
+    
+    >>> inputs = [('bach/bwv66.6', 60),
+    ...           ('schoenberg/opus19', 72),
+    ...           ('AcaciaReel', 66)]
+    >>> #_DOCS_SHOW outputs = common.runParallel(inputs, pitchesAbove, unpackIterable=True)
+    >>> outputs = common.runNonParallel(inputs, pitchesAbove, unpackIterable=True) #_DOCS_HIDE
+    >>> outputs
+    [99, 11, 123]    
     '''
     # multiprocessing has trouble with introspection
     # pylint: disable=not-callable
