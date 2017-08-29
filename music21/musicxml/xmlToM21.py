@@ -2395,7 +2395,14 @@ class MeasureParser(XMLParserBase):
             # add any accumulated lyrics
             self.updateLyricsFromList(c, self.mxLyricList)
             self.addToStaffReference(self.mxNoteList[0], c)
-            self.insertInMeasureOrVoice(mxNote, c)
+            for thisMxNote in self.mxNoteList:
+                # voice might be in a previous note; in fact, often in first <note>
+                if thisMxNote.find('voice') is not None:
+                    self.insertInMeasureOrVoice(thisMxNote, c)
+                    break
+            else:
+                self.insertInMeasureOrVoice(mxNote, c)
+                
             self.mxNoteList = [] # clear for next chord
             self.mxLyricList = []
 
@@ -3987,8 +3994,10 @@ class MeasureParser(XMLParserBase):
             thisVoice = self.voicesById[useVoice]
         elif int(useVoice) in self.voicesById:
             thisVoice = self.voicesById[int(useVoice)]
+        elif str(useVoice) in self.voicesById:
+            thisVoice = self.voicesById[str(useVoice)]
         else:
-            environLocal.warn('Cannot find voice %d; putting outside of voices...' %
+            environLocal.warn('Cannot find voice %r; putting outside of voices...' %
                               (useVoice))
             environLocal.warn('Current voiceIds: {0}'.format(list(self.voicesById)))
             environLocal.warn('Current voices: {0}'.format([v for v in m.voices]))
@@ -6060,6 +6069,7 @@ class Test(unittest.TestCase):
                             #forceSource=True
                             )
         m1 = c.parts[0].measure(1)
+        # m1.show('text')
         firstChord = m1.voices.getElementById('2').getElementsByClass('Chord')[0]
         self.assertEqual(repr(firstChord), '<music21.chord.Chord G4 B4>')
         self.assertEqual(firstChord.offset, 1.0)
