@@ -3990,6 +3990,7 @@ class MeasureParser(XMLParserBase):
         else:
             environLocal.warn('Cannot find voice %d; putting outside of voices...' %
                               (useVoice))
+            environLocal.warn('Current voiceIds: {0}'.format(list(self.voicesById)))
             environLocal.warn('Current voices: {0}'.format([v for v in m.voices]))
 
         return thisVoice
@@ -6058,7 +6059,8 @@ class Test(unittest.TestCase):
                             format='musicxml',
                             #forceSource=True
                             )
-        firstChord = c.parts[0].measure(1).voices.getElementById('2').notes[1]
+        m1 = c.parts[0].measure(1)
+        firstChord = m1.voices.getElementById('2').getElementsByClass('Chord')[0]
         self.assertEqual(repr(firstChord), '<music21.chord.Chord G4 B4>')
         self.assertEqual(firstChord.offset, 1.0)
 

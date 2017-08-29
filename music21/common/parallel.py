@@ -248,9 +248,9 @@ class Test(unittest.TestCase):
         files = ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']
         output = runParallel(files, _countN)
         self.assertEqual(output, [165, 50, 131])
-        runParallel(files, self._countN, 
+        runParallel(files, _countN, 
                     updateFunction=self._customUpdate1)
-        runParallel(files, self._countN, 
+        runParallel(files, _countN, 
                     updateFunction=self._customUpdate2,
                     updateSendsIterable=True)
         passed = runParallel(list(enumerate(files)), _countUnpacked,
