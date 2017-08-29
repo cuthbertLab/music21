@@ -390,7 +390,8 @@ class _EnvironmentCore:
                 self.__setitem__(name, value)  # use for key checking
         elif platform == 'darwin':
             for name, value in [
-                    ('lilypondPath', '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
+                    ('lilypondPath', 
+                        '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
                     ('musicxmlPath', '/Applications/MuseScore 2.app/Contents/MacOS/mscore'),
                     ('graphicsPath', '/Applications/Preview.app'),
                     ('vectorPath', '/Applications/Preview.app'),

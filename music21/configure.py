@@ -1242,7 +1242,8 @@ class SelectFilePath(SelectFromList):
 
 
     def _getDarwinApp(self, comparisonFunction):
-        '''Provide a comparison function that returns True or False based on the file name.
+        '''
+        Provide a comparison function that returns True or False based on the file name.
         This looks at everything in Applications, as well as every directory in Applications
         '''
         post = []

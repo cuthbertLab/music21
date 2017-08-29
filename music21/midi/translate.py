@@ -685,7 +685,10 @@ def instrumentToMidiEvents(inputM21,
     me.type = "PROGRAM_CHANGE"
     me.time = 0
     me.channel = channel
-    me.data = inst.midiProgram # key step
+    instMidiProgram = inst.midiProgram
+    if instMidiProgram is None:
+        instMidiProgram = 0
+    me.data = instMidiProgram # key step
     events.append(me)
     return events
 
