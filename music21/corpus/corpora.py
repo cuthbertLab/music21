@@ -374,11 +374,11 @@ class Corpus:
         >>> diBrief
         (<music21.corpus.work.DirectoryInformation airdsAirs>,
          <music21.corpus.work.DirectoryInformation bach>,
+         <music21.corpus.work.DirectoryInformation beach>,
          <music21.corpus.work.DirectoryInformation beethoven>,
-         <music21.corpus.work.DirectoryInformation chopin>,
-         <music21.corpus.work.DirectoryInformation ciconia>)
-        >>> diBrief[4].directoryTitle
-        'Johannes Ciconia'
+         <music21.corpus.work.DirectoryInformation chopin>)
+        >>> diBrief[2].directoryTitle
+        'Amy Beach'
         '''
         dirInfo = []
         for infoTriple in self._directoryInformation:
@@ -485,7 +485,7 @@ class Corpus:
         >>> workRefs = corpus.corpora.CoreCorpus().getWorkReferences()
         >>> workRefs[1:3]
         [<music21.corpus.work.DirectoryInformation bach>,
-         <music21.corpus.work.DirectoryInformation beethoven>]
+         <music21.corpus.work.DirectoryInformation beach>]
                  '''
         results = [di for di in self.directoryInformation]
 
@@ -507,6 +507,7 @@ class CoreCorpus(Corpus):
     _directoryInformation = ( # filepath, composer/collection name, isComposer
         ('airdsAirs', 'Aird\'s Airs', False),
         ('bach', 'Johann Sebastian Bach', True),
+        ('beach', 'Amy Beach', True),
         ('beethoven', 'Ludwig van Beethoven', True),
         ('chopin', 'Frederic Chopin', True),
         ('ciconia', 'Johannes Ciconia', True),
