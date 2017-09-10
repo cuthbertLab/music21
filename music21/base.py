@@ -155,11 +155,11 @@ class Groups(list): # no need to inherit from slotted object
 
 
     >>> g = Groups()
-    >>> g.append("hello")
+    >>> g.append('hello')
     >>> g[0]
     'hello'
 
-    >>> g.append("hello") # not added as already present
+    >>> g.append('hello') # not added as already present
     >>> len(g)
     1
 
@@ -179,10 +179,10 @@ class Groups(list): # no need to inherit from slotted object
 
     def _validName(self, value):
         if not isinstance(value, str):
-            raise exceptions21.GroupException("Only strings can be used as group names, " +
-                                              "not {}".format(repr(value)))
+            raise exceptions21.GroupException('Only strings can be used as group names, ' +
+                                              'not {}'.format(repr(value)))
         #if ' ' in value:
-        #    raise exceptions21.GroupException("Spaces are not allowed as group names")
+        #    raise exceptions21.GroupException('Spaces are not allowed as group names')
 
     def append(self, value):
         self._validName(value)
@@ -376,27 +376,27 @@ class Music21Object:
         self._duration = None
         self._priority = 0 # default is zero
 
-        if "id" in keywords:
-            self.id = keywords["id"]
+        if 'id' in keywords:
+            self.id = keywords['id']
         else:
             self.id = id(self)
 
-        if "groups" in keywords and keywords["groups"] is not None:
-            self.groups = keywords["groups"]
+        if 'groups' in keywords and keywords['groups'] is not None:
+            self.groups = keywords['groups']
         else:
             self.groups = Groups()
 
-        if "sites" in keywords:
-            self.sites = keywords["sites"]
+        if 'sites' in keywords:
+            self.sites = keywords['sites']
         else:
             self.sites = sites.Sites()
 
         # a duration object is not created until the .duration property is
         # accessed with _getDuration(); this is a performance optimization
-        if "duration" in keywords:
-            self.duration = keywords["duration"]
-        if "activeSite" in keywords:
-            self.activeSite = keywords["activeSite"]
+        if 'duration' in keywords:
+            self.duration = keywords['duration']
+        if 'activeSite' in keywords:
+            self.activeSite = keywords['activeSite']
         if 'style' in keywords:
             self.style = keywords['style']
         if 'editorial' in keywords:
@@ -412,11 +412,11 @@ class Music21Object:
         >>> m1 = base.Music21Object()
         >>> m2 = base.Music21Object()
         >>> m1.id = 'music21Object1'
-        >>> m1.groups.append("group1")
+        >>> m1.groups.append('group1')
         >>> m2.mergeAttributes(m1)
         >>> m2.id
         'music21Object1'
-        >>> "group1" in m2.groups
+        >>> 'group1' in m2.groups
         True
         '''
         if other.id != id(other):
@@ -541,8 +541,8 @@ class Music21Object:
 
         >>> from copy import deepcopy
         >>> n = note.Note('A')
-        >>> n.offset = 1.0 #duration.Duration("quarter")
-        >>> n.groups.append("flute")
+        >>> n.offset = 1.0 #duration.Duration('quarter')
+        >>> n.groups.append('flute')
         >>> n.groups
         ['flute']
 
@@ -551,7 +551,7 @@ class Music21Object:
         True
 
         >>> b = deepcopy(n)
-        >>> b.offset = 2.0 #duration.Duration("half")
+        >>> b.offset = 2.0 #duration.Duration('half')
 
         >>> n is b
         False
@@ -564,8 +564,8 @@ class Music21Object:
         1.0
         >>> b.offset
         2.0
-        >>> n.groups[0] = "bassoon"
-        >>> ("flute" in n.groups, "flute" in b.groups)
+        >>> n.groups[0] = 'bassoon'
+        >>> ('flute' in n.groups, 'flute' in b.groups)
         (False, True)
         '''
         #environLocal.printDebug(['calling Music21Object.__deepcopy__', self])
@@ -740,7 +740,7 @@ class Music21Object:
 
         Created automatically as needed:
 
-        >>> n = note.Note("C4")
+        >>> n = note.Note('C4')
         >>> n.editorial
         <music21.editorial.Editorial {} >
         >>> n.editorial.ficta = pitch.Accidental('sharp')
@@ -963,7 +963,7 @@ class Music21Object:
                     a = site.elementOffset(tryOrigin, stringReturns=stringReturns)
                 except AttributeError:
                     raise SitesException(
-                        "You were using %r as a site, when it is not a Stream..." % site)
+                        'You were using %r as a site, when it is not a Stream...' % site)
                 except Music21Exception as e: # currently StreamException, but will change
                     if tryOrigin in site._endElements:
                         if stringReturns is True:
@@ -1029,7 +1029,7 @@ class Music21Object:
         For an element which may not be in site, but might be in a Stream in site (or further
         in streams), find the cumulative offset of the element in that site.
 
-        >>> s = stream.Score(id="mainScore")
+        >>> s = stream.Score(id='mainScore')
         >>> p = stream.Part()
         >>> m = stream.Measure()
         >>> n = note.Note()
@@ -1042,7 +1042,7 @@ class Music21Object:
         If no hierarchy beginning with site contains the element and the element is not derived from
         an element that does, then a SitesException is raised:
 
-        >>> s2 = stream.Score(id="otherScore")
+        >>> s2 = stream.Score(id='otherScore')
         >>> n.getOffsetInHierarchy(s2)
         Traceback (most recent call last):
         music21.sites.SitesException: Element <music21.note.Note C>
@@ -1090,7 +1090,7 @@ class Music21Object:
             if cs.site is site:
                 return cs.offset
 
-        raise SitesException("Element {} is not in hierarchy of {}".format(self, site))
+        raise SitesException('Element {} is not in hierarchy of {}'.format(self, site))
 
 
     def getSpannerSites(self, spannerClassList=None):
@@ -1154,7 +1154,7 @@ class Music21Object:
         ...        nOtherSlurs = nOther.getSpannerSites('Slur')
         ...        for thisSlur in nSlurs:
         ...            if thisSlur in nOtherSlurs:
-        ...               print("%s shares a slur with %s" % (n.name, nOther.name))
+        ...               print('%s shares a slur with %s' % (n.name, nOther.name))
         C shares a slur with D
         C shares a slur with E
         D shares a slur with C
@@ -1340,7 +1340,7 @@ class Music21Object:
                     positionStart = ZeroSortTupleLow.modify(offset=positionStart.offset)
                 else:
                     raise Music21Exception(
-                            "Incorrect getElementMethod: {}".format(getElementMethod))
+                            'Incorrect getElementMethod: {}'.format(getElementMethod))
 
             if 'Before' in getElementMethod:
                 contextNode = siteTree.getNodeBefore(positionStart)
@@ -1668,7 +1668,7 @@ class Music21Object:
             callerFirst = self
             if self.isStream and self not in memo:
                 recursionType = self.recursionType
-                environLocal.printDebug("Caller first is {} with offsetAppend {}".format(
+                environLocal.printDebug('Caller first is {} with offsetAppend {}'.format(
                                                                 callerFirst, offsetAppend))
                 if returnSortTuples:
                     selfSortTuple = self.sortTuple().modify(offset=0.0, priority=float('-inf'))
@@ -1714,7 +1714,7 @@ class Music21Object:
                 yield ContextTuple(siteObj, positionInStream.offset, recursionType)
 
             memo.append(siteObj)
-            environLocal.printDebug("looking in contextSites for {} with position {}".format(
+            environLocal.printDebug('looking in contextSites for {} with position {}'.format(
                                                         siteObj, positionInStream.shortRepr()))
             for topLevel, inStreamPos, recurType in siteObj.contextSites(callerFirst=callerFirst,
                                               memo=memo,
@@ -1728,7 +1728,7 @@ class Music21Object:
                 hypotheticalPosition = positionInStream.modify(offset=inStreamOffset)
 
                 if topLevel not in memo:
-                    #environLocal.printDebug("Yielding {}, {}, {} from contextSites".format(
+                    #environLocal.printDebug('Yielding {}, {}, {} from contextSites'.format(
                     #                                                topLevel,
                     #                                                inStreamPos.shortRepr(),
                     #                                                recurType))
@@ -1741,7 +1741,7 @@ class Music21Object:
         if followDerivation:
             for derivedObject in topLevel.derivation.chain():
                 environLocal.printDebug(
-                        "looking now in derivedObject, {} with offsetAppend {}".format(
+                        'looking now in derivedObject, {} with offsetAppend {}'.format(
                                                             derivedObject, offsetAppend))
                 for derivedCsTuple in derivedObject.contextSites(
                                               callerFirst=None,
@@ -1752,7 +1752,7 @@ class Music21Object:
                                             # get activeSite unless sortByCreationTime
                     if derivedCsTuple.site not in memo:
                         environLocal.printDebug(
-                                "Yielding {} from derivedObject contextSites".format(derivedCsTuple)
+                                'Yielding {} from derivedObject contextSites'.format(derivedCsTuple)
                                 )
                         offsetAdjustedCsTuple = ContextTuple(
                             derivedCsTuple.site,
@@ -1767,7 +1767,7 @@ class Music21Object:
                                                offsetAdjustedCsTuple.recurseType)
                         memo.append(derivedCsTuple.site)
 
-        environLocal.printDebug("--returning from derivedObject search")
+        environLocal.printDebug('--returning from derivedObject search')
 
 
     def getAllContextsByClass(self, className):
@@ -2025,14 +2025,14 @@ class Music21Object:
             try:
                 storedOffset = site.elementOffset(self)
             except SitesException:
-                raise SitesException("v2.1. -- you may not assign an activesite for " +
-                                     "an object {} not in the Stream {}".format(self, site))
+                raise SitesException('v2.1. -- you may not assign an activesite for ' +
+                                     'an object {} not in the Stream {}'.format(self, site))
 
             self._activeSiteStoredOffset = storedOffset
             #siteId = id(site)
             #if not self.sites.hasSiteId(siteId): # This should raise a warning, should not happen
-            #    #environLocal.warn("Adding a siteDict entry for a " +
-            #    #                        "site that should already be there!")
+            #    #environLocal.warn('Adding a siteDict entry for a ' +
+            #    #                        'site that should already be there!')
             #    self.sites.add(site, idKey=siteId)
         else:
             self._activeSiteStoredOffset = None
@@ -2054,7 +2054,7 @@ class Music21Object:
         object is attached to a Stream.
 
 
-        >>> n = note.Note("C#4")
+        >>> n = note.Note('C#4')
         >>> p = stream.Part()
         >>> p.insert(20.0, n)
         >>> n.activeSite is p
@@ -2129,7 +2129,7 @@ class Music21Object:
         except TypeError:
             pass
 
-        if hasattr(value, "quarterLength"):
+        if hasattr(value, 'quarterLength'):
             # probably a Duration object, but could be something else -- in any case, we'll take it.
             offset = value.quarterLength
 
@@ -2152,7 +2152,7 @@ class Music21Object:
         If we put a `Note` into a `Stream`, we will see the activeSite changes.
 
         >>> import fractions
-        >>> n1 = note.Note("D#3")
+        >>> n1 = note.Note('D#3')
         >>> n1.activeSite is None
         True
 
@@ -2624,7 +2624,7 @@ class Music21Object:
 
         The method follows activeSites, so set the activeSite as necessary.
 
-        >>> p = stream.Part(id="newPart")
+        >>> p = stream.Part(id='newPart')
         >>> m = stream.Measure(number=20)
         >>> p.insert(0, m)
         >>> m.insert(0, noteE)
@@ -2784,8 +2784,8 @@ class Music21Object:
 
         if quarterLength > self.duration.quarterLength:
             raise duration.DurationException(
-            "cannot split a duration (%s) at this quarterLength (%s)" % (
-            self.duration.quarterLength, quarterLength))
+                'cannot split a duration (%s) at this quarterLength (%s)' % (
+                    self.duration.quarterLength, quarterLength))
 
         if retainOrigin is True:
             e = self
@@ -2933,13 +2933,14 @@ class Music21Object:
         [1.0, 1.0, 1.0]
         '''
         if self.duration is None: # pragma: no cover
-            raise Music21ObjectException('cannot split an element that has a Duration of None')
+            raise Music21ObjectException(
+                'cannot split an element that has a Duration of None')
 
         if opFrac(sum(quarterLengthList)) != self.duration.quarterLength:
-            raise Music21ObjectException('cannot split by quarter length list whose sum is not ' +
-                                         'equal to the quarterLength duration of the source: ' +
-                                         '%s, %s' % (quarterLengthList,
-                                                     self.duration.quarterLength))
+            raise Music21ObjectException(
+                'cannot split by quarter length list whose sum is not '
+                + 'equal to the quarterLength duration of the source: '
+                + '%s, %s' % (quarterLengthList, self.duration.quarterLength))
         # if nothing to do
         elif len(quarterLengthList) == 1:
             # return a copy of self in a list
@@ -3389,7 +3390,7 @@ class Music21Object:
 
         Test not using measures
 
-        >>> n = note.Note("E--3")
+        >>> n = note.Note('E--3')
         >>> n.quarterLength = 2
         >>> s = stream.Stream()
         >>> s.isMeasure
@@ -3508,7 +3509,7 @@ class ElementWrapper(Music21Object):
     ...     if i == 2:
     ...         j.id = None
     ...     else:
-    ...         j.id = str(i) + "_wrapper"
+    ...         j.id = str(i) + '_wrapper'
     ...     if i <=2:
     ...         print(j)
     <ElementWrapper id=0_wrapper offset=0.0 obj="<...Wave_read object...">
@@ -3535,7 +3536,7 @@ class ElementWrapper(Music21Object):
     def __repr__(self):
         shortObj = (str(self.obj))[0:30]
         if len(str(self.obj)) > 30:
-            shortObj += "..."
+            shortObj += '...'
 
         if self.id is not None:
             return '<%s id=%s offset=%s obj="%s">' % (self.__class__.__name__,
@@ -3551,7 +3552,7 @@ class ElementWrapper(Music21Object):
         '''Test ElementWrapper equality
 
         >>> import music21
-        >>> n = note.Note("C#")
+        >>> n = note.Note('C#')
         >>> a = music21.ElementWrapper(n)
         >>> a.offset = 3.0
         >>> b = music21.ElementWrapper(n)
@@ -3567,12 +3568,12 @@ class ElementWrapper(Music21Object):
         >>> a == c
         False
         '''
-        if (not hasattr(other, "obj")
-                or not hasattr(other, "offset")
-                or not hasattr(other, "priority")
-                or not hasattr(other, "groups")
-                or not hasattr(other, "activeSite")
-                or not hasattr(other, "duration")):
+        if (not hasattr(other, 'obj')
+                or not hasattr(other, 'offset')
+                or not hasattr(other, 'priority')
+                or not hasattr(other, 'groups')
+                or not hasattr(other, 'activeSite')
+                or not hasattr(other, 'duration')):
             return False
 
 
@@ -3596,7 +3597,7 @@ class ElementWrapper(Music21Object):
             object.__setattr__(self, name, value)
 
         # if not, change the attribute in the stored object
-        storedobj = object.__getattribute__(self, "obj")
+        storedobj = object.__getattribute__(self, 'obj')
         if (name not in ('offset', '_offset', '_activeSite')
                 and storedobj is not None
                 and hasattr(storedobj, name)):
@@ -3613,7 +3614,7 @@ class ElementWrapper(Music21Object):
         see: http://stackoverflow.com/questions/371753/python-using-getattribute-method
         for examples
         '''
-        storedobj = Music21Object.__getattribute__(self, "obj")
+        storedobj = Music21Object.__getattribute__(self, 'obj')
         if storedobj is None:
             raise AttributeError("Could not get attribute '" + name +
                                  "' in an object-less element")
@@ -3646,7 +3647,7 @@ class ElementWrapper(Music21Object):
         >>> aE.isTwin(bE)
         True
         '''
-        if not hasattr(other, "obj"):
+        if not hasattr(other, 'obj'):
             return False
 
         if (self.obj is other.obj or self.obj == other.obj):
@@ -3687,14 +3688,14 @@ class Test(unittest.TestCase):
 
     def testObjectCreation(self):
         a = TestMock()
-        a.groups.append("hello")
-        a.id = "hi"
+        a.groups.append('hello')
+        a.id = 'hi'
         a.offset = 2.0
         self.assertEqual(a.offset, 2.0)
 
     def testElementEquality(self):
         from music21 import note
-        n = note.Note("F-")
+        n = note.Note('F-')
         a = ElementWrapper(n)
         a.offset = 3.0
         c = ElementWrapper(n)
@@ -3708,20 +3709,20 @@ class Test(unittest.TestCase):
     def testNoteCreation(self):
         from music21 import note
         n = note.Note('A')
-        n.offset = 1.0 #duration.Duration("quarter")
-        n.groups.append("flute")
+        n.offset = 1.0 #duration.Duration('quarter')
+        n.groups.append('flute')
 
         b = copy.deepcopy(n)
-        b.offset = 2.0 # duration.Duration("half")
+        b.offset = 2.0 # duration.Duration('half')
 
         self.assertFalse(n is b)
         n.pitch.accidental = '-'
-        self.assertEqual(b.name, "A")
+        self.assertEqual(b.name, 'A')
         self.assertEqual(n.offset, 1.0)
         self.assertEqual(b.offset, 2.0)
-        n.groups[0] = "bassoon"
-        self.assertFalse("flute" in n.groups)
-        self.assertTrue("flute" in b.groups)
+        n.groups[0] = 'bassoon'
+        self.assertFalse('flute' in n.groups)
+        self.assertTrue('flute' in b.groups)
 
     def testOffsets(self):
         from music21 import note
@@ -3731,8 +3732,8 @@ class Test(unittest.TestCase):
 
     def testObjectsAndElements(self):
         from music21 import note, stream
-        note1 = note.Note("B-")
-        note1.duration.type = "whole"
+        note1 = note.Note('B-')
+        note1.duration.type = 'whole'
         stream1 = stream.Stream()
         stream1.append(note1)
         unused_subStream = stream1.notes
@@ -3793,14 +3794,14 @@ class Test(unittest.TestCase):
         '''
         from music21 import stream, base
         a = stream.Stream()
-        a.id = "a obj"
+        a.id = 'a obj'
         b = base.Music21Object()
-        b.id = "b obj"
+        b.id = 'b obj'
 
         b.id = 'test'
         a.insert(0, b)
         c = copy.deepcopy(b)
-        c.id = "c obj"
+        c.id = 'c obj'
 
         # have two locations: None, and that set by assigning activeSite
         self.assertEqual(len(b.sites), 2)
@@ -4634,7 +4635,7 @@ class Test(unittest.TestCase):
         m2 = copy.deepcopy(m)
         m2.number = 3333
         siteList = []
-        #environLocal.warn("#########################")
+        #environLocal.warn('#########################')
         for y in m2.contextSites():
             yTup = (y.site, y.offset, y.recurseType)
             siteList.append(repr(yTup))
@@ -4671,8 +4672,8 @@ class Test(unittest.TestCase):
         siteList = []
         for y in n.contextSites():
             siteList.append(repr(y.site))
-        self.assertEqual(siteList, ["<music21.stream.Measure 1 offset=0.0>",
-                                    "<music21.stream.Part p1>"])
+        self.assertEqual(siteList, ['<music21.stream.Measure 1 offset=0.0>',
+                                    '<music21.stream.Part p1>'])
         p2 = stream.Part()
         p2.id = 'p2'
         m2 = stream.Measure()
@@ -4683,26 +4684,26 @@ class Test(unittest.TestCase):
         siteList = []
         for y in n.contextSites():
             siteList.append(repr(y.site))
-        self.assertEqual(siteList, ["<music21.stream.Measure 2 offset=0.0>",
-                                    "<music21.stream.Part p2>",
-                                    "<music21.stream.Measure 1 offset=0.0>",
-                                    "<music21.stream.Part p1>"])
+        self.assertEqual(siteList, ['<music21.stream.Measure 2 offset=0.0>',
+                                    '<music21.stream.Part p2>',
+                                    '<music21.stream.Measure 1 offset=0.0>',
+                                    '<music21.stream.Part p1>'])
 
         siteList = []
         for y in n.contextSites(sortByCreationTime=True):
             siteList.append(repr(y.site))
-        self.assertEqual(siteList, ["<music21.stream.Measure 2 offset=0.0>",
-                                    "<music21.stream.Part p2>",
-                                    "<music21.stream.Measure 1 offset=0.0>",
-                                    "<music21.stream.Part p1>"])
+        self.assertEqual(siteList, ['<music21.stream.Measure 2 offset=0.0>',
+                                    '<music21.stream.Part p2>',
+                                    '<music21.stream.Measure 1 offset=0.0>',
+                                    '<music21.stream.Part p1>'])
 
         siteList = []
         for y in n.contextSites(sortByCreationTime='reverse'):
             siteList.append(repr(y.site))
-        self.assertEqual(siteList, ["<music21.stream.Measure 1 offset=0.0>",
-                                    "<music21.stream.Part p1>",
-                                    "<music21.stream.Measure 2 offset=0.0>",
-                                    "<music21.stream.Part p2>"])
+        self.assertEqual(siteList, ['<music21.stream.Measure 1 offset=0.0>',
+                                    '<music21.stream.Part p1>',
+                                    '<music21.stream.Measure 2 offset=0.0>',
+                                    '<music21.stream.Part p2>'])
 
 ## great isolation test, but no asserts for now...
 #     def testPreviousA(self):
@@ -4782,7 +4783,7 @@ _DOC_ORDER = [Music21Object, ElementWrapper]
 
 
 #------------------------------------------------------------------------------
-if __name__ == "__main__":
+if __name__ == '__main__':
     mainTest(Test) #, runTest='testPreviousB')
 
 

@@ -24,7 +24,7 @@ from music21.common import SlottedObjectMixin
 # imported by stream
 
 from music21 import environment
-_MOD = "derivation"
+_MOD = 'derivation'
 environLocal = environment.Environment(_MOD)
 
 
@@ -64,11 +64,11 @@ class Derivation(SlottedObjectMixin):
 
 
     >>> s1 = stream.Stream()
-    >>> s1.id = "DerivedStream"
+    >>> s1.id = 'DerivedStream'
     >>> d1 = derivation.Derivation(s1)
 
     >>> s2 = stream.Stream()
-    >>> s2.id = "OriginalStream"
+    >>> s2.id = 'OriginalStream'
 
     >>> d1.method = 'manual'
     >>> d1.origin = s2
@@ -312,7 +312,7 @@ class Test(unittest.TestCase):
 
 _DOC_ORDER = [Derivation]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)

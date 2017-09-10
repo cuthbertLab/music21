@@ -1,13 +1,14 @@
 from music21 import exceptions21
 from music21 import environment
 
-environLocal = environment.Environment('features.outputFormats.py')
+environLocal = environment.Environment('features.outputFormats')
 
 class OutputFormatException(exceptions21.Music21Exception):
     pass
 
 class OutputFormat:
-    '''Provide output for a DataSet, passed as an initial argument.
+    '''
+    Provide output for a DataSet, which is passed in as an initial argument.
     '''
     def __init__(self, dataSet=None):
         # assume a two dimensional array
@@ -21,12 +22,13 @@ class OutputFormat:
         pass # define in subclass
 
     def write(self, fp=None, includeClassLabel=True, includeId=True):
-        '''Write the file. If not file path is given, a temporary file will be written.
+        '''
+        Write the file. If not file path is given, a temporary file will be written.
         '''
         if fp is None:
             fp = environLocal.getTempFile(suffix=self._ext)
         if not fp.endswith(self._ext):
-            raise OutputFormatException("Could not get a temp file with the right extension")
+            raise OutputFormatException('Could not get a temp file with the right extension')
         with open(fp, 'w') as f:
             f.write(self.getString(includeClassLabel=includeClassLabel,
                                    includeId=includeId))
@@ -235,7 +237,7 @@ class OutputARFF(OutputFormat):
         return lineBreak.join(msg)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest()
 

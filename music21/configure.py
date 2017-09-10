@@ -35,7 +35,7 @@ from music21 import common
 from music21 import environment
 from music21 import exceptions21
 
-_MOD = "configure"
+_MOD = 'configure'
 environLocal = environment.Environment(_MOD)
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
@@ -194,7 +194,7 @@ def getUserData():
     else: # catch all
         post['os.uname'] = 'None'
 
-    post['time.gmtime'] = time.strftime("%a, %d %b %Y %H:%M:%S", time.gmtime())
+    post['time.gmtime'] = time.strftime('%a, %d %b %Y %H:%M:%S', time.gmtime())
     post['time.timezone'] = time.timezone
 
     tzname = time.tzname
@@ -810,7 +810,7 @@ class AskOpenInBrowser(YesOrNo):
             if hasWebbrowser is True:
                 webbrowser.open_new(self._urlTarget)
             else:
-                print("Point your browser to %s" % self._urlTarget)
+                print('Point your browser to %s' % self._urlTarget)
         elif result is False:
             pass
             #self._writeToUser(['No URL is opened.', ' '])
@@ -946,7 +946,7 @@ class AskSendInstallationReport(YesOrNo):
             if hasWebbrowser is True:
                 webbrowser.open(self._getMailToStr())
             else:
-                print("Could not open your mail program.  Sorry!")
+                print('Could not open your mail program.  Sorry!')
 
 
 #-------------------------------------------------------------------------------
@@ -1235,7 +1235,7 @@ class SelectFilePath(SelectFromList):
                         if comparisonFunction(sub2):
                             post.append(path2)
                 except OSError:
-                    print("Could not read paths inside %s" % path1)
+                    print('Could not read paths inside %s' % path1)
             else:
                 if comparisonFunction(sub1):
                     post.append(path1)
@@ -1798,7 +1798,7 @@ def run():
     ca = ConfigurationAssistant()
     ca.run()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     if len(sys.argv) == 1: # normal conditions
         #music21.mainTest(Test)
         run()

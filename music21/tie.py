@@ -30,8 +30,8 @@ class Tie(SlottedObjectMixin):
     of start, stop, or continue.
 
     >>> note1 = note.Note()
-    >>> note1.tie = tie.Tie("start") # start, stop, or continue
-    >>> note1.tie.style = "normal" # default; could also be "dotted" or "dashed" or "hidden"
+    >>> note1.tie = tie.Tie('start') # start, stop, or continue
+    >>> note1.tie.style = 'normal' # default; could also be 'dotted' or 'dashed' or 'hidden'
     >>> note1.tie.type
     'start'
 
@@ -102,12 +102,12 @@ class Tie(SlottedObjectMixin):
         #super().__init__()
         if type not in self.VALID_TIE_TYPES:
             raise TieException(
-                "Type must be one of {}, not {}".format(self.VALID_TIE_TYPES, type))
-        # naming this "type" was a mistake, because cannot create a property of this name.
+                'Type must be one of {}, not {}'.format(self.VALID_TIE_TYPES, type))
+        # naming this 'type' was a mistake, because cannot create a property of this name.
 
         self.id = id(self)
         self.type = type
-        self.style = "normal"
+        self.style = 'normal'
         self.placement = None # = unknown, can be 'above' or 'below'
 
     ### SPECIAL METHODS ###

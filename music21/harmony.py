@@ -30,7 +30,7 @@ from music21 import style
 from music21.figuredBass import realizerScale
 
 from music21 import environment
-_MOD = "harmony"
+_MOD = 'harmony'
 environLocal = environment.Environment(_MOD)
 
 
@@ -1370,7 +1370,7 @@ class ChordSymbol(Harmony):
     ...     chordSymbolName = 'C' + s
     ...     h = harmony.ChordSymbol(chordSymbolName)
     ...     pitchNames = [str(p) for p in h.pitches]
-    ...     print("%-10s%s" % (chordSymbolName, "[" + (', '.join(pitchNames)) + "]"))
+    ...     print('%-10s%s' % (chordSymbolName, '[' + (', '.join(pitchNames)) + ']'))
     C         [C3, E3, G3]
     Cm        [C3, E-3, G3]
     C+        [C3, E3, G#3]
@@ -1741,7 +1741,7 @@ class ChordSymbol(Harmony):
         >>> h._notationString()
         '1,-3,-5,--7'
         '''
-        notationString = ""
+        notationString = ''
 
         kind = self.chordKind
         if kind in CHORD_ALIASES:
@@ -1774,7 +1774,7 @@ class ChordSymbol(Harmony):
             st = st.replace(root, '')
             prelimFigure = prelimFigure.replace(',', '')
         else:
-            m1 = re.match(r"[A-Ga-g][#-]*", prelimFigure) #match not case sensitive,
+            m1 = re.match(r'[A-Ga-g][#-]*', prelimFigure) #match not case sensitive,
             if m1:
                 root = m1.group()
                 #remove the root and bass from the string and any additions/omitions/alterations/
@@ -1784,7 +1784,7 @@ class ChordSymbol(Harmony):
             self.root(pitch.Pitch(root))
 
         #Get optional Bass:
-        m2 = re.search(r"/[A-Ga-g][#-]*", prelimFigure) #match not case sensitive
+        m2 = re.search(r'/[A-Ga-g][#-]*', prelimFigure) #match not case sensitive
         remaining = st
         if m2:
             bass = m2.group()
@@ -1853,7 +1853,7 @@ class ChordSymbol(Harmony):
                     semiToneAlter = -1 * alteration.count('b')
                 else:
                     semiToneAlter = alteration.count('#')
-                m3 = re.search(r"[1-9]+", alteration)
+                m3 = re.search(r'[1-9]+', alteration)
                 if m3:
                     degrees.append([int(m3.group()), semiToneAlter])
 
@@ -2105,7 +2105,7 @@ class ChordSymbol(Harmony):
                         s = 'b'
                     prefix = s * abs(numAlter)
 
-                    figure += ' ' + csmod.modType +" " +  prefix + str(csmod.degree)
+                    figure += ' ' + csmod.modType + ' ' +  prefix + str(csmod.degree)
                 else:
                     figure += ' ' + csmod.modType + ' ' + str(csmod.degree)
 
@@ -2357,7 +2357,7 @@ class Test(unittest.TestCase):
     def testDoubleSharpsEtc(self):
         cisisdim = chord.Chord(('c##5', 'e#5', 'g#5'))
         fig = chordSymbolFigureFromChord(cisisdim)
-        self.assertEqual(fig, "C##dim")
+        self.assertEqual(fig, 'C##dim')
 
     def chordSymbolSetsBassOctave(self):
         d = ChordSymbol('Cm/E-')
@@ -2531,7 +2531,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 _DOC_ORDER = [Harmony, chordSymbolFigureFromChord, ChordSymbol, ChordStepModification]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test) #, runTest='chordSymbolSetsBassOctave')
 

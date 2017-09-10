@@ -520,8 +520,8 @@ class CoreCorpus(Corpus):
         ('josquin', 'Josquin des Prez', True),
         ('leadSheet', 'Leadsheet demos', False),
         ('luca', 'D. Luca', False),
-        ('miscFolk', "Miscellaneous Folk", False),
-        ('monteverdi', "Claudio Monteverdi", True),
+        ('miscFolk', 'Miscellaneous Folk', False),
+        ('monteverdi', 'Claudio Monteverdi', True),
         ('mozart', 'Wolfgang Amadeus Mozart', True),
         ('oneills1850', 'Oneill\'s 1850 Collection', False),
         ('palestrina', 'Giovanni Palestrina', True),
@@ -630,7 +630,7 @@ class CoreCorpus(Corpus):
         if expr is not None:
             path = common.cleanpath(expr)
             if not os.path.isdir(path) or not os.path.exists(path):
-                raise CorpusException("path needs to be a path to an existing directory")
+                raise CorpusException('path needs to be a path to an existing directory')
             userSettings['manualCoreCorpusPath'] = path
         else:
             userSettings['manualCoreCorpusPath'] = None
@@ -686,9 +686,9 @@ class LocalCorpus(Corpus):
 
     def __init__(self, name=None):
         if not isinstance(name, (str, type(None))):
-            raise CorpusException("Name must be a string or None")
+            raise CorpusException('Name must be a string or None')
         if name is not None and not name:
-            raise CorpusException("Name cannot be blank")
+            raise CorpusException('Name cannot be blank')
         if name == 'local':
             self._name = None
         elif name in ('core', 'virtual'):
@@ -1034,6 +1034,6 @@ _DOC_ORDER = (
     # VirtualCorpus,
     )
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest()

@@ -128,9 +128,9 @@ def getWork(workName,
     if not common.isListLike(fileExtensions):
         fileExtensions = [fileExtensions]
 
-    if workNameJoined.endswith(".xml"):
+    if workNameJoined.endswith('.xml'):
         # might be compressed MXL file
-        mxlWorkName = os.path.splitext(workNameJoined)[0] + ".mxl"
+        mxlWorkName = os.path.splitext(workNameJoined)[0] + '.mxl'
         addXMLWarning = True
 
     filePaths = None
@@ -361,6 +361,6 @@ def listSearchFields():
 #------------------------------------------------------------------------------
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest()

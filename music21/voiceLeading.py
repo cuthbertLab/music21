@@ -135,8 +135,8 @@ class VoiceLeadingQuartet(base.Music21Object):
                     raise AttributeError
             except AttributeError:
                 raise VoiceLeadingQuartetException(
-                    'got a key signature that is not a string or music21 Key ' +
-                    'object: %s' % keyValue)
+                    'got a key signature that is not a string or music21 Key '
+                    + 'object: %s' % keyValue)
         self._key = keyValue
 
     key = property(_getKey, _setKey, doc='''

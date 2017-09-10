@@ -83,7 +83,7 @@ be a problem, music21 could be modified to keep track of "rounding errors"
 and make sure that for instance half the notes of an 11:1 are 916 divisions
 long and the other half are 917.  But this has not been done yet.
 '''
-divisionsPerQuarter = 32*3*3*5*7 # 10080
+divisionsPerQuarter = 32 * 3 * 3 * 5 * 7 # 10080
 
 # ticks per quarter is used for midi
 # while a supposedly 16 bit unsigned value
@@ -130,7 +130,7 @@ class Test(unittest.TestCase):
 
 
 #-----------------------------------------------------------------||||||||||||--
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

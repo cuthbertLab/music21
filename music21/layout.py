@@ -98,12 +98,12 @@ from music21 import spanner
 from music21 import stream
 
 from music21 import environment
-_MOD = "layout"
+_MOD = 'layout'
 environLocal = environment.Environment(_MOD)
 
 
-SystemSize = namedtuple("SystemSize", "top left right bottom")
-PageSize = namedtuple("PageSize", "top left right bottom width height")
+SystemSize = namedtuple('SystemSize', 'top left right bottom')
+PageSize = namedtuple('PageSize', 'top left right bottom width height')
 
 class LayoutBase(base.Music21Object):
     classSortOrder = -10
@@ -167,7 +167,7 @@ class ScoreLayout(LayoutBase):
                 self.wordFont = keywords[key]
 
     def __repr__(self):
-        return "<music21.layout.ScoreLayout>"
+        return '<music21.layout.ScoreLayout>'
 
     def tenthsToMillimeters(self, tenths):
         '''
@@ -251,7 +251,7 @@ class PageLayout(LayoutBase):
                 self.isNew = keywords[key]
 
     def __repr__(self):
-        return "<music21.layout.PageLayout>"
+        return '<music21.layout.PageLayout>'
 
 
 #-------------------------------------------------------------------------------
@@ -304,7 +304,7 @@ class SystemLayout(LayoutBase):
                 self.isNew = keywords[key]
 
     def __repr__(self):
-        return "<music21.layout.SystemLayout>"
+        return '<music21.layout.SystemLayout>'
 
 class StaffLayout(LayoutBase):
     '''
@@ -380,9 +380,9 @@ class StaffLayout(LayoutBase):
                     self.hidden = True
 
     def __repr__(self):
-        return ("<music21.layout.StaffLayout " +
-                "distance %r, staffNumber %r, staffSize %r, staffLines %r>" % (
-                self.distance, self.staffNumber, self.staffSize, self.staffLines))
+        return ('<music21.layout.StaffLayout '
+                + 'distance %r, staffNumber %r, staffSize %r, staffLines %r>' % (
+                     self.distance, self.staffNumber, self.staffSize, self.staffLines))
 
 #-------------------------------------------------------------------------------
 class LayoutException(exceptions21.Music21Exception):
@@ -618,7 +618,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
     for pageStartM, pageEndM in pageMeasureTuples:
         pageNumber += 1
         if printUpdates is True:
-            print("updating page", pageNumber)
+            print('updating page', pageNumber)
         thisPage = Page()
         thisPage.measureStart = pageStartM
         thisPage.measureEnd = pageEndM
@@ -678,7 +678,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
                 # else:
                 staffObject.staffLayout = allStaffLayouts[0]
                 #if len(allStaffLayouts) > 1:
-                #    print("Got many staffLayouts")
+                #    print('Got many staffLayouts')
 
 
             allSystemLayouts = thisSystem.recurse().getElementsByClass('SystemLayout')
@@ -788,7 +788,7 @@ class LayoutScore(stream.Opus):
             break
 
         if foundPage is None:
-            raise LayoutException("Cannot find this measure on any page!")
+            raise LayoutException('Cannot find this measure on any page!')
 
         foundSystem = None
         foundSystemId = None
@@ -1153,12 +1153,12 @@ class LayoutScore(stream.Opus):
         except IndexError:
             firstMeasureOfStaff = stream.Stream()
             environLocal.warn(
-                "No measures found in pageId %d, systemId %d, staffId %d" % (
+                'No measures found in pageId %d, systemId %d, staffId %d' % (
                                                                         pageId, systemId, staffId))
 
         allStaffLayouts = firstMeasureOfStaff.iter.getElementsByClass('StaffLayout')
         if allStaffLayouts:
-            #print("Got staffLayouts: ")
+            #print('Got staffLayouts: ')
             for sltemp in allStaffLayouts:
                 distanceTemp = sltemp.distance
                 if distanceTemp is not None:
@@ -1203,7 +1203,7 @@ class LayoutScore(stream.Opus):
             firstMeasureOfStaff = thisStaff.getElementsByClass('Measure')[0]
         except IndexError:
             firstMeasureOfStaff = stream.Stream()
-            environLocal.warn("No measures found in pageId %d, systemId %d, staffId %d" % (
+            environLocal.warn('No measures found in pageId %d, systemId %d, staffId %d' % (
                                                                         pageId, systemId, staffId))
 
         numStaffLines = 5  # TODO: should be taken from staff attributes
@@ -1213,11 +1213,11 @@ class LayoutScore(stream.Opus):
 
         allStaffLayouts = list(firstMeasureOfStaff.iter.getElementsByClass('StaffLayout'))
         if allStaffLayouts:
-            #print("Got staffLayouts: ")
+            #print('Got staffLayouts: ')
             staffLayoutObj = allStaffLayouts[0]
             if staffLayoutObj.staffSize is not None:
                 staffSize = staffSizeBase * (staffLayoutObj.staffSize / 100.0)
-                #print("Got staffHeight of %d for partId %d" % (staffHeight, partId))
+                #print('Got staffHeight of %d for partId %d' % (staffHeight, partId))
                 staffSizeDefinedLocally = True
 
         if staffSizeDefinedLocally is False:
@@ -1446,7 +1446,7 @@ class LayoutScore(stream.Opus):
             if currentWidth is None:
                 ### error mode? throw error? or assume default width?  Let's do the latter for now
                 environLocal.warn(
-                    "Could not get width for measure %d, using default of 300" % m.number)
+                    'Could not get width for measure %d, using default of 300' % m.number)
                 currentWidth = 300.0
             else:
                 currentWidth = float(currentWidth)
@@ -1472,7 +1472,7 @@ class LayoutScore(stream.Opus):
         allRetInfo = []
         for mNum in range(self.measureStart, self.measureEnd + 1):
             if printUpdates is True: # so fast now that it's not needed
-                print("Doing measure ", mNum)
+                print('Doing measure ', mNum)
             mList = []
             for staffNum in range(numStaves):
                 tupleInfo = self.getPositionForStaffMeasure(staffNum, mNum, returnFormat)
@@ -1525,7 +1525,7 @@ class System(stream.Score):
         self.measureEnd = None
 
     def __repr__(self):
-        return "<{0}.{1} {2}: p.{3}, sys.{4}>".format(self.__module__, self.__class__.__name__,
+        return '<{0}.{1} {2}: p.{3}, sys.{4}>'.format(self.__module__, self.__class__.__name__,
                                                         self.systemNumber,
                                                         self.pageNumber, self.pageSystemNumber)
 
@@ -1553,7 +1553,7 @@ class Staff(stream.Part):
         self.staffLayout = None
 
     def __repr__(self):
-        return "<{0}.{1} {2}: p.{3}, sys.{4}, st.{5}>".format(
+        return '<{0}.{1} {2}: p.{3}, sys.{4}, st.{5}>'.format(
                                                         self.__module__,
                                                         self.__class__.__name__,
                                                         self.scoreStaffNumber,
@@ -1623,10 +1623,10 @@ class Test(unittest.TestCase):
         from music21 import corpus
         c = corpus.parse('luca/gloria').parts[0]
         #c.show('text')
-        retStr = ""
+        retStr = ''
         for x in c.flat:
             if 'PageLayout' in x.classes:
-                retStr += str(x.pageNumber) + ": " + str(x.measureNumber) + ", "
+                retStr += str(x.pageNumber) + ': ' + str(x.measureNumber) + ', '
 #        print(retStr)
         self.assertEqual(retStr, '1: 1, 2: 23, 3: 50, 4: 80, 5: 103, ')
 
@@ -1643,7 +1643,7 @@ class Test(unittest.TestCase):
         self.assertIsNotNone(hiddenStaff.staffLayout)
 
 #-------------------------------------------------------------------------------
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test) #, runTest='getStaffLayoutFromStaff')
 

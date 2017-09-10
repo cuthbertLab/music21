@@ -72,7 +72,7 @@ def getCorpusFilePath():
 
 def getCorpusContentDirs():
     '''
-    Get all dirs that are found in the corpus that contain content;
+    Get all dirs that are found in the CoreCorpus that contain content;
     that is, exclude dirs that have code or other resources.
 
     >>> fp = common.getCorpusContentDirs()

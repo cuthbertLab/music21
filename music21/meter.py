@@ -10,7 +10,8 @@
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
-'''This module defines the :class:`~music21.meter.TimeSignature` object,
+'''
+This module defines the :class:`~music21.meter.TimeSignature` object,
 as well as component objects for defining nested metrical structures,
 :class:`~music21.meter.MeterTerminal` and :class:`~music21.meter.MeterSequence` objects.
 '''
@@ -87,7 +88,7 @@ def slashToTuple(value):
     elif 'fast' in valueChars.lower():
         tempoIndication = 'fast'
 
-    matches = re.match(r"(\d+)\/(\d+)", valueNumbers)
+    matches = re.match(r'(\d+)\/(\d+)', valueNumbers)
     if matches is not None:
         n = int(matches.group(1))
         d = int(matches.group(2))
@@ -420,7 +421,7 @@ def bestTimeSignature(meas):
             try:
                 dType, match = duration.quarterLengthToClosestType(minDurTest)
             except ZeroDivisionError:
-                raise MeterException("Cannot find a good match for this measure")
+                raise MeterException('Cannot find a good match for this measure')
 
             if match or dType == MIN_DENOMINATOR_TYPE:
                 break
@@ -588,7 +589,7 @@ class MeterTerminal(SlottedObjectMixin):
         return '<MeterTerminal %s>' % self.__str__()
 
     def __str__(self):
-        return str(int(self.numerator)) + "/" + str(int(self.denominator))
+        return str(int(self.numerator)) + '/' + str(int(self.denominator))
 
 # now using ratioEqual()
 
@@ -2102,8 +2103,8 @@ class MeterSequence(MeterTerminal):
                 totalRatio = self._numerator / float(self._denominator)
             except TypeError:
                 raise MeterException(
-                    "Something wrong with the type of " +
-                    "this numerator %s %s or this denominator %s %s" %
+                    'Something wrong with the type of '
+                    + 'this numerator %s %s or this denominator %s %s' %
                                      (self._numerator, type(self._numerator),
                                       self._denominator, type(self._denominator)))
 
@@ -2804,7 +2805,7 @@ class TimeSignature(base.Music21Object):
     >>> tsCommon.symbol
     'common'
 
-    >>> tsCut = meter.TimeSignature("cut")
+    >>> tsCut = meter.TimeSignature('cut')
     >>> tsCut.beatCount
     2
     >>> tsCut.denominator
@@ -2882,7 +2883,7 @@ class TimeSignature(base.Music21Object):
             value = '{0}/{1}'.format(defaults.meterNumerator, defaults.meterDenominatorBeatType)
 
         self._overriddenBarDuration = None
-        self.symbol = ""
+        self.symbol = ''
         self.displaySequence = None
         self.beatSequence = None
         self.accentSequence = None
@@ -2899,7 +2900,7 @@ class TimeSignature(base.Music21Object):
         ## MSC: couldn't figure out what this does, so cut for now...
         ## whether the TimeSignature object is inherited from ??
         #self.inherited = False
-        self.symbol = "" # common, cut, single-number, normal
+        self.symbol = '' # common, cut, single-number, normal
 
         # a parameter to determine if the denominator is represented
         # as either a symbol (a note) or as a number
@@ -2945,7 +2946,7 @@ class TimeSignature(base.Music21Object):
         return self.__repr__()
 
     def __repr__(self):
-        return "<music21.meter.TimeSignature %s>" % self.ratioString
+        return '<music21.meter.TimeSignature %s>' % self.ratioString
 
     def ratioEqual(self, other):
         '''
@@ -3670,7 +3671,7 @@ class TimeSignature(base.Music21Object):
 
         Pickup measure support included by taking in an additional measureStartOffset argument.
 
-        >>> threeFour = meter.TimeSignature("3/4")
+        >>> threeFour = meter.TimeSignature('3/4')
         >>> nList = [note.Note(type='eighth') for _ in range(3)]
         >>> beamList = threeFour.getBeams(nList, measureStartOffset=1.5)
         >>> print(beamList)
@@ -4015,7 +4016,7 @@ class TimeSignature(base.Music21Object):
                     continue
                 if nextBeam.type in ('continue', 'stop'):
                     environLocal.warn(
-                        "Found a messed up beam pair {}, {}, at index {} of \n{}".format(
+                        'Found a messed up beam pair {}, {}, at index {} of \n{}'.format(
                             bThis, bNext, i, beamsList))
                     continue #
 
@@ -4428,7 +4429,7 @@ class TimeSignature(base.Music21Object):
         >>> c = corpus.parse('bwv1.6')
         >>> for m in c.parts[0].getElementsByClass('Measure'):
         ...     ts = m.timeSignature or m.getContextByClass('TimeSignature')
-        ...     print("%s %s" % (m.number, ts.getOffsetFromBeat(4.5) - m.paddingLeft))
+        ...     print('%s %s' % (m.number, ts.getOffsetFromBeat(4.5) - m.paddingLeft))
         0 0.5
         1 3.5
         2 3.5
@@ -4594,11 +4595,11 @@ class SenzaMisuraTimeSignature(base.Music21Object):
         self.text = text
 
     def __repr__(self):
-        head = "<music21.meter.SenzaMisuraTimeSignature"
+        head = '<music21.meter.SenzaMisuraTimeSignature'
         if self.text is None:
-            return head + ">"
+            return head + '>'
         else:
-            return head + " " + self.text + " >"
+            return head + ' ' + self.text + ' >'
 
 
 # TODO: Implement or delete...
@@ -5054,7 +5055,7 @@ class Test(unittest.TestCase):
         bm = converter.parse("tinyNotation: 2/4 b16 c' b a g f# g r")
         bm2 = bm.makeNotation()
         beamList = [n.beams for n in bm2.flat.notes]
-        beamListRepr = [str(i) + " " + repr(beamList[i]) for i in range(len(beamList))]
+        beamListRepr = [str(i) + ' ' + repr(beamList[i]) for i in range(len(beamList))]
         self.maxDiff = 2000
         self.assertEqual(beamListRepr, [
             '0 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>',
@@ -5085,7 +5086,7 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus
         fautIl = corpus.parse('demos/incorrect_time_signature_pv')
-        for m in fautIl.recurse().getElementsByClass("Measure"):
+        for m in fautIl.recurse().getElementsByClass('Measure'):
             m.timeSignature = m.bestTimeSignature()
         p1 = fautIl.parts[1]
         tsReps = []
@@ -5172,7 +5173,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [TimeSignature]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test) #, runTest='testCompoundSameDenominator')
 

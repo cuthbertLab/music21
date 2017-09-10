@@ -4010,8 +4010,8 @@ def getExtractorByTypeAndNumber(extractorType, number):
     ...       if fs[k][i] is not None:
     ...         n = fs[k][i].__name__
     ...         if fs[k][i] not in features.jSymbolic.featureExtractors:
-    ...            n += " (not implemented)"
-    ...         print("%s %d %s" % (k, i, n))
+    ...            n += ' (not implemented)'
+    ...         print('%s %d %s' % (k, i, n))
     D 1 OverallDynamicRangeFeature (not implemented)
     D 2 VariationOfDynamicsFeature (not implemented)
     D 3 VariationOfDynamicsInEachVoiceFeature (not implemented)
@@ -4606,7 +4606,7 @@ class Test(unittest.TestCase):
 
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

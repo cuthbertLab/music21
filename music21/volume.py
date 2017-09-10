@@ -22,7 +22,7 @@ from music21 import common
 from music21.common import SlottedObjectMixin
 
 from music21 import environment
-_MOD = "volume"
+_MOD = 'volume'
 environLocal = environment.Environment(_MOD)
 
 
@@ -91,7 +91,7 @@ class Volume(SlottedObjectMixin):
         return new
 
     def __repr__(self):
-        return "<music21.volume.Volume realized=%s>" % round(self.realized, 2)
+        return '<music21.volume.Volume realized=%s>' % round(self.realized, 2)
 
     def __getstate__(self):
         self._client = common.unwrapWeakref(self._client)
@@ -408,8 +408,8 @@ class Volume(SlottedObjectMixin):
     @velocityScalar.setter
     def velocityScalar(self, value):
         if not common.isNum(value):
-            raise VolumeException('value provided for velocityScalar must be a number, ' +
-                                  'not %s' % value)
+            raise VolumeException('value provided for velocityScalar must be a number, '
+                                  + 'not %s' % value)
         if value < 0:
             scalar = 0
         elif value > 1:
@@ -747,7 +747,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = []
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

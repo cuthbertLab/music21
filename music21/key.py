@@ -31,7 +31,7 @@ from music21 import scale
 from music21 import style
 
 from music21 import environment
-_MOD = "key"
+_MOD = 'key'
 environLocal = environment.Environment(_MOD)
 
 
@@ -415,20 +415,20 @@ class KeySignature(base.Music21Object):
 
 
     def _strDescription(self):
-        output = ""
+        output = ''
         ns = self.sharps
         if ns is None:
             output = 'pitches: [' + ', '.join([str(p) for p in self.alteredPitches]) + ']'
         elif ns > 1:
-            output = "%s sharps" % str(ns)
+            output = '%s sharps' % str(ns)
         elif ns == 1:
-            output = "1 sharp"
+            output = '1 sharp'
         elif ns == 0:
-            output = "no sharps or flats"
+            output = 'no sharps or flats'
         elif ns == -1:
-            output = "1 flat"
+            output = '1 flat'
         else:
-            output = "%s flats" % str(abs(ns))
+            output = '%s flats' % str(abs(ns))
         return output
 
     def __eq__(self, other):
@@ -444,7 +444,7 @@ class KeySignature(base.Music21Object):
             return False
 
     def __repr__(self):
-        return "<music21.key.KeySignature of %s>" % self._strDescription()
+        return '<music21.key.KeySignature of %s>' % self._strDescription()
 
     def __str__(self):
         return self.__repr__()
@@ -581,18 +581,18 @@ class KeySignature(base.Music21Object):
         or None if there is none.
 
         >>> g = key.KeySignature(1)
-        >>> g.accidentalByStep("F")
+        >>> g.accidentalByStep('F')
         <accidental sharp>
-        >>> g.accidentalByStep("G")
+        >>> g.accidentalByStep('G')
 
         >>> f = key.KeySignature(-1)
-        >>> bbNote = note.Note("B-5")
+        >>> bbNote = note.Note('B-5')
         >>> f.accidentalByStep(bbNote.step)
         <accidental flat>
 
         Fix a wrong note in F-major:
 
-        >>> wrongBNote = note.Note("B#4")
+        >>> wrongBNote = note.Note('B#4')
         >>> if f.accidentalByStep(wrongBNote.step) != wrongBNote.pitch.accidental:
         ...    wrongBNote.pitch.accidental = f.accidentalByStep(wrongBNote.step)
         >>> wrongBNote
@@ -606,8 +606,8 @@ class KeySignature(base.Music21Object):
         >>> s1.append(note.Note('C', type='half'))
         >>> s1.append(note.Note('E-', type='half'))
         >>> s1.append(key.KeySignature(-4)) # A-flat-major or F-minor
-        >>> s1.append(note.Note("A", type='whole'))
-        >>> s1.append(note.Note("F#", type='whole'))
+        >>> s1.append(note.Note('A', type='whole'))
+        >>> s1.append(note.Note('F#', type='whole'))
         >>> #_DOCS_SHOW s1.show()
 
         .. image:: images/keyAccidentalByStep_Before.*
@@ -633,8 +633,8 @@ class KeySignature(base.Music21Object):
 
         Test to make sure there are not linked accidentals (fixed bug 22 Nov. 2010)
 
-        >>> nB1 = note.Note("B", type='whole')
-        >>> nB2 = note.Note("B", type='whole')
+        >>> nB1 = note.Note('B', type='whole')
+        >>> nB2 = note.Note('B', type='whole')
         >>> s1.append(nB1)
         >>> s1.append(nB2)
         >>> for n in s1.notes:
@@ -896,13 +896,13 @@ class Key(KeySignature, scale.DiatonicScale):
         return hash(hashTuple)
 
     def __repr__(self):
-        return "<music21.key.Key of %s>" % self.__str__()
+        return '<music21.key.Key of %s>' % self.__str__()
 
     def __str__(self):
         # string representation needs to be complete, as is used
         # for metadata comparisons
         tonic = self.tonicPitchNameWithCase
-        return "%s %s" % (tonic, self.mode)
+        return '%s %s' % (tonic, self.mode)
 
     def __eq__(self, other):
         '''
@@ -983,10 +983,10 @@ class Key(KeySignature, scale.DiatonicScale):
 
         Useful, but simple:
 
-        >>> k = key.Key("c#")
+        >>> k = key.Key('c#')
         >>> k.tonicPitchNameWithCase
         'c#'
-        >>> k = key.Key("B")
+        >>> k = key.Key('B')
         >>> k.tonicPitchNameWithCase
         'B'
         >>> k.mode = 'minor'
@@ -1095,7 +1095,7 @@ class Key(KeySignature, scale.DiatonicScale):
         specification can be provided. Alternatively, a
         :class:`music21.interval.Interval` object can be supplied.
 
-        >>> dMajor = key.Key("D")
+        >>> dMajor = key.Key('D')
         >>> dMajor
         <music21.key.Key of D major>
 
@@ -1254,7 +1254,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [KeySignature, Key]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

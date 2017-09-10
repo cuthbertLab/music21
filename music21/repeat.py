@@ -52,7 +52,7 @@ class RepeatMark:
     >>> s.append(PartialRepeat())
     >>> repeats = s.iter.getElementsByClass(repeat.RepeatMark)
     >>> if repeats:
-    ...    print("Stream has %d repeat(s) in it" % (len(repeats)))
+    ...    print('Stream has %d repeat(s) in it' % (len(repeats)))
     Stream has 1 repeat(s) in it
     '''
 
@@ -607,7 +607,7 @@ def deleteMeasures(s, toDelete, *, inPlace=False, correctMeasureNumbers=True):
 
     # correct the measure numbers
     if correctMeasureNumbers:
-        measures = list(s.getElementsByClass("Measure"))
+        measures = list(s.getElementsByClass('Measure'))
         if len(measures) is not 0:
             i = measures[0].number
 
@@ -1956,14 +1956,16 @@ class RepeatFinder:
         music21.repeat.InsufficientLengthException: Cannot determine length
             of pickup given fewer than 3 measures
 
-        _OMIT_FROM_DOCS_
+        OMIT_FROM_DOCS
+        
         >>> repeat.RepeatFinder().getQuarterLengthOfPickupMeasure()
         Traceback (most recent call last):
-        music21.repeat.NoInternalStreamException: RepeatFinder must be initialized with a stream
+        music21.repeat.NoInternalStreamException: 
+            RepeatFinder must be initialized with a stream
 
         '''
         if self.s is None:
-            raise NoInternalStreamException("RepeatFinder must be initialized with a stream")
+            raise NoInternalStreamException('RepeatFinder must be initialized with a stream')
 
         if self.s.hasMeasures():
             s2 = self.s
@@ -1974,7 +1976,7 @@ class RepeatFinder:
         mOffsets = list(s2.measureOffsetMap().keys())
         if len(mOffsets) < 3:
             raise InsufficientLengthException(
-                "Cannot determine length of pickup given fewer than 3 measures")
+                'Cannot determine length of pickup given fewer than 3 measures')
 
         pickup = mOffsets[1] - mOffsets[0]
         normMeasure = mOffsets[2] - mOffsets[1]
@@ -2013,7 +2015,7 @@ class RepeatFinder:
         music21.repeat.NoInternalStreamException: RepeatFinder must be initialized with a stream
         '''
         if self.s is None:
-            raise NoInternalStreamException("RepeatFinder must be initialized with a stream")
+            raise NoInternalStreamException('RepeatFinder must be initialized with a stream')
 
         return self.getQuarterLengthOfPickupMeasure() != 0.0
 
@@ -2053,7 +2055,7 @@ class RepeatFinder:
         '''
 
         if self.s is None:
-            raise NoInternalStreamException("RepeatFinder must be initialized with a stream")
+            raise NoInternalStreamException('RepeatFinder must be initialized with a stream')
 
         if self._mList is not None:
             return self._mList
@@ -2065,15 +2067,15 @@ class RepeatFinder:
         # Check for different parts and change mlist to a list of
         # measure-streams: [<measures from part1>, <measures from part2>, ... ]
         if s.hasMeasures():
-            mlists = [s.getElementsByClass("Measure")]
+            mlists = [s.getElementsByClass('Measure')]
         else:
-            mlists = [ p.getElementsByClass("Measure") for p in s.parts ]
+            mlists = [ p.getElementsByClass('Measure') for p in s.parts ]
 
         #Check for unequal lengths
         for i in range(len(mlists) - 1):
             if len(mlists[i]) != len(mlists[i + 1]):
                 raise UnequalPartsLengthException(
-                        "Parts must each have the same number of measures.")
+                        'Parts must each have the same number of measures.')
 
         # Change mlist so each element of mlist is a list of hashed measures
         # for each measure in a part.
@@ -2423,7 +2425,7 @@ class RepeatFinder:
 
         if s is None:
             raise NoInternalStreamException(
-                "This function only works when RepeatFinder is initialized with a stream")
+                'This function only works when RepeatFinder is initialized with a stream')
 
         repeatEndingBars = [] # (measureStart, measureOfFirstEnding, repeatSignMeasure)
         toDelete = []
@@ -4306,7 +4308,7 @@ _DOC_ORDER = [RepeatExpression, RepeatExpressionMarker, Coda, Segno, Fine,
               RepeatExpressionCommand, DaCapo, DaCapoAlFine,
               DaCapoAlCoda, AlSegno, DalSegno, DalSegnoAlFine, DalSegnoAlCoda, RepeatFinder]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test) #, runTest='testExpandRepeatA')
 

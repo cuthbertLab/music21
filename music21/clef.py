@@ -27,7 +27,7 @@ from music21 import exceptions21
 from music21 import environment
 from music21 import style
 
-_MOD = "clef"
+_MOD = 'clef'
 environLocal = environment.Environment(_MOD)
 
 
@@ -108,8 +108,8 @@ class Clef(base.Music21Object):
 
     def __repr__(self):
         # get just the clef name of this instance
-        return "<music21.clef.%s>" % common.classToClassStr(self.__class__)
-        #return "<music21.clef.%s>" % str(self.__class__).split('.')[-1][:-2]
+        return '<music21.clef.%s>' % common.classToClassStr(self.__class__)
+        #return '<music21.clef.%s>' % str(self.__class__).split('.')[-1][:-2]
 
     def __eq__(self, other):
         '''
@@ -256,7 +256,7 @@ class TabClef(PitchClef):
     '''
     def __init__(self):
         super().__init__()
-        self.sign = "TAB"
+        self.sign = 'TAB'
         self.line = 5
 
 #-------------------------------------------------------------------------------
@@ -272,7 +272,7 @@ class GClef(PitchClef):
     '''
     def __init__(self):
         super().__init__()
-        self.sign = "G"
+        self.sign = 'G'
 
 class FrenchViolinClef(GClef):
     '''
@@ -367,7 +367,7 @@ class CClef(PitchClef):
     '''
     def __init__(self):
         super().__init__()
-        self.sign = "C"
+        self.sign = 'C'
 
 class SopranoClef(CClef):
     '''
@@ -460,7 +460,7 @@ class FClef(PitchClef):
     '''
     def __init__(self):
         super().__init__()
-        self.sign = "F"
+        self.sign = 'F'
 
 class FBaritoneClef(FClef):
     '''
@@ -541,10 +541,10 @@ class SubBassClef(FClef):
 
 #-------------------------------------------------------------------------------
 CLASS_FROM_TYPE = {
-    "G": [None, FrenchViolinClef, TrebleClef, GSopranoClef, None, None],
-    "C": [None, SopranoClef, MezzoSopranoClef, AltoClef, TenorClef, CBaritoneClef],
-    "F": [None, None, None, FBaritoneClef, BassClef, SubBassClef],
-    "TAB" : [None, None, None, None, None, TabClef]
+    'G': [None, FrenchViolinClef, TrebleClef, GSopranoClef, None, None],
+    'C': [None, SopranoClef, MezzoSopranoClef, AltoClef, TenorClef, CBaritoneClef],
+    'F': [None, None, None, FBaritoneClef, BassClef, SubBassClef],
+    'TAB' : [None, None, None, None, None, TabClef]
     }
 
 
@@ -556,15 +556,15 @@ def clefFromString(clefString, octaveShift=0):
     Does not refer to a violin/guitar string.
 
 
-    >>> tc = clef.clefFromString("G2")
+    >>> tc = clef.clefFromString('G2')
     >>> tc
     <music21.clef.TrebleClef>
-    >>> nonStandard1 = clef.clefFromString("F1")
+    >>> nonStandard1 = clef.clefFromString('F1')
     >>> nonStandard1
     <music21.clef.FClef>
     >>> nonStandard1.line
     1
-    >>> nonStandard2 = clef.clefFromString("D4")
+    >>> nonStandard2 = clef.clefFromString('D4')
     >>> nonStandard2
     <music21.clef.PitchClef>
     >>> nonStandard2.sign
@@ -573,19 +573,19 @@ def clefFromString(clefString, octaveShift=0):
     4
 
 
-    >>> tc8vb = clef.clefFromString("G2", -1)
+    >>> tc8vb = clef.clefFromString('G2', -1)
     >>> tc8vb
     <music21.clef.Treble8vbClef>
 
     Three special clefs, Tab, Percussion, and None are also supported.
 
-    >>> tabClef = clef.clefFromString("TAB")
+    >>> tabClef = clef.clefFromString('TAB')
     >>> tabClef
     <music21.clef.TabClef>
 
     Case does not matter.
 
-    >>> tc8vb = clef.clefFromString("g2", -1)
+    >>> tc8vb = clef.clefFromString('g2', -1)
     >>> tc8vb
     <music21.clef.Treble8vbClef>
 
@@ -599,7 +599,7 @@ def clefFromString(clefString, octaveShift=0):
 
     Invalid line numbers raise an exception:
 
-    >>> invalidClef = clef.clefFromString("F6")
+    >>> invalidClef = clef.clefFromString('F6')
     Traceback (most recent call last):
     music21.clef.ClefException: line number (second character) must be 1-5;
                 do not use this function for clefs on special staves such as 'F6'
@@ -626,15 +626,17 @@ def clefFromString(clefString, octaveShift=0):
             return JianpuClef()
 
     if len(xnStr) == 2:
-        (thisType, lineNum) = (xnStr[0], xnStr[1])
+        (thisType, lineNum) = (xnStr[0].upper(), int(xnStr[1]))
     elif len(xnStr) == 1: # some Humdrum files have just ClefG, eg. Haydn op. 9 no 3, mvmt 1
         thisType = xnStr[0].upper()
-        if thisType == "G":
+        if thisType == 'G':
             lineNum = 2
-        elif thisType == "F":
+        elif thisType == 'F':
             lineNum = 4
-        elif thisType == "C":
+        elif thisType == 'C':
             lineNum = 3
+        else:
+            lineNum = False;
     elif len(xnStr) > 2:
         from music21 import clef as myself # @UnresolvedImport
         xnLower = xnStr.lower()
@@ -647,12 +649,12 @@ def clefFromString(clefString, octaveShift=0):
             if isinstance(objType, type):
                 return objType()
 
-        raise ClefException("Could not find clef " + xnStr)
+        raise ClefException('Could not find clef ' + xnStr)
     else:
-        raise ClefException("Entry has clef info but no clef specified")
+        raise ClefException('Entry has clef info but no clef specified')
 
     if octaveShift != 0:
-        params = (thisType.upper(), int(lineNum), octaveShift)
+        params = (thisType, lineNum, octaveShift)
         if params == ('G', 2, -1):
             return Treble8vbClef()
         elif params == ('G', 2, 1):
@@ -664,22 +666,22 @@ def clefFromString(clefString, octaveShift=0):
         ### other octaveShifts will pass through
 
     if thisType is False or lineNum is False:
-        raise ClefException("can't read %s as clef str, should be G2, F4, etc.", xnStr)
-    lineNum = int(lineNum)
+        raise ClefException('cannot read %s as clef str, should be G2, F4, etc.', xnStr)
+
     if lineNum < 1 or lineNum > 5:
-        raise ClefException("line number (second character) must be 1-5; do not use this " +
-                            "function for clefs on special staves such as '%s'" % xnStr)
+        raise ClefException('line number (second character) must be 1-5; do not use this '
+                            + "function for clefs on special staves such as '%s'" % xnStr)
 
     clefObj = None
     if thisType in CLASS_FROM_TYPE:
         if CLASS_FROM_TYPE[thisType][lineNum] is None:
-            if thisType == "G":
+            if thisType == 'G':
                 clefObj = GClef()
-            elif thisType == "F":
+            elif thisType == 'F':
                 clefObj = FClef()
-            elif thisType == "C":
+            elif thisType == 'C':
                 clefObj = CClef()
-            elif thisType == "TAB":
+            elif thisType == 'TAB':
                 clefObj = TabClef()
             clefObj.line = lineNum
         else:
@@ -858,14 +860,14 @@ class Test(unittest.TestCase):
             self.assertEqual(c.line, params[1])
             self.assertEqual(c.octaveChange, params[2])
             self.assertEqual(isinstance(c, className), True,
-                             "Failed Conversion of classes: %s is not a %s" % (c, className))
+                             'Failed Conversion of classes: %s is not a %s' % (c, className))
 
     def testContexts(self):
         from music21 import stream
         from music21 import note
         from music21 import meter
 
-        n1 = note.Note("C")
+        n1 = note.Note('C')
         n1.offset = 10
         c1 = AltoClef()
         c1.offset = 0
@@ -876,11 +878,11 @@ class Test(unittest.TestCase):
 
         del(s1)
 
-        n2 = note.Note("D")
-        n2.duration.type = "whole"
-        n3 = note.Note("E")
-        n3.duration.type = "whole"
-        ts1 = meter.TimeSignature("4/4")
+        n2 = note.Note('D')
+        n2.duration.type = 'whole'
+        n3 = note.Note('E')
+        n3.duration.type = 'whole'
+        ts1 = meter.TimeSignature('4/4')
         s2 = stream.Stream()
         s2.append(c1)
         s2.append(ts1)
@@ -891,14 +893,14 @@ class Test(unittest.TestCase):
 
         del(s2)
 
-        n4 = note.Note("F")
-        n4.duration.type = "half"
-        n5 = note.Note("G")
-        n5.duration.type = "half"
-        n6 = note.Note("A")
-        n6.duration.type = "whole"
+        n4 = note.Note('F')
+        n4.duration.type = 'half'
+        n5 = note.Note('G')
+        n5.duration.type = 'half'
+        n6 = note.Note('A')
+        n6.duration.type = 'whole'
 
-        ts2 = meter.TimeSignature("4/4")
+        ts2 = meter.TimeSignature('4/4')
         bc1 = BassClef()
         tc1 = TrebleClef()
 
@@ -923,7 +925,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [Clef, TrebleClef, BassClef]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

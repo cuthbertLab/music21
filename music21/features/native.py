@@ -139,8 +139,8 @@ class QualityFeature(featuresModule.FeatureExtractor):
                 keyFeature = 1
             else:
                 raise NativeFeatureException(
-                    "should be able to get a mode from something here -- " +
-                    "perhaps there are no notes?")
+                    'should be able to get a mode from something here -- ' +
+                    'perhaps there are no notes?')
 
         self.feature.vector[0] = keyFeature
 
@@ -700,11 +700,11 @@ class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
         totalCorrectlySpelled = histo['isTriad']
         forteData = self.data['chordify.flat.getElementsByClass(Chord).setClassHistogram']
         totalForteTriads = 0
-        if "3-11" in forteData:
+        if '3-11' in forteData:
             totalForteTriads += forteData['3-11']
-        if "3-12" in forteData:
+        if '3-12' in forteData:
             totalForteTriads += forteData['3-12']
-        if "3-10" in forteData:
+        if '3-10' in forteData:
             totalForteTriads += forteData['3-10']
 
         totalIncorrectlySpelled = totalForteTriads - totalCorrectlySpelled
@@ -816,7 +816,7 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
     >>> #_DOCS_SHOW s = corpus.parse('mozart/k155', 2)
     >>> s = stream.Score() #_DOCS_HIDE
     >>> s.append(metadata.Metadata()) #_DOCS_HIDE
-    >>> s.metadata.composer = "W.A. Mozart" #_DOCS_HIDE
+    >>> s.metadata.composer = 'W.A. Mozart' #_DOCS_HIDE
     >>> fe = features.native.ComposerPopularity(s)
     >>> fe.extract().vector[0] > 6.0
     True
@@ -843,12 +843,12 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
         if md is None:
             return 0
         composer = md.composer
-        if composer is None or composer == "":
+        if composer is None or composer == '':
             return 0
         paramsBasic = {'q': composer}
 
         params = urlencode(paramsBasic)
-        urlStr = "http://www.google.com/search?%s" % params
+        urlStr = 'http://www.google.com/search?%s' % params
 
         headers = {'User-Agent': _M21UserAgent}
         req = Request(urlStr, headers=headers)
@@ -858,7 +858,7 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
 
         m = googleResultsRE.search(the_page)
         if m is not None and m.group(0):
-            totalRes = int(m.group(1).replace(',', ""))
+            totalRes = int(m.group(1).replace(',', ''))
             if totalRes > 0:
                 resultsLog = math.log(totalRes, 10)
             else:
@@ -1047,7 +1047,7 @@ class Test(unittest.TestCase):
 
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

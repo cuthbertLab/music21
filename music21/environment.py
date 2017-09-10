@@ -42,10 +42,10 @@ def etIndent(elem, level=0, spaces=2):
     '''
     indent an elementTree element for printing
     '''
-    i = "\n" + level * spaces * " "
+    i = '\n' + level * spaces * ' '
     if len(elem): # pylint: disable=len-as-condition
         if not elem.text or not elem.text.strip():
-            elem.text = i + spaces * " "
+            elem.text = i + spaces * ' '
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
         for subEl in elem:
@@ -335,7 +335,7 @@ class _EnvironmentCore:
         self._ref['lilypondFormat'] = 'pdf'
         self._ref['lilypondBackend'] = 'ps'
 
-        # path to a MusicXML reader: default, will find "MuseScore"
+        # path to a MusicXML reader: default, will find 'MuseScore'
         self._ref['musicxmlPath'] = None
 
         # path to a midi reader
@@ -661,12 +661,12 @@ class _EnvironmentCore:
         environmentKey = self.formatToKey(m21Format)
         if environmentKey is not None:
             if environmentKey not in self._ref:
-                raise EnvironmentException(environmentKey + " is not set in UserSettings. ")
+                raise EnvironmentException(environmentKey + ' is not set in UserSettings. ')
             return self._ref[environmentKey]
         return None
 
 
-    #@common.deprecated("May 24, 2014", "May 2016", "call SubConverter().launch() instead")
+    #@common.deprecated('May 24, 2014', 'May 2016', 'call SubConverter().launch() instead')
     def launch(self, fmt, filePath, options='', app=None):
         '''
         DEPRECATED May 24, 2014 -- call Launch on SubConverter
@@ -711,14 +711,14 @@ class _EnvironmentCore:
                 if m21Format == 'braille':
                     with open(filePath, 'r') as f:
                         for line in f:
-                            print(line, end="")
-                        print("")
+                            print(line, end='')
+                        print('')
                     return
                 else:
                     raise EnvironmentException(
-                        "Cannot find a valid application path for format {}. "
-                        "Specify this in your Environment by calling "
-                        "environment.set({!r}, '/path/to/application')".format(
+                        'Cannot find a valid application path for format {}. '
+                        + 'Specify this in your Environment by calling '
+                        + "environment.set({!r}, '/path/to/application')".format(
                             m21Format, environmentKey))
         elif platform == 'win':  # note extra set of quotes!
             cmd = '""%s" %s "%s""' % (fpApp, options, filePath)
@@ -1421,7 +1421,7 @@ class Test(unittest.TestCase):
             enc = "encoding='utf-8'"
         else:
             enc = ''
-        canonic = """<?xml version='1.0' """ + enc + """?>
+        canonic = '''<?xml version='1.0' ''' + enc + '''?>
 <settings encoding="utf-8">
   <preference name="autoDownload" value="ask" />
   <preference name="braillePath" />
@@ -1447,7 +1447,7 @@ class Test(unittest.TestCase):
   <preference name="warnings" value="1" />
   <preference name="writeFormat" value="musicxml" />
 </settings>
-"""
+'''
         self.assertTrue(common.whitespaceEqual(canonic, match))
 
         # try adding some local corpus settings
@@ -1463,7 +1463,7 @@ class Test(unittest.TestCase):
             enc = "encoding='utf-8'"
         else:
             enc = ''
-        canonic = """<?xml version='1.0' """ + enc + """?>
+        canonic = '''<?xml version='1.0' ''' + enc + '''?>
 <settings encoding="utf-8">
   <preference name="autoDownload" value="ask" />
   <preference name="braillePath" />
@@ -1500,7 +1500,7 @@ class Test(unittest.TestCase):
   <preference name="warnings" value="1" />
   <preference name="writeFormat" value="musicxml" />
 </settings>
-"""
+'''
         self.assertTrue(common.whitespaceEqual(canonic, match))
 
     def testFromSettings(self):
@@ -1522,7 +1522,7 @@ class Test(unittest.TestCase):
             enc = "encoding='utf-8'"
         else:
             enc = ''
-        canonic = """<?xml version='1.0' """ + enc + """?>
+        canonic = '''<?xml version='1.0' ''' + enc + '''?>
 <settings encoding="utf-8">
   <preference name="autoDownload" value="ask" />
   <preference name="braillePath" />
@@ -1552,7 +1552,7 @@ class Test(unittest.TestCase):
   <preference name="warnings" value="1" />
   <preference name="writeFormat" value="musicxml" />
 </settings>
-"""
+'''
         self.assertTrue(common.whitespaceEqual(canonic, match))
 
     def testEnvironmentA(self):
@@ -1571,6 +1571,6 @@ class Test(unittest.TestCase):
 
 _DOC_ORDER = [UserSettings, Environment, LocalCorpusSettings]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)

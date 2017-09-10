@@ -142,17 +142,17 @@ class FeatureExtractor:
 
         self.feature = None # Feature object that results from processing
 
-        if not hasattr(self, "name"):
+        if not hasattr(self, 'name'):
             self.name = None # string name representation
-        if not hasattr(self, "description"):
+        if not hasattr(self, 'description'):
             self.description = None # string description
-        if not hasattr(self, "isSequential"):
+        if not hasattr(self, 'isSequential'):
             self.isSequential = None # True or False
-        if not hasattr(self, "dimensions"):
+        if not hasattr(self, 'dimensions'):
             self.dimensions = None # number of dimensions
-        if not hasattr(self, "discrete"):
+        if not hasattr(self, 'discrete'):
             self.discrete = True # default
-        if not hasattr(self, "normalize"):
+        if not hasattr(self, 'normalize'):
             self.normalize = False # default is no
 
     def setData(self, dataOrStream):
@@ -288,7 +288,8 @@ class StreamForms:
 
     A dictionary `.forms` stores various intermediary representations
     of the stream which is the main power of this routine, making
-    it simple to
+    it simple to add additional feature extractors at low additional
+    time cost.
 
     '''
     def __init__(self, streamObj, prepareStream=True):
@@ -869,12 +870,12 @@ class DataSet:
         if (not callable(classValues)
                 and len(dataList) != len(classValues)):
             raise DataSetException(
-                "If classValues is not a function, it must have the same length as dataList")
+                'If classValues is not a function, it must have the same length as dataList')
         if (ids is not None
                 and not callable(ids)
                 and len(dataList) != len(ids)):
             raise DataSetException(
-                "If ids is not a function or None, it must have the same length as dataList")
+                'If ids is not a function or None, it must have the same length as dataList')
 
         if callable(classValues):
             try:
@@ -950,7 +951,7 @@ class DataSet:
 
         shouldUpdate = not self.quiet
 
-        # print("about to run parallel")
+        # print('about to run parallel')
         outputData = common.runParallel(self.dataInstances,
                                            _dataSetParallelSubprocess,
                                            updateFunction=shouldUpdate,
@@ -1096,7 +1097,7 @@ def _dataSetParallelSubprocess(dataInstance):
     row = []
     errors = []
     #howBigWeCopied = len(pickle.dumps(dataInstance))
-    #print("Starting ", dataInstance, " Size: ", howBigWeCopied)
+    #print('Starting ', dataInstance, ' Size: ', howBigWeCopied)
     for feClass in dataInstance.featureExtractorClassesForParallelRunning:
         fe = feClass()
         fe.setData(dataInstance)
@@ -1104,7 +1105,7 @@ def _dataSetParallelSubprocess(dataInstance):
         try:
             fReturned = fe.extract()
         except Exception as e: # for now take any error  # pylint: disable=broad-except
-            errors.append('failed feature extractor:' + str(fe) + ": " + str(e))
+            errors.append('failed feature extractor:' + str(fe) + ': ' + str(e))
             # provide a blank feature extractor
             fReturned = fe.getBlankFeature()
 
@@ -1370,7 +1371,7 @@ class Test(unittest.TestCase):
             s.append(note.Note(p))
         di = features.DataInstance(s)
 
-        self.assertEqual(pformat(di['flat.secondsMap']), """[{'durationSeconds': 0.5,
+        self.assertEqual(pformat(di['flat.secondsMap']), '''[{'durationSeconds': 0.5,
   'element': <music21.note.Note C>,
   'endTimeSeconds': 0.5,
   'offsetSeconds': 0.0,
@@ -1409,7 +1410,7 @@ class Test(unittest.TestCase):
   'element': <music21.note.Note A>,
   'endTimeSeconds': 4.0,
   'offsetSeconds': 3.5,
-  'voiceIndex': None}]""", pformat(di['secondsMap']))
+  'voiceIndex': None}]''', pformat(di['secondsMap']))
 
 
     def testDataSetOutput(self):
@@ -1630,7 +1631,7 @@ class Test(unittest.TestCase):
         classifier = orange.BayesLearner(data)
         for i in range(len(data)):
             c = classifier(data[i])
-            print("original", data[i].getclass(), "BayesLearner:", c)
+            print('original', data[i].getclass(), 'BayesLearner:', c)
 
 
     def xtestClassifiersA(self): # pragma: no cover
@@ -1732,25 +1733,25 @@ class Test(unittest.TestCase):
         tree = orngTree.TreeLearner(data, sameMajorityPruning=1, mForPruning=2)
         knn = orange.kNNLearner(data, k=21)
 
-        majority.name="Majority"
-        bayes.name="Naive Bayes"
-        tree.name="Tree"
-        knn.name="kNN"
+        majority.name='Majority'
+        bayes.name='Naive Bayes'
+        tree.name='Tree'
+        knn.name='kNN'
         classifiers = [majority, bayes, tree, knn]
 
         # print the head
-        print("Possible classes:", data.domain.classVar.values)
-        print("Original Class", end=' ')
+        print('Possible classes:', data.domain.classVar.values)
+        print('Original Class', end=' ')
         for l in classifiers:
-            print("%-13s" % (l.name), end=' ')
+            print('%-13s' % (l.name), end=' ')
         print()
 
         for example in data:
-            print("(%-10s)  " % (example.getclass()), end=' ')
+            print('(%-10s)  ' % (example.getclass()), end=' ')
             for c in classifiers:
                 p = c([example, orange.GetProbabilities])
-                print("%5.3f        " % (p[0]), end=' ')
-            print("")
+                print('%5.3f        ' % (p[0]), end=' ')
+            print('')
 
 
     def xtestOrangeClassifierTreeLearner(self): # pragma: no cover
@@ -1762,7 +1763,7 @@ class Test(unittest.TestCase):
         #tree = orngTree.TreeLearner(data)
         for i in range(len(data)):
             p = tree(data[i], orange.GetProbabilities)
-            print("%d: %5.3f (originally %s)" % (i + 1, p[1], data[i].getclass()))
+            print('%d: %5.3f (originally %s)' % (i + 1, p[1], data[i].getclass()))
 
         orngTree.printTxt(tree)
 
@@ -1834,7 +1835,7 @@ def pickleFunctionNumPitches(bachStream):
 _DOC_ORDER = [DataSet, Feature, FeatureExtractor]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test) #, runTest='testStreamFormsA')
 

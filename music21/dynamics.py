@@ -241,7 +241,7 @@ class Dynamic(base.Music21Object):
         self.positionPlacement = None
 
     def __repr__(self):
-        return "<music21.dynamics.Dynamic %s >" % self.value
+        return '<music21.dynamics.Dynamic %s >' % self.value
 
 
     def _getValue(self):
@@ -466,10 +466,10 @@ class Test(unittest.TestCase):
     def testCorpusDynamicsWedge(self):
         from music21 import corpus
         a = corpus.parse('opus41no1/movement2') # has dynamics!
-        b = a.parts[0].flat.getElementsByClass("Dynamic")
+        b = a.parts[0].flat.getElementsByClass('Dynamic')
         self.assertEqual(len(b), 35)
 
-        b = a.parts[0].flat.getElementsByClass("DynamicWedge")
+        b = a.parts[0].flat.getElementsByClass('DynamicWedge')
         self.assertEqual(len(b), 2)
 
 
@@ -520,7 +520,7 @@ class Test(unittest.TestCase):
 # define presented order in documentation
 _DOC_ORDER = [Dynamic, dynamicStrFromDecimal]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

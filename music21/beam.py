@@ -252,12 +252,12 @@ class Beams(EqualSlottedObjectMixin):
     def fill(self, level=None, type=None): # type is okay @ReservedAssignment
         '''
         A quick way of setting the beams list for a particular duration, for
-        instance, fill("16th") will clear the current list of beams in the
-        Beams object and add two beams.  fill(2) will do the same (though note
+        instance, `fill('16th')` will clear the current list of beams in the
+        Beams object and add two beams.  `fill(2)` will do the same (though note
         that that is an int, not a string).
 
         It does not do anything to the direction that the beams are going in,
-        or by default.  Either set type here or call setAll() on the Beams
+        or by default.  Either set type here or call `setAll()` on the Beams
         object afterwards.
 
         Both "eighth" and "8th" work.  Adding more than six beams (i.e. things
@@ -479,7 +479,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [Beams, Beam]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

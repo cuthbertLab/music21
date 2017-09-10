@@ -446,7 +446,7 @@ class ToneRow(stream.Stream):
         numPitches = len(self)
         pitchList = self.pitchClasses()
         if int(index) != index:
-            raise SerialException("Transformation must be by an integer.")
+            raise SerialException('Transformation must be by an integer.')
         else:
             firstPitch = pitchList[0]
             transformedPitchList = []
@@ -467,7 +467,7 @@ class ToneRow(stream.Stream):
                     newPitch = (index - pitchList[numPitches-1-i] + firstPitch) % 12
                     transformedPitchList.append(newPitch)
             else:
-                raise SerialException("Invalid transformation type.")
+                raise SerialException('Invalid transformation type.')
 
             return pcToToneRow(transformedPitchList)
 
@@ -510,7 +510,7 @@ class ToneRow(stream.Stream):
         if transformationType == 'T':
             return self.zeroCenteredTransformation('P', newIndex)
         if transformationType == 'P':
-            raise SerialException("Invalid Transformation Type.")
+            raise SerialException('Invalid Transformation Type.')
         else:
             return self.zeroCenteredTransformation(transformationType, newIndex)
 
@@ -766,7 +766,7 @@ class TwelveToneRow(ToneRow):
         '''
 
         if self.isTwelveToneRow() is False:
-            raise SerialException("An all-interval row must be a twelve-tone row.")
+            raise SerialException('An all-interval row must be a twelve-tone row.')
         else:
             tempAllInterval = True
             intervalString = self.getIntervalsAsString()
@@ -954,7 +954,7 @@ class TwelveToneRow(ToneRow):
         numchords = len(fullLinkIntervals)
 
         if self.isTwelveToneRow() is False:
-            raise SerialException("A Link Chord must be a twelve-tone row.")
+            raise SerialException('A Link Chord must be a twelve-tone row.')
         else:
             rowchecklist = [self,
                             self.zeroCenteredTransformation('I',0),
@@ -1016,7 +1016,7 @@ class TwelveToneRow(ToneRow):
         False
         '''
         if self.isTwelveToneRow() is False:
-            raise SerialException("Combinatoriality applies only to twelve-tone rows.")
+            raise SerialException('Combinatoriality applies only to twelve-tone rows.')
         else:
             if convention == 'zero':
                 testRow = []
@@ -1172,7 +1172,7 @@ def getHistoricalRowByName(rowName):
         rowObj = HistoricalTwelveToneRow(attr[0], attr[1], attr[2], attr[3])
         return rowObj
     else:
-        raise SerialException("No historical row with given name found")
+        raise SerialException('No historical row with given name found')
 
 #-------------------------------------------------------------------------------
 def pcToToneRow(pcSet):
@@ -1278,7 +1278,7 @@ class Test(unittest.TestCase):
 #            thisRow = thisRow()
 #            self.assertEqual(isinstance(thisRow, TwelveToneRow), True)
 #
-#            if thisRow.composer == "Berg":
+#            if thisRow.composer == 'Berg':
 #                continue
 #            post = thisRow.title
 #
@@ -1367,7 +1367,7 @@ _DOC_ORDER = ['ToneRow', 'TwelveToneRow', 'HistoricalTwelveToneRow', 'Contiguous
               'pcToToneRow', 'TwelveToneMatrix', 'rowToMatrix', 'getHistoricalRowByName',
               ]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

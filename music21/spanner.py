@@ -31,7 +31,7 @@ from music21 import defaults
 from music21 import style
 
 from music21 import environment
-_MOD = "spanner"
+_MOD = 'spanner'
 environLocal = environment.Environment(_MOD)
 
 
@@ -73,7 +73,7 @@ class Spanner(base.Music21Object):
 
     We can iterate over a spanner to get the contexts:
 
-    >>> print(" ".join([repr(n) for n in sp1]))
+    >>> print(' '.join([repr(n) for n in sp1]))
     <music21.note.Note C> <music21.note.Note D> <music21.note.Note E>
 
     Now we put the notes and the spanner into a Stream object.  Note that
@@ -1096,7 +1096,7 @@ class Slur(Spanner):
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
         self.placement = None  # can above or below, after musicxml
-        self.lineType = None  # can be "dashed" or None
+        self.lineType = None  # can be 'dashed' or None
 
     # TODO: add property for placement
 
@@ -1138,8 +1138,8 @@ class MultiMeasureRest(Spanner):
         self.maxSymbols = keywords.get('maxSymbols', defaults.multiMeasureRestMaxSymbols)
 
     def __repr__(self):
-        return "<music21.spanner.MultiMeasureRest {} measure{}>".format(self.numRests,
-                                        "s" if self.numRests != 1 else "")
+        return '<music21.spanner.MultiMeasureRest {} measure{}>'.format(self.numRests,
+                                        's' if self.numRests != 1 else '')
 
     @property
     def numRests(self):
@@ -1180,7 +1180,7 @@ class RepeatBracket(Spanner):
     The `number` keyword argument can be used to pass in the desired number.
 
     `overrideDisplay` if set will display something other than the number.  For instance
-    `ouvert` and `clos` for medieval music.  However, if you use it for something like "1-3"
+    `ouvert` and `clos` for medieval music.  However, if you use it for something like '1-3'
     be sure to set number properly too.
 
 
@@ -1485,7 +1485,7 @@ class Ottava(Spanner):
         elif self._type.startswith('22'):
             return 22
         else:
-            raise SpannerException("Cannot get shift magnitude from %s" % self._type)
+            raise SpannerException('Cannot get shift magnitude from %s' % self._type)
 
     def shiftDirection(self, reverse=False):
         '''
@@ -1515,9 +1515,9 @@ class Ottava(Spanner):
         '''
         from music21.interval import Interval
         if self.shiftDirection(reverse=reverse) == 'down':
-            header = "P-"
+            header = 'P-'
         else:
-            header = "P"
+            header = 'P'
 
         header += str(self.shiftMagnitude())
         return Interval(header)
@@ -2070,9 +2070,9 @@ class Test(unittest.TestCase):
 
         # p.show()
         raw = self.xmlStr(p)
-        self.assertEqual(raw.find("""<ending number="1" type="start" />""") > 1, True)
-        self.assertEqual(raw.find("""<ending number="2" type="stop" />""") > 1, True)
-        self.assertEqual(raw.find("""<ending number="2" type="start" />""") > 1, True)
+        self.assertEqual(raw.find('''<ending number="1" type="start" />''') > 1, True)
+        self.assertEqual(raw.find('''<ending number="2" type="stop" />''') > 1, True)
+        self.assertEqual(raw.find('''<ending number="2" type="start" />''') > 1, True)
 
     def testRepeatBracketD(self):
         from music21 import note, spanner, stream, bar
@@ -2156,21 +2156,21 @@ class Test(unittest.TestCase):
         self.assertEqual(len(p.spanners), 4)
 
         raw = self.xmlStr(p)
-        self.assertEqual(raw.find("""<ending number="1" type="start" />""") > 1, True)
-        self.assertEqual(raw.find("""<ending number="2" type="stop" />""") > 1, True)
-        self.assertEqual(raw.find("""<ending number="2" type="start" />""") > 1, True)
+        self.assertEqual(raw.find('''<ending number="1" type="start" />''') > 1, True)
+        self.assertEqual(raw.find('''<ending number="2" type="stop" />''') > 1, True)
+        self.assertEqual(raw.find('''<ending number="2" type="start" />''') > 1, True)
 
         p1 = copy.deepcopy(p)
         raw = self.xmlStr(p1)
-        self.assertEqual(raw.find("""<ending number="1" type="start" />""") > 1, True)
-        self.assertEqual(raw.find("""<ending number="2" type="stop" />""") > 1, True)
-        self.assertEqual(raw.find("""<ending number="2" type="start" />""") > 1, True)
+        self.assertEqual(raw.find('''<ending number="1" type="start" />''') > 1, True)
+        self.assertEqual(raw.find('''<ending number="2" type="stop" />''') > 1, True)
+        self.assertEqual(raw.find('''<ending number="2" type="start" />''') > 1, True)
 
         p2 = copy.deepcopy(p1)
         raw = self.xmlStr(p2)
-        self.assertEqual(raw.find("""<ending number="1" type="start" />""") > 1, True)
-        self.assertEqual(raw.find("""<ending number="2" type="stop" />""") > 1, True)
-        self.assertEqual(raw.find("""<ending number="2" type="start" />""") > 1, True)
+        self.assertEqual(raw.find('''<ending number="1" type="start" />''') > 1, True)
+        self.assertEqual(raw.find('''<ending number="2" type="stop" />''') > 1, True)
+        self.assertEqual(raw.find('''<ending number="2" type="start" />''') > 1, True)
 
 
     def testRepeatBracketE(self):
@@ -2478,8 +2478,8 @@ class Test(unittest.TestCase):
         m2 = stream.Measure()
         m1.number = 1
         m2.number = 2
-        n1 = note.Note("C#4", type='whole')
-        n2 = note.Note("D#4", type='whole')
+        n1 = note.Note('C#4', type='whole')
+        n2 = note.Note('D#4', type='whole')
         m1.insert(0, n1)
         m2.insert(0, n2)
         p.append(m1)
@@ -2487,7 +2487,7 @@ class Test(unittest.TestCase):
         sl = Slur([n1, n2])
         p.insert(0, sl)
         for x in p:
-            if "Spanner" in x.classes:
+            if 'Spanner' in x.classes:
                 p.remove(x)
         self.assertEqual(len(p.spanners), 0)
 
@@ -2501,8 +2501,8 @@ class Test(unittest.TestCase):
         m2 = stream.Measure()
         m1.number = 1
         m2.number = 2
-        n1 = note.Note("C#4", type='whole')
-        n2 = note.Note("D#4", type='whole')
+        n1 = note.Note('C#4', type='whole')
+        n2 = note.Note('D#4', type='whole')
         m1.insert(0, n1)
         m2.insert(0, n2)
         p.append(m1)
@@ -2635,7 +2635,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [Spanner]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

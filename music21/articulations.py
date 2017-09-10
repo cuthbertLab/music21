@@ -26,11 +26,11 @@ are found in music21.expressions.
 
 
 
->>> n1 = note.Note("D#4")
+>>> n1 = note.Note('D#4')
 >>> n1.articulations.append(articulations.Tenuto())
 >>> #_DOCS_SHOW n1.show()
 
->>> c1 = chord.Chord(["C3", "G4", "E-5"])
+>>> c1 = chord.Chord(['C3', 'G4', 'E-5'])
 >>> c1.articulations = [articulations.OrganHeel(), articulations.Accent()]
 >>> #_DOCS_SHOW c1.show()
 
@@ -69,7 +69,7 @@ A longer test showing the utility of the module:
 >>> s.append(n6)
 
 >>> s.metadata = metadata.Metadata()
->>> s.metadata.title = 'Prova articolazioni' # ital: "Articulation Test"
+>>> s.metadata.title = 'Prova articolazioni' # ital: 'Articulation Test'
 >>> s.metadata.composer = 'Giuliano Lancioni'
 
 >>> #_DOCS_SHOW s.show()
@@ -88,7 +88,7 @@ from music21 import exceptions21
 from music21 import environment
 from music21 import style
 
-_MOD = "articulations"
+_MOD = 'articulations'
 environLocal = environment.Environment(_MOD)
 
 
@@ -663,7 +663,7 @@ class Test(unittest.TestCase):
 # define presented order in documentation
 _DOC_ORDER = [Articulation]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

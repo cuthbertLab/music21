@@ -23,7 +23,7 @@ from music21 import exceptions21
 from music21 import environment
 from music21 import style
 
-_MOD = "text"
+_MOD = 'text'
 environLocal = environment.Environment(_MOD)
 
 
@@ -62,9 +62,9 @@ def assembleLyrics(streamIn, lineNumber=1):
 
     >>> s = stream.Stream()
     >>> n1 = note.Note()
-    >>> n1.lyric = "Hi"
+    >>> n1.lyric = 'Hi'
     >>> n2 = note.Note()
-    >>> n2.lyric = "there"
+    >>> n2.lyric = 'there'
     >>> s.append(n1)
     >>> s.append(n2)
     >>> text.assembleLyrics(s)
@@ -374,22 +374,22 @@ class LanguageDetector:
         unicode or ascii. current languages: en, fr, de, it, cn, or None
 
         >>> ld = text.LanguageDetector()
-        >>> ld.mostLikelyLanguage("Hello there, how are you doing today? " +
-        ...                        "I haven't seen you in a while.")
+        >>> ld.mostLikelyLanguage('Hello there, how are you doing today? '
+        ...                       + "I haven't seen you in a while.")
         'en'
-        >>> ld.mostLikelyLanguage("Ciao come stai? Sono molto lento oggi, ma non so perche.")
+        >>> ld.mostLikelyLanguage('Ciao come stai? Sono molto lento oggi, ma non so perche.')
         'it'
-        >>> ld.mostLikelyLanguage("Credo in unum deum. Patrem omnipotentem. Factorum celi")
+        >>> ld.mostLikelyLanguage('Credo in unum deum. Patrem omnipotentem. Factorum celi')
         'la'
 
         >>> ld = text.LanguageDetector()
-        >>> ld.mostLikelyLanguage("") is None
+        >>> ld.mostLikelyLanguage('') is None
         True
         '''
         if not excerpt:
             return None
         excTrigram = Trigram(excerpt)
-        maxLang = ""
+        maxLang = ''
         maxDifference = 1.0
         for lang in self.languageCodes:
             langDiff = self.trigrams[lang] - excTrigram
@@ -411,7 +411,7 @@ class LanguageDetector:
 
         >>> ld = text.LanguageDetector()
         >>> for i in range(len(ld.languageCodes)):
-        ...    print(str(i + 1) + " " +  ld.languageCodes[i])
+        ...    print(str(i + 1) + ' ' +  ld.languageCodes[i])
         1 en
         2 fr
         3 it
@@ -419,21 +419,21 @@ class LanguageDetector:
         5 cn
         6 la
         7 nl
-        >>> numLang = ld.mostLikelyLanguageNumeric("Hello there, how are you doing today? " +
-        ...                "I haven't seen you in a while.")
+        >>> numLang = ld.mostLikelyLanguageNumeric('Hello there, how are you doing today? '
+        ...                + "I haven't seen you in a while.")
         >>> numLang
         1
         >>> ld.languageCodes[numLang - 1]
         'en'
         '''
-        if excerpt is None or excerpt == "":
+        if excerpt is None or excerpt == '':
             return 0
         else:
             langCode = self.mostLikelyLanguage(excerpt)
             for i in range(len(self.languageCodes)):
                 if self.languageCodes[i] == langCode:
                     return i + 1
-            raise TextException("got a language that was not in the codes; should not happen")
+            raise TextException('got a language that was not in the codes; should not happen')
 
 #-------------------------------------------------------------------------------
 class Trigram:
@@ -510,10 +510,10 @@ class Trigram:
         self.measure()
 
     def measure(self):
-        """
+        '''
         calculates the scalar length of the trigram vector and
         stores it in self.length.
-        """
+        '''
         total = 0
         for y in self.lut.values():
             total += sum([ x * x for x in y.values() ])
@@ -521,12 +521,12 @@ class Trigram:
         self._length = thisLength
 
     def similarity(self, other):
-        """
+        '''
         returns a number between 0 and 1 indicating similarity between
         two trigrams.
         1 means an identical ratio of trigrams;
         0 means no trigrams in common.
-        """
+        '''
         if not isinstance(other, Trigram):
             raise TypeError("can't compare Trigram with non-Trigram")
         lut1 = self.lut
@@ -540,18 +540,22 @@ class Trigram:
                     if x in b:
                         total += a[x] * b[x]
 
-        #environLocal.warn([self.length, "self"])
-        #environLocal.warn([other.length, "other"])
+        #environLocal.warn([self.length, 'self'])
+        #environLocal.warn([other.length, 'other'])
 
         return float(total) / (self.length * other.length)
 
     def __sub__(self, other):
-        """indicates difference between trigram sets; 1 is entirely
-        different, 0 is entirely the same."""
+        '''
+        indicates difference between trigram sets; 1 is entirely
+        different, 0 is entirely the same.
+        '''
         return 1 - self.similarity(other)
 
     def makeWords(self, count):
-        """returns a string of made-up words based on the known text."""
+        '''
+        returns a string of made-up words based on the known text.
+        '''
         text = []
         k = '  '
         while count:
@@ -564,8 +568,10 @@ class Trigram:
 
 
     def likely(self, k):
-        """Returns a character likely to follow the given string
-        two character string, or a space if nothing is found."""
+        '''
+        Returns a character likely to follow the given string
+        two character string, or a space if nothing is found.
+        '''
         if k not in self.lut:
             return ' '
         # if you were using this a lot, caching would a good idea.
@@ -626,12 +632,12 @@ class Test(unittest.TestCase):
         self.assertTrue(0.99 < ld.trigrams['fr'] - ld.trigrams['cn'] < 1.0)
 
         self.assertEqual('en',
-                         ld.mostLikelyLanguage("hello friends, this is a test of the " +
-                                               "ability of language detector to " +
-                                               "tell what language I am writing in."))
+                         ld.mostLikelyLanguage('hello friends, this is a test of the '
+                                               + 'ability of language detector to '
+                                               + 'tell what language I am writing in.'))
         self.assertEqual('it', ld.mostLikelyLanguage(
-            "ciao amici! cosé trovo in quale lingua ho scritto questo passaggio. Spero che " +
-            "troverà che é stata scritta in italiano"))
+            'ciao amici! cosé trovo in quale lingua ho scritto questo passaggio. Spero che '
+            + 'troverà che é stata scritta in italiano'))
 
         ## TODO: Replace
         #messiahGovernment = corpus.parse('handel/hwv56/movement1-13.md')
@@ -646,7 +652,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [TextBox]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

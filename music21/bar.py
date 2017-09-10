@@ -129,7 +129,7 @@ class Barline(base.Music21Object):
         self.location = location # musicxml values: can be left, right, middle, None
 
     def __repr__(self):
-        return "<music21.bar.Barline style=%s>" % (self.style)
+        return '<music21.bar.Barline style=%s>' % (self.style)
 
     def _getStyle(self):
         return self._style
@@ -248,9 +248,9 @@ class Repeat(repeat.RepeatMark, Barline):
 
     def __repr__(self):
         if self._times is not None:
-            return "<music21.bar.Repeat direction=%s times=%s>" % (self.direction, self.times)
+            return '<music21.bar.Repeat direction=%s times=%s>' % (self.direction, self.times)
         else:
-            return "<music21.bar.Repeat direction=%s>" % (self.direction)
+            return '<music21.bar.Repeat direction=%s>' % (self.direction)
 
     def _setDirection(self, value):
         if value.lower() in ['start', 'end']:
