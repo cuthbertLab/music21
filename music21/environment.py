@@ -716,10 +716,11 @@ class _EnvironmentCore:
                     return
                 else:
                     raise EnvironmentException(
-                        'Cannot find a valid application path for format {}. '
+                        'Cannot find a valid application path '
+                        + 'for format {}. '.format(m21Format)
                         + 'Specify this in your Environment by calling '
                         + "environment.set({!r}, '/path/to/application')".format(
-                            m21Format, environmentKey))
+                            environmentKey))
         elif platform == 'win':  # note extra set of quotes!
             cmd = '""%s" %s "%s""' % (fpApp, options, filePath)
         elif platform == 'darwin':

@@ -636,7 +636,7 @@ def clefFromString(clefString, octaveShift=0):
         elif thisType == 'C':
             lineNum = 3
         else:
-            lineNum = False;
+            lineNum = False
     elif len(xnStr) > 2:
         from music21 import clef as myself # @UnresolvedImport
         xnLower = xnStr.lower()
