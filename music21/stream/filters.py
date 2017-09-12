@@ -396,14 +396,14 @@ class OffsetFilter(StreamFilter):
             return self.isElementOffsetInRange(e, offset, stopAfterEnd=True)
         else:
             return self.isElementOffsetInRange(e, offset, stopAfterEnd=False)
-    
+
     def isElementOffsetInRange(self, e, offset, *, stopAfterEnd=False):
         '''
         Given an element, offset, and stream, return
         True, False, or raise StopIteration if the
         element is in the range, not in the range, or (if stopAfterEnd is True) is not
         and no future elements will be in the range.
-        
+
         Factored out from __call__ to be used by OffsetHierarchyFilter
         '''
         dur = e.duration
@@ -474,7 +474,7 @@ class OffsetHierarchyFilter(OffsetFilter):
     see iterator.getElementsByOffsetInHierarchy()
 
     Finds elements that match a given offset range in the hierarchy.
-    
+
     Do not call .stream() afterwards or unstable results can occur.
     '''
     derivationStr = 'getElementsByOffsetInHierarchy'
@@ -485,7 +485,7 @@ class OffsetHierarchyFilter(OffsetFilter):
             return False
         if not hasattr(iterator, 'iteratorStartOffsetInHierarchy'):
             raise FilterException('Can only run OffsetHierarchyFilter on a RecursiveIterator')
-        
+
         offset = s.elementOffset(e) + iterator.iteratorStartOffsetInHierarchy
         return self.isElementOffsetInRange(e, offset, stopAfterEnd=False)
 

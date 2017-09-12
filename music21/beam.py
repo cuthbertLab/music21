@@ -78,14 +78,14 @@ import unittest
 from music21 import common
 from music21 import exceptions21
 from music21 import duration
+from music21 import style
 from music21.common import EqualSlottedObjectMixin
-
 
 class BeamException(exceptions21.Music21Exception):
     pass
 
 
-class Beam(EqualSlottedObjectMixin):
+class Beam(EqualSlottedObjectMixin, style.StyleMixin):
     '''
     A Beam is an object representation of one single beam, that is, one
     horizontal line connecting two notes together (or less commonly a note to a
@@ -138,6 +138,7 @@ class Beam(EqualSlottedObjectMixin):
     ### INITIALIZER ###
     # pylint: disable=redefined-builtin
     def __init__(self, type=None, direction=None, number=None):  # type is okay @ReservedAssignment
+        super().__init__()
         self.type = type  # start, stop, continue, partial
         self.direction = direction  # left or right for partial
         self.independentAngle = None
@@ -233,7 +234,7 @@ class Beams(EqualSlottedObjectMixin):
 
 
         A beam object can also be specified:
-        
+
         >>> beams = beam.Beams()
         >>> beam1 = beam.Beam(type='start', number=1)
         >>> beams.append(beam1)
@@ -245,18 +246,18 @@ class Beams(EqualSlottedObjectMixin):
             obj.number = len(self.beamsList) + 1
         else:
             obj = type
-        
+
         self.beamsList.append(obj)
 
     def fill(self, level=None, type=None): # type is okay @ReservedAssignment
         '''
         A quick way of setting the beams list for a particular duration, for
-        instance, fill("16th") will clear the current list of beams in the
-        Beams object and add two beams.  fill(2) will do the same (though note
+        instance, `fill('16th')` will clear the current list of beams in the
+        Beams object and add two beams.  `fill(2)` will do the same (though note
         that that is an int, not a string).
 
         It does not do anything to the direction that the beams are going in,
-        or by default.  Either set type here or call setAll() on the Beams
+        or by default.  Either set type here or call `setAll()` on the Beams
         object afterwards.
 
         Both "eighth" and "8th" work.  Adding more than six beams (i.e. things
@@ -478,7 +479,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [Beams, Beam]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

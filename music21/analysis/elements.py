@@ -10,7 +10,7 @@
 #-------------------------------------------------------------------------------
 import collections
 
-_MOD = 'analysis/elements.py'
+_MOD = 'analysis.elements'
 
 def attributeCount(streamOrStreamIter, attrName='quarterLength'):
     '''

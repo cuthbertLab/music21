@@ -172,7 +172,7 @@ class TimespanTree(trees.OffsetTree):
 
         Since Timespans do not have .sites, there is only one offset to deal with...
 
-        >>> tsList = [(0, 2), (0, 9), (1, 1), (2, 3), (3, 4), 
+        >>> tsList = [(0, 2), (0, 9), (1, 1), (2, 3), (3, 4),
         ...           (4, 9), (5, 6), (5, 8), (6, 8), (7, 7)]
         >>> ts = [tree.spans.Timespan(x, y) for x, y in tsList]
         >>> tsTree = tree.timespanTree.TimespanTree()
@@ -344,10 +344,11 @@ class TimespanTree(trees.OffsetTree):
         >>> for subsequence in scoreTree.iterateConsonanceBoundedVerticalities():
         ...     print('Subequence:')
         ...     for verticality in subsequence:
+        ...         verticalityChord = verticality.toChord()
         ...         print('\t[{}] {}: {}'.format(
         ...             verticality.measureNumber,
         ...             verticality,
-        ...             verticality.isConsonant,
+        ...             verticalityChord.isConsonant(),
         ...             ))
         ...
         Subequence:
@@ -406,12 +407,13 @@ class TimespanTree(trees.OffsetTree):
         '''
         iterator = self.iterateVerticalities()
         startingVerticality = next(iterator)
-        while not startingVerticality.isConsonant:
+        while not startingVerticality.toChord().isConsonant():
             startingVerticality = next(iterator)
+            
         verticalityBuffer = [startingVerticality]
         for verticality in iterator:
             verticalityBuffer.append(verticality)
-            if verticality.isConsonant:
+            if verticality.toChord().isConsonant():
                 if len(verticalityBuffer) > 2:
                     yield tuple(verticalityBuffer)
                 verticalityBuffer = [verticality]

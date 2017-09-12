@@ -48,12 +48,12 @@ class StreamCoreMixin:
         ### v4!
         #self._elementTree = tree.trees.ElementTree(source=self)
 
-    def coreInsert(self, offset, element, 
-                   ignoreSort=False, setActiveSite=True, 
-                   ):        
+    def coreInsert(self, offset, element,
+                   ignoreSort=False, setActiveSite=True,
+                   ):
         '''
         N.B. -- a "core" method, not to be used by general users.  Run .insert() instead.
-        
+
         A faster way of inserting elements that does no checks,
         just insertion.
 
@@ -103,10 +103,10 @@ class StreamCoreMixin:
         #self._elementTree.insert(float(offset), element)
         return storeSorted
 
-    def coreAppend(self, element, setActiveSite=True):        
+    def coreAppend(self, element, setActiveSite=True):
         '''
         N.B. -- a "core" method, not to be used by general users.  Run .append() instead.
-        
+
         Low level appending; like `coreInsert` does not error check,
         determine elements changed, or similar operations.
 
@@ -288,9 +288,9 @@ class StreamCoreMixin:
         important checks to that element.
 
         Used by both insert() and append()
-        
+
         Returns None or raises a StreamException
-        
+
         >>> s = stream.Stream()
         >>> s.coreGuardBeforeAddElement(s)
         Traceback (most recent call last):
@@ -320,11 +320,11 @@ class StreamCoreMixin:
         # all get() calls.
         element.purgeLocations()
 
-        
+
     def coreStoreAtEnd(self, element, setActiveSite=True):
         '''
         NB -- this is a "core" method.  Use .storeAtEnd() instead.
-        
+
         Core method for adding end elements.
         To be called by other methods.
         '''
@@ -355,18 +355,16 @@ class StreamCoreMixin:
         highly optimized data structure for searching through elements and
         offsets.
 
-        TODO: these should not all be PitchedTimespans...
-
         >>> score = tree.makeExampleScore()
         >>> scoreTree = score.asTimespans()
         >>> print(scoreTree)
         <TimespanTree {20} (0.0 to 8.0) <music21.stream.Score exampleScore>>
-            <PitchedTimespan (0.0 to 0.0) <music21.clef.BassClef>>
-            <PitchedTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
-            <PitchedTimespan (0.0 to 0.0) <music21.instrument.Instrument PartA: : >>
-            <PitchedTimespan (0.0 to 0.0) <music21.clef.BassClef>>
-            <PitchedTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
-            <PitchedTimespan (0.0 to 0.0) <music21.instrument.Instrument PartB: : >>
+            <ElementTimespan (0.0 to 0.0) <music21.clef.BassClef>>
+            <ElementTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
+            <ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument PartA: : >>
+            <ElementTimespan (0.0 to 0.0) <music21.clef.BassClef>>
+            <ElementTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
+            <ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument PartB: : >>
             <PitchedTimespan (0.0 to 1.0) <music21.note.Note C>>
             <PitchedTimespan (0.0 to 2.0) <music21.note.Note C#>>
             <PitchedTimespan (1.0 to 2.0) <music21.note.Note D>>
@@ -379,8 +377,8 @@ class StreamCoreMixin:
             <PitchedTimespan (6.0 to 7.0) <music21.note.Note B>>
             <PitchedTimespan (6.0 to 8.0) <music21.note.Note D#>>
             <PitchedTimespan (7.0 to 8.0) <music21.note.Note C>>
-            <PitchedTimespan (8.0 to 8.0) <music21.bar.Barline style=final>>
-            <PitchedTimespan (8.0 to 8.0) <music21.bar.Barline style=final>>
+            <ElementTimespan (8.0 to 8.0) <music21.bar.Barline style=final>>
+            <ElementTimespan (8.0 to 8.0) <music21.bar.Barline style=final>>
         '''
         hashedAttributes = hash( (tuple(classList or () ), flatten) )
         cacheKey = "timespanTree" + str(hashedAttributes)

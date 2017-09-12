@@ -41,7 +41,7 @@ def realizeOrnaments(srcObject):
     the performed version of the object:
 
 
-    >>> n1 = note.Note("D5")
+    >>> n1 = note.Note('D5')
     >>> n1.quarterLength = 1
     >>> n1.expressions.append(expressions.WholeStepMordent())
     >>> expList = expressions.realizeOrnaments(n1)
@@ -54,7 +54,7 @@ def realizeOrnaments(srcObject):
 
     :type srcObject: base.Music21Object
     '''
-    if not hasattr(srcObject, "expressions"):
+    if not hasattr(srcObject, 'expressions'):
         return [srcObject]
     elif not srcObject.expressions:
         return [srcObject]
@@ -103,6 +103,7 @@ class Expression(base.Music21Object):
 
     def __init__(self):
         super().__init__()
+        self.tieAttach = 'first' # attach to first note of a tied group.
 
     def __repr__(self):
         return '<music21.expressions.%s>' % (self.__class__.__name__)
@@ -131,17 +132,17 @@ class RehearsalMark(Expression):
     '''
     A rehearsal mark is a type of Expression that designates a rehearsal
     marking, such as A., B., etc.
-    
+
     Takes two inputs, content ('B', 5, 'III') and an optional numbering system which
     is helpful for getting the next rehearsal mark.
-    
+
     >>> rm = expressions.RehearsalMark('B')
     >>> rm
     <music21.expressions.RehearsalMark 'B'>
-    
+
     '''
     classSortOrder = -30
-    _styleClass = style.TextStyle
+    _styleClass = style.TextStylePlacement
 
     def __init__(self, content=None, *, numbering=None):
         super().__init__()
@@ -156,12 +157,12 @@ class RehearsalMark(Expression):
     def __repr__(self):
         return '<music21.expressions.%s %s>' % (self.__class__.__name__, repr(self.content))
 
-        
+
     @staticmethod
     def _getNumberingFromContent(c):
         '''
         if numbering was not set, get it from the content
-        
+
         >>> ex = expressions.RehearsalMark()
         >>> ex._getNumberingFromContent('C')
         'alphabetical'
@@ -188,36 +189,36 @@ class RehearsalMark(Expression):
             return 'number'
         if not isinstance(c, str):
             return None
-        
+
         try:
             unused = int(c)
             return 'number'
         except ValueError:
             pass
-        
+
         try:
             romanValue = common.numberTools.fromRoman(c)
             if len(c) >= 2:
                 return 'roman' # two letters is enough
-            
+
             if romanValue < 50:
                 return 'roman' # I, X, V
             else:
-                return 'alphabetical' # L, C, D, M 
-            
+                return 'alphabetical' # L, C, D, M
+
         except ValueError:
             pass
-        
+
         if c in string.ascii_letters:
             return 'alphabetical'
         else:
             return None
-        
-        
+
+
     def nextContent(self):
         '''
         Return the next content based on the numbering
-        
+
         >>> expressions.RehearsalMark('A').nextContent()
         'B'
 
@@ -241,7 +242,7 @@ class RehearsalMark(Expression):
         numbering = self.numbering
         if not numbering:
             numbering = self._getNumberingFromContent(self.content)
-                
+
         if not numbering:
             if self.content is None:
                 return None
@@ -251,23 +252,23 @@ class RehearsalMark(Expression):
         if numbering == 'alphabetical':
             nextContent = chr(ord(self.content[-1]) + 1)
             if nextContent not in string.ascii_letters:
-                return 'A' * (len(self.content) + 1) 
+                return 'A' * (len(self.content) + 1)
             else:
                 return nextContent
         elif numbering == 'number':
             return int(self.content) + 1
         elif numbering == 'roman':
             return common.toRoman(common.fromRoman(self.content) + 1)
-            
+
     def nextMark(self):
         '''
         Return the next rehearsal mark.
-        
+
         >>> rm = expressions.RehearsalMark('C')
         >>> rm.nextMark()
         <music21.expressions.RehearsalMark 'D'>
-        
-        
+
+
         >>> rm = expressions.RehearsalMark('IV', numbering='roman')
         >>> nm = rm.nextMark()
         >>> nm.content
@@ -316,10 +317,8 @@ class TextExpression(Expression):
 
         self._enclosure = None
 
-        self.style.absoluteY = 20
-
         # this does not do anything if default y is defined
-        self._positionPlacement = None
+        self.positionPlacement = None
 
 
     def __repr__(self):
@@ -388,8 +387,7 @@ class Ornament(Expression):
         super().__init__()
         self.connectedToPrevious = True
         # should follow directly on previous; true for most "ornaments".
-        self.tieAttach = 'first' # attach to first note of a tied group.
-
+        
     def realize(self, srcObj):
         '''
         subclassible method call that takes a sourceObject
@@ -407,7 +405,7 @@ class GeneralMordent(Ornament):
     '''
     def __init__(self):
         super().__init__()
-        self.direction = ""  # up or down
+        self.direction = ''  # up or down
         self.size = None # interval.Interval (General, etc.) class
         self.quarterLength = 0.125 # 32nd note default
         self.size = interval.Interval(2)
@@ -421,7 +419,7 @@ class GeneralMordent(Ornament):
         The second is the rest of the note
         The third is an empty list (since there are no notes at the end of a mordent)
 
-        >>> n1 = note.Note("C4")
+        >>> n1 = note.Note('C4')
         >>> n1.quarterLength = 0.5
         >>> m1 = expressions.Mordent()
         >>> m1.realize(n1)
@@ -430,7 +428,7 @@ class GeneralMordent(Ornament):
 
         Note: use one of the subclasses, not the GeneralMordent class
 
-        >>> n2 = note.Note("C4")
+        >>> n2 = note.Note('C4')
         >>> n2.quarterLength = 0.125
         >>> m2 = expressions.GeneralMordent()
         >>> m2.realize(n2)
@@ -443,16 +441,16 @@ class GeneralMordent(Ornament):
         from music21 import key
 
         if self.direction != 'up' and self.direction != 'down':
-            raise ExpressionException("Cannot realize a mordent if I do not know its direction")
-        if self.size == "":
-            raise ExpressionException("Cannot realize a mordent if there is no size given")
+            raise ExpressionException('Cannot realize a mordent if I do not know its direction')
+        if self.size == '':
+            raise ExpressionException('Cannot realize a mordent if there is no size given')
         if srcObj.duration is None or srcObj.duration.quarterLength == 0:
-            raise ExpressionException("Cannot steal time from an object with no duration")
+            raise ExpressionException('Cannot steal time from an object with no duration')
         if srcObj.duration.quarterLength < self.quarterLength * 2:
-            raise ExpressionException("The note is not long enough to realize a mordent")
+            raise ExpressionException('The note is not long enough to realize a mordent')
 
         remainderDuration = srcObj.duration.quarterLength - (2 * self.quarterLength)
-        if self.direction == "down":
+        if self.direction == 'down':
             transposeInterval = self.size.reverse()
         else:
             transposeInterval = self.size
@@ -483,8 +481,8 @@ class GeneralMordent(Ornament):
 
 #-------------------------------------------------------------------------------
 class Mordent(GeneralMordent):
-    '''A normal Mordent.
-
+    '''
+    A normal Mordent.
 
     >>> m = expressions.Mordent()
     >>> m.direction
@@ -495,11 +493,11 @@ class Mordent(GeneralMordent):
 
     def __init__(self):
         super().__init__()
-        self.direction = "down" # up or down
+        self.direction = 'down' # up or down
 
 class HalfStepMordent(Mordent):
-    '''A half step normal Mordent.
-
+    '''
+    A half step normal Mordent.
 
     >>> m = expressions.HalfStepMordent()
     >>> m.direction
@@ -512,8 +510,8 @@ class HalfStepMordent(Mordent):
         self.size = interval.Interval("m2")
 
 class WholeStepMordent(Mordent):
-    '''A whole step normal Mordent.
-
+    '''
+    A whole step normal Mordent.
 
     >>> m = expressions.WholeStepMordent()
     >>> m.direction
@@ -523,13 +521,13 @@ class WholeStepMordent(Mordent):
     '''
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval("M2")
+        self.size = interval.Interval('M2')
 
 
 #-------------------------------------------------------------------------------
 class InvertedMordent(GeneralMordent):
-    '''An inverted Mordent.
-
+    '''
+    An inverted Mordent.
 
     >>> m = expressions.InvertedMordent()
     >>> m.direction
@@ -539,11 +537,11 @@ class InvertedMordent(GeneralMordent):
     '''
     def __init__(self):
         super().__init__()
-        self.direction = "up"
+        self.direction = 'up'
 
 class HalfStepInvertedMordent(InvertedMordent):
-    '''A half-step inverted Mordent.
-
+    '''
+    A half-step inverted Mordent.
 
     >>> m = expressions.HalfStepInvertedMordent()
     >>> m.direction
@@ -556,8 +554,8 @@ class HalfStepInvertedMordent(InvertedMordent):
         self.size = interval.Interval("m2")
 
 class WholeStepInvertedMordent(InvertedMordent):
-    '''A whole-step inverted Mordent.
-
+    '''
+    A whole-step inverted Mordent.
 
     >>> m = expressions.WholeStepInvertedMordent()
     >>> m.direction
@@ -567,7 +565,7 @@ class WholeStepInvertedMordent(InvertedMordent):
     '''
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval("M2")
+        self.size = interval.Interval('M2')
 
 
 
@@ -584,7 +582,7 @@ class Trill(Ornament):
 
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval("M2")
+        self.size = interval.Interval('M2')
 
         self.placement = 'above'
         self.nachschlag = False # play little notes at the end of the trill?
@@ -624,7 +622,7 @@ class Trill(Ornament):
         The third is a list of the notes at the end if nachschlag is True, and empty list if False.
 
 
-        >>> n1 = note.Note("C4")
+        >>> n1 = note.Note('C4')
         >>> n1.quarterLength = 0.5
         >>> t1 = expressions.Trill()
         >>> t1.realize(n1)
@@ -634,7 +632,7 @@ class Trill(Ornament):
           <music21.note.Note D>], None, [])
 
 
-        >>> n2 = note.Note("D4")
+        >>> n2 = note.Note('D4')
         >>> n2.quarterLength = 0.125
         >>> t2 = expressions.Trill()
         >>> t2.realize(n2)
@@ -644,14 +642,14 @@ class Trill(Ornament):
         :type srcObj: base.Music21Object
         '''
         from music21 import key
-        if self.size == "":
-            raise ExpressionException("Cannot realize a trill if there is no size given")
+        if self.size == '':
+            raise ExpressionException('Cannot realize a trill if there is no size given')
         if srcObj.duration is None or srcObj.duration.quarterLength == 0:
-            raise ExpressionException("Cannot steal time from an object with no duration")
-        if srcObj.duration.quarterLength < 2*self.quarterLength:
-            raise ExpressionException("The note is not long enough to realize a trill")
-        if srcObj.duration.quarterLength < 4*self.quarterLength and self.nachschlag:
-            raise ExpressionException("The note is not long enough for a nachschlag")
+            raise ExpressionException('Cannot steal time from an object with no duration')
+        if srcObj.duration.quarterLength < 2 * self.quarterLength:
+            raise ExpressionException('The note is not long enough to realize a trill')
+        if srcObj.duration.quarterLength < 4 * self.quarterLength and self.nachschlag:
+            raise ExpressionException('The note is not long enough for a nachschlag')
 
         transposeInterval = self.size
         transposeIntervalReverse = self.size.reverse()
@@ -716,7 +714,7 @@ class HalfStepTrill(Trill):
     '''
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval("m2")
+        self.size = interval.Interval('m2')
 
 class WholeStepTrill(Trill):
     '''A basic trill marker.
@@ -730,13 +728,13 @@ class WholeStepTrill(Trill):
     '''
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval("M2")
+        self.size = interval.Interval('M2')
 
 
 class Shake(Trill):
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval("M2")
+        self.size = interval.Interval('M2')
         self.quarterLength = 0.25
 
 
@@ -749,7 +747,7 @@ class Shake(Trill):
 class Schleifer(Ornament):
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval("M2")
+        self.size = interval.Interval('M2')
         self.quarterLength = 0.25
 
 
@@ -757,7 +755,7 @@ class Schleifer(Ornament):
 class Turn(Ornament):
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval("M2")
+        self.size = interval.Interval('M2')
         self.placement = 'above'
         self.nachschlag = False # play little notes at the end of the trill?
         self.tieAttach = 'all'
@@ -770,12 +768,13 @@ class Turn(Ornament):
         returns a three-element tuple.
         The first is a list of the four notes that the beginning of the note was converted to.
         The second is a note of duration 0 because the turn "eats up" the whole note.
-        The third is a list of the notes at the end if nachschlag is True, and empty list if False.
+        The third is a list of the notes at the end if nachschlag is True, 
+        and empty list if False.
 
         >>> from  music21 import *
         >>> m1 = stream.Measure()
         >>> m1.append(key.Key('F', 'major'))
-        >>> n1 = note.Note("C5")
+        >>> n1 = note.Note('C5')
         >>> m1.append(n1)
         >>> t1 = expressions.Turn()
         >>> t1.realize(n1)
@@ -787,7 +786,7 @@ class Turn(Ornament):
 
         >>> m2 = stream.Measure()
         >>> m2.append(key.KeySignature(5))
-        >>> n2 = note.Note("B4")
+        >>> n2 = note.Note('B4')
         >>> m2.append(n2)
         >>> t2 = expressions.InvertedTurn()
         >>> t2.realize(n2)
@@ -798,7 +797,7 @@ class Turn(Ornament):
 
 
 
-        >>> n2 = note.Note("C4")
+        >>> n2 = note.Note('C4')
         >>> n2.quarterLength = 0.125
         >>> t2 = expressions.Turn()
         >>> t2.realize(n2)
@@ -810,11 +809,11 @@ class Turn(Ornament):
         from music21 import key
 
         if self.size is None:
-            raise ExpressionException("Cannot realize a turn if there is no size given")
+            raise ExpressionException('Cannot realize a turn if there is no size given')
         if srcObject.duration is None or srcObject.duration.quarterLength == 0:
-            raise ExpressionException("Cannot steal time from an object with no duration")
+            raise ExpressionException('Cannot steal time from an object with no duration')
         if srcObject.duration.quarterLength < 4 * self.quarterLength:
-            raise ExpressionException("The note is not long enough to realize a turn")
+            raise ExpressionException('The note is not long enough to realize a turn')
 
         remainderDuration = srcObject.duration.quarterLength - 4 * self.quarterLength
         transposeIntervalUp = self.size
@@ -868,7 +867,8 @@ class InvertedTurn(Turn):
 
 #-------------------------------------------------------------------------------
 class GeneralAppoggiatura(Ornament):
-    direction = ""  # up or down -- up means the grace note is below and goes up to the actual note
+    # up or down -- up means the grace note is below and goes up to the actual note
+    direction = ''  
     size = None # interval.Interval (General, etc.) class
 
     def __init__(self):
@@ -884,14 +884,14 @@ class GeneralAppoggiatura(Ornament):
         The second is the rest of the note
         The third is an empty list (since there are no notes at the end of an appoggiatura)
 
-        >>> n1 = note.Note("C4")
+        >>> n1 = note.Note('C4')
         >>> n1.quarterLength = 0.5
         >>> a1 = expressions.Appoggiatura()
         >>> a1.realize(n1)
         ([<music21.note.Note D>], <music21.note.Note C>, [])
 
 
-        >>> n2 = note.Note("C4")
+        >>> n2 = note.Note('C4')
         >>> n2.quarterLength = 1
         >>> a2 = expressions.HalfStepInvertedAppoggiatura()
         >>> a2.realize(n2)
@@ -902,15 +902,15 @@ class GeneralAppoggiatura(Ornament):
         from music21 import key
         if self.direction != 'up' and self.direction != 'down':
             raise ExpressionException(
-                    "Cannot realize an Appoggiatura if I do not know its direction")
-        if self.size == "":
+                    'Cannot realize an Appoggiatura if I do not know its direction')
+        if self.size == '':
             raise ExpressionException(
-                    "Cannot realize an Appoggiatura if there is no size given")
+                    'Cannot realize an Appoggiatura if there is no size given')
         if srcObj.duration is None or srcObj.duration.quarterLength == 0:
-            raise ExpressionException("Cannot steal time from an object with no duration")
+            raise ExpressionException('Cannot steal time from an object with no duration')
 
         newDuration = srcObj.duration.quarterLength / 2
-        if self.direction == "down":
+        if self.direction == 'down':
             transposeInterval = self.size
         else:
             transposeInterval = self.size.reverse()
@@ -932,34 +932,30 @@ class GeneralAppoggiatura(Ornament):
         return ([appogNote], remainderNote, [])
 
 class Appoggiatura(GeneralAppoggiatura):
-    direction = "down"
-    def __init__(self):
-        super().__init__()
+    direction = 'down'
 
 class HalfStepAppoggiatura(Appoggiatura):
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval("m2")
+        self.size = interval.Interval('m2')
 
 class WholeStepAppoggiatura(Appoggiatura):
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval("M2")
+        self.size = interval.Interval('M2')
 
 class InvertedAppoggiatura(GeneralAppoggiatura):
-    direction = "up"
-    def __init__(self):
-        super().__init__()
+    direction = 'up'
 
 class HalfStepInvertedAppoggiatura(InvertedAppoggiatura):
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval("m2")
+        self.size = interval.Interval('m2')
 
 class WholeStepInvertedAppoggiatura(InvertedAppoggiatura):
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval("M2")
+        self.size = interval.Interval('M2')
 
 #-------------------------------------------------------------------------------
 class TremoloException(exceptions21.Music21Exception):
@@ -1083,7 +1079,7 @@ class Fermata(Expression):
 
     >>> p1 = stream.Part()
     >>> p1.append(meter.TimeSignature('6/8'))
-    >>> n1 = note.Note("D-2")
+    >>> n1 = note.Note('D-2')
     >>> n1.quarterLength = 6
     >>> n1.expressions.append(expressions.Fermata())
     >>> p1.append(n1)
@@ -1091,11 +1087,13 @@ class Fermata(Expression):
     .. image:: images/expressionsFermata.*
          :width: 193
     '''
-    shape = "normal" # angled, square.
-    # for musicmxml, can be upright or inverted, but Finale's idea of an
-    # inverted fermata is ass backwards.
-    type  = "inverted"
-    tieAttach = 'last'
+    def __init__(self):
+        super().__init__()
+        self.shape = 'normal' # angled, square.
+        # for musicmxml, can be upright or inverted, but Finale's idea of an
+        # inverted fermata is ass backwards.
+        self.type  = 'inverted'
+        self.tieAttach = 'last'
 
 
 #-------------------------------------------------------------------------------
@@ -1205,18 +1203,18 @@ class Test(unittest.TestCase):
     def xtestRealize(self):
         from music21 import note
         from music21 import stream
-        n1 = note.Note("D4")
+        n1 = note.Note('D4')
         n1.quarterLength = 4
         n1.expressions.append(WholeStepMordent())
         expList = realizeOrnaments(n1)
         st1 = stream.Stream()
         st1.append(expList)
         st1n = st1.notes
-        self.assertEqual(st1n[0].name, "D")
+        self.assertEqual(st1n[0].name, 'D')
         self.assertEqual(st1n[0].quarterLength, 0.125)
-        self.assertEqual(st1n[1].name, "C")
+        self.assertEqual(st1n[1].name, 'C')
         self.assertEqual(st1n[1].quarterLength, 0.125)
-        self.assertEqual(st1n[2].name, "D")
+        self.assertEqual(st1n[2].name, 'D')
         self.assertEqual(st1n[2].quarterLength, 3.75)
 
 
@@ -1332,7 +1330,7 @@ class Test(unittest.TestCase):
 # define presented order in documentation
 _DOC_ORDER = [TextExpression]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

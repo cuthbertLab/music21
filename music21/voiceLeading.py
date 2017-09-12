@@ -34,6 +34,7 @@ The list of objects included here are:
 * :class:`~music21.voiceLeading.TwoChordLinearSegment` : 2 chord objects
 
 '''
+import enum
 import unittest
 
 from music21 import base
@@ -45,7 +46,6 @@ from music21 import key
 from music21 import note
 from music21 import chord
 
-import enum 
 
 #from music21 import harmony can't do this either
 #from music21 import roman Can't import roman because of circular
@@ -135,8 +135,8 @@ class VoiceLeadingQuartet(base.Music21Object):
                     raise AttributeError
             except AttributeError:
                 raise VoiceLeadingQuartetException(
-                    'got a key signature that is not a string or music21 Key ' +
-                    'object: %s' % keyValue)
+                    'got a key signature that is not a string or music21 Key '
+                    + 'object: %s' % keyValue)
         self._key = keyValue
 
     key = property(_getKey, _setKey, doc='''
@@ -653,7 +653,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         a concept so abhorrent we shudder to illustrate it with an example, but alas, we must:
 
         We will make the examples shorter with this abbreviation:
-        
+
         >>> N = note.Note
 
         >>> vlq = voiceLeading.VoiceLeadingQuartet(N("C4"), N("D4"), N("C5"), N("D5"))
@@ -680,7 +680,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         Perfect Octave, etc.)
 
         We will make the examples shorter with this abbreviation:
-        
+
         >>> N = note.Note
         >>> voiceLeading.VoiceLeadingQuartet(N("C4"), N("D4"), N("C4"), N("D4")).parallelUnison()
         True
@@ -1666,7 +1666,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
                   'couldBeNeighborTone',
                   'couldBeDiatonicNeighborTone',
                   'couldBeChromaticNeighborTone']
-    
+
     def __init__(self, noteListOrN1=None, n2=None, n3=None):
         if common.isIterable(noteListOrN1):
             super().__init__(noteListOrN1)

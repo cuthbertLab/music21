@@ -36,7 +36,7 @@ from music21.musedata import translate
 
 from music21 import common
 from music21 import environment
-_MOD = 'musedata.base.py'
+_MOD = 'musedata'
 environLocal = environment.Environment(_MOD)
 
 # for implementation
@@ -1479,7 +1479,7 @@ class MuseDataFile:
         #self.file = io.open(filename, encoding='utf-8')
         if isinstance(fp, pathlib.Path):
             fp = str(fp)
-        
+
         self.file = open(fp, 'rb')
         self.filename = fp
 
@@ -1491,7 +1491,7 @@ class MuseDataFile:
         except UnicodeDecodeError:
             fileContents = fileContents.decode('ISO-8859-1', 'ignore')
         return self.readstr(fileContents)
-    
+
     def close(self):
         self.file.close()
 

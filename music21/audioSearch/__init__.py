@@ -41,7 +41,7 @@ from music21.audioSearch import recording
 from music21.audioSearch import transcriber
 
 from music21 import environment
-_MOD = 'audioSearch/base.py'
+_MOD = 'audioSearch'
 environLocal = environment.Environment(_MOD)
 
 audioChunkLength = 1024

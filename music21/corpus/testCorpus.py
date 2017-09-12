@@ -221,7 +221,7 @@ class Test(unittest.TestCase):
 #         self.assertEqual(len(s)>=19, True)
 #         self.assertEqual(len(s[0].keys()), 4)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest('noDocTest',Test)
 

@@ -74,7 +74,7 @@ class DocBuilder:
 
         writers.ModuleReferenceReSTWriter().run()
         writers.CorpusReferenceReSTWriter().run()
- 
+
         if runSphinx:
             self.runSphinx()
 
@@ -113,7 +113,7 @@ class DocBuilder:
 
 
     def getPaths(self):
-        documentationDirectoryPath = os.path.join(common.getRootFilePath(), 
+        documentationDirectoryPath = os.path.join(common.getRootFilePath(),
                                                   'documentation')
         self.documentationDirectoryPath = documentationDirectoryPath
         self.autogenDirectoryPath = os.path.join(

@@ -46,7 +46,7 @@ from music21 import common
 from music21 import pitch
 
 from music21 import environment
-_MOD = "intervalNetwork.py"
+_MOD = 'scale.intervalNetwork'
 environLocal = environment.Environment(_MOD)
 
 

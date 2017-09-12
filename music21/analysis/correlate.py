@@ -21,7 +21,7 @@ from music21 import chord
 from music21 import dynamics
 
 from music21 import environment
-_MOD = 'correlate.py'
+_MOD = 'analysis.correlate'
 environLocal = environment.Environment(_MOD)
 
 
@@ -113,7 +113,7 @@ class ActivityMatch:
         >>> am = analysis.correlate.ActivityMatch(s.parts[0].flat)
         >>> am.pitchToDynamic()
         Traceback (most recent call last):
-        music21.analysis.correlate.CorrelateException: cannot create correlation: 
+        music21.analysis.correlate.CorrelateException: cannot create correlation:
             an object that is not found in the Stream: <class 'music21.dynamics.Dynamic'>
 
         Many dynamics

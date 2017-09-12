@@ -27,7 +27,7 @@ import unittest
 from music21 import clef
 from music21 import environment
 from music21 import exceptions21
-_MOD = 'musedata.translate.py'
+_MOD = 'musedata.translate'
 environLocal = environment.Environment(_MOD)
 
 

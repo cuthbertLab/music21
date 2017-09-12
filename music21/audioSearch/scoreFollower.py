@@ -19,7 +19,7 @@ from music21 import scale
 from music21 import search
 
 from music21 import environment
-_MOD = 'audioSearch/transcriber.py'
+_MOD = 'audioSearch.scoreFollower'
 environLocal = environment.Environment(_MOD)
 
 

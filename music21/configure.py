@@ -35,17 +35,17 @@ from music21 import common
 from music21 import environment
 from music21 import exceptions21
 
-_MOD = "configure.py"
+_MOD = 'configure'
 environLocal = environment.Environment(_MOD)
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 #-------------------------------------------------------------------------------
 # match finale name, which may be directory or something else
-reFinaleApp = re.compile(r'Finale (?:Notepad )?20[0-2][0-9][a-z\.0-9]*.app',
+reFinaleApp = re.compile(r'Finale.*.app',
                          re.IGNORECASE) # @UndefinedVariable
 reSibeliusApp = re.compile(r'Sibelius.app', re.IGNORECASE) # @UndefinedVariable
-reFinaleExe = re.compile(r'Finale (?:Notepad )?20[0-2][0-9][a-z\.0-9]*.exe',
+reFinaleExe = re.compile(r'Finale.*.exe',
                          re.IGNORECASE) # @UndefinedVariable
 reSibeliusExe = re.compile(r'Sibelius.exe', re.IGNORECASE) # @UndefinedVariable
 reFinaleReaderApp = re.compile(r'Finale Reader.app', re.IGNORECASE) # @UndefinedVariable
@@ -194,7 +194,7 @@ def getUserData():
     else: # catch all
         post['os.uname'] = 'None'
 
-    post['time.gmtime'] = time.strftime("%a, %d %b %Y %H:%M:%S", time.gmtime())
+    post['time.gmtime'] = time.strftime('%a, %d %b %Y %H:%M:%S', time.gmtime())
     post['time.timezone'] = time.timezone
 
     tzname = time.tzname
@@ -810,7 +810,7 @@ class AskOpenInBrowser(YesOrNo):
             if hasWebbrowser is True:
                 webbrowser.open_new(self._urlTarget)
             else:
-                print("Point your browser to %s" % self._urlTarget)
+                print('Point your browser to %s' % self._urlTarget)
         elif result is False:
             pass
             #self._writeToUser(['No URL is opened.', ' '])
@@ -946,7 +946,7 @@ class AskSendInstallationReport(YesOrNo):
             if hasWebbrowser is True:
                 webbrowser.open(self._getMailToStr())
             else:
-                print("Could not open your mail program.  Sorry!")
+                print('Could not open your mail program.  Sorry!')
 
 
 #-------------------------------------------------------------------------------
@@ -1128,7 +1128,7 @@ class AskAutoDownload(SelectFromList):
         'included in this distribution, but are indexed as links to other web sites ' +
         'where they can be downloaded (the "virtual corpus"). If you would like, music21 ' +
         'can help your computer automatically resolve these links and bring them to your ' +
-        'hard drive for analysis. ' + 
+        'hard drive for analysis. ' +
         # 'See corpus/virtual.py for a list of sites that music21 ' +
         #'might index.',
         ' ',
@@ -1235,14 +1235,15 @@ class SelectFilePath(SelectFromList):
                         if comparisonFunction(sub2):
                             post.append(path2)
                 except OSError:
-                    print("Could not read paths inside %s" % path1)
+                    print('Could not read paths inside %s' % path1)
             else:
                 if comparisonFunction(sub1):
                     post.append(path1)
 
 
     def _getDarwinApp(self, comparisonFunction):
-        '''Provide a comparison function that returns True or False based on the file name.
+        '''
+        Provide a comparison function that returns True or False based on the file name.
         This looks at everything in Applications, as well as every directory in Applications
         '''
         post = []
@@ -1755,10 +1756,10 @@ class Test(unittest.TestCase):
 
         self.assertEqual(reFinaleApp.match('final adsf 2011'), None)
 
-        g = reFinaleApp.match('Finale 2009.app')
-        self.assertEqual(g.group(0), 'Finale 2009.app')
+        g = reFinaleApp.match('Finale.app')
+        self.assertEqual(g.group(0), 'Finale.app')
 
-        self.assertEqual(reFinaleApp.match('Finale 1992.app'), None)
+        self.assertEqual(reFinaleApp.match('Final Cut 2017.app'), None)
 
 
     def testConfigurationAssistant(self):
@@ -1797,7 +1798,7 @@ def run():
     ca = ConfigurationAssistant()
     ca.run()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     if len(sys.argv) == 1: # normal conditions
         #music21.mainTest(Test)
         run()

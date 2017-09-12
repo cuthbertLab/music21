@@ -108,11 +108,11 @@ class SiteRef(common.SlottedObjectMixin):
             if currentSite is None:
                 self.siteWeakref = None
             else:
-                siteIdValue = str(id(currentSite)) + "_" + str(_singletonCounter())
+                siteIdValue = str(id(currentSite)) + '_' + str(_singletonCounter())
                 try:
                     GLOBAL_SITE_STATE_DICT[siteIdValue] = currentSite
                 except TypeError:
-                    raise TypeError("This str screwed up everything: {}".format(currentSite))
+                    raise TypeError('This str screwed up everything: {}'.format(currentSite))
                 self.siteWeakref = siteIdValue
         returnState = common.SlottedObjectMixin.__getstate__(self)
         if WEAKREF_ACTIVE and currentSite is not None:
@@ -219,7 +219,7 @@ class Sites(common.SlottedObjectMixin):
             else:
                 newIdKey = id(newSite.site)
                 #if newIdKey != idKey and oldSite.site != None:
-                #    print "WHOA! %s %s" % (newIdKey, idKey)
+                #    print 'WHOA! %s %s' % (newIdKey, idKey)
             newSite.siteIndex = oldSite.siteIndex
             newSite.globalSiteIndex = _singletonCounter()
             newSite.classString = oldSite.classString
@@ -339,7 +339,7 @@ class Sites(common.SlottedObjectMixin):
         TODO: Tests.  Including updates.
         '''
         if offset is not None:
-            raise SitesException("No offsets in sites anymore!")
+            raise SitesException('No offsets in sites anymore!')
         # NOTE: this is a performance critical method
 
         # a None object will have a key of None
@@ -355,7 +355,7 @@ class Sites(common.SlottedObjectMixin):
                 updateNotAdd = True
 
             #if idKey is not None:
-            #    print "Updating idKey %s for object %s" % (idKey, id(obj))
+            #    print 'Updating idKey %s for object %s' % (idKey, id(obj))
 
         #environLocal.printDebug(['adding obj', obj, idKey])
         # weak refs were being passed in __deepcopy__ calling this method
@@ -368,13 +368,13 @@ class Sites(common.SlottedObjectMixin):
 
         if updateNotAdd is True:
             #if obj is not None and id(obj) != idKey:
-            #    print("RED ALERT!")
+            #    print('RED ALERT!')
             siteRef = self.siteDict[idKey]
             siteRef.isDead = False  # in case it used to be a dead site...
         else:
             siteRef = SiteRef()
             #if id(obj) != idKey and obj is not None:
-            #    print "Houston, we have a problem %r" % obj
+            #    print 'Houston, we have a problem %r' % obj
 
         siteRef.site = obj  # stores a weakRef
         siteRef.classString = classString
@@ -609,9 +609,9 @@ class Sites(common.SlottedObjectMixin):
         >>> aSites = sites.Sites()
         >>> aSites.add(aObj)
         >>> aSites.add(bObj)
-        
+
         We get the most recently added object first
-        
+
         >>> aSites.getObjByClass('Mock', sortByCreationTime=True) == bObj
         True
 
@@ -661,7 +661,7 @@ class Sites(common.SlottedObjectMixin):
             #if DEBUG_CONTEXT: print('\tY: getObjByClass: iterating objs:', id(obj), obj)
             if (classNameIsStr and obj.isFlat):
                 #if DEBUG_CONTEXT:
-                #    print('\tY: skipping flat stream that does not contain object:', 
+                #    print('\tY: skipping flat stream that does not contain object:',
                 #                  id(obj), obj)
                 #environLocal.printDebug(
                 #    ['\tY: skipping flat stream that does not contain object:'])
@@ -794,7 +794,7 @@ class Sites(common.SlottedObjectMixin):
         >>> dc.hasSiteId(id(bSite))
         False
 
-        Note that we use "None" not id(None) as a key:
+        Note that we use 'None' not id(None) as a key:
 
         >>> dc.hasSiteId(id(None))
         False
@@ -1009,10 +1009,10 @@ class Test(unittest.TestCase):
 
 
         violin1 = corpus.parse(
-            "beethoven/opus18no1",
+            'beethoven/opus18no1',
             3,
             fileExtensions='xml',
-            ).getElementById("Violin I")
+            ).getElementById('Violin I')
         lastNote = violin1.flat.notes[-1]
         lastNoteClef = lastNote.getContextByClass(clef.Clef)
         self.assertEqual(isinstance(lastNoteClef, clef.TrebleClef), True)
@@ -1023,6 +1023,6 @@ _DOC_ORDER = [SiteRef, Sites]
 
 
 #------------------------------------------------------------------------------
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)

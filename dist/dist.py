@@ -20,12 +20,12 @@ To do a release,
     every once in a while run corpus.corpora.CoreCorpus().rebuildMetadataCache()
     (40 min on MacPro) -- either of these MAY change a lot of tests in corpus, metadata, etc.
     so don't skip the next step!
-3. run test/warningMultiprocessTest.py  for Python2 AND Python3 -- fix all warnings!
+3. run test/warningMultiprocessTest.py for lowest and highest version -- fix all warnings!
 4. run test/testLint.py and fix any lint errors
 5. commit and then check test/testSingleCoreAll.py results on Travis-CI
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
      but should be done before making a release).
-6. then python3 test/testDocumentation.py # only designed for Python 3... [*]
+6. then python3 test/testDocumentation.py [*]
 
 [*] you will need pytest and nbval installed (along with ipython and jupyter)
 
@@ -35,9 +35,10 @@ To do a release,
 [*] you will need sphinx, IPython (pip or easy_install), markdown, and pandoc (.dmg) installed
 
 9. run documentation/upload.py [not via eclipse] or upload via ssh.
-   -- you will need an MIT username and password
+   -- you will need an MIT username and password 
+   -- for each new major version ssh in and delete old files before uploading.
 
-10. And finally this file.
+10. And finally this file. (from the command line; not as python -m...)
 
 11. COMMIT to Github at this point w/ commit comment of the new version,
     then don't change anything until the next step is done.
@@ -49,16 +50,16 @@ To do a release,
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-13. Upload the new file with "twine upload music21-4.1.0.tar.gz" [*]
+13. Upload the new file with "twine upload music21-5.0.3a1.tar.gz" [*]
 
     [*] Requires twine to be installed
-    
+
     You will need a file called ~/.pypirc with
 
         [distutils]
         index-servers =
             pypi
-        
+
         [pypi]
         username:yourusername
         password:yourpassword
@@ -72,23 +73,16 @@ To do a release,
 
 DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do.
 '''
-
-
-import hashlib, os, sys, tarfile
+import hashlib
+import os
+import sys
+import tarfile
 
 from music21 import base
 from music21 import common
 
 from music21 import environment
-_MOD = 'dist.py'
-environLocal = environment.Environment(_MOD)
-
-
-'''
-Build and upload music21 in two formats: exe, and tar.
-
-Simply call from the command line.
-'''
+environLocal = environment.Environment('..dist.dist')
 
 PY = sys.executable
 environLocal.warn("using python executable at %s" % PY)
@@ -152,8 +146,11 @@ class Distributor:
 #                 if fpNew != fp:
 #                     os.rename(fp, fpNew)
 #                 self.fpWin = fpNew
+            
             if self.version in fn and fn.endswith('.tar.gz'):
                 self.fpTar = fp
+            else:
+                environLocal.warn(fn + ' does not end with .tar.gz')
 
         environLocal.warn('giving path for tar.gz')
         for fn in [self.fpTar]:
@@ -329,24 +326,6 @@ class Distributor:
             return hashlib.md5(open(path, 'rb').read()).hexdigest()
         else:
             return hashlib.md5(open(path, 'rb').read()).digest()
-
-    def getMD5Path(self):
-        '''
-        for PyPi -- no longer used.
-        '''
-        gitHubPath = "https://github.com"
-        user = "cuthbertLab"
-        package = "music21"
-        releaseDownload = "releases/download"
-        version = "v" + self.version
-        filename = "music21-" + self.version + ".tar.gz"
-
-        fullUrl = "/".join([gitHubPath, user, package, releaseDownload, version, filename])
-        md5Prefix = "#md5="
-        md5Source = self.md5ForFile(self.fpTar)
-        hashedUrl = "".join([fullUrl, md5Prefix, md5Source])
-        print(hashedUrl)
-        return hashedUrl
 
 
 

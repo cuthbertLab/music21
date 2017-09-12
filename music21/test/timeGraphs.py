@@ -108,8 +108,8 @@ class M21CallTest:
 class TestTimeHumdrum(M21CallTest):
     def testFocus(self):
         music21 = self.m21
-        unused = music21.humdrum.parseData(music21.humdrum.humdrumTestFiles.mazurka6).stream 
-        
+        unused = music21.humdrum.parseData(music21.humdrum.humdrumTestFiles.mazurka6).stream
+
 class TestTimeMozart(M21CallTest):
     def testFocus(self):
         music21 = self.m21
@@ -583,7 +583,7 @@ class CallGraph:
         '''
         suffix = '.png' # '.svg'
         outputFormat = suffix[1:]
-        _MOD = "test.timeGraphs.py"
+        _MOD = "test.timeGraphs"
 
         if runWithEnviron:
             from music21 import environment

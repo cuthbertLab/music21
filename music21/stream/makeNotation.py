@@ -141,7 +141,7 @@ def makeBeams(s, *, inPlace=False):
             # processing
             summed = sum([d.quarterLength for d in durList])
             # note, this ^^ is faster than a generator expression
-             
+
             durSum = opFrac(opFrac(summed)) # the double call corrects for tiny errors in adding
                     # floats and Fractions in the sum() call -- the first opFrac makes it
                     # impossible to have 4.00000000001, but returns Fraction(4, 1). The
@@ -172,7 +172,7 @@ def makeBeams(s, *, inPlace=False):
                     n.beams = beam.Beams()
 
     del mColl  # remove Stream no longer needed
-    
+
     s.streamStatus.beams = True
     if inPlace is not True:
         return returnObj
@@ -617,7 +617,7 @@ def makeMeasures(
             if finalBarline not in ['regular', None]:
                 m.rightBarline = finalBarline
         if bestClef:
-            m.clef = clef.bestClef(m, recurse=True)  
+            m.clef = clef.bestClef(m, recurse=True)
 
     if not inPlace:
         return post  # returns a new stream populated w/ new measure streams
@@ -710,7 +710,7 @@ def makeRests(s,
     {20.0} <music21.note.Note C>
     {21.0} <music21.note.Rest rest>
     {30.0} <music21.note.Note D>
-    >>> b[0].hideObjectOnPrint
+    >>> b[0].style.hideObjectOnPrint
     True
 
     Now with measures:
@@ -796,7 +796,7 @@ def makeRests(s,
         if qLen > 0:
             r = note.Rest()
             r.duration.quarterLength = qLen
-            r.hideObjectOnPrint = hideRests
+            r.style.hideObjectOnPrint = hideRests
             #environLocal.printDebug(['makeRests(): add rests', r, r.duration])
             # place at oLowTarget to reach to oLow
             v.coreInsert(oLowTarget, r)
@@ -807,7 +807,7 @@ def makeRests(s,
         if qLen > 0:
             r = note.Rest()
             r.duration.quarterLength = qLen
-            r.hideObjectOnPrint = hideRests
+            r.style.hideObjectOnPrint = hideRests
             # place at oHigh to reach to oHighTarget
             v.coreInsert(oHigh, r)
         v.coreElementsChanged()  # must update otherwise might add double r
@@ -818,7 +818,7 @@ def makeRests(s,
                 for e in gapStream:
                     r = note.Rest()
                     r.duration.quarterLength = e.duration.quarterLength
-                    r.hideObjectOnPrint = hideRests
+                    r.style.hideObjectOnPrint = hideRests
                     v.coreInsert(e.offset, r)
         v.coreElementsChanged()
         #environLocal.printDebug(['post makeRests show()', v])
@@ -1382,11 +1382,11 @@ def realizeOrnaments(s):
 
 def moveNotesToVoices(source, classFilterList=('GeneralNote',)):
     '''
-    Move 
+    Move
     '''
     from music21.stream import Voice
     dst = Voice()
-    
+
     # cast to list so source can be edited.
     affectedElements = list(source.iter.getElementsByClass(classFilterList))
 
@@ -1394,7 +1394,61 @@ def moveNotesToVoices(source, classFilterList=('GeneralNote',)):
         dst.insert(source.elementOffset(e), e)
         source.remove(e)
     source.insert(0, dst)
+
+
+
+def getTiePitchSet(prior):
+    '''
+    helper method for makeAccidentals to get the tie pitch set (or None) 
+    from the prior
+
+    >>> n1 = note.Note('C4')
+    >>> n2 = note.Note('D4')
+    >>> n2.tie = tie.Tie('start')
+    >>> n3 = note.Note('E4')
+    >>> n3.tie = tie.Tie('stop')
+    >>> n4 = note.Note('F4')
+    >>> n4.tie = tie.Tie('continue')
+    >>> c = chord.Chord([n1, n2, n3, n4])
+    >>> tps = stream.makeNotation.getTiePitchSet(c)
+    >>> isinstance(tps, set)
+    True
+    >>> sorted(tps)
+    ['D4', 'F4']
     
+    Non tie possessing objects return None
+    
+    >>> r = bar.Repeat()
+    >>> stream.makeNotation.getTiePitchSet(r) is None
+    True
+
+    Note or Chord without ties, returns an empty set:
+    
+    >>> n = note.Note('F#5')
+    >>> stream.makeNotation.getTiePitchSet(n)
+    set()
+
+    Rest return None
+
+    >>> r = note.Rest()
+    >>> stream.makeNotation.getTiePitchSet(r) is None
+    True
+    '''
+    if not hasattr(prior, 'tie') or not hasattr(prior, 'pitches'):
+        return None
+    else:
+        tiePitchSet = set()
+        if 'Chord' in prior.classes:
+            previousNotes = list(prior)
+        else:
+            previousNotes = [prior]
+            
+        for n in previousNotes:
+            if n.tie is None or n.tie.type == 'stop':
+                continue
+            tiePitchSet.add(n.pitch.nameWithOctave)
+        return tiePitchSet
+
 
 #------------------------------------------------------------------------------
 
@@ -1418,8 +1472,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s), 1)
         self.assertEqual(s[0].classes[0], 'Voice') # default is a Voice
         self.assertEqual(len(s[0]), 4)
-        self.assertEqual(str([n for n in s.voices[0].notesAndRests]), 
-                         '[<music21.note.Note C>, <music21.note.Note C>, ' 
+        self.assertEqual(str([n for n in s.voices[0].notesAndRests]),
+                         '[<music21.note.Note C>, <music21.note.Note C>, '
                          + '<music21.note.Note C>, <music21.note.Note C>]')
 
 

@@ -40,7 +40,7 @@ from music21.midi import realtime
 from music21.midi import percussion
 
 
-_MOD = "midi.base.py"
+_MOD = "midi"
 environLocal = environment.Environment(_MOD)
 
 
@@ -269,7 +269,7 @@ def putVariableLengthNumber(x):
     # note: negative numbers will cause an infinite loop here
     if x < 0:
         raise MidiException('cannot putVariableLengthNumber() when number is negative: %s' % x)
-    
+
     lst = bytearray()
     while True:
         y, x = x & 0x7F, x >> 7
@@ -277,7 +277,7 @@ def putVariableLengthNumber(x):
         if x == 0:
             break
     lst.reverse()
-    
+
     lst[-1] = lst[-1] & 0x7f
     return bytes(lst)
 
@@ -1127,7 +1127,8 @@ class MidiTrack:
         return False
 
     def setChannel(self, value):
-        '''Set the channel of all events in this Track.
+        '''
+        Set the channel of all events in this Track.
         '''
         if value not in range(1, 17): # count from 1
             raise MidiException('bad channel value: %s' % value)
@@ -1135,7 +1136,8 @@ class MidiTrack:
             e.channel = value
 
     def getChannels(self):
-        '''Get all channels used in this Track.
+        '''
+        Get all channels used in this Track.
         '''
         post = []
         for e in self.events:
@@ -1144,7 +1146,8 @@ class MidiTrack:
         return post
 
     def getProgramChanges(self):
-        '''Get all unique program changes used in this Track, sorted.
+        '''
+        Get all unique program changes used in this Track, sorted.
         '''
         post = []
         for e in self.events:
@@ -1323,7 +1326,7 @@ class Test(unittest.TestCase):
         self.assertEqual(midiBinStr, b"MThd"+ a2b_hex(b"000000060001000103c0") )
 
     def testBasicImport(self):
-        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive' 
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         fp = dirLib / 'test01.mid'
         environLocal.printDebug(fp)
         mf = MidiFile()
@@ -1364,7 +1367,7 @@ class Test(unittest.TestCase):
 
         # random files from the internet
         fp = dirLib / 'test03.mid'
-        
+
         environLocal.printDebug([fp])
         mf = MidiFile()
         mf.open(fp)
@@ -1406,7 +1409,7 @@ class Test(unittest.TestCase):
 
 
     def testInternalDataModel(self):
-        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive' 
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         fp = dirLib / 'test01.mid'
         # a simple file created in athenacl
         environLocal.printDebug([fp])
@@ -1441,9 +1444,9 @@ class Test(unittest.TestCase):
 
         mt = MidiTrack(1)
         # duration, pitch, velocity
-        data = [[1024, 60, 90], 
-                [1024, 50, 70], 
-                [1024, 51, 120], 
+        data = [[1024, 60, 90],
+                [1024, 50, 70],
+                [1024, 51, 120],
                 [1024, 62, 80]]
         t = 0
         tLast = 0
@@ -1595,7 +1598,7 @@ class Test(unittest.TestCase):
     def testImportWithRunningStatus(self):
         from music21 import converter
 
-        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive' 
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         fp = dirLib / 'test09.mid'
         # a simple file created in athenacl
         # dealing with midi files that use running status compression

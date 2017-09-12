@@ -32,9 +32,9 @@ import time
 def flattenList(l):
     '''
     Flatten a list of lists into a flat list
-    
+
     but not a list of lists of lists...
-    
+
     >>> l = [[1, 2, 3], [4, 5], [6]]
     >>> common.flattenList(l)
     [1, 2, 3, 4, 5, 6]
@@ -105,7 +105,7 @@ def sortModules(moduleList):
     modNameToMod = {}
     for mod in moduleList:
         modNameToMod[mod.__name__] = mod
-        fp = mod.__file__ # returns the pyc file
+        fp = mod.__file__ # returns the py or pyc file
         stat = os.stat(fp)
         lastmod = time.localtime(stat[8])
         asctime = time.asctime(lastmod)
@@ -113,8 +113,8 @@ def sortModules(moduleList):
     sort.sort()
     sort.reverse()
     # just return module list
-    return [modNameToMod[modName] for lastmod, asctime, modName in sort]
-
+    outMods = [modNameToMod[modName] for lastmod, asctime, modName in sort]
+    return outMods
 
 
 #-----------------------------

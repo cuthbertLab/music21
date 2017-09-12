@@ -17,7 +17,7 @@ import zipfile
 
 from music21 import common
 from music21 import environment
-_MOD = 'musicxml/archiveTools.py'
+_MOD = 'musicxml.archiveTools'
 environLocal = environment.Environment(_MOD)
 
 
@@ -111,7 +111,7 @@ def uncompressMXL(filename, deleteOriginal=False):
         except KeyError:
             for storedName in myZip.namelist():
                 myZip.extract(member=storedName, path=extractPath)
-            
+
     # Delete uncompressed xml file from system
     if deleteOriginal:
         os.remove(filename)

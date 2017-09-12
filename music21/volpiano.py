@@ -47,7 +47,7 @@ class Neume(spanner.Spanner):
 class LineBreak(base.Music21Object):
     '''
     Indicates that the line breaks at this point in the manuscript.
-    
+
     Denoted by one 7.
     '''
     pass
@@ -83,8 +83,8 @@ accidentalTokens = flatTokens + naturalTokens
 def toPart(volpianoText, *, breaksToLayout=False):
     '''
     Returns a music21 Part from volpiano text.
-    
-    >>> veniSancti = volpiano.toPart('1---c--d---f--d---ed--c--d---f' 
+
+    >>> veniSancti = volpiano.toPart('1---c--d---f--d---ed--c--d---f'
     ...                              + '---g--h--j---hgf--g--h---')
     >>> veniSancti.show('text')
     {0.0} <music21.stream.Measure 0 offset=0.0>
@@ -110,7 +110,7 @@ def toPart(volpianoText, *, breaksToLayout=False):
         {16.0} <music21.note.Note A>
 
     Clefs!
-    
+
     >>> clefTest = volpiano.toPart('1---c--2---c')
     >>> clefTest.show('text')
     {0.0} <music21.stream.Measure 0 offset=0.0>
@@ -122,15 +122,15 @@ def toPart(volpianoText, *, breaksToLayout=False):
     ...     n.nameWithOctave
     'C4'
     'E2'
-    
+
     Flats and Naturals:
-    
+
     >>> accTest = volpiano.toPart('1---e--we--e--We--e')
     >>> [n.name for n in accTest.recurse().notes]
     ['E', 'E-', 'E-', 'E', 'E']
 
     Breaks and barlines
-    
+
     >>> breakTest = volpiano.toPart('1---e-7-e-77-e-777-e-3-e-4')
     >>> breakTest.show('text')
     {0.0} <music21.stream.Measure 0 offset=0.0>
@@ -145,7 +145,7 @@ def toPart(volpianoText, *, breaksToLayout=False):
         {4.0} <music21.bar.Barline style=regular>
     {4.0} <music21.stream.Measure 0 offset=4.0>
         {0.0} <music21.note.Note E>
-        {1.0} <music21.bar.Barline style=double>       
+        {1.0} <music21.bar.Barline style=double>
 
 
     As layout objects using breaksToLayout=True
@@ -164,11 +164,11 @@ def toPart(volpianoText, *, breaksToLayout=False):
         {4.0} <music21.bar.Barline style=regular>
     {4.0} <music21.stream.Measure 0 offset=4.0>
         {0.0} <music21.note.Note E>
-        {1.0} <music21.bar.Barline style=double>       
+        {1.0} <music21.bar.Barline style=double>
 
-        
+
     Liquescence test:
-    
+
     >>> breakTest = volpiano.toPart('1---e-E-')
     >>> breakTest.recurse().notes[0].editorial.misc
     {'liquescence': False}
@@ -191,7 +191,7 @@ def toPart(volpianoText, *, breaksToLayout=False):
 
     bIsFlat = False
     eIsFlat = False
-    
+
     for token in volpianoText:
         if token == '7':
             continuousNumberOfBreakTokens += 1
@@ -199,18 +199,18 @@ def toPart(volpianoText, *, breaksToLayout=False):
         elif continuousNumberOfBreakTokens > 0:
             if not breaksToLayout: # default
                 breakClass = classByNumBreakTokens[continuousNumberOfBreakTokens]
-                breakToken = breakClass()
+                breakToken = breakClass() # pylint: disable=not-callable
             else:
                 breakClass = classByNumBreakTokensLayout[continuousNumberOfBreakTokens]
                 if continuousNumberOfBreakTokens < 3:
-                    breakToken = breakClass(isNew=True)
+                    breakToken = breakClass(isNew=True) # pylint: disable=not-callable
                 else:
-                    breakToken = breakClass()
-            
+                    breakToken = breakClass() # pylint: disable=not-callable
+
             currentMeasure.append(breakToken)
-        
+
         continuousNumberOfBreakTokens = 0
-        
+
         if token == '-':
             noteThatWouldGoInSpanner = None
             if currentNeumeSpanner:
@@ -227,7 +227,7 @@ def toPart(volpianoText, *, breaksToLayout=False):
                 c = clef.TrebleClef()
             elif token == '2':
                 c = clef.BassClef()
-            
+
             lastClef = c
             m.append(c)
 
@@ -253,21 +253,21 @@ def toPart(volpianoText, *, breaksToLayout=False):
 
             clefLowestLine = lastClef.lowestLine
             diatonicNoteNum = clefLowestLine + distanceFromLowestLine
-            
+
             n.pitch.diatonicNoteNum = diatonicNoteNum
             if n.pitch.step == 'B' and bIsFlat:
                 n.pitch.accidental = pitch.Accidental('flat')
             elif n.pitch.step == 'E' and eIsFlat:
                 n.pitch.accidental = pitch.Accidental('flat')
-            
+
             m.append(n)
-            
+
             if noteThatWouldGoInSpanner is not None:
                 currentNeumeSpanner = Neume([noteThatWouldGoInSpanner, n])
                 noteThatWouldGoInSpanner = None
             else:
                 noteThatWouldGoInSpanner = n
-        
+
         elif token in accidentalTokens:
             if token.lower() in eflatTokens and token in naturalTokens:
                 eIsFlat = False
@@ -280,13 +280,13 @@ def toPart(volpianoText, *, breaksToLayout=False):
             else: # pragma: no cover
                 raise VolpianoException(
                     'Unknown accidental: ' + token + ': Should not happen')
-    
-    
+
+
     if continuousNumberOfBreakTokens > 0:
         breakClass = classByNumBreakTokens[continuousNumberOfBreakTokens]
-        breakToken = breakClass()
+        breakToken = breakClass() # pylint: disable=not-callable
         currentMeasure.append(breakToken)
-        
+
     if m:
         p.append(m)
 
@@ -297,23 +297,23 @@ def toPart(volpianoText, *, breaksToLayout=False):
 def fromStream(s, *, layoutToBreaks=False):
     '''
     Convert a Stream to Volpiano.
-    
+
     These tests show how the same input converts back out:
-    
+
     >>> input = '1--c--d---f--d---ed--c--d---f---g--h--j---hgf--g--h---'
     >>> veniSancti = volpiano.toPart(input)
     >>> volpiano.fromStream(veniSancti)
     '1---c-d-f-d-ed-c-d-f-g-h-j-hg-f-g-h-'
-    
+
     >>> breakTest = volpiano.toPart('1---e-E--')
     >>> volpiano.fromStream(breakTest)
     '1---e-E-'
-    
+
     >>> accTest = volpiano.toPart('1---e--we--e--We--e')
     >>> volpiano.fromStream(accTest)
     '1---e-we-e-We-e-'
     '''
-    
+
     volpianoTokens = []
 
     def error(el, errorLevel=ErrorLevel.LOG):
@@ -322,11 +322,11 @@ def fromStream(s, *, layoutToBreaks=False):
             environLocal.warn(msg + ' this can lead to incorrect data.')
         else:
             environLocal.printDebug(msg)
-    
+
     def ap(tokens):
         for t in tokens:
             volpianoTokens.append(t)
-        
+
     def popHyphens():
         while volpianoTokens and volpianoTokens[-1] == '-':
             volpianoTokens.pop()
@@ -347,12 +347,12 @@ def fromStream(s, *, layoutToBreaks=False):
         if setNatural:
             accidentalToken = accidentalToken.upper()
         ap(accidentalToken)
-        
+
     lastClef = clef.TrebleClef()
 
     bIsFlat = False
     eIsFlat = False
-    
+
     for el in s.recurse():
         elClasses = el.classes
         if 'Clef' in elClasses:
@@ -363,13 +363,13 @@ def fromStream(s, *, layoutToBreaks=False):
                 ap('2---')
             else:
                 error(el, ErrorLevel.WARN)
-            
+
         elif 'Barline' in elClasses:
             if el.style in ('double', 'final'):
                 ap('---4')
             else:
                 ap('---3')
-                
+
         elif 'Note' in elClasses:
             n = el
             p = n.pitch
@@ -380,13 +380,13 @@ def fromStream(s, *, layoutToBreaks=False):
                 error(n, ErrorLevel.WARN)
                 continue
 
-            if n.notehead == 'x' or (n.hasEditorialInformation 
+            if n.notehead == 'x' or (n.hasEditorialInformation
                                       and 'liquescence' in n.editorial.misc
                                       and n.editorial.misc['liquescence']):
                 tokenName = liquscentPitches[indexInPitchString]
             else:
-                tokenName = normalPitches[indexInPitchString]                
-            
+                tokenName = normalPitches[indexInPitchString]
+
             if p.accidental is not None and p.accidental.alter != 0:
                 if p.step not in ('B', 'E'):
                     error(el, ErrorLevel.WARN)
@@ -396,7 +396,7 @@ def fromStream(s, *, layoutToBreaks=False):
                     error(el, ErrorLevel.WARN)
                     ap(tokenName)
                     continue
-                
+
                 if p.step == 'B' and not bIsFlat:
                     setAccFromPitch(distanceFromLowestLine)
                     bIsFlat = True
@@ -410,7 +410,7 @@ def fromStream(s, *, layoutToBreaks=False):
                 setAccFromPitch(distanceFromLowestLine, setNatural=True)
                 eIsFlat = False
             ap(tokenName)
-            
+
             neumeSpanner = n.getSpannerSites('Neume')
             if neumeSpanner and n is not neumeSpanner[0].getLast():
                 pass
@@ -423,7 +423,7 @@ def fromStream(s, *, layoutToBreaks=False):
                     ap('---')
                 else:
                     ap('--')
-                    
+
         elif 'SystemLayout' in elClasses and layoutToBreaks:
             popHyphens()
             ap('7---')
@@ -441,7 +441,7 @@ def fromStream(s, *, layoutToBreaks=False):
             ap('777---')
         else:
             error(el, ErrorLevel.LOG)
-            
+
     return ''.join(volpianoTokens)
 
 

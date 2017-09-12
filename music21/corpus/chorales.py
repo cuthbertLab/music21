@@ -21,7 +21,7 @@ import copy
 from music21 import exceptions21
 from music21 import environment
 from music21 import metadata
-_MOD = "corpus.chorales.py"
+_MOD = 'corpus.chorales'
 environLocal = environment.Environment(_MOD)
 
 class ChoraleList:
@@ -40,7 +40,7 @@ class ChoraleList:
     >>> bcl = corpus.chorales.ChoraleList()
     >>> info358 = bcl.byBudapest[358]
     >>> for key in sorted(list(info358)):
-    ...   print("%s %s" % (key, info358[key]))
+    ...   print('%s %s' % (key, info358[key]))
     baerenreiter 68
     budapest 358
     bwv 431
@@ -471,7 +471,8 @@ class ChoraleList:
                 continue
             else:
                 line = line[1:]
-                (title,bwv,kalmus,baerenreiter,budapest,riemenschneider,notes) = line.split('||')
+                (title, bwv, kalmus, baerenreiter, budapest, 
+                    riemenschneider, notes) = line.split('||')
                 if notes == '&nbsp;':
                     notes = None
                 lineDict = {'title': title, 'bwv': int(bwv),'kalmus': int(kalmus),
@@ -500,7 +501,7 @@ class ChoraleListRKBWV:
     >>> bcl = corpus.chorales.ChoraleListRKBWV()
     >>> info155 = bcl.byRiemenschneider[155]
     >>> for key in sorted(list(info155)):
-    ...   print("%s %s" % (key, info155[key]))
+    ...   print('%s %s' % (key, info155[key]))
     bwv 344
     kalmus 173
     riemenschneider 155
@@ -997,7 +998,7 @@ class Iterator:
     highestNumber to 7 would have the same effect as the given example.
 
     >>> BCI = corpus.chorales.Iterator(2, 371, numberingSystem='riemenschneider',
-    ...                                numberList=[1, 2, 3, 4, 6, 25, 190, 371], 
+    ...                                numberList=[1, 2, 3, 4, 6, 25, 190, 371],
     ...                                returnType='filename')
     25 will be skipped because it is not in the numberingSystem riemenschneider
 
@@ -1098,7 +1099,7 @@ class Iterator:
 
     def __len__(self):
         if self.numberingSystem is None:
-            raise BachException("NumberingSystem not set. Cannot find a length.")
+            raise BachException('NumberingSystem not set. Cannot find a length.')
         if self.numberingSystem == 'title':
             return len(self.titleList)
         else:
@@ -1112,24 +1113,24 @@ class Iterator:
             return returnObj
         else:
             if self.numberingSystem is None:
-                raise BachException("NumberingSystem not set. Cannot find index.")
+                raise BachException('NumberingSystem not set. Cannot find index.')
 
             elif self.numberingSystem == 'title':
                 if key in range(len(self.titleList)):
                     return self._returnChorale(key)
                 else:
-                    raise IndexError("%s is not in the range of the titleList." % key)
+                    raise IndexError('%s is not in the range of the titleList.' % key)
 
             elif self.iterationType == 'index' or self.numberingSystem == 'bwv':
                 if key in range(len(self.numberList)):
                     return self._returnChorale(key)
                 else:
-                    raise IndexError("%s is not in the range of the numberList." % key)
+                    raise IndexError('%s is not in the range of the numberList.' % key)
             elif self.iterationType == 'number':
                 if key in self.numberList:
                     return self._returnChorale(key)
                 else:
-                    raise IndexError("%s is not in the numberList" % key)
+                    raise IndexError('%s is not in the numberList' % key)
 
     def __next__(self):
         '''
@@ -1255,10 +1256,10 @@ class Iterator:
         if choraleIndex is None:
             choraleIndex = self._currentIndex
         if self.numberingSystem is None:
-            raise BachException("Cannot parse Chorales because no .numberingSystem set.")
+            raise BachException('Cannot parse Chorales because no .numberingSystem set.')
         elif self.numberingSystem == 'title':
             if self._titleList is None:
-                raise BachException("Cannot parse Chorales because no titles to parse.")
+                raise BachException('Cannot parse Chorales because no titles to parse.')
             else:
                 title = self.titleList[choraleIndex]
                 filename = 'bach/bwv' + str(self._choraleList2.byTitle[title]['bwv'])
@@ -1270,10 +1271,10 @@ class Iterator:
                 title = self._choraleList2.byRiemenschneider[choraleNumber]['title']
             elif self.numberingSystem == 'baerenreiter':
                 filename = 'bach/bwv' + str(self._choraleList1.byBaerenreiter[choraleNumber]['bwv'])
-                title = self._choraleList2.byBaerenreiter[choraleNumber]['title']
+                title = self._choraleList1.byBaerenreiter[choraleNumber]['title']
             elif self.numberingSystem == 'budapest':
                 filename = 'bach/bwv' + str(self._choraleList1.byBudapest[choraleNumber]['bwv'])
-                title = self._choraleList2.byBudapest[choraleNumber]['title']
+                title = self._choraleList1.byBudapest[choraleNumber]['title']
             elif self.numberingSystem == 'kalmus':
                 filename = 'bach/bwv' + str(self._choraleList2.byKalmus[choraleNumber]['bwv'])
                 title = self._choraleList2.byKalmus[choraleNumber]['title']
@@ -1303,7 +1304,7 @@ class Iterator:
             return filename
         else:
             raise Exception(
-                "An unexpected returnType %s was introduced. This should not happen." %
+                'An unexpected returnType %s was introduced. This should not happen.' %
                 self._returnType)
 
     def _initializeNumberList(self):
@@ -1392,7 +1393,7 @@ class Iterator:
     #- Numbering System
     def _getNumberingSystem(self):
         if self._numberingSystem is None:
-            raise BachException("Numbering System not set.")
+            raise BachException('Numbering System not set.')
         else:
             return self._numberingSystem
 
@@ -1405,7 +1406,7 @@ class Iterator:
             self._numberingSystem = 'title'
             self._setTitleList()
         else:
-            raise BachException("%s is not a valid numbering system for Bach Chorales." % value)
+            raise BachException('%s is not a valid numbering system for Bach Chorales.' % value)
 
     numberingSystem = property(_getNumberingSystem, _setNumberingSystem,
                                doc='''This property determines which numbering
@@ -1432,7 +1433,7 @@ class Iterator:
             self._titleList = None
             value = []
         elif not isinstance(value, list):
-            raise BachException("%s is not and must be a list." % value)
+            raise BachException('%s is not and must be a list.' % value)
         else:
             self._titleList = []
             for v in value:
@@ -1459,7 +1460,7 @@ class Iterator:
 
     def _setNumberList(self, value):
         if not isinstance(value, list):
-            raise BachException("%s is not and must be a list." % value)
+            raise BachException('%s is not and must be a list.' % value)
         if self._numberingSystem == 'title':
             self._numberList = None
             raise BachException("Cannot set numberList when .numberingSystem == 'title'")
@@ -1470,7 +1471,7 @@ class Iterator:
                     if v in self._choraleList2.byRiemenschneider:
                         self._numberList.append(v)
                     else:
-                        print("%s will be skipped because it is not in the numberingSystem %s" % (
+                        print('%s will be skipped because it is not in the numberingSystem %s' % (
                                                 v, self._numberingSystem))
             elif self._numberingSystem == 'kalmus':
                 self._numberList = []
@@ -1478,7 +1479,7 @@ class Iterator:
                     if v in self._choraleList2.byKalmus and v != 0:
                         self._numberList.append(v)
                     else:
-                        print("%s will be skipped because it is not in the numberingSystem %s" % (
+                        print('%s will be skipped because it is not in the numberingSystem %s' % (
                                                 v, self._numberingSystem))
             elif self._numberingSystem == 'bwv':
                 self._numberList = []
@@ -1486,7 +1487,7 @@ class Iterator:
                     if v in self._choraleList2.byBWV:
                         self._numberList.append(v)
                     else:
-                        print("%s will be skipped because it is not in the numberingSystem %s" % (
+                        print('%s will be skipped because it is not in the numberingSystem %s' % (
                                                 v, self._numberingSystem))
             elif self._numberingSystem == 'budapest':
                 self._numberList = []
@@ -1494,7 +1495,7 @@ class Iterator:
                     if v in self._choraleList1.byBudapest:
                         self._numberList.append(v)
                     else:
-                        print("%s will be skipped because it is not in the numberingSystem %s" % (
+                        print('%s will be skipped because it is not in the numberingSystem %s' % (
                                                 v, self._numberingSystem))
             elif self._numberingSystem == 'baerenreiter':
                 self._numberList = []
@@ -1502,7 +1503,7 @@ class Iterator:
                     if v in self._choraleList1.byBaerenreiter:
                         self._numberList.append(v)
                     else:
-                        print("u%s will be skipped because it is not in the numberingSystem %s" % (
+                        print('%s will be skipped because it is not in the numberingSystem %s' % (
                                                 v, self._numberingSystem))
 
             if self._numberList is None:
@@ -1535,7 +1536,7 @@ class Iterator:
 
     def _setCurrentNumber(self, value):
         if self._numberingSystem is None:
-            raise Exception("Numbering System is not set.")
+            raise Exception('Numbering System is not set.')
         if self._iterationType == 'number':
             if self._numberingSystem == 'title':
                 if self._titleList is None:
@@ -1546,11 +1547,11 @@ class Iterator:
                         if self._highestIndex is None or value <= self._highestIndex:
                             self._currentIndex = value
                         else:
-                            raise BachException("%s is greater than the highestNumber %s" % (
+                            raise BachException('%s is greater than the highestNumber %s' % (
                                                                         value, self.highestNumber))
                     else:
                         raise BachException(
-                            "%s is not an index in the range of the titleList" % value)
+                            '%s is not an index in the range of the titleList' % value)
             else:
                 if value is None:
                     self._currentIndex = 0
@@ -1559,11 +1560,11 @@ class Iterator:
                     if self._highestIndex is None or newIndex <= self._highestIndex:
                         self._currentIndex = newIndex
                     else:
-                        raise BachException("%s is greater than the HighestNumber %s" % (
+                        raise BachException('%s is greater than the HighestNumber %s' % (
                                                                 value, self.highestNumber))
                 else:
                     raise BachException(
-                        "%s does not correspond to a chorale in the %s numbering system" % (
+                        '%s does not correspond to a chorale in the %s numbering system' % (
                                                                 value, self.numberingSystem))
 
         elif self._iterationType == 'index':
@@ -1577,11 +1578,11 @@ class Iterator:
                             self._currentIndex = value
                         else:
                             raise BachException(
-                                "%s is greater than the highestNumber %s" % (
+                                '%s is greater than the highestNumber %s' % (
                                                             value, self.highestNumber))
                     else:
                         raise BachException(
-                            "%s is not an index in the range of the titleList" % value)
+                            '%s is not an index in the range of the titleList' % value)
             else:
                 if value is None:
                     self._currentIndex = 0
@@ -1590,11 +1591,11 @@ class Iterator:
                     if self._highestIndex is None or newIndex <= self._highestIndex:
                         self._currentIndex = newIndex
                     else:
-                        raise BachException("%s is greater than the HighestNumber %s" % (
+                        raise BachException('%s is greater than the HighestNumber %s' % (
                                                                     value, self.highestNumber))
                 else:
                     raise BachException(
-                        "%s does not correspond to a chorale in the %s numbering system" % (
+                        '%s does not correspond to a chorale in the %s numbering system' % (
                                                                     value, self.numberingSystem))
 
     currentNumber = property(_getCurrentNumber, _setCurrentNumber,
@@ -1618,7 +1619,7 @@ class Iterator:
 
     def _setHighestNumber(self, value):
         if self._numberingSystem is None:
-            raise Exception("Numbering System is not set.")
+            raise Exception('Numbering System is not set.')
         if self.iterationType == 'number':
             if self._numberingSystem == 'title':
                 if self._titleList is None:
@@ -1629,10 +1630,10 @@ class Iterator:
                         if self._currentIndex is None or value >= self._currentIndex:
                             self._highestIndex = value
                         else:
-                            raise BachException("%s is less than the currentNumber %s" % (
+                            raise BachException('%s is less than the currentNumber %s' % (
                                     value, self.currentNumber))
                     else:
-                        raise BachException("%s is not an index in the range of the titleList" %
+                        raise BachException('%s is not an index in the range of the titleList' %
                                             value)
             else:
                 if value is None:
@@ -1642,11 +1643,11 @@ class Iterator:
                     if self._currentIndex is None or newIndex >= self._currentIndex:
                         self._highestIndex = newIndex
                     else:
-                        raise BachException("%s is less than the CurrentNumber %s" % (
+                        raise BachException('%s is less than the CurrentNumber %s' % (
                             value, self.currentNumber))
                 else:
                     raise BachException(
-                        "%s does not correspond to a chorale in the %s numbering system" % (
+                        '%s does not correspond to a chorale in the %s numbering system' % (
                             value, self.numberingSystem))
 
         elif self.iterationType == 'index':
@@ -1659,10 +1660,10 @@ class Iterator:
                         if self._currentIndex is None or value >= self._currentIndex:
                             self._highestIndex = value
                         else:
-                            raise BachException("%s is less than the currentNumber %s" % (
+                            raise BachException('%s is less than the currentNumber %s' % (
                                                     value, self.currentNumber))
                     else:
-                        raise BachException("%s is not an index in the range of the titleList" %
+                        raise BachException('%s is not an index in the range of the titleList' %
                                             value)
             else:
                 if value is None:
@@ -1672,11 +1673,11 @@ class Iterator:
                     if self._currentIndex is None or newIndex >= self._currentIndex:
                         self._highestIndex = newIndex
                     else:
-                        raise BachException("%s is less than the CurrentNumber %s" % (
+                        raise BachException('%s is less than the CurrentNumber %s' % (
                                                     value, self.currentNumber))
                 else:
                     raise BachException(
-                        "%s does not correspond to a chorale in the %s numbering system" % (
+                        '%s does not correspond to a chorale in the %s numbering system' % (
                                                     value, self.numberingSystem))
 
     highestNumber = property(_getHighestNumber, _setHighestNumber,
@@ -1697,7 +1698,7 @@ class Iterator:
         if value in ['stream', 'filename']:
             self._returnType = value
         else:
-            raise BachException("%s is not a proper returnType for this iterator. " % value +
+            raise BachException('%s is not a proper returnType for this iterator. ' % value +
                                 "Only 'stream' and 'filename' are acceptable." )
 
     returnType = property(_getReturnType, _setReturnType,
@@ -1718,7 +1719,7 @@ class Iterator:
             self._initializeNumberList()
         else:
             raise BachException(
-                "%s is not a proper iterationType for this iterator. "  % value +
+                '%s is not a proper iterationType for this iterator. '  % value +
                 "Only 'number' and 'index' are acceptable.")
     iterationType = property(_getIterationType, _setIterationType,
                              doc='''This property determines how boundary numbers are
@@ -1747,6 +1748,6 @@ class TestExternal(unittest.TestCase): # pragma: no cover
             chorale.show()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest() #External)

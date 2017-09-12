@@ -23,11 +23,12 @@ before_install:
     - export PATH=/home/travis/bin:$PATH
 
 install:
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION libpng=1.6.27
     - conda install --yes python=$TRAVIS_PYTHON_VERSION pyqt
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy 
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION scipy 
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION matplotlib 
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION setuptools 
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION scipy
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION matplotlib
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION setuptools
     - conda install --yes python=$TRAVIS_PYTHON_VERSION coverage
     - cd ..
     - mv music21 music21base
@@ -36,6 +37,6 @@ install:
 
 script:
     - python -c 'from music21.test.testSingleCoreAll import travisMain as tm; tm()'
-    
+
 after_success:
     - if [ "$TRAVIS_PYTHON_VERSION" == "3.5" ]; then coveralls; fi

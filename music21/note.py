@@ -6,8 +6,8 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2016 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# Copyright:    Copyright © 2006-2017 Michael Scott Cuthbert and the music21 Project
+# License:      BSD or LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
 Classes and functions for creating Notes, Rests, and Lyrics.
@@ -32,7 +32,7 @@ from music21 import tie
 from music21 import volume
 
 from music21 import environment
-_MOD = "note.py"
+_MOD = 'note'
 environLocal = environment.Environment(_MOD)
 
 noteheadTypeNames = [
@@ -95,7 +95,7 @@ class Lyric(style.StyleMixin):
     The note.lyric property is a simple way of specifying a single lyric, but
     Lyric objects are needed for working with multiple lyrics.
 
-    >>> l = note.Lyric(text="hello")
+    >>> l = note.Lyric(text='hello')
     >>> l
     <music21.note.Lyric number=1 syllabic=single text="hello">
 
@@ -130,7 +130,7 @@ class Lyric(style.StyleMixin):
     the same as the number, but in cases where a string identifier is present,
     it will be different.
     '''
-    _styleClass = style.TextStyle
+    _styleClass = style.TextStylePlacement
     ### CLASS VARIABLES ###
 
     __slots__ = (
@@ -161,7 +161,7 @@ class Lyric(style.StyleMixin):
             applyRaw = False
         if text is not None:
             self.setTextAndSyllabic(text, applyRaw)
-        
+
         self.number = number
 
         if 'identifier' in kwargs:
@@ -264,21 +264,21 @@ class Lyric(style.StyleMixin):
         '''
         returns the text of the syllable with '-' etc.
 
-        >>> l = note.Lyric("hel-")
+        >>> l = note.Lyric('hel-')
         >>> l.text
         'hel'
         >>> l.rawText
         'hel-'
 
-        >>> l = note.Lyric("-lo")
+        >>> l = note.Lyric('-lo')
         >>> l.rawText
         '-lo'
 
-        >>> l = note.Lyric("-ti-")
+        >>> l = note.Lyric('-ti-')
         >>> l.rawText
         '-ti-'
 
-        >>> l = note.Lyric("bye")
+        >>> l = note.Lyric('bye')
         >>> l.rawText
         'bye'
         '''
@@ -300,8 +300,8 @@ class Lyric(style.StyleMixin):
         number; lyric order is always stored in this form. Descriptive
         identifiers like 'part2verse1' which can be found in the musicXML
         lyric number attribute should be stored in self.identifier.
-        
-        >>> l = note.Lyric("Hi")
+
+        >>> l = note.Lyric('Hi')
         >>> l.number = 5
         >>> l.number
         5
@@ -347,6 +347,7 @@ class GeneralNote(base.Music21Object):
     0.4375
     '''
     isChord = False
+    _styleClass = style.NoteStyle
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength']
@@ -383,7 +384,7 @@ class GeneralNote(base.Music21Object):
         self.expressions = []
         self.articulations = []
 
-        if "lyric" in keywords:
+        if 'lyric' in keywords:
             self.addLyric(keywords['lyric'])
 
         # note: Chords handle ties differently
@@ -393,7 +394,7 @@ class GeneralNote(base.Music21Object):
     def _getLyric(self):
         if not self.lyrics:
             return None
-        
+
         allText = [l.text for l in self.lyrics]
         return '\n'.join(allText)
 
@@ -401,12 +402,12 @@ class GeneralNote(base.Music21Object):
         self.lyrics = []
         if value in (None, False):
             return
-        
+
         if not isinstance(value, str):
             value = str(value)
-        
+
         values = value.split('\n')
-        for i, v in enumerate(values):    
+        for i, v in enumerate(values):
             self.lyrics.append(Lyric(v, number=i + 1))
 
     lyric = property(_getLyric, _setLyric,
@@ -433,7 +434,7 @@ class GeneralNote(base.Music21Object):
         []
 
         Set multiple lyrics with \n separated text:
-        
+
         >>> a.lyric = '1. Hi\n2. Bye'
         >>> a.lyric
         '1. Hi\n2. Bye'
@@ -450,7 +451,7 @@ class GeneralNote(base.Music21Object):
         can also be set.
 
         >>> n1 = note.Note()
-        >>> n1.addLyric("hello")
+        >>> n1.addLyric('hello')
         >>> n1.lyrics[0].text
         'hello'
         >>> n1.lyrics[0].number
@@ -458,19 +459,19 @@ class GeneralNote(base.Music21Object):
 
         An added option gives the lyric number, not the list position
 
-        >>> n1.addLyric("bye", 3)
+        >>> n1.addLyric('bye', 3)
         >>> n1.lyrics[1].text
         'bye'
         >>> n1.lyrics[1].number
         3
-        >>> for lyr in n1.lyrics: 
+        >>> for lyr in n1.lyrics:
         ...     print(lyr.text)
         hello
         bye
 
         Replace an existing lyric by specifying the same number:
 
-        >>> n1.addLyric("ciao", 3)
+        >>> n1.addLyric('ciao', 3)
         >>> n1.lyrics[1].text
         'ciao'
         >>> n1.lyrics[1].number
@@ -479,15 +480,15 @@ class GeneralNote(base.Music21Object):
         Giving a lyric with a hyphen at either end will set whether it
         is part of a multisyllable word:
 
-        >>> n1.addLyric("good-")
+        >>> n1.addLyric('good-')
         >>> n1.lyrics[2].text
         'good'
         >>> n1.lyrics[2].syllabic
         'begin'
 
-        This feature can be overridden by specifying the keyword only argument "applyRaw = True":
+        This feature can be overridden by specifying the keyword only argument "applyRaw=True":
 
-        >>> n1.addLyric("-5", applyRaw=True)
+        >>> n1.addLyric('-5', applyRaw=True)
         >>> n1.lyrics[3].text
         '-5'
         >>> n1.lyrics[3].syllabic
@@ -517,10 +518,10 @@ class GeneralNote(base.Music21Object):
         line number. shifts line numbers of all following lyrics in list
 
         >>> n1 = note.Note()
-        >>> n1.addLyric("second")
+        >>> n1.addLyric('second')
         >>> n1.lyrics
         [<music21.note.Lyric number=1 syllabic=single text="second">]
-        >>> n1.insertLyric("first", 0)
+        >>> n1.insertLyric('first', 0)
         >>> n1.lyrics
         [<music21.note.Lyric number=1 syllabic=single text="first">,
          <music21.note.Lyric number=2 syllabic=single text="second">]
@@ -529,19 +530,19 @@ class GeneralNote(base.Music21Object):
 
         test inserting in the middle.
 
-        >>> n1.insertLyric("newSecond", 1)
+        >>> n1.insertLyric('newSecond', 1)
         >>> n1.lyrics
         [<music21.note.Lyric number=1 syllabic=single text="first">,
          <music21.note.Lyric number=2 syllabic=single text="newSecond">,
          <music21.note.Lyric number=3 syllabic=single text="second">]
-         
+
         Test number as lyric...
-         
+
         >>> n1.insertLyric(0, 3)
         >>> n1.lyrics
-        [<music21.note.Lyric number=1 syllabic=single text="first">, 
-         <music21.note.Lyric number=2 syllabic=single text="newSecond">, 
-         <music21.note.Lyric number=3 syllabic=single text="second">, 
+        [<music21.note.Lyric number=1 syllabic=single text="first">,
+         <music21.note.Lyric number=2 syllabic=single text="newSecond">,
+         <music21.note.Lyric number=3 syllabic=single text="second">,
          <music21.note.Lyric number=4 syllabic=single text="0">]
         '''
         if not isinstance(text, str):
@@ -698,8 +699,8 @@ class NotRest(GeneralNote):
         self._volume = None # created on demand
         #replace
         self.linkage = 'tie'
-        if "beams" in keywords:
-            self.beams = keywords["beams"]
+        if 'beams' in keywords:
+            self.beams = keywords['beams']
         else:
             self.beams = beam.Beams()
 
@@ -744,7 +745,7 @@ class NotRest(GeneralNote):
 
     def _setStemDirection(self, direction):
         if direction is None:
-            direction = 'unspecified' # allow setting to None meaning 
+            direction = 'unspecified' # allow setting to None meaning
         elif direction == 'none':
             direction = 'noStem' # allow setting to none or None
         elif direction not in stemDirectionNames:
@@ -759,30 +760,30 @@ class NotRest(GeneralNote):
         >>> note.stemDirectionNames
         ['double', 'down', 'noStem', 'none', 'unspecified', 'up']
         >>> n = note.Note()
-        
+
         By default a Note's stemDirection is 'unspecified'
         meaning that it is unknown:
-        
+
         >>> n.stemDirection
         'unspecified'
-        
+
         >>> n.stemDirection = 'noStem'
         >>> n.stemDirection
         'noStem'
-        
+
         The alias 'none' (the string) is the same as 'noStem'
-        
+
         >>> n.stemDirection = 'none'
         >>> n.stemDirection
         'noStem'
-        
+
         >>> n.stemDirection = 'junk'
         Traceback (most recent call last):
         music21.note.NotRestException: not a valid stem direction name: junk
-        
+
         Stem direction can be set explicitly to None to remove
         any prior stem information, same as 'unspecified':
-        
+
         >>> n.stemDirection = None
         >>> n.stemDirection
         'unspecified'
@@ -822,8 +823,6 @@ class NotRest(GeneralNote):
 
 
     def _getNoteheadFill(self):
-        '''Return the Notehead fill type.  "yes" and "no" are converted to True, False
-        '''
         return self._noteheadFill
 
     def _setNoteheadFill(self, value):
@@ -839,7 +838,8 @@ class NotRest(GeneralNote):
 
     noteheadFill = property(_getNoteheadFill, _setNoteheadFill, doc='''
         Get or set the note head fill status of this NotRest. Valid note head fill values are
-        True, False, or None (meaning default).
+        True, False, or None (meaning default).  "yes" and "no" are converted to True
+        and False.
 
         >>> n = note.Note()
         >>> n.noteheadFill = 'no'
@@ -892,6 +892,25 @@ class NotRest(GeneralNote):
         ''')
 
     #---------------------------------------------------------------------------
+    def hasVolumeInformation(self):
+        '''
+        Returns bool whether volume was set -- saving some time for advanced
+        users (such as musicxml exporters) that only want to look at the volume
+        if it is already there.
+        
+        >>> n = note.Note()
+        >>> n.hasVolumeInformation()
+        False
+        >>> n.volume
+         <music21.volume.Volume realized=0.71>
+        >>> n.hasVolumeInformation()
+        True
+        '''
+        if self._volume is None:
+            return False
+        else:
+            return True
+    
     def _getVolume(self, forceClient=None):
         # lazy volume creation
         if self._volume is None:
@@ -905,11 +924,12 @@ class NotRest(GeneralNote):
     def _setVolume(self, value, setClient=True):
         # setParent is only False when Chords bundling Notes
         # test by looking for method
-        if hasattr(value, "getDynamicContext"):
+        if value is None:
+            self._volume = None
+        elif hasattr(value, 'getDynamicContext'):
             if setClient:
                 if value.client is not None:
-                    raise NotRestException(
-                        'cannot set a volume object that has a defined client: %s' % value.client)
+                    value = copy.deepcopy(value)
                 value.client = self # set to self
             self._volume = value
         elif common.isNum(value) and setClient:
@@ -928,7 +948,6 @@ class NotRest(GeneralNote):
         doc = '''
         Get and set the :class:`~music21.volume.Volume` object of this object.
         Volume objects are created on demand.
-
 
         >>> n1 = note.Note()
         >>> n1.volume.velocity = 120
@@ -1012,13 +1031,18 @@ class Note(NotRest):
     }
 
     # Accepts an argument for pitch
-    def __init__(self, *arguments, **keywords):
+    def __init__(self, pitchName=None, **keywords):
         super().__init__(**keywords)
-        if arguments:
-            if isinstance(arguments[0], pitch.Pitch):
-                self.pitch = arguments[0]
+
+        if 'pitch' in keywords and pitchName is None:
+            pitchName = keywords['pitch']
+            del keywords['pitch']
+        
+        if pitchName is not None:
+            if isinstance(pitchName, pitch.Pitch):
+                self.pitch = pitchName
             else: # assume first argument is pitch
-                self.pitch = pitch.Pitch(arguments[0], **keywords)
+                self.pitch = pitch.Pitch(pitchName, **keywords)
         else: # supply a default pitch
             name = 'C4'
             if 'name' in keywords:
@@ -1033,7 +1057,7 @@ class Note(NotRest):
     # operators, representations, and transformations
 
     def __repr__(self):
-        return "<music21.note.Note %s>" % self.name
+        return '<music21.note.Note %s>' % self.name
 
 
     def __eq__(self, other):
@@ -1107,9 +1131,9 @@ class Note(NotRest):
         '''
         __lt__, __gt__, __le__, __ge__ all use a pitch comparison
 
-        >>> highE = note.Note("E5")
-        >>> lowF = note.Note("F2")
-        >>> otherHighE = note.Note("E5")
+        >>> highE = note.Note('E5')
+        >>> lowF = note.Note('F2')
+        >>> otherHighE = note.Note('E5')
 
         >>> highE > lowF
         True
@@ -1228,17 +1252,17 @@ class Note(NotRest):
         'C2'
         >>> n.pitches
         (<music21.pitch.Pitch C2>,)
-        
+
         The value for setting must be a list or tuple:
-        
+
         >>> n.pitches = pitch.Pitch('C4')
         Traceback (most recent call last):
         music21.note.NoteException: cannot set pitches with provided object: C4
-        
+
         For setting a single one, use `n.pitch` instead.
-        
+
         Don't use strings, or you will get a string back!
-        
+
         >>> n.pitches = ('C4', 'D4')
         >>> n.pitch
         'C4'
@@ -1363,13 +1387,13 @@ class Unpitched(NotRest):
 
     The `Unpitched` object does not currently do anything and should
     not be used.
-    
+
     >>> unp = note.Unpitched()
-    
+
     Unpitched elements have displayStep and displayOctave
     which shows where they should be displayed, but they do not have pitch
     objects:
-    
+
     >>> unp.displayStep
     'C'
     >>> unp.displayOctave
@@ -1384,7 +1408,7 @@ class Unpitched(NotRest):
 
     def __init__(self):
         super().__init__()
-        self.displayStep = "C"
+        self.displayStep = 'C'
         self.displayOctave = 4
         self._storedInstrument = None
 
@@ -1441,7 +1465,7 @@ class Rest(GeneralNote):
     '''
     isNote = False
     isRest = True
-    name = "rest"
+    name = 'rest'
 
     _DOC_ATTR = {
     'isNote': 'Boolean read-only value describing if this Rest is a Note (False).',
@@ -1471,10 +1495,10 @@ class Rest(GeneralNote):
     def __init__(self, *arguments, **keywords):
         super().__init__(**keywords)
         self.stepShift = 0 # display line
-        self.fullMeasure = "auto" # see docs; True, False, 'always',
+        self.fullMeasure = 'auto' # see docs; True, False, 'always',
 
     def __repr__(self):
-        return "<music21.note.Rest %s>" % self.name
+        return '<music21.note.Rest %s>' % self.name
 
     def __eq__(self, other):
         '''
@@ -1537,7 +1561,7 @@ class SpacerRest(Rest):
     This object should only be used for making hidden space in a score in lilypond.
 
     This may become deprecated at some point...
-    
+
     >>> sr = note.SpacerRest(type='whole')
     >>> sr
     <music21.note.SpacerRest rest duration=4.0>
@@ -1546,7 +1570,7 @@ class SpacerRest(Rest):
         super().__init__(**keywords)
 
     def __repr__(self):
-        return "<music21.note.SpacerRest %s duration=%s>" % (
+        return '<music21.note.SpacerRest %s duration=%s>' % (
                     self.name, self.duration.quarterLength)
 
 
@@ -1626,7 +1650,7 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(l), '<music21.note.Lyric number=1 identifier="verse" text="hi">')
         l.text = None
         self.assertEqual(repr(l), '<music21.note.Lyric number=1 identifier="verse">')
-        
+
 
     def testComplex(self):
         note1 = Note()
@@ -1659,26 +1683,26 @@ class Test(unittest.TestCase):
 
 
     def testNote(self):
-    #    note1 = Note("c#1")
+    #    note1 = Note('c#1')
     #    assert note1.duration.quarterLength == 4
     #    note1.duration.dots = 1
     #    assert note1.duration.quarterLength == 6
-    #    note1.duration.type = "eighth"
+    #    note1.duration.type = 'eighth'
     #    assert note1.duration.quarterLength == 0.75
     #    assert note1.octave == 4
-    #    assert note1.step == "C"
+    #    assert note1.step == 'C'
 
         note2 = Rest()
         self.assertEqual(note2.isRest, True)
         note3 = Note()
-        note3.pitch.name = "B-"
+        note3.pitch.name = 'B-'
         # not sure how to test not None
         #self.assertFalse (note3.pitch.accidental, None)
-        self.assertEqual (note3.pitch.accidental.name, "flat")
+        self.assertEqual (note3.pitch.accidental.name, 'flat')
         self.assertEqual (note3.pitch.pitchClass, 10)
 
         a5 = Note()
-        a5.name = "A"
+        a5.name = 'A'
         a5.octave = 5
         self.assertAlmostEqual(a5.pitch.frequency, 880.0)
         self.assertEqual(a5.pitch.pitchClass, 9)
@@ -1966,7 +1990,7 @@ class Test(unittest.TestCase):
 # define presented order in documentation
 _DOC_ORDER = [Note, Rest, SpacerRest, Unpitched, NotRest, GeneralNote, Lyric]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)

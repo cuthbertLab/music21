@@ -6,8 +6,9 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2012, 2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# Copyright:    Copyright © 2011-2012, 2015, 2017 
+#               Michael Scott Cuthbert and the music21 Project
+# License:      BSD or LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
 This module defines the object model of Volume, covering all representation of
@@ -21,7 +22,7 @@ from music21 import common
 from music21.common import SlottedObjectMixin
 
 from music21 import environment
-_MOD = "volume.py"
+_MOD = 'volume'
 environLocal = environment.Environment(_MOD)
 
 
@@ -50,7 +51,7 @@ class Volume(SlottedObjectMixin):
 
     __slots__ = (
         '_client',
-        '_velocity',
+        '_velocityScalar',
         '_cachedRealized',
         'velocityIsRelative',
         )
@@ -68,7 +69,7 @@ class Volume(SlottedObjectMixin):
         # will use property; if None will leave as None
         self._client = None
         self.client = client
-        self._velocity = None
+        self._velocityScalar = None
         if velocity is not None:
             self.velocity = velocity
         elif velocityScalar is not None:
@@ -90,7 +91,7 @@ class Volume(SlottedObjectMixin):
         return new
 
     def __repr__(self):
-        return "<music21.volume.Volume realized=%s>" % round(self.realized, 2)
+        return '<music21.volume.Volume realized=%s>' % round(self.realized, 2)
 
     def __getstate__(self):
         self._client = common.unwrapWeakref(self._client)
@@ -127,11 +128,15 @@ class Volume(SlottedObjectMixin):
         111
         '''
         if other is not None:
-            self._velocity = other._velocity
+            self._velocityScalar = other._velocityScalar
             self.velocityIsRelative = other.velocityIsRelative
 
-    def getRealizedStr(self, useDynamicContext=True, useVelocity=True,
-        useArticulations=True, baseLevel=0.5, clip=True):
+    def getRealizedStr(self, 
+                       useDynamicContext=True, 
+                       useVelocity=True,
+                       useArticulations=True, 
+                       baseLevel=0.5, 
+                       clip=True):
         '''Return the realized as rounded and formatted string value. Useful for testing.
 
 
@@ -140,8 +145,10 @@ class Volume(SlottedObjectMixin):
         '0.5'
         '''
         val = self.getRealized(useDynamicContext=useDynamicContext,
-                    useVelocity=useVelocity, useArticulations=useArticulations,
-                    baseLevel=baseLevel, clip=clip)
+                               useVelocity=useVelocity, 
+                               useArticulations=useArticulations,
+                               baseLevel=baseLevel, 
+                               clip=clip)
         return str(round(val, 2))
 
     def getRealized(
@@ -220,14 +227,14 @@ class Volume(SlottedObjectMixin):
         # to 0 to 2. a velocityScalar of .7 thus scales the base value of
         # .5 by 1.4 to become .7
         if useVelocity:
-            if self._velocity is not None:
+            if self._velocityScalar is not None:
                 if not self.velocityIsRelative:
                     # if velocity is not relateive
                     # it should fully determines output independent of anything
                     # else
-                    val = self.velocityScalar
+                    val = self._velocityScalar
                 else:
-                    val = val * (self.velocityScalar * 2.0)
+                    val = val * (self._velocityScalar * 2.0)
             # this value provides a good default velocity, as .5 is low
             # this not a scalar application but a shift.
             else: # target :0.70866
@@ -342,18 +349,26 @@ class Volume(SlottedObjectMixin):
         >>> n.volume.velocity
         20
         '''
-        return self._velocity
+        vs = self._velocityScalar
+        if vs is None:
+            return None
+        v = vs * 127
+        if v > 127:
+            v = 127
+        elif v < 0:
+            v = 0
+        return round(v)
 
     @velocity.setter
     def velocity(self, value):
         if not common.isNum(value):
             raise VolumeException('value provided for velocity must be a number, not %s' % value)
         if value < 0:
-            self._velocity = 0
+            self._velocityScalar = 0.0
         elif value > 127:
-            self._velocity = 127
+            self._velocityScalar = 1.0
         else:
-            self._velocity = value
+            self._velocityScalar = value / 127.0
 
     @property
     def velocityScalar(self):
@@ -377,21 +392,31 @@ class Volume(SlottedObjectMixin):
         >>> n.volume.velocity = 127
         >>> n.volume.velocityScalar
         1.0
+        
+        If velocity is not set, then this will return None
+        
+        >>> n = note.Note()
+        >>> n.volume.velocityScalar is None
+        True        
         '''
-        return self._velocity / 127.0
+        v = self._velocityScalar
+        if v is None:
+            return None
+        else:
+            return v
 
     @velocityScalar.setter
     def velocityScalar(self, value):
         if not common.isNum(value):
-            raise VolumeException('value provided for velocityScalar must be a number, ' +
-                                  'not %s' % value)
+            raise VolumeException('value provided for velocityScalar must be a number, '
+                                  + 'not %s' % value)
         if value < 0:
             scalar = 0
         elif value > 1:
             scalar = 1
         else:
             scalar = value
-        self._velocity = round(scalar * 127)
+        self._velocityScalar = scalar
 
 
 #-------------------------------------------------------------------------------
@@ -462,8 +487,8 @@ def realizeVolume(srcStream,
             # this returns a value, but all we need to do is to set the
             # cached values stored internally
             val = e.volume.getRealized(useDynamicContext=dm,
-                                       useVelocity=True,
-                                       useArticulations=True)
+                                       useVelocity=useVelocity,
+                                       useArticulations=useArticulations)
             if setAbsoluteVelocity:
                 e.volume.velocityIsRelative = False
                 # set to velocity scalar
@@ -722,7 +747,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = []
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

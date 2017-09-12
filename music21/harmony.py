@@ -30,7 +30,7 @@ from music21 import style
 from music21.figuredBass import realizerScale
 
 from music21 import environment
-_MOD = "harmony.py"
+_MOD = 'harmony'
 environLocal = environment.Environment(_MOD)
 
 
@@ -201,7 +201,7 @@ class Harmony(chord.Chord):
             self.bass(self._overrides['root'])
 
         updatePitches = keywords.get('updatePitches', True)
-        if (updatePitches and self._figure is not None 
+        if (updatePitches and self._figure is not None
                 or 'root' in self._overrides or 'bass' in self._overrides):
             self._updatePitches()
         self._updateBasedOnXMLInput(keywords)
@@ -1094,8 +1094,8 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
     d13 = inChord.semitonesFromChordStep(6) #9  #thirteenth
 
     d2 = d9
-    d4 = d11 
-    d6 = d13 
+    d4 = d11
+    d6 = d13
 
     def compare(inChordNums, givenChordNums, permittedOmitions=()):
         '''
@@ -1370,7 +1370,7 @@ class ChordSymbol(Harmony):
     ...     chordSymbolName = 'C' + s
     ...     h = harmony.ChordSymbol(chordSymbolName)
     ...     pitchNames = [str(p) for p in h.pitches]
-    ...     print("%-10s%s" % (chordSymbolName, "[" + (', '.join(pitchNames)) + "]"))
+    ...     print('%-10s%s' % (chordSymbolName, '[' + (', '.join(pitchNames)) + ']'))
     C         [C3, E3, G3]
     Cm        [C3, E-3, G3]
     C+        [C3, E3, G#3]
@@ -1741,7 +1741,7 @@ class ChordSymbol(Harmony):
         >>> h._notationString()
         '1,-3,-5,--7'
         '''
-        notationString = ""
+        notationString = ''
 
         kind = self.chordKind
         if kind in CHORD_ALIASES:
@@ -1774,7 +1774,7 @@ class ChordSymbol(Harmony):
             st = st.replace(root, '')
             prelimFigure = prelimFigure.replace(',', '')
         else:
-            m1 = re.match(r"[A-Ga-g][#-]*", prelimFigure) #match not case sensitive,
+            m1 = re.match(r'[A-Ga-g][#-]*', prelimFigure) #match not case sensitive,
             if m1:
                 root = m1.group()
                 #remove the root and bass from the string and any additions/omitions/alterations/
@@ -1784,7 +1784,7 @@ class ChordSymbol(Harmony):
             self.root(pitch.Pitch(root))
 
         #Get optional Bass:
-        m2 = re.search(r"/[A-Ga-g][#-]*", prelimFigure) #match not case sensitive
+        m2 = re.search(r'/[A-Ga-g][#-]*', prelimFigure) #match not case sensitive
         remaining = st
         if m2:
             bass = m2.group()
@@ -1853,7 +1853,7 @@ class ChordSymbol(Harmony):
                     semiToneAlter = -1 * alteration.count('b')
                 else:
                     semiToneAlter = alteration.count('#')
-                m3 = re.search(r"[1-9]+", alteration)
+                m3 = re.search(r'[1-9]+', alteration)
                 if m3:
                     degrees.append([int(m3.group()), semiToneAlter])
 
@@ -1921,7 +1921,7 @@ class ChordSymbol(Harmony):
             realizerScaleCache[scaleInitTuple] = fbScale
         # render in the 3rd octave by default
         self._overrides['root'].octave = 3
-        
+
         if self._notationString():
             pitches = fbScale.getSamplePitches(self._overrides['root'], self._notationString())
             # remove duplicated bass note due to figured bass method.
@@ -1940,14 +1940,14 @@ class ChordSymbol(Harmony):
                 #there is a bass, yet no normal inversion was found....must be added note
 
                 inversionNum = None
-                self._overrides['bass'].octave = 2 
+                self._overrides['bass'].octave = 2
                     # arbitrary octave, must be below root,
                     # which was arbitrarily chosen as 3 above
                 pitches.append(self._overrides['bass'])
         else:
             self.inversion(None, transposeOnSet=False)
             inversionNum = None
-        
+
         if inversionNum not in (0, None):
             for p in pitches[0:inversionNum]:
                 if self.chordKind in nineElevenThirteen:
@@ -1978,7 +1978,7 @@ class ChordSymbol(Harmony):
         while self._hasPitchBelowA1(pitches) :
             for thisPitch in pitches:
                 thisPitch.octave += 1
-        
+
         self.pitches = tuple(pitches)
         self.sortDiatonicAscending(inPlace=True)
 
@@ -2105,7 +2105,7 @@ class ChordSymbol(Harmony):
                         s = 'b'
                     prefix = s * abs(numAlter)
 
-                    figure += ' ' + csmod.modType +" " +  prefix + str(csmod.degree)
+                    figure += ' ' + csmod.modType + ' ' +  prefix + str(csmod.degree)
                 else:
                     figure += ' ' + csmod.modType + ' ' + str(csmod.degree)
 
@@ -2357,7 +2357,7 @@ class Test(unittest.TestCase):
     def testDoubleSharpsEtc(self):
         cisisdim = chord.Chord(('c##5', 'e#5', 'g#5'))
         fig = chordSymbolFigureFromChord(cisisdim)
-        self.assertEqual(fig, "C##dim")
+        self.assertEqual(fig, 'C##dim')
 
     def chordSymbolSetsBassOctave(self):
         d = ChordSymbol('Cm/E-')
@@ -2421,7 +2421,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         #s.show()
         #s.show('text')
     #def realizeCSwithFB(self):
-    #see demos.bhadley.HarmonyRealizer
+    # see music21-demos : hadley.HarmonyRealizer
 
     def testALLchordKinds(self):
         '''
@@ -2470,59 +2470,59 @@ class TestExternal(unittest.TestCase): # pragma: no cover
                         print(n + m + ',' + harmony_type,
                               ChordSymbol(n + m + ',' + harmony_type).pitches)
 
-    def labelChordSymbols(self):
-        '''
-        A very rough sketch of code to label the chord symbols in a bach
-        chorale (in response to a post to the music21 list asking if this is
-        possible).
-        '''
-        from music21.alpha.theoryAnalysis import theoryAnalyzer
-        from music21 import harmony, corpus
-
-        score = corpus.parse('bach/bwv380')
-        excerpt = score.measures(2, 3)
-
-        # remove passing and/or neighbor tones?
-        analyzer = theoryAnalyzer.Analyzer()
-        analyzer.removePassingTones(excerpt)
-        analyzer.removeNeighborTones(excerpt)
-
-        slices = analyzer.getVerticalities(excerpt)
-        for vs in slices:
-            x = harmony.chordSymbolFigureFromChord(vs.getChord())
-            if x  != 'Chord Symbol Cannot Be Identified':
-                vs.lyric = x.replace('-', 'b')
-            print(x.replace('-', 'b'))
-#         Full, unmodified piece:
-#         Bb7
-#         Ebmaj7/Bb
-#         Bb7
-#         Chord Symbol Cannot Be Identified
-#         Bb7
-#         Eb
-#         Bb
-#         Chord Symbol Cannot Be Identified
-#         Bb/D
-#         Bb7
-#         CmaddD
-#         Cm/D
-#         Eb+M7/D
-#         Cm/Eb
-#         F7
-#
-#         piece with passing tones and neighbor tones removed:
-#         Bb7
-#         Bb7
-#         Chord Symbol Cannot Be Identified
-#         Eb
-#         Bb
-#         Bb/D
-#         Bb7
-#         CmaddD
-#         Cm/D
-#         Cm/Eb
-#         F7
-        excerpt.show()
+#     def labelChordSymbols(self):
+#         '''
+#         A very rough sketch of code to label the chord symbols in a bach
+#         chorale (in response to a post to the music21 list asking if this is
+#         possible).
+#         '''
+#         from music21.alpha.theoryAnalysis import theoryAnalyzer
+#         from music21 import harmony, corpus
+# 
+#         score = corpus.parse('bach/bwv380')
+#         excerpt = score.measures(2, 3)
+# 
+#         # remove passing and/or neighbor tones?
+#         analyzer = theoryAnalyzer.Analyzer()
+#         analyzer.removePassingTones(excerpt)
+#         analyzer.removeNeighborTones(excerpt)
+# 
+#         slices = analyzer.getVerticalities(excerpt)
+#         for vs in slices:
+#             x = harmony.chordSymbolFigureFromChord(vs.getChord())
+#             if x  != 'Chord Symbol Cannot Be Identified':
+#                 vs.lyric = x.replace('-', 'b')
+#             print(x.replace('-', 'b'))
+# #         Full, unmodified piece:
+# #         Bb7
+# #         Ebmaj7/Bb
+# #         Bb7
+# #         Chord Symbol Cannot Be Identified
+# #         Bb7
+# #         Eb
+# #         Bb
+# #         Chord Symbol Cannot Be Identified
+# #         Bb/D
+# #         Bb7
+# #         CmaddD
+# #         Cm/D
+# #         Eb+M7/D
+# #         Cm/Eb
+# #         F7
+# #
+# #         piece with passing tones and neighbor tones removed:
+# #         Bb7
+# #         Bb7
+# #         Chord Symbol Cannot Be Identified
+# #         Eb
+# #         Bb
+# #         Bb/D
+# #         Bb7
+# #         CmaddD
+# #         Cm/D
+# #         Cm/Eb
+# #         F7
+#         excerpt.show()
 
 
 #-------------------------------------------------------------------------------
@@ -2531,7 +2531,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 _DOC_ORDER = [Harmony, chordSymbolFigureFromChord, ChordSymbol, ChordStepModification]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test) #, runTest='chordSymbolSetsBassOctave')
 

@@ -226,6 +226,17 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
+        <duration>896</duration>
+        <voice>1</voice>
+        <type>breve</type>
+        <dot/>
+        <dot/>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
         <duration>448</duration>
         <voice>1</voice>
         <type>whole</type>

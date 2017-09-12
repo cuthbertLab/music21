@@ -172,7 +172,7 @@ class HumdrumDataCollection:
         The main parse function for non-opus data collections.
         '''
         self.stream = stream.Score()
-        
+
         self.maxSpines = 0
 
         # parse global comments and figure out the maximum number of spines we will have
@@ -192,7 +192,7 @@ class HumdrumDataCollection:
         for thisSpine in self.spineCollection:
             if thisSpine.parentSpine is None and thisSpine.spineType == 'kern':
                 self.stream.insert(thisSpine.stream)
-        
+
         self.parseMetadata()
 
     def determineIfDataStreamIsOpus(self, dataStream=None):
@@ -693,7 +693,7 @@ class HumdrumDataCollection:
                     if j in positionDict:
                         insertOffset = positionDict[j][0]
                         # hopefully not more than 20 events in a row...
-                        insertPriority = (positionDict[j][1][0].priority 
+                        insertPriority = (positionDict[j][1][0].priority
                                           - 40
                                           + numberOfGlobalEventsInARow)
                         break
@@ -714,13 +714,13 @@ class HumdrumDataCollection:
 
         for offset, el in insertList:
             self.stream.coreInsert(offset, el)
-            
+
         if insertList:
             self.stream.coreElementsChanged()
-        
+
         for el in appendList:
             self.stream.coreAppend(el)
-        
+
         if appendList:
             self.stream.coreElementsChanged()
 
@@ -730,7 +730,7 @@ class HumdrumDataCollection:
 #             return self._storedStream
 #         if self.parsedLines is False:
 #             self.parse()
-# 
+#
 #         if self.spineCollection is None:
 #             raise HumdrumException("parsing got no spine collections!")
 #         elif self.spineCollection.spines is None:
@@ -784,7 +784,7 @@ class HumdrumFile(HumdrumDataCollection):
             filename = self.filename
         if filename is None:
             raise HumdrumException('Cannot parse humdrum file without a filename!')
-        
+
         try:
             if isinstance(filename, pathlib.Path):
                 filename = str(filename)
@@ -796,7 +796,7 @@ class HumdrumFile(HumdrumDataCollection):
 
     def parseFileHandle(self, fileHandle):
         '''
-        takes a fileHandle and returns a HumdrumCollection by calling parse() 
+        takes a fileHandle and returns a HumdrumCollection by calling parse()
         '''
         spineDataCollection = []
         for line in fileHandle:
@@ -1024,12 +1024,12 @@ class HumdrumSpine:
     >>> spine2.stream
     <music21.stream.Part ...>
     '''
-    def __init__(self, id=0, eventList=None, streamClass=stream.Stream): #@ReservedAssignment
-        self.id = id
+    def __init__(self, spineId=0, eventList=None, streamClass=stream.Stream):
+        self.id = spineId
         if eventList is None:
             eventList = []
         for event in eventList:
-            event.spineId = id
+            event.spineId = spineId
 
         self.eventList = eventList
         self.stream = streamClass()
@@ -1277,8 +1277,8 @@ class KernSpine(HumdrumSpine):
     attribute set and thus events are processed as if they
     are kern notes
     '''
-    def __init__(self, id=0, eventList=None, streamClass=stream.Stream): #@ReservedAssignment
-        super().__init__(id, eventList, streamClass)
+    def __init__(self, spineId=0, eventList=None, streamClass=stream.Stream):
+        super().__init__(spineId, eventList, streamClass)
         self.lastContainer = None
         self.inTuplet = None
         self.lastNote = None
@@ -2673,7 +2673,7 @@ class GlobalReference(base.Music21Object):
             md.setWorkId(c, v)
 
         elif c == 'YEC': # electronic edition copyright.
-            md.copyright = v
+            md.copyright = metadata.Copyright(v)
 
         else:
             wasParsed = False
@@ -2846,7 +2846,7 @@ class Test(unittest.TestCase):
         md = c.metadata
         self.assertIsNotNone(md.composer)
         self.assertIn('Palestrina', md.composer)
-        
+
 
     def testFlavors(self):
         prevFlavor = flavors['JRP']

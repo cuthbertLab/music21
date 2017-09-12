@@ -31,7 +31,7 @@ from music21.analysis.discrete import DiscreteAnalysisException
 
 
 from music21 import environment
-_MOD = 'windowed.py'
+_MOD = 'analysis.windowed'
 environLocal = environment.Environment(_MOD)
 
 

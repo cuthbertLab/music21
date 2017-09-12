@@ -34,7 +34,7 @@ from music21 import note
 from music21 import search
 from music21 import stream
 
-_MOD = "variant.py"
+_MOD = 'variant'
 environLocal = environment.Environment(_MOD)
 
 
@@ -51,8 +51,8 @@ def mergeVariants(streamX, streamY, variantName='variant', *, inPlace=False):
     that function instead.
 
 
-    >>> streamX = converter.parse("tinynotation: 4/4 a4 b  c d", makeNotation=False)
-    >>> streamY = converter.parse("tinynotation: 4/4 a4 b- c e", makeNotation=False)
+    >>> streamX = converter.parse('tinynotation: 4/4 a4 b  c d', makeNotation=False)
+    >>> streamY = converter.parse('tinynotation: 4/4 a4 b- c e', makeNotation=False)
 
     >>> mergedStream = variant.mergeVariants(streamX, streamY,
     ...                                      variantName='docvariant', inPlace=False)
@@ -71,7 +71,7 @@ def mergeVariants(streamX, streamY, variantName='variant', *, inPlace=False):
     >>> v0[0]
     <music21.note.Note B->
 
-    >>> streamZ = converter.parse("tinynotation: 4/4 a4 b c d e f g a", makeNotation=False)
+    >>> streamZ = converter.parse('tinynotation: 4/4 a4 b c d e f g a', makeNotation=False)
     >>> variant.mergeVariants(streamX, streamZ, variantName='docvariant', inPlace=False)
     Traceback (most recent call last):
     music21.variant.VariantException: Could not determine what merging method to use.
@@ -86,12 +86,12 @@ def mergeVariants(streamX, streamY, variantName='variant', *, inPlace=False):
     >>> vScore = stream.Score()
 
     >>> #                                                 *
-    >>> ap1 = converter.parse("tinynotation: 4/4   a4 b c d    e2 f   g2 f4 g ")
-    >>> vp1 = converter.parse("tinynotation: 4/4   a4 b c e    e2 f   g2 f4 a ")
+    >>> ap1 = converter.parse('tinynotation: 4/4   a4 b c d    e2 f   g2 f4 g ')
+    >>> vp1 = converter.parse('tinynotation: 4/4   a4 b c e    e2 f   g2 f4 a ')
 
     >>> #                                                         *    *    *
-    >>> ap2 = converter.parse("tinynotation: 4/4   a4 g f e    f2 e   d2 g4 f ")
-    >>> vp2 = converter.parse("tinynotation: 4/4   a4 g f e    f2 g   f2 g4 d ")
+    >>> ap2 = converter.parse('tinynotation: 4/4   a4 g f e    f2 e   d2 g4 f ')
+    >>> vp2 = converter.parse('tinynotation: 4/4   a4 g f e    f2 g   f2 g4 d ')
 
     >>> ap1.id = 'aPart1'
     >>> ap2.id = 'aPart2'
@@ -154,17 +154,17 @@ def mergeVariants(streamX, streamY, variantName='variant', *, inPlace=False):
 
     '''
     classesX = streamX.classes
-    if "Score" in classesX:
+    if 'Score' in classesX:
         return mergeVariantScores(streamX, streamY, variantName, inPlace=inPlace)
-    elif streamX.iter.getElementsByClass("Measure"):
+    elif streamX.iter.getElementsByClass('Measure'):
         return mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace=inPlace)
     elif (streamX.iter.notesAndRests and
             streamX.duration.quarterLength == streamY.duration.quarterLength):
         return mergeVariantsEqualDuration([streamX, streamY], [variantName], inPlace=inPlace)
     else:
         raise VariantException(
-            "Could not determine what merging method to use. " +
-            "Try using a more specific merging function.")
+            'Could not determine what merging method to use. '
+            + 'Try using a more specific merging function.')
 
 def mergeVariantScores(aScore, vScore, variantName='variant', *, inPlace=False):
     '''
@@ -173,14 +173,14 @@ def mergeVariantScores(aScore, vScore, variantName='variant', *, inPlace=False):
 
     >>> aScore, vScore = stream.Score(), stream.Score()
 
-    >>> ap1 = stream.Part(converter.parse("tinynotation: 4/4   a4 b c d    e2 f2   g2 f4 g4 "
+    >>> ap1 = stream.Part(converter.parse('tinynotation: 4/4   a4 b c d    e2 f2   g2 f4 g4 '
     ...                                   ).makeMeasures())
-    >>> vp1 = stream.Part(converter.parse("tinynotation: 4/4   a4 b c e    e2 f2   g2 f4 a4 "
+    >>> vp1 = stream.Part(converter.parse('tinynotation: 4/4   a4 b c e    e2 f2   g2 f4 a4 '
     ...                                   ).makeMeasures())
 
-    >>> ap2 = stream.Part(converter.parse("tinynotation: 4/4   a4 g f e    f2 e2   d2 g4 f4 "
+    >>> ap2 = stream.Part(converter.parse('tinynotation: 4/4   a4 g f e    f2 e2   d2 g4 f4 '
     ...                                   ).makeMeasures())
-    >>> vp2 = stream.Part(converter.parse("tinynotation: 4/4   a4 g f e    f2 g2   f2 g4 d4 "
+    >>> vp2 = stream.Part(converter.parse('tinynotation: 4/4   a4 g f e    f2 g2   f2 g4 d4 '
     ...                                   ).makeMeasures())
 
     >>> aScore.insert(0.0, ap1)
@@ -230,7 +230,7 @@ def mergeVariantScores(aScore, vScore, variantName='variant', *, inPlace=False):
     '''
     if len(aScore.iter.parts) != len(vScore.iter.parts):
         raise VariantException(
-            "These scores do not have the same number of parts and cannot be merged.")
+            'These scores do not have the same number of parts and cannot be merged.')
 
     if inPlace is True:
         returnObj = aScore
@@ -430,7 +430,7 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName='variant', *, inPla
             yRegion = streamY.measures(yRegionStartMeasure + 1, yRegionEndMeasure)
             replacementDuration = 0.0
         else:
-            raise VariantException("Unknown regionType %r" % regionType)
+            raise VariantException('Unknown regionType %r' % regionType)
         addVariant(returnObj, startOffset, yRegion,
                    variantName=variantName, replacementDuration = replacementDuration)
 
@@ -716,8 +716,8 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName,
     designed to deal with.
 
 
-    >>> mainstream = converter.parse("tinynotation: 4/4   A4 B4 C4 D4   E1    F2 E2     E8 F8 F4 G2   G2 G4 F4   F4 F4 F4 F4   G1      ")
-    >>> ossiastream = converter.parse("tinynotation: 4/4  r1            r1    r1        E4 E4 F4 G4   r1         F2    F2      r1      ")
+    >>> mainstream = converter.parse('tinynotation: 4/4   A4 B4 C4 D4   E1    F2 E2     E8 F8 F4 G2   G2 G4 F4   F4 F4 F4 F4   G1      ')
+    >>> ossiastream = converter.parse('tinynotation: 4/4  r1            r1    r1        E4 E4 F4 G4   r1         F2    F2      r1      ')
     >>> mainstream.makeMeasures(inPlace=True)
     >>> ossiastream.makeMeasures(inPlace=True)
 
@@ -805,7 +805,7 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName,
         returnObj = copy.deepcopy(mainpart)
 
     if compareByMeasureNumber is True:
-        for ossiaMeasure in ossiapart.getElementsByClass("Measure"):
+        for ossiaMeasure in ossiapart.getElementsByClass('Measure'):
             if ossiaMeasure.notes: #If the measure is not just rests
                 ossiaNumber = ossiaMeasure.number
                 returnMeasure = returnObj.measure(ossiaNumber)
@@ -815,10 +815,10 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName,
                 else:
                     ossiaOffset = returnMeasure.getOffsetBySite(returnObj)
                     addVariant(returnObj, ossiaOffset, ossiaMeasure,
-                               variantName=ossiaName, variantGroups=None, 
+                               variantName=ossiaName, variantGroups=None,
                                replacementDuration=None)
     else:
-        for ossiaMeasure in ossiapart.getElementsByClass("Measure"):
+        for ossiaMeasure in ossiapart.getElementsByClass('Measure'):
             if ossiaMeasure.notes: #If the measure is not just rests
                 ossiaOffset = ossiaMeasure.getOffsetBySite(ossiapart)
                 if recurseInMeasures is True:
@@ -925,7 +925,7 @@ def addVariant(s, startOffset, sVariant, variantName=None,
     if sVariant is None: #deletion
         pass
     else: #replacement or insertion
-        if "Measure" in sVariant.classes: #sVariant is a measure put it in a variant and insert.
+        if 'Measure' in sVariant.classes: #sVariant is a measure put it in a variant and insert.
             tempVariant.append(sVariant)
         else: #sVariant is not a measure
             sVariantMeasures = sVariant.getElementsByClass('Measure')
@@ -1085,7 +1085,7 @@ def refineVariant(s, sVariant, *, inPlace=False):
             variantSubRegion = variantRegion.measures(variantStart + 1, variantEnd)
             replacementDuration = 0.0
         else:
-            raise VariantException("Unknown regionType %r" % regionType)
+            raise VariantException('Unknown regionType %r' % regionType)
 
         addVariant(returnRegion, startOffset,
                    variantSubRegion, variantGroups=variantGroups,
@@ -1117,12 +1117,12 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, *, inPla
 
     # associating measures in variantRegion to those in returnRegion ->
     #    This is done via 0 indexed lists corresponding to measures
-    returnObjectMeasureList = [i for i in range(len(returnObject.getElementsByClass("Measure")))]
+    returnObjectMeasureList = [i for i in range(len(returnObject.getElementsByClass('Measure')))]
     badnessDict = {}
     listDict = {}
     variantObjectMeasureList, unused_badness = _getBestListandScore(
-            returnObject.getElementsByClass("Measure"),
-            variantObject.getElementsByClass("Measure"),
+            returnObject.getElementsByClass('Measure'),
+            variantObject.getElementsByClass('Measure'),
             badnessDict,
             listDict)
 
@@ -1351,7 +1351,9 @@ def _getRegionsFromStreams(streamX, streamY):
 
 
     >>> s1 = converter.parse("tinynotation: 2/4 d4 e8. f16 GG4 b'4 b-2 c4 d8. e16 FF4 a'4 b-2")
-    >>> #                                       *0:Eq  *1:Rep        * *3:Eq             *6:In
+    
+                                                *0:Eq  *1:Rep        * *3:Eq             *6:In
+    
     >>> s2 = converter.parse("tinynotation: 2/4 d4 e8. f16 FF4 b'4 c4 d8. e16 FF4 a'4 b-2 b-2")
     >>> s1m = s1.makeMeasures()
     >>> s2m = s2.makeMeasures()
@@ -1737,10 +1739,10 @@ def _doVariantFixingOnStream(s, variantNames=None):
             targetElement = _getNextElements(s, v)
 
             #Delete initial clefs, etc. from initial insertion targetElement if it exists
-            if "Stream" in targetElement.classes:
+            if 'Stream' in targetElement.classes:
                 # Must use .elements, because of removal of elements
                 for e in targetElement.elements:
-                    if "Clef" in e.classes or "TimeSignature" in e.classes:
+                    if 'Clef' in e.classes or 'TimeSignature' in e.classes:
                         targetElement.remove(e)
 
             v.append(copy.deepcopy(targetElement)) #Appends a copy!!!
@@ -1894,7 +1896,7 @@ def _getPreviousElement(s, v):
         foundStream = replacedElements.iter.getElementsByClass(['Measure', 'Note', 'Rest'])
 
     if not foundStream:
-        raise VariantException("Cannot find any Measures, Notes, or Rests in variant")
+        raise VariantException('Cannot find any Measures, Notes, or Rests in variant')
     vClass = type(foundStream[0])
     if isinstance(vClass, note.GeneralNote):
         vClass = note.GeneralNote
@@ -2010,7 +2012,7 @@ class Variant(base.Music21Object):
         base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
 
     def __repr__(self):
-        return "<music21.variant.%s object of length %s>" % (self.__class__.__name__,
+        return '<music21.variant.%s object of length %s>' % (self.__class__.__name__,
                                                              str(self.containedHighestTime))
 
     def __getattr__(self, attr):
@@ -2309,18 +2311,18 @@ class Variant(base.Music21Object):
             contextStream = self.activeSite
             if contextStream is None:
                 environLocal.printDebug(
-                    "No contextStream or activeSite, finding most recently added site (dangerous)")
+                    'No contextStream or activeSite, finding most recently added site (dangerous)')
                 contextStream = self.getContextByClass('Stream')
                 if contextStream is None:
-                    raise VariantException("Cannot find a Stream context for this object...")
+                    raise VariantException('Cannot find a Stream context for this object...')
 
         if self not in contextStream.variants:
-            raise VariantException("Variant not found in stream %s" % contextStream)
+            raise VariantException('Variant not found in stream %s' % contextStream)
 
         vStart = self.getOffsetBySite(contextStream)
 
         if includeSpacers is True:
-            spacerDuration = self.getElementsByClass("SpacerRest")[0].duration.quarterLength
+            spacerDuration = self.getElementsByClass('SpacerRest')[0].duration.quarterLength
         else:
             spacerDuration = 0.0
 
@@ -2336,7 +2338,7 @@ class Variant(base.Music21Object):
                 includeEndBoundary=False,
                 mustFinishInSpan=False,
                 mustBeginInSpan=True,
-                classList=classes)
+                classList=classes).stream()
 
         elif self.lengthType == 'deletion':
             vMiddle = vStart + self.containedHighestTime
@@ -2350,11 +2352,11 @@ class Variant(base.Music21Object):
                 includeEndBoundary=False,
                 mustFinishInSpan=False,
                 mustBeginInSpan=True,
-                classList=classes)
+                classList=classes).stream()
             returnPart2 = contextStream.getElementsByOffset(vMiddle, vEnd,
                 includeEndBoundary=False,
                 mustFinishInSpan=False,
-                mustBeginInSpan=True)
+                mustBeginInSpan=True).stream()
 
             returnStream = returnPart1
             for e in returnPart2.elements:
@@ -2432,13 +2434,13 @@ class Variant(base.Music21Object):
         if referenceStream is None:
             referenceStream = self.activeSite
             if referenceStream is None:
-                environLocal.printDebug("No referenceStream or activeSite, " +
-                                        "finding most recently added site (dangerous)")
+                environLocal.printDebug('No referenceStream or activeSite, ' +
+                                        'finding most recently added site (dangerous)')
                 referenceStream = self.getContextByClass('Stream')
                 if referenceStream is None:
-                    raise VariantException("Cannot find a Stream context for this object...")
+                    raise VariantException('Cannot find a Stream context for this object...')
         if self not in referenceStream.variants:
-            raise VariantException("Variant not found in stream %s" % referenceStream)
+            raise VariantException('Variant not found in stream %s' % referenceStream)
 
         replacedElements = self.replacedElements(referenceStream, classList)
         for el in replacedElements:
@@ -2505,11 +2507,11 @@ class Test(unittest.TestCase):
         pass
 
     def pitchOut(self, listIn):
-        out = "["
+        out = '['
         for p in listIn:
             out += str(p) + ', '
         out = out[0:len(out)-2]
-        out += "]"
+        out += ']'
         return out
 
     def testBasicA(self):
@@ -2652,9 +2654,9 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         j2 = corpus.parse('trecento/PMFC_06-Jacopo-03b')
         jMerged = mergeVariantScores(j1, j2)
         jMerged.show('lily.pdf')
-        #jMerged.write('lily')#, fp="d:/desktop/t1.ly")
+        #jMerged.write('lily')#, fp='d:/desktop/t1.ly')
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test) #TestExternal)
 

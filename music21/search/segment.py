@@ -21,7 +21,7 @@ Speed notes:
    use pyLevenshtein if it is installed from http://code.google.com/p/pylevenshtein/ .
    You will need to compile it by running **sudo python setup.py install** on Mac or
    Unix (compilation is much more difficult on Windows; sorry). The ratios are very
-   slightly different, but the speedup is between 10 and 100x! 
+   slightly different, but the speedup is between 10 and 100x!
    (but then PyPy probably won't work)
 
 '''
@@ -40,7 +40,7 @@ from music21 import converter
 from music21 import corpus
 from music21 import environment
 
-_MOD = 'search.segment.py'
+_MOD = 'search.segment'
 environLocal = environment.Environment(_MOD)
 
 
@@ -148,10 +148,10 @@ def _indexSingleMulticore(filePath, *args, **kwds):
 
     if not isinstance(filePath, pathlib.Path):
         filePath = pathlib.Path(filePath)
-    
+
     shortfp = filePath.name
 
-    
+
     try:
         indexOutput = indexOnePath(filePath, *args, **kwds2)
     except Exception as e: # pylint: disable=broad-except
@@ -198,7 +198,7 @@ def indexScoreFilePaths(scoreFilePaths,
 
     indexFunc = partial(_indexSingleMulticore, *args, **kwds)
 
-    rpList = common.runParallel(scoreFilePaths, indexFunc, updateFunction)
+    rpList = common.runParallel(scoreFilePaths, indexFunc, updateFunction=updateFunction)
     scoreDict = OrderedDict(rpList)
 
     return scoreDict
@@ -231,7 +231,7 @@ def saveScoreDict(scoreDict, filePath=None):
         filePath = environLocal.getTempFile('.json')
     elif not isinstance(filePath, pathlib.Path):
         filePath = pathlib.Path(filePath)
-        
+
     with filePath.open('wb') as f:
         json.dump(scoreDict, f)
 
@@ -244,7 +244,7 @@ def loadScoreDict(filePath):
     '''
     if not isinstance(filePath, pathlib.Path):
         filePath = pathlib.Path(filePath)
-        
+
     with filePath.open('b') as f:
         scoreDict = json.load(f)
     return scoreDict

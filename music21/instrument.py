@@ -33,7 +33,7 @@ from music21 import pitch
 from music21.exceptions21 import InstrumentException
 
 from music21 import environment
-_MOD = "instrument.py"
+_MOD = 'instrument'
 environLocal = environment.Environment(_MOD)
 
 def unbundleInstruments(streamIn, *, inPlace=False):
@@ -139,17 +139,23 @@ class Instrument(base.Music21Object):
 
         self.partId = None
         self._partIdIsRandom = False
-        
+
         self.partName = None
         self.partAbbreviation = None
 
+        self.printPartName = None # True = yes, False = no, None = let others decide
+        self.printPartAbbreviation = None
+
+
         self.instrumentId = None # apply to midi and instrument
         self._instrumentIdIsRandom = False
+
 
         self.instrumentName = None
         self.instrumentAbbreviation = None
         self.midiProgram = None
         self.midiChannel = None
+        self.instrumentSound = None
 
         self.lowestNote = None
         self.highestNote = None
@@ -171,7 +177,7 @@ class Instrument(base.Music21Object):
         return ''.join(msg)
 
     def __repr__(self):
-        return "<%s.%s %s>" % (self.__class__.__module__,
+        return '<%s.%s %s>' % (self.__class__.__module__,
                                self.__class__.__name__,
                                self.__str__())
 
@@ -266,7 +272,7 @@ class Instrument(base.Music21Object):
             self.midiChannel = 0
             return 0
         elif len(channelFilter) >= maxMidi:
-            raise InstrumentException("we are out of midi channels! help!")
+            raise InstrumentException('we are out of midi channels! help!')
         else:
             for ch in range(maxMidi):
                 if ch in channelFilter:
@@ -277,8 +283,8 @@ class Instrument(base.Music21Object):
                     self.midiChannel = ch
                     return ch
             return 0
-            #raise InstrumentException("we are out of midi channels and this " +
-            #            "was not already detected PROGRAM BUG!")
+            #raise InstrumentException('we are out of midi channels and this ' +
+            #            'was not already detected PROGRAM BUG!')
 
 
 #-------------------------------------------------------------------------------
@@ -288,6 +294,7 @@ class KeyboardInstrument(Instrument):
         super().__init__()
         self.instrumentName = 'Keyboard'
         self.instrumentAbbreviation = 'Kb'
+        self.instrumentSound = 'keyboard.piano'
 
 class Piano(KeyboardInstrument):
     '''
@@ -309,7 +316,7 @@ class Piano(KeyboardInstrument):
         self.highestNote = pitch.Pitch('C8')
 
         self.names = {'de': ['Klavier', 'Pianoforte'],
-                      'en': ["Piano", "Pianoforte"]}
+                      'en': ['Piano', 'Pianoforte']}
 
 class Harpsichord(KeyboardInstrument):
     def __init__(self):
@@ -318,6 +325,7 @@ class Harpsichord(KeyboardInstrument):
         self.instrumentName = 'Harpsichord'
         self.instrumentAbbreviation = 'Hpschd'
         self.midiProgram = 6
+        self.instrumentSound = 'keyboard.harpsichord'
 
         self.lowestNote = pitch.Pitch('F1')
         self.highestNote = pitch.Pitch('F6')
@@ -329,6 +337,7 @@ class Clavichord(KeyboardInstrument):
         self.instrumentName = 'Clavichord'
         self.instrumentAbbreviation = 'Clv'
         self.midiProgram = 7
+        self.instrumentSound = 'keyboard.clavichord'
 
         #TODO: self.lowestNote = pitch.Pitch('')
         #TODO: self.highestNote = pitch.Pitch('')
@@ -340,14 +349,15 @@ class Celesta(KeyboardInstrument):
         self.instrumentName = 'Celesta'
         self.instrumentAbbreviation = 'Clst'
         self.midiProgram = 8
-
+        self.instrumentSound = 'keyboard.celesta'
 
 #-------------------------------------------------------------------------------
 class Organ(Instrument):
     def __init__(self):
         super().__init__()
-
+        self.instrumentName = 'Organ'
         self.midiProgram = 19
+        self.instrumentSound = 'keyboard.organ'
 
 class PipeOrgan(Organ):
     def __init__(self):
@@ -356,7 +366,7 @@ class PipeOrgan(Organ):
         self.instrumentName = 'Pipe Organ'
         self.instrumentAbbreviation = 'P Org'
         self.midiProgram = 19
-
+        self.instrumentSound = 'keyboard.organ.pipe'
         self.lowestNote = pitch.Pitch('C2')
         self.highestNote = pitch.Pitch('C6')
 
@@ -378,6 +388,7 @@ class ReedOrgan(Organ):
         self.instrumentName = 'Reed Organ'
         #TODO self.instrumentAbbreviation = ''
         self.midiProgram = 20
+        self.instrumentSound = 'keyboard.organ.reed'
 
         self.lowestNote = pitch.Pitch('C2')
         self.highestNote = pitch.Pitch('C6')
@@ -389,17 +400,19 @@ class Accordion(Organ):
         self.instrumentName = 'Accordion'
         self.instrumentAbbreviation = 'Acc'
         self.midiProgram = 21
+        self.instrumentSound = 'keyboard.accordion'
 
         self.lowestNote = pitch.Pitch('F3')
         self.highestNote = pitch.Pitch('A6')
 
-class Harmonica(Organ):
+class Harmonica(Instrument):
     def __init__(self):
         super().__init__()
 
         self.instrumentName = 'Harmonica'
         self.instrumentAbbreviation = 'Hmca'
         self.midiProgram = 22
+        self.instrumentSound = 'wind.reed.harmonica'
 
         self.lowestNote = pitch.Pitch('C3')
         self.highestNote = pitch.Pitch('C6')
@@ -418,16 +431,16 @@ class StringInstrument(Instrument):
         self.midiProgram = 48
 
     def _getStringPitches(self):
-        if hasattr(self, "_cachedPitches") and self._cachedPitches is not None:
+        if hasattr(self, '_cachedPitches') and self._cachedPitches is not None:
             return self._cachedPitches
-        elif not hasattr(self, "_stringPitches"):
-            raise InstrumentException("cannot get stringPitches for these instruments")
+        elif not hasattr(self, '_stringPitches'):
+            raise InstrumentException('cannot get stringPitches for these instruments')
         else:
             self._cachedPitches = [pitch.Pitch(x) for x in self._stringPitches]
             return self._cachedPitches
 
     def _setStringPitches(self, newPitches):
-        if newPitches and (hasattr(newPitches[0], "step") or newPitches[0] is None):
+        if newPitches and (hasattr(newPitches[0], 'step') or newPitches[0] is None):
             # newPitches is pitchObjects or something
             self._stringPitches = newPitches
             self._cachedPitches = newPitches
@@ -455,7 +468,7 @@ class StringInstrument(Instrument):
             (N.B. that string to pitch conversion is happening automatically)
 
 
-            >>> vln1.stringPitches = ["G3", "G4", "B4", "D4"]
+            >>> vln1.stringPitches = ['G3', 'G4', 'B4', 'D4']
 
             (`[*]In some tuning methods such as reentrant tuning on the ukulele,
             lute, or five-string banjo the order might not strictly be from lowest to
@@ -470,6 +483,7 @@ class Violin(StringInstrument):
         self.instrumentName = 'Violin'
         self.instrumentAbbreviation = 'Vln'
         self.midiProgram = 40
+        self.instrumentSound = 'strings.violin'
 
         self.lowestNote = pitch.Pitch('G3')
         self._stringPitches = ['G3', 'D4', 'A4', 'E5']
@@ -481,6 +495,7 @@ class Viola(StringInstrument):
         self.instrumentName = 'Viola'
         self.instrumentAbbreviation = 'Vla'
         self.midiProgram = 41
+        self.instrumentSound = 'strings.viola'
 
         self.lowestNote = pitch.Pitch('C3')
         self._stringPitches = ['C3', 'G3', 'D4', 'A4']
@@ -492,6 +507,7 @@ class Violoncello(StringInstrument):
         self.instrumentName = 'Violoncello'
         self.instrumentAbbreviation = 'Vc'
         self.midiProgram = 42
+        self.instrumentSound = 'strings.cello'
 
         self.lowestNote = pitch.Pitch('C2')
         self._stringPitches = ['C2', 'G2', 'D3', 'A3']
@@ -509,6 +525,7 @@ class Contrabass(StringInstrument):
         self.instrumentName = 'Contrabass'
         self.instrumentAbbreviation = 'Cb'
         self.midiProgram = 43
+        self.instrumentSound = 'strings.contrabass'
 
         self.lowestNote = pitch.Pitch('E2')
         self._stringPitches = ['E1', 'A1', 'D2', 'G2']
@@ -521,6 +538,7 @@ class Harp(StringInstrument):
         self.instrumentName = 'Harp'
         self.instrumentAbbreviation = 'Hp'
         self.midiProgram = 46
+        self.instrumentSound = 'pluck.harp'
 
         self.lowestNote = pitch.Pitch('C1')
         self.highestNote = pitch.Pitch('G#7')
@@ -533,6 +551,7 @@ class Guitar(StringInstrument):
         self.instrumentName = 'Guitar'
         self.instrumentAbbreviation = 'Gtr'
         self.midiProgram = 24  # default -- Acoustic
+        self.instrumentSound = 'pluck.guitar'
 
         self.lowestNote = pitch.Pitch('E2')
         self._stringPitches = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4']
@@ -544,6 +563,7 @@ class AcousticGuitar(Guitar):
         self.instrumentName = 'Acoustic Guitar'
         self.instrumentAbbreviation = 'Ac Gtr'
         self.midiProgram = 24
+        self.instrumentSound = 'pluck.guitar.acoustic'
 
 class ElectricGuitar(Guitar):
     def __init__(self):
@@ -552,6 +572,7 @@ class ElectricGuitar(Guitar):
         self.instrumentName = 'Electric Guitar'
         self.instrumentAbbreviation = 'Elec Gtr'
         self.midiProgram = 26
+        self.instrumentSound = 'pluck.guitar.electric'
 
 class AcousticBass(Guitar):
     def __init__(self):
@@ -560,6 +581,7 @@ class AcousticBass(Guitar):
         self.instrumentName = 'Acoustic Bass'
         self.instrumentAbbreviation = 'Ac b'
         self.midiProgram = 32
+        self.instrumentSound = 'pluck.bass.acoustic'
 
         self.lowestNote = pitch.Pitch('E1')
         self._stringPitches = ['E1', 'A1', 'D2', 'G2']
@@ -571,6 +593,7 @@ class ElectricBass(Guitar):
         self.instrumentName = 'Electric Bass'
         self.instrumentAbbreviation = 'Elec b'
         self.midiProgram = 33
+        self.instrumentSound = 'pluck.bass.electric'
 
         self.lowestNote = pitch.Pitch('E1')
         self._stringPitches = ['E1', 'A1', 'D2', 'G2']
@@ -582,6 +605,7 @@ class FretlessBass(Guitar):
         self.instrumentName = 'Fretless Bass'
         #TODO: self.instrumentAbbreviation = ''
         self.midiProgram = 35
+        self.instrumentSound = 'pluck.bass.fretless'
 
         self.lowestNote = pitch.Pitch('E1')
         self._stringPitches = ['E1', 'A1', 'D2', 'G2']
@@ -593,6 +617,7 @@ class Mandolin(StringInstrument):
 
         self.instrumentName = 'Mandolin'
         self.instrumentAbbreviation = 'Mdln'
+        self.instrumentSound = 'pluck.mandolin'
 
         self.lowestNote = pitch.Pitch('G3')
         self._stringPitches = ['G3', 'D4', 'A4', 'E5']
@@ -603,6 +628,7 @@ class Ukulele(StringInstrument):
 
         self.instrumentName = 'Ukulele'
         self.instrumentAbbreviation = 'Uke'
+        self.instrumentSound = 'pluck.ukulele'
 
         self.lowestNote = pitch.Pitch('C4')
         self._stringPitches = ['G4', 'C4', 'E4', 'A4']
@@ -1160,7 +1186,7 @@ class CrashCymbals(Cymbals):
         self.instrumentName = 'Crash Cymbals'
         self.instrumentAbbreviation = 'Cym'
         self.inGMPercMap = True
-        self._modifier = "1"
+        self._modifier = '1'
 
         self._modifierToPercMapPitch = {'1': 49,
                                         '2': 57,
@@ -1278,7 +1304,7 @@ class SnareDrum(UnpitchedPercussion):
         self.instrumentName = 'Snare Drum'
         self.instrumentAbbreviation = 'Sn Dr'
         self.inGMPercMap = True
-        self._modifier = "acoustic"
+        self._modifier = 'acoustic'
         self._modifierToPercMapPitch = {'acoustic': 38,
                                         'side': 37,
                                         'electic': 40,
@@ -1538,19 +1564,27 @@ def instrumentFromMidiProgram(number):
     >>> instrument.instrumentFromMidiProgram(500)
     Traceback (most recent call last):
     music21.exceptions21.InstrumentException: No instrument found with given midi program
+    
+    SLOW! creates each instrument in order
     '''
-    foundInstrument = False
     for myThing in sys.modules[__name__].__dict__.values():
         try:
+            isAnInstrument = False
+            for mroClass in myThing.mro():
+                if mroClass is Instrument:
+                    isAnInstrument = True
+                    break
+            
+            if not isAnInstrument:
+                continue
             i = myThing()
             mp = getattr(i, 'midiProgram')
             if mp == number:
-                foundInstrument = True
                 return i
         except (AttributeError, TypeError):
             pass
-    if not foundInstrument:
-        raise InstrumentException('No instrument found with given midi program')
+
+    raise InstrumentException('No instrument found with given midi program')
 
 
 
@@ -1709,7 +1743,7 @@ def partitionByInstrument(streamObj):
     for instrumentObj in instrumentIterator:
         # matching here by instrument name
         if instrumentObj.instrumentName not in names:
-            names[instrumentObj.instrumentName] = {'Instrument': instrumentObj} 
+            names[instrumentObj.instrumentName] = {'Instrument': instrumentObj}
             # just store one instance
 
     # create a return object that has a part for each instrument
@@ -1728,7 +1762,7 @@ def partitionByInstrument(streamObj):
     for el in s:
         if not el.isStream:
             post.insert(el.offset, el)
-        
+
         subStream = el
         for i in subStream.getElementsByClass('Instrument'):
             start = i.offset
@@ -1736,7 +1770,7 @@ def partitionByInstrument(streamObj):
             end = i.offset + i.duration.quarterLength
             # get destination Part
             p = names[i.instrumentName]['Part']
-            
+
             coll = subStream.getElementsByOffset(start, end,
                     # do not include elements that start at the end
                     includeEndBoundary=False,
@@ -1763,28 +1797,28 @@ def _combinations(instrumentString):
     allComb = []
     for size in range(1, len(sampleList) + 1):
         for i in range(len(sampleList) - size + 1):
-            allComb.append(" ".join(sampleList[i:i + size]))
+            allComb.append(' '.join(sampleList[i:i + size]))
     return allComb
 
 
 def fromString(instrumentString):
-    """
+    '''
     Given a string with instrument content (from an orchestral score
     for example), attempts to return an appropriate
     :class:`~music21.instrument.Instrument`.
 
     >>> from music21 import instrument
-    >>> t1 = instrument.fromString("Clarinet 2 in A")
+    >>> t1 = instrument.fromString('Clarinet 2 in A')
     >>> t1
     <music21.instrument.Clarinet Clarinet>
     >>> t1.transposition
     <music21.interval.Interval m-3>
 
-    >>> t2 = instrument.fromString("Clarinetto 3")
+    >>> t2 = instrument.fromString('Clarinetto 3')
     >>> t2
     <music21.instrument.Clarinet Clarinet>
 
-    >>> t3 = instrument.fromString("Flauto 2")
+    >>> t3 = instrument.fromString('Flauto 2')
     >>> t3
     <music21.instrument.Flute Flute>
 
@@ -1793,29 +1827,29 @@ def fromString(instrumentString):
     correctly as long as it's sequential.
 
 
-    >>> t4 = instrument.fromString("I <3 music saxofono tenor go beavers")
+    >>> t4 = instrument.fromString('I <3 music saxofono tenor go beavers')
     >>> t4
     <music21.instrument.TenorSaxophone Tenor Saxophone>
 
 
-    #_OMIT_FROM_DOCS
+    Some more demos:
 
 
-    >>> t5 = instrument.fromString("Bb Clarinet")
+    >>> t5 = instrument.fromString('Bb Clarinet')
     >>> t5
     <music21.instrument.Clarinet Clarinet>
     >>> t5.transposition
     <music21.interval.Interval M-2>
 
-    >>> t6 = instrument.fromString("Clarinet in B-flat")
+    >>> t6 = instrument.fromString('Clarinet in B-flat')
     >>> t5.bestName() == t6.bestName() and t5.transposition == t6.transposition
     True
 
-    >>> t7 = instrument.fromString("B-flat Clarinet.")
+    >>> t7 = instrument.fromString('B-flat Clarinet.')
     >>> t5.bestName() == t7.bestName() and t5.transposition == t7.transposition
     True
 
-    >>> t8 = instrument.fromString("Eb Clarinet")
+    >>> t8 = instrument.fromString('Eb Clarinet')
     >>> t5.bestName() == t8.bestName()
     True
     >>> t8.transposition
@@ -1826,7 +1860,7 @@ def fromString(instrumentString):
     rareness of B-natural forms of those instruments, this gives a B-flat, not
     B-natural clarinet, using the German form:
 
-    >>> t9 = instrument.fromString("Klarinette in B.")
+    >>> t9 = instrument.fromString('Klarinette in B.')
     >>> t9
     <music21.instrument.Clarinet Clarinet>
     >>> t9.transposition
@@ -1834,7 +1868,7 @@ def fromString(instrumentString):
 
     Use "H" or "b-natural" to get an instrument in B-major.  Or donate one to me
     and I'll change this back!
-    """
+    '''
     # pylint: disable=undefined-variable
     from music21.languageExcerpts import instrumentLookup
 
@@ -1872,7 +1906,7 @@ def fromString(instrumentString):
             pass
     if bestInstClass is None:
         raise InstrumentException(
-            "Could not match string with instrument: {0}".format(instrumentString))
+            'Could not match string with instrument: {0}'.format(instrumentString))
     if bestName not in instrumentLookup.transposition:
         return bestInstrument
 
@@ -2106,7 +2140,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 4)
         # piano spans are joined together
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
-        
+
         self.assertEqual(len(post.parts[0].notes), 12)
         offsetList = []
         ppn = post.parts[0].notes
@@ -2137,7 +2171,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [Instrument]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)

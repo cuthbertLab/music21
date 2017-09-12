@@ -30,8 +30,8 @@ class Tie(SlottedObjectMixin):
     of start, stop, or continue.
 
     >>> note1 = note.Note()
-    >>> note1.tie = tie.Tie("start") # start, stop, or continue
-    >>> note1.tie.style = "normal" # default; could also be "dotted" or "dashed" or "hidden"
+    >>> note1.tie = tie.Tie('start') # start, stop, or continue
+    >>> note1.tie.style = 'normal' # default; could also be 'dotted' or 'dashed' or 'hidden'
     >>> note1.tie.type
     'start'
 
@@ -84,7 +84,7 @@ class Tie(SlottedObjectMixin):
 
     _DOC_ATTR = {
         'type': '''
-            The tie type, can be 'start', 'stop', 'continue', or 'let-ring'.
+            The tie type, can be 'start', 'stop', 'continue', 'let-ring', or 'continue-let-ring'.
             ''',
         'style': '''
             The style of the tie.  Currently can be 'normal', 'dotted', 'dashed' or 'hidden'
@@ -94,20 +94,20 @@ class Tie(SlottedObjectMixin):
             it is unknown or should be determined from context, or 'above' or 'below.
             ''',
     }
-    
-    VALID_TIE_TYPES = ('start', 'stop', 'continue', 'let-ring')
+
+    VALID_TIE_TYPES = ('start', 'stop', 'continue', 'let-ring', 'continue-let-ring')
     ### INITIALIZER ###
     # pylint: disable=redefined-builtin
     def __init__(self, type='start'): #@ReservedAssignment
         #super().__init__()
         if type not in self.VALID_TIE_TYPES:
             raise TieException(
-                "Type must be one of {}, not {}".format(self.VALID_TIE_TYPES, type))
-        # naming this "type" was a mistake, because cannot create a property of this name.
+                'Type must be one of {}, not {}'.format(self.VALID_TIE_TYPES, type))
+        # naming this 'type' was a mistake, because cannot create a property of this name.
 
         self.id = id(self)
         self.type = type
-        self.style = "normal"
+        self.style = 'normal'
         self.placement = None # = unknown, can be 'above' or 'below'
 
     ### SPECIAL METHODS ###

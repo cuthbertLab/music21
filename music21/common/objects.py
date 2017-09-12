@@ -151,7 +151,7 @@ class SlottedObjectMixin:
         we need to preserve the order:
 
         >>> sorted(list(sSet))
-        ['direction', 'id', 'independentAngle', 'number', 'type']
+        ['_editorial', '_style', 'direction', 'id', 'independentAngle', 'number', 'type']
 
         When a normal Beam won't cut it...
 
@@ -161,7 +161,8 @@ class SlottedObjectMixin:
         >>> fb = FunkyBeam()
         >>> sSet = fb._getSlotsRecursive()
         >>> sorted(list(sSet))
-        ['direction', 'funkiness', 'groovability', 'id', 'independentAngle', 'number', 'type']
+        ['_editorial', '_style', 'direction', 'funkiness', 'groovability',
+            'id', 'independentAngle', 'number', 'type']
         '''
         slots = set()
         for cls in self.__class__.mro():
@@ -173,7 +174,7 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
     Same as above, but __eq__ and __ne__ functions are defined based on the slots.
 
     Slots are the only things compared, so do not mix with a __dict__ based object.
-    
+
     Ignores differences in .id
     '''
     def __eq__(self, other):

@@ -37,6 +37,12 @@ class Style:
     20.4
 
     '''
+    _DOC_ATTR = {
+        'hideObjectOnPrint': '''if set to `True` will not print upon output
+            (only used in MusicXML output at this point and
+            Lilypond for notes, chords, and rests).''',
+    }
+
     def __init__(self):
         self.size = None
 
@@ -56,6 +62,7 @@ class Style:
         self.color = None
 
         self.units = 'tenths'
+        self.hideObjectOnPrint = False
 
     def _getEnclosure(self):
         return self._enclosure
@@ -66,7 +73,7 @@ class Style:
         elif value == 'none':
             self._enclosure = None
         elif value.lower() in ('rectangle', 'square', 'oval', 'circle',
-                               'bracket', 'triangle', 'diamond', 
+                               'bracket', 'triangle', 'diamond',
                                'pentagon', 'hexagon', 'heptagon', 'octagon',
                                'nonagon', 'decagon'):
             self._enclosure = value.lower()
@@ -76,7 +83,7 @@ class Style:
     enclosure = property(_getEnclosure, _setEnclosure,
         doc = '''
         Get or set the enclosure.  Valid names are
-        rectangle, square, oval, circle, bracket, triangle, diamond, 
+        rectangle, square, oval, circle, bracket, triangle, diamond,
         pentagon, hexagon, heptagon, octagon,
         nonagon, decagon or None.
 
@@ -126,6 +133,17 @@ class Style:
         -70
         ''')
 
+class NoteStyle(Style):
+    '''
+    A Style object that also includes stem and accidental style information.
+
+    Beam style is stored on the Beams object, as is lyric style
+    '''
+    def __init__(self):
+        super().__init__()
+        self.stemStyle = None
+        self.accidentalStyle = None
+        self.noteSize = None # can be 'cue'...
 
 
 class TextStyle(Style):
@@ -148,8 +166,8 @@ class TextStyle(Style):
         self.textDecoration = None
 
         self._justify = None
-        self._alignHorizontal = 'left'
-        self._alignVertical = 'top'
+        self._alignHorizontal = None
+        self._alignVertical = None
 
     def _getAlignVertical(self):
         return self._alignVertical
@@ -162,7 +180,8 @@ class TextStyle(Style):
 
     alignVertical = property(_getAlignVertical, _setAlignVertical,
         doc = '''
-        Get or set the vertical align. Valid values are top, middle, bottom, and baseline
+        Get or set the vertical align. Valid values are top, middle, bottom, baseline
+        or None
 
         >>> te = style.TextStyle()
         >>> te.alignVertical = 'top'
@@ -182,7 +201,8 @@ class TextStyle(Style):
     alignHorizontal = property(_getAlignHorizontal,
         _setAlignHorizontal,
         doc = '''
-        Get or set the horizontal alignment.  Valid values are left, right, center
+        Get or set the horizontal alignment.  Valid values are left, right, center,
+        or None
 
 
         >>> te = style.TextStyle()
@@ -205,7 +225,7 @@ class TextStyle(Style):
 
     justify = property(_getJustify, _setJustify,
         doc = '''Get or set the justification.  Valid values are left,
-        center, right, and full (the last not supported by MusicXML)
+        center, right, full (not supported by MusicXML), and None
 
         >>> tst = style.TextStyle()
         >>> tst.justify = 'center'
@@ -332,7 +352,13 @@ class TextStyle(Style):
         else:
             self._fontFamily = [f.strip() for f in newFamily.split(',')]
 
-
+class TextStylePlacement(TextStyle):
+    '''
+    TextStyle plus a placement attribute
+    '''
+    def __init__(self):
+        super().__init__()
+        self.placement = None
 
 class BezierStyle(Style):
     '''
@@ -352,7 +378,7 @@ class BezierStyle(Style):
 class LineStyle(Style):
     '''
     from the MusicXML Definition
-    
+
     Defines lineShape ('straight', 'curved' or None)
     lineType ('solid', 'dashed', 'dotted', 'wavy' or None)
     dashLength (in tenths)
@@ -360,11 +386,45 @@ class LineStyle(Style):
     '''
     def __init__(self):
         super().__init__()
-        
+
         self.lineShape = None
         self.lineType = None
         self.dashLength = None
         self.spaceLength = None
+
+
+class StreamStyle(Style):
+    '''
+    Includes several elements in the MusicXML <appearance> tag in <defaults>
+    along with <music-font> and <word-font>
+    '''
+    def __init__(self):
+        super().__init__()
+        self.lineWidths = [] # two-tuples of type, width measured in tenths
+        self.noteSizes = [] # two-tuples of type and percentages of the normal size
+        self.distances = [] # two-tuples of beam or hyphen and tenths
+        self.otherAppearances = [] # two-tuples of type and tenths
+        self.musicFont = None # None or a TextStyle object
+        self.wordFont = None # None or a TextStyle object
+        self.lyricFonts = [] # a list of TextStyle objects
+        self.lyricLanguages = [] # a list of strings
+
+        self.printPartName = True
+        self.printPartAbbreviation = True
+
+        self.measureNumbering = None # can be None -- meaning no comment,
+            # 'none', 'measure', or 'system'...
+        self.measureNumberStyle = None
+
+
+class BeamStyle(Style):
+    '''
+    Style for beams
+    '''
+    def __init__(self):
+        super().__init__()
+        self.fan = None
+
 
 class StyleMixin(common.SlottedObjectMixin):
     '''
@@ -398,7 +458,7 @@ class StyleMixin(common.SlottedObjectMixin):
         >>> lObj.hasStyleInformation
         False
         >>> lObj.style
-        <music21.style.TextStyle object at 0x10b0a2080>
+        <music21.style.TextStylePlacement object at 0x10b0a2080>
         >>> lObj.hasStyleInformation
         True
         '''
@@ -490,10 +550,12 @@ class StyleMixin(common.SlottedObjectMixin):
         self._editorial = ed
 
 
+
+
 class Test(unittest.TestCase):
     pass
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test) #, runTest='')
 

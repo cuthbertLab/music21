@@ -18,8 +18,7 @@ import unittest
 # http://abcnotation.com/abc2mtex/abc.txt
 
 from music21 import environment
-_MOD = 'abcFormat.testFiles.py'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('abcFormat.testFiles')
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 

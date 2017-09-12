@@ -18,42 +18,45 @@ from music21 import common
 skip = ['installJupyter.ipynb']
 
 def runAll():
-    sourcePath = common.getRootFilePath() + os.sep + 'documentation' + os.sep + 'source'
+    sourcePath = common.getRootFilePath() / 'documentation' / 'source'
+    goodFiles = []
     for innerDir in ('about', 'developerReference', 'installing', 'usersGuide'):
-
-        fullDir = sourcePath + os.sep + innerDir
-        allFiles = os.listdir(fullDir)
-        for f in allFiles:
-            if not f.endswith('ipynb'):
+        fullDir = sourcePath / innerDir
+        for f in fullDir.rglob('*.ipynb'):
+            if f.name in skip:
                 continue
-            if f in skip:
+            if 'checkpoint' in str(f):
                 continue
-            print(innerDir + os.sep + f)
-            try:
-                retVal = runOne(fullDir + os.sep + f)
-            except KeyboardInterrupt:
-                break
+            
+            goodFiles.append(f)
+        
+    
+    for f in goodFiles:    
+        print("Running: ", str(f))
+        try:
+            retVal = runOne(f)
+        except KeyboardInterrupt:
+            break
 
-            if retVal == 512:
-                return None
+        if retVal == 512:
+            return None
 
 def runOne(nbFile):
     us = environment.UserSettings()
     museScore = us['musescoreDirectPNGPath']
-    us['musescoreDirectPNGPath'] = '/skip'
+    us['musescoreDirectPNGPath'] = '/skip' + str(museScore)
     try:
-        retVal = os.system('pytest --nbval ' + nbFile + ' --sanitize-with '
-                  + common.getRootFilePath() + os.sep + 'documentation' + os.sep
-                  + 'docbuild' + os.sep
-                  + 'nbval-sanitize.cfg -q')
+        retVal = os.system('pytest --nbval ' + str(nbFile) + ' --sanitize-with '
+                  + str(common.getRootFilePath() 
+                            / 'documentation' /  'docbuild' / 'nbval-sanitize.cfg ') 
+                  + '-q')
     except (Exception, KeyboardInterrupt):
         raise
+
     finally:
         us['musescoreDirectPNGPath'] = museScore
 
     return retVal
-    # '/Applications/MuseScore 2.app/Contents/MacOS/mscore'
-
 
 
 if __name__ == '__main__':

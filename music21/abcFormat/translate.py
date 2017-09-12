@@ -35,8 +35,7 @@ from music21 import note
 from music21 import chord
 from music21 import spanner
 
-_MOD = 'abcFormat.translate.py'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('abcFormat.translate')
 
 
 
@@ -324,7 +323,7 @@ def parseTokens(mh, dst, p, useMeasures):
                     n.articulations.append(articulations.Tenuto())
 
             dst.coreAppend(n, setActiveSite=False)
-            
+
         elif isinstance(t, abcFormat.ABCSlurStart):
             p.coreAppend(t.slurObj)
         elif isinstance(t, abcFormat.ABCCrescStart):
@@ -501,7 +500,7 @@ def reBar(music21Part, *, inPlace=False):
     >>> music21Part2.measure(2).show("text")
     {0.0} <music21.meter.TimeSignature 1/8>
     {0.0} <music21.note.Note E>
-    
+
     Changed in v.5: inPlace is False by default, and a keyword only argument.
     """
     if not inPlace:
@@ -709,7 +708,7 @@ class Test(unittest.TestCase):
         #environLocal.printDebug(['m1.notesAndRests[0].activeSite', m1.notesAndRests[0].activeSite])
 
         #self.assertEqual(m1.notesAndRests.activeSite)
-        
+
         n0 = m1.notesAndRests[0]
         n1 = m1.notesAndRests[1]
         self.assertEqual(n0.getOffsetBySite(m1) + m1.paddingLeft, 1.0)
@@ -731,7 +730,7 @@ class Test(unittest.TestCase):
         # notes are shown as being on beat 2 and 3
         n0 = m1.notesAndRests[0]
         n1 = m1.notesAndRests[1]
-        
+
         self.assertEqual(n0.getOffsetBySite(m1) + m1.paddingLeft, 3.5)
         self.assertEqual(m1.notesAndRests[0].beat, 4.5)
         self.assertEqual(n1.getOffsetBySite(m1) + m1.paddingLeft, 3.75)

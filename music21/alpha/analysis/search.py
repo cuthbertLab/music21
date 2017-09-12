@@ -18,8 +18,7 @@ from music21 import scale
 from music21 import stream
 
 from music21 import environment
-_MOD = 'analysis.search'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('alpha.analysis.search')
 
 
 class SearchModuleException(exceptions21.Music21Exception):

@@ -37,7 +37,7 @@ Installing Eclipse
 Once you have Git installed, download and install Eclipse. You can find the
 most recent version of Eclipse for Java EE at 
 `http://www.eclipse.org/downloads/ <http://www.eclipse.org/downloads/>`_, and
-these instructions are written with Eclipse for Java EE 4.5 (Mars) in mind though
+these instructions are written with Eclipse for Java EE 4.8 (Oxygen) in mind though
 some screenshots are from 4.3 (Kepler).
 
 
@@ -61,8 +61,8 @@ later).
 
 If you try running Eclipse and it gives you a warning about not having Java
 installed, go to
-http://www.java.com/en/download/help/windows_manual_download.xml#download and
-download a copy there.
+http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html 
+and download a copy there.
 
 
 Installing for Mac
@@ -79,6 +79,9 @@ You'll be prompted to select a workspace directory, which, by default is
 created in your documents folder. Be sure to remember where this directory is,
 as it is where music21 will be installed.  I use '/Users/cuthbert/git' for
 my workspace (you probably wouldn't use cuthbert).
+
+If you get an error about Java being too old, download a new one from
+http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html
 
 
 Installing for GNU/Linux/FreeBSD/Unix
@@ -119,41 +122,36 @@ repositories. Both of these can be installed via the Eclipse Marketplace.
     ..  image:: images/usingGit/eclipse__install_plugins__0.png
 
 2.  Search for PyDev in the Marketplace search box, and click **Install** in
-    the proper search results: (the latest version is now 3.5)
+    the proper search results: (the latest version is now 5.9)
 
     ..  image:: images/usingGit/eclipse__install_plugins__1__edited.png
 
-3.  When asked to confirm the installation, click **Install More** to return to
+3.  When asked to confirm the installation, click **Continue** to return to
     the search dialog:
 
     ..  image:: images/usingGit/eclipse__install_plugins__2__edited.png
 
-5.  Now, when asked to confirm the installation of PyDev, click
-    **Confirm**:
+4.  Now, when asked to confirm the installation of PyDev, click
+    **Confirm** (note: your system probably won't also have "EGit" listed).
 
     ..  image:: images/usingGit/eclipse__install_plugins__4__edited.png
 
-6.  You will be asked to accept the licensing for the plugin. Choose "I
+5.  You will be asked to accept the licensing for the plugin. Choose "I
     accept the terms of the license agreements" and click **Finish**:
 
     ..  image:: images/usingGit/eclipse__install_plugins__5__edited.png
 
-7.  Eclipse will now go through the process of automatically installing the
+6.  Eclipse will now go through the process of automatically installing the
     plugin. When it finishes, you'll be asked to confirm the certificate for
     PyDev. Click the checkbox and press OK:
 
     ..  image:: images/usingGit/eclipse__install_plugins__6__edited.png
 
-8.  Finally, Eclipse will ask to restart. Click **Yes** to complete the plugin
+7.  Finally, Eclipse will ask to restart. Click **Yes** to complete the plugin
     installation process:
 
     ..  image:: images/usingGit/eclipse__install_plugins__7.png
 
-..  warning::
-
-    The 4.x series of PyDev - currently available in the Eclipse Marketplace -
-    requires Java 7. The plugin will **not** activate in Eclipse without Java
-    7.
     
 Forking music21 on GitHub
 -------------------------

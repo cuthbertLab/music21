@@ -507,7 +507,7 @@ class DateRelative(DateSingle):
 
     ### INITIALIZER ###
 
-    def __init__(self, data='', relevance='after'):
+    def __init__(self, data='', relevance='after'): # pylint: disable=useless-super-delegation
         super().__init__(data, relevance)
 
     ### PUBLIC PROPERTIES ###
@@ -647,7 +647,7 @@ class DateSelection(DateSingle):
 
     ### INITIALIZER ###
 
-    def __init__(self, data='', relevance='or'):
+    def __init__(self, data='', relevance='or'): # pylint: disable=useless-super-delegation
         super().__init__(data, relevance)
 
     ### SPECIAL METHODS ###
@@ -705,6 +705,8 @@ class Text:
     >>> td = metadata.Text('concerto in d', 'en')
     >>> str(td)
     'concerto in d'
+    >>> td.language
+    'en'
     '''
 
     ### INITIALIZER ###
@@ -727,6 +729,11 @@ class Text:
             return str(self._data)
         else:
             return self._data
+
+    def __repr__(self):
+        return '<music21.metadata.primitives.{} {}>'.format(
+                                self.__class__.__name__, str(self))
+
 
     ### PUBLIC PROPERTIES ###
 
@@ -753,12 +760,14 @@ class Text:
         r'''
         Return a string representation with normalized articles.
 
-        >>> td = metadata.Text('Ale is Dear, The', 'en')
+        >>> td = metadata.Text('Ale is Dear, The', language='en')
         >>> str(td)
         'Ale is Dear, The'
 
         >>> td.getNormalizedArticle()
         'The Ale is Dear'
+
+        The language will determine whether the article is moved:
 
         >>> td.language = 'de'
         >>> td.getNormalizedArticle()
@@ -766,6 +775,24 @@ class Text:
         '''
         from music21 import text
         return text.prependArticle(str(self), self._language)
+
+#------------------------------------------------------------------------------
+class Copyright(Text):
+    '''
+    A subclass of text that can also have a role
+
+    >>> copyleft = metadata.primitives.Copyright('Copyright 1969 Cuthbert',
+    ...                role='fictitious')
+    >>> copyleft
+    <music21.metadata.primitives.Copyright Copyright 1969 Cuthbert>
+    >>> copyleft.role
+    'fictitious'
+    >>> str(copyleft)
+    'Copyright 1969 Cuthbert'
+    '''
+    def __init__(self, data='', language=None, *, role=None):
+        super().__init__(data, language)
+        self.role = role
 
 
 #------------------------------------------------------------------------------
@@ -928,7 +955,7 @@ class Contributor:
         ...     )
         >>> td.names
         ['Chopin, Fryderyk', 'Chopin, Frederick']
-        
+
         >>> td.names = ['Czerny', 'Spohr']
         >>> td.names
         ['Czerny', 'Spohr']
@@ -947,8 +974,8 @@ class Contributor:
         self._names = []  # reset
         for n in values:
             self._names.append(Text(n))
-            
-            
+
+
 
 
     @property
@@ -965,12 +992,12 @@ class Contributor:
         >>> td.role = 'lor'
         >>> td.role
         'orchestrator'
-        
+
         Roles can be created on the fly:
-        
+
         >>> td.role = 'court jester'
         >>> td.role
-        'court jester'        
+        'court jester'
         '''
         return self._role
 
@@ -1044,11 +1071,6 @@ class Creator(Contributor):
 
     relevance = 'creator'
 
-    ### INITIALIZER ###
-
-    def __init__(self, *args, **keywords):
-        super().__init__(*args, **keywords)
-
 
 #------------------------------------------------------------------------------
 
@@ -1074,13 +1096,6 @@ class Imprint:
 
 #------------------------------------------------------------------------------
 
-
-class Copyright:
-    r'''
-    An object representation of copyright.
-    '''
-    def __init__(self, *args, **keywords):
-        pass
 
 # !!!YEP: Publisher of electronic edition.
 # !!!YEC: Date and owner of electronic copyright.

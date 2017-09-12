@@ -23,9 +23,8 @@ from music21.figuredBass import possibility
 from music21.figuredBass import realizerScale
 from music21.figuredBass import resolution
 from music21.figuredBass import rules
-from itertools import filterfalse
 
-_MOD = 'segment.py'
+_MOD = 'figuredBass.segment'
 
 _defaultRealizerScale = {'scale': None} # singleton
 
@@ -902,8 +901,8 @@ def getPitches(pitchNames=('C', 'E', 'G'), bassPitch='C3', maxPitch='C8'):
 
     iter1 = itertools.product(pitchNames, range(maxPitch.octave + 1))
     iter2 = map(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)
-    iter3 = filterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)
-    iter4 = filterfalse(lambda samplePitch: samplePitch > maxPitch, iter3)
+    iter3 = itertools.filterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)
+    iter4 = itertools.filterfalse(lambda samplePitch: samplePitch > maxPitch, iter3)
     allPitches = list(iter4)
     allPitches.sort()
     return allPitches

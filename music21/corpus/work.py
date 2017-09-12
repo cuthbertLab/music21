@@ -28,7 +28,7 @@ class DirectoryInformation:
     only tested with CoreCorpus so far.
     '''
 
-    def __init__(self, dirName="", dirTitle="", isComposer=True, corpusObject=None):
+    def __init__(self, dirName='', dirTitle='', isComposer=True, corpusObject=None):
         self.directoryName = dirName
         self.directoryTitle = dirTitle
         self.isComposer = isComposer
@@ -116,6 +116,6 @@ class DirectoryInformation:
 #------------------------------------------------------------------------------
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest()

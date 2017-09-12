@@ -69,7 +69,7 @@ Here is an example of TinyNotation in action.
 {6.0} <music21.stream.Measure 3 offset=6.0>
     {0.0} <music21.note.Note C>
     {1.0} <music21.bar.Barline style=final>
->>> stream1.flat.getElementById("lastG").step
+>>> stream1.flat.getElementById('lastG').step
 'G'
 >>> stream1.flat.notesAndRests[1].isRest
 True
@@ -107,7 +107,7 @@ Changing time signatures are supported:
 Here is an equivalent way of doing the example above, but using the lower level
 :class:`music21.tinyNotation.Converter` object:
 
->>> tnc = tinyNotation.Converter("3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
+>>> tnc = tinyNotation.Converter('3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c')
 >>> stream2 = tnc.parse().stream
 >>> len(stream1.recurse()) == len(stream2.recurse())
 True
@@ -120,7 +120,7 @@ here we will set the "modifierStar" to change the color of notes:
 ...         m21Obj.style.color = self.modifierData
 ...         return m21Obj
 
->>> tnc = tinyNotation.Converter("3/4 C4*pink* D4*green* E4*blue*")
+>>> tnc = tinyNotation.Converter('3/4 C4*pink* D4*green* E4*blue*')
 >>> tnc.modifierStar = ColorModifier
 >>> s = tnc.parse().stream
 >>> for n in s.recurse().getElementsByClass('Note'):
@@ -136,7 +136,7 @@ Or more usefully, and often desired:
 ...         cs = harmony.ChordSymbol(n.pitch.name + self.modifierData)
 ...         cs.duration = n.duration
 ...         return cs
->>> tnc = tinyNotation.Converter("4/4 C2_maj7 D4_m E-_sus4")
+>>> tnc = tinyNotation.Converter('4/4 C2_maj7 D4_m E-_sus4')
 >>> tnc.modifierUnderscore = HarmonyModifier
 >>> s = tnc.parse().stream
 >>> s.show('text')
@@ -170,7 +170,7 @@ create a new Token type and add it to the tokenMap
 ...         keyName = self.token
 ...         return key.Key(keyName)
 >>> keyMapping = (r'k(.*)', KeyToken)
->>> tnc = tinyNotation.Converter("4/4 kE- G1 kf# A1")
+>>> tnc = tinyNotation.Converter('4/4 kE- G1 kf# A1')
 >>> tnc.tokenMap.append(keyMapping)
 >>> s = tnc.parse().stream
 >>> s.show('text')
@@ -243,7 +243,7 @@ from music21 import meter
 from music21 import pitch
 
 from music21 import environment
-_MOD = "tinyNotation.py"
+_MOD = 'tinyNotation'
 environLocal = environment.Environment(_MOD)
 
 class TinyNotationException(exceptions21.Music21Exception):
@@ -270,7 +270,7 @@ class State:
         self.affectedTokens = []
         self.parent = common.wrapWeakref(parent)
         self.stateInfo = stateInfo
-        #print("Adding state", self, parent.activeStates)
+        #print('Adding state', self, parent.activeStates)
 
     def start(self):
         '''
@@ -434,7 +434,7 @@ class Token:
 
     Call .parse(parent) to make it work.
     '''
-    def __init__(self, token=""):
+    def __init__(self, token=''):
         self.token = token
 
     def parse(self, parent):
@@ -458,7 +458,7 @@ class NoteOrRestToken(Token):
     '''
     represents a Note or Rest.  Chords are represented by Note objects
     '''
-    def __init__(self, token=""):
+    def __init__(self, token=''):
         super().__init__(token)
         self.durationMap = [
                             (r'(\d+)', 'durationType'),
@@ -555,7 +555,7 @@ class NoteToken(NoteOrRestToken):
         ('flats', r'(\-+)'),
         ('natural', r'(n)'),
     ])
-    def __init__(self, token=""):
+    def __init__(self, token=''):
         super().__init__(token)
         self.isEditorial = False
 
@@ -884,7 +884,7 @@ class Converter:
     _modifierSquareRe = re.compile(r'\[(.*?)\]')
     _modifierUnderscoreRe = re.compile(r'_(.*)')
 
-    def __init__(self, stringRep="", **keywords):
+    def __init__(self, stringRep='', **keywords):
         self.generalBracketStateRe = re.compile(r'(\w+)\{')
         self.tieStateRe = re.compile(r'\~')
 
@@ -961,7 +961,7 @@ class Converter:
             try:
                 self._tokenMapRe.append( (re.compile(rePre), classCall) )
             except sre_parse.error as e:
-                raise TinyNotationException("Error in compiling token, %s: %s" % (rePre, str(e)))
+                raise TinyNotationException('Error in compiling token, %s: %s' % (rePre, str(e)))
 
 
     def parse(self):
@@ -969,7 +969,7 @@ class Converter:
         splitPreTokens, setupRegularExpressions, then runs
         through each preToken, and runs postParse.
         '''
-        if self.preTokens == [] and self.stringRep != "":
+        if self.preTokens == [] and self.stringRep != '':
             self.splitPreTokens()
         if self._tokenMapRe is None:
             self.setupRegularExpressions()
@@ -998,7 +998,7 @@ class Converter:
 
         m21Obj = None
         tokenObj = None
-        
+
         # parse token with state:
         for tokenRe, tokenClass in self._tokenMapRe:
             matchSuccess = tokenRe.match(t)
@@ -1082,7 +1082,7 @@ class Converter:
             t = self.generalBracketStateRe.sub('', t, count=1)
             bracketMatchSuccess = self.generalBracketStateRe.search(t)
             if bracketType not in self.bracketStateMapping:
-                environLocal.warn("Incorrect bracket state: {0}".format(bracketType))
+                environLocal.warn('Incorrect bracket state: {0}'.format(bracketType))
                 continue
             stateObj = self.bracketStateMapping[bracketType](self, stateData)
             stateObj.start()
@@ -1154,7 +1154,7 @@ class Converter:
 
 
 class Test(unittest.TestCase):
-    parseTest = "1/4 trip{C8~ C~_hello C=mine} F~ F~ 2/8 F F# quad{g--16 a## FF(n) g#} g16 F0"
+    parseTest = '1/4 trip{C8~ C~_hello C=mine} F~ F~ 2/8 F F# quad{g--16 a## FF(n) g#} g16 F0'
 
     def runTest(self):
         pass
@@ -1169,8 +1169,8 @@ class Test(unittest.TestCase):
         self.assertEqual(sfn[2].tie.type, 'stop')
         self.assertEqual(sfn[0].step, 'C')
         self.assertEqual(sfn[0].octave, 3)
-        self.assertEqual(sfn[1].lyric, "hello")
-        self.assertEqual(sfn[2].id, "mine")
+        self.assertEqual(sfn[1].lyric, 'hello')
+        self.assertEqual(sfn[2].id, 'mine')
         self.assertEqual(sfn[6].pitch.accidental.alter, 1)
         self.assertEqual(sfn[7].pitch.accidental.alter, -2)
         self.assertEqual(sfn[9].editorial.ficta.alter, 0)

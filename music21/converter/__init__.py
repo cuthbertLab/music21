@@ -56,10 +56,12 @@ from music21 import exceptions21
 from music21 import common
 from music21 import stream
 from music21 import musedata as musedataModule
+from music21.metadata import bundles
+
 
 from music21 import _version
 from music21 import environment
-_MOD = 'converter/__init__.py'
+_MOD = 'converter'
 environLocal = environment.Environment(_MOD)
 
 
@@ -157,7 +159,7 @@ class ArchiveManager:
             raise ArchiveManagerException('no support for extension: %s' % self.archiveType)
 
         f = zipfile.ZipFile(str(self.fp), 'r')  # remove str in Py3.6
-        
+
         if name is None and dataFormat == 'musicxml': # try to auto-harvest
             # will return data as a string
             # note that we need to read the META-INF/container.xml file
@@ -201,7 +203,7 @@ class ArchiveManager:
                 component = f.open(subFp, 'rU')
                 lines = component.readlines()
                 #environLocal.printDebug(['subFp', subFp, len(lines)])
-            
+
                 try:
                     post.append(''.join([l.decode(encoding='UTF-8') for l in lines]))
                 except UnicodeDecodeError:
@@ -245,7 +247,7 @@ class PickleFilter:
     def getPickleFp(self, directory=None, zipType=None):
         '''
         Returns the file path of the pickle file for this file.
-        
+
         Returns a pathlib.Path
         '''
         if directory is None:
@@ -256,17 +258,19 @@ class PickleFilter:
         if zipType is None:
             extension = '.p'
         else:
-            extension = '.pgz'
-        pythonVersion = 'py' + str(sys.version_info[0]) + '.' + str(sys.version_info[1])
+            extension = '.p.gz'
 
-        baseName = '-'.join(['m21', _version.__version__, pythonVersion, 
-                             common.getMd5(str(self.fp))])
+        pythonVersion = 'py' + str(sys.version_info.major) + '.' + str(sys.version_info.minor)
+
+        pathNameToParse = str(self.fp)
+
+        baseName = '-'.join(['m21', _version.__version__, pythonVersion,
+                             common.getMd5(pathNameToParse)])
 
         if self.number is not None:
             baseName += '-' + str(self.number)
         baseName += extension
 
-        
         return directory / baseName
 
     def removePickle(self):
@@ -279,7 +283,6 @@ class PickleFilter:
         pickleFp = self.getPickleFp(zipType='gz') # pathlib...
         if pickleFp.exists():
             os.remove(pickleFp)
-
 
     def status(self):
         '''
@@ -296,7 +299,7 @@ class PickleFilter:
         >>> pickfilt = converter.PickleFilter(fp)
         >>> #_DOCS_SHOW pickfilt.status()
         (PosixPath('/Users/Cuthbert/Desktop/musicFile.mxl'), True,
-              PosixPath('/tmp/music21/m21-5.0.0-py3.6-18b8c5a5f07826bd67ea0f20462f0b8d.pgz'))
+              PosixPath('/tmp/music21/m21-5.0.0-py3.6-18b8c5a5f07826bd67ea0f20462f0b8d.p.gz'))
 
         '''
         fpScratch = environLocal.getRootTempDir()
@@ -335,7 +338,7 @@ _deregisteredSubconverters = [] # default subconverters to skip
 
 def resetSubconverters():
     '''
-    Reset state to default (removing all registered and deregistered subconverters.
+    Reset state to default (removing all registered and deregistered subconverters).
     '''
     global _registeredSubconverters # pylint: disable=global-statement
     global _deregisteredSubconverters # pylint: disable=global-statement
@@ -351,6 +354,7 @@ def registerSubconverter(newSubConverter):
     >>> class ConverterSonix(converter.subConverters.SubConverter):
     ...    registerFormats = ('sonix',)
     ...    registerInputExtensions = ('mus',)
+    
     >>> converter.registerSubconverter(ConverterSonix)
     >>> scf = converter.Converter().getSubConverterFormats()
     >>> for x in sorted(scf):
@@ -1086,6 +1090,12 @@ def parse(value, *args, **keywords):
         valueStr = value.decode('utf-8', 'ignore')
     if isinstance(value, pathlib.Path):
         valueStr = str(value)
+    elif isinstance(value, bundles.MetadataEntry):
+        if value.sourcePath.is_absolute():
+            valueStr = str(value.sourcePath)
+        else:
+            valueStr = str(common.getCorpusFilePath() / value.sourcePath)
+
     else:
         valueStr = value
 
@@ -1115,7 +1125,7 @@ def parse(value, *args, **keywords):
         return parseFile(common.cleanpath(valueStr), number=number, format=m21Format,
                          forceSource=forceSource, **keywords)
 
-    elif not isinstance(valueStr, bytes) and (valueStr.startswith('http://') 
+    elif not isinstance(valueStr, bytes) and (valueStr.startswith('http://')
                                               or valueStr.startswith('https://')):
         # its a url; may need to broaden these criteria
         return parseURL(value, number=number, format=m21Format,
@@ -1612,9 +1622,9 @@ class Test(unittest.TestCase):
 
 
     def testConversionMidiBasic(self):
-        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive' 
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         fp = dirLib / 'test01.mid'
-        
+
         # a simple file created in athenacl
 
         unused_s = parseFile(fp)

@@ -71,6 +71,7 @@ exist in the Python namespace.
 import copy
 import os
 import pathlib
+import pickle
 import time
 import unittest
 import zlib
@@ -85,10 +86,9 @@ from music21 import exceptions21
 from music21.ext import jsonpickle
 
 from music21 import environment
-_MOD = "freezeThaw.py"
+_MOD = 'freezeThaw'
 environLocal = environment.Environment(_MOD)
 
-import pickle
 #------------------------------------------------------------------------------
 
 
@@ -111,7 +111,7 @@ class StreamFreezeThawBase:
             raise ValueError
         if not isinstance(directory, pathlib.Path):
             directory = pathlib.Path(directory)
-        
+
         # cannot get data from stream, as offsets are broken
         streamStr = str(time.time())
         return directory / ('m21-' + common.getMd5(streamStr) + '.p')
@@ -267,7 +267,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
         >>> a = stream.Stream()
         >>> n = note.Note()
-        >>> n.duration.type = "whole"
+        >>> n.duration.type = 'whole'
         >>> a.repeatAppend(n, 10)
         >>> sf = freezeThaw.StreamFreezer(a)
         >>> sf.setupSerializationScaffold()
@@ -275,7 +275,7 @@ class StreamFreezer(StreamFreezeThawBase):
         if streamObj is None:
             streamObj = self.stream
             if streamObj is None:
-                raise FreezeThawException("You need to pass in a stream when creating to work")
+                raise FreezeThawException('You need to pass in a stream when creating to work')
         allEls = list(streamObj.recurse(restoreActiveSites=False))
                 # might not work when recurse yields...
 
@@ -414,8 +414,8 @@ class StreamFreezer(StreamFreezeThawBase):
         Called by setupSerializationScaffold.
 
         >>> s = stream.Measure()
-        >>> n1 = note.Note("C#")
-        >>> n2 = note.Note("E-")
+        >>> n1 = note.Note('C#')
+        >>> n2 = note.Note('E-')
         >>> bl1 = bar.Barline()
         >>> s.insert(0.0, n1)
         >>> s.insert(1.0, n2)
@@ -437,11 +437,11 @@ class StreamFreezer(StreamFreezeThawBase):
         Trying it again, but now with substreams:
 
         >>> s2 = stream.Measure()
-        >>> n1 = note.Note("C#")
-        >>> n2 = note.Note("E-")
+        >>> n1 = note.Note('C#')
+        >>> n2 = note.Note('E-')
         >>> bl1 = bar.Barline()
         >>> v1 = stream.Voice()
-        >>> n3 = note.Note("F#")
+        >>> n3 = note.Note('F#')
         >>> v1.insert(2.0, n3)
         >>> s2.insert(0.0, n1)
         >>> s2.insert(1.0, n2)
@@ -522,10 +522,10 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> foundIds = sf.findActiveStreamIdsInHierarchy()
         >>> for thisId in shouldFindIds:
         ...     if thisId not in foundIds:
-        ...         raise Exception("Missing Id")
+        ...         raise Exception('Missing Id')
         >>> for thisId in foundIds:
         ...     if thisId not in shouldFindIds:
-        ...         raise Exception("Additional Id Found")
+        ...         raise Exception('Additional Id Found')
 
         Spanners are included unless getSpanners is False
 
@@ -553,13 +553,13 @@ class StreamFreezer(StreamFreezeThawBase):
 
         >>> s = stream.Stream()
         >>> m = stream.Measure()
-        >>> m.append(note.Note(type="whole"))
+        >>> m.append(note.Note(type='whole'))
         >>> s.append(m)
 
         >>> s2 = stream.Stream()
         >>> m2 = stream.Measure()
-        >>> n2 = note.Note("D#4")
-        >>> n2.duration.type = "whole"
+        >>> n2 = note.Note('D#4')
+        >>> n2.duration.type = 'whole'
         >>> m2.append(n2)
         >>> s2.append(m2)
         >>> v = variant.Variant(s2)
@@ -570,7 +570,7 @@ class StreamFreezer(StreamFreezeThawBase):
         4
         >>> for streamElement in [s, m, m2, v._stream]:
         ...    if id(streamElement) not in allIds:
-        ...        print("this should not happen...", allIds, id(streamElement))
+        ...        print('this should not happen...', allIds, id(streamElement))
 
         N.B. with variants:
 
@@ -643,7 +643,7 @@ class StreamFreezer(StreamFreezeThawBase):
         No other compression types are currently supported.
         '''
         if zipType not in (None, 'zlib'):
-            raise FreezeThawException("Cannot zip files except zlib...")
+            raise FreezeThawException('Cannot zip files except zlib...')
 
         fmt = self.parseWriteFmt(fmt)
 
@@ -656,7 +656,7 @@ class StreamFreezer(StreamFreezeThawBase):
         else:
             if not isinstance(fp, pathlib.Path):
                 fp = pathlib.Path(fp)
-            
+
             if not fp.is_absolute(): # assume its a complete path
                 fp = environLocal.getRootTempDir() / fp
 
@@ -671,7 +671,7 @@ class StreamFreezer(StreamFreezeThawBase):
             pickleString = pickle.dumps(storage, protocol=pickle.HIGHEST_PROTOCOL)
             if zipType == 'zlib':
                 pickleString = zlib.compress(pickleString)
-            
+
             if isinstance(fp, pathlib.Path):
                 fp = str(fp)
             with open(fp, 'wb') as f: # binary
@@ -759,7 +759,7 @@ class StreamThawer(StreamFreezeThawBase):
 
         >>> a = stream.Stream()
         >>> n = note.Note()
-        >>> n.duration.type = "whole"
+        >>> n.duration.type = 'whole'
         >>> a.repeatAppend(n, 10)
         >>> sf = freezeThaw.StreamFreezer(a)
         >>> sf.setupSerializationScaffold()
@@ -776,7 +776,7 @@ class StreamThawer(StreamFreezeThawBase):
         if streamObj is None:
             streamObj = self.stream
             if streamObj is None:
-                raise FreezeThawException("You need to pass in a stream when creating to work")
+                raise FreezeThawException('You need to pass in a stream when creating to work')
 
         storedAutoSort = streamObj.autoSort
         streamObj.autoSort = False
@@ -827,8 +827,8 @@ class StreamThawer(StreamFreezeThawBase):
         >>> s._elements, s._endElements
         ([], [])
 
-        >>> n1 = note.Note("C#")
-        >>> n2 = note.Note("E-")
+        >>> n1 = note.Note('C#')
+        >>> n2 = note.Note('E-')
         >>> bl1 = bar.Barline()
         >>> tupleList = [(n1, 0.0), (n2, 1.0), (bl1, 'end')]
         >>> s._storedElementOffsetTuples = tupleList
@@ -848,7 +848,7 @@ class StreamThawer(StreamFreezeThawBase):
 
         >>> s2 = stream.Measure()
         >>> v1 = stream.Voice()
-        >>> n3 = note.Note("F#")
+        >>> n3 = note.Note('F#')
         >>> v1._storedElementOffsetTuples = [(n3, 2.0)]
         >>> tupleList = [(n1, 0.0), (n2, 1.0), (bl1, 'end'), (v1, 2.0)]
         >>> s2._storedElementOffsetTuples = tupleList
@@ -867,7 +867,7 @@ class StreamThawer(StreamFreezeThawBase):
                     try:
                         streamObj.coreInsert(offset, e)
                     except AttributeError:
-                        print("Problem in decoding... some debug info...")
+                        print('Problem in decoding... some debug info...')
                         print(offset, e)
                         print(streamObj)
                         print(streamObj.activeSite)
@@ -929,7 +929,7 @@ class StreamThawer(StreamFreezeThawBase):
         '''
         if isinstance(fp, pathlib.Path):
             fp = str(fp) # TODO: reverse this... use Pathlib...
-                        
+
         if os.sep in fp: # assume it's a complete path
             fp = fp
         else:
@@ -954,7 +954,7 @@ class StreamThawer(StreamFreezeThawBase):
                 except AttributeError as e:
                     raise FreezeThawException('Problem in decoding: {}'.format(e))
             else:
-                raise FreezeThawException("Unknown zipType %s" % zipType)
+                raise FreezeThawException('Unknown zipType %s' % zipType)
             f.close()
         elif fmt == 'jsonpickle':
             f = open(fp, 'r')
@@ -985,7 +985,7 @@ class StreamThawer(StreamFreezeThawBase):
             storage = jsonpickle.decode(fileData)
         else:
             raise FreezeThawException('bad StreamFreezer format: %s' % fmt)
-        environLocal.printDebug("StreamThawer:openStr: storage is: %s" % storage)
+        environLocal.printDebug('StreamThawer:openStr: storage is: %s' % storage)
         self.stream = self.unpackStream(storage)
 
 #--------------------------------------------------------------------------------
@@ -1105,7 +1105,7 @@ class Test(unittest.TestCase):
 #        for el in s._elements:
 #            idEl = el.id
 #            if idEl not in storedIds:
-#                print("Could not find ID %d for element %r at offset %f" %
+#                print('Could not find ID %d for element %r at offset %f' %
 #                      (idEl, el, el.offset))
 #        print storedIds
         #s.show('t')
@@ -1140,13 +1140,13 @@ class Test(unittest.TestCase):
 
         s = stream.Stream()
         m = stream.Measure()
-        m.append(note.Note(type="whole"))
+        m.append(note.Note(type='whole'))
         s.append(m)
 
         s2 = stream.Stream()
         m2 = stream.Measure()
-        n2 = note.Note("D#4")
-        n2.duration.type = "whole"
+        n2 = note.Note('D#4')
+        n2.duration.type = 'whole'
         m2.append(n2)
         s2.append(m2)
         v = variant.Variant(s2)
@@ -1191,7 +1191,7 @@ class Test(unittest.TestCase):
         d = sf.writeStr()
         #print d
 
-        #print "thawing."
+        #print 'thawing.'
 
         st = freezeThaw.StreamThawer()
         st.openStr(d)
@@ -1251,7 +1251,7 @@ class Test(unittest.TestCase):
         self.assertEqual(d[1][20].volume._client.__class__.__name__, 'weakref')
 
 #------------------------------------------------------------------------------
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

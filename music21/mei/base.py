@@ -176,15 +176,9 @@ tool.
 
 '''
 
-# Determine which ElementTree implementation to use.
-# We'll prefer the C-based versions if available, since they provide better performance.
-try:
-    from xml.etree import cElementTree as ETree
-except ImportError:
-    from xml.etree import ElementTree as ETree
+from xml.etree import ElementTree as ETree
 
 from collections import defaultdict
-import unittest
 from uuid import uuid4
 
 # music21
@@ -282,7 +276,7 @@ class MeiToM21Converter:
     '''
 
     def __init__(self, theDocument=None):
-        #  The __init__() documentation doesn't isn't processed by Sphinx, 
+        #  The __init__() documentation doesn't isn't processed by Sphinx,
         #  so I put it at class level.
         environLocal.printDebug('*** initializing MeiToM21Converter')
 
@@ -3459,61 +3453,4 @@ _DOC_ORDER = [
     tupletFromElement,
     ]
 
-class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
-    '''
-    This class runs the tests from all the TestCase sub-classes in the "test_base" module.
-
-    To help keep the MEI module's tests organized, I've grouped them into quite a number of classes.
-    To help simplify the test-running process, "multiprocessTest.py" only looks for a TestCase
-    sub-class called "Test." This class here allows both of these solutions to coexist.
-    '''
-
-    def testAll(self):
-        "Run the tests for the MEI module."
-        # This is a little confusing, so bear with me for a moment.
-        # The unittest.main() function *always* raises a SystemExit, because of how it was designed
-        # to be used. We're mis-using it, so we have to catch the SystemExit and inspect its result.
-        # If the first argument to the SystemExit is True, that means one of the tests in the
-        # module failed---but we don't know any more detail, so we just have to cause testAll() to
-        # fail too.
-        testResult = unittest.main(module='music21.mei.test_base',
-                                   exit=False,  # don't raise SystemExit
-                                   buffer=True)  # don't print things from successful tests
-        testResult = testResult.result
-        # unittest.main() actually returns a TestProgram; we want a TestResult
-        if not testResult.wasSuccessful():
-            self.fail(_TEST_FAILS.format(len(testResult.failures), len(testResult.errors)))
-
-if __name__ == "__main__":
-    # NOTE: When "multiprocessTest.py" is running the entire music21 test suite, it uses the class
-    #       called "Test," which is defined above.
-    import music21
-    from music21.mei import test_base
-    music21.mainTest(
-        test_base.TestMeiToM21Class,
-        test_base.TestThings,
-        test_base.TestMetadata,
-        test_base.TestAttrTranslators,
-        test_base.TestLyrics,
-        test_base.TestNoteFromElement,
-        test_base.TestRestFromElement,
-        test_base.TestChordFromElement,
-        test_base.TestClefFromElement,
-        test_base.TestLayerFromElement,
-        test_base.TestStaffFromElement,
-        test_base.TestStaffDefFromElement,
-        test_base.TestScoreDefFromElement,
-        test_base.TestEmbeddedElements,
-        test_base.TestAddSlurs,
-        test_base.TestBeams,
-        test_base.TestPreprocessors,
-        test_base.TestTuplets,
-        test_base.TestInstrDef,
-        test_base.TestMeasureFromElement,
-        test_base.TestSectionScore,
-        test_base.TestBarLineFromElement,
-        test_base.RegressionIntegrationTests,
-    )
-
-#------------------------------------------------------------------------------
 # eof

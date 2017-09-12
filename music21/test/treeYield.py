@@ -128,7 +128,7 @@ def testCode():
     mockType = lambda x: x.__class__.__name__ == 'Mock'
 
     subList = [100, 60, -2]
-    myList = [5, 20, [5, 12, 17], 30, 
+    myList = [5, 20, [5, 12, 17], 30,
               {'hello': 10, 'goodbye': 22, 'mock': Mock(subList)}, -20, Mock(subList)]
     myList.append(myList)
 

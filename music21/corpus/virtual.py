@@ -24,7 +24,7 @@ import unittest
 
 from music21 import common
 from music21 import environment
-_MOD = 'converter.py'
+_MOD = 'converter.virtual'
 environLocal = environment.Environment(_MOD)
 
 
@@ -212,7 +212,7 @@ class Test(unittest.TestCase):
 # define presented order in documentation
 _DOC_ORDER = []
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
     #music21.mainTest(Test, TestExternal)

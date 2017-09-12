@@ -31,7 +31,7 @@ from music21 import variant
 from music21 import note
 from music21.lily import lilyObjects as lyo
 
-_MOD = 'lily.translate2012.py'
+_MOD = 'lily.translate'
 environLocal = environment.Environment(_MOD)
 
 
@@ -1257,7 +1257,7 @@ class LilypondConverter:
 
         Now make the note disappear...
 
-        >>> n0.hideObjectOnPrint = True
+        >>> n0.style.hideObjectOnPrint = True
         >>> sm = conv.lySimpleMusicFromNoteOrRest(n0)
         >>> print(sm)
         s 4
@@ -1265,13 +1265,13 @@ class LilypondConverter:
         c = noteOrRest.classes
 
         simpleElementParts = []
-        if noteOrRest.hasStyleInformation is not None:
-            if noteOrRest.style.color and noteOrRest.hideObjectOnPrint is not True:
+        if noteOrRest.hasStyleInformation:
+            if noteOrRest.style.color and noteOrRest.style.hideObjectOnPrint is False:
                 colorLily = r'\color "' + noteOrRest.style.color + '" '
                 simpleElementParts.append(colorLily)
 
         if 'Note' in c:
-            if noteOrRest.hideObjectOnPrint is not True:
+            if not noteOrRest.hasStyleInformation or noteOrRest.style.hideObjectOnPrint is False:
                 lpPitch = self.lyPitchFromPitch(noteOrRest.pitch)
                 simpleElementParts.append(lpPitch)
                 if noteOrRest.pitch.accidental is not None:
@@ -1285,7 +1285,7 @@ class LilypondConverter:
         elif "SpacerRest" in c:
             simpleElementParts.append("s ")
         elif 'Rest' in c:
-            if noteOrRest.hideObjectOnPrint is True:
+            if noteOrRest.hasStyleInformation and noteOrRest.hideObjectOnPrint:
                 simpleElementParts.append("s ")
             else:
                 simpleElementParts.append("r ")
@@ -1411,12 +1411,12 @@ class LilypondConverter:
 
         test hidden chord:
 
-        >>> c1.hideObjectOnPrint = True
+        >>> c1.style.hideObjectOnPrint = True
         >>> print(conv.lySimpleMusicFromChord(c1))
         s 2..
         '''
         self.appendBeamCode(chordObj)
-        if chordObj.hideObjectOnPrint is not True:
+        if not chordObj.hasStyleInformation or chordObj.style.hideObjectOnPrint is not True:
 
             self.appendStemCode(chordObj)
 

@@ -27,7 +27,7 @@ from music21 import common
 from music21 import exceptions21
 from music21 import environment
 from music21 import key
-_MOD = 'romanText.rtObjects.py'
+_MOD = 'romanText.rtObjects'
 environLocal = environment.Environment(_MOD)
 
 # alternate endings might end with a, b, c for non
@@ -1325,7 +1325,7 @@ class RTFile:
         '''
         if isinstance(filename, pathlib.Path):
             filename = str(filename) # remove in Py3.6
-            
+
         for encoding in ('utf-8', 'macintosh', 'latin-1', 'utf-16'):
             try:
                 self.file = io.open(filename, encoding=encoding)

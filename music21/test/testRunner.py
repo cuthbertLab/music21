@@ -58,8 +58,8 @@ def addDocAttrTestsToSuite(suite,
     '''
     dtp = doctest.DocTestParser()
     if globs is False:
-        globs = __import__(defaultImports[0]).__dict__.copy()        
-        
+        globs = __import__(defaultImports[0]).__dict__.copy()
+
     elif globs is None:
         globs = {}
 
@@ -89,7 +89,7 @@ def fixDoctests(doctestSuite):
     for dtc in doctestSuite: # Suite to DocTestCase -- undocumented.
         if not hasattr(dtc, '_dt_test'):
             continue
-            
+
         dt = dtc._dt_test # DocTest
         for example in dt.examples: # fix Traceback exception differences Py2 to Py3
             example.want = stripAddresses(example.want, '0x...')
@@ -197,7 +197,7 @@ def mainTest(*testClasses, **kwargs):
                     'importPlusRelative' in sys.argv or
                     bool(kwargs.get('importPlusRelative', False))):
                 globs.update(globals())
-        
+
         try:
             s1 = doctest.DocTestSuite(
                 '__main__',

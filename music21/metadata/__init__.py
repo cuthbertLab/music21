@@ -49,6 +49,7 @@ import unittest
 
 from music21 import base
 from music21 import common
+from music21 import defaults
 from music21 import freezeThaw
 from music21 import exceptions21
 
@@ -105,10 +106,10 @@ class Metadata(base.Music21Object):
     made available by default.
 
     >>> md.searchAttributes
-    ('actNumber', 'alternativeTitle', 'associatedWork', 'collectionDesignation', 
-     'commission', 'composer', 'copyright', 'countryOfComposition', 'date', 'dedication', 
-     'groupTitle', 'localeOfComposition', 'movementName', 'movementNumber', 'number', 
-     'opusNumber', 'parentTitle', 'popularTitle', 'sceneNumber', 'textLanguage', 
+    ('actNumber', 'alternativeTitle', 'associatedWork', 'collectionDesignation',
+     'commission', 'composer', 'copyright', 'countryOfComposition', 'date', 'dedication',
+     'groupTitle', 'localeOfComposition', 'movementName', 'movementNumber', 'number',
+     'opusNumber', 'parentTitle', 'popularTitle', 'sceneNumber', 'textLanguage',
      'textOriginalLanguage', 'title', 'volume')
 
     Plus anything that is in contributors...
@@ -194,8 +195,14 @@ class Metadata(base.Music21Object):
         # be local file paths or otherwise
         self._urls = []
 
-        # TODO: need a specific object for copyright and imprint
+        # TODO: need a specific object for imprint
         self._imprint = None
+
+        self.software = [defaults.software]
+
+        # Copyright can be None or a copyright object
+        # TODO: Change to property to prevent text setting
+        # (but need to regenerate CoreCorpus() after doing so.)
         self.copyright = None
 
         # a dictionary of Text elements, where keys are work id strings
@@ -226,6 +233,7 @@ class Metadata(base.Music21Object):
         >>> c.metadata.all()
         [('arranger', 'Michael Scott Cuthbert'),
          ('composer', 'Arcangelo Corelli'),
+         ('copyright', '© 2014, Creative Commons License (CC-BY)'),
          ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
 
         Skip contributors is there to help with musicxml parsing -- there's no reason for it
@@ -234,21 +242,22 @@ class Metadata(base.Music21Object):
         >>> c.metadata.date = metadata.DateRelative('1689', 'onOrBefore')
         >>> c.metadata.localeOfComposition = 'Rome'
         >>> c.metadata.all(skipContributors=True)
-        [('date', '1689/--/-- or earlier'),
+        [('copyright', '© 2014, Creative Commons License (CC-BY)'),
+         ('date', '1689/--/-- or earlier'),
          ('localeOfComposition', 'Rome'),
          ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
         '''
         # pylint: disable=undefined-variable
         allOut = {}
-        
+
         searchAttributes = self.searchAttributes
-        
+
         for thisAttribute in sorted(set(searchAttributes)):
             try:
                 val = getattr(self, thisAttribute)
             except AttributeError:
                 continue
-            
+
             if skipContributors:
                 if isinstance(val, Contributor):
                     continue
@@ -333,10 +342,10 @@ class Metadata(base.Music21Object):
         ['Beach, Amy', 'Cheney, Amy Marcy']
 
         All contributor roles are searchable, even if they are not standard roles:
-        
+
         >>> md.search('Beach')
         (True, 'composer')
-        
+
         >>> dancer = metadata.Contributor()
         >>> dancer.names = ['Mark Gotham', 'I. Quinn']
         >>> dancer.role = 'interpretive dancer'
@@ -444,14 +453,14 @@ class Metadata(base.Music21Object):
 
         >>> md.search('opl(.*)cott')
         (True, 'composer')
-        
-        
+
+
         New in v.4 -- use a keyword argument to search
         that field directly:
-        
+
         >>> md.search(composer='Joplin')
         (True, 'composer')
-        
+
         TODO: Change to a namedtuple and add as a third element
         during a succesful search, the full value of the retrieved
         field (so that 'Joplin' would return 'Joplin, Scott')
@@ -461,8 +470,8 @@ class Metadata(base.Music21Object):
             return (False, None)
         elif query is None and field is None and kwargs:
             field, query = kwargs.popitem()
-        
-        
+
+
         if field is not None:
             field = field.lower()
             match = False
@@ -485,7 +494,7 @@ class Metadata(base.Music21Object):
             for innerField in self.searchAttributes:
                 value = getattr(self, innerField)
                 valueFieldPairs.append((value, innerField))
-                
+
         # now search all contributors.
         for contrib in self.contributors:
             if field is not None:
@@ -495,8 +504,8 @@ class Metadata(base.Music21Object):
                     continue
             for name in contrib.names:
                 valueFieldPairs.append((name, contrib.role))
-                
-                
+
+
         # for now, make all queries strings
         # ultimately, can look for regular expressions by checking for
         # .search
@@ -833,13 +842,13 @@ class RichMetadata(Metadata):
     >>> 'keySignatureFirst' in richMetadata.searchAttributes
     True
     >>> richMetadata.searchAttributes
-    ('actNumber', 'alternativeTitle', 'ambitus', 'associatedWork', 'collectionDesignation', 
-     'commission', 'composer', 'copyright', 'countryOfComposition', 'date', 'dedication', 
-     'groupTitle', 'keySignatureFirst', 'keySignatures', 'localeOfComposition', 'movementName', 
-     'movementNumber', 'noteCount', 'number', 'numberOfParts', 
-     'opusNumber', 'parentTitle', 'pitchHighest', 
-     'pitchLowest', 'popularTitle', 'quarterLength', 'sceneNumber', 'sourcePath', 'tempoFirst', 
-     'tempos', 'textLanguage', 'textOriginalLanguage', 'timeSignatureFirst', 
+    ('actNumber', 'alternativeTitle', 'ambitus', 'associatedWork', 'collectionDesignation',
+     'commission', 'composer', 'copyright', 'countryOfComposition', 'date', 'dedication',
+     'groupTitle', 'keySignatureFirst', 'keySignatures', 'localeOfComposition', 'movementName',
+     'movementNumber', 'noteCount', 'number', 'numberOfParts',
+     'opusNumber', 'parentTitle', 'pitchHighest',
+     'pitchLowest', 'popularTitle', 'quarterLength', 'sceneNumber', 'sourcePath', 'tempoFirst',
+     'tempos', 'textLanguage', 'textOriginalLanguage', 'timeSignatureFirst',
      'timeSignatures', 'title', 'volume')
     '''
 
@@ -933,11 +942,11 @@ class RichMetadata(Metadata):
             return '' # for some abc files...
         if not streamObj.filePath:
             return ''
-        
+
         streamFp = streamObj.filePath
         if not isinstance(streamFp, pathlib.Path):
             streamFp = pathlib.Path(streamFp)
-        
+
         try:
             relativePath = streamFp.relative_to(common.getCorpusFilePath())
             return relativePath.as_posix()

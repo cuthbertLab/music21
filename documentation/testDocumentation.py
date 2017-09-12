@@ -56,9 +56,6 @@ class NoOutput:
 
 sys.stdout = Unbuffered(sys.stdout)
 
-
-_MOD = "test.testDocumentation.py"
-
 skipModules = [
                'documenting.rst', # contains info that screws up testing
                ]

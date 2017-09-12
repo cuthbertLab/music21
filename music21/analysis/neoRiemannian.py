@@ -34,7 +34,7 @@ def L(c, raiseException=False):
     L is a function that takes a major or minor triad and returns a chord that
     is the L transformation. L transforms a chord to its Leading-Tone exchange.
 
-    Example 1: A C major chord, under P, will return an E minor chord
+    Example 1: A C major chord, under L, will return an E minor chord
 
     >>> c1 = chord.Chord("C4 E4 G4")
     >>> c2 = analysis.neoRiemannian.L(c1)
@@ -142,25 +142,22 @@ def LRP_combinations(c,
                      leftOrdered=False,
                      simplifyEnharmonic=False):
     '''
-    LRP_combinations is a function that takes a major or minor triad and a transformationString
-    and returns a transformed triad, using the L, R, and P transformations.
-    Certain combinations, such
-    as LPLPLP, are cyclical, and therefore will return the original chord
-    if simplifyEnharmonic = True.
+    LRP_combinations takes a major or minor triad, tranforms it according to the
+    list of L, R, and P transformations in the given transformationString, and
+    returns the result in triad.
+    Certain combinations, such as LPLPLP, are cyclical, and therefore
+    will return the original chord if simplifyEnharmonic = True (see completeHexatonic, below).
 
-    leftOrdered allows a user to work with the function notation that they prefer.
-    leftOrdered = False, the default, will mean that a transformationString that reads
-    "LPRLPR" will start by transforming the chord by L, then P,
-    then R, etc. Conversely, if leftOrdered = True (set by user), then "LPRLPR" will start by
-    transforming the chord by R, then P, then L--by reading the transformations left to right.
+    leftOrdered allows a user to work with their preferred function notation.
+    leftOrdered = False, the default, reads the transformationString from left to right,
+    so "LPR" will start by transforming the chord by L, then P, then R.
+    leftOrdered = True (set by user) works in the opposite direction (right to left), so
+    "LPR" starts with R, then P, then L.
 
-    simplifyEnharmonic allows a user to determine if they want the transformation to return
-    the actual results of such combined transformations,
-    which may include multiple sharps and flats.
-
+    simplifyEnharmonic returns results removing multiple sharps and flats where
+    they arise from combined transformations.
     If simplifyEnharmonic is True, the resulting chord will be simplified
-    to notes with at most 1 flat
-    or 1 sharp, in their most common form.
+    to notes with at most 1 flat or 1 sharp, in their most common form.
 
     >>> c1 = chord.Chord("C4 E4 G4")
     >>> c2 = analysis.neoRiemannian.LRP_combinations(c1, 'LP')
@@ -171,20 +168,20 @@ def LRP_combinations(c,
     >>> c4 = analysis.neoRiemannian.LRP_combinations(c3, 'RLP')
     >>> c4
     <music21.chord.Chord C4 F4 A-4 C5 F5>
-    '''
 
-#    >>> c5 = chord.Chord("B4 D#5 F#5")
-#    >>> c6 = LRP_combinations(c5, 'LPLPLP', leftOrdered = True, simplifyEnharmonic = True)
-#    >>> c6
-#    <music21.chord.Chord B4 D#5 F#5>
-#        >>> c5 = chord.Chord("C4 E4 G4 C5 E5")
-#    >>> c6 = LRP_combinations(c5, 'LPLPLP', leftOrdered = True)
-#    >>> c6
-#    <music21.chord.Chord C4 E4 G4 C5 E5>
-#    >>> c5 = chord.Chord("A-4 C4 E-5")
-#    >>> c6 = analysis.neoRiemannian.LRP_combinations(c5, 'LPLPLP')
-#    >>> c6
-#    <music21.chord.Chord A-4 C4 E-5>
+    >>> c5 = chord.Chord("B4 D#5 F#5")
+    >>> c6 = analysis.neoRiemannian.LRP_combinations(c5, 'LPLPLP', leftOrdered = True, simplifyEnharmonic = True)
+    >>> c6
+    <music21.chord.Chord B4 E-5 F#5>
+    >>> c5 = chord.Chord("C4 E4 G4")
+    >>> c6 = analysis.neoRiemannian.LRP_combinations(c5, 'LPLPLP', leftOrdered = True)
+    >>> c6
+    <music21.chord.Chord C4 E4 G4>
+    >>> c5 = chord.Chord("A-4 C4 E-5")
+    >>> c6 = analysis.neoRiemannian.LRP_combinations(c5, 'LPLPLP')
+    >>> c6
+    <music21.chord.Chord A-4 C4 E-5>
+    '''
 
     if c.isMajorTriad()  or c.isMinorTriad():
         if leftOrdered is False:
@@ -200,9 +197,10 @@ def LRP_combinations(c,
             if simplifyEnharmonic is False:
                 return c
             else:
-                for i in range(len(c.pitches)):
-                    c.pitches[i].simplifyEnharmonic(inPlace=True, mostCommon=True)
-                return c
+                newPitches = pitch.simplifyMultipleEnharmonics(c.pitches, keyContext=key.Key('C'))
+                newChord = copy.deepcopy(c)
+                newChord.pitches = newPitches
+                return newChord
         elif leftOrdered is True:
             transformationStringReversed = transformationString[::-1]
             for i in transformationStringReversed:
@@ -252,8 +250,14 @@ def LRP_combinations(c,
     # Optional parameter to take the scale/key
     # to simplify into, and then we can skip the step of having to find the key.
 
-def completeHexatonic(c):
+def completeHexatonic(c, simplifyEnharmonic=False):
     '''
+    completeHexatonic returns the list of six triads generated by the operation PLPLPL.
+    This six-part operation cycles between major and minor triads, ultimately returning to the
+    input triad (or its enharmonic equivalent).
+    This functions returns those six triads, ending with the original triad.
+    simplifyEnharmonic=False, by default, giving double flats;
+    simplifyEnharmonic can be set to True in order to avoid this.
 
     >>> c1 = chord.Chord("C4 E4 G4")
     >>> analysis.neoRiemannian.completeHexatonic(c1)
@@ -261,16 +265,28 @@ def completeHexatonic(c):
      <music21.chord.Chord C4 E-4 A-4>,
      <music21.chord.Chord C-4 E-4 A-4>,
      <music21.chord.Chord C-4 F-4 A-4>,
-     <music21.chord.Chord C-4 F-4 A--4>]
+     <music21.chord.Chord C-4 F-4 A--4>,
+     <music21.chord.Chord D--4 F-4 A--4>]
+
+     Or with  simplifyEnharmonic=True
+     >>> c2 = chord.Chord("C4 E4 G4")
+     >>> analysis.neoRiemannian.completeHexatonic(c2, simplifyEnharmonic=True)
+     [<music21.chord.Chord C4 E-4 G4>,
+      <music21.chord.Chord C4 E-4 A-4>,
+      <music21.chord.Chord C-4 E-4 A-4>,
+      <music21.chord.Chord C-4 F-4 A-4>,
+      <music21.chord.Chord C-4 F-4 A--4>,
+      <music21.chord.Chord D--4 F-4 A--4>]
     '''
-    #TODO: more documentation
     if c.isMajorTriad() or c.isMinorTriad():
         hexatonic_1 = P(c)
         hexatonic_2 = L(hexatonic_1)
         hexatonic_3 = P(hexatonic_2)
         hexatonic_4 = L(hexatonic_3)
         hexatonic_5 = P(hexatonic_4)
-        hexatonicList = [hexatonic_1, hexatonic_2, hexatonic_3, hexatonic_4, hexatonic_5]
+        hexatonic_6 = L(hexatonic_5)
+        hexatonicList = [hexatonic_1, hexatonic_2, hexatonic_3,
+                        hexatonic_4, hexatonic_5, hexatonic_6]
     return hexatonicList
 
 # correct spellings
@@ -325,4 +341,3 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test)
-

@@ -62,7 +62,7 @@ from music21 import pitch
 from music21 import interval
 from music21 import sieve
 
-_MOD = "scale.py"
+_MOD = 'scale'
 environLocal = environment.Environment(_MOD)
 
 DIRECTION_BI = intervalNetwork.DIRECTION_BI

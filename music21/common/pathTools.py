@@ -60,8 +60,8 @@ def getCorpusFilePath():
     >>> fp = common.getCorpusFilePath()
     >>> fp.name == 'corpus' and fp.parent.name == 'music21'
     True
-    
-    :rtype: pathlib.Path    
+
+    :rtype: pathlib.Path
     '''
     from music21 import corpus
     coreCorpus = corpus.corpora.CoreCorpus()
@@ -72,16 +72,17 @@ def getCorpusFilePath():
 
 def getCorpusContentDirs():
     '''
-    Get all dirs that are found in the corpus that contain content;
+    Get all dirs that are found in the CoreCorpus that contain content;
     that is, exclude dirs that have code or other resources.
 
     >>> fp = common.getCorpusContentDirs()
     >>> fp # this test will be fragile, depending on composition of dirs
-    ['airdsAirs', 'bach', 'beethoven', 'chopin', 'ciconia', 'corelli', 'cpebach',
-    'demos', 'essenFolksong', 'handel', 'haydn', 'josquin', 'leadSheet',
-    'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'palestrina',
-    'ryansMammoth', 'schoenberg', 'schumann', 'schumann_clara',
-    'theoryExercises', 'trecento', 'verdi', 'weber']
+    ['airdsAirs', 'bach', 'beach', 'beethoven', 'chopin', 
+     'ciconia', 'corelli', 'cpebach',
+     'demos', 'essenFolksong', 'handel', 'haydn', 'josquin', 'leadSheet',
+     'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'palestrina',
+     'ryansMammoth', 'schoenberg', 'schumann', 'schumann_clara',
+     'theoryExercises', 'trecento', 'verdi', 'weber']
 
     Make sure that all corpus data has a directoryInformation tag in
     CoreCorpus.
@@ -119,7 +120,7 @@ def getRootFilePath():
     Return the root directory for music21 -- outside of the music21 namespace
     which has directories such as "dist", "documentation", "music21"
 
-    :rtype: pathlib.Path    
+    :rtype: pathlib.Path
     '''
     fpMusic21 = getSourceFilePath()
     fpParent = fpMusic21.parent
@@ -149,7 +150,7 @@ def cleanpath(path, *, returnPathlib=None):
     turns backslashes to forward slashes, and finally if that file is not an absolute path,
     turns it from a relative path to an absolute path.
     '''
-    
+
     if isinstance(path, pathlib.Path):
         path = str(path)
         if returnPathlib is None:

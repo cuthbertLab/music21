@@ -256,7 +256,7 @@ class ContiguousSegmentSearcher:
     >>> searcher = search.serial.ContiguousSegmentSearcher(s, 'skipConsecutive', False)
     >>> contiglist = searcher.byLength(3)
     >>> print(contiglist)
-    [<music21.search.serial.ContiguousSegmentOfNotes ['G4', 'A4', 'B4']>, 
+    [<music21.search.serial.ContiguousSegmentOfNotes ['G4', 'A4', 'B4']>,
      <music21.search.serial.ContiguousSegmentOfNotes ['A4', 'B4', 'C5']>]
 
     .. image:: images/serial-findTransposedSegments.png
@@ -2408,7 +2408,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [    
+_DOC_ORDER = [
               'ContiguousSegmentSearcher',
               'ContiguousSegmentOfNotes',
               'SegmentMatcher',

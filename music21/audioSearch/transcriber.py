@@ -18,7 +18,7 @@ import os
 
 from music21 import scale
 from music21 import environment
-_MOD = 'audioSearch/transcriber.py'
+_MOD = 'audioSearch.transcriber'
 environLocal = environment.Environment(_MOD)
 
 

@@ -282,7 +282,7 @@ def findFormatExtFile(fp):
     '''
     if not isinstance(fp, pathlib.Path):
         fp = pathlib.Path(fp)
-    
+
     fileFormat, unused_extOut = findFormat(fp.suffix)
     if fileFormat is None:
         return (None, None)

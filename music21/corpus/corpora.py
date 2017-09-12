@@ -38,14 +38,14 @@ class Corpus:
     ## TODO: this is volitile -- should be elsewhere...
     _acceptableExtensions = ['abc', 'capella', 'midi', 'musicxml', 'musedata',
                              'humdrum', 'romantext', 'noteworthytext', 'noteworthy']
-    
-    _allExtensions = tuple(common.flattenList([common.findInputExtension(x) 
+
+    _allExtensions = tuple(common.flattenList([common.findInputExtension(x)
                                               for x in _acceptableExtensions]))
 
     _pathsCache = {}
 
     _directoryInformation = () # a tuple of triples -- see coreCorpus
-    
+
     parseUsingCorpus = True
     ### SPECIAL METHODS ###
 
@@ -62,7 +62,7 @@ class Corpus:
         for key in list(Corpus._pathsCache):
             if str(key[0]) == name:
                 keysToRemove.append(key)
-                
+
         for key in keysToRemove:
             del(Corpus._pathsCache[key])
 
@@ -79,7 +79,7 @@ class Corpus:
         '''
         rdp = common.cleanpath(rootDirectoryPath, returnPathlib=True)
         matched = []
-        
+
         for filename in rdp.rglob('*'):
             if filename.name.startswith('__'):
                 continue
@@ -164,7 +164,7 @@ class Corpus:
         '''
         mdb = self.metadataBundle
         if mdb is None:
-            return self 
+            return self
         if self.cacheFilePath is None:
             return self
 
@@ -172,7 +172,7 @@ class Corpus:
         mdb.delete()
         self.cacheMetadata(useMultiprocessing=useMultiprocessing, verbose=True)
         return self.metadataBundle
-    
+
     def cacheMetadata(self, useMultiprocessing=True, verbose=True, timer=None):
         '''
         Cache the metadata for a single corpus.
@@ -182,15 +182,15 @@ class Corpus:
                 environLocal.warn(message)
             else:
                 environLocal.printDebug(message)
-        
+
         if timer is None:
             timer = common.Timer()
             timer.start()
-        
-        
+
+
         metadataBundle = self.metadataBundle
         paths = self.getPaths()
-        
+
         update('{} metadata cache: starting processing of paths: {}'.format(
                 self.name, len(paths)))
         update('cache: filename: {0}'.format(metadataBundle.filePath))
@@ -201,18 +201,18 @@ class Corpus:
             useMultiprocessing=useMultiprocessing,
             verbose=verbose
             )
-        
+
         update('cache: writing time: {0} md items: {1}\n'.format(
             timer, len(metadataBundle)))
 
         update('cache: filename: {0}'.format(metadataBundle.filePath))
-        
+
         del metadataBundle
         return failingFilePaths
 
 
 
-    
+
     @abc.abstractmethod
     def getPaths(self, fileExtensions=None, expandExtensions=True):
         r'''
@@ -279,7 +279,7 @@ class Corpus:
                     results.append(path)
             if not results:
                 results = previousResults
-            
+
         movementResults = []
         if movementNumber is not None and results:
             # store one ore more possible mappings of movement number
@@ -374,11 +374,11 @@ class Corpus:
         >>> diBrief
         (<music21.corpus.work.DirectoryInformation airdsAirs>,
          <music21.corpus.work.DirectoryInformation bach>,
+         <music21.corpus.work.DirectoryInformation beach>,
          <music21.corpus.work.DirectoryInformation beethoven>,
-         <music21.corpus.work.DirectoryInformation chopin>,
-         <music21.corpus.work.DirectoryInformation ciconia>)
-        >>> diBrief[4].directoryTitle
-        'Johannes Ciconia'
+         <music21.corpus.work.DirectoryInformation chopin>)
+        >>> diBrief[2].directoryTitle
+        'Amy Beach'
         '''
         dirInfo = []
         for infoTriple in self._directoryInformation:
@@ -417,7 +417,7 @@ class Corpus:
         '''
         This is a synonym for the metadataBundle property, but easier to understand
         what it does.
-        
+
         >>> from music21 import corpus
         >>> corpus.corpora.CoreCorpus().all()
         <music21.metadata.bundles.MetadataBundle 'core': {150... entries}>
@@ -485,7 +485,7 @@ class Corpus:
         >>> workRefs = corpus.corpora.CoreCorpus().getWorkReferences()
         >>> workRefs[1:3]
         [<music21.corpus.work.DirectoryInformation bach>,
-         <music21.corpus.work.DirectoryInformation beethoven>]
+         <music21.corpus.work.DirectoryInformation beach>]
                  '''
         results = [di for di in self.directoryInformation]
 
@@ -507,6 +507,7 @@ class CoreCorpus(Corpus):
     _directoryInformation = ( # filepath, composer/collection name, isComposer
         ('airdsAirs', 'Aird\'s Airs', False),
         ('bach', 'Johann Sebastian Bach', True),
+        ('beach', 'Amy Beach', True),
         ('beethoven', 'Ludwig van Beethoven', True),
         ('chopin', 'Frederic Chopin', True),
         ('ciconia', 'Johannes Ciconia', True),
@@ -519,8 +520,8 @@ class CoreCorpus(Corpus):
         ('josquin', 'Josquin des Prez', True),
         ('leadSheet', 'Leadsheet demos', False),
         ('luca', 'D. Luca', False),
-        ('miscFolk', "Miscellaneous Folk", False),
-        ('monteverdi', "Claudio Monteverdi", True),
+        ('miscFolk', 'Miscellaneous Folk', False),
+        ('monteverdi', 'Claudio Monteverdi', True),
         ('mozart', 'Wolfgang Amadeus Mozart', True),
         ('oneills1850', 'Oneill\'s 1850 Collection', False),
         ('palestrina', 'Giovanni Palestrina', True),
@@ -546,7 +547,7 @@ class CoreCorpus(Corpus):
         filePath = common.getMetadataCacheFilePath() / 'core.p.gz'
         return filePath
 
-        
+
     ### PUBLIC METHODS ###
 
     def getPaths(
@@ -629,7 +630,7 @@ class CoreCorpus(Corpus):
         if expr is not None:
             path = common.cleanpath(expr)
             if not os.path.isdir(path) or not os.path.exists(path):
-                raise CorpusException("path needs to be a path to an existing directory")
+                raise CorpusException('path needs to be a path to an existing directory')
             userSettings['manualCoreCorpusPath'] = path
         else:
             userSettings['manualCoreCorpusPath'] = None
@@ -650,7 +651,7 @@ class CoreCorpus(Corpus):
             for unused in common.getCorpusFilePath().iterdir():
                 CoreCorpus._noCorpus = False
                 return False
-            
+
         CoreCorpus._noCorpus = False
         return CoreCorpus._noCorpus
 
@@ -685,16 +686,16 @@ class LocalCorpus(Corpus):
 
     def __init__(self, name=None):
         if not isinstance(name, (str, type(None))):
-            raise CorpusException("Name must be a string or None")
+            raise CorpusException('Name must be a string or None')
         if name is not None and not name:
-            raise CorpusException("Name cannot be blank")
+            raise CorpusException('Name cannot be blank')
         if name == 'local':
             self._name = None
         elif name in ('core', 'virtual'):
             raise CorpusException("The name '{}' is reserved.".format(name))
         else:
             self._name = name
-            
+
     ### SPECIAL METHODS ###
 
     def __repr__(self):
@@ -723,13 +724,13 @@ class LocalCorpus(Corpus):
     def cacheFilePath(self):
         '''
         Get the path to the file path that stores the .json file.
-        
+
         returns a pathlib.Path
         '''
         localCorpusSettings = self._getSettings()
         if localCorpusSettings is not None and localCorpusSettings.cacheFilePath is not None:
             return localCorpusSettings.cacheFilePath
-        
+
         localName = self.name
         if localName == 'local':
             localName = ''
@@ -773,7 +774,7 @@ class LocalCorpus(Corpus):
             raise corpus.CorpusException(
                 'an invalid file path has been provided: {0!r}'.format(
                     directoryPath))
-        
+
         directoryPath = common.cleanpath(directoryPath)
         if (not os.path.exists(directoryPath) or
                 not os.path.isdir(directoryPath)):
@@ -782,7 +783,7 @@ class LocalCorpus(Corpus):
                     directoryPath))
         if self.name not in LocalCorpus._temporaryLocalPaths:
             LocalCorpus._temporaryLocalPaths[self.name] = set()
-            
+
         LocalCorpus._temporaryLocalPaths[self.name].add(directoryPath)
         self._removeNameFromCache(self.name)
 
@@ -794,15 +795,15 @@ class LocalCorpus(Corpus):
             raise CorpusException('Cannot delete this corpus')
         elif not self.existsInSettings:
             return
-        
+
         if os.path.exists(self.metadataBundle.filePath):
             os.remove(self.metadataBundle.filePath)
-        
+
         userSettings = environment.UserSettings()
         del(userSettings['localCorporaSettings'][self.name])
         environment.Environment().write()
-        
-        
+
+
 
     def getPaths(
         self,
@@ -870,14 +871,14 @@ class LocalCorpus(Corpus):
         if self.name != 'local':
             lcs.name = self.name
         lcs.cacheFilePath = self.cacheFilePath
-            
+
         if self.name == 'local':
             userSettings['localCorpusSettings'] = lcs
         else:
             userSettings['localCorporaSettings'][self.name] = lcs
         environment.Environment().write()
         self.cacheMetadata()
-        
+
 
     ### PUBLIC PROPERTIES ###
 
@@ -889,11 +890,11 @@ class LocalCorpus(Corpus):
         candidatePaths = []
         if self.existsInSettings:
             settings = self._getSettings()
-            candidatePaths = list(settings)
-        temporaryPaths = LocalCorpus._temporaryLocalPaths.get(
-            self.name, [])
+            candidatePaths = [pathlib.Path(p) for p in settings]
+        temporaryPaths = [pathlib.Path(p) for p in LocalCorpus._temporaryLocalPaths.get(
+            self.name, [])]
         allPaths = tuple(sorted(set(candidatePaths).union(temporaryPaths)))
-        return tuple([pathlib.Path(p) for p in allPaths])
+        return allPaths
 
     @property
     def existsInSettings(self):
@@ -931,17 +932,17 @@ class LocalCorpus(Corpus):
 # class VirtualCorpus(Corpus):
 #     r'''
 #     A model of the *virtual* corpus. that stays online...
-# 
+#
 #     >>> virtualCorpus = corpus.corpora.VirtualCorpus()
-# 
+#
 #     '''
-# 
+#
 #     ### CLASS VARIABLES ###
-# 
+#
 #     _virtualWorks = []
 #
 #     name = 'virtual'
-# 
+#
 #     corpusName = None
 #     for corpusName in dir(virtual):
 #         className = getattr(virtual, corpusName)
@@ -954,14 +955,14 @@ class LocalCorpus(Corpus):
 #     del className
 #     del obj
 #     ### PRIVATE PROPERTIES ###
-# 
+#
 #     @property
 #     def cacheFilePath(self):
 #         filePath = common.getMetadataCacheFilePath() / 'virtual.p.gz'
 #         return filePath
-# 
+#
 #     ### PUBLIC METHODS ###
-# 
+#
 #     def getPaths(
 #         self,
 #         fileExtensions=None,
@@ -969,12 +970,12 @@ class LocalCorpus(Corpus):
 #         ):
 #         '''
 #         Get all paths in the virtual corpus that match a known extension.
-# 
+#
 #         An extension of None will return all known extensions.
-# 
+#
 #         >>> len(corpus.corpora.VirtualCorpus().getPaths()) > 6
 #         True
-# 
+#
 #         '''
 #         fileExtensions = self._translateExtensions(
 #             fileExtensions=fileExtensions,
@@ -989,7 +990,7 @@ class LocalCorpus(Corpus):
 #                         if result not in paths:
 #                             paths.append(result)
 #         return paths
-# 
+#
 #     def getWorkList(
 #         self,
 #         workName,
@@ -999,14 +1000,14 @@ class LocalCorpus(Corpus):
 #         '''
 #         Given a work name, search all virtual works and return a list of URLs
 #         for any matches.
-# 
+#
 #         >>> virtualCorpus = corpus.corpora.VirtualCorpus()
 #         >>> virtualCorpus.getWorkList('bach/bwv1007/prelude')
 #         ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
-# 
+#
 #         >>> virtualCorpus.getWorkList('junk')
 #         []
-# 
+#
 #         '''
 #         if not common.isListLike(fileExtensions):
 #             fileExtensions = [fileExtensions]
@@ -1014,8 +1015,8 @@ class LocalCorpus(Corpus):
 #             if obj.corpusPath is not None and workName.lower() in obj.corpusPath.lower():
 #                 return obj.getUrlByExt(fileExtensions)
 #         return []
-# 
-# 
+#
+#
 
 
 
@@ -1033,6 +1034,6 @@ _DOC_ORDER = (
     # VirtualCorpus,
     )
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest()

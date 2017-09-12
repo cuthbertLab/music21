@@ -28,7 +28,7 @@ class Documenter:
 
     def __repr__(self):
         raise NotImplementedError
-    
+
     ### PRIVATE PROPERTIES ###
 
     @property
@@ -320,7 +320,7 @@ class AttributeDocumenter(MemberDocumenter):
 class ClassDocumenter(ObjectDocumenter):
     '''
     A documenter for one class:
-    
+
     >>> from music21 import articulations
     >>> klass = articulations.Caesura
     >>> documenter = ClassDocumenter(klass)
@@ -392,7 +392,6 @@ class ClassDocumenter(ObjectDocumenter):
        :columns: 3
        - :attr:`~music21.base.Music21Object.classSortOrder`
        - :attr:`~music21.base.Music21Object.groups`
-       - :attr:`~music21.base.Music21Object.hideObjectOnPrint`
        - :attr:`~music21.base.Music21Object.id`
        - :attr:`~music21.base.Music21Object.isStream`
     '''
@@ -991,6 +990,13 @@ class ClassDocumenter(ObjectDocumenter):
         >>> for line in documenter.rstInheritedMethodsFormat:
         ...     line
         ...
+        'Methods inherited from :class:`~music21.note.NotRest`:'
+        ''
+        '.. hlist::'
+        '   :columns: 3'
+        ''
+        '   - :meth:`~music21.note.NotRest.hasVolumeInformation`'
+        ''
         'Methods inherited from :class:`~music21.note.GeneralNote`:'
         ''
         '.. hlist::'
@@ -1596,7 +1602,7 @@ class CorpusDocumenter(Documenter):
 #             str(corpusFile.title),
 #             str(corpusFile.format),
 #             str(corpusFile.path),
-#             )) 
+#             ))
 #         result.append('')
 #         result.append('  Source: {0}'.format(
 #             str(corpusFile.url)))

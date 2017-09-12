@@ -31,7 +31,7 @@ from music21 import defaults
 from music21 import style
 
 from music21 import environment
-_MOD = "spanner.py"
+_MOD = 'spanner'
 environLocal = environment.Environment(_MOD)
 
 
@@ -73,7 +73,7 @@ class Spanner(base.Music21Object):
 
     We can iterate over a spanner to get the contexts:
 
-    >>> print(" ".join([repr(n) for n in sp1]))
+    >>> print(' '.join([repr(n) for n in sp1]))
     <music21.note.Note C> <music21.note.Note D> <music21.note.Note E>
 
     Now we put the notes and the spanner into a Stream object.  Note that
@@ -215,7 +215,7 @@ class Spanner(base.Music21Object):
         # create a stream subclass, spanner storage; pass a reference
         # to this spanner for getting this spanner from the SpannerStorage
         # directly
-        
+
         # TODO: Move here! along with VariantStorage to variant.
         self.spannerStorage = stream.SpannerStorage(spannerParent=self)
 
@@ -556,7 +556,7 @@ class Spanner(base.Music21Object):
         >>> sl.addSpannedElements(n1, n2, n3, n4, n5)
         >>> sl.getFirst() is n1
         True
-        
+
         >>> spanner.Slur().getFirst() is None
         True
         '''
@@ -1096,7 +1096,7 @@ class Slur(Spanner):
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
         self.placement = None  # can above or below, after musicxml
-        self.lineType = None  # can be "dashed" or None
+        self.lineType = None  # can be 'dashed' or None
 
     # TODO: add property for placement
 
@@ -1138,8 +1138,8 @@ class MultiMeasureRest(Spanner):
         self.maxSymbols = keywords.get('maxSymbols', defaults.multiMeasureRestMaxSymbols)
 
     def __repr__(self):
-        return "<music21.spanner.MultiMeasureRest {} measure{}>".format(self.numRests,
-                                        "s" if self.numRests != 1 else "")
+        return '<music21.spanner.MultiMeasureRest {} measure{}>'.format(self.numRests,
+                                        's' if self.numRests != 1 else '')
 
     @property
     def numRests(self):
@@ -1180,7 +1180,7 @@ class RepeatBracket(Spanner):
     The `number` keyword argument can be used to pass in the desired number.
 
     `overrideDisplay` if set will display something other than the number.  For instance
-    `ouvert` and `clos` for medieval music.  However, if you use it for something like "1-3"
+    `ouvert` and `clos` for medieval music.  However, if you use it for something like '1-3'
     be sure to set number properly too.
 
 
@@ -1377,7 +1377,7 @@ class Ottava(Spanner):
     A non-transposing spanner has notes that are at the pitch that
     they would sound (therefore the Ottava spanner is a decorative
     line).
-    
+
     >>> ottava.transposing
     True
     >>> n1 = note.Note('D4')
@@ -1385,13 +1385,13 @@ class Ottava(Spanner):
     >>> ottava.addSpannedElements([n1, n2])
     >>> s = stream.Stream([ottava, n1, n2])
     >>> s.atSoundingPitch = False
-    
+
     >>> s2 = s.toSoundingPitch()
     >>> s2.show('text')
     {0.0} <music21.spanner.Ottava 8vb non-transposing<music21.note.Note D><music21.note.Note E>>
     {0.0} <music21.note.Note D>
     {1.0} <music21.note.Note E>
-    
+
     >>> for n in s2.notes:
     ...     print(n.nameWithOctave)
     D3
@@ -1424,7 +1424,7 @@ class Ottava(Spanner):
         transposing = 'transposing'
         if not self.transposing:
             transposing = 'non-transposing'
-        
+
         msg = msg.replace(self._reprHead, '<music21.spanner.Ottava {} {}'.format(
             self.type, transposing))
         return msg
@@ -1475,7 +1475,7 @@ class Ottava(Spanner):
     def shiftMagnitude(self):
         '''
         Get basic parameters of shift.
-        
+
         Returns either 8, 15, or 22 depending on the amount of shift
         '''
         if self._type.startswith('8'):
@@ -1485,7 +1485,7 @@ class Ottava(Spanner):
         elif self._type.startswith('22'):
             return 22
         else:
-            raise SpannerException("Cannot get shift magnitude from %s" % self._type)
+            raise SpannerException('Cannot get shift magnitude from %s' % self._type)
 
     def shiftDirection(self, reverse=False):
         '''
@@ -1507,7 +1507,7 @@ class Ottava(Spanner):
     def interval(self, reverse=False):
         '''
         return an interval.Interval() object representing this ottava
-        
+
         >>> ottava = spanner.Ottava(type='15mb')
         >>> i = ottava.interval()
         >>> i
@@ -1515,19 +1515,19 @@ class Ottava(Spanner):
         '''
         from music21.interval import Interval
         if self.shiftDirection(reverse=reverse) == 'down':
-            header = "P-"
+            header = 'P-'
         else:
-            header = "P"
-            
+            header = 'P'
+
         header += str(self.shiftMagnitude())
         return Interval(header)
 
     def performTransposition(self):
         '''
         On a transposing spanner, switch to non-transposing,
-        set hideObjectOnPrint to True, and transpose all notes and chords
+        set style.hideObjectOnPrint to True, and transpose all notes and chords
         in the spanner.  Called by :meth:`~music21.stream.Stream.toSoundingPitch` in Stream
-        
+
         >>> ottava = spanner.Ottava(type='8va')
         >>> n1 = note.Note('D#4')
         >>> n2 = note.Note('E#4')
@@ -1540,26 +1540,26 @@ class Ottava(Spanner):
         >>> ottava.transposing
         False
         >>> n1.nameWithOctave
-        'D#5'        
+        'D#5'
         '''
         if not self.transposing:
             return
         self.transposing = False
-        self.hideObjectOnPrint = True
-        
+        self.style.hideObjectOnPrint = True
+
         myInterval = self.interval()
         for n in self.getSpannedElements():
             if not hasattr(n, 'pitches'):
                 continue
             for p in n.pitches:
                 p.transpose(myInterval, inPlace=True)
-                
+
     def undoTransposition(self):
         '''
         Change a non-transposing spanner to a transposing spanner,
         making sure it is not hidden and transpose back all the notes
         and chords in the spanner.
-        
+
         Called by :meth:`~music21.stream.Stream.toWrittenPitch` in Stream
 
         >>> ottava = spanner.Ottava(type='8va')
@@ -1574,20 +1574,20 @@ class Ottava(Spanner):
         True
         >>> n1.nameWithOctave
         'D#3'
-        
+
         '''
         if self.transposing:
             return
         self.transposing = True
-        self.hideObjectOnPrint = False
-        
+        self.style.hideObjectOnPrint = False
+
         myInterval = self.interval(reverse=True)
         for n in self.getSpannedElements():
             if not hasattr(n, 'pitches'):
                 continue
             for p in n.pitches:
                 p.transpose(myInterval, inPlace=True)
-                
+
 
 class Line(Spanner):
     '''A line or bracket represented as a spanner above two Notes.
@@ -1738,22 +1738,22 @@ class Glissando(Spanner):
     '''
     A between two Notes specifying a glissando or similar alteration.
     Different line types can be specified.
-    
+
     Glissandos can have a label and a lineType.  Label is a string or None.
     lineType defaults to 'wavy'
-    
+
     >>> gl = spanner.Glissando()
     >>> gl.lineType
     'wavy'
     >>> print(gl.label)
     None
-    
+
     >>> gl.label = 'gliss.'
-    
+
     Note -- not a Line subclass for now, but that might change.
     '''
     validLineTypes = ('solid', 'dashed', 'dotted', 'wavy')
-    
+
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
 
@@ -2070,9 +2070,9 @@ class Test(unittest.TestCase):
 
         # p.show()
         raw = self.xmlStr(p)
-        self.assertEqual(raw.find("""<ending number="1" type="start" />""") > 1, True)
-        self.assertEqual(raw.find("""<ending number="2" type="stop" />""") > 1, True)
-        self.assertEqual(raw.find("""<ending number="2" type="start" />""") > 1, True)
+        self.assertEqual(raw.find('''<ending number="1" type="start" />''') > 1, True)
+        self.assertEqual(raw.find('''<ending number="2" type="stop" />''') > 1, True)
+        self.assertEqual(raw.find('''<ending number="2" type="start" />''') > 1, True)
 
     def testRepeatBracketD(self):
         from music21 import note, spanner, stream, bar
@@ -2156,21 +2156,21 @@ class Test(unittest.TestCase):
         self.assertEqual(len(p.spanners), 4)
 
         raw = self.xmlStr(p)
-        self.assertEqual(raw.find("""<ending number="1" type="start" />""") > 1, True)
-        self.assertEqual(raw.find("""<ending number="2" type="stop" />""") > 1, True)
-        self.assertEqual(raw.find("""<ending number="2" type="start" />""") > 1, True)
+        self.assertEqual(raw.find('''<ending number="1" type="start" />''') > 1, True)
+        self.assertEqual(raw.find('''<ending number="2" type="stop" />''') > 1, True)
+        self.assertEqual(raw.find('''<ending number="2" type="start" />''') > 1, True)
 
         p1 = copy.deepcopy(p)
         raw = self.xmlStr(p1)
-        self.assertEqual(raw.find("""<ending number="1" type="start" />""") > 1, True)
-        self.assertEqual(raw.find("""<ending number="2" type="stop" />""") > 1, True)
-        self.assertEqual(raw.find("""<ending number="2" type="start" />""") > 1, True)
+        self.assertEqual(raw.find('''<ending number="1" type="start" />''') > 1, True)
+        self.assertEqual(raw.find('''<ending number="2" type="stop" />''') > 1, True)
+        self.assertEqual(raw.find('''<ending number="2" type="start" />''') > 1, True)
 
         p2 = copy.deepcopy(p1)
         raw = self.xmlStr(p2)
-        self.assertEqual(raw.find("""<ending number="1" type="start" />""") > 1, True)
-        self.assertEqual(raw.find("""<ending number="2" type="stop" />""") > 1, True)
-        self.assertEqual(raw.find("""<ending number="2" type="start" />""") > 1, True)
+        self.assertEqual(raw.find('''<ending number="1" type="start" />''') > 1, True)
+        self.assertEqual(raw.find('''<ending number="2" type="stop" />''') > 1, True)
+        self.assertEqual(raw.find('''<ending number="2" type="start" />''') > 1, True)
 
 
     def testRepeatBracketE(self):
@@ -2478,8 +2478,8 @@ class Test(unittest.TestCase):
         m2 = stream.Measure()
         m1.number = 1
         m2.number = 2
-        n1 = note.Note("C#4", type='whole')
-        n2 = note.Note("D#4", type='whole')
+        n1 = note.Note('C#4', type='whole')
+        n2 = note.Note('D#4', type='whole')
         m1.insert(0, n1)
         m2.insert(0, n2)
         p.append(m1)
@@ -2487,7 +2487,7 @@ class Test(unittest.TestCase):
         sl = Slur([n1, n2])
         p.insert(0, sl)
         for x in p:
-            if "Spanner" in x.classes:
+            if 'Spanner' in x.classes:
                 p.remove(x)
         self.assertEqual(len(p.spanners), 0)
 
@@ -2501,8 +2501,8 @@ class Test(unittest.TestCase):
         m2 = stream.Measure()
         m1.number = 1
         m2.number = 2
-        n1 = note.Note("C#4", type='whole')
-        n2 = note.Note("D#4", type='whole')
+        n1 = note.Note('C#4', type='whole')
+        n2 = note.Note('D#4', type='whole')
         m1.insert(0, n1)
         m2.insert(0, n2)
         p.append(m1)
@@ -2611,11 +2611,11 @@ class Test(unittest.TestCase):
         self.assertEqual(len(t.spannerBundle), 1)
         tn2 = t.spannerBundle.getBySpannedElement(n2)
         self.assertEqual(len(tn2), 1)
-        
+
 
     def testGetSpannedElementIds(self):
         from music21 import note
-        
+
         n1 = note.Note('g')
         n2 = note.Note('f#')
         n3 = note.Note('e')
@@ -2635,7 +2635,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [Spanner]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

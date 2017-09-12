@@ -473,15 +473,15 @@ class Book(BaseObject):
             except ValueError:
                 raise XLRDError('No sheet named <%r>' % sheet_name_or_index)
         self._sheet_list[sheetx] = None
-        
+
     ##
     # This method has a dual purpose. You can call it to release
     # memory-consuming objects and (possibly) a memory-mapped file
     # (mmap.mmap object) when you have finished loading sheets in
     # on_demand mode, but still require the Book object to examine the
     # loaded sheets. It is also called automatically (a) when open_workbook
-    # raises an exception and (b) if you are using a "with" statement, when 
-    # the "with" block is exited. Calling this method multiple times on the 
+    # raises an exception and (b) if you are using a "with" statement, when
+    # the "with" block is exited. Calling this method multiple times on the
     # same object has no ill effect.
     def release_resources(self):
         self._resources_released = 1
@@ -494,13 +494,13 @@ class Book(BaseObject):
         self.filestr = None
         self._sharedstrings = None
         self._rich_text_runlist_map = None
-    
+
     def __enter__(self):
         return self
-        
+
     def __exit__(self, exc_type, exc_value, exc_tb):
         self.release_resources()
-        # return false        
+        # return false
 
     ##
     # A mapping from (lower_case_name, scope) to a single Name object.
@@ -1074,7 +1074,7 @@ class Book(BaseObject):
                 # Should implement handling of CONTINUE record(s) ...
                 if self.verbosity:
                     print((
-                        "*** WARNING: unpack failure in sheet %d of %d in SUPBOOK record for file %r" 
+                        "*** WARNING: unpack failure in sheet %d of %d in SUPBOOK record for file %r"
                         % (x, num_sheets, url)
                         ), file=self.logfile)
                 break
@@ -1128,7 +1128,7 @@ class Book(BaseObject):
             strlist.append(data)
         self._sharedstrings, rt_runlist = unpack_SST_table(strlist, uniquestrings)
         if self.formatting_info:
-            self._rich_text_runlist_map = rt_runlist        
+            self._rich_text_runlist_map = rt_runlist
         if DEBUG:
             t1 = time.time()
             print("SST processing took %.2f seconds" % (t1 - t0, ), file=self.logfile)
@@ -1393,7 +1393,7 @@ def unpack_SST_table(datatab, nstrings):
             datalen = len(data)
             options = local_BYTES_ORD(data[0])
             pos = 1
-        
+
         if rtcount:
             runs = []
             for runindex in xrange(rtcount):
@@ -1405,7 +1405,7 @@ def unpack_SST_table(datatab, nstrings):
                 runs.append(local_unpack("<HH", data[pos:pos+4]))
                 pos += 4
             richtext_runs[len(strings)] = runs
-                
+
         pos += phosz # size of the phonetic stuff to skip
         if pos >= datalen:
             # adjust to correct position in next record

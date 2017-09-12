@@ -76,6 +76,7 @@ def main(fnAccept=None, strict=False):
                 'too-many-instance-attributes', # maybe later
                 'protected-access', # this is an important one, but for now we do a lot of
                            # x = copy.deepcopy(self); x._volume = ... which is not a problem...
+                           # also, test suites need to be exempt.
     ]
     disable = [  # These also need to be changed in MUSIC21BASE/.pylintrc
                 'arguments-differ', # -- no -- should be able to add additional arguments so long
@@ -189,7 +190,8 @@ def main(fnAccept=None, strict=False):
     pylintRun(cmdFile, exit=False)
 
 def argRun():
-    parser = argparse.ArgumentParser(description='Run pylint on music21 according to style guide.')
+    parser = argparse.ArgumentParser(
+        description='Run pylint on music21 according to style guide.')
     parser.add_argument('files', metavar='filename', type=str, nargs='*',
                         help='Files to parse (default nearly all)')
     parser.add_argument('--strict', action='store_true',

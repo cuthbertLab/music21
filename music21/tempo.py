@@ -24,7 +24,7 @@ from music21 import note
 from music21 import style
 
 from music21 import environment
-_MOD = "tempo.py"
+_MOD = 'tempo'
 environLocal = environment.Environment(_MOD)
 
 
@@ -136,9 +136,9 @@ class TempoIndication(base.Music21Object):
     classSortOrder = 1
     _styleClass = style.TextStyle
 
-    def __init__(self):
-        super().__init__()
-        # self.style.justify = 'left' # creates a style object to share.
+#     def __init__(self):
+#         super().__init__()
+#         # self.style.justify = 'left' # creates a style object to share.
 
     def getSoundingMetronomeMark(self, found=None):
         '''Get the appropriate MetronomeMark from any sort of TempoIndication, regardless of class.
@@ -185,7 +185,7 @@ class TempoIndication(base.Music21Object):
 class TempoText(TempoIndication):
     '''
     >>> import music21
-    >>> tm = music21.tempo.TempoText("adagio")
+    >>> tm = music21.tempo.TempoText('adagio')
     >>> print(tm.text)
     adagio
     '''
@@ -204,7 +204,7 @@ class TempoText(TempoIndication):
 #                self.text = text
 
     def __repr__(self):
-        return "<%s %s>" % (self.__class__.__name__, self.text)
+        return '<%s %s>' % (self.__class__.__name__, self.text)
 
     def _getText(self):
         '''
@@ -231,7 +231,7 @@ class TempoText(TempoIndication):
         Get or set the text as a string.
 
         >>> import music21
-        >>> tm = music21.tempo.TempoText("adagio")
+        >>> tm = music21.tempo.TempoText('adagio')
         >>> tm.text
         'adagio'
         >>> tm.getTextExpression()
@@ -242,7 +242,7 @@ class TempoText(TempoIndication):
         '''
         Return a MetronomeMark object that is configured from this objects Text.
 
-        >>> tt = tempo.TempoText("slow")
+        >>> tt = tempo.TempoText('slow')
         >>> mm = tt.getMetronomeMark()
         >>> mm.number
         56
@@ -292,15 +292,15 @@ class TempoText(TempoIndication):
         plausible Tempo indications be used for this TempoText.
 
 
-        >>> tt = tempo.TempoText("adagio")
+        >>> tt = tempo.TempoText('adagio')
         >>> tt.isCommonTempoText()
         True
 
-        >>> tt = tempo.TempoText("Largo e piano")
+        >>> tt = tempo.TempoText('Largo e piano')
         >>> tt.isCommonTempoText()
         True
 
-        >>> tt = tempo.TempoText("undulating")
+        >>> tt = tempo.TempoText('undulating')
         >>> tt.isCommonTempoText()
         False
         '''
@@ -343,12 +343,12 @@ class MetronomeMark(TempoIndication):
     property independent of the `referent`.
 
     The `text` attribute will usually return a unicode string.
-    If you use "from __future__ import unicode_literals" this
+    If you use `from __future__ import unicode_literals` this
     will not be a problem at all.
 
 
 
-    >>> a = tempo.MetronomeMark("slow", 40, note.Note(type='half'))
+    >>> a = tempo.MetronomeMark('slow', 40, note.Note(type='half'))
     >>> a.number
     40
     >>> a.referent
@@ -381,7 +381,7 @@ class MetronomeMark(TempoIndication):
     Unicode values work fine thanks to Python 3:
 
     >>> marking = 'très vite'
-    >>> marking    
+    >>> marking
     'très vite'
     >>> print(tempo.defaultTempoValues[marking])
     144
@@ -423,10 +423,10 @@ class MetronomeMark(TempoIndication):
 
     def __repr__(self):
         if self.text is None:
-            return "<music21.tempo.MetronomeMark %s=%s>" % (
+            return '<music21.tempo.MetronomeMark %s=%s>' % (
                         self.referent.fullName, str(self.number))
         else:
-            return "<music21.tempo.MetronomeMark %s %s=%s>" % (
+            return '<music21.tempo.MetronomeMark %s %s=%s>' % (
                         self.text, self.referent.fullName, str(self.number))
 
     def _updateTextFromNumber(self):
@@ -675,7 +675,7 @@ class MetronomeMark(TempoIndication):
         #environLocal.printDebug(['matches', matches])
         post = None
         for tempoValue, tempoStr in matches:
-            if ((tempoNumber >= (tempoValue - spread) 
+            if ((tempoNumber >= (tempoValue - spread)
                     and tempoNumber <= (tempoValue + spread))): # found a match
                 post = tempoStr
                 break
@@ -927,7 +927,8 @@ class MetricModulation(TempoIndication):
         self._newMetronome = None
 
     def __repr__(self):
-        return "<music21.tempo.MetricModulation %s=%s>" % (self.oldMetronome, self.newMetronome)
+        return '<music21.tempo.MetricModulation %s=%s>' % (self.oldMetronome, 
+                                                           self.newMetronome)
 
 
     #---------------------------------------------------------------------------
@@ -936,7 +937,7 @@ class MetricModulation(TempoIndication):
     def _setOldMetronome(self, value):
         if value is None:
             pass # allow setting as None
-        elif not hasattr(value, "classes") or "MetronomeMark" not in value.classes:
+        elif not hasattr(value, 'classes') or 'MetronomeMark' not in value.classes:
             raise MetricModulationException(
                     'oldMetronome property must be set with a MetronomeMark instance')
         self._oldMetronome = value
@@ -1012,7 +1013,7 @@ class MetricModulation(TempoIndication):
     def _setNewMetronome(self, value):
         if value is None:
             pass # allow setting as None
-        elif not hasattr(value, "classes") or "MetronomeMark" not in value.classes:
+        elif not hasattr(value, 'classes') or 'MetronomeMark' not in value.classes:
 #        elif not isinstance(value, (MetronomeMark,
 #                                    music21.tempo.MetronomeMark)):
             raise MetricModulationException(
@@ -1263,7 +1264,7 @@ def interpolateElements(element1, element2, sourceStream,
     >>> destStream2.insert(50.5, element2)
     >>> tempo.interpolateElements(element1, element2, sourceStream, destStream2)
     >>> for el in [eA, eB, eC]:
-    ...    print("%.1f" % (el.getOffsetBySite(destStream2),))
+    ...    print('%.1f' % (el.getOffsetBySite(destStream2),))
     20.2
     30.3
     40.4
@@ -1275,7 +1276,7 @@ def interpolateElements(element1, element2, sourceStream,
     >>> destStream3 = stream.Stream()
     >>> destStream3.insert(100, element1)
     >>> destStream3.insert(500, element2)
-    >>> eA.id = "blah"
+    >>> eA.id = 'blah'
     >>> tempo.interpolateElements(element1, element2, sourceStream, destStream3, autoAdd=False)
     Traceback (most recent call last):
     music21.tempo.TempoException: Could not find element <music21.note.Note D> with id ...
@@ -1284,20 +1285,20 @@ def interpolateElements(element1, element2, sourceStream,
     try:
         startOffsetSrc = element1.getOffsetBySite(sourceStream)
     except exceptions21.Music21Exception:
-        raise TempoException("could not find element1 in sourceStream")
+        raise TempoException('could not find element1 in sourceStream')
     try:
         startOffsetDest = element1.getOffsetBySite(destinationStream)
     except exceptions21.Music21Exception:
-        raise TempoException("could not find element1 in destinationStream")
+        raise TempoException('could not find element1 in destinationStream')
 
     try:
         endOffsetSrc = element2.getOffsetBySite(sourceStream)
     except exceptions21.Music21Exception:
-        raise TempoException("could not find element2 in sourceStream")
+        raise TempoException('could not find element2 in sourceStream')
     try:
         endOffsetDest = element2.getOffsetBySite(destinationStream)
     except exceptions21.Music21Exception:
-        raise TempoException("could not find element2 in destinationStream")
+        raise TempoException('could not find element2 in destinationStream')
 
     scaleAmount = ((endOffsetDest - startOffsetDest + 0.0) / (endOffsetSrc - startOffsetSrc + 0.0))
 
@@ -1313,8 +1314,9 @@ def interpolateElements(element1, element2, sourceStream,
                 destinationOffset = (scaleAmount * (elOffsetSrc - startOffsetSrc)) + startOffsetDest
                 destinationStream.insert(destinationOffset, el)
             else:
-                raise TempoException("Could not find element " +
-                    "%s with id %r in destinationStream and autoAdd is false" % (repr(el), el.id))
+                raise TempoException('Could not find element '
+                    + '%s with id %r ' % (repr(el), el.id)
+                    + 'in destinationStream and autoAdd is false')
         else:
             destinationOffset = (scaleAmount * (elOffsetSrc - startOffsetSrc)) + startOffsetDest
             el.setOffsetBySite(destinationStream, destinationOffset)
@@ -1350,8 +1352,8 @@ class Test(unittest.TestCase):
         MM1 = MetronomeMark(number=60, referent=note.Note(type='quarter'))
         self.assertEqual(MM1.number, 60)
 
-        TM1 = TempoText("Lebhaft")
-        self.assertEqual(TM1.text, "Lebhaft")
+        TM1 = TempoText('Lebhaft')
+        self.assertEqual(TM1.text, 'Lebhaft')
 
 
     def testUnicode(self):
@@ -1360,13 +1362,13 @@ class Test(unittest.TestCase):
 
         #environLocal.printDebug(['testing tempo instantion', tm])
 
-        unused_tm = TempoText("adagio")
-        mm = MetronomeMark("adagio")
+        unused_tm = TempoText('adagio')
+        mm = MetronomeMark('adagio')
         self.assertEqual(mm.number, 56)
         self.assertEqual(mm.numberImplicit, True)
 
         self.assertEqual(mm.number, 56)
-        tm2 = TempoText("très vite")
+        tm2 = TempoText('très vite')
 
         self.assertEqual(tm2.text, 'très vite')
         mm = tm2.getMetronomeMark()
@@ -1480,7 +1482,7 @@ class Test(unittest.TestCase):
         m1 = stream.Measure()
         m1.repeatAppend(note.Note(quarterLength=1), 4)
         m2 = copy.deepcopy(m1)
-        mm1 = TempoText("slow")
+        mm1 = TempoText('slow')
         m1.insert(0, mm1)
         mm2 = MetronomeMark(number=150, referent=.5)
         m2.insert(0, mm2)
@@ -1500,7 +1502,7 @@ class Test(unittest.TestCase):
         m2 = copy.deepcopy(m1)
         m3 = copy.deepcopy(m2)
 
-        mm1 = MetronomeMark("slow")
+        mm1 = MetronomeMark('slow')
         m1.insert(0, mm1)
 
         mm2 = MetricModulation()
@@ -1696,7 +1698,7 @@ class Test(unittest.TestCase):
 
     def testStylesAreShared(self):
         halfNote = note.Note(type='half')
-        mm = MetronomeMark("slow", 40, halfNote)
+        mm = MetronomeMark('slow', 40, halfNote)
         mm.style.justify = 'left'
         self.assertIs(mm._tempoText.style, mm.style)
         self.assertIs(mm._tempoText._textExpression.style, mm.style)
@@ -1706,7 +1708,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [MetronomeMark, TempoText, MetricModulation, interpolateElements]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test) #, runTest='testStylesAreShared')
 

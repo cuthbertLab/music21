@@ -76,15 +76,14 @@ class ModuleIterator(Iterator):
     'music21.alpha.__init__'
     'music21.alpha.analysis.__init__'
     'music21.alpha.analysis.search'
-    'music21.alpha.chant'
-    'music21.alpha.contour'
+    'music21.analysis.__init__'
+    'music21.analysis.correlate'
     '''
 
     ### CLASS VARIABLES ###
 
     _ignoredDirectoryNames = (
         'archive',
-        'demos',
         'ext',
         'server',
         'source',
@@ -238,9 +237,9 @@ class FunctionIterator(Iterator):
     ('music21.abcFormat.translate', 'parseTokens')
     ('music21.abcFormat.translate', 'reBar')
     ('music21.alpha.analysis.search', 'findConsecutiveScale')
-    ('music21.alpha.chant', 'fromStream')
-    ('music21.alpha.counterpoint.species', 'getRandomCF')
-    ('music21.alpha.medren', 'breakMensuralStreamIntoBrevisLengths')
+    ('music21.analysis.discrete', 'analysisClassFromMethodName')
+    ('music21.analysis.discrete', 'analyzeStream')
+    ('music21.analysis.elements', 'attributeCount')
     '''
 
     ### SPECIAL METHODS ###

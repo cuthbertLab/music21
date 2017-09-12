@@ -62,7 +62,7 @@ from music21.figuredBass import realizerScale
 from music21.figuredBass import rules
 from music21.figuredBass import segment
 
-_MOD = 'realizer.py'
+_MOD = 'figuredBass.realizer'
 
 def figuredBassFromStream(streamPart):
     '''
@@ -532,7 +532,7 @@ class Realization:
                         are represented in keyboard style, with two staves. If False,
                         realizations are represented in chorale style with n staves,
                         where n is the number of parts. SATB if n = 4.'''}
-    
+
     def __init__(self, **fbLineOutputs):
         # fbLineOutputs always will have three elements, checks are for sphinx documentation only.
         if 'realizedSegmentList' in fbLineOutputs:

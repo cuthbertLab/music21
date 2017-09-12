@@ -56,8 +56,7 @@ from music21 import exceptions21
 
 from music21.abcFormat import translate
 
-_MOD = 'abc'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('abcFormat')
 
 # for implementation
 # see http://abcnotation.com/abc2mtex/abc.txt
@@ -1036,7 +1035,6 @@ class ABCSlurStart(ABCToken):
     ABCSlurStart tokens always precede the notes in a slur.
     For nested slurs, each open parenthesis gets its own token.
     '''
-
     def __init__(self, src):
         super().__init__(src)
         self.slurObj = None
@@ -1058,10 +1056,6 @@ class ABCParenStop(ABCToken):
     A general parenthesis stop;
     comes at the end of a tuplet, slur, or dynamic marking.
     '''
-
-    def __init__(self, src):
-        super().__init__(src)
-
     def __repr__(self):
         return '<music21.abcFormat.ABCParenStop %r>' % self.src
 

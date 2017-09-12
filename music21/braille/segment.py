@@ -25,6 +25,7 @@ and will henceforth be referred to as BMTM.
 
 import collections
 import copy
+import enum
 import unittest
 
 from music21 import bar
@@ -48,8 +49,6 @@ from music21.braille import text
 from music21.braille.objects import BrailleTranscriptionHelper
 
 from music21.common import opFrac
-
-import enum
 
 symbols = lookup.symbols
 
@@ -1929,7 +1928,7 @@ def prepareBeamedNotes(music21Measure):
     True
     """
     allNotes = music21Measure.notes.stream()
-    
+
     for sampleNote in allNotes:
         sampleNote.beamStart = False
         sampleNote.beamContinue = False
