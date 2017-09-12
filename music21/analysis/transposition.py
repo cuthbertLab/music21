@@ -32,11 +32,6 @@ class TranspositionChecker:
     >>> tc = analysis.transposition.TranspositionChecker(pList)
     >>> tc.numDistinctTranspositions()
     4
-<<<<<<< HEAD
-    
-=======
-
->>>>>>> cuthbertLab/master
     >>> allNormalOrderPitchTuples = tc.getPitchesOfDistinctTranspositions()
     >>> allNormalOrderPitchTuples
     [(<music21.pitch.Pitch C>, <music21.pitch.Pitch E>,
@@ -47,11 +42,6 @@ class TranspositionChecker:
                                          <music21.pitch.Pitch A#>),
      (<music21.pitch.Pitch E->, <music21.pitch.Pitch G>,
                                          <music21.pitch.Pitch B>)]
-<<<<<<< HEAD
-                                         
-=======
-
->>>>>>> cuthbertLab/master
     >>> myChord = chord.Chord(['C', 'E-', 'F#', 'A'])
     >>> pList = myChord.pitches
     >>> tc = analysis.transposition.TranspositionChecker(pList)
@@ -80,23 +70,6 @@ class TranspositionChecker:
     def getTranspositions(self):
         '''
         Gets all 12 transpositions (distinct or otherwise)
-<<<<<<< HEAD
-        
-        >>> p = [pitch.Pitch('D#')]
-        >>> tc = analysis.transposition.TranspositionChecker(p)
-        >>> tc.getTranspositions()
-        [[<music21.pitch.Pitch E->], 
-            [<music21.pitch.Pitch E>], 
-            [<music21.pitch.Pitch F>], 
-            [<music21.pitch.Pitch F#>], 
-            [<music21.pitch.Pitch G>], 
-            [<music21.pitch.Pitch G#>], 
-            [<music21.pitch.Pitch A>], 
-            [<music21.pitch.Pitch B->], 
-            [<music21.pitch.Pitch B>], 
-            [<music21.pitch.Pitch C>], 
-            [<music21.pitch.Pitch C#>], 
-=======
 
         >>> p = [pitch.Pitch('D#')]
         >>> tc = analysis.transposition.TranspositionChecker(p)
@@ -112,7 +85,6 @@ class TranspositionChecker:
             [<music21.pitch.Pitch B>],
             [<music21.pitch.Pitch C>],
             [<music21.pitch.Pitch C#>],
->>>>>>> cuthbertLab/master
             [<music21.pitch.Pitch D>]]
         '''
         allTranspositions = []
@@ -127,11 +99,7 @@ class TranspositionChecker:
     def listNormalOrders(self):
         '''
         List the normal orders for all 12 transpositions
-<<<<<<< HEAD
-        
-=======
 
->>>>>>> cuthbertLab/master
         >>> pList = [pitch.Pitch('C4'), pitch.Pitch('E4'), pitch.Pitch('G#4')]
         >>> tc = analysis.transposition.TranspositionChecker(pList)
         >>> tc.listNormalOrders()
@@ -139,11 +107,6 @@ class TranspositionChecker:
          [0, 4, 8], [1, 5, 9], [2, 6, 10], [3, 7, 11],
          [0, 4, 8], [1, 5, 9], [2, 6, 10], [3, 7, 11]]
         '''
-<<<<<<< HEAD
-        
-=======
-
->>>>>>> cuthbertLab/master
         if self.allTranspositions is None:
             self.getTranspositions()
         allTranspositions = self.allTranspositions
@@ -159,11 +122,7 @@ class TranspositionChecker:
     def listDistinctNormalOrders(self):
         '''
         List the distinct normal orders (without duplication).
-<<<<<<< HEAD
-        
-=======
 
->>>>>>> cuthbertLab/master
         >>> pList = [pitch.Pitch('C4'), pitch.Pitch('E4'), pitch.Pitch('G#4')]
         >>> tc = analysis.transposition.TranspositionChecker(pList)
         >>> tc.listDistinctNormalOrders()
@@ -181,11 +140,7 @@ class TranspositionChecker:
     def numDistinctTranspositions(self):
         '''
         Gives the number of distinct transpositions (normal orders).
-<<<<<<< HEAD
-        
-=======
 
->>>>>>> cuthbertLab/master
         >>> pList = [pitch.Pitch('C4'), pitch.Pitch('E4'), pitch.Pitch('G#4')]
         >>> tc = analysis.transposition.TranspositionChecker(pList)
         >>> tc.numDistinctTranspositions()
@@ -198,22 +153,14 @@ class TranspositionChecker:
     def getChordsOfDistinctTranspositions(self):
         '''
         Outputs chords for each distinct transposition (normal order).
-<<<<<<< HEAD
-        
-=======
 
->>>>>>> cuthbertLab/master
         >>> pList = [pitch.Pitch('C4'), pitch.Pitch('E4'), pitch.Pitch('G#4')]
         >>> tc = analysis.transposition.TranspositionChecker(pList)
         >>> tc.getChordsOfDistinctTranspositions()
         [<music21.chord.Chord C E G#>,
          <music21.chord.Chord C# F A>,
          <music21.chord.Chord D F# A#>,
-<<<<<<< HEAD
-         <music21.chord.Chord E- G B>]        
-=======
          <music21.chord.Chord E- G B>]
->>>>>>> cuthbertLab/master
         '''
         if self.distinctNormalOrders is None:
             self.listDistinctNormalOrders()
@@ -227,11 +174,7 @@ class TranspositionChecker:
     def getPitchesOfDistinctTranspositions(self):
         '''
         Outputs pitch tuples for each distinct transposition (normal order).
-<<<<<<< HEAD
-        
-=======
 
->>>>>>> cuthbertLab/master
         >>> pList = [pitch.Pitch('C4'), pitch.Pitch('E4'), pitch.Pitch('G#4')]
         >>> tc = analysis.transposition.TranspositionChecker(pList)
         >>> tc.getPitchesOfDistinctTranspositions()
