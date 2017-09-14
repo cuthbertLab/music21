@@ -3602,6 +3602,10 @@ class MeasureParser(XMLParserBase):
                 if tagSearch == 'slide':
                     gliss.slideType = 'continuous'
                 self.setLineStyle(mxObj, gliss)
+                if not mxObj.get('line-type') and tagSearch == 'slide':
+                    gliss.lineType = 'solid'
+                    gliss.style.lineType = 'solid'
+                
                 # TODO: attr bend-sound on <slide> only
                 self.setPrintStyle(mxObj, gliss)
                 _synchronizeIds(mxObj, gliss)

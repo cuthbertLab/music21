@@ -3012,7 +3012,12 @@ class MeasureExporter(XMLExporterBase):
             notations.append(mxSlur)
 
         for su in sb.getByClass('Glissando'):
-            mxGlissando = Element('glissando')
+            if su.slideType == 'continuous':
+                mxTag = 'slide'
+            else:
+                mxTag = 'glissando'
+            
+            mxGlissando = Element(mxTag)
             mxGlissando.set('number', str(su.idLocal))
             if su.lineType is not None:
                 mxGlissando.set('line-type', str(su.lineType))
