@@ -762,9 +762,9 @@ class XMLExporterBase:
             musicXMLNames = [musicXMLNames]
 
         if m21Names is None:
-            m21Names = musicXMLNames
+            m21Names = [common.hyphenToCamelCase(x) for x in musicXMLNames]
         elif not common.isIterable(m21Names):
-            m21Names = [m21Names]
+            m21Names = [common.hyphenToCamelCase(m21Names)]
 
         for xmlName, m21Name in zip(musicXMLNames, m21Names):
             try:
@@ -2994,6 +2994,14 @@ class MeasureExporter(XMLExporterBase):
             mxSlur = Element('slur')
             if su.isFirst(obj):
                 mxSlur.set('type', 'start')
+                self.setLineStyle(mxSlur, su)
+                self.setPosition(mxSlur, su)
+                self.setStyleAttributes(mxSlur, 
+                                        su,
+                                        ('bezier-offset', 'bezier-offset2',
+                                         'bezier-x', 'bezier-y',
+                                         'bezier-x2', 'bezier-y2'),
+                                        )
                 if su.placement is not None:
                     mxSlur.set('placement', str(su.placement))
             elif su.isLast(obj):
@@ -3902,6 +3910,8 @@ class MeasureExporter(XMLExporterBase):
             mxTied.set('line-type', t.style)
             # wavy is not supported as a tie type.
 
+        # Tie style needs to be dealt with after changes to Tie object...
+        
         # TODO: attrGroup: dashed-formatting
         # TODO: attrGroup: position
 

@@ -505,6 +505,23 @@ def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=
 
     >>> pitch.simplifyMultipleEnharmonics([6, 10, 1], keyContext=key.Key('C-'))
     [<music21.pitch.Pitch G->, <music21.pitch.Pitch B->, <music21.pitch.Pitch D->]
+    
+    
+    Note that if there's no key context, then we won't simplify everything (at least
+    for now; this behavior may change, ).
+    
+    >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('D--3'),
+    ...                                    pitch.Pitch('F-3'),
+    ...                                    pitch.Pitch('A--3')])
+    [<music21.pitch.Pitch D--3>, <music21.pitch.Pitch F-3>, <music21.pitch.Pitch A--3>]
+
+
+
+    >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('D--3'),
+    ...                                    pitch.Pitch('F-3'),
+    ...                                    pitch.Pitch('A--3')],
+    ...                                    keyContext=key.Key('C'))
+    [<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>]
     '''
 
     oldPitches = [p if isinstance(p, Pitch) else Pitch(p) for p in pitches]

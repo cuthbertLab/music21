@@ -310,9 +310,9 @@ class XMLParserBase:
             musicXMLNames = [musicXMLNames]
 
         if m21Names is None:
-            m21Names = musicXMLNames
+            m21Names = [common.hyphenToCamelCase(x) for x in musicXMLNames]
         elif not common.isIterable(m21Names):
-            m21Names = [m21Names]
+            m21Names = [common.hyphenToCamelCase(m21Names)]
 
         for xmlName, m21Name in zip(musicXMLNames, m21Names):
             mxValue = mxObject.get(xmlName)
@@ -360,8 +360,13 @@ class XMLParserBase:
         %line-shape, %line-type, %dashed-formatting (dash-length and space-length)
         '''
         musicXMLNames = ('line-shape', 'line-type', 'dash-length', 'space-length')
-        m21Names = ('lineShape', 'lineType', 'dashLength', 'spaceLength')
-        self.setStyleAttributes(mxObject, m21Object, musicXMLNames, m21Names)
+
+        if hasattr(m21Object, 'lineType'):
+            mxLineType = mxObject.get('line-type')
+            if mxLineType is not None:
+                m21Object.lineType = mxLineType
+        
+        self.setStyleAttributes(mxObject, m21Object, musicXMLNames)
 
     def setPrintStyleAlign(self, mxObject, m21Object):
         '''
@@ -433,6 +438,21 @@ class XMLParserBase:
         musicXMLNames = ('default-x', 'default-y', 'relative-x', 'relative-y')
         m21Names = ('absoluteX', 'absoluteY', 'relativeX', 'relativeY')
         self.setStyleAttributes(mxObject, m21Object, musicXMLNames, m21Names)
+
+    def setPlacement(self, mxObject, m21Object):
+        '''
+        Sets the placement for objects that have a .placement attribute
+        (most but not all spanners) and sets the style.placement for those
+        that don't.
+        '''
+        placement = mxObject.get('placement')
+        if placement is None:
+            return
+        
+        if hasattr(m21Object, 'placement'):
+            m21Object.placement = placement
+        else:
+            m21Object.style.placement = placement
 
 
     def setEditorial(self, mxObj, m21Obj):
@@ -3154,11 +3174,21 @@ class MeasureParser(XMLParserBase):
         >>> n.expressions[0].shape
         'angled'
         '''
-        # TODO: attr: print-object
+        # attr: print-object -- applies to all
+        printObjectValue = mxNotations.get('print-object')
+        if printObjectValue == 'no':
+            hideObject = True
+        else:
+            hideObject = False
+        
+        def optionalHideObject(obj):
+            if not hideObject:
+                return
+            obj.style.hideObjectOnPrint = True
+        
+        # tied is handled with tie
+        # tuplet is handled with time-modification.
 
-        # TODO: adjust tie with tied
-        # TODO: tuplet -- look of time-modification.
-        # TODO: slide
         # TODO: dynamics
         # TODO: arpeggiate
         # TODO: non-arpeggiate
@@ -3171,11 +3201,13 @@ class MeasureParser(XMLParserBase):
 
         for mxObj in flatten(mxNotations, 'technical'):
             technicalObj = self.xmlTechnicalToArticulation(mxObj)
+            optionalHideObject(technicalObj)
             if technicalObj is not None:
                 n.articulations.append(technicalObj)
 
         for mxObj in flatten(mxNotations, 'articulations'):
             articulationObj = self.xmlToArticulation(mxObj)
+            optionalHideObject(articulationObj)
             if articulationObj is not None:
                 n.articulations.append(articulationObj)
 
@@ -3183,6 +3215,7 @@ class MeasureParser(XMLParserBase):
         # get any fermatas, store on expressions
         for mxObj in mxNotations.findall('fermata'):
             fermata = expressions.Fermata()
+            optionalHideObject(fermata)
             self.setEditorial(mxNotations, fermata)
 
             ftype = mxObj.get('type')
@@ -3195,19 +3228,21 @@ class MeasureParser(XMLParserBase):
         for mxObj in flatten(mxNotations, 'ornaments'):
             if mxObj.tag in (xmlObjects.ORNAMENT_MARKS):
                 post = self.xmlOrnamentToExpression(mxObj)
+                optionalHideObject(post)
                 self.setEditorial(mxNotations, post)
                 if post is not None:
                     n.expressions.append(post)
                 #environLocal.printDebug(['adding to epxressions', post])
             elif mxObj.tag == 'wavy-line':
                 trillExtObj = self.xmlOneSpanner(mxObj, n, expressions.TrillExtension)
+                optionalHideObject(trillExtObj)
                 self.setEditorial(mxNotations, trillExtObj)
 
             elif mxObj.tag == 'tremolo':
                 trem = self.xmlToTremolo(mxObj, n)
+                optionalHideObject(trem)
                 self.setEditorial(mxNotations, trem)
-
-
+                
         # create spanners for rest
         self.xmlNotationsToSpanners(mxNotations, n)
 
@@ -3271,11 +3306,7 @@ class MeasureParser(XMLParserBase):
                 if mxObj.get('substitution') is not None:
                     tech.substitution = xmlObjects.yesNoToBoolean(mxObj.get('substitution'))
 
-
-            # print-style
-            placement = mxObj.get('placement')
-            if placement is not None:
-                tech.placement = placement
+            self.setPlacement(mxObj, tech)
             return tech
         else:
             environLocal.printDebug("Cannot translate %s in %s." % (tag, mxObj))
@@ -3366,9 +3397,7 @@ class MeasureParser(XMLParserBase):
             _synchronizeIds(mxObj, artic)
 
             self.setPrintStyle(mxObj, artic)
-            placement = mxObj.get('placement')
-            if placement is not None:
-                artic.placement = placement
+            self.setPlacement(mxObj, artic)
 
             # particular articulations have extra information.
             if tag == 'strong-accent':
@@ -3428,9 +3457,7 @@ class MeasureParser(XMLParserBase):
             return None
         self.setPrintStyle(mxObj, orn)
         # trill-sound?
-        placement = mxObj.get('placement')
-        if placement is not None:
-            orn.placement = placement
+        self.setPlacement(mxObj, orn)
         return orn
 
     def xmlDirectionTypeToSpanners(self, mxObj):
@@ -3534,6 +3561,7 @@ class MeasureParser(XMLParserBase):
 
                 if mxObj.tag == 'dashes':
                     sp.endTick = 'none'
+                    sp.lineType = 'dashed'
                 else:
                     sp.endTick = mxObj.get('line-end')
                     sp.endHeight = mxObj.get('end-length')
@@ -3550,26 +3578,35 @@ class MeasureParser(XMLParserBase):
 #                                    mxType, idFound])
         return returnList
 
-    def xmlNotationsToSpanners(self, mxNotations, n):
+    def xmlNotationsToSpanners(self, mxNotations, n):        
+        # todo mxNotations attr: print-object
+
         for mxObj in mxNotations.findall('slur'):
             slur = self.xmlOneSpanner(mxObj, n, spanner.Slur)
-            # TODO: attr line-type
-            # TODO: attr dashed-formatting
+            self.setLineStyle(mxObj, slur)
             self.setPosition(mxObj, slur)
-            # TODO: attr placement
+            self.setPlacement(mxObj, slur)
             # TODO: attr orientation
-            # TODO: attr bezier
+            self.setStyleAttributes(mxObj, 
+                                    slur,
+                                    ('bezier-offset', 'bezier-offset2',
+                                     'bezier-x', 'bezier-y',
+                                     'bezier-x2', 'bezier-y2')
+                                    )
             self.setColor(mxObj, slur)
 
 
-        for mxObj in mxNotations.findall('glissando'):
-            gliss = self.xmlOneSpanner(mxObj, n, spanner.Glissando)
-            # TODO: attr line-type
-            # TODO: attr dashed-formatting
-            self.setPrintStyle(mxObj, gliss)
-            _synchronizeIds(mxObj, gliss)
+        for tagSearch in ('glissando', 'slide'):
+            for mxObj in mxNotations.findall(tagSearch):
+                gliss = self.xmlOneSpanner(mxObj, n, spanner.Glissando)
+                if tagSearch == 'slide':
+                    gliss.slideType = 'continuous'
+                self.setLineStyle(mxObj, gliss)
+                # TODO: attr bend-sound on <slide> only
+                self.setPrintStyle(mxObj, gliss)
+                _synchronizeIds(mxObj, gliss)
 
-        # TODO: slide?
+
 
     def xmlToTremolo(self, mxTremolo, n):
         '''
@@ -3686,7 +3723,9 @@ class MeasureParser(XMLParserBase):
                 ['found unexpected arrangement of multiple tie types when '
                   + 'importing from musicxml:', typesFound])
 
-        # TODO: get everything else from <tied> besides line-style, placement, and orientation.
+        # TODO: get everything else from <tied> 
+        # besides line-style, placement, and orientation. such as bezier
+        # blocking on redoing tie.Tie to not use "style"
         mxNotations = mxNote.find('notations')
         if mxNotations != None:
             mxTiedList = mxNotations.findall('tied')
@@ -5417,7 +5456,7 @@ class Test(unittest.TestCase):
         ex = s.measures(2, 3) # this needs to get all spanners too
 
         # all spanners are referenced over; even ones that may not be relevant
-        self.assertEqual(len(ex.flat.spanners), 14)
+        self.assertEqual(len(ex.flat.spanners), 15)
         #ex.show()
 
         # slurs are on measures 2, 3
@@ -5425,6 +5464,7 @@ class Test(unittest.TestCase):
         # wavy lines on measures 6, 7
         # brackets etc. on measures 10-14
         # glissando on measure 16
+        # slide on measure 18 (= music21 Glissando)
 
 
     def testTextExpressionsA(self):
@@ -5916,7 +5956,10 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
         s = converter.parse(testPrimitive.spanners33a)
         #s.show()
-        self.assertEqual(len(s.flat.getElementsByClass('Glissando')), 1)
+        glisses = list(s.recurse().getElementsByClass('Glissando'))
+        self.assertEqual(len(glisses), 2)
+        self.assertEqual(glisses[0].slideType, 'chromatic')
+        self.assertEqual(glisses[1].slideType, 'continuous')
 
 
     def testImportDashes(self):
@@ -5925,7 +5968,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.spanners33a, forceSource=True, format='musicxml')
-        self.assertEqual(len(s.flat.getElementsByClass('Line')), 6)
+        self.assertEqual(len(s.recurse().getElementsByClass('Line')), 6)
 
 
     def testImportGraceA(self):

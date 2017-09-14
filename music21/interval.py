@@ -196,16 +196,13 @@ def convertDiatonicNumberToStep(dn):
     if dn == 0:
         return 'B', -1
     elif dn > 0:
-        octave = int((dn-1)/7.0)
-        stepNumber = (dn-1) - (octave * 7)
+        octave = int((dn - 1) / 7)
+        stepNumber = (dn - 1) - (octave * 7)
         return STEPNAMES[stepNumber], octave
 
-#        remainder, octave = math.modf((dn-1)/7.0)
-        # what is .001 doing here? -- A: prevents floating point errors
-#        return STEPNAMES[int((remainder*7)+.001)], int(octave)
     elif dn < 0:
-        octave = int((dn)/7.0)
-        stepNumber = (dn-1) - (octave * 7)
+        octave = int((dn) / 7.0)
+        stepNumber = (dn - 1) - (octave * 7)
         return STEPNAMES[stepNumber], (octave - 1)
 
 
@@ -477,7 +474,9 @@ def intervalToPythagoreanRatio(intervalObj):
 
     >>> iList = [interval.Interval(name) for name in ('P4', 'P5', 'M7')]
     >>> iList
-    [<music21.interval.Interval P4>, <music21.interval.Interval P5>, <music21.interval.Interval M7>]
+    [<music21.interval.Interval P4>, 
+     <music21.interval.Interval P5>, 
+     <music21.interval.Interval M7>]
 
     >>> [interval.intervalToPythagoreanRatio(i) for i in iList]
     [Fraction(4, 3), Fraction(3, 2), Fraction(243, 128)]
@@ -1326,8 +1325,9 @@ class DiatonicInterval(IntervalBase):
 
 class ChromaticInterval(IntervalBase):
     '''
-    Chromatic interval class. Unlike a :class:`~music21.interval.DiatonicInterval`, this Interval
-    class treats interval spaces in half-steps.  So Major 3rd and Diminished 4th are the same.
+    Chromatic interval class. Unlike a :class:`~music21.interval.DiatonicInterval`, 
+    this IntervalBase subclass treats interval spaces in half-steps.  
+    So Major 3rd and Diminished 4th are the same.
 
     Two ChromaticIntervals are equal if their size and direction are equal.
 
@@ -1623,18 +1623,8 @@ def notesToChromatic(n1, n2):
     >>> bInterval = interval.notesToChromatic(aPitch, bPitch)
     >>> bInterval
     <music21.interval.ChromaticInterval 15>
-
     '''
-    if hasattr(n1, 'pitch'):
-        p1 = n1.pitch
-    else:
-        p1 = n1
-
-    if hasattr(n2, 'pitch'):
-        p2 = n2.pitch
-    else:
-        p2 = n2
-
+    (p1, p2) = (_extractPitch(n1), _extractPitch(n2))
     return ChromaticInterval(p2.ps - p1.ps)
 
 

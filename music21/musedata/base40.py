@@ -8,7 +8,9 @@
 # Copyright:    Copyright © 2009-2010 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
+'''
+Implementation of Walter Hewlett's base40 system for musical intervals.
+'''
 import unittest
 from music21 import exceptions21
 

@@ -1753,11 +1753,14 @@ class Glissando(Spanner):
     Note -- not a Line subclass for now, but that might change.
     '''
     validLineTypes = ('solid', 'dashed', 'dotted', 'wavy')
+    validSlideTypes = ('chromatic', 'continuous', 'diatonic', 'white', 'black')
 
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
 
         self._lineType = 'wavy'
+        self._slideType = 'chromatic'
+
         self.label = None
 
         if 'lineType' in keywords:
@@ -1779,9 +1782,29 @@ class Glissando(Spanner):
         self._lineType = value.lower()
 
     lineType = property(_getLineType, _setLineType, doc='''
-        Get or set the lineType property. See Line for valid line types
+        Get or set the lineType property. See Line for valid line types.
         ''')
 
+    @property
+    def slideType(self):
+        '''
+        Get or set the slideType which determines how
+        the glissando or slide is to be played.  Values
+        are 'chromatic' (default), 'continuous' (like a slide or smear),
+        'diatonic' (like a harp gliss), 'white' (meaning a white-key gliss
+        as on a marimba), or 'black' (black-key gliss).
+        
+        'continuous' slides export to MusicXML as a <slide> object.
+        All others export as <glissando>.
+        '''
+        return self._slideType
+
+    @slideType.setter
+    def slideType(self, value):
+        if value.lower() not in self.validSlideTypes:
+            raise SpannerException('not a valid value: %s' % value)
+        self._slideType = value.lower()
+    
 #-------------------------------------------------------------------------------
 
 
