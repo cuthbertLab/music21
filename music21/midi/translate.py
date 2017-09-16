@@ -2854,7 +2854,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.flat.getElementsByClass('Chord')), 4)
 
     def testMidiEventsImported(self):
-
+        self.maxDiff = None
         from music21 import corpus
 
         def procCompare(mf, match):
@@ -2879,7 +2879,7 @@ class Test(unittest.TestCase):
                  (0, 'KEY_SIGNATURE', None),
                  (0, 'TIME_SIGNATURE', None),
                  (0, 'NOTE_ON', 69),
-                 (0, 'NOTE_OFF', 69),
+                 (1024, 'NOTE_OFF', 69),
                  (0, 'NOTE_ON', 71),
                  (1024, 'NOTE_OFF', 71),
                  (0, 'NOTE_ON', 73),

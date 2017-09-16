@@ -136,7 +136,7 @@ class StreamPlayer:  # pragma: no cover
                 "Could not play music file %s because: %s" % (stringIOFile,
                                                               self.pygame.get_error()))
         self.pygame.mixer.music.play()
-        framerate = int(1000/busyWaitMilliseconds) # coerce into int even if given a float.
+        framerate = int(1000 / busyWaitMilliseconds) # coerce into int even if given a float.
 
         while self.pygame.mixer.music.get_busy():
             if busyFunction is not None:
