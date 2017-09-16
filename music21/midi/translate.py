@@ -36,7 +36,7 @@ class TranslateException(exceptions21.Music21Exception):
 #-------------------------------------------------------------------------------
 # Durations
 
-def offsetToMidi(o, addStartDelay=True):
+def offsetToMidi(o, addStartDelay=False):
     '''
     Helper function to convert a music21 offset value to MIDI ticks,
     depends on *defaults.ticksPerQuarter* and *defaults.ticksAtStart*.
