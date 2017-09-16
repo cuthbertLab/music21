@@ -36,7 +36,7 @@ class TranslateException(exceptions21.Music21Exception):
 #-------------------------------------------------------------------------------
 # Durations
 
-def offsetToMidi(o, addStartDelay=True):
+def offsetToMidi(o, addStartDelay=False):
     '''
     Helper function to convert a music21 offset value to MIDI ticks,
     depends on *defaults.ticksPerQuarter* and *defaults.ticksAtStart*.
@@ -50,15 +50,15 @@ def offsetToMidi(o, addStartDelay=True):
 
 
     >>> midi.translate.offsetToMidi(0)
-    1024
-    >>> midi.translate.offsetToMidi(0, addStartDelay=False)
     0
+    >>> midi.translate.offsetToMidi(0, addStartDelay=True)
+    1024
 
     >>> midi.translate.offsetToMidi(1)
-    2048
+    1024
 
     >>> midi.translate.offsetToMidi(20.5)
-    22016
+    20992
     '''
     ticks =  int(round(o * defaults.ticksPerQuarter))
     if addStartDelay:
@@ -2878,8 +2878,8 @@ class Test(unittest.TestCase):
                  (0, 'PROGRAM_CHANGE', None),
                  (0, 'KEY_SIGNATURE', None),
                  (0, 'TIME_SIGNATURE', None),
-                 (1024, 'NOTE_ON', 69),
-                 (1024, 'NOTE_OFF', 69),
+                 (0, 'NOTE_ON', 69),
+                 (0, 'NOTE_OFF', 69),
                  (0, 'NOTE_ON', 71),
                  (1024, 'NOTE_OFF', 71),
                  (0, 'NOTE_ON', 73),
