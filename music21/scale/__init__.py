@@ -270,7 +270,7 @@ class AbstractScale(Scale):
         for p in pitchList:
             if isinstance(p, str):
                 pitchListReal.append(pitch.Pitch(p))
-            elif hasattr(p, 'classes') and 'GeneralNote' in p.classes:
+            elif hasattr(p, 'classes') and 'Note' in p.classes:
                 pitchListReal.append(p.pitch)
             else: # assume this is a pitch object
                 pitchListReal.append(p)
@@ -301,7 +301,7 @@ class AbstractScale(Scale):
                 while p.ps < pitchList[-1].ps:
                     p.octave += 1
             else:
-                while p.ps < pitchList[-1].ps:
+                while p.ps > pitchList[-1].ps:
                     p.octave += -1
 
             intervalList.append(interval.notesToInterval(pitchList[-1], p))
@@ -374,7 +374,8 @@ class AbstractScale(Scale):
 
 
     def getDegreeMaxUnique(self):
-        '''Return the maximum number of scale steps, or the number to use as a
+        '''
+        Return the maximum number of scale steps, or the number to use as a
         modulus.
         '''
         # access from property
@@ -480,7 +481,6 @@ class AbstractScale(Scale):
         in `intervalNetwork.IntervalNetwork`.
 
         Create an abstract pentatonic scale:
-
 
         >>> pitchList = ["C#4", "D#4", "F#4", "G#4", "A#4"]
         >>> absc = scale.AbstractScale()
@@ -605,30 +605,6 @@ class AbstractScale(Scale):
                 environLocal.launch(format, returnedFilePath, app=app)
                 return
         Scale.show(self, fmt=fmt, app=app)
-
-    @property
-    def networkxGraph(self):
-        '''
-        Return a networks Graph object representing a realized version
-        of this :class:`~music21.intervalNetwork.IntervalNetwork`
-        '''
-        return self._net.getNetworkxGraph()
-
-    def plot(self, *args, **keywords):
-        '''
-        Create and display a plot.
-        '''
-        # import is here to avoid import of matplotlib problems
-        from music21 import graph
-        # first ordered arg can be method type
-        g = graph.primitives.GraphNetworxGraph(networkxGraph=self.networkxGraph, *args, **keywords)
-            # for pitched version
-            #networkxGraph=self._getNetworkxRealizedGraph(pitchObj=pitchObj,
-            #    nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch))
-        g.process()
-
-
-
 
 #-------------------------------------------------------------------------------
 # abstract subclasses
@@ -3536,30 +3512,12 @@ class Test(unittest.TestCase):
         #s.show()
 
 
-
-    def testPlot(self):
-
-        try:
-            import networkx
-        except ImportError:
-            networkx = None # use for testing
-
-        if networkx is not None:
-            amms = AbstractMelodicMinorScale()
-            amms.plot(doneAction=None)
-
-
     def testPlagalModes(self):
-
         hs = HypophrygianScale('c4')
         self.assertEqual(self.pitchOut(hs.pitches), '[G3, A-3, B-3, C4, D-4, E-4, F4, G4]')
-
         self.assertEqual(str(hs.pitchFromDegree(1)), 'G3')
 
-
-
     def testRagAsawara(self):
-
         sc = RagAsawari('c4')
         self.assertEqual(str(sc.pitchFromDegree(1)), 'C4')
 

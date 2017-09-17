@@ -494,7 +494,8 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl.inwardContraryMotion()
         False
         '''
-        return self.contraryMotion() and self.hIntervals[0].direction == 1
+        return (self.contraryMotion() 
+                and self.hIntervals[0].direction == interval.Direction.ASCENDING)
 
     def inwardContraryMotion(self):
         '''
@@ -510,7 +511,8 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl.outwardContraryMotion()
         False
         '''
-        return self.contraryMotion() and self.hIntervals[0].direction == -1
+        return (self.contraryMotion() 
+                and self.hIntervals[0].direction == interval.Direction.DESCENDING)
 
     def antiParallelMotion(self, simpleName=None):
         '''Returns True if the simple interval before is the same as the simple
@@ -575,7 +577,8 @@ class VoiceLeadingQuartet(base.Music21Object):
                 return False
 
     def parallelInterval(self, thisInterval):
-        '''Returns true if there is a parallel motion or antiParallel motion of
+        '''
+        Returns true if there is a parallel motion or antiParallel motion of
         this type (thisInterval should be an Interval object)
 
         >>> n11 = note.Note("C4")
@@ -609,11 +612,14 @@ class VoiceLeadingQuartet(base.Music21Object):
 
         if not (self.parallelMotion() or self.antiParallelMotion()):
             return False
+
+        if isinstance(thisInterval, str):
+            thisInterval = interval.Interval(thisInterval)
+            
+        if self.vIntervals[0].semiSimpleName == thisInterval.semiSimpleName:
+            return True
         else:
-            if self.vIntervals[0].semiSimpleName == thisInterval.semiSimpleName:
-                return True
-            else:
-                return False
+            return False
 
     def parallelFifth(self):
         '''
@@ -715,7 +721,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         Returns boolean.
         '''
 
-        return self.parallelOctave() or self.parallelUnison()
+        return self.parallelUnison() or self.parallelOctave()
 
     def hiddenInterval(self, thisInterval):
         '''N.b. -- this method finds ALL hidden intervals,
@@ -748,6 +754,9 @@ class VoiceLeadingQuartet(base.Music21Object):
         elif not self.similarMotion():
             return False
         else:
+            if isinstance(thisInterval, str):
+                thisInterval = interval.Interval(thisInterval)
+
             if self.vIntervals[1].simpleName == thisInterval.simpleName:
                 return True
             else:
