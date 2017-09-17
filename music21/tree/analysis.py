@@ -186,7 +186,7 @@ class Horizontality(collections.Sequence):
 #     def hasHiddenOctave(self):
 #         pass
 #
-#     def hasImproperResolution(self):
+#     def hasProperResolution(self):
 #         pass
 #
 #     def hasInwardContraryMotion(self):

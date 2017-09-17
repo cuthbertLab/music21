@@ -80,7 +80,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                  'hIntervals': '''list of the two melodic intervals present,
                      v1n1 to v1n2 and v2n1 to v2n2'''}
 
-    def __init__(self, v1n1=None, v1n2=None, v2n1=None, v2n2=None, analyticKey=key.Key('C')):
+    def __init__(self, v1n1=None, v1n2=None, v2n1=None, v2n2=None, analyticKey=None):
         super().__init__()
         if not intervalCache:
             # populate interval cache if not done yet
@@ -120,7 +120,6 @@ class VoiceLeadingQuartet(base.Music21Object):
     def _getKey(self):
         return self._key
 
-
     def _setKey(self, keyValue):
         if isinstance(keyValue, str):
             try:
@@ -141,11 +140,11 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     key = property(_getKey, _setKey, doc='''
         set the key of this voiceleading quartet, for use in theory analysis routines
-        such as closesIncorrectly. The default key is C major
+        such as closesIncorrectly. Can be None
 
         >>> vlq = voiceLeading.VoiceLeadingQuartet('D', 'G', 'B', 'G')
-        >>> vlq.key
-        <music21.key.Key of C major>
+        >>> vlq.key is None
+        True
         >>> vlq.key = 'G'
         >>> vlq.key
         <music21.key.Key of G major>
@@ -195,7 +194,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl = voiceLeading.VoiceLeadingQuartet('C', 'D', 'E', 'F')
         >>> vl.v1n2
         <music21.note.Note D>
-
         ''')
 
 
@@ -297,7 +295,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.noMotion()
         False
-
         '''
         for iV in self.hIntervals:
             if iV.name != "P1":
@@ -308,7 +305,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         '''
         Returns true if one voice remains the same and another moves.  i.e.,
         noMotion must be False if obliqueMotion is True.
-
 
         >>> n1 = note.Note('G4')
         >>> n2 = note.Note('G4')
@@ -325,7 +321,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.obliqueMotion()
         False
-
         '''
         if self.noMotion():
             return False
@@ -342,7 +337,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         Returns true if the two voices both move in the same direction.
         Parallel Motion will also return true, as it is a special case of
         similar motion. If there is no motion, returns False.
-
 
         >>> n1 = note.Note('G4')
         >>> n2 = note.Note('G4')
@@ -373,7 +367,8 @@ class VoiceLeadingQuartet(base.Music21Object):
                 return False
 
     def parallelMotion(self, requiredInterval=None):
-        '''Returns True if both voices move with the same interval or an
+        '''
+        Returns True if both voices move with the same interval or an
         octave duplicate of the interval.  If requiredInterval is given
         then returns True only if the parallel interval is that simple interval.
 
@@ -494,7 +489,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl.inwardContraryMotion()
         False
         '''
-        return (self.contraryMotion() 
+        return (self.contraryMotion()
                 and self.hIntervals[0].direction == interval.Direction.ASCENDING)
 
     def inwardContraryMotion(self):
@@ -511,7 +506,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl.outwardContraryMotion()
         False
         '''
-        return (self.contraryMotion() 
+        return (self.contraryMotion()
                 and self.hIntervals[0].direction == interval.Direction.DESCENDING)
 
     def antiParallelMotion(self, simpleName=None):
@@ -615,7 +610,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
         if isinstance(thisInterval, str):
             thisInterval = interval.Interval(thisInterval)
-            
+
         if self.vIntervals[0].semiSimpleName == thisInterval.semiSimpleName:
             return True
         else:
@@ -774,14 +769,14 @@ class VoiceLeadingQuartet(base.Music21Object):
         '''
         return self.hiddenInterval(self.octave)
 
-    def improperResolution(self):
+    def isProperResolution(self):
         '''
         Checks whether the voice-leading quartet resolves correctly according to standard
-        counterpoint rules. If the first harmony is dissonant (d5, A4, or m7) it checks
+        counterpoint rules. If the first harmony is dissonant (P4, d5, A4, or m7) it checks
         that these are correctly resolved. If the first harmony is consonant, True is returned.
 
         The key parameter should be specified to check for motion in the bass from specific
-        note degrees. Default key is C Major.
+        note degrees. If it is not set, then no checking for scale degrees takes place.
 
         Diminished Fifth: in by contrary motion to a third, with 7 resolving up to 1 in the bass
         Augmented Fourth: out by contrary motion to a sixth, with chordal seventh resolving
@@ -793,64 +788,119 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> m1 = note.Note('E4')
         >>> m2 = note.Note('F4')
         >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
-        >>> vl.improperResolution() #d5
+        >>> vl.isProperResolution() # d5 resolves inward
         True
+        >>> m2.pitch.name = 'D'
+        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.isProperResolution() # d5 resolves outward
+        False
+        >>> vl.key = 'B-'
+        >>> vl.isProperResolution() # not on scale degrees that need resolution
+        True
+
 
         >>> n1 = note.Note('E5')
         >>> n2 = note.Note('F5')
         >>> m1 = note.Note('B-4')
         >>> m2 = note.Note('A4')
         >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
-        >>> vl.improperResolution() #A4
+        >>> vl.isProperResolution() # A4 resolves outward
         True
+        >>> m2.pitch.nameWithOctave = 'D5'
+        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.isProperResolution() # A4 resolves inward
+        False
+        >>> vl.key = 'B-'
+        >>> vl.isProperResolution() # A4 not on scale degrees that need resolution
+        True
+        >>> vl.key = 'F'
+        >>> vl.isProperResolution() # A4 on scale degrees that need resolution
+        False
 
         >>> n1 = note.Note('B-4')
         >>> n2 = note.Note('A4')
         >>> m1 = note.Note('C4')
         >>> m2 = note.Note('F4')
         >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
-        >>> vl.improperResolution() #m7
+        >>> vl.isProperResolution() # m7
         True
-
-        >>> n1 = note.Note('C4')
-        >>> n2 = note.Note('D4')
-        >>> m1 = note.Note('F4')
-        >>> m2 = note.Note('G4')
+        >>> m2.pitch.nameWithOctave = 'F3'
         >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
-        >>> vl.improperResolution() #not dissonant, true returned
+        >>> vl.isProperResolution() # m7 with similar motion
         False
+        >>> vl.key = 'B-'
+        >>> vl.isProperResolution() # m7 not on scale degrees that need resolution
+        True
+        >>> vl.key = 'F'
+        >>> vl.isProperResolution() # m7 on scale degrees that need resolution
+        False
+
+        P4 on the initial harmony must move down.
+
+        >>> n1 = note.Note('F5')
+        >>> n2 = note.Note('G5')
+        >>> m1 = note.Note('C4')
+        >>> m2 = note.Note('C4')
+        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.isProperResolution() # P4 must move down or remain static
+        False
+        >>> n2.step = 'E'
+        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> vl.isProperResolution() # P4 can move down by step or leap
+        True
 
         >>> vl = voiceLeading.VoiceLeadingQuartet('B-4', 'A4', 'C2', 'F2')
         >>> vl.key = key.Key('F')
-        >>> vl.improperResolution() # not dissonant, true returned
-        False
+        >>> vl.isProperResolution() # not dissonant, True returned
+        True
 
         Returns boolean.
         '''
         if self.noMotion():
-            return False
+            return True
 
-        scale = self.key.getScale()
-
-        if self.vIntervals[0].simpleName == 'd5':
-            return not (scale.getScaleDegreeFromPitch(self.v2n1) == 7
-                        and scale.getScaleDegreeFromPitch(self.v2n2) == 1
-                        and self.inwardContraryMotion()
-                        and self.vIntervals[1].generic.simpleUndirected == 3)
-
-        elif self.vIntervals[0].simpleName == 'A4':
-            return not (scale.getScaleDegreeFromPitch(self.v2n1) == 4
-                        and scale.getScaleDegreeFromPitch(self.v2n2) == 3
-                        and self.outwardContraryMotion()
-                        and self.vIntervals[1].generic.simpleUndirected == 6)
-
-        elif self.vIntervals[0].simpleName == 'm7':
-            return not (scale.getScaleDegreeFromPitch(self.v2n1) == 5
-                        and scale.getScaleDegreeFromPitch(self.v2n2) == 1
-                        and self.inwardContraryMotion()
-                        and self.vIntervals[1].generic.simpleUndirected == 3)
+        if self.key:
+            scale = self.key.getScale()
+            n1degree = scale.getScaleDegreeFromPitch(self.v2n1)
+            n2degree = scale.getScaleDegreeFromPitch(self.v2n2)
         else:
-            return False
+            scale = None
+            n1degree = None
+            n2degree = None
+
+        firstHarmony = self.vIntervals[0].simpleName
+        secondHarmony = self.vIntervals[1].generic.simpleUndirected
+
+        if firstHarmony == 'P4':
+            if self.v1n1 >= self.v1n2:
+                return True
+            else:
+                return False
+        elif firstHarmony == 'd5':
+            if scale and n1degree != 7:
+                return True
+            if scale and n2degree != 1:
+                return False
+            return (self.inwardContraryMotion()
+                        and secondHarmony == 3)
+
+        elif firstHarmony == 'A4':
+            if scale and n1degree != 4:
+                return True
+            if scale and n2degree != 3:
+                return False
+            return (self.outwardContraryMotion()
+                        and secondHarmony == 6)
+
+        elif firstHarmony == 'm7':
+            if scale and n1degree != 5:
+                return True
+            if scale and n2degree != 1:
+                return False
+            return (self.inwardContraryMotion()
+                        and secondHarmony == 3)
+        else:
+            return True
 
     def leapNotSetWithStep(self):
         '''

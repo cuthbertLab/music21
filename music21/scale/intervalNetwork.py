@@ -1297,9 +1297,14 @@ class IntervalNetwork:
         return (nodeObj.id, pitchReference.nameWithOctave,
                 minKey, maxKey, includeFirst)
 
-    def realizeAscending(self, pitchReference, nodeId=None,
-        minPitch=None, maxPitch=None, alteredDegrees=None,
-        fillMinMaxIfNone=False):
+    def realizeAscending(
+            self,
+            pitchReference,
+            nodeId=None,
+            minPitch=None,
+            maxPitch=None,
+            alteredDegrees=None,
+            fillMinMaxIfNone=False):
         '''
         Given a reference pitch, realize upwards to a maximum pitch.
 
@@ -1837,8 +1842,8 @@ class IntervalNetwork:
 
 
 
-    def realizePitch(self, pitchReference, nodeId=None, 
-                     minPitch=None, maxPitch=None, 
+    def realizePitch(self, pitchReference, nodeId=None,
+                     minPitch=None, maxPitch=None,
                      direction=DIRECTION_ASCENDING, alteredDegrees=None,
                      reverse=False):
         '''
@@ -1922,11 +1927,11 @@ class IntervalNetwork:
         # provide an arbitrary pitch refernece
         pitchReference = 'c4'
 
-        pList = self.realize(pitchReference=pitchReference, 
+        pList = self.realize(pitchReference=pitchReference,
                              nodeId=nodeId,
-                             minPitch=minPitch, 
+                             minPitch=minPitch,
                              maxPitch=maxPitch,
-                             direction=direction, 
+                             direction=direction,
                              alteredDegrees=alteredDegrees,
                              reverse=reverse)[0] # just return first component
 
@@ -2072,12 +2077,12 @@ class IntervalNetwork:
         return minPitch, maxPitch
 
     def realizePitchByDegree(
-            self, 
-            pitchReference, 
+            self,
+            pitchReference,
             nodeId=None,
             nodeDegreeTargets=(1,),
-            minPitch=None, 
-            maxPitch=None, 
+            minPitch=None,
+            maxPitch=None,
             direction=DIRECTION_ASCENDING,
             alteredDegrees=None
             ):
@@ -2479,11 +2484,14 @@ class IntervalNetwork:
         1
 
         '''
-        nId = self.getRelativeNodeId(pitchReference=pitchReference,
-            nodeName=nodeName, pitchTarget=pitchTarget,
+        nId = self.getRelativeNodeId(
+            pitchReference=pitchReference,
+            nodeName=nodeName,
+            pitchTarget=pitchTarget,
             comparisonAttribute=comparisonAttribute,
             alteredDegrees=alteredDegrees,
             direction=direction)
+
         if nId is None:
             return None
         else:
@@ -2502,7 +2510,6 @@ class IntervalNetwork:
         '''
         Given a reference pitch assigned to node id,
         determine the pitch for the target node degree.
-
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = scale.intervalNetwork.IntervalNetwork(edgeList)
@@ -3245,11 +3252,11 @@ class Test(unittest.TestCase):
                  {'id': 'terminusHigh', 'degree': 3},
                 )
 
-        edges = ({'interval':'m2', 
+        edges = ({'interval':'m2',
                   'connections':(
                         ['terminusLow', 0, 'bi'],
                     )},
-                {'interval':'M3', 
+                {'interval':'M3',
                  'connections':(
                         [0, 'terminusHigh', 'bi'],
                     )},
@@ -3467,5 +3474,3 @@ if __name__ == "__main__":
 
 #------------------------------------------------------------------------------
 # eof
-
-
