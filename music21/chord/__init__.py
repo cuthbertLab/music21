@@ -3677,6 +3677,9 @@ class Chord(note.NotRest):
         >>> c.chordTablesAddress
         ChordTableAddress(cardinality=3, forteClass=12, inversion=0, pcOriginal=2)
 
+        >>> c = chord.Chord('G#2 A2 D3 G3')
+        >>> c.chordTablesAddress
+        ChordTableAddress(cardinality=4, forteClass=6, inversion=0, pcOriginal=2)
         '''
         if self._chordTablesAddressNeedsUpdating:
             self._chordTablesAddress = chordTables.seekChordTablesAddress(self)
@@ -3984,11 +3987,27 @@ class Chord(note.NotRest):
         >>> c3.formatVectorString(c3.normalOrder)
         '<A25>'
 
+        OMIT_FROM_DOCS
+        
+        These were giving problems before:
+        
+        >>> chord.Chord('G#2 A2 D3 G3').normalOrder
+        [7, 8, 9, 2]
+
+        >>> chord.Chord('G3 D4 A-4 A4 C5 E5').normalOrder
+        [7, 8, 9, 0, 2, 4]
+
         '''
         cta = self.chordTablesAddress
-        pcOriginal = cta.pcOriginal
         transposedNormalForm = chordTables.addressToTransposedNormalForm(cta)
-        return [(pc + pcOriginal) % 12 for pc in transposedNormalForm]
+        orderedPCs = self.orderedPitchClasses
+        mustBePresentPCs = set(orderedPCs)
+        for transposeAmount in orderedPCs:
+            possibleNormalOrder = [(pc + transposeAmount) % 12 for pc in transposedNormalForm]
+            if set(possibleNormalOrder) == mustBePresentPCs:
+                return possibleNormalOrder
+        raise ChordException('Could not find a normalOrder for chord: ' 
+                             + str(self.orderedPitchClassesString))
 
     @property
     def normalOrderString(self):
