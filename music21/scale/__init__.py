@@ -2743,7 +2743,7 @@ class MelodicMinorScale(DiatonicScale):
     >>> sc = scale.MelodicMinorScale('e4')
     '''
     def __init__(self, tonic=None):
-        super().__init__(tonfic=tonic)
+        super().__init__(tonic=tonic)
         self.type = "melodic minor"
 
         # note: this changes the previously assigned AbstractDiatonicScale
