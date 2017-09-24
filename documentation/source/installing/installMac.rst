@@ -9,6 +9,21 @@ is probably the hardest part of the experience.
 Once you have that set, the rest should be much less painful.
 Trust us that it should work.
 
+
+Downloading Python 3 from python.org
+---------------------------------------
+
+Though Macs come with Python, it's a very old version.  We recommend 
+updating that by going to http://www.python.org/ and getting Python 3.6
+or later.
+
+(The `music21` team strongly recommends using the version of
+Python 3 from the python.org website and not the Conda version
+(or Enthought Canopy) because it is fully compatiable with 
+matplotlib.  If you have no plans on plotting functions, 
+feel free to use any flavor of Python 3.)
+
+
 Simple install on macOS Sierra or OS X El Capitan
 --------------------------------------------------
 
@@ -16,27 +31,15 @@ If you're on the newest versions of OS X, Sierra or El Capitan, then
 installation is very easy.  Open up "Terminal" in "Applications -> Utilities",
 then type at the prompt:
 
-     sudo pip install music21
+     sudo pip3 install music21
 
-it will prompt you for your password.  TADA: you have `music21` for Python 2.7.
-
-If you're not on El Cap, or if you want Python 3 (much better!) or something else
-comes up, just follow the instructions below *carefully* and you shouldn't
-have any problems.
+it will prompt you for your password.  TADA: you have `music21` for Python!
 
 To upgrade later, just do
 
-    sudo pip install --upgrade music21
+    sudo pip3 install --upgrade music21
 
-
-Downloading Python 3 from python.org
----------------------------------------
-
-The `music21` team strongly recommends using the version of
-Python 3 from the python.org website and not the Conda version
-(or Enthought Canopy) because it is fully compatiable with 
-matplotlib.  If you have no plans on plotting functions, 
-feel free to use any flavor of Python 3.
+(If you didn't install Python 3.6, then replace "pip3" with "pip"
 
 
 Starting Python and Checking the Version
@@ -46,56 +49,39 @@ Python is a simple but powerful programming language that `music21`
 is written in and in which you will write your own programs that 
 use `music21`.
 
-Mac OS X comes with Python, but if you have an older version of OS X
-(Leopard or earlier) it might not be a new enough version 
-to run `music21`. `Music21` requires Python 2.7 (2.7.3 or later) or Python 3.4 to 3.6. 
-
 To determine the Python version you have installed, open a 
 terminal (by going to Applications, then Utilities, and then 
-double clicking "Terminal") and enter the following command-line argument (don't type the "$")
+double clicking "Terminal") and enter the following command-line argument:
 
-    $ python -V
+    `python3 -V`
 
 it should display in Terminal something like the following:
 
 .. image:: images/macScreenPythonVersion.*
     :width: 650
 
-If it says 2.7.3 (possibly with a following number like
-2.7.10) or 3.4 or higher, you're okay.  If it says 2.4 or 2.5 or 2.6, 
+If it says 3.4 or higher (or possibly a number like 3.4.2), you're okay.  
+If it says 2.4 or 2.5 or 2.6, 
 go to http://www.python.org/download
 and download a newer version.  Multiple versions of Python can exist 
 on a single computer without any problems.
 
+Try typing:
 
-Download music21 
-----------------------------------------------
+    `2+2`
 
-Download the most-recent `music21` package by getting the first .tar.gz file
-from the following URL. 
+You should see `4`.  This means Python is working.  Now see if
+`music21` is working by typing:
 
-    https://github.com/cuthbertLab/music21/releases
+    `import music21`
+    
+Hopefully this should work fine.
 
-The newest version should be at the top.  ``Do not download`` the `-no-corpus`
-version of the file.
-
-Once it's downloaded, double-click the icon on your desktop named
-something like music21-4.0.0.tar.gz -- this will create a new directory
-on your desktop called something like "music21-4.0.0".  Look inside it.
-
-You will see the following files:
-
-.. image:: images/macScreenMusic21Folder.*
-    :width: 650
-
-If you're with us so far, you're halfway there.
+Exit python by typing `quit()`.
 
 
 Starting the Configuration Assistant
 -----------------------------------------------------
-
-The `music21` Configuration Assistant installs `music21` in a place where
-Python can find it and lets you configure `music21`. 
 
 Double click on the installer.command file to start. 
 This file should open a Terminal window and begin running the Configuration Assistant. 

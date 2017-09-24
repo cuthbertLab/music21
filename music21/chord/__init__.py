@@ -3997,6 +3997,8 @@ class Chord(note.NotRest):
         >>> chord.Chord('G3 D4 A-4 A4 C5 E5').normalOrder
         [7, 8, 9, 0, 2, 4]
 
+        >>> chord.Chord('E#3 A3 C#4').normalOrder
+        [1, 5, 9]
         '''
         cta = self.chordTablesAddress
         transposedNormalForm = chordTables.addressToTransposedNormalForm(cta)
