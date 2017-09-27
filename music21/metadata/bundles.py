@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #               Josiah Oberholtzer
 #
-# Copyright:    Copyright © 2010, 2012-14 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2010, 2012-14, '17 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
@@ -241,7 +241,7 @@ class MetadataBundle:
     <music21.metadata.bundles.MetadataBundle {25 entries}>
     >>> tripleMeterBundle = coreBundle.search('3/4')
     >>> tripleMeterBundle
-    <music21.metadata.bundles.MetadataBundle {1875 entries}>
+    <music21.metadata.bundles.MetadataBundle {1876 entries}>
     >>> bachBundle.intersection(tripleMeterBundle)
     <music21.metadata.bundles.MetadataBundle {6 entries}>
 
@@ -292,7 +292,7 @@ class MetadataBundle:
         <music21.metadata.bundles.MetadataBundle {25 entries}>
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1875 entries}>
+        <music21.metadata.bundles.MetadataBundle {1876 entries}>
         >>> bachBundle & tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {6 entries}>
 
@@ -551,7 +551,7 @@ class MetadataBundle:
         <music21.metadata.bundles.MetadataBundle {25 entries}>
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1875 entries}>
+        <music21.metadata.bundles.MetadataBundle {1876 entries}>
         >>> bachBundle - tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {19 entries}>
 
@@ -580,9 +580,9 @@ class MetadataBundle:
 
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1875 entries}>
+        <music21.metadata.bundles.MetadataBundle {1876 entries}>
         >>> bachBundle ^ tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1888 entries}>
+        <music21.metadata.bundles.MetadataBundle {1889 entries}>
 
         Returns a new metadata bundle.
         '''
@@ -921,7 +921,7 @@ class MetadataBundle:
 
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1875 entries}>
+        <music21.metadata.bundles.MetadataBundle {1876 entries}>
 
         >>> bachBundle.difference(tripleMeterBundle)
         <music21.metadata.bundles.MetadataBundle {19 entries}>
@@ -949,7 +949,7 @@ class MetadataBundle:
 
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1875 entries}>
+        <music21.metadata.bundles.MetadataBundle {1876 entries}>
 
         >>> bachBundle.intersection(tripleMeterBundle)
         <music21.metadata.bundles.MetadataBundle {6 entries}>
@@ -988,7 +988,7 @@ class MetadataBundle:
 
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1875 entries}>
+        <music21.metadata.bundles.MetadataBundle {1876 entries}>
 
         >>> bachBundle.isdisjoint(tripleMeterBundle)
         False
@@ -1270,9 +1270,9 @@ class MetadataBundle:
         <music21.metadata.bundles.MetadataBundle {25 entries}>
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1875 entries}>
+        <music21.metadata.bundles.MetadataBundle {1876 entries}>
         >>> bachBundle.symmetric_difference(tripleMeterBundle)
-        <music21.metadata.bundles.MetadataBundle {1888 entries}>
+        <music21.metadata.bundles.MetadataBundle {1889 entries}>
 
         Returns a new MetadataBundle.
         '''

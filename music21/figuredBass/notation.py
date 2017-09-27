@@ -545,21 +545,19 @@ class Modifier:
             pitchToAlter = copy.deepcopy(pitchToAlter)
         if self.accidental is None:
             return pitchToAlter
-        if self.accidental.alter == 0.0:
-            pitchToAlter.accidental = self.accidental
+        if self.accidental.alter == 0.0 or pitchToAlter.accidental is None:
+            pitchToAlter.accidental = copy.deepcopy(self.accidental)
         else:
-            if pitchToAlter.accidental is None:
-                pitchToAlter.accidental = self.accidental
-            else:
-                newAccidental = pitch.Accidental()
-                newAlter = pitchToAlter.accidental.alter + self.accidental.alter
-                try:
-                    newAccidental.set(newAlter)
-                    pitchToAlter.accidental = newAccidental
-                except pitch.AccidentalException:
-                    raise ModifierException("Resulting pitch accidental unsupported in music21.")
+            newAccidental = pitch.Accidental()
+            newAlter = pitchToAlter.accidental.alter + self.accidental.alter
+            try:
+                newAccidental.set(newAlter)
+                pitchToAlter.accidental = newAccidental
+            except pitch.AccidentalException:
+                raise ModifierException("Resulting pitch accidental unsupported in music21.")
 
-        return pitchToAlter
+        if not inPlace:
+            return pitchToAlter
 
 
 class ModifierException(exceptions21.Music21Exception):

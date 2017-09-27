@@ -1599,7 +1599,6 @@ def ensembleNameBySize(number):
     '''
     return the name of a generic ensemble with "number" players:
 
-
     >>> instrument.ensembleNameBySize(4)
     'quartet'
     >>> instrument.ensembleNameBySize(1)
@@ -1608,9 +1607,9 @@ def ensembleNameBySize(number):
     'treoctogetet'
     '''
     if number > 100:
-        raise InstrumentException('okay, youre on your own for this one buddy')
+        return 'large ensemble'
     elif number < 0:
-        raise InstrumentException('okay, youre on your own for this one buddy')
+        raise InstrumentException('okay, you are on your own for this one buddy')
     else:
         return ensembleNamesBySize[int(number)]
 
