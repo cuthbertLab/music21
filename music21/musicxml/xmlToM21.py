@@ -4134,9 +4134,12 @@ class MeasureParser(XMLParserBase):
         if barline.location == 'left':
             #environLocal.printDebug(['setting left barline', barline])
             m.leftBarline = barline
-        else:
+        elif barline.location == 'right':
             #environLocal.printDebug(['setting right barline', barline])
             m.rightBarline = barline
+        else: # middle barline
+            m.coreElementsChanged()
+            m.append(barline)
 
     def xmlToRepeat(self, mxBarline, inputM21=None):
         '''
@@ -4176,6 +4179,8 @@ class MeasureParser(XMLParserBase):
         location = mxBarline.get('location')
         if location is not None:
             r.location = location
+        else:
+            r.location = 'right' # default in musicxml 3.0
 
         mxRepeat = mxBarline.find('repeat')
         if mxRepeat is None:
@@ -4228,6 +4233,8 @@ class MeasureParser(XMLParserBase):
         location = mxBarline.get('location')
         if location is not None:
             b.location = location
+        else:
+            b.location = 'right' # default in musicxml 3.0
 
         if inputM21 is None:
             return b
