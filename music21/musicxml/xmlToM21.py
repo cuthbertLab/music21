@@ -4134,12 +4134,9 @@ class MeasureParser(XMLParserBase):
         if barline.location == 'left':
             #environLocal.printDebug(['setting left barline', barline])
             m.leftBarline = barline
-        elif barline.location == 'right':
+        else:
             #environLocal.printDebug(['setting right barline', barline])
             m.rightBarline = barline
-        else:
-            environLocal.printDebug(['not handling barline that is neither left nor right',
-                                     barline, barline.location])
 
     def xmlToRepeat(self, mxBarline, inputM21=None):
         '''
