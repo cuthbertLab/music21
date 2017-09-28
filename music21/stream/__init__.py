@@ -9715,6 +9715,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     {3.5} <music21.note.Note A>
             {8.0} <music21.stream.Measure 3 offset=8.0>
                 {0.0} <music21.note.Rest rest>
+                {4.0} <music21.bar.Barline style=final>
         {0.0} <music21.layout.ScoreLayout>
         >>> ce = c.voicesToParts()
         >>> ce.show('t')
@@ -9732,6 +9733,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 {3.0} <music21.note.Rest rest>
             {8.0} <music21.stream.Measure 3 offset=8.0>
                 {0.0} <music21.note.Rest rest>
+                {4.0} <music21.bar.Barline style=final>
         {0.0} <music21.stream.Part 0x109bbbcf8>
             {0.0} <music21.stream.Measure 1 offset=0.0>
                 {0.0} <music21.clef.BassClef>
