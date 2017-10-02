@@ -1541,13 +1541,15 @@ class LilypondConverter:
         >>> [str(lpc.lyMultipliedDurationFromDuration(c)) for c in components]
         ['1 ', '4 ']
         '''
-
-
         try:
             number_type = duration.convertTypeToNumber(durationObj.type) # module call
         except duration.DurationException as de:
             raise LilyTranslateException(
                 "DurationException for durationObject %s: %s" % (durationObj, de))
+
+        if number_type == 0:
+            raise LilyTranslateException(
+                'Cannot translate an object of zero duration %s' % durationObj)
 
         if number_type < 1:
             if number_type == 0.5:

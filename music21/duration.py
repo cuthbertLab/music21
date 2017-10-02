@@ -740,7 +740,8 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
 
 
 def convertTypeToNumber(dType):
-    '''Convert a duration type string (`dType`) to a numerical scalar representation that shows
+    '''
+    Convert a duration type string (`dType`) to a numerical scalar representation that shows
     how many of that duration type fits within a whole note.
 
     >>> duration.convertTypeToNumber('quarter')
@@ -751,6 +752,14 @@ def convertTypeToNumber(dType):
     1024.0
     >>> duration.convertTypeToNumber('maxima')
     0.125
+    
+    These other types give these results:
+    
+    >>> duration.convertTypeToNumber('zero')
+    0.0
+    >>> duration.convertTypeToNumber('complex')
+    Traceback (most recent call last):
+    music21.duration.DurationException: Could not determine durationNumber from None
     '''
     dTypeFound = None
     for num, typeName in typeFromNumDict.items():
