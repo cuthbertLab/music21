@@ -232,7 +232,7 @@ def opFrac(num):
     '''
     opFrac -> optionally convert a number to a fraction or back.
 
-    Important music21 2.x function for working with offsets and quarterLengths
+    Important music21 function for working with offsets and quarterLengths
 
     Takes in a number (or None) and converts it to a Fraction with denominator
     less than limitDenominator if it is not binary expressible; otherwise return a float.
@@ -257,9 +257,9 @@ def opFrac(num):
     65535
     >>> common.opFrac(3)
     3.0
-    >>> common.opFrac(1.0/3)
+    >>> common.opFrac(1/3)
     Fraction(1, 3)
-    >>> common.opFrac(1.0/4)
+    >>> common.opFrac(1/4)
     0.25
     >>> f = Fraction(1, 3)
     >>> common.opFrac(f + f + f)
