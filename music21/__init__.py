@@ -184,7 +184,7 @@ __version__ = VERSION_STR
 from music21.test.testRunner import mainTest
 
 #------------------------------------------------------------------------------
-# this bring all of our own __all__ names into the music21 package namespace
+# this brings all of our own __all__ names into the music21 package namespace
 from music21 import * # @UnresolvedImport # pylint: disable=wildcard-import
 
 #------------------------------------------------------------------------------

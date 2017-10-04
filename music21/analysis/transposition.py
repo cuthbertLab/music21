@@ -75,17 +75,17 @@ class TranspositionChecker:
         >>> tc = analysis.transposition.TranspositionChecker(p)
         >>> tc.getTranspositions()
         [[<music21.pitch.Pitch E->],
-            [<music21.pitch.Pitch E>],
-            [<music21.pitch.Pitch F>],
-            [<music21.pitch.Pitch F#>],
-            [<music21.pitch.Pitch G>],
-            [<music21.pitch.Pitch G#>],
-            [<music21.pitch.Pitch A>],
-            [<music21.pitch.Pitch B->],
-            [<music21.pitch.Pitch B>],
-            [<music21.pitch.Pitch C>],
-            [<music21.pitch.Pitch C#>],
-            [<music21.pitch.Pitch D>]]
+        [<music21.pitch.Pitch E>],
+        [<music21.pitch.Pitch F>],
+        [<music21.pitch.Pitch F#>],
+        [<music21.pitch.Pitch G>],
+        [<music21.pitch.Pitch G#>],
+        [<music21.pitch.Pitch A>],
+        [<music21.pitch.Pitch B->],
+        [<music21.pitch.Pitch B>],
+        [<music21.pitch.Pitch C>],
+        [<music21.pitch.Pitch C#>],
+        [<music21.pitch.Pitch D>]]
         '''
         allTranspositions = []
         for i in range(12):
