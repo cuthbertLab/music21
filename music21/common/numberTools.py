@@ -120,11 +120,11 @@ def numToIntOrFloat(value):
 
     Also can take in a string representing an int or float
 
-    >>> common.numToIntOrFloat("1.0")
+    >>> common.numToIntOrFloat('1.0')
     1
-    >>> common.numToIntOrFloat("1")
+    >>> common.numToIntOrFloat('1')
     1
-    >>> common.numToIntOrFloat("1.25")
+    >>> common.numToIntOrFloat('1.25')
     1.25
 
     :rtype: float
@@ -193,7 +193,7 @@ def _preFracLimitDenominator(n, d):
     >>> for i in range(50):
     ...     x = random.random()
     ...     if myWay(x) != theirWay(x):
-    ...         print("boo: %s, %s, %s" % (x, myWay(x), theirWay(x)))
+    ...         print('boo: %s, %s, %s' % (x, myWay(x), theirWay(x)))
 
     (n.b. -- nothing printed)
 
@@ -232,7 +232,7 @@ def opFrac(num):
     '''
     opFrac -> optionally convert a number to a fraction or back.
 
-    Important music21 2.x function for working with offsets and quarterLengths
+    Important music21 function for working with offsets and quarterLengths
 
     Takes in a number (or None) and converts it to a Fraction with denominator
     less than limitDenominator if it is not binary expressible; otherwise return a float.
@@ -257,9 +257,9 @@ def opFrac(num):
     65535
     >>> common.opFrac(3)
     3.0
-    >>> common.opFrac(1.0/3)
+    >>> common.opFrac(1/3)
     Fraction(1, 3)
-    >>> common.opFrac(1.0/4)
+    >>> common.opFrac(1/4)
     0.25
     >>> f = Fraction(1, 3)
     >>> common.opFrac(f + f + f)
@@ -318,7 +318,7 @@ def opFrac(num):
         else:
             return num # leave fraction alone
     else:
-        raise TypeError("Cannot convert num: %r" % num)
+        raise TypeError('Cannot convert num: %r' % num)
 
 
 
@@ -511,7 +511,7 @@ def strTrimFloat(floatNum, maxNum=4):
     >>> common.strTrimFloat(-5)
     '-5.0'
     '''
-    # variables called "off" because originally designed for offsets
+    # variables called 'off' because originally designed for offsets
     offBuildString = r'%.' + str(maxNum) + 'f'
     off = offBuildString % floatNum
     offDecimal = off.index('.')
@@ -687,7 +687,7 @@ def decimalToTuplet(decNum):
 
     flipNumerator = False
     if decNum <= 0:
-        raise ZeroDivisionError("number must be greater than zero")
+        raise ZeroDivisionError('number must be greater than zero')
     if decNum < 1:
         flipNumerator = True
         decNum = 1 / decNum
@@ -698,7 +698,7 @@ def decimalToTuplet(decNum):
     (jy, iy) = findSimpleFraction(working)
 
     if iy == 0:
-        raise Exception("No such luck")
+        raise Exception('No such luck')
 
     jy *= multiplier
     gcd = euclidGCD(int(jy), int(iy))
@@ -714,7 +714,7 @@ def decimalToTuplet(decNum):
 
 
 def unitNormalizeProportion(values):
-    """
+    '''
     Normalize values within the unit interval, where max is determined by the sum of the series.
 
 
@@ -732,7 +732,7 @@ def unitNormalizeProportion(values):
 
 
     :rtype: list(float)
-    """
+    '''
     # note: negative values should be shifted to positive region first
     summation = 0
     for x in values:
@@ -745,7 +745,7 @@ def unitNormalizeProportion(values):
     return unit
 
 def unitBoundaryProportion(series):
-    """
+    '''
     Take a series of parts with an implied sum, and create
     unit-interval boundaries proportional to the series components.
 
@@ -757,7 +757,7 @@ def unitBoundaryProportion(series):
 
 
     :rtype: list(tuple(float))
-    """
+    '''
     unit = unitNormalizeProportion(series)
     bounds = []
     summation = 0
@@ -903,7 +903,7 @@ def lcm(filterList):
     :rtype: int
     '''
     def _lcm(a, b):
-        """find lowest common multiple of a, b"""
+        '''find lowest common multiple of a, b'''
         # // forcers integer style division (no remainder)
         return abs(a * b) // euclidGCD(a, b)
 
@@ -1048,15 +1048,15 @@ def fromRoman(num, *, strictModern=False):
         value = ints[nums.index(c)]
         # If the next place holds a larger number, this value is negative.
         try:
-            nextvalue = ints[nums.index(inputRoman[i  + 1])]
-            if nextvalue > value and value in subtractionValues:
-                if strictModern and nextvalue >= value * 10:
+            nextValue = ints[nums.index(inputRoman[i  + 1])]
+            if nextValue > value and value in subtractionValues:
+                if strictModern and nextValue >= value * 10:
                     raise ValueError(
                         'input contains an invalid subtraction element (modern interpretation): '
                         + '%s' % num)
 
                 value *= -1
-            elif nextvalue > value:
+            elif nextValue > value:
                 raise ValueError(
                     'input contains an invalid subtraction element: %s' % num)
         except IndexError:
@@ -1075,9 +1075,7 @@ def fromRoman(num, *, strictModern=False):
 
 def toRoman(num):
     '''
-
     Convert a number from 1 to 3999 to a roman numeral
-
 
     >>> common.toRoman(2)
     'II'
@@ -1086,28 +1084,29 @@ def toRoman(num):
     >>> common.toRoman(1999)
     'MCMXCIX'
 
-    >>> common.toRoman("hi")
+    >>> common.toRoman('hi')
     Traceback (most recent call last):
     TypeError: expected integer, got <... 'str'>
 
     :rtype: str
     '''
     if not isinstance(num, int):
-        raise TypeError("expected integer, got %s" % type(num))
+        raise TypeError('expected integer, got %s' % type(num))
     if not 0 < num < 4000:
-        raise ValueError("Argument must be between 1 and 3999")
+        raise ValueError('Argument must be between 1 and 3999')
     ints = (1000, 900,  500, 400, 100,  90, 50,  40, 10,  9,   5,  4,   1)
     nums = ('M',  'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I')
-    result = ""
+    result = ''
     for i in range(len(ints)):
-        count = int(num/ ints[i])
+        count = int(num / ints[i])
         result += nums[i] * count
         num -= ints[i] * count
     return result
 
 
 def ordinalAbbreviation(value, plural=False):
-    '''Return the ordinal abbreviations for integers
+    '''
+    Return the ordinal abbreviations for integers
 
     >>> common.ordinalAbbreviation(3)
     'rd'
@@ -1195,11 +1194,9 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [fromRoman, toRoman]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof
-
-

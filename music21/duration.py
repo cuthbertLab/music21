@@ -703,6 +703,9 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
     >>> tup = duration.Tuplet(numberNotesActual=5, numberNotesNormal=4)
     >>> duration.convertTypeToQuarterLength('quarter', 0, [tup])
     Fraction(4, 5)
+    >>> duration.convertTypeToQuarterLength('quarter', 1, [tup])
+    Fraction(6, 5)
+    
 
     >>> tup = duration.Tuplet(numberNotesActual=3, numberNotesNormal=4)
     >>> duration.convertTypeToQuarterLength('quarter', 0, [tup])
@@ -740,7 +743,8 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
 
 
 def convertTypeToNumber(dType):
-    '''Convert a duration type string (`dType`) to a numerical scalar representation that shows
+    '''
+    Convert a duration type string (`dType`) to a numerical scalar representation that shows
     how many of that duration type fits within a whole note.
 
     >>> duration.convertTypeToNumber('quarter')
@@ -751,6 +755,14 @@ def convertTypeToNumber(dType):
     1024.0
     >>> duration.convertTypeToNumber('maxima')
     0.125
+    
+    These other types give these results:
+    
+    >>> duration.convertTypeToNumber('zero')
+    0.0
+    >>> duration.convertTypeToNumber('complex')
+    Traceback (most recent call last):
+    music21.duration.DurationException: Could not determine durationNumber from complex
     '''
     dTypeFound = None
     for num, typeName in typeFromNumDict.items():
@@ -760,7 +772,7 @@ def convertTypeToNumber(dType):
             break
     if dTypeFound is None:
         raise DurationException('Could not determine durationNumber from %s'
-                                % dTypeFound)
+                                % dType)
     else:
         return dTypeFound
 
@@ -2764,6 +2776,17 @@ def durationTupleFromQuarterLength(ql=1.0):
     if the ql can be expressed as a type and number of dots
     (no tuplets, no complex duration, etc.).  If it can't be expressed,
     returns an "inexpressible" DurationTuple.
+
+    >>> dt = duration.durationTupleFromQuarterLength(3.0)
+    >>> dt
+    DurationTuple(type='half', dots=1, quarterLength=3.0)
+    
+    If it's not possible, we return an "inexpressible" type:
+    
+    >>> dt = duration.durationTupleFromQuarterLength(2.5)
+    >>> dt
+    DurationTuple(type='inexpressible', dots=0, quarterLength=2.5)
+
     '''
     try:
         return _durationTupleCacheQuarterLength[ql]
@@ -2778,7 +2801,6 @@ def durationTupleFromQuarterLength(ql=1.0):
             return DurationTuple('inexpressible', 0, ql)
 
 
-
 def durationTupleFromTypeDots(durType='quarter', dots=0):
     '''
     Returns a DurationTuple (which knows its quarterLength) for
@@ -2791,7 +2813,9 @@ def durationTupleFromTypeDots(durType='quarter', dots=0):
     >>> dt is dt2
     True
 
-    >>> dt = duration.durationTupleFromTypeDots('zero', 0)
+    Also with keyword arguments.
+
+    >>> dt = duration.durationTupleFromTypeDots(durType='zero', dots=0)
     >>> dt
     DurationTuple(type='zero', dots=0, quarterLength=0.0)
 
@@ -3371,6 +3395,8 @@ class Test(unittest.TestCase):
         from music21 import stream
         # the current match results here are a good compromise
         # for a difficult situation.
+        
+        # this is close to 1/3 and 1/6 but not exact and that's part of the test.
         test, match = ([.333333] * 2 + [.1666666] * 5,
             ['start', None, None, 'stop', 'start', None, 'stop']
             )

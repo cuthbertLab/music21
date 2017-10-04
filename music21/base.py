@@ -664,7 +664,7 @@ class Music21Object:
         a fully qualified string name, or an object.
 
         Did I mention it's fast?  It's a drop in substitute for the deprecated
-        `.isClassOrSubClass`.  It's not as fast as x in n.classes or isinstance(n, x)
+        `.isClassOrSubclass`.  It's not as fast as x in n.classes or isinstance(n, x)
         if you know whether it's a string or class, but this is good and safe.
 
         >>> n = note.Note()
@@ -1218,7 +1218,7 @@ class Music21Object:
         '''
         Remove references to all locations in objects that no longer exist.
         '''
-        # NOTE: this method is overridden on Spanner and Variant, so not an easy fix...
+        # NOTE: this method is overridden on Spanner and Variant, so not an easy fix to remove...
         self.sites.purgeLocations(rescanIsDead=rescanIsDead)
 
 
@@ -1327,6 +1327,8 @@ class Music21Object:
             change the site (stream) to a Tree (using caches if possible),
             then find the node before (or after) the positionStart and
             return the element there or None.
+
+            flatten can be True, 'semiFlat', or False.
 
             '''
             siteTree = site.asTree(flatten=flatten, classList=className)

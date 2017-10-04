@@ -338,7 +338,7 @@ class Corpus:
         Search this corpus for metadata entries, returning a metadataBundle
 
         >>> corpus.corpora.CoreCorpus().search('3/4')
-        <music21.metadata.bundles.MetadataBundle {1875 entries}>
+        <music21.metadata.bundles.MetadataBundle {1876 entries}>
 
         >>> corpus.corpora.CoreCorpus().search(
         ...      'bach',
@@ -527,6 +527,7 @@ class CoreCorpus(Corpus):
         ('palestrina', 'Giovanni Palestrina', True),
         ('ryansMammoth', 'Ryan\'s Mammoth Collection', False),
         ('schoenberg', 'Arnold Schoenberg', True),
+        ('schubert', 'Franz Schubert', True),
         ('schumann', 'Robert Schumann', True),
         ('schumann_clara', 'Clara Schumann', True),
         ('theoryExercises', 'Theory Exercises', False),

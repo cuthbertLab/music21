@@ -1527,13 +1527,22 @@ class LilypondConverter:
         >>> str(lpc.lyMultipliedDurationFromDuration(duration.Duration(16.0)))
         '\\longa '
 
+        Does not work with zero duration notes:
+
+        >>> d = duration.Duration(0.0)
+        >>> str(lpc.lyMultipliedDurationFromDuration(d))
+        Traceback (most recent call last):
+        music21.lily.translate.LilyTranslateException: Cannot translate an object of 
+            zero duration <music21.duration.Duration 0.0>
+
+
         Does not work with complex durations:
 
         >>> d = duration.Duration(5.0)
         >>> str(lpc.lyMultipliedDurationFromDuration(d))
         Traceback (most recent call last):
         music21.lily.translate.LilyTranslateException: DurationException for durationObject
-            <music21.duration.Duration 5.0>: Could not determine durationNumber from None
+            <music21.duration.Duration 5.0>: Could not determine durationNumber from complex
 
         Instead split by components:
 
@@ -1541,13 +1550,15 @@ class LilypondConverter:
         >>> [str(lpc.lyMultipliedDurationFromDuration(c)) for c in components]
         ['1 ', '4 ']
         '''
-
-
         try:
             number_type = duration.convertTypeToNumber(durationObj.type) # module call
         except duration.DurationException as de:
             raise LilyTranslateException(
                 "DurationException for durationObject %s: %s" % (durationObj, de))
+
+        if number_type == 0:
+            raise LilyTranslateException(
+                'Cannot translate an object of zero duration %s' % durationObj)
 
         if number_type < 1:
             if number_type == 0.5:

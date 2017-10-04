@@ -167,6 +167,9 @@ def expandShortHand(shorthand):
 
     Note that this is not where abbreviations get expanded
 
+    >>> roman.expandShortHand('')
+    []
+
     >>> roman.expandShortHand('7') # not 7, 5, 3
     ['7']
 
@@ -179,7 +182,7 @@ def expandShortHand(shorthand):
     ['6']
 
 
-    Returns a list of expanded abbreviations.
+    Returns a list of individual shorthands.
     '''
     shorthand = shorthand.replace('/', '') # this line actually seems unnecessary.
     if ENDWITHFLAT_RE.match(shorthand):
@@ -230,8 +233,8 @@ def correctSuffixForChordQuality(chordObj, inversionString):
         if seventhType == 10 and qualityName == 'o':
             qualityName = '/o'
         elif seventhType != 9:
-            pass # do something for odd odd chords.
-    #print (inversionString, fifthName)
+            pass # do something for odd odd chords built on diminished triad.
+    # print(inversionString, fifthName)
     return qualityName + inversionString
 
 
@@ -1156,9 +1159,12 @@ class RomanNumeral(harmony.Harmony):
         self.frontAlterationTransposeInterval = None
         self.frontAlterationAccidental = None
         self.romanNumeralAlone = None
+        self.figuresWritten = None
+        self.figuresNotationObj = None
 
         self.impliedQuality = None
         self.impliedScale = None
+        self.scaleOffset = None
         self.useImpliedScale = False
         self.bracketedAlterations = None
         self.omittedSteps = []
@@ -1349,28 +1355,30 @@ class RomanNumeral(harmony.Harmony):
             thisSemis = self.semitonesFromChordStep(thisChordStep)
             if thisSemis is None:
                 continue
-            if thisSemis != thisCorrect:
-                correctedSemis = thisCorrect - thisSemis
+            if thisSemis == thisCorrect:
+                continue
+
+            correctedSemis = thisCorrect - thisSemis
+            if correctedSemis >= 6:
+                correctedSemis = -1 * (12 - correctedSemis)
+            elif correctedSemis <= -6:
+                correctedSemis += 12
+
+            faultyPitch = self.getChordStep(thisChordStep)
+            if faultyPitch is None:
+                raise RomanException(
+                    'this is very odd... should have been caught in semitonesFromChordStep')
+            if faultyPitch.accidental is None:
+                faultyPitch.accidental = pitch.Accidental(correctedSemis)
+            else:
+                acc = faultyPitch.accidental
+                correctedSemis += acc.alter
                 if correctedSemis >= 6:
-                    correctedSemis = -1* (12 - correctedSemis)
+                    correctedSemis = -1 * (12 - correctedSemis)
                 elif correctedSemis <= -6:
                     correctedSemis += 12
 
-                faultyPitch = self.getChordStep(thisChordStep)
-                if faultyPitch is None:
-                    raise RomanException(
-                        'this is very odd... should have been caught in semitonesFromChordStep')
-                if faultyPitch.accidental is None:
-                    faultyPitch.accidental = pitch.Accidental(correctedSemis)
-                else:
-                    acc = faultyPitch.accidental
-                    correctedSemis += acc.alter
-                    if correctedSemis >= 6:
-                        correctedSemis = -1* (12 - correctedSemis)
-                    elif correctedSemis <= -6:
-                        correctedSemis += 12
-
-                    acc.set(correctedSemis)
+                acc.set(correctedSemis)
 
 
     def _correctForSecondaryRomanNumeral(self, useScale, figure=None):
@@ -1649,7 +1657,7 @@ class RomanNumeral(harmony.Harmony):
         if self.secondaryRomanNumeralKey is not None:
             useScale = self.secondaryRomanNumeralKey
         elif not self.useImpliedScale:
-            useScale = self._scale
+            useScale = self.key
         else:
             useScale = self.impliedScale
 
@@ -1670,20 +1678,20 @@ class RomanNumeral(harmony.Harmony):
 
         for j in range(numberNotes):
             i = numberNotes - j - 1
-            thisscaleDegree = (bassScaleDegree
+            thisScaleDegree = (bassScaleDegree
                                 + self.figuresNotationObj.numbers[i]
                                 - 1)
-            newPitch = useScale.pitchFromDegree(thisscaleDegree,
+            newPitch = useScale.pitchFromDegree(thisScaleDegree,
                                                 direction=scale.DIRECTION_ASCENDING)
             pitchName = self.figuresNotationObj.modifiers[i].modifyPitchName(newPitch.name)
-            newnewPitch = pitch.Pitch(pitchName)
-            newnewPitch.octave = newPitch.octave
+            newNewPitch = pitch.Pitch(pitchName)
+            newNewPitch.octave = newPitch.octave
             #if newnewPitch.midi < lastPitch.midi:
             # better to compare pitch space, as midi has limits and rounding
-            if newnewPitch.ps < lastPitch.ps:
-                newnewPitch.octave += 1
-            pitches.append(newnewPitch)
-            lastPitch = newnewPitch
+            if newNewPitch.ps < lastPitch.ps:
+                newNewPitch.octave += 1
+            pitches.append(newNewPitch)
+            lastPitch = newNewPitch
 
         if self.frontAlterationTransposeInterval:
             newPitches = []

@@ -2618,15 +2618,15 @@ def _validateAddress(address):
 def addressToTransposedNormalForm(address):
     '''Given a TN address, return the normal form transposed to start on 0.
 
-    >>> chord.tables.addressToTransposedNormalForm((3,1,0))
+    >>> chord.tables.addressToTransposedNormalForm((3, 1, 0))
     (0, 1, 2)
-    >>> chord.tables.addressToTransposedNormalForm((3,11,-1))
+    >>> chord.tables.addressToTransposedNormalForm((3, 11, -1))
     (0, 4, 7)
-    >>> chord.tables.addressToTransposedNormalForm((3,11,1))
+    >>> chord.tables.addressToTransposedNormalForm((3, 11, 1))
     (0, 3, 7)
-    >>> chord.tables.addressToTransposedNormalForm((3,11))
+    >>> chord.tables.addressToTransposedNormalForm((3, 11))
     (0, 3, 7)
-    >>> chord.tables.addressToTransposedNormalForm((3,11,None))
+    >>> chord.tables.addressToTransposedNormalForm((3, 11, None))
     (0, 3, 7)
     '''
     card, index, inversion = _validateAddress(address)

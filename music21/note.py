@@ -291,6 +291,10 @@ class Lyric(style.StyleMixin):
         else:
             return self.text
 
+    @rawText.setter
+    def rawText(t):
+        self.setTextAndSyllabic(t, applyRaw=True)
+
     @property
     def number(self) -> int:
         '''
@@ -897,7 +901,7 @@ class NotRest(GeneralNote):
         Returns bool whether volume was set -- saving some time for advanced
         users (such as musicxml exporters) that only want to look at the volume
         if it is already there.
-        
+
         >>> n = note.Note()
         >>> n.hasVolumeInformation()
         False
@@ -910,7 +914,7 @@ class NotRest(GeneralNote):
             return False
         else:
             return True
-    
+
     def _getVolume(self, forceClient=None):
         # lazy volume creation
         if self._volume is None:
@@ -1037,7 +1041,7 @@ class Note(NotRest):
         if 'pitch' in keywords and pitchName is None:
             pitchName = keywords['pitch']
             del keywords['pitch']
-        
+
         if pitchName is not None:
             if isinstance(pitchName, pitch.Pitch):
                 self.pitch = pitchName
@@ -1998,8 +2002,3 @@ if __name__ == '__main__':
 
 #------------------------------------------------------------------------------
 # eof
-
-
-
-
-

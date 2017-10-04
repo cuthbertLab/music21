@@ -172,8 +172,8 @@ class Harmony(chord.Chord):
     ### INITIALIZER ###
 
     def __init__(self, figure=None, **keywords):
-        self._writeAsChord = False
         super().__init__()
+        self._writeAsChord = False
         # TODO: Deal with the roman numeral property of harmonies.
         #       MusicXML documentation is ambiguous:
         #       A root is a pitch name like C, D, E, where a function is an
@@ -2478,15 +2478,15 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 #         '''
 #         from music21.alpha.theoryAnalysis import theoryAnalyzer
 #         from music21 import harmony, corpus
-# 
+#
 #         score = corpus.parse('bach/bwv380')
 #         excerpt = score.measures(2, 3)
-# 
+#
 #         # remove passing and/or neighbor tones?
 #         analyzer = theoryAnalyzer.Analyzer()
 #         analyzer.removePassingTones(excerpt)
 #         analyzer.removeNeighborTones(excerpt)
-# 
+#
 #         slices = analyzer.getVerticalities(excerpt)
 #         for vs in slices:
 #             x = harmony.chordSymbolFigureFromChord(vs.getChord())

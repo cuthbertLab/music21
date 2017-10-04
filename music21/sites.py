@@ -26,7 +26,7 @@ WEAKREF_ACTIVE = True
 
 # Global site state dict is a weakValueDictionary -- meaning that the values
 # are weakrefs and the key, value pair disappears if the value
-# vanishes.  It is used to store siteRef.siteWeakRef values during a
+# vanishes.  It is used to store siteRef.siteWeakref values during a
 # __setstate__, __getstate__ instance within the same Python session.
 # if the object being pickled and then unpickled had a weakref to an object
 # that still exists, then restore it from the dictionary; otherwise, do not
@@ -322,14 +322,10 @@ class Sites(common.SlottedObjectMixin):
 
     ### PUBLIC METHODS ###
 
-    def add(self, obj, offset=None, timeValue=None, idKey=None, classString=None):
+    def add(self, obj, timeValue=None, idKey=None, classString=None):
         '''
         Add a reference to the `Sites` collection for this object.  Automatically
         called on stream.insert(n), etc.
-
-        The `timeValue` argument is used to store the time as an int
-        (in milliseconds after Jan 1, 1970) when this object was added to locations.
-        If set to `None`, then the current time is used.
 
         `idKey` stores the id() of the obj.  If `None`, then id(obj) is used.
 
@@ -338,8 +334,8 @@ class Sites(common.SlottedObjectMixin):
 
         TODO: Tests.  Including updates.
         '''
-        if offset is not None:
-            raise SitesException('No offsets in sites anymore!')
+        if timeValue is not None:
+            raise SitesException('No timeValue in sites anymore!')
         # NOTE: this is a performance critical method
 
         # a None object will have a key of None
@@ -362,19 +358,14 @@ class Sites(common.SlottedObjectMixin):
         # __deepcopy__ no longer call this method, so we can assume that
         # we will not get weakrefs
 
-        if obj is not None:
-            if classString is None:
-                classString = obj.classes[0]  # get most current class
+        if obj is not None and classString is None:
+            classString = obj.classes[0]  # get most current class
 
         if updateNotAdd is True:
-            #if obj is not None and id(obj) != idKey:
-            #    print('RED ALERT!')
             siteRef = self.siteDict[idKey]
             siteRef.isDead = False  # in case it used to be a dead site...
         else:
             siteRef = SiteRef()
-            #if id(obj) != idKey and obj is not None:
-            #    print 'Houston, we have a problem %r' % obj
 
         siteRef.site = obj  # stores a weakRef
         siteRef.classString = classString
@@ -465,7 +456,8 @@ class Sites(common.SlottedObjectMixin):
             if priorityId in keyRepository:
                 #environLocal.printDebug(['priorityTarget found in post:', priorityTarget])
                 # extract object and make first
-                keyRepository.insert(0, keyRepository.pop(keyRepository.index(priorityId)))
+                keyRepository.insert(0,
+                    keyRepository.pop(keyRepository.index(priorityId)))
 
 
         # get each dict from all defined contexts
@@ -571,7 +563,7 @@ class Sites(common.SlottedObjectMixin):
 
         '''
         post = None
-        for obj in self.get(sortByCreationTime='reverse'):
+        for obj in self.yieldSites(sortByCreationTime='reverse'):
             if obj is None:
                 continue # in case the reference is dead
             try:
@@ -580,10 +572,15 @@ class Sites(common.SlottedObjectMixin):
             except AttributeError:
                 pass
 
-    def getObjByClass(self, className, callerFirst=None,
-             sortByCreationTime=False,
-             priorityTarget=None, getElementMethod='getElementAtOrBefore',
-             memo=None):
+    def getObjByClass(
+            self,
+            className,
+            callerFirst=None,
+            sortByCreationTime=False,
+            priorityTarget=None,
+            getElementMethod='getElementAtOrBefore',
+            memo=None
+        ):
         '''
         Return the most recently added reference based on className.  Class
         name can be a string or the class name.
@@ -635,7 +632,7 @@ class Sites(common.SlottedObjectMixin):
 
         # search any defined contexts first
         # need to sort: look at most-recently added objs are first
-        objs = self.get(
+        objs = self.yieldSites(
             sortByCreationTime=sortByCreationTime,
             priorityTarget=priorityTarget,
             excludeNone=True,
