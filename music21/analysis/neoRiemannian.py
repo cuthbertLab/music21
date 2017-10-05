@@ -5,8 +5,9 @@
 #
 # Authors:      Maura Church
 #               Michael Scott Cuthbert
+#               Mark Gotham
 #
-# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -18,6 +19,7 @@ import unittest
 
 from music21 import exceptions21
 from music21 import chord
+from music21 import analysis
 
 from music21 import environment
 _MOD = "analysis.neoRiemannian"
@@ -29,7 +31,15 @@ environLocal = environment.Environment(_MOD)
 class LRPException(exceptions21.Music21Exception):
     pass
 
-def L(c, raiseException=False):
+def simplerEnharmonics(self):
+    pitchList = [p.nameWithOctave for p in self.pitches]
+    es = analysis.enharmonics.EnharmonicSimplifier(pitchList)
+    newPitches = es.bestPitches()
+    newChord = copy.deepcopy(self)
+    newChord.pitches = newPitches
+    return newChord
+
+def L(c, raiseException=True):
     '''
     L is a function that takes a major or minor triad and returns a chord that
     is the L transformation. L transforms a chord to its Leading-Tone exchange.
@@ -62,7 +72,7 @@ def L(c, raiseException=False):
     return LRP_transform(c, transposeInterval, changingPitch)
 
 
-def P(c, raiseException=False):
+def P(c, raiseException=True):
     '''
     P is a function that takes a major or minor triad and returns a chord that
     is the P transformation. P transforms a chord to its parallel, i.e. to the
@@ -95,7 +105,7 @@ def P(c, raiseException=False):
     return LRP_transform(c, transposeInterval, changingPitch)
 
 
-def R(c, raiseException=False):
+def R(c, raiseException=True):
     '''
     R is a function that takes a major or minor triad and returns a chord that
     is the R transformation. R transforms a chord to its relative, i.e. if
@@ -138,7 +148,7 @@ def LRP_transform(c, transposeInterval, changingPitch):
 
 def LRP_combinations(c,
                      transformationString,
-                     raiseException=False,
+                     raiseException=True,
                      leftOrdered=False,
                      simplifyEnharmonic=False):
     '''
@@ -170,17 +180,17 @@ def LRP_combinations(c,
     <music21.chord.Chord C4 F4 A-4 C5 F5>
 
     >>> c5 = chord.Chord("B4 D#5 F#5")
-    >>> c6 = analysis.neoRiemannian.LRP_combinations(c5, 'LPLPLP', leftOrdered = True, simplifyEnharmonic = True)
+    >>> c6 = analysis.neoRiemannian.LRP_combinations(c5, 'LPLPLP', leftOrdered=True, simplifyEnharmonic=True)
     >>> c6
-    <music21.chord.Chord B4 E-5 F#5>
+    <music21.chord.Chord B4 D#5 F#5>
     >>> c5 = chord.Chord("C4 E4 G4")
-    >>> c6 = analysis.neoRiemannian.LRP_combinations(c5, 'LPLPLP', leftOrdered = True)
+    >>> c6 = analysis.neoRiemannian.LRP_combinations(c5, 'LPLPLP', leftOrdered=True)
     >>> c6
-    <music21.chord.Chord C4 E4 G4>
+    <music21.chord.Chord D--4 F-4 A--4>
     >>> c5 = chord.Chord("A-4 C4 E-5")
     >>> c6 = analysis.neoRiemannian.LRP_combinations(c5, 'LPLPLP')
     >>> c6
-    <music21.chord.Chord A-4 C4 E-5>
+    <music21.chord.Chord G#4 B#3 D#5>
     '''
 
     if c.isMajorTriad()  or c.isMinorTriad():
@@ -197,10 +207,9 @@ def LRP_combinations(c,
             if simplifyEnharmonic is False:
                 return c
             else:
-                newPitches = pitch.simplifyMultipleEnharmonics(c.pitches, keyContext=key.Key('C'))
-                newChord = copy.deepcopy(c)
-                newChord.pitches = newPitches
-                return newChord
+                return simplerEnharmonics(c)
+                ## Previously:
+                # newPitches = pitch.simplifyMultipleEnharmonics(c.pitches, keyContext=key.Key('C'))
         elif leftOrdered is True:
             transformationStringReversed = transformationString[::-1]
             for i in transformationStringReversed:
@@ -215,40 +224,16 @@ def LRP_combinations(c,
             if simplifyEnharmonic is False:
                 return c
             else:
-                for i in range(len(c.pitches)):
-                    c.pitches[i].simplifyEnharmonic(inPlace=True, mostCommon=True)
-                return c
-
+                return simplerEnharmonics(c)
+                ## Previously:
+                # for i in range(len(c.pitches)):
+                #     c.pitches[i].simplifyEnharmonic(inPlace=True, mostCommon=True)
+                # return c
     else:
         if raiseException is True:
             raise LRPException(
                 'Cannot perform transformations on this chord: not a Major or Minor triad')
         return c
-
-    # TODO: Fix enharmonic problem
-    # create method, chord.simplifyEnharmonic() that will take the c.root()
-    # [call it correctlySpelled or simplifySpelling or something]
-    # and simplify it--how do we make sure it take the right one?
-    # Conflict between G# and A-. Then build triads from there using pitch.flipEnharmonic()
-    # have to make sure it is a minor or major triad
-    # any possible way to peek at the original chord and use information from that to help?
-
-    # Have a group of chords that are the "problematic" chords. REALLY funky chords
-    # make sure it works absolutely right for major, minor, augmented, diminished triad
-    # getEnharmonic on the pitches.
-
-    # problem with augmented: we'll always have a diminished fourth no matter how we spell it
-    # problem with diminished: we'll have an augmented fourth
-
-    # scale.deriveRanked: gives us the closest scale and how many of our notes are in that scale
-    # scale.deriveAll: comparison by pitchClass, not name
-    # check each of the pitches, if they're not in the scale, then flip the enharmonic
-
-    # can also use isTriad and incorrectlySpelled
-
-    # first figure out what scale you're simplifying into, then simplify it.
-    # Optional parameter to take the scale/key
-    # to simplify into, and then we can skip the step of having to find the key.
 
 def completeHexatonic(c, simplifyEnharmonic=False):
     '''
@@ -273,25 +258,29 @@ def completeHexatonic(c, simplifyEnharmonic=False):
      >>> analysis.neoRiemannian.completeHexatonic(c2, simplifyEnharmonic=True)
      [<music21.chord.Chord C4 E-4 G4>,
       <music21.chord.Chord C4 E-4 A-4>,
-      <music21.chord.Chord C-4 E-4 A-4>,
-      <music21.chord.Chord C-4 F-4 A-4>,
-      <music21.chord.Chord C-4 F-4 A--4>,
-      <music21.chord.Chord D--4 F-4 A--4>]
+      <music21.chord.Chord B3 D#4 G#4>,
+      <music21.chord.Chord B3 E4 G#4>,
+      <music21.chord.Chord B3 E4 G4>,
+      <music21.chord.Chord C4 E4 G4>]
     '''
     if c.isMajorTriad() or c.isMinorTriad():
-        hexatonic_1 = P(c)
-        hexatonic_2 = L(hexatonic_1)
-        hexatonic_3 = P(hexatonic_2)
-        hexatonic_4 = L(hexatonic_3)
-        hexatonic_5 = P(hexatonic_4)
-        hexatonic_6 = L(hexatonic_5)
+        if simplifyEnharmonic is False:
+            hexatonic_1 = P(c)
+            hexatonic_2 = L(hexatonic_1)
+            hexatonic_3 = P(hexatonic_2)
+            hexatonic_4 = L(hexatonic_3)
+            hexatonic_5 = P(hexatonic_4)
+            hexatonic_6 = L(hexatonic_5)
+        if simplifyEnharmonic is True:
+            hexatonic_1 = simplerEnharmonics(P(c))
+            hexatonic_2 = simplerEnharmonics(L(hexatonic_1))
+            hexatonic_3 = simplerEnharmonics(P(hexatonic_2))
+            hexatonic_4 = simplerEnharmonics(L(hexatonic_3))
+            hexatonic_5 = simplerEnharmonics(P(hexatonic_4))
+            hexatonic_6 = simplerEnharmonics(L(hexatonic_5))
         hexatonicList = [hexatonic_1, hexatonic_2, hexatonic_3,
                         hexatonic_4, hexatonic_5, hexatonic_6]
-    return hexatonicList
-
-# correct spellings
-# all cycles
-# what if you start on a not-even-member of the cycle?
+        return hexatonicList
 
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
@@ -301,8 +290,8 @@ class Test(unittest.TestCase):
         c2_L = L(c2)
         c2_P = P(c2)
         self.assertEqual(str(c2_L), "<music21.chord.Chord C4 E-4 A-4>")
+        self.assertIsInstance(c2_L, chord.Chord)
         self.assertEqual(str(c2_P), "<music21.chord.Chord C4 E4 G4>")
-
 
         c5 = chord.Chord('C4 E4 G4 C5 C5 G5')
         copyC5 = copy.deepcopy(c5)
@@ -334,8 +323,6 @@ class Test(unittest.TestCase):
         c7 = chord.Chord('C4 E4 G4 C5 E5')
         c7_T = LRP_combinations(c7, 'LP', leftOrdered=True)
         self.assertEqual(str(c7_T), "<music21.chord.Chord C4 E-4 A-4 C5 E-5>")
-
-
 
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
