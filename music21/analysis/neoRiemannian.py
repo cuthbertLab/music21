@@ -19,7 +19,7 @@ import unittest
 
 from music21 import exceptions21
 from music21 import chord
-from music21 import analysis
+from music21.analysis import enharmonics
 
 from music21 import environment
 _MOD = "analysis.neoRiemannian"
@@ -33,7 +33,7 @@ class LRPException(exceptions21.Music21Exception):
 
 def simplerEnharmonics(self):
     pitchList = [p.nameWithOctave for p in self.pitches]
-    es = analysis.enharmonics.EnharmonicSimplifier(pitchList)
+    es = enharmonics.EnharmonicSimplifier(pitchList)
     newPitches = es.bestPitches()
     newChord = copy.deepcopy(self)
     newChord.pitches = newPitches
