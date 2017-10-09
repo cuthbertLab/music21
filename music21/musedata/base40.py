@@ -19,7 +19,6 @@ from music21 import interval
 from music21 import note
 from music21 import pitch
 
-
 #Key => Base40 pitch number
 #Value => Music21 Pitch name
 base40Equivalent = {1: 'C--',
@@ -61,7 +60,8 @@ base40Equivalent = {1: 'C--',
                     37: 'B-',
                     38: 'B',
                     39: 'B#',
-                    40: 'B##'}
+                    40: 'B##',
+                    }
 
 
 #Key => Music21 Pitch name

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__ALL__ = ['correlate',  'discrete', 'elements',
+__ALL__ = ['correlate',  'discrete', 'elements', 'enharmonics',
            'floatingKey', 'metrical', 'neoRiemannian',
            'patel', 'pitchAnalysis',
            'reduceChords', 'reduceChordsOld', 'reduction', 'transposition',
@@ -10,6 +10,7 @@ __ALL__ = ['correlate',  'discrete', 'elements',
 from music21.analysis import correlate
 from music21.analysis import discrete
 from music21.analysis import elements
+from music21.analysis import enharmonics
 from music21.analysis import floatingKey
 from music21.analysis import metrical
 from music21.analysis import neoRiemannian
@@ -25,4 +26,3 @@ from music21.exceptions21 import AnalysisException
 
 #------------------------------------------------------------------------------
 # eof
-

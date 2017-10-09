@@ -32,7 +32,6 @@ class TranspositionChecker:
     >>> tc = analysis.transposition.TranspositionChecker(pList)
     >>> tc.numDistinctTranspositions()
     4
-
     >>> allNormalOrderPitchTuples = tc.getPitchesOfDistinctTranspositions()
     >>> allNormalOrderPitchTuples
     [(<music21.pitch.Pitch C>, <music21.pitch.Pitch E>,
@@ -43,7 +42,6 @@ class TranspositionChecker:
                                          <music21.pitch.Pitch A#>),
      (<music21.pitch.Pitch E->, <music21.pitch.Pitch G>,
                                          <music21.pitch.Pitch B>)]
-
     >>> myChord = chord.Chord(['C', 'E-', 'F#', 'A'])
     >>> pList = myChord.pitches
     >>> tc = analysis.transposition.TranspositionChecker(pList)
@@ -77,17 +75,17 @@ class TranspositionChecker:
         >>> tc = analysis.transposition.TranspositionChecker(p)
         >>> tc.getTranspositions()
         [[<music21.pitch.Pitch E->],
-            [<music21.pitch.Pitch E>],
-            [<music21.pitch.Pitch F>],
-            [<music21.pitch.Pitch F#>],
-            [<music21.pitch.Pitch G>],
-            [<music21.pitch.Pitch G#>],
-            [<music21.pitch.Pitch A>],
-            [<music21.pitch.Pitch B->],
-            [<music21.pitch.Pitch B>],
-            [<music21.pitch.Pitch C>],
-            [<music21.pitch.Pitch C#>],
-            [<music21.pitch.Pitch D>]]
+        [<music21.pitch.Pitch E>],
+        [<music21.pitch.Pitch F>],
+        [<music21.pitch.Pitch F#>],
+        [<music21.pitch.Pitch G>],
+        [<music21.pitch.Pitch G#>],
+        [<music21.pitch.Pitch A>],
+        [<music21.pitch.Pitch B->],
+        [<music21.pitch.Pitch B>],
+        [<music21.pitch.Pitch C>],
+        [<music21.pitch.Pitch C#>],
+        [<music21.pitch.Pitch D>]]
         '''
         allTranspositions = []
         for i in range(12):
@@ -109,7 +107,6 @@ class TranspositionChecker:
          [0, 4, 8], [1, 5, 9], [2, 6, 10], [3, 7, 11],
          [0, 4, 8], [1, 5, 9], [2, 6, 10], [3, 7, 11]]
         '''
-
         if self.allTranspositions is None:
             self.getTranspositions()
         allTranspositions = self.allTranspositions
