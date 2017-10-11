@@ -12,10 +12,8 @@
 
 import unittest
 import itertools
-from music21 import common
 from music21 import exceptions21
 from music21 import pitch
-from music21 import chord
 from music21 import musedata
 
 from music21 import environment
@@ -53,6 +51,7 @@ class EnharmonicSimplifier:
 
         self.pitchList = pitchList
         self.ruleObject = ruleClass()
+        self.allPossibleSpellings = None
         self.getRepresentations()
 
     def getRepresentations(self):
@@ -68,10 +67,13 @@ class EnharmonicSimplifier:
 
     def getProduct(self):
         self.allPossibleSpellings = list(itertools.product(*self.allSpellings))
+        return self.allPossibleSpellings
 
     def bestPitches(self):
         '''
-        Returns a list of pitches in the best enharmonic spelling according to the input criteria.
+        Returns a list of pitches in the best enharmonic 
+        spelling according to the input criteria.
+        
         >>> pList1 = [pitch.Pitch('C'), pitch.Pitch('D'), pitch.Pitch('E')]
         >>> es = analysis.enharmonics.EnharmonicSimplifier(pList1)
         >>> es.bestPitches()
