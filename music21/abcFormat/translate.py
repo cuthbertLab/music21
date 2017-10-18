@@ -34,6 +34,7 @@ from music21 import articulations
 from music21 import note
 from music21 import chord
 from music21 import spanner
+from music21 import harmony
 
 environLocal = environment.Environment('abcFormat.translate')
 
@@ -276,6 +277,13 @@ def parseTokens(mh, dst, p, useMeasures):
             #ql += t.quarterLength
 
         elif isinstance(t, abcFormat.ABCNote):
+            # add the attached chord symbol
+            if len(t.chordSymbols) == 1:
+                cs_ascii = t.chordSymbols[0]
+                assert cs_ascii[0] == cs_ascii[-1] == '"'
+                cs = harmony.ChordSymbol(cs_ascii[1:-1])
+                dst.coreAppend(cs, setActiveSite=False)
+                dst.coreElementsChanged()
             if t.isRest:
                 n = note.Rest()
             else:
