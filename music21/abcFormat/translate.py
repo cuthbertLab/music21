@@ -280,7 +280,7 @@ def parseTokens(mh, dst, p, useMeasures):
 
         elif isinstance(t, abcFormat.ABCNote):
             # add the attached chord symbol
-            if len(t.chordSymbols) == 1:
+            if t.chordSymbols:
                 cs_name = t.chordSymbols[0]
                 cs_name = re.sub('["]','', cs_name)
                 cs_name = re.sub('[()]', '', cs_name)
