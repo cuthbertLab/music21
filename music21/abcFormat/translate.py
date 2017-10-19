@@ -22,6 +22,7 @@ module's :func:`~music21.converter.parse` function.
 
 import copy
 import unittest
+import re
 
 from music21 import clef
 from music21 import common
@@ -35,6 +36,7 @@ from music21 import note
 from music21 import chord
 from music21 import spanner
 from music21 import harmony
+
 
 environLocal = environment.Environment('abcFormat.translate')
 
@@ -279,9 +281,12 @@ def parseTokens(mh, dst, p, useMeasures):
         elif isinstance(t, abcFormat.ABCNote):
             # add the attached chord symbol
             if len(t.chordSymbols) == 1:
-                cs_ascii = t.chordSymbols[0]
-                assert cs_ascii[0] == cs_ascii[-1] == '"'
-                cs = harmony.ChordSymbol(cs_ascii[1:-1])
+                cs_name = t.chordSymbols[0]
+                cs_name = re.sub('["]','', cs_name)
+                cs_name = re.sub('[()]', '', cs_name)
+                cs_name = re.sub('[()]', '', cs_name)
+                cs_name = re.sub('/.*', '', cs_name)
+                cs = harmony.ChordSymbol(cs_name)
                 dst.coreAppend(cs, setActiveSite=False)
                 dst.coreElementsChanged()
             if t.isRest:
