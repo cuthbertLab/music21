@@ -142,6 +142,7 @@ class ModuleGather:
             'timeGraphs.py',
             'timeGraphImportStar.py',
             'multiprocessTest.py',
+            'setup.py', # somehow got committed once and now screwing things up...
 
             'corpus/virtual.py', # offline for v.4
             'figuredBass/examples.py', # 40 seconds and runs fine
