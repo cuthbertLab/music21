@@ -53,7 +53,7 @@ def compressXML(filename, deleteOriginal=False):
     '''
     if not filename.endswith('.xml') and not filename.endswith('.musicxml'):
         return  # not a musicXML file
-    filename = common.pathTools.cleanpath(filename)
+    filename = common.pathTools.cleanpath(filename, returnPathlib=False)
     environLocal.warn("Updating file: {0}".format(filename))
     filenameList = filename.split(os.path.sep)
     # find the archive name (name w/out filepath)
@@ -96,7 +96,7 @@ def uncompressMXL(filename, deleteOriginal=False):
     '''
     if not filename.endswith(".mxl") and not filename.endswith('.musicxml'):
         return  # not a musicXML file
-    filename = common.pathTools.cleanpath(filename)
+    filename = common.pathTools.cleanpath(filename, returnPathlib=False)
     environLocal.warn("Updating file: {0}".format(filename))
     filenames = filename.split(os.path.sep)
     # find the archive name (name w/out filepath)

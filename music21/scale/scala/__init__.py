@@ -480,6 +480,9 @@ def parse(target):
     'Detempered Blackjack in 1/4 kleismic marvel tuning'
     '''
     match = None
+    
+    if isinstance(target, pathlib.Path):
+        target = str(target)
     # this may be a file path to a scala file
     if os.path.exists(target) and target.endswith('.scl'):
         match = target

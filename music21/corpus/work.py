@@ -97,7 +97,7 @@ class DirectoryInformation:
             # last component is name
             m21Format, ext = common.findFormatExtFile(fileComponents[-1])
             # all path parts after corpus
-            corpusPath = os.path.join(self.directoryName, fileStub)
+            corpusPath = os.path.join(str(self.directoryName), fileStub)
             corpusFileName = fileComponents[-1]  # all after
             title = None
             # this works but takes a long time!

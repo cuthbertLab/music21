@@ -20,6 +20,7 @@ reusable approaches to graphing data and structures in
 '''
 import collections
 import os
+import pathlib
 import unittest
 
 # from music21 import common
@@ -930,7 +931,7 @@ class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
         super().write(fp)
 
         if fp is None:
-            fp = environLocal.getTempFile('.png')
+            fp = environLocal.getTempFile('.png', returnPathlib=False)
 
         directory, fn = os.path.split(fp)
         fpLegend = os.path.join(directory, 'legend-' + fn)
@@ -1344,6 +1345,12 @@ class MultiStream(primitives.GraphGroupedVerticalBar, PlotStreamMixin):
                     s = converter.parse(s)
                 else: # assume corpus
                     s = corpus.parse(s)
+            elif isinstance(s, pathlib.Path):
+                foundPaths.append(s.name)
+                if s.exists():
+                    s = converter.parse(s)
+                else: # assume corpus
+                    s = corpus.parse(s)
             # otherwise assume a parsed stream
             self.streamList.append(s)
         return foundPaths
@@ -1593,7 +1600,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
             obj.run()
             fn = obj.__class__.__name__ + '.png'
-            fp = os.path.join(environLocal.getRootTempDir(), fn)
+            fp = str(environLocal.getRootTempDir() / fn)
             environLocal.printDebug(['writing fp:', fp])
             obj.write(fp)
 
