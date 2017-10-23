@@ -282,13 +282,13 @@ def parseTokens(mh, dst, p, useMeasures):
             # add the attached chord symbol
             if t.chordSymbols:
                 cs_name = t.chordSymbols[0]
-                cs_name = re.sub('["]','', cs_name)
+                cs_name = re.sub('["]','', cs_name).lstrip().rstrip()
                 cs_name = re.sub('[()]', '', cs_name)
-                cs_name = re.sub('[()]', '', cs_name)
-                cs_name = re.sub('/.*', '', cs_name)
-                cs = harmony.ChordSymbol(cs_name)
-                dst.coreAppend(cs, setActiveSite=False)
-                dst.coreElementsChanged()
+                cs_name = re.sub('[ /].*', '', cs_name)
+                if re.match(r'[A-Ga-g][#-]*', cs_name):
+                    cs = harmony.ChordSymbol(cs_name)
+                    dst.coreAppend(cs, setActiveSite=False)
+                    dst.coreElementsChanged()
             if t.isRest:
                 n = note.Rest()
             else:
