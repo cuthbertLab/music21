@@ -445,8 +445,11 @@ class Converter:
     def _getDownloadFp(self, directory, ext, url):
         if directory is None:
             raise ValueError
-        return os.path.join(directory, 'm21-' + _version.__version__ + '-' +
-                                            common.getMd5(url) + ext)
+        if not isinstance(directory, pathlib.Path):
+            directory = pathlib.Path(directory)
+        
+        fname = 'm21-' + _version.__version__ + '-' + common.getMd5(url) + ext
+        return directory / fname
 
     # pylint: disable=redefined-builtin
     def parseFileNoPickle(self, fp, number=None,
@@ -643,21 +646,17 @@ class Converter:
                 ext = '.txt'
 
         directory = environLocal.getRootTempDir()
-        dst = self._getDownloadFp(directory, ext, url)
-        if (hasattr(urllib, 'urlretrieve')):
-            # python 2
-            urlretrieve = urllib.urlretrieve
-        else: #python3
-            urlretrieve = urllib.request.urlretrieve # @UndefinedVariable
+        dst = self._getDownloadFp(directory, ext, url) # returns pathlib.Path
+        urlretrieve = urllib.request.urlretrieve
 
-        if not os.path.exists(dst):
+        if not dst.exists():
             try:
-                environLocal.printDebug(['downloading to:', dst])
-                fp, unused_headers = urlretrieve(url, filename=dst)
+                environLocal.printDebug(['downloading to:', str(dst)])
+                fp, unused_headers = urlretrieve(url, filename=str(dst))
             except IOError:
                 raise ConverterException('cannot access file: %s' % url)
         else:
-            environLocal.printDebug(['using already downloaded file:', dst])
+            environLocal.printDebug(['using already downloaded file:', str(dst)])
             fp = dst
 
         # update format based on downloaded fp
@@ -1088,6 +1087,7 @@ def parse(value, *args, **keywords):
 
     if isinstance(value, bytes):
         valueStr = value.decode('utf-8', 'ignore')
+        
     if isinstance(value, pathlib.Path):
         valueStr = str(value)
     elif isinstance(value, bundles.MetadataEntry):
@@ -1102,13 +1102,13 @@ def parse(value, *args, **keywords):
     if (common.isListLike(value)
             and len(value) == 2
             and value[1] is None
-            and os.path.exists(value[0])):
+            and os.path.exists(str(value[0]))):
         # comes from corpus.search
         return parseFile(value[0], format=m21Format, **keywords)
     elif (common.isListLike(value)
           and len(value) == 2
           and isinstance(value[1], int)
-          and os.path.exists(value[0])):
+          and os.path.exists(str(value[0]))):
         # corpus or other file with movement number
         return parseFile(value[0], format=m21Format, **keywords).getScoreByNumber(value[1])
     elif common.isListLike(value) or args: # tiny notation list # TODO: Remove.

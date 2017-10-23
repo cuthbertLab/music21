@@ -1706,7 +1706,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
             obj.data = data # add data here
             obj.process()
             fn = obj.__class__.__name__ + '.png'
-            fp = os.path.join(environLocal.getRootTempDir(), fn)
+            fp = str(environLocal.getRootTempDir() / fn)
             environLocal.printDebug(['writing fp:', fp])
             obj.write(fp)
 
@@ -1736,7 +1736,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         a.data = data
         a.process()
         fn = a.__class__.__name__ + '.png'
-        fp = os.path.join(environLocal.getRootTempDir(), fn)
+        fp = str(environLocal.getRootTempDir() / fn)
 
         a.write(fp)
 
@@ -1784,7 +1784,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         for obj, name in post:
             obj.process()
             fn = name + '.png'
-            fp = os.path.join(environLocal.getRootTempDir(), fn)
+            fp = str(environLocal.getRootTempDir() / fn)
             environLocal.printDebug(['writing fp:', fp])
             obj.write(fp)
 

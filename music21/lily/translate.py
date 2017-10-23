@@ -14,6 +14,7 @@ local computer, can automatically generate .pdf, .png, and .svg versions
 of musical files using Lilypond.
 '''
 import os
+import pathlib
 import re
 import subprocess
 import sys
@@ -2392,11 +2393,11 @@ class LilypondConverter:
         '''
         tloOut = str(self.topLevelObject)
         if fp is None:
-            fp = environLocal.getTempFile(ext)
+            fp = environLocal.getTempFile(ext, returnPathlib=False)
 
-        self.tempName = fp
+        self.tempName = pathlib.Path(fp)
 
-        with open(self.tempName, 'w') as f:
+        with self.tempName.open('w') as f:
             f.write(tloOut)
 
         return self.tempName
@@ -2423,21 +2424,18 @@ class LilypondConverter:
 
         lilyCommand = '"' + LILYEXEC + '" '
         if format is not None:
-            lilyCommand += "-f " + format + " "
+            lilyCommand += '-f ' + format + ' '
         if backend is not None:
-            lilyCommand += self.backendString + backend + " "
-        lilyCommand += "-o " + fileName + " " + fileName
+            lilyCommand += self.backendString + backend + ' '
+        lilyCommand += '-o ' + str(fileName) + ' ' + str(fileName)
+
+        os.system(lilyCommand)
 
         try:
-            os.system(lilyCommand)
-        except:
-            raise
-
-        try:
-            os.remove(fileName + ".eps")
+            os.remove(str(fileName) + ".eps")
         except OSError:
             pass
-        fileform = fileName + '.' + format
+        fileform = str(fileName) + '.' + format
         if not os.path.exists(fileform):
             # cannot find full path; try current directory
             fileend = os.path.basename(fileform)
@@ -2446,7 +2444,7 @@ class LilypondConverter:
                                 " or the full path " + fileform + " original file was " + fileName)
             else:
                 fileform = fileend
-        return fileform
+        return pathlib.Path(fileform)
 
     def createPDF(self, fileName=None):
         '''
@@ -2467,13 +2465,13 @@ class LilypondConverter:
         most users will just call stream.Stream.show('lily.pdf') on a stream.
         '''
         lF = self.createPDF()
-        if not os.path.exists(lF):
+        if not lF.exists():
             raise Exception('Something went wrong with PDF Creation')
         else:
             if os.name == 'nt':
-                command = 'start /wait %s && del /f %s' % (lF, lF)
+                command = 'start /wait %s && del /f %s' % (str(lF), str(lF))
             elif sys.platform == 'darwin':
-                command = 'open %s' % lF
+                command = 'open %s' % str(lF)
             else:
                 command = ''
             os.system(command)
@@ -2489,36 +2487,12 @@ class LilypondConverter:
         lilyFile = self.runThroughLily(backend='eps', format='png', fileName=fileName)
         if noPIL is False:
             try:
-                lilyImage = Image.open(lilyFile) # @UndefinedVariable
+                lilyImage = Image.open(str(lilyFile)) # @UndefinedVariable
                 lilyImage2 = ImageOps.expand(lilyImage, 10, 'white')
-                lilyImage2.save(lilyFile)
+                lilyImage2.save(str(lilyFile))
             except Exception: # pylint: disable=broad-except
                 pass # no big deal probably...
         return lilyFile
-
-
-#                if os.name == 'nt':
-#                    format = 'png'
-#                # why are we changing format for darwin? -- did not work before
-#                elif sys.platform == 'darwin':
-#                    format = 'jpeg'
-#                else: # default for all other platforms
-#                    format = 'png'
-#
-#                if lilyImage2.mode == "I;16":
-#                # @PIL88 @PIL101
-#                # "I;16" isn't an 'official' mode, but we still want to
-#                # provide a simple way to show 16-bit images.
-#                    base = "L"
-#                else:
-#                    base = Image.getmodebase(lilyImage2.mode)
-#                if base != lilyImage2.mode and lilyImage2.mode != "1":
-#                    file = lilyImage2.convert(base)._dump(format=format)
-#                else:
-#                    file = lilyImage2._dump(format=format)
-#                return file
-#            except:
-#                raise
 
     def showPNG(self):
         '''

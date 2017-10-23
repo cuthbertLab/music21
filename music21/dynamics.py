@@ -117,8 +117,6 @@ class Dynamic(base.Music21Object):
     '''
     Object representation of Dynamics.
 
-
-
     >>> pp1 = dynamics.Dynamic('pp')
     >>> pp1.value
     'pp'
@@ -130,7 +128,6 @@ class Dynamic(base.Music21Object):
 
     Dynamics can also be specified on a 0 to 1 scale with 1 being the
     loudest (see dynamicStrFromDecimal() above)
-
 
     >>> ppp = dynamics.Dynamic(0.15) # on 0 to 1 scale
     >>> ppp.value

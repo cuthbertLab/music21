@@ -10,9 +10,7 @@
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 
-
 import abc
-import os
 import pathlib
 
 from music21 import common
@@ -629,8 +627,8 @@ class CoreCorpus(Corpus):
     def manualCoreCorpusPath(self, expr): # pragma: no cover
         userSettings = environment.UserSettings()
         if expr is not None:
-            path = common.cleanpath(expr)
-            if not os.path.isdir(path) or not os.path.exists(path):
+            path = common.cleanpath(expr, returnPathlib=True)
+            if not path.is_dir() or not path.exists():
                 raise CorpusException('path needs to be a path to an existing directory')
             userSettings['manualCoreCorpusPath'] = path
         else:
@@ -771,14 +769,14 @@ class LocalCorpus(Corpus):
         unless explicitly saved by a call to ``LocalCorpus.save()``.
         '''
         from music21 import corpus
-        if not isinstance(directoryPath, str):
+        if not isinstance(directoryPath, (str, pathlib.Path)):
             raise corpus.CorpusException(
                 'an invalid file path has been provided: {0!r}'.format(
                     directoryPath))
 
-        directoryPath = common.cleanpath(directoryPath)
-        if (not os.path.exists(directoryPath) or
-                not os.path.isdir(directoryPath)):
+        directoryPath = common.cleanpath(directoryPath, returnPathlib=True)
+        if (not directoryPath.exists() or
+                not directoryPath.is_dir()):
             raise corpus.CorpusException(
                 'an invalid file path has been provided: {0!r}'.format(
                     directoryPath))
@@ -797,8 +795,8 @@ class LocalCorpus(Corpus):
         elif not self.existsInSettings:
             return
 
-        if os.path.exists(self.metadataBundle.filePath):
-            os.remove(self.metadataBundle.filePath)
+        if self.metadataBundle.filePath.exists():
+            self.metadataBundle.filePath.unlink()
 
         userSettings = environment.UserSettings()
         del(userSettings['localCorporaSettings'][self.name])

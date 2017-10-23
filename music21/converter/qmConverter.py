@@ -114,15 +114,14 @@ if __name__ == '__main__':
     import music21
     music21.mainTest()
 #     from music21 import common
-#     import os
 #
 #     converter.registerSubconverter(QMConverter)
 #
 #     print('\nFILE')
 #     print('+++++++++++++++++++++++++')
 #
-#     parserPath = common.getSourceFilePath() + os.path.sep + 'converter'
-#     testPath = parserPath + os.path.sep + 'quarterMusicTestIn.qm'
+#     parserPath = common.getSourceFilePath() / 'converter'
+#     testPath = parserPath / 'quarterMusicTestIn.qm'
 #
 #     a = converter.parse(testPath)
 #

@@ -739,6 +739,8 @@ class ConverterMusicXML(SubConverter):
         Check whether total number of pngs is in 1-9, 10-99, or 100-999 range,
          then return appropriate fp. Raises and exception if png fp does not exist.
         '''
+        xmlFilePath = str(xmlFilePath) # not pathlib.
+        
         if os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + "-1.png"):
             pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + "-1.png"
         elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + "-01.png"):
@@ -746,7 +748,8 @@ class ConverterMusicXML(SubConverter):
         elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + "-001.png"):
             pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + "-001.png"
         else:
-            raise SubConverterFileIOException("png file of xml not found. Is your file >999 pages?")
+            raise SubConverterFileIOException(
+                "png file of xml not found. Or file >999 pages?")
         return pngfp
 
     def parseData(self, xmlString, number=None):
@@ -777,7 +780,6 @@ class ConverterMusicXML(SubConverter):
         if isinstance(fp, pathlib.Path):
             fp  = str(fp) # remove in Py3.6
 
-
         # here, we can see if this is a mxl or similar archive
         arch = converter.ArchiveManager(fp)
         if arch.isArchive():
@@ -791,7 +793,7 @@ class ConverterMusicXML(SubConverter):
         # manually insert file name as a movementName title if no titles are defined
         if c.stream.metadata.movementName is None:
             junk, fn = os.path.split(fp)
-            c.stream.metadata.movementName = fn
+            c.stream.metadata.movementName = fn # this should become a Path 
         self.stream = c.stream
 
     def runThroughMusescore(self, fp, subformats=None, **keywords): # pragma: no cover

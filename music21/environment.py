@@ -573,11 +573,14 @@ class _EnvironmentCore:
         # darwin specific option
         # os.path.join(os.environ['HOME'], 'Library',)
 
-    def getTempFile(self, suffix=''):
+    def getTempFile(self, suffix='', returnPathlib=False):
         '''
         gets a temporary file with a suffix that will work for a bit.
         note that the file is closed after finding, so some older versions
         of python/OSes, etc. will immediately delete the file.
+        
+        v5 -- added returnPathlib.  default now is False, will become True when
+        py3.6 is the minimum version.
         '''
         # get the root dir, which may be the user-specified dir
         rootDir = self.getRootTempDir()
@@ -603,7 +606,10 @@ class _EnvironmentCore:
             filePath = tf.name
             tf.close()
         #self.printDebug([_MOD, 'temporary file:', filePath])
-        return filePath
+        if returnPathlib:
+            return pathlib.Path(filePath)
+        else:
+            return filePath
 
     def keys(self):
         return list(self._ref.keys()) + ['localCorpusPath']
