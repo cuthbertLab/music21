@@ -1779,6 +1779,9 @@ class ChordSymbol(Harmony):
                 root = m1.group()
                 #remove the root and bass from the string and any additions/omitions/alterations/
                 st = prelimFigure.replace(m1.group(), '')
+            else:
+                raise ValueError # This means that the given argument wasn't
+                # a proper chord name.
 
         if root:
             self.root(pitch.Pitch(root))
