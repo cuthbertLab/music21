@@ -1212,7 +1212,8 @@ class RomanNumeral(harmony.Harmony):
         workingFigure = self._parseBracketedAlterations(workingFigure)
 
         # Replace Neapolitan indication.
-        workingFigure = re.sub('^N', 'bII', workingFigure)
+        workingFigure = re.sub('^N6', 'bII6', workingFigure)
+        workingFigure = re.sub('^N', 'bII6', workingFigure)
 
         workingFigure = self._parseFrontAlterations(workingFigure)
         workingFigure, useScale = self._parseRNAloneAmidstAug6(workingFigure, useScale)
