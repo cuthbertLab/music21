@@ -149,14 +149,16 @@ def cleanpath(path, *, returnPathlib=None):
     (is this a good idea?), expanding %name% on Windows, normalizing path names (Windows
     turns backslashes to forward slashes, and finally if that file is not an absolute path,
     turns it from a relative path to an absolute path.
+    
+    v5 -- returnPathlib -- None (default) does not convert. False, returns a string,
+    True, returns a pathlib.Path.
     '''
 
     if isinstance(path, pathlib.Path):
         path = str(path)
         if returnPathlib is None:
             returnPathlib = True
-    else:
-        if returnPathlib is None:
+    elif returnPathlib is None:
             returnPathlib = False
     path = os.path.expanduser(path)
     path = os.path.normpath(path)

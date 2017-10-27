@@ -88,12 +88,11 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
         filePath = filePath.resolve()
         filePath = str(filePath)
 
-
     try:
         with io.open(filePath, 'r', encoding=firstGuess) as thisFile:
             data = thisFile.read()
             return data
-    except OSError: # Python3 FileNotFoundError...
+    except FileNotFoundError:
         raise
     except UnicodeDecodeError:
         with io.open(filePath, 'rb') as thisFileBinary:

@@ -292,7 +292,7 @@ class Lyric(style.StyleMixin):
             return self.text
 
     @rawText.setter
-    def rawText(t):
+    def rawText(self, t):
         self.setTextAndSyllabic(t, applyRaw=True)
 
     @property

@@ -92,10 +92,11 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
         if isinstance(storeFile, str):
             waveFilename = storeFile
         else:
-            waveFilename = environLocal.getRootTempDir() + os.path.sep + 'recordingTemp.wav'
+            waveFilename = str(environLocal.getRootTempDir() / 'recordingTemp.wav')
         ### write recording to disk
         data = b''.join(storedWaveSampleList)
         try:
+            # wave.open does not take a pathlike object as of 3.6
             wf = wave.open(waveFilename, 'wb')
             wf.setnchannels(recordChannels)
             wf.setsampwidth(p_audio.get_sample_size(recordFormat))

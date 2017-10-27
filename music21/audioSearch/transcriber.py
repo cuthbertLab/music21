@@ -13,7 +13,6 @@
 
 import unittest
 
-import os
 #from time import time
 
 from music21 import scale
@@ -40,7 +39,7 @@ def runTranscribe(show=True, plot=True, useMic=True,
     Microtonal scales are totally accepted, as are retuned scales where A != 440hz.
 
     if `saveFile` is False then then the recorded audio is saved to disk.  If
-    set to `True` then `environLocal.getRootTempDir() + os.path.sep + 'ex.wav'` is
+    set to `True` then `environLocal.getRootTempDir() / 'ex.wav'` is
     used as the filename.  If set to anything else then it will use that as the
     filename.
     '''
@@ -51,19 +50,20 @@ def runTranscribe(show=True, plot=True, useMic=True,
     #beginning - recording or not
     if saveFile != False:
         if saveFile:
-            WAVE_FILENAME = environLocal.getRootTempDir() + os.path.sep + 'ex.wav'
+            waveFilename = environLocal.getRootTempDir() / 'ex.wav'
         else:
-            WAVE_FILENAME = saveFile
+            waveFilename = saveFile
     else:
-        WAVE_FILENAME = False
+        waveFilename = False
 
     # the rest of the score
     if useMic is True:
         freqFromAQList = audioSearchBase.getFrequenciesFromMicrophone(
                                                   length=seconds,
-                                                  storeWaveFilename=WAVE_FILENAME)
+                                                  storeWaveFilename=str(waveFilename))
     else:
-        freqFromAQList = audioSearchBase.getFrequenciesFromAudioFile(waveFilename=WAVE_FILENAME)
+        freqFromAQList = audioSearchBase.getFrequenciesFromAudioFile(
+            waveFilename=str(waveFilename))
 
     detectedPitchesFreq = audioSearchBase.detectPitchFrequencies(freqFromAQList, useScale)
     detectedPitchesFreq = audioSearchBase.smoothFrequencies(detectedPitchesFreq)
@@ -83,10 +83,11 @@ def runTranscribe(show=True, plot=True, useMic=True,
         try:
             import matplotlib.pyplot # for find
         except ImportError:
-            raise audioSearchBase.AudioSearchException("Cannot plot without matplotlib installed.")
+            raise audioSearchBase.AudioSearchException(
+                'Cannot plot without matplotlib installed.')
         matplotlib.pyplot.plot(listplot)
         matplotlib.pyplot.show()
-    environLocal.printDebug("* END")
+    environLocal.printDebug('* END')
 
     return myScore
 
@@ -144,11 +145,11 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         pass
 
     def xtestRunTranscribe(self):
-        saveFile = environLocal.getRootTempDir() + os.path.sep + 'new_song.wav'
+        saveFile = environLocal.getRootTempDir() / 'new_song.wav'
         runTranscribe(show=False, plot=False, saveFile=saveFile, seconds=10.0)
 
     def xtestTranscribePachelbel(self):
-        saveFile = environLocal.getRootTempDir() + os.path.sep + 'pachelbel.wav'
+        saveFile = environLocal.getRootTempDir() / 'pachelbel.wav'
         unused_myScore = runTranscribe(useMic=False, saveFile=saveFile, plot=False, show=False)
         #myScore.show()
 
