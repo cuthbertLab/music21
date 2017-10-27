@@ -95,6 +95,7 @@ CHORD_TYPES = collections.OrderedDict([
     # other
     ('suspended-second',            ['1,2,5', ['sus2']]),                        # Y
     ('suspended-fourth',            ['1,4,5', ['sus', 'sus4']]),                 # Y
+    ('suspended-fourth-seventh',    ['1,4,5,-7', ['7sus', '7sus4']]),            # Y
     ('Neapolitan',                  ['1,2-,3,5-', ['N6']]),                      # Y
     ('Italian',                     ['1,#4,-6', ['It+6', 'It']]),                # Y
     ('French',                      ['1,2,#4,-6', ['Fr+6', 'Fr']]),              # Y
