@@ -11,14 +11,74 @@
 #-------------------------------------------------------------------------------
 __all__ = ['defaultlist',
            'SingletonCounter',
+           'RelativeCounter',
            'SlottedObjectMixin',
            'EqualSlottedObjectMixin',
            'Iterator',
            'Timer',
           ]
 
+import collections
 import time
 import weakref
+
+class RelativeCounter(collections.Counter):
+    '''
+    A counter that iterates from most common to least common
+    and can return new RelativeCounters that adjust for proportion or percentage.
+    
+    >>> l = ['b', 'a', 'a', 'c', 'd', 'd', 'e', 'e', 'e', 'e']
+    >>> rc = common.RelativeCounter(l)
+    >>> for k in rc:
+    ...     print(k, rc[k])
+    e 4
+    a 2
+    d 2
+    b 1
+    c 1
+    
+    Ties are iterated according to which appeared first in the generated list 
+        
+    >>> rcProportion = rc.asProportion()
+    >>> rcProportion['b']
+    0.1
+    >>> rcProportion['e']
+    0.4
+    >>> rcPercentage = rc.asPercentage()
+    >>> rcPercentage['b']
+    10.0
+    >>> rcPercentage['e']
+    40.0
+    
+    >>> for k, perc in rcPercentage.items():
+    ...     print(k, perc)
+    e 40.0
+    a 20.0
+    d 20.0
+    b 10.0
+    c 10.0
+    
+    '''
+    def __iter__(self):
+        sortedKeys = sorted(super().__iter__(), key=lambda x: self[x], reverse=True)
+        for k in sortedKeys:
+            yield k
+    
+    def asProportion(self):
+        selfLen = sum(self[x] for x in self)
+        outDict = {}
+        for y in self:
+            outDict[y] = self[y] / selfLen
+        new = self.__class__(outDict)
+        return new
+    
+    def asPercentage(self):
+        selfLen = sum(self[x] for x in self)
+        outDict = {}
+        for y in self:
+            outDict[y] = self[y] * 100 / selfLen
+        new = self.__class__(outDict)
+        return new
 
 class defaultlist(list):
     '''
