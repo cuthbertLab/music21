@@ -65,6 +65,10 @@ class RelativeCounter(collections.Counter):
         for k in sortedKeys:
             yield k
     
+    def items(self):
+        for k in self:
+            yield k, self[k]
+    
     def asProportion(self):
         selfLen = sum(self[x] for x in self)
         outDict = {}
