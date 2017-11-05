@@ -117,14 +117,14 @@ functionalityScores = {
     '#VI': 41,
     'vi': 40,
     'viio': 39,
-    '#viio': 39,
+    '#viio': 38,
     'iio': 37,  # common in Minor
     'iio42': 36,
     'bII6': 35,  # Neapolitan
     'iio43': 32,
     'iio65': 31,
     '#vio': 28,
-    '#vio6': 28,
+    '#vio6': 27,
     'III': 22,
     'v': 20,
     'VII': 19,
@@ -688,6 +688,47 @@ def romanNumeralFromChord(chordObj,
     <music21.roman.RomanNumeral #iii/o7 in d minor>
 
 
+    Augmented 6ths without key context
+
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord('E-4 G4 C#5'),
+    ...     )
+    <music21.roman.RomanNumeral It6 in g minor>
+
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord('E-4 G4 B-4 C#5'),
+    ...     )
+    <music21.roman.RomanNumeral Ger65 in g minor>
+
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord('E-4 G4 A4 C#5'),
+    ...     )
+    <music21.roman.RomanNumeral Fr43 in g minor>    
+
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord('E-4 G4 A#4 C#5'),
+    ...     )
+    <music21.roman.RomanNumeral Sw43 in g minor>
+
+
+    With correct key context:
+
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord('E-4 G4 C#5'),
+    ...     key.Key('G')
+    ...     )
+    <music21.roman.RomanNumeral It6 in G major>
+
+    With incorrect key context does not find an augmented 6th chord:
+
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord('E-4 G4 C#5'),
+    ...     key.Key('C')
+    ...     )
+    <music21.roman.RomanNumeral #io6b3 in C major>
+
+
+
     Former bugs:
 
     Should be iii7
@@ -718,6 +759,14 @@ def romanNumeralFromChord(chordObj,
     ...     )
     >>> romanNumeral9
     <music21.roman.RomanNumeral I#853 in C major>
+
+
+    Not an augmented 6th:
+
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord('E4 G4 B-4 C#5')
+    ...     )
+    <music21.roman.RomanNumeral io6b5b3 in c# minor>
 
 
     Note that this should be III+642 gives III+#642 (# before 6 is unnecessary)
@@ -803,9 +852,10 @@ def romanNumeralFromChord(chordObj,
     inversionString = postFigureFromChordAndKey(chordObj, alteredKeyObj)
 
     rnString = ft.prefix + stepRoman + inversionString
-    if not noKeyGiven and rnString in aug6subs:
+    
+    if not noKeyGiven and rnString in aug6subs and chordObj.isAugmentedSixth():
         rnString = aug6subs[rnString]
-    elif noKeyGiven and rnString in aug6NoKeyObjectSubs:
+    elif noKeyGiven and rnString in aug6NoKeyObjectSubs and chordObj.isAugmentedSixth():
         rnString = aug6NoKeyObjectSubs[rnString]
         if rnString in ('It6', 'Ger65'):
             keyObj = _getKeyFromCache(chordObj.fifth.name.lower())

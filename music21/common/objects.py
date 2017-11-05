@@ -27,36 +27,37 @@ class RelativeCounter(collections.Counter):
     A counter that iterates from most common to least common
     and can return new RelativeCounters that adjust for proportion or percentage.
     
-    >>> l = ['b', 'a', 'a', 'c', 'd', 'd', 'e', 'e', 'e', 'e']
+    >>> l = ['b', 'b', 'a', 'a', 'a', 'a', 'c', 'd', 'd', 'd'] + ['e'] * 10
     >>> rc = common.RelativeCounter(l)
     >>> for k in rc:
     ...     print(k, rc[k])
-    e 4
-    a 2
-    d 2
-    b 1
+    e 10
+    a 4
+    d 3
+    b 2
     c 1
     
-    Ties are iterated according to which appeared first in the generated list 
+    Ties are iterated according to which appeared first in the generated list in Py3.6
+    and in random order in Py3.4-3.5.
         
     >>> rcProportion = rc.asProportion()
     >>> rcProportion['b']
     0.1
     >>> rcProportion['e']
-    0.4
+    0.5
     >>> rcPercentage = rc.asPercentage()
     >>> rcPercentage['b']
     10.0
     >>> rcPercentage['e']
-    40.0
+    50.0
     
     >>> for k, perc in rcPercentage.items():
     ...     print(k, perc)
-    e 40.0
+    e 50.0
     a 20.0
-    d 20.0
+    d 15.0
     b 10.0
-    c 10.0
+    c 5.0
     
     '''
     def __iter__(self):
