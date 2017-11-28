@@ -1077,7 +1077,7 @@ class Test(unittest.TestCase):
          
         sa = StreamAligner(target, source)
         sa.align()
-        sa.showChanges(show=True)
+        sa.showChanges()
         
         self.assertEqual(target.getElementById(sa.changes[3][0].id).color, 'red')
         self.assertEqual(target.getElementById(sa.changes[3][0].id).lyric, '3')
@@ -1110,7 +1110,7 @@ class Test(unittest.TestCase):
          
         sa = StreamAligner(target, source)
         sa.align()
-        sa.showChanges(show=True)
+        sa.showChanges()
         
         self.assertEqual(target.getElementById(sa.changes[2][0].id).color, 'purple')
         self.assertEqual(target.getElementById(sa.changes[2][0].id).lyric, '2')
