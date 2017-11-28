@@ -746,8 +746,10 @@ class StreamAligner(object):
         >>> saA.setupDistanceMatrix()
         >>> saA.populateDistanceMatrix()
         >>> saA.calculateChangesList()
-        >>> saA.changesCount
-        Counter({<ChangeOps.Insertion: 0>: 1, <ChangeOps.NoChange: 3>: 1})
+        >>> saA.changesCount[alpha.analysis.aligner.ChangeOps.Insertion]
+        1
+        >>> saA.changesCount[alpha.analysis.aligner.ChangeOps.NoChange]
+        1
         >>> saA.similarityScore
         0.5
          
@@ -763,8 +765,10 @@ class StreamAligner(object):
         >>> saB.setupDistanceMatrix()
         >>> saB.populateDistanceMatrix()
         >>> saB.calculateChangesList()
-        >>> saB.changesCount
-        Counter({<ChangeOps.Deletion: 1>: 1, <ChangeOps.NoChange: 3>: 1})
+        >>> saB.changesCount[alpha.analysis.aligner.ChangeOps.Deletion]
+        1
+        >>> saB.changesCount[alpha.analysis.aligner.ChangeOps.NoChange]
+        1
         >>> saB.similarityScore
         0.5
          
@@ -778,8 +782,8 @@ class StreamAligner(object):
         >>> saC.setupDistanceMatrix()
         >>> saC.populateDistanceMatrix()
         >>> saC.calculateChangesList()
-        >>> saC.changesCount
-        Counter({<ChangeOps.NoChange: 3>: 2})
+        >>> saC.changesCount[alpha.analysis.aligner.ChangeOps.NoChange]
+        2
         >>> saC.similarityScore
         1.0
          
@@ -795,8 +799,10 @@ class StreamAligner(object):
         >>> saD.setupDistanceMatrix()
         >>> saD.populateDistanceMatrix()
         >>> saD.calculateChangesList()
-        >>> saD.changesCount
-        Counter({<ChangeOps.Substitution: 2>: 1, <ChangeOps.NoChange: 3>: 1})
+        >>> saD.changesCount[alpha.analysis.aligner.ChangeOps.Substitution]
+        1
+        >>> saD.changesCount[alpha.analysis.aligner.ChangeOps.NoChange]
+        1
         >>> saD.similarityScore
         0.5
          
