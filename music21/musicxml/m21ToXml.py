@@ -3635,6 +3635,93 @@ class MeasureExporter(XMLExporterBase):
             mxAlter.text = str(common.numToIntOrFloat(p.accidental.alter))
         _setTagTextFromAttribute(p, mxPitch, 'octave', 'implicitOctave')
         return mxPitch
+    
+    def fretNoteToXml(self, fretNote):
+        '''
+        Converts a FretNote Object to MusicXML readable format.
+        
+        *Note that, although music21 is referring to FretNotes as FretNotes, musicxml refers to the 
+        them as frame notes. To convert between the two formats, 'Fret-Note' must be converted to
+        'Frame-Note'
+        
+        >>> fn = tablature.FretNote(string = 3, fret = 1, fingering = 2)
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> MEXFretNote = MEX.fretNoteToXml(fn)
+        >>> MEX.dump(MEXFretNote)
+        <frame-note>
+            <string>3</string>
+            <fret>1</fret>
+            <fingering>2</fingering>
+        </frame-note>
+        
+        Without fingering!
+        
+        >>> fn2 = tablature.FretNote(string = 5, fret = 2)
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> MEXOtherFretNote = MEX.fretNoteToXml(fn2)
+        >>> MEX.dump(MEXOtherFretNote)
+        <frame-note>
+            <string>5</string>
+            <fret>2</fret>
+        </frame-note>
+        '''
+        FretNoteMX = Element('frame-note')
+        _setTagTextFromAttribute(fretNote, FretNoteMX, 'string')
+        _setTagTextFromAttribute(fretNote, FretNoteMX, 'fret')
+    
+        if fretNote.fingering != None:
+            _setTagTextFromAttribute(fretNote, FretNoteMX, 'fingering')
+                
+        return FretNoteMX
+        
+    def chordWithFretToXml(self, fretBoard):
+        '''
+        The ChordWithFretBoard Object combines chord symbols with FretNote objects.
+        
+        >>> myFretNote1 = tablature.FretNote(1, 2, 2)
+        >>> myFretNote2 = tablature.FretNote(2, 3, 3)
+        >>> myFretNote3 = tablature.FretNote(3, 2, 1)
+        >>> guitarChord = tablature.ChordWithFretBoard('DM', numStrings = 6, fretNotes = [myFretNote1, myFretNote2, myFretNote3])
+        >>> guitarChord.tuning = tablature.GuitarFretBoard().tuning
+        >>> guitarChord.getPitches()
+        [None, None, None, <music21.pitch.Pitch A3>, <music21.pitch.Pitch D4>, <music21.pitch.Pitch F#4>]
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> MEXChordWithFret = MEX.chordWithFretToXml(guitarChord)
+        >>> MEX.dump(MEXChordWithFret)
+        <frame>
+            <frame-strings>6</frame-strings>
+            <frame-frets>4</frame-frets>
+            <frame-note>
+                <string>3</string>
+                <fret>2</fret>
+                <fingering>1</fingering>
+            </frame-note>
+            <frame-note>
+                <string>2</string>
+                <fret>3</fret>
+                <fingering>3</fingering>
+            </frame-note>
+            <frame-note>
+                <string>1</string>
+                <fret>2</fret>
+                <fingering>2</fingering>
+            </frame-note>
+        </frame>
+        '''
+        if len(fretBoard.fretNotes) == 0:
+            return None
+        
+        mxFrame = Element('frame')
+        mxFrameStrings = SubElement(mxFrame, 'frame-strings')
+        mxFrameStrings.text = str(fretBoard.numStrings)
+        mxFrameFrets = SubElement(mxFrame, 'frame-frets')
+        mxFrameFrets.text = str(fretBoard.displayFrets)
+                
+        for thisFretNote in fretBoard.fretNotesLowestFirst():
+            mxFretNote = self.fretNoteToXml(thisFretNote)
+            mxFrame.append(mxFretNote)
+        
+        return mxFrame
 
     def tupletToTimeModification(self, tup):
         '''
