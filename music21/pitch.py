@@ -28,9 +28,11 @@ from music21 import defaults
 from music21 import exceptions21
 from music21 import interval
 from music21 import style
+from music21 import environment
 
 from music21.common import SlottedObjectMixin
-from music21 import environment
+from music21.analysis import enharmonics
+
 _MOD = 'pitch'
 environLocal = environment.Environment(_MOD)
 
@@ -474,73 +476,23 @@ def _greedyEnharmonicsSearch(oldPitches, scoreFunc=_dissonanceScore):
         newPitches.append(newPitch)
     return newPitches
 
-def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=None):
-    r'''Tries to simplify the enharmonic spelling of a list of pitches, pitch-
-    or pitch-class numbers according to a given criterion.
-
-    A function can be passed as an argument to `criterion`, that is tried to be
-    minimized in a greedy left-to-right fashion.
-
-    >>> pitch.simplifyMultipleEnharmonics([11, 3, 6])
-    [<music21.pitch.Pitch B>, <music21.pitch.Pitch D#>, <music21.pitch.Pitch F#>]
-
-    >>> pitch.simplifyMultipleEnharmonics([3, 8, 0])
-    [<music21.pitch.Pitch E->, <music21.pitch.Pitch A->, <music21.pitch.Pitch C>]
-
-    >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('G3'),
-    ...                                    pitch.Pitch('C-4'),
-    ...                                    pitch.Pitch('D4')])
-    [<music21.pitch.Pitch G3>, <music21.pitch.Pitch B3>, <music21.pitch.Pitch D4>]
-
-    >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('A3'),
-    ...                                    pitch.Pitch('B#3'),
-    ...                                    pitch.Pitch('E4')])
-    [<music21.pitch.Pitch A3>, <music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>]
-
-    The attribute `keyContext` is for supplying a KeySignature or a Key
-    which is used in the simplification:
-
-    >>> pitch.simplifyMultipleEnharmonics([6, 10, 1], keyContext=key.Key('B'))
-    [<music21.pitch.Pitch F#>, <music21.pitch.Pitch A#>, <music21.pitch.Pitch C#>]
-
-    >>> pitch.simplifyMultipleEnharmonics([6, 10, 1], keyContext=key.Key('C-'))
-    [<music21.pitch.Pitch G->, <music21.pitch.Pitch B->, <music21.pitch.Pitch D->]
-    
-    
-    Note that if there's no key context, then we won't simplify everything (at least
-    for now; this behavior may change, ).
-    
-    >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('D--3'),
-    ...                                    pitch.Pitch('F-3'),
-    ...                                    pitch.Pitch('A--3')])
-    [<music21.pitch.Pitch D--3>, <music21.pitch.Pitch F-3>, <music21.pitch.Pitch A--3>]
-
-
-
-    >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('D--3'),
-    ...                                    pitch.Pitch('F-3'),
-    ...                                    pitch.Pitch('A--3')],
-    ...                                    keyContext=key.Key('C'))
-    [<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>]
+def simplifyMultipleEnharmonics(pitches):
     '''
+    Replaces previous function with the new 'EnharmonicSimplifier' in analysis.
+    Returns a list of pitches with simplified enharmonic spellings.
+    See analysis/enharmonics.py
+    >>> pList1 = [pitch.Pitch('C'), pitch.Pitch('D'), pitch.Pitch('E')]
+    >>> es = analysis.enharmonics.EnharmonicSimplifier(pList1)
+    >>> es.bestPitches()
+    (<music21.pitch.Pitch C>, <music21.pitch.Pitch D>, <music21.pitch.Pitch E>)
+    >>> pList2 = ['D--', 'E', 'F##']
+    >>> es = analysis.enharmonics.EnharmonicSimplifier(pList2)
+    >>> es.bestPitches()
+    (<music21.pitch.Pitch C>, <music21.pitch.Pitch E>, <music21.pitch.Pitch G>)
+    '''
+    enh = enharmonics.EnharmonicSimplifier(pitches)
 
-    oldPitches = [p if isinstance(p, Pitch) else Pitch(p) for p in pitches]
-
-    if keyContext:
-        oldPitches = [keyContext.asKey('major').tonic] + oldPitches
-        remove_first = True
-    else:
-        remove_first = False
-
-    if len(oldPitches) < 5:
-        simplifiedPitches = _bruteForceEnharmonicsSearch(oldPitches, criterion)
-    else:
-        simplifiedPitches = _greedyEnharmonicsSearch(oldPitches, criterion)
-
-    if remove_first:
-        simplifiedPitches = simplifiedPitches[1:]
-
-    return simplifiedPitches
+    return enh.bestPitches()
 
 #------------------------------------------------------------------------------
 
@@ -1585,9 +1537,9 @@ class Pitch:
             Returns True or False about whether enharmonic spelling
             Has been inferred on pitch creation or whether it has
             been specified directly.
-            
+
             MIDI 61 is C# or D- equally.
-            
+
             >>> p = pitch.Pitch('C4')
             >>> p.spellingIsInferred
             False
@@ -1599,31 +1551,31 @@ class Pitch:
             >>> p.name = 'C#'
             >>> p.spellingIsInferred
             False
-            
+
             This makes a difference in transposing.  For instance:
-            
+
             >>> pInferred = pitch.Pitch(61)
             >>> pNotInferred = pitch.Pitch('C#4')
             >>> pInferred.nameWithOctave, pNotInferred.nameWithOctave
             ('C#4', 'C#4')
             >>> pInferred.spellingIsInferred, pNotInferred.spellingIsInferred
             (True, False)
-            
+
             >>> inferredTransposed = pInferred.transpose('A1')
             >>> inferredTransposed.nameWithOctave
             'D4'
             >>> notInferredTransposed = pNotInferred.transpose('A1')
             >>> notInferredTransposed.nameWithOctave
             'C##4'
-            
+
             An operation like diatonic transposition should retain the spelling is inferred
             for the resulting object
-            
+
             >>> inferredTransposed.spellingIsInferred, notInferredTransposed.spellingIsInferred
             (True, False)
 
             But Chromatic transposition can change an object to inferred spelling:
-            
+
             >>> p3 = notInferredTransposed.transpose(1) # C## -> E- not to C###
             >>> p3.nameWithOctave
             'E-4'
@@ -2330,9 +2282,9 @@ class Pitch:
         >>> d.defaultOctave = 5
         >>> d.ps
         75.0
-        
+
         Setting with microtones
-        
+
         >>> p = pitch.Pitch()
         >>> p.ps = 61
         >>> p.ps
@@ -2347,7 +2299,7 @@ class Pitch:
         C#~4(+20c)
         >>> p.ps = 61.4 # set a microtone
         >>> print(p)
-        C#~4(-10c)        
+        C#~4(-10c)
         ''')
 
 
@@ -2498,7 +2450,7 @@ class Pitch:
         # extract any numbers that may be octave designations
         octFound = []
         octNot = []
-        
+
         for char in usrStr:
             if char in '0123456789':
                 octFound.append(char)
@@ -2728,7 +2680,7 @@ class Pitch:
         Note that if spelling is inferred, setting the step does NOT
         give that enharmonic.  Perhaps it should, but best to make people use
         .getLowerEnharmonic or .getHigherEnharmonic instead.
-        
+
         >>> b.ps = 60
         >>> b.nameWithOctave
         'C4'
@@ -2739,7 +2691,7 @@ class Pitch:
         True
         >>> b.spellingIsInferred
         False
-        
+
         ''')
 
 
@@ -2961,7 +2913,7 @@ class Pitch:
         >>> p1.accidental = pitch.Accidental('half-sharp')
         >>> p1.german
         Traceback (most recent call last):
-        music21.pitch.PitchException: 
+        music21.pitch.PitchException:
             Es geht nicht "german" zu benutzen mit Microt...nen.  Schade!
 
         Note these rarely used pitches:
@@ -4277,7 +4229,7 @@ class Pitch:
         p = intervalObj.transposePitch(self)
         if not isinstance(value, int):
             p.spellingIsInferred = self.spellingIsInferred
-        
+
         if p.spellingIsInferred is True:
             p.simplifyEnharmonic(inPlace=True, mostCommon=True)
 
@@ -5508,4 +5460,3 @@ _DOC_ORDER = [Pitch, Accidental, Microtone]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-
