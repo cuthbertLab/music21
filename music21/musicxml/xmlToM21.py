@@ -79,8 +79,10 @@ def _clean(badStr):
 def musicXMLTypeToType(value):
     '''
     Utility function to convert a MusicXML duration type to an music21 duration type.
+
     Changes 'long' to 'longa' and deals with a Guitar Pro 5.2 bug in MusicXML
     export, that exports a 32nd note with the type '32th'.
+
     >>> musicxml.xmlToM21.musicXMLTypeToType('long')
     'longa'
     >>> musicxml.xmlToM21.musicXMLTypeToType('32th')
@@ -105,6 +107,7 @@ def musicXMLTypeToType(value):
 def _floatOrIntStr(strObj):
     '''
     Convert a string to float or int if possible...
+
     >>> _f = musicxml.xmlToM21._floatOrIntStr
     >>> _f("20.3")
     20.3
@@ -131,22 +134,31 @@ def _setAttributeFromAttribute(m21El, xmlEl, xmlAttributeName,
     If xmlEl has a at least one element of tag==tag with some text. If
     it does, set the attribute either with the same name (with "foo-bar" changed to
     "fooBar") or with attributeName to the text contents.
+
     Pass a function or lambda function as transform to transform the value before setting it
+
     >>> from xml.etree.ElementTree import fromstring as El
     >>> e = El('<page-layout new-page="yes" page-number="4" />')
+
     >>> setb = musicxml.xmlToM21._setAttributeFromAttribute
     >>> pl = layout.PageLayout()
     >>> setb(pl, e, 'page-number')
     >>> pl.pageNumber
     '4'
+
     >>> setb(pl, e, 'new-page', 'isNew')
     >>> pl.isNew
     'yes'
+
+
     Transform the pageNumber value to an int.
+
     >>> setb(pl, e, 'page-number', transform=int)
     >>> pl.pageNumber
     4
+
     More complex...
+
     >>> convBool = musicxml.xmlObjects.yesNoToBoolean
     >>> setb(pl, e, 'new-page', 'isNew', transform=convBool)
     >>> pl.isNew
@@ -168,20 +180,26 @@ def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, *, transform
     If xmlEl has a at least one element of tag==tag with some text. If
     it does, set the attribute either with the same name (with "foo-bar" changed to
     "fooBar") or with attributeName to the text contents.
+
     Pass a function or lambda function as `transform` to transform the value before setting it
+
     >>> from xml.etree.ElementTree import Element, SubElement
     >>> e = Element('accidental')
     >>> a = SubElement(e, 'alter')
     >>> a.text = '-2'
+
     >>> seta = musicxml.xmlToM21._setAttributeFromTagText
     >>> acc = pitch.Accidental()
     >>> seta(acc, e, 'alter', '_alter')
     >>> acc.alter
     '-2'
+
     Transform the alter text to a float.
+
     >>> seta(acc, e, 'alter', transform=float)
     >>> acc.alter
     -2.0
+
     >>> e2 = Element('score-partwise')
     >>> a2 = SubElement(e2, 'movement-title')
     >>> a2.text = "Trout"
@@ -189,7 +207,9 @@ def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, *, transform
     >>> seta(md, e2, 'movement-title', 'movementName')
     >>> md.movementName
     'Trout'
+
     set a different attribute
+
     >>> seta(md, e2, 'movement-title', 'composer')
     >>> md.composer
     'Trout'
@@ -214,13 +234,16 @@ def _synchronizeIds(element, m21Object):
     (%optional-unique-id)
     on many elements which is perfect for setting as .id on
     a music21 element.
+
     >>> from xml.etree.ElementTree import fromstring as El
     >>> e = El('<fermata id="fermata1"/>')
     >>> f = expressions.Fermata()
     >>> musicxml.xmlToM21._synchronizeIds(e, f)
     >>> f.id
     'fermata1'
+
     Does not change the id if the id is not specified:
+
     >>> e = El('<fermata />')
     >>> f = expressions.Fermata()
     >>> f.id = 'doNotOverwrite'
@@ -255,17 +278,22 @@ class XMLParserBase:
         Takes an mxObject, a music21Object, and a list/tuple of musicXMLnames and
         a list/tuple of m21Names, and assigns each of the mxObject's attributes
         that fits this style name to the corresponding style object's m21Name attribute.
+
         >>> from xml.etree.ElementTree import fromstring as El
         >>> XP = musicxml.xmlToM21.XMLParserBase()
         >>> mxObj = El('<a x="20.1" y="10.0" z="yes" />')
         >>> m21Obj = base.Music21Object()
         >>> musicXMLNames = ('w', 'x', 'y', 'z')
         >>> m21Names = ('justify', 'absoluteX', 'absoluteY', 'hideObjectOnPrint')
+
         >>> XP.setStyleAttributes(mxObj, m21Obj, musicXMLNames, m21Names)
+
         `.justify` requires a TextStyle object.
+
         >>> m21Obj.style.justify
         Traceback (most recent call last):
         AttributeError: 'Style' object has no attribute 'justify'
+
         >>> m21Obj.style.absoluteX
         20.1
         >>> m21Obj.style.absoluteY
@@ -316,6 +344,7 @@ class XMLParserBase:
         enclosure, on an
         m21Object, which must have style.TextStyle as its Style class,
         and then calls setPrintStyleAlign
+
         conforms to attr-group %text-formatting in the MusicXML DTD
         '''
         musicXMLNames = ('justify', 'text-decoration', 'text-rotation', 'letter-spacing',
@@ -343,6 +372,7 @@ class XMLParserBase:
         '''
         runs setPrintStyle and then sets horizontalAlign and verticalAlign, on an
         m21Object, which must have style.TextStyle as its Style class.
+
         conforms to attr-group %print-style-align in the MusicXML DTD
         '''
         self.setPrintStyle(mxObject, m21Object)
@@ -355,6 +385,7 @@ class XMLParserBase:
         '''
         get position, font, and color information from the mxObject
         into the m21Object, which must have style.TextStyle as its Style class.
+
         conforms to attr-group %print-style in the MusicXML DTD
         '''
         self.setPosition(mxObject, m21Object)
@@ -372,7 +403,9 @@ class XMLParserBase:
         sets font-family, font-style, font-size, and font-weight as
         fontFamily (list), fontStyle, fontSize and fontWeight from
         an object into a TextStyle object
+
         conforms to attr-group %font in the MusicXML DTD
+
         >>> from xml.etree.ElementTree import fromstring as El
         >>> XP = musicxml.xmlToM21.XMLParserBase()
         >>> mxObj = El('<text font-family="Courier,monospaced" font-style="italic" '
@@ -399,6 +432,7 @@ class XMLParserBase:
         get positioning information for an object from
         default-x, default-y, relative-x, relative-y into
         the .style attribute's absoluteX, relativeX, etc. attributes'
+
         conforms to attr-group %position in the MusicXML DTD
         '''
         musicXMLNames = ('default-x', 'default-y', 'relative-x', 'relative-y')
@@ -424,14 +458,18 @@ class XMLParserBase:
     def setEditorial(self, mxObj, m21Obj):
         '''
         Set editorial information from an mxObj
+
         >>> from xml.etree.ElementTree import fromstring as El
         >>> XP = musicxml.xmlToM21.XMLParserBase()
         >>> mxObj = El('<a/>')
         >>> n = note.Note('C#4')
+
         Most common case:
+
         >>> XP.setEditorial(mxObj, n)
         >>> n.hasEditorialInformation
         False
+
         >>> mxObj = El('<note><footnote>Sharp is conjectural</footnote>'
         ...            + '<level reference="yes">2</level></note>')
         >>> XP.setEditorial(mxObj, n)
@@ -448,8 +486,10 @@ class XMLParserBase:
         '2'
         >>> fn.isReference
         True
+
         If no <footnote> tag exists, the editorial information will be found in
         comments:
+
         >>> mxObj = El('<note><level reference="no">ed</level></note>')
         >>> n = note.Note('C#4')
         >>> XP.setEditorial(mxObj, n)
@@ -498,13 +538,18 @@ class XMLParserBase:
         '''
         Given an mxPrint object, set object data for
         the print section of a layout.PageLayout object
+
+
         >>> from xml.etree.ElementTree import fromstring as El
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
+
         >>> mxPrint = El('<print new-page="yes" page-number="5">'
         ...    + '    <page-layout><page-height>4000</page-height>'
         ...    + '        <page-margins><left-margin>20</left-margin>'
         ...    + '                 <right-margin>30.25</right-margin></page-margins>'
         ...    + '</page-layout></print>')
+
         >>> pl = MP.xmlPrintToPageLayout(mxPrint)
         >>> pl.isNew
         True
@@ -537,6 +582,7 @@ class XMLParserBase:
     def xmlPageLayoutToPageLayout(self, mxPageLayout, inputM21=None):
         '''
         get a PageLayout object from an mxPageLayout
+
         Called out from mxPrintToPageLayout because it
         is also used in the <defaults> tag
         '''
@@ -564,8 +610,11 @@ class XMLParserBase:
     def xmlPrintToSystemLayout(self, mxPrint, inputM21=None):
         '''
         Given an mxPrint object, set object data
+
         >>> from xml.etree.ElementTree import fromstring as El
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
+
         >>> mxPrint = El('<print new-system="yes">'
         ...    + '    <system-layout><system-distance>55</system-distance>'
         ...    + '        <system-margins><left-margin>20</left-margin>'
@@ -602,6 +651,7 @@ class XMLParserBase:
     def xmlSystemLayoutToSystemLayout(self, mxSystemLayout, inputM21=None):
         '''
         get a SystemLayout object from an <system-layout> element
+
         Called out from xmlPrintToSystemLayout because it
         is also used in the <defaults> tag
         '''
@@ -632,6 +682,7 @@ class XMLParserBase:
     def xmlStaffLayoutToStaffLayout(self, mxStaffLayout, inputM21=None):
         '''
         get a StaffLayout object from an <staff-layout> tag
+
         In music21, the <staff-layout> and <staff-details> are
         intertwined in a StaffLayout object.
         '''
@@ -823,6 +874,7 @@ class MusicXMLImporter(XMLParserBase):
         <score-part> entries into self.mxScorePartDict[partId]
         and adds them to any open <part-group> entries,
         stored as PartGroup objects in self.partGroupList
+
         '''
         mxPartList = mxScore.find('part-list')
         if mxPartList is None:
@@ -853,17 +905,22 @@ class MusicXMLImporter(XMLParserBase):
 
     def xmlCreditToTextBox(self, mxCredit):
         '''Convert a MusicXML credit to a music21 TextBox
+
         >>> import xml.etree.ElementTree as ET
         >>> credit = ET.fromstring(
         ...               '<credit page="2"><credit-words>Testing</credit-words></credit>')
+
         >>> MI = musicxml.xmlToM21.MusicXMLImporter()
         >>> tb = MI.xmlCreditToTextBox(credit)
         >>> tb.page
         2
         >>> tb.content
         'Testing'
+
         OMIT_FROM_DOCS
+
         Capella generates empty credit-words
+
         >>> credit = ET.fromstring('<credit><credit-words/></credit>')
         >>> tb = MI.xmlCreditToTextBox(credit)
         >>> tb
@@ -940,8 +997,10 @@ class MusicXMLImporter(XMLParserBase):
         Set the appearance and font information from mxDefault
         <appearance>, <music-font>, <word-font>, <lyric-font> (multiple),
         and <lyric-language> tags.
+
         Here the demo does not include the <appearance> tag since that is
         documented in `xmlAppearanceToStyle`
+
         >>> import xml.etree.ElementTree as ET
         >>> defaults = ET.fromstring('<defaults>'
         ...          + '<music-font font-family="Maestro, Opus" font-weight="bold" />'
@@ -951,6 +1010,7 @@ class MusicXMLImporter(XMLParserBase):
         ...          + '<lyric-language name="verse" xml:lang="fr" />'
         ...          + '<lyric-language name="chorus" xml:lang="en" />'
         ...          + '</defaults>')
+
         >>> MI = musicxml.xmlToM21.MusicXMLImporter()
         >>> MI.styleFromXmlDefaults(defaults)
         >>> st = MI.stream.style
@@ -1009,6 +1069,7 @@ class MusicXMLImporter(XMLParserBase):
     def xmlAppearanceToStyle(self, mxAppearance):
         '''
         Parse the appearance tag for information about line widths and note sizes
+
         >>> import xml.etree.ElementTree as ET
         >>> appear = ET.fromstring('<appearance>'
         ...          + '<line-width type="beam">5</line-width>'
@@ -1017,15 +1078,20 @@ class MusicXMLImporter(XMLParserBase):
         ...          + '<distance type="hyphen">0.5</distance>'
         ...          + '<other-appearance type="sharps">dotted</other-appearance>'
         ...          + '</appearance>')
+
         >>> MI = musicxml.xmlToM21.MusicXMLImporter()
         >>> MI.xmlAppearanceToStyle(appear)
         >>> st = MI.stream.style
+
         >>> st.lineWidths
         [('beam', 5), ('ledger', 1.5625)]
+
         >>> st.noteSizes
         [('grace', 60)]
+
         >>> st.distances
         [('hyphen', 0.5)]
+
         >>> st.otherAppearances
         [('sharps', 'dotted')]
         '''
@@ -1104,6 +1170,7 @@ class MusicXMLImporter(XMLParserBase):
     def xmlMetadata(self, el=None, inputM21=None):
         '''
         Converts part of the root element into a metadata object
+
         Supported: work-title, work-number, opus, movement-number,
         movement-title, identification
         '''
@@ -1137,8 +1204,11 @@ class MusicXMLImporter(XMLParserBase):
         '''
         Converter an <identification> tag, containing <creator> tags, <rights> tags, and
         <miscellaneous> tag.
+
         Not supported: source, relation
+
         Only the first <rights> tag is supported
+
         Encoding only parses "supports" and that only has
         new-system (definesExplicitSystemBreaks) and
         new-page (definesExplicitPageBreaks)
@@ -1207,8 +1277,10 @@ class MusicXMLImporter(XMLParserBase):
     def creatorToContributor(self, creator, inputM21=None):
         '''
         Given an <creator> tag, fill the necessary parameters of a Contributor.
+
         >>> import xml.etree.ElementTree as ET
         >>> creator = ET.fromstring('<creator type="composer">Beethoven, Ludwig van</creator>')
+
         >>> MI = musicxml.xmlToM21.MusicXMLImporter()
         >>> c = MI.creatorToContributor(creator)
         >>> c
@@ -1217,7 +1289,9 @@ class MusicXMLImporter(XMLParserBase):
         'composer'
         >>> c.name
         'Beethoven, Ludwig van'
+
         Pass in a Contributor object and set it...
+
         >>> c2 = metadata.Contributor()
         >>> MI.creatorToContributor(creator, c2)
         >>> c2.role
@@ -1244,8 +1318,10 @@ class MusicXMLImporter(XMLParserBase):
         '''
         Given an <rights> tag, fill the necessary parameters of a
         :class:`~music21.metadata.primitives.Copyright` object.
+
         >>> import xml.etree.ElementTree as ET
         >>> rights = ET.fromstring('<rights type="owner">CC-SA-BY</rights>')
+
         >>> MI = musicxml.xmlToM21.MusicXMLImporter()
         >>> c = MI.rightsToCopyright(rights)
         >>> c
@@ -1272,6 +1348,7 @@ class MusicXMLImporter(XMLParserBase):
 class PartParser(XMLParserBase):
     '''
     parser to work with a single <part> tag.
+
     called out for multiprocessing potential in future
     '''
     def __init__(self, mxPart=None, mxScorePart=None, parent=None):
@@ -1357,8 +1434,10 @@ class PartParser(XMLParserBase):
         The <score-part> tag contains a lot of information about the
         Part itself.  It was found in the <part-list> in the ScoreParser but
         was not parsed and instead passed into the PartParser as .mxScorePart.
+
         Sets the stream.partName, stream.partAbbreivation, self.activeInstrument,
         and inserts an instrument at the beginning of the stream.
+
         The instrumentObj being configured comes from self.getDefaultInstrument.
         '''
         part = self.stream
@@ -1410,6 +1489,7 @@ class PartParser(XMLParserBase):
         ...     + '</score-part>')
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> PP = musicxml.xmlToM21.PartParser()
+
         >>> mxScorePart = EL(scorePart)
         >>> i = PP.getDefaultInstrument(mxScorePart)
         >>> i.instrumentName
@@ -1608,8 +1688,11 @@ class PartParser(XMLParserBase):
         :class:`~music21.musicxml.xmlToM21.MeasureParser`
 
         >>> from xml.etree.ElementTree import fromstring as EL
+
         Testing full measure rest parsing:
+
         Here is a measure with a rest that lasts 4 beats but we will put it in a 3/4 context.
+
         >>> scoreMeasure = '<measure><note><rest/><duration>40320</duration></note></measure>'
         >>> mxMeasure = EL(scoreMeasure)
         >>> pp = musicxml.xmlToM21.PartParser()
@@ -1619,7 +1702,9 @@ class PartParser(XMLParserBase):
         4.0
         >>> pp.lastTimeSignature = meter.TimeSignature('3/4')
         >>> m = pp.xmlMeasureToMeasure(mxMeasure)
+
         Test that the rest lasts three, not four beats:
+
         >>> measureRest = m.notesAndRests[0]
         >>> measureRest
         <music21.note.Rest rest>
@@ -1672,8 +1757,10 @@ class PartParser(XMLParserBase):
         in transposition is going to have an effect on the
         Part's instrument list.  This (totally undocumented) method
         deals with it.
+
         If measureParser.transposition is None, does nothing.
         If measureParser.transposition is not None, but
+
         NOTE: Need to test a change of instrument w/o a change of
         transposition such as: Bb clarinet to Bb Soprano Sax to Eb clarinet?
         '''
@@ -1715,22 +1802,29 @@ class PartParser(XMLParserBase):
         '''
         Sets self.lastMeasureNumber and self.lastMeasureSuffix from the measure,
         which is used in fixing Finale unnumbered measure issues.
+
         Also sets self.lastTimeSignature from the timeSignature found in
         the measure, if any.
+
         >>> PP = musicxml.xmlToM21.PartParser()
+
         Here are the defaults:
+
         >>> PP.lastMeasureNumber
         0
         >>> PP.lastNumberSuffix is None
         True
         >>> PP.lastTimeSignature is None
         True
+
         After setLastMeasureInfo:
+
         >>> m = stream.Measure(number=4)
         >>> m.numberSuffix = 'b'
         >>> ts38 = meter.TimeSignature('3/8')
         >>> m.timeSignature = ts38
         >>> PP.setLastMeasureInfo(m)
+
         >>> PP.lastMeasureNumber
         4
         >>> PP.lastNumberSuffix
@@ -1739,22 +1833,28 @@ class PartParser(XMLParserBase):
         <music21.meter.TimeSignature 3/8>
         >>> PP.lastTimeSignature is ts38
         True
+
         Note that if there was no timeSignature defined in m,
         and no lastTimeSignature exists,
         the PartParser gets a default of 4/4, because
         after the first measure there's going to be routines
         that need some sort of time signature:
+
         >>> PP2 = musicxml.xmlToM21.PartParser()
         >>> m2 = stream.Measure(number=2)
         >>> PP2.setLastMeasureInfo(m2)
         >>> PP2.lastTimeSignature
         <music21.meter.TimeSignature 4/4>
+
+
         For obscure reasons relating to how Finale gives suffixes
         to unnumbered measures, if a measure has the same number
         as lastMeasureNumber, the lastNumberSuffix is not updated:
+
         >>> PP3 = musicxml.xmlToM21.PartParser()
         >>> PP3.lastMeasureNumber = 10
         >>> PP3.lastNumberSuffix = 'X1'
+
         >>> m10 = stream.Measure(number=10)
         >>> m10.numberSuffix = 'X2'
         >>> PP3.setLastMeasureInfo(m10)
@@ -1786,8 +1886,10 @@ class PartParser(XMLParserBase):
         immediately follows an incomplete measure (such as a repeat sign mid-measure
         in a piece where each phrase begins with a pickup and ends with an
         incomplete measure).
+
         Fills an empty measure with a measure of rest (bug in PDFtoMusic and
         other MusicXML writers).
+
         sets self.lastMeasureWasShort to True or False if it is an incomplete measure
         that is not a pickup.
         '''
@@ -1844,10 +1946,12 @@ class PartParser(XMLParserBase):
     def applyMultiMeasureRest(self, r):
         '''
         If there is an active MultiMeasureRestSpanner, add the Rest, r, to it:
+
         >>> PP = musicxml.xmlToM21.PartParser()
         >>> mmrSpanner = spanner.MultiMeasureRest()
         >>> mmrSpanner
         <music21.spanner.MultiMeasureRest 0 measures>
+
         >>> PP.activeMultiMeasureRestSpanner = mmrSpanner
         >>> PP.multiMeasureRestsToCapture = 2
         >>> r1 = note.Rest(type='whole', id='r1')
@@ -1856,22 +1960,28 @@ class PartParser(XMLParserBase):
         1
         >>> PP.activeMultiMeasureRestSpanner
         <music21.spanner.MultiMeasureRest 1 measure>
+
         >>> PP.activeMultiMeasureRestSpanner is mmrSpanner
         True
         >>> PP.stream.show('text')  # Nothing...
+
         >>> r2 = note.Rest(type='whole', id='r2')
         >>> PP.applyMultiMeasureRest(r2)
         >>> PP.multiMeasureRestsToCapture
         0
         >>> PP.activeMultiMeasureRestSpanner is None
         True
+
         # spanner added to stream
+
         >>> PP.stream.show('text')
         {0.0} <music21.spanner.MultiMeasureRest 2 measures>
+
         >>> r3 = note.Rest(type='whole', id='r3')
         >>> PP.applyMultiMeasureRest(r3)
         >>> PP.stream.show('text')
         {0.0} <music21.spanner.MultiMeasureRest 2 measures>
+
         '''
         if self.activeMultiMeasureRestSpanner is None:
             return
@@ -1886,9 +1996,11 @@ class PartParser(XMLParserBase):
 class MeasureParser(XMLParserBase):
     '''
     parser to work with a single <measure> tag.
+
     called out for simplicity.
 
     >>> from xml.etree.ElementTree import fromstring as EL
+
     >>> scoreMeasure = '<measure><note><rest/><duration>40320</duration></note></measure>'
     >>> mxMeasure = EL(scoreMeasure)
     >>> mp = musicxml.xmlToM21.MeasureParser(mxMeasure)
@@ -1897,6 +2009,7 @@ class MeasureParser(XMLParserBase):
     1
     >>> mp.restAndNoteCount['note']
     0
+
     >>> mp.fullMeasureRest
     True
     '''
@@ -1993,20 +2106,28 @@ class MeasureParser(XMLParserBase):
         '''
         gets a string representing a staff number, or None
         from an mxObject or a number...
+
         >>> mp = musicxml.xmlToM21.MeasureParser()
         >>> from xml.etree.ElementTree import fromstring as EL
+
         >>> gsn = mp.getStaffNumberStr
         >>> gsn(1)
         '1'
         >>> gsn('2')
         '2'
+
         <note> tags store their staff numbers in a <staff> tag's text...
+
         >>> gsn(EL('<note><staff>2</staff></note>'))
         '2'
+
         ...or not at all.
+
         >>> gsn(EL('<note><pitch><step>C</step><octave>4</octave></pitch></note>')) is None
         True
+
         Clefs, however, store theirs in a `number` attribute.
+
         >>> gsn(EL('<clef number="2"/>'))
         '2'
         >>> print(gsn(None))
@@ -2059,6 +2180,7 @@ class MeasureParser(XMLParserBase):
         Utility routine for importing musicXML objects;
         here, we store a reference to the music21 object in a dictionary,
         where keys are the staff values. Staff values may be None, 1, 2, etc.
+
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.addToStaffReference(1, note.Note('C5'))
         >>> MP.addToStaffReference(2, note.Note('D3'))
@@ -2071,12 +2193,15 @@ class MeasureParser(XMLParserBase):
         [<music21.note.Note C>]
         >>> MP.staffReference['2']
         [<music21.note.Note D>, <music21.note.Note E>]
+
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> mxNote = EL('<note><staff>1</staff></note>')
         >>> MP.addToStaffReference(mxNote, note.Note('F5'))
         >>> MP.staffReference['1']
         [<music21.note.Note C>, <music21.note.Note F>]
+
         No staff reference.
+
         >>> mxNote = EL('<note />')
         >>> MP.addToStaffReference(mxNote, note.Note('G4'))
         >>> len(MP.staffReference)
@@ -2093,11 +2218,15 @@ class MeasureParser(XMLParserBase):
     def insertCoreAndRef(self, offset, mxObjectOrNumber, m21Object):
         '''
         runs addToStaffReference and then insertCore.
+
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> mxNote = EL('<note><staff>1</staff></note>')
+
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.insertCoreAndRef(1.0, mxNote, note.Note('F5'))
+
         Need to run at end:
+
         >>> MP.stream.coreElementsChanged()
         >>> MP.stream.show('text')
         {1.0} <music21.note.Note F>
@@ -2156,6 +2285,7 @@ class MeasureParser(XMLParserBase):
         <print> handles changes in pages, numbering, layout,
         etc. so can generate PageLayout, SystemLayout, or StaffLayout
         objects.
+
         Should also be able to set measure attributes on self.stream
         '''
         def hasPageLayout(mxPrint):
@@ -2213,6 +2343,7 @@ class MeasureParser(XMLParserBase):
     def xmlToNote(self, mxNote):
         '''
         handles everything for creating a Note or Rest or Chord
+
         Does not actually return the note, but sets self.nLast to the note.
         '''
         try:
@@ -2307,14 +2438,18 @@ class MeasureParser(XMLParserBase):
     def xmlToChord(self, mxNoteList):
         '''
         Given an a list of mxNotes, fill the necessary parameters
+
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.divisions = 10080
+
         >>> qnDuration = r'<duration>7560</duration><type>quarter</type>'
+
         >>> a = EL(r'<note><pitch><step>A</step><octave>3</octave></pitch>'
         ...          + qnDuration + '</note>')
         >>> b = EL(r'<note><chord/><pitch><step>B</step><octave>3</octave></pitch>'
         ...          + qnDuration + '</note>')
+
         >>> c = MP.xmlToChord([a, b])
         >>> len(c.pitches)
         2
@@ -2374,14 +2509,20 @@ class MeasureParser(XMLParserBase):
         '''
         Translate a MusicXML <note> (without <chord/>)
         to a :class:`~music21.note.Note`.
+
         The `spannerBundle` parameter can be a list or a Stream
         for storing and processing Spanner objects.
+
         If inputM21 is not `None` then that object is used
         for translating. Otherwise a new Note is created.
+
         if freeSpanners is False then pending spanners will not be freed
+
         Returns a `note.Note` object.
+
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> MP.divisions = 10080
 
         >>> mxNote = EL('<note pizzicato="yes"><pitch><step>D</step>'
@@ -2398,16 +2539,20 @@ class MeasureParser(XMLParserBase):
         <music21.duration.Duration 0.75>
         >>> n.articulations
         [<music21.articulations.Pizzicato>]
+
+
         >>> beams = EL('<beam>begin</beam>')
         >>> mxNote.append(beams)
         >>> n = MP.xmlToSimpleNote(mxNote)
         >>> n.beams
         <music21.beam.Beams <music21.beam.Beam 1/start>>
+
         >>> stem = EL('<stem>up</stem>')
         >>> mxNote.append(stem)
         >>> n = MP.xmlToSimpleNote(mxNote)
         >>> n.stemDirection
         'up'
+
         # TODO: beams over rests?
         '''
         n = note.Note()
@@ -2443,32 +2588,39 @@ class MeasureParser(XMLParserBase):
     def xmlToBeam(self, mxBeam, inputM21=None):
         '''
         given an mxBeam object return a :class:`~music21.beam.Beam` object
+
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> mxBeam = EL('<beam>begin</beam>')
         >>> a = MP.xmlToBeam(mxBeam)
         >>> a.type
         'start'
+
         >>> mxBeam = EL('<beam>continue</beam>')
         >>> a = MP.xmlToBeam(mxBeam)
         >>> a.type
         'continue'
+
         >>> mxBeam = EL('<beam>end</beam>')
         >>> a = MP.xmlToBeam(mxBeam)
         >>> a.type
         'stop'
+
         >>> mxBeam = EL('<beam>forward hook    </beam>')
         >>> a = MP.xmlToBeam(mxBeam)
         >>> a.type
         'partial'
         >>> a.direction
         'right'
+
         >>> mxBeam = EL('<beam>backward hook</beam>')
         >>> a = MP.xmlToBeam(mxBeam)
         >>> a.type
         'partial'
         >>> a.direction
         'left'
+
         >>> mxBeam = EL('<beam>crazy</beam>')
         >>> a = MP.xmlToBeam(mxBeam)
         Traceback (most recent call last):
@@ -2507,8 +2659,10 @@ class MeasureParser(XMLParserBase):
 
     def xmlToBeams(self, mxBeamList, inputM21=None):
         '''given a list of mxBeam objects, sets the beamsList
+
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> mxBeam1 = EL('<beam>begin</beam>')
         >>> mxBeam2 = EL('<beam>begin</beam>')
         >>> mxBeamList = [mxBeam1, mxBeam2]
@@ -2533,8 +2687,10 @@ class MeasureParser(XMLParserBase):
     def xmlNotehead(self, n, mxNotehead):
         '''
         Set notehead information from the mxNotehead object
+
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> n = note.Note()
         >>> nh = EL('<notehead color="#FF0000" filled="no" parentheses="yes">' 
         ...         + 'diamond</notehead>')
@@ -2567,6 +2723,7 @@ class MeasureParser(XMLParserBase):
     def xmlToPitch(self, mxNote, inputM21=None):
         '''
         Given a MusicXML Note object, set this Pitch object to its values.
+
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
 
@@ -2575,6 +2732,7 @@ class MeasureParser(XMLParserBase):
         >>> a = MP.xmlToPitch(b)
         >>> print(a)
         E-3
+
         Conflicting alter and accidental -- alter is still stored, but name is :
 
         >>> b = EL('<note><pitch><step>E</step><alter>-1</alter><octave>3</octave></pitch>'
@@ -2584,10 +2742,13 @@ class MeasureParser(XMLParserBase):
         E#3
         >>> a.fullName
         'E-sharp in octave 3'
+
         >>> a.accidental.alter
         -1.0
+
         >>> a.accidental.name
         'sharp'
+
         >>> a.accidental.modifier
         '#'
         '''
@@ -2647,6 +2808,7 @@ class MeasureParser(XMLParserBase):
         '''
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> a = EL('<accidental>half-flat</accidental>')
         >>> b = pitch.Accidental()
         >>> MP.xmlToAccidental(a, b)
@@ -2654,14 +2816,17 @@ class MeasureParser(XMLParserBase):
         'half-flat'
         >>> b.alter
         -0.5
+
         >>> a = EL('<accidental parentheses="yes">sharp</accidental>')
         >>> b = MP.xmlToAccidental(a)
         >>> b.displayStyle
         'parentheses'
+
         >>> a = EL('<accidental bracket="yes">sharp</accidental>')
         >>> b = MP.xmlToAccidental(a)
         >>> b.displayStyle
         'bracket'
+
         >>> a = EL('<accidental bracket="yes" parentheses="yes">sharp</accidental>')
         >>> b = MP.xmlToAccidental(a)
         >>> b.displayStyle
@@ -2706,35 +2871,47 @@ class MeasureParser(XMLParserBase):
         '''
         Takes a <note> tag that has been shown to have a <rest> tag in it
         and return a rest.
+
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> mxr = EL('<note><rest/><duration>5040</duration><type>eighth</type></note>')
         >>> r = MP.xmlToRest(mxr)
         >>> r
         <music21.note.Rest rest>
         >>> r.duration.quarterLength
         0.5
+
         >>> mxr = EL('<note><rest><display-step>G</display-step>' +
         ...              '<display-octave>4</display-octave>' +
         ...              '</rest><duration>5040</duration><type>eighth</type></note>')
         >>> r = MP.xmlToRest(mxr)
         >>> r
         <music21.note.Rest rest>
+
         A rest normally lies at B4 in treble clef, but here we have put it at
         G4, so we'll shift it down two steps.
+
         >>> r.stepShift
         -2
+
         Clef context matters, here we will set it for notes that don't specify a staff:
+
         >>> MP.lastClefs[None] = clef.BassClef()
         >>> r = MP.xmlToRest(mxr)
+
         Now this is a high rest:
+
         >>> r.stepShift
         10
+
         Test full measure rest.
+
         >>> mxr = EL('<note><rest measure="yes"/><duration>40320</duration></note>')
         >>> r = MP.xmlToRest(mxr)
         >>> MP.fullMeasureRest
         True
+
         Note that we do NOT set `r`'s `.fullMeasure` to True or always, but keep it as
         "auto" so that changes in time signature, etc. will affect output.
         '''
@@ -2859,13 +3036,17 @@ class MeasureParser(XMLParserBase):
         Translate a `MusicXML` <note> object's
         <duration>, <type>, <dot>, tuplets, etc.
         to a music21 :class:`~music21.duration.Duration` object.
+
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> MP.divisions = 10080
+
         >>> mxNote = EL('<note><pitch><step>D</step>' +
         ...     '<alter>-1</alter><octave>6</octave></pitch>' +
         ...     '<duration>7560</duration>' +
         ...     '<type>eighth</type><dot/></note>')
+
         >>> c = duration.Duration()
         >>> MP.xmlToDuration(mxNote, c)
         >>> c
@@ -2980,6 +3161,7 @@ class MeasureParser(XMLParserBase):
         '''
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> mxNotations = EL('<notations>' +
         ...     '<fermata type="upright">angled</fermata>' +
         ...     '</notations>')
@@ -3068,15 +3250,19 @@ class MeasureParser(XMLParserBase):
         '''
         Convert an mxArticulationMark to a music21.articulations.Articulation
         object or one of its subclasses.
+
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> mxTech = EL('<down-bow placement="below"/>')
         >>> a = MP.xmlTechnicalToArticulation(mxTech)
         >>> a
         <music21.articulations.DownBow>
         >>> a.placement
         'below'
+
         Fingering might have substitution or alternate
+
         >>> mxTech = EL('<fingering substitution="yes">5</fingering>')
         >>> f = MP.xmlTechnicalToArticulation(mxTech)
         >>> f
@@ -3085,9 +3271,13 @@ class MeasureParser(XMLParserBase):
         True
         >>> f.alternate
         False
+
         FingerNumbers get converted to ints if possible
+
         >>> f.fingerNumber
         5
+
+
         >>> mxTech = EL('<fingering alternate="yes">4-3</fingering>')
         >>> f = MP.xmlTechnicalToArticulation(mxTech)
         >>>
@@ -3128,13 +3318,17 @@ class MeasureParser(XMLParserBase):
         From the artificial or natural tag (or no tag) and
         zero or one of base-pitch, sounding-pitch, touching-pitch,
         sets .harmonicType and .pitchType on a articulations.Harmonic object
+
         Called from xmlTechnicalToArticulation
+
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> mxTech = EL('<harmonic><artificial/><sounding-pitch/></harmonic>')
         >>> a = MP.xmlTechnicalToArticulation(mxTech)
         >>> a
         <music21.articulations.StringHarmonic>
+
         >>> a.harmonicType
         'artificial'
         >>> a.pitchType
@@ -3172,14 +3366,17 @@ class MeasureParser(XMLParserBase):
     def xmlToArticulation(self, mxObj):
         '''
         Return an articulation from an mxObj, setting placement
+
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> mxArt = EL('<spiccato placement="above"/>')
         >>> a = MP.xmlToArticulation(mxArt)
         >>> a
         <music21.articulations.Spiccato>
         >>> a.placement
         'above'
+
         >>> mxArt = EL('<doit dash-length="2" default-x="5" default-y="2" '
         ...            + 'line-shape="curved" line-type="dashed" space-length="1" />')
         >>> a = MP.xmlToArticulation(mxArt)
@@ -3223,12 +3420,17 @@ class MeasureParser(XMLParserBase):
     def xmlOrnamentToExpression(self, mxObj):
         '''
         Convert mxOrnament into a music21 ornament.
+
         This only processes non-spanner ornaments.
         Many mxOrnaments are spanners: these are handled elsewhere.
+
         Returns None if cannot be converted or not defined.
+
         Return an articulation from an mxObj, setting placement
+
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> mxOrn = EL('<inverted-turn placement="above" font-size="24"/>')
         >>> a = MP.xmlOrnamentToExpression(mxOrn)
         >>> a
@@ -3237,11 +3439,14 @@ class MeasureParser(XMLParserBase):
         'above'
         >>> a.style.fontSize
         24
+
         If it can't be converted, return None
+
         >>> mxOrn = EL('<crazy-slide placement="above"/>')
         >>> a = MP.xmlOrnamentToExpression(mxOrn)
         >>> a is None
         True
+
         Not supported currently: 'accidental-mark', 'vertical-turn',
         'delayed-turn', 'delayed-inverted-turn'
         '''
@@ -3259,26 +3464,33 @@ class MeasureParser(XMLParserBase):
         '''
         Some spanners, such as MusicXML wedge, bracket, and dashes,
         are encoded as MusicXML directions.
+
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> n1 = note.Note("D4")
         >>> MP.nLast = n1
+
         >>> len(MP.spannerBundle)
         0
         >>> mxDirectionType = EL('<wedge type="crescendo" number="2"/>')
         >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType)
         >>> retList
         [<music21.spanner.Crescendo >]
+
         >>> len(MP.spannerBundle)
         1
         >>> sp = MP.spannerBundle[0]
         >>> sp
         <music21.spanner.Crescendo >
+
         >>> mxDirectionType2 = EL('<wedge type="stop" number="2"/>')
         >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType2)
+
         retList is empty because nothing new has been added.
+
         >>> retList
         []
+
         >>> len(MP.spannerBundle)
         1
         >>> sp = MP.spannerBundle[0]
@@ -3431,6 +3643,7 @@ class MeasureParser(XMLParserBase):
         '''
         Some spanner types do not have an id necessarily, we allow duplicates of them
         if allowDuplicateIds is True. Wedges are one.
+
         Returns the new spanner created.
         '''
         idFound = mxObj.get('number')
@@ -3467,9 +3680,12 @@ class MeasureParser(XMLParserBase):
         '''
         Translate a MusicXML <note> with <tie> subelements
         :class:`~music21.tie.Tie` object
+
         >>> import xml.etree.ElementTree as ET
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         Create the incomplete part of a Note.
+
         >>> mxNote = ET.fromstring('<note><tie type="start" />'
         ...            + '<notations>'
         ...            + '<tied line-type="dotted" placement="below" type="start" />'
@@ -3481,8 +3697,10 @@ class MeasureParser(XMLParserBase):
         'dotted'
         >>> t.placement
         'below'
+
         Same thing but with orientation instead of placement, which both get mapped to
         placement in Tie objects
+
         >>> mxNote = ET.fromstring('<note><tie type="start" />'
         ...            + '<notations>'
         ...            + '<tied line-type="dotted" orientation="over" type="start" />'
@@ -3538,14 +3756,17 @@ class MeasureParser(XMLParserBase):
         '''
         Given an mxNote, based on mxTimeModification
         and mxTuplet objects, return a list of Tuplet objects
+
         >>> import xml.etree.ElementTree as ET
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> mxNote = ET.fromstring('<note><type>16th</type>' +
         ...    '<time-modification><actual-notes>5</actual-notes>' +
         ...    '<normal-notes>4</normal-notes></time-modification></note>')
         >>> t = MP.xmlToTuplets(mxNote)
         >>> t
         [<music21.duration.Tuplet 5/4/16th>]
+
         >>> mxNote = ET.fromstring('<note><type>eighth</type>' +
         ...    '<time-modification><actual-notes>5</actual-notes>' +
         ...    '<normal-notes>3</normal-notes>' +
@@ -3703,8 +3924,10 @@ class MeasureParser(XMLParserBase):
         '''
         Takes a list of <lyric> elements and update the
         note's lyrics from that list.
+
         >>> import xml.etree.ElementTree as ET
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> mxLyric1 = ET.fromstring('<lyric><text>Hi</text></lyric>')
         >>> mxLyric2 = ET.fromstring('<lyric><text>Hi</text></lyric>')
         >>> n = note.Note()
@@ -3728,9 +3951,12 @@ class MeasureParser(XMLParserBase):
         Translate a MusicXML <lyric> tag to a
         music21 :class:`~music21.note.Lyric` object or return None if no Lyric object
         should be created (empty lyric tags, for instance)
+
         If inputM21 is a :class:`~music21.note.Lyric` object, then the values of the
         mxLyric are transfered there and nothing returned.
+
         Otherwise, a new `Lyric` object is created and returned.
+
         >>> import xml.etree.ElementTree as ET
         >>> MP = musicxml.xmlToM21.MeasureParser()
 
@@ -3743,7 +3969,9 @@ class MeasureParser(XMLParserBase):
         <music21.note.Lyric number=4 syllabic=single text="word">
         >>> lyricObj.style.color
         'red'
+
         Non-numeric MusicXML lyric "number"s are converted to identifiers:
+
         >>> mxLyric.set('number', 'part2verse1')
         >>> l2 = MP.xmlToLyric(mxLyric)
         >>> l2
@@ -3917,16 +4145,20 @@ class MeasureParser(XMLParserBase):
         '''
         Given an mxBarline (not an mxRepeat object) with repeatObj as a parameter,
         file the necessary parameters and return a bar.Repeat() object
+
         >>> import xml.etree.ElementTree as ET
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> mxBarline = ET.fromstring('<barline><bar-style>light-heavy</bar-style>' +
         ...       '<repeat direction="backward"/></barline>')
         >>> r = MP.xmlToRepeat(mxBarline)
         >>> r
         <music21.bar.Repeat direction=end>
+
         Test that the music21 style for a backwards repeat is called "final"
         (because it resembles a final barline) but that the musicxml style
         is called light-heavy.
+
         >>> r.style
         'final'
         >>> r.direction
@@ -3977,8 +4209,10 @@ class MeasureParser(XMLParserBase):
     def xmlToBarline(self, mxBarline, inputM21=None):
         '''
         Given an mxBarline, fill the necessary parameters
+
         >>> import xml.etree.ElementTree as ET
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> mxBarline = ET.fromstring(
         ...               '<barline location="right"><bar-style>light-light</bar-style></barline>')
         >>> b = MP.xmlToBarline(mxBarline)
@@ -4016,33 +4250,44 @@ class MeasureParser(XMLParserBase):
     def xmlToChordSymbol(self, mxHarmony):
         '''
         Convert a <harmony> tag to a harmony.ChordSymbol object:
+
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> elStr = '<harmony><root><root-step>D</root-step><root-alter>-1</root-alter>'
         >>> elStr += '</root><kind>major-seventh</kind></harmony>'
         >>> mxHarmony = EL(elStr)
+
         >>> cs = MP.xmlToChordSymbol(mxHarmony)
         >>> cs
         <music21.harmony.ChordSymbol D-maj7>
+
         >>> cs.figure
         'D-maj7'
+
         >>> cs.pitches
         (<music21.pitch.Pitch D-3>,
          <music21.pitch.Pitch F3>,
          <music21.pitch.Pitch A-3>,
          <music21.pitch.Pitch C4>)
+
         >>> cs.root()
         <music21.pitch.Pitch D-3>
+
         TODO: this is very classically-oriented.  Make more Jazz/Rock like possible/default?.
+
         >>> mxHarmony.find('kind').text = 'major-sixth'
         >>> cs = MP.xmlToChordSymbol(mxHarmony)
         >>> cs
         <music21.harmony.ChordSymbol D-6>
+
         >>> cs.figure
         'D-6'
+
         >>> cs.pitches
         (<music21.pitch.Pitch D-3>, <music21.pitch.Pitch F3>,
          <music21.pitch.Pitch A-3>, <music21.pitch.Pitch B-3>)
+
         >>> cs.root()
         <music21.pitch.Pitch D-3>
         '''
@@ -4257,13 +4502,17 @@ class MeasureParser(XMLParserBase):
         '''
         Given an mxMetronome, convert to either a TempoIndication subclass,
         either a tempo.MetronomeMark or tempo.MetricModulation.
+
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> m = EL(r'<metronome><per-minute>125</per-minute>' +
         ...         '<beat-unit>half</beat-unit></metronome>')
         >>> MP.xmlToTempoIndication(m)
         <music21.tempo.MetronomeMark Half=125.0>
+
         Metric modulation:
+
         >>> m = EL(r'<metronome><beat-unit>long</beat-unit><beat-unit>32nd</beat-unit>' +
         ...         '<beat-unit-dot/></metronome>')
         >>> MP.xmlToTempoIndication(m)
@@ -4333,17 +4582,21 @@ class MeasureParser(XMLParserBase):
         '''
         Finds an <offset> inside the mxObj and returns it as
         a music21 offset (in quarterLengths)
+
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.divisions = 40
         >>> off = EL(r'<direction><offset>100</offset></direction>')
         >>> MP.xmlToOffset(off)
         2.5
+
         Returns a float, not fraction.
+
         >>> MP.divisions = 30
         >>> off = EL(r'<direction><offset>10</offset></direction>')
         >>> MP.xmlToOffset(off)
         0.33333...
+
         '''
 
         try:
@@ -4356,7 +4609,9 @@ class MeasureParser(XMLParserBase):
         '''
         parses the attributes of the <measure> tag.  Not the
         <attributes> tag inside the measure tag.
+
         calls parseMeasureNumbers(), and gets the width from the width tag.
+
         # TODO: implicit
         # TODO: non-controlling
         # may need to do a format/unit conversion?
@@ -4370,11 +4625,13 @@ class MeasureParser(XMLParserBase):
     def parseAttributesTag(self, mxAttributes):
         '''
         Parses a single attributes tag (mxAttributes) and sets
+
         self.attributesAreInternal to False,
         self.activeAttributes to mxAttributes,
         self.parent.activeAttributes to mxAttributes
         and then runs the appropriate attributeTagsToMethods for
         the attribute.
+
         Also sets self.divisions for the current divisions
         (along with self.parent.lastDivisions)
         and self.transposition and
@@ -4406,18 +4663,24 @@ class MeasureParser(XMLParserBase):
     def xmlTransposeToInterval(self, mxTranspose):
         '''
         Convert a MusicXML Transpose object to a music21 Interval object.
+
         >>> import xml.etree.ElementTree as ET
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> t = ET.fromstring('<transpose><diatonic>-1</diatonic>'
         ...                   + '<chromatic>-2</chromatic></transpose>')
         >>> MP.xmlTransposeToInterval(t)
         <music21.interval.Interval M-2>
+
         >>> t = ET.fromstring('<transpose><diatonic>-5</diatonic>'
         ...                   + '<chromatic>-9</chromatic></transpose>')
         >>> MP.xmlTransposeToInterval(t)
         <music21.interval.Interval M-6>
+
+
         Not mentioned in MusicXML XSD but supported in (Finale; MuseScore): octave-change
         refers to both diatonic and chromatic, so we will deal...
+
         >>> t = ET.fromstring('<transpose id="x"><diatonic>-1</diatonic><chromatic>-2</chromatic>'
         ...         + '<octave-change>-1</octave-change></transpose>')
         >>> inv = MP.xmlTransposeToInterval(t)
@@ -4493,35 +4756,48 @@ class MeasureParser(XMLParserBase):
         '''
         Returns a TimeSignature or SenzaMisuraTimeSignature (for senza-misura)
         from a <time> block.
+
         >>> import xml.etree.ElementTree as ET
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> mxTime = ET.fromstring('<time><beats>3</beats><beat-type>8</beat-type></time>')
         >>> MP.xmlToTimeSignature(mxTime)
         <music21.meter.TimeSignature 3/8>
+
         >>> mxTime = ET.fromstring('<time symbol="common"><beats>4</beats>' +
         ...                                              '<beat-type>4</beat-type></time>')
         >>> MP.xmlToTimeSignature(mxTime).symbol
         'common'
+
         Multiple times:
+
         >>> mxTime = ET.fromstring('<time><beats>3</beats><beat-type>8</beat-type>' +
         ...                              '<beats>4</beats><beat-type>4</beat-type></time>')
         >>> MP.xmlToTimeSignature(mxTime)
         <music21.meter.TimeSignature 3/8+4/4>
+
         >>> mxTime = ET.fromstring('<time><beats>3+2</beats><beat-type>8</beat-type></time>')
         >>> ts32 = MP.xmlToTimeSignature(mxTime)
         >>> ts32
         <music21.meter.TimeSignature 3/8+2/8>
+
         Senza Misura
+
         >>> mxSenza = ET.fromstring('<time><senza-misura>0</senza-misura></time>')
         >>> MP.xmlToTimeSignature(mxSenza)
         <music21.meter.SenzaMisuraTimeSignature 0 >
+
+
         Small Duration Time Signatures
+
         >>> mxTime = ET.fromstring('<time><beats>3</beats><beat-type>32</beat-type></time>')
         >>> MP.xmlToTimeSignature(mxTime)
         <music21.meter.TimeSignature 3/32>
+
         >>> mxTime = ET.fromstring('<time><beats>3</beats><beat-type>64</beat-type></time>')
         >>> MP.xmlToTimeSignature(mxTime)
         <music21.meter.TimeSignature 3/64>
+
         >>> mxTime = ET.fromstring('<time><beats>3</beats><beat-type>128</beat-type></time>')
         >>> MP.xmlToTimeSignature(mxTime)
         <music21.meter.TimeSignature 3/128>
@@ -4580,12 +4856,15 @@ class MeasureParser(XMLParserBase):
         '''
         Handles a clef object, appending it to the core, and
         setting self.lastClefs for the staff number.
+
         >>> import xml.etree.ElementTree as ET
         >>> mxClef = ET.fromstring('<clef><sign>G</sign><line>2</line></clef>')
+
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.handleClef(mxClef)
         >>> MP.lastClefs
         {None: <music21.clef.TrebleClef>}
+
         >>> mxClefBC = ET.fromstring('<clef number="2"><sign>F</sign><line>4</line></clef>')
         >>> MP.handleClef(mxClefBC)
         >>> MP.lastClefs['2']
@@ -4603,11 +4882,14 @@ class MeasureParser(XMLParserBase):
     def xmlToClef(self, mxClef):
         '''
         Returns a music21 Clef object from an mxClef element.
+
         >>> import xml.etree.ElementTree as ET
         >>> mxClef = ET.fromstring('<clef><sign>G</sign><line>2</line></clef>')
+
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.xmlToClef(mxClef)
         <music21.clef.TrebleClef>
+
         >>> mxClef = ET.fromstring('<clef><sign>TAB</sign></clef>')
         >>> MP.xmlToClef(mxClef)
         <music21.clef.TabClef>
@@ -4645,17 +4927,26 @@ class MeasureParser(XMLParserBase):
         '''
         Returns either a KeySignature (traditional or non-traditional)
         or a Key object based on whether fifths and mode is present.
+
         >>> import xml.etree.ElementTree as ET
         >>> mxKey = ET.fromstring('<key><fifths>-4</fifths></key>')
+
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.xmlToKeySignature(mxKey)
         <music21.key.KeySignature of 4 flats>
+
+
         >>> mxKey = ET.fromstring('<key><fifths>-4</fifths><mode>minor</mode></key>')
+
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.xmlToKeySignature(mxKey)
         <music21.key.Key of f minor>
+
+
         Invalid modes get ignored and returned as KeySignatures
+
         >>> mxKey = ET.fromstring('<key><fifths>-4</fifths><mode>crazy</mode></key>')
+
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.xmlToKeySignature(mxKey)
         <music21.key.KeySignature of 4 flats>
@@ -4689,12 +4980,14 @@ class MeasureParser(XMLParserBase):
         '''
         process the <key-octave> tags to potentially change a key signature
         to a non-standard key signature.
+
         >>> import xml.etree.ElementTree as ET
         >>> mxKey = ET.fromstring('<key><fifths>-4</fifths>'
         ...   + '<key-octave number="1">3</key-octave>'
         ...   + '<key-octave number="2">4</key-octave>'
         ...   + '<key-octave number="4">3</key-octave>'
         ...   + '</key>')
+
         >>> ks = key.KeySignature(-4)
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.mxKeyOctaves(mxKey, ks)
@@ -4730,13 +5023,18 @@ class MeasureParser(XMLParserBase):
     def nonTraditionalKeySignature(self, mxKey):
         '''
         Returns a KeySignature object that represents a nonTraditional Key Signature
+
         called by xmlToKeySignature if <fifths> is not present.
+
         >>> import xml.etree.ElementTree as ET
         >>> MP = musicxml.xmlToM21.MeasureParser()
+
         >>> mxKey = ET.fromstring('<key><key-step>E</key-step><key-alter>-1</key-alter></key>')
         >>> MP.nonTraditionalKeySignature(mxKey)
         <music21.key.KeySignature of pitches: [E-]>
+
         Should be the same:
+
         >>> MP.xmlToKeySignature(mxKey)
         <music21.key.KeySignature of pitches: [E-]>
         '''
@@ -4791,9 +5089,11 @@ class MeasureParser(XMLParserBase):
         StaffDetails (staff-details) handles attributes about
         the staff itself -- its size, number of lines, tuning,
         frets, etc.
+
         It is different from StaffLayout (staff-layout) which
         only handles relationship of one staff to another (the
         distance)
+
         Rather than returning a StaffLayout object,
         it adds it to self.staffLayoutObjects checking
         to see if there is already an incomplete
@@ -4847,6 +5147,7 @@ class MeasureParser(XMLParserBase):
     def xmlStaffLayoutFromStaffDetails(self, mxDetails):
         '''
         Returns a new StaffLayout object from staff-details.
+
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> mxDetails = EL('<details number="2" print-object="no">'
@@ -4880,9 +5181,12 @@ class MeasureParser(XMLParserBase):
     def handleMeasureStyle(self, mxMeasureStyle):
         '''
         measure + multimeasure repeats, slashed repeats, etc.
+
         But currently only multiMeasure rests are supported.
+
         Each of these applies to the entire measure, so there's
         no need to insert into the stream.
+
         Does not support multiple staves yet.
         '''
         # TODO: attr: number (staff number)
@@ -4911,12 +5215,15 @@ class MeasureParser(XMLParserBase):
         <measure> tag.  (Or, for testing, from the mNumRaw
         argument).  Sets MeasureParser.stream.number and possibly
         MeasureParser.stream.numberSuffix
+
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.parseMeasureNumbers('5')
         >>> MP.stream.number
         5
+
         Sets not only stream.number, but also MeasureParser.measureNumber and
         MeasureParser.numberSuffix
+
         >>> MP.parseMeasureNumbers('44b')
         >>> MP.stream.number
         44
@@ -4926,6 +5233,7 @@ class MeasureParser(XMLParserBase):
         44
         >>> MP.numberSuffix
         'b'
+
         >>> MP.parseMeasureNumbers('X1')
         >>> MP.stream.number
         1
@@ -4975,20 +5283,27 @@ class MeasureParser(XMLParserBase):
         `.voiceIndices` to be a set of all the voice texts, and if there is
         more than one voice in the measure, sets `.useVoices` to True
         and creates a voice for each.
+
         >>> import xml.etree.ElementTree as ET
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.mxMeasure = ET.fromstring('<measure><note><voice>1</voice></note></measure>')
         >>> MP.updateVoiceInformation()
+
         This is a set, so displays differently in PY2 vs. PY3
+
         >>> list(MP.voiceIndices)
         ['1']
         >>> MP.useVoices
         False
+
         `.updateVoiceInformation` runs `.coreInsert` so we need to call coreElementsChanged:
+
         >>> MP.stream.coreElementsChanged()
         >>> len(MP.stream)
         0
+
         Now a better test:
+
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.mxMeasure = ET.fromstring('<measure><note><voice>1</voice></note>'
         ...                                     + '<note><voice>2</voice></note></measure>')
@@ -5802,6 +6117,7 @@ class Test(unittest.TestCase):
         '''
         lots of lines, including overlapping here; testing that
         a line attached to a rest is still there.  Formerly was a problem.
+
         Many more tests could be done on this piece...
         '''
         from music21 import corpus
@@ -5980,6 +6296,7 @@ class Test(unittest.TestCase):
         '''
         Staff 2 of piano part 0 of schoenberg opus19.6 has a quarter rest not
         marked as a full measure rest (GOOD) as the last beat of a pickup measure.
+
         It should NOT become a full measure rest
         '''
         from music21 import corpus
@@ -6005,3 +6322,4 @@ class Test(unittest.TestCase):
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test) #, runTest='testRehearsalMarks')
+

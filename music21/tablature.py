@@ -76,17 +76,18 @@ class FretNote(object):
         <music21.tablature.FretNote >
         '''
         if self.string is not None:
-            stringRepr = '{0}{1} string'.format(self.string, common.ordinalAbbreviation(self.string))
+            stringRepr = '{}{} string'.format(self.string, common.ordinalAbbreviation(self.string))
         else:
             stringRepr = ''
 
         if self.fret is not None:
-            fretRepr = '{0}{1} fret'.format(self.fret, common.ordinalAbbreviation(self.fret))
+            fretRepr = '{}{} fret'.format(self.fret, common.ordinalAbbreviation(self.fret))
         else: 
             fretRepr = ''
 
         if self.fingering is not None:
-            fingeringRepr = '{0}{1} finger'.format(self.fingering, common.ordinalAbbreviation(self.fingering))
+            fingeringRepr = '{}{} finger'.format(self.fingering, 
+                                                 common.ordinalAbbreviation(self.fingering))
         else:
             fingeringRepr = ''
 
@@ -359,9 +360,4 @@ class Test(unittest.TestCase):
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-    
-<<<<<<< Updated upstream
-    
-=======
-    
->>>>>>> Stashed changes
+
