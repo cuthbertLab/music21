@@ -31,7 +31,6 @@ from music21 import style
 from music21 import environment
 
 from music21.common import SlottedObjectMixin
-from music21.analysis import enharmonics
 
 _MOD = 'pitch'
 environLocal = environment.Environment(_MOD)

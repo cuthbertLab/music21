@@ -6,7 +6,7 @@
 # Authors:      Mark Gotham
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012, 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@ class EnharmonicSimplifier:
     with predefined defaults for melodic and harmonic norms.
     Note: EnharmonicSimplifier itself returns nothing.
     '''
-    def __init__(self, pitchList, ruleClass=EnharmonicScoreRules):
+    def __init__(self, pitchList=None, ruleClass=EnharmonicScoreRules):
         if isinstance(pitchList[0], str):
             pitchList = [pitch.Pitch(p) for p in pitchList]
 
@@ -73,7 +73,7 @@ class EnharmonicSimplifier:
     def bestPitches(self):
         '''
         Returns a list of pitches in the best enharmonic spelling according to the input criteria.
-        
+
         >>> pList1 = [pitch.Pitch('C'), pitch.Pitch('D'), pitch.Pitch('E')]
         >>> es = analysis.enharmonics.EnharmonicSimplifier(pList1)
         >>> es.bestPitches()
@@ -82,6 +82,11 @@ class EnharmonicSimplifier:
         >>> es = analysis.enharmonics.EnharmonicSimplifier(pList2)
         >>> es.bestPitches()
         (<music21.pitch.Pitch C>, <music21.pitch.Pitch E>, <music21.pitch.Pitch G>)
+        >>> pList2 = ['D--', 'C#', 'E', 'F##']
+        >>> es = analysis.enharmonics.EnharmonicSimplifier(pList2)
+        >>> es.bestPitches()
+        (<music21.pitch.Pitch C>, <music21.pitch.Pitch C#>,
+        <music21.pitch.Pitch E>, <music21.pitch.Pitch G>)
         '''
         self.getProduct()
         bestPitches = []
