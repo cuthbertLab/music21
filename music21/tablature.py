@@ -4,7 +4,6 @@
 # Purpose:      Object for storing music21 information in the form of musical tablature.
 #
 # Authors:      Luke Poeppel
-#               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2006-2016 Michael Scott Cuthbert and the music21 Project
 # Licence:      LGPL or BSD, see licence.txt
@@ -361,4 +360,8 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
     
+<<<<<<< Updated upstream
     
+=======
+    
+>>>>>>> Stashed changes

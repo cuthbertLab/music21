@@ -43,6 +43,7 @@ from music21 import pitch
 from music21 import spanner
 from music21 import stream
 from music21 import style
+from music21 import tablature
 from music21.stream.iterator import OffsetIterator
 
 from music21.musicxml import xmlObjects
@@ -3598,7 +3599,6 @@ class MeasureExporter(XMLExporterBase):
             mxNoteList.append(self.noteToXml(n, addChordTag=addChordTag, chordParent=c))
         return mxNoteList
 
-
     def durationXml(self, dur):
         '''
         Convert a duration.Duration object to a <duration> tag using self.currentDivisions
@@ -3711,6 +3711,7 @@ class MeasureExporter(XMLExporterBase):
         if len(fretBoard.fretNotes) == 0:
             return None
         
+        #why isn't this the same as the function above? This seems a good deal simpler!
         mxFrame = Element('frame')
         mxFrameStrings = SubElement(mxFrame, 'frame-strings')
         mxFrameStrings.text = str(fretBoard.numStrings)
