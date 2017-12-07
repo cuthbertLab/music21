@@ -96,6 +96,7 @@ def getCorpusContentDirs():
     >>> failed
     []
 
+    :rtype: List[str]
     '''
     directoryName = str(getCorpusFilePath()) # Py3.6 remove
     result = []
@@ -153,7 +154,6 @@ def cleanpath(path, *, returnPathlib=None):
     v5 -- returnPathlib -- None (default) does not convert. False, returns a string,
     True, returns a pathlib.Path.
     '''
-
     if isinstance(path, pathlib.Path):
         path = str(path)
         if returnPathlib is None:

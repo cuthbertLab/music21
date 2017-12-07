@@ -41,7 +41,6 @@ def whitespaceEqual(a, b):
     r'''
     returns True if a and b are equal except for whitespace differences
 
-
     >>> a = "    hello \nthere "
     >>> b = "hello there"
     >>> c = " bye there "
@@ -49,6 +48,8 @@ def whitespaceEqual(a, b):
     True
     >>> common.whitespaceEqual(a, c)
     False
+
+    :rtype: bool
     '''
     a = WHITESPACE.sub('', a)
     b = WHITESPACE.sub('', b)
@@ -102,6 +103,7 @@ def hyphenToCamelCase(usrStr, replacement='-'):
     >>> common.hyphenToCamelCase('movement_name', replacement='_')
     'movementName'
 
+    :rtype: str
     '''
     PATTERN = re.compile(r'''
     (?<!\A) # not at the start of the string
@@ -149,6 +151,8 @@ def camelCaseToHyphen(usrStr, replacement='-'):
     >>> common.camelCaseToHyphen('fileName', replacement='A')
     Traceback (most recent call last):
     ValueError: Replacement cannot be an uppercase character.
+
+    :rtype: str    
     '''
     if len(replacement) != 1:
         raise ValueError('Replacement must be a single character.')
@@ -163,7 +167,6 @@ def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
     create a space separated string.
 
     If replaceUnderscore is True (default) then underscores also become spaces (but without the _)
-
 
     >>> common.spaceCamelCase('thisIsATest')
     'this Is A Test'
@@ -272,6 +275,8 @@ def formatStr(msg, *arguments, **keywords):
     >>> print(a)
     test 1 2 3
     <BLANKLINE>
+
+    :rtype: str
     '''
     if 'format' in keywords:
         formatType = keywords['format']
@@ -302,11 +307,12 @@ def stripAccents(inputString):
     removes accents from unicode strings.
 
     >>> s = 'trés vite'
-
     >>> 'é' in s
     True
     >>> common.stripAccents(s)
     'tres vite'
+
+    :rtype: str
     '''
     nfkd_form = unicodedata.normalize('NFKD', inputString)
     return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
@@ -327,7 +333,6 @@ def normalizeFilename(name):
 
     :type name: str
     :rtype: str
-
     '''
     extension = None
     lenName = len(name)
@@ -349,6 +354,9 @@ def removePunctuation(s):
 
     >>> common.removePunctuation("This, is! my (face).")
     'This is my face'
+
+    :type s: str
+    :rtype: str
     '''
     maketrans = str.maketrans("", "", string.punctuation)
     out = s.translate(maketrans)

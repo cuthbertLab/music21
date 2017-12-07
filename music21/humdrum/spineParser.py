@@ -2814,7 +2814,15 @@ class Test(unittest.TestCase):
         unused_s = hf1.stream
         #unused_s.show('text')
 
-
+    def testLyricsInSpine(self):
+        from music21 import text
+        hf1 = HumdrumDataCollection(testFiles.fakeTest)
+        hf1.parse()
+        #hf1.spineCollection.moveDynamicsAndLyricsToStreams()
+        s = hf1.stream
+        l = text.assembleLyrics(s)
+        self.assertEqual(l, 'Magijago ickewyan')
+        
     def testSplitSpines2(self):
         '''
         Currently this does not work since a second split on a stream that
