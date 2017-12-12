@@ -139,7 +139,7 @@ def findInstallations():
     '''
     found = []
     sitePackages = getSitePackages()
-    for fn in os.listdir(sitePackages):
+    for fn in sorted(os.listdir(sitePackages)):
         if fn.startswith('music21'):
             found.append(os.path.join(sitePackages, fn))
     try:
@@ -217,7 +217,7 @@ def _crawlPathUpward(start, target):
         environLocal.printDebug('at dir: %s' % thisDir)
         if match is not None:
             break
-        for fn in os.listdir(thisDir):
+        for fn in sorted(os.listdir(thisDir)):
             if fn == target:
                 match = os.path.join(thisDir, fn)
                 break
@@ -1219,7 +1219,7 @@ class SelectFilePath(SelectFromList):
         path0 = os-specific string
         post = list of matching results.
         '''
-        for sub1 in os.listdir(path0):
+        for sub1 in sorted(os.listdir(path0)):
             path1 = os.path.join(path0, sub1)
             if os.path.isdir(path1):
                 # on macos, .app files are actually directories; thus, look
@@ -1230,7 +1230,7 @@ class SelectFilePath(SelectFromList):
                 # only go two levels deep in /Applications: all things there,
                 # and all things in directories stored there.
                 try:
-                    for sub2 in os.listdir(path1):
+                    for sub2 in sorted(os.listdir(path1)):
                         path2 = os.path.join(path1, sub2)
                         if comparisonFunction(sub2):
                             post.append(path2)

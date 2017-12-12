@@ -106,7 +106,7 @@ def getCorpusContentDirs():
         '_metadataCache',
         '__pycache__',
         )
-    for filename in os.listdir(directoryName):
+    for filename in sorted(os.listdir(directoryName)):
         if filename.endswith(('.py', '.pyc')):
             continue
         elif filename.startswith('.'):
