@@ -2755,7 +2755,9 @@ class Test(unittest.TestCase):
         '''
         test loading a fake piece with spine paths, lyrics, dynamics, etc.
         '''
-        ms = HumdrumDataCollection(testFiles.fakeTest).stream
+        hdc = HumdrumDataCollection(testFiles.fakeTest)
+        hdc.parse()
+        ms = hdc.stream
         ms.show()
 
     def testSpineMazurka(self):
@@ -2830,6 +2832,7 @@ class Test(unittest.TestCase):
         in strangeWTCOpening, below.
         '''
         hf1 = HumdrumDataCollection(testFiles.splitLots)
+        hf1.parse()
         unused_masterStream = hf1.stream
 
     def testParseStrangeSplit(self):
@@ -2855,6 +2858,7 @@ class Test(unittest.TestCase):
         self.assertIsNotNone(md.composer)
         self.assertIn('Palestrina', md.composer)
 
+    
 
     def testFlavors(self):
         prevFlavor = flavors['JRP']
@@ -2892,7 +2896,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test) #, runTest='testMetadataRetrieved') #, TestExternal)
+    music21.mainTest(Test, runTest='testSplitSpines2') #, TestExternal)
 
 #------------------------------------------------------------------------------
 # eof
