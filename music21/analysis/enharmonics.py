@@ -68,10 +68,12 @@ class EnharmonicSimplifier:
 
     def getProduct(self):
         self.allPossibleSpellings = list(itertools.product(*self.allSpellings))
+        return self.allPossibleSpellings
 
     def bestPitches(self):
         '''
         Returns a list of pitches in the best enharmonic spelling according to the input criteria.
+        
         >>> pList1 = [pitch.Pitch('C'), pitch.Pitch('D'), pitch.Pitch('E')]
         >>> es = analysis.enharmonics.EnharmonicSimplifier(pList1)
         >>> es.bestPitches()

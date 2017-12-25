@@ -117,14 +117,14 @@ functionalityScores = {
     '#VI': 41,
     'vi': 40,
     'viio': 39,
-    '#viio': 39,
+    '#viio': 38,
     'iio': 37,  # common in Minor
     'iio42': 36,
     'bII6': 35,  # Neapolitan
     'iio43': 32,
     'iio65': 31,
     '#vio': 28,
-    '#vio6': 28,
+    '#vio6': 27,
     'III': 22,
     'v': 20,
     'VII': 19,
@@ -688,6 +688,47 @@ def romanNumeralFromChord(chordObj,
     <music21.roman.RomanNumeral #iii/o7 in d minor>
 
 
+    Augmented 6ths without key context
+
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord('E-4 G4 C#5'),
+    ...     )
+    <music21.roman.RomanNumeral It6 in g minor>
+
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord('E-4 G4 B-4 C#5'),
+    ...     )
+    <music21.roman.RomanNumeral Ger65 in g minor>
+
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord('E-4 G4 A4 C#5'),
+    ...     )
+    <music21.roman.RomanNumeral Fr43 in g minor>    
+
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord('E-4 G4 A#4 C#5'),
+    ...     )
+    <music21.roman.RomanNumeral Sw43 in g minor>
+
+
+    With correct key context:
+
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord('E-4 G4 C#5'),
+    ...     key.Key('G')
+    ...     )
+    <music21.roman.RomanNumeral It6 in G major>
+
+    With incorrect key context does not find an augmented 6th chord:
+
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord('E-4 G4 C#5'),
+    ...     key.Key('C')
+    ...     )
+    <music21.roman.RomanNumeral #io6b3 in C major>
+
+
+
     Former bugs:
 
     Should be iii7
@@ -720,6 +761,14 @@ def romanNumeralFromChord(chordObj,
     <music21.roman.RomanNumeral I#853 in C major>
 
 
+    Not an augmented 6th:
+
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord('E4 G4 B-4 C#5')
+    ...     )
+    <music21.roman.RomanNumeral io6b5b3 in c# minor>
+
+
     Note that this should be III+642 gives III+#642 (# before 6 is unnecessary)
 
     # >>> roman.romanNumeralFromChord(chord.Chord('B3 D3 E-3 G3'), key.Key('c'))
@@ -736,6 +785,21 @@ def romanNumeralFromChord(chordObj,
     # <music21.roman.RomanNumeral IV7 in c minor>
     # <music21.roman.RomanNumeral IV#75#3 in c minor>
     '''
+    aug6subs = {
+        '#ivo6b3': 'It6',
+        'II/o#643': 'Fr43',
+        '#ii64b3': 'Sw43',
+        '#ivo6bb5b3': 'Ger65',
+    }
+    aug6NoKeyObjectSubs = {
+        'io6b3': 'It6',
+        'I/o64b3': 'Fr43',
+        'i64b3': 'Sw43',
+        'io6b5b3': 'Ger65',        
+    }
+    
+    noKeyGiven = True if keyObj is None else False
+    
     #TODO: Make sure 9 works
     #stepAdjustments = {'minor' : {3: -1, 6: -1, 7: -1},
     #                   'diminished' : {3: -1, 5: -1, 6: -1, 7: -2},
@@ -788,7 +852,16 @@ def romanNumeralFromChord(chordObj,
     inversionString = postFigureFromChordAndKey(chordObj, alteredKeyObj)
 
     rnString = ft.prefix + stepRoman + inversionString
-
+    
+    if not noKeyGiven and rnString in aug6subs and chordObj.isAugmentedSixth():
+        rnString = aug6subs[rnString]
+    elif noKeyGiven and rnString in aug6NoKeyObjectSubs and chordObj.isAugmentedSixth():
+        rnString = aug6NoKeyObjectSubs[rnString]
+        if rnString in ('It6', 'Ger65'):
+            keyObj = _getKeyFromCache(chordObj.fifth.name.lower())
+        elif rnString in ('Fr43', 'Sw43'):
+            keyObj = _getKeyFromCache(chordObj.seventh.name.lower())
+            
     try:
         rn = RomanNumeral(rnString, keyObj, updatePitches=False)
     except fbNotation.ModifierException as strerror:
@@ -1212,7 +1285,8 @@ class RomanNumeral(harmony.Harmony):
         workingFigure = self._parseBracketedAlterations(workingFigure)
 
         # Replace Neapolitan indication.
-        workingFigure = re.sub('^N', 'bII', workingFigure)
+        workingFigure = re.sub('^N6', 'bII6', workingFigure)
+        workingFigure = re.sub('^N', 'bII6', workingFigure)
 
         workingFigure = self._parseFrontAlterations(workingFigure)
         workingFigure, useScale = self._parseRNAloneAmidstAug6(workingFigure, useScale)
@@ -1260,7 +1334,10 @@ class RomanNumeral(harmony.Harmony):
             return
         for (alterNotation, chordStep) in self.bracketedAlterations:
             alterNotation = re.sub('b', '-', alterNotation)
-            alterPitch = self.getChordStep(chordStep)
+            try:
+                alterPitch = self.getChordStep(chordStep)
+            except chord.ChordException:
+                continue # can happen for instance in It6 with updatePitches=False
             if alterPitch is not None:
                 newAccidental = pitch.Accidental(alterNotation)
                 if alterPitch.accidental is None:

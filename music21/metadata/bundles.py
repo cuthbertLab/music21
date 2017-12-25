@@ -752,8 +752,8 @@ class MetadataBundle:
         jobs = []
         accumulatedResults = []
         accumulatedErrors = []
-        if self.filePath is not None and os.path.exists(self.filePath):
-            metadataBundleModificationTime = os.path.getctime(self.filePath)
+        if self.filePath is not None and self.filePath.exists():
+            metadataBundleModificationTime = self.filePath.stat().st_ctime
         else:
             metadataBundleModificationTime = time.time()
 
@@ -901,8 +901,8 @@ class MetadataBundle:
         Return none.
         '''
         if self.filePath is not None:
-            if os.path.exists(self.filePath):
-                os.remove(self.filePath)
+            if self.filePath.exists():
+                self.filePath.unlink()
         return self
 
     def difference(self, metadataBundle):

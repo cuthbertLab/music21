@@ -119,8 +119,8 @@ class CapellaImporter:
 
         Returns self.xmlText
         '''
-        self.zipFilename = filename
-        zipFileHandle = zipfile.ZipFile(filename, 'r')
+        self.zipFilename = str(filename)
+        zipFileHandle = zipfile.ZipFile(str(filename), 'r')
         xmlText = zipFileHandle.read('score.xml')
         self.xmlText = xmlText
         return xmlText
@@ -899,17 +899,15 @@ class TestExternal(unittest.TestCase): # pragma: no cover
     def testComplete(self):
         ci = CapellaImporter()
         #ci.readCapellaXMLFile(r'd:/desktop/achsorgd.capx')
-        import os
-        capellaDirPath = common.getSourceFilePath() + os.path.sep + 'capella'
-        oswaldPath = capellaDirPath + os.path.sep + r'Nu_rue_mit_sorgen.capx'
+        capellaDirPath = common.getSourceFilePath() / 'capella'
+        oswaldPath = capellaDirPath / r'Nu_rue_mit_sorgen.capx'
         partScore = ci.scoreFromFile(oswaldPath)
         partScore.show()
 
     def xtestImportSorgen(self):
         ci = CapellaImporter()
-        import os
-        capellaDirPath = common.getSourceFilePath() + os.path.sep + 'capella'
-        oswaldPath = capellaDirPath + os.path.sep + r'Nu_rue_mit_sorgen.capx'
+        capellaDirPath = common.getSourceFilePath() / 'capella'
+        oswaldPath = capellaDirPath / r'Nu_rue_mit_sorgen.capx'
 
         ci.readCapellaXMLFile(oswaldPath)
         ci.parseXMLText()

@@ -41,7 +41,6 @@ def flattenList(l):
     '''
     return [item for sublist in l for item in sublist]
 
-
 #-------------------------------------------------------------------------------
 # provide warning strings to users for use in conditional imports
 

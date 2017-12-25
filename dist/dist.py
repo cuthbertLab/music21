@@ -106,7 +106,7 @@ class Distributor:
         # must be in the dist dir
         directory = os.getcwd()
         parentDir = os.path.dirname(directory)
-        parentContents = os.listdir(parentDir)
+        parentContents = sorted(os.listdir(parentDir))
         # make sure we are in the proper directory
         if (not directory.endswith("dist") or
             'music21' not in parentContents):
@@ -127,7 +127,7 @@ class Distributor:
         '''
         Process output of build scripts. Get most recently produced distributions.
         '''
-        contents = os.listdir(self.fpDistDir)
+        contents = sorted(os.listdir(self.fpDistDir))
         for fn in contents:
             fp = os.path.join(self.fpDistDir, fn)
             #if self.version in fn and fn.endswith('.egg'):

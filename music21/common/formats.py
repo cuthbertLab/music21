@@ -14,10 +14,16 @@ Utilities for working with file formats.
 
 almost everything here is deprecated.
 '''
-__all__ = ['findSubConverterForFormat', 'findFormat',
-           'findInputExtension', 'findFormatFile', 'findFormatExtFile',
+__all__ = ['findSubConverterForFormat', 
+           'findFormat',
+           'findInputExtension', 
+           'findFormatFile', 
+           'findFormatExtFile',
            'findFormatExtURL',
-           'VALID_SHOW_FORMATS', 'VALID_WRITE_FORMATS', 'VALID_AUTO_DOWNLOAD']
+           'VALID_SHOW_FORMATS', 
+           'VALID_WRITE_FORMATS', 
+           'VALID_AUTO_DOWNLOAD',
+           ]
 
 import pathlib
 

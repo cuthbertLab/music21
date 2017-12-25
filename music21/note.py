@@ -207,6 +207,10 @@ class Lyric(style.StyleMixin):
         'hel'
         >>> l.syllabic
         'begin'
+
+        :type rawText: str
+        :type applyRaw: bool
+        :rtype: None
         '''
         # do not want to do this unless we are sure this is not a string
         # possible might alter unicode or other string-like representations
@@ -248,7 +252,8 @@ class Lyric(style.StyleMixin):
         >>> l.identifier = 'Rainbow'
         >>> l.identifier
         'Rainbow'
-
+        
+        :rtype: str
         '''
         if self._identifier is None:
             return self._number
@@ -292,7 +297,7 @@ class Lyric(style.StyleMixin):
             return self.text
 
     @rawText.setter
-    def rawText(t):
+    def rawText(self, t):
         self.setTextAndSyllabic(t, applyRaw=True)
 
     @property
@@ -395,14 +400,14 @@ class GeneralNote(base.Music21Object):
         self.tie = None # store a Tie object
 
     #---------------------------------------------------------------------------
-    def _getLyric(self):
+    def _getLyric(self) -> str:
         if not self.lyrics:
             return None
 
         allText = [l.text for l in self.lyrics]
         return '\n'.join(allText)
 
-    def _setLyric(self, value):
+    def _setLyric(self, value: str) -> None:
         self.lyrics = []
         if value in (None, False):
             return
@@ -448,11 +453,16 @@ class GeneralNote(base.Music21Object):
 
         ''')
 
-    def addLyric(self, text, lyricNumber=None, *, applyRaw=False, lyricIdentifier=None):
+    def addLyric(self, 
+                 text, 
+                 lyricNumber=None, 
+                 *, 
+                 applyRaw=False, 
+                 lyricIdentifier=None) -> None:
         '''
         Adds a lyric, or an additional lyric, to a Note, Chord, or Rest's lyric list.
-        If `lyricNumber` is not None, a specific line of lyric text can be set. The lyricIdentifier
-        can also be set.
+        If `lyricNumber` is not None, a specific line of lyric text can be set. 
+        The lyricIdentifier can also be set.
 
         >>> n1 = note.Note()
         >>> n1.addLyric('hello')
@@ -686,14 +696,15 @@ class NotRest(GeneralNote):
     Basically, that's a `Note` or
     `Unpitched` object for now.
     '''
-
     # unspecified means that there may be a stem, but its orientation
     # has not been declared.
+
     _DOC_ATTR = {
         'beams': '''
             A :class:`~music21.beam.Beams` object that contains
             information about the beaming of this note.''',
     }
+
     def __init__(self, *arguments, **keywords):
         super().__init__(**keywords)
         self._notehead = 'normal'
@@ -744,7 +755,7 @@ class NotRest(GeneralNote):
             self._volume.client = self
     ####
 
-    def _getStemDirection(self):
+    def _getStemDirection(self) -> str:
         return self._stemDirection
 
     def _setStemDirection(self, direction):
@@ -794,7 +805,7 @@ class NotRest(GeneralNote):
         ''')
 
 
-    def _getNotehead(self):
+    def _getNotehead(self) -> str:
         return self._notehead
 
     def _setNotehead(self, value):
@@ -826,7 +837,7 @@ class NotRest(GeneralNote):
         ''')
 
 
-    def _getNoteheadFill(self):
+    def _getNoteheadFill(self) -> str:
         return self._noteheadFill
 
     def _setNoteheadFill(self, value):
@@ -859,7 +870,7 @@ class NotRest(GeneralNote):
         ''')
 
 
-    def _getNoteheadParenthesis(self):
+    def _getNoteheadParenthesis(self) -> bool:
         return self._noteheadParenthesis
 
     def _setNoteheadParenthesis(self, value):
@@ -896,7 +907,7 @@ class NotRest(GeneralNote):
         ''')
 
     #---------------------------------------------------------------------------
-    def hasVolumeInformation(self):
+    def hasVolumeInformation(self) -> bool:
         '''
         Returns bool whether volume was set -- saving some time for advanced
         users (such as musicxml exporters) that only want to look at the volume
@@ -915,7 +926,7 @@ class NotRest(GeneralNote):
         else:
             return True
 
-    def _getVolume(self, forceClient=None):
+    def _getVolume(self, forceClient=None) -> volume.Volume:
         # lazy volume creation
         if self._volume is None:
             if forceClient is None:
@@ -1182,10 +1193,10 @@ class Note(NotRest):
     # property access
 
 
-    def _getName(self):
+    def _getName(self) -> str:
         return self.pitch.name
 
-    def _setName(self, value):
+    def _setName(self, value: str):
         self.pitch.name = value
 
     name = property(_getName, _setName,
@@ -1193,9 +1204,10 @@ class Note(NotRest):
         See `Pitch`'s attribute :attr:`~music21.pitch.Pitch.name`.
         ''')
 
-    def _getNameWithOctave(self):
+    def _getNameWithOctave(self) -> str:
         return self.pitch.nameWithOctave
-    def _setNameWithOctave(self, value):
+    
+    def _setNameWithOctave(self, value: str):
         self.pitch.nameWithOctave = value
 
     nameWithOctave = property(_getNameWithOctave, _setNameWithOctave,
@@ -1205,10 +1217,10 @@ class Note(NotRest):
         ''')
 
 
-    def _getStep(self):
+    def _getStep(self) -> str:
         return self.pitch.step
 
-    def _setStep(self, value):
+    def _setStep(self, value: str):
         self.pitch.step = value
 
     step = property(_getStep, _setStep,
@@ -1216,10 +1228,10 @@ class Note(NotRest):
         See :attr:`~music21.pitch.Pitch.step`.
         ''')
 
-    def _getOctave(self):
+    def _getOctave(self) -> int:
         return self.pitch.octave
 
-    def _setOctave(self, value):
+    def _setOctave(self, value: int):
         self.pitch.octave = value
 
     octave = property(_getOctave, _setOctave,
@@ -1249,7 +1261,8 @@ class Note(NotRest):
         >>> n.pitches
         (<music21.pitch.Pitch G#>,)
 
-        Since this is a Note, not a chord, from the list or tuple, only the first one will be used:
+        Since this is a Note, not a chord, from the list or tuple, 
+        only the first one will be used:
 
         >>> n.pitches = [pitch.Pitch('c2'), pitch.Pitch('g2')]
         >>> n.nameWithOctave
@@ -1353,7 +1366,7 @@ class Note(NotRest):
             return None
 
     @property
-    def fullName(self):
+    def fullName(self) -> str:
         '''
         Return the most complete representation of this Note,
         providing duration and pitch information.
@@ -1424,7 +1437,7 @@ class Unpitched(NotRest):
 
     storedInstrument = property(_getStoredInstrument, _setStoredInstrument)
 
-    def displayPitch(self):
+    def displayPitch(self) -> pitch.Pitch:
         '''
         returns a pitch object that is the same as the displayStep and displayOctave.
         it will never have an accidental.
@@ -1540,7 +1553,7 @@ class Rest(GeneralNote):
 
 
     @property
-    def fullName(self):
+    def fullName(self) -> str:
         '''
         Return the most complete representation of this Rest,
         providing duration information.

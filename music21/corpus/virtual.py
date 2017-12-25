@@ -46,9 +46,10 @@ class VirtualWork:
 #         a file path based on the md5 of the works title. This means that all
 #         works must have unique titles in the virtual corpus.
 #         '''
+#         dir = pathlib.Path(dir)
 #         if dir is None:
 #             raise ValueError
-#         return os.path.join(dir, 'm21-' + common.getMd5(self.title) + '.p')
+#         return dir / ('m21-' + common.getMd5(self.title) + '.p')
 
     def getUrlByExt(self, extList=None):
         '''Given a request for an extension, find a best match for a URL from

@@ -934,7 +934,7 @@ class StreamThawer(StreamFreezeThawBase):
             fp = fp
         else:
             directory = environLocal.getRootTempDir()
-            fp = os.path.join(directory, fp)
+            fp = str(directory / fp)
 
         f = open(fp, 'rb')
         fileData = f.read() # TODO: do not read entire file

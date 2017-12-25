@@ -1,16 +1,9 @@
 filter:
     excluded_paths:
-        - music21/alpha/webapps/server/*
-        - music21/demos/*
         - music21/test/*
         - music21/ext/*
-        - music21/musicxml/mxObjects.py
-        - music21/musicxml/fromMxObjects.py
-        - music21/musicxml/toMxObjects.py
-        - music21/musicxml/xmlHandler.py
-        - music21/xmlNode.py
 
-#tools:
-#    pylint:
-#        python_version: 3     # Possible values: 2, 3
-#        config_file: '.pylintrc'
+tools:
+    pylint:
+        python_version: 3     # Possible values: 2, 3
+        config_file: '.pylintrc'

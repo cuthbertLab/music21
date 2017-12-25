@@ -546,7 +546,7 @@ class ChoraleListRKBWV:
     4---||---86.6---||---Es ist das Heil uns kommen her---||---86
     5---||---267---||---An Wasserflüssen Babylon---||---23
     6---||---281---||---Christus, der ist mein Leben---||---46
-    7---||---17.7---||---Nun lob, mein Seel, den Herren---||---271
+    7---||---17.7---||---Nun lob', mein Seel, den Herren---||---271
     8---||---40.8---||---Freuet euch, ihr Christen alle---||---105
     9---||---248.12-2---||---Ermuntre dich, mein schwacher Geist---||---80
     10---||---38.6---||---Aus tiefer Not schrei ich zu dir 1---||---31
@@ -556,7 +556,7 @@ class ChoraleListRKBWV:
     15---||---277---||---Christ lag in Todesbanden---||---38
     16---||---311---||---Es woll uns Gott genädig sein 2---||---95
     18---||---318---||---Menschenkind, merk eben---||---115
-    19---||---351---||---Ich hab mein Sach Gott heimgestellt---||---182
+    19---||---351---||---Ich hab' mein' Sach' Gott heimgestellt---||---182
     20---||---302---||---Ein feste Burg ist unser Gott---||---74
     21---||---153.5---||---Herzlich tut mich verlangen---||---160
     23---||---28.6---||---Helft mir Gotts Güte preisen---||---124
@@ -647,7 +647,7 @@ class ChoraleListRKBWV:
     113---||---245.37---||---Christus, der uns selig macht---||---50
     114---||---419---||---Von Gott will ich nicht lassen---||---326
     115---||---244.25---||---Was mein Gott will, das g'scheh allzeit---||---342
-    116---||---29.8---||---Nun lob, mein Seel, den Herren---||---272
+    116---||---29.8---||---Nun lob', mein Seel, den Herren---||---272
     117---||---244.10---||---O Welt, ich muß dich lassen---||---294
     118---||---244.32---||---In dich hab ich gehoffet, Herr 1---||---213
     119---||---176.6---||---Es woll uns Gott genädig sein 1---||---45
@@ -793,7 +793,7 @@ class ChoraleListRKBWV:
     265---||---144.6---||---Was mein Gott will, das g'scheh allzeit---||---343
     266---||---48.7---||---Wenn mein Stündlein vorhanden ist 2---||---144
     267---||---90.5---||---Vater unser im Himmelreich---||---319
-    268---||---389---||---Nun lob, mein Seel, den Herren---||---269
+    268---||---389---||---Nun lob', mein Seel, den Herren---||---269
     269---||---353---||---Wachet doch, erwacht, ihr Schläfer---||---186
     270---||---161.6---||---Herzlich tut mich verlangen---||---161
     271---||---315---||---Gib dich zufrieden und sei stille---||---111
@@ -821,7 +821,7 @@ class ChoraleListRKBWV:
     293---||---69.6-a---||---Was Gott tut, das ist wohlgetan---||---0
     294---||---113.8---||---Wenn mein Stündlein vorhanden ist 2---||---142
     295---||---335---||---Rex Christe factor omnium---||---145
-    296---||---390---||---Nun lob, mein Seel, den Herren---||---270
+    296---||---390---||---Nun lob', mein Seel, den Herren---||---270
     297---||---78.7---||---Wachet doch, erwacht, ihr Schläfer---||---188
     298---||---19.7---||---Wie nach einer Wasserquelle---||---99
     299---||---380---||---Meinen Jesum laß ich nicht---||---242
@@ -1725,8 +1725,36 @@ class Iterator:
                              doc='''This property determines how boundary numbers are
                                  interpreted, as indices or as catalogue numbers.''')
 
-
-
+def getByTitle(title):
+    '''
+    Return a Chorale by title (or title fragment) or None
+    
+    >>> t = "Sach' Gott heimgestellt"
+    >>> c = corpus.chorales.getByTitle(t)
+    >>> c.metadata.title
+    "Ich hab' mein' Sach' Gott heimgestellt"
+    '''
+    from music21 import corpus
+    
+    titleSearch = title.lower()
+    cl = ChoraleList()
+    clBWV = None
+    foundTitle = None
+    for cTitle in cl.byTitle:
+        if titleSearch in cTitle.lower():
+            clBWV = str(cl.byTitle[cTitle]['bwv'])
+            foundTitle = cTitle       
+            break
+    else:
+        return None
+    
+    cl = corpus.parse('bach/bwv' + clBWV)
+    if cl.metadata is None:
+        cl.metadata = metadata.Metadata()
+    cl.metadata.title = foundTitle
+    return cl
+    
+        
 class BachException(exceptions21.Music21Exception):
     pass
 

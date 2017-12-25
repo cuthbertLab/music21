@@ -478,21 +478,72 @@ def _greedyEnharmonicsSearch(oldPitches, scoreFunc=_dissonanceScore):
 
 def simplifyMultipleEnharmonics(pitches):
     '''
-    Replaces previous function with the new 'EnharmonicSimplifier' in analysis.
-    Returns a list of pitches with simplified enharmonic spellings.
-    See analysis/enharmonics.py
-    >>> pList1 = [pitch.Pitch('C'), pitch.Pitch('D'), pitch.Pitch('E')]
-    >>> es = analysis.enharmonics.EnharmonicSimplifier(pList1)
-    >>> es.bestPitches()
-    (<music21.pitch.Pitch C>, <music21.pitch.Pitch D>, <music21.pitch.Pitch E>)
-    >>> pList2 = ['D--', 'E', 'F##']
-    >>> es = analysis.enharmonics.EnharmonicSimplifier(pList2)
-    >>> es.bestPitches()
-    (<music21.pitch.Pitch C>, <music21.pitch.Pitch E>, <music21.pitch.Pitch G>)
-    '''
-    enh = enharmonics.EnharmonicSimplifier(pitches)
+    Tries to simplify the enharmonic spelling of a list of pitches, pitch-
+    or pitch-class numbers according to a given criterion.
 
-    return enh.bestPitches()
+    A function can be passed as an argument to `criterion`, that is tried to be
+    minimized in a greedy left-to-right fashion.
+
+    >>> pitch.simplifyMultipleEnharmonics([11, 3, 6])
+    [<music21.pitch.Pitch B>, <music21.pitch.Pitch D#>, <music21.pitch.Pitch F#>]
+
+    >>> pitch.simplifyMultipleEnharmonics([3, 8, 0])
+    [<music21.pitch.Pitch E->, <music21.pitch.Pitch A->, <music21.pitch.Pitch C>]
+
+    >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('G3'),
+    ...                                    pitch.Pitch('C-4'),
+    ...                                    pitch.Pitch('D4')])
+    [<music21.pitch.Pitch G3>, <music21.pitch.Pitch B3>, <music21.pitch.Pitch D4>]
+
+    >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('A3'),
+    ...                                    pitch.Pitch('B#3'),
+    ...                                    pitch.Pitch('E4')])
+    [<music21.pitch.Pitch A3>, <music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>]
+
+    The attribute `keyContext` is for supplying a KeySignature or a Key
+    which is used in the simplification:
+
+    >>> pitch.simplifyMultipleEnharmonics([6, 10, 1], keyContext=key.Key('B'))
+    [<music21.pitch.Pitch F#>, <music21.pitch.Pitch A#>, <music21.pitch.Pitch C#>]
+
+    >>> pitch.simplifyMultipleEnharmonics([6, 10, 1], keyContext=key.Key('C-'))
+    [<music21.pitch.Pitch G->, <music21.pitch.Pitch B->, <music21.pitch.Pitch D->]
+
+
+    Note that if there's no key context, then we won't simplify everything (at least
+    for now; this behavior may change, ).
+
+    >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('D--3'),
+    ...                                    pitch.Pitch('F-3'),
+    ...                                    pitch.Pitch('A--3')])
+    [<music21.pitch.Pitch D--3>, <music21.pitch.Pitch F-3>, <music21.pitch.Pitch A--3>]
+
+
+
+    >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('D--3'),
+    ...                                    pitch.Pitch('F-3'),
+    ...                                    pitch.Pitch('A--3')],
+    ...                                    keyContext=key.Key('C'))
+    [<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>]
+    '''
+
+    oldPitches = [p if isinstance(p, Pitch) else Pitch(p) for p in pitches]
+
+    if keyContext:
+        oldPitches = [keyContext.asKey('major').tonic] + oldPitches
+        remove_first = True
+    else:
+        remove_first = False
+
+    if len(oldPitches) < 5:
+        simplifiedPitches = _bruteForceEnharmonicsSearch(oldPitches, criterion)
+    else:
+        simplifiedPitches = _greedyEnharmonicsSearch(oldPitches, criterion)
+
+    if remove_first:
+        simplifiedPitches = simplifiedPitches[1:]
+
+    return simplifiedPitches
 
 #------------------------------------------------------------------------------
 
@@ -1013,7 +1064,7 @@ class Accidental(style.StyleMixin):
                       'isis', 2):
             self._name = 'double-sharp'
             self._alter = 2.0
-        elif name in ('flat', accidentalNameToModifier['flat'], 'es', -1):
+        elif name in ('flat', accidentalNameToModifier['flat'], 'es', 'b', -1):
             self._name = 'flat'
             self._alter = -1.0
         elif name in ('double-flat', accidentalNameToModifier['double-flat'],
