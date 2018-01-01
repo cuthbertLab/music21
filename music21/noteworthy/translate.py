@@ -914,7 +914,6 @@ class TestExternal(unittest.TestCase): # pragma: no cover
     def runTest(self):
         pass
     def testComplete(self):
-        import os
         nwcTranslatePath = common.getSourceFilePath() / 'noteworthy'
         complete = nwcTranslatePath / 'NWCTEXT_Really_complete_example_file.nwctxt'
         #'Part_OWeisheit.nwctxt' #

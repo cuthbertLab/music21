@@ -398,7 +398,7 @@ class Corpus:
 
         >>> from music21 import corpus
         >>> corpus.corpora.CoreCorpus().metadataBundle
-        <music21.metadata.bundles.MetadataBundle 'core': {150... entries}>
+        <music21.metadata.bundles.MetadataBundle 'core': {151... entries}>
 
         As a technical aside, the metadata bundle for a corpus is actually
         stored in corpus.manager, in order to cache most effectively over
@@ -418,7 +418,7 @@ class Corpus:
 
         >>> from music21 import corpus
         >>> corpus.corpora.CoreCorpus().all()
-        <music21.metadata.bundles.MetadataBundle 'core': {150... entries}>
+        <music21.metadata.bundles.MetadataBundle 'core': {151... entries}>
         '''
         return self.metadataBundle
 

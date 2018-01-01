@@ -159,7 +159,7 @@ def cleanpath(path, *, returnPathlib=None):
         if returnPathlib is None:
             returnPathlib = True
     elif returnPathlib is None:
-            returnPathlib = False
+        returnPathlib = False
     path = os.path.expanduser(path)
     path = os.path.normpath(path)
     if not os.path.isabs(path):

@@ -60,6 +60,7 @@ class RelativeCounter(collections.Counter):
     c 5.0
     
     '''
+    # pylint:disable=abstract-method
     def __iter__(self):
         sortedKeys = sorted(super().__iter__(), key=lambda x: self[x], reverse=True)
         for k in sortedKeys:

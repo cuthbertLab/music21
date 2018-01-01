@@ -164,7 +164,7 @@ class MetadataBundle:
     >>> from music21 import corpus, metadata
     >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
     >>> coreBundle
-    <music21.metadata.bundles.MetadataBundle 'core': {150... entries}>
+    <music21.metadata.bundles.MetadataBundle 'core': {151... entries}>
 
     >>> searchResults = coreBundle.search('bach', field='composer')
     >>> searchResults
@@ -215,9 +215,9 @@ class MetadataBundle:
     >>> coreBundle
     <music21.metadata.bundles.MetadataBundle 'core': {0 entries}>
     >>> coreBundle.read()
-    <music21.metadata.bundles.MetadataBundle 'core': {150... entries}>
+    <music21.metadata.bundles.MetadataBundle 'core': {151... entries}>
     >>> coreBundle
-    <music21.metadata.bundles.MetadataBundle 'core': {150... entries}>
+    <music21.metadata.bundles.MetadataBundle 'core': {151... entries}>
 
     Method 3:
 
@@ -225,7 +225,7 @@ class MetadataBundle:
     >>> localBundle = corpus.corpora.LocalCorpus().metadataBundle
 
     >>> coreBundle
-    <music21.metadata.bundles.MetadataBundle 'core': {150... entries}>
+    <music21.metadata.bundles.MetadataBundle 'core': {151... entries}>
 
 
 
@@ -632,7 +632,7 @@ class MetadataBundle:
         >>> from music21 import metadata
         >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> coreBundle
-        <music21.metadata.bundles.MetadataBundle 'core': {150... entries}>
+        <music21.metadata.bundles.MetadataBundle 'core': {151... entries}>
         >>> coreBundle.corpus
         <music21.corpus.corpora.CoreCorpus>
         '''

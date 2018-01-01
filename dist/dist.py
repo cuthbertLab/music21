@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2010-2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2018 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -22,10 +22,10 @@ To do a release,
     so don't skip the next step!
 3. run test/warningMultiprocessTest.py for lowest and highest version -- fix all warnings!
 4. run test/testLint.py and fix any lint errors
-5. commit and then check test/testSingleCoreAll.py results on Travis-CI
+5. commit and then check test/testSingleCoreAll.py or wait for results on Travis-CI
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
      but should be done before making a release).
-6. then python3 test/testDocumentation.py [*]
+6. then python3 /documentation/testDocumentation.py [*]
 
 [*] you will need pytest and nbval installed (along with ipython and jupyter)
 
@@ -44,7 +44,7 @@ To do a release,
     then don't change anything until the next step is done.
     (.gitignore SHOULD avoid uploading the large files created here...)
 
-12. Create a new release on GitHub and upload the TWO files created here. Use tag v2.0.1 (etc.).
+12. Create a new release on GitHub and upload the TWO files created here. Use tag v5.0.1 (etc.).
     Don't forget the "v" in the release tag.
     Drag in this order: .tar.gz, no-corpus.tar.gz
 

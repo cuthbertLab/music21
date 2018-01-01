@@ -158,7 +158,7 @@ def getDocumentationFiles(runOne=False):
 
     allModules = []
     for root, unused_dirnames, filenames in os.walk(builddocRstDir):
-        for module in filenames:
+        for module in sorted(filenames):
             fullModulePath = os.path.join(root, module)
             if not module.endswith('.rst'):
                 continue

@@ -47,7 +47,7 @@ master_doc = 'index'
 # General information about the project.
 project = 'music21'
 # pylint: disable=redefined-builtin
-copyright = '2006-2017, Michael Scott Cuthbert and cuthbertLab' # @ReservedAssignment
+copyright = '2006-2018, Michael Scott Cuthbert and cuthbertLab' # @ReservedAssignment
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
