@@ -78,7 +78,7 @@ class Corpus:
         rdp = common.cleanpath(rootDirectoryPath, returnPathlib=True)
         matched = []
 
-        for filename in rdp.rglob('*'):
+        for filename in sorted(rdp.rglob('*')):
             if filename.name.startswith('__'):
                 continue
             if filename.name.startswith('.'):

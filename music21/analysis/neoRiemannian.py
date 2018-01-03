@@ -251,15 +251,16 @@ def completeHexatonic(c, simplifyEnharmonics=False, raiseException=True):
      <music21.chord.Chord C-4 F-4 A--4>,
      <music21.chord.Chord D--4 F-4 A--4>]
 
-     Or with  simplifyEnharmonics=True
-     >>> c2 = chord.Chord("C4 E4 G4")
-     >>> analysis.neoRiemannian.completeHexatonic(c2, simplifyEnharmonics=True)
-     [<music21.chord.Chord C4 E-4 G4>,
-      <music21.chord.Chord C4 E-4 A-4>,
-      <music21.chord.Chord B3 D#4 G#4>,
-      <music21.chord.Chord B3 E4 G#4>,
-      <music21.chord.Chord B3 E4 G4>,
-      <music21.chord.Chord C4 E4 G4>]
+    Or with  simplifyEnharmonics=True
+     
+    >>> c2 = chord.Chord("C4 E4 G4")
+    >>> analysis.neoRiemannian.completeHexatonic(c2, simplifyEnharmonics=True)
+    [<music21.chord.Chord C4 E-4 G4>,
+     <music21.chord.Chord C4 E-4 A-4>,
+     <music21.chord.Chord B3 D#4 G#4>,
+     <music21.chord.Chord B3 E4 G#4>,
+     <music21.chord.Chord B3 E4 G4>,
+     <music21.chord.Chord C4 E4 G4>]
     '''
     if c.isMajorTriad() or c.isMinorTriad():
         hexatonicList = []
