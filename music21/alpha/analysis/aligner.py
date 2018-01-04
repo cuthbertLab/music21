@@ -8,14 +8,14 @@
 # Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
+from collections import Counter
+import operator
+import unittest
+
 from music21 import base as base
 from music21 import exceptions21
 from music21 import metadata
 from music21.alpha.analysis import hasher
-
-from collections import Counter
-import operator
-import unittest
 
 try:
     import enum
