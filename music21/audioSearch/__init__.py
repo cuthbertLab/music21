@@ -414,11 +414,11 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     >>> frequencyList, pachelbelFileHandle, currentSample = fTup
     >>> for i in range(5):
     ...     print(frequencyList[i])
-    143.627689055
-    99.0835452019
-    211.004784689
-    4700.31347962
-    767.827403482
+    143.627...
+    99.0835...
+    211.004...
+    4700.313...
+    767.827...
     >>> print(currentSample)  # should be near 44100, but probably not exact
     44032
 
@@ -429,11 +429,11 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     >>> frequencyList, pachelbelFileHandle, currentSample = fTup
     >>> for i in range(5):
     ...     print(frequencyList[i])
-    187.798213268
-    238.263483185
-    409.700397349
-    149.958733396
-    101.989786226
+    187.798...
+    238.263...
+    409.700...
+    149.958...
+    101.989...
     >>> print(currentSample)  # should be exactly double the previous
     88064
     '''
