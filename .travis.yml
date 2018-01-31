@@ -17,7 +17,7 @@ before_install:
     - export PYTHONPATH=/home/travis/cuthbertLab/music21base
     - export DISPLAY=:99.0
     - sh -e /etc/init.d/xvfb start
-    - wget -q http://download.linuxaudio.org/lilypond/binaries/linux-64/lilypond-2.19.54-1.linux-64.sh
+    - wget -q http://lilypond.org/downloads/binaries/linux-x86/lilypond-2.19.81-1.linux-x86.sh
     - pip3 install coveralls
     - sh lilypond-2.19.54-1.linux-64.sh --batch
     - export PATH=/home/travis/bin:$PATH
