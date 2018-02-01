@@ -515,6 +515,7 @@ class CoreCorpus(Corpus):
         ('essenFolksong', 'Essen Folksong Collection', False),
         ('handel', 'George Frideric Handel', True),
         ('haydn', 'Joseph Haydn', True),
+        ('joplin', 'Scott Joplin', True),
         ('josquin', 'Josquin des Prez', True),
         ('leadSheet', 'Leadsheet demos', False),
         ('luca', 'D. Luca', False),

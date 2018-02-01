@@ -15,10 +15,14 @@
 Tools for grouping notes and chords into a searchable tree
 organized by start and stop offsets.
 '''
+
+import copy
 import unittest
 
-from music21 import exceptions21
 from music21 import environment
+from music21 import exceptions21
+
+
 environLocal = environment.Environment("tree.spans")
 #------------------------------------------------------------------------------
 class TimespanException(exceptions21.TreeException):
@@ -351,8 +355,38 @@ class ElementTimespan(Timespan):
             self.element,
             )
 
-    ### PUBLIC METHODS ###
+    ### PUBLIC PROPERTIES ###
+    
+    @property
+    def quarterLength(self):
+        '''
+        The quarterLength of the Timespan, which, due to manipulation, may be different
+        from that of the element.
 
+        >>> n = note.Note('D-')
+        >>> n.offset = 1.0
+        >>> n.duration.quarterLength = 2.0
+
+        >>> pts = tree.spans.PitchedTimespan(n, offset=n.offset, endTime=3.0)
+        >>> pts
+        <PitchedTimespan (1.0 to 3.0) <music21.note.Note D->>
+        >>> pts.quarterLength
+        2.0
+        >>> n.duration.quarterLength
+        2.0
+
+        >>> pts2 = pts.new(offset=0.0)
+        >>> pts2
+        <PitchedTimespan (0.0 to 3.0) <music21.note.Note D->>
+        >>> pts2.quarterLength
+        3.0
+        >>> pts2.element.duration.quarterLength
+        2.0
+        '''
+        return self.endTime - self.offset
+
+
+    ### PUBLIC METHODS ###
 
     def new(self,
             element=None,
@@ -396,37 +430,7 @@ class ElementTimespan(Timespan):
 
 
     ### PUBLIC PROPERTIES ###
-
-
-    @property
-    def quarterLength(self):
-        '''
-        The quarterLength of the Timespan, which, due to manipulation, may be different
-        from that of the element.
-
-        >>> n = note.Note('D-')
-        >>> n.offset = 1.0
-        >>> n.duration.quarterLength = 2.0
-
-        >>> pts = tree.spans.PitchedTimespan(n, offset=n.offset, endTime=3.0)
-        >>> pts
-        <PitchedTimespan (1.0 to 3.0) <music21.note.Note D->>
-        >>> pts.quarterLength
-        2.0
-        >>> n.duration.quarterLength
-        2.0
-
-        >>> pts2 = pts.new(offset=0.0)
-        >>> pts2
-        <PitchedTimespan (0.0 to 3.0) <music21.note.Note D->>
-        >>> pts2.quarterLength
-        3.0
-        >>> pts2.element.duration.quarterLength
-        2.0
-        '''
-        return self.endTime - self.offset
-
-
+    
     @property
     def measureNumber(self):
         r'''
@@ -496,8 +500,21 @@ class ElementTimespan(Timespan):
         from music21 import stream
         return self.getParentageByClass(classList=(stream.Part,))
 
-
-
+    def makeElement(self, makeCopy=True):
+        '''
+        Return a copy of the element (or the same one if makeCopy is False)
+        with the quarterLength set to the length of the timespan
+        '''
+        el = self.element
+        if el is None:
+            return None
+        
+        if makeCopy:
+            el = copy.deepcopy(el)
+        
+        el.duration.quarterLength = self.quarterLength
+        return el
+    
 #------------------------------------------------------------------------------
 class PitchedTimespan(ElementTimespan):
     def __init__(self,
