@@ -799,7 +799,6 @@ class Clarinet(WoodwindInstrument):
 
 class BassClarinet(Clarinet):
     '''
-
     >>> bcl = instrument.BassClarinet()
     >>> bcl.instrumentName
     'Bass clarinet'
