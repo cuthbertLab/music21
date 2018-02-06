@@ -834,6 +834,10 @@ class XMLExporterBase:
         self.setColor(mxObject, m21Object)
 
     def setPrintObject(self, mxObject, m21Object):
+        '''
+        sets print-object to 'no' if m21Object.style.hideObjectOnPrint is True
+        or if m21Object is a StyleObject and has .hideObjectOnPrint set to True.
+        '''
         if isinstance(m21Object, style.Style):
             st = m21Object
         elif m21Object.hasStyleInformation:
@@ -4521,10 +4525,6 @@ class MeasureExporter(XMLExporterBase):
           <type>quarter</type>
         </note>
         '''
-        # TODO: attrGroup: print-object
-        # TODO: attr: print-frame
-        # TODO: attrGroup: placement
-
         if cs.writeAsChord is True:
             return self.chordToXml(cs)
 
@@ -4532,6 +4532,10 @@ class MeasureExporter(XMLExporterBase):
 
         mxHarmony = Element('harmony')
         _synchronizeIds(mxHarmony, cs)
+
+        self.setPrintObject(mxHarmony, cs)
+        # TODO: attr: print-frame
+        # TODO: attrGroup: placement
 
         self.setPrintStyle(mxHarmony, cs)
 
@@ -5471,7 +5475,6 @@ class MeasureExporter(XMLExporterBase):
         Compound meters are represented as multiple pairs of beat
         and beat-type elements
 
-
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> a = meter.TimeSignature('3/4')
         >>> b = MEX.timeSignatureToXml(a)
@@ -5499,7 +5502,6 @@ class MeasureExporter(XMLExporterBase):
           <beat-type>4</beat-type>
         </time>
 
-
         >>> a = meter.TimeSignature('4/4')
         >>> a.symbol = 'common'
         >>> b = MEX.timeSignatureToXml(a)
@@ -5509,7 +5511,6 @@ class MeasureExporter(XMLExporterBase):
           <beat-type>4</beat-type>
         </time>
 
-
         >>> a.symbol = ""
         >>> a.symbolizeDenominator = True
         >>> b = MEX.timeSignatureToXml(a)
@@ -5518,7 +5519,6 @@ class MeasureExporter(XMLExporterBase):
           <beats>4</beats>
           <beat-type>4</beat-type>
         </time>
-
 
         >>> sm = meter.SenzaMisuraTimeSignature('free')
         >>> b = MEX.timeSignatureToXml(sm)
@@ -5563,7 +5563,7 @@ class MeasureExporter(XMLExporterBase):
 
         # TODO: attr: separator
         self.setPrintStyleAlign(mxTime, ts)
-        # TODO: attr: print-object
+        self.setPrintObject(mxTime, ts)
         return mxTime
 
     def keySignatureToXml(self, keyOrKeySignature):
