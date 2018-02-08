@@ -43,7 +43,6 @@ from music21 import pitch
 from music21 import spanner
 from music21 import stream
 from music21 import style
-from music21 import tablature
 from music21.stream.iterator import OffsetIterator
 
 from music21.musicxml import xmlObjects
@@ -3644,7 +3643,7 @@ class MeasureExporter(XMLExporterBase):
         '''
         Converts a FretNote Object to MusicXML readable format.
         
-        *Note that, although music21 is referring to FretNotes as FretNotes, musicxml refers to the 
+        Note that, although music21 is referring to FretNotes as FretNotes, musicxml refers to the 
         them as frame notes. To convert between the two formats, 'Fret-Note' must be converted to
         'Frame-Note'
         

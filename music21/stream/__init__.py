@@ -12575,8 +12575,10 @@ class Score(Stream):
         voiceAllocation = 2
         permitOneVoicePerPart = False
 
-        return self.partsToVoices(voiceAllocation=voiceAllocation,
-            permitOneVoicePerPart=permitOneVoicePerPart)
+        return self.partsToVoices(
+            voiceAllocation=voiceAllocation,
+            permitOneVoicePerPart=permitOneVoicePerPart
+            )
 
     def flattenParts(self, classFilterList=('Note', 'Chord')):
         '''
