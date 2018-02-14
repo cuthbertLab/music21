@@ -95,6 +95,8 @@ CHORD_TYPES = collections.OrderedDict([
     # other
     ('suspended-second',            ['1,2,5', ['sus2']]),                        # Y
     ('suspended-fourth',            ['1,4,5', ['sus', 'sus4']]),                 # Y
+	('seventh-suspended-fourth',    ['1,4,5,-7', ['7sus4', '7sus']]),            # Y
+	('minor-seventh-added-fourth',  ['1,-3,4,-7', ['m7add4']]),                  # Y
     ('Neapolitan',                  ['1,2-,3,5-', ['N6']]),                      # Y
     ('Italian',                     ['1,#4,-6', ['It+6', 'It']]),                # Y
     ('French',                      ['1,2,#4,-6', ['Fr+6', 'Fr']]),              # Y
@@ -1218,6 +1220,11 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
                 inChord.root(inChord.bass())
                 kindStr = 'sus'
                 kind = 'suspended-fourth'
+                cs = inChord.root().name + kindStr
+            elif kindStr == 'm7add4':
+                inChord.root(inChord.bass())
+                kindStr = '7sus4'
+                kind = 'seventh-suspended-fourth'
                 cs = inChord.root().name + kindStr
             else:
                 cs = inChord.root().name + kindStr + '/' + inChord.bass().name
