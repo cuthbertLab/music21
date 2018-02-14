@@ -67,6 +67,7 @@ CHORD_TYPES = collections.OrderedDict([
     # ninths
     ('major-ninth',                 ['1,3,5,7,9', ['M9', 'Maj9']]),              # Y
     ('dominant-ninth',              ['1,3,5,-7,9', ['9', 'dom9']]),              # Y
+	('dominant-minor-ninth',        ['1,3,5,-7,-9', ['7b9']]),                   # Y
     ('minor-major-ninth',           ['1,-3,5,7,9', ['mM9', 'minmaj9']]),         # N
     ('minor-ninth',                 ['1,-3,5,-7,9', ['m9', 'min9']]),            # N
     ('augmented-major-ninth',       ['1,3,#5,7,9', ['+M9', 'augmaj9']]),         # Y
