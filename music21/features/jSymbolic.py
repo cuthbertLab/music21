@@ -2015,36 +2015,17 @@ class NoteDensityFeature(featuresModule.FeatureExtractor):
 
     def process(self):
         secondsMap = self.data['flat.secondsMap']
-        # create a dictionary of seconds regions, and count events in each each
-        # just look at start tme
-        regions = {}
-        minKey = None
-        maxKey = 0
-        for bundle in secondsMap:
-            # have already filtered only notes
-            keyStart = int(math.floor(bundle['offsetSeconds']))
-            keyEnd = int(math.floor(bundle['endTimeSeconds']))
-
-            if minKey is None or keyStart < minKey:
-                minKey = keyStart
-            if keyEnd > maxKey:
-                maxKey = keyEnd
-
-            # increment all contiguous regions
-            for i in range(keyStart, keyEnd + 1):
-                if i in regions:
-                    regions[i] += 1 # increment
-                else:
-                    regions[i] = 1
-        # have counts of all start events for each second; average
-        total = 0
-        for i in range(minKey, maxKey + 1):
-            if i in regions: # there may be gaps
-                total += regions[i]
-        self.feature.vector[0] = float(total) / (maxKey - minKey + 1) # number of slots, inclusive
-
-
-
+        # The average number of notes per second in the piece is calculated
+        # by taking the total number of notes in the piece and dividing by
+        # the end time of the piece (in seconds).
+        end_times = [bundle['endTimeSeconds'] for bundle in secondsMap]
+        end_times.sort()  # may already be sorted?
+        # Create a list of difference in time offset between consecutive notes
+        if end_times == []:
+            self.feature.vector[0] = 0.0
+        else:
+            self.feature.vector = float(len(end_times)) / end_times[-1]
+        
 class AverageNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     Average duration of notes in seconds.
