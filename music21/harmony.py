@@ -58,7 +58,8 @@ CHORD_TYPES = collections.OrderedDict([
     ('minor-seventh',               ['1,-3,5,-7', ['m7', 'min7']]),          # Y
     ('augmented-major seventh',     ['1,3,#5,7', ['+M7', 'augmaj7']]),       # N
     ('augmented-seventh',           ['1,3,#5,-7', ['7+', '+7', 'aug7']]),    # Y
-    ('half-diminished-seventh',     ['1,-3,-5,-7', ['/o7', 'm7b5']]),        # Y: 'half-diminished'
+    ('half-diminished-seventh',     ['1,-3,-5,-7', ['m7b5', '/o7']]),
+    # Y: 'half-diminished'
     ('diminished-seventh',          ['1,-3,-5,--7', ['o7', 'dim7']]),        # Y
     ('seventh-flat-five',           ['1,3,-5,-7', ['7b5', 'dom7dim5']]),        # N
     # sixths
@@ -68,6 +69,7 @@ CHORD_TYPES = collections.OrderedDict([
     ('major-ninth',                 ['1,3,5,7,9', ['M9', 'Maj9']]),              # Y
     ('dominant-ninth',              ['1,3,5,-7,9', ['9', 'dom9']]),              # Y
 	('dominant-minor-ninth',        ['1,3,5,-7,-9', ['7b9']]),                   # Y
+    ('dominant-minor-ninth-flat-fifth', ['1,3,-5,-7,-9', ['7b9b5']]),            # Y
 	('dominant-altered-ninth',      ['1,3,5,-7,#9', ['7#9']]),                   # Y
     ('minor-major-ninth',           ['1,-3,5,7,9', ['mM9', 'minmaj9']]),         # N
     ('minor-ninth',                 ['1,-3,5,-7,9', ['m9', 'min9']]),            # N
@@ -97,7 +99,7 @@ CHORD_TYPES = collections.OrderedDict([
     # other
     ('suspended-second',            ['1,2,5', ['sus2']]),                        # Y
     ('suspended-fourth',            ['1,4,5', ['sus', 'sus4']]),                 # Y
-	('seventh-suspended-fourth',    ['1,4,5,-7', ['7sus', '7sus4']]),            # Y
+	('seventh-suspended-fourth',    ['1,4,5,-7', ['7sus4', '7sus']]),            # Y
 	('ninth-suspended-fourth',      ['1,4,5,-7,9', ['9sus', '9sus4']]),          # Y
     ('Neapolitan',                  ['1,2-,3,5-', ['N6']]),                      # Y
     ('Italian',                     ['1,#4,-6', ['It+6', 'It']]),                # Y
