@@ -45,6 +45,7 @@ from music21 import pitch
 from music21 import key
 from music21 import note
 from music21 import chord
+from music21 import scale
 
 
 #from music21 import harmony can't do this either
@@ -891,6 +892,9 @@ class VoiceLeadingQuartet(base.Music21Object):
             m7:     Resolves to a third with a leap from 5 to 1 in the bass
 
 
+        We will make the examples shorter with this abbreviation:
+        >>> N = note.Note
+
         >>> n1 = note.Note('B-4')
         >>> n2 = note.Note('A4')
         >>> m1 = note.Note('E4')
@@ -976,13 +980,20 @@ class VoiceLeadingQuartet(base.Music21Object):
             return True
 
         if self.key:
-            scale = self.key.getScale()
-            n1degree = scale.getScaleDegreeFromPitch(self.v2n1)
-            n2degree = scale.getScaleDegreeFromPitch(self.v2n2)
+            keyScale = self.key.getScale(self.key.mode)
+            n1degree = keyScale.getScaleDegreeFromPitch(self.v2n1)
+            n2degree = keyScale.getScaleDegreeFromPitch(self.v2n2)
+
+            # catches case of #7 in minor
+            if self.key.mode == 'minor' and n1degree is None:
+                minorScale = scale.MelodicMinorScale(self.key.tonic)
+                n1degree = minorScale.getScaleDegreeFromPitch(self.v2n1, direction=scale.DIRECTION_ASCENDING);
+
         else:
-            scale = None
+            keyScale = None
             n1degree = None
             n2degree = None
+
 
         firstHarmony = self.vIntervals[0].simpleName
         secondHarmony = self.vIntervals[1].generic.simpleUndirected
@@ -994,25 +1005,25 @@ class VoiceLeadingQuartet(base.Music21Object):
                 return False
 
         elif firstHarmony == 'A4':
-            if scale and n1degree != 4:
+            if keyScale and n1degree != 4:
                 return True
-            if scale and n2degree != 3:
+            if keyScale and n2degree != 3:
                 return False
             return (self.outwardContraryMotion()
                         and secondHarmony == 6)
 
         elif firstHarmony == 'd5':
-            if scale and n1degree != 7:
+            if keyScale and n1degree != 7:
                 return True
-            if scale and n2degree != 1:
+            if keyScale and n2degree != 1:
                 return False
             return (self.inwardContraryMotion()
                         and secondHarmony == 3)
 
         elif firstHarmony == 'm7':
-            if scale and n1degree != 5:
+            if keyScale and n1degree != 5:
                 return True
-            if scale and n2degree != 1:
+            if keyScale and n2degree != 1:
                 return False
             return secondHarmony == 3
 
