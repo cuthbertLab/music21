@@ -778,10 +778,17 @@ class VoiceLeadingQuartet(base.Music21Object):
         The key parameter should be specified to check for motion in the bass from specific
         note degrees. If it is not set, then no checking for scale degrees takes place.
 
-        Diminished Fifth: in by contrary motion to a third, with 7 resolving up to 1 in the bass
-        Augmented Fourth: out by contrary motion to a sixth, with chordal seventh resolving
-        down to a third in the bass.
-        Minor Seventh: In to a third with a leap form 5 to 1 in the bass
+        Currently implements the following resolutions:
+
+            P4:     Top voice must resolve downward.
+
+            A4:     out by contrary motion to a sixth, with chordal seventh resolving
+                    down to a third in the bass.
+
+            d5:     in by contrary motion to a third, with 7 resolving up to 1 in the bass
+
+            m7:     Resolves to a third with a leap from 5 to 1 in the bass
+
 
         >>> n1 = note.Note('B-4')
         >>> n2 = note.Note('A4')
@@ -798,6 +805,14 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl.isProperResolution() # not on scale degrees that need resolution
         True
 
+        >>> n1 = note.Note('D4')
+        >>> n2 = note.Note('C4')
+        >>> m1 = note.Note('G#3')
+        >>> m2 = note.Note('A3')
+        >>> k = key.Key('a')
+        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2, k)
+        >>> vl.isProperResolution() # d5 with #7 in minor handled correctly
+        True
 
         >>> n1 = note.Note('E5')
         >>> n2 = note.Note('F5')
@@ -827,13 +842,13 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> m2.pitch.nameWithOctave = 'F3'
         >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
         >>> vl.isProperResolution() # m7 with similar motion
-        False
+        True
         >>> vl.key = 'B-'
         >>> vl.isProperResolution() # m7 not on scale degrees that need resolution
         True
         >>> vl.key = 'F'
         >>> vl.isProperResolution() # m7 on scale degrees that need resolution
-        False
+        True
 
         P4 on the initial harmony must move down.
 
@@ -876,13 +891,6 @@ class VoiceLeadingQuartet(base.Music21Object):
                 return True
             else:
                 return False
-        elif firstHarmony == 'd5':
-            if scale and n1degree != 7:
-                return True
-            if scale and n2degree != 1:
-                return False
-            return (self.inwardContraryMotion()
-                        and secondHarmony == 3)
 
         elif firstHarmony == 'A4':
             if scale and n1degree != 4:
@@ -892,13 +900,21 @@ class VoiceLeadingQuartet(base.Music21Object):
             return (self.outwardContraryMotion()
                         and secondHarmony == 6)
 
-        elif firstHarmony == 'm7':
-            if scale and n1degree != 5:
+        elif firstHarmony == 'd5':
+            if scale and n1degree != 7:
                 return True
             if scale and n2degree != 1:
                 return False
             return (self.inwardContraryMotion()
                         and secondHarmony == 3)
+
+        elif firstHarmony == 'm7':
+            if scale and n1degree != 5:
+                return True
+            if scale and n2degree != 1:
+                return False
+            return secondHarmony == 3
+
         else:
             return True
 
