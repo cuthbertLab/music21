@@ -73,7 +73,11 @@ class VoiceLeadingQuartet(base.Music21Object):
     v2n1 moves to v2n2.
     (v1n1: voice 1(top voice), note 1 (left most note) )
 
-    Necessary for classifying types of voice-leading motion
+    Necessary for classifying types of voice-leading motion.
+    
+    In general, v1 should be the "higher" voice and v2 the "lower" voice
+    in order for methods such as `.voiceCrossing` and `isProperResolution` 
+    to make sense.  Most routines will work the other way still though. 
     '''
 
     _DOC_ATTR = {'vIntervals': '''list of the two harmonic intervals present,
@@ -396,7 +400,9 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl.parallelMotion('P1')
         True
 
-        >>> vl.parallelMotion('P8', allowOctaveDisplacement=True) # octaves never equivalent to unisons
+        octaves never equivalent to unisons
+        
+        >>> vl.parallelMotion('P8', allowOctaveDisplacement=True)
         False
 
         >>> vl = voiceLeading.VoiceLeadingQuartet(N('A4'), N('B4'), N('D3'), N('E3'))
@@ -419,9 +425,12 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> gi = interval.GenericInterval(6)
         >>> vl.parallelMotion(gi) # these are parallel sixths ...
         True
+        
+        These are also parallel major sixths
+
         >>> i = interval.Interval('M6')
-        >>> di = interval.DiatonicInterval('major', 6)
-        >>> vl.parallelMotion(i) and vl.parallelMotion(di) # that are also parallel major sixths
+        >>> di = interval.DiatonicInterval('major', 6)        
+        >>> vl.parallelMotion(i) and vl.parallelMotion(di)
         True
 
         >>> vl = voiceLeading.VoiceLeadingQuartet(N('D5'), N('E6'), N('F3'), N('G3'))
@@ -440,7 +449,8 @@ class VoiceLeadingQuartet(base.Music21Object):
               and not allowOctaveDisplacement):
             return False
 
-        elif self.vIntervals[0].generic.semiSimpleUndirected != self.vIntervals[1].generic.semiSimpleUndirected:
+        elif (self.vIntervals[0].generic.semiSimpleUndirected 
+                != self.vIntervals[1].generic.semiSimpleUndirected):
             return False
 
         elif requiredInterval is None:
@@ -450,20 +460,27 @@ class VoiceLeadingQuartet(base.Music21Object):
             intervalsAreValid = False
 
             if isinstance(requiredInterval, interval.GenericInterval):
-                intervalsAreValid = (self.vIntervals[0].generic.semiSimpleUndirected == requiredInterval.semiSimpleUndirected)
+                intervalsAreValid = (self.vIntervals[0].generic.semiSimpleUndirected 
+                                     == requiredInterval.semiSimpleUndirected)
 
-            if isinstance(requiredInterval, int): # assume the user wants a parallel generic interval
+            if isinstance(requiredInterval, int): 
+                # assume the user wants a parallel generic interval
                 requiredInterval = interval.GenericInterval(requiredInterval)
-                intervalsAreValid = (self.vIntervals[0].generic.semiSimpleUndirected == requiredInterval.semiSimpleUndirected)
+                intervalsAreValid = (self.vIntervals[0].generic.semiSimpleUndirected 
+                                     == requiredInterval.semiSimpleUndirected)
 
             if isinstance(requiredInterval, str):
                 requiredInterval = interval.Interval(requiredInterval)
-                intervalsAreValid = (self.vIntervals[0].semiSimpleName == requiredInterval.semiSimpleName
-                                     and self.vIntervals[1].semiSimpleName == requiredInterval.semiSimpleName)
+                intervalsAreValid = (self.vIntervals[0].semiSimpleName 
+                                        == requiredInterval.semiSimpleName
+                                     and self.vIntervals[1].semiSimpleName 
+                                        == requiredInterval.semiSimpleName)
 
             elif isinstance(requiredInterval, (interval.Interval, interval.DiatonicInterval)):
-                intervalsAreValid = (self.vIntervals[0].semiSimpleName == requiredInterval.semiSimpleName
-                                     and self.vIntervals[1].semiSimpleName == requiredInterval.semiSimpleName)
+                intervalsAreValid = (self.vIntervals[0].semiSimpleName 
+                                        == requiredInterval.semiSimpleName
+                                     and self.vIntervals[1].semiSimpleName 
+                                        == requiredInterval.semiSimpleName)
 
             return intervalsAreValid
 
@@ -625,13 +642,12 @@ class VoiceLeadingQuartet(base.Music21Object):
         Returns true if there is a parallel motion or antiParallel motion of
         this type (thisInterval should be an Interval object)
 
-        >>> n11 = note.Note("C4")
-        >>> n12a = note.Note("D4") # ascending 2nd
-        >>> n12b = note.Note("D3") # descending 7th
+        >>> n11 = note.Note("G4")
+        >>> n12a = note.Note("A4") # ascending 2nd
 
-        >>> n21 = note.Note("G4")
-        >>> n22a = note.Note("A4") # ascending 2nd
-        >>> n22b = note.Note("B4") # ascending 3rd
+        >>> n21 = note.Note("C4")
+        >>> n22a = note.Note("D4") # ascending 2nd
+
         >>> vlq1 = voiceLeading.VoiceLeadingQuartet(n11, n12a, n21, n22a)
         >>> vlq1.parallelInterval(interval.Interval("P5"))
         True
@@ -641,13 +657,25 @@ class VoiceLeadingQuartet(base.Music21Object):
 
         Antiparallel fifths also are true
 
-        >>> vlq2 = voiceLeading.VoiceLeadingQuartet(n11, n12b, n21, n22a)
+        >>> n22b = note.Note("D3") # descending 7th
+        >>> vlq2 = voiceLeading.VoiceLeadingQuartet(n11, n12a, n21, n22b)
         >>> vlq2.parallelInterval(interval.Interval("P5"))
         True
+        
+        But Antiparallel other interval are not:
+
+        >>> N = note.Note
+        >>> vlq2a = voiceLeading.VoiceLeadingQuartet(N('C5'), N('C6'), N('C4'), N('C3'))
+        >>> vlq2a.parallelInterval(interval.Interval('P5'))
+        False
+        >>> vlq2a.parallelInterval(interval.Interval('P8'))
+        True
+        
 
         Non-parallel intervals are, of course, False
 
-        >>> vlq3 = voiceLeading.VoiceLeadingQuartet(n11, n12a, n21, n22b)
+        >>> n12b = note.Note("B4") # ascending 3rd
+        >>> vlq3 = voiceLeading.VoiceLeadingQuartet(n11, n12b, n21, n22b)
         >>> vlq3.parallelInterval(interval.Interval("P5"))
         False
 
@@ -658,7 +686,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                     requiredInterval=thisInterval,
                     allowOctaveDisplacement=True
                     )
-                or self.antiParallelMotion())
+                or self.antiParallelMotion(thisInterval))
 
 
     def parallelFifth(self):
@@ -669,19 +697,34 @@ class VoiceLeadingQuartet(base.Music21Object):
         We will make the examples shorter with this abbreviation:
         >>> N = note.Note
 
-        >>> voiceLeading.VoiceLeadingQuartet(N("G4"), N("A4"), N("C4"), N("D4")).parallelFifth() # parallel fifths
+        parallel fifths
+        
+        >>> vlq = voiceLeading.VoiceLeadingQuartet(N("G4"), N("A4"), N("C4"), N("D4"))
+        >>> vlq.parallelFifth() 
         True
 
-        >>> voiceLeading.VoiceLeadingQuartet(N("G4"), N("A5"), N("C4"), N("D4")).parallelFifth() # 5th -> 12th in similar motion
+        5th -> 12th in similar motion
+        
+        >>> vlq = voiceLeading.VoiceLeadingQuartet(N("G4"), N("A5"), N("C4"), N("D4"))
+        >>> vlq.parallelFifth() 
         True
 
-        >>> voiceLeading.VoiceLeadingQuartet(N("G4"), N("A4"), N("C4"), N("D3")).parallelFifth() # 5th -> 12th in antiparallel motion
+        5th -> 12th in antiparallel motion
+        
+        >>> vlq = voiceLeading.VoiceLeadingQuartet(N("G4"), N("A4"), N("C4"), N("D3"))
+        >>> vlq.parallelFifth()
         True
 
-        >>> voiceLeading.VoiceLeadingQuartet(N("G4"), N("A4"), N("C#4"), N("D4")).parallelFifth() # d5 -> P5 is fine
+        d5 -> P5 is not a parallelFifth
+        
+        >>> vlq = voiceLeading.VoiceLeadingQuartet(N("G4"), N("A4"), N("C#4"), N("D4"))
+        >>> vlq.parallelFifth()
         False
 
-        >>> voiceLeading.VoiceLeadingQuartet(N("G4"), N("Ab4"), N("C4"), N("D4")).parallelFifth() # P5 -> d5 is fine
+        nor is P5 -> d5
+        
+        >>> vlq = voiceLeading.VoiceLeadingQuartet(N("G4"), N("Ab4"), N("C4"), N("D4"))
+        >>> vlq.parallelFifth()
         False
 
         Returns boolean.
@@ -722,10 +765,12 @@ class VoiceLeadingQuartet(base.Music21Object):
         We will make the examples shorter with this abbreviation:
 
         >>> N = note.Note
-        >>> voiceLeading.VoiceLeadingQuartet(N("C4"), N("D4"), N("C4"), N("D4")).parallelUnison()
+        >>> vlq = voiceLeading.VoiceLeadingQuartet(N("C4"), N("D4"), N("C4"), N("D4"))
+        >>> vlq.parallelUnison()
         True
 
-        >>> voiceLeading.VoiceLeadingQuartet(N("C5"), N("D5"), N("C4"), N("D4")).parallelUnison()
+        >>> vlq  = voiceLeading.VoiceLeadingQuartet(N("C5"), N("D5"), N("C4"), N("D4"))
+        >>> vlq.parallelUnison()
         False
 
         Return boolean.
@@ -804,7 +849,8 @@ class VoiceLeadingQuartet(base.Music21Object):
 
     def hiddenFifth(self):
         '''
-        Calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.hiddenInterval` by passing a fifth
+        Calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.hiddenInterval` 
+        by passing a fifth
         '''
         return self.hiddenInterval(self.fifth)
 
@@ -987,7 +1033,9 @@ class VoiceLeadingQuartet(base.Music21Object):
             # catches case of #7 in minor
             if self.key.mode == 'minor' and n1degree is None:
                 minorScale = scale.MelodicMinorScale(self.key.tonic)
-                n1degree = minorScale.getScaleDegreeFromPitch(self.v2n1, direction=scale.DIRECTION_ASCENDING);
+                n1degree = minorScale.getScaleDegreeFromPitch(
+                    self.v2n1, 
+                    direction=scale.DIRECTION_ASCENDING);
 
         else:
             keyScale = None
@@ -1225,7 +1273,8 @@ def getVerticalityFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None
 class Verticality(base.Music21Object):
     '''
     A vertical slice object provides more accessible information about
-    vertical moments in a score. A vertical slice is instantiated by passing in a dictionary of
+    vertical moments in a score. A vertical slice is 
+    instantiated by passing in a dictionary of
     the form {partNumber : [ music21Objects ] }
     To create vertical slices out of a score, call
     by :meth:`~music21.theoryAnalzyer.getVerticalities`
@@ -1538,7 +1587,8 @@ class Verticality(base.Music21Object):
     def offset(self,leftAlign=True):
         '''
         returns the overall offset of the vertical slice. Typically, this would just be the
-        offset of each object in the vertical slice, and each object would have the same offset.
+        offset of each object in the vertical slice, 
+        and each object would have the same offset.
         However, if the duration of one object in the slice is different than the duration
         of another,
         and that other starts after the first, but the first is still sounding, then the
@@ -1654,9 +1704,10 @@ class VerticalityTriplet(VerticalityNTuplet):
                                     len(self.verticalities[2].getObjectsByClass(note.Note)))
                              ):
             self.tnlsDict[partNum] = ThreeNoteLinearSegment([
-                                    self.verticalities[0].getObjectsByPart(partNum, note.Note),
-                                    self.verticalities[1].getObjectsByPart(partNum, note.Note),
-                                    self.verticalities[2].getObjectsByPart(partNum, note.Note)])
+                            self.verticalities[0].getObjectsByPart(partNum, note.Note),
+                            self.verticalities[1].getObjectsByPart(partNum, note.Note),
+                            self.verticalities[2].getObjectsByPart(partNum, note.Note)
+                            ])
 
 
     def hasPassingTone(self, partNumToIdentify, unaccentedOnly=False):
@@ -1888,7 +1939,8 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
                 if value.isClassOrSubclass([note.Note, pitch.Pitch]):
                     return value
             except:
-                raise ThreeNoteLinearSegmentException('not a valid note specification: %s' % value)
+                raise ThreeNoteLinearSegmentException(
+                    'not a valid note specification: %s' % value)
 
     n1 = property(_getN1, _setN1, doc='''
         get or set the first note (left-most) in the segment
