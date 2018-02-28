@@ -2755,7 +2755,9 @@ class Test(unittest.TestCase):
         '''
         test loading a fake piece with spine paths, lyrics, dynamics, etc.
         '''
-        ms = HumdrumDataCollection(testFiles.fakeTest).stream
+        hdc = HumdrumDataCollection(testFiles.fakeTest)
+        hdc.parse()
+        ms = hdc.stream
         ms.show()
 
     def testSpineMazurka(self):
@@ -2814,7 +2816,15 @@ class Test(unittest.TestCase):
         unused_s = hf1.stream
         #unused_s.show('text')
 
-
+    def testLyricsInSpine(self):
+        from music21 import text
+        hf1 = HumdrumDataCollection(testFiles.fakeTest)
+        hf1.parse()
+        #hf1.spineCollection.moveDynamicsAndLyricsToStreams()
+        s = hf1.stream
+        l = text.assembleLyrics(s)
+        self.assertEqual(l, 'Magijago ickewyan')
+        
     def testSplitSpines2(self):
         '''
         Currently this does not work since a second split on a stream that
@@ -2822,6 +2832,7 @@ class Test(unittest.TestCase):
         in strangeWTCOpening, below.
         '''
         hf1 = HumdrumDataCollection(testFiles.splitLots)
+        hf1.parse()
         unused_masterStream = hf1.stream
 
     def testParseStrangeSplit(self):
@@ -2847,6 +2858,7 @@ class Test(unittest.TestCase):
         self.assertIsNotNone(md.composer)
         self.assertIn('Palestrina', md.composer)
 
+    
 
     def testFlavors(self):
         prevFlavor = flavors['JRP']
@@ -2884,7 +2896,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test) #, runTest='testMetadataRetrieved') #, TestExternal)
+    music21.mainTest(Test, runTest='testSplitSpines2') #, TestExternal)
 
 #------------------------------------------------------------------------------
 # eof

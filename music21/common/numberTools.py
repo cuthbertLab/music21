@@ -65,7 +65,6 @@ def cleanupFloat(floatNum, maxDenominator=defaults.limitOffsetDenominator):
     it to a fractions.Fraction object limited to
     a denominator of maxDenominator
 
-
     >>> common.cleanupFloat(0.33333327824)
     0.333333333333...
 
@@ -196,7 +195,6 @@ def _preFracLimitDenominator(n, d):
     ...         print('boo: %s, %s, %s' % (x, myWay(x), theirWay(x)))
 
     (n.b. -- nothing printed)
-
     '''
     nOrg = n
     dOrg = d
@@ -339,7 +337,6 @@ def mixedNumeral(expr, limitDenominator=defaults.limitOffsetDenominator):
     '0'
     >>> common.mixedNumeral(-0)
     '0'
-
 
     Works with Fraction objects too
 
@@ -510,6 +507,10 @@ def strTrimFloat(floatNum, maxNum=4):
     '2.0'
     >>> common.strTrimFloat(-5)
     '-5.0'
+
+    :type floatNum: float
+    :type maxNum: int
+    :rtype: str
     '''
     # variables called 'off' because originally designed for offsets
     offBuildString = r'%.' + str(maxNum) + 'f'
@@ -556,22 +557,22 @@ def nearestMultiple(n, unit):
     >>> common.nearestMultiple(.001, .125)[0]
     0.0
 
-    >>> common.almostEquals(common.nearestMultiple(.25, (1/3.))[0], .33333333)
+    >>> common.almostEquals(common.nearestMultiple(0.25, 1 / 3)[0], .33333333)
     True
-    >>> common.almostEquals(common.nearestMultiple(.55, (1/3.))[0], .66666666)
+    >>> common.almostEquals(common.nearestMultiple(0.55, 1 / 3)[0], .66666666)
     True
-    >>> common.almostEquals(common.nearestMultiple(234.69, (1/3.))[0], 234.6666666)
+    >>> common.almostEquals(common.nearestMultiple(234.69, 1 / 3)[0], 234.6666666)
     True
-    >>> common.almostEquals(common.nearestMultiple(18.123, (1/6.))[0], 18.16666666)
+    >>> common.almostEquals(common.nearestMultiple(18.123, 1 / 6)[0], 18.16666666)
     True
-
 
     >>> common.nearestMultiple(-0.5, 0.125)
     Traceback (most recent call last):
     ValueError: n (-0.5) is less than zero. Thus cannot find nearest
         multiple for a value less than the unit, 0.125
 
-
+    :type n: float
+    :type unit: float
     :rtype: tuple(float)
     '''
     if n < 0:

@@ -19,7 +19,6 @@ graphing archetypes using the matplotlib library.
 from __future__ import division, print_function, absolute_import
 
 import math
-import os
 import random
 import unittest
 

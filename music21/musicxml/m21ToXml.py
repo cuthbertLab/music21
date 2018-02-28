@@ -833,6 +833,10 @@ class XMLExporterBase:
         self.setColor(mxObject, m21Object)
 
     def setPrintObject(self, mxObject, m21Object):
+        '''
+        sets print-object to 'no' if m21Object.style.hideObjectOnPrint is True
+        or if m21Object is a StyleObject and has .hideObjectOnPrint set to True.
+        '''
         if isinstance(m21Object, style.Style):
             st = m21Object
         elif m21Object.hasStyleInformation:
@@ -3598,7 +3602,6 @@ class MeasureExporter(XMLExporterBase):
             mxNoteList.append(self.noteToXml(n, addChordTag=addChordTag, chordParent=c))
         return mxNoteList
 
-
     def durationXml(self, dur):
         '''
         Convert a duration.Duration object to a <duration> tag using self.currentDivisions
@@ -3635,6 +3638,94 @@ class MeasureExporter(XMLExporterBase):
             mxAlter.text = str(common.numToIntOrFloat(p.accidental.alter))
         _setTagTextFromAttribute(p, mxPitch, 'octave', 'implicitOctave')
         return mxPitch
+    
+    def fretNoteToXml(self, fretNote):
+        '''
+        Converts a FretNote Object to MusicXML readable format.
+        
+        Note that, although music21 is referring to FretNotes as FretNotes, musicxml refers to the 
+        them as frame notes. To convert between the two formats, 'Fret-Note' must be converted to
+        'Frame-Note'
+        
+        >>> fn = tablature.FretNote(string = 3, fret = 1, fingering = 2)
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> MEXFretNote = MEX.fretNoteToXml(fn)
+        >>> MEX.dump(MEXFretNote)
+        <frame-note>
+            <string>3</string>
+            <fret>1</fret>
+            <fingering>2</fingering>
+        </frame-note>
+        
+        Without fingering!
+        
+        >>> fn2 = tablature.FretNote(string = 5, fret = 2)
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> MEXOtherFretNote = MEX.fretNoteToXml(fn2)
+        >>> MEX.dump(MEXOtherFretNote)
+        <frame-note>
+            <string>5</string>
+            <fret>2</fret>
+        </frame-note>
+        '''
+        FretNoteMX = Element('frame-note')
+        _setTagTextFromAttribute(fretNote, FretNoteMX, 'string')
+        _setTagTextFromAttribute(fretNote, FretNoteMX, 'fret')
+    
+        if fretNote.fingering != None:
+            _setTagTextFromAttribute(fretNote, FretNoteMX, 'fingering')
+                
+        return FretNoteMX
+        
+    def chordWithFretToXml(self, fretBoard):
+        '''
+        The ChordWithFretBoard Object combines chord symbols with FretNote objects.
+        
+        >>> myFretNote1 = tablature.FretNote(1, 2, 2)
+        >>> myFretNote2 = tablature.FretNote(2, 3, 3)
+        >>> myFretNote3 = tablature.FretNote(3, 2, 1)
+        >>> guitarChord = tablature.ChordWithFretBoard('DM', numStrings = 6, fretNotes = [myFretNote1, myFretNote2, myFretNote3])
+        >>> guitarChord.tuning = tablature.GuitarFretBoard().tuning
+        >>> guitarChord.getPitches()
+        [None, None, None, <music21.pitch.Pitch A3>, <music21.pitch.Pitch D4>, <music21.pitch.Pitch F#4>]
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> MEXChordWithFret = MEX.chordWithFretToXml(guitarChord)
+        >>> MEX.dump(MEXChordWithFret)
+        <frame>
+            <frame-strings>6</frame-strings>
+            <frame-frets>4</frame-frets>
+            <frame-note>
+                <string>3</string>
+                <fret>2</fret>
+                <fingering>1</fingering>
+            </frame-note>
+            <frame-note>
+                <string>2</string>
+                <fret>3</fret>
+                <fingering>3</fingering>
+            </frame-note>
+            <frame-note>
+                <string>1</string>
+                <fret>2</fret>
+                <fingering>2</fingering>
+            </frame-note>
+        </frame>
+        '''
+        if len(fretBoard.fretNotes) == 0:
+            return None
+        
+        #why isn't this the same as the function above? This seems a good deal simpler!
+        mxFrame = Element('frame')
+        mxFrameStrings = SubElement(mxFrame, 'frame-strings')
+        mxFrameStrings.text = str(fretBoard.numStrings)
+        mxFrameFrets = SubElement(mxFrame, 'frame-frets')
+        mxFrameFrets.text = str(fretBoard.displayFrets)
+                
+        for thisFretNote in fretBoard.fretNotesLowestFirst():
+            mxFretNote = self.fretNoteToXml(thisFretNote)
+            mxFrame.append(mxFretNote)
+        
+        return mxFrame
 
     def tupletToTimeModification(self, tup):
         '''
@@ -4433,10 +4524,6 @@ class MeasureExporter(XMLExporterBase):
           <type>quarter</type>
         </note>
         '''
-        # TODO: attrGroup: print-object
-        # TODO: attr: print-frame
-        # TODO: attrGroup: placement
-
         if cs.writeAsChord is True:
             return self.chordToXml(cs)
 
@@ -4444,6 +4531,10 @@ class MeasureExporter(XMLExporterBase):
 
         mxHarmony = Element('harmony')
         _synchronizeIds(mxHarmony, cs)
+
+        self.setPrintObject(mxHarmony, cs)
+        # TODO: attr: print-frame
+        # TODO: attrGroup: placement
 
         self.setPrintStyle(mxHarmony, cs)
 
@@ -5383,7 +5474,6 @@ class MeasureExporter(XMLExporterBase):
         Compound meters are represented as multiple pairs of beat
         and beat-type elements
 
-
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> a = meter.TimeSignature('3/4')
         >>> b = MEX.timeSignatureToXml(a)
@@ -5411,7 +5501,6 @@ class MeasureExporter(XMLExporterBase):
           <beat-type>4</beat-type>
         </time>
 
-
         >>> a = meter.TimeSignature('4/4')
         >>> a.symbol = 'common'
         >>> b = MEX.timeSignatureToXml(a)
@@ -5421,7 +5510,6 @@ class MeasureExporter(XMLExporterBase):
           <beat-type>4</beat-type>
         </time>
 
-
         >>> a.symbol = ""
         >>> a.symbolizeDenominator = True
         >>> b = MEX.timeSignatureToXml(a)
@@ -5430,7 +5518,6 @@ class MeasureExporter(XMLExporterBase):
           <beats>4</beats>
           <beat-type>4</beat-type>
         </time>
-
 
         >>> sm = meter.SenzaMisuraTimeSignature('free')
         >>> b = MEX.timeSignatureToXml(sm)
@@ -5475,7 +5562,7 @@ class MeasureExporter(XMLExporterBase):
 
         # TODO: attr: separator
         self.setPrintStyleAlign(mxTime, ts)
-        # TODO: attr: print-object
+        self.setPrintObject(mxTime, ts)
         return mxTime
 
     def keySignatureToXml(self, keyOrKeySignature):

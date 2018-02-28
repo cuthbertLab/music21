@@ -234,7 +234,7 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwar
     Or, to get all the chorales (without using `corpus.chorales.Iterator`):
 
     >>> corpus.search(sourcePath='bach', numberOfParts=4)
-    <music21.metadata.bundles.MetadataBundle {360 entries}>
+    <music21.metadata.bundles.MetadataBundle {367 entries}>
 
 
 
@@ -248,7 +248,7 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwar
     ...     'bach',
     ...     corpusNames=('core',),
     ...     )
-    <music21.metadata.bundles.MetadataBundle {557 entries}>
+    <music21.metadata.bundles.MetadataBundle {564 entries}>
 
     If ``corpusNames`` is None, all corpora known to music21 will be searched.
 

@@ -3988,9 +3988,9 @@ class Chord(note.NotRest):
         '<A25>'
 
         OMIT_FROM_DOCS
-        
+
         These were giving problems before:
-        
+
         >>> chord.Chord('G#2 A2 D3 G3').normalOrder
         [7, 8, 9, 2]
 
@@ -4008,7 +4008,7 @@ class Chord(note.NotRest):
             possibleNormalOrder = [(pc + transposeAmount) % 12 for pc in transposedNormalForm]
             if set(possibleNormalOrder) == mustBePresentPCs:
                 return possibleNormalOrder
-        raise ChordException('Could not find a normalOrder for chord: ' 
+        raise ChordException('Could not find a normalOrder for chord: '
                              + str(self.orderedPitchClassesString))
 
     @property
@@ -4498,7 +4498,7 @@ class Chord(note.NotRest):
         96
 
         But after called, now it does:
-        
+
         >>> c.hasVolumeInformation()
         True
 
@@ -4668,7 +4668,8 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         pass
 
     def testBasic(self):
-        for pitchList in [['g2', 'c4', 'c#6'], ['c', 'd-', 'f#', 'g']]:
+        for pitchList in [['g2', 'c4', 'c#6'],
+                          ['c', 'd-', 'f#', 'g']]:
             a = Chord(pitchList)
             a.show()
 
@@ -5406,4 +5407,3 @@ if __name__ == '__main__':
 
 #------------------------------------------------------------------------------
 # eof
-

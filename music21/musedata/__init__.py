@@ -1658,7 +1658,7 @@ class MuseDataDirectory:
             #source = 'dir'
             #sep = os.sep # sep os.sep
             # first, get the contents of the dir and see if it has md files
-            for fn in os.listdir(dirOrList):
+            for fn in sorted(os.listdir(dirOrList)):
                 allPaths.append(os.path.join(dirOrList, fn))
 #                 if not self.isMusedataFile(fn):
 #                     continue

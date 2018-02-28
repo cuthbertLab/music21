@@ -1797,7 +1797,7 @@ class Test(unittest.TestCase):
 
         fewBach = corpus.search('bach/bwv6')
 
-        self.assertEqual(len(fewBach), 12)
+        self.assertEqual(len(fewBach), 13)
         ds = features.DataSet(classLabel='NumPitches')
         ds.addMultipleData(fewBach, classValues=pickleFunctionNumPitches)
         featureExtractors = features.extractorsById(['ql1', 'ql4'], 'native')
@@ -1811,6 +1811,7 @@ class Test(unittest.TestCase):
             Identifier,Unique_Note_Quarter_Lengths,Range_of_Note_Quarter_Lengths,NumPitches
             bach/bwv6.6.mxl,4,1.75,164
             bach/bwv60.5.mxl,6,2.75,281
+            bach/bwv62.6.mxl,5,1.75,148
             bach/bwv64.2.mxl,5,3.5,176
             bach/bwv64.4.mxl,5,2.5,368
             bach/bwv64.8.mxl,5,3.5,272

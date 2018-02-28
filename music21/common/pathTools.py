@@ -79,8 +79,9 @@ def getCorpusContentDirs():
     >>> fp # this test will be fragile, depending on composition of dirs
     ['airdsAirs', 'bach', 'beach', 'beethoven', 'chopin', 
      'ciconia', 'corelli', 'cpebach',
-     'demos', 'essenFolksong', 'handel', 'haydn', 'josquin', 'leadSheet',
-     'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'palestrina',
+     'demos', 'essenFolksong', 'handel', 'haydn', 'joplin', 'josquin', 
+     'leadSheet', 'luca', 'miscFolk', 'monteverdi', 'mozart', 
+     'oneills1850', 'palestrina',
      'ryansMammoth', 'schoenberg', 'schubert', 'schumann', 'schumann_clara',
      'theoryExercises', 'trecento', 'verdi', 'weber']
 
@@ -96,6 +97,7 @@ def getCorpusContentDirs():
     >>> failed
     []
 
+    :rtype: List[str]
     '''
     directoryName = str(getCorpusFilePath()) # Py3.6 remove
     result = []
@@ -105,7 +107,7 @@ def getCorpusContentDirs():
         '_metadataCache',
         '__pycache__',
         )
-    for filename in os.listdir(directoryName):
+    for filename in sorted(os.listdir(directoryName)):
         if filename.endswith(('.py', '.pyc')):
             continue
         elif filename.startswith('.'):
@@ -153,13 +155,12 @@ def cleanpath(path, *, returnPathlib=None):
     v5 -- returnPathlib -- None (default) does not convert. False, returns a string,
     True, returns a pathlib.Path.
     '''
-
     if isinstance(path, pathlib.Path):
         path = str(path)
         if returnPathlib is None:
             returnPathlib = True
     elif returnPathlib is None:
-            returnPathlib = False
+        returnPathlib = False
     path = os.path.expanduser(path)
     path = os.path.normpath(path)
     if not os.path.isabs(path):

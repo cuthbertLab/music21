@@ -148,6 +148,7 @@ __all__ = [
     'spanner',
     'stream',
     'style',
+    'tablature',
     'tempo',
     'text',
     'tie',

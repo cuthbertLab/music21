@@ -505,11 +505,11 @@ def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=
 
     >>> pitch.simplifyMultipleEnharmonics([6, 10, 1], keyContext=key.Key('C-'))
     [<music21.pitch.Pitch G->, <music21.pitch.Pitch B->, <music21.pitch.Pitch D->]
-    
-    
+
+
     Note that if there's no key context, then we won't simplify everything (at least
     for now; this behavior may change, ).
-    
+
     >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('D--3'),
     ...                                    pitch.Pitch('F-3'),
     ...                                    pitch.Pitch('A--3')])
@@ -1061,7 +1061,7 @@ class Accidental(style.StyleMixin):
                       'isis', 2):
             self._name = 'double-sharp'
             self._alter = 2.0
-        elif name in ('flat', accidentalNameToModifier['flat'], 'es', -1):
+        elif name in ('flat', accidentalNameToModifier['flat'], 'es', 'b', -1):
             self._name = 'flat'
             self._alter = -1.0
         elif name in ('double-flat', accidentalNameToModifier['double-flat'],
@@ -1585,9 +1585,9 @@ class Pitch:
             Returns True or False about whether enharmonic spelling
             Has been inferred on pitch creation or whether it has
             been specified directly.
-            
+
             MIDI 61 is C# or D- equally.
-            
+
             >>> p = pitch.Pitch('C4')
             >>> p.spellingIsInferred
             False
@@ -1599,31 +1599,31 @@ class Pitch:
             >>> p.name = 'C#'
             >>> p.spellingIsInferred
             False
-            
+
             This makes a difference in transposing.  For instance:
-            
+
             >>> pInferred = pitch.Pitch(61)
             >>> pNotInferred = pitch.Pitch('C#4')
             >>> pInferred.nameWithOctave, pNotInferred.nameWithOctave
             ('C#4', 'C#4')
             >>> pInferred.spellingIsInferred, pNotInferred.spellingIsInferred
             (True, False)
-            
+
             >>> inferredTransposed = pInferred.transpose('A1')
             >>> inferredTransposed.nameWithOctave
             'D4'
             >>> notInferredTransposed = pNotInferred.transpose('A1')
             >>> notInferredTransposed.nameWithOctave
             'C##4'
-            
+
             An operation like diatonic transposition should retain the spelling is inferred
             for the resulting object
-            
+
             >>> inferredTransposed.spellingIsInferred, notInferredTransposed.spellingIsInferred
             (True, False)
 
             But Chromatic transposition can change an object to inferred spelling:
-            
+
             >>> p3 = notInferredTransposed.transpose(1) # C## -> E- not to C###
             >>> p3.nameWithOctave
             'E-4'
@@ -2330,9 +2330,9 @@ class Pitch:
         >>> d.defaultOctave = 5
         >>> d.ps
         75.0
-        
+
         Setting with microtones
-        
+
         >>> p = pitch.Pitch()
         >>> p.ps = 61
         >>> p.ps
@@ -2347,7 +2347,7 @@ class Pitch:
         C#~4(+20c)
         >>> p.ps = 61.4 # set a microtone
         >>> print(p)
-        C#~4(-10c)        
+        C#~4(-10c)
         ''')
 
 
@@ -2498,7 +2498,7 @@ class Pitch:
         # extract any numbers that may be octave designations
         octFound = []
         octNot = []
-        
+
         for char in usrStr:
             if char in '0123456789':
                 octFound.append(char)
@@ -2728,7 +2728,7 @@ class Pitch:
         Note that if spelling is inferred, setting the step does NOT
         give that enharmonic.  Perhaps it should, but best to make people use
         .getLowerEnharmonic or .getHigherEnharmonic instead.
-        
+
         >>> b.ps = 60
         >>> b.nameWithOctave
         'C4'
@@ -2739,7 +2739,7 @@ class Pitch:
         True
         >>> b.spellingIsInferred
         False
-        
+
         ''')
 
 
@@ -2961,7 +2961,7 @@ class Pitch:
         >>> p1.accidental = pitch.Accidental('half-sharp')
         >>> p1.german
         Traceback (most recent call last):
-        music21.pitch.PitchException: 
+        music21.pitch.PitchException:
             Es geht nicht "german" zu benutzen mit Microt...nen.  Schade!
 
         Note these rarely used pitches:
@@ -3725,13 +3725,12 @@ class Pitch:
             self._transpositionIntervals[intervalString] = interval.Interval(intervalString)
         intervalObj = self._transpositionIntervals[intervalString]
         octaveStored = self.octave # may be None
+        p = intervalObj.transposePitch(self, maxAccidental=None)
         if not inPlace:
-            post = intervalObj.transposePitch(self, maxAccidental=None)
             if octaveStored is None:
-                post.octave = None
-            return post
+                p.octave = None
+            return p
         else:
-            p = intervalObj.transposePitch(self, maxAccidental=None)
             self.step = p.step
             self.accidental = p.accidental
             if p.microtone is not None:
@@ -4277,7 +4276,7 @@ class Pitch:
         p = intervalObj.transposePitch(self)
         if not isinstance(value, int):
             p.spellingIsInferred = self.spellingIsInferred
-        
+
         if p.spellingIsInferred is True:
             p.simplifyEnharmonic(inPlace=True, mostCommon=True)
 
@@ -5508,4 +5507,3 @@ _DOC_ORDER = [Pitch, Accidental, Microtone]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-

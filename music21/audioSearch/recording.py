@@ -20,7 +20,6 @@ users of 64-bit windows but 32-bit python should download the win32 port
 
 users of 64-bit windows and 64-bit python should download the amd64 port
 '''
-import os
 import unittest
 import wave
 
