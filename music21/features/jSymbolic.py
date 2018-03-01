@@ -35,41 +35,6 @@ environLocal = environment.Environment(_MOD)
 # 112 feature extractors
 
 
-
-#-------------------------------------------------------------------------------
-# need to classify and add id
-
-
-class DurationFeature(featuresModule.FeatureExtractor):
-    '''A feature extractor that extracts the duration of the piece in seconds.
-    
-    >>> s = corpus.parse('bwv66.6')
-    >>> for p in s.parts:
-    ...     p.insert(0, tempo.MetronomeMark(number=120))
-    >>> fe = features.jSymbolic.DurationFeature(s)
-    >>> f = fe.extract()
-    >>> f.vector[0]
-    18.0
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
-
-        self.name = 'Duration'
-        self.description = 'The total duration in seconds of the music.'
-        self.isSequential = False # this is the only jSymbolc non seq feature
-        self.dimensions = 1
-        self.discrete = False
-    
-    def process(self):
-        secondsMap = self.data['flat.secondsMap']
-        # The total duration of the piece is the same as the latest end time
-        # of all the notes.
-        end_times = [bundle['endTimeSeconds'] for bundle in secondsMap]
-        end_times.sort()  # may already be sorted?
-        self.feature.vector[0] = end_times[-1]
-
-
 #-------------------------------------------------------------------------------
 # melody based
 
@@ -1018,7 +983,6 @@ class NumberOfCommonPitchesFeature(featuresModule.FeatureExtractor):
         self.feature.vector[0] = post
 
 
-
 class PitchVarietyFeature(featuresModule.FeatureExtractor):
     '''
     Number of pitches used at least once.
@@ -1050,7 +1014,6 @@ class PitchVarietyFeature(featuresModule.FeatureExtractor):
         self.feature.vector[0] = post
 
 
-
 class PitchClassVarietyFeature(featuresModule.FeatureExtractor):
     '''
     Number of pitch classes used at least once.
@@ -1080,7 +1043,6 @@ class PitchClassVarietyFeature(featuresModule.FeatureExtractor):
             if count >= 1:
                 post += 1
         self.feature.vector[0] = post
-
 
 
 class RangeFeature(featuresModule.FeatureExtractor):
@@ -2770,6 +2732,38 @@ class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
                 self.feature.vector[0] = 1
                 return
 
+
+class DurationFeature(featuresModule.FeatureExtractor):
+    '''A feature extractor that extracts the duration of the piece in seconds.
+    
+    >>> s = corpus.parse('bwv66.6')
+    >>> for p in s.parts:
+    ...     p.insert(0, tempo.MetronomeMark(number=120))
+    >>> fe = features.jSymbolic.DurationFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector[0]
+    18.0
+    '''
+    id = 'R36'
+    def __init__(self, dataOrStream=None, *arguments, **keywords):
+        super().__init__(dataOrStream=dataOrStream,
+                                                 *arguments, **keywords)
+
+        self.name = 'Duration'
+        self.description = 'The total duration in seconds of the music.'
+        self.isSequential = False # this is the only jSymbolc non seq feature
+        self.dimensions = 1
+        self.discrete = False
+    
+    def process(self):
+        secondsMap = self.data['flat.secondsMap']
+        # The total duration of the piece is the same as the latest end time
+        # of all the notes.
+        end_times = [bundle['endTimeSeconds'] for bundle in secondsMap]
+        end_times.sort()  # may already be sorted?
+        self.feature.vector[0] = end_times[-1]
+
+
 #-------------------------------------------------------------------------------
 # dynamics
 
@@ -3833,6 +3827,7 @@ class OrchestralStringsFractionFeature(InstrumentFractionFeature):
     >>> print(fe.extract().vector[0])
     0.4
     '''
+
     id = 'I18'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
@@ -3877,6 +3872,7 @@ class ElectricInstrumentFractionFeature(InstrumentFractionFeature):
     >>> print(fe.extract().vector[0])
     0.8
     '''
+
     id = 'I20'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
@@ -3889,9 +3885,6 @@ class ElectricInstrumentFractionFeature(InstrumentFractionFeature):
 
         self._targetPrograms = [4, 5, 16, 18, 26, 27, 28, 29,
                                 30, 31, 33, 34,  35, 36, 37, 38, 39] # accept synth bass
-
-
-
 
 
 #------------------------------------------------------------------------------
@@ -4019,6 +4012,7 @@ extractorsById = OrderedDict( [
     TripleMeterFeature,
     QuintupleMeterFeature,
     ChangesOfMeterFeature,
+    DurationFeature,
                         ]),
                   ('T', [
     None,
@@ -4081,23 +4075,18 @@ def getExtractorByTypeAndNumber(extractorType, number):
     '''
     Typical usage:
 
-
     >>> t5 = features.jSymbolic.getExtractorByTypeAndNumber('T', 5)
     >>> t5.__name__
     'VoiceEqualityNoteDurationFeature'
     >>> bachExample = corpus.parse('bach/bwv66.6')
     >>> fe = t5(bachExample)
 
-
     Features unimplemented in jSymbolic but documented in the dissertation return None
-
 
     >>> features.jSymbolic.getExtractorByTypeAndNumber('C', 20) is None
     True
 
-
     Totally unknown features return an exception:
-
 
     >>> features.jSymbolic.getExtractorByTypeAndNumber('L', 900)
     Traceback (most recent call last):
@@ -4109,9 +4098,7 @@ def getExtractorByTypeAndNumber(extractorType, number):
     music21.features.jSymbolic.JSymbolicFeatureException: jSymbolic
         features of type C do not have number 200
 
-
     You could also find all the feature extractors this way:
-
 
     >>> fs = features.jSymbolic.extractorsById
     >>> for k in fs:
@@ -4204,7 +4191,7 @@ def getExtractorByTypeAndNumber(extractorType, number):
     R 14 BeatHistogramFeature (not implemented)
     R 15 NoteDensityFeature
     R 17 AverageNoteDurationFeature
-    R 18 VariabilityOfNoteDurationFeature (not implemented)
+    R 18 VariabilityOfNoteDurationFeature
     R 19 MaximumNoteDurationFeature
     R 20 MinimumNoteDurationFeature
     R 21 StaccatoIncidenceFeature
@@ -4218,6 +4205,7 @@ def getExtractorByTypeAndNumber(extractorType, number):
     R 33 TripleMeterFeature
     R 34 QuintupleMeterFeature
     R 35 ChangesOfMeterFeature
+    R 36 DurationFeature
     T 1 MaximumNumberOfIndependentVoicesFeature
     T 2 AverageNumberOfIndependentVoicesFeature
     T 3 VariabilityOfNumberOfIndependentVoicesFeature
@@ -4243,9 +4231,6 @@ def getExtractorByTypeAndNumber(extractorType, number):
             'jSymbolic features of type %s do not have number %d' % (extractorType, number))
 
 
-
-# Number of jsymbolic features implemented: 70
-# Number of jsymbolic features not implemented: 42
 featureExtractors = [
 
 MelodicIntervalHistogramFeature, # m1
@@ -4287,6 +4272,7 @@ ElectricInstrumentFractionFeature, #i20
 
 NoteDensityFeature, # r15
 AverageNoteDurationFeature, # r17
+VariabilityOfNoteDurationFeature, # r18
 MaximumNoteDurationFeature, # r19
 MinimumNoteDurationFeature, # r20
 StaccatoIncidenceFeature, # r21
@@ -4301,6 +4287,7 @@ CompoundOrSimpleMeterFeature, # r32
 TripleMeterFeature, # r33
 QuintupleMeterFeature, # r34
 ChangesOfMeterFeature, # r35
+DurationFeature, # r36
 
 MaximumNumberOfIndependentVoicesFeature, # t1
 AverageNumberOfIndependentVoicesFeature, # t2
