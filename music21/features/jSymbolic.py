@@ -4542,7 +4542,8 @@ class Test(unittest.TestCase):
 
         fe = features.jSymbolic.NoteDensityFeature(s)
         f = fe.extract()
-        self.assertAlmostEqual(f.vector[0], 4.88888888888)
+        # 8 notes in the span of 8 seconds
+        self.assertAlmostEqual(f.vector[0], 1.0)
 
         s = stream.Stream()
         s.insert(0, tempo.MetronomeMark(number=240))
@@ -4555,11 +4556,10 @@ class Test(unittest.TestCase):
         s.insert(6, note.Note(quarterLength=2))
         s.insert(7, note.Note(quarterLength=1))
 
+        # 8 notes in the span of 2 seconds
         fe = features.jSymbolic.NoteDensityFeature(s)
         f = fe.extract()
-        self.assertAlmostEqual(f.vector[0], 6.6666666666666666)
-
-
+        self.assertAlmostEqual(f.vector[0], 4.0)
 
     def testFeatureCount(self):
         from music21 import features
