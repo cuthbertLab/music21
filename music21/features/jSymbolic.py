@@ -2078,7 +2078,6 @@ class VariabilityOfNoteDurationFeature(featuresModule.FeatureExtractor):
         note_durations = []
         for bundle in secondsMap:
             note_durations.append(bundle['durationSeconds'])
-        print(note_durations)
         self.feature.vector[0] = statistics.pstdev(note_durations)
 
 
