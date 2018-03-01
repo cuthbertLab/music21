@@ -41,9 +41,7 @@ environLocal = environment.Environment(_MOD)
 
 
 class DurationFeature(featuresModule.FeatureExtractor):
-    '''A feature extractor that extracts the duration in seconds.
-
-
+    '''A feature extractor that extracts the duration of the piece in seconds.
     '''
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream,
@@ -53,7 +51,15 @@ class DurationFeature(featuresModule.FeatureExtractor):
         self.description = 'The total duration in seconds of the music.'
         self.isSequential = False # this is the only jSymbolc non seq feature
         self.dimensions = 1
-
+        self.discrete = False
+    
+    def process(self):
+        secondsMap = self.data['flat.secondsMap']
+        # The total duration of the piece is the same as the latest end time
+        # of all the notes.
+        end_times = [bundle['endTimeSeconds'] for bundle in secondsMap]
+        end_times.sort()  # may already be sorted?
+        self.feature.vector[0] = end_times[-1]
 
 
 #-------------------------------------------------------------------------------
