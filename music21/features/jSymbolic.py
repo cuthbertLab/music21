@@ -4322,9 +4322,8 @@ QualityFeature, #p22
 
 def getCompletionStats():
     '''
-
     >>> features.jSymbolic.getCompletionStats()
-    completion stats: 70/111 (0.6306...)
+    completion stats: 72/111 (0.6428...)
     '''
     countTotal = 0
     countComplete = 0
