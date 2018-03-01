@@ -1998,26 +1998,54 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         that extend into the lowest insert position.
 
         >>> st1 = stream.Stream()
-        >>> st1.insertAndShift(32, note.Note("B-"))
+        >>> st1.insertAndShift(32, note.Note('B'))
         >>> st1.highestOffset
         32.0
-        >>> st1.insertAndShift(32, note.Note("B-"))
+        >>> st1.insertAndShift(32, note.Note('C'))
         >>> st1.highestOffset
         33.0
+        >>> st1.show('text', addEndTimes=True)
+        {32.0 - 33.0} <music21.note.Note C>
+        {33.0 - 34.0} <music21.note.Note B>
+        
+        Let's insert an item at the beginning, note that
+        since the C and B are not affected, they do not shift.
+        
+        >>> st1.insertAndShift(0, note.Note('D'))
+        >>> st1.show('text', addEndTimes=True)
+        {0.0 - 1.0} <music21.note.Note D>
+        {32.0 - 33.0} <music21.note.Note C>
+        {33.0 - 34.0} <music21.note.Note B>
+
+        But if we insert something again at the beginning of the stream,
+        everything after the first shifted note begins shifting, so the
+        C and the B shift even though there is a gap there.  Normally
+        there's no gaps in a stream, so this will not be a factor:
+        
+        >>> st1.insertAndShift(0, note.Note('E'))
+        >>> st1.show('text', addEndTimes=True)
+        {0.0 - 1.0} <music21.note.Note E>
+        {1.0 - 2.0} <music21.note.Note D>
+        {33.0 - 34.0} <music21.note.Note C>
+        {34.0 - 35.0} <music21.note.Note B>
 
         In the single argument form with an object, inserts the element at its stored offset:
 
         >>> n1 = note.Note("C#")
         >>> n1.offset = 30.0
-        >>> n2 = note.Note("C#")
+        >>> n2 = note.Note("D#")
         >>> n2.offset = 30.0
         >>> st1 = stream.Stream()
         >>> st1.insertAndShift(n1)
-        >>> st1.insertAndShift(n2) # should shift offset of n1
+        >>> st1.insertAndShift(n2) # will shift offset of n1
         >>> n1.getOffsetBySite(st1)
         31.0
         >>> n2.getOffsetBySite(st1)
         30.0
+        >>> st1.show('text', addEndTimes=True)
+        {30.0 - 31.0} <music21.note.Note D#>
+        {31.0 - 32.0} <music21.note.Note C#>
+        
         >>> st2 = stream.Stream()
         >>> st2.insertAndShift(40.0, n1)
         >>> st2.insertAndShift(40.0, n2)
@@ -2028,8 +2056,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         offsets and items; the method then, obviously, inserts the items
         at the specified offsets:
 
-        >>> n1 = note.Note("G")
-        >>> n2 = note.Note("F#")
+        >>> n1 = note.Note("G-")
+        >>> n2 = note.Note("F-")
         >>> st3 = stream.Stream()
         >>> st3.insertAndShift([1.0, n1, 2.0, n2])
         >>> n1.getOffsetBySite(st3)
@@ -2038,6 +2066,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         2.0
         >>> len(st3)
         2
+        >>> st3.show('text', addEndTimes=True)
+        {1.0 - 2.0} <music21.note.Note G->
+        {2.0 - 3.0} <music21.note.Note F->
 
         N.B. -- using this method on a list assumes that you'll be inserting
         contiguous objects; you can't shift things that are separated, as this
@@ -2069,7 +2100,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             lowestOffsetInsert = offset
             highestTimeInsert = offset + qL
         elif itemOrNone is None and isinstance(offsetOrItemOrList, list):
-            # need to find which has the max combined offset and dur
+            # need to find which has the highest endtime (combined offset and dur)
             insertList = offsetOrItemOrList
             highestTimeInsert = 0.0
             lowestOffsetInsert = None
@@ -12575,8 +12606,10 @@ class Score(Stream):
         voiceAllocation = 2
         permitOneVoicePerPart = False
 
-        return self.partsToVoices(voiceAllocation=voiceAllocation,
-            permitOneVoicePerPart=permitOneVoicePerPart)
+        return self.partsToVoices(
+            voiceAllocation=voiceAllocation,
+            permitOneVoicePerPart=permitOneVoicePerPart
+            )
 
     def flattenParts(self, classFilterList=('Note', 'Chord')):
         '''

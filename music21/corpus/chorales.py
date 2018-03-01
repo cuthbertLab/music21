@@ -597,10 +597,10 @@ class ChoraleListRKBWV:
     55---||---110.7---||---Wir Christenleut---||---380
     56---||---121.6---||---Christum wir sollen loben schon---||---42
     57---||---404---||---O Traurigkeit, o Herzeleid---||---288
-    58---||---174.5---||---Herzlich lieb hab ich dich, o Herr---||---153
+    58---||---174.5---||---Herzlich lieb hab' ich dich, o Herr---||---153
     59---||---245.3---||---Herzliebster Jesu, was hast du verbrochen---||---168
-    60---||---133.6---||---O stilles Gotteslamm---||---181
-    61---||---159.5---||---Jesu Kreuz, Leiden und Pein---||---194
+    60---||---133.6---||---Ich freue mich in dir---||---181
+    61---||---159.5---||---Jesu Leiden, Pein und Tod---||---194
     62---||---197.10---||---Wer nur den lieben Gott läßt walten---||---370
     63---||---245.11---||---O Welt, ich muß dich lassen---||---293
     64---||---194.6---||---Treuer Gott, ich muss dir klagen---||---0

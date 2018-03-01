@@ -548,10 +548,10 @@ class StreamAligner(object):
         Finds the cost of substituting the targetTup with the sourceTup.
         For now it's just an interpolation of how many things they have in common
         
-        >>> # equality testing, both streams made from same note
-        >>> # targetA will not have the same reference as sourceA
-        >>> # but their hashes will be equal, which makes for their hashed objects to be 
-        >>> # able to be equal.
+        Example: equality testing, both streams made from same note
+        targetA will not have the same reference as sourceA
+        but their hashes will be equal, which makes for their hashed objects to be 
+        able to be equal.
         
         >>> note1 = note.Note("C4")
         >>> targetA = stream.Stream()
@@ -567,8 +567,10 @@ class StreamAligner(object):
         >>> hashedItem2A = saA.hashedSourceStream[0]
         >>> print(hashedItem1A)
         NoteHash(Pitch=60, Duration=1.0)
+        
         >>> print(hashedItem2A)
         NoteHash(Pitch=60, Duration=1.0)
+        
         >>> saA.tupleEqualityWithoutReference(hashedItem1A, hashedItem2A)
         True
         >>> saA.substitutionCost(hashedItem1A, hashedItem2A)
@@ -584,7 +586,8 @@ class StreamAligner(object):
         >>> hashedItem1B = saB.hashedTargetStream[0]
         >>> hashedItem2B = saB.hashedSourceStream[0]
         
-        >>> # hashed items only differ in 1 spot
+        hashed items only differ in 1 spot
+        
         >>> print(hashedItem1B)
         NoteHash(Pitch=60, Duration=1.0)
         
@@ -606,7 +609,8 @@ class StreamAligner(object):
         >>> hashedItem1C = saC.hashedTargetStream[0]
         >>> hashedItem2C = saC.hashedSourceStream[0]
         
-         >>> # hashed items should differ in 2 spot
+        hashed items should differ in 2 spots
+        
         >>> print(hashedItem1C)
         NoteHash(Pitch=64, Duration=1.0)
         

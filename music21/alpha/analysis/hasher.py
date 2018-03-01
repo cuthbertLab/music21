@@ -22,34 +22,46 @@ class Hasher(object):
     '''
     This is a modular hashing object that can hash notes, chords, and rests, and some of their
     properties. Steps to using and calling the hasher:
+    
     1) Initialize a hasher object
-    2) Set the properties that you want to hash. There are 4 main groups of properties/settings
+    
+    2) Set the properties that you want to hash. There are 4 main groups of properties/settings::
+    
         a) self.validTypes should be some combination of notes, chords, rests
+    
         b) general hashing settings include self.stripTies and self.includeReference. if 
            self.includeReference is True, a reference to to original note/rest/chord is created
            and kept track of during the hashing process.
+    
         c) note properties are things like pitch, duration, offset, and some slightly fancier
            properties
+    
         d) self.stateVars is a dictionary of things you might want to hash that require some memory
            e.g. current key signature, interval from the last note
+    
     3) call the hashStream() function on the stream you want to hash. 
     
     This is what the Hasher object does the in background once hashStream() is called:
+    
     1) It runs self.setupValidTypesAndStateVars() and sets up properties from (a) and (d) from
-        above based on your settings
+    above based on your settings
+    
     2) It runs self.preprocessStream() and based on settings from (d)
+    
     3) It determines which objects in the passed-in stream should be hashed
+    
     4) It runs self.setupTupleList() and sets up self.tupleList, self.hashingFunctions 
-       and self.tupleClass, all related to each other. self.tupleList is a list of all the
-       properties that are hashed. self.hashingFunctions is a dictionary of which hashing function
-       should be used for each property (there are multiple ways of hashing a note's pitch, for 
-       example, by MIDI number, or by a string representation). self.tupleClass is a NamedTuple
-       that is constructed ad hoc based on which properties are to be hashed. 
+    and self.tupleClass, all related to each other. self.tupleList is a list of all the
+    properties that are hashed. self.hashingFunctions is a dictionary of which hashing function
+    should be used for each property (there are multiple ways of hashing a note's pitch, for 
+    example, by MIDI number, or by a string representation). self.tupleClass is a NamedTuple
+    that is constructed ad hoc based on which properties are to be hashed. 
+    
     5) For all the elements from the stream that are to be hashed, the hasher hashes every one of
-       its properties that are to be hashed using the hashing function listed in 
-       self.hashingFunctions. It creates a single NamedTuple called a NoteHash for each element 
-       from the stream. However, if self.includeReference is set to True, a NoteHashWithReference 
-       tuple is created instead. 
+    its properties that are to be hashed using the hashing function listed in 
+    self.hashingFunctions. It creates a single NamedTuple called a NoteHash for each element 
+    from the stream. However, if self.includeReference is set to True, a NoteHashWithReference 
+    tuple is created instead. 
     '''
     def __init__(self):
         '''
@@ -758,8 +770,7 @@ class Test(unittest.TestCase):
         h.hashDuration = False
         h.hashOffset = False
         h.hashIntervalFromLastNote = True 
-        hashes = h.hashStream(s)
-        
+        unused_hashes = h.hashStream(s)
     
 class TestExternal(unittest.TestCase):
 
