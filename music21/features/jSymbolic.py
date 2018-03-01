@@ -2060,12 +2060,7 @@ class AverageNoteDurationFeature(featuresModule.FeatureExtractor):
 
 
 class VariabilityOfNoteDurationFeature(featuresModule.FeatureExtractor):
-    '''
-
-    Not yet implemented
-
-    Standard deviation of note durations in seconds.
-
+    '''Standard deviation of note durations in seconds.
     '''
     id = 'R18'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2078,9 +2073,13 @@ class VariabilityOfNoteDurationFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        pass
-        # TODO: implement
-        # if using numpy, can use:>>> numpy.std([1, 2, 3])
+        secondsMap = self.data['flat.secondsMap']
+        note_durations = []
+        for bundle in secondsMap:
+            note_durations.append(bundle['durationSeconds'])
+        print(note_durations)
+        self.feature.vector[0] = statistics.pstdev(note_durations)
+
 
 class MaximumNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
