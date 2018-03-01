@@ -1243,12 +1243,12 @@ def getIndex(featureString, extractorType=None):
 
 
     >>> features.getIndex('Range')
-    (59, 'jsymbolic')
+    (61, 'jsymbolic')
     >>> features.getIndex('Ends With Landini Melodic Contour')
     (19, 'native')
     >>> features.getIndex('abrandnewfeature!')
     >>> features.getIndex('Fifths Pitch Histogram', 'jsymbolic')
-    (68, 'jsymbolic')
+    (70, 'jsymbolic')
     >>> features.getIndex('Tonal Certainty', 'native')
     (1, 'native')
     '''
@@ -1843,8 +1843,3 @@ if __name__ == '__main__':
 
 #------------------------------------------------------------------------------
 # eof
-
-
-
-
-
