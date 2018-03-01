@@ -1992,22 +1992,17 @@ class BeatHistogramFeature(featuresModule.FeatureExtractor):
 
 class NoteDensityFeature(featuresModule.FeatureExtractor):
     '''
-
-    Gives the Average number of notes per second, taking into account
-    the tempo at any moment in the piece.  N.B. unlike the jSymbolic
-    version, music21's Feature Extraction methods can run on a subset
-    of the entire piece (measures, certain parts, etc.).  However, unlike
-    jSymbolic, music21 quantizes notes from midi somewhat before running
-    this test, so it is better run on encoded midi scores than recorded
-    midi performances.
-
-
+    Gives the average number of notes per second, taking into account
+    the tempo at any moment in the piece.  Unlike jSymbolic, music21
+    quantizes notes from MIDI somewhat before running this test; this
+    function is meant to be run on encoded MIDI scores rather than
+    recorded MIDI performances.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.NoteDensityFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [12.368421...]
+    [9.055...]
     '''
     id = 'R15'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
