@@ -1989,7 +1989,6 @@ class BeatHistogramFeature(featuresModule.FeatureExtractor):
         # TODO: implement
 
 
-
 class NoteDensityFeature(featuresModule.FeatureExtractor):
     '''
     Gives the average number of notes per second, taking into account
@@ -2025,7 +2024,7 @@ class NoteDensityFeature(featuresModule.FeatureExtractor):
         if end_times == []:
             self.feature.vector[0] = 0.0
         else:
-            self.feature.vector = float(len(end_times)) / end_times[-1]
+            self.feature.vector[0] = float(len(end_times)) / end_times[-1]
         
 class AverageNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
