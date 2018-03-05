@@ -70,22 +70,15 @@ class Feature:
     >>> myFeature.vector[2] = 1
 
     It's okay just to assign a new list to .vector itself.
-
-    There is a divide_by_max() method which will scale everything to between
-    -1 and 1 as a list of floats.
-
-    >>> myFeature.divide_by_max()
-    >>> myFeature.vector
-    [1.0, 0.5, 0.25]
     
-    The divide_by_sum() method is more useful for histograms:
-    we will want the sum of the array to be 1, not the max of any element.
+    There is a divide_by_sum() method which normalizes the values
+    of a histogram to sum to 1.
     
     >>> myFeature.divide_by_sum()
     >>> myFeature.vector
     [0.571..., 0.285..., 0.142...]
 
-    And that's it!  FeatureExtractors are much more interesting.
+    And that's it! FeatureExtractors are much more interesting.
     '''
     def __init__(self):
         # these values will be filled by the extractor
@@ -110,22 +103,6 @@ class Feature:
         Prepare the vector stored in this feature.
         '''
         self.vector = self._getVectors()
-
-    def divide_by_max(self):
-        '''
-        "Normalizes" the vector to lie between 0 and 1,
-        assuming there is more than one value.
-        '''
-        if self.dimensions == 1:
-            return # do nothing
-        m = max(self.vector)
-        if m == 0:
-            return # do nothing
-        scalar = 1.0 / m # get floating point scalar for speed
-        temp = self._getVectors()
-        for i, v in enumerate(self.vector):
-            temp[i] = v * scalar
-        self.vector = temp
 
     def divide_by_sum(self):
         '''
@@ -170,8 +147,6 @@ class FeatureExtractor:
             self.dimensions = None # number of dimensions
         if not hasattr(self, 'discrete'):
             self.discrete = True # default
-        if not hasattr(self, 'divide_by_max'):
-            self.divide_by_max = False # default is no
         if not hasattr(self, 'divide_by_sum'):
             self.divide_by_sum = False # default is no
 
@@ -265,8 +240,6 @@ class FeatureExtractor:
         # preparing the feature always sets self.feature to a new instance
         self.prepareFeature()
         self.process() # will set Feature object to _feature
-        if self.divide_by_max:
-            self.feature.divide_by_max()
         if self.divide_by_sum:
             self.feature.divide_by_sum()
         return self.feature
