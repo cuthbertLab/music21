@@ -724,11 +724,9 @@ class DataSet:
     >>> ds.addData('bach/bwv324.xml', classValue='Bach')
     >>> ds.process()
     >>> ds.getFeaturesAsList()[0]
-    ['bwv66.6', 0.0, 1.0, 0.375, 0.03125, 0.5, 0.1875, 0.90625, 0.0, 0.4375,
-     0.6875, 0.09375, 0.875, 0, 4, 4, 'Bach']
+    ['bwv66.6', 0.196..., 0.0736..., 0.006..., 0.098..., 0.0368..., 0.177..., 0.0, 0.085..., 0.134..., 0.018..., 0.171..., 0.0, 0, 4, 4, 'Bach']
     >>> ds.getFeaturesAsList()[1]
-    ['bach/bwv324.xml', 0.12, 0.0, 1.0, 0.12, 0.56..., 0.0, ..., 0.52...,
-     0.0, 0.68..., 0.0, 0.56..., 0, 4, 4, 'Bach']
+    ['bach/bwv324.xml', 0.240..., 0.028..., 0.134..., 0, 0.144..., 0.125..., 0, 0.163..., 0, 0.134..., 0.0288..., 0, 4, 4, 1, 'Bach']
     >>> ds = ds.getString()
 
 
@@ -1202,7 +1200,7 @@ def extractorById(idOrList, library=('jSymbolic', 'native')):
     >>> s.append(note.Note('A4'))
     >>> fe = features.extractorById('p20')(s) # call class
     >>> fe.extract().vector
-    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+    [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
     '''
     ebi = extractorsById(idOrList=idOrList, library=library)
