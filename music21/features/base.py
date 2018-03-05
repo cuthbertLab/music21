@@ -16,7 +16,6 @@ import unittest
 
 from collections import Counter
 
-
 from music21 import common
 from music21 import converter
 from music21 import corpus
@@ -72,12 +71,19 @@ class Feature:
 
     It's okay just to assign a new list to .vector itself.
 
-    There is a .normalize() method which will scale everything to between 0 and 1
-    (or technically -1 and 1) as a list of floats.
+    There is a divide_by_max() method which will scale everything to between
+    -1 and 1 as a list of floats.
 
-    >>> myFeature.normalize()
+    >>> myFeature.divide_by_max()
     >>> myFeature.vector
     [1.0, 0.5, 0.25]
+    
+    The divide_by_sum() method is more useful for histograms:
+    we will want the sum of the array to be 1, not the max of any element.
+    
+    >>> myFeature.divide_by_sum()
+    >>> myFeature.vector
+    [0.571..., 0.285..., 0.142...]
 
     And that's it!  FeatureExtractors are much more interesting.
     '''
@@ -105,9 +111,10 @@ class Feature:
         '''
         self.vector = self._getVectors()
 
-    def normalize(self):
+    def divide_by_max(self):
         '''
-        Normalize the vector between 0 and 1, assuming there is more than one value.
+        "Normalizes" the vector to lie between 0 and 1,
+        assuming there is more than one value.
         '''
         if self.dimensions == 1:
             return # do nothing
@@ -115,6 +122,17 @@ class Feature:
         if m == 0:
             return # do nothing
         scalar = 1.0 / m # get floating point scalar for speed
+        temp = self._getVectors()
+        for i, v in enumerate(self.vector):
+            temp[i] = v * scalar
+        self.vector = temp
+
+    def divide_by_sum(self):
+        '''
+        Normalizes the vector so that the sum of its elements is 1.
+        '''
+        s = sum(self.vector)
+        scalar = 1.0 / s # get floating point scalar for speed
         temp = self._getVectors()
         for i, v in enumerate(self.vector):
             temp[i] = v * scalar
@@ -152,8 +170,10 @@ class FeatureExtractor:
             self.dimensions = None # number of dimensions
         if not hasattr(self, 'discrete'):
             self.discrete = True # default
-        if not hasattr(self, 'normalize'):
-            self.normalize = False # default is no
+        if not hasattr(self, 'divide_by_max'):
+            self.divide_by_max = False # default is no
+        if not hasattr(self, 'divide_by_sum'):
+            self.divide_by_sum = False # default is no
 
     def setData(self, dataOrStream):
         '''
@@ -165,7 +185,7 @@ class FeatureExtractor:
                 dataOrStream.classes):
                 #environLocal.printDebug(['creating new DataInstance: this should be a Stream:',
                 #     dataOrStream])
-                # if we are passed a stream, create a DataInstrance to
+                # if we are passed a stream, create a DataInstance to
                 # manage the
                 # its data; this is less efficient but is good for testing
                 self.stream = dataOrStream
@@ -245,9 +265,10 @@ class FeatureExtractor:
         # preparing the feature always sets self.feature to a new instance
         self.prepareFeature()
         self.process() # will set Feature object to _feature
-        # assume we always want to normalize?
-        if self.normalize:
-            self.feature.normalize()
+        if self.divide_by_max:
+            self.feature.divide_by_max()
+        if self.divide_by_sum:
+            self.feature.divide_by_sum()
         return self.feature
 
     def getBlankFeature(self):
@@ -511,7 +532,6 @@ class StreamForms:
             histogramIndex = int(thisBPM)
             histogram[histogramIndex] += 1
         return histogram
-
 
 
     keysToMethods = {
