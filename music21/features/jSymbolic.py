@@ -2281,9 +2281,7 @@ class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
             dif = oNext-o
             if not common.almostEquals(dif, 0.0):
                 differences.append(dif)
-        self.feature.vector[0] = common.standardDeviation(differences,
-                                  bassel=False)
-
+        self.feature.vector[0] = statistics.pstdev(differences)
 
 
 class AverageTimeBetweenAttacksForEachVoiceFeature(
@@ -2387,8 +2385,7 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
                 dif = oNext-o # not including simultaneous attacks
                 if not common.almostEquals(dif, 0.0):
                     differences.append(dif)
-            stdDeviationByPart.append(common.standardDeviation(differences,
-                                                               bassel=False))
+            stdDeviationByPart.append(statistics.pstdev(differences))
         self.feature.vector[0] = (sum(stdDeviationByPart) /
                                    len(stdDeviationByPart))
 
@@ -2966,7 +2963,7 @@ class VariabilityOfNumberOfIndependentVoicesFeature(
                 for gSub in p.groups:
                     g.append(gSub) # add to temporary group; will act as a set
             found.append(len(g))
-        self.feature.vector[0] = common.standardDeviation(found, bassel=False)
+        self.feature.vector[0] = statistics.pstdev(found)
 
 
 class VoiceEqualityNumberOfNotesFeature(featuresModule.FeatureExtractor):

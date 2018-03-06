@@ -1029,13 +1029,6 @@ class Key(KeySignature, scale.DiatonicScale):
         # take average of all non-negative values
         meanMagnitude = sum(focus) / float(len(focus))
 
-        # standard deviation of all non-neg values
-        standardDeviation = common.standardDeviation(focus, bassel=False)
-
-        environLocal.printDebug(['absMagnitude', absMagnitude, 'leaderSpan', leaderSpan,
-                                 'meanMagnitude', meanMagnitude,
-                                 'standardDeviation', standardDeviation])
-
         # combine factors with a weighting for each
         # estimate range as 2, normalize between zero and 1
         return (absMagnitude * 1) + (leaderSpan * 2)
