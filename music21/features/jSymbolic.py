@@ -2669,23 +2669,27 @@ class QuintupleMeterFeature(featuresModule.FeatureExtractor):
 
 
 class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
-    '''A feature exractor that sets the feature to 1 if the time signature
-    is changed one or more times during the recording.
-
+    '''Returns 1 if the time signature is changed one or more
+    times during the recording.
 
     >>> s1 = stream.Stream()
     >>> s1.append(meter.TimeSignature('3/4'))
-    >>> s2 = stream.Stream()
-    >>> s2.append(meter.TimeSignature('3/4'))
-    >>> s2.append(meter.TimeSignature('4/4'))
-
     >>> fe = features.jSymbolic.ChangesOfMeterFeature(s1)
     >>> fe.extract().vector
     [0]
-    >>> fe.setData(s2) # change the data
+
+    >>> s2 = stream.Stream()
+    >>> s2.append(meter.TimeSignature('3/4'))
+    >>> s2.append(meter.TimeSignature('4/4'))
+    >>> fe.setData(s2)  # change the data
     >>> fe.extract().vector
     [1]
 
+    >>> s = corpus.parse('bwv66.6')
+    >>> fe = features.jSymbolic.ChangesOfMeterFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [0]
     '''
     id = 'R35'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2697,7 +2701,6 @@ class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
                             'times during the recording')
         self.isSequential = True
         self.dimensions = 1
-        self.normalize = False
 
     def process(self):
         elements = self.data['flat.getElementsByClass(TimeSignature)']
