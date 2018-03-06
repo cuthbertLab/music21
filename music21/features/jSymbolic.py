@@ -591,29 +591,45 @@ class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
 
 class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     '''
-    Average number of notes that separate melodic peaks and troughs in any channel.
+    Average number of notes that separate melodic peaks and troughs
+    in any part. This is calculated as the total number of intervals
+    (not counting unisons) divided by the number of times the melody
+    changes direction.
+    
+    >>> # C D E D C E D C C
+    >>> # Intervals: [0] 2 2 -2 -2 2 2 -4 0
+    >>> # Changes direction (equivalent to +/- sign) three times.
+    >>> # There are seven non-unison (nonzero) intervals.
+    >>> # Thus the duration of arcs is 7/3 ~= 2.333...
+    >>> s = converter.parse("tinyNotation: c' d' e' d' c' d' e'2 c'2 c'2")
+    >>> fe = features.jSymbolic.DurationOfMelodicArcsFeature(s)
+    >>> fe.extract().vector
+    [2.333...]
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.DurationOfMelodicArcsFeature(s)
-    >>> f = fe.extract()
-    >>> f.vector
-    [10.28...]
+    >>> fe.extract().vector
+    [1.74...]
     '''
     id = 'M18'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Duration of Melodic Arcs'
-        self.description = ('Average number of notes that separate melodic peaks and ' +
-            'troughs in any channel.')
+        self.description = ('Average number of notes that separate melodic ' +
+            'peaks and troughs in any part. This is calculated as the ' +
+            'total number of intervals (not counting unisons) divided ' +
+            'by the number of times the melody changes direction.')
         self.isSequential = True
         self.dimensions = 1
 
     def process(self):
         '''Do processing necessary, storing result in feature.
         '''
-        #rising = 0
-        #falling = 0
+        # `cList` contains a list of melodic intervals in a part.
+        # For example, C4 E4 G4 E4 C4 results in a cList of [4, 3, -3, -4].
+        # Each part is encoded in a separate cList; cBundle contains all
+        # the cList arrays.
         cBundle = []
         if self.data.partsCount > 0:
             for i in range(self.data.partsCount):
@@ -623,60 +639,78 @@ class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
             cList = self.data['contourList']
             cBundle.append(cList)
 
-        spanList = [] # for averaging
+        direction_changes = 0
+        nonunison_intervals = 0
+        # For each part, count how many times the direction changes
+        # by looking at the sign of the interval.
+        ASCENDING = 1
+        DESCENDING = -1
+        STATIONARY = 0
         for cList in cBundle:
-            pos = 0
-            posList = [pos]
-            for c in cList:
-                pos += c
-                posList.append(pos)
-
-            environLocal.printDebug(['posList', posList])
-            # get start to max, any max to min, and to end
-            peak = max(posList)
-            trough = min(posList)
-            count = 0
-            store = False
-            environLocal.printDebug(['trough, peak', trough, peak])
-
-            for i, val in enumerate(posList):
-                count += 1
-                if i == 0: # first
-                    count -= 1 # remove first
-                elif i == len(posList) - 1: # last
-                    store = True
-                elif val == peak or val == trough:
-                    store = True
-                # if store, then clear
-                #environLocal.printDebug([i, 'count', count, 'store', store])
-                if store:
-                    span = count - 1 # remove this matched value
-                    if span > 0:
-                        spanList.append(span)
-                    count = 0
-                    store = False
-            #environLocal.printDebug(['spanList', spanList])
-        self.feature.vector[0] = sum(spanList) / float(len(spanList))
+            current_direction = STATIONARY
+            for interval in cList:
+                if interval != 0:
+                    nonunison_intervals += 1
+                if current_direction == ASCENDING:
+                    if interval < 0:
+                        direction_changes += 1
+                        current_direction = DESCENDING
+                elif current_direction == DESCENDING:
+                    if interval > 0:
+                        direction_changes += 1
+                        current_direction = ASCENDING
+                else:  # if we begin stationary
+                    if interval > 0:
+                        current_direction = ASCENDING
+                    elif interval < 0:
+                        current_direction = DESCENDING
+        # Duration of melodic arcs is 0 if it never changes direction
+        if direction_changes == 0:
+            duration_of_melodic_arcs = 0
+        else:
+            duration_of_melodic_arcs = nonunison_intervals / direction_changes
+        self.feature.vector[0] = duration_of_melodic_arcs
 
 
 class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     '''
-    Average melodic interval separating the top note of melodic peaks and the
-    bottom note of melodic troughs.
+    Average span (in semitones) between melodic peaks and troughs
+    in any part. Each time the melody changes direction begins a
+    new arc. The average size of melodic arcs is defined as the
+    total size of melodic intervals between changes of directions -
+    or between the start of the melody and the first change of
+    direction - divided by the number of direction changes.
+    
+    >>> # C D E D C E D C C
+    >>> # Intervals: [0] 2 2 -2 -2 2 2 -4 0
+    >>> # Changes direction (equivalent to +/- sign) three times.
+    >>> # The total sum of interval distance up to the last change
+    >>> # of direction is 12. We don't count the last interval,
+    >>> # the descending major third, because it is not between
+    >>> # changes of direction. 
+    >>> # Thus the average size of melodic arcs is 12/3 = 4.
+    >>> s = converter.parse("tinyNotation: c' d' e' d' c' d' e'2 c'2 c'2")
+    >>> fe = features.jSymbolic.SizeOfMelodicArcsFeature(s)
+    >>> fe.extract().vector
+    [4.0]
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.SizeOfMelodicArcsFeature(s)
-    >>> f = fe.extract()
-    >>> f.vector
-    [14.5]
+    >>> fe.extract().vector
+    [4.84...]
     '''
     id = 'M19'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Size of Melodic Arcs'
-        self.description = ('Average melodic interval separating the top note of melodic ' +
-                            'peaks and the bottom note of melodic troughs.')
+        self.description = ('Average span (in semitones) between melodic peaks '+
+                            'and troughs in any part. Each time the melody changes ' +
+                            'direction begins a new arc. The average size of' +
+                            'melodic arcs is defined as the total size of melodic' +
+                            'intervals between changes of directions - or between'
+                            'the start of the melody and the first change of' +
+                            'direction - divided by the number of direction changes.')
         self.isSequential = True
         self.dimensions = 1
 
@@ -684,8 +718,10 @@ class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     def process(self):
         '''Do processing necessary, storing result in feature.
         '''
-        #rising = 0
-        #falling = 0
+        # `cList` contains a list of melodic intervals in a part.
+        # For example, C4 E4 G4 E4 C4 results in a cList of [4, 3, -3, -4].
+        # Each part is encoded in a separate cList; cBundle contains all
+        # the cList arrays.
         cBundle = []
         if self.data.partsCount > 0:
             for i in range(self.data.partsCount):
@@ -695,19 +731,51 @@ class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
             cList = self.data['contourList']
             cBundle.append(cList)
 
-        spanList = [] # for averaging
+        direction_changes = 0
+        sum_of_intervals = 0
+        # For each part, count how many times the direction changes
+        # by looking at the sign of the interval.
+        ASCENDING = 1
+        DESCENDING = -1
+        STATIONARY = 0
         for cList in cBundle:
-            pos = 0
-            posList = [pos]
-            for c in cList:
-                pos += c
-                posList.append(pos)
-            environLocal.printDebug(['posList', posList])
-            peak = max(posList)
-            trough = min(posList)
-            spanList.append(peak-trough)
-        environLocal.printDebug(['spanList', spanList])
-        self.feature.vector[0] = sum(spanList) / float(len(spanList))
+            current_direction = STATIONARY
+            this_arc_interval = 0
+            for interval in cList:
+                if current_direction == ASCENDING:
+                    if interval > 0:
+                        this_arc_interval += abs(interval)
+                    elif interval < 0:
+                        # total interval before the change gets added
+                        sum_of_intervals += this_arc_interval
+                        direction_changes += 1
+                        current_direction = DESCENDING
+                        # start fresh with the new arc on this interval
+                        this_arc_interval = abs(interval)
+                elif current_direction == DESCENDING:
+                    if interval < 0:
+                        this_arc_interval += abs(interval)
+                    elif interval > 0:
+                        # total interval before the change gets added
+                        sum_of_intervals += this_arc_interval
+                        direction_changes += 1
+                        current_direction = ASCENDING
+                        # start fresh with the new arc on this interval
+                        this_arc_interval = abs(interval)
+                else:  # if we begin stationary
+                    if interval > 0:
+                        current_direction = ASCENDING
+                        this_arc_interval += abs(interval)
+                    elif interval < 0:
+                        current_direction = DESCENDING
+                        this_arc_interval += abs(interval)
+
+        # If it never changes direction, the size of melodic arcs is defined to be 0
+        if direction_changes == 0:
+            size_of_melodic_arcs = 0
+        else:
+            size_of_melodic_arcs = sum_of_intervals / direction_changes
+        self.feature.vector[0] = size_of_melodic_arcs
 
 
 
@@ -4506,7 +4574,7 @@ class Test(unittest.TestCase):
             s.append(note.Note(copy.deepcopy(p)))
         fe = features.jSymbolic.DurationOfMelodicArcsFeature(s)
         f = fe.extract()
-        self.assertEqual(f.vector, [5])
+        self.assertEqual(f.vector, [0])
 
         s = stream.Stream()
         p = pitch.Pitch('c2')
@@ -4516,7 +4584,7 @@ class Test(unittest.TestCase):
             s.append(note.Note(copy.deepcopy(p)))
         fe = features.jSymbolic.DurationOfMelodicArcsFeature(s)
         f = fe.extract()
-        self.assertAlmostEqual(f.vector[0], 1+2/3.)
+        self.assertAlmostEqual(f.vector[0], 8/5)
 
     def testSizeOfMelodicArcsFeature(self):
         from music21 import stream, pitch, note, features
