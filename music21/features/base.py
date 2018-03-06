@@ -726,7 +726,7 @@ class DataSet:
     >>> ds.getFeaturesAsList()[0]
     ['bwv66.6', 0.196..., 0.0736..., 0.006..., 0.098..., 0.0368..., 0.177..., 0.0, 0.085..., 0.134..., 0.018..., 0.171..., 0.0, 0, 4, 4, 'Bach']
     >>> ds.getFeaturesAsList()[1]
-    ['bach/bwv324.xml', 0.240..., 0.028..., 0.134..., 0, 0.144..., 0.125..., 0, 0.163..., 0, 0.134..., 0.0288..., 0, 4, 4, 1, 'Bach']
+    ['bach/bwv324.xml', 0.240..., 0.028..., 0.134..., 0.0, 0.144..., 0.125..., 0.0, 0.163..., 0.0, 0.134..., 0.0288..., 0.0, 0, 4, 4, 'Bach']
     >>> ds = ds.getString()
 
 
@@ -1216,7 +1216,7 @@ def vectorById(streamObj, vectorId, library=('jSymbolic', 'native')):
     >>> s = stream.Stream()
     >>> s.append(note.Note('A4'))
     >>> features.vectorById(s, 'p20')
-    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+    [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     '''
     fe = extractorById(vectorId, library)(streamObj) # call class with stream
     if fe is None:
