@@ -7443,7 +7443,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         where each dictionary defines the real-time characteristics of
         the stored events. This will attempt to find
         all :class:`~music21.tempo.TempoIndication` subclasses and use these
-        values to realize tempi. If not initial tempo is found,
+        values to realize tempi. If no initial tempo is found,
         a tempo of 120 BPM will be provided.
         '''
         if srcObj is None:
