@@ -36,12 +36,7 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------------------------------------------------------------------------------
-# melody based
-
-
-#Each bin of such a histogram is labelled with a number indicating the number of
-#semi-tones separating sequentially adjacent notes in a given channel
-#(independently of direction of melodic motion).
+# melody
 
 class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
     '''
@@ -65,15 +60,13 @@ class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
                             'the values of the melodic interval histogram.')
         self.isSequential = True
         self.dimensions = 128
-        self.normalize = False
+        self.normalize = True
 
     def process(self):
         '''Do processing necessary, storing result in feature.
         '''
-        histo = self.data['midiIntervalHistogram']
-        histo_sum = float(sum(histo))
-        for i, value in enumerate(histo):
-            self.feature.vector[i] += value/histo_sum
+        for i, value in enumerate(self.data['midiIntervalHistogram']):
+            self.feature.vector[i] = value
 
 
 class AverageMelodicIntervalFeature(featuresModule.FeatureExtractor):
@@ -1077,12 +1070,12 @@ class RangeFeature(featuresModule.FeatureExtractor):
 
 class MostCommonPitchFeature(featuresModule.FeatureExtractor):
     '''
-    Bin label of the most common pitch divided by the number of possible pitches.
+    Bin label of the most common pitch.
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MostCommonPitchFeature(s)
     >>> fe.extract().vector
-    [2.54...]
+    [61]
     '''
     id = 'P11'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1090,8 +1083,7 @@ class MostCommonPitchFeature(featuresModule.FeatureExtractor):
                                                  *arguments, **keywords)
 
         self.name = 'Most Common Pitch'
-        self.description = ('Bin label of the most common pitch divided by the number ' +
-                            'of possible pitches.')
+        self.description = ('Bin label of the most common pitch.')
         self.isSequential = True
         self.dimensions = 1
         self.discrete = False
@@ -1102,10 +1094,10 @@ class MostCommonPitchFeature(featuresModule.FeatureExtractor):
         histo = self.data['pitches.midiPitchHistogram']
         try:
             pNumberMax = histo.most_common(1)[0][0]
-            numPitches = float(len(histo))
-            self.feature.vector[0] = pNumberMax / numPitches
+            self.feature.vector[0] = pNumberMax
         except IndexError:
             self.feature.vector[0] = 0.0
+
 
 class PrimaryRegisterFeature(featuresModule.FeatureExtractor):
     '''
@@ -1324,22 +1316,18 @@ class BasicPitchHistogramFeature(featuresModule.FeatureExtractor):
     >>> fe = features.jSymbolic.BasicPitchHistogramFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 0.0, 0.052631578..., 0.0, 0.0, 0.052631578...,
-    0.05263157894..., 0.2631578..., 0.0, 0.3157894..., 0.1052631...,
-    0.0, 0.052631..., 0.157894736..., 0.5263157..., 0.0, 0.368421052...,
-    0.6315789473..., 0.105263157..., 0.78947368..., 0.0, 1.0, 0.52631578...,
-    0.052631578..., 0.736842105..., 0.1578947..., 0.9473684..., 0.0,
-    0.36842105..., 0.47368421..., 0.0, 0.42105263..., 0.0, 0.36842105...,
-    0.0, 0.0, 0.052631578...,
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-
-    TODO: Better doctest...
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, \
+0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, \
+0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, \
+0.0, 0.0, 0.0, 0.006..., 0.0, 0.0, 0.006..., 0.006..., 0.030..., \
+0.0, 0.036..., 0.012..., 0.0, 0.006..., 0.018..., 0.061..., 0.0, \
+0.042..., 0.073..., 0.012..., 0.092..., 0.0, 0.116..., 0.061..., \
+0.006..., 0.085..., 0.018..., 0.110..., 0.0, 0.042..., 0.055..., \
+0.0, 0.049..., 0.0, 0.042..., 0.0, 0.0, 0.006..., 0.0, 0.0, 0.0, \
+0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, \
+0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, \
+0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, \
+0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     '''
     id = 'P19'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1351,7 +1339,6 @@ class BasicPitchHistogramFeature(featuresModule.FeatureExtractor):
                             'values of the basic pitch histogram.')
         self.isSequential = True
         self.dimensions = 128
-        self.discrete = False
         self.normalize = True
 
     def process(self):
@@ -1360,14 +1347,6 @@ class BasicPitchHistogramFeature(featuresModule.FeatureExtractor):
         for i, count in self.data['pitches.midiPitchHistogram'].items():
             self.feature.vector[i] = count
 
-
-# The second histogram was called the 'pitch class histogram,'
-# and had one bin for each of the twelve pitch classes.
-# The magnitude of each bin corresponded to the number of times
-# Note Ons occurred in a recording for a particular pitch class.
-# Enharmonic equivalents were assigned the same pitch class number.
-# This histogram gave insights into the types of scales used and the
-# amount of transposition that was present.
 
 class PitchClassDistributionFeature(featuresModule.FeatureExtractor):
     '''
@@ -1380,7 +1359,8 @@ class PitchClassDistributionFeature(featuresModule.FeatureExtractor):
     >>> fe = features.jSymbolic.PitchClassDistributionFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [0.0, 1.0, 0.375, 0.03125, 0.5, 0.1875, 0.90625, 0.0, 0.4375, 0.6875, 0.09375, 0.875]
+    [0.196..., 0.073..., 0.006..., 0.098..., 0.036..., 0.177..., 0.0, \
+0.085..., 0.134..., 0.018..., 0.171..., 0.0]
 
     '''
     id = 'P20'
@@ -1401,19 +1381,17 @@ class PitchClassDistributionFeature(featuresModule.FeatureExtractor):
     def process(self):
         '''Do processing necessary, storing result in feature.
         '''
+        # Create vector with [C, C#, D...]
+        temp = [0] * self.dimensions
         for i, count in enumerate(self.data['pitches.pitchClassHistogram']):
-            self.feature.vector[i] = count
+            temp[i] = count
+        # Now rearrange so that the most common is in array 0 as per
+        # original jSymbolic documentation and implementation
+        m = temp.index(max(temp))
+        # m will become 0, m + 1 will become 1, etc.
+        for i, val in enumerate(temp):
+            self.feature.vector[(i - m) % self.dimensions] = val
 
-# Finally, the fifths pitch histogram, also with twelve bins, was generated
-# by reordering the bins of the pitch class histogram so that adjacent bins
-# were separated by a perfect fifth rather than a semi-tone. This was done
-# using the following equation:
-#    b = (7a)mod(12)	(12)
-# where b is the fifths pitch histogram bin and a is the corresponding
-# pitch class histogram bin. The number seven is used because this is the n
-# umber of semi-tones in a perfect fifth, and the number twelve is used
-# because there are twelve pitch classes in total. This histogram was
-# useful for measuring dominant tonic relationships and for looking at types of transpositions.
 
 class FifthsPitchHistogramFeature(featuresModule.FeatureExtractor):
     '''
@@ -1428,7 +1406,8 @@ class FifthsPitchHistogramFeature(featuresModule.FeatureExtractor):
     >>> fe = features.jSymbolic.FifthsPitchHistogramFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [0.0, 0.0, 0.375, 0.6875, 0.5, 0.875, 0.90625, 1.0, 0.4375, 0.03125, 0.09375, 0.1875]
+    [0.0, 0.0, 0.073..., 0.134..., 0.098..., 0.171..., 0.177..., 0.196..., \
+0.085..., 0.006..., 0.018..., 0.036...]
     '''
     id = 'P21'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1440,7 +1419,6 @@ class FifthsPitchHistogramFeature(featuresModule.FeatureExtractor):
                             '5ths pitch class histogram.')
         self.isSequential = True
         self.dimensions = 12
-        self.discrete = False
         self.normalize = True
 
         # create pc to index mapping
@@ -2023,7 +2001,6 @@ class BeatHistogramFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 161
         self.discrete = False
-        self.normalize = True
 
     def process(self):
         raise JSymbolicFeatureException('not yet implemented')
@@ -2238,8 +2215,8 @@ class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
     >>> for p in s.parts:
     ...     p.insert(0, tempo.MetronomeMark(number=120))
     >>> fe = features.jSymbolic.AverageTimeBetweenAttacksFeature(s)
-    >>> f = fe.extract().vector
-    >>> print(round(f[0], 2))
+    >>> v = fe.extract().vector
+    >>> print(round(v[0], 2))
     0.35
     '''
 
@@ -2275,8 +2252,8 @@ class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.VariabilityOfTimeBetweenAttacksFeature(s)
-    >>> f = fe.extract().vector
-    >>> print(round(f[0], 2))
+    >>> v = fe.extract().vector
+    >>> print(round(v[0], 2))
     0.15
     '''
 
@@ -2692,23 +2669,27 @@ class QuintupleMeterFeature(featuresModule.FeatureExtractor):
 
 
 class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
-    '''A feature exractor that sets the feature to 1 if the time signature
-    is changed one or more times during the recording.
-
+    '''Returns 1 if the time signature is changed one or more
+    times during the recording.
 
     >>> s1 = stream.Stream()
     >>> s1.append(meter.TimeSignature('3/4'))
-    >>> s2 = stream.Stream()
-    >>> s2.append(meter.TimeSignature('3/4'))
-    >>> s2.append(meter.TimeSignature('4/4'))
-
     >>> fe = features.jSymbolic.ChangesOfMeterFeature(s1)
     >>> fe.extract().vector
     [0]
-    >>> fe.setData(s2) # change the data
+
+    >>> s2 = stream.Stream()
+    >>> s2.append(meter.TimeSignature('3/4'))
+    >>> s2.append(meter.TimeSignature('4/4'))
+    >>> fe.setData(s2)  # change the data
     >>> fe.extract().vector
     [1]
 
+    >>> s = corpus.parse('bwv66.6')
+    >>> fe = features.jSymbolic.ChangesOfMeterFeature(s)
+    >>> f = fe.extract()
+    >>> f.vector
+    [0]
     '''
     id = 'R35'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2720,7 +2701,6 @@ class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
                             'times during the recording')
         self.isSequential = True
         self.dimensions = 1
-        self.normalize = False
 
     def process(self):
         elements = self.data['flat.getElementsByClass(TimeSignature)']
