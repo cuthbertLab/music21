@@ -60,7 +60,7 @@ class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
                             'the values of the melodic interval histogram.')
         self.isSequential = True
         self.dimensions = 128
-        self.divide_by_sum = True
+        self.normalize = True
 
     def process(self):
         '''Do processing necessary, storing result in feature.
@@ -1339,7 +1339,7 @@ class BasicPitchHistogramFeature(featuresModule.FeatureExtractor):
                             'values of the basic pitch histogram.')
         self.isSequential = True
         self.dimensions = 128
-        self.divide_by_sum = True
+        self.normalize = True
 
     def process(self):
         '''Do processing necessary, storing result in feature.
@@ -1376,7 +1376,7 @@ class PitchClassDistributionFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 12
         self.discrete = False
-        self.divide_by_sum = True
+        self.normalize = True
 
     def process(self):
         '''Do processing necessary, storing result in feature.
@@ -1419,7 +1419,7 @@ class FifthsPitchHistogramFeature(featuresModule.FeatureExtractor):
                             '5ths pitch class histogram.')
         self.isSequential = True
         self.dimensions = 12
-        self.divide_by_sum = True
+        self.normalize = True
 
         # create pc to index mapping
         self._mapping = {}

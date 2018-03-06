@@ -71,10 +71,10 @@ class Feature:
 
     It's okay just to assign a new list to .vector itself.
     
-    There is a divide_by_sum() method which normalizes the values
+    There is a normalize() method which normalizes the values
     of a histogram to sum to 1.
     
-    >>> myFeature.divide_by_sum()
+    >>> myFeature.normalize()
     >>> myFeature.vector
     [0.571..., 0.285..., 0.142...]
 
@@ -104,7 +104,7 @@ class Feature:
         '''
         self.vector = self._getVectors()
 
-    def divide_by_sum(self):
+    def normalize(self):
         '''
         Normalizes the vector so that the sum of its elements is 1.
         '''
@@ -147,8 +147,8 @@ class FeatureExtractor:
             self.dimensions = None # number of dimensions
         if not hasattr(self, 'discrete'):
             self.discrete = True # default
-        if not hasattr(self, 'divide_by_sum'):
-            self.divide_by_sum = False # default is no
+        if not hasattr(self, 'normalize'):
+            self.normalize = False # default is no
 
     def setData(self, dataOrStream):
         '''
@@ -240,8 +240,8 @@ class FeatureExtractor:
         # preparing the feature always sets self.feature to a new instance
         self.prepareFeature()
         self.process() # will set Feature object to _feature
-        if self.divide_by_sum:
-            self.feature.divide_by_sum()
+        if self.normalize:
+            self.feature.normalize()
         return self.feature
 
     def getBlankFeature(self):
