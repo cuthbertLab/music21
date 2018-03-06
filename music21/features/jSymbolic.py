@@ -2215,8 +2215,8 @@ class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
     >>> for p in s.parts:
     ...     p.insert(0, tempo.MetronomeMark(number=120))
     >>> fe = features.jSymbolic.AverageTimeBetweenAttacksFeature(s)
-    >>> f = fe.extract().vector
-    >>> print(round(f[0], 2))
+    >>> v = fe.extract().vector
+    >>> print(round(v[0], 2))
     0.35
     '''
 
@@ -2252,8 +2252,8 @@ class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.VariabilityOfTimeBetweenAttacksFeature(s)
-    >>> f = fe.extract().vector
-    >>> print(round(f[0], 2))
+    >>> v = fe.extract().vector
+    >>> print(round(v[0], 2))
     0.15
     '''
 
