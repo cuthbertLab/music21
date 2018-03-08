@@ -2400,87 +2400,72 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
                                    len(stdDeviationByPart))
 
 
-class IncidenceOfCompleteRestsFeature(featuresModule.FeatureExtractor):
-    '''
-    Not yet implemented in music21
-
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                    *arguments, **keywords)
-
-        self.name = 'Incidence Of Complete Rests'
-        self.description = ('Total amount of time in seconds in which no notes ' +
-                    'are sounding on any channel divided by the total length ' +
-                    'of the recording.')
-        self.isSequential = True
-        self.dimensions = 1
-
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
 
 
-class MaximumCompleteRestDurationFeature(featuresModule.FeatureExtractor):
-    '''
-    Not yet implemented in music21
+#class IncidenceOfCompleteRestsFeature(featuresModule.FeatureExtractor):
+#    '''
+#    Not implemented in jSymbolic
+#
+#    '''
+#    def __init__(self, dataOrStream=None, *arguments, **keywords):
+#        super().__init__(dataOrStream=dataOrStream,
+#                    *arguments, **keywords)
+#
+#        self.name = 'Incidence Of Complete Rests'
+#        self.description = ('Total amount of time in seconds in which no notes are sounding' +
+#                    ' on any channel divided by the total length of the recording')
+#        self.isSequential = True
+#        self.dimensions = 1
+#
+#class MaximumCompleteRestDurationFeature(featuresModule.FeatureExtractor):
+#    '''
+#    Not implemented in jSymbolic
+#
+#    '''
+#    def __init__(self, dataOrStream=None, *arguments, **keywords):
+#        super().__init__(dataOrStream=dataOrStream,
+#                        *arguments, **keywords)
+#
+#        self.name = 'Maximumm Complete Rest Duration'
+#        self.description = ('Maximum amount of time in seconds in which no notes ' +
+#                'are sounding on any channel.')
+#        self.isSequential = True
+#        self.dimensions = 1
+#
+#class AverageRestDurationPerVoiceFeature(featuresModule.FeatureExtractor):
+#    '''
+#    Not implemented in jSymbolic
+#
+#    '''
+#    def __init__(self, dataOrStream=None, *arguments, **keywords):
+#        super().__init__(dataOrStream=dataOrStream,
+#                        *arguments, **keywords)
+#
+#        self.name = 'Average Rest Duration Per Voice'
+#        self.description = ('Average, in seconds, of the average amounts of time in each ' +
+#                'channel in which no note is sounding (counting only channels with at least ' +
+#                'one note), divided by the total duration of the recording')
+#        self.isSequential = True
+#        self.dimensions = 1
+#
+#class AverageVariabilityOfRestDurationsAcrossVoicesFeature(featuresModule.FeatureExtractor):
+#    '''
+#    Not implemented in jSymbolic
+#
+#    '''
+#    def __init__(self, dataOrStream=None, *arguments, **keywords):
+#        super().__init__(dataOrStream=dataOrStream,
+#                    *arguments, **keywords)
+#
+#        self.name = 'Average Variability Of Rest Durations Across Voices'
+#        self.description = ('Standard deviation, in seconds, of the average amounts of time ' +
+#                    'in each channel in which no note is sounding (counting only ' +
+#                    'channels with at least one note)'
+#        self.isSequential = True
+#        self.dimensions = 1
 
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                        *arguments, **keywords)
-
-        self.name = 'Maximumm Complete Rest Duration'
-        self.description = ('Maximum amount of time in seconds in which no notes ' +
-                'are sounding on any channel.')
-        self.isSequential = True
-        self.dimensions = 1
-
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
 
 
-class AverageRestDurationPerVoiceFeature(featuresModule.FeatureExtractor):
-    '''
-    Not yet implemented in music21
-
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                        *arguments, **keywords)
-
-        self.name = 'Average Rest Duration Per Voice'
-        self.description = ('Average, in seconds, of the average amounts of time in each ' +
-                'channel in which no note is sounding (counting only channels with at least ' +
-                'one note), divided by the total duration of the recording')
-        self.isSequential = True
-        self.dimensions = 1
-
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
-
-
-class AverageVariabilityOfRestDurationsAcrossVoicesFeature(featuresModule.FeatureExtractor):
-    '''
-    Not implemented in jSymbolic
-
-    '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                    *arguments, **keywords)
-
-        self.name = 'Average Variability Of Rest Durations Across Voices'
-        self.description = ('Standard deviation, in seconds, of the average amounts of time ' +
-                    'in each channel in which no note is sounding (counting only ' +
-                    'channels with at least one note)')
-        self.isSequential = True
-        self.dimensions = 1
-
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
 
 
 class InitialTempoFeature(featuresModule.FeatureExtractor):
@@ -2768,6 +2753,8 @@ class OverallDynamicRangeFeature(featuresModule.FeatureExtractor):
     Not implemented
 
     The maximum loudness minus the minimum loudness value.
+
+    TODO: implement
     '''
     id = 'D1'
 
@@ -2779,16 +2766,16 @@ class OverallDynamicRangeFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
-
 
 class VariationOfDynamicsFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
 
     Standard deviation of loudness levels of all notes.
+
+
+    TODO: implement
+
     '''
     id = 'D2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2799,10 +2786,6 @@ class VariationOfDynamicsFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
-
 
 
 class VariationOfDynamicsInEachVoiceFeature(featuresModule.FeatureExtractor):
@@ -2811,6 +2794,9 @@ class VariationOfDynamicsInEachVoiceFeature(featuresModule.FeatureExtractor):
 
     The average of the standard deviations of loudness levels within each
     channel that contains at least one note.
+
+    TODO: implement
+
     '''
     id = 'D3'
 
@@ -2823,10 +2809,6 @@ class VariationOfDynamicsInEachVoiceFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
-
 
 class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
     '''
@@ -2834,6 +2816,10 @@ class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
 
     Average change of loudness from one note to the next note in the
     same channel (in MIDI velocity units).
+
+
+    TODO: implement
+
     '''
 
     id = 'D4'
@@ -2846,9 +2832,6 @@ class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
 
 
 #-------------------------------------------------------------------------------
@@ -2982,6 +2965,10 @@ class VoiceEqualityNumberOfNotesFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
 
+
+
+    TODO: implement
+
     Standard deviation of the total number of Note Ons in each channel
     that contains at least one note.
     '''
@@ -2995,14 +2982,14 @@ class VoiceEqualityNumberOfNotesFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
-
-
 class VoiceEqualityNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
+
+
+
+    TODO: implement
+
     '''
     id = 'T5'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -3014,14 +3001,14 @@ class VoiceEqualityNoteDurationFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
-
 
 class VoiceEqualityDynamicsFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
+
+
+
+    TODO: implement
 
     '''
     id = 'T6'
@@ -3034,14 +3021,14 @@ class VoiceEqualityDynamicsFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
-
 
 class VoiceEqualityMelodicLeapsFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
+
+
+
+    TODO: implement
 
     '''
     id = 'T7'
@@ -3053,10 +3040,6 @@ class VoiceEqualityMelodicLeapsFeature(featuresModule.FeatureExtractor):
         for each channel that contains at least one note.'''
         self.isSequential = True
         self.dimensions = 1
-
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
 
 
 class VoiceEqualityRangeFeature(featuresModule.FeatureExtractor):
@@ -3076,14 +3059,14 @@ class VoiceEqualityRangeFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
-
 
 class ImportanceOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
+
+
+
+    TODO: implement
 
     '''
     id = 'T9'
@@ -3096,13 +3079,16 @@ class ImportanceOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
+
+
 
 class RelativeRangeOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
+
+
+
+    TODO: implement
 
     '''
     id = 'T10'
@@ -3116,14 +3102,15 @@ class RelativeRangeOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
 
 
 class RangeOfHighestLineFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
+
+
+
+    TODO: implement
 
     '''
     id = 'T12'
@@ -3137,14 +3124,15 @@ class RangeOfHighestLineFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
 
 
 class RelativeNoteDensityOfHighestLineFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
+
+
+
+    TODO: implement
 
     '''
     id = 'T13'
@@ -3159,14 +3147,14 @@ class RelativeNoteDensityOfHighestLineFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
-
 
 class MelodicIntervalsInLowestLineFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
+
+
+
+    TODO: implement
 
     '''
     id = 'T15'
@@ -3179,10 +3167,6 @@ class MelodicIntervalsInLowestLineFeature(featuresModule.FeatureExtractor):
         channels that contain at least two notes.'''
         self.isSequential = True
         self.dimensions = 1
-
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
 
 
 class VoiceSeparationFeature(featuresModule.FeatureExtractor):
@@ -3203,9 +3187,6 @@ class VoiceSeparationFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
 
 
 #-------------------------------------------------------------------------------
@@ -3350,6 +3331,11 @@ class NotePrevalenceOfUnpitchedInstrumentsFeature(
     featuresModule.FeatureExtractor):
     '''
     Not implemented
+
+
+
+    TODO: implement
+
     '''
     id = 'I4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -3365,10 +3351,7 @@ class NotePrevalenceOfUnpitchedInstrumentsFeature(
         self.isSequential = True
         self.dimensions = 47
 
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
-        # TODO: need to find events in channel 10.
+    # TODO: need to find events in channel 10.
 
 
 class TimePrevalenceOfPitchedInstrumentsFeature(
@@ -3382,6 +3365,9 @@ class TimePrevalenceOfPitchedInstrumentsFeature(
     which is set to the total time in seconds during which a
     given instrument was sounding one or more notes divided by the total length
     in seconds of the piece.'
+
+    TODO: implement
+
     '''
     id = 'I5'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -3395,11 +3381,7 @@ class TimePrevalenceOfPitchedInstrumentsFeature(
                             'or more notes divided by the total length in seconds of the piece.')
         self.isSequential = True
         self.dimensions = 128
-
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
-        # TODO: this can be done by symbolic duration in native.py
+    # TODO: this can be done by symbolic duration in native.py
 
 
 class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
@@ -3458,6 +3440,10 @@ class VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature(
     Map instrument that is used to play at least one note. It should be noted that only
     instruments 35 to 81 are included here, as they are the ones that are included in the
     official standard.
+
+
+    TODO: implement
+
     '''
     id = 'I7'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -3472,9 +3458,6 @@ class VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature(
         self.isSequential = True
         self.dimensions = 1
 
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
 
 
 class NumberOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
@@ -3520,6 +3503,8 @@ class NumberOfUnpitchedInstrumentsFeature(featuresModule.FeatureExtractor):
     Number of distinct MIDI Percussion Key Map patches that were used to play at
     least one note. It should be noted that only instruments 35 to 81 are
     included here, as they are the ones that are included in the official standard.
+
+    TODO: implement
     '''
 
     id = 'I9'
@@ -3534,9 +3519,6 @@ class NumberOfUnpitchedInstrumentsFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
 
 
 class PercussionPrevalenceFeature(featuresModule.FeatureExtractor):
@@ -3557,9 +3539,6 @@ class PercussionPrevalenceFeature(featuresModule.FeatureExtractor):
         self.isSequential = True
         self.dimensions = 1
 
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
 
 
 class InstrumentFractionFeature(featuresModule.FeatureExtractor):
@@ -3834,9 +3813,6 @@ class StringEnsembleFractionFeature(InstrumentFractionFeature):
 
         self._targetPrograms = [48, 49, 50, 51]
 
-    def process(self):
-        raise JSymbolicFeatureException('not yet implemented')
-        # TODO: implement
 
 
 class ElectricInstrumentFractionFeature(InstrumentFractionFeature):
