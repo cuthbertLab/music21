@@ -549,7 +549,7 @@ class ChoraleListRKBWV:
     8---||---40.8---||---Freuet euch, ihr Christen alle---||---105
     9---||---248.12-2---||---Ermuntre dich, mein schwacher Geist---||---80
     10---||---38.6---||---Aus tiefer Not schrei ich zu dir 1---||---31
-    11---||---41.6---||---Jesu, nun sei gepreiset---||---203
+    11---||---41.6satb---||---Jesu, nun sei gepreiset---||---203
     12---||---65.2---||---Puer natus in Bethlehem---||---302
     13---||---33.6---||---Allein zu dir, Herr Jesu Christ---||---16
     14---||---184.5---||---O Herre Gott, dein göttlich Wort---||---283
