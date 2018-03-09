@@ -555,12 +555,12 @@ class ChoraleListRKBWV:
     14---||---184.5---||---O Herre Gott, dein göttlich Wort---||---283
     15---||---277---||---Christ lag in Todesbanden---||---38
     16---||---311---||---Es woll uns Gott genädig sein 2---||---95
-    17---||---145.5---||---Erschienen ist der herrliche Tag---||---0
+    17---||---145.5---||---Erschienen ist der herrliche Tag---||---84
     18---||---318---||---Menschenkind, merk eben---||---115
     19---||---351---||---Ich hab' mein' Sach' Gott heimgestellt---||---182
     20---||---302---||---Ein feste Burg ist unser Gott---||---74
     21---||---153.5---||---Herzlich tut mich verlangen---||---160
-    22---||---180.7---||---Schmücke dich, o liebe Seele---||---0
+    22---||---180.7---||---Schmücke dich, o liebe Seele---||---304
     23---||---28.6---||---Helft mir Gotts Güte preisen---||---124
     24---||---415---||---Valet will ich dir geben---||---314
     25---||---148.6---||---Wo soll ich fliehen hin---||---0
