@@ -1187,37 +1187,11 @@ class Iterator:
         >>> from music21 import corpus
         >>> BCI = corpus.chorales.Iterator()
         >>> riemenschneider1 = BCI._returnChorale()
-        >>> riemenschneider1.show('text')
-        {0.0} <music21.text.TextBox "BWV 269">
-        {0.0} <music21.text.TextBox "PDF © 2004...">
-        {0.0} <music21.metadata.Metadata object at ...>
-        {0.0} <music21.stream.Part Soprano>
-            {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
-            {0.0} <music21.stream.Measure 0 offset=0.0>
-                {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.key.Key of G major>
-                {0.0} <music21.meter.TimeSignature 3/4>
-                {0.0} <music21.note.Note G>
-        ...
-
         >>> riemenschneider1.metadata.title
         'Aus meines Herzens Grunde'
 
         >>> BCI.currentNumber = BCI.highestNumber
         >>> riemenschneider371 = BCI._returnChorale()
-        >>> riemenschneider371.show('text')
-        {0.0} <music21.text.TextBox "BWV 278">
-        {0.0} <music21.text.TextBox "PDF © 2004...">
-        {0.0} <music21.metadata.Metadata object at ...>
-        {0.0} <music21.stream.Part Soprano>
-            {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
-            {0.0} <music21.stream.Measure 0 offset=0.0>
-                {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.key.Key of e minor>
-                {0.0} <music21.meter.TimeSignature 4/4>
-                {0.0} <music21.note.Note B>
-        ...
-
         >>> riemenschneider371.metadata.title
         'Christ lag in Todesbanden'
 
@@ -1248,19 +1222,6 @@ class Iterator:
 
         >>> BCI.currentNumber += 1
         >>> ausmeines = BCI._returnChorale()
-        >>> ausmeines.show('text')
-        {0.0} <music21.text.TextBox "BWV 269">
-        {0.0} <music21.text.TextBox "PDF © 2004...">
-        {0.0} <music21.metadata.Metadata object at ...>
-        {0.0} <music21.stream.Part Soprano>
-            {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
-            {0.0} <music21.stream.Measure 0 offset=0.0>
-                {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.key.Key of G major>
-                {0.0} <music21.meter.TimeSignature 3/4>
-                {0.0} <music21.note.Note G>
-        ...
-
         >>> ausmeines.metadata.title
         'Aus meines Herzens Grunde'
 
@@ -1271,8 +1232,6 @@ class Iterator:
 
         >>> BCI._returnChorale(3)
         'bach/bwv48.3'
-
-
         '''
         from music21 import corpus
 

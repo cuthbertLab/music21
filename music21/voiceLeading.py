@@ -1259,10 +1259,10 @@ def getVerticalityFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None
 
     contentDict = {}
     for partNum, partObj in enumerate(scoreObjectIsFrom.parts):
-        elementStream = partObj.flat.getElementsByOffset(offsetOfObject,
+        elementSelection = partObj.flat.getElementsByOffset(offsetOfObject,
                                                          mustBeginInSpan=False,
                                                          classList=classFilterList)
-        for el in elementStream.elements:
+        for el in elementSelection:
             if partNum in contentDict:
                 contentDict[partNum].append(el)
             else:
