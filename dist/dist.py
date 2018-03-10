@@ -25,7 +25,7 @@ To do a release,
 5. commit and then check test/testSingleCoreAll.py or wait for results on Travis-CI
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
      but should be done before making a release).
-6. then python3 /documentation/testDocumentation.py [*]
+6. then python3 documentation/testDocumentation.py [*]
 
 [*] you will need pytest and nbval installed (along with ipython and jupyter)
 

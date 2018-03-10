@@ -17,6 +17,7 @@ import difflib
 from music21 import note, chord, key
 from music21 import interval
 from music21 import stream
+from music21.exceptions21 import StreamException
 
 class Hasher(object):
     '''
@@ -138,7 +139,7 @@ class Hasher(object):
             self.stateVars["KeySignature"] = None
 
         # -- Begin Individual Hashing Functions of Properties---
-    def _hashDuration(self, e, chrd=None):
+    def _hashDuration(self, e, thisChord=None):
         '''
         returns the duration of a chord object passed in, otherwise the duration of a note
         object passed in. 
@@ -150,24 +151,24 @@ class Hasher(object):
         
         >>> d = duration.Duration(2.0)
         >>> c = chord.Chord('A-4 C#5 E5', duration=d)
-        >>> h._hashDuration(n, chrd=c)
+        >>> h._hashDuration(n, thisChord=c)
         2.0
         '''
-        if chrd:
-            return chrd.duration.quarterLength
+        if thisChord:
+            return thisChord.duration.quarterLength
         return e.duration.quarterLength
 
-    def _hashRoundedDuration(self, e, chrd=None):
+    def _hashRoundedDuration(self, e, thisChord=None):
         """
         TODO: Check if this is working
         """
-        if chrd:
-            return self._getApproxDurOrOffset(float(chrd.duration.quarterLength))
+        if thisChord:
+            return self._getApproxDurOrOffset(float(thisChord.duration.quarterLength))
         e.duration.quarterLength = self._getApproxDurOrOffset(float(e.duration.quarterLength))
         return e.duration.quarterLength
     
 
-    def _hashMIDIPitchName(self, e, chrd=None):
+    def _hashMIDIPitchName(self, e, thisChord=None):
         """
         returns midi pitch value (21-108) of a note
         returns 0 if rest
@@ -177,24 +178,24 @@ class Hasher(object):
         >>> c = chord.Chord('A-4 C#5 E5')
         >>> h = alpha.analysis.hasher.Hasher()
         >>> h.hashChordsAsChords = True
-        >>> h._hashMIDIPitchName(n, chrd=c)
+        >>> h._hashMIDIPitchName(n, thisChord=c)
         1
         >>> h.hashChordsAsChords = False
-        >>> h._hashMIDIPitchName(n, chrd=c)
+        >>> h._hashMIDIPitchName(n, thisChord=c)
         72
         >>> r = note.Rest()
-        >>> h._hashMIDIPitchName(r, chrd=c)
+        >>> h._hashMIDIPitchName(r, thisChord=c)
         0
         
         """
-        if chrd and self.hashChordsAsChords:
+        if thisChord and self.hashChordsAsChords:
             return 1
         elif isinstance(e, note.Rest):
             return 0
         return e.pitch.midi
 
     
-    def _hashPitchName(self, e, chrd=None):
+    def _hashPitchName(self, e, thisChord=None):
         """
         returns string representation of a note e.g. "F##4"
         returns "r" if rest
@@ -204,22 +205,22 @@ class Hasher(object):
         >>> c = chord.Chord('A-4 C#5 E5')
         >>> h = alpha.analysis.hasher.Hasher()
         >>> h.hashChordsAsChords = True
-        >>> h._hashPitchName(n, chrd=c)
+        >>> h._hashPitchName(n, thisChord=c)
         'z'
         >>> h.hashChordsAsChords = False
-        >>> h._hashPitchName(n, chrd=c)
+        >>> h._hashPitchName(n, thisChord=c)
         'C5'
         >>> r = note.Rest()
-        >>> h._hashPitchName(r, chrd=c)
+        >>> h._hashPitchName(r, thisChord=c)
         'r'
         """
-        if chrd and self.hashChordsAsChords:
+        if thisChord and self.hashChordsAsChords:
             return "z" 
         elif isinstance(e, note.Rest):
             return "r"
         return str(e.pitch)
     
-    def _hashPitchNameNoOctave(self, e, chrd=None):
+    def _hashPitchNameNoOctave(self, e, thisChord=None):
         """
         returns string representation of a note without the octave e.g. "F##"
         returns "r" if rest
@@ -229,16 +230,16 @@ class Hasher(object):
         >>> c = chord.Chord('A-4 C#5 E5')
         >>> h = alpha.analysis.hasher.Hasher()
         >>> h.hashChordsAsChords = True
-        >>> h._hashPitchNameNoOctave(n, chrd=c)
+        >>> h._hashPitchNameNoOctave(n, thisChord=c)
         'z'
         >>> h.hashChordsAsChords = False
-        >>> h._hashPitchNameNoOctave(n, chrd=c)
+        >>> h._hashPitchNameNoOctave(n, thisChord=c)
         'C'
         >>> r = note.Rest()
-        >>> h._hashPitchNameNoOctave(r, chrd=c)
+        >>> h._hashPitchNameNoOctave(r, thisChord=c)
         'r'
         """
-        if chrd and self.hashChordsAsChords:
+        if thisChord and self.hashChordsAsChords:
             return "z" 
         elif isinstance(e, note.Rest):
             return "r"
@@ -246,7 +247,7 @@ class Hasher(object):
 
 
     
-    def _hashOctave(self, e, chrd=None):
+    def _hashOctave(self, e, thisChord=None):
         """
         returns octave number of a note 
         returns -1 if rest or not hashing individual notes of a chord
@@ -255,13 +256,13 @@ class Hasher(object):
         >>> c = chord.Chord('A-4 C#5 E5')
         >>> h = alpha.analysis.hasher.Hasher()
         >>> h.hashChordsAsChords = True
-        >>> h._hashOctave(c, chrd=c)
+        >>> h._hashOctave(c, thisChord=c)
         -1
         >>> h.hashChordsAsChords = False
-        >>> h._hashOctave(n, chrd=c)
+        >>> h._hashOctave(n, thisChord=c)
         5
         >>> r = note.Rest()
-        >>> h._hashOctave(r, chrd=c)
+        >>> h._hashOctave(r, thisChord=c)
         -1
         """
         if isinstance(e, chord.Chord) and self.hashChordsAsChords:
@@ -270,63 +271,64 @@ class Hasher(object):
             return -1
         return e.octave
 
-    def _hashIsAccidental(self, e, chrd=None):
+    def _hashIsAccidental(self, e, thisChord=None):
         #TODO: figure out how to tell if note is accidental based on key sig
         pass
 
     
-    def _hashRoundedOffset(self, e, chrd=None):
+    def _hashRoundedOffset(self, e, thisChord=None):
         """
         returns offset rounded to the nearest subdivided beat
         subdivided beat is indicated with self.granularity
         by default, the granularity is set to 32, or 32nd notes
         """
-        if chrd:
-            return self._getApproxDurOrOffset(chrd.offset)
+        if thisChord:
+            return self._getApproxDurOrOffset(thisChord.offset)
         e.offset = self._getApproxDurOrOffset(e.offset)
         return e.offset
 
     
-    def _hashOffset(self, e, chrd=None):
+    def _hashOffset(self, e, thisChord=None):
         """
         returns unrounded floating point representation of a note's offset
         """
-        if chrd:
-            return chrd.offset
+        if thisChord:
+            return thisChord.offset
         return e.offset
 
     
-    def _hashIntervalFromLastNote(self, e, chrd=None):
+    def _hashIntervalFromLastNote(self, e, thisChord=None):
         """
         returns the interval between last note and current note, if extant
         known issues with first note of every measure in transposed pieces
         returns 0 if things don't work
         """
-        try: 
-            if isinstance(e, note.Note) and e.previous('Note', flattenLocalSites=True) is not None:
+        try:
+            if (isinstance(e, note.Note) 
+                    and e.previous('Note', flattenLocalSites=True) is not None):
                 previousNote = e.previous('Note', flattenLocalSites=True)
-                intFromLastNote = interval.Interval(noteStart=previousNote, noteEnd=e).intervalClass
+                intFromLastNote = interval.Interval(noteStart=previousNote, 
+                                                    noteEnd=e).intervalClass
                 return interval.convertGeneric(interval.Interval(intFromLastNote).intervalClass)
-        except:
-            pass
-        return 0
+        except TypeError:
+            return 0
     
-    def _hashPrimeFormString(self, e ,chrd=None):
+    def _hashPrimeFormString(self, e ,thisChord=None):
         """
         returns prime form of a chord as a string e.g. '<037>'
         returns "<>" otherwise
         """
-        if chrd:
-            return chrd.primeFormString
+        if thisChord:
+            return thisChord.primeFormString
         return "<>"
 
-    def _hashChordNormalOrderString(self, e ,chrd=None):
+    def _hashChordNormalOrderString(self, e ,thisChord=None):
         """
         returns normal order of a chord as a string e.g. '<047>'
         returns "<>" otherwise
         """
-        if chrd:
-            return chrd.formatVectorString(chrd.normalOrder)
+        if thisChord:
+            return thisChord.formatVectorString(thisChord.normalOrder)
         return "<>"
 
     # --- End Indvidual Hashing Functions
@@ -393,18 +395,17 @@ class Hasher(object):
 
     def preprocessStream(self, s):
         '''
-        strips ties from stream is self.stripTies is True
-        
+        strips ties from stream is self.stripTies is True        
         '''
         if self.stripTies:
             try:
                 st = s.stripTies()
-            except:
-                pass
-        try:
-            return st.recurse()
-        except:
-            return s.recurse()
+                return st.recurse()
+            except StreamException:
+                return s.recurse()
+
+        return s.recurse()
+
 
     def hashMeasures(self, s):
         '''
@@ -435,12 +436,12 @@ class Hasher(object):
             elif isinstance(elt, chord.Chord):
                 if self.hashChordsAsNotes:
                     for n in elt:
-                        singleNoteHash = [self.hashingFunctions[hashProperty](n, chrd=elt) 
+                        singleNoteHash = [self.hashingFunctions[hashProperty](n, thisChord=elt) 
                                             for hashProperty in self.tupleList]
                         
                         self.addHashToFinalHash(singleNoteHash, finalHash, n)
                 elif self.hashChordsAsChords:
-                    singleNoteHash = [self.hashingFunctions[hashProperty](None, chrd=elt) 
+                    singleNoteHash = [self.hashingFunctions[hashProperty](None, thisChord=elt) 
                                         for hashProperty in self.tupleList]
                     self.addHashToFinalHash(singleNoteHash, finalHash, elt)
             else: 
@@ -736,10 +737,10 @@ class Test(unittest.TestCase):
         h = Hasher()
         h.roundDurationAndOffset = True
 
-        NoteHash = collections.namedtuple('NoteHash', ["Pitch", "Duration", "Offset"])
+        CNoteHash = collections.namedtuple('NoteHash', ["Pitch", "Duration", "Offset"])
         hashes_plain_numbers = [(60, 1.78125, 0.0), (67, 0.65625, 1.78125), (60, 2.0, 2.4375), 
                                 (67, 2.0, 2.4375)]
-        hashes_in_format = [NoteHash(Pitch=x, Duration=z, Offset=a) 
+        hashes_in_format = [CNoteHash(Pitch=x, Duration=z, Offset=a) 
                             for (x, z, a) in hashes_plain_numbers]
         h3 = h.hashStream(s3)
         self.assertEqual(h3, hashes_in_format)

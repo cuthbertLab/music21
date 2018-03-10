@@ -38,9 +38,6 @@ class DeleteFixer(OMRMidiFixer):
     Deletes measure that have wrong things in them a la OpenScore specs
     
     '''
-    def __init__(self, changes, midiStream, omrStream):
-        super().__init__(changes, midiStream, omrStream)
-         
     def fix(self):
         for (midiRef, omrRef, op) in self.changes:
             if self.checkIfNoteInstance(midiRef, omrRef) is False:
@@ -320,3 +317,4 @@ class Test(unittest.TestCase):
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
+    
