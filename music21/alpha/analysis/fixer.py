@@ -44,7 +44,7 @@ class DeleteFixer(OMRMidiFixer):
                 continue
             # if the are the same, don't bother to try changing it
             # 3 is the number of noChange Ops
-            if isinstance(op, aligner.ChangeOps) and op.changeOpNum == 3:
+            if isinstance(op, aligner.ChangeOps) and op == aligner.ChangeOps.NoChange:
                 continue
              
             m = omrRef.getContextByClass(stream.Measure)
@@ -226,7 +226,7 @@ class EnharmonicFixer(OMRMidiFixer):
                 continue
             # if the are the same, don't bother to try changing it
             # 3 is the number of noChange Ops
-            if isinstance(op, aligner.ChangeOps) and op.changeOpNum == 3:
+            if isinstance(op, aligner.ChangeOps) and op == aligner.ChangeOps.NoChange:
                 continue
             
             # don't bother with notes with too big of an interval between them

@@ -9,6 +9,7 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 from collections import Counter
+import enum
 import operator
 import unittest
 
@@ -16,8 +17,6 @@ from music21 import base as base
 from music21 import exceptions21
 from music21 import metadata
 from music21.alpha.analysis import hasher
-
-import enum
 
 class AlignerException(exceptions21.Music21Exception):
     pass
