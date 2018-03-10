@@ -607,12 +607,12 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-    def _approximatelyEqual(self, a, b, sig_fig = 2):
+    def _approximatelyEqual(self, a, b, sig_fig=2):
         """
         use to look at whether beat lengths are close, within a certain range
         probably can use for other things that are approx. equal
         """
-        return (a==b or int(a*10**sig_fig) == int(b*10**sig_fig))
+        return (a == b or int(a * 10 ** sig_fig) == int(b * 10 ** sig_fig))
 
     
     def testBasicHash(self):
@@ -633,11 +633,13 @@ class Test(unittest.TestCase):
         s1.append(note3)
         s1.append(cMinor)
         s1.append(r)
+        
         h = Hasher()
+        
         hashes_plain_numbers = [(60, 2.0, 0.0), (66, 1.0, 2.0), (46, 1.0, 3.0), (60, 2.0, 4.0), 
                                 (67, 2.0, 4.0), (75, 2.0, 4.0), (0, 1.5, 6.0)]
-        NoteHash = collections.namedtuple('NoteHash', ["Pitch", "Duration", "Offset"])
-        hashes_in_format = [NoteHash(Pitch=x, Duration=y, Offset=z) 
+        CNoteHash = collections.namedtuple('NoteHash', ["Pitch", "Duration", "Offset"])
+        hashes_in_format = [CNoteHash(Pitch=x, Duration=y, Offset=z) 
                             for (x, y, z) in hashes_plain_numbers]
 
         self.assertEqual(h.hashStream(s1), hashes_in_format)
@@ -660,11 +662,11 @@ class Test(unittest.TestCase):
         h.hashChordsAsChords = True
         h.hashChordsAsNotes = False
         h.hashPrimeFormString = True
-        NoteHash = collections.namedtuple('NoteHash', ["Pitch", "PrimeFormString", 
+        CNoteHash = collections.namedtuple('NoteHash', ["Pitch", "PrimeFormString", 
                                                        "Duration", "Offset"])
         hashes_plain_numbers = [(60, "<>", 2.0, 0.0), (1, '<037>', 2.0, 2.0), 
                                 (1, '<037>', 4.0, 4.0)]
-        hashes_in_format = [NoteHash(Pitch=x, PrimeFormString=y, Duration = z, Offset=a) 
+        hashes_in_format = [CNoteHash(Pitch=x, PrimeFormString=y, Duration=z, Offset=a) 
                             for (x, y, z, a) in hashes_plain_numbers]
         
         self.assertEqual(h.hashStream(s1), hashes_in_format)
@@ -685,11 +687,11 @@ class Test(unittest.TestCase):
         h.hashChordsAsNotes = False
         h.hashPrimeFormString = False
         h.hashNormalOrderString = True
-        NoteHash = collections.namedtuple('NoteHash', ["Pitch", "NormalOrderString", 
+        CNoteHash = collections.namedtuple('NoteHash', ["Pitch", "NormalOrderString", 
                                                        "Duration", "Offset"])
         hashes_plain_numbers = [(60, "<>", 2.0, 0.0), (1, '<037>', 2.0, 2.0), 
                                 (1, '<047>', 4.0, 4.0)]
-        hashes_in_format = [NoteHash(Pitch=x, NormalOrderString=y, Duration = z, Offset=a) 
+        hashes_in_format = [CNoteHash(Pitch=x, NormalOrderString=y, Duration=z, Offset=a) 
                             for (x, y, z, a) in hashes_plain_numbers]
         self.assertEqual(h.hashStream(s2), hashes_in_format)
 
@@ -706,16 +708,19 @@ class Test(unittest.TestCase):
         s3.append(cMinor)
         h = Hasher()
         h.roundDurationAndOffset = False
-        NoteHash = collections.namedtuple('NoteHash', ["Pitch", "Duration", "Offset"])
-        hashes_plain_numbers = [(60, 1.783, 0.0), (67, 2.0/3, 1.783), (60, 2., 1.783+2.0/3), 
-                                (67, 2., 1.783+2.0/3)]
-        hashes_in_format = [NoteHash(Pitch=x, Duration = z, Offset=a) 
+        CNoteHash = collections.namedtuple('NoteHash', ["Pitch", "Duration", "Offset"])
+        hashes_plain_numbers = [(60, 1.783, 0.0), (67, 2/3, 1.783), (60, 2.0, 1.783 + 2/3), 
+                                (67, 2.0, 1.783 + 2/3)]
+        hashes_in_format = [CNoteHash(Pitch=x, Duration=z, Offset=a) 
                             for (x, z, a) in hashes_plain_numbers]
         h3 = h.hashStream(s3)
         h3_floats = [h3[0][2], h3[1][2], h3[2][2], h3[3][2]]
-        answers_floats = [hashes_in_format[0][2], hashes_in_format[1][2], hashes_in_format[2][2], 
+        answers_floats = [hashes_in_format[0][2], 
+                          hashes_in_format[1][2], 
+                          hashes_in_format[2][2], 
                           hashes_in_format[3][2]]
-        assert all(self._approximatelyEqual(*values) for values in zip(h3_floats, answers_floats))
+        assert all(self._approximatelyEqual(*values) 
+                   for values in zip(h3_floats, answers_floats))
 
     def testHashRoundedDuration(self):
         s3 = stream.Stream()
@@ -723,7 +728,7 @@ class Test(unittest.TestCase):
         note2 = note.Note("G4")
         cMinor = chord.Chord(["C4","G4"])
         note1.duration.quarterLength = 1.783
-        note2.duration.quarterLength = 2.0/3
+        note2.duration.quarterLength = 2/3
         cMinor.duration.type = "half"
         s3.append(note1)
         s3.append(note2)
@@ -732,14 +737,17 @@ class Test(unittest.TestCase):
         h.roundDurationAndOffset = True
 
         NoteHash = collections.namedtuple('NoteHash', ["Pitch", "Duration", "Offset"])
-        hashes_plain_numbers = [(60, 1.78125, 0.0), (67, .65625, 1.78125), (60, 2., 2.4375), 
-                                (67, 2., 2.4375)]
-        hashes_in_format = [NoteHash(Pitch=x, Duration = z, Offset=a) 
+        hashes_plain_numbers = [(60, 1.78125, 0.0), (67, 0.65625, 1.78125), (60, 2.0, 2.4375), 
+                                (67, 2.0, 2.4375)]
+        hashes_in_format = [NoteHash(Pitch=x, Duration=z, Offset=a) 
                             for (x, z, a) in hashes_plain_numbers]
         h3 = h.hashStream(s3)
         self.assertEqual(h3, hashes_in_format)
         h.granularity = 8 # smallest length note is now 8th note
-        new_hashes_in_format = [(60, 1.75, 0.0), (67, .625, 1.75), (60, 2., 2.5), (67, 2., 2.5)]
+        new_hashes_in_format = [(60, 1.75, 0.0), 
+                                (67, 0.625, 1.75), 
+                                (60, 2.0, 2.5), 
+                                (67, 2.0, 2.5)]
         h4 = h.hashStream(s3)
         self.assertEqual(h4, new_hashes_in_format)
     

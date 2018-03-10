@@ -190,8 +190,8 @@ class FretBoard(object):
         for thisFretNote in self.fretNotes:
             if requestedString == thisFretNote.string:
                 return thisFretNote
-        else:
-            return None
+
+        return None
 
     def getPitches(self):
         '''
@@ -226,7 +226,7 @@ class FretBoard(object):
         
         pitchList = [None] * self.numStrings
 
-        if len(self.fretNotes) == 0:
+        if not self.fretNotes:
             return pitchList
         
         for thisFretNote in self.fretNotes:
@@ -278,15 +278,15 @@ class ChordWithFretBoard(harmony.ChordSymbol, FretBoard):
         Given a chord with fret Figure, getFretNotesFromFigure returns each FretNote object
         within it.
         '''
-        figure = self.figure
+        # figure = self.figure
         return None
 
 #--------------------------------------------------------------------------------
-'''
-The following classes are some basic fretted instruments that are commonly used in 
-Tablature notation.
-'''
-#EADGBE
+#
+# The following classes are some basic fretted instruments that are commonly used in 
+# Tablature notation.
+#
+# EADGBE
 class GuitarFretBoard(FretBoard):
     def __init__(self, fretNotes=None, displayFrets=4):
         numStrings=6

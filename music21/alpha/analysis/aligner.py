@@ -51,6 +51,7 @@ class ChangeOps(enum.IntEnum):
     NoChange = 3
     
     def __init__(self, changeOpNum):
+        super().__init__()
         self.changeOpNum = changeOpNum
         self.colorDict = {0:"green", 1:"red", 2:"purple", 3:None}
         
@@ -74,16 +75,16 @@ class StreamAligner(object):
     - the second element of tuple
     """
     
-    def __init__(self, targetStream=None, sourceStream=None, hasher=None, preHashed=False):
+    def __init__(self, targetStream=None, sourceStream=None, hasher_func=None, preHashed=False):
         self.targetStream = targetStream
         self.sourceStream = sourceStream
         
         self.distanceMatrix = None
         
-        if hasher is None:
-            hasher = self.getDefaultHasher() 
+        if hasher_func is None:
+            hasher_func = self.getDefaultHasher() 
 
-        self.hasher = hasher    
+        self.hasher = hasher_func    
         self.preHashed = preHashed
         
         self.changes = []
@@ -95,6 +96,7 @@ class StreamAligner(object):
         
         self.hashedTargetStream = None
         self.hashedSourceStream = None
+        self.changesCount = None
         
     def getDefaultHasher(self):
         '''
@@ -986,7 +988,8 @@ class Test(unittest.TestCase):
         
     def testOneOffDeletionStream(self):
         '''
-        two streams, both the same, but one has an extra note should have .75 percentage similarity
+        two streams, both the same, but one has an extra note should 
+        have .75 percentage similarity
         '''
         from music21 import stream
         from music21 import note
