@@ -19,6 +19,7 @@ from music21 import interval
 from music21 import note
 
 from music21.braille import lookup
+from music21.common import stringTools
 
 # Add aliases to lookup tables ONLY if it will be used in many different contexts
 # if it is used in only one function, make the alias there.
@@ -1473,15 +1474,26 @@ def wordToBraille(sampleWord, isTextExpression=False):
     """
     wordTrans = []
 
+    def add_letter(letter):
+        if letter in alphabet:
+            wordTrans.append(alphabet[letter])
+        else:
+            l2 = stringTools.stripAccents(letter)
+            if l2 == letter:
+                raise KeyError('Cannot translate ' + letter)
+            wordTrans.append(alphabet['^'])
+            wordTrans.append(alphabet[l2])            
+
+
     if isTextExpression:
         for letter in sampleWord:
             if letter.isupper():
-                wordTrans.append(alphabet[letter.lower()])
+                add_letter(letter.lower())
             elif letter == '.':
                 wordTrans.append(symbols['dot'])
             else:
                 try:
-                    wordTrans.append(alphabet[letter])
+                    add_letter(letter)
                 except KeyError:
                     raise BrailleBasicException(
                         "Character '{0}' in Text Expression '{1}' ".format(letter, sampleWord) +
@@ -1501,12 +1513,12 @@ def wordToBraille(sampleWord, isTextExpression=False):
                 lastCharWasNumber = False
 
             if letter.isupper():
-                wordTrans.append(symbols['uppercase'] + alphabet[letter.lower()])
+                wordTrans.append(symbols['uppercase'])
+                add_letter(letter.lower())
             elif letter.isdigit():
                 wordTrans.append(lookup.numbersUpper[int(letter)])
             else:
-                wordTrans.append(alphabet[letter])
-
+                add_letter(letter)
 
         except KeyError:  # pragma: no cover
             raise BrailleBasicException(

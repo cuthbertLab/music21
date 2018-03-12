@@ -1035,7 +1035,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                 minorScale = scale.MelodicMinorScale(self.key.tonic)
                 n1degree = minorScale.getScaleDegreeFromPitch(
                     self.v2n1, 
-                    direction=scale.DIRECTION_ASCENDING);
+                    direction=scale.DIRECTION_ASCENDING)
 
         else:
             keyScale = None
@@ -1259,10 +1259,10 @@ def getVerticalityFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None
 
     contentDict = {}
     for partNum, partObj in enumerate(scoreObjectIsFrom.parts):
-        elementStream = partObj.flat.getElementsByOffset(offsetOfObject,
+        elementSelection = partObj.flat.getElementsByOffset(offsetOfObject,
                                                          mustBeginInSpan=False,
                                                          classList=classFilterList)
-        for el in elementStream.elements:
+        for el in elementSelection:
             if partNum in contentDict:
                 contentDict[partNum].append(el)
             else:

@@ -549,10 +549,10 @@ class ChoraleListRKBWV:
     8---||---40.8---||---Freuet euch, ihr Christen alle---||---105
     9---||---248.12-2---||---Ermuntre dich, mein schwacher Geist---||---80
     10---||---38.6---||---Aus tiefer Not schrei ich zu dir 1---||---31
-    11---||---41.6---||---Jesu, nun sei gepreiset---||---0
+    11---||---41.6---||---Jesu, nun sei gepreiset---||---203
     12---||---65.2---||---Puer natus in Bethlehem---||---302
     13---||---33.6---||---Allein zu dir, Herr Jesu Christ---||---16
-    14---||---184.5---||---O Herre Gott, dein göttlich Wort---||---0
+    14---||---184.5---||---O Herre Gott, dein göttlich Wort---||---283
     15---||---277---||---Christ lag in Todesbanden---||---38
     16---||---311---||---Es woll uns Gott genädig sein 2---||---95
     17---||---145.5---||---Erschienen ist der herrliche Tag---||---0
@@ -1187,37 +1187,11 @@ class Iterator:
         >>> from music21 import corpus
         >>> BCI = corpus.chorales.Iterator()
         >>> riemenschneider1 = BCI._returnChorale()
-        >>> riemenschneider1.show('text')
-        {0.0} <music21.text.TextBox "BWV 269">
-        {0.0} <music21.text.TextBox "PDF © 2004...">
-        {0.0} <music21.metadata.Metadata object at ...>
-        {0.0} <music21.stream.Part Soprano>
-            {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
-            {0.0} <music21.stream.Measure 0 offset=0.0>
-                {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.key.Key of G major>
-                {0.0} <music21.meter.TimeSignature 3/4>
-                {0.0} <music21.note.Note G>
-        ...
-
         >>> riemenschneider1.metadata.title
         'Aus meines Herzens Grunde'
 
         >>> BCI.currentNumber = BCI.highestNumber
         >>> riemenschneider371 = BCI._returnChorale()
-        >>> riemenschneider371.show('text')
-        {0.0} <music21.text.TextBox "BWV 278">
-        {0.0} <music21.text.TextBox "PDF © 2004...">
-        {0.0} <music21.metadata.Metadata object at ...>
-        {0.0} <music21.stream.Part Soprano>
-            {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
-            {0.0} <music21.stream.Measure 0 offset=0.0>
-                {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.key.Key of e minor>
-                {0.0} <music21.meter.TimeSignature 4/4>
-                {0.0} <music21.note.Note B>
-        ...
-
         >>> riemenschneider371.metadata.title
         'Christ lag in Todesbanden'
 
@@ -1248,19 +1222,6 @@ class Iterator:
 
         >>> BCI.currentNumber += 1
         >>> ausmeines = BCI._returnChorale()
-        >>> ausmeines.show('text')
-        {0.0} <music21.text.TextBox "BWV 269">
-        {0.0} <music21.text.TextBox "PDF © 2004...">
-        {0.0} <music21.metadata.Metadata object at ...>
-        {0.0} <music21.stream.Part Soprano>
-            {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
-            {0.0} <music21.stream.Measure 0 offset=0.0>
-                {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.key.Key of G major>
-                {0.0} <music21.meter.TimeSignature 3/4>
-                {0.0} <music21.note.Note G>
-        ...
-
         >>> ausmeines.metadata.title
         'Aus meines Herzens Grunde'
 
@@ -1271,8 +1232,6 @@ class Iterator:
 
         >>> BCI._returnChorale(3)
         'bach/bwv48.3'
-
-
         '''
         from music21 import corpus
 

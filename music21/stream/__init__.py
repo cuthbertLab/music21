@@ -4135,7 +4135,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             start, end = k
             focus = returnObj.getElementsByOffset(start, end,
                 includeEndBoundary=False, mustFinishInSpan=False,
-                mustBeginInSpan=True)
+                mustBeginInSpan=True).stream()
             trans = i.transposition
             if reverse:
                 trans = trans.reverse()

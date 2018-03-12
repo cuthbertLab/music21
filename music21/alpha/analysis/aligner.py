@@ -9,6 +9,7 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 from collections import Counter
+import enum
 import operator
 import unittest
 
@@ -16,11 +17,6 @@ from music21 import base as base
 from music21 import exceptions21
 from music21 import metadata
 from music21.alpha.analysis import hasher
-
-try:
-    import enum
-except ImportError:
-    from music21.ext import enum
 
 class AlignerException(exceptions21.Music21Exception):
     pass
@@ -49,14 +45,11 @@ class ChangeOps(enum.IntEnum):
     Deletion = 1
     Substitution = 2
     NoChange = 3
-    
-    def __init__(self, changeOpNum):
-        self.changeOpNum = changeOpNum
-        self.colorDict = {0:"green", 1:"red", 2:"purple", 3:None}
         
     @property
     def color(self):
-        return self.colorDict[self.changeOpNum]
+        colorDict = {0: "green", 1: "red", 2: "purple", 3: None}
+        return colorDict[self.value]
 
 class StreamAligner(object):
     """
@@ -74,16 +67,16 @@ class StreamAligner(object):
     - the second element of tuple
     """
     
-    def __init__(self, targetStream=None, sourceStream=None, hasher=None, preHashed=False):
+    def __init__(self, targetStream=None, sourceStream=None, hasher_func=None, preHashed=False):
         self.targetStream = targetStream
         self.sourceStream = sourceStream
         
         self.distanceMatrix = None
         
-        if hasher is None:
-            hasher = self.getDefaultHasher() 
+        if hasher_func is None:
+            hasher_func = self.getDefaultHasher() 
 
-        self.hasher = hasher    
+        self.hasher = hasher_func    
         self.preHashed = preHashed
         
         self.changes = []
@@ -95,6 +88,7 @@ class StreamAligner(object):
         
         self.hashedTargetStream = None
         self.hashedSourceStream = None
+        self.changesCount = None
         
     def getDefaultHasher(self):
         '''
@@ -154,7 +148,8 @@ class StreamAligner(object):
         >>> toBeHashedSouStream.append([note7, note8])
         >>> hashedTarStr = h.hashStream(toBeHashedTarStream)
         >>> hashedSouStr = h.hashStream(toBeHashedSouStream)
-        >>> sa2 = alpha.analysis.aligner.StreamAligner(hashedTarStr, hashedSouStr, preHashed = True)
+        >>> sa2 = alpha.analysis.aligner.StreamAligner(
+        ...             hashedTarStr, hashedSouStr, preHashed=True)
         
         >>> sa2.makeHashedStreams()
         >>> sa1.makeHashedStreams()
@@ -165,9 +160,11 @@ class StreamAligner(object):
         [NoteHash(Pitch=60, Duration=1.0), NoteHash(Pitch=64, Duration=1.0)]
         
         >>> sa2.hashedTargetStream
-        [NoteHash(Pitch=69, Duration=1.0, Offset=0.0), NoteHash(Pitch=71, Duration=1.0, Offset=1.0)]
+        [NoteHash(Pitch=69, Duration=1.0, Offset=0.0), 
+         NoteHash(Pitch=71, Duration=1.0, Offset=1.0)]
         >>> sa2.hashedSourceStream
-        [NoteHash(Pitch=69, Duration=1.0, Offset=0.0), NoteHash(Pitch=67, Duration=1.0, Offset=1.0)]
+        [NoteHash(Pitch=69, Duration=1.0, Offset=0.0), 
+         NoteHash(Pitch=67, Duration=1.0, Offset=1.0)]
         
         '''
         if not self.preHashed:
@@ -221,7 +218,7 @@ class StreamAligner(object):
         >>> sa2.setupDistanceMatrix()
         Traceback (most recent call last):
         music21.alpha.analysis.aligner.AlignerException: 
-        Cannot perform alignment with empty source stream.
+            Cannot perform alignment with empty source stream.
         
         '''
         if not self.hashedTargetStream:
@@ -244,12 +241,13 @@ class StreamAligner(object):
     
     def populateDistanceMatrix(self):
         '''
-        >>> # sets up the distance matrix for backtracing
+        Sets up the distance matrix for backtracing
         
         >>> note1 = note.Note("C#4")
         >>> note2 = note.Note("C4")
         
-        >>> # test 1: similar streams
+        Test 1: similar streams
+        
         >>> targetA = stream.Stream()
         >>> sourceA = stream.Stream()
         >>> targetA.append([note1, note2])
@@ -263,7 +261,8 @@ class StreamAligner(object):
                [2, 0, 2],
                [4, 2, 0]])
         
-        >>> # test 2
+        Second Test
+        
         >>> targetB = stream.Stream()
         >>> sourceB = stream.Stream()
         >>> targetB.append([note1, note2])
@@ -277,7 +276,8 @@ class StreamAligner(object):
                [2, 0],
                [4, 2]])
                
-        >>> # test 3 
+        Third Test
+        
         >>> note3 = note.Note("D5")
         >>> note3.quarterLength = 3
         >>> note4 = note.Note("E3")
@@ -738,9 +738,10 @@ class StreamAligner(object):
         >>> note1 = note.Note("C#4")
         >>> note2 = note.Note("C4")
          
-        >>> # test 1: one insertion, one no change. Target stream has one more note than
-        >>> # source stream, so source stream needs an insertion to match target stream.
-        >>> # should be .5 similarity between the two
+        test 1: one insertion, one no change. Target stream has one more note than
+        source stream, so source stream needs an insertion to match target stream.
+        should be .5 similarity between the two
+        
         >>> targetA = stream.Stream()
         >>> sourceA = stream.Stream()
         >>> targetA.append([note1, note2])
@@ -757,9 +758,10 @@ class StreamAligner(object):
         >>> saA.similarityScore
         0.5
          
-        >>> # test 2: one deletion, one no change. Target stream has one fewer note than
-        >>> # source stream, so source stream needs a deletion to match target stream.
-        >>> # should be .5 similarity between the two
+        test 2: one deletion, one no change. Target stream has one fewer note than
+        source stream, so source stream needs a deletion to match target stream.
+        should be .5 similarity between the two
+        
         >>> targetB = stream.Stream()
         >>> sourceB = stream.Stream()
         >>> targetB.append(note1)
@@ -776,7 +778,8 @@ class StreamAligner(object):
         >>> saB.similarityScore
         0.5
          
-        >>> # test 3: no changes
+        test 3: no changes
+        
         >>> targetC = stream.Stream()
         >>> sourceC = stream.Stream()
         >>> targetC.append([note1, note2])
@@ -791,7 +794,8 @@ class StreamAligner(object):
         >>> saC.similarityScore
         1.0
          
-        >>> # test 4: 1 no change, 1 substitution
+        test 4: 1 no change, 1 substitution
+        
         >>> targetD = stream.Stream()
         >>> sourceD = stream.Stream()
         >>> note3 = note.Note("C4") 
@@ -958,7 +962,7 @@ class Test(unittest.TestCase):
         sa = StreamAligner(target, source)
         sa.align()
         
-        self.assertEqual(sa.similarityScore, 2./3)
+        self.assertEqual(sa.similarityScore, 2/3)
     
     def testSameOneOffStream(self):
         '''
@@ -986,7 +990,8 @@ class Test(unittest.TestCase):
         
     def testOneOffDeletionStream(self):
         '''
-        two streams, both the same, but one has an extra note should have .75 percentage similarity
+        two streams, both the same, but one has an extra note should 
+        have .75 percentage similarity
         '''
         from music21 import stream
         from music21 import note
