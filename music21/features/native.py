@@ -63,11 +63,10 @@ class QualityFeature(featuresModule.FeatureExtractor):
     '''
     Extends the jSymbolic QualityFeature to automatically find mode
 
-    Set to 0 if the key signature indicates that
-    a recording is major, set to 1 if it indicates
-    that it is minor.  A Music21
-    addition: if no key mode is found in the piece, analyze the piece to
-    discover what mode it is most likely in.
+    Set to 0 if the key signature indicates that the score is major,
+    set to 1 if it indicates that it is minor. Music21 addition:
+    if no key mode is found in the piece, analyze the piece using
+    predetermined key profiles to discover what mode it is most likely in.
 
 
     Example: Handel, Rinaldo Aria (musicxml) is explicitly encoded as being in Major:
@@ -105,11 +104,11 @@ class QualityFeature(featuresModule.FeatureExtractor):
 
         self.name = 'Quality'
         self.description = '''
-            Set to 0 if the Key or KeySignature indicates that
-            a recording is major, set to 1 if it indicates
-            that it is minor.
-            Music21 addition: if no key mode is found in the piece, analyze the piece to
-            discover what mode it is most likely in.
+            Set to 0 if the Key or KeySignature indicates that a score
+            is major; set to 1 if it indicates that it is minor.
+            Music21 addition: if no key mode is found in the piece, analyze
+            the piece using predetermined key profiles to discover what mode
+            it is most likely in.
             '''
         self.isSequential = True
         self.dimensions = 1
@@ -166,7 +165,7 @@ class TonalCertainty(featuresModule.FeatureExtractor):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Tonal Certainty'
-        self.description = ('A floating point magnitude value that suggest tonal ' +
+        self.description = ('A floating point magnitude value that suggests tonal ' +
                         'certainty based on automatic key analysis.')
         self.dimensions = 1
         self.discrete = False

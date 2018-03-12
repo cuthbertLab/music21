@@ -523,7 +523,7 @@ class StreamForms:
        'midiPitchHistogram': formMidiPitchHistogram,
        'midiIntervalHistogram': formMidiIntervalHistogram,
        'contourList': formContourList,
-       'analyzedKey': lambda unused, f: f.analyze(method='key'),
+       'analyzedKey': lambda unused, f: f.analyze(method='KrumhanslSchmuckler'),
        'tonalCertainty': lambda unused, foundKey: foundKey.tonalCertainty(),
        'metadata': lambda unused, p: p.metadata,
        'secondsMap': formSecondsMap,
