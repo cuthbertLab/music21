@@ -28,7 +28,6 @@ __all__ = ['ordinals', 'musicOrdinals',
            'almostEquals',
            'addFloatPrecision', 'strTrimFloat',
            'nearestMultiple',
-           'standardDeviation',
 
            'dotMultiplier', 'decimalToTuplet',
            'unitNormalizeProportion', 'unitBoundaryProportion',
@@ -596,29 +595,6 @@ def nearestMultiple(n, unit):
     else:
     #elif n >= (matchHigh - halfUnit) and n <= matchHigh:
         return matchHigh, round(matchHigh - n, 7), round(n - matchHigh, 7)
-
-
-def standardDeviation(coll, bassel=False):
-    '''Given a collection of values, return the standard deviation.
-
-    >>> common.standardDeviation([2, 4, 4, 4, 5, 5, 7, 9])
-    2.0
-    >>> common.standardDeviation([600, 470, 170, 430, 300])
-    147.3227...
-    >>> common.standardDeviation([4, 2, 5, 8, 6], bassel=True)
-    2.23606...
-
-    :rtype: float
-    '''
-    avg = sum(coll) / float(len(coll))
-    diffColl = [math.pow(val - avg, 2) for val in coll]
-    # with a sample standard deviation (not a whole population)
-    # subtract 1 from the length
-    # this is bassel's correction
-    if bassel:
-        return math.sqrt(sum(diffColl) / float(len(diffColl) - 1))
-    else:
-        return math.sqrt(sum(diffColl) / float(len(diffColl)))
 
 
 def dotMultiplier(dots):

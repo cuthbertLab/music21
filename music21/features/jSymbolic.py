@@ -52,8 +52,7 @@ class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Melodic Interval Histogram'
         self.description = ('A features array with bins corresponding to ' +
@@ -81,8 +80,7 @@ class AverageMelodicIntervalFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Average Melodic Interval'
         self.description = 'Average melodic interval (in semitones).'
@@ -112,8 +110,7 @@ class MostCommonMelodicIntervalFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Most Common Melodic Interval'
         self.description = 'Melodic interval with the highest frequency.'
@@ -142,8 +139,7 @@ class DistanceBetweenMostCommonMelodicIntervalsFeature(
     '''
     id = 'M4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Distance Between Most Common Melodic Intervals'
         self.description = ('Absolute value of the difference between the ' +
@@ -179,8 +175,7 @@ class MostCommonMelodicIntervalPrevalenceFeature(
     '''
     id = 'M5'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Most Common Melodic Interval Prevalence'
         self.description = 'Fraction of melodic intervals that belong to the most common interval.'
@@ -209,8 +204,7 @@ class RelativeStrengthOfMostCommonIntervalsFeature(
     '''
     id = 'M6'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Relative Strength of Most Common Intervals'
         self.description = ('Fraction of melodic intervals that belong ' +
@@ -246,8 +240,7 @@ class NumberOfCommonMelodicIntervalsFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M7'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Number of Common Melodic Intervals'
         self.description = ('Number of melodic intervals that represent ' +
@@ -282,8 +275,7 @@ class AmountOfArpeggiationFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M8'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Amount of Arpeggiation'
         self.description = ('Fraction of horizontal intervals that are repeated notes, ' +
@@ -320,8 +312,7 @@ class RepeatedNotesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M9'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Repeated Notes'
         self.description = 'Fraction of notes that are repeated melodically.'
@@ -356,8 +347,7 @@ class ChromaticMotionFeature(featuresModule.FeatureExtractor):
     '''
     id = 'm10'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Chromatic Motion'
         self.description = 'Fraction of melodic intervals corresponding to a semi-tone.'
@@ -392,8 +382,7 @@ class StepwiseMotionFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M11'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Stepwise Motion'
         self.description = ('Fraction of melodic intervals that corresponded ' +
@@ -429,8 +418,7 @@ class MelodicThirdsFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M12'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Melodic Thirds'
         self.description = 'Fraction of melodic intervals that are major or minor thirds.'
@@ -465,8 +453,7 @@ class MelodicFifthsFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M13'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Melodic Fifths'
         self.description = 'Fraction of melodic intervals that are perfect fifths.'
@@ -501,8 +488,7 @@ class MelodicTritonesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M14'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Melodic Tritones'
         self.description = 'Fraction of melodic intervals that are tritones.'
@@ -537,8 +523,7 @@ class MelodicOctavesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M15'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Melodic Octaves'
         self.description = 'Fraction of melodic intervals that are octaves.'
@@ -574,8 +559,7 @@ class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
     '''
     id = 'm17'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Direction of Motion'
         self.description = 'Fraction of melodic intervals that are rising rather than falling.'
@@ -607,30 +591,45 @@ class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
 
 class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     '''
-    Average number of notes that separate melodic peaks and troughs in any channel.
+    Average number of notes that separate melodic peaks and troughs
+    in any part. This is calculated as the total number of intervals
+    (not counting unisons) divided by the number of times the melody
+    changes direction.
+    
+    Example: C D E D C E D C C
+    Intervals: [0] 2 2 -2 -2 2 2 -4 0
+    Changes direction (equivalent to +/- sign) three times.
+    There are seven non-unison (nonzero) intervals.
+    Thus the duration of arcs is 7/3 ~= 2.333...
+    >>> s = converter.parse("tinyNotation: c' d' e' d' c' d' e'2 c'2 c'2")
+    >>> fe = features.jSymbolic.DurationOfMelodicArcsFeature(s)
+    >>> fe.extract().vector
+    [2.333...]
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.DurationOfMelodicArcsFeature(s)
-    >>> f = fe.extract()
-    >>> f.vector
-    [10.28...]
+    >>> fe.extract().vector
+    [1.74...]
     '''
     id = 'M18'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Duration of Melodic Arcs'
-        self.description = ('Average number of notes that separate melodic peaks and ' +
-            'troughs in any channel.')
+        self.description = ('Average number of notes that separate melodic ' +
+            'peaks and troughs in any part. This is calculated as the ' +
+            'total number of intervals (not counting unisons) divided ' +
+            'by the number of times the melody changes direction.')
         self.isSequential = True
         self.dimensions = 1
 
     def process(self):
         '''Do processing necessary, storing result in feature.
         '''
-        #rising = 0
-        #falling = 0
+        # `cList` contains a list of melodic intervals in a part.
+        # For example, C4 E4 G4 E4 C4 results in a cList of [4, 3, -3, -4].
+        # Each part is encoded in a separate cList; cBundle contains all
+        # the cList arrays.
         cBundle = []
         if self.data.partsCount > 0:
             for i in range(self.data.partsCount):
@@ -640,61 +639,78 @@ class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
             cList = self.data['contourList']
             cBundle.append(cList)
 
-        spanList = [] # for averaging
+        direction_changes = 0
+        nonunison_intervals = 0
+        # For each part, count how many times the direction changes
+        # by looking at the sign of the interval.
+        ASCENDING = 1
+        DESCENDING = -1
+        STATIONARY = 0
         for cList in cBundle:
-            pos = 0
-            posList = [pos]
-            for c in cList:
-                pos += c
-                posList.append(pos)
-
-            environLocal.printDebug(['posList', posList])
-            # get start to max, any max to min, and to end
-            peak = max(posList)
-            trough = min(posList)
-            count = 0
-            store = False
-            environLocal.printDebug(['trough, peak', trough, peak])
-
-            for i, val in enumerate(posList):
-                count += 1
-                if i == 0: # first
-                    count -= 1 # remove first
-                elif i == len(posList) - 1: # last
-                    store = True
-                elif val == peak or val == trough:
-                    store = True
-                # if store, then clear
-                #environLocal.printDebug([i, 'count', count, 'store', store])
-                if store:
-                    span = count - 1 # remove this matched value
-                    if span > 0:
-                        spanList.append(span)
-                    count = 0
-                    store = False
-            #environLocal.printDebug(['spanList', spanList])
-        self.feature.vector[0] = sum(spanList) / float(len(spanList))
+            current_direction = STATIONARY
+            for interval in cList:
+                if interval != 0:
+                    nonunison_intervals += 1
+                if current_direction == ASCENDING:
+                    if interval < 0:
+                        direction_changes += 1
+                        current_direction = DESCENDING
+                elif current_direction == DESCENDING:
+                    if interval > 0:
+                        direction_changes += 1
+                        current_direction = ASCENDING
+                else:  # if we begin stationary
+                    if interval > 0:
+                        current_direction = ASCENDING
+                    elif interval < 0:
+                        current_direction = DESCENDING
+        # Duration of melodic arcs is 0 if it never changes direction
+        if direction_changes == 0:
+            duration_of_melodic_arcs = 0
+        else:
+            duration_of_melodic_arcs = nonunison_intervals / direction_changes
+        self.feature.vector[0] = duration_of_melodic_arcs
 
 
 class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     '''
-    Average melodic interval separating the top note of melodic peaks and the
-    bottom note of melodic troughs.
+    Average span (in semitones) between melodic peaks and troughs
+    in any part. Each time the melody changes direction begins a
+    new arc. The average size of melodic arcs is defined as the
+    total size of melodic intervals between changes of directions -
+    or between the start of the melody and the first change of
+    direction - divided by the number of direction changes.
+    
+    Example: C D E D C E D C C
+    Intervals: [0] 2 2 -2 -2 2 2 -4 0
+    Changes direction (equivalent to +/- sign) three times.
+    The total sum of interval distance up to the last change
+    of direction is 12. We don't count the last interval,
+    the descending major third, because it is not between
+    changes of direction. 
+    Thus the average size of melodic arcs is 12/3 = 4.
+    >>> s = converter.parse("tinyNotation: c' d' e' d' c' d' e'2 c'2 c'2")
+    >>> fe = features.jSymbolic.SizeOfMelodicArcsFeature(s)
+    >>> fe.extract().vector
+    [4.0]
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.SizeOfMelodicArcsFeature(s)
-    >>> f = fe.extract()
-    >>> f.vector
-    [14.5]
+    >>> fe.extract().vector
+    [4.84...]
     '''
     id = 'M19'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Size of Melodic Arcs'
-        self.description = ('Average melodic interval separating the top note of melodic ' +
-                            'peaks and the bottom note of melodic troughs.')
+        self.description = ('Average span (in semitones) between melodic peaks '+
+                            'and troughs in any part. Each time the melody changes ' +
+                            'direction begins a new arc. The average size of' +
+                            'melodic arcs is defined as the total size of melodic' +
+                            'intervals between changes of directions - or between'
+                            'the start of the melody and the first change of' +
+                            'direction - divided by the number of direction changes.')
         self.isSequential = True
         self.dimensions = 1
 
@@ -702,8 +718,10 @@ class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     def process(self):
         '''Do processing necessary, storing result in feature.
         '''
-        #rising = 0
-        #falling = 0
+        # `cList` contains a list of melodic intervals in a part.
+        # For example, C4 E4 G4 E4 C4 results in a cList of [4, 3, -3, -4].
+        # Each part is encoded in a separate cList; cBundle contains all
+        # the cList arrays.
         cBundle = []
         if self.data.partsCount > 0:
             for i in range(self.data.partsCount):
@@ -713,19 +731,51 @@ class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
             cList = self.data['contourList']
             cBundle.append(cList)
 
-        spanList = [] # for averaging
+        direction_changes = 0
+        sum_of_intervals = 0
+        # For each part, count how many times the direction changes
+        # by looking at the sign of the interval.
+        ASCENDING = 1
+        DESCENDING = -1
+        STATIONARY = 0
         for cList in cBundle:
-            pos = 0
-            posList = [pos]
-            for c in cList:
-                pos += c
-                posList.append(pos)
-            environLocal.printDebug(['posList', posList])
-            peak = max(posList)
-            trough = min(posList)
-            spanList.append(peak-trough)
-        environLocal.printDebug(['spanList', spanList])
-        self.feature.vector[0] = sum(spanList) / float(len(spanList))
+            current_direction = STATIONARY
+            this_arc_interval = 0
+            for interval in cList:
+                if current_direction == ASCENDING:
+                    if interval > 0:
+                        this_arc_interval += abs(interval)
+                    elif interval < 0:
+                        # total interval before the change gets added
+                        sum_of_intervals += this_arc_interval
+                        direction_changes += 1
+                        current_direction = DESCENDING
+                        # start fresh with the new arc on this interval
+                        this_arc_interval = abs(interval)
+                elif current_direction == DESCENDING:
+                    if interval < 0:
+                        this_arc_interval += abs(interval)
+                    elif interval > 0:
+                        # total interval before the change gets added
+                        sum_of_intervals += this_arc_interval
+                        direction_changes += 1
+                        current_direction = ASCENDING
+                        # start fresh with the new arc on this interval
+                        this_arc_interval = abs(interval)
+                else:  # if we begin stationary
+                    if interval > 0:
+                        current_direction = ASCENDING
+                        this_arc_interval += abs(interval)
+                    elif interval < 0:
+                        current_direction = DESCENDING
+                        this_arc_interval += abs(interval)
+
+        # If it never changes direction, the size of melodic arcs is defined to be 0
+        if direction_changes == 0:
+            size_of_melodic_arcs = 0
+        else:
+            size_of_melodic_arcs = sum_of_intervals / direction_changes
+        self.feature.vector[0] = size_of_melodic_arcs
 
 
 
@@ -741,12 +791,11 @@ class MostCommonPitchPrevalenceFeature(featuresModule.FeatureExtractor):
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MostCommonPitchPrevalenceFeature(s)
     >>> fe.extract().vector[0]
-    0.11...
+    0.116...
     '''
     id = 'P1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Most Common Pitch Prevalence'
         self.description = 'Fraction of Note Ons corresponding to the most common pitch.'
@@ -773,12 +822,11 @@ class MostCommonPitchClassPrevalenceFeature(featuresModule.FeatureExtractor):
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MostCommonPitchClassPrevalenceFeature(s)
     >>> fe.extract().vector
-    [0.19...]
+    [0.196...]
     '''
     id = 'P2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Most Common Pitch Class Prevalence'
         self.description = 'Fraction of Note Ons corresponding to the most common pitch class.'
@@ -798,7 +846,6 @@ class MostCommonPitchClassPrevalenceFeature(featuresModule.FeatureExtractor):
         self.feature.vector[0] = histo[pc] / float(pcCount)
 
 
-
 class RelativeStrengthOfTopPitchesFeature(featuresModule.FeatureExtractor):
     '''
     The frequency of the 2nd most common pitch divided by the frequency of the most common pitch.
@@ -806,12 +853,11 @@ class RelativeStrengthOfTopPitchesFeature(featuresModule.FeatureExtractor):
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.RelativeStrengthOfTopPitchesFeature(s)
     >>> fe.extract().vector
-    [0.94...]
+    [0.947...]
     '''
     id = 'P3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Relative Strength of Top Pitches'
         self.description = ('The frequency of the 2nd most common pitch ' +
@@ -834,19 +880,17 @@ class RelativeStrengthOfTopPitchesFeature(featuresModule.FeatureExtractor):
             self.feature.vector[0] = 0.0
 
 
-
 class RelativeStrengthOfTopPitchClassesFeature(featuresModule.FeatureExtractor):
     '''
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.RelativeStrengthOfTopPitchClassesFeature(s)
     >>> fe.extract().vector
-    [0.90...]
+    [0.906...]
     '''
     id = 'P4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Relative Strength of Top Pitch Classes'
         self.description = ('The frequency of the 2nd most common pitch class ' +
@@ -883,8 +927,7 @@ class IntervalBetweenStrongestPitchesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P5'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Interval Between Strongest Pitches'
         self.description = ('Absolute value of the difference between ' +
@@ -918,8 +961,7 @@ class IntervalBetweenStrongestPitchClassesFeature(
     id = 'P6'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Interval Between Strongest Pitch Classes'
         self.description = ('Absolute value of the difference between the pitch ' +
@@ -955,8 +997,7 @@ class NumberOfCommonPitchesFeature(featuresModule.FeatureExtractor):
     id = 'P7'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Number of Common Pitches'
         self.description = ('Number of pitches that account individually ' +
@@ -988,8 +1029,7 @@ class PitchVarietyFeature(featuresModule.FeatureExtractor):
     id = 'P8'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Pitch Variety'
         self.description = 'Number of pitches used at least once.'
@@ -1019,8 +1059,7 @@ class PitchClassVarietyFeature(featuresModule.FeatureExtractor):
     id = 'P9'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Pitch Class Variety'
         self.description = 'Number of pitch classes used at least once.'
@@ -1050,8 +1089,7 @@ class RangeFeature(featuresModule.FeatureExtractor):
     id = 'P10'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Range'
         self.description = 'Difference between highest and lowest pitches.'
@@ -1079,8 +1117,7 @@ class MostCommonPitchFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P11'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Most Common Pitch'
         self.description = ('Bin label of the most common pitch.')
@@ -1111,8 +1148,7 @@ class PrimaryRegisterFeature(featuresModule.FeatureExtractor):
     id = 'P12'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Primary Register'
         self.description = 'Average MIDI pitch.'
@@ -1139,8 +1175,7 @@ class ImportanceOfBassRegisterFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P13'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Importance of Bass Register'
         self.description = 'Fraction of Note Ons between MIDI pitches 0 and 54.'
@@ -1173,8 +1208,7 @@ class ImportanceOfMiddleRegisterFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P14'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Importance of Middle Register'
         self.description = 'Fraction of Note Ons between MIDI pitches 55 and 72.'
@@ -1208,8 +1242,7 @@ class ImportanceOfHighRegisterFeature(featuresModule.FeatureExtractor):
     id = 'P15'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Importance of High Register'
         self.description = 'Fraction of Note Ons between MIDI pitches 73 and 127.'
@@ -1242,8 +1275,7 @@ class MostCommonPitchClassFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P16'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Most Common Pitch Class'
         self.description = 'Bin label of the most common pitch class.'
@@ -1269,8 +1301,7 @@ class DominantSpreadFeature(featuresModule.FeatureExtractor):
     id = 'P17'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Dominant Spread'
         self.description = ('Largest number of consecutive pitch classes separated by ' +
@@ -1293,8 +1324,7 @@ class StrongTonalCentresFeature(featuresModule.FeatureExtractor):
     id = 'P18'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Strong Tonal Centres'
         self.description = ('Number of peaks in the fifths pitch histogram that each account ' +
@@ -1331,8 +1361,7 @@ class BasicPitchHistogramFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P19'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Basic Pitch Histogram'
         self.description = ('A features array with bins corresponding to the ' +
@@ -1365,8 +1394,7 @@ class PitchClassDistributionFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P20'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Pitch Class Distribution'
         self.description = ('A feature array with 12 entries where the first holds ' +
@@ -1411,8 +1439,7 @@ class FifthsPitchHistogramFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P21'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Fifths Pitch Histogram'
         self.description = ('A feature array with bins corresponding to the values of the ' +
@@ -1458,8 +1485,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
     id = 'P22'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Quality'
         self.description = '''
@@ -1497,8 +1523,7 @@ class GlissandoPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P23'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Glissando Prevalence'
         self.description = ('Number of Note Ons that have at least one MIDI Pitch Bend ' +
@@ -1521,8 +1546,7 @@ class AverageRangeOfGlissandosFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P24'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Average Range Of Glissandos'
         self.description = ('Average range of MIDI Pitch Bends, where "range" is ' +
@@ -1548,8 +1572,7 @@ class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P25'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Vibrato Prevalence'
         self.description = ('Number of notes for which Pitch Bend messages change ' +
@@ -1611,8 +1634,7 @@ class StrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
 
     id = 'R1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Strongest Rhythmic Pulse'
         self.description = 'Bin label of the beat bin with the highest frequency.'
@@ -1645,8 +1667,7 @@ class SecondStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Second Strongest Rhythmic Pulse'
         self.description = ('Bin label of the beat bin of the peak ' +
@@ -1685,8 +1706,7 @@ class HarmonicityOfTwoStrongestRhythmicPulsesFeature(
     '''
     id = 'R3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Harmonicity of Two Strongest Rhythmic Pulses'
         self.description = ('The bin label of the higher (in terms of bin label) of the ' +
@@ -1717,8 +1737,7 @@ class StrengthOfStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Strength of Strongest Rhythmic Pulse'
         self.description = 'Frequency of the beat bin with the highest frequency.'
@@ -1744,8 +1763,7 @@ class StrengthOfSecondStrongestRhythmicPulseFeature(
     '''
     id = 'R5'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Strength of Second Strongest Rhythmic Pulse'
         self.description = ('Frequency of the beat bin of the peak ' +
@@ -1781,8 +1799,7 @@ class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(
     '''
     id = 'R6'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Strength Ratio of Two Strongest Rhythmic Pulses'
         self.description = ('The frequency of the higher (in terms of frequency) of the two ' +
@@ -1816,8 +1833,7 @@ class CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(
     '''
     id = 'R7'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Combined Strength of Two Strongest Rhythmic Pulses'
         self.description = ('The sum of the frequencies of the two beat bins ' +
@@ -1846,8 +1862,7 @@ class NumberOfStrongPulsesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R8'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Number of Strong Pulses'
         self.description = 'Number of beat peaks with normalized frequencies over 0.1.'
@@ -1867,8 +1882,7 @@ class NumberOfModeratePulsesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R9'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Number of Moderate Pulses'
         self.description = 'Number of beat peaks with normalized frequencies over 0.01.'
@@ -1889,8 +1903,7 @@ class NumberOfRelativelyStrongPulsesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R10'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Number of Relatively Strong Pulses'
         self.description = '''Number of beat peaks with frequencies at least 30% as high as
@@ -1901,7 +1914,7 @@ class NumberOfRelativelyStrongPulsesFeature(featuresModule.FeatureExtractor):
 
 class RhythmicLoosenessFeature(featuresModule.FeatureExtractor):
     '''
-    TODO: implement
+    not yet implemented
 
     Average width of beat histogram peaks (in beats per minute).
     Width is measured for all peaks with frequencies at least 30% as high as the highest peak,
@@ -1910,8 +1923,7 @@ class RhythmicLoosenessFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R11'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Rhythmic Looseness'
         self.description = '''Average width of beat histogram peaks (in beats per minute).
@@ -1967,8 +1979,7 @@ class RhythmicVariabilityFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R13'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Rhythmic Variability'
         self.description = 'Standard deviation of the bin values (except the first 40 empty ones).'
@@ -1991,8 +2002,7 @@ class BeatHistogramFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R14'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Beat Histogram'
         self.description = ('A feature array with entries corresponding to the ' +
@@ -2023,8 +2033,7 @@ class NoteDensityFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R15'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Note Density'
         self.description = 'Average number of notes per second.'
@@ -2063,8 +2072,7 @@ class AverageNoteDurationFeature(featuresModule.FeatureExtractor):
     
     id = 'R17'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Average Note Duration'
         self.description = 'Average duration of notes in seconds.'
@@ -2099,8 +2107,7 @@ class VariabilityOfNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R18'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Variability of Note Duration'
         self.description = 'Standard deviation of note durations in seconds.'
@@ -2128,8 +2135,7 @@ class MaximumNoteDurationFeature(featuresModule.FeatureExtractor):
 
     id = 'R19'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Maximum Note Duration'
         self.description = 'Duration of the longest note (in seconds).'
@@ -2157,8 +2163,7 @@ class MinimumNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R20'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Minimum Note Duration'
         self.description = 'Duration of the shortest note (in seconds).'
@@ -2189,8 +2194,7 @@ class StaccatoIncidenceFeature(featuresModule.FeatureExtractor):
 
     id = 'R21'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Staccato Incidence'
         self.description = ('Number of notes with durations of less than a 10th ' +
@@ -2215,15 +2219,14 @@ class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
     >>> for p in s.parts:
     ...     p.insert(0, tempo.MetronomeMark(number=120))
     >>> fe = features.jSymbolic.AverageTimeBetweenAttacksFeature(s)
-    >>> v = fe.extract().vector
-    >>> print(round(v[0], 2))
-    0.35
+    >>> f = fe.extract()
+    >>> print(f.vector)
+    [0.35]
     '''
 
     id = 'R22'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Average Time Between Attacks'
         self.description = 'Average time in seconds between Note On events (regardless of channel).'
@@ -2232,14 +2235,16 @@ class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
 
     def process(self):
         secondsMap = self.data['flat.secondsMap']
+        # Get a list of note onset times
         onsets = [bundle['offsetSeconds'] for bundle in secondsMap]
-        onsets.sort() # may already be sorted?
+        onsets.sort()  # may already be sorted?
+        # Create a list of difference in time offset between consecutive notes
         differences = []
         for i, o in enumerate(onsets):
-            if i == len(onsets) - 1: # last
+            if i == len(onsets) - 1:  # stop before the last
                 break
             oNext = onsets[i + 1]
-            # not including simultaneous attacks
+            # Don't include simultaneous attacks
             dif = oNext-o
             if not common.almostEquals(dif, 0.0):
                 differences.append(dif)
@@ -2252,15 +2257,14 @@ class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.VariabilityOfTimeBetweenAttacksFeature(s)
-    >>> v = fe.extract().vector
-    >>> print(round(v[0], 2))
-    0.15
+    >>> f = fe.extract()
+    >>> print(f.vector)
+    [0.15]
     '''
 
     id = 'R23'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Variability of Time Between Attacks'
         self.description = ('Standard deviation of the times, in seconds, ' +
@@ -2270,20 +2274,19 @@ class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
 
     def process(self):
         secondsMap = self.data['flat.secondsMap']
+        # Create a list of difference in time offset between consecutive notes
         onsets = [bundle['offsetSeconds'] for bundle in secondsMap]
-        onsets.sort() # may already be sorted?
+        onsets.sort()  # may already be sorted?
         differences = []
         for i, o in enumerate(onsets):
-            if i == len(onsets) - 1: # last
+            if i == len(onsets) - 1:  # stop before the last
                 break
             oNext = onsets[i + 1]
-            # not including simultaneous attacks
+            # Don't include simultaneous attacks
             dif = oNext-o
             if not common.almostEquals(dif, 0.0):
                 differences.append(dif)
-        self.feature.vector[0] = common.standardDeviation(differences,
-                                  bassel=False)
-
+        self.feature.vector[0] = statistics.pstdev(differences)
 
 
 class AverageTimeBetweenAttacksForEachVoiceFeature(
@@ -2292,17 +2295,17 @@ class AverageTimeBetweenAttacksForEachVoiceFeature(
     Average of average times in seconds between Note On events on individual channels
     that contain at least one note.
 
-
     >>> s = corpus.parse('bwv66.6')
+    >>> for p in s.parts:
+    ...     p.insert(0, tempo.MetronomeMark(number=120))
     >>> fe = features.jSymbolic.AverageTimeBetweenAttacksForEachVoiceFeature(s)
     >>> f = fe.extract()
-    >>> f.vector
-    [0.4428...]
+    >>> print(f.vector[0])
+    0.442...
     '''
     id = 'R24'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Average Time Between Attacks For Each Voice'
         self.description = ('Average of average times in seconds between Note On events ' +
@@ -2322,15 +2325,16 @@ class AverageTimeBetweenAttacksForEachVoiceFeature(
             secondsMap = self.data['flat.secondsMap']
             onsets = [bundle['offsetSeconds'] for bundle in secondsMap]
             onsetsByPart.append(onsets)
-
+            
         for onsets in onsetsByPart:
-            onsets.sort() # may already be sorted?
+            # Create a list of difference in time offset between consecutive notes
+            onsets.sort()  # may already be sorted?
             differences = []
             for i, o in enumerate(onsets):
-                if i == len(onsets) - 1: # last
+                if i == len(onsets) - 1:  # stop before the last
                     break
                 oNext = onsets[i + 1]
-                # not including simultaneous attacks
+                # Don't include simultaneous attacks
                 dif = oNext-o
                 if not common.almostEquals(dif, 0.0):
                     differences.append(dif)
@@ -2346,15 +2350,17 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
     channels that contain at least one note.
 
     >>> s = corpus.parse('bwv66.6')
+    >>> for p in s.parts:
+    ...     p.insert(0, tempo.MetronomeMark(number=120))
     >>> fe = features.jSymbolic.AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [0.1773926...]
+    [0.177...]
     '''
+
     id = 'R25'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Average Variability of Time Between Attacks For Each Voice'
         self.description = ('Average standard deviation, in seconds, of time between ' +
@@ -2378,17 +2384,18 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
             onsetsByPart.append(onsets)
 
         for onsets in onsetsByPart:
-            onsets.sort() # may already be sorted?
+            # Create a list of difference in time offset between consecutive notes
+            onsets.sort()  # may already be sorted?
             differences = []
             for i, o in enumerate(onsets):
-                if i == len(onsets) - 1: # last
+                if i == len(onsets) - 1:  # stop before the last
                     break
                 oNext = onsets[i + 1]
-                dif = oNext-o # not including simultaneous attacks
+                dif = oNext - o
+                # Don't include simultaneous attacks
                 if not common.almostEquals(dif, 0.0):
                     differences.append(dif)
-            stdDeviationByPart.append(common.standardDeviation(differences,
-                                                               bassel=False))
+            stdDeviationByPart.append(statistics.pstdev(differences))
         self.feature.vector[0] = (sum(stdDeviationByPart) /
                                    len(stdDeviationByPart))
 
@@ -2476,8 +2483,7 @@ class InitialTempoFeature(featuresModule.FeatureExtractor):
 
     id = 'R30'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Initial Tempo'
         self.description = 'Tempo in beats per minute at the start of the recording.'
@@ -2513,8 +2519,7 @@ class InitialTimeSignatureFeature(featuresModule.FeatureExtractor):
 
     id = 'R31'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Initial Time Signature'
         self.description = ('A feature array with two elements. ' +
@@ -2561,8 +2566,7 @@ class CompoundOrSimpleMeterFeature(featuresModule.FeatureExtractor):
 
     id = 'R32'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Compound Or Simple Meter'
         self.description = ('Set to 1 if the initial meter is compound ' +
@@ -2611,8 +2615,7 @@ class TripleMeterFeature(featuresModule.FeatureExtractor):
 
     id = 'R33'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Triple Meter'
         self.description = ('Set to 1 if numerator of initial time signature is 3, ' +
@@ -2652,8 +2655,7 @@ class QuintupleMeterFeature(featuresModule.FeatureExtractor):
 
     id = 'R34'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Quintuple Meter'
         self.description = ('Set to 1 if numerator of initial time signature is 5, ' +
@@ -2693,8 +2695,7 @@ class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R35'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Changes of Meter'
         self.description = ('Set to 1 if the time signature is changed one or more ' +
@@ -2726,8 +2727,7 @@ class DurationFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R36'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Duration'
         self.description = 'The total duration in seconds of the music.'
@@ -2759,8 +2759,7 @@ class OverallDynamicRangeFeature(featuresModule.FeatureExtractor):
     id = 'D1'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Overall Dynamic Range'
         self.description = 'The maximum loudness minus the minimum loudness value.'
@@ -2780,8 +2779,7 @@ class VariationOfDynamicsFeature(featuresModule.FeatureExtractor):
     '''
     id = 'D2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Variation of Dynamics'
         self.description = 'Standard deviation of loudness levels of all notes.'
@@ -2803,8 +2801,7 @@ class VariationOfDynamicsInEachVoiceFeature(featuresModule.FeatureExtractor):
     id = 'D3'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Variation of Dynamics In Each Voice'
         self.description = ('The average of the standard deviations of loudness ' +
@@ -2824,10 +2821,10 @@ class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
     TODO: implement
 
     '''
+
     id = 'D4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Average Note To Note Dynamics Change'
         self.description = ('Average change of loudness from one note to the next note ' +
@@ -2837,15 +2834,13 @@ class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
 
 
 
-
-
 #-------------------------------------------------------------------------------
 # texture based
+
 
 class MaximumNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     '''
     Maximum number of different channels in which notes have sounded simultaneously.
-
     Here, Parts are treated as channels.
 
     >>> s = corpus.parse('handel/rinaldo/lascia_chio_pianga')
@@ -2859,12 +2854,11 @@ class MaximumNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     >>> f = fe.extract()
     >>> f.vector
     [4]
-
     '''
+    
     id = 'T1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Maximum Number of Independent Voices'
         self.description = ('Maximum number of different channels in which notes ' +
@@ -2906,8 +2900,7 @@ class AverageNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Average Number of Independent Voices'
         self.description = ('Average number of different channels in which notes have ' +
@@ -2945,8 +2938,7 @@ class VariabilityOfNumberOfIndependentVoicesFeature(
     '''
     id = 'T3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Variability of Number of Independent Voices'
         self.description = ('Standard deviation of number of different channels ' +
@@ -2966,7 +2958,7 @@ class VariabilityOfNumberOfIndependentVoicesFeature(
                 for gSub in p.groups:
                     g.append(gSub) # add to temporary group; will act as a set
             found.append(len(g))
-        self.feature.vector[0] = common.standardDeviation(found, bassel=False)
+        self.feature.vector[0] = statistics.pstdev(found)
 
 
 class VoiceEqualityNumberOfNotesFeature(featuresModule.FeatureExtractor):
@@ -2982,8 +2974,7 @@ class VoiceEqualityNumberOfNotesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Voice Equality - Number of Notes'
         self.description = ('Standard deviation of the total number of Note Ons ' +
@@ -3002,8 +2993,7 @@ class VoiceEqualityNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T5'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Voice Equality - Note Duration'
         self.description = ('Standard deviation of the total duration of notes in seconds ' +
@@ -3023,8 +3013,7 @@ class VoiceEqualityDynamicsFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T6'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Voice Equality - Dynamics'
         self.description = ('Standard deviation of the average volume of notes ' +
@@ -3044,8 +3033,7 @@ class VoiceEqualityMelodicLeapsFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T7'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Voice Equality - Melodic Leaps'
         self.description = '''Standard deviation of the average melodic leap in MIDI pitches
@@ -3063,8 +3051,7 @@ class VoiceEqualityRangeFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T8'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Voice Equality - Range'
         self.description = '''Standard deviation of the differences between the
@@ -3084,8 +3071,7 @@ class ImportanceOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T9'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Importance of Loudest Voice'
         self.description = '''Difference between the average loudness of the loudest channel
@@ -3107,8 +3093,7 @@ class RelativeRangeOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T10'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Relative Range of Loudest Voice'
         self.description = '''Difference between the highest note and the lowest note
@@ -3130,8 +3115,7 @@ class RangeOfHighestLineFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T12'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Range of Highest Line'
         self.description = '''Difference between the highest note and the lowest note
@@ -3154,8 +3138,7 @@ class RelativeNoteDensityOfHighestLineFeature(featuresModule.FeatureExtractor):
     id = 'T13'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Relative Note Density of Highest Line'
         self.description = '''Number of Note Ons in the channel with the highest average
@@ -3176,8 +3159,7 @@ class MelodicIntervalsInLowestLineFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T15'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Melodic Intervals in Lowest Line'
         self.description = '''Average melodic interval in semitones of the channel
@@ -3196,8 +3178,7 @@ class VoiceSeparationFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T20'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Voice Separation'
         self.description = '''Average separation in semi-tones between the average pitches of
@@ -3205,8 +3186,6 @@ class VoiceSeparationFeature(featuresModule.FeatureExtractor):
         least one note.'''
         self.isSequential = True
         self.dimensions = 1
-
-
 
 
 
@@ -3236,8 +3215,7 @@ class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
     '''
     id = 'I1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Pitched Instruments Present'
         self.description = '''Which pitched General MIDI Instruments are present.
@@ -3284,8 +3262,7 @@ class UnpitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
     id = 'I2'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Unpitched Instruments Present'
         self.description = '''Which unpitched MIDI Percussion Key Map instruments are present.
@@ -3323,8 +3300,7 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
     '''
     id = 'I3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Note Prevalence of Pitched Instruments'
         self.description = ('The fraction of (pitched) notes played by each ' +
@@ -3363,8 +3339,7 @@ class NotePrevalenceOfUnpitchedInstrumentsFeature(
     '''
     id = 'I4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Note Prevalence of Unpitched Instruments'
         self.description = '''The fraction of (unpitched) notes played by each General MIDI
@@ -3384,7 +3359,6 @@ class TimePrevalenceOfPitchedInstrumentsFeature(
     '''
     Not implemented
 
-
     The fraction of the total time of the recording in
     which a note was sounding for each (pitched) General
     MIDI Instrument. There is one entry for each instrument,
@@ -3397,8 +3371,7 @@ class TimePrevalenceOfPitchedInstrumentsFeature(
     '''
     id = 'I5'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Time Prevalence of Pitched Instruments'
         self.description = ('The fraction of the total time of the recording in which a note ' +
@@ -3430,8 +3403,7 @@ class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
     '''
     id = 'I6'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Variability of Note Prevalence of Pitched Instruments'
         self.description = ('Standard deviation of the fraction of Note Ons played ' +
@@ -3475,8 +3447,7 @@ class VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature(
     '''
     id = 'I7'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Variability of Note Prevalence of Unpitched Instruments'
         self.description = (
@@ -3491,6 +3462,7 @@ class VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature(
 
 class NumberOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
     '''
+    Total number of General MIDI patches that are used to play at least one note.
 
     >>> s1 = stream.Stream()
     >>> s1.append(instrument.AcousticGuitar())
@@ -3504,8 +3476,7 @@ class NumberOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
     '''
     id = 'I8'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Number of Pitched Instruments'
         self.description = ('Total number of General MIDI patches that are used to ' +
@@ -3525,13 +3496,9 @@ class NumberOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
         self.feature.vector[0] = count
 
 
-
-
-
 class NumberOfUnpitchedInstrumentsFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
-
 
     Number of distinct MIDI Percussion Key Map patches that were used to play at
     least one note. It should be noted that only instruments 35 to 81 are
@@ -3539,10 +3506,10 @@ class NumberOfUnpitchedInstrumentsFeature(featuresModule.FeatureExtractor):
 
     TODO: implement
     '''
+
     id = 'I9'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Number of Unpitched Instruments'
         self.description = ('Number of distinct MIDI Percussion Key Map patches that were ' +
@@ -3564,15 +3531,13 @@ class PercussionPrevalenceFeature(featuresModule.FeatureExtractor):
 
     id = 'I10'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Percussion Prevalence'
         self.description = ('Total number of Note Ons corresponding to unpitched percussion ' +
                             'instruments divided by total number of Note Ons in the recording.')
         self.isSequential = True
         self.dimensions = 1
-
 
 
 
@@ -3584,8 +3549,7 @@ class InstrumentFractionFeature(featuresModule.FeatureExtractor):
     look at the proportional usage of an Insutrment
     '''
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream,
-                                                 *arguments, **keywords)
+        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         # subclasses must define
         self._targetPrograms = []
@@ -3714,7 +3678,10 @@ class ViolinFractionFeature(InstrumentFractionFeature):
 
 class SaxophoneFractionFeature(InstrumentFractionFeature):
     '''
-
+    Fraction of all Note Ons belonging to saxophone patches (General MIDI
+    patches 65 through 68).
+    # NOTE: incorrect
+    
     >>> s1 = stream.Stream()
     >>> s1.append(instrument.SopranoSaxophone())
     >>> s1.repeatAppend(note.Note(), 6)
@@ -3723,7 +3690,6 @@ class SaxophoneFractionFeature(InstrumentFractionFeature):
     >>> fe = features.jSymbolic.SaxophoneFractionFeature(s1)
     >>> print(fe.extract().vector[0])
     0.6
-
     '''
     id = 'I15'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -3731,11 +3697,12 @@ class SaxophoneFractionFeature(InstrumentFractionFeature):
 
         self.name = 'Saxophone Fraction'
         self.description = ('Fraction of all Note Ons belonging to saxophone patches ' +
-                            '(GeneralMIDI patches 65 through 68).') # note : incorrect
+                            '(General MIDI patches 65 through 68).')
         self.isSequential = True
         self.dimensions = 1
 
         self._targetPrograms = [64, 65, 66, 67]
+
 
 class BrassFractionFeature(InstrumentFractionFeature):
     '''
@@ -3753,22 +3720,25 @@ class BrassFractionFeature(InstrumentFractionFeature):
     >>> print(fe.extract().vector[0])
     0.4
     '''
+
     id = 'I16'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Brass Fraction'
         self.description = ('Fraction of all Note Ons belonging to brass patches ' +
-                            '(GeneralMIDI patches 57 through 68).') # note: incorrect
+                            '(General MIDI patches 57 through 68).') # note: incorrect
         self.isSequential = True
         self.dimensions = 1
 
         self._targetPrograms = list(range(56, 62))
 
 
-
 class WoodwindsFractionFeature(InstrumentFractionFeature):
     '''
+    Fraction of all Note Ons belonging to woodwind patches
+    (General MIDI patches 69 through 76).
+
     TODO: Conflict in source: does 69-79?
 
     >>> s1 = stream.Stream()
@@ -3780,23 +3750,24 @@ class WoodwindsFractionFeature(InstrumentFractionFeature):
     >>> print(fe.extract().vector[0])
     0.3
     '''
+
     id = 'I17'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Woodwinds Fraction'
         self.description = ('Fraction of all Note Ons belonging to woodwind patches ' +
-                            '(GeneralMIDI patches 69 through 76).')
+                            '(General MIDI patches 69 through 76).')
         self.isSequential = True
         self.dimensions = 1
 
         self._targetPrograms = list(range(68, 80)) # include ocarina!
 
 
-
-
 class OrchestralStringsFractionFeature(InstrumentFractionFeature):
     '''
+    Fraction of all Note Ons belonging to orchestral strings patches
+    (General MIDI patches 41 or 47).
 
     >>> s1 = stream.Stream()
     >>> s1.append(instrument.Violoncello())
@@ -3813,7 +3784,7 @@ class OrchestralStringsFractionFeature(InstrumentFractionFeature):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Orchestral Strings Fraction'
-        self.description = ('Fraction of all Note Ons belonging to orchestral strings patches' +
+        self.description = ('Fraction of all Note Ons belonging to orchestral strings patches ' +
                             '(General MIDI patches 41 or 47).')
         self.isSequential = True
         self.dimensions = 1
@@ -3823,9 +3794,13 @@ class OrchestralStringsFractionFeature(InstrumentFractionFeature):
 
 class StringEnsembleFractionFeature(InstrumentFractionFeature):
     '''
-    Fraction of all Note Ons belonging to string ensemble patches(General MIDI patches 49 to 52)
+    Not implemented
+
+    Fraction of all Note Ons belonging to string ensemble patches
+    (General MIDI patches 49 to 52).
     '''
     # TODO: add tests, do not yet have instrument to model
+
     id = 'I19'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
@@ -3842,6 +3817,8 @@ class StringEnsembleFractionFeature(InstrumentFractionFeature):
 
 class ElectricInstrumentFractionFeature(InstrumentFractionFeature):
     '''
+    Fraction of all Note Ons belonging to electric instrument patches
+    (GeneneralMIDI patches 5, 6, 17, 19, 27 through 32, 24 through 40).
 
     >>> s1 = stream.Stream()
     >>> s1.append(instrument.ElectricOrgan())
@@ -4562,6 +4539,9 @@ class Test(unittest.TestCase):
     def testDurationOfMelodicArcsFeature(self):
         from music21 import stream, pitch, note, features
         # all up
+        # in jSymbolic implementation, all up means there
+        # is no melodic arc and thus the average duration
+        # of melodic arc is set to 0.
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4570,7 +4550,7 @@ class Test(unittest.TestCase):
             s.append(note.Note(copy.deepcopy(p)))
         fe = features.jSymbolic.DurationOfMelodicArcsFeature(s)
         f = fe.extract()
-        self.assertEqual(f.vector, [5])
+        self.assertEqual(f.vector, [0])
 
         s = stream.Stream()
         p = pitch.Pitch('c2')
@@ -4580,7 +4560,7 @@ class Test(unittest.TestCase):
             s.append(note.Note(copy.deepcopy(p)))
         fe = features.jSymbolic.DurationOfMelodicArcsFeature(s)
         f = fe.extract()
-        self.assertAlmostEqual(f.vector[0], 1+2/3.)
+        self.assertAlmostEqual(f.vector[0], 8/5)
 
     def testSizeOfMelodicArcsFeature(self):
         from music21 import stream, pitch, note, features
@@ -4662,15 +4642,9 @@ class Test(unittest.TestCase):
         f = fe.extract()
         self.assertEqual(140.0, f.vector[0])
 
-
-
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof
-
-
-
-
