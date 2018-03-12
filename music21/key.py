@@ -1000,7 +1000,7 @@ class Key(KeySignature, scale.DiatonicScale):
             tonic = tonic.name.lower()
         return tonic
 
-    def _tonalCertainityCorrelationCoefficient(self, *args, **keywords):
+    def _tonalCertaintyCorrelationCoefficient(self, *args, **keywords):
         # possible measures:
         if not self.alternateInterpretations:
             raise KeySignatureException(
@@ -1077,8 +1077,9 @@ class Key(KeySignature, scale.DiatonicScale):
         []
         '''
         if method == 'correlationCoefficient':
-            return self._tonalCertainityCorrelationCoefficient(
+            return self._tonalCertaintyCorrelationCoefficient(
                     args, keywords)
+        
 
     def transpose(self, value, *, inPlace=False):
         '''
