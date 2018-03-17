@@ -43,9 +43,12 @@ environLocal = environment.Environment(_MOD)
 
 
 validDenominators = [1, 2, 4, 8, 16, 32, 64, 128] # in order
-beamableDurationTypes = (duration.typeFromNumDict[8],
-            duration.typeFromNumDict[16], duration.typeFromNumDict[32],
-            duration.typeFromNumDict[64], duration.typeFromNumDict[128])
+beamableDurationTypes = (
+    duration.typeFromNumDict[8],
+    duration.typeFromNumDict[16], duration.typeFromNumDict[32],
+    duration.typeFromNumDict[64], duration.typeFromNumDict[128],
+    duration.typeFromNumDict[256],
+    )
 
 # also [pow(2,x) for x in range(8)]
 MIN_DENOMINATOR_TYPE = '128th'
@@ -2259,13 +2262,14 @@ class MeterSequence(MeterTerminal):
         '''
         Recursive utility function
 
-
         >>> b = meter.MeterSequence('4/4', 4)
         >>> b[1] = b[1].subdivide(2)
         >>> b[3] = b[3].subdivide(2)
         >>> b[3][0] = b[3][0].subdivide(2)
         >>> b
         <MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
+        >>> b._getLevelList(0)
+        [<MeterTerminal 1/4>, <MeterTerminal 1/4>, <MeterTerminal 1/4>, <MeterTerminal 1/4>]
         >>> meter.MeterSequence(b._getLevelList(0))
         <MeterSequence {1/4+1/4+1/4+1/4}>
         >>> meter.MeterSequence(b._getLevelList(1))
@@ -3780,6 +3784,8 @@ class TimeSignature(base.Music21Object):
                     # not archetypeSpanNext
                     #environLocal.printDebug(['matching partial left'])
                     beamType = 'partial-left'
+                elif (beamNext is None or beamNumber not in beamNext.getNumbers()):
+                    beamType = 'partial-right'
                 else:
                     beamType = 'start'
 
@@ -3870,7 +3876,7 @@ class TimeSignature(base.Music21Object):
         staticmethod, does not need instance:
 
         >>> durList = [0, -1, -2, -3]
-        >>> srcList = [note.Note(quarterLength=2**x) for x in durList]
+        >>> srcList = [note.Note(quarterLength=2 ** x) for x in durList]
         >>> srcList.append(note.Rest(type='32nd'))
         >>> meter.TimeSignature._naiveBeams(srcList)
         [None,
@@ -4056,7 +4062,6 @@ class TimeSignature(base.Music21Object):
                 thisBeam.type = 'stop'
                 thisBeam.direction = None
                 prevBeam.type = 'continue'
-
 
         return beamsList
 

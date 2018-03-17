@@ -17,6 +17,7 @@ import unittest
 
 from fractions import Fraction
 from music21 import defaults
+from music21.common.decorators import deprecated
 
 __all__ = ['ordinals', 'musicOrdinals',
 
@@ -41,6 +42,7 @@ __all__ = ['ordinals', 'musicOrdinals',
 
            'fromRoman', 'toRoman',
            'ordinalAbbreviation',
+           'standardDeviation',
            ]
 
 ordinals = ['Zeroth', 'First', 'Second', 'Third', 'Fourth', 'Fifth',
@@ -596,6 +598,25 @@ def nearestMultiple(n, unit):
     #elif n >= (matchHigh - halfUnit) and n <= matchHigh:
         return matchHigh, round(matchHigh - n, 7), round(n - matchHigh, 7)
 
+
+@deprecated('2018-01-01 v5', '2018-08-01', 'use statistics.stdev instead')
+def standardDeviation(coll, bassel=False):
+    '''
+    DEPRECATED: use statistics.stdev instead.
+    
+    Given a collection of values, return the standard deviation.
+
+    :rtype: float
+    '''
+    avg = sum(coll) / float(len(coll))
+    diffColl = [math.pow(val - avg, 2) for val in coll]
+    # with a sample standard deviation (not a whole population)
+    # subtract 1 from the length
+    # this is bassel's correction
+    if bassel:
+        return math.sqrt(sum(diffColl) / float(len(diffColl) - 1))
+    else:
+        return math.sqrt(sum(diffColl) / float(len(diffColl)))
 
 def dotMultiplier(dots):
     '''
