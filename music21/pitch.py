@@ -28,9 +28,10 @@ from music21 import defaults
 from music21 import exceptions21
 from music21 import interval
 from music21 import style
+from music21 import environment
 
 from music21.common import SlottedObjectMixin
-from music21 import environment
+
 _MOD = 'pitch'
 environLocal = environment.Environment(_MOD)
 
@@ -474,8 +475,9 @@ def _greedyEnharmonicsSearch(oldPitches, scoreFunc=_dissonanceScore):
         newPitches.append(newPitch)
     return newPitches
 
-def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=None):
-    r'''Tries to simplify the enharmonic spelling of a list of pitches, pitch-
+def simplifyMultipleEnharmonics(pitches):
+    '''
+    Tries to simplify the enharmonic spelling of a list of pitches, pitch-
     or pitch-class numbers according to a given criterion.
 
     A function can be passed as an argument to `criterion`, that is tried to be

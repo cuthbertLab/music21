@@ -180,8 +180,8 @@ def LRP_combinations(c,
     <music21.chord.Chord C4 F4 A-4 C5 F5>
 
     >>> c5 = chord.Chord("B4 D#5 F#5")
-    >>> c6 = analysis.neoRiemannian.LRP_combinations(c5, 
-    ...                        'LPLPLP', leftOrdered=True, simplifyEnharmonics=True)
+    >>> c6 = analysis.neoRiemannian.LRP_combinations(c5, 'LPLPLP',
+                                                    leftOrdered=True, simplifyEnharmonics=True)
     >>> c6
     <music21.chord.Chord B4 D#5 F#5>
     >>> c5 = chord.Chord("C4 E4 G4")
