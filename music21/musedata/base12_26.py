@@ -8,7 +8,9 @@
 # Copyright:    Copyright © 2018 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
+'''
+Placeholder dicts for the 0th and 1st order of Hewlett's base40 system (base12 and 26).
+'''
 import unittest
 from music21 import exceptions21
 
@@ -157,5 +159,10 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-
 #-------------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    import music21
+    music21.mainTest(Test)
+
+#------------------------------------------------------------------------------
