@@ -2,8 +2,8 @@
 __ALL__ = ['correlate',  'discrete', 'elements', 'enharmonics',
            'floatingKey', 'metrical', 'neoRiemannian',
            'patel', 'pitchAnalysis',
-           'reduceChords', 'reduceChordsOld', 'reduction', 'transposition',
-           'windowed', 'AnalysisException']
+           'reduceChords', 'reduceChordsOld', 'reduction', 'segmentByRests',
+           'transposition', 'windowed', 'AnalysisException']
 
 # this is necessary to get these names available with a
 # from music21 import * import statement
@@ -19,6 +19,7 @@ from music21.analysis import pitchAnalysis
 from music21.analysis import reduceChords
 from music21.analysis import reduceChordsOld
 from music21.analysis import reduction
+from music21.analysis import segmentByRests
 from music21.analysis import transposition
 from music21.analysis import windowed
 
