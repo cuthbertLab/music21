@@ -458,7 +458,7 @@ class ConverterBraille(SubConverter):
 
     def show(self, obj, fmt, app=None, subformats=None, **keywords): # pragma: no cover
         if not common.runningUnderIPython():
-            super().show(obj, fmt, app=None, subformats=None, **keywords)
+            super().show(obj, fmt, app=None, subformats=subformats, **keywords)
         else:
             from music21 import braille
             dataStr = braille.translate.objectToBraille(obj)
@@ -467,7 +467,7 @@ class ConverterBraille(SubConverter):
     def write(self, obj, fmt, fp=None, subformats=None, **keywords): # pragma: no cover
         from music21 import braille
         dataStr = braille.translate.objectToBraille(obj)
-        if 'ascii' in subformats:
+        if subformats is not None and 'ascii' in subformats:
             dataStr = braille.basic.brailleUnicodeToBrailleAscii(dataStr)
         fp = self.writeDataStream(fp, dataStr)
         return fp

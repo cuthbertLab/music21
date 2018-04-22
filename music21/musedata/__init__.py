@@ -31,6 +31,7 @@ import os
 import pathlib
 
 from music21 import exceptions21
+from music21.musedata import base12_26
 from music21.musedata import base40
 from music21.musedata import translate
 
@@ -1954,4 +1955,3 @@ if __name__ == "__main__":
 
 #------------------------------------------------------------------------------
 # eof
-
