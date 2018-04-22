@@ -129,15 +129,13 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
     except ImportError:
         raise AudioSearchException(
             "autocorrelationFunction needs scipy -- the only part of music21 that needs it")
-    #import matplotlib
-    import matplotlib.mlab # @UnresolvedImport
 
     recordedSignal = numpy.array(recordedSignal)
     correlation = fftconvolve(recordedSignal, recordedSignal[::-1], mode='full')
     lengthCorrelation = len(correlation) // 2
     correlation = correlation[lengthCorrelation:]
     difference = numpy.diff(correlation) #  Calculates the difference between slots
-    positiveDifferences = matplotlib.mlab.find(difference > 0)
+    positiveDifferences = numpy.where(difference > 0)[0]
     if len(positiveDifferences) == 0: # pylint: disable=len-as-condition
         finalResult = 10 # Rest
     else:
