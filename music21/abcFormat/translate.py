@@ -292,10 +292,10 @@ def parseTokens(mh, dst, p, useMeasures):
 
             # start or end a tie at note n
             if t.tie is not None:
-                if t.tie == "start":
+                if t.tie in ('start', 'continue'):
                     n.tie = tie.Tie(t.tie)
-                    n.tie.style = "normal"
-                elif t.tie == "stop":
+                    n.tie.style = 'normal'
+                elif t.tie == 'stop':
                     n.tie = tie.Tie(t.tie)
             ### Was: Extremely Slow for large Opus files... why?
             ### Answer: some pieces didn't close all their spanners, so
@@ -933,6 +933,11 @@ class Test(unittest.TestCase):
         from music21 import corpus
         unused = corpus.parse('han2.abc', number=445)
 
+    def testTiesTranslate(self):
+        from music21 import converter
+        notes = converter.parse("L:1/8\na-a-a", format="abc")
+        ties = [note.tie.type for note in notes.flat.notesAndRests]
+        self.assertListEqual(ties, ['start', 'continue', 'stop'])
 
     def xtestMergeScores(self):
         from music21 import corpus
