@@ -38,6 +38,8 @@ To do a release,
    -- you will need an MIT username and password 
    -- for each new major version ssh in and delete old files before uploading.
 
+9b. zip up documentation/build/html and get ready to upload/delete it.
+
 10. And finally this file. (from the command line; not as python -m...)
 
 11. COMMIT to Github at this point w/ commit comment of the new version,

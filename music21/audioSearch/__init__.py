@@ -129,15 +129,13 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
     except ImportError:
         raise AudioSearchException(
             "autocorrelationFunction needs scipy -- the only part of music21 that needs it")
-    #import matplotlib
-    import matplotlib.mlab # @UnresolvedImport
 
     recordedSignal = numpy.array(recordedSignal)
     correlation = fftconvolve(recordedSignal, recordedSignal[::-1], mode='full')
     lengthCorrelation = len(correlation) // 2
     correlation = correlation[lengthCorrelation:]
     difference = numpy.diff(correlation) #  Calculates the difference between slots
-    positiveDifferences = matplotlib.mlab.find(difference > 0)
+    positiveDifferences = numpy.where(difference > 0)[0]
     if len(positiveDifferences) == 0: # pylint: disable=len-as-condition
         finalResult = 10 # Rest
     else:
@@ -362,7 +360,7 @@ def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
     >>> readPath = common.getSourceFilePath() / 'audioSearch' / 'test_audio.wav'
     >>> freq = audioSearch.getFrequenciesFromAudioFile(waveFilename=readPath)
     >>> print(freq)
-    [143.627689055..., 99.083545201..., 211.004784688..., 4700.313479623..., ...]
+    [143.627..., 99.083..., 211.004..., 4700.313..., ...]
     '''
     if "numpy" in base._missingImport:
         raise AudioSearchException(
@@ -406,11 +404,11 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     >>> frequencyList, pachelbelFileHandle, currentSample = fTup
     >>> for i in range(5):
     ...     print(frequencyList[i])
-    143.627689055
-    99.0835452019
-    211.004784689
-    4700.31347962
-    767.827403482
+    143.627...
+    99.083...
+    211.004...
+    4700.313...
+    767.827...
     >>> print(currentSample)  # should be near 44100, but probably not exact
     44032
 
@@ -421,11 +419,11 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     >>> frequencyList, pachelbelFileHandle, currentSample = fTup
     >>> for i in range(5):
     ...     print(frequencyList[i])
-    187.798213268
-    238.263483185
-    409.700397349
-    149.958733396
-    101.989786226
+    187.798...
+    238.263...
+    409.700...
+    149.958...
+    101.989...
     >>> print(currentSample)  # should be exactly double the previous
     88064
     '''
