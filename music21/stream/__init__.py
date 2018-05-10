@@ -242,7 +242,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             else:
                 return '<%s.%s 0x%x>' % (self.__module__, self.__class__.__name__, self.id)
         else:
-            return super().__repr__(self)
+            return super().__repr__()
 
     def write(self, *args, **kwargs):
         #...    --- see base.py calls .write(
