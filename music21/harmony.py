@@ -1827,7 +1827,11 @@ class ChordSymbol(Harmony):
                 continue
             justints = itemString.replace('b', '')
             justints = justints.replace('#', '')
-            if int(justints) > 20: # MSC: what is this doing?
+            try:
+                justints = int(justints)
+            except ValueError:
+                raise ValueError  # Not a properly formatted chord, ignore it
+            if justints > 20:  # MSC: what is this doing?
                 skipNext = False
                 i = 0
                 charString = ''

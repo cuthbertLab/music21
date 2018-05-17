@@ -287,11 +287,12 @@ def parseTokens(mh, dst, p, useMeasures):
                 cs_name = re.sub('[ /].*', '', cs_name)
                 cs_name = re.sub('([A-Ga-g])b', r'\1-', cs_name) # Replace b
                 #  with - in malformed chord names
-                if re.match(r'[A-Ga-g][#-]*', cs_name):# Exclude malformed
-                    # chord names
+                try:
                     cs = harmony.ChordSymbol(cs_name)
                     dst.coreAppend(cs, setActiveSite=False)
                     dst.coreElementsChanged()
+                except ValueError:
+                    pass  # Exclude malformed chord
             if t.isRest:
                 n = note.Rest()
             else:
