@@ -803,7 +803,7 @@ class Test(unittest.TestCase):
         # each score in the opus is a Stream that contains a Part and metadata
         p1 = o.getScoreByNumber(1).parts[0]
         self.assertEqual(p1.offset, 0.0)
-        self.assertEqual(len(p1.flat.notesAndRests), 88)
+        self.assertEqual(len(p1.flat.notesAndRests), 90)
 
         p2 = o.getScoreByNumber(2).parts[0]
         self.assertEqual(p2.offset, 0.0)
@@ -811,7 +811,7 @@ class Test(unittest.TestCase):
 
         p3 = o.getScoreByNumber(3).parts[0]
         self.assertEqual(p3.offset, 0.0)
-        self.assertEqual(len(p3.flat.notesAndRests), 82)
+        self.assertEqual(len(p3.flat.notesAndRests), 86)
 
         p4 = o.getScoreByNumber(4).parts[0]
         self.assertEqual(p4.offset, 0.0)
