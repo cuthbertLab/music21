@@ -17,6 +17,7 @@ __all__ = ['tables', 'Chord']
 
 import copy
 import unittest
+import re
 
 from music21 import beam
 from music21 import common
@@ -536,6 +537,9 @@ class Chord(note.NotRest):
         else:
             return [n.pitch for n in deleteComponents]
 
+    def _cleanedFlatNotation(self, music_str):
+        return re.sub('([A-Ga-g])b', r'\1-', music_str)
+
     ### PUBLIC METHODS ###
     def _add_core_or_init(self, notes, *, useDuration=None):
         '''
@@ -887,7 +891,7 @@ class Chord(note.NotRest):
         '''
         if newbass:
             if isinstance(newbass, str):
-                newbass = newbass.replace('b', '-')
+                newbass = self._cleanedFlatNotation(newbass)
                 newbass = pitch.Pitch(newbass)
 
             self._overrides['bass'] = newbass
@@ -2997,7 +3001,7 @@ class Chord(note.NotRest):
         '''
         if newroot:
             if isinstance(newroot, str):
-                newroot = newroot.replace('b', '-')
+                newroot = self._cleanedFlatNotation(newroot)
                 newroot = pitch.Pitch(newroot)
 
             self._overrides['root'] = newroot

@@ -246,13 +246,13 @@ class Harmony(chord.Chord):
         for kw in keywords:
             if kw == 'root':
                 if isinstance(keywords[kw], str):
-                    keywords[kw].replace('b', '-')
+                    keywords[kw] = self._cleanedFlatNotation(keywords[kw])
                     self.root(pitch.Pitch(keywords[kw]))
                 else:
                     self.root(keywords[kw])
             elif kw == 'bass':
                 if isinstance(keywords[kw], str):
-                    keywords[kw].replace('b', '-')
+                    keywords[kw] = self._cleanedFlatNotation(keywords[kw])
                     self.bass(pitch.Pitch(keywords[kw]))
                 else:
                     self.bass(keywords[kw])
