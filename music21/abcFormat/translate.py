@@ -830,6 +830,23 @@ class Test(unittest.TestCase):
 
         #sMerged.show()
 
+    def testChordSymbols(self):
+
+        from music21 import corpus, pitch
+        o = corpus.parse('nottingham-dataset/reelsa-c')
+        self.assertEqual(len(o), 2)
+        # each score in the opus is a Stream that contains a Part and metadata
+
+        p1 = o.getScoreByNumber(81).parts[0]
+        self.assertEqual(p1.offset, 0.0)
+        self.assertEqual(len(p1.flat.notesAndRests), 77)
+        self.assertEqual(len(list(p1.flat.getElementsByClass('ChordSymbol'))), 25)
+        # Am/C
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[7].root(), pitch.Pitch('A3'))
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[7].bass(), pitch.Pitch('C3'))
+        # G7/B
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].root(), pitch.Pitch('G3'))
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].bass(), pitch.Pitch('B2'))
 
     def testLocaleOfCompositionImport(self):
 
