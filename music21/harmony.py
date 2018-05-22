@@ -95,6 +95,7 @@ CHORD_TYPES = collections.OrderedDict([
     # other
     ('suspended-second',            ['1,2,5', ['sus2']]),                        # Y
     ('suspended-fourth',            ['1,4,5', ['sus', 'sus4']]),                 # Y
+    ('suspended-fourth-seventh',    ['1,4,5,-7', ['7sus', '7sus4']]),            # Y
     ('Neapolitan',                  ['1,2-,3,5-', ['N6']]),                      # Y
     ('Italian',                     ['1,#4,-6', ['It+6', 'It']]),                # Y
     ('French',                      ['1,2,#4,-6', ['Fr+6', 'Fr']]),              # Y
@@ -1779,6 +1780,9 @@ class ChordSymbol(Harmony):
                 root = m1.group()
                 #remove the root and bass from the string and any additions/omitions/alterations/
                 st = prelimFigure.replace(m1.group(), '')
+            else:
+                raise ValueError # This means that the given argument wasn't
+                # a proper chord name.
 
         if root:
             self.root(pitch.Pitch(root))
@@ -1823,7 +1827,11 @@ class ChordSymbol(Harmony):
                 continue
             justints = itemString.replace('b', '')
             justints = justints.replace('#', '')
-            if int(justints) > 20: # MSC: what is this doing?
+            try:
+                justints = int(justints)
+            except ValueError:
+                raise ValueError  # Not a properly formatted chord, ignore it
+            if justints > 20:  # MSC: what is this doing?
                 skipNext = False
                 i = 0
                 charString = ''

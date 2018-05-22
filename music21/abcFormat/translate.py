@@ -22,6 +22,7 @@ module's :func:`~music21.converter.parse` function.
 
 import copy
 import unittest
+import re
 
 from music21 import clef
 from music21 import common
@@ -34,6 +35,8 @@ from music21 import articulations
 from music21 import note
 from music21 import chord
 from music21 import spanner
+from music21 import harmony
+
 
 environLocal = environment.Environment('abcFormat.translate')
 
@@ -276,6 +279,20 @@ def parseTokens(mh, dst, p, useMeasures):
             #ql += t.quarterLength
 
         elif isinstance(t, abcFormat.ABCNote):
+            # add the attached chord symbol
+            if t.chordSymbols:
+                cs_name = t.chordSymbols[0]
+                cs_name = re.sub('["]','', cs_name).lstrip().rstrip()
+                cs_name = re.sub('[()]', '', cs_name)
+                cs_name = re.sub('[ /].*', '', cs_name)
+                cs_name = re.sub('([A-Ga-g])b', r'\1-', cs_name) # Replace b
+                #  with - in malformed chord names
+                try:
+                    cs = harmony.ChordSymbol(cs_name)
+                    dst.coreAppend(cs, setActiveSite=False)
+                    dst.coreElementsChanged()
+                except ValueError:
+                    pass  # Exclude malformed chord
             if t.isRest:
                 n = note.Rest()
             else:
@@ -786,7 +803,7 @@ class Test(unittest.TestCase):
         # each score in the opus is a Stream that contains a Part and metadata
         p1 = o.getScoreByNumber(1).parts[0]
         self.assertEqual(p1.offset, 0.0)
-        self.assertEqual(len(p1.flat.notesAndRests), 88)
+        self.assertEqual(len(p1.flat.notesAndRests), 90)
 
         p2 = o.getScoreByNumber(2).parts[0]
         self.assertEqual(p2.offset, 0.0)
@@ -794,7 +811,7 @@ class Test(unittest.TestCase):
 
         p3 = o.getScoreByNumber(3).parts[0]
         self.assertEqual(p3.offset, 0.0)
-        self.assertEqual(len(p3.flat.notesAndRests), 82)
+        self.assertEqual(len(p3.flat.notesAndRests), 86)
 
         p4 = o.getScoreByNumber(4).parts[0]
         self.assertEqual(p4.offset, 0.0)
