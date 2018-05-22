@@ -284,9 +284,6 @@ def parseTokens(mh, dst, p, useMeasures):
                 cs_name = t.chordSymbols[0]
                 cs_name = re.sub('["]','', cs_name).lstrip().rstrip()
                 cs_name = re.sub('[()]', '', cs_name)
-                cs_name = re.sub('[ /].*', '', cs_name)
-                cs_name = re.sub('([A-Ga-g])b', r'\1-', cs_name) # Replace b
-                #  with - in malformed chord names
                 try:
                     cs = harmony.ChordSymbol(cs_name)
                     dst.coreAppend(cs, setActiveSite=False)
