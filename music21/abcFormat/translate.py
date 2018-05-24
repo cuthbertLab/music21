@@ -284,9 +284,7 @@ def parseTokens(mh, dst, p, useMeasures):
                 cs_name = t.chordSymbols[0]
                 cs_name = re.sub('["]','', cs_name).lstrip().rstrip()
                 cs_name = re.sub('[()]', '', cs_name)
-                cs_name = re.sub('[ /].*', '', cs_name)
-                cs_name = re.sub('([A-Ga-g])b', r'\1-', cs_name) # Replace b
-                #  with - in malformed chord names
+                cs_name = common.cleanedFlatNotation(cs_name)
                 try:
                     cs = harmony.ChordSymbol(cs_name)
                     dst.coreAppend(cs, setActiveSite=False)
@@ -832,6 +830,23 @@ class Test(unittest.TestCase):
 
         #sMerged.show()
 
+    def testChordSymbols(self):
+
+        from music21 import corpus, pitch
+        o = corpus.parse('nottingham-dataset/reelsa-c')
+        self.assertEqual(len(o), 2)
+        # each score in the opus is a Stream that contains a Part and metadata
+
+        p1 = o.getScoreByNumber(81).parts[0]
+        self.assertEqual(p1.offset, 0.0)
+        self.assertEqual(len(p1.flat.notesAndRests), 77)
+        self.assertEqual(len(list(p1.flat.getElementsByClass('ChordSymbol'))), 25)
+        # Am/C
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[7].root(), pitch.Pitch('A3'))
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[7].bass(), pitch.Pitch('C3'))
+        # G7/B
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].root(), pitch.Pitch('G3'))
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].bass(), pitch.Pitch('B2'))
 
     def testLocaleOfCompositionImport(self):
 
@@ -931,6 +946,32 @@ class Test(unittest.TestCase):
             s = corpus.parse(fn)
             assert s is not None
             #s.show()
+
+    def testCleanFlat(self):
+        from music21 import harmony, pitch
+
+        cs = harmony.ChordSymbol(root='eb', bass='bb', kind='dominant')
+        self.assertEquals(cs.bass(), pitch.Pitch('B-'))
+        self.assertEquals(cs.pitches[0], pitch.Pitch('B-2'))
+
+        cs = harmony.ChordSymbol('e-7/b-')
+        self.assertEquals(cs.root(), pitch.Pitch('E-3'))
+        self.assertEquals(cs.bass(), pitch.Pitch('B-2'))
+        self.assertEquals(cs.pitches[0], pitch.Pitch('B-2'))
+
+        # common.cleanedFlatNotation() shouldn't be called by
+        # the following calls, which what is being tested here:
+
+        cs = harmony.ChordSymbol('b-3')
+        self.assertEquals(cs.root(), pitch.Pitch('b-3'))
+        self.assertEquals(cs.pitches[0], pitch.Pitch('B-3'))
+        self.assertEquals(cs.pitches[1], pitch.Pitch('D4'))
+
+        cs = harmony.ChordSymbol('bb3')
+        self.assertEquals(cs.root(), pitch.Pitch('b3'))
+        self.assertEquals(cs.pitches[0], pitch.Pitch('B3'))
+        self.assertEquals(cs.pitches[1], pitch.Pitch('D#4'))
+
 
     def xtestTranslateB(self):
         '''

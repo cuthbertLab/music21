@@ -17,6 +17,7 @@ __all__ = ['tables', 'Chord']
 
 import copy
 import unittest
+import re
 
 from music21 import beam
 from music21 import common
@@ -887,7 +888,7 @@ class Chord(note.NotRest):
         '''
         if newbass:
             if isinstance(newbass, str):
-                newbass = newbass.replace('b', '-')
+                newbass = common.cleanedFlatNotation(newbass)
                 newbass = pitch.Pitch(newbass)
 
             self._overrides['bass'] = newbass
@@ -2997,7 +2998,7 @@ class Chord(note.NotRest):
         '''
         if newroot:
             if isinstance(newroot, str):
-                newroot = newroot.replace('b', '-')
+                newroot = common.cleanedFlatNotation(newroot)
                 newroot = pitch.Pitch(newroot)
 
             self._overrides['root'] = newroot
