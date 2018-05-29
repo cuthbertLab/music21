@@ -83,6 +83,7 @@ from music21 import derivation
 from music21 import exceptions21
 
 # these imports are for the sapo pickle module
+import importlib
 import copyreg
 import io
 import music21.converter
@@ -1361,8 +1362,13 @@ def load(file):
     return pickle.load(file)
 
 
-# register our methods to be used in multiprocessing lib
-multiprocessing.reduction.register(music21.stream.Stream, pickle_music21_stream)
+# this is needed because freezeThaw is loaded before than music21.stream is ready.
+# VERY UGLY!!!
+found = importlib.util.find_spec("stream", package="music21")
+if found:
+    # register our methods to be used in multiprocessing lib
+    multiprocessing.reduction.register(
+        music21.stream.Stream, pickle_music21_stream)
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
