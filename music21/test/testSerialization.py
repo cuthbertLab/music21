@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Name:         testSerialization.py
 # Purpose:      tests for serializing music21 objects
 #
@@ -8,11 +8,11 @@
 #
 # Copyright:    Copyright © 2012-13 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 
 
 import unittest
-import music21 # needed to do fully-qualified isinstance name checking
+import music21  # needed to do fully-qualified isinstance name checking
 
 from music21 import freezeThaw
 
@@ -21,10 +21,7 @@ _MOD = "test.testSerialization"
 environLocal = environment.Environment(_MOD)
 
 
-
-
-
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -44,7 +41,6 @@ class Test(unittest.TestCase):
         post = converter.thawStr(temp)
         self.assertEqual(len(post.notes), 2)
         self.assertEqual(str(post.notes[0].pitch), 'D2')
-
 
     def testBasicD(self):
         from music21 import stream, note, converter, spanner
@@ -70,9 +66,10 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.notes), 2)
         self.assertEqual(str(post.notes[0].pitch), 'D2')
         spPost = post.spanners[0]
-        self.assertEqual(spPost.getSpannedElements(), [post.notes[0], post.notes[1]])
-        self.assertEqual(spPost.getSpannedElementIds(), [id(post.notes[0]), id(post.notes[1])])
-
+        self.assertEqual(spPost.getSpannedElements(), [
+                         post.notes[0], post.notes[1]])
+        self.assertEqual(spPost.getSpannedElementIds(), [
+                         id(post.notes[0]), id(post.notes[1])])
 
     def testBasicE(self):
         from music21 import corpus, converter
@@ -80,13 +77,12 @@ class Test(unittest.TestCase):
 
         temp = converter.freezeStr(s, fmt='pickle')
         sPost = converter.thawStr(temp)
-        #sPost.show()
+        # sPost.show()
         self.assertEqual(len(s.flat.notes), len(sPost.flat.notes))
 
         self.assertEqual(len(s.parts[0].notes), len(sPost.parts[0].notes))
-        #print s.parts[0].notes
-        #sPost.parts[0].notes
-
+        # print s.parts[0].notes
+        # sPost.parts[0].notes
 
     def testBasicF(self):
         from music21 import stream, note, converter, spanner
@@ -103,8 +99,7 @@ class Test(unittest.TestCase):
         data = converter.freezeStr(s, fmt='pickle')
         sPost = converter.thawStr(data)
         self.assertEqual(len(sPost.notes), 5)
-        #sPost.show()
-
+        # sPost.show()
 
     def testBasicJ(self):
         from music21 import stream, note, converter
@@ -126,7 +121,7 @@ class Test(unittest.TestCase):
         s = stream.Score()
         s.insert(0, p1)
         s.insert(0, p2)
-        #s.show()
+        # s.show()
 
         temp = converter.freezeStr(s, fmt='pickle')
         sPost = converter.thawStr(temp)
@@ -134,7 +129,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sPost.parts[0].getElementsByClass('Measure')), 3)
         self.assertEqual(len(sPost.parts[1].getElementsByClass('Measure')), 3)
         self.assertEqual(len(sPost.flat.notes), 24)
-
 
     def testBasicI(self):
         from music21 import stream, note, converter
@@ -148,7 +142,7 @@ class Test(unittest.TestCase):
         s = stream.Score()
         s.insert(0, p1)
         s.insert(0, p2)
-        #s.show()
+        # s.show()
 
         temp = converter.freezeStr(s, fmt='pickle')
         sPost = converter.thawStr(temp)
@@ -156,7 +150,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sPost.parts[0].getElementsByClass('Measure')), 3)
         self.assertEqual(len(sPost.parts[1].getElementsByClass('Measure')), 3)
         self.assertEqual(len(sPost.flat.notes), 24)
-
 
     def testSpannerSerializationOfNotesNotInPickle(self):
         '''
@@ -175,40 +168,105 @@ class Test(unittest.TestCase):
         data = converter.freezeStr(s, fmt='pickle')
 
         unused_s2 = converter.thawStr(data)
-        #s2.show('text')
-
+        # s2.show('text')
 
     def testBigCorpus(self):
         from music21 import corpus, converter
         #import time
-        #print time.time()  # 8.3 sec from pickle; 10.3 sec for forceSource...
-        #s = corpus.parse('beethoven/opus133') #, forceSource = True)
-        #print time.time()  # purePython: 33! sec; cPickle: 25 sec
+        # print time.time()  # 8.3 sec from pickle; 10.3 sec for forceSource...
+        # s = corpus.parse('beethoven/opus133') #, forceSource = True)
+        # print time.time()  # purePython: 33! sec; cPickle: 25 sec
         #data = converter.freezeStr(s, fmt='pickle')
-        #print time.time()  # cPickle: 5.5 sec!
+        # print time.time()  # cPickle: 5.5 sec!
         s = corpus.parse('corelli/opus3no1/1grave')
         sf = freezeThaw.StreamFreezer(s, fastButUnsafe=True)
         data = sf.writeStr()
 
-        #print time.time() # purePython: 9 sec; cPickle: 3.8 sec!
+        # print time.time() # purePython: 9 sec; cPickle: 3.8 sec!
         unused_s2 = converter.thawStr(data)
-        #print time.time()
+        # print time.time()
 #        s2.show()
 
+    def testSapoPickler(self):
+        from music21 import corpus
+        s = corpus.parse('beethoven/opus18no1/movement1.mxl')
+        print('Loaded movement 1 from op 18, n 1 by Beethoven!')
 
+        from timeit import default_timer as timer
+        start = timer()
+        from music21 import freezeThaw as pickle
+        end = timer()
+        print('* Importing picklem21 needed', end - start, 'seconds')
 
+        # test pickle and depickle to/from file
 
-#------------------------------------------------------------------------------
+        def test_file_rw():
+            for METHOD in ['lzma', 'gzip', 'bz2', 'None']:
+                pickle.setCompressionMethod(METHOD)
+                start = timer()
+                with open('pickle-test.pkl.' + METHOD, 'wb') as f:
+                    pickle.dump(s, f)
+                end = timer()
+                print('* Writing file using ' + METHOD +
+                      ' compression needed', end - start, 'seconds')
+
+                start = timer()
+                with open('pickle-test.pkl.' + METHOD, 'rb') as f:
+                    pickle.load(f)
+                end = timer()
+                print('* Reading file using ' + METHOD +
+                      ' compression needed', end - start, 'seconds')
+
+        # test multiprocessing
+
+        def test_multiprocessing():
+            import multiprocessing as mp
+
+            def parse_stream(s, start, end, tot_elements):
+                """ parse a stream and count objects """
+                count = 0
+                for i in s.recurse()[start:end]:
+                    count += 1
+
+                tot_elements.value += count
+
+            total_length = len(s.recurse())
+            nproc = 4
+            for METHOD in ['lzma', 'gzip', 'bz2', 'None']:
+                pickle.setCompressionMethod(METHOD)
+
+                tot_elements = mp.Value('i', 0)
+                start = 0
+                processes = []
+                for i in range(nproc):
+                    end = int(total_length / nproc * (i + 1))
+                    p = mp.Process(target=parse_stream, args=(
+                        s, start, end, tot_elements))
+                    processes.append(p)
+                    start = end
+
+                for p in processes:
+                    p.start()
+
+                for p in processes:
+                    p.join()
+
+                print('# multiprocessing with ' + METHOD +
+                      ' counted ', tot_elements.value, 'elements')
+
+            if len(s.recurse()) != tot_elements.value:
+                print('# ERROR!')
+                print('# actually the object has', len(s.recurse()), 'elements')
+
+        test_file_rw()
+        test_multiprocessing()
+
+# ------------------------------------------------------------------------------
+
 
 if __name__ == "__main__":
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # eof
-
-
-
-
-
-
