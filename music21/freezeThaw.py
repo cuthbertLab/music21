@@ -6,6 +6,7 @@
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
+#               Federico Simonetta
 #
 # Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21
 #               Project
@@ -16,7 +17,8 @@ This module contains objects for storing complete `Music21Objects`, especially
 `Stream` and `Score` objects on disk.  Freezing (or "pickling") refers to
 writing the object to a file on disk (or to a string).  Thawing (or
 "unpickling") refers to reading in a string or file and returning a Music21
-object.
+object. This is useful for both writing to file and exchanging data between
+processes (i.e. when using `multiprocessing` module).
 
 This module offers alternatives to writing a `Score` to `MusicXML` with
 `s.write('musicxml')`.  `FreezeThaw` has some advantages over using `.write()`:
@@ -66,6 +68,25 @@ The name freezeThaw comes from Perl's implementation of similar methods -- I
 like the idea of thawing something that's frozen; "unpickling" just doesn't
 seem possible.  In any event, I needed a name that wouldn't already
 exist in the Python namespace.
+
+New procedures are available now. You can simply import this module and use
+it like the standard `pickle` module to write/reading files and whitin parallel
+procedures. It also support compression formats.
+
+You can import this with
+`from music21 import freezeThaw as pickle`
+
+Then, the following functions will be available:
+* `pickle.dump()`, to serialize an object
+* `pickle.dumps()`, to write an object to file through its serialization
+* `pickle.load()`, to load a serialized object
+* `pickle.loads()`, to load a file containing a serialized object
+
+Use `pickle.setCompressionMethod(METHOD)` to use a particular compression
+method, available values are 'lzma', 'gzip', 'bz2', 'None'.
+
+Once loaded, you can import `multiprocessing` module and use `music21` in
+parallel computing applications.
 '''
 
 import copy
