@@ -1259,8 +1259,6 @@ class Test(unittest.TestCase):
 
 # this is the code for the new sapo pickle procedures
 
-
-
 # COMPRESSION_LEVEL = -1
 COMPRESSION_METHOD = 'None'
 
@@ -1289,29 +1287,25 @@ def setCompressionMethod(method: str):
     objects """
     COMPRESSION_METHOD = method
 
+    global compressedFile
     if COMPRESSION_METHOD == 'lzma':
         from lzma import decompress, compress
-        from lzma import LZMAFile as CompressedFile
+        from lzma import LZMAFile as compressedFile
     elif COMPRESSION_METHOD == 'gzip':
         from gzip import decompress, compress
         from gzip import GzipFile
 
         # the following is needed due to a not coherent syntax in standard
         # python libs
-        global CompressedFile
-
-        def CompressedFile(f):
+        def compressedFile(f):
             return GzipFile(fileobj=f)
 
     elif COMPRESSION_METHOD == 'bz2':
         from bz2 import decompress, compress
-        from bz2 import BZ2File as CompressedFile
+        from bz2 import BZ2File as compressedFile
     elif COMPRESSION_METHOD == 'None':
         # defining dummy functions
-
-        global CompressedFile
-
-        def CompressedFile(arg):
+        def compressedFile(arg):
             return arg
 
         global compress
@@ -1363,7 +1357,7 @@ def loads(data):
 
 def load(file):
     """ Depickle a file object, already opened in byte mode"""
-    file = CompressedFile(file)
+    file = compressedFile(file)
     return pickle.load(file)
 
 

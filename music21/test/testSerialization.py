@@ -172,7 +172,7 @@ class Test(unittest.TestCase):
 
     def testBigCorpus(self):
         from music21 import corpus, converter
-        #import time
+        # import time
         # print time.time()  # 8.3 sec from pickle; 10.3 sec for forceSource...
         # s = corpus.parse('beethoven/opus133') #, forceSource = True)
         # print time.time()  # purePython: 33! sec; cPickle: 25 sec
@@ -190,32 +190,19 @@ class Test(unittest.TestCase):
     def testSapoPickler(self):
         from music21 import corpus
         s = corpus.parse('beethoven/opus18no1/movement1.mxl')
-        print('Loaded movement 1 from op 18, n 1 by Beethoven!')
 
-        from timeit import default_timer as timer
-        start = timer()
         from music21 import freezeThaw as pickle
-        end = timer()
-        print('* Importing picklem21 needed', end - start, 'seconds')
 
         # test pickle and depickle to/from file
 
         def test_file_rw():
             for METHOD in ['lzma', 'gzip', 'bz2', 'None']:
                 pickle.setCompressionMethod(METHOD)
-                start = timer()
                 with open('pickle-test.pkl.' + METHOD, 'wb') as f:
                     pickle.dump(s, f)
-                end = timer()
-                print('* Writing file using ' + METHOD +
-                      ' compression needed', end - start, 'seconds')
 
-                start = timer()
                 with open('pickle-test.pkl.' + METHOD, 'rb') as f:
                     pickle.load(f)
-                end = timer()
-                print('* Reading file using ' + METHOD +
-                      ' compression needed', end - start, 'seconds')
 
         # test multiprocessing
 
@@ -251,12 +238,8 @@ class Test(unittest.TestCase):
                 for p in processes:
                     p.join()
 
-                print('# multiprocessing with ' + METHOD +
-                      ' counted ', tot_elements.value, 'elements')
-
             if len(s.recurse()) != tot_elements.value:
-                print('# ERROR!')
-                print('# actually the object has', len(s.recurse()), 'elements')
+                raise Exception('multiprocessing failed!')
 
         test_file_rw()
         test_multiprocessing()
