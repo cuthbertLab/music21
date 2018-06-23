@@ -9572,8 +9572,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     return thisEl
             return otherElements[0]
 
-    def allPlayingWhileSounding(self, el, elStream=None,
-                                requireClass=False):
+    def allPlayingWhileSounding(self, el, elStream=None):
         '''
         Returns a new Stream of elements in this stream that sound
         at the same time as `el`, an element presumably in another Stream.
@@ -9586,7 +9585,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         to be the length of el -- thus a note sustained after el ends
         may have a release time beyond that of the duration of the Stream.
 
-        As above, elStream is an optional Stream to look up el's offset in.
+        As above, elStream is an optional Stream to look up el's offset in.  Use
+        this to work on an element in another part.
 
         The method always returns a Stream, but it might be an empty Stream.
 
@@ -9599,11 +9599,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         classList in elsewhere in stream to provide a list of classes that the
         el must be a part of.
 
-
         '''
-        if requireClass is not False:
-            raise Exception("requireClass is not implemented")
-
         if elStream is not None: # bit of safety
             elOffset = el.getOffsetBySite(elStream)
         else:
