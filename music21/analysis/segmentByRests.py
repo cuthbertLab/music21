@@ -6,7 +6,7 @@
 # Authors:      Mark Gotham
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2018 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
@@ -39,7 +39,7 @@ class Segmenter:
                         removeEmptyLists=True):
         '''
         Segments a part by its rests (and clefs) and returns a returns a list of lists where
-        each sublist is one segment of contiguous notes.
+        each sublist is one segment of contiguous notes. NB Uses .recurse() internally.
 
         >>> testStream = converter.parse("tinyNotation: C4 r D E r r F r G r A B r c")
         >>> segments = analysis.segmentByRests.Segmenter.getSegmentsList(testStream)
@@ -73,9 +73,11 @@ class Segmenter:
                     segments.remove(segment)
         return segments
 
-    def getIntervalList(workOrPart, printUnusual=False):
+    def getIntervalList(workOrPart):
         '''
         Given a work or part, returns a list of intervals between contiguous notes.
+        NB Uses .recurse() internally so
+        if called on a work then returns a list of lists with one list per part.
 
         >>> testStream = converter.parse("tinyNotation: 4/4 E4 r F G A r g c r c")
         >>> intList = analysis.segmentByRests.Segmenter.getIntervalList(testStream)
@@ -93,16 +95,6 @@ class Segmenter:
                 continue
             intervalObj = interval.Interval(n1, n2)
             semis = intervalObj.semitones
-            if printUnusual and (abs(semis) > 12 or
-                                 abs(semis) == 6 or
-                                 abs(semis) == 10 or
-                                 abs(semis) == 11):
-                 print('************************')
-                 print('Interval (semitones):', semis)
-                 print('Note 1:', n1)
-                 print('Measure Number:', n1.measureNumber)
-                 print('Part:', n1.getContextByClass('Part'))
-                 print('File Path:', list(n1.contextSites())[-1].site.filePath)
             intervalList.append(intervalObj)
         return intervalList
 
