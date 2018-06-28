@@ -6331,6 +6331,29 @@ class Test(unittest.TestCase):
         self.assertEqual(rmIterator[2].content, 'Test')
         self.assertEqual(rmIterator[2].style.enclosure, 'square')
 
+    def testNoChordImport(self):
+        from music21 import converter
+        from music21 import musicxml
+
+        thisDir = common.getSourceFilePath() / 'musicxml'
+        testFp = thisDir / 'testNC.xml'
+        no_chord = converter.parse(testFp, forceSource=True)
+        no_chord.show('txt')
+
+        GEX = musicxml.m21ToXml.GeneralObjectExporter(no_chord)
+        out = GEX.parse()
+        outStr = out.decode('utf-8')
+        print(outStr)
+
+        # TODO root-step should have empty text when kind is none
+        # TODO text should be N.C. when kind is none
+        # <root-step text="">C</root-step>
+        # <kind text="N.C.">none</kind>
+        # TODO Add possibility to create NC ChordSymbol with "N.C." figure
+        # Use MusicXML convention with C root and none kind
+
+        pass
+
 
 if __name__ == '__main__':
     import music21
