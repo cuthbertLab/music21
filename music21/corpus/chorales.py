@@ -722,7 +722,7 @@ class ChoraleListRKBWV:
     179---||---140.7---||---Wachet auf, ruft uns die Stimme---||---329
     180---||---265---||---Als Jesus Christus in der Nacht---||---21
     181---||---319---||---Gott hat das Evangelium---||---116
-    182---||---14.5---||---Wär Gott nicht mit uns diese Zeit---||---0
+    182---||---14.5---||---Wär’ Gott nicht mit uns diese Zeit---||---330
     183---||---388---||---Nun freut euch, lieben Christen, g'mein 1---||---261
     184---||---4.8---||---Christ lag in Todesbanden---||---41
     185---||---387---||---Ihr lieben Christen, freut euch nun---||---260
