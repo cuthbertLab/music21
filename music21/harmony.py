@@ -2180,6 +2180,81 @@ class ChordSymbol(Harmony):
             return False
 
 
+class NoChord(ChordSymbol):
+    '''
+    Class representing a special 'no chord' ChordSymbol used to explicitly
+    encode absence of chords. This is especially useful to stop a chord
+    without playing another.
+
+    >>> from music21 import stream, note
+    >>> s = stream.Score()
+    >>> s.repeatAppend(note.Note('C'), 4)
+    >>> s.append(ChordSymbol('C'))
+    >>> s.repeatAppend(note.Note('C'), 4)
+    >>> s.append(NoChord())
+    >>> s.repeatAppend(note.Note('C'), 4)
+    >>> s = s.makeMeasures()
+    >>> s = realizeChordSymbolDurations(s)
+    >>> s.show('text')
+    {0.0} <music21.clef.BassClef>
+    {0.0} <music21.meter.TimeSignature 4/4>
+    {0.0} <music21.note.Note C>
+    {1.0} <music21.note.Note C>
+    {2.0} <music21.note.Note C>
+    {3.0} <music21.note.Note C>
+    {4.0} <music21.harmony.ChordSymbol C>
+    {4.0} <music21.note.Note C>
+    {5.0} <music21.note.Note C>
+    {6.0} <music21.note.Note C>
+    {7.0} <music21.note.Note C>
+    {8.0} <music21.harmony.NoChord N.C.>
+    {8.0} <music21.note.Note C>
+    {9.0} <music21.note.Note C>
+    {10.0} <music21.note.Note C>
+    {11.0} <music21.note.Note C>
+    {12.0} <music21.bar.Barline style=final>
+    >>> c_major = s.getElementsByClass(ChordSymbol)[0]
+    >>> c_major.duration
+    <music21.duration.Duration 4.0>
+    >>> c_major.offset
+    4.0
+
+    '''
+
+    ### INITIALIZER ###
+
+    def __init__(self, figure=None, **keywords):
+
+        # override keywords to default values
+        keywords['kind'] = 'none'
+        for kw in keywords:
+            if kw == 'root':
+                keywords[kw] = None
+            if kw == 'bass':
+                keywords[kw] = None
+
+        super().__init__(figure, **keywords)
+
+        if self.chordKindStr is None or self.chordKindStr == '':
+            if self._figure is None:
+                self._figure = 'N.C.'
+            self.chordKindStr = self._figure
+
+        if self._figure is None:
+            self._figure = self.chordKindStr
+
+    def root(self, newroot=False, find=False):
+        # Ignore newroot, and set find to False to always return None
+        return super().root(newroot=False, find=False)
+
+    def bass(self, newbass=None, *, find=True):
+        # Ignore newbass, and set find to False to always return None
+        return super().bass(newbass=None, find=False)
+
+    def _parseFigure(self):
+        # do nothing, everything is already set.
+        return
+
 #-------------------------------------------------------------------------------
 
 
@@ -2473,6 +2548,50 @@ class TestExternal(unittest.TestCase): # pragma: no cover
                     for harmony_type in val:
                         print(n + m + ',' + harmony_type,
                               ChordSymbol(n + m + ',' + harmony_type).pitches)
+
+    def testNoChord(self):
+
+        from music21 import stream, note
+
+        nc = NoChord()
+        self.assertEqual('none', nc.chordKind)
+        self.assertEqual('N.C.', nc.chordKindStr)
+        self.assertEqual('N.C.', nc.figure)
+
+        nc = NoChord('NC')
+        self.assertEqual('none', nc.chordKind)
+        self.assertEqual('NC', nc.chordKindStr)
+        self.assertEqual('NC', nc.figure)
+
+        nc = NoChord('None')
+        self.assertEqual('none', nc.chordKind)
+        self.assertEqual('None', nc.chordKindStr)
+        self.assertEqual('None', nc.figure)
+
+        nc = NoChord(kind='none')
+        self.assertEqual('none', nc.chordKind)
+        self.assertEqual('N.C.', nc.chordKindStr)
+        self.assertEqual('N.C.', nc.figure)
+
+        nc = NoChord(kindStr='No Chord')
+        self.assertEqual('none', nc.chordKind)
+        self.assertEqual('No Chord', nc.chordKindStr)
+        self.assertEqual('No Chord', nc.figure)
+
+        nc = NoChord('NC', kindStr='No Chord')
+        self.assertEqual('none', nc.chordKind)
+        self.assertEqual('No Chord', nc.chordKindStr)
+        self.assertEqual('NC', nc.figure)
+
+        nc = NoChord(root='C', bass='E', kind='none')
+        self.assertEqual('N.C.', nc.chordKindStr)
+        self.assertEqual('N.C.', nc.figure)
+
+        self.assertEqual(str(nc), '<music21.harmony.NoChord N.C.>')
+        self.assertEqual(0, len(nc.pitches))
+        self.assertIsNone(nc.root())
+        self.assertIsNone(nc.bass())
+
 
 #     def labelChordSymbols(self):
 #         '''

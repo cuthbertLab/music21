@@ -1,9 +1,3 @@
-<harmony print-frame="no">
-  <root>
-    <root-step text="">C</root-step>
-    </root>
-  <kind text="random">none</kind>
-  </harmony>
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
@@ -174,7 +168,7 @@
       <harmony print-frame="no">
         <root>
           <root-step text="">C</root-step>
-          </root>
+        </root>
         <kind text="N.C.">none</kind>
         </harmony>
       <note default-x="141.41" default-y="-15.00">
