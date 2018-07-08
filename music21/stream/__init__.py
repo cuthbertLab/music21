@@ -995,10 +995,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         self.coreElementsChanged()
 
 
-    def index(self, obj):
+    def index(self, el):
         '''
         Return the first matched index for
         the specified object.
+        
+        Raises a StreamException if cannot
+        be found.
 
         >>> s = stream.Stream()
         >>> n1 = note.Note('g')
@@ -1011,23 +1014,29 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.index(n1)
         0
         >>> s.index(n2)
-        1        '''
+        1        
+        
+        >>> n3 = note.Note('a')
+        >>> s.index(n3)
+        Traceback (most recent call last):
+        music21.exceptions21.StreamException: cannot find object (<music21.note.Note A>) in Stream
+        '''
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
 
         if 'index' in self._cache and self._cache['index'] is not None:
             try:
-                return self._cache['index'][id(obj)]
+                return self._cache['index'][id(el)]
             except KeyError:
                 pass  # not in cache
         else:
             self._cache['index'] = {}
 
         # TODO: possibly replace by binary search
-        if common.isNum(obj):
-            objId = obj
+        if common.isNum(el):
+            objId = el
         else:
-            objId = id(obj)
+            objId = id(el)
 
         count = 0
         for e in self._elements:
@@ -1040,20 +1049,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 self._cache['index'][objId] = count
                 return count # this is the index
             count += 1 # cumulative indices
-        raise StreamException('cannot find object (%s) in Stream' % obj)
+        raise StreamException('cannot find object (%s) in Stream' % el)
 
 
     def remove(self,
                targetOrList,
-               firstMatchOnly=True,
+               *,
                shiftOffsets=False,
                recurse=False):
         '''
         Remove an object from this Stream. Additionally, this Stream is
         removed from the object's sites in :class:`~music21.sites.Sites`.
 
-        By default, only the first match is removed. This can be adjusted
-        with the `firstMatchOnly` parameters.
         If a list of objects is passed, they will all be removed.
         If shiftOffsets is True, then offsets will be
         corrected after object removal. It is more efficient to pass
@@ -1158,6 +1165,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             {0.0} <music21.note.Note C>
         {4.0} <music21.stream.Measure 2 offset=4.0>
         <BLANKLINE>
+        
+        Changed in v5.3 -- firstMatchOnly removed -- impossible to have element
+        in stream twice.  recurse and shiftOffsets changed to keywordOnly arguments
         '''
         # experimental
         if self._mutable is False:
@@ -1176,14 +1186,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             try:
                 targetList = sorted(targetOrList, key=self.elementOffset)
             except sites.SitesException:
-                # if recurse, it's not such a big deal...
+                # will not be found ifrecursing, it's not such a big deal...
                 targetList = targetOrList
-
         else:
             targetList = targetOrList
 
-        if shiftOffsets:
-            shiftDur = 0.0
+        shiftDur = 0.0 # for shiftOffsets
 
         for i, target in enumerate(targetList):
             try:
@@ -1233,7 +1241,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 else:
                     shiftedRegionEnd = self.duration.quarterLength
 
-                shiftDur = shiftDur + matchDuration
+                shiftDur += matchDuration
                 if shiftDur != 0.0:
                     # can this be done with recurse???
                     for e in self.iter.getElementsByOffset(shiftedRegionStart,
@@ -1243,7 +1251,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         mustBeginInSpan=True):
 
                         elementOffset = self.elementOffset(e)
-                        self.setElementOffset(e, elementOffset-shiftDur)
+                        self.setElementOffset(e, elementOffset - shiftDur)
             #if renumberMeasures is True and matchedEndElement is False:
             #   pass  # This should maybe just call a function renumberMeasures
         self.coreElementsChanged(clearIsSorted=False)
@@ -2223,21 +2231,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def replace(self,
                 target,
                 replacement,
+                *,
                 recurse=False,
                 allDerived=True):
         '''
-        Given a `target` object, replace all references of that object with
-        references to the supplied `replacement` object.
+        Given a `target` object, replace it with
+        the supplied `replacement` object.
+
+        Does nothing if target cannot be found.
 
         If `allDerived` is True (as it is by default), all sites that
         have a reference for the replacement will be similarly changed.
         This is useful for altering both a flat and nested representation.
 
-        firstMatchOnly did NOTHING because each element can only be in a site ONCE.
-        Removed!
-
-        allTargetSites RENAMED to allDerived -- only searches in derivation chain.
-
+        `recurse` is currently buggy and in beta.
 
         >>> csharp = note.Note("C#4")
         >>> s = stream.Stream()
@@ -2263,6 +2270,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         True
         >>> otherStream[0] is dflat
         True
+
+        Changed by v.5:
+
+        firstMatchOnly did NOTHING because each element can only be in a site ONCE.
+        Removed!
+
+        allTargetSites RENAMED to allDerived -- only searches in derivation chain.
+
+        Changed in v5.3 -- firstMatchOnly removed -- impossible to have element
+        in stream twice.  recurse and shiftOffsets changed to keywordOnly arguments
+
 
         OMIT_FROM_DOCS
 
