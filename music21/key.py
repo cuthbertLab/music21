@@ -22,7 +22,6 @@ import re
 import unittest
 
 from music21 import base
-from music21 import common
 from music21 import exceptions21
 from music21 import interval
 from music21 import note
@@ -1025,16 +1024,6 @@ class Key(KeySignature, scale.DiatonicScale):
         # take distance from first to second; greater certainty
         # seems to have a greater span
         leaderSpan = focus[0] - focus[1]
-
-        # take average of all non-negative values
-        meanMagnitude = sum(focus) / float(len(focus))
-
-        # standard deviation of all non-neg values
-        standardDeviation = common.standardDeviation(focus, bassel=False)
-
-        environLocal.printDebug(['absMagnitude', absMagnitude, 'leaderSpan', leaderSpan,
-                                 'meanMagnitude', meanMagnitude,
-                                 'standardDeviation', standardDeviation])
 
         # combine factors with a weighting for each
         # estimate range as 2, normalize between zero and 1

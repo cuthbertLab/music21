@@ -25,7 +25,7 @@ To do a release,
 5. commit and then check test/testSingleCoreAll.py or wait for results on Travis-CI
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
      but should be done before making a release).
-6. then python3 /documentation/testDocumentation.py [*]
+6. then python3 documentation/testDocumentation.py [*]
 
 [*] you will need pytest and nbval installed (along with ipython and jupyter)
 
@@ -37,6 +37,8 @@ To do a release,
 9. run documentation/upload.py [not via eclipse] or upload via ssh.
    -- you will need an MIT username and password 
    -- for each new major version ssh in and delete old files before uploading.
+
+9b. zip up documentation/build/html and get ready to upload/delete it.
 
 10. And finally this file. (from the command line; not as python -m...)
 

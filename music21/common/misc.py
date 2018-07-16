@@ -12,6 +12,7 @@
 '''
 If it doesn't fit anywhere else in the common directory, you'll find it here...
 '''
+import re
 
 __all__ = ['flattenList',
            'getMissingImportStr',
@@ -20,6 +21,7 @@ __all__ = ['flattenList',
            'pitchList',
            'runningUnderIPython',
            'defaultDeepcopy',
+           'cleanedFlatNotation'
            ]
 
 import copy
@@ -200,6 +202,16 @@ def defaultDeepcopy(obj, memo, callInit=True):
 
     return new
 
+def cleanedFlatNotation(music_str):
+    """
+    Returns a copy of the given string where each occurrence of a flat note
+    specified with a 'b' is replaced by a '-'.
+    :param music_str: a string containing a note specified (for example in a chord)
+    :return: a new string with flats only specified with '-'.
+    >>> common.cleanedFlatNotation('Cb')
+    'C-'
+    """
+    return re.sub('([A-Ga-g])b', r'\1-', music_str)
 
 if __name__ == '__main__':
     import music21

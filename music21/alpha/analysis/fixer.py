@@ -8,21 +8,21 @@
 # Copyright:    Copyright © 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
+import unittest
+
 from music21.alpha.analysis import aligner
 from music21 import interval
 from music21 import note
 from music21 import pitch
 from music21 import stream
 
-import unittest
-
 class OMRMidiFixer(object):
     '''
     Base class for future fixers
-    changes is a list of changes associated with the midiStream and omrStream, not a list of lists
+    changes is a list of changes associated with the midiStream and omrStream, 
+    not a list of lists
     '''
     def __init__(self, changes, midiStream, omrStream):
-        super(OMRMidiFixer, self).__init__()
         self.changes = changes
         self.midiStream = midiStream
         self.omrStream = omrStream
@@ -38,16 +38,13 @@ class DeleteFixer(OMRMidiFixer):
     Deletes measure that have wrong things in them a la OpenScore specs
     
     '''
-    def __init__(self, changes, midiStream, omrStream):
-        super().__init__(changes, midiStream, omrStream)
-         
     def fix(self):
         for (midiRef, omrRef, op) in self.changes:
-            if self.checkIfNoteInstance(midiRef, omrRef) == False:
+            if self.checkIfNoteInstance(midiRef, omrRef) is False:
                 continue
             # if the are the same, don't bother to try changing it
             # 3 is the number of noChange Ops
-            if isinstance(op, aligner.ChangeOps) and op.changeOpNum == 3:
+            if isinstance(op, aligner.ChangeOps) and op == aligner.ChangeOps.NoChange:
                 continue
              
             m = omrRef.getContextByClass(stream.Measure)
@@ -61,9 +58,8 @@ class EnharmonicFixer(OMRMidiFixer):
     MIDIReference and OMRReference are actual note/rest/chord object in some stream
     op is a ChangeOp that relates the two references
     
-    >>> ########################################
-    >>> ### TEST 1, no changes in omr stream ###
-    >>> ########################################
+    TEST 1, no changes in omr stream
+
     >>> omrStream1 = stream.Stream()
     >>> midiStream1 = stream.Stream()
           
@@ -87,9 +83,9 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> omrStream1[1]
     <music21.note.Note A#>
      
-    >>> ########################################
-    >>> ### TEST 2, no changes in omr stream ###
-    >>> ########################################
+     
+    TEST 2, no changes in omr stream
+
     >>> omrStream2 = stream.Stream()
     >>> midiStream2 = stream.Stream()
           
@@ -113,9 +109,9 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> omrStream1[1]
     <music21.note.Note A#>
      
-    >>> ########################################
-    >>> ### TEST 3 (case 1)
-    >>> ########################################
+    
+    TEST 3 (case 1)
+    
     >>> midiNote3 = note.Note('A4')
     >>> omrNote3 = note.Note('An4')
          
@@ -129,9 +125,9 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> fixer3.fix()
     >>> omrNote3.pitch.accidental
      
-    >>> ########################################
-    >>> ### TEST 4 (case 2-1) e.g midi = g#, gt = a-, omr = an
-    >>> ########################################
+    
+    TEST 4 (case 2-1) e.g midi = g#, gt = a-, omr = an
+    
     >>> midiNote4 = note.Note('G#4')
     >>> omrNote4 = note.Note('An4')
          
@@ -146,9 +142,9 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> omrNote4.pitch.accidental
     <accidental flat>
     
-    >>> ########################################
-    >>> ### TEST 5 (case 2-2) e.g midi = g-, gt = f#, omr = fn
-    >>> ########################################
+    
+    TEST 5 (case 2-2) e.g midi = g-, gt = f#, omr = fn
+    
     >>> midiNote5 = note.Note('G-4')
     >>> omrNote5 = note.Note('Fn4')
         
@@ -163,9 +159,9 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> omrNote5.pitch.accidental
     <accidental sharp>
     
-    >>> ########################################
-    >>> ### TEST 6.1 (case 3) e.g. midi = g#, gt = g#, omr = gn or omr = g-
-    >>> ########################################
+    
+    TEST 6.1 (case 3) e.g. midi = g#, gt = g#, omr = gn or omr = g-
+    
     >>> midiNote6_1 = note.Note('G#4')
     >>> midiNote6_2 = note.Note('G#4')
     >>> omrNote6_1 = note.Note('Gn4')
@@ -188,11 +184,11 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> omrNote6_2.pitch.accidental
     <accidental sharp>
     
-    >>> ########################################
-    >>> ### TEST 7 (case 4-1, 4-2) notes are on different step, off by an interval of 2,
-    >>> ### 4-1: e.g. midi = g#, gt = a-, omr = a#
-    >>> ### 4-2: e.g. midi = a-, gt = g#, omr = g-
-    >>> ########################################
+    
+    TEST 7 (case 4-1, 4-2) notes are on different step, off by an interval of 2,
+    * 4-1: e.g. midi = g#, gt = a-, omr = a#
+    * 4-2: e.g. midi = a-, gt = g#, omr = g-
+    
     >>> midiNote7_1 = note.Note('G#4')
     >>> omrNote7_1 = note.Note('A#4')
     
@@ -222,18 +218,15 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> omrNote7_2.pitch.accidental
     <accidental sharp>
     '''
-    def __init__(self, changes, midiStream, omrStream):
-        super(EnharmonicFixer, self).__init__(changes, midiStream, omrStream)
-    
     def fix(self):
         for (midiRef, omrRef, op) in self.changes:
             omrRef.color = "black"
             #if they're not notes, don't bother with rest
-            if self.checkIfNoteInstance(midiRef, omrRef) == False:
+            if self.checkIfNoteInstance(midiRef, omrRef) is False:
                 continue
             # if the are the same, don't bother to try changing it
             # 3 is the number of noChange Ops
-            if isinstance(op, aligner.ChangeOps) and op.changeOpNum == 3:
+            if isinstance(op, aligner.ChangeOps) and op == aligner.ChangeOps.NoChange:
                 continue
             
             # don't bother with notes with too big of an interval between them
@@ -246,15 +239,19 @@ class EnharmonicFixer(OMRMidiFixer):
                 else: 
                     # case 2-1: midi note is sharp, omr note is one step higher and natural,
                     # should be a flat instead. e.g midi = g#, gt = a-, omr = an
-                    # omr note has higher ps than midi-- on a higher line or space than midi note
+                    # omr note has higher ps than midi-- on a higher 
+                    # line or space than midi note
                     if omrRef.pitch > midiRef.pitch:
-                        if omrRef.pitch.transpose(interval.Interval(-1)).isEnharmonic(midiRef.pitch):
+                        if omrRef.pitch.transpose(interval.Interval(-1)
+                                                  ).isEnharmonic(midiRef.pitch):
                             omrRef.pitch.accidental = pitch.Accidental('flat')
                     # case 2-2: midi note is flat, omr note is one step lower and natural,
                     # should be a flat instead. e.g midi = g-, gt = f#, omr = fn
-                    # omr note has lower ps than midi-- on a higher line or space than midi note
+                    # omr note has lower ps than midi-- on a higher line 
+                    # or space than midi note
                     elif omrRef.pitch < midiRef.pitch:
-                        if omrRef.pitch.transpose(interval.Interval(1)).isEnharmonic(midiRef.pitch):
+                        if omrRef.pitch.transpose(interval.Interval(1)
+                                                  ).isEnharmonic(midiRef.pitch):
                             omrRef.pitch.accidental = pitch.Accidental('sharp')
             # case 3: notes are on same step, but omr got read wrong. 
             # e.g. midi = g#, gt = g#, omr = gn or omr = g-
@@ -270,18 +267,23 @@ class EnharmonicFixer(OMRMidiFixer):
                 # e.g. midi = g#, gt = a-, omr = a#
                 if omrRef.pitch > midiRef.pitch:
                     if omrRef.pitch.accidental == pitch.Accidental('sharp'):
-                        if omrRef.pitch.transpose(interval.Interval(-2)).isEnharmonic(midiRef.pitch):
+                        if omrRef.pitch.transpose(interval.Interval(-2)
+                                                  ).isEnharmonic(midiRef.pitch):
                             omrRef.pitch.accidental = pitch.Accidental('flat')
                 # case 4-2: notes are on different step, off by an interval of 2,
                 # omr note is lower and flat
                 # e.g. midi = a-, gt = g#, omr = g-
                 elif omrRef.pitch < midiRef.pitch:
                     if omrRef.pitch.accidental == pitch.Accidental('flat'):
-                        if omrRef.pitch.transpose(interval.Interval(2)).isEnharmonic(midiRef.pitch):
+                        if omrRef.pitch.transpose(interval.Interval(2)
+                                                  ).isEnharmonic(midiRef.pitch):
                             omrRef.pitch.accidental = pitch.Accidental('sharp')
-            # case 5: same step, MIDI has accidental, omr was read wrong (e.g. key signture not parsed)
+            # case 5: same step, MIDI has accidental, 
+            # omr was read wrong (e.g. key signture not parsed)
             # e.g. midi = b-, gt = b-, omr=
-            elif omrRef.pitch != midiRef.pitch and self.hasSharpFlatAcc(midiRef) and self.stepEq(midiRef, omrRef):
+            elif (omrRef.pitch != midiRef.pitch 
+                    and self.hasSharpFlatAcc(midiRef) 
+                    and self.stepEq(midiRef, omrRef)):
                 omrRef.pitch = midiRef.pitch
             
               
@@ -315,3 +317,4 @@ class Test(unittest.TestCase):
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
+    

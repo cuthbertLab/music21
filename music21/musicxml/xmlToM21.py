@@ -368,6 +368,21 @@ class XMLParserBase:
         
         self.setStyleAttributes(mxObject, m21Object, musicXMLNames)
 
+    def setPrintObject(self, mxObject, m21Object):
+        '''
+        convert 'print-object="no"' to m21Object.style.hideObjectOnPrint = True
+        '''
+        if mxObject.get('print-object') != 'no':
+            return
+
+        if hasattr(m21Object, 'style'):
+            m21Object.style.hideObjectOnPrint = True
+        else:
+            try:
+                m21Object.hideObjectOnPrint = True
+            except AttributeError: # slotted object
+                pass
+
     def setPrintStyleAlign(self, mxObject, m21Object):
         '''
         runs setPrintStyle and then sets horizontalAlign and verticalAlign, on an
@@ -2918,7 +2933,7 @@ class MeasureParser(XMLParserBase):
         r = note.Rest()
         mxRestTag = mxRest.find('rest')
         if mxRestTag is None:
-            raise MusicXMLImportException("do not call xmlToRest or a <note> unless it "
+            raise MusicXMLImportException("do not call xmlToRest on a <note> unless it "
                                           + "contains a rest tag.")
         isFullMeasure = mxRestTag.get('measure')
         if isFullMeasure == "yes":
@@ -2964,8 +2979,7 @@ class MeasureParser(XMLParserBase):
         # print object == 'no' and grace notes may have a type but not
         # a duration. they may be filtered out at the level of Stream
         # processing
-        if mxNote.get('print-object') == 'no':
-            n.style.hideObjectOnPrint = True
+        self.setPrintObject(mxNote, n)
             
         # attr dynamics -- MIDI Note On velocity with 90 = 100, but unbounded on the top
         dynamPercentage = mxNote.get('dynamics')
@@ -4299,7 +4313,7 @@ class MeasureParser(XMLParserBase):
         cs = harmony.ChordSymbol()
         self.setEditorial(mxHarmony, cs)
         self.setPrintStyle(mxHarmony, cs)
-        # TODO: attrGroup: print-object
+        self.setPrintObject(mxHarmony, cs)
         # TODO: attr: print-frame
         # TODO: attrGroup: placement
 
@@ -4834,7 +4848,7 @@ class MeasureParser(XMLParserBase):
         # TODO: interchangeable
 
         self.setPrintStyleAlign(mxTime, ts)
-        # TODO: attr: print-object
+        self.setPrintObject(mxTime, ts)
 
         # TODO: attr: separator
 
@@ -4912,7 +4926,7 @@ class MeasureParser(XMLParserBase):
         # TODO: size
         # TODO: after-barline -- particular style to clef.
         self.setPrintStyle(mxClef, clefObj)
-        # TODO: print-object
+        self.setPrintObject(mxClef, clefObj)
 
         return clefObj
 
@@ -4971,8 +4985,7 @@ class MeasureParser(XMLParserBase):
         self.mxKeyOctaves(mxKey, ks)
         # TODO: attr: number
         self.setPrintStyle(mxKey, ks)
-        # TODO: attr: print-object
-
+        self.setPrintObject(mxKey, ks)
 
         return ks
 
@@ -6322,9 +6335,4 @@ class Test(unittest.TestCase):
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test) #, runTest='testRehearsalMarks')
-
-
-
-
-
 

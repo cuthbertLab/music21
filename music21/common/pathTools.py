@@ -79,8 +79,9 @@ def getCorpusContentDirs():
     >>> fp # this test will be fragile, depending on composition of dirs
     ['airdsAirs', 'bach', 'beach', 'beethoven', 'chopin', 
      'ciconia', 'corelli', 'cpebach',
-     'demos', 'essenFolksong', 'handel', 'haydn', 'josquin', 'leadSheet',
-     'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'palestrina',
+     'demos', 'essenFolksong', 'handel', 'haydn', 'joplin', 'josquin', 
+     'leadSheet', 'luca', 'miscFolk', 'monteverdi', 'mozart', 'nottingham-dataset',
+     'oneills1850', 'palestrina',
      'ryansMammoth', 'schoenberg', 'schubert', 'schumann', 'schumann_clara',
      'theoryExercises', 'trecento', 'verdi', 'weber']
 

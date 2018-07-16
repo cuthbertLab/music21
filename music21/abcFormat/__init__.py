@@ -2203,7 +2203,10 @@ class ABCHandler:
 
             if isinstance(t, ABCTie):
                 # tPrev is guaranteed to be an ABCNote, by the grammar.
-                tPrev.tie = "start"
+                if tPrev.tie == 'stop':
+                    tPrev.tie = 'continue'                
+                else:
+                    tPrev.tie = 'start'
                 lastTieToken = t
 
             if isinstance(t, ABCStaccato):
