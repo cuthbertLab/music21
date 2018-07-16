@@ -548,12 +548,22 @@ V:1
 fz((6:4F,//A,//C//F//A//c// e/d/)dz
 '''
 
+czerny_csharp = '''
+X:4
+T:D Fragment
+C:Czerny
+M:C
+K:C#
+L:1/16
+CEDF EGFA GBAc Bdce|]
+'''
+
 #-------------------------------------------------------------------------------
 
 ALL  = [fyrareprisarn, mysteryReel, fullRiggedShip, aleIsDear, kitchGirl,
         williamAndNancy, morrisonsJig, hectorTheHero, kingOfTheFairies,
         sicutRosa, theAleWifesDaughter, theBeggerBoy, theBattleOfTheSnaBas,
-
+        czerny_csharp,
         draughtOfAle,
         valentineJigg,
         testPrimitive, testPrimitivePolyphonic, testPrimitiveTuplet
@@ -587,7 +597,8 @@ class Test(unittest.TestCase):
 
         for i, tf in enumerate(ALL):
             ah = af.readstr(tf)
-            environLocal.printDebug([ah.getTitle()])
+            title = ah.getTitle()
+            environLocal.printDebug([title])
             s = translate.abcToStreamScore(ah)
             # run musicxml processing to look for internal errors
             #print(repr(s.metadata._workIds['localeOfComposition']._data))
@@ -597,7 +608,12 @@ class Test(unittest.TestCase):
             except UnicodeDecodeError as ude:
                 environLocal.warn("About to fail on ABC file #{}".format(i))
                 raise ude
+            
+            if title == 'D Fragment':
+                sharps = s.parts[0].keySignature.sharps
+                assert sharps == 7, "C# key signature parsed incorrectly"
 
+        
 if __name__ == "__main__":
     import music21
     #music21.converter.parse(reelsABC21, format='abc').scores[1].show()
