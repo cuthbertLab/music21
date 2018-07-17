@@ -611,7 +611,7 @@ class Test(unittest.TestCase):
             
             if title == 'D Fragment':
                 sharps = s.parts[0].keySignature.sharps
-                assert sharps == 7, "C# key signature parsed incorrectly"
+                self.assertEquals(sharps, 7, "C# key signature should be parsed as 7 sharps")
 
         
 if __name__ == "__main__":
