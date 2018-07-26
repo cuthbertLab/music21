@@ -822,7 +822,7 @@ class ConverterMusicXML(SubConverter):
         fpOut = fp[0:len(fp) - 3]
         fpOut += subformatExtension
 
-        musescoreRun = '"' + str(musescorePath) + '" ' + fp + " -o " + fpOut + " -T 0 "
+        musescoreRun = '"' + str(musescorePath) + '" "' + fp + '" -o "' + fpOut + '" -T 0 '
         if 'dpi' in keywords:
             musescoreRun += " -r " + str(keywords['dpi'])
 
