@@ -6011,7 +6011,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     def extendDurationAndGetBoundaries(self, objName, *, inPlace=False):
         '''
-        DEPRECATED v.5 -- to be removed in v.6
+        To be DEPRECATED v.6 -- to be removed in v.7
 
         Extend the Duration of elements specified by objName;
         then, collect a dictionary for every matched element of objName class,
@@ -6739,14 +6739,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return self._cache['semiFlat']
 
 
-
+    @common.deprecated('Not used any more.  Use .containerHierarchy() instead', 'July 2018, v.5', 'July 2019')
     def _yieldReverseUpwardsSearch(self, memo=None, streamsOnly=False,
                              skipDuplicates=True, classFilter=()):
         '''
         Yield all containers (Stream subclasses), including self, and going upward
         and outward.
 
-        NOT CURRENTLY USED.
+        DEPRECATED AND NOT CURRENTLY USED.  Use `.containerHierarchy()` instead.
 
         Note: on first call, a new, fresh memo list must be provided;
         otherwise, values are retained from one call to the next.
@@ -6758,7 +6758,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> nMidMeasure = b[2][4]
         >>> nMidMeasure
         <music21.stream.Measure 3 offset=9.0>
-        >>> list(nMidMeasure._yieldReverseUpwardsSearch())
+        
+        EXAMPLE: 
+        
+        list(nMidMeasure._yieldReverseUpwardsSearch())
+        
         [<music21.stream.Measure 3 offset=9.0>,
          <music21.instrument.Instrument P2: Alto: Instrument 2>,
          <music21.stream.Part Alto>,
@@ -6974,6 +6978,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             ri.addFilter(filters.ClassFilter(classFilter))
         return ri
 
+    @common.deprecated('Just iterate over Stream.recurse(restoreActiveSites=True)', 'July 2018, v.5', 'June 2018')
     def restoreActiveSites(self):
         '''
         Restore all active sites for all elements from this Stream downward.

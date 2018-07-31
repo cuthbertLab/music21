@@ -60,14 +60,28 @@ class StreamIterator:
       and `sectionIndex` is where we are in the iterSection, or -1 if
       we have not started. This dict is shared among all sub iterators.
 
+    Constructor keyword only arguments:
+
+    * `filterList` is a list of stream.filters.Filter objects to apply
+    
+    * if `restoreActiveSites` is True (default) then on iterating, the activeSite is set
+      to the Stream being iterated over.
+      
+    * if `ignoreSorting` is True (default is False) then the Stream is not sorted before
+      iterating.  If the Stream is already sorted, then this value does not matter, and
+      no time will be saved by setting to False.
+      
+    * For `activeInformation` see above.
+
+    Changed in v.5.2 -- all arguments except srcStream are keyword only.
     '''
     def __init__(self,
                  srcStream,
+                 *,
                  filterList=None,
                  restoreActiveSites=True,
                  activeInformation=None,
-                 ignoreSorting=False,
-                 ):
+                 ignoreSorting=False):
         if not ignoreSorting and srcStream.isSorted is False and srcStream.autoSort:
             srcStream.sort()
         self.srcStream = srcStream
@@ -1177,17 +1191,18 @@ class OffsetIterator(StreamIterator):
     '''
     def __init__(self,
                  srcStream,
+                 *,
                  filterList=None,
                  restoreActiveSites=True,
                  activeInformation=None,
-                 ignoreSorting=False,
+                 ignoreSorting=False
                  ):
         super().__init__(srcStream,
-                                             filterList=filterList,
-                                             restoreActiveSites=restoreActiveSites,
-                                             activeInformation=activeInformation,
-                                             ignoreSorting=ignoreSorting,
-                                             )
+                         filterList=filterList,
+                         restoreActiveSites=restoreActiveSites,
+                         activeInformation=activeInformation,
+                         ignoreSorting=ignoreSorting,
+                         )
         self.raiseStopIterationNext = False
         self.nextToYield = []
         self.nextOffsetToYield = None
@@ -1298,6 +1313,7 @@ class RecursiveIterator(StreamIterator):
     '''
     def __init__(self,
                  srcStream,
+                 *,
                  filterList=None,
                  restoreActiveSites=True,
                  activeInformation=None,
