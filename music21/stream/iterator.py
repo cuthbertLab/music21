@@ -1317,8 +1317,8 @@ class RecursiveIterator(StreamIterator):
                  filterList=None,
                  restoreActiveSites=True,
                  activeInformation=None,
-                 streamsOnly=False, # to be removed?
-                 includeSelf=False, # to be removed?
+                 streamsOnly=False, 
+                 includeSelf=False,
                  ignoreSorting=False
                  ): #, parentIterator=None):
         super().__init__(srcStream,

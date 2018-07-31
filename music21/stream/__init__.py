@@ -6978,6 +6978,50 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             ri.addFilter(filters.ClassFilter(classFilter))
         return ri
 
+
+    def containerInHierarchy(self, el, *, setActiveSite=True):
+        '''
+        Returns the container in a hierarchy that this element belongs to.
+        
+        For instance, assume a Note (n) is in a Measure (m1) which is in a Part, in a Score (s1),
+        and the Note is also in another hierarchy (say, a chordified version of a Score, s2).
+        if s1.containerInHierarchy(n) is called, it will return m1, and (unless
+        `setActiveSite` is False) will return the Measure, m1, that contains the note.
+        
+        If it cannot be found, then None is returned.
+        
+        >>> s1 = stream.Score(id='s1')
+        >>> p1 = stream.Part()
+        >>> m1 = stream.Measure(id='m1')
+        >>> n = note.Note('D')
+        >>> m1.append(n)
+        >>> p1.append(m1)
+        >>> s1.insert(0, p1)
+        >>> s2 = stream.Stream(id='s2')
+        >>> s2.append(n)
+        >>> n.activeSite.id
+        's2'
+        >>> s1.containerInHierarchy(n).id
+        'm1'
+        >>> n.activeSite.id
+        'm1'
+        >>> n.activeSite = s2
+        >>> s1.containerInHierarchy(n, setActiveSite=False).id
+        'm1'
+        >>> n.activeSite.id
+        's2'
+        
+        @return Stream or None
+        '''
+        elSites = el.sites
+        for s in self.recurse(skipSelf=False, streamsOnly=True, restoreActiveSites=False):
+            if s in elSites:
+                if setActiveSite:
+                    el.activeSite = s
+                return s
+        return None
+
+
     @common.deprecated('Just iterate over Stream.recurse(restoreActiveSites=True)', 'July 2018, v.5', 'June 2018')
     def restoreActiveSites(self):
         '''
