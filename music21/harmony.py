@@ -2456,6 +2456,54 @@ class Test(unittest.TestCase):
         self.assertEqual(b.nameWithOctave, 'E-3')
 
 
+    def testNoChord(self):
+
+        from music21 import stream, note
+
+        nc = NoChord()
+        self.assertEqual('none', nc.chordKind)
+        self.assertEqual('N.C.', nc.chordKindStr)
+        self.assertEqual('N.C.', nc.figure)
+
+        nc = NoChord('NC')
+        self.assertEqual('none', nc.chordKind)
+        self.assertEqual('NC', nc.chordKindStr)
+        self.assertEqual('NC', nc.figure)
+
+        nc = NoChord('None')
+        self.assertEqual('none', nc.chordKind)
+        self.assertEqual('None', nc.chordKindStr)
+        self.assertEqual('None', nc.figure)
+
+        nc = NoChord(kind='none')
+        self.assertEqual('none', nc.chordKind)
+        self.assertEqual('N.C.', nc.chordKindStr)
+        self.assertEqual('N.C.', nc.figure)
+
+        nc = NoChord(kindStr='No Chord')
+        self.assertEqual('none', nc.chordKind)
+        self.assertEqual('No Chord', nc.chordKindStr)
+        self.assertEqual('No Chord', nc.figure)
+
+        nc = NoChord('NC', kindStr='No Chord')
+        self.assertEqual('none', nc.chordKind)
+        self.assertEqual('No Chord', nc.chordKindStr)
+        self.assertEqual('NC', nc.figure)
+
+        nc = NoChord(root='C', bass='E', kind='none')
+        self.assertEqual('N.C.', nc.chordKindStr)
+        self.assertEqual('N.C.', nc.figure)
+
+        self.assertEqual(str(nc), '<music21.harmony.NoChord N.C.>')
+        self.assertEqual(0, len(nc.pitches))
+        self.assertIsNone(nc.root())
+        self.assertIsNone(nc.bass())
+
+        nc._updatePitches()
+        self.assertEqual(0, len(nc.pitches))
+
+
+
 class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
@@ -2558,49 +2606,6 @@ class TestExternal(unittest.TestCase): # pragma: no cover
                     for harmony_type in val:
                         print(n + m + ',' + harmony_type,
                               ChordSymbol(n + m + ',' + harmony_type).pitches)
-
-    def testNoChord(self):
-
-        from music21 import stream, note
-
-        nc = NoChord()
-        self.assertEqual('none', nc.chordKind)
-        self.assertEqual('N.C.', nc.chordKindStr)
-        self.assertEqual('N.C.', nc.figure)
-
-        nc = NoChord('NC')
-        self.assertEqual('none', nc.chordKind)
-        self.assertEqual('NC', nc.chordKindStr)
-        self.assertEqual('NC', nc.figure)
-
-        nc = NoChord('None')
-        self.assertEqual('none', nc.chordKind)
-        self.assertEqual('None', nc.chordKindStr)
-        self.assertEqual('None', nc.figure)
-
-        nc = NoChord(kind='none')
-        self.assertEqual('none', nc.chordKind)
-        self.assertEqual('N.C.', nc.chordKindStr)
-        self.assertEqual('N.C.', nc.figure)
-
-        nc = NoChord(kindStr='No Chord')
-        self.assertEqual('none', nc.chordKind)
-        self.assertEqual('No Chord', nc.chordKindStr)
-        self.assertEqual('No Chord', nc.figure)
-
-        nc = NoChord('NC', kindStr='No Chord')
-        self.assertEqual('none', nc.chordKind)
-        self.assertEqual('No Chord', nc.chordKindStr)
-        self.assertEqual('NC', nc.figure)
-
-        nc = NoChord(root='C', bass='E', kind='none')
-        self.assertEqual('N.C.', nc.chordKindStr)
-        self.assertEqual('N.C.', nc.figure)
-
-        self.assertEqual(str(nc), '<music21.harmony.NoChord N.C.>')
-        self.assertEqual(0, len(nc.pitches))
-        self.assertIsNone(nc.root())
-        self.assertIsNone(nc.bass())
 
 
 #     def labelChordSymbols(self):
