@@ -2598,6 +2598,7 @@ class PartExporter(XMLExporterBase):
 class MeasureExporter(XMLExporterBase):
     classesToMethods = OrderedDict(
                [('Note', 'noteToXml'),
+                ('NoChord', 'noChordToXml'),
                 ('ChordSymbol', 'chordSymbolToXml'),
                 ('Chord', 'chordToXml'),
                 ('Rest', 'restToXml'),
@@ -4404,6 +4405,43 @@ class MeasureExporter(XMLExporterBase):
             SubElement(mxh, 'sounding-pitch')
         elif harm.pitchType == 'touching':
             SubElement(mxh, 'touching-pitch')
+
+
+    def noChordToXml(self, cs):
+        '''
+        Convert a NoChord object to an mxHarmony object.
+
+        '''
+        if cs.writeAsChord is True:
+            return self.chordToXml(cs)
+
+        from music21 import harmony
+
+        mxHarmony = Element('harmony')
+        _synchronizeIds(mxHarmony, cs)
+
+        self.setPrintObject(mxHarmony, cs)
+
+        self.setPrintStyle(mxHarmony, cs)
+
+        mxRoot = SubElement(mxHarmony, 'root')
+        mxStep = SubElement(mxRoot, 'root-step')
+        mxStep.text = 'C'
+        mxStep.set('text', '')
+
+
+        mxKind = SubElement(mxHarmony, 'kind')
+        cKind = cs.chordKind
+        assert cs.chordKind == 'none'
+        mxKind.text = str(cKind)
+        assert cs.chordKindStr not in (None, "")
+        mxKind.set('text', cs.chordKindStr)
+
+        self.setOffsetOptional(cs, mxHarmony)
+        self.setEditorial(mxHarmony, cs)
+
+        self.xmlRoot.append(mxHarmony)
+        return mxHarmony
 
     def chordSymbolToXml(self, cs):
         '''
