@@ -6335,42 +6335,23 @@ class Test(unittest.TestCase):
         self.assertEqual(rmIterator[2].style.enclosure, 'square')
 
     def testNoChordImport(self):
-        from music21.harmony import ChordSymbol, NoChord
         from music21 import converter
-        from music21 import musicxml
 
         thisDir = common.getSourceFilePath() / 'musicxml'
         testFp = thisDir / 'testNC.xml'
-        no_chord_score = converter.parse(testFp, forceSource=True)
-        no_chord_score.show('txt')
-        no_chord = no_chord_score.flat.getElementsByClass('ChordSymbol')[3]
+        s = converter.parse(testFp, forceSource=True)
 
-        GEX = musicxml.m21ToXml.GeneralObjectExporter(no_chord_score)
-        out = GEX.parse()
-        outStr = out.decode('utf-8')
-        print(outStr)
+        self.assertEqual(5, len(s.flat.getElementsByClass('ChordSymbol')))
+        self.assertEqual(2, len(s.flat.getElementsByClass('NoChord')))
 
-        # TODO root-step should have empty text when kind is none
-        # TODO text should be N.C. when kind is none
-        # <root-step text="">C</root-step>
-        # <kind text="N.C.">none</kind>
-        # TODO Add possibility to create NC ChordSymbol with "N.C." figure
-        # Use MusicXML convention with C root and none kind
+        self.assertEqual('augmented-seventh', s.flat.getElementsByClass('ChordSymbol')[0].chordKind)
+        self.assertEqual('none', s.flat.getElementsByClass('ChordSymbol')[1].chordKind)
 
-        new_nc = ChordSymbol(root = 'C', kind='augmented-seventh')
-        new_nc = ChordSymbol(root = 'C', kindStr='')
-        new_nc = ChordSymbol(root = 'C', kindStr='N.C.')
-        new_nc = ChordSymbol(kind='none')
-        new_nc.findRoot()
+        self.assertEqual('random', str(s.flat.getElementsByClass('NoChord')[
+                                           0].chordKindStr))
+        self.assertEqual('N.C.', str(s.flat.getElementsByClass('NoChord')[
+                                         1].chordKindStr))
 
-
-        # Doesn't need both kind and kindStr. When build from figure,
-        # only kind is set (even if figure provides kindStr)
-        # Should have special subclass, with root returning None,
-        # kind 'none', kindStr whatever is given, or some default 'N.C',
-        # and figure should return kindStr. Should implement parseFigure ?
-
-        pass
 
 
 if __name__ == '__main__':
