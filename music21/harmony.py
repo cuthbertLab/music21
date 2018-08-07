@@ -2255,6 +2255,16 @@ class NoChord(ChordSymbol):
         # do nothing, everything is already set.
         return
 
+    @property
+    def writeAsChord(self):
+        # Never write NoChords.
+        return False
+
+    @writeAsChord.setter
+    def writeAsChord(self, val):
+        pass
+
+
 #-------------------------------------------------------------------------------
 
 
