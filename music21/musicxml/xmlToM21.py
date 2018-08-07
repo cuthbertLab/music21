@@ -4342,6 +4342,8 @@ class MeasureParser(XMLParserBase):
         mxKind = mxHarmony.find('kind')
         if mxKind is not None and mxKind.text is not None: # two ways of doing it...
             cs.chordKind = mxKind.text.strip()
+            if cs.chordKind == 'none':
+                cs = harmony.NoChord()
             mxKindText = mxKind.get('text') # attribute
             if mxKindText is not None:
                 cs.chordKindStr = mxKindText
@@ -4382,10 +4384,11 @@ class MeasureParser(XMLParserBase):
             seta(hd, mxDegree, 'degree-type', 'modType')
             cs.addChordStepModification(hd)
 
-        cs._updatePitches()
-        #environLocal.printDebug(['xmlToChordSymbol(): Harmony object', h])
-        if cs.root().name != r.name:
-            cs.root(r)
+        if cs.chordKind != 'none':
+            cs._updatePitches()
+            #environLocal.printDebug(['xmlToChordSymbol(): Harmony object', h])
+            if cs.root().name != r.name:
+                cs.root(r)
 
         return cs
 
