@@ -80,7 +80,7 @@ def getCorpusContentDirs():
     ['airdsAirs', 'bach', 'beach', 'beethoven', 'chopin', 
      'ciconia', 'corelli', 'cpebach',
      'demos', 'essenFolksong', 'handel', 'haydn', 'joplin', 'josquin', 
-     'leadSheet', 'luca', 'miscFolk', 'monteverdi', 'mozart', 
+     'leadSheet', 'luca', 'miscFolk', 'monteverdi', 'mozart', 'nottingham-dataset',
      'oneills1850', 'palestrina',
      'ryansMammoth', 'schoenberg', 'schubert', 'schumann', 'schumann_clara',
      'theoryExercises', 'trecento', 'verdi', 'weber']

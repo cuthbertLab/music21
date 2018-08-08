@@ -3240,50 +3240,50 @@ class Test(unittest.TestCase):
         self.assertEqual(match, ['2a', '3a', '3b', 'n3(3b)', 'n4(3b)', '3c'])
 
         # environLocal.printDebug(['upward, with skipDuplicates:'])
-        match = []
-        # must provide empty list for memo
-        for x in s7._yieldReverseUpwardsSearch([], streamsOnly=True, skipDuplicates=True):
-            match.append(x.id)
-            # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
-        self.assertEqual(match, ['3c', '2a', '1a', '2b', '2c', '3a', '3b'] )
+#         match = []
+#         # must provide empty list for memo
+#         for x in s7._yieldReverseUpwardsSearch([], streamsOnly=True, skipDuplicates=True):
+#             match.append(x.id)
+#             # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
+#         self.assertEqual(match, ['3c', '2a', '1a', '2b', '2c', '3a', '3b'] )
 
 
         # environLocal.printDebug(['upward from a single node, with skipDuplicates'])
-        match = []
-        for x in s10._yieldReverseUpwardsSearch([], streamsOnly=True):
-            match.append(x.id)
-            # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
-
-        self.assertEqual(match, ['3f', '2c', '1a', '2a', '2b'] )
+#         match = []
+#         for x in s10._yieldReverseUpwardsSearch([], streamsOnly=True):
+#             match.append(x.id)
+#             # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
+# 
+#         self.assertEqual(match, ['3f', '2c', '1a', '2a', '2b'] )
 
 
         # environLocal.printDebug(['upward with skipDuplicates=False:'])
-        match = []
-        for x in s10._yieldReverseUpwardsSearch([], streamsOnly=True, skipDuplicates=False):
-            match.append(x.id)
-            # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
-        self.assertEqual(match, ['3f', '2c', '1a', '2a', '1a', '2b', '1a'] )
+#         match = []
+#         for x in s10._yieldReverseUpwardsSearch([], streamsOnly=True, skipDuplicates=False):
+#             match.append(x.id)
+#             # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
+#         self.assertEqual(match, ['3f', '2c', '1a', '2a', '1a', '2b', '1a'] )
 
 
         # environLocal.printDebug(['upward, with skipDuplicates, streamsOnly=False:'])
-        match = []
-        # must provide empty list for memo
-        for x in s8._yieldReverseUpwardsSearch([], streamsOnly=False,
-            skipDuplicates=True):
-            match.append(x.id)
-            environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
-        self.assertEqual(match, ['3d', 'n2(2b)', '2b', 'n(1a)', '1a', '2a', '2c', '3e'] )
+#         match = []
+#         # must provide empty list for memo
+#         for x in s8._yieldReverseUpwardsSearch([], streamsOnly=False,
+#             skipDuplicates=True):
+#             match.append(x.id)
+#             environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
+#         self.assertEqual(match, ['3d', 'n2(2b)', '2b', 'n(1a)', '1a', '2a', '2c', '3e'] )
 
 
         # environLocal.printDebug(['upward, with skipDuplicates, streamsOnly=False:'])
-        match = []
-        # must provide empty list for memo
-        for x in s4._yieldReverseUpwardsSearch([], streamsOnly=False,
-            skipDuplicates=True):
-            match.append(x.id)
-            # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
-        # notice that this does not get the nonConatainers for 2b
-        self.assertEqual(match, ['2c', 'n(1a)', '1a', '2a', '2b'] )
+#         match = []
+#         # must provide empty list for memo
+#         for x in s4._yieldReverseUpwardsSearch([], streamsOnly=False,
+#             skipDuplicates=True):
+#             match.append(x.id)
+#             # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
+#         # notice that this does not get the nonConatainers for 2b
+#         self.assertEqual(match, ['2c', 'n(1a)', '1a', '2a', '2b'] )
 
 
 

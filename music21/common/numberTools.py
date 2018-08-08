@@ -17,6 +17,7 @@ import unittest
 
 from fractions import Fraction
 from music21 import defaults
+from music21.common.decorators import deprecated
 
 __all__ = ['ordinals', 'musicOrdinals',
 
@@ -28,7 +29,6 @@ __all__ = ['ordinals', 'musicOrdinals',
            'almostEquals',
            'addFloatPrecision', 'strTrimFloat',
            'nearestMultiple',
-           'standardDeviation',
 
            'dotMultiplier', 'decimalToTuplet',
            'unitNormalizeProportion', 'unitBoundaryProportion',
@@ -42,6 +42,7 @@ __all__ = ['ordinals', 'musicOrdinals',
 
            'fromRoman', 'toRoman',
            'ordinalAbbreviation',
+           'standardDeviation',
            ]
 
 ordinals = ['Zeroth', 'First', 'Second', 'Third', 'Fourth', 'Fifth',
@@ -598,15 +599,12 @@ def nearestMultiple(n, unit):
         return matchHigh, round(matchHigh - n, 7), round(n - matchHigh, 7)
 
 
+@deprecated('2018-01-01 v5', '2018-08-01', 'use statistics.stdev instead')
 def standardDeviation(coll, bassel=False):
-    '''Given a collection of values, return the standard deviation.
-
-    >>> common.standardDeviation([2, 4, 4, 4, 5, 5, 7, 9])
-    2.0
-    >>> common.standardDeviation([600, 470, 170, 430, 300])
-    147.3227...
-    >>> common.standardDeviation([4, 2, 5, 8, 6], bassel=True)
-    2.23606...
+    '''
+    DEPRECATED: use statistics.stdev instead.
+    
+    Given a collection of values, return the standard deviation.
 
     :rtype: float
     '''
@@ -619,7 +617,6 @@ def standardDeviation(coll, bassel=False):
         return math.sqrt(sum(diffColl) / float(len(diffColl) - 1))
     else:
         return math.sqrt(sum(diffColl) / float(len(diffColl)))
-
 
 def dotMultiplier(dots):
     '''

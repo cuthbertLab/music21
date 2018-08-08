@@ -416,8 +416,8 @@ class ABCMetadata(ABCToken):
             raise ABCTokenException('no key signature associated with this meta-data')
 
         # abc uses b for flat in key spec only
-        keyNameMatch = ['c', 'g', 'd', 'a', 'e', 'b', 'f#', 'g#',
-                        'f', 'bb', 'eb', 'ab', 'db', 'gb', 'cb',
+        keyNameMatch = ['c', 'g', 'd', 'a', 'e', 'b', 'f#', 'g#', 
+                        'f', 'bb', 'eb', 'd#', 'ab', 'e#', 'db', 'c#', 'gb', 'cb',
                         # HP or Hp are used for highland pipes
                         'hp']
 
@@ -2203,7 +2203,10 @@ class ABCHandler:
 
             if isinstance(t, ABCTie):
                 # tPrev is guaranteed to be an ABCNote, by the grammar.
-                tPrev.tie = "start"
+                if tPrev.tie == 'stop':
+                    tPrev.tie = 'continue'                
+                else:
+                    tPrev.tie = 'start'
                 lastTieToken = t
 
             if isinstance(t, ABCStaccato):

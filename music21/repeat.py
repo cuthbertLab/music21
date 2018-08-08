@@ -3050,8 +3050,8 @@ class Test(unittest.TestCase):
         self.assertEqual(str(s.flat.pitches[0]), 'A2')
 
         self.assertEqual(features.vectorById(s, 'p20'),
-                         [1.0, 1/3, 0.0, 1.0, 1/3,
-                          0.0, 1.0, 1/3, 0.0, 1.0, 1/3, 0.0])
+                         [3/16, 1/16, 0.0, 3/16, 1/16,
+                          0.0, 3/16, 1/16, 0.0, 3/16, 1/16, 0.0])
         self.assertEqual([x.nameWithOctave for x in s.flat.pitches],
                          ['A2', 'B-3', 'A2', 'A2', 'C3', 'C#4', 'C3', 'C3', 'E-3',
                           'E4', 'E-3', 'E-3', 'F#3', 'G4', 'F#3', 'F#3', 'A3',
@@ -3067,8 +3067,8 @@ class Test(unittest.TestCase):
         self.assertEqual(str(s1.flat.pitches[0]), 'C3')
 
         self.assertEqual(features.vectorById(s1, 'p20'),
-                         [0.2, 2/30, 0.0, 0.6, 0.2, 0.0,
-                          1.0, 1/3, 0.0, 0.0, 0.0, 0.0])
+                         [15*(1/36), 5/36, 0.0, 0.0, 0.0, 0.0,
+                          1/12, 1/36, 0.0, 1/4, 1/12, 0.0])
 
         self.assertEqual([x.nameWithOctave for x in s1.flat.pitches],
                          ['C3', 'C#4', 'C3', 'C3', 'E-3', 'E4', 'E-3',

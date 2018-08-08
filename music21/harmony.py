@@ -247,13 +247,13 @@ class Harmony(chord.Chord):
         for kw in keywords:
             if kw == 'root':
                 if isinstance(keywords[kw], str):
-                    keywords[kw].replace('b', '-')
+                    keywords[kw] = common.cleanedFlatNotation(keywords[kw])
                     self.root(pitch.Pitch(keywords[kw]))
                 else:
                     self.root(keywords[kw])
             elif kw == 'bass':
                 if isinstance(keywords[kw], str):
-                    keywords[kw].replace('b', '-')
+                    keywords[kw] = common.cleanedFlatNotation(keywords[kw])
                     self.bass(pitch.Pitch(keywords[kw]))
                 else:
                     self.bass(keywords[kw])
@@ -677,6 +677,14 @@ def addNewChordSymbol(chordTypeName, fbNotationString, AbbreviationList):
      <music21.pitch.Pitch E-3>, <music21.pitch.Pitch A--3>)
 
     OMIT_FROM_DOCS
+
+    >>> harmony.ChordSymbol(root='Cb', kind='BethChord').pitches
+    (<music21.pitch.Pitch C-3>, <music21.pitch.Pitch D3>,
+     <music21.pitch.Pitch E-3>, <music21.pitch.Pitch A--3>)
+
+    >>> harmony.ChordSymbol(root='C-', kind='BethChord').pitches
+    (<music21.pitch.Pitch C-3>, <music21.pitch.Pitch D3>,
+     <music21.pitch.Pitch E-3>, <music21.pitch.Pitch A--3>)
 
     >>> harmony.removeChordSymbols('BethChord')
     '''
@@ -1827,7 +1835,11 @@ class ChordSymbol(Harmony):
                 continue
             justints = itemString.replace('b', '')
             justints = justints.replace('#', '')
-            if int(justints) > 20: # MSC: what is this doing?
+            try:
+                justints = int(justints)
+            except ValueError:
+                raise ValueError  # Not a properly formatted chord, ignore it
+            if justints > 20:  # MSC: what is this doing?
                 skipNext = False
                 i = 0
                 charString = ''

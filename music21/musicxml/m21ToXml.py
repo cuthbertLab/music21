@@ -3685,10 +3685,12 @@ class MeasureExporter(XMLExporterBase):
         >>> myFretNote1 = tablature.FretNote(1, 2, 2)
         >>> myFretNote2 = tablature.FretNote(2, 3, 3)
         >>> myFretNote3 = tablature.FretNote(3, 2, 1)
-        >>> guitarChord = tablature.ChordWithFretBoard('DM', numStrings = 6, fretNotes = [myFretNote1, myFretNote2, myFretNote3])
+        >>> guitarChord = tablature.ChordWithFretBoard('DM', numStrings=6, 
+        ...                    fretNotes=[myFretNote1, myFretNote2, myFretNote3])
         >>> guitarChord.tuning = tablature.GuitarFretBoard().tuning
         >>> guitarChord.getPitches()
-        [None, None, None, <music21.pitch.Pitch A3>, <music21.pitch.Pitch D4>, <music21.pitch.Pitch F#4>]
+        [None, None, None, 
+         <music21.pitch.Pitch A3>, <music21.pitch.Pitch D4>, <music21.pitch.Pitch F#4>]
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> MEXChordWithFret = MEX.chordWithFretToXml(guitarChord)
         >>> MEX.dump(MEXChordWithFret)
@@ -3712,7 +3714,7 @@ class MeasureExporter(XMLExporterBase):
             </frame-note>
         </frame>
         '''
-        if len(fretBoard.fretNotes) == 0:
+        if not fretBoard.fretNotes:
             return None
         
         #why isn't this the same as the function above? This seems a good deal simpler!

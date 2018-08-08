@@ -1,11 +1,16 @@
 language: python
 
-sudo: false
-
-python:
-    - "3.4"
-    - "3.5"
-    - "3.6"
+matrix:
+    include:
+        - python: 3.4
+          dist: trusty
+          sudo: false
+        - python: 3.5
+          dist: xenial
+          sudo: false
+        - python: 3.6
+          dist: trusty
+          sudo: false
 
 before_install:
     - mkdir ~/Desktop
@@ -39,4 +44,4 @@ script:
     - python -c 'from music21.test.testSingleCoreAll import travisMain as tm; tm()'
 
 after_success:
-    - if [ "$TRAVIS_PYTHON_VERSION" == "3.5" ]; then coveralls; fi
+    - if [ "$TRAVIS_PYTHON_VERSION" == "3.4" ]; then coveralls; fi

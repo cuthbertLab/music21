@@ -522,6 +522,7 @@ class CoreCorpus(Corpus):
         ('miscFolk', 'Miscellaneous Folk', False),
         ('monteverdi', 'Claudio Monteverdi', True),
         ('mozart', 'Wolfgang Amadeus Mozart', True),
+        ('nottingham-dataset', 'Nottingham Music Database (partial)', False),
         ('oneills1850', 'Oneill\'s 1850 Collection', False),
         ('palestrina', 'Giovanni Palestrina', True),
         ('ryansMammoth', 'Ryan\'s Mammoth Collection', False),
