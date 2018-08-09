@@ -286,7 +286,10 @@ def parseTokens(mh, dst, p, useMeasures):
                 cs_name = re.sub('[()]', '', cs_name)
                 cs_name = common.cleanedFlatNotation(cs_name)
                 try:
-                    cs = harmony.ChordSymbol(cs_name)
+                    if cs_name in ('NC', 'N.C.', 'No Chord', 'None'):
+                        cs = harmony.NoChord(cs_name)
+                    else:
+                        cs = harmony.ChordSymbol(cs_name)
                     dst.coreAppend(cs, setActiveSite=False)
                     dst.coreElementsChanged()
                 except ValueError:
@@ -847,6 +850,35 @@ class Test(unittest.TestCase):
         # G7/B
         self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].root(), pitch.Pitch('G3'))
         self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].bass(), pitch.Pitch('B2'))
+
+
+    def testNoChord(self):
+
+        from music21 import converter
+
+        target_str = """
+                	T: No Chords
+                	M: 4/4
+                	L: 1/1
+                	K: C
+                	[| "C" C | "NC" C | "C" C | "N.C." C | "C" C 
+                	| "No Chord" C | "C" C | "None" C | "C" C | "Other" 
+                	C |]
+                """
+        score = converter.parse(target_str, format='abc')
+
+        self.assertEqual(len(list(score.flat.getElementsByClass(
+            'ChordSymbol'))), 9)
+        self.assertEqual(len(list(score.flat.getElementsByClass(
+            'NoChord'))), 4)
+
+        score = harmony.realizeChordSymbolDurations(score)
+
+        self.assertEqual(8, score.getElementsByClass('ChordSymbol')[
+            -1].quarterLength)
+        self.assertEqual(4, score.getElementsByClass('ChordSymbol')[
+            0].quarterLength)
+
 
     def testLocaleOfCompositionImport(self):
 

@@ -2198,7 +2198,8 @@ class NoChord(ChordSymbol):
     encode absence of chords. This is especially useful to stop a chord
     without playing another.
 
-    >>> from music21 import stream, note
+    >>> from music21 import stream, note, harmony
+    >>> from music21.harmony import ChordSymbol, NoChord
     >>> s = stream.Score()
     >>> s.repeatAppend(note.Note('C'), 4)
     >>> s.append(ChordSymbol('C'))
@@ -2206,7 +2207,7 @@ class NoChord(ChordSymbol):
     >>> s.append(NoChord())
     >>> s.repeatAppend(note.Note('C'), 4)
     >>> s = s.makeMeasures()
-    >>> s = realizeChordSymbolDurations(s)
+    >>> s = harmony.realizeChordSymbolDurations(s)
     >>> s.show('text')
     {0.0} <music21.clef.BassClef>
     {0.0} <music21.meter.TimeSignature 4/4>
