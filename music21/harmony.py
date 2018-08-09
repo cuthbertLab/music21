@@ -2620,7 +2620,6 @@ class TestExternal(unittest.TestCase): # pragma: no cover
                         print(n + m + ',' + harmony_type,
                               ChordSymbol(n + m + ',' + harmony_type).pitches)
 
-
 #     def labelChordSymbols(self):
 #         '''
 #         A very rough sketch of code to label the chord symbols in a bach
