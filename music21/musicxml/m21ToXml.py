@@ -2598,6 +2598,7 @@ class PartExporter(XMLExporterBase):
 class MeasureExporter(XMLExporterBase):
     classesToMethods = OrderedDict(
                [('Note', 'noteToXml'),
+                ('NoChord', 'noChordToXml'),
                 ('ChordSymbol', 'chordSymbolToXml'),
                 ('Chord', 'chordToXml'),
                 ('Rest', 'restToXml'),
@@ -4407,6 +4408,43 @@ class MeasureExporter(XMLExporterBase):
         elif harm.pitchType == 'touching':
             SubElement(mxh, 'touching-pitch')
 
+
+    def noChordToXml(self, cs):
+        '''
+        Convert a NoChord object to an mxHarmony object.
+
+        '''
+        if cs.writeAsChord is True:
+            return self.chordToXml(cs)
+
+        from music21 import harmony
+
+        mxHarmony = Element('harmony')
+        _synchronizeIds(mxHarmony, cs)
+
+        self.setPrintObject(mxHarmony, cs)
+
+        self.setPrintStyle(mxHarmony, cs)
+
+        mxRoot = SubElement(mxHarmony, 'root')
+        mxStep = SubElement(mxRoot, 'root-step')
+        mxStep.text = 'C'
+        mxStep.set('text', '')
+
+
+        mxKind = SubElement(mxHarmony, 'kind')
+        cKind = cs.chordKind
+        assert cs.chordKind == 'none'
+        mxKind.text = str(cKind)
+        assert cs.chordKindStr not in (None, "")
+        mxKind.set('text', cs.chordKindStr)
+
+        self.setOffsetOptional(cs, mxHarmony)
+        self.setEditorial(mxHarmony, cs)
+
+        self.xmlRoot.append(mxHarmony)
+        return mxHarmony
+
     def chordSymbolToXml(self, cs):
         '''
         Convert a ChordSymbol object to an mxHarmony object.
@@ -5927,6 +5965,12 @@ class Test(unittest.TestCase):
         bytesOutUnicode = bytesOut.decode('utf-8')
         return bytesOutUnicode
 
+    def getET(self, obj):
+        SX = ScoreExporter(obj)
+        mxScore = SX.parse()
+        SX.indent(mxScore)
+        return mxScore
+
     def testBasic(self):
         pass
 
@@ -5953,6 +5997,52 @@ class Test(unittest.TestCase):
         p.insert(0.0, sl3)
         #p.getElementsByClass('Measure')[1].insert(0.0, sl3)
         self.assertEqual(self.getXml(p).count(u'<slur '), 6)
+
+
+    def testExportNC(self):
+        from music21 import stream, note
+        from music21 import harmony
+
+        s = stream.Score()
+        p = stream.Part()
+        m = stream.Measure()
+        m.append(harmony.ChordSymbol('C'))
+        m.repeatAppend(note.Note('C'), 4)
+        p.append(m)
+        m = stream.Measure()
+        m.append(harmony.NoChord())
+        m.repeatAppend(note.Note('C'), 2)
+        m.append(harmony.ChordSymbol('C'))
+        m.repeatAppend(note.Note('C'), 2)
+        p.append(m)
+        s.append(p)
+
+        self.assertEqual(3, self.getXml(s).count(u'<harmony'))
+        self.assertEqual(1, self.getXml(s).count(u'<kind '
+                                                  u'text="N.C.">none</kind>'))
+        self.assertEqual(1, self.getXml(s).count(u'<root-step text="">'))
+
+        s = stream.Score()
+        p = stream.Part()
+        m = stream.Measure()
+        m.append(harmony.NoChord())
+        m.repeatAppend(note.Note('C'), 2)
+        m.append(harmony.ChordSymbol('C'))
+        m.repeatAppend(note.Note('C'), 2)
+        p.append(m)
+        m = stream.Measure()
+        m.append(harmony.NoChord('No Chord'))
+        m.repeatAppend(note.Note('C'), 2)
+        m.append(harmony.ChordSymbol('C'))
+        m.repeatAppend(note.Note('C'), 2)
+        p.append(m)
+        s.append(p)
+
+        self.assertEqual(1, self.getXml(s).count(u'<kind '
+                                                 u'text="N.C.">none</kind>'))
+        self.assertEqual(1, self.getXml(s).count(u'<kind '
+                                                 u'text="No Chord">none</kind>'))
+
 
 class TestExternal(unittest.TestCase): # pragma: no cover
     def runTest(self):

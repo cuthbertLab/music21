@@ -4342,6 +4342,8 @@ class MeasureParser(XMLParserBase):
         mxKind = mxHarmony.find('kind')
         if mxKind is not None and mxKind.text is not None: # two ways of doing it...
             cs.chordKind = mxKind.text.strip()
+            if cs.chordKind == 'none':
+                cs = harmony.NoChord()
             mxKindText = mxKind.get('text') # attribute
             if mxKindText is not None:
                 cs.chordKindStr = mxKindText
@@ -4382,10 +4384,11 @@ class MeasureParser(XMLParserBase):
             seta(hd, mxDegree, 'degree-type', 'modType')
             cs.addChordStepModification(hd)
 
-        cs._updatePitches()
-        #environLocal.printDebug(['xmlToChordSymbol(): Harmony object', h])
-        if cs.root().name != r.name:
-            cs.root(r)
+        if cs.chordKind != 'none':
+            cs._updatePitches()
+            #environLocal.printDebug(['xmlToChordSymbol(): Harmony object', h])
+            if cs.root().name != r.name:
+                cs.root(r)
 
         return cs
 
@@ -6330,6 +6333,25 @@ class Test(unittest.TestCase):
         self.assertEqual(rmIterator[1].style.enclosure, None)
         self.assertEqual(rmIterator[2].content, 'Test')
         self.assertEqual(rmIterator[2].style.enclosure, 'square')
+
+    def testNoChordImport(self):
+        from music21 import converter
+
+        thisDir = common.getSourceFilePath() / 'musicxml'
+        testFp = thisDir / 'testNC.xml'
+        s = converter.parse(testFp, forceSource=True)
+
+        self.assertEqual(5, len(s.flat.getElementsByClass('ChordSymbol')))
+        self.assertEqual(2, len(s.flat.getElementsByClass('NoChord')))
+
+        self.assertEqual('augmented-seventh', s.flat.getElementsByClass('ChordSymbol')[0].chordKind)
+        self.assertEqual('none', s.flat.getElementsByClass('ChordSymbol')[1].chordKind)
+
+        self.assertEqual('random', str(s.flat.getElementsByClass('NoChord')[
+                                           0].chordKindStr))
+        self.assertEqual('N.C.', str(s.flat.getElementsByClass('NoChord')[
+                                         1].chordKindStr))
+
 
 
 if __name__ == '__main__':
