@@ -2111,20 +2111,35 @@ class Chord(note.NotRest):
         >>> chord.Chord().isDiminishedSeventh()
         False
         '''
+        return self.isSeventhOfType((0, 3, 6, 9))
+
+    def isSeventhOfType(self, intervalArray):
+        '''
+        Returns True if chord is a seventh chord of a particular type
+        as specified by intervalArray.  For instance `.isDiminishedSeventh()`
+        is just a thin wrapper around `.isSeventhOfType([0, 3, 6, 9])`
+        and `isDominantSeventh()` has intervalArray([0, 4, 7, 10])
+        
+        intervalArray can be any iterable.        
+        '''
         try:
             third = self.third
             fifth = self.fifth
             seventh = self.seventh
         except ChordException:
             return False
+        
+        root = self.root()
 
         if third is None or fifth is None or seventh is None:
             return False
         for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(self.root(), thisPitch)
-            if thisInterval.chromatic.mod12 not in (0, 3, 6, 9):
+            thisInterval = interval.notesToInterval(root, thisPitch)
+            if thisInterval.chromatic.mod12 not in intervalArray:
                 return False
         return True
+        
+        
 
     def isDiminishedTriad(self):
         '''Returns True if chord is a Diminished Triad, that is,
@@ -2179,21 +2194,7 @@ class Chord(note.NotRest):
         >>> chord.Chord().isDominantSeventh()
         False
         '''
-        try:
-            third = self.third
-            fifth = self.fifth
-            seventh = self.seventh
-        except ChordException:
-            return False
-
-        if third is None or fifth is None or seventh is None:
-            return False
-        for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(self.root(), thisPitch)
-            if thisInterval.chromatic.mod12 not in (0, 4, 7, 10):
-                return False
-
-        return True
+        return self.isSeventhOfType((0, 4, 7, 10))
 
     def isFalseDiminishedSeventh(self):
         '''Returns True if chord is a Diminished Seventh, that is,
@@ -2400,21 +2401,7 @@ class Chord(note.NotRest):
         >>> chord.Chord().isHalfDiminishedSeventh()
         False
         '''
-        try:
-            third = self.third
-            fifth = self.fifth
-            seventh = self.seventh
-        except ChordException:
-            return False
-
-        if third is None or fifth is None or seventh is None:
-            return False
-        for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(self.root(), thisPitch)
-            if thisInterval.chromatic.mod12 not in (0, 3, 6, 10):
-                return False
-
-        return True
+        return self.isSeventhOfType((0, 3, 6, 10))
 
     def isIncompleteMajorTriad(self):
         '''
