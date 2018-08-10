@@ -78,11 +78,23 @@ import unittest
 from music21 import common
 from music21 import exceptions21
 from music21 import duration
+from music21 import environment
 from music21 import style
 from music21.common import EqualSlottedObjectMixin
 
+_MOD = 'meter'
+environLocal = environment.Environment(_MOD)
+
+
 class BeamException(exceptions21.Music21Exception):
     pass
+
+beamableDurationTypes = (
+    duration.typeFromNumDict[8],
+    duration.typeFromNumDict[16], duration.typeFromNumDict[32],
+    duration.typeFromNumDict[64], duration.typeFromNumDict[128],
+    duration.typeFromNumDict[256],
+    )
 
 
 class Beam(EqualSlottedObjectMixin, style.StyleMixin):
@@ -215,6 +227,209 @@ class Beams(EqualSlottedObjectMixin):
         for beam in self.beamsList:
             msg.append(str(beam))
         return '<music21.beam.Beams %s>' % '/'.join(msg)
+
+    ### STATIC METHODS ###
+    @staticmethod
+    def naiveBeams(srcList):
+        '''
+        Given a list or iterator of elements, return a list of None or Beams for
+        each element: None if the element is a quarter or larger or
+        if the element is a Rest, and the fullest possible set of beams
+        for the duration if it is a beamable.  Each beam object has type of None
+
+        staticmethod, does not need instance:
+
+        >>> durList = [0, -1, -2, -3]
+        >>> srcList = [note.Note(quarterLength=2 ** x) for x in durList]
+        >>> srcList.append(note.Rest(type='32nd'))
+        >>> beam.Beams.naiveBeams(srcList)
+        [None,
+         <music21.beam.Beams <music21.beam.Beam 1/None>>,
+         <music21.beam.Beams <music21.beam.Beam 1/None>/<music21.beam.Beam 2/None>>,
+         <music21.beam.Beams <music21.beam.Beam 1/None>/<music21.beam.Beam
+                     2/None>/<music21.beam.Beam 3/None>>,
+         None]
+        '''
+        beamsList = []
+        for el in srcList:
+            # if a dur cannot be beamable under any circumstance, replace
+            # it with None; this includes Rests
+            if el.duration.type not in beamableDurationTypes:
+                beamsList.append(None) # placeholder
+            elif el.isRest is True:
+                beamsList.append(None) # placeholder
+            else:
+                # we have a beamable duration
+                b = Beams()
+                # set the necessary number of internal beamsList, that is,
+                # one for each horizontal line in the beams group
+                # this does not set type or direction
+                b.fill(el.duration.type)
+                beamsList.append(b)
+        return beamsList
+
+    @staticmethod
+    def removeSandwichedUnbeamables(beamsList):
+        '''
+        Go through the naiveBeamsList and remove beams from objects surrounded
+        by None objects -- you can't beam to nothing!
+
+        Modifies beamsList in place
+
+        >>> N = note.Note
+        >>> R = note.Rest
+        >>> e = 'eighth'
+        >>> nList = [N(type=e), R(type=e), N(type=e), N(type=e),
+        ...          R(type=e), N(type=e), R(type=e), N(type=e)]
+        >>> beamsList = beam.Beams.naiveBeams(nList)
+        >>> beamsList
+        [<music21.beam.Beams <music21.beam.Beam 1/None>>,
+         None,
+         <music21.beam.Beams <music21.beam.Beam 1/None>>,
+         <music21.beam.Beams <music21.beam.Beam 1/None>>,
+         None,
+         <music21.beam.Beams <music21.beam.Beam 1/None>>,
+         None,
+         <music21.beam.Beams <music21.beam.Beam 1/None>>]
+
+        >>> beamsList2 = beam.Beams.removeSandwichedUnbeamables(beamsList)
+        >>> beamsList2 is beamsList
+        True
+        >>> beamsList2
+        [None,
+         None,
+         <music21.beam.Beams <music21.beam.Beam 1/None>>,
+         <music21.beam.Beams <music21.beam.Beam 1/None>>,
+         None,
+         None,
+         None,
+         None]
+        '''
+        beamLast = None
+        for i in range(len(beamsList)):
+            if i != len(beamsList) - 1:
+                beamNext = beamsList[i + 1]
+            else:
+                beamNext = None
+
+            if beamLast is None and beamNext is None:
+                beamsList[i] = None
+
+            beamLast = beamsList[i]
+
+        return beamsList
+
+    @staticmethod
+    def mergeConnectingPartialBeams(beamsList):
+        '''
+        Partial-right followed by partial-left must also be connected, even if otherwise
+        over a archetypeSpan, such as 16th notes 2 and 3 in a quarter note span where
+        16ths are not beamed by default.
+        '''
+        ## sanitize two partials in a row:
+        for i in range(len(beamsList) - 1):
+            bThis = beamsList[i]
+            bNext = beamsList[i + 1]
+            if not bThis or not bNext:
+                continue
+
+            bThisNum = bThis.getNumbers()
+            if not bThisNum:
+                continue
+
+            for thisNum in bThisNum:
+                thisBeam = bThis.getByNumber(thisNum)
+                if thisBeam.type != 'partial' or thisBeam.direction != 'right':
+                    continue
+
+                if thisNum not in bNext.getNumbers():
+                    continue
+
+                nextBeam = bNext.getByNumber(thisNum)
+                if nextBeam.type == 'partial' and nextBeam.direction == 'right':
+                    continue
+                if nextBeam.type in ('continue', 'stop'):
+                    environLocal.warn(
+                        'Found a messed up beam pair {}, {}, at index {} of \n{}'.format(
+                            bThis, bNext, i, beamsList))
+                    continue #
+
+
+                thisBeam.type = 'start'
+                thisBeam.direction = None
+                if nextBeam.type == 'partial':
+                    nextBeam.type = 'stop'
+                elif nextBeam.type == 'start':
+                    nextBeam.type = 'continue'
+
+                nextBeam.direction = None
+
+        # now fix partial-lefts that follow stops:
+        for i in range(1, len(beamsList)):
+            bThis = beamsList[i]
+            bPrev = beamsList[i - 1]
+            if not bThis or not bPrev:
+                continue
+
+            bThisNum = bThis.getNumbers()
+            if not bThisNum:
+                continue
+
+            for thisNum in bThisNum:
+                thisBeam = bThis.getByNumber(thisNum)
+                if thisBeam.type != 'partial' or thisBeam.direction != 'left':
+                    continue
+
+                if thisNum not in bPrev.getNumbers():
+                    continue
+
+                prevBeam = bPrev.getByNumber(thisNum)
+                if prevBeam.type != 'stop':
+                    continue
+
+                thisBeam.type = 'stop'
+                thisBeam.direction = None
+                prevBeam.type = 'continue'
+
+        return beamsList
+
+    @staticmethod
+    def sanitizePartialBeams(beamsList):
+        '''
+        It is possible at a late stage to have beams that only consist of partials
+        or beams with a 'start' followed by 'partial/left' or possibly 'stop' followed
+        by 'partial/right'; beams entirely consisting of partials are removed
+        and the direction of irrational partials is fixed.
+        '''
+        for i in range(len(beamsList)):
+            if beamsList[i] is None:
+                continue
+            allTypes = beamsList[i].getTypes()
+            ## clear elements that have partial beams with no full beams:
+            if 'start' not in allTypes and 'stop' not in allTypes and 'continue' not in allTypes:
+                # nothing but partials
+                beamsList[i] = None
+                continue
+            ## make sure a partial-left does not follow a start or a partial-right does not
+            ## follow a stop
+            hasStart = False
+            hasStop = False
+            for b in beamsList[i].beamsList:
+                if b.type == 'start':
+                    hasStart = True
+                    continue
+                if b.type == 'stop':
+                    hasStop = True
+                    continue
+                if hasStart and b.type == 'partial' and b.direction == 'left':
+                    b.direction = 'right'
+                elif hasStop and b.type == 'partial' and b.direction == 'right':
+                    b.direction = 'left'
+
+        return beamsList
+
+
+
 
     ### PUBLIC METHODS ###
     # pylint: disable=redefined-builtin

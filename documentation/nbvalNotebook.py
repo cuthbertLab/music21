@@ -22,7 +22,7 @@ def runAll():
     goodFiles = []
     for innerDir in ('about', 'developerReference', 'installing', 'usersGuide'):
         fullDir = sourcePath / innerDir
-        for f in fullDir.rglob('*.ipynb'):
+        for f in sorted(fullDir.rglob('*.ipynb')):
             if f.name in skip:
                 continue
             if 'checkpoint' in str(f):

@@ -120,7 +120,7 @@ class CapellaImporter:
         Returns self.xmlText
         '''
         self.zipFilename = str(filename)
-        zipFileHandle = zipfile.ZipFile(str(filename, 'r'))
+        zipFileHandle = zipfile.ZipFile(str(filename), 'r')
         xmlText = zipFileHandle.read('score.xml')
         self.xmlText = xmlText
         return xmlText

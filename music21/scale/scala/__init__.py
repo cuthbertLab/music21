@@ -88,7 +88,7 @@ def getPaths():
         # returns a list with one or more paths
         # the first is the path to the directory that contains xml files
         directory = moduleName.__path__[0]
-        dirListing = [os.path.join(directory, x) for x in os.listdir(directory)]
+        dirListing = [os.path.join(directory, x) for x in sorted(os.listdir(directory))]
 
     paths = {} # return a dictionary with keys and list of alternate names
     for fp in dirListing:

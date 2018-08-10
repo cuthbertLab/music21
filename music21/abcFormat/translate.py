@@ -22,6 +22,7 @@ module's :func:`~music21.converter.parse` function.
 
 import copy
 import unittest
+import re
 
 from music21 import clef
 from music21 import common
@@ -34,6 +35,8 @@ from music21 import articulations
 from music21 import note
 from music21 import chord
 from music21 import spanner
+from music21 import harmony
+
 
 environLocal = environment.Environment('abcFormat.translate')
 
@@ -276,6 +279,21 @@ def parseTokens(mh, dst, p, useMeasures):
             #ql += t.quarterLength
 
         elif isinstance(t, abcFormat.ABCNote):
+            # add the attached chord symbol
+            if t.chordSymbols:
+                cs_name = t.chordSymbols[0]
+                cs_name = re.sub('["]','', cs_name).lstrip().rstrip()
+                cs_name = re.sub('[()]', '', cs_name)
+                cs_name = common.cleanedFlatNotation(cs_name)
+                try:
+                    if cs_name in ('NC', 'N.C.', 'No Chord', 'None'):
+                        cs = harmony.NoChord(cs_name)
+                    else:
+                        cs = harmony.ChordSymbol(cs_name)
+                    dst.coreAppend(cs, setActiveSite=False)
+                    dst.coreElementsChanged()
+                except ValueError:
+                    pass  # Exclude malformed chord
             if t.isRest:
                 n = note.Rest()
             else:
@@ -292,10 +310,10 @@ def parseTokens(mh, dst, p, useMeasures):
 
             # start or end a tie at note n
             if t.tie is not None:
-                if t.tie == "start":
+                if t.tie in ('start', 'continue'):
                     n.tie = tie.Tie(t.tie)
-                    n.tie.style = "normal"
-                elif t.tie == "stop":
+                    n.tie.style = 'normal'
+                elif t.tie == 'stop':
                     n.tie = tie.Tie(t.tie)
             ### Was: Extremely Slow for large Opus files... why?
             ### Answer: some pieces didn't close all their spanners, so
@@ -786,7 +804,7 @@ class Test(unittest.TestCase):
         # each score in the opus is a Stream that contains a Part and metadata
         p1 = o.getScoreByNumber(1).parts[0]
         self.assertEqual(p1.offset, 0.0)
-        self.assertEqual(len(p1.flat.notesAndRests), 88)
+        self.assertEqual(len(p1.flat.notesAndRests), 90)
 
         p2 = o.getScoreByNumber(2).parts[0]
         self.assertEqual(p2.offset, 0.0)
@@ -794,7 +812,7 @@ class Test(unittest.TestCase):
 
         p3 = o.getScoreByNumber(3).parts[0]
         self.assertEqual(p3.offset, 0.0)
-        self.assertEqual(len(p3.flat.notesAndRests), 82)
+        self.assertEqual(len(p3.flat.notesAndRests), 86)
 
         p4 = o.getScoreByNumber(4).parts[0]
         self.assertEqual(p4.offset, 0.0)
@@ -814,6 +832,52 @@ class Test(unittest.TestCase):
         self.assertEqual(sMerged.parts[3].getElementsByClass('Clef')[0].sign, 'F')
 
         #sMerged.show()
+
+    def testChordSymbols(self):
+
+        from music21 import corpus, pitch
+        o = corpus.parse('nottingham-dataset/reelsa-c')
+        self.assertEqual(len(o), 2)
+        # each score in the opus is a Stream that contains a Part and metadata
+
+        p1 = o.getScoreByNumber(81).parts[0]
+        self.assertEqual(p1.offset, 0.0)
+        self.assertEqual(len(p1.flat.notesAndRests), 77)
+        self.assertEqual(len(list(p1.flat.getElementsByClass('ChordSymbol'))), 25)
+        # Am/C
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[7].root(), pitch.Pitch('A3'))
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[7].bass(), pitch.Pitch('C3'))
+        # G7/B
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].root(), pitch.Pitch('G3'))
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].bass(), pitch.Pitch('B2'))
+
+
+    def testNoChord(self):
+
+        from music21 import converter
+
+        target_str = """
+                	T: No Chords
+                	M: 4/4
+                	L: 1/1
+                	K: C
+                	[| "C" C | "NC" C | "C" C | "N.C." C | "C" C 
+                	| "No Chord" C | "C" C | "None" C | "C" C | "Other" 
+                	C |]
+                """
+        score = converter.parse(target_str, format='abc')
+
+        self.assertEqual(len(list(score.flat.getElementsByClass(
+            'ChordSymbol'))), 9)
+        self.assertEqual(len(list(score.flat.getElementsByClass(
+            'NoChord'))), 4)
+
+        score = harmony.realizeChordSymbolDurations(score)
+
+        self.assertEqual(8, score.getElementsByClass('ChordSymbol')[
+            -1].quarterLength)
+        self.assertEqual(4, score.getElementsByClass('ChordSymbol')[
+            0].quarterLength)
 
 
     def testLocaleOfCompositionImport(self):
@@ -915,6 +979,32 @@ class Test(unittest.TestCase):
             assert s is not None
             #s.show()
 
+    def testCleanFlat(self):
+        from music21 import harmony, pitch
+
+        cs = harmony.ChordSymbol(root='eb', bass='bb', kind='dominant')
+        self.assertEquals(cs.bass(), pitch.Pitch('B-'))
+        self.assertEquals(cs.pitches[0], pitch.Pitch('B-2'))
+
+        cs = harmony.ChordSymbol('e-7/b-')
+        self.assertEquals(cs.root(), pitch.Pitch('E-3'))
+        self.assertEquals(cs.bass(), pitch.Pitch('B-2'))
+        self.assertEquals(cs.pitches[0], pitch.Pitch('B-2'))
+
+        # common.cleanedFlatNotation() shouldn't be called by
+        # the following calls, which what is being tested here:
+
+        cs = harmony.ChordSymbol('b-3')
+        self.assertEquals(cs.root(), pitch.Pitch('b-3'))
+        self.assertEquals(cs.pitches[0], pitch.Pitch('B-3'))
+        self.assertEquals(cs.pitches[1], pitch.Pitch('D4'))
+
+        cs = harmony.ChordSymbol('bb3')
+        self.assertEquals(cs.root(), pitch.Pitch('b3'))
+        self.assertEquals(cs.pitches[0], pitch.Pitch('B3'))
+        self.assertEquals(cs.pitches[1], pitch.Pitch('D#4'))
+
+
     def xtestTranslateB(self):
         '''
         Dylan -- this could be too slow to make it a test!
@@ -933,6 +1023,11 @@ class Test(unittest.TestCase):
         from music21 import corpus
         unused = corpus.parse('han2.abc', number=445)
 
+    def testTiesTranslate(self):
+        from music21 import converter
+        notes = converter.parse("L:1/8\na-a-a", format="abc")
+        ties = [note.tie.type for note in notes.flat.notesAndRests]
+        self.assertListEqual(ties, ['start', 'continue', 'stop'])
 
     def xtestMergeScores(self):
         from music21 import corpus

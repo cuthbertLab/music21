@@ -16,7 +16,6 @@ import unittest
 
 from collections import Counter
 
-
 from music21 import common
 from music21 import converter
 from music21 import corpus
@@ -71,15 +70,15 @@ class Feature:
     >>> myFeature.vector[2] = 1
 
     It's okay just to assign a new list to .vector itself.
-
-    There is a .normalize() method which will scale everything to between 0 and 1
-    (or technically -1 and 1) as a list of floats.
-
+    
+    There is a normalize() method which normalizes the values
+    of a histogram to sum to 1.
+    
     >>> myFeature.normalize()
     >>> myFeature.vector
-    [1.0, 0.5, 0.25]
+    [0.571..., 0.285..., 0.142...]
 
-    And that's it!  FeatureExtractors are much more interesting.
+    And that's it! FeatureExtractors are much more interesting.
     '''
     def __init__(self):
         # these values will be filled by the extractor
@@ -107,14 +106,10 @@ class Feature:
 
     def normalize(self):
         '''
-        Normalize the vector between 0 and 1, assuming there is more than one value.
+        Normalizes the vector so that the sum of its elements is 1.
         '''
-        if self.dimensions == 1:
-            return # do nothing
-        m = max(self.vector)
-        if m == 0:
-            return # do nothing
-        scalar = 1.0 / m # get floating point scalar for speed
+        s = sum(self.vector)
+        scalar = 1.0 / s # get floating point scalar for speed
         temp = self._getVectors()
         for i, v in enumerate(self.vector):
             temp[i] = v * scalar
@@ -165,7 +160,7 @@ class FeatureExtractor:
                 dataOrStream.classes):
                 #environLocal.printDebug(['creating new DataInstance: this should be a Stream:',
                 #     dataOrStream])
-                # if we are passed a stream, create a DataInstrance to
+                # if we are passed a stream, create a DataInstance to
                 # manage the
                 # its data; this is less efficient but is good for testing
                 self.stream = dataOrStream
@@ -245,7 +240,6 @@ class FeatureExtractor:
         # preparing the feature always sets self.feature to a new instance
         self.prepareFeature()
         self.process() # will set Feature object to _feature
-        # assume we always want to normalize?
         if self.normalize:
             self.feature.normalize()
         return self.feature
@@ -513,7 +507,6 @@ class StreamForms:
         return histogram
 
 
-
     keysToMethods = {
        'flat': lambda unused, p: p.flat,
        'pitches': lambda unused, p: p.pitches,
@@ -731,11 +724,11 @@ class DataSet:
     >>> ds.addData('bach/bwv324.xml', classValue='Bach')
     >>> ds.process()
     >>> ds.getFeaturesAsList()[0]
-    ['bwv66.6', 0.0, 1.0, 0.375, 0.03125, 0.5, 0.1875, 0.90625, 0.0, 0.4375,
-     0.6875, 0.09375, 0.875, 0, 4, 4, 'Bach']
+    ['bwv66.6', 0.196..., 0.0736..., 0.006..., 0.098..., 0.0368..., 0.177..., 0.0, 
+     0.085..., 0.134..., 0.018..., 0.171..., 0.0, 0, 4, 4, 'Bach']
     >>> ds.getFeaturesAsList()[1]
-    ['bach/bwv324.xml', 0.12, 0.0, 1.0, 0.12, 0.56..., 0.0, ..., 0.52...,
-     0.0, 0.68..., 0.0, 0.56..., 0, 4, 4, 'Bach']
+    ['bach/bwv324.xml', 0.240..., 0.028..., 0.134..., 0.0, 0.144..., 0.125..., 0.0, 
+     0.163..., 0.0, 0.134..., 0.0288..., 0.0, 0, 4, 4, 'Bach']
     >>> ds = ds.getString()
 
 
@@ -1209,7 +1202,7 @@ def extractorById(idOrList, library=('jSymbolic', 'native')):
     >>> s.append(note.Note('A4'))
     >>> fe = features.extractorById('p20')(s) # call class
     >>> fe.extract().vector
-    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+    [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
     '''
     ebi = extractorsById(idOrList=idOrList, library=library)
@@ -1225,7 +1218,7 @@ def vectorById(streamObj, vectorId, library=('jSymbolic', 'native')):
     >>> s = stream.Stream()
     >>> s.append(note.Note('A4'))
     >>> features.vectorById(s, 'p20')
-    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+    [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     '''
     fe = extractorById(vectorId, library)(streamObj) # call class with stream
     if fe is None:
@@ -1243,12 +1236,12 @@ def getIndex(featureString, extractorType=None):
 
 
     >>> features.getIndex('Range')
-    (59, 'jsymbolic')
+    (61, 'jsymbolic')
     >>> features.getIndex('Ends With Landini Melodic Contour')
     (19, 'native')
     >>> features.getIndex('abrandnewfeature!')
     >>> features.getIndex('Fifths Pitch Histogram', 'jsymbolic')
-    (68, 'jsymbolic')
+    (70, 'jsymbolic')
     >>> features.getIndex('Tonal Certainty', 'native')
     (1, 'native')
     '''
@@ -1797,7 +1790,7 @@ class Test(unittest.TestCase):
 
         fewBach = corpus.search('bach/bwv6')
 
-        self.assertEqual(len(fewBach), 12)
+        self.assertEqual(len(fewBach), 13)
         ds = features.DataSet(classLabel='NumPitches')
         ds.addMultipleData(fewBach, classValues=pickleFunctionNumPitches)
         featureExtractors = features.extractorsById(['ql1', 'ql4'], 'native')
@@ -1811,6 +1804,7 @@ class Test(unittest.TestCase):
             Identifier,Unique_Note_Quarter_Lengths,Range_of_Note_Quarter_Lengths,NumPitches
             bach/bwv6.6.mxl,4,1.75,164
             bach/bwv60.5.mxl,6,2.75,281
+            bach/bwv62.6.mxl,5,1.75,148
             bach/bwv64.2.mxl,5,3.5,176
             bach/bwv64.4.mxl,5,2.5,368
             bach/bwv64.8.mxl,5,3.5,272
@@ -1842,8 +1836,3 @@ if __name__ == '__main__':
 
 #------------------------------------------------------------------------------
 # eof
-
-
-
-
-

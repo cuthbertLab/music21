@@ -159,8 +159,8 @@ def makeBeams(s, *, inPlace=False):
             offset = 0.0
             if m.paddingLeft != 0.0:
                 offset = opFrac(m.paddingLeft)
-            elif (noteStream.highestTime < lastTimeSignature.barDuration.quarterLength):
-                offset = (lastTimeSignature.barDuration.quarterLength - noteStream.highestTime)
+            elif (noteStream.highestTime < barQL):
+                offset = barQL - noteStream.highestTime
 
             beamsList = lastTimeSignature.getBeams(noteStream, measureStartOffset=offset)
 
@@ -173,7 +173,7 @@ def makeBeams(s, *, inPlace=False):
 
     del mColl  # remove Stream no longer needed
 
-    s.streamStatus.beams = True
+    returnObj.streamStatus.beams = True
     if inPlace is not True:
         return returnObj
 

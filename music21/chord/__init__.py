@@ -17,6 +17,7 @@ __all__ = ['tables', 'Chord']
 
 import copy
 import unittest
+import re
 
 from music21 import beam
 from music21 import common
@@ -887,7 +888,7 @@ class Chord(note.NotRest):
         '''
         if newbass:
             if isinstance(newbass, str):
-                newbass = newbass.replace('b', '-')
+                newbass = common.cleanedFlatNotation(newbass)
                 newbass = pitch.Pitch(newbass)
 
             self._overrides['bass'] = newbass
@@ -2110,20 +2111,35 @@ class Chord(note.NotRest):
         >>> chord.Chord().isDiminishedSeventh()
         False
         '''
+        return self.isSeventhOfType((0, 3, 6, 9))
+
+    def isSeventhOfType(self, intervalArray):
+        '''
+        Returns True if chord is a seventh chord of a particular type
+        as specified by intervalArray.  For instance `.isDiminishedSeventh()`
+        is just a thin wrapper around `.isSeventhOfType([0, 3, 6, 9])`
+        and `isDominantSeventh()` has intervalArray([0, 4, 7, 10])
+        
+        intervalArray can be any iterable.        
+        '''
         try:
             third = self.third
             fifth = self.fifth
             seventh = self.seventh
         except ChordException:
             return False
+        
+        root = self.root()
 
         if third is None or fifth is None or seventh is None:
             return False
         for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(self.root(), thisPitch)
-            if thisInterval.chromatic.mod12 not in (0, 3, 6, 9):
+            thisInterval = interval.notesToInterval(root, thisPitch)
+            if thisInterval.chromatic.mod12 not in intervalArray:
                 return False
         return True
+        
+        
 
     def isDiminishedTriad(self):
         '''Returns True if chord is a Diminished Triad, that is,
@@ -2178,21 +2194,7 @@ class Chord(note.NotRest):
         >>> chord.Chord().isDominantSeventh()
         False
         '''
-        try:
-            third = self.third
-            fifth = self.fifth
-            seventh = self.seventh
-        except ChordException:
-            return False
-
-        if third is None or fifth is None or seventh is None:
-            return False
-        for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(self.root(), thisPitch)
-            if thisInterval.chromatic.mod12 not in (0, 4, 7, 10):
-                return False
-
-        return True
+        return self.isSeventhOfType((0, 4, 7, 10))
 
     def isFalseDiminishedSeventh(self):
         '''Returns True if chord is a Diminished Seventh, that is,
@@ -2399,21 +2401,7 @@ class Chord(note.NotRest):
         >>> chord.Chord().isHalfDiminishedSeventh()
         False
         '''
-        try:
-            third = self.third
-            fifth = self.fifth
-            seventh = self.seventh
-        except ChordException:
-            return False
-
-        if third is None or fifth is None or seventh is None:
-            return False
-        for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(self.root(), thisPitch)
-            if thisInterval.chromatic.mod12 not in (0, 3, 6, 10):
-                return False
-
-        return True
+        return self.isSeventhOfType((0, 3, 6, 10))
 
     def isIncompleteMajorTriad(self):
         '''
@@ -2997,7 +2985,7 @@ class Chord(note.NotRest):
         '''
         if newroot:
             if isinstance(newroot, str):
-                newroot = newroot.replace('b', '-')
+                newroot = common.cleanedFlatNotation(newroot)
                 newroot = pitch.Pitch(newroot)
 
             self._overrides['root'] = newroot
@@ -3988,9 +3976,9 @@ class Chord(note.NotRest):
         '<A25>'
 
         OMIT_FROM_DOCS
-        
+
         These were giving problems before:
-        
+
         >>> chord.Chord('G#2 A2 D3 G3').normalOrder
         [7, 8, 9, 2]
 
@@ -4008,7 +3996,7 @@ class Chord(note.NotRest):
             possibleNormalOrder = [(pc + transposeAmount) % 12 for pc in transposedNormalForm]
             if set(possibleNormalOrder) == mustBePresentPCs:
                 return possibleNormalOrder
-        raise ChordException('Could not find a normalOrder for chord: ' 
+        raise ChordException('Could not find a normalOrder for chord: '
                              + str(self.orderedPitchClassesString))
 
     @property
@@ -4498,7 +4486,7 @@ class Chord(note.NotRest):
         96
 
         But after called, now it does:
-        
+
         >>> c.hasVolumeInformation()
         True
 
@@ -4668,7 +4656,8 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         pass
 
     def testBasic(self):
-        for pitchList in [['g2', 'c4', 'c#6'], ['c', 'd-', 'f#', 'g']]:
+        for pitchList in [['g2', 'c4', 'c#6'],
+                          ['c', 'd-', 'f#', 'g']]:
             a = Chord(pitchList)
             a.show()
 
@@ -5406,4 +5395,3 @@ if __name__ == '__main__':
 
 #------------------------------------------------------------------------------
 # eof
-

@@ -990,12 +990,15 @@ class Environment:
         '''
         return envSingleton().getSettingsPath()
 
-    def getTempFile(self, suffix=''):
+    def getTempFile(self, suffix='', returnPathlib=False):
         '''
         Return a file path to a temporary file with the specified suffix (file
         extension).
+
+        v5 -- added returnPathlib.  default now is False, will become True when
+        py3.6 is the minimum version.
         '''
-        filePath = envSingleton().getTempFile(suffix=suffix)
+        filePath = envSingleton().getTempFile(suffix=suffix, returnPathlib=returnPathlib)
         self.printDebug([_MOD, 'temporary file:', filePath])
         return filePath
 

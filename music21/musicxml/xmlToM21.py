@@ -368,6 +368,21 @@ class XMLParserBase:
         
         self.setStyleAttributes(mxObject, m21Object, musicXMLNames)
 
+    def setPrintObject(self, mxObject, m21Object):
+        '''
+        convert 'print-object="no"' to m21Object.style.hideObjectOnPrint = True
+        '''
+        if mxObject.get('print-object') != 'no':
+            return
+
+        if hasattr(m21Object, 'style'):
+            m21Object.style.hideObjectOnPrint = True
+        else:
+            try:
+                m21Object.hideObjectOnPrint = True
+            except AttributeError: # slotted object
+                pass
+
     def setPrintStyleAlign(self, mxObject, m21Object):
         '''
         runs setPrintStyle and then sets horizontalAlign and verticalAlign, on an
@@ -2918,7 +2933,7 @@ class MeasureParser(XMLParserBase):
         r = note.Rest()
         mxRestTag = mxRest.find('rest')
         if mxRestTag is None:
-            raise MusicXMLImportException("do not call xmlToRest or a <note> unless it "
+            raise MusicXMLImportException("do not call xmlToRest on a <note> unless it "
                                           + "contains a rest tag.")
         isFullMeasure = mxRestTag.get('measure')
         if isFullMeasure == "yes":
@@ -2964,8 +2979,7 @@ class MeasureParser(XMLParserBase):
         # print object == 'no' and grace notes may have a type but not
         # a duration. they may be filtered out at the level of Stream
         # processing
-        if mxNote.get('print-object') == 'no':
-            n.style.hideObjectOnPrint = True
+        self.setPrintObject(mxNote, n)
             
         # attr dynamics -- MIDI Note On velocity with 90 = 100, but unbounded on the top
         dynamPercentage = mxNote.get('dynamics')
@@ -4299,7 +4313,7 @@ class MeasureParser(XMLParserBase):
         cs = harmony.ChordSymbol()
         self.setEditorial(mxHarmony, cs)
         self.setPrintStyle(mxHarmony, cs)
-        # TODO: attrGroup: print-object
+        self.setPrintObject(mxHarmony, cs)
         # TODO: attr: print-frame
         # TODO: attrGroup: placement
 
@@ -4328,6 +4342,8 @@ class MeasureParser(XMLParserBase):
         mxKind = mxHarmony.find('kind')
         if mxKind is not None and mxKind.text is not None: # two ways of doing it...
             cs.chordKind = mxKind.text.strip()
+            if cs.chordKind == 'none':
+                cs = harmony.NoChord()
             mxKindText = mxKind.get('text') # attribute
             if mxKindText is not None:
                 cs.chordKindStr = mxKindText
@@ -4368,10 +4384,11 @@ class MeasureParser(XMLParserBase):
             seta(hd, mxDegree, 'degree-type', 'modType')
             cs.addChordStepModification(hd)
 
-        cs._updatePitches()
-        #environLocal.printDebug(['xmlToChordSymbol(): Harmony object', h])
-        if cs.root().name != r.name:
-            cs.root(r)
+        if cs.chordKind != 'none':
+            cs._updatePitches()
+            #environLocal.printDebug(['xmlToChordSymbol(): Harmony object', h])
+            if cs.root().name != r.name:
+                cs.root(r)
 
         return cs
 
@@ -4834,7 +4851,7 @@ class MeasureParser(XMLParserBase):
         # TODO: interchangeable
 
         self.setPrintStyleAlign(mxTime, ts)
-        # TODO: attr: print-object
+        self.setPrintObject(mxTime, ts)
 
         # TODO: attr: separator
 
@@ -4912,7 +4929,7 @@ class MeasureParser(XMLParserBase):
         # TODO: size
         # TODO: after-barline -- particular style to clef.
         self.setPrintStyle(mxClef, clefObj)
-        # TODO: print-object
+        self.setPrintObject(mxClef, clefObj)
 
         return clefObj
 
@@ -4971,8 +4988,7 @@ class MeasureParser(XMLParserBase):
         self.mxKeyOctaves(mxKey, ks)
         # TODO: attr: number
         self.setPrintStyle(mxKey, ks)
-        # TODO: attr: print-object
-
+        self.setPrintObject(mxKey, ks)
 
         return ks
 
@@ -6317,6 +6333,25 @@ class Test(unittest.TestCase):
         self.assertEqual(rmIterator[1].style.enclosure, None)
         self.assertEqual(rmIterator[2].content, 'Test')
         self.assertEqual(rmIterator[2].style.enclosure, 'square')
+
+    def testNoChordImport(self):
+        from music21 import converter
+
+        thisDir = common.getSourceFilePath() / 'musicxml'
+        testFp = thisDir / 'testNC.xml'
+        s = converter.parse(testFp, forceSource=True)
+
+        self.assertEqual(5, len(s.flat.getElementsByClass('ChordSymbol')))
+        self.assertEqual(2, len(s.flat.getElementsByClass('NoChord')))
+
+        self.assertEqual('augmented-seventh', s.flat.getElementsByClass('ChordSymbol')[0].chordKind)
+        self.assertEqual('none', s.flat.getElementsByClass('ChordSymbol')[1].chordKind)
+
+        self.assertEqual('random', str(s.flat.getElementsByClass('NoChord')[
+                                           0].chordKindStr))
+        self.assertEqual('N.C.', str(s.flat.getElementsByClass('NoChord')[
+                                         1].chordKindStr))
+
 
 
 if __name__ == '__main__':

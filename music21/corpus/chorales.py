@@ -80,7 +80,6 @@ class ChoraleList:
         # |-
         # |Christe, der du bist Tag und Licht||274||34||245||44||245||&nbsp;
 
-
         allCat = '''|Was Gott tut, das ist wohlgetan||250||339||346||342||347||
         |-
         |Sei Lob und Ehr' dem höchsten Gut||251||89||328||91||329||
@@ -550,17 +549,21 @@ class ChoraleListRKBWV:
     8---||---40.8---||---Freuet euch, ihr Christen alle---||---105
     9---||---248.12-2---||---Ermuntre dich, mein schwacher Geist---||---80
     10---||---38.6---||---Aus tiefer Not schrei ich zu dir 1---||---31
-    11---||---41.6---||---Jesu, nun sei gepreiset---||---0
+    11---||---41.6---||---Jesu, nun sei gepreiset---||---203
     12---||---65.2---||---Puer natus in Bethlehem---||---302
     13---||---33.6---||---Allein zu dir, Herr Jesu Christ---||---16
+    14---||---184.5---||---O Herre Gott, dein göttlich Wort---||---283
     15---||---277---||---Christ lag in Todesbanden---||---38
     16---||---311---||---Es woll uns Gott genädig sein 2---||---95
+    17---||---145.5---||---Erschienen ist der herrliche Tag---||---0
     18---||---318---||---Menschenkind, merk eben---||---115
     19---||---351---||---Ich hab' mein' Sach' Gott heimgestellt---||---182
     20---||---302---||---Ein feste Burg ist unser Gott---||---74
     21---||---153.5---||---Herzlich tut mich verlangen---||---160
+    22---||---180.7---||---Schmücke dich, o liebe Seele---||---0
     23---||---28.6---||---Helft mir Gotts Güte preisen---||---124
     24---||---415---||---Valet will ich dir geben---||---314
+    25---||---148.6---||---Wo soll ich fliehen hin---||---0
     26---||---20.7---||---O Ewigkeit, du Donnerwort---||---276
     26---||---20.11---||---O Ewigkeit, du Donnerwort---||---276
     27---||---308---||---Es spricht der Unweisen Mund---||---92
@@ -574,6 +577,7 @@ class ChoraleListRKBWV:
     35---||---248.53-5---||---Gott des Himmels und der Erden---||---114
     36---||---385---||---Nun bitten wir den heiligen Geist---||---254
     37---||---352---||---Wachet doch, erwacht, ihr Schläfer---||---185
+    38---||---115.6---||---Mache dich, mein Geist, bereit---||---0
     39---||---259---||---Ach, was soll ich Sünder machen---||---10
     40---||---255---||---Ach Gott und Herr, wie groß und schwer---||---3
     41---||---65.7---||---Was mein Gott will, das g'scheh allzeit---||---346
@@ -593,18 +597,20 @@ class ChoraleListRKBWV:
     55---||---110.7---||---Wir Christenleut---||---380
     56---||---121.6---||---Christum wir sollen loben schon---||---42
     57---||---404---||---O Traurigkeit, o Herzeleid---||---288
-    58---||---174.5---||---Herzlich lieb hab ich dich, o Herr---||---153
+    58---||---174.5---||---Herzlich lieb hab' ich dich, o Herr---||---153
     59---||---245.3---||---Herzliebster Jesu, was hast du verbrochen---||---168
-    60---||---133.6---||---O stilles Gotteslamm---||---181
-    61---||---159.5---||---Jesu Kreuz, Leiden und Pein---||---194
+    60---||---133.6---||---Ich freue mich in dir---||---181
+    61---||---159.5---||---Jesu Leiden, Pein und Tod---||---194
     62---||---197.10---||---Wer nur den lieben Gott läßt walten---||---370
     63---||---245.11---||---O Welt, ich muß dich lassen---||---293
+    64---||---194.6---||---Treuer Gott, ich muss dir klagen---||---0
     65---||---144.3---||---Was Gott tut, das ist wohlgetan---||---338
     66---||---280---||---Es woll uns Gott genädig sein 1---||---43
     67---||---39.7---||---Wie nach einer Wasserquelle---||---104
     68---||---431---||---Wenn wir in höchsten Nöten sein---||---358
     69---||---226.2---||---Komm, heiliger Geist, Herre Gott---||---221
     70---||---322---||---Gott sei gelobet und gebenedeiet---||---119
+    71---||---177.5---||---Ich ruf zu dir, Herr Jesu Christ---||---0
     72---||---6.6---||---Erhalt uns, Herr, bei deinem Wort---||---79
     73---||---334---||---Wenn mein Stündlein vorhanden ist 2---||---141
     74---||---244.54---||---Herzlich tut mich verlangen---||---162
@@ -615,12 +621,14 @@ class ChoraleListRKBWV:
     79---||---342---||---Heut' triumphieret Gottes Sohn---||---171
     80---||---244.44---||---Herzlich tut mich verlangen---||---159
     81---||---245.15---||---Christus, der uns selig macht---||---49
+    82---||---46.6---||---O großer Gott von Macht---||---0
     83---||---245.14---||---Jesu Kreuz, Leiden und Pein---||---192
     84---||---197.5---||---Nun bitten wir den heiligen Geist---||---255
     85---||---45.7---||---Die Wollust dieser Welt---||---278
     86---||---36.4-2---||---Wie schön leuchtet der Morgenstern---||---377
     87---||---56.5---||---Du geballtes Weltgebäude---||---72
     88---||---28.6---||---Helft mir Gotts Güte preisen---||---124
+    89---||---244.62---||---O Haupt voll Blut und Wunden---||---0
     90---||---57.8---||---Hast du denn, Liebster, dein Angesicht gänzlich verborgen---||---231
     91---||---42.7---||---Gib unsern Fürsten und aller Obrigkeit (ending)---||---322
     91---||---42.7---||---Verleih uns Frieden gnädiglich (beginning)---||---322
@@ -630,6 +638,7 @@ class ChoraleListRKBWV:
     95---||---55.5---||---Werde munter, mein Gemüte---||---362
     96---||---87.7---||---Jesu, meine Freude---||---201
     97---||---169.7---||---Nun bitten wir den heiligen Geist---||---256
+    98---||---244.15---||---O Haupt voll Blut und Wunden---||---0
     99---||---16.6---||---Helft mir Gotts Güte preisen---||---125
     100---||---18.5-w---||---Durch Adams Fall ist ganz verderbt---||---73
     101---||---164.6---||---Herr Christ, der einge Gottes-Söhn---||---127
@@ -672,6 +681,7 @@ class ChoraleListRKBWV:
     138---||---64.8---||---Jesu, meine Freude---||---200
     139---||---248.33-3---||---Warum sollt ich mich denn grämen---||---335
     140---||---367---||---In allen meinen Taten---||---211
+    141---||---409---||---Seelenbräutigam---||---0
     142---||---40.6---||---Schwing dich auf zu deinem Gott---||---305
     143---||---368---||---In dulci jubilo---||---215
     144---||---339---||---Aus tiefer Not schrei ich zu dir 2---||---151
@@ -700,6 +710,7 @@ class ChoraleListRKBWV:
     167---||---300---||---Du großer Schmerzensmann, vom Vater so geschlagen---||---70
     168---||---341---||---Heut ist, o Mensch, ein großer Trauertag---||---170
     169---||---355---||---Jesu, der du selbsten wohl---||---189
+    170---||---62.6---||---Nun komm, der Heiden Heiland---||---0
     171---||---408---||---Schaut, ihr Sünder! Ihr macht mir große Pein---||---303
     172---||---410---||---Sei gegrüßet, Jesu gütig---||---307
     173---||---400---||---O Herzensangst, o Bangigkeit und Zagen---||---284
@@ -711,6 +722,7 @@ class ChoraleListRKBWV:
     179---||---140.7---||---Wachet auf, ruft uns die Stimme---||---329
     180---||---265---||---Als Jesus Christus in der Nacht---||---21
     181---||---319---||---Gott hat das Evangelium---||---116
+    182---||---14.5---||---Wär’ Gott nicht mit uns diese Zeit---||---330
     183---||---388---||---Nun freut euch, lieben Christen, g'mein 1---||---261
     184---||---4.8---||---Christ lag in Todesbanden---||---41
     185---||---387---||---Ihr lieben Christen, freut euch nun---||---260
@@ -719,6 +731,7 @@ class ChoraleListRKBWV:
     188---||---349---||---Ach Herre Gott, mich treibt die Not---||---179
     189---||---336---||---Herr Jesu Christ, wahr' Mensch und Gott---||---146
     190---||---337---||---Herr, nun laß in Frieden---||---148
+    191---||---73.5---||---Von Gott will ich nicht lassen---||---0
     192---||---321---||---Gottlob, es geht nunmehr zu Ende---||---118
     193---||---424---||---Was bist du doch, o Seele, so betrübet---||---337
     194---||---123.6---||---Liebster Immanuel, Herzog der Frommen---||---229
@@ -737,10 +750,12 @@ class ChoraleListRKBWV:
     207---||---295---||---Spiritus sancti gratia---||---63
     208---||---266---||---Am Sabbat früh Marien drei 1---||---22
     209---||---299---||---Dir, dir, Jehova, will ich singen---||---67
+    210---||---275---||---Christe, du Beistand deiner Kreuzgemeine---||---0
     211---||---426---||---Weltlich Ehr und zeitlich Gut---||---351
     212---||---329---||---Lob sei dir, gütiger Gott---||---136
     213---||---405---||---O wie selig seid ihr doch, ihr Frommen---||---299
     214---||---383---||---Mitten wir im Leben sind---||---252
+    215---||---126.6---||---Verleih uns Frieden gnädlich---||---0
     216---||---60.5---||---Es ist genug---||---91
     217---||---153.9---||---Herr Jesu Christ, meins Lebens Licht---||---9
     218---||---372---||---Herr, dein Ohren zu mir neige---||---226
@@ -761,6 +776,7 @@ class ChoraleListRKBWV:
     233---||---154.3---||---Werde munter, mein Gemüte---||---365
     234---||---320---||---Gott lebet noch, Seele, was verzagst du doch?---||---117
     235---||---325---||---Heilig, heilig, heilig---||---123
+    236---||---335---||---O Jesu, du mein Bräutigam---||---0
     237---||---423---||---Was betrübst du dich, mein Herze---||---336
     238---||---310---||---Es wird schier der letzte Tag herkommen---||---94
     239---||---292---||---Den Vater dort oben---||---60
@@ -769,8 +785,10 @@ class ChoraleListRKBWV:
     242---||---435---||---Wie bist du, Seele, in mir so gar betrübt---||---374
     243---||---356---||---Jesu, du mein liebstes Leben---||---190
     244---||---357---||---Jesu, Jesu, du bist mein---||---191
+    245---||---274---||---Christe, der du bist Tag und Licht---||---0
     246---||---411---||---Singt dem Herrn ein neues Lied---||---309
     247---||---432---||---Wenn wir in höchsten Nöten sein---||---359
+    248---||---177.4---||---Sei Lob und Ehr dem höchsten Gut---||---0
     249---||---260---||---Allein Gott in der Höh sei Ehr---||---12
     250---||---303---||---Ein feste Burg ist unser Gott---||---75
     251---||---345---||---Ich bin ja, Herr, in deiner Macht---||---174
@@ -833,6 +851,8 @@ class ChoraleListRKBWV:
     305---||---36.4-2---||---Wie schön leuchtet der Morgenstern---||---377
     306---||---402---||---Es sind doch selig alle, die im rechten Glauben wandeln---||---286
     307---||---283---||---Christus, der uns selig macht---||---48
+    308---||---3.6---||---Ach Gott, wie manches Herzeleid---||---0
+    309---||---267---||---Ein Lämmlein geht und trägt die Schuld---||---0
     310---||---245.22---||---Mach's mit mir, Gott, nach deiner Güt---||---239
     311---||---287---||---Jesus Christ, unser Herre---||---54
     312---||---398---||---Die Wollust dieser Welt---||---277
@@ -851,6 +871,7 @@ class ChoraleListRKBWV:
     325---||---83.5---||---Mit Fried und Freud ich fahr dahin---||---250
     326---||---104.6---||---Allein Gott in der Höh sei Ehr---||---13
     327---||---190.7---||---Jesu, nun sei gepreiset---||---205
+    328---||---373---||---Liebster Jesu, wir sind hier---||---0
     329---||---251---||---Es ist das Heil uns kommen Her---||---89
     330---||---252---||---Nun danket alle Gott---||---258
     331---||---136.6---||---Auf meinen lieben Gott---||---27
@@ -859,6 +880,7 @@ class ChoraleListRKBWV:
     334---||---327---||---Ihr Knecht des Herren allzugleich---||---132
     335---||---155.5---||---Es ist das Heil uns kommen her---||---88
     336---||---258---||---Wo Gott, der Herr, nicht bei uns hält---||---383
+    337---||---24.6---||---O Gott, du frommer Gott---||---0
     338---||---145-a---||---Jesus, meine Zuversicht---||---209
     339---||---179.6---||---Wer nur den lieben Gott läßt walten---||---371
     340---||---272---||---Lobet Gott, unsern Herren---||---32
@@ -875,6 +897,7 @@ class ChoraleListRKBWV:
     351---||---430---||---Wenn mein Stündlein vorhanden ist 1---||---355
     352---||---312---||---Es woll uns Gott genädig sein 2---||---96
     353---||---112.5---||---Allein Gott in der Höh sei Ehr---||---14
+    354---||---117.4---||---Sei Lob und Ehr dem höchsten Gut---||---0
     355---||---44.7---||---O Welt, ich muß dich lassen---||---296
     356---||---358---||---Jesu, meine Freude---||---195
     357---||---422---||---Warum sollt ich mich denn grämen---||---334
@@ -900,7 +923,7 @@ class ChoraleListRKBWV:
 
         for line in allCat.splitlines():
             line = line.strip()
-            (riemenschneider,bwv,title,kalmus) = line.split('---||---')
+            (riemenschneider, bwv, title, kalmus) = line.split('---||---')
             lineDict = {'title': title, 'bwv': bwv,'kalmus': int(kalmus),
                         'riemenschneider': int(riemenschneider)}
             self.byTitle[title] = lineDict
@@ -961,10 +984,10 @@ class Iterator:
     numbering system selected, or if the
     numbering system selected is not valid.
 
-    >>> BCI.currentNumber = 25
+    >>> BCI.currentNumber = 377
     Traceback (most recent call last):
     ...
-    music21.corpus.chorales.BachException: 25 does not correspond to a
+    music21.corpus.chorales.BachException: 377 does not correspond to a
         chorale in the riemenschneider numbering system
 
     >>> BCI.numberingSystem = 'not a numbering system'
@@ -998,9 +1021,9 @@ class Iterator:
     highestNumber to 7 would have the same effect as the given example.
 
     >>> BCI = corpus.chorales.Iterator(2, 371, numberingSystem='riemenschneider',
-    ...                                numberList=[1, 2, 3, 4, 6, 25, 190, 371],
+    ...                                numberList=[1, 2, 3, 4, 6, 190, 371, 500],
     ...                                returnType='filename')
-    25 will be skipped because it is not in the numberingSystem riemenschneider
+    500 will be skipped because it is not in the numberingSystem riemenschneider
 
     >>> for chorale in BCI:
     ...    print(chorale)
@@ -1024,7 +1047,7 @@ class Iterator:
     bach/bwv38.6
 
     >>> print(corpus.chorales.Iterator(returnType='filename')[55])
-    bach/bwv159.5
+    bach/bwv121.6
 
 
     For the first 20 chorales in the Riemenschneider numbering system, there are professionally
@@ -1060,7 +1083,7 @@ class Iterator:
         different information at this time. Also, there are problems
         with entries in BachChoraleListRKBWV
         that need to be addressed. Namely, chorales that share the
-        same key (and thus overwrite eachother)
+        same key (and thus overwrite each other)
         and chorales that do not appear to be in the corpus at all.
         '''
         self._currentIndex = None
@@ -1072,8 +1095,8 @@ class Iterator:
         self._iterationType = 'number'
         self.analysis = False
 
-        self._choraleList1 = ChoraleList() #For budapest, baerenreiter
-        self._choraleList2 = ChoraleListRKBWV() #for kalmus, riemenschneider, title, and bwv
+        self._choraleList1 = ChoraleList() # For budapest, baerenreiter
+        self._choraleList2 = ChoraleListRKBWV() # for kalmus, riemenschneider, title, and bwv
 
         self.numberingSystem = numberingSystem #This assignment must come before the kwargs
 
@@ -1164,37 +1187,11 @@ class Iterator:
         >>> from music21 import corpus
         >>> BCI = corpus.chorales.Iterator()
         >>> riemenschneider1 = BCI._returnChorale()
-        >>> riemenschneider1.show('text')
-        {0.0} <music21.text.TextBox "BWV 269">
-        {0.0} <music21.text.TextBox "PDF © 2004...">
-        {0.0} <music21.metadata.Metadata object at ...>
-        {0.0} <music21.stream.Part Soprano>
-            {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
-            {0.0} <music21.stream.Measure 0 offset=0.0>
-                {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.key.Key of G major>
-                {0.0} <music21.meter.TimeSignature 3/4>
-                {0.0} <music21.note.Note G>
-        ...
-
         >>> riemenschneider1.metadata.title
         'Aus meines Herzens Grunde'
 
         >>> BCI.currentNumber = BCI.highestNumber
         >>> riemenschneider371 = BCI._returnChorale()
-        >>> riemenschneider371.show('text')
-        {0.0} <music21.text.TextBox "BWV 278">
-        {0.0} <music21.text.TextBox "PDF © 2004...">
-        {0.0} <music21.metadata.Metadata object at ...>
-        {0.0} <music21.stream.Part Soprano>
-            {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
-            {0.0} <music21.stream.Measure 0 offset=0.0>
-                {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.key.Key of e minor>
-                {0.0} <music21.meter.TimeSignature 4/4>
-                {0.0} <music21.note.Note B>
-        ...
-
         >>> riemenschneider371.metadata.title
         'Christ lag in Todesbanden'
 
@@ -1225,19 +1222,6 @@ class Iterator:
 
         >>> BCI.currentNumber += 1
         >>> ausmeines = BCI._returnChorale()
-        >>> ausmeines.show('text')
-        {0.0} <music21.text.TextBox "BWV 269">
-        {0.0} <music21.text.TextBox "PDF © 2004...">
-        {0.0} <music21.metadata.Metadata object at ...>
-        {0.0} <music21.stream.Part Soprano>
-            {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
-            {0.0} <music21.stream.Measure 0 offset=0.0>
-                {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.key.Key of G major>
-                {0.0} <music21.meter.TimeSignature 3/4>
-                {0.0} <music21.note.Note G>
-        ...
-
         >>> ausmeines.metadata.title
         'Aus meines Herzens Grunde'
 
@@ -1248,8 +1232,6 @@ class Iterator:
 
         >>> BCI._returnChorale(3)
         'bach/bwv48.3'
-
-
         '''
         from music21 import corpus
 
@@ -1324,7 +1306,7 @@ class Iterator:
         >>> BCI = corpus.chorales.Iterator()
         >>> BCI.numberingSystem = 'riemenschneider'
         >>> (BCI._numberList[0], BCI._numberList[40], BCI._numberList[-1])
-        (1, 46, 371)
+        (1, 41, 371)
 
         >>> BCI.numberingSystem = 'kalmus'
         >>> (BCI._numberList[0], BCI._numberList[40], BCI._numberList[-1])
@@ -1332,7 +1314,7 @@ class Iterator:
 
         >>> BCI.numberingSystem = 'bwv'
         >>> (BCI._numberList[0], BCI._numberList[40], BCI._numberList[-1])
-        ('10.7', '174.5', '96.6')
+        ('10.7', '164.6', '96.6')
 
         >>> BCI.numberingSystem = 'budapest'
         >>> (BCI._numberList[0], BCI._numberList[40], BCI._numberList[-1])

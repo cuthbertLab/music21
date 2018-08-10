@@ -92,9 +92,9 @@ class TwelveToneMatrix(stream.Stream):
             if isinstance(self[0], ToneRow):
                 return '<music21.serial.TwelveToneMatrix for [%s]>' % self[0]
             else:
-                return stream.Stream.__repr__(self)
+                return super().__repr__()
         else:
-            return stream.Stream.__repr__(self)
+            return super().__repr__()
 #-------------------------------------------------------------------------------
 
 historicalDict = {

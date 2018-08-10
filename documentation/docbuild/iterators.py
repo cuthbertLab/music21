@@ -53,7 +53,7 @@ class IPythonNotebookIterator(Iterator):
     def __iter__(self):
         rootFilesystemPath = common.getRootFilePath()
         documentationPath = rootFilesystemPath / 'documentation' /'source'
-        for fileName in documentationPath.rglob('*.ipynb'):
+        for fileName in sorted(documentationPath.rglob('*.ipynb')):
             if fileName.parent.name.endswith('.ipynb_checkpoints'):
                 continue
             if '-checkpoint' in fileName.name:
@@ -101,7 +101,7 @@ class ModuleIterator(Iterator):
         for directoryPath, directoryNames, fileNames in os.walk(
             rootFilesystemPath):
             directoryNamesToRemove = []
-            for directoryName in directoryNames:
+            for directoryName in sorted(directoryNames):
                 if directoryName in self._ignoredDirectoryNames:
                     directoryNamesToRemove.append(directoryName)
             for directoryName in directoryNamesToRemove:
@@ -123,7 +123,7 @@ class ModuleIterator(Iterator):
                         continue
                 except ImportError:
                     pass
-            for fileName in fileNames:
+            for fileName in sorted(fileNames):
                 if fileName in self._ignoredFileNames:
                     continue
                 if not fileName.endswith('.py'):

@@ -3725,13 +3725,12 @@ class Pitch:
             self._transpositionIntervals[intervalString] = interval.Interval(intervalString)
         intervalObj = self._transpositionIntervals[intervalString]
         octaveStored = self.octave # may be None
+        p = intervalObj.transposePitch(self, maxAccidental=None)
         if not inPlace:
-            post = intervalObj.transposePitch(self, maxAccidental=None)
             if octaveStored is None:
-                post.octave = None
-            return post
+                p.octave = None
+            return p
         else:
-            p = intervalObj.transposePitch(self, maxAccidental=None)
             self.step = p.step
             self.accidental = p.accidental
             if p.microtone is not None:

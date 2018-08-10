@@ -177,10 +177,11 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
                 print("Delay in processing, seconds: ", end="")
             elif timeouts == 5:
                 print("Starting first modules, should take 5-10 seconds: ", end="")
+
             if timeouts % 5 == 0:
-                print(str(timeouts) + " ", end="")
+                print(str(timeouts) + " ", end="", flush=True)
             if timeouts > maxTimeout and eventsProcessed > 0:
-                print("\nToo many delays, giving up...")
+                print("\nToo many delays, giving up...", flush=True)
                 continueIt = False
                 printSummary(summaryOutput, timeStart, pathsToRun)
                 pool.close()

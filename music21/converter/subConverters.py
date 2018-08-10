@@ -377,11 +377,11 @@ class ConverterIPython(SubConverter):
             outputId = "midiPlayerDiv" + str(s())
             display(HTML("""
                 <div id='""" + outputId + """'></div>
-                <link rel="stylesheet" href="http://artusi.xyz/music21j/css/m21.css"
+                <link rel="stylesheet" href="//cuthbertLab.github.io/music21j/css/m21.css"
                     type="text/css" />
                 <script>
                 require.config({
-                    paths: {'music21': 'http://artusi.xyz/music21j/src/music21'}
+                    paths: {'music21': '//cuthbertLab.github.io/music21j/src/music21'}
                 });
                 require(['music21'], function() {
                                mp = new music21.miditools.MidiPlayer();
@@ -458,7 +458,7 @@ class ConverterBraille(SubConverter):
 
     def show(self, obj, fmt, app=None, subformats=None, **keywords): # pragma: no cover
         if not common.runningUnderIPython():
-            super().show(obj, fmt, app=None, subformats=None, **keywords)
+            super().show(obj, fmt, app=None, subformats=subformats, **keywords)
         else:
             from music21 import braille
             dataStr = braille.translate.objectToBraille(obj)
@@ -467,7 +467,7 @@ class ConverterBraille(SubConverter):
     def write(self, obj, fmt, fp=None, subformats=None, **keywords): # pragma: no cover
         from music21 import braille
         dataStr = braille.translate.objectToBraille(obj)
-        if 'ascii' in subformats:
+        if subformats is not None and 'ascii' in subformats:
             dataStr = braille.basic.brailleUnicodeToBrailleAscii(dataStr)
         fp = self.writeDataStream(fp, dataStr)
         return fp
@@ -822,7 +822,7 @@ class ConverterMusicXML(SubConverter):
         fpOut = fp[0:len(fp) - 3]
         fpOut += subformatExtension
 
-        musescoreRun = '"' + str(musescorePath) + '" ' + fp + " -o " + fpOut + " -T 0 "
+        musescoreRun = '"' + str(musescorePath) + '" "' + fp + '" -o "' + fpOut + '" -T 0 '
         if 'dpi' in keywords:
             musescoreRun += " -r " + str(keywords['dpi'])
 

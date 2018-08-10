@@ -78,7 +78,7 @@ class Corpus:
         rdp = common.cleanpath(rootDirectoryPath, returnPathlib=True)
         matched = []
 
-        for filename in rdp.rglob('*'):
+        for filename in sorted(rdp.rglob('*')):
             if filename.name.startswith('__'):
                 continue
             if filename.name.startswith('.'):
@@ -398,7 +398,7 @@ class Corpus:
 
         >>> from music21 import corpus
         >>> corpus.corpora.CoreCorpus().metadataBundle
-        <music21.metadata.bundles.MetadataBundle 'core': {150... entries}>
+        <music21.metadata.bundles.MetadataBundle 'core': {151... entries}>
 
         As a technical aside, the metadata bundle for a corpus is actually
         stored in corpus.manager, in order to cache most effectively over
@@ -418,7 +418,7 @@ class Corpus:
 
         >>> from music21 import corpus
         >>> corpus.corpora.CoreCorpus().all()
-        <music21.metadata.bundles.MetadataBundle 'core': {150... entries}>
+        <music21.metadata.bundles.MetadataBundle 'core': {151... entries}>
         '''
         return self.metadataBundle
 
@@ -515,12 +515,14 @@ class CoreCorpus(Corpus):
         ('essenFolksong', 'Essen Folksong Collection', False),
         ('handel', 'George Frideric Handel', True),
         ('haydn', 'Joseph Haydn', True),
+        ('joplin', 'Scott Joplin', True),
         ('josquin', 'Josquin des Prez', True),
         ('leadSheet', 'Leadsheet demos', False),
         ('luca', 'D. Luca', False),
         ('miscFolk', 'Miscellaneous Folk', False),
         ('monteverdi', 'Claudio Monteverdi', True),
         ('mozart', 'Wolfgang Amadeus Mozart', True),
+        ('nottingham-dataset', 'Nottingham Music Database (partial)', False),
         ('oneills1850', 'Oneill\'s 1850 Collection', False),
         ('palestrina', 'Giovanni Palestrina', True),
         ('ryansMammoth', 'Ryan\'s Mammoth Collection', False),

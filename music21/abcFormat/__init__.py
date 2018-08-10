@@ -416,8 +416,8 @@ class ABCMetadata(ABCToken):
             raise ABCTokenException('no key signature associated with this meta-data')
 
         # abc uses b for flat in key spec only
-        keyNameMatch = ['c', 'g', 'd', 'a', 'e', 'b', 'f#', 'g#',
-                        'f', 'bb', 'eb', 'ab', 'db', 'gb', 'cb',
+        keyNameMatch = ['c', 'g', 'd', 'a', 'e', 'b', 'f#', 'g#', 
+                        'f', 'bb', 'eb', 'd#', 'ab', 'e#', 'db', 'c#', 'gb', 'cb',
                         # HP or Hp are used for highland pipes
                         'hp']
 
@@ -2021,22 +2021,38 @@ class ABCHandler:
                 self._tokens.append(ABCTenuto(c))
                 continue
 
-            # get the start of a note event: alpha, or
-            # ~ tunr/ornament, accidentals ^, =, - as well as ^^
+            # get the start of a note event: alpha, decoration, or accidental
             if (c.isalpha() or c in '~^=_'):
                 # condition where we start with an alpha that is not an alpha
                 # that comes before a pitch indication
-                # H is fermata, L is accent, T is trill
-                # not sure what S is, but josquin/laPlusDesPlus.abc
-                # uses it before pitches; might be a segno
-                foundPitchAlpha = c.isalpha() and c not in 'vHLTS'
+                # From the 2.2 draft standard, we see the following "decorations"
+                # defined:
+                #     .       staccato mark
+                #     ~       Irish roll
+                #     H       fermata
+                #     L       accent or emphasis
+                #     M       lowermordent
+                #     O       coda
+                #     P       uppermordent
+                #     S       segno
+                #     T       trill
+                #     u       up-bow
+                #     v       down-bow
+                #
+                # Accidentals are these:
+                #     ^       sharp
+                #     ^^      double-sharp
+                #     =       natural
+                #     _       flat
+                #     __      double-flat
+                accidentalsAndDecorations = '.~^=_HLMOPSTuv'
+                foundPitchAlpha = c.isalpha() and c not in accidentalsAndDecorations
                 j = currentIndex + 1
 
                 while j <= lastIndex:
                     # if we have not found pitch alpha
-                    # ornaments may precede note names
-                    # accidentals (^=_) staccato (.), up/down bow (u, v)
-                    if (not foundPitchAlpha and strSrc[j] in '~=^_vHLTS'):
+                    # decorations and/or accidentals may precede note names
+                    if (not foundPitchAlpha and strSrc[j] in accidentalsAndDecorations):
                         j += 1
                         continue
                     # only allow one pitch alpha to be a continue condition
@@ -2046,7 +2062,7 @@ class ABCHandler:
                         j += 1
                         continue
                     # continue conditions after alpha:
-                    # , register modifiaciton (, ') or number, rhythm indication
+                    # , register modification (, ') or number, rhythm indication
                     # number, /,
                     elif strSrc[j].isdigit() or strSrc[j] in ',/,\'':
                         j += 1
@@ -2071,7 +2087,7 @@ class ABCHandler:
                 if collect in ['w', 'u', 'v', 'v.', 'h', 'H', 'vk',
                     'uk', 'U', '~',
                     '.', '=', 'V', 'v.', 'S', 's', 'i', 'I', 'ui', 'u.', 'Q', 'Hy', 'Hx',
-                    'r', 'm', 'M', 'n', 'N', 'o',
+                    'r', 'm', 'M', 'n', 'N', 'o', 'O', 'P',
                     'l', 'L', 'R',
                     'y', 'T', 't', 'x', 'Z']:
                     pass
@@ -2187,7 +2203,10 @@ class ABCHandler:
 
             if isinstance(t, ABCTie):
                 # tPrev is guaranteed to be an ABCNote, by the grammar.
-                tPrev.tie = "start"
+                if tPrev.tie == 'stop':
+                    tPrev.tie = 'continue'                
+                else:
+                    tPrev.tie = 'start'
                 lastTieToken = t
 
             if isinstance(t, ABCStaccato):
