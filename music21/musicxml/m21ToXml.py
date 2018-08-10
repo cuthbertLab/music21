@@ -2600,6 +2600,7 @@ class MeasureExporter(XMLExporterBase):
     classesToMethods = OrderedDict(
                [('Note', 'noteToXml'),
                 ('NoChord', 'noChordToXml'),
+                ('ChordWithFretBoard', 'chordWithFretToXml'),
                 ('ChordSymbol', 'chordSymbolToXml'),
                 ('Chord', 'chordToXml'),
                 ('Rest', 'restToXml'),
@@ -3679,7 +3680,7 @@ class MeasureExporter(XMLExporterBase):
                 
         return FretNoteMX
         
-    def chordWithFretToXml(self, fretBoard):
+    def fretBoardToXml(self, fretBoard):
         '''
         The ChordWithFretBoard Object combines chord symbols with FretNote objects.
         
@@ -3693,7 +3694,7 @@ class MeasureExporter(XMLExporterBase):
         [None, None, None, 
          <music21.pitch.Pitch A3>, <music21.pitch.Pitch D4>, <music21.pitch.Pitch F#4>]
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
-        >>> MEXChordWithFret = MEX.chordWithFretToXml(guitarChord)
+        >>> MEXChordWithFret = MEX.fretBoardToXml(guitarChord)
         >>> MEX.dump(MEXChordWithFret)
         <frame>
             <frame-strings>6</frame-strings>
@@ -3730,6 +3731,18 @@ class MeasureExporter(XMLExporterBase):
             mxFrame.append(mxFretNote)
         
         return mxFrame
+    
+    def chordWithFretToXml(self, cwf):
+        '''
+        Deals with both chords and frets.
+        Generate harmony and append xml to it.
+        '''
+        mxHarmony = self.chordSymbolToXml(cwf)
+        mxFrame = self.fretBoardToXml(cwf)
+        
+        mxHarmony.append(mxFrame)
+        
+        return mxHarmony
 
     def tupletToTimeModification(self, tup):
         '''
