@@ -43,7 +43,6 @@ from music21 import pitch
 from music21 import spanner
 from music21 import stream
 from music21 import style
-from music21 import tablature
 from music21.stream.iterator import OffsetIterator
 
 from music21.musicxml import xmlObjects
@@ -4431,8 +4430,6 @@ class MeasureExporter(XMLExporterBase):
         if cs.writeAsChord is True:
             return self.chordToXml(cs)
 
-        from music21 import harmony
-
         mxHarmony = Element('harmony')
         _synchronizeIds(mxHarmony, cs)
 
@@ -6014,7 +6011,6 @@ class Test(unittest.TestCase):
 
 
     def testExportNC(self):
-        from music21 import stream, note
         from music21 import harmony
 
         s = stream.Score()

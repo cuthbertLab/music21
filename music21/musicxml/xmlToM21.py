@@ -49,6 +49,7 @@ from music21 import repeat
 from music21 import spanner
 from music21 import stream
 from music21 import style
+from music21 import tablature
 from music21 import tempo
 from music21 import text # for text boxes
 from music21 import tie
@@ -184,15 +185,15 @@ def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, *, transform
     Pass a function or lambda function as `transform` to transform the value before setting it
 
     >>> from xml.etree.ElementTree import Element, SubElement
+    
+    This is essentially `<accidental><alter>-2</alter></accidental>`:
+
     >>> e = Element('accidental')
     >>> a = SubElement(e, 'alter')
     >>> a.text = '-2'
 
     >>> seta = musicxml.xmlToM21._setAttributeFromTagText
     >>> acc = pitch.Accidental()
-    >>> seta(acc, e, 'alter', '_alter')
-    >>> acc.alter
-    '-2'
 
     Transform the alter text to a float.
 
@@ -217,6 +218,7 @@ def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, *, transform
     matchEl = xmlEl.find(tag) # find first
     if matchEl is None:
         return
+    
     value = matchEl.text
     if value in (None, ""):
         return
@@ -226,6 +228,7 @@ def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, *, transform
 
     if attributeName is None:
         attributeName = common.hyphenToCamelCase(tag)
+        
     setattr(m21El, attributeName, value)
 
 def _synchronizeIds(element, m21Object):
@@ -234,7 +237,9 @@ def _synchronizeIds(element, m21Object):
     (%optional-unique-id)
     on many elements which is perfect for setting as .id on
     a music21 element.
-
+    
+    <fermata id="hello"><id>bye</id></fermata>
+    
     >>> from xml.etree.ElementTree import fromstring as El
     >>> e = El('<fermata id="fermata1"/>')
     >>> f = expressions.Fermata()
@@ -4305,12 +4310,23 @@ class MeasureParser(XMLParserBase):
         >>> cs.root()
         <music21.pitch.Pitch D-3>
         '''
-        # TODO: frame
         # TODO: offset
         # staff is covered by insertCoreAndReference
+        mxKind = mxHarmony.find('kind')
+        if mxKind is not None and mxKind.text is not None:
+            kindText = mxKind.text.strip()
+        else:
+            kindText = None
+        mxFrame = mxHarmony.find('frame')
 
         #environLocal.printDebug(['mxToChordSymbol():', mxHarmony])
-        cs = harmony.ChordSymbol()
+        if mxFrame is not None:
+            cs = tablature.ChordWithFretBoard()
+        elif kindText == 'none':
+            cs = harmony.NoChord()
+        else:
+            cs = harmony.ChordSymbol()
+        
         self.setEditorial(mxHarmony, cs)
         self.setPrintStyle(mxHarmony, cs)
         self.setPrintObject(mxHarmony, cs)
@@ -4339,11 +4355,8 @@ class MeasureParser(XMLParserBase):
             seta(cs, mxHarmony, 'function', 'romanNumeral')
 
 
-        mxKind = mxHarmony.find('kind')
-        if mxKind is not None and mxKind.text is not None: # two ways of doing it...
+        if kindText is not None: # two ways of doing it...
             cs.chordKind = mxKind.text.strip()
-            if cs.chordKind == 'none':
-                cs = harmony.NoChord()
             mxKindText = mxKind.get('text') # attribute
             if mxKindText is not None:
                 cs.chordKindStr = mxKindText
@@ -4389,6 +4402,12 @@ class MeasureParser(XMLParserBase):
             #environLocal.printDebug(['xmlToChordSymbol(): Harmony object', h])
             if cs.root().name != r.name:
                 cs.root(r)
+
+        # TODO: frame
+        if mxFrame is not None:
+            pass
+            # TODO: Luke: Uncomment this next line when method is ready...
+            # self.xmlFrameToFretBoard(mxFrame, cs)
 
         return cs
 
@@ -4907,6 +4926,11 @@ class MeasureParser(XMLParserBase):
         >>> MP.xmlToClef(mxClef)
         <music21.clef.TrebleClef>
 
+        >>> mxClef = ET.fromstring('<clef><sign>G</sign><line>2</line>' 
+        ...                        + '<clef-octave-change>-1</clef-octave-change></clef>')
+        >>> MP.xmlToClef(mxClef)
+        <music21.clef.Treble8vbClef>
+
         >>> mxClef = ET.fromstring('<clef><sign>TAB</sign></clef>')
         >>> MP.xmlToClef(mxClef)
         <music21.clef.TabClef>
@@ -4918,7 +4942,10 @@ class MeasureParser(XMLParserBase):
             line = mxClef.find('line').text.strip()
             mxOctaveChange = mxClef.find('clef-octave-change')
             if mxOctaveChange != None:
-                octaveChange = int(mxOctaveChange.text)
+                try:
+                    octaveChange = int(mxOctaveChange.text)
+                except ValueError:
+                    octaveChange = 0
             else:
                 octaveChange = 0
             clefObj = clef.clefFromString(sign + line, octaveChange)
