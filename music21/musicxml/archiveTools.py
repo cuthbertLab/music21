@@ -25,7 +25,7 @@ environLocal = environment.Environment(_MOD)
 # compression
 
 
-def compressAllXMLFiles(deleteOriginal=False):
+def compressAllXMLFiles(*, deleteOriginal=False):
     '''
     Takes all filenames in corpus.paths and runs
     :meth:`music21.musicxml.archiveTools.compressXML` on each.  If the musicXML files are
@@ -42,7 +42,7 @@ def compressAllXMLFiles(deleteOriginal=False):
         )
 
 
-def compressXML(filename, deleteOriginal=False):
+def compressXML(filename, *, deleteOriginal=False):
     '''
     Takes a filename, and if the filename corresponds to a musicXML file with
     an .xml extension, creates a corresponding compressed .mxl file in the same
@@ -51,6 +51,7 @@ def compressXML(filename, deleteOriginal=False):
     If deleteOriginal is set to True, the original musicXML file is deleted
     from the system.
     '''
+    filename = str(filename)
     if not filename.endswith('.xml') and not filename.endswith('.musicxml'):
         return  # not a musicXML file
     filename = common.pathTools.cleanpath(filename, returnPathlib=False)
