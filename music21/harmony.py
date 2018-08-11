@@ -1359,10 +1359,10 @@ class ChordSymbol(Harmony):
     'minor'
 
     >>> cs.root()
-    <music21.pitch.Pitch C>
+    <music21.pitch.Pitch C4>
 
     >>> cs.bass()
-    <music21.pitch.Pitch E->
+    <music21.pitch.Pitch E-3>
 
     The second approach to creating a Chord Symbol object, by
     passing a regular expression (this list is not exhaustive):
@@ -1908,7 +1908,7 @@ class ChordSymbol(Harmony):
         ['D-3', 'F3', 'A-3', 'B-3']
 
         >>> csMaj6.root()
-        <music21.pitch.Pitch D->
+        <music21.pitch.Pitch D-3>
 
         >>> csMaj6.inversion()
         0
@@ -2470,9 +2470,6 @@ class Test(unittest.TestCase):
 
 
     def testNoChord(self):
-
-        from music21 import stream, note
-
         nc = NoChord()
         self.assertEqual('none', nc.chordKind)
         self.assertEqual('N.C.', nc.chordKindStr)
