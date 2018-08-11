@@ -929,10 +929,10 @@ class Expander:
                 else:
                     raise ExpanderException('a right barline is found that cannot be processed: ' +
                                             '%s, %s' % (m, rb))
-        if countBalance != 0:
+        if countBalance not in (0, 1):
             environLocal.printDebug(['Repeats are not balanced: countBalance: %s' % (countBalance)])
             return False
-        if startCount != endCount:
+        if startCount != endCount and startCount != (endCount - 1):
             environLocal.printDebug(['start count not the same as end count: %s / %s' % (
                                                                     startCount, endCount)])
             return False
@@ -1074,6 +1074,7 @@ class Expander:
         >>> s.makeMeasures(inPlace=True)
         >>> s.measure(2).leftBarline = bar.Repeat(direction='start')
         >>> s.measure(2).rightBarline = bar.Repeat(direction='end', times=3)
+        >>> rb = spanner.RepeatBracket(s.measure(2))
         >>> s.measure(4).leftBarline = bar.Repeat(direction='start')
         >>> s.measure(4).rightBarline = bar.Repeat(direction='end', times=2)
         >>> e = repeat.Expander(s)
@@ -1084,6 +1085,15 @@ class Expander:
         >>> from pprint import pprint as pp
         >>> pp(e._groupRepeatBracketIndices(s))
         [{'measureIndices': [], 'repeatBrackets': []}]
+
+
+        Should work if no start repeat.
+
+        >>> s = converter.parse('tinynotation: 3/4 A2.  C4 D E   F2.    G4 a b   c2.')
+        >>> s.makeMeasures(inPlace=True)
+        >>> s.measure(2).rightBarline = bar.Repeat(direction='end')
+        >>> e = repeat.Expander(s)
+
         '''
         groups = []
         mEnumerated = [x for x in enumerate(streamObj)]

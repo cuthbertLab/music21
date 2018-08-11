@@ -168,17 +168,17 @@ class MetadataBundle:
 
     >>> searchResults = coreBundle.search('bach', field='composer')
     >>> searchResults
-    <music21.metadata.bundles.MetadataBundle {25 entries}>
+    <music21.metadata.bundles.MetadataBundle {358 entries}>
 
     >>> resultsEntries = searchResults.search('3/4')
     >>> resultsEntries
-    <music21.metadata.bundles.MetadataBundle {6 entries}>
+    <music21.metadata.bundles.MetadataBundle {40 entries}>
 
 
     Results are ordered by their source path:
 
     >>> resultsEntries[0]
-    <music21.metadata.bundles.MetadataEntry: bach_bwv366_krn>
+    <music21.metadata.bundles.MetadataEntry: bach_bwv11_6_mxl>
 
     To get a score out of the entry, call .parse()
 
@@ -238,12 +238,12 @@ class MetadataBundle:
     ...     field='composer',
     ...     )
     >>> bachBundle
-    <music21.metadata.bundles.MetadataBundle {25 entries}>
+    <music21.metadata.bundles.MetadataBundle {358 entries}>
     >>> tripleMeterBundle = coreBundle.search('3/4')
     >>> tripleMeterBundle
     <music21.metadata.bundles.MetadataBundle {1876 entries}>
     >>> bachBundle.intersection(tripleMeterBundle)
-    <music21.metadata.bundles.MetadataBundle {6 entries}>
+    <music21.metadata.bundles.MetadataBundle {40 entries}>
 
     Finally, a metadata bundle need not be associated with any corpus at all,
     and can be populated ad hoc:
@@ -289,12 +289,12 @@ class MetadataBundle:
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {25 entries}>
+        <music21.metadata.bundles.MetadataBundle {358 entries}>
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {1876 entries}>
         >>> bachBundle & tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {6 entries}>
+        <music21.metadata.bundles.MetadataBundle {40 entries}>
 
         Returns a new metadata bundle.
         '''
@@ -507,7 +507,7 @@ class MetadataBundle:
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {25 entries}>
+        <music21.metadata.bundles.MetadataBundle {358 entries}>
         >>> corelliBundle = coreBundle.search(
         ...     'corelli',
         ...     field='composer',
@@ -515,7 +515,7 @@ class MetadataBundle:
         >>> corelliBundle
         <music21.metadata.bundles.MetadataBundle {1 entry}>
         >>> bachBundle | corelliBundle
-        <music21.metadata.bundles.MetadataBundle {26 entries}>
+        <music21.metadata.bundles.MetadataBundle {359 entries}>
 
         Returns a new metadata bundle.
         '''
@@ -548,12 +548,12 @@ class MetadataBundle:
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {25 entries}>
+        <music21.metadata.bundles.MetadataBundle {358 entries}>
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {1876 entries}>
         >>> bachBundle - tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {19 entries}>
+        <music21.metadata.bundles.MetadataBundle {318 entries}>
 
         Returns a new metadata bundle.
 
@@ -576,13 +576,13 @@ class MetadataBundle:
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {25 entries}>
+        <music21.metadata.bundles.MetadataBundle {358 entries}>
 
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {1876 entries}>
         >>> bachBundle ^ tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1889 entries}>
+        <music21.metadata.bundles.MetadataBundle {2154 entries}>
 
         Returns a new metadata bundle.
         '''
@@ -838,7 +838,7 @@ class MetadataBundle:
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {25 entries}>
+        <music21.metadata.bundles.MetadataBundle {358 entries}>
 
         >>> bachBundle.clear()
         >>> bachBundle
@@ -917,14 +917,14 @@ class MetadataBundle:
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {25 entries}>
+        <music21.metadata.bundles.MetadataBundle {358 entries}>
 
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {1876 entries}>
 
         >>> bachBundle.difference(tripleMeterBundle)
-        <music21.metadata.bundles.MetadataBundle {19 entries}>
+        <music21.metadata.bundles.MetadataBundle {318 entries}>
 
         Returns a new metadata bundle.
         '''
@@ -945,14 +945,14 @@ class MetadataBundle:
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {25 entries}>
+        <music21.metadata.bundles.MetadataBundle {358 entries}>
 
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {1876 entries}>
 
         >>> bachBundle.intersection(tripleMeterBundle)
-        <music21.metadata.bundles.MetadataBundle {6 entries}>
+        <music21.metadata.bundles.MetadataBundle {40 entries}>
 
         Returns a new MetadataBundle.
         '''
@@ -974,7 +974,7 @@ class MetadataBundle:
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {25 entries}>
+        <music21.metadata.bundles.MetadataBundle {358 entries}>
 
         >>> corelliBundle = coreBundle.search(
         ...     'corelli',
@@ -1010,11 +1010,11 @@ class MetadataBundle:
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {25 entries}>
+        <music21.metadata.bundles.MetadataBundle {358 entries}>
 
         >>> tripleMeterBachBundle = bachBundle.search('3/4')
         >>> tripleMeterBachBundle
-        <music21.metadata.bundles.MetadataBundle {6 entries}>
+        <music21.metadata.bundles.MetadataBundle {40 entries}>
 
         >>> tripleMeterBachBundle.issubset(bachBundle)
         True
@@ -1039,11 +1039,11 @@ class MetadataBundle:
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {25 entries}>
+        <music21.metadata.bundles.MetadataBundle {358 entries}>
 
         >>> tripleMeterBachBundle = bachBundle.search('3/4')
         >>> tripleMeterBachBundle
-        <music21.metadata.bundles.MetadataBundle {6 entries}>
+        <music21.metadata.bundles.MetadataBundle {40 entries}>
 
         >>> tripleMeterBachBundle.issuperset(bachBundle)
         False
@@ -1267,12 +1267,12 @@ class MetadataBundle:
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {25 entries}>
+        <music21.metadata.bundles.MetadataBundle {358 entries}>
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {1876 entries}>
         >>> bachBundle.symmetric_difference(tripleMeterBundle)
-        <music21.metadata.bundles.MetadataBundle {1889 entries}>
+        <music21.metadata.bundles.MetadataBundle {2154 entries}>
 
         Returns a new MetadataBundle.
         '''
@@ -1291,7 +1291,7 @@ class MetadataBundle:
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {25 entries}>
+        <music21.metadata.bundles.MetadataBundle {358 entries}>
         >>> beethovenBundle = coreBundle.search(
         ...     'beethoven',
         ...     field='composer',
@@ -1300,7 +1300,7 @@ class MetadataBundle:
         <music21.metadata.bundles.MetadataBundle {20 entries}>
 
         >>> bachBundle.union(beethovenBundle)
-        <music21.metadata.bundles.MetadataBundle {45 entries}>
+        <music21.metadata.bundles.MetadataBundle {378 entries}>
 
         Returns a new MetadataBundle.
         '''
@@ -1369,7 +1369,7 @@ class MetadataBundle:
         >>> import tempfile
         >>> tempFilePath = tempfile.mkstemp()[1]
         >>> bachBundle.write(filePath=tempFilePath)
-        <music21.metadata.bundles.MetadataBundle {25 entries}>
+        <music21.metadata.bundles.MetadataBundle {358 entries}>
         >>> os.remove(tempFilePath)
         '''
         filePath = filePath or self.filePath

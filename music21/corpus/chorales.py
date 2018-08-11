@@ -1205,11 +1205,11 @@ class Iterator:
         >>> BCI.titleList = ['Christ lag in Todesbanden', 'Aus meines Herzens Grunde']
         >>> christlag = BCI._returnChorale()
         >>> christlag.show('text')
-        {0.0} <music21.text.TextBox "BWV 278">
         {0.0} <music21.text.TextBox "PDF © 2004...">
+        {0.0} <music21.text.TextBox "BWV 278">
         {0.0} <music21.metadata.Metadata object at ...>
         {0.0} <music21.stream.Part Soprano>
-            {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
+            {0.0} <music21.instrument.Instrument P1: Soprano: >
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.clef.TrebleClef>
                 {0.0} <music21.key.Key of e minor>

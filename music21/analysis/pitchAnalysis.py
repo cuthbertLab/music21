@@ -24,9 +24,9 @@ def pitchAttributeCount(s, pitchAttr='name'):
     >>> for n in sorted(pcCount):
     ...     print ("%2d: %2d" % (n, pcCount[n]))
      0:  3
-     2: 25
+     2: 26
      3:  3
-     4: 14
+     4: 13
      6: 15
      7: 13
      9: 17
@@ -38,7 +38,7 @@ def pitchAttributeCount(s, pitchAttr='name'):
     >>> nameCount = analysis.pitchAnalysis.pitchAttributeCount(bach, 'name')
     >>> for n, count in nameCount.most_common(3):
     ...     print ("%2s: %2d" % (n, nameCount[n]))
-     D: 25
+     D: 26
      A: 17
     F#: 15
 
