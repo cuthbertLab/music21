@@ -315,7 +315,7 @@ class Date:
 
         >>> a.datetime
         Traceback (most recent call last):
-        TypeError: Required argument 'day' (pos 3) not found
+        TypeError: ...argument 'day' (pos 3)...
         '''
         # pylint: disable=no-value-for-parameter
         post = []
@@ -898,8 +898,8 @@ class Contributor:
         >>> a.role
         'composer'
 
-        >>> a.age()
-        datetime.timedelta(20552)
+        >>> a.age().days
+        20552
 
         >>> str(a.age())
         '20552 days, 0:00:00'

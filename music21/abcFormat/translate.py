@@ -983,8 +983,8 @@ class Test(unittest.TestCase):
         from music21 import harmony, pitch
 
         cs = harmony.ChordSymbol(root='eb', bass='bb', kind='dominant')
-        self.assertEquals(cs.bass(), pitch.Pitch('B-'))
-        self.assertEquals(cs.pitches[0], pitch.Pitch('B-2'))
+        self.assertEquals(cs.bass(), pitch.Pitch('B-2'))
+        self.assertIs(cs.pitches[0], cs.bass())
 
         cs = harmony.ChordSymbol('e-7/b-')
         self.assertEquals(cs.root(), pitch.Pitch('E-3'))
