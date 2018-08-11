@@ -2141,6 +2141,7 @@ class ABCHandler:
         lastStrAccToken = None
         lastTenutoToken = None
         lastGraceToken = None
+        lastNoteToken = None
 
 
         for i in range(len(self._tokens)):
@@ -2202,11 +2203,11 @@ class ABCHandler:
 
 
             if isinstance(t, ABCTie):
-                # tPrev is guaranteed to be an ABCNote, by the grammar.
-                if tPrev.tie == 'stop':
-                    tPrev.tie = 'continue'                
-                else:
-                    tPrev.tie = 'start'
+                # tPrev is usually an ABCNote but may be a GraceStop.
+                if lastNoteToken and lastNoteToken.tie == 'stop':
+                    lastNoteToken.tie = 'continue'                
+                elif lastNoteToken:
+                    lastNoteToken.tie = 'start'
                 lastTieToken = t
 
             if isinstance(t, ABCStaccato):
@@ -2288,7 +2289,7 @@ class ABCHandler:
                     lastTupletToken.noteCount -= 1 # decrement
                     # add a reference to the note
                     t.activeTuplet = lastTupletToken.tupletObj
-
+                lastNoteToken = t
 
 
         # parse : call methods to set attributes and parse abc string

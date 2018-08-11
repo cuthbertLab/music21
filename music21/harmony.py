@@ -193,7 +193,7 @@ class Harmony(chord.Chord):
         #for example, for Chord Symbols the figure might be 'Cm7'
         #for roman numerals, the figure might be 'I7'
         self._figure = figure
-        if self._figure is not None:
+        if self._figure:
             self._parseFigure()
         # if the bass is not specified, but the root is,
         # assume the bass and root are identical and

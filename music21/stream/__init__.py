@@ -12338,7 +12338,7 @@ class Score(Stream):
         >>> len(excerpt.parts)
         4
         >>> excerpt.parts[0].show('text')
-        {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
+        {0.0} <music21.instrument.Instrument P1: Soprano: >
         {0.0} <music21.clef.TrebleClef>
         {0.0} <music21.key.Key of e minor>
         {0.0} <music21.meter.TimeSignature 4/4>
@@ -12352,7 +12352,7 @@ class Score(Stream):
         unless this information appears in the measure itself at the beginning:
 
         >>> bachIn.measure(1).parts[0].show('text')
-        {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
+        {0.0} <music21.instrument.Instrument P1: Soprano: >
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.key.Key of e minor>
@@ -12370,7 +12370,7 @@ class Score(Stream):
         >>> excerpt = bachIn.measure(-1)
         >>> excerptChords = excerpt.chordify()
         >>> excerptChords.show('text')
-        {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
+        {0.0} <music21.instrument.Instrument P1: Soprano: >
         {0.0} <music21.clef.TrebleClef>
         {0.0} <music21.key.Key of e minor>
         {0.0} <music21.meter.TimeSignature 4/4>
