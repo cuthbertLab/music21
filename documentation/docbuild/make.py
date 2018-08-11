@@ -118,7 +118,6 @@ class DocBuilder:
         # If the docs fail to build, we should not try to open a web browser.
         returnCode = 0
 
-        xx = input(str(sphinxOptions))
         if sphinx_new:
             import sphinx.cmd.build
             sphinx_main_command = sphinx.cmd.build.main

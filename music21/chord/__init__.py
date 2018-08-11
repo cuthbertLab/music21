@@ -1137,55 +1137,13 @@ class Chord(note.NotRest):
         else:
             return True
 
-    def findRoot(self):
+    def _findRoot(self):
         '''
         Looks for the root usually by finding the note with the most 3rds above
         it.
 
         Generally use root() instead, since if a chord doesn't know its root,
-        root() will run findRoot() automatically.
-
-        Example:
-
-        >>> cmaj = chord.Chord(['E', 'G', 'C'])
-        >>> cmaj.findRoot()
-        <music21.pitch.Pitch C>
-
-        For some chords we make an exception.  For instance, this chord in
-        B-flat minor:
-
-        >>> aDim7no3rd = chord.Chord(['A3', 'E-4', 'G4'])
-
-        Could be considered an type of E-flat 11 chord with a 3rd, but no 5th,
-        7th, or 9th, in 5th inversion.  That doesn't make sense, so we should
-        call it an A dim 7th chord
-        with no 3rd.
-
-        >>> aDim7no3rd.findRoot()
-        <music21.pitch.Pitch A3>
-
-        >>> aDim7no3rdInv = chord.Chord(['E-3', 'A4', 'G4'])
-        >>> aDim7no3rdInv.findRoot()
-        <music21.pitch.Pitch A4>
-
-        The root of a 13th chord (which could be any chord in any inversion) is
-        designed to be the bass:
-
-        >>> chord.Chord('F3 A3 C4 E-4 G-4 B4 D5').findRoot()
-        <music21.pitch.Pitch F3>
-
-        >>> lotsOfNotes = chord.Chord(['E3', 'C4', 'G4', 'B-4', 'E5', 'G5'])
-        >>> r = lotsOfNotes.findRoot()
-        >>> r
-        <music21.pitch.Pitch C4>
-
-        >>> r is lotsOfNotes.pitches[1]
-        True
-
-
-        >>> chord.Chord().findRoot()
-        Traceback (most recent call last):
-        music21.chord.ChordException: no notes in chord <music21.chord.Chord >
+        root() will run ._findRoot() automatically.
         '''
         def rootnessFunction(rootThirdList):
             '''
@@ -1222,7 +1180,7 @@ class Chord(note.NotRest):
         rootThirdsList = []
         rootnessFunctionScores = []
         if not closedChord.pitches:
-            raise ChordException('no notes in chord %r' % self)
+            raise ChordException('no pitches in chord %r' % self)
         elif len(closedChord.pitches) == 1:
             return self.pitches[0]
         indexOfPitchesWithPerfectlyStackedThirds = []
@@ -1255,6 +1213,12 @@ class Chord(note.NotRest):
         mostRootyIndex = rootnessFunctionScores.index(max(rootnessFunctionScores))
         return closedChord.pitches[mostRootyIndex]
 
+    @common.deprecated('August 2018, v5.2', 'September 2020, v.7', 'just run .root() directly')
+    def findRoot(self):
+        '''
+        A deprecated function.  Just call .root() directly.
+        '''
+        return self._findRoot()
 
     def geometricNormalForm(self):
         '''
@@ -2243,7 +2207,7 @@ class Chord(note.NotRest):
         Returns True if the chord is a French augmented sixth chord
         (flat 6th scale degree in bass, tonic, second scale degree, and raised 4th).
 
-        N.B. The findRoot() method of music21.chord Chord determines
+        N.B. The root() method of music21.chord Chord determines
         the root based on the note with
         the most thirds above it. However, under this definition, a
         1st-inversion french augmented sixth chord
@@ -2742,7 +2706,7 @@ class Chord(note.NotRest):
         ### Sw+6 => Minor sixth scale step in bass, tonic, raised 4th + raised 2nd scale degree.
         augSixthChord = self.removeRedundantPitchNames(inPlace=False)
 
-        # The findRoot() method of music21.chord Chord determines the root based on the note with
+        # The root() method of music21.chord Chord determines the root based on the note with
         # the most thirds above it. However, under this definition, a Swiss augmented sixth chord
         # resembles a second inversion chord, not the first inversion subdominant chord it is based
         # upon. We fix this by adjusting the root. First, however, we check to see if the chord is
@@ -2962,13 +2926,55 @@ class Chord(note.NotRest):
         return self._removePitchByRedundantAttribute('name',
               inPlace=inPlace)
 
-    def root(self, newroot=False, find=True):
+    def root(self, newroot=False, *, find=True):
         '''
-        Returns or sets the Root of the chord. If not set, will run findRoot (q.v.)
+        Returns or sets the Root of the chord. If not set, will find it.
 
         >>> cmaj = chord.Chord(['E3', 'C4', 'G5'])
         >>> cmaj.root()
         <music21.pitch.Pitch C4>
+
+        Examples:
+
+        >>> cmaj = chord.Chord(['E', 'G', 'C'])
+        >>> cmaj.root()
+        <music21.pitch.Pitch C>
+
+        For some chords we make an exception.  For instance, this chord in
+        B-flat minor:
+
+        >>> aDim7no3rd = chord.Chord(['A3', 'E-4', 'G4'])
+
+        ...could be considered an type of E-flat 11 chord with a 3rd, but no 5th,
+        7th, or 9th, in 5th inversion.  That doesn't make sense, so we should
+        call it an A dim 7th chord
+        with no 3rd.
+
+        >>> aDim7no3rd.root()
+        <music21.pitch.Pitch A3>
+
+        >>> aDim7no3rdInv = chord.Chord(['E-3', 'A4', 'G4'])
+        >>> aDim7no3rdInv.root()
+        <music21.pitch.Pitch A4>
+
+
+        The root of a 13th chord (which could be any chord in any inversion) is
+        designed to be the bass:
+
+        >>> chord.Chord('F3 A3 C4 E-4 G-4 B4 D5').root()
+        <music21.pitch.Pitch F3>
+
+
+        Multiple pitches in different octaves do not interfere with root.
+
+        >>> lotsOfNotes = chord.Chord(['E3', 'C4', 'G4', 'B-4', 'E5', 'G5'])
+        >>> r = lotsOfNotes.root()
+        >>> r
+        <music21.pitch.Pitch C4>
+
+        >>> r is lotsOfNotes.pitches[1]
+        True
+
 
         By default this method uses an algorithm to find the root among the
         chord's pitches, if no root has been previously specified. If this is
@@ -2982,12 +2988,56 @@ class Chord(note.NotRest):
         >>> d = harmony.ChordSymbol('CM/E')
         >>> d.root(find=False)
         <music21.pitch.Pitch C4>
+
+
+        To specify the root directly, pass the pitch to the root function:
+        
+        >>> csus4 = chord.Chord('C4 F4 G4')
+        >>> csus4.root() # considered to be an F9 chord in 2nd inversion
+        <music21.pitch.Pitch F4>
+        >>> csus4.root('C4')
+        >>> csus4.root()
+        <music21.pitch.Pitch C4>
+        
+        Note that the root is set to a pitch in the chord if possible.
+
+        >>> csus4.root() is csus4.pitches[0]
+        True
+
+        A chord with no pitches has no root.
+
+        >>> chord.Chord().root()
+        Traceback (most recent call last):
+        music21.chord.ChordException: no pitches in chord <music21.chord.Chord >
+
+
+        Changed in v5.2 -- find is a keyword-only parameter, newroot finds pitch in chord
         '''
         if newroot:
             if isinstance(newroot, str):
                 newroot = common.cleanedFlatNotation(newroot)
                 newroot = pitch.Pitch(newroot)
 
+            # try to set newroot to be a pitch in the chord if possible
+            foundRootInChord = False
+            for p in self.pitches: # first by identity
+                if newroot is p:
+                    foundRootInChord = True
+                    break
+
+            if not foundRootInChord:
+                for p in self.pitches: # then by name with octave
+                    if p.nameWithOctave == newroot.nameWithOctave:
+                        newroot = p
+                        foundRootInChord = True
+                        break
+                    
+            if not foundRootInChord: # finally by name
+                for p in self.pitches:
+                    if p.name == newroot.name:
+                        newroot = p
+                        break
+            
             self._overrides['root'] = newroot
             self._cache['root'] = newroot
 
@@ -2998,7 +3048,7 @@ class Chord(note.NotRest):
             if 'root' in self._cache:
                 return self._cache['root']
             else:
-                self._cache['root'] = self.findRoot()
+                self._cache['root'] = self._findRoot()
                 return self._cache['root']
         elif ('root' in self._overrides):
             return self._overrides['root']

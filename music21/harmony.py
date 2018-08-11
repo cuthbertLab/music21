@@ -935,7 +935,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
 
     >>> c = chord.Chord(['E-3', 'D-4', 'F3', 'A-3'] )
 
-    Without a 3rd and 5th, findRoot() algorithm can't locate the root,
+    Without a 3rd and 5th, root() algorithm can't locate the root,
     so we must tell it the root (or write an algorithm that assumes the root is the
     lowest note if the root can't be found)
 
@@ -1040,9 +1040,9 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
 
     This algorithm works as follows:
 
-    1. chord is analyzed for root (using chord's findRoot() )
+    1. chord is analyzed for root (using chord's root() )
        if the root cannot be determined, error is raised
-       be aware that the findRoot() method determines the root based on which note has
+       be aware that the root() method determines the root based on which note has
        the most thirds above it
        this is not a consistent way to determine the root of 13th chords, for example
     2. a chord vector is extracted from the chord
