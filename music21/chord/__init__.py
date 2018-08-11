@@ -2926,7 +2926,7 @@ class Chord(note.NotRest):
         return self._removePitchByRedundantAttribute('name',
               inPlace=inPlace)
 
-    def root(self, newroot=False, *, find=True):
+    def root(self, newroot=False, *, find=None):
         '''
         Returns or sets the Root of the chord. If not set, will find it.
 
@@ -2982,7 +2982,7 @@ class Chord(note.NotRest):
         will be returned if no root is specified
 
         >>> c = chord.Chord(['E3', 'G3', 'B4'])
-        >>> c.root(find=False) == None
+        >>> c.root(find=False) is None
         True
 
         >>> d = harmony.ChordSymbol('CM/E')
@@ -3003,8 +3003,18 @@ class Chord(note.NotRest):
 
         >>> csus4.root() is csus4.pitches[0]
         True
+        
+        Return to the original root() by setting find explicitly to True:
+        
+        >>> csus4.root(find=True)
+        <music21.pitch.Pitch F4>
 
-        A chord with no pitches has no root.
+        the find algorithm ensures that the overridden root is gone:
+                
+        >>> csus4.root()
+        <music21.pitch.Pitch F4>
+
+        A chord with no pitches has no root and raises a ChordException.
 
         >>> chord.Chord().root()
         Traceback (most recent call last):
@@ -3013,6 +3023,8 @@ class Chord(note.NotRest):
 
         Changed in v5.2 -- find is a keyword-only parameter, newroot finds pitch in chord
         '''
+        # None value for find indicates: return override if overridden, cache if cached
+        # or find new value if neither is the case.        
         if newroot:
             if isinstance(newroot, str):
                 newroot = common.cleanedFlatNotation(newroot)
@@ -3044,7 +3056,14 @@ class Chord(note.NotRest):
             if 'inversion' in self._cache:
                 del self._cache['inversion']
                 # reset inversion if root changes
-        elif ('root' not in self._overrides) and find:
+        elif find is True:
+            if 'root' in self._overrides:
+                del self._overrides['root']
+            if 'inversion' in self._cache:
+                del self._cache['inversion']
+            self._cache['root'] = self._findRoot()
+            return self._cache['root']
+        elif ('root' not in self._overrides) and find is not False:
             if 'root' in self._cache:
                 return self._cache['root']
             else:
