@@ -1791,7 +1791,7 @@ class Test(unittest.TestCase):
 
         fewBach = corpus.search('bach/bwv6')
 
-        self.assertEqual(len(fewBach), 14)
+        self.assertEqual(len(fewBach), 13)
         ds = features.DataSet(classLabel='NumPitches')
         ds.addMultipleData(fewBach, classValues=pickleFunctionNumPitches)
         featureExtractors = features.extractorsById(['ql1', 'ql4'], 'native')
@@ -1815,7 +1815,6 @@ class Test(unittest.TestCase):
             bach/bwv67.4.xml,3,1.5,173
             bach/bwv67.7.mxl,4,2.5,132
             bach/bwv69.6-a.mxl,4,1.5,170
-            bach/bwv69.6-a.xml,4,1.5,236
             bach/bwv69.6.xml,8,4.25,623
             ''').strip())
 
