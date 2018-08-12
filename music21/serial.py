@@ -1298,7 +1298,8 @@ class Test(unittest.TestCase):
             ['D', 'C#', 'A', 'B-', 'F', 'E-', 'E', 'C', 'G#', 'G', 'F#', 'B'])
         s37 = getHistoricalRowByName('RowSchoenbergOp37').matrix()
         r0 = s37[0]
-        # pylint: disable=not-an-iterable  # r0 is TOO an iterable
+        # r0 is TOO an iterable
+        # pylint: disable=not-an-iterable
         self.assertEqual([e.name for e in r0], ['C', 'B', 'G', 'G#', 'E-', 'C#', 'D', 'B-',
                                                     'F#', 'F', 'E', 'A'])
 

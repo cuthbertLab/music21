@@ -63,7 +63,7 @@ class Segmenter:
                 continue
 
         # Optionally: Remove the empty sublists given by rests
-        if removeEmptyLists == True:
+        if removeEmptyLists:
             for segment in segments[::-1]:
                 if not segment:
                     segments.remove(segment)

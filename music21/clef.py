@@ -666,7 +666,7 @@ def clefFromString(clefString, octaveShift=0):
         ### other octaveShifts will pass through
 
     if thisType is False or lineNum is False:
-        raise ClefException('cannot read %s as clef str, should be G2, F4, etc.', xnStr)
+        raise ClefException('cannot read %s as clef str, should be G2, F4, etc.' % xnStr)
 
     if lineNum < 1 or lineNum > 5:
         raise ClefException('line number (second character) must be 1-5; do not use this '

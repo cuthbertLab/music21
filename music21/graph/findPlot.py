@@ -23,9 +23,9 @@ from music21.graph import primitives
 
 # shortcuts that get a PlotClass directly
 PLOTCLASS_SHORTCUTS = {
+    'ambitus': plot.WindowedAmbitus,
     'dolan': plot.Dolan,
     'instruments': plot.Dolan,
-    'ambitus': plot.WindowedAmbitus,
     'key': plot.WindowedKey,
     'pianoroll': plot.HorizontalBarPitchSpaceOffset,
 }

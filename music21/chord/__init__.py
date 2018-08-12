@@ -3523,7 +3523,7 @@ class Chord(note.NotRest):
         >>> c1 = chord.Chord(['d3', 'e-4', 'b-4'])
         >>> t1 = tie.Tie('start')
         >>> c1.setTie(t1, 'b-4') # or it can be done with a pitch.Pitch object
-        >>> c1.getTie(c1.pitches[2]) == t1
+        >>> c1.getTie(c1.pitches[2]) is t1
         True
 
         Setting a tie with a chord with the same pitch twice requires
@@ -3576,7 +3576,7 @@ class Chord(note.NotRest):
                 break
         if not match: # more loose comparison: by ==
             for d in self._notes:
-                if pitchTarget not in (d, d.pitch):
+                if pitchTarget in (d, d.pitch):
                     d.tie = t
                     match = True
                     break

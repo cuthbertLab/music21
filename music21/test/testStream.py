@@ -1338,16 +1338,15 @@ class Test(unittest.TestCase):
     def testMeasureOffsetMapPostTie(self):
         from music21 import corpus, stream
 
-        a = corpus.parse('bach/bwv4.8.xml')
+        a = corpus.parse('bach/bwv4.8')
         # alto line syncopated/tied notes across bars
         #a.show()
         alto = a.parts[1]
-        countedAltoNotes = 73
-
+        countedAltoNotes = 52
         self.assertEqual(len(alto.flat.notesAndRests), countedAltoNotes)
 
-        correctMeasureOffsetMap = [0.0, 1.0, 5.0, 9.0, 13.0, 17.0, 21.0, 25.0,
-                                   29.0, 33.0, 37.0, 41.0, 45.0, 49.0, 53.0, 57.0, 61.0]
+        correctMeasureOffsetMap = [0.0, 1.0, 5.0, 9.0, 13.0, 16.0, 20.0, 24.0,
+                                   28.0, 31.0, 32.0, 36.0, 40.0, 44.0]
         # offset map for measures looking at the part's Measures
         # note that pickup bar is taken into account
         post = alto.measureOffsetMap()
@@ -1362,7 +1361,7 @@ class Test(unittest.TestCase):
         altoPostTie = a.parts[1].stripTies()
         # we can get the length of this directly b/c we just of a stream of
         # notes, no Measures
-        self.assertEqual(len(altoPostTie.notesAndRests), countedAltoNotes - 4)
+        self.assertEqual(len(altoPostTie.notesAndRests), countedAltoNotes - 2)
 
         # we can still get measure numbers:
         mNo = altoPostTie.notesAndRests[3].getContextByClass(stream.Measure).number
@@ -7825,7 +7824,7 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    music21.mainTest(Test, 'verbose', runTest='testSchoenbergChordifyFermatas')
+    music21.mainTest(Test, 'verbose')
 
 #------------------------------------------------------------------------------
 # eof

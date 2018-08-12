@@ -8934,7 +8934,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             skipUnisons = True  # implied
 
         # need to look for voices in self and deal with each one at a time
-        if self.hasVoices:
+        if self.hasVoices():
             vGroups = []
             for v in self.voices:
                 vGroups.append(v.flat)
@@ -8943,7 +8943,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             vGroups = (self.flat,)
 
         for v in vGroups:
-            for e in v.elements:
+            for e in v:
                 if (lastWasNone is False
                         and skipGaps is False
                         and e.offset > lastEnd):

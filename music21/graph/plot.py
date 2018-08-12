@@ -1095,7 +1095,10 @@ class HorizontalBarWeighted(primitives.GraphHorizontalBarWeighted, PlotStreamMix
     Many different weighted segments can provide a
     representation of a dynamic parameter of a Part.
     '''
-    axesClasses = {'x': axis.OffsetAxis, 'y': None}
+    axesClasses = {
+        'x': axis.OffsetAxis, 
+        'y': None
+    }
     keywordConfigurables = primitives.GraphHorizontalBarWeighted.keywordConfigurables + (
         'fillByMeasure', 'segmentByTarget', 'normalizeByPart', 'partGroups')
 
@@ -1116,7 +1119,9 @@ class HorizontalBarWeighted(primitives.GraphHorizontalBarWeighted, PlotStreamMix
         if 'Score' not in self.streamObj.classes:
             raise GraphException('provided Stream must be Score')
         # parameters: x, span, heightScalar, color, alpha, yShift
-        pr = reduction.PartReduction(self.streamObj, partGroups=self.partGroups,
+        pr = reduction.PartReduction(
+                self.streamObj, 
+                partGroups=self.partGroups,
                 fillByMeasure=self.fillByMeasure,
                 segmentByTarget=self.segmentByTarget,
                 normalizeByPart=self.normalizeByPart)
@@ -1181,7 +1186,8 @@ class Dolan(HorizontalBarWeighted):
         #self.fy = lambda n: n.pitch.pitchClass
         #self.fyTicks = self.ticksPitchClassUsage
         # must set part groups if not defined here
-        self._getPartGroups()
+        if streamObj is not None:
+            self._getPartGroups()
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
             self.figureSize = (10, 4)
@@ -1200,9 +1206,9 @@ class Dolan(HorizontalBarWeighted):
         Examine the instruments in the Score and determine if there
         is a good match for a default configuration of parts.
         '''
-        if self.partGroups is not None:
+        if self.partGroups:
             return # keep what the user set
-        if self.streamObj is None:
+        if self.streamObj:
             return None
         instStream = self.streamObj.flat.getElementsByClass('Instrument')
         if not instStream:

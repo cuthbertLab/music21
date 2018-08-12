@@ -3739,7 +3739,8 @@ class MeasureExporter(XMLExporterBase):
         mxHarmony = self.chordSymbolToXml(cwf)
         mxFrame = self.fretBoardToXml(cwf)
         
-        mxHarmony.append(mxFrame)
+        if mxFrame is not None:
+            mxHarmony.append(mxFrame)
         
         return mxHarmony
 
@@ -5235,13 +5236,12 @@ class MeasureExporter(XMLExporterBase):
         '''
         mxBeam = Element('beam')
         _synchronizeIds(mxBeam, beamObject)
-
-        if beamObject.type == 'start':
-            mxBeam.text = 'begin'
-        elif beamObject.type == 'continue':
-            mxBeam.text = 'continue'
-        elif beamObject.type == 'stop':
-            mxBeam.text = 'end'
+        beamToType = {'start': 'begin',
+                      'continue': 'continue',
+                      'stop': 'end',
+                      }
+        if beamObject.type in beamToType:
+            mxBeam.text = beamToType[beamObject.type]
         elif beamObject.type == 'partial':
             if beamObject.direction == 'left':
                 mxBeam.text = 'backward hook'
@@ -5952,7 +5952,8 @@ class MeasureExporter(XMLExporterBase):
 #-------------------------------------------------------------------------------
 def indent(elem, level=0):
     i = "\n" + level * "  "
-    if len(elem):  # pylint: disable=len-as-condition
+    # pylint: disable=len-as-condition
+    if len(elem):
         if not elem.text or not elem.text.strip():
             elem.text = i + "  "
         if not elem.tail or not elem.tail.strip():

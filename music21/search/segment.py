@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2011-2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2018 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -293,7 +293,7 @@ def scoreSimilarity(
     >>> scoreSim = search.segment.scoreSimilarity(scoreDict, forceDifflib=True) #_DOCS_HIDE
     >>> #_DOCS_SHOW scoreSim = search.segment.scoreSimilarity(scoreDict)
     >>> len(scoreSim)
-    496
+    306
 
     Returns a list of tuples of first score name, first score voice number, first score
     measure number, second score name, second score voice number, second score
@@ -301,10 +301,10 @@ def scoreSimilarity(
 
     >>> for result in scoreSim[64:68]:
     ...     result
-    ('bwv197.5.mxl', 0, 2, (9, 14), 'bwv190.7.mxl', 1, 3, (15, 23), 0.26...)
-    ('bwv197.5.mxl', 0, 2, (9, 14), 'bwv190.7.mxl', 1, 4, (20, 29), 0.11...)
-    ('bwv197.5.mxl', 0, 2, (9, 14), 'bwv190.7.mxl', 1, 5, (25, 32), 0.17...)
-    ('bwv197.5.mxl', 0, 2, (9, 14), 'bwv190.7.mxl', 2, 0, (0, 8), 0.075...)
+    ('bwv197.5.mxl', 1, 0, (1, 7), 'bwv190.7.mxl', 3, 1, (7, 18), 0.13...)
+    ('bwv197.5.mxl', 1, 0, (1, 7), 'bwv190.7.mxl', 3, 2, (14, 22), 0.109...)
+    ('bwv197.5.mxl', 1, 0, (1, 7), 'bwv197.10.mxl', 0, 0, (1, 10), 0.233...)
+    ('bwv197.5.mxl', 1, 0, (1, 7), 'bwv197.10.mxl', 1, 0, (1, 9), 0.3)
     '''
     similarityScores = []
     scoreIndex = 0
