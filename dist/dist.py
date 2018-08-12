@@ -44,7 +44,7 @@ while it is running.  This takes a while and runs single core, so allocate time.
 
 11. COMMIT to Github at this point w/ commit comment of the new version,
     then don't change anything until the next step is done.
-    (.gitignore SHOULD avoid uploading the large files created here...)
+    (.gitignore will avoid uploading the large files created here...)
 
 12. Create a new release on GitHub and upload the TWO files created here. Use tag v5.0.1 (etc.).
     Don't forget the "v" in the release tag.
