@@ -342,7 +342,7 @@ class Corpus:
         ...      'bach',
         ...      field='composer',
         ...      )
-        <music21.metadata.bundles.MetadataBundle {25 entries}>
+        <music21.metadata.bundles.MetadataBundle {362 entries}>
 
         >>> predicate = lambda noteCount: noteCount < 20
         >>> corpus.corpora.CoreCorpus().search(

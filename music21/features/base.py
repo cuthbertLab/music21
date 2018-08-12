@@ -727,8 +727,9 @@ class DataSet:
     ['bwv66.6', 0.196..., 0.0736..., 0.006..., 0.098..., 0.0368..., 0.177..., 0.0, 
      0.085..., 0.134..., 0.018..., 0.171..., 0.0, 0, 4, 4, 'Bach']
     >>> ds.getFeaturesAsList()[1]
-    ['bach/bwv324.xml', 0.240..., 0.028..., 0.134..., 0.0, 0.144..., 0.125..., 0.0, 
-     0.163..., 0.0, 0.134..., 0.0288..., 0.0, 0, 4, 4, 'Bach']
+    ['bach/bwv324.xml', 0.25, 0.0288..., 0.125, 0.0, 0.144..., 0.125, 0.0, 0.163..., 0.0, 0.134..., 
+    0.0288..., 0.0, 0, 4, 4, 'Bach']
+
     >>> ds = ds.getString()
 
 
@@ -1790,7 +1791,7 @@ class Test(unittest.TestCase):
 
         fewBach = corpus.search('bach/bwv6')
 
-        self.assertEqual(len(fewBach), 13)
+        self.assertEqual(len(fewBach), 14)
         ds = features.DataSet(classLabel='NumPitches')
         ds.addMultipleData(fewBach, classValues=pickleFunctionNumPitches)
         featureExtractors = features.extractorsById(['ql1', 'ql4'], 'native')
@@ -1803,16 +1804,17 @@ class Test(unittest.TestCase):
         self.assertEqual(post.strip(), textwrap.dedent('''
             Identifier,Unique_Note_Quarter_Lengths,Range_of_Note_Quarter_Lengths,NumPitches
             bach/bwv6.6.mxl,4,1.75,164
-            bach/bwv60.5.mxl,6,2.75,281
-            bach/bwv62.6.mxl,5,1.75,148
-            bach/bwv64.2.mxl,5,3.5,176
-            bach/bwv64.4.mxl,5,2.5,368
-            bach/bwv64.8.mxl,5,3.5,272
-            bach/bwv65.2.mxl,4,3.0,151
-            bach/bwv65.7.mxl,7,2.75,337
+            bach/bwv60.5.mxl,6,2.75,282
+            bach/bwv62.6.mxl,5,1.75,182
+            bach/bwv64.2.mxl,4,1.5,179
+            bach/bwv64.4.mxl,5,2.5,249
+            bach/bwv64.8.mxl,5,3.5,188
+            bach/bwv65.2.mxl,4,3.0,148
+            bach/bwv65.7.mxl,7,2.75,253
             bach/bwv66.6.mxl,3,1.5,165
             bach/bwv67.4.xml,3,1.5,173
-            bach/bwv67.7.mxl,4,2.5,190
+            bach/bwv67.7.mxl,4,2.5,132
+            bach/bwv69.6-a.mxl,4,1.5,170
             bach/bwv69.6-a.xml,4,1.5,236
             bach/bwv69.6.xml,8,4.25,623
             ''').strip())

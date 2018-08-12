@@ -1211,6 +1211,7 @@ class Iterator:
         {0.0} <music21.stream.Part Soprano>
             {0.0} <music21.instrument.Instrument P1: Soprano: >
             {0.0} <music21.stream.Measure 0 offset=0.0>
+                {0.0} <music21.layout.SystemLayout>
                 {0.0} <music21.clef.TrebleClef>
                 {0.0} <music21.key.Key of e minor>
                 {0.0} <music21.meter.TimeSignature 4/4>

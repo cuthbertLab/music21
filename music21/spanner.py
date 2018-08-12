@@ -1243,7 +1243,9 @@ class RepeatBracket(Spanner):
         This must return a string, as we may have single numbers or lists.
         For a raw numerical list, use getNumberList() below.
         '''
-        if len(self._numberRange) == 1:
+        if not self._numberRange:
+            return ''
+        elif len(self._numberRange) == 1:
             return str(self._number)
         else:
             if self._numberSpanIsContiguous is False:

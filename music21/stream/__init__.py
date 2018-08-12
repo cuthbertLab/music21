@@ -3564,7 +3564,23 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             hasUniqueMeasureNumbers = hasMeasureNumberInformation(mStreamIter)
             if numberEnd is not None:
-                matchingMeasureNumbers = set(range(numberStart, numberEnd + 1))
+                if isinstance(numberStart, str) or isinstance(numberEnd, str):
+                    matchingMeasureNumbers = set()
+                    matchingMeasureNumbers.add(numberStart)
+                    startNum, suffix = common.getNumFromStr(numberStart)
+                    startNum = int(startNum)
+                    if not suffix:
+                        matchingMeasureNumbers.add(startNum)
+                    endNum, suffix = common.getNumFromStr(numberEnd)
+                    endNum = int(endNum)
+                    if not suffix:
+                        endNum += 1
+                    for thisN in range(startNum + 1, endNum):
+                        matchingMeasureNumbers.add(thisN)
+                    matchingMeasureNumbers.add(numberEnd)
+                else:
+                    matchingMeasureNumbers = set(range(numberStart, numberEnd + 1))
+
                 if hasUniqueMeasureNumbers:
                     matches = [m for m in mStreamIter if m.number in matchingMeasureNumbers]
                 else:
@@ -3572,11 +3588,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                     if i + 1 in matchingMeasureNumbers]
             else:
                 if hasUniqueMeasureNumbers:
-                    matches = [m for m in mStreamIter if m.number >= numberStart]
+                    if isinstance(numberStart, str):
+                        matches = [m for m in mStreamIter if m.number > int(common.getNumFromStr(numberStart)[0])]
+                    else:
+                        matches = [m for m in mStreamIter if m.number >= numberStart]
                 else:
-                    matches = [m for i, m in enumerate(mStreamIter)
-                                    if i + 1 >= numberStart]
-
+                    if isinstance(numberStart, str):
+                        matches = [m for m in mStreamIter if m.number > int(common.getNumFromStr(numberStart)[0])]
+                    else:
+                        matches = [m for i, m in enumerate(mStreamIter)
+                                        if i + 1 >= numberStart]
 
         if not matches:
             startMeasure = None
@@ -3652,7 +3673,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> print(a.parts[0].measure(99))
         None
         '''
-        if measureNumber < 0:
+        if not isinstance(measureNumber, str) and measureNumber < 0:
             indicesNotNumbers = True
 
         startMeasureNumber = measureNumber

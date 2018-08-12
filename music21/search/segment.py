@@ -293,7 +293,7 @@ def scoreSimilarity(
     >>> scoreSim = search.segment.scoreSimilarity(scoreDict, forceDifflib=True) #_DOCS_HIDE
     >>> #_DOCS_SHOW scoreSim = search.segment.scoreSimilarity(scoreDict)
     >>> len(scoreSim)
-    671
+    496
 
     Returns a list of tuples of first score name, first score voice number, first score
     measure number, second score name, second score voice number, second score
@@ -301,11 +301,10 @@ def scoreSimilarity(
 
     >>> for result in scoreSim[64:68]:
     ...     result
-    ...
-    (...'bwv197.5.mxl', 0, 1, (5, 11), ...'bwv197.10.mxl', 3, 1, (5, 12), 0.0)
-    (...'bwv197.5.mxl', 0, 1, (5, 11), ...'bwv197.10.mxl', 3, 2, (9, 14), 0.0)
-    (...'bwv197.5.mxl', 0, 2, (9, 14), ...'bwv190.7.mxl', 0, 0, (0, 9), 0.07547...)
-    (...'bwv197.5.mxl', 0, 2, (9, 14), ...'bwv190.7.mxl', 0, 1, (6, 15), 0.07547...)
+    ('bwv197.5.mxl', 0, 2, (9, 14), 'bwv190.7.mxl', 1, 3, (15, 23), 0.26...)
+    ('bwv197.5.mxl', 0, 2, (9, 14), 'bwv190.7.mxl', 1, 4, (20, 29), 0.11...)
+    ('bwv197.5.mxl', 0, 2, (9, 14), 'bwv190.7.mxl', 1, 5, (25, 32), 0.17...)
+    ('bwv197.5.mxl', 0, 2, (9, 14), 'bwv190.7.mxl', 2, 0, (0, 8), 0.075...)
     '''
     similarityScores = []
     scoreIndex = 0

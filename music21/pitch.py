@@ -4998,8 +4998,8 @@ class Test(unittest.TestCase):
         # in key signature, so should not be shown
         self.assertEqual(pAltered.accidental.displayStatus, False)
 
-        altoMeasures = s.parts[1].getElementsByClass('Measure')
-        pAltered = altoMeasures[6].pitches[2]
+        altoM6 = s.parts[1].measure(6)
+        pAltered = altoM6.pitches[2]
         self.assertEqual(pAltered.accidental.name, 'sharp')
         self.assertEqual(pAltered.accidental.displayStatus, True)
 

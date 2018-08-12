@@ -2240,29 +2240,29 @@ class Test(unittest.TestCase):
         [<MidiEvent DeltaTime, t=0, track=1, channel=1>,
          <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b'Soprano'>,
          <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-         <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>,
+         <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>, 
          <MidiEvent DeltaTime, t=0, track=1, channel=1>]"""
 
         self.maxDiff = None
-        self.assertTrue(common.whitespaceEqual(str(mts.events[:5]), match))
+        found = str(mts.events[:5])
+        self.assertTrue(common.whitespaceEqual(found, match), found)
 
         # first note-on is not delayed, even w anacrusis
         match = """
         [<MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b'Alto'>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
+        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>, 
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
         <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data=b'\\x02\\x01'>]"""
+        <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data=b'\\x02\\x00'>]"""
 
         alto = s.parts['alto']
         mta = streamHierarchyToMidiTracks(alto)[0]
 
-        self.assertTrue(common.whitespaceEqual(str(mta.events[:10]), match))
+        found = str(mta.events[:8])
+        self.assertTrue(common.whitespaceEqual(found, match), found)
 
         # try streams to midi tracks
         # get just the soprano part
@@ -2274,8 +2274,6 @@ class Test(unittest.TestCase):
         match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b'Soprano'>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>,
@@ -2283,7 +2281,8 @@ class Test(unittest.TestCase):
         <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data=b'\\x02\\x01'>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data=b'\\x04\\x02\\x18\\x08'>]"""
-        self.assertTrue(common.whitespaceEqual(str(mtList[0].events[:12]), match))
+        found = str(mtList[0].events[:10])
+        self.assertTrue(common.whitespaceEqual(found, match), found)
 
     def testMidiProgramChangeA(self):
         from music21 import instrument

@@ -219,7 +219,7 @@ class Repeat(repeat.RepeatMark, Barline):
         {2.0} <music21.note.Note D-->
         {3.0} <music21.note.Note D-->
         {4.0} <music21.bar.Barline style=double>
-    {4.0} <music21.stream.Measure 0 offset=4.0>
+    {4.0} <music21.stream.Measure 0a offset=4.0>
         {0.0} <music21.bar.Barline style=double>
         {0.0} <music21.meter.TimeSignature 4/4>
         {0.0} <music21.note.Note D-->

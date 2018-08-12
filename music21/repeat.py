@@ -16,6 +16,7 @@ Some RepeatMark objects are Expression objects; others are Bar objects. See for 
 the :class:`~music21.bar.Repeat` which represents a normal barline repeat.
 '''
 import copy
+import string
 import unittest
 
 from music21 import exceptions21
@@ -550,20 +551,6 @@ def deleteMeasures(s, toDelete, *, inPlace=False, correctMeasureNumbers=True):
 
     OMIT_FROM_DOCS
 
-    >>> chorale2 = corpus.parse('bwv101.7.mxl')
-    >>> s = deepcopy(chorale2)
-    >>> repeat.deleteMeasures(s, [3, 4, 5], inPlace=True)
-    >>> m2 = search.translateStreamToString(chorale2.parts[0].measure(2).notesAndRests)
-    >>> resm2 = search.translateStreamToString(s.parts[0].measure(2).notesAndRests)
-    >>> m3 = search.translateStreamToString(chorale2.parts[0].measure(3).notesAndRests)
-    >>> m6 = search.translateStreamToString(chorale2.parts[0].measure(6).notesAndRests)
-    >>> resm3 = search.translateStreamToString(s.parts[0].measure(3).notesAndRests)
-    >>> m2 == resm2
-    True
-    >>> resm3 == m3
-    False
-    >>> resm3 == m6
-    True
     >>> chorale3 = corpus.parse('bwv102.7.mxl')
     >>> s = repeat.deleteMeasures(chorale3, [2, 3])
     >>> (len(s.parts[2].getElementsByClass(stream.Measure)) ==
@@ -704,13 +691,13 @@ class Expander:
         {1.0} <music21.note.Note D>
         {2.0} <music21.note.Note E>
         {3.0} <music21.bar.Barline style=double>
-    {6.0} <music21.stream.Measure 2 offset=6.0>
+    {6.0} <music21.stream.Measure 2a offset=6.0>
         {0.0} <music21.bar.Barline style=double>
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Note D>
         {2.0} <music21.note.Note E>
         {3.0} <music21.bar.Barline style=double>
-    {9.0} <music21.stream.Measure 2 offset=9.0>
+    {9.0} <music21.stream.Measure 2b offset=9.0>
         {0.0} <music21.bar.Barline style=double>
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Note D>
@@ -839,27 +826,34 @@ class Expander:
         >>> e.measureMap()
         [0, 1, 1, 1, 2, 3, 3, 4]
         >>> e.measureMap(returnType='measureNumber')
-        ['1', '2', '2', '2', '3', '4', '4', '5']
+        ['1', '2', '2a', '2b', '3', '4', '4a', '5']
         '''
         measureNumberList = []
+        measureNumberNoSuffixList = []
         post = self.process()
 
         measureContainingStreams = post
 
         for i, m in enumerate(measureContainingStreams.getElementsByClass('Measure')):
             measureNumberList.append(m.measureNumberWithSuffix())
+            measureNumberNoSuffixList.append(m.number)
 
         if returnType == 'measureNumber':
             return measureNumberList
 
         measureNumberDict = {}
+        measureNumberNoSuffixDict = {}
         for i, m in enumerate(self._srcMeasureStream):
             measureNumberDict[m.measureNumberWithSuffix()] = i
+            measureNumberNoSuffixDict[m.number] = i
             # could be overwritten if the same measureNumber is used multiple times.
 
         indexList = []
-        for measureNumberWithSuffix in measureNumberList:
-            indexList.append(measureNumberDict[measureNumberWithSuffix])
+        for i, measureNumberWithSuffix in enumerate(measureNumberList):
+            try:
+                indexList.append(measureNumberDict[measureNumberWithSuffix])
+            except KeyError:
+                indexList.append(measureNumberNoSuffixDict[measureNumberNoSuffixList[i]])                
         return indexList
 
 
@@ -1075,25 +1069,15 @@ class Expander:
         >>> s.measure(2).leftBarline = bar.Repeat(direction='start')
         >>> s.measure(2).rightBarline = bar.Repeat(direction='end', times=3)
         >>> rb = spanner.RepeatBracket(s.measure(2))
+        >>> s.insert(0, rb)
         >>> s.measure(4).leftBarline = bar.Repeat(direction='start')
         >>> s.measure(4).rightBarline = bar.Repeat(direction='end', times=2)
         >>> e = repeat.Expander(s)
 
-        Does nothing, because only searching for repeatBrackets, not repeat signs.
-        Need a better test.
-
         >>> from pprint import pprint as pp
         >>> pp(e._groupRepeatBracketIndices(s))
-        [{'measureIndices': [], 'repeatBrackets': []}]
-
-
-        Should work if no start repeat.
-
-        >>> s = converter.parse('tinynotation: 3/4 A2.  C4 D E   F2.    G4 a b   c2.')
-        >>> s.makeMeasures(inPlace=True)
-        >>> s.measure(2).rightBarline = bar.Repeat(direction='end')
-        >>> e = repeat.Expander(s)
-
+        [{'measureIndices': [2], 
+          'repeatBrackets': [<music21.spanner.RepeatBracket  <music21.stream.Measure 2 offset=3.0>>]}]
         '''
         groups = []
         mEnumerated = [x for x in enumerate(streamObj)]
@@ -1357,7 +1341,7 @@ class Expander:
         >>> s.measure(4).leftBarline = bar.Repeat(direction='start')
         >>> s.measure(4).rightBarline = bar.Repeat(direction='end', times=2)
 
-        processInnermostRepeatBars only will expand the first time.
+        processInnermostRepeatBars only will expand the first set of repeats.
 
         >>> e = repeat.Expander(s)
         >>> s2 = e.processInnermostRepeatBars(s)
@@ -1372,13 +1356,13 @@ class Expander:
             {1.0} <music21.note.Note D>
             {2.0} <music21.note.Note E>
             {3.0} <music21.bar.Barline style=double>
-        {6.0} <music21.stream.Measure 2 offset=6.0>
+        {6.0} <music21.stream.Measure 2a offset=6.0>
             {0.0} <music21.bar.Barline style=double>
             {0.0} <music21.note.Note C>
             {1.0} <music21.note.Note D>
             {2.0} <music21.note.Note E>
             {3.0} <music21.bar.Barline style=double>
-        {9.0} <music21.stream.Measure 2 offset=9.0>
+        {9.0} <music21.stream.Measure 2b offset=9.0>
             {0.0} <music21.bar.Barline style=double>
             {0.0} <music21.note.Note C>
             {1.0} <music21.note.Note D>
@@ -1396,7 +1380,7 @@ class Expander:
             {0.0} <music21.note.Note C>
             {3.0} <music21.bar.Barline style=final>
 
-        Calling it again does the trick, as _processRecursiveRepeatBars does
+        Calling it again will complete the job, as .process() does
 
         >>> s3 = e.processInnermostRepeatBars(s2)
         >>> s3.show('text')
@@ -1404,9 +1388,9 @@ class Expander:
         ...
         {3.0} <music21.stream.Measure 2 offset=3.0>
         ...
-        {6.0} <music21.stream.Measure 2 offset=6.0>
+        {6.0} <music21.stream.Measure 2a offset=6.0>
         ...
-        {9.0} <music21.stream.Measure 2 offset=9.0>
+        {9.0} <music21.stream.Measure 2b offset=9.0>
         ...
         {12.0} <music21.stream.Measure 3 offset=12.0>
         ...
@@ -1416,7 +1400,7 @@ class Expander:
             {1.0} <music21.note.Note A>
             {2.0} <music21.note.Note B>
             {3.0} <music21.bar.Barline style=double>
-        {18.0} <music21.stream.Measure 4 offset=18.0>
+        {18.0} <music21.stream.Measure 4a offset=18.0>
             {0.0} <music21.bar.Barline style=double>
             {0.0} <music21.note.Note G>
             {1.0} <music21.note.Note A>
@@ -1424,7 +1408,34 @@ class Expander:
             {3.0} <music21.bar.Barline style=double>
         {21.0} <music21.stream.Measure 5 offset=21.0>
         ...
+
+
+        Should work even if no start repeat is given:
+
+        >>> s = converter.parse('tinynotation: 3/4 A2.  C4 D E   F2.    G4 a b   c2.')
+        >>> s.makeMeasures(inPlace=True)
+        >>> s.measure(2).rightBarline = bar.Repeat(direction='end')
+        >>> e = repeat.Expander(s)
+        >>> s2 = e.processInnermostRepeatBars(s)
+        >>> s2.show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+        ...
+        {3.0} <music21.stream.Measure 2 offset=3.0>
+        ...
+        {6.0} <music21.stream.Measure 1a offset=6.0>
+        ...
+        {9.0} <music21.stream.Measure 2a offset=9.0>
+        ...
+            {3.0} <music21.bar.Barline style=double>
+        {12.0} <music21.stream.Measure 3 offset=12.0>
+        ...
+        {15.0} <music21.stream.Measure 4 offset=15.0>
+        ...
+        {18.0} <music21.stream.Measure 5 offset=18.0>
+        ...
+            {3.0} <music21.bar.Barline style=final>
         '''
+        lowercase_alphabet = string.ascii_lowercase
         # get class from src
         new = streamObj.__class__()
 
@@ -1481,6 +1492,9 @@ class Expander:
                         # and this is not the last time
                         if repeatTimes >= 2 and times < repeatTimes - 1:
                             self._stripRepeatExpressions(mSub)
+                        
+                        if times != 0:
+                            mSub.numberSuffix = lowercase_alphabet[(times - 1) % 26] # just in case
                         new.append(mSub)
                         # renumber at end
                         #number += 1
@@ -2045,18 +2059,26 @@ class RepeatFinder:
         equal under the '==' operator.
 
         >>> chorale = corpus.parse('bwv154.3.mxl')
+        
+        Expand the repeats:
+        
+        >>> chorale = repeat.Expander(chorale.parts[0]).process()
+        
+        Search for similarity:
+        
         >>> repeat.RepeatFinder(chorale).getMeasureSimilarityList()
-        [[4], [5], [6], [7, 15], [], [], [], [15], [], [], [], [], [], [], [], []]
-        >>> repeat.RepeatFinder(chorale.parts[0]).getMeasureSimilarityList()
-        [[4, 12], [5], [6], [7, 15], [12], [], [], [15], [], [], [], [], [], [], [], []]
+        [[4, 12], [5, 13], [6], [7], [12], [13], [], [], [], [], [], [], [], [], [], []]
 
         >>> chorale2 = corpus.parse('bwv153.5.mxl')
+        >>> chorale2 = repeat.Expander(chorale2.parts[0]).process()
         >>> repeat.RepeatFinder(chorale2).getMeasureSimilarityList()    #bwv153.5 has a pickup
-        [[], [5], [6], [7], [], [], [], [], [], [], [], [], [], [], [], [], []]
+        [[5], [6], [7], [8], [9], [], [], [], [], [], [15], [], [], [], [19], [], [], [], [], []]
         >>> hashFunction = lambda m : str(len(m))
-        >>> repeat.RepeatFinder(chorale.parts[0].measures(1, 8),
+
+        >>> repeat.RepeatFinder(chorale.measures(1, 8),
         ...                     defaultMeasureHashFunction=hashFunction).getMeasureSimilarityList()
-        [[1, 2, 4, 5, 6], [2, 4, 5, 6], [4, 5, 6], [7], [5, 6], [6], [], []]
+        [[1, 2, 4, 5, 6, 8, 10], [2, 4, 5, 6, 8, 10], [4, 5, 6, 8, 10], 
+         [7, 9, 11], [5, 6, 8, 10], [6, 8, 10], [8, 10], [9, 11], [10], [11], [], []]
 
         _OMIT_FROM_DOCS_
         >>> repeat.RepeatFinder().getMeasureSimilarityList()
@@ -2348,50 +2370,25 @@ class RepeatFinder:
         OMIT_FROM_DOCS
 
         >>> c1 = corpus.parse('bwv115.6.mxl')    #has a repeated section
-        >>> c1simple = repeat.RepeatFinder(c1).simplify()
-        >>> m4 = search.translateStreamToString( c1.parts[0].measure(4).notesAndRests)
-        >>> m5 = search.translateStreamToString( c1.parts[0].measure(5).notesAndRests)
-        >>> m9 = search.translateStreamToString( c1.parts[0].measure(9).notesAndRests)
-        >>> resm4 = search.translateStreamToString( c1simple.parts[0].measure(4).notesAndRests)
-        >>> resm5 = search.translateStreamToString( c1simple.parts[0].measure(5).notesAndRests)
+        >>> c1p0 = repeat.Expander(c1.parts[0]).process()
+        >>> c1simple = repeat.RepeatFinder(c1p0).simplify()
+        >>> m4 = search.translateStreamToString(c1p0.measure(3).notesAndRests)
+        >>> m5 = search.translateStreamToString(c1p0.measure(4).notesAndRests)
+        >>> m9 = search.translateStreamToString(c1p0.getElementsByClass('Measure')[7].notesAndRests)
+        >>> resm4 = search.translateStreamToString(c1simple.measure(3).notesAndRests)
+        >>> resm5 = search.translateStreamToString(c1simple.measure(4).notesAndRests)
         >>> m4 == resm4
         True
         >>> m5 == resm5
-        False
+        True
         >>> m9 == resm5
         True
-        >>> initialRepeats = c1.flat.getElementsByClass(bar.Repeat)
+        >>> initialRepeats = c1p0.flat.getElementsByClass(bar.Repeat)
         >>> len(initialRepeats)
         0
         >>> resRepeats = c1simple.flat.getElementsByClass(bar.Repeat)
         >>> len(resRepeats)
-        4
-
-        >>> c2 = corpus.parse('bwv117.4.mxl')
-        >>> m3 = search.translateStreamToString( c2.parts[0].measure(3).notesAndRests)
-        >>> m6 = search.translateStreamToString( c2.parts[0].measure(6).notesAndRests)
-        >>> m9 = search.translateStreamToString( c2.parts[0].measure(9).notesAndRests)
-        >>> initialRepeats = c2.flat.getElementsByClass(bar.Repeat)
-        >>> initialBrackets = c2.flat.getElementsByClass(spanner.RepeatBracket)
-        >>> repeat.RepeatFinder(c2).simplify(inPlace=True)
-        >>> resm3 = search.translateStreamToString( c2.parts[0].measure(3).notesAndRests)
-        >>> resm6 = search.translateStreamToString( c2.parts[0].measure(6).notesAndRests)
-        >>> simplifiedRepeats = c2.flat.getElementsByClass(bar.Repeat)
-        >>> simplifiedBrackets = c2.flat.getElementsByClass(spanner.RepeatBracket)
-        >>> m3 == resm3
-        True
-        >>> m6 == resm6
-        False
-        >>> m9 == resm6
-        True
-        >>> len(initialRepeats)
-        0
-        >>> len(initialBrackets)
-        0
-        >>> len(simplifiedRepeats)
-        8
-        >>> len(simplifiedBrackets)
-        8
+        1
 
         >>> s = stream.Stream()
         >>> for i in range(1, 6):
@@ -2510,15 +2507,19 @@ class RepeatFinder:
         of measure numbers such that measure l1[i] is the same as measure l2[i].
 
         >>> chorale = corpus.parse('bwv117.4.mxl')
+        
+        Expand repeats
+        
+        >>> chorale = repeat.Expander(chorale.parts[0]).process()
         >>> #_DOCS_SHOW chorale.show()
 
-        Measures 1-3 are the same as measures 4-6.
+        Measures 0-4 are the same as measures 5-9.
 
         .. image:: images/repeat-SimplifyExample_Chorale.*
            :width: 600
 
         >>> repeat.RepeatFinder(chorale).getSimilarMeasureGroups()
-        [([1, 2, 3], [5, 6, 7])]
+        [([0, 1, 2, 3, 4], [5, 6, 7, 8, 9]), ([1, 2, 3, 4, 5], [6, 7, 8, 9, 10]), ([0], [10])]
 
         Notice that although measures 2-3 are the same as measures 6-7, we
         don't have ([2, 3], [6, 7]) in our result, since ([1, 2, 3], [5, 6, 7])
@@ -2828,7 +2829,7 @@ class Test(unittest.TestCase):
                           'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4'])
         measureNumbersPost = [m.measureNumberWithSuffix()
                               for m in post.getElementsByClass('Measure')]
-        self.assertEqual(['1', '1', '2', '2'], measureNumbersPost)
+        self.assertEqual(['1', '1a', '2', '2a'], measureNumbersPost)
 
         # two repeat bars with another bar in between
         s = stream.Part()

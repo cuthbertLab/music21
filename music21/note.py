@@ -1742,7 +1742,7 @@ class Test(unittest.TestCase):
             for obj in n.expressions:
                 if isinstance(obj, expressions.Fermata):
                     found.append(obj)
-        self.assertEqual(len(found), 6)
+        self.assertEqual(len(found), 24)
 
 
     def testNoteBeatProperty(self):
@@ -1826,7 +1826,7 @@ class Test(unittest.TestCase):
 
 
     def testNoteBeatPropertyCorpus(self):
-        data = [['bach/bwv255', [4.0, 1.0, 2.0, 2.5, 3.0, 4.0, 4.5, 1.0, 1.5]],
+        data = [['bach/bwv255', [4.0, 1.0, 2.5, 3.0, 4.0, 4.5, 1.0, 1.5]],
                 ['bach/bwv153.9', [1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 3.0, 1.0]]
                 ]
 
