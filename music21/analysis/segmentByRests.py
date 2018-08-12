@@ -12,11 +12,8 @@
 
 import unittest
 
-from music21 import common
 from music21 import exceptions21
-from music21 import pitch
 from music21 import interval
-from music21 import stream
 from music21 import converter
 
 from music21 import environment
@@ -32,10 +29,9 @@ class Segmenter:
     '''
     Given a work or part, returns a list of melodic segments or intervals.
     '''
-    def __init__(self, inputStream):
-        self.inputStream = inputStream
-
-    def getSegmentsList(workOrPart,
+    @classmethod
+    def getSegmentsList(cls,
+                        workOrPart,
                         removeEmptyLists=True):
         '''
         Segments a part by its rests (and clefs) and returns a returns a list of lists where
@@ -69,11 +65,12 @@ class Segmenter:
         # Optionally: Remove the empty sublists given by rests
         if removeEmptyLists == True:
             for segment in segments[::-1]:
-                if len(segment) == 0:
+                if not segment:
                     segments.remove(segment)
         return segments
 
-    def getIntervalList(workOrPart):
+    @classmethod
+    def getIntervalList(cls, workOrPart):
         '''
         Given a work or part, returns a list of intervals between contiguous notes.
         NB Uses .recurse() internally so
@@ -86,7 +83,7 @@ class Segmenter:
         '''
         intervalList = []
         elementList = workOrPart.recurse().getElementsByClass(['Note', 'Rest', 'Clef'])
-        for i in range(len(elementList)-1):
+        for i in range(len(elementList) - 1):
             n1 = elementList[i]
             if 'Rest' in n1.classes or 'Clef' in n1.classes:
                 continue
@@ -94,7 +91,6 @@ class Segmenter:
             if 'Rest' in n2.classes or 'Clef' in n2.classes:
                 continue
             intervalObj = interval.Interval(n1, n2)
-            semis = intervalObj.semitones
             intervalList.append(intervalObj)
         return intervalList
 

@@ -15,19 +15,19 @@ Builds various kinds of music21 distribution files and uploads them to PyPI and 
 To do a release,
 
 1. update the VERSION in _version.py and the single test cases in base.py.
-2. for a major change, run
-    `corpus.corpora.CoreCorpus().cacheMetadata()`.
-    every once in a while run corpus.corpora.CoreCorpus().rebuildMetadataCache()
+2. run `corpus.corpora.CoreCorpus().cacheMetadata()`.
+    for a major change run corpus.corpora.CoreCorpus().rebuildMetadataCache()
     (40 min on MacPro) -- either of these MAY change a lot of tests in corpus, metadata, etc.
     so don't skip the next step!
-3. run test/warningMultiprocessTest.py for lowest and highest version -- fix all warnings!
+3. run test/warningMultiprocessTest.py for lowest and highest Py version -- fix all warnings!
 4. run test/testLint.py and fix any lint errors
 5. commit and then check test/testSingleCoreAll.py or wait for results on Travis-CI
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
      but should be done before making a release).
 6. then python3 documentation/testDocumentation.py [*]
 
-[*] you will need pytest and nbval installed (along with ipython and jupyter)
+[*] you will need pytest and nbval installed (along with ipython and jupyter), you cannot fix tests
+while it is running.  This takes a while and runs single core, so allocate time.
 
 7. run documentation/make.py clean
 8. run documentation/make.py   [*]

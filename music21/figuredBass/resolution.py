@@ -93,7 +93,7 @@ def augmentedSixthToDominant(augSixthPossib, augSixthType=None, augSixthChordInf
         elif augSixthChord.isSwissAugmentedSixth():
             augSixthType = 3
 
-    if augSixthType == 1 or augSixthType == 3:
+    if augSixthType in (1, 3):
         [bass, other, root, unused_third, fifth] = augSixthChordInfo # other == sixth
     elif augSixthType == 2:
         [bass, root, unused_third, fifth, other] = augSixthChordInfo # other == seventh
@@ -162,7 +162,7 @@ def augmentedSixthToMajorTonic(augSixthPossib, augSixthType=None, augSixthChordI
         elif augSixthChord.isSwissAugmentedSixth():
             augSixthType = 3
 
-    if augSixthType == 1 or augSixthType == 3:
+    if augSixthType in (1, 3):
         [bass, other, root, unused_third, fifth] = augSixthChordInfo # other == sixth
     elif augSixthType == 2:
         [bass, root, unused_third, fifth, other] = augSixthChordInfo # other == seventh
@@ -232,7 +232,7 @@ def augmentedSixthToMinorTonic(augSixthPossib, augSixthType=None, augSixthChordI
         elif augSixthChord.isSwissAugmentedSixth():
             augSixthType = 3
 
-    if augSixthType == 1 or augSixthType == 3:
+    if augSixthType in (1, 3):
         [bass, other, root, unused_third, fifth] = augSixthChordInfo # other == sixth
     elif augSixthType == 2:
         [bass, root, unused_third, fifth, other] = augSixthChordInfo # other == seventh

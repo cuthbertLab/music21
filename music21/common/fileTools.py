@@ -92,14 +92,12 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
         with io.open(filePath, 'r', encoding=firstGuess) as thisFile:
             data = thisFile.read()
             return data
-    except FileNotFoundError:
-        raise
     except UnicodeDecodeError:
         with io.open(filePath, 'rb') as thisFileBinary:
             dataBinary = thisFileBinary.read()
             encoding = chardet.detect(dataBinary)['encoding']
             return codecs.decode(dataBinary, encoding)
-
+    # might also raise FileNotFoundError, but let that bubble
 
 #===============================================================================
 # Image functions

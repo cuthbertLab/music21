@@ -1033,7 +1033,7 @@ class IntervalNetwork:
             elif nodeId.lower() in ['terminushigh', 'high']:
                 return self.terminusHighNodes # returns a list
             else:
-                raise IntervalNetworkException('got a string that has no match:', nodeId)
+                raise IntervalNetworkException('got a string that has no match: ' + nodeId)
         elif isinstance(nodeId, Node):
             # look for direct match
             for nId in self.nodes:
@@ -1041,7 +1041,7 @@ class IntervalNetwork:
                 if n is nodeId: # could be a == comparison?
                     return [n] # return only one
         else: # match coords
-            raise IntervalNetworkException('cannot filter by: %s', nodeId)
+            raise IntervalNetworkException('cannot filter by: %s' % nodeId)
 
 
     def getNext(self, nodeStart, direction):

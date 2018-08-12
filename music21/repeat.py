@@ -599,7 +599,7 @@ def deleteMeasures(s, toDelete, *, inPlace=False, correctMeasureNumbers=True):
             i = measures[0].number
 
             # if we deleted the first measure.  TODO: test this case
-            if i != 0 and i != 1:
+            if i not in (0, 1):
                 i = 1   # can simplify to one line with above.
 
             for measure in measures:
@@ -926,7 +926,7 @@ class Expander:
         if countBalance not in (0, 1):
             environLocal.printDebug(['Repeats are not balanced: countBalance: %s' % (countBalance)])
             return False
-        if startCount != endCount and startCount != (endCount - 1):
+        if startCount not in (endCount, endCount - 1):
             environLocal.printDebug(['start count not the same as end count: %s / %s' % (
                                                                     startCount, endCount)])
             return False
@@ -1077,7 +1077,8 @@ class Expander:
         >>> from pprint import pprint as pp
         >>> pp(e._groupRepeatBracketIndices(s))
         [{'measureIndices': [2], 
-          'repeatBrackets': [<music21.spanner.RepeatBracket  <music21.stream.Measure 2 offset=3.0>>]}]
+          'repeatBrackets': [<music21.spanner.RepeatBracket  
+                                  <music21.stream.Measure 2 offset=3.0>>]}]
         '''
         groups = []
         mEnumerated = [x for x in enumerate(streamObj)]

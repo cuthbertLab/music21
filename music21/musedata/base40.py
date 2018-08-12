@@ -228,7 +228,7 @@ def base40ToPitch(base40Num):
     p.octave = ((base40Num - 1) / 40) + 1
     tableNum = base40Num - 40 * (p.octave - 1)
     pitchName = base40Equivalent[tableNum]
-    if pitchName != None:
+    if pitchName is not None:
         p.name = pitchName
         return p
 

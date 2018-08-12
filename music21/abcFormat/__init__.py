@@ -500,7 +500,7 @@ class ABCMetadata(ABCToken):
         # need to unpack list w/ *
         sharps, mode = self._getKeySignatureParameters()
         ks = key.KeySignature(sharps)
-        if mode in (None, ""):
+        if mode in (None, ''):
             return ks
         else:
             return ks.asKey(mode)
@@ -1359,7 +1359,7 @@ class ABCNote(ABCToken):
         if name == 'z':
             return (None, None) # designates a rest
 
-        if forceKeySignature != None:
+        if forceKeySignature is not None:
             activeKeySignature = forceKeySignature
         else: # may be None
             activeKeySignature = self.activeKeySignature
@@ -1379,11 +1379,11 @@ class ABCNote(ABCToken):
 
         # get an accidental string
         accString = ''
-        for i in range(strSrc.count("_")):
+        for i in range(strSrc.count('_')):
             accString += '-' # m21 symbols
-        for i in range(strSrc.count("^")):
+        for i in range(strSrc.count('^')):
             accString += '#' # m21 symbols
-        for i in range(strSrc.count("=")):
+        for i in range(strSrc.count('=')):
             accString += 'n' # m21 symbols
 
         # if there is an explicit accidental, regardless of key, it should
@@ -1459,7 +1459,7 @@ class ABCNote(ABCToken):
         >>> an.getQuarterLength('A', forceDefaultQuarterLength=1)
         1.875
         '''
-        if forceDefaultQuarterLength != None:
+        if forceDefaultQuarterLength is not None:
             activeDefaultQuarterLength = forceDefaultQuarterLength
         else: # may be None
             activeDefaultQuarterLength = self.activeDefaultQuarterLength
@@ -1510,7 +1510,7 @@ class ABCNote(ABCToken):
         else:
             ql = activeDefaultQuarterLength * int(numStr)
 
-        if self.brokenRhythmMarker != None:
+        if self.brokenRhythmMarker is not None:
             symbol, direction = self.brokenRhythmMarker
             if symbol == '>':
                 modPair = (1.5, .5)
@@ -1545,9 +1545,9 @@ class ABCNote(ABCToken):
             pn, accDisp = self.getPitchName(nonChordSymStr,
                                       forceKeySignature=forceKeySignature)
         except ABCHandlerException:
-            environLocal.warn(["Could not get pitch information from note: " ,
-                               "{0}, assuming C".format(nonChordSymStr)])
-            pn = "C"
+            environLocal.warn(['Could not get pitch information from note: ' ,
+                               '{0}, assuming C'.format(nonChordSymStr)])
+            pn = 'C'
             accDisp = False
 
         self.pitchName, self.accidentalDisplayStatus = pn, accDisp
@@ -1595,7 +1595,7 @@ class ABCChord(ABCNote):
                                         forceDefaultQuarterLength=forceDefaultQuarterLength
                                 )
 
-        if forceKeySignature != None:
+        if forceKeySignature is not None:
             activeKeySignature = forceKeySignature
         else: # may be None
             activeKeySignature = self.activeKeySignature
@@ -1622,7 +1622,7 @@ class ABCChord(ABCNote):
             if isinstance(t, ABCNote) and not t.isRest:
                 self.subTokens.append(t)
 
-        if chordDurationPost != None:
+        if chordDurationPost is not None:
             self.quarterLength = chordDurationPost
 
 
@@ -1827,9 +1827,9 @@ class ABCHandler:
             # e.g. dAG FED:|2 dAG FGA| this is incorrect, but can avoid by
             # looking for a leading pipe
             if (((c.isalpha() and c.isupper()) or c in 'w')
-                and cNext != None
+                and cNext is not None
                 and cNext == ':'
-                and cNextNext != None
+                and cNextNext is not None
                 and cNextNext not in '|'):
                 # collect until end of line; add one to get line break
                 j = self._getNextLineBreak(strSrc, currentIndex)
@@ -1881,7 +1881,7 @@ class ABCHandler:
                     continue
 
             # get tuplet indicators: (2, (3, (p:q:r or (3::
-            if (c == '(' and cNext != None and cNext.isdigit()):
+            if (c == '(' and cNext is not None and cNext.isdigit()):
                 skipAhead = 1
                 j = currentIndex + skipAhead + 1 # always two characters
                 unused, possibleColon, qChar, unused = self._getLinearContext(strSrc, j)
@@ -1925,14 +1925,14 @@ class ABCHandler:
                         }
                 j = currentIndex + 1
                 while j < currentIndex + 20: #a reasonable upper bound
-                    if strSrc[j] == "!":
+                    if strSrc[j] == '!':
                         if strSrc[currentIndex:j + 1] in exclaimDict:
                             exclaimClass = exclaimDict[strSrc[currentIndex:j + 1]]
                             exclaimObject = exclaimClass(c)
                             self._tokens.append(exclaimObject)
                             skipAhead = j - currentIndex # not + 1
                             break
-                        #NB: We're currently skipping over all other "!" expressions
+                        #NB: We're currently skipping over all other '!' expressions
                         else:
                             skipAhead = j - currentIndex # not + 1
                             break
@@ -1943,7 +1943,7 @@ class ABCHandler:
 
 
             # get slurs, ensuring that they're not confused for tuplets
-            if (c == '(' and cNext != None and not cNext.isdigit()):
+            if (c == '(' and cNext is not None and not cNext.isdigit()):
                 self._tokens.append(ABCSlurStart(c))
                 continue
 
@@ -1989,35 +1989,35 @@ class ABCHandler:
                 skipAhead = j - (currentIndex + 1)
                 continue
 
-            if (c=="."):
+            if (c == '.'):
                 self._tokens.append(ABCStaccato(c))
                 continue
 
-            if (c=="u"):
+            if (c == 'u'):
                 self._tokens.append(ABCUpbow(c))
                 continue
 
-            if (c=="{"):
+            if (c == '{'):
                 self._tokens.append(ABCGraceStart(c))
                 continue
 
-            if (c=="}"):
+            if (c == '}'):
                 self._tokens.append(ABCGraceStop(c))
                 continue
 
-            if (c=="v"):
+            if (c == 'v'):
                 self._tokens.append(ABCDownbow(c))
                 continue
 
-            if (c=="K"):
+            if (c == 'K'):
                 self._tokens.append(ABCAccent(c))
                 continue
 
-            if (c=="k"):
+            if (c == 'k'):
                 self._tokens.append(ABCStraccent(c))
                 continue
 
-            if (c=="M"):
+            if (c == 'M'):
                 self._tokens.append(ABCTenuto(c))
                 continue
 
@@ -2101,7 +2101,7 @@ class ABCHandler:
                 elif collect.startswith('x') or collect.startswith('H') or collect.startswith('Z'):
                     pass
                 # not sure what =20 refers to
-                elif len(collect) > 1 and collect.startswith("=") and collect[1].isdigit():
+                elif len(collect) > 1 and collect.startswith('=') and collect[1].isdigit():
                     pass
                 # only let valid collect strings be parsed
                 else:
@@ -2160,7 +2160,7 @@ class ABCHandler:
                 elif t.isKey():
                     sharpCount, mode = t._getKeySignatureParameters()
                     lastKeySignature = key.KeySignature(sharpCount)
-                    if mode not in (None, ""):
+                    if mode not in (None, ''):
                         lastKeySignature = lastKeySignature.asKey(mode)
 
                 if t.isReferenceNumber():
@@ -2188,17 +2188,17 @@ class ABCHandler:
                 # token
                 t.updateNoteCount()
                 lastTupletToken = t
-                self.activeParens.append("Tuplet")
+                self.activeParens.append('Tuplet')
 
             # notes within slur marks need to be added to the spanner
             if isinstance(t, ABCSlurStart):
                 t.fillSlur()
                 self.activeSpanners.append(t.slurObj)
-                self.activeParens.append("Slur")
+                self.activeParens.append('Slur')
             elif isinstance(t, ABCParenStop):
                 if self.activeParens:
                     p = self.activeParens.pop()
-                    if p == "Slur" or p == "Crescendo" or p == "Diminuendo":
+                    if p in ('Slur', 'Crescendo', 'Diminuendo'):
                         self.activeSpanners.pop()
 
 
@@ -2233,12 +2233,12 @@ class ABCHandler:
             if isinstance(t, ABCCrescStart):
                 t.fillCresc()
                 self.activeSpanners.append(t.crescObj)
-                self.activeParens.append("Crescendo")
+                self.activeParens.append('Crescendo')
 
             if isinstance(t, ABCDimStart):
                 t.fillDim()
                 self.activeSpanners.append(t.dimObj)
-                self.activeParens.append("Diminuendo")
+                self.activeParens.append('Diminuendo')
 
             if isinstance(t, ABCGraceStart):
                 lastGraceToken = t
@@ -2259,25 +2259,25 @@ class ABCHandler:
                 t.applicableSpanners = self.activeSpanners[:] # fast copy of a list
                 # ends ties one note after they begin
                 if lastTieToken is not None:
-                    t.tie = "stop"
+                    t.tie = 'stop'
                     lastTieToken = None
                 if lastStaccToken is not None:
-                    t.artic.append("staccato")
+                    t.artic.append('staccato')
                     lastStaccToken = None
                 if lastUpToken is not None:
-                    t.artic.append("upbow")
+                    t.artic.append('upbow')
                     lastUpToken = None
                 if lastDownToken is not None:
-                    t.artic.append("downbow")
+                    t.artic.append('downbow')
                     lastDownToken = None
                 if lastAccToken is not None:
-                    t.artic.append("accent")
+                    t.artic.append('accent')
                     lastAccToken = None
                 if lastStrAccToken is not None:
-                    t.artic.append("strongaccent")
+                    t.artic.append('strongaccent')
                     lastStrAccToken = None
                 if lastTenutoToken is not None:
-                    t.artic.append("tenuto")
+                    t.artic.append('tenuto')
                     lastTenutoToken = None
                 if lastGraceToken is not None:
                     t.inGrace = True
@@ -2578,8 +2578,6 @@ class ABCHandler:
         >>> [t.src for t in mergedTokens.tokens]
         ['M:6/8', 'L:1/8', 'K:G', 'V:1 name="Whistle" snm="wh"',
          'B3', 'A3', '|', 'G6', '|', 'B3', 'A3', '|', 'G6', '||']
-
-
         '''
         # TODO: this procedure should also be responsible for
         # breaking the passage into voice/lyric pairs
@@ -2979,7 +2977,7 @@ class ABCFile:
         self.file = fileLike # already 'open'
 
     def __repr__(self):
-        r = "<music21.abcFormat.ABCFile>"
+        r = '<music21.abcFormat.ABCFile>'
         return r
 
     def close(self):
@@ -3064,15 +3062,13 @@ class Test(unittest.TestCase):
         from music21.abcFormat import testFiles
 
         for (tf, countTokens, noteTokens, chordTokens) in [
-            (testFiles.fyrareprisarn, 241, 152, 0),
-            (testFiles.mysteryReel, 192, 153, 0),
-            (testFiles.aleIsDear, 291, 206, 32),
-            (testFiles.testPrimitive, 100, 75, 2),
-            (testFiles.kitchGirl, 126, 101, 2),
-            (testFiles.williamAndNancy, 127, 93, 0),
-            (testFiles.morrisonsJig, 178, 137, 0),
-
-                ]:
+                (testFiles.fyrareprisarn, 241, 152, 0),
+                (testFiles.mysteryReel, 192, 153, 0),
+                (testFiles.aleIsDear, 291, 206, 32),
+                (testFiles.testPrimitive, 100, 75, 2),
+                (testFiles.williamAndNancy, 127, 93, 0),
+                (testFiles.morrisonsJig, 178, 137, 0),
+            ]:
 
             handler = ABCHandler()
             handler.tokenize(tf)
@@ -3172,19 +3168,19 @@ class Test(unittest.TestCase):
 
         # with a key signature, matching steps are assumed altered
         an.activeKeySignature = key.KeySignature(3)
-        self.assertEqual(an.getPitchName("c"), ('C#5', False))
+        self.assertEqual(an.getPitchName('c'), ('C#5', False))
 
         an.activeKeySignature = None
-        self.assertEqual(an.getPitchName("c"), ('C5', None))
-        self.assertEqual(an.getPitchName("^c"), ('C#5', True))
+        self.assertEqual(an.getPitchName('c'), ('C5', None))
+        self.assertEqual(an.getPitchName('^c'), ('C#5', True))
 
 
         an.activeKeySignature = key.KeySignature(-3)
-        self.assertEqual(an.getPitchName("B"), ('B-4', False))
+        self.assertEqual(an.getPitchName('B'), ('B-4', False))
 
         an.activeKeySignature = None
-        self.assertEqual(an.getPitchName("B"), ('B4', None))
-        self.assertEqual(an.getPitchName("_B"), ('B-4', True))
+        self.assertEqual(an.getPitchName('B'), ('B4', None))
+        self.assertEqual(an.getPitchName('_B'), ('B-4', True))
 
 
     def testSplitByMeasure(self):
@@ -3571,7 +3567,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [ABCFile, ABCHandler, ABCHandlerBar]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)

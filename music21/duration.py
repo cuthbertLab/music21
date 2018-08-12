@@ -936,7 +936,7 @@ class Tuplet:
             self.numberNotesActual = 3
 
         # this stores a durationTuple
-        if 'durationActual' in keywords and keywords['durationActual'] != None:
+        if 'durationActual' in keywords and keywords['durationActual'] is not None:
             if isinstance(keywords['durationActual'], str):
                 self.durationActual = durationTupleFromTypeDots(keywords['durationActual'], 0)
             elif common.isIterable(keywords['durationActual']):
@@ -954,7 +954,7 @@ class Tuplet:
             self.numberNotesNormal = 2
 
 
-        if 'durationNormal' in keywords and keywords['durationNormal'] != None:
+        if 'durationNormal' in keywords and keywords['durationNormal'] is not None:
             if isinstance(keywords['durationNormal'], str):
                 self.durationNormal = durationTupleFromTypeDots(keywords['durationNormal'], 0)
             elif common.isIterable(keywords['durationNormal']):
@@ -2492,7 +2492,7 @@ class Duration(SlottedObjectMixin):
 
             msg = []
             typeStr = c.type
-            if dots >= 2 or (typeStr != 'longa' and typeStr != 'maxima'):
+            if dots >= 2 or (typeStr not in ('longa', 'maxima')):
                 if dotStr is not None:
                     msg.append('%s ' % dotStr)
             else:

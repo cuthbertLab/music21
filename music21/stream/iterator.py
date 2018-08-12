@@ -544,8 +544,8 @@ class StreamIterator:
                 except TypeError: # one element filters are acceptable.
                     if f(e) is False:
                         return False
-            except StopIteration:
-                raise
+            except StopIteration: # pylint: disable=try-except-raise
+                raise  # clearer this way to see that this can happen...
         return True
 
     def _newBaseStream(self):

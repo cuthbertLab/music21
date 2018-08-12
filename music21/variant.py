@@ -2026,15 +2026,13 @@ class Variant(base.Music21Object):
         # TODO: check tt recurse does not go into this
         if attr in ['flat', 'pitches']:
             raise AttributeError
-        try:
-            ## needed for unpickling where ._stream doesn't exist until later...
-            if attr != '_stream' and hasattr(self, '_stream'):
-                return getattr(self._stream, attr)
-            else:
-                raise AttributeError
-        except: ## make better -- should not say 'VariantStorage has no attribute...'
-            raise
 
+        ## needed for unpickling where ._stream doesn't exist until later...
+        if attr != '_stream' and hasattr(self, '_stream'):
+            return getattr(self._stream, attr)
+        else:
+            raise AttributeError
+        
     def __getitem__(self, key):
         return self._stream.__getitem__(key)
 

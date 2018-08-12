@@ -186,7 +186,8 @@ from music21.test.testRunner import mainTest
 
 #------------------------------------------------------------------------------
 # this brings all of our own __all__ names into the music21 package namespace
-from music21 import * # @UnresolvedImport # pylint: disable=wildcard-import
+# pylint: disable=wildcard-import
+from music21 import * # @UnresolvedImport 
 
 #------------------------------------------------------------------------------
 # eof

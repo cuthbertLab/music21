@@ -12,12 +12,6 @@
 Placeholder dicts for the 0th and 1st order of Hewlett's base40 system (base12 and 26).
 '''
 import unittest
-from music21 import exceptions21
-
-from music21 import common
-from music21 import interval
-from music21 import note
-from music21 import pitch
 
 #-------------------------------------------------------------------------------
 

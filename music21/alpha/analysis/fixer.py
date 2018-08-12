@@ -16,7 +16,7 @@ from music21 import note
 from music21 import pitch
 from music21 import stream
 
-class OMRMidiFixer(object):
+class OMRMidiFixer:
     '''
     Base class for future fixers
     changes is a list of changes associated with the midiStream and omrStream, 

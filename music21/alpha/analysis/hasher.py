@@ -19,7 +19,7 @@ from music21 import interval
 from music21 import stream
 from music21.exceptions21 import StreamException
 
-class Hasher(object):
+class Hasher:
     '''
     This is a modular hashing object that can hash notes, chords, and rests, and some of their
     properties. Steps to using and calling the hasher:

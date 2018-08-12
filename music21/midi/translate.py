@@ -337,7 +337,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
         tOn, eOn = 0, eventList[1]
         tOff, unused_eOff = dur, eventList[3]
     else:
-        raise TranslateException('cannot handle MIDI event list in the form: %r', eventList)
+        raise TranslateException('cannot handle MIDI event list in the form: %r' % eventList)
 
     n.pitch.midi = eOn.pitch
     n.volume.velocity = eOn.velocity
@@ -2010,7 +2010,7 @@ def midiAsciiStringToBinaryString(midiFormat=1, ticksPerQuarterNote=960, tracksE
 
     mf.ticksPerQuarterNote = ticksPerQuarterNote
 
-    if (tracksEventsList != None):
+    if (tracksEventsList is not None):
         for i in range(numTracks):
             trk = midiModule.MidiTrack(i)   # sets the MidiTrack index parameters
             for j in tracksEventsList[i]:

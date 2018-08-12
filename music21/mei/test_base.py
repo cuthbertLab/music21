@@ -57,7 +57,7 @@ from music21 import stream
 from music21 import tie
 
 # Importing from base.py
-import music21.mei.base as base
+import music21.mei.base as base # pylint: disable=useless-import-alias
 from music21.mei.base import _XMLID
 from music21.mei.base import _MEINS
 

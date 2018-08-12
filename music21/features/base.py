@@ -980,7 +980,8 @@ class DataSet:
                 # in some cases there might be problem; to not fail
                 try:
                     fReturned = fe.extract()
-                except Exception as e: # for now take any error  # pylint: disable=broad-except
+                except Exception as e: # pylint: disable=broad-except
+                    # for now take any error  
                     fList = ['failed feature extractor:', fe, str(e)]
                     if self.quiet is True:
                         environLocal.printDebug(fList)
@@ -1098,7 +1099,8 @@ def _dataSetParallelSubprocess(dataInstance):
         # in some cases there might be problem; to not fail
         try:
             fReturned = fe.extract()
-        except Exception as e: # for now take any error  # pylint: disable=broad-except
+        except Exception as e: # pylint: disable=broad-except
+            # for now take any error  
             errors.append('failed feature extractor:' + str(fe) + ': ' + str(e))
             # provide a blank feature extractor
             fReturned = fe.getBlankFeature()
@@ -1615,151 +1617,151 @@ class Test(unittest.TestCase):
         ds.write('/_scratch/chinaMitteleuropaSplit-b.csv')
         ds.write('/_scratch/chinaMitteleuropaSplit-b.arff')
 
-
-    def xtestOrangeBayesA(self): # pragma: no cover
-        '''Using an already created test file with a BayesLearner.
-        '''
-        import orange # @UnresolvedImport # pylint: disable=import-error
-        data = orange.ExampleTable(
-            '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
-        classifier = orange.BayesLearner(data)
-        for i in range(len(data)):
-            c = classifier(data[i])
-            print('original', data[i].getclass(), 'BayesLearner:', c)
-
-
-    def xtestClassifiersA(self): # pragma: no cover
-        '''Using an already created test file with a BayesLearner.
-        '''
-        import orange, orngTree # @UnresolvedImport  # pylint: disable=import-error
-        data1 = orange.ExampleTable(
-                '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
-
-        data2 = orange.ExampleTable(
-                '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b2.tab')
-
-        majority = orange.MajorityLearner
-        bayes = orange.BayesLearner
-        tree = orngTree.TreeLearner
-        knn = orange.kNNLearner
-
-        for classifierType in [majority, bayes, tree, knn]:
-            print('')
-            for classifierData, classifierStr, matchData, matchStr in [
-                (data1, 'data1', data1, 'data1'),
-                (data1, 'data1', data2, 'data2'),
-                (data2, 'data2', data2, 'data2'),
-                (data2, 'data2', data1, 'data1'),
-                ]:
-
-                # train with data1
-                classifier = classifierType(classifierData)
-                mismatch = 0
-                for i in range(len(matchData)):
-                    c = classifier(matchData[i])
-                    if c != matchData[i].getclass():
-                        mismatch += 1
-
-                print('%s %s: misclassified %s/%s of %s' % (
-                        classifierStr, classifierType, mismatch, len(matchData), matchStr))
-
-#             if classifierType == orngTree.TreeLearner:
-#                 orngTree.printTxt(classifier)
-
-
-
-    def xtestClassifiersB(self): # pragma: no cover
-        '''Using an already created test file with a BayesLearner.
-        '''
-        import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
-        data1 = orange.ExampleTable(
-                '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
-
-        data2 = orange.ExampleTable(
-                '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b2.tab',
-                use=data1.domain)
-
-        data1.extend(data2)
-        data = data1
-
-        majority = orange.MajorityLearner
-        bayes = orange.BayesLearner
-        tree = orngTree.TreeLearner
-        knn = orange.kNNLearner
-
-        folds = 10
-        for classifierType in [majority, bayes, tree, knn]:
-            print('')
-
-            cvIndices = orange.MakeRandomIndicesCV(data, folds)
-            for fold in range(folds):
-                train = data.select(cvIndices, fold, negate=1)
-                test = data.select(cvIndices, fold)
-
-                for classifierData, classifierStr, matchData, matchStr in [
-                    (train, 'train', test, 'test'),
-                    ]:
-
-                    # train with data1
-                    classifier = classifierType(classifierData)
-                    mismatch = 0
-                    for i in range(len(matchData)):
-                        c = classifier(matchData[i])
-                        if c != matchData[i].getclass():
-                            mismatch += 1
-
-                    print('%s %s: misclassified %s/%s of %s' % (
-                            classifierStr, classifierType, mismatch, len(matchData), matchStr))
-
-
-    def xtestOrangeClassifiers(self): # pragma: no cover
-        '''
-        This test shows how to compare four classifiers; replace the file path
-        with a path to the .tab data file.
-        '''
-        import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
-        data = orange.ExampleTable(
-            '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
-
-        # setting up the classifiers
-        majority = orange.MajorityLearner(data)
-        bayes = orange.BayesLearner(data)
-        tree = orngTree.TreeLearner(data, sameMajorityPruning=1, mForPruning=2)
-        knn = orange.kNNLearner(data, k=21)
-
-        majority.name='Majority'
-        bayes.name='Naive Bayes'
-        tree.name='Tree'
-        knn.name='kNN'
-        classifiers = [majority, bayes, tree, knn]
-
-        # print the head
-        print('Possible classes:', data.domain.classVar.values)
-        print('Original Class', end=' ')
-        for l in classifiers:
-            print('%-13s' % (l.name), end=' ')
-        print()
-
-        for example in data:
-            print('(%-10s)  ' % (example.getclass()), end=' ')
-            for c in classifiers:
-                p = c([example, orange.GetProbabilities])
-                print('%5.3f        ' % (p[0]), end=' ')
-            print('')
-
-
-    def xtestOrangeClassifierTreeLearner(self): # pragma: no cover
-        import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
-        data = orange.ExampleTable(
-            '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
-
-        tree = orngTree.TreeLearner(data, sameMajorityPruning=1, mForPruning=2)
-        #tree = orngTree.TreeLearner(data)
-        for i in range(len(data)):
-            p = tree(data[i], orange.GetProbabilities)
-            print('%d: %5.3f (originally %s)' % (i + 1, p[1], data[i].getclass()))
-
-        orngTree.printTxt(tree)
+# all these are written using orange-Py2 code; need better.
+#     def xtestOrangeBayesA(self): # pragma: no cover
+#         '''Using an already created test file with a BayesLearner.
+#         '''
+#         import orange # @UnresolvedImport # pylint: disable=import-error
+#         data = orange.ExampleTable(
+#             '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
+#         classifier = orange.BayesLearner(data)
+#         for i in range(len(data)):
+#             c = classifier(data[i])
+#             print('original', data[i].getclass(), 'BayesLearner:', c)
+# 
+# 
+#     def xtestClassifiersA(self): # pragma: no cover
+#         '''Using an already created test file with a BayesLearner.
+#         '''
+#         import orange, orngTree # @UnresolvedImport  # pylint: disable=import-error
+#         data1 = orange.ExampleTable(
+#                 '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
+# 
+#         data2 = orange.ExampleTable(
+#                 '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b2.tab')
+# 
+#         majority = orange.MajorityLearner
+#         bayes = orange.BayesLearner
+#         tree = orngTree.TreeLearner
+#         knn = orange.kNNLearner
+# 
+#         for classifierType in [majority, bayes, tree, knn]:
+#             print('')
+#             for classifierData, classifierStr, matchData, matchStr in [
+#                 (data1, 'data1', data1, 'data1'),
+#                 (data1, 'data1', data2, 'data2'),
+#                 (data2, 'data2', data2, 'data2'),
+#                 (data2, 'data2', data1, 'data1'),
+#                 ]:
+# 
+#                 # train with data1
+#                 classifier = classifierType(classifierData)
+#                 mismatch = 0
+#                 for i in range(len(matchData)):
+#                     c = classifier(matchData[i])
+#                     if c != matchData[i].getclass():
+#                         mismatch += 1
+# 
+#                 print('%s %s: misclassified %s/%s of %s' % (
+#                         classifierStr, classifierType, mismatch, len(matchData), matchStr))
+# 
+# #             if classifierType == orngTree.TreeLearner:
+# #                 orngTree.printTxt(classifier)
+# 
+# 
+# 
+#     def xtestClassifiersB(self): # pragma: no cover
+#         '''Using an already created test file with a BayesLearner.
+#         '''
+#         import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
+#         data1 = orange.ExampleTable(
+#                 '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
+# 
+#         data2 = orange.ExampleTable(
+#                 '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b2.tab',
+#                 use=data1.domain)
+# 
+#         data1.extend(data2)
+#         data = data1
+# 
+#         majority = orange.MajorityLearner
+#         bayes = orange.BayesLearner
+#         tree = orngTree.TreeLearner
+#         knn = orange.kNNLearner
+# 
+#         folds = 10
+#         for classifierType in [majority, bayes, tree, knn]:
+#             print('')
+# 
+#             cvIndices = orange.MakeRandomIndicesCV(data, folds)
+#             for fold in range(folds):
+#                 train = data.select(cvIndices, fold, negate=1)
+#                 test = data.select(cvIndices, fold)
+# 
+#                 for classifierData, classifierStr, matchData, matchStr in [
+#                     (train, 'train', test, 'test'),
+#                     ]:
+# 
+#                     # train with data1
+#                     classifier = classifierType(classifierData)
+#                     mismatch = 0
+#                     for i in range(len(matchData)):
+#                         c = classifier(matchData[i])
+#                         if c != matchData[i].getclass():
+#                             mismatch += 1
+# 
+#                     print('%s %s: misclassified %s/%s of %s' % (
+#                             classifierStr, classifierType, mismatch, len(matchData), matchStr))
+# 
+# 
+#     def xtestOrangeClassifiers(self): # pragma: no cover
+#         '''
+#         This test shows how to compare four classifiers; replace the file path
+#         with a path to the .tab data file.
+#         '''
+#         import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
+#         data = orange.ExampleTable(
+#             '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
+# 
+#         # setting up the classifiers
+#         majority = orange.MajorityLearner(data)
+#         bayes = orange.BayesLearner(data)
+#         tree = orngTree.TreeLearner(data, sameMajorityPruning=1, mForPruning=2)
+#         knn = orange.kNNLearner(data, k=21)
+# 
+#         majority.name='Majority'
+#         bayes.name='Naive Bayes'
+#         tree.name='Tree'
+#         knn.name='kNN'
+#         classifiers = [majority, bayes, tree, knn]
+# 
+#         # print the head
+#         print('Possible classes:', data.domain.classVar.values)
+#         print('Original Class', end=' ')
+#         for l in classifiers:
+#             print('%-13s' % (l.name), end=' ')
+#         print()
+# 
+#         for example in data:
+#             print('(%-10s)  ' % (example.getclass()), end=' ')
+#             for c in classifiers:
+#                 p = c([example, orange.GetProbabilities])
+#                 print('%5.3f        ' % (p[0]), end=' ')
+#             print('')
+# 
+# 
+#     def xtestOrangeClassifierTreeLearner(self): # pragma: no cover
+#         import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
+#         data = orange.ExampleTable(
+#             '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
+# 
+#         tree = orngTree.TreeLearner(data, sameMajorityPruning=1, mForPruning=2)
+#         #tree = orngTree.TreeLearner(data)
+#         for i in range(len(data)):
+#             p = tree(data[i], orange.GetProbabilities)
+#             print('%d: %5.3f (originally %s)' % (i + 1, p[1], data[i].getclass()))
+# 
+#         orngTree.printTxt(tree)
 
 
     def testParallelRun(self):

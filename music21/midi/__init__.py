@@ -764,7 +764,7 @@ class MidiEvent:
                 environLocal.printDebug(['unhandled message:', midiStr[2]])
             return midiStr[3:]
 
-        elif x == 0xF0 or x == 0xF7:
+        elif x in (0xF0, 0xF7):
             self.type = {0xF0: "F0_SYSEX_EVENT",
                          0xF7: "F7_SYSEX_EVENT"}[x]
             length, midiStr = getVariableLengthNumber(midiStr[1:])

@@ -590,7 +590,7 @@ def nearestMultiple(n, unit):
     #print(['mult, halfUnit, matchLow, matchHigh', mult, halfUnit, matchLow, matchHigh])
 
     if matchLow >= n >= matchHigh:
-        raise Exception('cannot place n between multiples: %s, %s', matchLow, matchHigh)
+        raise Exception('cannot place n between multiples: %s, %s' % (matchLow, matchHigh))
 
     if n >= matchLow and n <= (matchLow + halfUnit):
         return matchLow, round(n - matchLow, 7), round(n - matchLow, 7)

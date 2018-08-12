@@ -1319,7 +1319,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # call elements changed once; sorted arrangement has not changed
         self.coreElementsChanged(clearIsSorted=False)
-        return
 
     def removeByClass(self, classFilterList):
         '''
@@ -1697,7 +1696,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if offset is None:
                 offset = 0.0
             else:
-                raise StreamException("offset %s must be a number", offset)
+                raise StreamException("offset %s must be a number" % offset)
 
         if not isinstance(item, base.Music21Object):
             raise StreamException('to put a non Music21Object in a stream, ' +
@@ -3589,12 +3588,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             else:
                 if hasUniqueMeasureNumbers:
                     if isinstance(numberStart, str):
-                        matches = [m for m in mStreamIter if m.number > int(common.getNumFromStr(numberStart)[0])]
+                        matches = [m for m in mStreamIter 
+                                   if m.number > int(common.getNumFromStr(numberStart)[0])]
                     else:
                         matches = [m for m in mStreamIter if m.number >= numberStart]
                 else:
                     if isinstance(numberStart, str):
-                        matches = [m for m in mStreamIter if m.number > int(common.getNumFromStr(numberStart)[0])]
+                        matches = [m for m in mStreamIter 
+                                   if m.number > int(common.getNumFromStr(numberStart)[0])]
                     else:
                         matches = [m for i, m in enumerate(mStreamIter)
                                         if i + 1 >= numberStart]
@@ -4919,13 +4920,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if endTimesOnly:
             offsets = set()
         else:
-            offsets = set([opFrac(v[0]) for v in offsetDictValues])
+            offsets = {opFrac(v[0]) for v in offsetDictValues}
         
         if offsetsOnly:
             endTimes = set()
         else:
-            endTimes = set([opFrac(v[0] + v[1].duration.quarterLength) 
-                            for v in offsetDictValues])
+            endTimes = {opFrac(v[0] + v[1].duration.quarterLength)
+                            for v in offsetDictValues}
         return sorted(offsets.union(endTimes))
     
     def makeChords(self,
@@ -6760,7 +6761,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return self._cache['semiFlat']
 
 
-    @common.deprecated('Not used any more.  Use .containerHierarchy() instead', 'July 2018, v.5', 'July 2019')
+    @common.deprecated('Not used any more.  Use .containerHierarchy() instead', 
+                       'July 2018, v.5', 'July 2019')
     def _yieldReverseUpwardsSearch(self, memo=None, streamsOnly=False,
                              skipDuplicates=True, classFilter=()):
         '''
@@ -7043,7 +7045,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return None
 
 
-    @common.deprecated('Just iterate over Stream.recurse(restoreActiveSites=True)', 'July 2018, v.5', 'June 2018')
+    @common.deprecated('Just iterate over Stream.recurse(restoreActiveSites=True)', 
+                       'July 2018, v.5', 'June 2018')
     def restoreActiveSites(self):
         '''
         Restore all active sites for all elements from this Stream downward.
@@ -7203,12 +7206,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # Take the case where a whole note appears a 0.0, but a textExpression (ql=0) at 0.25 --
             # isSorted would be true, but highestTime should be 4.0 not 0.25
             for e in self._elements:
-                try:
-                    candidateOffset = (self.elementOffset(e) +
-                                   e.duration.quarterLength)
-                except:
-                    #print(self, e, id(e), e.offset, e.getSites())
-                    raise
+                candidateOffset = (self.elementOffset(e) +
+                               e.duration.quarterLength)
                 if candidateOffset > highestTimeSoFar:
                     highestTimeSoFar = candidateOffset
             self._cache["HighestTime"] = float(highestTimeSoFar)
@@ -10003,7 +10002,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     #---------------------------------------------------------------------------
     # Lyric control
-
+    # might be overwritten in base.splitAtDurations, but covered with a check
+    # pylint: disable=method-hidden 
     def lyrics(self, ignoreBarlines=True, recurse=False, skipTies=False):
         '''
         Returns a dict of lists of lyric objects (with the keys being

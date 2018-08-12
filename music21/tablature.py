@@ -27,7 +27,7 @@ from music21 import pitch
 class TablatureException(exceptions21.Music21Exception):
     pass
 
-class FretNote(object):
+class FretNote:
     '''
     A FretNote represents a note on a Fretboard, where each string should
     be fingered (or not).
@@ -100,7 +100,7 @@ class FretNote(object):
 
         return '<music21.tablature.FretNote {}>'.format(fullRepr)
 
-class FretBoard(object):
+class FretBoard:
     '''
     A FretBoard represents a displayed fretboard (i.e. used in chord symbols).
     To be displayed, a fretboard requires a tuning system, defined by the fretted instrument
@@ -241,7 +241,7 @@ class FretBoard(object):
             
         return pitchList
 
-class FirstFret(object):
+class FirstFret:
     '''
     FirstFretInfo returns the information regarding the first fret utilized in a
     given chord position.
@@ -264,8 +264,9 @@ class ChordWithFretBoard(harmony.ChordSymbol, FretBoard):
     '''
     def __init__(self, figure=None,  numStrings=6, fretNotes=None, displayFrets=4, **keywords):
         harmony.ChordSymbol.__init__(self, figure=figure, **keywords)
-        if fretNotes is None:
-            fretNotes = self.getFretNotesFromFigure()
+        # uncomment when self.getFretNotesFromFigure() works...
+        # if fretNotes is None:
+        #     fretNotes = self.getFretNotesFromFigure()
         
         FretBoard.__init__(self, 
                            numStrings=numStrings, 

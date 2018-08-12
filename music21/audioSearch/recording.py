@@ -87,7 +87,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
     st.close()
     p_audio.terminate()
 
-    if storeFile != False:
+    if storeFile is not False:
         if isinstance(storeFile, str):
             waveFilename = storeFile
         else:

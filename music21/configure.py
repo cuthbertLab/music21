@@ -518,13 +518,13 @@ class Dialog:
         be provided to test. Sets self._result; does not return a value.
         '''
         # if an introduction is defined, try to use it
-        intro = self._rawIntroduction()
+        intro = self._rawIntroduction() # pylint: disable=assignment-from-none
         if intro is not None and not skipIntro:
             self._writeToUser(intro)
 
         # always call preAskUser: can customize in subclass. must return True
         # or False. if False, askUser cannot continue
-        post = self._preAskUser(force=force)
+        post = self._preAskUser(force=force) # pylint: disable=assignment-from-no-return
         if post is False:
             self._result = BadConditions()
             return
@@ -534,7 +534,7 @@ class Dialog:
             # in some cases, the query might not be able to be formed:
             # for example, in selecting values from a list, and not having
             # any values. thus, query may be an error
-            query = self._rawQuery()
+            query = self._rawQuery() # pylint: disable=assignment-from-no-return
             if isinstance(query, DialogError):
                 # set result as error
                 self._result = query
@@ -557,7 +557,8 @@ class Dialog:
 
             # need to not catch no NoInput nor IncompleteInput classes, as they
             # will be handled in evaluation
-            cookedInput = self._evaluateUserInput(rawInput)
+            # pylint: disable=assignment-from-no-return
+            cookedInput = self._evaluateUserInput(rawInput) 
             #environLocal.printDebug(['post _evaluateUserInput() cookedInput', cookedInput])
 
             # if no default and no input, we get here (default supplied in

@@ -1297,15 +1297,17 @@ class Test(unittest.TestCase):
         self.assertEqual([p.name for p in src],
             ['D', 'C#', 'A', 'B-', 'F', 'E-', 'E', 'C', 'G#', 'G', 'F#', 'B'])
         s37 = getHistoricalRowByName('RowSchoenbergOp37').matrix()
-        self.assertEqual([e.name for e in s37[0]], ['C', 'B', 'G', 'G#', 'E-', 'C#', 'D', 'B-',
+        r0 = s37[0]
+        # pylint: disable=not-an-iterable  # r0 is TOO an iterable
+        self.assertEqual([e.name for e in r0], ['C', 'B', 'G', 'G#', 'E-', 'C#', 'D', 'B-',
                                                     'F#', 'F', 'E', 'A'])
 
 
     def testLabelingA(self):
         from music21 import corpus
-        series = {'a':1, 'g-':2, 'g':3, 'a-':4,
-                  'f':5, 'e-':6, 'e':7, 'd':8,
-                  'c':9, 'c#':10, 'b-':11, 'b':12}
+        series = {'a': 1, 'g-': 2, 'g': 3, 'a-': 4,
+                  'f': 5, 'e-': 6, 'e': 7, 'd': 8,
+                  'c': 9, 'c#': 10, 'b-': 11, 'b': 12}
         s = corpus.parse('bwv66.6')
         for n in s.flat.notes:
             for key in series:

@@ -2531,7 +2531,7 @@ class InitialTimeSignatureFeature(featuresModule.FeatureExtractor):
 
     def process(self):
         elements = self.data['flat.getElementsByClass(TimeSignature)']
-        if len(elements) < 1:
+        if not elements:
             return # vector already zero
         ts = elements[0]
         environLocal.printDebug(['found ts', ts])

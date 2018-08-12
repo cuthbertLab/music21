@@ -2244,7 +2244,7 @@ class ScoreExporter(XMLExporterBase):
         if mdObj.movementName not in (None, ''):
             mxMovementTitle.text = str(mdObj.movementName)
         else:  # it is none
-            if mdObj.title != None:
+            if mdObj.title is not None:
                 mxMovementTitle.text = str(mdObj.title)
             else:
                 mxMovementTitle.text = defaults.title
@@ -3674,7 +3674,7 @@ class MeasureExporter(XMLExporterBase):
         _setTagTextFromAttribute(fretNote, FretNoteMX, 'string')
         _setTagTextFromAttribute(fretNote, FretNoteMX, 'fret')
     
-        if fretNote.fingering != None:
+        if fretNote.fingering is not None:
             _setTagTextFromAttribute(fretNote, FretNoteMX, 'fingering')
                 
         return FretNoteMX
@@ -5397,7 +5397,7 @@ class MeasureExporter(XMLExporterBase):
         else:
             raise bar.BarException('cannot handle direction format:', r.direction)
 
-        if r.times != None:
+        if r.times is not None:
             mxRepeat.set('times', str(r.times))
 
         # TODO: attr: winged

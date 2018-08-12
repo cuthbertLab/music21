@@ -1597,7 +1597,7 @@ class Test(unittest.TestCase):
             post = p.recurse().notes[0].getContextByClass('Clef')
             self.assertEqual(isinstance(post, clef.TenorClef), True)
             for n in p.flat.notes:
-                if n.tie != None:
+                if n.tie is not None:
                     countTies += 1
                     if n.tie.type == 'start' or n.tie.type =='continue':
                         countStartTies += 1

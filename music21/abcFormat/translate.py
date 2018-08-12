@@ -845,11 +845,15 @@ class Test(unittest.TestCase):
         self.assertEqual(len(p1.flat.notesAndRests), 77)
         self.assertEqual(len(list(p1.flat.getElementsByClass('ChordSymbol'))), 25)
         # Am/C
-        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[7].root(), pitch.Pitch('A3'))
-        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[7].bass(), pitch.Pitch('C3'))
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[7].root(), 
+                         pitch.Pitch('A3'))
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[7].bass(), 
+                         pitch.Pitch('C3'))
         # G7/B
-        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].root(), pitch.Pitch('G3'))
-        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].bass(), pitch.Pitch('B2'))
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].root(), 
+                         pitch.Pitch('G3'))
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].bass(), 
+                         pitch.Pitch('B2'))
 
 
     def testNoChord(self):
@@ -980,29 +984,29 @@ class Test(unittest.TestCase):
             #s.show()
 
     def testCleanFlat(self):
-        from music21 import harmony, pitch
+        from music21 import pitch
 
         cs = harmony.ChordSymbol(root='eb', bass='bb', kind='dominant')
-        self.assertEquals(cs.bass(), pitch.Pitch('B-2'))
+        self.assertEqual(cs.bass(), pitch.Pitch('B-2'))
         self.assertIs(cs.pitches[0], cs.bass())
 
         cs = harmony.ChordSymbol('e-7/b-')
-        self.assertEquals(cs.root(), pitch.Pitch('E-3'))
-        self.assertEquals(cs.bass(), pitch.Pitch('B-2'))
-        self.assertEquals(cs.pitches[0], pitch.Pitch('B-2'))
+        self.assertEqual(cs.root(), pitch.Pitch('E-3'))
+        self.assertEqual(cs.bass(), pitch.Pitch('B-2'))
+        self.assertEqual(cs.pitches[0], pitch.Pitch('B-2'))
 
         # common.cleanedFlatNotation() shouldn't be called by
         # the following calls, which what is being tested here:
 
         cs = harmony.ChordSymbol('b-3')
-        self.assertEquals(cs.root(), pitch.Pitch('b-3'))
-        self.assertEquals(cs.pitches[0], pitch.Pitch('B-3'))
-        self.assertEquals(cs.pitches[1], pitch.Pitch('D4'))
+        self.assertEqual(cs.root(), pitch.Pitch('b-3'))
+        self.assertEqual(cs.pitches[0], pitch.Pitch('B-3'))
+        self.assertEqual(cs.pitches[1], pitch.Pitch('D4'))
 
         cs = harmony.ChordSymbol('bb3')
-        self.assertEquals(cs.root(), pitch.Pitch('b3'))
-        self.assertEquals(cs.pitches[0], pitch.Pitch('B3'))
-        self.assertEquals(cs.pitches[1], pitch.Pitch('D#4'))
+        self.assertEqual(cs.root(), pitch.Pitch('b3'))
+        self.assertEqual(cs.pitches[0], pitch.Pitch('B3'))
+        self.assertEqual(cs.pitches[1], pitch.Pitch('D#4'))
 
 
     def xtestTranslateB(self):

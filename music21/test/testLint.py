@@ -74,9 +74,13 @@ def main(fnAccept=None, strict=False):
                 'too-many-lines',    # yes, someday.
                 'too-many-return-statements', # we'll see
                 'too-many-instance-attributes', # maybe later
+                'inconsistent-return-statements', # would be nice
                 'protected-access', # this is an important one, but for now we do a lot of
                            # x = copy.deepcopy(self); x._volume = ... which is not a problem...
                            # also, test suites need to be exempt.
+                'keyword-arg-before-vararg', # a good thing to check for new code, but
+                           # requires rewriting function signatures in old code
+
     ]
     disable = [  # These also need to be changed in MUSIC21BASE/.pylintrc
                 'arguments-differ', # -- no -- should be able to add additional arguments so long
@@ -90,7 +94,9 @@ def main(fnAccept=None, strict=False):
                 'unnecessary-pass', # nice, but not really a problem...
                 'locally-disabled', # test for this later, but hopefully will know what
                             # they're doing
-
+                'consider-using-get', # if it can figure out that the default value is something
+                            # simple, we will turn back on, but until then, no.
+                'chained-comparison', # sometimes simpler that way
                 #'duplicate-code', # needs to ignore strings -- keeps getting doctests...
                 'too-many-ancestors', # -- 8 is okay.
                 'abstract-class-instantiated', # this trips on the fractions.Fraction() class.
@@ -103,7 +109,6 @@ def main(fnAccept=None, strict=False):
                 'unpacking-non-sequence', # gets it wrong too often.
                 'too-many-boolean-expressions', #AbstractDiatonicScale.__eq__ shows how this
                     # can be fine...
-
                 'misplaced-comparison-constant', # sometimes 2 < x is what we want
                 'unsubscriptable-object', # unfortunately, thinks that Streams are unsubscriptable.
                 'consider-iterating-dictionary', # sometimes .keys() is a good test against
@@ -187,7 +192,10 @@ def main(fnAccept=None, strict=False):
     cmdFile = cmd + acceptable
     #print(' '.join(cmdFile))
     #print(fp)
-    pylintRun(cmdFile, exit=False)
+    try:
+        pylintRun(cmdFile, exit=False)
+    except TypeError:
+        pylintRun(cmdFile, do_exit=False) # renamed in recent versions
 
 def argRun():
     parser = argparse.ArgumentParser(

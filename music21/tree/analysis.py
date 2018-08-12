@@ -12,7 +12,7 @@
 '''
 Tools for performing voice-leading analysis with trees.
 '''
-import collections
+import collections.abc
 import unittest
 #from music21 import base
 #from music21 import common
@@ -30,7 +30,7 @@ class HorizontalityException(exceptions21.TreeException):
 #------------------------------------------------------------------------------
 
 
-class Horizontality(collections.Sequence):
+class Horizontality(collections.abc.Sequence):
     r'''
     A horizontality of consecutive PitchedTimespan objects.
 
@@ -46,7 +46,7 @@ class Horizontality(collections.Sequence):
     ### INITIALIZER ###
 
     def __init__(self, timespans=None):
-        if not isinstance(timespans, collections.Sequence):
+        if not isinstance(timespans, collections.abc.Sequence):
             raise HorizontalityException("timespans must be a sequence, not %r" % timespans)
         if not timespans:
             raise HorizontalityException(

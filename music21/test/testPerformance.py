@@ -209,19 +209,19 @@ class Test(unittest.TestCase):
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):
                 post = m.getContextByClass('Clef')
-                assert post != None
+                assert post is not None
                 post = m.getContextByClass('TimeSignature')
-                assert post != None
+                assert post is not None
                 post = m.getContextByClass('KeySignature')
-                assert post != None
+                assert post is not None
 
                 for n in m.notesAndRests:
                     post = n.getContextByClass('Clef')
-                    assert post != None
+                    assert post is not None
                     post = n.getContextByClass('TimeSignature')
-                    assert post != None
+                    assert post is not None
                     post = n.getContextByClass('KeySignature')
-                    assert post != None
+                    assert post is not None
 
 
     def runGetElementsByPrevious(self):
@@ -235,19 +235,19 @@ class Test(unittest.TestCase):
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):
                 post = m.previous('Clef')
-                assert post != None
+                assert post is not None
                 post = m.previous('TimeSignature')
-                assert post != None
+                assert post is not None
                 post = m.previous('KeySignature')
-                assert post != None
+                assert post is not None
 
                 for n in m.notesAndRests:
                     post = n.getContextByClass('Clef')
-                    assert post != None
+                    assert post is not None
                     post = n.getContextByClass('TimeSignature')
-                    assert post != None
+                    assert post is not None
                     post = n.getContextByClass('KeySignature')
-                    assert post != None
+                    assert post is not None
 
 
 

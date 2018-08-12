@@ -15,7 +15,7 @@ Tools for grouping elements, timespans, and especially
 pitched elements into kinds of searchable tree organized by start and stop offsets
 and other positions.
 '''
-import collections
+import collections.abc
 import random
 import unittest
 
@@ -406,9 +406,16 @@ class TimespanTree(trees.OffsetTree):
             [9] <Verticality 35.0 {F#3 A#3 C#4 F#4}>: True
         '''
         iterator = self.iterateVerticalities()
-        startingVerticality = next(iterator)
-        while not startingVerticality.toChord().isConsonant():
+        try:
             startingVerticality = next(iterator)
+        except StopIteration:
+            return
+        
+        while not startingVerticality.toChord().isConsonant():
+            try:
+                startingVerticality = next(iterator)
+            except StopIteration:
+                return
             
         verticalityBuffer = [startingVerticality]
         for verticality in iterator:
@@ -601,7 +608,7 @@ class TimespanTree(trees.OffsetTree):
         >>> scoreTree.elementsOverlappingOffset(0.1)
         ()
         '''
-        if not isinstance(offsets, collections.Iterable):
+        if not isinstance(offsets, collections.abc.Iterable):
             offsets = [offsets]
         for offset in offsets:
             overlaps = self.elementsOverlappingOffset(offset)

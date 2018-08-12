@@ -314,7 +314,7 @@ class ChordReducer:
             if c.isNote:
                 p = tuple(c.pitch.pitchClass)
             else:
-                p = tuple(set([x.pitchClass for x in c.pitches]))
+                p = tuple({x.pitchClass for x in c.pitches})
             if p not in presentPCs:
                 presentPCs[p] = 0.0
             presentPCs[p] += weightAlgorithm(c)
@@ -537,7 +537,7 @@ class ChordReducer:
             if isinstance(c, note.Note):
                 p = tuple(c.pitch.pitchClass)
             elif isinstance(c, chord.Chord):
-                p = tuple(set([x.pitchClass for x in c.pitches]))
+                p = tuple({x.pitchClass for x in c.pitches})
             else:
                 continue
             if p in trimmedMaxChords and p != currentGreedyChordPCs:

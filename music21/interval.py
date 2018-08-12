@@ -265,7 +265,7 @@ def convertSpecifier(specifier):
                     post = i
                     break
     # if no match or None, None will be returned
-    if post != None:
+    if post is not None:
         postStr = prefixSpecs[post]
     return post, postStr
 
@@ -2972,7 +2972,7 @@ class Test(unittest.TestCase):
         def collectAccidentalDisplayStatus(s):
             post = []
             for e in s.flat.notes:
-                if e.pitch.accidental != None:
+                if e.pitch.accidental is not None:
                     post.append(e.pitch.accidental.displayStatus)
                 else: # mark as not having an accidental
                     post.append('x')

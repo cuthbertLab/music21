@@ -333,7 +333,6 @@ class TieState(State):
             self.affectedTokens[0].tie.type = 'continue'
         if len(self.affectedTokens) > 1: # could be end.
             self.affectedTokens[1].tie = tie.Tie('stop')
-        return None
 
 
 class TupletState(State):

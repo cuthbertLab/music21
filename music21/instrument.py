@@ -194,13 +194,13 @@ class Instrument(base.Music21Object):
         Find a viable name, looking first at instrument, then part, then
         abbreviations.
         '''
-        if self.partName != None:
+        if self.partName is not None:
             return self.partName
-        elif self.partAbbreviation != None:
+        elif self.partAbbreviation is not None:
             return self.partAbbreviation
-        elif self.instrumentName != None:
+        elif self.instrumentName is not None:
             return self.instrumentName
-        elif self.instrumentAbbreviation != None:
+        elif self.instrumentAbbreviation is not None:
             return self.instrumentAbbreviation
         else:
             return None
@@ -265,7 +265,7 @@ class Instrument(base.Music21Object):
         maxMidi = 16
         channelFilter = []
         for e in usedChannels:
-            if e != None:
+            if e is not None:
                 channelFilter.append(e)
 
         if not channelFilter:

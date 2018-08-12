@@ -14,7 +14,7 @@
 '''
 Object for dealing with vertical simultaneities in a fast way w/o Chord's overhead.
 '''
-import collections
+import collections.abc
 import copy
 import unittest
 
@@ -1042,7 +1042,7 @@ class Verticality:
 #------------------------------------------------------------------------------
 
 
-class VerticalitySequence(collections.Sequence):
+class VerticalitySequence(collections.abc.Sequence):
     r'''
     A segment of verticalities.
     '''

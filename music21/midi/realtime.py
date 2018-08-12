@@ -76,25 +76,25 @@ class StreamPlayer:  # pragma: no cover
             import pygame
             self.pygame = pygame
         except ImportError:
-            raise StreamPlayerException("StreamPlayer requires pygame.  Install first")
+            raise StreamPlayerException('StreamPlayer requires pygame.  Install first')
         if (self.mixerInitialized is False or
-                ("reinitMixer" in keywords and keywords["reinitMixer"] != False)):
-            if "mixerFreq" in keywords:
-                mixerFreq = keywords["mixerFreq"]
+                ('reinitMixer' in keywords and keywords['reinitMixer'] is not False)):
+            if 'mixerFreq' in keywords:
+                mixerFreq = keywords['mixerFreq']
             else:
                 mixerFreq = 44100
 
-            if "mixerBitSize" in keywords:
+            if 'mixerBitSize' in keywords:
                 mixerBitSize = keywords['mixerBitSize']
             else:
                 mixerBitSize = -16
 
-            if "mixerChannels" in keywords:
+            if 'mixerChannels' in keywords:
                 mixerChannels = keywords['mixerChannels']
             else:
                 mixerChannels = 2
 
-            if "mixerBuffer" in keywords:
+            if 'mixerBuffer' in keywords:
                 mixerBuffer = keywords['mixerBuffer']
             else:
                 mixerBuffer = 1024
@@ -133,7 +133,7 @@ class StreamPlayer:  # pragma: no cover
             self.pygame.mixer.music.load(stringIOFile)
         except self.pygame.error:
             raise StreamPlayerException(
-                "Could not play music file %s because: %s" % (stringIOFile,
+                'Could not play music file %s because: %s' % (stringIOFile,
                                                               self.pygame.get_error()))
         self.pygame.mixer.music.play()
         framerate = int(1000 / busyWaitMilliseconds) # coerce into int even if given a float.
@@ -174,7 +174,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         def busyCounter(timeList):
             timeCounter = timeList[0]
             timeCounter.times += timeCounter.updateTime
-            print("hi! waited %d milliseconds" % (timeCounter.times))
+            print('hi! waited %d milliseconds' % (timeCounter.times))
 
         class Mock():
             times = 0

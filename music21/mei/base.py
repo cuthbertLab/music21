@@ -359,7 +359,7 @@ def safePitch(name, accidental=None, octave=''):
     >>> safePitch('D', '#', '6')
     <music21.pitch.Pitch D#6>
     '''
-    if len(name) < 1:
+    if not name:
         return pitch.Pitch()
     elif accidental is None:
         return pitch.Pitch(name + octave)

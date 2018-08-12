@@ -10,7 +10,7 @@
 determining the type of an object.
 """
 import base64
-import collections
+import collections.abc
 import io
 import operator
 import time
@@ -334,7 +334,7 @@ def is_iterator(obj):
     if not PY3:
         is_file = isinstance(obj, __builtin__.file)
 
-    return (isinstance(obj, collections.Iterator) and
+    return (isinstance(obj, collections.abc.Iterator) and
             not isinstance(obj, io.IOBase) and not is_file)
 
 
@@ -379,7 +379,7 @@ def has_reduce(obj):
         return (False, False)
 
     has_reduce = False
-    has_reduce_ex = False
+    has_reduce_ex = False # @UnusedVariable
 
     REDUCE = '__reduce__'
     REDUCE_EX = '__reduce_ex__'

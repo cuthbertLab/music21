@@ -131,7 +131,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                 keyValue = key.Key(key.convertKeyStringToMusic21KeyString(keyValue))
             except:
                 raise VoiceLeadingQuartetException(
-                    'got a key signature string that is not supported: %s', keyValue)
+                    'got a key signature string that is not supported: %s' % keyValue)
         else:
             try:
                 isKey = True if 'Key' in keyValue.classes else False
@@ -1938,9 +1938,12 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
             try:
                 if value.isClassOrSubclass([note.Note, pitch.Pitch]):
                     return value
+                else:
+                    return None
             except:
                 raise ThreeNoteLinearSegmentException(
                     'not a valid note specification: %s' % value)
+        
 
     n1 = property(_getN1, _setN1, doc='''
         get or set the first note (left-most) in the segment

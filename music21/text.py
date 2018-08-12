@@ -154,7 +154,7 @@ def prependArticle(src, language=None):
         if trailing.lower() == candidate:
             match = trailing
             break
-    if match != None:
+    if match is not None:
         # recombine everything except the last comma split
         return match + ' ' + ','.join(src.split(',')[:-1])
     else: # not match
@@ -192,7 +192,7 @@ def postpendArticle(src, language=None):
         if leading.lower() == candidate:
             match = leading
             break
-    if match != None:
+    if match is not None:
         # recombine everything except the last comma split
         return ' '.join(src.split(' ')[1:]) + ', %s' % match
     else: # not match
@@ -314,7 +314,7 @@ class TextBox(base.Music21Object):
         return self._page
 
     def _setPage(self, value):
-        if value != None:
+        if value is not None:
             self._page = int(value) # must be an integer
         # do not set otherwise
 

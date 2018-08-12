@@ -503,7 +503,8 @@ class FiguredBassLine:
                         del movementsBC[possibB]
                 for (possibA, possibBList) in list(movementsAB.items()):
                     movementsAB[possibA] = list(
-                                filter(lambda possibB: possibB in movementsBC, possibBList))
+                        # pylint: disable=cell-var-from-loop
+                        filter(lambda possibB: (possibB in movementsBC), possibBList))
 
             for (possibA, possibBList) in list(movementsAB.items()):
                 if not possibBList:

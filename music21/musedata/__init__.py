@@ -63,7 +63,7 @@ class MuseDataRecord:
         self.src = src # src here is one line of text
         self.parent = parent
 
-        if self.parent != None:
+        if self.parent is not None:
             # form measure, then part
             self.stage = self.parent.parent.stage
         else:
@@ -224,7 +224,7 @@ class MuseDataRecord:
             acc = pitch.Accidental('flat')
         # if no match or ' ', return None
 
-        if acc != None:
+        if acc is not None:
             # not sure what the expectation is here: could be 'normal'
             # 'unless-repeated'
             acc.displayType = 'always'
@@ -320,9 +320,9 @@ class MuseDataRecord:
                     "Error in parsing: " + self.src + "\n   Column 5 must be blank.")
 
         # the parent is the measure, and the parent of that is the part
-        if self.parent != None:
+        if self.parent is not None:
             dpq = self.parent.parent.getDivisionsPerQuarterNote()
-        elif divisionsPerQuarterNote != None:
+        elif divisionsPerQuarterNote is not None:
             dpq = divisionsPerQuarterNote
         else:
             raise MuseDataException('cannot access parent container of this record ' +
@@ -617,7 +617,7 @@ class MuseDataMeasure:
         # store reference to parent Part
         self.parent = parent
 
-        if self.parent != None:
+        if self.parent is not None:
             # form measure, then part
             self.stage = self.parent.stage
         else:
@@ -658,7 +658,7 @@ class MuseDataMeasure:
         elif dataBar in ['heavy4', 'heave4']:
             blStyle = 'heavy-heavy'
         else:
-            raise MuseDataException('cannot process bar data definition: %s', dataBar)
+            raise MuseDataException('cannot process bar data definition: %s' % dataBar)
 
         bl = bar.Barline(blStyle)
 
@@ -1418,7 +1418,7 @@ class MuseDataPart:
             boundaries.append((firstPostAttributesIndex, mIndices[0] - 1))
             startIterIndex = 0
 
-        if startIterIndex != None:
+        if startIterIndex is not None:
             for i in range(startIterIndex, len(mIndices)):
                 # if the last
                 if i == len(mIndices) - 1:
@@ -1427,7 +1427,6 @@ class MuseDataPart:
                     boundaries.append((mIndices[i], mIndices[i + 1] - 1))
 
         return boundaries
-
 
 
     def update(self):

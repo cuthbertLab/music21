@@ -4837,7 +4837,7 @@ class Pitch:
                   and pPast.accidental.name == pSelf.accidental.name
                   and octaveMatch is True):
                 if (cautionaryNotImmediateRepeat is False
-                    and pPast.accidental.displayStatus != False):
+                    and pPast.accidental.displayStatus is not False):
                     # do not show (unless previous note's accidental wasn't displayed
                     # because of a tie or some other reason)
                     # result will be False, do not need to check altered tones
@@ -5318,8 +5318,6 @@ class Test(unittest.TestCase):
         assert(bm.flat.notes[6].pitch.accidental is not None)               # En5
         assert(bm.flat.notes[6].pitch.accidental.name == 'natural')
         assert(bm.flat.notes[6].pitch.accidental.displayStatus is True)
-
-        return
 
     def testPitchEquality(self):
         '''Test updating accidental display.

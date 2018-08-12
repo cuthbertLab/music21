@@ -476,7 +476,7 @@ def realizeVolume(srcStream,
                 dm = False # set to not search dynamic context
                 for k in range(lastRelevantKeyIndex, len(bKeys)):
                     start, end = bKeys[k]
-                    if eStart >= start and eStart < end:
+                    if end > eStart >= start:
                         # store so as to start in the same position
                         # for next element
                         lastRelevantKeyIndex = k

@@ -105,11 +105,9 @@ class SubConverter:
             with open(str(filePath), 'rb') as f: # remove str in Py3.6
                 dataStream = f.read()
 
-        try:
-            self.parseData(dataStream, number)
-        except NotImplementedError:  # just for showing that this is possible.
-            raise
-
+        # might raise NotImplementedError
+        self.parseData(dataStream, number)
+        
         return self.stream
 
     def _getStream(self):

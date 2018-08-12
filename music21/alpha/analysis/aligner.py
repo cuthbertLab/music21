@@ -13,7 +13,7 @@ import enum
 import operator
 import unittest
 
-from music21 import base as base
+from music21 import base
 from music21 import exceptions21
 from music21 import metadata
 from music21.alpha.analysis import hasher
@@ -51,7 +51,7 @@ class ChangeOps(enum.IntEnum):
         colorDict = {0: "green", 1: "red", 2: "purple", 3: None}
         return colorDict[self.value]
 
-class StreamAligner(object):
+class StreamAligner:
     """
     Stream Aligner is a dumb object that takes in two streams and forces them to align
     without any thought to any external variables

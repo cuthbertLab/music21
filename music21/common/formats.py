@@ -337,7 +337,7 @@ def findFormatExtURL(url):
                     break
     # presently, not keeping the extension returned from this function
     # reason: mxl is converted to xml; need to handle mxl files first
-    if ext != None:
+    if ext is not None:
         fileFormat, unused_junk = findFormat(ext)
         return fileFormat, ext
     else:

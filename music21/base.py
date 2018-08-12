@@ -1462,7 +1462,7 @@ class Music21Object:
         for site, positionStart, searchType in self.contextSites(
                                             returnSortTuples=True,
                                             sortByCreationTime=sortByCreationTime):
-            if searchType == 'elementsOnly' or searchType == 'elementsFirst':
+            if searchType in ('elementsOnly', 'elementsFirst'):
                 contextEl = payloadExtractor(site, flatten=False, positionStart=positionStart)
 
                 if contextEl is not None and wellFormed(contextEl, site):
@@ -2796,8 +2796,9 @@ class Music21Object:
         eRemain = copy.deepcopy(self)
 
         # clear lyrics from remaining parts
-        if hasattr(eRemain, 'lyrics'):
-            eRemain.lyrics = []
+        if hasattr(eRemain, 'lyrics') and not callable(eRemain.lyrics):
+            # lyrics is a function on Streams...
+            eRemain.lyrics = [] # pylint: disable=attribute-defined-outside-init
 
         spannerList = []
         for listType in ('expressions', 'articulations'):
@@ -2849,7 +2850,7 @@ class Music21Object:
                         or 'Unpitched' in e.classes):
 
             forceEndTieType = 'stop'
-            if e.tie is not None:
+            if hasattr(e, 'tie') and e.tie is not None:
                 # the last tie of what was formally a start should
                 # continue
                 if e.tie.type == 'start':
@@ -2863,11 +2864,13 @@ class Music21Object:
                 elif e.tie.type == 'continue':
                     forceEndTieType = 'continue'
                     # keep continue if already set
-            else:
+            elif hasattr(e, 'tie'):
                 e.tie = tie.Tie('start')  # pylint: disable=attribute-defined-outside-init
                 # # need a tie object
 
-            eRemain.tie = tie.Tie(forceEndTieType)
+            if hasattr(eRemain, 'tie'):
+                # pylint: disable=attribute-defined-outside-init
+                eRemain.tie = tie.Tie(forceEndTieType)
 
         elif addTies and 'Chord' in e.classes:
             for i in range(len(e._notes)):

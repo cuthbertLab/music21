@@ -1274,8 +1274,8 @@ class Iterator:
                     analysis = corpus.parse(riemenschneiderName)
                     if analysis is not None:
                         chorale.insert(0, analysis.parts[0])
-                except Exception: # fail silently # pylint: disable=broad-except
-                    pass
+                except Exception: # pylint: disable=broad-except
+                    pass # fail silently
             # Store the correct title in metadata (replacing the chorale number as it is parsed)
             if chorale.metadata is None:
                 chorale.metadata = metadata.Metadata()

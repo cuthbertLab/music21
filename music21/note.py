@@ -150,24 +150,14 @@ class Lyric(style.StyleMixin):
         # these are set by setTextAndSyllabic
         self.text = None
         # given as begin, middle, end, or single
-        if 'syllabic' in kwargs:
-            self.syllabic = kwargs['syllabic']
-        else:
-            self.syllabic = None
+        self.syllabic = kwargs.get('syllabic', None)
+        applyRaw = kwargs.get('applyRaw', False)
 
-        if 'applyRaw' in kwargs:
-            applyRaw = kwargs['applyRaw']
-        else:
-            applyRaw = False
         if text is not None:
             self.setTextAndSyllabic(text, applyRaw)
 
         self.number = number
-
-        if 'identifier' in kwargs:
-            self.identifier = kwargs['identifier']
-        else:
-            self.identifier = None
+        self.identifier = kwargs.get('identifier', None)
 
     ### SPECIAL METHODS ###
 
@@ -1109,11 +1099,11 @@ class Note(NotRest):
         # converting to sets produces ordered cols that remove duplicate
         # however, must then convert to list to match based on class ==
         # not on class id()
-        if (sorted(list(set([x.classes[0] for x in self.articulations]))) !=
-            sorted(list(set([x.classes[0] for x in other.articulations])))):
+        if (sorted({x.classes[0] for x in self.articulations}) !=
+            sorted({x.classes[0] for x in other.articulations})):
             return False
-        if (sorted(list(set([x.classes[0] for x in self.expressions]))) !=
-            sorted(list(set([x.classes[0] for x in other.expressions])))):
+        if (sorted({x.classes[0] for x in self.expressions}) !=
+            sorted({x.classes[0] for x in other.expressions})):
             return False
 
         # Tie objects if present compare only type

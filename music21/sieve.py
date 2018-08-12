@@ -148,7 +148,7 @@ def eratosthenes(firstCandidate=2):
         # q is the candidate, the running integer list
         p = D.pop(q, None) # returns item for key, None if not in dict
         # if candidate (q) is already in dict, not a prime
-        if p != None: # key (prime candidate) in dictionary
+        if p is not None: # key (prime candidate) in dictionary
             # update dictionary w/ the next multiple of this prime not already
             # in dicitionary
             nextMult = p + q # prime prime plus the candidate; next multiple
@@ -184,10 +184,10 @@ def rabinMiller(n):
     False
     '''
     n = abs(n)
-    if n in [2, 3]:
+    if n in (2, 3):
         return True
     m = n % 6 # if n (except 2 and 3) mod 6 is not 1 or 5, then n isn't prime
-    if m != 1 and m != 5:
+    if m not in (1, 5):
         return False
     # primes up to 100;  2, 3 handled by mod 6
     primes = [5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43,
@@ -247,7 +247,7 @@ def discreteBinaryPad(series, fixRange=None):
         if not common.isNum(x):
             raise UnitException('non integer value found')
     discrete = []
-    if fixRange != None:
+    if fixRange is not None:
         fixRange.sort() # make sure sorted
         minVal = fixRange[0]
         maxVal = fixRange[-1]
@@ -287,7 +287,7 @@ def unitNormRange(series, fixRange=None):
 
 
     '''
-    if fixRange != None:
+    if fixRange is not None:
         fixRange.sort()
         minFound = fixRange[0]
         maxFound = fixRange[-1]
@@ -564,11 +564,11 @@ class PrimeSegment:
         '''
         z = [self.seg[0], self.seg[-1]]
 
-        if segmentFormat in ['bin', 'binary']:
+        if segmentFormat in ('bin', 'binary'):
             return discreteBinaryPad(self.seg, z)
-        elif segmentFormat in ['unit']:
+        elif segmentFormat == 'unit':
             return unitNormRange(self.seg, z)
-        elif segmentFormat in ['wid', 'width']:
+        elif segmentFormat in ('wid', 'width'):
             wid = []
             for i in range(len(self.seg) - 1):
                 wid.append((self.seg[i + 1]-self.seg[i]))
@@ -601,7 +601,7 @@ class Residual:
         self._z = z
         #print 'residual init self._z', self._z
         self._m = m
-        if neg not in [0, 1]:
+        if neg not in (0, 1):
             raise ResidualException('negative value must be 0, 1, or a Boolean')
         self._neg = neg # negative, complement boolean
         if self._m == 0: # 0 mode causes ZeroDivisionError
@@ -669,14 +669,14 @@ class Residual:
         else:
             seg = subset
 
-        if segmentFormat in ['bin', 'binary']:
+        if segmentFormat in ('bin', 'binary'):
             return discreteBinaryPad(seg, z)
-        elif segmentFormat in ['unit']:
+        elif segmentFormat == 'unit':
             return unitNormRange(seg, z)
-        elif segmentFormat in ['wid', 'width']: # difference always equal to m
+        elif segmentFormat in ('wid', 'width'): # difference always equal to m
             wid = [self._m] * (len(seg) - 1) # one shorter than segment
             return wid
-        elif segmentFormat in ['int', 'integer']: # int, integer
+        elif segmentFormat in ('int', 'integer'): # int, integer
             return seg
         else:
             raise ResidualException('%s not a valid sieve segmentFormat string.' % segmentFormat)
@@ -931,7 +931,7 @@ class CompressionSegment:
 
     def _zUpdate(self, z=None):
         # z must at least be a superset of match
-        if z != None: # its a list
+        if z is not None: # its a list
             if not self._subset(self._match, z):
                 raise CompressionSegmentException(
                     'z range must be a superset of desired segment')
@@ -1457,7 +1457,7 @@ class Sieve:
         if z is None: # if none given, give internal
             z = self._z
         # z is valid, gets default from residual class
-        if not common.isListLike(z) and z != None:
+        if not common.isListLike(z) and z is not None:
             raise SieveException('z must be a list of integers, not %r' % z)
         valList = self._resLib[resId](n, z) # call residual object
         return self._setInstantiateStr(valList)
@@ -1553,18 +1553,18 @@ class Sieve:
                 msg = 'negation cannot be used without operands'
                 raise SieveException('badly formed logical string (a): (%s)' % msg)
             # attempting to use negationg as a binary operators
-            elif (char == NEG and charPrevious != None and
+            elif (char == NEG and charPrevious is not None and
                 charPrevious in RESIDUAL): # digit, or @ sign
                 msg = 'negation cannot be used as a binary operator'
                 raise SieveException('badly formed logical string (b): (%s)' % msg)
             # check if NEG is not folloed by a digit;
             # special case of NEG; need to convert into a binary operator
-            elif (char == NEG and charNext != None and
+            elif (char == NEG and charNext is not None and
                 charNext == LGROUP):
                 # if not first char, and the prevous char is not an operator or
                 # a delimter, this is an error (binary negation)
-                if (charPrevious != None and charPrevious not
-                    in [LGROUP, AND, OR, XOR]):
+                if (charPrevious is not None and charPrevious not
+                    in (LGROUP, AND, OR, XOR)):
                     msg = 'negation must be of a group and isolated by delimiters'
                     raise SieveException('badly formed logical string (c): (%s)' % msg)
                 # add a set of z, or 1@0
@@ -1713,11 +1713,11 @@ class Sieve:
 
         seg = list(seg)
         seg.sort()
-        if segmentFormat in ['bin', 'binary']:
+        if segmentFormat in ('bin', 'binary'):
             return discreteBinaryPad(seg, z)
-        elif segmentFormat in ['unit']:
+        elif segmentFormat == 'unit':
             return unitNormRange(seg, z)
-        elif segmentFormat in ['wid', 'width']:
+        elif segmentFormat in ('wid', 'width'):
             wid = []
             for i in range(len(seg) - 1):
                 wid.append((seg[i + 1]-seg[i]))
@@ -1780,7 +1780,7 @@ class Sieve:
             zMax = p + zStep
 
             # must collect non width formats as integer values; then convert
-            if segmentFormat in ['wid', 'width']:
+            if segmentFormat in ('wid', 'width'):
                 segmentPartial = self.segment(self._state, n,
                                               list(range(zMin, zMax)), segmentFormat)
             else: # if a unit, need to start with integers
@@ -1801,10 +1801,10 @@ class Sieve:
 
         # only width format comes out correct after concatenation
         # for unit and binary, derive new z based on min and max
-        if format in ['unit']:
+        if segmentFormat == 'unit':
             # make z to minimum and max value found
             return unitNormRange(seg, range(seg[0], seg[-1] + 1))
-        elif format in ['bin', 'binary']:
+        elif segmentFormat in ('bin', 'binary'):
             # make to minimum and max value found
             return discreteBinaryPad(seg, range(seg[0], seg[-1] + 1))
         else:

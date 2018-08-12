@@ -1244,7 +1244,6 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
         except basic.BrailleBasicException as bbe:
             if bbe.args[0] != "No heading can be made.":
                 raise bbe
-        return None
 
     def extractNoteGrouping(self):
         (rightKey, leftKey) = self.currentGroupingPair
@@ -1287,7 +1286,6 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
         else:
             lh_braille = ""
         self.addNoteGroupings(currentMeasureNumber, rh_braille, lh_braille)
-        return None
 
 #     #noinspection PyUnusedLocal
 #     def extractSignatureGrouping(self, brailleKeyboard):

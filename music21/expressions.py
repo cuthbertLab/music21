@@ -61,7 +61,10 @@ def realizeOrnaments(srcObject):
     else:
         preExpandList = []
         postExpandList = []
-        while 1 == 1:
+        
+        loopBuster = 100
+        while loopBuster:
+            loopBuster -= 1
             thisExpression = srcObject.expressions[0]
             if hasattr(thisExpression, 'realize'):
                 preExpand, newSrcObject, postExpand = thisExpression.realize(srcObject)

@@ -1207,7 +1207,7 @@ class LyPrefixCompositeMusic(LyObject):
         t = self.type
         if t == 'scheme':
             return str(self.genericPrefixMusicScm)
-        elif t == 'context' or t == 'new':
+        elif t in ('context', 'new'):
             c = self.backslash + t + ' ' + str(self.simpleString) + ' '
             if self.optionalId is not None:
                 c += str(self.optionalId) + ' '

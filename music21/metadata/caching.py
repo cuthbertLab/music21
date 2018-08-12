@@ -358,7 +358,7 @@ class JobProcessor:
         job_queue.close()
         for worker in workers:
             worker.join()
-        return # end generator
+        # end generator
 
     @staticmethod
     def process_serial(jobs):
@@ -376,7 +376,7 @@ class JobProcessor:
                 'filePath': job.filePath,
                 'remainingJobs': remainingJobs,
                 }
-        return # end generator
+        # end generator
 
 
 #------------------------------------------------------------------------------
@@ -408,7 +408,6 @@ class WorkerProcess(multiprocessing.Process): # @UndefinedVariable pylint: disab
             job.run()
             self.job_queue.task_done()
             self.result_queue.put(pickle.dumps(job, protocol=0))
-        return
 
 
 #------------------------------------------------------------------------------

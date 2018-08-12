@@ -278,7 +278,7 @@ class AbstractScale(Scale):
 
         self.fixDefaultOctaveForPitchList(pitchList)
 
-        if not common.isListLike(pitchList) or len(pitchList) < 1:
+        if not common.isListLike(pitchList) or not pitchList:
             raise ScaleException("Cannot build a network from this pitch list: %s" % pitchList)
         intervalList = []
         for i in range(len(pitchList) - 1):

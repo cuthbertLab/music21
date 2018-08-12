@@ -245,7 +245,7 @@ class Chord(note.NotRest):
 #            for thisNote in notes:
 #                # get duration from first note
 #                # but should other notes have the same duration?
-#                if hasattr(thisNote, 'duration') and thisNote.duration != None:
+#                if hasattr(thisNote, 'duration') and thisNote.duration is not None:
 #                    self.duration = notes[0].duration
 #                    break
 
@@ -1061,7 +1061,7 @@ class Chord(note.NotRest):
                 dif = 1
             else: # equal
                 dif = None
-            if dif != None:
+            if dif is not None:
                 while pBass.octave != forceOctave:
                     # shift octave of all pitches
                     for p in returnObj.pitches:
@@ -2306,10 +2306,7 @@ class Chord(note.NotRest):
         ### No other pitches may be present that aren't the m6 scale step,
         ### raised 4th, tonic, or supertonic.
         for samplePitch in augSixthChord.pitches:
-            if (not (samplePitch == bass
-                     or samplePitch == root
-                     or samplePitch == tonic
-                     or samplePitch == supertonic)):
+            if samplePitch not in (bass, root, tonic, supertonic):
                 return False
         return True
 
@@ -2550,7 +2547,7 @@ class Chord(note.NotRest):
 
         ### No other pitches may be present that aren't the m6 scale step, raised 4th, or tonic.
         for samplePitch in augSixthChord.pitches:
-            if not (samplePitch == bass or samplePitch == root or samplePitch == tonic):
+            if samplePitch not in (bass, root, tonic):
                 return False
 
         if restrictDoublings:
@@ -3579,7 +3576,7 @@ class Chord(note.NotRest):
                 break
         if not match: # more loose comparison: by ==
             for d in self._notes:
-                if d.pitch == pitchTarget or d == pitchTarget:
+                if pitchTarget not in (d, d.pitch):
                     d.tie = t
                     match = True
                     break
@@ -4213,7 +4210,7 @@ class Chord(note.NotRest):
 
         '''
         post = chordTables.addressToCommonNames(self.chordTablesAddress)
-        if post != None:
+        if post is not None:
             nameStr = post[0] # get first
         else:
             nameStr = ''

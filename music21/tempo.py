@@ -466,7 +466,7 @@ class MetronomeMark(TempoIndication):
             # should be a music21.duration.Duration object or a
             # Music21Object with a duration or None
         else:
-            raise TempoException('Cannot get a Duration from the supplied object: %s', value)
+            raise TempoException('Cannot get a Duration from the supplied object: %s' % value)
 
     referent = property(_getReferent, _setReferent, doc=
         '''

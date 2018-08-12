@@ -709,7 +709,7 @@ class ContiguousSegmentSearcher:
             activePitches = []
             for thisChord in activeChordList:
                 activePitches.extend(thisChord.pitches[:])
-            uniqueActivePitchClasses = set([p.pitchClass for p in activePitches])
+            uniqueActivePitchClasses = {p.pitchClass for p in activePitches}
             numUniqueActivePitchClasses = len(uniqueActivePitchClasses)
             if numUniqueActivePitchClasses == self.searchLength:
                 self.activeChordList = activeChordList

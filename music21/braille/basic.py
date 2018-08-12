@@ -1450,7 +1450,7 @@ def yieldDots(brailleCharacter):
     ⠄
     '''
     for dots in lookup.binary_dots[brailleCharacter]:
-        if dots == '10' or dots == '11':
+        if dots in ('10', '11'):
             yield symbols['dot']
 
 #-------------------------------------------------------------------------------

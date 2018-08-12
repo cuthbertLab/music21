@@ -1292,7 +1292,7 @@ def makeTupletBrackets(s, *, inPlace=False):
                 #                         completionCount, completionTarget])
 
             # if tuplet next and previous not None, increment
-            elif tupletPrevious != None and tupletNext != None:
+            elif tupletPrevious is not None and tupletNext is not None:
                 # do not need to change tuplet type; should be None
                 pass
                 #environLocal.printDebug(['completion count, target:',
