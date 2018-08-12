@@ -160,15 +160,16 @@ def _indexSingleMulticore(filePath, *args, **kwds):
             indexOutput = ""
         else:
             raise(e)
-    return(shortfp, indexOutput)
+    return(shortfp, indexOutput, filePath)
 
 def _giveUpdatesMulticore(numRun, totalRun, latestOutput):
     print("Indexed %s (%d/%d)" % (latestOutput[0], numRun, totalRun))
 
 
 def indexScoreFilePaths(scoreFilePaths,
-                        giveUpdates=False,
+                        giveUpdates=False,                        
                         *args,
+                        runMulticore=True,
                         **kwds):
     '''
     Returns a dictionary of the lists from indexScoreParts for each score in
@@ -198,7 +199,25 @@ def indexScoreFilePaths(scoreFilePaths,
 
     indexFunc = partial(_indexSingleMulticore, *args, **kwds)
 
-    rpList = common.runParallel(scoreFilePaths, indexFunc, updateFunction=updateFunction)
+
+    for i in range(len(scoreFilePaths)):
+        if not isinstance(scoreFilePaths[i], pathlib.Path):
+            scoreFilePaths[i] = pathlib.Path(scoreFilePaths[i])
+
+    if runMulticore:
+        rpListUnOrdered = common.runParallel(scoreFilePaths, indexFunc, updateFunction=updateFunction)
+    else:
+        rpListUnOrdered = common.runNonParallel(scoreFilePaths, indexFunc, updateFunction=updateFunction)
+    
+    # ensure that orderedDict is sorted by original scoreFiles
+    rpDict = {}
+    for outShortName, outData, originalPathlib in rpListUnOrdered:
+        rpDict[originalPathlib] = (outShortName, outData)
+
+    rpList = []    
+    for p in scoreFilePaths:
+        rpList.append(rpDict[p])
+        
     scoreDict = OrderedDict(rpList)
 
     return scoreDict
