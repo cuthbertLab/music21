@@ -305,25 +305,26 @@ def scoreSimilarity(
     pairwise similarity.
 
     >>> filePaths = []
-    >>> filePaths.append(corpus.search('bwv197.5.mxl')[0].sourcePath)
-    >>> filePaths.append(corpus.search('bwv190.7.mxl')[0].sourcePath)
-    >>> filePaths.append(corpus.search('bwv197.10.mxl')[0].sourcePath)
+    >>> for p in ('bwv197.5.mxl', 'bwv190.7.mxl', 'bwv197.10.mxl'):
+    ...     #_DOCS_SHOW source = corpus.search(p)[0].sourcePath
+    ...     source = corpus.corpora.CoreCorpus().search(p)[0].sourcePath #_DOCS_HIDE
+    ...     filePaths.append(source)
     >>> scoreDict = search.segment.indexScoreFilePaths(filePaths)
     >>> scoreSim = search.segment.scoreSimilarity(scoreDict, forceDifflib=True) #_DOCS_HIDE
     >>> #_DOCS_SHOW scoreSim = search.segment.scoreSimilarity(scoreDict)
     >>> len(scoreSim)
-    306
+    496
 
     Returns a list of tuples of first score name, first score voice number, first score
     measure number, second score name, second score voice number, second score
     measure number, and similarity score (0 to 1).
 
-    >>> for result in scoreSim[64:68]:
+    >>> for result in scoreSim[133:137]:
     ...     result
-    ('bwv197.5.mxl', 1, 0, (1, 7), 'bwv190.7.mxl', 3, 1, (7, 18), 0.13...)
-    ('bwv197.5.mxl', 1, 0, (1, 7), 'bwv190.7.mxl', 3, 2, (14, 22), 0.109...)
-    ('bwv197.5.mxl', 1, 0, (1, 7), 'bwv197.10.mxl', 0, 0, (1, 10), 0.233...)
-    ('bwv197.5.mxl', 1, 0, (1, 7), 'bwv197.10.mxl', 1, 0, (1, 9), 0.3)
+    ('bwv197.5.mxl', 1, 1, (4, 10), 'bwv190.7.mxl', 3, 4, (22, 30), 0.13...)
+    ('bwv197.5.mxl', 1, 1, (4, 10), 'bwv197.10.mxl', 0, 0, (0, 8), 0.2)
+    ('bwv197.5.mxl', 1, 1, (4, 10), 'bwv197.10.mxl', 1, 0, (0, 7), 0.266...)
+    ('bwv197.5.mxl', 1, 1, (4, 10), 'bwv197.10.mxl', 1, 1, (4, 9), 0.307...)
     '''
     similarityScores = []
     scoreIndex = 0
