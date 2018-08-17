@@ -38,16 +38,11 @@ _MOD = 'chord'
 environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------
-
-
 class ChordException(exceptions21.Music21Exception):
     pass
 
 
-
-
 #-------------------------------------------------------------------------------
-
 
 class Chord(note.NotRest):
     '''Class for dealing with chords
@@ -91,12 +86,9 @@ class Chord(note.NotRest):
     >>> cmaj2
     <music21.chord.Chord C E G>
 
-
-
     Chord has the ability to determine the root of a chord, as well as the bass note of a chord.
     In addition, Chord is capable of determining what type of chord a particular chord is, whether
     it is a triad or a seventh, major or minor, etc, as well as what inversion the chord is in.
-
 
     A chord can also be created from pitch class numbers:
 
@@ -134,7 +126,6 @@ class Chord(note.NotRest):
     'half'
     >>> myChord.duration.dots
     3
-
 
 
     OMIT_FROM_DOCS
@@ -469,7 +460,7 @@ class Chord(note.NotRest):
         '''
         msg = ['<']
         for e in vectorList: # should be numbers
-            eStr = pitch._convertPitchClassToStr(e)
+            eStr = pitch.convertPitchClassToStr(e)
             msg.append(eStr)
         msg.append('>')
         return ''.join(msg)
@@ -1544,19 +1535,28 @@ class Chord(note.NotRest):
         >>> chord.fromIntervalVector((1, 1, 1, 1, 1, 1)).getZRelation()
         <music21.chord.Chord C D- E- G>
 
+        Z relation will always be zero indexed:
+
+        >>> c = chord.Chord('D D# F# G#')
+        >>> c.getZRelation()
+        <music21.chord.Chord C D- E- G>
 
         >>> chord.Chord('C E G').getZRelation() is None
         True
         '''
         if self.hasZRelation:
-            chordTablesAddress = tuple(self.chordTablesAddress)
+            chordTablesAddress = self.chordTablesAddress
             v = chordTables.addressToIntervalVector(chordTablesAddress)
             addresses = chordTables.intervalVectorToAddress(v)
             #environLocal.printDebug(['addresses', addresses,
             #    'chordTablesAddress', chordTablesAddress])
             # addresses returned here are 2 elements lists
-            addresses.remove(chordTablesAddress[:2])
-            prime = chordTables.addressToTransposedNormalForm(addresses[0])
+            other = None
+            for thisAddress in addresses:
+                if thisAddress.forteClass != chordTablesAddress.forteClass:
+                    other = thisAddress
+            # other should always be defined to not None
+            prime = chordTables.addressToTransposedNormalForm(other)
             return Chord(prime)
         return None
         # c2.getZRelation()  # returns a list in non-ET12 space...
@@ -3764,7 +3764,7 @@ class Chord(note.NotRest):
     def commonName(self):
         '''
         Return the most common name associated with this Chord as a string.
-        does not currently check enharmonic equivalents.
+        Checks some common enharmonic equivalents.
 
         >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.commonName
@@ -3774,6 +3774,10 @@ class Chord(note.NotRest):
         >>> c2.commonName
         'major triad'
 
+        >>> c2b = chord.Chord(['c', 'f-', 'g'])
+        >>> c2b.commonName
+        'enharmonic equivalent to major triad'
+
         >>> c3 = chord.Chord(['c', 'd-', 'e', 'f#'])
         >>> c3.commonName
         'all-interval tetrachord'
@@ -3781,8 +3785,75 @@ class Chord(note.NotRest):
         >>> c3 = chord.Chord([0, 1, 2, 3, 4, 9])
         >>> c3.commonName
         ''
+        
+        Dominant seventh and German/Swiss sixths are distinguished
+        
+        >>> c4a = chord.Chord(['c', 'e', 'g', 'b-'])
+        >>> c4a.commonName
+        'dominant seventh chord'
+
+        >>> c4b = chord.Chord(['c', 'e', 'g', 'a#'])
+        >>> c4b.commonName
+        'German augmented sixth chord'        
+
+        >>> c4c = chord.Chord(['c', 'e', 'f##', 'a#'])
+        >>> c4c.commonName # some call it Alsacian or English
+        'Swiss augmented sixth chord'
+        
+        Dyads are called by actual name:
+        
+        >>> dyad1 = chord.Chord('C E')
+        >>> dyad1.commonName
+        'Major Third'
+        >>> dyad2 = chord.Chord('C F-')
+        >>> dyad2.commonName
+        'Diminished Fourth'
+        
         '''
-        ctn = chordTables.addressToCommonNames(self.chordTablesAddress)
+        cta = self.chordTablesAddress
+        if cta.cardinality == 2:
+            return interval.Interval(self.pitches[0], self.pitches[1]).niceName
+        
+        ctn = chordTables.addressToCommonNames(cta)
+        forteClass = self.forteClass
+        # forteClassTn = self.forteClassTn
+        enharmonicTests = {
+            '3-11A': self.isMinorTriad,
+            '3-11B': self.isMajorTriad,
+            '3-10': self.isDiminishedTriad,
+            '3-12': self.isAugmentedTriad,
+        }
+
+        # special cases
+        if forteClass == '4-27B':
+            # dominant seventh OR German Aug 6
+            if self.isDominantSeventh():
+                return ctn[0]
+            elif self.isGermanAugmentedSixth():
+                return ctn[2]
+            elif self.isSwissAugmentedSixth():
+                return ctn[3]
+            else:
+                return 'enharmonic to ' + ctn[0]
+        elif forteClass == '4-25':
+            if self.isFrenchAugmentedSixth():
+                return ctn[1]
+            else:
+                return ctn[0]
+        elif forteClass == '3-8A':
+            if self.isItalianAugmentedSixth():
+                return ctn[1]
+            else:
+                return ctn[0]
+            
+        elif forteClass in enharmonicTests:
+            out = ctn[0]
+            test = enharmonicTests[forteClass]
+            if not test():
+                out = 'enharmonic equivalent to ' + out
+            return out
+        
+                
         if not ctn:
             return ''
         else:
@@ -4718,8 +4789,8 @@ def fromIntervalVector(notation, getZRelation=False):
         raise ChordException('cannot handle specified notation: %s' % notation)
 
     post = []
-    for card, num in addressList:
-        post.append(Chord(chordTables.addressToTransposedNormalForm([card, num])))
+    for address in addressList:
+        post.append(Chord(chordTables.addressToTransposedNormalForm(address)))
     # for now, return the first chord
     # z-related chords will have more than one
     if len(post) == 1:

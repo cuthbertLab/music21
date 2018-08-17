@@ -137,13 +137,13 @@ def _convertPitchClassToNumber(ps):
         # maybe it is a string of an integer?
         return int(ps)
 
-def _convertPitchClassToStr(pc):
+def convertPitchClassToStr(pc):
     '''
     Given a pitch class number, return a string.
 
-    >>> pitch._convertPitchClassToStr(3)
+    >>> pitch.convertPitchClassToStr(3)
     '3'
-    >>> pitch._convertPitchClassToStr(10)
+    >>> pitch.convertPitchClassToStr(10)
     'A'
     '''
     pc = pc % 12 # do just in case
@@ -1976,7 +1976,6 @@ class Pitch:
         >>> p.microtone = pitch.Microtone(-30)
         >>> p
         <music21.pitch.Pitch E-4(-30c)>
-
         ''')
 
 
@@ -1988,15 +1987,12 @@ class Pitch:
         has a non-zero microtonal adjustment or
         has a quarter tone accidental.
 
-
-
         >>> p = pitch.Pitch('g4')
         >>> p.isTwelveTone()
         True
         >>> p.microtone = -20
         >>> p.isTwelveTone()
         False
-
 
         >>> p2 = pitch.Pitch('g~4')
         >>> p2.isTwelveTone()
@@ -2171,7 +2167,6 @@ class Pitch:
 
         if not inPlace:
             return returnObj
-
 
 
     def convertMicrotonesToQuarterTones(self, *, inPlace=False):
@@ -2401,8 +2396,6 @@ class Pitch:
         MIDI pitch values are like ps values (pitchSpace) rounded to
         the nearest integer; while the ps attribute will accommodate floats.
 
-
-
         >>> c = pitch.Pitch('C4')
         >>> c.midi
         60
@@ -2410,10 +2403,8 @@ class Pitch:
         >>> c.midi
         24
 
-
         Note that like ps (pitchSpace), MIDI notes do not distinguish between
         sharps and flats, etc.
-
 
         >>> dSharp = pitch.Pitch('D#4')
         >>> dSharp.midi
@@ -2438,7 +2429,6 @@ class Pitch:
         >>> veryHighFHalfFlat.midi
         125
 
-
         >>> notAsHighNote = pitch.Pitch()
         >>> notAsHighNote.ps = veryHighFHalfFlat.midi
         >>> notAsHighNote
@@ -2455,7 +2445,6 @@ class Pitch:
         2.0
         >>> a.spellingIsInferred
         True
-
 
         More absurd octaves...
 
@@ -2539,10 +2528,8 @@ class Pitch:
         '''Name presently returns pitch name and accidental without octave.
 
         >>> a = pitch.Pitch('G#')
-
-        This only displays properly in Py3:
-
-        `a.unicodeName` -> 'G♯'
+        >>> a.unicodeName
+        'G♯'
         '''
         if self.accidental is not None:
             return self.step + self.accidental.unicode
@@ -2742,13 +2729,6 @@ class Pitch:
 
         ''')
 
-
-    def _getStepWithOctave(self):
-        if self.octave is None:
-            return self.step
-        else:
-            return self.step + str(self.octave)
-
     def _getPitchClass(self):
         pc = round(self.ps) % 12
         if pc == 12:
@@ -2852,11 +2832,8 @@ class Pitch:
         1.9
         ''')
 
-
     def _getPitchClassString(self):
         '''
-
-
         >>> a = pitch.Pitch('a3')
         >>> a._getPitchClassString()
         '9'
@@ -2864,7 +2841,7 @@ class Pitch:
         >>> a._getPitchClassString()
         'A'
         '''
-        return _convertPitchClassToStr(self._getPitchClass())
+        return convertPitchClassToStr(self._getPitchClass())
 
     pitchClassString = property(_getPitchClassString, _setPitchClass,
         doc = '''
@@ -2873,7 +2850,6 @@ class Pitch:
         respectively. Can be used to set pitch class by a
         string representation as well (though this is also
         possible with :attr:`~music21.pitch.Pitch.pitchClass`.
-
 
         >>> a = pitch.Pitch('a#3')
         >>> a.pitchClass
@@ -2945,7 +2921,6 @@ class Pitch:
         (where B-flat = B, B = H, etc.)
         (Microtones and Quartertones raise an error).  Note that
         Ases is used instead of the also acceptable Asas.
-
 
         >>> print(pitch.Pitch('B-').german)
         B

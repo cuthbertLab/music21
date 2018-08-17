@@ -2152,7 +2152,7 @@ SCREF = {
 (2,  3,  0)    : {'name': ('interval class 3', 'minor third', 'm3',)},
 (2,  4,  0)    : {'name': ('interval class 4', 'major third', 'M3')},
 (2,  5,  0)    : {'name': ('interval class 5', 'perfect fourth', 'P4')},
-(2,  6,  0)    : {'name': ('tritone', 'diminished third')},
+(2,  6,  0)    : {'name': ('tritone', 'diminished fifth', 'augmented fourth')},
 (3,  1,  0)    : {'name': ('chromatic trimirror',)},
 (3,  2,  1)    : {'name': ('phrygian trichord',)},
 (3,  2, -1)    : {'name': ('minor trichord',)},
@@ -2165,7 +2165,7 @@ SCREF = {
 (3,  6,  0)    : {'name': ('whole-tone trichord',)},
 (3,  7,  1)    : {'name': ('incomplete minor-seventh chord',)},
 (3,  7, -1)    : {'name': ('incomplete dominant-seventh chord',)},
-(3,  8,  1)    : {'name': ('incomplete dominant-seventh chord', 'Italian-sixth')},
+(3,  8,  1)    : {'name': ('incomplete dominant-seventh chord', 'Italian augmented sixth chord')},
 (3,  8, -1)    : {'name': ('incomplete half-diminished seventh chord',)},
 (3,  9,  0)    : {'name': ('quartal trichord',)},
 (3, 10,  0)    : {'name': ('diminished triad',)},
@@ -2208,11 +2208,12 @@ SCREF = {
 (4, 22, -1)    : {'name': ('perfect-fourth minor tetrachord',)},
 (4, 23,  0)    : {'name': ('quartal tetramirror',)},
 (4, 24,  0)    : {'name': ('augmented seventh chord',)},
-(4, 25,  0)    : {'name': ("Messiaen's truncated mode 6", 'French-sixth chord')},
+(4, 25,  0)    : {'name': ("Messiaen's truncated mode 6", 'French augmented sixth chord')},
 (4, 26,  0)    : {'name': ('minor seventh chord',)},
 (4, 27,  1)    : {'name': ('half-diminished seventh chord',)},
 (4, 27, -1)    : {'name': ('dominant seventh chord',
-                          'major minor seventh chord', 'German sixth chord')},
+                          'major minor seventh chord', 'German augmented sixth chord', 
+                          'Swiss augmented sixth chord')},
 (4, 28,  0)    : {'name': ('diminished seventh chord', 'equal 4-part octave division')},
 (4, 29,  1)    : {'name': ('all-interval tetrachord',)},
 (4, 29, -1)    : {'name': ('all-interval tetrachord',)},
@@ -2674,13 +2675,14 @@ def intervalVectorToAddress(vector):
     '''Given a vector, collect all addresses that match.
 
     >>> chord.tables.intervalVectorToAddress((7,6,5,4,4,2))
-    [(8, 1)]
+    [ChordTableAddress(cardinality=8, forteClass=1, inversion=None, pcOriginal=None)]
     >>> chord.tables.intervalVectorToAddress((12,12,12,12,12,6))
-    [(12, 1)]
+    [ChordTableAddress(cardinality=12, forteClass=1, inversion=None, pcOriginal=None)]
     >>> chord.tables.intervalVectorToAddress((2,2,3,1,1,1))
-    [(5, 10)]
+    [ChordTableAddress(cardinality=5, forteClass=10, inversion=None, pcOriginal=None)]
     >>> chord.tables.intervalVectorToAddress((1,1,1,1,1,1))
-    [(4, 15), (4, 29)]
+    [ChordTableAddress(cardinality=4, forteClass=15, inversion=None, pcOriginal=None),
+     ChordTableAddress(cardinality=4, forteClass=29, inversion=None, pcOriginal=None)]
     '''
     post = []
     vector = tuple(vector)
@@ -2690,20 +2692,20 @@ def intervalVectorToAddress(vector):
                 continue # first, used for spacing
             # index 1 is vector
             if sc[1] == vector:
-                post.append((card, num))
+                post.append(ChordTableAddress(card, num, None, None))
     return post
 
 def addressToZAddress(address):
     '''Given a TN address, return the address of the z set, if not None
 
     >>> chord.tables.addressToZAddress((5,12))
-    (5, 36, 1)
+    ChordTableAddress(cardinality=5, forteClass=36, inversion=1, pcOriginal=None)
     >>> chord.tables.addressToZAddress((5,36,None))
-    (5, 12, 0)
+    ChordTableAddress(cardinality=5, forteClass=12, inversion=0, pcOriginal=None)
     >>> chord.tables.addressToZAddress((5,37))
-    (5, 17, 0)
+    ChordTableAddress(cardinality=5, forteClass=17, inversion=0, pcOriginal=None)
     >>> chord.tables.addressToZAddress((8,29))
-    (8, 15, 1)
+    ChordTableAddress(cardinality=8, forteClass=15, inversion=1, pcOriginal=None)
     '''
     card, index, unused_inversion = _validateAddress(address)
     z = FORTE[card][index][3]
@@ -2711,7 +2713,7 @@ def addressToZAddress(address):
         return None
     else:
         zAddress = _validateAddress((card, z, None))
-        return zAddress
+        return ChordTableAddress(*zAddress, None)
 
 def addressToCommonNames(address):
     '''
@@ -2719,7 +2721,9 @@ def addressToCommonNames(address):
 
     >>> chord.tables.addressToCommonNames((3,1,0))
     ['chromatic trimirror']
-    >>> chord.tables.addressToCommonNames((3,11,-1))
+    
+    >>> address = chord.tables.ChordTableAddress(3, 11, -1, 2)
+    >>> chord.tables.addressToCommonNames(address)
     ['major triad']
     '''
     address = _validateAddress(address)
@@ -2732,7 +2736,8 @@ def addressToCommonNames(address):
 def addressToForteName(address, classification='tn'):
     '''Given an address, return the set-class name as a string.
 
-    >>> chord.tables.addressToForteName((8,15,1))
+    >>> address = chord.tables.ChordTableAddress(8, 15, 1, 10)
+    >>> chord.tables.addressToForteName(address)
     '8-15A'
     >>> chord.tables.addressToForteName((8,15))
     '8-15A'
@@ -2767,9 +2772,6 @@ def seekChordTablesAddress(c):
     NOTE: time consuming, and only should be run when necessary.
 
     >>> c1 = chord.Chord(['c3'])
-    >>> c1.orderedPitchClasses
-    [0]
-
     >>> chord.tables.seekChordTablesAddress(c1)
     ChordTableAddress(cardinality=1, forteClass=1, inversion=0, pcOriginal=0)
 
@@ -2831,7 +2833,7 @@ def seekChordTablesAddress(c):
         testSetInvert = [(x + (12 - testSetInvert[0])) % 12
                         for x in testSetInvert]
 
-        candidateTuple = (testSet, testSetInvert, testSetOriginalPC)
+        candidateTuple = (tuple(testSet), tuple(testSetInvert), testSetOriginalPC)
         candidates.append(candidateTuple)
 
     # compare sets to those in table
@@ -2842,12 +2844,13 @@ def seekChordTablesAddress(c):
         dataLine = FORTE[card][indexCandidate]
         if dataLine is None:
             continue # spacer lines
+        dataLinePcs = dataLine[0]
         inversionsAvailable = forteIndexToInversionsAvailable(card, indexCandidate)
 
         for candidate, candidateInversion, candidateOriginalPC in candidates:
             #environLocal.printDebug([candidate])
             # need to only match form
-            if dataLine[0] == tuple(candidate): # must compare to tuple
+            if dataLinePcs == candidate:
                 if 0 in inversionsAvailable:
                     index, inversion = indexCandidate, 0
                 else:
@@ -2855,7 +2858,7 @@ def seekChordTablesAddress(c):
                 matchedPCOriginal = candidateOriginalPC
                 match = True
                 break
-            elif dataLine[0] == tuple(candidateInversion):
+            elif dataLinePcs == candidateInversion:
                 if 0 in inversionsAvailable:
                     index, inversion = indexCandidate, 0
                 else:
