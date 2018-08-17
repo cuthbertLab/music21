@@ -400,7 +400,7 @@ class WorkerProcess(multiprocessing.Process): # @UndefinedVariable pylint: disab
     def run(self):
         while True:
             job = self.job_queue.get()
-            # "Poison Pill" causes worker shutdown:
+            # 'Poison Pill' causes worker shutdown:
             if job is None:
                 self.job_queue.task_done()
                 break
@@ -430,7 +430,7 @@ __all__ = [
     'cacheMetadata',
     ]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

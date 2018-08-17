@@ -265,7 +265,7 @@ class MetadataBundle:
         from music21 import corpus
         self._metadataEntries = OrderedDict()
         if not isinstance(expr, (str, corpus.corpora.Corpus, type(None))):
-            raise MetadataBundleException("Need to take a string, corpus, or None as expression")
+            raise MetadataBundleException('Need to take a string, corpus, or None as expression')
 
         self._corpus = None
 
@@ -595,7 +595,7 @@ class MetadataBundle:
 
     def _apply_set_operation(self, metadataBundle, operator):
         if not isinstance(metadataBundle, type(self)):
-            raise MetadataBundleException("metadataBundle must be a MetadataBundle")
+            raise MetadataBundleException('metadataBundle must be a MetadataBundle')
         selfKeys = set(self._metadataEntries.keys())
         otherKeys = set(metadataBundle._metadataEntries.keys())
         resultKeys = getattr(selfKeys, operator)(otherKeys)
@@ -614,7 +614,7 @@ class MetadataBundle:
 
     def _apply_set_predicate(self, metadataBundle, predicate):
         if not isinstance(metadataBundle, type(self)):
-            raise MetadataBundleException("metadataBundle must be a MetadataBundle")
+            raise MetadataBundleException('metadataBundle must be a MetadataBundle')
         selfKeys = set(self._metadataEntries.keys())
         otherKeys = set(metadataBundle._metadataEntries.keys())
         return getattr(selfKeys, predicate)(otherKeys)
@@ -1217,7 +1217,7 @@ class MetadataBundle:
         newMetadataBundle = MetadataBundle()
         if query is None and field is None:
             if not kwargs:
-                raise MetadataBundleException("Query cannot be empty")
+                raise MetadataBundleException('Query cannot be empty')
             field, query = kwargs.popitem()
 
         for key in self._metadataEntries:
@@ -1448,7 +1448,7 @@ __all__ = [
     'MetadataBundle',
     ]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test) #, runTest='testFileExtensions')
 

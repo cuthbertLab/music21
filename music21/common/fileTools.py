@@ -19,7 +19,7 @@ import io
 import pathlib
 import os
 
-from music21.ext import chardet
+from music21.ext import chardet # type: ignore
 
 __all__ = ['readFileEncodingSafe',
            'cd',

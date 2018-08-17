@@ -114,7 +114,7 @@ class Date:
         >>> str(d)
         '1030?/12~/04?'
         '''
-        # datetime.strftime("%Y.%m.%d")
+        # datetime.strftime('%Y.%m.%d')
         # cannot use this, as it does not support dates lower than 1900!
         msg = []
         if self.hour is None and self.minute is None and self.second is None:
@@ -1256,7 +1256,7 @@ __all__ = [
     'Text',
     ]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

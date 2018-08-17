@@ -114,7 +114,7 @@ class PercussionMapper:
         >>> bassDrum1Pitch = pitch.Pitch('B-1')
         >>> pm.midiPitchToInstrument(bassDrum1Pitch)
         Traceback (most recent call last):
-        music21.midi.percussion.MIDIPercussionException: 34 doesn't map to a valid instrument!
+        music21.midi.percussion.MIDIPercussionException: 34 does not map to a valid instrument!
 
         Also, certain GM instruments do not have corresponding music21 instruments,
         so at present they also raise an exception.
@@ -122,7 +122,7 @@ class PercussionMapper:
         >>> cabasaPitch = 69
         >>> pm.midiPitchToInstrument(cabasaPitch)
         Traceback (most recent call last):
-        music21.midi.percussion.MIDIPercussionException: 69 doesn't map to a valid instrument!
+        music21.midi.percussion.MIDIPercussionException: 69 does not map to a valid instrument!
 
 
         Some music21 Instruments have more than one MidiPitch.  In this case you'll
@@ -149,7 +149,7 @@ class PercussionMapper:
         else:
             midiNumber = midiPitch.midi
         if midiNumber not in self.reverseInstrumentMapping:
-            raise MIDIPercussionException("%r doesn't map to a valid instrument!" % midiNumber)
+            raise MIDIPercussionException('%r does not map to a valid instrument!' % midiNumber)
         midiInstrument = self.reverseInstrumentMapping[midiNumber]
 
         midiInstrumentObject = midiInstrument()
@@ -189,7 +189,7 @@ class PercussionMapper:
             is not in the GM Percussion Map!
         '''
         if not hasattr(midiInstrument, 'inGMPercMap') or midiInstrument.inGMPercMap is False:
-            raise MIDIPercussionException("%r is not in the GM Percussion Map!" % midiInstrument)
+            raise MIDIPercussionException('%r is not in the GM Percussion Map!' % midiInstrument)
         midiPitch = midiInstrument.percMapPitch
         pitchObject = pitch.Pitch()
         pitchObject.midi = midiPitch
@@ -230,7 +230,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [PercussionMapper]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

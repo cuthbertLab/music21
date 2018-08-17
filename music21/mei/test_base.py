@@ -63,9 +63,8 @@ from music21.mei.base import _MEINS
 
 # pylint: disable=pointless-string-statement
 class Test(unittest.TestCase): 
-
-#class TestMeiToM21Class(unittest.TestCase):
-    '''Tests for the MeiToM21Converter class.'''
+    #class TestMeiToM21Class(unittest.TestCase):
+    # '''Tests for the MeiToM21Converter class.'''
 
     def testInit1(self):
         '''__init__(): no argument gives an "empty" MeiToM21Converter instance'''
@@ -142,9 +141,9 @@ class Test(unittest.TestCase):
         mockMeta.assert_called_once_with(testConv.documentRoot)
 
 
-#------------------------------------------------------------------------------
-# class TestThings(unittest.TestCase):
-    '''Tests for utility functions.'''
+    #------------------------------------------------------------------------------
+    # class TestThings(unittest.TestCase):
+    # '''Tests for utility functions.'''
 
     def testSafePitch1(self):
         '''safePitch(): when ``name`` is a valid pitch name'''
@@ -351,9 +350,9 @@ class Test(unittest.TestCase):
         self.assertRaises(RuntimeError, base.getVoiceId, fromThese)
 
 
-#------------------------------------------------------------------------------
-# class TestMetadata(unittest.TestCase):
-    '''Tests for the metadata-fetching functions.'''
+    #------------------------------------------------------------------------------
+    # class TestMetadata(unittest.TestCase):
+    # '''Tests for the metadata-fetching functions.'''
 
     @mock.patch('music21.mei.base.metaSetTitle')
     @mock.patch('music21.mei.base.metaSetComposer')
@@ -630,9 +629,9 @@ class Test(unittest.TestCase):
         self.assertEqual(expDate, actual.date)
 
 
-#------------------------------------------------------------------------------
-# class TestAttrTranslators(unittest.TestCase):
-    '''Tests for the one-to-one (string-to-simple-datatype) converter functions.'''
+    #------------------------------------------------------------------------------
+    # class TestAttrTranslators(unittest.TestCase):
+    # '''Tests for the one-to-one (string-to-simple-datatype) converter functions.'''
 
     def testAttrTranslator1(self):
         '''_attrTranslator(): the usual case works properly when "attr" is in "mapping"'''
@@ -847,9 +846,9 @@ class Test(unittest.TestCase):
         self.assertEqual(expected.type, expected.type)
 
 
-#------------------------------------------------------------------------------
-# class TestLyrics(unittest.TestCase):
-    '''Tests for sylFromElement() and verseFromElement()'''
+    #------------------------------------------------------------------------------
+    # class TestLyrics(unittest.TestCase):
+    # '''Tests for sylFromElement() and verseFromElement()'''
 
     def testSyl1(self):
         '''
@@ -987,9 +986,9 @@ class Test(unittest.TestCase):
         mockEnviron.warn.assert_called_once_with(base._BAD_VERSE_NUMBER.format('None'))
 
 
-#------------------------------------------------------------------------------
-# class TestNoteFromElement(unittest.TestCase):
-    '''Tests for noteFromElement()'''
+    #------------------------------------------------------------------------------
+    # class TestNoteFromElement(unittest.TestCase):
+    # '''Tests for noteFromElement()'''
     # NOTE: For this TestCase, in the unit tests, if you get...
     #       AttributeError: 'str' object has no attribute 'call_count'
     #       ... it means a test failure, because the str should have been a MagicMock but was
@@ -1363,9 +1362,9 @@ class Test(unittest.TestCase):
     # NOTE: consider adding to previous tests rather than making new ones
 
 
-#------------------------------------------------------------------------------
-# class TestRestFromElement(unittest.TestCase):
-    '''Tests for restFromElement() and spaceFromElement()'''
+    #------------------------------------------------------------------------------
+    # class TestRestFromElement(unittest.TestCase):
+    # '''Tests for restFromElement() and spaceFromElement()'''
 
     @mock.patch('music21.note.Rest')
     @mock.patch('music21.mei.base.makeDuration')
@@ -1504,9 +1503,9 @@ class Test(unittest.TestCase):
         self.assertTrue(actual.m21wasMRest)
 
 
-#------------------------------------------------------------------------------
-# class TestChordFromElement(unittest.TestCase):
-    '''Tests for chordFromElement()'''
+    #------------------------------------------------------------------------------
+    # class TestChordFromElement(unittest.TestCase):
+    # '''Tests for chordFromElement()'''
     # NOTE: For this TestCase, in the unit tests, if you get...
     #       AttributeError: 'str' object has no attribute 'call_count'
     #       ... it means a test failure, because the str should have been a MagicMock but was
@@ -1792,9 +1791,9 @@ class Test(unittest.TestCase):
     # NOTE: consider adding to previous tests rather than making new ones
 
 
-#------------------------------------------------------------------------------
-# class TestClefFromElement(unittest.TestCase):
-    '''Tests for clefFromElement()'''
+    #------------------------------------------------------------------------------
+    # class TestClefFromElement(unittest.TestCase):
+    # '''Tests for clefFromElement()'''
     # NOTE: in this function's integration tests, the Element.tag attribute doesn't actually matter
 
     @mock.patch('music21.clef.clefFromString')
@@ -1948,9 +1947,9 @@ class Test(unittest.TestCase):
 
 
 
-#------------------------------------------------------------------------------
-# class TestLayerFromElement(unittest.TestCase):
-    '''Tests for layerFromElement()'''
+    #------------------------------------------------------------------------------
+    # class TestLayerFromElement(unittest.TestCase):
+    # '''Tests for layerFromElement()'''
 
     @mock.patch('music21.mei.base.noteFromElement')
     @mock.patch('music21.stream.Voice')
@@ -2133,9 +2132,9 @@ class Test(unittest.TestCase):
 
 
 
-#------------------------------------------------------------------------------
-# class TestStaffFromElement(unittest.TestCase):
-    '''Tests for staffFromElement()'''
+    #------------------------------------------------------------------------------
+    # class TestStaffFromElement(unittest.TestCase):
+    # '''Tests for staffFromElement()'''
 
     @mock.patch('music21.mei.base.layerFromElement')
     def testUnit1StaffFromElement(self, mockLayerFromElement):
@@ -2205,9 +2204,9 @@ class Test(unittest.TestCase):
 
 
 
-#------------------------------------------------------------------------------
-# class TestStaffDefFromElement(unittest.TestCase):
-    '''Tests for staffDefFromElement()'''
+    #------------------------------------------------------------------------------
+    # class TestStaffDefFromElement(unittest.TestCase):
+    # '''Tests for staffDefFromElement()'''
 
     @mock.patch('music21.mei.base.instrDefFromElement')
     @mock.patch('music21.mei.base._timeSigFromAttrs')
@@ -2595,9 +2594,9 @@ class Test(unittest.TestCase):
 
 
 
-#------------------------------------------------------------------------------
-# class TestScoreDefFromElement(unittest.TestCase):
-    '''Tests for scoreDefFromElement()'''
+    #------------------------------------------------------------------------------
+    # class TestScoreDefFromElement(unittest.TestCase):
+    # '''Tests for scoreDefFromElement()'''
 
     @mock.patch('music21.mei.base._timeSigFromAttrs')
     @mock.patch('music21.mei.base._keySigFromAttrs')
@@ -2701,9 +2700,9 @@ class Test(unittest.TestCase):
 
 
 
-#------------------------------------------------------------------------------
-# class TestEmbeddedElements(unittest.TestCase):
-    '''Tests for _processesEmbeddedElements()'''
+    #------------------------------------------------------------------------------
+    # class TestEmbeddedElements(unittest.TestCase):
+    # '''Tests for _processesEmbeddedElements()'''
 
     def testUnit1EmbeddedElements(self):
         '''
@@ -5048,9 +5047,7 @@ class Test(unittest.TestCase):
         self.assertEqual(instr.partName, 'Clarinet')
         self.assertEqual(instr.transposition.directedName, 'm-3')
 
-if __name__ == "__main__":
-    # NOTE: When "multiprocessTest.py" is running the entire music21 test suite, it uses the class
-    #       called "Test," which is defined above.
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

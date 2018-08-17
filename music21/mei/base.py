@@ -224,19 +224,19 @@ _IGNORE_UNPROCESSED = (
 # Exceptions
 #------------------------------------------------------------------------------
 class MeiValidityError(exceptions21.Music21Exception):
-    "When there is an otherwise-unspecified validity error that prevents parsing."
+    'When there is an otherwise-unspecified validity error that prevents parsing.'
     pass
 
 class MeiValueError(exceptions21.Music21Exception):
-    "When an attribute has an invalid value."
+    'When an attribute has an invalid value.'
     pass
 
 class MeiAttributeError(exceptions21.Music21Exception):
-    "When an element has an invalid attribute."
+    'When an element has an invalid attribute.'
     pass
 
 class MeiElementError(exceptions21.Music21Exception):
-    "When an element itself is invalid."
+    'When an element itself is invalid.'
     pass
 
 
@@ -469,28 +469,48 @@ _DUR_ATTR_DICT = {'long': 16.0, 'breve': 8.0, '1': 4.0, '2': 2.0, '4': 1.0, '8':
 # for _articulationFromAttr()
 # NOTE: 'marc-stacc' and 'ten-stacc' require multiple music21 events, so they are handled
 #       separately in _articulationFromAttr().
-_ARTIC_ATTR_DICT = {'acc': articulations.Accent, 'stacc': articulations.Staccato,
-                    'ten': articulations.Tenuto, 'stacciss': articulations.Staccatissimo,
-                    'marc': articulations.StrongAccent, 'spicc': articulations.Spiccato,
-                    'doit': articulations.Doit, 'plop': articulations.Plop,
-                    'fall': articulations.Falloff, 'dnbow': articulations.DownBow,
-                    'upbow': articulations.UpBow, 'harm': articulations.Harmonic,
-                    'snap': articulations.SnapPizzicato, 'stop': articulations.Stopped,
+_ARTIC_ATTR_DICT = {'acc': articulations.Accent, 
+                    'stacc': articulations.Staccato,
+                    'ten': articulations.Tenuto, 
+                    'stacciss': articulations.Staccatissimo,
+                    'marc': articulations.StrongAccent, 
+                    'spicc': articulations.Spiccato,
+                    'doit': articulations.Doit, 
+                    'plop': articulations.Plop,
+                    'fall': articulations.Falloff, 
+                    'dnbow': articulations.DownBow,
+                    'upbow': articulations.UpBow, 
+                    'harm': articulations.Harmonic,
+                    'snap': articulations.SnapPizzicato, 
+                    'stop': articulations.Stopped,
                     'open': articulations.OpenString,  # this may also mean "no mute?"
-                    'dbltongue': articulations.DoubleTongue, 'toe': articulations.OrganToe,
-                    'trpltongue': articulations.TripleTongue, 'heel': articulations.OrganHeel,
+                    'dbltongue': articulations.DoubleTongue, 
+                    'toe': articulations.OrganToe,
+                    'trpltongue': articulations.TripleTongue, 
+                    'heel': articulations.OrganHeel,
                     # TODO: these aren't implemented in music21, so I'll make new ones
-                    'tap': articulations.Articulation, 'lhpizz': articulations.Articulation,
-                    'dot': articulations.Articulation, 'stroke': articulations.Articulation,
-                    'rip': articulations.Articulation, 'bend': articulations.Articulation,
-                    'flip': articulations.Articulation, 'smear': articulations.Articulation,
+                    'tap': articulations.Articulation, 
+                    'lhpizz': articulations.Articulation,
+                    'dot': articulations.Articulation, 
+                    'stroke': articulations.Articulation,
+                    'rip': articulations.Articulation, 
+                    'bend': articulations.Articulation,
+                    'flip': articulations.Articulation, 
+                    'smear': articulations.Articulation,
                     'fingernail': articulations.Articulation,  # (u1D1B3)
-                    'damp': articulations.Articulation, 'dampall': articulations.Articulation}
+                    'damp': articulations.Articulation, 
+                    'dampall': articulations.Articulation,
+                    }
 
 # for _barlineFromAttr()
 # TODO: make new music21 Barline styles for 'dbldashed' and 'dbldotted'
-_BAR_ATTR_DICT = {'dashed': 'dashed', 'dotted': 'dotted', 'dbl': 'double', 'end': 'final',
-                  'invis': 'none', 'single': 'regular'}
+_BAR_ATTR_DICT = {'dashed': 'dashed', 
+                  'dotted': 'dotted', 
+                  'dbl': 'double', 
+                  'end': 'final',
+                  'invis': 'none', 
+                  'single': 'regular',
+                  }
 
 
 # One-to-One Translator Functions

@@ -16,7 +16,7 @@ __all__ = ['runParallel',
 import multiprocessing
 import unittest
 
-from music21.ext.joblib import Parallel, delayed  # @UnresolvedImport
+from music21.ext.joblib import Parallel, delayed  # @UnresolvedImport # type: ignore
 
 def runParallel(iterable, parallelFunction, *,
                 updateFunction=None, updateMultiply=3,

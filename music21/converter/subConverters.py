@@ -1244,36 +1244,18 @@ class Test(unittest.TestCase):
         it was exported from
         the "sibmei" plug-in for Sibelius.
         '''
-        try:
-            # this works in Python 3.3+
-            from unittest import mock  # pylint: disable=no-name-in-module
-        except ImportError:
-            try:
-                # system library overrides the built-in
-                import mock
-            except ImportError:
-                # last resort
-                from music21.ext import mock
+        from unittest import mock  # pylint: disable=no-name-in-module
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             testPath = common.getSourceFilePath() / 'mei' / 'test' / 'notes_in_utf16.mei'
             testConverter = ConverterMEI()
-            testConverter.parseFile(str(testPath))
+            testConverter.parseFile(str(testPath)) # remove str in Py3.6
             self.assertEqual(1, mockConv.call_count)
 
     def testImportMei4(self):
         '''
         For the sake of completeness, this is the same as testImportMei3() but with a UTF-8 file.
         '''
-        try:
-            # this works in Python 3.3+
-            from unittest import mock  # pylint: disable=no-name-in-module
-        except ImportError:
-            try:
-                # system library overrides the built-in
-                import mock
-            except ImportError:
-                # last resort
-                from music21.ext import mock
+        from unittest import mock  # pylint: disable=no-name-in-module
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             testPath = common.getSourceFilePath() / 'mei' / 'test' / 'notes_in_utf8.mei'
             testConverter = ConverterMEI()

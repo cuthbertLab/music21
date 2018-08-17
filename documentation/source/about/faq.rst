@@ -64,7 +64,7 @@ What is the native `music21` data format?
 
     * For data that cannot easily be recreated (because it's computationally expensive to create, or 
       relies on user input, or is stochastically generated), 
-      Python's pickle or cPickle packages will allow you 
+      Python's pickle package will allow you 
       to store your data on disk.  These files cannot necessarily 
       be read in by a later version of `music21` 
       (This is the reverse of the problem Finale has, 
@@ -165,7 +165,7 @@ What is MusicXML?
     MusicXML is a file format for exchanging musical scores among different 
     programs, such as, oh... `music21` and Finale (or `music21` and Sibelius,
     or Dorico, or MuseScore).  
-    It was created by Recordare (Michael Good, CEO). More 
+    It was created by Recordare (Michael Good, CEO) and now run by the W3C. More 
     information about the project can be found at:
 
     * http://www.musicxml.com/
@@ -183,14 +183,4 @@ And this Humdrum about which you speak?
     * http://music-cog.ohio-state.edu/Humdrum
     * http://kern.humdrum.net
 
-What's Lilypond?
 
-    It's an open-source package for displaying music, sort of like 
-    Finale and Sibelius, but with different goals and a different 
-    approach (and it's free!).  If you have Lilypond installed, 
-    music21 can output to lilypond by using "show('lily.png')" or "show('lily.pdf')" 
-     
-    More information on the Lilypond can be found here at the following links:
-
-    * http://lilypond.org/web
-    * http://lilypond.org/doc/v2.12/input/regression/musicxml/collated-files.html

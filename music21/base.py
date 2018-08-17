@@ -2677,7 +2677,7 @@ class Music21Object:
         that were created during the split, such as by
 
 
-        TODO: unit into a "split" function -- document obscure uses.
+        TODO: unite into a "split" function -- document obscure uses.
 
         >>> a = note.Note('C#5')
         >>> a.duration.type = 'whole'
@@ -2927,7 +2927,7 @@ class Music21Object:
         that are partitioned and tied with the specified quarter
         length list durations.
 
-        TODO: unit into a "split" function -- document obscure uses.
+        TODO: unite into a "split" function -- document obscure uses.
 
 
         >>> n = note.Note()
