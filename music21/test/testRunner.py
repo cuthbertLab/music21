@@ -196,7 +196,7 @@ def mainTest(*testClasses, **kwargs):
             if ('importPlusRelative' in testClasses or
                     'importPlusRelative' in sys.argv or
                     bool(kwargs.get('importPlusRelative', False))):
-                globs.update(globals())
+                globs.update(inspect.stack()[1][0].f_globals)
 
         try:
             s1 = doctest.DocTestSuite(

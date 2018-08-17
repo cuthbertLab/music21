@@ -55,7 +55,7 @@ from music21 import scale
 
 # create a module level shared cache for intervals of P1, P5, P8
 # to be populated the first time a VLQ object is created
-intervalCache = []
+intervalCache = [] # type: List[interval.Interval]
 
 class MotionType(str, enum.Enum):
     antiParallel = 'Anti-Parallel'

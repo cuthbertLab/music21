@@ -18,8 +18,8 @@ This module defines numerous subclasses of
 commonly used clefs. Clef objects are often found
 within :class:`~music21.stream.Measure` objects.
 '''
-
 import unittest
+# from typing import Mapping
 
 from music21 import base
 from music21 import common
@@ -92,7 +92,7 @@ class Clef(base.Music21Object):
             >>> print(clef.NoClef().line)
             None
             ''',
-    }
+    } # type: Mapping[str, str]
 
     _styleClass = style.TextStyle
     classSortOrder = 0
@@ -184,7 +184,8 @@ class PitchClef(Clef):
             >>> clef.TrebleClef().lowestLine
             31
             ''',
-    }
+    }  # type: Mapping[str, str]
+    
     def __init__(self):
         super().__init__()
         self.lowestLine = None

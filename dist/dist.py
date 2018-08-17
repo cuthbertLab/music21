@@ -34,25 +34,26 @@ while it is running.  This takes a while and runs single core, so allocate time.
 
 [*] you will need sphinx, IPython (pip or easy_install), markdown, and pandoc (.dmg) installed
 
-9. run documentation/upload.py [not via eclipse] or upload via ssh.
+9. ssh to MIT, cd music21/doc and rm -rf *
+
+10. run documentation/upload.py [not via eclipse] or upload via ssh.
    -- you will need an MIT username and password 
-   -- for each new major version ssh in and delete old files before uploading.
 
-9b. zip up documentation/build/html and get ready to upload/delete it.
+11. zip up documentation/build/html and get ready to upload/delete it.
 
-10. And finally this file. (from the command line; not as python -m...)
+12. And finally this file. (from the command line; not as python -m...)
 
-11. COMMIT to Github at this point w/ commit comment of the new version,
+13. COMMIT to Github at this point w/ commit comment of the new version,
     then don't change anything until the next step is done.
     (.gitignore will avoid uploading the large files created here...)
 
-12. Create a new release on GitHub and upload the TWO files created here. Use tag v5.0.1 (etc.).
+14. Create a new release on GitHub and upload the TWO files created here. Use tag v5.0.1 (etc.).
     Don't forget the "v" in the release tag.
     Drag in this order: .tar.gz, no-corpus.tar.gz
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-13. Upload the new file to PyPI with "twine upload music21-5.0.5a2.tar.gz" [*]
+15. Upload the new file to PyPI with "twine upload music21-5.0.5a2.tar.gz" [*]
 
     [*] Requires twine to be installed
 
@@ -66,12 +67,12 @@ while it is running.  This takes a while and runs single core, so allocate time.
         username:yourusername
         password:yourpassword
 
-15. Delete the two .tar.gz files in dist...
+16. Delete the two .tar.gz files in dist...
 
-16. Immediately increment the number in _version.py and run tests on it here
+17. Immediately increment the number in _version.py and run tests on it here
     to prepare for next release.
 
-17. Announce on the blog, to the list, and twitter.
+18. Announce on the blog, to the list, and twitter.
 
 DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do.
 '''

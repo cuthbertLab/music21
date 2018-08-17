@@ -330,7 +330,6 @@ class Music21Object:
 
             All undefined classes have classSortOrder of 20 -- same as note.Note
 
-
             >>> m21o = base.Music21Object()
             >>> m21o.classSortOrder
             20

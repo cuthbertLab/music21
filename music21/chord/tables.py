@@ -2546,9 +2546,9 @@ def forteIndexToInversionsAvailable(card, index):
     [0]
     '''
     if card not in list(range(1,13)):
-        raise ChordTablesException('cardinality %s not valod' % card)
+        raise ChordTablesException('cardinality %s not valid' % card)
     if index < 1 or index > TNMAX[card]:
-        raise ChordTablesException('index %s not valod' % index)
+        raise ChordTablesException('index %s not valid' % index)
     # get morris invaraince vector
     morris = FORTE[card][index][2]
     if morris[1] > 0: # second value stored inversion status
@@ -2702,8 +2702,6 @@ def addressToZAddress(address):
     (5, 12, 0)
     >>> chord.tables.addressToZAddress((5,37))
     (5, 17, 0)
-    >>> chord.tables.addressToZAddress((8,29))
-    (8, 15, 1)
     >>> chord.tables.addressToZAddress((8,29))
     (8, 15, 1)
     '''

@@ -896,7 +896,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER = [] # type: List[Class]
 
 
 if __name__ == '__main__':

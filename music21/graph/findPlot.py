@@ -39,7 +39,7 @@ FORMAT_SYNONYMS = [('horizontalbar', 'bar', 'horizontal', 'pianoroll', 'piano'),
                    ('3dbars', '3d'),
                    ('colorgrid', 'grid', 'window', 'windowed'),
                    ('horizontalbarweighted', 'barweighted', 'weightedbar')
-                   ]
+                   ] # type: List[Tuple[str]]
 
 # define co format strings
 FORMATS = [syn[0] for syn in FORMAT_SYNONYMS]

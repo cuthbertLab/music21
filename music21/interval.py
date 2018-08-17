@@ -34,11 +34,7 @@ from music21 import environment
 _MOD = 'interval'
 environLocal = environment.Environment(_MOD)
 
-try:
-    import enum
-except ImportError:
-    from music21.ext import enum # @UnusedImport
-
+import enum
 
 #-------------------------------------------------------------------------------
 # constants

@@ -3,6 +3,8 @@ __pycache__/
 *$py.class
 .cache/v/cache/lastfailed
 .cache/**
+.mypy_cache/**
+**/.mypy_cache/**
 
 #PYCharm
 .idea
