@@ -45,16 +45,17 @@ owners who have allowed them to be included with music21.
 '''
 import sys
 
-minPythonVersion = (3, 4)
+minPythonVersion = (3, 5)
 minPythonVersionStr = '.'.join([str(x) for x in minPythonVersion])
 if sys.version_info < minPythonVersion:
     raise ImportError('''
-    Music21 v.5 is a Python {}+ only library.
+    Music21 v.5.4 is a Python {}+ only library.
     Use music21 v.4 to run on Python 2.7.
+    Use music21 v.5.2 to run on Python 3.4.
 
     If you got this library by installing there are several options.
 
-    - 1. (Best) Upgrade to Python 3, latest.
+    - 1. (Best) Upgrade to Python 3, latest (currently 3.7).
 
          The great features there will more
          than make up for the headache of downloading
