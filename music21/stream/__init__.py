@@ -1953,6 +1953,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         As sorting is done only by priority and class,
         it cannot avoid setting isSorted to False.
 
+        >>> s = stream.Stream()
+        >>> b = bar.Repeat()
+        >>> s.storeAtEnd(b)
+        >>> b in s
+        True
+        >>> s.elementOffset(b)
+        0.0
+        >>> s.elementOffset(b, stringReturns=True)
+        'highestTime'
+        
+        Only elements of zero duration can be stored.  Otherwise a
+        `StreamException` is raised.        
         '''
         if isinstance(itemOrList, list):
             for item in itemOrList:
@@ -1961,6 +1973,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return
         else:
             item = itemOrList
+            
         try:
             unused = item.isStream # will raise attribute error
             element = item

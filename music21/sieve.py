@@ -180,29 +180,39 @@ def rabinMiller(n):
     True
     >>> sieve.rabinMiller(4)
     False
-    >>> sieve.rabinMiller(123986234193)
+
+    >>> sieve.rabinMiller(6**4 + 1) # prime
+    True
+    
+    >>> sieve.rabinMiller(123986234193) # divisible by 3, runs fast
     False
     '''
     n = abs(n)
     if n in (2, 3):
         return True
+
     m = n % 6 # if n (except 2 and 3) mod 6 is not 1 or 5, then n isn't prime
     if m not in (1, 5):
         return False
+    
     # primes up to 100;  2, 3 handled by mod 6
-    primes = [5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43,
+    primes = [ 5,  7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43,
               47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+    
     if n <= 100:
         if n in primes:
             return True # must include 2, 3
         return False
+    
     for prime in primes:
         if n % prime == 0:
             return 0
+
     s, r = n - 1, 1
     while not s & 1:
         s >>= 1
         r = r + 1
+    
     for i in range(10): # random tests
         # calculate a^s mod n, where a is a random number
         y = pow(random.randint(1, n - 1), s, n)
@@ -630,7 +640,7 @@ class Residual:
         #fmt = drawer.strScrub(fmt, 'l')
         fmt = fmt.strip().lower()
         if fmt in self._segmentFormatOptions:
-            raise ResidualException('format not in format optoins: %s' % fmt)
+            raise ResidualException('format not in format options: %s' % fmt)
         self._segmentFormat = fmt
 
     #---------------------------------------------------------------------------

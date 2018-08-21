@@ -4436,6 +4436,34 @@ class Test(unittest.TestCase):
         # index is now 1
         self.assertEqual(s.index(b1), 1)
 
+    def testStoreAtEndFailures(self):
+        from music21 import stream, bar
+        
+        s = Stream()
+        with self.assertRaises(stream.StreamException):
+            s.storeAtEnd(6)
+        
+        n = note.Note()
+        n.duration.quarterLength = 2.0
+        with self.assertRaises(stream.StreamException):
+            s.storeAtEnd(n)
+        
+        # also test that lists work...
+        b = bar.Barline()
+        s.storeAtEnd([b])
+
+        # also test that element may not be in stream twice.
+        with self.assertRaises(stream.StreamException):
+            s.storeAtEnd([b])
+        
+        
+        # test that element may not be in stream elements and at end.
+        b2 = bar.Barline()
+        s.insert(0, b2)
+        with self.assertRaises(stream.StreamException):
+            s.storeAtEnd(b2)
+        
+
 
     def testElementsHighestTimeB(self):
         '''Test adding elements at the highest time position
