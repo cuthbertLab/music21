@@ -465,6 +465,13 @@ class Fingering(TechnicalIndication):
     fingering:
 
     >>> f.alternate = True
+
+    Fingerings are the only articulations that apply per note in a chord.
+    Other articulations, e.g., accents, apply to the whole chord and will,
+    therefore, only be associated with the first note of a chord when serializing.
+    Since chords store all articulations in an ordered list, Fingerings
+    are mapped implicitly to the notes of a chord in order. Superfluous
+    Fingerings will be ignored and may be discarded when serializaing.
     '''
     def __init__(self, fingerNumber=None):
         super().__init__()

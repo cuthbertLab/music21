@@ -3099,7 +3099,7 @@ class MeasureExporter(XMLExporterBase):
 
         return notations
 
-    def noteToXml(self, n, addChordTag=False, chordParent=None):
+    def noteToXml(self, n, noteIndexInChord=0, chordParent=None):
         '''
         Translate a music21 :class:`~music21.note.Note` or a Rest into a
         ElementTree, note element.
@@ -3189,6 +3189,7 @@ class MeasureExporter(XMLExporterBase):
         TODO: Test with spanners...
 
         '''
+        addChordTag = (noteIndexInChord != 0)
         setb = _setAttributeFromAttribute
 
         if chordParent is None:
@@ -3363,7 +3364,7 @@ class MeasureExporter(XMLExporterBase):
 
         # TODO: staff
 
-        mxNotationsList = self.noteToNotations(n, addChordTag, chordParent)
+        mxNotationsList = self.noteToNotations(n, noteIndexInChord, chordParent)
 
         # add tuplets if it's a note or the first <note> of a chord.
         if addChordTag is False:
@@ -3597,11 +3598,47 @@ class MeasureExporter(XMLExporterBase):
           <type>half</type>
           <notehead parentheses="no">diamond</notehead>
         </note>
+
+        Test articulations of chords with fingerings. Superfluous fingerings will be ignored.
+
+        >>> testChord = chord.Chord('E4 C5')
+        >>> testChord.articulations = [articulations.Fingering(1), articulations.Accent(), articulations.Fingering(5), articulations.Fingering(3)]
+        >>> for n in MEX.chordToXml(testChord): MEX.dump(n)
+        <note>
+          <pitch>
+            <step>E</step>
+            <octave>4</octave>
+          </pitch>
+          <duration>10080</duration>
+          <type>quarter</type>
+          <notations>
+            <articulations>
+              <accent />
+            </articulations>
+            <technical>
+              <fingering alternate="no" substitution="no">1</fingering>
+            </technical>
+          </notations>
+        </note>
+        <note>
+          <chord />
+          <pitch>
+            <step>C</step>
+            <octave>5</octave>
+          </pitch>
+          <duration>10080</duration>
+          <type>quarter</type>
+          <notations>
+            <technical>
+              <fingering alternate="no" substitution="no">5</fingering>
+            </technical>
+          </notations>
+        </note>
+
         '''
         mxNoteList = []
         for i, n in enumerate(c):
-            addChordTag = True if i != 0 else False
-            mxNoteList.append(self.noteToXml(n, addChordTag=addChordTag, chordParent=c))
+            mxNoteList.append(self.noteToXml(n, i, chordParent=c))
         return mxNoteList
 
     def durationXml(self, dur):
@@ -3858,7 +3895,7 @@ class MeasureExporter(XMLExporterBase):
             mxNotehead.set('color', color)
         return mxNotehead
 
-    def noteToNotations(self, n, notFirstNoteOfChord=False, chordParent=None):
+    def noteToNotations(self, n, noteIndexInChord=0, chordParent=None):
         '''
         Take information from .expressions,
         .articulations, and spanners to
@@ -3867,17 +3904,17 @@ class MeasureExporter(XMLExporterBase):
         mxArticulations = None
         mxTechnicalMark = None
         mxOrnaments = None
+        isSingleNoteOrFirstInChord = (noteIndexInChord == 0)
 
         notations = []
 
-        if notFirstNoteOfChord is False:
-            # only apply expressions and articulations
-            # to notes or the first note of a chord...
-            chordOrNote = n
-            if chordParent is not None:
-                # get expressions from first note of chord
-                chordOrNote = chordParent
+        chordOrNote = n
+        if chordParent is not None:
+            # get expressions from first note of chord
+            chordOrNote = chordParent
 
+        # only apply expressions to notes or the first note of a chord...
+        if isSingleNoteOrFirstInChord:
             for expObj in chordOrNote.expressions:
                 mxExpression = self.expressionToXml(expObj)
                 if mxExpression is None:
@@ -3892,15 +3929,27 @@ class MeasureExporter(XMLExporterBase):
                 else:
                     notations.append(mxExpression)
 
-            for artObj in chordOrNote.articulations:
-                if 'TechnicalIndication' in artObj.classes:
-                    if mxTechnicalMark is None:
-                        mxTechnicalMark = Element('technical')
-                    mxTechnicalMark.append(self.articulationToXmlTechnical(artObj))
-                else:
-                    if mxArticulations is None:
-                        mxArticulations = Element('articulations')
-                    mxArticulations.append(self.articulationToXmlArticulation(artObj))
+        # apply all articulations apart from fingerings only to first note of chord
+        from music21.articulations import Fingering
+        applicableArticulations = []
+        fingeringNumber = 0
+        for a in chordOrNote.articulations:
+            if 'Fingering' in a.classSet:
+                if fingeringNumber == noteIndexInChord:
+                    applicableArticulations.append(a)
+                fingeringNumber += 1
+            elif isSingleNoteOrFirstInChord:
+                applicableArticulations.append(a)
+
+        for artObj in applicableArticulations:
+            if 'TechnicalIndication' in artObj.classes:
+                if mxTechnicalMark is None:
+                    mxTechnicalMark = Element('technical')
+                mxTechnicalMark.append(self.articulationToXmlTechnical(artObj))
+            else:
+                if mxArticulations is None:
+                    mxArticulations = Element('articulations')
+                mxArticulations.append(self.articulationToXmlArticulation(artObj))
 
 
         # TODO: attrGroup: print-object (for individual notations)
@@ -3915,7 +3964,7 @@ class MeasureExporter(XMLExporterBase):
 
         # <tuplet> handled elsewhere, because it's on the overall duration on chord...
 
-        if notFirstNoteOfChord is False and chordParent is not None:
+        if isSingleNoteOrFirstInChord and chordParent is not None:
             notations.extend(self.objectAttachedSpannersToNotations(chordParent))
         elif chordParent is not None:
             pass
