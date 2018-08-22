@@ -3602,15 +3602,12 @@ class MeasureExporter(XMLExporterBase):
         Test articulations of chords with fingerings. Superfluous fingerings will be ignored.
 
         >>> testChord = chord.Chord('E4 C5')
-        >>> testChord.articulations = [articulations.Fingering(1), articulations.Accent(), articulations.Fingering(5), articulations.Fingering(3)]
-        >>> for n in MEX.chordToXml(testChord): MEX.dump(n)
+        >>> testChord.articulations = [articulations.Fingering(1), 
+        ...        articulations.Accent(), articulations.Fingering(5), articulations.Fingering(3)]
+        >>> for n in MEX.chordToXml(testChord): 
+        ...     MEX.dump(n)
         <note>
-          <pitch>
-            <step>E</step>
-            <octave>4</octave>
-          </pitch>
-          <duration>10080</duration>
-          <type>quarter</type>
+          ...
           <notations>
             <articulations>
               <accent />
@@ -3622,12 +3619,7 @@ class MeasureExporter(XMLExporterBase):
         </note>
         <note>
           <chord />
-          <pitch>
-            <step>C</step>
-            <octave>5</octave>
-          </pitch>
-          <duration>10080</duration>
-          <type>quarter</type>
+          ...
           <notations>
             <technical>
               <fingering alternate="no" substitution="no">5</fingering>
@@ -3930,7 +3922,6 @@ class MeasureExporter(XMLExporterBase):
                     notations.append(mxExpression)
 
         # apply all articulations apart from fingerings only to first note of chord
-        from music21.articulations import Fingering
         applicableArticulations = []
         fingeringNumber = 0
         for a in chordOrNote.articulations:
@@ -6160,4 +6151,3 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test) #, runTest='testSpannersWrite')
-
