@@ -853,9 +853,15 @@ class StreamIterator:
         return self
 
 
-    def getElementsByOffset(self, offsetStart, offsetEnd=None,
-                    includeEndBoundary=True, mustFinishInSpan=False,
-                    mustBeginInSpan=True, includeElementsThatEndAtStart=True):
+    def getElementsByOffset(
+            self, 
+            offsetStart, 
+            offsetEnd=None,
+            *,
+            includeEndBoundary=True, 
+            mustFinishInSpan=False,
+            mustBeginInSpan=True, 
+            includeElementsThatEndAtStart=True):
         '''
         Adds a filter keeping only Music21Objects that
         are found at a certain offset or within a certain
@@ -1002,6 +1008,8 @@ class StreamIterator:
         3
         >>> len(list(s.iter.getElementsByOffset(0.0, mustBeginInSpan=False)))
         3
+        
+        Changed in v5.5 -- all arguments changing behavior are keyword only.
 
         OMIT_FROM_DOCS
 
@@ -1055,12 +1063,14 @@ class StreamIterator:
 
         :rtype: StreamIterator
         '''
-        self.addFilter(filters.OffsetFilter(offsetStart,
-                                            offsetEnd,
-                                            includeEndBoundary,
-                                            mustFinishInSpan,
-                                            mustBeginInSpan,
-                                            includeElementsThatEndAtStart))
+        self.addFilter(filters.OffsetFilter(
+                            offsetStart,
+                            offsetEnd,
+                            includeEndBoundary=includeEndBoundary,
+                            mustFinishInSpan=mustFinishInSpan,
+                            mustBeginInSpan=mustBeginInSpan,
+                            includeElementsThatEndAtStart=includeElementsThatEndAtStart)
+                      )
         return self
 
     #-------------------------------------------------------------
@@ -1101,7 +1111,7 @@ class StreamIterator:
         <music21.note.Rest rest>
         <music21.note.Note D>
 
-        chained filters... (this makes no sense since notes is a subset of notesAndRests
+        chained filters... (this makes no sense since notes is a subset of notesAndRests)
 
         >>> for el in s.iter.notesAndRests.notes:
         ...     print(el)
@@ -1548,9 +1558,15 @@ class RecursiveIterator(StreamIterator):
             # will still return numbers even if _endElements
 
 
-    def getElementsByOffsetInHierarchy(self, offsetStart, offsetEnd=None,
-                    includeEndBoundary=True, mustFinishInSpan=False,
-                    mustBeginInSpan=True, includeElementsThatEndAtStart=True):
+    def getElementsByOffsetInHierarchy(
+            self, 
+            offsetStart, 
+            offsetEnd=None,
+            *,
+            includeEndBoundary=True, 
+            mustFinishInSpan=False,
+            mustBeginInSpan=True, 
+            includeElementsThatEndAtStart=True):
         '''
         Adds a filter keeping only Music21Objects that
         are found at a certain offset or within a certain
@@ -1574,14 +1590,17 @@ class RecursiveIterator(StreamIterator):
         <music21.note.Note F#> 9.0 3 Bass
         <music21.note.Note B> 9.5 3 Bass
 
+        Changed in v5.5 -- all behavior changing options are keyword only.
+        
         :rtype: StreamIterator
         '''
-        f = filters.OffsetHierarchyFilter(offsetStart,
-                                            offsetEnd,
-                                            includeEndBoundary,
-                                            mustFinishInSpan,
-                                            mustBeginInSpan,
-                                            includeElementsThatEndAtStart)
+        f = filters.OffsetHierarchyFilter(
+                offsetStart,
+                offsetEnd,
+                includeEndBoundary=includeEndBoundary,
+                mustFinishInSpan=mustFinishInSpan,
+                mustBeginInSpan=mustBeginInSpan,
+                includeElementsThatEndAtStart=includeElementsThatEndAtStart)
         self.addFilter(f)
         return self
 

@@ -2897,6 +2897,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def getElementsByOffset(self,
                             offsetStart,
                             offsetEnd=None,
+                            *,
                             includeEndBoundary=True,
                             mustFinishInSpan=False,
                             mustBeginInSpan=True,
@@ -2905,7 +2906,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         Returns a StreamIterator containing all Music21Objects that
         are found at a certain offset or within a certain
-        offset time range (given the start and optional stop values).
+        offset time range (given the `offsetStart` and (optional) `offsetEnd` values).
 
         There are several attributes that govern how this range is
         determined:
@@ -2945,6 +2946,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Setting includeElementsThatEndAtStart to False is useful for zeroLength
         searches that set mustBeginInSpan == False to not catch notes that were
         playing before the search but that end just before the end of the search type.
+        This setting is *ignored* for zero-length searches.
         See the code for allPlayingWhileSounding for a demonstration.
 
         This chart, and the examples below, demonstrate the various
@@ -2970,6 +2972,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         1
         >>> out1[0].step
         'D'
+
         >>> out2 = st1.getElementsByOffset(1, 3)
         >>> len(out2)
         1
@@ -3016,19 +3019,35 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ['D']
 
 
-        >>> a = stream.Stream()
-        >>> n = note.Note('G')
-        >>> n.quarterLength = .5
-        >>> a.repeatInsert(n, list(range(8)))
-        >>> b = stream.Stream()
-        >>> b.repeatInsert(a, [0, 3, 6])
-        >>> c = b.getElementsByOffset(2, 6.9)
-        >>> len(c)
+        Note how zeroLengthSearches implicitly set includeElementsThatEndAtStart=False.        
+        These two are the same:
+        
+        >>> out1 = st1.getElementsByOffset(2, mustBeginInSpan=False)
+        >>> out2 = st1.getElementsByOffset(2, 2, mustBeginInSpan=False)
+        >>> len(out1) == len(out2) == 1
+        True
+        >>> out1.elements[0] is out2.elements[0] is n2
+        True
+        
+        But this is different:
+        
+        >>> out3 = st1.getElementsByOffset(2, 2.1, mustBeginInSpan=False)
+        >>> len(out3)
         2
-        >>> c = b.flat.getElementsByOffset(2, 6.9)
-        >>> len(c)
-        10
+        >>> out3[0] is n0
+        True
+        
+        Explicitly setting includeElementsThatEndAtStart=False does not get the
+        first note:
 
+        >>> out4 = st1.getElementsByOffset(2, 2.1, mustBeginInSpan=False,
+        ...                                includeElementsThatEndAtStart=False)
+        >>> len(out4)
+        1
+        >>> out4[0] is n2
+        True
+
+        
 
         Testing multiple zero-length elements with mustBeginInSpan:
 
@@ -3045,6 +3064,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         3
 
         OMIT_FROM_DOCS
+
+        >>> a = stream.Stream()
+        >>> n = note.Note('G')
+        >>> n.quarterLength = .5
+        >>> a.repeatInsert(n, list(range(8)))
+        >>> b = stream.Stream()
+        >>> b.repeatInsert(a, [0, 3, 6])
+        >>> c = b.getElementsByOffset(2, 6.9)
+        >>> len(c)
+        2
+        >>> c = b.flat.getElementsByOffset(2, 6.9)
+        >>> len(c)
+        10
+
 
         Same test as above, but with floats
 
@@ -3093,6 +3126,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         2
         >>> [el.step for el in out7]
         ['C', 'D']
+
+        Changed in v5.5: all arguments changing behavior are keyword only.
 
         :rtype: Stream
         '''
@@ -9615,7 +9650,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         is of the same class, then the first element encountered is
         returned. For more complex usages, use allPlayingWhileSounding.
 
-        Returns None if no elements fit the bill.
+        Returns None if no elements fit the bill.        
 
         The optional elStream is the stream in which el is found.
         If provided, el's offset

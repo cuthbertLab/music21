@@ -362,12 +362,21 @@ class OffsetFilter(StreamFilter):
     see iterator.getElementsByOffset()
 
     Finds elements that match a given offset range.
+    
+    Changed in v5.5 -- all arguments except offsetStart and offsetEnd are keyword only.
     '''
+    
     derivationStr = 'getElementsByOffset'
-
-    def __init__(self, offsetStart=0.0, offsetEnd=None,
-                    includeEndBoundary=True, mustFinishInSpan=False,
-                    mustBeginInSpan=True, includeElementsThatEndAtStart=True):
+    
+    def __init__(self, 
+                 offsetStart=0.0, 
+                 offsetEnd=None, 
+                 *,
+                 includeEndBoundary=True, 
+                 mustFinishInSpan=False,
+                 mustBeginInSpan=True, 
+                 includeElementsThatEndAtStart=True
+                 ):
         super().__init__()
 
         self.offsetStart = opFrac(offsetStart)
@@ -404,13 +413,10 @@ class OffsetFilter(StreamFilter):
         element is in the range, not in the range, or (if stopAfterEnd is True) is not
         and no future elements will be in the range.
 
-        Factored out from __call__ to be used by OffsetHierarchyFilter
+        Factored out from __call__ to be used by OffsetHierarchyFilter and it's just
+        a beast.  :-)
         '''
-        dur = e.duration
-
-        #offset = common.cleanupFloat(offset)
-
-        if offset > self.offsetEnd:  # anything that ends after the span is definitely out
+        if offset > self.offsetEnd:  # anything that begins after the span is definitely out
             if stopAfterEnd:
                 # if sorted, optimize by breaking after exceeding offsetEnd
                 # eventually we could do a binary search to speed up...
@@ -418,19 +424,21 @@ class OffsetFilter(StreamFilter):
             else:
                 return False
 
+        dur = e.duration
+
         elementEnd = opFrac(offset + dur.quarterLength)
         if elementEnd < self.offsetStart:
             # anything that finishes before the span ends is definitely out
             return False
 
+        # some part of the element is at least touching some part of span.
+        # all the simple cases done! Now need to filter out those that
+        # are border cases depending on settings
+
         if dur.quarterLength == 0:
             elementIsZeroLength = True
         else:
             elementIsZeroLength = False
-
-
-        # all the simple cases done! Now need to filter out those that
-        # are border cases depending on settings
 
         if self.zeroLengthSearch is True and elementIsZeroLength is True:
             # zero Length Searches -- include all zeroLengthElements
@@ -450,18 +458,15 @@ class OffsetFilter(StreamFilter):
         if self.mustBeginInSpan is True:
             if offset < self.offsetStart:
                 return False
-            if self.includeEndBoundary is False:
-                if offset >= self.offsetEnd:
-                    # >= is unnecessary, should just be ==, but better safe than sorry
-                    return False
-
-        if self.mustBeginInSpan is False:
-            if elementIsZeroLength is False:
-                if elementEnd == self.offsetEnd and self.zeroLengthSearch is True:
-                    return False
-        if self.includeEndBoundary is False:
-            if offset >= self.offsetEnd:
+            if self.includeEndBoundary is False and offset == self.offsetEnd:
                 return False
+        elif (elementIsZeroLength is False
+                and elementEnd == self.offsetEnd 
+                and self.zeroLengthSearch is True):
+            return False
+                
+        if self.includeEndBoundary is False and offset == self.offsetEnd:
+            return False
 
         if self.includeElementsThatEndAtStart is False and elementEnd == self.offsetStart:
             return False
