@@ -3,7 +3,7 @@ language: python
 matrix:
     include:
         - python: 3.5
-          dist: xenial
+          dist: trusty
           sudo: false
         - python: 3.6
           dist: trusty
