@@ -50,7 +50,7 @@ class StreamCoreMixin:
 
     def coreInsert(self, offset, element,
                    *,
-                   ignoreSort=False, setActiveSite=True,
+                   ignoreSort=False, setActiveSite=True
                    ):
         '''
         N.B. -- a "core" method, not to be used by general users.  Run .insert() instead.
