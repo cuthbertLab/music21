@@ -2325,6 +2325,12 @@ class Interval(IntervalBase):
             return Interval(diatonic=self.diatonic.reverse(),
                             chromatic=self.chromatic.reverse())
 
+    def _getNoteStart(self):
+        '''
+        returns self._noteStart
+        '''
+        return self._noteStart
+
     def _setNoteStart(self, n):
         '''
         Assuming that this interval is defined,
@@ -2338,12 +2344,6 @@ class Interval(IntervalBase):
         pitch2 = self.transposePitch(pitch1)
         self._noteEnd = copy.deepcopy(self._noteStart)
         self._noteEnd.pitch = pitch2
-
-    def _getNoteStart(self):
-        '''
-        returns self._noteStart
-        '''
-        return self._noteStart
 
     noteStart = property(_getNoteStart, _setNoteStart,
         doc = '''

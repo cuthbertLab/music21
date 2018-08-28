@@ -160,10 +160,6 @@ class Graph:
         Matplotlib Figure objects need to be explicitly closed when no longer used...
         '''
         if hasattr(self, 'figure') and self.figure is not None and self.doneAction is None:
-#             keep_observers = False
-#             if self.doneAction == 'show':
-#                 keep_observers = True
-#             self.figure.clf(keep_observers=keep_observers)
             etm = getExtendedModules()
             etm.plt.close(self.figure)
 

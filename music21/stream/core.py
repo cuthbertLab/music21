@@ -131,8 +131,13 @@ class StreamCoreMixin:
     #---------------------------------------------------------------------------
     # adding and editing Elements and Streams -- all need to call coreElementsChanged
     # most will set isSorted to False
-    def coreElementsChanged(self, updateIsFlat=True, clearIsSorted=True,
-                        memo=None, keepIndex=False):
+    def coreElementsChanged(
+            self, 
+            *,            
+            updateIsFlat=True, 
+            clearIsSorted=True,
+            memo=None, 
+            keepIndex=False):
         '''
         NB -- a "core" stream method that is not necessary for most users.
 

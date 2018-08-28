@@ -1505,6 +1505,7 @@ class Music21Object:
 
 
     def contextSites(self,
+                     *,                     
                      callerFirst=None,
                      memo=None,
                      offsetAppend=0.0,
@@ -1660,7 +1661,8 @@ class Music21Object:
         <music21.stream.Measure 2 offset=0.0>
         <music21.stream.Part p2>
 
-        *removed in v3: priorityTarget cannot be set, in order to use .sites.yieldSites()*
+        *  removed in v3: priorityTarget cannot be set, in order to use .sites.yieldSites()
+        *  changed in v5.5: all arguments are keyword only.
         '''
         if memo is None:
             memo = []
@@ -2010,7 +2012,7 @@ class Music21Object:
         # can be None
         if sites.WEAKREF_ACTIVE:
             if self._activeSite is None: #leave None
-                return self._activeSite
+                return None
             else: # even if current activeSite is not a weakref, this will work
                 #environLocal.printDebug(['_getActiveSite() called:',
                 #                          'self._activeSite', self._activeSite])
@@ -2026,8 +2028,8 @@ class Music21Object:
             try:
                 storedOffset = site.elementOffset(self)
             except SitesException:
-                raise SitesException('v2.1. -- you may not assign an activesite for ' +
-                                     'an object {} not in the Stream {}'.format(self, site))
+                raise SitesException('activeSite cannot be set for ' +
+                                     'object {} not in the Stream {}'.format(self, site))
 
             self._activeSiteStoredOffset = storedOffset
             #siteId = id(site)

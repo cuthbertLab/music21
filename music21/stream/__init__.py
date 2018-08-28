@@ -307,8 +307,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         specialized :class:`music21.stream.StreamIterator` class, which
         adds necessary Stream-specific features.
 
-        Generally you don't need this, but it is necessary to add filters to an
-        iterative search.
+        Generally you don't need this, just iterate over a stream, but it is necessary 
+        to add custom filters to an iterative search before iterating.
         '''
         return self.__iter__()
 
@@ -429,16 +429,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 return classStream.stream()
             else:
                 raise KeyError('provided class (%s) does not match any contained Objects' % k)
-
-
-#    def __del__(self):
-#        self.cache = {}
-#         #environLocal.printDebug(['calling __del__ from Stream', self])
-#         # this is experimental
-#         # this did not offer improvements, and raised a number of errors
-#         for e in self._elements:
-#             e.sites.remove(self)
-
 
 
     def _getElements(self):
@@ -832,6 +822,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     keySignature = property(_getKeySignature, _setKeySignature)
 
+
+    def clear(self):
+        self.elements = []
+         
 
     def cloneEmpty(self, derivationMethod=None):
         '''
@@ -1517,6 +1511,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> n2 = note.Note('D')
         >>> s.setElementOffset(n2, 30.0, addElement=True)
+        
+        Changed in v5.5 -- also sets .activeSite for the element.
         '''
         try:
             offset = opFrac(offset)
@@ -1528,6 +1524,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             raise StreamException(
                 "Cannot set the offset for element {}, not in Stream {}.".format(element, self))
         self._offsetDict[idEl] = (offset, element) # fast
+        element.activeSite = self;
 
     def elementOffset(self, element, stringReturns=False):
         '''

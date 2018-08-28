@@ -69,8 +69,8 @@ class SubConverter:
     canBePickled = True
     registerFormats = ()
     registerShowFormats = ()
-    registerInputExtensions = ()
-    registerOutputExtensions = ()
+    registerInputExtensions = () # if converter supports input, put something here
+    registerOutputExtensions = () # if converter supports output put something here.
     registerOutputSubformatExtensions = {}
     launchKey = None
 
@@ -96,7 +96,7 @@ class SubConverter:
         '''
         Called when a file is encountered. If all that needs to be done is
         loading the file and putting the data into parseData then there is no need
-        to do anything except set self.readBinary (True|False).
+        to do implement this method.  Just set self.readBinary to True|False.
         '''
         if self.readBinary is False:
             with open(str(filePath)) as f:  # remove str in Py3.6
@@ -141,6 +141,8 @@ class SubConverter:
         to search for the application.  If it's not specified then there might be
         a default one for the converter in self.launchKey.  If it can't find it
         there then environLocal.formatToApp(fmt) will be used.
+        
+        Not needed for formats for which .show() just prints to the console.
         '''
         if fmt is None and self.registerShowFormats:
             fmt = self.registerShowFormats[0]
@@ -177,6 +179,13 @@ class SubConverter:
         os.system(cmd)
 
     def show(self, obj, fmt, app=None, subformats=None, **keywords):
+        '''
+        Write the data, then show the generated data, using `.launch()` or printing
+        to a console.
+        
+        Some simple formats that do not need launching, may skip .launch() and
+        simply return the output.
+        '''
         returnedFilePath = self.write(obj, fmt, subformats=subformats, **keywords)
         self.launch(returnedFilePath, fmt=fmt, app=app)
 
@@ -525,6 +534,54 @@ class ConverterTextLine(SubConverter):
     def show(self, obj, *args, **keywords):
         return obj._reprTextLine()
 
+class ConverterVolpiano(SubConverter):
+    '''
+    Reads or writes volpiano (Chant encoding).
+    
+    Normally, just use 'converter' and .show()/.write()
+    
+    >>> p = converter.parse('volpiano: 1---c-d-ef----4')
+    >>> p.show('text')
+    {0.0} <music21.stream.Measure 0 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note D>
+        {2.0} <music21.note.Note E>
+        {3.0} <music21.note.Note F>
+        {4.0} <music21.volpiano.Neume <music21.note.Note E><music21.note.Note F>>
+        {4.0} <music21.bar.Barline style=double>
+    >>> p.show('volpiano')
+    1---c-d-ef----4
+    '''
+    registerFormats = ('volpiano',)
+    registerInputExtensions = ('volpiano', 'vp')
+    registerOutputExtensions = ('txt', 'vp')
+
+    def parseData(self, dataString, **keywords):
+        from music21 import volpiano
+        breaksToLayout = keywords.get('breaksToLayout', False)
+        self.stream = volpiano.toPart(dataString, breaksToLayout=breaksToLayout)
+
+    def getDataStr(self, obj, *args, **keywords):
+        '''
+        Get the raw data, for storing as a variable.
+        '''
+        from music21 import volpiano
+        if (obj.isStream):
+            s = obj
+        else:
+            s = stream.Stream()
+            s.append(obj)
+            
+        return volpiano.fromStream(s)
+
+    def write(self, obj, fmt, fp=None, subformats=None, **keywords): # pragma: no cover
+        dataStr = self.getDataStr(obj, **keywords)
+        self.writeDataStream(fp, dataStr)
+        return fp
+    
+    def show(self, obj, *args, **keywords):
+        print(self.getDataStr(obj, *args, **keywords))
 
 class ConverterScala(SubConverter):
     registerFormats = ('scala',)

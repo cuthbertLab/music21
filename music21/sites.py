@@ -476,6 +476,7 @@ class Sites(common.SlottedObjectMixin):
 
 
     def get(self,
+            *,            
             sortByCreationTime=False,
             priorityTarget=None,
             excludeNone=False):
@@ -515,7 +516,7 @@ class Sites(common.SlottedObjectMixin):
         >>> begotten == [cObj, bObj, aObj]
         True
 
-
+        * Changed in v5.5: keyword only.
         '''
         post = list(self.yieldSites(sortByCreationTime, priorityTarget, excludeNone))
 
@@ -575,6 +576,7 @@ class Sites(common.SlottedObjectMixin):
     def getObjByClass(
             self,
             className,
+            *,
             callerFirst=None,
             sortByCreationTime=False,
             priorityTarget=None,
@@ -615,6 +617,8 @@ class Sites(common.SlottedObjectMixin):
         >>> aSites.getObjByClass(Mock, sortByCreationTime=True) == bObj
         True
 
+        * Changed in v5.5: all arguments except className are keyword only.
+
         OMIT_FROM_DOCS
         TODO: not sure if memo is properly working: need a test case
         '''
@@ -636,7 +640,7 @@ class Sites(common.SlottedObjectMixin):
             sortByCreationTime=sortByCreationTime,
             priorityTarget=priorityTarget,
             excludeNone=True,
-            )
+            ) # objs is a generator
         #printMemo(memo, 'getObjByClass() called: looking at %s sites' % len(objs))
         classNameIsStr = isinstance(className, str)
         for obj in objs:
