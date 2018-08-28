@@ -49,6 +49,7 @@ class StreamCoreMixin:
         #self._elementTree = tree.trees.ElementTree(source=self)
 
     def coreInsert(self, offset, element,
+                   *,
                    ignoreSort=False, setActiveSite=True,
                    ):
         '''
@@ -93,11 +94,9 @@ class StreamCoreMixin:
                         if highestSortTuple < thisSortTuple:
                             storeSorted = True
 
-        self.setElementOffset(element, float(offset), addElement=True)
+        self.setElementOffset(element, float(offset), addElement=True, setActiveSite=setActiveSite)
         element.sites.add(self)
         # need to explicitly set the activeSite of the element
-        if setActiveSite:
-            element.activeSite = self
         # will be sorted later if necessary
         self._elements.append(element)
         #self._elementTree.insert(float(offset), element)

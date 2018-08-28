@@ -1479,7 +1479,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 e.purgeOrphans(excludeStorageStreams=False)
 
 
-    def setElementOffset(self, element, offset, addElement=False):
+    def setElementOffset(self, element, offset, *, addElement=False, setActiveSite=True):
         '''
         Sets the Offset for an element, very quickly.
 
@@ -1507,12 +1507,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         used in normal situations.
         it is used by .insert() and .append() and other core functions; other things
         must also be done to
-        properly add an element.)
+        properly add an element, such as append sites.)
 
         >>> n2 = note.Note('D')
         >>> s.setElementOffset(n2, 30.0, addElement=True)
         
-        Changed in v5.5 -- also sets .activeSite for the element.
+        Changed in v5.5 -- also sets .activeSite for the element unless setActiveSite is False
         '''
         try:
             offset = opFrac(offset)
@@ -1524,7 +1524,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             raise StreamException(
                 "Cannot set the offset for element {}, not in Stream {}.".format(element, self))
         self._offsetDict[idEl] = (offset, element) # fast
-        element.activeSite = self;
+        if setActiveSite:
+            element.activeSite = self;
 
     def elementOffset(self, element, stringReturns=False):
         '''

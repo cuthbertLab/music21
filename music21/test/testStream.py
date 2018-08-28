@@ -5133,36 +5133,36 @@ class Test(unittest.TestCase):
 
 
     def testActiveSiteMangling(self):
-        s1 = Stream()
-        s2 = Stream()
-        s2.append(s1)
+        outer = Stream()
+        inner = Stream()
+        outer.append(inner)
 
-        self.assertEqual(s1.activeSite, s2)
-        junk = s1.semiFlat
-        self.assertEqual(s1.activeSite, s2)
-        junk = s1.flat  # the order of these two calls ensures that _getFlatFromSemiflat is called
-        self.assertEqual(s1.activeSite, s2)
+        self.assertEqual(inner.activeSite, outer)
+        junk = inner.semiFlat
+        self.assertEqual(inner.activeSite, outer)
+        junk = inner.flat  # the order of these two calls ensures that _getFlatFromSemiflat is called
+        self.assertEqual(inner.activeSite, outer)
 
         # this works fine
-        junk = s2.flat
-        self.assertEqual(s1.activeSite, s2)
+        junk = outer.flat
+        self.assertEqual(inner.activeSite, outer)
 
         # this was the key problem: getting the semiFlat of the activeSite
         # looses the activeSite of the sub-stream; this is fixed by the inserting
         # of the sub-Stream with setActiveSite False
-        junk = s2.semiFlat
-        self.assertEqual(s1.activeSite, s2)
+        junk = outer.semiFlat
+        self.assertEqual(inner.activeSite, outer)
 
         # these test prove that getting a semiFlat stream does not change the
         # activeSite
-        junk = s1.sites.getObjByClass(meter.TimeSignature)
-        self.assertEqual(s1.activeSite, s2)
+        junk = inner.sites.getObjByClass(meter.TimeSignature)
+        self.assertEqual(inner.activeSite, outer)
 
-        junk = s1.sites.getObjByClass(clef.Clef)
-        self.assertEqual(s1.activeSite, s2)
+        junk = inner.sites.getObjByClass(clef.Clef)
+        self.assertEqual(inner.activeSite, outer)
 
-        junk = s1.getContextByClass('Clef')
-        self.assertEqual(s1.activeSite, s2)
+        junk = inner.getContextByClass('Clef')
+        self.assertEqual(inner.activeSite, outer)
 
 
 
@@ -7852,7 +7852,7 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    music21.mainTest(Test, 'verbose')
+    music21.mainTest(Test, 'verbose',) # runTest='testChordifyTagPartB')
 
 #------------------------------------------------------------------------------
 # eof
