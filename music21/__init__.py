@@ -107,6 +107,7 @@ __all__ = [
     'musedata',
     'musicxml',
     'noteworthy',
+    'opensheetmusicdisplay',
     'omr',
     'romanText',
     'scale',
