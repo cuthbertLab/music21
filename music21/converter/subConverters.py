@@ -1473,6 +1473,24 @@ class Test(unittest.TestCase):
         xmlconverter = ConverterMusicXML()
         self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, xmlfp)
 
+    def testOpenSheetMusicDisplayRuns(self):
+        from music21 import corpus, environment
+        environLocal = environment.Environment()
+
+        s = corpus.parse('luca/gloria').measures(1, 19)
+        # s.show('osmd')
+        ConverterOpenSheetMusicDisplay().show(s, None)
+
+    def testAddsDefaultPartId(self):
+        from music21 import converter
+        s = music21.converter.parse("tinyNotation: 3/4 E4 r f#")
+
+        s = ConverterOpenSheetMusicDisplay.addDefaultPartName(s)
+        firstInstrumentObject = s.getInstruments(returnDefault=True, recurse=True)[0]
+        # print("firstInstrumentObject",firstInstrumentObject)
+        # print("firstInstrumentObject.instrumentName",firstInstrumentObject.instrumentName)
+        assert firstInstrumentObject.instrumentName != None
+        assert firstInstrumentObject.instrumentName != ''
 
 class TestExternal(unittest.TestCase): # pragma: no cover
     def runTest(self):
