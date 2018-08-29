@@ -15,7 +15,18 @@ See OSMD project page here: https://github.com/opensheetmusicdisplay/opensheetmu
 import unittest
 from music21 import exceptions21
 
-from IPython.core.display import display, HTML, Javascript
+
+class OpenSheetMusicDisplayException(exceptions21.Music21Exception):
+    pass
+
+try:
+    # raise ImportError('for testing')
+    from IPython.core.display import display, HTML, Javascript
+except ImportError as e:
+    # raise error only if methods are called by a .show()
+    def display(*args, **kwargs):
+        raise OpenSheetMusicDisplayException('OpenSheetMusicDisplay requires IPython to be installed')
+    HTML = Javascript = display
 
 
 from music21.converter.subConverters import SubConverter
