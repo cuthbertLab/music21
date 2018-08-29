@@ -293,7 +293,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     registerFormats = ('osmd',)
     registerShowFormats = ('osmd',) 
 
-    def show(self, obj, fmt, app=None, subformats=None, fixPartName=True, **keywords):
+    def show(self, obj, fmt, app=None, subformats=None, fixPartName=True, offline=True, **keywords):
         score = obj
         if fixPartName:
             score = self.addDefaultPartName(score)
@@ -303,7 +303,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         display(HTML('<div id="'+div_id+'">loading OpenSheetMusicDisplay</div>'))
 
         xml = open(score.write('musicxml')).read()
-        script = self.musicXMLToScript(xml, div_id)
+        script = self.musicXMLToScript(xml, div_id, offline=offline)
 
         display(Javascript(script))
         return div_id
@@ -315,7 +315,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
                 "-"+str(time.time()).replace('.','-') # '.' is the class selector
 
     @staticmethod
-    def musicXMLToScript(xml, div_id):
+    def musicXMLToScript(xml, div_id, offline=True):
         
         # print('xml length:', len(xml))
         script_dir = os.path.join(os.path.dirname(__file__), 'opensheetmusicdisplay.0.3.1.min.js')
@@ -337,13 +337,14 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
                 var s = document.createElement( 'script' );
                 // alternative to local file is using a CDN
                 // s.setAttribute( 'src', "https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@0.3.1/build/opensheetmusicdisplay.min.js" );
-                s.setAttribute( 'src', "{{script_dir}}" );
-                s.onload=function(){
+                //s.setAttribute( 'src', "{{script_dir}}" );
+                function oncompleted(){
                     window.define = _define
                     console.log("loaded OSMD for the first time",opensheetmusicdisplay)
                     resolve(opensheetmusicdisplay);
                 };
-                document.body.appendChild( s ); // browser will try to load the new script tag
+                {{script_command}}
+                
             }) 
         }
         loadOSMD().then((OSMD)=>{
@@ -364,6 +365,21 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         .replace('{{DIV_ID}}',div_id) \
         .replace('{{data}}',json.dumps(xml)) \
         .replace('{{script_dir}}',pathname2url(script_dir))
+        print("offline",offline)
+        if offline is True:
+            script_content = open(script_dir).read()
+            script = script.replace('{{script_command}}',"""
+                s.type = 'text/javascript';
+                s.text="""+json.dumps(script_content)+""";
+                document.body.appendChild( s ); // browser will try to load the new script tag
+                oncompleted();
+                """)
+        else:
+            script = script.replace('{{script_command}}',"""
+                s.setAttribute( 'src', 'https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@0.3.1/build/opensheetmusicdisplay.min.js' );
+                s.onload=oncompleted;
+                document.body.appendChild( s ); // browser will try to load the new script tag
+                """)
 
         return script
 
