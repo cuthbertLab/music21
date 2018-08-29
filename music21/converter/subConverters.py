@@ -277,6 +277,115 @@ class SubConverter:
             f.close()
         return fp
 
+from IPython.core.display import display, HTML, Javascript
+from music21.instrument import Piano
+from urllib.request import pathname2url
+import time
+import random
+import json
+
+class ConverterOpenSheetMusicDisplay(SubConverter):
+    '''
+    Converter for displaying sheet music inline
+    in an IPython notebook.
+    Uses: https://opensheetmusicdisplay.org/ for rendering
+    '''
+    registerFormats = ('osmd',)
+    registerShowFormats = ('osmd',) 
+
+    def show(self, obj, fmt, app=None, subformats=None, fixPartName=True, **keywords):
+        score = obj
+        if fixPartName:
+            score = self.addDefaultPartName(score)
+
+        div_id = self.getUniqueDivId()
+
+        display(HTML('<div id="'+div_id+'">loading OpenSheetMusicDisplay</div>'))
+
+        xml = open(score.write('musicxml')).read()
+        script = self.musicXMLToScript(xml, div_id)
+
+        display(Javascript(script))
+        return div_id
+
+    @staticmethod
+    def getUniqueDivId():
+        return "OSMD-div-"+ \
+                str(random.randint(0,1000000))+ \
+                "-"+str(time.time()).replace('.','-') # '.' is the class selector
+
+    @staticmethod
+    def musicXMLToScript(xml, div_id):
+        
+        # print('xml length:', len(xml))
+        script_dir = os.path.join(os.path.dirname(__file__), 'opensheetmusicdisplay.0.3.1.min.js')
+
+        # script that will replace div contents with OSMD display
+        script = """
+        console.log("loadOSMD()");
+        function loadOSMD() { 
+            return new Promise(function(resolve, reject){
+
+                if (window.opensheetmusicdisplay) {
+                    console.log("already loaded")
+                    return resolve(window.opensheetmusicdisplay)
+                }
+                console.log("loading osmd for the first time")
+                // OSMD script has a 'define' call which conflicts with requirejs
+                var _define = window.define // save the define object 
+                window.define = undefined // now the loaded script will ignore requirejs
+                var s = document.createElement( 'script' );
+                // alternative to local file is using a CDN
+                // s.setAttribute( 'src', "https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@0.3.1/build/opensheetmusicdisplay.min.js" );
+                s.setAttribute( 'src', "{{script_dir}}" );
+                s.onload=function(){
+                    window.define = _define
+                    console.log("loaded OSMD for the first time",opensheetmusicdisplay)
+                    resolve(opensheetmusicdisplay);
+                };
+                document.body.appendChild( s ); // browser will try to load the new script tag
+            }) 
+        }
+        loadOSMD().then((OSMD)=>{
+            console.log("loaded OSMD",OSMD)
+            var div_id = "{{DIV_ID}}";
+                console.log(div_id)
+            window.openSheetMusicDisplay = new OSMD.OpenSheetMusicDisplay(div_id);
+            openSheetMusicDisplay
+                .load({{data}})
+                .then(
+                  function() {
+                    console.log("rendering data")
+                    openSheetMusicDisplay.render();
+                  }
+                );
+        })
+        """ \
+        .replace('{{DIV_ID}}',div_id) \
+        .replace('{{data}}',json.dumps(xml)) \
+        .replace('{{script_dir}}',pathname2url(script_dir))
+
+        return script
+
+    @staticmethod
+    def addDefaultPartName(score):
+        # If no partName is present in the first instrument, OSMD will display the ugly 'partId'
+        allInstruments = list(score.getInstruments(returnDefault=False, recurse=True))
+        
+        if len(allInstruments)==0:
+            # print("adding default inst")
+            defaultInstrument = Piano()
+            defaultInstrument.instrumentName = 'Default'
+            score.insert(None, defaultInstrument)
+            score.coreElementsChanged()
+        elif not allInstruments[0].instrumentName: 
+            # print("adding instrumentName")
+            # instrumentName must not be '' or None
+            allInstruments[0].instrumentName = 'Default'
+            score.coreElementsChanged()
+
+        return score
+
 class ConverterIPython(SubConverter):
     '''
     Meta-subconverter for displaying image data etc. in iPython
