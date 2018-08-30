@@ -161,9 +161,6 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testOpenSheetMusicDisplayRuns(self):
         from music21 import corpus, environment
         environLocal = environment.Environment()
