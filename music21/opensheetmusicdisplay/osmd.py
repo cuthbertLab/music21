@@ -19,9 +19,11 @@ from music21 import exceptions21
 class OpenSheetMusicDisplayException(exceptions21.Music21Exception):
     pass
 
+hasInstalledIPython = False
 try:
     # raise ImportError('for testing')
     from IPython.core.display import display, HTML, Javascript
+    hasInstalledIPython = True
 except ImportError as e:
     # raise error only if methods are called by a .show()
     def display(*args, **kwargs):
@@ -161,6 +163,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
 
 class Test(unittest.TestCase):
 
+    @unittest.skipUnless(hasInstalledIPython, "skipping since IPython not installed")
     def testOpenSheetMusicDisplayRuns(self):
         from music21 import corpus, environment
         environLocal = environment.Environment()
