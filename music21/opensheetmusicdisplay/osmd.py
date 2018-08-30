@@ -107,13 +107,13 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
             console.log("loaded OSMD",OSMD)
             var div_id = "{{DIV_ID}}";
                 console.log(div_id)
+            document.querySelector('#'+div_id).innerHTML = "";
             window.openSheetMusicDisplay = new OSMD.OpenSheetMusicDisplay(div_id);
             openSheetMusicDisplay
                 .load({{data}})
                 .then(
                   function() {
                     console.log("rendering data")
-                    document.querySelector('#'+div_id).innerHTML = "";
                     openSheetMusicDisplay.render();
                   }
                 );
