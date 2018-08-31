@@ -3782,9 +3782,11 @@ class Chord(note.NotRest):
         >>> c3.commonName
         'all-interval tetrachord'
 
+        Chords with no common names just return the Forte Class
+
         >>> c3 = chord.Chord([0, 1, 2, 3, 4, 9])
         >>> c3.commonName
-        ''
+        'forte class 6-36B'
         
         Dominant seventh and German/Swiss sixths are distinguished
         
@@ -3809,6 +3811,7 @@ class Chord(note.NotRest):
         >>> dyad2.commonName
         'Diminished Fourth'
         
+        Changed in v5.5: special cases for checking enharmonics in some cases
         '''
         cta = self.chordTablesAddress
         if cta.cardinality == 2:
@@ -3855,7 +3858,7 @@ class Chord(note.NotRest):
         
                 
         if not ctn:
-            return ''
+            return 'forte class ' + forteClass
         else:
             return ctn[0]
 
@@ -4268,9 +4271,10 @@ class Chord(note.NotRest):
     @property
     def pitchedCommonName(self):
         '''
-        Return the common name of this Chord preceded by its root, if a root is
-        available:
+        Return a common name of this Chord including a pitch identifier, if possible:
 
+        Most common chords will use the root as the pitch name and have it at the beginning:
+        
         >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.pitchedCommonName
         'C-minor triad'
@@ -4278,18 +4282,47 @@ class Chord(note.NotRest):
         >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.pitchedCommonName
         'C-major triad'
+        
+        Because the hyphen is confusing w/ music21 flat notation, flats are displayed
+        as "b":
 
+        >>> c2a = chord.Chord('C-2 E-2 G-2')
+        >>> c2a.pitchedCommonName
+        'Cb-major triad'        
+        
+        Other forms might have the pitch elsewhere.  Thus this is a method for display,
+        not for extracting information:
+        
+        >>> c3 = chord.Chord('A#2 D3 F3')
+        >>> c3.pitchedCommonName
+        'enharmonic equivalent to major triad above A#'
+        
+        Note that in this case, the bass, not the root is used to determine the pitch name:
+        
+        >>> c4 = chord.Chord('D3 F3 A#3')
+        >>> c4.pitchedCommonName
+        'enharmonic equivalent to major triad above D'
+        
+        >>> c5 = chord.Chord([1, 2, 3, 4, 5, 10])
+        >>> c5.pitchedCommonName
+        'forte class 6-36B above C#'
+
+        
+        Changed in v5.5 -- octaves never included, flats are converted, 
+        special tools for enharmonics.
         '''
-        post = chordTables.addressToCommonNames(self.chordTablesAddress)
-        if post is not None:
-            nameStr = post[0] # get first
+        nameStr = self.commonName
+
+        if 'enharmonic' in nameStr or 'forte class' in nameStr:
+            # root detection gives weird results for pitchedCommonName
+            bass = self.bass()
+            return '%s above %s' % (nameStr, bass.name.replace('-', 'b'))
         else:
-            nameStr = ''
-        try:
-            root = self.root()
-        except ChordException: # if a root cannot be found
-            root = self.pitches[0]
-        return '%s-%s' % (root, nameStr)
+            try:
+                root = self.root()
+            except ChordException: # if a root cannot be found
+                root = self.pitches[0]
+            return '%s-%s' % (root.name.replace('-', 'b'), nameStr)
 
     @property
     def pitches(self):

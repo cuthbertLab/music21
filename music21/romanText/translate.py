@@ -1147,10 +1147,10 @@ m7 = m3
         s = romanTextToStreamScore(testSecondaryInCopy)
         m = s.measure(6).flat
         self.assertEqual(m.getElementsByClass('RomanNumeral')[0].pitchedCommonName,
-                         'E5-dominant seventh chord')
+                         'E-dominant seventh chord')
         m = s.measure(7).flat
         self.assertEqual(m.getElementsByClass('RomanNumeral')[0].pitchedCommonName,
-                         'E5-dominant seventh chord')
+                         'E-dominant seventh chord')
         #s.show()
 
     def testBasicB(self):
