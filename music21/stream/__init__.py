@@ -1456,7 +1456,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return
         # iterate over complete semi-flat (need containers); find
         # all new/old pairs
-        for e in new.recurse(skipSelf=True):
+        for e in new.recurse(includeSelf=False):
             # update based on id of old object, and ref to new object
             if 'Spanner' in e.classes:
                 continue
@@ -2392,7 +2392,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         if allDerived:
             for derivedSite in self.derivation.chain():
-                for subsite in derivedSite.recurse(streamsOnly=True, skipSelf=False):
+                for subsite in derivedSite.recurse(streamsOnly=True, includeSelf=True):
                     if subsite in target.sites:
                         subsite.replace(target,
                                         replacement,
@@ -2756,7 +2756,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Stream:
 
         >>> totalFound = 0
-        >>> for subStream in a.recurse(streamsOnly=True):
+        >>> for subStream in a.recurse(streamsOnly=True, includeSelf=True):
         ...     found = subStream.getElementsByClass(note.Rest)
         ...     totalFound += len(found)
         >>> totalFound
@@ -5476,7 +5476,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             measureIterator = template.getElementsByClass('Measure')
             for i, templateMeasure in enumerate(measureIterator):
                 measurePart = workObj.measure(i, collect=(), indicesNotNumbers=True)
-                chordifyOneMeasure(templateMeasure, measurePart)
+                if measurePart is not None:
+                    chordifyOneMeasure(templateMeasure, measurePart)
+                else:
+                    environLocal.warn('Malformed Part object, {}, at measure index {}'.format(
+                                            workObj, i)
+                    )
         else:
             chordifyOneMeasure(template, workObj)
         
@@ -6908,14 +6913,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             memo.append(id(e))
 
     def recurse(self,
+                *,
                 streamsOnly=False,
                 restoreActiveSites=True,
                 classFilter=(),
-                skipSelf=False):
+                skipSelf=True,
+                includeSelf=None):
         '''
-        NOTE: skipSelf is going to become True by default soon -- make sure that you
-        are NOT relying on the default value.
-
         Returns an iterator that iterates over a list of Music21Objects
         contained in the Stream, starting with self (unless skipSelf is True),
         continuing with self's elements,
@@ -6962,7 +6966,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         So, that's not how we use `.recurse()`.  Instead use it in a for loop:
 
-        >>> for el in s.recurse():
+        >>> for el in s.recurse(includeSelf=True):
         ...     tup = (el, el.offset, el.activeSite)
         ...     print(tup)
         (<music21.stream.Score mainScore>, 0.0, None)
@@ -7015,11 +7019,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         So, this is pretty unreliable so don't use it unless the tiny speedup is worth it.
 
         The other two attributes are pretty self-explanatory: `streamsOnly` will put only Streams
-        in, while `skipSelf` will ignore the initial stream from recursion.  If the inclusion or
-        exclusion of `self` is important to you, put it in explicitly, because the default
-        will likely change in the future.
+        in, while `includeSelf` will add the initial stream from recursion.  If the inclusion or
+        exclusion of `self` is important to you, put it in explicitly.
 
-        >>> for el in s.recurse(skipSelf=True, streamsOnly=True):
+        >>> for el in s.recurse(includeSelf=False, streamsOnly=True):
         ...     tup = (el, el.offset, el.activeSite)
         ...     print(tup)
         (<music21.stream.Part part0>, 0.0, <music21.stream.Score mainScore>)
@@ -7035,9 +7038,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             the components of the Stream being iterated over during iteration.
             if you need to edit while recusing, list(s.recurse()) is safer.
 
-        #TODO: change skipSelf by January 2016.
+        Changed in v5.5 -- `skipSelf` is True as promised.  All attributes are keyword only. 
+        `includeSelf` is added and now preferred over `skipSelf`.  `skipSelf` will be removed
+        in or after 2022.    
         '''
-        includeSelf = not skipSelf
+        if includeSelf is None:
+            includeSelf = not skipSelf
         ri = iterator.RecursiveIterator(self,
                                         streamsOnly=streamsOnly,
                                         restoreActiveSites=restoreActiveSites,
@@ -7083,7 +7089,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         @return Stream or None
         '''
         elSites = el.sites
-        for s in self.recurse(skipSelf=False, streamsOnly=True, restoreActiveSites=False):
+        for s in self.recurse(includeSelf=True, streamsOnly=True, restoreActiveSites=False):
             if s in elSites:
                 if setActiveSite:
                     el.activeSite = s
@@ -7108,7 +7114,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         if self._mutable is not False:
             self.sort() # must sort before making immutable
-        for e in self.recurse(streamsOnly=True, skipSelf=True):
+        for e in self.recurse(streamsOnly=True, includeSelf=False):
             #e.purgeLocations(rescanIsDead=True)
             # NOTE: calling this method was having the side effect of removing
             # sites from locations when a Note was both in a Stream and in
@@ -12513,7 +12519,7 @@ class Score(Stream):
         spannerBundle = post.spannerBundle # use property
         # iterate over complete semi flat (need containers); find
         # all new/old pairs
-        for e in post.recurse(skipSelf=True):
+        for e in post.recurse(includeSelf=False):
             # update based on last id, new object
             if e.sites.hasSpannerSite():
                 origin = e.derivation.origin

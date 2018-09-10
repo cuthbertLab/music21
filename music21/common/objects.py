@@ -37,7 +37,7 @@ class RelativeCounter(collections.Counter):
     b 2
     c 1
     
-    Ties are iterated according to which appeared first in the generated list in Py3.6
+    Ties are iterated according to which appeared first in the generated list in Py3.6+
     and in random order in Py3.4-3.5.
         
     >>> rcProportion = rc.asProportion()

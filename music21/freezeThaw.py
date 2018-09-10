@@ -587,7 +587,7 @@ class StreamFreezer(StreamFreezeThawBase):
         else:
             streamObj = hierarchyObject
         streamsFoundGenerator = streamObj.recurse(streamsOnly=True,
-                       restoreActiveSites=False)
+                       restoreActiveSites=False, includeSelf=True)
         streamIds = [id(s) for s in streamsFoundGenerator]
 
         if getSpanners is True:
@@ -595,7 +595,7 @@ class StreamFreezer(StreamFreezeThawBase):
             streamIds += spannerBundle.getSpannerStorageIds()
 
         if getVariants is True:
-            for el in streamObj.recurse().getElementsByClass('Variant'):
+            for el in streamObj.recurse(includeSelf=True).getElementsByClass('Variant'):
                 streamIds += self.findActiveStreamIdsInHierarchy(el._stream)
 
         # should not happen that there are duplicates, but possible with spanners...

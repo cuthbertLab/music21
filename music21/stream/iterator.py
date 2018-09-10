@@ -1133,7 +1133,7 @@ class StreamIterator:
     @property
     def spanners(self):
         '''
-        Adds a ClassFilter for Variant objects
+        Adds a ClassFilter for Spanner objects
         '''
         self.addFilter(filters.ClassFilter('Spanner'))
         return self
@@ -1263,6 +1263,9 @@ class OffsetIterator(StreamIterator):
 #------------------------------------------------------------------------------
 class RecursiveIterator(StreamIterator):
     '''
+    One of the most powerful iterators in music21.  Generally not called
+    directly, but created by being invoked on a stream with `Stream.recurse()`
+    
     >>> b = corpus.parse('bwv66.6')
     >>> ri = stream.iterator.RecursiveIterator(b, streamsOnly=True)
     >>> for x in ri:
@@ -1282,7 +1285,7 @@ class RecursiveIterator(StreamIterator):
 
     But this is how you'll actually use it:
 
-    >>> for x in b.recurse(streamsOnly=True):
+    >>> for x in b.recurse(streamsOnly=True, includeSelf=True):
     ...     print(x)
     <music21.stream.Score 0x10484fd68>
     <music21.stream.Part Soprano>
@@ -1305,14 +1308,13 @@ class RecursiveIterator(StreamIterator):
     <music21.stream.iterator.RecursiveIterator for Score:0x10487f550 @:0>
 
     >>> for el in expressive:
-    ...     printer = (el, el.expressions)
-    ...     print(printer)
-    (<music21.note.Note C#>, [<music21.expressions.Fermata>])
-    (<music21.note.Note A>, [<music21.expressions.Fermata>])
-    (<music21.note.Note F#>, [<music21.expressions.Fermata>])
-    (<music21.note.Note C#>, [<music21.expressions.Fermata>])
-    (<music21.note.Note G#>, [<music21.expressions.Fermata>])
-    (<music21.note.Note F#>, [<music21.expressions.Fermata>])
+    ...     print(el, el.expressions)
+    <music21.note.Note C#> [<music21.expressions.Fermata>]
+    <music21.note.Note A> [<music21.expressions.Fermata>]
+    <music21.note.Note F#> [<music21.expressions.Fermata>]
+    <music21.note.Note C#> [<music21.expressions.Fermata>]
+    <music21.note.Note G#> [<music21.expressions.Fermata>]
+    <music21.note.Note F#> [<music21.expressions.Fermata>]
 
     >>> len(expressive)
     6
@@ -1332,11 +1334,11 @@ class RecursiveIterator(StreamIterator):
                  ignoreSorting=False
                  ): #, parentIterator=None):
         super().__init__(srcStream,
-                                                filterList=filterList,
-                                                restoreActiveSites=restoreActiveSites,
-                                                activeInformation=activeInformation,
-                                                ignoreSorting=ignoreSorting,
-                                                )
+                         filterList=filterList,
+                         restoreActiveSites=restoreActiveSites,
+                         activeInformation=activeInformation,
+                         ignoreSorting=ignoreSorting,
+                        )
         if 'lastYielded' not in self.activeInformation:
             self.activeInformation['lastYielded'] = None
 
@@ -1363,7 +1365,11 @@ class RecursiveIterator(StreamIterator):
         super().reset()
 
     def __next__(self):
-
+        '''
+        Get the next element of the stream under iteration.
+        
+        The same __iter__ as the superclass is used.
+        '''
         while self.index < self.streamLength:
             # wrap this in a while loop instead of
             # returning self.__next__() because
@@ -1450,7 +1456,7 @@ class RecursiveIterator(StreamIterator):
 
     def iteratorStack(self):
         '''
-        Returns a stack of Streams at this point in the iteration.  Last is most recent.
+        Returns a stack of RecursiveIterators at this point in the iteration.  Last is most recent.
 
         >>> b = corpus.parse('bwv66.6')
         >>> bRecurse = b.recurse()
@@ -1462,7 +1468,7 @@ class RecursiveIterator(StreamIterator):
         >>> bRecurse.iteratorStack()
         [<music21.stream.iterator.RecursiveIterator for Score:0x10475cdd8 @:2>,
          <music21.stream.iterator.RecursiveIterator for Part:Soprano @:3>,
-         <music21.stream.iterator.RecursiveIterator for Measure:m.1 @:2>]
+         <music21.stream.iterator.RecursiveIterator for Measure:m.1 @:3>]
         '''
         iterStack = [self]
         x = self
@@ -1623,7 +1629,7 @@ class Test(unittest.TestCase):
         m.append(note.Note('E'))
         p.insert(0, note.Note('C'))
         p.append(m)
-        pRecurse = p.recurse()
+        pRecurse = p.recurse(includeSelf=True)
         allOffsets = []
         for unused in pRecurse:
             allOffsets.append(pRecurse.currentHierarchyOffset())
