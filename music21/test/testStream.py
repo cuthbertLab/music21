@@ -3216,14 +3216,14 @@ class Test(unittest.TestCase):
         # environLocal.printDebug(['downward:'])
 
         match = []
-        for x in s1.recurse(streamsOnly=True):
+        for x in s1.recurse(streamsOnly=True, includeSelf=True):
             match.append(x.id)
             # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         self.assertEqual(match, ['1a', '2a', '3a', '3b', '3c', '2b', '3d', '3e', '2c', '3f'])
 
         # environLocal.printDebug(['downward with elements:'])
         match = []
-        for x in s1.recurse(streamsOnly=False):
+        for x in s1.recurse(streamsOnly=False, includeSelf=True):
             match.append(x.id)
             # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         self.assertEqual(match, ['1a', 'n(1a)', '2a', '3a', '3b', 'n3(3b)', 'n4(3b)', '3c',
@@ -3232,7 +3232,7 @@ class Test(unittest.TestCase):
 
         # environLocal.printDebug(['downward from non-topmost element:'])
         match = []
-        for x in s2.recurse(streamsOnly=False):
+        for x in s2.recurse(streamsOnly=False, includeSelf=True):
             match.append(x.id)
             # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         # test downward
@@ -5942,7 +5942,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
         # default
-        rElements = list(s.recurse()) # NOTE: list(s.recurse())
+        rElements = list(s.recurse(includeSelf=True)) # NOTE: list(s.recurse())
             # removes self, while [x for x in s.recurse()] does not.
         self.assertTrue(s in rElements)
         self.assertEqual(len(rElements), 240)

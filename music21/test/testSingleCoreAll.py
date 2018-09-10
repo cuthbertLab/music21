@@ -102,8 +102,8 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
     environLocal.printDebug('running Tests...\n')
 
     with warnings.catch_warnings():
-        warnings.simplefilter('ignore', RuntimeWarning)  # import modules...
-        warnings.simplefilter('ignore', FutureWarning)  # a lot of these scipy->numpy
+        warnings.simplefilter('once', RuntimeWarning)  # import modules...
+        warnings.simplefilter('once', FutureWarning)  # a lot of these scipy->numpy
         runner = unittest.TextTestRunner(verbosity=verbosity)
         finalTestResults = runner.run(s1)
 
