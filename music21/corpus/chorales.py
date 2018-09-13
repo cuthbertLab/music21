@@ -555,20 +555,20 @@ class ChoraleListRKBWV:
     14---||---184.5---||---O Herre Gott, dein göttlich Wort---||---283
     15---||---277---||---Christ lag in Todesbanden---||---38
     16---||---311---||---Es woll uns Gott genädig sein 2---||---95
-    17---||---145.5---||---Erschienen ist der herrliche Tag---||---0
+    17---||---145.5---||---Erschienen ist der herrliche Tag---||---83
     18---||---318---||---Menschenkind, merk eben---||---115
     19---||---351---||---Ich hab' mein' Sach' Gott heimgestellt---||---182
     20---||---302---||---Ein feste Burg ist unser Gott---||---74
     21---||---153.5---||---Herzlich tut mich verlangen---||---160
-    22---||---180.7---||---Schmücke dich, o liebe Seele---||---0
-    23---||---28.6---||---Helft mir Gotts Güte preisen---||---124
+    22---||---180.7---||---Schmücke dich, o liebe Seele---||---304
+    23---||---28.6---||---Zeuch ein zu deinen Toren---||---124
     24---||---415---||---Valet will ich dir geben---||---314
-    25---||---148.6---||---Wo soll ich fliehen hin---||---0
+    25---||---148.6---||---Wo soll ich fliehen hin---||---26
     26---||---20.7---||---O Ewigkeit, du Donnerwort---||---276
     26---||---20.11---||---O Ewigkeit, du Donnerwort---||---276
     27---||---308---||---Es spricht der Unweisen Mund---||---92
     28---||---36.8-2---||---Nun komm, der Heiden Heiland---||---264
-    29---||---32.6---||---Wie nach einer Wasserquelle---||---102
+    29---||---32.6---||---Freu' dich sehr, o meine Seele---||---102
     30---||---363---||---Jesus Christus, unser Heiland, der von uns den Gottes Zorn wandt---||---206
     31---||---256---||---Wo Gott der Herr nicht bei uns hält---||---385
     32---||---386---||---Nun danket alle Gott---||---257
@@ -577,7 +577,7 @@ class ChoraleListRKBWV:
     35---||---248.53-5---||---Gott des Himmels und der Erden---||---114
     36---||---385---||---Nun bitten wir den heiligen Geist---||---254
     37---||---352---||---Wachet doch, erwacht, ihr Schläfer---||---185
-    38---||---115.6---||---Mache dich, mein Geist, bereit---||---0
+    38---||---115.6---||---Straf' mich nicht in deinem Zorn---||---312
     39---||---259---||---Ach, was soll ich Sünder machen---||---10
     40---||---255---||---Ach Gott und Herr, wie groß und schwer---||---3
     41---||---65.7---||---Was mein Gott will, das g'scheh allzeit---||---346
@@ -585,15 +585,15 @@ class ChoraleListRKBWV:
     43---||---8.6---||---Liebster Gott, wann werd ich sterben---||---227
     44---||---377---||---Mach's mit mir, Gott, nach deiner Güt---||---237
     45---||---108.6---||---Kommt her zu mir, spricht Gottes Söhn---||---224
-    46---||---248.9-1---||---Vom Himmel hoch, da komm ich her---||---0
+    46---||---248.9-1---||---Vom Himmel hoch, da komm ich her---||---323
     47---||---416---||---Vater unser im Himmelreich---||---316
     48---||---26.6---||---Ach wie nichtig, ach wie flüchtig---||---11
     49---||---382---||---Mit Fried und Freud ich fahr dahin---||---249
-    50---||---244.37---||---O Welt, ich muß dich lassen---||---292
+    50---||---244.37---||---In allen meinen Taten---||---292
     51---||---91.6---||---Gelobet seist du, Jesu Christ---||---109
     52---||---429---||---Wenn mein Stündlein vorhanden ist 1---||---354
     53---||---122.6---||---Das neugeborne Kindelein---||---57
-    54---||---151.5---||---Kommt her, ihr lieben Schwesterlein---||---235
+    54---||---151.5---||---Lobt Gott, ihr Christen, allzugleich---||---235
     55---||---110.7---||---Wir Christenleut---||---380
     56---||---121.6---||---Christum wir sollen loben schon---||---42
     57---||---404---||---O Traurigkeit, o Herzeleid---||---288
@@ -602,15 +602,15 @@ class ChoraleListRKBWV:
     60---||---133.6---||---Ich freue mich in dir---||---181
     61---||---159.5---||---Jesu Leiden, Pein und Tod---||---194
     62---||---197.10---||---Wer nur den lieben Gott läßt walten---||---370
-    63---||---245.11---||---O Welt, ich muß dich lassen---||---293
-    64---||---194.6---||---Treuer Gott, ich muss dir klagen---||---0
+    63---||---245.11---||---Nun ruhen alle Wälder---||---293
+    64---||---194.6---||---Freu’ dich sehr, o meine Seele---||---100
     65---||---144.3---||---Was Gott tut, das ist wohlgetan---||---338
-    66---||---280---||---Es woll uns Gott genädig sein 1---||---43
-    67---||---39.7---||---Wie nach einer Wasserquelle---||---104
+    66---||---280---||---Christ, unser Herr, zum Jordan kam---||---43
+    67---||---39.7---||---Freu' dich sehr, o meine Seele---||---104
     68---||---431---||---Wenn wir in höchsten Nöten sein---||---358
     69---||---226.2---||---Komm, heiliger Geist, Herre Gott---||---221
     70---||---322---||---Gott sei gelobet und gebenedeiet---||---119
-    71---||---177.5---||---Ich ruf zu dir, Herr Jesu Christ---||---0
+    71---||---177.5---||---Ich ruf zu dir, Herr Jesu Christ---||---183
     72---||---6.6---||---Erhalt uns, Herr, bei deinem Wort---||---79
     73---||---334---||---Wenn mein Stündlein vorhanden ist 2---||---141
     74---||---244.54---||---Herzlich tut mich verlangen---||---162
@@ -628,7 +628,7 @@ class ChoraleListRKBWV:
     86---||---36.4-2---||---Wie schön leuchtet der Morgenstern---||---377
     87---||---56.5---||---Du geballtes Weltgebäude---||---72
     88---||---28.6---||---Helft mir Gotts Güte preisen---||---124
-    89---||---244.62---||---O Haupt voll Blut und Wunden---||---0
+    89---||---244.62---||---O Haupt voll Blut und Wunden---||---162
     90---||---57.8---||---Hast du denn, Liebster, dein Angesicht gänzlich verborgen---||---231
     91---||---42.7---||---Gib unsern Fürsten und aller Obrigkeit (ending)---||---322
     91---||---42.7---||---Verleih uns Frieden gnädiglich (beginning)---||---322
@@ -638,7 +638,7 @@ class ChoraleListRKBWV:
     95---||---55.5---||---Werde munter, mein Gemüte---||---362
     96---||---87.7---||---Jesu, meine Freude---||---201
     97---||---169.7---||---Nun bitten wir den heiligen Geist---||---256
-    98---||---244.15---||---O Haupt voll Blut und Wunden---||---0
+    98---||---244.15---||---O Haupt voll Blut und Wunden---||---162
     99---||---16.6---||---Helft mir Gotts Güte preisen---||---125
     100---||---18.5-w---||---Durch Adams Fall ist ganz verderbt---||---73
     101---||---164.6---||---Herr Christ, der einge Gottes-Söhn---||---127
@@ -665,8 +665,8 @@ class ChoraleListRKBWV:
     122---||---85.6---||---Ist Gott mein Schild und Helfersmann---||---216
     123---||---183.5---||---Helft mir Gotts Güte preisen---||---126
     124---||---268---||---Auf, auf, mein Herz, und du, mein ganzer Sinn---||---24
-    125---||---104.6---||---Allein Gott in der Höh sei Ehr---||---0
-    126---||---18.5-l---||---Durch Adams Fall ist ganz verderbt---||---0
+    125---||---104.6---||---Allein Gott in der Höh' sei Ehr---||---12
+    126---||---18.5-l---||---Durch Adams Fall ist ganz verderbt---||---73
     127---||---298---||---Dies sind die heiligen zehn Gebot---||---66
     128---||---263---||---Alles ist an Gottes Segen---||---19
     129---||---369---||---Keinen hat Gott verlassen---||---217
@@ -681,7 +681,7 @@ class ChoraleListRKBWV:
     138---||---64.8---||---Jesu, meine Freude---||---200
     139---||---248.33-3---||---Warum sollt ich mich denn grämen---||---335
     140---||---367---||---In allen meinen Taten---||---211
-    141---||---409---||---Seelenbräutigam---||---0
+    141---||---409---||---Seelenbräutigam---||---306
     142---||---40.6---||---Schwing dich auf zu deinem Gott---||---305
     143---||---368---||---In dulci jubilo---||---215
     144---||---339---||---Aus tiefer Not schrei ich zu dir 2---||---151
@@ -701,7 +701,7 @@ class ChoraleListRKBWV:
     158---||---294---||---Der Tag der ist so freudenreich---||---62
     159---||---264---||---Als der gütige Gott vollenden wollt sein Wort---||---20
     160---||---64.2---||---Gelobet seist du, Jesu Christ---||---108
-    161---||---366---||---Ihr Gestirn, ihr hohen Lüfte---||---210
+    161---||---366---||---Ihr Gestirn', ihr hohlen Lüfte---||---210
     162---||---288---||---Das alte Jahr vergangen ist---||---55
     163---||---313---||---Für Freuden laßt uns springen---||---106
     164---||---326---||---Ihr Knecht des Herren allzugleich---||---129
@@ -710,7 +710,7 @@ class ChoraleListRKBWV:
     167---||---300---||---Du großer Schmerzensmann, vom Vater so geschlagen---||---70
     168---||---341---||---Heut ist, o Mensch, ein großer Trauertag---||---170
     169---||---355---||---Jesu, der du selbsten wohl---||---189
-    170---||---62.6---||---Nun komm, der Heiden Heiland---||---0
+    170---||---62.6---||---Nun komm, der Heiden Heiland---||---265
     171---||---408---||---Schaut, ihr Sünder! Ihr macht mir große Pein---||---303
     172---||---410---||---Sei gegrüßet, Jesu gütig---||---307
     173---||---400---||---O Herzensangst, o Bangigkeit und Zagen---||---284
@@ -724,14 +724,14 @@ class ChoraleListRKBWV:
     181---||---319---||---Gott hat das Evangelium---||---116
     182---||---14.5---||---Wär’ Gott nicht mit uns diese Zeit---||---330
     183---||---388---||---Nun freut euch, lieben Christen, g'mein 1---||---261
-    184---||---4.8---||---Christ lag in Todesbanden---||---41
+    184---||---4.8---||---Christ lag in Todesbanden---||---38
     185---||---387---||---Ihr lieben Christen, freut euch nun---||---260
     186---||---254---||---Ach Gott, erhör mein Seufzen und Wehklagen---||---2
     187---||---370---||---Komm, Gott Schöpfer, heiliger Geist---||---218
     188---||---349---||---Ach Herre Gott, mich treibt die Not---||---179
     189---||---336---||---Herr Jesu Christ, wahr' Mensch und Gott---||---146
     190---||---337---||---Herr, nun laß in Frieden---||---148
-    191---||---73.5---||---Von Gott will ich nicht lassen---||---0
+    191---||---73.5---||---Von Gott will ich nicht lassen---||---328
     192---||---321---||---Gottlob, es geht nunmehr zu Ende---||---118
     193---||---424---||---Was bist du doch, o Seele, so betrübet---||---337
     194---||---123.6---||---Liebster Immanuel, Herzog der Frommen---||---229
@@ -747,7 +747,7 @@ class ChoraleListRKBWV:
     204---||---166.6---||---Wer nur den lieben Gott läßt walten---||---372
     205---||---328---||---Herr Gott, dich loben wir, Herr Gott, wir danken dir---||---133
     206---||---412---||---So gibst du nun, mein Jesu, gute Nacht---||---310
-    207---||---295---||---Spiritus sancti gratia---||---63
+    207---||---295---||---Des Heil'gen Geistes reiche Gnad'||---63
     208---||---266---||---Am Sabbat früh Marien drei 1---||---22
     209---||---299---||---Dir, dir, Jehova, will ich singen---||---67
     210---||---275---||---Christe, du Beistand deiner Kreuzgemeine---||---0
@@ -755,7 +755,7 @@ class ChoraleListRKBWV:
     212---||---329---||---Lob sei dir, gütiger Gott---||---136
     213---||---405---||---O wie selig seid ihr doch, ihr Frommen---||---299
     214---||---383---||---Mitten wir im Leben sind---||---252
-    215---||---126.6---||---Verleih uns Frieden gnädlich---||---0
+    215---||---126.6---||---Verleih uns Frieden gnädlich---||---321
     216---||---60.5---||---Es ist genug---||---91
     217---||---153.9---||---Herr Jesu Christ, meins Lebens Licht---||---9
     218---||---372---||---Herr, dein Ohren zu mir neige---||---226
@@ -776,7 +776,7 @@ class ChoraleListRKBWV:
     233---||---154.3---||---Werde munter, mein Gemüte---||---365
     234---||---320---||---Gott lebet noch, Seele, was verzagst du doch?---||---117
     235---||---325---||---Heilig, heilig, heilig---||---123
-    236---||---335---||---O Jesu, du mein Bräutigam---||---0
+    236---||---335---||---O Jesu, du mein Bräutigam---||---145
     237---||---423---||---Was betrübst du dich, mein Herze---||---336
     238---||---310---||---Es wird schier der letzte Tag herkommen---||---94
     239---||---292---||---Den Vater dort oben---||---60
@@ -785,10 +785,10 @@ class ChoraleListRKBWV:
     242---||---435---||---Wie bist du, Seele, in mir so gar betrübt---||---374
     243---||---356---||---Jesu, du mein liebstes Leben---||---190
     244---||---357---||---Jesu, Jesu, du bist mein---||---191
-    245---||---274---||---Christe, der du bist Tag und Licht---||---0
+    245---||---274---||---Christe, der du bist Tag und Licht---||---34
     246---||---411---||---Singt dem Herrn ein neues Lied---||---309
     247---||---432---||---Wenn wir in höchsten Nöten sein---||---359
-    248---||---177.4---||---Sei Lob und Ehr dem höchsten Gut---||---0
+    248---||---177.4---||---Sei Lob und Ehr dem höchsten Gut---||---89
     249---||---260---||---Allein Gott in der Höh sei Ehr---||---12
     250---||---303---||---Ein feste Burg ist unser Gott---||---75
     251---||---345---||---Ich bin ja, Herr, in deiner Macht---||---174
@@ -801,7 +801,7 @@ class ChoraleListRKBWV:
     258---||---378---||---Meine Augen schließ ich jetzt in Gottes Namen zu---||---240
     259---||---42.7---||---Verleih uns Frieden gnädiglich (beginning)---||---322
     259---||---42.7---||---Gib unsern Fürsten und aller Obrigkeit (ending)---||---322
-    260---||---307---||---Nun freut euch, lieben Christen, g'mein 2---||---262
+    260---||---307---||---Es ist gewißlich an der Zeit---||---262
     261---||---158.4---||---Christ lag in Todesbanden---||---40
     261---||---279---||---Christ lag in Todesbanden---||---40
     262---||---2.6---||---Ach Gott, vom Himmel sieh' darein---||---7
@@ -836,7 +836,7 @@ class ChoraleListRKBWV:
     290---||---9.7---||---Es ist das Heil uns kommen her---||---87
     291---||---94.8---||---Die Wollust dieser Welt---||---281
     292---||---101.7---||---Vater unser im Himmelreich---||---318
-    293---||---69.6-a---||---Was Gott tut, das ist wohlgetan---||---0
+    293---||---69.6-a---||---Was Gott tut, das ist wohlgetan---||---341
     294---||---113.8---||---Wenn mein Stündlein vorhanden ist 2---||---142
     295---||---335---||---Rex Christe factor omnium---||---145
     296---||---390---||---Nun lob', mein Seel, den Herren---||---270
@@ -849,10 +849,10 @@ class ChoraleListRKBWV:
     303---||---96.6---||---Herr Christ, der einge Gottes-Söhn---||---128
     304---||---5.7---||---Auf meinen lieben Gott---||---28
     305---||---36.4-2---||---Wie schön leuchtet der Morgenstern---||---377
-    306---||---402---||---Es sind doch selig alle, die im rechten Glauben wandeln---||---286
+    306---||---402---||---O Mensch, bewein' dein' Sünde groß---||---286
     307---||---283---||---Christus, der uns selig macht---||---48
-    308---||---3.6---||---Ach Gott, wie manches Herzeleid---||---0
-    309---||---267---||---Ein Lämmlein geht und trägt die Schuld---||---0
+    308---||---3.6---||---Ach Gott, wie manches Herzeleid---||---8
+    309---||---267---||---Ein Lämmlein geht und trägt die Schuld---||---23
     310---||---245.22---||---Mach's mit mir, Gott, nach deiner Güt---||---239
     311---||---287---||---Jesus Christ, unser Herre---||---54
     312---||---398---||---Die Wollust dieser Welt---||---277
@@ -871,7 +871,7 @@ class ChoraleListRKBWV:
     325---||---83.5---||---Mit Fried und Freud ich fahr dahin---||---250
     326---||---104.6---||---Allein Gott in der Höh sei Ehr---||---13
     327---||---190.7---||---Jesu, nun sei gepreiset---||---205
-    328---||---373---||---Liebster Jesu, wir sind hier---||---0
+    328---||---373---||---Liebster Jesu, wir sind hier---||---228
     329---||---251---||---Es ist das Heil uns kommen Her---||---89
     330---||---252---||---Nun danket alle Gott---||---258
     331---||---136.6---||---Auf meinen lieben Gott---||---27
@@ -880,7 +880,7 @@ class ChoraleListRKBWV:
     334---||---327---||---Ihr Knecht des Herren allzugleich---||---132
     335---||---155.5---||---Es ist das Heil uns kommen her---||---88
     336---||---258---||---Wo Gott, der Herr, nicht bei uns hält---||---383
-    337---||---24.6---||---O Gott, du frommer Gott---||---0
+    337---||---24.6---||---O Gott, du frommer Gott---||---282
     338---||---145-a---||---Jesus, meine Zuversicht---||---209
     339---||---179.6---||---Wer nur den lieben Gott läßt walten---||---371
     340---||---272---||---Lobet Gott, unsern Herren---||---32
@@ -897,7 +897,7 @@ class ChoraleListRKBWV:
     351---||---430---||---Wenn mein Stündlein vorhanden ist 1---||---355
     352---||---312---||---Es woll uns Gott genädig sein 2---||---96
     353---||---112.5---||---Allein Gott in der Höh sei Ehr---||---14
-    354---||---117.4---||---Sei Lob und Ehr dem höchsten Gut---||---0
+    354---||---117.4---||---Sei Lob und Ehr dem höchsten Gut---||---89
     355---||---44.7---||---O Welt, ich muß dich lassen---||---296
     356---||---358---||---Jesu, meine Freude---||---195
     357---||---422---||---Warum sollt ich mich denn grämen---||---334
