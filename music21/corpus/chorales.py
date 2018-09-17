@@ -747,7 +747,7 @@ class ChoraleListRKBWV:
     204---||---166.6---||---Wer nur den lieben Gott läßt walten---||---372
     205---||---328---||---Herr Gott, dich loben wir, Herr Gott, wir danken dir---||---133
     206---||---412---||---So gibst du nun, mein Jesu, gute Nacht---||---310
-    207---||---295---||---Des Heil'gen Geistes reiche Gnad'||---63
+    207---||---295---||---Des Heil'gen Geistes reiche Gnad'---||---63
     208---||---266---||---Am Sabbat früh Marien drei 1---||---22
     209---||---299---||---Dir, dir, Jehova, will ich singen---||---67
     210---||---275---||---Christe, du Beistand deiner Kreuzgemeine---||---0
