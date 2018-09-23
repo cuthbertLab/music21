@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         tie.py
 # Purpose:      music21 classes for representing ties (visual and conceptual)
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2010, 2012, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 '''
 The `tie` module contains a single class, `Tie` that represents the visual and
@@ -19,11 +19,12 @@ import unittest
 from music21 import exceptions21
 from music21.common import SlottedObjectMixin
 
+
 class TieException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
 
+# ------------------------------------------------------------------------------
 class Tie(SlottedObjectMixin):
     '''
     Object added to notes that are tied to other notes. The `type` value is one
@@ -96,10 +97,11 @@ class Tie(SlottedObjectMixin):
     }
 
     VALID_TIE_TYPES = ('start', 'stop', 'continue', 'let-ring', 'continue-let-ring')
+
     ### INITIALIZER ###
     # pylint: disable=redefined-builtin
-    def __init__(self, type='start'): #@ReservedAssignment
-        #super().__init__()
+    def __init__(self, type='start'): # @ReservedAssignment
+        # super().__init__()
         if type not in self.VALID_TIE_TYPES:
             raise TieException(
                 'Type must be one of {}, not {}'.format(self.VALID_TIE_TYPES, type))
@@ -155,11 +157,11 @@ class Test(unittest.TestCase):
         pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

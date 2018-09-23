@@ -26,6 +26,7 @@ def optional_arg_decorator(fn):
     @wraps(fn)
     def wrapped_decorator(*args, **kwargs):
         is_bound_method = hasattr(args[0], fn.__name__) if args else False
+        klass = None
 
         if is_bound_method:
             klass = args[0]

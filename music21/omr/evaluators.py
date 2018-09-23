@@ -251,6 +251,10 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
     if debug:
         print('Running Horizontal Model (Prior-based-on-distance)')
 
+    correctingArrayHorAllPart = []
+    numberOfIncorrectMeasures = 0
+    numberOfTotalMeasures = 0
+
     if runOnePart is True:
         scorePart = s.singleParts[pn]
         incorrectMeasureIndices = scorePart.getIncorrectMeasureIndices()
@@ -259,9 +263,6 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
             print("Hashed notes:", s.singleParts[pn].hashedNotes)
         scorePart.runHorizontalCorrectionModel()
     else:
-        correctingArrayHorAllPart = []
-        numberOfIncorrectMeasures = 0
-        numberOfTotalMeasures = 0
         for temppn in range(len(s.singleParts)):
             scorePart = s.singleParts[temppn]
             incorrectMeasureIndices = scorePart.getIncorrectMeasureIndices()
@@ -269,6 +270,7 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
             correctingArrayHorOnePart = scorePart.runHorizontalCorrectionModel()
             correctingArrayHorAllPart.append(correctingArrayHorOnePart)
             numberOfTotalMeasures += len(s.singleParts[temppn].hashedNotes)
+
     if debug:
         print("for each entry in the array below, we have ")
         print("[flagged measure part, flagged measure index, source measure part, " +

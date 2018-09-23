@@ -528,7 +528,7 @@ def intervalToPythagoreanRatio(intervalObj):
 
         _pythagorean_cache[end_pitch_wanted.name] = end_pitch, ratio
 
-    octaves = int((end_pitch_wanted.ps - end_pitch.ps)/12)
+    octaves = int((end_pitch_wanted.ps - end_pitch.ps) / 12)
     return ratio * Fraction(2, 1) ** octaves
 
 #-------------------------------------------------------------------------------
@@ -686,8 +686,8 @@ class GenericInterval(IntervalBase):
             self.isUnison = False
 
         # unisons (even augmented) are neither steps nor skips.
-        steps, octaves = math.modf(self.undirected/7.0)
-        steps = int(steps*7 + .001)
+        steps, octaves = math.modf(self.undirected / 7)
+        steps = int(steps * 7 + .001)
         octaves = int(octaves)
         if (steps == 0):
             octaves = octaves - 1
@@ -1275,7 +1275,7 @@ class DiatonicInterval(IntervalBase):
         # note: part of this functionality used to be in the function
         # _stringToDiatonicChromatic(), which used to be named something else
 
-        octaveOffset = int(abs(self.generic.staffDistance)/7)
+        octaveOffset = int(abs(self.generic.staffDistance) / 7)
         semitonesStart = semitonesGeneric[self.generic.simpleUndirected]
         specName = prefixSpecs[self.specifier]
 

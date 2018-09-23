@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         sorting.py
 # Purpose:      Music21 class for sorting
 #
@@ -8,7 +8,7 @@
 # Copyright:    Copyright © 2014-2015 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module defines a single class, SortTuple, which is a named tuple that can
 sort against bare offsets and other SortTuples.
@@ -207,7 +207,6 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
         Add all attributes from one sortTuple to another,
         returning a new one.
 
-
         >>> n = note.Note()
         >>> n.offset = 10
         >>> s = stream.Stream()
@@ -250,7 +249,6 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
         SortTuple(atEnd=0, offset=0.0, priority=0, classSortOrder=-40, isNotGrace=1, insertIndex=0)
 
         Note that atEnd and isNotGrace are lower bounded at 0.
-
         '''
         if not isinstance(other, self.__class__):
             raise SortingException('Cannot add attributes from a different class')

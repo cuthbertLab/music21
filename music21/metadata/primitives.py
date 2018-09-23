@@ -9,14 +9,6 @@
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
 # Project License:      LGPL, see license.txt
 #------------------------------------------------------------------------------
-__all__ = ['Date', 'DateSingle', 'DateRelative', 'DateBetween',
-           'DateSelection',
-           'Text',
-           'Contributor',
-           'Creator',
-           'Imprint',
-           'Copyright']
-
 import datetime
 import os
 import unittest
@@ -28,6 +20,21 @@ from music21 import exceptions21
 
 
 from music21 import environment
+
+__all__ = [
+    'Contributor',
+    'Copyright',
+    'Creator',
+    'Date',
+    'DateBetween',
+    'DateRelative',
+    'DateSelection',
+    'DateSingle',
+    'Imprint',
+    'Text',
+    ]
+
+
 environLocal = environment.Environment(os.path.basename(__file__))
 
 
@@ -1243,18 +1250,6 @@ _DOC_ORDER = (
     Contributor,
     )
 
-__all__ = [
-    'Contributor',
-    'Copyright',
-    'Creator',
-    'Date',
-    'DateBetween',
-    'DateRelative',
-    'DateSelection',
-    'DateSingle',
-    'Imprint',
-    'Text',
-    ]
 
 if __name__ == '__main__':
     import music21

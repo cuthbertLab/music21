@@ -1197,6 +1197,7 @@ class IntervalNetwork:
         else:
             pitchOrigin = copy.deepcopy(pitchOrigin)
 
+        pCollect = None
 
         # get the node id that we are starting with
         nodeId = self.getRelativeNodeId(pitchReference,
@@ -1205,7 +1206,7 @@ class IntervalNetwork:
                                         direction=direction,
                                         alteredDegrees=alteredDegrees)
 
-        #environLocal.printDebug(['nextPitch()', 'got node Id', nodeId,
+        # environLocal.printDebug(['nextPitch()', 'got node Id', nodeId,
         #  'direction', direction, 'self.nodes[nodeId].degree', self.nodes[nodeId].degree,
         #  'pitchOrigin', pitchOrigin])
 
@@ -1218,7 +1219,7 @@ class IntervalNetwork:
                                                     pitchTarget=pitchOrigin,
                                                     direction=direction) # must add direction
 
-            #environLocal.printDebug(['nextPitch()', 'looking for neighbor',
+            # environLocal.printDebug(['nextPitch()', 'looking for neighbor',
             #                         'getNeighbor', getNeighbor, 'source nodeId', nodeId,
             #                         'lowId/highId', lowId, highId])
 
@@ -1241,16 +1242,17 @@ class IntervalNetwork:
                                         alteredDegrees={} # need unaltered tone here, thus omitted
                                         )
 
-        #environLocal.printDebug(['nextPitch()', 'pitch obtained based on nodeName',
+        # environLocal.printDebug(['nextPitch()', 'pitch obtained based on nodeName',
         # nodeName, 'p', p, 'nodeId', nodeId, 'self.nodes[nodeId].degree',
         # self.nodes[nodeId].degree])
 
         # transfer octave from origin to new pitch derived from node
         # note: this assumes octave equivalence and may be a problem
         p.octave = pitchOrigin.octave
-        #pitchObj = p
+        # pitchObj = p
         n = self.nodes[nodeId]
-        #pCollect = p # usually p, unles altered
+        # pCollect = p # usually p, unles altered
+
         for i in range(stepSize):
             postEdge, postNode = self.getNext(n, direction)
             if len(postEdge) > 1:
@@ -1372,6 +1374,8 @@ class IntervalNetwork:
                                    maxPitch)
             if ck in self._ascendingCache:
                 return self._ascendingCache[ck]
+        else:
+            ck = None
 
         # if this network is octaveDuplicating, than we can shift
         # reference up octaves to just below minPitch
@@ -2159,6 +2163,9 @@ class IntervalNetwork:
         of this IntervalNetwork if networkx is installed
 
         '''
+        weight = 1
+        style = 'solid'
+
         def sortTerminusLowThenIntThenTerminusHigh(a):
             '''
             return a two-tuple where the first element is -1 if 'TERMINUS_LOW',

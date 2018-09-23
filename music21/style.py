@@ -109,7 +109,7 @@ class Style:
                 value = -70
             try:
                 value = common.numToIntOrFloat(value)
-            except (ValueError):
+            except ValueError:
                 raise TextFormatException('Not a supported absoluteY position: %s' % value)
             self._absoluteY = value
 

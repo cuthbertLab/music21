@@ -191,7 +191,7 @@ def defaultDeepcopy(obj, memo, callInit=True):
     dictState = getattr(obj, '__dict__', None)
     if dictState is not None:
         for k in dictState:
-            setattr(new, k, copy.deepcopy(dictState[k], memo))
+            setattr(new, k, copy.deepcopy(dictState[k], memo=memo))
     slots = set()
     for cls in obj.__class__.mro(): # it is okay that it's in reverse order, since it's just names
         slots.update(getattr(cls, '__slots__', ()))

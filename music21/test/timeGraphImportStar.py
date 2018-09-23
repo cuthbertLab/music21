@@ -140,9 +140,9 @@ class CallGraph:
         '''
         suffix = '.png' # '.svg' no reader for now...
         _MOD = "test.timeGraphImportStar"
+        from music21 import environment
 
         if runWithEnviron:
-            from music21 import environment
             environLocal = environment.Environment(_MOD)
             fp = environLocal.getTempFile(suffix)
         # manually get a temporary file

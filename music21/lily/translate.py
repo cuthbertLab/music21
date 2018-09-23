@@ -1770,6 +1770,7 @@ class LilypondConverter:
         Create a new context from the variant object or a list of variants and append.
         '''
         musicList = []
+        longestReplacedElements = []
 
         if isinstance(variantObjectOrList, variant.Variant):
             variantObject = variantObjectOrList
@@ -1962,13 +1963,15 @@ class LilypondConverter:
 
         if coloredVariants is True:
             color = self.variantColors[self.addedVariants.index(variantName) % 6]
-
+        else:
+            color = None
 
 
         #######################
 
         musicList = []
         highestOffsetSoFar = 0.0
+        longestVariant = None
 
         self.variantMode = True
 
@@ -1996,7 +1999,7 @@ class LilypondConverter:
 
             if coloredVariants is True:
                 for n in v._stream.recurse().notesAndRests:
-                    n.style.color = color# make thing (with or without fraction)
+                    n.style.color = color # make thing (with or without fraction)
 
             # Strip off spacer
             endOffset = v.containedHighestTime
@@ -2292,7 +2295,7 @@ class LilypondConverter:
                                                         identifierInit=lyo.LyIdentifierInit(
                                                           string=metadataObject.alternativeTitle))
                 lpHeaderBodyAssignments.append(lySubtitleAssignment)
-                lyTitleAssignment.setParent(lpHeaderBody)
+                lySubtitleAssignment.setParent(lpHeaderBody)
 
         lpHeaderBody.assignments = lpHeaderBodyAssignments
         return lpHeader

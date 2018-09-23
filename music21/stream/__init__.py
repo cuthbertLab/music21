@@ -873,7 +873,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(t)
         0
         '''
-        base.Music21Object.mergeAttributes(self, other)
+        super().mergeAttributes(other)
 
         for attr in ('autoSort', 'isSorted', 'definesExplicitSystemBreaks',
                      'definesExplicitPageBreaks', '_atSoundingPitch', '_mutable'):
@@ -1525,7 +1525,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 "Cannot set the offset for element {}, not in Stream {}.".format(element, self))
         self._offsetDict[idEl] = (offset, element) # fast
         if setActiveSite:
-            element.activeSite = self;
+            element.activeSite = self
 
     def elementOffset(self, element, stringReturns=False):
         '''
@@ -8614,7 +8614,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     def hasPartLikeStreams(self):
         '''
-        Return a boolean value showing if this Stream contains multiple Parts,
+        Return a boolean value showing if this Stream contains any Parts,
         or Part-like sub-Streams.
 
         Part-like sub-streams are Streams that contain Measures or Notes.
@@ -12977,10 +12977,14 @@ class Opus(Stream):
         Performs title search using the :meth:`~music21.metadata.Metadata.search` method,
         and returns the first result.
 
-
         >>> o = corpus.parse('essenFolksong/erk5')
         >>> s = o.getScoreByTitle('Vrienden, kommt alle gaere')
-        >>> s = o.getScoreByTitle('(.*)kommt(.*)') # regular expression
+        >>> s.metadata.title
+        'Vrienden, kommt alle gaere'
+
+        Regular expressions work fine
+
+        >>> s = o.getScoreByTitle('(.*)kommt(.*)')
         >>> s.metadata.title
         'Vrienden, kommt alle gaere'
         '''

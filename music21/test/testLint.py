@@ -190,9 +190,10 @@ def main(fnAccept=None, strict=False):
         acceptable.append(fp)
 
     cmdFile = cmd + acceptable
-    #print(' '.join(cmdFile))
-    #print(fp)
+    # print(' '.join(cmdFile))
+    # print(fp)
     try:
+        # noinspection PyArgumentList
         pylintRun(cmdFile, exit=False)
     except TypeError:
         pylintRun(cmdFile, do_exit=False) # renamed in recent versions
@@ -205,8 +206,8 @@ def argRun():
     parser.add_argument('--strict', action='store_true',
                         help='Run the file in strict mode')
     args = parser.parse_args()
-    #print(args.files)
-    #print(args.strict)
+    # print(args.files)
+    # print(args.strict)
     files = args.files if args.files else None
     if files:
         sfp = common.getSourceFilePath()

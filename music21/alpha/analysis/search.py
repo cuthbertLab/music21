@@ -57,6 +57,9 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
 
     degreeLast = None
     pLast = None
+    pNext = None
+    p = None
+    d = None
     directionLast = None
 
     collPitches = []

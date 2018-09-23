@@ -278,7 +278,6 @@ class Spanner(base.Music21Object):
                     # there is a bug where it is possible for
                     # an element to appear twice in spannerStorage
                     # this is the TODO item
-
         return new
 
 
@@ -2265,14 +2264,14 @@ class Test(unittest.TestCase):
         '''Test basic octave shift creation and output, as well as passing
         objects through make measure calls.
         '''
-        from music21 import stream, note, spanner, chord
+        from music21 import stream, note, chord
 
         s = stream.Stream()
         s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
         # s.repeatAppend(note.Note(), 12)
         n1 = s.notes[0]
         n2 = s.notes[-1]
-        sp1 = spanner.Ottava(n1, n2)  # default is 8va
+        sp1 = Ottava(n1, n2)  # default is 8va
         s.append(sp1)
         raw = self.xmlStr(s)
         self.assertEqual(raw.count('octave-shift'), 2)
@@ -2283,7 +2282,7 @@ class Test(unittest.TestCase):
         s.repeatAppend(note.Note(), 12)
         n1 = s.notes[0]
         n2 = s.notes[-1]
-        sp1 = spanner.Ottava(n1, n2, type='8vb')
+        sp1 = Ottava(n1, n2, type='8vb')
         s.append(sp1)
         # s.show()
         raw = self.xmlStr(s)
@@ -2294,7 +2293,7 @@ class Test(unittest.TestCase):
         s.repeatAppend(note.Note(), 12)
         n1 = s.notes[0]
         n2 = s.notes[-1]
-        sp1 = spanner.Ottava(n1, n2, type='15ma')
+        sp1 = Ottava(n1, n2, type='15ma')
         s.append(sp1)
         # s.show()
         raw = self.xmlStr(s)
@@ -2305,7 +2304,7 @@ class Test(unittest.TestCase):
         s.repeatAppend(note.Note(), 12)
         n1 = s.notes[0]
         n2 = s.notes[-1]
-        sp1 = spanner.Ottava(n1, n2, type='15mb')
+        sp1 = Ottava(n1, n2, type='15mb')
         s.append(sp1)
         # s.show()
         raw = self.xmlStr(s)
@@ -2484,10 +2483,10 @@ class Test(unittest.TestCase):
 #         self.assertEqual(raw.count('<dashes'), 4)
 
     def testOneElementSpanners(self):
-        from music21 import note, spanner
+        from music21 import note
 
         n1 = note.Note()
-        sp = spanner.Spanner()
+        sp = Spanner()
         sp.addSpannedElements(n1)
         sp.completeStatus = True
         self.assertEqual(sp.completeStatus, True)

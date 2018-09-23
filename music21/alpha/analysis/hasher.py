@@ -305,8 +305,8 @@ class Hasher:
         """
         try:
             if (isinstance(e, note.Note) 
-                    and e.previous('Note', flattenLocalSites=True) is not None):
-                previousNote = e.previous('Note', flattenLocalSites=True)
+                    and e.previous('Note') is not None):
+                previousNote = e.previous('Note')
                 intFromLastNote = interval.Interval(noteStart=previousNote, 
                                                     noteEnd=e).intervalClass
                 return interval.convertGeneric(interval.Interval(intFromLastNote).intervalClass)

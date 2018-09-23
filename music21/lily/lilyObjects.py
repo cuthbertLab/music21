@@ -131,7 +131,7 @@ class LyObject:
         >>> lilyAttributes is lm.lilyAttributes
         True
         '''
-
+        attrs = None
         foundClass = False
         for tryClass in self.supportedClasses:
             if tryClass in m21Object.classes or tryClass == '*':
@@ -1220,8 +1220,8 @@ class LyPrefixCompositeMusic(LyObject):
         elif t == 'repeated':
             return str(self.repeatedMusic)
         elif t == 'transpose':
-            return ''.join(self.backslash, 'transpose ', str(self.pitchAlsoInChords1), ' ',
-                           str(self.pitchAlsoInChords2), ' ', str(self.music), ' ')
+            return ''.join([self.backslash, 'transpose ', str(self.pitchAlsoInChords1), ' ',
+                           str(self.pitchAlsoInChords2), ' ', str(self.music), ' '])
         elif t == 'modeChanging':
             return str(self.modeChangingHead) + ' ' + str(self.groupedMusicList)
         elif t == 'modeChangingWith':
@@ -1370,8 +1370,8 @@ class LyPropertyOperation(LyObject):
         elif self.mode == 'unset':
             return self.backslash + 'unset ' + self.value1 + ' '
         elif self.mode == 'override':
-            return ''.join(self.backslash, 'override ', self.value1, ' ', self.value2,
-                           ' = ', self.value3, ' ')
+            return ''.join([self.backslash, 'override ', self.value1, ' ', self.value2,
+                           ' = ', self.value3, ' '])
         elif self.mode == 'revert':
             return self.backslash + 'revert ' + self.value1 + ' ' + self.value2 + ' '
 

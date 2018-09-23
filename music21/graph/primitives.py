@@ -16,8 +16,6 @@ Object definitions for graphing and plotting :class:`~music21.stream.Stream` obj
 The :class:`~music21.graph.primitives.Graph` object subclasses primitive, abstract fundamental
 graphing archetypes using the matplotlib library.
 '''
-from __future__ import division, print_function, absolute_import
-
 import math
 import random
 import unittest

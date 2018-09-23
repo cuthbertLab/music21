@@ -205,6 +205,7 @@ class Distributor:
             # not the name of that dir
             tf.extractall(path=fpDir)
             os.system('mv %s %s' % (fpSrcDir, fpDstDir))
+            tf.close() # done after extraction
 
         #elif mode == EGG:
         #    os.system('mkdir %s' % fpDstDir)
@@ -212,7 +213,6 @@ class Distributor:
         #    tf = zipfile.ZipFile(fp, 'r')
         #    tf.extractall(path=fpDstDir)
 
-        tf.close() # done after extraction
 
         # remove files, updates manifest
         for fn in common.getCorpusContentDirs():
@@ -224,9 +224,12 @@ class Distributor:
 
 
         # adjust the sources Txt file
-        if mode == TAR:
-            sourcesTxt = os.path.join(fpDstDir, 'music21.egg-info', 'SOURCES.txt')
-        #elif mode == EGG:
+        # if mode == TAR:
+        sourcesTxt = os.path.join(fpDstDir, 'music21.egg-info', 'SOURCES.txt')
+        # else:
+        #    raise Exception('invalid mode')
+
+        # elif mode == EGG:
         #    sourcesTxt = os.path.join(fpDstDir, 'EGG-INFO', 'SOURCES.txt')
 
         # files will look like 'music21/corpus/haydn' in SOURCES.txt

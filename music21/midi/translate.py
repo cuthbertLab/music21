@@ -498,6 +498,8 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     >>> c.duration.quarterLength
     2.0
     '''
+    tOn = 0
+
     if inputM21 is None:
         c = chord.Chord()
     else:

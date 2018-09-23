@@ -4710,7 +4710,7 @@ class Chord(note.NotRest):
             # remove any component volmes
             for c in self._notes:
                 c._volume = None
-            return note.NotRest._setVolume(self, expr, setClient=False)
+            note.NotRest._setVolume(self, expr, setClient=False)
         elif common.isNum(expr):
             vol = self._getVolume()
             if expr < 1: # assume a scalar

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         tablature.py
 # Purpose:      Object for storing music21 information in the form of musical tablature.
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2006-2016 Michael Scott Cuthbert and the music21 Project
 # Licence:      LGPL or BSD, see licence.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Music21 representation of FretNote and FretBoard objects.
 
@@ -15,8 +15,6 @@ TODO:
 Chord from Figure
 Chord from FretBoard Object with tuning.
 '''
-from __future__ import division, print_function
-
 import unittest
 
 from music21 import common
@@ -282,7 +280,7 @@ class ChordWithFretBoard(harmony.ChordSymbol, FretBoard):
         # figure = self.figure
         return None
 
-#--------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 #
 # The following classes are some basic fretted instruments that are commonly used in 
 # Tablature notation.
@@ -319,7 +317,7 @@ class MandolinFretBoard(FretBoard):
         super(MandolinFretBoard, self).__init__(numStrings, fretNotes, displayFrets)
         
         self.tuning= [pitch.Pitch('G3'), pitch.Pitch('D4'), pitch.Pitch('A4'), pitch.Pitch('E5')]
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
     def runTest(self):
@@ -328,11 +326,8 @@ class Test(unittest.TestCase):
     def testFretNoteString(self):
         f = FretNote(4, 1, 2)
         
-        stringAndFretInfo = []
-        
-        stringAndFretInfo.append(f.string)
-        stringAndFretInfo.append(f.fret)
-        
+        stringAndFretInfo = [f.string, f.fret]
+
         self.assertEqual(stringAndFretInfo, [4, 1])
         
     def testStupidFretNote(self):

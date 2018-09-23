@@ -693,7 +693,9 @@ class Test(unittest.TestCase):
         actual = base._articulationFromAttr(attr)
         self.assertEqual(0, mockTrans.call_count)
         for i in range(len(expected)):
-            self.assertTrue(isinstance(actual[i], expected[i]))
+            actualHere = actual[i]
+            expectedHere = expected[i]
+            self.assertTrue(isinstance(actualHere, expectedHere))
 
     @mock.patch('music21.mei.base._attrTranslator')
     def testArticulation3(self, mockTrans):
@@ -703,7 +705,9 @@ class Test(unittest.TestCase):
         actual = base._articulationFromAttr(attr)
         self.assertEqual(0, mockTrans.call_count)
         for i in range(len(expected)):
-            self.assertTrue(isinstance(actual[i], expected[i]))
+            actualHere = actual[i]
+            expectedHere = expected[i]
+            self.assertTrue(isinstance(actualHere, expectedHere))
 
     @mock.patch('music21.mei.base._attrTranslator')
     def testArticulation4(self, mockTrans):

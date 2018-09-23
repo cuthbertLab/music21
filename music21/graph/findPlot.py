@@ -309,6 +309,7 @@ def getPlotsToMake(graphFormat=None,
     def _bestPlotType(graphClassesToChooseFrom):
         # now get the best graph type from this possibly motley list...
         numAxes = len([1 for val in (xValue, yValue, zValue) if val is not None])
+        bestGraphType = ''
 
         if numAxes == 3:
             bestGraphType = 'scatterweighted'

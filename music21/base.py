@@ -1926,10 +1926,6 @@ class Music21Object:
 
         The `classFilterList` can be used to specify one or more classes to match.
 
-        The `flattenLocalSites` parameter determines if the sites of this element
-        (e.g., a Measure's Part) are flattened on first search. When True, elements
-        contained in adjacent containers may be selected first.
-
         >>> s = corpus.parse('bwv66.6')
         >>> m2 = s.parts[0].iter.getElementsByClass('Measure')[2] # pickup measure
         >>> m3 = s.parts[0].iter.getElementsByClass('Measure')[3]
@@ -3486,7 +3482,7 @@ class ElementWrapper(Music21Object):
     >>> s.id = 'mainStream'
     >>> s.append(meter.TimeSignature('fast 6/8'))
     >>> for i in range(10):
-    ...    fileName = 'thisSound_' + str(random.randint(1, 20)) + '.wav'
+    ...    #_DOCS_SHOW fileName = 'thisSound_' + str(random.randint(1, 20)) + '.wav'
     ...    fileName = 'thisSound_' + str(1+((i * 100) % 19)) + '.wav' #_DOCS_HIDE
     ...    soundFile = Wave_read() #_DOCS_HIDE # #make a more predictable "random" set.
     ...    #_DOCS_SHOW soundFile = wave.open(fileName)

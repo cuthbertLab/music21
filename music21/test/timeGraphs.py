@@ -290,6 +290,7 @@ class TestCreateDurations(CallTest):
 class TestParseABC(CallTest):
 
     def __init__(self):
+        super().__init__()
         from music21.test import testPerformance
         self.t = testPerformance.Test()
 
@@ -305,7 +306,7 @@ class TestParseABC(CallTest):
 class TestGetContextByClassA(CallTest):
 
     def __init__(self):
-
+        super().__init__()
         from music21 import corpus
         self.s = corpus.parse('bwv66.6')
 
@@ -326,6 +327,7 @@ class TestGetContextByClassA(CallTest):
 class TestParseRNText(CallTest):
 
     def __init__(self):
+        super().__init__()
         from music21.test import testPerformance
         self.t = testPerformance.Test()
 
@@ -337,6 +339,7 @@ class TestParseRNText(CallTest):
 class TestMusicXMLMultiPartOutput(CallTest):
 
     def __init__(self):
+        super().__init__()
         from music21 import note, stream
         self.s = stream.Score()
         for i in range(10): # parts
@@ -581,12 +584,13 @@ class CallGraph:
         Note that the default of runWithEnviron imports music21.environment.  That might
         skew results
         '''
+        from music21 import environment
+
         suffix = '.png' # '.svg'
         outputFormat = suffix[1:]
         _MOD = "test.timeGraphs"
 
         if runWithEnviron:
-            from music21 import environment
             environLocal = environment.Environment(_MOD)
             fp = environLocal.getTempFile(suffix)
         # manually get a temporary file

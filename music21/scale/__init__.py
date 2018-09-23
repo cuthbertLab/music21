@@ -584,6 +584,9 @@ class AbstractScale(Scale):
             fileFormat, ext = common.findFormat(fmt)
             if fp is None:
                 fpLocal = environLocal.getTempFile(ext)
+            else:
+                fpLocal = fp
+
             if fileFormat in ['scala']:
                 ss = self.getScalaData(direction=direction)
                 sf = scala.ScalaFile(ss) # pass storage to the file
