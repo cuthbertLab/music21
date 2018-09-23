@@ -109,7 +109,7 @@ def hyphenToCamelCase(usrStr, replacement='-'):
     (?<!\A) # not at the start of the string
     ''' + replacement + r'''
     (?=[a-zA-Z]) # followed by a letter
-    ''', re.X) # @UndefinedVariable
+    ''', re.VERBOSE) # @UndefinedVariable
 
     tokens = PATTERN.split(usrStr)
     response = tokens.pop(0).lower()

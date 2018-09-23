@@ -770,7 +770,7 @@ class MusicXMLImporter(XMLParserBase):
         self.partGroupList = []
         self.parts = []
 
-        self.musicXmlVersion = '1.0'
+        self.musicXmlVersion = '3.0'
 
     def scoreFromFile(self, filename):
         '''

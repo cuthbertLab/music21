@@ -122,9 +122,8 @@ def getMetadataFromContext(s):
 
     for contextSite in s.contextSites():
         if contextSite.site.metadata is not None:
-            md = contextSite.site.metadata
-            break
-    return md
+            return contextSite.site.metadata
+    return None
 
 def _setTagTextFromAttribute(m21El, xmlEl, tag, attributeName=None,
                              *, transform=None, forceEmpty=False):
@@ -225,7 +224,7 @@ def _setAttributeFromAttribute(m21El, xmlEl, xmlAttributeName, attributeName=Non
     if attributeName is None:
         attributeName = common.hyphenToCamelCase(xmlAttributeName)
 
-    value = getattr(m21El, attributeName)
+    value = getattr(m21El, attributeName, None)
     if value is None:
         return
 
@@ -237,7 +236,7 @@ def _setAttributeFromAttribute(m21El, xmlEl, xmlAttributeName, attributeName=Non
 def _synchronizeIds(element, m21Object):
     '''
     MusicXML 3.1 defines the id attribute (entity: %optional-unique-id)
-    on many elements which is perfect for setting as .id on
+    on many elements which is perfect for getting from .id on
     a music21 element.
 
     >>> from xml.etree.ElementTree import fromstring as El
@@ -360,6 +359,7 @@ class GeneralObjectExporter():
         if obj is None:
             obj = self.generalObj
         outObj = self.fromGeneralObject(obj)
+        # TODO: set whether to do an additional score copy in submethods.
         return self.parseWellformedObject(outObj)
 
     def parseWellformedObject(self, sc):
@@ -420,9 +420,6 @@ class GeneralObjectExporter():
         s = stream.Score()
         s.insert(0, p)
         s.metadata = copy.deepcopy(getMetadataFromContext(p))
-#         if p.metadata is not None:
-#             s.insert(0.0, copy.deepcopy(p.metadata))
-
         return self.fromScore(s)
 
     def fromMeasure(self, m):
@@ -443,7 +440,7 @@ class GeneralObjectExporter():
         return self.fromPart(p)
 
     def fromVoice(self, v):
-        m = stream.Measure()
+        m = stream.Measure(number=1)
         m.insert(0, v)
         return self.fromMeasure(m)
 
@@ -692,7 +689,7 @@ class XMLExporterBase:
         >>> from music21.musicxml.m21ToXml import Element
         >>> e = Element('accidental')
 
-        >>> XB = musicxml.m21ToXml.XMLExporterBase()
+        >>> XB = musicxml.m21ToXml.XMLExporterBase
         >>> XB.dump(e)
         <accidental />
 
@@ -1364,14 +1361,13 @@ class ScoreExporter(XMLExporterBase):
         if s.hasPartLikeStreams():
             self.parsePartlikeScore()
         else:
-            self.parseFlatScore()
+            self.parseFlatScore() # TODO(msc): determine if ever called.
 
         self.postPartProcess()
 
         # clean up for circular references.
-        # self.partExporterList.clear() # PY3 only
-        del self.partExporterList[:]
-
+        self.partExporterList.clear()
+        
         return self.xmlRoot
 
 

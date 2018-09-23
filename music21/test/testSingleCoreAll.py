@@ -103,7 +103,7 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
 
     with warnings.catch_warnings():
         warnings.simplefilter('once', RuntimeWarning)  # import modules...
-        warnings.simplefilter('once', FutureWarning)  # a lot of these scipy->numpy
+        warnings.simplefilter('ignore', FutureWarning)  # a lot of these scipy->numpy
         runner = unittest.TextTestRunner(verbosity=verbosity)
         finalTestResults = runner.run(s1)
 
