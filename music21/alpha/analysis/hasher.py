@@ -307,6 +307,8 @@ class Hasher:
             if (isinstance(e, note.Note) 
                     and e.previous('Note') is not None):
                 previousNote = e.previous('Note')
+                if (previousNote is None):
+                    return 0
                 intFromLastNote = interval.Interval(noteStart=previousNote, 
                                                     noteEnd=e).intervalClass
                 return interval.convertGeneric(interval.Interval(intFromLastNote).intervalClass)

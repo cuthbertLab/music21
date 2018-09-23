@@ -114,11 +114,10 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
     143.6276...
     '''
     if ('numpy' in base._missingImport or
-            'scipy' in base._missingImport or
-            'matplotlib' in base._missingImport):
+            'scipy' in base._missingImport):
         #len(_missingImport) > 0:
-        raise AudioSearchException('Cannot run autocorrelationFunction without all of ' +
-                'numpy, scipy, and matplotlib installed.  Missing %s' % base._missingImport)
+        raise AudioSearchException('Cannot run autocorrelationFunction without both of ' +
+                'numpy and scipy installed.  Missing %s' % base._missingImport)
     import numpy
     try:
         with warnings.catch_warnings(): # scipy.signal gives ImportWarning...

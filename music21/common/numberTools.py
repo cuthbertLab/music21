@@ -108,6 +108,8 @@ def numToIntOrFloat(value):
     1.5
     >>> common.numToIntOrFloat(1.0000000005)
     1
+    >>> common.numToIntOrFloat(0.999999999)
+    1
 
     >>> sharp = pitch.Accidental('sharp')
     >>> common.numToIntOrFloat(sharp.alter)
@@ -128,10 +130,10 @@ def numToIntOrFloat(value):
     :rtype: float
     '''
     try:
-        intVal = int(value)
-    except ValueError:
+        intVal = round(value)
+    except (ValueError, TypeError):
         value = float(value)
-        intVal = int(value)
+        intVal = round(value)
 
     try:
         value + 0.0

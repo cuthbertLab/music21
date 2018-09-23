@@ -2593,7 +2593,7 @@ class MeasureExporter(XMLExporterBase):
     classesToMethods = OrderedDict(
                [('Note', 'noteToXml'),
                 ('NoChord', 'noChordToXml'),
-                ('ChordWithFretBoard', 'chordWithFretToXml'),
+                ('ChordWithFretBoard', 'chordWithFretBoardToXml'),
                 ('ChordSymbol', 'chordSymbolToXml'),
                 ('Chord', 'chordToXml'),
                 ('Rest', 'restToXml'),
@@ -2744,6 +2744,7 @@ class MeasureExporter(XMLExporterBase):
 
         if backupAfterwards:
             # return to the beginning of the measure.
+            # MSC: i think the int is there for PY2 and no longer needed
             amountToBackup = int(round(divisions * self.offsetInMeasure))
             if amountToBackup:
                 mxBackup = Element('backup')
@@ -3206,7 +3207,7 @@ class MeasureExporter(XMLExporterBase):
         # TODO: attr: attack
         # TODO: attr: release
         # TODO: attr: time-only
-        self.setColor(mxNote, n)
+        self.setColor(mxNote, n) # TODO(msc): is this redundant with setColor below?
         _synchronizeIds(mxNote, n)
 
         d = chordOrN.duration
@@ -3754,7 +3755,7 @@ class MeasureExporter(XMLExporterBase):
         
         return mxFrame
     
-    def chordWithFretToXml(self, cwf):
+    def chordWithFretBoardToXml(self, cwf):
         '''
         Deals with both chords and frets.
         Generate harmony and append xml to it.
@@ -5487,7 +5488,7 @@ class MeasureExporter(XMLExporterBase):
         if mxMeasureStyle is not None:
             mxAttributes.append(mxMeasureStyle)
 
-        if mxAttributes or mxAttributes.attrib:
+        if len(mxAttributes) > 0 or mxAttributes.attrib:
             self.xmlRoot.append(mxAttributes)
         return mxAttributes
 
@@ -5701,13 +5702,7 @@ class MeasureExporter(XMLExporterBase):
             # TODO: cancel
             seta(keyOrKeySignature, mxKey, 'fifths', 'sharps')
             if hasattr(keyOrKeySignature, 'mode') and keyOrKeySignature.mode is not None:
-                if (environLocal.xmlReaderType() == 'Musescore'
-                        and keyOrKeySignature.mode not in ('major', 'minor')):
-                    # Musescore up to v. 2 has major problems with modes other than major or minor
-                    # Fixed in latest Nightlys
-                    pass
-                else:
-                    seta(keyOrKeySignature, mxKey, 'mode')
+                seta(keyOrKeySignature, mxKey, 'mode')
 
         else:
             # choice... non-traditional-key...

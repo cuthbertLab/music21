@@ -1938,7 +1938,7 @@ class Duration(SlottedObjectMixin):
         1.0
         >>> a.componentStartTime(3)
         Traceback (most recent call last):
-        music21.duration.DurationException: invalid component index value (3) submitted;
+        music21.duration.DurationException: invalid component index value 3 submitted;
                                             value must be an integer between 0 and 2
         '''
         if componentIndex not in range(len(self.components)):
