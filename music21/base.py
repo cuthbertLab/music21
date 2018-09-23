@@ -1993,7 +1993,7 @@ class Music21Object:
             asTree = activeS.asTree(classList=className, flatten=False)
             prevNode = asTree.getNodeBefore(self.sortTuple())
             if prevNode is None:
-                if activeS.isClassOrSubclass(className):
+                if className is None or activeS.isClassOrSubclass(className):
                     return activeS
                 else:
                     return None

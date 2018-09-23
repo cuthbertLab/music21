@@ -4938,7 +4938,13 @@ class MeasureParser(XMLParserBase):
         if sign.lower() in ('tab', 'percussion', 'none', 'jianpu'):
             clefObj = clef.clefFromString(sign)
         else:
-            line = mxClef.find('line').text.strip()
+            mxLine = mxClef.find('line')
+            if mxLine is not None:
+                line = mxLine.text.strip()
+            elif sign == 'G':
+                line = '2'
+            else:
+                line = '4'
             mxOctaveChange = mxClef.find('clef-octave-change')
             if mxOctaveChange is not None:
                 try:
