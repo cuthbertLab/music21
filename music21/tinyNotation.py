@@ -921,6 +921,8 @@ class Converter:
         else:
             self.makeNotation = True
 
+        self.raiseExceptions = keywords.get('raiseExceptions', False)
+
         self.stateDictDefault = {'currentTimeSignature': None,
                                  'lastDuration': 1.0
                                  }
@@ -1015,26 +1017,33 @@ class Converter:
         tokenObj = None
 
         # parse token with state:
+        hasMatch = False
         for tokenRe, tokenClass in self._tokenMapRe:
             matchSuccess = tokenRe.match(t)
             if matchSuccess is None:
                 continue
 
+            hasMatch = True
             tokenData = matchSuccess.group(1)
             tokenObj = tokenClass(tokenData)
             m21Obj = tokenObj.parse(self)
             if m21Obj is not None: # can only match one.
                 break
 
-        for stateObj in self.activeStates[:]: # iterate over copy so we can remove.
-            m21Obj = stateObj.affectTokenAfterParseBeforeModifiers(m21Obj)
+        if not hasMatch and self.raiseExceptions:
+            raise TinyNotationException('Cannot parse "' + t + '"')            
 
+        if m21Obj is not None:
+            for stateObj in self.activeStates[:]: # iterate over copy so we can remove.
+                m21Obj = stateObj.affectTokenAfterParseBeforeModifiers(m21Obj)
 
-        for modObj in activeModifiers:
-            m21Obj = modObj.postParse(m21Obj)
+        if m21Obj is not None:
+            for modObj in activeModifiers:
+                m21Obj = modObj.postParse(m21Obj)
 
-        for stateObj in self.activeStates[:]: # iterate over copy so we can remove.
-            m21Obj = stateObj.affectTokenAfterParse(m21Obj)
+        if m21Obj is not None:
+            for stateObj in self.activeStates[:]: # iterate over copy so we can remove.
+                m21Obj = stateObj.affectTokenAfterParse(m21Obj)
 
         if m21Obj is not None:
             self.stream.coreAppend(m21Obj)
