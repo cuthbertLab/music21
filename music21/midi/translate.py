@@ -2191,7 +2191,7 @@ class Test(unittest.TestCase):
         match = '''[<MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b''>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>,
+        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, parameter1=0, parameter2=64>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data=b'\\x03\\x02\\x18\\x08'>,
         <MidiEvent DeltaTime, t=3072, track=1, channel=1>,
@@ -2242,7 +2242,7 @@ class Test(unittest.TestCase):
         [<MidiEvent DeltaTime, t=0, track=1, channel=1>,
          <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b'Soprano'>,
          <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-         <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>, 
+         <MidiEvent PITCH_BEND, t=0, track=1, channel=1, parameter1=0, parameter2=64>, 
          <MidiEvent DeltaTime, t=0, track=1, channel=1>]'''
 
         self.maxDiff = None
@@ -2254,7 +2254,7 @@ class Test(unittest.TestCase):
         [<MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b'Alto'>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>, 
+        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, parameter1=0, parameter2=64>, 
         <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
         <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
@@ -2276,7 +2276,7 @@ class Test(unittest.TestCase):
         match = '''[<MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b'Soprano'>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>,
+        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, parameter1=0, parameter2=64>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,

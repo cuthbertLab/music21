@@ -477,8 +477,8 @@ class MidiEvent:
         self.time = time
         self.channel = channel
 
-        self._parameter1 = None # pitch or first data value
-        self._parameter2 = None # velocity or second data value
+        self.parameter1 = None # pitch or first data value
+        self.parameter2 = None # velocity or second data value
 
         # data is a property...
 
@@ -519,10 +519,10 @@ class MidiEvent:
         if self.type in ['NOTE_ON', 'NOTE_OFF']:
             attrList = ['pitch', 'velocity']
         else:
-            if self._parameter2 is None:
+            if self.parameter2 is None:
                 attrList = ['data']
             else:
-                attrList = ['_parameter1', '_parameter2']
+                attrList = ['parameter1', 'parameter2']
 
         for attrib in attrList:
             if getattr(self, attrib) is not None:
@@ -531,22 +531,22 @@ class MidiEvent:
 
     # provide parameter access to pitch and velocity
     def _setPitch(self, value):
-        self._parameter1 = value
+        self.parameter1 = value
 
     def _getPitch(self):
         # only return pitch if this is note on /off
         if self.type in ['NOTE_ON', 'NOTE_OFF']:
-            return self._parameter1
+            return self.parameter1
         else:
             return None
 
     pitch = property(_getPitch, _setPitch)
 
     def _setVelocity(self, value):
-        self._parameter2 = value
+        self.parameter2 = value
 
     def _getVelocity(self):
-        return self._parameter2
+        return self.parameter2
 
     velocity = property(_getVelocity, _setVelocity)
 
@@ -557,18 +557,20 @@ class MidiEvent:
             if isinstance(value, str):
                 value = value.encode('utf-8')
 
-        self._parameter1 = value
+        self.parameter1 = value
 
     def _getData(self):
-        return self._parameter1
+        return self.parameter1
 
     data = property(_getData, _setData)
 
 
     def setPitchBend(self, cents, bendRange=2):
         '''
-        Treat this event as a pitch bend value, and set the ._parameter1 and
-         ._parameter2 fields appropriately given a specified bend value in cents.
+        Treat this event as a pitch bend value, and set the .parameter1 and
+         .parameter2 fields appropriately given a specified bend value in cents.
+
+        Also called Pitch Wheel
 
         The `bendRange` parameter gives the number of half steps in the bend range.
 
@@ -576,33 +578,91 @@ class MidiEvent:
         >>> mt = midi.MidiTrack(1)
         >>> me1 = midi.MidiEvent(mt)
         >>> me1.setPitchBend(50)
-        >>> me1._parameter1, me1._parameter2
+        >>> me1.parameter1, me1.parameter2
         (0, 80)
         >>> me1.setPitchBend(100)
-        >>> me1._parameter1, me1._parameter2
+        >>> me1.parameter1, me1.parameter2
         (0, 96)
+
+        Neutral is 0, 64
+        
+        >>> me1.setPitchBend(0)
+        >>> me1.parameter1, me1.parameter2
+        (0, 64)
+
+        
+        Parameter 2 is most significant digit, not
+        parameter 1.
+        
+        >>> me1.setPitchBend(101)
+        >>> me1.parameter1, me1.parameter2
+        (40, 96)
+
+        Exceeding maximum sets max
+
         >>> me1.setPitchBend(200)
-        >>> me1._parameter1, me1._parameter2
+        >>> me1.parameter1, me1.parameter2
         (127, 127)
+        >>> me1.setPitchBend(300)
+        >>> me1.parameter1, me1.parameter2
+        (127, 127)
+
         >>> me1.setPitchBend(-50)
-        >>> me1._parameter1, me1._parameter2
+        >>> me1.parameter1, me1.parameter2
         (0, 48)
         >>> me1.setPitchBend(-100)
-        >>> me1._parameter1, me1._parameter2
+        >>> me1.parameter1, me1.parameter2
         (0, 32)
+        >>> me1.setPitchBend(-196)
+        >>> me1.parameter1, me1.parameter2
+        (36, 1)
+        >>> me1.setPitchBend(-200)
+        >>> me1.parameter1, me1.parameter2
+        (0, 0)
+        
+        Again, excess trimmed
+        
+        >>> me1.setPitchBend(-300)
+        >>> me1.parameter1, me1.parameter2
+        (0, 0)
+
+        But a larger `bendRange` can be set in semitones for non-GM devices:
+
+        >>> me1.setPitchBend(-300, bendRange=4)
+        >>> me1.parameter1, me1.parameter2
+        (0, 16)
+        >>> me1.setPitchBend(-399, bendRange=4)
+        >>> me1.parameter1, me1.parameter2
+        (20, 0)
+
+        OMIT_FROM_DOCS
+        
+        Pitch bends very close to 0 had problems
+
+        >>> me1.setPitchBend(-196)
+        >>> me1.parameter1, me1.parameter2
+        (36, 1)
+        >>> me1.setPitchBend(-197)
+        >>> me1.parameter1, me1.parameter2
+        (123, 0)
         '''
-        # value range is 0, 16383
-        # center should be 8192
+        # value range is 0, 16383 (0 to 0x4000 - 1)
+        # center should be 8192 (0x2000)
         centRange = bendRange * 100
-        center = 8192
-        topSpan = 16383 - center
+        if cents > centRange:
+            cents = centRange
+        elif cents < -1 * centRange:
+            cents = -1 * centRange        
+        
+        center = 0x2000
+        topSpan = 0x4000 - 1 - center
         bottomSpan = center
 
+        shiftScalar = cents / centRange
+
         if cents > 0:
-            shiftScalar = cents / float(centRange)
             shift = int(round(shiftScalar * topSpan))
         elif cents < 0:
-            shiftScalar = cents / float(centRange) # will be negative
             shift = int(round(shiftScalar * bottomSpan)) # will be negative
         else: # cents is zero
             shift = 0
@@ -610,21 +670,22 @@ class MidiEvent:
 
         # produce a two-char value
         charValue = putVariableLengthNumber(target)
-        d1, junk = getNumber(charValue[0], 1)
+        d1, junk = getNumber(charValue[0], 1) # d1 = parameter2
         # need to convert from 8 bit to 7, so using & 0x7F
         d1 = d1 & 0x7F
         if len(charValue) > 1:
             d2, junk = getNumber(charValue[1], 1)
             d2 = d2 & 0x7F
         else:
-            d2 = 0
+            d2 = d1
+            d1 = 0
 
         #environLocal.printDebug(['got target char value', charValue,
         # 'getVariableLengthNumber(charValue)', getVariableLengthNumber(charValue)[0],
         # 'd1', d1, 'd2', d2,])
 
-        self._parameter1 = d2
-        self._parameter2 = d1 # d1 is msb here
+        self.parameter1 = d2
+        self.parameter2 = d1 # d1 is most significant byte here
 
     def _parseChannelVoiceMessage(self, midiStr):
         '''
@@ -812,11 +873,11 @@ class MidiEvent:
             if self.type not in ('PROGRAM_CHANGE', 'CHANNEL_KEY_PRESSURE'):
                 # this results in a two-part string, like '\x00\x00'
                 try:
-                    data = chr(self._parameter1) + chr(self._parameter2)
+                    data = chr(self.parameter1) + chr(self.parameter2)
                 except ValueError:
                     raise MidiException(
                         'Problem with representing either %d or %d' % (
-                                                    self._parameter1, self._parameter2))
+                                                    self.parameter1, self.parameter2))
             elif self.type == 'PROGRAM_CHANGE':
                 #environLocal.printDebug(['trying to add program change data: %s' % self.data])
                 try:
