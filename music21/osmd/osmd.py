@@ -19,16 +19,17 @@ from music21 import exceptions21
 class OpenSheetMusicDisplayException(exceptions21.Music21Exception):
     pass
 
-hasInstalledIPython = False
-try:
-    # raise ImportError('for testing')
-    from IPython.core.display import display, HTML, Javascript
-    hasInstalledIPython = True
-except ImportError as e:
-    # raise error only if methods are called by a .show()
+
+loader = importlib.util.find_spec('IPython.core.display')
+if loader is None:
+    hasInstalledIPython = False
     def display(*args, **kwargs):
         raise OpenSheetMusicDisplayException('OpenSheetMusicDisplay requires IPython to be installed')
     HTML = Javascript = display
+else:
+    from IPython.core.display import display, HTML, Javascript
+    hasInstalledIPython = True
+del importlib
 
 
 from music21.converter.subConverters import SubConverter
