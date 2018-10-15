@@ -168,7 +168,7 @@ class TestExternal(unittest.TestCase):
         from music21 import corpus, environment
         environLocal = environment.Environment()
 
-        s = corpus.parse('luca/gloria').measures(1, 19)
+        s = corpus.parse('bwv66.6')
         # s.show('osmd')
         ConverterOpenSheetMusicDisplay().show(s, None)
 
