@@ -47,25 +47,25 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     registerFormats = ('osmd',)
     registerShowFormats = ('osmd',) 
 
-    def show(self, obj, fmt, 
-            fixPartName=True, offline=True, div_id=None,
-            **keywords):
+    def show(self, obj, fmt,
+             fixPartName=True, offline=True, divId=None,
+             **keywords):
         score = obj
         if fixPartName:
             score = self.addDefaultPartName(score)
 
-        if div_id is None:
+        if divId is None:
             # create unique reference to output div in case we wish to update it
-            div_id = self.getUniqueDivId()
+            divId = self.getUniqueDivId()
             # div contents should be replaced by rendering
-            display(HTML('<div id="'+div_id+'">loading OpenSheetMusicDisplay</div>'))
+            display(HTML('<div id="' + divId + '">loading OpenSheetMusicDisplay</div>'))
 
 
         xml = open(score.write('musicxml')).read()
-        script = self.musicXMLToScript(xml, div_id, offline=offline)
+        script = self.musicXMLToScript(xml, divId, offline=offline)
 
         display(Javascript(script))
-        return div_id
+        return divId
 
     @staticmethod
     def getUniqueDivId():
@@ -74,7 +74,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
                 "-"+str(time.time()).replace('.','-') # '.' is the class selector
 
     @staticmethod
-    def musicXMLToScript(xml, div_id, offline=True):
+    def musicXMLToScript(xml, divId, offline=True):
         
         # print('xml length:', len(xml))
         script_dir = os.path.join(os.path.dirname(__file__), 'opensheetmusicdisplay.0.3.1.min.js')
@@ -122,7 +122,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
                 );
         })
         """ \
-        .replace('{{DIV_ID}}',div_id) \
+        .replace('{{DIV_ID}}', divId) \
         .replace('{{data}}',json.dumps(xml)) \
         .replace('{{script_dir}}',pathname2url(script_dir))
 
