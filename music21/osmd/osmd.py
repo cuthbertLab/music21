@@ -5,7 +5,7 @@
 #
 # Authors:      Sven Hollowell
 #
-# Copyright:    Copyright © 2012-14 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2018 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
