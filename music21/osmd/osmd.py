@@ -46,10 +46,12 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     Uses: https://opensheetmusicdisplay.org/ for rendering
     '''
     registerFormats = ('osmd',)
-    registerShowFormats = ('osmd',) 
+    registerShowFormats = ('osmd',)
+    script_url = """https://github.com/opensheetmusicdisplay/opensheetmusicdisplay/releases/download/0.3.1/opensheetmusicdisplay.min.js"""
+    osmd_file = os.path.join(os.path.dirname(__file__), 'opensheetmusicdisplay.0.3.1.min.js')
 
     def show(self, obj, fmt,
-             fixPartName=True, offline=True, divId=None,
+             fixPartName=True, offline=False, divId=None,
              **keywords):
         score = obj
         if fixPartName:
@@ -74,11 +76,10 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
                 str(random.randint(0,1000000))+ \
                 "-"+str(time.time()).replace('.','-') # '.' is the class selector
 
-    @staticmethod
-    def musicXMLToScript(xml, divId, offline=True):
-        
+
+    def musicXMLToScript(self, xml, divId, offline=False):
+
         # print('xml length:', len(xml))
-        script_dir = os.path.join(os.path.dirname(__file__), 'opensheetmusicdisplay.0.3.1.min.js')
 
         # script that will replace div contents with OSMD display
         script = """
@@ -95,9 +96,6 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
                 var _define = window.define // save the define object 
                 window.define = undefined // now the loaded script will ignore requirejs
                 var s = document.createElement( 'script' );
-                // alternative to local file is using a CDN
-                // s.setAttribute( 'src', "https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@0.3.1/build/opensheetmusicdisplay.min.js" );
-                //s.setAttribute( 'src', "{{script_dir}}" );
                 function oncompleted(){
                     window.define = _define
                     console.log("loaded OSMD for the first time",opensheetmusicdisplay)
@@ -123,12 +121,21 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
                 );
         })
         """ \
-        .replace('{{DIV_ID}}', divId) \
-        .replace('{{data}}',json.dumps(xml)) \
-        .replace('{{script_dir}}',pathname2url(script_dir))
+            .replace('{{DIV_ID}}', divId) \
+            .replace('{{data}}',json.dumps(xml))
+
+
+
 
         if offline is True:
-            script_content = open(script_dir).read()
+            if not os.path.isfile(self.osmd_file):
+                # on first use we download the file and store it locally for subsequent use
+                import urllib.request
+                # TODO: catch error for no internet connection
+                urllib.request.urlretrieve(self.script_url, self.osmd_file)
+
+            # since we can't link to files from a notebook (security risk) we dump the file contents to inject.
+            script_content = open(self.osmd_file).read()
             script = script.replace('{{script_command}}',"""
                 s.type = 'text/javascript';
                 s.text="""+json.dumps(script_content)+""";
@@ -137,7 +144,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
                 """)
         else:
             script = script.replace('{{script_command}}',"""
-                s.setAttribute( 'src', 'https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@0.3.1/build/opensheetmusicdisplay.min.js' );
+                s.setAttribute( 'src', '"""+self.script_url+"""' );
                 s.onload=oncompleted;
                 document.body.appendChild( s ); // browser will try to load the new script tag
                 """)
@@ -155,7 +162,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
             defaultInstrument.instrumentName = 'Default'
             score.insert(None, defaultInstrument)
             score.coreElementsChanged()
-        elif not allInstruments[0].instrumentName: 
+        elif not allInstruments[0].instrumentName:
             # print("adding instrumentName")
             # instrumentName must not be '' or None
             allInstruments[0].instrumentName = 'Default'
