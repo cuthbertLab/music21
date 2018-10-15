@@ -161,7 +161,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
 
         return score
 
-class Test(unittest.TestCase):
+class TestExternal(unittest.TestCase):
 
     @unittest.skipUnless(hasInstalledIPython, "skipping since IPython not installed")
     def testOpenSheetMusicDisplayRuns(self):
@@ -186,4 +186,4 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(TestExternal)
