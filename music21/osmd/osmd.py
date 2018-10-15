@@ -13,8 +13,6 @@ Registers the .show('osmd') converter for use in IPython browser
 See OSMD project page here: https://github.com/opensheetmusicdisplay/opensheetmusicdisplay
 '''
 import unittest
-import importlib
-
 from music21.converter.subConverters import SubConverter
 from music21.instrument import Piano
 import time, random, json, os
@@ -25,11 +23,12 @@ class OpenSheetMusicDisplayException(exceptions21.Music21Exception):
     pass
 
 
-loader = importlib.util.find_spec('IPython.core.display')
-if loader is None:
-    hasInstalledIPython = False
-else:
-    hasInstalledIPython = True
+import importlib
+try:
+    loader = importlib.util.find_spec('IPython.core.display')
+except (ModuleNotFoundError, ImportError):
+    loader = None
+hasInstalledIPython = loader is not None
 del importlib
 
 def getExtendedModules():
