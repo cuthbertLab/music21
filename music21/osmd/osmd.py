@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         osmd/osmd.py
-# Purpose:      music21 classes for displaying music21 scores in IPython notebooks
+# Purpose:      display Streams in IPython notebooks using Open Sheet Music Display
 #
 # Authors:      Sven Hollowell
 #
