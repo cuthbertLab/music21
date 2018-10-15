@@ -26,7 +26,7 @@ class OpenSheetMusicDisplayException(exceptions21.Music21Exception):
 import importlib
 try:
     loader = importlib.util.find_spec('IPython.core.display')
-except (ModuleNotFoundError, ImportError):
+except ImportError:
     loader = None
 hasInstalledIPython = loader is not None
 del importlib
