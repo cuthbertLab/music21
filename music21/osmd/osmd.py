@@ -47,8 +47,8 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     '''
     registerFormats = ('osmd',)
     registerShowFormats = ('osmd',)
-    script_url = """https://github.com/opensheetmusicdisplay/opensheetmusicdisplay/releases/download/0.3.1/opensheetmusicdisplay.min.js"""
-    osmd_file = os.path.join(os.path.dirname(__file__), 'opensheetmusicdisplay.0.3.1.min.js')
+    script_url = """https://github.com/opensheetmusicdisplay/opensheetmusicdisplay/releases/download/0.5.1/opensheetmusicdisplay.min.js"""
+    osmd_file = os.path.join(os.path.dirname(__file__), 'opensheetmusicdisplay.0.5.1.min.js')
 
     def show(self, obj, fmt,
              fixPartName=True, offline=False, divId=None,
