@@ -13,6 +13,7 @@ Registers the .show('osmd') converter for use in IPython browser
 See OSMD project page here: https://github.com/opensheetmusicdisplay/opensheetmusicdisplay
 '''
 import unittest
+import importlib
 from music21 import exceptions21
 
 
