@@ -14,8 +14,12 @@ See OSMD project page here: https://github.com/opensheetmusicdisplay/opensheetmu
 '''
 import unittest
 import importlib
-from music21 import exceptions21
 
+from music21.converter.subConverters import SubConverter
+from music21.instrument import Piano
+import time, random, json, os
+
+from music21 import exceptions21
 
 class OpenSheetMusicDisplayException(exceptions21.Music21Exception):
     pass
@@ -24,19 +28,19 @@ class OpenSheetMusicDisplayException(exceptions21.Music21Exception):
 loader = importlib.util.find_spec('IPython.core.display')
 if loader is None:
     hasInstalledIPython = False
-    def display(*args, **kwargs):
-        raise OpenSheetMusicDisplayException('OpenSheetMusicDisplay requires IPython to be installed')
-    HTML = Javascript = display
 else:
-    from IPython.core.display import display, HTML, Javascript
     hasInstalledIPython = True
 del importlib
 
+def getExtendedModules():
+    if hasInstalledIPython:
+        from IPython.core.display import display, HTML, Javascript
+    else:
+        def display(*args, **kwargs):
+            raise OpenSheetMusicDisplayException('OpenSheetMusicDisplay requires IPython to be installed')
+        HTML = Javascript = display
+    return display, HTML, Javascript
 
-from music21.converter.subConverters import SubConverter
-from music21.instrument import Piano
-from urllib.request import pathname2url
-import time, random, json, os
 
 
 class ConverterOpenSheetMusicDisplay(SubConverter):
@@ -50,6 +54,9 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     script_url = """https://github.com/opensheetmusicdisplay/opensheetmusicdisplay/releases/download/0.5.1/opensheetmusicdisplay.min.js"""
     osmd_file = os.path.join(os.path.dirname(__file__), 'opensheetmusicdisplay.0.5.1.min.js')
 
+    def __init__(self):
+        self.display, self.HTML, self.Javascript = getExtendedModules()
+
     def show(self, obj, fmt,
              fixPartName=True, offline=False, divId=None,
              **keywords):
@@ -61,13 +68,13 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
             # create unique reference to output div in case we wish to update it
             divId = self.getUniqueDivId()
             # div contents should be replaced by rendering
-            display(HTML('<div id="' + divId + '">loading OpenSheetMusicDisplay</div>'))
+            self.display(self.HTML('<div id="' + divId + '">loading OpenSheetMusicDisplay</div>'))
 
 
         xml = open(score.write('musicxml')).read()
         script = self.musicXMLToScript(xml, divId, offline=offline)
 
-        display(Javascript(script))
+        self.display(self.Javascript(script))
         return divId
 
     @staticmethod
