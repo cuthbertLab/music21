@@ -180,8 +180,8 @@ class TestExternal(unittest.TestCase):
         firstInstrumentObject = s.getInstruments(returnDefault=True, recurse=True)[0]
         # print("firstInstrumentObject",firstInstrumentObject)
         # print("firstInstrumentObject.instrumentName",firstInstrumentObject.instrumentName)
-        assert firstInstrumentObject.instrumentName != None
-        assert firstInstrumentObject.instrumentName != ''
+        self.assertNotNone(firstInstrumentObject.instrumentName)
+        self.assertNotEqual(firstInstrumentObject.instrumentName,'')
 
 
 if __name__ == "__main__":
