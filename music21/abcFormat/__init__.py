@@ -416,7 +416,7 @@ class ABCMetadata(ABCToken):
             raise ABCTokenException('no key signature associated with this meta-data')
 
         # abc uses b for flat in key spec only
-        keyNameMatch = ['c', 'g', 'd', 'a', 'e', 'b', 'f#', 'g#', 
+        keyNameMatch = ['c', 'g', 'd', 'a', 'e', 'b', 'f#', 'g#', 'a#', 
                         'f', 'bb', 'eb', 'd#', 'ab', 'e#', 'db', 'c#', 'gb', 'cb',
                         # HP or Hp are used for highland pipes
                         'hp']
@@ -426,11 +426,12 @@ class ABCMetadata(ABCToken):
         standardKeyStr = 'C'
         stringRemain = ''
         # first, get standard key indication
-        for target in keyNameMatch:
+        for target in sorted(keyNameMatch, key=len, reverse=True):
             if target == self.data[:len(target)].lower():
                 # keep case
                 standardKeyStr = self.data[:len(target)]
                 stringRemain = self.data[len(target):]
+                break
 
         # replace a flat symbol if found; only the second char
         if standardKeyStr == 'HP':
@@ -442,7 +443,9 @@ class ABCMetadata(ABCToken):
 
         mode = None
         stringRemain = stringRemain.strip()
-        if stringRemain != '':
+        if stringRemain == '':
+            mode = 'major'
+        else:
             # only first three characters are parsed
             modeCandidate = stringRemain.lower()
             for match, modeStr in [
