@@ -358,6 +358,8 @@ class ABCMetadata(ABCToken):
         and translate sharps count compatible with m21,
         returning the number of sharps and the mode.
 
+        >>> from music21 import abcFormat
+
         >>> am = abcFormat.ABCMetadata('K:Eb Lydian')
         >>> am.preParse()
         >>> am._getKeySignatureParameters()
@@ -381,12 +383,12 @@ class ABCMetadata(ABCToken):
         >>> am = abcFormat.ABCMetadata('K: F')
         >>> am.preParse()
         >>> am._getKeySignatureParameters()
-        (-1, None)
+        (-1, 'major')
 
         >>> am = abcFormat.ABCMetadata('K:G')
         >>> am.preParse()
         >>> am._getKeySignatureParameters()
-        (1, None)
+        (1, 'major')
 
         >>> am = abcFormat.ABCMetadata('K:Gm')
         >>> am.preParse()
@@ -416,7 +418,7 @@ class ABCMetadata(ABCToken):
             raise ABCTokenException('no key signature associated with this meta-data')
 
         # abc uses b for flat in key spec only
-        keyNameMatch = ['c', 'g', 'd', 'a', 'e', 'b', 'f#', 'g#', 'a#', 
+        keyNameMatch = ['c', 'g', 'd', 'a', 'e', 'b', 'f#', 'g#', 'a#',
                         'f', 'bb', 'eb', 'd#', 'ab', 'e#', 'db', 'c#', 'gb', 'cb',
                         # HP or Hp are used for highland pipes
                         'hp']
@@ -433,17 +435,13 @@ class ABCMetadata(ABCToken):
                 stringRemain = self.data[len(target):]
                 break
 
-        # replace a flat symbol if found; only the second char
-        if standardKeyStr == 'HP':
-            standardKeyStr = 'C' # no sharp or flats
-        elif standardKeyStr == 'Hp':
-            standardKeyStr = 'D' # use F#, C#, Gn
         if len(standardKeyStr) > 1 and standardKeyStr[1] == 'b':
             standardKeyStr = standardKeyStr[0] + '-'
 
         mode = None
         stringRemain = stringRemain.strip()
         if stringRemain == '':
+            # Assume mode is major by default
             mode = 'major'
         else:
             # only first three characters are parsed
@@ -461,6 +459,16 @@ class ABCMetadata(ABCToken):
                 if modeCandidate.startswith(match):
                     mode = modeStr
                     break
+
+        # Special case for highland pipes
+        # replace a flat symbol if found; only the second char
+        if standardKeyStr == 'HP':
+            standardKeyStr = 'C' # no sharp or flats
+            mode = None
+        elif standardKeyStr == 'Hp':
+            standardKeyStr = 'D' # use F#, C#, Gn
+            mode = None
+
         # not yet implemented: checking for additional chromatic alternations
         # e.g.: K:D =c would write the key signature as two sharps
         # (key of D) but then mark every  c  as  natural
