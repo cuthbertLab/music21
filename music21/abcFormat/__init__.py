@@ -484,7 +484,7 @@ class ABCMetadata(ABCToken):
         >>> am.preParse()
         >>> ks = am.getKeySignatureObject()
         >>> ks
-        <music21.key.KeySignature of 1 sharp>
+        <music21.key.Key of G major>
 
         >>> am = abcFormat.ABCMetadata('K:Gmin')
         >>> am.preParse()
