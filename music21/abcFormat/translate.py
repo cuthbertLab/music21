@@ -884,6 +884,42 @@ class Test(unittest.TestCase):
             0].quarterLength)
 
 
+    def testAbcKeyImport(self):
+        from music21 import abcFormat
+
+        # sharps
+        major = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#']
+        minor = ['Am', 'Em', 'Bm', 'F#m', 'C#m', 'G#m', 'D#m', 'A#m']
+
+        for n, (maj,min) in enumerate(zip(major, minor)):
+            am = abcFormat.ABCMetadata('K:'+maj)
+            am.preParse()
+            ks_major = am.getKeySignatureObject()
+            am = abcFormat.ABCMetadata('K:'+min)
+            am.preParse()
+            ks_minor = am.getKeySignatureObject()
+            self.assertEqual(n, ks_major.sharps)
+            self.assertEqual(n, ks_minor.sharps)
+            self.assertEqual('major', ks_major.mode)
+            self.assertEqual('minor', ks_minor.mode)
+
+        #flats
+        major = ['C', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb']
+        minor = ['Am', 'Dm', 'Gm', 'Cm', 'Fm', 'Bbm', 'Ebm', 'Abm']
+
+        for n, (maj,min) in enumerate(zip(major, minor)):
+            am = abcFormat.ABCMetadata('K:'+maj)
+            am.preParse()
+            ks_major = am.getKeySignatureObject()
+            am = abcFormat.ABCMetadata('K:'+min)
+            am.preParse()
+            ks_minor = am.getKeySignatureObject()
+            self.assertEqual(-n, ks_major.sharps)
+            self.assertEqual(-n, ks_minor.sharps)
+            self.assertEqual('major', ks_major.mode)
+            self.assertEqual('minor', ks_minor.mode)
+
+
     def testLocaleOfCompositionImport(self):
 
         from music21 import corpus
