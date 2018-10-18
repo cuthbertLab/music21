@@ -358,6 +358,8 @@ class ABCMetadata(ABCToken):
         and translate sharps count compatible with m21,
         returning the number of sharps and the mode.
 
+        >>> from music21 import abcFormat
+
         >>> am = abcFormat.ABCMetadata('K:Eb Lydian')
         >>> am.preParse()
         >>> am._getKeySignatureParameters()
@@ -381,12 +383,12 @@ class ABCMetadata(ABCToken):
         >>> am = abcFormat.ABCMetadata('K: F')
         >>> am.preParse()
         >>> am._getKeySignatureParameters()
-        (-1, None)
+        (-1, 'major')
 
         >>> am = abcFormat.ABCMetadata('K:G')
         >>> am.preParse()
         >>> am._getKeySignatureParameters()
-        (1, None)
+        (1, 'major')
 
         >>> am = abcFormat.ABCMetadata('K:Gm')
         >>> am.preParse()
@@ -416,7 +418,7 @@ class ABCMetadata(ABCToken):
             raise ABCTokenException('no key signature associated with this meta-data')
 
         # abc uses b for flat in key spec only
-        keyNameMatch = ['c', 'g', 'd', 'a', 'e', 'b', 'f#', 'g#', 
+        keyNameMatch = ['c', 'g', 'd', 'a', 'e', 'b', 'f#', 'g#', 'a#',
                         'f', 'bb', 'eb', 'd#', 'ab', 'e#', 'db', 'c#', 'gb', 'cb',
                         # HP or Hp are used for highland pipes
                         'hp']
@@ -426,23 +428,22 @@ class ABCMetadata(ABCToken):
         standardKeyStr = 'C'
         stringRemain = ''
         # first, get standard key indication
-        for target in keyNameMatch:
+        for target in sorted(keyNameMatch, key=len, reverse=True):
             if target == self.data[:len(target)].lower():
                 # keep case
                 standardKeyStr = self.data[:len(target)]
                 stringRemain = self.data[len(target):]
+                break
 
-        # replace a flat symbol if found; only the second char
-        if standardKeyStr == 'HP':
-            standardKeyStr = 'C' # no sharp or flats
-        elif standardKeyStr == 'Hp':
-            standardKeyStr = 'D' # use F#, C#, Gn
         if len(standardKeyStr) > 1 and standardKeyStr[1] == 'b':
             standardKeyStr = standardKeyStr[0] + '-'
 
         mode = None
         stringRemain = stringRemain.strip()
-        if stringRemain != '':
+        if stringRemain == '':
+            # Assume mode is major by default
+            mode = 'major'
+        else:
             # only first three characters are parsed
             modeCandidate = stringRemain.lower()
             for match, modeStr in [
@@ -458,6 +459,16 @@ class ABCMetadata(ABCToken):
                 if modeCandidate.startswith(match):
                     mode = modeStr
                     break
+
+        # Special case for highland pipes
+        # replace a flat symbol if found; only the second char
+        if standardKeyStr == 'HP':
+            standardKeyStr = 'C' # no sharp or flats
+            mode = None
+        elif standardKeyStr == 'Hp':
+            standardKeyStr = 'D' # use F#, C#, Gn
+            mode = None
+
         # not yet implemented: checking for additional chromatic alternations
         # e.g.: K:D =c would write the key signature as two sharps
         # (key of D) but then mark every  c  as  natural
@@ -473,7 +484,7 @@ class ABCMetadata(ABCToken):
         >>> am.preParse()
         >>> ks = am.getKeySignatureObject()
         >>> ks
-        <music21.key.KeySignature of 1 sharp>
+        <music21.key.Key of G major>
 
         >>> am = abcFormat.ABCMetadata('K:Gmin')
         >>> am.preParse()
