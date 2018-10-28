@@ -1898,7 +1898,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> n3.getOffsetBySite(a)
         18.0
 
-        TODO: Appending a Clef after a KeySignature will not cause sorting to be re-run.
+        TODO(bug): Appending a Clef after a KeySignature, or
+        a Measure after a KeySignature, etc. will not cause sorting to be re-run.
         '''
         # store and increment highest time for insert offset
         highestTime = self.highestTime

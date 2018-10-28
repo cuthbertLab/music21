@@ -882,14 +882,14 @@ class Music21Object:
         that container can be provided here, and the offset in that object
         can be returned.
 
-        >>> n = note.Note('A-4')  # a Music21Objecct
+        >>> n = note.Note('A-4')  # a Music21Object
         >>> n.offset = 30
         >>> n.getOffsetBySite(None)
         30.0
 
         >>> s1 = stream.Stream()
         >>> s1.id = 'containingStream'
-        >>> s1.insert(20.0/3, n)
+        >>> s1.insert(20 / 3, n)
         >>> n.getOffsetBySite(s1)
         Fraction(20, 3)
         >>> float(n.getOffsetBySite(s1))
@@ -1753,22 +1753,24 @@ class Music21Object:
                                               returnSortTuples=True,
                                               sortByCreationTime=sortByCreationTime):
                                             # get activeSite unless sortByCreationTime
-                    if derivedCsTuple.site not in memo:
-                        environLocal.printDebug(
-                                'Yielding {} from derivedObject contextSites'.format(derivedCsTuple)
-                                )
-                        offsetAdjustedCsTuple = ContextTuple(
-                            derivedCsTuple.site,
-                            derivedCsTuple.offset.modify(offset=derivedCsTuple[1].offset +
-                                                                offsetAppend),
-                            derivedCsTuple.recurseType)
-                        if returnSortTuples:
-                            yield offsetAdjustedCsTuple
-                        else:
-                            yield ContextTuple(offsetAdjustedCsTuple.site,
-                                               offsetAdjustedCsTuple.offset.offset,
-                                               offsetAdjustedCsTuple.recurseType)
-                        memo.append(derivedCsTuple.site)
+                    if derivedCsTuple.site in memo:
+                        continue
+                    
+                    environLocal.printDebug(
+                            'Yielding {} from derivedObject contextSites'.format(derivedCsTuple)
+                            )
+                    offsetAdjustedCsTuple = ContextTuple(
+                        derivedCsTuple.site,
+                        derivedCsTuple.offset.modify(offset=derivedCsTuple[1].offset +
+                                                            offsetAppend),
+                        derivedCsTuple.recurseType)
+                    if returnSortTuples:
+                        yield offsetAdjustedCsTuple
+                    else:
+                        yield ContextTuple(offsetAdjustedCsTuple.site,
+                                           offsetAdjustedCsTuple.offset.offset,
+                                           offsetAdjustedCsTuple.recurseType)
+                    memo.append(derivedCsTuple.site)
 
         environLocal.printDebug('--returning from derivedObject search')
 

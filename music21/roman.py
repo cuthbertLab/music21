@@ -1131,6 +1131,33 @@ class RomanNumeral(harmony.Harmony):
     <music21.roman.RomanNumeral vi in C major>
 
 
+    The I64 chord can also be specified as Cad64, which
+    simply parses as I64:
+    
+    >>> r = roman.RomanNumeral('Cad64', key.Key('C'))
+    >>> r
+    <music21.roman.RomanNumeral Cad64 in C major>
+    >>> [str(p) for p in r.pitches]
+    ['G4', 'C5', 'E5']
+
+    >>> r = roman.RomanNumeral('Cad64', key.Key('c'))
+    >>> r
+    <music21.roman.RomanNumeral Cad64 in c minor>
+    >>> [str(p) for p in r.pitches]
+    ['G4', 'C5', 'E-5']
+
+
+    
+    Works also for secondary romans:
+    
+
+    >>> r = roman.RomanNumeral('Cad64/V', key.Key('c'))
+    >>> r
+    <music21.roman.RomanNumeral Cad64/V in c minor>
+    >>> [str(p) for p in r.pitches]
+    ['D5', 'G5', 'B5']
+    
+
 
     OMIT_FROM_DOCS
 
@@ -1279,6 +1306,13 @@ class RomanNumeral(harmony.Harmony):
             useScale = self.impliedScale
 
         (workingFigure, useScale) = self._correctForSecondaryRomanNumeral(useScale)
+        
+        if workingFigure == 'Cad64':
+            if useScale.mode == 'minor':
+                workingFigure = 'i64'
+            else:
+                workingFigure = 'I64'
+            
         self.primaryFigure = workingFigure
 
         workingFigure = self._parseOmittedSteps(workingFigure)

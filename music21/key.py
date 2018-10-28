@@ -838,7 +838,6 @@ class Key(KeySignature, scale.DiatonicScale):
     _sharps = 0
     _mode = None
 
-
     def __init__(self, tonic=None, mode=None):
         if tonic is not None:
             if hasattr(tonic, 'classes') and ('Music21Object' in tonic.classes
@@ -991,12 +990,18 @@ class Key(KeySignature, scale.DiatonicScale):
         >>> k.mode = 'minor'
         >>> k.tonicPitchNameWithCase
         'b'
+        
+        Anything else will return the default (capital)
+        
+        >>> k.mode = 'dorian'
+        >>> k.tonicPitchNameWithCase
+        'B'
         '''
-        tonic = self.tonic
+        tonic = self.tonic.name
         if self.mode == 'major':
-            tonic = tonic.name.upper()
+            tonic = tonic.upper()
         elif self.mode == 'minor':
-            tonic = tonic.name.lower()
+            tonic = tonic.lower()
         return tonic
 
     def _tonalCertainityCorrelationCoefficient(self, *args, **keywords):
