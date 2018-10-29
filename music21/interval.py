@@ -21,6 +21,7 @@ from fractions import Fraction
 
 import abc
 import copy
+import enum
 import math
 import unittest
 
@@ -33,8 +34,6 @@ from music21 import exceptions21
 from music21 import environment
 _MOD = 'interval'
 environLocal = environment.Environment(_MOD)
-
-import enum
 
 #-------------------------------------------------------------------------------
 # constants

@@ -4437,7 +4437,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s.index(b1), 1)
 
     def testStoreAtEndFailures(self):
-        from music21 import stream, bar
+        from music21 import stream
         
         s = Stream()
         with self.assertRaises(stream.StreamException):
@@ -5140,7 +5140,8 @@ class Test(unittest.TestCase):
         self.assertEqual(inner.activeSite, outer)
         junk = inner.semiFlat
         self.assertEqual(inner.activeSite, outer)
-        junk = inner.flat  # the order of these two calls ensures that _getFlatFromSemiflat is called
+        junk = inner.flat  
+        # the order of these two calls ensures that _getFlatFromSemiflat is called
         self.assertEqual(inner.activeSite, outer)
 
         # this works fine

@@ -891,11 +891,11 @@ class Test(unittest.TestCase):
         major = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#']
         minor = ['Am', 'Em', 'Bm', 'F#m', 'C#m', 'G#m', 'D#m', 'A#m']
 
-        for n, (maj,min) in enumerate(zip(major, minor)):
-            am = abcFormat.ABCMetadata('K:'+maj)
+        for n, (majName, minName) in enumerate(zip(major, minor)):
+            am = abcFormat.ABCMetadata('K:' + majName)
             am.preParse()
             ks_major = am.getKeySignatureObject()
-            am = abcFormat.ABCMetadata('K:'+min)
+            am = abcFormat.ABCMetadata('K:' + minName)
             am.preParse()
             ks_minor = am.getKeySignatureObject()
             self.assertEqual(n, ks_major.sharps)
@@ -907,15 +907,15 @@ class Test(unittest.TestCase):
         major = ['C', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb']
         minor = ['Am', 'Dm', 'Gm', 'Cm', 'Fm', 'Bbm', 'Ebm', 'Abm']
 
-        for n, (maj,min) in enumerate(zip(major, minor)):
-            am = abcFormat.ABCMetadata('K:'+maj)
+        for n, (majName, minName) in enumerate(zip(major, minor)):
+            am = abcFormat.ABCMetadata('K:' + majName)
             am.preParse()
             ks_major = am.getKeySignatureObject()
-            am = abcFormat.ABCMetadata('K:'+min)
+            am = abcFormat.ABCMetadata('K:' + minName)
             am.preParse()
             ks_minor = am.getKeySignatureObject()
-            self.assertEqual(-n, ks_major.sharps)
-            self.assertEqual(-n, ks_minor.sharps)
+            self.assertEqual(-1 * n, ks_major.sharps)
+            self.assertEqual(-1 * n, ks_minor.sharps)
             self.assertEqual('major', ks_major.mode)
             self.assertEqual('minor', ks_minor.mode)
 
