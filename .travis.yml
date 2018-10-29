@@ -8,9 +8,6 @@ matrix:
         - python: 3.6
           dist: trusty
           sudo: false
-        - python: 3.7
-          dist: xenial
-          sudo: true
 
 before_install:
     - mkdir ~/Desktop
@@ -28,7 +25,7 @@ before_install:
     - export PATH=/home/travis/bin:$PATH
 
 install:
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION libpng=1.6.27
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION libpng
     - conda install --yes python=$TRAVIS_PYTHON_VERSION pyqt
     - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy
     - conda install --yes python=$TRAVIS_PYTHON_VERSION scipy
