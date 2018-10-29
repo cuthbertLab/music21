@@ -10066,11 +10066,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             p = Part()
             s.insert(0, p)
             if not separateById:
-                p.id = self.id + '-v' + str(i)
+                p.id = str(self.id) + '-v' + str(i)
                 partDict[i] = p
             else:
                 voiceId = voiceIds[i]
-                p.id = self.id + '-' + voiceId
+                p.id = str(self.id) + '-' + voiceId
                 partDict[voiceId] = p
 
         if self.hasMeasures():
