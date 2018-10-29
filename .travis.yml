@@ -8,6 +8,9 @@ matrix:
         - python: 3.6
           dist: trusty
           sudo: false
+	- python: 3.7
+          dist: xenial
+          sudo: true
 
 before_install:
     - mkdir ~/Desktop
