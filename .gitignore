@@ -73,7 +73,5 @@ documentation/source/tutorials/MersenneDemo_files/_fig_05.png
 .cache/v/cache/lastfailed
 
 .ropeproject/config.py
-.pytest_cache/v/cache/nodeids
-.pytest_cache/v/cache/lastfailed
-.pytest_cache/v/cache/nodeids
-.pytest_cache/v/cache/lastfailed
+.pytest_cache
+.pytest_cache/**
