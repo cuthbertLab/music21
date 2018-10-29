@@ -205,9 +205,15 @@ def indexScoreFilePaths(scoreFilePaths,
             scoreFilePaths[i] = pathlib.Path(scoreFilePaths[i])
 
     if runMulticore:
-        rpListUnOrdered = common.runParallel(scoreFilePaths, indexFunc, updateFunction=updateFunction)
+        rpListUnOrdered = common.runParallel(
+            scoreFilePaths, 
+            indexFunc, 
+            updateFunction=updateFunction)
     else:
-        rpListUnOrdered = common.runNonParallel(scoreFilePaths, indexFunc, updateFunction=updateFunction)
+        rpListUnOrdered = common.runNonParallel(
+            scoreFilePaths, 
+            indexFunc, 
+            updateFunction=updateFunction)
     
     # ensure that orderedDict is sorted by original scoreFiles
     rpDict = {}

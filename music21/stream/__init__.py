@@ -10073,47 +10073,54 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 p.id = str(self.id) + '-' + voiceId
                 partDict[voiceId] = p
 
+        def doOneMeasureWithVoices(m):
+            '''
+            This is the main routine for dealing with the most common
+            and most difficult voice set.
+            '''
+            mActive = Measure()
+            mActive.mergeAttributes(m) # get groups, optional id
+            # merge everything except Voices; this will get
+            # clefs
+            mActive.mergeElements(m, classFilterList=(
+                                        'Bar', 'TimeSignature', 'Clef', 'KeySignature'))
+            vIndex = 0  # should not be necessary, but pylint warns on loop variables
+                        # that could possibly be undefined used out of the loop.
+
+            seenIdsThisMeasure = set()
+            for vIndex, v in enumerate(m.voices):
+                # TODO(msc): fix bugs if same voice id appears twice in same measure
+                
+                # make an independent copy
+                mNew = copy.deepcopy(mActive)
+                # merge all elements from the voice
+                mNew.mergeElements(v)
+                # insert in the appropriate part
+                vId = v.id
+                if not separateById:
+                    p = partDict[vIndex]
+                else:
+                    seenIdsThisMeasure.add(vId)
+                    p = partDict[vId]
+                p.insert(self.elementOffset(m), mNew)
+
+            # vIndex is now the number of voices - 1.  Fill empty voices
+            if not separateById:
+                for emptyIndex in range(vIndex + 1, partCount):
+                    p = partDict[emptyIndex]
+                    p.insert(self.elementOffset(m), copy.deepcopy(mActive))
+            else:
+                for voiceId in partDict:
+                    if voiceId in seenIdsThisMeasure:
+                        continue
+                    p = partDict[voiceId]
+                    p.insert(self.elementOffset(m), copy.deepcopy(mActive))
+                    
+
         if self.hasMeasures():
             for m in self.iter.getElementsByClass('Measure'):
                 if m.hasVoices():
-                    mActive = Measure()
-                    mActive.mergeAttributes(m) # get groups, optional id
-                    # merge everything except Voices; this will get
-                    # clefs
-                    mActive.mergeElements(m, classFilterList=(
-                                                'Bar', 'TimeSignature', 'Clef', 'KeySignature'))
-                    vIndex = 0  # should not be necessary, but pylint warns on loop variables
-                                # that could possibly be undefined used out of the loop.
-
-                    seenIdsThisMeasure = set()
-                    for vIndex, v in enumerate(m.voices):
-                        # TODO(msc): fix bugs if same voice id appears twice in same measure
-                        
-                        # make an independent copy
-                        mNew = copy.deepcopy(mActive)
-                        # merge all elements from the voice
-                        mNew.mergeElements(v)
-                        # insert in the appropriate part
-                        vId = v.id
-                        if not separateById:
-                            p = partDict[vIndex]
-                        else:
-                            seenIdsThisMeasure.add(vId)
-                            p = partDict[vId]
-                        p.insert(self.elementOffset(m), mNew)
-
-                    # vIndex is now the number of voices - 1.  Fill empty voices
-                    if not separateById:
-                        for emptyIndex in range(vIndex + 1, partCount):
-                            p = partDict[emptyIndex]
-                            p.insert(self.elementOffset(m), copy.deepcopy(mActive))
-                    else:
-                        for voiceId in partDict:
-                            if voiceId in seenIdsThisMeasure:
-                                continue
-                            p = partDict[voiceId]
-                            p.insert(self.elementOffset(m), copy.deepcopy(mActive))
-                            
+                    doOneMeasureWithVoices(m)
                 # if a measure does not have voices, simply populate
                 # with elements and append
                 else:
