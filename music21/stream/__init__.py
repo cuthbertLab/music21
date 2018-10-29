@@ -9837,7 +9837,99 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if not inPlace:
             return returnObj
 
-    def voicesToParts(self):
+
+    def _maxVoiceCount(self, *, countById=False):
+        '''
+        Returns the maximum number of voices in a part.  Used by voicesToParts.
+        Minimum returned is 1.  If `countById` is True, returns a tuple of 
+        (maxVoiceCount, voiceIdList)
+
+        >>> from copy import copy
+        
+        >>> p0 = stream.Part()
+        >>> p0._maxVoiceCount()
+        1
+        >>> v0 = stream.Voice(id='v0')
+        >>> p0.insert(0, v0)
+        >>> p0._maxVoiceCount()
+        1
+        >>> v1 = stream.Voice(id='v1')
+        >>> p0.insert(0, v1)
+        >>> p0._maxVoiceCount()
+        2
+
+        >>> p1 = stream.Part()
+        >>> m1 = stream.Measure(number=1)
+        >>> p1.insert(0, m1)
+        >>> p1._maxVoiceCount()
+        1
+        >>> m1.insert(0, v0)
+        >>> p1._maxVoiceCount()
+        1
+        >>> m1.insert(0, v1)
+        >>> p1._maxVoiceCount()
+        2
+        >>> m2 = stream.Measure(number=2)
+        >>> p1.append(m2)
+        >>> p1._maxVoiceCount()
+        2
+        >>> v01 = copy(v0)
+        >>> v11 = stream.Voice(id='v11')
+        >>> m2.insert(0, v01)
+        >>> m2.insert(0, v11)
+        >>> p1._maxVoiceCount()
+        2
+        >>> v2 = stream.Voice(id='v2')
+        >>> m2.insert(0, v2)
+        >>> p1._maxVoiceCount()
+        3        
+        
+        If `countById` is True then different voice ids create different parts.
+        
+        >>> mvc, vIds = p1._maxVoiceCount(countById=True)
+        >>> mvc
+        4 
+        >>> vIds
+        ['v0', 'v1', 'v11', 'v2']
+        
+        >>> v01.id = 'v01'
+        >>> mvc, vIds = p1._maxVoiceCount(countById=True)
+        >>> mvc
+        5
+        >>> vIds
+        ['v0', 'v1', 'v01', 'v11', 'v2']
+        '''
+        voiceCount = 1
+        voiceIds = []
+        
+        if self.hasMeasures():
+            for m in self.iter.getElementsByClass('Measure'):
+                mVoices = m.voices
+                mVCount = len(mVoices)
+                if not countById:
+                    voiceCount = max(mVCount, voiceCount)
+                else:
+                    for v in mVoices:
+                        if v.id not in voiceIds:
+                            voiceIds.append(v.id)
+                    
+        elif self.hasVoices():
+            voices = self.voices
+            if not countById:
+                voiceCount = len(voices)
+            else:
+                voiceIds = [v.id for v in voices]            
+        else: # if no measure or voices, get one part
+            voiceCount = 1
+
+        voiceCount = max(voiceCount, len(voiceIds))
+
+        if not countById:
+            return voiceCount
+        else:
+            return voiceCount, voiceIds
+
+    def voicesToParts(self, *, separateById=False):
         '''
         If this Stream defines one or more voices,
         extract each into a Part, returning a Score.
@@ -9879,9 +9971,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 {0.0} <music21.note.Rest rest>
                 {4.0} <music21.bar.Barline style=final>
         {0.0} <music21.layout.ScoreLayout>
+        
         >>> ce = c.voicesToParts()
         >>> ce.show('t')
-        {0.0} <music21.stream.Part 0x109bbb828>
+        {0.0} <music21.stream.Part Piano-v0>
             {0.0} <music21.stream.Measure 1 offset=0.0>
                 {0.0} <music21.clef.TrebleClef>
                 {0.0} <music21.key.Key of D major>
@@ -9896,7 +9989,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             {8.0} <music21.stream.Measure 3 offset=8.0>
                 {0.0} <music21.note.Rest rest>
                 {4.0} <music21.bar.Barline style=final>
-        {0.0} <music21.stream.Part 0x109bbbcf8>
+        {0.0} <music21.stream.Part Piano-v1>
             {0.0} <music21.stream.Measure 1 offset=0.0>
                 {0.0} <music21.clef.BassClef>
                 {0.0} <music21.key.Key of D major>
@@ -9908,6 +10001,41 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 {3.5} <music21.note.Note A>
             {8.0} <music21.stream.Measure 3 offset=8.0>
         <BLANKLINE>
+        
+        If `separateById` is True then all voices with the same id
+        will be connected to the same Part, regardless of order
+        they appear in the measure.
+        
+        Compare the previous output:
+        
+        >>> p0pitches = ce.parts[0].pitches
+        >>> p1pitches = ce.parts[1].pitches
+        >>> ' '.join([p.nameWithOctave for p in p0pitches])
+        'E4 D#4 D#4 E4 F#4 E4 B3 B3 E4 E4'
+        >>> ' '.join([p.nameWithOctave for p in p1pitches])
+        'F#2 F#3 E3 E2 D#2 D#3 B2 B3 E2 E3 D3 D2 C#2 C#3 A2 A3'
+        
+        Swap voice ids in first measure:
+
+        >>> m0 = c.parts[0].getElementsByClass('Measure')[0]
+        >>> m0.voices[0].id, m0.voices[1].id
+        ('3', '4')                
+        >>> m0.voices[0].id = '4'
+        >>> m0.voices[1].id = '3'
+        
+        Now run voicesToParts with `separateById=True`
+        
+        >>> ce = c.voicesToParts(separateById=True)
+        >>> p0pitches = ce.parts[0].pitches
+        >>> p1pitches = ce.parts[1].pitches
+        >>> ' '.join([p.nameWithOctave for p in p0pitches])
+        'E4 D#4 D#4 E4 F#4 E2 E3 D3 D2 C#2 C#3 A2 A3'
+        >>> ' '.join([p.nameWithOctave for p in p1pitches])
+        'F#2 F#3 E3 E2 D#2 D#3 B2 B3 E4 B3 B3 E4 E4'
+        
+        Note that the second and subsequent measure's pitches were changed
+        not the first, because separateById aligns the voices according to
+        order first encountered, not by sorting the Ids.
         '''
         s = Score()
         #s.metadata = self.metadata
@@ -9916,30 +10044,34 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # add all parts to one Score
         if self.hasPartLikeStreams():
             for p in self.getElementsByClass('Stream'): # part;like does not necessarily mean .parts
-                sSub = p.voicesToParts()
+                sSub = p.voicesToParts(separateById=separateById)
                 for pSub in sSub:
                     s.insert(0, pSub)
             return s
 
         # need to find maximum voice count
-        partCount = 1
-        #partId = []
-        if self.hasMeasures():
-            for m in self.iter.getElementsByClass('Measure'):
-                vCount = len(m.voices)
-                if vCount > partCount:
-                    partCount = vCount
-        elif self.hasVoices():
-            partCount = len(self.voices)
-        else: # if no measure or voices, get one part
-            partCount = 1
+        mvcReturn = self._maxVoiceCount(countById=separateById)
+        if not separateById:
+            partCount = mvcReturn
+            voiceIds = []
+        else:
+            partCount, voiceIds = mvcReturn
 
         #environLocal.printDebug(['voicesToParts(): got partCount', partCount])
 
         # create parts, naming ids by voice id?
-        for dummy in range(partCount):
+        partDict = {}
+        
+        for i in range(partCount):
             p = Part()
             s.insert(0, p)
+            if not separateById:
+                p.id = self.id + '-v' + str(i)
+                partDict[i] = p
+            else:
+                voiceId = voiceIds[i]
+                p.id = self.id + '-' + voiceId
+                partDict[voiceId] = p
 
         if self.hasMeasures():
             for m in self.iter.getElementsByClass('Measure'):
@@ -9952,17 +10084,36 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                                 'Bar', 'TimeSignature', 'Clef', 'KeySignature'))
                     vIndex = 0  # should not be necessary, but pylint warns on loop variables
                                 # that could possibly be undefined used out of the loop.
+
+                    seenIdsThisMeasure = set()
                     for vIndex, v in enumerate(m.voices):
+                        # TODO(msc): fix bugs if same voice id appears twice in same measure
+                        
                         # make an independent copy
                         mNew = copy.deepcopy(mActive)
                         # merge all elements from the voice
                         mNew.mergeElements(v)
                         # insert in the appropriate part
-                        s.parts[vIndex].insert(self.elementOffset(m), mNew)
+                        vId = v.id
+                        if not separateById:
+                            p = partDict[vIndex]
+                        else:
+                            seenIdsThisMeasure.add(vId)
+                            p = partDict[vId]
+                        p.insert(self.elementOffset(m), mNew)
 
                     # vIndex is now the number of voices - 1.  Fill empty voices
-                    for emptyIndex in range(vIndex + 1, partCount):
-                        s.parts[emptyIndex].insert(self.elementOffset(m), copy.deepcopy(mActive))
+                    if not separateById:
+                        for emptyIndex in range(vIndex + 1, partCount):
+                            p = partDict[emptyIndex]
+                            p.insert(self.elementOffset(m), copy.deepcopy(mActive))
+                    else:
+                        for voiceId in partDict:
+                            if voiceId in seenIdsThisMeasure:
+                                continue
+                            p = partDict[voiceId]
+                            p.insert(self.elementOffset(m), copy.deepcopy(mActive))
+                            
                 # if a measure does not have voices, simply populate
                 # with elements and append
                 else:
