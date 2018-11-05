@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #               Mark Gotham
 #
-# Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2017-18 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -61,7 +61,8 @@ def L(c, raiseException=True):
     L is a function that takes a major or minor triad and returns a chord that
     is the L transformation. L transforms a chord to its Leading-Tone exchange.
 
-    Example 1: A C major chord, under L, will return an E minor chord
+    A C major chord, under L, will return an E minor chord, by transforming the root
+    to its leading tone, B.
 
     >>> c1 = chord.Chord('C4 E4 G4')
     >>> c2 = analysis.neoRiemannian.L(c1)
