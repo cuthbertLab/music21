@@ -845,7 +845,7 @@ class ChoraleListRKBWV:
     299---||---380---||---Meinen Jesum laß ich nicht---||---242
     300---||---421---||---Warum betrübst du dich, mein Herz---||---332
     301---||---114.7---||---Wo Gott, der Herr, nicht bei uns hält---||---386
-    302---||---343---||---Hilf, Gott, laß mirs gelingen---||---172
+    302---||---343---||---Hilf, Gott, daß mir's gelinge---||---172
     303---||---96.6---||---Herr Christ, der einge Gottes-Söhn---||---128
     304---||---5.7---||---Auf meinen lieben Gott---||---28
     305---||---36.4-2---||---Wie schön leuchtet der Morgenstern---||---377
