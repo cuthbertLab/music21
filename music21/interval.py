@@ -752,6 +752,8 @@ class GenericInterval(IntervalBase):
 
     def __eq__(self, other):
         '''
+        True if value and direction are the same.
+        
         >>> a = interval.GenericInterval('Third')
         >>> b = interval.GenericInterval(-3)
         >>> c = interval.GenericInterval(3)
@@ -1013,6 +1015,9 @@ class DiatonicInterval(IntervalBase):
     >>> aInterval = interval.DiatonicInterval('p', 1)
     >>> aInterval.simpleName
     'P1'
+    >>> aInterval.direction
+    <Direction.OBLIQUE: 0>
+    
     >>> aInterval = interval.DiatonicInterval('major', 3)
     >>> aInterval.simpleName
     'M3'
@@ -1097,7 +1102,8 @@ class DiatonicInterval(IntervalBase):
         # translate strings, if provided, to integers
         # specifier here is the index number in the prefixSpecs list
         self.specifier, unused_specifierStr = convertSpecifier(specifier)
-        if self.generic.undirected != 1 or specifier == PERFECT:
+                
+        if self.generic.undirected != 1 or self.specifier == PERFECT:
             self.direction = self.generic.direction
         else:
             # assume in the absence of other evidence,
@@ -1171,6 +1177,8 @@ class DiatonicInterval(IntervalBase):
 
     def __eq__(self, other):
         '''
+        True if generic, specifier, and direction are the same.
+        
         >>> a = interval.DiatonicInterval('major', 3)
         >>> b = interval.DiatonicInterval('minor', 3)
         >>> c = interval.DiatonicInterval('major', 3)
@@ -1405,6 +1413,7 @@ class ChromaticInterval(IntervalBase):
 
     def __eq__(self, other):
         '''
+        True if number of semitones is the same.
 
         >>> a = interval.ChromaticInterval(-14)
         >>> b = interval.ChromaticInterval(14)
@@ -2058,6 +2067,8 @@ class Interval(IntervalBase):
 
     def __eq__(self, other):
         '''
+        True if .diatonic and .chromatic are equal.
+        
         >>> a = interval.Interval('a4')
         >>> b = interval.Interval('d5')
         >>> c = interval.Interval('m3')
