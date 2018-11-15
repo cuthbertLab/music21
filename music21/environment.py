@@ -182,9 +182,14 @@ class _EnvironmentCore:
 
         # note: this will not get 'localCorpusPath' as there may be more than
         # one value
-        if key not in self._ref:
+        if key not in self._ref and key != 'localCorpusPath':
             raise EnvironmentException('no preference: %s' % key)
-        value = self._ref[key]
+        
+        if key != 'localCorpusPath':
+            value = self._ref[key]
+        else:
+            value = self._ref['localCorpusSettings'][0]
+        
         if isinstance(value, bytes):
             value = value.decode(encoding='utf-8', errors='replace')
 
