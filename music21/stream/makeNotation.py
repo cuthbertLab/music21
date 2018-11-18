@@ -1214,6 +1214,8 @@ def makeTupletBrackets(s, *, inPlace=False):
         # only want to look at notes
         notes = returnObj.notesAndRests
         for n in notes:
+            if n.duration.isGrace:
+                continue
             durationList.append(n.duration)
 
     tupletMap = [] # a list of (tuplet obj / Duration) pairs
