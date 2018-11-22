@@ -171,6 +171,18 @@ class Clef(base.Music21Object):
         if hasattr(self, 'lowestLine') and self.lowestLine is not None:
             self.lowestLine += (newValue - oldOctaveChange) * 7
 
+    @property
+    def name(self):
+        '''
+        Returns the "name" of the clef, from the class name
+        
+        >>> tc = clef.TrebleClef()
+        >>> tc.name
+        'treble'
+        '''
+        className = self.__class__.__name__.replace('Clef', '')
+        return className[0].lower() + className[1:]
+
 #-------------------------------------------------------------------------------
 class PitchClef(Clef):
     '''
