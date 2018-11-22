@@ -3767,7 +3767,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> sopr = b.parts[0]
         >>> soprEmpty = sopr.template()
         >>> soprEmpty.show('text')
-        {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
+        {0.0} <music21.instrument.Instrument 'P1: Soprano: Instrument 1'>
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.key.Key of f# minor>
@@ -3784,12 +3784,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ...
 
 
-        Really make empty with fillWithRests = False
+        Really make empty with `fillWithRests=False`
 
         >>> alto = b.parts[1]
         >>> altoEmpty = alto.template(fillWithRests=False)
         >>> altoEmpty.show('text')
-        {0.0} <music21.instrument.Instrument P2: Alto: Instrument 2>
+        {0.0} <music21.instrument.Instrument 'P2: Alto: Instrument 2'>
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.key.Key of f# minor>
@@ -3843,7 +3843,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> b.template().show('text')
         {0.0} <music21.metadata.Metadata object at 0x106151940>
         {0.0} <music21.stream.Part Soprano>
-            {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
+            {0.0} <music21.instrument.Instrument 'P1: Soprano: Instrument 1'>
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.clef.TrebleClef>
                 {0.0} <music21.key.Key of f# minor>
@@ -3856,7 +3856,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 {0.0} <music21.note.Rest rest>
                 {3.0} <music21.bar.Barline style=final>
         {0.0} <music21.stream.Part Alto>
-            {0.0} <music21.instrument.Instrument P2: Alto: Instrument 2>
+            {0.0} <music21.instrument.Instrument 'P2: Alto: Instrument 2'>
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.clef.TrebleClef>
                 {0.0} <music21.key.Key of f# minor>
@@ -4253,7 +4253,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> scSounding = sc.toSoundingPitch()
         >>> scSounding.show('text')
         {0.0} <music21.stream.Part barisax>
-            {0.0} <music21.instrument.BaritoneSaxophone Baritone Saxophone>
+            {0.0} <music21.instrument.BaritoneSaxophone 'Baritone Saxophone'>
             {0.0} <music21.stream.Measure 1 offset=0.0>
                 {0.0} <music21.note.Note C>
 
@@ -4316,7 +4316,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> scWritten = sc.toWrittenPitch()
         >>> scWritten.show('text')
         {0.0} <music21.stream.Part barisax>
-            {0.0} <music21.instrument.BaritoneSaxophone Baritone Saxophone>
+            {0.0} <music21.instrument.BaritoneSaxophone 'Baritone Saxophone'>
             {0.0} <music21.stream.Measure 1 offset=0.0>
                 {0.0} <music21.note.Note A>
         >>> scWritten.atSoundingPitch
@@ -4592,7 +4592,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> qj.id = 'measureExcerpt'
 
         >>> qj.show('text')
-        {0.0} <music21.instrument.Instrument P1: MusicXML Part: Grand Piano>
+        {0.0} <music21.instrument.Instrument 'P1: MusicXML Part: Grand Piano'>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.layout.SystemLayout>
             {0.0} <music21.clef.Treble8vbClef>
@@ -4614,7 +4614,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> qj2 = qj.invertDiatonic(note.Note('F4'), inPlace=False)
         >>> qj2.show('text')
-        {0.0} <music21.instrument.Instrument P1: MusicXML Part: Grand Piano>
+        {0.0} <music21.instrument.Instrument 'P1: MusicXML Part: Grand Piano'>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.layout.SystemLayout>
             {0.0} <music21.clef.Treble8vbClef>
@@ -6839,7 +6839,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         list(nMidMeasure._yieldReverseUpwardsSearch())
         
         [<music21.stream.Measure 3 offset=9.0>,
-         <music21.instrument.Instrument P2: Alto: Instrument 2>,
+         <music21.instrument.Instrument 'P2: Alto: Instrument 2'>,
          <music21.stream.Part Alto>,
          <music21.metadata.Metadata object at 0x...>,
          <music21.stream.Part Soprano>,
@@ -9942,7 +9942,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {0.0} <music21.text.TextBox "Music21">
         {0.0} <music21.metadata.Metadata object at 0x109ce1630>
         {0.0} <music21.stream.Part Piano>
-            {0.0} <music21.instrument.Instrument P1: Piano: >
+            {0.0} <music21.instrument.Instrument 'P1: Piano: '>
             {0.0} <music21.stream.Measure 1 offset=0.0>
                 {0.0} <music21.layout.PageLayout>
                 {0.0} <music21.layout.SystemLayout>
@@ -12570,7 +12570,7 @@ class Score(Stream):
         >>> len(excerpt.parts)
         4
         >>> excerpt.parts[0].show('text')
-        {0.0} <music21.instrument.Instrument P1: Soprano: >
+        {0.0} <music21.instrument.Instrument 'P1: Soprano: '>
         {0.0} <music21.clef.TrebleClef>
         {0.0} <music21.key.Key of e minor>
         {0.0} <music21.meter.TimeSignature 4/4>
@@ -12584,7 +12584,7 @@ class Score(Stream):
         unless this information appears in the measure itself at the beginning:
 
         >>> bachIn.measure(1).parts[0].show('text')
-        {0.0} <music21.instrument.Instrument P1: Soprano: >
+        {0.0} <music21.instrument.Instrument 'P1: Soprano: '>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.key.Key of e minor>
@@ -12602,7 +12602,7 @@ class Score(Stream):
         >>> excerpt = bachIn.measure(-1)
         >>> excerptChords = excerpt.chordify()
         >>> excerptChords.show('text')
-        {0.0} <music21.instrument.Instrument P1: Soprano: >
+        {0.0} <music21.instrument.Instrument 'P1: Soprano: '>
         {0.0} <music21.clef.TrebleClef>
         {0.0} <music21.key.Key of e minor>
         {0.0} <music21.meter.TimeSignature 4/4>

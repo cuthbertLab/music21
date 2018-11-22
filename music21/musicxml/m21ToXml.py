@@ -2351,8 +2351,8 @@ class PartExporter(XMLExporterBase):
         The "P" signifies that it is the main instrument associated with a Part.
 
         >>> PEX.instrumentStream.show('text')
-        {0.0} <music21.instrument.Clarinet P...: Clarinet>
-        {4.0} <music21.instrument.BassClarinet Bass clarinet>
+        {0.0} <music21.instrument.Clarinet 'P...: Clarinet'>
+        {4.0} <music21.instrument.BassClarinet 'Bass clarinet'>
         '''
         # get a default instrument if not assigned
         self.instrumentStream = self.stream.getInstruments(returnDefault=True, recurse=True)

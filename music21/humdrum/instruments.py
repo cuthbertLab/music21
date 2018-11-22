@@ -225,7 +225,7 @@ def fromHumdrumClass(hdclass):
     '''
 
     >>> humdrum.instruments.fromHumdrumClass('vox')
-    <music21.instrument.Vocalist Voice>
+    <music21.instrument.Vocalist 'Voice'>
     '''
     from music21 import instrument
     try:
@@ -240,7 +240,7 @@ def fromHumdrumInstrument(hdinst):
     '''
 
     >>> humdrum.instruments.fromHumdrumInstrument('calto')
-    <music21.instrument.Alto Alto>
+    <music21.instrument.Alto 'Alto'>
     '''
     from music21 import instrument
     try:

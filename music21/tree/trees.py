@@ -176,7 +176,7 @@ class ElementTree(core.AVLTree):
         <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
 
         >>> scoreTree[0]
-        <music21.instrument.Instrument PartA: : >
+        <music21.instrument.Instrument 'PartA: : '>
 
         >>> scoreTree[-1]
         <music21.bar.Barline style=final>
@@ -197,7 +197,7 @@ class ElementTree(core.AVLTree):
 
         >>> for x in scoreTree[:]:
         ...     x
-        <music21.instrument.Instrument PartA: : >
+        <music21.instrument.Instrument 'PartA: : '>
                 ...
         <music21.bar.Barline style=final>
 
@@ -526,9 +526,9 @@ class ElementTree(core.AVLTree):
             Payload:<music21.key.Key of f# minor>>
         <ElementNode: Start:0.0 <0.0...>   Indices:(l:0 *6* r:12) Payload:<music21.clef.TrebleClef>>
         <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *3* r:6)
-            Payload:<music21.instrument.Instrument P3: Tenor: Instrument 3>>
+            Payload:<music21.instrument.Instrument 'P3: Tenor: Instrument 3'>>
         <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *1* r:3)
-            Payload:<music21.instrument.Instrument P1: Soprano: Instrument 1>>
+            Payload:<music21.instrument.Instrument 'P1: Soprano: Instrument 1'>>
         <ElementNode: Start:0.0 <0.-30...> Indices:(l:0 *0* r:1)
             Payload:<music21.metadata.Metadata object at 0x104adbdd8>>
 
@@ -585,7 +585,7 @@ class ElementTree(core.AVLTree):
 
         >>> scoreTree.getNodeByIndex(0)
         <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *0* r:2)
-            Payload:<music21.instrument.Instrument PartA: : >>
+            Payload:<music21.instrument.Instrument 'PartA: : '>>
 
         >>> scoreTree.getNodeByIndex(-1)
         <ElementNode: Start:End <0.-5...> Indices:(l:19 *19* r:20)
@@ -662,9 +662,9 @@ class ElementTree(core.AVLTree):
         >>> for node in scoreTree.iterNodes():
         ...     print(node)
         <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *0* r:2)
-                Payload:<music21.instrument.Instrument PartA: : >>
+                Payload:<music21.instrument.Instrument 'PartA: : '>>
         <ElementNode: Start:0.0 <0.-25...> Indices:(l:1 *1* r:2)
-                Payload:<music21.instrument.Instrument PartB: : >>
+                Payload:<music21.instrument.Instrument 'PartB: : '>>
         <ElementNode: Start:0.0 <0.0...> Indices:(l:0 *2* r:4) Payload:<music21.clef.BassClef>>
         <ElementNode: Start:0.0 <0.0...> Indices:(l:3 *3* r:4) Payload:<music21.clef.BassClef>>
         <ElementNode: Start:0.0 <0.4...> Indices:(l:0 *4* r:8)
@@ -940,7 +940,7 @@ class OffsetTree(ElementTree):
         >>> scoreTree = score.asTree(flatten=True, groupOffsets=True)
 
         >>> scoreTree[0]
-        <music21.instrument.Instrument PartA: : >
+        <music21.instrument.Instrument 'PartA: : '>
 
         >>> scoreTree[-1]
         <music21.bar.Barline style=final>
@@ -1457,8 +1457,8 @@ class OffsetTree(ElementTree):
         >>> list(sorted(sd.keys()))
         [0.0, 2.0, 4.0, 6.0, 8.0]
         >>> sd[0.0]
-        [<music21.instrument.Instrument PartA: : >,
-         <music21.instrument.Instrument PartB: : >,
+        [<music21.instrument.Instrument 'PartA: : '>,
+         <music21.instrument.Instrument 'PartB: : '>,
          <music21.clef.BassClef>,
          <music21.clef.BassClef>,
          <music21.meter.TimeSignature 2/4>,

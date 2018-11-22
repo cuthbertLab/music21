@@ -100,13 +100,13 @@ class PercussionMapper:
         >>> cowPitch = pitch.Pitch(56)
         >>> cowbell = pm.midiPitchToInstrument(cowPitch)
         >>> cowbell
-        <music21.instrument.Cowbell Cowbell>
+        <music21.instrument.Cowbell 'Cowbell'>
 
         Or it can just take an integer (representing MIDI note) for the pitch instead...
 
         >>> moreCowbell = pm.midiPitchToInstrument(56)
         >>> moreCowbell
-        <music21.instrument.Cowbell Cowbell>
+        <music21.instrument.Cowbell 'Cowbell'>
 
         The standard GM Percussion list goes from 35 to 81;
         pitches outside this range raise an exception.
@@ -131,14 +131,14 @@ class PercussionMapper:
         >>> acousticBassDrumPitch = pitch.Pitch(35)
         >>> acousticBDInstrument = pm.midiPitchToInstrument(acousticBassDrumPitch)
         >>> acousticBDInstrument
-        <music21.instrument.BassDrum Bass Drum>
+        <music21.instrument.BassDrum 'Bass Drum'>
         >>> acousticBDInstrument.modifier
         'acoustic'
 
         >>> oneBassDrumPitch = pitch.Pitch(36)
         >>> oneBDInstrument = pm.midiPitchToInstrument(oneBassDrumPitch)
         >>> oneBDInstrument
-        <music21.instrument.BassDrum Bass Drum>
+        <music21.instrument.BassDrum 'Bass Drum'>
         >>> oneBDInstrument.modifier
         '1'
 
@@ -185,7 +185,7 @@ class PercussionMapper:
         >>> myBagpipes = instrument.Bagpipes()
         >>> pipePitch = pm.midiInstrumentToPitch(myBagpipes)
         Traceback (most recent call last):
-        music21.midi.percussion.MIDIPercussionException: <music21.instrument.Bagpipes Bagpipes>
+        music21.midi.percussion.MIDIPercussionException: <music21.instrument.Bagpipes 'Bagpipes'>
             is not in the GM Percussion Map!
         '''
         if not hasattr(midiInstrument, 'inGMPercMap') or midiInstrument.inGMPercMap is False:

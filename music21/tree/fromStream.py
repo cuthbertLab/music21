@@ -163,9 +163,9 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, group
     >>> for x in etFlat.iterNodes():
     ...     x
     <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *0* r:2)
-        Payload:<music21.instrument.Instrument PartA: : >>
+        Payload:<music21.instrument.Instrument 'PartA: : '>>
     <ElementNode: Start:0.0 <0.-25...> Indices:(l:1 *1* r:2)
-        Payload:<music21.instrument.Instrument PartB: : >>
+        Payload:<music21.instrument.Instrument 'PartB: : '>>
     <ElementNode: Start:0.0 <0.0...> Indices:(l:0 *2* r:4) Payload:<music21.clef.BassClef>>
     <ElementNode: Start:0.0 <0.0...> Indices:(l:3 *3* r:4) Payload:<music21.clef.BassClef>>
     ...

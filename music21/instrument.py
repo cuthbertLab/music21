@@ -50,9 +50,9 @@ def unbundleInstruments(streamIn, *, inPlace=False):
     >>> s.append(up2)
     >>> s2 = instrument.unbundleInstruments(s)
     >>> s2.show('text')
-    {0.0} <music21.instrument.BassDrum Bass Drum>
+    {0.0} <music21.instrument.BassDrum 'Bass Drum'>
     {0.0} <music21.note.Unpitched object at 0x...>
-    {1.0} <music21.instrument.Cowbell Cowbell>
+    {1.0} <music21.instrument.Cowbell 'Cowbell'>
     {1.0} <music21.note.Unpitched object at 0x...>
     '''
     if inPlace is True:
@@ -134,7 +134,7 @@ class Instrument(base.Music21Object):
 
     classSortOrder = -25
 
-    def __init__(self):
+    def __init__(self, instrumentName=None):
         super().__init__()
 
         self.partId = None
@@ -151,7 +151,7 @@ class Instrument(base.Music21Object):
         self._instrumentIdIsRandom = False
 
 
-        self.instrumentName = None
+        self.instrumentName = instrumentName
         self.instrumentAbbreviation = None
         self.midiProgram = None
         self.midiChannel = None
@@ -177,7 +177,7 @@ class Instrument(base.Music21Object):
         return ''.join(msg)
 
     def __repr__(self):
-        return '<%s.%s %s>' % (self.__class__.__module__,
+        return '<%s.%s %r>' % (self.__class__.__module__,
                                self.__class__.__name__,
                                self.__str__())
 
@@ -1618,9 +1618,9 @@ def instrumentFromMidiProgram(number):
     return the instrument with "number" as its assigned midi program:
 
     >>> instrument.instrumentFromMidiProgram(0)
-    <music21.instrument.Piano Piano>
+    <music21.instrument.Piano 'Piano'>
     >>> instrument.instrumentFromMidiProgram(21)
-    <music21.instrument.Accordion Accordion>
+    <music21.instrument.Accordion 'Accordion'>
     >>> instrument.instrumentFromMidiProgram(500)
     Traceback (most recent call last):
     music21.exceptions21.InstrumentException: No instrument found with given midi program
@@ -1671,36 +1671,36 @@ def partitionByInstrument(streamObj):
     >>> s.show('text')
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.instrument.Piccolo Piccolo>
+            {0.0} <music21.instrument.Piccolo 'Piccolo'>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.meter.TimeSignature 4/4>
             {0.0} <music21.note.Note C>
             {1.0} <music21.note.Note D>
-            {2.0} <music21.instrument.AltoSaxophone Alto Saxophone>
+            {2.0} <music21.instrument.AltoSaxophone 'Alto Saxophone'>
             {2.0} <music21.note.Note E>
             {3.0} <music21.note.Note F>
         {4.0} <music21.stream.Measure 2 offset=4.0>
             {0.0} <music21.note.Note G>
             {1.0} <music21.note.Note A>
             {2.0} <music21.note.Note B>
-            {3.0} <music21.instrument.Piccolo Piccolo>
+            {3.0} <music21.instrument.Piccolo 'Piccolo'>
             {3.0} <music21.note.Note C>
         {8.0} <music21.stream.Measure 3 offset=8.0>
             {0.0} <music21.note.Note C>
             {4.0} <music21.bar.Barline style=final>
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.instrument.Trombone Trombone>
+            {0.0} <music21.instrument.Trombone 'Trombone'>
             {0.0} <music21.clef.BassClef>
             {0.0} <music21.meter.TimeSignature 4/4>
             {0.0} <music21.note.Note C#>
             {1.0} <music21.note.Note D#>
             {2.0} <music21.note.Note E#>
-            {3.0} <music21.instrument.Piccolo Piccolo>
+            {3.0} <music21.instrument.Piccolo 'Piccolo'>
             {3.0} <music21.note.Note F#>
         {4.0} <music21.stream.Measure 2 offset=4.0>
             {0.0} <music21.note.Note G#>
-            {1.0} <music21.instrument.Trombone Trombone>
+            {1.0} <music21.instrument.Trombone 'Trombone'>
             {1.0} <music21.note.Note A#>
             {2.0} <music21.note.Note B#>
             {3.0} <music21.note.Note C#>
@@ -1726,7 +1726,7 @@ def partitionByInstrument(streamObj):
     >>> s2.show('text')
     {0.0} <music21.stream.Part Piccolo>
         {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.instrument.Piccolo Piccolo>
+            {0.0} <music21.instrument.Piccolo 'Piccolo'>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.meter.TimeSignature 4/4>
             {0.0} <music21.note.Note C>
@@ -1742,21 +1742,21 @@ def partitionByInstrument(streamObj):
             {4.0} <music21.bar.Barline style=final>
     {0.0} <music21.stream.Part Alto Saxophone>
         {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.instrument.AltoSaxophone Alto Saxophone>
+            {0.0} <music21.instrument.AltoSaxophone 'Alto Saxophone'>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.meter.TimeSignature 4/4>
             {0.0} <music21.note.Rest rest>
             {2.0} <music21.note.Note E>
             {3.0} <music21.note.Note F>
         {4.0} <music21.stream.Measure 2 offset=4.0>
-            {0.0} <music21.instrument.AltoSaxophone Alto Saxophone>
+            {0.0} <music21.instrument.AltoSaxophone 'Alto Saxophone'>
             {0.0} <music21.note.Note G>
             {1.0} <music21.note.Note A>
             {2.0} <music21.note.Note B>
             {3.0} <music21.bar.Barline style=final>
     {0.0} <music21.stream.Part Trombone>
         {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.instrument.Trombone Trombone>
+            {0.0} <music21.instrument.Trombone 'Trombone'>
             {0.0} <music21.clef.BassClef>
             {0.0} <music21.meter.TimeSignature 4/4>
             {0.0} <music21.note.Note C#>
@@ -1870,17 +1870,17 @@ def fromString(instrumentString):
     >>> from music21 import instrument
     >>> t1 = instrument.fromString('Clarinet 2 in A')
     >>> t1
-    <music21.instrument.Clarinet Clarinet>
+    <music21.instrument.Clarinet 'Clarinet 2 in A'>
     >>> t1.transposition
     <music21.interval.Interval m-3>
 
     >>> t2 = instrument.fromString('Clarinetto 3')
     >>> t2
-    <music21.instrument.Clarinet Clarinet>
+    <music21.instrument.Clarinet 'Clarinetto 3'>
 
-    >>> t3 = instrument.fromString('Flauto 2')
+    >>> t3 = instrument.fromString('flauto 2')
     >>> t3
-    <music21.instrument.Flute Flute>
+    <music21.instrument.Flute 'flauto 2'>
 
 
     Excess information is ignored, and the useful information can be extracted
@@ -1889,7 +1889,7 @@ def fromString(instrumentString):
 
     >>> t4 = instrument.fromString('I <3 music saxofono tenor go beavers')
     >>> t4
-    <music21.instrument.TenorSaxophone Tenor Saxophone>
+    <music21.instrument.TenorSaxophone 'I <3 music saxofono tenor go beavers'>
 
 
     Some more demos:
@@ -1897,20 +1897,23 @@ def fromString(instrumentString):
 
     >>> t5 = instrument.fromString('Bb Clarinet')
     >>> t5
-    <music21.instrument.Clarinet Clarinet>
+    <music21.instrument.Clarinet 'Bb Clarinet'>
     >>> t5.transposition
     <music21.interval.Interval M-2>
 
     >>> t6 = instrument.fromString('Clarinet in B-flat')
-    >>> t5.bestName() == t6.bestName() and t5.transposition == t6.transposition
+    >>> t5.__class__ == t6.__class__
+    True
+
+    >>> t5.transposition == t6.transposition
     True
 
     >>> t7 = instrument.fromString('B-flat Clarinet.')
-    >>> t5.bestName() == t7.bestName() and t5.transposition == t7.transposition
+    >>> t5.__class__ == t7.__class__ and t5.transposition == t7.transposition
     True
 
     >>> t8 = instrument.fromString('Eb Clarinet')
-    >>> t5.bestName() == t8.bestName()
+    >>> t5.__class__ == t8.__class__
     True
     >>> t8.transposition
     <music21.interval.Interval m3>
@@ -1922,7 +1925,7 @@ def fromString(instrumentString):
 
     >>> t9 = instrument.fromString('Klarinette in B.')
     >>> t9
-    <music21.instrument.Clarinet Clarinet>
+    <music21.instrument.Clarinet 'Klarinette in B.'>
     >>> t9.transposition
     <music21.interval.Interval M-2>
 
@@ -1932,6 +1935,7 @@ def fromString(instrumentString):
     # pylint: disable=undefined-variable
     from music21.languageExcerpts import instrumentLookup
 
+    instrumentStringOrig = instrumentString
     instrumentString = common.removePunctuation(instrumentString)
     allCombinations = _combinations(instrumentString)
     # First task: Find the best instrument.
@@ -1961,6 +1965,7 @@ def fromString(instrumentString):
                 # on in the string (i.e. Bb Piccolo Trumpet)
                 bestInstClass = thisInstClass
                 bestInstrument = thisInstrument
+                bestInstrument.instrumentName = instrumentStringOrig
                 bestName = thisBestName
         except KeyError:
             pass

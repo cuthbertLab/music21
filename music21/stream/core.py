@@ -365,10 +365,10 @@ class StreamCoreMixin:
         <TimespanTree {20} (0.0 to 8.0) <music21.stream.Score exampleScore>>
             <ElementTimespan (0.0 to 0.0) <music21.clef.BassClef>>
             <ElementTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
-            <ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument PartA: : >>
+            <ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument 'PartA: : '>>
             <ElementTimespan (0.0 to 0.0) <music21.clef.BassClef>>
             <ElementTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
-            <ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument PartB: : >>
+            <ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument 'PartB: : '>>
             <PitchedTimespan (0.0 to 1.0) <music21.note.Note C>>
             <PitchedTimespan (0.0 to 2.0) <music21.note.Note C#>>
             <PitchedTimespan (1.0 to 2.0) <music21.note.Note D>>
