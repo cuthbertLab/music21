@@ -129,12 +129,6 @@ def travisMain():
 
 #-------------------------------------------------------------------------------
 if __name__ == '__main__':
-    try:
-        reload(sys) # @UndefinedVariable
-        sys.setdefaultencoding("UTF-8") # @UndefinedVariable
-    except (NameError, AttributeError):
-        pass # no need in Python3
-
     # if optional command line arguments are given, assume they are
     # test group arguments
     if len(sys.argv) >= 2:

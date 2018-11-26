@@ -1787,6 +1787,9 @@ class Test(unittest.TestCase):
     def testMultipleSearches(self):
         from music21.features import outputFormats
         from music21 import features
+
+        # Need explicit import for picklinging within the testSingleCoreAll context
+        from music21.features.base import _pickleFunctionNumPitches # @UnresolvedImport
         import textwrap
 
         self.maxDiff = None
@@ -1795,7 +1798,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(fewBach), 13)
         ds = features.DataSet(classLabel='NumPitches')
-        ds.addMultipleData(fewBach, classValues=pickleFunctionNumPitches)
+        ds.addMultipleData(fewBach, classValues=_pickleFunctionNumPitches)
         featureExtractors = features.extractorsById(['ql1', 'ql4'], 'native')
         ds.addFeatureExtractors(featureExtractors)
         ds.runParallel = True
@@ -1821,7 +1824,7 @@ class Test(unittest.TestCase):
             ''').strip())
 
 
-def pickleFunctionNumPitches(bachStream):
+def _pickleFunctionNumPitches(bachStream):
     '''
     A function for documentation testing of a pickleable function
     '''
