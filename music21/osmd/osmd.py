@@ -14,6 +14,7 @@ See OSMD project page here: https://github.com/opensheetmusicdisplay/opensheetmu
 '''
 import unittest
 from music21.converter.subConverters import SubConverter
+from music21.instrument import Piano
 import time, random, json, os
 
 from music21 import exceptions21
@@ -58,9 +59,11 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         self.display, self.HTML, self.Javascript = getExtendedModules()
 
     def show(self, obj, fmt,
-             offline=False, divId=None,
+             fixPartName=True, offline=False, divId=None,
              **keywords):
         score = obj
+        if fixPartName:
+            score = self.addDefaultPartName(score)
 
         if divId is None:
             # create unique reference to output div in case we wish to update it
@@ -118,6 +121,24 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
 
         return script
 
+    @staticmethod
+    def addDefaultPartName(score):
+        # If no partName is present in the first instrument, OSMD will display the ugly 'partId'
+        allInstruments = list(score.getInstruments(returnDefault=False, recurse=True))
+        
+        if len(allInstruments)==0:
+            # print("adding default inst")
+            defaultInstrument = Piano()
+            defaultInstrument.instrumentName = 'Default'
+            score.insert(None, defaultInstrument)
+            score.coreElementsChanged()
+        elif not allInstruments[0].instrumentName:
+            # print("adding instrumentName")
+            # instrumentName must not be '' or None
+            allInstruments[0].instrumentName = 'Default'
+            score.coreElementsChanged()
+
+        return score
 
 class TestExternal(unittest.TestCase):
 
@@ -129,6 +150,17 @@ class TestExternal(unittest.TestCase):
         s = corpus.parse('bwv66.6')
         # s.show('osmd')
         ConverterOpenSheetMusicDisplay().show(s, None)
+
+    def testAddsDefaultPartId(self):
+        from music21 import converter
+        s = converter.parse("tinyNotation: 3/4 E4 r f#")
+
+        s = ConverterOpenSheetMusicDisplay.addDefaultPartName(s)
+        firstInstrumentObject = s.getInstruments(returnDefault=True, recurse=True)[0]
+        # print("firstInstrumentObject",firstInstrumentObject)
+        # print("firstInstrumentObject.instrumentName",firstInstrumentObject.instrumentName)
+        self.assertNotEqual(firstInstrumentObject.instrumentName, None)
+        self.assertNotEqual(firstInstrumentObject.instrumentName,'')
 
 
 if __name__ == "__main__":
