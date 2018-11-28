@@ -50,8 +50,10 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     '''
     registerFormats = ('osmd',)
     registerShowFormats = ('osmd',)
-    script_url = """https://github.com/opensheetmusicdisplay/opensheetmusicdisplay/releases/download/0.5.1/opensheetmusicdisplay.min.js"""
-    osmd_file = os.path.join(os.path.dirname(__file__), 'opensheetmusicdisplay.0.5.1.min.js')
+    # when updating the script tag osmd will only reload in a notebook if you: Kernel -> restart and clear output, then
+    # save the notebook and refresh the page. Otherwise the script will stay on the page and not reload.
+    script_url = """https://github.com/opensheetmusicdisplay/opensheetmusicdisplay/releases/download/0.6.3/opensheetmusicdisplay.min.js"""
+    osmd_file = os.path.join(os.path.dirname(__file__), 'opensheetmusicdisplay.0.6.3.min.js')
 
     def __init__(self):
         self.display, self.HTML, self.Javascript = getExtendedModules()
