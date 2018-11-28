@@ -85,17 +85,14 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
                 "-"+str(time.time()).replace('.','-') # '.' is the class selector
 
 
-    def musicXMLToScript(self, xml, divId, offline=False):
 
-        # print('xml length:', len(xml))
+
+    def musicXMLToScript(self, xml, divId, offline=False):
 
         # script that will replace div contents with OSMD display
         script = open('./music21/osmd/notebookOSMDLoader.js', 'r').read() \
             .replace('{{DIV_ID}}', divId) \
-            .replace('{{data}}',json.dumps(xml))
-
-
-
+            .replace('"{{data}}"',json.dumps(xml))
 
         if offline is True:
             if not os.path.isfile(self.osmd_file):
@@ -106,19 +103,10 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
 
             # since we can't link to files from a notebook (security risk) we dump the file contents to inject.
             script_content = open(self.osmd_file).read()
-            script = script.replace('{{script_command}}',"""
-                s.type = 'text/javascript';
-                s.text="""+json.dumps(script_content)+""";
-                document.body.appendChild( s ); // browser will try to load the new script tag
-                oncompleted();
-                """)
-        else:
-            script = script.replace('{{script_command}}',"""
-                s.setAttribute( 'src', '"""+self.script_url+"""' );
-                s.onload=oncompleted;
-                document.body.appendChild( s ); // browser will try to load the new script tag
-                """)
+            script = script.replace('"{{offline_script}}"',json.dumps(script_content),1 )
 
+        else:
+            script = script.replace('"{{script_url}}"',json.dumps(self.script_url), 1)
         return script
 
     @staticmethod

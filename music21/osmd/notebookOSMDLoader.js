@@ -16,8 +16,21 @@ function loadOSMD() {
             console.log("loaded OSMD for the first time",opensheetmusicdisplay)
             resolve(opensheetmusicdisplay);
         };
-        {{script_command}}
         
+        var offline_script = "{{offline_script}}";
+        if (offline_script!=='{{offline_script}}') {
+            // if python has given us an offline script to use:
+            s.type = 'text/javascript';
+            s.text = offline_script;
+            document.body.appendChild( s ); // browser will try to load the new script tag
+            oncompleted();
+        }
+        var script_url = "{{script_url}}";
+        if (script_url!=='{{script_url}}') {
+            s.setAttribute( 'src', script_url);
+            s.onload=oncompleted;
+            document.body.appendChild( s ); // browser will try to load the new script tag     
+        }
     }) 
 }
 loadOSMD().then((OSMD)=>{
@@ -27,11 +40,14 @@ loadOSMD().then((OSMD)=>{
     document.querySelector('#'+div_id).innerHTML = "";
     window.openSheetMusicDisplay = new OSMD.OpenSheetMusicDisplay(div_id);
     openSheetMusicDisplay
-        .load({{data}})
+        .load("{{data}}") // this is replaced by the xml generated in python
         .then(
           function() {
             console.log("rendering data")
             openSheetMusicDisplay.render();
+            // we could also remove this script tag to free up memory (would limit debugging though)
+            // var me = document.currentScript;
+            // me.parentNode.removeChild(me)
           }
         );
 })
