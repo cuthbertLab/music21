@@ -169,6 +169,9 @@ class TestExternal(unittest.TestCase):
         s = corpus.parse('bwv66.6')
         ConverterOpenSheetMusicDisplay().show(s, None)
 
+
+class Test(unittest.TestCase):
+
     def testAddsDefaultPartId(self):
         from music21 import converter
         s = converter.parse("tinyNotation: 3/4 E4 r f#")
