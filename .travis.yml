@@ -25,7 +25,6 @@ before_install:
     - export PATH=/home/travis/bin:$PATH
 
 install:
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION ipython
     - conda install --yes python=$TRAVIS_PYTHON_VERSION libpng=1.6.27
     - conda install --yes python=$TRAVIS_PYTHON_VERSION pyqt
     - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy
