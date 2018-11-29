@@ -79,7 +79,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         '''
         score = obj
         if fixPartName:
-            score = self.addDefaultPartName(score)
+            self.addDefaultPartName(score)
 
         if divId is None:
             # create unique reference to output div in case we wish to update it
@@ -148,8 +148,6 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
             # instrumentName must not be '' or None
             allInstruments[0].instrumentName = 'Default'
 
-        return score
-
 
 class TestExternal(unittest.TestCase):
 
@@ -165,7 +163,7 @@ class TestExternal(unittest.TestCase):
         from music21 import converter
         s = converter.parse("tinyNotation: 3/4 E4 r f#")
 
-        s = ConverterOpenSheetMusicDisplay.addDefaultPartName(s)
+        ConverterOpenSheetMusicDisplay.addDefaultPartName(s)
         firstInstrumentObject = s.getInstruments(returnDefault=True, recurse=True)[0]
         self.assertNotEqual(firstInstrumentObject.instrumentName, None)
         self.assertNotEqual(firstInstrumentObject.instrumentName,'')
