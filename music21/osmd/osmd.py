@@ -93,6 +93,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         self.display(self.Javascript(script))
         return divId
 
+
     @staticmethod
     def getUniqueDivId():
         '''
@@ -101,7 +102,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         '''
         return "OSMD-div-" + \
                 str(random.randint(0,1000000)) + \
-                "-" + str(time.time()).replace('.','-')  # '.' is the class selector
+                "-" + str(time.time()).replace('.', '-')  # '.' is the class selector
 
 
 
@@ -109,6 +110,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     def musicXMLToScript(self, xml, divId, offline=False):
         '''
         Converts the xml into Javascript which can be injected into a webpage to display the score.
+        If divId is provided then it will be used as the container, if not a new
         '''
         # script that will replace div contents with OSMD display
         script = open('./music21/osmd/notebookOSMDLoader.js', 'r').read() \
@@ -130,12 +132,21 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
             script = script.replace('"{{script_url}}"',json.dumps(self.script_url), 1)
         return script
 
-    '''
-    Due to a bug in OpenSheetMusicDisplay if a <part-name> is not provided it will default 
-    to an auto-generated random string. This method is used to fix that by default.
-    '''
+
     @staticmethod
     def addDefaultPartName(score):
+        '''
+        Due to a bug in OpenSheetMusicDisplay if a <part-name> is not provided it will default
+        to an auto-generated random string. This method is used to fix that by default.
+
+
+        >>> import music21
+        >>> # display two scores to demonstrate difference.
+        >>> s = music21.converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
+        >>> s.show('osmd',fixPartName=False)
+        >>> music21.osmd.ConverterOpenSheetMusicDisplay.addDefaultPartName(s)
+        >>> s.show('osmd',fixPartName=False)
+        '''
         # If no partName is present in the first instrument, OSMD will display the ugly 'partId'
         allInstruments = list(score.getInstruments(returnDefault=False, recurse=True))
         
@@ -156,7 +167,6 @@ class TestExternal(unittest.TestCase):
         from music21 import corpus, environment
 
         s = corpus.parse('bwv66.6')
-        # s.show('osmd')
         ConverterOpenSheetMusicDisplay().show(s, None)
 
     def testAddsDefaultPartId(self):
