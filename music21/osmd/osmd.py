@@ -19,6 +19,7 @@ import time, random, json, os
 
 from music21 import exceptions21
 
+
 class OpenSheetMusicDisplayException(exceptions21.Music21Exception):
     pass
 
@@ -31,11 +32,12 @@ except ImportError:
 hasInstalledIPython = loader is not None
 del importlib
 
+
 def getExtendedModules():
     if hasInstalledIPython:
         from IPython.core.display import display, HTML, Javascript
     else:
-        def display(*args, **kwargs):
+        def display():
             raise OpenSheetMusicDisplayException('OpenSheetMusicDisplay requires IPython to be installed')
         HTML = Javascript = display
     return display, HTML, Javascript
@@ -52,7 +54,8 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     registerShowFormats = ('osmd',)
     # when updating the script tag osmd will only reload in a notebook if you: Kernel -> restart and clear output, then
     # save the notebook and refresh the page. Otherwise the script will stay on the page and not reload.
-    script_url = """https://github.com/opensheetmusicdisplay/opensheetmusicdisplay/releases/download/0.6.3/opensheetmusicdisplay.min.js"""
+    script_url = """https://github.com/opensheetmusicdisplay/opensheetmusicdisplay/releases/download/0.6.3/
+    opensheetmusicdisplay.min.js"""
     osmd_file = os.path.join(os.path.dirname(__file__), 'opensheetmusicdisplay.0.6.3.min.js')
 
     def __init__(self):
@@ -71,7 +74,6 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
             # div contents should be replaced by rendering
             self.display(self.HTML('<div id="' + divId + '">loading OpenSheetMusicDisplay</div>'))
 
-
         xml = open(score.write('musicxml')).read()
         script = self.musicXMLToScript(xml, divId, offline=offline)
 
@@ -80,9 +82,9 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
 
     @staticmethod
     def getUniqueDivId():
-        return "OSMD-div-"+ \
-                str(random.randint(0,1000000))+ \
-                "-"+str(time.time()).replace('.','-') # '.' is the class selector
+        return "OSMD-div-" + \
+                str(random.randint(0,1000000)) + \
+                "-" + str(time.time()).replace('.','-')  # '.' is the class selector
 
 
 
@@ -133,7 +135,6 @@ class TestExternal(unittest.TestCase):
     @unittest.skipUnless(hasInstalledIPython, "skipping since IPython not installed")
     def testOpenSheetMusicDisplayRuns(self):
         from music21 import corpus, environment
-        environLocal = environment.Environment()
 
         s = corpus.parse('bwv66.6')
         # s.show('osmd')
@@ -145,8 +146,6 @@ class TestExternal(unittest.TestCase):
 
         s = ConverterOpenSheetMusicDisplay.addDefaultPartName(s)
         firstInstrumentObject = s.getInstruments(returnDefault=True, recurse=True)[0]
-        # print("firstInstrumentObject",firstInstrumentObject)
-        # print("firstInstrumentObject.instrumentName",firstInstrumentObject.instrumentName)
         self.assertNotEqual(firstInstrumentObject.instrumentName, None)
         self.assertNotEqual(firstInstrumentObject.instrumentName,'')
 
