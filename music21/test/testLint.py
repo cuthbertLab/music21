@@ -12,6 +12,7 @@
 
 # this requires pylint to be installed and available from the command line
 import argparse
+import os
 
 from music21 import common
 from music21.test import commonTest
@@ -190,8 +191,14 @@ def main(fnAccept=None, strict=False):
         acceptable.append(fp)
 
     cmdFile = cmd + acceptable
+    if not acceptable:
+        print('No matching files were found.')
+        return
+
+    # print(fnAccept)
     # print(' '.join(cmdFile))
     # print(fp)
+    
     try:
         # noinspection PyArgumentList
         pylintRun(cmdFile, exit=False)
@@ -210,8 +217,13 @@ def argRun():
     # print(args.strict)
     files = args.files if args.files else None
     if files:
-        sfp = common.getSourceFilePath()
-        files = [common.relativepath(f, sfp) for f in files]
+        filesMid = [os.path.abspath(f) for f in files]
+        files = []
+        for f in filesMid:
+            if os.path.exists(f):
+                files.append(f)
+            else:
+                print('skipping ' + f + ': no matching file')
     main(files, args.strict)
 
 if __name__ == '__main__':
