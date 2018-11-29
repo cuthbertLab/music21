@@ -61,9 +61,22 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     def __init__(self):
         self.display, self.HTML, self.Javascript = getExtendedModules()
 
+
+
     def show(self, obj, fmt,
              fixPartName=True, offline=False, divId=None,
              **keywords):
+        r'''
+        Displays the score object in a notebook using the OpenSheetMusicDisplay.js library.
+
+        >>> import music21
+        >>> s = music21.converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
+        >>> fig_1 = s.show('osmd')
+
+        To update a previously displayed score use the returned divId from before:
+
+        >>> s.show('osmd', divId=fig_1)
+        '''
         score = obj
         if fixPartName:
             score = self.addDefaultPartName(score)
@@ -82,6 +95,10 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
 
     @staticmethod
     def getUniqueDivId():
+        '''
+        Generates a unique id for the div in which the score is displayed.
+        This is so we can update a previously used div.
+        '''
         return "OSMD-div-" + \
                 str(random.randint(0,1000000)) + \
                 "-" + str(time.time()).replace('.','-')  # '.' is the class selector
@@ -90,7 +107,9 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
 
 
     def musicXMLToScript(self, xml, divId, offline=False):
-
+        '''
+        Converts the xml into Javascript which can be injected into a webpage to display the score.
+        '''
         # script that will replace div contents with OSMD display
         script = open('./music21/osmd/notebookOSMDLoader.js', 'r').read() \
             .replace('{{DIV_ID}}', divId) \
@@ -105,29 +124,32 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
 
             # since we can't link to files from a notebook (security risk) we dump the file contents to inject.
             script_content = open(self.osmd_file).read()
-            script = script.replace('"{{offline_script}}"',json.dumps(script_content),1 )
+            script = script.replace('"{{offline_script}}"',json.dumps(script_content),1)
 
         else:
             script = script.replace('"{{script_url}}"',json.dumps(self.script_url), 1)
         return script
 
+    '''
+    Due to a bug in OpenSheetMusicDisplay if a <part-name> is not provided it will default 
+    to an auto-generated random string. This method is used to fix that by default.
+    '''
     @staticmethod
     def addDefaultPartName(score):
         # If no partName is present in the first instrument, OSMD will display the ugly 'partId'
         allInstruments = list(score.getInstruments(returnDefault=False, recurse=True))
         
-        if len(allInstruments)==0:
-            # print("adding default inst")
+        if not allInstruments:
             defaultInstrument = Piano()
             defaultInstrument.instrumentName = 'Default'
             score.insert(0.0, defaultInstrument)
             score.coreElementsChanged()
         elif not allInstruments[0].instrumentName:
-            # print("adding instrumentName")
             # instrumentName must not be '' or None
             allInstruments[0].instrumentName = 'Default'
 
         return score
+
 
 class TestExternal(unittest.TestCase):
 
