@@ -126,7 +126,6 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
             # print("adding instrumentName")
             # instrumentName must not be '' or None
             allInstruments[0].instrumentName = 'Default'
-            score.coreElementsChanged()
 
         return score
 
