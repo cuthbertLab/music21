@@ -120,7 +120,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
             # print("adding default inst")
             defaultInstrument = Piano()
             defaultInstrument.instrumentName = 'Default'
-            score.insert(None, defaultInstrument)
+            score.insert(0.0, defaultInstrument)
             score.coreElementsChanged()
         elif not allInstruments[0].instrumentName:
             # print("adding instrumentName")
