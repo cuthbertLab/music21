@@ -1784,6 +1784,7 @@ class Test(unittest.TestCase):
         fe00 = ds.features[0][0]
         self.assertEqual(fe00.vector, [3])
 
+    # pylint: disable=redefined-outer-name
     def testMultipleSearches(self):
         from music21.features import outputFormats
         from music21 import features

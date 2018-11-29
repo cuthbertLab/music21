@@ -32,6 +32,7 @@ install:
     - conda install --yes python=$TRAVIS_PYTHON_VERSION matplotlib
     - conda install --yes python=$TRAVIS_PYTHON_VERSION setuptools
     - conda install --yes python=$TRAVIS_PYTHON_VERSION coverage
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION pylint
     - cd ..
     - mv music21 music21base
     - cd music21base

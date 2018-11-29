@@ -244,6 +244,7 @@ def _countUnpacked(i, fn):
     return True
 
 class Test(unittest.TestCase):
+    # pylint: disable=redefined-outer-name
     def testMultiprocess(self):
         files = ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']
         # for importing into testSingleCoreAll we need the full path to the modules
