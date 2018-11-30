@@ -2585,7 +2585,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         :ref:`User's Guide, Chapter 22: Graphing <usersGuide_22_graphing>`.
 
         >>> s = corpus.parse('demos/two-parts.xml') #_DOCS_HIDE
-        >>> # s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
+        >>> s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
         >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
         >>> #_DOCS_SHOW s.plot('pianoroll')
 

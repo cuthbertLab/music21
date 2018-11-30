@@ -6,7 +6,7 @@ matrix:
           dist: xenial
           sudo: false
         - python: 3.6
-          dist: trusty
+          dist: xenial
           sudo: false
 
 before_install:
