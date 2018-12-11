@@ -17,6 +17,7 @@ before_install:
 #    - pwd
 #    - export PATH=/home/travis/miniconda2/bin:$PATH
     - sudo apt-get install -y libpng-dev
+    - sudo apt-get install python-qt4
     - export PYTHONPATH=/home/travis/cuthbertLab/music21base
     - export DISPLAY=:99.0
     - sh -e /etc/init.d/xvfb start
@@ -34,7 +35,6 @@ install:
 #    - conda install --yes python=$TRAVIS_PYTHON_VERSION setuptools
 #    - conda install --yes python=$TRAVIS_PYTHON_VERSION coverage
 #    - conda install --yes python=$TRAVIS_PYTHON_VERSION pylint
-    - pip install pyqt
     - pip install numpy
     - pip install scipy
     - pip install matplotlib
