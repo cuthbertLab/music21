@@ -388,6 +388,37 @@ class GeneralNote(base.Music21Object):
 
         # note: Chords handle ties differently
         self.tie = None # store a Tie object
+        
+    def __eq__(self, other):
+        '''
+        General Note objects are equal if their durations are equal and
+        they have the same articulation and expression classes (in any order)
+        and theiir ties are equal.
+        '''
+
+        if other == None or not isinstance(other, GeneralNote):
+            return NotImplemented
+        # checks type, dots, tuplets, quarterlength, uses Pitch.__eq__
+        if self.duration != other.duration:
+            return False
+        # articulations are a list of Articulation objects
+        # converting to sets produces ordered cols that remove duplicate
+        # however, must then convert to list to match based on class ==
+        # not on class id()
+        if (sorted({x.classes[0] for x in self.articulations}) !=
+            sorted({x.classes[0] for x in other.articulations})):
+            return False
+        if (sorted({x.classes[0] for x in self.expressions}) !=
+            sorted({x.classes[0] for x in other.expressions})):
+            return False
+
+        # Tie objects if present compare only type
+        if self.tie != other.tie:
+            return False
+        return True
+
+    def __ne__(self, other):
+        return not self == other
 
     #---------------------------------------------------------------------------
     def _getLyric(self) -> str:
@@ -712,6 +743,25 @@ class NotRest(GeneralNote):
     #==============================================================================================
     # Special functions
     #==============================================================================================
+    def __eq__(self, other):
+        if not super().__eq__(other):
+            return False
+        if not isinstance(other, NotRest):
+            return False
+        
+        if self.notehead != other.notehead:
+            return False
+        if self.noteheadFill != other.noteheadFill:
+            return False
+        if self.noteheadParenthesis != other.noteheadParenthesis:
+            return False
+        # Q: should volume need to be equal?
+        if self.beams != other.beams:
+            return False
+        return True
+    
+    def __ne__(self, other):
+        return not self == other
 
     def __deepcopy__(self, memo=None):
         '''
@@ -965,10 +1015,6 @@ class NotRest(GeneralNote):
         ''')
 
 
-
-
-
-
 #-------------------------------------------------------------------------------
 class Note(NotRest):
     '''
@@ -994,7 +1040,7 @@ class Note(NotRest):
     (such as pitch, duration,
     articulations, and ornaments) are equal.  Attributes
     that might change based on the wider context
-    of a note (such as offset, beams, stem direction)
+    of a note (such as offset)
     are not compared. This test presently does not look at lyrics in
     establishing equality.  It may in the future.
 
@@ -1089,25 +1135,13 @@ class Note(NotRest):
         '''
         if other is None or not isinstance(other, Note):
             return NotImplemented
+
+        retval = super().__eq__(other)
+        if retval is not True:
+            return retval
+        
         # checks pitch.octave, pitch.accidental, uses Pitch.__eq__
         if self.pitch != other.pitch:
-            return False
-        # checks type, dots, tuplets, quarterlength, uses Pitch.__eq__
-        if self.duration != other.duration:
-            return False
-        # articulations are a list of Articulation objects
-        # converting to sets produces ordered cols that remove duplicate
-        # however, must then convert to list to match based on class ==
-        # not on class id()
-        if (sorted({x.classes[0] for x in self.articulations}) !=
-            sorted({x.classes[0] for x in other.articulations})):
-            return False
-        if (sorted({x.classes[0] for x in self.expressions}) !=
-            sorted({x.classes[0] for x in other.expressions})):
-            return False
-
-        # Tie objects if present compare only type
-        if self.tie != other.tie:
             return False
         return True
 
@@ -1419,6 +1453,17 @@ class Unpitched(NotRest):
         self.displayOctave = 4
         self._storedInstrument = None
 
+    def __eq__(self, other):
+        if not super().__eq__(other):
+            return False
+        if not isinstance(other, Unpitched):
+            return False
+        if self.displayStep != other.displayStep:
+            return False
+        if self.displayOctave != other.displayOctave:
+            return False
+        return True
+        
     def _getStoredInstrument(self):
         return self._storedInstrument
 
@@ -1523,7 +1568,10 @@ class Rest(GeneralNote):
         >>> r1 == note.Note()
         False
         '''
-        return isinstance(other, Rest) and self.duration == other.duration
+        if not isinstance(other, Rest):
+            return NotImplemented
+        
+        return super().__eq__(other)
 
     def __ne__(self, other):
         '''

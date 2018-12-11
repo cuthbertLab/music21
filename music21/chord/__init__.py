@@ -247,6 +247,38 @@ class Chord(note.NotRest):
 
 
     ### SPECIAL METHODS ###
+    def __eq__(self, other):
+        '''
+        True if the it passes all `super()`
+        equality tests and the pitches are the same
+        (possibly in a different order)
+        
+        >>> c1 = chord.Chord('C4 E4 G4')
+        >>> c2 = chord.Chord('E4 C4 G4')
+        >>> c1 == c2
+        True
+        >>> c3 = chord.Chord('E4 C#4 G4')
+        >>> c2 == c3
+        False
+        >>> n1 = note.Note('C4')
+        >>> c1 == n1
+        False
+        >>> c2.duration.quarterLength = 2.0
+        >>> c1 == c2
+        False
+        >>> c1 != c2
+        True
+        
+        '''
+        if not super().__eq__(other):
+            return False
+        if not isinstance(other, Chord):
+            return False
+        if set(self.pitches) != set(other.pitches):
+            return False
+        return True
+    
+    
     def __deepcopy__(self, memo=None):
         '''As Chord objects have one or more Volume, objects, and Volume
         objects store weak refs to the to client object, need to specialize
