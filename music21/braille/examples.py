@@ -118,6 +118,7 @@ Ascending Chord:
 F eighth ⠛
 Interval 4 ⠼
 Interval 6 ⠴
+** Grouping x 2 **
 ====
 Measure 2 Right, Note Grouping 1:
 Articulation staccato ⠦
@@ -128,18 +129,6 @@ D eighth ⠑
 Articulation staccato ⠦
 D eighth ⠑
 <BLANKLINE>
-Measure 2 Left, Note Grouping 1:
-Octave 2 ⠘
-B eighth ⠚
-Ascending Chord:
-Octave 3 ⠸
-F eighth ⠛
-Interval 4 ⠼
-Interval 6 ⠴
-Ascending Chord:
-F eighth ⠛
-Interval 4 ⠼
-Interval 6 ⠴
 ====
 Measure 3 Right, Note Grouping 1:
 Articulation accent ⠨⠦
@@ -312,6 +301,7 @@ Ascending Chord:
 F eighth ⠛
 Interval 4 ⠼
 Interval 6 ⠴
+** Grouping x 2 **
 ====
 Measure 2 Right, Note Grouping 1:
 Articulation staccato ⠦
@@ -322,18 +312,6 @@ D eighth ⠑
 Articulation staccato ⠦
 D eighth ⠑
 
-Measure 2 Left, Note Grouping 1:
-Octave 2 ⠘
-B eighth ⠚
-Ascending Chord:
-Octave 3 ⠸
-F eighth ⠛
-Interval 4 ⠼
-Interval 6 ⠴
-Ascending Chord:
-F eighth ⠛
-Interval 4 ⠼
-Interval 6 ⠴
 ====
 Measure 3 Right, Note Grouping 1:
 Articulation accent ⠨⠦

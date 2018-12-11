@@ -11114,8 +11114,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {2.0} <music21.note.Note C>
         {3.0} <music21.note.Note D>
         {4.0} <music21.note.Note E>
-        {15.0} <music21.note.Note G>
         {5.0} <music21.note.Note F>
+        {15.0} <music21.note.Note G>
 
         >>> sGapsExpanded = s._removeOrExpandGaps(
         ...            [(0.0, 5.0, []), (11.0, 5.0, []), (14.0, 1.0, [n])], isRemove=False)
