@@ -10,12 +10,12 @@ matrix:
           sudo: false
 
 before_install:
-    - mkdir ~/Desktop
-    - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
-    - chmod +x miniconda.sh
-    - ./miniconda.sh -b
-    - pwd
-    - export PATH=/home/travis/miniconda2/bin:$PATH
+#    - mkdir ~/Desktop
+#    - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+#    - chmod +x miniconda.sh
+#    - ./miniconda.sh -b
+#    - pwd
+#    - export PATH=/home/travis/miniconda2/bin:$PATH
     - export PYTHONPATH=/home/travis/cuthbertLab/music21base
     - export DISPLAY=:99.0
     - sh -e /etc/init.d/xvfb start
@@ -25,14 +25,22 @@ before_install:
     - export PATH=/home/travis/bin:$PATH
 
 install:
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION libpng
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION pyqt
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION scipy
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION matplotlib
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION setuptools
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION coverage
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION pylint
+#    - conda install --yes python=$TRAVIS_PYTHON_VERSION libpng
+#    - conda install --yes python=$TRAVIS_PYTHON_VERSION pyqt
+#    - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy
+#    - conda install --yes python=$TRAVIS_PYTHON_VERSION scipy
+#    - conda install --yes python=$TRAVIS_PYTHON_VERSION matplotlib
+#    - conda install --yes python=$TRAVIS_PYTHON_VERSION setuptools
+#    - conda install --yes python=$TRAVIS_PYTHON_VERSION coverage
+#    - conda install --yes python=$TRAVIS_PYTHON_VERSION pylint
+    - apt-get install libpng-dev
+    - pip install pyqt
+    - pip install numpy
+    - pip install scipy
+    - pip install matplotlib
+    - pip install setuptools
+    - pip install coverage
+    - pip install pylint
     - cd ..
     - mv music21 music21base
     - cd music21base
