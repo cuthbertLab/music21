@@ -8,7 +8,7 @@ matrix:
         - python: 3.6
           dist: xenial
           sudo: false
-        - python: 3.7
+        - python: 3.7-dev
           dist: xenial
           sudo: false
 
