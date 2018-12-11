@@ -123,7 +123,7 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
 def travisMain():
     # the main call for travis-ci tests.
     # exits with the returnCode
-    returnCode = main(verbosity=2)
+    returnCode = main(verbosity=1)
     exit(returnCode)
 
 
