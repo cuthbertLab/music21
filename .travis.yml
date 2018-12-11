@@ -10,7 +10,7 @@ matrix:
           sudo: false
         - python: 3.7
           dist: xenial
-          sudo: yes
+          sudo: true
 
 before_install:
     # needed for some tests that add Desktop
