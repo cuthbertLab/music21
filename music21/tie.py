@@ -136,17 +136,6 @@ class Tie(SlottedObjectMixin):
             return True
         return False
 
-    def __ne__(self, other):
-        '''
-        Tests for object inequality.
-
-        >>> a = tie.Tie('start')
-        >>> b = tie.Tie('stop')
-        >>> a != b
-        True
-        '''
-        return not self.__eq__(other)
-
     def __repr__(self):
         return '<music21.tie.Tie %s>' % self.type
 

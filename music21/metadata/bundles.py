@@ -493,9 +493,6 @@ class MetadataBundle:
         '''
         return self._apply_set_predicate(metadataBundle, '__lt__')
 
-    def __ne__(self, expr):
-        return self != expr
-
     def __or__(self, metadataBundle):
         r'''
         Compute the set-wise `or` of two metadata bundles:
@@ -613,6 +610,9 @@ class MetadataBundle:
         return resultBundle
 
     def _apply_set_predicate(self, metadataBundle, predicate):
+        '''
+        Applies a predicate such as '__or__' to self and another metadataBundle.
+        '''
         if not isinstance(metadataBundle, type(self)):
             raise MetadataBundleException('metadataBundle must be a MetadataBundle')
         selfKeys = set(self._metadataEntries.keys())

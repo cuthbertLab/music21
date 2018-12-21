@@ -671,9 +671,6 @@ class Microtone(SlottedObjectMixin):
         return hash(hashValues)
 
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
     def __repr__(self):
         '''
         Return a string representation.
@@ -953,12 +950,6 @@ class Accidental(style.StyleMixin):
             return True
         else:
             return False
-
-    def __ne__(self, other):
-        '''
-        Inequality. Needed for pitch comparisons.
-        '''
-        return not (self.__eq__(other))
 
     def __repr__(self):
         return '<accidental %s>' % self.name
@@ -1780,9 +1771,6 @@ class Pitch:
             type(self),
             )
         return hash(hashValues)
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
 
     def __lt__(self, other):
         '''Accepts enharmonic equivalence. Based entirely on pitch space

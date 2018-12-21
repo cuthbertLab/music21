@@ -266,9 +266,6 @@ class ElementTree(core.AVLTree):
             return 0
         return self.rootNode.subtreeElementsStopIndex
 
-    def __ne__(self, expr):
-        return not self == expr
-
     def __repr__(self):
         o = self.source
         pos = self.lowestPosition()

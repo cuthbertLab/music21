@@ -596,26 +596,16 @@ class MeterTerminal(SlottedObjectMixin):
 #         >>> a = MeterTerminal('2/4')
 #         >>> b = MeterTerminal('3/4')
 #         '''
-# #         if not isinstnace(other, MeterTerminal):
+# #         if not isinstance(other, MeterTerminal):
 # #             return False
-#         if other is None: return False
+#         if other is None: 
+#               return False
 #         if (other.numerator == self.numerator
 #             and other.denominator == self.denominator):
 #             return True
 #         else:
 #             return False
 #
-#     def __ne__(self, other):
-#         '''Inequality.
-#         '''
-# #         if not isinstnace(other, MeterTerminal):
-# #             return True
-#         if other is None: return True
-#         if (other.numerator == self.numerator
-#             and other.denominator == self.denominator):
-#             return False
-#         else:
-#             return True
 
     def ratioEqual(self, other):
         '''

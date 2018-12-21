@@ -417,9 +417,6 @@ class GeneralNote(base.Music21Object):
             return False
         return True
 
-    def __ne__(self, other):
-        return not self == other
-
     #---------------------------------------------------------------------------
     def _getLyric(self) -> str:
         if not self.lyrics:
@@ -760,9 +757,6 @@ class NotRest(GeneralNote):
             return False
         return True
     
-    def __ne__(self, other):
-        return not self == other
-
     def __deepcopy__(self, memo=None):
         '''
         As NotRest objects have a Volume, objects, and Volume objects
@@ -1145,30 +1139,9 @@ class Note(NotRest):
             return False
         return True
 
-    def __ne__(self, other):
-        '''Inequality.
-
-        >>> n1 = note.Note()
-        >>> n1.pitch.name = 'G#'
-        >>> n2 = note.Note()
-        >>> n2.pitch.name = 'A-'
-        >>> n3 = note.Note()
-        >>> n3.pitch.name = 'G#'
-        >>> n1 != n2
-        True
-        >>> n1 != n3
-        False
-        >>> n3.duration.quarterLength = 3
-        >>> n1 != n3
-        True
-        '''
-        if other is None or not isinstance(other, Note):
-            return NotImplemented
-        return not self.__eq__(other)
-
     def __lt__(self, other):
         '''
-        __lt__, __gt__, __le__, __ge__ all use a pitch comparison
+        __lt__, __gt__, __le__, __ge__ all use a pitch comparison.
 
         >>> highE = note.Note('E5')
         >>> lowF = note.Note('F2')
@@ -1183,18 +1156,31 @@ class Note(NotRest):
         >>> highE <= otherHighE
         True
 
-        Notice that in Python3 you cannot compare w/ ints or anything not pitched.
+        Notice you cannot compare Notes w/ ints or anything not pitched.
 
-        `highE < 50`
-
+        >>> highE < 50
         Traceback (most recent call last):
-        TypeError: unorderable types: Note() < int()
+        TypeError: '<' not supported between instances of 'Note' and 'int'
+        
+        Note also that two objects can be >= and <= without being equal, because
+        only pitch-height is being compared in <, <=, >, >= but duration and other
+        elements are compared in equality.
+        
+        >>> otherHighE.duration.type = 'whole'
+        >>> highE >= otherHighE
+        True
+        >>> highE <= otherHighE
+        True
+        >>> highE == otherHighE
+        False
         '''
         try:
             return self.pitch < other.pitch
         except AttributeError:
             return NotImplemented
 
+    # do not factor out into @total_ordering because of the difference between __eq__ and
+    # the equal part of __le__ and __ge__
     def __gt__(self, other):
         try:
             return self.pitch > other.pitch
@@ -1562,6 +1548,9 @@ class Rest(GeneralNote):
         >>> r2 = note.Rest()
         >>> r1 == r2
         True
+        >>> r1 != r2
+        False
+        
         >>> r2.duration.quarterLength = 4.0/3
         >>> r1 == r2
         False
@@ -1572,23 +1561,6 @@ class Rest(GeneralNote):
             return NotImplemented
         
         return super().__eq__(other)
-
-    def __ne__(self, other):
-        '''
-        Inequality
-
-        >>> r1 = note.Rest()
-        >>> r2 = note.Rest()
-        >>> r1 != r2
-        False
-        >>> r2.duration.quarterLength = 2.0
-        >>> r1 != r2
-        True
-        >>> r1 != note.Note()
-        True
-        '''
-        return not self == other
-
 
     @property
     def fullName(self) -> str:

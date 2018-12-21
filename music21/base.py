@@ -44,6 +44,21 @@ import unittest
 
 from collections import namedtuple
 
+# for type annotation only
+import fractions
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
+
 from music21.test.testRunner import mainTest
 ## all other music21 modules below...
 
@@ -184,16 +199,16 @@ class Groups(list): # no need to inherit from slotted object
         #if ' ' in value:
         #    raise exceptions21.GroupException('Spaces are not allowed as group names')
 
-    def append(self, value):
+    def append(self, value: Union[int, str]) -> None:
         self._validName(value)
         if not list.__contains__(self, value):
             list.append(self, value)
 
-    def __setitem__(self, i, y):
+    def __setitem__(self, i: int, y: Union[int, str]):
         self._validName(y)
         list.__setitem__(self, i, y)
 
-    def __eq__(self, other):
+    def __eq__(self, other: 'Groups'):
         '''
         Test Group equality. In normal lists, order matters; here it does not. More like a set.
 
@@ -233,25 +248,6 @@ class Groups(list): # no need to inherit from slotted object
             if sls[x].lower() != slo[x].lower():
                 return False
         return True
-
-    def __ne__(self, other):
-        '''
-        In normal lists, order matters; here it does not.
-
-        >>> a = Groups()
-        >>> a.append('red')
-        >>> a.append('green')
-        >>> a
-        ['red', 'green']
-
-        >>> b = Groups()
-        >>> b.append('green')
-        >>> b.append('blue')
-        >>> a != b
-        True
-        '''
-        return not (self == other)
-
 
 
 #------------------------------------------------------------------------------
@@ -528,7 +524,7 @@ class Music21Object:
 
         return new
 
-    def __deepcopy__(self, memo=None):
+    def __deepcopy__(self, memo: Optional[Dict[int, Any]]=None) -> 'Music21Object':
         '''
         Helper method to copy.py's deepcopy function.  Call it from there.
 
@@ -841,7 +837,7 @@ class Music21Object:
         Fraction(1, 3)
     ''')
 
-    def _getDerivation(self):
+    def _getDerivation(self) -> derivation.Derivation:
         '''
         Return the :class:`~music21.derivation.Derivation` object for this element.
 
@@ -870,7 +866,7 @@ class Music21Object:
             self._derivation = derivation.Derivation(client=self)
         return self._derivation
 
-    def _setDerivation(self, newDerivation):
+    def _setDerivation(self, newDerivation: derivation.Derivation) -> None:
         self._derivation = newDerivation
 
     derivation = property(_getDerivation, _setDerivation)
@@ -3237,7 +3233,7 @@ class Music21Object:
         return ts
 
     @property
-    def beat(self):
+    def beat(self) -> Union[fractions.Fraction, float]:
         '''
         Return the beat of this object as found in the most
         recently positioned Measure. Beat values count from 1 and
@@ -3290,7 +3286,7 @@ class Music21Object:
         return ts.getBeatProportion(ts.getMeasureOffsetOrMeterModulusOffset(self))
 
     @property
-    def beatStr(self):
+    def beatStr(self) -> str:
         '''
         Return a string representation of the beat of
         this object as found in the most recently positioned
@@ -3319,7 +3315,7 @@ class Music21Object:
         return ts.getBeatProportionStr(ts.getMeasureOffsetOrMeterModulusOffset(self))
 
     @property
-    def beatDuration(self):
+    def beatDuration(self) -> 'Duration':
         '''
         Return a :class:`~music21.duration.Duration` of the beat
         active for this object as found in the most recently
@@ -3351,7 +3347,7 @@ class Music21Object:
 
 
     @property
-    def beatStrength(self):
+    def beatStrength(self) -> float:
         '''
         Return the metrical accent of this object
         in the most recently positioned Measure. Accent values
@@ -3420,17 +3416,7 @@ class Music21Object:
                                   forcePositionMatch=True,
                                   permitMeterModulus=False)
 
-    def _setSeconds(self, value):
-        ti = self.getContextByClass('TempoIndication')
-        if ti is None:
-            raise Music21ObjectException('this object does not have a TempoIndication in Sites')
-        mm = ti.getSoundingMetronomeMark()
-        self.duration = mm.secondsToDuration(value)
-        for s in self.sites.get(excludeNone=True):
-            if self in s._elements:
-                s.coreElementsChanged() # highest time is changed.
-
-    def _getSeconds(self):
+    def _getSeconds(self) -> float:
         # do not search of duration is zero
         if self.duration is None or self.duration.quarterLength == 0.0:
             return 0.0
@@ -3441,6 +3427,16 @@ class Music21Object:
         mm = ti.getSoundingMetronomeMark()
         # once we have mm, simply pass in this duration
         return mm.durationToSeconds(self.duration)
+
+    def _setSeconds(self, value: float) -> None:
+        ti = self.getContextByClass('TempoIndication')
+        if ti is None:
+            raise Music21ObjectException('this object does not have a TempoIndication in Sites')
+        mm = ti.getSoundingMetronomeMark()
+        self.duration = mm.secondsToDuration(value)
+        for s in self.sites.get(excludeNone=True):
+            if self in s._elements:
+                s.coreElementsChanged() # highest time is changed.
 
     seconds = property(_getSeconds, _setSeconds, doc='''
         Get or set the duration of this object in seconds, assuming
@@ -3555,7 +3551,7 @@ class ElementWrapper(Music21Object):
                                                 self.offset,
                                                 shortObj)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         '''Test ElementWrapper equality
 
         >>> import music21
@@ -3593,10 +3589,7 @@ class ElementWrapper(Music21Object):
         else:
             return False
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         #environLocal.printDebug(['calling __setattr__ of ElementWrapper', name, value])
 
         # if in the ElementWrapper already, set that first
@@ -3613,7 +3606,7 @@ class ElementWrapper(Music21Object):
         else:
             object.__setattr__(self, name, value)
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
         '''This method is only called when __getattribute__() fails.
         Using this also avoids the potential recursion problems of subclassing
         __getattribute__()_
@@ -3628,7 +3621,7 @@ class ElementWrapper(Music21Object):
         else:
             return object.__getattribute__(storedobj, name)
 
-    def isTwin(self, other):
+    def isTwin(self, other: 'ElementWrapper') -> bool:
         '''
         A weaker form of equality.  a.isTwin(b) is true if
         a and b store either the same object OR objects that are equal.

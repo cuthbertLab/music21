@@ -230,9 +230,6 @@ class AbstractScale(Scale):
         else:
             return False
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
     @abc.abstractmethod
     def _buildNetwork(self):
         '''
@@ -1291,9 +1288,6 @@ class ConcreteScale(Scale):
                 return True
             else:
                 return False
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
 
     @property
     def name(self):

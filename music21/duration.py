@@ -1517,6 +1517,9 @@ class Duration(SlottedObjectMixin):
         >>> cDur = duration.Duration('16th')
         >>> aDur == bDur
         False
+        >>> aDur != bDur
+        True
+
 
         >>> cDur == bDur
         True
@@ -1548,19 +1551,6 @@ class Duration(SlottedObjectMixin):
 
         return True
 
-    def __ne__(self, other):
-        '''Test not equality.
-
-        >>> aDur = duration.Duration('quarter')
-        >>> bDur = duration.Duration('16th')
-        >>> cDur = duration.Duration('16th')
-        >>> aDur != bDur
-        True
-
-        >>> cDur != bDur
-        False
-        '''
-        return not self.__eq__(other)
 
     def __repr__(self):
         if self.linked is True:

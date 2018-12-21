@@ -161,10 +161,6 @@ class Edge:
         return (isinstance(other, self.__class__)
             and self.__dict__ == other.__dict__)
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-
     def __repr__(self):
         return '<music21.scale.intervalNetwork.Edge %s %s %s>' % (self.direction,
              self.interval.name, repr(self._connections))
@@ -340,9 +336,6 @@ class Node(common.SlottedObjectMixin):
         '''
         return (hash(self) == hash(other))
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
     def __repr__(self):
         return '<music21.scale.intervalNetwork.Node id=%s>' % (repr(self.id))
 
@@ -466,9 +459,6 @@ class IntervalNetwork:
         # then matched
         return (isinstance(other, self.__class__)
             and self.__dict__ == other.__dict__)
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
 
     def fillBiDirectedEdges(self, edgeList):
         '''

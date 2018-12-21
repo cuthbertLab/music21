@@ -254,6 +254,9 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
         return True
 
     def __ne__(self, other):
+        '''
+        Defining __ne__ explicitly so that it inherits the same as __eq__
+        '''
         return not (self == other)
 
 

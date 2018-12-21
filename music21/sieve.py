@@ -761,22 +761,11 @@ class Residual:
         else:
             return 0
 
-    def __ne__(self, other):
-        '''
-        m and shift not equal
-        '''
-        if other is None:
-            return 1
-        if (self._m != other._m
-                or self._shift != other._shift
-                or self._neg != other._neg):
-            return 1
-        else:
-            return 0
-
     def __cmp__(self, other):
         '''
         allow comparison based on m and shift; if all equal look at neg
+        
+        Still being used internally even though __cmp__ is not used in Python 3
         '''
         #return neg if self < other, zero if self == other,
         # a positive integer if self > other.

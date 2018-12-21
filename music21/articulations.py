@@ -186,22 +186,6 @@ class Articulation(base.Music21Object):
 #             return True
 #         return False
 #
-#     def __ne__(self, other):
-#         '''Inequality. Needed for pitch comparisons.
-#
-#
-#         >>> at1 = articulations.StrongAccent()
-#         >>> at2 = articulations.StrongAccent()
-#         >>> at3 = articulations.Accent()
-#         >>> at4 = articulations.Staccatissimo()
-#         >>> at5 = articulations.Staccato()
-#         >>> at6 = articulations.Spiccato()
-#         >>> at1 != at2
-#         False
-#         >>> at1 != at3
-#         True
-#         '''
-#         return not self.__eq__(other)
 
     def _getVolumeShift(self):
         return self._volumeShift
