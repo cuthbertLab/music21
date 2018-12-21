@@ -28,7 +28,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'5.5.0'
+'5.6.0'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -48,14 +48,8 @@ from collections import namedtuple
 import fractions
 from typing import (
     Any,
-    Callable,
     Dict,
-    Iterator,
-    List,
     Optional,
-    Set,
-    Tuple,
-    Type,
     Union,
 )
 
@@ -1220,13 +1214,17 @@ class Music21Object:
     #---------------------------------------------------------------------------------
     # contexts...
     def getContextByClass(self,
-                             className,
-                             getElementMethod='getElementAtOrBefore',
-                             sortByCreationTime=False):
+                          className,
+                          *,
+                          getElementMethod='getElementAtOrBefore',
+                          sortByCreationTime=False,
+                          followDerivation=True
+                          ):
         '''
         A very powerful method in music21 of fundamental importance: Returns
         the element matching the className that is closest to this element in
-        its current hierarchy.  For instance, take this stream of changing time
+        its current hierarchy (or the hierarchy of the derivation origin unless
+        `followDerivation` is False.  For instance, take this stream of changing time
         signatures:
 
         >>> p = converter.parse('tinynotation: 3/4 C4 D E 2/4 F G A B 1/4 c')
@@ -1302,13 +1300,49 @@ class Music21Object:
         *    'getElementAtOrAfter'
 
         The "after" do forward contexts -- looking ahead.
+        
+        Notice that if searching for a `Stream` context, the element is not
+        guaranteed to be in that Stream.  This is obviously true in this case:
+        
+        >>> p = stream.Part()
+        >>> m = stream.Measure(number=1)
+        >>> p.insert(0, m)
+        >>> n = note.Note('D')
+        >>> m.append(n)
+        >>> try:
+        ...     n.getContextByClass('Part').elementOffset(n)
+        ... except Music21Exception:
+        ...     print('not there')
+        not there
+
+        But it is less clear with something like this:
+        
+        >>> import copy
+        >>> n2 = copy.deepcopy(n)
+        >>> try:
+        ...     n2.getContextByClass('Measure').elementOffset(n2)
+        ... except Music21Exception:
+        ...     print('not there')
+        not there
+
+        A measure context is being found, but only through the derivation chain.
+        
+        >>> n2.getContextByClass('Measure')
+        <music21.stream.Measure 1 offset=0.0>
+        
+        To prevent this error, use the `followDerivation=False` setting
+        
+        >>> print(n2.getContextByClass('Measure', followDerivation=False))
+        None
+        
+        * v 5.7 -- added followDerivation=False and made everything but the class keyword only
 
         OMIT_FROM_DOCS
 
-        >>> a = b.getContextByClass('Note', 'getElementBefore')
+        >>> a = b.getContextByClass('Note', getElementMethod='getElementBefore')
         >>> a
         <music21.note.Note A>
-        >>> c = b.getContextByClass('Note', 'getElementAfter')
+        >>> c = b.getContextByClass('Note', getElementMethod='getElementAfter')
         >>> c
         <music21.note.Note C>
 
@@ -1456,7 +1490,9 @@ class Music21Object:
 
         for site, positionStart, searchType in self.contextSites(
                                             returnSortTuples=True,
-                                            sortByCreationTime=sortByCreationTime):
+                                            sortByCreationTime=sortByCreationTime,
+                                            followDerivation=followDerivation
+                                            ):
             if searchType in ('elementsOnly', 'elementsFirst'):
                 contextEl = payloadExtractor(site, flatten=False, positionStart=positionStart)
 
@@ -2578,7 +2614,7 @@ class Music21Object:
     #--------------------------------------------------------------------------
     # duration manipulation, processing, and splitting
 
-    def containerHierarchy(self, followDerivation=True, includeNonStreamDerivations=False):
+    def containerHierarchy(self, *, followDerivation=True, includeNonStreamDerivations=False):
         '''
         Return a list of Stream subclasses that this object
         is contained within or (if followDerivation is set) is derived from.
@@ -2621,7 +2657,6 @@ class Music21Object:
          <music21.stream.Score 0x1049a5668>]
 
 
-
         The method follows activeSites, so set the activeSite as necessary.
 
         >>> p = stream.Part(id='newPart')
@@ -2633,6 +2668,8 @@ class Music21Object:
         >>> noteE.containerHierarchy()
         [<music21.stream.Measure 20 offset=0.0>,
          <music21.stream.Part newPart>]
+         
+        * changed in v.5.7: followDerivation and includeNonStreamDerivations are now keyword only
         '''
         post = []
         focus = self
@@ -3684,8 +3721,12 @@ class Test(unittest.TestCase):
                     obj = name()
                 except TypeError:
                     continue
-                i = copy.copy(obj)
-                j = copy.deepcopy(obj)
+                try:
+                    i = copy.copy(obj)
+                    j = copy.deepcopy(obj)
+                except TypeError as e:
+                    self.fail('Could not copy {}: {}'.format(obj, str(e)))
+
 
     def testObjectCreation(self):
         a = TestMock()
@@ -4409,7 +4450,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         p = converter.parse('tinynotation: 3/4 C4 D E 2/4 F G A B 1/4 c')
         b = p.measure(3).notes[-1]
-        c = b.getContextByClass('Note', 'getElementAfterOffset')
+        c = b.getContextByClass('Note', getElementMethod='getElementAfterOffset')
         self.assertEqual(c.name, 'C')
 
     def testGetContextByClassB(self):
