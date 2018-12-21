@@ -1158,10 +1158,11 @@ class Note(NotRest):
 
         Notice you cannot compare Notes w/ ints or anything not pitched.
 
-        >>> highE < 50
-        Traceback (most recent call last):
-        TypeError: '<' not supported between instances of 'Note' and 'int'
-        
+        :: 
+            `highE < 50`
+            Traceback (most recent call last):
+            TypeError: '<' not supported between instances of 'Note' and 'int'
+            
         Note also that two objects can be >= and <= without being equal, because
         only pitch-height is being compared in <, <=, >, >= but duration and other
         elements are compared in equality.
@@ -1173,6 +1174,13 @@ class Note(NotRest):
         True
         >>> highE == otherHighE
         False
+        
+        
+        OMIT_FROM_DOCS
+        
+        The `highE < 50` test fails on Python 3.5, because of a change to the
+        TypeError output list.  When m21 becomes Python 3.6 > only, then
+        we can add the test back in.
         '''
         try:
             return self.pitch < other.pitch

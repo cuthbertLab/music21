@@ -3668,7 +3668,8 @@ class Test(unittest.TestCase):
         pass
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
+        '''
+        Test copying all objects defined in this module
         '''
         for part in sys.modules[self.__module__].__dict__:
             match = False

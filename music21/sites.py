@@ -87,17 +87,37 @@ class SiteRef(common.SlottedObjectMixin):
         self.siteIndex = None
         self.siteWeakref = None
 
+    def __repr__(self):
+        if self is _NoneSiteRef:
+            return '<music21.sites.SiteRef Global None Index>'
+        
+        siteRepr = repr(self.site)
+        if self.isDead:
+            siteRepr = 'dead site'
+        
+        return '<music21.sites.SiteRef {}/{} to {}>'.format(
+            self.siteIndex, self.globalSiteIndex, siteRepr
+        )
+
     def _getAndUnwrapSite(self):
         if WEAKREF_ACTIVE:
-            return common.unwrapWeakref(self.siteWeakref)
+            ret = common.unwrapWeakref(self.siteWeakref)
         else:
-            return self.siteWeakref
+            ret = self.siteWeakref
+            
+        if ret is None and self is not _NoneSiteRef:
+            self.isDead = True
+            
+        return ret
+
 
     def _setAndWrapSite(self, site):
         if WEAKREF_ACTIVE:
             self.siteWeakref = common.wrapWeakref(site)
         else:
             self.siteWeakref = site
+        self.isDead = False
+
 
     site = property(_getAndUnwrapSite, _setAndWrapSite)
 
@@ -289,36 +309,6 @@ class Sites(common.SlottedObjectMixin):
         '''
         return self.yieldSites(excludeNone=True)
 
-    ### PRIVATE METHODS ###
-
-    def _keysByTime(self, newFirst=True):
-        '''
-        Get keys sorted by creation time, where most
-        recent are first if `newFirst` is True. else, most recent are last.
-
-        >>> class Mock(base.Music21Object):
-        ...     pass
-        >>> aObj = Mock()
-        >>> bObj = Mock()
-        >>> cObj = Mock()
-        >>> aSites = sites.Sites()
-        >>> aSites.add(cObj)
-        >>> aSites.add(aObj)
-        >>> aSites.add(bObj)
-        >>> k = aSites._keysByTime()
-        >>> aSites.siteDict[k[0]].siteIndex > aSites.siteDict[k[1]].siteIndex
-        True
-        >>> aSites.siteDict[k[1]].siteIndex > aSites.siteDict[k[2]].siteIndex
-        True
-
-        '''
-        post = []
-        for key in self.siteDict:
-            post.append((self.siteDict[key].siteIndex, key))
-        post.sort()
-        if newFirst:
-            post.reverse()
-        return [k for (unused_time, k) in post]
 
     ### PUBLIC METHODS ###
 
@@ -391,13 +381,12 @@ class Sites(common.SlottedObjectMixin):
                    priorityTarget=None,
                    excludeNone=False):
         '''
-        Yield references; order, based on dictionary keys, is from most
-        recently added to least recently added.
+        Yield references; order, based on dictionary keys, is from least
+        recently added to most recently added.
 
-        The `sortByCreationTime` option will sort objects by creation time,
+        The `sortByCreationTime` option if set to True will sort objects by creation time,
         where most-recently assigned objects are returned first.
-        Can be [False, other], [True, 1] or ['reverse', -1]
-
+        
         Note that priorityTarget is searched only on id -- this could be dangerous if the
         target has been garbage collected and the id is reused. Unlikely since you gotta
         pass in the priorityTarget itself so therefore it still exists...
@@ -441,15 +430,15 @@ class Sites(common.SlottedObjectMixin):
         b
         a
 
-        *changed drammatically from the unused version in v.3*
+        *Changes:*
+        
+        # v.3: changed dramatically from previously unused version
+        # `sortByCreationTime='reverse'` is removed, since the ordered dict takes
+        care of it and was not working
         '''
+        keyRepository = list(self.siteDict.keys())
         if sortByCreationTime is True:
-            keyRepository = self._keysByTime(newFirst=True)
-        # reverse creation time puts oldest elements first
-        elif sortByCreationTime == 'reverse':
-            keyRepository = self._keysByTime(newFirst=False)
-        else:  # None, or False
-            keyRepository = list(self.siteDict.keys())
+            keyRepository.reverse()
 
         if priorityTarget is not None:
             priorityId = id(priorityTarget)
