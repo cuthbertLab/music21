@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         environment.py
 # Purpose:      Storage for user environment settings and defaults
 #
@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2009-2017 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 The environment module describes an object for accessing and setting
 variables related to the user's music21 environment. Such variables include
@@ -56,7 +56,7 @@ def etIndent(elem, level=0, spaces=2):
         if level and (not elem.tail or not elem.tail.strip()):
             elem.tail = i
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class EnvironmentException(exceptions21.Music21Exception):
@@ -67,7 +67,7 @@ class UserSettingsException(EnvironmentException):
     pass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # this must be above EnvironmentSingleton
 class LocalCorpusSettings(list):
     '''
@@ -123,7 +123,7 @@ class LocalCorpusSettings(list):
         if self.cacheFilePath is not None:
             mdbpPart = ', cacheFilePath=' + repr(self.cacheFilePath)
         return 'LocalCorpusSettings({}{}{})'.format(listRepr, namePart, mdbpPart)
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class _EnvironmentCore:
@@ -786,7 +786,7 @@ class _EnvironmentCore:
         settingsTree.write(str(filePath), encoding='utf-8')
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 # store one instance of _EnvironmentCore within this module
@@ -804,7 +804,7 @@ def envSingleton():
     '''
     return _environStorage['instance']
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class Environment:
     '''
     The environment.Environment object stores user preferences as a
@@ -1172,7 +1172,7 @@ class Environment:
         else:
             return 'unknown'
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class UserSettings:
@@ -1368,7 +1368,7 @@ class UserSettings:
         self._environment.write()
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # convenience routines for accessing UserSettings.
 
 
@@ -1415,7 +1415,7 @@ def get(key):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
 
@@ -1581,7 +1581,7 @@ class Test(unittest.TestCase):
         self.assertEqual(list(env['localCorpusSettings']), ['/a', '/b'])
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 _DOC_ORDER = [UserSettings, Environment, LocalCorpusSettings]

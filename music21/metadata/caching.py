@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         caching.py
 # Purpose:      music21 classes for representing score and work meta-data
 #
@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 import multiprocessing
 import os
 import pathlib
@@ -20,17 +20,17 @@ import unittest
 from music21 import common
 from music21 import exceptions21
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 from music21 import environment
 environLocal = environment.Environment(os.path.basename(__file__))
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class MetadataCacheException(exceptions21.Music21Exception):
     pass
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def cacheMetadata(corpusNames=None,
                   useMultiprocessing=True,
                   verbose=False):
@@ -77,7 +77,7 @@ def cacheMetadata(corpusNames=None,
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class MetadataCachingJob:
@@ -257,7 +257,7 @@ class MetadataCachingJob:
         return cleanFilePath
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class JobProcessor:
@@ -379,7 +379,7 @@ class JobProcessor:
         # end generator
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class WorkerProcess(multiprocessing.Process): # @UndefinedVariable pylint: disable=inherit-non-class
@@ -410,7 +410,7 @@ class WorkerProcess(multiprocessing.Process): # @UndefinedVariable pylint: disab
             self.result_queue.put(pickle.dumps(job, protocol=0))
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -419,7 +419,7 @@ class Test(unittest.TestCase):
         pass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 _DOC_ORDER = ()
@@ -435,4 +435,4 @@ if __name__ == '__main__':
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------

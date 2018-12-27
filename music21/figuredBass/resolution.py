@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         resolution.py
 # Purpose:      Defines standard resolutions for possibility instances
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 .. note:: The terminology, V43, viio, iv, etc. are explained
      more fully in *The Music Theory Handbook*
@@ -713,7 +713,7 @@ def showResolutions(*allPossib):
     score.insert(0, bassLine)
     score.show()
 
-#----------------------------------------------
+# ---------------------------------------------
 # INTERNAL METHODS
 
 def _transpose(samplePitch, intervalString):
@@ -753,11 +753,11 @@ _DOC_ORDER = [augmentedSixthToDominant,
               diminishedSeventhToMajorTonic, diminishedSeventhToMinorTonic,
               diminishedSeventhToMajorSubdominant, diminishedSeventhToMinorSubdominant]
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ResolutionException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -767,5 +767,5 @@ if __name__ == "__main__":
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

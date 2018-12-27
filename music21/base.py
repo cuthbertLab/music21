@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         base.py
 # Purpose:      Music21 base classes and important utilities
 #
@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2006-2016 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 `music21.base` is what you get in `music21` if you type ``import music21``. It
 contains all the most low-level objects that also appear in the music21 module
@@ -28,7 +28,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'5.6.0'
+'5.6.1'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -56,13 +56,13 @@ from typing import (
 from music21.test.testRunner import mainTest
 ## all other music21 modules below...
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # version string and tuple must be the same
 
 from music21._version import __version__, __version_info__
 VERSION = __version_info__
 VERSION_STR = __version__
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 __all__ = ['Music21Exception',
            'SitesException',
            'Music21ObjectException',
@@ -79,7 +79,7 @@ __all__ = ['Music21Exception',
 #       separately in "music21/__init__.py"
 ##      so make sure to update in both places
 
-#-----all exceptions are in the exceptions21 package.
+# ----all exceptions are in the exceptions21 package.
 from music21 import exceptions21
 
 Music21Exception = exceptions21.Music21Exception
@@ -121,7 +121,7 @@ class Music21ObjectException(exceptions21.Music21Exception):
 class ElementException(exceptions21.Music21Exception):
     pass
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # for contextSites searches...
 ContextTuple = namedtuple('ContextTuple', 'site offset recurseType')
 
@@ -148,7 +148,7 @@ class _SplitTuple(tuple):
     def __init__(self, tupEls): # pylint: disable=super-init-not-called
         self.spannerList = []
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # make subclass of set once that is defined properly
 
 
@@ -244,7 +244,7 @@ class Groups(list): # no need to inherit from slotted object
         return True
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Music21Object:
@@ -436,7 +436,7 @@ class Music21Object:
 
         # call class to get a new, empty instance
         new = self.__class__() # TODO: this creates an extra duration object for notes... ugghhh...
-        #environLocal.printDebug(['Music21Object.__deepcopy__', self, id(self)])
+        # environLocal.printDebug(['Music21Object.__deepcopy__', self, id(self)])
         #for name in dir(self):
         if '_duration' in ignoreAttributes:
             ## this can be done much faster in most cases...
@@ -557,11 +557,11 @@ class Music21Object:
         >>> ('flute' in n.groups, 'flute' in b.groups)
         (False, True)
         '''
-        #environLocal.printDebug(['calling Music21Object.__deepcopy__', self])
+        # environLocal.printDebug(['calling Music21Object.__deepcopy__', self])
         new = self._deepcopySubclassable(memo)
         # must do this after copying
         new.purgeOrphans()
-        #environLocal.printDebug([self, 'end deepcopy', 'self._activeSite', self._activeSite])
+        # environLocal.printDebug([self, 'end deepcopy', 'self._activeSite', self._activeSite])
         return new
 
 
@@ -699,7 +699,7 @@ class Music21Object:
             return classSet
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     @property
     def hasEditorialInformation(self):
         '''
@@ -811,7 +811,7 @@ class Music21Object:
 
 
 
-    #---------------------------
+    # --------------------------
     # convenience.  used to be in note.Note, but belongs everywhere:
     def _getQuarterLength(self):
         return self.duration.quarterLength
@@ -1179,7 +1179,7 @@ class Music21Object:
 
         The `excludeStorageStreams` are SpannerStorage and VariantStorage.
         '''
-        #environLocal.printDebug(['purging orphans'])
+        # environLocal.printDebug(['purging orphans'])
         orphans = []
         # TODO: how can this be optimized to not use getSites, so as to
         # not unwrap weakrefs?
@@ -1192,7 +1192,7 @@ class Music21Object:
                     # only get those that are not Storage Streams
                     if ('SpannerStorage' not in s.classes
                         and 'VariantStorage' not in s.classes):
-                        #environLocal.printDebug(['removing orphan:', s])
+                        # environLocal.printDebug(['removing orphan:', s])
                         orphans.append(id(s))
                 else: # get all
                     orphans.append(id(s))
@@ -1211,7 +1211,7 @@ class Music21Object:
         self.sites.purgeLocations(rescanIsDead=rescanIsDead)
 
 
-    #---------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------
     # contexts...
     def getContextByClass(self,
                           className,
@@ -1248,7 +1248,7 @@ class Music21Object:
         {7.0} <music21.stream.Measure 4 offset=7.0>
             {0.0} <music21.meter.TimeSignature 1/4>
             {0.0} <music21.note.Note C>
-            {1.0} <music21.bar.Barline style=final>
+            {1.0} <music21.bar.Barline type=final>
 
         Let's get the last two notes of the piece, the B and high c:
 
@@ -1763,7 +1763,7 @@ class Music21Object:
                 hypotheticalPosition = positionInStream.modify(offset=inStreamOffset)
 
                 if topLevel not in memo:
-                    #environLocal.printDebug('Yielding {}, {}, {} from contextSites'.format(
+                    # environLocal.printDebug('Yielding {}, {}, {} from contextSites'.format(
                     #                                                topLevel,
                     #                                                inStreamPos.shortRepr(),
                     #                                                recurType))
@@ -1834,7 +1834,7 @@ class Music21Object:
             yield el
             el = el.getContextByClass(className, getElementMethod='getElementBeforeOffset')
 
-    #--------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
 
     def next(self, className=None):
@@ -1922,7 +1922,7 @@ class Music21Object:
         <music21.note.Note F#> <music21.stream.Part Soprano>
         <music21.note.Note E#> <music21.stream.Part Soprano>
         <music21.note.Note F#> <music21.stream.Part Soprano>
-        <music21.bar.Barline style=final> <music21.stream.Part Soprano>
+        <music21.bar.Barline type=final> <music21.stream.Part Soprano>
         '''
         allSiteContexts = list(self.contextSites(returnSortTuples=True))
         maxRecurse = 20
@@ -2035,10 +2035,10 @@ class Music21Object:
                 return prevNode.payload
 
     # end contexts...
-    #---------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------
 
 
-    #--------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # properties
 
     def _getActiveSite(self):
@@ -2047,14 +2047,14 @@ class Music21Object:
             if self._activeSite is None: #leave None
                 return None
             else: # even if current activeSite is not a weakref, this will work
-                #environLocal.printDebug(['_getActiveSite() called:',
+                # environLocal.printDebug(['_getActiveSite() called:',
                 #                          'self._activeSite', self._activeSite])
                 return common.unwrapWeakref(self._activeSite)
         else: # pragma: no cover
             return self._activeSite
 
     def _setActiveSite(self, site):
-        #environLocal.printDebug(['_setActiveSite() called:', 'self', self, 'site', site])
+        # environLocal.printDebug(['_setActiveSite() called:', 'self', self, 'site', site])
 
         # NOTE: this is a performance intensive call
         if site is not None:
@@ -2067,7 +2067,7 @@ class Music21Object:
             self._activeSiteStoredOffset = storedOffset
             #siteId = id(site)
             #if not self.sites.hasSiteId(siteId): # This should raise a warning, should not happen
-            #    #environLocal.warn('Adding a siteDict entry for a ' +
+            #    # environLocal.warn('Adding a siteDict entry for a ' +
             #    #                        'site that should already be there!')
             #    self.sites.add(site, idKey=siteId)
         else:
@@ -2132,7 +2132,7 @@ class Music21Object:
         #there is a problem if a new activeSite is being set and no offsets have
         # been provided for that activeSite; when self.offset is called,
         # the first case here would match
-        #environLocal.printDebug(['Music21Object._getOffset', 'self.id',
+        # environLocal.printDebug(['Music21Object._getOffset', 'self.id',
         #                           self.id, 'id(self)', id(self), self.__class__])
         activeSiteWeakRef = self._activeSite
         if activeSiteWeakRef is not None:
@@ -2385,7 +2385,7 @@ class Music21Object:
             except SitesException:
                 if raiseExceptionOnMiss:
                     raise
-                #environLocal.warn(r)
+                # environLocal.warn(r)
                     # activeSite may have vanished! or does not have the element
                 foundOffset = self._naiveOffset
 
@@ -2412,7 +2412,7 @@ class Music21Object:
         return SortTuple(atEnd, offset, self.priority,
                           self.classSortOrder, isNotGrace, insertIndex)
 
-    #------------------------------------------------------------------
+    # -----------------------------------------------------------------
     def _getDuration(self):
         '''
         Gets the DurationObject of the object or None
@@ -2506,7 +2506,7 @@ class Music21Object:
         ''')
 
 
-    #--------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # display and writing
 
     def write(self, fmt=None, fp=None, **keywords): #pragma: no cover
@@ -2611,7 +2611,7 @@ class Music21Object:
                                  subformats=subformats,
                                  **keywords)
 
-    #--------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # duration manipulation, processing, and splitting
 
     def containerHierarchy(self, *, followDerivation=True, includeNonStreamDerivations=False):
@@ -2679,11 +2679,11 @@ class Music21Object:
             # collect activeSite unless activeSite is None;
             # if so, try to get rootDerivation
             candidate = focus.activeSite
-            #environLocal.printDebug(['containerHierarchy(): activeSite found:', candidate])
+            # environLocal.printDebug(['containerHierarchy(): activeSite found:', candidate])
             if candidate is None: # nothing more to derive
                 # if this is a Stream, we might find a root derivation
                 if followDerivation is True and hasattr(focus, 'derivation'):
-                    #environLocal.printDebug(['containerHierarchy():
+                    # environLocal.printDebug(['containerHierarchy():
                     # found rootDerivation:', focus.rootDerivation])
                     alt = focus.derivation.rootDerivation
                     if alt is None:
@@ -3120,7 +3120,7 @@ class Music21Object:
         quarterLengthList = [c.quarterLength * atm for c in self.duration.components]
         splitList = self.splitByQuarterLengths(quarterLengthList)
         return splitList
-    #--------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # temporal and beat based positioning
     @property
     def measureNumber(self):
@@ -3225,18 +3225,18 @@ class Music21Object:
         '''
         activeS = self.activeSite
         if activeS is not None and activeS.isMeasure:
-            #environLocal.printDebug(['found activeSite as Measure, using for offset'])
+            # environLocal.printDebug(['found activeSite as Measure, using for offset'])
             offsetLocal = activeS.elementOffset(self)
             if includeMeasurePadding:
                 offsetLocal += activeS.paddingLeft
         else:
-            #environLocal.printDebug(['did not find activeSite as Measure,
+            # environLocal.printDebug(['did not find activeSite as Measure,
             #    doing context search', 'self.activeSite', self.activeSite])
             # testing sortByCreationTime == true; this may be necessary
             # as we often want the most recent measure
             m = self.getContextByClass('Measure', sortByCreationTime=True)
             if m is not None:
-                #environLocal.printDebug(['using found Measure for offset access'])
+                # environLocal.printDebug(['using found Measure for offset access'])
                 try:
                     if includeMeasurePadding:
                         offsetLocal = m.elementOffset(self) + m.paddingLeft
@@ -3249,11 +3249,11 @@ class Music21Object:
                         offsetLocal = 0.0
 
             else: # hope that we get the right one
-                #environLocal.printDebug(
+                # environLocal.printDebug(
                 #  ['_getMeasureOffset(): cannot find a Measure; using standard offset access'])
                 offsetLocal = self.offset
 
-        #environLocal.printDebug(
+        # environLocal.printDebug(
         #     ['_getMeasureOffset(): found local offset as:', offsetLocal, self])
         return offsetLocal
 
@@ -3489,7 +3489,7 @@ class Music21Object:
         ''')
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class ElementWrapper(Music21Object):
@@ -3571,7 +3571,7 @@ class ElementWrapper(Music21Object):
         # Music21Object
         #self._unlinkedDuration = None
 
-    #--------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
     def __repr__(self):
         shortObj = (str(self.obj))[0:30]
@@ -3627,7 +3627,7 @@ class ElementWrapper(Music21Object):
             return False
 
     def __setattr__(self, name: str, value: Any) -> None:
-        #environLocal.printDebug(['calling __setattr__ of ElementWrapper', name, value])
+        # environLocal.printDebug(['calling __setattr__ of ElementWrapper', name, value])
 
         # if in the ElementWrapper already, set that first
         if name in self.__dict__:
@@ -3693,7 +3693,7 @@ class ElementWrapper(Music21Object):
             return False
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class TestMock(Music21Object):
@@ -4504,7 +4504,7 @@ class Test(unittest.TestCase):
         #n1 = m2[-1] # last element is a note
         n2 = m4[-1] # last element is a note
 
-        #environLocal.printDebug(['getContextByClass()'])
+        # environLocal.printDebug(['getContextByClass()'])
         #self.assertEqual(str(n1.getContextByClass('TimeSignature')),
         #    '<music21.meter.TimeSignature 3/4>')
         environLocal.printDebug(['getContextByClass()'])
@@ -4675,7 +4675,7 @@ class Test(unittest.TestCase):
         m2 = copy.deepcopy(m)
         m2.number = 3333
         siteList = []
-        #environLocal.warn('#########################')
+        # environLocal.warn('#########################')
         for y in m2.contextSites():
             yTup = (y.site, y.offset, y.recurseType)
             siteList.append(repr(yTup))
@@ -4817,15 +4817,15 @@ class Test(unittest.TestCase):
         prev = ecopy2.previous('Note')
         self.assertIs(prev, ecopy1)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Music21Object, ElementWrapper]
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 if __name__ == '__main__':
     mainTest(Test) #, runTest='testPreviousB')
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         segment.py
 # Purpose:      music21 class representing a figured bass note and notation
 #                realization.
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import collections
 import copy
 import itertools
@@ -137,7 +137,7 @@ class Segment:
         self._environRules = environment.Environment(_MOD)
 
 
-    #-------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     # EXTERNAL METHODS
 
     def singlePossibilityRules(self, fbRules=None):
@@ -782,7 +782,7 @@ class Segment:
             return resolutionMethod(segmentB, *args)
         return self._resolveOrdinarySegment(segmentB)
 
-    #-------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     # INTERNAL METHODS
 
     def _isCorrectSinglePossibility(self, possibA):
@@ -997,7 +997,7 @@ def printRules(rulesList, maxLength=4):
 class SegmentException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1007,5 +1007,5 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

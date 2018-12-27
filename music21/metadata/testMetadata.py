@@ -40,7 +40,7 @@ class Test(unittest.TestCase):
             date='2010',
             composer='Frank',
             )
-        #environLocal.printDebug([str(md.json)])
+        # environLocal.printDebug([str(md.json)])
         self.assertEqual(md.composer, 'Frank')
         self.assertEqual(md.date, '2010/--/--')
         self.assertEqual(md.composer, 'Frank')
@@ -142,7 +142,7 @@ class Test(unittest.TestCase):
         self.assertEqual(richMetadata.noteCount, 165)
         self.assertEqual(richMetadata.quarterLength, 36.0)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 if __name__ == '__main__':
     import music21

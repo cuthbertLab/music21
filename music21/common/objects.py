@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         common/objects.py
 # Purpose:      Commonly used Objects and Mixins
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 __all__ = ['defaultlist',
            'SingletonCounter',
            'RelativeCounter',
@@ -141,7 +141,7 @@ class SingletonCounter:
         _singletonCounter['value'] += 1
         return post
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class SlottedObjectMixin:
     r'''
     Provides template for classes implementing slots allowing it to be pickled
@@ -260,7 +260,7 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
         return not (self == other)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Iterator:
     '''A simple Iterator object used to handle iteration of Streams and other
     list-like objects.
@@ -296,7 +296,7 @@ class Iterator:
         return self.__next__()
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Timer:
     """
     An object for timing. Call it to get the current time since starting.

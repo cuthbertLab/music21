@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         testStream.py
 # Purpose:      tests for stream.py
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import random
 import unittest
 import copy
@@ -42,7 +42,7 @@ _MOD = 'testStream'
 environLocal = environment.Environment(_MOD)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase): # pragma: no cover
     def runTest(self):
         pass
@@ -284,7 +284,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         bMeasure.show()
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1910,16 +1910,16 @@ class Test(unittest.TestCase):
         barred1 = s.makeMeasures()
         self.assertEqual(
             str(barred1.getElementsByClass('Measure')[-1].rightBarline),
-            '<music21.bar.Barline style=final>')
+            '<music21.bar.Barline type=final>')
         #barred1.show()
 
         barred2 = s.makeMeasures(innerBarline='dashed', finalBarline='double')
         match = [str(m.rightBarline) for m in
             barred2.getElementsByClass('Measure')]
-        self.assertEqual(match, ['<music21.bar.Barline style=dashed>',
-                                 '<music21.bar.Barline style=dashed>',
-                                 '<music21.bar.Barline style=dashed>',
-                                 '<music21.bar.Barline style=double>'])
+        self.assertEqual(match, ['<music21.bar.Barline type=dashed>',
+                                 '<music21.bar.Barline type=dashed>',
+                                 '<music21.bar.Barline type=dashed>',
+                                 '<music21.bar.Barline type=double>'])
         #barred2.show()
 
         # try using bar objects
@@ -1929,10 +1929,10 @@ class Test(unittest.TestCase):
         #barred3.show()
         match = [str(m.rightBarline) for m in
             barred3.getElementsByClass('Measure')]
-        self.assertEqual(match, ['<music21.bar.Barline style=none>',
-                                 '<music21.bar.Barline style=none>',
-                                 '<music21.bar.Barline style=none>',
-                                 '<music21.bar.Barline style=short>'])
+        self.assertEqual(match, ['<music21.bar.Barline type=none>',
+                                 '<music21.bar.Barline type=none>',
+                                 '<music21.bar.Barline type=none>',
+                                 '<music21.bar.Barline type=short>'])
 
         # setting to None will not set a barline object at all
         barred4 = s.makeMeasures(innerBarline=None, finalBarline=None)
@@ -2358,7 +2358,7 @@ class Test(unittest.TestCase):
         match = [p.accidental.displayStatus for p in p1.pitches]
         self.assertEqual(match, [True, False])
         m = p1.measure(1)
-        self.assertEqual(str(m.rightBarline), '<music21.bar.Barline style=final>')
+        self.assertEqual(str(m.rightBarline), '<music21.bar.Barline type=final>')
 
     def testMakeAccidentalsWithKeysInMeasures(self):
         scale1 = ['c4', 'd4', 'e4', 'f4', 'g4', 'a4', 'b4', 'c5']
@@ -6376,16 +6376,16 @@ class Test(unittest.TestCase):
 
         s.finalBarline = 'dotted'
         self.assertEqual(str(s.getElementsByClass('Measure')[-1].rightBarline),
-                         '<music21.bar.Barline style=dotted>')
+                         '<music21.bar.Barline type=dotted>')
         self.assertEqual(str(s.finalBarline),
-                         '<music21.bar.Barline style=dotted>')
+                         '<music21.bar.Barline type=dotted>')
 
         s.finalBarline = 'final'
         self.assertEqual(str(s.getElementsByClass('Measure')[-1].rightBarline),
-                         '<music21.bar.Barline style=final>')
+                         '<music21.bar.Barline type=final>')
 
         self.assertEqual(str(s.finalBarline),
-                         '<music21.bar.Barline style=final>')
+                         '<music21.bar.Barline type=final>')
         #s.show()
 
 
@@ -6393,21 +6393,21 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
         sop = s.parts[0]
-        self.assertEqual(str(sop.finalBarline), '<music21.bar.Barline style=final>')
+        self.assertEqual(str(sop.finalBarline), '<music21.bar.Barline type=final>')
         sop.finalBarline = 'double'
-        self.assertEqual(str(sop.finalBarline), '<music21.bar.Barline style=double>')
+        self.assertEqual(str(sop.finalBarline), '<music21.bar.Barline type=double>')
 
         # process entire Score
         s.finalBarline = 'tick'
         self.assertEqual(str(s.finalBarline),
-                         '[<music21.bar.Barline style=tick>, <music21.bar.Barline style=tick>, '
-                         + '<music21.bar.Barline style=tick>, <music21.bar.Barline style=tick>]')
+                         '[<music21.bar.Barline type=tick>, <music21.bar.Barline type=tick>, '
+                         + '<music21.bar.Barline type=tick>, <music21.bar.Barline type=tick>]')
 
         # can set a heterogenous final barlines
         s.finalBarline = ['final', 'none']
         self.assertEqual(str(s.finalBarline),
-                         '[<music21.bar.Barline style=final>, <music21.bar.Barline style=none>, '
-                         + '<music21.bar.Barline style=final>, <music21.bar.Barline style=none>]')
+                         '[<music21.bar.Barline type=final>, <music21.bar.Barline type=none>, '
+                         + '<music21.bar.Barline type=final>, <music21.bar.Barline type=none>]')
 
 
 
@@ -7850,12 +7850,12 @@ class Test(unittest.TestCase):
 #         cLast = m10.notes[-1]
 #         self.assertEqual(cLast.expressions, [])
         
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 if __name__ == "__main__":
     music21.mainTest(Test, 'verbose',) # runTest='testChordifyTagPartB')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 
 

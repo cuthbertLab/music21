@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         musicxml/m21ToXml.py
 # Purpose:      Translate from music21 objects to musicxml representation
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2010-2012, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Converters for music21 objects to musicxml using ElementTree
 '''
@@ -49,7 +49,7 @@ from music21 import environment
 _MOD = "musicxml.m21ToXml"
 environLocal = environment.Environment(_MOD)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class MusicXMLExportException(exceptions21.Music21Exception):
     pass
 class NoteheadException(MusicXMLExportException):
@@ -679,7 +679,7 @@ class XMLExporterBase:
         divider = ET.Comment(commentText)
         self.xmlRoot.append(divider)
 
-    #-------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     @staticmethod
     def dump(obj):
         r'''
@@ -1300,7 +1300,7 @@ class XMLExporterBase:
         return mxAccidental
 
 
-#----------
+# ---------
 
 class ScoreExporter(XMLExporterBase):
     '''
@@ -2265,7 +2265,7 @@ class ScoreExporter(XMLExporterBase):
             mxCreator.text = c.name
         return mxCreator
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class PartExporter(XMLExporterBase):
@@ -2587,7 +2587,7 @@ class PartExporter(XMLExporterBase):
         return mxMidiInstrument
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class MeasureExporter(XMLExporterBase):
     classesToMethods = OrderedDict(
@@ -5160,7 +5160,7 @@ class MeasureExporter(XMLExporterBase):
 
 
 
-    #------------------------------
+    # -----------------------------
     # note helpers...
     def lyricToXml(self, l):
         '''
@@ -5979,7 +5979,7 @@ class MeasureExporter(XMLExporterBase):
         return None
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def indent(elem, level=0):
     i = "\n" + level * "  "
     # pylint: disable=len-as-condition

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         features.native.py
 # Purpose:      music21 feature extractors
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Original music21 feature extractors.
 '''
@@ -25,7 +25,7 @@ from music21 import environment
 _MOD = 'features.native'
 environLocal = environment.Environment(_MOD)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # ideas for other music21 features extractors
 
 # notation features: clef usage, enharmonic usage
@@ -53,7 +53,7 @@ environLocal = environment.Environment(_MOD)
 # harmony realization also adds pitches not available in midi
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class NativeFeatureException(featuresModule.FeatureException):
     pass
 
@@ -143,7 +143,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
         self.feature.vector[0] = keyFeature
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TonalCertainty(featuresModule.FeatureExtractor):
     '''
     >>> s = corpus.parse('bwv66.6')
@@ -176,7 +176,7 @@ class TonalCertainty(featuresModule.FeatureExtractor):
         self.feature.vector[0] = self.data['flat.analyzedKey.tonalCertainty']
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # features that use metrical distinctions
 
 class FirstBeatAttackPrevalence(featuresModule.FeatureExtractor):
@@ -204,7 +204,7 @@ class FirstBeatAttackPrevalence(featuresModule.FeatureExtractor):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # employing symbolic durations
 
 
@@ -324,7 +324,7 @@ class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
         self.feature.vector[0] = maxVal - minVal
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # various ways of looking at chordify representation
 
 # percentage of closed-position chords and
@@ -773,7 +773,7 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
         self.feature.vector = vector
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # metadata
 
 class ComposerPopularity(featuresModule.FeatureExtractor):
@@ -846,7 +846,7 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # melodic contour
 
 
@@ -891,7 +891,7 @@ class LandiniCadence(featuresModule.FeatureExtractor):
                     cListClean.append(c)
             # find matches
             for cMatch in match:
-                #environLocal.printDebug(['cList', cList, 'cListClean',
+                # environLocal.printDebug(['cList', cList, 'cListClean',
                 #    cListClean, 'cMatch', cMatch])
                 # compare to last
                 if len(cListClean) >= len(cMatch):
@@ -905,7 +905,7 @@ class LandiniCadence(featuresModule.FeatureExtractor):
             self.feature.vector[0] = 1
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # text features
 
 class LanguageFeature(featuresModule.FeatureExtractor):
@@ -944,7 +944,7 @@ class LanguageFeature(featuresModule.FeatureExtractor):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 featureExtractors = [
@@ -979,7 +979,7 @@ LanguageFeature, # tx1
 ]
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1018,7 +1018,7 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 
 

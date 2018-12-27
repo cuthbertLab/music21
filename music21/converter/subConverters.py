@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         converter/__init__.py
 # Purpose:      Specific subconverters for formats music21 should handle
 #
@@ -8,14 +8,14 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Subconverters parse or display a single format.
 
 Each subconverter should inherit from the base SubConverter object and have at least a
 parseData method that sets self.stream.
 '''
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Converters are associated classes; they are not subclasses, but most define a pareData() method,
 # a parseFile() method, and a .stream attribute or property.
 import base64
@@ -549,7 +549,7 @@ class ConverterVolpiano(SubConverter):
         {2.0} <music21.note.Note E>
         {3.0} <music21.note.Note F>
         {4.0} <music21.volpiano.Neume <music21.note.Note E><music21.note.Note F>>
-        {4.0} <music21.bar.Barline style=double>
+        {4.0} <music21.bar.Barline type=double>
     >>> p.show('volpiano')
     1---c-d-ef----4
     '''
@@ -588,7 +588,7 @@ class ConverterScala(SubConverter):
     registerInputExtensions = ('scl',)
     registerOutputExtensions = ('scl',)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ConverterHumdrum(SubConverter):
     '''Simple class wrapper for parsing Humdrum data provided in a file or in a string.
     '''
@@ -600,7 +600,7 @@ class ConverterHumdrum(SubConverter):
         self.data = None
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def parseData(self, humdrumString, number=None):
         '''Open Humdrum data from a string -- calls humdrum.parseData()
 
@@ -649,7 +649,7 @@ class ConverterHumdrum(SubConverter):
         self.stream = self.data.stream
         return self.data
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ConverterTinyNotation(SubConverter):
     '''
     Simple class wrapper for parsing TinyNotation data provided in a file or
@@ -664,7 +664,7 @@ class ConverterTinyNotation(SubConverter):
         super().__init__(**keywords)
         self.data = None
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def parseData(self, tnData, number=None):
         '''Open TinyNotation data from a string
 
@@ -684,7 +684,7 @@ class ConverterTinyNotation(SubConverter):
             {1.3333} <music21.note.Note A>
             {1.6667} <music21.note.Note G>
             {2.0} <music21.note.Note C>
-            {2.5} <music21.bar.Barline style=final>
+            {2.5} <music21.bar.Barline type=final>
         '''
         if isinstance(tnData, str):
             tnStr = tnData
@@ -719,7 +719,7 @@ class ConverterNoteworthy(SubConverter):
     registerFormats = ('noteworthytext',)
     registerInputExtensions = ('nwctxt',)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def parseData(self, nwcData):
         r'''Open Noteworthy data from a string or list
 
@@ -764,7 +764,7 @@ class ConverterNoteworthyBinary(SubConverter):
     readBinary = True
     registerFormats = ('noteworthy',)
     registerInputExtensions = ('nwc', )
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def parseData(self, nwcData):  # pragma: no cover
         from music21.noteworthy import binaryTranslate as noteworthyBinary
         self.stream = noteworthyBinary.NWCConverter().parseString(nwcData)
@@ -774,7 +774,7 @@ class ConverterNoteworthyBinary(SubConverter):
         from music21.noteworthy import binaryTranslate as noteworthyBinary
         self.stream = noteworthyBinary.NWCConverter().parseFile(fp)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ConverterMusicXML(SubConverter):
     '''
     Converter for MusicXML using the 2015 ElementTree system.
@@ -788,7 +788,7 @@ class ConverterMusicXML(SubConverter):
                                          'pdf': 'pdf',
                                          }
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def findPNGfpFromXMLfp(self, xmlFilePath):
         '''
         Check whether total number of pngs is in 1-9, 10-99, or 100-999 range,
@@ -953,7 +953,7 @@ class ConverterMusicXML(SubConverter):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ConverterMidi(SubConverter):
     '''
     Simple class wrapper for parsing MIDI and sending MIDI data out.
@@ -993,7 +993,7 @@ class ConverterMidi(SubConverter):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ConverterABC(SubConverter):
     '''
     Simple class wrapper for parsing ABC.
@@ -1031,7 +1031,7 @@ class ConverterABC(SubConverter):
         If `number` is provided, and this ABC file defines multiple works
         with a X: tag, just the specified work will be returned.
         '''
-        #environLocal.printDebug(['ConverterABC.parseFile: got number', number])
+        # environLocal.printDebug(['ConverterABC.parseFile: got number', number])
         from music21 import abcFormat
 
         af = abcFormat.ABCFile()
@@ -1126,7 +1126,7 @@ class ConverterCapella(SubConverter):
         self.stream = ci.scoreFromFile(fp)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ConverterMuseData(SubConverter):
     '''Simple class wrapper for parsing MuseData.
     '''
@@ -1167,13 +1167,13 @@ class ConverterMuseData(SubConverter):
 
         af = converter.ArchiveManager(fp)
 
-        #environLocal.printDebug(['ConverterMuseData: parseFile', fp, af.isArchive()])
+        # environLocal.printDebug(['ConverterMuseData: parseFile', fp, af.isArchive()])
         # for dealing with one or more files
         if fp.suffix == '.zip' or af.isArchive():
-            #environLocal.printDebug(['ConverterMuseData: found archive', fp])
+            # environLocal.printDebug(['ConverterMuseData: found archive', fp])
             # get data will return all data from the zip as a single string
             for partStr in af.getData(dataFormat='musedata'):
-                #environLocal.printDebug(['partStr', len(partStr)])
+                # environLocal.printDebug(['partStr', len(partStr)])
                 mdw.addString(partStr)
         else:
             if fp.is_dir:
@@ -1187,7 +1187,7 @@ class ConverterMuseData(SubConverter):
             for fpInner in fpList:
                 mdw.addFile(fpInner)
 
-        #environLocal.printDebug(['ConverterMuseData: mdw file count', len(mdw.files)])
+        # environLocal.printDebug(['ConverterMuseData: mdw file count', len(mdw.files)])
 
         musedataTranslate.museDataWorkToStreamScore(mdw, self.stream)
 

@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         common/fileTools.py
 # Purpose:      Utilities for files
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Tools for working with files
 '''
@@ -68,14 +68,14 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
 
     >>> data = common.readFileEncodingSafe(c)
     >>> data[0:30]
-    '#-*- coding: utf-8 -*-\n#------'
+    '#-*- coding: utf-8 -*-\n# -----'
 
     Well, that's nothing, since the first guess here is utf-8 and it's right. So let's
     give a worse first guess:
 
     >>> data = common.readFileEncodingSafe(c, firstGuess='SHIFT_JIS') # old Japanese standard
     >>> data[0:30]
-    '#-*- coding: utf-8 -*-\n#------'
+    '#-*- coding: utf-8 -*-\n# -----'
 
     It worked!
 
@@ -153,11 +153,11 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
 #
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 if __name__ == "__main__":
     import music21 # @Reimport
     music21.mainTest()
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

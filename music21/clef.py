@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         clef.py
 # Purpose:      Objects for representing clefs
 #
@@ -11,7 +11,7 @@
 #
 # Changes:      04 March 2014 by Michael Bodenbach
 #               - TabClef added
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module defines numerous subclasses of
 :class:`~music21.clef.Clef`, providing object representations for all
@@ -35,7 +35,7 @@ class ClefException(exceptions21.Music21Exception):
     pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Clef(base.Music21Object):
     '''
     A Clef is a basic `music21` object for representing musical clefs
@@ -183,7 +183,7 @@ class Clef(base.Music21Object):
         className = self.__class__.__name__.replace('Clef', '')
         return className[0].lower() + className[1:]
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class PitchClef(Clef):
     '''
     superclass for all other clef subclasses that use pitches...
@@ -272,7 +272,7 @@ class TabClef(PitchClef):
         self.sign = 'TAB'
         self.line = 5
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class GClef(PitchClef):
     '''
     A generic G Clef
@@ -369,7 +369,7 @@ class GSopranoClef(GClef):
         self.line = 3
         self.lowestLine = (7 * 4) + 1
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class CClef(PitchClef):
     '''
     A generic C Clef, with no line set
@@ -462,7 +462,7 @@ class CBaritoneClef(CClef):
         self.lowestLine = (7 * 2) + 7
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class FClef(PitchClef):
     '''
     A generic F-Clef, like a Bass clef
@@ -552,7 +552,7 @@ class SubBassClef(FClef):
         self.lowestLine = (7 * 2) + 3
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 CLASS_FROM_TYPE = {
     'G': [None, FrenchViolinClef, TrebleClef, GSopranoClef, None, None],
     'C': [None, SopranoClef, MezzoSopranoClef, AltoClef, TenorClef, CBaritoneClef],
@@ -762,7 +762,7 @@ def bestClef(streamObj, allowTreble8vb=False, recurse=False):
         elif p.diatonicNoteNum < 24: # Bass F or lower
             height += -3 # bonus
         return height
-    #environLocal.printDebug(['calling bestClef()'])
+    # environLocal.printDebug(['calling bestClef()'])
 
     totalNotes = 0
     totalHeight = 0
@@ -786,7 +786,7 @@ def bestClef(streamObj, allowTreble8vb=False, recurse=False):
     else:
         averageHeight = (totalHeight + 0.0) / totalNotes
 
-    #environLocal.printDebug(['average height', averageHeight])
+    # environLocal.printDebug(['average height', averageHeight])
     if (allowTreble8vb is False):
         if averageHeight > 52: # value found with experimentation; revise
             return Treble8vaClef()
@@ -805,7 +805,7 @@ def bestClef(streamObj, allowTreble8vb=False, recurse=False):
             return BassClef()
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -867,7 +867,7 @@ class Test(unittest.TestCase):
                         '<clef-octave-change>' + str(octaveChange) + '</clef-octave-change></clef>')
             c = MP.xmlToClef(mxClef)
 
-            #environLocal.printDebug([type(c).__name__])
+            # environLocal.printDebug([type(c).__name__])
 
             self.assertEqual(c.sign, params[0])
             self.assertEqual(c.line, params[1])
@@ -933,7 +933,7 @@ class Test(unittest.TestCase):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Clef, TrebleClef, BassClef]
 
@@ -944,5 +944,5 @@ if __name__ == '__main__':
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

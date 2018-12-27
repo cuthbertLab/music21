@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         harmony.py
 # Purpose:      music21 classes for representing harmonies and chord symbols
 #
@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2011-2012, 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 An object representation of harmony, a subclass of chord, as encountered as chord symbols or
 roman numerals, or other chord representations with a defined root.
@@ -34,7 +34,7 @@ _MOD = 'harmony'
 environLocal = environment.Environment(_MOD)
 
 
-#---------------------------------------------------------------------------
+# --------------------------------------------------------------------------
 
 
 # Y indicates this chord_type is an official XML chord typ
@@ -112,14 +112,14 @@ CHORD_ALIASES = {'dominant': 'dominant-seventh',
                  'half-diminished': 'half-diminished-seventh',
                  }
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class HarmonyException(exceptions21.Music21Exception):
     pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class Harmony(chord.Chord):
@@ -460,13 +460,13 @@ class Harmony(chord.Chord):
         return self.chordStepModifications
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class ChordStepModificationException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class ChordStepModification:
@@ -657,7 +657,7 @@ class ChordStepModification:
             'not a valid degree modification type: {0}'.format(expr))
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 def addNewChordSymbol(chordTypeName, fbNotationString, AbbreviationList):
@@ -1322,10 +1322,10 @@ def removeChordSymbols(chordType):
     del CHORD_TYPES[chordType]
 
 
-#---------------------------------------------------------------------------
+# --------------------------------------------------------------------------
 realizerScaleCache = {}
 
-#---------------------------------------------------------------------------
+# --------------------------------------------------------------------------
 
 
 class ChordSymbol(Harmony):
@@ -2231,7 +2231,7 @@ class NoChord(ChordSymbol):
     {9.0} <music21.note.Note C>
     {10.0} <music21.note.Note C>
     {11.0} <music21.note.Note C>
-    {12.0} <music21.bar.Barline style=final>
+    {12.0} <music21.bar.Barline type=final>
     >>> c_major = s.getElementsByClass(ChordSymbol)[0]
     >>> c_major.duration
     <music21.duration.Duration 4.0>
@@ -2284,7 +2284,7 @@ class NoChord(ChordSymbol):
         pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 def realizeChordSymbolDurations(piece):
@@ -2314,7 +2314,7 @@ def realizeChordSymbolDurations(piece):
     {5.0} <music21.note.Note C>
     {6.0} <music21.note.Note C>
     {7.0} <music21.note.Note C>
-    {8.0} <music21.bar.Barline style=final>
+    {8.0} <music21.bar.Barline type=final>
 
     If only one chord symbol object is present:
 
@@ -2330,7 +2330,7 @@ def realizeChordSymbolDurations(piece):
     {1.0} <music21.note.Note C>
     {2.0} <music21.note.Note C>
     {3.0} <music21.note.Note C>
-    {4.0} <music21.bar.Barline style=final>
+    {4.0} <music21.bar.Barline type=final>
 
     If a ChordSymbol object exists followed by many notes, duration represents
     all those notes (how else can the computer know to end the chord? if
@@ -2358,7 +2358,7 @@ def realizeChordSymbolDurations(piece):
     {9.0} <music21.note.Note C>
     {10.0} <music21.note.Note C>
     {11.0} <music21.note.Note C>
-    {12.0} <music21.bar.Barline style=final>
+    {12.0} <music21.bar.Barline type=final>
     '''
     pf = piece.flat
     onlyChords = pf.getElementsByClass(ChordSymbol).stream()
@@ -2384,7 +2384,7 @@ def realizeChordSymbolDurations(piece):
         return piece
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -2678,7 +2678,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 #         excerpt.show()
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 _DOC_ORDER = [Harmony, chordSymbolFigureFromChord, ChordSymbol, ChordStepModification]
@@ -2689,5 +2689,5 @@ if __name__ == '__main__':
     music21.mainTest(Test) #, runTest='chordSymbolSetsBassOctave')
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

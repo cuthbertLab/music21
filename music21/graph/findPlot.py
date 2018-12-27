@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         graph/findPlot.py
 # Purpose:      Methods for finding approriate plots for plotStream.
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Methods for finding appropriate plots for plotStream.
 '''
@@ -134,7 +134,7 @@ def userFormatsToFormat(userFormat):
     >>> graph.findPlot.userFormatsToFormat('4D super chart')
     '4dsuperchart'
     '''
-    #environLocal.printDebug(['calling user userFormatsToFormat:', value])
+    # environLocal.printDebug(['calling user userFormatsToFormat:', value])
     userFormat = userFormat.lower()
     userFormat = userFormat.replace(' ', '')
 
@@ -143,7 +143,7 @@ def userFormatsToFormat(userFormat):
             return opt[0] # first one for each is the preferred
 
     # return unaltered if no match
-    #environLocal.printDebug(['userFormatsToFormat(): could not match value', value])
+    # environLocal.printDebug(['userFormatsToFormat(): could not match value', value])
     return userFormat
 
 def getPlotClassesFromFormat(graphFormat, checkPlotClasses=None):

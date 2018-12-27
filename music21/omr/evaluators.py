@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         omr/evaluators.py
 # Purpose:      music21 module for evaluating correcting of output from OMR software
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2014 Maura Church, Michael Scott Cuthbert, and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module takes two XML files and displays the number of measures that
 differ between the two before and after running the combined correction models

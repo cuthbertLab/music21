@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         fromCapellaXML.py
 # Purpose:      Module for importing capellaXML (.capx) files.
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 A beta version of a complete .capx to music21 converter.
 
@@ -39,7 +39,7 @@ from music21 import tie
 
 #from music21 import environment
 #_MOD = 'capella.fromCapellaXML.py'
-#environLocal = environment.Environment(_MOD)
+# environLocal = environment.Environment(_MOD)
 
 #capellaDynamics = {'r': 'ppp',
 #                   'q': 'pp',
@@ -371,7 +371,7 @@ class CapellaImporter:
         {0.0} <music21.key.KeySignature of 1 flat>
         {0.0} <music21.note.Note G>
         {2.0} <music21.note.Note A>
-        {4.0} <music21.bar.Barline style=final>
+        {4.0} <music21.bar.Barline type=final>
 
         >>> s.highestTime
         4.0
@@ -856,7 +856,7 @@ class CapellaImporter:
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> barlineTag = ci.domElementFromText('<barline type="end"/>')
         >>> ci.barlineListFromBarline(barlineTag)
-        [<music21.bar.Barline style=final>]
+        [<music21.bar.Barline type=final>]
 
         >>> repeatTag = ci.domElementFromText('<barline type="repEndBegin"/>')
         >>> ci.barlineListFromBarline(repeatTag)

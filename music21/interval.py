@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         interval.py
 # Purpose:      music21 classes for representing intervals
 #
@@ -10,7 +10,7 @@
 #
 # Copyright:    Copyright © 2009-2012, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module defines various types of interval objects.
 Fundamental classes are :class:`~music21.interval.Interval`,
@@ -35,7 +35,7 @@ from music21 import environment
 _MOD = 'interval'
 environLocal = environment.Environment(_MOD)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # constants
 
 STEPNAMES = ('C', 'D', 'E', 'F', 'G', 'A', 'B')
@@ -103,11 +103,11 @@ semitonesAdjustImperf = {'M': 0, 'm': -1, 'A': 1, 'AA': 2, 'AAA': 3, 'AAAA': 4,
                          'd': -2, 'dd': -3, 'ddd': -4, 'dddd': -5} #offset from Major
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class IntervalException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # some utility functions
 
 def _extractPitch(nOrP):
@@ -530,7 +530,7 @@ def intervalToPythagoreanRatio(intervalObj):
     octaves = int((end_pitch_wanted.ps - end_pitch.ps) / 12)
     return ratio * Fraction(2, 1) ** octaves
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class IntervalBase(base.Music21Object):
     '''
     General base class for inheritance.
@@ -935,7 +935,7 @@ class GenericInterval(IntervalBase):
             {3.0} <music21.note.Note B>
         {12.0} <music21.stream.Measure 4 offset=12.0>
             {0.0} <music21.note.Note D>
-            {4.0} <music21.bar.Barline style=final>
+            {4.0} <music21.bar.Barline type=final>
 
         Does not take into account harmonic or melodic minor.
         '''
@@ -1543,7 +1543,7 @@ class ChromaticInterval(IntervalBase):
         return newPitch
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def _stringToDiatonicChromatic(value):
     '''
     A function for processing interval strings and returning
@@ -1767,7 +1767,7 @@ def intervalFromGenericAndChromatic(gInt, cInt):
     return Interval(diatonic=dInt, chromatic=cInt)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # store implicit diatonic if set from chromatic specification
 # if implicit, turing transpose, set to simplifyEnharmonic
@@ -2275,7 +2275,7 @@ class Interval(IntervalBase):
             halfStepsToFix = (-self.chromatic.semitones -
                           interval2.chromatic.semitones)
 
-        #environLocal.printDebug(['self', self, 'halfStepsToFix', halfStepsToFix,
+        # environLocal.printDebug(['self', self, 'halfStepsToFix', halfStepsToFix,
         #    'centsOrigin', centsOrigin, 'interval2', interval2])
 
         if halfStepsToFix != 0:
@@ -2289,7 +2289,7 @@ class Interval(IntervalBase):
                 # just create new pitch, directly setting the pitch space value
                 #pitchAlt = copy.deepcopy(pitch2)
                 #pitchAlt.ps = pitch2.ps + halfStepsToFix
-                #environLocal.printDebug(
+                # environLocal.printDebug(
                 #    'coercing pitch due to a transposition that requires an extreme ' +
                 #    'accidental: %s -> %s' % (pitch2, pitchAlt) )
                 #pitch2 = pitchAlt
@@ -2448,7 +2448,7 @@ class Interval(IntervalBase):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def getWrittenHigherNote(note1, note2):
     '''
     Given two :class:`~music21.note.Note` or :class:`~music21.pitch.Pitch` objects,
@@ -2769,7 +2769,7 @@ def subtract(intervalList):
     #print n1.nameWithOctave, n2.nameWithOctave
     return Interval(noteStart=n1, noteEnd=n2)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -3147,7 +3147,7 @@ class Test(unittest.TestCase):
         self.assertEqual(n2.nameWithOctave, 'F4')
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [notesToChromatic, intervalsToDiatonic,
         intervalFromGenericAndChromatic,
@@ -3161,7 +3161,7 @@ if __name__ == '__main__':
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 
 

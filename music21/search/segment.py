@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         search/segment.py
 # Purpose:      music21 classes for searching via segment matching
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2011-2018 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 tools for segmenting -- that is, dividing up a score into small, possibly overlapping
 sections -- for searching across pieces for similarity.
@@ -398,7 +398,7 @@ def scoreSimilarity(
     #pprint.pprint(similarityScores)
     return similarityScores
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
@@ -407,5 +407,5 @@ if __name__ == "__main__":
     import music21
     music21.mainTest()
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

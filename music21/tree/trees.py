@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         tree/trees.py
 # Purpose:      Subclasses of tree.core.AVLTree for different purposes
 #
@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Tools for grouping elements, timespans, and especially
 pitched elements into kinds of searchable tree organized by start and stop offsets
@@ -32,11 +32,11 @@ environLocal = environment.Environment("tree.trees")
 INFINITY = float('inf')
 NEGATIVE_INFINITY = float('-inf')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class ElementTreeException(exceptions21.TreeException):
     pass
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class ElementTree(core.AVLTree):
     r'''
@@ -179,7 +179,7 @@ class ElementTree(core.AVLTree):
         <music21.instrument.Instrument 'PartA: : '>
 
         >>> scoreTree[-1]
-        <music21.bar.Barline style=final>
+        <music21.bar.Barline type=final>
 
         >>> scoreTree[2000] is None
         True
@@ -199,7 +199,7 @@ class ElementTree(core.AVLTree):
         ...     x
         <music21.instrument.Instrument 'PartA: : '>
                 ...
-        <music21.bar.Barline style=final>
+        <music21.bar.Barline type=final>
 
         These should all be the same as the flat version:
 
@@ -371,8 +371,8 @@ class ElementTree(core.AVLTree):
             <music21.note.Note B>
             <music21.note.Note D#>
             <music21.note.Note C>
-            <music21.bar.Barline style=final>
-            <music21.bar.Barline style=final>
+            <music21.bar.Barline type=final>
+            <music21.bar.Barline type=final>
         '''
         result = []
         result.append(repr(self))
@@ -544,9 +544,9 @@ class ElementTree(core.AVLTree):
         <ElementNode: Start:35.0 <0.20...> Indices:(l:184 *189* r:195)
             Payload:<music21.note.Note A#>>
         <ElementNode: Start:36.0 <0.-5...> Indices:(l:190 *192* r:195)
-            Payload:<music21.bar.Barline style=final>>
+            Payload:<music21.bar.Barline type=final>>
         <ElementNode: Start:36.0 <0.-5...> Indices:(l:193 *194* r:195)
-            Payload:<music21.bar.Barline style=final>>
+            Payload:<music21.bar.Barline type=final>>
         '''
         def recurse(l, globalStartOffset):
             '''
@@ -586,7 +586,7 @@ class ElementTree(core.AVLTree):
 
         >>> scoreTree.getNodeByIndex(-1)
         <ElementNode: Start:End <0.-5...> Indices:(l:19 *19* r:20)
-            Payload:<music21.bar.Barline style=final>>
+            Payload:<music21.bar.Barline type=final>>
 
         >>> scoreTree.getNodeByIndex(slice(2, 5))
         [<ElementNode: Start:0.0 <0.0...> Indices:(l:0 *2* r:4) Payload:<music21.clef.BassClef>>,
@@ -676,9 +676,9 @@ class ElementTree(core.AVLTree):
         <ElementNode: Start:7.0 <0.20...> Indices:(l:15 *17* r:20)
                 Payload:<music21.note.Note C>>
         <ElementNode: Start:End <0.-5...> Indices:(l:18 *18* r:20)
-                Payload:<music21.bar.Barline style=final>>
+                Payload:<music21.bar.Barline type=final>>
         <ElementNode: Start:End <0.-5...> Indices:(l:19 *19* r:20)
-                Payload:<music21.bar.Barline style=final>>
+                Payload:<music21.bar.Barline type=final>>
         '''
         # py 3 only
         # yield from super().__iter__()
@@ -883,7 +883,7 @@ class ElementTree(core.AVLTree):
 
 
 
-#----------------------------------------------------------------
+# ---------------------------------------------------------------
 class OffsetTree(ElementTree):
     '''
     A tree representation where positions are offsets in the score
@@ -940,7 +940,7 @@ class OffsetTree(ElementTree):
         <music21.instrument.Instrument 'PartA: : '>
 
         >>> scoreTree[-1]
-        <music21.bar.Barline style=final>
+        <music21.bar.Barline type=final>
 
         >>> scoreTree[2:5]
         [<music21.clef.BassClef>, <music21.clef.BassClef>, <music21.meter.TimeSignature 2/4>]
@@ -1078,7 +1078,7 @@ class OffsetTree(ElementTree):
                 yield el
 
 
-    #----------static methods ------------------------
+    # ---------static methods ------------------------
     @staticmethod
     def elementEndTime(el, node):
         '''
@@ -1088,7 +1088,7 @@ class OffsetTree(ElementTree):
         '''
         return node.position + el.duration.quarterLength
 
-    #----------public methods ------------------------
+    # ---------public methods ------------------------
     def getPositionFromElementUnsafe(self, el):
         '''
         A quick but dirty method for getting the likely position (or offset) of an element
@@ -1474,8 +1474,8 @@ class OffsetTree(ElementTree):
 
 
 
-#----------------------------------------------------------------
-#------------------------------------------------------------------------------
+# ---------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -1619,7 +1619,7 @@ class Test(unittest.TestCase):
 # #     {1.5} <music21.chord.Chord F#3>
 # #     {2.0} <music21.chord.Chord C#4>
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 _DOC_ORDER = (
@@ -1628,7 +1628,7 @@ _DOC_ORDER = (
     )
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 if __name__ == "__main__":

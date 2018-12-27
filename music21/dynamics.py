@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         dynamics.py
 # Purpose:      Module for dealing with dynamics changes.
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 '''
 Classes and functions for creating and manipulating dynamic symbols. Rather than
@@ -105,14 +105,14 @@ dynamicStrToScalar = {
         }
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class DynamicException(exceptions21.Music21Exception):
     pass
 
 class WedgeException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Dynamic(base.Music21Object):
     '''
     Object representation of Dynamics.
@@ -342,7 +342,7 @@ class Dynamic(base.Music21Object):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class DynamicWedge(spanner.Spanner):
     '''Common base-class for Crescendo and Diminuendo.
     '''
@@ -400,7 +400,7 @@ class Diminuendo(DynamicWedge):
         msg = msg.replace(self._reprHead, '<music21.spanner.Diminuendo ')
         return msg
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
@@ -423,7 +423,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         a.show()
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -513,7 +513,7 @@ class Test(unittest.TestCase):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Dynamic, dynamicStrFromDecimal]
 
@@ -522,6 +522,6 @@ if __name__ == '__main__':
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

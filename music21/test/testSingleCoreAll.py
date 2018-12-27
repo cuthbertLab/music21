@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         test.py
 # Purpose:      Controller for all module tests in music21.
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Controller to run all module tests in the music21 folders.
 
@@ -69,7 +69,7 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
                 unitTestCases.append(moduleObject.Test)
         if not hasattr(moduleObject, 'TestExternal'):
             pass
-            #environLocal.printDebug('%s has no TestExternal class\n' % module)
+            # environLocal.printDebug('%s has no TestExternal class\n' % module)
         else:
             if 'external' in testGroup or 'testExternal' in testGroup:
                 unitTestCases.append(moduleObject.TestExternal)
@@ -127,7 +127,7 @@ def travisMain():
     exit(returnCode)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 if __name__ == '__main__':
     # if optional command line arguments are given, assume they are
     # test group arguments
@@ -136,6 +136,6 @@ if __name__ == '__main__':
     else:
         unused_returnCode = main()
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

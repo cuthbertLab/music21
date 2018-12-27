@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         analysis/neoRiemannian.py
 # Purpose:      Neo-Riemannian Chord Transformations
 #
@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2017-18 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module defines the L, P, and R objects and their
 related transformations as called on a :class:`~music21.chord.Chord`, 
@@ -28,7 +28,7 @@ environLocal = environment.Environment(_MOD)
 
 # TODO: change doctests from passing on exceptions to raising them and trapping them.
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class LRPException(exceptions21.Music21Exception):
     pass
 
@@ -359,7 +359,7 @@ def hexatonicSystem(c):
     
     
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def testNeoRiemannianTransformations(self):
@@ -401,10 +401,10 @@ class Test(unittest.TestCase):
         c7_T = LRP_combinations(c7, 'LP', leftOrdered=True)
         self.assertEqual(str(c7_T), '<music21.chord.Chord C4 E-4 A-4 C5 E-5>')
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 _DOC_ORDER = [L, R, P, LRP_combinations, completeHexatonic, hexatonicSystem, LRPException]
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)

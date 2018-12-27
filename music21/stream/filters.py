@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         stream/filter.py
 # Purpose:      classes for filtering iterators of  streams...
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2008-2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 The filter module contains :class:`~music21.stream.filters.StreamFilter` objects
 which are used by :class:`~music21.stream.iterator.StreamIterator` objects to
@@ -25,7 +25,7 @@ from music21.exceptions21 import Music21Exception
 
 class FilterException(Music21Exception):
     pass
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class StreamFilter:
     '''
@@ -67,7 +67,7 @@ class StreamFilter:
     #def reset(self):
     #    pass
 
-    #---------------------------------------------------------------
+    # --------------------------------------------------------------
     # ProtoM21Object things...
     @property
     def classSet(self):
@@ -447,7 +447,7 @@ class OffsetFilter(StreamFilter):
 
         if self.mustFinishInSpan is True:
             if elementEnd > self.offsetEnd:
-                #environLocal.warn([elementEnd, offsetEnd, e])
+                # environLocal.warn([elementEnd, offsetEnd, e])
                 return False
             if self.includeEndBoundary is False:
                 # we include the end boundary if the search is zeroLength --

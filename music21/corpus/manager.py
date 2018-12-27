@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         corpus/manager.py
 # Purpose:      Manage multiple corpora
 #
@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2009, 2013, 2015-17 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 The manager module handles requests across multiple corpora.  It should be the default
 interface to searching corpora.
@@ -34,7 +34,7 @@ _metadataBundles = {
     # 'virtual': None,
     }
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def fromName(name):
     '''
     Instantiate a specific corpus based on `name`:
@@ -358,7 +358,7 @@ def listSearchFields():
     '''
     return tuple(sorted(metadata.RichMetadata.searchAttributes))
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 if __name__ == '__main__':

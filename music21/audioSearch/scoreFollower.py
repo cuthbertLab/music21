@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         audioSearch.scoreFollower.py
 # Purpose:      Detection of the position in the score in real time
 #
@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 import math
 import unittest
 
@@ -563,7 +563,7 @@ class ScoreFollower:
         return totalLength, lastNotePosition, probabilityHit, END_OF_SCORE
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class TestExternal(unittest.TestCase): # pragma: no cover
@@ -579,7 +579,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         ScF.runScoreFollower(plot=False, useMic=True, seconds=10.0)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 if __name__ == '__main__':
@@ -587,5 +587,5 @@ if __name__ == '__main__':
     music21.mainTest(TestExternal)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

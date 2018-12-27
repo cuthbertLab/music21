@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         romanText/rtObjects.py
 # Purpose:      music21 objects for processing roman numeral analysis text files
 #
@@ -11,7 +11,7 @@
 #
 # Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Translation routines for roman numeral analysis text files, as defined
 and demonstrated by Dmitri Tymoczko.
@@ -50,7 +50,7 @@ reRepeatStopAtom = re.compile(r'\:\|\|')
 reNoChordAtom = re.compile('NC')
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class RomanTextException(exceptions21.Music21Exception):
     pass
@@ -65,7 +65,7 @@ class RTFileException(exceptions21.Music21Exception):
     pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class RTToken:
     '''Stores each linear, logical entity of a RomanText.
@@ -726,7 +726,7 @@ class RTBeat(RTAtom):
         from music21 import meter
         beat = self.getBeatFloatOrFrac()
 
-        #environLocal.printDebug(['using beat value:', beat])
+        # environLocal.printDebug(['using beat value:', beat])
         # TODO: check for exceptions/errors if this beat is bad
         try:
             post = timeSignature.getOffsetFromBeat(beat)
@@ -898,7 +898,7 @@ class RTOptionalKeyOpen(RTAtom):
             keyStr = keyStr.replace(':', '')
             keyStr = keyStr.replace('?', '')
             keyStr = keyStr.replace('(', '')
-            #environLocal.printDebug(['create a key from:', keyStr])
+            # environLocal.printDebug(['create a key from:', keyStr])
             return key.Key(keyStr)
 
 class RTOptionalKeyClose(RTAtom):
@@ -928,7 +928,7 @@ class RTOptionalKeyClose(RTAtom):
             keyStr = keyStr.replace(':', '')
             keyStr = keyStr.replace('?', '')
             keyStr = keyStr.replace(')', '')
-            #environLocal.printDebug(['create a key from:', keyStr])
+            # environLocal.printDebug(['create a key from:', keyStr])
             return key.Key(keyStr)
 
 
@@ -1018,7 +1018,7 @@ class RTRepeatStop(RTRepeat):
         return '<RTRepeatStop %r>' % self.src
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class RTHandler:
 
@@ -1176,7 +1176,7 @@ class RTHandler:
         # break into lines
         lines = src.split('\n')
         linesHeader, linesBody = self.splitAtHeader(lines)
-        #environLocal.printDebug([linesHeader])
+        # environLocal.printDebug([linesHeader])
         self._tokens += self.tokenizeHeader(linesHeader)
         self._tokens += self.tokenizeBody(linesBody)
 
@@ -1281,7 +1281,7 @@ class RTHandler:
 
         return post
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # access tokens
 
     def _getTokens(self):
@@ -1309,7 +1309,7 @@ class RTHandler:
         return rth
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class RTFile:
     '''
@@ -1376,7 +1376,7 @@ class RTFile:
         return handler
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
     def runTest(self):
@@ -1518,7 +1518,7 @@ class Test(unittest.TestCase):
         self.assertEqual(count, 1)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 #_DOC_ORDER = []
 
@@ -1527,5 +1527,5 @@ if __name__ == "__main__":
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

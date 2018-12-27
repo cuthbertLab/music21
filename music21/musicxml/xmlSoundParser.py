@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         musicxml/xmlSoundParser.py
 # Purpose:      Translate the <sound> tag to music21
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Methods for converting <sound> tag to the many different music21
 objects that this tag might represent.

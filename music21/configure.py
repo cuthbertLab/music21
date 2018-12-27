@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         configure.py
 # Purpose:      Installation and Configuration Utilties
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import os
 import re
 import time
@@ -40,7 +40,7 @@ environLocal = environment.Environment(_MOD)
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # match finale name, which may be directory or something else
 reFinaleApp = re.compile(r'Finale.*.app',
                          re.IGNORECASE) # @UndefinedVariable
@@ -61,7 +61,7 @@ urlMusic21List = 'http://groups.google.com/group/music21list'
 
 LINE_WIDTH = 78
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # class Action(threading.Thread):
 #     '''
 #     A thread-based action for performing remote actions, like downloading
@@ -75,7 +75,7 @@ LINE_WIDTH = 78
 #         pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 
@@ -257,7 +257,7 @@ def findSetup():
     return match
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # error objects, not exceptions
 class DialogError:
     '''
@@ -302,11 +302,11 @@ class BadConditions(DialogError):
         super().__init__(src=src)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class DialogException(exceptions21.Music21Exception, DialogError):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Dialog:
     '''
     Model a dialog as a question and response. Have different subclases for
@@ -330,7 +330,7 @@ class Dialog:
         # parse the default to permit expressive flexibility
         defaultCooked = self._parseUserInput(default)
         # if not any class of error:
-        #environLocal.printDebug(['Dialog: defaultCooked:', defaultCooked])
+        # environLocal.printDebug(['Dialog: defaultCooked:', defaultCooked])
 
         if not isinstance(defaultCooked, DialogError):
             self._default = defaultCooked
@@ -548,7 +548,7 @@ class Dialog:
                 rawInput = force
 
             # rawInput here could be an error or a value
-            #environLocal.printDebug(['received as rawInput', rawInput])
+            # environLocal.printDebug(['received as rawInput', rawInput])
             # check for errors and handle
             if isinstance(rawInput, KeyInterruptError):
                 # set as result KeyInterruptError
@@ -559,7 +559,7 @@ class Dialog:
             # will be handled in evaluation
             # pylint: disable=assignment-from-no-return
             cookedInput = self._evaluateUserInput(rawInput) 
-            #environLocal.printDebug(['post _evaluateUserInput() cookedInput', cookedInput])
+            # environLocal.printDebug(['post _evaluateUserInput() cookedInput', cookedInput])
 
             # if no default and no input, we get here (default supplied in
             # evaluate
@@ -620,7 +620,7 @@ class Dialog:
                 raise DialogException('perform action raised a dialog exception')
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class AnyKey(Dialog):
     '''
     Press any key to continue
@@ -649,7 +649,7 @@ class AnyKey(Dialog):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class YesOrNo(Dialog):
     '''
     Ask a yes or no question.
@@ -775,7 +775,7 @@ class YesOrNo(Dialog):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class AskOpenInBrowser(YesOrNo):
     '''
     Ask the user if the want to open a URL in a browser.
@@ -950,7 +950,7 @@ class AskSendInstallationReport(YesOrNo):
                 print('Could not open your mail program.  Sorry!')
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class SelectFromList(Dialog):
     '''
     General class to select values from a list.
@@ -1079,7 +1079,7 @@ class SelectFromList(Dialog):
 
         >>> d = configure.SelectFromList()
         '''
-        #environLocal.printDebug(['SelectFromList', '_parseUserInput', 'raw', raw])
+        # environLocal.printDebug(['SelectFromList', '_parseUserInput', 'raw', raw])
         if raw is None:
             return NoInput()
         if raw == '':
@@ -1438,7 +1438,7 @@ class SelectMusicXMLReader(SelectFilePath):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ConfigurationAssistant:
     '''
     Class for managing numerous configuration tasks.
@@ -1558,7 +1558,7 @@ class ConfigurationAssistant:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # for time-out gather of arguments: possibly look at:
 # http://code.activestate.com/recipes/576780/
 # http://www.garyrobinson.net/2009/10/non-blocking-raw_input-for-python.html
@@ -1617,7 +1617,7 @@ class ConfigurationAssistant:
 #         print ('got: %s' % post)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
@@ -1821,6 +1821,6 @@ if __name__ == '__main__':
         elif hasattr(t, sys.argv[1]):
             getattr(t, sys.argv[1])()
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

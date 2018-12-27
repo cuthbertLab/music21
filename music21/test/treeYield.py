@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         treeYield.py
 # Purpose:      traverse a complex datastructure and yield elements
 #               that fit a given criteria
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert
 # License:      CC-BY (see StackOverflow link below)
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # http://stackoverflow.com/questions/12611337/
 #     recursively-dir-a-python-object-to-find-values-of-a-certain-type-or-with-a-cer
 

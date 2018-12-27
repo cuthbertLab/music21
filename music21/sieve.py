@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         sieve.py
 # Purpose:      sieve operations, after Iannis Xenakis.
 #
@@ -8,7 +8,7 @@
 # Copyright:    Copyright © 2003, 2010 Christopher Ariza
 #               Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 A comprehensive, object model of the Xenakis Sieve. :class:`music21.sieve.Sieve`
 objects can be created from high-level string notations, and used to generate line segments
@@ -65,7 +65,7 @@ _MOD = 'sieve'
 environLocal = environment.Environment(_MOD)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class UnitException(exceptions21.Music21Exception):
     pass
 
@@ -92,7 +92,7 @@ RESIDUAL = list(string.digits) + ['@']
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # from
 # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/117119
 # David Eppstein, UC Irvine, 28 Feb 2002
@@ -231,7 +231,7 @@ def rabinMiller(n):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # list processing and unit interval routines
 # possible move to common.py if used elsewhere
 
@@ -396,7 +396,7 @@ def unitNormStep(step, a=0, b=1, normalized=True):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # note: some of these methods are in common, though they are slightly different algorithms;
 # need to test for compatibility
 
@@ -497,7 +497,7 @@ def _meziriac(c1, c2):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class PrimeSegment:
     def __init__(self, start, length):
         '''
@@ -593,7 +593,7 @@ class PrimeSegment:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Residual:
     '''
     object that represents a modulus and a start point
@@ -621,7 +621,7 @@ class Residual:
         self._segmentFormatOptions = ['int', 'bin', 'unit', 'wid']
         self._segmentFormat = 'int'
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # utility functions
     def setZ(self, z):
         '''
@@ -643,7 +643,7 @@ class Residual:
             raise ResidualException('format not in format options: %s' % fmt)
         self._segmentFormat = fmt
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def segment(self, n=0, z=None, segmentFormat=None):
         '''
         get a residual subset of this modulus at this n
@@ -701,7 +701,7 @@ class Residual:
         '''
         return self._m
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def copy(self):
         # TODO: replace with deepcopy method
         m = copy.copy(self._m)
@@ -841,7 +841,7 @@ class Residual:
         pass
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _cmpIntersection(self, m1, m2, n1, n2):
         '''
         compression by intersection
@@ -874,7 +874,7 @@ class Residual:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class CompressionSegment:
     '''
     Utility to convert from a point sequence to sieve.
@@ -942,7 +942,7 @@ class CompressionSegment:
             zMin, zMax = self._match[0], self._match[-1]
             self._z = list(range(zMin, (zMax + 1)))
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def __call__(self):
         '''
 
@@ -963,7 +963,7 @@ class CompressionSegment:
             resStr = '|'.join(resStr)
         return resStr
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _subset(self, sub, thisSet):
         '''
         True if sub is part of set; assumes no redundancies in each
@@ -1025,7 +1025,7 @@ class CompressionSegment:
         self._residuals.sort()
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # http://docs.python.org/lib/set-objects.html
 # set object precedence is places & before |
@@ -1101,7 +1101,7 @@ class Sieve:
         if self._usrStr is not None:
             self._load()
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _load(self):
         if common.isListLike(self._usrStr):
             self._resClear()
@@ -1159,7 +1159,7 @@ class Sieve:
             self._expPeriod = lcmExp
             self._cmpPeriod = _lcmRecurse(mListCmp)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def expand(self):
         '''
         Set this Sieve to its expanded state.
@@ -1180,7 +1180,7 @@ class Sieve:
             self._state = 'cmp'
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _getParameterData(self):
         '''
         Provides a dictionary data representation for exchange
@@ -1193,7 +1193,7 @@ class Sieve:
             data['z'] = self._z
         return data
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # utility functions
     def setZ(self, z):
         '''
@@ -1217,7 +1217,7 @@ class Sieve:
         self._segmentFormat = fmt
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # operator overloading for sieves
     # problem: redunant parenthesis are not removed
 
@@ -1288,7 +1288,7 @@ class Sieve:
 
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # string conversions
     def _parseResidual(self, usrStr):
         '''
@@ -1385,7 +1385,7 @@ class Sieve:
         usrStr = usrStr.replace(' ', '')
         return usrStr
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _setInstantiateStr(self, valList):
         '''
         return string necessary to instantiate a set object.
@@ -1494,7 +1494,7 @@ class Sieve:
         elif state == 'exp':
             raise SieveException('expanded residual classes shold never be cleared')
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # expansion methods
 
     def _initLoadSegment(self, usrData):
@@ -1605,7 +1605,7 @@ class Sieve:
         self._expTree = ''.join(self._expTree)
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # compression methods
     def _cmpIntersection(self):
         '''
@@ -1657,7 +1657,7 @@ class Sieve:
 
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     def segment(self, state=None, n=0, z=None, segmentFormat=None):
         '''
@@ -1830,7 +1830,7 @@ class Sieve:
     def __str__(self):
         return self.represent()
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # high level utility obj
 
 class PitchSieve:
@@ -1875,7 +1875,7 @@ class PitchSieve:
             self.eld = float(eld)
         else:
             self.eld = eld
-        #environLocal.printDebug(['PitchSieve', eld])
+        # environLocal.printDebug(['PitchSieve', eld])
 
 
     def __call__(self):
@@ -1995,7 +1995,7 @@ class PitchSieve:
         post = []
         #value = 0
         for i, width in enumerate(widthSegments):
-            #environLocal.printDebug(['stepStart', stepStart, 'stepEnd', stepEnd])
+            # environLocal.printDebug(['stepStart', stepStart, 'stepEnd', stepEnd])
             intervalObj = interval.Interval(width * self.eld)
             post.append(intervalObj)
 
@@ -2014,7 +2014,7 @@ class PitchSieve:
 #                 stepEnd = integerSteps[i + 1]
 #             else:
 #                 break
-#             #environLocal.printDebug(['stepStart', stepStart, 'stepEnd', stepEnd])
+#             # environLocal.printDebug(['stepStart', stepStart, 'stepEnd', stepEnd])
 #             intervalObj = interval.Interval(stepEnd-stepStart)
 #             post.append(intervalObj)
 #
@@ -2025,7 +2025,7 @@ class PitchSieve:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -2062,7 +2062,7 @@ class Test(unittest.TestCase):
                  (1, 6, 11, 16, 17),
                     ]
         for arg in testArgs:
-            #environLocal.printDebug(['testSieveParse', arg])
+            # environLocal.printDebug(['testSieveParse', arg])
             testObj = Sieve(arg)
             dummy = testObj(0, list(range(30)))
 
@@ -2165,12 +2165,12 @@ class Test(unittest.TestCase):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
@@ -2178,5 +2178,5 @@ if __name__ == '__main__':
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

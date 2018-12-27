@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         graph/axis.py
 # Purpose:      Classes for extracting one dimensional data for graphs
 #
@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2009-2012, 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Definitions for extracting data from a Stream to place on one axis of a
 :class:`~music21.graph.plot.PlotStream` or similar object.
@@ -284,7 +284,7 @@ class Axis:
         '''
         pass
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class PitchAxis(Axis):
     '''
     Axis subclass for dealing with Pitches
@@ -335,7 +335,7 @@ class PitchAxis(Axis):
         D4
         E♭4
         '''
-        #environLocal.printDebug(['calling filterPitchLabel', ticks])
+        # environLocal.printDebug(['calling filterPitchLabel', ticks])
         # this uses tex mathtext, which happens to define sharp and flat
         #http://matplotlib.org/users/mathtext.html
         post = []
@@ -723,7 +723,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
 #         '''
 #         return self._pitchTickHelper('nameWithOctave', 'diatonicNoteNum')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class PositionAxis(Axis):
     '''
     Axis subclass for dealing with Positions
@@ -865,14 +865,14 @@ class OffsetAxis(PositionAxis):
         if self.useMeasures:
             return self._measureTicks(self.minValue, self.maxValue, offsetMap)
         else: # generate numeric ticks
-            #environLocal.printDebug(['using offsets for offset ticks'])
+            # environLocal.printDebug(['using offsets for offset ticks'])
             # get integers for range calculation
             ticks = [] # a list of graphed value, string label pairs
             oMin = int(math.floor(self.minValue))
             oMax = int(math.ceil(self.maxValue))
             for i in range(oMin, oMax + 1, self.offsetStepSize):
                 ticks.append((i, '%s' % i))
-                #environLocal.printDebug(['ticksOffset():', 'final ticks', ticks])
+                # environLocal.printDebug(['ticksOffset():', 'final ticks', ticks])
             return ticks
 
     def _measureTicks(self, dataMin, dataMax, offsetMap):
@@ -880,7 +880,7 @@ class OffsetAxis(PositionAxis):
         helper method for ticks() just to pull out code.
         '''
         ticks = []
-        #environLocal.printDebug(['using measures for offset ticks'])
+        # environLocal.printDebug(['using measures for offset ticks'])
         # store indices in offsetMap
         mNoToUse = []
         sortedKeys = list(offsetMap.keys())
@@ -893,7 +893,7 @@ class OffsetAxis(PositionAxis):
                 # assume we can get the first Measure in the lost if
                 # measurers; this may not always be True
                 mNoToUse.append(key)
-        #environLocal.printDebug(['ticksOffset():', 'mNotToUse', mNoToUse])
+        # environLocal.printDebug(['ticksOffset():', 'mNotToUse', mNoToUse])
 
         # just get the min and the max
         if self.minMaxMeasureOnly:
@@ -1199,7 +1199,7 @@ class OffsetEndAxis(OffsetAxis):
 
         return (off, useQL)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class DynamicsAxis(Axis):
     '''
     Axis subclass for dealing with Dynamics
@@ -1242,7 +1242,7 @@ class DynamicsAxis(Axis):
             ticks.append((i, r'$%s$' % dynamics.shortNames[i]))
         return ticks
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class CountingAxis(Axis):
     '''
     Axis subclass for counting data in another Axis.
@@ -1320,7 +1320,7 @@ class CountingAxis(Axis):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def testCountingAxisFormat(self):
@@ -1341,7 +1341,7 @@ class Test(unittest.TestCase):
                          [(1, 2, {}), (2, 2, {'color': 'red'}),
                           (3, 2, {}), (4, 2, {'color': 'red'})])
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)

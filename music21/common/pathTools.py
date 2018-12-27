@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         common/pathTools.py
 # Purpose:      Utilities for paths
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 __all__ = [
            'getRootFilePath',
            'getSourceFilePath',
@@ -23,7 +23,7 @@ import inspect
 import os
 import pathlib
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def getSourceFilePath():
     '''
     Get the music21 directory that contains source files such as note.py, etc..

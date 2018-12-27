@@ -160,11 +160,11 @@ __all__ = [
     'volume',
     ]
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # for sub packages, need to manually add the modules in these subpackages
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # base Music21Object -- all objects should inherit from this!
 from music21 import base
 
@@ -185,10 +185,10 @@ __version__ = VERSION_STR
 # legacy reason why it's here...
 from music21.test.testRunner import mainTest
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # this brings all of our own __all__ names into the music21 package namespace
 # pylint: disable=wildcard-import
 from music21 import * # @UnresolvedImport 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

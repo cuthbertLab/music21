@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         alpha/analysis/aligner.py
 # Purpose:      A general aligner that tries its best to align two streams
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 from collections import Counter
 import enum
 import operator

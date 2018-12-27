@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         editorial.py
 # Purpose:      music21 classes for representing notes
 #
@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2008-2015 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Editorial objects store comments and other meta-data associated with specific
 :class:`~music21.note.Note` objects or other music21 objects.
@@ -18,7 +18,7 @@ import unittest
 from music21 import exceptions21
 from music21 import style
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class EditorialException(exceptions21.Music21Exception):
@@ -28,7 +28,7 @@ class CommentException(exceptions21.Music21Exception):
     pass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class Editorial(dict):
     '''
     Editorial comments and special effects that can be applied to music21 objects.
@@ -111,7 +111,7 @@ class Editorial(dict):
         else:
             raise AttributeError("No such attribute: " + name)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class Comment(style.StyleMixin):
     '''
     A comment or footnote or something else attached to a note.
@@ -142,7 +142,7 @@ class Comment(style.StyleMixin):
         else:
             return head + "'" + self.text[:17] + "...' " + end
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -176,7 +176,7 @@ class Test(unittest.TestCase):
                 self.assertIsNot(b, None)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 _DOC_ORDER = (

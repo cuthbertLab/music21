@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         features/base.py
 # Purpose:      Feature extractors base classes.
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2011-2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import os
 import pathlib
 import pickle
@@ -29,7 +29,7 @@ from music21 import environment
 _MOD = 'features.base'
 environLocal = environment.Environment(_MOD)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class FeatureException(exceptions21.Music21Exception):
     pass
 
@@ -116,7 +116,7 @@ class Feature:
         self.vector = temp
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class FeatureExtractorException(exceptions21.Music21Exception):
     pass
 
@@ -158,7 +158,7 @@ class FeatureExtractor:
         if dataOrStream is not None:
             if (hasattr(dataOrStream, 'classes') and 'Stream' in
                 dataOrStream.classes):
-                #environLocal.printDebug(['creating new DataInstance: this should be a Stream:',
+                # environLocal.printDebug(['creating new DataInstance: this should be a Stream:',
                 #     dataOrStream])
                 # if we are passed a stream, create a DataInstance to
                 # manage the
@@ -265,7 +265,7 @@ class FeatureExtractor:
         return f
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class StreamForms:
     '''
     A dictionary-like wrapper of a Stream, providing
@@ -379,7 +379,7 @@ class StreamForms:
                     except AttributeError:
                         pass # problem with not having midi
         return histo
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
     def formPartitionByInstrument(self, prepared):
         from music21 import instrument
         return instrument.partitionByInstrument(prepared)
@@ -483,7 +483,7 @@ class StreamForms:
                         psNext = nNext.pitch.midi
 
                     cList.append(psNext - ps)
-        #environLocal.printDebug(['contourList', cList])
+        # environLocal.printDebug(['contourList', cList])
         return cList
 
     def formSecondsMap(self, prepared):
@@ -531,7 +531,7 @@ class StreamForms:
        'beatHistogram': formBeatHistogram,
     }
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class DataInstance:
     '''
     A data instance for analysis. This object prepares a Stream
@@ -704,7 +704,7 @@ class DataInstance:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class DataSetException(exceptions21.Music21Exception):
     pass
 
@@ -1136,7 +1136,7 @@ def allFeaturesAsList(streamInput):
     return allData
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def extractorsById(idOrList, library=('jSymbolic', 'native')):
     '''
     Given one or more :class:`~music21.features.FeatureExtractor` ids, return the
@@ -1267,7 +1267,7 @@ def getIndex(featureString, extractorType=None):
         return None
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1469,7 +1469,7 @@ class Test(unittest.TestCase):
 
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # silent tests
 
 
@@ -1831,7 +1831,7 @@ def _pickleFunctionNumPitches(bachStream):
     '''
     return len(bachStream.pitches)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [DataSet, Feature, FeatureExtractor]
 
@@ -1841,5 +1841,5 @@ if __name__ == '__main__':
     music21.mainTest(Test) #, runTest='testStreamFormsA')
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

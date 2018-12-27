@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         instrument.py
 # Purpose:      Class for basic instrument information
 #
@@ -11,7 +11,7 @@
 #
 # Copyright:    Copyright © 2009-2012, 17 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module represents instruments through objects that contain general information
 such as Metadata for instrument names, classifications, transpositions and default
@@ -211,7 +211,7 @@ class Instrument(base.Music21Object):
         Force a unique id by using an MD5
         '''
         idNew = 'P%s' % common.getMd5()
-        #environLocal.printDebug(['incrementing instrument from',
+        # environLocal.printDebug(['incrementing instrument from',
         #                         self.partId, 'to', idNew])
         self.partId = idNew
         self._partIdIsRandom = True
@@ -221,7 +221,7 @@ class Instrument(base.Music21Object):
         Force a unique id by using an MD5
         '''
         idNew = 'I%s' % common.getMd5()
-        #environLocal.printDebug(['incrementing instrument from',
+        # environLocal.printDebug(['incrementing instrument from',
         #                         self.partId, 'to', idNew])
         self.instrumentId = idNew
         self._instrumentIdIsRandom = True
@@ -287,7 +287,7 @@ class Instrument(base.Music21Object):
             #            'was not already detected PROGRAM BUG!')
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class KeyboardInstrument(Instrument):
 
     def __init__(self):
@@ -351,7 +351,7 @@ class Celesta(KeyboardInstrument):
         self.midiProgram = 8
         self.instrumentSound = 'keyboard.celesta'
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Organ(Instrument):
     def __init__(self):
         super().__init__()
@@ -418,7 +418,7 @@ class Harmonica(Instrument):
         self.highestNote = pitch.Pitch('C6')
 
 
-#------------------------------------------------------
+# -----------------------------------------------------
 class StringInstrument(Instrument):
 
     def __init__(self):
@@ -682,7 +682,7 @@ class Koto(StringInstrument):
         self.instrumentSound = 'pluck.koto'
         self.midiProgram = 107
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class WoodwindInstrument(Instrument):
     def __init__(self):
         super().__init__()
@@ -905,7 +905,7 @@ class Shehnai(WoodwindInstrument):
         self.instrumentSound = 'wind.reed.shenai'
         self.midiProgram = 111
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class BrassInstrument(Instrument):
     def __init__(self):
@@ -977,7 +977,7 @@ class Tuba(BrassInstrument):
 
         self.lowestNote = pitch.Pitch('E-2')
         
-#-------------
+# ------------
 
 class Percussion(Instrument):
     def __init__(self):
@@ -1500,7 +1500,7 @@ class WindMachine(UnpitchedPercussion):
         #TODO: self.instrumentAbbreviation = ''
         self.instrumentSound = 'effect.wind'
 
-#------------------------------------------------------
+# -----------------------------------------------------
 
 class Vocalist(Instrument):
     '''
@@ -1561,7 +1561,7 @@ class Bass(Vocalist):
         self.instrumentAbbreviation = 'B'
         self.instrumentSound = 'voice.bass'
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 ensembleNamesBySize = ['no performers', 'solo', 'duet', 'trio', 'quartet',
                        'quintet', 'sextet', 'septet', 'octet', 'nonet', 'dectet',
@@ -1687,7 +1687,7 @@ def partitionByInstrument(streamObj):
             {3.0} <music21.note.Note C>
         {8.0} <music21.stream.Measure 3 offset=8.0>
             {0.0} <music21.note.Note C>
-            {4.0} <music21.bar.Barline style=final>
+            {4.0} <music21.bar.Barline type=final>
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.instrument.Trombone 'Trombone'>
@@ -1706,7 +1706,7 @@ def partitionByInstrument(streamObj):
             {3.0} <music21.note.Note C#>
         {8.0} <music21.stream.Measure 3 offset=8.0>
             {0.0} <music21.note.Note C#>
-            {4.0} <music21.bar.Barline style=final>
+            {4.0} <music21.bar.Barline type=final>
 
     >>> s2 = instrument.partitionByInstrument(s)
     >>> len(s2.parts)
@@ -1739,7 +1739,7 @@ def partitionByInstrument(streamObj):
             {3.0} <music21.note.Note C>
         {8.0} <music21.stream.Measure 3 offset=8.0>
             {0.0} <music21.note.Note C>
-            {4.0} <music21.bar.Barline style=final>
+            {4.0} <music21.bar.Barline type=final>
     {0.0} <music21.stream.Part Alto Saxophone>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.instrument.AltoSaxophone 'Alto Saxophone'>
@@ -1753,7 +1753,7 @@ def partitionByInstrument(streamObj):
             {0.0} <music21.note.Note G>
             {1.0} <music21.note.Note A>
             {2.0} <music21.note.Note B>
-            {3.0} <music21.bar.Barline style=final>
+            {3.0} <music21.bar.Barline type=final>
     {0.0} <music21.stream.Part Trombone>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.instrument.Trombone 'Trombone'>
@@ -1770,7 +1770,7 @@ def partitionByInstrument(streamObj):
             {3.0} <music21.note.Note C#>
         {8.0} <music21.stream.Measure 3 offset=8.0>
             {0.0} <music21.note.Note C#>
-            {4.0} <music21.bar.Barline style=final>
+            {4.0} <music21.bar.Barline type=final>
 
 
     TODO: parts should be in Score Order. Coincidence that this almost works.
@@ -1992,7 +1992,7 @@ def fromString(instrumentString):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
@@ -2134,7 +2134,7 @@ class Test(unittest.TestCase):
         self.assertEqual(post.parts[3].getInstrument().instrumentName, 'Flute')
         self.assertEqual(len(post.parts[3].notes), 4)
 
-        #environLocal.printDebug(['post processing'])
+        # environLocal.printDebug(['post processing'])
         #post.show('t')
 
 
@@ -2173,7 +2173,7 @@ class Test(unittest.TestCase):
         self.assertEqual([n.offset for n in post.parts[0].notes],
                          [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 9.0, 10.0, 11.0, 12.0, 13.0])
 
-        #environLocal.printDebug(['post processing'])
+        # environLocal.printDebug(['post processing'])
         #post.show('t')
 
 
@@ -2231,7 +2231,7 @@ class Test(unittest.TestCase):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Instrument]
 
@@ -2243,6 +2243,6 @@ if __name__ == '__main__':
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

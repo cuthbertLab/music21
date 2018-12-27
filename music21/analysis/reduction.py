@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         reduction.py
 # Purpose:      Tools for creating a score reduction.
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2011-2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Tools for generation reduction displays, showing a score and or a chord reduction,
 and one or more reductive representation lines.
@@ -35,7 +35,7 @@ environLocal = environment.Environment(_MOD)
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ReductiveEventException(exceptions21.Music21Exception):
     pass
 
@@ -181,7 +181,7 @@ class ReductiveNote:
                 elif nhf == 'no':
                     nhf = False
                 n.noteheadFill = nhf
-                #environLocal.printDebug(['set nothead fill:', n.noteheadFill])
+                # environLocal.printDebug(['set nothead fill:', n.noteheadFill])
         if 'textBelow' in self._parameters:
             n.addLyric(self._parameters['textBelow'])
         if 'textAbove' in self._parameters:
@@ -189,7 +189,7 @@ class ReductiveNote:
         return n, te
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ScoreReductionException(exceptions21.Music21Exception):
     pass
 
@@ -295,7 +295,7 @@ class ScoreReduction:
             # store measure index
             rn = ReductiveNote(l.text, n, infoDict['measureIndex'], offset)
             if rn.isParsed():
-                #environLocal.printDebug(['parsing reductive note', rn])
+                # environLocal.printDebug(['parsing reductive note', rn])
                 # use id, lyric text as hash
                 key = str(id(n)) + l.text
                 self._reductiveNotes[key] = rn
@@ -362,7 +362,7 @@ class ScoreReduction:
             # TODO: insert into note or chord
             for unused_key, rn in self._reductiveNotes.items():
                 if oneGroup or rn['group'] == gName:
-                    #environLocal.printDebug([
+                    # environLocal.printDebug([
                     #  '_createReduction(): found reductive note, rn', rn, 'group', gName])
                     gMeasure = gMeasures[rn.measureIndex]
                     if not gMeasure.voices: # common setup routines
@@ -425,11 +425,11 @@ class ScoreReduction:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class PartReductionException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class PartReduction:
     '''
     A part reduction reduces a Score into one or more parts.
@@ -498,7 +498,7 @@ class PartReduction:
         for p in self._score.parts:
             if not p.hasMeasures():
                 self._fillByMeasure = False
-                #environLocal.printDebug(['overriding fillByMeasure as no measures are defined'])
+                # environLocal.printDebug(['overriding fillByMeasure as no measures are defined'])
                 break
 
     def _createPartBundles(self):
@@ -513,7 +513,7 @@ class PartReduction:
                 name, pColor, matches = d['name'], d['color'], d['match']
                 sub = []
                 for p in self._score.parts:
-                    #environLocal.printDebug(['_createPartBundles: part.id', p.id])
+                    # environLocal.printDebug(['_createPartBundles: part.id', p.id])
                     # if matches is None, use group name
                     if matches is None:
                         matches = [name]
@@ -570,7 +570,7 @@ class PartReduction:
                 partMeasures = []
                 for p in parts:
                     partMeasures.append(p.getElementsByClass('Measure').stream())
-                #environLocal.printDebug(['partMeasures', partMeasures])
+                # environLocal.printDebug(['partMeasures', partMeasures])
                 # assuming that all parts have same number of measures
                 # iterate over each measures
                 # iLast = len(partMeasures[0]) - 1
@@ -582,7 +582,7 @@ class PartReduction:
                         if p[i].iter.notes:
                             active = True
                             break
-                    #environLocal.printDebug([i, 'active', active])
+                    # environLocal.printDebug([i, 'active', active])
                     if not active:
                         continue
                     # get offset, or start, of this measure
@@ -630,7 +630,7 @@ class PartReduction:
                 # a None in the resulting list designates a rest
                 noteSrc = eSrc.findConsecutiveNotes()
                 for i, e in enumerate(noteSrc):
-                    #environLocal.printDebug(['i, e', i, e])
+                    # environLocal.printDebug(['i, e', i, e])
                     # if this event is a rest, e is None
                     if e is None:
                         if eStart is None: # the first event is a rest
@@ -662,7 +662,7 @@ class PartReduction:
                         if eStart is None:
                             eStart = e.getOffsetBySite(eSrc)
                         eLast = e
-            #environLocal.printDebug(['dataEvents', dataEvents])
+            # environLocal.printDebug(['dataEvents', dataEvents])
             self._eventSpans[pGroupId] = dataEvents
 
 
@@ -711,7 +711,7 @@ class PartReduction:
                         w = None
                     else:
                         w = targetToWeight(match)
-                    #environLocal.printDebug(['segment weight', w])
+                    # environLocal.printDebug(['segment weight', w])
                     ds['weight'] = w
         else:
             for partBundle in self._partBundles:
@@ -726,7 +726,7 @@ class PartReduction:
                     match = flatRef.getElementsByOffset(offsetStart, offsetEnd,
                         includeEndBoundary=True, mustFinishInSpan=False,
                         mustBeginInSpan=True).getElementsByClass(target).stream()
-                    #environLocal.printDebug(['matched elements', target, match])
+                    # environLocal.printDebug(['matched elements', target, match])
                     # extend duration of all found dynamics
                     match.extendDuration(target, inPlace=True)
                     #match.show('t')
@@ -749,7 +749,7 @@ class PartReduction:
                         # thus, span needs to be distance to end of regions
                         if targetSpan <= 0.001:
                             targetSpan = offsetEnd - targetStart
-                        #environLocal.printDebug([t, 'targetSpan', targetSpan,
+                        # environLocal.printDebug([t, 'targetSpan', targetSpan,
                         #  'offsetEnd', offsetEnd, "ds['span']", ds['span']])
 
                         if i==0 and ds['eStart'] == targetStart:
@@ -796,7 +796,7 @@ class PartReduction:
                 if i == 0: # cannot extend first
                     if ds['weight'] is None: # this is an error in the rep
                         ds['weight'] = minValue
-                        #environLocal.printDebug([
+                        # environLocal.printDebug([
                         #  'cannnot extend a weight: no previous weight defined'])
                     else:
                         lastWeight = ds['weight']
@@ -808,7 +808,7 @@ class PartReduction:
                     # do not have a list; mist set to min
                     elif ds['weight'] is None and lastWeight is None:
                         ds['weight'] = minValue
-                        #environLocal.printDebug([
+                        # environLocal.printDebug([
                         #  'cannnot extend a weight: no previous weight defined'])
 #         environLocal.printDebug(['_extendSpans: post'])
 #         for partBundle in self._partBundles:
@@ -874,7 +874,7 @@ class PartReduction:
             data.append((partBundle['pGroupId'], dataList))
         return data
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1295,7 +1295,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
     def testPartReductionB(self):
         t = Test()
         t.testPartReductionB(show=True)
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
@@ -1304,7 +1304,7 @@ if __name__ == "__main__":
     music21.mainTest(Test) #, runTest='testPartReductionSchoenberg')
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 
 

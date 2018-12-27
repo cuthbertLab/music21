@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         corpus/testCorpus.py
 # Purpose:      testing for the corpus
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import re
 import unittest
 
@@ -39,7 +39,7 @@ class Test(unittest.TestCase):
             keyStream = s.parts[0].flat.getElementsByClass(key.KeySignature)
             keyObj = keyStream[0]
             keyObjs.append(keyObj)
-            #environLocal.printDebug([keyObj])
+            # environLocal.printDebug([keyObj])
         self.assertEqual(len(keyObjs), 5)
 
     def testEssenImport(self):
@@ -226,5 +226,5 @@ if __name__ == '__main__':
     music21.mainTest('noDocTest',Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

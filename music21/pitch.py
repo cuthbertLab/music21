@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         pitch.py
 # Purpose:      music21 classes for representing pitches
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2008-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Classes for representing and manipulating pitches, pitch-space, and accidentals.
 
@@ -109,7 +109,7 @@ def _sortModifiers():
 accidentalModifiersSorted = _sortModifiers()
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # utility functions
 
 def _convertPitchClassToNumber(ps):
@@ -175,7 +175,7 @@ def _convertPsToOct(ps):
     5
 
     '''
-    #environLocal.printDebug(['_convertPsToOct: input', ps])
+    # environLocal.printDebug(['_convertPsToOct: input', ps])
     ps = round(ps, PITCH_SPACE_SIG_DIGITS)
     return int(math.floor(ps / 12.)) - 1
 
@@ -233,7 +233,7 @@ def _convertPsToStep(ps):
     # micro here will be between 0 and 1
     pc, micro = divmod(pcReal, 1)
 
-    #environLocal.printDebug(['_convertPsToStep(): post divmod',  'ps', repr(ps),
+    # environLocal.printDebug(['_convertPsToStep(): post divmod',  'ps', repr(ps),
     #    'pcReal', repr(pcReal), 'pc', repr(pc), 'micro', repr(micro)])
 
     # if close enough to a quarter tone
@@ -263,7 +263,7 @@ def _convertPsToStep(ps):
 
     pc = int(pc)
 
-    #environLocal.printDebug(['_convertPsToStep(): post', 'alter', alter,
+    # environLocal.printDebug(['_convertPsToStep(): post', 'alter', alter,
     #    'micro', micro, 'pc', pc])
 
     octShift = 0
@@ -400,7 +400,7 @@ def _convertHarmonicToCents(value):
         value = 1 / (abs(value))
     return round(1200 * math.log(value, 2))
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True, triadAward=True):
     r'''
@@ -542,7 +542,7 @@ def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=
 
     return simplifiedPitches
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class AccidentalException(exceptions21.Music21Exception):
     pass
@@ -556,7 +556,7 @@ class MicrotoneException(exceptions21.Music21Exception):
     pass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Microtone(SlottedObjectMixin):
@@ -1130,7 +1130,7 @@ class Accidental(style.StyleMixin):
             return False
         return True
 
-    #--------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # main properties
 
     def _getName(self):
@@ -1311,7 +1311,7 @@ class Accidental(style.StyleMixin):
         # keep lower case
         return self.name
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def setAttributeIndependently(self, attribute, value):
         '''
         Set an attribute of 'name', 'alter', and 'modifier', independently
@@ -1351,7 +1351,7 @@ class Accidental(style.StyleMixin):
         privateAttrName = '_' + attribute
         setattr(self, privateAttrName, value)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def inheritDisplay(self, other):
         '''
         Given another Accidental object, inherit all the display properites
@@ -1374,7 +1374,7 @@ class Accidental(style.StyleMixin):
                 setattr(self, attr, value)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 ## tried as SlottedObjectMixin -- made creation time slower! Not worth the restrictions
 class Pitch:
     '''
@@ -1857,7 +1857,7 @@ class Pitch:
         '''
         return self.__gt__(other) or self.__eq__(other)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     @property
     def classSet(self):
         '''
@@ -2202,7 +2202,7 @@ class Pitch:
         if not inPlace:
             return returnObj
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     def _getPs(self):
         '''
@@ -3221,7 +3221,7 @@ class Pitch:
 
     def _setFreq440(self, value):
         post = 12 * (math.log(value/ 440.0) / math.log(2)) + 69
-        #environLocal.printDebug(['convertFqToPs():', 'input', fq, 'output', repr(post)])
+        # environLocal.printDebug(['convertFqToPs():', 'input', fq, 'output', repr(post)])
         # rounding here is essential
         p2  = round(post, PITCH_SPACE_SIG_DIGITS)
 
@@ -3236,7 +3236,7 @@ class Pitch:
         of v1.3, this is the same as .frequency always.
         ''')
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def getHarmonic(self, number):
         '''
         Return a Pitch object representing the harmonic found above this Pitch.
@@ -3323,7 +3323,7 @@ class Pitch:
         else:
             temp.microtone = centShift
 
-        #environLocal.printDebug(['getHarmonic()', 'self', self,
+        # environLocal.printDebug(['getHarmonic()', 'self', self,
         #   'self.frequency', self.frequency, 'centShift', centShift, 'temp', temp,
         #   'temp.frequency', temp.frequency, 'temp.microtone', temp.microtone])
 
@@ -3334,7 +3334,7 @@ class Pitch:
         # store a copy as the fundamental
         final.fundamental = copy.deepcopy(self)
 
-        #environLocal.printDebug(['getHarmonic()', 'final', final,
+        # environLocal.printDebug(['getHarmonic()', 'final', final,
         #   'final.frequency', final.frequency])
         return final
 
@@ -3395,7 +3395,7 @@ class Pitch:
             if p.ps > target.ps:
                 break
 
-        #environLocal.printDebug(['harmonicFromFundamental():', 'fundamental', fundamental,
+        # environLocal.printDebug(['harmonicFromFundamental():', 'fundamental', fundamental,
         #    'found', found])
 
         # it is either the last or the second to last
@@ -3414,14 +3414,14 @@ class Pitch:
             distanceLower = target.ps - candidateLower.ps
             distanceHigher = candidateHigher.ps - target.ps
 
-            #environLocal.printDebug(['harmonicFromFundamental():',
+            # environLocal.printDebug(['harmonicFromFundamental():',
             #        'distanceLower', distanceLower, 'distanceHigher', distanceHigher,
             #        'target', target])
 
             if distanceLower <= distanceHigher:
                 #pd = 'distanceLower (%s); distanceHigher (%s); distance lower ' +
                 #      'is closer to target: %s'
-                #environLocal.printDebug(['harmonicFromFundamental():',
+                # environLocal.printDebug(['harmonicFromFundamental():',
                 #                         pd  % (candidateLower, candidateHigher, target)])
                 # the lower is closer, thus we need to raise gap
                 match = candidateLower
@@ -3437,7 +3437,7 @@ class Pitch:
 
         return harmonicMatch, gap
 
-        #environLocal.printDebug(['harmonicFromFundamental():', 'match', match,
+        # environLocal.printDebug(['harmonicFromFundamental():', 'match', match,
         #    'gap', gap, 'harmonicMatch', harmonicMatch])
 
         # need to found gap, otherwise may get very small values
@@ -3594,7 +3594,7 @@ class Pitch:
 
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def isEnharmonic(self, other):
         '''
         Return True if other is an enharmonic equivalent of self.
@@ -4053,7 +4053,7 @@ class Pitch:
         return post
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _getDiatonicNoteNum(self):
         '''
         Returns (or takes) an integer that uniquely identifies the
@@ -4229,7 +4229,7 @@ class Pitch:
 
         :rtype: music21.pitch.Pitch
         '''
-        #environLocal.printDebug(['Pitch.transpose()', value])
+        # environLocal.printDebug(['Pitch.transpose()', value])
         if hasattr(value, 'classes') and 'IntervalBase' in value.classes:
             intervalObj = value
         else: # try to process
@@ -4258,7 +4258,7 @@ class Pitch:
             self.fundamental = p.fundamental
             return None
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # utilities for pitch object manipulation
 
     def transposeBelowTarget(self, target, *, minimize=False, inPlace=False):
@@ -4403,7 +4403,7 @@ class Pitch:
         if not inPlace:
             return src
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     def _nameInKeySignature(self, alteredPitches):
         '''
@@ -4787,7 +4787,7 @@ class Pitch:
             # if A to A#, or A to A-, but not A# to A
             elif (pPast.accidental is None and pSelf.accidental is not None):
                 self.accidental.displayStatus = True
-                #environLocal.printDebug(['match previous no mark'])
+                # environLocal.printDebug(['match previous no mark'])
                 setFromPitchPast = True
                 break
 
@@ -4913,7 +4913,7 @@ class Pitch:
         return chordOut
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
 
@@ -4995,7 +4995,7 @@ class Test(unittest.TestCase):
                 past.append(p)
 
         def compare(past, result):
-            #environLocal.printDebug(['accidental compare'])
+            # environLocal.printDebug(['accidental compare'])
             for i in range(len(result)):
                 p = past[i]
                 if p.accidental is None:
@@ -5101,7 +5101,7 @@ class Test(unittest.TestCase):
                 past.append(p)
 
         def compare(past, result):
-            #environLocal.printDebug(['accidental compare'])
+            # environLocal.printDebug(['accidental compare'])
             for i in range(len(result)):
                 p = past[i]
                 if p.accidental is None:
@@ -5114,7 +5114,7 @@ class Test(unittest.TestCase):
                 targetName = result[i][0]
                 targetDisplayStatus = result[i][1]
 
-                #environLocal.printDebug(['accidental test:', p, pName,
+                # environLocal.printDebug(['accidental test:', p, pName,
                 #         pDisplayStatus, 'target:', targetName, targetDisplayStatus])
                 self.assertEqual(pName, targetName)
                 self.assertEqual(pDisplayStatus, targetDisplayStatus,
@@ -5220,7 +5220,7 @@ class Test(unittest.TestCase):
                 past.append(p)
 
         def compare(past, result):
-            #environLocal.printDebug(['accidental compare'])
+            # environLocal.printDebug(['accidental compare'])
             for i in range(len(result)):
                 p = past[i]
                 if p.accidental is None:
@@ -5316,7 +5316,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import m21ToXml
 
         p1 = Pitch('D#~')
-        #environLocal.printDebug([p1, p1.accidental])
+        # environLocal.printDebug([p1, p1.accidental])
         self.assertEqual(str(p1), 'D#~')
         # test generation of raw musicxml output
         xmlout = m21ToXml.GeneralObjectExporter().parse(p1).decode('utf-8')
@@ -5458,7 +5458,7 @@ class Test(unittest.TestCase):
              ), str(pList))
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 
 

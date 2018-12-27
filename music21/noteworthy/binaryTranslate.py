@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         noteworthy/binaryTranslate.py
 # Purpose:      parses .nwc binary files, compressed and uncompressed
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    (c) 2013 The music21 Project
 # License:      LGPL
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Attempts at reading pure .nwc files in music21
 
@@ -463,13 +463,13 @@ class NWCStaff:
 
 
     def parse(self):
-        #environLocal.warn([self.parent.parsePosition, self.objects])
+        # environLocal.warn([self.parent.parsePosition, self.objects])
         self.parseHeader()
-        #environLocal.warn(['header done', self.parent.parsePosition, self.objects])
+        # environLocal.warn(['header done', self.parent.parsePosition, self.objects])
         self.parseLyrics()
-        #environLocal.warn(['lyrics done', self.parent.parsePosition, self.objects])
+        # environLocal.warn(['lyrics done', self.parent.parsePosition, self.objects])
         self.parseObjects()
-        #environLocal.warn([self.parent.parsePosition, self.objects])
+        # environLocal.warn([self.parent.parsePosition, self.objects])
 
     def dump(self):
         dumpObjects = []
@@ -558,7 +558,7 @@ class NWCStaff:
                 maxRead = 1000
                 while continueIt is True and maxRead > 0:
                     syllable = p.readToNUL()
-                    #environLocal.warn([p.parsePosition, syllable, 'syllable'])
+                    # environLocal.warn([p.parsePosition, syllable, 'syllable'])
                     maxRead -= 1
                     #print "syllable: ", syllable
                     if syllable == b"":

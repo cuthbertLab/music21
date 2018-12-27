@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         docbuild/writers.py
 # Purpose:      music21 documentation writer to rst
 #
@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 import os
 import pathlib

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         examples.py
 # Purpose:      Transcribing popular music into braille music using music21.
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 """
 The melody to the "Happy Birthday" song, in G major and 3/4 time.
 
@@ -182,7 +182,7 @@ def happyBirthday():
     hb.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     return hb
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1157,5 +1157,5 @@ if __name__ == "__main__":
     import music21
     music21.mainTest(Test) #, runTest='testVerdiDebug')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

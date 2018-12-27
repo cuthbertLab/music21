@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         stream/core.py
 # Purpose:      mixin class for the core elements of Streams
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2008-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 the Stream Core Mixin handles the core attributes of streams that
 should be thought of almost as private values and not used except
@@ -68,7 +68,7 @@ class StreamCoreMixin:
 
         Returns boolean if the Stream is now sorted.
         '''
-        #environLocal.printDebug(['coreInsert', 'self', self,
+        # environLocal.printDebug(['coreInsert', 'self', self,
         #    'offset', offset, 'element', element])
         # need to compare highest time before inserting the element in
         # the elements list
@@ -127,7 +127,7 @@ class StreamCoreMixin:
         # does not change sorted state
         if element.duration is not None:
             self._setHighestTime(ht + element.duration.quarterLength)
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # adding and editing Elements and Streams -- all need to call coreElementsChanged
     # most will set isSorted to False
     def coreElementsChanged(
@@ -285,7 +285,7 @@ class StreamCoreMixin:
                 return e
         return None
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def coreGuardBeforeAddElement(self, element, checkRedundancy=True):
         '''
         Before adding an element, this method provides
@@ -381,8 +381,8 @@ class StreamCoreMixin:
             <PitchedTimespan (6.0 to 7.0) <music21.note.Note B>>
             <PitchedTimespan (6.0 to 8.0) <music21.note.Note D#>>
             <PitchedTimespan (7.0 to 8.0) <music21.note.Note C>>
-            <ElementTimespan (8.0 to 8.0) <music21.bar.Barline style=final>>
-            <ElementTimespan (8.0 to 8.0) <music21.bar.Barline style=final>>
+            <ElementTimespan (8.0 to 8.0) <music21.bar.Barline type=final>>
+            <ElementTimespan (8.0 to 8.0) <music21.bar.Barline type=final>>
         '''
         hashedAttributes = hash( (tuple(classList or () ), flatten) )
         cacheKey = "timespanTree" + str(hashedAttributes)

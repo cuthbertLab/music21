@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         mei/test_main.py
 # Purpose:      Tests for mei/base.py
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Tests for :mod:`music21.mei.base`.
 '''
@@ -141,7 +141,7 @@ class Test(unittest.TestCase):
         mockMeta.assert_called_once_with(testConv.documentRoot)
 
 
-    #------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------
     # class TestThings(unittest.TestCase):
     # '''Tests for utility functions.'''
 
@@ -350,7 +350,7 @@ class Test(unittest.TestCase):
         self.assertRaises(RuntimeError, base.getVoiceId, fromThese)
 
 
-    #------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------
     # class TestMetadata(unittest.TestCase):
     # '''Tests for the metadata-fetching functions.'''
 
@@ -629,7 +629,7 @@ class Test(unittest.TestCase):
         self.assertEqual(expDate, actual.date)
 
 
-    #------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------
     # class TestAttrTranslators(unittest.TestCase):
     # '''Tests for the one-to-one (string-to-simple-datatype) converter functions.'''
 
@@ -850,7 +850,7 @@ class Test(unittest.TestCase):
         self.assertEqual(expected.type, expected.type)
 
 
-    #------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------
     # class TestLyrics(unittest.TestCase):
     # '''Tests for sylFromElement() and verseFromElement()'''
 
@@ -990,7 +990,7 @@ class Test(unittest.TestCase):
         mockEnviron.warn.assert_called_once_with(base._BAD_VERSE_NUMBER.format('None'))
 
 
-    #------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------
     # class TestNoteFromElement(unittest.TestCase):
     # '''Tests for noteFromElement()'''
     # NOTE: For this TestCase, in the unit tests, if you get...
@@ -1366,7 +1366,7 @@ class Test(unittest.TestCase):
     # NOTE: consider adding to previous tests rather than making new ones
 
 
-    #------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------
     # class TestRestFromElement(unittest.TestCase):
     # '''Tests for restFromElement() and spaceFromElement()'''
 
@@ -1507,7 +1507,7 @@ class Test(unittest.TestCase):
         self.assertTrue(actual.m21wasMRest)
 
 
-    #------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------
     # class TestChordFromElement(unittest.TestCase):
     # '''Tests for chordFromElement()'''
     # NOTE: For this TestCase, in the unit tests, if you get...
@@ -1795,7 +1795,7 @@ class Test(unittest.TestCase):
     # NOTE: consider adding to previous tests rather than making new ones
 
 
-    #------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------
     # class TestClefFromElement(unittest.TestCase):
     # '''Tests for clefFromElement()'''
     # NOTE: in this function's integration tests, the Element.tag attribute doesn't actually matter
@@ -1951,7 +1951,7 @@ class Test(unittest.TestCase):
 
 
 
-    #------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------
     # class TestLayerFromElement(unittest.TestCase):
     # '''Tests for layerFromElement()'''
 
@@ -2136,7 +2136,7 @@ class Test(unittest.TestCase):
 
 
 
-    #------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------
     # class TestStaffFromElement(unittest.TestCase):
     # '''Tests for staffFromElement()'''
 
@@ -2208,7 +2208,7 @@ class Test(unittest.TestCase):
 
 
 
-    #------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------
     # class TestStaffDefFromElement(unittest.TestCase):
     # '''Tests for staffDefFromElement()'''
 
@@ -2598,7 +2598,7 @@ class Test(unittest.TestCase):
 
 
 
-    #------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------
     # class TestScoreDefFromElement(unittest.TestCase):
     # '''Tests for scoreDefFromElement()'''
 
@@ -2704,7 +2704,7 @@ class Test(unittest.TestCase):
 
 
 
-    #------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------
     # class TestEmbeddedElements(unittest.TestCase):
     # '''Tests for _processesEmbeddedElements()'''
 
@@ -2759,7 +2759,7 @@ class Test(unittest.TestCase):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # class TestAddSlurs(unittest.TestCase):
     '''Tests for addSlurs()'''
 
@@ -2944,7 +2944,7 @@ class Test(unittest.TestCase):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # class TestBeams(unittest.TestCase):
     '''Tests for beams in all their guises.'''
 
@@ -3021,7 +3021,7 @@ class Test(unittest.TestCase):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #class TestPreprocessors(unittest.TestCase):
     '''Tests for the preprocessing helper functions for convertFromString().'''
 
@@ -3339,7 +3339,7 @@ class Test(unittest.TestCase):
         self.assertEqual(expNoteTwoAttrib, noteTwo.attrib)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # class TestTuplets(unittest.TestCase):
     '''Tests for the tuplet-processing helper function, scaleToTuplet().'''
 
@@ -3631,7 +3631,7 @@ class Test(unittest.TestCase):
             self.assertFalse(hasattr(theLayer[i], 'm21TupletNumbase'))
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # class TestInstrDef(unittest.TestCase):
     '''Tests for instrDefFromElement().'''
 
@@ -3703,7 +3703,7 @@ class Test(unittest.TestCase):
         self.assertEqual(expFromStringArg, actual.partName)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # class TestMeasureFromElement(unittest.TestCase):
     '''Tests for measureFromElement() and its helper functions.'''
 
@@ -4193,7 +4193,7 @@ class Test(unittest.TestCase):
         self.assertTrue(foundClef is True)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # class TestSectionScore(unittest.TestCase):
     '''Tests for scoreFromElement(), sectionFromElement(), and
     their helper function sectionScoreCore().'''
@@ -4983,7 +4983,7 @@ class Test(unittest.TestCase):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # class TestBarLineFromElement(unittest.TestCase):
     '''Tests for barLineFromElement()'''
 
@@ -5007,7 +5007,7 @@ class Test(unittest.TestCase):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # class RegressionIntegrationTests(unittest.TestCase):
     '''
     Targeted tests that address bugs, run without any mock objects.
@@ -5055,4 +5055,4 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------

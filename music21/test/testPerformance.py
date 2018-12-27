@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         testPerformance.py
 # Purpose:      Tests keep track of long-term performance targets
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2009-2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module defines a number of performance test.
  Results for these performances are stored and dated,
@@ -27,7 +27,7 @@ from music21 import environment
 _MOD = 'test.testPerformance'
 environLocal = environment.Environment(_MOD)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -257,7 +257,7 @@ class Test(unittest.TestCase):
         '''
         unused = corpus.parse('monteverdi/madrigal.5.3.rntxt', forceSource=True)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def testTimingTolerance(self):
         '''
         Test the performance of methods defined above,
@@ -406,6 +406,6 @@ if __name__ == "__main__":
         music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         scale.py
 # Purpose:      music21 classes for representing scales
 #
@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2009-2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 The various Scale objects provide a bi-directional object representation
 of octave repeating and non-octave repeating scales built by network
@@ -53,7 +53,7 @@ import unittest
 
 from music21.scale import intervalNetwork
 from music21.scale import scala
-#--------------------------
+# -------------------------
 from music21 import base
 from music21 import common
 from music21 import environment
@@ -72,7 +72,7 @@ DIRECTION_DESCENDING = intervalNetwork.DIRECTION_DESCENDING
 TERMINUS_LOW = intervalNetwork.TERMINUS_LOW
 TERMINUS_HIGH = intervalNetwork.TERMINUS_HIGH
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ScaleException(exceptions21.Music21Exception):
     pass
 
@@ -170,7 +170,7 @@ class Scale(base.Music21Object):
 
         return post
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class AbstractScale(Scale):
     '''
     An abstract scale is specific scale formation, but does not have a
@@ -287,7 +287,7 @@ class AbstractScale(Scale):
             # all notes must be identical in each octave
             #if abs(pitchList[-1].ps - pitchList[0].ps) == 12:
             span = interval.notesToInterval(pitchList[0], pitchList[-1])
-            #environLocal.printDebug(['got span', span, span.name])
+            # environLocal.printDebug(['got span', span, span.name])
             if span.name  == 'P8':
                 self.octaveDuplicating = True
             else:
@@ -303,7 +303,7 @@ class AbstractScale(Scale):
 
             intervalList.append(interval.notesToInterval(pitchList[-1], p))
             span = interval.notesToInterval(pitchList[0], p)
-            #environLocal.printDebug(['got span', span, span.name])
+            # environLocal.printDebug(['got span', span, span.name])
             if span.name  == 'P8':
                 self.octaveDuplicating = True
             else:
@@ -314,7 +314,7 @@ class AbstractScale(Scale):
 #             else:
 #                 self.octaveDuplicating == False
 
-        #environLocal.printDebug(['intervalList', intervalList,
+        # environLocal.printDebug(['intervalList', intervalList,
         #                        'self.octaveDuplicating', self.octaveDuplicating])
         self._net = intervalNetwork.IntervalNetwork(intervalList,
                                                     octaveDuplicating=self.octaveDuplicating)
@@ -560,7 +560,7 @@ class AbstractScale(Scale):
         return copy.deepcopy(post)
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def getScalaData(self, direction=DIRECTION_ASCENDING):
         '''
         Get the interval sequence as a :class:~music21.scala.ScalaData object
@@ -606,7 +606,7 @@ class AbstractScale(Scale):
                 return
         Scale.show(self, fmt=fmt, app=app)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # abstract subclasses
 
 
@@ -1141,7 +1141,7 @@ class AbstractWeightedHexatonicBlues(AbstractScale):
         self._net.fillArbitrary(nodes, edges)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ConcreteScale(Scale):
     '''
     A concrete scale is specific scale formation with
@@ -1307,7 +1307,7 @@ class ConcreteScale(Scale):
         return '<music21.scale.%s %s %s>' % (self.__class__.__name__, self.tonic.name, self.type)
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def getTonic(self):
         '''
         Return the tonic.
@@ -2022,7 +2022,7 @@ class ConcreteScale(Scale):
 
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # comparison and evaluation
 
     def match(self, other, comparisonAttribute='name'):
@@ -2295,7 +2295,7 @@ class ConcreteScale(Scale):
         return newScale
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # alternative outputs
 
     def getScalaData(self):
@@ -2333,7 +2333,7 @@ class ConcreteScale(Scale):
                 return
         Scale.show(self, fmt=fmt, app=app)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # concrete scales and subclasses
 
 class DiatonicScale(ConcreteScale):
@@ -2477,7 +2477,7 @@ class DiatonicScale(ConcreteScale):
         return MajorScale(self.pitchFromDegree(self.abstract.relativeMajorDegree))
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # diatonic scales and modes
 class MajorScale(DiatonicScale):
     '''A Major Scale
@@ -2693,7 +2693,7 @@ class HypoaeolianScale(DiatonicScale):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # other diatonic scales
 class HarmonicMinorScale(DiatonicScale):
     '''
@@ -2750,7 +2750,7 @@ class MelodicMinorScale(DiatonicScale):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # other scales
 
 class OctatonicScale(ConcreteScale):
@@ -2910,7 +2910,7 @@ class SieveScale(ConcreteScale):
             pitchUpper=str(tonic.transpose(48)), eld=eld)
             # four octave default
 
-        #environLocal.printDebug([self._pitchSieve.sieveObject.represent(),
+        # environLocal.printDebug([self._pitchSieve.sieveObject.represent(),
         #      self._pitchSieve.getIntervalSequence()])
         # mode here is a list of intervals
         intervalSequence = self._pitchSieve.getIntervalSequence()
@@ -3040,7 +3040,7 @@ class WeightedHexatonicBlues(ConcreteScale):
         self.type = 'Weighted Hexatonic Blues'
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -3300,7 +3300,7 @@ class Test(unittest.TestCase):
 
 
         # as single interval cycle, all are 1
-        #environLocal.printDebug(['calling get scale degree from pitch'])
+        # environLocal.printDebug(['calling get scale degree from pitch'])
         self.assertEqual(sc.getScaleDegreeFromPitch('g4'), 1)
         self.assertEqual(sc.getScaleDegreeFromPitch('b-2',
             direction=DIRECTION_ASCENDING), 1)
@@ -3952,7 +3952,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         with self.assertRaises(intervalNetwork.IntervalNetworkException):
             e.deriveRanked(['C4', 'E4', 'G4'], comparisonAttribute='name')
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [ConcreteScale, AbstractScale]
 
@@ -3965,5 +3965,5 @@ if __name__ == "__main__":
 # store implicit tonic or Not
 # if not set, then comparisons fall to abstract
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

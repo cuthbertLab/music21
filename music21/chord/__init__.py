@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         chord.py
 # Purpose:      Chord representation and utilities
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module defines the Chord object, a sub-class of :class:`~music21.note.GeneralNote`
 as well as other methods, functions, and objects related to chords.
@@ -37,12 +37,12 @@ from music21.common import deprecated
 _MOD = 'chord'
 environLocal = environment.Environment(_MOD)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ChordException(exceptions21.Music21Exception):
     pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class Chord(note.NotRest):
     '''Class for dealing with chords
@@ -284,7 +284,7 @@ class Chord(note.NotRest):
         objects store weak refs to the to client object, need to specialize
         deepcopy handling depending on if the chord has its own volume object.
         '''
-        #environLocal.printDebug(['calling NotRest.__deepcopy__', self])
+        # environLocal.printDebug(['calling NotRest.__deepcopy__', self])
         # as this inherits from NotRest, can use that __deepcopy__ as basis
         # that looks only to _volume to see if it is not None; with a
         # Chord, _volume will always be None
@@ -542,7 +542,7 @@ class Chord(note.NotRest):
             else:
                 deleteComponents.append(comp)
 
-        #environLocal.printDebug(['unique, delete', self, unique, delete])
+        # environLocal.printDebug(['unique, delete', self, unique, delete])
         altered = returnObj._notes
         alteredId = [id(n) for n in altered]
         for n in deleteComponents:
@@ -808,7 +808,7 @@ class Chord(note.NotRest):
 
         if sortPitches:
             c = c.sortAscending()
-        #environLocal.printDebug(['annotateIntervals()', c.pitches])
+        # environLocal.printDebug(['annotateIntervals()', c.pitches])
         lyricsList = []
 
         for j in range(len(c.pitches) - 1, 0, -1): # only go to one; zero never used
@@ -1062,7 +1062,7 @@ class Chord(note.NotRest):
         <music21.chord.Chord C6 E6 G6>
 
         '''
-        #environLocal.printDebug(['calling closedPosition()', inPlace])
+        # environLocal.printDebug(['calling closedPosition()', inPlace])
         if inPlace:
             returnObj = self
         else:
@@ -1580,7 +1580,7 @@ class Chord(note.NotRest):
             chordTablesAddress = self.chordTablesAddress
             v = chordTables.addressToIntervalVector(chordTablesAddress)
             addresses = chordTables.intervalVectorToAddress(v)
-            #environLocal.printDebug(['addresses', addresses,
+            # environLocal.printDebug(['addresses', addresses,
             #    'chordTablesAddress', chordTablesAddress])
             # addresses returned here are 2 elements lists
             other = None
@@ -1655,10 +1655,10 @@ class Chord(note.NotRest):
             if c.hasVolumeInformation():
                 count += 1
         if count == len(self._notes):
-            #environLocal.printDebug(['hasComponentVolumes:', True])
+            # environLocal.printDebug(['hasComponentVolumes:', True])
             return True
         else:
-            #environLocal.printDebug(['hasComponentVolumes:', False])
+            # environLocal.printDebug(['hasComponentVolumes:', False])
             return False
 
     def hasRepeatedChordStep(self, chordStep, *, testRoot=None):
@@ -4055,7 +4055,7 @@ class Chord(note.NotRest):
 
         '''
         post = chordTables.addressToZAddress(self.chordTablesAddress)
-        #environLocal.printDebug(['got post', post])
+        # environLocal.printDebug(['got post', post])
         if post is not None:
             return True
         return False
@@ -4497,11 +4497,11 @@ class Chord(note.NotRest):
         '''
         third = self.semitonesFromChordStep(3)
         fifth = self.semitonesFromChordStep(5)
-        #environLocal.printDebug(['third, fifth', third, fifth])
+        # environLocal.printDebug(['third, fifth', third, fifth])
         if third is None:
             return 'other'
         elif self.hasRepeatedChordStep(3):
-            #environLocal.printDebug('self.hasRepeatedChordStep(3)', self.hasRepeatedChordStep(3))
+            # environLocal.printDebug('self.hasRepeatedChordStep(3)', self.hasRepeatedChordStep(3))
             return 'other'
         elif fifth is None:
             if third == 4:
@@ -4764,11 +4764,11 @@ class Chord(note.NotRest):
         else:
             raise ChordException('unhandled setting expr: %s' % expr)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # volume per pitch
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
 
 
@@ -4868,7 +4868,7 @@ def fromIntervalVector(notation, getZRelation=False):
         return None
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class TestExternal(unittest.TestCase): # pragma: no cover
@@ -5604,7 +5604,7 @@ class Test(unittest.TestCase):
         a.inversion(1)
         self.assertEqual(repr(a), '<music21.chord.Chord B4 D5 F5 G5>')
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 _DOC_ORDER = [Chord]
@@ -5614,5 +5614,5 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test) #, runTest='testInvertingSimple')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

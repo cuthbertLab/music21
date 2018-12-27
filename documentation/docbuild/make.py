@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         documentation/make.py
 # Purpose:      music21 documentation script, v. 2.0
 #
@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2013-17 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 import os
 import shutil

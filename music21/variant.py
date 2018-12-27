@@ -121,7 +121,7 @@ def mergeVariants(streamX, streamY, variantName='variant', *, inPlace=False):
             {0.0} <music21.note.Note G>
             {2.0} <music21.note.Note F>
             {3.0} <music21.note.Note G>
-            {4.0} <music21.bar.Barline style=final>
+            {4.0} <music21.bar.Barline type=final>
     {0.0} <music21.stream.Part aPart2>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
@@ -138,7 +138,7 @@ def mergeVariants(streamX, streamY, variantName='variant', *, inPlace=False):
             {0.0} <music21.note.Note D>
             {2.0} <music21.note.Note G>
             {3.0} <music21.note.Note F>
-            {4.0} <music21.bar.Barline style=final>
+            {4.0} <music21.bar.Barline type=final>
 
 
     >>> mergedPart = variant.mergeVariants(ap2, vp2, variantName='docvariant', inPlace=False)
@@ -148,7 +148,7 @@ def mergeVariants(streamX, streamY, variantName='variant', *, inPlace=False):
     {4.0} <music21.variant.Variant object of length 8.0>
     {4.0} <music21.stream.Measure 2 offset=4.0>
     ...
-        {4.0} <music21.bar.Barline style=final>
+        {4.0} <music21.bar.Barline type=final>
 
 
     '''
@@ -208,7 +208,7 @@ def mergeVariantScores(aScore, vScore, variantName='variant', *, inPlace=False):
             {0.0} <music21.note.Note G>
             {2.0} <music21.note.Note F>
             {3.0} <music21.note.Note G>
-            {4.0} <music21.bar.Barline style=final>
+            {4.0} <music21.bar.Barline type=final>
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
@@ -225,7 +225,7 @@ def mergeVariantScores(aScore, vScore, variantName='variant', *, inPlace=False):
             {0.0} <music21.note.Note D>
             {2.0} <music21.note.Note G>
             {3.0} <music21.note.Note F>
-            {4.0} <music21.bar.Barline style=final>
+            {4.0} <music21.bar.Barline type=final>
 
     '''
     if len(aScore.iter.parts) != len(vScore.iter.parts):

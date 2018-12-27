@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         romanText/translate.py
 # Purpose:      Translation routines for roman numeral analysis text files
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2011-2012, 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Translation routines for roman numeral analysis text files, as defined
 and demonstrated by Dmitri Tymoczko.  Also used for the ClerqTemperley
@@ -144,7 +144,7 @@ USE_RN_CACHE = False
 ## Not currently using rnCache because of problems with PivotChords,
 ## See mail from Dmitri, 30 September 2014
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class RomanTextTranslateException(exceptions21.Music21Exception):
     pass
@@ -160,7 +160,7 @@ def _copySingleMeasure(t, p, kCurrent):
     m23=m21
     '''
     # copy from a past location; need to change key
-    #environLocal.printDebug(['calling _copySingleMeasure()'])
+    # environLocal.printDebug(['calling _copySingleMeasure()'])
     targetNumber, unused_targetRepeat = t.getCopyTarget()
     if len(targetNumber) > 1: # this is an encoding error
         raise RomanTextTranslateException(
@@ -211,7 +211,7 @@ def _copyMultipleMeasures(t, p, kCurrent):
 
     '''
     # the key provided needs to be the current key
-    #environLocal.printDebug(['calling _copyMultipleMeasures()'])
+    # environLocal.printDebug(['calling _copyMultipleMeasures()'])
 
     targetNumbers, unused_targetRepeat = t.getCopyTarget()
     if len(targetNumbers) == 1: # this is an encoding error
@@ -633,7 +633,7 @@ class PartTranslator:
                     rn.followsKeyChange = False
             except (roman.RomanNumeralException,
                 exceptions21.Music21CommonException):
-                #environLocal.printDebug('cannot create RN from: %s' % a.src)
+                # environLocal.printDebug('cannot create RN from: %s' % a.src)
                 rn = note.Note() # create placeholder
 
             if self.pivotChordPossible is False:
@@ -682,7 +682,7 @@ class PartTranslator:
         else:
             rtt = RomanTextUnprocessedToken(a)
             m.coreInsert(o, rtt)
-            #environLocal.warn("Got an unknown token: %r" % a)
+            # environLocal.warn("Got an unknown token: %r" % a)
 
         self.currentOffsetInMeasure = o
 
@@ -926,7 +926,7 @@ def romanTextToStreamOpus(rtHandler, inputM21=None):
         return romanTextToStreamScore(rtHandler, inputM21=inputM21)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class TestExternal(unittest.TestCase): # pragma: no cover
 
@@ -1316,7 +1316,7 @@ m3 NC b3 G: V
         self.assertEqual(n2.duration.quarterLength, common.opFrac(13./6) )
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # define presented order in documentation
 _DOC_ORDER = []
@@ -1336,6 +1336,6 @@ if __name__ == "__main__":
     #print(time.time() - t)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

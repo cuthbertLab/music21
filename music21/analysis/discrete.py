@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         discrete.py
 # Purpose:      Framework for modular, windowed analysis
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2010-2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Modular analysis procedures for use alone or
 applied with :class:`music21.analysis.windowed.WindowedAnalysis` class.
@@ -40,7 +40,7 @@ environLocal = environment.Environment(_MOD)
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class DiscreteAnalysisException(exceptions21.Music21Exception):
     pass
 
@@ -183,7 +183,7 @@ class DiscreteAnalysis:
         pass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # alternative names
 # PitchClassKeyFinding
 # KeySearchByProbeTone
@@ -394,7 +394,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             # pitch objects created here
             likelyKeys[i] = (pitch.Pitch(keyResults.index(a[i])),
                              differences[keyResults.index(a[i])])
-            #environLocal.printDebug(['added likely key', likelyKeys[i]])
+            # environLocal.printDebug(['added likely key', likelyKeys[i]])
         return likelyKeys
 
 
@@ -452,7 +452,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             colorsUsed = self.getColorsUsed()
             solutionsUsed = self.getSolutionsUsed()
 
-            #environLocal.printDebug(['colors used:', colorsUsed])
+            # environLocal.printDebug(['colors used:', colorsUsed])
             keySortOrderFiltered = []
             for keyEl in _keySortOrder:
                 for sol in solutionsUsed: # three values
@@ -529,7 +529,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
     def _likelyKeys(self, sStream):
         pcDistribution = self._getPitchClassDistribution(sStream)
-        #environLocal.printDebug(['process(); pcDistribution', pcDistribution])
+        # environLocal.printDebug(['process(); pcDistribution', pcDistribution])
 
         keyResultsMajor = self._convoluteDistribution(pcDistribution, 'major')
         differenceMajor = self._getDifference(keyResultsMajor,
@@ -588,10 +588,10 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         elif mode == 'minor':
             if pitchObj.name not in self.keysValidMinor:
                 flipEnharmonic = True
-        #environLocal.printDebug(['pre flip enharmonic', pitchObj])
+        # environLocal.printDebug(['pre flip enharmonic', pitchObj])
         if flipEnharmonic:
             pitchObj.getEnharmonic(inPlace=True)
-        #environLocal.printDebug(['post flip enharmonic', pitchObj])
+        # environLocal.printDebug(['post flip enharmonic', pitchObj])
         return pitchObj
 
 
@@ -644,7 +644,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
         sortList.sort()
         sortList.reverse()
-        #environLocal.printDebug(['sortList', sortList])
+        # environLocal.printDebug(['sortList', sortList])
 
         coefficient, p, mode = sortList[0]
         p = self._bestKeyEnharmonic(p, mode, sStream)
@@ -706,7 +706,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # specialize subclass by class
 
 class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
@@ -957,7 +957,7 @@ keyWeightKeyAnalysisClasses = [KrumhanslSchmuckler, KrumhanslKessler,
                                AardenEssen, SimpleWeights, BellmanBudge, TemperleyKostkaPayne]
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class Ambitus(DiscreteAnalysis):
     '''
     An basic analysis method for measuring register.
@@ -1013,7 +1013,7 @@ class Ambitus(DiscreteAnalysis):
             self._pitchSpanColors[i] = self._rgbToHex(((val*.75), (val*.6), val))
             step += 1
 
-        #environLocal.printDebug([self._pitchSpanColors])
+        # environLocal.printDebug([self._pitchSpanColors])
 
     def getPitchSpan(self, subStream):
         '''
@@ -1047,7 +1047,7 @@ class Ambitus(DiscreteAnalysis):
         psFound = []
         pitchesFound = []
         for n in justNotes:
-            #environLocal.printDebug([n])
+            # environLocal.printDebug([n])
             pitches = []
             if 'Chord' in n.classes and 'ChordSymbol' not in n.classes:
                 pitches = n.pitches
@@ -1250,7 +1250,7 @@ class Ambitus(DiscreteAnalysis):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class MelodicIntervalDiversity(DiscreteAnalysis):
     '''
     An analysis method to determine the diversity of intervals used in a Stream.
@@ -1300,7 +1300,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
                     nNext = None
 
                 if nNext is not None:
-                    #environLocal.printDebug(['creating interval from notes:', n, nNext, i])
+                    # environLocal.printDebug(['creating interval from notes:', n, nNext, i])
                     i = interval.notesToInterval(n, nNext)
                     if ignoreUnison: # will apply to enharmonic eq unisons
                         if i.chromatic.semitones == 0:
@@ -1336,7 +1336,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         return solution
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # public access function
 
 def analyzeStream(streamObj, *args, **keywords):
@@ -1382,7 +1382,7 @@ def analyzeStream(streamObj, *args, **keywords):
 
     if match is not None:
         obj = match() # NOTE: Cuthbert, this was previously analysisClassName()? - out of scope
-        #environLocal.printDebug(['analysis method used:', obj])
+        # environLocal.printDebug(['analysis method used:', obj])
         return obj.getSolution(streamObj)
 
     # if no match raise error
@@ -1424,7 +1424,7 @@ def analysisClassFromMethodName(method):
         if (method.lower() in analysisClass.__name__.lower()
                 or method.lower() in analysisClass.name):
             match = analysisClass
-            #environLocal.printDebug(['matched analysis class name'])
+            # environLocal.printDebug(['matched analysis class name'])
             break
 
     if match is None:
@@ -1433,7 +1433,7 @@ def analysisClassFromMethodName(method):
             for idStr in analysisClass.identifiers:
                 if method == idStr:
                     match = analysisClass
-                    #environLocal.printDebug(['matched idStr', idStr])
+                    # environLocal.printDebug(['matched idStr', idStr])
                     break
 
     if match is None:
@@ -1442,14 +1442,14 @@ def analysisClassFromMethodName(method):
             for idStr in analysisClass.identifiers:
                 if method in idStr:
                     match = analysisClass
-                    #environLocal.printDebug(['matched idStr', idStr])
+                    # environLocal.printDebug(['matched idStr', idStr])
                     break
             if match is not None:
                 break
 
     return match
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -1644,7 +1644,7 @@ _DOC_ORDER = [analyzeStream, DiscreteAnalysis, Ambitus, MelodicIntervalDiversity
               KeyWeightKeyAnalysis, SimpleWeights, AardenEssen, BellmanBudge,
               KrumhanslSchmuckler, KrumhanslKessler, TemperleyKostkaPayne]
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 if __name__ == "__main__":
     import music21
@@ -1652,7 +1652,7 @@ if __name__ == "__main__":
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 
 

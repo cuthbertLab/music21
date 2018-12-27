@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         metadata.py
 # Purpose:      music21 classes for representing score and work meta-data
 #
@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Classes and functions for creating and processing metadata associated with
 scores, works, and fragments, such as titles, movements, authors, publishers,
@@ -61,7 +61,7 @@ from music21.metadata.primitives import (Date, DateSingle, DateRelative, DateBet
                                          Imprint, Copyright)
 
 from music21.metadata import testMetadata
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 from music21 import environment
@@ -70,7 +70,7 @@ environLocal = environment.Environment(os.path.basename(__file__))
 
 AmbitusShort = namedtuple('AmbitusShort', 'semitones diatonic pitchLowest pitchHighest')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Metadata(base.Music21Object):
@@ -483,7 +483,7 @@ class Metadata(base.Music21Object):
                 pass
             if not match:
                 for searchAttribute in self.searchAttributes:
-                    #environLocal.printDebug(['comparing fields:', f, field])
+                    # environLocal.printDebug(['comparing fields:', f, field])
                     # look for partial match in all fields
                     if field.lower() in searchAttribute.lower():
                         value = getattr(self, searchAttribute)
@@ -824,7 +824,7 @@ class Metadata(base.Music21Object):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class RichMetadata(Metadata):
@@ -1060,14 +1060,14 @@ class RichMetadata(Metadata):
                                     pitchHighest=self.pitchHighest,
                                     )
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 _DOC_ORDER = ()
@@ -1082,4 +1082,4 @@ if __name__ == '__main__':
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------

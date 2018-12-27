@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         spanner.py
 # Purpose:      The Spanner base-class and subclasses
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 A spanner is a music21 object that represents a connection usually between
 two or more music21 objects that might live in different streams but need
@@ -35,14 +35,14 @@ _MOD = 'spanner'
 environLocal = environment.Environment(_MOD)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class SpannerException(exceptions21.Music21Exception):
     pass
 class SpannerBundleException(exceptions21.Music21Exception):
     pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Spanner(base.Music21Object):
     '''
     Spanner objects live on Streams in the same manner as other Music21Objects,
@@ -313,7 +313,7 @@ class Spanner(base.Music21Object):
         '''
         return self._deepcopySubclassable(memo)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # as spannedElements is private Stream, unwrap/wrap methods need to override
     # Music21Object to get at these objects
     # this is the same as with Variants
@@ -329,7 +329,7 @@ class Spanner(base.Music21Object):
         self.spannerStorage.purgeLocations(rescanIsDead=rescanIsDead)
         base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def __getitem__(self, key):
         '''
 
@@ -594,7 +594,7 @@ class Spanner(base.Music21Object):
             return None
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class SpannerBundle:
     '''
     A utility object for collecting and processing
@@ -1084,7 +1084,7 @@ class SpannerBundle:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # connect two or more notes anywhere in the score
 class Slur(Spanner):
     '''
@@ -1104,7 +1104,7 @@ class Slur(Spanner):
         msg = msg.replace(self._reprHead, '<music21.spanner.Slur ')
         return msg
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class MultiMeasureRest(Spanner):
     '''
     A grouping symbol that indicates that a collection of rests lasts
@@ -1167,7 +1167,7 @@ class MultiMeasureRest(Spanner):
     def numRests(self, overridden):
         self._overriddenNumber = overridden
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # first/second repeat bracket
 class RepeatBracket(Spanner):
     '''
@@ -1351,7 +1351,7 @@ class RepeatBracket(Spanner):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # line-based spanners
 
 class Ottava(Spanner):
@@ -1806,7 +1806,7 @@ class Glissando(Spanner):
             raise SpannerException('not a valid value: %s' % value)
         self._slideType = value.lower()
     
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -2654,7 +2654,7 @@ class Test(unittest.TestCase):
         slList = sl.getSpannedElementIds()
         self.assertEqual(idList, slList)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Spanner]
 
@@ -2665,5 +2665,5 @@ if __name__ == '__main__':
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

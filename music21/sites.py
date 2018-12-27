@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         sites.py
 # Purpose:      Objects for keeping track of relationships among Music21Objects
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2007-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 sites.py -- Objects for keeping track of relationships among Music21Objects
 '''
@@ -38,7 +38,7 @@ GLOBAL_SITE_STATE_DICT = weakref.WeakValueDictionary()
 class SitesException(exceptions21.Music21Exception):
     pass
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class SiteRef(common.SlottedObjectMixin):
     '''
     a single Site (stream, container, parent, reference, etc.) stored inside the Sites object.
@@ -224,7 +224,7 @@ class Sites(common.SlottedObjectMixin):
         #copies; this functionality is used at times in context searches, but
         # may be a performance hog.
         new = self.__class__()
-        #environLocal.printDebug(['Sites.__deepcopy__',
+        # environLocal.printDebug(['Sites.__deepcopy__',
         #    'self.siteDict.keys()', self.siteDict.keys()])
         for idKey in self.siteDict:
             if idKey is None:
@@ -343,7 +343,7 @@ class Sites(common.SlottedObjectMixin):
             #if idKey is not None:
             #    print 'Updating idKey %s for object %s' % (idKey, id(obj))
 
-        #environLocal.printDebug(['adding obj', obj, idKey])
+        # environLocal.printDebug(['adding obj', obj, idKey])
         # weak refs were being passed in __deepcopy__ calling this method
         # __deepcopy__ no longer call this method, so we can assume that
         # we will not get weakrefs
@@ -443,7 +443,7 @@ class Sites(common.SlottedObjectMixin):
         if priorityTarget is not None:
             priorityId = id(priorityTarget)
             if priorityId in keyRepository:
-                #environLocal.printDebug(['priorityTarget found in post:', priorityTarget])
+                # environLocal.printDebug(['priorityTarget found in post:', priorityTarget])
                 # extract object and make first
                 keyRepository.insert(0,
                     keyRepository.pop(keyRepository.index(priorityId)))
@@ -513,7 +513,7 @@ class Sites(common.SlottedObjectMixin):
         # want to be extra safe.  If you want fast, use .yieldSites
         if priorityTarget is not None:
             if priorityTarget in post:
-                #environLocal.printDebug(['priorityTarget found in post:', priorityTarget])
+                # environLocal.printDebug(['priorityTarget found in post:', priorityTarget])
                 # extract object and make first
                 post.insert(0, post.pop(post.index(priorityTarget)))
         return post
@@ -633,7 +633,7 @@ class Sites(common.SlottedObjectMixin):
         #printMemo(memo, 'getObjByClass() called: looking at %s sites' % len(objs))
         classNameIsStr = isinstance(className, str)
         for obj in objs:
-            #environLocal.printDebug(['memo', memo])
+            # environLocal.printDebug(['memo', memo])
             if classNameIsStr:
                 if className in obj.classes:
                     post = obj
@@ -653,7 +653,7 @@ class Sites(common.SlottedObjectMixin):
                 #if DEBUG_CONTEXT:
                 #    print('\tY: skipping flat stream that does not contain object:',
                 #                  id(obj), obj)
-                #environLocal.printDebug(
+                # environLocal.printDebug(
                 #    ['\tY: skipping flat stream that does not contain object:'])
                 if obj.sites.getSiteCount() == 0: # is top level; no more to search
                     if not obj.hasElementOfClass(className, forceFlat=True):
@@ -922,7 +922,7 @@ class Sites(common.SlottedObjectMixin):
             siteId = id(site)
         try:
             del self.siteDict[siteId]
-            #environLocal.printDebug(['removed site w/o exception:', siteId,
+            # environLocal.printDebug(['removed site w/o exception:', siteId,
             #    'self.siteDict.keys()', self.siteDict.keys()])
         except:
             raise SitesException('an entry for this object ' +
@@ -939,7 +939,7 @@ class Sites(common.SlottedObjectMixin):
         if idKey is None:
             raise SitesException('trying to remove None idKey is not allowed')
 
-        #environLocal.printDebug(['removeById', idKey,
+        # environLocal.printDebug(['removeById', idKey,
         #    'self.siteDict.keys()', self.siteDict.keys()])
         try:
             del self.siteDict[idKey]
@@ -1008,11 +1008,11 @@ class Test(unittest.TestCase):
         self.assertEqual(isinstance(lastNoteClef, clef.TrebleClef), True)
 
 
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 _DOC_ORDER = [SiteRef, Sites]
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         graph.py
 # Purpose:      Classes for graphing in matplotlib and/or other graphing tools.
 #
@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2009-2012, 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Object definitions for graphing and plotting :class:`~music21.stream.Stream` objects.
 
@@ -108,7 +108,7 @@ def plotStream(streamObj,
 
     '''
     plotMake = findPlot.getPlotsToMake(graphFormat, xValue, yValue, zValue)
-    #environLocal.printDebug(['plotClassName found', plotMake])
+    # environLocal.printDebug(['plotClassName found', plotMake])
     for plotInfo in plotMake:
         if not common.isIterable(plotInfo):
             plotClassName = plotInfo
@@ -124,7 +124,7 @@ def plotStream(streamObj,
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
@@ -220,16 +220,16 @@ class Test(unittest.TestCase):
         s.plot('dolan', fillByMeasure=True, segmentByTarget=True, doneAction=None)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 _DOC_ORDER = [plotStream]
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test) #, runTest='testPlot3DPitchSpaceQuarterLengthCount')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

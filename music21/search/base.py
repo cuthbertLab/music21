@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         search/base.py
 # Purpose:      music21 classes for searching within files
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2011-2013, 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 base classes for searching scores.
 
@@ -90,7 +90,7 @@ class StreamSearcher:
     {6.0} <music21.stream.Measure 3 offset=6.0>
         {0.5} <music21.note.Note C>
         {2.0} <music21.note.Note D>
-        {3.0} <music21.bar.Barline style=final>
+        {3.0} <music21.bar.Barline type=final>
 
     Let's create something to search for:
 
@@ -321,7 +321,7 @@ def rhythmicSearch(thisStreamOrIterator, searchList):
     {6.0} <music21.stream.Measure 3 offset=6.0>
         {0.5} <music21.note.Note C>
         {2.0} <music21.note.Rest rest>
-        {3.0} <music21.bar.Barline style=final>
+        {3.0} <music21.bar.Barline type=final>
 
     Now we will search for all dotted-quarter/eighth elements in the Stream:
 
@@ -991,7 +991,7 @@ def translateDurationToBytes(n):
     return secondByte
 
 
-#--------------------
+# -------------------
 
 def mostCommonMeasureRythms(streamIn, transposeDiatonic=False):
     '''
@@ -1092,7 +1092,7 @@ class Test(unittest.TestCase):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = ['StreamSearcher',
               'Wildcard',
@@ -1104,5 +1104,5 @@ if __name__ == "__main__":
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

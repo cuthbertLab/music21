@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         upload.py
 # Purpose:      music21 documentation upload utility
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2009-2010, 2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #pylint: disable=line-too-long
 '''
 if you get a 'ssh_askpass' not found error, create this file in

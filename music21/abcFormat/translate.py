@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         abcFormat.translate.py
 # Purpose:      Translate ABC and music21 objects
 #
@@ -10,7 +10,7 @@
 # Copyright:    Copyright © 2010-2013 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Functions for translating music21 objects and
 :class:`~music21.abcFormat.ABCHandler` instances.
@@ -58,7 +58,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         p = inputM21
 
     if spannerBundle is None:
-        #environLocal.printDebug(['mxToMeasure()', 'creating SpannerBundle'])
+        # environLocal.printDebug(['mxToMeasure()', 'creating SpannerBundle'])
         spannerBundle = spanner.SpannerBundle()
 
 
@@ -68,10 +68,10 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         # first, split into a list of Measures; if there is only metadata and
         # one measure, that means that no measures are defined
         barHandlers = abcHandler.splitByMeasure()
-        #environLocal.printDebug(['barHandlers', len(barHandlers)])
+        # environLocal.printDebug(['barHandlers', len(barHandlers)])
         # merge loading meta data with each bar that preceedes it
         mergedHandlers = abcFormat.mergeLeadingMetaData(barHandlers)
-        #environLocal.printDebug(['mergedHandlers', len(mergedHandlers)])
+        # environLocal.printDebug(['mergedHandlers', len(mergedHandlers)])
     else: # simply stick in a single list
         mergedHandlers = [abcHandler]
 
@@ -90,11 +90,11 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
 
     for mh in mergedHandlers:
         # if use measures and the handler has notes; otherwise add to part
-        #environLocal.printDebug(['abcToStreamPart', 'handler', 'left:', mh.leftBarToken,
+        # environLocal.printDebug(['abcToStreamPart', 'handler', 'left:', mh.leftBarToken,
         #    'right:', mh.rightBarToken, 'len(mh)', len(mh)])
 
         if useMeasures and mh.hasNotes():
-            #environLocal.printDebug(['abcToStreamPart', 'useMeasures',
+            # environLocal.printDebug(['abcToStreamPart', 'useMeasures',
             #    useMeasures, 'mh.hasNotes()', mh.hasNotes()])
             dst = stream.Measure()
             # bar tokens are already extracted form token list and are available
@@ -153,7 +153,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         else:
             dst = p # store directly in a part instance
 
-        #environLocal.printDebug([mh, 'dst', dst])
+        # environLocal.printDebug([mh, 'dst', dst])
         #ql = 0 # might not be zero if there is a pickup
 
         postTransposition, clefSet = parseTokens(mh, dst, p, useMeasures)
@@ -170,7 +170,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                 if dst.barDurationProportion() < 1.0:
                     dst.padAsAnacrusis()
                     dst.number = 0
-                    #environLocal.printDebug([
+                    # environLocal.printDebug([
                     #    'incompletely filled Measure found on abc import; ',
                     #    'interpreting as a anacrusis:', 'padingLeft:', dst.paddingLeft])
             else:
@@ -195,7 +195,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
 
     if useMeasures and p.recurse().getElementsByClass('TimeSignature'):
         # call make beams for now; later, import beams
-        #environLocal.printDebug(['abcToStreamPart: calling makeBeams'])
+        # environLocal.printDebug(['abcToStreamPart: calling makeBeams'])
         try:
             p.makeBeams(inPlace=True)
         except (meter.MeterException, stream.StreamException) as e:
@@ -241,7 +241,7 @@ def parseTokens(mh, dst, p, useMeasures):
                 clefObj, transposition = t.getClefObject()
                 if clefObj is not None:
                     clefSet = False
-                    #environLocal.printDebug(['found clef in key token:', t,
+                    # environLocal.printDebug(['found clef in key token:', t,
                     #     clefObj, transposition])
                     if useMeasures:  # assume at start of measures
                         dst.clef = clefObj
@@ -381,23 +381,23 @@ def abcToStreamScore(abcHandler, inputM21=None):
             if t.isTitle():
                 if titleCount == 0: # first
                     md.title = t.data
-                    #environLocal.printDebug(['got metadata title', md.title])
+                    # environLocal.printDebug(['got metadata title', md.title])
                     titleCount += 1
                 # all other titles go in alternative field
                 else:
                     md.alternativeTitle = t.data
-                    #environLocal.printDebug(['got alternative title', md.alternativeTitle])
+                    # environLocal.printDebug(['got alternative title', md.alternativeTitle])
                     titleCount += 1
             elif t.isComposer():
                 md.composer = t.data
 
             elif t.isOrigin():
                 md.localeOfComposition = t.data
-                #environLocal.printDebug(['got local of composition', md.localOfComposition])
+                # environLocal.printDebug(['got local of composition', md.localOfComposition])
 
             elif t.isReferenceNumber():
                 md.number = int(t.data) # convert to int?
-                #environLocal.printDebug(['got work number', md.number])
+                # environLocal.printDebug(['got work number', md.number])
 
 
     partHandlers = []
@@ -442,7 +442,7 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
     else:
         opus = inputM21
 
-    #environLocal.printDebug(['abcToStreamOpus: got number', number])
+    # environLocal.printDebug(['abcToStreamOpus: got number', number])
 
     # returns a dictionary of numerical key
     if abcHandler.definesReferenceNumbers():
@@ -571,7 +571,7 @@ class ABCTranslateException(exceptions21.Music21Exception):
     pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -722,8 +722,8 @@ class Test(unittest.TestCase):
         self.assertEqual(m1.duration.quarterLength, 2.0)
         #m1.show('t')
         # notes are shown as being on beat 2 and 3
-        #environLocal.printDebug(['m1.notesAndRests.activeSite', m1.notesAndRests.activeSite])
-        #environLocal.printDebug(['m1.notesAndRests[0].activeSite', m1.notesAndRests[0].activeSite])
+        # environLocal.printDebug(['m1.notesAndRests.activeSite', m1.notesAndRests.activeSite])
+        # environLocal.printDebug(['m1.notesAndRests[0].activeSite', m1.notesAndRests[0].activeSite])
 
         #self.assertEqual(m1.notesAndRests.activeSite)
 
@@ -1079,6 +1079,6 @@ if __name__ == "__main__":
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

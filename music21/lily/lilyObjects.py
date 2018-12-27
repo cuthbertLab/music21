@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         lily/objects.py
 # Purpose:      python objects representing lilypond
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2007-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # pylint: disable=too-many-function-args
 # unfortunately the way this was originally set up the previous line is needed
 '''
@@ -275,7 +275,7 @@ class LyMock(LyObject):
     defaultAttributes = {'mockAttribute2': 7,
                  }
 
-#-----------Grammar------------------#
+# ----------Grammar------------------#
 
 class LyLilypondTop(LyObject):
     r'''
@@ -1999,7 +1999,7 @@ class LyMarkup(LyObject):
         return c + str(self.simpleMarkup)
 
 
-###-------------older-------------
+### ------------older-------------
 #
 #class LyNote(LyObject):
 #    pass
@@ -2010,7 +2010,7 @@ class LyMarkup(LyObject):
 #class LyLyricGroup(LyObject):
 #    pass
 #
-###---------Layout----------##
+### --------Layout----------##
 #
 #class LyPaper(LyObject):
 #    m21toLy = {'PageLayout': {'pageWidth': 'paper-width',
@@ -2035,7 +2035,7 @@ class LyMarkup(LyObject):
 #    pass
 #
 #
-###--------Tools-----------##
+### -------Tools-----------##
 #class LyCodePrinter:
 #    pass
 #
@@ -2044,7 +2044,7 @@ class LyMarkup(LyObject):
 #        bracketNesting = 0
 #        angleBracketNest = 0
 
-##-------Tests------------##
+## ------Tests------------##
 
 class Test(unittest.TestCase):
 
@@ -2088,13 +2088,13 @@ class Test(unittest.TestCase):
 
 
 
-##-------Main-------------##
+## ------Main-------------##
 if __name__ == '__main__':
     # pylint: disable=ungrouped-imports
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         humdrum.spineParser.py
 # Purpose:      Conversion and Utility functions for Humdrum and kern in particular
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 music21.humdrum.spineParser is a collection of utilities for changing
 native humdrum code into music21 streams.  Most music21 users will
@@ -1528,7 +1528,7 @@ class SpineEvent:
         else:
             return hdStringToNote(convertString)
 
-#------SPINE COLLECTION------------
+# -----SPINE COLLECTION------------
 
 class SpineCollection:
     '''
@@ -2314,8 +2314,16 @@ def hdStringToNote(contents):
 def hdStringToMeasure(contents, previousMeasure=None):
     '''
     kern uses an equals sign followed by processing instructions to
-    create new measures.  Here is how...
+    create new measures.
+
+    N.B. -- much of the code for describing how repeat
+    signs are encoded is among the oldest code for music21
+    and was not updated when musicxml parsing was added.
+    It does not yet use the bar.RepeatMark() class
+    or any other post 2009 additions.
     '''
+    # TODO(msc): fix!!!
+
     m1 = stream.Measure()
     rematchMN = re.search(r'(\d+)([a-z]?)', contents)
 
@@ -2329,55 +2337,55 @@ def hdStringToMeasure(contents, previousMeasure=None):
     barline = bar.Barline()
 
     if contents.count('-'):
-        barline.style = 'none'
+        barline.type = 'none'
     elif contents.count('\''):
-        barline.style = 'short'
+        barline.type = 'short'
     elif contents.count('`'):
-        barline.style = 'tick'
+        barline.type = 'tick'
     elif contents.count('||'):
-        barline.style = 'double'
+        barline.type = 'double'
         if contents.count(':') > 1:
-            barline.repeat_dots = 'both'
+            barline.repeatDots = 'both'
         elif contents.count(':|'):
-            barline.repeat_dots = 'left'
+            barline.repeatDots = 'left'
         elif contents.count('|:'):
-            barline.repeat_dots = 'right'
+            barline.repeatDots = 'right'
     elif contents.count('!!'):
-        barline.style = 'heavy-heavy'
+        barline.type = 'heavy-heavy'
         if contents.count(':') > 1:
-            barline.repeat_dots = 'both'
+            barline.repeatDots = 'both'
         elif contents.count(':!'):
-            barline.repeat_dots = 'left'
+            barline.repeatDots = 'left'
         elif contents.count('!:'):
-            barline.repeat_dots = 'right'
+            barline.repeatDots = 'right'
     elif contents.count('|!'):
-        barline.style = 'final'
+        barline.type = 'final'
         if contents.count(':') > 1:
-            barline.repeat_dots = 'both'
+            barline.repeatDots = 'both'
         elif contents.count(':|'):
-            barline.repeat_dots = 'left'
+            barline.repeatDots = 'left'
         elif contents.count('!:'):
-            barline.repeat_dots = 'right'
+            barline.repeatDots = 'right'
     elif contents.count('!|'):
-        barline.style = 'heavy-light'
+        barline.type = 'heavy-light'
         if contents.count(':') > 1:
-            barline.repeat_dots = 'both'
+            barline.repeatDots = 'both'
         elif contents.count(':!'):
-            barline.repeat_dots = 'left'
+            barline.repeatDots = 'left'
         elif contents.count('|:'):
-            barline.repeat_dots = 'right'
+            barline.repeatDots = 'right'
     elif contents.count('|'):
-        barline.style = 'regular'
+        barline.type = 'regular'
         if contents.count(':') > 1:
-            barline.repeat_dots = 'both'
+            barline.repeatDots = 'both'
         elif contents.count(':|'):
-            barline.repeat_dots = 'left'
+            barline.repeatDots = 'left'
         elif contents.count('|:'):
-            barline.repeat_dots = 'right'
+            barline.repeatDots = 'right'
     elif contents.count('=='):
-        barline.style = 'double'
+        barline.type = 'double'
         if contents.count(':') > 1:
-            barline.repeat_dots = 'both'
+            barline.repeatDots = 'both'
             ## cannot specify single repeat dots without styles
         if contents == '==|':
             raise HumdrumException(
@@ -2734,7 +2742,7 @@ class Test(unittest.TestCase):
         self.assertEqual(m1.number, 29)
         self.assertEqual(m1.numberSuffix, 'a')
         self.assertEqual(m0.rightBarline.style, 'regular')
-        self.assertEqual(m0.rightBarline.repeat_dots, 'both')
+        self.assertEqual(m0.rightBarline.repeatDots, 'both')
         self.assertTrue(m0.rightBarline.pause is not None)
         self.assertTrue(isinstance(m0.rightBarline.pause, expressions.Fermata))
 
@@ -2822,7 +2830,7 @@ class Test(unittest.TestCase):
         s = hf1.stream
         l = text.assembleLyrics(s)
         self.assertEqual(l, 'Magijago ickewyan')
-        
+
     def testSplitSpines2(self):
         '''
         Currently this does not work since a second split on a stream that
@@ -2856,7 +2864,7 @@ class Test(unittest.TestCase):
         self.assertIsNotNone(md.composer)
         self.assertIn('Palestrina', md.composer)
 
-    
+
 
     def testFlavors(self):
         prevFlavor = flavors['JRP']
@@ -2896,6 +2904,5 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test) #, runTest='testSplitSpines2') #, TestExternal)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
-

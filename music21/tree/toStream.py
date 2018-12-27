@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         tree/toStream.py
 # Purpose:      Tools for recreating streams from trees
 #
@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Tools for generating new Streams from trees (fast, manipulatable objects)
 
@@ -134,7 +134,7 @@ def partwise(tsTree, templateStream=None):
 
 _DOC_ORDER = ()
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 if __name__ == "__main__":
     import music21

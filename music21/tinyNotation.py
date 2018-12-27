@@ -68,7 +68,7 @@ Here is an example of TinyNotation in action.
     {2.0} <music21.note.Note C>
 {6.0} <music21.stream.Measure 3 offset=6.0>
     {0.0} <music21.note.Note C>
-    {1.0} <music21.bar.Barline style=final>
+    {1.0} <music21.bar.Barline type=final>
 >>> stream1.flat.getElementById('lastG').step
 'G'
 >>> stream1.flat.notesAndRests[1].isRest
@@ -100,7 +100,7 @@ Changing time signatures are supported:
 {7.0} <music21.stream.Measure 4 offset=7.0>
     {0.0} <music21.meter.TimeSignature 1/4>
     {0.0} <music21.note.Note C>
-    {1.0} <music21.bar.Barline style=final>
+    {1.0} <music21.bar.Barline type=final>
 
 
 
@@ -146,7 +146,7 @@ Or more usefully, and often desired:
     {0.0} <music21.harmony.ChordSymbol Cmaj7>
     {2.0} <music21.harmony.ChordSymbol Dm>
     {3.0} <music21.harmony.ChordSymbol E-sus4>
-    {4.0} <music21.bar.Barline style=final>
+    {4.0} <music21.bar.Barline type=final>
 >>> for cs in s.recurse().getElementsByClass('ChordSymbol'):
 ...     print([p.name for p in cs.pitches])
 ['C', 'E', 'G', 'B']
@@ -182,7 +182,7 @@ create a new Token type and add it to the tokenMap
 {4.0} <music21.stream.Measure 2 offset=4.0>
     {0.0} <music21.key.Key of f# minor>
     {0.0} <music21.note.Note A>
-    {4.0} <music21.bar.Barline style=final>
+    {4.0} <music21.bar.Barline type=final>
 
 
 TokenMap should be passed a string, representing a regular expression with exactly one
@@ -219,7 +219,7 @@ over the years:
 {2.0} <music21.stream.Measure 2 offset=2.0>
     {0.0} <music21.note.Note F>
     {1.5} <music21.chord.Chord D3 F#3 A3>
-    {2.0} <music21.bar.Barline style=final>
+    {2.0} <music21.bar.Barline type=final>
 
 If you want to create a very different dialect, you can subclass tinyNotation.Converter
 and set it up once to use the mappings above.   See
@@ -765,7 +765,7 @@ class Converter:
         {1.3333} <music21.note.Note E>
         {1.6667} <music21.note.Note D>
         {2.0} <music21.note.Note C>
-        {4.0} <music21.bar.Barline style=final>
+        {4.0} <music21.bar.Barline type=final>
 
 
     Or, breaking down what Parse does bit by bit:
@@ -885,7 +885,7 @@ class Converter:
         {1.3333} <music21.note.Note E>
         {1.6667} <music21.note.Note D>
         {2.0} <music21.note.Note C>
-        {4.0} <music21.bar.Barline style=final>
+        {4.0} <music21.bar.Barline type=final>
 
     '''
     bracketStateMapping = {

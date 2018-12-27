@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         tree/core.py
 # Purpose:      Core AVLTree object.  To be optimized the hell out of.
 #
@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 These are the lowest level tools for working with self-balancing AVL trees.
 
@@ -19,7 +19,7 @@ absolutely balanced by having O(log n) search times.
 from music21.exceptions21 import TreeException
 from music21 import common
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class AVLNode(common.SlottedObjectMixin):
     r'''
     An AVL Tree Node, not specialized in any way, just contains positions.
@@ -470,7 +470,7 @@ class AVLNode(common.SlottedObjectMixin):
         return node
 
 
-#----------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 
 class AVLTree:
     r'''
@@ -696,20 +696,20 @@ class AVLTree:
         >>> endNode = scoreTree.getNodeAfter(9999)
         >>> endNode
         <ElementNode: Start:End <0.-5...> Indices:(l:188 *191* r:195)
-               Payload:<music21.bar.Barline style=final>>
+               Payload:<music21.bar.Barline type=final>>
 
         >>> while endNode is not None:
         ...     print(endNode)
         ...     endNodePosition = endNode.position
         ...     endNode = scoreTree.getNodeAfter(endNodePosition)
         <ElementNode: Start:End <0.-5...> Indices:(l:188 *191* r:195)
-            Payload:<music21.bar.Barline style=final>>
+            Payload:<music21.bar.Barline type=final>>
         <ElementNode: Start:End <0.-5...> Indices:(l:192 *192* r:193)
-            Payload:<music21.bar.Barline style=final>>
+            Payload:<music21.bar.Barline type=final>>
         <ElementNode: Start:End <0.-5...> Indices:(l:192 *193* r:195)
-            Payload:<music21.bar.Barline style=final>>
+            Payload:<music21.bar.Barline type=final>>
         <ElementNode: Start:End <0.-5...> Indices:(l:194 *194* r:195)
-            Payload:<music21.bar.Barline style=final>>
+            Payload:<music21.bar.Barline type=final>>
 
         >>> note1 = score.flat.notes[30]
 
@@ -894,7 +894,7 @@ class AVLTree:
 
 
 
-#-------------------------------#
+# ------------------------------#
 if __name__ == '__main__':
     import music21
     music21.mainTest()

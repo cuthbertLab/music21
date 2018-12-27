@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         noteGrouping.py
 # Purpose:      Transcribes note groupings into Braille
 # Authors:      Jose Cabal-Ugaz
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2012, 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import unittest
 
 from collections import OrderedDict
@@ -283,7 +283,7 @@ def transcribeNoteGrouping(brailleElementGrouping, showLeadingOctave=True):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):

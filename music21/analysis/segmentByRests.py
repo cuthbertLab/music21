@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         segmentByRests.py
 # Purpose:      Break up a part into its contiguous melodies.
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2018 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 import unittest
 
@@ -20,7 +20,7 @@ from music21 import environment
 _MOD = 'analysis.segmentByRests'
 environLocal = environment.Environment(_MOD)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class SegmentationException(exceptions21.Music21Exception):
     pass
@@ -94,7 +94,7 @@ class Segmenter:
             intervalList.append(intervalObj)
         return intervalList
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def testGetSegmentsList(self):
@@ -111,7 +111,7 @@ class Test(unittest.TestCase):
         self.assertEqual(intervalList[0].name,'M2')
         self.assertIsInstance(intervalList, list)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test)

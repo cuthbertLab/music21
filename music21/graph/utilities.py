@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         graph/utilities.py
 # Purpose:      Methods for finding external modules, manipulating colors, etc.
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2012, 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Methods for finding external modules, converting colors to Matplotlib colors, etc.
 '''
@@ -69,7 +69,7 @@ def getExtendedModules():
 
     return ExtendedModules(matplotlib, Axes3D, collections, patches, plt, networkx)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class GraphException(exceptions21.Music21Exception):
     pass
 

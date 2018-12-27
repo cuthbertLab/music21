@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         mei/base.py
 # Purpose:      Public methods for the MEI module
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 .. codeauthor:: Chistopher Antila <christopher@antila.ca>
 
@@ -205,7 +205,7 @@ environLocal = environment.Environment(_MOD)
 
 
 # Module-Level Constants
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 _XMLID = '{http://www.w3.org/XML/1998/namespace}id'
 _MEINS = '{http://www.music-encoding.org/ns/mei}'
 # when these tags aren't processed, we won't worry about them (at least for now)
@@ -222,7 +222,7 @@ _IGNORE_UNPROCESSED = (
 
 
 # Exceptions
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class MeiValidityError(exceptions21.Music21Exception):
     'When there is an otherwise-unspecified validity error that prevents parsing.'
     pass
@@ -241,7 +241,7 @@ class MeiElementError(exceptions21.Music21Exception):
 
 
 # Text Strings for Error Conditions
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # NOTE: these are all collected handily at the top for two reasons: help you find the easier, and
 #       help you translate them easier
 _TEST_FAILS = 'MEI module had {} failures and {} errors; run music21/mei/base.py to find out more.'
@@ -260,7 +260,7 @@ _BAD_VERSE_NUMBER = 'Verse number must be an int (got "{}")'
 
 
 # Module-level Functions
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class MeiToM21Converter:
     '''
     A :class:`MeiToM21Converter` instance manages the conversion of an MEI document into music21
@@ -337,7 +337,7 @@ class MeiToM21Converter:
 
 
 # Module-level Functions
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def safePitch(name, accidental=None, octave=''):
     '''
     Safely build a :class:`Pitch` from a string.
@@ -448,7 +448,7 @@ def allPartsPresent(scoreElem):
 
 
 # Constants for One-to-One Translation
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # for _accidentalFromAttr()
 # None is for when @accid is omitted
 _ACCID_ATTR_DICT = {'s': '#', 'f': '-', 'ss': '##', 'x': '##', 'ff': '--', 'xs': '###',
@@ -514,7 +514,7 @@ _BAR_ATTR_DICT = {'dashed': 'dashed',
 
 
 # One-to-One Translator Functions
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def _attrTranslator(attr, name, mapping):
     '''
     Helper function for other functions that need to translate the value of an attribute to another
@@ -655,7 +655,7 @@ def _sharpsFromAttr(signature):
 
 
 # "Preprocessing" and "Postprocessing" Functions for convertFromString()
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def _ppSlurs(theConverter):
     '''
     Pre-processing helper for :func:`convertFromString` that handles slurs specified in <slur>
@@ -936,7 +936,7 @@ def _ppConclude(theConverter):
 
 
 # Helper Functions
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def _processEmbeddedElements(elements, mapping, callerTag=None, slurBundle=None):
     '''
     From an iterable of MEI ``elements``, use functions in the ``mapping`` to convert each element
@@ -1478,7 +1478,7 @@ def _guessTuplets(theLayer):
 
 
 # Element-Based Converter Functions
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     '''
     <scoreDef> Container for score meta-information.
@@ -3448,7 +3448,7 @@ def scoreFromElement(elem, slurBundle):
     return theScore
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 _DOC_ORDER = [
     accidFromElement,
     articFromElement,

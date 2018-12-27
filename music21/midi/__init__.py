@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         midi/__init__.py
 # Purpose:      Access to MIDI library / music21 classes for dealing with midi data
 #
@@ -10,7 +10,7 @@
 # Copyright:    Copyright © 2011-2013 Michael Scott Cuthbert and the music21 Project
 #               Some parts of this module are in the Public Domain, see details.
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Objects and tools for processing MIDI data.  Converts from MIDI files to
 :class:`~music21.midi.MidiEvent`, :class:`~music21.midi.MidiTrack`, and
@@ -49,7 +49,7 @@ environLocal = environment.Environment(_MOD)
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class EnumerationException(exceptions21.Music21Exception):
     pass
 
@@ -59,7 +59,7 @@ class MidiException(exceptions21.Music21Exception):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # def showstr(str, n=16):
 #     for x in str[:n]:
 #         print (('%02x' % ord(x)),)
@@ -205,12 +205,12 @@ def getVariableLengthNumber(midiStr):
             x = midiStr[i]
         else:
             x = ord(midiStr[i])
-        #environLocal.printDebug(['getVariableLengthNumber: examined char:',
+        # environLocal.printDebug(['getVariableLengthNumber: examined char:',
         # charToBinary(midiStr[i])])
         summation = (summation << 7) + (x & 0x7F)
         i += 1
         if not (x & 0x80):
-            #environLocal.printDebug(['getVariableLengthNumber: depth read into string: %s' % i])
+            # environLocal.printDebug(['getVariableLengthNumber: depth read into string: %s' % i])
             return summation, midiStr[i:]
     raise MidiException('did not find the end of the number!')
 
@@ -268,7 +268,7 @@ def putVariableLengthNumber(x):
     Traceback (most recent call last):
     music21.midi.MidiException: cannot putVariableLengthNumber() when number is negative: -1
     '''
-    #environLocal.printDebug(['calling putVariableLengthNumber(x) with', x])
+    # environLocal.printDebug(['calling putVariableLengthNumber(x) with', x])
     # note: negative numbers will cause an infinite loop here
     if x < 0:
         raise MidiException('cannot putVariableLengthNumber() when number is negative: %s' % x)
@@ -316,7 +316,7 @@ def putNumbersAsList(numList):
         post.append(n)
     return bytes(post)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Enumeration:
     '''
     Utility object for defining binary MIDI message constants.
@@ -379,7 +379,7 @@ class Enumeration:
 
     def whatis(self, value):
         post = self.reverseLookup[value]
-        #environLocal.printDebug(['whatis() call: post', post])
+        # environLocal.printDebug(['whatis() call: post', post])
         return post
 
 channelVoiceMessages = Enumeration([('NOTE_OFF', 0x80),
@@ -422,7 +422,7 @@ metaEvents = Enumeration([('SEQUENCE_NUMBER', 0x00),
                           ('KEY_SIGNATURE', 0x59),
                           ('SEQUENCER_SPECIFIC_META_EVENT', 0x7F)])
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class MidiEvent:
     '''
     A model of a MIDI event, including note-on, note-off, program change,
@@ -680,7 +680,7 @@ class MidiEvent:
             d2 = d1
             d1 = 0
 
-        #environLocal.printDebug(['got target char value', charValue,
+        # environLocal.printDebug(['got target char value', charValue,
         # 'getVariableLengthNumber(charValue)', getVariableLengthNumber(charValue)[0],
         # 'd1', d1, 'd2', d2,])
 
@@ -724,7 +724,7 @@ class MidiEvent:
 
         self.channel = (x & 0x0F) + 1  # this is same as y + 1
         self.type = channelVoiceMessages.whatis(y)
-        #environLocal.printDebug(['MidiEvent.read()', self.type])
+        # environLocal.printDebug(['MidiEvent.read()', self.type])
         if self.type in ('PROGRAM_CHANGE', 'CHANNEL_KEY_PRESSURE'):
             self.data = z
             return midiStr[2:]
@@ -812,7 +812,7 @@ class MidiEvent:
         else:
             z = ord(midiStr[1])  # given a string representation, get decimal number
 
-        #environLocal.printDebug([
+        # environLocal.printDebug([
         #    'MidiEvent.read(): trying to parse a MIDI event, looking at first two chars:',
         #    'repr(x)', repr(x), 'charToBinary(str[0])', charToBinary(str[0]),
         #    'charToBinary(str[1])', charToBinary(str[1])])
@@ -840,7 +840,7 @@ class MidiEvent:
 
         # SEQUENCE_TRACK_NAME and other MetaEvents are here
         elif x == 0xFF:
-            #environLocal.printDebug(['MidiEvent.read(): got a variable length meta event',
+            # environLocal.printDebug(['MidiEvent.read(): got a variable length meta event',
             # charToBinary(str[0])])
             if not metaEvents.hasValue(z):
                 environLocal.printDebug(['unknown meta event: FF %02X' % z])
@@ -866,7 +866,7 @@ class MidiEvent:
         sysex_event_dict = {'F0_SYSEX_EVENT': 0xF0,
                             'F7_SYSEX_EVENT': 0xF7}
         if channelVoiceMessages.hasattr(self.type):
-            #environLocal.printDebug(['writing channelVoiceMessages', self.type])
+            # environLocal.printDebug(['writing channelVoiceMessages', self.type])
             x = chr((self.channel - 1) +
                     getattr(channelVoiceMessages, self.type))
             # for writing note-on/note-off
@@ -879,7 +879,7 @@ class MidiEvent:
                         'Problem with representing either %d or %d' % (
                                                     self.parameter1, self.parameter2))
             elif self.type == 'PROGRAM_CHANGE':
-                #environLocal.printDebug(['trying to add program change data: %s' % self.data])
+                # environLocal.printDebug(['trying to add program change data: %s' % self.data])
                 try:
                     data = chr(self.data)
                 except TypeError:
@@ -913,13 +913,13 @@ class MidiEvent:
             try: # TODO: need to handle unicode
                 return s + self.data
             except (UnicodeDecodeError, TypeError):
-                #environLocal.printDebug(['cannot decode data', self.data])
+                # environLocal.printDebug(['cannot decode data', self.data])
                 return s + unicodedata.normalize('NFKD',
                            self.data).encode('ascii', 'ignore')
         else:
             raise MidiException('unknown midi event type: %s' % self.type)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def isNoteOn(self):
         '''
         Return a boolean if this is a note-on message and velocity is not zero.
@@ -1103,7 +1103,7 @@ class MidiTrack:
             raise MidiException('badly formed midi string: missing leading MTrk')
         # get the 4 chars after the MTrk encoding
         length, midiStr = getNumber(midiStr[4:], 4)
-        #environLocal.printDebug(['MidiTrack.read(): got chunk size', length])
+        # environLocal.printDebug(['MidiTrack.read(): got chunk size', length])
         self.length = length
 
         # all event data is in the track str
@@ -1128,7 +1128,7 @@ class MidiTrack:
                 trackStrCandidate = e.read(timeCandidate, trackStrCandidate)
             except MidiException:
                 # assume that trackStr, after delta extraction, is still correct
-                #environLocal.printDebug(['forced to skip event; delta_t:', delta_t])
+                # environLocal.printDebug(['forced to skip event; delta_t:', delta_t])
                 # set to result after taking delta time
                 trackStr = trackStrCandidate
                 continue
@@ -1173,7 +1173,7 @@ class MidiTrack:
             r = r + '    ' + e.__repr__() + '\n'
         return r + '  >'
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def updateEvents(self):
         '''
         We may attach events to this track before setting their `track` parameter.
@@ -1313,7 +1313,7 @@ class MidiFile:
         else:
             self.ticksPerQuarterNote = division & 0x7FFF
 
-        #environLocal.printDebug(['MidiFile.readstr(): got midi file format:', self.format,
+        # environLocal.printDebug(['MidiFile.readstr(): got midi file format:', self.format,
         #'with specified number of tracks:', numTracks, 'ticksPerSecond:', self.ticksPerSecond,
         # 'ticksPerQuarterNote:', self.ticksPerQuarterNote])
 
@@ -1361,7 +1361,7 @@ class MidiFile:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase): # pragma: no cover
     '''
     These are tests that open windows and rely on external software
@@ -1373,7 +1373,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
     def testBasic(self):
         pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1502,8 +1502,8 @@ class Test(unittest.TestCase):
             self.assertTrue(isinstance(track2.events[i], DeltaTime))
             self.assertTrue(isinstance(track2.events[i + 1], MidiEvent))
 
-            #environLocal.printDebug(['sample events: ', track2.events[i]])
-            #environLocal.printDebug(['sample events: ', track2.events[i + 1]])
+            # environLocal.printDebug(['sample events: ', track2.events[i]])
+            # environLocal.printDebug(['sample events: ', track2.events[i + 1]])
             i += 2
 
         # first object is delta time
@@ -1609,7 +1609,7 @@ class Test(unittest.TestCase):
             mt.events.append(dt)
 
             me = MidiEvent(mt, type='PITCH_BEND', channel=1)
-            #environLocal.printDebug(['creating event:', me, 'pbValues[i]', pbValues[i]])
+            # environLocal.printDebug(['creating event:', me, 'pbValues[i]', pbValues[i]])
             me.time = None #d
             me.setPitchBend(pbValues[i]) # set values in cents
             mt.events.append(me)
@@ -1681,7 +1681,7 @@ class Test(unittest.TestCase):
         #    print n, n.quarterLength
         #s.show()
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
@@ -1690,6 +1690,6 @@ if __name__ == '__main__':
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

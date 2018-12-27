@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:          chord.tables.py
 # Purpose:       data and tables for chord and set class processing.
 #
@@ -8,7 +8,7 @@
 # Copyright:    Copyright © 2001-2011 Christopher Ariza
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 '''
 This module stores numerous data lists used in deriving set-class values and other post-tonal
@@ -28,13 +28,13 @@ environLocal = environment.Environment(_MOD)
 ChordTableAddress = namedtuple('ChordTableAddress', 'cardinality forteClass inversion pcOriginal')
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ChordTablesException(exceptions21.Music21Exception):
     pass
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # TNI structures are defined
 # 0=pitches, 1=ICV, 2=invariance vector (Robert Morris), 3 = Z-relation)
 # invariance vector can be used to determine symmetry.
@@ -310,7 +310,7 @@ t1   = ((0,1,2,3,4,5,6,7,8,9,10,11), (12,12,12,12,12,6), (12,12,12,12,0,0,0,0), 
 dodecachord = (None, t1)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 FORTE = (None, monad, diad, trichord, tetrachord, pentachord, hexachord, septachord, octachord,
          nonachord, decachord, undecachord, dodecachord)
 
@@ -319,7 +319,7 @@ FORTE = (None, monad, diad, trichord, tetrachord, pentachord, hexachord, septach
 #         [number(forte)] = 3
 #         [data(0=pitches, 1=ICV, 2=invariance vector (morris), 3 = Z-relation)]
 #         [element in list]
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 #cardinality 1
 card_1 ={(1 , 0) :(FORTE[1][1][0], #1
@@ -1750,7 +1750,7 @@ card_12 ={(1 , 0) :(FORTE[12][1][0], #351
                          ),
             }
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 SCDICT = {1 : card_1,
           2 : card_2,
           3 : card_3,
@@ -1767,7 +1767,7 @@ SCDICT = {1 : card_1,
 del card_1, card_2, card_3, card_4, card_5, card_6,
 del card_7, card_8, card_9, card_10, card_11,card_12
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # thes dicts provide index max fr cardinality key
 TNMAX = {0:1, 1:1, 2:6, 3:19, 4:43, 5:66, 6:80,
          7:66, 8:43, 9:19, 10:6, 11:1, 12:1 }
@@ -2129,7 +2129,7 @@ TNREF = {  (1, 1,     0)     : 1,
              }
 
 
-#-----------------------------------------------------------------||||||||||||--
+# ----------------------------------------------------------------||||||||||||--
 # reference dict stores name and citation references
 
 # names found from many sources, including:
@@ -2530,7 +2530,7 @@ SCREF = {
                               'chromatic scale', 'dodecamirror')}
 }
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # function to access data
 
 def forteIndexToInversionsAvailable(card, index):
@@ -2600,7 +2600,7 @@ def _validateAddress(address):
             raise ChordTablesException('inversion %s not valid' % inversion)
 
     if inversion is None: # get a default inversion
-        #environLocal.printDebug(['getting inversion for:', card, index])
+        # environLocal.printDebug(['getting inversion for:', card, index])
         if 0 in inversionsAvailable:
             inversion = 0
         else:
@@ -2811,7 +2811,7 @@ def seekChordTablesAddress(c):
         raise ChordTablesException(
             'cannot access chord tables address for Chord with %s pitches' % len(pcSet))
 
-    #environLocal.printDebug(['calling seekChordTablesAddress:', pcSet])
+    # environLocal.printDebug(['calling seekChordTablesAddress:', pcSet])
 
     card = len(pcSet)
     if card == 1: # its a singleton: return
@@ -2848,7 +2848,7 @@ def seekChordTablesAddress(c):
         inversionsAvailable = forteIndexToInversionsAvailable(card, indexCandidate)
 
         for candidate, candidateInversion, candidateOriginalPC in candidates:
-            #environLocal.printDebug([candidate])
+            # environLocal.printDebug([candidate])
             # need to only match form
             if dataLinePcs == candidate:
                 if 0 in inversionsAvailable:
@@ -2871,7 +2871,7 @@ def seekChordTablesAddress(c):
     return ChordTableAddress(card, index, inversion, matchedPCOriginal)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -2921,7 +2921,7 @@ class Test(unittest.TestCase):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [addressToForteName, addressToPrimeForm, addressToForteName, seekChordTablesAddress]
 
@@ -2931,6 +2931,6 @@ if __name__ == '__main__':
     music21.mainTest()
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

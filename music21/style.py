@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         style.py
 # Purpose:      Music21 classes for non-analytic display properties
 #
@@ -8,7 +8,7 @@
 # Copyright:    Copyright © 2016 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 The style module represents information about the style of a Note, Accidental,
 etc. such that precise positioning information, layout, size, etc. can be specified.
@@ -559,5 +559,5 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test) #, runTest='')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

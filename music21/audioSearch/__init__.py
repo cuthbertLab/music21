@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         audioSearch.py
 # Purpose:      base subroutines for all audioSearching and score following
 #               routines
@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Base routines used throughout audioSearching and score-folling.
 
@@ -546,7 +546,7 @@ def smoothFrequencies(detectedPitchesFreq, smoothLevels=7, inPlace=True):
 
 
 
-#-------------------------------------------------------
+# ------------------------------------------------------
 # Duration related routines
 
 
@@ -688,7 +688,7 @@ def quarterLengthEstimation(durationList, mostRepeatedQuarterLength=1.0):
 
     pdf, bins = histogram(dl,8.0)
 
-    #environLocal.printDebug('HISTOGRAMA %s %s' % (pdf, bins))
+    # environLocal.printDebug('HISTOGRAMA %s %s' % (pdf, bins))
 
     i = len(pdf) - 1 # backwards! it has more sense
     while pdf[i] != max(pdf):
@@ -702,10 +702,10 @@ def quarterLengthEstimation(durationList, mostRepeatedQuarterLength=1.0):
     binPosition = 0 - math.log(mostRepeatedQuarterLength, 2)
     qle = qle * math.pow(2, binPosition) # it normalizes the length to a quarter note
 
-    #environLocal.printDebug('QUARTER ESTIMATION')
-    #environLocal.printDebug('bins %s ' % bins)
-    #environLocal.printDebug('pdf %s' % pdf)
-    #environLocal.printDebug('quarterLengthEstimate %f' % qle)
+    # environLocal.printDebug('QUARTER ESTIMATION')
+    # environLocal.printDebug('bins %s ' % bins)
+    # environLocal.printDebug('pdf %s' % pdf)
+    # environLocal.printDebug('quarterLengthEstimate %f' % qle)
     return qle
 
 
@@ -886,14 +886,14 @@ def decisionProcess(partsList, notePrediction, beginningData,
 class AudioSearchException(exceptions21.Music21Exception):
     pass
 
-#------------------------------------------
+# -----------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [] # type: List[Class]
 
@@ -903,5 +903,5 @@ if __name__ == '__main__':
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

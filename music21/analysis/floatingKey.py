@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         analysis/floatingKey.py
 # Purpose:      Framework for floating key analysis
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 The floatingKey analyzer will give an approximation of the key at any point in
 a score down to the measure level using a fixed window.  It helps smooth out

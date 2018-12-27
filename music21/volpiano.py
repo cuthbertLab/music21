@@ -149,10 +149,10 @@ def toPart(volpianoText, *, breaksToLayout=False):
         {2.0} <music21.note.Note E>
         {3.0} <music21.volpiano.ColumnBreak object at 0x105262240>
         {3.0} <music21.note.Note E>
-        {4.0} <music21.bar.Barline style=regular>
+        {4.0} <music21.bar.Barline type=regular>
     {4.0} <music21.stream.Measure 0 offset=4.0>
         {0.0} <music21.note.Note E>
-        {1.0} <music21.bar.Barline style=double>
+        {1.0} <music21.bar.Barline type=double>
 
 
     As layout objects using breaksToLayout=True
@@ -168,10 +168,10 @@ def toPart(volpianoText, *, breaksToLayout=False):
         {2.0} <music21.note.Note E>
         {3.0} <music21.volpiano.ColumnBreak object at 0x105262240>
         {3.0} <music21.note.Note E>
-        {4.0} <music21.bar.Barline style=regular>
+        {4.0} <music21.bar.Barline type=regular>
     {4.0} <music21.stream.Measure 0 offset=4.0>
         {0.0} <music21.note.Note E>
-        {1.0} <music21.bar.Barline style=double>
+        {1.0} <music21.bar.Barline type=double>
 
 
     Liquescence test:
@@ -241,7 +241,7 @@ def toPart(volpianoText, *, breaksToLayout=False):
         elif token in '34':
             bl = bar.Barline()
             if token == '4':
-                bl.style = 'double'
+                bl.type = 'double'
             m.rightBarline = bl
             p.append(m)
             m = stream.Measure()
@@ -346,7 +346,7 @@ def fromStream(s, *, layoutToBreaks=False):
         7: 'x',
         11: 'z',
     }
-    
+
     def setAccFromPitch(dist, setNatural=False):
         if dist not in distToAccidental:
             error('{} above lowest line'.format(dist), ErrorLevel.WARN)

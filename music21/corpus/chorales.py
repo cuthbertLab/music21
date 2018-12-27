@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         corpus/chorales.py
 # Purpose:      Access to the chorale collection
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This file makes it easier to access Bach's chorales through various
 numbering schemes and filters and includes the Iterator()

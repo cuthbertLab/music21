@@ -86,7 +86,7 @@ def cleanupFloat(floatNum, maxDenominator=defaults.limitOffsetDenominator):
         f = Fraction(floatNum).limit_denominator(maxDenominator)
         return float(f)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Number methods...
 
 
@@ -1155,7 +1155,7 @@ class Test(unittest.TestCase):
             for i in range(1000):
                 # equal chance of -1, 1
                 x += weightedSelection([-1, 1], [1, 1])
-            #environLocal.printDebug(['weightedSelection([-1, 1], [1, 1])', x])
+            # environLocal.printDebug(['weightedSelection([-1, 1], [1, 1])', x])
             self.assertTrue(-250 < x < 250)
 
 
@@ -1165,7 +1165,7 @@ class Test(unittest.TestCase):
             for i in range(1000):
                 # 10000 more chance of 0 than 1.
                 x += weightedSelection([0, 1], [10000, 1])
-            #environLocal.printDebug(['weightedSelection([0, 1], [10000, 1])', x])
+            # environLocal.printDebug(['weightedSelection([0, 1], [10000, 1])', x])
             self.assertTrue(0 <= x < 20)
 
         for j in range(10):
@@ -1173,7 +1173,7 @@ class Test(unittest.TestCase):
             for i in range(1000):
                 # 10,000 times more likely 1 than 0.
                 x += weightedSelection([0, 1], [1, 10000])
-            #environLocal.printDebug(['weightedSelection([0, 1], [1, 10000])', x])
+            # environLocal.printDebug(['weightedSelection([0, 1], [1, 10000])', x])
             self.assertTrue(900 <= x <= 1000)
 
 
@@ -1182,12 +1182,12 @@ class Test(unittest.TestCase):
             for i in range(1000):
                 # no chance of anything but 0.
                 x += weightedSelection([0, 1], [1, 0])
-            #environLocal.printDebug(['weightedSelection([0, 1], [1, 0])', x])
+            # environLocal.printDebug(['weightedSelection([0, 1], [1, 0])', x])
             self.assertEqual(x, 0)
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [fromRoman, toRoman]
 
@@ -1196,5 +1196,5 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

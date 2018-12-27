@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         beam.py
 # Purpose:      music21 classes for representing notes
 #
@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 The module defines Beam and Beams (note plural) objects.
 
@@ -166,7 +166,7 @@ class Beam(EqualSlottedObjectMixin, style.StyleMixin):
         else:
             return '<music21.beam.Beam %s/%s/%s>' % (self.number, self.type, self.direction)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Beams(EqualSlottedObjectMixin):
@@ -678,7 +678,7 @@ class Beams(EqualSlottedObjectMixin):
                 self.beamsList[i].direction = direction
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -687,7 +687,7 @@ class Test(unittest.TestCase):
         pass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # define presented order in documentation
 
 

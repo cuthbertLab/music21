@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         repeat.py
 # Purpose:      Base classes for processing repeats
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2011-2012, 16 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module provides the base class for all RepeatMark objects: entities that denote repeats.
 
@@ -29,7 +29,7 @@ _MOD = 'repeat'
 environLocal = environment.Environment(_MOD)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class RepeatMark:
     '''
     Base class of all repeat objects, including RepeatExpression objects and
@@ -59,7 +59,7 @@ class RepeatMark:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class RepeatExpressionException(exceptions21.Music21Exception):
     pass
 
@@ -391,7 +391,7 @@ class DalSegnoAlCoda(RepeatExpressionCommand):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # store a list of one each of RepeatExpression objects; these are used for t
 # testing TextExpressions
 # 500 microseconds to run...
@@ -400,7 +400,7 @@ repeatExpressionReference = [Coda(), Segno(), Fine(), DaCapo(), DaCapoAlFine(),
 
 
 
-#-------------------------------
+# ------------------------------
 def insertRepeatEnding(s, start, end, endingNumber=1, *, inPlace=False):
     '''
     Designates a range of measures as being repeated endings (i.e. first and second endings)
@@ -674,7 +674,7 @@ class Expander:
         {3.0} <music21.bar.Repeat direction=end times=3>
     {6.0} <music21.stream.Measure 3 offset=6.0>
         {0.0} <music21.note.Note F>
-        {3.0} <music21.bar.Barline style=final>
+        {3.0} <music21.bar.Barline type=final>
 
     >>> e = repeat.Expander(s)
     >>> e.repeatBarsAreCoherent()
@@ -686,26 +686,26 @@ class Expander:
         {0.0} <music21.meter.TimeSignature 3/4>
         {0.0} <music21.note.Note A>
     {3.0} <music21.stream.Measure 2 offset=3.0>
-        {0.0} <music21.bar.Barline style=double>
+        {0.0} <music21.bar.Barline type=double>
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Note D>
         {2.0} <music21.note.Note E>
-        {3.0} <music21.bar.Barline style=double>
+        {3.0} <music21.bar.Barline type=double>
     {6.0} <music21.stream.Measure 2a offset=6.0>
-        {0.0} <music21.bar.Barline style=double>
+        {0.0} <music21.bar.Barline type=double>
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Note D>
         {2.0} <music21.note.Note E>
-        {3.0} <music21.bar.Barline style=double>
+        {3.0} <music21.bar.Barline type=double>
     {9.0} <music21.stream.Measure 2b offset=9.0>
-        {0.0} <music21.bar.Barline style=double>
+        {0.0} <music21.bar.Barline type=double>
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Note D>
         {2.0} <music21.note.Note E>
-        {3.0} <music21.bar.Barline style=double>
+        {3.0} <music21.bar.Barline type=double>
     {12.0} <music21.stream.Measure 3 offset=12.0>
         {0.0} <music21.note.Note F>
-        {3.0} <music21.bar.Barline style=final>
+        {3.0} <music21.bar.Barline type=final>
 
     OMIT_FROM_DOCS
 
@@ -867,7 +867,7 @@ class Expander:
         lb = m.leftBarline
         rb = m.rightBarline
         if lb is not None and 'Repeat' in lb.classes:
-            #environLocal.printDebug(['inserting new barline: %s' % newStyle])
+            # environLocal.printDebug(['inserting new barline: %s' % newStyle])
             m.leftBarline = bar.Barline(newStyle)
         if rb is not None and 'Repeat' in rb.classes:
             m.rightBarline = bar.Barline(newStyle)
@@ -930,7 +930,7 @@ class Expander:
             environLocal.printDebug(['start count not the same as end count: %s / %s' % (
                                                                     startCount, endCount)])
             return False
-        #environLocal.printDebug(['matched start and end repeat barline count of: ',
+        # environLocal.printDebug(['matched start and end repeat barline count of: ',
         #    '%s/%s' % (startCount, endCount)])
         return True
 
@@ -946,7 +946,7 @@ class Expander:
         # for now, only accepting one segno
         sumDs = (self._dsCount + self._dsacCount +
                 self._dsafCount + self._asCount)
-        #environLocal.printDebug(['_daCapoOrSegno', sumDc, sumDs])
+        # environLocal.printDebug(['_daCapoOrSegno', sumDc, sumDs])
         if sumDc == 1 and sumDs == 0:
             return DaCapo
         elif sumDs == 1 and sumDc == 0:
@@ -992,17 +992,17 @@ class Expander:
 
         # if dc, there can be no codas
         if self._dcCount == 1 and self._codaCount == 0:
-            #environLocal.printDebug(['returning true on dc'])
+            # environLocal.printDebug(['returning true on dc'])
             return True
 
         # if we have a da capo al fine, must have one fine
         elif self._dcafCount == 1 and self._fineCount == 1:
-            #environLocal.printDebug(['returning true on dcaf'])
+            # environLocal.printDebug(['returning true on dcaf'])
             return True
 
         # if we have a da capo al coda, must have two coda signs
         elif self._dcacCount == 1 and self._codaCount == 2:
-            #environLocal.printDebug(['returning true on dcac'])
+            # environLocal.printDebug(['returning true on dcac'])
             return True
 
         # return false for all other cases
@@ -1022,13 +1022,13 @@ class Expander:
         if (self._asCount == 1
                 and self._segnoCount == 1
                 and self._codaCount == 0):
-            #environLocal.printDebug(['returning true on as'])
+            # environLocal.printDebug(['returning true on as'])
             return True
 
         if (self._dsCount == 1
                 and self._segnoCount == 1
                 and self._codaCount == 0):
-            #environLocal.printDebug(['returning true on ds'])
+            # environLocal.printDebug(['returning true on ds'])
             return True
 
         # if we have a da capo al fine, must have one fine
@@ -1036,7 +1036,7 @@ class Expander:
                 and self._codaCount == 0
                 and self._segnoCount == 1
                 and self._fineCount == 1):
-            #environLocal.printDebug(['returning true on dsaf'])
+            # environLocal.printDebug(['returning true on dsaf'])
             return True
 
         # if we have a da capo al coda, must have two coda signs
@@ -1044,7 +1044,7 @@ class Expander:
                 and self._codaCount == 2
                 and self._segnoCount == 1
                 and self._fineCount == 0):
-            #environLocal.printDebug(['returning true on dsac'])
+            # environLocal.printDebug(['returning true on dsac'])
             return True
 
         # return false for all other cases
@@ -1093,7 +1093,7 @@ class Expander:
             m = streamObj[i]
             #shiftedIndex = False
             for rb in self._repeatBrackets:
-                #environLocal.printDebug(['_groupRepeatBracketIndices', rb])
+                # environLocal.printDebug(['_groupRepeatBracketIndices', rb])
                 #match = False
                 if rb.isFirst(m): # for this rb, is this the first measures
                     if rb.getNumberList()[0] in foundRBNumbers:
@@ -1141,9 +1141,9 @@ class Expander:
             # get for each group and look at one at a time.
 
             rBrackets = group['repeatBrackets']
-            #environLocal.printDebug(['_repeatBracketsAreCoherent',
+            # environLocal.printDebug(['_repeatBracketsAreCoherent',
             #    "group['measureIndices']",  group['measureIndices']])
-            #environLocal.printDebug(['_repeatBracketsAreCoherent',
+            # environLocal.printDebug(['_repeatBracketsAreCoherent',
             #    "group['repeatBrackets']",  group['repeatBrackets']])
 
             # the numbers must be consecutive
@@ -1169,7 +1169,7 @@ class Expander:
             # there needs to be repeat after each bracket except the last
             spannedMeasureIds = []
             for rbCount, rb in enumerate(rBrackets):
-                #environLocal.printDebug(['rbCount', rbCount, rb])
+                # environLocal.printDebug(['rbCount', rbCount, rb])
                 # get the last, which is a measure, see if it has a repeat
                 m = rb.getLast()
                 # check that they do not overlap: look at all components (starts
@@ -1197,7 +1197,7 @@ class Expander:
         Return True if this Stream of Measures has a repeat
         pair still to process.
         '''
-        #environLocal.printDebug(['hasRepeat', streamObj])
+        # environLocal.printDebug(['hasRepeat', streamObj])
         for i in range(len(streamObj)):
             m = streamObj[i]
             lb = m.leftBarline
@@ -1258,7 +1258,7 @@ class Expander:
                 # an end may be placed on the left barline; of the next measuer
                 # meaning that we only want up until the previous
                 elif lb.direction == 'end':
-                    #environLocal.printDebug(['found an end in left barline: %s' % lb])
+                    # environLocal.printDebug(['found an end in left barline: %s' % lb])
                     if not startIndices:
                         # get from first to this one
                         barRepeatIndices = range(i)
@@ -1352,23 +1352,23 @@ class Expander:
             {0.0} <music21.meter.TimeSignature 3/4>
             {0.0} <music21.note.Note A>
         {3.0} <music21.stream.Measure 2 offset=3.0>
-            {0.0} <music21.bar.Barline style=double>
+            {0.0} <music21.bar.Barline type=double>
             {0.0} <music21.note.Note C>
             {1.0} <music21.note.Note D>
             {2.0} <music21.note.Note E>
-            {3.0} <music21.bar.Barline style=double>
+            {3.0} <music21.bar.Barline type=double>
         {6.0} <music21.stream.Measure 2a offset=6.0>
-            {0.0} <music21.bar.Barline style=double>
+            {0.0} <music21.bar.Barline type=double>
             {0.0} <music21.note.Note C>
             {1.0} <music21.note.Note D>
             {2.0} <music21.note.Note E>
-            {3.0} <music21.bar.Barline style=double>
+            {3.0} <music21.bar.Barline type=double>
         {9.0} <music21.stream.Measure 2b offset=9.0>
-            {0.0} <music21.bar.Barline style=double>
+            {0.0} <music21.bar.Barline type=double>
             {0.0} <music21.note.Note C>
             {1.0} <music21.note.Note D>
             {2.0} <music21.note.Note E>
-            {3.0} <music21.bar.Barline style=double>
+            {3.0} <music21.bar.Barline type=double>
         {12.0} <music21.stream.Measure 3 offset=12.0>
             {0.0} <music21.note.Note F>
         {15.0} <music21.stream.Measure 4 offset=15.0>
@@ -1379,7 +1379,7 @@ class Expander:
             {3.0} <music21.bar.Repeat direction=end times=2>
         {18.0} <music21.stream.Measure 5 offset=18.0>
             {0.0} <music21.note.Note C>
-            {3.0} <music21.bar.Barline style=final>
+            {3.0} <music21.bar.Barline type=final>
 
         Calling it again will complete the job, as .process() does
 
@@ -1396,17 +1396,17 @@ class Expander:
         {12.0} <music21.stream.Measure 3 offset=12.0>
         ...
         {15.0} <music21.stream.Measure 4 offset=15.0>
-            {0.0} <music21.bar.Barline style=double>
+            {0.0} <music21.bar.Barline type=double>
             {0.0} <music21.note.Note G>
             {1.0} <music21.note.Note A>
             {2.0} <music21.note.Note B>
-            {3.0} <music21.bar.Barline style=double>
+            {3.0} <music21.bar.Barline type=double>
         {18.0} <music21.stream.Measure 4a offset=18.0>
-            {0.0} <music21.bar.Barline style=double>
+            {0.0} <music21.bar.Barline type=double>
             {0.0} <music21.note.Note G>
             {1.0} <music21.note.Note A>
             {2.0} <music21.note.Note B>
-            {3.0} <music21.bar.Barline style=double>
+            {3.0} <music21.bar.Barline type=double>
         {21.0} <music21.stream.Measure 5 offset=21.0>
         ...
 
@@ -1427,14 +1427,14 @@ class Expander:
         ...
         {9.0} <music21.stream.Measure 2a offset=9.0>
         ...
-            {3.0} <music21.bar.Barline style=double>
+            {3.0} <music21.bar.Barline type=double>
         {12.0} <music21.stream.Measure 3 offset=12.0>
         ...
         {15.0} <music21.stream.Measure 4 offset=15.0>
         ...
         {18.0} <music21.stream.Measure 5 offset=18.0>
         ...
-            {3.0} <music21.bar.Barline style=final>
+            {3.0} <music21.bar.Barline type=final>
         '''
         lowercase_alphabet = string.ascii_lowercase
         # get class from src
@@ -1447,7 +1447,7 @@ class Expander:
             repeatIndices = self.findInnermostRepeatIndices(streamObj)
         else: # use passed
             forcedIndices = True
-        #environLocal.printDebug(['got new repeat indices:', repeatIndices])
+        # environLocal.printDebug(['got new repeat indices:', repeatIndices])
 
         # renumber measures starting with the first number found here
 #         number = streamObj[0].number
@@ -1458,7 +1458,7 @@ class Expander:
         # use index values instead of an interator
         i = 0
         while i < len(streamObj):
-            #environLocal.printDebug(['processing measure index:', i,
+            # environLocal.printDebug(['processing measure index:', i,
             # 'repeatIndices', repeatIndices])
             # if this index is the start of the repeat
             if i == repeatIndices[0]:
@@ -1477,14 +1477,14 @@ class Expander:
                     repeatTimes = repeatTimesFound
 
                 for times in range(repeatTimes):
-                    #environLocal.printDebug(['repeat times:', times])
+                    # environLocal.printDebug(['repeat times:', times])
                     # copy the range of measures; this will include the first
                     # always copying from the same source
                     for j in repeatIndices:
                         mSub = copy.deepcopy(streamObj[j])
                         # must do for each pass, b/c not changing source
                         # stream
-                        #environLocal.printDebug(['got j, repeatIndicies', j, repeatIndices])
+                        # environLocal.printDebug(['got j, repeatIndicies', j, repeatIndices])
                         if j in [repeatIndices[0], repeatIndices[-1]]:
                             self._stripRepeatBarlines(mSub)
                         #mSub.number = number
@@ -1516,12 +1516,12 @@ class Expander:
                     # cannot deepcopy here, as we might orphan a spanner
                     # attached to bracket after this repeat segment
                     m = streamObj[i]
-                    #environLocal.printDebug(['about to insert m into new', 'id(m)', id(m),
+                    # environLocal.printDebug(['about to insert m into new', 'id(m)', id(m),
                     #   'new', id(new), 'all ids:', [id(e) for e in new]])
                         #m = copy.deepcopy(streamObj[i])
                         #new.show('t')
                     if stripFirstNextMeasure:
-                        #environLocal.printDebug(['got stripFirstNextMeasure'])
+                        # environLocal.printDebug(['got stripFirstNextMeasure'])
                         self._stripRepeatBarlines(m)
                         # change in source too
                         self._stripRepeatBarlines(streamObj[i])
@@ -1557,7 +1557,7 @@ class Expander:
         groups = self._groupRepeatBracketIndices(streamObj)
         # if we do not groups when expected it is probably b/c spanners have
         # been orphaned
-        #environLocal.printDebug(['got groups:', groups])
+        # environLocal.printDebug(['got groups:', groups])
         if not groups: # none found:
             return self.processInnermostRepeatBars(streamObj)
 
@@ -1573,22 +1573,22 @@ class Expander:
             mEnd = streamObj[innermost[-1]]
             for rb in rBrackets:
                 if id(rb) in repeatBracketsMemo:
-                    #environLocal.printDebug(['skipping rb as in memo keys:', rb])
+                    # environLocal.printDebug(['skipping rb as in memo keys:', rb])
                     break # do not need to look at components
                 elif rb.hasSpannedElement(mStart) or rb.hasSpannedElement(mEnd):
-                    #environLocal.printDebug(['matched rb as component' ])
+                    # environLocal.printDebug(['matched rb as component' ])
                     groupFocus = group
                     break
                 else:
                     pass
-                    #environLocal.printDebug(['rb does not have measure as a spanned element',
+                    # environLocal.printDebug(['rb does not have measure as a spanned element',
                     #'rb', rb, 'mEnd', mEnd])
             if groupFocus is not None:
                 break
 
         # if the innermost measures are not part of a group, process normally
         if groupFocus is None:
-            #environLocal.printDebug(['cannot find innermost in a group:',
+            # environLocal.printDebug(['cannot find innermost in a group:',
             #'innermost', innermost, 'groupFocus', groupFocus])
             return self.processInnermostRepeatBars(streamObj)
         #else: # have innermost in a bracket
@@ -1649,7 +1649,7 @@ class Expander:
             boundaries.append(data)
 
         for data in boundaries:
-            #environLocal.printDebug(['processing data bundle:', data])
+            # environLocal.printDebug(['processing data bundle:', data])
 
             # each number in a racket corresponds to one or more repeat
             # find indices to process and times based on repeat brackets
@@ -1664,7 +1664,7 @@ class Expander:
                 out = self.processInnermostRepeatBars(streamObj,
                        repeatIndices=data['validIndices'], repeatTimes=repeatTimes,
                        returnExpansionOnly=True)
-                #environLocal.printDebug(['got bracket segment:',
+                # environLocal.printDebug(['got bracket segment:',
                 #   [n.name for n in out.flat.pitches]])
                 streamBracketRepeats.append(out)
                 # highest index will always be the last copied, up until end
@@ -1766,7 +1766,7 @@ class Expander:
         maxProcesses = 100 # safety check
         while maxProcesses > 0:
             maxProcesses = maxProcesses - 1
-            #environLocal.printDebug(['process(): top of loop'])
+            # environLocal.printDebug(['process(): top of loop'])
             #post.show('t')
             #post = self.processInnermostRepeatBars(post)
             streamObj = self._processInnermostRepeatsAndBrackets(
@@ -1776,7 +1776,7 @@ class Expander:
             #post.show('t')
             if self._hasRepeat(streamObj):
                 pass
-                #environLocal.printDebug(['process() calling:
+                # environLocal.printDebug(['process() calling:
                 # self.findInnermostRepeatIndices(post)',
                 # self.findInnermostRepeatIndices(post)])
             else:
@@ -1807,7 +1807,7 @@ class Expander:
             end = self.getRepeatExpressionIndex(streamObj, 'Fine')[0]
         else:
             end = len(streamObj) - 1
-        #environLocal.printDebug(['got end/fine:', end])
+        # environLocal.printDebug(['got end/fine:', end])
 
         # coda jump/start
         if recType in ['DaCapoAlCoda', 'DalSegnoAlCoda']:
@@ -1838,7 +1838,7 @@ class Expander:
         if number is None:
             number = 1
 
-        #environLocal.printDebug(['_processRepeatExpressionAndRepeats',
+        # environLocal.printDebug(['_processRepeatExpressionAndRepeats',
         #'index segments', indexSegments])
         # recType.repeatAfterJump
 
@@ -1876,7 +1876,7 @@ class Expander:
 
     _DOC_ORDER = ['process', 'measureMap']
 
-#----------------------------------------------------------
+# ---------------------------------------------------------
 
 class UnequalPartsLengthException(exceptions21.Music21Exception):
     pass
@@ -2554,7 +2554,7 @@ class RepeatFinder:
         return mGroups
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -4314,7 +4314,7 @@ class Test(unittest.TestCase):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [RepeatExpression, RepeatExpressionMarker, Coda, Segno, Fine,
               RepeatExpressionCommand, DaCapo, DaCapoAlFine,
@@ -4324,6 +4324,6 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test) #, runTest='testExpandRepeatA')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

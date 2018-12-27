@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         musicxml/archiveTools.py
 # Purpose:      Tools for compressing and uncompressing MusicXML files
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009, 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Tools for compressing and uncompressing musicxml files.
 '''
@@ -21,7 +21,7 @@ _MOD = 'musicxml.archiveTools'
 environLocal = environment.Environment(_MOD)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # compression
 
 

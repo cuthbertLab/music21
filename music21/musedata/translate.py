@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         musedata.translate.py
 # Purpose:      Translate MuseData into music21 objects
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 **N.B. in Dec. 2014 MuseData access was removed from music21 because the rights conflicted with
 access computationally from music21.  This module is retained for anyone who has such access,
@@ -33,7 +33,7 @@ environLocal = environment.Environment(_MOD)
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class MuseDataTranslateException(exceptions21.Music21Exception):
     pass
 
@@ -98,7 +98,7 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
         # directly assign pitch object; will already have accidental
         post.pitch = records[0].getPitchObject()
     else:
-        #environLocal.printDebug(['attempting chord creation: records', len(records)])
+        # environLocal.printDebug(['attempting chord creation: records', len(records)])
         # can supply a lost of Pitch objects at creation
         post = chord.Chord([r.getPitchObject() for r in records])
 
@@ -178,14 +178,14 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
     # create and store objects
     mdmObjs = museDataPart.getMeasures()
 
-    #environLocal.printDebug(['first measure parent', mdmObjs[0].parent])
+    # environLocal.printDebug(['first measure parent', mdmObjs[0].parent])
 
     barCount = 0
     # get each measure
     # store last Note/Chord/Rest for tie comparisons; span measures
     eLast = None
     for mIndex, mdm in enumerate(mdmObjs):
-        #environLocal.printDebug(['processing:', mdm.src])
+        # environLocal.printDebug(['processing:', mdm.src])
         if not mdm.hasNotes():
             continue
 
@@ -207,7 +207,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
 
         # conditions for a final measure definition defining the last bar
         if mdmNext is not None and not mdmNext.hasNotes():
-            #environLocal.printDebug(['got mdmNext not none and not has notes'])
+            # environLocal.printDebug(['got mdmNext not none and not has notes'])
             # get bar from next measure definition
             m.rightBarline = mdmNext.getBarObject()
 
@@ -236,7 +236,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
         # get notes in each record
         for i in range(len(mdrObjs)):
             mdr = mdrObjs[i]
-            #environLocal.printDebug(['processing:', mdr.src])
+            # environLocal.printDebug(['processing:', mdr.src])
 
             if mdr.isBack():
                 # the current use of back assumes tt back assumes tt we always
@@ -251,7 +251,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
                 vActive = stream.Voice()
 
             if mdr.isRest():
-                #environLocal.printDebug(['got mdr rest, parent:', mdr.parent])
+                # environLocal.printDebug(['got mdr rest, parent:', mdr.parent])
                 # check for pending records first
                 if pendingRecords != []:
                     eLast = _processPending(hasVoices, pendingRecords, eLast, m, vActive)
@@ -297,7 +297,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
             # can only do this b/c ts is defined
             if m.barDurationProportion() < 1.0:
                 m.padAsAnacrusis()
-                #environLocal.printDebug(['incompletely filled Measure found on musedata import; ',
+                # environLocal.printDebug(['incompletely filled Measure found on musedata import; ',
                 #   'interpreting as a anacrusis:', 'padingLeft:', m.paddingLeft])
         p.coreAppend(m)
         barCount += 1
@@ -305,7 +305,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
     p.coreElementsChanged()
     # for now, make all imports a c-score on import;
     tInterval = museDataPart.getTranspositionIntervalObject()
-    #environLocal.printDebug(['got transposition interval', p.id, tInterval])
+    # environLocal.printDebug(['got transposition interval', p.id, tInterval])
     if tInterval is not None:
         p.flat.transpose(tInterval,
                         classFilterList=['Note', 'Chord', 'KeySignature'],
@@ -367,7 +367,7 @@ def museDataWorkToStreamScore(museDataWork, inputM21=None):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -614,7 +614,7 @@ class Test(unittest.TestCase):
 #         self.assertEqual(len(s.flat.getElementsByClass('Note')), 2792)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [museDataWorkToStreamScore]
 
@@ -624,6 +624,6 @@ if __name__ == "__main__":
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

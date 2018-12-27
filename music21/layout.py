@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         layout.py
 # Purpose:      Layout objects
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 The layout.py module contains two types of objects that specify the layout on
 page (or screen) for Scores and other Stream objects.  There are two main types
@@ -111,7 +111,7 @@ class LayoutBase(base.Music21Object):
         super().__init__()
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ScoreLayout(LayoutBase):
     '''Parameters for configuring a score's layout.
 
@@ -192,7 +192,7 @@ class ScoreLayout(LayoutBase):
         return round(millimetersPerTenth * tenths, 6)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class PageLayout(LayoutBase):
     '''
     Parameters for configuring a page's layout.
@@ -254,7 +254,7 @@ class PageLayout(LayoutBase):
         return '<music21.layout.PageLayout>'
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class SystemLayout(LayoutBase):
     '''
     Object that configures or alters a system's layout.
@@ -384,7 +384,7 @@ class StaffLayout(LayoutBase):
                 + 'distance %r, staffNumber %r, staffSize %r, staffLines %r>' % (
                      self.distance, self.staffNumber, self.staffSize, self.staffLines))
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class LayoutException(exceptions21.Music21Exception):
     pass
 
@@ -392,7 +392,7 @@ class StaffGroupException(spanner.SpannerException):
     pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class StaffGroup(spanner.Spanner):
     '''
     A StaffGroup defines a collection of one or more Parts,
@@ -445,7 +445,7 @@ class StaffGroup(spanner.Spanner):
             self.name = keywords['abbreviation'] # user property
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _getBarTogether(self):
         return self._barTogether
 
@@ -500,7 +500,7 @@ class StaffGroup(spanner.Spanner):
         ''')
 
 
-#----------------------------------------------------------------
+# ---------------------------------------------------------------
 # Stream subclasses for layout
 
 def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
@@ -1563,7 +1563,7 @@ class Staff(stream.Part):
 
 _DOC_ORDER = [ScoreLayout, PageLayout, SystemLayout, StaffLayout, LayoutBase,
               LayoutScore, Page, System, Staff]
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1642,13 +1642,13 @@ class Test(unittest.TestCase):
         self.assertTrue(hiddenStaff.__repr__().endswith('Staff 11: p.1, sys.4, st.2>'))
         self.assertIsNotNone(hiddenStaff.staffLayout)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test) #, runTest='getStaffLayoutFromStaff')
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         common/classTools.py
 # Purpose:      Utilities for classes
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 #from music21 import exceptions21
 __all__ = ['isNum', 'isListLike', 'isIterable', 'classToClassStr', 'getClassSet']
@@ -166,7 +166,7 @@ def getClassSet(instance, classNameTuple=None):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 # _DOC_ORDER = [fromRoman, toRoman]
 
@@ -175,7 +175,7 @@ if __name__ == "__main__":
     import music21
     music21.mainTest()
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         roman.py
 # Purpose:      music21 classes for doing Roman Numeral / Tonal analysis
 #
@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2011-2013 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Music21 class for dealing with Roman Numeral analysis
 '''
@@ -39,7 +39,7 @@ environLocal = environment.Environment(_MOD)
 
 # TODO: setting inversion should change the figure
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 SHORTHAND_RE = re.compile(r'#*-*b*o*[1-9xyz]')
@@ -137,7 +137,7 @@ functionalityScores = {
     }
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 def expandShortHand(shorthand):
@@ -874,7 +874,7 @@ def romanNumeralFromChord(chordObj,
     return rn
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class RomanException(exceptions21.Music21Exception):
@@ -885,7 +885,7 @@ class RomanNumeralException(exceptions21.Music21Exception):
     pass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class RomanNumeral(harmony.Harmony):
@@ -1954,7 +1954,7 @@ class RomanNumeral(harmony.Harmony):
         if isinstance(keyOrScale, str):
             keyOrScale = _getKeyFromCache(keyOrScale)
         elif keyOrScale is not None:
-            #environLocal.printDebug(['got keyOrScale', keyOrScale])
+            # environLocal.printDebug(['got keyOrScale', keyOrScale])
             try:
                 keyClasses = keyOrScale.classes
             except:
@@ -2168,7 +2168,7 @@ class RomanNumeral(harmony.Harmony):
         self._functionalityScore = value
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -2626,7 +2626,7 @@ if __name__ == '__main__':
     music21.mainTest(Test) #, runTest='testAugmentedOctave')
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 _DOC_ORDER = (
@@ -2634,5 +2634,5 @@ _DOC_ORDER = (
     )
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

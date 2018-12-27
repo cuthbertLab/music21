@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         stream/iterator.py
 # Purpose:      classes for walking through streams...
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2008-2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 this class contains iterators and filters for walking through streams
 
@@ -22,14 +22,14 @@ from music21.stream import filters
 
 from music21.sites import SitesException
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class StreamIteratorException(StreamException):
     pass
 
 class StreamIteratorInefficientWarning(PendingDeprecationWarning):
     pass
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class StreamIterator:
     '''
@@ -408,7 +408,7 @@ class StreamIterator:
             return True
         return False
 
-    #----------------------------------------------------------------
+    # ---------------------------------------------------------------
     # start and stop
 
     def updateActiveInformation(self):
@@ -460,7 +460,7 @@ class StreamIterator:
             self.srcStreamElements = ()
 
 
-    #---------------------------------------------------------------
+    # --------------------------------------------------------------
     # ProtoM21Object things...
     @property
     def classSet(self):
@@ -473,7 +473,7 @@ class StreamIterator:
     def classes(self):
         return tuple([x.__name__ for x in self.__class__.mro()])
 
-    #----------------------------------------------------------------
+    # ---------------------------------------------------------------
     # getting items
 
 
@@ -610,14 +610,14 @@ class StreamIterator:
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Rest rest>
         {2.0} <music21.note.Note D>
-        {3.0} <music21.bar.Barline style=regular>
+        {3.0} <music21.bar.Barline type=regular>
 
         >>> s3.elementOffset(b, stringReturns=True)
         'highestTime'
 
         >>> s4 = s.iter.getElementsByClass('Barline').stream()
         >>> s4.show('t')
-        {0.0} <music21.bar.Barline style=regular>
+        {0.0} <music21.bar.Barline type=regular>
 
 
         Note that this routine can create Streams that have elements that the original
@@ -704,7 +704,7 @@ class StreamIterator:
         return getattr(self.activeInformation['stream'], self.activeInformation['iterSection'])
 
 
-    #-------------------------------------------------------------
+    # ------------------------------------------------------------
     def addFilter(self, newFilter):
         '''
         adds a filter to the list.
@@ -1073,7 +1073,7 @@ class StreamIterator:
                       )
         return self
 
-    #-------------------------------------------------------------
+    # ------------------------------------------------------------
     # properties -- historical...
 
     @property
@@ -1156,7 +1156,7 @@ class StreamIterator:
         self.addFilter(filters.ClassFilter('Voice'))
         return self
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class OffsetIterator(StreamIterator):
     '''
     An iterator that with each iteration returns a list of elements
@@ -1260,7 +1260,7 @@ class OffsetIterator(StreamIterator):
         self.raiseStopIterationNext = False
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class RecursiveIterator(StreamIterator):
     '''
     One of the most powerful iterators in music21.  Generally not called

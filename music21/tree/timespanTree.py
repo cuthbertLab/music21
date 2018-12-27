@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         tree/timespanTree.py
 # Purpose:      Subclasses of tree.trees.OffsetTree for manipulation
 #
@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Tools for grouping elements, timespans, and especially
 pitched elements into kinds of searchable tree organized by start and stop offsets
@@ -27,12 +27,12 @@ from music21.tree import spans, trees
 from music21 import environment
 environLocal = environment.Environment("tree.timespanTree")
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class TimespanTreeException(exceptions21.TreeException):
     pass
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class TimespanTree(trees.OffsetTree):
     r'''
@@ -820,7 +820,7 @@ class Test(unittest.TestCase):
                     # pylint: disable=consider-using-enumerate
                     for i in range(len(currentTimespansInTree)):
                         self.assertEqual(currentTimespansInList[i], currentTimespansInTree[i])
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 if __name__ == "__main__":

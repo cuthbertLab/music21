@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         basic.py
 # Purpose:      music21 class which allows transcription of music21Object instances to braille.
 # Authors:      Jose Cabal-Ugaz
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2011, 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 import unittest
 
@@ -30,7 +30,7 @@ symbols = lookup.symbols
 environRules = environment.Environment('basic.py')
 
 beamStatus = {}
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # music21Object to braille unicode methods
 
 #noinspection PyStatementEffect
@@ -996,7 +996,7 @@ def timeSigToBraille(m21TimeSignature):
         m21TimeSignature._brailleEnglish.append("{0} None".format(m21TimeSignature))
         return symbols['basic_exception']
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Helper methods
 
 def showOctaveWithNote(previousNote, currentNote):
@@ -1317,7 +1317,7 @@ def transcribeSignatures(music21KeySignature, music21TimeSignature, outgoingKeyS
 
     return "".join(trans)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Translation between braille unicode and ASCII/other symbols.
 
 def brailleUnicodeToBrailleAscii(brailleUnicode):
@@ -1453,7 +1453,7 @@ def yieldDots(brailleCharacter):
         if dots in ('10', '11'):
             yield symbols['dot']
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Transcription of words and numbers.
 
 def wordToBraille(sampleWord, isTextExpression=False):
@@ -1559,12 +1559,12 @@ def numberToBraille(sampleNumber, withNumberSign=True, lower=False):
                                                                     digit, sampleNumber))
     return "".join(numberTrans)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class BrailleBasicException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1575,5 +1575,5 @@ if __name__ == "__main__":
     import music21
     music21.mainTest(Test) #, verbose=True)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

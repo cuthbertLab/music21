@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         note.py
 # Purpose:      music21 classes for representing notes
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2006-2017 Michael Scott Cuthbert and the music21 Project
 # License:      BSD or LGPL, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Classes and functions for creating Notes, Rests, and Lyrics.
 
@@ -75,7 +75,7 @@ stemDirectionNames = [
     ]
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class LyricException(exceptions21.Music21Exception):
     pass
 
@@ -85,7 +85,7 @@ class NoteException(exceptions21.Music21Exception):
 class NotRestException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class Lyric(style.StyleMixin):
@@ -318,7 +318,7 @@ class Lyric(style.StyleMixin):
             self._number = value
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class GeneralNote(base.Music21Object):
@@ -417,7 +417,7 @@ class GeneralNote(base.Music21Object):
             return False
         return True
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _getLyric(self) -> str:
         if not self.lyrics:
             return None
@@ -597,10 +597,10 @@ class GeneralNote(base.Music21Object):
             return False
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # properties common to Notes, Rests,
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def augmentOrDiminish(self, scalar, *, inPlace=False):
         '''
         Given a scalar greater than zero, return a Note with a scaled Duration.
@@ -650,7 +650,7 @@ class GeneralNote(base.Music21Object):
         else:
             return None
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def getGrace(self, *, appogiatura=False, inPlace=False):
         '''
         Return a grace version of this GeneralNote
@@ -706,7 +706,7 @@ class GeneralNote(base.Music21Object):
             return e
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class NotRest(GeneralNote):
     '''
     Parent class for Note-like objects that are not rests; that is to say
@@ -769,7 +769,7 @@ class NotRest(GeneralNote):
         >>> m.volume.client is m
         True
         '''
-        #environLocal.printDebug(['calling NotRest.__deepcopy__', self])
+        # environLocal.printDebug(['calling NotRest.__deepcopy__', self])
         new = super().__deepcopy__(memo=memo)
         # after copying, if a Volume exists, it is linked to the old object
         # look at _volume so as not to create object if not already there
@@ -940,7 +940,7 @@ class NotRest(GeneralNote):
         music21.note.NotRestException: notehead parentheses must be True or False, not 'blah'
         ''')
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def hasVolumeInformation(self) -> bool:
         '''
         Returns bool whether volume was set -- saving some time for advanced
@@ -1009,7 +1009,7 @@ class NotRest(GeneralNote):
         ''')
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Note(NotRest):
     '''
     One of the most important music21 classes, a Note
@@ -1098,7 +1098,7 @@ class Note(NotRest):
                 del keywords['nameWithOctave']
             self.pitch = pitch.Pitch(name, **keywords)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # operators, representations, and transformations
 
     def __repr__(self):
@@ -1207,7 +1207,7 @@ class Note(NotRest):
         except AttributeError:
             return NotImplemented
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # property access
 
 
@@ -1410,11 +1410,11 @@ class Note(NotRest):
         return ''.join(msg)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # convenience classes
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Unpitched(NotRest):
     '''
     A General class of unpitched objects which appear at different places
@@ -1484,7 +1484,7 @@ class Unpitched(NotRest):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Rest(GeneralNote):
     '''
     Rests are represented in music21 as GeneralNote objects that do not have
@@ -1609,7 +1609,7 @@ class SpacerRest(Rest):
                     self.name, self.duration.quarterLength)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # test methods and classes
 
 class TestExternal(unittest.TestCase): # pragma: no cover
@@ -1647,7 +1647,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -2021,7 +2021,7 @@ class Test(unittest.TestCase):
         self.assertEqual(n1Copy.volume.velocity, 100)
         self.assertEqual(n1Copy.volume.client, n1Copy)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Note, Rest, SpacerRest, Unpitched, NotRest, GeneralNote, Lyric]
 
@@ -2031,5 +2031,5 @@ if __name__ == '__main__':
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

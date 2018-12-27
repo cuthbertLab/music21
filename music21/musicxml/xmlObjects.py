@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         musicxml/xmlObjects.py
 # Purpose:      MusicXML objects for conversion to and from music21
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import re
 
 from collections import OrderedDict
@@ -99,7 +99,7 @@ ORNAMENT_MARKS = {'trill-mark'       : expressions.Trill,
                   # TODO: 'accidental-mark' -- something else...
                   }
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # helpers
 
 STYLE_ATTRIBUTES_YES_NO_TO_BOOL = ('hideObjectOnPrint', )
@@ -187,7 +187,7 @@ def isValidXSDID(text):
     else:
         return False
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
     music21.mainTest()

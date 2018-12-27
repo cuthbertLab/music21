@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         lily/translate.py
 # Purpose:      music21 classes for translating to Lilypond
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2007-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 music21 translates to Lilypond format and if Lilypond is installed on the
 local computer, can automatically generate .pdf, .png, and .svg versions
@@ -81,7 +81,7 @@ def makeLettersOnlyId(inputString):
 
     return returnString
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class LilypondConverter:
     fictaDef = (
     r'''
@@ -232,7 +232,7 @@ class LilypondConverter:
             self.context = self.topLevelObject
 
 
-    #------------ Set a complete Lilypond Tree from a music21 object ----------#
+    # ----------- Set a complete Lilypond Tree from a music21 object ----------#
     def textFromMusic21Object(self, m21ObjectIn):
         r'''
         get a proper lilypond text file for writing from a music21 object
@@ -381,7 +381,7 @@ class LilypondConverter:
         self.context.contents = contents
 
 
-    #------- return Lily objects or append to the current context -----------#
+    # ------ return Lily objects or append to the current context -----------#
     def lyScoreBlockFromScore(self, scoreIn):
 
         lpCompositeMusic = lyo.LyCompositeMusic()
@@ -2385,7 +2385,7 @@ class LilypondConverter:
         lyObject.content = schemeStr
         return lyObject
 
-    #--------------display and converter routines ---------------------#
+    # -------------display and converter routines ---------------------#
     def writeLyFile(self, ext='', fp=None):
         '''
         writes the contents of the self.topLevelObject to a file.
@@ -2610,14 +2610,14 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         s.show('lily.png')
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 if __name__ == "__main__":
     # pylint: disable=ungrouped-imports
     import music21
     music21.mainTest(Test) #, TestExternal)
     #music21.mainTest(TestExternal, 'noDocTest')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 
 

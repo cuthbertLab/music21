@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         features.jSymbolic.py
 # Purpose:      music21 functions for simple feature extraction
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 The features implemented here are based on those found in jSymbolic and
 defined in Cory McKay's MA Thesis, "Automatic Genre Classification of MIDI Recordings"
@@ -31,11 +31,11 @@ environLocal = environment.Environment(_MOD)
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # 112 feature extractors
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # melody
 
 class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
@@ -780,7 +780,7 @@ class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # pitch
 
 
@@ -1610,7 +1610,7 @@ class PrevalenceOfMicrotonesFeature(featuresModule.FeatureExtractor):
         # TODO: implement
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # rhythm
 
 class StrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
@@ -2744,7 +2744,7 @@ class DurationFeature(featuresModule.FeatureExtractor):
         self.feature.vector[0] = end_times[-1]
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # dynamics
 
 
@@ -2834,7 +2834,7 @@ class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # texture based
 
 
@@ -3189,7 +3189,7 @@ class VoiceSeparationFeature(featuresModule.FeatureExtractor):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # instrumentation
 
 
@@ -3844,7 +3844,7 @@ class ElectricInstrumentFractionFeature(InstrumentFractionFeature):
                                 30, 31, 33, 34,  35, 36, 37, 38, 39] # accept synth bass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class JSymbolicFeatureException(featuresModule.FeatureException):
     pass
 
@@ -4296,7 +4296,7 @@ def getCompletionStats():
             countComplete, countTotal, (float(countComplete)/countTotal)))
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -4646,5 +4646,5 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

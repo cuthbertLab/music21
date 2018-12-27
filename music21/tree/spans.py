@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         tree/spans.py
 # Purpose:      Tools for marking off spans of time that optionally contain
 #               elements and which can be manipulated quickly in a tree
@@ -10,7 +10,7 @@
 # Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Tools for grouping notes and chords into a searchable tree
 organized by start and stop offsets.
@@ -24,11 +24,11 @@ from music21 import exceptions21
 
 
 environLocal = environment.Environment("tree.spans")
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class TimespanException(exceptions21.TreeException):
     pass
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class Timespan:
     r'''
     A span of time, with a start offset and stop offset.
@@ -223,7 +223,7 @@ class Timespan:
         return left, right
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class ElementTimespan(Timespan):
     r'''
@@ -515,7 +515,7 @@ class ElementTimespan(Timespan):
         el.duration.quarterLength = self.quarterLength
         return el
     
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class PitchedTimespan(ElementTimespan):
     def __init__(self,
                  element=None,
@@ -623,7 +623,7 @@ class PitchedTimespan(ElementTimespan):
         return (can, message)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
 
