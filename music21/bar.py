@@ -113,7 +113,7 @@ class Barline(base.Music21Object):
 
     N.B. for backwards compatibility reasons, currently
     Bar objects do not use the style.Style class since
-    the phrase "style" was already used. 
+    the phrase "style" was already used.
     '''
     validStyles = list(barStyleDict.keys())
 
@@ -129,7 +129,7 @@ class Barline(base.Music21Object):
             self.type = style
 
         # pause can be music21.expressions.Fermata object
-        self.pause = None 
+        self.pause = None
 
         # location is primarily stored in the stream as leftBarline or rightBarline
         # but can also be stored here.
@@ -144,10 +144,10 @@ class Barline(base.Music21Object):
     def _setStyle(self, value):
         # will raise exception on error
         self.type = value
-        
+
     style = property(_getStyle, _setStyle,
         doc = '''
-        DEPRECATED: use type instead.        
+        DEPRECATED: use type instead.
         ''')
 
     def _getType(self):
@@ -155,11 +155,11 @@ class Barline(base.Music21Object):
         synonym for style...
         '''
         return self._type
-        
+
     def _setType(self, value):
         self._type = standardizeBarStyle(value)
-        
-    type = property(_getType, _setType, 
+
+    type = property(_getType, _setType,
         doc='''
         Get and set the Barline type property.
 
@@ -173,12 +173,28 @@ class Barline(base.Music21Object):
 
         >>> b.type = 'light-light'
         >>> b.type
-        'double'        
+        'double'
         ''')
-        
 
-    @property
     def musicXMLBarStyle(self):
+        '''
+        returns the musicxml style for the bar.  most are the same as
+        `.type` but "double" and "final" are different. 
+        
+        >>> b = bar.Barline('tick')
+        >>> b.musicXMLBarStyle()
+        'tick'
+        
+        >>> b.type = 'double'
+        >>> b.musicXMLBarStyle()
+        'light-light'
+        
+        >>> b.type = 'final'
+        >>> b.musicXMLBarStyle()
+        'light-heavy'
+
+        Changed in v.5.7 -- was a property before.
+        '''
         return styleToMusicXMLBarStyle(self.type)
 
 
@@ -388,4 +404,3 @@ if __name__ == '__main__':
 
 # -----------------------------------------------------------------------------
 # eof
-
