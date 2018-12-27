@@ -2727,7 +2727,7 @@ class Duration(SlottedObjectMixin):
         array.  See music21.Music21Object.classes for more details.
         '''
         return tuple([x.__name__ for x in self.__class__.mro()])
-        # TODO: inherit from a protom21object...
+        # TODO: inherit from a protoM21Object...
 
 
     @property
