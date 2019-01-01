@@ -1065,7 +1065,7 @@ class Note(NotRest):
     isRest = False
 
     # define order to present names in documentation; use strings
-    _DOC_ORDER = ['duration', 'quarterLength', 'nameWithOctave', 'pitchClass']
+    _DOC_ORDER = ['duration', 'quarterLength', 'nameWithOctave']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
     'isNote': 'Boolean read-only value describing if this Note is a Note (True).',

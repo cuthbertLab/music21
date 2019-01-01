@@ -17,6 +17,7 @@ from music21 import common
 # pytest --nbval usersGuide_15_key.ipynb --sanitize-with ../../nbval-sanitize.cfg -q
 skip = ['installJupyter.ipynb']
 
+
 def runAll():
     sourcePath = common.getRootFilePath() / 'documentation' / 'source'
     goodFiles = []
@@ -27,11 +28,11 @@ def runAll():
                 continue
             if 'checkpoint' in str(f):
                 continue
-            
+
             goodFiles.append(f)
-        
-    
-    for f in goodFiles:    
+
+
+    for f in goodFiles:
         print("Running: ", str(f))
         try:
             retVal = runOne(f)
@@ -41,14 +42,15 @@ def runAll():
         if retVal == 512:
             return None
 
+
 def runOne(nbFile):
     us = environment.UserSettings()
     museScore = us['musescoreDirectPNGPath']
     us['musescoreDirectPNGPath'] = '/skip' + str(museScore)
     try:
         retVal = os.system('pytest --nbval ' + str(nbFile) + ' --sanitize-with '
-                  + str(common.getRootFilePath() 
-                            / 'documentation' /  'docbuild' / 'nbval-sanitize.cfg ') 
+                  + str(common.getRootFilePath()
+                            / 'documentation' / 'docbuild' / 'nbval-sanitize.cfg ')
                   + '-q')
     except (Exception, KeyboardInterrupt):
         raise

@@ -8,7 +8,7 @@
 # Copyright:    Copyright © 2009-2010, 2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 # ------------------------------------------------------------------------------
-#pylint: disable=line-too-long
+# pylint: disable=line-too-long
 '''
 if you get a 'ssh_askpass' not found error, create this file in
 /usr/libexec/ssh-askpass and sudo chmod +x it afterwards:
@@ -62,13 +62,14 @@ def getDirBuildHtml():
     dirBuildHtml = os.path.join(dirBuild, 'html')
     return dirBuildHtml
 
+
 def main():
 
     # this needs to be on level higher then the level of the source
-    #DST_MIT = 'athena.dialup.mit.edu:/afs/athena.mit.edu/org/m/music21/doc/'
+    # DST_MIT = 'athena.dialup.mit.edu:/afs/athena.mit.edu/org/m/music21/doc/'
     remoteHost = 'athena.dialup.mit.edu'
     remoteDir = '/afs/athena.mit.edu/org/m/music21/doc/'
-    #tar czpf - -C build/html/ . | ssh cuthbert@linux.mit.edu "tar xzpf - -C /afs/athena.mit.edu/org/m/music21/doc/"
+    # tar czpf - -C build/html/ . | ssh cuthbert@linux.mit.edu "tar xzpf - -C /afs/athena.mit.edu/org/m/music21/doc/"
 
     user = getpass.getpass('provide user name : ')
 
@@ -76,7 +77,7 @@ def main():
     src = getDirBuildHtml()
     # -r flag makes this recursive
     cmdStr = 'tar czpf - -C %s . | ssh %s@%s "tar xzpf - -C %s"' % (src, user, remoteHost, remoteDir)
-    #cmdStr = 'scp -r "%s" %s@%s' % (src + "/*", user, DST_MIT)
+    # cmdStr = 'scp -r "%s" %s@%s' % (src + "/*", user, DST_MIT)
     print(cmdStr)
 
     os.system(cmdStr)

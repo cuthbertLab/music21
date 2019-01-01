@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-The music21 Framework is Copyright © 2006-2016 Michael Scott Cuthbert
+The music21 Framework is Copyright © 2006-2019 Michael Scott Cuthbert
 and the music21 Project
 
 (Michael Scott Cuthbert, principal investigator; cuthbert@mit.edu)
@@ -49,7 +49,8 @@ minPythonVersion = (3, 5)
 minPythonVersionStr = '.'.join([str(x) for x in minPythonVersion])
 if sys.version_info < minPythonVersion:
     raise ImportError('''
-    Music21 v.5.4 is a Python {}+ only library.
+    Music21 v.5.4+ is a Python {}+ only library.
+    Use music21 v.1 to run on Python 2.1-2.6.
     Use music21 v.4 to run on Python 2.7.
     Use music21 v.5.2 to run on Python 3.4.
 
@@ -180,6 +181,7 @@ from music21.base import ElementWrapper
 
 from music21.base import VERSION
 from music21.base import VERSION_STR
+
 __version__ = VERSION_STR
 
 # legacy reason why it's here...
@@ -188,7 +190,7 @@ from music21.test.testRunner import mainTest
 # -----------------------------------------------------------------------------
 # this brings all of our own __all__ names into the music21 package namespace
 # pylint: disable=wildcard-import
-from music21 import * # @UnresolvedImport 
+from music21 import * # @UnresolvedImport
 
 # -----------------------------------------------------------------------------
 # eof
