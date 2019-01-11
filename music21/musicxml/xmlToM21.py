@@ -4332,7 +4332,11 @@ class MeasureParser(XMLParserBase):
         Create a ChordSymbol object and insert it to the core and staff reference.
         '''
         h = self.xmlToChordSymbol(mxHarmony)
-        self.insertCoreAndRef(self.offsetMeasureNote, mxHarmony, h)
+        chordOffset = self.xmlToOffset(mxHarmony)
+        if chordOffset > 0:
+            self.insertCoreAndRef(chordOffset, mxHarmony, h)
+        else:
+            self.insertCoreAndRef(self.offsetMeasureNote, mxHarmony, h)
 
     def xmlToChordSymbol(self, mxHarmony):
         '''
@@ -6463,6 +6467,14 @@ class Test(unittest.TestCase):
         self.assertEqual('N.C.', str(s.flat.getElementsByClass('NoChord')[
                                          1].chordKindStr))
 
+    def testChordOffset(self):
+        from music21 import converter
+
+        thisDir = common.getSourceFilePath() / 'musicxml'
+        testFp = thisDir / 'testChordOffset.xml'
+        s = converter.parse(testFp, forceSource=True)
+
+        s.show()
 
 
 if __name__ == '__main__':
