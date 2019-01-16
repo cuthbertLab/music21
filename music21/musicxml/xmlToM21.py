@@ -4333,10 +4333,10 @@ class MeasureParser(XMLParserBase):
         '''
         h = self.xmlToChordSymbol(mxHarmony)
         chordOffset = self.xmlToOffset(mxHarmony)
-        if chordOffset > 0:
-            self.insertCoreAndRef(chordOffset, mxHarmony, h)
-        else:
-            self.insertCoreAndRef(self.offsetMeasureNote, mxHarmony, h)
+        if chordOffset != 0:
+            print(chordOffset)
+        self.insertCoreAndRef(self.offsetMeasureNote + chordOffset,
+                              mxHarmony, h)
 
     def xmlToChordSymbol(self, mxHarmony):
         '''
