@@ -12,14 +12,15 @@ matrix:
           dist: xenial
           sudo: true
 
+services:
+  - xvfb
+
 before_install:
     # needed for some tests that add Desktop
     - mkdir ~/Desktop
     - sudo apt-get install -y libpng-dev
     - sudo apt-get install -y python-qt4
     - export PYTHONPATH=/home/travis/cuthbertLab/music21base
-    - export DISPLAY=:99.0
-    - sh -e /etc/init.d/xvfb start
     - wget -q http://lilypond.org/downloads/binaries/linux-64/lilypond-2.19.81-1.linux-64.sh
     - pip3 install coveralls
     - sh lilypond-2.19.81-1.linux-64.sh --batch
