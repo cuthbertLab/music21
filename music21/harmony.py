@@ -108,7 +108,7 @@ CHORD_TYPES = collections.OrderedDict([
 # these are different names used by MusicXML and others,
 # and the authoritative name that they resolve to
 CHORD_ALIASES = {'dominant': 'dominant-seventh',
-                 'major-minor': 'major-minor-seventh',
+                 'major-minor': 'minor-major-seventh',
                  'half-diminished': 'half-diminished-seventh',
                  }
 

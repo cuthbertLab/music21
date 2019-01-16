@@ -4084,9 +4084,9 @@ class MeasureParser(XMLParserBase):
             number = int(number)
             ly.number = number
         except (TypeError, ValueError):
-            ly.number = 0  # If musicXML lyric number is not a number, set it to 0.
-                           # This tells the caller of mxToLyric that a new number needs
-                           # to be given based on the lyrics context amongst other lyrics.
+            ly.number = 0   # If musicXML lyric number is not a number, set it to 0.
+                            # This tells the caller of mxToLyric that a new number needs
+                            # to be given based on the lyrics context amongst other lyrics.
             if number is not None:
                 ly.identifier = number
 
