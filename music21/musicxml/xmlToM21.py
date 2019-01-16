@@ -5164,6 +5164,14 @@ class MeasureParser(XMLParserBase):
 
         >>> MP.xmlToKeySignature(mxKey)
         <music21.key.KeySignature of pitches: [E-]>
+        
+        
+        Works with key-accidental also:
+        
+        >>> mxKey = ET.fromstring('<key><key-step>G</key-step><key-alter>1</key-alter>'
+        ...                       + '<key-accidental>sharp</key-accidental></key>')
+        >>> MP.nonTraditionalKeySignature(mxKey)
+        <music21.key.KeySignature of pitches: [G#]>        
         '''
         allChildren = list(mxKey)
 
@@ -5200,7 +5208,11 @@ class MeasureParser(XMLParserBase):
             thisAccidental = allAccidentals[i]
             p = pitch.Pitch(thisStep)
             if thisAccidental is not None:
-                p.accidental = pitch.Accidental(self.mxAccidentalNameToM21[thisAccidental])
+                if thisAccidental in self.mxAccidentalNameToM21:
+                    accidentalName = self.mxAccidentalNameToM21[thisAccidental]
+                else:
+                    accidentalName = thisAccidental
+                p.accidental = pitch.Accidental(accidentalName)
                 p.accidental.alter = thisAlter
             else:
                 p.accidental = pitch.Accidental(thisAlter)
