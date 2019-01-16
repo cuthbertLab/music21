@@ -79,20 +79,20 @@
         </attributes>
       <harmony print-frame="no">
         <root>
-          <root-step>C</root-step>
+          <root-step>E</root-step>
           </root>
-        <kind>major</kind>
+        <kind>minor-seventh</kind>
         </harmony>
       <harmony print-frame="no">
         <root>
-          <root-step>D</root-step>
+          <root-step>G</root-step>
           </root>
         <kind>major</kind>
         <offset>2</offset>
         </harmony>
       <note default-x="75.17" default-y="-15.00">
         <pitch>
-          <step>C</step>
+          <step>E</step>
           <octave>5</octave>
           </pitch>
         <duration>4</duration>
@@ -105,11 +105,11 @@
         <root>
           <root-step>E</root-step>
           </root>
-        <kind>major</kind>
+        <kind>minor-seventh</kind>
         </harmony>
       <note default-x="12.00" default-y="-15.00">
         <pitch>
-          <step>C</step>
+          <step>E</step>
           <octave>5</octave>
           </pitch>
         <duration>2</duration>
@@ -119,13 +119,13 @@
         </note>
       <harmony print-frame="no">
         <root>
-          <root-step>F</root-step>
+          <root-step>G</root-step>
           </root>
         <kind>major</kind>
         </harmony>
       <note default-x="259.24" default-y="-15.00">
         <pitch>
-          <step>C</step>
+          <step>E</step>
           <octave>5</octave>
           </pitch>
         <duration>2</duration>
@@ -133,9 +133,41 @@
         <type>half</type>
         <stem>down</stem>
         </note>
-      <barline location="right">
-        <bar-style>light-heavy</bar-style>
-        </barline>
+      </measure>
+      <measure width="215" number="8">
+          <harmony font-size="10.25" default-y="34">
+              <root>
+                  <root-step>C</root-step>
+              </root>
+              <kind halign="center" use-symbols="yes">diminished-seventh</kind>
+          </harmony>
+          <note default-x="17">
+              <pitch>
+                  <step>E</step>
+                  <octave>4</octave>
+              </pitch>
+              <duration>3</duration>
+              <voice>1</voice>
+              <type>half</type>
+              <dot/>
+              <stem default-y="-4.5">up</stem>
+          </note>
+          <harmony font-size="10.25" default-y="34">
+              <root>
+                  <root-step>E</root-step>
+              </root>
+              <kind halign="center" text="7">dominant</kind>
+              <bass>
+                  <bass-step>B</bass-step>
+              </bass>
+              <offset>-1</offset>
+          </harmony>
+          <note default-x="152">
+              <rest/>
+              <duration>1</duration>
+              <voice>1</voice>
+              <type>quarter</type>
+          </note>
       </measure>
     </part>
   </score-partwise>
