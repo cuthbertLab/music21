@@ -4084,9 +4084,9 @@ class MeasureParser(XMLParserBase):
             number = int(number)
             ly.number = number
         except (TypeError, ValueError):
-            ly.number = 0  # If musicXML lyric number is not a number, set it to 0.
-                           # This tells the caller of mxToLyric that a new number needs
-                           # to be given based on the lyrics context amongst other lyrics.
+            ly.number = 0   # If musicXML lyric number is not a number, set it to 0.
+                            # This tells the caller of mxToLyric that a new number needs
+                            # to be given based on the lyrics context amongst other lyrics.
             if number is not None:
                 ly.identifier = number
 
@@ -5166,6 +5166,14 @@ class MeasureParser(XMLParserBase):
 
         >>> MP.xmlToKeySignature(mxKey)
         <music21.key.KeySignature of pitches: [E-]>
+        
+        
+        Works with key-accidental also:
+        
+        >>> mxKey = ET.fromstring('<key><key-step>G</key-step><key-alter>1</key-alter>'
+        ...                       + '<key-accidental>sharp</key-accidental></key>')
+        >>> MP.nonTraditionalKeySignature(mxKey)
+        <music21.key.KeySignature of pitches: [G#]>        
         '''
         allChildren = list(mxKey)
 
@@ -5202,7 +5210,11 @@ class MeasureParser(XMLParserBase):
             thisAccidental = allAccidentals[i]
             p = pitch.Pitch(thisStep)
             if thisAccidental is not None:
-                p.accidental = pitch.Accidental(self.mxAccidentalNameToM21[thisAccidental])
+                if thisAccidental in self.mxAccidentalNameToM21:
+                    accidentalName = self.mxAccidentalNameToM21[thisAccidental]
+                else:
+                    accidentalName = thisAccidental
+                p.accidental = pitch.Accidental(accidentalName)
                 p.accidental.alter = thisAlter
             else:
                 p.accidental = pitch.Accidental(thisAlter)
