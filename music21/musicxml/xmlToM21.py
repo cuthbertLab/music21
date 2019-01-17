@@ -6484,7 +6484,7 @@ class Test(unittest.TestCase):
 
         thisDir = common.getSourceFilePath() / 'musicxml'
         testFp = thisDir / 'testChordOffset.xml'
-        s = converter.parse(testFp, forceSource=True)
+        s = converter.parse(testFp)
 
         offsets = [0.0, 2.0, 0.0, 2.0, 0.0, 2.0]
         for ch, offset in zip(s.recurse().getElementsByClass('ChordSymbol'),
