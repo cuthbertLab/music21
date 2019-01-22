@@ -12,7 +12,7 @@
 # ------------------------------------------------------------------------------
 '''
 This module defines the L, P, and R objects and their
-related transformations as called on a :class:`~music21.chord.Chord`, 
+related transformations as called on a :class:`~music21.chord.Chord`,
 according to Neo-Riemannian theory.
 '''
 import copy
@@ -35,17 +35,17 @@ class LRPException(exceptions21.Music21Exception):
 def _simplerEnharmonics(c):
     '''
     Returns a copy of chord `c` with pitches simplified.
-    
+
     Uses `:meth:music21.analysis.enharmonics.EnharmonicSimplifier.bestPitches`
-    
+
     >>> c = chord.Chord('B# F- G')
     >>> c2 = analysis.neoRiemannian._simplerEnharmonics(c)
     >>> c2
     <music21.chord.Chord C E G>
     >>> c3 = analysis.neoRiemannian._simplerEnharmonics(c2)
-    
+
     Returns a copy even if nothing has changed.
-    
+
     >>> c2 is c3
     False
     '''
@@ -74,7 +74,7 @@ def L(c, raiseException=True):
     >>> c3 = chord.Chord('C4 D4 E4')
     >>> analysis.neoRiemannian.L(c3)
     Traceback (most recent call last):
-    music21.analysis.neoRiemannian.LRPException: Cannot perform L on this chord: 
+    music21.analysis.neoRiemannian.LRPException: Cannot perform L on this chord:
         not a major or minor triad
 
     If `raiseException` is `False` then the original chord is returned.
@@ -113,7 +113,7 @@ def P(c, raiseException=True):
     See :func:`~music21.analysis.neoRiemannian.L` for further details about error handling.
 
     OMIT_FROM_DOCS
-    
+
     >>> c3 = chord.Chord('C4 D4 E4')
     >>> analysis.neoRiemannian.P(c3)
     Traceback (most recent call last):
@@ -148,7 +148,7 @@ def R(c, raiseException=True):
     See :func:`~music21.analysis.neoRiemannian.L` for further details about error handling.
 
     OMIT_FROM_DOCS
-    
+
     >>> c3 = chord.Chord('C4 D4 E4')
     >>> analysis.neoRiemannian.R(c3)
     Traceback (most recent call last):
@@ -169,7 +169,7 @@ def R(c, raiseException=True):
 
 def _LRP_transform(c, transposeInterval, changingPitch):
     '''
-    Performs a neoRiemannian transformation on c that involves transposing `changingPitch`    
+    Performs a neoRiemannian transformation on c that involves transposing `changingPitch`
     `transposeInterval`.
     '''
     changingPitchCopy = copy.deepcopy(changingPitch)
@@ -178,6 +178,40 @@ def _LRP_transform(c, transposeInterval, changingPitch):
         if changingPitchCopy.name == newChord.pitches[i].name:
             newChord.pitches[i].transpose(transposeInterval, inPlace=True)
     return chord.Chord(newChord.pitches)
+
+def isNeoR(c1, c2):
+    '''
+    Tests if two chords are related by a single L, P, or R transformation,
+    and returns that transform if so (otherwise, False).
+
+    >>> c1 = chord.Chord('C4 E4 G4')
+    >>> c2 = chord.Chord('B3 E4 G4')
+    >>> analysis.neoRiemannian.isNeoR(c1, c2)
+    'L'
+
+    >>> c1 = chord.Chord('C4 E4 G4')
+    >>> c2 = chord.Chord('C4 E-4 G4')
+    >>> analysis.neoRiemannian.isNeoR(c1, c2)
+    'P'
+
+    >>> c1 = chord.Chord('C4 E4 G4')
+    >>> c2 = chord.Chord('C4 E4 A4')
+    >>> analysis.neoRiemannian.isNeoR(c1, c2)
+    'R'
+    '''
+
+    lc1 = L(c1)
+    pc1 = P(c1)
+    rc1 = R(c1)
+
+    if lc1.normalOrder == c2.normalOrder:
+        return 'L'
+    elif pc1.normalOrder == c2.normalOrder:
+        return 'P'
+    elif rc1.normalOrder == c2.normalOrder:
+        return 'R'
+    else:
+        return False
 
 def LRP_combinations(c,
                      transformationString,
@@ -189,7 +223,7 @@ def LRP_combinations(c,
     list of L, R, and P transformations in the given transformationString, and
     returns the result in triad.
     Certain combinations, such as LPLPLP, are cyclical, and therefore
-    will return a copy of the original chord if `simplifyEnharmonics` = `True` (see 
+    will return a copy of the original chord if `simplifyEnharmonics` = `True` (see
     :func:`~music21.analysis.neoRiemannian.completeHexatonic`, below).
 
     `leftOrdered` allows a user to work with their preferred function notation (left or right
@@ -197,7 +231,7 @@ def LRP_combinations(c,
 
     By default, `leftOrdered` is False, so transformations progress towards the right.
     Thus 'LPR' will start by transforming the chord by L, then P, then R.
-    
+
     If `leftOrdered` is True, the operations work in the opposite direction (right to left), so
     'LPR' indicates the result of the chord transformed by R, then P, then L.
 
@@ -222,7 +256,7 @@ def LRP_combinations(c,
     <music21.chord.Chord C4 F4 A-4 C5 F5>
 
     >>> c5 = chord.Chord('B4 D#5 F#5')
-    >>> c6 = analysis.neoRiemannian.LRP_combinations(c5, 
+    >>> c6 = analysis.neoRiemannian.LRP_combinations(c5,
     ...                        'LPLPLP', leftOrdered=True, simplifyEnharmonics=True)
     >>> c6
     <music21.chord.Chord B4 D#5 F#5>
@@ -267,7 +301,7 @@ def completeHexatonic(c, simplifyEnharmonics=False, raiseException=True):
     This six-part operation cycles between major and minor triads, ultimately returning to the
     input triad (or its enharmonic equivalent).
     This functions returns those six triads, ending with the original triad.
-    
+
     `simplifyEnharmonics` is False, by default, giving double flats at the end.
 
     >>> c1 = chord.Chord('C4 E4 G4')
@@ -280,7 +314,7 @@ def completeHexatonic(c, simplifyEnharmonics=False, raiseException=True):
      <music21.chord.Chord D--4 F-4 A--4>]
 
     `simplifyEnharmonics` can be set to True in order to avoid this.
-     
+
     >>> c2 = chord.Chord('C4 E4 G4')
     >>> analysis.neoRiemannian.completeHexatonic(c2, simplifyEnharmonics=True)
     [<music21.chord.Chord C4 E-4 G4>,
@@ -313,7 +347,7 @@ def hexatonicSystem(c):
     Hexatonic Systems, and the Analysis of Late-Romantic
     Triadic Progressions," *Music Analysis*, 15.1 (1996), 9-40,
     at p. 17.  Possible values are 'northern', 'western', 'eastern', or 'southern'
-    
+
     >>> cMaj = chord.Chord('C E G')
     >>> analysis.neoRiemannian.hexatonicSystem(cMaj)
     'northern'
@@ -321,10 +355,10 @@ def hexatonicSystem(c):
     >>> gMin = chord.Chord('G B- D')
     >>> analysis.neoRiemannian.hexatonicSystem(gMin)
     'western'
-    
-    Each chord in the :func:`~music21.analysis.neoRiemannian.completeHexatonic` of that chord 
+
+    Each chord in the :func:`~music21.analysis.neoRiemannian.completeHexatonic` of that chord
     is in the same hexatonic system, by definition or tautology.
-    
+
     >>> for ch in analysis.neoRiemannian.completeHexatonic(cMaj):
     ...     print(analysis.neoRiemannian.hexatonicSystem(ch))
     northern
@@ -333,11 +367,11 @@ def hexatonicSystem(c):
     northern
     northern
     northern
-        
+
     Note that the classification looks only at the
     pitch class of the root of the chord.  Seventh chords,
     diminished triads, etc. will also be classified.
-    
+
     >>> dDom65 = chord.Chord('F#4 D5 A5 C6')
     >>> analysis.neoRiemannian.hexatonicSystem(dDom65)
     'southern'
@@ -348,7 +382,7 @@ def hexatonicSystem(c):
     mappings = [({0, 4, 8}, 'northern'),
                 ({1, 5, 9}, 'eastern'),
                 ({2, 6, 10}, 'southern'),
-                ({3, 7, 11}, 'western'),                
+                ({3, 7, 11}, 'western'),
                 ]
     for pcSet, poleName in mappings:
         if rootPC in pcSet:
@@ -356,8 +390,8 @@ def hexatonicSystem(c):
 
     # pragma: no-cover
     raise LRPException('Odd pitch class that is not in 0 to 11!')
-    
-    
+
+
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
@@ -400,6 +434,33 @@ class Test(unittest.TestCase):
         c7 = chord.Chord('C4 E4 G4 C5 E5')
         c7_T = LRP_combinations(c7, 'LP', leftOrdered=True)
         self.assertEqual(str(c7_T), '<music21.chord.Chord C4 E-4 A-4 C5 E-5>')
+
+    def testIsNeoR(self):
+
+        c1 = chord.Chord('C4 E4 G4')
+        c2 = chord.Chord('B3 E4 G4')
+        ans1 = isNeoR(c1, c2)
+
+        self.assertEqual(ans1, 'L')
+
+        c3 = chord.Chord('C4 E4 G4')
+        c4 = chord.Chord('C4 E-4 G4')
+        ans2 = isNeoR(c3, c4)
+
+        self.assertEqual(ans2, 'P')
+
+        c5 = chord.Chord('C4 E4 G4')
+        c6 = chord.Chord('C4 E4 A4')
+        ans3 = isNeoR(c5, c6)
+
+        self.assertEqual(ans3, 'R')
+
+        c7 = chord.Chord('C4 E4 G4')
+        c8 = chord.Chord('C4 E-4 A-4')
+        ans4 = isNeoR(c7, c8)
+
+        self.assertEqual(ans4, False)
+
 
 # ------------------------------------------------------------------------------
 _DOC_ORDER = [L, R, P, LRP_combinations, completeHexatonic, hexatonicSystem, LRPException]
