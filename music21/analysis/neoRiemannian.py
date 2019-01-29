@@ -94,7 +94,7 @@ def L(c, raiseException=True):
             raise LRPException('Cannot perform L on this chord: not a major or minor triad')
         return c
 
-    outChord = _singleNoteTransform(c, transposeInterval, changingPitch)
+    outChord = _singlePitchTransform(c, transposeInterval, changingPitch)
     outChord.quarterLength = c.quarterLength
 
     return outChord
@@ -132,7 +132,7 @@ def P(c, raiseException=True):
             raise LRPException('Cannot perform P on this chord: not a Major or Minor triad')
         return c
 
-    outChord = _singleNoteTransform(c, transposeInterval, changingPitch)
+    outChord = _singlePitchTransform(c, transposeInterval, changingPitch)
     outChord.quarterLength = c.quarterLength
 
     return outChord
@@ -170,12 +170,12 @@ def R(c, raiseException=True):
             raise LRPException('Cannot perform R on this chord: not a Major or Minor triad')
         return c
 
-    outChord = _singleNoteTransform(c, transposeInterval, changingPitch)
+    outChord = _singlePitchTransform(c, transposeInterval, changingPitch)
     outChord.quarterLength = c.quarterLength
 
     return outChord
 
-def _singleNoteTransform(c, transposeInterval, changingPitch):
+def _singlePitchTransform(c, transposeInterval, changingPitch):
     '''
     Performs a neoRiemannian transformation on c that involves transposing `changingPitch` by
     `transposeInterval`.
@@ -187,9 +187,11 @@ def _singleNoteTransform(c, transposeInterval, changingPitch):
             newChord.pitches[i].transpose(transposeInterval, inPlace=True)
     return chord.Chord(newChord.pitches)
 
+# ------------------------------------------------------------------------------
+
 def isNeoR(c1, c2):
     '''
-    Tests if two chords are related by a single L, P, R, or chromatic mediant transformation,
+    Tests if two chords are related by a single L, P, R transformation,
     and returns that transform if so (otherwise, False).
 
     >>> c1 = chord.Chord('C4 E4 G4')
@@ -206,43 +208,55 @@ def isNeoR(c1, c2):
     >>> c2 = chord.Chord('C4 E4 A4')
     >>> analysis.neoRiemannian.isNeoR(c1, c2)
     'R'
+
+    >>> c1 = chord.Chord('C4 E4 G4')
+    >>> c2 = chord.Chord('C-4 E-4 A-4')
+    >>> analysis.neoRiemannian.isNeoR(c1, c2)
+    False
     '''
+
 
     lc1 = L(c1)
     pc1 = P(c1)
     rc1 = R(c1)
 
-    UFM = chromaticMediants(c1, transformation='UFM')
-    USM = chromaticMediants(c1, transformation='USM')
-    LFM = chromaticMediants(c1, transformation='LFM')
-    LSM = chromaticMediants(c1, transformation='LSM')
+    c2NO = c2.normalOrder
 
-    Slide = S(c1)
-    Neben = N(c1)
-
-    if lc1.normalOrder == c2.normalOrder:
+    if lc1.normalOrder == c2NO:
         return 'L'
-    elif pc1.normalOrder == c2.normalOrder:
+    elif pc1.normalOrder == c2NO:
         return 'P'
-    elif rc1.normalOrder == c2.normalOrder:
+    elif rc1.normalOrder == c2NO:
         return 'R'
-
-    elif UFM.normalOrder == c2.normalOrder:
-        return 'UFM'
-    elif USM.normalOrder == c2.normalOrder:
-        return 'USM'
-    elif LFM.normalOrder == c2.normalOrder:
-        return 'LFM'
-    elif LSM.normalOrder == c2.normalOrder:
-        return 'LSM'
-
-    elif Slide.normalOrder == c2.normalOrder:
-        return 'Slide'
-    elif Neben.normalOrder == c2.normalOrder:
-        return 'Neberverwandt'
 
     else:
         return False
+
+def chromaticMediantRelation(c1, c2):
+    '''
+    Tests if these is a chromatic mediant relation between two chords
+    and returns the type if so (otherwise, returns nothing).
+
+    >>> c1 = chord.Chord('C4 E4 G4')
+    >>> c2 = chord.Chord('A-3 C4 E-4')
+    >>> analysis.neoRiemannian.chromaticMediantRelation(c1, c2)
+    'LFM'
+
+    >>> c1 = chord.Chord('C4 E4 G4')
+    >>> c2 = chord.Chord('C-4 E-4 A-4')
+    >>> analysis.neoRiemannian.chromaticMediantRelation(c1, c2)
+
+    '''
+
+    transformList = ['UFM', 'USM', 'LFM', 'LSM']
+
+    c2NO = c2.normalOrder
+
+    for transform in transformList:
+        thisChord = chromaticMediants(c1, transformation=transform)
+        if thisChord.normalOrder == c2NO:
+            return transform
+            break
 
 # ------------------------------------------------------------------------------
 
@@ -425,7 +439,7 @@ def hexatonicSystem(c):
 
 # ------------------------------------------------------------------------------
 
-def chromaticMediants(c, transformation='UFM', simplifyEnharmonics=True, raiseException=True):
+def chromaticMediants(c, transformation='UFM'):
     '''
     Transforms a chord into the given chromatic mediant. Options:
     UFM = Upper Flat Mediant;
@@ -438,25 +452,24 @@ def chromaticMediants(c, transformation='UFM', simplifyEnharmonics=True, raiseEx
     involves root motion by a third;
     entails exactly one common-tone.
 
-    >>> Cmaj = chord.Chord('C5 E5 G5')
-    >>> UFMCmaj = analysis.neoRiemannian.chromaticMediants(Cmaj, transformation='UFM')
-    >>> [x.name for x in UFMCmaj.pitches]
+    >>> cMaj = chord.Chord('C5 E5 G5')
+    >>> UFMcMaj = analysis.neoRiemannian.chromaticMediants(cMaj, transformation='UFM')
+    >>> [x.name for x in UFMcMaj.pitches]
     ['E-', 'G', 'B-']
-    >>> USMCmaj = analysis.neoRiemannian.chromaticMediants(Cmaj, transformation='USM')
-    >>> [x.name for x in USMCmaj.pitches]
+    >>> USMcMaj = analysis.neoRiemannian.chromaticMediants(cMaj, transformation='USM')
+    >>> [x.name for x in USMcMaj.pitches]
     ['E', 'G#', 'B']
-    >>> LFMCmaj = analysis.neoRiemannian.chromaticMediants(Cmaj, transformation='LFM')
-    >>> [x.name for x in LFMCmaj.pitches]
+    >>> LFMcMaj = analysis.neoRiemannian.chromaticMediants(cMaj, transformation='LFM')
+    >>> [x.name for x in LFMcMaj.pitches]
     ['A-', 'C', 'E-']
-    >>> LSMCmaj = analysis.neoRiemannian.chromaticMediants(Cmaj, transformation='LSM')
-    >>> [x.name for x in LSMCmaj.pitches]
+    >>> LSMcMaj = analysis.neoRiemannian.chromaticMediants(cMaj, transformation='LSM')
+    >>> [x.name for x in LSMcMaj.pitches]
     ['A', 'C#', 'E']
     '''
 
-    if raiseException is True:
-        options = ['UFM', 'USM', 'LFM', 'LSM']
-        if transformation not in options:
-            raise NeoR_Exception('Transformation must be one of %s' %options)
+    options = ['UFM', 'USM', 'LFM', 'LSM']
+    if transformation not in options:
+        raise ValueError('Transformation must be one of %s' %options)
 
     if c.forteClassTnI == '3-11': # if (c.isMajorTriad() or chord.isMinorTriad()):
         if transformation == 'UFM':
@@ -467,13 +480,12 @@ def chromaticMediants(c, transformation='UFM', simplifyEnharmonics=True, raiseEx
             newChord = c.transpose(-4)
         elif transformation == 'LSM':
             newChord = c.transpose(-3)
+    else:
+        raise ValueError('Chord must be major or minor')
 
-    outChord = _simplerEnharmonics(newChord)
-    outChord.quarterLength = c.quarterLength
+    return _simplerEnharmonics(newChord)
 
-    return outChord
-
-def disjunctMediants(c, UpperOrLower='Upper', raiseException=True):
+def disjunctMediants(c, upperOrLower='upper'):
     '''
     Transforms a chord into the upper or lower disjunct mediant.
     These transformations involve:
@@ -481,56 +493,43 @@ def disjunctMediants(c, UpperOrLower='Upper', raiseException=True):
     mode-change;
     no common-tones.
 
-    >>> Cmaj = chord.Chord('C5 E5 G5')
-    >>> UpChrom = analysis.neoRiemannian.disjunctMediants(Cmaj, UpperOrLower='Upper')
-    >>> [x.name for x in UpChrom.pitches]
+    >>> cMaj = chord.Chord('C5 E5 G5')
+    >>> upChrom = analysis.neoRiemannian.disjunctMediants(cMaj, upperOrLower='upper')
+    >>> [x.name for x in upChrom.pitches]
     ['E-', 'G-', 'B-']
-    >>> DownChrom = analysis.neoRiemannian.disjunctMediants(Cmaj, UpperOrLower='Lower')
-    >>> [x.name for x in DownChrom.pitches]
+    >>> downChrom = analysis.neoRiemannian.disjunctMediants(cMaj, upperOrLower='lower')
+    >>> [x.name for x in downChrom.pitches]
     ['A-', 'C-', 'E-']
     '''
 
-    if raiseException is True:
-        options = ['Upper', 'Lower']
-        if UpperOrLower not in options:
-            raise NeoR_Exception('UpperOrLower must be one of %s' %options)
+    options = ['upper', 'lower']
+    if upperOrLower not in options:
+        raise ValueError('upperOrLower must be one of %s' %options)
 
     if c.isMinorTriad():
-
-        if UpperOrLower=='Upper':
-            transposeChordIntv = 4
-        elif UpperOrLower=='Lower':
+        transposeChordIntv = 4 # Upper, default
+        if upperOrLower=='lower':
             transposeChordIntv = -3
-
         newChord = _simplerEnharmonics(c.transpose(transposeChordIntv))
 
         transposeInterval = 'A1'
         changingPitch = newChord.third
-        outChord = _singleNoteTransform(newChord, transposeInterval, changingPitch)
-        outChord.quarterLength = c.quarterLength
-
-        return outChord
+        return _singlePitchTransform(newChord, transposeInterval, changingPitch)
 
     elif c.isMajorTriad():
-
-        if UpperOrLower=='Upper':
-            transposeChordIntv = 3
-        elif UpperOrLower=='Lower':
+        transposeChordIntv = 3
+        if upperOrLower=='lower':
             transposeChordIntv = -4
-
         newChord = _simplerEnharmonics(c.transpose(transposeChordIntv))
 
         transposeInterval = '-A1'
         changingPitch = newChord.third
-        outChord = _singleNoteTransform(newChord, transposeInterval, changingPitch)
-        outChord.quarterLength = c.quarterLength
-
-        return outChord
+        return _singlePitchTransform(newChord, transposeInterval, changingPitch)
 
     else:
-        raise NeoR_Exception('Chord must be major or minor')
+        raise ValueError('Chord must be major or minor')
 
-def S(c, raiseException=True):
+def S(c):
     '''
     Slide transform connecting major and minor triads with the third as the single common tone
     (i.e. with the major triad root a semi-tone below the minor). So:
@@ -539,14 +538,14 @@ def S(c, raiseException=True):
     one common-tones.
     Slide is equivalent to 'LPR'.
 
-    >>> Cmaj = chord.Chord('C5 E5 G5')
-    >>> SlideUp = analysis.neoRiemannian.S(Cmaj)
-    >>> [x.name for x in SlideUp.pitches]
+    >>> cMaj = chord.Chord('C5 E5 G5')
+    >>> slideUp = analysis.neoRiemannian.S(cMaj)
+    >>> [x.name for x in slideUp.pitches]
     ['C#', 'E', 'G#']
 
     >>> aMin = chord.Chord('A4 C5 E5')
-    >>> SlideDown = analysis.neoRiemannian.S(aMin)
-    >>> [x.name for x in SlideDown.pitches]
+    >>> slideDown = analysis.neoRiemannian.S(aMin)
+    >>> [x.name for x in slideDown.pitches]
     ['A-', 'C', 'E-']
     '''
 
@@ -560,14 +559,14 @@ def N(c):
     with one common tone in each case.
     This is equivalent to 'RLP'.
 
-    >>> Cmaj = chord.Chord('C5 E5 G5')
-    >>> N1 = analysis.neoRiemannian.N(Cmaj)
-    >>> [x.name for x in N1.pitches]
+    >>> cMaj = chord.Chord('C5 E5 G5')
+    >>> n1 = analysis.neoRiemannian.N(cMaj)
+    >>> [x.name for x in n1.pitches]
     ['C', 'F', 'A-']
 
     >>> aMin = chord.Chord('A4 C5 E5')
-    >>> N2 = analysis.neoRiemannian.N(aMin)
-    >>> [x.name for x in N2.pitches]
+    >>> n2 = analysis.neoRiemannian.N(aMin)
+    >>> [x.name for x in n2.pitches]
     ['G#', 'B', 'E']
     '''
 
@@ -633,53 +632,48 @@ class Test(unittest.TestCase):
         self.assertEqual(ans3, 'R')
 
         c5 = chord.Chord('C4 E-4 A-4')
-        ans4 = isNeoR(c1, c5)
+        ans4 = chromaticMediantRelation(c1, c5)
         self.assertEqual(ans4, 'LFM')
 
-        c6 = chord.Chord('C#4 E4 G#4')
-        ans4 = isNeoR(c1, c6)
-        self.assertEqual(ans4, 'Slide')
-
-        c7 = chord.Chord('C4 F4 A-4')
-        ans5 = isNeoR(c1, c7)
-        self.assertEqual(ans5, 'Neberverwandt')
-
-        c8 = chord.Chord('C-4 E-4 A-4')
-        ans6 = isNeoR(c1, c8)
-        self.assertEqual(ans6, False) # disjunct mediants not currently included
+        c6 = chord.Chord('C-4 E-4 A-4')
+        ans5 = isNeoR(c1, c6)
+        ans6 = chromaticMediantRelation(c1, c6)
+        self.assertEqual(ans5, False)
+        self.assertEqual(ans6, None) # disjunct mediants not currently included
 
     def testMediants(self):
 
         c9 = chord.Chord('C5 E5 G5')
+        c9a = chord.Chord('C#5 E#5 G#5')
 
-        UFMCmaj = chromaticMediants(c9, transformation='UFM')
-        self.assertEqual([x.name for x in UFMCmaj.pitches], ['E-', 'G', 'B-'])
+        UFMcMaj = chromaticMediants(c9, transformation='UFM')
+        self.assertEqual([x.name for x in UFMcMaj.pitches], ['E-', 'G', 'B-'])
 
-        USMCmaj = chromaticMediants(c9, transformation='USM')
-        self.assertEqual([x.name for x in USMCmaj.pitches], ['E', 'G#', 'B'])
+        USMcMaj = chromaticMediants(c9, transformation='USM')
+        self.assertEqual([x.name for x in USMcMaj.pitches], ['E', 'G#', 'B'])
 
-        LFMCmaj = chromaticMediants(c9, transformation='LFM')
-        self.assertEqual([x.name for x in LFMCmaj.pitches], ['A-', 'C', 'E-'])
+        LFMcMaj = chromaticMediants(c9, transformation='LFM')
+        self.assertEqual([x.nameWithOctave for x in LFMcMaj.pitches], ['A-4', 'C5', 'E-5'])
 
-        LSMCmaj = chromaticMediants(c9, transformation='LSM')
-        self.assertEqual([x.name for x in LSMCmaj.pitches], ['A', 'C#', 'E'])
+        LSMcMaj = chromaticMediants(c9, transformation='LSM')
+        self.assertEqual([x.nameWithOctave for x in LSMcMaj.pitches], ['A4', 'C#5', 'E5'])
 
-        UpChrom = disjunctMediants(c9, UpperOrLower='Upper')
-        self.assertEqual([x.name for x in UpChrom.pitches], ['E-', 'G-', 'B-'])
+        upChrom = disjunctMediants(c9a, upperOrLower='upper')
+        self.assertEqual([x.name for x in upChrom.pitches], ['E', 'G', 'B'])
 
-        DownChrom = disjunctMediants(c9, UpperOrLower='Lower')
-        self.assertEqual([x.name for x in DownChrom.pitches], ['A-', 'C-', 'E-'])
+        downChrom = disjunctMediants(c9a, upperOrLower='lower')
+        self.assertEqual([x.nameWithOctave for x in downChrom.pitches], ['A4', 'C5', 'E5'])
 
     def testSnN(self):
 
         c10 = chord.Chord('C5 E5 G5')
         c11 = chord.Chord('A4 C5 E5')
 
-        SlideUp = S(c10)
-        self.assertEqual([x.name for x in SlideUp.pitches], ['C#', 'E', 'G#'])
+        slideUp = S(c10)
+        self.assertEqual([x.name for x in slideUp.pitches], ['C#', 'E', 'G#'])
 
-        SlideDown = S(c11)
-        self.assertEqual([x.name for x in SlideDown.pitches], ['A-', 'C', 'E-'])
+        slideDown = S(c11)
+        self.assertEqual([x.name for x in slideDown.pitches], ['A-', 'C', 'E-'])
 
         N1 = N(c10)
         self.assertEqual([x.name for x in N1.pitches], ['C', 'F', 'A-'])
