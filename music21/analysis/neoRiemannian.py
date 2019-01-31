@@ -82,7 +82,15 @@ def L(c, raiseException=True):
     >>> c4 = analysis.neoRiemannian.L(c3, raiseException=False)
     >>> c4 is c3
     True
+
+    Accepts any music21 chord, with or without octave specified:
+
+    >>> noOctaveChord = chord.Chord([0, 3, 7])
+    >>> chordL = analysis.neoRiemannian.L(noOctaveChord)
+    >>> chordL.pitches
+    (<music21.pitch.Pitch C>, <music21.pitch.Pitch E->, <music21.pitch.Pitch A->)
     '''
+
     if c.isMajorTriad():
         transposeInterval = '-m2'
         changingPitch = c.root()
@@ -189,7 +197,7 @@ def _singlePitchTransform(c, transposeInterval, changingPitch):
 
 # ------------------------------------------------------------------------------
 
-def isNeoR(c1, c2):
+def isNeoR(c1, c2, transforms='LRP'):
     '''
     Tests if two chords are related by a single L, P, R transformation,
     and returns that transform if so (otherwise, False).
@@ -213,24 +221,41 @@ def isNeoR(c1, c2):
     >>> c2 = chord.Chord('C-4 E-4 A-4')
     >>> analysis.neoRiemannian.isNeoR(c1, c2)
     False
+
+    Option to limit to the search to only 1-2 transforms ('L', 'R', 'P', 'LR', 'LP', 'RP'). So:
+    >>> c3 = chord.Chord('C4 E-4 G4')
+    >>> analysis.neoRiemannian.isNeoR(c1, c3)
+    'P'
+    
+    ... but not if P is excluded ...
+    >>> analysis.neoRiemannian.isNeoR(c1, c3, transforms='LR')
+    False
     '''
-
-
-    lc1 = L(c1)
-    pc1 = P(c1)
-    rc1 = R(c1)
 
     c2NO = c2.normalOrder
 
-    if lc1.normalOrder == c2NO:
-        return 'L'
-    elif pc1.normalOrder == c2NO:
-        return 'P'
-    elif rc1.normalOrder == c2NO:
-        return 'R'
+    transformList = [x for x in transforms]
 
-    else:
-        return False
+    for i in transformList:
+        if i == 'L':
+            c = L(c1)
+            if c.normalOrder == c2NO:
+                return 'L'
+                break
+        elif i == 'R':
+            c = R(c1)
+            if c.normalOrder == c2NO:
+                return 'R'
+                break
+        elif i == 'P':
+            c = P(c1)
+            if c.normalOrder == c2NO:
+                return 'P'
+                break
+        else:
+            raise LRPException('{} is not a NeoRiemannian transformation (L, R, or P)'.format(i))
+
+    return False # If neither an exception, nor any of the called L, R, or P tranforms
 
 def chromaticMediantRelation(c1, c2):
     '''
@@ -626,6 +651,9 @@ class Test(unittest.TestCase):
         c3 = chord.Chord('C4 E-4 G4')
         ans2 = isNeoR(c1, c3)
         self.assertEqual(ans2, 'P')
+        # ... But not if P is excluded ...
+        ans2 = isNeoR(c1, c3, transforms='LR')
+        self.assertEqual(ans2, False)
 
         c4 = chord.Chord('C4 E4 A4')
         ans3 = isNeoR(c1, c4)
@@ -682,7 +710,10 @@ class Test(unittest.TestCase):
         self.assertEqual([x.name for x in N2.pitches], ['G#', 'B', 'E'])
 
 # ------------------------------------------------------------------------------
-_DOC_ORDER = [L, R, P, S, N, chromaticMediants, disjunctMediants, LRP_combinations, completeHexatonic, hexatonicSystem, LRPException]
+_DOC_ORDER = [L, R, P, S, N, isNeoR,
+                LRP_combinations, completeHexatonic, hexatonicSystem, LRPException,
+                chromaticMediants, chromaticMediantRelation,
+                disjunctMediants,]
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
