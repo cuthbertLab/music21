@@ -3905,6 +3905,55 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.flat.getElementsByClass('Clef')), 2)
 
 
+    def testMakeNotationKeySignatureOneVoice(self):
+        '''
+        The base-case: Stream should keep it's key.KeySignature element when a single-voice score is prepared for notation.
+        '''
+        sharpsInKey = 2
+        c = clef.TrebleClef()
+        ts = meter.TimeSignature('4/4')
+        ks = key.KeySignature(sharpsInKey)
+        s = Stream()
+        s.insert(0.0, c)
+        s.insert(0.0, ts)
+        s.insert(0.0, ks)
+        s.insert(0.0, note.Note('C'))
+        s.insert(2.0, note.Note('G'))
+
+        sPost = s.makeNotation()
+
+        self.assertEqual(len(sPost.getElementsByClass('Measure')), 1)
+        m1 = sPost.getElementsByClass('Measure')[0]
+        self.assertEqual(m1.keySignature.sharps, sharpsInKey)
+
+    def testMakeNotationKeySignatureMultiVoice(self):
+        '''
+        Stream should keep it's key.KeySignature element when a multi-voice score is prepared for notation.
+        '''
+
+        sharpsInKey = 2
+        c = clef.TrebleClef()
+        ts = meter.TimeSignature('4/4')
+        ks = key.KeySignature(2)
+        s = Stream()
+        s.insert(0.0, c)
+        s.insert(0.0, ts)
+        s.insert(0.0, ks)
+
+        # two notes at the same time create multi-voice
+        s.insert(2.0, note.Note('C'))
+        s.insert(2.0, note.Note('G'))
+
+        sPost = s.makeNotation()
+
+        # self.assertEqual(post.hasPartLikeStreams(), True)
+        # print("sPost.getElementsByClass('Measure')", sPost.getElementsByClass('Measure'))
+        self.assertEqual(len(sPost.getElementsByClass('Measure')), 1)
+        m1 = sPost.getElementsByClass('Measure')[0]
+        # print("sPost.getElementsByClass('Measure')[0]", m1)
+        # print('m1.keySignature',m1.keySignature.sharps)
+        assert(m1.keySignature is not None)
+        self.assertEqual(m1.keySignature.sharps, sharpsInKey)
 
     def testMakeTies(self):
 

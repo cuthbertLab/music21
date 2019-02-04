@@ -497,6 +497,8 @@ def makeMeasures(
         # creating Measures; this clef is from getClefs, called above
         if measureCount == 0:
             m.clef = clefObj
+            if voiceCount > 0 and s.keySignature is not None:
+                m.insert(0, s.keySignature)
             # environLocal.printDebug(
             #    ['assigned clef to measure', measureCount, m.clef])
 
