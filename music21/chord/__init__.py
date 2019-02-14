@@ -4290,13 +4290,13 @@ class Chord(note.NotRest):
     def noteIds(self):
         '''
         Return a list of XML note ids from each
-        :class:`~music21.note.Note` object's
+        :class:`~musicgi21.note.Note` object's
         :attr:`~music21.note.Note.id` attribute.
 
         (Added by Werner Goebl, Martin Bonev, 7 Feb 2019)
-        
+
         '''
-        return [d.id for d in self._notes]
+        return [n.id for n in self._notes]
 
     @pitchNames.setter
     def pitchNames(self, value):
