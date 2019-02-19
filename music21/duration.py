@@ -2830,7 +2830,7 @@ def durationTupleFromTypeDots(durType='quarter', dots=0):
     except KeyError:
         try:
             ql = typeToDuration[durType] * common.dotMultiplier(dots)
-        except IndexError:
+        except (KeyError, IndexError):
             raise DurationException('Unknown type: {0}'.format(durType))
         nt = DurationTuple(durType, dots, ql)
         _durationTupleCacheTypeDots[tp] = nt

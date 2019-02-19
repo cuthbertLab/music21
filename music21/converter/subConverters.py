@@ -507,7 +507,7 @@ class ConverterText(SubConverter):
     registerOutputExtensions = ('txt',)
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords): # pragma: no cover
-        dataStr = obj._reprText()
+        dataStr = obj._reprText(**keywords)
         self.writeDataStream(fp, dataStr)
         return fp
 

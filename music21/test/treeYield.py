@@ -140,17 +140,14 @@ def testMIDIParse():
     from music21 import converter, common
     from music21 import freezeThaw
 
-    #a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
-    #c = converter.parse(a)
-#     c = corpus.parse('bwv66.6', forceSource=True)
-#     v = freezeThaw.StreamFreezer(c)
-#     v.setupSerializationScaffold()
-#     return v.writeStr() # returns a string
-    import os
-    a = os.path.join(common.getSourceFilePath(),
-                     'midi',
-                     'testPrimitive',
-                     'test03.mid')
+    # a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
+    # c = converter.parse(a)
+    # c = corpus.parse('bwv66.6', forceSource=True)
+    # v = freezeThaw.StreamFreezer(c)
+    # v.setupSerializationScaffold()
+    # return v.writeStr() # returns a string
+    
+    a = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test03.mid'
 
     #a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
     c = converter.parse(a)

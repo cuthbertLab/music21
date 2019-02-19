@@ -1254,11 +1254,13 @@ class Music21Object:
 
         Let's get the last two notes of the piece, the B and high c:
 
-        >>> c = p.measure(4).notes[0]
+        >>> m4 = p.measure(4)
+        >>> c = m4.notes[0]
         >>> c
         <music21.note.Note C>
 
-        >>> b = p.measure(3).notes[-1]
+        >>> m3 = p.measure(3)
+        >>> b = m3.notes[-1]
         >>> b
         <music21.note.Note B>
 

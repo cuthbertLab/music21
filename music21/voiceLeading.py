@@ -24,7 +24,7 @@ The list of objects included here are:
     composed of any music21 objects
 * :class:`~music21.voiceLeading.VerticalityNTuplet` : group of three
     contiguous verticality objects
-* :class:`~music21.voiceLeading.VerticalityTriplet` : three vertical slices
+* :class:`~music21.voiceLeading.VerticalityTriplet` : three verticality objects -- has special features
 
 * :class:`~music21.voiceLeading.NObjectLinearSegment` : n (any number) of music21 objects
 * :class:`~music21.voiceLeading.NNoteLinearSegment` : n (any number) of notes
@@ -1275,23 +1275,20 @@ def getVerticalityFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None
 
 class Verticality(base.Music21Object):
     '''
-    A vertical slice object provides more accessible information about
-    vertical moments in a score. A vertical slice is
+    A Verticality (previously called "vertical slice") 
+    object provides more accessible information about
+    vertical moments in a score. A Verticality is
     instantiated by passing in a dictionary of
     the form {partNumber : [ music21Objects ] }
-    To create vertical slices out of a score, call
-    by :meth:`~music21.theoryAnalzyer.getVerticalities`
 
-    Vertical slices are useful to provide direct and easy access to objects in a part.
-    A list of vertical
-    slices, although similar to the list of chords from a chordified score,
+    Verticalities are useful to provide direct and easy access to objects in a part.
+    A list of Verticalities, although similar to the list of chords from a chordified score,
     provides easier access to partnumber
     information and identity of objects in the score. Plus, the objects in a
-    vertical slice points directly
-    to the objects in the score, so modifying a vertical slice taken from a
+    Verticality point directly
+    to the objects in the score, so modifying a Verticality taken from a
     score is the same as modyfing the elements
-    of the vertical slice in the score directly.
-
+    of the Verticality in the score directly.
 
     >>> vs1 = voiceLeading.Verticality({0:[note.Note('A4'), harmony.ChordSymbol('Cm')],
     ...                                 1: [note.Note('F2')]})
@@ -1300,8 +1297,11 @@ class Verticality(base.Music21Object):
     >>> vs1.getObjectsByPart(0, note.Note)
     <music21.note.Note A>
     '''
+    #  obsolete:     To create Verticalities out of a score, call
+    #                by :meth:`~music21.theoryAnalzyer.getVerticalities`
+    
     _DOC_ATTR = {
-        'contentDict': '''Dictionary representing contents of vertical slices.
+        'contentDict': '''Dictionary representing contents of Verticalities.
             the keys of the dictionary
             are the part numbers and the element at each key is a list of
             music21 objects (allows for multiple voices
@@ -1318,7 +1318,7 @@ class Verticality(base.Music21Object):
 
     def isConsonant(self):
         '''
-        evaluates whether this vertical slice moment is consonant or dissonant
+        evaluates whether this Verticality moment is consonant or dissonant
         according to the common-practice
         consonance rules. Method generates chord of all simultaneously sounding pitches, then calls
         :meth:`~music21.chord.isConsonant`
@@ -1344,7 +1344,7 @@ class Verticality(base.Music21Object):
         '''
         extracts all simultaneously sounding pitches (from chords, notes, harmony objects, etc.)
         and returns
-        as a chord. Pretty much returns the vertical slice to a chordified output.
+        as a chord. Pretty much returns the Verticality to a chordified output.
 
         >>> N = note.Note
         >>> vs1 = voiceLeading.Verticality({0:N('A4'), 1:chord.Chord(['B', 'C', 'A']), 2:N('A')})
@@ -1368,7 +1368,7 @@ class Verticality(base.Music21Object):
 
     def makeAllSmallestDuration(self):
         '''
-        locates the smallest duration of all elements in the vertical slice
+        locates the smallest duration of all elements in the Verticality
         and assigns this duration
         to each element
 
@@ -1387,7 +1387,7 @@ class Verticality(base.Music21Object):
 
     def makeAllLargestDuration(self):
         '''
-        locates the largest duration of all elements in the vertical slice
+        locates the largest duration of all elements in the Verticality
         and assigns this duration
         to each element
 
@@ -1446,7 +1446,7 @@ class Verticality(base.Music21Object):
 
     def changeDurationofAllObjects(self, newQuarterLength):
         '''
-        changes the duration of all objects in vertical slice
+        changes the duration of all objects in Verticality
 
         >>> n1 =  note.Note('C4')
         >>> n1.quarterLength = 1
@@ -1497,7 +1497,7 @@ class Verticality(base.Music21Object):
 
     def getObjectsByClass(self, classFilterList, partNums=None):
         '''
-        returns a list of all objects in the vertical slice of a type contained
+        returns a list of all objects in the Verticality of a type contained
         in the classFilterList. Optionally
         specify partnumbers to only search for matching objects
 
@@ -1535,7 +1535,7 @@ class Verticality(base.Music21Object):
         return retList
 
     objects = property(_getObjects, doc='''
-        return a list of all the music21 objects in the vertical slice
+        return a list of all the music21 objects in the Verticality
 
         >>> vs1 = voiceLeading.Verticality({0:[harmony.ChordSymbol('C'), note.Note('A4'),],
         ...                                 1:[note.Note('C')]})
@@ -1545,7 +1545,7 @@ class Verticality(base.Music21Object):
 
     def getStream(self, streamVSCameFrom=None):
         '''
-        returns the stream representation of this vertical slice. Optionally pass in
+        returns the stream representation of this Verticality. Optionally pass in
         the full stream that this verticality was extracted from, and correct key, meter, and time
         signatures will be included
         (under development)
@@ -1586,8 +1586,8 @@ class Verticality(base.Music21Object):
 
     def offset(self, leftAlign=True):
         '''
-        returns the overall offset of the vertical slice. Typically, this would just be the
-        offset of each object in the vertical slice,
+        returns the overall offset of the Verticality. Typically, this would just be the
+        offset of each object in the Verticality,
         and each object would have the same offset.
         However, if the duration of one object in the slice is different than the duration
         of another,
@@ -1595,7 +1595,7 @@ class Verticality(base.Music21Object):
         offsets would be
         different. In this case, specify leftAlign=True to return the lowest valued-offset
         of all the objects
-        in the vertical slice. If you prefer the offset of the right-most starting object,
+        in the Verticality. If you prefer the offset of the right-most starting object,
         then specify leftAlign=False
 
         >>> s = stream.Score()
@@ -1630,12 +1630,12 @@ class Verticality(base.Music21Object):
         return newList[0].lyric
 
     lyric = property(_getLyric, _setLyric, doc='''
-        sets each element on the vertical slice to have the passed in lyric
+        sets each element on the Verticality to have the passed in lyric
 
         >>> h = voiceLeading.Verticality({1:note.Note('C'), 2:harmony.ChordSymbol('C')})
-        >>> h.lyric = 'vertical slice 1'
+        >>> h.lyric = 'Verticality 1'
         >>> h.getStream().flat.getElementsByClass(note.Note)[0].lyric
-        'vertical slice 1'
+        'Verticality 1'
         ''')
 
     def __repr__(self):
@@ -1651,7 +1651,7 @@ class Verticality(base.Music21Object):
         return self.style.color
 
     color = property(_getColor, _setColor, doc='''
-        sets the color of each element in the vertical slice
+        sets the color of each element in the Verticality
 
         >>> vs1 = voiceLeading.Verticality({1:note.Note('C'), 2:harmony.ChordSymbol('D')})
         >>> vs1.color = 'blue'
@@ -1662,7 +1662,7 @@ class Verticality(base.Music21Object):
 
 class VerticalityNTuplet(base.Music21Object):
     '''
-    a collection of n number of vertical slices. These objects are useful when
+    a collection of n number of Verticalities. These objects are useful when
     analyzing counterpoint
     motion and music theory elements such as passing tones
     '''
@@ -1690,7 +1690,7 @@ class VerticalityNTuplet(base.Music21Object):
 
 
 class VerticalityTriplet(VerticalityNTuplet):
-    '''a collection of three vertical slices'''
+    '''a collection of three Verticalities'''
 
     def __init__(self, listofVerticalities):
         super().__init__(listofVerticalities)
@@ -1700,7 +1700,7 @@ class VerticalityTriplet(VerticalityNTuplet):
 
     def _calcTNLS(self):
         '''
-        calculates the three note linear segments if only three vertical slices provided
+        calculates the three note linear segments if only three Verticalities provided
         '''
         for partNum in range(min(len(self.verticalities[0].getObjectsByClass(note.Note)),
                                     len(self.verticalities[1].getObjectsByClass(note.Note)),
@@ -1715,13 +1715,13 @@ class VerticalityTriplet(VerticalityNTuplet):
 
     def hasPassingTone(self, partNumToIdentify, unaccentedOnly=False):
         '''
-        return true if this vertical slice triplet contains a passing tone
+        return true if this Verticality triplet contains a passing tone
         music21 currently identifies passing tones by analyzing both horizontal motion
         and vertical motion.
         It first checks to see if the note could be a passing tone based on the notes
         linearly adjacent to it.
         It then checks to see if the note's vertical context is dissonant, while the
-        vertical slices
+        Verticalities
         to the left and right are consonant
 
         partNum is the part (starting with 0) to identify the passing tone
@@ -1752,21 +1752,21 @@ class VerticalityTriplet(VerticalityNTuplet):
             return True
         else:
             return False
-        # check that the vertical slice containing the passing tone is dissonant
+        # check that the Verticality containing the passing tone is dissonant
 
     def hasNeighborTone(self, partNumToIdentify, unaccentedOnly=False):
         '''
-        return true if this vertical slice triplet contains a neighbor tone
+        return true if this Verticality triplet contains a neighbor tone
         music21 currently identifies neighbor tones by analyzing both horizontal motion
         and vertical motion.
         It first checks to see if the note could be a neighbor tone based on the notes
         linearly adjacent to it.
         It then checks to see if the note's vertical context is dissonant,
-        while the vertical slices
+        while the Verticalities
         to the left and right are consonant
 
         partNum is the part (starting with 0) to identify the passing tone
-        for use on 3 vertical slices (3tuplet)
+        for use on 3 Verticalities (3tuplet)
 
         >>> vs1 = voiceLeading.Verticality({0:note.Note('E-4'), 1: note.Note('C3')})
         >>> vs2 = voiceLeading.Verticality({0:note.Note('E-4'), 1: note.Note('B2')})

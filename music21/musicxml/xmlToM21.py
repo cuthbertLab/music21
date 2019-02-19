@@ -5964,7 +5964,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         beeth = common.getCorpusFilePath() + '/beethoven/opus133.mxl'
         # TODO: this is way too long... lots of hidden 32nd notes for trills...
-        s = converter.parse(beeth, forceSource=True, format='musicxml')
+        s = converter.parse(beeth, format='musicxml')
         ex = s.parts[0]
         countTrill = 0
         for n in ex.flat.notes:
@@ -6114,7 +6114,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testPrimitive
 
-        s = converter.parse(testPrimitive.spanners33a, forceSource=True, format='musicxml')
+        s = converter.parse(testPrimitive.spanners33a, format='musicxml')
         self.assertEqual(len(s.recurse().getElementsByClass('Line')), 6)
 
 
@@ -6153,7 +6153,7 @@ class Test(unittest.TestCase):
         # NB using getWorkList to change format to oldmusicxml as necessary for testing.
         c = converter.parse(corpus.corpora.CoreCorpus().getWorkList('demos/layoutTest.xml')[0],
                             format='musicxml',
-                            #forceSource=True
+                            # forceSource=True
                             )
         #c = corpus.parse('demos/layoutTest.xml')
         layouts = c.flat.getElementsByClass('LayoutBase').stream()
@@ -6193,7 +6193,7 @@ class Test(unittest.TestCase):
         # NB using getWorkList to change format to oldmusicxml as necessary for testing.
         c = converter.parse(corpus.corpora.CoreCorpus().getWorkList('demos/layoutTestMore.xml')[0],
                             format='musicxml',
-                            #forceSource=True
+                            # forceSource=True
                             )
         #c = corpus.parse('demos/layoutTest.xml')
         layouts = c.flat.getElementsByClass('LayoutBase').stream()
@@ -6225,7 +6225,7 @@ class Test(unittest.TestCase):
         c = converter.parse(corpus.corpora.CoreCorpus().getWorkList(
                                                     'schoenberg/opus19/movement2.mxl')[0],
                             format='musicxml',
-                            #forceSource=True
+                            # sforceSource=True
                             )
         dynAll = c.flat.getElementsByClass('Dynamic')
         self.assertEqual(len(dynAll), 6)
@@ -6243,7 +6243,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         thisDir = common.getSourceFilePath() / 'musicxml'
         testFp = thisDir / 'testTrillOnOneNote.xml'
-        c = converter.parse(testFp) #, forceSource=True)
+        c = converter.parse(testFp) # , forceSource=True)
 
         trillExtension = c.parts[0].getElementsByClass('TrillExtension')[0]
         fSharpTrill = c.recurse().notes[0]
@@ -6274,7 +6274,7 @@ class Test(unittest.TestCase):
         c = converter.parse(corpus.corpora.CoreCorpus().getWorkList(
                                                     'demos/voices_with_chords.xml')[0],
                             format='musicxml',
-                            #forceSource=True
+                            # forceSource=True
                             )
         m1 = c.parts[0].measure(1)
         # m1.show('text')
@@ -6439,7 +6439,7 @@ class Test(unittest.TestCase):
         It should NOT become a full measure rest
         '''
         from music21 import corpus
-        sch = corpus.parse('schoenberg/opus19/movement6', forceSource=True)
+        sch = corpus.parse('schoenberg/opus19/movement6')
         r = sch.parts[1].measure(1).notesAndRests[0]
         self.assertEqual(r.duration.type, 'quarter')
         self.assertTrue(r.fullMeasure is not True)
@@ -6448,7 +6448,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testPrimitive
 
-        s = converter.parse(testPrimitive.directions31a, forceSource=True)
+        s = converter.parse(testPrimitive.directions31a)
         rmIterator = s.recurse().getElementsByClass('RehearsalMark')
         self.assertEqual(len(rmIterator), 4)
         self.assertEqual(rmIterator[0].content, 'A')
@@ -6462,7 +6462,7 @@ class Test(unittest.TestCase):
 
         thisDir = common.getSourceFilePath() / 'musicxml'
         testFp = thisDir / 'testNC.xml'
-        s = converter.parse(testFp, forceSource=True)
+        s = converter.parse(testFp)
 
         self.assertEqual(5, len(s.flat.getElementsByClass('ChordSymbol')))
         self.assertEqual(2, len(s.flat.getElementsByClass('NoChord')))

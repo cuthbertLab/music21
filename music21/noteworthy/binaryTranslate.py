@@ -30,7 +30,7 @@ convert the file into .xml or .nwctxt first.
 
     >>> #_DOCS_SHOW c = converter.parse('/Users/cuthbert/desktop/cuthbert_test1.nwc')
     >>> p = common.getSourceFilePath() / 'noteworthy' / 'cuthbert_test1.nwc' #_DOCS_HIDE
-    >>> c = converter.parse(str(p), forceSource=True) #_DOCS_HIDE
+    >>> c = converter.parse(str(p)) #_DOCS_HIDE
     >>> c.show('text')
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 0 offset=0.0>

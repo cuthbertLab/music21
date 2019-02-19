@@ -1147,6 +1147,7 @@ class DiatonicInterval(IntervalBase):
 
             self.isDiatonicStep = self.generic.isDiatonicStep
             self.isStep = self.generic.isStep
+            self.isSkip = self.generic.isSkip
 
 
             # for inversions
@@ -2035,6 +2036,7 @@ class Interval(IntervalBase):
             self.isChromaticStep = False
 
         self.isStep = self.isChromaticStep or self.isDiatonicStep
+        self.isSkip = self.diatonic.isSkip
 
     def __repr__(self):
         from music21 import pitch

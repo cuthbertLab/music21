@@ -56,7 +56,7 @@ def cacheMetadata(corpusNames=None,
     failingFilePaths = []
 
     # the core cache is based on local files stored in music21
-    # virtual is on-line
+    # (no-longer-existent virtual is on-line)
     for corpusName in corpusNames:
         corpusObject = manager.fromName(corpusName)
         failingFilePaths += corpusObject.cacheMetadata(useMultiprocessing, verbose, timer)

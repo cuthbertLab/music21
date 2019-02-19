@@ -1071,7 +1071,7 @@ class Test(unittest.TestCase):
 
     def xtestMergeScores(self):
         from music21 import corpus
-        unused = corpus.parse('josquin/laDeplorationDeLaMorteDeJohannesOckeghem', forceSource=True)
+        unused = corpus.parse('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
         # this was getting incorrect Clefs...
 
 if __name__ == "__main__":
