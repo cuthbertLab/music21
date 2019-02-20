@@ -2036,7 +2036,13 @@ class Interval(IntervalBase):
             self.isChromaticStep = False
 
         self.isStep = self.isChromaticStep or self.isDiatonicStep
-        self.isSkip = self.diatonic.isSkip
+        if self.diatonic is not None:
+            self.isSkip = self.diatonic.isSkip
+        elif self.chromatic is not None:
+            self.isSkip = True if abs(self.semitones) > 2 else False
+        else:
+            self.isSkip = None
+
 
     def __repr__(self):
         from music21 import pitch
