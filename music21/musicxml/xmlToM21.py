@@ -3392,6 +3392,10 @@ class MeasureParser(XMLParserBase):
                 #     mallet lift, mallet table, martellato, martellato lift,
                 #     muted martellato, pluck lift, and swing.
                 tech.displayText = mxObj.text
+            if tag == 'fret':
+                tech.number = mxObj.text
+            if tag == 'string':
+                tech.number = mxObj.text
             if tag == 'harmonic':
                 self.setHarmonic(mxObj, tech)
             if tag in ('heel', 'toe'):

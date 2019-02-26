@@ -505,7 +505,12 @@ class OpenString(Bowing):
     pass
 
 class StringIndication(Bowing):
-    pass
+    def __init__(self):
+        super().__init__()
+        self.number = ''
+
+    def __repr__(self):
+        return '<music21.articulations.%s %s>' % (self.__class__.__name__, self.number)
 
 
 class StringThumbPosition(Bowing):
@@ -539,7 +544,12 @@ class NailPizzicato(Pizzicato):
     pass
 
 class FretIndication(TechnicalIndication):
-    pass
+    def __init__(self):
+        super().__init__()
+        self.number = ''
+
+    def __repr__(self):
+        return '<music21.articulations.%s %s>' % (self.__class__.__name__, self.number)
 
 class FrettedPluck(FretIndication, Fingering):
     '''
