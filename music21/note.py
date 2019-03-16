@@ -345,6 +345,8 @@ class GeneralNote(base.Music21Object):
     >>> gn.quarterLength
     0.4375
     '''
+    isNote = False
+    isRest = False
     isChord = False
     _styleClass = style.NoteStyle
 
@@ -1058,11 +1060,8 @@ class Note(NotRest):
     >>> n = note.Note(nameWithOctave='D#5')
     >>> n.nameWithOctave
     'D#5'
-
-
     '''
     isNote = True
-    isRest = False
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength', 'nameWithOctave']
@@ -1438,9 +1437,6 @@ class Unpitched(NotRest):
     Traceback (most recent call last):
     AttributeError: 'Unpitched' object has no attribute 'pitch'
     '''
-    isNote = False
-    isRest = False
-
     def __init__(self):
         super().__init__()
         self.displayStep = 'C'
@@ -1509,7 +1505,6 @@ class Rest(GeneralNote):
     >>> r.name
     'rest'
     '''
-    isNote = False
     isRest = True
     name = 'rest'
 
