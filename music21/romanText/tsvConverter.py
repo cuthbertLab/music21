@@ -10,7 +10,7 @@
 # ------------------------------------------------------------------------------
 '''
 Convertor for parsing the tabular representations of harmonic analysis such as the
-DCML lab's Annotated Beethoven Corpus (Neuwirth et al. 2018).
+DCMLab's Annotated Beethoven Corpus (Neuwirth et al. 2018).
 '''
 
 import csv
