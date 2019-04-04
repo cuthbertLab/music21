@@ -9,7 +9,7 @@
 # License:      LGPL or BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Converter for parsing the tabular representations of harmonic analysis such as the
+Convertor for parsing the tabular representations of harmonic analysis such as the
 DCMLab's Annotated Beethoven Corpus (Neuwirth et al. 2018).
 '''
 
