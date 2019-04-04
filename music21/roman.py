@@ -85,7 +85,7 @@ figureShorthands = {
     '642': '42',
     'bb7b5b3': 'o7',
     'bb7b53': 'o7',
-    #'6b5bb3': 'o65',
+    # '6b5bb3': 'o65',
     'b7b5b3': '/o7',
     }
 
@@ -1145,18 +1145,23 @@ class RomanNumeral(harmony.Harmony):
     <music21.roman.RomanNumeral Cad64 in c minor>
     >>> [str(p) for p in r.pitches]
     ['G4', 'C5', 'E-5']
-
-
     
     Works also for secondary romans:
-    
 
     >>> r = roman.RomanNumeral('Cad64/V', key.Key('c'))
     >>> r
     <music21.roman.RomanNumeral Cad64/V in c minor>
     >>> [str(p) for p in r.pitches]
     ['D5', 'G5', 'B5']
-    
+
+
+    The RomanNumeral constructor accepts a keyword 'updatePitches' which is
+    passed to harmony.Harmony. By default it
+    is True, but can be set to False to initialize faster if pitches are not needed.
+
+    >>> r = roman.RomanNumeral('vio', em, updatePitches=False)
+    >>> r.pitches
+    ()
 
 
     OMIT_FROM_DOCS
@@ -1202,13 +1207,6 @@ class RomanNumeral(harmony.Harmony):
     >>> [str(pitch) for pitch in r.pitches]
     ['G4']
 
-
-    Accepts a keyword 'updatePitches' which is passed to harmony.Harmony. By default it
-    is True, but can be set to False to initialize faster if pitches are not needed.
-
-    >>> r = roman.RomanNumeral('vio', em, updatePitches=False)
-    >>> r.pitches
-    ()
     '''
     # TODO: document better! what is inherited and what is new?
 

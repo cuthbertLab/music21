@@ -277,20 +277,41 @@ class RTTagged(RTToken):
         return False
 
     def isKeySignature(self):
-        '''True if tag represents a key signature, otherwise False.
+        '''
+        True if tag represents a key signature, otherwise False.
 
         >>> tag = romanText.rtObjects.RTTagged('KeySignature: This is a key signature.')
         >>> tag.isKeySignature()
         True
+        >>> tag.data
+        'This is a key signature.'
+
+        KeySignatures are a type of tagged data found outside of measures,
+        such as "Key Signature: -1" meaning one flat.
+
+        Key signatures are generally numbers representing the number of sharps (or
+        negative for flats).  Non-standard key signatures are not supported.
+        
+        >>> tag = romanText.rtObjects.RTTagged('KeySignature: -3')
+        >>> tag.data
+        '-3'
+
+        music21 supports one legacy key signature type: `KeySignature: Bb` which
+        represents a one-flat signature.  Important to note: no other key signatures
+        of this type are supported.  (For instance, `KeySignature: Ab` has no effect)
+        
+        >>> tag = romanText.rtObjects.RTTagged('KeySignature: Bb')
+        >>> tag.data
+        'Bb'
+
+        Testing that `.isKeySignature` returns `False` for non-key signatures:
 
         >>> tag = romanText.rtObjects.RTTagged('Nothing: Nothing at all.')
         >>> tag.isKeySignature()
         False
 
-        KeySignatures are a type of tagged data found outside of measures,
-        such as "Key Signature: Bb," meaning one flat.
 
-        Note: this is not the same as a key definition found inside of a
+        N.B.: this is not the same as a key definition found inside of a
         Measure. These are represented by RTKey rtObjects, defined below, and are
         not RTTagged rtObjects, but RTAtom subclasses.
         '''
@@ -822,7 +843,8 @@ class RTAnalyticKey(RTKeyTypeAtom):
 
 
 class RTKeySignature(RTAtom):
-    '''An RTKeySignature(RTAtom) only defines a change in the KeySignature.
+    '''
+    An RTKeySignature(RTAtom) only defines a change in the KeySignature.
     It does not in itself create a :class:~'music21.key.Key' object, nor
     does it change the analysis taking place.
 

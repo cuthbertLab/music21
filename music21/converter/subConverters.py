@@ -961,7 +961,7 @@ class ConverterMidi(SubConverter):
     readBinary = True
     registerFormats = ('midi',)
     registerInputExtensions = ('mid', 'midi')
-    registerOutputExtensions = ('mid', )
+    registerOutputExtensions = ('mid',)
 
     def parseData(self, strData, number=None):
         '''
@@ -1082,7 +1082,9 @@ class ConverterRomanText(SubConverter):
 
 
 class ConverterClercqTemperley(SubConverter):
-    '''Simple class wrapper for parsing roman text harmonic definitions.
+    '''
+    Wrapper for parsing harmonic definitions in Trevor de Clercq and
+    David Temperley's format.
     '''
     registerFormats = ('cttxt', 'har')
     registerInputExtensions = ('cttxt', 'har')
@@ -1119,7 +1121,7 @@ class ConverterCapella(SubConverter):
 
     def parseFile(self, fp, number=None):
         '''
-        Read a file
+        Parse a Capella file
         '''
         from music21.capella import fromCapellaXML
         ci = fromCapellaXML.CapellaImporter()
