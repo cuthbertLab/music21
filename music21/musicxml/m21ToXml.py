@@ -4495,7 +4495,6 @@ class MeasureExporter(XMLExporterBase):
     def chordSymbolToXml(self, cs):
         '''
         Convert a ChordSymbol object to an mxHarmony object.
-
         >>> cs = harmony.ChordSymbol()
         >>> cs.root('E-')
         >>> cs.bass('B-')
@@ -4576,7 +4575,7 @@ class MeasureExporter(XMLExporterBase):
           <kind>suspended-fourth</kind>
           <degree>
             <degree-value>9</degree-value>
-            <degree-alter />
+            <degree-alter>0</degree-alter>
             <degree-type>add</degree-type>
           </degree>
         </harmony>
@@ -6040,7 +6039,6 @@ class Test(unittest.TestCase):
         #p.getElementsByClass('Measure')[1].insert(0.0, sl3)
         self.assertEqual(self.getXml(p).count(u'<slur '), 6)
 
-
     def testExportNC(self):
         from music21 import harmony
 
@@ -6083,6 +6081,10 @@ class Test(unittest.TestCase):
                                                  u'text="N.C.">none</kind>'))
         self.assertEqual(1, self.getXml(s).count(u'<kind '
                                                  u'text="No Chord">none</kind>'))
+
+
+
+
 
 
 class TestExternal(unittest.TestCase): # pragma: no cover
