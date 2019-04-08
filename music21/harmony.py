@@ -650,7 +650,7 @@ class ChordStepModification:
     @modType.setter
     def modType(self, expr):
         if expr is not None and isinstance(expr, str):
-            if expr.lower() in ['add', 'subtract', 'alter']:
+            if expr.lower() in ['add', 'subtract', 'omit', 'alter']:
                 self._modType = expr.lower()
                 return
         raise ChordStepModificationException(
@@ -1090,10 +1090,13 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
         raise HarmonyException(e )
 
     if len(inChord.pitches) == 1:
+        # Don't replace -  with b in root name, this is kept everywhere else,
+        # and otherwise it creates a figure that ChordSymbol(figure) can't
+        # parse!
         if includeChordType:
-            return (inChord.root().name.replace('-', 'b') + 'pedal', 'pedal')
+            return (inChord.root().name + 'pedal', 'pedal')
         else:
-            return inChord.root().name.replace('-', 'b') + 'pedal'
+            return inChord.root().name + 'pedal'
 
     d3 = inChord.semitonesFromChordStep(3) #4  #triad
     d5 = inChord.semitonesFromChordStep(5) #7  #triad
@@ -1321,6 +1324,18 @@ def removeChordSymbols(chordType):
     '''
     del CHORD_TYPES[chordType]
 
+def _get_alteration(alteration):
+    if alteration != '':
+        if 'b' in alteration:
+            semiToneAlter = -1 * alteration.count('b')
+        else:
+            semiToneAlter = alteration.count('#')
+        mt = re.search('^alter|add|subtract|omit', alteration)
+        type = mt.group() if mt else 'add'
+        md = re.search(r'[1-9]+', alteration)
+        if md:
+            degree = int(md.group())
+            return type, degree, semiToneAlter
 
 # --------------------------------------------------------------------------
 realizerScaleCache = {}
@@ -1458,8 +1473,7 @@ class ChordSymbol(Harmony):
     (<music21.pitch.Pitch A-2>, <music21.pitch.Pitch C-3>, <music21.pitch.Pitch E-3>)
 
     >>> harmony.ChordSymbol('F-dim7').pitches
-    (<music21.pitch.Pitch F-2>, <music21.pitch.Pitch A--2>,
-     <music21.pitch.Pitch C--3>, <music21.pitch.Pitch E---3>)
+    (<music21.pitch.Pitch F-2>, <music21.pitch.Pitch A--2>, <music21.pitch.Pitch C--3>, <music21.pitch.Pitch E---3>)
 
     Thanks to David Bolton for catching the bugs tested below:
 
@@ -1711,7 +1725,7 @@ class ChordSymbol(Harmony):
         for hD in chordStepModifications:
             if hD.modType == 'add':
                 typeAdd(hD)
-            elif hD.modType == 'subtract':
+            elif hD.modType == 'subtract' or hD.modType == 'omit':
                 typeSubtract(hD)
             elif hD.modType == 'alter':
                 typeAlter(hD)
@@ -1719,15 +1733,25 @@ class ChordSymbol(Harmony):
         return tuple(pitches)
 
     def _getKindFromShortHand(self, sH):
+        all_abbr = [a for type in CHORD_TYPES.values() for a in type[1]]
+        # check all abbr that contain a # or b in their name (initially it
+        # was checking only ob9
+        with_sharp = [a for a in all_abbr if '#' in a]
+        with_sharp = [a for a in with_sharp if a in sH]
+        with_flat = [a for a in all_abbr if 'b' in a]
+        with_flat = [a for a in with_flat if a in sH]
         originalsH = sH
         if 'add' in sH:
             sH = sH[0:sH.index('add')]
         if 'omit' in sH:
             sH = sH[0:sH.index('omit')]
-        if '#' in sH and sH[sH.index('#') + 1].isdigit():
+        if 'subtract' in sH:
+            sH = sH[0:sH.index('subtract')]
+        if 'alter' in sH:
+            sH = sH[0:sH.index('alter')]
+        if '#' in sH and sH[sH.index('#') + 1].isdigit() and not with_sharp:
             sH = sH[0:sH.index('#')]
-        if 'b' in sH and sH[sH.index('b') + 1].isdigit() and 'ob9' not in sH:
-            # yuck, special exception
+        if 'b' in sH and sH[sH.index('b') + 1].isdigit() and not with_flat:
             sH = sH[0:sH.index('b')]
         for chordKind in CHORD_TYPES:
             for charString in getAbbreviationListGivenChordType(chordKind):
@@ -1793,7 +1817,7 @@ class ChordSymbol(Harmony):
             if m1:
                 root = m1.group()
                 #remove the root and bass from the string and any additions/omitions/alterations/
-                st = prelimFigure.replace(m1.group(), '')
+                st = prelimFigure[:m1.start()] + prelimFigure[m1.end():]
             else:
                 raise ValueError # This means that the given argument wasn't
                 # a proper chord name.
@@ -1809,27 +1833,19 @@ class ChordSymbol(Harmony):
             bass = bass.replace('/', '')
             self.bass(bass)
             #remove the root and bass from the string and any additions/omitions/alterations/
-            remaining = st.replace(m2.group(), '')
+            # get the match on st, should match since st is a substring of
+            # prelimFigure
+            m3 = re.search(r'/[A-Ga-g][#-]*', st)
+            assert m3
+            remaining = st[:m3.start()] + st[m3.end():]
 
         st = self._getKindFromShortHand(remaining)
-        # 'add', 'alter' and 'omit' in the chordString is kinda broken, not a high
-        # priority since there is no well defined nomenclature
-        if 'add' in remaining:
-            degree = remaining[remaining.index('add') + 3: ]
-            self.addChordStepModification(ChordStepModification('add', int(degree)))
-            return
-        if 'alter' in remaining:
-            degree = remaining[remaining.index('alter') + 5: ]
-            self.addChordStepModification(ChordStepModification('alter', int(degree)))
-            return
-        if 'omit' in remaining or 'subtract' in remaining:
-            degree = remaining[remaining.index('omit') + 4: ]
-            self.addChordStepModification(ChordStepModification('subtract', int(degree)))
-            return
 
         st = st.replace(',', '')
-
-        if 'b' in st or '#' in st:
+        if 'add' in st or 'alter'in st or 'omit' in st or 'subtract' in st:
+            splitter = re.compile('((?:alter|add|omit|subtract)[b#]*[1-9]+)')
+            alterations = splitter.split(st)
+        elif 'b' in st or '#' in st:
             splitter = re.compile('([b#]+[^b#]+)')
             alterations = splitter.split(st)
         else:
@@ -1839,7 +1855,11 @@ class ChordSymbol(Harmony):
         for itemString in alterations:
             if itemString == '':
                 continue
-            justints = itemString.replace('b', '')
+            justints = itemString.replace('subtract', '')
+            justints = justints.replace('omit', '')
+            justints = justints.replace('add', '')
+            justints = justints.replace('alter', '')
+            justints = justints.replace('b', '')
             justints = justints.replace('#', '')
             try:
                 justints = int(justints)
@@ -1868,20 +1888,12 @@ class ChordSymbol(Harmony):
         for item in indexes:
             altCopy.append(item)
         alterations = altCopy
-        degrees = []
         for alteration in alterations:
-            if alteration != '':
-                if 'b' in alteration:
-                    semiToneAlter = -1 * alteration.count('b')
-                else:
-                    semiToneAlter = alteration.count('#')
-                m3 = re.search(r'[1-9]+', alteration)
-                if m3:
-                    degrees.append([int(m3.group()), semiToneAlter])
-
-        for degree, alterBy in degrees:
-            self.addChordStepModification(
-                ChordStepModification('add', degree, alterBy))
+            alteration = _get_alteration(alteration)
+            if alteration:
+                modType, alteration, alterBy = alteration
+                self.addChordStepModification(
+                    ChordStepModification(modType, alteration, alterBy))
 
     def _updatePitches(self):
         '''
@@ -2150,7 +2162,7 @@ class ChordSymbol(Harmony):
             'Tristan',
             'augmented-seventh',
             'diminished-seventh',
-            'dominant',
+            'dominant-seventh',
             'half-diminished',
             'major-minor',
             'major-seventh',
@@ -2171,26 +2183,29 @@ class ChordSymbol(Harmony):
             'major-13th',
             'minor-13th',
             )
+        kind = self.chordKind
+        if kind in CHORD_ALIASES:
+            kind = CHORD_ALIASES[kind]
         if inversion == 5 and (
-            self.chordKind in thirteenths
-            or self.chordKind in elevenths
+            kind in thirteenths
+            or kind in elevenths
             ):
             return True
         elif inversion == 4 and (
-            self.chordKind in elevenths
-            or self.chordKind in thirteenths
-            or self.chordKind in ninths
+            kind in elevenths
+            or kind in thirteenths
+            or kind in ninths
             ):
             return True
         elif inversion == 3 and (
-            self.chordKind in sevenths
-            or self.chordKind in ninths
-            or self.chordKind in elevenths
-            or self.chordKind in thirteenths
+            kind in sevenths
+            or kind in ninths
+            or kind in elevenths
+            or kind in thirteenths
             ):
             return True
         elif (inversion in (2, 1)
-                and not self.chordKind == 'pedal'):
+                and not kind == 'pedal'):
             return True
         elif inversion is None:
             return False
@@ -2474,6 +2489,260 @@ class Test(unittest.TestCase):
         b = d.bass()
         self.assertEqual(b.nameWithOctave, 'E-3')
 
+    def testChordStepFromFigure(self):
+        from xml.etree.ElementTree import fromstring as EL
+        from music21 import musicxml, pitch
+
+        pitches = ('G2', 'B2', 'F3', 'A-3', 'A#3', 'C#4', 'E-4')
+        pitches = tuple(pitch.Pitch(p) for p in pitches)
+
+        xmlString = """
+          <harmony>
+            <root>
+              <root-step>G</root-step>
+            </root>
+            <kind text="7alt">dominant</kind>
+            <degree>
+              <degree-value>5</degree-value>
+              <degree-alter>0</degree-alter>
+              <degree-type>subtract</degree-type>
+            </degree>
+            <degree>
+              <degree-value>9</degree-value>
+              <degree-alter>-1</degree-alter>
+              <degree-type>add</degree-type>
+            </degree>
+            <degree>
+              <degree-value>9</degree-value>
+              <degree-alter>1</degree-alter>
+              <degree-type>add</degree-type>
+            </degree>
+            <degree>
+              <degree-value>11</degree-value>
+              <degree-alter>1</degree-alter>
+              <degree-type>add</degree-type>
+            </degree>
+            <degree>
+              <degree-value>13</degree-value>
+              <degree-alter>-1</degree-alter>
+              <degree-type>add</degree-type>
+            </degree>
+          </harmony>
+        """
+
+        MP = musicxml.xmlToM21.MeasureParser()
+        mxHarmony = EL(xmlString)
+
+        cs1 = MP.xmlToChordSymbol(mxHarmony)
+        cs2 = ChordSymbol(cs1.figure)
+        cs3 = ChordSymbol('G7 subtract 5 add b9 add #9 add #11 add b13')
+
+        self.assertEqual(pitches, cs1.pitches)
+        self.assertEqual(pitches, cs2.pitches)
+        self.assertEqual(pitches, cs3.pitches)
+
+        #########
+
+        pitches = ('C3', 'E3', 'G3', 'B-3', 'D-4')
+        pitches = tuple(pitch.Pitch(p) for p in pitches)
+
+        xmlString = """
+            <harmony>
+            <root>
+              <root-step>C</root-step>
+            </root>
+            <kind text="7b9">dominant</kind>
+            <degree>
+              <degree-value>9</degree-value>
+              <degree-alter>-1</degree-alter>
+              <degree-type>add</degree-type>
+            </degree>
+          </harmony>
+        """
+
+        MP = musicxml.xmlToM21.MeasureParser()
+        mxHarmony = EL(xmlString)
+
+        cs1 = MP.xmlToChordSymbol(mxHarmony)
+        cs2 = ChordSymbol(cs1.figure)
+        cs3 = ChordSymbol('C7 b9')
+        cs4 = ChordSymbol('C7 add b9')
+
+        self.assertEqual(pitches, cs1.pitches)
+        self.assertEqual(pitches, cs2.pitches)
+        self.assertEqual(pitches, cs3.pitches)
+        self.assertEqual(pitches, cs4.pitches)
+
+        # Test alter
+        cs = ChordSymbol('A7 alter #5')
+        self.assertEqual('(<music21.pitch.Pitch A2>, <music21.pitch.Pitch '
+                         'C#3>, <music21.pitch.Pitch E#3>, '
+                         '<music21.pitch.Pitch G3>)', str(cs.pitches))
+
+        #########
+
+        pitches = ('A2','C#3','E#3','G3','B#3','D#4')
+        pitches = tuple(pitch.Pitch(p) for p in pitches)
+
+        xmlString = """
+          <harmony>
+            <root>
+              <root-step>A</root-step>
+              </root>
+            <kind>dominant</kind>
+            <degree>
+              <degree-value>5</degree-value>
+              <degree-alter>1</degree-alter>
+              <degree-type>alter</degree-type>
+              </degree>
+            <degree>
+              <degree-value>9</degree-value>
+              <degree-alter>1</degree-alter>
+              <degree-type>add</degree-type>
+              </degree>
+            <degree>
+              <degree-value>11</degree-value>
+              <degree-alter>1</degree-alter>
+              <degree-type>add</degree-type>
+              </degree>
+            </harmony>
+        """
+
+        MP = musicxml.xmlToM21.MeasureParser()
+        mxHarmony = EL(xmlString)
+
+        cs1 = MP.xmlToChordSymbol(mxHarmony)
+        cs2 = ChordSymbol(cs1.figure)
+        cs3 = ChordSymbol('A7 alter #5 add #9 add #11')
+
+        self.assertEqual(pitches, cs1.pitches)
+        self.assertEqual(pitches, cs2.pitches)
+        self.assertEqual(pitches, cs3.pitches)
+
+    def testChordWithBass(self):
+
+
+        from xml.etree.ElementTree import fromstring as EL
+        from music21 import musicxml, pitch
+
+        pitches = ('G2', 'A2', 'C#3', 'E3')
+        pitches = tuple(pitch.Pitch(p) for p in pitches)
+
+        xmlString = """
+          <harmony>
+            <root>
+              <root-step>A</root-step>
+            </root>
+            <kind text="7">dominant</kind>
+            <inversion>3</inversion>
+            <bass>
+              <bass-step>G</bass-step>
+            </bass>
+          </harmony>
+          """
+
+        MP = musicxml.xmlToM21.MeasureParser()
+        mxHarmony = EL(xmlString)
+
+        cs1 = MP.xmlToChordSymbol(mxHarmony)
+        cs2 = ChordSymbol(cs1.figure)
+        cs3 = ChordSymbol('A7/G')
+
+        self.assertEqual(pitches, cs1.pitches)
+        self.assertEqual(pitches, cs2.pitches)
+        self.assertEqual(pitches, cs3.pitches)
+
+    def testChordFlatSharpInFigure(self):
+        from xml.etree.ElementTree import fromstring as EL
+        from music21 import musicxml, pitch
+
+        pitches = ('G2', 'A2', 'B2', 'D#3', 'F3')
+        pitches = tuple(pitch.Pitch(p) for p in pitches)
+
+        xmlString = """
+          <harmony>
+            <root>
+              <root-step>G</root-step>
+            </root>
+            <kind text="9+">augmented-dominant-ninth</kind>
+          </harmony>
+        """
+
+        MP = musicxml.xmlToM21.MeasureParser()
+        mxHarmony = EL(xmlString)
+
+        cs1 = MP.xmlToChordSymbol(mxHarmony)
+        cs2 = ChordSymbol(cs1.figure)
+        cs3 = ChordSymbol('G+9')
+        cs4 = ChordSymbol('G9#5')
+
+        self.assertEqual(pitches, cs1.pitches)
+        self.assertEqual(pitches, cs2.pitches)
+        self.assertEqual(pitches, cs3.pitches)
+        self.assertEqual(pitches, cs4.pitches)
+
+        pitches = ('A2', 'C3', 'E3', 'G#3')
+        pitches = tuple(pitch.Pitch(p) for p in pitches)
+        self.assertEqual(pitches, ChordSymbol('AmM7').pitches)
+        self.assertEqual(pitches, ChordSymbol('Aminmaj7').pitches)
+        self.assertEqual(pitches, ChordSymbol('Am#7').pitches)
+
+    def testRootBassParsing(self):
+        """
+        This tests a bug where the root and bass were wrongly parsed,
+        since the matched root and bass where globally removed from figure,
+        and not only where matched.
+        """
+        from xml.etree.ElementTree import fromstring as EL
+        from music21 import musicxml, pitch
+
+        pitches = ('E-2', 'E3', 'G#3', 'B3', 'D4')
+        pitches = tuple(pitch.Pitch(p) for p in pitches)
+
+        xmlString = """
+          <harmony>
+            <root>
+              <root-step>E</root-step>
+            </root>
+            <kind text="7">dominant</kind>
+            <bass>
+              <bass-step>E</bass-step>
+              <bass-alter>-1</bass-alter>
+            </bass>
+          </harmony>
+        """
+
+        MP = musicxml.xmlToM21.MeasureParser()
+        mxHarmony = EL(xmlString)
+
+        cs1 = MP.xmlToChordSymbol(mxHarmony)
+        cs2 = ChordSymbol(cs1.figure)
+        cs3 = ChordSymbol('E7/E-')
+
+        self.assertEqual(pitches, cs1.pitches)
+        self.assertEqual(pitches, cs2.pitches)
+        self.assertEqual(pitches, cs3.pitches)
+
+    def testBug(self):
+        """
+    (<music21.pitch.Pitch F-2>, <music21.pitch.Pitch A--2>, <music21.pitch.Pitch C--3>, <music21.pitch.Pitch E---3>)
+Got:
+    (<music21.pitch.Pitch F-2>, <music21.pitch.Pitch A--2>, <music21.pitch.Pitch C--3>, <music21.pitch.Pitch E---3>)
+
+        :return:
+        """
+        s = corpus.parse('leadsheet/fosterBrownHair')
+        initialSymbols = s.flat.getElementsByClass(ChordSymbol)[0:5]
+        l = [[str(c.name) for c in c.pitches] for c in initialSymbols]
+
+        print(l)
+
+
+    def testAddSubtractAlterations(self):
+        ch1 = ChordSymbol('F7 add 4 subtract 3')
+        ch2 = ChordSymbol('F7sus4')
+
+        self.assertEqual(ch1.pitches, ch2.pitches)
 
     def testNoChord(self):
         nc = NoChord()
