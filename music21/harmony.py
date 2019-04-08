@@ -2723,21 +2723,6 @@ class Test(unittest.TestCase):
         self.assertEqual(pitches, cs2.pitches)
         self.assertEqual(pitches, cs3.pitches)
 
-    def testBug(self):
-        """
-    (<music21.pitch.Pitch F-2>, <music21.pitch.Pitch A--2>, <music21.pitch.Pitch C--3>, <music21.pitch.Pitch E---3>)
-Got:
-    (<music21.pitch.Pitch F-2>, <music21.pitch.Pitch A--2>, <music21.pitch.Pitch C--3>, <music21.pitch.Pitch E---3>)
-
-        :return:
-        """
-        s = corpus.parse('leadsheet/fosterBrownHair')
-        initialSymbols = s.flat.getElementsByClass(ChordSymbol)[0:5]
-        l = [[str(c.name) for c in c.pitches] for c in initialSymbols]
-
-        print(l)
-
-
     def testAddSubtractAlterations(self):
         ch1 = ChordSymbol('F7 add 4 subtract 3')
         ch2 = ChordSymbol('F7sus4')
