@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         tree/analysis.py
 # Purpose:      horizontal analysis tools on timespan trees
 #
@@ -8,11 +8,11 @@
 # Copyright:    Copyright © 2013-14 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Tools for performing voice-leading analysis with trees.
 '''
-import collections
+import collections.abc
 import unittest
 #from music21 import base
 #from music21 import common
@@ -27,10 +27,10 @@ class HorizontalityException(exceptions21.TreeException):
     pass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
-class Horizontality(collections.Sequence):
+class Horizontality(collections.abc.Sequence):
     r'''
     A horizontality of consecutive PitchedTimespan objects.
 
@@ -46,7 +46,7 @@ class Horizontality(collections.Sequence):
     ### INITIALIZER ###
 
     def __init__(self, timespans=None):
-        if not isinstance(timespans, collections.Sequence):
+        if not isinstance(timespans, collections.abc.Sequence):
             raise HorizontalityException("timespans must be a sequence, not %r" % timespans)
         if not timespans:
             raise HorizontalityException(
@@ -133,7 +133,7 @@ class Horizontality(collections.Sequence):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 
@@ -245,7 +245,7 @@ class Horizontality(collections.Sequence):
 #         return self._voiceTwoNoteTwo
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -254,13 +254,13 @@ class Test(unittest.TestCase):
         pass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 _DOC_ORDER = ()
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         common/stringTools.py
 # Purpose:      Utilities for strings
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Tools for working with strings
 '''
@@ -32,7 +32,7 @@ import time
 import string
 import unicodedata # @UnresolvedImport
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 WHITESPACE = re.compile(r'\s+')
 LINEFEED = re.compile('\n+')
 
@@ -109,7 +109,7 @@ def hyphenToCamelCase(usrStr, replacement='-'):
     (?<!\A) # not at the start of the string
     ''' + replacement + r'''
     (?=[a-zA-Z]) # followed by a letter
-    ''', re.X) # @UndefinedVariable
+    ''', re.VERBOSE) # @UndefinedVariable
 
     tokens = PATTERN.split(usrStr)
     response = tokens.pop(0).lower()
@@ -363,10 +363,10 @@ def removePunctuation(s):
     return out
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 if __name__ == "__main__":
     import music21 # @Reimport
     music21.mainTest()
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

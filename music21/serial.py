@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         serial.py
 # Purpose:      music21 classes for serial transformations
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module defines objects for defining and manipulating structures
 common to serial and/or twelve-tone music,
@@ -34,12 +34,12 @@ environLocal = environment.Environment(_MOD)
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class SerialException(exceptions21.Music21Exception):
     pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TwelveToneMatrix(stream.Stream):
     '''
     An object representation of a 2-dimensional array of 12 pitches.
@@ -95,7 +95,7 @@ class TwelveToneMatrix(stream.Stream):
                 return super().__repr__()
         else:
             return super().__repr__()
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 historicalDict = {
       'RowWebernOp29': ('Webern', 'Op. 29', 'Cantata I',
@@ -246,7 +246,7 @@ historicalDict = {
                            [1, 0, 11, 7, 8, 2, 3, 6, 5, 4, 9, 10])
       }
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ToneRow(stream.Stream):
     '''
     A Stream representation of a tone row, or an ordered sequence of pitches;
@@ -637,7 +637,7 @@ class TwelveToneRow(ToneRow):
 
 #     def __init__(self, *arguments, **keywords):
 #         super().__init__(*arguments, **keywords)
-#         #environLocal.printDebug(['TwelveToneRow.__init__: length of elements', len(self)])
+#         # environLocal.printDebug(['TwelveToneRow.__init__: length of elements', len(self)])
 # 
 #         #if self.row != None:
 #         #    for pc in self.row:
@@ -688,7 +688,7 @@ class TwelveToneRow(ToneRow):
             matrixObj.insert(0, rowObject)
 
 
-        #environLocal.printDebug([
+        # environLocal.printDebug([
         #  'calling matrix start: len row:', self.row, 'len self', len(self)])
 
         return matrixObj
@@ -1174,7 +1174,7 @@ def getHistoricalRowByName(rowName):
     else:
         raise SerialException('No historical row with given name found')
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def pcToToneRow(pcSet):
     '''A convenience function that, given a list of pitch classes represented as integers
     and turns it in to a :class:`~music21.serial.ToneRow` object.
@@ -1260,7 +1260,7 @@ def rowToMatrix(p):
     return '\n'.join(ret)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1297,15 +1297,18 @@ class Test(unittest.TestCase):
         self.assertEqual([p.name for p in src],
             ['D', 'C#', 'A', 'B-', 'F', 'E-', 'E', 'C', 'G#', 'G', 'F#', 'B'])
         s37 = getHistoricalRowByName('RowSchoenbergOp37').matrix()
-        self.assertEqual([e.name for e in s37[0]], ['C', 'B', 'G', 'G#', 'E-', 'C#', 'D', 'B-',
+        r0 = s37[0]
+        # r0 is TOO an iterable
+        # pylint: disable=not-an-iterable
+        self.assertEqual([e.name for e in r0], ['C', 'B', 'G', 'G#', 'E-', 'C#', 'D', 'B-',
                                                     'F#', 'F', 'E', 'A'])
 
 
     def testLabelingA(self):
         from music21 import corpus
-        series = {'a':1, 'g-':2, 'g':3, 'a-':4,
-                  'f':5, 'e-':6, 'e':7, 'd':8,
-                  'c':9, 'c#':10, 'b-':11, 'b':12}
+        series = {'a': 1, 'g-': 2, 'g': 3, 'a-': 4,
+                  'f': 5, 'e-': 6, 'e': 7, 'd': 8,
+                  'c': 9, 'c#': 10, 'b-': 11, 'b': 12}
         s = corpus.parse('bwv66.6')
         for n in s.flat.notes:
             for key in series:
@@ -1361,7 +1364,7 @@ class Test(unittest.TestCase):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = ['ToneRow', 'TwelveToneRow', 'HistoricalTwelveToneRow', 'ContiguousSegmentOfNotes',
               'pcToToneRow', 'TwelveToneMatrix', 'rowToMatrix', 'getHistoricalRowByName',
@@ -1371,5 +1374,5 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

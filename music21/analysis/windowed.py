@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         windowed.py
 # Purpose:      Framework for modular, windowed analysis
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2010 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module describes classes for performing windowed and overlapping windowed analysis.
 The :class:`music21.analysis.windowed.WindowedAnalysis` provides a reusable framework for
@@ -35,12 +35,12 @@ _MOD = 'analysis.windowed'
 environLocal = environment.Environment(_MOD)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class WindowedAnalysisException(exceptions21.Music21Exception):
     pass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class WindowedAnalysis:
     '''
@@ -52,7 +52,7 @@ class WindowedAnalysis:
     '''
     def __init__(self, streamObj, analysisProcessor):
         self.processor = analysisProcessor
-        #environLocal.printDebug(self.processor)
+        # environLocal.printDebug(self.processor)
         if 'Stream' not in streamObj.classes:
             raise WindowedAnalysisException('non-stream provided as argument')
         self._srcStream = streamObj
@@ -144,7 +144,7 @@ class WindowedAnalysis:
             for i in windowCountIndices:
                 current = stream.Stream()
                 for j in range(i, i + windowSize):
-                    #environLocal.printDebug(['self._windowedStream[j]', self._windowedStream[j]])
+                    # environLocal.printDebug(['self._windowedStream[j]', self._windowedStream[j]])
                     current.append(self._windowedStream[j])
 
                 try:
@@ -296,7 +296,7 @@ class WindowedAnalysis:
                 windowSizes.append(totalWindow)
 
         for i in windowSizes:
-            #environLocal.printDebug(['processing window:', i])
+            # environLocal.printDebug(['processing window:', i])
             # each of these results are lists, where len is based on
             soln, colorn = self.analyze(i, windowType=windowType)
             # store lists of results in a list of lists
@@ -313,7 +313,7 @@ class WindowedAnalysis:
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
@@ -425,7 +425,7 @@ class Test(unittest.TestCase):
         plot.run()
         #plot.write()
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [WindowedAnalysis]
 
@@ -434,7 +434,7 @@ if __name__ == "__main__":
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         key.py
 # Purpose:      Classes for keys
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009, 2010, 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module defines objects for representing key signatures as well as key
 areas. The :class:`~music21.key.KeySignature` is used in
@@ -35,7 +35,7 @@ environLocal = environment.Environment(_MOD)
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # store a cache of already-found values
 _sharpsToPitchCache = {}
 
@@ -310,13 +310,13 @@ class KeySignatureException(exceptions21.Music21Exception):
 class KeyException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class KeySignature(base.Music21Object):
     '''
     A KeySignature object specifies the signature to be used for a piece; it takes
@@ -407,7 +407,7 @@ class KeySignature(base.Music21Object):
         hashTuple = (self._sharps, tuple(self._alteredPitches), self.accidentalsApplyOnlyToOctave)
         return hash(hashTuple)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _attributesChanged(self):
         '''Clear the altered pitches cache'''
         self._alteredPitchesCached = []
@@ -509,7 +509,7 @@ class KeySignature(base.Music21Object):
             return self._alteredPitches
 
         if self._alteredPitchesCached: # if list not empty
-            #environLocal.printDebug(['using cached altered pitches'])
+            # environLocal.printDebug(['using cached altered pitches'])
             return self._alteredPitchesCached
 
         post = []
@@ -653,7 +653,7 @@ class KeySignature(base.Music21Object):
         return None
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # methods
     def transpose(self, value, *, inPlace=False):
         '''
@@ -753,7 +753,7 @@ class KeySignature(base.Music21Object):
         else:
             raise KeySignatureException('No mapping to a scale exists for this mode yet: %s' % mode)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # properties
 
 
@@ -837,7 +837,6 @@ class Key(KeySignature, scale.DiatonicScale):
     '''
     _sharps = 0
     _mode = None
-
 
     def __init__(self, tonic=None, mode=None):
         if tonic is not None:
@@ -991,12 +990,18 @@ class Key(KeySignature, scale.DiatonicScale):
         >>> k.mode = 'minor'
         >>> k.tonicPitchNameWithCase
         'b'
+        
+        Anything else will return the default (capital)
+        
+        >>> k.mode = 'dorian'
+        >>> k.tonicPitchNameWithCase
+        'B'
         '''
-        tonic = self.tonic
+        tonic = self.tonic.name
         if self.mode == 'major':
-            tonic = tonic.name.upper()
+            tonic = tonic.upper()
         elif self.mode == 'minor':
-            tonic = tonic.name.lower()
+            tonic = tonic.lower()
         return tonic
 
     def _tonalCertainityCorrelationCoefficient(self, *args, **keywords):
@@ -1145,7 +1150,7 @@ class Key(KeySignature, scale.DiatonicScale):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1238,7 +1243,7 @@ class Test(unittest.TestCase):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [KeySignature, Key]
 
@@ -1251,6 +1256,6 @@ if __name__ == '__main__':
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

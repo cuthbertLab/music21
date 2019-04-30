@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         testLint.py
 # Purpose:      Controller for all lint based testing.
 #
@@ -8,10 +8,11 @@
 #
 # Copyright:    Copyright © 2009-2010, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # this requires pylint to be installed and available from the command line
 import argparse
+import os
 
 from music21 import common
 from music21.test import commonTest
@@ -74,9 +75,13 @@ def main(fnAccept=None, strict=False):
                 'too-many-lines',    # yes, someday.
                 'too-many-return-statements', # we'll see
                 'too-many-instance-attributes', # maybe later
+                'inconsistent-return-statements', # would be nice
                 'protected-access', # this is an important one, but for now we do a lot of
                            # x = copy.deepcopy(self); x._volume = ... which is not a problem...
                            # also, test suites need to be exempt.
+                'keyword-arg-before-vararg', # a good thing to check for new code, but
+                           # requires rewriting function signatures in old code
+
     ]
     disable = [  # These also need to be changed in MUSIC21BASE/.pylintrc
                 'arguments-differ', # -- no -- should be able to add additional arguments so long
@@ -90,7 +95,9 @@ def main(fnAccept=None, strict=False):
                 'unnecessary-pass', # nice, but not really a problem...
                 'locally-disabled', # test for this later, but hopefully will know what
                             # they're doing
-
+                'consider-using-get', # if it can figure out that the default value is something
+                            # simple, we will turn back on, but until then, no.
+                'chained-comparison', # sometimes simpler that way
                 #'duplicate-code', # needs to ignore strings -- keeps getting doctests...
                 'too-many-ancestors', # -- 8 is okay.
                 'abstract-class-instantiated', # this trips on the fractions.Fraction() class.
@@ -103,7 +110,6 @@ def main(fnAccept=None, strict=False):
                 'unpacking-non-sequence', # gets it wrong too often.
                 'too-many-boolean-expressions', #AbstractDiatonicScale.__eq__ shows how this
                     # can be fine...
-
                 'misplaced-comparison-constant', # sometimes 2 < x is what we want
                 'unsubscriptable-object', # unfortunately, thinks that Streams are unsubscriptable.
                 'consider-iterating-dictionary', # sometimes .keys() is a good test against
@@ -185,9 +191,19 @@ def main(fnAccept=None, strict=False):
         acceptable.append(fp)
 
     cmdFile = cmd + acceptable
-    #print(' '.join(cmdFile))
-    #print(fp)
-    pylintRun(cmdFile, exit=False)
+    if not acceptable:
+        print('No matching files were found.')
+        return
+
+    # print(fnAccept)
+    # print(' '.join(cmdFile))
+    # print(fp)
+    
+    try:
+        # noinspection PyArgumentList
+        pylintRun(cmdFile, exit=False)
+    except TypeError:
+        pylintRun(cmdFile, do_exit=False) # renamed in recent versions
 
 def argRun():
     parser = argparse.ArgumentParser(
@@ -197,12 +213,17 @@ def argRun():
     parser.add_argument('--strict', action='store_true',
                         help='Run the file in strict mode')
     args = parser.parse_args()
-    #print(args.files)
-    #print(args.strict)
+    # print(args.files)
+    # print(args.strict)
     files = args.files if args.files else None
     if files:
-        sfp = common.getSourceFilePath()
-        files = [common.relativepath(f, sfp) for f in files]
+        filesMid = [os.path.abspath(f) for f in files]
+        files = []
+        for f in filesMid:
+            if os.path.exists(f):
+                files.append(f)
+            else:
+                print('skipping ' + f + ': no matching file')
     main(files, args.strict)
 
 if __name__ == '__main__':
@@ -214,6 +235,6 @@ if __name__ == '__main__':
 #         test.main(restoreEnvironmentDefaults=True)
 #
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

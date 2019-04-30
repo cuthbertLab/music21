@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         volpiano.py
 # Purpose:      music21 classes for converting to and from volpiano
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 The Volpiano font is a specialized font for encoding Western Plainchant
 easily with immediate visual feedback (see the CANTUS database).
@@ -33,8 +33,10 @@ from music21 import stream
 
 environLocal = environment.Environment('volpiano.py')
 
+
 class VolpianoException(exceptions21.Music21Exception):
     pass
+
 
 ErrorLevel = enum.Enum('ErrorLevel', 'WARN LOG')
 
@@ -44,6 +46,7 @@ class Neume(spanner.Spanner):
     A spanner that represents a Neume.  No name of the neume, just that it is a Neume.
     '''
 
+
 class LineBreak(base.Music21Object):
     '''
     Indicates that the line breaks at this point in the manuscript.
@@ -51,6 +54,7 @@ class LineBreak(base.Music21Object):
     Denoted by one 7.
     '''
     pass
+
 
 class PageBreak(base.Music21Object):
     '''
@@ -60,6 +64,7 @@ class PageBreak(base.Music21Object):
     '''
     pass
 
+
 class ColumnBreak(base.Music21Object):
     '''
     Indicates that the page breaks at this point in the manuscript
@@ -67,6 +72,7 @@ class ColumnBreak(base.Music21Object):
     Denoted by three 7s.
     '''
     pass
+
 
 classByNumBreakTokens = [None, LineBreak, PageBreak, ColumnBreak]
 classByNumBreakTokensLayout = [None, layout.SystemLayout, layout.PageLayout, ColumnBreak]
@@ -79,6 +85,7 @@ bflatTokens = 'iyz'
 flatTokens = eflatTokens + bflatTokens
 naturalTokens = flatTokens.upper()
 accidentalTokens = flatTokens + naturalTokens
+
 
 def toPart(volpianoText, *, breaksToLayout=False):
     '''
@@ -142,10 +149,10 @@ def toPart(volpianoText, *, breaksToLayout=False):
         {2.0} <music21.note.Note E>
         {3.0} <music21.volpiano.ColumnBreak object at 0x105262240>
         {3.0} <music21.note.Note E>
-        {4.0} <music21.bar.Barline style=regular>
+        {4.0} <music21.bar.Barline type=regular>
     {4.0} <music21.stream.Measure 0 offset=4.0>
         {0.0} <music21.note.Note E>
-        {1.0} <music21.bar.Barline style=double>
+        {1.0} <music21.bar.Barline type=double>
 
 
     As layout objects using breaksToLayout=True
@@ -161,10 +168,10 @@ def toPart(volpianoText, *, breaksToLayout=False):
         {2.0} <music21.note.Note E>
         {3.0} <music21.volpiano.ColumnBreak object at 0x105262240>
         {3.0} <music21.note.Note E>
-        {4.0} <music21.bar.Barline style=regular>
+        {4.0} <music21.bar.Barline type=regular>
     {4.0} <music21.stream.Measure 0 offset=4.0>
         {0.0} <music21.note.Note E>
-        {1.0} <music21.bar.Barline style=double>
+        {1.0} <music21.bar.Barline type=double>
 
 
     Liquescence test:
@@ -234,7 +241,7 @@ def toPart(volpianoText, *, breaksToLayout=False):
         elif token in '34':
             bl = bar.Barline()
             if token == '4':
-                bl.style = 'double'
+                bl.type = 'double'
             m.rightBarline = bl
             p.append(m)
             m = stream.Measure()
@@ -339,6 +346,7 @@ def fromStream(s, *, layoutToBreaks=False):
         7: 'x',
         11: 'z',
     }
+
     def setAccFromPitch(dist, setNatural=False):
         if dist not in distToAccidental:
             error('{} above lowest line'.format(dist), ErrorLevel.WARN)

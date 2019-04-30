@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         derivation.py
 # Purpose:      Class for storing and managing Stream-based derivations
 #
@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2011-2014 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 '''
 This module defines objects for tracking the derivation of one
@@ -298,7 +298,7 @@ class Derivation(SlottedObjectMixin):
         else:
             return None
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -307,7 +307,7 @@ class Test(unittest.TestCase):
         pass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # define presented order in documentation
 
 _DOC_ORDER = [Derivation]

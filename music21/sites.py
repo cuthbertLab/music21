@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         sites.py
 # Purpose:      Objects for keeping track of relationships among Music21Objects
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2007-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 sites.py -- Objects for keeping track of relationships among Music21Objects
 '''
@@ -38,7 +38,7 @@ GLOBAL_SITE_STATE_DICT = weakref.WeakValueDictionary()
 class SitesException(exceptions21.Music21Exception):
     pass
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class SiteRef(common.SlottedObjectMixin):
     '''
     a single Site (stream, container, parent, reference, etc.) stored inside the Sites object.
@@ -87,17 +87,37 @@ class SiteRef(common.SlottedObjectMixin):
         self.siteIndex = None
         self.siteWeakref = None
 
+    def __repr__(self):
+        if self is _NoneSiteRef:
+            return '<music21.sites.SiteRef Global None Index>'
+        
+        siteRepr = repr(self.site)
+        if self.isDead:
+            siteRepr = 'dead site'
+        
+        return '<music21.sites.SiteRef {}/{} to {}>'.format(
+            self.siteIndex, self.globalSiteIndex, siteRepr
+        )
+
     def _getAndUnwrapSite(self):
         if WEAKREF_ACTIVE:
-            return common.unwrapWeakref(self.siteWeakref)
+            ret = common.unwrapWeakref(self.siteWeakref)
         else:
-            return self.siteWeakref
+            ret = self.siteWeakref
+            
+        if ret is None and self is not _NoneSiteRef:
+            self.isDead = True
+            
+        return ret
+
 
     def _setAndWrapSite(self, site):
         if WEAKREF_ACTIVE:
             self.siteWeakref = common.wrapWeakref(site)
         else:
             self.siteWeakref = site
+        self.isDead = False
+
 
     site = property(_getAndUnwrapSite, _setAndWrapSite)
 
@@ -204,7 +224,7 @@ class Sites(common.SlottedObjectMixin):
         #copies; this functionality is used at times in context searches, but
         # may be a performance hog.
         new = self.__class__()
-        #environLocal.printDebug(['Sites.__deepcopy__',
+        # environLocal.printDebug(['Sites.__deepcopy__',
         #    'self.siteDict.keys()', self.siteDict.keys()])
         for idKey in self.siteDict:
             if idKey is None:
@@ -289,36 +309,6 @@ class Sites(common.SlottedObjectMixin):
         '''
         return self.yieldSites(excludeNone=True)
 
-    ### PRIVATE METHODS ###
-
-    def _keysByTime(self, newFirst=True):
-        '''
-        Get keys sorted by creation time, where most
-        recent are first if `newFirst` is True. else, most recent are last.
-
-        >>> class Mock(base.Music21Object):
-        ...     pass
-        >>> aObj = Mock()
-        >>> bObj = Mock()
-        >>> cObj = Mock()
-        >>> aSites = sites.Sites()
-        >>> aSites.add(cObj)
-        >>> aSites.add(aObj)
-        >>> aSites.add(bObj)
-        >>> k = aSites._keysByTime()
-        >>> aSites.siteDict[k[0]].siteIndex > aSites.siteDict[k[1]].siteIndex
-        True
-        >>> aSites.siteDict[k[1]].siteIndex > aSites.siteDict[k[2]].siteIndex
-        True
-
-        '''
-        post = []
-        for key in self.siteDict:
-            post.append((self.siteDict[key].siteIndex, key))
-        post.sort()
-        if newFirst:
-            post.reverse()
-        return [k for (unused_time, k) in post]
 
     ### PUBLIC METHODS ###
 
@@ -353,7 +343,7 @@ class Sites(common.SlottedObjectMixin):
             #if idKey is not None:
             #    print 'Updating idKey %s for object %s' % (idKey, id(obj))
 
-        #environLocal.printDebug(['adding obj', obj, idKey])
+        # environLocal.printDebug(['adding obj', obj, idKey])
         # weak refs were being passed in __deepcopy__ calling this method
         # __deepcopy__ no longer call this method, so we can assume that
         # we will not get weakrefs
@@ -391,13 +381,12 @@ class Sites(common.SlottedObjectMixin):
                    priorityTarget=None,
                    excludeNone=False):
         '''
-        Yield references; order, based on dictionary keys, is from most
-        recently added to least recently added.
+        Yield references; order, based on dictionary keys, is from least
+        recently added to most recently added.
 
-        The `sortByCreationTime` option will sort objects by creation time,
+        The `sortByCreationTime` option if set to True will sort objects by creation time,
         where most-recently assigned objects are returned first.
-        Can be [False, other], [True, 1] or ['reverse', -1]
-
+        
         Note that priorityTarget is searched only on id -- this could be dangerous if the
         target has been garbage collected and the id is reused. Unlikely since you gotta
         pass in the priorityTarget itself so therefore it still exists...
@@ -441,20 +430,20 @@ class Sites(common.SlottedObjectMixin):
         b
         a
 
-        *changed drammatically from the unused version in v.3*
+        *Changes:*
+        
+        # v.3: changed dramatically from previously unused version
+        # `sortByCreationTime='reverse'` is removed, since the ordered dict takes
+        care of it and was not working
         '''
+        keyRepository = list(self.siteDict.keys())
         if sortByCreationTime is True:
-            keyRepository = self._keysByTime(newFirst=True)
-        # reverse creation time puts oldest elements first
-        elif sortByCreationTime == 'reverse':
-            keyRepository = self._keysByTime(newFirst=False)
-        else:  # None, or False
-            keyRepository = list(self.siteDict.keys())
+            keyRepository.reverse()
 
         if priorityTarget is not None:
             priorityId = id(priorityTarget)
             if priorityId in keyRepository:
-                #environLocal.printDebug(['priorityTarget found in post:', priorityTarget])
+                # environLocal.printDebug(['priorityTarget found in post:', priorityTarget])
                 # extract object and make first
                 keyRepository.insert(0,
                     keyRepository.pop(keyRepository.index(priorityId)))
@@ -476,6 +465,7 @@ class Sites(common.SlottedObjectMixin):
 
 
     def get(self,
+            *,            
             sortByCreationTime=False,
             priorityTarget=None,
             excludeNone=False):
@@ -515,7 +505,7 @@ class Sites(common.SlottedObjectMixin):
         >>> begotten == [cObj, bObj, aObj]
         True
 
-
+        * Changed in v5.5: keyword only.
         '''
         post = list(self.yieldSites(sortByCreationTime, priorityTarget, excludeNone))
 
@@ -523,7 +513,7 @@ class Sites(common.SlottedObjectMixin):
         # want to be extra safe.  If you want fast, use .yieldSites
         if priorityTarget is not None:
             if priorityTarget in post:
-                #environLocal.printDebug(['priorityTarget found in post:', priorityTarget])
+                # environLocal.printDebug(['priorityTarget found in post:', priorityTarget])
                 # extract object and make first
                 post.insert(0, post.pop(post.index(priorityTarget)))
         return post
@@ -575,6 +565,7 @@ class Sites(common.SlottedObjectMixin):
     def getObjByClass(
             self,
             className,
+            *,
             callerFirst=None,
             sortByCreationTime=False,
             priorityTarget=None,
@@ -615,6 +606,8 @@ class Sites(common.SlottedObjectMixin):
         >>> aSites.getObjByClass(Mock, sortByCreationTime=True) == bObj
         True
 
+        * Changed in v5.5: all arguments except className are keyword only.
+
         OMIT_FROM_DOCS
         TODO: not sure if memo is properly working: need a test case
         '''
@@ -636,11 +629,11 @@ class Sites(common.SlottedObjectMixin):
             sortByCreationTime=sortByCreationTime,
             priorityTarget=priorityTarget,
             excludeNone=True,
-            )
+            ) # objs is a generator
         #printMemo(memo, 'getObjByClass() called: looking at %s sites' % len(objs))
         classNameIsStr = isinstance(className, str)
         for obj in objs:
-            #environLocal.printDebug(['memo', memo])
+            # environLocal.printDebug(['memo', memo])
             if classNameIsStr:
                 if className in obj.classes:
                     post = obj
@@ -660,7 +653,7 @@ class Sites(common.SlottedObjectMixin):
                 #if DEBUG_CONTEXT:
                 #    print('\tY: skipping flat stream that does not contain object:',
                 #                  id(obj), obj)
-                #environLocal.printDebug(
+                # environLocal.printDebug(
                 #    ['\tY: skipping flat stream that does not contain object:'])
                 if obj.sites.getSiteCount() == 0: # is top level; no more to search
                     if not obj.hasElementOfClass(className, forceFlat=True):
@@ -929,7 +922,7 @@ class Sites(common.SlottedObjectMixin):
             siteId = id(site)
         try:
             del self.siteDict[siteId]
-            #environLocal.printDebug(['removed site w/o exception:', siteId,
+            # environLocal.printDebug(['removed site w/o exception:', siteId,
             #    'self.siteDict.keys()', self.siteDict.keys()])
         except:
             raise SitesException('an entry for this object ' +
@@ -946,7 +939,7 @@ class Sites(common.SlottedObjectMixin):
         if idKey is None:
             raise SitesException('trying to remove None idKey is not allowed')
 
-        #environLocal.printDebug(['removeById', idKey,
+        # environLocal.printDebug(['removeById', idKey,
         #    'self.siteDict.keys()', self.siteDict.keys()])
         try:
             del self.siteDict[idKey]
@@ -1015,11 +1008,11 @@ class Test(unittest.TestCase):
         self.assertEqual(isinstance(lastNoteClef, clef.TrebleClef), True)
 
 
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 _DOC_ORDER = [SiteRef, Sites]
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)

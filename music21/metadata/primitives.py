@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         primitives.py
 # Purpose:      music21 classes for representing score and work meta-data
 #
@@ -8,15 +8,7 @@
 #
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
 # Project License:      LGPL, see license.txt
-#------------------------------------------------------------------------------
-__all__ = ['Date', 'DateSingle', 'DateRelative', 'DateBetween',
-           'DateSelection',
-           'Text',
-           'Contributor',
-           'Creator',
-           'Imprint',
-           'Copyright']
-
+# -----------------------------------------------------------------------------
 import datetime
 import os
 import unittest
@@ -24,14 +16,29 @@ import unittest
 from music21 import common
 from music21 import exceptions21
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 from music21 import environment
+
+__all__ = [
+    'Contributor',
+    'Copyright',
+    'Creator',
+    'Date',
+    'DateBetween',
+    'DateRelative',
+    'DateSelection',
+    'DateSingle',
+    'Imprint',
+    'Text',
+    ]
+
+
 environLocal = environment.Environment(os.path.basename(__file__))
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Date:
@@ -114,7 +121,7 @@ class Date:
         >>> str(d)
         '1030?/12~/04?'
         '''
-        # datetime.strftime("%Y.%m.%d")
+        # datetime.strftime('%Y.%m.%d')
         # cannot use this, as it does not support dates lower than 1900!
         msg = []
         if self.hour is None and self.minute is None and self.second is None:
@@ -315,7 +322,7 @@ class Date:
 
         >>> a.datetime
         Traceback (most recent call last):
-        TypeError: Required argument 'day' (pos 3) not found
+        TypeError: ...argument 'day' (pos 3)...
         '''
         # pylint: disable=no-value-for-parameter
         post = []
@@ -379,7 +386,7 @@ class Date:
         return False
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class DateSingle:
@@ -480,7 +487,7 @@ class DateSingle:
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class DateRelative(DateSingle):
@@ -546,7 +553,7 @@ class DateRelative(DateSingle):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class DateBetween(DateSingle):
@@ -617,7 +624,7 @@ class DateBetween(DateSingle):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class DateSelection(DateSingle):
@@ -693,7 +700,7 @@ class DateSelection(DateSingle):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Text:
@@ -776,7 +783,7 @@ class Text:
         from music21 import text
         return text.prependArticle(str(self), self._language)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class Copyright(Text):
     '''
     A subclass of text that can also have a role
@@ -795,7 +802,7 @@ class Copyright(Text):
         self.role = role
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Contributor:
@@ -898,8 +905,8 @@ class Contributor:
         >>> a.role
         'composer'
 
-        >>> a.age()
-        datetime.timedelta(20552)
+        >>> a.age().days
+        20552
 
         >>> str(a.age())
         '20552 days, 0:00:00'
@@ -1046,7 +1053,7 @@ class Contributor:
                 return role_id
         raise exceptions21.MetadataException('No such role: %s' % roleName)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Creator(Contributor):
@@ -1072,7 +1079,7 @@ class Creator(Contributor):
     relevance = 'creator'
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Imprint:
@@ -1094,7 +1101,7 @@ class Imprint:
 # !!!SMA: Acknowledgement of manuscript access.
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 # !!!YEP: Publisher of electronic edition.
@@ -1107,7 +1114,7 @@ class Imprint:
 # !!!YOY: Original copyright year.
 # !!!YOE: Original editor.
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # supported work ids and abbreviations
 
 #     'otl' : 'title',
@@ -1136,7 +1143,7 @@ class Imprint:
 #     'opc' : 'localeOfComposition', # origin in abc
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -1230,7 +1237,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(dateSelection._data), 3)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 _DOC_ORDER = (
@@ -1243,22 +1250,10 @@ _DOC_ORDER = (
     Contributor,
     )
 
-__all__ = [
-    'Contributor',
-    'Copyright',
-    'Creator',
-    'Date',
-    'DateBetween',
-    'DateRelative',
-    'DateSelection',
-    'DateSingle',
-    'Imprint',
-    'Text',
-    ]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------

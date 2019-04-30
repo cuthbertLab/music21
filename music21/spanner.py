@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         spanner.py
 # Purpose:      The Spanner base-class and subclasses
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 A spanner is a music21 object that represents a connection usually between
 two or more music21 objects that might live in different streams but need
@@ -35,14 +35,14 @@ _MOD = 'spanner'
 environLocal = environment.Environment(_MOD)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class SpannerException(exceptions21.Music21Exception):
     pass
 class SpannerBundleException(exceptions21.Music21Exception):
     pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Spanner(base.Music21Object):
     '''
     Spanner objects live on Streams in the same manner as other Music21Objects,
@@ -278,7 +278,6 @@ class Spanner(base.Music21Object):
                     # there is a bug where it is possible for
                     # an element to appear twice in spannerStorage
                     # this is the TODO item
-
         return new
 
 
@@ -314,7 +313,7 @@ class Spanner(base.Music21Object):
         '''
         return self._deepcopySubclassable(memo)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # as spannedElements is private Stream, unwrap/wrap methods need to override
     # Music21Object to get at these objects
     # this is the same as with Variants
@@ -330,7 +329,7 @@ class Spanner(base.Music21Object):
         self.spannerStorage.purgeLocations(rescanIsDead=rescanIsDead)
         base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def __getitem__(self, key):
         '''
 
@@ -595,7 +594,7 @@ class Spanner(base.Music21Object):
             return None
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class SpannerBundle:
     '''
     A utility object for collecting and processing
@@ -1085,7 +1084,7 @@ class SpannerBundle:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # connect two or more notes anywhere in the score
 class Slur(Spanner):
     '''
@@ -1105,7 +1104,7 @@ class Slur(Spanner):
         msg = msg.replace(self._reprHead, '<music21.spanner.Slur ')
         return msg
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class MultiMeasureRest(Spanner):
     '''
     A grouping symbol that indicates that a collection of rests lasts
@@ -1168,7 +1167,7 @@ class MultiMeasureRest(Spanner):
     def numRests(self, overridden):
         self._overriddenNumber = overridden
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # first/second repeat bracket
 class RepeatBracket(Spanner):
     '''
@@ -1243,7 +1242,9 @@ class RepeatBracket(Spanner):
         This must return a string, as we may have single numbers or lists.
         For a raw numerical list, use getNumberList() below.
         '''
-        if len(self._numberRange) == 1:
+        if not self._numberRange:
+            return ''
+        elif len(self._numberRange) == 1:
             return str(self._number)
         else:
             if self._numberSpanIsContiguous is False:
@@ -1350,7 +1351,7 @@ class RepeatBracket(Spanner):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # line-based spanners
 
 class Ottava(Spanner):
@@ -1805,7 +1806,7 @@ class Glissando(Spanner):
             raise SpannerException('not a valid value: %s' % value)
         self._slideType = value.lower()
     
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -2263,14 +2264,14 @@ class Test(unittest.TestCase):
         '''Test basic octave shift creation and output, as well as passing
         objects through make measure calls.
         '''
-        from music21 import stream, note, spanner, chord
+        from music21 import stream, note, chord
 
         s = stream.Stream()
         s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
         # s.repeatAppend(note.Note(), 12)
         n1 = s.notes[0]
         n2 = s.notes[-1]
-        sp1 = spanner.Ottava(n1, n2)  # default is 8va
+        sp1 = Ottava(n1, n2)  # default is 8va
         s.append(sp1)
         raw = self.xmlStr(s)
         self.assertEqual(raw.count('octave-shift'), 2)
@@ -2281,7 +2282,7 @@ class Test(unittest.TestCase):
         s.repeatAppend(note.Note(), 12)
         n1 = s.notes[0]
         n2 = s.notes[-1]
-        sp1 = spanner.Ottava(n1, n2, type='8vb')
+        sp1 = Ottava(n1, n2, type='8vb')
         s.append(sp1)
         # s.show()
         raw = self.xmlStr(s)
@@ -2292,7 +2293,7 @@ class Test(unittest.TestCase):
         s.repeatAppend(note.Note(), 12)
         n1 = s.notes[0]
         n2 = s.notes[-1]
-        sp1 = spanner.Ottava(n1, n2, type='15ma')
+        sp1 = Ottava(n1, n2, type='15ma')
         s.append(sp1)
         # s.show()
         raw = self.xmlStr(s)
@@ -2303,7 +2304,7 @@ class Test(unittest.TestCase):
         s.repeatAppend(note.Note(), 12)
         n1 = s.notes[0]
         n2 = s.notes[-1]
-        sp1 = spanner.Ottava(n1, n2, type='15mb')
+        sp1 = Ottava(n1, n2, type='15mb')
         s.append(sp1)
         # s.show()
         raw = self.xmlStr(s)
@@ -2482,10 +2483,10 @@ class Test(unittest.TestCase):
 #         self.assertEqual(raw.count('<dashes'), 4)
 
     def testOneElementSpanners(self):
-        from music21 import note, spanner
+        from music21 import note
 
         n1 = note.Note()
-        sp = spanner.Spanner()
+        sp = Spanner()
         sp.addSpannedElements(n1)
         sp.completeStatus = True
         self.assertEqual(sp.completeStatus, True)
@@ -2653,7 +2654,7 @@ class Test(unittest.TestCase):
         slList = sl.getSpannedElementIds()
         self.assertEqual(idList, slList)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Spanner]
 
@@ -2664,5 +2665,5 @@ if __name__ == '__main__':
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

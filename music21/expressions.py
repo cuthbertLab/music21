@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         expressions.py
 # Purpose:      notation mods
 #
@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module provides object representations of expressions, that is
 notational symbols such as Fermatas, Mordents, Trills, Turns, etc.
@@ -61,7 +61,10 @@ def realizeOrnaments(srcObject):
     else:
         preExpandList = []
         postExpandList = []
-        while 1 == 1:
+        
+        loopBuster = 100
+        while loopBuster:
+            loopBuster -= 1
             thisExpression = srcObject.expressions[0]
             if hasattr(thisExpression, 'realize'):
                 preExpand, newSrcObject, postExpand = thisExpression.realize(srcObject)
@@ -90,7 +93,7 @@ def realizeOrnaments(srcObject):
         return retList
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ExpressionException(exceptions21.Music21Exception):
     pass
 
@@ -127,7 +130,7 @@ class Expression(base.Music21Object):
         className = self.__class__.__name__
         return common.camelCaseToHyphen(className, replacement=' ')
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class RehearsalMark(Expression):
     '''
     A rehearsal mark is a type of Expression that designates a rehearsal
@@ -278,7 +281,7 @@ class RehearsalMark(Expression):
         '''
         return RehearsalMark(self.nextContent(), numbering=self.numbering)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TextExpressionException(ExpressionException):
     pass
 
@@ -345,7 +348,7 @@ class TextExpression(Expression):
         ''')
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # text expression in musicxml may be repeat expressions
     # need to see if this is a repeat expression, and if so
     # return the appropriate object
@@ -380,7 +383,7 @@ class TextExpression(Expression):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Ornament(Expression):
 
     def __init__(self):
@@ -399,7 +402,7 @@ class Ornament(Expression):
         return ([], srcObj, [])
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class GeneralMordent(Ornament):
     '''Base class for all Mordent types.
     '''
@@ -479,7 +482,7 @@ class GeneralMordent(Ornament):
         #TODO clear just mordent here...
         return (mordNotes, remainderNote, [])
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Mordent(GeneralMordent):
     '''
     A normal Mordent.
@@ -524,7 +527,7 @@ class WholeStepMordent(Mordent):
         self.size = interval.Interval('M2')
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class InvertedMordent(GeneralMordent):
     '''
     An inverted Mordent.
@@ -569,7 +572,7 @@ class WholeStepInvertedMordent(InvertedMordent):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Trill(Ornament):
     '''A basic trill marker.
 
@@ -740,7 +743,7 @@ class Shake(Trill):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # TODO: BaroqueSlide
 # this is a slide or culee
@@ -751,7 +754,7 @@ class Schleifer(Ornament):
         self.quarterLength = 0.25
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Turn(Ornament):
     def __init__(self):
         super().__init__()
@@ -865,7 +868,7 @@ class InvertedTurn(Turn):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class GeneralAppoggiatura(Ornament):
     # up or down -- up means the grace note is below and goes up to the actual note
     direction = ''  
@@ -957,7 +960,7 @@ class WholeStepInvertedAppoggiatura(InvertedAppoggiatura):
         super().__init__()
         self.size = interval.Interval('M2')
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TremoloException(exceptions21.Music21Exception):
     pass
 
@@ -1066,7 +1069,7 @@ class Tremolo(Ornament):
 
         return (objsConverted, None, [])
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Fermata(Expression):
     '''
     Fermatas by default get appended to the last
@@ -1096,7 +1099,7 @@ class Fermata(Expression):
         self.tieAttach = 'last'
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # spanner expressions
 
 class TrillExtensionException(exceptions21.Music21Exception):
@@ -1194,7 +1197,7 @@ class TremoloSpanner(spanner.Spanner):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1326,7 +1329,7 @@ class Test(unittest.TestCase):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [TextExpression]
 
@@ -1334,6 +1337,6 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

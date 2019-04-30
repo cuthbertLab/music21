@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         alpha/analysis/hasher.py
 # Purpose:      Hash musical notation
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 import unittest
 
@@ -19,7 +19,7 @@ from music21 import interval
 from music21 import stream
 from music21.exceptions21 import StreamException
 
-class Hasher(object):
+class Hasher:
     '''
     This is a modular hashing object that can hash notes, chords, and rests, and some of their
     properties. Steps to using and calling the hasher:
@@ -305,8 +305,10 @@ class Hasher(object):
         """
         try:
             if (isinstance(e, note.Note) 
-                    and e.previous('Note', flattenLocalSites=True) is not None):
-                previousNote = e.previous('Note', flattenLocalSites=True)
+                    and e.previous('Note') is not None):
+                previousNote = e.previous('Note')
+                if (previousNote is None):
+                    return 0
                 intFromLastNote = interval.Interval(noteStart=previousNote, 
                                                     noteEnd=e).intervalClass
                 return interval.convertGeneric(interval.Interval(intFromLastNote).intervalClass)

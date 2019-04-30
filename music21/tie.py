@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         tie.py
 # Purpose:      music21 classes for representing ties (visual and conceptual)
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2010, 2012, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 '''
 The `tie` module contains a single class, `Tie` that represents the visual and
@@ -19,11 +19,12 @@ import unittest
 from music21 import exceptions21
 from music21.common import SlottedObjectMixin
 
+
 class TieException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
 
+# ------------------------------------------------------------------------------
 class Tie(SlottedObjectMixin):
     '''
     Object added to notes that are tied to other notes. The `type` value is one
@@ -96,10 +97,11 @@ class Tie(SlottedObjectMixin):
     }
 
     VALID_TIE_TYPES = ('start', 'stop', 'continue', 'let-ring', 'continue-let-ring')
+
     ### INITIALIZER ###
     # pylint: disable=redefined-builtin
-    def __init__(self, type='start'): #@ReservedAssignment
-        #super().__init__()
+    def __init__(self, type='start'): # @ReservedAssignment
+        # super().__init__()
         if type not in self.VALID_TIE_TYPES:
             raise TieException(
                 'Type must be one of {}, not {}'.format(self.VALID_TIE_TYPES, type))
@@ -134,19 +136,20 @@ class Tie(SlottedObjectMixin):
             return True
         return False
 
-    def __ne__(self, other):
-        '''
-        Tests for object inequality.
-
-        >>> a = tie.Tie('start')
-        >>> b = tie.Tie('stop')
-        >>> a != b
-        True
-        '''
-        return not self.__eq__(other)
-
     def __repr__(self):
         return '<music21.tie.Tie %s>' % self.type
+
+
+    @property
+    def classes(self):
+        '''
+        Returns a list containing the names (strings, not objects) of classes
+        that this object belongs to -- starting with the object's class name
+        and going up the mro() for the object.  Very similar to Perl's @ISA
+        array.  See music21.Music21Object.classes for more details.
+        '''
+        return tuple([x.__name__ for x in self.__class__.mro()])
+        # TODO: inherit from a protoM21Object...
 
 
 class Test(unittest.TestCase):
@@ -155,11 +158,11 @@ class Test(unittest.TestCase):
         pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

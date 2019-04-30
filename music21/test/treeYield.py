@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         treeYield.py
 # Purpose:      traverse a complex datastructure and yield elements
 #               that fit a given criteria
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert
 # License:      CC-BY (see StackOverflow link below)
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # http://stackoverflow.com/questions/12611337/
 #     recursively-dir-a-python-object-to-find-values-of-a-certain-type-or-with-a-cer
 
@@ -140,17 +140,14 @@ def testMIDIParse():
     from music21 import converter, common
     from music21 import freezeThaw
 
-    #a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
-    #c = converter.parse(a)
-#     c = corpus.parse('bwv66.6', forceSource=True)
-#     v = freezeThaw.StreamFreezer(c)
-#     v.setupSerializationScaffold()
-#     return v.writeStr() # returns a string
-    import os
-    a = os.path.join(common.getSourceFilePath(),
-                     'midi',
-                     'testPrimitive',
-                     'test03.mid')
+    # a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
+    # c = converter.parse(a)
+    # c = corpus.parse('bwv66.6', forceSource=True)
+    # v = freezeThaw.StreamFreezer(c)
+    # v.setupSerializationScaffold()
+    # return v.writeStr() # returns a string
+    
+    a = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test03.mid'
 
     #a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
     c = converter.parse(a)

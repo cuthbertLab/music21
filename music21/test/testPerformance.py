@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         testPerformance.py
 # Purpose:      Tests keep track of long-term performance targets
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2009-2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module defines a number of performance test.
  Results for these performances are stored and dated,
@@ -27,7 +27,7 @@ from music21 import environment
 _MOD = 'test.testPerformance'
 environLocal = environment.Environment(_MOD)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -209,19 +209,19 @@ class Test(unittest.TestCase):
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):
                 post = m.getContextByClass('Clef')
-                assert post != None
+                assert post is not None
                 post = m.getContextByClass('TimeSignature')
-                assert post != None
+                assert post is not None
                 post = m.getContextByClass('KeySignature')
-                assert post != None
+                assert post is not None
 
                 for n in m.notesAndRests:
                     post = n.getContextByClass('Clef')
-                    assert post != None
+                    assert post is not None
                     post = n.getContextByClass('TimeSignature')
-                    assert post != None
+                    assert post is not None
                     post = n.getContextByClass('KeySignature')
-                    assert post != None
+                    assert post is not None
 
 
     def runGetElementsByPrevious(self):
@@ -235,19 +235,19 @@ class Test(unittest.TestCase):
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):
                 post = m.previous('Clef')
-                assert post != None
+                assert post is not None
                 post = m.previous('TimeSignature')
-                assert post != None
+                assert post is not None
                 post = m.previous('KeySignature')
-                assert post != None
+                assert post is not None
 
                 for n in m.notesAndRests:
                     post = n.getContextByClass('Clef')
-                    assert post != None
+                    assert post is not None
                     post = n.getContextByClass('TimeSignature')
-                    assert post != None
+                    assert post is not None
                     post = n.getContextByClass('KeySignature')
-                    assert post != None
+                    assert post is not None
 
 
 
@@ -257,7 +257,7 @@ class Test(unittest.TestCase):
         '''
         unused = corpus.parse('monteverdi/madrigal.5.3.rntxt', forceSource=True)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def testTimingTolerance(self):
         '''
         Test the performance of methods defined above,
@@ -406,6 +406,6 @@ if __name__ == "__main__":
         music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

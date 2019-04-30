@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         midi/percussion.py
 # Purpose:      music21 classes for representing pitches
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2012, 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import unittest
 import copy
 
@@ -100,13 +100,13 @@ class PercussionMapper:
         >>> cowPitch = pitch.Pitch(56)
         >>> cowbell = pm.midiPitchToInstrument(cowPitch)
         >>> cowbell
-        <music21.instrument.Cowbell Cowbell>
+        <music21.instrument.Cowbell 'Cowbell'>
 
         Or it can just take an integer (representing MIDI note) for the pitch instead...
 
         >>> moreCowbell = pm.midiPitchToInstrument(56)
         >>> moreCowbell
-        <music21.instrument.Cowbell Cowbell>
+        <music21.instrument.Cowbell 'Cowbell'>
 
         The standard GM Percussion list goes from 35 to 81;
         pitches outside this range raise an exception.
@@ -114,7 +114,7 @@ class PercussionMapper:
         >>> bassDrum1Pitch = pitch.Pitch('B-1')
         >>> pm.midiPitchToInstrument(bassDrum1Pitch)
         Traceback (most recent call last):
-        music21.midi.percussion.MIDIPercussionException: 34 doesn't map to a valid instrument!
+        music21.midi.percussion.MIDIPercussionException: 34 does not map to a valid instrument!
 
         Also, certain GM instruments do not have corresponding music21 instruments,
         so at present they also raise an exception.
@@ -122,7 +122,7 @@ class PercussionMapper:
         >>> cabasaPitch = 69
         >>> pm.midiPitchToInstrument(cabasaPitch)
         Traceback (most recent call last):
-        music21.midi.percussion.MIDIPercussionException: 69 doesn't map to a valid instrument!
+        music21.midi.percussion.MIDIPercussionException: 69 does not map to a valid instrument!
 
 
         Some music21 Instruments have more than one MidiPitch.  In this case you'll
@@ -131,14 +131,14 @@ class PercussionMapper:
         >>> acousticBassDrumPitch = pitch.Pitch(35)
         >>> acousticBDInstrument = pm.midiPitchToInstrument(acousticBassDrumPitch)
         >>> acousticBDInstrument
-        <music21.instrument.BassDrum Bass Drum>
+        <music21.instrument.BassDrum 'Bass Drum'>
         >>> acousticBDInstrument.modifier
         'acoustic'
 
         >>> oneBassDrumPitch = pitch.Pitch(36)
         >>> oneBDInstrument = pm.midiPitchToInstrument(oneBassDrumPitch)
         >>> oneBDInstrument
-        <music21.instrument.BassDrum Bass Drum>
+        <music21.instrument.BassDrum 'Bass Drum'>
         >>> oneBDInstrument.modifier
         '1'
 
@@ -149,7 +149,7 @@ class PercussionMapper:
         else:
             midiNumber = midiPitch.midi
         if midiNumber not in self.reverseInstrumentMapping:
-            raise MIDIPercussionException("%r doesn't map to a valid instrument!" % midiNumber)
+            raise MIDIPercussionException('%r does not map to a valid instrument!' % midiNumber)
         midiInstrument = self.reverseInstrumentMapping[midiNumber]
 
         midiInstrumentObject = midiInstrument()
@@ -185,11 +185,11 @@ class PercussionMapper:
         >>> myBagpipes = instrument.Bagpipes()
         >>> pipePitch = pm.midiInstrumentToPitch(myBagpipes)
         Traceback (most recent call last):
-        music21.midi.percussion.MIDIPercussionException: <music21.instrument.Bagpipes Bagpipes>
+        music21.midi.percussion.MIDIPercussionException: <music21.instrument.Bagpipes 'Bagpipes'>
             is not in the GM Percussion Map!
         '''
         if not hasattr(midiInstrument, 'inGMPercMap') or midiInstrument.inGMPercMap is False:
-            raise MIDIPercussionException("%r is not in the GM Percussion Map!" % midiInstrument)
+            raise MIDIPercussionException('%r is not in the GM Percussion Map!' % midiInstrument)
         midiPitch = midiInstrument.percMapPitch
         pitchObject = pitch.Pitch()
         pitchObject.midi = midiPitch
@@ -225,15 +225,15 @@ class Test(unittest.TestCase):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [PercussionMapper]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         segment.py
 # Purpose:      Division of stream.Part into segments for individual handling
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 """
 Inner classes and methods for transcribing musical segments into braille.
@@ -152,7 +152,7 @@ SegmentKey = collections.namedtuple('SegmentKey', 'measure ordinal affinity hand
 SegmentKey.__new__.__defaults__ = (0, 0, None, None)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class BrailleElementGrouping(list):
     _DOC_ATTR = {
@@ -1244,7 +1244,6 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
         except basic.BrailleBasicException as bbe:
             if bbe.args[0] != "No heading can be made.":
                 raise bbe
-        return None
 
     def extractNoteGrouping(self):
         (rightKey, leftKey) = self.currentGroupingPair
@@ -1287,7 +1286,6 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
         else:
             lh_braille = ""
         self.addNoteGroupings(currentMeasureNumber, rh_braille, lh_braille)
-        return None
 
 #     #noinspection PyUnusedLocal
 #     def extractSignatureGrouping(self, brailleKeyboard):
@@ -1302,7 +1300,7 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
 #         pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Grouping + Segment creation from music21.stream Part
 
 def findSegments(music21Part, **partKeywords):
@@ -1432,7 +1430,7 @@ def findSegments(music21Part, **partKeywords):
     ===
     Measure 17, Note Grouping 1:
     <music21.note.Note E->
-    <music21.bar.Barline style=final>
+    <music21.bar.Barline type=final>
     ===
     ---end segment---
     """
@@ -1487,7 +1485,7 @@ def prepareSlurredNotes(music21Part, **keywords):
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Note D>
         {2.0} <music21.note.Note E>
-        {3.0} <music21.bar.Barline style=final>
+        {3.0} <music21.bar.Barline type=final>
     {3.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note E>>
     >>> shortA = copy.deepcopy(short)
     >>> segment.prepareSlurredNotes(shortA)
@@ -1517,7 +1515,7 @@ def prepareSlurredNotes(music21Part, **keywords):
         {1.5} <music21.note.Note F>
         {2.0} <music21.note.Note G>
         {2.5} <music21.note.Note A>
-        {3.0} <music21.bar.Barline style=final>
+        {3.0} <music21.bar.Barline type=final>
     {3.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note A>>
     >>> longA = copy.deepcopy(long)
     >>> segment.prepareSlurredNotes(longA)
@@ -1674,7 +1672,7 @@ def getRawSegments(music21Part, setHand=None):
         {2.0} <music21.note.Note G>
     {9.0} <music21.stream.Measure 4 offset=9.0>
         {0.0} <music21.note.Note C>
-        {3.0} <music21.bar.Barline style=final>
+        {3.0} <music21.bar.Barline type=final>
 
 
     By default, there is no break anywhere within the Part,
@@ -1711,7 +1709,7 @@ def getRawSegments(music21Part, setHand=None):
     ===
     Measure 4, Note Grouping 1:
     <music21.note.Note C>
-    <music21.bar.Barline style=final>
+    <music21.bar.Barline type=final>
     ===
     ---end segment---
 
@@ -1756,7 +1754,7 @@ def getRawSegments(music21Part, setHand=None):
     ===
     Measure 4, Note Grouping 1:
     <music21.note.Note C>
-    <music21.bar.Barline style=final>
+    <music21.bar.Barline type=final>
     ===
     ---end segment---
     """
@@ -1848,7 +1846,7 @@ def extractBrailleElements(music21Measure):
     {1.5} <music21.note.Note D>
     {1.75} <music21.note.Note D>
     {2.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>
-    {2.0} <music21.bar.Barline style=final>
+    {2.0} <music21.bar.Barline type=final>
 
 
     Spanners are dealt with in :meth:`~music21.braille.segment.prepareSlurredNotes`,
@@ -1865,7 +1863,7 @@ def extractBrailleElements(music21Measure):
     <music21.note.Note D>
     <music21.note.Note D>
     <music21.note.Note D>
-    <music21.bar.Barline style=final>
+    <music21.bar.Barline type=final>
     """
     allElements = BrailleElementGrouping()
     for music21Object in music21Measure:
@@ -1915,7 +1913,7 @@ def prepareBeamedNotes(music21Measure):
         {1.25} <music21.note.Note D>
         {1.5} <music21.note.Note D>
         {1.75} <music21.note.Note D>
-        {2.0} <music21.bar.Barline style=final>
+        {2.0} <music21.bar.Barline type=final>
     >>> measure = tn[0]
     >>> segment.prepareBeamedNotes(measure)
     >>> measure.notes[0].beamStart
@@ -2078,7 +2076,7 @@ def areGroupingsIdentical(noteGroupingA, noteGroupingB):
     return False
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Helper Methods
 
 def splitNoteGrouping(noteGrouping, beatDivisionOffset=0):
@@ -2192,12 +2190,12 @@ def splitMeasure(music21Measure, beatDivisionOffset=0, useTimeSignature=None):
     rightMeasure.remove(ts)
     return (leftMeasure, rightMeasure)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class BrailleSegmentException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -2216,5 +2214,5 @@ if __name__ == "__main__":
     import music21
     music21.mainTest(Test) #, runTest='testGetRawSegments')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

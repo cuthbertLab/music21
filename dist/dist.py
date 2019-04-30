@@ -15,44 +15,45 @@ Builds various kinds of music21 distribution files and uploads them to PyPI and 
 To do a release,
 
 1. update the VERSION in _version.py and the single test cases in base.py.
-2. for a major change, run
-    `corpus.corpora.CoreCorpus().cacheMetadata()`.
-    every once in a while run corpus.corpora.CoreCorpus().rebuildMetadataCache()
+2. run `corpus.corpora.CoreCorpus().cacheMetadata()`.
+    for a major change run corpus.corpora.CoreCorpus().rebuildMetadataCache()
     (40 min on MacPro) -- either of these MAY change a lot of tests in corpus, metadata, etc.
     so don't skip the next step!
-3. run test/warningMultiprocessTest.py for lowest and highest version -- fix all warnings!
+3. run test/warningMultiprocessTest.py for lowest and highest Py version -- fix all warnings!
 4. run test/testLint.py and fix any lint errors
 5. commit and then check test/testSingleCoreAll.py or wait for results on Travis-CI
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
      but should be done before making a release).
 6. then python3 documentation/testDocumentation.py [*]
 
-[*] you will need pytest and nbval installed (along with ipython and jupyter)
+[*] you will need pytest and nbval installed (along with ipython and jupyter), you cannot fix tests
+while it is running.  This takes a while and runs single core, so allocate time.
 
 7. run documentation/make.py clean
 8. run documentation/make.py   [*]
 
 [*] you will need sphinx, IPython (pip or easy_install), markdown, and pandoc (.dmg) installed
 
-9. run documentation/upload.py [not via eclipse] or upload via ssh.
+9. ssh to MIT, cd music21/doc and rm -rf *
+
+10. run documentation/upload.py [not via eclipse] or upload via ssh.
    -- you will need an MIT username and password 
-   -- for each new major version ssh in and delete old files before uploading.
 
-9b. zip up documentation/build/html and get ready to upload/delete it.
+11. zip up documentation/build/html and get ready to upload/delete it.
 
-10. And finally this file. (from the command line; not as python -m...)
+12. And finally this file. (from the command line; not as python -m...)
 
-11. COMMIT to Github at this point w/ commit comment of the new version,
+13. COMMIT to Github at this point w/ commit comment of the new version,
     then don't change anything until the next step is done.
-    (.gitignore SHOULD avoid uploading the large files created here...)
+    (.gitignore will avoid uploading the large files created here...)
 
-12. Create a new release on GitHub and upload the TWO files created here. Use tag v5.0.1 (etc.).
+14. Create a new release on GitHub and upload the TWO files created here. Use tag v5.0.1 (etc.).
     Don't forget the "v" in the release tag.
     Drag in this order: .tar.gz, no-corpus.tar.gz
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-13. Upload the new file to PyPI with "twine upload music21-5.0.5a2.tar.gz" [*]
+15. Upload the new file to PyPI with "twine upload music21-5.0.5a2.tar.gz" [*]
 
     [*] Requires twine to be installed
 
@@ -66,12 +67,12 @@ To do a release,
         username:yourusername
         password:yourpassword
 
-15. Delete the two .tar.gz files in dist...
+16. Delete the two .tar.gz files in dist...
 
-16. Immediately increment the number in _version.py and run tests on it here
+17. Immediately increment the number in _version.py and run tests on it here
     to prepare for next release.
 
-17. Announce on the blog, to the list, and twitter.
+18. Announce on the blog, to the list, and twitter.
 
 DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do.
 '''
@@ -204,6 +205,7 @@ class Distributor:
             # not the name of that dir
             tf.extractall(path=fpDir)
             os.system('mv %s %s' % (fpSrcDir, fpDstDir))
+            tf.close() # done after extraction
 
         #elif mode == EGG:
         #    os.system('mkdir %s' % fpDstDir)
@@ -211,7 +213,6 @@ class Distributor:
         #    tf = zipfile.ZipFile(fp, 'r')
         #    tf.extractall(path=fpDstDir)
 
-        tf.close() # done after extraction
 
         # remove files, updates manifest
         for fn in common.getCorpusContentDirs():
@@ -223,9 +224,12 @@ class Distributor:
 
 
         # adjust the sources Txt file
-        if mode == TAR:
-            sourcesTxt = os.path.join(fpDstDir, 'music21.egg-info', 'SOURCES.txt')
-        #elif mode == EGG:
+        # if mode == TAR:
+        sourcesTxt = os.path.join(fpDstDir, 'music21.egg-info', 'SOURCES.txt')
+        # else:
+        #    raise Exception('invalid mode')
+
+        # elif mode == EGG:
         #    sourcesTxt = os.path.join(fpDstDir, 'EGG-INFO', 'SOURCES.txt')
 
         # files will look like 'music21/corpus/haydn' in SOURCES.txt

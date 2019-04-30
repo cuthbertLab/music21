@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:          test.toggleDebug.py
 # Purpose:       Changes debug on if off, off if on...
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Run from command line to toggle debug status.
 '''

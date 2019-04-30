@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         common/formats.py
 # Purpose:      Utilities for formats
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Utilities for working with file formats.
 
@@ -43,7 +43,7 @@ VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi',
                        'musicxml.png', 'musicxml.pdf']
 VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def findSubConverterForFormat(fmt):
     '''
     return a converter.subConverter.SubConverter subclass
@@ -337,7 +337,7 @@ def findFormatExtURL(url):
                     break
     # presently, not keeping the extension returned from this function
     # reason: mxl is converted to xml; need to handle mxl files first
-    if ext != None:
+    if ext is not None:
         fileFormat, unused_junk = findFormat(ext)
         return fileFormat, ext
     else:
@@ -348,6 +348,6 @@ if __name__ == "__main__":
     import music21
     music21.mainTest()
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

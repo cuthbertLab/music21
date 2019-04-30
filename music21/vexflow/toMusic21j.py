@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         vexflow/toM21p.py
 # Purpose:      music21 classes for converting music21 objects to music21j
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2012-14 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Convert a music21 object into JSON and send it to the browser for music21j to use.
 '''

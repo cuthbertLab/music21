@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         translate.py
 # Purpose:      music21 class which allows transcription of music21 data to braille
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 """
 Methods for exporting music21 data as braille.
 
@@ -96,7 +96,7 @@ from music21.braille.lookup import alphabet
 from music21.braille import segment
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 def objectToBraille(music21Obj, **keywords):
     """
@@ -223,7 +223,7 @@ def measureToBraille(music21Measure, **keywords):
         {0.0} <music21.clef.TrebleClef>
         {0.0} <music21.meter.TimeSignature 4/4>
         {0.0} <music21.note.Note C>
-        {4.0} <music21.bar.Barline style=final>
+        {4.0} <music21.bar.Barline type=final>
     >>> print(braille.translate.objectToBraille(p))
     ⠀⠀⠼⠙⠲⠀⠀
     ⠼⠁⠀⠐⠽⠣⠅
@@ -332,14 +332,14 @@ def _translateArgs(**keywords):
 
 _DOC_ORDER = [objectToBraille]
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class BrailleTranslateException(exceptions21.Music21Exception):
     pass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -351,5 +351,5 @@ if __name__ == "__main__":
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

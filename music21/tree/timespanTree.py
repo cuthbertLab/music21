@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         tree/timespanTree.py
 # Purpose:      Subclasses of tree.trees.OffsetTree for manipulation
 #
@@ -9,13 +9,13 @@
 # Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Tools for grouping elements, timespans, and especially
 pitched elements into kinds of searchable tree organized by start and stop offsets
 and other positions.
 '''
-import collections
+import collections.abc
 import random
 import unittest
 
@@ -27,12 +27,12 @@ from music21.tree import spans, trees
 from music21 import environment
 environLocal = environment.Environment("tree.timespanTree")
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class TimespanTreeException(exceptions21.TreeException):
     pass
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class TimespanTree(trees.OffsetTree):
     r'''
@@ -406,9 +406,16 @@ class TimespanTree(trees.OffsetTree):
             [9] <Verticality 35.0 {F#3 A#3 C#4 F#4}>: True
         '''
         iterator = self.iterateVerticalities()
-        startingVerticality = next(iterator)
-        while not startingVerticality.toChord().isConsonant():
+        try:
             startingVerticality = next(iterator)
+        except StopIteration:
+            return
+        
+        while not startingVerticality.toChord().isConsonant():
+            try:
+                startingVerticality = next(iterator)
+            except StopIteration:
+                return
             
         verticalityBuffer = [startingVerticality]
         for verticality in iterator:
@@ -601,7 +608,7 @@ class TimespanTree(trees.OffsetTree):
         >>> scoreTree.elementsOverlappingOffset(0.1)
         ()
         '''
-        if not isinstance(offsets, collections.Iterable):
+        if not isinstance(offsets, collections.abc.Iterable):
             offsets = [offsets]
         for offset in offsets:
             overlaps = self.elementsOverlappingOffset(offset)
@@ -813,7 +820,7 @@ class Test(unittest.TestCase):
                     # pylint: disable=consider-using-enumerate
                     for i in range(len(currentTimespansInTree)):
                         self.assertEqual(currentTimespansInList[i], currentTimespansInTree[i])
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         graph/plots.py
 # Purpose:      Classes for plotting music21 graphs based on Streams.
 #
@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2009-2012, 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Object definitions for plotting :class:`~music21.stream.Stream` objects.
 
@@ -51,7 +51,7 @@ def _mergeDicts(a, b):
     return c
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # graphing utilities that operate on streams
 
 class PlotStreamMixin:
@@ -151,7 +151,7 @@ class PlotStreamMixin:
 
         self.process()
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def setAxisKeywords(self):
         '''
         Configure axis parameters based on keywords given when creating the Plot.
@@ -187,7 +187,7 @@ class PlotStreamMixin:
                 setattr(thisAxis, shortKw, self.savedKeywords[kw])
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def extractData(self):
         if None in self.allAxes:
             raise PlotStreamException("Set all axes before calling extractData() via run()")
@@ -267,7 +267,7 @@ class PlotStreamMixin:
         for thisAxis in self.allAxes:
             thisAxis.postProcessData()
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     @staticmethod
     def extractChordDataOneAxis(ax, c, formatDict):
         '''
@@ -321,7 +321,7 @@ class PlotStreamMixin:
                 if target is not None:
                     destValues.append(target)
 
-        #environLocal.printDebug(['after looking at Pitch:',
+        # environLocal.printDebug(['after looking at Pitch:',
         #    'xValues', xValues, 'yValues', yValues])
 
         # if we only have one attribute from the Chord, and many from the
@@ -360,7 +360,7 @@ class PlotStreamMixin:
             if shortAmount:
                 l += [fillVal] * shortAmount
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     @property
     def id(self):
         '''
@@ -384,7 +384,7 @@ class PlotStreamMixin:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class PlotStream(primitives.Graph, PlotStreamMixin):
     def __init__(self, streamObj=None, *args, **keywords):
@@ -394,7 +394,7 @@ class PlotStream(primitives.Graph, PlotStreamMixin):
         self.axisX = axis.OffsetAxis(self, 'x')
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # scatter plots
 
 class Scatter(primitives.GraphScatter, PlotStreamMixin):
@@ -536,7 +536,7 @@ class ScatterPitchSpaceDynamicSymbol(Scatter):
         self.postProcessData()
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # histograms
 class Histogram(primitives.GraphHistogram, PlotStreamMixin):
     '''
@@ -678,7 +678,7 @@ class HistogramQuarterLength(Histogram):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # weighted scatter
 
 class ScatterWeighted(primitives.GraphScatterWeighted, PlotStreamMixin):
@@ -808,7 +808,7 @@ class ScatterWeightedPitchSpaceDynamicSymbol(ScatterWeighted):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # color grids
 
 
@@ -896,7 +896,7 @@ class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
             tickRange = range(len(metaMatrix))
 
         environLocal.printDebug(['tickRange', tickRange])
-        #environLocal.printDebug(['last start color', colorMatrix[-1][0]])
+        # environLocal.printDebug(['last start color', colorMatrix[-1][0]])
 
 
         # get dictionaries of meta data for each row
@@ -988,7 +988,7 @@ class WindowedAmbitus(WindowedAnalysis):
     '''
     processorClassDefault = discrete.Ambitus
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # horizontal bar graphs
 
 class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
@@ -1088,14 +1088,17 @@ class HorizontalBarPitchSpaceOffset(HorizontalBar):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class HorizontalBarWeighted(primitives.GraphHorizontalBarWeighted, PlotStreamMixin):
     '''
     A base class for plots of Scores with weighted (by height) horizontal bars.
     Many different weighted segments can provide a
     representation of a dynamic parameter of a Part.
     '''
-    axesClasses = {'x': axis.OffsetAxis, 'y': None}
+    axesClasses = {
+        'x': axis.OffsetAxis, 
+        'y': None
+    }
     keywordConfigurables = primitives.GraphHorizontalBarWeighted.keywordConfigurables + (
         'fillByMeasure', 'segmentByTarget', 'normalizeByPart', 'partGroups')
 
@@ -1116,13 +1119,15 @@ class HorizontalBarWeighted(primitives.GraphHorizontalBarWeighted, PlotStreamMix
         if 'Score' not in self.streamObj.classes:
             raise GraphException('provided Stream must be Score')
         # parameters: x, span, heightScalar, color, alpha, yShift
-        pr = reduction.PartReduction(self.streamObj, partGroups=self.partGroups,
+        pr = reduction.PartReduction(
+                self.streamObj, 
+                partGroups=self.partGroups,
                 fillByMeasure=self.fillByMeasure,
                 segmentByTarget=self.segmentByTarget,
                 normalizeByPart=self.normalizeByPart)
         pr.process()
         data = pr.getGraphHorizontalBarWeightedData()
-        #environLocal.printDebug(['data', data])
+        # environLocal.printDebug(['data', data])
         uniqueOffsets = []
         for unused_key, value in data:
             for dataList in value:
@@ -1181,7 +1186,8 @@ class Dolan(HorizontalBarWeighted):
         #self.fy = lambda n: n.pitch.pitchClass
         #self.fyTicks = self.ticksPitchClassUsage
         # must set part groups if not defined here
-        self._getPartGroups()
+        if streamObj is not None:
+            self._getPartGroups()
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
             self.figureSize = (10, 4)
@@ -1200,9 +1206,9 @@ class Dolan(HorizontalBarWeighted):
         Examine the instruments in the Score and determine if there
         is a good match for a default configuration of parts.
         '''
-        if self.partGroups is not None:
+        if self.partGroups:
             return # keep what the user set
-        if self.streamObj is None:
+        if self.streamObj:
             return None
         instStream = self.streamObj.flat.getElementsByClass('Instrument')
         if not instStream:
@@ -1255,7 +1261,7 @@ class Dolan(HorizontalBarWeighted):
 
 
 
-#-------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------
 # 3D plots
 
 class Plot3DBars(primitives.Graph3DBars, PlotStreamMixin):
@@ -1302,7 +1308,7 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
             self.title = 'Pitch by Quarter Length Count'
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # base class for multi-stream displays
 
 class MultiStream(primitives.GraphGroupedVerticalBar, PlotStreamMixin):
@@ -1431,7 +1437,7 @@ class Features(MultiStream):
             dataPoint = [labelList[i], sub]
             data.append(dataPoint)
 
-        #environLocal.printDebug(['data', data])
+        # environLocal.printDebug(['data', data])
 
         xTicks = []
         for x, label in enumerate(labelList):
@@ -1442,7 +1448,7 @@ class Features(MultiStream):
         yTicks = []
         return data, xTicks, yTicks
 
-#------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase): # pragma: no cover
 
 
@@ -2017,7 +2023,7 @@ class Test(unittest.TestCase):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [
         HistogramPitchSpace,

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         mei/base.py
 # Purpose:      Public methods for the MEI module
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 .. codeauthor:: Chistopher Antila <christopher@antila.ca>
 
@@ -205,7 +205,7 @@ environLocal = environment.Environment(_MOD)
 
 
 # Module-Level Constants
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 _XMLID = '{http://www.w3.org/XML/1998/namespace}id'
 _MEINS = '{http://www.music-encoding.org/ns/mei}'
 # when these tags aren't processed, we won't worry about them (at least for now)
@@ -222,26 +222,26 @@ _IGNORE_UNPROCESSED = (
 
 
 # Exceptions
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class MeiValidityError(exceptions21.Music21Exception):
-    "When there is an otherwise-unspecified validity error that prevents parsing."
+    'When there is an otherwise-unspecified validity error that prevents parsing.'
     pass
 
 class MeiValueError(exceptions21.Music21Exception):
-    "When an attribute has an invalid value."
+    'When an attribute has an invalid value.'
     pass
 
 class MeiAttributeError(exceptions21.Music21Exception):
-    "When an element has an invalid attribute."
+    'When an element has an invalid attribute.'
     pass
 
 class MeiElementError(exceptions21.Music21Exception):
-    "When an element itself is invalid."
+    'When an element itself is invalid.'
     pass
 
 
 # Text Strings for Error Conditions
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # NOTE: these are all collected handily at the top for two reasons: help you find the easier, and
 #       help you translate them easier
 _TEST_FAILS = 'MEI module had {} failures and {} errors; run music21/mei/base.py to find out more.'
@@ -260,7 +260,7 @@ _BAD_VERSE_NUMBER = 'Verse number must be an int (got "{}")'
 
 
 # Module-level Functions
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class MeiToM21Converter:
     '''
     A :class:`MeiToM21Converter` instance manages the conversion of an MEI document into music21
@@ -337,7 +337,7 @@ class MeiToM21Converter:
 
 
 # Module-level Functions
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def safePitch(name, accidental=None, octave=''):
     '''
     Safely build a :class:`Pitch` from a string.
@@ -359,7 +359,7 @@ def safePitch(name, accidental=None, octave=''):
     >>> safePitch('D', '#', '6')
     <music21.pitch.Pitch D#6>
     '''
-    if len(name) < 1:
+    if not name:
         return pitch.Pitch()
     elif accidental is None:
         return pitch.Pitch(name + octave)
@@ -448,7 +448,7 @@ def allPartsPresent(scoreElem):
 
 
 # Constants for One-to-One Translation
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # for _accidentalFromAttr()
 # None is for when @accid is omitted
 _ACCID_ATTR_DICT = {'s': '#', 'f': '-', 'ss': '##', 'x': '##', 'ff': '--', 'xs': '###',
@@ -469,32 +469,52 @@ _DUR_ATTR_DICT = {'long': 16.0, 'breve': 8.0, '1': 4.0, '2': 2.0, '4': 1.0, '8':
 # for _articulationFromAttr()
 # NOTE: 'marc-stacc' and 'ten-stacc' require multiple music21 events, so they are handled
 #       separately in _articulationFromAttr().
-_ARTIC_ATTR_DICT = {'acc': articulations.Accent, 'stacc': articulations.Staccato,
-                    'ten': articulations.Tenuto, 'stacciss': articulations.Staccatissimo,
-                    'marc': articulations.StrongAccent, 'spicc': articulations.Spiccato,
-                    'doit': articulations.Doit, 'plop': articulations.Plop,
-                    'fall': articulations.Falloff, 'dnbow': articulations.DownBow,
-                    'upbow': articulations.UpBow, 'harm': articulations.Harmonic,
-                    'snap': articulations.SnapPizzicato, 'stop': articulations.Stopped,
+_ARTIC_ATTR_DICT = {'acc': articulations.Accent, 
+                    'stacc': articulations.Staccato,
+                    'ten': articulations.Tenuto, 
+                    'stacciss': articulations.Staccatissimo,
+                    'marc': articulations.StrongAccent, 
+                    'spicc': articulations.Spiccato,
+                    'doit': articulations.Doit, 
+                    'plop': articulations.Plop,
+                    'fall': articulations.Falloff, 
+                    'dnbow': articulations.DownBow,
+                    'upbow': articulations.UpBow, 
+                    'harm': articulations.Harmonic,
+                    'snap': articulations.SnapPizzicato, 
+                    'stop': articulations.Stopped,
                     'open': articulations.OpenString,  # this may also mean "no mute?"
-                    'dbltongue': articulations.DoubleTongue, 'toe': articulations.OrganToe,
-                    'trpltongue': articulations.TripleTongue, 'heel': articulations.OrganHeel,
+                    'dbltongue': articulations.DoubleTongue, 
+                    'toe': articulations.OrganToe,
+                    'trpltongue': articulations.TripleTongue, 
+                    'heel': articulations.OrganHeel,
                     # TODO: these aren't implemented in music21, so I'll make new ones
-                    'tap': articulations.Articulation, 'lhpizz': articulations.Articulation,
-                    'dot': articulations.Articulation, 'stroke': articulations.Articulation,
-                    'rip': articulations.Articulation, 'bend': articulations.Articulation,
-                    'flip': articulations.Articulation, 'smear': articulations.Articulation,
+                    'tap': articulations.Articulation, 
+                    'lhpizz': articulations.Articulation,
+                    'dot': articulations.Articulation, 
+                    'stroke': articulations.Articulation,
+                    'rip': articulations.Articulation, 
+                    'bend': articulations.Articulation,
+                    'flip': articulations.Articulation, 
+                    'smear': articulations.Articulation,
                     'fingernail': articulations.Articulation,  # (u1D1B3)
-                    'damp': articulations.Articulation, 'dampall': articulations.Articulation}
+                    'damp': articulations.Articulation, 
+                    'dampall': articulations.Articulation,
+                    }
 
 # for _barlineFromAttr()
 # TODO: make new music21 Barline styles for 'dbldashed' and 'dbldotted'
-_BAR_ATTR_DICT = {'dashed': 'dashed', 'dotted': 'dotted', 'dbl': 'double', 'end': 'final',
-                  'invis': 'none', 'single': 'regular'}
+_BAR_ATTR_DICT = {'dashed': 'dashed', 
+                  'dotted': 'dotted', 
+                  'dbl': 'double', 
+                  'end': 'final',
+                  'invis': 'none', 
+                  'single': 'regular',
+                  }
 
 
 # One-to-One Translator Functions
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def _attrTranslator(attr, name, mapping):
     '''
     Helper function for other functions that need to translate the value of an attribute to another
@@ -635,7 +655,7 @@ def _sharpsFromAttr(signature):
 
 
 # "Preprocessing" and "Postprocessing" Functions for convertFromString()
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def _ppSlurs(theConverter):
     '''
     Pre-processing helper for :func:`convertFromString` that handles slurs specified in <slur>
@@ -916,7 +936,7 @@ def _ppConclude(theConverter):
 
 
 # Helper Functions
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def _processEmbeddedElements(elements, mapping, callerTag=None, slurBundle=None):
     '''
     From an iterable of MEI ``elements``, use functions in the ``mapping`` to convert each element
@@ -1458,7 +1478,7 @@ def _guessTuplets(theLayer):
 
 
 # Element-Based Converter Functions
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     '''
     <scoreDef> Container for score meta-information.
@@ -1500,9 +1520,9 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     >>> len(result)
     5
     >>> result['1']
-    {'instrument': <music21.instrument.Clarinet 1: Clarinet: Clarinet>}
+    {'instrument': <music21.instrument.Clarinet '1: Clarinet: Clarinet'>}
     >>> result['3']
-    {'instrument': <music21.instrument.Violin 3: Violin: Violin>}
+    {'instrument': <music21.instrument.Violin '3: Violin: Violin'>}
     >>> result['all-part objects']
     [<music21.meter.TimeSignature 3/4>]
     >>> result['whole-score objects']
@@ -1666,7 +1686,7 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     >>> len(result)
     1
     >>> result
-    {'instrument': <music21.instrument.Clarinet 1: Clarinet: Clarinet>}
+    {'instrument': <music21.instrument.Clarinet '1: Clarinet: Clarinet'>}
     >>> result['instrument'].partId
     '1'
     >>> result['instrument'].partName
@@ -1687,7 +1707,7 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     >>> len(result)
     3
     >>> result['instrument']
-    <music21.instrument.Tuba 2: Tuba: Tuba>
+    <music21.instrument.Tuba '2: Tuba: Tuba'>
     >>> result['clef']
     <music21.clef.BassClef>
     >>> result['key']
@@ -3428,7 +3448,7 @@ def scoreFromElement(elem, slurBundle):
     return theScore
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 _DOC_ORDER = [
     accidFromElement,
     articFromElement,

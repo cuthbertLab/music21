@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         caching.py
 # Purpose:      music21 classes for representing score and work meta-data
 #
@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 import multiprocessing
 import os
 import pathlib
@@ -20,17 +20,17 @@ import unittest
 from music21 import common
 from music21 import exceptions21
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 from music21 import environment
 environLocal = environment.Environment(os.path.basename(__file__))
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class MetadataCacheException(exceptions21.Music21Exception):
     pass
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def cacheMetadata(corpusNames=None,
                   useMultiprocessing=True,
                   verbose=False):
@@ -56,7 +56,7 @@ def cacheMetadata(corpusNames=None,
     failingFilePaths = []
 
     # the core cache is based on local files stored in music21
-    # virtual is on-line
+    # (no-longer-existent virtual is on-line)
     for corpusName in corpusNames:
         corpusObject = manager.fromName(corpusName)
         failingFilePaths += corpusObject.cacheMetadata(useMultiprocessing, verbose, timer)
@@ -77,7 +77,7 @@ def cacheMetadata(corpusNames=None,
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class MetadataCachingJob:
@@ -257,7 +257,7 @@ class MetadataCachingJob:
         return cleanFilePath
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class JobProcessor:
@@ -358,7 +358,7 @@ class JobProcessor:
         job_queue.close()
         for worker in workers:
             worker.join()
-        return # end generator
+        # end generator
 
     @staticmethod
     def process_serial(jobs):
@@ -376,10 +376,10 @@ class JobProcessor:
                 'filePath': job.filePath,
                 'remainingJobs': remainingJobs,
                 }
-        return # end generator
+        # end generator
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class WorkerProcess(multiprocessing.Process): # @UndefinedVariable pylint: disable=inherit-non-class
@@ -400,7 +400,7 @@ class WorkerProcess(multiprocessing.Process): # @UndefinedVariable pylint: disab
     def run(self):
         while True:
             job = self.job_queue.get()
-            # "Poison Pill" causes worker shutdown:
+            # 'Poison Pill' causes worker shutdown:
             if job is None:
                 self.job_queue.task_done()
                 break
@@ -408,10 +408,9 @@ class WorkerProcess(multiprocessing.Process): # @UndefinedVariable pylint: disab
             job.run()
             self.job_queue.task_done()
             self.result_queue.put(pickle.dumps(job, protocol=0))
-        return
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -420,7 +419,7 @@ class Test(unittest.TestCase):
         pass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 _DOC_ORDER = ()
@@ -431,9 +430,9 @@ __all__ = [
     'cacheMetadata',
     ]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------

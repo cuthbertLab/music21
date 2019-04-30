@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         abcFormat.translate.py
 # Purpose:      Translate ABC and music21 objects
 #
@@ -10,7 +10,7 @@
 # Copyright:    Copyright © 2010-2013 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Functions for translating music21 objects and
 :class:`~music21.abcFormat.ABCHandler` instances.
@@ -58,7 +58,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         p = inputM21
 
     if spannerBundle is None:
-        #environLocal.printDebug(['mxToMeasure()', 'creating SpannerBundle'])
+        # environLocal.printDebug(['mxToMeasure()', 'creating SpannerBundle'])
         spannerBundle = spanner.SpannerBundle()
 
 
@@ -68,10 +68,10 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         # first, split into a list of Measures; if there is only metadata and
         # one measure, that means that no measures are defined
         barHandlers = abcHandler.splitByMeasure()
-        #environLocal.printDebug(['barHandlers', len(barHandlers)])
+        # environLocal.printDebug(['barHandlers', len(barHandlers)])
         # merge loading meta data with each bar that preceedes it
         mergedHandlers = abcFormat.mergeLeadingMetaData(barHandlers)
-        #environLocal.printDebug(['mergedHandlers', len(mergedHandlers)])
+        # environLocal.printDebug(['mergedHandlers', len(mergedHandlers)])
     else: # simply stick in a single list
         mergedHandlers = [abcHandler]
 
@@ -90,11 +90,11 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
 
     for mh in mergedHandlers:
         # if use measures and the handler has notes; otherwise add to part
-        #environLocal.printDebug(['abcToStreamPart', 'handler', 'left:', mh.leftBarToken,
+        # environLocal.printDebug(['abcToStreamPart', 'handler', 'left:', mh.leftBarToken,
         #    'right:', mh.rightBarToken, 'len(mh)', len(mh)])
 
         if useMeasures and mh.hasNotes():
-            #environLocal.printDebug(['abcToStreamPart', 'useMeasures',
+            # environLocal.printDebug(['abcToStreamPart', 'useMeasures',
             #    useMeasures, 'mh.hasNotes()', mh.hasNotes()])
             dst = stream.Measure()
             # bar tokens are already extracted form token list and are available
@@ -153,7 +153,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         else:
             dst = p # store directly in a part instance
 
-        #environLocal.printDebug([mh, 'dst', dst])
+        # environLocal.printDebug([mh, 'dst', dst])
         #ql = 0 # might not be zero if there is a pickup
 
         postTransposition, clefSet = parseTokens(mh, dst, p, useMeasures)
@@ -170,7 +170,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                 if dst.barDurationProportion() < 1.0:
                     dst.padAsAnacrusis()
                     dst.number = 0
-                    #environLocal.printDebug([
+                    # environLocal.printDebug([
                     #    'incompletely filled Measure found on abc import; ',
                     #    'interpreting as a anacrusis:', 'padingLeft:', dst.paddingLeft])
             else:
@@ -195,7 +195,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
 
     if useMeasures and p.recurse().getElementsByClass('TimeSignature'):
         # call make beams for now; later, import beams
-        #environLocal.printDebug(['abcToStreamPart: calling makeBeams'])
+        # environLocal.printDebug(['abcToStreamPart: calling makeBeams'])
         try:
             p.makeBeams(inPlace=True)
         except (meter.MeterException, stream.StreamException) as e:
@@ -241,7 +241,7 @@ def parseTokens(mh, dst, p, useMeasures):
                 clefObj, transposition = t.getClefObject()
                 if clefObj is not None:
                     clefSet = False
-                    #environLocal.printDebug(['found clef in key token:', t,
+                    # environLocal.printDebug(['found clef in key token:', t,
                     #     clefObj, transposition])
                     if useMeasures:  # assume at start of measures
                         dst.clef = clefObj
@@ -286,7 +286,10 @@ def parseTokens(mh, dst, p, useMeasures):
                 cs_name = re.sub('[()]', '', cs_name)
                 cs_name = common.cleanedFlatNotation(cs_name)
                 try:
-                    cs = harmony.ChordSymbol(cs_name)
+                    if cs_name in ('NC', 'N.C.', 'No Chord', 'None'):
+                        cs = harmony.NoChord(cs_name)
+                    else:
+                        cs = harmony.ChordSymbol(cs_name)
                     dst.coreAppend(cs, setActiveSite=False)
                     dst.coreElementsChanged()
                 except ValueError:
@@ -378,23 +381,23 @@ def abcToStreamScore(abcHandler, inputM21=None):
             if t.isTitle():
                 if titleCount == 0: # first
                     md.title = t.data
-                    #environLocal.printDebug(['got metadata title', md.title])
+                    # environLocal.printDebug(['got metadata title', md.title])
                     titleCount += 1
                 # all other titles go in alternative field
                 else:
                     md.alternativeTitle = t.data
-                    #environLocal.printDebug(['got alternative title', md.alternativeTitle])
+                    # environLocal.printDebug(['got alternative title', md.alternativeTitle])
                     titleCount += 1
             elif t.isComposer():
                 md.composer = t.data
 
             elif t.isOrigin():
                 md.localeOfComposition = t.data
-                #environLocal.printDebug(['got local of composition', md.localOfComposition])
+                # environLocal.printDebug(['got local of composition', md.localOfComposition])
 
             elif t.isReferenceNumber():
                 md.number = int(t.data) # convert to int?
-                #environLocal.printDebug(['got work number', md.number])
+                # environLocal.printDebug(['got work number', md.number])
 
 
     partHandlers = []
@@ -439,7 +442,7 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
     else:
         opus = inputM21
 
-    #environLocal.printDebug(['abcToStreamOpus: got number', number])
+    # environLocal.printDebug(['abcToStreamOpus: got number', number])
 
     # returns a dictionary of numerical key
     if abcHandler.definesReferenceNumbers():
@@ -568,7 +571,7 @@ class ABCTranslateException(exceptions21.Music21Exception):
     pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -719,8 +722,8 @@ class Test(unittest.TestCase):
         self.assertEqual(m1.duration.quarterLength, 2.0)
         #m1.show('t')
         # notes are shown as being on beat 2 and 3
-        #environLocal.printDebug(['m1.notesAndRests.activeSite', m1.notesAndRests.activeSite])
-        #environLocal.printDebug(['m1.notesAndRests[0].activeSite', m1.notesAndRests[0].activeSite])
+        # environLocal.printDebug(['m1.notesAndRests.activeSite', m1.notesAndRests.activeSite])
+        # environLocal.printDebug(['m1.notesAndRests[0].activeSite', m1.notesAndRests[0].activeSite])
 
         #self.assertEqual(m1.notesAndRests.activeSite)
 
@@ -842,11 +845,80 @@ class Test(unittest.TestCase):
         self.assertEqual(len(p1.flat.notesAndRests), 77)
         self.assertEqual(len(list(p1.flat.getElementsByClass('ChordSymbol'))), 25)
         # Am/C
-        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[7].root(), pitch.Pitch('A3'))
-        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[7].bass(), pitch.Pitch('C3'))
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[7].root(), 
+                         pitch.Pitch('A3'))
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[7].bass(), 
+                         pitch.Pitch('C3'))
         # G7/B
-        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].root(), pitch.Pitch('G3'))
-        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].bass(), pitch.Pitch('B2'))
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].root(), 
+                         pitch.Pitch('G3'))
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].bass(), 
+                         pitch.Pitch('B2'))
+
+
+    def testNoChord(self):
+
+        from music21 import converter
+
+        target_str = """
+                	T: No Chords
+                	M: 4/4
+                	L: 1/1
+                	K: C
+                	[| "C" C | "NC" C | "C" C | "N.C." C | "C" C 
+                	| "No Chord" C | "C" C | "None" C | "C" C | "Other" 
+                	C |]
+                """
+        score = converter.parse(target_str, format='abc')
+
+        self.assertEqual(len(list(score.flat.getElementsByClass(
+            'ChordSymbol'))), 9)
+        self.assertEqual(len(list(score.flat.getElementsByClass(
+            'NoChord'))), 4)
+
+        score = harmony.realizeChordSymbolDurations(score)
+
+        self.assertEqual(8, score.getElementsByClass('ChordSymbol')[
+            -1].quarterLength)
+        self.assertEqual(4, score.getElementsByClass('ChordSymbol')[
+            0].quarterLength)
+
+
+    def testAbcKeyImport(self):
+        from music21 import abcFormat
+
+        # sharps
+        major = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#']
+        minor = ['Am', 'Em', 'Bm', 'F#m', 'C#m', 'G#m', 'D#m', 'A#m']
+
+        for n, (majName, minName) in enumerate(zip(major, minor)):
+            am = abcFormat.ABCMetadata('K:' + majName)
+            am.preParse()
+            ks_major = am.getKeySignatureObject()
+            am = abcFormat.ABCMetadata('K:' + minName)
+            am.preParse()
+            ks_minor = am.getKeySignatureObject()
+            self.assertEqual(n, ks_major.sharps)
+            self.assertEqual(n, ks_minor.sharps)
+            self.assertEqual('major', ks_major.mode)
+            self.assertEqual('minor', ks_minor.mode)
+
+        #flats
+        major = ['C', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb']
+        minor = ['Am', 'Dm', 'Gm', 'Cm', 'Fm', 'Bbm', 'Ebm', 'Abm']
+
+        for n, (majName, minName) in enumerate(zip(major, minor)):
+            am = abcFormat.ABCMetadata('K:' + majName)
+            am.preParse()
+            ks_major = am.getKeySignatureObject()
+            am = abcFormat.ABCMetadata('K:' + minName)
+            am.preParse()
+            ks_minor = am.getKeySignatureObject()
+            self.assertEqual(-1 * n, ks_major.sharps)
+            self.assertEqual(-1 * n, ks_minor.sharps)
+            self.assertEqual('major', ks_major.mode)
+            self.assertEqual('minor', ks_minor.mode)
+
 
     def testLocaleOfCompositionImport(self):
 
@@ -948,29 +1020,29 @@ class Test(unittest.TestCase):
             #s.show()
 
     def testCleanFlat(self):
-        from music21 import harmony, pitch
+        from music21 import pitch
 
         cs = harmony.ChordSymbol(root='eb', bass='bb', kind='dominant')
-        self.assertEquals(cs.bass(), pitch.Pitch('B-'))
-        self.assertEquals(cs.pitches[0], pitch.Pitch('B-2'))
+        self.assertEqual(cs.bass(), pitch.Pitch('B-2'))
+        self.assertIs(cs.pitches[0], cs.bass())
 
         cs = harmony.ChordSymbol('e-7/b-')
-        self.assertEquals(cs.root(), pitch.Pitch('E-3'))
-        self.assertEquals(cs.bass(), pitch.Pitch('B-2'))
-        self.assertEquals(cs.pitches[0], pitch.Pitch('B-2'))
+        self.assertEqual(cs.root(), pitch.Pitch('E-3'))
+        self.assertEqual(cs.bass(), pitch.Pitch('B-2'))
+        self.assertEqual(cs.pitches[0], pitch.Pitch('B-2'))
 
         # common.cleanedFlatNotation() shouldn't be called by
         # the following calls, which what is being tested here:
 
         cs = harmony.ChordSymbol('b-3')
-        self.assertEquals(cs.root(), pitch.Pitch('b-3'))
-        self.assertEquals(cs.pitches[0], pitch.Pitch('B-3'))
-        self.assertEquals(cs.pitches[1], pitch.Pitch('D4'))
+        self.assertEqual(cs.root(), pitch.Pitch('b-3'))
+        self.assertEqual(cs.pitches[0], pitch.Pitch('B-3'))
+        self.assertEqual(cs.pitches[1], pitch.Pitch('D4'))
 
         cs = harmony.ChordSymbol('bb3')
-        self.assertEquals(cs.root(), pitch.Pitch('b3'))
-        self.assertEquals(cs.pitches[0], pitch.Pitch('B3'))
-        self.assertEquals(cs.pitches[1], pitch.Pitch('D#4'))
+        self.assertEqual(cs.root(), pitch.Pitch('b3'))
+        self.assertEqual(cs.pitches[0], pitch.Pitch('B3'))
+        self.assertEqual(cs.pitches[1], pitch.Pitch('D#4'))
 
 
     def xtestTranslateB(self):
@@ -999,7 +1071,7 @@ class Test(unittest.TestCase):
 
     def xtestMergeScores(self):
         from music21 import corpus
-        unused = corpus.parse('josquin/laDeplorationDeLaMorteDeJohannesOckeghem', forceSource=True)
+        unused = corpus.parse('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
         # this was getting incorrect Clefs...
 
 if __name__ == "__main__":
@@ -1007,6 +1079,6 @@ if __name__ == "__main__":
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

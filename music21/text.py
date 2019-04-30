@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         text.py
 # Purpose:      music21 classes for text processing
 #
@@ -8,14 +8,14 @@
 #
 # Copyright:    Copyright © 2009-2012, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Utility routines for processing text in scores and other musical objects.
 '''
 import unittest
 import random
 
-#import music21 # needed to properly do isinstance checking
+# import music21 # needed to properly do isinstance checking
 
 from music21 import base
 from music21 import common
@@ -34,25 +34,26 @@ environLocal = environment.Environment(_MOD)
 # http://en.wikipedia.org/wiki/Article_(grammar)
 articleReference = {
     # arabic
-    'ar' : ['al-'],
+    'ar': ['al-'],
     # english
-    'en' : ['the', 'a', 'an'],
+    'en': ['the', 'a', 'an'],
     # german
-    'de' : ['der', 'die', 'das', 'des', 'dem', 'den', 'ein', 'eine', 'einer', 'einem', 'einen'],
+    'de': ['der', 'die', 'das', 'des', 'dem', 'den', 'ein', 'eine', 'einer', 'einem', 'einen'],
     # dutch
-    'nl' : ['de', 'het', '\'t', 'een'],
+    'nl': ['de', 'het', '\'t', 'een'],
     # spanish
-    'es' : ['el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas'],
+    'es': ['el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas'],
     # portuguese
-    'pt' : ['o', 'a', 'os', 'as', 'um', 'uma', 'uns', 'umas'],
+    'pt': ['o', 'a', 'os', 'as', 'um', 'uma', 'uns', 'umas'],
     # french
-    'fr' : ['le', 'la', 'les', 'l\'', 'un', 'une', 'des', 'du', 'de la', 'des'],
+    'fr': ['le', 'la', 'les', 'l\'', 'un', 'une', 'des', 'du', 'de la', 'des'],
     # italian
-    'it' : ['il', 'lo', 'la', 'l\'', 'i', 'gli', 'le', 'un\'', 'un', 'uno', 'una',
-            'del', 'dello', 'della', 'dei', 'degli', 'delle'],
+    'it': ['il', 'lo', 'la', 'l\'', 'i', 'gli', 'le', 'un\'', 'un', 'uno', 'una',
+           'del', 'dello', 'della', 'dei', 'degli', 'delle'],
     }
 
-#-------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 def assembleLyrics(streamIn, lineNumber=1):
     '''
     Concatenate text from a stream. The Stream is automatically flattened.
@@ -79,7 +80,7 @@ def assembleLyrics(streamIn, lineNumber=1):
             lyricObj = n.lyrics[lineNumber - 1] # a list of lyric objs
         except IndexError:
             continue
-        #environLocal.printDebug(['lyricObj', 'lyricObj.text', lyricObj.text,
+        # environLocal.printDebug(['lyricObj', 'lyricObj.text', lyricObj.text,
         #    'lyricObj.syllabic', lyricObj.syllabic, 'word', word])
 
         # need to match case of non-defined syllabic attribute
@@ -90,12 +91,13 @@ def assembleLyrics(streamIn, lineNumber=1):
             elif lyricObj.syllabic in ['end', 'single', None]:
                 if lyricObj.text is not None: # should not be possible but sometimes happens
                     word.append(lyricObj.text)
-                #environLocal.printDebug(['word pre-join', word])
+                # environLocal.printDebug(['word pre-join', word])
                 words.append(''.join(word))
                 word = []
             else:
                 raise Exception('no known Text syllabic setting: %s' % lyricObj.syllabic)
     return ' '.join(words)
+
 
 def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n'):
     r'''
@@ -115,9 +117,9 @@ def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n'):
     '''
     lyrics = ''
     for i in range(1, maxLyrics):
-        l = assembleLyrics(streamIn, i)
-        if l != '':
-            lyrics += lyricSeparation + l
+        lyr = assembleLyrics(streamIn, i)
+        if lyr != '':
+            lyrics += lyricSeparation + lyr
     return lyrics
 
 
@@ -154,7 +156,7 @@ def prependArticle(src, language=None):
         if trailing.lower() == candidate:
             match = trailing
             break
-    if match != None:
+    if match is not None:
         # recombine everything except the last comma split
         return match + ' ' + ','.join(src.split(',')[:-1])
     else: # not match
@@ -192,24 +194,24 @@ def postpendArticle(src, language=None):
         if leading.lower() == candidate:
             match = leading
             break
-    if match != None:
+    if match is not None:
         # recombine everything except the last comma split
         return ' '.join(src.split(' ')[1:]) + ', %s' % match
     else: # not match
         return src
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TextException(exceptions21.Music21Exception):
     pass
 
 
-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TextBoxException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 class TextBox(base.Music21Object):
     '''
     A TextBox is arbitrary text that might be positioned anywhere on a page,
@@ -298,7 +300,7 @@ class TextBox(base.Music21Object):
             self._content = value
 
     content = property(_getContent, _setContent,
-        doc = '''Get or set the content.
+        doc='''Get or set the content.
 
 
         >>> te = text.TextBox('Con fuoco')
@@ -314,13 +316,12 @@ class TextBox(base.Music21Object):
         return self._page
 
     def _setPage(self, value):
-        if value != None:
+        if value is not None:
             self._page = int(value) # must be an integer
         # do not set otherwise
 
     page = property(_getPage, _setPage,
-        doc = '''Get or set the page number. The first page (page 1) is the default.
-
+        doc='''Get or set the page number. The first page (page 1) is the default.
 
         >>> te = text.TextBox('Great Score')
         >>> te.content
@@ -333,7 +334,7 @@ class TextBox(base.Music21Object):
         ''')
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class LanguageDetector:
     '''
     Attempts to detect language on the basis of trigrams
@@ -435,10 +436,11 @@ class LanguageDetector:
                     return i + 1
             raise TextException('got a language that was not in the codes; should not happen')
 
-#-------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 class Trigram:
     '''
-    See LanguageDector above.
+    See LanguageDetector above.
     From http://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
 
     The frequency of three character
@@ -477,8 +479,6 @@ class Trigram:
     >>> #_DOCS_SHOW reference_en.makeWords(30)
     My withillonquiver and ald, by now wittlectionsurper, may sequia,
     tory, I ad my notter. Marriusbabilly She lady for rachalle spen hat knong al elf
-
-
     '''
 
     def __init__(self, excerptList=None):
@@ -516,7 +516,7 @@ class Trigram:
         '''
         total = 0
         for y in self.lut.values():
-            total += sum([ x * x for x in y.values() ])
+            total += sum([x * x for x in y.values()])
         thisLength = total ** 0.5
         self._length = thisLength
 
@@ -540,8 +540,8 @@ class Trigram:
                     if x in b:
                         total += a[x] * b[x]
 
-        #environLocal.warn([self.length, 'self'])
-        #environLocal.warn([other.length, 'other'])
+        # environLocal.warn([self.length, 'self'])
+        # environLocal.warn([other.length, 'other'])
 
         return float(total) / (self.length * other.length)
 
@@ -582,8 +582,7 @@ class Trigram:
         return random.choice(letters)
 
 
-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -622,10 +621,6 @@ class Test(unittest.TestCase):
 
     def testLanguageDetector(self):
         ld = LanguageDetector()
-        #print ld.trigrams['fr'] - ld.trigrams['it']
-        #print ld.trigrams['fr'] - ld.trigrams['de']
-        #print ld.trigrams['fr'] - ld.trigrams['cn']
-
         diffFrIt = ld.trigrams['fr'] - ld.trigrams['it']
         self.assertTrue(0.50 < diffFrIt < 0.55)
         self.assertTrue(0.67 < ld.trigrams['fr'] - ld.trigrams['de'] < 0.70)
@@ -640,14 +635,14 @@ class Test(unittest.TestCase):
             + 'troverà che é stata scritta in italiano'))
 
         ## TODO: Replace
-        #messiahGovernment = corpus.parse('handel/hwv56/movement1-13.md')
-        #forUntoUs = assembleLyrics(messiahGovernment)
-        #self.assertTrue(forUntoUs.startswith('For unto us a child is born'))
-        #forUntoUs = forUntoUs.replace('_', '')
-        #self.assertEqual('en', ld.mostLikelyLanguage(forUntoUs))
+        # messiahGovernment = corpus.parse('handel/hwv56/movement1-13.md')
+        # forUntoUs = assembleLyrics(messiahGovernment)
+        # self.assertTrue(forUntoUs.startswith('For unto us a child is born'))
+        # forUntoUs = forUntoUs.replace('_', '')
+        # self.assertEqual('en', ld.mostLikelyLanguage(forUntoUs))
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [TextBox]
 
@@ -657,5 +652,5 @@ if __name__ == '__main__':
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

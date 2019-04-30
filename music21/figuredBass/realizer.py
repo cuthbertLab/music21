@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         realizer.py
 # Purpose:      music21 class to define a figured bass line, consisting of notes
 #                and figures in a given key.
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module, the heart of fbRealizer, is all about realizing
 a bass line of (bassNote, notationString)
@@ -261,7 +261,8 @@ class FiguredBassLine:
 
         >>> from music21 import corpus
         >>> sBach = corpus.parse('bach/bwv307')
-        >>> sBach['bass'].measure(0).show("text")
+        >>> sBach['bass'].measure(0).show('text')
+        {0.0} ...
         {0.0} <music21.clef.BassClef>
         {0.0} <music21.key.Key of B- major>
         {0.0} <music21.meter.TimeSignature 4/4>
@@ -269,7 +270,7 @@ class FiguredBassLine:
         {0.5} <music21.note.Note C>
 
         >>> fbLine = realizer.figuredBassFromStream(sBach['bass'])
-        >>> fbLine.generateBassLine().measure(1).show("text")
+        >>> fbLine.generateBassLine().measure(1).show('text')
         {0.0} <music21.clef.BassClef>
         {0.0} <music21.key.KeySignature of 2 flats>
         {0.0} <music21.meter.TimeSignature 4/4>
@@ -502,7 +503,8 @@ class FiguredBassLine:
                         del movementsBC[possibB]
                 for (possibA, possibBList) in list(movementsAB.items()):
                     movementsAB[possibA] = list(
-                                filter(lambda possibB: possibB in movementsBC, possibBList))
+                        # pylint: disable=cell-var-from-loop
+                        filter(lambda possibB: (possibB in movementsBC), possibBList))
 
             for (possibA, possibBList) in list(movementsAB.items()):
                 if not possibBList:
@@ -781,7 +783,7 @@ _DOC_ORDER = [figuredBassFromStream, addLyricsToBassNote,
 class FiguredBassLineException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -791,5 +793,5 @@ if __name__ == "__main__":
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

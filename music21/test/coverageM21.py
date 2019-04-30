@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         coverageM21.py
 # Purpose:      Starts Coverage w/ default arguments
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2014-15 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import sys
 
 omit_modules = [
@@ -33,8 +33,8 @@ exclude_lines = [
                 ]
 
 def getCoverage(overrideVersion=False):
-    if overrideVersion or sys.version_info.minor == 4: 
-        # run on Py 3.4 -- to get Py 3.6 timing...
+    if overrideVersion or sys.version_info.minor == 5: 
+        # run on Py 3.5 -- to get Py 3.6/3.7 timing...
         try:
             import coverage
             cov = coverage.coverage(omit=omit_modules)

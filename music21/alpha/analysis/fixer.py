@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         alpha/analysis/fixer.py
 # Purpose:      Fixes two streams given a list of changes between them
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import unittest
 
 from music21.alpha.analysis import aligner
@@ -16,7 +16,7 @@ from music21 import note
 from music21 import pitch
 from music21 import stream
 
-class OMRMidiFixer(object):
+class OMRMidiFixer:
     '''
     Base class for future fixers
     changes is a list of changes associated with the midiStream and omrStream, 

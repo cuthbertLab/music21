@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         multiprocesssTest.py
 # Purpose:      Controller for all tests in music21 run concurrently.
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2012-15 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Multiprocess testing.  Tests all doctests and Test unittest objects in all
 modules that are imported when running "import music21".  Runs threads on
@@ -42,7 +42,7 @@ ModuleResponse = collections.namedtuple('ModuleResponse',
 ModuleResponse.__new__.__defaults__ = (None,) * len(ModuleResponse._fields)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 def runOneModuleWithoutImp(args):
     modGath = args[0] # modGather object

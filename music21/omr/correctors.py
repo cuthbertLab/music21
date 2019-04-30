@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         omr/correctors.py
 # Purpose:      music21 modules for correcting the output from OMR software
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2014 Maura Church, Michael Scott Cuthbert, and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import math
 import difflib
 import copy
@@ -454,6 +454,8 @@ class SinglePart:
         '''
         from music21 import meter
         self.incorrectMeasures = []
+
+
         if runFast is True:
             try:
                 m = self.measureStream[0]
@@ -462,6 +464,9 @@ class SinglePart:
                 ts = meter.TimeSignature('4/4')
             if ts is None:
                 ts = meter.TimeSignature('4/4')
+        else:
+            ts = meter.TimeSignature('4/4')
+
         for i in range(len(self.measureStream)):
             if runFast is False:
                 m = self.measureStream[i]
@@ -770,12 +775,17 @@ class MeasureHash:
         '''
 
         duration1to127 = self.hashQuarterLength(n.duration.quarterLength)
+        byteEncoding = ''
+
         if duration1to127 % 2 == 0 and duration1to127 > 0:
             byteEncoding = chr(duration1to127)
         elif duration1to127 % 2 == 1 and duration1to127 > 0:
             byteEncoding = chr(duration1to127 + 1)
         elif duration1to127 < 0:
             byteEncoding = chr(1)
+        else:
+            raise Exception('Invalid Byte Encoding')
+
         return byteEncoding
 
     def hashGrace(self,n):
@@ -798,6 +808,8 @@ class MeasureHash:
 
         '''
         duration1to127 = self.hashQuarterLength(r.duration.quarterLength)
+
+        byteEncoding = ''
         if duration1to127 % 2 == 0 and duration1to127 > 0:
             byteEncoding = chr(duration1to127 + 1)
         elif duration1to127 % 2 == 1 and duration1to127 > 0:

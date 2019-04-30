@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         converter/__init__.py
 # Purpose:      Provide a common way to create Streams from any data music21
 #               handles
@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 music21.converter contains tools for loading music from various file formats,
 whether from disk, from the web, or from text, into
@@ -65,7 +65,7 @@ _MOD = 'converter'
 environLocal = environment.Environment(_MOD)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ArchiveManagerException(exceptions21.Music21Exception):
     pass
 
@@ -79,7 +79,7 @@ class ConverterFileException(exceptions21.Music21Exception):
     pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ArchiveManager:
     r'''
     Before opening a file path, this class can check if this is an
@@ -196,13 +196,13 @@ class ArchiveManager:
             # or, return a list of strings
             # alternative, a different method might return one at a time
             mdd = musedataModule.MuseDataDirectory(f.namelist())
-            #environLocal.printDebug(['mdd object, namelist', mdd, f.namelist])
+            # environLocal.printDebug(['mdd object, namelist', mdd, f.namelist])
 
             post = []
             for subFp in mdd.getPaths():
                 component = f.open(subFp, 'rU')
                 lines = component.readlines()
-                #environLocal.printDebug(['subFp', subFp, len(lines)])
+                # environLocal.printDebug(['subFp', subFp, len(lines)])
 
                 try:
                     post.append(''.join([l.decode(encoding='UTF-8') for l in lines]))
@@ -224,7 +224,7 @@ class ArchiveManager:
         return post
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class PickleFilter:
     '''
     Before opening a file path, this class checks to see if there is an up-to-date
@@ -242,7 +242,7 @@ class PickleFilter:
         self.fp = common.cleanpath(fp, returnPathlib=True)
         self.forceSource = forceSource
         self.number = number
-        #environLocal.printDebug(['creating pickle filter'])
+        # environLocal.printDebug(['creating pickle filter'])
 
     def getPickleFp(self, directory=None, zipType=None):
         '''
@@ -332,7 +332,7 @@ class PickleFilter:
         return fpLoad, writePickle, fpPickle
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 _registeredSubconverters = []
 _deregisteredSubconverters = [] # default subconverters to skip
 
@@ -426,7 +426,7 @@ def unregisterSubconverter(removeSubconverter):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class Converter:
@@ -463,7 +463,7 @@ class Converter:
         Does not use or store pickles in any circumstance.
         '''
         fp = common.cleanpath(fp, returnPathlib=True)
-        #environLocal.printDebug(['attempting to parseFile', fp])
+        # environLocal.printDebug(['attempting to parseFile', fp])
         if not fp.exists():
             raise ConverterFileException('no such file exists: %s' % fp)
         useFormat = format
@@ -671,7 +671,7 @@ class Converter:
         self.stream.fileNumber = number
         self.stream.fileFormat = useFormat
 
-    #------------------------------------------------------------------------#
+    # -----------------------------------------------------------------------#
     # Subconverters
     def subconvertersList(self, converterType='any'):
         '''
@@ -703,7 +703,8 @@ class Converter:
          <class 'music21.converter.subConverters.ConverterNoteworthyBinary'>,
          <class 'music21.converter.subConverters.ConverterRomanText'>,
          <class 'music21.converter.subConverters.ConverterScala'>,
-         <class 'music21.converter.subConverters.ConverterTinyNotation'>]
+         <class 'music21.converter.subConverters.ConverterTinyNotation'>,
+         <class 'music21.converter.subConverters.ConverterVolpiano'>]
 
         >>> sclOutput = c.subconvertersList('output')
         >>> sclOutput
@@ -714,7 +715,8 @@ class Converter:
          <class 'music21.converter.subConverters.ConverterScala'>,
          <class 'music21.converter.subConverters.ConverterText'>,
          <class 'music21.converter.subConverters.ConverterTextLine'>,
-         <class 'music21.converter.subConverters.ConverterVexflow'>]
+         <class 'music21.converter.subConverters.ConverterVexflow'>,
+         <class 'music21.converter.subConverters.ConverterVolpiano'>]
 
 
 
@@ -784,6 +786,7 @@ class Converter:
         <class 'music21.converter.subConverters.ConverterTextLine'>
         <class 'music21.converter.subConverters.ConverterTinyNotation'>
         <class 'music21.converter.subConverters.ConverterVexflow'>
+        <class 'music21.converter.subConverters.ConverterVolpiano'>
         <class 'music21.converter.subConverters.SubConverter'>
         '''
         defaultSubconverters = []
@@ -828,6 +831,7 @@ class Converter:
         ('tinynotation', <class 'music21.converter.subConverters.ConverterTinyNotation'>)
         ('txt', <class 'music21.converter.subConverters.ConverterText'>)
         ('vexflow', <class 'music21.converter.subConverters.ConverterVexflow'>)
+        ('volpiano', <class 'music21.converter.subConverters.ConverterVolpiano'>)
         ('xml', <class 'music21.converter.subConverters.ConverterMusicXML'>)
         '''
         converterFormats = {}
@@ -971,7 +975,7 @@ class Converter:
             return None
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # properties
     @property
     def stream(self):
@@ -990,7 +994,7 @@ class Converter:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # module level convenience methods
 
 # pylint: disable=redefined-builtin
@@ -1065,7 +1069,7 @@ def parse(value, *args, **keywords):
     >>> s.getElementsByClass(meter.TimeSignature)[0]
     <music21.meter.TimeSignature 2/16>
     '''
-    #environLocal.printDebug(['attempting to parse()', value])
+    # environLocal.printDebug(['attempting to parse()', value])
     if 'forceSource' in keywords:
         forceSource = keywords['forceSource']
         del(keywords['forceSource'])
@@ -1160,7 +1164,7 @@ def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib'):
         {1.0} <music21.note.Note D>
         {2.0} <music21.note.Note E>
         {3.0} <music21.note.Note F>
-        {4.0} <music21.bar.Barline style=final>
+        {4.0} <music21.bar.Barline type=final>
     >>> fp = converter.freeze(c, fmt='pickle')
     >>> #_DOCS_SHOW fp
     '/tmp/music21/sjiwoe.pgz'
@@ -1177,7 +1181,7 @@ def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib'):
         {1.0} <music21.note.Note D>
         {2.0} <music21.note.Note E>
         {3.0} <music21.note.Note F>
-        {4.0} <music21.bar.Barline style=final>
+        {4.0} <music21.bar.Barline type=final>
     '''
     from music21 import freezeThaw
     v = freezeThaw.StreamFreezer(streamObj, fastButUnsafe=fastButUnsafe)
@@ -1247,7 +1251,7 @@ def thawStr(strData):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase): # pragma: no cover
     # interpreter loading
 
@@ -1597,7 +1601,7 @@ class Test(unittest.TestCase):
             post = p.recurse().notes[0].getContextByClass('Clef')
             self.assertEqual(isinstance(post, clef.TenorClef), True)
             for n in p.flat.notes:
-                if n.tie != None:
+                if n.tie is not None:
                     countTies += 1
                     if n.tie.type == 'start' or n.tie.type =='continue':
                         countStartTies += 1
@@ -1659,7 +1663,7 @@ class Test(unittest.TestCase):
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test05.mid'
         s = parseFile(fp)
         #s.show()
-        #environLocal.printDebug(['\nopening fp', fp])
+        # environLocal.printDebug(['\nopening fp', fp])
 
         self.assertEqual(len(s.flat.getElementsByClass(note.Note)), 2)
         self.assertEqual(len(s.flat.getElementsByClass(chord.Chord)), 4)
@@ -1673,7 +1677,7 @@ class Test(unittest.TestCase):
         s = parseFile(fp)
         #s.show()
 
-        #environLocal.printDebug(['\nopening fp', fp])
+        # environLocal.printDebug(['\nopening fp', fp])
 
         #s.show()
         from fractions import Fraction as F
@@ -1692,7 +1696,7 @@ class Test(unittest.TestCase):
         # TODO much work is still needed on getting timing right
         # this produces numerous errors in makeMeasure partitioning
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test07.mid'
-        #environLocal.printDebug(['\nopening fp', fp])
+        # environLocal.printDebug(['\nopening fp', fp])
         s = parseFile(fp)
         #s.show('t')
         self.assertEqual(len(s.flat.getElementsByClass('TimeSignature')), 1)
@@ -1703,7 +1707,7 @@ class Test(unittest.TestCase):
 
         # this sample has dynamic changes in key signature
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test08.mid'
-        #environLocal.printDebug(['\nopening fp', fp])
+        # environLocal.printDebug(['\nopening fp', fp])
         s = parseFile(fp)
         #s.show('t')
         self.assertEqual(len(s.flat.getElementsByClass('TimeSignature')), 1)
@@ -1899,7 +1903,7 @@ class Test(unittest.TestCase):
             parse(fp)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [parse, parseFile, parseData, parseURL, freeze, thaw, freezeStr, thawStr,
               Converter, registerSubconverter, unregisterSubconverter]
@@ -1912,6 +1916,6 @@ if __name__ == "__main__":
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

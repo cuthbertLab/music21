@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         features/base.py
 # Purpose:      Feature extractors base classes.
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2011-2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import os
 import pathlib
 import pickle
@@ -29,7 +29,7 @@ from music21 import environment
 _MOD = 'features.base'
 environLocal = environment.Environment(_MOD)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class FeatureException(exceptions21.Music21Exception):
     pass
 
@@ -116,7 +116,7 @@ class Feature:
         self.vector = temp
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class FeatureExtractorException(exceptions21.Music21Exception):
     pass
 
@@ -158,7 +158,7 @@ class FeatureExtractor:
         if dataOrStream is not None:
             if (hasattr(dataOrStream, 'classes') and 'Stream' in
                 dataOrStream.classes):
-                #environLocal.printDebug(['creating new DataInstance: this should be a Stream:',
+                # environLocal.printDebug(['creating new DataInstance: this should be a Stream:',
                 #     dataOrStream])
                 # if we are passed a stream, create a DataInstance to
                 # manage the
@@ -265,7 +265,7 @@ class FeatureExtractor:
         return f
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class StreamForms:
     '''
     A dictionary-like wrapper of a Stream, providing
@@ -379,7 +379,7 @@ class StreamForms:
                     except AttributeError:
                         pass # problem with not having midi
         return histo
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
     def formPartitionByInstrument(self, prepared):
         from music21 import instrument
         return instrument.partitionByInstrument(prepared)
@@ -483,7 +483,7 @@ class StreamForms:
                         psNext = nNext.pitch.midi
 
                     cList.append(psNext - ps)
-        #environLocal.printDebug(['contourList', cList])
+        # environLocal.printDebug(['contourList', cList])
         return cList
 
     def formSecondsMap(self, prepared):
@@ -531,7 +531,7 @@ class StreamForms:
        'beatHistogram': formBeatHistogram,
     }
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class DataInstance:
     '''
     A data instance for analysis. This object prepares a Stream
@@ -704,7 +704,7 @@ class DataInstance:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class DataSetException(exceptions21.Music21Exception):
     pass
 
@@ -727,8 +727,9 @@ class DataSet:
     ['bwv66.6', 0.196..., 0.0736..., 0.006..., 0.098..., 0.0368..., 0.177..., 0.0, 
      0.085..., 0.134..., 0.018..., 0.171..., 0.0, 0, 4, 4, 'Bach']
     >>> ds.getFeaturesAsList()[1]
-    ['bach/bwv324.xml', 0.240..., 0.028..., 0.134..., 0.0, 0.144..., 0.125..., 0.0, 
-     0.163..., 0.0, 0.134..., 0.0288..., 0.0, 0, 4, 4, 'Bach']
+    ['bach/bwv324.xml', 0.25, 0.0288..., 0.125, 0.0, 0.144..., 0.125, 0.0, 0.163..., 0.0, 0.134..., 
+    0.0288..., 0.0, 0, 4, 4, 'Bach']
+
     >>> ds = ds.getString()
 
 
@@ -979,7 +980,8 @@ class DataSet:
                 # in some cases there might be problem; to not fail
                 try:
                     fReturned = fe.extract()
-                except Exception as e: # for now take any error  # pylint: disable=broad-except
+                except Exception as e: # pylint: disable=broad-except
+                    # for now take any error  
                     fList = ['failed feature extractor:', fe, str(e)]
                     if self.quiet is True:
                         environLocal.printDebug(fList)
@@ -1097,7 +1099,8 @@ def _dataSetParallelSubprocess(dataInstance):
         # in some cases there might be problem; to not fail
         try:
             fReturned = fe.extract()
-        except Exception as e: # for now take any error  # pylint: disable=broad-except
+        except Exception as e: # pylint: disable=broad-except
+            # for now take any error  
             errors.append('failed feature extractor:' + str(fe) + ': ' + str(e))
             # provide a blank feature extractor
             fReturned = fe.getBlankFeature()
@@ -1133,7 +1136,7 @@ def allFeaturesAsList(streamInput):
     return allData
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def extractorsById(idOrList, library=('jSymbolic', 'native')):
     '''
     Given one or more :class:`~music21.features.FeatureExtractor` ids, return the
@@ -1264,7 +1267,7 @@ def getIndex(featureString, extractorType=None):
         return None
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1466,7 +1469,7 @@ class Test(unittest.TestCase):
 
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # silent tests
 
 
@@ -1614,151 +1617,151 @@ class Test(unittest.TestCase):
         ds.write('/_scratch/chinaMitteleuropaSplit-b.csv')
         ds.write('/_scratch/chinaMitteleuropaSplit-b.arff')
 
-
-    def xtestOrangeBayesA(self): # pragma: no cover
-        '''Using an already created test file with a BayesLearner.
-        '''
-        import orange # @UnresolvedImport # pylint: disable=import-error
-        data = orange.ExampleTable(
-            '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
-        classifier = orange.BayesLearner(data)
-        for i in range(len(data)):
-            c = classifier(data[i])
-            print('original', data[i].getclass(), 'BayesLearner:', c)
-
-
-    def xtestClassifiersA(self): # pragma: no cover
-        '''Using an already created test file with a BayesLearner.
-        '''
-        import orange, orngTree # @UnresolvedImport  # pylint: disable=import-error
-        data1 = orange.ExampleTable(
-                '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
-
-        data2 = orange.ExampleTable(
-                '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b2.tab')
-
-        majority = orange.MajorityLearner
-        bayes = orange.BayesLearner
-        tree = orngTree.TreeLearner
-        knn = orange.kNNLearner
-
-        for classifierType in [majority, bayes, tree, knn]:
-            print('')
-            for classifierData, classifierStr, matchData, matchStr in [
-                (data1, 'data1', data1, 'data1'),
-                (data1, 'data1', data2, 'data2'),
-                (data2, 'data2', data2, 'data2'),
-                (data2, 'data2', data1, 'data1'),
-                ]:
-
-                # train with data1
-                classifier = classifierType(classifierData)
-                mismatch = 0
-                for i in range(len(matchData)):
-                    c = classifier(matchData[i])
-                    if c != matchData[i].getclass():
-                        mismatch += 1
-
-                print('%s %s: misclassified %s/%s of %s' % (
-                        classifierStr, classifierType, mismatch, len(matchData), matchStr))
-
-#             if classifierType == orngTree.TreeLearner:
-#                 orngTree.printTxt(classifier)
-
-
-
-    def xtestClassifiersB(self): # pragma: no cover
-        '''Using an already created test file with a BayesLearner.
-        '''
-        import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
-        data1 = orange.ExampleTable(
-                '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
-
-        data2 = orange.ExampleTable(
-                '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b2.tab',
-                use=data1.domain)
-
-        data1.extend(data2)
-        data = data1
-
-        majority = orange.MajorityLearner
-        bayes = orange.BayesLearner
-        tree = orngTree.TreeLearner
-        knn = orange.kNNLearner
-
-        folds = 10
-        for classifierType in [majority, bayes, tree, knn]:
-            print('')
-
-            cvIndices = orange.MakeRandomIndicesCV(data, folds)
-            for fold in range(folds):
-                train = data.select(cvIndices, fold, negate=1)
-                test = data.select(cvIndices, fold)
-
-                for classifierData, classifierStr, matchData, matchStr in [
-                    (train, 'train', test, 'test'),
-                    ]:
-
-                    # train with data1
-                    classifier = classifierType(classifierData)
-                    mismatch = 0
-                    for i in range(len(matchData)):
-                        c = classifier(matchData[i])
-                        if c != matchData[i].getclass():
-                            mismatch += 1
-
-                    print('%s %s: misclassified %s/%s of %s' % (
-                            classifierStr, classifierType, mismatch, len(matchData), matchStr))
-
-
-    def xtestOrangeClassifiers(self): # pragma: no cover
-        '''
-        This test shows how to compare four classifiers; replace the file path
-        with a path to the .tab data file.
-        '''
-        import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
-        data = orange.ExampleTable(
-            '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
-
-        # setting up the classifiers
-        majority = orange.MajorityLearner(data)
-        bayes = orange.BayesLearner(data)
-        tree = orngTree.TreeLearner(data, sameMajorityPruning=1, mForPruning=2)
-        knn = orange.kNNLearner(data, k=21)
-
-        majority.name='Majority'
-        bayes.name='Naive Bayes'
-        tree.name='Tree'
-        knn.name='kNN'
-        classifiers = [majority, bayes, tree, knn]
-
-        # print the head
-        print('Possible classes:', data.domain.classVar.values)
-        print('Original Class', end=' ')
-        for l in classifiers:
-            print('%-13s' % (l.name), end=' ')
-        print()
-
-        for example in data:
-            print('(%-10s)  ' % (example.getclass()), end=' ')
-            for c in classifiers:
-                p = c([example, orange.GetProbabilities])
-                print('%5.3f        ' % (p[0]), end=' ')
-            print('')
-
-
-    def xtestOrangeClassifierTreeLearner(self): # pragma: no cover
-        import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
-        data = orange.ExampleTable(
-            '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
-
-        tree = orngTree.TreeLearner(data, sameMajorityPruning=1, mForPruning=2)
-        #tree = orngTree.TreeLearner(data)
-        for i in range(len(data)):
-            p = tree(data[i], orange.GetProbabilities)
-            print('%d: %5.3f (originally %s)' % (i + 1, p[1], data[i].getclass()))
-
-        orngTree.printTxt(tree)
+# all these are written using orange-Py2 code; need better.
+#     def xtestOrangeBayesA(self): # pragma: no cover
+#         '''Using an already created test file with a BayesLearner.
+#         '''
+#         import orange # @UnresolvedImport # pylint: disable=import-error
+#         data = orange.ExampleTable(
+#             '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
+#         classifier = orange.BayesLearner(data)
+#         for i in range(len(data)):
+#             c = classifier(data[i])
+#             print('original', data[i].getclass(), 'BayesLearner:', c)
+# 
+# 
+#     def xtestClassifiersA(self): # pragma: no cover
+#         '''Using an already created test file with a BayesLearner.
+#         '''
+#         import orange, orngTree # @UnresolvedImport  # pylint: disable=import-error
+#         data1 = orange.ExampleTable(
+#                 '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
+# 
+#         data2 = orange.ExampleTable(
+#                 '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b2.tab')
+# 
+#         majority = orange.MajorityLearner
+#         bayes = orange.BayesLearner
+#         tree = orngTree.TreeLearner
+#         knn = orange.kNNLearner
+# 
+#         for classifierType in [majority, bayes, tree, knn]:
+#             print('')
+#             for classifierData, classifierStr, matchData, matchStr in [
+#                 (data1, 'data1', data1, 'data1'),
+#                 (data1, 'data1', data2, 'data2'),
+#                 (data2, 'data2', data2, 'data2'),
+#                 (data2, 'data2', data1, 'data1'),
+#                 ]:
+# 
+#                 # train with data1
+#                 classifier = classifierType(classifierData)
+#                 mismatch = 0
+#                 for i in range(len(matchData)):
+#                     c = classifier(matchData[i])
+#                     if c != matchData[i].getclass():
+#                         mismatch += 1
+# 
+#                 print('%s %s: misclassified %s/%s of %s' % (
+#                         classifierStr, classifierType, mismatch, len(matchData), matchStr))
+# 
+# #             if classifierType == orngTree.TreeLearner:
+# #                 orngTree.printTxt(classifier)
+# 
+# 
+# 
+#     def xtestClassifiersB(self): # pragma: no cover
+#         '''Using an already created test file with a BayesLearner.
+#         '''
+#         import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
+#         data1 = orange.ExampleTable(
+#                 '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
+# 
+#         data2 = orange.ExampleTable(
+#                 '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b2.tab',
+#                 use=data1.domain)
+# 
+#         data1.extend(data2)
+#         data = data1
+# 
+#         majority = orange.MajorityLearner
+#         bayes = orange.BayesLearner
+#         tree = orngTree.TreeLearner
+#         knn = orange.kNNLearner
+# 
+#         folds = 10
+#         for classifierType in [majority, bayes, tree, knn]:
+#             print('')
+# 
+#             cvIndices = orange.MakeRandomIndicesCV(data, folds)
+#             for fold in range(folds):
+#                 train = data.select(cvIndices, fold, negate=1)
+#                 test = data.select(cvIndices, fold)
+# 
+#                 for classifierData, classifierStr, matchData, matchStr in [
+#                     (train, 'train', test, 'test'),
+#                     ]:
+# 
+#                     # train with data1
+#                     classifier = classifierType(classifierData)
+#                     mismatch = 0
+#                     for i in range(len(matchData)):
+#                         c = classifier(matchData[i])
+#                         if c != matchData[i].getclass():
+#                             mismatch += 1
+# 
+#                     print('%s %s: misclassified %s/%s of %s' % (
+#                             classifierStr, classifierType, mismatch, len(matchData), matchStr))
+# 
+# 
+#     def xtestOrangeClassifiers(self): # pragma: no cover
+#         '''
+#         This test shows how to compare four classifiers; replace the file path
+#         with a path to the .tab data file.
+#         '''
+#         import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
+#         data = orange.ExampleTable(
+#             '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
+# 
+#         # setting up the classifiers
+#         majority = orange.MajorityLearner(data)
+#         bayes = orange.BayesLearner(data)
+#         tree = orngTree.TreeLearner(data, sameMajorityPruning=1, mForPruning=2)
+#         knn = orange.kNNLearner(data, k=21)
+# 
+#         majority.name='Majority'
+#         bayes.name='Naive Bayes'
+#         tree.name='Tree'
+#         knn.name='kNN'
+#         classifiers = [majority, bayes, tree, knn]
+# 
+#         # print the head
+#         print('Possible classes:', data.domain.classVar.values)
+#         print('Original Class', end=' ')
+#         for l in classifiers:
+#             print('%-13s' % (l.name), end=' ')
+#         print()
+# 
+#         for example in data:
+#             print('(%-10s)  ' % (example.getclass()), end=' ')
+#             for c in classifiers:
+#                 p = c([example, orange.GetProbabilities])
+#                 print('%5.3f        ' % (p[0]), end=' ')
+#             print('')
+# 
+# 
+#     def xtestOrangeClassifierTreeLearner(self): # pragma: no cover
+#         import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
+#         data = orange.ExampleTable(
+#             '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
+# 
+#         tree = orngTree.TreeLearner(data, sameMajorityPruning=1, mForPruning=2)
+#         #tree = orngTree.TreeLearner(data)
+#         for i in range(len(data)):
+#             p = tree(data[i], orange.GetProbabilities)
+#             print('%d: %5.3f (originally %s)' % (i + 1, p[1], data[i].getclass()))
+# 
+#         orngTree.printTxt(tree)
 
 
     def testParallelRun(self):
@@ -1781,9 +1784,13 @@ class Test(unittest.TestCase):
         fe00 = ds.features[0][0]
         self.assertEqual(fe00.vector, [3])
 
-    def testMultipleSearches(self):
+    # pylint: disable=redefined-outer-name
+    def x_fix_parallel_first_testMultipleSearches(self):
         from music21.features import outputFormats
         from music21 import features
+
+        # Need explicit import for picklinging within the testSingleCoreAll context
+        from music21.features.base import _pickleFunctionNumPitches # @UnresolvedImport
         import textwrap
 
         self.maxDiff = None
@@ -1792,7 +1799,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(fewBach), 13)
         ds = features.DataSet(classLabel='NumPitches')
-        ds.addMultipleData(fewBach, classValues=pickleFunctionNumPitches)
+        ds.addMultipleData(fewBach, classValues=_pickleFunctionNumPitches)
         featureExtractors = features.extractorsById(['ql1', 'ql4'], 'native')
         ds.addFeatureExtractors(featureExtractors)
         ds.runParallel = True
@@ -1803,28 +1810,28 @@ class Test(unittest.TestCase):
         self.assertEqual(post.strip(), textwrap.dedent('''
             Identifier,Unique_Note_Quarter_Lengths,Range_of_Note_Quarter_Lengths,NumPitches
             bach/bwv6.6.mxl,4,1.75,164
-            bach/bwv60.5.mxl,6,2.75,281
-            bach/bwv62.6.mxl,5,1.75,148
-            bach/bwv64.2.mxl,5,3.5,176
-            bach/bwv64.4.mxl,5,2.5,368
-            bach/bwv64.8.mxl,5,3.5,272
-            bach/bwv65.2.mxl,4,3.0,151
-            bach/bwv65.7.mxl,7,2.75,337
+            bach/bwv60.5.mxl,6,2.75,282
+            bach/bwv62.6.mxl,5,1.75,182
+            bach/bwv64.2.mxl,4,1.5,179
+            bach/bwv64.4.mxl,5,2.5,249
+            bach/bwv64.8.mxl,5,3.5,188
+            bach/bwv65.2.mxl,4,3.0,148
+            bach/bwv65.7.mxl,7,2.75,253
             bach/bwv66.6.mxl,3,1.5,165
             bach/bwv67.4.xml,3,1.5,173
-            bach/bwv67.7.mxl,4,2.5,190
-            bach/bwv69.6-a.xml,4,1.5,236
+            bach/bwv67.7.mxl,4,2.5,132
+            bach/bwv69.6-a.mxl,4,1.5,170
             bach/bwv69.6.xml,8,4.25,623
             ''').strip())
 
 
-def pickleFunctionNumPitches(bachStream):
+def _pickleFunctionNumPitches(bachStream):
     '''
     A function for documentation testing of a pickleable function
     '''
     return len(bachStream.pitches)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [DataSet, Feature, FeatureExtractor]
 
@@ -1834,5 +1841,5 @@ if __name__ == '__main__':
     music21.mainTest(Test) #, runTest='testStreamFormsA')
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

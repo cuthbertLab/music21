@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         search.serial.py
 # Purpose:      music21 classes for serial searching
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2012, 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#--------------------------------------------------
+# -------------------------------------------------
 import copy
 import unittest
 
@@ -709,7 +709,7 @@ class ContiguousSegmentSearcher:
             activePitches = []
             for thisChord in activeChordList:
                 activePitches.extend(thisChord.pitches[:])
-            uniqueActivePitchClasses = set([p.pitchClass for p in activePitches])
+            uniqueActivePitchClasses = {p.pitchClass for p in activePitches}
             numUniqueActivePitchClasses = len(uniqueActivePitchClasses)
             if numUniqueActivePitchClasses == self.searchLength:
                 self.activeChordList = activeChordList
@@ -1606,7 +1606,7 @@ class MultisetSegmentMatcher(SegmentMatcher):
         {0.0} <music21.note.Note E>
     {16.0} <music21.stream.Measure 5 offset=16.0>
         {0.0} <music21.note.Note G>
-        {4.0} <music21.bar.Barline style=final>
+        {4.0} <music21.bar.Barline type=final>
 
     >>> #_DOCS_SHOW part.show()
 
@@ -2400,13 +2400,13 @@ def labelTransposedAndInvertedMultisets(inputStream,
                                         includeChords).find(segmentList)
     return _labelGeneral(segmentsToLabel, streamCopy, multisetDict, reps, includeChords)
 
-#---------------------------------------------------------------------
+# --------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [
               'ContiguousSegmentSearcher',
@@ -2429,5 +2429,5 @@ if __name__ == "__main__":
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

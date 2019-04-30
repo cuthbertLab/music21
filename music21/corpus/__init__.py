@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         corpus/__init__.py
 # Purpose:      Shortcuts to the corpus collection
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 The music21 corpus includes a collection of freely distributable
 music in MusicXML, Humdrum, and other representations. The corpus
@@ -63,7 +63,7 @@ environLocal = environment.Environment(_MOD)
 from music21.exceptions21 import CorpusException
 
 from music21.corpus.manager import search
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 def getCorePaths(fileExtensions=None, expandExtensions=True):
@@ -185,7 +185,7 @@ def getPaths(
     return paths
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # metadata routines
 
 
@@ -201,7 +201,7 @@ def cacheMetadata(corpusNames=('local',), verbose=True):
     metadata.caching.cacheMetadata(corpusNames, verbose=verbose)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 def getComposer(composerName, fileExtensions=None):
@@ -244,7 +244,7 @@ def noCorpus():
     return corpora.CoreCorpus().noCorpus
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 def getWork(workName, movementNumber=None, fileExtensions=None):

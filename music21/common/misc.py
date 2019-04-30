@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         common/misc.py
 # Purpose:      Everything that doesn't fit into anything else.
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 If it doesn't fit anywhere else in the common directory, you'll find it here...
 '''
@@ -30,7 +30,7 @@ import sys
 import textwrap
 import time
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def flattenList(l):
     '''
     Flatten a list of lists into a flat list
@@ -43,7 +43,7 @@ def flattenList(l):
     '''
     return [item for sublist in l for item in sublist]
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # provide warning strings to users for use in conditional imports
 
 def getMissingImportStr(modNameList):
@@ -118,7 +118,7 @@ def sortModules(moduleList):
     return outMods
 
 
-#-----------------------------
+# ----------------------------
 def pitchList(pitchL):
     '''
     utility method that replicates the previous behavior of
@@ -150,13 +150,13 @@ def runningUnderIPython():
 
 
 
-#-----------------------------
+# ----------------------------
 # match collections, defaultdict()
 
 
 # NB -- temp files (tempFile) etc. are in environment.py
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def defaultDeepcopy(obj, memo, callInit=True):
     '''
     Unfortunately, it is not possible to do something like:
@@ -191,7 +191,7 @@ def defaultDeepcopy(obj, memo, callInit=True):
     dictState = getattr(obj, '__dict__', None)
     if dictState is not None:
         for k in dictState:
-            setattr(new, k, copy.deepcopy(dictState[k], memo))
+            setattr(new, k, copy.deepcopy(dictState[k], memo=memo))
     slots = set()
     for cls in obj.__class__.mro(): # it is okay that it's in reverse order, since it's just names
         slots.update(getattr(cls, '__slots__', ()))

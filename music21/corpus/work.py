@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         corpus/work.py
 # Purpose:      Manage one work
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 This is a lightweight module that stores information about individual corpus works.
 '''
@@ -16,7 +16,7 @@ import os
 
 from music21 import common
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 CorpusWork = namedtuple('CorpusWork', 'title files virtual')
 CorpusFile = namedtuple('CorpusFile', 'path title filename format ext')
 # VirtualCorpusFile = namedtuple('VirtualCorpusFile', 'path title url format')
@@ -71,7 +71,7 @@ class DirectoryInformation:
                 # TODO: this should be renamed since not all are composers
         for path in works:
             # split by the composer dir to get relative path
-            #environLocal.printDebug(['dir composer', composerDirectory, path])
+            # environLocal.printDebug(['dir composer', composerDirectory, path])
             junk, fileStub = path.as_posix().split(self.directoryName)
             if fileStub.startswith(os.sep):
                 fileStub = fileStub[len(os.sep):]
@@ -81,7 +81,7 @@ class DirectoryInformation:
             # or a top-level name
             m21Format, ext = common.findFormatExtFile(fileComponents[-1])
             if ext is None:
-                #environLocal.printDebug([
+                # environLocal.printDebug([
                 #    'file that does not seem to have an extension',
                 #    ext, path])
                 continue
@@ -113,7 +113,7 @@ class DirectoryInformation:
             # add this path
         return self.works
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 if __name__ == '__main__':

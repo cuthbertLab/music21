@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         clercqTemperley.py
 # Purpose:      Demonstration of using music21 to parse Clercq-Temperley's
 #               popular music flavor of RomanText
@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2011-12, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Parses the de Clercq-Temperley popular music flavor of RomanText.
 The Clercq-Temperley file format and additional rock corpus analysis
@@ -312,7 +312,7 @@ class CTSong:
                                                                  self.title,
                                                                  self.year)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def parse(self, textFile):
         '''
         Called when a CTSong is created by passing a string or filename;
@@ -548,7 +548,7 @@ class CTRule:
     def __repr__(self):
         return '<music21.CTRule.%s text="%s">' % (self.__class__.__name__, self.text)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _getParent(self):
         return common.unwrapWeakref(self._parent)
 
@@ -558,7 +558,7 @@ class CTRule:
     parent = property(_getParent, _setParent, doc=r'''
     A reference to the CTSong object housing the CTRule if any.
     ''')
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def expand(self, ts=None, ks=None):
         '''
         The meat of it all -- expand one rule completely and return a list of Measure objects.
@@ -762,7 +762,7 @@ class CTRule:
 
         return measureGroups3
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def isSame(self, rn, lastChord):
         if lastChord is None:
             same = False
@@ -831,7 +831,7 @@ class CTRule:
         if atom[0].islower() and 'a' in atom: # todo: what about biia ?
             atom = atom.replace('a', '+')
         return atom
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     def _setMusicText(self, value):
         self._musicText = str(value)
@@ -945,7 +945,7 @@ class CTRule:
         return sectionName
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -995,7 +995,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         #sc = s.toScore()
         #print sc.highestOffset
         #sc.show()
-#---------------------------------------------------------------------------
+# --------------------------------------------------------------------------
 
 # define presented class order in documentation
 
@@ -1007,5 +1007,5 @@ if __name__ == "__main__":
     # from music21.romanText import clercqTemperley
     # test = clercqTemperley.TestExternal()
     # test.testB()
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

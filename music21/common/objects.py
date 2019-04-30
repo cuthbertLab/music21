@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         common/objects.py
 # Purpose:      Commonly used Objects and Mixins
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 __all__ = ['defaultlist',
            'SingletonCounter',
            'RelativeCounter',
@@ -37,7 +37,7 @@ class RelativeCounter(collections.Counter):
     b 2
     c 1
     
-    Ties are iterated according to which appeared first in the generated list in Py3.6
+    Ties are iterated according to which appeared first in the generated list in Py3.6+
     and in random order in Py3.4-3.5.
         
     >>> rcProportion = rc.asProportion()
@@ -141,7 +141,7 @@ class SingletonCounter:
         _singletonCounter['value'] += 1
         return post
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class SlottedObjectMixin:
     r'''
     Provides template for classes implementing slots allowing it to be pickled
@@ -254,10 +254,13 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
         return True
 
     def __ne__(self, other):
+        '''
+        Defining __ne__ explicitly so that it inherits the same as __eq__
+        '''
         return not (self == other)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Iterator:
     '''A simple Iterator object used to handle iteration of Streams and other
     list-like objects.
@@ -293,7 +296,7 @@ class Iterator:
         return self.__next__()
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Timer:
     """
     An object for timing. Call it to get the current time since starting.

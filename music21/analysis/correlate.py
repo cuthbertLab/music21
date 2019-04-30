@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         correlate.py
 # Purpose:      Stream analyzer designed to correlate and graph two properties
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2009-2010 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Various tools and utilities to find correlations between disparate objects in a Stream.
 '''
@@ -27,14 +27,14 @@ environLocal = environment.Environment(_MOD)
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class CorrelateException(exceptions21.Music21Exception):
     pass
 
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ActivityMatch:
     '''Given a Stream, find if one object is active while another is also active.
 
@@ -96,7 +96,7 @@ class ActivityMatch:
                     entry['dst'].append(element)
 
         self.data = post
-        #environLocal.printDebug(['_findActive', self.data])
+        # environLocal.printDebug(['_findActive', self.data])
         return self.data
 
 
@@ -184,7 +184,7 @@ class ActivityMatch:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -225,7 +225,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(dataPairs), 111)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
@@ -233,6 +233,6 @@ if __name__ == "__main__":
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

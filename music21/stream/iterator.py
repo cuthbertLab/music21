@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         stream/iterator.py
 # Purpose:      classes for walking through streams...
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2008-2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 this class contains iterators and filters for walking through streams
 
@@ -22,14 +22,14 @@ from music21.stream import filters
 
 from music21.sites import SitesException
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class StreamIteratorException(StreamException):
     pass
 
 class StreamIteratorInefficientWarning(PendingDeprecationWarning):
     pass
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class StreamIterator:
     '''
@@ -60,14 +60,28 @@ class StreamIterator:
       and `sectionIndex` is where we are in the iterSection, or -1 if
       we have not started. This dict is shared among all sub iterators.
 
+    Constructor keyword only arguments:
+
+    * `filterList` is a list of stream.filters.Filter objects to apply
+    
+    * if `restoreActiveSites` is True (default) then on iterating, the activeSite is set
+      to the Stream being iterated over.
+      
+    * if `ignoreSorting` is True (default is False) then the Stream is not sorted before
+      iterating.  If the Stream is already sorted, then this value does not matter, and
+      no time will be saved by setting to False.
+      
+    * For `activeInformation` see above.
+
+    Changed in v.5.2 -- all arguments except srcStream are keyword only.
     '''
     def __init__(self,
                  srcStream,
+                 *,
                  filterList=None,
                  restoreActiveSites=True,
                  activeInformation=None,
-                 ignoreSorting=False,
-                 ):
+                 ignoreSorting=False):
         if not ignoreSorting and srcStream.isSorted is False and srcStream.autoSort:
             srcStream.sort()
         self.srcStream = srcStream
@@ -394,7 +408,7 @@ class StreamIterator:
             return True
         return False
 
-    #----------------------------------------------------------------
+    # ---------------------------------------------------------------
     # start and stop
 
     def updateActiveInformation(self):
@@ -446,7 +460,7 @@ class StreamIterator:
             self.srcStreamElements = ()
 
 
-    #---------------------------------------------------------------
+    # --------------------------------------------------------------
     # ProtoM21Object things...
     @property
     def classSet(self):
@@ -459,7 +473,7 @@ class StreamIterator:
     def classes(self):
         return tuple([x.__name__ for x in self.__class__.mro()])
 
-    #----------------------------------------------------------------
+    # ---------------------------------------------------------------
     # getting items
 
 
@@ -530,8 +544,8 @@ class StreamIterator:
                 except TypeError: # one element filters are acceptable.
                     if f(e) is False:
                         return False
-            except StopIteration:
-                raise
+            except StopIteration: # pylint: disable=try-except-raise
+                raise  # clearer this way to see that this can happen...
         return True
 
     def _newBaseStream(self):
@@ -596,14 +610,14 @@ class StreamIterator:
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Rest rest>
         {2.0} <music21.note.Note D>
-        {3.0} <music21.bar.Barline style=regular>
+        {3.0} <music21.bar.Barline type=regular>
 
         >>> s3.elementOffset(b, stringReturns=True)
         'highestTime'
 
         >>> s4 = s.iter.getElementsByClass('Barline').stream()
         >>> s4.show('t')
-        {0.0} <music21.bar.Barline style=regular>
+        {0.0} <music21.bar.Barline type=regular>
 
 
         Note that this routine can create Streams that have elements that the original
@@ -690,7 +704,7 @@ class StreamIterator:
         return getattr(self.activeInformation['stream'], self.activeInformation['iterSection'])
 
 
-    #-------------------------------------------------------------
+    # ------------------------------------------------------------
     def addFilter(self, newFilter):
         '''
         adds a filter to the list.
@@ -839,9 +853,15 @@ class StreamIterator:
         return self
 
 
-    def getElementsByOffset(self, offsetStart, offsetEnd=None,
-                    includeEndBoundary=True, mustFinishInSpan=False,
-                    mustBeginInSpan=True, includeElementsThatEndAtStart=True):
+    def getElementsByOffset(
+            self, 
+            offsetStart, 
+            offsetEnd=None,
+            *,
+            includeEndBoundary=True, 
+            mustFinishInSpan=False,
+            mustBeginInSpan=True, 
+            includeElementsThatEndAtStart=True):
         '''
         Adds a filter keeping only Music21Objects that
         are found at a certain offset or within a certain
@@ -988,6 +1008,8 @@ class StreamIterator:
         3
         >>> len(list(s.iter.getElementsByOffset(0.0, mustBeginInSpan=False)))
         3
+        
+        Changed in v5.5 -- all arguments changing behavior are keyword only.
 
         OMIT_FROM_DOCS
 
@@ -1041,15 +1063,17 @@ class StreamIterator:
 
         :rtype: StreamIterator
         '''
-        self.addFilter(filters.OffsetFilter(offsetStart,
-                                            offsetEnd,
-                                            includeEndBoundary,
-                                            mustFinishInSpan,
-                                            mustBeginInSpan,
-                                            includeElementsThatEndAtStart))
+        self.addFilter(filters.OffsetFilter(
+                            offsetStart,
+                            offsetEnd,
+                            includeEndBoundary=includeEndBoundary,
+                            mustFinishInSpan=mustFinishInSpan,
+                            mustBeginInSpan=mustBeginInSpan,
+                            includeElementsThatEndAtStart=includeElementsThatEndAtStart)
+                      )
         return self
 
-    #-------------------------------------------------------------
+    # ------------------------------------------------------------
     # properties -- historical...
 
     @property
@@ -1087,7 +1111,7 @@ class StreamIterator:
         <music21.note.Rest rest>
         <music21.note.Note D>
 
-        chained filters... (this makes no sense since notes is a subset of notesAndRests
+        chained filters... (this makes no sense since notes is a subset of notesAndRests)
 
         >>> for el in s.iter.notesAndRests.notes:
         ...     print(el)
@@ -1109,7 +1133,7 @@ class StreamIterator:
     @property
     def spanners(self):
         '''
-        Adds a ClassFilter for Variant objects
+        Adds a ClassFilter for Spanner objects
         '''
         self.addFilter(filters.ClassFilter('Spanner'))
         return self
@@ -1132,7 +1156,7 @@ class StreamIterator:
         self.addFilter(filters.ClassFilter('Voice'))
         return self
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class OffsetIterator(StreamIterator):
     '''
     An iterator that with each iteration returns a list of elements
@@ -1177,17 +1201,18 @@ class OffsetIterator(StreamIterator):
     '''
     def __init__(self,
                  srcStream,
+                 *,
                  filterList=None,
                  restoreActiveSites=True,
                  activeInformation=None,
-                 ignoreSorting=False,
+                 ignoreSorting=False
                  ):
         super().__init__(srcStream,
-                                             filterList=filterList,
-                                             restoreActiveSites=restoreActiveSites,
-                                             activeInformation=activeInformation,
-                                             ignoreSorting=ignoreSorting,
-                                             )
+                         filterList=filterList,
+                         restoreActiveSites=restoreActiveSites,
+                         activeInformation=activeInformation,
+                         ignoreSorting=ignoreSorting,
+                         )
         self.raiseStopIterationNext = False
         self.nextToYield = []
         self.nextOffsetToYield = None
@@ -1235,9 +1260,12 @@ class OffsetIterator(StreamIterator):
         self.raiseStopIterationNext = False
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class RecursiveIterator(StreamIterator):
     '''
+    One of the most powerful iterators in music21.  Generally not called
+    directly, but created by being invoked on a stream with `Stream.recurse()`
+    
     >>> b = corpus.parse('bwv66.6')
     >>> ri = stream.iterator.RecursiveIterator(b, streamsOnly=True)
     >>> for x in ri:
@@ -1257,7 +1285,7 @@ class RecursiveIterator(StreamIterator):
 
     But this is how you'll actually use it:
 
-    >>> for x in b.recurse(streamsOnly=True):
+    >>> for x in b.recurse(streamsOnly=True, includeSelf=True):
     ...     print(x)
     <music21.stream.Score 0x10484fd68>
     <music21.stream.Part Soprano>
@@ -1280,14 +1308,13 @@ class RecursiveIterator(StreamIterator):
     <music21.stream.iterator.RecursiveIterator for Score:0x10487f550 @:0>
 
     >>> for el in expressive:
-    ...     printer = (el, el.expressions)
-    ...     print(printer)
-    (<music21.note.Note C#>, [<music21.expressions.Fermata>])
-    (<music21.note.Note A>, [<music21.expressions.Fermata>])
-    (<music21.note.Note F#>, [<music21.expressions.Fermata>])
-    (<music21.note.Note C#>, [<music21.expressions.Fermata>])
-    (<music21.note.Note G#>, [<music21.expressions.Fermata>])
-    (<music21.note.Note F#>, [<music21.expressions.Fermata>])
+    ...     print(el, el.expressions)
+    <music21.note.Note C#> [<music21.expressions.Fermata>]
+    <music21.note.Note A> [<music21.expressions.Fermata>]
+    <music21.note.Note F#> [<music21.expressions.Fermata>]
+    <music21.note.Note C#> [<music21.expressions.Fermata>]
+    <music21.note.Note G#> [<music21.expressions.Fermata>]
+    <music21.note.Note F#> [<music21.expressions.Fermata>]
 
     >>> len(expressive)
     6
@@ -1298,19 +1325,20 @@ class RecursiveIterator(StreamIterator):
     '''
     def __init__(self,
                  srcStream,
+                 *,
                  filterList=None,
                  restoreActiveSites=True,
                  activeInformation=None,
-                 streamsOnly=False, # to be removed?
-                 includeSelf=False, # to be removed?
+                 streamsOnly=False, 
+                 includeSelf=False,
                  ignoreSorting=False
                  ): #, parentIterator=None):
         super().__init__(srcStream,
-                                                filterList=filterList,
-                                                restoreActiveSites=restoreActiveSites,
-                                                activeInformation=activeInformation,
-                                                ignoreSorting=ignoreSorting,
-                                                )
+                         filterList=filterList,
+                         restoreActiveSites=restoreActiveSites,
+                         activeInformation=activeInformation,
+                         ignoreSorting=ignoreSorting,
+                        )
         if 'lastYielded' not in self.activeInformation:
             self.activeInformation['lastYielded'] = None
 
@@ -1337,7 +1365,11 @@ class RecursiveIterator(StreamIterator):
         super().reset()
 
     def __next__(self):
-
+        '''
+        Get the next element of the stream under iteration.
+        
+        The same __iter__ as the superclass is used.
+        '''
         while self.index < self.streamLength:
             # wrap this in a while loop instead of
             # returning self.__next__() because
@@ -1424,7 +1456,7 @@ class RecursiveIterator(StreamIterator):
 
     def iteratorStack(self):
         '''
-        Returns a stack of Streams at this point in the iteration.  Last is most recent.
+        Returns a stack of RecursiveIterators at this point in the iteration.  Last is most recent.
 
         >>> b = corpus.parse('bwv66.6')
         >>> bRecurse = b.recurse()
@@ -1436,7 +1468,7 @@ class RecursiveIterator(StreamIterator):
         >>> bRecurse.iteratorStack()
         [<music21.stream.iterator.RecursiveIterator for Score:0x10475cdd8 @:2>,
          <music21.stream.iterator.RecursiveIterator for Part:Soprano @:3>,
-         <music21.stream.iterator.RecursiveIterator for Measure:m.1 @:2>]
+         <music21.stream.iterator.RecursiveIterator for Measure:m.1 @:3>]
         '''
         iterStack = [self]
         x = self
@@ -1532,9 +1564,15 @@ class RecursiveIterator(StreamIterator):
             # will still return numbers even if _endElements
 
 
-    def getElementsByOffsetInHierarchy(self, offsetStart, offsetEnd=None,
-                    includeEndBoundary=True, mustFinishInSpan=False,
-                    mustBeginInSpan=True, includeElementsThatEndAtStart=True):
+    def getElementsByOffsetInHierarchy(
+            self, 
+            offsetStart, 
+            offsetEnd=None,
+            *,
+            includeEndBoundary=True, 
+            mustFinishInSpan=False,
+            mustBeginInSpan=True, 
+            includeElementsThatEndAtStart=True):
         '''
         Adds a filter keeping only Music21Objects that
         are found at a certain offset or within a certain
@@ -1558,14 +1596,17 @@ class RecursiveIterator(StreamIterator):
         <music21.note.Note F#> 9.0 3 Bass
         <music21.note.Note B> 9.5 3 Bass
 
+        Changed in v5.5 -- all behavior changing options are keyword only.
+        
         :rtype: StreamIterator
         '''
-        f = filters.OffsetHierarchyFilter(offsetStart,
-                                            offsetEnd,
-                                            includeEndBoundary,
-                                            mustFinishInSpan,
-                                            mustBeginInSpan,
-                                            includeElementsThatEndAtStart)
+        f = filters.OffsetHierarchyFilter(
+                offsetStart,
+                offsetEnd,
+                includeEndBoundary=includeEndBoundary,
+                mustFinishInSpan=mustFinishInSpan,
+                mustBeginInSpan=mustBeginInSpan,
+                includeElementsThatEndAtStart=includeElementsThatEndAtStart)
         self.addFilter(f)
         return self
 
@@ -1588,7 +1629,7 @@ class Test(unittest.TestCase):
         m.append(note.Note('E'))
         p.insert(0, note.Note('C'))
         p.append(m)
-        pRecurse = p.recurse()
+        pRecurse = p.recurse(includeSelf=True)
         allOffsets = []
         for unused in pRecurse:
             allOffsets.append(pRecurse.currentHierarchyOffset())

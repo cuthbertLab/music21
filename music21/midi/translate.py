@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         midi.translate.py
 # Purpose:      Translate MIDI and music21 objects
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2010-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Module to translate MIDI data to music21 Streams and voice versa.  Note that quantization of
 notes takes place in the :meth:`~music21.stream.Stream.quantize` method not here.
@@ -25,15 +25,15 @@ from music21 import exceptions21
 from music21 import environment
 from music21 import stream
 
-_MOD = "midi.translate"
+_MOD = 'midi.translate'
 environLocal = environment.Environment(_MOD)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TranslateException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Durations
 
 def offsetToMidi(o, addStartDelay=False):
@@ -153,7 +153,7 @@ def midiToDuration(ticks, ticksPerQuarter=None, inputM21DurationObject=None):
     return d
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # utility functions for getting commonly used event
 
 
@@ -186,7 +186,7 @@ def getStartEvents(mt=None, channel=1, instrumentObj=None):
     events.append(dt)
 
     me = midiModule.MidiEvent(mt, channel=channel)
-    me.type = "SEQUENCE_TRACK_NAME"
+    me.type = 'SEQUENCE_TRACK_NAME'
     me.time = 0 # always at zero?
     me.data = partName
     events.append(me)
@@ -220,14 +220,14 @@ def getEndEvents(mt=None, channel=1):
     events.append(dt)
 
     me = midiModule.MidiEvent(mt)
-    me.type = "END_OF_TRACK"
+    me.type = 'END_OF_TRACK'
     me.channel = channel
     me.data = '' # must set data to empty string
     events.append(me)
 
     return events
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Multiobject conversion
 
 def music21ObjectToMidiFile(music21Object):
@@ -250,7 +250,7 @@ def music21ObjectToMidiFile(music21Object):
         return streamToMidiFile(s)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Notes
 
 def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
@@ -284,7 +284,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     >>> dt1.time = 1024
 
     >>> me1 = midi.MidiEvent(mt)
-    >>> me1.type = "NOTE_ON"
+    >>> me1.type = 'NOTE_ON'
     >>> me1.pitch = 45
     >>> me1.velocity = 94
 
@@ -292,7 +292,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     >>> dt2.time = 2048
 
     >>> me2 = midi.MidiEvent(mt)
-    >>> me2.type = "NOTE_ON"
+    >>> me2.type = 'NOTE_ON'
     >>> me2.pitch = 45
     >>> me2.velocity = 0
 
@@ -337,7 +337,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
         tOn, eOn = 0, eventList[1]
         tOff, unused_eOff = dur, eventList[3]
     else:
-        raise TranslateException('cannot handle MIDI event list in the form: %r', eventList)
+        raise TranslateException('cannot handle MIDI event list in the form: %r' % eventList)
 
     n.pitch.midi = eOn.pitch
     n.volume.velocity = eOn.velocity
@@ -347,7 +347,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     if (tOff - tOn) != 0:
         midiToDuration(tOff - tOn, ticksPerQuarter, n.duration)
     else:
-        #environLocal.printDebug(['cannot translate found midi event with zero duration:', eOn, n])
+        # environLocal.printDebug(['cannot translate found midi event with zero duration:', eOn, n])
         # for now, substitute 1
         n.quarterLength = 1.0
 
@@ -405,7 +405,7 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
         eventList.append(dt)
 
     me1 = midiModule.MidiEvent(mt)
-    me1.type = "NOTE_ON"
+    me1.type = 'NOTE_ON'
     me1.channel = channel
     me1.time = None # not required
     me1.pitch = n.pitch.midi
@@ -429,7 +429,7 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
         eventList.append(dt)
 
     me2 = midiModule.MidiEvent(mt)
-    me2.type = "NOTE_OFF"
+    me2.type = 'NOTE_OFF'
     me2.channel = channel
     me2.time = None #d
     me2.pitch = n.pitch.midi
@@ -447,7 +447,7 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Chords
 
 def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
@@ -464,7 +464,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     >>> dt1.time = 0
 
     >>> me1 = midi.MidiEvent(mt)
-    >>> me1.type = "NOTE_ON"
+    >>> me1.type = 'NOTE_ON'
     >>> me1.pitch = 45
     >>> me1.velocity = 94
 
@@ -472,7 +472,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     >>> dt2.time = 0
 
     >>> me2 = midi.MidiEvent(mt)
-    >>> me2.type = "NOTE_ON"
+    >>> me2.type = 'NOTE_ON'
     >>> me2.pitch = 46
     >>> me2.velocity = 94
 
@@ -480,7 +480,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     >>> dt3.time = 2048
 
     >>> me3 = midi.MidiEvent(mt)
-    >>> me3.type = "NOTE_OFF"
+    >>> me3.type = 'NOTE_OFF'
     >>> me3.pitch = 45
     >>> me3.velocity = 0
 
@@ -488,7 +488,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     >>> dt4.time = 0
 
     >>> me4 = midi.MidiEvent(mt)
-    >>> me4.type = "NOTE_OFF"
+    >>> me4.type = 'NOTE_OFF'
     >>> me4.pitch = 46
     >>> me4.velocity = 0
 
@@ -498,6 +498,8 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     >>> c.duration.quarterLength
     2.0
     '''
+    tOn = 0
+
     if inputM21 is None:
         c = chord.Chord()
     else:
@@ -547,7 +549,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     if (tOff - tOn) != 0:
         midiToDuration(tOff - tOn, ticksPerQuarter, c.duration)
     else:
-        #environLocal.printDebug(['cannot translate found midi event with zero duration:',
+        # environLocal.printDebug(['cannot translate found midi event with zero duration:',
         #                         eventList, c])
         # for now, substitute 1
         c.quarterLength = 1
@@ -605,7 +607,7 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
             eventList.append(dt)
 
         me = midiModule.MidiEvent(mt)
-        me.type = "NOTE_ON"
+        me.type = 'NOTE_ON'
         me.channel = 1
         me.time = None # not required
         me.pitch = chordComponent.pitch.midi
@@ -643,7 +645,7 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
             eventList.append(dt)
 
         me = midiModule.MidiEvent(mt)
-        me.type = "NOTE_OFF"
+        me.type = 'NOTE_OFF'
         me.channel = 1
         me.time = None #d
         me.pitch = pitchObj.midi
@@ -662,7 +664,7 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
     return eventList
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def instrumentToMidiEvents(inputM21, 
                            includeDeltaTime=True,
                            midiTrack=None, 
@@ -682,7 +684,7 @@ def instrumentToMidiEvents(inputM21,
         dt.time = 0
         events.append(dt)
     me = midiModule.MidiEvent(mt)
-    me.type = "PROGRAM_CHANGE"
+    me.type = 'PROGRAM_CHANGE'
     me.time = 0
     me.channel = channel
     instMidiProgram = inst.midiProgram
@@ -693,7 +695,7 @@ def instrumentToMidiEvents(inputM21,
     return events
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Meta events
 
 def midiEventsToInstrument(eventList):
@@ -718,14 +720,14 @@ def midiEventsToTimeSignature(eventList):
 
     >>> mt = midi.MidiTrack(1)
     >>> me1 = midi.MidiEvent(mt)
-    >>> me1.type = "TIME_SIGNATURE"
+    >>> me1.type = 'TIME_SIGNATURE'
     >>> me1.data = midi.putNumbersAsList([3, 1, 24, 8]) # 3/2 time
     >>> ts = midi.translate.midiEventsToTimeSignature(me1)
     >>> ts
     <music21.meter.TimeSignature 3/2>
 
     >>> me2 = midi.MidiEvent(mt)
-    >>> me2.type = "TIME_SIGNATURE"
+    >>> me2.type = 'TIME_SIGNATURE'
     >>> me2.data = midi.putNumbersAsList([3, 4]) # 3/16 time
     >>> ts = midi.translate.midiEventsToTimeSignature(me2)
     >>> ts
@@ -800,7 +802,7 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
     subCount = 8 # number of 32 notes in a quarternote
 
     me = midiModule.MidiEvent(mt)
-    me.type = "TIME_SIGNATURE"
+    me.type = 'TIME_SIGNATURE'
     me.channel = 1
     me.time = None # not required
     me.data = midiModule.putNumbersAsList([n, d, metroClick, subCount])
@@ -815,7 +817,7 @@ def midiEventsToKey(eventList):
 
     >>> mt = midi.MidiTrack(1)
     >>> me1 = midi.MidiEvent(mt)
-    >>> me1.type = "KEY_SIGNATURE"
+    >>> me1.type = 'KEY_SIGNATURE'
     >>> me1.data = midi.putNumbersAsList([2, 0]) # d major
     >>> ks = midi.translate.midiEventsToKey(me1)
     >>> ks
@@ -824,7 +826,7 @@ def midiEventsToKey(eventList):
     'major'
 
     >>> me2 = midi.MidiEvent(mt)
-    >>> me2.type = "KEY_SIGNATURE"
+    >>> me2.type = 'KEY_SIGNATURE'
     >>> me2.data = midi.putNumbersAsList([-2, 1]) # g minor
     >>> me2.data
     b'\\xfe\\x01'
@@ -863,7 +865,7 @@ def midiEventsToKey(eventList):
     if post[1] == 1:
         mode = 'minor'
 
-    #environLocal.printDebug(['midiEventsToKey', post, sharpCount])
+    # environLocal.printDebug(['midiEventsToKey', post, sharpCount])
     ks = key.KeySignature(sharpCount)
     k = ks.asKey(mode)
 
@@ -906,7 +908,7 @@ def keySignatureToMidiEvents(ks, includeDeltaTime=True):
     else: # major or None; must define one
         mode = 0
     me = midiModule.MidiEvent(mt)
-    me.type = "KEY_SIGNATURE"
+    me.type = 'KEY_SIGNATURE'
     me.channel = 1
     me.time = None # not required
     me.data = midiModule.putNumbersAsList([sharpCount, mode])
@@ -931,7 +933,7 @@ def midiEventsToTempo(eventList):
     mspq = midiModule.getNumber(event.data, 3)[0] # first data is number
     bpm = round(60000000 / mspq, 2)
     #post = midiModule.getNumbersAsList(event.data)
-    #environLocal.printDebug(['midiEventsToTempo, got bpm', bpm])
+    # environLocal.printDebug(['midiEventsToTempo, got bpm', bpm])
     mm = tempo.MetronomeMark(number=bpm)
     return mm
 
@@ -973,7 +975,7 @@ def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
         eventList.append(dt)
 
     me = midiModule.MidiEvent(mt)
-    me.type = "SET_TEMPO"
+    me.type = 'SET_TEMPO'
     me.channel = 1
     me.time = None # not required
 
@@ -988,7 +990,7 @@ def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Streams
 
 
@@ -1158,7 +1160,7 @@ def _processPackets(packets,
     usedTracks = []
 
     for p in packets:
-        #environLocal.printDebug(['_processPackets', p['midiEvent'].track, p['trackId']])
+        # environLocal.printDebug(['_processPackets', p['midiEvent'].track, p['trackId']])
         # must use trackId, as .track on MidiEvent is not yet set
         if p['trackId'] not in usedTracks:
             usedTracks.append(p['trackId'])
@@ -1173,12 +1175,12 @@ def _processPackets(packets,
             # if this is a note off, and has a cent shift, need to
             # rest the pitch bend back to 0 cents
             if p['midiEvent'].type == 'NOTE_OFF':
-                #environLocal.printDebug(['got note-off', p['midiEvent']])
+                # environLocal.printDebug(['got note-off', p['midiEvent']])
                 # cent shift is set for note on and note off
                 if p['centShift'] is not None:
                     # do not set channel, as already set
                     me = midiModule.MidiEvent(p['midiEvent'].track,
-                                              type="PITCH_BEND", 
+                                              type='PITCH_BEND', 
                                               channel=p['midiEvent'].channel)
                     # note off stores note on's pitch; do not invert, simply
                     # set to zero
@@ -1189,7 +1191,7 @@ def _processPackets(packets,
                                             obj=None, 
                                             lastInstrument=None)
                     post.append(pBendEnd)
-                    #environLocal.printDebug(['adding pitch bend', pBendEnd])
+                    # environLocal.printDebug(['adding pitch bend', pBendEnd])
             continue # store and continue
 
         # set default channel for all packets
@@ -1204,7 +1206,7 @@ def _processPackets(packets,
         channelExclude = [] # channels that cannot be used
         centShift = p['centShift'] # may be None
 
-        #environLocal.printDebug(['\n\noffset', o, 'oEnd', oEnd, 'centShift', centShift])
+        # environLocal.printDebug(['\n\noffset', o, 'oEnd', oEnd, 'centShift', centShift])
 
         # iterate through all past events/channels, and find all
         # that are active and have a pitch bend
@@ -1220,7 +1222,7 @@ def _processPackets(packets,
                  or (start < oEnd and stop > oEnd)
                 ):
                 # if there is a cent shift active in the already used channel
-                #environLocal.printDebug(['matchedOffset overlap'])
+                # environLocal.printDebug(['matchedOffset overlap'])
                 centShiftList = uniqueChannelEvents[key]
                 if centShiftList:
                     # only add if unique
@@ -1234,7 +1236,7 @@ def _processPackets(packets,
                             # cannot break early w/o sorting
 
         # if no channels are excluded, get a new channel
-        #environLocal.printDebug(['post process channelExclude', channelExclude])
+        # environLocal.printDebug(['post process channelExclude', channelExclude])
         if channelExclude: # only change if necessary
             ch = None
             # iterate in order over all channels: lower will be added first
@@ -1248,7 +1250,7 @@ def _processPackets(packets,
             p['midiEvent'].channel = ch
             # change channel of note off; this is used above to turn off pbend
             p['midiEvent'].correspondingEvent.channel = ch
-            #environLocal.printDebug(['set channel of correspondingEvent:',
+            # environLocal.printDebug(['set channel of correspondingEvent:',
                                 #p['midiEvent'].correspondingEvent])
 
             # TODO: must add program change, as we are now in a new
@@ -1271,13 +1273,13 @@ def _processPackets(packets,
             # always set corresponding event to the same channel
             p['midiEvent'].correspondingEvent.channel = ch
 
-        #environLocal.printDebug(['assigning channel', ch, 'channelsDynamic', channelsDynamic,
-        # "p['initChannel']", p['initChannel']])
+        # environLocal.printDebug(['assigning channel', ch, 'channelsDynamic', channelsDynamic,
+        # 'p['initChannel']', p['initChannel']])
 
         if centShift is not None:
             # add pitch bend
             me = midiModule.MidiEvent(p['midiEvent'].track,
-                                      type="PITCH_BEND", 
+                                      type='PITCH_BEND', 
                                       channel=ch)
             me.setPitchBend(centShift)
             pBendStart = _getPacket(trackId=p['trackId'],
@@ -1286,7 +1288,7 @@ def _processPackets(packets,
                                     obj=None,
                                     lastInstrument=None)
             post.append(pBendStart)
-            #environLocal.printDebug(['adding pitch bend', me])
+            # environLocal.printDebug(['adding pitch bend', me])
             # removal of pitch bend will happen above with note off
 
         # key includes channel, so that durations can span once in each channel
@@ -1299,10 +1301,10 @@ def _processPackets(packets,
         if centShift is not None:
             uniqueChannelEvents[key].append(centShift)
         post.append(p) # add packet/ done after ch change or bend addition
-        #environLocal.printDebug(['uniqueChannelEvents', uniqueChannelEvents])
+        # environLocal.printDebug(['uniqueChannelEvents', uniqueChannelEvents])
 
     # this is called once at completion
-    #environLocal.printDebug(['uniqueChannelEvents', uniqueChannelEvents])
+    # environLocal.printDebug(['uniqueChannelEvents', uniqueChannelEvents])
 
     # after processing, collect all channels used
     foundChannels = []
@@ -1312,8 +1314,8 @@ def _processPackets(packets,
 #         for ch in chList:
 #             if ch not in foundChannels:
 #                 foundChannels.append(ch)
-    #environLocal.printDebug(['foundChannels', foundChannels])
-    #environLocal.printDebug(['usedTracks', usedTracks])
+    # environLocal.printDebug(['foundChannels', foundChannels])
+    # environLocal.printDebug(['usedTracks', usedTracks])
 
     # post processing of entire packet collection
     # for all used channels, create a zero pitch bend at time zero
@@ -1323,7 +1325,7 @@ def _processPackets(packets,
         ch = initChannelForTrack[trackId]
         # use None for track; will get updated later
         me = midiModule.MidiEvent(track=trackId, 
-                                  type="PITCH_BEND", 
+                                  type='PITCH_BEND', 
                                   channel=ch)
         me.setPitchBend(0)
         pBendEnd = _getPacket(trackId=trackId,
@@ -1332,7 +1334,7 @@ def _processPackets(packets,
                               obj=None, 
                               lastInstrument=None)
         post.append(pBendEnd)
-        #environLocal.printDebug(['adding pitch bend for found channels', me])
+        # environLocal.printDebug(['adding pitch bend for found channels', me])
     # this sort is necessary
     post.sort(
         key=lambda x: (x['offset'], x['midiEvent'].sortOrder)
@@ -1365,7 +1367,7 @@ def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None):
     '''
     from music21 import midi as midiModule
 
-    #environLocal.printDebug(['_packetsToEvents', 'got packets:', len(packetsSrc)])
+    # environLocal.printDebug(['_packetsToEvents', 'got packets:', len(packetsSrc)])
     # add delta times
     # first, collect only the packets for this track id
     packets = []
@@ -1387,11 +1389,11 @@ def _packetsToEvents(midiTrack, packetsSrc, trackIdFilter=None):
             raise TranslateException('got a negative delta time')
         # set the channel from the midi event
         dt = midiModule.DeltaTime(midiTrack, time=t, channel=me.channel)
-        #environLocal.printDebug(['packetsByOffset', p])
+        # environLocal.printDebug(['packetsByOffset', p])
         events.append(dt)
         events.append(me)
         lastOffset = p['offset']
-    #environLocal.printDebug(['_packetsToEvents', 'total events:', len(events)])
+    # environLocal.printDebug(['_packetsToEvents', 'total events:', len(events)])
     return events
 
 
@@ -1444,7 +1446,7 @@ def midiTrackToStream(mt,
     >>> len(s.notesAndRests)
     11
     '''
-    #environLocal.printDebug(['midiTrackToStream(): got midi track: events',
+    # environLocal.printDebug(['midiTrackToStream(): got midi track: events',
     # len(mt.events), 'ticksPerQuarter', ticksPerQuarter])
 
     if inputM21 is None:
@@ -1468,8 +1470,8 @@ def midiTrackToStream(mt,
     i = 0
     while i < len(mt.events):
         # in pairs, first should be delta time, second should be event
-        #environLocal.printDebug(['midiTrackToStream(): index', 'i', i, mt.events[i]])
-        #environLocal.printDebug(['midiTrackToStream(): index', 'i + 1', i + 1, mt.events[i + 1]])
+        # environLocal.printDebug(['midiTrackToStream(): index', 'i', i, mt.events[i]])
+        # environLocal.printDebug(['midiTrackToStream(): index', 'i + 1', i + 1, mt.events[i + 1]])
 
         # need to find pairs of delta time and events
         # in some cases, there are delta times that are out of order, or
@@ -1483,25 +1485,25 @@ def midiTrackToStream(mt,
             continue
         elif (not mt.events[i].isDeltaTime() and not
             mt.events[i + 1].isDeltaTime()):
-            #environLocal.printDebug(['midiTrackToStream(): got two non delta times in a row'])
+            # environLocal.printDebug(['midiTrackToStream(): got two non delta times in a row'])
             i += 1
             continue
         elif mt.events[i].isDeltaTime() and mt.events[i + 1].isDeltaTime():
-            #environLocal.printDebug(['midiTrackToStream(): got two delta times in a row'])
+            # environLocal.printDebug(['midiTrackToStream(): got two delta times in a row'])
             i += 1
             continue
         else:
             # cannot pair delta time to the next event; skip by 1
-            #environLocal.printDebug(['cannot pair to delta time', mt.events[i]])
+            # environLocal.printDebug(['cannot pair to delta time', mt.events[i]])
             i += 1
             continue
-    #environLocal.printDebug(['raw event pairs', events])
+    # environLocal.printDebug(['raw event pairs', events])
     # need to pair note-on with note-off
     notes = [] # store pairs of pairs
     metaEvents = [] # store pairs of abs time, m21 object
     memo = [] # store already matched note off
     for i in range(len(events)):
-        #environLocal.printDebug(['midiTrackToStream(): paired events', events[i][0], events[i][1]])
+        # environLocal.printDebug(['midiTrackToStream(): paired events', events[i][0], events[i][1]])
         if i in memo:
             continue
         t, e = events[i]
@@ -1509,7 +1511,7 @@ def midiTrackToStream(mt,
         # events
         if e.isNoteOn():
             match = None
-            #environLocal.printDebug(['midiTrackToStream(): isNoteOn', e])
+            # environLocal.printDebug(['midiTrackToStream(): isNoteOn', e])
             for j in range(i + 1, len(events)):
                 if j in memo:
                     continue
@@ -1523,7 +1525,7 @@ def midiTrackToStream(mt,
                 notes.append([events[i], events[j]])
             else:
                 pass
-                #environLocal.printDebug([
+                # environLocal.printDebug([
                 #    'midiTrackToStream(): cannot find a note off for a note on', e])
         else:
             if e.type == 'TIME_SIGNATURE':
@@ -1542,14 +1544,14 @@ def midiTrackToStream(mt,
                 pass
             else:
                 pass
-                #environLocal.printDebug(['unhandled event:', e.type, e.data])
+                # environLocal.printDebug(['unhandled event:', e.type, e.data])
 
     # first create meta events
     for t, obj in metaEvents:
-        #environLocal.printDebug(['insert midi meta event:', t, obj])
+        # environLocal.printDebug(['insert midi meta event:', t, obj])
         s.coreInsert(t / ticksPerQuarter, obj)
     s.coreElementsChanged()
-    #environLocal.printDebug([
+    # environLocal.printDebug([
     #    'midiTrackToStream(): found notes ready for Stream import', len(notes)])
 
     # collect notes with similar start times into chords
@@ -1560,7 +1562,7 @@ def midiTrackToStream(mt,
     iGathered = [] # store a lost of indexes of gathered values put into chords
     voicesRequired = False
     if len(notes) > 1:
-        #environLocal.printDebug(['\nmidiTrackToStream(): notes', notes])
+        # environLocal.printDebug(['\nmidiTrackToStream(): notes', notes])
         while i < len(notes):
             if i in iGathered:
                 i += 1
@@ -1569,7 +1571,7 @@ def midiTrackToStream(mt,
             on, off = notes[i]
             t, e = on
             tOff, unused_eOff = off
-            #environLocal.printDebug(['on, off', on, off, 'i', i, 'len(notes)', len(notes)])
+            # environLocal.printDebug(['on, off', on, off, 'i', i, 'len(notes)', len(notes)])
 
             # go through all following notes; if there is only 1 note, this will
             # not execute;
@@ -1643,8 +1645,8 @@ def midiTrackToStream(mt,
     s.coreElementsChanged()
     # quantize to nearest 16th
     if quantizePost:
-        if "quarterLengthDivisors" in keywords:
-            quarterLengthDivisors = keywords["quarterLengthDivisors"]
+        if 'quarterLengthDivisors' in keywords:
+            quarterLengthDivisors = keywords['quarterLengthDivisors']
         else:
             quarterLengthDivisors = None
         s.quantize(quarterLengthDivisors=quarterLengthDivisors,
@@ -1790,7 +1792,7 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
         if ch not in channelsAssigned:
             channelsDynamic.append(ch)
 
-    #environLocal.printDebug(['channelForInstrument', channelForInstrument,
+    # environLocal.printDebug(['channelForInstrument', channelForInstrument,
     #    'channelsDynamic', channelsDynamic, 'allChannels', allChannels,
     #    'allUniqueInstruments', allUniqueInstruments])
 
@@ -1826,7 +1828,7 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
                                  channelsDynamic=channelsDynamic,
                                  initChannelForTrack=initChannelForTrack)
 
-    #environLocal.printDebug(['got netPackets:', len(netPackets),
+    # environLocal.printDebug(['got netPackets:', len(netPackets),
     #    'packetStorage keys (tracks)', packetStorage.keys()])
     # build each track, sorting out the appropriate packets based on track
     # ids
@@ -1862,11 +1864,11 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
         s = inputM21
     # store common elements such as time sig, key sig from conductor
     conductorTrack = stream.Stream()
-    #environLocal.printDebug(['midi track count', len(midiTracks)])
+    # environLocal.printDebug(['midi track count', len(midiTracks)])
     for mt in midiTracks:
         # not all tracks have notes defined; only creates parts for those
         # that do
-        #environLocal.printDebug(['raw midi trakcs', mt])
+        # environLocal.printDebug(['raw midi trakcs', mt])
         if mt.hasNotes():
             streamPart = stream.Part() # create a part instance for each part
             midiTrackToStream(mt, 
@@ -1880,12 +1882,12 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
         else:
             # note: in some cases a track such as this might have metadata
             # such as the time sig, tempo, or other parameters
-            #environLocal.printDebug(['found midi track without notes:'])
+            # environLocal.printDebug(['found midi track without notes:'])
             midiTrackToStream(mt,
                               ticksPerQuarter,
                               quantizePost,
                               inputM21=conductorTrack, **keywords)
-    #environLocal.printDebug(['show() conductorTrack elements'])
+    # environLocal.printDebug(['show() conductorTrack elements'])
     # if we have time sig/key sig elements, add to each part
 
     # TODO: this would be faster if we iterated in the other order.
@@ -2010,14 +2012,14 @@ def midiAsciiStringToBinaryString(midiFormat=1, ticksPerQuarterNote=960, tracksE
 
     mf.ticksPerQuarterNote = ticksPerQuarterNote
 
-    if (tracksEventsList != None):
+    if (tracksEventsList is not None):
         for i in range(numTracks):
             trk = midiModule.MidiTrack(i)   # sets the MidiTrack index parameters
             for j in tracksEventsList[i]:
                 me = midiModule.MidiEvent(trk)
                 dt = midiModule.DeltaTime(trk)
 
-                chunk_event_param = str(j).split(" ")
+                chunk_event_param = str(j).split(' ')
 
                 dt.channel = i + 1
                 dt.time = int(chunk_event_param[0])
@@ -2027,17 +2029,17 @@ def midiAsciiStringToBinaryString(midiFormat=1, ticksPerQuarterNote=960, tracksE
                 me.velocity = int(chunk_event_param[3])
 
                 valid = False
-                if (chunk_event_param[1] != "FF") :
+                if (chunk_event_param[1] != 'FF') :
                     if (list(chunk_event_param[1])[0] == '8'):
-                        me.type = "NOTE_OFF"
+                        me.type = 'NOTE_OFF'
                         valid = True
                     elif (list(chunk_event_param[1])[0] == '9'):
                         valid = True
-                        me.type = "NOTE_ON"
+                        me.type = 'NOTE_ON'
                     else:
-                        environLocal.warn("Unsupported midi event: 0x%s" % (chunk_event_param[1]))
+                        environLocal.warn('Unsupported midi event: 0x%s' % (chunk_event_param[1]))
                 else:
-                    environLocal.warn("Unsupported meta event: 0x%s" % (chunk_event_param[1]))
+                    environLocal.warn('Unsupported meta event: 0x%s' % (chunk_event_param[1]))
 
                 if valid:
                     trk.events.append(dt)
@@ -2045,7 +2047,7 @@ def midiAsciiStringToBinaryString(midiFormat=1, ticksPerQuarterNote=960, tracksE
 
             mf.tracks.append(trk)
 
-    midiBinStr = b""
+    midiBinStr = b''
     midiBinStr = midiBinStr + mf.writestr()
 
     return midiBinStr
@@ -2095,7 +2097,7 @@ def midiFileToStream(mf, inputM21=None, quantizePost=True, **keywords):
     >>> len(s.flat.notesAndRests)
     11
     '''
-    #environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
+    # environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
     if inputM21 is None:
         s = stream.Score()
     else:
@@ -2116,7 +2118,7 @@ def midiFileToStream(mf, inputM21=None, quantizePost=True, **keywords):
     return s
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -2145,8 +2147,8 @@ class Test(unittest.TestCase):
 
         midiBinStr = midiAsciiStringToBinaryString(tracksEventsList=midiTrack)
 
-        self.assertEqual(midiBinStr, b"MThd" + a2b_hex("000000060001000103c0") +
-                                     b"MTrk" + a2b_hex("0000000400901f0f"))
+        self.assertEqual(midiBinStr, b'MThd' + a2b_hex('000000060001000103c0') +
+                                     b'MTrk' + a2b_hex('0000000400901f0f'))
 
     def testNote(self):
         from music21 import midi as midiModule
@@ -2186,10 +2188,10 @@ class Test(unittest.TestCase):
         # get and compare just the time signatures
         mtAlt = streamHierarchyToMidiTracks(s.getElementsByClass('TimeSignature').stream())[0]
 
-        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>,
+        match = '''[<MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b''>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>,
+        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, parameter1=0, parameter2=64>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data=b'\\x03\\x02\\x18\\x08'>,
         <MidiEvent DeltaTime, t=3072, track=1, channel=1>,
@@ -2197,7 +2199,7 @@ class Test(unittest.TestCase):
         <MidiEvent DeltaTime, t=5120, track=1, channel=1>,
         <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data=b'\\x02\\x02\\x18\\x08'>,
         <MidiEvent DeltaTime, t=1024, track=1, channel=1>,
-        <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=b''>]"""
+        <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=b''>]'''
 
 
         self.assertTrue(common.whitespaceEqual(str(mtAlt.events), match), str(mtAlt.events))
@@ -2236,33 +2238,33 @@ class Test(unittest.TestCase):
         mts = streamHierarchyToMidiTracks(soprano)[0] # get one
 
         # first note-on is not delayed, even w anacrusis
-        match = """
+        match = '''
         [<MidiEvent DeltaTime, t=0, track=1, channel=1>,
          <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b'Soprano'>,
          <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-         <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>,
-         <MidiEvent DeltaTime, t=0, track=1, channel=1>]"""
+         <MidiEvent PITCH_BEND, t=0, track=1, channel=1, parameter1=0, parameter2=64>, 
+         <MidiEvent DeltaTime, t=0, track=1, channel=1>]'''
 
         self.maxDiff = None
-        self.assertTrue(common.whitespaceEqual(str(mts.events[:5]), match))
+        found = str(mts.events[:5])
+        self.assertTrue(common.whitespaceEqual(found, match), found)
 
         # first note-on is not delayed, even w anacrusis
-        match = """
+        match = '''
         [<MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b'Alto'>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
+        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, parameter1=0, parameter2=64>, 
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
         <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data=b'\\x02\\x01'>]"""
+        <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data=b'\\x02\\x00'>]'''
 
         alto = s.parts['alto']
         mta = streamHierarchyToMidiTracks(alto)[0]
 
-        self.assertTrue(common.whitespaceEqual(str(mta.events[:10]), match))
+        found = str(mta.events[:8])
+        self.assertTrue(common.whitespaceEqual(found, match), found)
 
         # try streams to midi tracks
         # get just the soprano part
@@ -2271,19 +2273,18 @@ class Test(unittest.TestCase):
         self.assertEqual(len(mtList), 1)
 
         # its the same as before
-        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>,
+        match = '''[<MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b'Soprano'>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>,
+        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, parameter1=0, parameter2=64>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data=b'\\x02\\x01'>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data=b'\\x04\\x02\\x18\\x08'>]"""
-        self.assertTrue(common.whitespaceEqual(str(mtList[0].events[:12]), match))
+        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data=b'\\x04\\x02\\x18\\x08'>]'''
+        found = str(mtList[0].events[:10])
+        self.assertTrue(common.whitespaceEqual(found, match), found)
 
     def testMidiProgramChangeA(self):
         from music21 import instrument
@@ -2344,7 +2345,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(mtList), 1)
 
         # its the same as before
-        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>,
+        match = '''[<MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=65, velocity=0>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=66, velocity=90>,
@@ -2363,7 +2364,7 @@ class Test(unittest.TestCase):
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=54, velocity=0>,
         <MidiEvent DeltaTime, t=1024, track=1, channel=1>,
-        <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=b''>]"""
+        <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=b''>]'''
 
         results = str(mtList[0].events[-20:])
         self.assertTrue(common.whitespaceEqual(results, match), results)
@@ -2906,13 +2907,13 @@ class Test(unittest.TestCase):
                  (1024, 'NOTE_OFF', 66),
                  (1024, 'END_OF_TRACK', None)]
         procCompare(mf, match)
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 _DOC_ORDER = [streamToMidiFile, midiFileToStream]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         testRunner.py
 # Purpose:      Music21 testing suite
 #
@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2006-2016 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 The testRunner module contains the all important "mainTest" function that runs tests
 in a given module.  Except for the one instance of "defaultImports", everything here
@@ -124,7 +124,7 @@ def stripAddresses(textString, replacement="ADDRESS"):
     return ADDRESS.sub(replacement, textString)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 def mainTest(*testClasses, **kwargs):
     '''
@@ -196,7 +196,7 @@ def mainTest(*testClasses, **kwargs):
             if ('importPlusRelative' in testClasses or
                     'importPlusRelative' in sys.argv or
                     bool(kwargs.get('importPlusRelative', False))):
-                globs.update(globals())
+                globs.update(inspect.stack()[1][0].f_globals)
 
         try:
             s1 = doctest.DocTestSuite(

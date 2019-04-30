@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         naturalLanguageObjects.py
 # Purpose:      Multi-lingual conversion of pitch, etc. objects
 # Authors:      David Perez
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2014, 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Multi-lingual conversion of pitch, etc. objects
 '''
@@ -120,7 +120,7 @@ def toChord(pitchArray, languageString):
     noteList = [toNote(pitchObj, languageString) for pitchObj in pitchArray]
     return chord.Chord(noteList)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -262,7 +262,7 @@ class Test(unittest.TestCase):
         self.assertEqual("<music21.chord.Chord A#### B--->",
                          toChord(["la quadruple dièse", "si triple bémol"],"fr").__repr__())
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # define presented order in documentation
 
 

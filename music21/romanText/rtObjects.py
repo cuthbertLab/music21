@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         romanText/rtObjects.py
 # Purpose:      music21 objects for processing roman numeral analysis text files
 #
@@ -11,7 +11,7 @@
 #
 # Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Translation routines for roman numeral analysis text files, as defined
 and demonstrated by Dmitri Tymoczko.
@@ -50,7 +50,7 @@ reRepeatStopAtom = re.compile(r'\:\|\|')
 reNoChordAtom = re.compile('NC')
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class RomanTextException(exceptions21.Music21Exception):
     pass
@@ -65,7 +65,7 @@ class RTFileException(exceptions21.Music21Exception):
     pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class RTToken:
     '''Stores each linear, logical entity of a RomanText.
@@ -277,20 +277,41 @@ class RTTagged(RTToken):
         return False
 
     def isKeySignature(self):
-        '''True if tag represents a key signature, otherwise False.
+        '''
+        True if tag represents a key signature, otherwise False.
 
         >>> tag = romanText.rtObjects.RTTagged('KeySignature: This is a key signature.')
         >>> tag.isKeySignature()
         True
+        >>> tag.data
+        'This is a key signature.'
+
+        KeySignatures are a type of tagged data found outside of measures,
+        such as "Key Signature: -1" meaning one flat.
+
+        Key signatures are generally numbers representing the number of sharps (or
+        negative for flats).  Non-standard key signatures are not supported.
+        
+        >>> tag = romanText.rtObjects.RTTagged('KeySignature: -3')
+        >>> tag.data
+        '-3'
+
+        music21 supports one legacy key signature type: `KeySignature: Bb` which
+        represents a one-flat signature.  Important to note: no other key signatures
+        of this type are supported.  (For instance, `KeySignature: Ab` has no effect)
+        
+        >>> tag = romanText.rtObjects.RTTagged('KeySignature: Bb')
+        >>> tag.data
+        'Bb'
+
+        Testing that `.isKeySignature` returns `False` for non-key signatures:
 
         >>> tag = romanText.rtObjects.RTTagged('Nothing: Nothing at all.')
         >>> tag.isKeySignature()
         False
 
-        KeySignatures are a type of tagged data found outside of measures,
-        such as "Key Signature: Bb," meaning one flat.
 
-        Note: this is not the same as a key definition found inside of a
+        N.B.: this is not the same as a key definition found inside of a
         Measure. These are represented by RTKey rtObjects, defined below, and are
         not RTTagged rtObjects, but RTAtom subclasses.
         '''
@@ -726,7 +747,7 @@ class RTBeat(RTAtom):
         from music21 import meter
         beat = self.getBeatFloatOrFrac()
 
-        #environLocal.printDebug(['using beat value:', beat])
+        # environLocal.printDebug(['using beat value:', beat])
         # TODO: check for exceptions/errors if this beat is bad
         try:
             post = timeSignature.getOffsetFromBeat(beat)
@@ -822,7 +843,8 @@ class RTAnalyticKey(RTKeyTypeAtom):
 
 
 class RTKeySignature(RTAtom):
-    '''An RTKeySignature(RTAtom) only defines a change in the KeySignature.
+    '''
+    An RTKeySignature(RTAtom) only defines a change in the KeySignature.
     It does not in itself create a :class:~'music21.key.Key' object, nor
     does it change the analysis taking place.
 
@@ -898,7 +920,7 @@ class RTOptionalKeyOpen(RTAtom):
             keyStr = keyStr.replace(':', '')
             keyStr = keyStr.replace('?', '')
             keyStr = keyStr.replace('(', '')
-            #environLocal.printDebug(['create a key from:', keyStr])
+            # environLocal.printDebug(['create a key from:', keyStr])
             return key.Key(keyStr)
 
 class RTOptionalKeyClose(RTAtom):
@@ -928,7 +950,7 @@ class RTOptionalKeyClose(RTAtom):
             keyStr = keyStr.replace(':', '')
             keyStr = keyStr.replace('?', '')
             keyStr = keyStr.replace(')', '')
-            #environLocal.printDebug(['create a key from:', keyStr])
+            # environLocal.printDebug(['create a key from:', keyStr])
             return key.Key(keyStr)
 
 
@@ -1018,7 +1040,7 @@ class RTRepeatStop(RTRepeat):
         return '<RTRepeatStop %r>' % self.src
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class RTHandler:
 
@@ -1176,7 +1198,7 @@ class RTHandler:
         # break into lines
         lines = src.split('\n')
         linesHeader, linesBody = self.splitAtHeader(lines)
-        #environLocal.printDebug([linesHeader])
+        # environLocal.printDebug([linesHeader])
         self._tokens += self.tokenizeHeader(linesHeader)
         self._tokens += self.tokenizeBody(linesBody)
 
@@ -1281,7 +1303,7 @@ class RTHandler:
 
         return post
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # access tokens
 
     def _getTokens(self):
@@ -1309,7 +1331,7 @@ class RTHandler:
         return rth
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class RTFile:
     '''
@@ -1376,7 +1398,7 @@ class RTFile:
         return handler
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
     def runTest(self):
@@ -1518,7 +1540,7 @@ class Test(unittest.TestCase):
         self.assertEqual(count, 1)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 #_DOC_ORDER = []
 
@@ -1527,5 +1549,5 @@ if __name__ == "__main__":
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

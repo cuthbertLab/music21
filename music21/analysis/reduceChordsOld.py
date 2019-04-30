@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         reduceChords.py
 # Purpose:      Tools for eliminating passing chords, etc.
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2013-14 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Automatically reduce a MeasureStack to a single chord or group of chords.
 '''
@@ -113,7 +113,7 @@ class ChordReducer:
             if c.isNote:
                 p = tuple(c.pitch.pitchClass)
             else:
-                p = tuple(set([x.pitchClass for x in c.pitches]))
+                p = tuple({x.pitchClass for x in c.pitches})
             if p in trimmedMaxChords and p != currentGreedyChordPCs:
                 # keep this chord
                 if currentGreedyChord is None and c.offset != 0.0:
@@ -200,7 +200,7 @@ class ChordReducer:
             if c.isNote:
                 p = tuple(c.pitch.pitchClass)
             else:
-                p = tuple(set([x.pitchClass for x in c.pitches]))
+                p = tuple({x.pitchClass for x in c.pitches})
             if p not in presentPCs:
                 presentPCs[p] = 0.0
             presentPCs[p] += weightAlgorithm(c)
@@ -320,7 +320,7 @@ class ChordReducer:
             self._lastTs = sourceMeasureTs
 
         return m
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -379,7 +379,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         c.show()
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
@@ -390,5 +390,5 @@ if __name__ == "__main__":
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

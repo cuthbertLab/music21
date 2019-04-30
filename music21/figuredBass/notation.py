@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         notation.py
 # Purpose:      music21 class for conveniently representing figured bass notation
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 import unittest
 import copy
@@ -350,7 +350,7 @@ class Notation:
 class NotationException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Figure:
     '''
     A Figure is created by providing a number and a modifierString. The
@@ -389,7 +389,7 @@ class Figure:
 class FigureException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 specialModifiers = {'+' : '#',
                     '/' : '-',
                     '\\' : '#',
@@ -563,7 +563,7 @@ class Modifier:
 class ModifierException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # Helper Methods
 def convertToPitch(pitchString):

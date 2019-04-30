@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         articulations.py
 # Purpose:      music21 classes for representing articulations
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 '''
 Classes for representing and processing articulations.
@@ -96,7 +96,7 @@ environLocal = environment.Environment(_MOD)
 class ArticulationException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Articulation(base.Music21Object):
     '''
     Base class for all Articulation sub-classes.
@@ -186,22 +186,6 @@ class Articulation(base.Music21Object):
 #             return True
 #         return False
 #
-#     def __ne__(self, other):
-#         '''Inequality. Needed for pitch comparisons.
-#
-#
-#         >>> at1 = articulations.StrongAccent()
-#         >>> at2 = articulations.StrongAccent()
-#         >>> at3 = articulations.Accent()
-#         >>> at4 = articulations.Staccatissimo()
-#         >>> at5 = articulations.Staccato()
-#         >>> at6 = articulations.Spiccato()
-#         >>> at1 != at2
-#         False
-#         >>> at1 != at3
-#         True
-#         '''
-#         return not self.__eq__(other)
 
     def _getVolumeShift(self):
         return self._volumeShift
@@ -224,7 +208,7 @@ class Articulation(base.Music21Object):
         True
         ''')
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class LengthArticulation(Articulation):
     '''
     Superclass for all articulations that change the length of a note.
@@ -249,7 +233,7 @@ class TimbreArticulation(Articulation):
     '''
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Accent(DynamicArticulation):
     '''
 
@@ -335,7 +319,7 @@ class DetachedLegato(LengthArticulation):
         super().__init__()
         self.lengthShift = 0.9
 
-#---------- indeterminant slides
+# --------- indeterminant slides
 
 class IndeterminantSlide(PitchArticulation):
     '''
@@ -383,7 +367,7 @@ class Falloff(IndeterminantSlide):
         super().__init__()
         self.tieAttach = 'last'
 
-#---------- end indeterminant slide
+# --------- end indeterminant slide
 
 
 class BreathMark(LengthArticulation):
@@ -423,7 +407,7 @@ class Unstress(DynamicArticulation):
         self._volumeShift = -0.05
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TechnicalIndication(Articulation):
     '''
     TechnicalIndications (MusicXML: technical) give performance
@@ -465,6 +449,13 @@ class Fingering(TechnicalIndication):
     fingering:
 
     >>> f.alternate = True
+
+    Fingerings are the only articulations that apply per note in a chord.
+    Other articulations, e.g., accents, apply to the whole chord and will,
+    therefore, only be associated with the first note of a chord when serializing.
+    Since chords store all articulations in an ordered list, Fingerings
+    are mapped implicitly to the notes of a chord in order. Superfluous
+    Fingerings will be ignored and may be discarded when serializaing.
     '''
     def __init__(self, fingerNumber=None):
         super().__init__()
@@ -476,7 +467,7 @@ class Fingering(TechnicalIndication):
         return '<music21.articulations.%s %s>' % (self.__class__.__name__, self.fingerNumber)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class UpBow(Bowing):
     '''
     >>> a = articulations.UpBow()
@@ -590,7 +581,7 @@ class TripleTongue(TonguingIndication):
 class Stopped(WindIndication):
     pass
 
-#--------------------------------
+# -------------------------------
 class OrganIndication(TechnicalIndication):
     '''
     Indicates whether a pitch should be played with heel or toe.
@@ -629,7 +620,7 @@ class HandbellIndication(TechnicalIndication):
     pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -659,7 +650,7 @@ class Test(unittest.TestCase):
 #         #self.assertEqual(list(set([a1, a3])), list(set([a2, a4])))
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Articulation]
 
@@ -669,7 +660,7 @@ if __name__ == '__main__':
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 
 

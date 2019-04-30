@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         commonTest.py
 # Purpose:      Things common to testing
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-15 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Things that are common to testing...
 '''
@@ -116,7 +116,7 @@ class Music21TestRunner(unittest.runner.TextTestRunner):
             pass
         return result
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ModuleGather:
     r'''
     Utility class for gathering and importing all modules in the music21

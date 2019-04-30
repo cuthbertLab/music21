@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         timespans/node.py
 # Purpose:      Internal data structures for timespan collections
 #
@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Internal data structures for timespan collections.
 
@@ -21,7 +21,7 @@ import unittest
 from music21.tree import core
 from music21.base import Music21Object
 from music21.sorting import SortTuple
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class ElementNode(core.AVLNode):
     r'''
     A node containing a single element, which is aware of the element's
@@ -292,7 +292,7 @@ class ElementNode(core.AVLNode):
         self.endTimeHigh = endTimeHigh
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class OffsetNode(ElementNode):
     r'''
     A node representing zero, one, or many elements at an offset.  It has all the
@@ -303,8 +303,8 @@ class OffsetNode(ElementNode):
     >>> score = tree.makeExampleScore()
     >>> sf = score.flat
     >>> sf.show('text', addEndTimes=True)
-    {0.0 - 0.0} <music21.instrument.Instrument PartA: : >
-    {0.0 - 0.0} <music21.instrument.Instrument PartB: : >
+    {0.0 - 0.0} <music21.instrument.Instrument 'PartA: : '>
+    {0.0 - 0.0} <music21.instrument.Instrument 'PartB: : '>
     {0.0 - 0.0} <music21.clef.BassClef>
     {0.0 - 0.0} <music21.clef.BassClef>
     {0.0 - 0.0} <music21.meter.TimeSignature 2/4>
@@ -321,8 +321,8 @@ class OffsetNode(ElementNode):
     {6.0 - 7.0} <music21.note.Note B>
     {6.0 - 8.0} <music21.note.Note D#>
     {7.0 - 8.0} <music21.note.Note C>
-    {8.0 - 8.0} <music21.bar.Barline style=final>
-    {8.0 - 8.0} <music21.bar.Barline style=final>
+    {8.0 - 8.0} <music21.bar.Barline type=final>
+    {8.0 - 8.0} <music21.bar.Barline type=final>
 
     >>> scoreTree = tree.fromStream.asTimespans(sf, flatten=False, classList=None)
     >>> rn = scoreTree.rootNode
@@ -370,8 +370,8 @@ class OffsetNode(ElementNode):
     <OffsetNode: Start:0.0 Indices:(0:0:8:8) Length:{8}>
 
     >>> leftLeft.payload
-    [<ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument PartA: : >>,
-     <ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument PartB: : >>,
+    [<ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument 'PartA: : '>>,
+     <ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument 'PartB: : '>>,
      <ElementTimespan (0.0 to 0.0) <music21.clef.BassClef>>,
      <ElementTimespan (0.0 to 0.0) <music21.clef.BassClef>>,
      <ElementTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>,
@@ -562,7 +562,7 @@ class OffsetNode(ElementNode):
                 outEndTimes.append(tsOrEl.endTime)
         return outEndTimes
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 
@@ -572,13 +572,13 @@ class Test(unittest.TestCase):
         pass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 _DOC_ORDER = (ElementNode, OffsetNode)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 if __name__ == "__main__":

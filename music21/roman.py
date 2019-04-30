@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         roman.py
 # Purpose:      music21 classes for doing Roman Numeral / Tonal analysis
 #
@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2011-2013 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Music21 class for dealing with Roman Numeral analysis
 '''
@@ -39,7 +39,7 @@ environLocal = environment.Environment(_MOD)
 
 # TODO: setting inversion should change the figure
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 SHORTHAND_RE = re.compile(r'#*-*b*o*[1-9xyz]')
@@ -85,7 +85,7 @@ figureShorthands = {
     '642': '42',
     'bb7b5b3': 'o7',
     'bb7b53': 'o7',
-    #'6b5bb3': 'o65',
+    # '6b5bb3': 'o65',
     'b7b5b3': '/o7',
     }
 
@@ -137,7 +137,7 @@ functionalityScores = {
     }
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 def expandShortHand(shorthand):
@@ -874,7 +874,7 @@ def romanNumeralFromChord(chordObj,
     return rn
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class RomanException(exceptions21.Music21Exception):
@@ -885,7 +885,7 @@ class RomanNumeralException(exceptions21.Music21Exception):
     pass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class RomanNumeral(harmony.Harmony):
@@ -1131,6 +1131,38 @@ class RomanNumeral(harmony.Harmony):
     <music21.roman.RomanNumeral vi in C major>
 
 
+    The I64 chord can also be specified as Cad64, which
+    simply parses as I64:
+    
+    >>> r = roman.RomanNumeral('Cad64', key.Key('C'))
+    >>> r
+    <music21.roman.RomanNumeral Cad64 in C major>
+    >>> [str(p) for p in r.pitches]
+    ['G4', 'C5', 'E5']
+
+    >>> r = roman.RomanNumeral('Cad64', key.Key('c'))
+    >>> r
+    <music21.roman.RomanNumeral Cad64 in c minor>
+    >>> [str(p) for p in r.pitches]
+    ['G4', 'C5', 'E-5']
+    
+    Works also for secondary romans:
+
+    >>> r = roman.RomanNumeral('Cad64/V', key.Key('c'))
+    >>> r
+    <music21.roman.RomanNumeral Cad64/V in c minor>
+    >>> [str(p) for p in r.pitches]
+    ['D5', 'G5', 'B5']
+
+
+    The RomanNumeral constructor accepts a keyword 'updatePitches' which is
+    passed to harmony.Harmony. By default it
+    is True, but can be set to False to initialize faster if pitches are not needed.
+
+    >>> r = roman.RomanNumeral('vio', em, updatePitches=False)
+    >>> r.pitches
+    ()
+
 
     OMIT_FROM_DOCS
 
@@ -1175,13 +1207,6 @@ class RomanNumeral(harmony.Harmony):
     >>> [str(pitch) for pitch in r.pitches]
     ['G4']
 
-
-    Accepts a keyword 'updatePitches' which is passed to harmony.Harmony. By default it
-    is True, but can be set to False to initialize faster if pitches are not needed.
-
-    >>> r = roman.RomanNumeral('vio', em, updatePitches=False)
-    >>> r.pitches
-    ()
     '''
     # TODO: document better! what is inherited and what is new?
 
@@ -1279,6 +1304,13 @@ class RomanNumeral(harmony.Harmony):
             useScale = self.impliedScale
 
         (workingFigure, useScale) = self._correctForSecondaryRomanNumeral(useScale)
+        
+        if workingFigure == 'Cad64':
+            if useScale.mode == 'minor':
+                workingFigure = 'i64'
+            else:
+                workingFigure = 'I64'
+            
         self.primaryFigure = workingFigure
 
         workingFigure = self._parseOmittedSteps(workingFigure)
@@ -1920,7 +1952,7 @@ class RomanNumeral(harmony.Harmony):
         if isinstance(keyOrScale, str):
             keyOrScale = _getKeyFromCache(keyOrScale)
         elif keyOrScale is not None:
-            #environLocal.printDebug(['got keyOrScale', keyOrScale])
+            # environLocal.printDebug(['got keyOrScale', keyOrScale])
             try:
                 keyClasses = keyOrScale.classes
             except:
@@ -2134,7 +2166,7 @@ class RomanNumeral(harmony.Harmony):
         self._functionalityScore = value
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -2592,7 +2624,7 @@ if __name__ == '__main__':
     music21.mainTest(Test) #, runTest='testAugmentedOctave')
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 _DOC_ORDER = (
@@ -2600,5 +2632,5 @@ _DOC_ORDER = (
     )
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

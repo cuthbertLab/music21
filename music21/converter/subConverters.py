@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         converter/__init__.py
 # Purpose:      Specific subconverters for formats music21 should handle
 #
@@ -8,14 +8,14 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Subconverters parse or display a single format.
 
 Each subconverter should inherit from the base SubConverter object and have at least a
 parseData method that sets self.stream.
 '''
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Converters are associated classes; they are not subclasses, but most define a pareData() method,
 # a parseFile() method, and a .stream attribute or property.
 import base64
@@ -69,8 +69,8 @@ class SubConverter:
     canBePickled = True
     registerFormats = ()
     registerShowFormats = ()
-    registerInputExtensions = ()
-    registerOutputExtensions = ()
+    registerInputExtensions = () # if converter supports input, put something here
+    registerOutputExtensions = () # if converter supports output put something here.
     registerOutputSubformatExtensions = {}
     launchKey = None
 
@@ -96,7 +96,7 @@ class SubConverter:
         '''
         Called when a file is encountered. If all that needs to be done is
         loading the file and putting the data into parseData then there is no need
-        to do anything except set self.readBinary (True|False).
+        to do implement this method.  Just set self.readBinary to True|False.
         '''
         if self.readBinary is False:
             with open(str(filePath)) as f:  # remove str in Py3.6
@@ -105,11 +105,9 @@ class SubConverter:
             with open(str(filePath), 'rb') as f: # remove str in Py3.6
                 dataStream = f.read()
 
-        try:
-            self.parseData(dataStream, number)
-        except NotImplementedError:  # just for showing that this is possible.
-            raise
-
+        # might raise NotImplementedError
+        self.parseData(dataStream, number)
+        
         return self.stream
 
     def _getStream(self):
@@ -143,6 +141,8 @@ class SubConverter:
         to search for the application.  If it's not specified then there might be
         a default one for the converter in self.launchKey.  If it can't find it
         there then environLocal.formatToApp(fmt) will be used.
+        
+        Not needed for formats for which .show() just prints to the console.
         '''
         if fmt is None and self.registerShowFormats:
             fmt = self.registerShowFormats[0]
@@ -179,6 +179,13 @@ class SubConverter:
         os.system(cmd)
 
     def show(self, obj, fmt, app=None, subformats=None, **keywords):
+        '''
+        Write the data, then show the generated data, using `.launch()` or printing
+        to a console.
+        
+        Some simple formats that do not need launching, may skip .launch() and
+        simply return the output.
+        '''
         returnedFilePath = self.write(obj, fmt, subformats=subformats, **keywords)
         self.launch(returnedFilePath, fmt=fmt, app=app)
 
@@ -500,7 +507,7 @@ class ConverterText(SubConverter):
     registerOutputExtensions = ('txt',)
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords): # pragma: no cover
-        dataStr = obj._reprText()
+        dataStr = obj._reprText(**keywords)
         self.writeDataStream(fp, dataStr)
         return fp
 
@@ -514,7 +521,7 @@ class ConverterTextLine(SubConverter):
 
     >>> s = corpus.parse('bwv66.6')
     >>> s.measures(1, 4).show('textline')
-    '{0.0} <music21.stream.Part Soprano> / {0.0} <music21.instrument.Instrument ... 1>...'
+    "{0.0} <music21.stream.Part Soprano> / {0.0} <music21.instrument.Instrument '... 1'>..."
     '''
     registerFormats = ('textline',)
     registerOutputExtensions = ('txt',)
@@ -527,13 +534,61 @@ class ConverterTextLine(SubConverter):
     def show(self, obj, *args, **keywords):
         return obj._reprTextLine()
 
+class ConverterVolpiano(SubConverter):
+    '''
+    Reads or writes volpiano (Chant encoding).
+    
+    Normally, just use 'converter' and .show()/.write()
+    
+    >>> p = converter.parse('volpiano: 1---c-d-ef----4')
+    >>> p.show('text')
+    {0.0} <music21.stream.Measure 0 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note D>
+        {2.0} <music21.note.Note E>
+        {3.0} <music21.note.Note F>
+        {4.0} <music21.volpiano.Neume <music21.note.Note E><music21.note.Note F>>
+        {4.0} <music21.bar.Barline type=double>
+    >>> p.show('volpiano')
+    1---c-d-ef----4
+    '''
+    registerFormats = ('volpiano',)
+    registerInputExtensions = ('volpiano', 'vp')
+    registerOutputExtensions = ('txt', 'vp')
+
+    def parseData(self, dataString, **keywords):
+        from music21 import volpiano
+        breaksToLayout = keywords.get('breaksToLayout', False)
+        self.stream = volpiano.toPart(dataString, breaksToLayout=breaksToLayout)
+
+    def getDataStr(self, obj, *args, **keywords):
+        '''
+        Get the raw data, for storing as a variable.
+        '''
+        from music21 import volpiano
+        if (obj.isStream):
+            s = obj
+        else:
+            s = stream.Stream()
+            s.append(obj)
+            
+        return volpiano.fromStream(s)
+
+    def write(self, obj, fmt, fp=None, subformats=None, **keywords): # pragma: no cover
+        dataStr = self.getDataStr(obj, **keywords)
+        self.writeDataStream(fp, dataStr)
+        return fp
+    
+    def show(self, obj, *args, **keywords):
+        print(self.getDataStr(obj, *args, **keywords))
 
 class ConverterScala(SubConverter):
     registerFormats = ('scala',)
     registerInputExtensions = ('scl',)
     registerOutputExtensions = ('scl',)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ConverterHumdrum(SubConverter):
     '''Simple class wrapper for parsing Humdrum data provided in a file or in a string.
     '''
@@ -545,7 +600,7 @@ class ConverterHumdrum(SubConverter):
         self.data = None
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def parseData(self, humdrumString, number=None):
         '''Open Humdrum data from a string -- calls humdrum.parseData()
 
@@ -594,7 +649,7 @@ class ConverterHumdrum(SubConverter):
         self.stream = self.data.stream
         return self.data
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ConverterTinyNotation(SubConverter):
     '''
     Simple class wrapper for parsing TinyNotation data provided in a file or
@@ -609,7 +664,7 @@ class ConverterTinyNotation(SubConverter):
         super().__init__(**keywords)
         self.data = None
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def parseData(self, tnData, number=None):
         '''Open TinyNotation data from a string
 
@@ -629,7 +684,7 @@ class ConverterTinyNotation(SubConverter):
             {1.3333} <music21.note.Note A>
             {1.6667} <music21.note.Note G>
             {2.0} <music21.note.Note C>
-            {2.5} <music21.bar.Barline style=final>
+            {2.5} <music21.bar.Barline type=final>
         '''
         if isinstance(tnData, str):
             tnStr = tnData
@@ -664,7 +719,7 @@ class ConverterNoteworthy(SubConverter):
     registerFormats = ('noteworthytext',)
     registerInputExtensions = ('nwctxt',)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def parseData(self, nwcData):
         r'''Open Noteworthy data from a string or list
 
@@ -709,7 +764,7 @@ class ConverterNoteworthyBinary(SubConverter):
     readBinary = True
     registerFormats = ('noteworthy',)
     registerInputExtensions = ('nwc', )
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def parseData(self, nwcData):  # pragma: no cover
         from music21.noteworthy import binaryTranslate as noteworthyBinary
         self.stream = noteworthyBinary.NWCConverter().parseString(nwcData)
@@ -719,7 +774,7 @@ class ConverterNoteworthyBinary(SubConverter):
         from music21.noteworthy import binaryTranslate as noteworthyBinary
         self.stream = noteworthyBinary.NWCConverter().parseFile(fp)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ConverterMusicXML(SubConverter):
     '''
     Converter for MusicXML using the 2015 ElementTree system.
@@ -733,7 +788,7 @@ class ConverterMusicXML(SubConverter):
                                          'pdf': 'pdf',
                                          }
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def findPNGfpFromXMLfp(self, xmlFilePath):
         '''
         Check whether total number of pngs is in 1-9, 10-99, or 100-999 range,
@@ -822,7 +877,7 @@ class ConverterMusicXML(SubConverter):
         fpOut = fp[0:len(fp) - 3]
         fpOut += subformatExtension
 
-        musescoreRun = '"' + str(musescorePath) + '" ' + fp + " -o " + fpOut + " -T 0 "
+        musescoreRun = '"' + str(musescorePath) + '" "' + fp + '" -o "' + fpOut + '" -T 0 '
         if 'dpi' in keywords:
             musescoreRun += " -r " + str(keywords['dpi'])
 
@@ -898,7 +953,7 @@ class ConverterMusicXML(SubConverter):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ConverterMidi(SubConverter):
     '''
     Simple class wrapper for parsing MIDI and sending MIDI data out.
@@ -906,7 +961,7 @@ class ConverterMidi(SubConverter):
     readBinary = True
     registerFormats = ('midi',)
     registerInputExtensions = ('mid', 'midi')
-    registerOutputExtensions = ('mid', )
+    registerOutputExtensions = ('mid',)
 
     def parseData(self, strData, number=None):
         '''
@@ -938,7 +993,7 @@ class ConverterMidi(SubConverter):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ConverterABC(SubConverter):
     '''
     Simple class wrapper for parsing ABC.
@@ -976,7 +1031,7 @@ class ConverterABC(SubConverter):
         If `number` is provided, and this ABC file defines multiple works
         with a X: tag, just the specified work will be returned.
         '''
-        #environLocal.printDebug(['ConverterABC.parseFile: got number', number])
+        # environLocal.printDebug(['ConverterABC.parseFile: got number', number])
         from music21 import abcFormat
 
         af = abcFormat.ABCFile()
@@ -1027,7 +1082,9 @@ class ConverterRomanText(SubConverter):
 
 
 class ConverterClercqTemperley(SubConverter):
-    '''Simple class wrapper for parsing roman text harmonic definitions.
+    '''
+    Wrapper for parsing harmonic definitions in Trevor de Clercq and
+    David Temperley's format.
     '''
     registerFormats = ('cttxt', 'har')
     registerInputExtensions = ('cttxt', 'har')
@@ -1064,14 +1121,14 @@ class ConverterCapella(SubConverter):
 
     def parseFile(self, fp, number=None):
         '''
-        Read a file
+        Parse a Capella file
         '''
         from music21.capella import fromCapellaXML
         ci = fromCapellaXML.CapellaImporter()
         self.stream = ci.scoreFromFile(fp)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ConverterMuseData(SubConverter):
     '''Simple class wrapper for parsing MuseData.
     '''
@@ -1112,13 +1169,13 @@ class ConverterMuseData(SubConverter):
 
         af = converter.ArchiveManager(fp)
 
-        #environLocal.printDebug(['ConverterMuseData: parseFile', fp, af.isArchive()])
+        # environLocal.printDebug(['ConverterMuseData: parseFile', fp, af.isArchive()])
         # for dealing with one or more files
         if fp.suffix == '.zip' or af.isArchive():
-            #environLocal.printDebug(['ConverterMuseData: found archive', fp])
+            # environLocal.printDebug(['ConverterMuseData: found archive', fp])
             # get data will return all data from the zip as a single string
             for partStr in af.getData(dataFormat='musedata'):
-                #environLocal.printDebug(['partStr', len(partStr)])
+                # environLocal.printDebug(['partStr', len(partStr)])
                 mdw.addString(partStr)
         else:
             if fp.is_dir:
@@ -1132,7 +1189,7 @@ class ConverterMuseData(SubConverter):
             for fpInner in fpList:
                 mdw.addFile(fpInner)
 
-        #environLocal.printDebug(['ConverterMuseData: mdw file count', len(mdw.files)])
+        # environLocal.printDebug(['ConverterMuseData: mdw file count', len(mdw.files)])
 
         musedataTranslate.museDataWorkToStreamScore(mdw, self.stream)
 
@@ -1246,36 +1303,18 @@ class Test(unittest.TestCase):
         it was exported from
         the "sibmei" plug-in for Sibelius.
         '''
-        try:
-            # this works in Python 3.3+
-            from unittest import mock  # pylint: disable=no-name-in-module
-        except ImportError:
-            try:
-                # system library overrides the built-in
-                import mock
-            except ImportError:
-                # last resort
-                from music21.ext import mock
+        from unittest import mock  # pylint: disable=no-name-in-module
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             testPath = common.getSourceFilePath() / 'mei' / 'test' / 'notes_in_utf16.mei'
             testConverter = ConverterMEI()
-            testConverter.parseFile(str(testPath))
+            testConverter.parseFile(str(testPath)) # remove str in Py3.6
             self.assertEqual(1, mockConv.call_count)
 
     def testImportMei4(self):
         '''
         For the sake of completeness, this is the same as testImportMei3() but with a UTF-8 file.
         '''
-        try:
-            # this works in Python 3.3+
-            from unittest import mock  # pylint: disable=no-name-in-module
-        except ImportError:
-            try:
-                # system library overrides the built-in
-                import mock
-            except ImportError:
-                # last resort
-                from music21.ext import mock
+        from unittest import mock  # pylint: disable=no-name-in-module
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             testPath = common.getSourceFilePath() / 'mei' / 'test' / 'notes_in_utf8.mei'
             testConverter = ConverterMEI()

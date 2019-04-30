@@ -1,5 +1,5 @@
 ﻿# -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         corpus/virtual.py
 # Purpose:      Access to the Virtual corpus collection
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 The virtual.py module is a library of references to remotely stored music data files,
 as well as meta-data necessary to download and, if available, access an already downloaded file.
@@ -64,7 +64,7 @@ class VirtualWork:
         for ext in extList:
             for url in self.urlList:
                 unused_format, extFound = common.findFormatExtURL(url)
-                #environLocal.printDebug([extFound, ext])
+                # environLocal.printDebug([extFound, ext])
                 if extFound == ext:
                     post.append(url)
         return post # no match
@@ -72,7 +72,7 @@ class VirtualWork:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # keep these in alphabetical order
 
 class BachBWV1007Prelude(VirtualWork):
@@ -184,7 +184,7 @@ class PachelbelCanonD(VirtualWork):
                             'pachelbel&file=canon.krn&f=xml')
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase): # pragma: no cover
     # interpreter loading
 
@@ -209,7 +209,7 @@ class Test(unittest.TestCase):
         self.assertNotEqual(a.getUrlByExt(['.xml']), [])
         self.assertNotEqual(a.getUrlByExt(['.krn']), [])
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
@@ -219,6 +219,6 @@ if __name__ == '__main__':
     #music21.mainTest(Test, TestExternal)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

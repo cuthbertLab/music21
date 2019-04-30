@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         scala/__init__.py
 # Purpose:      Interface and representation of Scala scale files
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2010, 16 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 '''
 This module defines classes for representing Scala scale data,
@@ -62,7 +62,7 @@ environLocal = environment.Environment(_MOD)
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # global variable to cache the paths returned from getPaths()
 SCALA_PATHS = {'allPaths': None}
 
@@ -111,7 +111,7 @@ def getPaths():
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 
@@ -263,7 +263,7 @@ class ScalaData:
         count = 0 # count non-comment lines
         for i, l in enumerate(lines):
             l = l.strip()
-            #environLocal.printDebug(['l', l, self.fileName, i])
+            # environLocal.printDebug(['l', l, self.fileName, i])
             if l.startswith('!'):
                 if i == 0 and self.fileName is None: # try to get from first l
                     if '.scl' in l: # its got the file name
@@ -298,7 +298,7 @@ class ScalaData:
         location = 0
         for c in self.getCentsAboveTonic():
             dif = c - location
-            #environLocal.printDebug(['getAdjacentCents', 'c', c, 'location', location, 'dif', dif])
+            # environLocal.printDebug(['getAdjacentCents', 'c', c, 'location', location, 'dif', dif])
             post.append(dif)
             location = c # set new location
         return post
@@ -374,7 +374,7 @@ class ScalaData:
         return '\n'.join(msg)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ScalaFile:
     '''
     Interface for reading and writing scala files.
@@ -448,7 +448,7 @@ class ScalaFile:
         # handle Scale or other objects
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def parse(target):
     '''
     Get a :class:`~music21.scala.ScalaData` object from
@@ -559,7 +559,7 @@ def search(target):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
@@ -726,7 +726,7 @@ Aristoxenos' Chromatic/Enharmonic, 3 + 9 + 18 parts
                           '<music21.interval.Interval m2 (+50c)>',
                           '<music21.interval.Interval m3>'])
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
@@ -737,7 +737,7 @@ if __name__ == "__main__":
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 
 
@@ -747,6 +747,6 @@ if __name__ == "__main__":
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         musedata/__init__.py
 # Purpose:      parses Walter Hewlett's MuseData format
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2010, 2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 **N.B. in Dec. 2014 MuseData access was removed from music21 because the rights conflicted with
 access computationally from music21.  This module is retained for anyone who has such access,
@@ -47,23 +47,23 @@ environLocal = environment.Environment(_MOD)
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class MuseDataException(exceptions21.Music21Exception):
     pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class MuseDataRecord:
     '''
     Object for extracting data from a Note or other related record, or a
     single line of musedata data.
     '''
     def __init__(self, src='', parent=None):
-        #environLocal.printDebug(['creating MuseDataRecord'])
+        # environLocal.printDebug(['creating MuseDataRecord'])
         self.src = src # src here is one line of text
         self.parent = parent
 
-        if self.parent != None:
+        if self.parent is not None:
             # form measure, then part
             self.stage = self.parent.parent.stage
         else:
@@ -177,7 +177,7 @@ class MuseDataRecord:
         # probably a faster way to do this
         numbers, junk = common.getNumFromStr(data)
         pStr.append(numbers)
-        #environLocal.printDebug(['pitch parameters', ''.join(pStr), 'src', self.src])
+        # environLocal.printDebug(['pitch parameters', ''.join(pStr), 'src', self.src])
         return ''.join(pStr)
 
 
@@ -224,7 +224,7 @@ class MuseDataRecord:
             acc = pitch.Accidental('flat')
         # if no match or ' ', return None
 
-        if acc != None:
+        if acc is not None:
             # not sure what the expectation is here: could be 'normal'
             # 'unless-repeated'
             acc.displayType = 'always'
@@ -279,7 +279,7 @@ class MuseDataRecord:
             if p.accidental is not None and self.hasCautionaryAccidental():
                 p.accidental.displayStatus = True
 
-            #environLocal.printDebug(['p', p])
+            # environLocal.printDebug(['p', p])
             return p
 
 
@@ -320,9 +320,9 @@ class MuseDataRecord:
                     "Error in parsing: " + self.src + "\n   Column 5 must be blank.")
 
         # the parent is the measure, and the parent of that is the part
-        if self.parent != None:
+        if self.parent is not None:
             dpq = self.parent.parent.getDivisionsPerQuarterNote()
-        elif divisionsPerQuarterNote != None:
+        elif divisionsPerQuarterNote is not None:
             dpq = divisionsPerQuarterNote
         else:
             raise MuseDataException('cannot access parent container of this record ' +
@@ -551,7 +551,7 @@ class MuseDataRecord:
                 post.append(dynamics.Dynamic('sf'))
             elif t == 'R': # rfz
                 post.append(dynamics.Dynamic('sf'))
-        #environLocal.printDebug(['got dynamics', post])
+        # environLocal.printDebug(['got dynamics', post])
         return post
 
 
@@ -575,7 +575,7 @@ class MuseDataRecord:
             return True
         return False
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class MuseDataRecordIterator:
     '''
     Create MuseDataRecord objects on demand, in order
@@ -598,7 +598,7 @@ class MuseDataRecordIterator:
 
     next = __next__ #py2
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class MuseDataMeasure:
     '''
     A MuseDataMeasure is an abstraction of the data contained within a measure definitions.
@@ -612,12 +612,12 @@ class MuseDataMeasure:
     def __init__(self, src=None, parent=None):
         if src is None:
             src = []
-        #environLocal.printDebug(['creating MuseDataMeasure'])
+        # environLocal.printDebug(['creating MuseDataMeasure'])
         self.src = src # a list of character lines for this measure
         # store reference to parent Part
         self.parent = parent
 
-        if self.parent != None:
+        if self.parent is not None:
             # form measure, then part
             self.stage = self.parent.stage
         else:
@@ -642,7 +642,7 @@ class MuseDataMeasure:
             data = 'measure'
 
         dataBar = data[1:7]
-        #environLocal.printDebug(['getBarObject: dataBar', dataBar])
+        # environLocal.printDebug(['getBarObject: dataBar', dataBar])
         if dataBar == 'easure': # regular
             blStyle = 'regular'
         elif dataBar == 'dotted':
@@ -658,7 +658,7 @@ class MuseDataMeasure:
         elif dataBar in ['heavy4', 'heave4']:
             blStyle = 'heavy-heavy'
         else:
-            raise MuseDataException('cannot process bar data definition: %s', dataBar)
+            raise MuseDataException('cannot process bar data definition: %s' % dataBar)
 
         bl = bar.Barline(blStyle)
 
@@ -734,7 +734,7 @@ class MuseDataMeasure:
         return [mdr for mdr in self]
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class MuseDataMeasureIterator:
     '''Create MuseDataMeasure objects on demand, in order
     '''
@@ -758,14 +758,14 @@ class MuseDataMeasureIterator:
 
     next = __next__ # py2
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class MuseDataPart:
     '''A MuseData part is defined by collection of lines
     '''
     def __init__(self, src=None, stage=None):
         if src is None:
             src = []
-        #environLocal.printDebug(['creating MuseDataPart'])
+        # environLocal.printDebug(['creating MuseDataPart'])
         self.src = src # a list of character lines for this part
 
         # a list of start, end indicies for each defined measure
@@ -780,7 +780,7 @@ class MuseDataPart:
             self.stage = self._determineStage()
         if self.stage == 1:
             self.src = self._scrubStage1(self.src)
-        #environLocal.printDebug(['MuseDataPart: stage:', self.stage])
+        # environLocal.printDebug(['MuseDataPart: stage:', self.stage])
 
     def __repr__(self):
         return '<music21.musedata.MuseDataPart>'
@@ -1097,7 +1097,7 @@ class MuseDataPart:
         if self.stage == 1:
             # combine the two lines into one, all space separated
             record = self.src[6].strip() + ' ' + self.src[7].strip()
-            #environLocal.printDebug(['got attributes record:', record])
+            # environLocal.printDebug(['got attributes record:', record])
             return record
         else:
             i = 11 # start with index 11, move to line tt starts with $
@@ -1350,7 +1350,7 @@ class MuseDataPart:
                 # data here is divisions per bar; need to divide by ts
                 # quarter length
                 self._divisionsPerQuarterNote = data / ts.barDuration.quarterLength
-                #environLocal.printDebug(['stage1: self._divisionsPerQuarterNote',
+                # environLocal.printDebug(['stage1: self._divisionsPerQuarterNote',
                 #        self._divisionsPerQuarterNote])
             else:
                 # '$ K:-3   Q:4   T:3/4   C:22', 'Q:'
@@ -1360,7 +1360,7 @@ class MuseDataPart:
         return self._divisionsPerQuarterNote
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # dealing with measures and notes
     def _getMeasureBoundaryIndices(self, src=None):
         '''
@@ -1418,7 +1418,7 @@ class MuseDataPart:
             boundaries.append((firstPostAttributesIndex, mIndices[0] - 1))
             startIterIndex = 0
 
-        if startIterIndex != None:
+        if startIterIndex is not None:
             for i in range(startIterIndex, len(mIndices)):
                 # if the last
                 if i == len(mIndices) - 1:
@@ -1427,7 +1427,6 @@ class MuseDataPart:
                     boundaries.append((mIndices[i], mIndices[i + 1] - 1))
 
         return boundaries
-
 
 
     def update(self):
@@ -1457,7 +1456,7 @@ class MuseDataPart:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class MuseDataFile:
     '''
     A MuseDataFile file may describe one or more MuseDataPart;
@@ -1500,7 +1499,7 @@ class MuseDataFile:
         '''
         Read a string, dividing it into individual parts.
         '''
-        #environLocal.printDebug(['readstr()', 'len(str)', len(str)])
+        # environLocal.printDebug(['readstr()', 'len(str)', len(str)])
         # need to split the string into individual parts, as more than
         # one part might be defined
         commentToggle = False
@@ -1509,7 +1508,7 @@ class MuseDataFile:
         srcLines = input_str.split('\n')
         #lastLineIndex = len(srcLines) - 1
         for i, line in enumerate(srcLines):
-            #environLocal.printDebug(['reading line', i, line])
+            # environLocal.printDebug(['reading line', i, line])
 
             # each part, or the entire file, will end with /END
             if line.startswith('&'):
@@ -1526,7 +1525,7 @@ class MuseDataFile:
                 continue
             # stage 1 files use END, stage 2 uses /END
             elif line.startswith('/END') or line.startswith('END'):
-                #environLocal.printDebug(['found last line', i, repr(line),
+                # environLocal.printDebug(['found last line', i, repr(line),
                 #        'length of lines', len(lines)])
                 # anticipate malformed files that have more than one END at END
                 if len(lines) <= 1:
@@ -1545,7 +1544,7 @@ class MuseDataFile:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class MuseDataWork:
     '''A work might consist of one ore more files.
     '''
@@ -1568,7 +1567,7 @@ class MuseDataWork:
 
         for fpInner in fpList:
             mdf = MuseDataFile()
-            #environLocal.printDebug('processing MuseData file: %s' % fp)
+            # environLocal.printDebug('processing MuseData file: %s' % fp)
             mdf.open(fpInner)
             mdf.read()  # process string and break into parts
             mdf.close()
@@ -1588,7 +1587,7 @@ class MuseDataWork:
 
         # TODO: Okay, so what? did we test this or demo anything?
         '''
-        #environLocal.printDebug(['addString str', str])
+        # environLocal.printDebug(['addString str', str])
 #         if str.strip() == '':
 #             raise MuseDataException('passed in empty string to add string')
         if not common.isIterable(input_str):
@@ -1602,7 +1601,7 @@ class MuseDataWork:
             self.files.append(mdf)
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def getParts(self):
         '''
         Get all parts contained in all files associated with this work.
@@ -1620,7 +1619,7 @@ class MuseDataWork:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class MuseDataDirectory:
     '''
     This class manages finding musedata files stored in a directory,
@@ -1638,7 +1637,7 @@ class MuseDataDirectory:
         self._prepareGroups(dirOrList)
 
     def _prepareGroups(self, dirOrList):
-        #environLocal.printDebug(['_prepareGroups', dirOrList])
+        # environLocal.printDebug(['_prepareGroups', dirOrList])
 
         if isinstance(dirOrList, pathlib.Path):
             dirOrList = str(dirOrList) # Py3.6 remove
@@ -1709,19 +1708,19 @@ class MuseDataDirectory:
 #                         rawPaths.append(os.path.join(dirpath, fn))
             #stub, base = os.split(dirOrList)
             # see if top level is directory
-            #environLocal.printDebug(['here', rawPaths])
+            # environLocal.printDebug(['here', rawPaths])
 
 
 
         # after gathering paths, may need to sort/get by groups
         self.paths.sort()
-        #environLocal.printDebug(['self.paths', self.paths])
+        # environLocal.printDebug(['self.paths', self.paths])
 
     def isMusedataFile(self, fp):
         # look for file extension; not often used
         # cannot open file and look, as names from a zip archive are not
         # directly openable
-        #environLocal.printDebug(['isMusedataFile: checking:', fp])
+        # environLocal.printDebug(['isMusedataFile: checking:', fp])
         unused_dir, fn = os.path.split(fp)
         if fp.endswith('.md'):
             return True
@@ -1737,12 +1736,12 @@ class MuseDataDirectory:
     def getPaths(self, group=None):
         '''Return sorted paths for a group, or None
         '''
-        #environLocal.printDebug(['getPaths() called with self.paths', self.paths])
+        # environLocal.printDebug(['getPaths() called with self.paths', self.paths])
         return self.paths
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1792,7 +1791,7 @@ class Test(unittest.TestCase):
         dirLib = os.path.join(fp, 'test01')
         for fn in ['01.md', '02.md', '03.md', '04.md', '05.md']:
             fp = os.path.join(dirLib, fn)
-            #environLocal.printDebug([fp])
+            # environLocal.printDebug([fp])
 
             mdw.addFile(fp)
 
@@ -1942,7 +1941,7 @@ class Test(unittest.TestCase):
 #
 #         self.assertEqual(len(s.parts[-1].flat.notes), 287)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [MuseDataWork]
 
@@ -1953,5 +1952,5 @@ if __name__ == "__main__":
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

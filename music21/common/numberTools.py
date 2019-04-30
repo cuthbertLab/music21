@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         common/numberTools.py
 # Purpose:      Utilities for working with numbers or number-like objects
 #
@@ -8,9 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
-from __future__ import division, print_function
-
+# ------------------------------------------------------------------------------
 import math
 import random
 import unittest
@@ -88,7 +86,7 @@ def cleanupFloat(floatNum, maxDenominator=defaults.limitOffsetDenominator):
         f = Fraction(floatNum).limit_denominator(maxDenominator)
         return float(f)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Number methods...
 
 
@@ -110,6 +108,8 @@ def numToIntOrFloat(value):
     1.5
     >>> common.numToIntOrFloat(1.0000000005)
     1
+    >>> common.numToIntOrFloat(0.999999999)
+    1
 
     >>> sharp = pitch.Accidental('sharp')
     >>> common.numToIntOrFloat(sharp.alter)
@@ -130,10 +130,10 @@ def numToIntOrFloat(value):
     :rtype: float
     '''
     try:
-        intVal = int(value)
-    except ValueError:
+        intVal = round(value)
+    except (ValueError, TypeError):
         value = float(value)
-        intVal = int(value)
+        intVal = round(value)
 
     try:
         value + 0.0
@@ -590,7 +590,7 @@ def nearestMultiple(n, unit):
     #print(['mult, halfUnit, matchLow, matchHigh', mult, halfUnit, matchLow, matchHigh])
 
     if matchLow >= n >= matchHigh:
-        raise Exception('cannot place n between multiples: %s, %s', matchLow, matchHigh)
+        raise Exception('cannot place n between multiples: %s, %s' % (matchLow, matchHigh))
 
     if n >= matchLow and n <= (matchLow + halfUnit):
         return matchLow, round(n - matchLow, 7), round(n - matchLow, 7)
@@ -1155,7 +1155,7 @@ class Test(unittest.TestCase):
             for i in range(1000):
                 # equal chance of -1, 1
                 x += weightedSelection([-1, 1], [1, 1])
-            #environLocal.printDebug(['weightedSelection([-1, 1], [1, 1])', x])
+            # environLocal.printDebug(['weightedSelection([-1, 1], [1, 1])', x])
             self.assertTrue(-250 < x < 250)
 
 
@@ -1165,7 +1165,7 @@ class Test(unittest.TestCase):
             for i in range(1000):
                 # 10000 more chance of 0 than 1.
                 x += weightedSelection([0, 1], [10000, 1])
-            #environLocal.printDebug(['weightedSelection([0, 1], [10000, 1])', x])
+            # environLocal.printDebug(['weightedSelection([0, 1], [10000, 1])', x])
             self.assertTrue(0 <= x < 20)
 
         for j in range(10):
@@ -1173,7 +1173,7 @@ class Test(unittest.TestCase):
             for i in range(1000):
                 # 10,000 times more likely 1 than 0.
                 x += weightedSelection([0, 1], [1, 10000])
-            #environLocal.printDebug(['weightedSelection([0, 1], [1, 10000])', x])
+            # environLocal.printDebug(['weightedSelection([0, 1], [1, 10000])', x])
             self.assertTrue(900 <= x <= 1000)
 
 
@@ -1182,12 +1182,12 @@ class Test(unittest.TestCase):
             for i in range(1000):
                 # no chance of anything but 0.
                 x += weightedSelection([0, 1], [1, 0])
-            #environLocal.printDebug(['weightedSelection([0, 1], [1, 0])', x])
+            # environLocal.printDebug(['weightedSelection([0, 1], [1, 0])', x])
             self.assertEqual(x, 0)
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [fromRoman, toRoman]
 
@@ -1196,5 +1196,5 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

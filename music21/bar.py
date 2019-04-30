@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         bar.py
 # Purpose:      music21 classes for representing bars, repeats, and related
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Object models of barlines, including repeat barlines.
 '''
@@ -25,13 +25,13 @@ from music21 import environment
 _MOD = 'bar'
 environLocal = environment.Environment(_MOD)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class BarException(exceptions21.Music21Exception):
     pass
 
 
-# store alternative names for styles; use this dictionary for translation
+# store alternative names for types; use this dictionary for translation
 # reference
 barStyleList = ['regular', 'dotted', 'dashed', 'heavy', 'double', 'final',
                 'heavy-light', 'heavy-heavy', 'tick', 'short', 'none']
@@ -82,7 +82,7 @@ def standardizeBarStyle(value):
         raise BarException('cannot process style: %s' % value)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Barline(base.Music21Object):
     '''A representation of a barline.
     Barlines are conventionally assigned to Measure objects
@@ -91,79 +91,118 @@ class Barline(base.Music21Object):
 
     >>> bl = bar.Barline('double')
     >>> bl
-    <music21.bar.Barline style=double>
+    <music21.bar.Barline type=double>
 
-    The style can also just be set via a keyword of "style".  Or if no style is specified,
+    The type can also just be set via a keyword of "type".  Or if no type is specified,
     a regular barline is returned.  Location can also be explicitly stored, but it's not
     needed except for musicxml translation:
 
-    >>> bl2 = bar.Barline(style='dashed')
+    >>> bl2 = bar.Barline(type='dashed')
     >>> bl2
-    <music21.bar.Barline style=dashed>
+    <music21.bar.Barline type=dashed>
     >>> bl3 = bar.Barline()
     >>> bl3
-    <music21.bar.Barline style=regular>
-    >>> bl4 = bar.Barline(style='final', location='right')
+    <music21.bar.Barline type=regular>
+    >>> bl4 = bar.Barline(type='final', location='right')
     >>> bl4
-    <music21.bar.Barline style=final>
-    >>> bl4.style
+    <music21.bar.Barline type=final>
+    >>> bl4.type
     'final'
 
-    Note that the barline style 'ticked' only is displayed correctly in Finale and Finale Notepad.
+    Note that the barline type 'ticked' only is displayed correctly in Finale and Finale Notepad.
+
+    N.B. for backwards compatibility reasons, currently
+    Bar objects do not use the style.Style class since
+    the phrase "style" was already used.
     '''
     validStyles = list(barStyleDict.keys())
 
-    _style = None
-    _pause = None  # can be music21.expressions.Fermata object
-
     classSortOrder = -5
 
-    def __init__(self, style=None, location=None):
+    def __init__(self, type=None, location=None, *, style=None):  # @ReservedAssignment
         super().__init__()
 
+        self._type = None  # same as style...
         # this will raise an exception on error from property
-        self.style = style
+        self.type = type
+        if style is not None:  # former name for type.
+            self.type = style
+
+        # pause can be music21.expressions.Fermata object
+        self.pause = None
 
         # location is primarily stored in the stream as leftBarline or rightBarline
         # but can also be stored here.
         self.location = location # musicxml values: can be left, right, middle, None
 
     def __repr__(self):
-        return '<music21.bar.Barline style=%s>' % (self.style)
+        return '<music21.bar.Barline type=%s>' % (self.type)
 
     def _getStyle(self):
-        return self._style
+        return self.type
 
     def _setStyle(self, value):
         # will raise exception on error
-        self._style = standardizeBarStyle(value)
+        self.type = value
 
     style = property(_getStyle, _setStyle,
-        doc = '''Get and set the Barline style property.
+        doc = '''
+        DEPRECATED: use type instead.
+        ''')
 
+    def _getType(self):
+        '''
+        synonym for style...
+        '''
+        return self._type
+
+    def _setType(self, value):
+        self._type = standardizeBarStyle(value)
+
+    type = property(_getType, _setType,
+        doc='''
+        Get and set the Barline type property.
 
         >>> b = bar.Barline()
-        >>> b.style = 'tick'
-        >>> b.style
+        >>> b.type = 'tick'
+        >>> b.type
         'tick'
 
-        Synonyms are given for some styles:
+        Synonyms are given for some types, based on
+        musicxml styles:
 
-        >>> b.style = 'light-light'
-        >>> b.style
+        >>> b.type = 'light-light'
+        >>> b.type
         'double'
         ''')
 
-    @property
     def musicXMLBarStyle(self):
-        return styleToMusicXMLBarStyle(self.style)
+        '''
+        returns the musicxml style for the bar.  most are the same as
+        `.type` but "double" and "final" are different. 
+        
+        >>> b = bar.Barline('tick')
+        >>> b.musicXMLBarStyle()
+        'tick'
+        
+        >>> b.type = 'double'
+        >>> b.musicXMLBarStyle()
+        'light-light'
+        
+        >>> b.type = 'final'
+        >>> b.musicXMLBarStyle()
+        'light-heavy'
+
+        Changed in v.5.7 -- was a property before.
+        '''
+        return styleToMusicXMLBarStyle(self.type)
 
 
 
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # note that musicxml permits the barline to have attributes for segno and coda
 #		<xs:attribute name="segno" type="xs:token"/>
@@ -212,32 +251,30 @@ class Repeat(repeat.RepeatMark, Barline):
     >>> q = p.expandRepeats()
     >>> q.show('text')
     {0.0} <music21.stream.Measure 0 offset=0.0>
-        {0.0} <music21.bar.Barline style=double>
+        {0.0} <music21.bar.Barline type=double>
         {0.0} <music21.meter.TimeSignature 4/4>
         {0.0} <music21.note.Note D-->
         {1.0} <music21.note.Note D-->
         {2.0} <music21.note.Note D-->
         {3.0} <music21.note.Note D-->
-        {4.0} <music21.bar.Barline style=double>
-    {4.0} <music21.stream.Measure 0 offset=4.0>
-        {0.0} <music21.bar.Barline style=double>
+        {4.0} <music21.bar.Barline type=double>
+    {4.0} <music21.stream.Measure 0a offset=4.0>
+        {0.0} <music21.bar.Barline type=double>
         {0.0} <music21.meter.TimeSignature 4/4>
         {0.0} <music21.note.Note D-->
         {1.0} <music21.note.Note D-->
         {2.0} <music21.note.Note D-->
         {3.0} <music21.note.Note D-->
-        {4.0} <music21.bar.Barline style=double>
+        {4.0} <music21.bar.Barline type=double>
     '''
-    _repeatDots = None # not sure what this is for; inherited from old modles
-
-
+    # _repeatDots = None # not sure what this is for; inherited from old modles
     def __init__(self, direction='start', times=None):
         repeat.RepeatMark.__init__(self)
         if direction == 'start':
-            style = 'heavy-light'
+            barType = 'heavy-light'
         else:
-            style = 'final'
-        Barline.__init__(self, style=style)
+            barType = 'final'
+        Barline.__init__(self, type=barType)
 
         self._direction = None # either start or end
         self._times = None  # if an end, how many repeats
@@ -256,9 +293,9 @@ class Repeat(repeat.RepeatMark, Barline):
         if value.lower() in ['start', 'end']:
             self._direction = value.lower()
             if self._direction == 'end':
-                self.style = 'final'
+                self.type = 'final'
             elif self._direction == 'start':
-                self.style = 'heavy-light'
+                self.type = 'heavy-light'
         else:
             raise BarException('cannot set repeat direction to: %s' % value)
 
@@ -268,7 +305,7 @@ class Repeat(repeat.RepeatMark, Barline):
     direction = property(_getDirection, _setDirection,
         doc = '''Get or set the direction of this Repeat barline. Can be start or end.
 
-        TODO: show how changing direction changes style.
+        TODO: show how changing direction changes type.
         ''')
 
     def _setTimes(self, value):
@@ -330,7 +367,7 @@ class Repeat(repeat.RepeatMark, Barline):
         return expressions.TextExpression(value)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -365,6 +402,5 @@ if __name__ == '__main__':
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
-

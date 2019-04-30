@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         graph/primitives.py
 # Purpose:      Classes for graphing in matplotlib and/or other graphing tools.
 #
@@ -9,15 +9,13 @@
 #
 # Copyright:    Copyright © 2009-2012, 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Object definitions for graphing and plotting :class:`~music21.stream.Stream` objects.
 
 The :class:`~music21.graph.primitives.Graph` object subclasses primitive, abstract fundamental
 graphing archetypes using the matplotlib library.
 '''
-from __future__ import division, print_function, absolute_import
-
 import math
 import random
 import unittest
@@ -36,7 +34,7 @@ _MOD = 'graph.primitives'
 environLocal = environment.Environment(_MOD)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Graph:
     '''
     A music21.graph.primitives.Graph is an object that represents a visual graph or
@@ -160,10 +158,6 @@ class Graph:
         Matplotlib Figure objects need to be explicitly closed when no longer used...
         '''
         if hasattr(self, 'figure') and self.figure is not None and self.doneAction is None:
-#             keep_observers = False
-#             if self.doneAction == 'show':
-#                 keep_observers = True
-#             self.figure.clf(keep_observers=keep_observers)
             etm = getExtendedModules()
             etm.plt.close(self.figure)
 
@@ -247,7 +241,7 @@ class Graph:
         for value, label in pairs:
             positions.append(value)
             labels.append(label)
-        #environLocal.printDebug(['got labels', labels])
+        # environLocal.printDebug(['got labels', labels])
         self.axis[axisKey]['ticks'] = positions, labels
 
     def setIntegerTicksFromData(self, unsortedData, axisKey='y', dataSteps=8):
@@ -500,7 +494,7 @@ class Graph:
         '''
         pass
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def callDoneAction(self, fp=None):
         '''
         Implement the desired doneAction, after data processing
@@ -600,7 +594,7 @@ class GraphNetworxGraph(Graph):
             # shift labels off center of nodes
             posNodeLabels[nId] = (nData['pos'][0] + 0.125, nData['pos'][1])
 
-        #environLocal.printDebug(['get position', posNodes])
+        # environLocal.printDebug(['get position', posNodes])
         #posNodes = networkx.spring_layout(self.networkxGraph, weighted=True)
         # draw nodes
         networkx.draw_networkx_nodes(self.networkxGraph, posNodes,
@@ -819,7 +813,7 @@ class GraphColorGridLegend(Graph):
         >>> subplot
         <matplotlib...AxesSubplot object at 0x111e13828>
         '''
-        #environLocal.printDebug(['rowLabel', rowLabel, i])
+        # environLocal.printDebug(['rowLabel', rowLabel, i])
 
         positions = []
         heights = []
@@ -832,7 +826,7 @@ class GraphColorGridLegend(Graph):
 
         # add a new subplot for each row
         posTriple = (len(self.data), 1, rowIndex + 1)
-        #environLocal.printDebug(['posTriple', posTriple])
+        # environLocal.printDebug(['posTriple', posTriple])
         ax = figure.add_subplot(*posTriple)
 
         # ax is an Axes object
@@ -965,7 +959,7 @@ class GraphHorizontalBar(Graph):
         xMin = min(xPoints)
         xMax = max(xPoints)
         xRange = xMax - xMin
-        #environLocal.printDebug(['got xMin, xMax for points', xMin, xMax, ])
+        # environLocal.printDebug(['got xMin, xMax for points', xMin, xMax, ])
 
         self.setAxisRange('y', (0, len(keys) * self.barSpace))
         self.setAxisRange('x', (xMin, xMax))
@@ -1096,7 +1090,7 @@ class GraphHorizontalBarWeighted(Graph):
         xMin = min(xPoints)
         xMax = max(xPoints)
         xRange = xMax - xMin
-        #environLocal.printDebug(['got xMin, xMax for points', xMin, xMax, ])
+        # environLocal.printDebug(['got xMin, xMax for points', xMin, xMax, ])
 
         # NOTE: these pad values determine extra space inside the graph that
         # is not filled with data, a sort of inner margin
@@ -1196,7 +1190,7 @@ class GraphScatterWeighted(Graph):
             yDistort = yRange / xRange
         elif yRange > xRange:
             xDistort = xRange / yRange
-        #environLocal.printDebug(['xDistort, yDistort', xDistort, yDistort])
+        # environLocal.printDebug(['xDistort, yDistort', xDistort, yDistort])
 
         zNorm = []
         for z in zList:
@@ -1529,8 +1523,8 @@ class Graph3DBars(Graph):
                 x, z = yDict[key][i]
                 zVals.append(z)
                 xVals.append(x)
-        #environLocal.printDebug(['yVals', yVals])
-        #environLocal.printDebug(['xVals', xVals])
+        # environLocal.printDebug(['yVals', yVals])
+        # environLocal.printDebug(['xVals', xVals])
 
         if self.axis['x']['range'] is None:
             self.axis['x']['range'] = min(xVals), max(xVals)
@@ -1595,7 +1589,7 @@ class Test(unittest.TestCase):
                 unused_b = copy.deepcopy(obj)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
@@ -1822,5 +1816,5 @@ if __name__ == "__main__":
     import music21
     music21.mainTest(Test) #, runTest='testPlot3DPitchSpaceQuarterLengthCount')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

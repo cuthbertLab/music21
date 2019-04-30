@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Name:         tree/verticality.py
 # Purpose:      Object for dealing with vertical simultaneities in a
 #               fast way w/o Chord's overhead
@@ -10,11 +10,11 @@
 # Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Object for dealing with vertical simultaneities in a fast way w/o Chord's overhead.
 '''
-import collections
+import collections.abc
 import copy
 import unittest
 
@@ -689,7 +689,7 @@ class Verticality:
         seenPitches = set()
         notesToAdd = {}
                 
-        startStopSet = set(['start', 'stop'])
+        startStopSet = {'start', 'stop'}
         pitchBust = 0 # used if removeRedundantPitches is False.
 
 
@@ -720,7 +720,7 @@ class Verticality:
                                 offsetDifference, endTimeDifference, ts, self)            
             
             
-            if nNew.tie is not None and set([nNew.tie.type, addTie]) == startStopSet: 
+            if nNew.tie is not None and {nNew.tie.type, addTie} == startStopSet:
                 nNew.tie.type = 'continue'  
             elif nNew.tie is not None and nNew.tie.type == 'continue':
                 nNew.tie.placement = None
@@ -781,7 +781,7 @@ class Verticality:
                 return # do nothing
             elif oldNoteTie is None:
                 notesToAdd[pitchKey] = possibleNewNote # a better note to add
-            elif set([oldNoteTie.type, possibleNewNote.tie.type]) == startStopSet:
+            elif {oldNoteTie.type, possibleNewNote.tie.type} == startStopSet:
                 notesToAdd[pitchKey].tie.type = 'continue'
             elif possibleNewNote.tie.type == 'continue':
                 notesToAdd[pitchKey] = possibleNewNote # a better note to add
@@ -1039,10 +1039,10 @@ class Verticality:
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
-class VerticalitySequence(collections.Sequence):
+class VerticalitySequence(collections.abc.Sequence):
     r'''
     A segment of verticalities.
     '''
@@ -1090,20 +1090,20 @@ class VerticalitySequence(collections.Sequence):
         return unwrapped
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 _DOC_ORDER = (Verticality, VerticalitySequence)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 if __name__ == "__main__":

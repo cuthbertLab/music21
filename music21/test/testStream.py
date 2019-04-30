@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         testStream.py
 # Purpose:      tests for stream.py
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import random
 import unittest
 import copy
@@ -42,7 +42,7 @@ _MOD = 'testStream'
 environLocal = environment.Environment(_MOD)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase): # pragma: no cover
     def runTest(self):
         pass
@@ -284,7 +284,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         bMeasure.show()
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1338,16 +1338,15 @@ class Test(unittest.TestCase):
     def testMeasureOffsetMapPostTie(self):
         from music21 import corpus, stream
 
-        a = corpus.parse('bach/bwv4.8.xml')
+        a = corpus.parse('bach/bwv4.8')
         # alto line syncopated/tied notes across bars
         #a.show()
         alto = a.parts[1]
-        countedAltoNotes = 73
-
+        countedAltoNotes = 52
         self.assertEqual(len(alto.flat.notesAndRests), countedAltoNotes)
 
-        correctMeasureOffsetMap = [0.0, 1.0, 5.0, 9.0, 13.0, 17.0, 21.0, 25.0,
-                                   29.0, 33.0, 37.0, 41.0, 45.0, 49.0, 53.0, 57.0, 61.0]
+        correctMeasureOffsetMap = [0.0, 1.0, 5.0, 9.0, 13.0, 16.0, 20.0, 24.0,
+                                   28.0, 31.0, 32.0, 36.0, 40.0, 44.0]
         # offset map for measures looking at the part's Measures
         # note that pickup bar is taken into account
         post = alto.measureOffsetMap()
@@ -1362,7 +1361,7 @@ class Test(unittest.TestCase):
         altoPostTie = a.parts[1].stripTies()
         # we can get the length of this directly b/c we just of a stream of
         # notes, no Measures
-        self.assertEqual(len(altoPostTie.notesAndRests), countedAltoNotes - 4)
+        self.assertEqual(len(altoPostTie.notesAndRests), countedAltoNotes - 2)
 
         # we can still get measure numbers:
         mNo = altoPostTie.notesAndRests[3].getContextByClass(stream.Measure).number
@@ -1911,16 +1910,16 @@ class Test(unittest.TestCase):
         barred1 = s.makeMeasures()
         self.assertEqual(
             str(barred1.getElementsByClass('Measure')[-1].rightBarline),
-            '<music21.bar.Barline style=final>')
+            '<music21.bar.Barline type=final>')
         #barred1.show()
 
         barred2 = s.makeMeasures(innerBarline='dashed', finalBarline='double')
         match = [str(m.rightBarline) for m in
             barred2.getElementsByClass('Measure')]
-        self.assertEqual(match, ['<music21.bar.Barline style=dashed>',
-                                 '<music21.bar.Barline style=dashed>',
-                                 '<music21.bar.Barline style=dashed>',
-                                 '<music21.bar.Barline style=double>'])
+        self.assertEqual(match, ['<music21.bar.Barline type=dashed>',
+                                 '<music21.bar.Barline type=dashed>',
+                                 '<music21.bar.Barline type=dashed>',
+                                 '<music21.bar.Barline type=double>'])
         #barred2.show()
 
         # try using bar objects
@@ -1930,10 +1929,10 @@ class Test(unittest.TestCase):
         #barred3.show()
         match = [str(m.rightBarline) for m in
             barred3.getElementsByClass('Measure')]
-        self.assertEqual(match, ['<music21.bar.Barline style=none>',
-                                 '<music21.bar.Barline style=none>',
-                                 '<music21.bar.Barline style=none>',
-                                 '<music21.bar.Barline style=short>'])
+        self.assertEqual(match, ['<music21.bar.Barline type=none>',
+                                 '<music21.bar.Barline type=none>',
+                                 '<music21.bar.Barline type=none>',
+                                 '<music21.bar.Barline type=short>'])
 
         # setting to None will not set a barline object at all
         barred4 = s.makeMeasures(innerBarline=None, finalBarline=None)
@@ -2359,7 +2358,7 @@ class Test(unittest.TestCase):
         match = [p.accidental.displayStatus for p in p1.pitches]
         self.assertEqual(match, [True, False])
         m = p1.measure(1)
-        self.assertEqual(str(m.rightBarline), '<music21.bar.Barline style=final>')
+        self.assertEqual(str(m.rightBarline), '<music21.bar.Barline type=final>')
 
     def testMakeAccidentalsWithKeysInMeasures(self):
         scale1 = ['c4', 'd4', 'e4', 'f4', 'g4', 'a4', 'b4', 'c5']
@@ -3217,14 +3216,14 @@ class Test(unittest.TestCase):
         # environLocal.printDebug(['downward:'])
 
         match = []
-        for x in s1.recurse(streamsOnly=True):
+        for x in s1.recurse(streamsOnly=True, includeSelf=True):
             match.append(x.id)
             # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         self.assertEqual(match, ['1a', '2a', '3a', '3b', '3c', '2b', '3d', '3e', '2c', '3f'])
 
         # environLocal.printDebug(['downward with elements:'])
         match = []
-        for x in s1.recurse(streamsOnly=False):
+        for x in s1.recurse(streamsOnly=False, includeSelf=True):
             match.append(x.id)
             # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         self.assertEqual(match, ['1a', 'n(1a)', '2a', '3a', '3b', 'n3(3b)', 'n4(3b)', '3c',
@@ -3233,57 +3232,57 @@ class Test(unittest.TestCase):
 
         # environLocal.printDebug(['downward from non-topmost element:'])
         match = []
-        for x in s2.recurse(streamsOnly=False):
+        for x in s2.recurse(streamsOnly=False, includeSelf=True):
             match.append(x.id)
             # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         # test downward
         self.assertEqual(match, ['2a', '3a', '3b', 'n3(3b)', 'n4(3b)', '3c'])
 
         # environLocal.printDebug(['upward, with skipDuplicates:'])
-        match = []
-        # must provide empty list for memo
-        for x in s7._yieldReverseUpwardsSearch([], streamsOnly=True, skipDuplicates=True):
-            match.append(x.id)
-            # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
-        self.assertEqual(match, ['3c', '2a', '1a', '2b', '2c', '3a', '3b'] )
+#         match = []
+#         # must provide empty list for memo
+#         for x in s7._yieldReverseUpwardsSearch([], streamsOnly=True, skipDuplicates=True):
+#             match.append(x.id)
+#             # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
+#         self.assertEqual(match, ['3c', '2a', '1a', '2b', '2c', '3a', '3b'] )
 
 
         # environLocal.printDebug(['upward from a single node, with skipDuplicates'])
-        match = []
-        for x in s10._yieldReverseUpwardsSearch([], streamsOnly=True):
-            match.append(x.id)
-            # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
-
-        self.assertEqual(match, ['3f', '2c', '1a', '2a', '2b'] )
+#         match = []
+#         for x in s10._yieldReverseUpwardsSearch([], streamsOnly=True):
+#             match.append(x.id)
+#             # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
+# 
+#         self.assertEqual(match, ['3f', '2c', '1a', '2a', '2b'] )
 
 
         # environLocal.printDebug(['upward with skipDuplicates=False:'])
-        match = []
-        for x in s10._yieldReverseUpwardsSearch([], streamsOnly=True, skipDuplicates=False):
-            match.append(x.id)
-            # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
-        self.assertEqual(match, ['3f', '2c', '1a', '2a', '1a', '2b', '1a'] )
+#         match = []
+#         for x in s10._yieldReverseUpwardsSearch([], streamsOnly=True, skipDuplicates=False):
+#             match.append(x.id)
+#             # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
+#         self.assertEqual(match, ['3f', '2c', '1a', '2a', '1a', '2b', '1a'] )
 
 
         # environLocal.printDebug(['upward, with skipDuplicates, streamsOnly=False:'])
-        match = []
-        # must provide empty list for memo
-        for x in s8._yieldReverseUpwardsSearch([], streamsOnly=False,
-            skipDuplicates=True):
-            match.append(x.id)
-            environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
-        self.assertEqual(match, ['3d', 'n2(2b)', '2b', 'n(1a)', '1a', '2a', '2c', '3e'] )
+#         match = []
+#         # must provide empty list for memo
+#         for x in s8._yieldReverseUpwardsSearch([], streamsOnly=False,
+#             skipDuplicates=True):
+#             match.append(x.id)
+#             environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
+#         self.assertEqual(match, ['3d', 'n2(2b)', '2b', 'n(1a)', '1a', '2a', '2c', '3e'] )
 
 
         # environLocal.printDebug(['upward, with skipDuplicates, streamsOnly=False:'])
-        match = []
-        # must provide empty list for memo
-        for x in s4._yieldReverseUpwardsSearch([], streamsOnly=False,
-            skipDuplicates=True):
-            match.append(x.id)
-            # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
-        # notice that this does not get the nonConatainers for 2b
-        self.assertEqual(match, ['2c', 'n(1a)', '1a', '2a', '2b'] )
+#         match = []
+#         # must provide empty list for memo
+#         for x in s4._yieldReverseUpwardsSearch([], streamsOnly=False,
+#             skipDuplicates=True):
+#             match.append(x.id)
+#             # environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
+#         # notice that this does not get the nonConatainers for 2b
+#         self.assertEqual(match, ['2c', 'n(1a)', '1a', '2a', '2b'] )
 
 
 
@@ -3914,7 +3913,7 @@ class Test(unittest.TestCase):
         def collectAccidentalDisplayStatus(s):
             post = []
             for e in s.flat.notesAndRests:
-                if e.pitch.accidental != None:
+                if e.pitch.accidental is not None:
                     post.append((e.pitch.name, e.pitch.accidental.displayStatus))
                 else: # mark as not having an accidental
                     post.append('x')
@@ -4436,6 +4435,34 @@ class Test(unittest.TestCase):
         self.assertEqual([e.offset for e in s], [0.0, 30.0])
         # index is now 1
         self.assertEqual(s.index(b1), 1)
+
+    def testStoreAtEndFailures(self):
+        from music21 import stream
+        
+        s = Stream()
+        with self.assertRaises(stream.StreamException):
+            s.storeAtEnd(6)
+        
+        n = note.Note()
+        n.duration.quarterLength = 2.0
+        with self.assertRaises(stream.StreamException):
+            s.storeAtEnd(n)
+        
+        # also test that lists work...
+        b = bar.Barline()
+        s.storeAtEnd([b])
+
+        # also test that element may not be in stream twice.
+        with self.assertRaises(stream.StreamException):
+            s.storeAtEnd([b])
+        
+        
+        # test that element may not be in stream elements and at end.
+        b2 = bar.Barline()
+        s.insert(0, b2)
+        with self.assertRaises(stream.StreamException):
+            s.storeAtEnd(b2)
+        
 
 
     def testElementsHighestTimeB(self):
@@ -5106,36 +5133,37 @@ class Test(unittest.TestCase):
 
 
     def testActiveSiteMangling(self):
-        s1 = Stream()
-        s2 = Stream()
-        s2.append(s1)
+        outer = Stream()
+        inner = Stream()
+        outer.append(inner)
 
-        self.assertEqual(s1.activeSite, s2)
-        junk = s1.semiFlat
-        self.assertEqual(s1.activeSite, s2)
-        junk = s1.flat  # the order of these two calls ensures that _getFlatFromSemiflat is called
-        self.assertEqual(s1.activeSite, s2)
+        self.assertEqual(inner.activeSite, outer)
+        junk = inner.semiFlat
+        self.assertEqual(inner.activeSite, outer)
+        junk = inner.flat  
+        # the order of these two calls ensures that _getFlatFromSemiflat is called
+        self.assertEqual(inner.activeSite, outer)
 
         # this works fine
-        junk = s2.flat
-        self.assertEqual(s1.activeSite, s2)
+        junk = outer.flat
+        self.assertEqual(inner.activeSite, outer)
 
         # this was the key problem: getting the semiFlat of the activeSite
         # looses the activeSite of the sub-stream; this is fixed by the inserting
         # of the sub-Stream with setActiveSite False
-        junk = s2.semiFlat
-        self.assertEqual(s1.activeSite, s2)
+        junk = outer.semiFlat
+        self.assertEqual(inner.activeSite, outer)
 
         # these test prove that getting a semiFlat stream does not change the
         # activeSite
-        junk = s1.sites.getObjByClass(meter.TimeSignature)
-        self.assertEqual(s1.activeSite, s2)
+        junk = inner.sites.getObjByClass(meter.TimeSignature)
+        self.assertEqual(inner.activeSite, outer)
 
-        junk = s1.sites.getObjByClass(clef.Clef)
-        self.assertEqual(s1.activeSite, s2)
+        junk = inner.sites.getObjByClass(clef.Clef)
+        self.assertEqual(inner.activeSite, outer)
 
-        junk = s1.getContextByClass('Clef')
-        self.assertEqual(s1.activeSite, s2)
+        junk = inner.getContextByClass('Clef')
+        self.assertEqual(inner.activeSite, outer)
 
 
 
@@ -5915,7 +5943,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
         # default
-        rElements = list(s.recurse()) # NOTE: list(s.recurse())
+        rElements = list(s.recurse(includeSelf=True)) # NOTE: list(s.recurse())
             # removes self, while [x for x in s.recurse()] does not.
         self.assertTrue(s in rElements)
         self.assertEqual(len(rElements), 240)
@@ -6348,16 +6376,16 @@ class Test(unittest.TestCase):
 
         s.finalBarline = 'dotted'
         self.assertEqual(str(s.getElementsByClass('Measure')[-1].rightBarline),
-                         '<music21.bar.Barline style=dotted>')
+                         '<music21.bar.Barline type=dotted>')
         self.assertEqual(str(s.finalBarline),
-                         '<music21.bar.Barline style=dotted>')
+                         '<music21.bar.Barline type=dotted>')
 
         s.finalBarline = 'final'
         self.assertEqual(str(s.getElementsByClass('Measure')[-1].rightBarline),
-                         '<music21.bar.Barline style=final>')
+                         '<music21.bar.Barline type=final>')
 
         self.assertEqual(str(s.finalBarline),
-                         '<music21.bar.Barline style=final>')
+                         '<music21.bar.Barline type=final>')
         #s.show()
 
 
@@ -6365,21 +6393,21 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
         sop = s.parts[0]
-        self.assertEqual(str(sop.finalBarline), '<music21.bar.Barline style=final>')
+        self.assertEqual(str(sop.finalBarline), '<music21.bar.Barline type=final>')
         sop.finalBarline = 'double'
-        self.assertEqual(str(sop.finalBarline), '<music21.bar.Barline style=double>')
+        self.assertEqual(str(sop.finalBarline), '<music21.bar.Barline type=double>')
 
         # process entire Score
         s.finalBarline = 'tick'
         self.assertEqual(str(s.finalBarline),
-                         '[<music21.bar.Barline style=tick>, <music21.bar.Barline style=tick>, '
-                         + '<music21.bar.Barline style=tick>, <music21.bar.Barline style=tick>]')
+                         '[<music21.bar.Barline type=tick>, <music21.bar.Barline type=tick>, '
+                         + '<music21.bar.Barline type=tick>, <music21.bar.Barline type=tick>]')
 
         # can set a heterogenous final barlines
         s.finalBarline = ['final', 'none']
         self.assertEqual(str(s.finalBarline),
-                         '[<music21.bar.Barline style=final>, <music21.bar.Barline style=none>, '
-                         + '<music21.bar.Barline style=final>, <music21.bar.Barline style=none>]')
+                         '[<music21.bar.Barline type=final>, <music21.bar.Barline type=none>, '
+                         + '<music21.bar.Barline type=final>, <music21.bar.Barline type=none>]')
 
 
 
@@ -7822,12 +7850,12 @@ class Test(unittest.TestCase):
 #         cLast = m10.notes[-1]
 #         self.assertEqual(cLast.expressions, [])
         
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    music21.mainTest(Test, 'verbose', runTest='testSchoenbergChordifyFermatas')
+    music21.mainTest(Test, 'verbose',) # runTest='testChordifyTagPartB')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 
 

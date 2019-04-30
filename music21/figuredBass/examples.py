@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         examples.py
 # Purpose:      music21 class which allows running of test cases
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2010-2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Each of the example methods in this module provides a figured bass line as a
 :class:`~music21.figuredBass.realizer.FiguredBassLine` instance.
@@ -26,7 +26,7 @@ import unittest
 from music21.figuredBass import realizer
 from music21.figuredBass import rules
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def exampleA():
     '''
     This example was a homework assignment for 21M.302: Harmony & Counterpoint II
@@ -487,7 +487,7 @@ _DOC_ORDER = [exampleA, exampleB, exampleC, exampleD, V43ResolutionExample,
               augmentedSixthResolutionExample, italianA6ResolutionExample, twelveBarBlues,
               generateBoogieVamp, generateTripletBlues]
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -497,5 +497,5 @@ if __name__ == "__main__":
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

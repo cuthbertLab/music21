@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         timespans/fromStream.py
 # Purpose:      Tools for creating timespans from Streams
 #
@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Tools for creating timespans (fast, manipulatable objects) from Streams
 '''
@@ -163,9 +163,9 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, group
     >>> for x in etFlat.iterNodes():
     ...     x
     <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *0* r:2)
-        Payload:<music21.instrument.Instrument PartA: : >>
+        Payload:<music21.instrument.Instrument 'PartA: : '>>
     <ElementNode: Start:0.0 <0.-25...> Indices:(l:1 *1* r:2)
-        Payload:<music21.instrument.Instrument PartB: : >>
+        Payload:<music21.instrument.Instrument 'PartB: : '>>
     <ElementNode: Start:0.0 <0.0...> Indices:(l:0 *2* r:4) Payload:<music21.clef.BassClef>>
     <ElementNode: Start:0.0 <0.0...> Indices:(l:3 *3* r:4) Payload:<music21.clef.BassClef>>
     ...
@@ -175,9 +175,9 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, group
     ...
     <ElementNode: Start:7.0 <0.20...> Indices:(l:15 *17* r:20) Payload:<music21.note.Note C>>
     <ElementNode: Start:End <0.-5...> Indices:(l:18 *18* r:20)
-        Payload:<music21.bar.Barline style=final>>
+        Payload:<music21.bar.Barline type=final>>
     <ElementNode: Start:End <0.-5...> Indices:(l:19 *19* r:20)
-        Payload:<music21.bar.Barline style=final>>
+        Payload:<music21.bar.Barline type=final>>
 
     >>> etFlat.getPositionAfter(0.5)
     SortTuple(atEnd=0, offset=1.0, priority=0, classSortOrder=20, isNotGrace=1, insertIndex=...)
@@ -330,7 +330,7 @@ def asTimespans(inputStream, flatten, classList):
     return listOfTimespanTrees[0]
 
 
-#---------------------
+# --------------------
 class Test(unittest.TestCase):
 
     def testFastPopulate(self):
@@ -366,7 +366,7 @@ class Test(unittest.TestCase):
 #         tl0 = treeList[0]
 
 
-#---------------------
+# --------------------
 
 if __name__ == '__main__':
     import music21

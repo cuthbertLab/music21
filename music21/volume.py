@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         volume.py
 # Purpose:      Objects for representing volume, amplitude, and related
 #               parameters
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2012, 2015, 2017 
+# Copyright:    Copyright © 2011-2012, 2015, 2017
 #               Michael Scott Cuthbert and the music21 Project
 # License:      BSD or LGPL, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module defines the object model of Volume, covering all representation of
 amplitude, volume, velocity, and related parameters.
@@ -26,14 +26,14 @@ _MOD = 'volume'
 environLocal = environment.Environment(_MOD)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class VolumeException(exceptions21.Music21Exception):
     pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class Volume(SlottedObjectMixin):
@@ -59,12 +59,12 @@ class Volume(SlottedObjectMixin):
     ### INITIALIZER ###
 
     def __init__(
-        self,
-        client=None,
-        velocity=None,
-        velocityScalar=None,
-        velocityIsRelative=True,
-        ):
+            self,
+            client=None,
+            velocity=None,
+            velocityScalar=None,
+            velocityIsRelative=True,
+            ):
         # store a reference to the client, as we use this to do context
         # will use property; if None will leave as None
         self._client = None
@@ -131,11 +131,11 @@ class Volume(SlottedObjectMixin):
             self._velocityScalar = other._velocityScalar
             self.velocityIsRelative = other.velocityIsRelative
 
-    def getRealizedStr(self, 
-                       useDynamicContext=True, 
+    def getRealizedStr(self,
+                       useDynamicContext=True,
                        useVelocity=True,
-                       useArticulations=True, 
-                       baseLevel=0.5, 
+                       useArticulations=True,
+                       baseLevel=0.5,
                        clip=True):
         '''Return the realized as rounded and formatted string value. Useful for testing.
 
@@ -145,20 +145,20 @@ class Volume(SlottedObjectMixin):
         '0.5'
         '''
         val = self.getRealized(useDynamicContext=useDynamicContext,
-                               useVelocity=useVelocity, 
+                               useVelocity=useVelocity,
                                useArticulations=useArticulations,
-                               baseLevel=baseLevel, 
+                               baseLevel=baseLevel,
                                clip=clip)
         return str(round(val, 2))
 
     def getRealized(
-        self,
-        useDynamicContext=True,
-        useVelocity=True,
-        useArticulations=True,
-        baseLevel=0.5,
-        clip=True,
-        ):
+            self,
+            useDynamicContext=True,
+            useVelocity=True,
+            useArticulations=True,
+            baseLevel=0.5,
+            clip=True,
+            ):
         '''
         Get a realized unit-interval scalar for this Volume. This scalar is to
         be applied to the dynamic range of whatever output is available,
@@ -218,7 +218,7 @@ class Volume(SlottedObjectMixin):
         0.1574803...
 
         '''
-        #velocityIsRelative might be best set at import. e.g., from MIDI,
+        # velocityIsRelative might be best set at import. e.g., from MIDI,
         # velocityIsRelative is False, but in other applications, it may not
         # be
         val = baseLevel
@@ -242,8 +242,8 @@ class Volume(SlottedObjectMixin):
         # only change the val from here if velocity is relative
         if self.velocityIsRelative:
             if useDynamicContext is not False:
-                if hasattr(useDynamicContext,
-                    'classes') and 'Dynamic' in useDynamicContext.classes:
+                if (hasattr(useDynamicContext, 'classes')
+                        and 'Dynamic' in useDynamicContext.classes):
                     dm = useDynamicContext # it is a dynamic
                 elif self.client is not None:
                     dm = self.getDynamicContext() # dm may be None
@@ -392,12 +392,12 @@ class Volume(SlottedObjectMixin):
         >>> n.volume.velocity = 127
         >>> n.volume.velocityScalar
         1.0
-        
+
         If velocity is not set, then this will return None
-        
+
         >>> n = note.Note()
         >>> n.volume.velocityScalar is None
-        True        
+        True
         '''
         v = self._velocityScalar
         if v is None:
@@ -419,7 +419,7 @@ class Volume(SlottedObjectMixin):
         self._velocityScalar = scalar
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # utility stream processing methods
 
 
@@ -476,7 +476,7 @@ def realizeVolume(srcStream,
                 dm = False # set to not search dynamic context
                 for k in range(lastRelevantKeyIndex, len(bKeys)):
                     start, end = bKeys[k]
-                    if eStart >= start and eStart < end:
+                    if end > eStart >= start:
                         # store so as to start in the same position
                         # for next element
                         lastRelevantKeyIndex = k
@@ -495,8 +495,7 @@ def realizeVolume(srcStream,
                 e.volume.velocityScalar = val
 
 
-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -737,12 +736,9 @@ class Test(unittest.TestCase):
         self.assertEqual(match, ['0.96', '0.71', '0.71', '0.81', '0.86', '0.71', '0.81',
                                  '0.71', '0.86', '0.81', '0.71', '0.71', '0.96', '0.71',
                                  '0.71', '0.81'])
-        #s.show()
-        #s.show('midi')
 
 
-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
@@ -753,5 +749,5 @@ if __name__ == '__main__':
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

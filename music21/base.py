@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         base.py
 # Purpose:      Music21 base classes and important utilities
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2016 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2006-2019 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 `music21.base` is what you get in `music21` if you type ``import music21``. It
 contains all the most low-level objects that also appear in the music21 module
@@ -28,7 +28,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'5.2.0'
+'5.6.1'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -44,16 +44,25 @@ import unittest
 
 from collections import namedtuple
 
+# for type annotation only
+import fractions
+from typing import (
+    Any,
+    Dict,
+    Optional,
+    Union,
+)
+
 from music21.test.testRunner import mainTest
 ## all other music21 modules below...
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # version string and tuple must be the same
 
 from music21._version import __version__, __version_info__
 VERSION = __version_info__
 VERSION_STR = __version__
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 __all__ = ['Music21Exception',
            'SitesException',
            'Music21ObjectException',
@@ -70,7 +79,7 @@ __all__ = ['Music21Exception',
 #       separately in "music21/__init__.py"
 ##      so make sure to update in both places
 
-#-----all exceptions are in the exceptions21 package.
+# ----all exceptions are in the exceptions21 package.
 from music21 import exceptions21
 
 Music21Exception = exceptions21.Music21Exception
@@ -106,15 +115,19 @@ if _missingImport: # pragma: no cover
         environLocal.warn(common.getMissingImportStr(_missingImport),
         header='music21:')
 
+
 class Music21ObjectException(exceptions21.Music21Exception):
     pass
+
 
 class ElementException(exceptions21.Music21Exception):
     pass
 
-#------------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
 # for contextSites searches...
 ContextTuple = namedtuple('ContextTuple', 'site offset recurseType')
+
 
 # pseudo class for returning splitAtX() type commands.
 class _SplitTuple(tuple):
@@ -139,7 +152,7 @@ class _SplitTuple(tuple):
     def __init__(self, tupEls): # pylint: disable=super-init-not-called
         self.spannerList = []
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # make subclass of set once that is defined properly
 
 
@@ -179,21 +192,21 @@ class Groups(list): # no need to inherit from slotted object
 
     def _validName(self, value):
         if not isinstance(value, str):
-            raise exceptions21.GroupException('Only strings can be used as group names, ' +
-                                              'not {}'.format(repr(value)))
-        #if ' ' in value:
-        #    raise exceptions21.GroupException('Spaces are not allowed as group names')
+            raise exceptions21.GroupException('Only strings can be used as group names, '
+                                              + 'not {}'.format(repr(value)))
+        # if ' ' in value:
+        #     raise exceptions21.GroupException('Spaces are not allowed as group names')
 
-    def append(self, value):
+    def append(self, value: Union[int, str]) -> None:
         self._validName(value)
         if not list.__contains__(self, value):
             list.append(self, value)
 
-    def __setitem__(self, i, y):
+    def __setitem__(self, i: int, y: Union[int, str]):
         self._validName(y)
         list.__setitem__(self, i, y)
 
-    def __eq__(self, other):
+    def __eq__(self, other: 'Groups'):
         '''
         Test Group equality. In normal lists, order matters; here it does not. More like a set.
 
@@ -234,27 +247,8 @@ class Groups(list): # no need to inherit from slotted object
                 return False
         return True
 
-    def __ne__(self, other):
-        '''
-        In normal lists, order matters; here it does not.
 
-        >>> a = Groups()
-        >>> a.append('red')
-        >>> a.append('green')
-        >>> a
-        ['red', 'green']
-
-        >>> b = Groups()
-        >>> b.append('green')
-        >>> b.append('blue')
-        >>> a != b
-        True
-        '''
-        return not (self == other)
-
-
-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Music21Object:
@@ -320,7 +314,7 @@ class Music21Object:
             arbitrary `Groups` that this object belongs to.''',
         'isStream': '''Boolean value for quickly identifying
             :class:`~music21.stream.Stream` objects (False by default).''',
-        'classSortOrder' : '''Property which returns an number (int or otherwise)
+        'classSortOrder': '''Property which returns an number (int or otherwise)
             depending on the class of the Music21Object that
             represents a priority for an object based on its class alone --
             used as a tie for stream sorting in case two objects have the
@@ -329,7 +323,6 @@ class Music21Object:
             all come (in that order) before Note.
 
             All undefined classes have classSortOrder of 20 -- same as note.Note
-
 
             >>> m21o = base.Music21Object()
             >>> m21o.classSortOrder
@@ -447,8 +440,8 @@ class Music21Object:
 
         # call class to get a new, empty instance
         new = self.__class__() # TODO: this creates an extra duration object for notes... ugghhh...
-        #environLocal.printDebug(['Music21Object.__deepcopy__', self, id(self)])
-        #for name in dir(self):
+        # environLocal.printDebug(['Music21Object.__deepcopy__', self, id(self)])
+        # for name in dir(self):
         if '_duration' in ignoreAttributes:
             ## this can be done much faster in most cases...
             d = self._duration
@@ -515,21 +508,21 @@ class Music21Object:
                         shallowlyCopiedObject = copy.copy(attrValue)
                         setattr(new, name, shallowlyCopiedObject)
                         environLocal.printDebug(
-                            '__deepcopy__: Could not deepcopy ' +
-                            '{0} in {1}, not a music21Object'.format(name, self) +
-                            'so making a shallow copy')
+                            '__deepcopy__: Could not deepcopy '
+                            + '{0} in {1}, not a music21Object'.format(name, self)
+                            + 'so making a shallow copy')
                     except TypeError:
                         # just link...
-                        environLocal.printDebug('__deepcopy__: Could not copy (deep or shallow) ' +
-                            '%s in %s, not a music21Object so just making a link' % (name, self))
+                        environLocal.printDebug('__deepcopy__: Could not copy (deep or shallow) '
+                            + '%s in %s, not a music21Object so just making a link' % (name, self))
                         setattr(new, name, attrValue)
                 else: # raise error for our own problem. # pragma: no cover
-                    raise Music21Exception('__deepcopy__: Cannot deepcopy Music21Object ' +
-                        '%s probably because it requires a default value in instantiation.' % name)
+                    raise Music21Exception('__deepcopy__: Cannot deepcopy Music21Object '
+                        + '%s probably because it requires a default value in instantiation.' % name)
 
         return new
 
-    def __deepcopy__(self, memo=None):
+    def __deepcopy__(self, memo: Optional[Dict[int, Any]]=None) -> 'Music21Object':
         '''
         Helper method to copy.py's deepcopy function.  Call it from there.
 
@@ -568,11 +561,11 @@ class Music21Object:
         >>> ('flute' in n.groups, 'flute' in b.groups)
         (False, True)
         '''
-        #environLocal.printDebug(['calling Music21Object.__deepcopy__', self])
+        # environLocal.printDebug(['calling Music21Object.__deepcopy__', self])
         new = self._deepcopySubclassable(memo)
         # must do this after copying
         new.purgeOrphans()
-        #environLocal.printDebug([self, 'end deepcopy', 'self._activeSite', self._activeSite])
+        # environLocal.printDebug([self, 'end deepcopy', 'self._activeSite', self._activeSite])
         return new
 
 
@@ -584,7 +577,7 @@ class Music21Object:
 
     def __setstate__(self, state):
         # defining self.__dict__ upon initialization currently breaks everything
-        self.__dict__ = state #pylint: disable=attribute-defined-outside-init
+        self.__dict__ = state # pylint: disable=attribute-defined-outside-init
 
 
     def isClassOrSubclass(self, classFilterList):
@@ -617,8 +610,7 @@ class Music21Object:
         '''
         Returns a tuple containing the names (strings, not objects) of classes that this
         object belongs to -- starting with the object's class name and going up the mro()
-        for the object.  Very similar to Perl's @ISA array:
-
+        for the object.
 
         >>> q = note.Note()
         >>> q.classes
@@ -709,8 +701,8 @@ class Music21Object:
             self._classSetCacheDict[self.__class__] = classSet
             return classSet
 
+    # --------------------------------------------------------------------------
 
-    #---------------------------------------------------------------------------
     @property
     def hasEditorialInformation(self):
         '''
@@ -821,9 +813,9 @@ class Music21Object:
         self._style = newStyle
 
 
-
-    #---------------------------
+    # --------------------------
     # convenience.  used to be in note.Note, but belongs everywhere:
+
     def _getQuarterLength(self):
         return self.duration.quarterLength
 
@@ -842,7 +834,7 @@ class Music21Object:
         Fraction(1, 3)
     ''')
 
-    def _getDerivation(self):
+    def _getDerivation(self) -> derivation.Derivation:
         '''
         Return the :class:`~music21.derivation.Derivation` object for this element.
 
@@ -871,7 +863,7 @@ class Music21Object:
             self._derivation = derivation.Derivation(client=self)
         return self._derivation
 
-    def _setDerivation(self, newDerivation):
+    def _setDerivation(self, newDerivation: derivation.Derivation) -> None:
         self._derivation = newDerivation
 
     derivation = property(_getDerivation, _setDerivation)
@@ -883,14 +875,14 @@ class Music21Object:
         that container can be provided here, and the offset in that object
         can be returned.
 
-        >>> n = note.Note('A-4')  # a Music21Objecct
+        >>> n = note.Note('A-4')  # a Music21Object
         >>> n.offset = 30
         >>> n.getOffsetBySite(None)
         30.0
 
         >>> s1 = stream.Stream()
         >>> s1.id = 'containingStream'
-        >>> s1.insert(20.0/3, n)
+        >>> s1.insert(20 / 3, n)
         >>> n.getOffsetBySite(s1)
         Fraction(20, 3)
         >>> float(n.getOffsetBySite(s1))
@@ -1076,8 +1068,6 @@ class Music21Object:
         %timeit b = corpus.parse('bwv66.6') -- 24.8ms
         %timeit b = corpus.parse('bwv66.6'); b.flat -- 42.9ms
         %timeit b = corpus.parse('bwv66.6'); b.recurse().stream() -- 83.1ms
-
-
         '''
         try:
             return self.getOffsetBySite(site)
@@ -1190,7 +1180,7 @@ class Music21Object:
 
         The `excludeStorageStreams` are SpannerStorage and VariantStorage.
         '''
-        #environLocal.printDebug(['purging orphans'])
+        # environLocal.printDebug(['purging orphans'])
         orphans = []
         # TODO: how can this be optimized to not use getSites, so as to
         # not unwrap weakrefs?
@@ -1203,7 +1193,7 @@ class Music21Object:
                     # only get those that are not Storage Streams
                     if ('SpannerStorage' not in s.classes
                         and 'VariantStorage' not in s.classes):
-                        #environLocal.printDebug(['removing orphan:', s])
+                        # environLocal.printDebug(['removing orphan:', s])
                         orphans.append(id(s))
                 else: # get all
                     orphans.append(id(s))
@@ -1222,16 +1212,21 @@ class Music21Object:
         self.sites.purgeLocations(rescanIsDead=rescanIsDead)
 
 
-    #---------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------
     # contexts...
+
     def getContextByClass(self,
-                             className,
-                             getElementMethod='getElementAtOrBefore',
-                             sortByCreationTime=False):
+                          className,
+                          *,
+                          getElementMethod='getElementAtOrBefore',
+                          sortByCreationTime=False,
+                          followDerivation=True
+                          ):
         '''
         A very powerful method in music21 of fundamental importance: Returns
         the element matching the className that is closest to this element in
-        its current hierarchy.  For instance, take this stream of changing time
+        its current hierarchy (or the hierarchy of the derivation origin unless
+        `followDerivation` is False.  For instance, take this stream of changing time
         signatures:
 
         >>> p = converter.parse('tinynotation: 3/4 C4 D E 2/4 F G A B 1/4 c')
@@ -1255,15 +1250,17 @@ class Music21Object:
         {7.0} <music21.stream.Measure 4 offset=7.0>
             {0.0} <music21.meter.TimeSignature 1/4>
             {0.0} <music21.note.Note C>
-            {1.0} <music21.bar.Barline style=final>
+            {1.0} <music21.bar.Barline type=final>
 
         Let's get the last two notes of the piece, the B and high c:
 
-        >>> c = p.measure(4).notes[0]
+        >>> m4 = p.measure(4)
+        >>> c = m4.notes[0]
         >>> c
         <music21.note.Note C>
 
-        >>> b = p.measure(3).notes[-1]
+        >>> m3 = p.measure(3)
+        >>> b = m3.notes[-1]
         >>> b
         <music21.note.Note B>
 
@@ -1308,12 +1305,48 @@ class Music21Object:
 
         The "after" do forward contexts -- looking ahead.
 
+        Notice that if searching for a `Stream` context, the element is not
+        guaranteed to be in that Stream.  This is obviously true in this case:
+
+        >>> p = stream.Part()
+        >>> m = stream.Measure(number=1)
+        >>> p.insert(0, m)
+        >>> n = note.Note('D')
+        >>> m.append(n)
+        >>> try:
+        ...     n.getContextByClass('Part').elementOffset(n)
+        ... except Music21Exception:
+        ...     print('not there')
+        not there
+
+        But it is less clear with something like this:
+
+        >>> import copy
+        >>> n2 = copy.deepcopy(n)
+        >>> try:
+        ...     n2.getContextByClass('Measure').elementOffset(n2)
+        ... except Music21Exception:
+        ...     print('not there')
+        not there
+
+        A measure context is being found, but only through the derivation chain.
+
+        >>> n2.getContextByClass('Measure')
+        <music21.stream.Measure 1 offset=0.0>
+
+        To prevent this error, use the `followDerivation=False` setting
+
+        >>> print(n2.getContextByClass('Measure', followDerivation=False))
+        None
+
+        * v 5.7 -- added followDerivation=False and made everything but the class keyword only
+
         OMIT_FROM_DOCS
 
-        >>> a = b.getContextByClass('Note', 'getElementBefore')
+        >>> a = b.getContextByClass('Note', getElementMethod='getElementBefore')
         >>> a
         <music21.note.Note A>
-        >>> c = b.getContextByClass('Note', 'getElementAfter')
+        >>> c = b.getContextByClass('Note', getElementMethod='getElementAfter')
         >>> c
         <music21.note.Note C>
 
@@ -1444,10 +1477,10 @@ class Music21Object:
                 return True
 
             if 'Before' in getElementMethod and selfSt < contextSt:
-                #print(getElementMethod, selfSt.shortRepr(), contextSt.shortRepr(), self, contextEl)
+                # print(getElementMethod, selfSt.shortRepr(), contextSt.shortRepr(), self, contextEl)
                 return False
             elif 'After' in getElementMethod and selfSt > contextSt:
-                #print(getElementMethod, selfSt.shortRepr(), contextSt.shortRepr(), self, contextEl)
+                # print(getElementMethod, selfSt.shortRepr(), contextSt.shortRepr(), self, contextEl)
                 return False
             else:
                 return True
@@ -1461,8 +1494,10 @@ class Music21Object:
 
         for site, positionStart, searchType in self.contextSites(
                                             returnSortTuples=True,
-                                            sortByCreationTime=sortByCreationTime):
-            if searchType == 'elementsOnly' or searchType == 'elementsFirst':
+                                            sortByCreationTime=sortByCreationTime,
+                                            followDerivation=followDerivation
+                                            ):
+            if searchType in ('elementsOnly', 'elementsFirst'):
                 contextEl = payloadExtractor(site, flatten=False, positionStart=positionStart)
 
                 if contextEl is not None and wellFormed(contextEl, site):
@@ -1506,6 +1541,7 @@ class Music21Object:
 
 
     def contextSites(self,
+                     *,
                      callerFirst=None,
                      memo=None,
                      offsetAppend=0.0,
@@ -1661,7 +1697,8 @@ class Music21Object:
         <music21.stream.Measure 2 offset=0.0>
         <music21.stream.Part p2>
 
-        *removed in v3: priorityTarget cannot be set, in order to use .sites.yieldSites()*
+        *  removed in v3: priorityTarget cannot be set, in order to use .sites.yieldSites()
+        *  changed in v5.5: all arguments are keyword only.
         '''
         if memo is None:
             memo = []
@@ -1730,7 +1767,7 @@ class Music21Object:
                 hypotheticalPosition = positionInStream.modify(offset=inStreamOffset)
 
                 if topLevel not in memo:
-                    #environLocal.printDebug('Yielding {}, {}, {} from contextSites'.format(
+                    # environLocal.printDebug('Yielding {}, {}, {} from contextSites'.format(
                     #                                                topLevel,
                     #                                                inStreamPos.shortRepr(),
                     #                                                recurType))
@@ -1752,22 +1789,24 @@ class Music21Object:
                                               returnSortTuples=True,
                                               sortByCreationTime=sortByCreationTime):
                                             # get activeSite unless sortByCreationTime
-                    if derivedCsTuple.site not in memo:
-                        environLocal.printDebug(
-                                'Yielding {} from derivedObject contextSites'.format(derivedCsTuple)
-                                )
-                        offsetAdjustedCsTuple = ContextTuple(
-                            derivedCsTuple.site,
-                            derivedCsTuple.offset.modify(offset=derivedCsTuple[1].offset +
-                                                                offsetAppend),
-                            derivedCsTuple.recurseType)
-                        if returnSortTuples:
-                            yield offsetAdjustedCsTuple
-                        else:
-                            yield ContextTuple(offsetAdjustedCsTuple.site,
-                                               offsetAdjustedCsTuple.offset.offset,
-                                               offsetAdjustedCsTuple.recurseType)
-                        memo.append(derivedCsTuple.site)
+                    if derivedCsTuple.site in memo:
+                        continue
+
+                    environLocal.printDebug(
+                            'Yielding {} from derivedObject contextSites'.format(derivedCsTuple)
+                            )
+                    offsetAdjustedCsTuple = ContextTuple(
+                        derivedCsTuple.site,
+                        derivedCsTuple.offset.modify(offset=derivedCsTuple[1].offset
+                                                            + offsetAppend),
+                        derivedCsTuple.recurseType)
+                    if returnSortTuples:
+                        yield offsetAdjustedCsTuple
+                    else:
+                        yield ContextTuple(offsetAdjustedCsTuple.site,
+                                           offsetAdjustedCsTuple.offset.offset,
+                                           offsetAdjustedCsTuple.recurseType)
+                    memo.append(derivedCsTuple.site)
 
         environLocal.printDebug('--returning from derivedObject search')
 
@@ -1799,7 +1838,7 @@ class Music21Object:
             yield el
             el = el.getContextByClass(className, getElementMethod='getElementBeforeOffset')
 
-    #--------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
 
     def next(self, className=None):
@@ -1887,7 +1926,7 @@ class Music21Object:
         <music21.note.Note F#> <music21.stream.Part Soprano>
         <music21.note.Note E#> <music21.stream.Part Soprano>
         <music21.note.Note F#> <music21.stream.Part Soprano>
-        <music21.bar.Barline style=final> <music21.stream.Part Soprano>
+        <music21.bar.Barline type=final> <music21.stream.Part Soprano>
         '''
         allSiteContexts = list(self.contextSites(returnSortTuples=True))
         maxRecurse = 20
@@ -1924,10 +1963,6 @@ class Music21Object:
         Music21Object.
 
         The `classFilterList` can be used to specify one or more classes to match.
-
-        The `flattenLocalSites` parameter determines if the sites of this element
-        (e.g., a Measure's Part) are flattened on first search. When True, elements
-        contained in adjacent containers may be selected first.
 
         >>> s = corpus.parse('bwv66.6')
         >>> m2 = s.parts[0].iter.getElementsByClass('Measure')[2] # pickup measure
@@ -1996,44 +2031,47 @@ class Music21Object:
             asTree = activeS.asTree(classList=className, flatten=False)
             prevNode = asTree.getNodeBefore(self.sortTuple())
             if prevNode is None:
-                return activeS
+                if className is None or activeS.isClassOrSubclass(className):
+                    return activeS
+                else:
+                    return None
             else:
                 return prevNode.payload
 
     # end contexts...
-    #---------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------
 
 
-    #--------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # properties
 
     def _getActiveSite(self):
         # can be None
         if sites.WEAKREF_ACTIVE:
-            if self._activeSite is None: #leave None
-                return self._activeSite
+            if self._activeSite is None: # leave None
+                return None
             else: # even if current activeSite is not a weakref, this will work
-                #environLocal.printDebug(['_getActiveSite() called:',
+                # environLocal.printDebug(['_getActiveSite() called:',
                 #                          'self._activeSite', self._activeSite])
                 return common.unwrapWeakref(self._activeSite)
         else: # pragma: no cover
             return self._activeSite
 
     def _setActiveSite(self, site):
-        #environLocal.printDebug(['_setActiveSite() called:', 'self', self, 'site', site])
+        # environLocal.printDebug(['_setActiveSite() called:', 'self', self, 'site', site])
 
         # NOTE: this is a performance intensive call
         if site is not None:
             try:
                 storedOffset = site.elementOffset(self)
             except SitesException:
-                raise SitesException('v2.1. -- you may not assign an activesite for ' +
-                                     'an object {} not in the Stream {}'.format(self, site))
+                raise SitesException('activeSite cannot be set for '
+                                     + 'object {} not in the Stream {}'.format(self, site))
 
             self._activeSiteStoredOffset = storedOffset
-            #siteId = id(site)
-            #if not self.sites.hasSiteId(siteId): # This should raise a warning, should not happen
-            #    #environLocal.warn('Adding a siteDict entry for a ' +
+            # siteId = id(site)
+            # if not self.sites.hasSiteId(siteId): # This should raise a warning, should not happen
+            #    # environLocal.warn('Adding a siteDict entry for a ' +
             #    #                        'site that should already be there!')
             #    self.sites.add(site, idKey=siteId)
         else:
@@ -2095,10 +2133,10 @@ class Music21Object:
         There is a branch that does slow searches.
         See test/testSerialization to have it active.
         '''
-        #there is a problem if a new activeSite is being set and no offsets have
+        # there is a problem if a new activeSite is being set and no offsets have
         # been provided for that activeSite; when self.offset is called,
         # the first case here would match
-        #environLocal.printDebug(['Music21Object._getOffset', 'self.id',
+        # environLocal.printDebug(['Music21Object._getOffset', 'self.id',
         #                           self.id, 'id(self)', id(self), self.__class__])
         activeSiteWeakRef = self._activeSite
         if activeSiteWeakRef is not None:
@@ -2141,7 +2179,7 @@ class Music21Object:
             self._naiveOffset = offset
 
     offset = property(_getOffset, _setOffset,
-        doc = '''
+        doc='''
         The offset property sets or returns the position of this object
         as a float or fractions.Fraction value
         (generally in `quarterLengths`), depending on what is representable.
@@ -2351,7 +2389,7 @@ class Music21Object:
             except SitesException:
                 if raiseExceptionOnMiss:
                     raise
-                #environLocal.warn(r)
+                # environLocal.warn(r)
                     # activeSite may have vanished! or does not have the element
                 foundOffset = self._naiveOffset
 
@@ -2378,7 +2416,7 @@ class Music21Object:
         return SortTuple(atEnd, offset, self.priority,
                           self.classSortOrder, isNotGrace, insertIndex)
 
-    #------------------------------------------------------------------
+    # -----------------------------------------------------------------
     def _getDuration(self):
         '''
         Gets the DurationObject of the object or None
@@ -2406,7 +2444,7 @@ class Music21Object:
             raise Exception('this must be a Duration object, not %s' % durationObj)
 
     duration = property(_getDuration, _setDuration,
-        doc = '''
+        doc='''
         Get and set the duration of this object as a Duration object.
         ''')
 
@@ -2440,7 +2478,7 @@ class Music21Object:
             self.informSites({'changedElement': 'priority', 'priority': value})
 
     priority = property(_getPriority, _setPriority,
-        doc = '''
+        doc='''
         Get and set the priority integer value.
 
         Priority specifies the order of processing from left (lowest number)
@@ -2472,10 +2510,10 @@ class Music21Object:
         ''')
 
 
-    #--------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # display and writing
 
-    def write(self, fmt=None, fp=None, **keywords): #pragma: no cover
+    def write(self, fmt=None, fp=None, **keywords): # pragma: no cover
         '''
         Write out a file of music notation (or an image, etc.) in a given format.  If
         fp is specified as a file path then the file will be placed there.  If it is not
@@ -2520,7 +2558,7 @@ class Music21Object:
         '''
         return self.__repr__()
 
-    def show(self, fmt=None, app=None, **keywords): #pragma: no cover
+    def show(self, fmt=None, app=None, **keywords): # pragma: no cover
         '''
         Displays an object in a format provided by the
         fmt argument or, if not provided, the format set in the user's Environment
@@ -2577,10 +2615,10 @@ class Music21Object:
                                  subformats=subformats,
                                  **keywords)
 
-    #--------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # duration manipulation, processing, and splitting
 
-    def containerHierarchy(self, followDerivation=True, includeNonStreamDerivations=False):
+    def containerHierarchy(self, *, followDerivation=True, includeNonStreamDerivations=False):
         '''
         Return a list of Stream subclasses that this object
         is contained within or (if followDerivation is set) is derived from.
@@ -2623,7 +2661,6 @@ class Music21Object:
          <music21.stream.Score 0x1049a5668>]
 
 
-
         The method follows activeSites, so set the activeSite as necessary.
 
         >>> p = stream.Part(id='newPart')
@@ -2635,6 +2672,8 @@ class Music21Object:
         >>> noteE.containerHierarchy()
         [<music21.stream.Measure 20 offset=0.0>,
          <music21.stream.Part newPart>]
+
+        * changed in v.5.7: followDerivation and includeNonStreamDerivations are now keyword only
         '''
         post = []
         focus = self
@@ -2644,11 +2683,11 @@ class Music21Object:
             # collect activeSite unless activeSite is None;
             # if so, try to get rootDerivation
             candidate = focus.activeSite
-            #environLocal.printDebug(['containerHierarchy(): activeSite found:', candidate])
+            # environLocal.printDebug(['containerHierarchy(): activeSite found:', candidate])
             if candidate is None: # nothing more to derive
                 # if this is a Stream, we might find a root derivation
                 if followDerivation is True and hasattr(focus, 'derivation'):
-                    #environLocal.printDebug(['containerHierarchy():
+                    # environLocal.printDebug(['containerHierarchy():
                     # found rootDerivation:', focus.rootDerivation])
                     alt = focus.derivation.rootDerivation
                     if alt is None:
@@ -2678,7 +2717,7 @@ class Music21Object:
         that were created during the split, such as by
 
 
-        TODO: unit into a "split" function -- document obscure uses.
+        TODO: unite into a "split" function -- document obscure uses.
 
         >>> a = note.Note('C#5')
         >>> a.duration.type = 'whole'
@@ -2796,8 +2835,9 @@ class Music21Object:
         eRemain = copy.deepcopy(self)
 
         # clear lyrics from remaining parts
-        if hasattr(eRemain, 'lyrics'):
-            eRemain.lyrics = []
+        if hasattr(eRemain, 'lyrics') and not callable(eRemain.lyrics):
+            # lyrics is a function on Streams...
+            eRemain.lyrics = [] # pylint: disable=attribute-defined-outside-init
 
         spannerList = []
         for listType in ('expressions', 'articulations'):
@@ -2849,7 +2889,7 @@ class Music21Object:
                         or 'Unpitched' in e.classes):
 
             forceEndTieType = 'stop'
-            if e.tie is not None:
+            if hasattr(e, 'tie') and e.tie is not None:
                 # the last tie of what was formally a start should
                 # continue
                 if e.tie.type == 'start':
@@ -2863,11 +2903,13 @@ class Music21Object:
                 elif e.tie.type == 'continue':
                     forceEndTieType = 'continue'
                     # keep continue if already set
-            else:
+            elif hasattr(e, 'tie'):
                 e.tie = tie.Tie('start')  # pylint: disable=attribute-defined-outside-init
                 # # need a tie object
 
-            eRemain.tie = tie.Tie(forceEndTieType)
+            if hasattr(eRemain, 'tie'):
+                # pylint: disable=attribute-defined-outside-init
+                eRemain.tie = tie.Tie(forceEndTieType)
 
         elif addTies and 'Chord' in e.classes:
             for i in range(len(e._notes)):
@@ -2925,7 +2967,7 @@ class Music21Object:
         that are partitioned and tied with the specified quarter
         length list durations.
 
-        TODO: unit into a "split" function -- document obscure uses.
+        TODO: unite into a "split" function -- document obscure uses.
 
 
         >>> n = note.Note()
@@ -3082,8 +3124,9 @@ class Music21Object:
         quarterLengthList = [c.quarterLength * atm for c in self.duration.components]
         splitList = self.splitByQuarterLengths(quarterLengthList)
         return splitList
-    #--------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # temporal and beat based positioning
+
     @property
     def measureNumber(self):
         '''
@@ -3187,18 +3230,18 @@ class Music21Object:
         '''
         activeS = self.activeSite
         if activeS is not None and activeS.isMeasure:
-            #environLocal.printDebug(['found activeSite as Measure, using for offset'])
+            # environLocal.printDebug(['found activeSite as Measure, using for offset'])
             offsetLocal = activeS.elementOffset(self)
             if includeMeasurePadding:
                 offsetLocal += activeS.paddingLeft
         else:
-            #environLocal.printDebug(['did not find activeSite as Measure,
+            # environLocal.printDebug(['did not find activeSite as Measure,
             #    doing context search', 'self.activeSite', self.activeSite])
             # testing sortByCreationTime == true; this may be necessary
             # as we often want the most recent measure
             m = self.getContextByClass('Measure', sortByCreationTime=True)
             if m is not None:
-                #environLocal.printDebug(['using found Measure for offset access'])
+                # environLocal.printDebug(['using found Measure for offset access'])
                 try:
                     if includeMeasurePadding:
                         offsetLocal = m.elementOffset(self) + m.paddingLeft
@@ -3211,11 +3254,11 @@ class Music21Object:
                         offsetLocal = 0.0
 
             else: # hope that we get the right one
-                #environLocal.printDebug(
+                # environLocal.printDebug(
                 #  ['_getMeasureOffset(): cannot find a Measure; using standard offset access'])
                 offsetLocal = self.offset
 
-        #environLocal.printDebug(
+        # environLocal.printDebug(
         #     ['_getMeasureOffset(): found local offset as:', offsetLocal, self])
         return offsetLocal
 
@@ -3232,7 +3275,7 @@ class Music21Object:
         return ts
 
     @property
-    def beat(self):
+    def beat(self) -> Union[fractions.Fraction, float]:
         '''
         Return the beat of this object as found in the most
         recently positioned Measure. Beat values count from 1 and
@@ -3285,7 +3328,7 @@ class Music21Object:
         return ts.getBeatProportion(ts.getMeasureOffsetOrMeterModulusOffset(self))
 
     @property
-    def beatStr(self):
+    def beatStr(self) -> str:
         '''
         Return a string representation of the beat of
         this object as found in the most recently positioned
@@ -3314,7 +3357,7 @@ class Music21Object:
         return ts.getBeatProportionStr(ts.getMeasureOffsetOrMeterModulusOffset(self))
 
     @property
-    def beatDuration(self):
+    def beatDuration(self) -> 'duration.Duration':
         '''
         Return a :class:`~music21.duration.Duration` of the beat
         active for this object as found in the most recently
@@ -3346,7 +3389,7 @@ class Music21Object:
 
 
     @property
-    def beatStrength(self):
+    def beatStrength(self) -> float:
         '''
         Return the metrical accent of this object
         in the most recently positioned Measure. Accent values
@@ -3415,17 +3458,7 @@ class Music21Object:
                                   forcePositionMatch=True,
                                   permitMeterModulus=False)
 
-    def _setSeconds(self, value):
-        ti = self.getContextByClass('TempoIndication')
-        if ti is None:
-            raise Music21ObjectException('this object does not have a TempoIndication in Sites')
-        mm = ti.getSoundingMetronomeMark()
-        self.duration = mm.secondsToDuration(value)
-        for s in self.sites.get(excludeNone=True):
-            if self in s._elements:
-                s.coreElementsChanged() # highest time is changed.
-
-    def _getSeconds(self):
+    def _getSeconds(self) -> float:
         # do not search of duration is zero
         if self.duration is None or self.duration.quarterLength == 0.0:
             return 0.0
@@ -3436,6 +3469,16 @@ class Music21Object:
         mm = ti.getSoundingMetronomeMark()
         # once we have mm, simply pass in this duration
         return mm.durationToSeconds(self.duration)
+
+    def _setSeconds(self, value: float) -> None:
+        ti = self.getContextByClass('TempoIndication')
+        if ti is None:
+            raise Music21ObjectException('this object does not have a TempoIndication in Sites')
+        mm = ti.getSoundingMetronomeMark()
+        self.duration = mm.secondsToDuration(value)
+        for s in self.sites.get(excludeNone=True):
+            if self in s._elements:
+                s.coreElementsChanged() # highest time is changed.
 
     seconds = property(_getSeconds, _setSeconds, doc='''
         Get or set the duration of this object in seconds, assuming
@@ -3451,7 +3494,7 @@ class Music21Object:
         ''')
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class ElementWrapper(Music21Object):
@@ -3482,7 +3525,7 @@ class ElementWrapper(Music21Object):
     >>> s.id = 'mainStream'
     >>> s.append(meter.TimeSignature('fast 6/8'))
     >>> for i in range(10):
-    ...    fileName = 'thisSound_' + str(random.randint(1, 20)) + '.wav'
+    ...    #_DOCS_SHOW fileName = 'thisSound_' + str(random.randint(1, 20)) + '.wav'
     ...    fileName = 'thisSound_' + str(1+((i * 100) % 19)) + '.wav' #_DOCS_HIDE
     ...    soundFile = Wave_read() #_DOCS_HIDE # #make a more predictable "random" set.
     ...    #_DOCS_SHOW soundFile = wave.open(fileName)
@@ -3531,9 +3574,9 @@ class ElementWrapper(Music21Object):
         self.obj = obj # object stored here
         # the unlinkedDuration is the duration that is inherited from
         # Music21Object
-        #self._unlinkedDuration = None
+        # self._unlinkedDuration = None
 
-    #--------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
     def __repr__(self):
         shortObj = (str(self.obj))[0:30]
@@ -3550,7 +3593,7 @@ class ElementWrapper(Music21Object):
                                                 self.offset,
                                                 shortObj)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         '''Test ElementWrapper equality
 
         >>> import music21
@@ -3588,11 +3631,8 @@ class ElementWrapper(Music21Object):
         else:
             return False
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __setattr__(self, name, value):
-        #environLocal.printDebug(['calling __setattr__ of ElementWrapper', name, value])
+    def __setattr__(self, name: str, value: Any) -> None:
+        # environLocal.printDebug(['calling __setattr__ of ElementWrapper', name, value])
 
         # if in the ElementWrapper already, set that first
         if name in self.__dict__:
@@ -3608,7 +3648,7 @@ class ElementWrapper(Music21Object):
         else:
             object.__setattr__(self, name, value)
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
         '''This method is only called when __getattribute__() fails.
         Using this also avoids the potential recursion problems of subclassing
         __getattribute__()_
@@ -3618,12 +3658,12 @@ class ElementWrapper(Music21Object):
         '''
         storedobj = Music21Object.__getattribute__(self, 'obj')
         if storedobj is None:
-            raise AttributeError("Could not get attribute '" + name +
-                                 "' in an object-less element")
+            raise AttributeError("Could not get attribute '" + name
+                                 + "' in an object-less element")
         else:
             return object.__getattribute__(storedobj, name)
 
-    def isTwin(self, other):
+    def isTwin(self, other: 'ElementWrapper') -> bool:
         '''
         A weaker form of equality.  a.isTwin(b) is true if
         a and b store either the same object OR objects that are equal.
@@ -3658,19 +3698,20 @@ class ElementWrapper(Music21Object):
             return False
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class TestMock(Music21Object):
     pass
 
-class Test(unittest.TestCase):
 
+class Test(unittest.TestCase):
     def runTest(self):
         pass
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
+        '''
+        Test copying all objects defined in this module
         '''
         for part in sys.modules[self.__module__].__dict__:
             match = False
@@ -3685,8 +3726,12 @@ class Test(unittest.TestCase):
                     obj = name()
                 except TypeError:
                     continue
-                i = copy.copy(obj)
-                j = copy.deepcopy(obj)
+                try:
+                    i = copy.copy(obj)
+                    j = copy.deepcopy(obj)
+                except TypeError as e:
+                    self.fail('Could not copy {}: {}'.format(obj, str(e)))
+
 
     def testObjectCreation(self):
         a = TestMock()
@@ -3711,7 +3756,7 @@ class Test(unittest.TestCase):
     def testNoteCreation(self):
         from music21 import note
         n = note.Note('A')
-        n.offset = 1.0 #duration.Duration('quarter')
+        n.offset = 1.0 # duration.Duration('quarter')
         n.groups.append('flute')
 
         b = copy.deepcopy(n)
@@ -3769,7 +3814,7 @@ class Test(unittest.TestCase):
         # assigning a activeSite directly # v2.1. no longer allowed if not in site
         def assignActiveSite(a, b):
             a.activeSite = b
-        self.assertRaises(SitesException, assignActiveSite, a,b)
+        self.assertRaises(SitesException, assignActiveSite, a, b)
         # now we have two offsets in locations
         b.insert(a)
         self.assertEqual(len(a.sites), 2)
@@ -3779,7 +3824,7 @@ class Test(unittest.TestCase):
         # still have activeSite
         self.assertEqual(a.activeSite, b)
         # now the offst returns the value for the current activeSite
-        #b.setElementOffset(a, 40.0)
+        # b.setElementOffset(a, 40.0)
         self.assertEqual(a.offset, 40.0)
 
         # assigning a activeSite to None
@@ -3814,7 +3859,7 @@ class Test(unittest.TestCase):
 
     def testM21BaseLocationsCopyB(self):
         # the active site of a deepcopy should not be the same?
-        #self.assertEqual(post[-1].activeSite, a)
+        # self.assertEqual(post[-1].activeSite, a)
         from music21 import stream, base
         a = stream.Stream()
         b = base.Music21Object()
@@ -3861,7 +3906,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s2.flat.getElementAtOrBefore(110), n2)
 
         # note: we cannot do this
-        #self.assertEqual(s2.flat.getOffsetBySite(n2), 110)
+        #    self.assertEqual(s2.flat.getOffsetBySite(n2), 110)
         # we can do this:
         self.assertEqual(n2.getOffsetBySite(s2.flat), 110)
 
@@ -3958,7 +4003,7 @@ class Test(unittest.TestCase):
         p1 = s.parts['Soprano']
 
         # this does not work; cannot get these values from Measures
-        #self.assertEqual(p1.getElementsByClass('Measure')[3].beat, 3)
+        #    self.assertEqual(p1.getElementsByClass('Measure')[3].beat, 3)
 
         # clef/ks can get its beat; these objects are in a pickup,
         # and this give their bar offset relative to the bar
@@ -4006,23 +4051,23 @@ class Test(unittest.TestCase):
         post = []
         for m in p1.getElementsByClass('Measure'):
             post.append(m._getMeasureOffset())
-        self.assertEqual(post, [0.0, 1.0, 5.0, 9.0, 13.0, 17.0, 21.0, 25.0, 29.0, 33.0] )
+        self.assertEqual(post, [0.0, 1.0, 5.0, 9.0, 13.0, 17.0, 21.0, 25.0, 29.0, 33.0])
 
         # all other methods define None
         post = []
         for n in p1.getElementsByClass('Measure'):
             post.append(n.beat)
-        self.assertEqual(post, [None, None, None, None, None, None, None, None, None, None] )
+        self.assertEqual(post, [None, None, None, None, None, None, None, None, None, None])
 
         post = []
         for n in p1.getElementsByClass('Measure'):
             post.append(n.beatStr)
-        self.assertEqual(post, [None, None, None, None, None, None, None, None, None, None] )
+        self.assertEqual(post, [None, None, None, None, None, None, None, None, None, None])
 
         post = []
         for n in p1.getElementsByClass('Measure'):
             post.append(n.beatDuration)
-        self.assertEqual(post, [None, None, None, None, None, None, None, None, None, None] )
+        self.assertEqual(post, [None, None, None, None, None, None, None, None, None, None])
 
     def testGetBeatStrengthA(self):
         from music21 import stream, note, meter
@@ -4032,7 +4077,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.insert(0, meter.TimeSignature('4/4'))
         s.repeatAppend(n, 8)
-        #match = []
+        # match = []
         self.assertEqual([e.beatStrength for e in s.notes],
                          [1.0, 0.25, 0.5, 0.25, 1.0, 0.25, 0.5, 0.25])
 
@@ -4059,7 +4104,7 @@ class Test(unittest.TestCase):
             match.append(n.measureNumber)
         self.assertEqual(match, [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3,
                                  4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7,
-                                 8, 8, 8, 9, 9, 9, 9] )
+                                 8, 8, 8, 9, 9, 9, 9])
 
         # create a note and put it in different measures
         m1 = stream.Measure()
@@ -4165,17 +4210,15 @@ class Test(unittest.TestCase):
         self.assertEqual([n.offset for n in m1.notesAndRests], [0.0, 0.5])
         self.assertEqual(m1.paddingLeft, 3.0)
 
-        #offsets for flat representation have proper spacing
-        self.assertEqual([n.offset for n in p.flat.notesAndRests],
-                         [0.0, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0,
-                          8.0, 9.0, 10.0, 11.0, 12.0, 12.5, 13.0, 15.0,
-                          16.0, 16.5, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0,
-                          23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 28.5, 29.0,
-                          31.0, 32.0, 33.0, 34.0, 34.5, 34.75, 35.0, 35.5,
-                          36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0,
-                          44.0, 45.0, 47.0, 48.0, 48.5, 49.0, 50.0, 51.0,
-                          52.0, 53.0, 54.0, 55.0, 56.0, 57.0, 58.0, 59.0,
-                          60.0, 60.5, 61.0, 63.0] )
+        offsets = [n.offset for n in p.flat.notesAndRests]
+        # offsets for flat representation have proper spacing
+        self.assertEqual(offsets,
+                         [0.0, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0,
+                          9.0, 10.0, 11.0, 12.0, 12.5, 13.0, 15.0, 16.0, 17.0,
+                          18.0, 18.5, 18.75, 19.0, 19.5, 20.0, 21.0, 22.0, 23.0, 24.0,
+                          25.0, 26.0, 27.0, 28.0, 29.0, 31.0, 32.0, 32.5, 33.0, 34.0,
+                          35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0,
+                          43.0, 44.0, 44.5, 45.0, 47.0])
 
 
     def testHighestTime(self):
@@ -4280,6 +4323,7 @@ class Test(unittest.TestCase):
     def testElementWrapperOffsetAccess(self):
         from music21 import stream, meter
         from music21 import base
+
         class Mock:
             pass
 
@@ -4304,20 +4348,20 @@ class Test(unittest.TestCase):
     def testGetActiveSiteTimeSignature(self):
         from music21 import base
         from music21 import stream, meter
+
         class Wave_read:
             def getnchannels(self):
                 return 2
 
         s = stream.Stream()
         s.append(meter.TimeSignature('fast 6/8'))
-        #s.show('t')
+        # s.show('t')
         storage = []
         for i in range(6):
-            soundFile = Wave_read() #_DOCS_HIDE
-            #el = music21.Music21Object() #
+            soundFile = Wave_read() # _DOCS_HIDE
+            # el = music21.Music21Object()
             el = base.ElementWrapper(soundFile)
             storage.append(el)
-            #print el
             self.assertEqual(el.obj, soundFile)
             s.insert(i, el)
 
@@ -4412,7 +4456,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         p = converter.parse('tinynotation: 3/4 C4 D E 2/4 F G A B 1/4 c')
         b = p.measure(3).notes[-1]
-        c = b.getContextByClass('Note', 'getElementAfterOffset')
+        c = b.getContextByClass('Note', getElementMethod='getElementAfterOffset')
         self.assertEqual(c.name, 'C')
 
     def testGetContextByClassB(self):
@@ -4462,12 +4506,12 @@ class Test(unittest.TestCase):
         s.insert(0, p3)
         s.insert(0, p4)
 
-        #self.targetMeasures = m4
-        #n1 = m2[-1] # last element is a note
+        # self.targetMeasures = m4
+        # n1 = m2[-1] # last element is a note
         n2 = m4[-1] # last element is a note
 
-        #environLocal.printDebug(['getContextByClass()'])
-        #self.assertEqual(str(n1.getContextByClass('TimeSignature')),
+        # environLocal.printDebug(['getContextByClass()'])
+        # self.assertEqual(str(n1.getContextByClass('TimeSignature')),
         #    '<music21.meter.TimeSignature 3/4>')
         environLocal.printDebug(['getContextByClass()'])
         self.assertEqual(str(n2.getContextByClass('TimeSignature')),
@@ -4591,8 +4635,8 @@ class Test(unittest.TestCase):
         # TODO: use Ordered Dict.
         self.assertEqual(set(n2.getSpannerSites()), set([sp1, sp2]))
 
-        #Optionally a class name or list of class names can be
-        #specified and only Spanners of that class will be returned
+        # Optionally a class name or list of class names can be
+        # specified and only Spanners of that class will be returned
 
         sp3 = dynamics.Diminuendo(n1, n2)
         self.assertEqual(n2.getSpannerSites('Diminuendo'), [sp3])
@@ -4602,8 +4646,8 @@ class Test(unittest.TestCase):
         self.assertEqual(set(n2.getSpannerSites('DynamicWedge')), set([sp2, sp3]))
         self.assertEqual(set(n2.getSpannerSites(['Slur', 'Diminuendo'])), set([sp1, sp3]))
 
-        #The order spanners are returned is generally the order that they were
-        #added, but that is not guaranteed, so for safety sake, use set comparisons:
+        # The order spanners are returned is generally the order that they were
+        # added, but that is not guaranteed, so for safety sake, use set comparisons:
 
         self.assertEqual(set(n2.getSpannerSites(['Slur', 'Diminuendo'])), set([sp3, sp1]))
 
@@ -4637,7 +4681,7 @@ class Test(unittest.TestCase):
         m2 = copy.deepcopy(m)
         m2.number = 3333
         siteList = []
-        #environLocal.warn('#########################')
+        # environLocal.warn('#########################')
         for y in m2.contextSites():
             yTup = (y.site, y.offset, y.recurseType)
             siteList.append(repr(yTup))
@@ -4771,7 +4815,7 @@ class Test(unittest.TestCase):
 
         w = v.transpose('M3') # same as deepcopy,
         # but more instructive in debugging since pitches change...
-        #w = copy.deepcopy(v)
+        #    w = copy.deepcopy(v)
         ecopy1 = w[0][0]
         self.assertEqual(ecopy1.pitch.name, 'E')
         ecopy2 = w[1][0]
@@ -4779,15 +4823,16 @@ class Test(unittest.TestCase):
         prev = ecopy2.previous('Note')
         self.assertIs(prev, ecopy1)
 
-#-------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Music21Object, ElementWrapper]
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 if __name__ == '__main__':
-    mainTest(Test) #, runTest='testPreviousB')
+    mainTest(Test) # , runTest='testPreviousB')
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

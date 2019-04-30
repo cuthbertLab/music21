@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         enharmonics.py
 # Purpose:      Tools for returning best enharmonics
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 import unittest
 import itertools
@@ -144,7 +144,7 @@ class EnharmonicSimplifier:
         score = (dimCount + augCount + 1) * self.ruleObject.augDimPenalty
         return score
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def testBestPitches(self):
@@ -183,7 +183,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(pList), 3)
         self.assertIsInstance(testAugDimScore, int)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test)

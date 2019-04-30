@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         note.py
 # Purpose:      music21 classes for representing notes
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2006-2017 Michael Scott Cuthbert and the music21 Project
 # License:      BSD or LGPL, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Classes and functions for creating Notes, Rests, and Lyrics.
 
@@ -75,7 +75,7 @@ stemDirectionNames = [
     ]
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class LyricException(exceptions21.Music21Exception):
     pass
 
@@ -85,7 +85,7 @@ class NoteException(exceptions21.Music21Exception):
 class NotRestException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class Lyric(style.StyleMixin):
@@ -150,24 +150,14 @@ class Lyric(style.StyleMixin):
         # these are set by setTextAndSyllabic
         self.text = None
         # given as begin, middle, end, or single
-        if 'syllabic' in kwargs:
-            self.syllabic = kwargs['syllabic']
-        else:
-            self.syllabic = None
+        self.syllabic = kwargs.get('syllabic', None)
+        applyRaw = kwargs.get('applyRaw', False)
 
-        if 'applyRaw' in kwargs:
-            applyRaw = kwargs['applyRaw']
-        else:
-            applyRaw = False
         if text is not None:
             self.setTextAndSyllabic(text, applyRaw)
 
         self.number = number
-
-        if 'identifier' in kwargs:
-            self.identifier = kwargs['identifier']
-        else:
-            self.identifier = None
+        self.identifier = kwargs.get('identifier', None)
 
     ### SPECIAL METHODS ###
 
@@ -328,7 +318,7 @@ class Lyric(style.StyleMixin):
             self._number = value
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class GeneralNote(base.Music21Object):
@@ -355,6 +345,8 @@ class GeneralNote(base.Music21Object):
     >>> gn.quarterLength
     0.4375
     '''
+    isNote = False
+    isRest = False
     isChord = False
     _styleClass = style.NoteStyle
 
@@ -398,8 +390,36 @@ class GeneralNote(base.Music21Object):
 
         # note: Chords handle ties differently
         self.tie = None # store a Tie object
+        
+    def __eq__(self, other):
+        '''
+        General Note objects are equal if their durations are equal and
+        they have the same articulation and expression classes (in any order)
+        and theiir ties are equal.
+        '''
 
-    #---------------------------------------------------------------------------
+        if other == None or not isinstance(other, GeneralNote):
+            return NotImplemented
+        # checks type, dots, tuplets, quarterlength, uses Pitch.__eq__
+        if self.duration != other.duration:
+            return False
+        # articulations are a list of Articulation objects
+        # converting to sets produces ordered cols that remove duplicate
+        # however, must then convert to list to match based on class ==
+        # not on class id()
+        if (sorted({x.classes[0] for x in self.articulations}) !=
+            sorted({x.classes[0] for x in other.articulations})):
+            return False
+        if (sorted({x.classes[0] for x in self.expressions}) !=
+            sorted({x.classes[0] for x in other.expressions})):
+            return False
+
+        # Tie objects if present compare only type
+        if self.tie != other.tie:
+            return False
+        return True
+
+    # --------------------------------------------------------------------------
     def _getLyric(self) -> str:
         if not self.lyrics:
             return None
@@ -579,10 +599,10 @@ class GeneralNote(base.Music21Object):
             return False
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # properties common to Notes, Rests,
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def augmentOrDiminish(self, scalar, *, inPlace=False):
         '''
         Given a scalar greater than zero, return a Note with a scaled Duration.
@@ -632,7 +652,7 @@ class GeneralNote(base.Music21Object):
         else:
             return None
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def getGrace(self, *, appogiatura=False, inPlace=False):
         '''
         Return a grace version of this GeneralNote
@@ -688,7 +708,7 @@ class GeneralNote(base.Music21Object):
             return e
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class NotRest(GeneralNote):
     '''
     Parent class for Note-like objects that are not rests; that is to say
@@ -722,7 +742,23 @@ class NotRest(GeneralNote):
     #==============================================================================================
     # Special functions
     #==============================================================================================
-
+    def __eq__(self, other):
+        if not super().__eq__(other):
+            return False
+        if not isinstance(other, NotRest):
+            return False
+        
+        if self.notehead != other.notehead:
+            return False
+        if self.noteheadFill != other.noteheadFill:
+            return False
+        if self.noteheadParenthesis != other.noteheadParenthesis:
+            return False
+        # Q: should volume need to be equal?
+        if self.beams != other.beams:
+            return False
+        return True
+    
     def __deepcopy__(self, memo=None):
         '''
         As NotRest objects have a Volume, objects, and Volume objects
@@ -735,7 +771,7 @@ class NotRest(GeneralNote):
         >>> m.volume.client is m
         True
         '''
-        #environLocal.printDebug(['calling NotRest.__deepcopy__', self])
+        # environLocal.printDebug(['calling NotRest.__deepcopy__', self])
         new = super().__deepcopy__(memo=memo)
         # after copying, if a Volume exists, it is linked to the old object
         # look at _volume so as not to create object if not already there
@@ -906,7 +942,7 @@ class NotRest(GeneralNote):
         music21.note.NotRestException: notehead parentheses must be True or False, not 'blah'
         ''')
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def hasVolumeInformation(self) -> bool:
         '''
         Returns bool whether volume was set -- saving some time for advanced
@@ -975,11 +1011,7 @@ class NotRest(GeneralNote):
         ''')
 
 
-
-
-
-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Note(NotRest):
     '''
     One of the most important music21 classes, a Note
@@ -1004,7 +1036,7 @@ class Note(NotRest):
     (such as pitch, duration,
     articulations, and ornaments) are equal.  Attributes
     that might change based on the wider context
-    of a note (such as offset, beams, stem direction)
+    of a note (such as offset)
     are not compared. This test presently does not look at lyrics in
     establishing equality.  It may in the future.
 
@@ -1028,14 +1060,11 @@ class Note(NotRest):
     >>> n = note.Note(nameWithOctave='D#5')
     >>> n.nameWithOctave
     'D#5'
-
-
     '''
     isNote = True
-    isRest = False
 
     # define order to present names in documentation; use strings
-    _DOC_ORDER = ['duration', 'quarterLength', 'nameWithOctave', 'pitchClass']
+    _DOC_ORDER = ['duration', 'quarterLength', 'nameWithOctave']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
     'isNote': 'Boolean read-only value describing if this Note is a Note (True).',
@@ -1068,7 +1097,7 @@ class Note(NotRest):
                 del keywords['nameWithOctave']
             self.pitch = pitch.Pitch(name, **keywords)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # operators, representations, and transformations
 
     def __repr__(self):
@@ -1099,52 +1128,19 @@ class Note(NotRest):
         '''
         if other is None or not isinstance(other, Note):
             return NotImplemented
+
+        retval = super().__eq__(other)
+        if retval is not True:
+            return retval
+        
         # checks pitch.octave, pitch.accidental, uses Pitch.__eq__
         if self.pitch != other.pitch:
             return False
-        # checks type, dots, tuplets, quarterlength, uses Pitch.__eq__
-        if self.duration != other.duration:
-            return False
-        # articulations are a list of Articulation objects
-        # converting to sets produces ordered cols that remove duplicate
-        # however, must then convert to list to match based on class ==
-        # not on class id()
-        if (sorted(list(set([x.classes[0] for x in self.articulations]))) !=
-            sorted(list(set([x.classes[0] for x in other.articulations])))):
-            return False
-        if (sorted(list(set([x.classes[0] for x in self.expressions]))) !=
-            sorted(list(set([x.classes[0] for x in other.expressions])))):
-            return False
-
-        # Tie objects if present compare only type
-        if self.tie != other.tie:
-            return False
         return True
-
-    def __ne__(self, other):
-        '''Inequality.
-
-        >>> n1 = note.Note()
-        >>> n1.pitch.name = 'G#'
-        >>> n2 = note.Note()
-        >>> n2.pitch.name = 'A-'
-        >>> n3 = note.Note()
-        >>> n3.pitch.name = 'G#'
-        >>> n1 != n2
-        True
-        >>> n1 != n3
-        False
-        >>> n3.duration.quarterLength = 3
-        >>> n1 != n3
-        True
-        '''
-        if other is None or not isinstance(other, Note):
-            return NotImplemented
-        return not self.__eq__(other)
 
     def __lt__(self, other):
         '''
-        __lt__, __gt__, __le__, __ge__ all use a pitch comparison
+        __lt__, __gt__, __le__, __ge__ all use a pitch comparison.
 
         >>> highE = note.Note('E5')
         >>> lowF = note.Note('F2')
@@ -1159,18 +1155,39 @@ class Note(NotRest):
         >>> highE <= otherHighE
         True
 
-        Notice that in Python3 you cannot compare w/ ints or anything not pitched.
+        Notice you cannot compare Notes w/ ints or anything not pitched.
 
-        `highE < 50`
-
-        Traceback (most recent call last):
-        TypeError: unorderable types: Note() < int()
+        :: 
+            `highE < 50`
+            Traceback (most recent call last):
+            TypeError: '<' not supported between instances of 'Note' and 'int'
+            
+        Note also that two objects can be >= and <= without being equal, because
+        only pitch-height is being compared in <, <=, >, >= but duration and other
+        elements are compared in equality.
+        
+        >>> otherHighE.duration.type = 'whole'
+        >>> highE >= otherHighE
+        True
+        >>> highE <= otherHighE
+        True
+        >>> highE == otherHighE
+        False
+        
+        
+        OMIT_FROM_DOCS
+        
+        The `highE < 50` test fails on Python 3.5, because of a change to the
+        TypeError output list.  When m21 becomes Python 3.6 > only, then
+        we can add the test back in.
         '''
         try:
             return self.pitch < other.pitch
         except AttributeError:
             return NotImplemented
 
+    # do not factor out into @total_ordering because of the difference between __eq__ and
+    # the equal part of __le__ and __ge__
     def __gt__(self, other):
         try:
             return self.pitch > other.pitch
@@ -1189,7 +1206,7 @@ class Note(NotRest):
         except AttributeError:
             return NotImplemented
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # property access
 
 
@@ -1392,11 +1409,11 @@ class Note(NotRest):
         return ''.join(msg)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # convenience classes
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Unpitched(NotRest):
     '''
     A General class of unpitched objects which appear at different places
@@ -1420,15 +1437,23 @@ class Unpitched(NotRest):
     Traceback (most recent call last):
     AttributeError: 'Unpitched' object has no attribute 'pitch'
     '''
-    isNote = False
-    isRest = False
-
     def __init__(self):
         super().__init__()
         self.displayStep = 'C'
         self.displayOctave = 4
         self._storedInstrument = None
 
+    def __eq__(self, other):
+        if not super().__eq__(other):
+            return False
+        if not isinstance(other, Unpitched):
+            return False
+        if self.displayStep != other.displayStep:
+            return False
+        if self.displayOctave != other.displayOctave:
+            return False
+        return True
+        
     def _getStoredInstrument(self):
         return self._storedInstrument
 
@@ -1455,7 +1480,7 @@ class Unpitched(NotRest):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Rest(GeneralNote):
     '''
     Rests are represented in music21 as GeneralNote objects that do not have
@@ -1480,7 +1505,6 @@ class Rest(GeneralNote):
     >>> r.name
     'rest'
     '''
-    isNote = False
     isRest = True
     name = 'rest'
 
@@ -1527,30 +1551,19 @@ class Rest(GeneralNote):
         >>> r2 = note.Rest()
         >>> r1 == r2
         True
+        >>> r1 != r2
+        False
+        
         >>> r2.duration.quarterLength = 4.0/3
         >>> r1 == r2
         False
         >>> r1 == note.Note()
         False
         '''
-        return isinstance(other, Rest) and self.duration == other.duration
-
-    def __ne__(self, other):
-        '''
-        Inequality
-
-        >>> r1 = note.Rest()
-        >>> r2 = note.Rest()
-        >>> r1 != r2
-        False
-        >>> r2.duration.quarterLength = 2.0
-        >>> r1 != r2
-        True
-        >>> r1 != note.Note()
-        True
-        '''
-        return not self == other
-
+        if not isinstance(other, Rest):
+            return NotImplemented
+        
+        return super().__eq__(other)
 
     @property
     def fullName(self) -> str:
@@ -1591,7 +1604,7 @@ class SpacerRest(Rest):
                     self.name, self.duration.quarterLength)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # test methods and classes
 
 class TestExternal(unittest.TestCase): # pragma: no cover
@@ -1629,7 +1642,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1742,7 +1755,7 @@ class Test(unittest.TestCase):
             for obj in n.expressions:
                 if isinstance(obj, expressions.Fermata):
                     found.append(obj)
-        self.assertEqual(len(found), 6)
+        self.assertEqual(len(found), 24)
 
 
     def testNoteBeatProperty(self):
@@ -1826,7 +1839,7 @@ class Test(unittest.TestCase):
 
 
     def testNoteBeatPropertyCorpus(self):
-        data = [['bach/bwv255', [4.0, 1.0, 2.0, 2.5, 3.0, 4.0, 4.5, 1.0, 1.5]],
+        data = [['bach/bwv255', [4.0, 1.0, 2.5, 3.0, 4.0, 4.5, 1.0, 1.5]],
                 ['bach/bwv153.9', [1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 3.0, 1.0]]
                 ]
 
@@ -2003,7 +2016,7 @@ class Test(unittest.TestCase):
         self.assertEqual(n1Copy.volume.velocity, 100)
         self.assertEqual(n1Copy.volume.client, n1Copy)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Note, Rest, SpacerRest, Unpitched, NotRest, GeneralNote, Lyric]
 
@@ -2013,5 +2026,5 @@ if __name__ == '__main__':
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

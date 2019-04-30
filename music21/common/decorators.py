@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         common/decorators.py
 # Purpose:      Decorators for functions
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import warnings
 
 from functools import wraps
@@ -26,6 +26,7 @@ def optional_arg_decorator(fn):
     @wraps(fn)
     def wrapped_decorator(*args, **kwargs):
         is_bound_method = hasattr(args[0], fn.__name__) if args else False
+        klass = None
 
         if is_bound_method:
             klass = args[0]
@@ -144,7 +145,7 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
 if __name__ == "__main__":
     import music21 # @Reimport
     music21.mainTest()
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 
 

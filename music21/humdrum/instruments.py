@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         humdrum.instruments.py
 # Purpose:      Instrument Lists for Humdrum and kern in particular
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Instrument translations from http://www.music-cog.ohio-state.edu/Humdrum/guide.append2.html
 '''
@@ -225,7 +225,7 @@ def fromHumdrumClass(hdclass):
     '''
 
     >>> humdrum.instruments.fromHumdrumClass('vox')
-    <music21.instrument.Vocalist Voice>
+    <music21.instrument.Vocalist 'Voice'>
     '''
     from music21 import instrument
     try:
@@ -240,7 +240,7 @@ def fromHumdrumInstrument(hdinst):
     '''
 
     >>> humdrum.instruments.fromHumdrumInstrument('calto')
-    <music21.instrument.Alto Alto>
+    <music21.instrument.Alto 'Alto'>
     '''
     from music21 import instrument
     try:

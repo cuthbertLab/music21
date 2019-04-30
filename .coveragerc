@@ -1,3 +1,7 @@
+[run]
+source =
+    /home/travis/music21base/music21
+
 [report]
 exclude_lines =
     if __name__ == .__main__.:

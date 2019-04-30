@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         reduceChords.py
 # Purpose:      Tools for eliminating passing chords, etc.
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Automatically reduce a MeasureStack to a single chord or group of chords.
 '''
@@ -27,7 +27,7 @@ from music21 import tree
 #from music21 import tie
 environLocal = environment.Environment('reduceChords')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 def testMeasureStream1():
     '''
@@ -52,7 +52,7 @@ def testMeasureStream1():
     return measure
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class ChordReducerException(exceptions21.Music21Exception):
     pass
 
@@ -314,7 +314,7 @@ class ChordReducer:
             if c.isNote:
                 p = tuple(c.pitch.pitchClass)
             else:
-                p = tuple(set([x.pitchClass for x in c.pitches]))
+                p = tuple({x.pitchClass for x in c.pitches})
             if p not in presentPCs:
                 presentPCs[p] = 0.0
             presentPCs[p] += weightAlgorithm(c)
@@ -537,7 +537,7 @@ class ChordReducer:
             if isinstance(c, note.Note):
                 p = tuple(c.pitch.pitchClass)
             elif isinstance(c, chord.Chord):
-                p = tuple(set([x.pitchClass for x in c.pitches]))
+                p = tuple({x.pitchClass for x in c.pitches})
             else:
                 continue
             if p in trimmedMaxChords and p != currentGreedyChordPCs:
@@ -680,7 +680,7 @@ class ChordReducer:
         scoreTree.splitAt(bassOffsets)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -735,7 +735,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         score.show()
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # define presented order in documentation
 
 _DOC_ORDER = []

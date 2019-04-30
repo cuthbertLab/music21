@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         freezeThaw.py
 # Purpose:      Methods for storing any music21 object on disk.
 #               Uses pickle and json
@@ -10,7 +10,7 @@
 # Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 r'''
 This module contains objects for storing complete `Music21Objects`, especially
 `Stream` and `Score` objects on disk.  Freezing (or "pickling") refers to
@@ -89,13 +89,13 @@ from music21 import environment
 _MOD = 'freezeThaw'
 environLocal = environment.Environment(_MOD)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class FreezeThawException(exceptions21.Music21Exception):
     pass
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class StreamFreezeThawBase:
@@ -135,7 +135,7 @@ class StreamFreezeThawBase:
         return allObjs
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class StreamFreezer(StreamFreezeThawBase):
     '''
     This class is used to freeze a Stream, preparing it for serialization
@@ -428,7 +428,7 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> s._storedElementOffsetTuples
         [(<music21.note.Note C#>, 0.0),
          (<music21.note.Note E->, 1.0),
-         (<music21.bar.Barline style=regular>, 'end')]
+         (<music21.bar.Barline type=regular>, 'end')]
         >>> n1.getOffsetBySite(s)
         Traceback (most recent call last):
         music21.sites.SitesException: an entry for this object <music21.note.Note C#> is
@@ -455,7 +455,7 @@ class StreamFreezer(StreamFreezeThawBase):
         [(<music21.note.Note C#>, 0.0),
          (<music21.note.Note E->, 1.0),
          (<music21.stream.Voice ...>, 2.0),
-         (<music21.bar.Barline style=regular>, 'end')]
+         (<music21.bar.Barline type=regular>, 'end')]
         >>> s2._storedElementOffsetTuples[2][0] is v1
         True
 
@@ -587,7 +587,7 @@ class StreamFreezer(StreamFreezeThawBase):
         else:
             streamObj = hierarchyObject
         streamsFoundGenerator = streamObj.recurse(streamsOnly=True,
-                       restoreActiveSites=False)
+                       restoreActiveSites=False, includeSelf=True)
         streamIds = [id(s) for s in streamsFoundGenerator]
 
         if getSpanners is True:
@@ -595,7 +595,7 @@ class StreamFreezer(StreamFreezeThawBase):
             streamIds += spannerBundle.getSpannerStorageIds()
 
         if getVariants is True:
-            for el in streamObj.recurse().getElementsByClass('Variant'):
+            for el in streamObj.recurse(includeSelf=True).getElementsByClass('Variant'):
                 streamIds += self.findActiveStreamIdsInHierarchy(el._stream)
 
         # should not happen that there are duplicates, but possible with spanners...
@@ -606,7 +606,7 @@ class StreamFreezer(StreamFreezeThawBase):
         return streamIds
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def parseWriteFmt(self, fmt):
         '''Parse a passed-in write format
 
@@ -838,9 +838,9 @@ class StreamThawer(StreamFreezeThawBase):
         >>> s.show('text')
         {0.0} <music21.note.Note C#>
         {1.0} <music21.note.Note E->
-        {2.0} <music21.bar.Barline style=regular>
+        {2.0} <music21.bar.Barline type=regular>
         >>> s._endElements
-        [<music21.bar.Barline style=regular>]
+        [<music21.bar.Barline type=regular>]
         >>> s[1].getOffsetBySite(s)
         1.0
 
@@ -858,7 +858,7 @@ class StreamThawer(StreamFreezeThawBase):
         {1.0} <music21.note.Note E->
         {2.0} <music21.stream.Voice ...>
             {2.0} <music21.note.Note F#>
-        {5.0} <music21.bar.Barline style=regular>
+        {5.0} <music21.bar.Barline type=regular>
         '''
         if hasattr(streamObj, '_storedElementOffsetTuples'):
             #streamObj._elementTree = ElementTree(source=streamObj)
@@ -942,7 +942,7 @@ class StreamThawer(StreamFreezeThawBase):
 
         fmt = self.parseOpenFmt(fileData)
         if fmt == 'pickle':
-            #environLocal.printDebug(['opening fp', fp])
+            # environLocal.printDebug(['opening fp', fp])
             f = open(fp, 'rb')
             if zipType is None:
                 storage = pickle.load(f)
@@ -988,9 +988,9 @@ class StreamThawer(StreamFreezeThawBase):
         environLocal.printDebug('StreamThawer:openStr: storage is: %s' % storage)
         self.stream = self.unpackStream(storage)
 
-#--------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1250,14 +1250,14 @@ class Test(unittest.TestCase):
         d = converter.thawStr(f)
         self.assertEqual(d[1][20].volume._client.__class__.__name__, 'weakref')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 
 

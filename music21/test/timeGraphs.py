@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:          timeGraphs.py
 # Purpose:       install
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import time
 
 
@@ -79,7 +79,7 @@ class Timer:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class CallTest:
     '''Base class for timed tests
     '''
@@ -104,7 +104,7 @@ class M21CallTest:
         self.m21 = music21
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TestTimeHumdrum(M21CallTest):
     def testFocus(self):
         music21 = self.m21
@@ -290,6 +290,7 @@ class TestCreateDurations(CallTest):
 class TestParseABC(CallTest):
 
     def __init__(self):
+        super().__init__()
         from music21.test import testPerformance
         self.t = testPerformance.Test()
 
@@ -305,7 +306,7 @@ class TestParseABC(CallTest):
 class TestGetContextByClassA(CallTest):
 
     def __init__(self):
-
+        super().__init__()
         from music21 import corpus
         self.s = corpus.parse('bwv66.6')
 
@@ -326,6 +327,7 @@ class TestGetContextByClassA(CallTest):
 class TestParseRNText(CallTest):
 
     def __init__(self):
+        super().__init__()
         from music21.test import testPerformance
         self.t = testPerformance.Test()
 
@@ -333,10 +335,11 @@ class TestParseRNText(CallTest):
         self.t.runParseMonteverdiRNText()
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TestMusicXMLMultiPartOutput(CallTest):
 
     def __init__(self):
+        super().__init__()
         from music21 import note, stream
         self.s = stream.Score()
         for i in range(10): # parts
@@ -526,7 +529,7 @@ class TestRomantextParse(CallTest):
         self.converter.parse(self.tf.monteverdi_3_13)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # handler
 class CallGraph:
 
@@ -581,12 +584,13 @@ class CallGraph:
         Note that the default of runWithEnviron imports music21.environment.  That might
         skew results
         '''
+        from music21 import environment
+
         suffix = '.png' # '.svg'
         outputFormat = suffix[1:]
         _MOD = "test.timeGraphs"
 
         if runWithEnviron:
-            from music21 import environment
             environLocal = environment.Environment(_MOD)
             fp = environLocal.getTempFile(suffix)
         # manually get a temporary file
@@ -665,6 +669,6 @@ if __name__ == '__main__':
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

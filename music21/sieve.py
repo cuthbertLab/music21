@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         sieve.py
 # Purpose:      sieve operations, after Iannis Xenakis.
 #
@@ -8,7 +8,7 @@
 # Copyright:    Copyright © 2003, 2010 Christopher Ariza
 #               Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 A comprehensive, object model of the Xenakis Sieve. :class:`music21.sieve.Sieve`
 objects can be created from high-level string notations, and used to generate line segments
@@ -65,7 +65,7 @@ _MOD = 'sieve'
 environLocal = environment.Environment(_MOD)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class UnitException(exceptions21.Music21Exception):
     pass
 
@@ -92,7 +92,7 @@ RESIDUAL = list(string.digits) + ['@']
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # from
 # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/117119
 # David Eppstein, UC Irvine, 28 Feb 2002
@@ -148,7 +148,7 @@ def eratosthenes(firstCandidate=2):
         # q is the candidate, the running integer list
         p = D.pop(q, None) # returns item for key, None if not in dict
         # if candidate (q) is already in dict, not a prime
-        if p != None: # key (prime candidate) in dictionary
+        if p is not None: # key (prime candidate) in dictionary
             # update dictionary w/ the next multiple of this prime not already
             # in dicitionary
             nextMult = p + q # prime prime plus the candidate; next multiple
@@ -180,29 +180,39 @@ def rabinMiller(n):
     True
     >>> sieve.rabinMiller(4)
     False
-    >>> sieve.rabinMiller(123986234193)
+
+    >>> sieve.rabinMiller(6**4 + 1) # prime
+    True
+    
+    >>> sieve.rabinMiller(123986234193) # divisible by 3, runs fast
     False
     '''
     n = abs(n)
-    if n in [2, 3]:
+    if n in (2, 3):
         return True
+
     m = n % 6 # if n (except 2 and 3) mod 6 is not 1 or 5, then n isn't prime
-    if m != 1 and m != 5:
+    if m not in (1, 5):
         return False
+    
     # primes up to 100;  2, 3 handled by mod 6
-    primes = [5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43,
+    primes = [ 5,  7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43,
               47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+    
     if n <= 100:
         if n in primes:
             return True # must include 2, 3
         return False
+    
     for prime in primes:
         if n % prime == 0:
             return 0
+
     s, r = n - 1, 1
     while not s & 1:
         s >>= 1
         r = r + 1
+    
     for i in range(10): # random tests
         # calculate a^s mod n, where a is a random number
         y = pow(random.randint(1, n - 1), s, n)
@@ -221,7 +231,7 @@ def rabinMiller(n):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # list processing and unit interval routines
 # possible move to common.py if used elsewhere
 
@@ -247,7 +257,7 @@ def discreteBinaryPad(series, fixRange=None):
         if not common.isNum(x):
             raise UnitException('non integer value found')
     discrete = []
-    if fixRange != None:
+    if fixRange is not None:
         fixRange.sort() # make sure sorted
         minVal = fixRange[0]
         maxVal = fixRange[-1]
@@ -287,7 +297,7 @@ def unitNormRange(series, fixRange=None):
 
 
     '''
-    if fixRange != None:
+    if fixRange is not None:
         fixRange.sort()
         minFound = fixRange[0]
         maxFound = fixRange[-1]
@@ -386,7 +396,7 @@ def unitNormStep(step, a=0, b=1, normalized=True):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # note: some of these methods are in common, though they are slightly different algorithms;
 # need to test for compatibility
 
@@ -487,7 +497,7 @@ def _meziriac(c1, c2):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class PrimeSegment:
     def __init__(self, start, length):
         '''
@@ -564,11 +574,11 @@ class PrimeSegment:
         '''
         z = [self.seg[0], self.seg[-1]]
 
-        if segmentFormat in ['bin', 'binary']:
+        if segmentFormat in ('bin', 'binary'):
             return discreteBinaryPad(self.seg, z)
-        elif segmentFormat in ['unit']:
+        elif segmentFormat == 'unit':
             return unitNormRange(self.seg, z)
-        elif segmentFormat in ['wid', 'width']:
+        elif segmentFormat in ('wid', 'width'):
             wid = []
             for i in range(len(self.seg) - 1):
                 wid.append((self.seg[i + 1]-self.seg[i]))
@@ -583,7 +593,7 @@ class PrimeSegment:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Residual:
     '''
     object that represents a modulus and a start point
@@ -601,7 +611,7 @@ class Residual:
         self._z = z
         #print 'residual init self._z', self._z
         self._m = m
-        if neg not in [0, 1]:
+        if neg not in (0, 1):
             raise ResidualException('negative value must be 0, 1, or a Boolean')
         self._neg = neg # negative, complement boolean
         if self._m == 0: # 0 mode causes ZeroDivisionError
@@ -611,7 +621,7 @@ class Residual:
         self._segmentFormatOptions = ['int', 'bin', 'unit', 'wid']
         self._segmentFormat = 'int'
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # utility functions
     def setZ(self, z):
         '''
@@ -630,10 +640,10 @@ class Residual:
         #fmt = drawer.strScrub(fmt, 'l')
         fmt = fmt.strip().lower()
         if fmt in self._segmentFormatOptions:
-            raise ResidualException('format not in format optoins: %s' % fmt)
+            raise ResidualException('format not in format options: %s' % fmt)
         self._segmentFormat = fmt
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def segment(self, n=0, z=None, segmentFormat=None):
         '''
         get a residual subset of this modulus at this n
@@ -669,14 +679,14 @@ class Residual:
         else:
             seg = subset
 
-        if segmentFormat in ['bin', 'binary']:
+        if segmentFormat in ('bin', 'binary'):
             return discreteBinaryPad(seg, z)
-        elif segmentFormat in ['unit']:
+        elif segmentFormat == 'unit':
             return unitNormRange(seg, z)
-        elif segmentFormat in ['wid', 'width']: # difference always equal to m
+        elif segmentFormat in ('wid', 'width'): # difference always equal to m
             wid = [self._m] * (len(seg) - 1) # one shorter than segment
             return wid
-        elif segmentFormat in ['int', 'integer']: # int, integer
+        elif segmentFormat in ('int', 'integer'): # int, integer
             return seg
         else:
             raise ResidualException('%s not a valid sieve segmentFormat string.' % segmentFormat)
@@ -691,7 +701,7 @@ class Residual:
         '''
         return self._m
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def copy(self):
         # TODO: replace with deepcopy method
         m = copy.copy(self._m)
@@ -751,22 +761,11 @@ class Residual:
         else:
             return 0
 
-    def __ne__(self, other):
-        '''
-        m and shift not equal
-        '''
-        if other is None:
-            return 1
-        if (self._m != other._m
-                or self._shift != other._shift
-                or self._neg != other._neg):
-            return 1
-        else:
-            return 0
-
     def __cmp__(self, other):
         '''
         allow comparison based on m and shift; if all equal look at neg
+        
+        Still being used internally even though __cmp__ is not used in Python 3
         '''
         #return neg if self < other, zero if self == other,
         # a positive integer if self > other.
@@ -842,7 +841,7 @@ class Residual:
         pass
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _cmpIntersection(self, m1, m2, n1, n2):
         '''
         compression by intersection
@@ -875,7 +874,7 @@ class Residual:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class CompressionSegment:
     '''
     Utility to convert from a point sequence to sieve.
@@ -931,7 +930,7 @@ class CompressionSegment:
 
     def _zUpdate(self, z=None):
         # z must at least be a superset of match
-        if z != None: # its a list
+        if z is not None: # its a list
             if not self._subset(self._match, z):
                 raise CompressionSegmentException(
                     'z range must be a superset of desired segment')
@@ -943,7 +942,7 @@ class CompressionSegment:
             zMin, zMax = self._match[0], self._match[-1]
             self._z = list(range(zMin, (zMax + 1)))
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def __call__(self):
         '''
 
@@ -964,7 +963,7 @@ class CompressionSegment:
             resStr = '|'.join(resStr)
         return resStr
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _subset(self, sub, thisSet):
         '''
         True if sub is part of set; assumes no redundancies in each
@@ -1026,7 +1025,7 @@ class CompressionSegment:
         self._residuals.sort()
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # http://docs.python.org/lib/set-objects.html
 # set object precedence is places & before |
@@ -1102,7 +1101,7 @@ class Sieve:
         if self._usrStr is not None:
             self._load()
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _load(self):
         if common.isListLike(self._usrStr):
             self._resClear()
@@ -1160,7 +1159,7 @@ class Sieve:
             self._expPeriod = lcmExp
             self._cmpPeriod = _lcmRecurse(mListCmp)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def expand(self):
         '''
         Set this Sieve to its expanded state.
@@ -1181,7 +1180,7 @@ class Sieve:
             self._state = 'cmp'
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _getParameterData(self):
         '''
         Provides a dictionary data representation for exchange
@@ -1194,7 +1193,7 @@ class Sieve:
             data['z'] = self._z
         return data
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # utility functions
     def setZ(self, z):
         '''
@@ -1218,7 +1217,7 @@ class Sieve:
         self._segmentFormat = fmt
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # operator overloading for sieves
     # problem: redunant parenthesis are not removed
 
@@ -1289,7 +1288,7 @@ class Sieve:
 
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # string conversions
     def _parseResidual(self, usrStr):
         '''
@@ -1386,7 +1385,7 @@ class Sieve:
         usrStr = usrStr.replace(' ', '')
         return usrStr
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _setInstantiateStr(self, valList):
         '''
         return string necessary to instantiate a set object.
@@ -1457,7 +1456,7 @@ class Sieve:
         if z is None: # if none given, give internal
             z = self._z
         # z is valid, gets default from residual class
-        if not common.isListLike(z) and z != None:
+        if not common.isListLike(z) and z is not None:
             raise SieveException('z must be a list of integers, not %r' % z)
         valList = self._resLib[resId](n, z) # call residual object
         return self._setInstantiateStr(valList)
@@ -1495,7 +1494,7 @@ class Sieve:
         elif state == 'exp':
             raise SieveException('expanded residual classes shold never be cleared')
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # expansion methods
 
     def _initLoadSegment(self, usrData):
@@ -1553,18 +1552,18 @@ class Sieve:
                 msg = 'negation cannot be used without operands'
                 raise SieveException('badly formed logical string (a): (%s)' % msg)
             # attempting to use negationg as a binary operators
-            elif (char == NEG and charPrevious != None and
+            elif (char == NEG and charPrevious is not None and
                 charPrevious in RESIDUAL): # digit, or @ sign
                 msg = 'negation cannot be used as a binary operator'
                 raise SieveException('badly formed logical string (b): (%s)' % msg)
             # check if NEG is not folloed by a digit;
             # special case of NEG; need to convert into a binary operator
-            elif (char == NEG and charNext != None and
+            elif (char == NEG and charNext is not None and
                 charNext == LGROUP):
                 # if not first char, and the prevous char is not an operator or
                 # a delimter, this is an error (binary negation)
-                if (charPrevious != None and charPrevious not
-                    in [LGROUP, AND, OR, XOR]):
+                if (charPrevious is not None and charPrevious not
+                    in (LGROUP, AND, OR, XOR)):
                     msg = 'negation must be of a group and isolated by delimiters'
                     raise SieveException('badly formed logical string (c): (%s)' % msg)
                 # add a set of z, or 1@0
@@ -1606,7 +1605,7 @@ class Sieve:
         self._expTree = ''.join(self._expTree)
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # compression methods
     def _cmpIntersection(self):
         '''
@@ -1658,7 +1657,7 @@ class Sieve:
 
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     def segment(self, state=None, n=0, z=None, segmentFormat=None):
         '''
@@ -1713,11 +1712,11 @@ class Sieve:
 
         seg = list(seg)
         seg.sort()
-        if segmentFormat in ['bin', 'binary']:
+        if segmentFormat in ('bin', 'binary'):
             return discreteBinaryPad(seg, z)
-        elif segmentFormat in ['unit']:
+        elif segmentFormat == 'unit':
             return unitNormRange(seg, z)
-        elif segmentFormat in ['wid', 'width']:
+        elif segmentFormat in ('wid', 'width'):
             wid = []
             for i in range(len(seg) - 1):
                 wid.append((seg[i + 1]-seg[i]))
@@ -1780,7 +1779,7 @@ class Sieve:
             zMax = p + zStep
 
             # must collect non width formats as integer values; then convert
-            if segmentFormat in ['wid', 'width']:
+            if segmentFormat in ('wid', 'width'):
                 segmentPartial = self.segment(self._state, n,
                                               list(range(zMin, zMax)), segmentFormat)
             else: # if a unit, need to start with integers
@@ -1801,10 +1800,10 @@ class Sieve:
 
         # only width format comes out correct after concatenation
         # for unit and binary, derive new z based on min and max
-        if format in ['unit']:
+        if segmentFormat == 'unit':
             # make z to minimum and max value found
             return unitNormRange(seg, range(seg[0], seg[-1] + 1))
-        elif format in ['bin', 'binary']:
+        elif segmentFormat in ('bin', 'binary'):
             # make to minimum and max value found
             return discreteBinaryPad(seg, range(seg[0], seg[-1] + 1))
         else:
@@ -1831,7 +1830,7 @@ class Sieve:
     def __str__(self):
         return self.represent()
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # high level utility obj
 
 class PitchSieve:
@@ -1876,7 +1875,7 @@ class PitchSieve:
             self.eld = float(eld)
         else:
             self.eld = eld
-        #environLocal.printDebug(['PitchSieve', eld])
+        # environLocal.printDebug(['PitchSieve', eld])
 
 
     def __call__(self):
@@ -1996,7 +1995,7 @@ class PitchSieve:
         post = []
         #value = 0
         for i, width in enumerate(widthSegments):
-            #environLocal.printDebug(['stepStart', stepStart, 'stepEnd', stepEnd])
+            # environLocal.printDebug(['stepStart', stepStart, 'stepEnd', stepEnd])
             intervalObj = interval.Interval(width * self.eld)
             post.append(intervalObj)
 
@@ -2015,7 +2014,7 @@ class PitchSieve:
 #                 stepEnd = integerSteps[i + 1]
 #             else:
 #                 break
-#             #environLocal.printDebug(['stepStart', stepStart, 'stepEnd', stepEnd])
+#             # environLocal.printDebug(['stepStart', stepStart, 'stepEnd', stepEnd])
 #             intervalObj = interval.Interval(stepEnd-stepStart)
 #             post.append(intervalObj)
 #
@@ -2026,7 +2025,7 @@ class PitchSieve:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -2063,7 +2062,7 @@ class Test(unittest.TestCase):
                  (1, 6, 11, 16, 17),
                     ]
         for arg in testArgs:
-            #environLocal.printDebug(['testSieveParse', arg])
+            # environLocal.printDebug(['testSieveParse', arg])
             testObj = Sieve(arg)
             dummy = testObj(0, list(range(30)))
 
@@ -2166,12 +2165,12 @@ class Test(unittest.TestCase):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
@@ -2179,5 +2178,5 @@ if __name__ == '__main__':
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
