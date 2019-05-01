@@ -40,6 +40,7 @@ from music21 import harmony
 
 environLocal = environment.Environment('abcFormat.translate')
 
+reFullPitchName = re.compile('([A-G])(#|\-|n)*(\d+)')
 
 
 def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
@@ -219,6 +220,7 @@ def parseTokens(mh, dst, p, useMeasures):
     # in case need to transpose due to clef indication
     from music21 import abcFormat
 
+    accidentalized = dict()
     postTransposition = 0
     clefSet = False
     for t in mh.tokens:
@@ -279,6 +281,8 @@ def parseTokens(mh, dst, p, useMeasures):
             #ql += t.quarterLength
 
         elif isinstance(t, abcFormat.ABCNote):
+            pit = t.pitchName
+            basePit = None
             # add the attached chord symbol
             if t.chordSymbols:
                 cs_name = t.chordSymbols[0]
@@ -297,7 +301,20 @@ def parseTokens(mh, dst, p, useMeasures):
             if t.isRest:
                 n = note.Rest()
             else:
-                n = note.Note(t.pitchName)
+                mat = reFullPitchName.search(t.pitchName)
+                if not mat:
+                    raise ValueError("Bad note pitch name: {}".format(t.pitchName))
+                noteName = mat.group(1)
+                octave = mat.group(3)
+                basePit = noteName + octave
+                accidental = None
+                if mat.group(2):  # Accidental present
+                    accidental = mat.group(2)
+                    accidentalized[basePit] = accidental
+                elif basePit in accidentalized:
+                    pit = noteName + accidentalized[basePit] + octave
+                    
+                n = note.Note(pit)
                 if n.pitch.accidental is not None:
                     n.pitch.accidental.displayStatus = t.accidentalDisplayStatus
 
