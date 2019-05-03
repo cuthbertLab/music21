@@ -27,6 +27,7 @@ from music21 import key
 from music21 import pitch
 from music21 import style
 
+from music21.chord import sortDiatonicAscending
 from music21.figuredBass import realizerScale
 
 from music21 import environment
@@ -1555,22 +1556,21 @@ class ChordSymbol(Harmony):
         thirteenths = ['dominant-13th', 'major-13th', 'minor-13th']
 
         if self.chordKind in ninths:
-            pitches[1] = pitch.Pitch(pitches[1].name + str(pitches[1].octave + 1))
+            pitches[1].octave += 1
         elif self.chordKind in elevenths:
-            pitches[1] = pitch.Pitch(pitches[1].name + str(pitches[1].octave + 1))
-            pitches[3] = pitch.Pitch(pitches[3].name + str(pitches[3].octave + 1))
+            pitches[1].octave +=1
+            pitches[3].octave +=1
 
         elif self.chordKind in thirteenths:
-            pitches[1] = pitch.Pitch(pitches[1].name + str(pitches[1].octave + 1))
-            pitches[3] = pitch.Pitch(pitches[3].name + str(pitches[3].octave + 1))
-            pitches[5] = pitch.Pitch(pitches[5].name + str(pitches[5].octave + 1))
+            pitches[1].octave += 1
+            pitches[3].octave += 1
+            pitches[5].octave += 1
         else:
             return pitches
 
-        c = chord.Chord(pitches)
-        c = c.sortDiatonicAscending()
+        sortDiatonicAscending(pitches)
 
-        return list(c.pitches)
+        return pitches
 
     def _adjustPitchesForChordStepModifications(self, pitches):
         '''
@@ -1619,6 +1619,10 @@ class ChordSymbol(Harmony):
 
         rootPitch = self.root()
         sc = scale.MajorScale(rootPitch)
+        # in case of inversion, the root should be updated, so make sure it's
+        # still accurate
+        if not rootPitch is pitches[0]:
+            print('hey')
 
         def typeAdd(hD):
             '''
@@ -1956,13 +1960,15 @@ class ChordSymbol(Harmony):
         # render in the 3rd octave by default
         self._overrides['root'].octave = 3
 
+        # Re-arranged this code to ensure root in pitches is the actual
+        # root object, so that subsequent pitch modifications are propagated
+        # to it.
+        pitches = [self._overrides['root']]
         if self._notationString():
-            pitches = fbScale.getSamplePitches(self._overrides['root'], self._notationString())
+            new_pitches = fbScale.getSamplePitches(self._overrides['root'],
+                                           self._notationString())
             # remove duplicated bass note due to figured bass method.
-            pitches.pop(0)
-        else:
-            pitches = []
-            pitches.append(self._overrides['root'])
+            pitches.extend(new_pitches[2:])
 
         pitches = self._adjustOctaves(pitches)
 
@@ -2013,8 +2019,8 @@ class ChordSymbol(Harmony):
             for thisPitch in pitches:
                 thisPitch.octave += 1
 
+        sortDiatonicAscending(pitches)
         self.pitches = tuple(pitches)
-        self.sortDiatonicAscending(inPlace=True)
 
         # set overrides to be pitches in the harmony
         self._overrides = {}
@@ -2722,6 +2728,76 @@ class Test(unittest.TestCase):
         self.assertEqual(pitches, cs1.pitches)
         self.assertEqual(pitches, cs2.pitches)
         self.assertEqual(pitches, cs3.pitches)
+
+    def testChordStepBass(self):
+        """
+        This tests a bug where the chord modification (add 2) was placed at a
+        wrong octave, resulting in a D bass instead of the proper E.
+        """
+        from xml.etree.ElementTree import fromstring as EL
+        from music21 import musicxml, pitch
+
+        pitches = ('E3', 'G3', 'C4', 'D4')
+        pitches = tuple(pitch.Pitch(p) for p in pitches)
+
+        xmlString = """
+      <harmony default-y="40" font-size="15">
+        <root>
+          <root-step>C</root-step>
+        </root>
+        <kind halign="center">major</kind>
+        <bass>
+          <bass-step>E</bass-step>
+        </bass>
+        <degree>
+          <degree-value>2</degree-value>
+          <degree-alter>0</degree-alter>
+          <degree-type text="add">add</degree-type>
+        </degree>
+      </harmony>
+           """
+
+        MP = musicxml.xmlToM21.MeasureParser()
+        mxHarmony = EL(xmlString)
+
+        cs1 = MP.xmlToChordSymbol(mxHarmony)
+        cs2 = ChordSymbol(cs1.figure)
+        cs3 = ChordSymbol('C/E add 2')
+
+        self.assertEqual(pitches, cs1.pitches)
+        self.assertEqual(pitches, cs2.pitches)
+        self.assertEqual(pitches, cs3.pitches)
+
+    def testNinth(self):
+        """
+        This tests a bug in _adjustOctaves.
+        """
+        from xml.etree.ElementTree import fromstring as EL
+        from music21 import musicxml, pitch
+
+        pitches = ('D2', 'F2', 'A2', 'C3', 'E3')
+        pitches = tuple(pitch.Pitch(p) for p in pitches)
+
+        xmlString = """
+        <harmony default-y="40" font-size="15">
+            <root>
+              <root-step>D</root-step>
+            </root>
+            <kind halign="center" text="min9">minor-ninth</kind>
+        </harmony>
+           """
+
+        MP = musicxml.xmlToM21.MeasureParser()
+        mxHarmony = EL(xmlString)
+
+        cs1 = MP.xmlToChordSymbol(mxHarmony)
+        cs2 = ChordSymbol(cs1.figure)
+        cs3 = ChordSymbol('Dm9')
+
+        self.assertEqual(pitches, cs1.pitches)
+        self.assertEqual(pitches, cs2.pitches)
+        self.assertEqual(pitches, cs3.pitches)
+
 
     def testAddSubtractAlterations(self):
         ch1 = ChordSymbol('F7 add 4 subtract 3')
