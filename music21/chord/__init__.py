@@ -3698,7 +3698,7 @@ class Chord(note.NotRest):
             returnObj = self
         else:
             returnObj = copy.deepcopy(self)
-        returnObj._notes.sort(key=lambda x: (x.pitch.diatonicNoteNum, x.pitch.ps))
+        sortDiatonicAscending(returnObj._notes)
         return returnObj
 
     def sortFrequencyAscending(self):
@@ -4770,6 +4770,26 @@ class Chord(note.NotRest):
 
     # --------------------------------------------------------------------------
 
+def sort_pitches(notes_or_pitches, key_pitch):
+    """
+    Sort the list of notes or pitches according to the key defined on the
+    pitches.
+    :param notes_or_pitches: a list of either notes or pitches
+    :param key_pitch: a key on the pitches for sorting the list
+    :return:
+    """
+    def _pitch(e):
+        if isinstance(e, note.Note):
+            return e.pitch
+        if isinstance(e, pitch.Pitch):
+            return e
+        raise ValueError
+
+    notes_or_pitches.sort(key = lambda e:key_pitch(_pitch(e)))
+
+def sortDiatonicAscending(notes_or_pitches):
+    sort_pitches(notes_or_pitches,
+                 key_pitch= lambda p: (p.diatonicNoteNum, p.ps))
 
 
 def fromForteClass(notation):
