@@ -15,6 +15,7 @@ An object representation of harmony, a subclass of chord, as encountered as chor
 roman numerals, or other chord representations with a defined root.
 '''
 import collections
+import copy
 import re
 import unittest
 
@@ -1979,9 +1980,13 @@ class ChordSymbol(Harmony):
             suspended = ['suspended-second','suspended-fourth',
                          'suspended-fourth-seventh']
             if self.chordKind in suspended:
-                if interval.notesToInterval(self._overrides['root'],
-                                            self._overrides['bass']).generic.simpleDirected == 4:
-                    inv = 1
+                tempRoot = copy.deepcopy(self._overrides['root'])
+                tempRoot.octave = 3
+                tempBass = copy.deepcopy(self._overrides['bass'])
+                tempBass.octave = 3
+                if interval.notesToInterval(tempRoot,
+                                            tempBass).generic.simpleDirected == 4:
+                    inversionNum = 1
 
             if not self.inversionIsValid(inversionNum):
                 #there is a bass, yet no normal inversion was found....must be added note
