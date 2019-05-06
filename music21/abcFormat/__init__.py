@@ -91,6 +91,8 @@ reMetadataTag = re.compile('[A-Zw]:')
 rePitchName = re.compile('[a-gA-Gz]')
 reChordSymbol = re.compile('"[^"]*"') # non greedy
 reChord = re.compile('[.*?]') # non greedy
+reAbcVersion = re.compile('^%abc-((\d+)\.(\d+)\.?(\d+)?)')
+reDirective = re.compile('^%%([a-z\-]+)\s+([^\s]+)(.*)')
 
 
 # ------------------------------------------------------------------------------
@@ -713,7 +715,6 @@ class ABCMetadata(ABCToken):
                 'no quarter length associated with this meta-data: %s' % self.data)
 
 
-
 class ABCBar(ABCToken):
 
     # given a logical unit, create an object
@@ -1216,7 +1217,6 @@ class ABCBrokenRhythmMarker(ABCToken):
         self.data = self.src.strip()
 
 
-
 class ABCNote(ABCToken):
     '''
     A model of an ABCNote.
@@ -1235,11 +1235,13 @@ class ABCNote(ABCToken):
     # given a logical unit, create an object
     # may be a chord, notes, bars
 
-    def __init__(self, src=''):
+    def __init__(self, src='', carriedAccidental=None):
         super().__init__(src)
         # store chord string if connected to this note
         self.chordSymbols = []
-
+        
+        self.carriedAccidental = carriedAccidental
+        
         # context attributes
         self.inBar = None
         self.inBeam = None
@@ -1275,10 +1277,8 @@ class ABCNote(ABCToken):
         self.pitchName = None # if None, a rest or chord
         self.quarterLength = None
 
-
     def __repr__(self):
         return '<music21.abcFormat.ABCNote %r>' % self.src
-
 
     @staticmethod
     def _splitChordSymbols(strSrc):
@@ -1306,7 +1306,6 @@ class ABCNote(ABCToken):
             return chordSymbols, strSrc[i:]
         else:
             return [], strSrc
-
 
     def getPitchName(self, strSrc, forceKeySignature=None):
         '''
@@ -1376,7 +1375,7 @@ class ABCNote(ABCToken):
             activeKeySignature = self.activeKeySignature
 
         try: # returns pStr, accidentalDisplayStatus
-            return _pitchTranslationCache[(strSrc, str(activeKeySignature))]
+            return _pitchTranslationCache[(strSrc, self.carriedAccidental, str(activeKeySignature))]
         except KeyError:
             pass
 
@@ -1389,17 +1388,35 @@ class ABCNote(ABCToken):
         octave += strSrc.count("'")
 
         # get an accidental string
+        
         accString = ''
-        for i in range(strSrc.count('_')):
+        for _ in range(strSrc.count('_')):
             accString += '-' # m21 symbols
-        for i in range(strSrc.count('^')):
+        for _ in range(strSrc.count('^')):
             accString += '#' # m21 symbols
-        for i in range(strSrc.count('=')):
+        for _ in range(strSrc.count('=')):
             accString += 'n' # m21 symbols
+        
+        carriedAccString = ''
+        if self.carriedAccidental:
+            # No overriding accidental attached to this note
+            # force carrying through the measure.
+            for _ in range(self.carriedAccidental.count('_')):
+                carriedAccString += '-' # m21 symbols
+            for _ in range(self.carriedAccidental.count('^')):
+                carriedAccString += '#' # m21 symbols
+            for _ in range(self.carriedAccidental.count('=')):
+                carriedAccString += 'n' # m21 symbols
 
+        if carriedAccString and accString:
+            raise ABCHandlerException("Carried accidentals not rendered moot.")
         # if there is an explicit accidental, regardless of key, it should
         # be shown: this will works for naturals well
-        if accString != '':
+        if carriedAccString:
+            # An accidental carrying through the measure is supposed to be applied.
+            # This will be set iff no explicit accidental is attached to the note.
+            accidentalDisplayStatus = None
+        elif accString != '':
             accidentalDisplayStatus = True
         # if we do not have a key signature, and have accidentals, set to None
         elif activeKeySignature is None:
@@ -1422,12 +1439,14 @@ class ABCNote(ABCToken):
             accidentalDisplayStatus = False
 
         # making upper here, but this is not relevant
-        pStr = '%s%s%s' % (name.upper(), accString, octave)
+        if carriedAccString:
+            pStr = '%s%s%s' % (name.upper(), carriedAccString, octave)
+        else:
+            pStr = '%s%s%s' % (name.upper(), accString, octave)
 
         # store in global cache
-        _pitchTranslationCache[(strSrc, str(activeKeySignature))] = pStr, accidentalDisplayStatus
+        _pitchTranslationCache[(strSrc, self.carriedAccidental, str(activeKeySignature))] = pStr, accidentalDisplayStatus
         return pStr, accidentalDisplayStatus
-
 
     def getQuarterLength(self, strSrc, forceDefaultQuarterLength=None):
         '''
@@ -1541,9 +1560,7 @@ class ABCNote(ABCToken):
             elif direction == 'right':
                 ql *= modPair[1]
 
-
         return ql
-
 
     def parse(self, forceDefaultQuarterLength=None,
                     forceKeySignature=None):
@@ -1639,15 +1656,15 @@ class ABCChord(ABCNote):
 
 # ------------------------------------------------------------------------------
 class ABCHandler:
-
     # divide elements of a character stream into objects and handle
     # store in a list, and pass global information to compontns
-    def __init__(self):
-        # tokens are ABC objects in a linear stream
+    def __init__(self, abcVersion=None):
+        # tokens are ABC objects import n a linear stream
+        self.abcVersion = abcVersion # At this point, only "2.1" and None are valid settings.
+        self.abcDirectives = dict()
         self._tokens = []
         self.activeParens = []
         self.activeSpanners = []
-
 
     @staticmethod
     def _getLinearContext(strSrc, i):
@@ -1766,10 +1783,17 @@ class ABCHandler:
         else: # append unaltered
             post.append(ABCBar(token))
         return post
-
-
+    
     # --------------------------------------------------------------------------
     # token processing
+
+    def _accidentalPropagation(self):
+        if not self.abcVersion or self.abcVersion[0] == "1":
+            return 'not'
+        if 'propagate-accidentals' in self.abcDirectives:
+            return self.abcDirectives['propagate-accidentals']
+        return 'pitch' # Default per abc 2.1 standard
+
 
     def tokenize(self, strSrc):
         '''
@@ -1811,9 +1835,15 @@ class ABCHandler:
         collect = []
         lastIndex = len(strSrc) - 1
         skipAhead = 0
+        accidentalsAndDecorations = '.~^=_HLMOPSTuv'
+        accidentals = '^=_'
 
         activeChordSymbol = '' # accumulate, then prepend
-
+        accidentalized = dict()
+        accidental = None
+        pit = None
+        isFirstComment = True
+        
         while currentIndex < lastIndex:
             currentIndex += 1
             currentIndex += skipAhead
@@ -1828,6 +1858,18 @@ class ABCHandler:
             # comment lines, also encoding defs
             if c == '%':
                 skipAhead = self._getNextLineBreak(strSrc, currentIndex) - (currentIndex + 1)
+                commentLine = strSrc[currentIndex:currentIndex + skipAhead + 1]
+                if isFirstComment: 
+                    isFirstComment = False
+                    verMats = reAbcVersion.match(commentLine)
+                    if verMats:
+                        abcVer = verMats.group(1)
+                        self.abcVersion = abcVer
+                dirMats = reDirective.match(commentLine)
+                if dirMats:
+                    var = dirMats.group(1)
+                    val = dirMats.group(2)
+                    self.abcDirectives[var] = val
                 # environLocal.printDebug(['got comment:', repr(strSrc[i:j + 1])])
                 continue
 
@@ -1854,8 +1896,7 @@ class ABCHandler:
                 continue
 
             # get bars: if not a space and not alphanemeric
-            if (not c.isspace() and not c.isalnum()
-                and c not in ['~', '(']):
+            if (not c.isspace() and not c.isalnum() and c not in ['~', '(']):
                 matchBars = False
                 for barIndex in range(len(ABC_BARS)):
                     # first of bars tuple is symbol to match
@@ -1877,6 +1918,8 @@ class ABCHandler:
                             matchBars = True
                             break
                 if matchBars is True:
+                    accidentalized = dict() 
+                    accidental = None
                     j = currentIndex + skipAhead + 1
                     collect = strSrc[currentIndex:j]
                     # filter and replace with 2 tokens if necessary
@@ -1951,8 +1994,6 @@ class ABCHandler:
                 # not found, continue...
                 continue
 
-
-
             # get slurs, ensuring that they're not confused for tuplets
             if (c == '(' and cNext is not None and not cNext.isdigit()):
                 self._tokens.append(ABCSlurStart(c))
@@ -1967,7 +2008,6 @@ class ABCHandler:
             if (c == '-'):
                 self._tokens.append(ABCTie(c))
                 continue
-
 
             # get chord symbols / guitar chords; collected and joined with
             # chord or notes
@@ -1998,6 +2038,9 @@ class ABCHandler:
                 # environLocal.printDebug(['got chord:', repr(collect)])
                 self._tokens.append(ABCChord(collect))
                 skipAhead = j - (currentIndex + 1)
+                # TODO: Chords need to be aware of accidentals too.
+                # Also what happens to prefixes and suffixes attached to chords,
+                # like ties.
                 continue
 
             if (c == '.'):
@@ -2056,8 +2099,11 @@ class ABCHandler:
                 #     =       natural
                 #     _       flat
                 #     __      double-flat
-                accidentalsAndDecorations = '.~^=_HLMOPSTuv'
                 foundPitchAlpha = c.isalpha() and c not in accidentalsAndDecorations
+                if foundPitchAlpha:
+                    pit = c
+                if c in accidentals:
+                    accidental = c
                 j = currentIndex + 1
 
                 while j <= lastIndex:
@@ -2065,17 +2111,22 @@ class ABCHandler:
                     # decorations and/or accidentals may precede note names
                     if (not foundPitchAlpha and strSrc[j] in accidentalsAndDecorations):
                         j += 1
+                        if strSrc[j] in accidentals:
+                            accidental += strSrc[j]
                         continue
                     # only allow one pitch alpha to be a continue condition
                     elif (not foundPitchAlpha and strSrc[j].isalpha()
                         and strSrc[j] not in '~wuvhHLTSN'):
                         foundPitchAlpha = True
+                        pit = strSrc[j] 
                         j += 1
                         continue
                     # continue conditions after alpha:
                     # , register modification (, ') or number, rhythm indication
                     # number, /,
                     elif strSrc[j].isdigit() or strSrc[j] in ',/,\'':
+                        if strSrc[j] in ',\'':  # Register (octave) modification
+                            pit += strSrc[j] 
                         j += 1
                         continue
                     else: # space, all else: break
@@ -2115,8 +2166,26 @@ class ABCHandler:
                 elif len(collect) > 1 and collect.startswith('=') and collect[1].isdigit():
                     pass
                 # only let valid collect strings be parsed
+                elif pit:
+                    pitClass = pit[0].upper()
+                    carriedAccidental = None
+                    propagation = self._accidentalPropagation()
+                    if accidental:
+                        # Remember the active accidentals in the measure
+                        if propagation == 'octave':
+                            accidentalized[pit] = accidental
+                        elif propagation == 'pitch':
+                            accidentalized[pitClass] = accidental
+                        accidental = None
+                    else:
+                        if propagation == 'pitch' and pitClass in accidentalized:
+                            carriedAccidental = accidentalized[pitClass]
+                        elif propagation == 'octave' and pit in accidentalized:
+                            carriedAccidental = accidentalized[pit]
+                    self._tokens.append(ABCNote(collect, carriedAccidental=carriedAccidental))
                 else:
                     self._tokens.append(ABCNote(collect))
+                    
                 skipAhead = j - (currentIndex + 1)
                 continue
             # look for white space: can be used to determine beam groups
@@ -2153,7 +2222,6 @@ class ABCHandler:
         lastTenutoToken = None
         lastGraceToken = None
         lastNoteToken = None
-
 
         for i in range(len(self._tokens)):
             # get context of tokens
@@ -2212,7 +2280,6 @@ class ABCHandler:
                     if p in ('Slur', 'Crescendo', 'Diminuendo'):
                         self.activeSpanners.pop()
 
-
             if isinstance(t, ABCTie):
                 # tPrev is usually an ABCNote but may be a GraceStop.
                 if lastNoteToken and lastNoteToken.tie == 'stop':
@@ -2239,8 +2306,6 @@ class ABCHandler:
             if isinstance(t, ABCTenuto):
                 lastTenutoToken = t
 
-
-
             if isinstance(t, ABCCrescStart):
                 t.fillCresc()
                 self.activeSpanners.append(t.crescObj)
@@ -2256,8 +2321,6 @@ class ABCHandler:
 
             if isinstance(t, ABCGraceStop):
                 lastGraceToken = None
-
-
 
             # ABCChord inherits ABCNote, thus getting note is enough for both
             if isinstance(t, (ABCNote, ABCChord)):
@@ -2697,12 +2760,11 @@ class ABCHandler:
 
         Returns a list of ABCHandlerBar instances.
         The first usually defines only Metadata
-
+        
         TODO: Test and examples
         '''
         if self._tokens == []:
             raise ABCHandlerException('must process tokens before calling split')
-
 
         post = []
         barIndices = self.tokensToBarIndices()
@@ -2825,8 +2887,6 @@ class ABCHandler:
 
         return barIndices
 
-
-
     def hasNotes(self):
         '''
         If tokens are processed, return True if ABCNote or
@@ -2870,7 +2930,6 @@ class ABCHandler:
                 if t.isTitle():
                     return t.data
         return None
-
 
 
 class ABCHandlerBar(ABCHandler):
@@ -2961,7 +3020,8 @@ class ABCFile:
     '''
     ABC File or String access
     '''
-    def __init__(self):
+    def __init__(self, abcVersion=None):
+        self.abcVersion = abcVersion
         self.file = None
         self.filename = None
 
@@ -3049,7 +3109,7 @@ class ABCFile:
             # will raise exception if cannot be found
             strSrc = self.extractReferenceNumber(strSrc, number)
 
-        handler = ABCHandler()
+        handler = ABCHandler(abcVersion=self.abcVersion)
         # return the handler instance
         handler.process(strSrc)
         return handler
@@ -3126,7 +3186,6 @@ class Test(unittest.TestCase):
         self.assertEqual(rePitchName.findall(src)[0], 'A')
 
 
-
     def testTokenProcessMetadata(self):
         from music21.abcFormat import testFiles
 
@@ -3153,8 +3212,6 @@ class Test(unittest.TestCase):
                     elif t.tag == 'K':
                         self.assertEqual(t.data, keyEncoded)
 
-
-
     def testTokenProcess(self):
         from music21.abcFormat import testFiles
 
@@ -3170,7 +3227,6 @@ class Test(unittest.TestCase):
             handler = ABCHandler()
             handler.tokenize(tf)
             handler.tokenProcess()
-
 
     def testNoteParse(self):
         from music21 import key
