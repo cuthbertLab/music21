@@ -91,8 +91,8 @@ reMetadataTag = re.compile('[A-Zw]:')
 rePitchName = re.compile('[a-gA-Gz]')
 reChordSymbol = re.compile('"[^"]*"') # non greedy
 reChord = re.compile('[.*?]') # non greedy
-reAbcVersion = re.compile('^%abc-((\d+)\.(\d+)\.?(\d+)?)')
-reDirective = re.compile('^%%([a-z\-]+)\s+([^\s]+)(.*)')
+reAbcVersion = re.compile(r'^%abc-((\d+)\.(\d+)\.?(\d+)?)')
+reDirective = re.compile(r'^%%([a-z\-]+)\s+([^\s]+)(.*)')
 
 
 # ------------------------------------------------------------------------------
@@ -1237,11 +1237,16 @@ class ABCNote(ABCToken):
 
     def __init__(self, src='', carriedAccidental=None):
         super().__init__(src)
-        # store chord string if connected to this note
-        self.chordSymbols = []
         
+        # store the ABC accidental string propagated in the measure that
+        # must be applied to this note. Note must not be set if the
+        # note already has an explicit accidental attached. (The explicit
+        # accidental is now the one that will be carried forward.)
         self.carriedAccidental = carriedAccidental
         
+        # store chord string if connected to this note
+        self.chordSymbols = []
+       
         # context attributes
         self.inBar = None
         self.inBeam = None
@@ -1390,22 +1395,22 @@ class ABCNote(ABCToken):
         # get an accidental string
         
         accString = ''
-        for _ in range(strSrc.count('_')):
+        for dummy in range(strSrc.count('_')):
             accString += '-' # m21 symbols
-        for _ in range(strSrc.count('^')):
+        for dummy in range(strSrc.count('^')):
             accString += '#' # m21 symbols
-        for _ in range(strSrc.count('=')):
+        for dummy in range(strSrc.count('=')):
             accString += 'n' # m21 symbols
         
         carriedAccString = ''
         if self.carriedAccidental:
             # No overriding accidental attached to this note
             # force carrying through the measure.
-            for _ in range(self.carriedAccidental.count('_')):
+            for dummy in range(self.carriedAccidental.count('_')):
                 carriedAccString += '-' # m21 symbols
-            for _ in range(self.carriedAccidental.count('^')):
+            for dummy in range(self.carriedAccidental.count('^')):
                 carriedAccString += '#' # m21 symbols
-            for _ in range(self.carriedAccidental.count('=')):
+            for dummy in range(self.carriedAccidental.count('=')):
                 carriedAccString += 'n' # m21 symbols
 
         if carriedAccString and accString:
@@ -1445,7 +1450,8 @@ class ABCNote(ABCToken):
             pStr = '%s%s%s' % (name.upper(), accString, octave)
 
         # store in global cache
-        _pitchTranslationCache[(strSrc, self.carriedAccidental, str(activeKeySignature))] = pStr, accidentalDisplayStatus
+        _pitchTranslationCache[(strSrc, self.carriedAccidental, str(activeKeySignature))] = \
+            pStr, accidentalDisplayStatus
         return pStr, accidentalDisplayStatus
 
     def getQuarterLength(self, strSrc, forceDefaultQuarterLength=None):
@@ -1657,11 +1663,13 @@ class ABCChord(ABCNote):
 # ------------------------------------------------------------------------------
 class ABCHandler:
     # divide elements of a character stream into objects and handle
-    # store in a list, and pass global information to compontns
+    # store in a list, and pass global information to components
+    # Optionally, specify the (major, minor, patch) version of ABC to process--
+    # e.g., (1.2.0). If not set, default ABC 1.3 parsing is performed.
     def __init__(self, abcVersion=None):
         # tokens are ABC objects import n a linear stream
-        self.abcVersion = abcVersion # At this point, only "2.1" and None are valid settings.
-        self.abcDirectives = dict()
+        self.abcVersion = abcVersion
+        self.abcDirectives = {}
         self._tokens = []
         self.activeParens = []
         self.activeSpanners = []
@@ -1788,7 +1796,18 @@ class ABCHandler:
     # token processing
 
     def _accidentalPropagation(self):
-        if not self.abcVersion or self.abcVersion[0] == "1":
+        '''
+        Determine how accidentals should "carry through the measure."
+        
+        >>> ah = abcFormat.ABCHandler(abcVersion=(1,3,0))
+        >>> ah._accidentalPropagation()
+        not
+        >>> ah = abcFormat.ABCHandler(abcVersion=(2,0,0))
+        >>> ah._accidentalPropagation()
+        pitch
+        '''
+        minVersion = (2,0,0)
+        if not self.abcVersion or self.abcVersion < minVersion:
             return 'not'
         if 'propagate-accidentals' in self.abcDirectives:
             return self.abcDirectives['propagate-accidentals']
@@ -1839,9 +1858,9 @@ class ABCHandler:
         accidentals = '^=_'
 
         activeChordSymbol = '' # accumulate, then prepend
-        accidentalized = dict()
+        accidentalized = {}
         accidental = None
-        pit = None
+        abcPitch = None # ABC substring defining any pitch within the current token
         isFirstComment = True
         
         while currentIndex < lastIndex:
@@ -1863,8 +1882,14 @@ class ABCHandler:
                     isFirstComment = False
                     verMats = reAbcVersion.match(commentLine)
                     if verMats:
-                        abcVer = verMats.group(1)
-                        self.abcVersion = abcVer
+                        abcMajor = int(verMats.group(2))
+                        abcMinor = int(verMats.group(3))
+                        if verMats.group(4):
+                            abcPatch = int(verMats(4))
+                        else:
+                            abcPatch = 0
+                        verTuple = (abcMajor, abcMinor, abcPatch)
+                        self.abcVersion = verTuple
                 dirMats = reDirective.match(commentLine)
                 if dirMats:
                     var = dirMats.group(1)
@@ -1918,7 +1943,7 @@ class ABCHandler:
                             matchBars = True
                             break
                 if matchBars is True:
-                    accidentalized = dict() 
+                    accidentalized = {}
                     accidental = None
                     j = currentIndex + skipAhead + 1
                     collect = strSrc[currentIndex:j]
@@ -2101,7 +2126,7 @@ class ABCHandler:
                 #     __      double-flat
                 foundPitchAlpha = c.isalpha() and c not in accidentalsAndDecorations
                 if foundPitchAlpha:
-                    pit = c
+                    abcPitch = c
                 if c in accidentals:
                     accidental = c
                 j = currentIndex + 1
@@ -2118,7 +2143,7 @@ class ABCHandler:
                     elif (not foundPitchAlpha and strSrc[j].isalpha()
                         and strSrc[j] not in '~wuvhHLTSN'):
                         foundPitchAlpha = True
-                        pit = strSrc[j] 
+                        abcPitch = strSrc[j] 
                         j += 1
                         continue
                     # continue conditions after alpha:
@@ -2126,7 +2151,7 @@ class ABCHandler:
                     # number, /,
                     elif strSrc[j].isdigit() or strSrc[j] in ',/,\'':
                         if strSrc[j] in ',\'':  # Register (octave) modification
-                            pit += strSrc[j] 
+                            abcPitch += strSrc[j] 
                         j += 1
                         continue
                     else: # space, all else: break
@@ -2166,22 +2191,22 @@ class ABCHandler:
                 elif len(collect) > 1 and collect.startswith('=') and collect[1].isdigit():
                     pass
                 # only let valid collect strings be parsed
-                elif pit:
-                    pitClass = pit[0].upper()
+                elif abcPitch:
+                    pitchClass = abcPitch[0].upper()
                     carriedAccidental = None
                     propagation = self._accidentalPropagation()
                     if accidental:
                         # Remember the active accidentals in the measure
                         if propagation == 'octave':
-                            accidentalized[pit] = accidental
+                            accidentalized[abcPitch] = accidental
                         elif propagation == 'pitch':
-                            accidentalized[pitClass] = accidental
+                            accidentalized[pitchClass] = accidental
                         accidental = None
                     else:
-                        if propagation == 'pitch' and pitClass in accidentalized:
-                            carriedAccidental = accidentalized[pitClass]
-                        elif propagation == 'octave' and pit in accidentalized:
-                            carriedAccidental = accidentalized[pit]
+                        if propagation == 'pitch' and pitchClass in accidentalized:
+                            carriedAccidental = accidentalized[pitchClass]
+                        elif propagation == 'octave' and abcPitch in accidentalized:
+                            carriedAccidental = accidentalized[abcPitch]
                     self._tokens.append(ABCNote(collect, carriedAccidental=carriedAccidental))
                 else:
                     self._tokens.append(ABCNote(collect))
@@ -3019,6 +3044,8 @@ def mergeLeadingMetaData(barHandlers):
 class ABCFile:
     '''
     ABC File or String access
+    # Optionally, specify the (major, minor, patch) version of ABC to process--
+    # e.g., (1.2.0). If not set, default ABC 1.3 parsing is performed.
     '''
     def __init__(self, abcVersion=None):
         self.abcVersion = abcVersion

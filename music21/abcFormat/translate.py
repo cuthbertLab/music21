@@ -278,7 +278,6 @@ def parseTokens(mh, dst, p, useMeasures):
             #ql += t.quarterLength
 
         elif isinstance(t, abcFormat.ABCNote):
-            pit = t.pitchName
             # add the attached chord symbol
             if t.chordSymbols:
                 cs_name = t.chordSymbols[0]
@@ -297,7 +296,7 @@ def parseTokens(mh, dst, p, useMeasures):
             if t.isRest:
                 n = note.Rest()
             else:
-                n = note.Note(pit)
+                n = note.Note(t.pitchName)
                 if n.pitch.accidental is not None:
                     n.pitch.accidental.displayStatus = t.accidentalDisplayStatus
 
@@ -723,7 +722,8 @@ class Test(unittest.TestCase):
         #m1.show('t')
         # notes are shown as being on beat 2 and 3
         # environLocal.printDebug(['m1.notesAndRests.activeSite', m1.notesAndRests.activeSite])
-        # environLocal.printDebug(['m1.notesAndRests[0].activeSite', m1.notesAndRests[0].activeSite])
+        # environLocal.printDebug(['m1.notesAndRests[0].activeSite',
+        #     m1.notesAndRests[0].activeSite])
 
         #self.assertEqual(m1.notesAndRests.activeSite)
 

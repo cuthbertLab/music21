@@ -548,7 +548,7 @@ V:1
 fz((6:4F,//A,//C//F//A//c// e/d/)dz
 '''
 
-czerny_csharp = '''
+czernyCsharp = '''
 X:4
 T:D Fragment
 C:Czerny
@@ -627,9 +627,6 @@ g^G_ag a=ffF|=F2^c2 FB =ca|]
 ALL  = [fyrareprisarn, mysteryReel, fullRiggedShip, aleIsDear, kitchGirl,
         williamAndNancy, morrisonsJig, hectorTheHero, kingOfTheFairies,
         sicutRosa, theAleWifesDaughter, theBeggerBoy, theBattleOfTheSnaBas,
-        czerny_csharp, carryThrough, 
-        # FIXME: carrying tied accidentals across bar lines does not work.
-        tieOver,
         draughtOfAle,
         valentineJigg,
         testPrimitive, testPrimitivePolyphonic, testPrimitiveTuplet
@@ -656,9 +653,8 @@ class Test(unittest.TestCase):
         from music21.musicxml import m21ToXml
 
         af = abcFormat.ABCFile()
-
         GEX = m21ToXml.GeneralObjectExporter()
-
+        
         for i, tf in enumerate(ALL):
             ah = af.readstr(tf)
             title = ah.getTitle()
@@ -672,119 +668,111 @@ class Test(unittest.TestCase):
             except UnicodeDecodeError as ude:
                 environLocal.warn('About to fail on ABC file #{}'.format(i))
                 raise ude
-            
-            if title == 'D Fragment':
-                sharps = s.parts[0].keySignature.sharps
-                self.assertEqual(sharps, 7, 'C# key signature should be parsed as 7 sharps')
+    
+    def testKeySignatures(self):      
+        from music21 import abcFormat
+        from music21.abcFormat import translate
+        af = abcFormat.ABCFile()
+        ah = af.readstr(czernyCsharp)
+        s = translate.abcToStreamScore(ah)
+        sharps = s.parts[0].keySignature.sharps
+        self.assertEqual(sharps, 7, 'C# key signature should be parsed as 7 sharps')
                 
     def testAbc21(self):
         from music21 import abcFormat, note
         from music21.abcFormat import translate
-        from music21.musicxml import m21ToXml
 
-        af = abcFormat.ABCFile(abcVersion="2.1")
+        af = abcFormat.ABCFile(abcVersion=(2,1,0))
+        ah = af.readstr(carryThrough)
+        title = ah.getTitle()
+        environLocal.printDebug([title])
+        s = translate.abcToStreamScore(ah)
+        notes = s.flat.getElementsByClass(note.Note)
+        cSharp = notes[3]
+        cThrough = notes[5]
+        self.assertEqual(cSharp.pitch.midi, cThrough.pitch.midi, "Sharp does not carry through measure")
+        bFlat = notes[4]
+        bLast = notes[7]
+        self.assertEqual(bFlat.pitch.midi, bLast.pitch.midi, "Flat does not carry through measure")
+        bNat = notes[10]
+        bNatNext = notes[11]
+        self.assertEqual(bNat.pitch.midi, bNatNext.pitch.midi, "Natural does not carry through measure")
+        self.assertEqual(notes[12].pitch.midi, 73, "Sharp does not carry through measure")
+        self.assertEqual(notes[13].pitch.midi, 72, "Natural is ignored")
+        self.assertEqual(notes[14].pitch.midi, 72, "Natural does not carry through measure")
+        self.assertEqual(notes[16].pitch.midi, 72, "Sharp carries over measure incorrectly")
+        self.assertEqual(notes[17].pitch.midi, 74, "Sharp (D5) carries over measure incorrectly")
+        self.assertEqual(notes[18].pitch.midi, 78, "Natural (F5) carries over measure incorrectly")
+        # TODO: Carrying an accidental into the next measure with a tie does not work.
+        # notes = s.flat.getElementsByClass(note.Note)
+        # self.assertEqual(notes[4].pitch.midi, 70, "Tied note loses it sharp")
+        # self.assertEqual(notes[6].pitch.midi, 69, "Tied-over sharp persists past the tie")
 
-        gex = m21ToXml.GeneralObjectExporter()
-        
-        files = [carryThrough]
-        for i, tf in enumerate(files):
-            ah = af.readstr(tf)
-            title = ah.getTitle()
-            environLocal.printDebug([title])
-            s = translate.abcToStreamScore(ah)
-            try:
-                unused_out = gex.parse(s)
-            except UnicodeDecodeError as ude:
-                environLocal.warn('About to fail on ABC file #{}'.format(i))
-                raise ude
-            if title == 'Through Measure':
-                notes = s.flat.getElementsByClass(note.Note)
-                cSharp = notes[3]
-                cThrough = notes[5]
-                self.assertEqual(cSharp.pitch.midi, cThrough.pitch.midi, "Sharp does not carry through measure")
-                bFlat = notes[4]
-                bLast = notes[7]
-                self.assertEqual(bFlat.pitch.midi, bLast.pitch.midi, "Flat does not carry through measure")
-                bNat = notes[10]
-                bNatNext = notes[11]
-                self.assertEqual(bNat.pitch.midi, bNatNext.pitch.midi, "Natural does not carry through measure")
-                self.assertEqual(notes[12].pitch.midi, 73, "Sharp does not carry through measure")
-                self.assertEqual(notes[13].pitch.midi, 72, "Natural is ignored")
-                self.assertEqual(notes[14].pitch.midi, 72, "Natural does not carry through measure")
-                self.assertEqual(notes[16].pitch.midi, 72, "Sharp carries over measure incorrectly")
-                self.assertEqual(notes[17].pitch.midi, 74, "Sharp (D5) carries over measure incorrectly")
-                self.assertEqual(notes[18].pitch.midi, 78, "Natural (F5) carries over measure incorrectly")
-            # elif title == 'Tie Through Measure':
-                # FIXME: Carrying an accidental into the next measure with a tie doesn't work.
-                # notes = s.flat.getElementsByClass(note.Note)
-                # self.assertEqual(notes[4].pitch.midi, 70, "Tied note loses it sharp")
-                # self.assertEqual(notes[6].pitch.midi, 69, "Tied-over sharp persists past the tie")
-
-    def testAbc21Directive(self):
+    def testAbc21DirectiveCarryPitch(self):
         from music21 import abcFormat, note
         from music21.abcFormat import translate
-        from music21.musicxml import m21ToXml
 
         af = abcFormat.ABCFile()
-
-        gex = m21ToXml.GeneralObjectExporter()
+        ah = af.readstr(directiveCarryPitch)
+        s = translate.abcToStreamScore(ah)
+        notes = s.flat.getElementsByClass(note.Note)
+        gSharp = notes[1]
+        g8va = notes[3]
+        self.assertEqual(gSharp.pitch.midi % 12, g8va.pitch.midi % 12, "Sharp does not carry through measure")
+        aFlat = notes[2]
+        a = notes[4]
+        self.assertEqual(aFlat.pitch.midi, a.pitch.midi, "Flat does not carry through measure")
+        fNat = notes[5]
+        f = notes[6]
+        f8ba = notes[7]
+        self.assertEqual(fNat.pitch.midi, f.pitch.midi, "Natural does not carry through measure")
+        self.assertEqual(fNat.pitch.midi % 12, f8ba.pitch.midi % 12, "Natural does not carry through measure")
+        self.assertEqual(notes[8].pitch.midi, 65, "Natural is ignored")
+        self.assertEqual(notes[12].pitch.midi, 72, "Natural is ignored")
         
-        files = [directiveCarryPitch, directiveCarryOctave, directiveCarryNot]
-        for i, tf in enumerate(files):
-            ah = af.readstr(tf)
-            title = ah.getTitle()
-            environLocal.printDebug([title])
-            s = translate.abcToStreamScore(ah)
-            try:
-                unused_out = gex.parse(s)
-            except UnicodeDecodeError as ude:
-                environLocal.warn('About to fail on ABC file #{}'.format(i))
-                raise ude
-            if title == 'Directive Pitch':
-                notes = s.flat.getElementsByClass(note.Note)
-                gSharp = notes[1]
-                g8va = notes[3]
-                self.assertEqual(gSharp.pitch.midi % 12, g8va.pitch.midi % 12, "Sharp does not carry through measure")
-                aFlat = notes[2]
-                a = notes[4]
-                self.assertEqual(aFlat.pitch.midi, a.pitch.midi, "Flat does not carry through measure")
-                fNat = notes[5]
-                f = notes[6]
-                f8ba = notes[7]
-                self.assertEqual(fNat.pitch.midi, f.pitch.midi, "Natural does not carry through measure")
-                self.assertEqual(fNat.pitch.midi % 12, f8ba.pitch.midi % 12, "Natural does not carry through measure")
-                self.assertEqual(notes[8].pitch.midi, 65, "Natural is ignored")
-                self.assertEqual(notes[12].pitch.midi, 72, "Natural is ignored")
-            if title == 'Directive Octave':
-                notes = s.flat.getElementsByClass(note.Note)
-                gSharp = notes[1]
-                g8va = notes[3]
-                self.assertTrue(gSharp.pitch.midi % 12 > g8va.pitch.midi % 12, "Sharp carries beyond its octave")
-                aFlat = notes[2]
-                a = notes[4]
-                self.assertEqual(aFlat.pitch.midi, a.pitch.midi, "Flat does not carry through measure")
-                fNat = notes[5]
-                f = notes[6]
-                f8ba = notes[7]
-                self.assertEqual(fNat.pitch.midi, f.pitch.midi, "Natural does not carry through measure")
-                self.assertTrue(fNat.pitch.midi % 12 < f8ba.pitch.midi % 12, "Natural carries beyond its octave")
-                self.assertEqual(notes[8].pitch.midi, 65, "Natural is ignored")
-                self.assertEqual(notes[12].pitch.midi, 72, "Natural is ignored")
-            if title == 'Directive Not':
-                notes = s.flat.getElementsByClass(note.Note)
-                gSharp = notes[1]
-                g8va = notes[3]
-                self.assertTrue(gSharp.pitch.midi % 12 > g8va.pitch.midi % 12, "Sharp carries beyond its octave")
-                aFlat = notes[2]
-                a = notes[4]
-                self.assertTrue(aFlat.pitch.midi < a.pitch.midi, "Flat carries through measure")
-                fNat = notes[5]
-                f = notes[6]
-                f8ba = notes[7]
-                self.assertTrue(fNat.pitch.midi < f.pitch.midi, "Natural carries through measure")
-                self.assertTrue(fNat.pitch.midi % 12 < f8ba.pitch.midi % 12, "Natural carries beyond its octave")
-                self.assertEqual(notes[8].pitch.midi, 65, "Natural is ignored")
-                self.assertEqual(notes[12].pitch.midi, 72, "Natural is ignored")
+    def testAbc21DirectiveCarryOctave(self):
+        from music21 import abcFormat, note
+        from music21.abcFormat import translate
+
+        af = abcFormat.ABCFile()
+        ah = af.readstr(directiveCarryOctave)
+        s = translate.abcToStreamScore(ah)
+        notes = s.flat.getElementsByClass(note.Note)
+        gSharp = notes[1]
+        g8va = notes[3]
+        self.assertTrue(gSharp.pitch.midi % 12 > g8va.pitch.midi % 12, "Sharp carries beyond its octave")
+        aFlat = notes[2]
+        a = notes[4]
+        self.assertEqual(aFlat.pitch.midi, a.pitch.midi, "Flat does not carry through measure")
+        fNat = notes[5]
+        f = notes[6]
+        f8ba = notes[7]
+        self.assertEqual(fNat.pitch.midi, f.pitch.midi, "Natural does not carry through measure")
+        self.assertTrue(fNat.pitch.midi % 12 < f8ba.pitch.midi % 12, "Natural carries beyond its octave")
+        self.assertEqual(notes[8].pitch.midi, 65, "Natural is ignored")
+        self.assertEqual(notes[12].pitch.midi, 72, "Natural is ignored")
+        
+    def testAbc21DirectiveCarryNot(self):
+        from music21 import abcFormat, note
+        from music21.abcFormat import translate
+
+        af = abcFormat.ABCFile()
+        ah = af.readstr(directiveCarryNot)
+        s = translate.abcToStreamScore(ah)
+        notes = s.flat.getElementsByClass(note.Note)
+        gSharp = notes[1]
+        g8va = notes[3]
+        self.assertTrue(gSharp.pitch.midi % 12 > g8va.pitch.midi % 12, "Sharp carries beyond its octave")
+        aFlat = notes[2]
+        a = notes[4]
+        self.assertTrue(aFlat.pitch.midi < a.pitch.midi, "Flat carries through measure")
+        fNat = notes[5]
+        f = notes[6]
+        f8ba = notes[7]
+        self.assertTrue(fNat.pitch.midi < f.pitch.midi, "Natural carries through measure")
+        self.assertTrue(fNat.pitch.midi % 12 < f8ba.pitch.midi % 12, "Natural carries beyond its octave")
+        self.assertEqual(notes[8].pitch.midi, 65, "Natural is ignored")
+        self.assertEqual(notes[12].pitch.midi, 72, "Natural is ignored")
                         
 if __name__ == '__main__':
     import music21
