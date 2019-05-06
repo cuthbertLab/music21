@@ -2012,9 +2012,9 @@ class ChordSymbol(Harmony):
 
             #if after bumping up the octaves, there are still pitches below bass pitch
             #bump up their octaves
-            #bassPitch = pitches[inversionNum]
+            bassPitch = pitches[inversionNum]
 
-            #self.bass(bassPitch)
+            self.bass(bassPitch)
             for p in pitches:
                 if p.diatonicNoteNum < self._overrides['bass'].diatonicNoteNum:
                     p.octave = p.octave + 1
@@ -2035,9 +2035,11 @@ class ChordSymbol(Harmony):
         self.pitches = tuple(pitches)
 
         # set overrides to be pitches in the harmony
-        self._overrides = {}
         self.bass(self.bass())
         self.root(self.root())
+        assert self.root() in pitches
+        assert self.bass() in pitches
+        self._overrides = {}
 
     ### PUBLIC METHODS ###
 
