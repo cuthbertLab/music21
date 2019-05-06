@@ -1801,10 +1801,10 @@ class ABCHandler:
         
         >>> ah = abcFormat.ABCHandler(abcVersion=(1,3,0))
         >>> ah._accidentalPropagation()
-        not
+        'not'
         >>> ah = abcFormat.ABCHandler(abcVersion=(2,0,0))
         >>> ah._accidentalPropagation()
-        pitch
+        'pitch'
         '''
         minVersion = (2,0,0)
         if not self.abcVersion or self.abcVersion < minVersion:
