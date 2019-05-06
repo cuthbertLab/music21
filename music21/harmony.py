@@ -1975,6 +1975,13 @@ class ChordSymbol(Harmony):
         if self._overrides['root'].name != self._overrides['bass'].name:
 
             inversionNum = self.inversion()
+            # Special case for first inversion of suspended chords...
+            suspended = ['suspended-second','suspended-fourth',
+                         'suspended-fourth-seventh']
+            if self.chordKind in suspended:
+                if interval.notesToInterval(self._overrides['root'],
+                                            self._overrides['bass']).generic.simpleDirected == 4:
+                    inv = 1
 
             if not self.inversionIsValid(inversionNum):
                 #there is a bass, yet no normal inversion was found....must be added note
