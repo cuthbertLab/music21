@@ -41,7 +41,6 @@ from music21 import harmony
 environLocal = environment.Environment('abcFormat.translate')
 
 
-
 def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     '''
     Handler conversion of a single Part of a multi-part score.
@@ -723,7 +722,8 @@ class Test(unittest.TestCase):
         #m1.show('t')
         # notes are shown as being on beat 2 and 3
         # environLocal.printDebug(['m1.notesAndRests.activeSite', m1.notesAndRests.activeSite])
-        # environLocal.printDebug(['m1.notesAndRests[0].activeSite', m1.notesAndRests[0].activeSite])
+        # environLocal.printDebug(['m1.notesAndRests[0].activeSite',
+        #     m1.notesAndRests[0].activeSite])
 
         #self.assertEqual(m1.notesAndRests.activeSite)
 
