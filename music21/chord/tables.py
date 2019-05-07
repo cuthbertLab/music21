@@ -2179,7 +2179,7 @@ SCREF = {
 (4,  4,  1)    : {'name': ('minor third tetracluster',)},
 (4,  4, -1)    : {'name': ('minor third tetracluster',)},
 (4,  5,  1)    : {'name': ('major third tetracluster',)},
-(4,  5, -1)    : {'name': ('major third testacluster',)},
+(4,  5, -1)    : {'name': ('major third tetracluster',)},
 (4,  6,  0)    : {'name': ('perfect fourth tetramirror',)},
 (4,  7,  0)    : {'name': ('Arabian tetramirror',)},
 (4,  8,  0)    : {'name': ('double-fourth tetramirror',)},
