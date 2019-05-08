@@ -333,7 +333,7 @@ class PartTranslator:
     def translateTokens(self, tokens):
         for t in tokens:
             try:
-                self.translateOneToken(t)
+                self.translateOneLineToken(t)
             except Exception: # pylint: disable=broad-except
                 tracebackMessage = traceback.format_exc()
                 raise RomanTextTranslateException(
@@ -350,12 +350,15 @@ class PartTranslator:
         return p
 
 
-    def translateOneToken(self, t):
+    def translateOneLineToken(self, t):
         '''
         Translates one token t and set the current settings.
+        
+        A token in this case consists of an entire line's worth.
+        It might be a token such as 'Title: Neko Funjatta' or
+        a composite token such as 'm23 b4 IV6'
         '''
         md = self.md
-        p = self.p
         # environLocal.printDebug(['token', t])
         if t.isTitle():
             md.title = t.data
@@ -381,67 +384,96 @@ class PartTranslator:
             self.parseKeySignatureTag(t)
 
         elif t.isMeasure():
-            # environLocal.printDebug(['handling measure token:', t])
-            #if t.number[0] % 10 == 0:
-            #    print "at number " + str(t.number[0])
-            if t.variantNumber is not None:
-                # environLocal.printDebug(['skipping variant: %s' % t])
-                return
-            if t.variantLetter is not None:
-                # environLocal.printDebug(['skipping variant: %s' % t])
-                return
+            self.translateMeasureLineToken(t)
+        else:
+            # TODO(msc): store other metadata
+            pass
 
-            # if this measure number is more than 1 greater than the last
-            # defined measure number, and the previous chord is not None,
-            # then fill with copies of the last-defined measure
-            if ((t.number[0] > self.lastMeasureNumber + 1)
-                    and (self.previousRn is not None)):
-                for i in range(self.lastMeasureNumber + 1, t.number[0]):
-                    mFill = stream.Measure()
-                    mFill.number = i
-                    newRn = copy.deepcopy(self.previousRn)
-                    newRn.lyric = ""
-                    # set to entire bar duration and tie
-                    newRn.duration = copy.deepcopy(self.tsAtTimeOfLastChord.barDuration)
-                    if self.previousRn.tie is None:
-                        self.previousRn.tie = tie.Tie('start')
-                    else:
-                        self.previousRn.tie.type = 'continue'
-                    # set to stop for now; may extend on next iteration
-                    newRn.tie = tie.Tie('stop')
-                    self.previousRn = newRn
-                    mFill.append(newRn)
-                    appendMeasureToRepeatEndingsDict(self.lastMeasureToken,
-                                                     mFill,
-                                                     self.repeatEndings, i)
-                    p.coreAppend(mFill)
-                self.lastMeasureNumber = t.number[0] - 1
-                self.lastMeasureToken = t
+    def translateMeasureLineToken(self, t):
+        '''
+        Translate a measure token consisting of a single line such as::
 
-            # create a new measure or copy a past measure
-            if len(t.number) == 1 and t.isCopyDefinition: # if not a range
-                p.coreElementsChanged()
-                m, self.kCurrent = _copySingleMeasure(t, p, self.kCurrent)
-                p.coreAppend(m)
-                self.lastMeasureNumber = m.number
-                self.lastMeasureToken = t
-                romans = m.getElementsByClass(roman.RomanNumeral)
-                if romans:
-                    self.previousRn = romans[-1]
+            m21 b3 V b4 C: IV
+        
+        Or it might be a variant measure, or a copy instruction.
+        '''
+        p = self.p
+        skipsPriorMeasures = ((t.number[0] > self.lastMeasureNumber + 1)
+                              and (self.previousRn is not None))
+        isSingleMeasureCopy = (len(t.number) == 1 and t.isCopyDefinition)
+        isMultipleMeasureCopy = (len(t.number) > 1)
+        
+        # environLocal.printDebug(['handling measure token:', t])
+        #if t.number[0] % 10 == 0:
+        #    print "at number " + str(t.number[0])
+        if t.variantNumber is not None:
+            # TODO(msc): parse variant numbers
+            # environLocal.printDebug(['skipping variant: %s' % t])
+            return
+        if t.variantLetter is not None:
+            # TODO(msc): parse variant letters
+            # environLocal.printDebug(['skipping variant: %s' % t])
+            return
 
-            elif len(t.number) > 1:
-                p.coreElementsChanged()
-                measures, self.kCurrent = _copyMultipleMeasures(t, p, self.kCurrent)
-                p.append(measures) # appendCore does not work with list
-                self.lastMeasureNumber = measures[-1].number
-                self.lastMeasureToken = t
-                romans = measures[-1].getElementsByClass(roman.RomanNumeral)
-                if romans:
-                    self.previousRn = romans[-1]
+        # if this measure number is more than 1 greater than the last
+        # defined measure number, and the previous chord is not None,
+        # then fill with copies of the last-defined measure
+        if skipsPriorMeasures:
+            self.fillToMeasureToken(t)
 
-            else:
-                m = self.translateSingleMeasure(t)
-                p.coreAppend(m)
+        # create a new measure or copy a past measure
+        if isSingleMeasureCopy: # if not a range
+            p.coreElementsChanged()
+            m, self.kCurrent = _copySingleMeasure(t, p, self.kCurrent)
+            p.coreAppend(m)
+            self.lastMeasureNumber = m.number
+            self.lastMeasureToken = t
+            romans = m.getElementsByClass(roman.RomanNumeral)
+            if romans:
+                self.previousRn = romans[-1]
+
+        elif isMultipleMeasureCopy:
+            p.coreElementsChanged()
+            measures, self.kCurrent = _copyMultipleMeasures(t, p, self.kCurrent)
+            p.append(measures) # appendCore does not work with list
+            self.lastMeasureNumber = measures[-1].number
+            self.lastMeasureToken = t
+            romans = measures[-1].getElementsByClass(roman.RomanNumeral)
+            if romans:
+                self.previousRn = romans[-1]
+
+        else:
+            m = self.translateSingleMeasure(t)
+            p.coreAppend(m)
+
+    def fillToMeasureToken(self, t):
+        '''
+        Create a series of measures which extend the previous RN until the measure number
+        implied by t.
+        '''
+        p = self.p
+        for i in range(self.lastMeasureNumber + 1, t.number[0]):
+            mFill = stream.Measure()
+            mFill.number = i
+            if self.previousRn is not None:
+                newRn = copy.deepcopy(self.previousRn)
+                newRn.lyric = ""
+                # set to entire bar duration and tie
+                newRn.duration = copy.deepcopy(self.tsAtTimeOfLastChord.barDuration)
+                if self.previousRn.tie is None:
+                    self.previousRn.tie = tie.Tie('start')
+                else:
+                    self.previousRn.tie.type = 'continue'
+                # set to stop for now; may extend on next iteration
+                newRn.tie = tie.Tie('stop')
+                self.previousRn = newRn
+                mFill.append(newRn)
+            appendMeasureToRepeatEndingsDict(self.lastMeasureToken,
+                                             mFill,
+                                             self.repeatEndings, i)
+            p.coreAppend(mFill)
+        self.lastMeasureNumber = t.number[0] - 1
+        self.lastMeasureToken = t
 
     def parseKeySignatureTag(self, t):
         '''
