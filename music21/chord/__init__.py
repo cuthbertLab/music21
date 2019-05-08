@@ -247,6 +247,7 @@ class Chord(note.NotRest):
 
 
     ### SPECIAL METHODS ###
+    
     def __eq__(self, other):
         '''
         True if the it passes all `super()`
@@ -468,6 +469,7 @@ class Chord(note.NotRest):
 
 
     ### STATIC METHOD ###
+    
     @staticmethod
     def formatVectorString(vectorList):
         '''
@@ -497,8 +499,6 @@ class Chord(note.NotRest):
         msg.append('>')
         return ''.join(msg)
 
-
-    ### PUBLIC METHODS ###
 
     ### PRIVATE METHODS ###
 
@@ -560,7 +560,6 @@ class Chord(note.NotRest):
         else:
             return [n.pitch for n in deleteComponents]
 
-    ### PUBLIC METHODS ###
     def _add_core_or_init(self, notes, *, useDuration=None):
         '''
         This is the private append method called by .add and called by __init__.
@@ -612,6 +611,9 @@ class Chord(note.NotRest):
                 raise ChordException('Could not process input argument %s' % n)
 
         return useDuration
+
+
+    ### PUBLIC METHODS ###
 
     def add(self, notes, *, runSort=True):
         '''
@@ -4123,6 +4125,83 @@ class Chord(note.NotRest):
         '''
         return len(self.pitchClasses)
 
+    @property
+    def notes(self):
+        '''
+        Return a tuple (immutable) of the notes contained in the chord.
+        
+        Generally using .pitches or iterating over the chord is the best way to work with
+        the components of a chord, but in unusual cases, a chord may, for instance, consist
+        of notes with independent durations, volumes, or colors, or, more often, different tie
+        statuses.  `Chord` includes methods such as `.setTie()` for most of these features,
+        but from time to time accessing all the `Note` objects as a tuple can be valuable.
+
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])        
+        >>> c1.duration.type = 'quarter'
+        >>> c1Notes = c1.notes
+        >>> c1Notes
+        (<music21.note.Note C>, <music21.note.Note E->, <music21.note.Note G>)
+        
+        Note that to set duration independently, a new Duration object needs to
+        be created.  Internal notes for Chords created from strings or pitches
+        all share a Duration object.
+
+        >>> c1.duration is c1Notes[0].duration
+        True
+        >>> c1Notes[1].duration is c1Notes[2].duration
+        True
+
+        >>> c1Notes[2].duration = duration.Duration('half')
+        >>> c1.duration.type
+        'quarter'
+        >>> c1[2].duration.type
+        'half'
+        
+        The property can also set the notes for a chord, but it must be
+        set to an iterable of literal Note objects.
+        
+        >>> c1.notes = [note.Note('D#4'), note.Note('C#4')]
+        >>> c1
+        <music21.chord.Chord D#4 C#4>
+        
+        Notice that the notes are not sorted by default -- this is a property for
+        power users who want complete control.
+        
+        Any incorrect assignment raises a TypeError:
+        
+        >>> c1.notes = 'C E G'
+        Traceback (most recent call last):
+        TypeError: notes must be set with an iterable
+
+        >>> c1.notes = [pitch.Pitch('C'), pitch.Pitch('E')]
+        Traceback (most recent call last):
+        TypeError: every element of notes must be a note.Note object
+
+        In case of an error, the previous notes are not changed.  (For this reason,
+        `.notes` cannot take a generator expression.
+        
+        >>> c1
+        <music21.chord.Chord D#4 C#4>
+        
+        new in v5.7
+        '''
+        return tuple(self._notes)
+
+    @notes.setter
+    def notes(self, newNotes):
+        '''
+        sets notes to an iterable of Note objects
+        '''
+        if not common.isIterable(newNotes):
+            raise TypeError('notes must be set with an iterable')
+        if not all(isinstance(n, note.Note) for n in newNotes):
+            raise TypeError('every element of notes must be a note.Note object')
+        self._notes.clear()
+        self.add(newNotes, runSort=False)
+        
+        
+        
+        
 
     @property
     def normalOrder(self):
