@@ -670,7 +670,7 @@ class ChoraleListRKBWV:
     127---||---298---||---Dies sind die heiligen zehn Gebot---||---66
     128---||---263---||---Alles ist an Gottes Segen---||---19
     129---||---369---||---Keinen hat Gott verlassen---||---217
-    130---||---324---||---Meine Seel erhebt den Herren---||---121
+    130---||---324---||---Meine Seel erhebet den Herrn---||---121
     131---||---373---||---Liebster Jesu, wir sind hier---||---228
     132---||---371---||---Kyrie, Gott Vater in Ewigkeit---||---225
     133---||---437---||---Wir glauben all an einen Gott, Schöpfer Himmels und der Erden---||---382
