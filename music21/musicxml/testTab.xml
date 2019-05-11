@@ -8,12 +8,12 @@
         </score-part>
     </part-list>
     <part id="P1">
-        <measure>
+        <measure number="0">
             <note>
                 <type>quarter</type>
                 <notations>
                     <technical>
-                        <string>6</string>
+                        <string>4</string>
                         <fret>7</fret>
                     </technical>
                 </notations>
