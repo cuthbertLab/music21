@@ -1917,7 +1917,7 @@ class ChordSymbol(Harmony):
         ['C3', 'E-3', 'G3']
 
         >>> [str(p) for p in harmony.ChordSymbol(root='C', bass='B', kind='major-ninth').pitches]
-        ['B2', 'C3', 'D3', 'E3', 'G3']
+        ['B1', 'D2', 'C3', 'E3', 'G3']
 
         >>> [str(p) for p in harmony.ChordSymbol(root='D', bass='F', kind='minor-seventh').pitches]
         ['F3', 'A3', 'C4', 'D4']
