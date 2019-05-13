@@ -1326,7 +1326,36 @@ def removeChordSymbols(chordType):
     '''
     del CHORD_TYPES[chordType]
 
-def _get_alteration(alteration):
+def _getAlteration(alteration):
+    """
+    Parses the string-encoded alteration and returns a tuple containing the
+    alteration type (add, subtract/omit, alter), the degree of the chord,
+    and the number representing the chromatic alteration of this degree. add
+    is considered by default if not explicitly mentioned. If list is emtpy,
+    returns None.
+
+    >>> harmony._getAlteration('add4')
+    ('add', 4, 0)
+
+    >>> harmony._getAlteration('subtract3')
+    ('subtract', 3, -1)
+
+    >>> harmony._getAlteration('addb9')
+    ('add', 9, -1)
+
+    >>> harmony._getAlteration('add#9')
+    ('add', 9, 1)
+
+    >>> harmony._getAlteration('b9')
+    ('add', 9, -1)
+
+    >>> harmony._getAlteration('alter#5')
+    ('alter', 5, 1)
+
+    >>> harmony._getAlteration('alter##5')
+    ('alter', 5, 2)
+
+    """
     if alteration != '':
         if 'b' in alteration:
             semiToneAlter = -1 * alteration.count('b')
@@ -1893,7 +1922,7 @@ class ChordSymbol(Harmony):
             altCopy.append(item)
         alterations = altCopy
         for alteration in alterations:
-            alteration = _get_alteration(alteration)
+            alteration = _getAlteration(alteration)
             if alteration:
                 modType, alteration, alterBy = alteration
                 self.addChordStepModification(
