@@ -2036,8 +2036,6 @@ class ChordSymbol(Harmony):
         # set overrides to be pitches in the harmony
         self.bass(self.bass())
         self.root(self.root())
-        assert self.root() in pitches
-        assert self.bass() in pitches
 
     ### PUBLIC METHODS ###
 
