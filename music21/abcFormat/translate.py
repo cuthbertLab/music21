@@ -1031,10 +1031,18 @@ class Test(unittest.TestCase):
         self.assertEqual(cs.bass(), pitch.Pitch('B-2'))
         self.assertEqual(cs.pitches[0], pitch.Pitch('B-2'))
 
+        # common.cleanedFlatNotation() shouldn't be called by
+        # the following calls, which what is being tested here:
+
         cs = harmony.ChordSymbol('b-3')
         self.assertEqual(cs.root(), pitch.Pitch('b-3'))
         self.assertEqual(cs.pitches[0], pitch.Pitch('B-3'))
         self.assertEqual(cs.pitches[1], pitch.Pitch('D4'))
+
+        cs = harmony.ChordSymbol('bb3')
+        self.assertEqual(cs.root(), pitch.Pitch('b2'))
+        self.assertEqual(cs.pitches[0], pitch.Pitch('B2'))
+        self.assertEqual(cs.pitches[1], pitch.Pitch('D3'))
 
     def xtestTranslateB(self):
         '''
