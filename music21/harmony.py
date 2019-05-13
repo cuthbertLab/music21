@@ -1841,7 +1841,6 @@ class ChordSymbol(Harmony):
             # get the match on st, should match since st is a substring of
             # prelimFigure
             m3 = re.search(r'/[A-Ga-g][#-]*', st)
-            assert m3
             remaining = st[:m3.start()] + st[m3.end():]
 
         st = self._getKindFromShortHand(remaining)
