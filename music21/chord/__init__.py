@@ -4770,12 +4770,12 @@ class Chord(note.NotRest):
 
     # --------------------------------------------------------------------------
 
-def sort_pitches(notes_or_pitches, key_pitch):
+def sortPitches(notesOrPitches, keyPitch):
     """
     Sort the list of notes or pitches according to the key defined on the
     pitches.
-    :param notes_or_pitches: a list of either notes or pitches
-    :param key_pitch: a key on the pitches for sorting the list
+    :param notesOrPitches: a list of either notes or pitches
+    :param keyPitch: a key on the pitches for sorting the list
     :return:
     """
     def _pitch(e):
@@ -4785,11 +4785,15 @@ def sort_pitches(notes_or_pitches, key_pitch):
             return e
         raise ValueError
 
-    notes_or_pitches.sort(key = lambda e:key_pitch(_pitch(e)))
+    notesOrPitches.sort(key = lambda e:keyPitch(_pitch(e)))
 
-def sortDiatonicAscending(notes_or_pitches):
-    sort_pitches(notes_or_pitches,
-                 key_pitch= lambda p: (p.diatonicNoteNum, p.ps))
+def sortDiatonicAscending(notesOrPitches):
+    """
+    The notes or pitches are sorted by Scale degree and then by Offset (so F##
+    sorts below G-).
+    Notes that are the identical pitch retain their order
+    """
+    sortPitches(notesOrPitches, keyPitch= lambda p: (p.diatonicNoteNum, p.ps))
 
 
 def fromForteClass(notation):
