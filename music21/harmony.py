@@ -1653,7 +1653,7 @@ class ChordSymbol(Harmony):
         # in case of inversion, the root should be updated, so make sure it's
         # still accurate
         if not rootPitch is pitches[0]:
-            print('hey')
+            raise ValueError('List of pitches does not start with the root')
 
         def typeAdd(hD):
             '''
