@@ -1768,6 +1768,43 @@ class ChordSymbol(Harmony):
         return tuple(pitches)
 
     def _getKindFromShortHand(self, sH):
+        """
+        Tries to identify a chord kind abbreviation in the given shorthand,
+        and if successful, sets self.chordKind to the corresponding chord
+        type, and returns the remaining shorthand, with the chord kind
+        abbreviation removed.
+
+        >>> cs = ChordSymbol(root='C')
+        >>> cs._getKindFromShortHand('7')
+        ''
+        >>> cs.chordKind
+        'dominant-seventh'
+
+        >>> cs = ChordSymbol(root='C')
+        >>> cs._getKindFromShortHand('7sus4')
+        ''
+        >>> cs.chordKind
+        'suspended-fourth-seventh'
+
+        When the shorthand contains additional information, it is returned
+        after setting the chord kind:
+
+        >>> cs = ChordSymbol(root='C')
+        >>> cs._getKindFromShortHand('7add4subtract3')
+        'add4subtract3'
+        >>> cs.chordKind
+        'dominant-seventh'
+
+        When the shorthand does not contain any valid chord kind
+        abbreviation, it is returned as is, and the chordKind remains unset:
+
+        >>> cs = ChordSymbol(root='C')
+        >>> cs._getKindFromShortHand('maj69')
+        'maj69'
+        >>> cs.chordKind
+        ''
+
+        """
         allAbbr = [a for type in CHORD_TYPES.values() for a in type[1]]
         # check all abbr that contain a # or b in their name (initially it
         # was checking only ob9)
