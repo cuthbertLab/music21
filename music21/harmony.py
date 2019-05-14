@@ -1768,13 +1768,13 @@ class ChordSymbol(Harmony):
         return tuple(pitches)
 
     def _getKindFromShortHand(self, sH):
-        all_abbr = [a for type in CHORD_TYPES.values() for a in type[1]]
+        allAbbr = [a for type in CHORD_TYPES.values() for a in type[1]]
         # check all abbr that contain a # or b in their name (initially it
-        # was checking only ob9
-        with_sharp = [a for a in all_abbr if '#' in a]
-        with_sharp = [a for a in with_sharp if a in sH]
-        with_flat = [a for a in all_abbr if 'b' in a]
-        with_flat = [a for a in with_flat if a in sH]
+        # was checking only ob9)
+        withSharp = [a for a in allAbbr if '#' in a]
+        withSharp = [a for a in withSharp if a in sH]
+        withFlat = [a for a in allAbbr if 'b' in a]
+        withFlat = [a for a in withFlat if a in sH]
         originalsH = sH
         if 'add' in sH:
             sH = sH[0:sH.index('add')]
@@ -1784,9 +1784,9 @@ class ChordSymbol(Harmony):
             sH = sH[0:sH.index('subtract')]
         if 'alter' in sH:
             sH = sH[0:sH.index('alter')]
-        if '#' in sH and sH[sH.index('#') + 1].isdigit() and not with_sharp:
+        if '#' in sH and sH[sH.index('#') + 1].isdigit() and not withSharp:
             sH = sH[0:sH.index('#')]
-        if 'b' in sH and sH[sH.index('b') + 1].isdigit() and not with_flat:
+        if 'b' in sH and sH[sH.index('b') + 1].isdigit() and not withFlat:
             sH = sH[0:sH.index('b')]
         for chordKind in CHORD_TYPES:
             for charString in getAbbreviationListGivenChordType(chordKind):
