@@ -1776,13 +1776,13 @@ class ChordSymbol(Harmony):
         type, and returns the remaining shorthand, with the chord kind
         abbreviation removed.
 
-        >>> cs = ChordSymbol(root='C')
+        >>> cs = harmony.ChordSymbol(root='C')
         >>> cs._getKindFromShortHand('7')
         ''
         >>> cs.chordKind
         'dominant-seventh'
 
-        >>> cs = ChordSymbol(root='C')
+        >>> cs = harmony.ChordSymbol(root='C')
         >>> cs._getKindFromShortHand('7sus4')
         ''
         >>> cs.chordKind
@@ -1791,7 +1791,7 @@ class ChordSymbol(Harmony):
         When the shorthand contains additional information, it is returned
         after setting the chord kind:
 
-        >>> cs = ChordSymbol(root='C')
+        >>> cs = harmony.ChordSymbol(root='C')
         >>> cs._getKindFromShortHand('7add4subtract3')
         'add4subtract3'
         >>> cs.chordKind
@@ -1800,7 +1800,7 @@ class ChordSymbol(Harmony):
         When the shorthand does not contain any valid chord kind
         abbreviation, it is returned as is, and the chordKind remains unset:
 
-        >>> cs = ChordSymbol(root='C')
+        >>> cs = harmony.ChordSymbol(root='C')
         >>> cs._getKindFromShortHand('maj69')
         'maj69'
         >>> cs.chordKind
