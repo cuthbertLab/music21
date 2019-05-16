@@ -2574,13 +2574,43 @@ class Test(unittest.TestCase):
         b = d.bass()
         self.assertEqual(b.nameWithOctave, 'E-3')
 
-    def testChordStepFromFigure(self):
+    def runTestOnChord(self, xmlString, figure, pitches):
+        """
+        Run a series of tests on the given chord.
+
+        :param xmlString: an XML harmony object
+        :param figure: the equivalent figure representation
+        :param pitches: the list of pitches of the chord
+        """
         from xml.etree.ElementTree import fromstring as EL
         from music21 import musicxml, pitch
 
-        pitches = ('G2', 'B2', 'F3', 'A-3', 'A#3', 'C#4', 'E-4')
         pitches = tuple(pitch.Pitch(p) for p in pitches)
 
+        MP = musicxml.xmlToM21.MeasureParser()
+        mxHarmony = EL(xmlString)
+
+        cs1 = MP.xmlToChordSymbol(mxHarmony)
+        cs2 = ChordSymbol(cs1.figure)
+        cs3 = ChordSymbol(figure)
+
+        self.assertEqual(pitches, cs1.pitches)
+        self.assertEqual(pitches, cs2.pitches)
+        self.assertEqual(pitches, cs3.pitches)
+
+        kind1 = cs1.chordKind
+        kind2 = cs2.chordKind
+        kind3 = cs3.chordKind
+        if kind1 in CHORD_ALIASES:
+            kind1 = CHORD_ALIASES[kind1]
+        if kind2 in CHORD_ALIASES:
+            kind2 = CHORD_ALIASES[kind2]
+        if kind3 in CHORD_ALIASES:
+            kind3 = CHORD_ALIASES[kind3]
+        self.assertEqual(kind1, kind2)
+        self.assertEqual(kind1, kind3)
+
+    def testChordStepFromFigure(self):
         xmlString = """
           <harmony>
             <root>
@@ -2614,22 +2644,18 @@ class Test(unittest.TestCase):
             </degree>
           </harmony>
         """
+        figure = 'G7 subtract 5 add b9 add #9 add #11 add b13'
+        pitches = ('G2', 'B2', 'F3', 'A-3', 'A#3', 'C#4', 'E-4')
+        self.runTestOnChord(xmlString, figure, pitches)
 
-        MP = musicxml.xmlToM21.MeasureParser()
-        mxHarmony = EL(xmlString)
+        figure = 'G7 subtract5 addb9 add#9 add#11 addb13'
+        self.runTestOnChord(xmlString, figure, pitches)
 
-        cs1 = MP.xmlToChordSymbol(mxHarmony)
-        cs2 = ChordSymbol(cs1.figure)
-        cs3 = ChordSymbol('G7 subtract 5 add b9 add #9 add #11 add b13')
-
-        self.assertEqual(pitches, cs1.pitches)
-        self.assertEqual(pitches, cs2.pitches)
-        self.assertEqual(pitches, cs3.pitches)
+        figure = 'G7subtract5addb9add#9add#11addb13'
+        self.runTestOnChord(xmlString, figure, pitches)
 
         #########
 
-        pitches = ('C3', 'E3', 'G3', 'B-3', 'D-4')
-        pitches = tuple(pitch.Pitch(p) for p in pitches)
 
         xmlString = """
             <harmony>
@@ -2644,19 +2670,13 @@ class Test(unittest.TestCase):
             </degree>
           </harmony>
         """
+        figure = 'C7 b9'
+        pitches = ('C3', 'E3', 'G3', 'B-3', 'D-4')
 
-        MP = musicxml.xmlToM21.MeasureParser()
-        mxHarmony = EL(xmlString)
+        self.runTestOnChord(xmlString, figure, pitches)
 
-        cs1 = MP.xmlToChordSymbol(mxHarmony)
-        cs2 = ChordSymbol(cs1.figure)
-        cs3 = ChordSymbol('C7 b9')
-        cs4 = ChordSymbol('C7 add b9')
-
-        self.assertEqual(pitches, cs1.pitches)
-        self.assertEqual(pitches, cs2.pitches)
-        self.assertEqual(pitches, cs3.pitches)
-        self.assertEqual(pitches, cs4.pitches)
+        figure = 'C7 add b9'
+        self.runTestOnChord(xmlString, figure, pitches)
 
         # Test alter
         cs = ChordSymbol('A7 alter #5')
@@ -2665,9 +2685,6 @@ class Test(unittest.TestCase):
                          '<music21.pitch.Pitch G3>)', str(cs.pitches))
 
         #########
-
-        pitches = ('A2','C#3','E#3','G3','B#3','D#4')
-        pitches = tuple(pitch.Pitch(p) for p in pitches)
 
         xmlString = """
           <harmony>
@@ -2692,26 +2709,12 @@ class Test(unittest.TestCase):
               </degree>
             </harmony>
         """
+        figure = 'A7 alter #5 add #9 add #11'
+        pitches = ('A2','C#3','E#3','G3','B#3','D#4')
 
-        MP = musicxml.xmlToM21.MeasureParser()
-        mxHarmony = EL(xmlString)
-
-        cs1 = MP.xmlToChordSymbol(mxHarmony)
-        cs2 = ChordSymbol(cs1.figure)
-        cs3 = ChordSymbol('A7 alter #5 add #9 add #11')
-
-        self.assertEqual(pitches, cs1.pitches)
-        self.assertEqual(pitches, cs2.pitches)
-        self.assertEqual(pitches, cs3.pitches)
+        self.runTestOnChord(xmlString, figure, pitches)
 
     def testChordWithBass(self):
-
-
-        from xml.etree.ElementTree import fromstring as EL
-        from music21 import musicxml, pitch
-
-        pitches = ('G2', 'A2', 'C#3', 'E3')
-        pitches = tuple(pitch.Pitch(p) for p in pitches)
 
         xmlString = """
           <harmony>
@@ -2725,24 +2728,13 @@ class Test(unittest.TestCase):
             </bass>
           </harmony>
           """
+        figure = 'A7/G'
+        pitches = ('G2', 'A2', 'C#3', 'E3')
 
-        MP = musicxml.xmlToM21.MeasureParser()
-        mxHarmony = EL(xmlString)
+        self.runTestOnChord(xmlString, figure, pitches)
 
-        cs1 = MP.xmlToChordSymbol(mxHarmony)
-        cs2 = ChordSymbol(cs1.figure)
-        cs3 = ChordSymbol('A7/G')
-
-        self.assertEqual(pitches, cs1.pitches)
-        self.assertEqual(pitches, cs2.pitches)
-        self.assertEqual(pitches, cs3.pitches)
 
     def testChordFlatSharpInFigure(self):
-        from xml.etree.ElementTree import fromstring as EL
-        from music21 import musicxml, pitch
-
-        pitches = ('G2', 'A2', 'B2', 'D#3', 'F3')
-        pitches = tuple(pitch.Pitch(p) for p in pitches)
 
         xmlString = """
           <harmony>
@@ -2752,19 +2744,13 @@ class Test(unittest.TestCase):
             <kind text="9+">augmented-dominant-ninth</kind>
           </harmony>
         """
+        pitches = ('G2', 'A2', 'B2', 'D#3', 'F3')
+        figure = 'G+9'
+        self.runTestOnChord(xmlString, figure, pitches)
 
-        MP = musicxml.xmlToM21.MeasureParser()
-        mxHarmony = EL(xmlString)
+        figure = 'G9#5'
+        self.runTestOnChord(xmlString, figure, pitches)
 
-        cs1 = MP.xmlToChordSymbol(mxHarmony)
-        cs2 = ChordSymbol(cs1.figure)
-        cs3 = ChordSymbol('G+9')
-        cs4 = ChordSymbol('G9#5')
-
-        self.assertEqual(pitches, cs1.pitches)
-        self.assertEqual(pitches, cs2.pitches)
-        self.assertEqual(pitches, cs3.pitches)
-        self.assertEqual(pitches, cs4.pitches)
 
         pitches = ('A2', 'C3', 'E3', 'G#3')
         pitches = tuple(pitch.Pitch(p) for p in pitches)
@@ -2778,11 +2764,6 @@ class Test(unittest.TestCase):
         since the matched root and bass where globally removed from figure,
         and not only where matched.
         """
-        from xml.etree.ElementTree import fromstring as EL
-        from music21 import musicxml, pitch
-
-        pitches = ('E-2', 'E3', 'G#3', 'B3', 'D4')
-        pitches = tuple(pitch.Pitch(p) for p in pitches)
 
         xmlString = """
           <harmony>
@@ -2796,87 +2777,55 @@ class Test(unittest.TestCase):
             </bass>
           </harmony>
         """
+        figure = 'E7/E-'
+        pitches = ('E-2', 'E3', 'G#3', 'B3', 'D4')
+        self.runTestOnChord(xmlString, figure, pitches)
 
-        MP = musicxml.xmlToM21.MeasureParser()
-        mxHarmony = EL(xmlString)
-
-        cs1 = MP.xmlToChordSymbol(mxHarmony)
-        cs2 = ChordSymbol(cs1.figure)
-        cs3 = ChordSymbol('E7/E-')
-
-        self.assertEqual(pitches, cs1.pitches)
-        self.assertEqual(pitches, cs2.pitches)
-        self.assertEqual(pitches, cs3.pitches)
 
     def testChordStepBass(self):
         """
         This tests a bug where the chord modification (add 2) was placed at a
         wrong octave, resulting in a D bass instead of the proper E.
         """
-        from xml.etree.ElementTree import fromstring as EL
-        from music21 import musicxml, pitch
-
-        pitches = ('E3', 'G3', 'C4', 'D4')
-        pitches = tuple(pitch.Pitch(p) for p in pitches)
 
         xmlString = """
-      <harmony default-y="40" font-size="15">
-        <root>
-          <root-step>C</root-step>
-        </root>
-        <kind halign="center">major</kind>
-        <bass>
-          <bass-step>E</bass-step>
-        </bass>
-        <degree>
-          <degree-value>2</degree-value>
-          <degree-alter>0</degree-alter>
-          <degree-type text="add">add</degree-type>
-        </degree>
-      </harmony>
+          <harmony>
+            <root>
+              <root-step>C</root-step>
+            </root>
+            <kind>major</kind>
+            <bass>
+              <bass-step>E</bass-step>
+            </bass>
+            <degree>
+              <degree-value>2</degree-value>
+              <degree-alter>0</degree-alter>
+              <degree-type text="add">add</degree-type>
+            </degree>
+          </harmony>
            """
+        figure = 'C/E add 2'
+        pitches = ('E3', 'G3', 'C4', 'D4')
 
-        MP = musicxml.xmlToM21.MeasureParser()
-        mxHarmony = EL(xmlString)
-
-        cs1 = MP.xmlToChordSymbol(mxHarmony)
-        cs2 = ChordSymbol(cs1.figure)
-        cs3 = ChordSymbol('C/E add 2')
-
-        self.assertEqual(pitches, cs1.pitches)
-        self.assertEqual(pitches, cs2.pitches)
-        self.assertEqual(pitches, cs3.pitches)
+        self.runTestOnChord(xmlString, figure, pitches)
 
     def testNinth(self):
         """
         This tests a bug in _adjustOctaves.
         """
-        from xml.etree.ElementTree import fromstring as EL
-        from music21 import musicxml, pitch
-
-        pitches = ('D2', 'F2', 'A2', 'C3', 'E3')
-        pitches = tuple(pitch.Pitch(p) for p in pitches)
 
         xmlString = """
-        <harmony default-y="40" font-size="15">
+        <harmony >
             <root>
               <root-step>D</root-step>
             </root>
-            <kind halign="center" text="min9">minor-ninth</kind>
+            <kind text="min9">minor-ninth</kind>
         </harmony>
            """
+        pitches = ('D2', 'F2', 'A2', 'C3', 'E3')
+        figure = 'Dm9'
 
-        MP = musicxml.xmlToM21.MeasureParser()
-        mxHarmony = EL(xmlString)
-
-        cs1 = MP.xmlToChordSymbol(mxHarmony)
-        cs2 = ChordSymbol(cs1.figure)
-        cs3 = ChordSymbol('Dm9')
-
-        self.assertEqual(pitches, cs1.pitches)
-        self.assertEqual(pitches, cs2.pitches)
-        self.assertEqual(pitches, cs3.pitches)
-
+        self.runTestOnChord(xmlString, figure, pitches)
 
     def testAddSubtractAlterations(self):
         ch1 = ChordSymbol('F7 add 4 subtract 3')
