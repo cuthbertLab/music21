@@ -1740,7 +1740,9 @@ class ChordSymbol(Harmony):
                 degree = degree.replace('A', '') #A is for 'Altered'
                 if hD.degree == int(degree):
                     # transpose by semitones (positive for up, negative for down)
-                    p.transpose(hD.interval, inPlace=True),
+                    pAltered = p.transpose(hD.interval)
+                    pitches.remove(p)
+                    pitches.append(pAltered)
                     pitchFound = True
 
 #                         for degreeString in self._degreesList:
