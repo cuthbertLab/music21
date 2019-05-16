@@ -6491,6 +6491,49 @@ class Test(unittest.TestCase):
                               offsets):
             self.assertEqual(ch.offset, offset)
 
+    def testEmptyDegreeAlter(self):
+        from xml.etree.ElementTree import fromstring as EL
+
+        MP = MeasureParser()
+
+        xmlString = """
+        <harmony>
+          <root>
+            <root-step>F</root-step>
+          </root>
+          <kind>suspended-fourth</kind>
+          <degree>
+            <degree-value>9</degree-value>
+            <degree-alter>0</degree-alter>
+            <degree-type>add</degree-type>
+          </degree>
+        </harmony>
+        """
+        mxHarmony = EL(xmlString)
+
+        cs1 = MP.xmlToChordSymbol(mxHarmony)
+
+        xmlString = """
+        <harmony>
+          <root>
+            <root-step>F</root-step>
+          </root>
+          <kind>suspended-fourth</kind>
+          <degree>
+            <degree-value>9</degree-value>
+            <degree-alter />
+            <degree-type>add</degree-type>
+          </degree>
+        </harmony>
+        """
+        mxHarmony = EL(xmlString)
+        cs2 = MP.xmlToChordSymbol(mxHarmony)
+
+        cs3 = harmony.ChordSymbol('F sus add 9')
+
+        self.assertEqual(cs1.pitches, cs3.pitches)
+        self.assertEqual(cs2.pitches, cs3.pitches)
+
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test) #, runTest='testRehearsalMarks')
