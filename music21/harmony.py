@@ -1523,7 +1523,7 @@ class ChordSymbol(Harmony):
     >>> cs = harmony.ChordSymbol(root='E', bass='C', kind='diminished-seventh')
 
     >>> [str(p) for p in cs.pitches]
-    ['C2', 'E3', 'G3', 'B-3', 'D-4']
+    ['C3', 'E3', 'G3', 'B-3', 'D-4']
 
     >>> cs.figure
     'Eo7/C'
@@ -1602,6 +1602,22 @@ class ChordSymbol(Harmony):
         sortDiatonicAscending(pitches)
 
         return pitches
+
+    def _assignOctaveForBass(self):
+        """
+        Assigns the highest octave to the bass that ensure it remains lower
+        than the root.
+        """
+        root = self._overrides['root']
+        bass = self._overrides['bass']
+        bass.octave = root.octave
+
+        if bass.ps > root.ps:
+            bass.octave -= 1
+
+        assert bass.ps < root.ps
+
+        return bass.octave
 
     def _adjustPitchesForChordStepModifications(self, pitches):
         '''
@@ -2044,25 +2060,22 @@ class ChordSymbol(Harmony):
         if self._overrides['root'].name != self._overrides['bass'].name:
 
             inversionNum = self.inversion()
-            # Special case for first inversion of suspended chords...
-            suspended = ['suspended-second','suspended-fourth',
-                         'suspended-fourth-seventh']
-            if self.chordKind in suspended:
-                tempRoot = copy.deepcopy(self._overrides['root'])
-                tempRoot.octave = 3
-                tempBass = copy.deepcopy(self._overrides['bass'])
-                tempBass.octave = 3
-                if interval.notesToInterval(tempRoot,
-                                            tempBass).generic.simpleDirected == 4:
-                    inversionNum = 1
+            ignoreInversion = False
 
             if not self.inversionIsValid(inversionNum):
                 #there is a bass, yet no normal inversion was found....must be added note
+                ignoreInversion = True
+            elif not pitches[inversionNum].pitchClass == self._overrides[
+                'bass'].pitchClass:
+                # the bass found by the inversion doesn't not correspond to
+                # the specified bass (probably the user is building some
+                # weird chord here, but it shouldn't fail).
+                ignoreInversion = True
 
+            if ignoreInversion:
                 inversionNum = None
-                self._overrides['bass'].octave = 2
-                    # arbitrary octave, must be below root,
-                    # which was arbitrarily chosen as 3 above
+                # Make bass lower than the root
+                self._assignOctaveForBass()
                 pitches.append(self._overrides['bass'])
         else:
             self.inversion(None, transposeOnSet=False)
@@ -2072,17 +2085,16 @@ class ChordSymbol(Harmony):
             for p in pitches[0:inversionNum]:
                 if self.chordKind in nineElevenThirteen:
                     #bump octave up by two for nineths,elevenths, and thirteenths
-                    p.octave = p.octave + 2
-                    #this creates more spacing....
+                    p.octave = p.octave + 2  # this creates more spacing....
                 else:
                     #only bump up by one for triads and sevenths.
                     p.octave = p.octave + 1
 
-            #if after bumping up the octaves, there are still pitches below bass pitch
-            #bump up their octaves
             bassPitch = pitches[inversionNum]
-
             self.bass(bassPitch)
+
+            #if after bumping up the octaves, there are still pitches below bass pitch
+            # bump up their octaves
             for p in pitches:
                 if p.diatonicNoteNum < self._overrides['bass'].diatonicNoteNum:
                     p.octave = p.octave + 1
@@ -2290,7 +2302,10 @@ class ChordSymbol(Harmony):
             ):
             return True
         elif (inversion in (2, 1)
-                and not kind == 'pedal'):
+              and not kind in ('pedal', 'power', 'suspended-second',
+                               'suspended-fourth', 'suspended-fourth-seventh')):
+            # Inversions are not quite defined for those chord types, so it's
+            # better to simply append the bass.
             return True
         elif inversion is None:
             return False
@@ -2778,7 +2793,7 @@ class Test(unittest.TestCase):
           </harmony>
         """
         figure = 'E7/E-'
-        pitches = ('E-2', 'E3', 'G#3', 'B3', 'D4')
+        pitches = ('E-3', 'E3', 'G#3', 'B3', 'D4')
         self.runTestOnChord(xmlString, figure, pitches)
 
 
@@ -2808,6 +2823,145 @@ class Test(unittest.TestCase):
         pitches = ('E3', 'G3', 'C4', 'D4')
 
         self.runTestOnChord(xmlString, figure, pitches)
+
+    def testSusBass(self):
+        """
+        This tests a bug where the bass addition was considered as the fifth
+        inversion in suspended chords. Now, this is considered as a non-valid
+        inversion, and the bass is simply added before the root.
+        """
+        from xml.etree.ElementTree import fromstring as EL
+        from music21 import musicxml, pitch
+
+        pitches = ('G2', 'D3', 'G3', 'A3')
+        pitches = tuple(pitch.Pitch(p) for p in pitches)
+
+        xmlString = """
+          <harmony>
+            <root>
+              <root-step>D</root-step>
+            </root>
+            <kind text="sus">suspended-fourth</kind>
+            <bass>
+              <bass-step>G</bass-step>
+            </bass>
+
+          </harmony>
+         """
+
+        MP = musicxml.xmlToM21.MeasureParser()
+        mxHarmony = EL(xmlString)
+
+        cs1 = MP.xmlToChordSymbol(mxHarmony)
+        cs2 = ChordSymbol(cs1.figure)
+        cs3 = ChordSymbol('Dsus/G')
+
+        self.assertEqual(pitches, cs1.pitches)
+        self.assertEqual(pitches, cs2.pitches)
+        self.assertEqual(pitches, cs3.pitches)
+
+    def testWrongBass(self):
+        """
+        Bug where bass isn't in chord.
+        """
+        from xml.etree.ElementTree import fromstring as EL
+        from music21 import musicxml, pitch
+
+        pitches = ('E-2', 'C3', 'E3', 'G3')
+        pitches = tuple(pitch.Pitch(p) for p in pitches)
+
+        xmlString = """
+          <harmony>
+            <root>
+              <root-step>C</root-step>
+            </root>
+            <kind text="">major</kind>
+            <bass>
+              <bass-step>E-</bass-step>
+            </bass>
+          </harmony>
+         """
+
+        MP = musicxml.xmlToM21.MeasureParser()
+        mxHarmony = EL(xmlString)
+
+        cs1 = MP.xmlToChordSymbol(mxHarmony)
+        cs2 = ChordSymbol(cs1.figure)
+        cs3 = ChordSymbol('C/E-')
+
+        self.assertEqual(pitches, cs1.pitches)
+        self.assertEqual(pitches, cs2.pitches)
+        self.assertEqual(pitches, cs3.pitches)
+
+        # There was a bug where the bass was E3, because E-2 was assume to be
+        # in the chord.
+        self.assertEqual('E-2', cs1.bass().nameWithOctave)
+
+    def testSus2Bass(self):
+        from xml.etree.ElementTree import fromstring as EL
+        from music21 import musicxml, pitch
+
+        pitches = ('E2', 'C3', 'D3', 'G3')
+        pitches = tuple(pitch.Pitch(p) for p in pitches)
+
+        xmlString = """
+          <harmony>
+            <root>
+              <root-step>C</root-step>
+            </root>
+            <kind text="sus2">suspended-second</kind>
+            <bass>
+              <bass-step>E</bass-step>
+            </bass>
+          </harmony>
+       """
+
+        MP = musicxml.xmlToM21.MeasureParser()
+        mxHarmony = EL(xmlString)
+
+        cs1 = MP.xmlToChordSymbol(mxHarmony)
+        cs2 = ChordSymbol(cs1.figure)
+        cs3 = ChordSymbol('Csus2/E')
+
+        self.assertEqual('E2', cs1.bass().nameWithOctave)
+
+        self.assertEqual(pitches, cs1.pitches)
+        self.assertEqual(pitches, cs2.pitches)
+        self.assertEqual(pitches, cs3.pitches)
+
+    def testPower(self):
+        """
+        power chords should not have inversions
+        """
+
+        from xml.etree.ElementTree import fromstring as EL
+        from music21 import musicxml, pitch
+
+        pitches = ('E2', 'A2', 'E3')
+        pitches = tuple(pitch.Pitch(p) for p in pitches)
+
+        xmlString = """
+          <harmony>
+            <root>
+              <root-step>A</root-step>
+            </root>
+            <kind text="5">power</kind>
+            <bass>
+              <bass-step>E</bass-step>
+            </bass>
+          </harmony>
+        """
+
+        MP = musicxml.xmlToM21.MeasureParser()
+        mxHarmony = EL(xmlString)
+
+        cs1 = MP.xmlToChordSymbol(mxHarmony)
+        cs2 = ChordSymbol(cs1.figure)
+        cs3 = ChordSymbol('Apower/E')
+
+        self.assertEqual(pitches, cs1.pitches)
+        self.assertEqual(pitches, cs2.pitches)
+        self.assertEqual(pitches, cs3.pitches)
 
     def testNinth(self):
         """
