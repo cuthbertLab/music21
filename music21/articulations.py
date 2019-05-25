@@ -513,7 +513,7 @@ class StringIndication(Bowing):
     >>> si = articulations.StringIndication(2)
     >>> si
     <music21.articulations.StringIndication 2>
-    >>> f.number
+    >>> si.number
     2
 
     If no argument to the constructor is specified, number defaults to 0.
@@ -562,10 +562,10 @@ class FretIndication(TechnicalIndication):
 
     A FretIndication can be constructed as
 
-    >>> si = articulations.FretIndication(3)
-    >>> si
+    >>> fi = articulations.FretIndication(3)
+    >>> fi
     <music21.articulations.FretIndication 3>
-    >>> f.number
+    >>> fi.number
     3
 
     If no argument to the constructor is specified, number defaults to 0.
