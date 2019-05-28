@@ -171,6 +171,8 @@ class Harmony(chord.Chord):
     is True, but can be set to False to initialize faster if pitches are not needed.
     '''
     _styleClass = style.TextStyle
+    _alterRe = re.compile('((?:alter|add|omit|subtract)[b#]*[1-9]+)')
+    _addRe = re.compile('([b#]+[^b#]+)')
 
     ### INITIALIZER ###
 
@@ -1933,11 +1935,9 @@ class ChordSymbol(Harmony):
 
         st = st.replace(',', '')
         if 'add' in st or 'alter'in st or 'omit' in st or 'subtract' in st:
-            splitter = re.compile('((?:alter|add|omit|subtract)[b#]*[1-9]+)')
-            alterations = splitter.split(st)
+            alterations = self._alterRe.split(st)
         elif 'b' in st or '#' in st:
-            splitter = re.compile('([b#]+[^b#]+)')
-            alterations = splitter.split(st)
+            alterations = self._addRe.split(st)
         else:
             alterations = [st]
         indexes = []
