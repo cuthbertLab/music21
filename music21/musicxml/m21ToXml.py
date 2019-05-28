@@ -4495,6 +4495,7 @@ class MeasureExporter(XMLExporterBase):
     def chordSymbolToXml(self, cs):
         '''
         Convert a ChordSymbol object to an mxHarmony object.
+        
         >>> cs = harmony.ChordSymbol()
         >>> cs.root('E-')
         >>> cs.bass('B-')
