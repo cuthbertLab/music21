@@ -1358,17 +1358,19 @@ def _getAlteration(alteration):
     ('alter', 5, 2)
 
     """
-    if alteration != '':
-        if 'b' in alteration:
-            semiToneAlter = -1 * alteration.count('b')
-        else:
-            semiToneAlter = alteration.count('#')
-        mt = re.search('^alter|add|subtract|omit', alteration)
-        type = mt.group() if mt else 'add'
-        md = re.search(r'[1-9]+', alteration)
-        if md:
-            degree = int(md.group())
-            return type, degree, semiToneAlter
+    if not alteration:
+        return None
+
+    if 'b' in alteration:
+        semiToneAlter = -1 * alteration.count('b')
+    else:
+        semiToneAlter = alteration.count('#')
+    mt = re.search('^alter|add|subtract|omit', alteration)
+    type = mt.group() if mt else 'add'
+    md = re.search(r'[1-9]+', alteration)
+    if md:
+        degree = int(md.group())
+        return type, degree, semiToneAlter
 
 # --------------------------------------------------------------------------
 realizerScaleCache = {}
