@@ -225,13 +225,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # experimental
         self._mutable = True
 
-        if givenElements is not None:
+        if givenElements and common.isIterable(givenElements):
             # TODO: perhaps convert a single element into a list?
-            try:
-                for e in givenElements:
+            for e in givenElements:
+                try:
                     self.coreInsert(e.offset, e)
-            except (AttributeError, TypeError):
-                raise StreamException("Unable to insert {0}".format(e))
+                except (AttributeError, TypeError):
+                    raise StreamException("Unable to insert {0}".format(e))
             self.coreElementsChanged()
 
 
@@ -11589,6 +11589,27 @@ class Measure(Stream):
 
     All properties of a Measure that are Music21 objects are found as part of
     the Stream's elements.
+
+    Measure number can be explicitly set with the `number` keyword:
+
+    >>> m4 = stream.Measure(number=4)
+    >>> m4
+    <music21.stream.Measure 4 offset=0.0>
+    >>> m4.number
+    4
+
+    If passed a single integer as an argument, assumes that this int
+    is the measure number.
+
+    >>> m5 = stream.Measure(5)
+    >>> m5
+    <music21.stream.Measure 5 offset=0.0>
+
+    Though they have all the features of general streams,
+    Measures have specific attributes that allow for setting their number
+    and numberSuffix, keep track of whether they have a different clef or
+    key or timeSignature than previous measures, allow for padding (and pickups),
+    and can be found as a "measure slice" within a score and parts.
     '''
     recursionType = 'elementsFirst'
     isMeasure = True
@@ -11629,6 +11650,10 @@ class Measure(Stream):
     }
 
     def __init__(self, *args, **keywords):
+        if len(args) == 1 and isinstance(args[0], int) and 'number' not in keywords:
+            keywords['number'] = args[0]
+            args = ()
+
         super().__init__(*args, **keywords)
 
         # clef and timeSignature is defined as a property below
