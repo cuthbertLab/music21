@@ -2981,6 +2981,40 @@ class Test(unittest.TestCase):
 
         self.runTestOnChord(xmlString, figure, pitches)
 
+    def testInversion(self):
+        from xml.etree.ElementTree import fromstring as EL
+        from music21 import musicxml, pitch
+
+        xmlString = """
+        <harmony>
+          <root>
+            <root-step>C</root-step>
+          </root>
+          <kind>major</kind>
+          <inversion>1</inversion>
+        </harmony>
+        """
+
+        # pitches = ('E3','G3','C4')
+        # pitches = tuple(pitch.Pitch(p) for p in pitches)
+
+        MP = musicxml.xmlToM21.MeasureParser()
+        mxHarmony = EL(xmlString)
+
+        cs1 = MP.xmlToChordSymbol(mxHarmony)
+        cs2 = ChordSymbol('C/E')
+
+        self.assertEqual(1, cs1.inversion())
+        self.assertEqual(1, cs2.inversion())
+        
+        # self.assertEqual(cs1.pitches, pitches)
+        # self.assertEqual(cs2.pitches, pitches)
+
+        # self.assertEqual(cs1.root(), cs2.root())
+        # self.assertEqual(cs1.bass(), cs2.bass())
+
+
+
     def testAddSubtractAlterations(self):
         ch1 = ChordSymbol('F7 add 4 subtract 3')
         ch2 = ChordSymbol('F7sus4')
