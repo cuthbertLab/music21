@@ -2625,6 +2625,12 @@ class Test(unittest.TestCase):
         self.assertEqual(kind1, kind2)
         self.assertEqual(kind1, kind3)
 
+        self.assertEqual(cs1.root(), cs2.root())
+        self.assertEqual(cs1.root(), cs3.root())
+
+        self.assertEqual(cs1.bass(), cs2.bass())
+        self.assertEqual(cs1.bass(), cs3.bass())
+
     def testChordStepFromFigure(self):
         xmlString = """
           <harmony>
