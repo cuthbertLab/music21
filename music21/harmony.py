@@ -1783,7 +1783,7 @@ class ChordSymbol(Harmony):
         for hD in chordStepModifications:
             if hD.modType == 'add':
                 typeAdd(hD)
-            elif hD.modType == 'subtract' or hD.modType == 'omit':
+            elif hD.modType in ('subtract', 'omit'):
                 typeSubtract(hD)
             elif hD.modType == 'alter':
                 typeAlter(hD)
