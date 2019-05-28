@@ -1605,7 +1605,7 @@ class ChordSymbol(Harmony):
 
     def _assignOctaveForBass(self):
         """
-        Assigns the highest octave to the bass that ensure it remains lower
+        Assigns the highest octave to the bass that ensures it remains lower
         than the root.
         """
         root = self._overrides['root']
@@ -1615,7 +1615,8 @@ class ChordSymbol(Harmony):
         if bass.ps > root.ps:
             bass.octave -= 1
 
-        assert bass.ps < root.ps
+        if bass.ps == root.ps:
+            raise ValueError('bass and root should be different')
 
         return bass.octave
 
