@@ -1504,8 +1504,8 @@ class ChordSymbol(Harmony):
     (<music21.pitch.Pitch A-2>, <music21.pitch.Pitch C-3>, <music21.pitch.Pitch E-3>)
 
     >>> harmony.ChordSymbol('F-dim7').pitches
-    (<music21.pitch.Pitch F-2>, <music21.pitch.Pitch A--2>, \
-<music21.pitch.Pitch C--3>, <music21.pitch.Pitch E---3>)
+    (<music21.pitch.Pitch F-2>, <music21.pitch.Pitch A--2>,
+    <music21.pitch.Pitch C--3>, <music21.pitch.Pitch E---3>)
 
     Thanks to David Bolton for catching the bugs tested below:
 
