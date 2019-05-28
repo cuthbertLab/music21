@@ -15,17 +15,7 @@ import sys
 import unittest
 import textwrap
 
-try:
-    reload  # python2 @UndefinedVariable
-except NameError:
-    try:
-        from importlib import reload # Python 3.4
-    except ImportError:
-        from imp import reload
-#try:
-#    import readline
-#except ImportError:
-#    pass
+from importlib import reload  # Python 3.4
 
 import io
 
@@ -59,7 +49,7 @@ urlMuseScore = 'http://musescore.org'
 urlGettingStarted = 'http://web.mit.edu/music21/doc/' # #'http://music21.readthedocs.org'
 urlMusic21List = 'http://groups.google.com/group/music21list'
 
-LINE_WIDTH = 78
+LINE_WIDTH : int = 78
 
 # ------------------------------------------------------------------------------
 # class Action(threading.Thread):
@@ -364,7 +354,6 @@ class Dialog:
             return KeyInterruptError()
         except Exception: # pylint: disable=broad-except
             return DialogError()
-        return NoInput()
 
 
     def prependPromptHeader(self, msg):
@@ -806,7 +795,7 @@ class AskOpenInBrowser(YesOrNo):
                 import webbrowser
                 hasWebbrowser = True
             except ImportError:
-                pass
+                webbrowser = None
 
             if hasWebbrowser is True:
                 webbrowser.open_new(self._urlTarget)
@@ -839,42 +828,46 @@ class AskInstall(YesOrNo):
 
     def _performActionNix(self, simulate=False):
         fp = findSetup()
-        if fp is not None:
+        if fp is None:
+            return None
 
-            self._writeToUser(['You must authorize writing in the following directory:',
-                               getSitePackages(),
-                               ' ',
-                               'Please provide your user password to complete this operation.',
-                               ''])
+        self._writeToUser(['You must authorize writing in the following directory:',
+                           getSitePackages(),
+                           ' ',
+                           'Please provide your user password to complete this operation.',
+                           ''])
 
-            stdoutSrc = sys.stdout
-            #stderrSrc = sys.stderr
+        stdoutSrc = sys.stdout
+        #stderrSrc = sys.stderr
 
-            fileLikeOpen = io.StringIO()
-            sys.stdout = fileLikeOpen
+        fileLikeOpen = io.StringIO()
+        sys.stdout = fileLikeOpen
 
-            directory, unused_fn = os.path.split(fp)
-            pyPath = sys.executable
-            cmd = 'cd %s; sudo %s setup.py install' % (directory, pyPath)
-            post = os.system(cmd)
+        directory, unused_fn = os.path.split(fp)
+        pyPath = sys.executable
+        cmd = "cd %r; sudo %r setup.py install" % (directory, pyPath)
+        post = os.system(cmd)
 
-            fileLikeOpen.close()
-            sys.stdout = stdoutSrc
-            #sys.stderr = stderrSrc
-            return post
+        fileLikeOpen.close()
+        sys.stdout = stdoutSrc
+        #sys.stderr = stderrSrc
+        return post
 
     def _performAction(self, simulate=False):
-        '''The action here is to open the stored URL in a browser, if the user agrees.
+        '''The action here is to install in site packages, if the user agrees.
         '''
         result = self.getResult()
         if result is True:
             platform = common.getPlatform()
             if platform == 'win':
-                pass
+                post = None
             elif platform == 'darwin':
                 post = self._performActionNix()
             elif platform == 'nix':
                 post = self._performActionNix()
+            else:
+                post = None
+
             return post
 
 
@@ -898,6 +891,7 @@ class AskSendInstallationReport(YesOrNo):
         self.appendPromptHeader(msg)
 
     def _getMailToStr(self):
+        # noinspection PyListCreation
         body = []
         body.append('Please send the following email; your return email address ' +
                     'will never be used in any way.')
@@ -942,7 +936,7 @@ class AskSendInstallationReport(YesOrNo):
                 import webbrowser
                 hasWebbrowser = True
             except ImportError:
-                pass
+                webbrowser = None
 
             if hasWebbrowser is True:
                 webbrowser.open(self._getMailToStr())
@@ -1378,6 +1372,8 @@ class SelectMusicXMLReader(SelectFilePath):
             post = self._getMusicXMLReaderDarwin()
         elif platform == 'nix':
             post = self._getMusicXMLReaderNix()
+        else:
+            post = ''
         return post
 
 
@@ -1392,6 +1388,8 @@ class SelectMusicXMLReader(SelectFilePath):
             urlTarget = urlFinaleNotepad
         elif platform == 'nix':
             urlTarget = urlMuseScore
+        else:
+            urlTarget = ''
 
         # this does not do anything: customize in subclass
         d = AskOpenInBrowser(urlTarget=urlTarget, default=True, tryAgain=False,
@@ -1458,7 +1456,7 @@ class ConfigurationAssistant:
 
     def getDialogs(self):
         if 'site-packages' not in common.getSourceFilePath().parts:
-            d = AskInstall(default=1)
+            d = AskInstall(default=True)
             self._dialogs.append(d)
 
         d = SelectMusicXMLReader(default=1)
