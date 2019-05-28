@@ -49,7 +49,7 @@ urlMuseScore = 'http://musescore.org'
 urlGettingStarted = 'http://web.mit.edu/music21/doc/' # #'http://music21.readthedocs.org'
 urlMusic21List = 'http://groups.google.com/group/music21list'
 
-LINE_WIDTH : int = 78
+LINE_WIDTH = 78
 
 # ------------------------------------------------------------------------------
 # class Action(threading.Thread):
