@@ -18,6 +18,7 @@ import collections
 import re
 import unittest
 
+from music21 import base
 from music21 import chord
 from music21 import common
 from music21 import duration
@@ -168,6 +169,8 @@ class Harmony(chord.Chord):
     Accepts a keyword 'updatePitches'. By default it
     is True, but can be set to False to initialize faster if pitches are not needed.
     '''
+    # sort harmony just before notes and chords and other default objects
+    classSortOrder = base.Music21Object.classSortOrder - 1
     _styleClass = style.TextStyle
 
     ### INITIALIZER ###
@@ -2475,6 +2478,32 @@ class Test(unittest.TestCase):
         self.assertEqual(b.nameWithOctave, 'E-3')
 
 
+    def testClassSortOrderHarmony(self):
+        '''
+        This tests a former bug in getContextByClass
+        because ChordSymbol used to have the same `.classSortOrder`
+        as Note.
+        '''
+        from music21 import note, stream
+
+        cs = ChordSymbol('C')
+        n = note.Note('C')
+        m = stream.Measure(1)
+
+        m.insert(0, n)
+        m.insert(0, cs)
+        self.assertIs(n.getContextByClass('ChordSymbol'), cs)
+
+        # check that it works also with append
+        cs = ChordSymbol('C')
+        n = note.Note('C')
+        n.duration.quarterLength = 0
+        m = stream.Measure(1)
+        m.append(n)
+        m.append(cs)
+        self.assertIs(n.getContextByClass('ChordSymbol'), cs)
+
+
     def testNoChord(self):
         nc = NoChord()
         self.assertEqual('none', nc.chordKind)
@@ -2686,7 +2715,7 @@ _DOC_ORDER = [Harmony, chordSymbolFigureFromChord, ChordSymbol, ChordStepModific
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='chordSymbolSetsBassOctave')
+    music21.mainTest(Test)  # , runTest='testClassSortOrderHarmony')
 
 
 # -----------------------------------------------------------------------------
