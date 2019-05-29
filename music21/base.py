@@ -1346,6 +1346,21 @@ class Music21Object:
         >>> a = b.getContextByClass('Note', getElementMethod='getElementBefore')
         >>> a
         <music21.note.Note A>
+
+        # debugging a consistent error.
+
+        >>> for site, positionStart, searchType in b.contextSites(
+        ...                                 returnSortTuples=True,
+        ...                                 sortByCreationTime=False,
+        ...                                 followDerivation=True
+        ...                                 ):
+        ...     print(site, positionStart, searchType)
+        <music21.stream.Measure 3 offset=5.0> SortTuple(atEnd=0, offset=1.0, ...) elementsFirst
+        <music21.stream.Part 0x1118cadd8> SortTuple(atEnd=0, offset=6.0, ...) flatten
+        <music21.stream.Part 0x1118cadd8_flat> SortTuple(atEnd=0, offset=6.0, ...) flatten
+        <music21.stream.Part 0x1118cadd8_flat> SortTuple(atEnd=0, offset=6.0, ...) flatten
+        <music21.stream.Part 0x1118cadd8_flat_flat> SortTuple(atEnd=0, offset=6.0, ...) flatten
+
         >>> c = b.getContextByClass('Note', getElementMethod='getElementAfter')
         >>> c
         <music21.note.Note C>
@@ -1355,7 +1370,7 @@ class Music21Object:
         >>> noteA.getContextByClass('TimeSignature')
         <music21.meter.TimeSignature 4/4>
         '''
-        def payloadExtractor(site, flatten, positionStart):
+        def payloadExtractor(checkSite, flatten, innerPositionStart):
             '''
             change the site (stream) to a Tree (using caches if possible),
             then find the node before (or after) the positionStart and
@@ -1364,23 +1379,23 @@ class Music21Object:
             flatten can be True, 'semiFlat', or False.
 
             '''
-            siteTree = site.asTree(flatten=flatten, classList=className)
+            siteTree = checkSite.asTree(flatten=flatten, classList=className)
             if 'Offset' in getElementMethod:
                 # these methods match only by offset.  Used in .getBeat among other places
                 if (('At' in getElementMethod and 'Before' in getElementMethod)
                         or ('At' not in getElementMethod and 'After' in getElementMethod)):
-                    positionStart = ZeroSortTupleHigh.modify(offset=positionStart.offset)
+                    innerPositionStart = ZeroSortTupleHigh.modify(offset=innerPositionStart.offset)
                 elif (('At' in getElementMethod and 'After' in getElementMethod)
                         or ('At' not in getElementMethod and 'Before' in getElementMethod)):
-                    positionStart = ZeroSortTupleLow.modify(offset=positionStart.offset)
+                    innerPositionStart = ZeroSortTupleLow.modify(offset=innerPositionStart.offset)
                 else:
                     raise Music21Exception(
                             'Incorrect getElementMethod: {}'.format(getElementMethod))
 
             if 'Before' in getElementMethod:
-                contextNode = siteTree.getNodeBefore(positionStart)
+                contextNode = siteTree.getNodeBefore(innerPositionStart)
             else:
-                contextNode = siteTree.getNodeAfter(positionStart)
+                contextNode = siteTree.getNodeAfter(innerPositionStart)
 
             if contextNode is not None:
                 payload = contextNode.payload
@@ -1388,7 +1403,7 @@ class Music21Object:
             else:
                 return None
 
-        def wellFormed(contextEl, site):
+        def wellFormed(checkContextEl, checkSite):
             '''
             Long explanation for a short method.
 
@@ -1468,19 +1483,22 @@ class Music21Object:
             this extacted section, one wants to see how that fits into a larger stream hierarchy.
             '''
             try:
-                selfSt = self.sortTuple(site, raiseExceptionOnMiss=True)
-                contextSt = contextEl.sortTuple(site, raiseExceptionOnMiss=True)
+                selfSortTuple = self.sortTuple(checkSite, raiseExceptionOnMiss=True)
+                contextSortTuple = checkContextEl.sortTuple(checkSite, raiseExceptionOnMiss=True)
             except SitesException:
-                # might be raised by selfSt; should not be by contextSt. It just
-                # means that selfSt isn't in the same stream as contextSt, such as
+                # might be raised by selfSortTuple; should not be by contextSortTuple.
+                # It just means that selfSortTuple isn't in the same stream
+                # as contextSortTuple, such as
                 # when crossing measure borders.  Thus it's well-formed.
                 return True
 
-            if 'Before' in getElementMethod and selfSt < contextSt:
-                # print(getElementMethod, selfSt.shortRepr(), contextSt.shortRepr(), self, contextEl)
+            if 'Before' in getElementMethod and selfSortTuple < contextSortTuple:
+                # print(getElementMethod, selfSortTuple.shortRepr(),
+                #       contextSortTuple.shortRepr(), self, contextEl)
                 return False
-            elif 'After' in getElementMethod and selfSt > contextSt:
-                # print(getElementMethod, selfSt.shortRepr(), contextSt.shortRepr(), self, contextEl)
+            elif 'After' in getElementMethod and selfSortTuple > contextSortTuple:
+                # print(getElementMethod, selfSortTuple.shortRepr(),
+                #       contextSortTuple.shortRepr(), self, contextEl)
                 return False
             else:
                 return True
@@ -1498,7 +1516,9 @@ class Music21Object:
                                             followDerivation=followDerivation
                                             ):
             if searchType in ('elementsOnly', 'elementsFirst'):
-                contextEl = payloadExtractor(site, flatten=False, positionStart=positionStart)
+                contextEl = payloadExtractor(site,
+                                             flatten=False,
+                                             innerPositionStart=positionStart)
 
                 if contextEl is not None and wellFormed(contextEl, site):
                     try:
@@ -1518,7 +1538,9 @@ class Music21Object:
                         # containing site because that comes before.
                         return site # if the site itself is the context, return it...
 
-                contextEl = payloadExtractor(site, flatten='semiFlat', positionStart=positionStart)
+                contextEl = payloadExtractor(site,
+                                             flatten='semiFlat',
+                                             innerPositionStart=positionStart)
                 if contextEl is not None and wellFormed(contextEl, site):
                     try:
                         contextEl.activeSite = site
