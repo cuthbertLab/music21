@@ -2094,6 +2094,11 @@ class ChordSymbol(Harmony):
             if not self.inversionIsValid(inversionNum):
                 #there is a bass, yet no normal inversion was found....must be added note
                 ignoreInversion = True
+            elif inversionNum >= len(pitches):
+                # For some reason we don't have enough pitches to make the 
+                # inversion -- can happen in some weird cases, but still that
+                # shouldn't fail.
+                ignoreInversion = True
             elif not pitches[inversionNum].pitchClass == self._overrides[
                 'bass'].pitchClass:
                 # the bass found by the inversion doesn't not correspond to
@@ -3041,13 +3046,23 @@ class Test(unittest.TestCase):
 
         self.assertEqual(1, cs1.inversion())
         self.assertEqual(1, cs2.inversion())
-        
+
         # self.assertEqual(cs1.pitches, pitches)
         # self.assertEqual(cs2.pitches, pitches)
 
         # self.assertEqual(cs1.root(), cs2.root())
         # self.assertEqual(cs1.bass(), cs2.bass())
 
+    def testChordWithoutKind(self):
+        """
+        This verifies that the chord creation doesn't fail with an index out
+        of range exception when no chord kind is specified.
+        """
+        cs = ChordSymbol(root='C', bass='E')
+
+        self.assertEqual(1, cs.inversion())
+        self.assertEqual('C3', str(cs.root()))
+        self.assertEqual('E2', str(cs.bass()))
 
 
     def testAddSubtractAlterations(self):
