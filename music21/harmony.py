@@ -1611,6 +1611,32 @@ class ChordSymbol(Harmony):
         """
         Assigns the highest octave to the bass that ensures it remains lower
         than the root.
+
+        >>> cs = harmony.ChordSymbol()
+        >>> cs.root('A3')
+        >>> cs.bass('E')
+        >>> cs._assignOctaveForBass()
+        3
+        >>> cs.bass()
+        <music21.pitch.Pitch E3>
+
+        >>> cs = harmony.ChordSymbol()
+        >>> cs.root('C3')
+        >>> cs.bass('E')
+        >>> cs._assignOctaveForBass()
+        2
+        >>> cs.bass()
+        <music21.pitch.Pitch E2>
+
+        >>> cs = harmony.ChordSymbol()
+        >>> cs.root('E-3')
+        >>> cs.bass('E')
+        >>> cs._assignOctaveForBass()
+        2
+        >>> cs.bass()
+        <music21.pitch.Pitch E2>
+
+
         """
         root = self._overrides['root']
         bass = self._overrides['bass']
