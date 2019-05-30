@@ -1321,12 +1321,12 @@ class ModuleDocumenter(ObjectDocumenter):
         result.extend(self.makeHeading(referentPackagesystemPath, 1))
         result.extend(self.rstEditingWarningFormat)
         result.extend(self.rstAutodocDirectiveFormat)
+        for classDocumenter in self.classDocumenters:
+            result.extend(classDocumenter.run())
         if self.functionDocumenters:
             result.extend(self.makeHeading('Functions', 2))
             for functionDocumenter in self.functionDocumenters:
                 result.extend(functionDocumenter.run())
-        for classDocumenter in self.classDocumenters:
-            result.extend(classDocumenter.run())
         return result
 
     def __repr__(self):
@@ -1387,8 +1387,9 @@ class ModuleDocumenter(ObjectDocumenter):
             if referent in classDocumenters:
                 result.append(classDocumenters[referent])
                 del(classDocumenters[referent])
-        for documenter in sorted(classDocumenters.values(),
-            key=lambda x: x.referentPackagesystemPath):
+        for documenter in sorted(
+                classDocumenters.values(),
+                key=lambda x: x.referentPackagesystemPath):
             result.append(documenter)
         return result
 

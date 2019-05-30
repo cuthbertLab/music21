@@ -446,7 +446,7 @@ def identifyAsTonicOrDominant(inChord, inKey):
     >>> roman.identifyAsTonicOrDominant(['D3'], key.Key('f'))
     False
     '''
-    if isinstance(inChord, list):
+    if isinstance(inChord, (list, tuple)):
         inChord = chord.Chord(inChord)
     pitchNameList = []
     for x in inChord.pitches:
@@ -1213,12 +1213,12 @@ class RomanNumeral(harmony.Harmony):
     '''
     # TODO: document better! what is inherited and what is new?
 
-    _alterationRegex = re.compile(r'^(b+|\-+|\#+)')
+    _alterationRegex = re.compile(r'^(b+|-+|#+)')
     _omittedStepsRegex = re.compile(r'(\[(no[1-9]+)+\]\s*)+')
-    _bracketedAlterationRegex =  re.compile(r'\[(b+|\-+|\#+)(\d+)\]')
+    _bracketedAlterationRegex =  re.compile(r'\[(b+|-+|#+)(\d+)\]')
     _augmentedSixthRegex = re.compile(r'(It|Ger|Fr|Sw)')
     _romanNumeralAloneRegex = re.compile(r'(IV|I{1,3}|VI{0,2}|iv|i{1,3}|vi{0,2}|N)')
-    _secondarySlashRegex = re.compile(r'(.*?)\/([\#a-np-zA-NP-Z].*)')
+    _secondarySlashRegex = re.compile(r'(.*?)/([#a-np-zA-NP-Z].*)')
 
     _DOC_ATTR = {
         'scaleCardinality': '''
@@ -1691,7 +1691,6 @@ class RomanNumeral(harmony.Harmony):
         >>> outScale
         <music21.key.Key of c minor>
         '''
-        romanNumeralAlone = ''
         if (not self._romanNumeralAloneRegex.match(workingFigure)
                 and not self._augmentedSixthRegex.match(workingFigure)):
             raise RomanException('No roman numeral found in {!r}'.format(
@@ -1703,7 +1702,7 @@ class RomanNumeral(harmony.Harmony):
                 self.useImpliedScale = True
             rm = self._augmentedSixthRegex.match(workingFigure)
             romanNumeralAlone = rm.group(1)
-            if (romanNumeralAlone in ('It', 'Ger')):
+            if romanNumeralAlone in ('It', 'Ger'):
                 self.scaleDegree = 4
             else:
                 self.scaleDegree = 2
@@ -2047,7 +2046,7 @@ class RomanNumeral(harmony.Harmony):
         >>> neapolitan.scaleDegreeWithAlteration
         (2, <accidental flat>)
         '''
-        return (self.scaleDegree, self.frontAlterationAccidental)
+        return self.scaleDegree, self.frontAlterationAccidental
 
 
     def bassScaleDegreeFromNotation(self, notationObject=None):
