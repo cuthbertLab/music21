@@ -769,6 +769,9 @@ def romanNumeralFromChord(chordObj,
     <music21.roman.RomanNumeral io6b5b3 in c# minor>
 
 
+    OMIT_FROM_DOCS
+
+
     Note that this should be III+642 gives III+#642 (# before 6 is unnecessary)
 
     # >>> roman.romanNumeralFromChord(chord.Chord('B3 D3 E-3 G3'), key.Key('c'))
@@ -2026,7 +2029,7 @@ class RomanNumeral(harmony.Harmony):
     @property
     def scaleDegreeWithAlteration(self):
         '''
-        Returns or sets a two element tuple of the scale degree and the
+        Returns a two element tuple of the scale degree and the
         accidental that alters the scale degree for things such as #ii or
         bV.
 
@@ -2035,15 +2038,16 @@ class RomanNumeral(harmony.Harmony):
 
         Has the same effect as setting .scaleDegree and
         .frontAlterationAccidental separately
+
+        >>> v = roman.RomanNumeral('V', 'C')
+        >>> v.scaleDegreeWithAlteration
+        (5, None)
+
+        >>> neapolitan = roman.RomanNumeral('N6', 'c#')
+        >>> neapolitan.scaleDegreeWithAlteration
+        (2, <accidental flat>)
         '''
         return (self.scaleDegree, self.frontAlterationAccidental)
-
-    @scaleDegreeWithAlteration.setter
-    def scaleDegreeWithAlteration(self, scaleDegree, alteration):
-        self.scaleDegree = scaleDegree
-        self.frontAlterationAccidental = alteration
-        if self._parsingComplete:
-            self._updatePitches()
 
 
     def bassScaleDegreeFromNotation(self, notationObject=None):
@@ -2627,9 +2631,9 @@ if __name__ == '__main__':
 # -----------------------------------------------------------------------------
 
 
-_DOC_ORDER = (
+_DOC_ORDER = [
     RomanNumeral,
-    )
+    ]
 
 
 # -----------------------------------------------------------------------------
