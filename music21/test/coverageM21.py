@@ -33,14 +33,15 @@ exclude_lines = [
                 ]
 
 def getCoverage(overrideVersion=False):
-    if overrideVersion or sys.version_info.minor == 5: 
-        # run on Py 3.5 -- to get Py 3.6/3.7 timing...
+    if overrideVersion or sys.version_info.minor == 6:
+        # run on Py 3.6 -- to get Py 3.5/3.7 timing...
         try:
             import coverage
-            cov = coverage.coverage(omit=omit_modules)
+            cov = coverage.Coverage(omit=omit_modules)
             for e in exclude_lines:
                 cov.exclude(e, which='exclude')
             cov.start()
+            import music21
         except ImportError:
             cov = None
     else:
