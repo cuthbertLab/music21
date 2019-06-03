@@ -19,6 +19,8 @@ and used to configure, :class:`~music21.note.Note` objects.
 import copy
 import unittest
 
+from typing import Optional
+
 from music21 import base
 from music21 import beam
 from music21 import common
@@ -170,7 +172,7 @@ class Lyric(style.StyleMixin):
                 else:
                     return '<music21.note.Lyric number=%d text="%s">' % (self.number, self.text)
             else:
-                return '<music21.note.Lyric number=%d>' % (self.number)
+                return '<music21.note.Lyric number=%d>' % self.number
         else:
             if self.text is not None:
                 if self.syllabic is not None:
@@ -395,12 +397,12 @@ class GeneralNote(base.Music21Object):
         '''
         General Note objects are equal if their durations are equal and
         they have the same articulation and expression classes (in any order)
-        and theiir ties are equal.
+        and their ties are equal.
         '''
 
-        if other == None or not isinstance(other, GeneralNote):
+        if other is None or not isinstance(other, GeneralNote):
             return NotImplemented
-        # checks type, dots, tuplets, quarterlength, uses Pitch.__eq__
+        # checks type, dots, tuplets, quarterLength, uses Pitch.__eq__
         if self.duration != other.duration:
             return False
         # articulations are a list of Articulation objects
@@ -420,7 +422,7 @@ class GeneralNote(base.Music21Object):
         return True
 
     # --------------------------------------------------------------------------
-    def _getLyric(self) -> str:
+    def _getLyric(self) -> Optional[str]:
         if not self.lyrics:
             return None
 
@@ -946,7 +948,7 @@ class NotRest(GeneralNote):
     def hasVolumeInformation(self) -> bool:
         '''
         Returns bool whether volume was set -- saving some time for advanced
-        users (such as musicxml exporters) that only want to look at the volume
+        users (such as MusicXML exporters) that only want to look at the volume
         if it is already there.
 
         >>> n = note.Note()
@@ -1578,10 +1580,7 @@ class Rest(GeneralNote):
         >>> note.Rest(type='whole').fullName
         'Whole Rest'
         '''
-        msg = []
-        msg.append(self.duration.fullName)
-        msg.append(' Rest')
-        return ''.join(msg)
+        return self.duration.fullName + ' Rest'
 
 
 

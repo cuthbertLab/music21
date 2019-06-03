@@ -59,6 +59,13 @@ class ChoraleList:
 
     '''
     def __init__(self):
+        self.byTitle = {}
+        self.byBWV = {}
+        self.byKalmus = {}
+        self.byBaerenreiter = {}
+        self.byBudapest = {}
+        self.byRiemenschneider = {}
+
         self.prepareList()
 
     def prepareList(self):
@@ -456,13 +463,6 @@ class ChoraleList:
         |Wir glauben all' an einen Gott||437||382||133||382||133||&nbsp;
         |-
         |Wo Gott zum Haus nicht gibt sein' Gunst||438||389||157||388||157||&nbsp;'''
-
-        self.byTitle = {}
-        self.byBWV = {}
-        self.byKalmus = {}
-        self.byBaerenreiter = {}
-        self.byBudapest = {}
-        self.byRiemenschneider = {}
 
         for line in allCat.splitlines():
             line = line.strip()
@@ -1424,7 +1424,7 @@ class Iterator:
                     self._titleList.append(v)
                 else:
                     print('%s will be skipped because it is not a recognized title' % v)
-        if self._titleList == []:
+        if not self._titleList:
             self._titleList = None
 
         self._initializeNumberList()
