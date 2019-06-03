@@ -1918,6 +1918,10 @@ def accidFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     **Attributes/Elements Implemented:**
 
     - @accid (from att.accid.log)
+    - @accid.ges (from att.accid.ges)
+
+    .. note:: If set, the @accid.ges attribute is always imported as the music21 :class:`Accidental`
+        for this note. We assume it corresponds to the accidental implied by a key signature.
 
     **Attributes/Elements in Testing:** none
 
@@ -1936,11 +1940,14 @@ def accidFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
             - (att.staffident (@staff)) (att.layerident (@layer)))
 
     - att.accid.vis (all)
-    - att.accid.gesatt.accid.anl (all)
+    - att.accid.anl (all)
 
     **Contained Elements not Implemented:** none
     '''
-    return _accidentalFromAttr(elem.get('accid'))
+    if elem.get('accid.ges') is not None:
+        return _accidGesFromAttr(elem.get('accid.ges', ''))
+    else:
+        return _accidentalFromAttr(elem.get('accid'))
 
 
 def sylFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
