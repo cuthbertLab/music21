@@ -37,7 +37,7 @@ cov = coverageM21.getCoverage()
 
 
 
-def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verbosity=2):
+def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=10, verbosity=2):
     '''
     Run all tests. Group can be test and external
 
