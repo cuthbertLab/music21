@@ -504,7 +504,7 @@ class ChoraleListRKBWV:
     bwv 344
     kalmus 173
     riemenschneider 155
-    title Hilf, Herr Jesu, laß gelingen 1
+    title Hilf, Herr Jesu, laß gelingen
     >>> #_DOCS_SHOW c = corpus.parse('bach/bwv' + str(info155['bwv']))
     >>> #_DOCS_SHOW c.show() # shows Bach BWV344
 
@@ -1003,14 +1003,14 @@ class Iterator:
     >>> BCI.numberingSystem = 'title'
     >>> BCI.returnType = 'filename'
     >>> BCI.titleList = ['Jesu, meine Freude',
-    ...                  'Mit Fried und Freud ich fahr dahin',
+    ...                  'Gott hat das Evangelium',
     ...                  'Not a Chorale']
     Not a Chorale will be skipped because it is not a recognized title
 
     >>> for chorale in BCI:
     ...    print(chorale)
     bach/bwv358
-    bach/bwv83.5
+    bach/bwv319
 
     The numberList, which by default includes all chorales in the chosen numberingSystem,
     can be set like the titleList. In the following example,
@@ -1060,7 +1060,7 @@ class Iterator:
     not give the German title but rather the BWV number.
 
     >>> corpus.chorales.Iterator(returnType='stream')[1].metadata.title
-    'Ich dank dir, lieber Herre'
+    'Ich dank’ dir, lieber Herre'
 
 
     '''
