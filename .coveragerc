@@ -1,6 +1,6 @@
 [run]
 omit =
-    */virtualenv/*
+    /home/travis/virtualenv/*
 
 [report]
 exclude_lines =
