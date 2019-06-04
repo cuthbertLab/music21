@@ -208,6 +208,14 @@ class Test(unittest.TestCase):
         a = BachBWV1007Prelude()
         self.assertNotEqual(a.getUrlByExt(['.xml']), [])
         self.assertNotEqual(a.getUrlByExt(['.krn']), [])
+        BachBWV772()
+        BachBWV773()
+        ColtraneGiantSteps()
+        SchubertD576()
+        SchubertD5762()
+        SchubertD5763()
+        SchubertD5764()
+        PachelbelCanonD()
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation

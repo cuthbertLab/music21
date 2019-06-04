@@ -53,7 +53,7 @@ from music21 import metadata
 from music21.corpus import chorales
 from music21.corpus import corpora
 from music21.corpus import manager
-# from music21.corpus import virtual
+from music21.corpus import virtual
 from music21.corpus import work
 
 from music21 import environment

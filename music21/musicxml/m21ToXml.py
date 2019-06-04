@@ -504,6 +504,7 @@ class GeneralObjectExporter():
         '''
         Provide a complete MusicXML string from a single dynamic by
         putting it into a Stream first.
+
         '''
         dCopy = copy.deepcopy(dynamicObject)
         out = stream.Stream()
@@ -515,10 +516,29 @@ class GeneralObjectExporter():
         '''
         Generate the pitches from this scale
         and put it into a stream.Measure, then call
-        fromMeasure on it
+        fromMeasure on it.
+
+        >>> cMaj = scale.MajorScale('C')
+        >>> GEX = musicxml.m21ToXml.GeneralObjectExporter()
+        >>> m = GEX.fromScale(cMaj)
+        >>> m
+        <music21.stream.Score 0x11d4f17b8>
+
+        >>> m.show('text')
+        {0.0} <music21.stream.Part 0x116a04b38>
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.clef.TrebleClef>
+                {0.0} <music21.meter.TimeSignature 10/4>
+                {0.0} <music21.note.Note C>
+                {4.0} <music21.note.Note D>
+                {5.0} <music21.note.Note E>
+                {6.0} <music21.note.Note F>
+                {7.0} <music21.note.Note G>
+                {8.0} <music21.note.Note A>
+                {9.0} <music21.note.Note B>
         '''
         m = stream.Measure(number=1)
-        for i in range(1, scaleObject._abstract.getDegreeMaxUnique() + 1):
+        for i in range(1, scaleObject.abstract.getDegreeMaxUnique() + 1):
             p = scaleObject.pitchFromDegree(i)
             n = note.Note()
             n.pitch = p
@@ -539,6 +559,25 @@ class GeneralObjectExporter():
 
         Overrides the general scale behavior to highlight
         the tonic and dominant.
+
+        >>> cMaj = scale.MajorScale('C')
+        >>> GEX = musicxml.m21ToXml.GeneralObjectExporter()
+        >>> m = GEX.fromDiatonicScale(cMaj)
+        >>> m
+        <music21.stream.Score 0x11d4f17b8>
+
+        >>> m.show('text')
+        {0.0} <music21.stream.Part 0x116a04b38>
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.clef.TrebleClef>
+                {0.0} <music21.meter.TimeSignature 11/4>
+                {0.0} <music21.note.Note C>
+                {4.0} <music21.note.Note D>
+                {5.0} <music21.note.Note E>
+                {6.0} <music21.note.Note F>
+                {7.0} <music21.note.Note G>
+                {9.0} <music21.note.Note A>
+                {10.0} <music21.note.Note B>
         '''
         m = stream.Measure(number=1)
         for i in range(1, diatonicScaleObject._abstract.getDegreeMaxUnique() + 1):
@@ -2980,12 +3019,37 @@ class MeasureExporter(XMLExporterBase):
         '''
         return a list of <notations> from spanners related to the object that should appear
         in the notations tag (slurs, slides, etc.)
+
+        >>> n0 = note.Note('C')
+        >>> n1 = note.Note('D')
+        >>> trem = expressions.TremoloSpanner([n0, n1])
+        >>> m = stream.Measure()
+        >>> m.insert(0, trem)
+        >>> m.append(n0)
+        >>> m.append(n1)
+        >>> mex = musicxml.m21ToXml.MeasureExporter(m)
+        >>> out = mex.objectAttachedSpannersToNotations(n0, m.spannerBundle)
+        >>> out
+        [<Element 'ornaments' at 0x1114d9408>]
+        >>> mex.dump(out[0])
+        <ornaments>
+          <tremolo type="start">3</tremolo>
+        </ornaments>
+
+        >>> out = mex.objectAttachedSpannersToNotations(n1, m.spannerBundle)
+        >>> mex.dump(out[0])
+        <ornaments>
+          <tremolo type="stop">3</tremolo>
+        </ornaments>
+
+
         '''
         notations = []
         if objectSpannerBundle is not None:
             sb = objectSpannerBundle
         else:
             sb = self.objectSpannerBundle
+
         if not sb:
             return notations
 
