@@ -673,6 +673,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.append(note.Note())
         >>> testBool(s)
         True
+
+        >>> s = stream.Stream()
+        >>> s.storeAtEnd(bar.Barline('final'))
+        >>> testBool(s)
+        True
         '''
         if self._elements: # blindingly faster than if len(self._elements) > 0
             return True    # and even about 5x faster than if any(self._elements)

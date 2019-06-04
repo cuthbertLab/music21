@@ -1377,10 +1377,15 @@ class LyReRhythmedMusic(LyObject):
         return outputString # previously this did not return...
 
 class LyContextChange(LyObject):
+    r'''
+    >>> lcc = lily.lilyObjects.LyContextChange('x', 'y')
+    >>> str(lcc)
+    '\\change x = y '
+    '''
     def __init__(self, before=None, after=None):
         super().__init__()
         self.before = before
-        self.alter = after
+        self.after = after
 
     def stringOutput(self):
         return self.backslash + 'change ' + self.before + ' = ' + self.after + ' '
@@ -1406,15 +1411,29 @@ class LyPropertyOperation(LyObject):
     Represents:
 
        property_operation: STRING '=' scalar
-                       | "\\unset" simple_string
+                       | "\unset" simple_string
                        | "\override" simple_string property_path '=' scalar
                        | "\revert" simple_string embedded_scm
 
-    manditory mode in ['set', 'unset', 'override', 'revert']
+    mandatory mode in ['set', 'unset', 'override', 'revert']
 
 
     also represents simple_music_property_def which has the same forms
 
+
+    >>> lpo = lily.lilyObjects.LyPropertyOperation('unset', 'simple')
+    >>> str(lpo)
+    '\\unset simple '
+
+    >>> lpo = lily.lilyObjects.LyPropertyOperation('override', 'simple', 'x', 'y')
+    >>> str(lpo)
+    '\\override simple x = y '
+
+    >>> lpo = lily.lilyObjects.LyPropertyOperation('revert', 'x', 'y')
+    >>> str(lpo)
+    '\\revert x y '
+
+    TODO: should \set be given?
     '''
     def __init__(self, mode=None, value1=None, value2=None, value3=None):
         super().__init__()
@@ -1424,6 +1443,9 @@ class LyPropertyOperation(LyObject):
         self.value3 = value3
 
     def stringOutput(self):
+        if self.mode not in ('set', 'unset', 'override', 'revert'):
+            raise LilyObjectsException('invalid mode %s' % self.mode)
+
         if self.mode == 'set':
             return self.backslash + 'set ' + self.value1 + ' = ' + self.value2 + ' '
         elif self.mode == 'unset':
