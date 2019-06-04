@@ -62,11 +62,16 @@ class Tie(SlottedObjectMixin):
     tied notes, and the first note has a 'dotted'-start tie, and the
     second note has a 'dashed'-stop tie, the graphical tie itself will be dotted.
 
+    A type of tie that is unknown raises a ValueError:
 
+    >>> tie.Tie('hello')
+    Traceback (most recent call last):
+    music21.tie.TieException: Type must be one of
+    ('start', 'stop', 'continue', 'let-ring', 'continue-let-ring'), not hello
 
     OMIT_FROM_DOCS
        optional (to know what notes are next:)
-          .to = note()   # not implimented yet, b/c of garbage coll.
+          .to = note()   # not implemented yet, b/c of garbage coll.
           .from = note()
 
     (question: should notes be able to be tied to multiple notes
@@ -147,6 +152,9 @@ class Tie(SlottedObjectMixin):
         that this object belongs to -- starting with the object's class name
         and going up the mro() for the object.  Very similar to Perl's @ISA
         array.  See music21.Music21Object.classes for more details.
+
+        >>> tie.Tie().classes
+        ('Tie', 'SlottedObjectMixin', 'object')
         '''
         return tuple([x.__name__ for x in self.__class__.mro()])
         # TODO: inherit from a protoM21Object...
