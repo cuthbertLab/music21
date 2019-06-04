@@ -304,26 +304,52 @@ class Chord(note.NotRest):
         Get item makes access pitch components for the Chord easier
 
         >>> c = chord.Chord('C#4 D-4')
-        >>> c[0]
+        >>> cSharp = c[0]
+        >>> cSharp
         <music21.note.Note C#>
 
         >>> c['0.step']
         'C'
         >>> c['3.accidental']
         Traceback (most recent call last):
-        KeyError: 'cannot access component with: 3.accidental'
+        KeyError: 'Cannot access component with: 3.accidental'
 
         >>> c[5]
         Traceback (most recent call last):
-        KeyError: 'cannot access component with: 5'
+        KeyError: 'Cannot access component with: 5'
 
         >>> c['D-4']
         <music21.note.Note D->
 
         >>> c['D-4.style.color'] is None
         True
+
+        Getting by note does not do very much...
+
+        >>> c[cSharp]
+        <music21.note.Note C#>
+
+        But we can get from another note
+
+        >>> cSharp2 = note.Note('C#4')
+        >>> cSharp2.duration.quarterLength = 3.0
+        >>> c[cSharp2] is cSharp
+        True
+        >>> c[cSharp2] is cSharp2
+        False
+
+        KeyError is raised if not in chord.
+
+        >>> notInChord = note.Note('G')
+        >>> c[notInChord]
+        Traceback (most recent call last):
+        KeyError: 'Cannot access component with: <music21.note.Note G>'
+
+        >>> c[None]
+        Traceback (most recent call last):
+        KeyError: 'Cannot access component with: None'
         '''
-        keyErrorStr = 'cannot access component with: %s' % key
+        keyErrorStr = 'Cannot access component with: %s' % key
         if isinstance(key, str):
             if key.count('.'):
                 key, attrStr = key.split('.', 1)
@@ -367,7 +393,7 @@ class Chord(note.NotRest):
                     break
             else:
                 for n in self._notes:
-                    if n == key:
+                    if n.pitch == key.pitch:
                         foundNote = n
                         break
                 else:
@@ -423,6 +449,10 @@ class Chord(note.NotRest):
         >>> c[-1].style.color
         'red'
 
+
+        >>> c[0] = None
+        Traceback (most recent call last):
+        ValueError: Chord index must be set to a valid note object
         '''
         if isinstance(key, str) and key.count('.'):
             keySplit = key.split('.')
@@ -1454,13 +1484,16 @@ class Chord(note.NotRest):
         >>> print(c1.getNoteheadFill(c1.pitches[0]))
         None
 
-        >>> c1.getNotehead(pitch.Pitch('A#6')) is None
+        >>> c1.getNoteheadFill(pitch.Pitch('A#6')) is None
         True
 
         Will work if the two notes are equal in pitch
 
         >>> c1.getNoteheadFill(note.Note('G4'))
         True
+
+        Returns None if the pitch is not in the Chord:
+
         '''
         if hasattr(p, 'pitch'):
             p = p.pitch
@@ -1476,7 +1509,7 @@ class Chord(note.NotRest):
 
     def getStemDirection(self, p):
         '''Given a pitch in this Chord, return an associated stem attribute, or
-        return 'unspecified' if not defined for that Pitch.
+        return 'unspecified' if not defined for that Pitch or None.
 
         If the pitch is not found, None will be returned.
 
@@ -1492,8 +1525,14 @@ class Chord(note.NotRest):
 
         Will work if the two pitches are equal in pitch
 
-        >>> c1.getStemDirection(pitch.Pitch('G4'))
+        >>> c1.getStemDirection(note.Note('G4'))
         'double'
+
+        Returns None if a Note or Pitch is not in the Chord
+
+        >>> c1.getStemDirection(pitch.Pitch('A#4')) is None
+        True
+
         '''
         if hasattr(p, 'pitch'):
             p = p.pitch
@@ -1880,7 +1919,8 @@ class Chord(note.NotRest):
             elif bassToRoot == 3: # thirteenth
                 inv = 6
             else:
-                inv = None #no longer raise an exception if not normal inversion
+                inv = None  # no longer raise an exception if not normal inversion
+
             # is this cache worth it? or more trouble than it's worth...
             self._cache['inversion'] = inv
             return inv
@@ -2158,7 +2198,7 @@ class Chord(note.NotRest):
         
         
 
-    def isDiminishedTriad(self):
+    def isDiminishedTriad(self) -> bool:
         '''Returns True if chord is a Diminished Triad, that is,
         if it contains only notes that are
         either in unison with the root, a minor third above the
@@ -2194,7 +2234,7 @@ class Chord(note.NotRest):
 
         return True
 
-    def isDominantSeventh(self):
+    def isDominantSeventh(self) -> bool:
         '''Returns True if chord is a Dominant Seventh, that is,
         if it contains only notes that are
         either in unison with the root, a major third above the root,
@@ -2210,17 +2250,22 @@ class Chord(note.NotRest):
 
         >>> chord.Chord().isDominantSeventh()
         False
+
+        >>> c2 = chord.Chord('C4 E4 G4 A#4')
+        >>> c2.isDominantSeventh()
+        False
         '''
         return self.isSeventhOfType((0, 4, 7, 10))
 
-    def isFalseDiminishedSeventh(self):
-        '''Returns True if chord is a Diminished Seventh, that is,
+    def isFalseDiminishedSeventh(self) -> bool:
+        '''
+        Returns True if chord is a Diminished Seventh, that is,
         if it contains only notes that are
         either in unison with the root, a minor third above the root,
         a diminished fifth, or a minor seventh
         above the root. Additionally, must contain at least one of
         each third and fifth above the root.
-        Chord MAY BE SPELLED INCORRECTLY. Otherwise returns false.
+        Chord MAY BE SPELLED INCORRECTLY. Otherwise returns False.
 
 
         >>> c = chord.Chord('C D# G- A')
@@ -2229,6 +2274,14 @@ class Chord(note.NotRest):
 
         >>> chord.Chord().isFalseDiminishedSeventh()
         False
+
+        >>> chord.Chord('C4 E4 G4').isFalseDiminishedSeventh()
+        False
+
+        Correctly spelled diminished seventh chords are also false diminished sevenths.
+
+        >>> chord.Chord('C4 E-4 G-4 B--4').isFalseDiminishedSeventh()
+        True
         '''
         third = False
         fifth = False
@@ -2255,7 +2308,7 @@ class Chord(note.NotRest):
 
         return True
 
-    def isFrenchAugmentedSixth(self):
+    def isFrenchAugmentedSixth(self) -> bool:
         '''
         Returns True if the chord is a French augmented sixth chord
         (flat 6th scale degree in bass, tonic, second scale degree, and raised 4th).
@@ -2344,14 +2397,47 @@ class Chord(note.NotRest):
                 return False
         return True
 
-    def isGermanAugmentedSixth(self):
+    def isGermanAugmentedSixth(self) -> bool:
+        '''
+        Returns True if the chord is a German augmented sixth chord
+        (flat 6th scale degree in bass, tonic, flat third scale degree, and raised 4th).
+
+
+        >>> gr6a = chord.Chord(['A-3', 'C4', 'E-4', 'F#4'])
+        >>> gr6a.isGermanAugmentedSixth()
+        True
+
+        Spelling matters (see isSwissAugmentedSixth
+
+        >>> gr6b = chord.Chord(['A-3', 'C4', 'D#4', 'F#4'])
+        >>> gr6b.isGermanAugmentedSixth()
+        False
+
+        Inversion matters...
+
+        >>> gr6c = chord.Chord(['C4', 'E-4', 'F#4', 'A-4'])
+        >>> gr6c.isGermanAugmentedSixth()
+        False
+
+        OMIT_FROM_DOCS
+
+        >>> chord.Chord().isGermanAugmentedSixth()
+        False
+
+        >>> gr6d = chord.Chord(['A-3', 'C-4', 'E-4', 'F#4'])
+        >>> gr6d.isGermanAugmentedSixth()
+        False
+        '''
         augSixthChord = self.removeRedundantPitchNames(inPlace=False)
-        ### Chord must be in first inversion.
-        if not augSixthChord.inversion() == 1:
+        # Chord must be in first inversion.
+        try:
+            if not augSixthChord.inversion() == 1:
+                return False
+        except ChordException:
             return False
 
-        ### Augmented sixth interval (simple or compound) must be present
-        ### between bass and raised 4th (root of chord)
+        # Augmented sixth interval (simple or compound) must be present
+        # between bass and raised 4th (root of chord)
         bass = augSixthChord.bass()
         root = augSixthChord.root()
         if bass is None or root is None:
@@ -2361,10 +2447,10 @@ class Chord(note.NotRest):
                  and augSixthInterval.generic.simpleDirected == 6)):
             return False
 
-        ### The fifth of the chord must be the tonic.
-        ### The fifth of the chord is the tonic if and only if
-        ### there is a M3 (simple or compound) between the bass (m6 scale step)
-        ### and the fifth of the chord.
+        # The fifth of the chord must be the tonic.
+        # The fifth of the chord is the tonic if and only if
+        # there is a M3 (simple or compound) between the bass (m6 scale step)
+        # and the fifth of the chord.
         tonic = augSixthChord.getChordStep(5)
         if tonic is None:
             return False
@@ -2373,10 +2459,10 @@ class Chord(note.NotRest):
                  and majThirdInterval.generic.simpleDirected == 3)):
             return False
 
-        ### The seventh of the chord must be the mediant.
-        ### The seventh of the chord is the mediant if and only if
-        ### there is a P5 (simple or compound) between the bass
-        ### (m6 scale step) and the fifth of the chord.
+        # The seventh of the chord must be the mediant.
+        # The seventh of the chord is the mediant if and only if
+        # there is a P5 (simple or compound) between the bass
+        # (m6 scale step) and the fifth of the chord.
         mediant = augSixthChord.getChordStep(7)
         if mediant is None:
             return False
@@ -2387,7 +2473,7 @@ class Chord(note.NotRest):
 
         return True
 
-    def isHalfDiminishedSeventh(self):
+    def isHalfDiminishedSeventh(self) -> bool:
         '''
         Returns True if chord is a Half Diminished Seventh, that is,
         if it contains only notes that are
@@ -2417,7 +2503,7 @@ class Chord(note.NotRest):
         '''
         return self.isSeventhOfType((0, 3, 6, 10))
 
-    def isIncompleteMajorTriad(self):
+    def isIncompleteMajorTriad(self) -> bool:
         '''
         Returns True if the chord is an incomplete Major triad, or, essentially,
         a dyad of root and major third
@@ -2461,7 +2547,7 @@ class Chord(note.NotRest):
 
         return True
 
-    def isIncompleteMinorTriad(self):
+    def isIncompleteMinorTriad(self) -> bool:
         '''
         returns True if the chord is an incomplete Minor triad, or, essentially,
         a dyad of root and minor third
@@ -2499,10 +2585,10 @@ class Chord(note.NotRest):
 
         return True
 
-    def isItalianAugmentedSixth(self, restrictDoublings=False):
+    def isItalianAugmentedSixth(self, restrictDoublings=False) -> bool:
         '''
-        Returns true if the chord is a properly spelled Italian augmented sixth chord in
-        first inversion.
+        Returns True if the chord is a properly spelled Italian augmented sixth chord in
+        first inversion.  Otherwise returns False.
 
         If restrictDoublings is set to True then only the tonic may be doubled.
 
