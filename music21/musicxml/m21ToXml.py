@@ -3169,6 +3169,8 @@ class MeasureExporter(XMLExporterBase):
 
         >>> n = note.Note('D#5')
         >>> n.quarterLength = 3
+        >>> n.volume.velocityScalar = 0.5
+
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> len(MEX.xmlRoot)
         0
@@ -3176,7 +3178,7 @@ class MeasureExporter(XMLExporterBase):
         >>> mxNote
         <Element 'note' at 0x10113cb38>
         >>> MEX.dump(mxNote)
-        <note>
+        <note dynamics="70.56">
           <pitch>
             <step>D</step>
             <alter>1</alter>
@@ -3222,9 +3224,10 @@ class MeasureExporter(XMLExporterBase):
         2
 
         >>> n.notehead = 'diamond'
+        >>> n.articulations.append(articulations.Pizzicato())
         >>> mxNote = MEX.noteToXml(n)
         >>> MEX.dump(mxNote)
-        <note>
+        <note dynamics="70.56" pizzicato="yes">
           ...
           <notehead parentheses="no">diamond</notehead>
         </note>
@@ -3992,6 +3995,8 @@ class MeasureExporter(XMLExporterBase):
                 applicableArticulations.append(a)
 
         for artObj in applicableArticulations:
+            if 'Pizzicato' in artObj.classes:
+                continue
             if 'TechnicalIndication' in artObj.classes:
                 if mxTechnicalMark is None:
                     mxTechnicalMark = Element('technical')
