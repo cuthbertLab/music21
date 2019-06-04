@@ -1119,6 +1119,7 @@ class MusicXMLImporter(XMLParserBase):
             self.stream.style.lyricFonts.append(styleTuple)
 
         for mxLyricLanguage in mxDefaults.findall('lyric-language'):
+            lyricLanguage = 'en'
             lyricName = mxLyricLanguage.get('name')
             for akey, value in mxLyricLanguage.attrib.items():
                 # {http://www.w3.org/XML/1998/namespace}lang
@@ -2457,6 +2458,7 @@ class MeasureParser(XMLParserBase):
                 self.chordVoice = vIndex
 
         if isChord is True: # and isRest is False...?
+            n = None  # fo linting
             self.mxNoteList.append(mxNote)
             # store lyrics for latter processing
             for mxLyric in mxNote.findall('lyric'):
@@ -3145,6 +3147,9 @@ class MeasureParser(XMLParserBase):
         >>> c.dots
         1
         '''
+        numDots = 0
+        tups = ()
+
         if inputM21 is None:
             d = None
         else:
@@ -3196,7 +3201,7 @@ class MeasureParser(XMLParserBase):
                     qLenRounded = 2.0**round(math.log(qLen, 2)) # math.log2 appears in py3.3
                     environLocal.printDebug(['mxToDuration',
                             'rounding duration to {0} as type is not'.format(qLenRounded) +
-                            'defined and raw quarterlength ' +
+                            'defined and raw quarterLength ' +
                             '({0}) is not a computable duration'.format(qLen)])
                     # environLocal.printDebug(['mxToDuration', 'raw qLen', qLen, durationType,
                     #                         'mxNote:',
@@ -3595,6 +3600,8 @@ class MeasureParser(XMLParserBase):
                 spClass = dynamics.Diminuendo
             elif mType == 'stop':
                 spClass = dynamics.DynamicWedge # parent of Cresc/Dim
+            else:
+                raise MusicXMLImportException('Unknown type, %s.' % mType)
 
             if mType != 'stop':
                 sp = self.xmlOneSpanner(mxObj, None, spClass, allowDuplicateIds=True)
@@ -3607,7 +3614,7 @@ class MeasureParser(XMLParserBase):
                 try:
                     sp = spb[0]
                 except IndexError:
-                    raise MusicXMLImportException('Error in geting DynamicWedges...'
+                    raise MusicXMLImportException('Error in getting DynamicWedges...'
                           + 'Measure no. ' + str(self.measureNumber)
                           + ' ' + str(self.parent.partId))
                 sp.completeStatus = True

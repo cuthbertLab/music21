@@ -4115,7 +4115,7 @@ class Chord(note.NotRest):
         >>> c.fullName
         'Chord {D | F-sharp | A} Quarter'
 
-        >>> chord.Chord(['d1', 'e4-', 'b3-'], quarterLength=2/3.).fullName
+        >>> chord.Chord(['d1', 'e4-', 'b3-'], quarterLength=2/3).fullName
         'Chord {D in octave 1 | E-flat in octave 4 | B-flat in octave 3} Quarter Triplet (2/3 QL)'
 
         '''

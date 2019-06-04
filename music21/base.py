@@ -829,7 +829,7 @@ class Music21Object:
         >>> n.quarterLength = 2.0
         >>> n.quarterLength
         2.0
-        >>> n.quarterLength = 1.0/3
+        >>> n.quarterLength = 1/3
         >>> n.quarterLength
         Fraction(1, 3)
     ''')
@@ -3611,10 +3611,10 @@ class ElementWrapper(Music21Object):
                                                       self.offset,
                                                       shortObj)
         else:
+            # for instance, some ElementWrappers
             return '<%s offset=%s obj="%s">' % (self.__class__.__name__,
                                                 self.offset,
                                                 shortObj)
-
     def __eq__(self, other) -> bool:
         '''Test ElementWrapper equality
 

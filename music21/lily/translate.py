@@ -1128,12 +1128,12 @@ class LilypondConverter:
 
 
         >>> n2 = note.Note("D#4")
-        >>> n2.duration.quarterLength = 1.0/3
+        >>> n2.duration.quarterLength = 1/3
         >>> n2.duration.tuplets[0].type = 'start'
         >>> n3 = note.Note("E4")
-        >>> n3.duration.quarterLength = 1.0/3
+        >>> n3.duration.quarterLength = 1/3
         >>> n4 = note.Note("F4")
-        >>> n4.duration.quarterLength = 1.0/3
+        >>> n4.duration.quarterLength = 1/3
         >>> n4.duration.tuplets[0].type = 'stop'
 
         >>> n5 = note.Note("F#4")
@@ -1191,12 +1191,12 @@ class LilypondConverter:
 
 
         >>> c2 = chord.Chord(["D4", "F#4", "A4"])
-        >>> c2.duration.quarterLength = 1.0/3
+        >>> c2.duration.quarterLength = 1/3
         >>> c2.duration.tuplets[0].type = 'start'
         >>> c3 = chord.Chord(["D4", "F4", "G4"])
-        >>> c3.duration.quarterLength = 1.0/3
+        >>> c3.duration.quarterLength = 1/3
         >>> c4 = chord.Chord(["C4", "E4", "G4", "C5"])
-        >>> c4.duration.quarterLength = 1.0/3
+        >>> c4.duration.quarterLength = 1/3
         >>> c4.duration.tuplets[0].type = 'stop'
 
         >>> c5 = chord.Chord(["C4", "F4", "A-4"])

@@ -821,7 +821,7 @@ class Accidental(style.StyleMixin):
 
     ### INITIALIZER ###
 
-    def __init__(self, specifier : Union[int, str] = 'natural'):
+    def __init__(self, specifier : Union[int, str, float] = 'natural'):
         super().__init__()
         # managed by properties
         self._displayType = 'normal' # always, never, unless-repeated, even-tied
@@ -3460,7 +3460,7 @@ class Pitch:
 
 
     def harmonicString(self,
-                       fundamental : Union[str, 'music21.pitch.Pitch', None] = None):
+                       fundamental : Union[str, 'music21.pitch.Pitch', None] = None) -> str:
         '''
         Return a string representation of a harmonic equivalence.
 
@@ -3505,7 +3505,7 @@ class Pitch:
         if fundamental is None:
             if self.fundamental is None:
                 raise PitchException('no fundamental is defined for this Pitch: ' +
-                                     'provide one as an arugment')
+                                     'provide one as an argument')
             else:
                 fundamental = self.fundamental
         if isinstance(fundamental, str):
@@ -4151,7 +4151,8 @@ class Pitch:
     diatonicNoteNum = property(_getDiatonicNoteNum, _setDiatonicNoteNum,
         doc = str(_getDiatonicNoteNum.__doc__))
 
-    def transpose(self, value, *, inPlace=False):
+    def transpose(self, value : Union['music21.interval.IntervalBase', str, int],
+                  *, inPlace=False):
         '''
         Transpose the pitch by the user-provided value.  If the value is an
         integer, the transposition is treated in half steps. If the value is a
@@ -4236,7 +4237,7 @@ class Pitch:
         :rtype: music21.pitch.Pitch
         '''
         # environLocal.printDebug(['Pitch.transpose()', value])
-        if hasattr(value, 'classes') and 'IntervalBase' in value.classes:
+        if 'IntervalBase' in getattr(value, 'classes', []):
             intervalObj = value
         else: # try to process
             intervalObj = interval.Interval(value)
@@ -5451,9 +5452,9 @@ class Test(unittest.TestCase):
     def testMicrotoneD(self):
         from music21 import pitch
         # the microtonal scale used by padberg
-        f = [440, 458 + 1/3., 476 + 2/3., 495, 513 + 1/3., 531 + 2/3., 550, 568 + 1/3.,
-             586 + 2/3., 605, 623 + 1/3., 641 + 2/3., 660, 678 + 1/3., 696 + 2/3., 715,
-             733 + 1/3., 751 + 2/3., 770, 788 + 1/3., 806 + 2/3., 825, 843 + 1/3., 861 + 2/3.]
+        f = [440, 458 + 1/3, 476 + 2/3, 495, 513 + 1/3, 531 + 2/3, 550, 568 + 1/3,
+             586 + 2/3, 605, 623 + 1/3, 641 + 2/3, 660, 678 + 1/3, 696 + 2/3, 715,
+             733 + 1/3, 751 + 2/3, 770, 788 + 1/3, 806 + 2/3, 825, 843 + 1/3, 861 + 2/3]
         self.assertEqual(len(f), 24)
         pList = []
         for fq in f:

@@ -479,7 +479,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 e.activeSite = self
             self._endElements = list(value._endElements)
             for e in self._endElements:
-                self.setElementOffset(e, value.elementOffset(e, stringReturn=True), addElement=True)
+                self.setElementOffset(e, value.elementOffset(e, stringReturns=True), addElement=True)
                 e.sites.add(self)
                 e.activeSite = self
         else:
@@ -961,6 +961,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         if classFilterList is not None:
             classFilterSet = set(classFilterList)
+        else:
+            classFilterSet = None
 
         for e in other._elements:
             #self.insert(other.offset, e)
@@ -1214,6 +1216,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             match = None
             matchedEndElement = False
             baseElementCount = len(self._elements)
+            matchOffset = 0.0  # to avoid possibility of undefined
+
             if indexInStream < baseElementCount:
                 match = self._elements.pop(indexInStream)
             else:
@@ -3403,6 +3407,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         if classList is not None:
             classSet = set(classList)
+        else:
+            classSet = None
 
         try:
             # index() ultimately does an autoSort check, so no check here or
@@ -3571,7 +3577,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 try:
                     mNumber = int(m.number)
                 except ValueError:
-                    raise StreamException('found problematic measure number: %s' % mNumber)
+                    raise StreamException('found problematic measure for numbering: %s' % m)
                 uniqueMeasureNumbers.add(mNumber)
                 if len(uniqueMeasureNumbers) > 1:
                     break
@@ -3910,7 +3916,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         out = self.cloneEmpty('template')
         if removeClasses is None:
-            removeClasses = set(['GeneralNote', 'Dynamic', 'Expression'])
+            removeClasses = {'GeneralNote', 'Dynamic', 'Expression'}
         elif common.isIterable(removeClasses):
             removeClasses = set(removeClasses)
 
@@ -4647,6 +4653,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         elif len(keySigSearch) == 1:
             ourKey = keySigSearch[0]
         else:
+            ourKey = None  # for might be undefined warning
             quickSearch = False
 
         inversionDNN = inversionNote.pitch.diatonicNoteNum
@@ -4900,29 +4907,26 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         elements = self.elements
         for i in range(len(elements)):
             b = elements[i]
-            if b.id is not None or searchElement.id is not None:
-                if b.id == searchElement.id:
-                    found = i
-                    foundOffset = self.elementOffset(elements[i])
-                    foundEnd = foundOffset + elements[i].duration.quarterLength
-            else:
-                if b is searchElement:
-                    found = i
-                    foundOffset = self.elementOffset(elements[i])
-                    foundEnd = foundOffset + elements[i].duration.quarterLength
+            if b.id == searchElement.id:
+                found = i
+                foundOffset = self.elementOffset(elements[i])
+                foundEnd = foundOffset + elements[i].duration.quarterLength
+            elif b is searchElement:
+                found = i
+                foundOffset = self.elementOffset(elements[i])
+                foundEnd = foundOffset + elements[i].duration.quarterLength
         if found is None:
             raise StreamException("Could not find the element in the stream")
 
         # handle _elements and _endElements independently
         for e in self._elements:
             o = self.elementOffset(e)
-            if (o >= foundOffset - before and o < foundEnd + after):
+            if foundOffset - before <= o < foundEnd + after:
                 display.coreInsert(o, e)
 
         for e in self._endElements:
             o = self.elementOffset(e)
-            if (o >= foundOffset - before and o < foundEnd + after):
-                #display.storeAtEnd(e)
+            if foundOffset - before <= o < foundEnd + after:
                 display.coreStoreAtEnd(e)
         display.coreElementsChanged()
         return display
@@ -12824,6 +12828,7 @@ class Score(Stream):
         165
 
         '''
+        sub = []
         bundle = []
         if common.isNum(voiceAllocation):
             voicesPerPart = voiceAllocation
@@ -12836,7 +12841,7 @@ class Score(Stream):
                 if pIndex % voicesPerPart == voicesPerPart - 1:
                     bundle.append(sub)
                     sub = []
-            if sub != []: # get last
+            if sub: # get last
                 bundle.append(sub)
         # else, assume it is a list of groupings
         elif common.isIterable(voiceAllocation):

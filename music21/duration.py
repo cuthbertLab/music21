@@ -525,10 +525,10 @@ def quarterConversion(qLen):
     Or, a quarter that is 1/3 of a half.
     Or, a quarter that is 2/3 of a quarter.
 
-    >>> duration.quarterConversion(2.0/3.0)
+    >>> duration.quarterConversion(2/3)
     QuarterLengthConversion(components=(DurationTuple(type='quarter', dots=0, quarterLength=1.0),),
         tuplet=<music21.duration.Tuplet 3/2/quarter>)
-    >>> t = duration.quarterConversion(2.0/3.0).tuplet
+    >>> t = duration.quarterConversion(2/3).tuplet
     >>> t
     <music21.duration.Tuplet 3/2/quarter>
     >>> t.durationActual
@@ -539,18 +539,18 @@ def quarterConversion(qLen):
     Or, an eighth that is 1/3 of a quarter
     Or, an eighth that is 2/3 of eighth
 
-    >>> duration.quarterConversion(1.0/3)
+    >>> duration.quarterConversion(1/3)
     QuarterLengthConversion(components=(DurationTuple(type='eighth', dots=0, quarterLength=0.5),),
         tuplet=<music21.duration.Tuplet 3/2/eighth>)
 
     A half that is 1/3 of a whole, or a triplet half note.
     Or, a half that is 2/3 of a half
 
-    >>> duration.quarterConversion(4.0/3.0)
+    >>> duration.quarterConversion(4/3)
     QuarterLengthConversion(components=(DurationTuple(type='half', dots=0, quarterLength=2.0),),
         tuplet=<music21.duration.Tuplet 3/2/half>)
 
-    >>> duration.quarterConversion(1.0/6.0)
+    >>> duration.quarterConversion(1/6)
     QuarterLengthConversion(components=(DurationTuple(type='16th', dots=0, quarterLength=0.25),),
         tuplet=<music21.duration.Tuplet 3/2/16th>)
 
@@ -558,7 +558,7 @@ def quarterConversion(qLen):
     A sixteenth that is 1/5 of a quarter
     Or, a sixteenth that is 4/5ths of a 16th
 
-    >>> duration.quarterConversion(1.0/5.0)
+    >>> duration.quarterConversion(1/5)
     QuarterLengthConversion(components=(DurationTuple(type='16th', dots=0, quarterLength=0.25),),
         tuplet=<music21.duration.Tuplet 5/4/16th>)
 
@@ -566,14 +566,14 @@ def quarterConversion(qLen):
     A 16th that is  1/7th of a quarter
     Or, a 16th that is 4/7 of a 16th
 
-    >>> duration.quarterConversion(1.0/7.0)
+    >>> duration.quarterConversion(1/7)
     QuarterLengthConversion(components=(DurationTuple(type='16th', dots=0, quarterLength=0.25),),
         tuplet=<music21.duration.Tuplet 7/4/16th>)
 
     A 4/7ths of a whole note, or
     A quarter that is 4/7th of of a quarter
 
-    >>> duration.quarterConversion(4.0/7.0)
+    >>> duration.quarterConversion(4/7)
     QuarterLengthConversion(components=(DurationTuple(type='quarter', dots=0, quarterLength=1.0),),
                             tuplet=<music21.duration.Tuplet 7/4/quarter>)
 
@@ -590,7 +590,7 @@ def quarterConversion(qLen):
     Since tuplets now apply to the entire Duration, expect some odder tuplets for unusual
     values that should probably be split generally...
 
-    >>> duration.quarterConversion(7.0/3)
+    >>> duration.quarterConversion(7/3)
     QuarterLengthConversion(components=(DurationTuple(type='whole', dots=0, quarterLength=4.0),),
         tuplet=<music21.duration.Tuplet 12/7/16th>)
 
@@ -1351,7 +1351,7 @@ def _durtationTupleOrdinal(self):
     >>> b.ordinal
     1
 
-    >>> c = duration.DurationTuple('1024th', 0, 1.0/256)
+    >>> c = duration.DurationTuple('1024th', 0, 1/256)
     >>> c.ordinal
     14
     '''
@@ -2662,7 +2662,7 @@ class Duration(SlottedObjectMixin):
         as floats:
 
         >>> b = duration.Duration()
-        >>> b.quarterLength = 1.0/3
+        >>> b.quarterLength = 1/3
         >>> b.quarterLength
         Fraction(1, 3)
 
@@ -3044,7 +3044,7 @@ class TupletFixer:
         >>> for i in range(9):
         ...    n = note.Note()
         ...    n.pitch.ps = 60 + i
-        ...    n.duration.quarterLength = 1.0/3
+        ...    n.duration.quarterLength = 1/3
         ...    if i % 3 == 2:
         ...        n.duration.tuplets[0].type = 'stop'
         ...    s.append(n)
@@ -3096,12 +3096,12 @@ class TupletFixer:
         >>> s = stream.Stream()
 
         >>> n1 = note.Note('C')
-        >>> n1.duration.quarterLength = 2.0/3
+        >>> n1.duration.quarterLength = 2/3
         >>> n1.duration.quarterLength
         Fraction(2, 3)
         >>> s.append(n1)
         >>> n2 = note.Note('D')
-        >>> n2.duration.quarterLength = 1.0/3
+        >>> n2.duration.quarterLength = 1/3
         >>> n2.duration.quarterLength
         Fraction(1, 3)
         >>> s.append(n2)

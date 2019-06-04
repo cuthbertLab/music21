@@ -312,7 +312,7 @@ if __name__ == "__main__":
 #     s.insert(0, clef.TrebleClef())
 #     s.insert(0, meter.TimeSignature('1/4'))
 #     n = note.Note()
-#     n.duration.quarterLength = 1/3.
+#     n.duration.quarterLength = 1/3
 #     s.repeatAppend(n, 3)
 #     p = stream.Part()
 #     p.repeatAppend(s, 2)

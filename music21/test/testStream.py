@@ -404,6 +404,13 @@ class Test(unittest.TestCase):
         self.assertTrue(st1.flat.sorted[0] is n1)
         self.assertEqual(st1.flat.sorted[0].offset, 22.0)
 
+    def testStreamExceptionsOnAssert(self):
+        from music21 import stream
+        with self.assertRaises(stream.StreamException):
+            n1 = note.Note()
+            stream.Stream([n1, 0])
+
+
     def testStreamRecursion(self):
         srcStream = Stream()
         for x in range(6):
@@ -445,7 +452,7 @@ class Test(unittest.TestCase):
         # elementsSorted returns offset, dur, element
         offsets = [a.offset for a in farStream.flat]
 
-        # create what we epxect to be the offsets
+        # create what we expect to be the offsets
         offsetsMatch = list(range(6))
         offsetsMatch += [x + 10 for x in range(6)]
         offsetsMatch += [x + 20 for x in range(6)]
@@ -649,11 +656,11 @@ class Test(unittest.TestCase):
 
         # this, if called, actively destroys the activeSite relationship!
         # on the measures (as new Elements are not created)
-        #m = b.getElementsByClass('Measure')[5]
-        #self.assertEqual(isinstance(m, Measure), True)
+        # m = b.getElementsByClass('Measure')[5]
+        # self.assertEqual(isinstance(m, Measure), True)
 
         # this false b/c, when getting the measures, activeSites are lost
-        #self.assertEqual(m.activeSite, b) #measures activeSite should be part
+        # self.assertEqual(m.activeSite, b) #measures activeSite should be part
         # NOTE: this is dependent on raw element order, and might change
         # due to importing changes
         #b.show('t')
@@ -687,7 +694,7 @@ class Test(unittest.TestCase):
         n.offset = 10
         a.insert(n)
         b.insert(n)
-        # the objects elements has been transfered to each activeSite
+        # the objects elements has been transferred to each activeSite
         # stream in the same way
         self.assertEqual(n.getOffsetBySite(a), n.getOffsetBySite(b))
         self.assertEqual(n.getOffsetBySite(a), 10)
@@ -730,7 +737,7 @@ class Test(unittest.TestCase):
     def testGetInstrumentManual(self):
         from music21 import defaults
 
-        #import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         # search activeSite from a measure within
 
         # a different test derived from a TestExternal
@@ -785,7 +792,7 @@ class Test(unittest.TestCase):
     def testStreamCopy(self):
         '''Test copying a stream
         '''
-        #import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         # search activeSite from a measure within
 
         # a different test derived from a TestExternal
@@ -793,10 +800,10 @@ class Test(unittest.TestCase):
         r = Stream()
         for x in ['c3', 'a3', 'c#4', 'd3'] * 30:
             n = note.Note(x)
-            n.quarterLength = random.choice([.25])
+            n.quarterLength = random.choice([0.25])
             q.append(n)
             m = note.Note(x)
-            m.quarterLength = .5
+            m.quarterLength = 0.5
             r.append(m)
         s = Stream() # container
 
@@ -850,8 +857,6 @@ class Test(unittest.TestCase):
 
 
     def testGetTimeSignatures(self):
-        #getTimeSignatures
-
         n = note.Note()
         n.quarterLength = 3
         a = Stream()
@@ -879,7 +884,7 @@ class Test(unittest.TestCase):
         # none of the offsets are being copied
         offsets = [x.offset for x in b]
         # with autoSort is passed on from elements search
-        #self.assertEqual(offsets, [0.0, 3.0, 10.0, 20.0, 40.0])
+        # self.assertEqual(offsets, [0.0, 3.0, 10.0, 20.0, 40.0])
         self.assertEqual(offsets, [0.0, 10.0, 3.0, 20.0, 40.0])
 
 
@@ -3581,18 +3586,18 @@ class Test(unittest.TestCase):
         '''Creating brackets
         '''
         from music21.stream import makeNotation
-        def collectType(s):
+        def collectType(ss):
             post = []
-            for e in s:
+            for e in ss:
                 if e.duration.tuplets:
                     post.append(e.duration.tuplets[0].type)
                 else:
                     post.append(None)
             return post
 
-        def collectBracket(s):
+        def collectBracket(ss):
             post = []
-            for e in s:
+            for e in ss:
                 if e.duration.tuplets:
                     post.append(e.duration.tuplets[0].bracket)
                 else:
@@ -3602,7 +3607,7 @@ class Test(unittest.TestCase):
         # case of incomplete, single tuplet ending the Stream
         # remove bracket
         s = Stream()
-        qlList = [1, 2, .5, 1/6.]
+        qlList = [1, 2, .5, 1/6]
         for ql in qlList:
             n = note.Note()
             n.quarterLength = ql
@@ -3617,18 +3622,18 @@ class Test(unittest.TestCase):
         '''Creating brackets
         '''
         from music21.stream import makeNotation
-        def collectType(s):
+        def collectType(ss):
             post = []
-            for e in s:
+            for e in ss:
                 if e.duration.tuplets:
                     post.append(e.duration.tuplets[0].type)
                 else:
                     post.append(None)
             return post
 
-        def collectBracket(s):
+        def collectBracket(ss):
             post = []
-            for e in s:
+            for e in ss:
                 if e.duration.tuplets:
                     post.append(e.duration.tuplets[0].bracket)
                 else:
@@ -3636,7 +3641,7 @@ class Test(unittest.TestCase):
             return post
 
         s = Stream()
-        qlList = [1, 1/3., 1/3., 1/3., 1, 1]
+        qlList = [1, 1/3, 1/3, 1/3, 1, 1]
         for ql in qlList:
             n = note.Note()
             n.quarterLength = ql
@@ -3647,7 +3652,7 @@ class Test(unittest.TestCase):
 
 
         s = Stream()
-        qlList = [1, 1/6., 1/6., 1/6., 1/6., 1/6., 1/6., 1, 1]
+        qlList = [1, 1/6, 1/6, 1/6, 1/6, 1/6, 1/6, 1, 1]
         for ql in qlList:
             n = note.Note()
             n.quarterLength = ql
@@ -3661,7 +3666,7 @@ class Test(unittest.TestCase):
 
         # case of tuplet ending the Stream
         s = Stream()
-        qlList = [1, 2, .5, 1/6., 1/6., 1/6., ]
+        qlList = [1, 2, .5, 1/6, 1/6, 1/6, ]
         for ql in qlList:
             n = note.Note()
             n.quarterLength = ql
@@ -3673,7 +3678,7 @@ class Test(unittest.TestCase):
 
         # case of incomplete, single tuplets in the middle of a Strem
         s = Stream()
-        qlList = [1, 1/3., 1, 1/3., 1, 1/3.]
+        qlList = [1, 1/3, 1, 1/3, 1, 1/3]
         for ql in qlList:
             n = note.Note()
             n.quarterLength = ql
@@ -3686,7 +3691,7 @@ class Test(unittest.TestCase):
 
         # diverse groups that sum to a whole
         s = Stream()
-        qlList = [1, 1/3., 2/3., 2/3., 1/6., 1/6., 1]
+        qlList = [1, 1/3, 2/3, 2/3, 1/6, 1/6, 1]
         for ql in qlList:
             n = note.Note()
             n.quarterLength = ql
@@ -3698,7 +3703,7 @@ class Test(unittest.TestCase):
 
         # diverse groups that sum to a whole
         s = Stream()
-        qlList = [1, 1/3., 2/3., 1, 1/6., 1/3., 1/3., 1/6. ]
+        qlList = [1, 1/3, 2/3, 1, 1/6, 1/3, 1/3, 1/6 ]
         for ql in qlList:
             n = note.Note()
             n.quarterLength = ql
@@ -3713,7 +3718,7 @@ class Test(unittest.TestCase):
 
         # quintuplets
         s = Stream()
-        qlList = [1, 1/5., 1/5., 1/10., 1/10., 1/5., 1/5., 2. ]
+        qlList = [1, 1/5, 1/5, 1/10, 1/10, 1/5, 1/5, 2. ]
         for ql in qlList:
             n = note.Note()
             n.quarterLength = ql
@@ -3748,7 +3753,7 @@ class Test(unittest.TestCase):
             return post
 
 #         s = Stream()
-#         qlList = [1, 1/3., 1/3., 1/3., 1, 1, 1/3., 1/3., 1/3., 1, 1]
+#         qlList = [1, 1/3, 1/3, 1/3, 1, 1, 1/3, 1/3, 1/3, 1, 1]
 #         for ql in qlList:
 #             n = note.Note()
 #             n.quarterLength = ql
@@ -3760,7 +3765,7 @@ class Test(unittest.TestCase):
 #         #s.show()
 
         s = Stream()
-        qlList = [1/3.,]
+        qlList = [1/3,]
         for ql in qlList:
             n = note.Note()
             n.quarterLength = ql
@@ -4622,9 +4627,9 @@ class Test(unittest.TestCase):
 
         # cannot map .3333 into .5, so this raises an exception
         self.assertRaises(stream.StreamException,
-                          lambda: s.sliceByQuarterLengths(1/3., inPlace=False))
+                          lambda: s.sliceByQuarterLengths(1/3, inPlace=False))
 
-        post = s.sliceByQuarterLengths(1/6., inPlace=False)
+        post = s.sliceByQuarterLengths(1/6, inPlace=False)
         self.assertEqual([n.tie.type for n in post.notesAndRests],
                          ['start', 'continue', 'continue', 'continue', 'continue', 'stop',
                           'start', 'continue', 'continue', 'continue', 'continue', 'continue',
@@ -4786,7 +4791,7 @@ class Test(unittest.TestCase):
         n1 = note.Note()
         n1.quarterLength = 2
         n2 = note.Note()
-        n2.quarterLength = 1/3.
+        n2.quarterLength = 1/3
         n3 = note.Note()
         n3.quarterLength = 0.5
         n4 = note.Note()
@@ -6130,7 +6135,7 @@ class Test(unittest.TestCase):
         from music21 import stream
         m = stream.Measure()
         m.repeatAppend(note.Note('c#', quarterLength=0.5), 4)
-        m.repeatAppend(note.Note('c', quarterLength=1/3.0), 6)
+        m.repeatAppend(note.Note('c', quarterLength=1/3), 6)
         # calls makeAccidentals, makeBeams, makeTuplets
         m.makeNotation(inPlace=True)
 
@@ -6153,7 +6158,7 @@ class Test(unittest.TestCase):
         from music21 import stream
         m = stream.Measure()
         m.repeatAppend(note.Note('c#', quarterLength=0.5), 4)
-        m.repeatAppend(note.Note('c', quarterLength=1/3.0), 6)
+        m.repeatAppend(note.Note('c', quarterLength=1/3), 6)
         GEX = m21ToXml.GeneralObjectExporter()
         raw = GEX.parse(m).decode('utf-8')
         self.assertTrue(raw.find('<beam number="1">begin</beam>') > 0, raw)
@@ -6459,6 +6464,16 @@ class Test(unittest.TestCase):
                          + '<music21.bar.Barline type=final>, <music21.bar.Barline type=none>]')
 
 
+    def testSetElementsFromOtherStreamWithEndElements(self):
+        from music21 import bar, stream
+        b = bar.Barline('double')
+
+        s = stream.Stream()
+        s.storeAtEnd(b)
+
+        c = stream.Stream()
+        c.elements = s
+        self.assertIn(b, s)
 
 
     def testStreamElementsComparison(self):
@@ -7324,7 +7339,7 @@ class Test(unittest.TestCase):
         from music21 import stream
         # testing a problem in triplets in makeChords
         s = stream.Stream()
-        s.repeatAppend(note.Note('G4', quarterLength=1/3.), 6)
+        s.repeatAppend(note.Note('G4', quarterLength=1/3), 6)
         s.insert(0, note.Note('C4', quarterLength=2))
         chords = s.chordify()
         #s.chordify().show('t')
@@ -7333,7 +7348,7 @@ class Test(unittest.TestCase):
 
         # try with small divisions
         s = stream.Stream()
-        s.repeatAppend(note.Note('G4', quarterLength=1/6.), 12)
+        s.repeatAppend(note.Note('G4', quarterLength=1/6), 12)
         s.insert(0, note.Note('C4', quarterLength=2))
         chords = s.chordify()
         #s.chordify().show('t')
@@ -7341,7 +7356,7 @@ class Test(unittest.TestCase):
             self.assertEqual(len(c), 2)
 
         s = stream.Stream()
-        s.repeatAppend(note.Note('G4', quarterLength=1/12.), 24)
+        s.repeatAppend(note.Note('G4', quarterLength=1/12), 24)
         s.insert(0, note.Note('C4', quarterLength=2))
         chords = s.chordify()
         #s.chordify().show('t')
@@ -7349,7 +7364,7 @@ class Test(unittest.TestCase):
             self.assertEqual(len(c), 2)
 
         s = stream.Stream()
-        s.repeatAppend(note.Note('G4', quarterLength=1/24.), 48)
+        s.repeatAppend(note.Note('G4', quarterLength=1/24), 48)
         s.insert(0, note.Note('C4', quarterLength=2))
         chords = s.chordify()
         #s.chordify().show('t')

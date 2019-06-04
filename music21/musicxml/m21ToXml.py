@@ -125,6 +125,7 @@ def getMetadataFromContext(s):
             return contextSite.site.metadata
     return None
 
+
 def _setTagTextFromAttribute(m21El, xmlEl, tag, attributeName=None,
                              *, transform=None, forceEmpty=False):
     '''
@@ -134,9 +135,10 @@ def _setTagTextFromAttribute(m21El, xmlEl, tag, attributeName=None,
     Pass a function or lambda function as transform to transform the
     value before setting it.  String transformation is assumed.
 
-    Returns the subelement
+    Returns the SubElement
 
     Will not create an empty element unless forceEmpty is True
+
 
     >>> from music21.musicxml.m21ToXml import Element
     >>> e = Element('accidental')
@@ -273,7 +275,7 @@ def _synchronizeIds(element, m21Object):
     element.set('id', m21Object.id)
 
 
-class GeneralObjectExporter():
+class GeneralObjectExporter:
     classMapping = OrderedDict([
         ('Score', 'fromScore'),
         ('Part', 'fromPart'),
@@ -580,7 +582,7 @@ class GeneralObjectExporter():
                 {10.0} <music21.note.Note B>
         '''
         m = stream.Measure(number=1)
-        for i in range(1, diatonicScaleObject._abstract.getDegreeMaxUnique() + 1):
+        for i in range(1, diatonicScaleObject.abstract.getDegreeMaxUnique() + 1):
             p = diatonicScaleObject.pitchFromDegree(i)
             n = note.Note()
             n.pitch = p
@@ -2654,7 +2656,7 @@ class MeasureExporter(XMLExporterBase):
          ('TimeSignature', 'timeSignatureToXml'),
         ])
 
-    ignoreOnParseClasses = set(['LayoutBase', 'Barline'])
+    ignoreOnParseClasses = {'LayoutBase', 'Barline'}
 
 
     def __init__(self, measureObj=None, parent=None):
@@ -2862,15 +2864,15 @@ class MeasureExporter(XMLExporterBase):
         to the <measure> tag. (2) spanners related to the object that should appear after the
         object in the measure tag.
         '''
-        def getProc(su, target):
+        def getProc(su, innerTarget):
             if len(su) == 1:  # have a one element wedge
                 proc = ('first', 'last')
             else:
-                if su.isFirst(target) and su.isLast(target):
+                if su.isFirst(innerTarget) and su.isLast(innerTarget):
                     proc = ('first', 'last')  # same element can be first and last
-                elif su.isFirst(target):
+                elif su.isFirst(innerTarget):
                     proc = ('first',)
-                elif su.isLast(target):
+                elif su.isLast(innerTarget):
                     proc = ('last',)
                 else:
                     proc = ()
@@ -2965,8 +2967,7 @@ class MeasureExporter(XMLExporterBase):
         >>> st['spread']
         15
         '''
-        post = {}
-        post['type'] = 'start'
+        post = {'type': 'start'}
         if spannerClass == 'Ottava':
             post['size'] = sp.shiftMagnitude()
             post['type'] = sp.shiftDirection(reverse=True)  # up or down
@@ -2996,8 +2997,7 @@ class MeasureExporter(XMLExporterBase):
         >>> en['size']
         8
         '''
-        post = {}
-        post['type'] = 'stop'
+        post = {'type': 'stop'}
         if spannerClass == 'Ottava':
             post['size'] = sp.shiftMagnitude()
         elif spannerClass == 'Line':
@@ -3194,7 +3194,7 @@ class MeasureExporter(XMLExporterBase):
 
 
         >>> r = note.Rest()
-        >>> r.quarterLength = 1.0/3
+        >>> r.quarterLength = 1/3
         >>> r.duration.tuplets[0].type = 'start'
         >>> mxRest = MEX.noteToXml(r)
         >>> MEX.dump(mxRest)
@@ -5166,7 +5166,7 @@ class MeasureExporter(XMLExporterBase):
 
     def textExpressionToXml(self, teOrRe):
         '''
-        Convert a TextExpression or RepreatExpression to a MusicXML mxDirection type.
+        Convert a TextExpression or RepeatExpression to a MusicXML mxDirection type.
         returns a musicxml.mxObjects.Direction object
         '''
         mxWords = Element('words')
@@ -5176,6 +5176,8 @@ class MeasureExporter(XMLExporterBase):
         elif hasattr(teOrRe, 'getText'):  # RepeatExpression
             te = teOrRe.getTextExpression()
             mxWords.text = str(te.content)
+        else:
+            raise MusicXMLExportException('teOrRe must be a TextExpression or RepeatExpression')
 
         self.setTextFormatting(mxWords, te)
 

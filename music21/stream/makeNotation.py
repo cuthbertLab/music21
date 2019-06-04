@@ -1188,7 +1188,7 @@ def makeTupletBrackets(s, *, inPlace=False):
     TODO: does not handle nested tuplets
 
     >>> n = note.Note()
-    >>> n.duration.quarterLength = 1.0/3
+    >>> n.duration.quarterLength = 1/3
     >>> s = stream.Stream()
     >>> s.insert(0, meter.TimeSignature('2/4'))
     >>> s.repeatAppend(n, 6)

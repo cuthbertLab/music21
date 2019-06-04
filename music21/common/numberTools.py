@@ -831,13 +831,13 @@ def approximateGCD(values, grain=1e-4):
     1.0
     >>> common.approximateGCD([2, 5, 10, 0.25])
     0.25
-    >>> common.strTrimFloat(common.approximateGCD([1/3., 2/3.]))
+    >>> common.strTrimFloat(common.approximateGCD([1/3, 2/3]))
     '0.3333'
-    >>> common.strTrimFloat(common.approximateGCD([5/3., 2/3., 4]))
+    >>> common.strTrimFloat(common.approximateGCD([5/3, 2/3, 4]))
     '0.3333'
-    >>> common.strTrimFloat(common.approximateGCD([5/3., 2/3., 5]))
+    >>> common.strTrimFloat(common.approximateGCD([5/3, 2/3, 5]))
     '0.3333'
-    >>> common.strTrimFloat(common.approximateGCD([5/3., 2/3., 5/6., 3/6.]))
+    >>> common.strTrimFloat(common.approximateGCD([5/3, 2/3, 5/6, 3/6]))
     '0.1667'
 
     :rtype: float

@@ -170,7 +170,7 @@ class Test(unittest.TestCase):
         Creating 10000 Duration objects
         '''
         from music21 import duration
-        qlList = [4, 2, 1, .5, 1/3., .25, .125]
+        qlList = [4, 2, 1, .5, 1/3, .25, .125]
 
         for i in range(10000):
             ql = qlList[i%len(qlList)]

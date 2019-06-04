@@ -93,12 +93,12 @@ def convertTempoByReferent(numberSrc, quarterLengthBeatSrc,
 
     60 at dotted quarter, get trip
 
-    >>> tempo.convertTempoByReferent(60, 1.5, 1/3.)
+    >>> tempo.convertTempoByReferent(60, 1.5, 1/3)
     270.0
 
     A Fraction instance can also be used:
 
-    >>> tempo.convertTempoByReferent(60, 1.5, common.opFrac(1/3.))
+    >>> tempo.convertTempoByReferent(60, 1.5, common.opFrac(1/3))
     270.0
 
     '''

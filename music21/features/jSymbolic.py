@@ -4442,7 +4442,7 @@ class Test(unittest.TestCase):
 
         fe = features.jSymbolic.StepwiseMotionFeature(s)
         f = fe.extract()
-        self.assertEqual(f.vector, [2/3.])
+        self.assertEqual(f.vector, [2/3])
 
     def testMelodicThirdsFeature(self):
         from music21 import stream, pitch, note, features
@@ -4456,7 +4456,7 @@ class Test(unittest.TestCase):
 
         fe = features.jSymbolic.MelodicThirdsFeature(s)
         f = fe.extract()
-        self.assertEqual(f.vector, [1/6.])
+        self.assertEqual(f.vector, [1/6])
 
     def testMelodicFifthsFeature(self):
         from music21 import stream, pitch, note, features
@@ -4470,7 +4470,7 @@ class Test(unittest.TestCase):
 
         fe = features.jSymbolic.MelodicFifthsFeature(s)
         f = fe.extract()
-        self.assertEqual(f.vector, [2/6.])
+        self.assertEqual(f.vector, [2/6])
 
     def testMelodicTritonesFeature(self):
         from music21 import stream, pitch, note, features
@@ -4484,7 +4484,7 @@ class Test(unittest.TestCase):
 
         fe = features.jSymbolic.MelodicTritonesFeature(s)
         f = fe.extract()
-        self.assertEqual(f.vector, [1/6.])
+        self.assertEqual(f.vector, [1/6])
 
     def testMelodicOctavesFeature(self):
         from music21 import stream, pitch, note, features
@@ -4498,7 +4498,7 @@ class Test(unittest.TestCase):
 
         fe = features.jSymbolic.MelodicOctavesFeature(s)
         f = fe.extract()
-        self.assertEqual(f.vector, [1/6.])
+        self.assertEqual(f.vector, [1/6])
 
     def testDirectionOfMotionFeature(self):
         from music21 import stream, pitch, note, features
@@ -4583,7 +4583,7 @@ class Test(unittest.TestCase):
             s.append(note.Note(copy.deepcopy(p)))
         fe = features.jSymbolic.SizeOfMelodicArcsFeature(s)
         unused_f = fe.extract()
-        #self.assertAlmostEqual(f.vector[0], 1+2/3.)
+        # self.assertAlmostEqual(f.vector[0], 1 + 2/3)
 
     def testNoteDensityFeatureA(self):
         from music21 import stream, note, tempo, features

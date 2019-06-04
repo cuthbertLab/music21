@@ -632,7 +632,7 @@ class GeneralNote(base.Music21Object):
 
         >>> n = note.Note()
         >>> n.quarterLength = 3
-        >>> n2 = n.augmentOrDiminish(1.0/3, inPlace=False)
+        >>> n2 = n.augmentOrDiminish(1/3, inPlace=False)
         >>> n2.quarterLength
         1.0
         >>> n.quarterLength

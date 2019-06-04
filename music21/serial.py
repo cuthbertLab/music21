@@ -536,7 +536,7 @@ class ToneRow(stream.Stream):
         >>> schoenberg25.findZeroCenteredTransformations(schoenberg26)
         []
         >>> schoenberg26.findZeroCenteredTransformations(
-        ...     schoenberg26.zeroCenteredTransformation('RI',8))
+        ...     schoenberg26.zeroCenteredTransformation('RI', 8))
         [('RI', 8)]
         '''
         if len(self) != len(otherRow):
@@ -736,14 +736,14 @@ class TwelveToneRow(ToneRow):
         if convention == 'zero':
             for historicalRow in historicalDict:
                 trans = getHistoricalRowByName(historicalRow).findZeroCenteredTransformations(self)
-                if trans != []:
+                if trans:
                     samerows.append((historicalRow, trans))
             return samerows
         if convention == 'original':
             for historicalRow in historicalDict:
                 historicalRowObject = getHistoricalRowByName(historicalRow)
                 trans = historicalRowObject.findOriginalCenteredTransformations(self)
-                if trans != []:
+                if trans:
                     samerows.append((historicalRow, trans))
             return samerows
         else:
@@ -968,7 +968,7 @@ class TwelveToneRow(ToneRow):
                     if fullLinkIntervals[i] == intervals:
                         classification = linkClassification[i]
                         specialintervals.append(specialLinkIntervals[i])
-            if specialintervals == []:
+            if not specialintervals:
                 return None, []
             else:
                 return classification, specialintervals
