@@ -1167,6 +1167,38 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[2].flat.notesAndRests), 44)
         self.assertEqual(len(s.parts[3].flat.notesAndRests), 41)
 
+    def testStripTiesChords(self):
+        '''
+        Test whether strip ties merges some chords that are the same and
+        some that are not.
+        '''
+        from music21 import stream, tie, meter
+        ch0 = chord.Chord('C4 E4 G4')
+        ch1 = chord.Chord('C4 E4 G4')
+        ch2 = chord.Chord('C3 E3 G3')
+        ch3 = chord.Chord('C3 E-3 G3')
+        ch4 = chord.Chord('D4 F#4 A4')
+        ch5 = chord.Chord('D4 F#4')
+        chords = [ch0, ch1, ch2, ch3, ch4, ch5]
+        p = stream.Part()
+        p.append(meter.TimeSignature('1/4'))
+        for i in range(6):
+            c = chords[i]
+            if not i % 2:
+                t = tie.Tie('start')
+                c.tie = t
+            m = stream.Measure(number=i + 1)
+            m.append(c)
+            p.append(m)
+        p2 = p.stripTies(matchByPitch=True)
+        chordsOut = list(p2.getElementsByClass('Chord'))
+        self.assertEqual(len(chordsOut), 5)
+        self.assertEqual(chordsOut[0].pitches, ch0.pitches)
+        self.assertEqual(chordsOut[0].duration.quarterLength, 2.0)
+        self.assertEqual(chordsOut[1].pitches, ch2.pitches)
+        self.assertEqual(chordsOut[2].pitches, ch3.pitches)
+        self.assertEqual(chordsOut[3].pitches, ch4.pitches)
+        self.assertEqual(chordsOut[4].pitches, ch5.pitches)
 
 
     def testTwoStreamMethods(self):
@@ -6286,6 +6318,25 @@ class Test(unittest.TestCase):
 
         unused_qj2 = qj.invertDiatonic(note.Note('F4'), inPlace=False)
         #qj2.measures(1, 2).show('text')
+
+    def testInvertDiatonicQuickSearch(self):
+        '''
+        doctests sufficiently search invertDiatonic for complex cases,
+        but not simple ones.
+        '''
+        from music21 import stream
+        m = stream.Measure()
+        m.insert(0, note.Note('G4'))
+        m2 = m.invertDiatonic()
+        self.assertEqual(m2.recurse().notes[0].nameWithOctave, 'F3')
+        m.insert(0, key.Key('G'))
+        m3 = m.invertDiatonic()
+        self.assertEqual(m3.recurse().notes[0].nameWithOctave, 'F#3')
+        m4 = m.invertDiatonic(note.Note('G4'))
+        self.assertEqual(m4.recurse().notes[0].nameWithOctave, 'G4')
+        m5 = m.invertDiatonic(note.Note('G3'))
+        self.assertEqual(m5.recurse().notes[0].nameWithOctave, 'G2')
+
 
 
     def testSemiFlatCachingA(self):

@@ -1163,9 +1163,9 @@ class HumdrumSpine:
         >>> s1.append(m2)
         >>> s1.append(note.Note('D4', type='half'))
         >>> s1.show('text')
-        {0.0} <music21.meter.TimeSignature 2/4>
         {0.0} <music21.stream.Measure 1 offset=0.0>
         <BLANKLINE>
+        {0.0} <music21.meter.TimeSignature 2/4>
         {0.0} <music21.note.Note C>
         {1.0} <music21.stream.Measure 2 offset=1.0>
         <BLANKLINE>
